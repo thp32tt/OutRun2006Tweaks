@@ -73,24 +73,6 @@ include(FetchContent)
 if(POLICY CMP0135)
 	cmake_policy(SET CMP0135 NEW)
 endif()
-message(STATUS "Fetching zydis (v4.0.0)...")
-FetchContent_Declare(zydis
-	GIT_REPOSITORY
-		"https://github.com/zyantific/zydis"
-	GIT_TAG
-		v4.0.0
-)
-FetchContent_MakeAvailable(zydis)
-
-message(STATUS "Fetching safetyhook (629558c64009a7291ba6ed5cfb49187086a27a47)...")
-FetchContent_Declare(safetyhook
-	GIT_REPOSITORY
-		"https://github.com/cursey/safetyhook"
-	GIT_TAG
-		629558c64009a7291ba6ed5cfb49187086a27a47
-)
-FetchContent_MakeAvailable(safetyhook)
-
 message(STATUS "Fetching ogg (v1.3.6)...")
 FetchContent_Declare(ogg
 	GIT_REPOSITORY
@@ -146,6 +128,17 @@ FetchContent_Declare(sdl
 		release-3.4.12
 )
 FetchContent_MakeAvailable(sdl)
+
+set(SAFETYHOOK_FETCH_ZYDIS ON)
+
+message(STATUS "Fetching safetyhook (f44cc070a8340f2f26649553c49533475417304d)...")
+FetchContent_Declare(safetyhook
+	GIT_REPOSITORY
+		"https://github.com/cursey/safetyhook"
+	GIT_TAG
+		f44cc070a8340f2f26649553c49533475417304d
+)
+FetchContent_MakeAvailable(safetyhook)
 
 # Target: spdlog
 set(spdlog_SOURCES

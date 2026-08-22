@@ -58,14 +58,19 @@ compile-definitions = ["SPDLOG_COMPILED_LIB", "_DISABLE_CONSTEXPR_MUTEX_CONSTRUC
 compile-options = ["/utf-8"]
 
 [fetch-content]
-zydis = { git = "https://github.com/zyantific/zydis", tag = "v4.0.0" }
-safetyhook = { git = "https://github.com/cursey/safetyhook", tag = "629558c64009a7291ba6ed5cfb49187086a27a47" }
 ogg = { git = "https://github.com/xiph/ogg", tag = "v1.3.6" }
 flac = { git = "https://github.com/xiph/flac", tag = "1.5.0" }
 miniupnpc = { git = "https://github.com/miniupnp/miniupnp", tag = "miniupnpd_2_3_10", subdir = "miniupnpc" }
 jsoncpp = { git = "https://github.com/open-source-parsers/jsoncpp.git", tag = "1.9.8" }
 zlib = { git = "https://github.com/madler/zlib", tag = "v1.3.2" }
 sdl = { git = "https://github.com/libsdl-org/SDL", tag = "release-3.4.12" }
+
+[fetch-content.safetyhook]
+git = "https://github.com/cursey/safetyhook"
+tag = "f44cc070a8340f2f26649553c49533475417304d"
+cmake-before="""
+set(SAFETYHOOK_FETCH_ZYDIS ON)
+"""
 
 [target.outrun2006tweaks]
 type = "shared"
