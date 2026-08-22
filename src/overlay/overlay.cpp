@@ -541,7 +541,7 @@ static void render_first_run_intro()
 
 	const ImVec2 display = ImGui::GetIO().DisplaySize;
 	ImGui::SetNextWindowPos(ImVec2(display.x * 0.5f, display.y * 0.5f), 0, ImVec2(0.5f, 0.5f));
-	ImGui::SetNextWindowSize(ImVec2(display.x * (0.1f * Overlay::GlobalFontScale), 0.0f));
+	ImGui::SetNextWindowSize(ImVec2(384.0f * Overlay::GlobalFontScale, 0.0f));
 
 	if (!ImGui::BeginPopupModal(Title, nullptr, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize))
 		return;
