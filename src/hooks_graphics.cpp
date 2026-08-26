@@ -12,6 +12,9 @@ namespace Settings
 	Setting<bool> SkyGlowTwoStep{ "Graphics", "SkyGlowTwoStep", true,
 		"Reduces aliasing in the sky glow effect by handling the SkyGlowFactor in two steps. "
 		"Likely not console-accurate, but can help reduce the aliasing with Factor = 4 or higher." };
+	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
+		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
+
 	Setting<bool> UseHiDefCharacters{ "Graphics", "UseHiDefCharacters", true,
 		"Forces hi-def versions of Alberto/Jennifer/Clarissa during gameplay." };
 
@@ -154,6 +157,121 @@ public:
 	static RestoreCarBaseShadow instance;
 };
 RestoreCarBaseShadow RestoreCarBaseShadow::instance;
+
+// Restores the console's lighting dynamic range, which the PC port didn't make
+// use of, costing roughly a third of the sun on surfaces facing it.
+//
+// In the stage data the light diffuse is often authored between 1.00 - 1.64 on
+// the original OR2 stages.
+// The vertex shader ends on "mad oD0, r0, r2, r1", and oD0 is a colour output,
+// which hardware clamps to 0.0 - 1.0. So saturate(N dot L) * material * 1.64 clips 
+// at 1.0 and the pixel stage then modulates the texture by 1.0 instead of 1.64.
+//
+// The console keeps the same value under the clamp by working in a dynamic range
+// of 2: the light diffuse is halved into the constant, the ambient half of the
+// equation is scaled by CV_R_DRANGE (c16) to match, and the first texture stage
+// then doubles the result back with D3DTOP_MODULATE2X. The arcade shader source
+// names the constant "reciprocal of dynamic range" and comments the clamp.
+//
+class RestoreXboxBrightness : public Hook
+{
+	// (1) Doubling is chosen per shader by a flag holding the bound shader's id.
+	// Only id 1, a shader combined from the VsUnit tables, has its lighting halved
+	// and so wants doubling back. vsSelectVertexShader binds the shader and returns
+	// without ever writing the flag; the one path that does write it is for an entry
+	// carrying no shader, which writes zero, so the flag never holds 1.
+	//
+	// The hook adds the missing write where the shader is bound. esi holds the
+	// shader entry there, and its third word is the id.
+	static constexpr int SelectVertexShader_IdBranch_Addr = 0x106E9;
+	static constexpr int Modulate2xFlag_Addr = 0x49EDD0;
+	static constexpr int ShaderEntry_Id = 2;
+
+	inline static SafetyHookMid SelectVertexShader_hook = {};
+	static void SelectVertexShader_dest(safetyhook::Context& ctx)
+	{
+		const uint32_t* entry = reinterpret_cast<const uint32_t*>(ctx.esi);
+		if (entry)
+			*Module::exe_ptr<uint32_t>(Modulate2xFlag_Addr) = entry[ShaderEntry_Id];
+	}
+
+	// (2) The promotion has to be redone for every material. psSetTextureColorOp
+	// has its own copy of it but only reaches that when the requested colour op
+	// differs from the previous one, and it records the op unpromoted. Two materials
+	// that both ask for MODULATE are then identical to that test even when their
+	// shader ids differ, so the second inherits the first's MODULATE2X combiner and
+	// its intensity_state.
+	//
+	// Promoting from a hook at the entry, with the in-function copy blanked, makes
+	// the op reaching that test the promoted one. A differing shader id then reopens
+	// it by itself, while an op that really is unchanged still short circuits and
+	// avoids rebuilding the shader every draw.
+	static constexpr int PsSetTextureColorOp_Addr = 0xB800;
+	static constexpr int PsSetTextureColorOp_Inline_Addr = 0xB832;
+	static constexpr int PsSetTextureColorOp_Inline_Size = 29;
+	static constexpr int IntensityState_Addr = 0x49EDC8;
+	static constexpr uint32_t Op_Modulate = 4;
+	static constexpr uint32_t Op_Modulate2x = 5;
+
+	inline static SafetyHookMid PsSetTextureColorOp_hook = {};
+	static void PsSetTextureColorOp_dest(safetyhook::Context& ctx)
+	{
+		// __usercall: eax is the texture stage, edx the requested colour op.
+		if (ctx.eax != 0 || !Settings::RestoreXboxBrightness)
+			return;
+
+		uint32_t* intensityState = Module::exe_ptr<uint32_t>(IntensityState_Addr);
+		*intensityState = 0;
+
+		if (ctx.edx != Op_Modulate)
+			return;
+		if (*Module::exe_ptr<uint32_t>(Modulate2xFlag_Addr) != 1)
+			return;
+
+		ctx.edx = Op_Modulate2x;
+		*intensityState = 1;
+	}
+
+	// (3) Texture stage 0's MODULATE2X snippet is a copy of the plain MODULATE one
+	// in both shader model tables, missing the shift that does the doubling. Stage 1
+	// carries it in both. Bits 24 to 27 of a destination token hold the shift, where
+	// 1 means _x2. Both tables need patching: a material landing on the untouched
+	// one gets the halved light with nothing to double it back.
+	static constexpr int Modulate2xShift_ps11_Addr = 0x21EB43;
+	static constexpr int Modulate2xShift_ps14_Addr = 0x21EF97;
+
+	// (4) vsSetLightIntensity uploads the halved diffuse and c16 only on the frame
+	// the mode turns on, and vsSetDirctinalLight overwrites that same register with
+	// the unhalved diffuse every frame after. Dropping the test re-uploads it per
+	// material, which runs after the light setup rather than before it.
+	static constexpr int IntensityLatch_Addr = 0x10D16;
+
+public:
+	std::string_view description() override
+	{
+		return "RestoreXboxBrightness";
+	}
+
+	bool apply() override
+	{
+		Memory::VP::Patch(Module::exe_ptr<uint8_t>(Modulate2xShift_ps11_Addr), uint8_t(0x81));
+		Memory::VP::Patch(Module::exe_ptr<uint8_t>(Modulate2xShift_ps14_Addr), uint8_t(0x81));
+
+		Memory::VP::Nop(Module::exe_ptr(IntensityLatch_Addr), 6);
+		Memory::VP::Nop(Module::exe_ptr(PsSetTextureColorOp_Inline_Addr),
+			PsSetTextureColorOp_Inline_Size);
+
+		SelectVertexShader_hook = safetyhook::create_mid(
+			Module::exe_ptr(SelectVertexShader_IdBranch_Addr), SelectVertexShader_dest);
+		PsSetTextureColorOp_hook = safetyhook::create_mid(
+			Module::exe_ptr(PsSetTextureColorOp_Addr), PsSetTextureColorOp_dest);
+
+		return SelectVertexShader_hook && PsSetTextureColorOp_hook;
+	}
+
+	static RestoreXboxBrightness instance;
+};
+RestoreXboxBrightness RestoreXboxBrightness::instance;
 
 // Restores the console sky glow, which PC port mostly included but was disabled
 // in the code due to various issues.
@@ -1121,6 +1239,27 @@ class AnisotropicFiltering : public Hook
 		Game::D3DDevice()->SetSamplerState(Sampler, D3DSAMP_MAXANISOTROPY, Settings::AnisotropicFiltering);
 	}
 
+	// ChangeTexAttribute reads the mip filter from bits 19-20 of the material and
+	// passes it straight to D3DSAMP_MIPFILTER, but first rewrites a 3 into a 1:
+	// D3DTEXF_ANISOTROPIC is not a legal D3D9 mip filter, and it picks POINT rather
+	// than LINEAR to replace it.
+	// A material asking for the best filtering therefore gets hard mip transitions, 
+	// which shimmer wherever the mip level changes quickly across a surface, thin 
+	// geometry seen at an angle most of all.
+	const static int MipFilter_HookAddr = 0x9B73;
+
+	inline static SafetyHookMid mip_hook = {};
+	static void mip_destination(safetyhook::Context& ctx)
+	{
+		if (Settings::AnisotropicFiltering <= 0)
+			return;
+
+		// Only upgrade POINT. A material that asked for no mipmapping at all is
+		// left alone, since that is a deliberate choice for 2D and UI textures.
+		if (ctx.esi == D3DTEXF_POINT)
+			ctx.esi = D3DTEXF_LINEAR;
+	}
+
 	inline static SafetyHookMid dest_hook2 = {};
 	static void destination2(safetyhook::Context& ctx)
 	{
@@ -1149,6 +1288,7 @@ public:
 	{
 		dest_hook = safetyhook::create_mid(Module::exe_ptr(ChangeTexAttribute_HookAddr1), destination);
 		dest_hook2 = safetyhook::create_mid(Module::exe_ptr(ChangeTexAttribute_HookAddr2), destination2);
+		mip_hook = safetyhook::create_mid(Module::exe_ptr(MipFilter_HookAddr), mip_destination);
 
 		return true;
 	}
