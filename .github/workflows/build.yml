@@ -19,16 +19,16 @@ jobs:
       - name: Include experimental WheelFFB source
         shell: pwsh
         run: |
-          if (Test-Path "src/hooks_wheel_ffb.cpp") {
+          if (Test-Path "src/hooks_wheel_ffb_build.cpp") {
             $cmake = Get-Content CMakeLists.txt -Raw
-            if ($cmake -notmatch 'src/hooks_wheel_ffb\.cpp') {
+            if ($cmake -notmatch 'src/hooks_wheel_ffb_build\.cpp') {
               $needle = "`t`"src/hooks_forcefeedback.cpp`""
-              $insert = "$needle`r`n`t`"src/hooks_wheel_ffb.cpp`""
+              $insert = "$needle`r`n`t`"src/hooks_wheel_ffb_build.cpp`""
               $cmake = $cmake.Replace($needle, $insert)
               Set-Content -Path CMakeLists.txt -Value $cmake -NoNewline
             }
-            if (-not (Select-String -Path CMakeLists.txt -Pattern 'src/hooks_wheel_ffb\.cpp' -Quiet)) {
-              throw "Failed to add hooks_wheel_ffb.cpp to generated CMake source list"
+            if (-not (Select-String -Path CMakeLists.txt -Pattern 'src/hooks_wheel_ffb_build\.cpp' -Quiet)) {
+              throw "Failed to add hooks_wheel_ffb_build.cpp to generated CMake source list"
             }
           }
 
