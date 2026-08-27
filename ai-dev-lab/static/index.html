@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AgentBoard</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; color-scheme: light dark; }
+    body { max-width: 1000px; margin: 0 auto; padding: 32px 20px; }
+    h1 { margin-bottom: 4px; }
+    .muted { opacity: .7; }
+    form, .task { border: 1px solid #8885; border-radius: 12px; padding: 14px; }
+    form { display: grid; gap: 10px; margin: 24px 0; }
+    input, textarea, select, button { font: inherit; padding: 9px; }
+    .columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .column { min-width: 0; }
+    .task { margin: 10px 0; }
+    .task h3 { margin: 0 0 6px; }
+    .task p { white-space: pre-wrap; }
+    .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    @media (max-width: 760px) { .columns { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <h1>AgentBoard</h1>
+  <div class="muted">A tiny task board built to be modified by coding agents.</div>
+
+  <form id="new-task">
+    <strong>Create task</strong>
+    <input id="title" maxlength="120" placeholder="Task title" required />
+    <textarea id="description" maxlength="2000" placeholder="Description"></textarea>
+    <label>Priority
+      <select id="priority">
+        <option value="1">1 - High</option>
+        <option value="2" selected>2 - Normal</option>
+        <option value="3">3 - Low</option>
+      </select>
+    </label>
+    <button type="submit">Add task</button>
+  </form>
+
+  <div class="columns" id="board"></div>
+
+  <script>
+    const statuses = [
+      ["todo", "To do"],
+      ["doing", "Doing"],
+      ["done", "Done"],
+    ];
+
+    async function api(url, options = {}) {
+      const response = await fetch(url, {
+        headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+        ...options,
+      });
+      if (!response.ok) {
+        const body = await response.text();
+        throw new Error(body || `HTTP ${response.status}`);
+      }
+      return response.status === 204 ? null : response.json();
+    }
+
+    function escapeHtml(value) {
+      const div = document.createElement("div");
+      div.textContent = value;
+      return div.innerHTML;
+    }
+
+    async function load() {
+      const tasks = await api("/api/tasks");
+      const board = document.querySelector("#board");
+      board.innerHTML = statuses.map(([status, label]) => {
+        const cards = tasks.filter(t => t.status === status).map(t => `
+          <div class="task">
+            <h3>${escapeHtml(t.title)}</h3>
+            <div class="muted">Priority ${t.priority}</div>
+            <p>${escapeHtml(t.description)}</p>
+            <div class="row">
+              <select onchange="moveTask(${t.id}, this.value)">
+                ${statuses.map(([s, l]) => `<option value="${s}" ${s === t.status ? "selected" : ""}>${l}</option>`).join("")}
+              </select>
+              <button onclick="deleteTask(${t.id})">Delete</button>
+            </div>
+          </div>`).join("");
+        return `<section class="column"><h2>${label}</h2>${cards || '<div class="muted">No tasks</div>'}</section>`;
+      }).join("");
+    }
+
+    async function moveTask(id, status) {
+      await api(`/api/tasks/${id}`, { method: "PATCH", body: JSON.stringify({ status }) });
+      await load();
+    }
+
+    async function deleteTask(id) {
+      if (!confirm("Delete this task?")) return;
+      await api(`/api/tasks/${id}`, { method: "DELETE" });
+      await load();
+    }
+
+    document.querySelector("#new-task").addEventListener("submit", async event => {
+      event.preventDefault();
+      await api("/api/tasks", {
+        method: "POST",
+        body: JSON.stringify({
+          title: document.querySelector("#title").value,
+          description: document.querySelector("#description").value,
+          priority: Number(document.querySelector("#priority").value),
+        }),
+      });
+      event.target.reset();
+      await load();
+    });
+
+    load().catch(error => {
+      document.querySelector("#board").textContent = `Failed to load: ${error.message}`;
+    });
+  </script>
+</body>
+</html>
