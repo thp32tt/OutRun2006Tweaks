@@ -1,0 +1,30 @@
+name: AgentBoard CI
+
+on:
+  push:
+    branches: [ai-dev-lab]
+    paths:
+      - 'ai-dev-lab/**'
+      - '.github/workflows/ai-dev-lab-ci.yml'
+  pull_request:
+    paths:
+      - 'ai-dev-lab/**'
+      - '.github/workflows/ai-dev-lab-ci.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ai-dev-lab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: ai-dev-lab/pyproject.toml
+      - name: Install
+        run: pip install -e '.[dev]'
+      - name: Test
+        run: pytest
