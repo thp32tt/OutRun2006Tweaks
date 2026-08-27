@@ -1,1 +1,0 @@
-Temporary marker: rebuilding Wheel FFB around DirectInput COM based on d-b-c-e/OutRun2006Tweaks-FFB hardware-validated design. This file will be updated/removed once integration completes.
