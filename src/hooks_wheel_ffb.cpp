@@ -54,16 +54,6 @@ namespace Settings
         Range<float>{ 0.01f, 1.0f }
     };
 
-    Setting<int> WheelFFBSteeringCenter{
-        "WheelFFB", "SteeringCenter", 32767,
-        "Raw 16-bit steering-axis center.", Range<int>{ 0, 65535 }
-    };
-
-    Setting<int> WheelFFBSteeringRange{
-        "WheelFFB", "SteeringRange", 32767,
-        "Raw 16-bit steering-axis half-range.", Range<int>{ 1000, 65535 }
-    };
-
     Setting<bool> WheelFFBInvertForce{
         "WheelFFB", "InvertForce", false,
         "Invert the constant-force direction."
@@ -119,15 +109,19 @@ namespace
                 Game::current_mode && (*Game::current_mode == STATE_GAME);
 
             float steer = 0.0f;
-            if (inGame && Game::dinput_state && Game::dinput_state->deviceReady_1D0)
+            if (inGame)
             {
-                const int raw = static_cast<int>(Game::dinput_state->axes_94[0]);
-                const int center = Settings::WheelFFBSteeringCenter;
-                const int range = std::max(1000, static_cast<int>(Settings::WheelFFBSteeringRange));
-
-                steer = std::clamp(
-                    static_cast<float>(raw - center) / static_cast<float>(range),
-                    -1.0f, 1.0f);
+                // Ask the game's own GetVolume function for steering.
+                // When UseNewInput is enabled, Tweaks already hooks this address
+                // and returns the current SDL input value; with legacy input the
+                // original game function returns the DirectInput steering value.
+                using GetVolumeFn = int(__cdecl*)(ADChannel);
+                auto getVolume = Module::fn_ptr<GetVolumeFn>(0x53720);
+                if (getVolume)
+                {
+                    const int rawSteer = getVolume(ADChannel::Steering);
+                    steer = std::clamp(rawSteer / 127.0f, -1.0f, 1.0f);
+                }
             }
 
             float target = 0.0f;
