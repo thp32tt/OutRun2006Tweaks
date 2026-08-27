@@ -1,0 +1,1 @@
+"""AgentBoard application package."""
