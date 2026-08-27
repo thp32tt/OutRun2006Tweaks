@@ -46,3 +46,7 @@ This is a first hardware smoke-test build. It is intended to verify:
 4. The restored Xbox vibration signal can drive a sine texture effect.
 
 True SAT, slip-based unloading, wall impact shaping, gear-shift pulses and separate road/kerb effects come after the output path is verified on real hardware.
+
+## CI
+
+GitHub Actions is enabled for this fork. Every push to `wheel-ffb` should run the repository's existing Windows 2022 / Visual Studio 2022 Win32 Release workflow and upload the normal Tweaks build as an artifact.
