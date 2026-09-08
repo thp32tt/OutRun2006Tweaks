@@ -16,13 +16,13 @@
 // MOZA R3 / ES-family menu navigation helper for the legacy DirectInput path.
 //
 // The original game can auto-bind an analogue wheel/pedal axis to menu
-// Up/Down.  On modern wheels that axis may not be centred the way OutRun 2006
-// expects, so the menu scrolls continuously.  Rather than trying to guess which
+// Up/Down. On modern wheels that axis may not be centred the way OutRun 2006
+// expects, so the menu scrolls continuously. Rather than trying to guess which
 // legacy axis should be neutral, this helper replaces menu direction input with
 // the R3 wheel's physical D-pad buttons while outside STATE_GAME.
 //
 // MOZA Pit House numbers buttons from 1, while DIJOYSTATE2::rgbButtons is
-// zero-based.  Public R3+ES profiles consistently map the D-pad as:
+// zero-based. Public R3+ES profiles consistently map the D-pad as:
 //   Up=5, Right=6, Down=7, Left=8  (Pit House numbering)
 // The values remain configurable in case a firmware/wheel revision differs.
 namespace Settings
@@ -67,7 +67,7 @@ namespace
             uint32_t rawMask;
             uint32_t switchMask;
             int virtualKey;
-            Setting<int>* buttonSetting;
+            Settings::Setting<int>* buttonSetting;
             const char* name;
         };
 
@@ -328,7 +328,7 @@ namespace
 
             for (const auto& direction : Directions)
             {
-                if (buttonHeld(state, int(*direction.buttonSetting)))
+                if (buttonHeld(state, int(direction.buttonSetting->get())))
                     result |= direction.rawMask;
             }
             return true;
