@@ -96,6 +96,7 @@ namespace Settings
 
 	extern Setting<bool> AllowFLAC;                        // hooks_flac.cpp
 
+	extern Setting<bool> WheelInputCompatibility;          // input_manager.cpp
 	extern Setting<bool> UseNewInput;                      // input_manager.cpp
 	extern Setting<bool> BypassGameSensitivity;            // input_manager.cpp
 	extern Setting<float> SteeringDeadZone;                // hooks_input.cpp

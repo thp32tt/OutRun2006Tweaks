@@ -4,6 +4,7 @@ This branch adds native steering-wheel force feedback to current OutRun2006Tweak
 
 ## Current architecture
 
+- **Wheel input:** the game's original DirectInput path (the same path used by the working v0.6.1 release), selected by `WheelInputCompatibility = true`.
 - **FFB output:** Windows DirectInput 8 COM (`IDirectInputEffect`).
 - **Steering source:** the game's real `GetVolume(Steering)` path, not the unverified `EVWORK_CAR::field_1D0` value.
 - **Update cadence:** one update per `CalcVibrationValues()` / car-physics tick (normally 60 Hz).
@@ -47,6 +48,14 @@ Direct-drive safety is treated separately from the feel model:
 Settings can be overridden in `OutRun2006Tweaks.user.ini`:
 
 ```ini
+[Controls]
+# Keep this enabled for MOZA and other Windows steering wheels.
+WheelInputCompatibility = true
+UseNewInput = false
+ControllerHotPlug = false
+VibrationMode = 0
+ImpulseVibrationMode = 0
+
 [WheelFFB]
 Enable = true
 DeviceName = MOZA
@@ -90,12 +99,20 @@ This keeps steering FFB and synthesizes limited-frequency texture through Consta
 
 The first drive is still a smoke test. Verify these before judging fine feel:
 
-1. OutRun still sees steering and pedals normally.
-2. Log contains `WheelFFB: ready on 'MOZA ...'`.
-3. Left steering produces a restoring force toward the right and vice versa.
-4. Straight-line force does not violently oscillate.
-5. Alt-Tab and game exit remove torque cleanly.
-6. Only after the above, judge drift unloading, road texture, crash and gear effects.
+1. Connect and power on the wheel before launching the game.
+2. Bind/calibrate it through the game's **Options > Controller** screen.
+3. Do not use the F11 controller list for this mode. It belongs to the disabled SDL input path, so an empty list is expected.
+4. Confirm the log contains `WheelInputCompatibility: legacy DirectInput active` and `WheelFFB: ready on 'MOZA ...'`.
+5. Verify steering and pedals before judging force feedback.
+6. Left steering must produce a restoring force toward the right and vice versa.
+7. Straight-line force must not violently oscillate.
+8. Alt-Tab and game exit must remove torque cleanly.
+
+`InputBackend` only selects an SDL backend and is intentionally ignored while
+`WheelInputCompatibility` is enabled. If the old game controller configuration
+has become corrupted, exit the game and move `SaveGame/common.dat` somewhere
+safe before launching again; this resets more game settings than controls, so
+keep the backup.
 
 Useful log lines start with `WheelFFB:` or `WheelFFB DIAG:`.
 

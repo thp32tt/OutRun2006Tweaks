@@ -2,12 +2,16 @@
 
 namespace Settings
 {
+	Setting<bool> WheelInputCompatibility{ "Controls", "WheelInputCompatibility", true,
+		"Uses the game's legacy DirectInput controller path for steering wheels that SDL does not expose as gamepads. "
+		"When enabled, UseNewInput, ControllerHotPlug, and the built-in XInput vibration path are disabled at startup." };
+
 	Setting<int> InputBackend{ "Controls", "InputBackend", 0,
 		"Backend to use for the SDL3 input system. "
 		"If your controller fails to be detected, try changing the backend here and relaunching.",
 		{ "Windows.Gaming.Input", "RawInput", "DirectInput", "XInput" } };
 
-	Setting<bool> UseNewInput{ "Controls", "UseNewInput", true,
+	Setting<bool> UseNewInput{ "Controls", "UseNewInput", false,
 		"Enables new SDL-based input system, allowing game to see full trigger range without any shared trigger axes issues "
 		"(experimental, not every menu/gamemode has been tested with it yet)." };
 	Setting<bool> BypassGameSensitivity{ "Controls", "BypassGameSensitivity", false,
@@ -177,6 +181,7 @@ public:
 
 	void declare_settings() override
 	{
+		Settings::WheelInputCompatibility.needs_restart();
 		Settings::UseNewInput.needs_restart();
 		Settings::UseNewInput.hidden(Settings::UseNewInput); // Unhide if UseNewInput is disabled for some reason, hide if it's enabled
 		Settings::InputBackend.needs_restart();
