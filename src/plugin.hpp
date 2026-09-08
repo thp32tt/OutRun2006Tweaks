@@ -101,6 +101,8 @@ namespace Settings
 	extern Setting<bool> BypassGameSensitivity;            // input_manager.cpp
 	extern Setting<float> SteeringDeadZone;                // hooks_input.cpp
 	extern Setting<bool> ControllerHotPlug;                // hooks_input.cpp
+	extern Setting<bool> WheelAccelerationInvert;          // hooks_input.cpp
+	extern Setting<bool> WheelBrakeInvert;                 // hooks_input.cpp
 	extern Setting<int> ImpulseVibrationMode;              // hooks_input.cpp
 	extern Setting<float> ImpulseVibrationLeftMultiplier;  // hooks_input.cpp
 	extern Setting<float> ImpulseVibrationRightMultiplier; // hooks_input.cpp

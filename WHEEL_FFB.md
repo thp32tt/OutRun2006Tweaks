@@ -55,6 +55,9 @@ UseNewInput = false
 ControllerHotPlug = false
 VibrationMode = 0
 ImpulseVibrationMode = 0
+WheelAccelerationInvert = true
+WheelBrakeInvert = false
+WheelMenuDirectionFilter = true
 
 [WheelFFB]
 Enable = true
@@ -113,6 +116,18 @@ The first drive is still a smoke test. Verify these before judging fine feel:
 has become corrupted, exit the game and move `SaveGame/common.dat` somewhere
 safe before launching again; this resets more game settings than controls, so
 keep the backup.
+
+The MOZA accelerator can report its DirectInput axis in the opposite direction
+to the one expected by OutRun. The branch therefore defaults to
+`WheelAccelerationInvert = true`. If pressing the brake releases it and letting
+go applies it, set `WheelBrakeInvert = true` in `OutRun2006Tweaks.user.ini`.
+Use either these per-game settings or Pit House pedal inversion, not both.
+
+At rest, that reversed axis can also be interpreted as a held menu direction.
+`WheelMenuDirectionFilter = true` learns a direction that remains held outside
+a race and suppresses it. Other wheel directions and keyboard arrow keys remain
+available. The log records the learned direction as
+`WheelMenuDirectionFilter: suppressing continuously-held ...`.
 
 Useful log lines start with `WheelFFB:` or `WheelFFB DIAG:`.
 
