@@ -230,7 +230,7 @@ namespace
             }
 
             // Non-exclusive input reader: leave the original game DirectInput
-            // device and the FFB output device alone.
+            // device alone while navigating menus.
             hr = device->SetCooperativeLevel(
                 hwnd, DISCL_NONEXCLUSIVE | DISCL_BACKGROUND);
             if (FAILED(hr))
@@ -345,8 +345,20 @@ namespace
 
         static void replaceMenuDirections(SumoDInputState* state)
         {
-            if (!state || !activeInMenu())
+            if (!state)
                 return;
+
+            if (!activeInMenu())
+            {
+                // The FFB engine intentionally acquires the wheel exclusively.
+                // Release this non-exclusive menu reader before gameplay so it
+                // can never block FFB acquisition on drivers that enforce it.
+                if (device || directInput)
+                    releaseDevice();
+                previousDirectionsRaw = 0;
+                currentDirectionsRaw = 0;
+                return;
+            }
 
             uint32_t wheelDirections = 0;
             if (!pollDirectDirections(wheelDirections))
