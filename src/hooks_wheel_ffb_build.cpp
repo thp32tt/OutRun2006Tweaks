@@ -5,3 +5,4 @@
 #include "hooks_wheel_ffb.cpp"
 #include "hooks_wheel_input_compat_v2.hpp"
 #include "hooks_wheel_r3_menu_dpad.hpp"
+#include "hooks_wheel_menu_keyboard_back.hpp"
