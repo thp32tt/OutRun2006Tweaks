@@ -71,6 +71,11 @@ jobs:
         run: |
           python tools/patch_wheel_setup_ui_compile.py
 
+      - name: Add combined simulation FFB panel
+        shell: pwsh
+        run: |
+          python tools/patch_wheel_setup_ffb_panel.py
+
       - name: Configure
         run: |
           mkdir build
