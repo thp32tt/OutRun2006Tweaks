@@ -8,15 +8,15 @@
 #include "game_addrs.hpp"
 
 // Legacy-wheel menu Select helper.
-// The original controller calibration screen can stop accepting normal keyboard
-// input after a DirectInput wheel is selected.  Keep Enter available as the
-// game's A/Select action independently of the user's wheel/button bindings so a
-// completely unassigned controller profile can still be calibrated manually.
+// The original game reuses the button bound to Gear Up as Accept/Select in many
+// menus, including the legacy controller configuration screen. Some screens also
+// query A directly. Keep Enter available independently of the user's wheel/button
+// bindings so a completely-unassigned controller profile can still be calibrated.
 namespace Settings
 {
     Setting<bool> WheelMenuKeyboardEnterSelect{
         "Controls", "WheelMenuKeyboardEnterSelect", true,
-        "In legacy wheel mode, maps keyboard Enter to the game's A/Select menu action."
+        "In legacy wheel mode, maps keyboard Enter to the game's A/GearUp menu actions."
     };
 }
 
@@ -26,6 +26,7 @@ namespace
     {
         inline static constexpr uint32_t RawAMask = 0x00000002u;
         inline static constexpr uint32_t ASwitchMask = 1u << int(SwitchId::A);
+        inline static constexpr uint32_t GearUpSwitchMask = 1u << int(SwitchId::GearUp);
 
         inline static SafetyHookInline ReadIOHook = {};
         inline static SafetyHookInline SwitchNowHook = {};
@@ -47,6 +48,11 @@ namespace
         static bool enterHeldNow()
         {
             return (GetAsyncKeyState(VK_RETURN) & 0x8000) != 0;
+        }
+
+        static bool isSelectQuery(uint32_t switches)
+        {
+            return switches == ASwitchMask || switches == GearUpSwitchMask;
         }
 
         static int ReadIO_dest()
@@ -77,12 +83,12 @@ namespace
             if (result)
                 return result;
 
-            if (activeInMenu() && switches == ASwitchMask && enterHeldNow())
+            if (activeInMenu() && isSelectQuery(switches) && enterHeldNow())
             {
                 if (!logged)
                 {
                     logged = true;
-                    spdlog::info("WheelMenuKeyboardEnterSelect: Enter mapped to legacy A/Select menu action");
+                    spdlog::info("WheelMenuKeyboardEnterSelect: Enter mapped to legacy A/GearUp menu action");
                 }
                 return 1;
             }
@@ -95,7 +101,7 @@ namespace
             if (result)
                 return result;
 
-            if (activeInMenu() && switches == ASwitchMask && enterCurrent && !enterPrevious)
+            if (activeInMenu() && isSelectQuery(switches) && enterCurrent && !enterPrevious)
                 return 1;
             return 0;
         }
@@ -124,7 +130,7 @@ namespace
 
             const bool ok = !!ReadIOHook && !!SwitchNowHook && !!SwitchOnHook;
             if (ok)
-                spdlog::info("WheelMenuKeyboardEnterSelect: enabled");
+                spdlog::info("WheelMenuKeyboardEnterSelect: enabled (A/GearUp)");
             return ok;
         }
 
