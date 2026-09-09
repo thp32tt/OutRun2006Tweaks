@@ -40,6 +40,15 @@ replace_once(
     "live periodic disable",
 )
 
+# The watchdog originally only looked at ConstantForce/Spring/Damper state.  If
+# both condition effects are disabled while a hardware sine is active, a stalled
+# game tick could otherwise leave road/tire vibration running indefinitely.
+replace_once(
+'''            if (elapsed > 250 &&\n                (prevConstantLevel_ != 0 || prevSpringCoefficient_ != 0 ||\n                 prevDamperCoefficient_ != 0))\n''',
+'''            if (elapsed > 250 &&\n                (prevConstantLevel_ != 0 || prevSpringCoefficient_ != 0 ||\n                 prevDamperCoefficient_ != 0 || roadState_.lastMagnitude != 0 ||\n                 slipState_.lastMagnitude != 0))\n''',
+    "watchdog covers hardware periodic effects",
+)
+
 # Insert a single gain helper before create_constant_effect().  Do not change
 # effect-specific type parameters here; DIEP_GAIN is orthogonal to spring,
 # damper, periodic and constant-force magnitudes.
@@ -80,6 +89,18 @@ gain_helper = r'''        DWORD configured_effect_gain() const
                         deviceAcquired_ = true;
                     hr = effect->SetParameters(&params, DIEP_GAIN);
                 }
+
+                // Some DirectInput drivers do not advertise DIEP_GAIN as a
+                // dynamic parameter.  DirectInput often restarts implicitly,
+                // but drivers are also allowed to return DIERR_EFFECTPLAYING.
+                // Stop only that effect and explicitly restart it with the new
+                // gain rather than making the F11 Overall Strength slider fail.
+                if (hr == DIERR_EFFECTPLAYING)
+                {
+                    effect->Stop();
+                    hr = effect->SetParameters(&params, DIEP_GAIN | DIEP_START);
+                }
+
                 if (FAILED(hr))
                 {
                     failed = true;
@@ -134,4 +155,4 @@ replace_once(
 )
 
 path.write_text(text, encoding="utf-8")
-print("Applied live FFB controls: immediate disable, live gain, live periodic backend switching")
+print("Applied live FFB controls: immediate disable, live gain, periodic switching/watchdog")
