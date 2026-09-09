@@ -64,9 +64,16 @@ require("src/hooks_wheel_r3_menu_ab.hpp", 'retryAfter = now + 500;', "A/B stale-
 forbid("src/hooks_wheel_r3_device_autoselect.hpp", 'Settings::WheelFFBDeviceName = "";', "do not erase configured FFB name")
 forbid("src/hooks_wheel_r3_device_autoselect.hpp", 'Settings::WheelMenuR3DeviceName = "";', "do not erase configured menu name")
 
-# Universal profile must own menu input when enabled.
+# Universal profile must own menu input when enabled and never silently jump to
+# another cached device or assume its filtered combo index equals a game slot.
 require("src/hooks_wheel_r3_menu_dpad.hpp", '!Settings::WheelUniversalSetupEnable &&', "universal excludes fixed R3 D-pad helper")
 require("src/hooks_wheel_r3_menu_ab.hpp", '!Settings::WheelUniversalSetupEnable &&', "universal excludes fixed R3 A/B helper")
+require("src/overlay/wheel_setup_ui.cpp", 'if (index < 0 && wanted.empty() && !devices_.empty())', "strict saved universal device")
+require("src/overlay/wheel_setup_ui.cpp", 'release_device();\n                devices_.clear();', "universal stale-device re-enumeration")
+require("src/overlay/wheel_setup_ui.cpp", 'is_virtual_name(product) || is_virtual_name(instanceName)', "virtual instance filtering")
+require("src/overlay/wheel_setup_ui.cpp", 'static int regular_device_count()', "legacy slot count")
+require("src/overlay/wheel_setup_ui.cpp", 'ImGui::BeginCombo("Legacy input slot"', "explicit legacy input slot")
+forbid("src/overlay/wheel_setup_ui.cpp", 'WheelUniversalLegacyDeviceIndex = std::clamp(index, 0, 2);', "do not equate filtered device index with game slot")
 require("src/overlay/wheel_setup_ui.cpp", 'ImGui::SliderInt("Steering Deadzone", &deadzonePercent, 0, 20, "%d%%")', "0-percent wheel deadzone UI")
 require("src/overlay/wheel_setup_ui.cpp", 'ImGui::SeparatorText("Simulation FFB")', "combined simulation FFB panel")
 
