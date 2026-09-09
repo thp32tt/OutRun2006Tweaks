@@ -45,7 +45,17 @@ namespace Settings
 
     Setting<float> WheelFFBSpringStrength{
         "WheelFFB", "SpringStrength", 0.45f,
-        "Speed-dependent center restoring force.", Range<float>{ 0.0f, 1.5f }
+        "Speed-dependent center restoring force. Drives GUID_Spring when hardware spring is enabled.", Range<float>{ 0.0f, 1.5f }
+    };
+
+    Setting<bool> WheelFFBUseHardwareSpring{
+        "WheelFFB", "UseHardwareSpring", true,
+        "Use a DirectInput GUID_Spring condition effect for centering instead of synthesizing spring torque at 60 Hz."
+    };
+
+    Setting<float> WheelFFBSpringSaturation{
+        "WheelFFB", "SpringSaturation", 0.775f,
+        "Maximum hardware spring output before GlobalStrength, based on the FXT spring saturation model.", Range<float>{ 0.1f, 1.0f }
     };
 
     Setting<float> WheelFFBDamperStrength{
@@ -60,7 +70,7 @@ namespace Settings
 
     Setting<float> WheelFFBGripLoss{
         "WheelFFB", "GripLoss", 0.60f,
-        "How much cornering load unloads as the car enters a deep drift.", Range<float>{ 0.0f, 1.0f }
+        "How much cornering load and hardware spring unload as the car enters a deep drift.", Range<float>{ 0.0f, 1.0f }
     };
 
     Setting<float> WheelFFBLateralDeadzone{
@@ -285,16 +295,38 @@ namespace
                 --recreateRampFrames_;
             }
 
-            // Center-out arcade model.
+            // FXT-inspired split: the centering backbone is a DirectInput
+            // condition effect handled continuously by the wheel/driver. Keep
+            // the game's real lateral/event signals on ConstantForce.
             const float speedCurve =
                 std::clamp(speedNorm / 0.25f, 0.0f, 1.0f) *
                 (0.35f + 0.65f * speedNorm);
 
-            const float spring =
-                -steer * static_cast<float>(Settings::WheelFFBSpringStrength) * speedCurve;
+            const float springStrength =
+                std::clamp(
+                    static_cast<float>(Settings::WheelFFBSpringStrength) *
+                    speedCurve * gripFactor,
+                    0.0f, 1.0f);
 
-            // Because steer comes from the real input path, derive rate from it
-            // here instead of using the unverified field_1D4.
+            const bool suppressSpringForImpact =
+                crashImpulseTimer_ > CrashCooldownFrames;
+
+            if (springEffect_)
+            {
+                update_spring(
+                    suppressSpringForImpact
+                        ? 0.0f
+                        : springStrength * warmupScale * recreateScale);
+            }
+
+            const float softwareSpring =
+                springEffect_
+                    ? 0.0f
+                    : -steer * static_cast<float>(Settings::WheelFFBSpringStrength) * speedCurve;
+
+            // Keep the current software damper for this first comparison build.
+            // A separate GUID_Damper can be tested after the hardware spring is
+            // validated on the R3, so the two changes are not confounded.
             constexpr float SteerRateScale = 10.0f;
             const float damper =
                 -steerRate * SteerRateScale *
@@ -319,7 +351,7 @@ namespace
 
             float structural = 0.0f;
             if (crashImpulseTimer_ <= CrashCooldownFrames)
-                structural = (spring + lateral) * loadMod + damper;
+                structural = (softwareSpring + lateral) * loadMod + damper;
 
             float events = update_event_force();
 
@@ -385,6 +417,14 @@ namespace
                 create_periodic_effects();
             }
 
+            if (Settings::WheelFFBUseHardwareSpring &&
+                !springEffect_ &&
+                (updateCounter_ % 60) == 0 &&
+                GetTickCount() >= springRecreateHoldoffUntil_)
+            {
+                create_spring_effect();
+            }
+
             prevGear_ = curGear;
             prevCollisionFlags_ = stateFlags;
             maybe_log(speedNorm, steer, steerRate, driftAmt, roughness, level);
@@ -396,7 +436,8 @@ namespace
                 return;
 
             const DWORD elapsed = GetTickCount() - lastUpdateTick_;
-            if (elapsed > 250 && prevConstantLevel_ != 0)
+            if (elapsed > 250 &&
+                (prevConstantLevel_ != 0 || prevSpringCoefficient_ != 0))
             {
                 zero_all_forces();
                 reset_signal_state();
@@ -432,6 +473,12 @@ namespace
                 spdlog::info("WheelFFB: PanicStop constant zero => 0x{:08X}", (unsigned)hr);
                 hr = constantEffect_->Stop();
                 spdlog::info("WheelFFB: PanicStop constant Stop => 0x{:08X}", (unsigned)hr);
+            }
+
+            if (springEffect_)
+            {
+                const HRESULT springHr = springEffect_->Stop();
+                spdlog::info("WheelFFB: PanicStop spring Stop => 0x{:08X}", (unsigned)springHr);
             }
 
             if (roadTextureEffect_)
@@ -636,6 +683,12 @@ namespace
                 return false;
             }
 
+            if (Settings::WheelFFBUseHardwareSpring && !create_spring_effect())
+            {
+                spdlog::warn(
+                    "WheelFFB: hardware GUID_Spring unavailable; retaining software spring fallback");
+            }
+
             create_periodic_effects();
             install_exit_guards();
 
@@ -643,11 +696,12 @@ namespace
             reset_signal_state();
 
             spdlog::info(
-                "WheelFFB: ready on '{}' (DirectInput COM, axes={}, buttons={}, global={}%)",
+                "WheelFFB: ready on '{}' (DirectInput COM, axes={}, buttons={}, global={}%, spring={})",
                 selectedName_,
                 caps.dwAxes,
                 caps.dwButtons,
-                static_cast<int>(static_cast<float>(Settings::WheelFFBGlobalStrength) * 100.0f));
+                static_cast<int>(static_cast<float>(Settings::WheelFFBGlobalStrength) * 100.0f),
+                springEffect_ ? "GUID_Spring" : "software");
 
             return true;
         }
@@ -702,6 +756,162 @@ namespace
 
             spdlog::info("WheelFFB: ConstantForce created");
             return true;
+        }
+
+        bool create_spring_effect()
+        {
+            if (!device_ || !Settings::WheelFFBUseHardwareSpring)
+                return false;
+
+            DWORD axes[1] = { DIJOFS_X };
+            LONG directions[1] = { 0 };
+
+            const DWORD saturation = static_cast<DWORD>(
+                std::clamp(static_cast<float>(Settings::WheelFFBSpringSaturation), 0.1f, 1.0f) *
+                static_cast<float>(DI_FFNOMINALMAX));
+
+            DICONDITION condition{};
+            condition.lOffset = 0;
+            condition.lPositiveCoefficient = 0;
+            condition.lNegativeCoefficient = 0;
+            condition.dwPositiveSaturation = saturation;
+            condition.dwNegativeSaturation = saturation;
+            condition.lDeadBand = 0;
+
+            DIEFFECT effect{};
+            effect.dwSize = sizeof(effect);
+            effect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
+            effect.dwDuration = INFINITE;
+            effect.dwSamplePeriod = 0;
+            effect.dwGain = static_cast<DWORD>(
+                std::clamp(static_cast<float>(Settings::WheelFFBGlobalStrength), 0.0f, 1.0f) *
+                static_cast<float>(DI_FFNOMINALMAX));
+            effect.dwTriggerButton = DIEB_NOTRIGGER;
+            effect.dwTriggerRepeatInterval = 0;
+            effect.cAxes = 1;
+            effect.rgdwAxes = axes;
+            effect.rglDirection = directions;
+            effect.cbTypeSpecificParams = sizeof(condition);
+            effect.lpvTypeSpecificParams = &condition;
+
+            HRESULT hr = device_->CreateEffect(
+                GUID_Spring, &effect, &springEffect_, nullptr);
+
+            if (FAILED(hr) || !springEffect_)
+            {
+                spdlog::warn(
+                    "WheelFFB: CreateEffect(GUID_Spring) failed (0x{:08X})",
+                    (unsigned)hr);
+                springRecreateHoldoffUntil_ = GetTickCount() + 1000;
+                return false;
+            }
+
+            hr = springEffect_->Start(1, 0);
+            if (FAILED(hr))
+            {
+                spdlog::warn(
+                    "WheelFFB: GUID_Spring initial Start failed (0x{:08X}); SetParameters will retry with DIEP_START",
+                    (unsigned)hr);
+            }
+
+            prevSpringCoefficient_ = 0;
+            prevSpringSaturation_ = saturation;
+            springStrategy_ = -1;
+
+            spdlog::info(
+                "WheelFFB: GUID_Spring created (saturation={} / {}, negative coefficients pull toward center)",
+                static_cast<unsigned>(saturation),
+                DI_FFNOMINALMAX);
+            return true;
+        }
+
+        void update_spring(float strength)
+        {
+            if (!springEffect_ || !device_ || panicStopped_)
+                return;
+
+            const LONG coefficientMagnitude = static_cast<LONG>(
+                std::clamp(strength, 0.0f, 1.0f) *
+                static_cast<float>(DI_FFNOMINALMAX));
+
+            // DirectInput's condition equation uses A(q-q0). A spring must use
+            // negative coefficients so displacement produces force back toward
+            // the zero offset rather than accelerating away from center.
+            const LONG coefficient = -coefficientMagnitude;
+            const DWORD saturation = static_cast<DWORD>(
+                std::clamp(static_cast<float>(Settings::WheelFFBSpringSaturation), 0.1f, 1.0f) *
+                static_cast<float>(DI_FFNOMINALMAX));
+
+            const bool silence =
+                coefficient == 0 && prevSpringCoefficient_ != 0;
+            const bool coefficientChanged =
+                std::abs(coefficient - prevSpringCoefficient_) > 40;
+            const bool saturationChanged =
+                saturation != prevSpringSaturation_;
+
+            if (!silence && !coefficientChanged && !saturationChanged)
+                return;
+
+            DICONDITION condition{};
+            condition.lOffset = 0;
+            condition.lPositiveCoefficient = coefficient;
+            condition.lNegativeCoefficient = coefficient;
+            condition.dwPositiveSaturation = saturation;
+            condition.dwNegativeSaturation = saturation;
+            condition.lDeadBand = 0;
+
+            DIEFFECT params{};
+            params.dwSize = sizeof(params);
+            params.cbTypeSpecificParams = sizeof(condition);
+            params.lpvTypeSpecificParams = &condition;
+
+            DWORD flags = DIEP_TYPESPECIFICPARAMS |
+                (springStrategy_ == 1 ? DIEP_START : 0);
+
+            HRESULT hr = springEffect_->SetParameters(&params, flags);
+
+            if (springStrategy_ == -1)
+            {
+                if (SUCCEEDED(hr))
+                {
+                    springStrategy_ = 0;
+                    spdlog::info("WheelFFB: GUID_Spring updates work without DIEP_START");
+                }
+                else
+                {
+                    hr = springEffect_->SetParameters(
+                        &params, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+                    if (SUCCEEDED(hr))
+                    {
+                        springStrategy_ = 1;
+                        spdlog::info("WheelFFB: GUID_Spring driver requires DIEP_START");
+                    }
+                }
+            }
+
+            if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
+            {
+                device_->Acquire();
+                hr = springEffect_->SetParameters(
+                    &params, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+            }
+
+            if (FAILED(hr))
+            {
+                spdlog::warn(
+                    "WheelFFB: GUID_Spring update failed (0x{:08X}); returning to software spring fallback",
+                    (unsigned)hr);
+                springEffect_->Stop();
+                safe_release_effect(springEffect_, "stale spring");
+                prevSpringCoefficient_ = 0;
+                prevSpringSaturation_ = 0;
+                springStrategy_ = -1;
+                springRecreateHoldoffUntil_ = GetTickCount() + 1000;
+                return;
+            }
+
+            prevSpringCoefficient_ = coefficient;
+            prevSpringSaturation_ = saturation;
         }
 
         IDirectInputEffect* create_periodic_effect(const char* label, float initialHz)
@@ -1054,6 +1264,9 @@ namespace
             if (constantEffect_ && prevConstantLevel_ != 0)
                 set_constant_force(0);
 
+            if (springEffect_ && prevSpringCoefficient_ != 0)
+                update_spring(0.0f);
+
             prevStructuralLevel_ = 0;
 
             if (roadTextureEffect_)
@@ -1067,6 +1280,7 @@ namespace
             smoothedLateral_ = 0.0f;
             prevSteer_ = 0.0f;
             prevStructuralLevel_ = 0;
+            prevSpringCoefficient_ = 0;
             crashImpulseTimer_ = 0;
             crashImpulseForce_ = 0.0f;
             gearShiftTimer_ = 0;
@@ -1221,7 +1435,7 @@ namespace
 
             lastLogTick_ = now;
             spdlog::info(
-                "WheelFFB DIAG: spd={:.2f} steer={:.3f} rate={:.4f} lat={:.2f} drift={:.2f} rough={:.2f} out={} periodic={}",
+                "WheelFFB DIAG: spd={:.2f} steer={:.3f} rate={:.4f} lat={:.2f} drift={:.2f} rough={:.2f} out={} spring={} coeff={} periodic={}",
                 speedNorm,
                 steer,
                 steerRate,
@@ -1229,12 +1443,15 @@ namespace
                 driftAmt,
                 roughness,
                 static_cast<int>(level),
+                springEffect_ ? "HW" : "SW",
+                static_cast<int>(prevSpringCoefficient_),
                 periodicsActive_);
         }
 
         IDirectInput8A* directInput_ = nullptr;
         IDirectInputDevice8A* device_ = nullptr;
         IDirectInputEffect* constantEffect_ = nullptr;
+        IDirectInputEffect* springEffect_ = nullptr;
         IDirectInputEffect* roadTextureEffect_ = nullptr;
         IDirectInputEffect* tireSlipEffect_ = nullptr;
 
@@ -1246,9 +1463,11 @@ namespace
         bool panicStopped_ = false;
         bool periodicsActive_ = false;
         int periodicStrategy_ = -1;
+        int springStrategy_ = -1;
 
         DWORD retryAfter_ = 0;
         DWORD recreateHoldoffUntil_ = 0;
+        DWORD springRecreateHoldoffUntil_ = 0;
         DWORD lastUpdateTick_ = 0;
         DWORD lastLogTick_ = 0;
 
@@ -1272,6 +1491,8 @@ namespace
 
         LONG prevConstantLevel_ = 0;
         LONG prevStructuralLevel_ = 0;
+        LONG prevSpringCoefficient_ = 0;
+        DWORD prevSpringSaturation_ = 0;
 
         int crashImpulseTimer_ = 0;
         int gearShiftTimer_ = 0;
