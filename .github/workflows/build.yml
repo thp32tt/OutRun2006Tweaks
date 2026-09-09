@@ -16,20 +16,34 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Include experimental WheelFFB source
+      - name: Include experimental wheel sources
         shell: pwsh
         run: |
+          $cmake = Get-Content CMakeLists.txt -Raw
+
           if (Test-Path "src/hooks_wheel_ffb_build.cpp") {
-            $cmake = Get-Content CMakeLists.txt -Raw
             if ($cmake -notmatch 'src/hooks_wheel_ffb_build\.cpp') {
               $needle = "`t`"src/hooks_forcefeedback.cpp`""
               $insert = "$needle`r`n`t`"src/hooks_wheel_ffb_build.cpp`""
               $cmake = $cmake.Replace($needle, $insert)
-              Set-Content -Path CMakeLists.txt -Value $cmake -NoNewline
             }
-            if (-not (Select-String -Path CMakeLists.txt -Pattern 'src/hooks_wheel_ffb_build\.cpp' -Quiet)) {
-              throw "Failed to add hooks_wheel_ffb_build.cpp to generated CMake source list"
+          }
+
+          if (Test-Path "src/overlay/wheel_setup_ui.cpp") {
+            if ($cmake -notmatch 'src/overlay/wheel_setup_ui\.cpp') {
+              $needle = "`t`"src/overlay/input_bindings_ui.cpp`""
+              $insert = "$needle`r`n`t`"src/overlay/wheel_setup_ui.cpp`""
+              $cmake = $cmake.Replace($needle, $insert)
             }
+          }
+
+          Set-Content -Path CMakeLists.txt -Value $cmake -NoNewline
+
+          if (-not (Select-String -Path CMakeLists.txt -Pattern 'src/hooks_wheel_ffb_build\.cpp' -Quiet)) {
+            throw "Failed to add hooks_wheel_ffb_build.cpp to generated CMake source list"
+          }
+          if (-not (Select-String -Path CMakeLists.txt -Pattern 'src/overlay/wheel_setup_ui\.cpp' -Quiet)) {
+            throw "Failed to add wheel_setup_ui.cpp to generated CMake source list"
           }
 
       - name: Apply R3 FFB behavior patch
@@ -41,6 +55,21 @@ jobs:
         shell: pwsh
         run: |
           python tools/patch_wheel_ffb_r3_spring_direction.py
+
+      - name: Apply simulation FFB patch
+        shell: pwsh
+        run: |
+          python tools/patch_wheel_ffb_simulation.py
+
+      - name: Apply menu/gameplay FFB handoff patch
+        shell: pwsh
+        run: |
+          python tools/patch_wheel_ffb_menu_handoff.py
+
+      - name: Finalize universal wheel setup UI
+        shell: pwsh
+        run: |
+          python tools/patch_wheel_setup_ui_compile.py
 
       - name: Configure
         run: |
