@@ -50,6 +50,18 @@ require("src/hooks_wheel_ffb.cpp", 'roadState_.lastMagnitude != 0', "watchdog co
 require("src/hooks_wheel_ffb.cpp", 'slipState_.lastMagnitude != 0', "watchdog covers tire periodic")
 require("src/hooks_wheel_ffb.cpp", 'DWORD lastEffectGain_ = 0xFFFFFFFFu;', "gain recovery sentinel")
 
+# Second-round lifecycle/safety review.
+require("src/hooks_wheel_ffb.cpp", 'std::fill_n(speedHistory_, SpeedHistoryCount, 0.0f);', "stale speed history reset")
+require("src/hooks_wheel_ffb.cpp", 'lateralHistoryIndex_ = 0;', "stale lateral history reset")
+require("src/hooks_wheel_ffb.cpp", 'prevCollisionFlags_ = 0;', "collision edge state reset")
+require("src/hooks_wheel_ffb.cpp", 'if (!appActive_)', "background FFB reacquire gate")
+require("src/hooks_wheel_ffb.cpp", 'self->device_->Unacquire();', "focus-loss exclusive release")
+require("src/hooks_wheel_ffb.cpp", 'HWND subclassHwnd_ = nullptr;', "idempotent window subclass state")
+require("src/hooks_wheel_ffb.cpp", 'if (!exitProcessHook_)', "idempotent ExitProcess hook")
+require("src/hooks_wheel_ffb.cpp", 'DWORD nextGainRetryTick_ = 0;', "live gain failure backoff state")
+require("src/hooks_wheel_ffb.cpp", 'nextGainRetryTick_ = GetTickCount() + 250;', "live gain retry backoff")
+require("src/hooks_wheel_ffb.cpp", 'static_cast<float>(Settings::WheelFFBRoadTexture) / 0.20f', "road-detail scales splash")
+
 # R3-specific legacy defaults proven by physical testing.
 require("src/hooks_input.cpp", 'Setting<float> SteeringDeadZone{ "Controls", "SteeringDeadZone", 0.0f,', "0-percent wheel deadzone source default")
 require("src/hooks_input.cpp", 'Setting<bool> WheelAccelerationInvert{ "Controls", "WheelAccelerationInvert", false,', "R3 accelerator default")
@@ -78,6 +90,11 @@ require("src/overlay/wheel_setup_ui.cpp", 'is_virtual_name(product) || is_virtua
 require("src/overlay/wheel_setup_ui.cpp", 'static int regular_device_count()', "legacy slot count")
 require("src/overlay/wheel_setup_ui.cpp", 'ImGui::BeginCombo("Legacy input slot"', "explicit legacy input slot")
 forbid("src/overlay/wheel_setup_ui.cpp", 'WheelUniversalLegacyDeviceIndex = std::clamp(index, 0, 2);', "do not equate filtered device index with game slot")
+require("src/overlay/wheel_setup_ui.cpp", 'pure_universal_menu_query(switches)', "universal menu query scope")
+require("src/overlay/wheel_setup_ui.cpp", '(menuHeld_ & switches) == switches', "universal SwitchNow exact mask")
+require("src/overlay/wheel_setup_ui.cpp", '(menuPressed_ & switches) == switches', "universal SwitchOn exact mask")
+require("src/overlay/wheel_setup_ui.cpp", 'const int regularCount = std::max(device_count() - 1, 0);', "live legacy-slot clamp")
+require("src/overlay/wheel_setup_ui.cpp", 'Settings::WheelUniversalLegacyDeviceIndex = currentSlot;', "UI slot clamp persistence")
 require("src/overlay/wheel_setup_ui.cpp", 'ImGui::SliderInt("Steering Deadzone", &deadzonePercent, 0, 20, "%d%%")', "0-percent wheel deadzone UI")
 require("src/overlay/wheel_setup_ui.cpp", 'ImGui::SeparatorText("Simulation FFB")', "combined simulation FFB panel")
 
