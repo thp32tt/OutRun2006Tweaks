@@ -21,6 +21,15 @@ replace_once(
     "acceleration invert default",
 )
 
+# The shipped INI explicitly overrides the C++ default, so patch it too. Without
+# this, a clean install would still boot with the R3 accelerator backwards.
+replace_once(
+    "OutRun2006Tweaks.ini",
+    "WheelAccelerationInvert = true\n",
+    "WheelAccelerationInvert = false\n",
+    "shipped acceleration invert default",
+)
+
 replace_once(
     "src/hooks_wheel_input_compat_v2.hpp",
     '        "Controls", "WheelPedalSplitFix", true,\n',
@@ -82,4 +91,4 @@ replace_once(
     "periodic DIEP_START strategy",
 )
 
-print("Applied wheel runtime hardening: pedal defaults, universal-menu exclusion, persistent DIEP_START")
+print("Applied wheel runtime hardening: pedal defaults/INI, universal-menu exclusion, persistent DIEP_START")
