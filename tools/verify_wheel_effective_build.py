@@ -38,6 +38,14 @@ require("src/hooks_wheel_ffb.cpp", 'bool ignoreName = false;', "strict-first FFB
 require("src/hooks_wheel_ffb.cpp", 'no literal MOZA DirectInput name; trying first attached non-virtual FFB device', "R3 FFB fallback")
 forbid("src/hooks_wheel_ffb.cpp", 'Keep the current software damper for this first comparison build.', "no stale software-damper block")
 
+# Live DD-wheel safety and F11 tuning behavior.
+require("src/hooks_wheel_ffb.cpp", 'disabled live; all effects zeroed immediately', "immediate live FFB disable")
+require("src/hooks_wheel_ffb.cpp", 'void apply_live_effect_gain()', "live effect-gain helper")
+require("src/hooks_wheel_ffb.cpp", 'effect->SetParameters(&params, DIEP_GAIN)', "DirectInput DIEP_GAIN update")
+require("src/hooks_wheel_ffb.cpp", 'lastEffectGain_ = configured_effect_gain();', "initial gain cache")
+require("src/hooks_wheel_ffb.cpp", 'hardware periodic effects disabled live; using ConstantForce fallback', "live periodic backend disable")
+require("src/hooks_wheel_ffb.cpp", 'DWORD lastEffectGain_ = 0xFFFFFFFFu;', "gain recovery sentinel")
+
 # R3-specific legacy defaults proven by physical testing.
 require("src/hooks_input.cpp", 'Setting<float> SteeringDeadZone{ "Controls", "SteeringDeadZone", 0.0f,', "0-percent wheel deadzone source default")
 require("src/hooks_input.cpp", 'Setting<bool> WheelAccelerationInvert{ "Controls", "WheelAccelerationInvert", false,', "R3 accelerator default")
