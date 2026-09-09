@@ -8,15 +8,15 @@
 #include "game_addrs.hpp"
 
 // Legacy-wheel menu escape helper.
-// Some original OutRun controller/configuration screens do not react to the
-// normal keyboard ESC path once a DirectInput wheel is selected. Inject ESC as
-// both legacy Back and B/Return at the raw-state and logical-switch layers so
-// the user can always leave/confirm the controller configuration screen.
+// The original game reuses the button bound to Gear Down as Back in many menus,
+// including the legacy controller configuration screen. Some screens also query
+// Back/B directly. Inject ESC at both the raw-state and logical-switch layers so
+// a fully-unassigned wheel profile can always leave the configuration screen.
 namespace Settings
 {
     Setting<bool> WheelMenuKeyboardEscapeBack{
         "Controls", "WheelMenuKeyboardEscapeBack", true,
-        "In legacy wheel mode, maps keyboard Escape to the game's Back/B menu actions."
+        "In legacy wheel mode, maps keyboard Escape to the game's Back/B/GearDown menu actions."
     };
 }
 
@@ -29,6 +29,7 @@ namespace
         inline static constexpr uint32_t RawEscapeMask = RawBackMask | RawBMask;
         inline static constexpr uint32_t BackSwitchMask = 1u << int(SwitchId::Back);
         inline static constexpr uint32_t BSwitchMask = 1u << int(SwitchId::B);
+        inline static constexpr uint32_t GearDownSwitchMask = 1u << int(SwitchId::GearDown);
 
         inline static SafetyHookInline ReadIOHook = {};
         inline static SafetyHookInline SwitchNowHook = {};
@@ -54,7 +55,9 @@ namespace
 
         static bool isBackQuery(uint32_t switches)
         {
-            return switches == BackSwitchMask || switches == BSwitchMask;
+            return switches == BackSwitchMask ||
+                switches == BSwitchMask ||
+                switches == GearDownSwitchMask;
         }
 
         static int ReadIO_dest()
@@ -90,7 +93,7 @@ namespace
                 if (!logged)
                 {
                     logged = true;
-                    spdlog::info("WheelMenuKeyboardEscapeBack: ESC mapped to legacy Back/B menu action");
+                    spdlog::info("WheelMenuKeyboardEscapeBack: ESC mapped to legacy Back/B/GearDown menu action");
                 }
                 return 1;
             }
@@ -132,7 +135,7 @@ namespace
 
             const bool ok = !!ReadIOHook && !!SwitchNowHook && !!SwitchOnHook;
             if (ok)
-                spdlog::info("WheelMenuKeyboardEscapeBack: enabled");
+                spdlog::info("WheelMenuKeyboardEscapeBack: enabled (Back/B/GearDown)");
             return ok;
         }
 
