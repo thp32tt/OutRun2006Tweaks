@@ -42,8 +42,12 @@ forbid("src/hooks_wheel_ffb.cpp", 'Keep the current software damper for this fir
 require("src/hooks_wheel_ffb.cpp", 'disabled live; all effects zeroed immediately', "immediate live FFB disable")
 require("src/hooks_wheel_ffb.cpp", 'void apply_live_effect_gain()', "live effect-gain helper")
 require("src/hooks_wheel_ffb.cpp", 'effect->SetParameters(&params, DIEP_GAIN)', "DirectInput DIEP_GAIN update")
+require("src/hooks_wheel_ffb.cpp", 'if (hr == DIERR_EFFECTPLAYING)', "gain update handles non-dynamic drivers")
+require("src/hooks_wheel_ffb.cpp", 'DIEP_GAIN | DIEP_START', "gain update explicit restart fallback")
 require("src/hooks_wheel_ffb.cpp", 'lastEffectGain_ = configured_effect_gain();', "initial gain cache")
 require("src/hooks_wheel_ffb.cpp", 'hardware periodic effects disabled live; using ConstantForce fallback', "live periodic backend disable")
+require("src/hooks_wheel_ffb.cpp", 'roadState_.lastMagnitude != 0', "watchdog covers road periodic")
+require("src/hooks_wheel_ffb.cpp", 'slipState_.lastMagnitude != 0', "watchdog covers tire periodic")
 require("src/hooks_wheel_ffb.cpp", 'DWORD lastEffectGain_ = 0xFFFFFFFFu;', "gain recovery sentinel")
 
 # R3-specific legacy defaults proven by physical testing.
