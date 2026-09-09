@@ -76,6 +76,11 @@ jobs:
         run: |
           python tools/patch_wheel_setup_ffb_panel.py
 
+      - name: Apply wheel runtime hardening
+        shell: pwsh
+        run: |
+          python tools/patch_wheel_debug_hardening.py
+
       - name: Configure
         run: |
           mkdir build
