@@ -10,6 +10,11 @@ text = text.replace(
 
 text = text.replace('axis_name(axisSetting)', 'axis_name(int(axisSetting))')
 
+# wheel_setup_ui.cpp is outside namespace Settings here; qualify the template
+# type explicitly so MSVC does not parse Setting<int> as an unknown template.
+text = text.replace('Setting<int>& axisSetting', 'Settings::Setting<int>& axisSetting')
+text = text.replace('Setting<int>& setting', 'Settings::Setting<int>& setting')
+
 old = '''        void assign_digital(int code)\n        {\n            switch (target_)\n'''
 new = '''        void assign_digital(int code)\n        {\n            const bool gameplayButton =\n                target_ == BindTarget::GearUp || target_ == BindTarget::GearDown ||\n                target_ == BindTarget::Start || target_ == BindTarget::View;\n            if (gameplayButton && code >= 128)\n            {\n                target_ = BindTarget::None;\n                status_ = "Gameplay actions currently require a physical button; POV is supported for menu directions.";\n                return;\n            }\n\n            switch (target_)\n'''
 if old not in text:
