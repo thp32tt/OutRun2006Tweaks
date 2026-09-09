@@ -81,6 +81,11 @@ jobs:
         run: |
           python tools/patch_wheel_debug_hardening.py
 
+      - name: Verify effective wheel build
+        shell: pwsh
+        run: |
+          python tools/verify_wheel_effective_build.py
+
       - name: Configure
         run: |
           mkdir build
@@ -120,3 +125,16 @@ jobs:
         with:
           name: outrun2006tweaks-${{ github.sha }}
           path: build/bin/
+
+      - name: Upload effective wheel sources
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: wheel-effective-source-${{ github.sha }}
+          path: |
+            src/hooks_wheel_ffb.cpp
+            src/hooks_wheel_input_compat_v2.hpp
+            src/hooks_wheel_r3_menu_dpad.hpp
+            src/hooks_wheel_r3_menu_ab.hpp
+            src/hooks_wheel_r3_device_autoselect.hpp
+            src/overlay/wheel_setup_ui.cpp
+            OutRun2006Tweaks.ini
