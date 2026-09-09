@@ -90,6 +90,10 @@ jobs:
         shell: pwsh
         run: python tools/verify_wheel_effective_build.py
 
+      - name: Verify FFB numeric invariants
+        shell: pwsh
+        run: python tools/verify_wheel_ffb_math.py
+
       - name: Configure
         run: |
           mkdir build
@@ -117,6 +121,36 @@ jobs:
         run: |
           cp OutRun2006Tweaks.ini build/bin/OutRun2006Tweaks.ini
           cp OutRun2006Tweaks.lods.ini build/bin/OutRun2006Tweaks.lods.ini
+
+      - name: Verify built wheel payload
+        shell: pwsh
+        run: |
+          $dllPath = "build/bin/dinput8.dll"
+          if (-not (Test-Path $dllPath)) { throw "dinput8.dll was not produced" }
+          $bytes = [System.IO.File]::ReadAllBytes($dllPath)
+          if ($bytes.Length -lt 1000000) { throw "dinput8.dll is unexpectedly small" }
+          if ($bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw "dinput8.dll has no MZ header" }
+          $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+          if ($peOffset -lt 0 -or ($peOffset + 6) -ge $bytes.Length) { throw "invalid PE offset" }
+          $signature = [Text.Encoding]::ASCII.GetString($bytes, $peOffset, 4)
+          if ($signature -ne "PE`0`0") { throw "invalid PE signature" }
+          $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
+          if ($machine -ne 0x014C) { throw ("expected Win32 x86 DLL, machine=0x{0:X4}" -f $machine) }
+          $ascii = [Text.Encoding]::ASCII.GetString($bytes)
+          $markers = @(
+            "WheelFFB: GUID_Damper created",
+            "WheelFFB: live GlobalStrength applied to active effects",
+            "WheelFFB: no literal MOZA DirectInput name",
+            "WheelUniversalSetup: F11 universal DirectInput profile support installed"
+          )
+          foreach ($marker in $markers) {
+            if (-not $ascii.Contains($marker)) { throw "missing compiled marker: $marker" }
+          }
+          $ini = Get-Content "build/bin/OutRun2006Tweaks.ini" -Raw
+          if ($ini -notmatch '(?m)^SteeringDeadZone\s*=\s*0\.0\s*$') { throw "shipped deadzone is not 0.0" }
+          if ($ini -notmatch '(?m)^WheelAccelerationInvert\s*=\s*false\s*$') { throw "shipped accelerator invert is not false" }
+          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, required wheel markers present" -f $bytes.Length)
+          Get-FileHash $dllPath -Algorithm SHA256
           
       - name: Download EXE
         shell: pwsh
