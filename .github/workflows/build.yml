@@ -98,6 +98,10 @@ jobs:
         shell: pwsh
         run: python tools/patch_wheel_round2_ui.py
 
+      - name: Apply round3 ten-pass correctness hardening
+        shell: pwsh
+        run: python tools/patch_wheel_round3_10pass.py
+
       - name: Verify effective wheel build
         shell: pwsh
         run: python tools/verify_wheel_effective_build.py
@@ -154,6 +158,8 @@ jobs:
             "WheelFFB: live GlobalStrength applied to active effects",
             "WheelFFB: no literal MOZA DirectInput name",
             "WheelFFB: scheduling DirectInput device reinitialization",
+            "WheelFFB: hardware spring disabled live; using software centering",
+            "Reverse ConstantForce",
             "WheelUniversalSetup: F11 universal DirectInput profile support installed"
           )
           foreach ($marker in $markers) {
