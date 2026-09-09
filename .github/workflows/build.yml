@@ -37,6 +37,11 @@ jobs:
         run: |
           python tools/patch_wheel_ffb_r3_behavior.py
 
+      - name: Apply R3 spring direction patch
+        shell: pwsh
+        run: |
+          python tools/patch_wheel_ffb_r3_spring_direction.py
+
       - name: Configure
         run: |
           mkdir build
