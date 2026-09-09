@@ -81,6 +81,11 @@ jobs:
         run: |
           python tools/patch_wheel_debug_hardening.py
 
+      - name: Apply wheel device-selection hardening
+        shell: pwsh
+        run: |
+          python tools/patch_wheel_device_selection.py
+
       - name: Verify effective wheel build
         shell: pwsh
         run: |
