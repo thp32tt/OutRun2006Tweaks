@@ -48,53 +48,47 @@ jobs:
 
       - name: Apply R3 FFB behavior patch
         shell: pwsh
-        run: |
-          python tools/patch_wheel_ffb_r3_behavior.py
+        run: python tools/patch_wheel_ffb_r3_behavior.py
 
       - name: Apply R3 spring direction patch
         shell: pwsh
-        run: |
-          python tools/patch_wheel_ffb_r3_spring_direction.py
+        run: python tools/patch_wheel_ffb_r3_spring_direction.py
 
       - name: Apply simulation FFB patch
         shell: pwsh
-        run: |
-          python tools/patch_wheel_ffb_simulation.py
+        run: python tools/patch_wheel_ffb_simulation.py
 
       - name: Apply menu/gameplay FFB handoff patch
         shell: pwsh
-        run: |
-          python tools/patch_wheel_ffb_menu_handoff.py
+        run: python tools/patch_wheel_ffb_menu_handoff.py
 
       - name: Finalize universal wheel setup UI
         shell: pwsh
-        run: |
-          python tools/patch_wheel_setup_ui_compile.py
+        run: python tools/patch_wheel_setup_ui_compile.py
 
       - name: Add combined simulation FFB panel
         shell: pwsh
-        run: |
-          python tools/patch_wheel_setup_ffb_panel.py
+        run: python tools/patch_wheel_setup_ffb_panel.py
 
       - name: Apply wheel runtime hardening
         shell: pwsh
-        run: |
-          python tools/patch_wheel_debug_hardening.py
+        run: python tools/patch_wheel_debug_hardening.py
 
       - name: Apply wheel device-selection hardening
         shell: pwsh
-        run: |
-          python tools/patch_wheel_device_selection.py
+        run: python tools/patch_wheel_device_selection.py
 
       - name: Apply live FFB controls hardening
         shell: pwsh
-        run: |
-          python tools/patch_wheel_ffb_live_controls.py
+        run: python tools/patch_wheel_ffb_live_controls.py
+
+      - name: Apply universal wheel reader hardening
+        shell: pwsh
+        run: python tools/patch_wheel_setup_reader_hardening.py
 
       - name: Verify effective wheel build
         shell: pwsh
-        run: |
-          python tools/verify_wheel_effective_build.py
+        run: python tools/verify_wheel_effective_build.py
 
       - name: Configure
         run: |
@@ -116,8 +110,7 @@ jobs:
           (Get-Content build/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
       
       - name: Build
-        run: |
-          cmake --build build --config ${{matrix.build_type}}
+        run: cmake --build build --config ${{matrix.build_type}}
           
       - name: Copy settings
         shell: pwsh
@@ -127,8 +120,7 @@ jobs:
           
       - name: Download EXE
         shell: pwsh
-        run: |
-          Invoke-WebRequest -Uri https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.1/OR2006C2C.EXE -OutFile build/bin/OR2006C2C.exe
+        run: Invoke-WebRequest -Uri https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.1/OR2006C2C.EXE -OutFile build/bin/OR2006C2C.exe
           
       - name: Upload
         uses: actions/upload-artifact@v7.0.1
