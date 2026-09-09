@@ -86,6 +86,14 @@ jobs:
         shell: pwsh
         run: python tools/patch_wheel_setup_reader_hardening.py
 
+      - name: Apply round2 FFB lifecycle safety
+        shell: pwsh
+        run: python tools/patch_wheel_round2_core.py
+
+      - name: Apply round2 universal input semantics
+        shell: pwsh
+        run: python tools/patch_wheel_round2_ui.py
+
       - name: Verify effective wheel build
         shell: pwsh
         run: python tools/verify_wheel_effective_build.py
