@@ -4,9 +4,15 @@ path = Path("src/overlay/wheel_setup_ui.cpp")
 text = path.read_text(encoding="utf-8")
 
 old = '''    extern Setting<std::string> WheelFFBDeviceName;\n\n    Setting<bool> WheelUniversalSetupEnable{\n'''
-new = '''    extern Setting<std::string> WheelFFBDeviceName;\n    extern Setting<float> WheelFFBGlobalStrength;\n    extern Setting<float> WheelFFBSpringStrength;\n    extern Setting<float> WheelFFBDamperStrength;\n    extern Setting<float> WheelFFBSteeringWeight;\n    extern Setting<float> WheelFFBGripLoss;\n    extern Setting<float> WheelFFBLowSpeedSpring;\n    extern Setting<float> WheelFFBSpringLoadBoost;\n    extern Setting<float> WheelFFBRoadTexture;\n    extern Setting<float> WheelFFBTireSlip;\n    extern Setting<float> WheelFFBWallImpact;\n    extern Setting<bool> WheelFFBUseHardwareSpring;\n    extern Setting<bool> WheelFFBUseHardwareDamper;\n\n    Setting<bool> WheelUniversalSetupEnable{\n'''
+new = '''    extern Setting<std::string> WheelFFBDeviceName;\n    extern Setting<bool> WheelMenuR3DirectDPad;\n    extern Setting<bool> WheelMenuR3DirectAB;\n    extern Setting<float> WheelFFBGlobalStrength;\n    extern Setting<float> WheelFFBSpringStrength;\n    extern Setting<float> WheelFFBDamperStrength;\n    extern Setting<float> WheelFFBSteeringWeight;\n    extern Setting<float> WheelFFBGripLoss;\n    extern Setting<float> WheelFFBLowSpeedSpring;\n    extern Setting<float> WheelFFBSpringLoadBoost;\n    extern Setting<float> WheelFFBRoadTexture;\n    extern Setting<float> WheelFFBTireSlip;\n    extern Setting<float> WheelFFBWallImpact;\n    extern Setting<bool> WheelFFBUseHardwareSpring;\n    extern Setting<bool> WheelFFBUseHardwareDamper;\n\n    Setting<bool> WheelUniversalSetupEnable{\n'''
 if old not in text:
     raise SystemExit("FFB extern insertion point not found")
+text = text.replace(old, new, 1)
+
+old = '''            ImGui::Checkbox("Enable F11 universal wheel profile", Settings::WheelUniversalSetupEnable.ptr());\n            if (ImGui::IsItemHovered())\n                ImGui::SetTooltip("When enabled, these bindings are written into OutRun's original legacy DirectInput device mapping.");\n'''
+new = '''            if (ImGui::Checkbox("Enable F11 universal wheel profile", Settings::WheelUniversalSetupEnable.ptr()))\n            {\n                if (Settings::WheelUniversalSetupEnable)\n                {\n                    // The old R3-specific readers assume fixed button numbers.\n                    // Once a universal profile is active, its own bindings must\n                    // be the sole wheel-menu source so Logitech/Thrustmaster/\n                    // Fanatec/Simagic/etc. do not inherit R3 button mappings.\n                    Settings::WheelMenuR3DirectDPad = false;\n                    Settings::WheelMenuR3DirectAB = false;\n                    status_ = "Universal profile enabled; legacy R3 fixed-button menu helpers were disabled.";\n                }\n            }\n            if (ImGui::IsItemHovered())\n                ImGui::SetTooltip("When enabled, these bindings are written into OutRun's original legacy DirectInput device mapping.");\n'''
+if old not in text:
+    raise SystemExit("universal profile checkbox insertion point not found")
 text = text.replace(old, new, 1)
 
 old = '''            ImGui::SeparatorText("Wheel options");\n            int deadzonePercent = int(float(Settings::SteeringDeadZone) * 100.0f + 0.5f);\n'''
@@ -22,4 +28,4 @@ if old not in text:
 text = text.replace(old, new, 1)
 
 path.write_text(text, encoding="utf-8")
-print("Added simulation FFB panel to universal Wheel Setup tab")
+print("Added simulation FFB panel and universal-profile menu handoff")
