@@ -32,6 +32,11 @@ jobs:
             }
           }
 
+      - name: Apply R3 FFB behavior patch
+        shell: pwsh
+        run: |
+          python tools/patch_wheel_ffb_r3_behavior.py
+
       - name: Configure
         run: |
           mkdir build
