@@ -86,6 +86,11 @@ jobs:
         run: |
           python tools/patch_wheel_device_selection.py
 
+      - name: Apply live FFB controls hardening
+        shell: pwsh
+        run: |
+          python tools/patch_wheel_ffb_live_controls.py
+
       - name: Verify effective wheel build
         shell: pwsh
         run: |
