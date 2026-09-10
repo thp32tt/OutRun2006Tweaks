@@ -31,6 +31,10 @@ ffb = rep(ffb,
     '"WheelFFB", "SpringLoadBoost", 0.30f,',
     'stronger spring corner-load response')
 ffb = rep(ffb,
+    '"WheelFFB", "DamperStrength", 0.34f,',
+    '"WheelFFB", "DamperStrength", 0.30f,',
+    'damping remains a stabilizer')
+ffb = rep(ffb,
     '''"WheelFFB", "SteeringWeight", 1.10f,
         "Self-aligning torque strength. Uses steering angle, speed and OutRun lateral load; unloads only in deeper drift.", Range<float>{ 0.0f, 1.5f }''',
     '''"WheelFFB", "SteeringWeight", 1.45f,
