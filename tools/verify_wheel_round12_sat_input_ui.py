@@ -27,24 +27,23 @@ require('src/hooks_wheel_ffb.cpp', 'auto getVolume = Module::fn_ptr<GetVolumeFn>
 require('src/hooks_wheel_ffb.cpp', 'sat={:.3f} steerSrc={}', 'diagnostic logs SAT and source')
 require('src/hooks_wheel_ffb.cpp', 'Settings::UseNewInput ? "SDL" : "legacy"', 'diagnostic source selector')
 
-# The Controls dialog should no longer expose a second FFB tuning page.
 forbid('src/overlay/input_bindings_ui.cpp', 'ImGui::BeginTabItem("Force Feedback")', 'duplicate Controls FFB tab removed')
-
-# In the normal SDL3 path, the main shell page is unambiguously FFB-only and
-# legacy input mapping/options are gated away. Compatibility mode keeps them.
 require('src/overlay/wheel_setup_ui.cpp', 'return Settings::UseNewInput ? "Force Feedback" : "Legacy Wheel Setup";', 'main tab has clear role')
 require('src/overlay/wheel_setup_ui.cpp', '"Force feedback only. With UseNewInput enabled, steering, pedals, buttons, menu controls and calibration come only from Input Bindings.', 'SDL navigation guidance')
 require('src/overlay/wheel_setup_ui.cpp', 'if (!Settings::UseNewInput)\n            {\n            const int regularSlots', 'legacy mapper gated')
 require('src/overlay/wheel_setup_ui.cpp', 'if (!Settings::UseNewInput)\n            {\n            ImGui::SeparatorText("Wheel options")', 'legacy wheel options gated')
-require('src/overlay/wheel_setup_ui.cpp', 'Settings::write(Module::UserIniPath);', 'FFB device selection persists')
+require('src/overlay/wheel_setup_ui.cpp', 'Settings::write(Module::UserIniPath);', 'FFB device/preset selection persists')
 require('src/overlay/wheel_setup_ui.cpp', 'Settings::WheelFFBEnable = true;', 'SAT preset recovers disabled FFB')
 require('src/overlay/wheel_setup_ui.cpp', '"Input setup: Input Bindings only. FFB setup: this Force Feedback page only.', 'single navigation summary')
 
-# Round11 SAT still must be present and strong after the routing/UI repair.
 require('src/hooks_wheel_ffb.cpp', 'const float selfAligningTorque =', 'SAT model retained')
 require('src/hooks_wheel_ffb.cpp', 'structural = (softwareSpring + selfAligningTorque) * loadMod + damper;', 'SAT output retained')
-require('src/overlay/wheel_setup_ui.cpp', 'Load MOZA R3 SAT test', 'SAT test preset retained')
-require('src/overlay/wheel_setup_ui.cpp', 'Settings::WheelFFBSteeringWeight = 1.10f;', 'strong SAT setting retained')
+setup = read('src/overlay/wheel_setup_ui.cpp')
+if 'Load MOZA R3 Strong SAT' in setup:
+    require('src/overlay/wheel_setup_ui.cpp', 'Settings::WheelFFBSteeringWeight = 1.45f;', 'Round15 strong SAT setting retained')
+else:
+    require('src/overlay/wheel_setup_ui.cpp', 'Load MOZA R3 SAT test', 'SAT test preset retained')
+    require('src/overlay/wheel_setup_ui.cpp', 'Settings::WheelFFBSteeringWeight = 1.10f;', 'Round11 SAT setting retained')
 
 for path in ['src/hooks_wheel_ffb.cpp', 'src/overlay/input_bindings_ui.cpp', 'src/overlay/wheel_setup_ui.cpp']:
     data = read(path)
