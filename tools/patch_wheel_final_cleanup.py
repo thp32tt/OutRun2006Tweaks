@@ -139,3 +139,8 @@ runpy.run_path('tools/patch_wheel_round6_fivepass.py', run_name='__main__')
 # Round-7: final DD-wheel runtime safety pass. Cancel transient force-test/event
 # state on focus loss, keep direction tests pure, and forbid deferred test torque.
 runpy.run_path('tools/patch_wheel_round7_final_safety.py', run_name='__main__')
+
+# Round-8: input/key-setting hardening. Protect first-frame state, digital-axis
+# aggregation, binding-file recovery, raw-axis release sequencing, and legacy
+# F11 menu ownership without changing the force-feedback model.
+runpy.run_path('tools/patch_wheel_round8_input_binding.py', run_name='__main__')
