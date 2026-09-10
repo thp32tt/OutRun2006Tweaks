@@ -164,15 +164,14 @@ uis = rep(
     'ImGui::SliderInt("Steering Deadzone", &deadzonePercent, 5, 20, "%d%%")',
     'ImGui::SliderInt("Steering Deadzone", &deadzonePercent, 0, 20, "%d%%")',
     'allow zero steering deadzone')
-uis = rep(
-    uis,
-    'ImGui::TextDisabled("Multi-device input by hyp36rmax");',
-    'ImGui::TextDisabled("Multi-device input architecture adapted from hyp36rmax (MIT)");',
-    'runtime attribution')
-# The attribution appears twice in the upstream UI; update the second occurrence too.
-uis = uis.replace(
-    'ImGui::TextDisabled("Multi-device input by hyp36rmax");',
-    'ImGui::TextDisabled("Multi-device input architecture adapted from hyp36rmax (MIT)");')
+
+old_attribution = 'ImGui::TextDisabled("Multi-device input by hyp36rmax");'
+new_attribution = 'ImGui::TextDisabled("Multi-device input architecture adapted from hyp36rmax (MIT)");'
+attribution_count = uis.count(old_attribution)
+if attribution_count < 1:
+    raise SystemExit('runtime attribution: no hyp36rmax attribution labels found')
+uis = uis.replace(old_attribution, new_attribution)
+print(f'patched: runtime attribution x{attribution_count}')
 
 # --- Startup policy: no longer force the legacy Sumo DirectInput path.  The new
 # raw-device InputManager is now the preferred path; legacy helpers remain a
