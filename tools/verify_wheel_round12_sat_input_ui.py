@@ -33,12 +33,12 @@ forbid('src/overlay/input_bindings_ui.cpp', 'ImGui::BeginTabItem("Force Feedback
 # In the normal SDL3 path, the main shell page is unambiguously FFB-only and
 # legacy input mapping/options are gated away. Compatibility mode keeps them.
 require('src/overlay/wheel_setup_ui.cpp', 'return Settings::UseNewInput ? "Force Feedback" : "Legacy Wheel Setup";', 'main tab has clear role')
-require('src/overlay/wheel_setup_ui.cpp', '"Force feedback only. Configure steering, pedals, buttons and calibration in the game Controls / Controller Setup screen.', 'SDL navigation guidance')
+require('src/overlay/wheel_setup_ui.cpp', '"Force feedback only. With UseNewInput enabled, steering, pedals, buttons, menu controls and calibration come only from Input Bindings.', 'SDL navigation guidance')
 require('src/overlay/wheel_setup_ui.cpp', 'if (!Settings::UseNewInput)\n            {\n            const int regularSlots', 'legacy mapper gated')
 require('src/overlay/wheel_setup_ui.cpp', 'if (!Settings::UseNewInput)\n            {\n            ImGui::SeparatorText("Wheel options")', 'legacy wheel options gated')
 require('src/overlay/wheel_setup_ui.cpp', 'Settings::write(Module::UserIniPath);', 'FFB device selection persists')
 require('src/overlay/wheel_setup_ui.cpp', 'Settings::WheelFFBEnable = true;', 'SAT preset recovers disabled FFB')
-require('src/overlay/wheel_setup_ui.cpp', '"Input setup: game Controls / Controller Setup. FFB setup: this page only.', 'single navigation summary')
+require('src/overlay/wheel_setup_ui.cpp', '"Input setup: Input Bindings only. FFB setup: this Force Feedback page only.', 'single navigation summary')
 
 # Round11 SAT still must be present and strong after the routing/UI repair.
 require('src/hooks_wheel_ffb.cpp', 'const float selfAligningTorque =', 'SAT model retained')
