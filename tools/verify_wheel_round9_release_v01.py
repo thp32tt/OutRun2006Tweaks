@@ -24,7 +24,12 @@ require('src/hooks_wheel_ffb.cpp', '"WheelFFB", "WallImpact", 0.38f,', 'restrain
 require('src/hooks_wheel_ffb.cpp', '"WheelFFB", "RoadTexture", 0.30f,', 'road detail retained')
 require('src/hooks_wheel_ffb.cpp', '"WheelFFB", "TireSlip", 0.20f,', 'tire slip retained')
 
-if 'MOZA R3 SAT test' in input_ui:
+if 'Load MOZA R3 Strong SAT' in setup_ui:
+    require('src/hooks_wheel_ffb.cpp', '"WheelFFB", "SpringStrength", 0.65f,', 'Round15 strong spring supersedes earlier tune')
+    require('src/hooks_wheel_ffb.cpp', '"WheelFFB", "DamperStrength", 0.30f,', 'Round15 damping stabilizer')
+    require('src/hooks_wheel_ffb.cpp', '"WheelFFB", "SteeringWeight", 1.45f,', 'Round15 strong SAT supersedes earlier tune')
+    require('src/overlay/wheel_setup_ui.cpp', 'Load MOZA R3 Strong SAT', 'Round15 setup preset visible')
+elif 'MOZA R3 SAT test' in input_ui:
     require('src/hooks_wheel_ffb.cpp', '"WheelFFB", "SpringStrength", 0.32f,', 'Round11 supersedes v0.1 spring')
     require('src/hooks_wheel_ffb.cpp', '"WheelFFB", "DamperStrength", 0.34f,', 'Round11 supersedes v0.1 damping')
     require('src/hooks_wheel_ffb.cpp', '"WheelFFB", "SteeringWeight", 1.10f,', 'Round11 supersedes cornering with SAT')
@@ -37,7 +42,8 @@ else:
     require('src/overlay/input_bindings_ui.cpp', 'applyPreset(0.70f, 0.60f, 0.42f, 0.38f, 0.65f, 0.38f, 0.30f, 0.20f, 0.08f, 0.35f);', 'exact v0.1 profile values')
     require('src/overlay/wheel_setup_ui.cpp', 'Load MOZA R3 v0.1 (default)', 'F11 setup v0.1 preset')
 
-# Existing comparison presets must remain available.
+# Existing comparison presets must remain available in the source even though
+# the SDL Input Bindings dialog no longer exposes FFB tuning itself.
 require('src/overlay/input_bindings_ui.cpp', 'Simulation Balanced v1', 'balanced comparison preset retained')
 require('src/overlay/input_bindings_ui.cpp', 'Arcade Light v1', 'light comparison preset retained')
 require('src/overlay/input_bindings_ui.cpp', 'Arcade Strong v1', 'strong comparison preset retained')
