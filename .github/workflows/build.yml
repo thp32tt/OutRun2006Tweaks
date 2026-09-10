@@ -198,7 +198,8 @@ jobs:
             "multi-device SDL raw input enabled",
             "Multi-device input architecture adapted from hyp36rmax (MIT)",
             "2-axis POLAR actuator encoding",
-            "MOZA R3 Strong SAT",
+            "MOZA R3 Natural SAT",
+            "Single-owner wheel FFB: DirectInput COM only",
             "Self-aligning Torque (SAT)",
             "steerSrc={}",
             "Test Left (20%)"
@@ -211,7 +212,7 @@ jobs:
           if ($ini -notmatch '(?m)^WheelAccelerationInvert\s*=\s*false\s*$') { throw "shipped accelerator invert is not false" }
           if ($ini -notmatch '(?m)^UseNewInput\s*=\s*true\s*$') { throw "multi-device input is not the shipped default" }
           if ($ini.Contains('# Leave false for steering wheels.')) { throw "stale wheel UseNewInput guidance remains in shipped INI" }
-          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, Strong SAT + single-owner Input Bindings/FFB markers present" -f $bytes.Length)
+          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, Natural SAT + single-owner wheel FFB markers present" -f $bytes.Length)
           Get-FileHash $dllPath -Algorithm SHA256
 
       - name: Download EXE
@@ -230,6 +231,7 @@ jobs:
           name: wheel-effective-source-${{ github.sha }}
           path: |
             src/hooks_wheel_ffb.cpp
+            src/hooks_forcefeedback.cpp
             src/hooks_wheel_input_compat_v2.hpp
             src/hooks_wheel_r3_menu_dpad.hpp
             src/hooks_wheel_r3_menu_ab.hpp
