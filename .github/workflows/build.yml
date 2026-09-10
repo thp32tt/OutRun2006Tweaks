@@ -198,7 +198,9 @@ jobs:
             "multi-device SDL raw input enabled",
             "Multi-device input architecture adapted from hyp36rmax (MIT)",
             "2-axis POLAR actuator encoding",
-            "Simulation Balanced v1",
+            "MOZA R3 SAT test",
+            "Self-aligning Torque (SAT)",
+            "steerSrc={}",
             "Test Left (20%)"
           )
           foreach ($marker in $markers) {
@@ -209,7 +211,7 @@ jobs:
           if ($ini -notmatch '(?m)^WheelAccelerationInvert\s*=\s*false\s*$') { throw "shipped accelerator invert is not false" }
           if ($ini -notmatch '(?m)^UseNewInput\s*=\s*true\s*$') { throw "multi-device input is not the shipped default" }
           if ($ini.Contains('# Leave false for steering wheels.')) { throw "stale wheel UseNewInput guidance remains in shipped INI" }
-          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, advanced FFB + community multi-device markers present" -f $bytes.Length)
+          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, SAT steering source + unified FFB menu markers present" -f $bytes.Length)
           Get-FileHash $dllPath -Algorithm SHA256
 
       - name: Download EXE
