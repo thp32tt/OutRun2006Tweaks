@@ -135,3 +135,7 @@ runpy.run_path('tools/patch_wheel_round5_compile_fix.py', run_name='__main__')
 # Round-6: five-pass review of lifecycle/focus races, exact device identity,
 # FFB backend parity, numeric fail-safe behavior, and F11 runtime ownership.
 runpy.run_path('tools/patch_wheel_round6_fivepass.py', run_name='__main__')
+
+# Round-7: final DD-wheel runtime safety pass. Cancel transient force-test/event
+# state on focus loss, keep direction tests pure, and forbid deferred test torque.
+runpy.run_path('tools/patch_wheel_round7_final_safety.py', run_name='__main__')
