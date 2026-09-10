@@ -127,3 +127,7 @@ runpy.run_path('tools/patch_wheel_round4_fivepass.py', run_name='__main__')
 # Round-5: repair the round-4 compiler regression and apply another five
 # lifecycle/hotplug review passes to the exact effective source.
 runpy.run_path('tools/patch_wheel_round5_fivepass.py', run_name='__main__')
+
+# Final compiler-specific guard discovered by the real Win32 MSVC build: avoid
+# Windows min/max macro expansion in the multi-device hotplug path.
+runpy.run_path('tools/patch_wheel_round5_compile_fix.py', run_name='__main__')
