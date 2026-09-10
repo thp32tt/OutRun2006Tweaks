@@ -33,9 +33,13 @@ require(helper, 'bool calibrated() const', 'calibration state is separate')
 require(helper, 'bool sampleValid() const', 'sample validity state is separate')
 require(helper, 'bool torqueActive() const', 'torque activity state is separate')
 require(helper, 'float decay_invalid_sample()', 'transient invalid sample decay')
+require(helper, 'void clear_dynamic_state()', 'dynamic state can reset without losing basis calibration')
 require(helper, 'activationBlend_ = std::min(1.0f, activationBlend_ + (1.0f / 24.0f));', '24-tick activation ramp')
 require(helper, 'sampleValid_ = calibrated_;', 'parking zero is valid after calibration')
-require(helper, 'lastTorque_ = 0.0f;', 'valid zero reaches true zero')
+require(helper, 'if (speedNorm <= 0.04f)', 'parking/restart stale-state guard')
+require(helper, 'motionScale > motionScaleEma_ * 5.0f', 'relative teleport/warp detector')
+require(helper, '++discontinuityCount_;', 'motion discontinuities are observable')
+require(helper, 'lastTorque_ *= 0.55f;', 'brief invalid samples decay rather than switch force model')
 
 require(helper, 'const D3DMATRIX& body = car->matrix_70;', 'non-display body transform candidate')
 require(helper, 'const D3DVECTOR current = car->position_14;', 'physics tick motion source')
@@ -49,6 +53,7 @@ require(helper, 'roadWheelAngle - bodySlip_ - yawRate_ * yawLeadSeconds', 'front
 require(helper, '(frontSlip_ > 0.0f ? -1.0f : 1.0f)', 'SAT direction follows front slip')
 require(helper, 'car->spd_mb_20.x', 'direct velocity candidate is measured')
 require(helper, 'positionStep_', 'position delta scale is measured')
+require(helper, 'motionScaleEma_', 'position step is normalized against rolling speed scale')
 require(helper, 'spdLen_', 'direct velocity magnitude is measured')
 require(helper, 'spdCorrelation_', 'spd_mb correlation is logged before use')
 
@@ -95,6 +100,16 @@ if not (math.isclose(calibration_output, 0.12) and math.isclose(active_output, 0
     raise SystemExit('ROUND17 VERIFY FAILED [activation/fallback crossfade semantics]')
 print('ROUND17 VERIFY OK [calibration fallback fades completely to true Physics zero]')
 
+# Four transient bad ticks decay monotonically, the fifth reaches zero.
+torque = 1.0
+decayed = []
+for i in range(1, 6):
+    torque = 0.0 if i > 4 else torque * 0.55
+    decayed.append(torque)
+if not (decayed[0] > decayed[1] > decayed[2] > decayed[3] > decayed[4] == 0.0):
+    raise SystemExit(f'ROUND17 VERIFY FAILED [invalid sample decay]: {decayed}')
+print(f'ROUND17 VERIFY OK [invalid sample decay]: {decayed}')
+
 beta, yaw, speed = 0.18, 0.50, 0.75
 yaw_lead = 0.10 - 0.045 * speed
 slip_left_counter = -0.15 * 0.52 - beta - yaw * yaw_lead
@@ -114,4 +129,4 @@ for path in [
         raise SystemExit(f'ROUND17 VERIFY FAILED [brace balance]: {path}')
     print(f'ROUND17 VERIFY OK [brace balance {path}]')
 
-print('Round-17 physics SAT verification passed: post-physics sampling + separated validity state')
+print('Round-17 physics SAT verification passed: post-physics sampling + separated validity + stale-state guards')
