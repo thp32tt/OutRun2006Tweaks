@@ -22,8 +22,8 @@ def rep(text: str, old: str, new: str, label: str) -> str:
 # centre, so Reset to default must preserve the wheel-branch 0% baseline.
 ui = rep(
     ui,
-    '                    Settings::SteeringDeadZone = 0.2f;\n',
-    '                    Settings::SteeringDeadZone = 0.0f;\n',
+    'Settings::SteeringDeadZone = 0.2f;',
+    'Settings::SteeringDeadZone = 0.0f;',
     'Reset to default keeps zero wheel deadzone')
 
 
