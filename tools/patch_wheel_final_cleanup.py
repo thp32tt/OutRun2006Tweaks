@@ -1,4 +1,5 @@
 from pathlib import Path
+import runpy
 
 ffb_path = Path('src/hooks_wheel_ffb.cpp')
 ui_path = Path('src/overlay/input_bindings_ui.cpp')
@@ -32,8 +33,20 @@ ui = rep(
 # Keep the documentation aligned with the actual hybrid architecture: SDL owns
 # multi-device input, while the custom DirectInput COM engine remains the sole
 # FFB owner. Legacy DirectInput remains an explicit fallback.
-old_comment = '''# Enables new SDL-based input system\n# Allowing game to see full trigger range without any shared trigger axes issues\n# (experimental, not every menu/gamemode has been tested with it yet)\n# Leave false for steering wheels. WheelInputCompatibility also enforces this\n# after user.ini and command-line overrides are read.\nUseNewInput = true\n'''
-new_comment = '''# Enables the multi-device SDL input system with raw joystick bindings.\n# This is the wheel-build default; force feedback remains on the custom\n# DirectInput COM engine. With an attached FFB wheel, automatic backend\n# selection prefers SDL DirectInput. Set false only when deliberately using\n# WheelInputCompatibility as the legacy input fallback.\nUseNewInput = true\n'''
+old_comment = '''# Enables new SDL-based input system
+# Allowing game to see full trigger range without any shared trigger axes issues
+# (experimental, not every menu/gamemode has been tested with it yet)
+# Leave false for steering wheels. WheelInputCompatibility also enforces this
+# after user.ini and command-line overrides are read.
+UseNewInput = true
+'''
+new_comment = '''# Enables the multi-device SDL input system with raw joystick bindings.
+# This is the wheel-build default; force feedback remains on the custom
+# DirectInput COM engine. With an attached FFB wheel, automatic backend
+# selection prefers SDL DirectInput. Set false only when deliberately using
+# WheelInputCompatibility as the legacy input fallback.
+UseNewInput = true
+'''
 ini = rep(ini, old_comment, new_comment, 'document the multi-device wheel default')
 
 
@@ -41,15 +54,72 @@ ini = rep(ini, old_comment, new_comment, 'document the multi-device wheel defaul
 # non-gameplay screen. Previously the request stayed queued and could fire on
 # the first race frame. Reject such requests immediately, and also clear any
 # pending test whenever the engine resets its gameplay signal state.
-old_request = '''        void request_direction_test(int direction)\n        {\n            if (direction == 0)\n            {\n                manualTestFrames_ = 0;\n                if (initialized_ && !panicStopped_)\n                    set_constant_force(0);\n                return;\n            }\n            manualTestDirection_ = direction < 0 ? -1 : 1;\n            manualTestFrames_ = 18;\n            spdlog::info(\n                "WheelFFB: queued safe {} direction test at fixed 20% output",\n                manualTestDirection_ < 0 ? "left" : "right");\n        }\n'''
-new_request = '''        void request_direction_test(int direction)\n        {\n            if (direction == 0)\n            {\n                manualTestFrames_ = 0;\n                manualTestDirection_ = 1;\n                if (initialized_ && !panicStopped_)\n                    set_constant_force(0);\n                return;\n            }\n\n            const bool inGameplay =\n                Game::current_mode && (*Game::current_mode == STATE_GAME);\n            if (!inGameplay)\n            {\n                manualTestFrames_ = 0;\n                manualTestDirection_ = 1;\n                spdlog::warn(\n                    "WheelFFB: ignored direction test outside gameplay; no torque was queued");\n                return;\n            }\n\n            manualTestDirection_ = direction < 0 ? -1 : 1;\n            manualTestFrames_ = 18;\n            spdlog::info(\n                "WheelFFB: queued safe {} direction test at fixed 20% output",\n                manualTestDirection_ < 0 ? "left" : "right");\n        }\n'''
+old_request = '''        void request_direction_test(int direction)
+        {
+            if (direction == 0)
+            {
+                manualTestFrames_ = 0;
+                if (initialized_ && !panicStopped_)
+                    set_constant_force(0);
+                return;
+            }
+            manualTestDirection_ = direction < 0 ? -1 : 1;
+            manualTestFrames_ = 18;
+            spdlog::info(
+                "WheelFFB: queued safe {} direction test at fixed 20% output",
+                manualTestDirection_ < 0 ? "left" : "right");
+        }
+'''
+new_request = '''        void request_direction_test(int direction)
+        {
+            if (direction == 0)
+            {
+                manualTestFrames_ = 0;
+                manualTestDirection_ = 1;
+                if (initialized_ && !panicStopped_)
+                    set_constant_force(0);
+                return;
+            }
+
+            const bool inGameplay =
+                Game::current_mode && (*Game::current_mode == STATE_GAME);
+            if (!inGameplay)
+            {
+                manualTestFrames_ = 0;
+                manualTestDirection_ = 1;
+                spdlog::warn(
+                    "WheelFFB: ignored direction test outside gameplay; no torque was queued");
+                return;
+            }
+
+            manualTestDirection_ = direction < 0 ? -1 : 1;
+            manualTestFrames_ = 18;
+            spdlog::info(
+                "WheelFFB: queued safe {} direction test at fixed 20% output",
+                manualTestDirection_ < 0 ? "left" : "right");
+        }
+'''
 ffb = rep(ffb, old_request, new_request, 'direction test is gameplay-only')
 
-old_reset = '''            splashTimer_ = 0;\n            splashAmp_ = 0.0f;\n\n            // Menu/race transitions must not reuse samples from the previous\n'''
-new_reset = '''            splashTimer_ = 0;\n            splashAmp_ = 0.0f;\n            manualTestFrames_ = 0;\n            manualTestDirection_ = 1;\n\n            // Menu/race transitions must not reuse samples from the previous\n'''
+old_reset = '''            splashTimer_ = 0;
+            splashAmp_ = 0.0f;
+
+            // Menu/race transitions must not reuse samples from the previous
+'''
+new_reset = '''            splashTimer_ = 0;
+            splashAmp_ = 0.0f;
+            manualTestFrames_ = 0;
+            manualTestDirection_ = 1;
+
+            // Menu/race transitions must not reuse samples from the previous
+'''
 ffb = rep(ffb, old_reset, new_reset, 'signal reset clears pending direction test')
 
 ffb_path.write_text(ffb, encoding='utf-8')
 ui_path.write_text(ui, encoding='utf-8')
 ini_path.write_text(ini, encoding='utf-8')
 print('Applied final wheel cleanup: reset deadzone, input docs, direction-test safety')
+
+# Round-4: execute five additional source-hardening passes after all prior
+# transformations so the checks operate on the exact effective source.
+runpy.run_path('tools/patch_wheel_round4_fivepass.py', run_name='__main__')
