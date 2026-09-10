@@ -83,3 +83,7 @@ runpy.run_path('tools/patch_wheel_round13_ffb_ui_complete.py', run_name='__main_
 # Round-14: make the default SDL input ownership explicit. Input Bindings owns
 # steering/pedals/buttons/calibration; the main page owns force feedback only.
 runpy.run_path('tools/patch_wheel_round14_input_ui_roles.py', run_name='__main__')
+
+# Round-15: R3 hardware test correction. Reverse the ConstantForce/SAT actuator
+# direction and substantially strengthen ordinary-corner SAT and centering.
+runpy.run_path('tools/patch_wheel_round15_strong_r3_sat.py', run_name='__main__')
