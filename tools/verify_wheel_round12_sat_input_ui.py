@@ -39,7 +39,9 @@ require('src/overlay/wheel_setup_ui.cpp', '"Input setup: Input Bindings only. FF
 require('src/hooks_wheel_ffb.cpp', 'const float selfAligningTorque =', 'SAT model retained')
 require('src/hooks_wheel_ffb.cpp', 'structural = (softwareSpring + selfAligningTorque) * loadMod + damper;', 'SAT output retained')
 setup = read('src/overlay/wheel_setup_ui.cpp')
-if 'Load MOZA R3 Strong SAT' in setup:
+if 'Load MOZA R3 Natural SAT' in setup:
+    require('src/overlay/wheel_setup_ui.cpp', 'Settings::WheelFFBSteeringWeight = 1.75f;', 'Round16 natural SAT preset retained')
+elif 'Load MOZA R3 Strong SAT' in setup:
     require('src/overlay/wheel_setup_ui.cpp', 'Settings::WheelFFBSteeringWeight = 1.45f;', 'Round15 strong SAT setting retained')
 else:
     require('src/overlay/wheel_setup_ui.cpp', 'Load MOZA R3 SAT test', 'SAT test preset retained')
