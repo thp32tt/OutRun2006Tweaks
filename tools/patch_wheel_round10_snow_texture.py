@@ -71,3 +71,11 @@ print('Applied round-10 snow/ice continuous road-vibration suppression')
 # Round-11: replace the old signed lateral ConstantForce with a deliberately
 # stronger sim-style pseudo self-aligning torque model.
 runpy.run_path('tools/patch_wheel_round11_strong_sat.py', run_name='__main__')
+
+# Round-12: feed SAT from the actual SDL multi-device steering state and remove
+# the duplicate FFB page from the Controls dialog.
+runpy.run_path('tools/patch_wheel_round12_sat_input_ui.py', run_name='__main__')
+
+# Round-13: retain every important FFB control and safe direction test on the
+# single main Force Feedback page.
+runpy.run_path('tools/patch_wheel_round13_ffb_ui_complete.py', run_name='__main__')
