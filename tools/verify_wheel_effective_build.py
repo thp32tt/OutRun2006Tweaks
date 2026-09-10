@@ -84,7 +84,8 @@ forbid("src/hooks_wheel_r3_device_autoselect.hpp", 'Settings::WheelMenuR3DeviceN
 # another cached device or assume its filtered combo index equals a game slot.
 require("src/hooks_wheel_r3_menu_dpad.hpp", '!Settings::WheelUniversalSetupEnable &&', "universal excludes fixed R3 D-pad helper")
 require("src/hooks_wheel_r3_menu_ab.hpp", '!Settings::WheelUniversalSetupEnable &&', "universal excludes fixed R3 A/B helper")
-require("src/overlay/wheel_setup_ui.cpp", 'if (index < 0 && wanted.empty() && !devices_.empty())', "strict saved universal device")
+require("src/overlay/wheel_setup_ui.cpp", 'bool select_by_identity(const std::string& wantedGuid, const std::string& wantedName)', "GUID-aware universal selection")
+require("src/overlay/wheel_setup_ui.cpp", 'if (index < 0 && guid.empty() && wantedName.empty() && !devices_.empty()) index=0;', "strict saved universal device")
 require("src/overlay/wheel_setup_ui.cpp", 'release_device();\n                devices_.clear();', "universal stale-device re-enumeration")
 require("src/overlay/wheel_setup_ui.cpp", 'is_virtual_name(product) || is_virtual_name(instanceName)', "virtual instance filtering")
 require("src/overlay/wheel_setup_ui.cpp", 'static int regular_device_count()', "legacy slot count")
