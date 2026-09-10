@@ -149,3 +149,7 @@ runpy.run_path('tools/patch_wheel_round8_input_binding.py', run_name='__main__')
 # It adds steering resistance through spring/damping while deliberately keeping
 # collision feedback below the old Simulation Balanced reference preset.
 runpy.run_path('tools/patch_wheel_round9_release_v01.py', run_name='__main__')
+
+# Round-10: snow/ice stages use a high steady gamepad-rumble surface value.
+# Attenuate only their road-texture sine so a DD wheel does not buzz continuously.
+runpy.run_path('tools/patch_wheel_round10_snow_texture.py', run_name='__main__')
