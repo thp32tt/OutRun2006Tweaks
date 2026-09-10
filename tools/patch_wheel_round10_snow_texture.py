@@ -87,3 +87,9 @@ runpy.run_path('tools/patch_wheel_round14_input_ui_roles.py', run_name='__main__
 # Round-15: R3 hardware test correction. Reverse the ConstantForce/SAT actuator
 # direction and substantially strengthen ordinary-corner SAT and centering.
 runpy.run_path('tools/patch_wheel_round15_strong_r3_sat.py', run_name='__main__')
+
+# Round-16: hardware feedback showed the strong power curve could snap around
+# centre. Replace it with a progressive SAT shape, fade generic Spring at speed,
+# hide the duplicate generic WheelFFB settings and suppress SDL rumble while the
+# DirectInput COM wheel engine owns FFB output.
+runpy.run_path('tools/patch_wheel_round16_natural_single_owner.py', run_name='__main__')
