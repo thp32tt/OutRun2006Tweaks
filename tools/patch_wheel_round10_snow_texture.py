@@ -1,4 +1,5 @@
 from pathlib import Path
+import runpy
 
 ffb_path = Path('src/hooks_wheel_ffb.cpp')
 ffb = ffb_path.read_text(encoding='utf-8')
@@ -66,3 +67,7 @@ ffb = rep(ffb, old_splash, new_splash, 'apply snow/ice attenuation to road splas
 
 ffb_path.write_text(ffb, encoding='utf-8')
 print('Applied round-10 snow/ice continuous road-vibration suppression')
+
+# Round-11: replace the old signed lateral ConstantForce with a deliberately
+# stronger sim-style pseudo self-aligning torque model.
+runpy.run_path('tools/patch_wheel_round11_strong_sat.py', run_name='__main__')
