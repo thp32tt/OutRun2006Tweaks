@@ -89,11 +89,7 @@ jobs:
 
       - name: Verify consolidated source after archive
         shell: pwsh
-        run: |
-          python tools/verify_wheel_ffb_current.py
-          if (Select-String -Path .github/workflows/build.yml -Pattern 'cmake --build' -Quiet) {
-            throw 'Consolidation workflow must not compile'
-          }
+        run: python tools/verify_wheel_ffb_current.py
 
       - name: Commit consolidated baseline
         shell: pwsh
