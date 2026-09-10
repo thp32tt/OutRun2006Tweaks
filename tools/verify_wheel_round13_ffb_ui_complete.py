@@ -19,7 +19,9 @@ require('WheelFFB_RequestDirectionTest(-1);', 'left direction test wired')
 require('Test Right (20%)', 'right direction test visible')
 require('WheelFFB_RequestDirectionTest(1);', 'right direction test wired')
 require('WheelFFB_RequestDirectionTest(0);', 'stop direction test wired')
-if 'Load MOZA R3 Strong SAT' in text:
+if 'Load MOZA R3 Natural SAT' in text:
+    require('Load MOZA R3 Natural SAT', 'Round16 natural SAT preset retained')
+elif 'Load MOZA R3 Strong SAT' in text:
     require('Load MOZA R3 Strong SAT', 'Round15 strong SAT preset retained')
 else:
     require('Load MOZA R3 SAT test', 'SAT preset retained')
