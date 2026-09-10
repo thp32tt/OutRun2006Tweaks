@@ -74,3 +74,13 @@ jobs:
             --title 'OutRun2006Tweaks Wheel FFB v0.1' `
             --notes-file RELEASE_NOTES_v0.1.md `
             --prerelease
+
+  remove-prerelease:
+    if: "${{ github.event.head_commit.message == 'chore: remove v0.1 prerelease' }}"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete v0.1 release and tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete v0.1 --repo "$GITHUB_REPOSITORY" --cleanup-tag --yes
