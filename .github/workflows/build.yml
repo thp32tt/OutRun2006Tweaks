@@ -118,6 +118,10 @@ jobs:
         shell: pwsh
         run: python tools/patch_wheel_ffb_community.py
 
+      - name: Apply final wheel cleanup
+        shell: pwsh
+        run: python tools/patch_wheel_final_cleanup.py
+
       - name: Verify effective wheel build
         shell: pwsh
         run: python tools/verify_wheel_effective_build.py
@@ -133,6 +137,10 @@ jobs:
       - name: Verify multi-device hybrid ten-pass invariants
         shell: pwsh
         run: python tools/verify_multi_device_hybrid.py
+
+      - name: Verify final wheel cleanup
+        shell: pwsh
+        run: python tools/verify_wheel_final_cleanup.py
 
       - name: Configure
         run: |
@@ -183,6 +191,7 @@ jobs:
             "WheelFFB: scheduling DirectInput device reinitialization",
             "WheelFFB: hardware spring disabled live; using software centering",
             "WheelFFB: selected DirectInput identity",
+            "WheelFFB: ignored direction test outside gameplay; no torque was queued",
             "Reverse ConstantForce",
             "Reverse Spring",
             "WheelUniversalSetup: F11 universal DirectInput profile support installed",
@@ -199,6 +208,7 @@ jobs:
           if ($ini -notmatch '(?m)^SteeringDeadZone\s*=\s*0\.0\s*$') { throw "shipped deadzone is not 0.0" }
           if ($ini -notmatch '(?m)^WheelAccelerationInvert\s*=\s*false\s*$') { throw "shipped accelerator invert is not false" }
           if ($ini -notmatch '(?m)^UseNewInput\s*=\s*true\s*$') { throw "multi-device input is not the shipped default" }
+          if ($ini.Contains('# Leave false for steering wheels.')) { throw "stale wheel UseNewInput guidance remains in shipped INI" }
           Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, advanced FFB + community multi-device markers present" -f $bytes.Length)
           Get-FileHash $dllPath -Algorithm SHA256
 
