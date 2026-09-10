@@ -11,9 +11,20 @@ public:
     {
         positionValid_ = false;
         headingValid_ = false;
-        ready_ = false;
+        calibrated_ = false;
+        sampleValid_ = false;
+        torqueActive_ = false;
         forwardAxis_ = 0;
         forwardSign_ = 1.0f;
+        calibrationSamples_ = 0;
+        calibrationScoreX_ = 0.0f;
+        calibrationScoreZ_ = 0.0f;
+        calibrationSignedX_ = 0.0f;
+        calibrationSignedZ_ = 0.0f;
+        calibrationConfidence_ = 0.0f;
+        activationBlend_ = 0.0f;
+        invalidTicks_ = 0;
+        lastTorque_ = 0.0f;
         prevPosition_ = D3DVECTOR{};
         prevHeading_ = 0.0f;
         bodySlip_ = 0.0f;
@@ -21,6 +32,8 @@ public:
         frontSlip_ = 0.0f;
         vLong_ = 0.0f;
         vLat_ = 0.0f;
+        positionStep_ = 0.0f;
+        spdLen_ = 0.0f;
         spdCorrelation_ = 0.0f;
     }
 
@@ -34,16 +47,20 @@ public:
         float satStrength,
         float satSpeed)
     {
-        ready_ = false;
+        sampleValid_ = false;
+        torqueActive_ = false;
         vLong_ = 0.0f;
         vLat_ = 0.0f;
+        positionStep_ = 0.0f;
+        spdLen_ = 0.0f;
         spdCorrelation_ = 0.0f;
+
         if (!car)
-            return 0.0f;
+            return decay_invalid_sample();
 
         const D3DVECTOR current = car->position_14;
         if (!std::isfinite(current.x) || !std::isfinite(current.z))
-            return 0.0f;
+            return decay_invalid_sample();
 
         if (!positionValid_)
         {
@@ -56,35 +73,80 @@ public:
         const float dz = current.z - prevPosition_.z;
         prevPosition_ = current;
         const float motionLen = std::sqrt(dx * dx + dz * dz);
-        if (!std::isfinite(motionLen) || motionLen <= 0.00001f)
+        positionStep_ = std::isfinite(motionLen) ? motionLen : 0.0f;
+
+        // At genuine parking speed, zero SAT is a valid state rather than a
+        // failed physics sample. This distinction prevents Natural SAT from
+        // leaking back in around centre/standstill after calibration.
+        if (speedNorm <= 0.04f)
+        {
+            lastTorque_ = 0.0f;
+            invalidTicks_ = 0;
+            sampleValid_ = calibrated_;
             return 0.0f;
+        }
+
+        if (!std::isfinite(motionLen) || motionLen <= 0.00001f)
+            return decay_invalid_sample();
 
         const float motionX = dx / motionLen;
         const float motionZ = dz / motionLen;
-
-        // matrix_B0 is known to be the display transform and can be touched by
-        // frame interpolation. matrix_70 is therefore the first physics/body
-        // transform candidate. Calibrate whether the car model's forward axis
-        // is local X or local Z only on a reasonably straight rolling sample,
-        // and never switch it during a drift.
         const D3DMATRIX& body = car->matrix_70;
-        if (forwardAxis_ == 0 && speedNorm > 0.12f && cornerLoadSmooth < 0.18f)
+
+        // D3D's OutRun car transforms use row-vector basis/translation layout.
+        // The model's local forward axis may be row 1 or row 3, so score both
+        // across multiple straight rolling physics ticks. Never commit basis
+        // identity from one noisy frame and never recalibrate in a drift.
+        if (!calibrated_ &&
+            speedNorm > 0.12f &&
+            std::abs(steer) < 0.08f &&
+            cornerLoadSmooth < 0.12f)
         {
             const float xLen = std::sqrt(body._11 * body._11 + body._13 * body._13);
             const float zLen = std::sqrt(body._31 * body._31 + body._33 * body._33);
-            if (xLen > 0.0001f && zLen > 0.0001f)
+            if (std::isfinite(xLen) && std::isfinite(zLen) &&
+                xLen > 0.0001f && zLen > 0.0001f)
             {
                 const float xDot =
                     (body._11 / xLen) * motionX + (body._13 / xLen) * motionZ;
                 const float zDot =
                     (body._31 / zLen) * motionX + (body._33 / zLen) * motionZ;
-                forwardAxis_ = std::abs(zDot) >= std::abs(xDot) ? 3 : 1;
-                const float chosen = forwardAxis_ == 3 ? zDot : xDot;
-                forwardSign_ = chosen >= 0.0f ? 1.0f : -1.0f;
+                calibrationScoreX_ += std::abs(xDot);
+                calibrationScoreZ_ += std::abs(zDot);
+                calibrationSignedX_ += xDot;
+                calibrationSignedZ_ += zDot;
+                ++calibrationSamples_;
+
+                constexpr int CalibrationSamplesRequired = 12;
+                if (calibrationSamples_ >= CalibrationSamplesRequired)
+                {
+                    const float invSamples = 1.0f / static_cast<float>(calibrationSamples_);
+                    const float xScore = calibrationScoreX_ * invSamples;
+                    const float zScore = calibrationScoreZ_ * invSamples;
+                    const float bestScore = std::max(xScore, zScore);
+                    const float secondScore = std::min(xScore, zScore);
+                    calibrationConfidence_ = bestScore - secondScore;
+
+                    // Require both strong motion alignment and clear separation
+                    // from the orthogonal basis. If not confident, keep
+                    // collecting straight samples instead of guessing.
+                    if (bestScore >= 0.85f && calibrationConfidence_ >= 0.25f)
+                    {
+                        forwardAxis_ = zScore >= xScore ? 3 : 1;
+                        const float signedScore = forwardAxis_ == 3
+                            ? calibrationSignedZ_
+                            : calibrationSignedX_;
+                        forwardSign_ = signedScore >= 0.0f ? 1.0f : -1.0f;
+                        calibrated_ = true;
+                        activationBlend_ = 0.0f;
+                        invalidTicks_ = 0;
+                        lastTorque_ = 0.0f;
+                    }
+                }
             }
         }
 
-        if (forwardAxis_ == 0)
+        if (!calibrated_)
             return 0.0f;
 
         float forwardX = forwardAxis_ == 3 ? body._31 : body._11;
@@ -93,12 +155,12 @@ public:
         forwardZ *= forwardSign_;
         const float forwardLen = std::sqrt(forwardX * forwardX + forwardZ * forwardZ);
         if (!std::isfinite(forwardLen) || forwardLen <= 0.0001f)
-            return 0.0f;
+            return decay_invalid_sample();
         forwardX /= forwardLen;
         forwardZ /= forwardLen;
 
-        // Right-positive car-local motion. Only direction is required here, so
-        // position delta is safe even before OutRun's world-speed scale is known.
+        // Right-positive car-local motion. Position delta is intentionally used
+        // until spd_mb_20's units/coordinate space are proven by telemetry.
         const float rightX = forwardZ;
         const float rightZ = -forwardX;
         vLong_ = dx * forwardX + dz * forwardZ;
@@ -125,15 +187,17 @@ public:
         while (headingDelta < -Pi)
             headingDelta += TwoPi;
         if (std::abs(headingDelta) >= 0.35f)
-            return 0.0f;
+            return decay_invalid_sample();
 
+        // This helper is called once per OutRun simulation tick. The game
+        // physics loop remains fixed at 60 Hz even when rendering >60 FPS.
         const float rawYawRate = std::clamp(headingDelta * 60.0f, -3.5f, 3.5f);
         yawRate_ += (rawYawRate - yawRate_) * 0.20f;
 
         // Bicycle-model inspired front-slip proxy:
         // alpha_f ~= road-wheel-angle - beta - a*r/v.
-        // The game's world velocity scale is not calibrated yet, so a*r/v is a
-        // bounded speed-dependent time constant for v1 rather than fake metres.
+        // World velocity units are not calibrated yet, so a*r/v is represented
+        // by a bounded speed-dependent time constant for this experimental pass.
         constexpr float RoadWheelLockRad = 0.52f;
         const float roadWheelAngle = steer * RoadWheelLockRad;
         const float yawLeadSeconds = 0.10f - 0.045f * speedNorm;
@@ -142,18 +206,28 @@ public:
             -0.70f, 0.70f);
         frontSlip_ += (rawFrontSlip - frontSlip_) * 0.22f;
 
-        // Track whether spd_mb_20 is a world-space velocity vector. It is not
-        // used for force yet: if this correlation stays near +/-1 during a lap,
-        // v2 can switch from position differencing to the direct game vector.
+        // Measure whether spd_mb_20 is a world-space velocity vector. Keep it
+        // telemetry-only until correlation and scale are proven by a real lap.
         const float spdX = car->spd_mb_20.x;
         const float spdZ = car->spd_mb_20.z;
         const float spdLen = std::sqrt(spdX * spdX + spdZ * spdZ);
         if (std::isfinite(spdLen) && spdLen > 0.0001f)
-            spdCorrelation_ = (spdX / spdLen) * motionX + (spdZ / spdLen) * motionZ;
+        {
+            spdLen_ = spdLen;
+            spdCorrelation_ =
+                (spdX / spdLen) * motionX + (spdZ / spdLen) * motionZ;
+        }
+
+        sampleValid_ = true;
+        invalidTicks_ = 0;
+        activationBlend_ = std::min(1.0f, activationBlend_ + (1.0f / 24.0f));
 
         const float slipAbs = std::abs(frontSlip_);
-        if (slipAbs <= 0.004f || speedNorm <= 0.04f)
+        if (slipAbs <= 0.004f)
+        {
+            lastTorque_ = 0.0f;
             return 0.0f;
+        }
 
         // Pneumatic-trail-like response: rise to a peak around 9 degrees front
         // slip, then unload as the tyre slides more deeply instead of increasing
@@ -175,25 +249,65 @@ public:
             (frontSlip_ > 0.0f ? -1.0f : 1.0f) *
             trailShape * satSpeed * physicsLoad * physicsGrip *
             returnRelief * satStrength;
-        ready_ = std::isfinite(torque);
-        return ready_ ? torque : 0.0f;
+        if (!std::isfinite(torque))
+            return decay_invalid_sample();
+
+        lastTorque_ = torque;
+        torqueActive_ = std::abs(torque) > 0.0001f;
+        return torque;
     }
 
-    bool ready() const { return ready_; }
+    bool calibrated() const { return calibrated_; }
+    bool sampleValid() const { return sampleValid_; }
+    bool torqueActive() const { return torqueActive_; }
     int forwardAxis() const { return forwardAxis_; }
+    float calibrationConfidence() const { return calibrationConfidence_; }
+    float activationBlend() const { return activationBlend_; }
     float bodySlip() const { return bodySlip_; }
     float yawRate() const { return yawRate_; }
     float frontSlip() const { return frontSlip_; }
     float vLong() const { return vLong_; }
     float vLat() const { return vLat_; }
+    float positionStep() const { return positionStep_; }
+    float spdLen() const { return spdLen_; }
     float spdCorrelation() const { return spdCorrelation_; }
 
 private:
+    float decay_invalid_sample()
+    {
+        sampleValid_ = false;
+        torqueActive_ = false;
+        if (!calibrated_)
+            return 0.0f;
+
+        // Do not switch force models for a single bad physics sample. Briefly
+        // decay the previous Physics SAT request, then reach a safe zero.
+        ++invalidTicks_;
+        if (invalidTicks_ > 4)
+        {
+            lastTorque_ = 0.0f;
+            return 0.0f;
+        }
+        lastTorque_ *= 0.55f;
+        return lastTorque_;
+    }
+
     bool positionValid_ = false;
     bool headingValid_ = false;
-    bool ready_ = false;
+    bool calibrated_ = false;
+    bool sampleValid_ = false;
+    bool torqueActive_ = false;
     int forwardAxis_ = 0;
     float forwardSign_ = 1.0f;
+    int calibrationSamples_ = 0;
+    float calibrationScoreX_ = 0.0f;
+    float calibrationScoreZ_ = 0.0f;
+    float calibrationSignedX_ = 0.0f;
+    float calibrationSignedZ_ = 0.0f;
+    float calibrationConfidence_ = 0.0f;
+    float activationBlend_ = 0.0f;
+    int invalidTicks_ = 0;
+    float lastTorque_ = 0.0f;
     D3DVECTOR prevPosition_{};
     float prevHeading_ = 0.0f;
     float bodySlip_ = 0.0f;
@@ -201,5 +315,7 @@ private:
     float frontSlip_ = 0.0f;
     float vLong_ = 0.0f;
     float vLat_ = 0.0f;
+    float positionStep_ = 0.0f;
+    float spdLen_ = 0.0f;
     float spdCorrelation_ = 0.0f;
 };
