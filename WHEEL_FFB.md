@@ -1,136 +1,122 @@
-# Wheel FFB experimental branch
+# Wheel / FFB architecture — v0.1
 
-This branch adds native steering-wheel force feedback to current OutRun2006Tweaks, initially targeting a MOZA R3.
+This document describes the `wheel-ffb` branch used for **OutRun2006Tweaks Wheel FFB v0.1**.
 
-## Current architecture
+## Scope
 
-- **Wheel input:** the game's original DirectInput path (the same path used by the working v0.6.1 release), selected by `WheelInputCompatibility = true`.
-- **FFB output:** Windows DirectInput 8 COM (`IDirectInputEffect`).
-- **Steering source:** the game's real `GetVolume(Steering)` path, not the unverified `EVWORK_CAR::field_1D0` value.
-- **Update cadence:** one update per `CalcVibrationValues()` / car-physics tick (normally 60 Hz).
-- **Main steering output:** `GUID_ConstantForce` updated with `DIEP_TYPESPECIFICPARAMS | DIEP_START`.
-- **Road/tire texture:** hardware `GUID_Sine` periodic effects when the driver supports them; constant-force sine fallback otherwise.
-- **Device handling:** dedicated `EXCLUSIVE | BACKGROUND` DirectInput handle; default device-name filter is `MOZA`; common virtual devices such as vJoy/ViGEm/XOutput are skipped.
+v0.1 was created primarily for a personal **MOZA R3** setup and has only been personally hardware-tested on that wheel. It is shared as an experimental community build for anyone who may find it useful.
 
-The DirectInput output design is based on the hardware-tested lessons in `d-b-c-e/OutRun2006Tweaks-FFB` (MIT), while this branch keeps the current emoose Tweaks codebase and fixes the steering-source problem recorded in that project by reading the actual game steering input.
+## Architecture
+
+Input and force feedback deliberately use separate owners:
+
+- **Input owner:** SDL3 raw joystick multi-device path.
+- **FFB owner:** custom Windows DirectInput COM engine.
+- Wheels, pedals, shifters, button boxes and gamepads can be bound independently.
+- FFB is pinned to the selected DirectInput device GUID rather than whichever similarly named interface appears first.
+- Legacy original-game DirectInput input remains an explicit compatibility fallback; it is not the v0.1 default.
+- Application-level SDL Haptic is not used as the wheel FFB backend.
+
+This separation avoids having an input poller and an FFB backend fight over the same exclusive DirectInput handle.
+
+## Input setup
+
+F11 provides:
+
+- startup device enumeration and hotplug handling;
+- per-device button / axis / hat bindings;
+- VID/PID plus serial/path identity where available;
+- Steering / Accelerator / Brake calibration with Min / Rest / Max;
+- axis inversion / positive-side selection;
+- guided Quick Setup;
+- live input display and binding persistence.
+
+Quick Setup waits for the captured control to be released before moving to the next step, including raw pedal axes. This prevents a held accelerator from being mistaken for the following brake step.
 
 ## Force model
 
-The experimental model is intentionally arcade-oriented:
+The FFB model uses the real game steering input and game-physics signals rather than the previously unverified `field_1D0` steering assumption.
 
-1. **Center spring** — actual steering position × speed curve.
-2. **Damper** — derived from frame-to-frame change in the actual steering input.
-3. **Cornering load** — OutRun's `field_264 + field_268` lateral signal.
-4. **Grip loss** — cornering load gets lighter as the lateral signal enters a deep drift.
-5. **Weight transfer** — braking/acceleration modulates structural steering load.
-6. **Wall impact** — short directional collision impulse with cooldown.
-7. **Gear shift** — symmetric +/− double pulse so it feels like a thunk instead of a sideways yank.
-8. **Road texture** — OutRun's own Xbox surface roughness LUT (`sub_1149C0`) drives a hardware sine effect.
-9. **Tire slip** — 40→28 Hz sine chatter as drift depth increases.
+Main channels:
 
-Output conditioning includes a warm-up ramp, `tanh()` soft saturation, per-frame slew limiting and a ramp-in when a DirectInput effect has to be recreated.
+1. **Aligning / Spring** — speed-dependent centering based on actual steering position.
+2. **Dynamic Damping** — resists steering velocity without being another centering spring.
+3. **Cornering Load** — adds load from OutRun lateral physics.
+4. **Grip-loss Unload** — reduces cornering/spring load in a deep drift.
+5. **Weight Transfer** — acceleration/braking modulation.
+6. **Collision** — short directional impact impulse.
+7. **Gear Shift** — short symmetric shift thunk.
+8. **Road Detail** — periodic texture derived from the game's surface roughness information.
+9. **Tire Slip** — periodic chatter that increases with drift depth.
 
-## Safety / lifecycle
+Signal conditioning applies master gain before soft saturation/slew. DirectInput effect `dwGain` remains at `DI_FFNOMINALMAX`; the 0-150% master control is software model gain, not an out-of-range driver gain.
 
-Direct-drive safety is treated separately from the feel model:
+## MOZA R3 v0.1 default profile
 
-- conservative default master gain: **25%**;
-- 30-frame startup ramp;
-- 6%/frame structural slew limit by default;
-- watchdog timer zeros forces if the game FFB tick stops for more than 250 ms;
-- Alt-Tab zeros forces;
-- `WM_CLOSE`, `WM_DESTROY`, `WM_QUERYENDSESSION` and `ExitProcess` paths call `PanicStop`;
-- `PanicStop` sends constant-force zero, stops periodic effects, `STOPALL`, `SETACTUATORSOFF`, `RESET`, then unacquires the device;
-- driver autocenter is restored **after** `Unacquire`, matching the ordering validated on a MOZA R12 in the reference project.
+The release default intentionally adds steering resistance without making collision feedback too strong.
 
-## Settings
-
-Settings can be overridden in `OutRun2006Tweaks.user.ini`:
-
-```ini
-[Controls]
-# Keep this enabled for MOZA and other Windows steering wheels.
-WheelInputCompatibility = true
-UseNewInput = false
-ControllerHotPlug = false
-VibrationMode = 0
-ImpulseVibrationMode = 0
-WheelAccelerationInvert = true
-WheelBrakeInvert = false
-WheelMenuDirectionFilter = true
-
-[WheelFFB]
-Enable = true
-DeviceName = MOZA
-
-# R3 first-test values
-GlobalStrength = 0.25
-SpringStrength = 0.45
-DamperStrength = 0.10
-SteeringWeight = 0.45
-GripLoss = 0.60
-LateralDeadzone = 1.5
-WeightTransfer = 0.60
-
-WallImpact = 0.35
-GearShift = 0.18
-RoadTexture = 0.20
-TireSlip = 0.18
-EngineIdle = 0.04
-
-SlewRate = 0.06
-UsePeriodicEffects = true
-InvertForce = false
-DebugLog = true
+```text
+Overall Strength       0.70
+Aligning / Spring      0.60
+Dynamic Damping        0.42
+Cornering Load         0.38
+Grip-loss Unload       0.65
+Collision              0.38
+Road Detail            0.30
+Tire Slip              0.20
+Low-speed Aligning     0.08
+Corner-load Boost      0.35
+Hardware Spring        ON
+Hardware Damper        ON
+Reverse Spring         OFF (MOZA R3 tested direction)
 ```
 
-If the wheel pulls further into a corner instead of returning toward center, change:
+F11 exposes this as **MOZA R3 v0.1 (default)**. The older Simulation Balanced / Arcade Light / Arcade Strong presets remain available as comparison references.
 
-```ini
-InvertForce = true
-```
+## Safety and lifecycle
 
-If periodic vibration behaves strangely on a particular driver, test:
+The DirectInput engine includes:
 
-```ini
-UsePeriodicEffects = false
-```
+- startup/reconnect force ramping;
+- foreground/gameplay checks before torque updates;
+- force zeroing and transient-event reset on focus loss;
+- watchdog behavior when the FFB update path stalls;
+- device-loss reacquire/reinitialize handling;
+- panic-stop handling on game/window shutdown;
+- safe left/right direction tests fixed at 20%, rejected outside gameplay;
+- periodic road/tire/collision/shift signals silenced during manual direction tests.
 
-This keeps steering FFB and synthesizes limited-frequency texture through ConstantForce instead.
+Direct-drive wheels can still produce significant force. Keep a conservative hardware torque limit while testing a new wheel or driver.
 
-## First MOZA R3 test
+## Compatibility notes
 
-The first drive is still a smoke test. Verify these before judging fine feel:
+### MOZA R3
 
-1. Connect and power on the wheel before launching the game.
-2. Bind/calibrate it through the game's **Options > Controller** screen.
-3. Do not use the F11 controller list for this mode. It belongs to the disabled SDL input path, so an empty list is expected.
-4. Confirm the log contains `WheelInputCompatibility: legacy DirectInput active` and `WheelFFB: ready on 'MOZA ...'`.
-5. Verify steering and pedals before judging force feedback.
-6. Left steering must produce a restoring force toward the right and vice versa.
-7. Straight-line force must not violently oscillate.
-8. Alt-Tab and game exit must remove torque cleanly.
+Personally tested in v0.1. In the tested setup:
 
-`InputBackend` only selects an SDL backend and is intentionally ignored while
-`WheelInputCompatibility` is enabled. If the old game controller configuration
-has become corrupted, exit the game and move `SaveGame/common.dat` somewhere
-safe before launching again; this resets more game settings than controls, so
-keep the backup.
+- 270° steering range was used;
+- Spring direction works with normal/positive coefficients;
+- Reverse Spring is OFF;
+- steering, pedals, menu directions/buttons and FFB operate through the multi-device + DirectInput split architecture.
 
-The MOZA accelerator can report its DirectInput axis in the opposite direction
-to the one expected by OutRun. The branch therefore defaults to
-`WheelAccelerationInvert = true`. If pressing the brake releases it and letting
-go applies it, set `WheelBrakeInvert = true` in `OutRun2006Tweaks.user.ini`.
-Use either these per-game settings or Pit House pedal inversion, not both.
+### Other hardware
 
-At rest, that reversed axis can also be interpreted as a held menu direction.
-`WheelMenuDirectionFilter = true` learns a direction that remains held outside
-a race and suppresses it. Other wheel directions and keyboard arrow keys remain
-available. The log records the learned direction as
-`WheelMenuDirectionFilter: suppressing continuously-held ...`.
+Other DirectInput-compatible wheels may work, including devices that expose separate input and FFB interfaces. v0.1 should still be treated as **untested** on hardware other than the MOZA R3 until community reports are available.
 
-Useful log lines start with `WheelFFB:` or `WheelFFB DIAG:`.
+For a report, include:
 
-## CI
+- wheel base / rim / pedals / shifter models;
+- driver and firmware versions;
+- whether input appears in F11 Controllers;
+- whether the selected FFB device passes direction tests;
+- `OutRun2006Tweaks.log` from a complete launch → race → exit session.
 
-Every push to `wheel-ffb` runs the existing Windows Server 2022 / Visual Studio 2022 **Win32 Release** GitHub Actions workflow. The workflow injects `src/hooks_wheel_ffb_build.cpp` into the generated CMake source list and uploads the normal Tweaks build as an Artifact.
+## Credits
+
+The implementation and design work builds on community references from:
+
+- [emoose/OutRun2006Tweaks](https://github.com/emoose/OutRun2006Tweaks)
+- [hyp36rmax/multi-device-input](https://github.com/hyp36rmax/multi-device-input/tree/multi-device-input)
+- [d-b-c-e/OutRun2006Tweaks-FFB](https://github.com/d-b-c-e/OutRun2006Tweaks-FFB)
+
+Thank you to those authors and community testers for making their work and hardware observations available. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for license/attribution details.

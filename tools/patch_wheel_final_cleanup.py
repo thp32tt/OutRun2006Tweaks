@@ -144,3 +144,8 @@ runpy.run_path('tools/patch_wheel_round7_final_safety.py', run_name='__main__')
 # aggregation, binding-file recovery, raw-axis release sequencing, and legacy
 # F11 menu ownership without changing the force-feedback model.
 runpy.run_path('tools/patch_wheel_round8_input_binding.py', run_name='__main__')
+
+# Round-9 / v0.1: install the hardware-tested MOZA R3 personal release tune.
+# It adds steering resistance through spring/damping while deliberately keeping
+# collision feedback below the old Simulation Balanced reference preset.
+runpy.run_path('tools/patch_wheel_round9_release_v01.py', run_name='__main__')
