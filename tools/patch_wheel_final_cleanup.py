@@ -123,3 +123,7 @@ print('Applied final wheel cleanup: reset deadzone, input docs, direction-test s
 # Round-4: execute five additional source-hardening passes after all prior
 # transformations so the checks operate on the exact effective source.
 runpy.run_path('tools/patch_wheel_round4_fivepass.py', run_name='__main__')
+
+# Round-5: repair the round-4 compiler regression and apply another five
+# lifecycle/hotplug review passes to the exact effective source.
+runpy.run_path('tools/patch_wheel_round5_fivepass.py', run_name='__main__')
