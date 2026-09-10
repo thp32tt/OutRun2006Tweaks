@@ -50,8 +50,9 @@ if stack:
 print('ROUND10 VERIFY OK [delimiter balance]')
 print('Round-10 snow/ice vibration suppression verification passed')
 
-# Round-11/12/13 are chained by the Round-10 patch runner, so verify the final
-# effective source in the same order.
+# Round-11/12/13/14 are chained by the Round-10 patch runner, so verify the
+# final effective source in the same order.
 runpy.run_path('tools/verify_wheel_round11_strong_sat.py', run_name='__main__')
 runpy.run_path('tools/verify_wheel_round12_sat_input_ui.py', run_name='__main__')
 runpy.run_path('tools/verify_wheel_round13_ffb_ui_complete.py', run_name='__main__')
+runpy.run_path('tools/verify_wheel_round14_input_ui_roles.py', run_name='__main__')
