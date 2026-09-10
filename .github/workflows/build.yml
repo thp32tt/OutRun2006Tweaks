@@ -114,6 +114,10 @@ jobs:
         shell: pwsh
         run: python tools/patch_multi_device_hybrid.py
 
+      - name: Apply d-b-c-e + Discord community FFB refinements
+        shell: pwsh
+        run: python tools/patch_wheel_ffb_community.py
+
       - name: Verify effective wheel build
         shell: pwsh
         run: python tools/verify_wheel_effective_build.py
@@ -139,7 +143,7 @@ jobs:
       - name: Add older VC2022 redist workaround to safetyhook
         shell: pwsh
         run: |
-          (Get-Content build/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/safetyhook-build/safetyhook.vcxproj
+          (Get-Content build/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/safetyhook-build/src/safetyhook.vcxproj
           (Get-Content build/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/zydis-build/Zydis.vcxproj
           (Get-Content build/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/zydis-build/zycore/Zycore.vcxproj
 
@@ -183,7 +187,10 @@ jobs:
             "Reverse Spring",
             "WheelUniversalSetup: F11 universal DirectInput profile support installed",
             "multi-device SDL raw input enabled",
-            "Multi-device input architecture adapted from hyp36rmax (MIT)"
+            "Multi-device input architecture adapted from hyp36rmax (MIT)",
+            "2-axis POLAR actuator encoding",
+            "Simulation Balanced v1",
+            "Test Left (20%)"
           )
           foreach ($marker in $markers) {
             if (-not $ascii.Contains($marker)) { throw "missing compiled marker: $marker" }
@@ -191,7 +198,8 @@ jobs:
           $ini = Get-Content "build/bin/OutRun2006Tweaks.ini" -Raw
           if ($ini -notmatch '(?m)^SteeringDeadZone\s*=\s*0\.0\s*$') { throw "shipped deadzone is not 0.0" }
           if ($ini -notmatch '(?m)^WheelAccelerationInvert\s*=\s*false\s*$') { throw "shipped accelerator invert is not false" }
-          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, advanced FFB + multi-device markers present" -f $bytes.Length)
+          if ($ini -notmatch '(?m)^UseNewInput\s*=\s*true\s*$') { throw "multi-device input is not the shipped default" }
+          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, advanced FFB + community multi-device markers present" -f $bytes.Length)
           Get-FileHash $dllPath -Algorithm SHA256
 
       - name: Download EXE
