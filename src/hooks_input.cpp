@@ -15,12 +15,12 @@
 
 namespace Settings
 {
-	Setting<float> SteeringDeadZone{ "Controls", "SteeringDeadZone", 0.2f,
-		"Allows overriding the steering deadzone. Game default is 0.2 / 20%.", Range<float>{ 0.f, 1.f } };
+	Setting<float> SteeringDeadZone{ "Controls", "SteeringDeadZone", 0.0f,
+		"Allows overriding the steering deadzone. Original game default is 0.2 / 20%; wheel branch default is 0%.", Range<float>{ 0.f, 1.f } };
 	Setting<bool> ControllerHotPlug{ "Controls", "ControllerHotPlug", false,
 		"Allows game to detect newly plugged in devices, rather than needing a restart. May have issues with some "
 		"controllers/wheels, and is ignored when using UseNewInput as hot-plug is supported by it by default." };
-	Setting<bool> WheelAccelerationInvert{ "Controls", "WheelAccelerationInvert", true,
+	Setting<bool> WheelAccelerationInvert{ "Controls", "WheelAccelerationInvert", false,
 		"Reverses the legacy DirectInput acceleration channel for wheel pedals that report released as maximum." };
 	Setting<bool> WheelBrakeInvert{ "Controls", "WheelBrakeInvert", false,
 		"Reverses the legacy DirectInput brake channel. Enable this only if the brake is active while released." };

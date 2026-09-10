@@ -112,30 +112,13 @@ void Plugin_Init()
 		} 
 	}
 
-	// The last official release used the game's own DirectInput path. Current
-	// SDL builds only enumerate SDL_Gamepad devices, so Windows wheels without a
-	// gamepad mapping (including MOZA/Fanatec/Logitech models) disappear from the
-	// new binding UI regardless of the selected SDL backend. Keep the current
-	// fixes and overlay, but restore the known-good v0.6.1 input path for this
-	// wheel-focused build. Do this after user/command-line INIs are read so a
-	// stale UseNewInput=true override cannot silently defeat compatibility mode.
-	if (Settings::WheelInputCompatibility)
+	if (Settings::UseNewInput)
 	{
-		const bool changedInputMode = Settings::UseNewInput;
-		const bool changedHotPlug = Settings::ControllerHotPlug;
-		const bool changedVibration = Settings::VibrationMode || Settings::ImpulseVibrationMode;
-
-		Settings::UseNewInput = false;
-		Settings::ControllerHotPlug = false;
-		Settings::VibrationMode = 0;
-		Settings::ImpulseVibrationMode = 0;
-
-		spdlog::info(
-			"WheelInputCompatibility: legacy DirectInput active "
-			"(UseNewInput=false, ControllerHotPlug=false, built-in XInput vibration=false){}",
-			(changedInputMode || changedHotPlug || changedVibration)
-				? " [overrode conflicting settings]"
-				: "");
+		spdlog::info("Wheel input: multi-device SDL raw input enabled; legacy DirectInput helpers remain inactive fallback");
+	}
+	else if (Settings::WheelInputCompatibility)
+	{
+		spdlog::info("Wheel input: legacy DirectInput compatibility fallback enabled");
 	}
 
 	Settings::to_log();

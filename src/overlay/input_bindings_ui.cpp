@@ -1,10 +1,32 @@
 #include "input_manager.hpp"
-#include "wheel_force_feedback.hpp"
 
 #include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <cstring>
+
+namespace Settings
+{
+    extern Setting<bool> WheelFFBEnable;
+    extern Setting<float> WheelFFBGlobalStrength;
+    extern Setting<float> WheelFFBSpringStrength;
+    extern Setting<float> WheelFFBDamperStrength;
+    extern Setting<float> WheelFFBSteeringWeight;
+    extern Setting<float> WheelFFBGripLoss;
+    extern Setting<float> WheelFFBLowSpeedSpring;
+    extern Setting<float> WheelFFBSpringLoadBoost;
+    extern Setting<float> WheelFFBWallImpact;
+    extern Setting<float> WheelFFBRoadTexture;
+    extern Setting<float> WheelFFBTireSlip;
+    extern Setting<bool> WheelFFBUseHardwareSpring;
+    extern Setting<bool> WheelFFBUseHardwareDamper;
+    extern Setting<bool> WheelFFBUsePeriodicEffects;
+    extern Setting<bool> WheelFFBInvertForce;
+    extern Setting<bool> WheelFFBInvertSpring;
+    extern Setting<bool> WheelFFBDebugLog;
+}
+
+void WheelFFB_RequestDirectionTest(int direction);
 
 //
 // Binding editor.
@@ -130,6 +152,7 @@ private:
 	bool quickSetupPreviousUnsaved = false;
 	std::vector<std::pair<Selection, std::vector<InputBinding>>> quickSetupBackup;
 	std::optional<InputBinding> quickSetupCandidate;
+	std::optional<InputBinding> releaseGuardBinding;
 	bool quickSetupTimedOut = false;
 	std::chrono::steady_clock::time_point quickSetupCaptureDeadline{};
 	static constexpr auto QuickSetupCaptureTime = std::chrono::seconds(6);
@@ -162,6 +185,7 @@ private:
 		bindIndex = index;
 		bindingName = name_for(target);
 		axisBaseline.clear();
+		releaseGuardBinding.reset();
 		if (quickSetupActive)
 		{
 			quickSetupCandidate.reset();
@@ -192,6 +216,7 @@ private:
 		quickSetupComplete = false;
 		quickSetupStep = 0;
 		quickSetupCandidate.reset();
+		releaseGuardBinding.reset();
 		quickSetupTimedOut = false;
 		unsavedChanges = quickSetupPreviousUnsaved;
 	}
@@ -279,6 +304,7 @@ public:
 			else
 				action.add(binding);
 
+			releaseGuardBinding = binding;
 			isListeningForInput = ListenState::WaitForBindButtonRelease;
 			ImGui::CloseCurrentPopup();
 		};
@@ -575,14 +601,20 @@ private:
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip("Pedal direction is detected automatically during calibration");
 				}
-				else
+				else if (steering || binding.isAxis())
 				{
 					if (ImGui::Checkbox("##invert", &binding.negate))
 						unsavedChanges = true;
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(steering
 							? "Steer the other way with this input"
-							: "Invert this input");
+							: "Use the opposite side of this axis");
+				}
+				else
+				{
+					ImGui::TextDisabled("-");
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip("Invert is only meaningful for axes or steering-direction buttons");
 				}
 
 				ImGui::TableNextColumn();
@@ -632,7 +664,7 @@ private:
 			ImGui::TextWrapped("Connect a controller, wheel, pedal set or shifter. Devices appear here automatically.");
 			ImGui::Spacing();
 			ImGui::Separator();
-			ImGui::TextDisabled("Multi-device input by hyp36rmax");
+			ImGui::TextDisabled("Multi-device input architecture adapted from hyp36rmax (MIT)");
 			return;
 		}
 
@@ -688,7 +720,7 @@ private:
 
 		ImGui::Spacing();
 		ImGui::Separator();
-		ImGui::TextDisabled("Multi-device input by hyp36rmax");
+		ImGui::TextDisabled("Multi-device input architecture adapted from hyp36rmax (MIT)");
 	}
 
 	// These are tweaks settings rather than bindings, so they go to the tweaks INI
@@ -738,7 +770,7 @@ private:
 			setting_changed(Settings::ImpulseVibrationMode);
 
 		int deadzonePercent = int(Settings::SteeringDeadZone * 100.f);
-		if (ImGui::SliderInt("Steering Deadzone", &deadzonePercent, 5, 20, "%d%%"))
+		if (ImGui::SliderInt("Steering Deadzone", &deadzonePercent, 0, 20, "%d%%"))
 		{
 			Settings::SteeringDeadZone = float(deadzonePercent) / 100.f;
 			setting_changed(Settings::SteeringDeadZone);
@@ -753,95 +785,101 @@ private:
 
 	void draw_force_feedback()
 	{
-		ImGui::TextWrapped("Choose your wheel, set the strength, then use the two direction tests. That's all most players need.");
+		ImGui::TextWrapped("Advanced DirectInput COM FFB. Input bindings can come from any connected device; FFB remains attached to the selected force-feedback wheel.");
 		ImGui::Spacing();
-		if (ImGui::Checkbox("Enable force feedback", Settings::WheelFFBEnabled.ptr()))
-		{
-			setting_changed(Settings::WheelFFBEnabled);
-			WheelForceFeedback::refresh();
-		}
 
-		const auto& devices = WheelForceFeedback::devices();
-		auto device_label = [&devices](size_t index)
+		auto applyPreset = [&](float overall, float spring, float damper, float lateral,
+			float grip, float impact, float road, float tire, float lowSpeed, float loadBoost)
 		{
-			const auto& device = devices[index];
-			const int duplicateCount = int(std::count_if(devices.begin(), devices.end(), [&](const auto& other) { return other.name == device.name; }));
-			if (duplicateCount < 2)
-				return device.name;
-			int occurrence = 1;
-			for (size_t previous = 0; previous < index; ++previous)
-				if (devices[previous].name == device.name) ++occurrence;
-			return std::format("{} (Device {})", device.name, occurrence);
+			Settings::WheelFFBGlobalStrength = overall;
+			Settings::WheelFFBSpringStrength = spring;
+			Settings::WheelFFBDamperStrength = damper;
+			Settings::WheelFFBSteeringWeight = lateral;
+			Settings::WheelFFBGripLoss = grip;
+			Settings::WheelFFBWallImpact = impact;
+			Settings::WheelFFBRoadTexture = road;
+			Settings::WheelFFBTireSlip = tire;
+			Settings::WheelFFBLowSpeedSpring = lowSpeed;
+			Settings::WheelFFBSpringLoadBoost = loadBoost;
+			setting_changed(Settings::WheelFFBGlobalStrength);
+			setting_changed(Settings::WheelFFBSpringStrength);
+			setting_changed(Settings::WheelFFBDamperStrength);
+			setting_changed(Settings::WheelFFBSteeringWeight);
+			setting_changed(Settings::WheelFFBGripLoss);
+			setting_changed(Settings::WheelFFBWallImpact);
+			setting_changed(Settings::WheelFFBRoadTexture);
+			setting_changed(Settings::WheelFFBTireSlip);
+			setting_changed(Settings::WheelFFBLowSpeedSpring);
+			setting_changed(Settings::WheelFFBSpringLoadBoost);
 		};
 
-		std::string preview = devices.empty() ? "No compatible wheel" : "Select wheel";
-		for (size_t i = 0; i < devices.size(); ++i)
-			if (devices[i].id == Settings::WheelFFBDevice.get()) preview = device_label(i);
-		ImGui::BeginDisabled(!Settings::WheelFFBEnabled);
-		if (ImGui::BeginCombo("Wheel", preview.c_str()))
-		{
-			for (size_t i = 0; i < devices.size(); ++i)
-			{
-				const auto& device = devices[i];
-				const std::string label = device_label(i);
-				bool selected = device.id == Settings::WheelFFBDevice.get();
-				ImGui::PushID(device.id.c_str());
-				if (ImGui::Selectable(label.c_str(), selected))
-				{
-					WheelForceFeedback::select(device.id);
-					setting_changed(Settings::WheelFFBDevice);
-				}
-				ImGui::PopID();
-			}
-			ImGui::EndCombo();
-		}
-		ImGui::TextDisabled("Fanatec and some other bases use separate input and FFB interfaces; this is normal.");
-		if (ImGui::SliderInt("Wheel force strength", Settings::WheelFFBStrength.ptr(), 0, 150, "%d%%"))
-			setting_changed(Settings::WheelFFBStrength);
-		if (Settings::WheelFFBStrength.get() > 100)
-			ImGui::TextColored(ImVec4(1.0f, 0.65f, 0.25f, 1.0f),
-				"High output: lower your wheel base strength first, especially on direct-drive wheels.");
-
-		ImGui::SeparatorText("Test your wheel");
-		ImGui::BeginDisabled(!WheelForceFeedback::ready());
-		if (ImGui::Button("Test left")) WheelForceFeedback::test(-1.f);
+		ImGui::SeparatorText("Versioned baseline presets");
+		if (ImGui::Button("MOZA R3 SAT test"))
+			applyPreset(0.70f, 0.32f, 0.34f, 1.10f, 0.65f, 0.38f, 0.30f, 0.20f, 0.08f, 0.18f);
+		if (ImGui::Button("Simulation Balanced v1"))
+			applyPreset(0.70f, 0.60f, 0.32f, 0.38f, 0.65f, 0.65f, 0.30f, 0.20f, 0.08f, 0.35f);
 		ImGui::SameLine();
-		if (ImGui::Button("Test right")) WheelForceFeedback::test(1.f);
+		if (ImGui::Button("Arcade Light v1"))
+			applyPreset(0.55f, 0.45f, 0.15f, 0.30f, 0.55f, 0.55f, 0.30f, 0.18f, 0.12f, 0.20f);
+		ImGui::SameLine();
+		if (ImGui::Button("Arcade Strong v1"))
+			applyPreset(0.90f, 0.65f, 0.30f, 0.45f, 0.60f, 0.75f, 0.35f, 0.22f, 0.08f, 0.40f);
+		ImGui::TextDisabled("MOZA R3 SAT test makes self-aligning torque the main steering force; old presets remain comparison references.");
+
+		if (ImGui::Checkbox("Enable force feedback", Settings::WheelFFBEnable.ptr()))
+			setting_changed(Settings::WheelFFBEnable);
+
+		ImGui::BeginDisabled(!Settings::WheelFFBEnable);
+		if (ImGui::SliderFloat("Overall strength", Settings::WheelFFBGlobalStrength.ptr(), 0.0f, 1.5f, "%.2f"))
+			setting_changed(Settings::WheelFFBGlobalStrength);
+		if (Settings::WheelFFBGlobalStrength.get() > 1.0f)
+			ImGui::TextColored(ImVec4(1.0f, 0.65f, 0.25f, 1.0f),
+				"Above 100% reduces headroom/contrast. Use only when the wheel is still too light.");
+		if (ImGui::SliderFloat("Low-speed centering spring", Settings::WheelFFBSpringStrength.ptr(), 0.0f, 1.5f, "%.2f"))
+			setting_changed(Settings::WheelFFBSpringStrength);
+		if (ImGui::SliderFloat("Dynamic damping", Settings::WheelFFBDamperStrength.ptr(), 0.0f, 1.0f, "%.2f"))
+			setting_changed(Settings::WheelFFBDamperStrength);
+		if (ImGui::SliderFloat("Self-aligning torque (SAT)", Settings::WheelFFBSteeringWeight.ptr(), 0.0f, 1.5f, "%.2f"))
+			setting_changed(Settings::WheelFFBSteeringWeight);
+		if (ImGui::SliderFloat("Grip-loss unloading", Settings::WheelFFBGripLoss.ptr(), 0.0f, 1.0f, "%.2f"))
+			setting_changed(Settings::WheelFFBGripLoss);
+		if (ImGui::SliderFloat("Collision", Settings::WheelFFBWallImpact.ptr(), 0.0f, 1.0f, "%.2f"))
+			setting_changed(Settings::WheelFFBWallImpact);
+		if (ImGui::SliderFloat("Road detail", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 1.0f, "%.2f"))
+			setting_changed(Settings::WheelFFBRoadTexture);
+		if (ImGui::SliderFloat("Tire slip", Settings::WheelFFBTireSlip.ptr(), 0.0f, 1.0f, "%.2f"))
+			setting_changed(Settings::WheelFFBTireSlip);
+
+		ImGui::SeparatorText("Backends / direction");
+		if (ImGui::Checkbox("Hardware GUID_Spring", Settings::WheelFFBUseHardwareSpring.ptr()))
+			setting_changed(Settings::WheelFFBUseHardwareSpring);
+		ImGui::SameLine();
+		if (ImGui::Checkbox("Hardware GUID_Damper", Settings::WheelFFBUseHardwareDamper.ptr()))
+			setting_changed(Settings::WheelFFBUseHardwareDamper);
+		if (ImGui::Checkbox("Hardware road/slip sine effects", Settings::WheelFFBUsePeriodicEffects.ptr()))
+			setting_changed(Settings::WheelFFBUsePeriodicEffects);
+		if (ImGui::Checkbox("Reverse ConstantForce", Settings::WheelFFBInvertForce.ptr()))
+			setting_changed(Settings::WheelFFBInvertForce);
+		ImGui::SameLine();
+		if (ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr()))
+			setting_changed(Settings::WheelFFBInvertSpring);
+		if (ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr()))
+			setting_changed(Settings::WheelFFBDebugLog);
+
+		ImGui::SeparatorText("Safe direction test");
+		if (ImGui::Button("Test Left (20%)"))
+			WheelFFB_RequestDirectionTest(-1);
+		ImGui::SameLine();
+		if (ImGui::Button("Test Right (20%)"))
+			WheelFFB_RequestDirectionTest(1);
+		ImGui::SameLine();
+		if (ImGui::Button("Stop Test"))
+			WheelFFB_RequestDirectionTest(0);
+		ImGui::TextDisabled("Direction tests are hard-capped at 20% and ignore Overall Strength headroom.");
+
+		ImGui::Spacing();
+		ImGui::TextDisabled("Select/refresh the exact DirectInput FFB interface and inspect capabilities in the Wheel Setup tab.");
 		ImGui::EndDisabled();
-		ImGui::TextDisabled("Tests use a gentle force and stop automatically.");
-		ImGui::EndDisabled();
-
-		ImGui::Spacing();
-		ImGui::SeparatorText("Status");
-		ImGui::TextWrapped("%s", WheelForceFeedback::status().c_str());
-
-		ImGui::Spacing();
-		if (ImGui::CollapsingHeader("Advanced", ImGuiTreeNodeFlags_None))
-		{
-			ImGui::TextWrapped("These options are only needed when a wheel behaves incorrectly or was connected after the game started.");
-			if (ImGui::SliderFloat("Centering", Settings::WheelFFBSpringStrength.ptr(), 0.0f, 1.0f, "%.2f"))
-				setting_changed(Settings::WheelFFBSpringStrength);
-			if (ImGui::SliderFloat("Damping", Settings::WheelFFBDamperStrength.ptr(), 0.0f, 1.0f, "%.2f"))
-				setting_changed(Settings::WheelFFBDamperStrength);
-			if (ImGui::SliderFloat("Impacts", Settings::WheelFFBImpactStrength.ptr(), 0.0f, 1.0f, "%.2f"))
-				setting_changed(Settings::WheelFFBImpactStrength);
-			if (ImGui::SliderFloat("Road detail", Settings::WheelFFBRoadStrength.ptr(), 0.0f, 1.0f, "%.2f"))
-				setting_changed(Settings::WheelFFBRoadStrength);
-			if (ImGui::SliderFloat("Grip loss", Settings::WheelFFBGripLossStrength.ptr(), 0.0f, 1.0f, "%.2f"))
-				setting_changed(Settings::WheelFFBGripLossStrength);
-			if (ImGui::Checkbox("Invert force direction", Settings::WheelFFBInvert.ptr()))
-				setting_changed(Settings::WheelFFBInvert);
-			if (ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDiagnosticLog.ptr()))
-				setting_changed(Settings::WheelFFBDiagnosticLog);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Write detailed live force signals to the log for troubleshooting.");
-			if (ImGui::Button("Refresh connected wheels")) WheelForceFeedback::refresh();
-			ImGui::TextDisabled("Compatibility details are recorded automatically in OutRun2006Tweaks.log.");
-		}
-
-		ImGui::Spacing();
-		ImGui::Separator();
-		ImGui::TextDisabled("Force feedback by hyp36rmax");
 	}
 
 	// The prompt shown while an input is being waited on.
@@ -865,8 +903,20 @@ private:
 
 		if (isListeningForInput == ListenState::WaitForBindButtonRelease)
 		{
-			if (!manager.anyInputPressed())
+			bool capturedReleased = true;
+			if (releaseGuardBinding)
 			{
+				const auto resolveJoystick = [&manager](const InputBinding& binding)
+					{
+						return manager.joystickForBinding(binding);
+					};
+				capturedReleased = std::abs(releaseGuardBinding->read(
+					manager.getPrimaryGamepad(), resolveJoystick)) < 0.25f;
+			}
+
+			if (capturedReleased && !manager.anyInputPressed())
+			{
+				releaseGuardBinding.reset();
 				if (quickSetupActive && quickSetupStep < int(std::size(QuickSetupSteps)))
 					begin_listening(quick_setup_selection(quickSetupStep), -1);
 				else
@@ -918,6 +968,7 @@ private:
 					auto& bindings = action_for(bindTarget).bindings();
 					std::erase_if(bindings, [](const InputBinding& existing) { return !existing.isKeyboard(); });
 					action_for(bindTarget).add(*quickSetupCandidate);
+					releaseGuardBinding = *quickSetupCandidate;
 					quickSetupCandidate.reset();
 					++quickSetupStep;
 					unsavedChanges = true;
@@ -927,7 +978,9 @@ private:
 				ImGui::SameLine();
 				if (ImGui::Button("Try again"))
 				{
-					begin_listening(bindTarget, -1);
+					releaseGuardBinding = *quickSetupCandidate;
+					quickSetupCandidate.reset();
+					isListeningForInput = ListenState::WaitForBindButtonRelease;
 					ImGui::CloseCurrentPopup();
 				}
 			}
@@ -1054,6 +1107,11 @@ public:
 			ImGuiWindowFlags_NoResize |
 			ImGuiWindowFlags_NoMove))
 		{
+			ImGui::TextWrapped(
+				"Multi-device input setup. With UseNewInput enabled, steering, pedals, buttons, menu controls and calibration are saved and applied only from Input Bindings.");
+			ImGui::TextDisabled("Force feedback is configured separately in the Force Feedback tab.");
+			ImGui::Separator();
+
 			if (ImGui::Button("Quick Setup"))
 				start_quick_setup();
 
@@ -1097,11 +1155,6 @@ public:
 					ImGui::EndTabItem();
 				}
 
-				if (ImGui::BeginTabItem("Force Feedback"))
-				{
-					draw_force_feedback();
-					ImGui::EndTabItem();
-				}
 
 				if (ImGui::BeginTabItem("Options"))
 				{
@@ -1131,7 +1184,7 @@ public:
 				else
 				{
 					unsavedChanges = true;
-					Settings::SteeringDeadZone = 0.2f;
+					Settings::SteeringDeadZone = 0.0f;
 					setting_changed(Settings::SteeringDeadZone);
 					Settings::BypassGameSensitivity = false;
 					setting_changed(Settings::BypassGameSensitivity);

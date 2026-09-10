@@ -52,20 +52,20 @@ namespace
 
             if (r3_autoselect_lower(Settings::WheelMenuR3DeviceName.get()) == "moza")
             {
-                Settings::WheelMenuR3DeviceName = "";
+                // Keep the name: strict-first/fallback selection happens in the reader.
                 changed = true;
             }
 
             if (r3_autoselect_lower(Settings::WheelFFBDeviceName.get()) == "moza")
             {
-                Settings::WheelFFBDeviceName = "";
+                // Keep the name: strict-first/fallback selection happens in the FFB engine.
                 changed = true;
             }
 
             if (changed)
             {
                 spdlog::info(
-                    "WheelR3DeviceAutoSelect: Windows did not reliably expose the R3 with a MOZA-prefixed DirectInput name; relaxed default device-name filters to auto-select");
+                    "WheelR3DeviceAutoSelect: MOZA default uses strict-name-first selection with an FFB-only fallback");
             }
 
             return true;

@@ -9,6 +9,7 @@
 
 namespace Settings
 {
+    extern Setting<bool> WheelFFBEnable;
 	Setting<int> VibrationMode{ "Controls", "VibrationMode", 0,
 		"Enable/disable/customize the Xbox vibration code. (NOTE: Some bluetooth controllers may cause framerate issues when vibration is enabled)",
 		{ "Disable", "Enable Xbox vibration", "L/R motors swapped", "L/R motors merged together" } };
@@ -27,6 +28,12 @@ float VibrationRightMotor = 0.f;
 
 void SetVibration(int userId, float leftMotor, float rightMotor)
 {
+    // With SDL multi-device input, wheel FFB is owned exclusively by the
+    // DirectInput COM WheelFFBEngine. Do not let the independent gamepad-rumble
+    // path reach a wheel/gamepad interface at the same time.
+    if (Settings::UseNewInput && Settings::WheelFFBEnable)
+        return;
+
     if (!Settings::VibrationMode)
         return;
     else if (Settings::VibrationMode == 2) // Swap L/R
@@ -57,6 +64,8 @@ extern "C"
     long _ftol2(double);
 }
 
+void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car);
+
 class Vibration : public Hook
 {
     const static int GamePlCar_Ctrl_Addr = 0xA8330;
@@ -64,10 +73,14 @@ class Vibration : public Hook
     inline static SafetyHookInline GamePlCar_Ctrl = {};
     static void GamePlCar_Ctrl_Hook(EVWORK_CAR* car)
     {
+        // Keep legacy/gamepad vibration timing unchanged. Wheel FFB is
+        // intentionally different: sample the car only AFTER its physics Ctrl
+        // returns so body motion/yaw belong to the current simulation tick.
         CalcVibrationValues(car);
         SetVibration(0, VibrationLeftMotor, VibrationRightMotor);
 
         GamePlCar_Ctrl.call(car);
+        WheelFFB_UpdateAfterPhysics(car);
     }
 
 public:

@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 #include <unordered_map>
+#include <algorithm>
 #include <vector>
 #include <memory>
 
@@ -61,7 +62,7 @@ struct InputState
 	float currentValue = 0.0f;
 	float previousValue = 0.0f;
 	bool isAxis = false;
-	InputSourceType lastSourceType;
+	InputSourceType lastSourceType = InputSourceType::GamePad;
 
 	void update(float newValue)
 	{
@@ -329,16 +330,21 @@ class InputAction
 
 public:
 	const InputState& update(SDL_Gamepad* primary_pad,
-		const std::function<SDL_Joystick*(const InputBinding&)>& joystickForBinding)
+		const std::function<SDL_Joystick*(const InputBinding&)>& joystickForBinding,
+		bool positiveOnly = false)
 	{
 		float maxValue = 0.0f;
 		bool isAxisInput = false;
 		InputSourceType lastSource = state_.lastSourceType;
 
-		// Read all bindings and take the highest absolute value
+		// Analog actions need the largest magnitude so signed steering survives.
+		// Digital actions pass positiveOnly=true: the negative side of an axis is
+		// inactive for that action and must never mask another +1 button binding.
 		for (const auto& binding : bindings_)
 		{
 			float currentValue = binding.read(primary_pad, joystickForBinding);
+			if (positiveOnly && currentValue <= 0.0f)
+				continue;
 			if (std::abs(currentValue) > std::abs(maxValue))
 			{
 				maxValue = currentValue;
@@ -443,9 +449,9 @@ private:
 	// Switch bitmasks. switch_current/_previous are what the game sees;
 	// switch_overlay is the same data before game-side suppression, so the
 	// overlay can still be driven while the game is deaf.
-	uint32_t switch_current;
-	uint32_t switch_previous;
-	uint32_t switch_overlay;
+	uint32_t switch_current = 0;
+	uint32_t switch_previous = 0;
+	uint32_t switch_overlay = 0;
 
 	// Mirror of the raw DirectInput masks. Edges are tracked here rather than
 	// read back out of the game's copy, because DInputUpdate rewrites the same
@@ -591,10 +597,14 @@ private:
 		char guidText[33]{};
 		SDL_GUIDToString(SDL_GetJoystickGUID(joystick), guidText, int(std::size(guidText)));
 		const std::string guid(guidText);
-		const int occurrence = int(std::count_if(devices.begin(), devices.end(), [&guid](const InputDevice& device)
+		int occurrence = 0;
+		while (std::any_of(devices.begin(), devices.end(), [&guid, occurrence](const InputDevice& device)
 			{
-				return device.guid == guid;
-			}));
+				return device.guid == guid && device.occurrence == occurrence;
+			}))
+		{
+			++occurrence;
+		}
 		const char* serialText = SDL_GetJoystickSerial(joystick);
 		const char* pathText = SDL_GetJoystickPath(joystick);
 		InputDevice device{ instanceId, joystick, SDL_IsGamepad(instanceId), guid, occurrence,
@@ -611,10 +621,10 @@ private:
 	{
 		const bool usbIdentityMatches = (!binding.deviceVendor || device.vendor == binding.deviceVendor) &&
 			(!binding.deviceProduct || device.product == binding.deviceProduct);
-		if (!binding.deviceSerial.empty() && usbIdentityMatches && device.serial == binding.deviceSerial)
-			return true;
-		if (!binding.devicePath.empty() && usbIdentityMatches && device.path == binding.devicePath)
-			return true;
+		if (!binding.deviceSerial.empty())
+			return usbIdentityMatches && device.serial == binding.deviceSerial;
+		if (!binding.devicePath.empty())
+			return usbIdentityMatches && device.path == binding.devicePath;
 		return device.guid == binding.deviceGuid && device.occurrence == binding.deviceOccurrence;
 	}
 
@@ -672,15 +682,33 @@ private:
 
 		if (it != controllers.end())
 		{
-			Game::CurrentPadType = Game::GamepadType::PC;
+			const int removedIndex = int(std::distance(controllers.begin(), it));
+			const bool removedPrimary = (removedIndex == primaryControllerIndex);
 
 			SDL_CloseGamepad(*it);
 			controllers.erase(it);
 
 			spdlog::debug(__FUNCTION__ "(instance {}): removed instance", instanceId);
 
-			if (primaryControllerIndex >= controllers.size())
-				setPrimaryGamepad(controllers.empty() ? -1 : 0);
+			if (controllers.empty())
+			{
+				Game::CurrentPadType = Game::GamepadType::PC;
+				setPrimaryGamepad(-1);
+			}
+			else if (removedPrimary)
+			{
+				const int replacementIndex =
+                    removedIndex < int(controllers.size())
+                        ? removedIndex
+                        : int(controllers.size()) - 1;
+                setPrimaryGamepad(replacementIndex);
+			}
+			else if (primaryControllerIndex > removedIndex)
+			{
+				--primaryControllerIndex;
+				if (auto* pad = getPrimaryGamepad())
+					setupGamepad(pad);
+			}
 		}
 	}
 
@@ -1044,13 +1072,19 @@ public:
 
 		spdlog::info(__FUNCTION__ " - {} key binds, {} pad binds, {} device binds", key_binds, pad_binds, device_binds);
 
-		// we have binds, reset any of our defaults
+		// Preserve the current working configuration until at least one entry
+		// has parsed successfully. This makes Load bindings transactional for a
+		// completely malformed/truncated file.
+		auto previousVolumeBindings = volumeBindings;
+		auto previousSwitchBindings = switchBindings;
+		auto previousModBindings = modBindings;
 		for (auto& binding : volumeBindings)
 			binding.clear();
 		for (auto& binding : switchBindings)
 			binding.clear();
 		for (auto& binding : modBindings)
 			binding.clear();
+		int loadedBinds = 0;
 
 		for (const auto& entry : entries)
 		{
@@ -1075,9 +1109,29 @@ public:
 			}
 
 			binding->negate = action->negate;
+			if (binding->negate && !binding->isAxis() &&
+				!(action->kind == ActionRef::Kind::Volume &&
+					action->index == int(ADChannel::Steering)))
+			{
+				// A '-' suffix on a button/key cannot select an opposite direction;
+				// it only turns +1 into -1 and makes digital/pedal actions unusable.
+				spdlog::warn(__FUNCTION__ ": ignoring invalid negative suffix for non-axis action {}", entry.key);
+				binding->negate = false;
+			}
 			addBinding(*action, *binding);
+			++loadedBinds;
 		}
 
+		if (loadedBinds == 0)
+		{
+			volumeBindings = std::move(previousVolumeBindings);
+			switchBindings = std::move(previousSwitchBindings);
+			modBindings = std::move(previousModBindings);
+			spdlog::error(__FUNCTION__ ": no valid bindings parsed; previous bindings preserved");
+			return false;
+		}
+
+		ensureOverlayBindable();
 		return true;
 	}
 
@@ -1195,7 +1249,13 @@ public:
 		{
 			auto& vol = volumeBindings[i].update(gamepad, resolveJoystick);
 			if (Overlay::IsBindingDialogActive || Overlay::IsActive) [[unlikely]]
+			{
+				// Keep the binding's live state for the UI, but never leave a stale
+				// throttle/brake/steering command active underneath the overlay.
+				volumes[i].previousValue = 0.0f;
+				volumes[i].currentValue = 0.0f;
 				continue;
+			}
 
 			volumes[i] = vol;
 
@@ -1221,7 +1281,7 @@ public:
 		uint32_t mask = 0;
 		for (size_t i = 0; i < switchBindings.size(); ++i)
 		{
-			auto& switchState = switchBindings[i].update(gamepad, resolveJoystick);
+			auto& switchState = switchBindings[i].update(gamepad, resolveJoystick, true);
 			if (switchState.isPressed())
 			{
 				mask |= (1 << i);
@@ -1291,7 +1351,7 @@ public:
 			};
 
 		for (size_t i = 0; i < modBindings.size(); ++i)
-			modStates[i] = modBindings[i].update(gamepad, resolveJoystick);
+			modStates[i] = modBindings[i].update(gamepad, resolveJoystick, true);
 	}
 
 	// Rebuilds the raw DirectInput masks from the bindings. Called once per

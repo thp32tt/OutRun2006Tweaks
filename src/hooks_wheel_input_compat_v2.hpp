@@ -27,7 +27,7 @@ namespace Settings
     extern Setting<bool> WheelMenuDirectionFilter; // hooks_input.cpp
 
     Setting<bool> WheelPedalSplitFix{
-        "Controls", "WheelPedalSplitFix", true,
+        "Controls", "WheelPedalSplitFix", false,
         "Suppresses the synthetic brake half produced when a legacy DirectInput wheel exposes one pedal as a centred/shared axis."
     };
 

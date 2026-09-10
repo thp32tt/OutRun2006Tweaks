@@ -9,10 +9,13 @@
 
 #include <algorithm>
 #include <array>
+#include <cctype>
 #include <cmath>
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <imgui.h>
@@ -22,12 +25,40 @@
 #include "game_addrs.hpp"
 #include "overlay.hpp"
 
+void WheelFFB_RequestDirectionTest(int direction);
+
 namespace Settings
 {
     extern Setting<float> SteeringDeadZone;
+    extern Setting<bool> UseNewInput;
+    extern Setting<bool> WheelFFBEnable;
     extern Setting<bool> WheelAccelerationInvert;
     extern Setting<bool> WheelBrakeInvert;
     extern Setting<std::string> WheelFFBDeviceName;
+    extern Setting<std::string> WheelFFBDeviceGuid;
+    extern Setting<bool> WheelMenuR3DirectDPad;
+    extern Setting<bool> WheelMenuR3DirectAB;
+    extern Setting<float> WheelFFBGlobalStrength;
+    extern Setting<float> WheelFFBSpringStrength;
+    extern Setting<float> WheelFFBSpringSaturation;
+    extern Setting<float> WheelFFBDamperStrength;
+    extern Setting<float> WheelFFBSteeringWeight;
+    extern Setting<bool> WheelFFBPhysicsSat;
+    extern Setting<float> WheelFFBGripLoss;
+    extern Setting<float> WheelFFBLowSpeedSpring;
+    extern Setting<float> WheelFFBSpringLoadBoost;
+    extern Setting<float> WheelFFBWeightTransfer;
+    extern Setting<float> WheelFFBSlewRate;
+    extern Setting<int> VibrationMode;
+    extern Setting<float> WheelFFBRoadTexture;
+    extern Setting<float> WheelFFBTireSlip;
+    extern Setting<float> WheelFFBWallImpact;
+    extern Setting<bool> WheelFFBUseHardwareSpring;
+    extern Setting<bool> WheelFFBUseHardwareDamper;
+    extern Setting<bool> WheelFFBInvertForce;
+    extern Setting<bool> WheelFFBInvertSpring;
+    extern Setting<bool> WheelFFBUsePeriodicEffects;
+    extern Setting<bool> WheelFFBDebugLog;
 
     Setting<bool> WheelUniversalSetupEnable{
         "Controls", "WheelUniversalSetupEnable", false,
@@ -37,6 +68,11 @@ namespace Settings
     Setting<std::string> WheelUniversalDeviceName{
         "Controls", "WheelUniversalDeviceName", "",
         "DirectInput product name selected by F11 Wheel Setup."
+    };
+
+    Setting<std::string> WheelUniversalDeviceGuid{
+        "Controls", "WheelUniversalDeviceGuid", "",
+        "Exact DirectInput instance GUID selected by F11 Wheel Setup."
     };
 
     Setting<int> WheelUniversalLegacyDeviceIndex{
@@ -123,6 +159,26 @@ namespace
         "X", "Y", "Z", "Rx", "Ry", "Rz", "Slider 1", "Slider 2"
     };
 
+    std::string lower_identity(std::string value)
+    {
+        std::transform(value.begin(), value.end(), value.begin(),
+            [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+        return value;
+    }
+
+    std::string wheel_guid_key(const GUID& guid)
+    {
+        char b[64]{};
+        std::snprintf(b, sizeof(b),
+            "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+            (unsigned)guid.Data1, (unsigned)guid.Data2, (unsigned)guid.Data3,
+            (unsigned)guid.Data4[0], (unsigned)guid.Data4[1],
+            (unsigned)guid.Data4[2], (unsigned)guid.Data4[3],
+            (unsigned)guid.Data4[4], (unsigned)guid.Data4[5],
+            (unsigned)guid.Data4[6], (unsigned)guid.Data4[7]);
+        return lower_identity(b);
+    }
+
     bool is_virtual_name(const std::string& name)
     {
         std::string lower = name;
@@ -189,6 +245,7 @@ namespace
     struct DeviceInfo
     {
         GUID guid{};
+        std::string guidKey;
         std::string name;
         DWORD axes = 0;
         DWORD buttons = 0;
@@ -215,53 +272,71 @@ namespace
             enumerate();
         }
 
-        bool select_by_name(const std::string& wanted)
+        bool select_by_identity(const std::string& wantedGuid, const std::string& wantedName)
         {
-            if (wanted == selectedName_ && device_)
-                return true;
+            const std::string guid = lower_identity(wantedGuid);
+            if (device_ && !guid.empty() && guid == selectedGuidKey_) return true;
+            if (device_ && guid.empty() && wantedName == selectedName_) return true;
 
             release_device();
-            if (devices_.empty())
-                enumerate();
-
+            if (devices_.empty()) enumerate();
             int index = -1;
-            for (size_t i = 0; i < devices_.size(); ++i)
+            if (!guid.empty())
             {
-                if (devices_[i].name == wanted)
-                {
-                    index = int(i);
-                    break;
-                }
+                for (size_t i=0; i<devices_.size(); ++i)
+                    if (devices_[i].guidKey == guid) { index=int(i); break; }
+                if (index < 0)
+                    return false;
             }
-            if (index < 0 && !devices_.empty())
-                index = 0;
-            if (index < 0)
-                return false;
-            return open(index);
+            else if (!wantedName.empty())
+            {
+                for (size_t i=0; i<devices_.size(); ++i)
+                    if (devices_[i].name == wantedName) { index=int(i); break; }
+            }
+            if (index < 0 && guid.empty() && wantedName.empty() && !devices_.empty()) index=0;
+            return index >= 0 ? open(index) : false;
         }
 
         bool poll()
         {
             if (!device_)
             {
-                if (!select_by_name(Settings::WheelUniversalDeviceName.get()))
+                if (!select_by_identity(
+                        Settings::WheelUniversalDeviceGuid.get(),
+                        Settings::WheelUniversalDeviceName.get()))
                     return false;
             }
 
             HRESULT hr = device_->Poll();
             if (FAILED(hr))
+            {
                 hr = device_->Acquire();
+                if (SUCCEEDED(hr))
+                    hr = device_->Poll();
+            }
             if (FAILED(hr))
+            {
+                release_device();
+                devices_.clear();
                 return false;
+            }
 
             hr = device_->GetDeviceState(sizeof(state_), &state_);
             if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
             {
-                if (FAILED(device_->Acquire()))
-                    return false;
-                hr = device_->GetDeviceState(sizeof(state_), &state_);
+                if (SUCCEEDED(device_->Acquire()))
+                {
+                    device_->Poll();
+                    hr = device_->GetDeviceState(sizeof(state_), &state_);
+                }
             }
-            return SUCCEEDED(hr);
+            if (FAILED(hr))
+            {
+                release_device();
+                devices_.clear();
+                return false;
+            }
+            return true;
         }
 
         const DIJOYSTATE2& state() const { return state_; }
@@ -276,6 +351,7 @@ namespace
                 device_ = nullptr;
             }
             selectedName_.clear();
+            selectedGuidKey_.clear();
             state_ = {};
         }
 
@@ -284,11 +360,13 @@ namespace
         {
             auto* self = static_cast<DirectWheelReader*>(context);
             const std::string product = instance->tszProductName;
-            if (is_virtual_name(product))
+            const std::string instanceName = instance->tszInstanceName;
+            if (is_virtual_name(product) || is_virtual_name(instanceName))
                 return DIENUM_CONTINUE;
 
             DeviceInfo info{};
             info.guid = instance->guidInstance;
+            info.guidKey = wheel_guid_key(info.guid);
             info.name = product;
 
             IDirectInputDevice8A* temp = nullptr;
@@ -359,9 +437,15 @@ namespace
                 return false;
             }
 
-            device->Acquire();
+            hr = device->Acquire();
+            if (FAILED(hr) && hr != S_FALSE)
+            {
+                device->Release();
+                return false;
+            }
             device_ = device;
             selectedName_ = devices_[index].name;
+            selectedGuidKey_ = devices_[index].guidKey;
             return true;
         }
 
@@ -379,6 +463,7 @@ namespace
         IDirectInputDevice8A* device_ = nullptr;
         std::vector<DeviceInfo> devices_;
         std::string selectedName_;
+        std::string selectedGuidKey_;
         DIJOYSTATE2 state_{};
     };
 
@@ -395,6 +480,25 @@ namespace
         inline static uint32_t menuPressed_ = 0;
         inline static uint32_t previousMenuHeld_ = 0;
         inline static DWORD lastApplyLog_ = 0;
+
+        inline static constexpr uint32_t UniversalMenuSwitchMask =
+            (1u << int(SwitchId::Start)) |
+            (1u << int(SwitchId::Back)) |
+            (1u << int(SwitchId::A)) |
+            (1u << int(SwitchId::B)) |
+            (1u << int(SwitchId::GearDown)) |
+            (1u << int(SwitchId::GearUp)) |
+            (1u << int(SwitchId::SelectionUp)) |
+            (1u << int(SwitchId::SelectionDown)) |
+            (1u << int(SwitchId::SelectionLeft)) |
+            (1u << int(SwitchId::SelectionRight));
+
+        static bool pure_universal_menu_query(uint32_t switches)
+        {
+            return switches != 0 &&
+                (switches & UniversalMenuSwitchMask) != 0 &&
+                (switches & ~UniversalMenuSwitchMask) == 0;
+        }
 
         static bool active()
         {
@@ -422,7 +526,15 @@ namespace
             if (!active())
                 return;
 
-            const int slot = std::clamp(int(Settings::WheelUniversalLegacyDeviceIndex), 0, 2);
+            const int regularCount = std::max(device_count() - 1, 0);
+            if (regularCount <= 0)
+                return;
+            const int maxSlot = std::min(regularCount - 1, 2);
+            const int slot = std::clamp(
+                int(Settings::WheelUniversalLegacyDeviceIndex), 0, maxSlot);
+            if (slot != int(Settings::WheelUniversalLegacyDeviceIndex))
+                Settings::WheelUniversalLegacyDeviceIndex = slot;
+
             auto* device = device_at(slot);
             if (!device)
                 return;
@@ -525,17 +637,17 @@ namespace
         static int SwitchNow_dest(uint32_t switches)
         {
             const int result = SwitchNowHook.ccall<int>(switches);
-            if (result || !active())
+            if (result || !active() || !pure_universal_menu_query(switches))
                 return result;
-            return (menuHeld_ & switches) != 0 ? 1 : 0;
+            return (menuHeld_ & switches) == switches ? 1 : 0;
         }
 
         static int SwitchOn_dest(uint32_t switches)
         {
             const int result = SwitchOnHook.ccall<int>(switches);
-            if (result || !active())
+            if (result || !active() || !pure_universal_menu_query(switches))
                 return result;
-            return (menuPressed_ & switches) != 0 ? 1 : 0;
+            return (menuPressed_ & switches) == switches ? 1 : 0;
         }
 
         static int maybe_invert_steering(int channel, int result)
@@ -559,9 +671,22 @@ namespace
     public:
         static void apply_now() { apply_mapping(); }
 
+        static int regular_device_count()
+        {
+            return std::max(device_count() - 1, 0);
+        }
+
         static bool copy_current_mapping()
         {
-            const int slot = std::clamp(int(Settings::WheelUniversalLegacyDeviceIndex), 0, 2);
+            const int regularCount = std::max(device_count() - 1, 0);
+            if (regularCount <= 0)
+                return false;
+            const int maxSlot = std::min(regularCount - 1, 2);
+            const int slot = std::clamp(
+                int(Settings::WheelUniversalLegacyDeviceIndex), 0, maxSlot);
+            if (slot != int(Settings::WheelUniversalLegacyDeviceIndex))
+                Settings::WheelUniversalLegacyDeviceIndex = slot;
+
             auto* device = device_at(slot);
             if (!device)
                 return false;
@@ -630,13 +755,20 @@ namespace
             status_ = "Saved to OutRun2006Tweaks.user.ini";
         }
 
-        void select_device(const DeviceInfo& info, int index)
+        void select_device(const DeviceInfo& info)
         {
             Settings::WheelUniversalDeviceName = info.name;
-            Settings::WheelUniversalLegacyDeviceIndex = std::clamp(index, 0, 2);
+            Settings::WheelUniversalDeviceGuid = info.guidKey;
             Settings::WheelFFBDeviceName = info.name;
-            gReader.select_by_name(info.name);
-            status_ = "Selected wheel; FFB device will follow this product name.";
+            Settings::WheelFFBDeviceGuid = info.guidKey;
+            gReader.select_by_identity(info.guidKey, info.name);
+            Settings::write(Module::UserIniPath);
+            if (Settings::UseNewInput)
+                status_ = "Selected FFB wheel and saved its exact DirectInput GUID. Restart the game after changing physical wheel.";
+            else
+                status_ = UniversalWheelProfile::regular_device_count() > 1
+                    ? "Selected wheel/FFB device. Confirm the OutRun legacy input slot below when multiple controllers are present."
+                    : "Selected wheel; FFB device follows this product name.";
         }
 
         void begin_bind(BindTarget target)
@@ -668,6 +800,16 @@ namespace
 
         void assign_digital(int code)
         {
+            const bool gameplayButton =
+                target_ == BindTarget::GearUp || target_ == BindTarget::GearDown ||
+                target_ == BindTarget::Start || target_ == BindTarget::View;
+            if (gameplayButton && code >= 128)
+            {
+                target_ = BindTarget::None;
+                status_ = "Gameplay actions currently require a physical button; POV is supported for menu directions.";
+                return;
+            }
+
             switch (target_)
             {
             case BindTarget::GearUp: Settings::WheelUniversalGearUpButton = code; break;
@@ -757,13 +899,13 @@ namespace
             return v;
         }
 
-        void axis_row(const char* label, BindTarget target, Setting<int>& axisSetting,
+        void axis_row(const char* label, BindTarget target, Settings::Setting<int>& axisSetting,
             bool* invertPtr, bool steering)
         {
             ImGui::PushID(label);
             ImGui::TextUnformatted(label);
             ImGui::SameLine(180.0f);
-            ImGui::TextDisabled("Axis %s", axis_name(axisSetting));
+            ImGui::TextDisabled("Axis %s", axis_name(int(axisSetting)));
             ImGui::SameLine(290.0f);
             if (ImGui::Button("Bind", ImVec2(70, 0)))
                 begin_bind(target);
@@ -782,7 +924,7 @@ namespace
             ImGui::PopID();
         }
 
-        void button_row(const char* label, BindTarget target, Setting<int>& setting)
+        void button_row(const char* label, BindTarget target, Settings::Setting<int>& setting)
         {
             ImGui::PushID(label);
             ImGui::TextUnformatted(label);
@@ -811,7 +953,10 @@ namespace
 
     public:
         Kind kind() const override { return Kind::Tab; }
-        const char* name() const override { return "Wheel Setup"; }
+        const char* name() const override
+        {
+            return Settings::UseNewInput ? "Force Feedback" : "Legacy Wheel Setup";
+        }
         int order() const override { return 25; }
         void init() override {}
 
@@ -819,8 +964,16 @@ namespace
         {
             listen_for_binding();
 
-            ImGui::TextWrapped(
-                "Universal legacy DirectInput wheel setup. Bind here from a game menu; gameplay FFB uses the same selected product name.");
+            if (Settings::UseNewInput)
+            {
+                ImGui::TextWrapped(
+                    "Force feedback only. With UseNewInput enabled, steering, pedals, buttons, menu controls and calibration come only from Input Bindings. This page does not create input bindings; it only selects the DirectInput FFB wheel and tunes its forces.");
+            }
+            else
+            {
+                ImGui::TextWrapped(
+                    "Legacy DirectInput wheel setup. Use this page for compatibility-mode input bindings and force feedback.");
+            }
 
             const auto& devices = gReader.devices();
             if (ImGui::Button("Refresh Devices"))
@@ -829,27 +982,76 @@ namespace
             ImGui::SameLine();
             std::string preview = Settings::WheelUniversalDeviceName.get();
             if (preview.empty()) preview = devices.empty() ? "No DirectInput device" : devices.front().name;
+            const std::string configuredGuid =
+                lower_identity(Settings::WheelUniversalDeviceGuid.get());
+            auto isSelectedDevice = [&](const DeviceInfo& dev)
+            {
+                return !configuredGuid.empty()
+                    ? dev.guidKey == configuredGuid
+                    : dev.name == Settings::WheelUniversalDeviceName.get();
+            };
             if (ImGui::BeginCombo("Wheel", preview.c_str()))
             {
                 for (size_t i = 0; i < devices.size(); ++i)
                 {
-                    const bool selected = devices[i].name == Settings::WheelUniversalDeviceName.get();
-                    if (ImGui::Selectable(devices[i].name.c_str(), selected))
-                        select_device(devices[i], int(i));
+                    const bool selected = isSelectedDevice(devices[i]);
+                    const std::string label = devices[i].name + "##" + devices[i].guidKey;
+                    if (ImGui::Selectable(label.c_str(), selected)) select_device(devices[i]);
                     if (selected) ImGui::SetItemDefaultFocus();
                 }
                 ImGui::EndCombo();
             }
+            for (const auto& dev : devices)
+                if (isSelectedDevice(dev))
+                    ImGui::TextDisabled("%lu axes / %lu buttons / %lu POV / FFB %s / GUID %s",
+                        dev.axes, dev.buttons, dev.povs, dev.ffb ? "yes" : "no", dev.guidKey.c_str());
 
-            if (!devices.empty())
+            if (!Settings::UseNewInput)
             {
-                for (const auto& dev : devices)
-                    if (dev.name == Settings::WheelUniversalDeviceName.get())
-                        ImGui::TextDisabled("%lu axes / %lu buttons / %lu POV / FFB %s",
-                            dev.axes, dev.buttons, dev.povs, dev.ffb ? "yes" : "no");
+            const int regularSlots = UniversalWheelProfile::regular_device_count();
+            if (regularSlots == 1)
+                Settings::WheelUniversalLegacyDeviceIndex = 0;
+            if (regularSlots > 0)
+            {
+                int currentSlot = std::clamp(
+                    int(Settings::WheelUniversalLegacyDeviceIndex), 0,
+                    std::min(regularSlots - 1, 2));
+                if (currentSlot != int(Settings::WheelUniversalLegacyDeviceIndex))
+                    Settings::WheelUniversalLegacyDeviceIndex = currentSlot;
+                const std::string slotPreview =
+                    "OutRun slot " + std::to_string(currentSlot + 1);
+                if (ImGui::BeginCombo("Legacy input slot", slotPreview.c_str()))
+                {
+                    for (int slot = 0; slot < std::min(regularSlots, 3); ++slot)
+                    {
+                        const std::string label =
+                            "OutRun slot " + std::to_string(slot + 1);
+                        const bool selected = slot == currentSlot;
+                        if (ImGui::Selectable(label.c_str(), selected))
+                            Settings::WheelUniversalLegacyDeviceIndex = slot;
+                        if (selected)
+                            ImGui::SetItemDefaultFocus();
+                    }
+                    ImGui::EndCombo();
+                }
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip(
+                        "This is OutRun's original DirectInput slot, not the filtered Wheel combo index. Usually slot 1 when only one wheel is connected.");
             }
 
-            ImGui::Checkbox("Enable F11 universal wheel profile", Settings::WheelUniversalSetupEnable.ptr());
+            if (ImGui::Checkbox("Enable F11 universal wheel profile", Settings::WheelUniversalSetupEnable.ptr()))
+            {
+                if (Settings::WheelUniversalSetupEnable)
+                {
+                    // The old R3-specific readers assume fixed button numbers.
+                    // Once a universal profile is active, its own bindings must
+                    // be the sole wheel-menu source so Logitech/Thrustmaster/
+                    // Fanatec/Simagic/etc. do not inherit R3 button mappings.
+                    Settings::WheelMenuR3DirectDPad = false;
+                    Settings::WheelMenuR3DirectAB = false;
+                    status_ = "Universal profile enabled; legacy R3 fixed-button menu helpers were disabled.";
+                }
+            }
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("When enabled, these bindings are written into OutRun's original legacy DirectInput device mapping.");
 
@@ -859,7 +1061,9 @@ namespace
                 if (UniversalWheelProfile::copy_current_mapping())
                 {
                     Settings::WheelUniversalSetupEnable = true;
-                    status_ = "Imported current steering/pedal/shift bindings. Menu bindings can now be added below.";
+                    Settings::WheelMenuR3DirectDPad = false;
+                    Settings::WheelMenuR3DirectAB = false;
+                    status_ = "Imported current steering/pedal/shift bindings. Universal menu ownership enabled; add menu bindings below.";
                 }
                 else
                     status_ = "No regular legacy DirectInput game device is ready yet.";
@@ -888,7 +1092,106 @@ namespace
 
             if (ImGui::Button("MOZA R3/ES menu defaults"))
                 apply_r3_menu_defaults();
+            }
 
+            ImGui::SeparatorText("Simulation FFB");
+            ImGui::Checkbox("Enable Force Feedback", Settings::WheelFFBEnable.ptr());
+            ImGui::TextDisabled("gameplay FFB follows the exact selected DirectInput GUID.");
+            ImGui::TextWrapped(
+                "Single-owner wheel FFB: DirectInput COM only. SAT now rises smoothly from centre, builds with speed/corner load and unloads only in a deep slide. Centering Spring is mainly a low-speed stabilizer, so it no longer stacks a second strong high-speed return force.");
+            ImGui::TextDisabled("Settings > WheelFFB is hidden; changes on this page apply live. SDL gamepad rumble is suppressed while wheel FFB is enabled.");
+
+            ImGui::SliderFloat("Overall Strength", Settings::WheelFFBGlobalStrength.ptr(), 0.0f, 1.5f, "%.2f");
+            if (Settings::WheelFFBGlobalStrength.get() > 1.0f)
+                ImGui::TextColored(ImVec4(1.0f, 0.65f, 0.25f, 1.0f),
+                    "Above 100% trades force-detail contrast for extra weight.");
+            ImGui::SliderFloat("Centering Spring (low speed)", Settings::WheelFFBSpringStrength.ptr(), 0.0f, 1.0f, "%.2f");
+            ImGui::SliderFloat("Dynamic Damping", Settings::WheelFFBDamperStrength.ptr(), 0.0f, 0.80f, "%.2f");
+            ImGui::SliderFloat("Self-aligning Torque (SAT)", Settings::WheelFFBSteeringWeight.ptr(), 0.0f, 2.00f, "%.2f");
+            ImGui::Checkbox("Physics SAT v1 (body slip + yaw)", Settings::WheelFFBPhysicsSat.ptr());
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Uses post-physics OutRun car motion/body heading to estimate front slip. Disable for the Round-16 Natural SAT comparison.");
+            ImGui::SliderFloat("Grip-loss Unload", Settings::WheelFFBGripLoss.ptr(), 0.0f, 1.0f, "%.2f");
+            ImGui::SliderFloat("Road Detail", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 0.50f, "%.2f");
+            ImGui::SliderFloat("Tire Slip", Settings::WheelFFBTireSlip.ptr(), 0.0f, 0.50f, "%.2f");
+            ImGui::SliderFloat("Collision", Settings::WheelFFBWallImpact.ptr(), 0.0f, 1.0f, "%.2f");
+            ImGui::Checkbox("Hardware GUID_Spring", Settings::WheelFFBUseHardwareSpring.ptr());
+            ImGui::SameLine();
+            ImGui::Checkbox("Hardware GUID_Damper", Settings::WheelFFBUseHardwareDamper.ptr());
+            ImGui::Checkbox("Hardware road/slip sine effects", Settings::WheelFFBUsePeriodicEffects.ptr());
+            ImGui::SameLine();
+            ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr());
+            ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr());
+            ImGui::SameLine();
+            ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr());
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Use Reverse Spring only if the wheel pushes farther away from centre. ConstantForce direction is independent.");
+
+            ImGui::SeparatorText("Safe direction test");
+            if (ImGui::Button("Test Left (20%)"))
+                WheelFFB_RequestDirectionTest(-1);
+            ImGui::SameLine();
+            if (ImGui::Button("Test Right (20%)"))
+                WheelFFB_RequestDirectionTest(1);
+            ImGui::SameLine();
+            if (ImGui::Button("Stop Test"))
+                WheelFFB_RequestDirectionTest(0);
+            ImGui::TextDisabled("Direction tests are hard-capped at 20% and only run during active gameplay.");
+
+            if (ImGui::Button("Load MOZA R3 Physics SAT v1"))
+            {
+                Settings::WheelFFBEnable = true;
+                Settings::WheelFFBPhysicsSat = true;
+                Settings::WheelFFBGlobalStrength = 0.70f;
+                Settings::WheelFFBSpringStrength = 0.65f;
+                Settings::WheelFFBSpringSaturation = 0.95f;
+                Settings::WheelFFBDamperStrength = 0.28f;
+                Settings::WheelFFBSteeringWeight = 1.45f;
+                Settings::WheelFFBGripLoss = 0.65f;
+                Settings::WheelFFBWeightTransfer = 0.15f;
+                Settings::WheelFFBSlewRate = 0.040f;
+                Settings::WheelFFBRoadTexture = 0.30f;
+                Settings::WheelFFBTireSlip = 0.20f;
+                Settings::WheelFFBWallImpact = 0.38f;
+                Settings::WheelFFBUseHardwareSpring = true;
+                Settings::WheelFFBUseHardwareDamper = true;
+                Settings::WheelFFBInvertForce = true;
+                Settings::WheelFFBInvertSpring = false;
+                Settings::WheelFFBDebugLog = true;
+                Settings::VibrationMode = 0;
+                Settings::write(Module::UserIniPath);
+                status_ = "Loaded MOZA R3 Physics SAT v1: post-physics body-slip/yaw SAT with diagnostic logging. Saved to user.ini.";
+            }
+            ImGui::SameLine();
+
+            if (ImGui::Button("Load MOZA R3 Natural SAT"))
+            {
+                Settings::WheelFFBPhysicsSat = false;
+                Settings::WheelFFBEnable = true;
+                Settings::WheelFFBGlobalStrength = 0.70f;
+                Settings::WheelFFBSpringStrength = 0.65f;
+                Settings::WheelFFBSpringSaturation = 0.95f;
+                Settings::WheelFFBLowSpeedSpring = 0.20f;
+                Settings::WheelFFBSpringLoadBoost = 0.30f;
+                Settings::WheelFFBDamperStrength = 0.30f;
+                Settings::WheelFFBSteeringWeight = 1.75f;
+                Settings::WheelFFBGripLoss = 0.65f;
+                Settings::WheelFFBWeightTransfer = 0.20f;
+                Settings::WheelFFBSlewRate = 0.045f;
+                Settings::WheelFFBRoadTexture = 0.30f;
+                Settings::WheelFFBTireSlip = 0.20f;
+                Settings::WheelFFBWallImpact = 0.38f;
+                Settings::WheelFFBUseHardwareSpring = true;
+                Settings::WheelFFBUseHardwareDamper = true;
+                Settings::WheelFFBInvertForce = true;
+                Settings::WheelFFBInvertSpring = false;
+                Settings::VibrationMode = 0;
+                Settings::write(Module::UserIniPath);
+                status_ = "Loaded MOZA R3 Natural SAT: smooth progressive SAT, low-speed-only spring assist and single DirectInput COM wheel FFB. Saved to user.ini.";
+            }
+
+            if (!Settings::UseNewInput)
+            {
             ImGui::SeparatorText("Wheel options");
             int deadzonePercent = int(float(Settings::SteeringDeadZone) * 100.0f + 0.5f);
             if (ImGui::SliderInt("Steering Deadzone", &deadzonePercent, 0, 20, "%d%%"))
@@ -902,6 +1205,7 @@ namespace
             ImGui::SameLine();
             if (ImGui::Button("Save Wheel Profile"))
                 save();
+            }
 
             if (target_ != BindTarget::None)
             {
@@ -913,7 +1217,9 @@ namespace
 
             ImGui::Spacing();
             ImGui::TextDisabled(
-                "FFB tuning remains under Settings > WheelFFB. Wheel selection is shared with WheelFFB DeviceName; restart after switching to a different physical wheel.");
+                Settings::UseNewInput
+                    ? "Input setup: Input Bindings only. FFB setup: this Force Feedback page only. Restart after switching to a different physical wheel."
+                    : "Legacy compatibility input and FFB are configured on this page. Restart after switching to a different physical wheel.");
         }
 
         static WheelSetupWindow instance;

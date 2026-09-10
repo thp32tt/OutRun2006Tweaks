@@ -12,11 +12,14 @@
 #include <cmath>
 #include <cctype>
 #include <cstring>
+#include <cstdio>
 #include <string>
+#include <vector>
 
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "game_addrs.hpp"
+#include "hooks_wheel_physics_sat.hpp"
 
 extern "C"
 {
@@ -24,9 +27,11 @@ extern "C"
 }
 
 extern double __cdecl sub_1149C0(unsigned int surfaceMask, int loadColiType, DWORD* waterFlag);
+extern float InputManager_SteeringValue();
 
 namespace Settings
 {
+    extern Setting<bool> UseNewInput;
     // Experimental branch: enabled by default, but deliberately conservative for DD wheels.
     Setting<bool> WheelFFBEnable{
         "WheelFFB", "Enable", true,
@@ -38,13 +43,18 @@ namespace Settings
         "Case-insensitive substring used to select the FFB wheel. Empty selects the first non-virtual FFB device."
     };
 
+    Setting<std::string> WheelFFBDeviceGuid{
+        "WheelFFB", "DeviceGuid", "",
+        "Exact DirectInput instance GUID selected by F11 Wheel Setup; a saved GUID never falls back unless that exact interface failed initialization."
+    };
+
     Setting<float> WheelFFBGlobalStrength{
-        "WheelFFB", "GlobalStrength", 0.25f,
-        "Master DirectInput effect gain. Start low on direct-drive wheels.", Range<float>{ 0.0f, 1.0f }
+        "WheelFFB", "GlobalStrength", 0.70f,
+        "Master force-model gain. Applied before soft saturation/slew; 1.0=100%, 1.5=150% headroom.", Range<float>{ 0.0f, 1.5f }
     };
 
     Setting<float> WheelFFBSpringStrength{
-        "WheelFFB", "SpringStrength", 0.45f,
+        "WheelFFB", "SpringStrength", 0.65f,
         "Speed-dependent center restoring force. Drives GUID_Spring when hardware spring is enabled.", Range<float>{ 0.0f, 1.5f }
     };
 
@@ -59,17 +69,37 @@ namespace Settings
     };
 
     Setting<float> WheelFFBDamperStrength{
-        "WheelFFB", "DamperStrength", 0.10f,
-        "Resistance to rapid steering movement.", Range<float>{ 0.0f, 1.0f }
+        "WheelFFB", "DamperStrength", 0.30f,
+        "Dynamic steering damping. For DD wheels try 0.25-0.45.", Range<float>{ 0.0f, 1.0f }
+    };
+
+    Setting<bool> WheelFFBUseHardwareDamper{
+        "WheelFFB", "UseHardwareDamper", true,
+        "Use DirectInput GUID_Damper when the wheel supports it; otherwise use the software fallback."
+    };
+
+    Setting<float> WheelFFBLowSpeedSpring{
+        "WheelFFB", "LowSpeedSpring", 0.20f,
+        "Fraction of aligning/centering force retained at very low speed.", Range<float>{ 0.0f, 0.5f }
+    };
+
+    Setting<float> WheelFFBSpringLoadBoost{
+        "WheelFFB", "SpringLoadBoost", 0.30f,
+        "Extra aligning force under cornering load before grip-loss unloading.", Range<float>{ 0.0f, 1.0f }
     };
 
     Setting<float> WheelFFBSteeringWeight{
-        "WheelFFB", "SteeringWeight", 0.45f,
-        "Cornering load from OutRun lateral physics.", Range<float>{ 0.0f, 1.5f }
+        "WheelFFB", "SteeringWeight", 1.45f,
+        "Self-aligning torque strength. Physics SAT uses body slip, yaw rate and lateral load; Natural SAT remains available for comparison.", Range<float>{ 0.0f, 2.0f }
+    };
+
+    Setting<bool> WheelFFBPhysicsSat{
+        "WheelFFB", "PhysicsSAT", true,
+        "Experimental body-slip/yaw SAT instead of steering-centre direction alone."
     };
 
     Setting<float> WheelFFBGripLoss{
-        "WheelFFB", "GripLoss", 0.60f,
+        "WheelFFB", "GripLoss", 0.65f,
         "How much cornering load and hardware spring unload as the car enters a deep drift.", Range<float>{ 0.0f, 1.0f }
     };
 
@@ -84,7 +114,7 @@ namespace Settings
     };
 
     Setting<float> WheelFFBWallImpact{
-        "WheelFFB", "WallImpact", 0.35f,
+        "WheelFFB", "WallImpact", 0.38f,
         "Collision impulse strength.", Range<float>{ 0.0f, 1.0f }
     };
 
@@ -94,12 +124,12 @@ namespace Settings
     };
 
     Setting<float> WheelFFBRoadTexture{
-        "WheelFFB", "RoadTexture", 0.20f,
+        "WheelFFB", "RoadTexture", 0.30f,
         "Hardware sine vibration driven by the game's own surface roughness table.", Range<float>{ 0.0f, 1.0f }
     };
 
     Setting<float> WheelFFBTireSlip{
-        "WheelFFB", "TireSlip", 0.18f,
+        "WheelFFB", "TireSlip", 0.20f,
         "Hardware sine chatter as drift depth increases.", Range<float>{ 0.0f, 1.0f }
     };
 
@@ -119,8 +149,13 @@ namespace Settings
     };
 
     Setting<bool> WheelFFBInvertForce{
-        "WheelFFB", "InvertForce", false,
-        "Reverse steering force direction."
+        "WheelFFB", "InvertForce", true,
+        "Reverse ConstantForce steering/event direction without changing the centering spring."
+    };
+
+    Setting<bool> WheelFFBInvertSpring{
+        "WheelFFB", "InvertSpring", false,
+        "Reverse only the DirectInput GUID_Spring condition direction. Leave off when the wheel returns toward centre normally."
     };
 
     Setting<bool> WheelFFBDebugLog{
@@ -134,6 +169,20 @@ namespace
     constexpr UINT_PTR FFB_SUBCLASS_ID = 0x0FFB;
     constexpr UINT_PTR FFB_WATCHDOG_TIMER_ID = 0x0FFA;
     constexpr UINT FFB_WATCHDOG_INTERVAL_MS = 100;
+    constexpr DWORD FFB_DEVICE_FAILURE_GRACE_MS = 750;
+    constexpr DWORD FFB_DEVICE_RETRY_MS = 750;
+
+    // GetTickCount wraps roughly every 49.7 days. Compare deadlines by signed
+    // subtraction so retry/holdoff gates remain correct across the wrap.
+    bool tick_before(DWORD now, DWORD deadline)
+    {
+        return deadline != 0 && static_cast<LONG>(now - deadline) < 0;
+    }
+
+    bool tick_reached(DWORD now, DWORD deadline)
+    {
+        return deadline == 0 || static_cast<LONG>(now - deadline) >= 0;
+    }
 
     std::string lower_copy(const char* text)
     {
@@ -141,6 +190,19 @@ namespace
         std::transform(result.begin(), result.end(), result.begin(),
             [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
         return result;
+    }
+
+    std::string directinput_guid_key(const GUID& guid)
+    {
+        char b[64]{};
+        std::snprintf(b, sizeof(b),
+            "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+            (unsigned)guid.Data1, (unsigned)guid.Data2, (unsigned)guid.Data3,
+            (unsigned)guid.Data4[0], (unsigned)guid.Data4[1],
+            (unsigned)guid.Data4[2], (unsigned)guid.Data4[3],
+            (unsigned)guid.Data4[4], (unsigned)guid.Data4[5],
+            (unsigned)guid.Data4[6], (unsigned)guid.Data4[7]);
+        return lower_copy(b);
     }
 
     bool is_virtual_device_name(const std::string& lowered)
@@ -163,14 +225,97 @@ namespace
     public:
         void update(EVWORK_CAR* car)
         {
-            if (!Settings::WheelFFBEnable || !car || panicStopped_)
+            if (!car || panicStopped_)
                 return;
 
-            lastUpdateTick_ = GetTickCount();
+            if (!Settings::WheelFFBEnable)
+            {
+                if (initialized_ && enabledLastTick_)
+                {
+                    zero_all_forces();
+                    reset_signal_state();
+                    enabledLastTick_ = false;
+                    spdlog::info("WheelFFB: disabled live; all effects zeroed immediately");
+                }
+                return;
+            }
+            enabledLastTick_ = true;
+
+            // Safety first for a DD base: WM_ACTIVATEAPP releases exclusive
+            // ownership when the game loses focus. Do not let the 60 Hz update
+            // loop immediately reacquire it while another application is active.
+            if (!appActive_)
+            {
+                // initialize() can set appActive_=false before the window
+                // subclass exists. Recover from that startup/background case
+                // only after the real game window is foreground again.
+                if (!initialized_ && gameHwnd_ && GetForegroundWindow() == gameHwnd_)
+                {
+                    appActive_ = true;
+                    warmupFrames_ = 0;
+                }
+                else
+                {
+                    if (initialized_)
+                    {
+                        zero_all_forces();
+                        reset_signal_state();
+                    }
+                    return;
+                }
+            }
+
+            // WM_ACTIVATEAPP is normally authoritative, but keep a direct
+            // foreground guard as a second DD-wheel safety net. A delayed or
+            // missed activation message must never leave background torque
+            // running merely because the device uses DISCL_BACKGROUND.
+            if (initialized_ && gameHwnd_ && GetForegroundWindow() != gameHwnd_)
+            {
+                appActive_ = false;
+                zero_all_forces();
+                reset_signal_state();
+                if (device_ && deviceAcquired_)
+                {
+                    device_->Unacquire();
+                    deviceAcquired_ = false;
+                }
+                return;
+            }
+
+            const DWORD updateNow = GetTickCount();
+
+            if (initialized_)
+            {
+                const std::string guidNow = lower_copy(Settings::WheelFFBDeviceGuid.get().c_str());
+                const std::string nameNow = lower_copy(Settings::WheelFFBDeviceName.get().c_str());
+                if (guidNow != selectedConfiguredGuid_ || nameNow != selectedConfiguredName_)
+                {
+                    selectedConfiguredGuid_ = guidNow;
+                    selectedConfiguredName_ = nameNow;
+                    request_device_reinitialize("configured wheel identity changed", S_OK);
+                    return;
+                }
+            }
+
+            if (deviceReinitPending_)
+            {
+                if (tick_before(updateNow, deviceReinitAfter_))
+                    return;
+                teardown_for_reinitialize();
+                deviceReinitPending_ = false;
+                deviceFailureSince_ = 0;
+                initialized_ = false;
+                retryAfter_ = updateNow + FFB_DEVICE_RETRY_MS;
+                spdlog::info(
+                    "WheelFFB: DirectInput device released; waiting to re-enumerate after device loss");
+                return;
+            }
+
+            lastUpdateTick_ = updateNow;
 
             if (!initialized_)
             {
-                if (GetTickCount() < retryAfter_)
+                if (tick_before(GetTickCount(), retryAfter_))
                     return;
                 if (!initialize())
                 {
@@ -185,7 +330,80 @@ namespace
             if (!inGameplay)
             {
                 zero_all_forces();
+                // Let the legacy/menu DirectInput reader reacquire the same
+                // physical wheel while menus or F11 setup are active. Effects
+                // remain created and are reused when gameplay resumes.
+                if (device_ && deviceAcquired_)
+                {
+                    device_->Unacquire();
+                    deviceAcquired_ = false;
+                }
                 reset_signal_state();
+                return;
+            }
+
+            if (device_ && !deviceAcquired_)
+            {
+                if (!gameHwnd_ || GetForegroundWindow() != gameHwnd_)
+                    return;
+
+                const HRESULT acquireHr = device_->Acquire();
+                if (FAILED(acquireHr) && acquireHr != S_FALSE)
+                {
+                    note_device_failure("gameplay Acquire", acquireHr);
+                    return;
+                }
+
+                if (GetForegroundWindow() != gameHwnd_)
+                {
+                    device_->Unacquire();
+                    deviceAcquired_ = false;
+                    return;
+                }
+
+                deviceAcquired_ = true;
+                clear_device_failure();
+                const HRESULT actuatorHr =
+                    device_->SendForceFeedbackCommand(DISFFC_SETACTUATORSON);
+                if (FAILED(actuatorHr))
+                {
+                    note_device_failure("SETACTUATORSON", actuatorHr);
+                    device_->Unacquire();
+                    deviceAcquired_ = false;
+                    return;
+                }
+                clear_device_failure();
+            }
+
+            apply_live_effect_gain();
+
+            if (manualTestFrames_ > 0)
+            {
+                if (springEffect_)
+                    update_spring(0.0f);
+                if (damperEffect_)
+                    update_damper(0.0f);
+                if (roadTextureEffect_)
+                    update_periodic(roadTextureEffect_, roadState_, 0.0f, 30.0f);
+                if (tireSlipEffect_)
+                    update_periodic(tireSlipEffect_, slipState_, 0.0f, 35.0f);
+
+                crashImpulseTimer_ = 0;
+                crashImpulseForce_ = 0.0f;
+                gearShiftTimer_ = 0;
+                splashTimer_ = 0;
+                splashAmp_ = 0.0f;
+
+                LONG testLevel = manualTestDirection_ * 2000L;
+                if (Settings::WheelFFBInvertForce)
+                    testLevel = -testLevel;
+                set_constant_force(testLevel);
+                --manualTestFrames_;
+                if (manualTestFrames_ == 0)
+                {
+                    zero_all_forces();
+                    reset_signal_state();
+                }
                 return;
             }
 
@@ -195,18 +413,25 @@ namespace
 
             // field_1C4 reaches roughly 2.0 at OutRun top speed. Normalize by 2
             // rather than treating 1.0 as terminal speed.
-            const float speed = car->field_1C4;
+            const float speedRaw = car->field_1C4;
+            const float speed = std::isfinite(speedRaw) ? speedRaw : 0.0f;
             const float speedNorm = std::clamp(speed / 2.0f, 0.0f, 1.0f);
+            const float configuredStrength =
+                static_cast<float>(Settings::WheelFFBGlobalStrength);
+            const float outputStrength = std::isfinite(configuredStrength)
+                ? std::clamp(configuredStrength, 0.0f, 1.5f)
+                : 0.0f;
 
             const uint32_t stateFlags = car->field_8;
             const uint32_t curGear = car->cur_gear_208;
-            const float lateralRaw = car->field_264 + car->field_268;
+            const float lateralSum = car->field_264 + car->field_268;
+            const float lateralRaw = std::isfinite(lateralSum) ? lateralSum : 0.0f;
 
             // Fast attack / slightly slower release. This is intentionally close
             // to the Redux-era tuning, but the steering backbone comes from the
             // real game input instead of car->field_1D0.
             const float alpha =
-                std::abs(lateralRaw) > std::abs(smoothedLateral_) ? 0.25f : 0.20f;
+                std::abs(lateralRaw) > std::abs(smoothedLateral_) ? 0.18f : 0.12f;
             smoothedLateral_ += (lateralRaw - smoothedLateral_) * alpha;
 
             lateralHistory_[lateralHistoryIndex_ % LateralHistoryCount] = smoothedLateral_;
@@ -236,22 +461,51 @@ namespace
             DWORD waterFlag = 0;
             for (int i = 0; i < 4; ++i)
             {
-                roughness = std::max(
-                    roughness,
-                    static_cast<float>(sub_1149C0(
-                        car->water_flag_24C[i],
-                        static_cast<int>(car->OnRoadPlace_5C.loadColiType_0),
-                        &waterFlag)));
+                const float surfaceRoughness = static_cast<float>(sub_1149C0(
+                    car->water_flag_24C[i],
+                    static_cast<int>(car->OnRoadPlace_5C.loadColiType_0),
+                    &waterFlag));
+                if (std::isfinite(surfaceRoughness))
+                    roughness = std::max(roughness, surfaceRoughness);
             }
 
-            // Road texture and tire-slip envelopes.
+            // Road texture and tire-slip envelopes.  sub_1149C0 returns
+            // ~0.25 for ordinary asphalt; that is a material baseline, not a
+            // request to vibrate the wheel.  The Xbox routine only enters its
+            // stronger surface branch above roughly 0.30, so remove that
+            // baseline here and ramp rough surfaces from 0.30 -> 0.85.
+            const float textureRoughness =
+                std::clamp((roughness - 0.30f) / 0.55f, 0.0f, 1.0f);
+            const float roadSpeedGate =
+                std::clamp((speedNorm - 0.05f) / 0.20f, 0.0f, 1.0f);
+
+            // Xbox gamepad rumble treats snow/ice as a continuously rough
+            // material. On a DD wheel that becomes an unpleasant constant
+            // high-frequency sine. Stage IDs follow Game::StageNames: 4/19
+            // are Snowy Mountain/Ice Scape and +30 are their reverse variants.
+            const int stageNumber = Game::GetNowStageNum(8);
+            const int uniqueStage = Game::GetStageUniqueNum(stageNumber);
+            const bool snowOrIceStage =
+                uniqueStage == 4 || uniqueStage == 19 ||
+                uniqueStage == 34 || uniqueStage == 49;
+            constexpr float SnowIceRoadTextureScale = 0.04f;
+            const float stageRoadTextureScale =
+                snowOrIceStage ? SnowIceRoadTextureScale : 1.0f;
+
             float roadAmp =
-                roughness * speedNorm * static_cast<float>(Settings::WheelFFBRoadTexture);
+                textureRoughness * roadSpeedGate *
+                static_cast<float>(Settings::WheelFFBRoadTexture) * outputStrength *
+                stageRoadTextureScale;
             const float roadFreq = 25.0f + 12.0f * speedNorm;
 
             if (waterFlag && roughness > 0.7f && speedNorm > 0.70f && splashTimer_ <= 0)
             {
-                splashAmp_ = (roughness - 0.7f) * speedNorm * 0.75f;
+                const float roadTextureScale = std::clamp(
+                    static_cast<float>(Settings::WheelFFBRoadTexture) / 0.20f,
+                    0.0f, 5.0f);
+                splashAmp_ =
+                    (roughness - 0.7f) * speedNorm * 0.75f * roadTextureScale *
+                    outputStrength * stageRoadTextureScale;
                 splashTimer_ = 9;
             }
             if (splashTimer_ > 0)
@@ -264,7 +518,7 @@ namespace
             float slipFreq = 40.0f;
             if (driftAmt > 0.15f && speedNorm > 0.05f)
             {
-                slipAmp = driftAmt * static_cast<float>(Settings::WheelFFBTireSlip);
+                slipAmp = driftAmt * static_cast<float>(Settings::WheelFFBTireSlip) * outputStrength;
                 slipFreq = 40.0f - 12.0f * driftAmt;
             }
             else if (speedNorm < 0.03f && car->pedal_amount_34 > 0)
@@ -272,8 +526,16 @@ namespace
                 const float throttleNorm =
                     std::clamp(static_cast<float>(car->pedal_amount_34) / 255.0f, 0.0f, 1.0f);
                 slipAmp =
-                    static_cast<float>(Settings::WheelFFBEngineIdle) * throttleNorm;
+                    static_cast<float>(Settings::WheelFFBEngineIdle) * throttleNorm * outputStrength;
                 slipFreq = 15.0f + 7.0f * throttleNorm;
+            }
+
+            if (!Settings::WheelFFBUsePeriodicEffects &&
+                (roadTextureEffect_ || tireSlipEffect_))
+            {
+                disable_periodics();
+                spdlog::info(
+                    "WheelFFB: hardware periodic effects disabled live; using ConstantForce fallback");
             }
 
             // Warm-up ramp prevents the first few garbage/settling frames from
@@ -298,45 +560,169 @@ namespace
             // FXT-inspired split: the centering backbone is a DirectInput
             // condition effect handled continuously by the wheel/driver. Keep
             // the game's real lateral/event signals on ConstantForce.
-            const float speedCurve =
-                std::clamp(speedNorm / 0.25f, 0.0f, 1.0f) *
-                (0.35f + 0.65f * speedNorm);
+            // Simulation-style aligning backbone: light at parking speed,
+            // progressively stronger with vehicle speed, then additionally
+            // loaded by cornering force. Deep slip unloads the wheel again.
+            const float cornerLoad = std::clamp(std::abs(latNorm), 0.0f, 1.0f);
 
-            const float springStrength =
-                std::clamp(
-                    static_cast<float>(Settings::WheelFFBSpringStrength) *
-                    speedCurve * gripFactor,
-                    0.0f, 1.0f);
+            // Keep GUID_Spring as a low-speed/near-centre stabilizer instead of
+            // stacking a second high-speed SAT on top of ConstantForce. The
+            // fade is a smoothstep, so crossing the blend region cannot create
+            // a coefficient step or a sudden return-to-centre kick.
+            const float springFadeT = std::clamp(
+                (speedNorm - 0.05f) / 0.35f, 0.0f, 1.0f);
+            const float springFade =
+                springFadeT * springFadeT * (3.0f - 2.0f * springFadeT);
+            const float springSpeed = 1.0f - 0.88f * springFade;
+            const float springGrip = 0.80f + 0.20f * gripFactor;
+            const float springStrength = std::clamp(
+                static_cast<float>(Settings::WheelFFBSpringStrength) *
+                    springSpeed * springGrip,
+                0.0f, 1.0f);
 
             const bool suppressSpringForImpact =
                 crashImpulseTimer_ > CrashCooldownFrames;
+
+            // Make UseHardwareSpring a real live F11 switch.  Previously
+            // changing it to false after startup left the already-created
+            // GUID_Spring running, which made direction testing misleading.
+            if (!Settings::WheelFFBUseHardwareSpring && springEffect_)
+            {
+                update_spring(0.0f);
+                springEffect_->Stop();
+                safe_release_effect(springEffect_, "hardware spring disabled");
+                prevSpringCoefficient_ = 0;
+                prevSpringSaturation_ = 0;
+                springStrategy_ = -1;
+                spdlog::info("WheelFFB: hardware spring disabled live; using software centering");
+            }
 
             if (springEffect_)
             {
                 update_spring(
                     suppressSpringForImpact
                         ? 0.0f
-                        : springStrength * warmupScale * recreateScale);
+                        : springStrength * warmupScale * recreateScale * outputStrength);
             }
 
             const float softwareSpring =
                 springEffect_
                     ? 0.0f
-                    : -steer * static_cast<float>(Settings::WheelFFBSpringStrength) * speedCurve;
+                    : -steer * springStrength;
 
-            // Keep the current software damper for this first comparison build.
-            // A separate GUID_Damper can be tested after the hardware spring is
-            // validated on the R3, so the two changes are not confounded.
-            constexpr float SteerRateScale = 10.0f;
-            const float damper =
-                -steerRate * SteerRateScale *
+            // ACC/AMS2-inspired dynamic damping. It resists steering velocity
+            // rather than pulling toward centre, grows with vehicle speed, and
+            // relaxes when the tyres are deeply sliding so counter-steer is not
+            // smothered. Prefer a native DirectInput GUID_Damper on wheels that
+            // implement it and keep the old software term as a fallback.
+            const float dampingSpeed =
+                0.10f + 0.90f * std::pow(speedNorm, 1.30f);
+            const float dampingGrip = 0.25f + 0.75f * gripFactor;
+            const float dynamicDamperStrength = std::clamp(
                 static_cast<float>(Settings::WheelFFBDamperStrength) *
-                (0.4f + 0.6f * speedNorm);
+                    dampingSpeed * dampingGrip,
+                0.0f, 1.0f);
 
-            const float lateral =
-                latNorm * speedNorm *
-                static_cast<float>(Settings::WheelFFBSteeringWeight) *
-                gripFactor;
+            if (!Settings::WheelFFBUseHardwareDamper && damperEffect_)
+            {
+                update_damper(0.0f);
+                damperEffect_->Stop();
+                safe_release_effect(damperEffect_, "hardware damper disabled");
+                prevDamperCoefficient_ = 0;
+                damperStrategy_ = -1;
+                spdlog::info("WheelFFB: hardware damper disabled live; using software damping");
+            }
+
+            if (damperEffect_)
+                update_damper(dynamicDamperStrength * warmupScale * recreateScale * outputStrength);
+
+            constexpr float SteerRateScale = 10.0f;
+            const float damper = damperEffect_
+                ? 0.0f
+                : -steerRate * SteerRateScale * dynamicDamperStrength;
+
+            // Strong sim-style pseudo self-aligning torque (SAT). OutRun does
+            // not expose tyre pneumatic trail directly, so use the real steering
+            // angle as torque direction and the game's smoothed lateral signal as
+            // a load magnitude. This is intentionally NOT the old signed lateral
+            // ConstantForce, which could partially cancel the centering spring.
+            //
+            // - steering angle determines restoring direction (always toward centre)
+            // - vehicle speed builds SAT progressively
+            // - lateral load makes a loaded corner heavier
+            // - deeper drift unloads SAT so loss of grip is felt in the wheel
+            const float steerAbs = std::clamp(std::abs(steer), 0.0f, 1.0f);
+
+            // Natural pseudo-SAT: a soft 2.5% centre deadband followed by a
+            // sine-shaped pneumatic-trail curve. Unlike the previous power
+            // curve, tiny steering angles stay tiny instead of immediately
+            // generating a large ConstantForce. The curve remains progressive
+            // through normal cornering angles and naturally flattens near lock.
+            const float satAngleInput = std::clamp(
+                (steerAbs - 0.025f) / 0.975f, 0.0f, 1.0f);
+            constexpr float HalfPi = 1.57079632679f;
+            const float steerForSat = std::sin(satAngleInput * HalfPi);
+
+            // Motion gate removes SAT at rest, then builds it continuously once
+            // the car is rolling. This retains strong loaded-corner steering
+            // without the old square-root-like jump at small steering angles.
+            const float satMotionT = std::clamp(
+                (speedNorm - 0.015f) / 0.085f, 0.0f, 1.0f);
+            const float satMotionGate =
+                satMotionT * satMotionT * (3.0f - 2.0f * satMotionT);
+            const float satSpeed = satMotionGate *
+                (0.20f + 0.80f * std::sqrt(speedNorm));
+
+            // OutRun exposes an arcade lateral signal rather than tyre
+            // pneumatic trail. Use only its magnitude as a gentle load modifier
+            // and never let its sign decide the FFB direction.
+            const float cornerLoadSmooth =
+                cornerLoad * cornerLoad * (3.0f - 2.0f * cornerLoad);
+            const float satLoadBoost = 0.72f + 0.38f * cornerLoadSmooth;
+
+            // Lateral magnitude is only a proxy for actual slip. Unload late and
+            // smoothly so an ordinary loaded corner cannot repeatedly lose and
+            // regain SAT as the Xbox vibration signal crosses a threshold.
+            const float satSlipT = std::clamp(
+                (driftAmt - 0.60f) / 0.35f, 0.0f, 1.0f);
+            const float satSlip =
+                satSlipT * satSlipT * (3.0f - 2.0f * satSlipT);
+            const float satGrip = 1.0f -
+                0.65f * static_cast<float>(Settings::WheelFFBGripLoss) * satSlip;
+
+            // A real steering rack loses net aligning acceleration as the wheel
+            // is already rotating quickly back toward centre. Apply a bounded
+            // return-rate relief to stop a DD base from whipping through zero;
+            // holding a corner (rate ~= 0) still gets the full SAT magnitude.
+            const bool returningToCentre = steer * steerRate < 0.0f;
+            const float returnRateT = returningToCentre
+                ? std::clamp(std::abs(steerRate) / 0.08f, 0.0f, 1.0f)
+                : 0.0f;
+            const float returnRateSmooth =
+                returnRateT * returnRateT * (3.0f - 2.0f * returnRateT);
+            const float satReturnRelief = 1.0f - 0.45f * returnRateSmooth;
+
+            const float satStrength = std::clamp(
+                static_cast<float>(Settings::WheelFFBSteeringWeight), 0.0f, 2.0f);
+            const float naturalSatTorque =
+                (steer >= 0.0f ? -1.0f : 1.0f) *
+                steerForSat * satSpeed * satLoadBoost * satGrip *
+                satReturnRelief * satStrength;
+
+            // Physics SAT derives force direction from estimated front slip,
+            // not merely from steering sign. During initial basis calibration
+            // retain only a small Natural SAT safety net, then crossfade over
+            // 24 valid physics ticks. Once active, a valid zero Physics SAT is
+            // truly zero; Natural SAT never leaks back in around wheel centre.
+            const float physicsSatTorque = physicsSat_.update(
+                car, steer, speedNorm, cornerLoadSmooth, returnRateSmooth,
+                static_cast<float>(Settings::WheelFFBGripLoss),
+                satStrength, satSpeed);
+            const float physicsFallback = naturalSatTorque * 0.15f;
+            const float physicsMix = physicsSat_.activationBlend();
+            const float selfAligningTorque = Settings::WheelFFBPhysicsSat
+                ? physicsFallback + (physicsSatTorque - physicsFallback) * physicsMix
+                : naturalSatTorque;
 
             float loadMod = 1.0f;
             if (speedHistoryIndex_ > 6)
@@ -346,20 +732,25 @@ namespace
                 const float longAccel = (speed - oldSpeed) * 5.0f;
                 loadMod = 1.0f + std::clamp(
                     -longAccel * static_cast<float>(Settings::WheelFFBWeightTransfer),
-                    -0.20f, 0.30f);
+                    -0.06f, 0.08f);
             }
 
             float structural = 0.0f;
             if (crashImpulseTimer_ <= CrashCooldownFrames)
-                structural = (softwareSpring + lateral) * loadMod + damper;
+                structural = (softwareSpring + selfAligningTorque) * loadMod + damper;
 
             float events = update_event_force();
 
-            float total = structural + events;
+            // d-b-c-e toolkit v0.8.0 ordering: gain/invert are part of the
+            // signal before soft saturation and slew. This prevents high gain
+            // or inversion from disagreeing with the slew limiter's last value.
+            float total = (structural + events) * outputStrength;
             if (Settings::WheelFFBInvertForce)
                 total = -total;
 
             total *= warmupScale * recreateScale;
+            if (!std::isfinite(total))
+                total = 0.0f;
 
             // Soft saturation preserves detail near the force cap.
             const float compressed = std::tanh(total);
@@ -367,9 +758,12 @@ namespace
             LONG structuralLevel =
                 static_cast<LONG>(compressed * static_cast<float>(DI_FFNOMINALMAX));
 
+            const float configuredSlew = static_cast<float>(Settings::WheelFFBSlewRate);
+            const float safeSlew = std::isfinite(configuredSlew)
+                ? std::clamp(configuredSlew, 0.01f, 1.0f)
+                : 0.06f;
             const LONG maxSlew = static_cast<LONG>(
-                std::clamp(static_cast<float>(Settings::WheelFFBSlewRate), 0.01f, 1.0f) *
-                static_cast<float>(DI_FFNOMINALMAX));
+                safeSlew * static_cast<float>(DI_FFNOMINALMAX));
 
             const LONG structuralDelta = structuralLevel - prevStructuralLevel_;
             const bool bypassSlew =
@@ -383,14 +777,16 @@ namespace
             prevStructuralLevel_ = structuralLevel;
 
             // Hardware periodics are preferred. If unavailable, inject a capped
-            // low-frequency sine after the tanh compressor.
+            // low-frequency sine after the tanh compressor. Road/slip signals
+            // share the same startup/recreate ramp as structural force.
+            const float effectRampScale = warmupScale * recreateScale;
             float fallbackVibration = 0.0f;
             if (!periodicsActive_)
             {
                 fallbackVibration += synth_fallback(
-                    roadPhase_, roadAmp, std::min(roadFreq, 15.0f));
+                    roadPhase_, roadAmp * effectRampScale, std::min(roadFreq, 15.0f));
                 fallbackVibration += synth_fallback(
-                    slipPhase_, slipAmp, std::min(slipFreq, 15.0f));
+                    slipPhase_, slipAmp * effectRampScale, std::min(slipFreq, 15.0f));
             }
 
             const LONG level = std::clamp(
@@ -405,14 +801,14 @@ namespace
             ++updateCounter_;
             if (periodicsActive_ && (updateCounter_ % 4) == 0)
             {
-                update_periodic(roadTextureEffect_, roadState_, roadAmp, roadFreq);
-                update_periodic(tireSlipEffect_, slipState_, slipAmp, slipFreq);
+                update_periodic(roadTextureEffect_, roadState_, roadAmp * effectRampScale, roadFreq);
+                update_periodic(tireSlipEffect_, slipState_, slipAmp * effectRampScale, slipFreq);
             }
 
             if (Settings::WheelFFBUsePeriodicEffects &&
                 (!roadTextureEffect_ || !tireSlipEffect_) &&
                 (updateCounter_ % 60) == 0 &&
-                GetTickCount() >= recreateHoldoffUntil_)
+                tick_reached(GetTickCount(), recreateHoldoffUntil_))
             {
                 create_periodic_effects();
             }
@@ -420,14 +816,71 @@ namespace
             if (Settings::WheelFFBUseHardwareSpring &&
                 !springEffect_ &&
                 (updateCounter_ % 60) == 0 &&
-                GetTickCount() >= springRecreateHoldoffUntil_)
+                tick_reached(GetTickCount(), springRecreateHoldoffUntil_))
             {
                 create_spring_effect();
             }
 
+            if (Settings::WheelFFBUseHardwareDamper &&
+                !damperEffect_ &&
+                (updateCounter_ % 60) == 0 &&
+                tick_reached(GetTickCount(), damperRecreateHoldoffUntil_))
+            {
+                create_damper_effect();
+            }
+
             prevGear_ = curGear;
             prevCollisionFlags_ = stateFlags;
-            maybe_log(speedNorm, steer, steerRate, driftAmt, roughness, level);
+            maybe_log(speedNorm, steer, steerRate, driftAmt, roughness, selfAligningTorque, level);
+        }
+
+        void request_direction_test(int direction)
+        {
+            if (direction == 0)
+            {
+                const bool hadPendingTest = manualTestFrames_ > 0;
+                manualTestFrames_ = 0;
+                manualTestDirection_ = 1;
+                const bool inGameplay =
+                    Game::current_mode && (*Game::current_mode == STATE_GAME);
+                if (hadPendingTest && initialized_ && !panicStopped_ &&
+                    deviceAcquired_ && inGameplay && appActive_ && gameHwnd_ &&
+                    GetForegroundWindow() == gameHwnd_)
+                {
+                    zero_all_forces();
+                }
+                if (hadPendingTest)
+                    reset_signal_state();
+                return;
+            }
+
+            const bool inGameplay =
+                Game::current_mode && (*Game::current_mode == STATE_GAME);
+            if (!inGameplay)
+            {
+                manualTestFrames_ = 0;
+                manualTestDirection_ = 1;
+                spdlog::warn(
+                    "WheelFFB: ignored direction test outside gameplay; no torque was queued");
+                return;
+            }
+
+            if (!Settings::WheelFFBEnable || !initialized_ || panicStopped_ ||
+                !device_ || !deviceAcquired_ || !appActive_ || !gameHwnd_ ||
+                GetForegroundWindow() != gameHwnd_)
+            {
+                manualTestFrames_ = 0;
+                manualTestDirection_ = 1;
+                spdlog::warn(
+                    "WheelFFB: ignored direction test while FFB device was not active and foreground; no torque was queued");
+                return;
+            }
+
+            manualTestDirection_ = direction < 0 ? -1 : 1;
+            manualTestFrames_ = 18;
+            spdlog::info(
+                "WheelFFB: queued safe {} direction test at fixed 20% output",
+                manualTestDirection_ < 0 ? "left" : "right");
         }
 
         void check_watchdog()
@@ -437,7 +890,9 @@ namespace
 
             const DWORD elapsed = GetTickCount() - lastUpdateTick_;
             if (elapsed > 250 &&
-                (prevConstantLevel_ != 0 || prevSpringCoefficient_ != 0))
+                (prevConstantLevel_ != 0 || prevSpringCoefficient_ != 0 ||
+                 prevDamperCoefficient_ != 0 || roadState_.lastMagnitude != 0 ||
+                 slipState_.lastMagnitude != 0))
             {
                 zero_all_forces();
                 reset_signal_state();
@@ -462,11 +917,11 @@ namespace
 
             if (constantEffect_)
             {
-                DICONSTANTFORCE cf{};
+                constantParams_ = {};
                 DIEFFECT eff{};
                 eff.dwSize = sizeof(eff);
-                eff.cbTypeSpecificParams = sizeof(cf);
-                eff.lpvTypeSpecificParams = &cf;
+                eff.cbTypeSpecificParams = sizeof(constantParams_);
+                eff.lpvTypeSpecificParams = &constantParams_;
 
                 HRESULT hr = constantEffect_->SetParameters(
                     &eff, DIEP_TYPESPECIFICPARAMS | DIEP_START);
@@ -479,6 +934,12 @@ namespace
             {
                 const HRESULT springHr = springEffect_->Stop();
                 spdlog::info("WheelFFB: PanicStop spring Stop => 0x{:08X}", (unsigned)springHr);
+            }
+
+            if (damperEffect_)
+            {
+                const HRESULT damperHr = damperEffect_->Stop();
+                spdlog::info("WheelFFB: PanicStop damper Stop => 0x{:08X}", (unsigned)damperHr);
             }
 
             if (roadTextureEffect_)
@@ -495,6 +956,7 @@ namespace
 
             // DIPROP_AUTOCENTER must be written while unacquired.
             hr = device_->Unacquire();
+            deviceAcquired_ = false;
             spdlog::info("WheelFFB: PanicStop Unacquire => 0x{:08X}", (unsigned)hr);
 
             DIPROPDWORD autocenter{};
@@ -504,6 +966,8 @@ namespace
             autocenter.diph.dwHow = DIPH_DEVICE;
             autocenter.dwData = DIPROPAUTOCENTER_ON;
             hr = device_->SetProperty(DIPROP_AUTOCENTER, &autocenter.diph);
+            if (SUCCEEDED(hr))
+                driverAutocenterDisabled_ = false;
             spdlog::info("WheelFFB: PanicStop autocenter restore => 0x{:08X}", (unsigned)hr);
         }
 
@@ -527,6 +991,8 @@ namespace
             GUID selectedGuid{};
             std::string selectedName;
             bool found = false;
+            bool ignoreName = false;
+            bool matchGuidOnly = false;
         };
 
         static BOOL CALLBACK enum_devices_callback(
@@ -537,6 +1003,17 @@ namespace
             const std::string productName = lower_copy(instance->tszProductName);
             const std::string wanted =
                 lower_copy(Settings::WheelFFBDeviceName.get().c_str());
+            const std::string wantedGuid =
+                lower_copy(Settings::WheelFFBDeviceGuid.get().c_str());
+
+            if (ctx->self && tick_before(GetTickCount(), ctx->self->failedInterfaceUntil_) &&
+                directinput_guid_key(instance->guidInstance) == ctx->self->failedInterfaceGuid_)
+            {
+                spdlog::warn(
+                    "WheelFFB: temporarily skipping rejected FFB interface '{}' [{}] to try a sibling",
+                    instance->tszProductName, directinput_guid_key(instance->guidInstance));
+                return DIENUM_CONTINUE;
+            }
 
             if (is_virtual_device_name(instanceName) ||
                 is_virtual_device_name(productName))
@@ -547,7 +1024,11 @@ namespace
                 return DIENUM_CONTINUE;
             }
 
-            if (!wanted.empty() &&
+            if (ctx->matchGuidOnly &&
+                (wantedGuid.empty() || directinput_guid_key(instance->guidInstance) != wantedGuid))
+                return DIENUM_CONTINUE;
+
+            if (!ctx->matchGuidOnly && !ctx->ignoreName && !wanted.empty() &&
                 instanceName.find(wanted) == std::string::npos &&
                 productName.find(wanted) == std::string::npos)
             {
@@ -558,6 +1039,167 @@ namespace
             ctx->selectedName = instance->tszProductName;
             ctx->found = true;
             return DIENUM_STOP;
+        }
+
+        void clear_device_failure()
+        {
+            deviceFailureSince_ = 0;
+        }
+
+        void request_device_reinitialize(const char* reason, HRESULT hr)
+        {
+            if (panicStopped_ || deviceReinitPending_)
+                return;
+
+            deviceReinitPending_ = true;
+            deviceReinitAfter_ = GetTickCount();
+            spdlog::warn(
+                "WheelFFB: scheduling DirectInput device reinitialization after {} (0x{:08X})",
+                reason, (unsigned)hr);
+        }
+
+        void note_device_failure(const char* where, HRESULT hr)
+        {
+            if (panicStopped_ || !initialized_)
+                return;
+
+            const DWORD now = GetTickCount();
+            if (deviceFailureSince_ == 0)
+            {
+                deviceFailureSince_ = now;
+                spdlog::warn(
+                    "WheelFFB: DirectInput device access failed at {} (0x{:08X}); allowing {}ms for transient recovery",
+                    where, (unsigned)hr, (unsigned)FFB_DEVICE_FAILURE_GRACE_MS);
+                return;
+            }
+
+            if (now - deviceFailureSince_ >= FFB_DEVICE_FAILURE_GRACE_MS)
+                request_device_reinitialize(where, hr);
+        }
+
+        bool reacquire_after_input_loss(const char* where, HRESULT originalHr)
+        {
+            if (!device_)
+            {
+                note_device_failure(where, originalHr);
+                return false;
+            }
+
+            const bool inGameplay =
+                Game::current_mode && (*Game::current_mode == STATE_GAME);
+            if (!inGameplay)
+            {
+                deviceAcquired_ = false;
+                return false;
+            }
+            if (!appActive_ || !gameHwnd_ || GetForegroundWindow() != gameHwnd_)
+            {
+                deviceAcquired_ = false;
+                return false;
+            }
+
+            deviceAcquired_ = false;
+            const HRESULT acquireHr = device_->Acquire();
+            if (SUCCEEDED(acquireHr) || acquireHr == S_FALSE)
+            {
+                if (!appActive_ || GetForegroundWindow() != gameHwnd_)
+                {
+                    device_->Unacquire();
+                    deviceAcquired_ = false;
+                    return false;
+                }
+
+                deviceAcquired_ = true;
+                const HRESULT actuatorHr =
+                    device_->SendForceFeedbackCommand(DISFFC_SETACTUATORSON);
+                if (FAILED(actuatorHr))
+                {
+                    device_->Unacquire();
+                    deviceAcquired_ = false;
+                    note_device_failure("reacquire SETACTUATORSON", actuatorHr);
+                    return false;
+                }
+                clear_device_failure();
+                return true;
+            }
+
+            note_device_failure(where, acquireHr);
+            return false;
+        }
+
+        void release_effects_for_reinitialize()
+        {
+            safe_release_effect(constantEffect_, "constant during device reinit");
+            safe_release_effect(springEffect_, "spring during device reinit");
+            safe_release_effect(damperEffect_, "damper during device reinit");
+            safe_release_effect(roadTextureEffect_, "road during device reinit");
+            safe_release_effect(tireSlipEffect_, "tire during device reinit");
+
+            roadState_ = {};
+            slipState_ = {};
+            periodicsActive_ = false;
+            springStrategy_ = 1;
+            damperStrategy_ = 1;
+            periodicStrategy_ = 1;
+        }
+
+        void teardown_for_reinitialize()
+        {
+            if (device_)
+            {
+                __try
+                {
+                    device_->SendForceFeedbackCommand(DISFFC_STOPALL);
+                    device_->SendForceFeedbackCommand(DISFFC_SETACTUATORSOFF);
+                }
+                __except (EXCEPTION_EXECUTE_HANDLER)
+                {
+                    spdlog::warn(
+                        "WheelFFB: exception stopping stale DirectInput device during reinit (0x{:X})",
+                        GetExceptionCode());
+                }
+            }
+
+            release_effects_for_reinitialize();
+            deviceAcquired_ = false;
+
+            restore_driver_autocenter("device reinitialize");
+            release_device();
+            release_directinput();
+            selectedName_.clear();
+            selectedGuid_ = {};
+            lastEffectGain_ = 0xFFFFFFFFu;
+            nextGainRetryTick_ = 0;
+            lastGainErrorLog_ = 0;
+            recreateHoldoffUntil_ = 0;
+            springRecreateHoldoffUntil_ = 0;
+            damperRecreateHoldoffUntil_ = 0;
+            reset_signal_state();
+        }
+
+        static BOOL CALLBACK enum_actuator_axis_callback(
+            LPCDIDEVICEOBJECTINSTANCEA object, LPVOID context)
+        {
+            auto* self = static_cast<WheelFFBEngine*>(context);
+            if (!self || !object)
+                return DIENUM_CONTINUE;
+            if ((object->dwType & DIDFT_FFACTUATOR) != 0 && self->actuatorAxes_.size() < 2)
+                self->actuatorAxes_.push_back(object->dwOfs);
+            return DIENUM_CONTINUE;
+        }
+
+        DWORD primary_actuator_axis() const
+        {
+            return actuatorAxes_.empty() ? DIJOFS_X : actuatorAxes_.front();
+        }
+
+        void mark_selected_interface_failed(const char* reason, HRESULT hr)
+        {
+            failedInterfaceGuid_ = directinput_guid_key(selectedGuid_);
+            failedInterfaceUntil_ = GetTickCount() + 5000;
+            spdlog::warn(
+                "WheelFFB: interface '{}' [{}] rejected {}; trying a sibling interface on retry (0x{:08X})",
+                selectedName_, failedInterfaceGuid_, reason, (unsigned)hr);
         }
 
         bool initialize()
@@ -581,12 +1223,61 @@ namespace
 
             EnumContext ctx{};
             ctx.self = this;
+            const std::string configuredGuid =
+                lower_copy(Settings::WheelFFBDeviceGuid.get().c_str());
 
-            hr = directInput_->EnumDevices(
-                DI8DEVCLASS_GAMECTRL,
-                enum_devices_callback,
-                &ctx,
-                DIEDFL_ATTACHEDONLY | DIEDFL_FORCEFEEDBACK);
+            if (!configuredGuid.empty())
+            {
+                ctx.matchGuidOnly = true;
+                hr = directInput_->EnumDevices(
+                    DI8DEVCLASS_GAMECTRL, enum_devices_callback, &ctx,
+                    DIEDFL_ATTACHEDONLY | DIEDFL_FORCEFEEDBACK);
+                if (FAILED(hr))
+                {
+                    release_directinput();
+                    return false;
+                }
+                if (!ctx.found)
+                {
+                    const bool rejectedExactInterface =
+                        failedInterfaceGuid_ == configuredGuid &&
+                        tick_before(GetTickCount(), failedInterfaceUntil_);
+                    if (!rejectedExactInterface)
+                    {
+                        spdlog::warn(
+                            "WheelFFB: saved DirectInput GUID '{}' is unavailable; refusing DeviceName fallback",
+                            Settings::WheelFFBDeviceGuid.get());
+                        release_directinput();
+                        return false;
+                    }
+
+                    spdlog::warn(
+                        "WheelFFB: saved DirectInput GUID '{}' was rejected during initialization; trying a sibling DeviceName interface",
+                        Settings::WheelFFBDeviceGuid.get());
+                    ctx = {};
+                    ctx.self = this;
+                }
+            }
+
+            if (!ctx.found)
+            {
+                hr = directInput_->EnumDevices(
+                    DI8DEVCLASS_GAMECTRL, enum_devices_callback, &ctx,
+                    DIEDFL_ATTACHEDONLY | DIEDFL_FORCEFEEDBACK);
+            }
+
+            if (SUCCEEDED(hr) && !ctx.found &&
+                lower_copy(Settings::WheelFFBDeviceName.get().c_str()) == "moza")
+            {
+                ctx.ignoreName = true;
+                spdlog::warn(
+                    "WheelFFB: no literal MOZA DirectInput name; trying first attached non-virtual FFB device");
+                hr = directInput_->EnumDevices(
+                    DI8DEVCLASS_GAMECTRL,
+                    enum_devices_callback,
+                    &ctx,
+                    DIEDFL_ATTACHEDONLY | DIEDFL_FORCEFEEDBACK);
+            }
 
             if (FAILED(hr) || !ctx.found)
             {
@@ -599,23 +1290,40 @@ namespace
 
             selectedGuid_ = ctx.selectedGuid;
             selectedName_ = ctx.selectedName;
+            selectedConfiguredGuid_ = lower_copy(Settings::WheelFFBDeviceGuid.get().c_str());
+            selectedConfiguredName_ = lower_copy(Settings::WheelFFBDeviceName.get().c_str());
+            spdlog::info("WheelFFB: selected DirectInput identity '{}' / '{}'",
+                selectedName_, directinput_guid_key(selectedGuid_));
 
             hr = directInput_->CreateDevice(selectedGuid_, &device_, nullptr);
             if (FAILED(hr) || !device_)
             {
+                const HRESULT failHr = FAILED(hr) ? hr : E_FAIL;
+                mark_selected_interface_failed("CreateDevice", failHr);
                 spdlog::error(
                     "WheelFFB: CreateDevice('{}') failed (0x{:08X})",
-                    selectedName_, (unsigned)hr);
+                    selectedName_, (unsigned)failHr);
                 release_directinput();
                 return false;
             }
 
             DIDEVCAPS caps{};
             caps.dwSize = sizeof(caps);
-            device_->GetCapabilities(&caps);
+            hr = device_->GetCapabilities(&caps);
+            if (FAILED(hr))
+            {
+                mark_selected_interface_failed("GetCapabilities", hr);
+                spdlog::error(
+                    "WheelFFB: GetCapabilities('{}') failed (0x{:08X})",
+                    selectedName_, (unsigned)hr);
+                release_device();
+                release_directinput();
+                return false;
+            }
 
             if ((caps.dwFlags & DIDC_FORCEFEEDBACK) == 0)
             {
+                mark_selected_interface_failed("force-feedback capability", E_NOINTERFACE);
                 spdlog::error("WheelFFB: '{}' does not report force-feedback capability", selectedName_);
                 release_device();
                 release_directinput();
@@ -625,6 +1333,7 @@ namespace
             hr = device_->SetDataFormat(&c_dfDIJoystick2);
             if (FAILED(hr))
             {
+                mark_selected_interface_failed("SetDataFormat", hr);
                 spdlog::error("WheelFFB: SetDataFormat failed (0x{:08X})", (unsigned)hr);
                 release_device();
                 release_directinput();
@@ -640,12 +1349,26 @@ namespace
                 return false;
             }
 
+            // initialize() can run while the game is already in the background,
+            // before our WM_ACTIVATEAPP subclass has seen a focus transition.
+            // Seed appActive_ from the real foreground window so an exclusive
+            // DD device is never acquired merely because the default was true.
+            appActive_ = (GetForegroundWindow() == gameHwnd_);
+            if (!appActive_)
+            {
+                release_device();
+                release_directinput();
+                retryAfter_ = GetTickCount() + FFB_DEVICE_RETRY_MS;
+                return false;
+            }
+
             hr = device_->SetCooperativeLevel(
                 gameHwnd_,
                 DISCL_EXCLUSIVE | DISCL_BACKGROUND);
 
             if (FAILED(hr))
             {
+                mark_selected_interface_failed("SetCooperativeLevel", hr);
                 spdlog::error(
                     "WheelFFB: SetCooperativeLevel(EXCLUSIVE|BACKGROUND) failed (0x{:08X})",
                     (unsigned)hr);
@@ -664,17 +1387,49 @@ namespace
             hr = device_->SetProperty(DIPROP_AUTOCENTER, &autocenter.diph);
             if (FAILED(hr))
                 spdlog::warn("WheelFFB: disabling driver autocenter failed (0x{:08X})", (unsigned)hr);
+            else
+                driverAutocenterDisabled_ = true;
 
             hr = device_->Acquire();
             if (FAILED(hr))
             {
+                mark_selected_interface_failed("Acquire", hr);
                 spdlog::error("WheelFFB: Acquire('{}') failed (0x{:08X})", selectedName_, (unsigned)hr);
                 release_device();
                 release_directinput();
                 return false;
             }
+            deviceAcquired_ = true;
 
-            device_->SendForceFeedbackCommand(DISFFC_SETACTUATORSON);
+            const HRESULT actuatorOnHr =
+                device_->SendForceFeedbackCommand(DISFFC_SETACTUATORSON);
+            if (FAILED(actuatorOnHr))
+            {
+                mark_selected_interface_failed("initial SETACTUATORSON", actuatorOnHr);
+                spdlog::error(
+                    "WheelFFB: SETACTUATORSON during initialization failed (0x{:08X})",
+                    (unsigned)actuatorOnHr);
+                release_device();
+                release_directinput();
+                return false;
+            }
+
+            actuatorAxes_.clear();
+            const HRESULT axisEnumHr = device_->EnumObjects(
+                enum_actuator_axis_callback, this, DIDFT_AXIS);
+            if (FAILED(axisEnumHr) || actuatorAxes_.empty())
+            {
+                actuatorAxes_.clear();
+                actuatorAxes_.push_back(DIJOFS_X);
+                spdlog::warn(
+                    "WheelFFB: no explicit DIDFT_FFACTUATOR axis reported; using DIJOFS_X fallback");
+            }
+            else
+            {
+                spdlog::info(
+                    "WheelFFB: detected {} force actuator axis/axes; primary offset={}",
+                    actuatorAxes_.size(), (unsigned)actuatorAxes_.front());
+            }
 
             if (!create_constant_effect())
             {
@@ -683,31 +1438,66 @@ namespace
                 return false;
             }
 
+            {
+                const std::string actualGuid = directinput_guid_key(selectedGuid_);
+                if (lower_copy(Settings::WheelFFBDeviceGuid.get().c_str()) != actualGuid)
+                {
+                    Settings::WheelFFBDeviceGuid = actualGuid;
+                    selectedConfiguredGuid_ = actualGuid;
+                    spdlog::info(
+                        "WheelFFB: pinned working force interface GUID '{}' after capability validation",
+                        actualGuid);
+                }
+            }
+
             if (Settings::WheelFFBUseHardwareSpring && !create_spring_effect())
             {
                 spdlog::warn(
                     "WheelFFB: hardware GUID_Spring unavailable; retaining software spring fallback");
             }
 
+            if (Settings::WheelFFBUseHardwareDamper && !create_damper_effect())
+            {
+                spdlog::warn(
+                    "WheelFFB: hardware GUID_Damper unavailable; retaining software damper fallback");
+            }
+
             create_periodic_effects();
             install_exit_guards();
 
             initialized_ = true;
+            deviceReinitPending_ = false;
+            deviceFailureSince_ = 0;
+            deviceReinitAfter_ = 0;
+            retryAfter_ = 0;
             reset_signal_state();
 
+            lastEffectGain_ = configured_effect_gain();
+            failedInterfaceGuid_.clear();
+            failedInterfaceUntil_ = 0;
+
             spdlog::info(
-                "WheelFFB: ready on '{}' (DirectInput COM, axes={}, buttons={}, global={}%, spring={})",
+                "WheelFFB: ready on '{}' (DirectInput COM, axes={}, buttons={}, global={}%, spring={}, damper={})",
                 selectedName_,
                 caps.dwAxes,
                 caps.dwButtons,
                 static_cast<int>(static_cast<float>(Settings::WheelFFBGlobalStrength) * 100.0f),
-                springEffect_ ? "GUID_Spring" : "software");
+                springEffect_ ? "GUID_Spring" : "software",
+                damperEffect_ ? "GUID_Damper" : "software");
 
             return true;
         }
 
         float read_game_steering() const
         {
+            if (Settings::UseNewInput)
+            {
+                const float steering = InputManager_SteeringValue();
+                return std::isfinite(steering)
+                    ? std::clamp(steering, -1.0f, 1.0f)
+                    : 0.0f;
+            }
+
             using GetVolumeFn = int(__cdecl*)(ADChannel);
             auto getVolume = Module::fn_ptr<GetVolumeFn>(0x53720);
             if (!getVolume)
@@ -717,44 +1507,150 @@ namespace
             return std::clamp(raw / 127.0f, -1.0f, 1.0f);
         }
 
+        DWORD configured_effect_gain() const
+        {
+            // Overall strength moved into the force model. The DirectInput
+            // device-side gain remains nominal, avoiding double scaling.
+            return DI_FFNOMINALMAX;
+        }
+
+        void apply_live_effect_gain()
+        {
+            if (!device_ || !deviceAcquired_ || panicStopped_)
+                return;
+
+            const DWORD now = GetTickCount();
+            if (tick_before(now, nextGainRetryTick_))
+                return;
+
+            const DWORD gain = configured_effect_gain();
+            if (gain == lastEffectGain_)
+                return;
+
+            DIEFFECT params{};
+            params.dwSize = sizeof(params);
+            params.dwGain = gain;
+
+            bool failed = false;
+            auto updateGain = [&](IDirectInputEffect* effect, const char* label)
+            {
+                if (!effect)
+                    return;
+
+                HRESULT hr = effect->SetParameters(&params, DIEP_GAIN);
+                if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
+                {
+                    if (reacquire_after_input_loss("live gain", hr))
+                        hr = effect->SetParameters(&params, DIEP_GAIN);
+                }
+
+                // Some DirectInput drivers do not advertise DIEP_GAIN as a
+                // dynamic parameter.  DirectInput often restarts implicitly,
+                // but drivers are also allowed to return DIERR_EFFECTPLAYING.
+                // Stop only that effect and explicitly restart it with the new
+                // gain rather than making the F11 Overall Strength slider fail.
+                if (hr == DIERR_EFFECTPLAYING)
+                {
+                    effect->Stop();
+                    hr = effect->SetParameters(&params, DIEP_GAIN | DIEP_START);
+                }
+
+                if (FAILED(hr))
+                {
+                    failed = true;
+                    const DWORD now = GetTickCount();
+                    if (now - lastGainErrorLog_ >= 2000)
+                    {
+                        lastGainErrorLog_ = now;
+                        spdlog::warn(
+                            "WheelFFB: live gain update failed for {} (0x{:08X})",
+                            label, (unsigned)hr);
+                    }
+                }
+            };
+
+            updateGain(constantEffect_, "ConstantForce");
+            updateGain(springEffect_, "GUID_Spring");
+            updateGain(damperEffect_, "GUID_Damper");
+            updateGain(roadTextureEffect_, "RoadTexture");
+            updateGain(tireSlipEffect_, "TireSlip");
+
+            if (!failed)
+            {
+                lastEffectGain_ = gain;
+                nextGainRetryTick_ = 0;
+                spdlog::info(
+                    "WheelFFB: live GlobalStrength applied to active effects ({}%)",
+                    static_cast<unsigned>((gain * 100u) / DI_FFNOMINALMAX));
+            }
+            else
+            {
+                // Keep F11 responsive without turning a persistent driver
+                // failure into hundreds of SetParameters calls per second.
+                nextGainRetryTick_ = GetTickCount() + 250;
+            }
+        }
+
         bool create_constant_effect()
         {
             if (!device_)
                 return false;
 
-            DWORD axes[1] = { DIJOFS_X };
-            LONG directions[1] = { 0 };
-            DICONSTANTFORCE cf{};
-            cf.lMagnitude = 0;
+            safe_release_effect(constantEffect_, "constant before create");
+            constantEffectPolar_ = false;
+
+            DWORD axes[2] = {
+                primary_actuator_axis(),
+                actuatorAxes_.size() > 1 ? actuatorAxes_[1] : primary_actuator_axis()
+            };
+            LONG directions[2] = { 9000L, 0L };
+            constantParams_ = {};
+            constantParams_.lMagnitude = 0;
 
             DIEFFECT effect{};
             effect.dwSize = sizeof(effect);
-            effect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
             effect.dwDuration = INFINITE;
             effect.dwSamplePeriod = 0;
-            effect.dwGain = static_cast<DWORD>(
-                std::clamp(static_cast<float>(Settings::WheelFFBGlobalStrength), 0.0f, 1.0f) *
-                static_cast<float>(DI_FFNOMINALMAX));
+            effect.dwGain = DI_FFNOMINALMAX;
             effect.dwTriggerButton = DIEB_NOTRIGGER;
             effect.dwTriggerRepeatInterval = 0;
-            effect.cAxes = 1;
             effect.rgdwAxes = axes;
             effect.rglDirection = directions;
-            effect.cbTypeSpecificParams = sizeof(cf);
-            effect.lpvTypeSpecificParams = &cf;
+            effect.cbTypeSpecificParams = sizeof(constantParams_);
+            effect.lpvTypeSpecificParams = &constantParams_;
 
-            HRESULT hr = device_->CreateEffect(
-                GUID_ConstantForce, &effect, &constantEffect_, nullptr);
+            HRESULT hr = E_FAIL;
+            if (actuatorAxes_.size() > 1)
+            {
+                effect.dwFlags = DIEFF_POLAR | DIEFF_OBJECTOFFSETS;
+                effect.cAxes = 2;
+                hr = device_->CreateEffect(GUID_ConstantForce, &effect, &constantEffect_, nullptr);
+                if (SUCCEEDED(hr) && constantEffect_)
+                {
+                    constantEffectPolar_ = true;
+                    spdlog::info("WheelFFB: ConstantForce created with 2-axis POLAR actuator encoding");
+                    return true;
+                }
 
+                safe_release_effect(constantEffect_, "failed POLAR constant");
+                spdlog::warn(
+                    "WheelFFB: 2-axis POLAR ConstantForce rejected (0x{:08X}); trying one-axis CARTESIAN",
+                    (unsigned)hr);
+            }
+
+            effect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
+            effect.cAxes = 1;
+            directions[0] = 1;
+            hr = device_->CreateEffect(GUID_ConstantForce, &effect, &constantEffect_, nullptr);
             if (FAILED(hr) || !constantEffect_)
             {
-                spdlog::error(
-                    "WheelFFB: CreateEffect(ConstantForce) failed (0x{:08X})",
-                    (unsigned)hr);
+                mark_selected_interface_failed("ConstantForce creation", hr);
+                spdlog::error("WheelFFB: CreateEffect(ConstantForce) failed (0x{:08X})", (unsigned)hr);
                 return false;
             }
 
-            spdlog::info("WheelFFB: ConstantForce created");
+            constantEffectPolar_ = false;
+            spdlog::info("WheelFFB: ConstantForce created with 1-axis CARTESIAN fallback");
             return true;
         }
 
@@ -763,36 +1659,38 @@ namespace
             if (!device_ || !Settings::WheelFFBUseHardwareSpring)
                 return false;
 
-            DWORD axes[1] = { DIJOFS_X };
+            DWORD axes[1] = { primary_actuator_axis() };
             LONG directions[1] = { 0 };
 
+            const float configuredSaturation =
+                static_cast<float>(Settings::WheelFFBSpringSaturation);
+            const float safeSaturation = std::isfinite(configuredSaturation)
+                ? std::clamp(configuredSaturation, 0.1f, 1.0f)
+                : 0.775f;
             const DWORD saturation = static_cast<DWORD>(
-                std::clamp(static_cast<float>(Settings::WheelFFBSpringSaturation), 0.1f, 1.0f) *
-                static_cast<float>(DI_FFNOMINALMAX));
+                safeSaturation * static_cast<float>(DI_FFNOMINALMAX));
 
-            DICONDITION condition{};
-            condition.lOffset = 0;
-            condition.lPositiveCoefficient = 0;
-            condition.lNegativeCoefficient = 0;
-            condition.dwPositiveSaturation = saturation;
-            condition.dwNegativeSaturation = saturation;
-            condition.lDeadBand = 0;
+            springParams_ = {};
+            springParams_.lOffset = 0;
+            springParams_.lPositiveCoefficient = 0;
+            springParams_.lNegativeCoefficient = 0;
+            springParams_.dwPositiveSaturation = saturation;
+            springParams_.dwNegativeSaturation = saturation;
+            springParams_.lDeadBand = 0;
 
             DIEFFECT effect{};
             effect.dwSize = sizeof(effect);
             effect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
             effect.dwDuration = INFINITE;
             effect.dwSamplePeriod = 0;
-            effect.dwGain = static_cast<DWORD>(
-                std::clamp(static_cast<float>(Settings::WheelFFBGlobalStrength), 0.0f, 1.0f) *
-                static_cast<float>(DI_FFNOMINALMAX));
+            effect.dwGain = DI_FFNOMINALMAX;
             effect.dwTriggerButton = DIEB_NOTRIGGER;
             effect.dwTriggerRepeatInterval = 0;
             effect.cAxes = 1;
             effect.rgdwAxes = axes;
             effect.rglDirection = directions;
-            effect.cbTypeSpecificParams = sizeof(condition);
-            effect.lpvTypeSpecificParams = &condition;
+            effect.cbTypeSpecificParams = sizeof(springParams_);
+            effect.lpvTypeSpecificParams = &springParams_;
 
             HRESULT hr = device_->CreateEffect(
                 GUID_Spring, &effect, &springEffect_, nullptr);
@@ -816,10 +1714,10 @@ namespace
 
             prevSpringCoefficient_ = 0;
             prevSpringSaturation_ = saturation;
-            springStrategy_ = -1;
+            springStrategy_ = 1; // Always include DIEP_START on dynamic updates.
 
             spdlog::info(
-                "WheelFFB: GUID_Spring created (saturation={} / {}, negative coefficients pull toward center)",
+                "WheelFFB: GUID_Spring created (saturation={} / {}, R3 normal sign=positive, independent direction toggle)",
                 static_cast<unsigned>(saturation),
                 DI_FFNOMINALMAX);
             return true;
@@ -830,17 +1728,26 @@ namespace
             if (!springEffect_ || !device_ || panicStopped_)
                 return;
 
+            const float safeStrength = std::isfinite(strength)
+                ? std::clamp(strength, 0.0f, 1.0f)
+                : 0.0f;
             const LONG coefficientMagnitude = static_cast<LONG>(
-                std::clamp(strength, 0.0f, 1.0f) *
-                static_cast<float>(DI_FFNOMINALMAX));
+                safeStrength * static_cast<float>(DI_FFNOMINALMAX));
 
-            // DirectInput's condition equation uses A(q-q0). A spring must use
-            // negative coefficients so displacement produces force back toward
-            // the zero offset rather than accelerating away from center.
-            const LONG coefficient = -coefficientMagnitude;
+            // R3 hardware testing established positive condition coefficients
+            // as the normal centering sign for this backend.  Keep this independent
+            // from ConstantForce inversion so fixing corner-force direction can
+            // never accidentally turn the centering spring into a runaway force.
+            const LONG coefficient = Settings::WheelFFBInvertSpring
+                ? -coefficientMagnitude
+                : coefficientMagnitude;
+            const float configuredSaturation =
+                static_cast<float>(Settings::WheelFFBSpringSaturation);
+            const float safeSaturation = std::isfinite(configuredSaturation)
+                ? std::clamp(configuredSaturation, 0.1f, 1.0f)
+                : 0.775f;
             const DWORD saturation = static_cast<DWORD>(
-                std::clamp(static_cast<float>(Settings::WheelFFBSpringSaturation), 0.1f, 1.0f) *
-                static_cast<float>(DI_FFNOMINALMAX));
+                safeSaturation * static_cast<float>(DI_FFNOMINALMAX));
 
             const bool silence =
                 coefficient == 0 && prevSpringCoefficient_ != 0;
@@ -852,18 +1759,18 @@ namespace
             if (!silence && !coefficientChanged && !saturationChanged)
                 return;
 
-            DICONDITION condition{};
-            condition.lOffset = 0;
-            condition.lPositiveCoefficient = coefficient;
-            condition.lNegativeCoefficient = coefficient;
-            condition.dwPositiveSaturation = saturation;
-            condition.dwNegativeSaturation = saturation;
-            condition.lDeadBand = 0;
+            springParams_ = {};
+            springParams_.lOffset = 0;
+            springParams_.lPositiveCoefficient = coefficient;
+            springParams_.lNegativeCoefficient = coefficient;
+            springParams_.dwPositiveSaturation = saturation;
+            springParams_.dwNegativeSaturation = saturation;
+            springParams_.lDeadBand = 0;
 
             DIEFFECT params{};
             params.dwSize = sizeof(params);
-            params.cbTypeSpecificParams = sizeof(condition);
-            params.lpvTypeSpecificParams = &condition;
+            params.cbTypeSpecificParams = sizeof(springParams_);
+            params.lpvTypeSpecificParams = &springParams_;
 
             DWORD flags = DIEP_TYPESPECIFICPARAMS |
                 (springStrategy_ == 1 ? DIEP_START : 0);
@@ -891,9 +1798,9 @@ namespace
 
             if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
             {
-                device_->Acquire();
-                hr = springEffect_->SetParameters(
-                    &params, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+                if (reacquire_after_input_loss("GUID_Spring", hr))
+                    hr = springEffect_->SetParameters(
+                        &params, DIEP_TYPESPECIFICPARAMS | DIEP_START);
             }
 
             if (FAILED(hr))
@@ -910,8 +1817,138 @@ namespace
                 return;
             }
 
+            clear_device_failure();
             prevSpringCoefficient_ = coefficient;
             prevSpringSaturation_ = saturation;
+        }
+
+        bool create_damper_effect()
+        {
+            if (!device_ || !Settings::WheelFFBUseHardwareDamper)
+                return false;
+
+            DWORD axes[1] = { primary_actuator_axis() };
+            LONG directions[1] = { 0 };
+            damperParams_ = {};
+            damperParams_.lOffset = 0;
+            damperParams_.lPositiveCoefficient = 0;
+            damperParams_.lNegativeCoefficient = 0;
+            damperParams_.dwPositiveSaturation = DI_FFNOMINALMAX;
+            damperParams_.dwNegativeSaturation = DI_FFNOMINALMAX;
+            damperParams_.lDeadBand = 0;
+
+            DIEFFECT effect{};
+            effect.dwSize = sizeof(effect);
+            effect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
+            effect.dwDuration = INFINITE;
+            effect.dwSamplePeriod = 0;
+            effect.dwGain = DI_FFNOMINALMAX;
+            effect.dwTriggerButton = DIEB_NOTRIGGER;
+            effect.dwTriggerRepeatInterval = 0;
+            effect.cAxes = 1;
+            effect.rgdwAxes = axes;
+            effect.rglDirection = directions;
+            effect.cbTypeSpecificParams = sizeof(damperParams_);
+            effect.lpvTypeSpecificParams = &damperParams_;
+
+            HRESULT hr = device_->CreateEffect(
+                GUID_Damper, &effect, &damperEffect_, nullptr);
+            if (FAILED(hr) || !damperEffect_)
+            {
+                spdlog::warn(
+                    "WheelFFB: CreateEffect(GUID_Damper) failed (0x{:08X})",
+                    (unsigned)hr);
+                damperRecreateHoldoffUntil_ = GetTickCount() + 1000;
+                return false;
+            }
+
+            hr = damperEffect_->Start(1, 0);
+            if (FAILED(hr))
+                spdlog::warn("WheelFFB: GUID_Damper initial Start failed (0x{:08X})", (unsigned)hr);
+
+            prevDamperCoefficient_ = 0;
+            damperStrategy_ = 1; // Always include DIEP_START after menu reacquire.
+            spdlog::info("WheelFFB: GUID_Damper created (dynamic speed/grip damping)");
+            return true;
+        }
+
+        void update_damper(float strength)
+        {
+            if (!damperEffect_ || !device_ || panicStopped_)
+                return;
+
+            // Positive coefficients are the conventional DirectInput condition
+            // representation for GUID_Damper; the effect type itself applies
+            // force opposite steering velocity.
+            const float safeStrength = std::isfinite(strength)
+                ? std::clamp(strength, 0.0f, 1.0f)
+                : 0.0f;
+            const LONG coefficient = static_cast<LONG>(
+                safeStrength * static_cast<float>(DI_FFNOMINALMAX));
+
+            const bool silence = coefficient == 0 && prevDamperCoefficient_ != 0;
+            const bool changed = std::abs(coefficient - prevDamperCoefficient_) > 40;
+            if (!silence && !changed)
+                return;
+
+            damperParams_ = {};
+            damperParams_.lOffset = 0;
+            damperParams_.lPositiveCoefficient = coefficient;
+            damperParams_.lNegativeCoefficient = coefficient;
+            damperParams_.dwPositiveSaturation = DI_FFNOMINALMAX;
+            damperParams_.dwNegativeSaturation = DI_FFNOMINALMAX;
+            damperParams_.lDeadBand = 0;
+
+            DIEFFECT params{};
+            params.dwSize = sizeof(params);
+            params.cbTypeSpecificParams = sizeof(damperParams_);
+            params.lpvTypeSpecificParams = &damperParams_;
+
+            DWORD flags = DIEP_TYPESPECIFICPARAMS |
+                (damperStrategy_ == 1 ? DIEP_START : 0);
+            HRESULT hr = damperEffect_->SetParameters(&params, flags);
+
+            if (damperStrategy_ == -1)
+            {
+                if (SUCCEEDED(hr))
+                {
+                    damperStrategy_ = 0;
+                    spdlog::info("WheelFFB: GUID_Damper updates work without DIEP_START");
+                }
+                else
+                {
+                    hr = damperEffect_->SetParameters(
+                        &params, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+                    if (SUCCEEDED(hr))
+                    {
+                        damperStrategy_ = 1;
+                        spdlog::info("WheelFFB: GUID_Damper driver requires DIEP_START");
+                    }
+                }
+            }
+
+            if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
+            {
+                if (reacquire_after_input_loss("GUID_Damper", hr))
+                    hr = damperEffect_->SetParameters(
+                        &params, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+            }
+
+            if (FAILED(hr))
+            {
+                spdlog::warn(
+                    "WheelFFB: GUID_Damper update failed (0x{:08X}); using software fallback",
+                    (unsigned)hr);
+                damperEffect_->Stop();
+                safe_release_effect(damperEffect_, "stale damper");
+                prevDamperCoefficient_ = 0;
+                damperStrategy_ = -1;
+                damperRecreateHoldoffUntil_ = GetTickCount() + 1000;
+                return;
+            }
+
+            clear_device_failure();
+            prevDamperCoefficient_ = coefficient;
         }
 
         IDirectInputEffect* create_periodic_effect(const char* label, float initialHz)
@@ -919,9 +1956,12 @@ namespace
             if (!device_)
                 return nullptr;
 
-            DWORD axes[1] = { DIJOFS_X };
+            DWORD axes[1] = { primary_actuator_axis() };
             LONG directions[1] = { 0 };
-            DIPERIODIC periodic{};
+            DIPERIODIC& periodic = (std::strcmp(label, "RoadTexture") == 0)
+                ? roadPeriodicParams_
+                : tireSlipPeriodicParams_;
+            periodic = {};
             periodic.dwMagnitude = 0;
             periodic.lOffset = 0;
             periodic.dwPhase = 0;
@@ -931,9 +1971,7 @@ namespace
             effect.dwSize = sizeof(effect);
             effect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
             effect.dwDuration = INFINITE;
-            effect.dwGain = static_cast<DWORD>(
-                std::clamp(static_cast<float>(Settings::WheelFFBGlobalStrength), 0.0f, 1.0f) *
-                static_cast<float>(DI_FFNOMINALMAX));
+            effect.dwGain = DI_FFNOMINALMAX;
             effect.dwTriggerButton = DIEB_NOTRIGGER;
             effect.cAxes = 1;
             effect.rgdwAxes = axes;
@@ -980,7 +2018,14 @@ namespace
                 roadTextureEffect_ != nullptr && tireSlipEffect_ != nullptr;
 
             if (!periodicsActive_)
-                spdlog::warn("WheelFFB: hardware periodic effects unavailable; using constant-force fallback");
+            {
+                // Treat the two sines atomically. A half-created pair plus the
+                // software fallback would double one signal and distort tuning.
+                disable_periodics();
+                recreateHoldoffUntil_ = GetTickCount() + 500;
+                spdlog::warn(
+                    "WheelFFB: complete hardware periodic pair unavailable; using ConstantForce fallback for both signals");
+            }
         }
 
         void update_periodic(
@@ -992,15 +2037,29 @@ namespace
             if (!effect || panicStopped_)
                 return;
 
-            const DWORD mag = static_cast<DWORD>(
-                std::clamp(magnitude, 0.0f, 1.0f) *
-                static_cast<float>(DI_FFNOMINALMAX));
-            frequency = std::clamp(frequency, 1.0f, 100.0f);
+            // Very small hardware-sine magnitudes can remain audible on DD
+            // bases.  Snap them to zero, and update much more aggressively on
+            // falling magnitude so an off-road effect cannot remain latched
+            // after the car returns to asphalt.
+            const float magnitudeClamped = std::isfinite(magnitude)
+                ? std::clamp(magnitude, 0.0f, 1.0f)
+                : 0.0f;
+            const DWORD mag = magnitudeClamped < 0.01f
+                ? 0u
+                : static_cast<DWORD>(
+                    magnitudeClamped * static_cast<float>(DI_FFNOMINALMAX));
+            frequency = std::isfinite(frequency)
+                ? std::clamp(frequency, 1.0f, 100.0f)
+                : 30.0f;
             const DWORD period = static_cast<DWORD>(1000000.0f / frequency);
 
+            const long magDelta = std::abs(
+                static_cast<long>(mag) - static_cast<long>(state.lastMagnitude));
             const bool silence = mag == 0 && state.lastMagnitude != 0;
             const bool magChanged =
-                std::abs(static_cast<long>(mag) - static_cast<long>(state.lastMagnitude)) > 300;
+                magDelta > 60 ||
+                (state.lastMagnitude > 0 &&
+                 magDelta * 5 > static_cast<long>(state.lastMagnitude));
             const bool periodChanged =
                 state.lastPeriod != 0 &&
                 std::abs(static_cast<long>(period) - static_cast<long>(state.lastPeriod)) * 10 >
@@ -1009,7 +2068,10 @@ namespace
             if (!silence && !magChanged && !periodChanged)
                 return;
 
-            DIPERIODIC periodic{};
+            DIPERIODIC& periodic = (effect == roadTextureEffect_)
+                ? roadPeriodicParams_
+                : tireSlipPeriodicParams_;
+            periodic = {};
             periodic.dwMagnitude = mag;
             periodic.dwPeriod = period;
 
@@ -1042,6 +2104,13 @@ namespace
                 }
             }
 
+            if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
+            {
+                if (reacquire_after_input_loss("GUID_Sine periodic", hr))
+                    hr = effect->SetParameters(
+                        &params, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+            }
+
             if (FAILED(hr))
             {
                 spdlog::warn(
@@ -1052,6 +2121,7 @@ namespace
                 return;
             }
 
+            clear_device_failure();
             state.lastMagnitude = mag;
             state.lastPeriod = period;
         }
@@ -1081,71 +2151,67 @@ namespace
                 -static_cast<LONG>(DI_FFNOMINALMAX),
                 static_cast<LONG>(DI_FFNOMINALMAX));
 
-            DICONSTANTFORCE cf{};
-            cf.lMagnitude = requestedLevel;
+            constantParams_ = {};
+            LONG directions[2] = { 1L, 0L };
+            DWORD flags = DIEP_TYPESPECIFICPARAMS | DIEP_START;
 
             DIEFFECT params{};
             params.dwSize = sizeof(params);
-            params.cbTypeSpecificParams = sizeof(cf);
-            params.lpvTypeSpecificParams = &cf;
+            params.cbTypeSpecificParams = sizeof(constantParams_);
+            params.lpvTypeSpecificParams = &constantParams_;
+
+            if (constantEffectPolar_)
+            {
+                constantParams_.lMagnitude = std::abs(requestedLevel);
+                directions[0] = requestedLevel < 0 ? 27000L : 9000L;
+                params.cAxes = 2;
+                params.rglDirection = directions;
+                flags |= DIEP_DIRECTION;
+            }
+            else
+            {
+                constantParams_.lMagnitude = requestedLevel;
+            }
 
             HRESULT hr = E_FAIL;
             if (constantEffect_)
-            {
-                hr = constantEffect_->SetParameters(
-                    &params, DIEP_TYPESPECIFICPARAMS | DIEP_START);
-            }
+                hr = constantEffect_->SetParameters(&params, flags);
 
             if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
             {
-                device_->Acquire();
-                if (constantEffect_)
-                {
-                    hr = constantEffect_->SetParameters(
-                        &params, DIEP_TYPESPECIFICPARAMS | DIEP_START);
-                }
+                if (reacquire_after_input_loss("ConstantForce", hr) && constantEffect_)
+                    hr = constantEffect_->SetParameters(&params, flags);
             }
 
             if (hr == E_HANDLE || hr == DIERR_NOTDOWNLOADED || !constantEffect_)
             {
                 safe_release_effect(constantEffect_, "stale constant");
-
                 const DWORD now = GetTickCount();
-                if (now < recreateHoldoffUntil_)
+                if (tick_before(now, recreateHoldoffUntil_))
                     return;
 
                 if (!create_constant_effect())
                 {
                     recreateHoldoffUntil_ = now + 500;
+                    request_device_reinitialize("ConstantForce recreation rejected interface", hr);
                     return;
                 }
-
-                DICONSTANTFORCE zero{};
-                DIEFFECT zeroParams{};
-                zeroParams.dwSize = sizeof(zeroParams);
-                zeroParams.cbTypeSpecificParams = sizeof(zero);
-                zeroParams.lpvTypeSpecificParams = &zero;
-
-                constantEffect_->SetParameters(
-                    &zeroParams, DIEP_TYPESPECIFICPARAMS | DIEP_START);
 
                 recreateRampFrames_ = RecreateRampFrames;
                 prevConstantLevel_ = 0;
                 prevStructuralLevel_ = 0;
-
-                spdlog::info(
-                    "WheelFFB: recreated ConstantForce after handle loss; ramping in");
+                spdlog::info("WheelFFB: recreated ConstantForce after handle loss; ramping in");
                 return;
             }
 
             if (FAILED(hr))
             {
-                spdlog::warn(
-                    "WheelFFB: constant force update failed (0x{:08X})",
-                    (unsigned)hr);
+                note_device_failure("ConstantForce", hr);
+                spdlog::warn("WheelFFB: constant force update failed (0x{:08X})", (unsigned)hr);
                 return;
             }
 
+            clear_device_failure();
             prevConstantLevel_ = requestedLevel;
         }
 
@@ -1167,8 +2233,10 @@ namespace
                     const float direction =
                         lateralBeforeImpact >= 0.0f ? -1.0f : 1.0f;
 
+                    const float severity =
+                        std::clamp((speedDrop - 0.03f) / 0.12f, 0.0f, 1.0f);
                     crashImpulseForce_ =
-                        direction * 1.5f *
+                        direction * (1.7f + 0.8f * severity) *
                         static_cast<float>(Settings::WheelFFBWallImpact);
 
                     crashImpulseTimer_ = CrashTimerFrames;
@@ -1197,7 +2265,7 @@ namespace
                     lateralBeforeImpact >= 0.0f ? -1.0f : 1.0f;
 
                 crashImpulseForce_ =
-                    direction * 1.2f *
+                    direction * 1.9f *
                     static_cast<float>(Settings::WheelFFBWallImpact);
                 crashImpulseTimer_ = CrashTimerFrames;
                 smoothedLateral_ = 0.0f;
@@ -1218,14 +2286,15 @@ namespace
             {
                 if (crashImpulseTimer_ > CrashCooldownFrames)
                 {
-                    float envelope = 1.0f;
-                    if (crashImpulseTimer_ <= 85)
-                    {
-                        envelope =
-                            static_cast<float>(crashImpulseTimer_ - CrashCooldownFrames) /
-                            5.0f;
-                    }
-                    result += crashImpulseForce_ * envelope;
+                    // A short kick/rebound is much easier to feel on a DD wheel
+                    // than the old soft one-direction 10-frame push.
+                    const int impactFrame = CrashTimerFrames - crashImpulseTimer_;
+                    if (impactFrame < 3)
+                        result += crashImpulseForce_;
+                    else if (impactFrame < 6)
+                        result -= crashImpulseForce_ * 0.55f;
+                    else
+                        result += crashImpulseForce_ * 0.20f;
                 }
                 --crashImpulseTimer_;
             }
@@ -1245,7 +2314,8 @@ namespace
 
         float synth_fallback(float& phase, float amplitude, float frequency)
         {
-            if (amplitude <= 0.005f)
+            if (!std::isfinite(amplitude) || !std::isfinite(frequency) ||
+                amplitude <= 0.005f)
             {
                 phase = 0.0f;
                 return 0.0f;
@@ -1267,6 +2337,9 @@ namespace
             if (springEffect_ && prevSpringCoefficient_ != 0)
                 update_spring(0.0f);
 
+            if (damperEffect_ && prevDamperCoefficient_ != 0)
+                update_damper(0.0f);
+
             prevStructuralLevel_ = 0;
 
             if (roadTextureEffect_)
@@ -1279,8 +2352,10 @@ namespace
         {
             smoothedLateral_ = 0.0f;
             prevSteer_ = 0.0f;
+            physicsSat_.reset();
             prevStructuralLevel_ = 0;
             prevSpringCoefficient_ = 0;
+            prevDamperCoefficient_ = 0;
             crashImpulseTimer_ = 0;
             crashImpulseForce_ = 0.0f;
             gearShiftTimer_ = 0;
@@ -1289,6 +2364,19 @@ namespace
             slipPhase_ = 0.0f;
             splashTimer_ = 0;
             splashAmp_ = 0.0f;
+            manualTestFrames_ = 0;
+            manualTestDirection_ = 1;
+
+            // Menu/race transitions must not reuse samples from the previous
+            // gameplay segment. Old speed/lateral history can otherwise look
+            // like a huge first-frame deceleration and synthesize a false crash
+            // or weight-transfer kick when returning from F11/the main menu.
+            std::fill_n(speedHistory_, SpeedHistoryCount, 0.0f);
+            speedHistoryIndex_ = 0;
+            std::fill_n(lateralHistory_, LateralHistoryCount, 0.0f);
+            lateralHistoryIndex_ = 0;
+            prevGear_ = 0;
+            prevCollisionFlags_ = 0;
         }
 
         void install_exit_guards()
@@ -1296,31 +2384,48 @@ namespace
             if (!gameHwnd_)
                 return;
 
-            if (SetWindowSubclass(
-                    gameHwnd_,
-                    window_subclass_proc,
-                    FFB_SUBCLASS_ID,
-                    reinterpret_cast<DWORD_PTR>(this)))
+            // USB/device-loss recovery may call initialize() more than once.
+            // Window subclassing and inline-hooking ExitProcess must be
+            // idempotent or a second initialization can create a bad hook chain.
+            if (subclassHwnd_ != gameHwnd_)
             {
-                SetTimer(
-                    gameHwnd_,
-                    FFB_WATCHDOG_TIMER_ID,
-                    FFB_WATCHDOG_INTERVAL_MS,
-                    nullptr);
-                spdlog::info("WheelFFB: window exit/watchdog guard installed");
-            }
-            else
-            {
-                spdlog::warn("WheelFFB: SetWindowSubclass failed");
+                if (subclassHwnd_ && IsWindow(subclassHwnd_))
+                {
+                    KillTimer(subclassHwnd_, FFB_WATCHDOG_TIMER_ID);
+                    RemoveWindowSubclass(
+                        subclassHwnd_, window_subclass_proc, FFB_SUBCLASS_ID);
+                }
+
+                if (SetWindowSubclass(
+                        gameHwnd_,
+                        window_subclass_proc,
+                        FFB_SUBCLASS_ID,
+                        reinterpret_cast<DWORD_PTR>(this)))
+                {
+                    subclassHwnd_ = gameHwnd_;
+                    SetTimer(
+                        gameHwnd_,
+                        FFB_WATCHDOG_TIMER_ID,
+                        FFB_WATCHDOG_INTERVAL_MS,
+                        nullptr);
+                    spdlog::info("WheelFFB: window exit/watchdog guard installed");
+                }
+                else
+                {
+                    spdlog::warn("WheelFFB: SetWindowSubclass failed");
+                }
             }
 
-            if (auto* exitProc =
-                    GetProcAddress(GetModuleHandleA("kernel32.dll"), "ExitProcess"))
+            if (!exitProcessHook_)
             {
-                exitProcessHook_ =
-                    safetyhook::create_inline(exitProc, exit_process_hook);
-                if (exitProcessHook_)
-                    spdlog::info("WheelFFB: ExitProcess safety hook installed");
+                if (auto* exitProc =
+                        GetProcAddress(GetModuleHandleA("kernel32.dll"), "ExitProcess"))
+                {
+                    exitProcessHook_ =
+                        safetyhook::create_inline(exitProc, exit_process_hook);
+                    if (exitProcessHook_)
+                        spdlog::info("WheelFFB: ExitProcess safety hook installed");
+                }
             }
 
             activeEngine_ = this;
@@ -1346,8 +2451,23 @@ namespace
                     break;
 
                 case WM_ACTIVATEAPP:
-                    if (wParam == FALSE)
+                    self->appActive_ = (wParam != FALSE);
+                    if (!self->appActive_)
+                    {
                         self->zero_all_forces();
+                        self->reset_signal_state();
+                        if (self->device_ && self->deviceAcquired_)
+                        {
+                            self->device_->Unacquire();
+                            self->deviceAcquired_ = false;
+                        }
+                    }
+                    else
+                    {
+                        // Re-enter with the normal DD warm-up ramp instead of
+                        // restoring the previous torque in one frame.
+                        self->warmupFrames_ = 0;
+                    }
                     break;
 
                 case WM_CLOSE:
@@ -1392,14 +2512,65 @@ namespace
             effect = nullptr;
         }
 
-        void release_device()
+        void restore_driver_autocenter(const char* where)
         {
-            if (!device_)
+            if (!device_ || !driverAutocenterDisabled_)
                 return;
+
+            deviceAcquired_ = false;
             __try
             {
                 device_->Unacquire();
-                device_->Release();
+
+                DIPROPDWORD autocenter{};
+                autocenter.diph.dwSize = sizeof(autocenter);
+                autocenter.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+                autocenter.diph.dwObj = 0;
+                autocenter.diph.dwHow = DIPH_DEVICE;
+                autocenter.dwData = DIPROPAUTOCENTER_ON;
+                const HRESULT restoreHr =
+                    device_->SetProperty(DIPROP_AUTOCENTER, &autocenter.diph);
+                if (FAILED(restoreHr))
+                {
+                    spdlog::warn(
+                        "WheelFFB: autocenter restore during {} failed (0x{:08X})",
+                        where, (unsigned)restoreHr);
+                }
+                else
+                {
+                    driverAutocenterDisabled_ = false;
+                }
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+                spdlog::warn(
+                    "WheelFFB: exception restoring autocenter during {} (0x{:X})",
+                    where, GetExceptionCode());
+            }
+        }
+
+        void release_device()
+        {
+            if (!device_)
+            {
+                deviceAcquired_ = false;
+                driverAutocenterDisabled_ = false;
+                return;
+            }
+
+            // Clear logical acquisition state before touching a possibly stale
+            // COM object. Even a driver exception must not leave a phantom
+            // acquired device behind in the engine state.
+            deviceAcquired_ = false;
+            restore_driver_autocenter("device release");
+
+            IDirectInputDevice8A* staleDevice = device_;
+            device_ = nullptr;
+            driverAutocenterDisabled_ = false;
+            __try
+            {
+                staleDevice->Unacquire();
+                staleDevice->Release();
             }
             __except (EXCEPTION_EXECUTE_HANDLER)
             {
@@ -1407,15 +2578,25 @@ namespace
                     "WheelFFB: exception releasing DirectInput device (0x{:X})",
                     GetExceptionCode());
             }
-            device_ = nullptr;
         }
 
         void release_directinput()
         {
             if (!directInput_)
                 return;
-            directInput_->Release();
+
+            IDirectInput8A* staleDirectInput = directInput_;
             directInput_ = nullptr;
+            __try
+            {
+                staleDirectInput->Release();
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+                spdlog::warn(
+                    "WheelFFB: exception releasing DirectInput root object (0x{:X})",
+                    GetExceptionCode());
+            }
         }
 
         void maybe_log(
@@ -1424,6 +2605,7 @@ namespace
             float steerRate,
             float driftAmt,
             float roughness,
+            float satTorque,
             LONG level)
         {
             if (!Settings::WheelFFBDebugLog)
@@ -1435,16 +2617,38 @@ namespace
 
             lastLogTick_ = now;
             spdlog::info(
-                "WheelFFB DIAG: spd={:.2f} steer={:.3f} rate={:.4f} lat={:.2f} drift={:.2f} rough={:.2f} out={} spring={} coeff={} periodic={}",
+                "WheelFFB DIAG: spd={:.2f} steer={:.3f} rate={:.4f} lat={:.2f} drift={:.2f} rough={:.2f} sat={:.3f} phys={} basis=M70r{} cal={:.2f} mix={:.2f} beta={:.3f} yaw={:.3f} fslip={:.3f} vLat={:.5f} vLong={:.5f} step={:.5f} spdLen={:.5f} spdCorr={:.2f} steerSrc={} out={} invCF={} spring={} invSpring={} coeff={} damper={} dcoeff={} periodic={}",
                 speedNorm,
                 steer,
                 steerRate,
                 smoothedLateral_,
                 driftAmt,
                 roughness,
+                satTorque,
+                Settings::WheelFFBPhysicsSat
+                    ? (physicsSat_.calibrated()
+                        ? (physicsSat_.sampleValid() ? "ACTIVE" : "HOLD")
+                        : "CAL")
+                    : "OFF",
+                physicsSat_.forwardAxis(),
+                physicsSat_.calibrationConfidence(),
+                physicsSat_.activationBlend(),
+                physicsSat_.bodySlip(),
+                physicsSat_.yawRate(),
+                physicsSat_.frontSlip(),
+                physicsSat_.vLat(),
+                physicsSat_.vLong(),
+                physicsSat_.positionStep(),
+                physicsSat_.spdLen(),
+                physicsSat_.spdCorrelation(),
+                Settings::UseNewInput ? "SDL" : "legacy",
                 static_cast<int>(level),
+                bool(Settings::WheelFFBInvertForce),
                 springEffect_ ? "HW" : "SW",
+                bool(Settings::WheelFFBInvertSpring),
                 static_cast<int>(prevSpringCoefficient_),
+                damperEffect_ ? "HW" : "SW",
+                static_cast<int>(prevDamperCoefficient_),
                 periodicsActive_);
         }
 
@@ -1452,30 +2656,60 @@ namespace
         IDirectInputDevice8A* device_ = nullptr;
         IDirectInputEffect* constantEffect_ = nullptr;
         IDirectInputEffect* springEffect_ = nullptr;
+        IDirectInputEffect* damperEffect_ = nullptr;
         IDirectInputEffect* roadTextureEffect_ = nullptr;
         IDirectInputEffect* tireSlipEffect_ = nullptr;
 
+        // DirectInput does not promise to copy lpvTypeSpecificParams. Keep the
+        // backing structures alive for as long as their effects exist.
+        DICONSTANTFORCE constantParams_{};
+        DICONDITION springParams_{};
+        DICONDITION damperParams_{};
+        DIPERIODIC roadPeriodicParams_{};
+        DIPERIODIC tireSlipPeriodicParams_{};
+
+        std::vector<DWORD> actuatorAxes_;
+        bool constantEffectPolar_ = false;
+
         GUID selectedGuid_{};
         std::string selectedName_;
+        std::string selectedConfiguredGuid_;
+        std::string selectedConfiguredName_;
         HWND gameHwnd_ = nullptr;
+        HWND subclassHwnd_ = nullptr;
 
         bool initialized_ = false;
         bool panicStopped_ = false;
+        bool deviceAcquired_ = false;
+        bool driverAutocenterDisabled_ = false;
+        bool enabledLastTick_ = true;
+        bool appActive_ = true;
         bool periodicsActive_ = false;
-        int periodicStrategy_ = -1;
+        int periodicStrategy_ = 1; // Explicitly restart sine effects on every update.
         int springStrategy_ = -1;
+        int damperStrategy_ = -1;
 
         DWORD retryAfter_ = 0;
+        std::string failedInterfaceGuid_;
+        DWORD failedInterfaceUntil_ = 0;
         DWORD recreateHoldoffUntil_ = 0;
         DWORD springRecreateHoldoffUntil_ = 0;
+        DWORD damperRecreateHoldoffUntil_ = 0;
         DWORD lastUpdateTick_ = 0;
         DWORD lastLogTick_ = 0;
+        DWORD lastGainErrorLog_ = 0;
+        DWORD lastEffectGain_ = 0xFFFFFFFFu;
+        DWORD nextGainRetryTick_ = 0;
+        DWORD deviceFailureSince_ = 0;
+        DWORD deviceReinitAfter_ = 0;
+        bool deviceReinitPending_ = false;
 
         PeriodicState roadState_{};
         PeriodicState slipState_{};
 
         float smoothedLateral_ = 0.0f;
         float prevSteer_ = 0.0f;
+        WheelPhysicsSatV1 physicsSat_{};
         float crashImpulseForce_ = 0.0f;
         float roadPhase_ = 0.0f;
         float slipPhase_ = 0.0f;
@@ -1492,12 +2726,15 @@ namespace
         LONG prevConstantLevel_ = 0;
         LONG prevStructuralLevel_ = 0;
         LONG prevSpringCoefficient_ = 0;
+        LONG prevDamperCoefficient_ = 0;
         DWORD prevSpringSaturation_ = 0;
 
         int crashImpulseTimer_ = 0;
         int gearShiftTimer_ = 0;
         int warmupFrames_ = 0;
         int recreateRampFrames_ = 0;
+        int manualTestFrames_ = 0;
+        int manualTestDirection_ = 1;
         int splashTimer_ = 0;
         unsigned updateCounter_ = 0;
 
@@ -1510,13 +2747,8 @@ namespace
 
     class WheelFFBHook : public Hook
     {
-        inline static SafetyHookInline CalcVibrationHook_ = {};
-
-        static void __cdecl calc_vibration_hook(EVWORK_CAR* car)
-        {
-            CalcVibrationHook_.ccall<void>(car);
-            gWheelFFB.update(car);
-        }
+        // FFB update ownership lives in the existing GamePlCar_Ctrl wrapper.
+        // Do not install another inline hook on the physics/vibration path.
 
     public:
         std::string_view description() override
@@ -1524,28 +2756,29 @@ namespace
             return "WheelFFB (DirectInput COM)";
         }
 
+        void declare_settings() override
+        {
+            // Wheel FFB has one dedicated F11 page. Keep every [WheelFFB]
+            // setting out of the generic Settings window so there is no second
+            // UI that looks like a competing backend.
+            for (auto* setting : Settings::SettingBase::registry())
+            {
+                if (setting && setting->section() == "WheelFFB")
+                    setting->hidden(true);
+            }
+        }
+
         bool validate() override
         {
-            return Settings::WheelFFBEnable;
+            // The engine itself gates on WheelFFBEnable; the existing Vibration
+            // GamePlCar_Ctrl wrapper invokes us after each 60 Hz physics tick.
+            return true;
         }
 
         bool apply() override
         {
-            // Hook Tweaks' Xbox vibration calculation instead of installing a
-            // second GamePlCar_Ctrl hook. This gives one deterministic 60 Hz
-            // update after the game's car physics has been calculated.
-            CalcVibrationHook_ = safetyhook::create_inline(
-                reinterpret_cast<void*>(&CalcVibrationValues),
-                calc_vibration_hook);
-
-            if (!CalcVibrationHook_)
-            {
-                spdlog::error("WheelFFB: failed to hook CalcVibrationValues");
-                return false;
-            }
-
             spdlog::info(
-                "WheelFFB: DirectInput COM hook installed; device init deferred to first gameplay tick");
+                "WheelFFB: DirectInput COM engine registered; update runs after GamePlCar_Ctrl physics");
             return true;
         }
 
@@ -1553,4 +2786,14 @@ namespace
     };
 
     WheelFFBHook WheelFFBHook::instance;
+}
+
+void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
+{
+    gWheelFFB.update(car);
+}
+
+void WheelFFB_RequestDirectionTest(int direction)
+{
+    gWheelFFB.request_direction_test(direction);
 }

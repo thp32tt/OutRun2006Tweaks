@@ -1,5 +1,12 @@
 #include "input_manager.hpp"
-#include "wheel_force_feedback.hpp"
+#ifndef DIRECTINPUT_VERSION
+#define DIRECTINPUT_VERSION 0x0800
+#endif
+#include <Windows.h>
+#include <dinput.h>
+
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib, "dxguid.lib")
 
 namespace Settings
 {
@@ -7,6 +14,9 @@ namespace Settings
 		"Backend to use for the SDL3 input system. Automatic uses DirectInput when a force-feedback wheel is attached "
 		"and Windows.Gaming.Input otherwise. If a controller fails to respond, choose another backend and relaunch.",
 		{ "Automatic", "RawInput", "DirectInput", "XInput" } };
+
+	Setting<bool> WheelInputCompatibility{ "Controls", "WheelInputCompatibility", false,
+		"Use the original-game DirectInput wheel path as a compatibility fallback. Disable UseNewInput when enabling this." };
 
 	Setting<bool> UseNewInput{ "Controls", "UseNewInput", true,
 		"Enables new SDL-based input system, allowing game to see full trigger range without any shared trigger axes issues "
@@ -16,13 +26,39 @@ namespace Settings
 		"sensitive controls. Only used when UseNewInput is enabled." };
 }
 
+namespace
+{
+    BOOL CALLBACK detect_ffb_device(LPCDIDEVICEINSTANCEA, LPVOID context)
+    {
+        *static_cast<bool*>(context) = true;
+        return DIENUM_STOP;
+    }
+
+    bool has_attached_ffb_wheel()
+    {
+        IDirectInput8A* di = nullptr;
+        const HRESULT createHr = DirectInput8Create(
+            GetModuleHandleW(nullptr), DIRECTINPUT_VERSION, IID_IDirectInput8A,
+            reinterpret_cast<void**>(&di), nullptr);
+        if (FAILED(createHr) || !di)
+            return false;
+
+        bool found = false;
+        const HRESULT enumHr = di->EnumDevices(
+            DI8DEVCLASS_GAMECTRL, detect_ffb_device, &found,
+            DIEDFL_ATTACHEDONLY | DIEDFL_FORCEFEEDBACK);
+        di->Release();
+        return SUCCEEDED(enumHr) && found;
+    }
+}
+
 InputManager& InputManager::instance = *new InputManager;
 
 // TODO: Move most of input_manager.hpp to this .cpp, not sure why so much was left in there..
 void InputManager::init(HWND hwnd)
 {
 	int activeBackend = Settings::InputBackend;
-	if (activeBackend == 0 && WheelForceFeedback::has_attached_device())
+	if (activeBackend == 0 && has_attached_ffb_wheel())
 	{
 		activeBackend = 2;
 		spdlog::info(__FUNCTION__ ": Automatic backend selected DirectInput for an attached force-feedback wheel");
@@ -79,12 +115,10 @@ void InputManager::init(HWND hwnd)
 		setupDefaultBindings();
 
 	ensureOverlayBindable();
-	WheelForceFeedback::init(hwnd);
 }
 
 void InputManager_Update()
 {
-	WheelForceFeedback::update();
 	if (Settings::UseNewInput)
 		InputManager::instance.update();
 }

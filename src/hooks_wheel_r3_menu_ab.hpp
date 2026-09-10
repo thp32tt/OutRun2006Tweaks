@@ -27,6 +27,8 @@
 // so the force-feedback backend can take exclusive FFB ownership.
 namespace Settings
 {
+    extern Setting<bool> WheelUniversalSetupEnable;
+
     Setting<bool> WheelMenuR3DirectAB{
         "Controls", "WheelMenuR3DirectAB", true,
         "In legacy wheel mode, keeps the MOZA R3/ES physical A/B buttons available as menu Accept/Back regardless of saved bindings."
@@ -84,6 +86,7 @@ namespace
             GUID guid{};
             std::string name;
             bool found = false;
+            bool ignoreName = false;
         };
 
         static std::string lowerCopy(const char* text)
@@ -98,6 +101,7 @@ namespace
         {
             return Settings::WheelInputCompatibility &&
                 !Settings::UseNewInput &&
+                !Settings::WheelUniversalSetupEnable &&
                 Settings::WheelMenuR3DirectAB &&
                 Game::current_mode &&
                 *Game::current_mode != STATE_GAME;
@@ -111,7 +115,7 @@ namespace
             const std::string instanceName = lowerCopy(instance->tszInstanceName);
             const std::string productName = lowerCopy(instance->tszProductName);
 
-            if (!wanted.empty() &&
+            if (!ctx->ignoreName && !wanted.empty() &&
                 instanceName.find(wanted) == std::string::npos &&
                 productName.find(wanted) == std::string::npos)
             {
@@ -146,7 +150,7 @@ namespace
                 return true;
 
             const DWORD now = GetTickCount();
-            if (now < retryAfter)
+            if (retryAfter != 0 && static_cast<LONG>(now - retryAfter) < 0)
                 return false;
 
             releaseDevice();
@@ -168,7 +172,19 @@ namespace
                 DI8DEVCLASS_GAMECTRL,
                 enumDevicesCallback,
                 &ctx,
-                DIEDFL_ATTACHEDONLY);
+                DIEDFL_ATTACHEDONLY | DIEDFL_FORCEFEEDBACK);
+            if (SUCCEEDED(hr) && !ctx.found &&
+                lowerCopy(Settings::WheelMenuR3DeviceName.get().c_str()) == "moza")
+            {
+                ctx.ignoreName = true;
+                spdlog::warn(
+                    "WheelMenuR3DirectAB: no literal MOZA name; trying first attached FFB wheel");
+                hr = directInput->EnumDevices(
+                    DI8DEVCLASS_GAMECTRL,
+                    enumDevicesCallback,
+                    &ctx,
+                    DIEDFL_ATTACHEDONLY | DIEDFL_FORCEFEEDBACK);
+            }
             if (FAILED(hr) || !ctx.found)
             {
                 retryAfter = now + 2000;
@@ -273,6 +289,8 @@ namespace
                         static_cast<unsigned>(hr));
                 }
                 haveDirectState = false;
+                releaseDevice();
+                retryAfter = now + 500;
                 return false;
             }
 
