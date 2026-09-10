@@ -25,8 +25,8 @@ rep(
 
 rep(
 '''            ImGui::SeparatorText("Simulation FFB");\n            ImGui::TextWrapped(\n''',
-'''            ImGui::SeparatorText("Simulation FFB");\n            ImGui::Checkbox("Enable Force Feedback", Settings::WheelFFBEnable.ptr());\n            ImGui::TextWrapped(\n''',
-'put FFB enable on single page')
+'''            ImGui::SeparatorText("Simulation FFB");\n            ImGui::Checkbox("Enable Force Feedback", Settings::WheelFFBEnable.ptr());\n            ImGui::TextDisabled("gameplay FFB follows the exact selected DirectInput GUID.");\n            ImGui::TextWrapped(\n''',
+'put FFB enable and exact GUID guidance on single page')
 
 rep(
 '''            ImGui::Checkbox("Hardware GUID_Damper", Settings::WheelFFBUseHardwareDamper.ptr());\n            ImGui::Checkbox("Reverse ConstantForce", Settings::WheelFFBInvertForce.ptr());\n''',
