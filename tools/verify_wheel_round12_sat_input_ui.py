@@ -24,7 +24,8 @@ def forbid(path: str, needle: str, label: str) -> None:
 require('src/hooks_wheel_ffb.cpp', 'extern float InputManager_SteeringValue();', 'direct SDL steering export declared')
 require('src/hooks_wheel_ffb.cpp', 'if (Settings::UseNewInput)\n            {\n                const float steering = InputManager_SteeringValue();', 'new input SAT uses direct steering')
 require('src/hooks_wheel_ffb.cpp', 'auto getVolume = Module::fn_ptr<GetVolumeFn>(0x53720);', 'legacy steering fallback retained')
-require('src/hooks_wheel_ffb.cpp', 'sat={:.3f} steerSrc={}', 'diagnostic logs SAT and source')
+require('src/hooks_wheel_ffb.cpp', 'sat={:.3f}', 'diagnostic logs SAT')
+require('src/hooks_wheel_ffb.cpp', 'steerSrc={}', 'diagnostic logs steering source')
 require('src/hooks_wheel_ffb.cpp', 'Settings::UseNewInput ? "SDL" : "legacy"', 'diagnostic source selector')
 
 forbid('src/overlay/input_bindings_ui.cpp', 'ImGui::BeginTabItem("Force Feedback")', 'duplicate Controls FFB tab removed')
