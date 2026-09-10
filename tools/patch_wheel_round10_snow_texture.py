@@ -93,3 +93,8 @@ runpy.run_path('tools/patch_wheel_round15_strong_r3_sat.py', run_name='__main__'
 # hide the duplicate generic WheelFFB settings and suppress SDL rumble while the
 # DirectInput COM wheel engine owns FFB output.
 runpy.run_path('tools/patch_wheel_round16_natural_single_owner.py', run_name='__main__')
+
+# Round-17: experimental vehicle-dynamics SAT. Keep Round-16 Natural SAT as an
+# A/B fallback, but derive the active SAT direction from body slip + yaw/front
+# slip so counter-steer can stay continuous through wheel centre.
+runpy.run_path('tools/patch_wheel_round17_physics_sat.py', run_name='__main__')
