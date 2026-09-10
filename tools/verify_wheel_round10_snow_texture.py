@@ -17,9 +17,6 @@ require('stageRoadTextureScale;', 'road sine uses stage attenuation')
 require('outputStrength * stageRoadTextureScale;', 'splash periodic uses stage attenuation')
 require('magnitudeClamped < 0.01f', 'existing tiny-periodic snap-to-zero remains active')
 
-# With the retained RoadTexture/GlobalStrength values, even maximum
-# textureRoughness on a snow/ice stage remains below the 1% hardware-periodic
-# threshold: 1 * 1 * .30 * .70 * .04.
 max_default_snow_road = 1.0 * 1.0 * 0.30 * 0.70 * 0.04
 if not max_default_snow_road < 0.01:
     raise SystemExit(f'ROUND10 VERIFY FAILED [default snow road silence]: {max_default_snow_road}')
@@ -50,7 +47,7 @@ if stack:
 print('ROUND10 VERIFY OK [delimiter balance]')
 print('Round-10 snow/ice vibration suppression verification passed')
 
-# Round-11 through Round-16 are chained by the Round-10 patch runner, so verify
+# Round-11 through Round-17 are chained by the Round-10 patch runner, so verify
 # the final effective source in the same order.
 runpy.run_path('tools/verify_wheel_round11_strong_sat.py', run_name='__main__')
 runpy.run_path('tools/verify_wheel_round12_sat_input_ui.py', run_name='__main__')
@@ -58,3 +55,4 @@ runpy.run_path('tools/verify_wheel_round13_ffb_ui_complete.py', run_name='__main
 runpy.run_path('tools/verify_wheel_round14_input_ui_roles.py', run_name='__main__')
 runpy.run_path('tools/verify_wheel_round15_strong_r3_sat.py', run_name='__main__')
 runpy.run_path('tools/verify_wheel_round16_natural_single_owner.py', run_name='__main__')
+runpy.run_path('tools/verify_wheel_round17_physics_sat.py', run_name='__main__')
