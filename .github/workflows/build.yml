@@ -102,6 +102,18 @@ jobs:
         shell: pwsh
         run: python tools/patch_wheel_round3_10pass.py
 
+      - name: Pin FFB to exact DirectInput GUID
+        shell: pwsh
+        run: python tools/patch_wheel_ffb_device_guid.py
+
+      - name: Pin F11 wheel setup to exact DirectInput GUID
+        shell: pwsh
+        run: python tools/patch_wheel_setup_device_guid.py
+
+      - name: Adapt multi-device input to advanced FFB
+        shell: pwsh
+        run: python tools/patch_multi_device_hybrid.py
+
       - name: Verify effective wheel build
         shell: pwsh
         run: python tools/verify_wheel_effective_build.py
@@ -113,6 +125,10 @@ jobs:
       - name: Verify round3 ten-pass hardening
         shell: pwsh
         run: python tools/verify_wheel_round3_10pass.py
+
+      - name: Verify multi-device hybrid ten-pass invariants
+        shell: pwsh
+        run: python tools/verify_multi_device_hybrid.py
 
       - name: Configure
         run: |
@@ -160,12 +176,14 @@ jobs:
           $markers = @(
             "WheelFFB: GUID_Damper created",
             "WheelFFB: live GlobalStrength applied to active effects",
-            "WheelFFB: no literal MOZA DirectInput name",
             "WheelFFB: scheduling DirectInput device reinitialization",
             "WheelFFB: hardware spring disabled live; using software centering",
+            "WheelFFB: selected DirectInput identity",
             "Reverse ConstantForce",
             "Reverse Spring",
-            "WheelUniversalSetup: F11 universal DirectInput profile support installed"
+            "WheelUniversalSetup: F11 universal DirectInput profile support installed",
+            "multi-device SDL raw input enabled",
+            "Multi-device input architecture adapted from hyp36rmax (MIT)"
           )
           foreach ($marker in $markers) {
             if (-not $ascii.Contains($marker)) { throw "missing compiled marker: $marker" }
@@ -173,7 +191,7 @@ jobs:
           $ini = Get-Content "build/bin/OutRun2006Tweaks.ini" -Raw
           if ($ini -notmatch '(?m)^SteeringDeadZone\s*=\s*0\.0\s*$') { throw "shipped deadzone is not 0.0" }
           if ($ini -notmatch '(?m)^WheelAccelerationInvert\s*=\s*false\s*$') { throw "shipped accelerator invert is not false" }
-          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, required wheel markers present" -f $bytes.Length)
+          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, advanced FFB + multi-device markers present" -f $bytes.Length)
           Get-FileHash $dllPath -Algorithm SHA256
 
       - name: Download EXE
@@ -196,5 +214,9 @@ jobs:
             src/hooks_wheel_r3_menu_dpad.hpp
             src/hooks_wheel_r3_menu_ab.hpp
             src/hooks_wheel_r3_device_autoselect.hpp
+            src/input_manager.hpp
+            src/input_manager.cpp
+            src/overlay/input_bindings_ui.cpp
             src/overlay/wheel_setup_ui.cpp
+            src/dllmain.cpp
             OutRun2006Tweaks.ini
