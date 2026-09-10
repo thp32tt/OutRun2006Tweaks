@@ -64,3 +64,4 @@ print('Final wheel cleanup verification passed')
 # source produced by the build pipeline.
 runpy.run_path('tools/verify_wheel_round4_fivepass.py', run_name='__main__')
 runpy.run_path('tools/verify_wheel_round5_fivepass.py', run_name='__main__')
+runpy.run_path('tools/verify_wheel_round6_fivepass.py', run_name='__main__')

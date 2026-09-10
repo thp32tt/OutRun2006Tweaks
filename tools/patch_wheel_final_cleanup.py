@@ -131,3 +131,7 @@ runpy.run_path('tools/patch_wheel_round5_fivepass.py', run_name='__main__')
 # Final compiler-specific guard discovered by the real Win32 MSVC build: avoid
 # Windows min/max macro expansion in the multi-device hotplug path.
 runpy.run_path('tools/patch_wheel_round5_compile_fix.py', run_name='__main__')
+
+# Round-6: five-pass review of lifecycle/focus races, exact device identity,
+# FFB backend parity, numeric fail-safe behavior, and F11 runtime ownership.
+runpy.run_path('tools/patch_wheel_round6_fivepass.py', run_name='__main__')
