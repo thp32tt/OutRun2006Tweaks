@@ -60,6 +60,7 @@ require(
 
 print('Final wheel cleanup verification passed')
 
-# Verify the additional five source-level hardening passes on the final effective
+# Verify the additional source-level hardening passes on the final effective
 # source produced by the build pipeline.
 runpy.run_path('tools/verify_wheel_round4_fivepass.py', run_name='__main__')
+runpy.run_path('tools/verify_wheel_round5_fivepass.py', run_name='__main__')
