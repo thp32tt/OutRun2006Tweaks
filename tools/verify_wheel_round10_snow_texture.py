@@ -1,4 +1,5 @@
 from pathlib import Path
+import runpy
 
 path = Path('src/hooks_wheel_ffb.cpp')
 text = path.read_text(encoding='utf-8')
@@ -16,14 +17,14 @@ require('stageRoadTextureScale;', 'road sine uses stage attenuation')
 require('outputStrength * stageRoadTextureScale;', 'splash periodic uses stage attenuation')
 require('magnitudeClamped < 0.01f', 'existing tiny-periodic snap-to-zero remains active')
 
-# With shipped v0.1 defaults, even maximum textureRoughness on a snow/ice stage
-# remains below the 1% hardware-periodic threshold: 1 * 1 * .30 * .70 * .04.
+# With the retained RoadTexture/GlobalStrength values, even maximum
+# textureRoughness on a snow/ice stage remains below the 1% hardware-periodic
+# threshold: 1 * 1 * .30 * .70 * .04.
 max_default_snow_road = 1.0 * 1.0 * 0.30 * 0.70 * 0.04
 if not max_default_snow_road < 0.01:
     raise SystemExit(f'ROUND10 VERIFY FAILED [default snow road silence]: {max_default_snow_road}')
 print(f'ROUND10 VERIFY OK [default snow road silence]: max={max_default_snow_road:.4f}')
 
-# Simple delimiter sanity check after transformation.
 pairs = {'(': ')', '{': '}', '[': ']'}
 stack = []
 in_string = False
@@ -48,3 +49,7 @@ if stack:
     raise SystemExit('ROUND10 VERIFY FAILED [delimiter balance]')
 print('ROUND10 VERIFY OK [delimiter balance]')
 print('Round-10 snow/ice vibration suppression verification passed')
+
+# Round-11 is chained by the Round-10 patch runner so verify the final effective
+# source here as well.
+runpy.run_path('tools/verify_wheel_round11_strong_sat.py', run_name='__main__')
