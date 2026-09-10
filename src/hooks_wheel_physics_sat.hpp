@@ -24,6 +24,7 @@ public:
         calibrationConfidence_ = 0.0f;
         activationBlend_ = 0.0f;
         invalidTicks_ = 0;
+        discontinuityCount_ = 0;
         lastTorque_ = 0.0f;
         prevPosition_ = D3DVECTOR{};
         prevHeading_ = 0.0f;
@@ -33,6 +34,8 @@ public:
         vLong_ = 0.0f;
         vLat_ = 0.0f;
         positionStep_ = 0.0f;
+        motionScaleEma_ = 0.0f;
+        motionScaleSamples_ = 0;
         spdLen_ = 0.0f;
         spdCorrelation_ = 0.0f;
     }
@@ -75,19 +78,40 @@ public:
         const float motionLen = std::sqrt(dx * dx + dz * dz);
         positionStep_ = std::isfinite(motionLen) ? motionLen : 0.0f;
 
-        // At genuine parking speed, zero SAT is a valid state rather than a
-        // failed physics sample. This distinction prevents Natural SAT from
-        // leaking back in around centre/standstill after calibration.
+        // A stop/restart must not inherit the previous corner's beta/yaw/front
+        // slip. Keep the already-proven matrix basis, but restart dynamic state
+        // and its crossfade before the car moves again.
         if (speedNorm <= 0.04f)
         {
-            lastTorque_ = 0.0f;
-            invalidTicks_ = 0;
+            clear_dynamic_state();
             sampleValid_ = calibrated_;
             return 0.0f;
         }
 
         if (!std::isfinite(motionLen) || motionLen <= 0.00001f)
             return decay_invalid_sample();
+
+        // Detect restart/warp discontinuities without assuming OutRun world
+        // units. Position step is normalized by current speed, then compared
+        // with its own rolling scale. A large relative jump clears dynamic SAT
+        // history instead of becoming a one-frame lateral-velocity impulse.
+        const float motionScale = motionLen / std::max(speedNorm, 0.05f);
+        if (motionScaleSamples_ >= 12 &&
+            motionScaleEma_ > 0.00001f &&
+            motionScale > motionScaleEma_ * 5.0f)
+        {
+            ++discontinuityCount_;
+            clear_dynamic_state();
+            return 0.0f;
+        }
+        if (std::isfinite(motionScale))
+        {
+            if (motionScaleSamples_ == 0)
+                motionScaleEma_ = motionScale;
+            else
+                motionScaleEma_ += (motionScale - motionScaleEma_) * 0.05f;
+            ++motionScaleSamples_;
+        }
 
         const float motionX = dx / motionLen;
         const float motionZ = dz / motionLen;
@@ -138,9 +162,7 @@ public:
                             : calibrationSignedX_;
                         forwardSign_ = signedScore >= 0.0f ? 1.0f : -1.0f;
                         calibrated_ = true;
-                        activationBlend_ = 0.0f;
-                        invalidTicks_ = 0;
-                        lastTorque_ = 0.0f;
+                        clear_dynamic_state();
                     }
                 }
             }
@@ -187,7 +209,11 @@ public:
         while (headingDelta < -Pi)
             headingDelta += TwoPi;
         if (std::abs(headingDelta) >= 0.35f)
-            return decay_invalid_sample();
+        {
+            ++discontinuityCount_;
+            clear_dynamic_state();
+            return 0.0f;
+        }
 
         // This helper is called once per OutRun simulation tick. The game
         // physics loop remains fixed at 60 Hz even when rendering >60 FPS.
@@ -261,6 +287,7 @@ public:
     bool sampleValid() const { return sampleValid_; }
     bool torqueActive() const { return torqueActive_; }
     int forwardAxis() const { return forwardAxis_; }
+    int discontinuityCount() const { return discontinuityCount_; }
     float calibrationConfidence() const { return calibrationConfidence_; }
     float activationBlend() const { return activationBlend_; }
     float bodySlip() const { return bodySlip_; }
@@ -269,10 +296,24 @@ public:
     float vLong() const { return vLong_; }
     float vLat() const { return vLat_; }
     float positionStep() const { return positionStep_; }
+    float motionScale() const { return motionScaleEma_; }
     float spdLen() const { return spdLen_; }
     float spdCorrelation() const { return spdCorrelation_; }
 
 private:
+    void clear_dynamic_state()
+    {
+        headingValid_ = false;
+        prevHeading_ = 0.0f;
+        bodySlip_ = 0.0f;
+        yawRate_ = 0.0f;
+        frontSlip_ = 0.0f;
+        activationBlend_ = 0.0f;
+        invalidTicks_ = 0;
+        lastTorque_ = 0.0f;
+        torqueActive_ = false;
+    }
+
     float decay_invalid_sample()
     {
         sampleValid_ = false;
@@ -307,6 +348,7 @@ private:
     float calibrationConfidence_ = 0.0f;
     float activationBlend_ = 0.0f;
     int invalidTicks_ = 0;
+    int discontinuityCount_ = 0;
     float lastTorque_ = 0.0f;
     D3DVECTOR prevPosition_{};
     float prevHeading_ = 0.0f;
@@ -316,6 +358,8 @@ private:
     float vLong_ = 0.0f;
     float vLat_ = 0.0f;
     float positionStep_ = 0.0f;
+    float motionScaleEma_ = 0.0f;
+    int motionScaleSamples_ = 0;
     float spdLen_ = 0.0f;
     float spdCorrelation_ = 0.0f;
 };
