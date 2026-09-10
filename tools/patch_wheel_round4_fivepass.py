@@ -14,9 +14,9 @@ rep('''    constexpr DWORD FFB_DEVICE_RETRY_MS = 750;\n''','''    constexpr DWOR
 for old,new,label in [
 ('if (updateNow < deviceReinitAfter_)','if (tick_before(updateNow, deviceReinitAfter_))','device reinit deadline'),
 ('if (GetTickCount() < retryAfter_)','if (tick_before(GetTickCount(), retryAfter_))','initialize retry deadline'),
-('GetTickCount() >= recreateHoldoffUntil_)','tick_reached(GetTickCount(), recreateHoldoffUntil_)','periodic holdoff'),
-('GetTickCount() >= springRecreateHoldoffUntil_)','tick_reached(GetTickCount(), springRecreateHoldoffUntil_)','spring holdoff'),
-('GetTickCount() >= damperRecreateHoldoffUntil_)','tick_reached(GetTickCount(), damperRecreateHoldoffUntil_)','damper holdoff'),
+('GetTickCount() >= recreateHoldoffUntil_)','tick_reached(GetTickCount(), recreateHoldoffUntil_))','periodic holdoff'),
+('GetTickCount() >= springRecreateHoldoffUntil_)','tick_reached(GetTickCount(), springRecreateHoldoffUntil_))','spring holdoff'),
+('GetTickCount() >= damperRecreateHoldoffUntil_)','tick_reached(GetTickCount(), damperRecreateHoldoffUntil_))','damper holdoff'),
 ('if (nextGainRetryTick_ != 0 && now < nextGainRetryTick_)','if (tick_before(now, nextGainRetryTick_))','gain retry deadline'),
 ('if (now < recreateHoldoffUntil_)','if (tick_before(now, recreateHoldoffUntil_))','constant recreate holdoff'),
 ('GetTickCount() < ctx->self->failedInterfaceUntil_','tick_before(GetTickCount(), ctx->self->failedInterfaceUntil_)','failed sibling holdoff'),
