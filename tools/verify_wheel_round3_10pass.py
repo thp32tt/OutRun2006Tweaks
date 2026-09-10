@@ -6,7 +6,7 @@ ui = Path('src/overlay/wheel_setup_ui.cpp').read_text(encoding='utf-8')
 checks = [
     ('independent spring invert setting', 'Setting<bool> WheelFFBInvertSpring{' in ffb),
     ('spring no longer follows InvertForce', 'const LONG coefficient = Settings::WheelFFBInvertSpring' in ffb and 'const LONG coefficient = Settings::WheelFFBInvertForce' not in ffb),
-    ('F11 ConstantForce direction control', 'Reverse ConstantForce' in ui),
+    ('F11 ConstantForce direction control', ('Reverse ConstantForce' in ui or 'Reverse SAT / ConstantForce' in ui)),
     ('F11 spring direction control', 'Reverse Spring' in ui),
     ('hardware spring live-disable fallback', 'hardware spring disabled live; using software centering' in ffb),
     ('gameplay actuator retry path', 'note_device_failure("SETACTUATORSON", actuatorHr);' in ffb and 'deviceAcquired_ = false;' in ffb),
