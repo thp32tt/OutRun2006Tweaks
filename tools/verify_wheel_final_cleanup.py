@@ -1,4 +1,5 @@
 from pathlib import Path
+import runpy
 
 
 def read(path: str) -> str:
@@ -58,3 +59,7 @@ require(
     'direction test explicitly checks gameplay state')
 
 print('Final wheel cleanup verification passed')
+
+# Verify the additional five source-level hardening passes on the final effective
+# source produced by the build pipeline.
+runpy.run_path('tools/verify_wheel_round4_fivepass.py', run_name='__main__')
