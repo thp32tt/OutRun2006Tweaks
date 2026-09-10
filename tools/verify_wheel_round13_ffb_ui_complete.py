@@ -19,7 +19,10 @@ require('WheelFFB_RequestDirectionTest(-1);', 'left direction test wired')
 require('Test Right (20%)', 'right direction test visible')
 require('WheelFFB_RequestDirectionTest(1);', 'right direction test wired')
 require('WheelFFB_RequestDirectionTest(0);', 'stop direction test wired')
-require('Load MOZA R3 SAT test', 'SAT preset retained')
+if 'Load MOZA R3 Strong SAT' in text:
+    require('Load MOZA R3 Strong SAT', 'Round15 strong SAT preset retained')
+else:
+    require('Load MOZA R3 SAT test', 'SAT preset retained')
 require('Self-aligning Torque (SAT)', 'SAT slider retained')
 
 if text.count('{') != text.count('}'):
