@@ -1,11 +1,9 @@
-# one-shot post-review workflow
 name: Apply FFB and setup UX review
 
 on:
   push:
     branches: [ wheel-ffb ]
     paths:
-      - '.github/postreview_ffb_ui_fix.py'
       - '.github/workflows/apply_ffb_ui_all.yml'
   workflow_dispatch:
 
@@ -13,30 +11,24 @@ permissions:
   contents: write
 
 jobs:
-  apply-and-verify:
+  cleanup:
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout wheel-ffb
-        uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           ref: wheel-ffb
           fetch-depth: 0
-      - name: Apply post-review safeguards
-        run: python .github/postreview_ffb_ui_fix.py
-      - name: Verify current source invariants
-        run: python tools/verify_wheel_ffb_current.py
-      - name: Compile production-header math tests
-        run: python tools/verify_wheel_ffb_math.py
-      - name: Check whitespace
-        run: git diff --check
-      - name: Commit verified source changes
+      - name: Remove temporary review harness
         run: |
-          if git diff --quiet; then
-            echo "No source changes to commit"
-            exit 0
-          fi
+          rm -f .github/apply_ffb_ui_all.py
+          rm -f .github/fix_ffb_ui_verifier.py
+          rm -f .github/fix_ffb_ui_verifier2.py
+          rm -f .github/postreview_ffb_ui_fix.py
+          rm -f .github/workflows/apply_ffb_ui_all.yml
+      - name: Commit cleanup
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "fix: harden FFB status and setup UX [skip ci]"
+          git commit -m "chore: remove temporary FFB UI review harness"
           git push origin HEAD:wheel-ffb
