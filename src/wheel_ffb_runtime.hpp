@@ -1,4 +1,6 @@
 #pragma once
+#include <array>
+#include <cstddef>
 #include <cstdint>
 
 struct WheelFFBHeadroomSnapshot
@@ -13,7 +15,47 @@ struct WheelFFBHeadroomSnapshot
     float suggestedOverall = 0.0f;
 };
 
+struct WheelFFBStatusSnapshot
+{
+    bool initialized = false;
+    bool acquired = false;
+    bool outputOwner = false;
+    bool ffbStateValid = false;
+    bool actuatorsOn = false;
+    bool powerOn = false;
+    bool safetySwitchOn = false;
+    bool userSwitchOn = false;
+    bool paused = false;
+    bool deviceLost = false;
+    bool constantEffect = false;
+    bool springEffect = false;
+    bool damperEffect = false;
+    bool periodicEffects = false;
+    bool constantCapsKnown = false;
+    bool constantDynamic = false;
+    bool polarDirectionDynamic = false;
+    bool springCapsKnown = false;
+    bool springDynamic = false;
+    bool damperCapsKnown = false;
+    bool damperDynamic = false;
+    bool periodicCapsKnown = false;
+    bool periodicDynamic = false;
+    bool directionTested = false;
+};
+
+inline constexpr std::size_t WheelFFBGraphCapacity = 180;
+struct WheelFFBGraphSnapshot
+{
+    std::size_t count = 0;
+    std::array<float, WheelFFBGraphCapacity> rawStructural{};
+    std::array<float, WheelFFBGraphCapacity> softLimited{};
+    std::array<float, WheelFFBGraphCapacity> postSlew{};
+    std::array<float, WheelFFBGraphCapacity> finalOutput{};
+};
+
 void WheelFFB_RequestDirectionTest(int direction);
 void WheelFFB_RequestSettingsTransition();
 WheelFFBHeadroomSnapshot WheelFFB_GetHeadroomSnapshot();
+WheelFFBStatusSnapshot WheelFFB_GetStatusSnapshot();
+WheelFFBGraphSnapshot WheelFFB_GetGraphSnapshot();
 void WheelFFB_ResetHeadroomStats();

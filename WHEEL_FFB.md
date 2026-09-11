@@ -130,3 +130,12 @@ The vehicle estimator keeps the existing bicycle-model-inspired `roadWheelAngle 
 `Force Feedback -> FFB Headroom / Clipping` measures sustained structural demand only. Crash/gear events, startup/recreate ramps and near-stop frames are excluded. P95/P99, soft-knee occupancy and hard-cap demand are reported, with a non-automatic Overall Strength suggestion targeting roughly 90% P99 demand.
 
 Wheel-specific response correction is optional and **off by default**. A wheel profile can store `ResponseCorrection`, an 11-point monotonic `ResponseLUT` (desired torque 0..100% in 10% steps -> DirectInput command), and optional `MaxTorqueNm` for diagnostics. These hardware properties are deliberately excluded from named FFB feel profiles. Leave correction linear/off on a DD wheel unless a measured response curve justifies it.
+
+
+## Setup and DirectInput capability diagnostics
+
+The F11 Force Feedback page now reports the live DirectInput FFB state, hardware effect/fallback ownership, and whether each effect advertises dynamic parameter updates. If a driver explicitly reports that Spring, Damper, or Sine type-specific parameters cannot be changed while playing, the engine prefers the software fallback instead of repeatedly stop/restarting that hardware effect. Failed capability discovery preserves the prior compatibility path rather than rejecting older drivers blindly.
+
+The page also shows a Ready to Drive checklist, steering-device VID/PID recommendation for the FFB output, a rolling three-second Raw -> Soft Limit -> Post Slew -> Final DirectInput graph, and a Revert unsaved FFB action. Input Bindings highlights the exact manual binding button currently listening, warns when the same physical control is already used by another action, and exposes wheel/pedal calibration directly in the Quick Setup completion flow.
+
+`ReversalReleaseRate` is separate from the normal `SlewRate`: normal SAT buildup keeps its existing profile tuning, while stale torque can unload faster when SAT changes direction. This targets counter-steer latency without globally making impacts or ordinary force buildup harsher.

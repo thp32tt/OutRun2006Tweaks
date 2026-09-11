@@ -162,7 +162,13 @@ namespace Settings
 
     Setting<float> WheelFFBSlewRate{
         "WheelFFB", "SlewRate", 0.06f,
-        "Maximum structural-force change per 60 Hz tick, normalized 0..1.", Range<float>{ 0.01f, 1.0f }
+        "Maximum normal structural-force build change per 60 Hz tick, normalized 0..1.", Range<float>{ 0.01f, 1.0f }
+    };
+
+    Setting<float> WheelFFBReversalReleaseRate{
+        "WheelFFB", "ReversalReleaseRate", 0.12f,
+        "Dedicated stale-torque release rate when SAT changes direction. Higher values reduce counter-steer latency without accelerating normal force build.",
+        Range<float>{ 0.02f, 1.0f }
     };
 
     Setting<bool> WheelFFBUsePeriodicEffects{
@@ -921,6 +927,14 @@ namespace
 
             const LONG releaseMaxSlew = std::min(
                 static_cast<LONG>(DI_FFNOMINALMAX), maxSlew * 2);
+            const float configuredReversalRelease =
+                static_cast<float>(Settings::WheelFFBReversalReleaseRate);
+            const float safeReversalRelease = std::isfinite(configuredReversalRelease)
+                ? std::clamp(configuredReversalRelease, 0.02f, 1.0f)
+                : 0.12f;
+            const LONG reversalReleaseMaxSlew = std::max(
+                releaseMaxSlew,
+                static_cast<LONG>(safeReversalRelease * static_cast<float>(DI_FFNOMINALMAX)));
             const bool oppositeTorqueDirection =
                 structuralLevel != 0 && prevStructuralLevel_ != 0 &&
                 (structuralLevel > 0) != (prevStructuralLevel_ > 0);
@@ -930,11 +944,11 @@ namespace
                 // A sign change first unloads stale torque to zero at the
                 // already-approved faster release rate. Do not build the new
                 // direction in the same tick.
-                if (std::abs(prevStructuralLevel_) <= releaseMaxSlew)
+                if (std::abs(prevStructuralLevel_) <= reversalReleaseMaxSlew)
                     structuralLevel = 0;
                 else
                     structuralLevel = prevStructuralLevel_ +
-                        (prevStructuralLevel_ > 0 ? -releaseMaxSlew : releaseMaxSlew);
+                        (prevStructuralLevel_ > 0 ? -reversalReleaseMaxSlew : reversalReleaseMaxSlew);
             }
             else
             {
@@ -977,6 +991,11 @@ namespace
                 vibrationRequested, -vibrationHeadroom, vibrationHeadroom);
             const LONG levelBeforeResponse = baseSteeringLevel + vibrationLevel;
             const LONG level = apply_response_correction(levelBeforeResponse);
+            record_graph_sample(
+                total,
+                compressed,
+                static_cast<float>(structuralLevel) / static_cast<float>(DI_FFNOMINALMAX),
+                static_cast<float>(level) / static_cast<float>(DI_FFNOMINALMAX));
 
             if (std::abs(level - prevConstantLevel_) > 15 || eventLevel != 0 ||
                 (level != 0 && GetTickCount() - lastConstantWriteTick_ >= FFB_EFFECT_REFRESH_MS))
@@ -1110,6 +1129,67 @@ namespace
             return result;
         }
 
+        WheelFFBStatusSnapshot status_snapshot() const
+        {
+            WheelFFBStatusSnapshot result{};
+            result.initialized = initialized_;
+            result.acquired = deviceAcquired_;
+            result.outputOwner = output_owner_active();
+            result.constantEffect = constantEffect_ != nullptr;
+            result.springEffect = springEffect_ != nullptr;
+            result.damperEffect = damperEffect_ != nullptr;
+            result.periodicEffects = periodicsActive_;
+            result.constantCapsKnown = constantCapsKnown_;
+            result.constantDynamic = !constantCapsKnown_ ||
+                (constantDynamicParams_ & DIEP_TYPESPECIFICPARAMS) != 0;
+            result.polarDirectionDynamic = !constantCapsKnown_ ||
+                (constantDynamicParams_ & DIEP_DIRECTION) != 0;
+            result.springCapsKnown = springCapsKnown_;
+            result.springDynamic = !springCapsKnown_ ||
+                (springDynamicParams_ & DIEP_TYPESPECIFICPARAMS) != 0;
+            result.damperCapsKnown = damperCapsKnown_;
+            result.damperDynamic = !damperCapsKnown_ ||
+                (damperDynamicParams_ & DIEP_TYPESPECIFICPARAMS) != 0;
+            result.periodicCapsKnown = periodicCapsKnown_;
+            result.periodicDynamic = !periodicCapsKnown_ ||
+                (periodicDynamicParams_ & DIEP_TYPESPECIFICPARAMS) != 0;
+            result.directionTested = directionTested_;
+
+            if (device_)
+            {
+                DWORD state = 0;
+                if (SUCCEEDED(device_->GetForceFeedbackState(&state)))
+                {
+                    result.ffbStateValid = true;
+                    result.actuatorsOn = (state & DIGFFS_ACTUATORSON) != 0;
+                    result.powerOn = (state & DIGFFS_POWERON) != 0;
+                    result.safetySwitchOn = (state & DIGFFS_SAFETYSWITCHON) != 0;
+                    result.userSwitchOn = (state & DIGFFS_USERFFSWITCHON) != 0;
+                    result.paused = (state & DIGFFS_PAUSED) != 0;
+                    result.deviceLost = (state & DIGFFS_DEVICELOST) != 0;
+                }
+            }
+            return result;
+        }
+
+        WheelFFBGraphSnapshot graph_snapshot() const
+        {
+            WheelFFBGraphSnapshot result{};
+            result.count = graphCount_;
+            const size_t start = graphCount_ < WheelFFBGraphCapacity
+                ? 0
+                : graphWriteIndex_ % WheelFFBGraphCapacity;
+            for (size_t i = 0; i < graphCount_; ++i)
+            {
+                const size_t src = (start + i) % WheelFFBGraphCapacity;
+                result.rawStructural[i] = graphRawStructural_[src];
+                result.softLimited[i] = graphSoftLimited_[src];
+                result.postSlew[i] = graphPostSlew_[src];
+                result.finalOutput[i] = graphFinalOutput_[src];
+            }
+            return result;
+        }
+
         void reset_headroom_stats()
         {
             headroomHistogram_.fill(0);
@@ -1122,6 +1202,8 @@ namespace
 
         void request_direction_test(int direction)
         {
+            if (direction != 0)
+                directionTested_ = true;
             if (direction == 0)
             {
                 const bool hadPendingTest = manualTestFrames_ > 0;
@@ -1840,10 +1922,52 @@ namespace
             return std::clamp(raw / 127.0f, -1.0f, 1.0f);
         }
 
+        bool query_dynamic_effect_capability(
+            REFGUID effectGuid, const char* label, DWORD required,
+            bool& known, DWORD& dynamicParams)
+        {
+            known = false;
+            dynamicParams = 0;
+            if (!device_)
+                return false;
+
+            DIEFFECTINFOA info{};
+            info.dwSize = sizeof(info);
+            const HRESULT hr = device_->GetEffectInfo(&info, effectGuid);
+            if (FAILED(hr))
+            {
+                // Some older drivers do not expose useful effect metadata even
+                // though SetParameters works. Preserve the proven legacy path
+                // when capability discovery itself is unavailable.
+                spdlog::warn(
+                    "WheelFFB: GetEffectInfo({}) failed (0x{:08X}); keeping compatibility behavior",
+                    label, (unsigned)hr);
+                return true;
+            }
+
+            known = true;
+            dynamicParams = info.dwDynamicParams;
+            const bool supported = (dynamicParams & required) == required;
+            spdlog::info(
+                "WheelFFB: {} dynamic params=0x{:08X}, required=0x{:08X}, live={}",
+                label, (unsigned)dynamicParams, (unsigned)required, supported);
+            return supported;
+        }
+
         bool create_constant_effect()
         {
             if (!device_)
                 return false;
+
+            const bool liveMagnitude = query_dynamic_effect_capability(
+                GUID_ConstantForce, "ConstantForce", DIEP_TYPESPECIFICPARAMS,
+                constantCapsKnown_, constantDynamicParams_);
+            if (constantCapsKnown_ && !liveMagnitude)
+            {
+                spdlog::error(
+                    "WheelFFB: ConstantForce reports no live magnitude update support; rejecting this FFB interface");
+                return false;
+            }
 
             safe_release_effect(constantEffect_, "constant before create");
             constantEffectPolar_ = false;
@@ -1869,7 +1993,9 @@ namespace
             effect.lpvTypeSpecificParams = &constantParams_;
 
             HRESULT hr = E_FAIL;
-            if (actuatorAxes_.size() > 1)
+            const bool polarDirectionDynamic =
+                !constantCapsKnown_ || (constantDynamicParams_ & DIEP_DIRECTION) != 0;
+            if (actuatorAxes_.size() > 1 && polarDirectionDynamic)
             {
                 effect.dwFlags = DIEFF_POLAR | DIEFF_OBJECTOFFSETS;
                 effect.cAxes = 2;
@@ -1911,6 +2037,13 @@ namespace
         {
             if (!device_ || !Settings::WheelFFBUseHardwareSpring)
                 return false;
+            if (!query_dynamic_effect_capability(
+                    GUID_Spring, "GUID_Spring", DIEP_TYPESPECIFICPARAMS,
+                    springCapsKnown_, springDynamicParams_))
+            {
+                spdlog::warn("WheelFFB: GUID_Spring is not safely live-updatable; using software centering");
+                return false;
+            }
 
             DWORD axes[1] = { primary_actuator_axis() };
             LONG directions[1] = { 1 };
@@ -2082,6 +2215,13 @@ namespace
         {
             if (!device_ || !Settings::WheelFFBUseHardwareDamper)
                 return false;
+            if (!query_dynamic_effect_capability(
+                    GUID_Damper, "GUID_Damper", DIEP_TYPESPECIFICPARAMS,
+                    damperCapsKnown_, damperDynamicParams_))
+            {
+                spdlog::warn("WheelFFB: GUID_Damper is not safely live-updatable; using software damping");
+                return false;
+            }
 
             DWORD axes[1] = { primary_actuator_axis() };
             LONG directions[1] = { 1 };
@@ -2214,6 +2354,13 @@ namespace
         {
             if (!device_)
                 return nullptr;
+            if (!query_dynamic_effect_capability(
+                    GUID_Sine, "GUID_Sine", DIEP_TYPESPECIFICPARAMS,
+                    periodicCapsKnown_, periodicDynamicParams_))
+            {
+                spdlog::warn("WheelFFB: GUID_Sine is not safely live-updatable; using ConstantForce vibration fallback");
+                return nullptr;
+            }
 
             DWORD axes[1] = { primary_actuator_axis() };
             LONG directions[1] = { 1 };
@@ -2408,6 +2555,17 @@ namespace
             roadState_ = {};
             slipState_ = {};
             periodicsActive_ = false;
+        }
+
+        void record_graph_sample(float rawStructural, float softLimited, float postSlew, float finalOutput)
+        {
+            const size_t slot = graphWriteIndex_ % WheelFFBGraphCapacity;
+            graphRawStructural_[slot] = std::isfinite(rawStructural) ? rawStructural : 0.0f;
+            graphSoftLimited_[slot] = std::isfinite(softLimited) ? softLimited : 0.0f;
+            graphPostSlew_[slot] = std::isfinite(postSlew) ? postSlew : 0.0f;
+            graphFinalOutput_[slot] = std::isfinite(finalOutput) ? finalOutput : 0.0f;
+            ++graphWriteIndex_;
+            graphCount_ = std::min<std::size_t>(graphCount_ + 1, WheelFFBGraphCapacity);
         }
 
         void record_headroom(float demand, bool eligible)
@@ -3030,6 +3188,15 @@ namespace
         bool enabledLastTick_ = true;
         bool appActive_ = true;
         bool periodicsActive_ = false;
+        bool directionTested_ = false;
+        bool constantCapsKnown_ = false;
+        bool springCapsKnown_ = false;
+        bool damperCapsKnown_ = false;
+        bool periodicCapsKnown_ = false;
+        DWORD constantDynamicParams_ = 0;
+        DWORD springDynamicParams_ = 0;
+        DWORD damperDynamicParams_ = 0;
+        DWORD periodicDynamicParams_ = 0;
         int periodicStrategy_ = 1; // Explicitly restart sine effects on every update.
         int springStrategy_ = -1;
         int damperStrategy_ = -1;
@@ -3063,6 +3230,13 @@ namespace
         std::uint64_t headroomHardClipSamples_ = 0;
         float headroomCurrentDemand_ = 0.0f;
         float headroomPeakDemand_ = 0.0f;
+
+        std::array<float, WheelFFBGraphCapacity> graphRawStructural_{};
+        std::array<float, WheelFFBGraphCapacity> graphSoftLimited_{};
+        std::array<float, WheelFFBGraphCapacity> graphPostSlew_{};
+        std::array<float, WheelFFBGraphCapacity> graphFinalOutput_{};
+        std::size_t graphWriteIndex_ = 0;
+        std::size_t graphCount_ = 0;
 
         WheelFFBMath::ResponseLUT responseLut_ = WheelFFBMath::linear_response_lut();
         std::string responseLutSpec_;
@@ -3174,6 +3348,16 @@ void WheelFFB_RequestSettingsTransition()
 WheelFFBHeadroomSnapshot WheelFFB_GetHeadroomSnapshot()
 {
     return gWheelFFB.headroom_snapshot();
+}
+
+WheelFFBStatusSnapshot WheelFFB_GetStatusSnapshot()
+{
+    return gWheelFFB.status_snapshot();
+}
+
+WheelFFBGraphSnapshot WheelFFB_GetGraphSnapshot()
+{
+    return gWheelFFB.graph_snapshot();
 }
 
 void WheelFFB_ResetHeadroomStats()

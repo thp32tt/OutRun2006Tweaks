@@ -173,6 +173,50 @@ private:
 	// Resolve both bindings to their current physical SDL instance and replace
 	// only bindings from that same device. Disconnected/unresolved bindings are
 	// deliberately preserved rather than guessed away.
+	static bool same_control(const InputBinding& a, const InputBinding& b)
+	{
+		if (a.kind != b.kind)
+			return false;
+		switch (a.kind)
+		{
+		case InputBinding::Kind::Key: return a.key == b.key;
+		case InputBinding::Kind::PadButton: return a.button == b.button;
+		case InputBinding::Kind::PadAxis: return a.axis == b.axis && a.negate == b.negate;
+		case InputBinding::Kind::JoyButton:
+		case InputBinding::Kind::JoyAxis:
+		case InputBinding::Kind::JoyHat:
+		{
+			const auto* da = InputManager::instance.deviceForBinding(a);
+			const auto* db = InputManager::instance.deviceForBinding(b);
+			const bool sameDevice = da && db
+				? da->instanceId == db->instanceId
+				: a.deviceGuid == b.deviceGuid && a.deviceOccurrence == b.deviceOccurrence;
+			return sameDevice && a.controlIndex == b.controlIndex &&
+				(a.kind != InputBinding::Kind::JoyHat || a.hatMask == b.hatMask);
+		}
+		default: return false;
+		}
+	}
+
+	static std::string binding_conflicts(const InputBinding& candidate, const Selection& target)
+	{
+		std::string result;
+		for (const ActionListEntry& entry : ActionList)
+		{
+			const Selection other{ entry.kind, entry.index };
+			if (other == target)
+				continue;
+			const auto& bindings = action_for(other).bindings();
+			if (std::any_of(bindings.begin(), bindings.end(), [&](const InputBinding& b)
+				{ return same_control(b, candidate); }))
+			{
+				if (!result.empty()) result += ", ";
+				result += name_for(other);
+			}
+		}
+		return result;
+	}
+
 	static bool same_source_family(const InputBinding& existing, const InputBinding& candidate)
 	{
 		if (candidate.isRawDevice())
@@ -330,6 +374,9 @@ public:
 		// what is already bound.
 		const auto commit = [&](const InputBinding& binding)
 		{
+			const std::string conflicts = binding_conflicts(binding, bindTarget);
+			if (!conflicts.empty())
+				persistenceStatus = "Note: this control is also bound to " + conflicts + ".";
 			if (quickSetupActive)
 			{
 				quickSetupCandidate = binding;
@@ -615,8 +662,17 @@ private:
 				const std::string label = std::format("{}  ({})",
 					binding.displayName(padType, steering), sourceName);
 
+				const bool listeningHere = isListeningForInput != ListenState::False &&
+					!quickSetupActive && bindTarget == selected && bindIndex == i;
+				if (listeningHere)
+				{
+					ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_Text]);
+					ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
+				}
 				if (ImGui::Button(label.c_str(), ImVec2(-FLT_MIN, 0)))
 					begin_listening(selected, i);
+				if (listeningHere)
+					ImGui::PopStyleColor(2);
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("Rebind this input");
 
@@ -674,8 +730,17 @@ private:
 		if (bindings.empty())
 			ImGui::TextDisabled("Nothing bound.");
 
-		if (ImGui::Button("+ Add binding"))
+		const bool listeningForNew = isListeningForInput != ListenState::False &&
+			!quickSetupActive && bindTarget == selected && bindIndex == -1;
+		if (listeningForNew)
+		{
+			ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_Text]);
+			ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
+		}
+		if (ImGui::Button(listeningForNew ? "LISTENING...##addBinding" : "+ Add binding"))
 			begin_listening(selected, -1);
+		if (listeningForNew)
+			ImGui::PopStyleColor(2);
 
 		// Live value of the selected action.
 		const float value = action.getState().currentValue;
@@ -686,7 +751,6 @@ private:
 		ImGui::ProgressBar(std::clamp(filled, 0.0f, 1.0f), ImVec2(-FLT_MIN, 0),
 			std::format("{:.2f}", value).c_str());
 
-		draw_calibration_popup();
 	}
 
 	void draw_controllers()
@@ -1092,6 +1156,10 @@ private:
 				ImGui::Text("Detected: %s", quickSetupCandidate->displayName().c_str());
 				if (const auto* device = manager.deviceForBinding(*quickSetupCandidate))
 					ImGui::TextDisabled("Device: %s", SDL_GetJoystickName(device->joystick));
+				const std::string conflicts = binding_conflicts(*quickSetupCandidate, bindTarget);
+				if (!conflicts.empty())
+					ImGui::TextColored(ImVec4(1.0f, 0.70f, 0.20f, 1.0f),
+						"Also bound to: %s", conflicts.c_str());
 				ImGui::TextWrapped("Confirm this input before Quick Setup moves to the next control.");
 				if (ImGui::Button("Use this input"))
 				{
@@ -1155,6 +1223,46 @@ private:
 		}
 	}
 
+	int first_raw_axis_binding(const Selection& selection) const
+	{
+		const auto& bindings = action_for(selection).bindings();
+		for (int i = 0; i < int(bindings.size()); ++i)
+			if (bindings[i].kind == InputBinding::Kind::JoyAxis)
+				return i;
+		return -1;
+	}
+
+	bool axis_calibrated(const Selection& selection) const
+	{
+		const int index = first_raw_axis_binding(selection);
+		if (index < 0)
+			return true; // SDL gamepad axes already use normalized platform ranges.
+		const auto& binding = action_for(selection).bindings()[index];
+		const int negative = binding.axisRest - binding.axisMinimum;
+		const int positive = binding.axisMaximum - binding.axisRest;
+		return binding.axisMode == InputBinding::AxisMode::Signed
+			? negative > 4096 && positive > 4096
+			: (std::max)(negative, positive) > 4096;
+	}
+
+	void quick_calibration_row(const char* label, const Selection& selection)
+	{
+		const int index = first_raw_axis_binding(selection);
+		if (index < 0)
+		{
+			ImGui::TextDisabled("%s: platform/gamepad calibration", label);
+			return;
+		}
+		const bool ready = axis_calibrated(selection);
+		ImGui::TextColored(ready ? ImVec4(0.35f, 0.90f, 0.45f, 1.0f) : ImVec4(1.0f, 0.70f, 0.20f, 1.0f),
+			"%s: %s", label, ready ? "calibrated" : "needs calibration");
+		ImGui::SameLine();
+		ImGui::PushID(label);
+		if (ImGui::SmallButton(ready ? "Recalibrate" : "Calibrate now"))
+			begin_calibration(selection, index);
+		ImGui::PopID();
+	}
+
 	void draw_quick_setup_complete(bool& dialogOpen)
 	{
 		if (!quickSetupComplete)
@@ -1180,6 +1288,19 @@ private:
 		ImGui::SameLine();
 		ImGui::ProgressBar(std::clamp(brake, 0.0f, 1.0f), ImVec2(280.0f, 0),
 			std::format("{:.2f}", brake).c_str());
+
+		ImGui::SeparatorText("Guided axis calibration");
+		ImGui::TextWrapped("Finish wheel center/end-stops and pedal rest/full-travel here before saving. This keeps calibration inside Quick Setup instead of hiding it in the manual editor.");
+		quick_calibration_row("Steering", { Vol, int(ADChannel::Steering) });
+		quick_calibration_row("Accelerator", { Vol, int(ADChannel::Acceleration) });
+		quick_calibration_row("Brake", { Vol, int(ADChannel::Brake) });
+		const bool guidedCalibrationReady =
+			axis_calibrated({ Vol, int(ADChannel::Steering) }) &&
+			axis_calibrated({ Vol, int(ADChannel::Acceleration) }) &&
+			axis_calibrated({ Vol, int(ADChannel::Brake) });
+		if (!guidedCalibrationReady)
+			ImGui::TextColored(ImVec4(1.0f, 0.70f, 0.20f, 1.0f),
+				"Raw wheel/pedal axes still need calibration; Save & Drive remains available if you intentionally want the current ranges.");
 
 		ImGui::Spacing();
 		if (ImGui::Button("Save & Drive"))
@@ -1413,6 +1534,7 @@ public:
 
 			draw_listening_popup();
 			draw_quick_setup_complete(dialogOpen);
+			draw_calibration_popup();
 
 			ImGui::EndPopup();
 		}

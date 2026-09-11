@@ -24,6 +24,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "overlay.hpp"
+#include "input_manager.hpp"
 #include "wheel_ffb_math.hpp"
 #include "wheel_ffb_runtime.hpp"
 #include "wheel_profile_store.hpp"
@@ -53,6 +54,7 @@ namespace Settings
     extern Setting<float> WheelFFBGearShift;
     extern Setting<float> WheelFFBEngineIdle;
     extern Setting<float> WheelFFBSlewRate;
+    extern Setting<float> WheelFFBReversalReleaseRate;
     extern Setting<int> VibrationMode;
     extern Setting<float> WheelFFBRoadTexture;
     extern Setting<float> WheelFFBTireSlip;
@@ -259,6 +261,8 @@ namespace
         DWORD buttons = 0;
         DWORD povs = 0;
         bool ffb = false;
+        std::uint16_t vendor = 0;
+        std::uint16_t product = 0;
     };
 
     class DirectWheelReader
@@ -388,6 +392,16 @@ namespace
                     info.buttons = caps.dwButtons;
                     info.povs = caps.dwPOVs;
                     info.ffb = (caps.dwFlags & DIDC_FORCEFEEDBACK) != 0;
+                }
+                DIPROPDWORD vidpid{};
+                vidpid.diph.dwSize = sizeof(vidpid);
+                vidpid.diph.dwHeaderSize = sizeof(vidpid.diph);
+                vidpid.diph.dwObj = 0;
+                vidpid.diph.dwHow = DIPH_DEVICE;
+                if (SUCCEEDED(temp->GetProperty(DIPROP_VIDPID, &vidpid.diph)))
+                {
+                    info.vendor = LOWORD(vidpid.dwData);
+                    info.product = HIWORD(vidpid.dwData);
                 }
                 temp->Release();
             }
@@ -783,6 +797,102 @@ namespace
         bool confirmingFfbOverwrite_ = false;
         bool confirmingFfbDelete_ = false;
 
+        struct FfbSavedSnapshot
+        {
+            bool valid = false;
+            bool enable = true;
+            bool physicsSat = true;
+            bool hwSpring = true;
+            bool hwDamper = true;
+            bool periodic = true;
+            bool invertForce = true;
+            bool invertSpring = false;
+            bool responseCorrection = false;
+            float global = 0.70f;
+            float spring = 0.65f;
+            float springSaturation = 0.95f;
+            float damper = 0.30f;
+            float steering = 1.45f;
+            float mechanical = 0.25f;
+            float trailLead = 0.25f;
+            float gripLoss = 0.65f;
+            float lateralDeadzone = 1.5f;
+            float weightTransfer = 0.15f;
+            float gearShift = 0.18f;
+            float engineIdle = 0.04f;
+            float slew = 0.06f;
+            float reversalRelease = 0.12f;
+            float road = 0.30f;
+            float tire = 0.20f;
+            float collision = 0.38f;
+            float maxTorque = 0.0f;
+            std::string responseLut;
+        } savedFfb_;
+
+        void capture_saved_ffb()
+        {
+            savedFfb_.valid = true;
+            savedFfb_.enable = Settings::WheelFFBEnable;
+            savedFfb_.physicsSat = Settings::WheelFFBPhysicsSat;
+            savedFfb_.hwSpring = Settings::WheelFFBUseHardwareSpring;
+            savedFfb_.hwDamper = Settings::WheelFFBUseHardwareDamper;
+            savedFfb_.periodic = Settings::WheelFFBUsePeriodicEffects;
+            savedFfb_.invertForce = Settings::WheelFFBInvertForce;
+            savedFfb_.invertSpring = Settings::WheelFFBInvertSpring;
+            savedFfb_.responseCorrection = Settings::WheelFFBResponseCorrection;
+            savedFfb_.global = Settings::WheelFFBGlobalStrength;
+            savedFfb_.spring = Settings::WheelFFBSpringStrength;
+            savedFfb_.springSaturation = Settings::WheelFFBSpringSaturation;
+            savedFfb_.damper = Settings::WheelFFBDamperStrength;
+            savedFfb_.steering = Settings::WheelFFBSteeringWeight;
+            savedFfb_.mechanical = Settings::WheelFFBMechanicalTrail;
+            savedFfb_.trailLead = Settings::WheelFFBTrailResponseLead;
+            savedFfb_.gripLoss = Settings::WheelFFBGripLoss;
+            savedFfb_.lateralDeadzone = Settings::WheelFFBLateralDeadzone;
+            savedFfb_.weightTransfer = Settings::WheelFFBWeightTransfer;
+            savedFfb_.gearShift = Settings::WheelFFBGearShift;
+            savedFfb_.engineIdle = Settings::WheelFFBEngineIdle;
+            savedFfb_.slew = Settings::WheelFFBSlewRate;
+            savedFfb_.reversalRelease = Settings::WheelFFBReversalReleaseRate;
+            savedFfb_.road = Settings::WheelFFBRoadTexture;
+            savedFfb_.tire = Settings::WheelFFBTireSlip;
+            savedFfb_.collision = Settings::WheelFFBWallImpact;
+            savedFfb_.maxTorque = Settings::WheelFFBMaxTorqueNm;
+            savedFfb_.responseLut = Settings::WheelFFBResponseLUT.get();
+        }
+
+        void restore_saved_ffb()
+        {
+            if (!savedFfb_.valid) return;
+            Settings::WheelFFBEnable = savedFfb_.enable;
+            Settings::WheelFFBPhysicsSat = savedFfb_.physicsSat;
+            Settings::WheelFFBUseHardwareSpring = savedFfb_.hwSpring;
+            Settings::WheelFFBUseHardwareDamper = savedFfb_.hwDamper;
+            Settings::WheelFFBUsePeriodicEffects = savedFfb_.periodic;
+            Settings::WheelFFBInvertForce = savedFfb_.invertForce;
+            Settings::WheelFFBInvertSpring = savedFfb_.invertSpring;
+            Settings::WheelFFBResponseCorrection = savedFfb_.responseCorrection;
+            Settings::WheelFFBGlobalStrength = savedFfb_.global;
+            Settings::WheelFFBSpringStrength = savedFfb_.spring;
+            Settings::WheelFFBSpringSaturation = savedFfb_.springSaturation;
+            Settings::WheelFFBDamperStrength = savedFfb_.damper;
+            Settings::WheelFFBSteeringWeight = savedFfb_.steering;
+            Settings::WheelFFBMechanicalTrail = savedFfb_.mechanical;
+            Settings::WheelFFBTrailResponseLead = savedFfb_.trailLead;
+            Settings::WheelFFBGripLoss = savedFfb_.gripLoss;
+            Settings::WheelFFBLateralDeadzone = savedFfb_.lateralDeadzone;
+            Settings::WheelFFBWeightTransfer = savedFfb_.weightTransfer;
+            Settings::WheelFFBGearShift = savedFfb_.gearShift;
+            Settings::WheelFFBEngineIdle = savedFfb_.engineIdle;
+            Settings::WheelFFBSlewRate = savedFfb_.slew;
+            Settings::WheelFFBReversalReleaseRate = savedFfb_.reversalRelease;
+            Settings::WheelFFBRoadTexture = savedFfb_.road;
+            Settings::WheelFFBTireSlip = savedFfb_.tire;
+            Settings::WheelFFBWallImpact = savedFfb_.collision;
+            Settings::WheelFFBMaxTorqueNm = savedFfb_.maxTorque;
+            Settings::WheelFFBResponseLUT = savedFfb_.responseLut;
+        }
+
         void refresh_ffb_profiles(const std::string& selectName = {})
         {
             ffbProfiles_ = WheelProfileStore::list_profiles(WheelProfileStore::Kind::ForceFeedback);
@@ -1174,6 +1284,8 @@ namespace
         void render(bool) override
         {
             listen_for_binding();
+            if (!savedFfb_.valid)
+                capture_saved_ffb();
             const auto track_ffb_change = [this](bool changed)
             {
                 if (changed)
@@ -1202,6 +1314,23 @@ namespace
             const auto& devices = gReader.devices();
             if (ImGui::Button("Refresh Devices"))
                 gReader.refresh_devices();
+
+            std::uint16_t steeringVendor = 0;
+            std::uint16_t steeringProduct = 0;
+            if (Settings::UseNewInput)
+            {
+                const auto& steeringBindings = InputManager::instance.actionFor(
+                    InputManager::ActionKind::Volume, int(ADChannel::Steering)).bindings();
+                for (const auto& binding : steeringBindings)
+                {
+                    if (binding.isRawDevice() && binding.deviceVendor != 0)
+                    {
+                        steeringVendor = binding.deviceVendor;
+                        steeringProduct = binding.deviceProduct;
+                        break;
+                    }
+                }
+            }
 
             auto first_device_name = [&](bool ffbOnly) -> std::string
             {
@@ -1269,7 +1398,12 @@ namespace
                         if (ffbOnly && !dev.ffb)
                             continue;
                         const bool selected = isSelectedDevice(dev);
-                        const std::string item = dev.name + "##" + label + dev.guidKey;
+                        const bool steeringMatch = ffbOutput && steeringVendor != 0 &&
+                            dev.vendor == steeringVendor &&
+                            (steeringProduct == 0 || dev.product == steeringProduct);
+                        const std::string item = dev.name +
+                            (steeringMatch ? "  [recommended: steering device]" : "") +
+                            "##" + label + dev.guidKey;
                         if (ImGui::Selectable(item.c_str(), selected))
                             select_device(dev, ffbOutput);
                         if (selected)
@@ -1280,8 +1414,15 @@ namespace
 
                 for (const auto& dev : devices)
                     if (isSelectedDevice(dev))
-                        ImGui::TextDisabled("%lu axes / %lu buttons / %lu POV / FFB %s / GUID %s",
-                            dev.axes, dev.buttons, dev.povs, dev.ffb ? "yes" : "no", dev.guidKey.c_str());
+                    {
+                        ImGui::TextDisabled("%lu axes / %lu buttons / %lu POV / FFB %s / VID:%04X PID:%04X / GUID %s",
+                            dev.axes, dev.buttons, dev.povs, dev.ffb ? "yes" : "no",
+                            unsigned(dev.vendor), unsigned(dev.product), dev.guidKey.c_str());
+                        if (ffbOutput && steeringVendor != 0 && dev.vendor == steeringVendor &&
+                            (steeringProduct == 0 || dev.product == steeringProduct))
+                            ImGui::TextColored(ImVec4(0.35f, 0.90f, 0.45f, 1.0f),
+                                "Matches the steering device VID/PID (recommendation only). ");
+                    }
             };
 
             if (Settings::UseNewInput)
@@ -1297,6 +1438,70 @@ namespace
                     Settings::WheelUniversalDeviceGuid.get(), Settings::WheelUniversalDeviceName.get(), false);
                 draw_device_combo("FFB Output", true,
                     Settings::WheelFFBDeviceGuid.get(), Settings::WheelFFBDeviceName.get(), true);
+            }
+
+            if (Settings::UseNewInput)
+            {
+                const WheelFFBStatusSnapshot ffbStatus = WheelFFB_GetStatusSnapshot();
+                ImGui::SeparatorText("Ready to Drive");
+                const auto bound = [](InputManager::ActionKind kind, int index)
+                {
+                    return !InputManager::instance.actionFor(kind, index).bindings().empty();
+                };
+                const bool steeringReady = bound(InputManager::ActionKind::Volume, int(ADChannel::Steering));
+                const bool accelReady = bound(InputManager::ActionKind::Volume, int(ADChannel::Acceleration));
+                const bool brakeReady = bound(InputManager::ActionKind::Volume, int(ADChannel::Brake));
+                const bool driveButtonsReady =
+                    bound(InputManager::ActionKind::Switch, int(SwitchId::GearUp)) &&
+                    bound(InputManager::ActionKind::Switch, int(SwitchId::GearDown));
+                const bool menuReady =
+                    bound(InputManager::ActionKind::Switch, int(SwitchId::A)) &&
+                    bound(InputManager::ActionKind::Switch, int(SwitchId::B)) &&
+                    bound(InputManager::ActionKind::Switch, int(SwitchId::SelectionUp)) &&
+                    bound(InputManager::ActionKind::Switch, int(SwitchId::SelectionDown)) &&
+                    bound(InputManager::ActionKind::Switch, int(SwitchId::SelectionLeft)) &&
+                    bound(InputManager::ActionKind::Switch, int(SwitchId::SelectionRight));
+                const auto readiness = [](const char* label, bool ok)
+                {
+                    ImGui::TextColored(ok ? ImVec4(0.35f, 0.90f, 0.45f, 1.0f) : ImVec4(1.0f, 0.70f, 0.20f, 1.0f),
+                        "%s %s", ok ? "[OK]" : "[!]", label);
+                };
+                readiness("Steering", steeringReady);
+                ImGui::SameLine(); readiness("Pedals", accelReady && brakeReady);
+                ImGui::SameLine(); readiness("Shifters", driveButtonsReady);
+                readiness("Menu controls", menuReady);
+                ImGui::SameLine(); readiness("FFB device", ffbStatus.initialized || !Settings::WheelFFBDeviceGuid.get().empty());
+                ImGui::SameLine(); readiness("Direction test", ffbStatus.directionTested);
+
+                ImGui::SeparatorText("FFB Runtime Status");
+                ImGui::Text("Engine: %s   Device: %s   Output owner: %s",
+                    ffbStatus.initialized ? "ready" : "waiting",
+                    ffbStatus.acquired ? "acquired" : "released",
+                    ffbStatus.outputOwner ? "active" : "inactive");
+                ImGui::Text("Effects: Constant %s | Spring %s | Damper %s | Periodic %s",
+                    ffbStatus.constantEffect ? "HW" : "-",
+                    ffbStatus.springEffect ? "HW" : "SW",
+                    ffbStatus.damperEffect ? "HW" : "SW",
+                    ffbStatus.periodicEffects ? "HW" : "SW");
+                if (ffbStatus.ffbStateValid)
+                {
+                    ImGui::Text("Driver state: actuators %s | power %s | safety %s | user switch %s%s%s",
+                        ffbStatus.actuatorsOn ? "ON" : "OFF",
+                        ffbStatus.powerOn ? "ON" : "OFF",
+                        ffbStatus.safetySwitchOn ? "ON" : "OFF",
+                        ffbStatus.userSwitchOn ? "ON" : "OFF",
+                        ffbStatus.paused ? " | PAUSED" : "",
+                        ffbStatus.deviceLost ? " | DEVICE LOST" : "");
+                    if (!ffbStatus.powerOn || !ffbStatus.safetySwitchOn || !ffbStatus.userSwitchOn || ffbStatus.deviceLost)
+                        ImGui::TextColored(ImVec4(1.0f, 0.45f, 0.25f, 1.0f),
+                            "Wheel/driver reports FFB disabled or unavailable. This page will not override a hardware safety/user switch.");
+                }
+                ImGui::TextDisabled("Dynamic effect capability: Constant %s, POLAR direction %s, Spring %s, Damper %s, Sine %s",
+                    ffbStatus.constantDynamic ? "yes" : "no",
+                    ffbStatus.polarDirectionDynamic ? "yes" : "no",
+                    ffbStatus.springDynamic ? "yes" : "no",
+                    ffbStatus.damperDynamic ? "yes" : "no",
+                    ffbStatus.periodicDynamic ? "yes" : "no");
             }
 
             draw_ffb_profiles();
@@ -1425,9 +1630,17 @@ namespace
                 track_ffb_change(ImGui::SliderFloat("Lateral Signal Deadzone", Settings::WheelFFBLateralDeadzone.ptr(), 0.0f, 8.0f, "%.2f"));
                 track_ffb_change(ImGui::SliderFloat("Gear Shift", Settings::WheelFFBGearShift.ptr(), 0.0f, 1.0f, "%.2f"));
                 track_ffb_change(ImGui::SliderFloat("Engine Idle", Settings::WheelFFBEngineIdle.ptr(), 0.0f, 0.50f, "%.2f"));
-                track_ffb_change(ImGui::SliderFloat("Force Slew Rate", Settings::WheelFFBSlewRate.ptr(), 0.01f, 1.0f, "%.3f"));
+                track_ffb_change(ImGui::SliderFloat("Force Build Slew Rate", Settings::WheelFFBSlewRate.ptr(), 0.01f, 1.0f, "%.3f"));
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip("Maximum structural-force change per 60 Hz tick. Lower is smoother/slower; higher responds faster.");
+                    ImGui::SetTooltip("Maximum normal structural-force build change per 60 Hz tick. Lower is smoother/slower; higher responds faster.");
+                track_ffb_change(ImGui::SliderFloat("Countersteer Release Rate", Settings::WheelFFBReversalReleaseRate.ptr(), 0.02f, 1.0f, "%.3f"));
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("When SAT reverses direction, stale torque unloads at least this fast before the new direction builds. This reduces counter-steer latency without speeding up normal force buildup.");
+                const float buildRate = std::max(0.01f, float(Settings::WheelFFBSlewRate));
+                const float reversalRate = std::max(0.02f, float(Settings::WheelFFBReversalReleaseRate));
+                ImGui::TextDisabled("Approx full-scale ramp: build %.0f ms | stale reversal release %.0f ms at 60 Hz.",
+                    (1.0f / buildRate) * (1000.0f / 60.0f),
+                    (1.0f / reversalRate) * (1000.0f / 60.0f));
                 if (Settings::WheelFFBPhysicsSat)
                 {
                     ImGui::SeparatorText("Physics SAT transient");
@@ -1490,11 +1703,22 @@ namespace
                 if (Settings::write(Module::UserIniPath))
                 {
                     ffbDirty_ = false;
+                    capture_saved_ffb();
                     status_ = "Force feedback settings saved.";
                 }
                 else
                     status_ = "Could not save force feedback settings.";
             }
+            ImGui::SameLine();
+            if (!ffbDirty_ || !savedFfb_.valid) ImGui::BeginDisabled();
+            if (ImGui::Button("Revert unsaved FFB"))
+            {
+                restore_saved_ffb();
+                ffbDirty_ = false;
+                WheelFFB_RequestSettingsTransition();
+                status_ = "Reverted live FFB tuning to the last saved state.";
+            }
+            if (!ffbDirty_ || !savedFfb_.valid) ImGui::EndDisabled();
 
             ImGui::SeparatorText("FFB Headroom / Clipping");
             const WheelFFBHeadroomSnapshot headroom = WheelFFB_GetHeadroomSnapshot();
@@ -1521,6 +1745,18 @@ namespace
             if (ImGui::Button("Reset headroom analysis"))
                 WheelFFB_ResetHeadroomStats();
 
+            ImGui::SeparatorText("Recent FFB Pipeline (last 3 seconds of driving)");
+            const WheelFFBGraphSnapshot graph = WheelFFB_GetGraphSnapshot();
+            if (graph.count > 1)
+            {
+                ImGui::PlotLines("Raw structural", graph.rawStructural.data(), int(graph.count), 0, nullptr, -1.5f, 1.5f, ImVec2(0, 46));
+                ImGui::PlotLines("Soft limited", graph.softLimited.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 46));
+                ImGui::PlotLines("Post slew", graph.postSlew.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 46));
+                ImGui::PlotLines("Final DirectInput", graph.finalOutput.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 46));
+            }
+            else
+                ImGui::TextDisabled("Drive for a moment, then open F11 to inspect the captured force pipeline.");
+
             ImGui::SeparatorText("Safe direction test");
             if (ImGui::Button("Test Left (20%)"))
                 WheelFFB_RequestDirectionTest(-1);
@@ -1546,6 +1782,7 @@ namespace
                 Settings::WheelFFBGripLoss = 0.65f;
                 Settings::WheelFFBWeightTransfer = 0.15f;
                 Settings::WheelFFBSlewRate = 0.040f;
+                Settings::WheelFFBReversalReleaseRate = 0.12f;
                 Settings::WheelFFBRoadTexture = 0.30f;
                 Settings::WheelFFBTireSlip = 0.20f;
                 Settings::WheelFFBWallImpact = 0.38f;
@@ -1584,6 +1821,7 @@ namespace
                 Settings::WheelFFBGripLoss = 0.65f;
                 Settings::WheelFFBWeightTransfer = 0.20f;
                 Settings::WheelFFBSlewRate = 0.045f;
+                Settings::WheelFFBReversalReleaseRate = 0.12f;
                 Settings::WheelFFBRoadTexture = 0.30f;
                 Settings::WheelFFBTireSlip = 0.20f;
                 Settings::WheelFFBWallImpact = 0.38f;
