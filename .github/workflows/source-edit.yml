@@ -20,18 +20,14 @@ jobs:
           ref: wheel-ffb
           fetch-depth: 0
 
-      - name: Apply reviewed source changes
-        run: |
-          python3 .github/source_edit_fix.py
-          python3 .github/source_edit.py
-          rm -f .github/source_edit_fix.py
+      - name: Apply five-pass review fixes
+        run: python3 .github/source_edit.py
 
       - name: Commit source-only changes
         run: |
+          rm -f .github/source_edit.py .github/workflows/source-edit.yml
           git config user.name "thp32tt"
           git config user.email "129367814+thp32tt@users.noreply.github.com"
           git add -A
-          git commit -m "refactor: separate wheel input and FFB ownership [skip ci]"
+          git commit -m "refactor: apply five-pass wheel FFB review fixes [skip ci]"
           git push origin HEAD:wheel-ffb
-
-# source-only execution marker: final-review-trigger
