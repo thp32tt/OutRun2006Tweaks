@@ -928,7 +928,7 @@ namespace
             if (Settings::WheelFFBUsePeriodicEffects &&
                 (!roadTextureEffect_ || !tireSlipEffect_) &&
                 (updateCounter_ % 60) == 0 &&
-                tick_reached(GetTickCount(), recreateHoldoffUntil_))
+                tick_reached(GetTickCount(), periodicRecreateHoldoffUntil_))
             {
                 create_periodic_effects();
             }
@@ -1363,7 +1363,8 @@ namespace
             release_directinput();
             selectedName_.clear();
             selectedGuid_ = {};
-            recreateHoldoffUntil_ = 0;
+            constantRecreateHoldoffUntil_ = 0;
+            periodicRecreateHoldoffUntil_ = 0;
             springRecreateHoldoffUntil_ = 0;
             damperRecreateHoldoffUntil_ = 0;
             reset_signal_state();
@@ -2129,7 +2130,7 @@ namespace
                 // Treat the two sines atomically. A half-created pair plus the
                 // software fallback would double one signal and distort tuning.
                 disable_periodics();
-                recreateHoldoffUntil_ = GetTickCount() + 500;
+                periodicRecreateHoldoffUntil_ = GetTickCount() + 500;
                 spdlog::warn(
                     "WheelFFB: complete hardware periodic pair unavailable; using ConstantForce fallback for both signals");
             }
@@ -2233,7 +2234,7 @@ namespace
                     "WheelFFB: periodic update failed (0x{:08X}); falling back to ConstantForce vibration",
                     (unsigned)hr);
                 disable_periodics();
-                recreateHoldoffUntil_ = GetTickCount() + 500;
+                periodicRecreateHoldoffUntil_ = GetTickCount() + 500;
                 return;
             }
 
@@ -2305,12 +2306,12 @@ namespace
             {
                 safe_release_effect(constantEffect_, "stale constant");
                 const DWORD now = GetTickCount();
-                if (tick_before(now, recreateHoldoffUntil_))
+                if (tick_before(now, constantRecreateHoldoffUntil_))
                     return;
 
                 if (!create_constant_effect())
                 {
-                    recreateHoldoffUntil_ = now + 500;
+                    constantRecreateHoldoffUntil_ = now + 500;
                     request_device_reinitialize("ConstantForce recreation rejected interface", hr);
                     return;
                 }
@@ -2825,7 +2826,8 @@ namespace
         DWORD retryAfter_ = 0;
         std::string failedInterfaceGuid_;
         DWORD failedInterfaceUntil_ = 0;
-        DWORD recreateHoldoffUntil_ = 0;
+        DWORD constantRecreateHoldoffUntil_ = 0;
+        DWORD periodicRecreateHoldoffUntil_ = 0;
         DWORD springRecreateHoldoffUntil_ = 0;
         DWORD damperRecreateHoldoffUntil_ = 0;
         DWORD lastUpdateTick_ = 0;
