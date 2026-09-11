@@ -1001,13 +1001,31 @@ namespace
                 bool ffbOutput)
             {
                 const std::string configuredGuid = lower_identity(configuredGuidValue);
+                const std::string configuredName = lower_identity(configuredNameValue);
+                std::string autoMatchedFfbGuid;
+                if (ffbOutput && configuredGuid.empty() && !configuredName.empty())
+                {
+                    // Match the FFB engine's DeviceName behavior: before F11 has
+                    // saved an exact GUID, values such as the shipped "MOZA"
+                    // default are case-insensitive product-name substrings.
+                    for (const auto& dev : devices)
+                    {
+                        if (dev.ffb && lower_identity(dev.name).find(configuredName) != std::string::npos)
+                        {
+                            autoMatchedFfbGuid = dev.guidKey;
+                            break;
+                        }
+                    }
+                }
                 auto isSelectedDevice = [&](const DeviceInfo& dev)
                 {
                     if (ffbOnly && !dev.ffb)
                         return false;
-                    return !configuredGuid.empty()
-                        ? dev.guidKey == configuredGuid
-                        : dev.name == configuredNameValue;
+                    if (!configuredGuid.empty())
+                        return dev.guidKey == configuredGuid;
+                    if (ffbOutput && !autoMatchedFfbGuid.empty())
+                        return dev.guidKey == autoMatchedFfbGuid;
+                    return dev.name == configuredNameValue;
                 };
 
                 std::string preview;
