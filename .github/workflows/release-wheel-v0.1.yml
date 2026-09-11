@@ -84,20 +84,22 @@ jobs:
             --notes-file RELEASE_NOTES_v0.1.md
 
   sync-release-notes:
-    if: "${{ github.event.head_commit.message == 'docs: add Korean documentation and release notices' }}"
+    if: "${{ github.event.head_commit.message == 'docs: add Korean documentation and release notices' || github.event.head_commit.message == 'release: publish v0.1 as stable' }}"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout documentation commit
         uses: actions/checkout@v7.0.1
 
-      - name: Sync bilingual notes to GitHub release v0.1
+      - name: Sync bilingual notes and publish stable GitHub release v0.1
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release edit v0.1 \
             --repo "$GITHUB_REPOSITORY" \
             --title 'OutRun2006Tweaks Wheel FFB v0.1' \
-            --notes-file RELEASE_NOTES_v0.1.md
+            --notes-file RELEASE_NOTES_v0.1.md \
+            --prerelease=false \
+            --latest
 
   remove-release:
     if: "${{ github.event.head_commit.message == 'chore: remove v0.1 release' }}"
