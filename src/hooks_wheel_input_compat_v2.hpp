@@ -315,7 +315,7 @@ namespace
 
         bool validate() override
         {
-            return Settings::WheelInputCompatibility;
+            return Settings::WheelInputCompatibility && !Settings::UseNewInput;
         }
 
         void declare_settings() override
