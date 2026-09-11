@@ -1,5 +1,6 @@
 name: Source-only 30-pass review
 
+# Trigger file for the one-time source review; removed after verification.
 on:
   push:
     branches: [ wheel-ffb ]
