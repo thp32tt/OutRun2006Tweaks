@@ -797,10 +797,17 @@ namespace
             {
                 const float oldSpeed =
                     speedHistory_[(speedHistoryIndex_ - 6) % SpeedHistoryCount];
-                const float longAccel = (speed - oldSpeed) * 5.0f;
+                const float longAccelSample = (speed - oldSpeed) * 5.0f;
+                if (std::isfinite(longAccelSample))
+                    smoothedLongAccel_ +=
+                        (longAccelSample - smoothedLongAccel_) * 0.25f;
+                const float configuredWeightTransfer =
+                    static_cast<float>(Settings::WheelFFBWeightTransfer);
+                const float weightTransfer = std::isfinite(configuredWeightTransfer)
+                    ? std::clamp(configuredWeightTransfer, 0.0f, 1.5f)
+                    : 0.0f;
                 loadMod = 1.0f + std::clamp(
-                    -longAccel * static_cast<float>(Settings::WheelFFBWeightTransfer),
-                    -0.06f, 0.08f);
+                    -smoothedLongAccel_ * weightTransfer, -0.06f, 0.08f);
             }
 
             float structural = 0.0f;
@@ -2430,6 +2437,7 @@ namespace
         void reset_signal_state()
         {
             smoothedLateral_ = 0.0f;
+            smoothedLongAccel_ = 0.0f;
             prevSteer_ = 0.0f;
             smoothedSteerRate_ = 0.0f;
             steerSampleValid_ = false;
@@ -2797,6 +2805,7 @@ namespace
         PeriodicState slipState_{};
 
         float smoothedLateral_ = 0.0f;
+        float smoothedLongAccel_ = 0.0f;
         float prevSteer_ = 0.0f;
         float smoothedSteerRate_ = 0.0f;
         bool steerSampleValid_ = false;
