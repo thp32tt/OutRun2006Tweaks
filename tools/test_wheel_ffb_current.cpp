@@ -25,9 +25,13 @@ int main() {
  require(pneumatic_sat_shape(.16f)>.98f,"pneumatic SAT peaks near prior 0.16rad region");
  require(pneumatic_sat_shape(.32f)<.50f,"pneumatic trail falls in deep understeer");
  require(combined_sat_shape(.16f,.25f)<=1.000001f,"combined SAT bounded");
- require(combined_sat_shape(.32f,.25f)>pneumatic_sat_shape(.32f),"mechanical trail preserves deep-slip torque");
+ require(mechanical_sat_shape(.12f,.25f)>0.10f,"mechanical trail acts in normal loaded corner");
+ require(mechanical_sat_shape(.32f,.25f)>mechanical_sat_shape(.12f,.25f),"mechanical term follows front lateral force");
+ require(combined_sat_shape(.32f,.25f)>pneumatic_sat_shape(.32f),"total trail preserves deep-slip torque");
  require(combined_sat_shape(.32f,0.0f)==pneumatic_sat_shape(.32f),"mechanical trail zero is pure pneumatic");
  require(std::abs(combined_sat_shape(.32f,.25f)-combined_sat_shape(-.32f,.25f))<1e-6f,"SAT shape symmetry");
+ require(pneumatic_sat_shape(.20f,.28f)<pneumatic_sat_shape(.20f,.20f),"phase-led growing slip drops pneumatic trail sooner");
+ require(pneumatic_sat_shape(.20f,.12f)>pneumatic_sat_shape(.20f,.20f),"phase-led recovering slip restores pneumatic trail sooner");
  for(int i=0;i<=7000;++i) {float a=i*.0001f;float p=pneumatic_sat_shape(a),c=combined_sat_shape(a,.25f);require(std::isfinite(p)&&p>=0&&p<=1.000001f,"pneumatic bounds");require(std::isfinite(c)&&c>=0&&c<=1.000001f,"combined bounds");}
  require(soft_saturate(.5f)==.5f,"soft clip linear midrange");
  require(std::abs(soft_saturate(-.5f)+.5f)<1e-6,"soft clip symmetry");

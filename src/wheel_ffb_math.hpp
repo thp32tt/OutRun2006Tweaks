@@ -44,27 +44,59 @@ namespace WheelFFBMath
         return 1.0f - (1.0f - ResidualTrail) * t;
     }
 
-    // Fy * pneumatic trail. Normalize the empirically-known peak of the two
-    // analytic curves so SteeringWeight keeps roughly the same normal-corner
-    // authority as the previous single trail_shape() implementation.
-    inline float pneumatic_sat_shape(float alpha)
+    // Reference peak of Fy * pneumatic trail. The absolute units are not
+    // available from OutRun, so this keeps SteeringWeight near its established
+    // scale while the relative trail terms shape the torque curve.
+    inline constexpr float PneumaticReferencePeak = 0.838899081f;
+
+    // Lateral force and pneumatic trail have different transient behaviour.
+    // forceAlpha is the filtered tyre-force slip, while trailAlpha may be a
+    // modest phase-led version used only by the pneumatic lever arm.
+    inline float pneumatic_sat_shape(float forceAlpha, float trailAlpha)
     {
-        if (!std::isfinite(alpha)) return 0.0f;
-        constexpr float RawPeak = 0.838899081f;
-        const float raw = lateral_force_shape(alpha) * pneumatic_trail_factor(alpha);
-        return std::clamp(raw / RawPeak, 0.0f, 1.0f);
+        if (!std::isfinite(forceAlpha) || !std::isfinite(trailAlpha)) return 0.0f;
+        const float raw =
+            lateral_force_shape(forceAlpha) * pneumatic_trail_factor(trailAlpha);
+        return std::clamp(raw / PneumaticReferencePeak, 0.0f, 1.0f);
     }
 
-    // Add a bounded mechanical/caster-trail component without turning it into
-    // an artificial steering-centre spring. It is driven by the same front Fy
-    // proxy and becomes relatively important only as pneumatic trail fades.
-    inline float combined_sat_shape(float alpha, float mechanicalTrailMix)
+    inline float pneumatic_sat_shape(float alpha)
     {
-        const float pneumatic = pneumatic_sat_shape(alpha);
-        const float fy = lateral_force_shape(alpha);
-        const float mix = std::clamp(mechanicalTrailMix, 0.0f, 0.60f);
-        const float mechanical = mix * fy * (1.0f - pneumatic);
-        return std::clamp(pneumatic + mechanical, 0.0f, 1.0f);
+        return pneumatic_sat_shape(alpha, alpha);
+    }
+
+    // Mechanical/caster trail contributes whenever front lateral force exists;
+    // it is not a substitute that appears only after pneumatic trail collapses.
+    // The setting is a normalized pseudo-trail ratio, not a physical distance.
+    inline float mechanical_sat_shape(float forceAlpha, float mechanicalTrailRatio)
+    {
+        if (!std::isfinite(forceAlpha)) return 0.0f;
+        const float ratio = std::clamp(mechanicalTrailRatio, 0.0f, 0.60f);
+        const float denominator = PneumaticReferencePeak + ratio;
+        return denominator > 0.0f
+            ? std::clamp(lateral_force_shape(forceAlpha) * ratio / denominator, 0.0f, 1.0f)
+            : 0.0f;
+    }
+
+    // Total aligning moment follows Fy * (pneumatic trail + mechanical trail).
+    // Normalize the total pseudo-trail so enabling mechanical trail reshapes
+    // the SAT curve without silently turning SteeringWeight into a second gain.
+    inline float combined_sat_shape(
+        float forceAlpha, float trailAlpha, float mechanicalTrailRatio)
+    {
+        if (!std::isfinite(forceAlpha) || !std::isfinite(trailAlpha)) return 0.0f;
+        const float ratio = std::clamp(mechanicalTrailRatio, 0.0f, 0.60f);
+        const float denominator = PneumaticReferencePeak + ratio;
+        if (denominator <= 0.0f)
+            return 0.0f;
+        const float raw = lateral_force_shape(forceAlpha) *
+            (pneumatic_trail_factor(trailAlpha) + ratio);
+        return std::clamp(raw / denominator, 0.0f, 1.0f);
+    }
+
+    inline float combined_sat_shape(float alpha, float mechanicalTrailRatio)
+    {
+        return combined_sat_shape(alpha, alpha, mechanicalTrailRatio);
     }
 
     // Kept as a compatibility alias for older host tests/tools. Production

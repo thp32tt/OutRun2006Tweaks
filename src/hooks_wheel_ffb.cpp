@@ -105,7 +105,13 @@ namespace Settings
 
     Setting<float> WheelFFBMechanicalTrail{
         "WheelFFB", "MechanicalTrail", 0.25f,
-        "Physics SAT mechanical/caster-trail contribution after pneumatic trail begins to fade. Not a centre spring.",
+        "Normalized mechanical/caster-trail ratio in Physics SAT. Acts with front lateral force across the corner; not a centre spring.",
+        Range<float>{ 0.0f, 0.60f }
+    };
+
+    Setting<float> WheelFFBTrailResponseLead{
+        "WheelFFB", "TrailResponseLead", 0.25f,
+        "Pneumatic-trail transient phase lead toward raw front slip. Lateral force and torque direction remain filtered.",
         Range<float>{ 0.0f, 0.60f }
     };
 
@@ -798,19 +804,29 @@ namespace
             // first near understeer while mechanical trail keeps useful rack
             // torque alive instead of making the wheel suddenly go dead.
             const float frontSlip = vehicleDynamics_.frontSlip();
+            const float rawFrontSlip = vehicleDynamics_.rawFrontSlip();
             float physicsSatTorque = 0.0f;
+            const float configuredTrailResponseLead =
+                static_cast<float>(Settings::WheelFFBTrailResponseLead);
+            const float trailResponseLead = std::isfinite(configuredTrailResponseLead)
+                ? std::clamp(configuredTrailResponseLead, 0.0f, 0.60f)
+                : 0.25f;
+            const float trailResponseSlip = std::clamp(
+                frontSlip + (rawFrontSlip - frontSlip) * trailResponseLead,
+                -0.70f, 0.70f);
             const float lateralForceShape = WheelFFBMath::lateral_force_shape(frontSlip);
-            const float pneumaticTrail = WheelFFBMath::pneumatic_trail_factor(frontSlip);
-            const float pneumaticSatShape = WheelFFBMath::pneumatic_sat_shape(frontSlip);
+            const float pneumaticTrail = WheelFFBMath::pneumatic_trail_factor(trailResponseSlip);
+            const float pneumaticSatShape =
+                WheelFFBMath::pneumatic_sat_shape(frontSlip, trailResponseSlip);
             const float configuredMechanicalTrail =
                 static_cast<float>(Settings::WheelFFBMechanicalTrail);
             const float mechanicalTrailMix = std::isfinite(configuredMechanicalTrail)
                 ? std::clamp(configuredMechanicalTrail, 0.0f, 0.60f)
                 : 0.25f;
             const float mechanicalContribution =
-                mechanicalTrailMix * lateralForceShape * (1.0f - pneumaticSatShape);
-            const float physicsShape =
-                WheelFFBMath::combined_sat_shape(frontSlip, mechanicalTrailMix);
+                WheelFFBMath::mechanical_sat_shape(frontSlip, mechanicalTrailMix);
+            const float physicsShape = WheelFFBMath::combined_sat_shape(
+                frontSlip, trailResponseSlip, mechanicalTrailMix);
             const float trailShape = pneumaticSatShape; // legacy telemetry field name
             const float physicsLoad = 0.62f + 0.48f * lateralLoadSmooth;
             const float rearSlideRelief = 1.0f - 0.15f * gripLoss * bodySlide;
@@ -1021,14 +1037,14 @@ namespace
                     periodicsActive_, outputStrength, bool(Settings::WheelFFBInvertForce),
                     bool(Settings::WheelFFBInvertSpring));
                 spdlog::info(
-                    "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} rawFrontSlip={} frontSlip={} frontBlend={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} diPreResponse={} diCorrected={} responseCorrection={}",
+                    "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} rawFrontSlip={} frontSlip={} frontBlend={} trailResponseSlip={} trailResponseLead={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} diPreResponse={} diCorrected={} responseCorrection={}",
                     telemetryNow,
                     vehicleDynamics_.rawBodySlip(), vehicleDynamics_.bodySlip(), vehicleDynamics_.bodySlipBlend(),
                     vehicleDynamics_.rawYawRate(), vehicleDynamics_.yawRate(), vehicleDynamics_.yawRateBlend(),
                     vehicleDynamics_.rawFrontSlip(), vehicleDynamics_.frontSlip(), vehicleDynamics_.frontSlipBlend(),
-                    lateralForceShape, pneumaticTrail, pneumaticSatShape, mechanicalTrailMix,
-                    mechanicalContribution, physicsShape, levelBeforeResponse, level,
-                    bool(Settings::WheelFFBResponseCorrection));
+                    trailResponseSlip, trailResponseLead, lateralForceShape, pneumaticTrail,
+                    pneumaticSatShape, mechanicalTrailMix, mechanicalContribution, physicsShape,
+                    levelBeforeResponse, level, bool(Settings::WheelFFBResponseCorrection));
                 // Raw horizontal bases allow row/column x X/Z candidates to be
                 // compared offline without changing the active steering model.
                 spdlog::info(

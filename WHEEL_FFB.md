@@ -71,6 +71,8 @@ Reverse Spring         OFF
 
 `Load MOZA R3 Natural SAT` keeps the same overall/effect baseline but disables Physics SAT and uses Steering Weight 1.75, Dynamic Damping 0.30, Weight Transfer 0.20 and Slew 0.045. Treat both as starting points: verify ConstantForce and Spring direction with the 20% safe tests before increasing hardware torque.
 
+For the R3, MOZA specifies a 3.9 Nm peak-torque direct-drive base with a 1000 Hz USB refresh capability. That USB figure does **not** create new OutRun physics samples: the game logic remains 60 Hz, so this fork deliberately does not synthesize a separate 1000/2000 Hz ConstantForce thread. While validating the game's SAT model, keep the Pit House **Base FFB Curve linear** and remember that Pit House mechanical centering, damping, inertia and friction are independent base-side forces that can stack with the game's Spring/Damper/SAT. Response correction remains off unless a measured wheel-response curve justifies it.
+
 ## Safety and lifecycle
 
 The DirectInput engine includes:
@@ -121,9 +123,9 @@ Thank you to those authors and community testers for making their work and hardw
 
 ## Research-informed SAT and wheel-response model
 
-Physics SAT now separates a **pneumatic-trail** component from a bounded **mechanical/caster-trail** component. Both are driven by the estimated front-slip/lateral-force proxy; mechanical trail is not a centre spring. Pneumatic SAT peaks around the normal loaded-corner region and falls first as front slip grows, while the mechanical contribution preserves some steering authority through deeper understeer instead of letting the wheel go artificially dead.
+Physics SAT separates a **pneumatic-trail** component from a bounded **mechanical/caster-trail** component. The combined proxy follows the standard aligning-moment structure `Fy * (pneumatic trail + mechanical trail)`: mechanical trail therefore acts whenever front lateral force exists instead of behaving like a fallback that only appears after pneumatic trail collapses. The total is normalized so `SteeringWeight` remains the primary gain, and mechanical trail is still not a centre spring.
 
-The vehicle estimator keeps the existing bicycle-model-inspired `roadWheelAngle - bodySlip - yawRate * yawLeadSeconds` relation, but its body-slip/yaw/front-slip filters are now speed-adaptive. This is a relaxation-length-inspired approximation: at higher vehicle speed the same fixed time low-pass created too much countersteer/SAT lag. Telemetry records both raw and filtered states plus the active blend values (`WheelFFB SATMODEL`).
+The vehicle estimator keeps the existing bicycle-model-inspired `roadWheelAngle - bodySlip - yawRate * yawLeadSeconds` relation, but its body-slip/yaw/front-slip filters are speed-adaptive. This is a relaxation-length-inspired approximation: at higher vehicle speed the same fixed time low-pass created too much countersteer/SAT lag. Aligning moment has different transient behaviour from lateral force, so **Pneumatic Trail Response Lead** lets only the pneumatic lever arm move part-way toward raw front slip while lateral force and torque direction remain on the filtered signal. The default 0.25 is deliberately conservative and telemetry records `trailResponseSlip` / `trailResponseLead` for hardware validation.
 
 `Force Feedback -> FFB Headroom / Clipping` measures sustained structural demand only. Crash/gear events, startup/recreate ramps and near-stop frames are excluded. P95/P99, soft-knee occupancy and hard-cap demand are reported, with a non-automatic Overall Strength suggestion targeting roughly 90% P99 demand.
 

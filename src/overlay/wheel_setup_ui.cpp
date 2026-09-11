@@ -45,6 +45,7 @@ namespace Settings
     extern Setting<float> WheelFFBDamperStrength;
     extern Setting<float> WheelFFBSteeringWeight;
     extern Setting<float> WheelFFBMechanicalTrail;
+    extern Setting<float> WheelFFBTrailResponseLead;
     extern Setting<bool> WheelFFBPhysicsSat;
     extern Setting<float> WheelFFBGripLoss;
     extern Setting<float> WheelFFBLateralDeadzone;
@@ -1399,7 +1400,7 @@ namespace
             {
                 track_ffb_change(ImGui::SliderFloat("Mechanical / Caster Trail", Settings::WheelFFBMechanicalTrail.ptr(), 0.0f, 0.60f, "%.2f"));
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip("Adds bounded front-lateral-force restoring torque as pneumatic trail fades. This is not a centre spring; 0 disables the mechanical/caster contribution.");
+                    ImGui::SetTooltip("Normalized mechanical/caster trail acts with front lateral force throughout a corner. 0 disables it; this is not a centre spring.");
             }
             track_ffb_change(ImGui::SliderFloat("Grip-loss Response", Settings::WheelFFBGripLoss.ptr(), 0.0f, 1.0f, "%.2f"));
 
@@ -1409,6 +1410,7 @@ namespace
             track_ffb_change(ImGui::Checkbox("Hardware GUID_Spring", Settings::WheelFFBUseHardwareSpring.ptr()));
             ImGui::SameLine();
             track_ffb_change(ImGui::Checkbox("Hardware GUID_Damper", Settings::WheelFFBUseHardwareDamper.ptr()));
+            ImGui::TextDisabled("Wheelbase/driver-side spring, damping, inertia or friction are additional forces; keep them conservative while tuning game-side feel.");
 
             ImGui::SeparatorText("Effects");
             track_ffb_change(ImGui::SliderFloat("Road Detail", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 0.50f, "%.2f"));
@@ -1426,6 +1428,13 @@ namespace
                 track_ffb_change(ImGui::SliderFloat("Force Slew Rate", Settings::WheelFFBSlewRate.ptr(), 0.01f, 1.0f, "%.3f"));
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip("Maximum structural-force change per 60 Hz tick. Lower is smoother/slower; higher responds faster.");
+                if (Settings::WheelFFBPhysicsSat)
+                {
+                    ImGui::SeparatorText("Physics SAT transient");
+                    track_ffb_change(ImGui::SliderFloat("Pneumatic Trail Response Lead", Settings::WheelFFBTrailResponseLead.ptr(), 0.0f, 0.60f, "%.2f"));
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Lets pneumatic trail react part-way toward raw front slip while lateral force and torque direction stay filtered. Higher reduces SAT lag but can expose more telemetry noise.");
+                }
 
                 ImGui::SeparatorText("Wheel hardware calibration");
                 track_ffb_change(ImGui::Checkbox("Enable wheel response correction", Settings::WheelFFBResponseCorrection.ptr()));
@@ -1533,6 +1542,7 @@ namespace
                 Settings::WheelFFBDamperStrength = 0.28f;
                 Settings::WheelFFBSteeringWeight = 1.45f;
                 Settings::WheelFFBMechanicalTrail = 0.25f;
+                Settings::WheelFFBTrailResponseLead = 0.25f;
                 Settings::WheelFFBGripLoss = 0.65f;
                 Settings::WheelFFBWeightTransfer = 0.15f;
                 Settings::WheelFFBSlewRate = 0.040f;
@@ -1570,6 +1580,7 @@ namespace
                 Settings::WheelFFBDamperStrength = 0.30f;
                 Settings::WheelFFBSteeringWeight = 1.75f;
                 Settings::WheelFFBMechanicalTrail = 0.25f;
+                Settings::WheelFFBTrailResponseLead = 0.25f;
                 Settings::WheelFFBGripLoss = 0.65f;
                 Settings::WheelFFBWeightTransfer = 0.20f;
                 Settings::WheelFFBSlewRate = 0.045f;
