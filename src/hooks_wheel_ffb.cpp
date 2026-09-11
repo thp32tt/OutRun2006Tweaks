@@ -652,10 +652,12 @@ namespace
                         : springStrength * warmupScale * recreateScale * outputStrength);
             }
 
+            const float softwareSpringSign = Settings::WheelFFBInvertSpring
+                ? 1.0f : -1.0f;
             const float softwareSpring =
                 springEffect_
                     ? 0.0f
-                    : -steer * springStrength;
+                    : steer * softwareSpringSign * springStrength;
 
             // ACC/AMS2-inspired dynamic damping. It resists steering velocity
             // rather than pulling toward centre, grows with vehicle speed, and

@@ -186,4 +186,5 @@ req(ffb, 'vehicleDynamics_.reset_dynamic();', 'engine transitions preserve dynam
 req(dyn, 'calibrationSamples_ >= CalibrationSamplesRequired * 4', 'ambiguous basis calibration retries with a fresh window')
 forbid(ffb, 'bypassSlew', 'events never bypass sustained steering slew')
 req(ffb, 'const LONG eventLevel = static_cast<LONG>', 'events have an independent immediate output path')
+req(ffb, 'const float softwareSpringSign = Settings::WheelFFBInvertSpring', 'Reverse Spring also controls software fallback')
 print('CURRENT WHEEL FFB STRUCTURE VERIFIED; run verify_wheel_ffb_math.py for numerical tests')
