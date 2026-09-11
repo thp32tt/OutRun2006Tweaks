@@ -1,5 +1,6 @@
 name: Source-only detailed 30-pass profile review
 
+# One-time source review trigger; removed after verification.
 on:
   push:
     branches: [ wheel-ffb ]
