@@ -174,6 +174,18 @@ public:
                         calibrated_ = true;
                         clear_dynamic_state();
                     }
+                    else if (calibrationSamples_ >= CalibrationSamplesRequired * 4)
+                    {
+                        // Do not let a noisy launch poison the basis average for
+                        // the rest of the race. Retry from a fresh straight-line
+                        // window while Natural SAT remains fully available.
+                        calibrationSamples_ = 0;
+                        calibrationScoreX_ = 0.0f;
+                        calibrationScoreZ_ = 0.0f;
+                        calibrationSignedX_ = 0.0f;
+                        calibrationSignedZ_ = 0.0f;
+                        calibrationConfidence_ = 0.0f;
+                    }
                 }
             }
         }
