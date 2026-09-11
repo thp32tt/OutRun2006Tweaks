@@ -664,9 +664,12 @@ namespace
             // implement it and keep the old software term as a fallback.
             const float dampingSpeed =
                 0.10f + 0.90f * std::pow(speedNorm, 1.30f);
-            // Release steering damping only when the chassis is actually
-            // sliding. A high lateral-G but fully-gripped corner keeps damping.
-            const float damperRelease = 1.0f - 0.55f * gripLoss * bodySlide;
+            // Release steering damping from real tyre/chassis slip, never
+            // from lateral-G alone. Front scrub gets a slightly smaller weight
+            // than body slide so understeer is readable without making the rack
+            // go completely loose in an ordinary loaded corner.
+            const float damperSlipRelief = std::max(bodySlide, frontScrub * 0.75f);
+            const float damperRelease = 1.0f - 0.55f * gripLoss * damperSlipRelief;
             const float dynamicDamperStrength = std::clamp(
                 static_cast<float>(Settings::WheelFFBDamperStrength) *
                     dampingSpeed * damperRelease,
@@ -900,7 +903,7 @@ namespace
             {
                 lastTelemetryTick_ = telemetryNow;
                 spdlog::info(
-                    "WheelFFB SAMPLE t={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperCoefficient={} roadAmp={} slipAmp={} structural={} event={} preClip={} postClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
+                    "WheelFFB SAMPLE t={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperRelease={} damperCoefficient={} roadAmp={} slipAmp={} structural={} event={} preClip={} postClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
                     telemetryNow, static_cast<const void*>(car), speedRaw, speedNorm, steer, rawSteerRate, steerRate,
                     car->field_264, car->field_268, lateralRaw, smoothedLateral_, lateralLoadSmooth,
                     vehicleDynamics_.bodySlip(), bodySlide, vehicleDynamics_.yawRate(), frontSlip, frontScrub,
@@ -910,7 +913,7 @@ namespace
                     vehicleDynamics_.forwardAxis(), vehicleDynamics_.calibrationConfidence(),
                     vehicleDynamics_.sampleValid(), physicsMix, physicsSatTorque, selfAligningTorque,
                     trailShape, physicsLoad, rearSlideRelief, springStrength, prevSpringCoefficient_,
-                    dynamicDamperStrength, prevDamperCoefficient_, roadAmp, slipAmp,
+                    dynamicDamperStrength, damperRelease, prevDamperCoefficient_, roadAmp, slipAmp,
                     structural, events, total, compressed, structuralLevel, level, prevConstantLevel_,
                     constantEffectPolar_, springEffect_ != nullptr, damperEffect_ != nullptr,
                     periodicsActive_, outputStrength, bool(Settings::WheelFFBInvertForce),
