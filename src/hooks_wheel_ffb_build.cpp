@@ -36,7 +36,7 @@ namespace Settings
     Setting<int> WheelFFBFeelRevision{
         "WheelFFB", "FeelRevision", 0,
         "Internal one-shot migration version for wheel FFB feel defaults.",
-        Range<int>{ 0, 2 }
+        Range<int>{ 0, 3 }
     };
 }
 
@@ -66,37 +66,65 @@ namespace
                uniqueStage == 34 || uniqueStage == 49;
     }
 
-    float sample_max_surface_roughness(EVWORK_CAR* car)
+    struct RoadSurfaceProfile
     {
-        if (!car)
-            return 0.0f;
+        float minimum = 1.0f;
+        float maximum = 0.0f;
+        float spread = 0.0f;
+        int validSamples = 0;
+    };
 
-        float roughness = 0.0f;
+    RoadSurfaceProfile sample_surface_profile(EVWORK_CAR* car)
+    {
+        RoadSurfaceProfile result{};
+        if (!car)
+            return result;
+
         DWORD waterFlag = 0;
         for (int i = 0; i < 4; ++i)
         {
-            const float surfaceRoughness = static_cast<float>(sub_1149C0(
+            const float roughness = static_cast<float>(sub_1149C0(
                 car->water_flag_24C[i],
                 static_cast<int>(car->OnRoadPlace_5C.loadColiType_0),
                 &waterFlag));
-            if (std::isfinite(surfaceRoughness))
-                roughness = std::max(roughness, surfaceRoughness);
+            if (!std::isfinite(roughness))
+                continue;
+
+            result.minimum = std::min(result.minimum, roughness);
+            result.maximum = std::max(result.maximum, roughness);
+            ++result.validSamples;
         }
-        return roughness;
+
+        if (result.validSamples == 0)
+        {
+            result.minimum = 0.0f;
+            return result;
+        }
+
+        result.spread = std::max(0.0f, result.maximum - result.minimum);
+        return result;
     }
+
+    DWORD lastRoadCompatibilityLogTick = 0;
 }
 
 // MOZA R3 reports GUID_Sine creation/update support successfully, but real
 // hardware testing shows that its road-texture sine can be effectively
-// inaudible at the wheel. The engine already has a headroom-limited
-// ConstantForce vibration fallback, so make that the reliable R3 path.
+// inaudible at the wheel. The engine already has a ConstantForce vibration
+// fallback, so make that the reliable R3 path.
 //
-// Snow/Ice has a separate 4% attenuation in the production engine to avoid a
-// constant DD-wheel buzz from the material baseline. Preserve a subtle 20%
-// baseline there, but cancel that attenuation when the game's own per-wheel
-// roughness rises above 0.55 (curb, shoulder, rough surface). Because the
-// engine takes the maximum of all four wheel samples, one or two wheels are
-// enough to trigger the tactile response.
+// A second R3-specific issue appears under loaded cornering: the sustained SAT
+// can consume most of the ConstantForce range, making a small symmetric texture
+// ripple almost disappear. During a *real surface transition* only (one/two
+// wheels on a curb/shoulder, or a genuinely rough material), temporarily unload
+// SAT/damping and normalize RoadTexture to a clear tactile amplitude. This does
+// not weaken ordinary cornering and does not make straight asphalt vibrate.
+//
+// Snow is special because its four-wheel baseline can itself be around 0.50.
+// Looking only at max roughness therefore misses a curb whose contacted wheels
+// become *less* rough than the snow. The min/max spread across all four wheels
+// catches that mixed-surface case regardless of which material has the larger
+// scalar value.
 void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
 {
     const bool r3Compatibility = r3_road_texture_compatibility_needed();
@@ -109,27 +137,88 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
 
     const float originalRoadTexture =
         static_cast<float>(Settings::WheelFFBRoadTexture);
-    bool restoreRoadTexture = false;
+    const float originalSteeringWeight =
+        static_cast<float>(Settings::WheelFFBSteeringWeight);
+    const float originalDamperStrength =
+        static_cast<float>(Settings::WheelFFBDamperStrength);
 
-    if (r3Compatibility && car && is_snow_or_ice_stage_for_ffb())
+    bool restoreTactileOverrides = false;
+
+    if (r3Compatibility && car)
     {
-        const float roughness = sample_max_surface_roughness(car);
+        const RoadSurfaceProfile surface = sample_surface_profile(car);
+        const bool mixedSurface =
+            surface.validSamples >= 2 && surface.spread >= 0.08f;
+        const bool genuinelyRough = surface.maximum >= 0.60f;
+        const bool tactileSurface = mixedSurface || genuinelyRough;
 
-        // hooks_wheel_ffb.cpp multiplies Snow/Ice RoadTexture by 0.04. A factor
-        // of 25 therefore restores the normal surface amplitude. Leave the
-        // ordinary snow/ice material at only 20% of normal (factor 5), while
-        // letting a curb/shoulder roughness excursion use full tactile force.
-        constexpr float CoreSnowScale = 0.04f;
-        const float desiredRelativeScale = roughness > 0.55f ? 1.0f : 0.20f;
-        Settings::WheelFFBRoadTexture =
-            originalRoadTexture * (desiredRelativeScale / CoreSnowScale);
-        restoreRoadTexture = true;
+        if (tactileSurface)
+        {
+            const float speedRaw = std::isfinite(car->field_1C4)
+                ? car->field_1C4 : 0.0f;
+            const float speedNorm = std::clamp(speedRaw / 2.0f, 0.0f, 1.0f);
+            const float roadSpeedGate =
+                std::clamp((speedNorm - 0.05f) / 0.20f, 0.0f, 1.0f);
+            const float textureRoughness =
+                std::clamp((surface.maximum - 0.30f) / 0.55f, 0.0f, 1.0f);
+            const float outputStrength = std::clamp(
+                static_cast<float>(Settings::WheelFFBGlobalStrength), 0.0f, 1.5f);
+            const bool snowStage = is_snow_or_ice_stage_for_ffb();
+            const float coreStageScale = snowStage ? 0.04f : 1.0f;
+
+            // Aim for a consistent normalized tactile ripple instead of simply
+            // multiplying the user's RoadTexture everywhere. Mixed curb/edge
+            // contact is deliberately stronger than a fully rough road.
+            const float desiredRoadAmp = mixedSurface ? 0.30f : 0.22f;
+            const float envelope =
+                textureRoughness * roadSpeedGate * outputStrength * coreStageScale;
+            if (envelope > 0.0005f)
+            {
+                // This value is temporary for one physics tick and is restored
+                // immediately below. Values above the UI range are intentional:
+                // they compensate the core's snow attenuation and/or a small
+                // material scalar, while the resulting roadAmp stays bounded by
+                // desiredRoadAmp and the DirectInput output remains hard capped.
+                const float normalizedRoadSetting = desiredRoadAmp / envelope;
+                Settings::WheelFFBRoadTexture = std::clamp(
+                    std::max(originalRoadTexture, normalizedRoadSetting),
+                    0.0f, 120.0f);
+            }
+
+            // A curb hit should be felt as a brief rack unload/rattle, not be
+            // buried underneath the cornering torque. Only relax these while a
+            // mixed/rough surface is actually under the tyres.
+            const float steeringScale = mixedSurface ? 0.72f : 0.80f;
+            const float damperScale = mixedSurface ? 0.55f : 0.70f;
+            Settings::WheelFFBSteeringWeight =
+                originalSteeringWeight * steeringScale;
+            Settings::WheelFFBDamperStrength =
+                originalDamperStrength * damperScale;
+            restoreTactileOverrides = true;
+
+            const DWORD now = GetTickCount();
+            if (Settings::WheelFFBDebugLog &&
+                now - lastRoadCompatibilityLogTick >= 750)
+            {
+                lastRoadCompatibilityLogTick = now;
+                spdlog::info(
+                    "WheelFFB ROAD: min={:.2f} max={:.2f} spread={:.2f} mixed={} snow={} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
+                    surface.minimum, surface.maximum, surface.spread,
+                    mixedSurface, snowStage, desiredRoadAmp,
+                    static_cast<float>(Settings::WheelFFBRoadTexture),
+                    steeringScale, damperScale);
+            }
+        }
     }
 
     WheelFFB_UpdateAfterPhysics_Core(car);
 
-    if (restoreRoadTexture)
+    if (restoreTactileOverrides)
+    {
         Settings::WheelFFBRoadTexture = originalRoadTexture;
+        Settings::WheelFFBSteeringWeight = originalSteeringWeight;
+        Settings::WheelFFBDamperStrength = originalDamperStrength;
+    }
 }
 
 namespace
@@ -252,10 +341,26 @@ namespace
             {
                 // R3 accepts GUID_Sine calls but the user's hardware produces no
                 // useful tactile output from them. Route road/slip vibration
-                // through the already headroom-limited ConstantForce fallback.
+                // through the ConstantForce fallback.
                 Settings::WheelFFBUsePeriodicEffects = false;
                 Settings::WheelFFBFeelRevision = 2;
                 revision = 2;
+                changed = true;
+            }
+
+            if (revision < 3)
+            {
+                // DirectInput exposes this R3 as "R3 Racing Wheel and Pedals"
+                // (SDL may prepend "Gudsen"), so the old default substring
+                // "MOZA" cannot match a clean install. Use the stable R3 product
+                // substring; once initialized the core still pins the exact GUID.
+                const std::string configured =
+                    lower_copy(Settings::WheelFFBDeviceName.get().c_str());
+                if (configured == "moza")
+                    Settings::WheelFFBDeviceName = "R3 Racing Wheel";
+
+                Settings::WheelFFBFeelRevision = 3;
+                revision = 3;
                 changed = true;
             }
 
@@ -270,6 +375,11 @@ namespace
                 spdlog::warn(
                     "WheelFFBFeelRetune: applied revision {} for this session but could not persist user.ini",
                     revision);
+            }
+            else if (revision >= 3)
+            {
+                spdlog::info(
+                    "WheelFFBFeelRetune: applied revision 3 (R3 DirectInput auto-match + mixed-surface curb tactile)");
             }
             else if (revision >= 2)
             {
