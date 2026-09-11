@@ -1,140 +1,102 @@
 # Wheel / FFB architecture — v0.1
 
-This document describes the `wheel-ffb` branch used for **OutRun2006Tweaks Wheel FFB v0.1**.
+This document describes the release architecture of the `wheel-ffb` branch used for **OutRun2006Tweaks Wheel FFB v0.1**.
 
 ## Scope
 
-v0.1 was created primarily for a personal **MOZA R3** setup and has only been personally hardware-tested on that wheel. It is shared as an experimental community build for anyone who may find it useful.
+v0.1 was developed primarily around a **MOZA R3** and the tested default path is:
 
-## Architecture
+- input: SDL3 raw multi-device input;
+- force feedback: Windows DirectInput COM;
+- build: Win32 x86;
+- game update rate: OutRun's native 60 Hz gameplay loop.
 
-Input and force feedback deliberately use separate owners:
+Other DirectInput wheels may work, but the R3 is the main hardware validation target for this release.
 
-- **Input owner:** SDL3 raw joystick multi-device path.
-- **FFB owner:** custom Windows DirectInput COM engine.
-- Wheels, pedals, shifters, button boxes and gamepads can be bound independently.
-- FFB is pinned to the selected DirectInput device GUID rather than whichever similarly named interface appears first.
-- Legacy original-game DirectInput input remains an explicit compatibility fallback; it is not the v0.1 default.
-- Application-level SDL Haptic is not used as the wheel FFB backend.
+## Input ownership
 
-This separation avoids having an input poller and an FFB backend fight over the same exclusive DirectInput handle.
+With `UseNewInput=true`, **Input Bindings is the only input-binding owner** for steering, pedals, buttons and menu controls. Wheel, separate pedals, shifter, button box and gamepad can all contribute to one player at the same time.
 
-## Input setup
+The older legacy DirectInput path remains available only as a compatibility fallback. The v0.1 release documentation no longer directs users through the removed Quick Setup flow.
 
-With the default `UseNewInput=true` path, **Input Bindings** is the single owner of steering, pedals, shifter/buttons and menu controls. Open it from the game's Controller Configuration screen, from **Settings → Controls → Configure Input Bindings**, or directly from **F11 → Force Feedback → Open Input Bindings**.
+Bindings identify raw devices using stable physical identity data where possible and persist separately from named FFB feel profiles.
 
-Quick Setup currently walks through Steering, Accelerator, Brake, Shift Up/Down, Start, Confirm, Back and Menu Up/Right/Down/Left. Each captured raw-device source replaces bindings only from the same currently resolved physical SDL device, so a wheel pass does not erase separate pedals, a shifter/button box or the default gamepad bindings. A step can be skipped when the wheel has no matching control. The completion screen keeps steering/pedal calibration inside the guided flow: newly captured raw axes start with unmeasured end-stops, and **Save & Drive** remains disabled until Steering, Accelerator and Brake are present and their raw-axis travel has been calibrated. **Keep & Fine-tune** remains available for additional manual edits.
+## FFB ownership
 
-Bindings are live immediately but are not durable until saved. Manual edits expose **Save & Return to game** so it is explicit whether the current mapping has been persisted. While a manual binding is listening, the exact binding button is visually inverted and labelled as listening where appropriate, and a duplicate-control warning identifies other actions already using that physical control without forbidding intentional sharing. The **Profiles** tab can save the complete multi-device binding set as `OutRun2006Tweaks.profiles/Input/<name>.ini`; steering deadzone, sensitivity bypass, input backend and the exact selected DirectInput FFB output identity travel with that wheel profile. Loading a profile also updates the normal `OutRun2006Tweaks.input.ini` and user settings, invalidates the previous wheel's FFB direction-test result, and survives the next restart. The separately named FFB feel profiles remain device-independent.
+The wheel FFB backend is a single DirectInput COM owner. It pins output to the selected DirectInput device identity instead of whichever similarly named interface is enumerated first.
 
-The Controllers page provides live raw axis/button/hat diagnostics and hotplugged devices appear automatically. Binding identity prefers VID/PID plus serial when available; USB path is only a duplicate-device fallback rather than a hard requirement.
+The main steering model contains:
 
-## Force model
+1. **Physics SAT** — estimates front slip from vehicle motion, steering and yaw, then derives aligning torque from lateral force and total trail.
+2. **Natural SAT fallback** — progressive steering-angle-based restoring torque when the physics sample is unavailable or Physics SAT is disabled.
+3. **Mechanical / caster trail** — remains active with front lateral load instead of acting as an artificial center spring.
+4. **Low-speed spring** — only a stabilizer near low speed; deliberately reduced on the tested R3 feel.
+5. **Dynamic damping** — steering-velocity resistance that releases as the front end scrubs or the car slides.
+6. **Grip-loss unloading** — reduces steering load as usable front grip falls away.
+7. **Road / tire / gear / collision effects** — transient tactile effects layered on top of the structural steering signal.
 
-The FFB owner is the custom DirectInput COM engine and remains separate from SDL input ownership. The main steering model now has two SAT paths:
+## MOZA R3 compatibility path
 
-1. **Physics SAT** — estimates front slip from steering angle, body slip and yaw, then shapes it with a pneumatic-trail-like curve. It requires a current valid motion sample.
-2. **Natural SAT** — steering-angle based progressive restoring torque. It is also the full-strength fallback while Physics SAT is calibrating or temporarily lacks valid motion telemetry.
-3. **Centering Spring** — low-speed stabilizer, preferably DirectInput `GUID_Spring` when supported.
-4. **Dynamic Damping** — resists steering velocity and releases with real front scrub/body slide.
-5. **Weight Transfer** — filtered longitudinal acceleration/braking modulation of steering load.
-6. **Collision / Gear Shift** — short event impulses kept separate from sustained steering slew.
-7. **Road Detail / Tire Slip** — hardware sine effects where available, with a ConstantForce fallback that only uses remaining steering headroom.
+The R3 driver can accept creation/update of a DirectInput sine effect while the physical road texture remains effectively inaudible. v0.1 therefore forces road/slip vibration through the **ConstantForce fallback** on the R3 path.
 
-`field_264/268` are used as lateral-load magnitude only; grip/slip decisions come from the vehicle-dynamics estimator. GlobalStrength is software model gain, while DirectInput device/effect gain stays at `DI_FFNOMINALMAX`. Sustained force passes through the production soft-knee limiter and DD-safe slew path.
+Road contact is sampled across all four wheels. The compatibility layer distinguishes:
 
-The dedicated Force Feedback page exposes common controls directly and keeps lower-level but still supported values under **Advanced FFB tuning** (Spring Saturation, Weight Transfer, Lateral Signal Deadzone, Gear Shift, Engine Idle and Force Slew Rate). Named feel profiles are stored separately under `OutRun2006Tweaks.profiles/FFB/<name>.ini`. They intentionally exclude the DirectInput output-device GUID/name and diagnostic logging, so switching a force profile cannot silently redirect torque to another wheel. Loading a profile zeroes the current effects and restarts the normal DD-safe warm-up ramp before the new values take over.
+- **mixed surface** — meaningful roughness spread while only part of the car is on a curb/shoulder;
+- **fully rough surface** — all sampled wheels are on a high-roughness surface;
+- **ordinary surface** — no extra tactile override.
 
-## MOZA R3 recommended profiles
+Mixed and fully rough curb states use the same strong tactile profile so vibration does not disappear when the remaining wheels cross fully onto the curb. During tactile contact the R3 path temporarily reduces structural SAT/damping enough for the road ripple to remain perceptible under corner load, then immediately restores the user's normal settings.
 
-The current UI provides two saved starting points rather than the obsolete single `v0.1 default` button.
+Snow stages have a much lower core road-texture scale. The R3 compatibility wrapper compensates that attenuation only when a real tactile surface is detected, so the normal snow road itself does not become a constant buzz.
 
-```text
-Load MOZA R3 Physics SAT
-Overall Strength       0.70
-Centering Spring       0.65
-Spring Saturation      0.95
-Dynamic Damping        0.28
-Self-aligning Torque   1.45
-Grip-loss Response     0.65
-Weight Transfer        0.15
-Force Slew Rate        0.040
-Road Detail            0.30
-Tire Slip              0.20
-Collision              0.38
-Hardware Spring        ON
-Hardware Damper        ON
-Hardware sine effects  ON
-Reverse SAT/CF         ON
-Reverse Spring         OFF
-```
+## Device selection and safety
 
-`Load MOZA R3 Natural SAT` keeps the same overall/effect baseline but disables Physics SAT and uses Steering Weight 1.75, Dynamic Damping 0.30, Weight Transfer 0.20 and Slew 0.045. Treat both as starting points: verify ConstantForce and Spring direction with the 20% safe tests before increasing hardware torque.
+- Clean R3 setups auto-match the DirectInput product substring `R3 Racing Wheel`.
+- Once a device is selected, the exact DirectInput GUID is persisted.
+- Focus loss, state transitions and device loss clear active effects.
+- Device reconnect schedules normal DirectInput reinitialization.
+- Manual left/right direction tests are hard-capped at 20% and only run during active gameplay.
+- A wheel-output owner suppresses duplicate gamepad rumble ownership where required.
 
-For the R3, MOZA specifies a 3.9 Nm peak-torque direct-drive base with a 1000 Hz USB refresh capability. That USB figure does **not** create new OutRun physics samples: the game logic remains 60 Hz, so this fork deliberately does not synthesize a separate 1000/2000 Hz ConstantForce thread. While validating the game's SAT model, keep the Pit House **Base FFB Curve linear** and remember that Pit House mechanical centering, damping, inertia and friction are independent base-side forces that can stack with the game's Spring/Damper/SAT. Response correction remains off unless a measured wheel-response curve justifies it.
+## R3 release feel
 
-## Safety and lifecycle
+The release retune intentionally moved away from a heavy artificial spring:
 
-The DirectInput engine includes:
+- low-speed spring reduced;
+- spring saturation reduced;
+- SAT remains the main cornering load;
+- road texture is strengthened for the ConstantForce fallback;
+- tire-slip buzz is kept low;
+- gear-change feedback is made clearly perceptible;
+- snow/curb tactile handling is R3-specific and does not globally weaken ordinary cornering.
 
-- startup/reconnect force ramping;
-- foreground/gameplay checks before torque updates;
-- force zeroing and transient-event reset on focus loss;
-- watchdog behavior when the FFB update path stalls;
-- device-loss reacquire/reinitialize handling;
-- panic-stop handling on game/window shutdown;
-- safe left/right direction tests fixed at 20%, rejected outside gameplay;
-- periodic road/tire/collision/shift signals silenced during manual direction tests.
+These are starting values rather than a guarantee for every firmware/Pit House configuration.
 
-Direct-drive wheels can still produce significant force. Keep a conservative hardware torque limit while testing a new wheel or driver.
+## Diagnostics
 
-## Compatibility notes
+`OutRun2006Tweaks.log` records:
 
-### MOZA R3
+- selected DirectInput FFB identity;
+- effect creation/fallback status;
+- SAT and final output diagnostics;
+- R3 road-contact diagnostics including min/max roughness, spread, mixed/full-rough state and temporary tactile scaling.
 
-Personally tested in v0.1. In the tested setup:
+For a useful hardware report, include the full launch → race → exit log plus wheel-base model, driver and firmware version.
 
-- 270° steering range was used;
-- Spring direction works with normal/positive coefficients;
-- Reverse Spring is OFF;
-- steering, pedals, menu directions/buttons and FFB operate through the multi-device + DirectInput split architecture.
+## Build and release validation
 
-### Other hardware
+CI runs:
 
-Other DirectInput-compatible wheels may work, including devices that expose separate input and FFB interfaces. v0.1 should still be treated as **untested** on hardware other than the MOZA R3 until community reports are available.
+- `tools/verify_wheel_ffb_current.py` against the consolidated production source;
+- the production wheel FFB math test;
+- Win32 Release compilation;
+- PE32 payload checks and compiled marker verification;
+- final artifact upload from the exact release commit.
 
-For a report, include:
+The v0.1 release workflow waits for the matching successful Build workflow before publishing the ZIP.
 
-- wheel base / rim / pedals / shifter models;
-- driver and firmware versions;
-- whether input appears in F11 Controllers;
-- whether the selected FFB device passes direction tests;
-- `OutRun2006Tweaks.log` from a complete launch → race → exit session.
+## Credits / license
 
-## Credits
+The implementation is based on `emoose/OutRun2006Tweaks` and incorporates design lessons from public OutRun wheel work including `hyp36rmax/multi-device-input` and `d-b-c-e/OutRun2006Tweaks-FFB`.
 
-The implementation and design work builds on community references from:
-
-- [emoose/OutRun2006Tweaks](https://github.com/emoose/OutRun2006Tweaks)
-- [hyp36rmax/multi-device-input](https://github.com/hyp36rmax/multi-device-input/tree/multi-device-input)
-- [d-b-c-e/OutRun2006Tweaks-FFB](https://github.com/d-b-c-e/OutRun2006Tweaks-FFB)
-
-Thank you to those authors and community testers for making their work and hardware observations available. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for license/attribution details.
-
-## Research-informed SAT and wheel-response model
-
-Physics SAT separates a **pneumatic-trail** component from a bounded **mechanical/caster-trail** component. The combined proxy follows the standard aligning-moment structure `Fy * (pneumatic trail + mechanical trail)`: mechanical trail therefore acts whenever front lateral force exists instead of behaving like a fallback that only appears after pneumatic trail collapses. The total is normalized so `SteeringWeight` remains the primary gain, and mechanical trail is still not a centre spring.
-
-The vehicle estimator keeps the existing bicycle-model-inspired `roadWheelAngle - bodySlip - yawRate * yawLeadSeconds` relation, but its body-slip/yaw/front-slip filters are speed-adaptive. This is a relaxation-length-inspired approximation: at higher vehicle speed the same fixed time low-pass created too much countersteer/SAT lag. Aligning moment has different transient behaviour from lateral force, so **Pneumatic Trail Response Lead** lets only the pneumatic lever arm move part-way toward raw front slip while lateral force and torque direction remain on the filtered signal. The default 0.25 is deliberately conservative and telemetry records `trailResponseSlip` / `trailResponseLead` for hardware validation.
-
-`Force Feedback -> FFB Headroom / Clipping` measures sustained structural demand only. Crash/gear events, startup/recreate ramps and near-stop frames are excluded. P95/P99, soft-knee occupancy and hard-cap demand are reported, with a non-automatic Overall Strength suggestion targeting roughly 90% P99 demand.
-
-Wheel-specific response correction is optional and **off by default**. A wheel profile can store `ResponseCorrection`, an 11-point monotonic `ResponseLUT` (desired torque 0..100% in 10% steps -> DirectInput command), and optional `MaxTorqueNm` for diagnostics. These hardware properties are deliberately excluded from named FFB feel profiles. Leave correction linear/off on a DD wheel unless a measured response curve justifies it.
-
-## Setup and DirectInput capability diagnostics
-
-The F11 Force Feedback page reports the live DirectInput FFB state, hardware effect/fallback ownership, and whether each effect advertises dynamic parameter updates. Unknown capability metadata is shown as **unknown** rather than being treated as supported or rejected. If a driver explicitly reports that Spring, Damper, or Sine type-specific parameters cannot be changed while playing, the engine prefers the software fallback instead of repeatedly stop/restarting that hardware effect. Failed capability discovery preserves the prior compatibility path rather than rejecting older drivers blindly.
-
-The page also shows a Ready to Drive checklist, steering-device VID/PID recommendation for the FFB output, a rolling three-second Raw -> Soft Limit -> Post Slew -> Final DirectInput graph, and a Revert unsaved FFB action. A saved/disconnected GUID is not considered FFB-ready, and changing or loading a different physical FFB output clears the previous direction-test result so the new wheel must be tested safely again.
-
-`ReversalReleaseRate` is separate from the normal `SlewRate`: normal SAT buildup keeps its existing profile tuning, while stale torque can unload faster when SAT changes direction. This targets counter-steer latency without globally making impacts or ordinary force buildup harsher.
+Repository license details are in `LICENSE.md` and `THIRD_PARTY_NOTICES.md`. The public binary ZIP receives one consolidated `LICENSES.txt` generated from the dependency source trees used for that build.

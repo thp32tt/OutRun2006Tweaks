@@ -1,54 +1,57 @@
 # Third-party notices and acknowledgements
 
-This file records the source projects most directly referenced while developing the `wheel-ffb` branch.
+This file documents the main upstream/reference projects used by the `wheel-ffb` branch and how binary-release notices are handled.
 
-## 1. emoose / OutRun2006Tweaks
+## Upstream base
+
+### emoose / OutRun2006Tweaks
 
 Repository: https://github.com/emoose/OutRun2006Tweaks
 
-Role in this project: **upstream/base project**. The wrapper, game hooks, overlay/config system and the majority of the codebase originate from OutRun2006Tweaks.
+Role: upstream/base project. The wrapper, game hooks, overlay/configuration system and much of the codebase originate from this project.
 
-License reviewed: **MIT License**. The repository license notice is:
+License: MIT. The original `Copyright (c) 2023 emoose` notice is preserved in this repository's `LICENSE.md`.
 
-```text
-MIT License
-Copyright (c) 2023 emoose
-```
+## Wheel/input references
 
-The complete MIT text and required copyright/permission notice are preserved in this repository's `LICENSE.md`.
-
-**Thank you to emoose and all upstream contributors for OutRun2006Tweaks.**
-
-## 2. hyp36rmax / multi-device-input
+### hyp36rmax / multi-device-input
 
 Repository/branch: https://github.com/hyp36rmax/multi-device-input/tree/multi-device-input
 
-Role in this project: important reference/adaptation source for **SDL3 raw multi-device input**, separate USB device handling, guided Quick Setup, physical-device identity and hardware compatibility behavior.
+Role: important public reference/adaptation source for SDL3 raw multi-device input, separate USB-device handling and modern wheel compatibility behavior.
 
-License reviewed: the `multi-device-input` branch retains the same **MIT License** file and upstream copyright notice (`Copyright (c) 2023 emoose`). The required MIT notice is already preserved by `LICENSE.md` in this repository.
+The branch retains the upstream MIT license notice.
 
-**Special thanks to hyp36rmax for the multi-device work, hardware testing and the practical compatibility lessons shared with the OutRun community.**
-
-## 3. d-b-c-e / OutRun2006Tweaks-FFB
+### d-b-c-e / OutRun2006Tweaks-FFB
 
 Repository: https://github.com/d-b-c-e/OutRun2006Tweaks-FFB
 
-Role in this project: important reference for **DirectInput steering-wheel FFB architecture**, hardware periodic effects, centre/spring + damper + cornering-load model design, grip-loss unloading and force signal-conditioning order.
+Role: important public reference for DirectInput wheel-FFB architecture and force-model/signal-conditioning ideas.
 
-License reviewed: the repository root publishes the fork under the same **MIT License** and upstream copyright notice (`Copyright (c) 2023 emoose`). The required MIT notice is preserved by this repository's `LICENSE.md`.
+The repository retains the upstream MIT license notice. This fork does not redistribute the separate `WheelFfb.dll` toolkit from that project; the v0.1 FFB backend is implemented directly with Windows DirectInput COM.
 
-The d-b-c-e fork documents a separately vendored wheel toolkit in its own tree. **This project does not copy or redistribute that toolkit's `WheelFfb.dll`, native binary, or vendored toolkit source.** The v0.1 backend here is implemented directly with Windows DirectInput COM; only architectural/behavioral lessons from the public FFB fork were used as references.
+## Build dependencies
 
-**Thank you to d-b-c-e for publishing the FFB experiments, measurements and implementation lessons.**
+The produced DLL also incorporates open-source dependencies from the upstream build, including projects fetched or linked through CMake/submodules such as SDL, SafetyHook/Zydis, spdlog, Dear ImGui, xxHash, IXWebSocket, zlib, jsoncpp, Ogg/FLAC, miniz and related support libraries.
 
-## 4. Community testing / discussion
+Rather than manually maintaining a second copy of every dependency license in the release workflow, CI scans the exact checked-out/fetched dependency source trees used for the build and concatenates unique `LICENSE*`, `COPYING*` and `COPYRIGHT*` files into the release package as `LICENSES.txt`.
 
-OutRun2006Tweaks Discord/community discussions were also used as practical references for wheel behavior, device-interface quirks, safe force-test levels and reconnect/focus handling. These are acknowledged as testing/design input rather than copied source code.
+This keeps the public ZIP small while retaining the notices supplied by the actual dependency revisions that were compiled.
 
-Thank you to everyone who shared logs, hardware behavior and troubleshooting results.
+## Replacement game executable
+
+The release package includes `OR2006C2C.exe` downloaded from the public upstream OutRun2006Tweaks v0.1 release asset. The upstream release describes it as a replacement executable for Steam/DVD installations so DLL wrappers can work with the game.
+
+Source release: https://github.com/emoose/OutRun2006Tweaks/releases/tag/v0.1
+
+Game code/assets and related trademarks remain the property of their respective rights holders; inclusion here does not change those rights.
+
+## Community testing
+
+Community discussions and user hardware logs were used as practical testing/design input for wheel behavior, device-interface quirks, force direction, reconnect handling and R3 tactile tuning.
 
 ## License summary
 
-The three directly referenced OutRun2006Tweaks code repositories above expose an MIT `LICENSE.md`, and this repository preserves that upstream MIT notice unchanged. The `wheel-ffb` additions are distributed under the same repository license.
+The forked source remains under the repository's MIT license while preserving the upstream notice. Binary-release dependency notices are generated from the actual source/dependency trees and shipped as `LICENSES.txt`.
 
-This notice is an attribution/engineering record, not legal advice. Third-party libraries/submodules used by the upstream build retain their own licenses and notices.
+This file is a project attribution/packaging record, not legal advice.
