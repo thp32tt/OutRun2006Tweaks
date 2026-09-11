@@ -2,9 +2,6 @@ name: Build
 
 on:
   push:
-    paths-ignore:
-      - '.github/workflows/source-ffb-review5.yml'
-      - '.github/source_ffb_review5.py'
   pull_request:
 
 jobs:
