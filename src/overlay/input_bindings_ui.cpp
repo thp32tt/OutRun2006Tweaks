@@ -863,7 +863,9 @@ private:
 		if (ImGui::Button(saveLabel))
 		{
 			std::string error;
-			if (profileAlreadyExists && !confirmingProfileOverwrite)
+			const bool existsOnDisk = !requestedName.empty() &&
+				WheelProfileStore::profile_exists(WheelProfileStore::Kind::Input, requestedName);
+			if (existsOnDisk && !confirmingProfileOverwrite)
 			{
 				confirmingProfileOverwrite = true;
 				persistenceStatus = "Click Confirm overwrite to replace the existing wheel profile.";

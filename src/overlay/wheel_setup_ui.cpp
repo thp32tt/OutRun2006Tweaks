@@ -849,7 +849,9 @@ namespace
                 : (exists ? "Overwrite profile##ffbProfileSave" : "Save as profile##ffbProfileSave");
             if (ImGui::Button(saveLabel))
             {
-                if (exists && !confirmingFfbOverwrite_)
+                const bool existsOnDisk = !requested.empty() &&
+                    WheelProfileStore::profile_exists(WheelProfileStore::Kind::ForceFeedback, requested);
+                if (existsOnDisk && !confirmingFfbOverwrite_)
                 {
                     confirmingFfbOverwrite_ = true;
                     status_ = "Click Confirm overwrite to replace the existing FFB profile.";
