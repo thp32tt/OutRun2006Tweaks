@@ -187,6 +187,11 @@ public:
         const float rightZ = -forwardX;
         vLong_ = dx * forwardX + dz * forwardZ;
         vLat_ = dx * rightX + dz * rightZ;
+        if (vLong_ <= 0.0f)
+        {
+            clear_dynamic_state();
+            return;
+        }
         const float rawBodySlip = std::clamp(
             std::atan2(vLat_, std::max(std::abs(vLong_), 0.00001f)),
             -0.70f, 0.70f);
@@ -248,6 +253,7 @@ public:
     bool calibrated() const { return calibrated_; }
     bool sampleValid() const { return sampleValid_; }
     int forwardAxis() const { return forwardAxis_; }
+    float forwardSign() const { return forwardSign_; }
     int discontinuityCount() const { return discontinuityCount_; }
     float calibrationConfidence() const { return calibrationConfidence_; }
     float activationBlend() const { return activationBlend_; }
@@ -279,6 +285,8 @@ private:
     void decay_invalid_sample()
     {
         sampleValid_ = false;
+        headingValid_ = false; // The next heading is a baseline, not a one-tick derivative.
+        positionValid_ = false; // Never span a missing position with a one-tick velocity.
         if (!calibrated_)
             return;
 

@@ -153,6 +153,11 @@ void InputManager_SetVibration(WORD left, WORD right)
 	InputManager::instance.setVibration(left, right);
 }
 
+void InputManager_StopVibration()
+{
+    InputManager::instance.stopVibration();
+}
+
 void InputManager_Shutdown()
 {
 	InputManager::instance.shutdown();

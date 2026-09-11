@@ -45,8 +45,6 @@ namespace Settings
     extern Setting<float> WheelFFBSteeringWeight;
     extern Setting<bool> WheelFFBPhysicsSat;
     extern Setting<float> WheelFFBGripLoss;
-    extern Setting<float> WheelFFBLowSpeedSpring;
-    extern Setting<float> WheelFFBSpringLoadBoost;
     extern Setting<float> WheelFFBWeightTransfer;
     extern Setting<float> WheelFFBSlewRate;
     extern Setting<int> VibrationMode;
@@ -59,6 +57,7 @@ namespace Settings
     extern Setting<bool> WheelFFBInvertSpring;
     extern Setting<bool> WheelFFBUsePeriodicEffects;
     extern Setting<bool> WheelFFBDebugLog;
+    extern Setting<bool> WheelFFBTelemetry;
 
     Setting<bool> WheelUniversalSetupEnable{
         "Controls", "WheelUniversalSetupEnable", false,
@@ -761,7 +760,8 @@ namespace
             Settings::WheelUniversalDeviceGuid = info.guidKey;
             Settings::WheelFFBDeviceName = info.name;
             Settings::WheelFFBDeviceGuid = info.guidKey;
-            gReader.select_by_identity(info.guidKey, info.name);
+            if (!Settings::UseNewInput)
+                gReader.select_by_identity(info.guidKey, info.name);
             Settings::write(Module::UserIniPath);
             if (Settings::UseNewInput)
                 status_ = "Selected FFB wheel and saved its exact DirectInput GUID. Restart the game after changing physical wheel.";
@@ -980,10 +980,12 @@ namespace
                 gReader.refresh_devices();
 
             ImGui::SameLine();
-            std::string preview = Settings::WheelUniversalDeviceName.get();
+            std::string preview = Settings::UseNewInput
+                ? Settings::WheelFFBDeviceName.get() : Settings::WheelUniversalDeviceName.get();
             if (preview.empty()) preview = devices.empty() ? "No DirectInput device" : devices.front().name;
             const std::string configuredGuid =
-                lower_identity(Settings::WheelUniversalDeviceGuid.get());
+                lower_identity(Settings::UseNewInput
+                    ? Settings::WheelFFBDeviceGuid.get() : Settings::WheelUniversalDeviceGuid.get());
             auto isSelectedDevice = [&](const DeviceInfo& dev)
             {
                 return !configuredGuid.empty()
@@ -1121,11 +1123,16 @@ namespace
             ImGui::Checkbox("Hardware road/slip sine effects", Settings::WheelFFBUsePeriodicEffects.ptr());
             ImGui::SameLine();
             ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr());
+            ImGui::Checkbox("Record driving telemetry (10 Hz)", Settings::WheelFFBTelemetry.ptr());
             ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr());
             ImGui::SameLine();
             ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr());
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Use Reverse Spring only if the wheel pushes farther away from centre. ConstantForce direction is independent.");
+
+            if (ImGui::Button("Save Force Feedback"))
+                status_ = Settings::write(Module::UserIniPath)
+                    ? "Force feedback settings saved." : "Could not save force feedback settings.";
 
             ImGui::SeparatorText("Safe direction test");
             if (ImGui::Button("Test Left (20%)"))
@@ -1155,6 +1162,7 @@ namespace
                 Settings::WheelFFBWallImpact = 0.38f;
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
+                Settings::WheelFFBUsePeriodicEffects = true;
                 Settings::WheelFFBInvertForce = true;
                 Settings::WheelFFBInvertSpring = false;
                 Settings::WheelFFBDebugLog = true;
@@ -1171,8 +1179,6 @@ namespace
                 Settings::WheelFFBGlobalStrength = 0.70f;
                 Settings::WheelFFBSpringStrength = 0.65f;
                 Settings::WheelFFBSpringSaturation = 0.95f;
-                Settings::WheelFFBLowSpeedSpring = 0.20f;
-                Settings::WheelFFBSpringLoadBoost = 0.30f;
                 Settings::WheelFFBDamperStrength = 0.30f;
                 Settings::WheelFFBSteeringWeight = 1.75f;
                 Settings::WheelFFBGripLoss = 0.65f;
@@ -1183,6 +1189,7 @@ namespace
                 Settings::WheelFFBWallImpact = 0.38f;
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
+                Settings::WheelFFBUsePeriodicEffects = true;
                 Settings::WheelFFBInvertForce = true;
                 Settings::WheelFFBInvertSpring = false;
                 Settings::VibrationMode = 0;

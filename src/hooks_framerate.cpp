@@ -465,6 +465,9 @@ class ReplaceGameUpdateLoop : public Hook
 			Game::LinkControlReceive();
 			Game::ModeControl();
 			Game::EventControl();
+			// Also runs when no player-car Ctrl is dispatched (menus/restarts).
+			void WheelFFB_ServiceSafety();
+			WheelFFB_ServiceSafety();
 			Game::GhostCarExecServer();
 			Game::fn4666A0();
 

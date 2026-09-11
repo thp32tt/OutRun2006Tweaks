@@ -1454,6 +1454,13 @@ public:
 	InputAction& modAction(ModAction action) { return modBindings[size_t(action)]; }
 	static const std::string& modActionName(ModAction action) { return modNames[size_t(action)]; }
 
+	void stopVibration()
+	{
+		std::lock_guard<std::mutex> lock(mtx);
+		for (auto* controller : controllers)
+			SDL_RumbleGamepad(controller, 0, 0, 0);
+	}
+
 	void setVibration(WORD left, WORD right)
 	{
 		auto* controller = getPrimaryGamepad();

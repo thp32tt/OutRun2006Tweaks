@@ -5,29 +5,6 @@
 #include <cmath>
 #include <cstring>
 
-namespace Settings
-{
-    extern Setting<bool> WheelFFBEnable;
-    extern Setting<float> WheelFFBGlobalStrength;
-    extern Setting<float> WheelFFBSpringStrength;
-    extern Setting<float> WheelFFBDamperStrength;
-    extern Setting<float> WheelFFBSteeringWeight;
-    extern Setting<float> WheelFFBGripLoss;
-    extern Setting<float> WheelFFBLowSpeedSpring;
-    extern Setting<float> WheelFFBSpringLoadBoost;
-    extern Setting<float> WheelFFBWallImpact;
-    extern Setting<float> WheelFFBRoadTexture;
-    extern Setting<float> WheelFFBTireSlip;
-    extern Setting<bool> WheelFFBUseHardwareSpring;
-    extern Setting<bool> WheelFFBUseHardwareDamper;
-    extern Setting<bool> WheelFFBUsePeriodicEffects;
-    extern Setting<bool> WheelFFBInvertForce;
-    extern Setting<bool> WheelFFBInvertSpring;
-    extern Setting<bool> WheelFFBDebugLog;
-}
-
-void WheelFFB_RequestDirectionTest(int direction);
-
 //
 // Binding editor.
 //
@@ -783,106 +760,6 @@ private:
 				"Only used when UseNewInput is enabled.");
 	}
 
-	void draw_force_feedback()
-	{
-		ImGui::TextWrapped("Advanced DirectInput COM FFB. Input bindings can come from any connected device; FFB remains attached to the selected force-feedback wheel.");
-		ImGui::Spacing();
-
-		auto applyPreset = [&](float overall, float spring, float damper, float lateral,
-			float grip, float impact, float road, float tire, float lowSpeed, float loadBoost)
-		{
-			Settings::WheelFFBGlobalStrength = overall;
-			Settings::WheelFFBSpringStrength = spring;
-			Settings::WheelFFBDamperStrength = damper;
-			Settings::WheelFFBSteeringWeight = lateral;
-			Settings::WheelFFBGripLoss = grip;
-			Settings::WheelFFBWallImpact = impact;
-			Settings::WheelFFBRoadTexture = road;
-			Settings::WheelFFBTireSlip = tire;
-			Settings::WheelFFBLowSpeedSpring = lowSpeed;
-			Settings::WheelFFBSpringLoadBoost = loadBoost;
-			setting_changed(Settings::WheelFFBGlobalStrength);
-			setting_changed(Settings::WheelFFBSpringStrength);
-			setting_changed(Settings::WheelFFBDamperStrength);
-			setting_changed(Settings::WheelFFBSteeringWeight);
-			setting_changed(Settings::WheelFFBGripLoss);
-			setting_changed(Settings::WheelFFBWallImpact);
-			setting_changed(Settings::WheelFFBRoadTexture);
-			setting_changed(Settings::WheelFFBTireSlip);
-			setting_changed(Settings::WheelFFBLowSpeedSpring);
-			setting_changed(Settings::WheelFFBSpringLoadBoost);
-		};
-
-		ImGui::SeparatorText("Versioned baseline presets");
-		if (ImGui::Button("MOZA R3 SAT test"))
-			applyPreset(0.70f, 0.32f, 0.34f, 1.10f, 0.65f, 0.38f, 0.30f, 0.20f, 0.08f, 0.18f);
-		if (ImGui::Button("Simulation Balanced v1"))
-			applyPreset(0.70f, 0.60f, 0.32f, 0.38f, 0.65f, 0.65f, 0.30f, 0.20f, 0.08f, 0.35f);
-		ImGui::SameLine();
-		if (ImGui::Button("Arcade Light v1"))
-			applyPreset(0.55f, 0.45f, 0.15f, 0.30f, 0.55f, 0.55f, 0.30f, 0.18f, 0.12f, 0.20f);
-		ImGui::SameLine();
-		if (ImGui::Button("Arcade Strong v1"))
-			applyPreset(0.90f, 0.65f, 0.30f, 0.45f, 0.60f, 0.75f, 0.35f, 0.22f, 0.08f, 0.40f);
-		ImGui::TextDisabled("MOZA R3 SAT test makes self-aligning torque the main steering force; old presets remain comparison references.");
-
-		if (ImGui::Checkbox("Enable force feedback", Settings::WheelFFBEnable.ptr()))
-			setting_changed(Settings::WheelFFBEnable);
-
-		ImGui::BeginDisabled(!Settings::WheelFFBEnable);
-		if (ImGui::SliderFloat("Overall strength", Settings::WheelFFBGlobalStrength.ptr(), 0.0f, 1.5f, "%.2f"))
-			setting_changed(Settings::WheelFFBGlobalStrength);
-		if (Settings::WheelFFBGlobalStrength.get() > 1.0f)
-			ImGui::TextColored(ImVec4(1.0f, 0.65f, 0.25f, 1.0f),
-				"Above 100% reduces headroom/contrast. Use only when the wheel is still too light.");
-		if (ImGui::SliderFloat("Low-speed centering spring", Settings::WheelFFBSpringStrength.ptr(), 0.0f, 1.5f, "%.2f"))
-			setting_changed(Settings::WheelFFBSpringStrength);
-		if (ImGui::SliderFloat("Dynamic damping", Settings::WheelFFBDamperStrength.ptr(), 0.0f, 1.0f, "%.2f"))
-			setting_changed(Settings::WheelFFBDamperStrength);
-		if (ImGui::SliderFloat("Self-aligning torque (SAT)", Settings::WheelFFBSteeringWeight.ptr(), 0.0f, 1.5f, "%.2f"))
-			setting_changed(Settings::WheelFFBSteeringWeight);
-		if (ImGui::SliderFloat("Grip-loss unloading", Settings::WheelFFBGripLoss.ptr(), 0.0f, 1.0f, "%.2f"))
-			setting_changed(Settings::WheelFFBGripLoss);
-		if (ImGui::SliderFloat("Collision", Settings::WheelFFBWallImpact.ptr(), 0.0f, 1.0f, "%.2f"))
-			setting_changed(Settings::WheelFFBWallImpact);
-		if (ImGui::SliderFloat("Road detail", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 1.0f, "%.2f"))
-			setting_changed(Settings::WheelFFBRoadTexture);
-		if (ImGui::SliderFloat("Tire slip", Settings::WheelFFBTireSlip.ptr(), 0.0f, 1.0f, "%.2f"))
-			setting_changed(Settings::WheelFFBTireSlip);
-
-		ImGui::SeparatorText("Backends / direction");
-		if (ImGui::Checkbox("Hardware GUID_Spring", Settings::WheelFFBUseHardwareSpring.ptr()))
-			setting_changed(Settings::WheelFFBUseHardwareSpring);
-		ImGui::SameLine();
-		if (ImGui::Checkbox("Hardware GUID_Damper", Settings::WheelFFBUseHardwareDamper.ptr()))
-			setting_changed(Settings::WheelFFBUseHardwareDamper);
-		if (ImGui::Checkbox("Hardware road/slip sine effects", Settings::WheelFFBUsePeriodicEffects.ptr()))
-			setting_changed(Settings::WheelFFBUsePeriodicEffects);
-		if (ImGui::Checkbox("Reverse ConstantForce", Settings::WheelFFBInvertForce.ptr()))
-			setting_changed(Settings::WheelFFBInvertForce);
-		ImGui::SameLine();
-		if (ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr()))
-			setting_changed(Settings::WheelFFBInvertSpring);
-		if (ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr()))
-			setting_changed(Settings::WheelFFBDebugLog);
-
-		ImGui::SeparatorText("Safe direction test");
-		if (ImGui::Button("Test Left (20%)"))
-			WheelFFB_RequestDirectionTest(-1);
-		ImGui::SameLine();
-		if (ImGui::Button("Test Right (20%)"))
-			WheelFFB_RequestDirectionTest(1);
-		ImGui::SameLine();
-		if (ImGui::Button("Stop Test"))
-			WheelFFB_RequestDirectionTest(0);
-		ImGui::TextDisabled("Direction tests are hard-capped at 20% and ignore Overall Strength headroom.");
-
-		ImGui::Spacing();
-		ImGui::TextDisabled("Select/refresh the exact DirectInput FFB interface and inspect capabilities in the Wheel Setup tab.");
-		ImGui::EndDisabled();
-	}
-
-	// The prompt shown while an input is being waited on.
 	void draw_listening_popup()
 	{
 		if (isListeningForInput == ListenState::False)

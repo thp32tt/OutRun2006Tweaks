@@ -31,8 +31,20 @@ void SetVibration(int userId, float leftMotor, float rightMotor)
     // With SDL multi-device input, wheel FFB is owned exclusively by the
     // DirectInput COM WheelFFBEngine. Do not let the independent gamepad-rumble
     // path reach a wheel/gamepad interface at the same time.
-    if (Settings::UseNewInput && Settings::WheelFFBEnable)
+    static bool wheelOwnedLastCall = false;
+    if (Settings::WheelFFBEnable)
+    {
+        if (!wheelOwnedLastCall)
+        {
+            void InputManager_StopVibration();
+            InputManager_StopVibration();
+            XINPUT_VIBRATION zero{};
+            XInputSetState(Settings::VibrationControllerId, &zero);
+        }
+        wheelOwnedLastCall = true;
         return;
+    }
+    wheelOwnedLastCall = false;
 
     if (!Settings::VibrationMode)
         return;
