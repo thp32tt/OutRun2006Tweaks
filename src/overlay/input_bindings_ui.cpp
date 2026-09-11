@@ -1144,7 +1144,7 @@ public:
 
 			// Back/B leaves the dialog, but only while nothing is being bound -
 			// otherwise the press meant for a binding closes the screen instead.
-			if (isListeningForInput == ListenState::False)
+			if (isListeningForInput == ListenState::False && !unsavedChanges)
 			{
 				if ((manager.switch_overlay & (1 << int(SwitchId::Back) | 1 << int(SwitchId::B))) != 0)
 					dialogOpen = false;

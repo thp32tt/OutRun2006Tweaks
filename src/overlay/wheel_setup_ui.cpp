@@ -1209,7 +1209,6 @@ namespace
                 ImGui::TextDisabled("Advanced values apply live like the main controls; use Save Force Feedback to persist them.");
             }
 
-            ImGui::SameLine();
             ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr());
             ImGui::Checkbox("Record driving telemetry (10 Hz)", Settings::WheelFFBTelemetry.ptr());
             ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr());
