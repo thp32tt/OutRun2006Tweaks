@@ -1,0 +1,30 @@
+name: FFB selector source-only review
+
+on:
+  push:
+    branches:
+      - wheel-ffb
+    paths:
+      - '.github/workflows/source-edit.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  source-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: wheel-ffb
+          fetch-depth: 0
+      - name: Apply source-only selector fix
+        run: python3 .github/ui_match_review.py
+      - name: Commit source-only selector fix
+        run: |
+          rm -f .github/ui_match_review.py
+          git config user.name "thp32tt"
+          git config user.email "129367814+thp32tt@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: align FFB selector with DeviceName auto-match [skip ci]"
+          git push origin HEAD:wheel-ffb
