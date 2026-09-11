@@ -6,6 +6,7 @@ on:
     branches: [ wheel-ffb ]
     paths:
       - '.github/research_ffb_apply.py'
+      - '.github/research_ffb_verify_fix.py'
       - '.github/workflows/source-research-ffb-apply.yml'
 
 permissions:
@@ -23,6 +24,9 @@ jobs:
 
       - name: Apply research-informed source changes
         run: python .github/research_ffb_apply.py
+
+      - name: Update verifier for response-correction output stage
+        run: python .github/research_ffb_verify_fix.py
 
       - name: Verify current source invariants
         run: python tools/verify_wheel_ffb_current.py
