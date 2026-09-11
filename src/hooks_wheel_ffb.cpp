@@ -243,14 +243,12 @@ namespace
             }
 
             // Safety first for a DD base: WM_ACTIVATEAPP releases exclusive
-            // ownership when the game loses focus. Do not let the 60 Hz update
-            // loop immediately reacquire it while another application is active.
+            // ownership when the game loses focus. The foreground window is also
+            // authoritative on recovery so a missed activation message cannot
+            // leave FFB permanently dormant after Alt-Tab.
             if (!appActive_)
             {
-                // initialize() can set appActive_=false before the window
-                // subclass exists. Recover from that startup/background case
-                // only after the real game window is foreground again.
-                if (!initialized_ && gameHwnd_ && GetForegroundWindow() == gameHwnd_)
+                if (gameHwnd_ && GetForegroundWindow() == gameHwnd_)
                 {
                     appActive_ = true;
                     warmupFrames_ = 0;
