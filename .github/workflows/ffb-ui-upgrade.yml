@@ -1,4 +1,5 @@
 name: Verified FFB and Setup UX Upgrade
+# trigger: complete FFB/UI implementation validation
 
 on:
   push:
