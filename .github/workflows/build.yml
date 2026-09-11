@@ -2,8 +2,6 @@ name: Build
 
 on:
   push:
-    paths-ignore:
-      - '.github/workflows/source-ffb-review10-selective.yml'
   pull_request:
 
 jobs:
