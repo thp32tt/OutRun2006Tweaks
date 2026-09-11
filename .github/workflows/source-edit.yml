@@ -21,7 +21,10 @@ jobs:
           fetch-depth: 0
 
       - name: Apply reviewed source changes
-        run: python3 .github/source_edit.py
+        run: |
+          python3 .github/source_edit_fix.py
+          python3 .github/source_edit.py
+          rm -f .github/source_edit_fix.py
 
       - name: Commit source-only changes
         run: |
