@@ -35,6 +35,10 @@ jobs:
           s = p.read_text(encoding='utf-8')
           s = s.replace(r"ffbProfileName_[0] = '\\0';", r"ffbProfileName_[0] = '\0';")
           s = s.replace(r'OutRun2006Tweaks.profiles\\\\FFB', r'OutRun2006Tweaks.profiles\\FFB')
+          s = s.replace(
+              '    if count != 1:\n',
+              '    if count < 1 or (count != 1 and "Settings::VibrationMode = 0;" not in old):\n',
+              1)
           p.write_text(s, encoding='utf-8')
           PY
           python3 -m py_compile .github/source_review30_profiles.py
