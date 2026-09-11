@@ -42,24 +42,15 @@ jobs:
         shell: pwsh
         run: python tools/verify_wheel_ffb_current.py
 
-      - name: Restore normal build workflow and remove one-shot files
-        shell: pwsh
-        run: |
-          $build = Get-Content .github/workflows/build.yml -Raw
-          $build = $build.Replace("    if: github.event_name != 'push' || github.event.head_commit.message != 'chore: apply wheel dynamics refactor'`r`n", "")
-          $build = $build.Replace("    if: github.event_name != 'push' || github.event.head_commit.message != 'chore: apply wheel dynamics refactor'`n", "")
-          Set-Content .github/workflows/build.yml -Value $build -NoNewline
-          Remove-Item tools/refactor_wheel_dynamics_once.py
-          Remove-Item tools/.wheel-dynamics-trigger
-          Remove-Item .github/workflows/source-refactor.yml
-
-      - name: Commit source refactor
+      - name: Commit source refactor only
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
+          git add src/hooks_wheel_ffb.cpp src/hooks_wheel_vehicle_dynamics.hpp src/overlay/wheel_setup_ui.cpp tools/verify_wheel_ffb_current.py
+          git rm --cached src/hooks_wheel_physics_sat.hpp 2>$null; if ($LASTEXITCODE -ne 0) { git add -u src/hooks_wheel_physics_sat.hpp }
+          git add -u src/hooks_wheel_physics_sat.hpp
           git commit -m "refactor: separate lateral load, chassis slide and front scrub [skip ci]"
           git push origin HEAD:wheel-ffb
