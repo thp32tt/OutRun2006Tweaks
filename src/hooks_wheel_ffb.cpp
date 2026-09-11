@@ -374,8 +374,6 @@ namespace
                 clear_device_failure();
             }
 
-            apply_live_effect_gain();
-
             if (manualTestFrames_ > 0)
             {
                 if (springEffect_)
@@ -1272,9 +1270,6 @@ namespace
             release_directinput();
             selectedName_.clear();
             selectedGuid_ = {};
-            lastEffectGain_ = 0xFFFFFFFFu;
-            nextGainRetryTick_ = 0;
-            lastGainErrorLog_ = 0;
             recreateHoldoffUntil_ = 0;
             springRecreateHoldoffUntil_ = 0;
             damperRecreateHoldoffUntil_ = 0;
@@ -1561,7 +1556,6 @@ namespace
             retryAfter_ = 0;
             reset_signal_state();
 
-            lastEffectGain_ = configured_effect_gain();
             failedInterfaceGuid_.clear();
             failedInterfaceUntil_ = 0;
 
@@ -1594,90 +1588,6 @@ namespace
 
             const int raw = getVolume(ADChannel::Steering);
             return std::clamp(raw / 127.0f, -1.0f, 1.0f);
-        }
-
-        DWORD configured_effect_gain() const
-        {
-            // Overall strength moved into the force model. The DirectInput
-            // device-side gain remains nominal, avoiding double scaling.
-            return DI_FFNOMINALMAX;
-        }
-
-        void apply_live_effect_gain()
-        {
-            if (!device_ || !deviceAcquired_ || panicStopped_)
-                return;
-
-            const DWORD now = GetTickCount();
-            if (tick_before(now, nextGainRetryTick_))
-                return;
-
-            const DWORD gain = configured_effect_gain();
-            if (gain == lastEffectGain_)
-                return;
-
-            DIEFFECT params{};
-            params.dwSize = sizeof(params);
-            params.dwGain = gain;
-
-            bool failed = false;
-            auto updateGain = [&](IDirectInputEffect* effect, const char* label)
-            {
-                if (!effect)
-                    return;
-
-                HRESULT hr = effect->SetParameters(&params, DIEP_GAIN);
-                if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
-                {
-                    if (reacquire_after_input_loss("live gain", hr))
-                        hr = effect->SetParameters(&params, DIEP_GAIN);
-                }
-
-                // Some DirectInput drivers do not advertise DIEP_GAIN as a
-                // dynamic parameter.  DirectInput often restarts implicitly,
-                // but drivers are also allowed to return DIERR_EFFECTPLAYING.
-                // Stop only that effect and explicitly restart it with the new
-                // gain rather than making the F11 Overall Strength slider fail.
-                if (hr == DIERR_EFFECTPLAYING)
-                {
-                    effect->Stop();
-                    hr = effect->SetParameters(&params, DIEP_GAIN | DIEP_START);
-                }
-
-                if (FAILED(hr))
-                {
-                    failed = true;
-                    const DWORD now = GetTickCount();
-                    if (now - lastGainErrorLog_ >= 2000)
-                    {
-                        lastGainErrorLog_ = now;
-                        spdlog::warn(
-                            "WheelFFB: live gain update failed for {} (0x{:08X})",
-                            label, (unsigned)hr);
-                    }
-                }
-            };
-
-            updateGain(constantEffect_, "ConstantForce");
-            updateGain(springEffect_, "GUID_Spring");
-            updateGain(damperEffect_, "GUID_Damper");
-            updateGain(roadTextureEffect_, "RoadTexture");
-            updateGain(tireSlipEffect_, "TireSlip");
-
-            if (!failed)
-            {
-                lastEffectGain_ = gain;
-                nextGainRetryTick_ = 0;
-                spdlog::info(
-                    "WheelFFB: live GlobalStrength applied to active effects ({}%)",
-                    static_cast<unsigned>((gain * 100u) / DI_FFNOMINALMAX));
-            }
-            else
-            {
-                // Keep F11 responsive without turning a persistent driver
-                // failure into hundreds of SetParameters calls per second.
-                nextGainRetryTick_ = GetTickCount() + 250;
-            }
         }
 
         bool create_constant_effect()
@@ -2815,9 +2725,6 @@ namespace
         DWORD damperRecreateHoldoffUntil_ = 0;
         DWORD lastUpdateTick_ = 0;
         DWORD lastLogTick_ = 0;
-        DWORD lastGainErrorLog_ = 0;
-        DWORD lastEffectGain_ = 0xFFFFFFFFu;
-        DWORD nextGainRetryTick_ = 0;
         DWORD deviceFailureSince_ = 0;
         DWORD deviceReinitAfter_ = 0;
         bool deviceReinitPending_ = false;
