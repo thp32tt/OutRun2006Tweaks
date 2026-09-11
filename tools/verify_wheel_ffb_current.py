@@ -21,16 +21,19 @@ def forbid(text, needle, label):
 
 ffb = read('src/hooks_wheel_ffb.cpp')
 vib = read('src/hooks_forcefeedback.cpp')
-phys = read('src/hooks_wheel_physics_sat.hpp')
+dyn = read('src/hooks_wheel_vehicle_dynamics.hpp')
 input_cpp = read('src/input_manager.cpp')
 bind_ui = read('src/overlay/input_bindings_ui.cpp')
 wheel_ui = read('src/overlay/wheel_setup_ui.cpp')
 ini = read('OutRun2006Tweaks.ini')
 
+if (ROOT / 'src/hooks_wheel_physics_sat.hpp').exists():
+    raise SystemExit('CURRENT VERIFY FAILED [obsolete Physics SAT helper still active]')
+
 for rel, text in [
     ('src/hooks_wheel_ffb.cpp', ffb),
     ('src/hooks_forcefeedback.cpp', vib),
-    ('src/hooks_wheel_physics_sat.hpp', phys),
+    ('src/hooks_wheel_vehicle_dynamics.hpp', dyn),
     ('src/input_manager.cpp', input_cpp),
     ('src/overlay/input_bindings_ui.cpp', bind_ui),
     ('src/overlay/wheel_setup_ui.cpp', wheel_ui),
@@ -53,8 +56,8 @@ req(ffb, 'WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)', 'post-physics FFB entry
 forbid(ffb, 'CalcVibrationHook_', 'no competing CalcVibrationValues FFB hook')
 req(vib, 'if (Settings::UseNewInput && Settings::WheelFFBEnable)', 'SDL rumble suppressed under wheel FFB')
 req(ffb, 'setting->hidden(true);', 'generic WheelFFB settings hidden')
-
 req(vib, 'GamePlCar_Ctrl.call(car);\n        WheelFFB_UpdateAfterPhysics(car);', 'post-physics execution order')
+
 calc = vib.find('CalcVibrationValues(car);')
 ctrl = vib.find('GamePlCar_Ctrl.call(car);')
 wheel = vib.find('WheelFFB_UpdateAfterPhysics(car);')
@@ -62,36 +65,51 @@ if not (0 <= calc < ctrl < wheel):
     raise SystemExit('CURRENT VERIFY FAILED [vibration/physics/FFB ordering]')
 print('OK [vibration before physics; wheel FFB after physics]')
 
-req(ffb, '#include "hooks_wheel_physics_sat.hpp"', 'Physics SAT helper included')
-req(ffb, 'Setting<bool> WheelFFBPhysicsSat', 'Physics SAT selectable')
-req(ffb, 'const float physicsMix = physicsSat_.activationBlend();', 'Physics SAT activation crossfade')
-forbid(ffb, 'physicsSat_.ready() ?', 'old ready/fallback switching removed')
-req(phys, 'bool calibrated() const', 'calibration state separated')
-req(phys, 'bool sampleValid() const', 'sample validity separated')
-req(phys, 'bool torqueActive() const', 'torque activity separated')
-req(phys, 'constexpr int CalibrationSamplesRequired = 12;', 'multi-sample basis calibration')
-req(phys, 'bestScore >= 0.85f && calibrationConfidence_ >= 0.25f', 'basis confidence gate')
-req(phys, 'activationBlend_ = std::min(1.0f, activationBlend_ + (1.0f / 24.0f));', '24-tick Physics SAT blend')
-req(phys, 'motionScale > motionScaleEma_ * 5.0f', 'restart/warp discontinuity guard')
-req(phys, 'if (speedNorm <= 0.04f)', 'stopped-car dynamic state reset')
-req(phys, 'headingDelta * 60.0f', 'fixed 60 Hz yaw-rate derivative')
-req(phys, 'roadWheelAngle - bodySlip_ - yawRate_ * yawLeadSeconds', 'front-slip proxy')
-req(phys, '(frontSlip_ > 0.0f ? -1.0f : 1.0f)', 'SAT direction follows front slip')
-req(phys, 'car->spd_mb_20.x', 'spd_mb telemetry retained')
+# Vehicle dynamics is now estimation-only; the main FFB engine owns force shaping.
+req(ffb, '#include "hooks_wheel_vehicle_dynamics.hpp"', 'vehicle dynamics helper included')
+req(dyn, 'class WheelVehicleDynamics', 'estimator separated from FFB torque')
+forbid(dyn, 'satStrength', 'estimator owns no SAT strength')
+forbid(dyn, 'gripLoss', 'estimator owns no grip tuning')
+forbid(dyn, 'trailShape', 'estimator owns no tire-force curve')
+req(dyn, 'roadWheelAngle - bodySlip_ - yawRate_ * yawLeadSeconds', 'front-slip proxy')
+req(dyn, 'constexpr int CalibrationSamplesRequired = 12;', 'multi-sample basis calibration')
+req(dyn, 'bestScore >= 0.85f && calibrationConfidence_ >= 0.25f', 'basis confidence gate')
+req(dyn, 'motionScale > motionScaleEma_ * 5.0f', 'restart/warp discontinuity guard')
+req(dyn, 'if (speedNorm <= 0.04f)', 'stopped-car dynamic state reset')
+req(dyn, 'headingDelta * 60.0f', 'fixed 60 Hz yaw-rate derivative')
+req(dyn, 'car->spd_mb_20.x', 'spd_mb telemetry retained')
+req(dyn, 'if (invalidTicks_ > 4)\n            clear_dynamic_state();', 'stale dynamics cleared after invalid telemetry')
 
+# field_264/268 are lateral load only. Slip/grip must come from dynamics.
+req(ffb, 'const float lateralSum = car->field_264 + car->field_268;', 'OutRun lateral-G source retained')
+req(ffb, 'const float lateralLoad = std::clamp(std::abs(latNorm), 0.0f, 1.0f);', 'lateral signal used as load magnitude')
+req(ffb, 'vehicleDynamics_.update(car, steer, speedNorm, lateralLoadSmooth);', 'dynamics updated independently')
+forbid(ffb, 'driftAmt', 'lateral-G drift detector removed')
+forbid(ffb, 'gripFactor', 'shared lateral-G grip factor removed')
+req(ffb, 'const float bodySlideT = std::clamp(', 'body slip drives chassis slide')
+req(ffb, 'const float frontScrubT = std::clamp(', 'front slip drives tire scrub')
+req(ffb, 'const float springStrength = std::clamp(\n                static_cast<float>(Settings::WheelFFBSpringStrength) * springSpeed,', 'spring independent of grip/slip')
+req(ffb, 'const float damperRelease = 1.0f - 0.55f * gripLoss * bodySlide;', 'damper released by chassis slide')
+req(ffb, 'frontScrub * (0.50f + 0.50f * lateralLoadSmooth) +\n                    bodySlide * 0.20f', 'tire slip driven mainly by front scrub')
+req(ffb, 'const float naturalSlideRelief =\n                1.0f - 0.25f * gripLoss * bodySlide;', 'Natural SAT unloads from real slide')
+req(ffb, 'const float rearSlideRelief =\n                    1.0f - 0.15f * gripLoss * bodySlide;', 'Physics SAT avoids body-slip double unload')
+req(ffb, 'const float slipX = frontSlipAbs / 0.16f;', 'Physics SAT pneumatic-trail curve lives in FFB engine')
+req(ffb, '(frontSlip > 0.0f ? -1.0f : 1.0f)', 'Physics SAT direction follows front slip')
+forbid(ffb, 'physicsGrip', 'old strong body-slip SAT double-unload removed')
+
+req(wheel_ui, 'Physics SAT (body slip + yaw)', 'versionless Physics SAT UI')
+req(wheel_ui, 'Load MOZA R3 Physics SAT', 'versionless Physics SAT preset')
+req(wheel_ui, 'Grip-loss Response', 'grip-loss UI reflects broader role')
 req(wheel_ui, 'Test Left (20%)', 'safe left test')
 req(wheel_ui, 'Test Right (20%)', 'safe right test')
 req(ffb, 'DI_FFNOMINALMAX', 'nominal DirectInput device gain')
 req(ffb, 'WheelFFB: scheduling DirectInput device reinitialization', 'device recovery path')
 req(ffb, 'SnowIceRoadTextureScale = 0.04f', 'snow/ice periodic attenuation')
 req(ffb, 'std::isfinite', 'non-finite input/output guards')
-
-req(wheel_ui, 'Load MOZA R3 Physics SAT v1', 'Physics SAT preset')
-req(wheel_ui, 'Load MOZA R3 Natural SAT', 'Natural SAT A/B preset')
 req(wheel_ui, 'Settings::WheelFFBInvertForce = true;', 'R3 ConstantForce direction baseline')
 req(wheel_ui, 'Settings::WheelFFBInvertSpring = false;', 'R3 Spring direction baseline')
 req(wheel_ui, 'Settings::VibrationMode = 0;', 'R3 preset disables gamepad rumble')
-req(ffb, 'phys={} basis=M70r{} cal={:.2f} mix={:.2f}', 'Physics SAT diagnostic telemetry')
+req(ffb, 'load={:.2f} slide={:.2f} scrub={:.2f}', 'separated load/slide/scrub diagnostics')
 req(ffb, 'step={:.5f} spdLen={:.5f} spdCorr={:.2f}', 'velocity diagnostic telemetry')
 
 for pattern, label in [

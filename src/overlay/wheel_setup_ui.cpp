@@ -1098,7 +1098,7 @@ namespace
             ImGui::Checkbox("Enable Force Feedback", Settings::WheelFFBEnable.ptr());
             ImGui::TextDisabled("gameplay FFB follows the exact selected DirectInput GUID.");
             ImGui::TextWrapped(
-                "Single-owner wheel FFB: DirectInput COM only. SAT now rises smoothly from centre, builds with speed/corner load and unloads only in a deep slide. Centering Spring is mainly a low-speed stabilizer, so it no longer stacks a second strong high-speed return force.");
+                "Single-owner wheel FFB: DirectInput COM only. field_264/268 are lateral load only; body slip releases damping, while front slip drives Physics SAT and tire scrub. Centering Spring remains a low-speed stabilizer.");
             ImGui::TextDisabled("Settings > WheelFFB is hidden; changes on this page apply live. SDL gamepad rumble is suppressed while wheel FFB is enabled.");
 
             ImGui::SliderFloat("Overall Strength", Settings::WheelFFBGlobalStrength.ptr(), 0.0f, 1.5f, "%.2f");
@@ -1108,10 +1108,10 @@ namespace
             ImGui::SliderFloat("Centering Spring (low speed)", Settings::WheelFFBSpringStrength.ptr(), 0.0f, 1.0f, "%.2f");
             ImGui::SliderFloat("Dynamic Damping", Settings::WheelFFBDamperStrength.ptr(), 0.0f, 0.80f, "%.2f");
             ImGui::SliderFloat("Self-aligning Torque (SAT)", Settings::WheelFFBSteeringWeight.ptr(), 0.0f, 2.00f, "%.2f");
-            ImGui::Checkbox("Physics SAT v1 (body slip + yaw)", Settings::WheelFFBPhysicsSat.ptr());
+            ImGui::Checkbox("Physics SAT (body slip + yaw)", Settings::WheelFFBPhysicsSat.ptr());
             if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Uses post-physics OutRun car motion/body heading to estimate front slip. Disable for the Round-16 Natural SAT comparison.");
-            ImGui::SliderFloat("Grip-loss Unload", Settings::WheelFFBGripLoss.ptr(), 0.0f, 1.0f, "%.2f");
+                ImGui::SetTooltip("Uses post-physics OutRun car motion/body heading to estimate front slip. Disable for the Natural SAT comparison.");
+            ImGui::SliderFloat("Grip-loss Response", Settings::WheelFFBGripLoss.ptr(), 0.0f, 1.0f, "%.2f");
             ImGui::SliderFloat("Road Detail", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 0.50f, "%.2f");
             ImGui::SliderFloat("Tire Slip", Settings::WheelFFBTireSlip.ptr(), 0.0f, 0.50f, "%.2f");
             ImGui::SliderFloat("Collision", Settings::WheelFFBWallImpact.ptr(), 0.0f, 1.0f, "%.2f");
@@ -1138,7 +1138,7 @@ namespace
                 WheelFFB_RequestDirectionTest(0);
             ImGui::TextDisabled("Direction tests are hard-capped at 20% and only run during active gameplay.");
 
-            if (ImGui::Button("Load MOZA R3 Physics SAT v1"))
+            if (ImGui::Button("Load MOZA R3 Physics SAT"))
             {
                 Settings::WheelFFBEnable = true;
                 Settings::WheelFFBPhysicsSat = true;
@@ -1160,7 +1160,7 @@ namespace
                 Settings::WheelFFBDebugLog = true;
                 Settings::VibrationMode = 0;
                 Settings::write(Module::UserIniPath);
-                status_ = "Loaded MOZA R3 Physics SAT v1: post-physics body-slip/yaw SAT with diagnostic logging. Saved to user.ini.";
+                status_ = "Loaded MOZA R3 Physics SAT: lateral load, body slide and front scrub are separated; diagnostic logging enabled. Saved to user.ini.";
             }
             ImGui::SameLine();
 

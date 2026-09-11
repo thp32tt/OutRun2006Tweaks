@@ -1,10 +1,12 @@
 #pragma once
 
-// Experimental OutRun vehicle-dynamics SAT helper.
-// This file deliberately owns no DirectInput objects. It only converts the
-// game's car motion/transform into a signed aligning-torque request; the main
-// WheelFFBEngine remains the sole hardware-output owner.
-class WheelPhysicsSatV1
+// OutRun vehicle-dynamics estimator for steering FFB.
+//
+// This class deliberately owns no DirectInput effects and computes no FFB
+// torque. Its only job is to estimate reusable vehicle state from the game:
+// body slip (beta), yaw rate, front-slip proxy and local motion. WheelFFBEngine
+// decides how those signals affect SAT, damping and tire scrub.
+class WheelVehicleDynamics
 {
 public:
     void reset()
@@ -13,7 +15,6 @@ public:
         headingValid_ = false;
         calibrated_ = false;
         sampleValid_ = false;
-        torqueActive_ = false;
         forwardAxis_ = 0;
         forwardSign_ = 1.0f;
         calibrationSamples_ = 0;
@@ -25,7 +26,6 @@ public:
         activationBlend_ = 0.0f;
         invalidTicks_ = 0;
         discontinuityCount_ = 0;
-        lastTorque_ = 0.0f;
         prevPosition_ = D3DVECTOR{};
         prevHeading_ = 0.0f;
         bodySlip_ = 0.0f;
@@ -40,18 +40,13 @@ public:
         spdCorrelation_ = 0.0f;
     }
 
-    float update(
+    void update(
         EVWORK_CAR* car,
         float steer,
         float speedNorm,
-        float cornerLoadSmooth,
-        float returnRateSmooth,
-        float gripLoss,
-        float satStrength,
-        float satSpeed)
+        float lateralLoadSmooth)
     {
         sampleValid_ = false;
-        torqueActive_ = false;
         vLong_ = 0.0f;
         vLat_ = 0.0f;
         positionStep_ = 0.0f;
@@ -59,17 +54,23 @@ public:
         spdCorrelation_ = 0.0f;
 
         if (!car)
-            return decay_invalid_sample();
+        {
+            decay_invalid_sample();
+            return;
+        }
 
         const D3DVECTOR current = car->position_14;
         if (!std::isfinite(current.x) || !std::isfinite(current.z))
-            return decay_invalid_sample();
+        {
+            decay_invalid_sample();
+            return;
+        }
 
         if (!positionValid_)
         {
             prevPosition_ = current;
             positionValid_ = true;
-            return 0.0f;
+            return;
         }
 
         const float dx = current.x - prevPosition_.x;
@@ -79,22 +80,22 @@ public:
         positionStep_ = std::isfinite(motionLen) ? motionLen : 0.0f;
 
         // A stop/restart must not inherit the previous corner's beta/yaw/front
-        // slip. Keep the already-proven matrix basis, but restart dynamic state
-        // and its crossfade before the car moves again.
+        // slip. Keep the proven matrix basis but restart only dynamic state.
         if (speedNorm <= 0.04f)
         {
             clear_dynamic_state();
             sampleValid_ = calibrated_;
-            return 0.0f;
+            return;
         }
 
         if (!std::isfinite(motionLen) || motionLen <= 0.00001f)
-            return decay_invalid_sample();
+        {
+            decay_invalid_sample();
+            return;
+        }
 
         // Detect restart/warp discontinuities without assuming OutRun world
-        // units. Position step is normalized by current speed, then compared
-        // with its own rolling scale. A large relative jump clears dynamic SAT
-        // history instead of becoming a one-frame lateral-velocity impulse.
+        // units. Compare normalized step length with its rolling scale.
         const float motionScale = motionLen / std::max(speedNorm, 0.05f);
         if (motionScaleSamples_ >= 12 &&
             motionScaleEma_ > 0.00001f &&
@@ -102,7 +103,7 @@ public:
         {
             ++discontinuityCount_;
             clear_dynamic_state();
-            return 0.0f;
+            return;
         }
         if (std::isfinite(motionScale))
         {
@@ -117,14 +118,13 @@ public:
         const float motionZ = dz / motionLen;
         const D3DMATRIX& body = car->matrix_70;
 
-        // D3D's OutRun car transforms use row-vector basis/translation layout.
-        // The model's local forward axis may be row 1 or row 3, so score both
-        // across multiple straight rolling physics ticks. Never commit basis
-        // identity from one noisy frame and never recalibrate in a drift.
+        // OutRun uses row-vector transforms, but whether local X or Z is the
+        // vehicle-forward basis is verified from several straight rolling ticks
+        // rather than guessed from one frame.
         if (!calibrated_ &&
             speedNorm > 0.12f &&
             std::abs(steer) < 0.08f &&
-            cornerLoadSmooth < 0.12f)
+            lateralLoadSmooth < 0.12f)
         {
             const float xLen = std::sqrt(body._11 * body._11 + body._13 * body._13);
             const float zLen = std::sqrt(body._31 * body._31 + body._33 * body._33);
@@ -151,9 +151,6 @@ public:
                     const float secondScore = std::min(xScore, zScore);
                     calibrationConfidence_ = bestScore - secondScore;
 
-                    // Require both strong motion alignment and clear separation
-                    // from the orthogonal basis. If not confident, keep
-                    // collecting straight samples instead of guessing.
                     if (bestScore >= 0.85f && calibrationConfidence_ >= 0.25f)
                     {
                         forwardAxis_ = zScore >= xScore ? 3 : 1;
@@ -169,7 +166,7 @@ public:
         }
 
         if (!calibrated_)
-            return 0.0f;
+            return;
 
         float forwardX = forwardAxis_ == 3 ? body._31 : body._11;
         float forwardZ = forwardAxis_ == 3 ? body._33 : body._13;
@@ -177,12 +174,15 @@ public:
         forwardZ *= forwardSign_;
         const float forwardLen = std::sqrt(forwardX * forwardX + forwardZ * forwardZ);
         if (!std::isfinite(forwardLen) || forwardLen <= 0.0001f)
-            return decay_invalid_sample();
+        {
+            decay_invalid_sample();
+            return;
+        }
         forwardX /= forwardLen;
         forwardZ /= forwardLen;
 
-        // Right-positive car-local motion. Position delta is intentionally used
-        // until spd_mb_20's units/coordinate space are proven by telemetry.
+        // Right-positive local motion. Position delta remains authoritative until
+        // spd_mb_20's coordinate space/scale is proven by real-lap telemetry.
         const float rightX = forwardZ;
         const float rightZ = -forwardX;
         vLong_ = dx * forwardX + dz * forwardZ;
@@ -197,7 +197,7 @@ public:
         {
             prevHeading_ = heading;
             headingValid_ = true;
-            return 0.0f;
+            return;
         }
 
         constexpr float Pi = 3.14159265359f;
@@ -212,18 +212,15 @@ public:
         {
             ++discontinuityCount_;
             clear_dynamic_state();
-            return 0.0f;
+            return;
         }
 
-        // This helper is called once per OutRun simulation tick. The game
-        // physics loop remains fixed at 60 Hz even when rendering >60 FPS.
+        // Called once per fixed OutRun simulation tick, independent of render FPS.
         const float rawYawRate = std::clamp(headingDelta * 60.0f, -3.5f, 3.5f);
         yawRate_ += (rawYawRate - yawRate_) * 0.20f;
 
-        // Bicycle-model inspired front-slip proxy:
+        // Bicycle-model-inspired front-slip proxy:
         // alpha_f ~= road-wheel-angle - beta - a*r/v.
-        // World velocity units are not calibrated yet, so a*r/v is represented
-        // by a bounded speed-dependent time constant for this experimental pass.
         constexpr float RoadWheelLockRad = 0.52f;
         const float roadWheelAngle = steer * RoadWheelLockRad;
         const float yawLeadSeconds = 0.10f - 0.045f * speedNorm;
@@ -232,8 +229,7 @@ public:
             -0.70f, 0.70f);
         frontSlip_ += (rawFrontSlip - frontSlip_) * 0.22f;
 
-        // Measure whether spd_mb_20 is a world-space velocity vector. Keep it
-        // telemetry-only until correlation and scale are proven by a real lap.
+        // Telemetry-only validation for the game's native speed vector.
         const float spdX = car->spd_mb_20.x;
         const float spdZ = car->spd_mb_20.z;
         const float spdLen = std::sqrt(spdX * spdX + spdZ * spdZ);
@@ -247,45 +243,10 @@ public:
         sampleValid_ = true;
         invalidTicks_ = 0;
         activationBlend_ = std::min(1.0f, activationBlend_ + (1.0f / 24.0f));
-
-        const float slipAbs = std::abs(frontSlip_);
-        if (slipAbs <= 0.004f)
-        {
-            lastTorque_ = 0.0f;
-            return 0.0f;
-        }
-
-        // Pneumatic-trail-like response: rise to a peak around 9 degrees front
-        // slip, then unload as the tyre slides more deeply instead of increasing
-        // forever like a generic centering spring.
-        constexpr float HalfPi = 1.57079632679f;
-        const float slipX = slipAbs / 0.16f;
-        const float trailShape = slipX <= 1.0f
-            ? std::sin(slipX * HalfPi)
-            : std::exp(-(slipX - 1.0f) * 0.90f);
-
-        const float slideT = std::clamp(
-            (std::abs(bodySlip_) - 0.12f) / 0.28f, 0.0f, 1.0f);
-        const float slideSmooth = slideT * slideT * (3.0f - 2.0f * slideT);
-        const float physicsGrip = 1.0f - 0.70f * gripLoss * slideSmooth;
-        const float physicsLoad = 0.62f + 0.48f * cornerLoadSmooth;
-        const float returnRelief = 1.0f - 0.15f * returnRateSmooth;
-
-        const float torque =
-            (frontSlip_ > 0.0f ? -1.0f : 1.0f) *
-            trailShape * satSpeed * physicsLoad * physicsGrip *
-            returnRelief * satStrength;
-        if (!std::isfinite(torque))
-            return decay_invalid_sample();
-
-        lastTorque_ = torque;
-        torqueActive_ = std::abs(torque) > 0.0001f;
-        return torque;
     }
 
     bool calibrated() const { return calibrated_; }
     bool sampleValid() const { return sampleValid_; }
-    bool torqueActive() const { return torqueActive_; }
     int forwardAxis() const { return forwardAxis_; }
     int discontinuityCount() const { return discontinuityCount_; }
     float calibrationConfidence() const { return calibrationConfidence_; }
@@ -304,40 +265,39 @@ private:
     void clear_dynamic_state()
     {
         headingValid_ = false;
+        sampleValid_ = false;
         prevHeading_ = 0.0f;
         bodySlip_ = 0.0f;
         yawRate_ = 0.0f;
         frontSlip_ = 0.0f;
+        vLong_ = 0.0f;
+        vLat_ = 0.0f;
         activationBlend_ = 0.0f;
         invalidTicks_ = 0;
-        lastTorque_ = 0.0f;
-        torqueActive_ = false;
     }
 
-    float decay_invalid_sample()
+    void decay_invalid_sample()
     {
         sampleValid_ = false;
-        torqueActive_ = false;
         if (!calibrated_)
-            return 0.0f;
+            return;
 
-        // Do not switch force models for a single bad physics sample. Briefly
-        // decay the previous Physics SAT request, then reach a safe zero.
         ++invalidTicks_;
+        bodySlip_ *= 0.55f;
+        yawRate_ *= 0.55f;
+        frontSlip_ *= 0.55f;
+        activationBlend_ *= 0.85f;
+
+        // Once telemetry has been invalid for several ticks, clear all dynamic
+        // slip/yaw state. Calibration/basis remains valid so recovery is quick.
         if (invalidTicks_ > 4)
-        {
-            lastTorque_ = 0.0f;
-            return 0.0f;
-        }
-        lastTorque_ *= 0.55f;
-        return lastTorque_;
+            clear_dynamic_state();
     }
 
     bool positionValid_ = false;
     bool headingValid_ = false;
     bool calibrated_ = false;
     bool sampleValid_ = false;
-    bool torqueActive_ = false;
     int forwardAxis_ = 0;
     float forwardSign_ = 1.0f;
     int calibrationSamples_ = 0;
@@ -349,7 +309,6 @@ private:
     float activationBlend_ = 0.0f;
     int invalidTicks_ = 0;
     int discontinuityCount_ = 0;
-    float lastTorque_ = 0.0f;
     D3DVECTOR prevPosition_{};
     float prevHeading_ = 0.0f;
     float bodySlip_ = 0.0f;

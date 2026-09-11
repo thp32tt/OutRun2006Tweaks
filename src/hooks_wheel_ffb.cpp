@@ -19,7 +19,7 @@
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "game_addrs.hpp"
-#include "hooks_wheel_physics_sat.hpp"
+#include "hooks_wheel_vehicle_dynamics.hpp"
 
 extern "C"
 {
@@ -90,7 +90,7 @@ namespace Settings
 
     Setting<float> WheelFFBSteeringWeight{
         "WheelFFB", "SteeringWeight", 1.45f,
-        "Self-aligning torque strength. Physics SAT uses body slip, yaw rate and lateral load; Natural SAT remains available for comparison.", Range<float>{ 0.0f, 2.0f }
+        "Self-aligning torque strength. Physics SAT direction/trail comes from front slip; field_264/268 only scale lateral load.", Range<float>{ 0.0f, 2.0f }
     };
 
     Setting<bool> WheelFFBPhysicsSat{
@@ -100,12 +100,12 @@ namespace Settings
 
     Setting<float> WheelFFBGripLoss{
         "WheelFFB", "GripLoss", 0.65f,
-        "How much cornering load and hardware spring unload as the car enters a deep drift.", Range<float>{ 0.0f, 1.0f }
+        "How strongly real chassis/front-slip signals release damping and unload SAT. Lateral G is load only, never a drift detector.", Range<float>{ 0.0f, 1.0f }
     };
 
     Setting<float> WheelFFBLateralDeadzone{
         "WheelFFB", "LateralDeadzone", 1.5f,
-        "Subtractive noise floor for the game's lateral force signal.", Range<float>{ 0.0f, 8.0f }
+        "Subtractive noise floor for the game's lateral-G/load signal.", Range<float>{ 0.0f, 8.0f }
     };
 
     Setting<float> WheelFFBWeightTransfer{
@@ -130,7 +130,7 @@ namespace Settings
 
     Setting<float> WheelFFBTireSlip{
         "WheelFFB", "TireSlip", 0.20f,
-        "Hardware sine chatter as drift depth increases.", Range<float>{ 0.0f, 1.0f }
+        "Hardware sine chatter driven mainly by estimated front-tire scrub, with a small chassis-slide contribution.", Range<float>{ 0.0f, 1.0f }
     };
 
     Setting<float> WheelFFBEngineIdle{
@@ -445,11 +445,31 @@ namespace
                     lateralDz = smoothedLateral_ >= 0.0f ? mag : -mag;
             }
 
+            // field_264 + field_268 is treated strictly as lateral acceleration/load.
+            // It must never decide whether the tyres are sliding; that comes from
+            // bodySlip/frontSlip estimated from actual vehicle motion.
             const float latNorm = std::clamp(lateralDz / 24.0f, -1.0f, 1.0f);
-            const float driftAmt =
-                std::clamp((std::abs(smoothedLateral_) - 12.0f) / 12.0f, 0.0f, 1.0f);
-            const float gripFactor =
-                1.0f - static_cast<float>(Settings::WheelFFBGripLoss) * driftAmt;
+            const float lateralLoad = std::clamp(std::abs(latNorm), 0.0f, 1.0f);
+            const float lateralLoadSmooth =
+                lateralLoad * lateralLoad * (3.0f - 2.0f * lateralLoad);
+
+            vehicleDynamics_.update(car, steer, speedNorm, lateralLoadSmooth);
+
+            const float bodySlideT = std::clamp(
+                (std::abs(vehicleDynamics_.bodySlip()) - 0.10f) / 0.22f,
+                0.0f, 1.0f);
+            const float bodySlide =
+                bodySlideT * bodySlideT * (3.0f - 2.0f * bodySlideT);
+            const float frontScrubT = std::clamp(
+                (std::abs(vehicleDynamics_.frontSlip()) - 0.04f) / 0.14f,
+                0.0f, 1.0f);
+            const float frontScrub =
+                frontScrubT * frontScrubT * (3.0f - 2.0f * frontScrubT);
+            const float configuredGripLoss =
+                static_cast<float>(Settings::WheelFFBGripLoss);
+            const float gripLoss = std::isfinite(configuredGripLoss)
+                ? std::clamp(configuredGripLoss, 0.0f, 1.0f)
+                : 0.0f;
 
             speedHistory_[speedHistoryIndex_ % SpeedHistoryCount] = speed;
             ++speedHistoryIndex_;
@@ -516,10 +536,16 @@ namespace
 
             float slipAmp = 0.0f;
             float slipFreq = 40.0f;
-            if (driftAmt > 0.15f && speedNorm > 0.05f)
+            const float slipSeverity = std::clamp(
+                frontScrub * (0.50f + 0.50f * lateralLoadSmooth) +
+                    bodySlide * 0.20f,
+                0.0f, 1.0f);
+            if (slipSeverity > 0.08f && speedNorm > 0.05f)
             {
-                slipAmp = driftAmt * static_cast<float>(Settings::WheelFFBTireSlip) * outputStrength;
-                slipFreq = 40.0f - 12.0f * driftAmt;
+                slipAmp =
+                    slipSeverity * static_cast<float>(Settings::WheelFFBTireSlip) *
+                    outputStrength;
+                slipFreq = 40.0f - 12.0f * slipSeverity;
             }
             else if (speedNorm < 0.03f && car->pedal_amount_34 > 0)
             {
@@ -563,8 +589,6 @@ namespace
             // Simulation-style aligning backbone: light at parking speed,
             // progressively stronger with vehicle speed, then additionally
             // loaded by cornering force. Deep slip unloads the wheel again.
-            const float cornerLoad = std::clamp(std::abs(latNorm), 0.0f, 1.0f);
-
             // Keep GUID_Spring as a low-speed/near-centre stabilizer instead of
             // stacking a second high-speed SAT on top of ConstantForce. The
             // fade is a smoothstep, so crossing the blend region cannot create
@@ -574,10 +598,10 @@ namespace
             const float springFade =
                 springFadeT * springFadeT * (3.0f - 2.0f * springFadeT);
             const float springSpeed = 1.0f - 0.88f * springFade;
-            const float springGrip = 0.80f + 0.20f * gripFactor;
+            // Centering Spring is an artificial low-speed stabilizer, not a tyre
+            // grip estimator. Do not modulate it with lateral-G or slide state.
             const float springStrength = std::clamp(
-                static_cast<float>(Settings::WheelFFBSpringStrength) *
-                    springSpeed * springGrip,
+                static_cast<float>(Settings::WheelFFBSpringStrength) * springSpeed,
                 0.0f, 1.0f);
 
             const bool suppressSpringForImpact =
@@ -617,10 +641,12 @@ namespace
             // implement it and keep the old software term as a fallback.
             const float dampingSpeed =
                 0.10f + 0.90f * std::pow(speedNorm, 1.30f);
-            const float dampingGrip = 0.25f + 0.75f * gripFactor;
+            // Release steering damping only when the chassis is actually
+            // sliding. A high lateral-G but fully-gripped corner keeps damping.
+            const float damperRelease = 1.0f - 0.55f * gripLoss * bodySlide;
             const float dynamicDamperStrength = std::clamp(
                 static_cast<float>(Settings::WheelFFBDamperStrength) *
-                    dampingSpeed * dampingGrip,
+                    dampingSpeed * damperRelease,
                 0.0f, 1.0f);
 
             if (!Settings::WheelFFBUseHardwareDamper && damperEffect_)
@@ -676,19 +702,12 @@ namespace
             // OutRun exposes an arcade lateral signal rather than tyre
             // pneumatic trail. Use only its magnitude as a gentle load modifier
             // and never let its sign decide the FFB direction.
-            const float cornerLoadSmooth =
-                cornerLoad * cornerLoad * (3.0f - 2.0f * cornerLoad);
-            const float satLoadBoost = 0.72f + 0.38f * cornerLoadSmooth;
+            const float satLoadBoost = 0.72f + 0.38f * lateralLoadSmooth;
 
-            // Lateral magnitude is only a proxy for actual slip. Unload late and
-            // smoothly so an ordinary loaded corner cannot repeatedly lose and
-            // regain SAT as the Xbox vibration signal crosses a threshold.
-            const float satSlipT = std::clamp(
-                (driftAmt - 0.60f) / 0.35f, 0.0f, 1.0f);
-            const float satSlip =
-                satSlipT * satSlipT * (3.0f - 2.0f * satSlipT);
-            const float satGrip = 1.0f -
-                0.65f * static_cast<float>(Settings::WheelFFBGripLoss) * satSlip;
+            // Natural SAT remains an A/B fallback, but even it now unloads from
+            // actual chassis slide instead of mistaking high lateral-G for drift.
+            const float naturalSlideRelief =
+                1.0f - 0.25f * gripLoss * bodySlide;
 
             // A real steering rack loses net aligning acceleration as the wheel
             // is already rotating quickly back toward centre. Apply a bounded
@@ -706,20 +725,41 @@ namespace
                 static_cast<float>(Settings::WheelFFBSteeringWeight), 0.0f, 2.0f);
             const float naturalSatTorque =
                 (steer >= 0.0f ? -1.0f : 1.0f) *
-                steerForSat * satSpeed * satLoadBoost * satGrip *
+                steerForSat * satSpeed * satLoadBoost * naturalSlideRelief *
                 satReturnRelief * satStrength;
 
-            // Physics SAT derives force direction from estimated front slip,
-            // not merely from steering sign. During initial basis calibration
-            // retain only a small Natural SAT safety net, then crossfade over
-            // 24 valid physics ticks. Once active, a valid zero Physics SAT is
-            // truly zero; Natural SAT never leaks back in around wheel centre.
-            const float physicsSatTorque = physicsSat_.update(
-                car, steer, speedNorm, cornerLoadSmooth, returnRateSmooth,
-                static_cast<float>(Settings::WheelFFBGripLoss),
-                satStrength, satSpeed);
+            // Physics SAT force shaping lives here, separate from the vehicle
+            // estimator. Front slip determines both direction and the pneumatic-
+            // trail-like rise/fall. Body slide only applies a mild rear-slide
+            // relief so counter-steer SAT is not double-unloaded.
+            const float frontSlip = vehicleDynamics_.frontSlip();
+            const float frontSlipAbs = std::abs(frontSlip);
+            float physicsSatTorque = 0.0f;
+            if (vehicleDynamics_.calibrated() && frontSlipAbs > 0.004f)
+            {
+                const float slipX = frontSlipAbs / 0.16f;
+                const float trailShape = slipX <= 1.0f
+                    ? std::sin(slipX * HalfPi)
+                    : std::exp(-(slipX - 1.0f) * 0.90f);
+                const float physicsLoad = 0.62f + 0.48f * lateralLoadSmooth;
+                const float rearSlideRelief =
+                    1.0f - 0.15f * gripLoss * bodySlide;
+                const float physicsReturnRelief =
+                    1.0f - 0.15f * returnRateSmooth;
+
+                physicsSatTorque =
+                    (frontSlip > 0.0f ? -1.0f : 1.0f) *
+                    trailShape * satSpeed * physicsLoad * rearSlideRelief *
+                    physicsReturnRelief * satStrength;
+                if (!std::isfinite(physicsSatTorque))
+                    physicsSatTorque = 0.0f;
+            }
+
+            // During basis calibration retain only a small Natural SAT safety
+            // net, then crossfade over valid dynamics ticks. Invalid telemetry
+            // decays/clears dynamics state instead of leaking stale slide values.
             const float physicsFallback = naturalSatTorque * 0.15f;
-            const float physicsMix = physicsSat_.activationBlend();
+            const float physicsMix = vehicleDynamics_.activationBlend();
             const float selfAligningTorque = Settings::WheelFFBPhysicsSat
                 ? physicsFallback + (physicsSatTorque - physicsFallback) * physicsMix
                 : naturalSatTorque;
@@ -831,7 +871,7 @@ namespace
 
             prevGear_ = curGear;
             prevCollisionFlags_ = stateFlags;
-            maybe_log(speedNorm, steer, steerRate, driftAmt, roughness, selfAligningTorque, level);
+            maybe_log(speedNorm, steer, steerRate, lateralLoadSmooth, bodySlide, frontScrub, roughness, selfAligningTorque, level);
         }
 
         void request_direction_test(int direction)
@@ -2352,7 +2392,7 @@ namespace
         {
             smoothedLateral_ = 0.0f;
             prevSteer_ = 0.0f;
-            physicsSat_.reset();
+            vehicleDynamics_.reset();
             prevStructuralLevel_ = 0;
             prevSpringCoefficient_ = 0;
             prevDamperCoefficient_ = 0;
@@ -2603,7 +2643,9 @@ namespace
             float speedNorm,
             float steer,
             float steerRate,
-            float driftAmt,
+            float lateralLoad,
+            float bodySlide,
+            float frontScrub,
             float roughness,
             float satTorque,
             LONG level)
@@ -2617,30 +2659,32 @@ namespace
 
             lastLogTick_ = now;
             spdlog::info(
-                "WheelFFB DIAG: spd={:.2f} steer={:.3f} rate={:.4f} lat={:.2f} drift={:.2f} rough={:.2f} sat={:.3f} phys={} basis=M70r{} cal={:.2f} mix={:.2f} beta={:.3f} yaw={:.3f} fslip={:.3f} vLat={:.5f} vLong={:.5f} step={:.5f} spdLen={:.5f} spdCorr={:.2f} steerSrc={} out={} invCF={} spring={} invSpring={} coeff={} damper={} dcoeff={} periodic={}",
+                "WheelFFB DIAG: spd={:.2f} steer={:.3f} rate={:.4f} lat={:.2f} load={:.2f} slide={:.2f} scrub={:.2f} rough={:.2f} sat={:.3f} phys={} basis=M70r{} cal={:.2f} mix={:.2f} beta={:.3f} yaw={:.3f} fslip={:.3f} vLat={:.5f} vLong={:.5f} step={:.5f} spdLen={:.5f} spdCorr={:.2f} steerSrc={} out={} invCF={} spring={} invSpring={} coeff={} damper={} dcoeff={} periodic={}",
                 speedNorm,
                 steer,
                 steerRate,
                 smoothedLateral_,
-                driftAmt,
+                lateralLoad,
+                bodySlide,
+                frontScrub,
                 roughness,
                 satTorque,
                 Settings::WheelFFBPhysicsSat
-                    ? (physicsSat_.calibrated()
-                        ? (physicsSat_.sampleValid() ? "ACTIVE" : "HOLD")
+                    ? (vehicleDynamics_.calibrated()
+                        ? (vehicleDynamics_.sampleValid() ? "ACTIVE" : "HOLD")
                         : "CAL")
                     : "OFF",
-                physicsSat_.forwardAxis(),
-                physicsSat_.calibrationConfidence(),
-                physicsSat_.activationBlend(),
-                physicsSat_.bodySlip(),
-                physicsSat_.yawRate(),
-                physicsSat_.frontSlip(),
-                physicsSat_.vLat(),
-                physicsSat_.vLong(),
-                physicsSat_.positionStep(),
-                physicsSat_.spdLen(),
-                physicsSat_.spdCorrelation(),
+                vehicleDynamics_.forwardAxis(),
+                vehicleDynamics_.calibrationConfidence(),
+                vehicleDynamics_.activationBlend(),
+                vehicleDynamics_.bodySlip(),
+                vehicleDynamics_.yawRate(),
+                vehicleDynamics_.frontSlip(),
+                vehicleDynamics_.vLat(),
+                vehicleDynamics_.vLong(),
+                vehicleDynamics_.positionStep(),
+                vehicleDynamics_.spdLen(),
+                vehicleDynamics_.spdCorrelation(),
                 Settings::UseNewInput ? "SDL" : "legacy",
                 static_cast<int>(level),
                 bool(Settings::WheelFFBInvertForce),
@@ -2709,7 +2753,7 @@ namespace
 
         float smoothedLateral_ = 0.0f;
         float prevSteer_ = 0.0f;
-        WheelPhysicsSatV1 physicsSat_{};
+        WheelVehicleDynamics vehicleDynamics_{};
         float crashImpulseForce_ = 0.0f;
         float roadPhase_ = 0.0f;
         float slipPhase_ = 0.0f;
