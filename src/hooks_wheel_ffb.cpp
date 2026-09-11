@@ -783,7 +783,7 @@ namespace
             // Keep the Natural safety net alive throughout the activation ramp.
             // Dropping it on the calibration tick created a short SAT hole while
             // physicsMix was still near zero.
-            const float physicsFallback = naturalSatTorque * 0.15f;
+            const float physicsFallback = naturalSatTorque;
             const float selfAligningTorque = Settings::WheelFFBPhysicsSat
                 ? physicsFallback + (physicsSatTorque - physicsFallback) * physicsMix
                 : naturalSatTorque;
