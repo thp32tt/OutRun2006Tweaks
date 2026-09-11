@@ -6,6 +6,7 @@ on:
 
 jobs:
   build:
+    if: github.event_name != 'push' || github.event.head_commit.message != 'chore: apply wheel dynamics refactor'
     runs-on: windows-2022
     strategy:
       matrix:
@@ -76,10 +77,11 @@ jobs:
             "multi-device SDL raw input enabled",
             "Multi-device input architecture adapted from hyp36rmax (MIT)",
             "2-axis POLAR actuator encoding",
-            "MOZA R3 Physics SAT v1",
+            "MOZA R3 Physics SAT",
             "MOZA R3 Natural SAT",
             "Single-owner wheel FFB: DirectInput COM only",
-            "Physics SAT v1 (body slip + yaw)",
+            "Physics SAT (body slip + yaw)",
+            "load={:.2f} slide={:.2f} scrub={:.2f}",
             "basis=M70r{}",
             "steerSrc={}",
             "Test Left (20%)"
@@ -114,7 +116,7 @@ jobs:
           path: |
             src/hooks_wheel_ffb.cpp
             src/hooks_wheel_ffb_build.cpp
-            src/hooks_wheel_physics_sat.hpp
+            src/hooks_wheel_vehicle_dynamics.hpp
             src/hooks_forcefeedback.cpp
             src/hooks_wheel_input_compat_v2.hpp
             src/hooks_wheel_r3_menu_dpad.hpp
