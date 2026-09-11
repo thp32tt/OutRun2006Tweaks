@@ -1,4 +1,4 @@
-# Triggered final post-review safeguard pass.
+# Corrected final post-review safeguard pass.
 name: Final FFB UI Postfix
 
 on:
@@ -6,6 +6,7 @@ on:
     branches: [ wheel-ffb ]
     paths:
       - '.github/final_ffb_ui_postfix.py'
+      - '.github/final_ffb_ui_postfix_v2.py'
       - '.github/workflows/final-ffb-ui-postfix.yml'
 
 permissions:
@@ -24,8 +25,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Apply final post-review safeguards
-        run: python .github/final_ffb_ui_postfix.py
+      - name: Apply corrected final post-review safeguards
+        run: python .github/final_ffb_ui_postfix_v2.py
 
       - name: Run current source verifier
         run: python tools/verify_wheel_ffb_current.py
@@ -53,6 +54,6 @@ jobs:
       - name: Remove temporary postfix harness
         run: |
           git pull --rebase origin wheel-ffb
-          git rm .github/final_ffb_ui_postfix.py .github/workflows/final-ffb-ui-postfix.yml
+          git rm .github/final_ffb_ui_postfix.py .github/final_ffb_ui_postfix_v2.py .github/workflows/final-ffb-ui-postfix.yml
           git commit -m "chore: remove temporary final FFB UI postfix harness"
           git push origin HEAD:wheel-ffb
