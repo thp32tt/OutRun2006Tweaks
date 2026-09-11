@@ -805,26 +805,29 @@ namespace
             if (crashImpulseTimer_ <= CrashCooldownFrames)
                 structural = (softwareSpring + selfAligningTorque) * loadMod + damper;
 
-            const bool eventActive =
-                crashImpulseTimer_ > CrashCooldownFrames || gearShiftTimer_ > 0;
             float events = update_event_force();
 
-            // d-b-c-e toolkit v0.8.0 ordering: gain/invert are part of the
-            // signal before soft saturation and slew. This prevents high gain
-            // or inversion from disagreeing with the slew limiter's last value.
-            float total = (structural + events) * outputStrength;
-            if (Settings::WheelFFBInvertForce)
-                total = -total;
-
-            total *= warmupScale * recreateScale;
+            // Sustained steering and short events have different timing needs.
+            // Keep SAT/spring/damper on the DD-safe slew path while allowing a
+            // crash or gear thunk to arrive promptly without releasing that
+            // slew limiter for the whole steering signal.
+            const float forceDirection = Settings::WheelFFBInvertForce ? -1.0f : 1.0f;
+            const float outputRamp = warmupScale * recreateScale;
+            float total = structural * outputStrength * forceDirection * outputRamp;
+            float eventOutput = events * outputStrength * forceDirection * outputRamp;
             if (!std::isfinite(total))
                 total = 0.0f;
+            if (!std::isfinite(eventOutput))
+                eventOutput = 0.0f;
 
             // Preserve ordinary SAT linearly; bend only near the force cap.
             const float compressed = WheelFFBMath::soft_saturate(total);
+            const float eventCompressed = WheelFFBMath::soft_saturate(eventOutput);
 
             LONG structuralLevel =
                 static_cast<LONG>(compressed * static_cast<float>(DI_FFNOMINALMAX));
+            const LONG eventLevel = static_cast<LONG>(
+                eventCompressed * static_cast<float>(DI_FFNOMINALMAX));
 
             const float configuredSlew = static_cast<float>(Settings::WheelFFBSlewRate);
             const float safeSlew = std::isfinite(configuredSlew)
@@ -842,9 +845,8 @@ namespace
                 ? std::min(static_cast<LONG>(DI_FFNOMINALMAX), maxSlew * 2)
                 : maxSlew;
             const LONG structuralDelta = structuralLevel - prevStructuralLevel_;
-            const bool bypassSlew = eventActive;
 
-            if (std::abs(structuralDelta) > appliedMaxSlew && !bypassSlew)
+            if (std::abs(structuralDelta) > appliedMaxSlew)
             {
                 structuralLevel = prevStructuralLevel_ +
                     (structuralDelta > 0 ? appliedMaxSlew : -appliedMaxSlew);
@@ -865,12 +867,12 @@ namespace
             }
 
             const LONG level = std::clamp(
-                structuralLevel +
+                structuralLevel + eventLevel +
                     static_cast<LONG>(fallbackVibration * static_cast<float>(DI_FFNOMINALMAX)),
                 -static_cast<LONG>(DI_FFNOMINALMAX),
                 static_cast<LONG>(DI_FFNOMINALMAX));
 
-            if (std::abs(level - prevConstantLevel_) > 15 || bypassSlew ||
+            if (std::abs(level - prevConstantLevel_) > 15 || eventLevel != 0 ||
                 (level != 0 && GetTickCount() - lastConstantWriteTick_ >= FFB_EFFECT_REFRESH_MS))
                 set_constant_force(level);
 
@@ -913,7 +915,7 @@ namespace
             {
                 lastTelemetryTick_ = telemetryNow;
                 spdlog::info(
-                    "WheelFFB SAMPLE t={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperRelease={} damperCoefficient={} roadAmp={} slipAmp={} structural={} event={} preClip={} postClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
+                    "WheelFFB SAMPLE t={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperRelease={} damperCoefficient={} roadAmp={} slipAmp={} structural={} event={} structuralPreClip={} structuralPostClip={} eventPostClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
                     telemetryNow, static_cast<const void*>(car), speedRaw, speedNorm, steer, rawSteerRate, steerRate,
                     car->field_264, car->field_268, lateralRaw, smoothedLateral_, lateralLoadSmooth,
                     vehicleDynamics_.bodySlip(), bodySlide, vehicleDynamics_.yawRate(), frontSlip, frontScrub,
@@ -924,7 +926,7 @@ namespace
                     vehicleDynamics_.sampleValid(), physicsMix, physicsSatTorque, selfAligningTorque,
                     trailShape, physicsLoad, rearSlideRelief, springStrength, prevSpringCoefficient_,
                     dynamicDamperStrength, damperRelease, prevDamperCoefficient_, roadAmp, slipAmp,
-                    structural, events, total, compressed, structuralLevel, level, prevConstantLevel_,
+                    structural, events, total, compressed, eventCompressed, structuralLevel, level, prevConstantLevel_,
                     constantEffectPolar_, springEffect_ != nullptr, damperEffect_ != nullptr,
                     periodicsActive_, outputStrength, bool(Settings::WheelFFBInvertForce),
                     bool(Settings::WheelFFBInvertSpring));

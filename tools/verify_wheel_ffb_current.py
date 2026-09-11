@@ -184,4 +184,6 @@ req(ffb, 'const float physicsMix = vehicleDynamics_.sampleValid()', 'invalid dyn
 req(dyn, 'void reset_dynamic()', 'dynamic reset preserves calibrated vehicle basis')
 req(ffb, 'vehicleDynamics_.reset_dynamic();', 'engine transitions preserve dynamics calibration')
 req(dyn, 'calibrationSamples_ >= CalibrationSamplesRequired * 4', 'ambiguous basis calibration retries with a fresh window')
+forbid(ffb, 'bypassSlew', 'events never bypass sustained steering slew')
+req(ffb, 'const LONG eventLevel = static_cast<LONG>', 'events have an independent immediate output path')
 print('CURRENT WHEEL FFB STRUCTURE VERIFIED; run verify_wheel_ffb_math.py for numerical tests')
