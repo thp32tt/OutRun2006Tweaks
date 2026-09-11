@@ -1,0 +1,49 @@
+name: Source-only Wheel Dynamics Refactor
+
+on:
+  push:
+    branches: [ wheel-ffb ]
+
+permissions:
+  contents: write
+
+jobs:
+  refactor:
+    if: "${{ github.event.head_commit.message == 'chore: apply wheel dynamics refactor' }}"
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+          submodules: false
+
+      - name: Apply dynamics/grip role separation
+        shell: pwsh
+        run: python tools/refactor_wheel_dynamics_once.py
+
+      - name: Verify consolidated source
+        shell: pwsh
+        run: python tools/verify_wheel_ffb_current.py
+
+      - name: Restore normal build workflow and remove one-shot files
+        shell: pwsh
+        run: |
+          $build = Get-Content .github/workflows/build.yml -Raw
+          $build = $build.Replace("    if: github.event_name != 'push' || github.event.head_commit.message != 'chore: apply wheel dynamics refactor'`r`n", "")
+          $build = $build.Replace("    if: github.event_name != 'push' || github.event.head_commit.message != 'chore: apply wheel dynamics refactor'`n", "")
+          Set-Content .github/workflows/build.yml -Value $build -NoNewline
+          Remove-Item tools/refactor_wheel_dynamics_once.py
+          Remove-Item tools/.wheel-dynamics-trigger
+          Remove-Item .github/workflows/source-refactor.yml
+
+      - name: Commit source refactor
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "refactor: separate lateral load, chassis slide and front scrub [skip ci]"
+          git push origin HEAD:wheel-ffb
