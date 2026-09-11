@@ -763,9 +763,11 @@ namespace
             // During basis calibration retain only a small Natural SAT safety
             // net, then crossfade over valid dynamics ticks. Invalid telemetry
             // decays/clears dynamics state instead of leaking stale slide values.
-            const float physicsFallback = vehicleDynamics_.calibrated()
-                ? 0.0f : naturalSatTorque * 0.15f;
             const float physicsMix = vehicleDynamics_.activationBlend();
+            // Keep the Natural safety net alive throughout the activation ramp.
+            // Dropping it on the calibration tick created a short SAT hole while
+            // physicsMix was still near zero.
+            const float physicsFallback = naturalSatTorque * 0.15f;
             const float selfAligningTorque = Settings::WheelFFBPhysicsSat
                 ? physicsFallback + (physicsSatTorque - physicsFallback) * physicsMix
                 : naturalSatTorque;
