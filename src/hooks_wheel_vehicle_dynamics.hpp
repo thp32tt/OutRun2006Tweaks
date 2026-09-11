@@ -40,6 +40,20 @@ public:
         spdCorrelation_ = 0.0f;
     }
 
+    void reset_dynamic()
+    {
+        // Preserve the proven matrix basis while dropping every time-domain
+        // sample. Menu/focus/F11 transitions must not force another straight-
+        // line calibration before Physics SAT can return.
+        positionValid_ = false;
+        headingValid_ = false;
+        prevPosition_ = D3DVECTOR{};
+        positionStep_ = 0.0f;
+        spdLen_ = 0.0f;
+        spdCorrelation_ = 0.0f;
+        clear_dynamic_state();
+    }
+
     void update(
         EVWORK_CAR* car,
         float steer,

@@ -181,4 +181,6 @@ req(ffb, 'std::abs(structuralDelta) > appliedMaxSlew', 'asymmetric slew applied 
 forbid(ffb, 'naturalSatTorque * 0.15f', 'Physics mode never falls back to weak 15 percent steering')
 req(ffb, 'vehicleDynamics_.calibrated() && vehicleDynamics_.sampleValid()', 'Physics SAT requires a current valid motion sample')
 req(ffb, 'const float physicsMix = vehicleDynamics_.sampleValid()', 'invalid dynamics falls back to Natural SAT immediately')
+req(dyn, 'void reset_dynamic()', 'dynamic reset preserves calibrated vehicle basis')
+req(ffb, 'vehicleDynamics_.reset_dynamic();', 'engine transitions preserve dynamics calibration')
 print('CURRENT WHEEL FFB STRUCTURE VERIFIED; run verify_wheel_ffb_math.py for numerical tests')

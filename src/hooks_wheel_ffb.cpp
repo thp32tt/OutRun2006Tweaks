@@ -2420,7 +2420,7 @@ namespace
             prevSteer_ = 0.0f;
             smoothedSteerRate_ = 0.0f;
             steerSampleValid_ = false;
-            vehicleDynamics_.reset();
+            vehicleDynamics_.reset_dynamic();
             prevStructuralLevel_ = 0;
             prevSpringCoefficient_ = 0;
             prevDamperCoefficient_ = 0;
