@@ -621,11 +621,22 @@ private:
 	{
 		const bool usbIdentityMatches = (!binding.deviceVendor || device.vendor == binding.deviceVendor) &&
 			(!binding.deviceProduct || device.product == binding.deviceProduct);
+		if (!usbIdentityMatches)
+			return false;
+
+		// A real serial is the strongest stable identity. USB paths are not: they
+		// can change when the same wheel/pedal set is moved to another port or hub.
 		if (!binding.deviceSerial.empty())
-			return usbIdentityMatches && device.serial == binding.deviceSerial;
-		if (!binding.devicePath.empty())
-			return usbIdentityMatches && device.path == binding.devicePath;
-		return device.guid == binding.deviceGuid && device.occurrence == binding.deviceOccurrence;
+			return device.serial == binding.deviceSerial;
+
+		if (!binding.deviceGuid.empty() && device.guid != binding.deviceGuid)
+			return false;
+		if (device.occurrence == binding.deviceOccurrence)
+			return true;
+
+		// Path is only a duplicate-device tie-breaker/fallback, never a mandatory
+		// identity for otherwise matching VID/PID/GUID hardware.
+		return !binding.devicePath.empty() && device.path == binding.devicePath;
 	}
 
 	SDL_Joystick* joystickForBinding(const InputBinding& binding) const

@@ -9,7 +9,6 @@
 
 namespace Settings
 {
-    extern Setting<bool> WheelFFBEnable;
 	Setting<int> VibrationMode{ "Controls", "VibrationMode", 0,
 		"Enable/disable/customize the Xbox vibration code. (NOTE: Some bluetooth controllers may cause framerate issues when vibration is enabled)",
 		{ "Disable", "Enable Xbox vibration", "L/R motors swapped", "L/R motors merged together" } };
@@ -26,13 +25,15 @@ int VibrationStrength = 10;
 float VibrationLeftMotor = 0.f;
 float VibrationRightMotor = 0.f;
 
+bool WheelFFB_IsOutputOwnerActive();
+
 void SetVibration(int userId, float leftMotor, float rightMotor)
 {
-    // With SDL multi-device input, wheel FFB is owned exclusively by the
-    // DirectInput COM WheelFFBEngine. Do not let the independent gamepad-rumble
-    // path reach a wheel/gamepad interface at the same time.
+    // Suppress the independent gamepad-rumble path only after the
+    // DirectInput WheelFFBEngine has actually initialized an output device.
+    // A configured-but-missing/failed wheel must not disable controller rumble.
     static bool wheelOwnedLastCall = false;
-    if (Settings::WheelFFBEnable)
+    if (WheelFFB_IsOutputOwnerActive())
     {
         if (!wheelOwnedLastCall)
         {

@@ -923,6 +923,11 @@ namespace
             }
         }
 
+        bool output_owner_active() const
+        {
+            return Settings::WheelFFBEnable && initialized_ && device_ && !panicStopped_;
+        }
+
         void request_direction_test(int direction)
         {
             if (direction == 0)
@@ -2909,6 +2914,11 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
 void WheelFFB_ServiceSafety()
 {
     gWheelFFB.service_safety();
+}
+
+bool WheelFFB_IsOutputOwnerActive()
+{
+    return gWheelFFB.output_owner_active();
 }
 
 void WheelFFB_RequestDirectionTest(int direction)

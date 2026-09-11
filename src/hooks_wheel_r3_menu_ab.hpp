@@ -415,7 +415,10 @@ namespace
 
         bool validate() override
         {
-            return Settings::WheelInputCompatibility && !Settings::UseNewInput;
+            return Settings::WheelInputCompatibility &&
+                !Settings::UseNewInput &&
+                !Settings::WheelUniversalSetupEnable &&
+                Settings::WheelMenuR3DirectAB;
         }
 
         void declare_settings() override

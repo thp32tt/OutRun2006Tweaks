@@ -25,6 +25,9 @@
 namespace Settings
 {
     extern Setting<bool> WheelMenuDirectionFilter; // hooks_input.cpp
+    extern Setting<bool> UseNewInput;
+    extern Setting<bool> WheelInputCompatibility;
+    extern Setting<bool> WheelUniversalSetupEnable;
 
     Setting<bool> WheelPedalSplitFix{
         "Controls", "WheelPedalSplitFix", false,
@@ -82,7 +85,9 @@ namespace
 
         static bool active()
         {
-            return Settings::WheelInputCompatibility && !Settings::UseNewInput;
+            return Settings::WheelInputCompatibility &&
+                !Settings::UseNewInput &&
+                !Settings::WheelUniversalSetupEnable;
         }
 
         static bool mayLearnMenuDirection()

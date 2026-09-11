@@ -703,7 +703,7 @@ namespace
         }
 
         std::string_view description() override { return "Universal DirectInput Wheel Setup"; }
-        bool validate() override { return Settings::WheelInputCompatibility; }
+        bool validate() override { return Settings::WheelInputCompatibility && !Settings::UseNewInput && Settings::WheelUniversalSetupEnable; }
         bool apply() override
         {
             ReadIOHook = safetyhook::create_inline(Module::exe_ptr(0x53BB0), ReadIO_dest);
@@ -754,21 +754,29 @@ namespace
             status_ = "Saved to OutRun2006Tweaks.user.ini";
         }
 
-        void select_device(const DeviceInfo& info)
+        void select_device(const DeviceInfo& info, bool ffbOutput)
         {
+            if (ffbOutput)
+            {
+                if (!info.ffb)
+                {
+                    status_ = "That DirectInput interface does not advertise force feedback.";
+                    return;
+                }
+                Settings::WheelFFBDeviceName = info.name;
+                Settings::WheelFFBDeviceGuid = info.guidKey;
+                Settings::write(Module::UserIniPath);
+                status_ = "Selected FFB output and saved its exact DirectInput GUID. Restart after changing the physical wheel base.";
+                return;
+            }
+
             Settings::WheelUniversalDeviceName = info.name;
             Settings::WheelUniversalDeviceGuid = info.guidKey;
-            Settings::WheelFFBDeviceName = info.name;
-            Settings::WheelFFBDeviceGuid = info.guidKey;
-            if (!Settings::UseNewInput)
-                gReader.select_by_identity(info.guidKey, info.name);
+            gReader.select_by_identity(info.guidKey, info.name);
             Settings::write(Module::UserIniPath);
-            if (Settings::UseNewInput)
-                status_ = "Selected FFB wheel and saved its exact DirectInput GUID. Restart the game after changing physical wheel.";
-            else
-                status_ = UniversalWheelProfile::regular_device_count() > 1
-                    ? "Selected wheel/FFB device. Confirm the OutRun legacy input slot below when multiple controllers are present."
-                    : "Selected wheel; FFB device follows this product name.";
+            status_ = UniversalWheelProfile::regular_device_count() > 1
+                ? "Selected legacy input device. Confirm the OutRun legacy input slot below when multiple controllers are present."
+                : "Selected legacy input device. FFB output is configured separately below.";
         }
 
         void begin_bind(BindTarget target)
@@ -979,34 +987,67 @@ namespace
             if (ImGui::Button("Refresh Devices"))
                 gReader.refresh_devices();
 
-            ImGui::SameLine();
-            std::string preview = Settings::UseNewInput
-                ? Settings::WheelFFBDeviceName.get() : Settings::WheelUniversalDeviceName.get();
-            if (preview.empty()) preview = devices.empty() ? "No DirectInput device" : devices.front().name;
-            const std::string configuredGuid =
-                lower_identity(Settings::UseNewInput
-                    ? Settings::WheelFFBDeviceGuid.get() : Settings::WheelUniversalDeviceGuid.get());
-            auto isSelectedDevice = [&](const DeviceInfo& dev)
+            auto first_device_name = [&](bool ffbOnly) -> std::string
             {
-                return !configuredGuid.empty()
-                    ? dev.guidKey == configuredGuid
-                    : dev.name == Settings::WheelUniversalDeviceName.get();
+                for (const auto& dev : devices)
+                    if (!ffbOnly || dev.ffb)
+                        return dev.name;
+                return ffbOnly ? "No force-feedback DirectInput device" : "No DirectInput device";
             };
-            if (ImGui::BeginCombo("Wheel", preview.c_str()))
+
+            auto draw_device_combo = [&](const char* label, bool ffbOnly,
+                const std::string& configuredGuidValue, const std::string& configuredNameValue,
+                bool ffbOutput)
             {
-                for (size_t i = 0; i < devices.size(); ++i)
+                std::string preview = configuredNameValue;
+                if (preview.empty())
+                    preview = first_device_name(ffbOnly);
+                const std::string configuredGuid = lower_identity(configuredGuidValue);
+                auto isSelectedDevice = [&](const DeviceInfo& dev)
                 {
-                    const bool selected = isSelectedDevice(devices[i]);
-                    const std::string label = devices[i].name + "##" + devices[i].guidKey;
-                    if (ImGui::Selectable(label.c_str(), selected)) select_device(devices[i]);
-                    if (selected) ImGui::SetItemDefaultFocus();
+                    if (ffbOnly && !dev.ffb)
+                        return false;
+                    return !configuredGuid.empty()
+                        ? dev.guidKey == configuredGuid
+                        : dev.name == configuredNameValue;
+                };
+
+                if (ImGui::BeginCombo(label, preview.c_str()))
+                {
+                    for (const auto& dev : devices)
+                    {
+                        if (ffbOnly && !dev.ffb)
+                            continue;
+                        const bool selected = isSelectedDevice(dev);
+                        const std::string item = dev.name + "##" + label + dev.guidKey;
+                        if (ImGui::Selectable(item.c_str(), selected))
+                            select_device(dev, ffbOutput);
+                        if (selected)
+                            ImGui::SetItemDefaultFocus();
+                    }
+                    ImGui::EndCombo();
                 }
-                ImGui::EndCombo();
+
+                for (const auto& dev : devices)
+                    if (isSelectedDevice(dev))
+                        ImGui::TextDisabled("%lu axes / %lu buttons / %lu POV / FFB %s / GUID %s",
+                            dev.axes, dev.buttons, dev.povs, dev.ffb ? "yes" : "no", dev.guidKey.c_str());
+            };
+
+            if (Settings::UseNewInput)
+            {
+                ImGui::SameLine();
+                draw_device_combo("FFB Output", true,
+                    Settings::WheelFFBDeviceGuid.get(), Settings::WheelFFBDeviceName.get(), true);
             }
-            for (const auto& dev : devices)
-                if (isSelectedDevice(dev))
-                    ImGui::TextDisabled("%lu axes / %lu buttons / %lu POV / FFB %s / GUID %s",
-                        dev.axes, dev.buttons, dev.povs, dev.ffb ? "yes" : "no", dev.guidKey.c_str());
+            else
+            {
+                ImGui::SameLine();
+                draw_device_combo("Legacy Input Wheel", false,
+                    Settings::WheelUniversalDeviceGuid.get(), Settings::WheelUniversalDeviceName.get(), false);
+                draw_device_combo("FFB Output", true,
+                    Settings::WheelFFBDeviceGuid.get(), Settings::WheelFFBDeviceName.get(), true);
+            }
 
             if (!Settings::UseNewInput)
             {
@@ -1226,7 +1267,7 @@ namespace
             ImGui::TextDisabled(
                 Settings::UseNewInput
                     ? "Input setup: Input Bindings only. FFB setup: this Force Feedback page only. Restart after switching to a different physical wheel."
-                    : "Legacy compatibility input and FFB are configured on this page. Restart after switching to a different physical wheel.");
+                    : "Legacy input and DirectInput FFB output are selected separately on this page. Restart after switching physical devices.");
         }
 
         static WheelSetupWindow instance;
