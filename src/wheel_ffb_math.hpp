@@ -20,6 +20,30 @@ namespace WheelFFBMath
             + (t*t*t - t*t)*endSlope;
     }
 
+    // Symmetric C1 soft limiter. Preserve low/mid-range force exactly, then
+    // bend only the final quarter toward the DirectInput cap. This keeps SAT
+    // detail and weight intact while still preventing hard clipping at 100%.
+    inline float soft_saturate(float value)
+    {
+        if (!std::isfinite(value)) return 0.0f;
+        const float sign = value < 0.0f ? -1.0f : 1.0f;
+        const float x = std::abs(value);
+        constexpr float Knee = 0.75f;
+        constexpr float Limit = 1.35f;
+        if (x <= Knee) return value;
+        if (x >= Limit) return sign;
+
+        const float span = Limit - Knee;
+        const float t = (x - Knee) / span;
+        const float t2 = t * t;
+        const float t3 = t2 * t;
+        const float h00 = 2.0f * t3 - 3.0f * t2 + 1.0f;
+        const float h10 = t3 - 2.0f * t2 + t;
+        const float h01 = -2.0f * t3 + 3.0f * t2;
+        const float y = h00 * Knee + h10 * span + h01;
+        return sign * y;
+    }
+
     inline float physics_return_relief(float alpha, float steerRate)
     {
         // Relieve only torque doing positive work on the moving wheel.

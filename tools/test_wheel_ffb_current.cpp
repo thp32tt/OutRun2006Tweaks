@@ -24,6 +24,11 @@ int main() {
  for(float a: {.004f,.16f,.176f}) {float h=1e-5f;float l=(trail_shape(a)-trail_shape(a-h))/h,r=(trail_shape(a+h)-trail_shape(a))/h; require(std::abs(l-r)<.05f,"trail C1 join");}
  require(trail_shape(.004001f)-trail_shape(.003999f)<.0001f,"no SAT cutoff step");
  require(std::abs(trail_shape(.32f)-std::exp(-.9f))<1e-6,"deep-slip baseline preserved");
+ require(WheelFFBMath::soft_saturate(.5f)==.5f,"soft clip linear midrange");
+ require(std::abs(WheelFFBMath::soft_saturate(-.5f)+.5f)<1e-6,"soft clip symmetry");
+ require(WheelFFBMath::soft_saturate(1.0f)>.90f&&WheelFFBMath::soft_saturate(1.0f)<1.0f,"soft clip late knee");
+ require(WheelFFBMath::soft_saturate(2.0f)==1.0f&&WheelFFBMath::soft_saturate(-2.0f)==-1.0f,"soft clip cap");
+ float clipPrev=0; for(int i=0;i<=2000;++i){float x=i*.001f,y=WheelFFBMath::soft_saturate(x);require(std::isfinite(y)&&y>=clipPrev-1e-6f&&y<=1.000001f,"soft clip monotonic");clipPrev=y;}
  // Fixed front slip and wheel velocity have the same relief on either side of centre.
  require(WheelFFBMath::physics_return_relief(.15f,-.08f)==.85f,"countersteer relief");
  require(WheelFFBMath::physics_return_relief(.15f,.08f)==1,"opposing work no relief");

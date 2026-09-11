@@ -802,8 +802,8 @@ namespace
             if (!std::isfinite(total))
                 total = 0.0f;
 
-            // Soft saturation preserves detail near the force cap.
-            const float compressed = std::tanh(total);
+            // Preserve ordinary SAT linearly; bend only near the force cap.
+            const float compressed = WheelFFBMath::soft_saturate(total);
 
             LONG structuralLevel =
                 static_cast<LONG>(compressed * static_cast<float>(DI_FFNOMINALMAX));
@@ -887,7 +887,7 @@ namespace
             {
                 lastTelemetryTick_ = telemetryNow;
                 spdlog::info(
-                    "WheelFFB SAMPLE t={} car={} speedRaw={} speedNorm={} steer={} steerRateTick={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperCoefficient={} roadAmp={} slipAmp={} structural={} event={} preTanh={} postTanh={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
+                    "WheelFFB SAMPLE t={} car={} speedRaw={} speedNorm={} steer={} steerRateTick={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperCoefficient={} roadAmp={} slipAmp={} structural={} event={} preClip={} postClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
                     telemetryNow, static_cast<const void*>(car), speedRaw, speedNorm, steer, steerRate,
                     car->field_264, car->field_268, lateralRaw, smoothedLateral_, lateralLoadSmooth,
                     vehicleDynamics_.bodySlip(), bodySlide, vehicleDynamics_.yawRate(), frontSlip, frontScrub,
