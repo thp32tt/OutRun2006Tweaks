@@ -12,6 +12,12 @@
 
 #include "plugin.hpp"
 
+namespace Settings
+{
+    extern Setting<std::string> WheelFFBDeviceName;
+    extern Setting<std::string> WheelFFBDeviceGuid;
+}
+
 // Named wheel/input and force-feedback profiles live beside the DLL instead of
 // inside OutRun2006Tweaks.user.ini.  The active configuration is still copied
 // to the normal INI files when a profile is loaded, so selecting a profile is
@@ -203,6 +209,8 @@ namespace WheelProfileStore
         std::string inputBackend;
         std::string steeringDeadZone;
         std::string bypassSensitivity;
+        std::string ffbDeviceName;
+        std::string ffbDeviceGuid;
     };
 
     inline InputOptionsSnapshot capture_input_options()
@@ -211,6 +219,8 @@ namespace WheelProfileStore
             Settings::InputBackend.to_string(),
             Settings::SteeringDeadZone.to_string(),
             Settings::BypassGameSensitivity.to_string(),
+            Settings::WheelFFBDeviceName.to_string(),
+            Settings::WheelFFBDeviceGuid.to_string(),
         };
     }
 
@@ -219,6 +229,8 @@ namespace WheelProfileStore
         Settings::InputBackend.set_from_string(snapshot.inputBackend);
         Settings::SteeringDeadZone.set_from_string(snapshot.steeringDeadZone);
         Settings::BypassGameSensitivity.set_from_string(snapshot.bypassSensitivity);
+        Settings::WheelFFBDeviceName.set_from_string(snapshot.ffbDeviceName);
+        Settings::WheelFFBDeviceGuid.set_from_string(snapshot.ffbDeviceGuid);
     }
 
     inline bool append_input_options(const std::filesystem::path& path, std::string* error = nullptr)
@@ -234,6 +246,9 @@ namespace WheelProfileStore
         file << "InputBackend = " << Settings::InputBackend.to_string() << "\n";
         file << "SteeringDeadZone = " << Settings::SteeringDeadZone.to_string() << "\n";
         file << "BypassGameSensitivity = " << Settings::BypassGameSensitivity.to_string() << "\n";
+        file << "FFBDeviceName = " << Settings::WheelFFBDeviceName.to_string() << "\n";
+        file << "FFBDeviceGuid = " << Settings::WheelFFBDeviceGuid.to_string() << "\n";
+        file.flush();
         if (!file)
         {
             if (error) *error = "Failed while writing wheel-specific input options.";
@@ -265,7 +280,9 @@ namespace WheelProfileStore
 
         if (!apply("InputBackend", Settings::InputBackend) ||
             !apply("SteeringDeadZone", Settings::SteeringDeadZone) ||
-            !apply("BypassGameSensitivity", Settings::BypassGameSensitivity))
+            !apply("BypassGameSensitivity", Settings::BypassGameSensitivity) ||
+            !apply("FFBDeviceName", Settings::WheelFFBDeviceName) ||
+            !apply("FFBDeviceGuid", Settings::WheelFFBDeviceGuid))
         {
             restore_input_options(before);
             if (error) *error = "Input profile contains an invalid wheel-specific option.";
@@ -319,6 +336,7 @@ namespace WheelProfileStore
         file << "[WheelFFB]\n";
         for (const Settings::SettingBase* setting : ffb_settings())
             file << setting->key() << " = " << setting->to_string() << "\n";
+        file.flush();
         if (!file)
         {
             if (error) *error = "Failed while writing FFB profile.";

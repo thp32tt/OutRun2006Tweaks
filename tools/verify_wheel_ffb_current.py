@@ -40,7 +40,10 @@ for rel, text in [
     ('src/input_manager.cpp', input_cpp),
     ('src/overlay/input_bindings_ui.cpp', bind_ui),
     ('src/overlay/wheel_setup_ui.cpp', wheel_ui),
+    ('src/wheel_profile_store.hpp', profiles),
 ]:
+    if '\x00' in text:
+        raise SystemExit(f'CURRENT VERIFY FAILED [NUL byte in source]: {rel}')
     if text.count('{') != text.count('}'):
         raise SystemExit(f'CURRENT VERIFY FAILED [brace balance]: {rel}')
     print(f'OK [brace balance {rel}]')
@@ -165,6 +168,8 @@ req(profiles, 'Kind::Input ? "Input" : "FFB"', 'separate input and FFB profile f
 req(profiles, 'InputBackend = ', 'wheel profile stores backend choice')
 req(profiles, 'SteeringDeadZone = ', 'wheel profile stores steering deadzone')
 req(profiles, 'BypassGameSensitivity = ', 'wheel profile stores sensitivity bypass')
+req(profiles, 'FFBDeviceName = ', 'wheel profile stores FFB output name')
+req(profiles, 'FFBDeviceGuid = ', 'wheel profile stores exact FFB output GUID')
 forbid(profiles, 'UseNewInput = ', 'wheel profile never switches the input architecture live')
 req(profiles, 'key != "DeviceName" && key != "DeviceGuid"', 'FFB profiles never reroute the output device')
 req(profiles, 'key != "Telemetry" && key != "DebugLog"', 'FFB profiles keep diagnostics global')
@@ -172,6 +177,9 @@ req(profiles, 'load_ffb_profile(', 'transactional named FFB profile loader')
 req(bind_ui, 'ImGui::BeginTabItem("Profiles")', 'input binding UI exposes wheel profiles')
 req(bind_ui, 'WheelProfileStore::append_input_options', 'wheel profile saves wheel-specific input options')
 req(bind_ui, 'manager.saveBindingIni(Module::BindingsIniPath)', 'loaded wheel profile is durable in canonical binding file')
+req(bind_ui, 'wheel_profile_exists_cached', 'input profile overwrite check uses cached list')
+req(wheel_ui, 'ffb_profile_exists_cached', 'FFB profile overwrite check uses cached list')
+req(input_hpp, 'file.flush();', 'binding/profile writer checks buffered write errors')
 req(wheel_ui, 'Force Feedback Profiles', 'FFB UI exposes named profiles')
 req(wheel_ui, 'WheelProfileStore::save_ffb_profile', 'FFB UI saves named profile')
 req(wheel_ui, 'WheelProfileStore::load_ffb_profile', 'FFB UI loads named profile')

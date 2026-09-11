@@ -1217,7 +1217,19 @@ public:
 		file << "\n[Keyboard]\n";
 		writeBindingSection(file, true);
 
+		file.flush();
+		if (!file)
+		{
+			spdlog::error(__FUNCTION__ ": failed while writing INI file: {}", iniPath.string());
+			file.close();
+			return false;
+		}
 		file.close();
+		if (file.fail())
+		{
+			spdlog::error(__FUNCTION__ ": failed while closing INI file: {}", iniPath.string());
+			return false;
+		}
 		spdlog::info(__FUNCTION__": saved to INI file: {}", iniPath.string());
 
 		return true;

@@ -808,6 +808,15 @@ private:
 			? &wheelProfiles[selectedWheelProfile] : nullptr;
 	}
 
+	bool wheel_profile_exists_cached(const std::string& name) const
+	{
+		const std::string wanted = WheelProfileStore::lower_ascii(name);
+		return std::any_of(wheelProfiles.begin(), wheelProfiles.end(), [&](const std::string& profile)
+		{
+			return WheelProfileStore::lower_ascii(profile) == wanted;
+		});
+	}
+
 	void draw_profiles()
 	{
 		auto& manager = InputManager::instance;
@@ -847,7 +856,7 @@ private:
 
 		const std::string requestedName = WheelProfileStore::normalize_profile_name(wheelProfileName);
 		const bool profileAlreadyExists =
-			!requestedName.empty() && WheelProfileStore::profile_exists(WheelProfileStore::Kind::Input, requestedName);
+			!requestedName.empty() && wheel_profile_exists_cached(requestedName);
 		const char* saveLabel = confirmingProfileOverwrite
 			? "Confirm overwrite##inputProfileSave"
 			: (profileAlreadyExists ? "Overwrite profile##inputProfileSave" : "Save as profile##inputProfileSave");

@@ -804,6 +804,15 @@ namespace
                 ? &ffbProfiles_[selectedFfbProfile_] : nullptr;
         }
 
+        bool ffb_profile_exists_cached(const std::string& name) const
+        {
+            const std::string wanted = WheelProfileStore::lower_ascii(name);
+            return std::any_of(ffbProfiles_.begin(), ffbProfiles_.end(), [&](const std::string& profile)
+            {
+                return WheelProfileStore::lower_ascii(profile) == wanted;
+            });
+        }
+
         void draw_ffb_profiles()
         {
             if (!ffbProfilesLoaded_)
@@ -834,8 +843,7 @@ namespace
             if (ImGui::InputText("FFB profile name", ffbProfileName_, sizeof(ffbProfileName_)))
                 confirmingFfbOverwrite_ = false;
             const std::string requested = WheelProfileStore::normalize_profile_name(ffbProfileName_);
-            const bool exists = !requested.empty() &&
-                WheelProfileStore::profile_exists(WheelProfileStore::Kind::ForceFeedback, requested);
+            const bool exists = !requested.empty() && ffb_profile_exists_cached(requested);
             const char* saveLabel = confirmingFfbOverwrite_
                 ? "Confirm overwrite##ffbProfileSave"
                 : (exists ? "Overwrite profile##ffbProfileSave" : "Save as profile##ffbProfileSave");
@@ -905,7 +913,7 @@ namespace
                     if (WheelProfileStore::delete_profile(WheelProfileStore::Kind::ForceFeedback, *profile, &error))
                     {
                         status_ = "Deleted FFB profile: " + *profile;
-                        ffbProfileName_[0] = ' ';
+                        ffbProfileName_[0] = '\0';
                         refresh_ffb_profiles();
                     }
                     else
