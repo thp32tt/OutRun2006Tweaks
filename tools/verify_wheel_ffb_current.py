@@ -175,4 +175,7 @@ req(ffb, 'bool steerSampleValid_ = false;', 'steering derivative has explicit ba
 req(ffb, 'smoothedSteerRate_ += (rawSteerRate - smoothedSteerRate_) * 0.45f;', 'steering-rate quantization filter')
 req(ffb, 'steerRateRaw={} steerRateFiltered={}', 'raw and filtered steering-rate telemetry')
 req(ffb, 'damperRequested={} damperRelease={} damperCoefficient={}', 'damper release visible in telemetry')
+req(ffb, 'const bool unloadingStructural = sameTorqueDirection &&', 'force unload detected separately from force build')
+req(ffb, 'maxSlew * 2', 'stale torque can decay twice as fast')
+req(ffb, 'std::abs(structuralDelta) > appliedMaxSlew', 'asymmetric slew applied to structural force')
 print('CURRENT WHEEL FFB STRUCTURE VERIFIED; run verify_wheel_ffb_math.py for numerical tests')

@@ -831,13 +831,21 @@ namespace
             const LONG maxSlew = static_cast<LONG>(
                 safeSlew * static_cast<float>(DI_FFNOMINALMAX));
 
+            const bool sameTorqueDirection =
+                structuralLevel == 0 || prevStructuralLevel_ == 0 ||
+                (structuralLevel > 0) == (prevStructuralLevel_ > 0);
+            const bool unloadingStructural = sameTorqueDirection &&
+                std::abs(structuralLevel) < std::abs(prevStructuralLevel_);
+            const LONG appliedMaxSlew = unloadingStructural
+                ? std::min(static_cast<LONG>(DI_FFNOMINALMAX), maxSlew * 2)
+                : maxSlew;
             const LONG structuralDelta = structuralLevel - prevStructuralLevel_;
             const bool bypassSlew = eventActive;
 
-            if (std::abs(structuralDelta) > maxSlew && !bypassSlew)
+            if (std::abs(structuralDelta) > appliedMaxSlew && !bypassSlew)
             {
                 structuralLevel = prevStructuralLevel_ +
-                    (structuralDelta > 0 ? maxSlew : -maxSlew);
+                    (structuralDelta > 0 ? appliedMaxSlew : -appliedMaxSlew);
             }
             prevStructuralLevel_ = structuralLevel;
 
