@@ -48,50 +48,52 @@ verifier = "tools/verify_wheel_ffb_current.py"
 # delivered after we have already detected focus loss ourselves.
 replace_once(
     ffb,
-    """            // Safety first for a DD base: WM_ACTIVATEAPP releases exclusive\n"
-    "            // ownership when the game loses focus. Do not let the 60 Hz update\n"
-    "            // loop immediately reacquire it while another application is active.\n"
-    "            if (!appActive_)\n"
-    "            {\n"
-    "                // initialize() can set appActive_=false before the window\n"
-    "                // subclass exists. Recover from that startup/background case\n"
-    "                // only after the real game window is foreground again.\n"
-    "                if (!initialized_ && gameHwnd_ && GetForegroundWindow() == gameHwnd_)\n"
-    "                {\n"
-    "                    appActive_ = true;\n"
-    "                    warmupFrames_ = 0;\n"
-    "                }\n"
-    "                else\n"
-    "                {\n"
-    "                    if (initialized_)\n"
-    "                    {\n"
-    "                        zero_all_forces();\n"
-    "                        reset_signal_state();\n"
-    "                    }\n"
-    "                    return;\n"
-    "                }\n"
-    "            }\n""",
-    """            // Safety first for a DD base: WM_ACTIVATEAPP releases exclusive\n"
-    "            // ownership when the game loses focus. The foreground window is also\n"
-    "            // authoritative on recovery so a missed activation message cannot\n"
-    "            // leave FFB permanently dormant after Alt-Tab.\n"
-    "            if (!appActive_)\n"
-    "            {\n"
-    "                if (gameHwnd_ && GetForegroundWindow() == gameHwnd_)\n"
-    "                {\n"
-    "                    appActive_ = true;\n"
-    "                    warmupFrames_ = 0;\n"
-    "                }\n"
-    "                else\n"
-    "                {\n"
-    "                    if (initialized_)\n"
-    "                    {\n"
-    "                        zero_all_forces();\n"
-    "                        reset_signal_state();\n"
-    "                    }\n"
-    "                    return;\n"
-    "                }\n"
-    "            }\n""",
+    """            // Safety first for a DD base: WM_ACTIVATEAPP releases exclusive
+            // ownership when the game loses focus. Do not let the 60 Hz update
+            // loop immediately reacquire it while another application is active.
+            if (!appActive_)
+            {
+                // initialize() can set appActive_=false before the window
+                // subclass exists. Recover from that startup/background case
+                // only after the real game window is foreground again.
+                if (!initialized_ && gameHwnd_ && GetForegroundWindow() == gameHwnd_)
+                {
+                    appActive_ = true;
+                    warmupFrames_ = 0;
+                }
+                else
+                {
+                    if (initialized_)
+                    {
+                        zero_all_forces();
+                        reset_signal_state();
+                    }
+                    return;
+                }
+            }
+""",
+    """            // Safety first for a DD base: WM_ACTIVATEAPP releases exclusive
+            // ownership when the game loses focus. The foreground window is also
+            // authoritative on recovery so a missed activation message cannot
+            // leave FFB permanently dormant after Alt-Tab.
+            if (!appActive_)
+            {
+                if (gameHwnd_ && GetForegroundWindow() == gameHwnd_)
+                {
+                    appActive_ = true;
+                    warmupFrames_ = 0;
+                }
+                else
+                {
+                    if (initialized_)
+                    {
+                        zero_all_forces();
+                        reset_signal_state();
+                    }
+                    return;
+                }
+            }
+""",
 )
 verify()
 commit("fix: recover wheel FFB after missed focus activation [skip ci]", ffb)
@@ -100,31 +102,35 @@ commit("fix: recover wheel FFB after missed focus activation [skip ci]", ffb)
 # failure. The live-disable caller must re-check the pointer before Stop().
 replace_once(
     ffb,
-    """            if (!Settings::WheelFFBUseHardwareSpring && springEffect_)\n"
-    "            {\n"
-    "                update_spring(0.0f);\n"
-    "                springEffect_->Stop();\n"
-    "                safe_release_effect(springEffect_, \"hardware spring disabled\");\n""",
-    """            if (!Settings::WheelFFBUseHardwareSpring && springEffect_)\n"
-    "            {\n"
-    "                update_spring(0.0f);\n"
-    "                if (springEffect_)\n"
-    "                    springEffect_->Stop();\n"
-    "                safe_release_effect(springEffect_, \"hardware spring disabled\");\n""",
+    """            if (!Settings::WheelFFBUseHardwareSpring && springEffect_)
+            {
+                update_spring(0.0f);
+                springEffect_->Stop();
+                safe_release_effect(springEffect_, "hardware spring disabled");
+""",
+    """            if (!Settings::WheelFFBUseHardwareSpring && springEffect_)
+            {
+                update_spring(0.0f);
+                if (springEffect_)
+                    springEffect_->Stop();
+                safe_release_effect(springEffect_, "hardware spring disabled");
+""",
 )
 replace_once(
     ffb,
-    """            if (!Settings::WheelFFBUseHardwareDamper && damperEffect_)\n"
-    "            {\n"
-    "                update_damper(0.0f);\n"
-    "                damperEffect_->Stop();\n"
-    "                safe_release_effect(damperEffect_, \"hardware damper disabled\");\n""",
-    """            if (!Settings::WheelFFBUseHardwareDamper && damperEffect_)\n"
-    "            {\n"
-    "                update_damper(0.0f);\n"
-    "                if (damperEffect_)\n"
-    "                    damperEffect_->Stop();\n"
-    "                safe_release_effect(damperEffect_, \"hardware damper disabled\");\n""",
+    """            if (!Settings::WheelFFBUseHardwareDamper && damperEffect_)
+            {
+                update_damper(0.0f);
+                damperEffect_->Stop();
+                safe_release_effect(damperEffect_, "hardware damper disabled");
+""",
+    """            if (!Settings::WheelFFBUseHardwareDamper && damperEffect_)
+            {
+                update_damper(0.0f);
+                if (damperEffect_)
+                    damperEffect_->Stop();
+                safe_release_effect(damperEffect_, "hardware damper disabled");
+""",
 )
 verify()
 commit("fix: make live condition-effect disable null-safe [skip ci]", ffb)
@@ -138,15 +144,12 @@ if text.count("recreateHoldoffUntil_") != 7:
 replace_once(
     ffb,
     "        DWORD recreateHoldoffUntil_ = 0;\n",
-    "        DWORD constantRecreateHoldoffUntil_ = 0;\n"
-    "        DWORD periodicRecreateHoldoffUntil_ = 0;\n",
+    "        DWORD constantRecreateHoldoffUntil_ = 0;\n        DWORD periodicRecreateHoldoffUntil_ = 0;\n",
 )
 replace_once(
     ffb,
     "            recreateHoldoffUntil_ = 0;\n            springRecreateHoldoffUntil_ = 0;\n",
-    "            constantRecreateHoldoffUntil_ = 0;\n"
-    "            periodicRecreateHoldoffUntil_ = 0;\n"
-    "            springRecreateHoldoffUntil_ = 0;\n",
+    "            constantRecreateHoldoffUntil_ = 0;\n            periodicRecreateHoldoffUntil_ = 0;\n            springRecreateHoldoffUntil_ = 0;\n",
 )
 replace_once(
     ffb,
@@ -179,21 +182,25 @@ commit("fix: isolate steering and periodic effect recovery [skip ci]", ffb)
 # can inherit a stale accepted level and defer the first write to the new effect.
 replace_once(
     ffb,
-    """                    constantEffectPolar_ = true;\n"
-    "                    spdlog::info(\"WheelFFB: ConstantForce created with 2-axis POLAR actuator encoding\");\n""",
-    """                    constantEffectPolar_ = true;\n"
-    "                    prevConstantLevel_ = 0;\n"
-    "                    lastConstantWriteTick_ = 0;\n"
-    "                    spdlog::info(\"WheelFFB: ConstantForce created with 2-axis POLAR actuator encoding\");\n""",
+    """                    constantEffectPolar_ = true;
+                    spdlog::info("WheelFFB: ConstantForce created with 2-axis POLAR actuator encoding");
+""",
+    """                    constantEffectPolar_ = true;
+                    prevConstantLevel_ = 0;
+                    lastConstantWriteTick_ = 0;
+                    spdlog::info("WheelFFB: ConstantForce created with 2-axis POLAR actuator encoding");
+""",
 )
 replace_once(
     ffb,
-    """            constantEffectPolar_ = false;\n"
-    "            spdlog::info(\"WheelFFB: ConstantForce created with 1-axis CARTESIAN fallback\");\n""",
-    """            constantEffectPolar_ = false;\n"
-    "            prevConstantLevel_ = 0;\n"
-    "            lastConstantWriteTick_ = 0;\n"
-    "            spdlog::info(\"WheelFFB: ConstantForce created with 1-axis CARTESIAN fallback\");\n""",
+    """            constantEffectPolar_ = false;
+            spdlog::info("WheelFFB: ConstantForce created with 1-axis CARTESIAN fallback");
+""",
+    """            constantEffectPolar_ = false;
+            prevConstantLevel_ = 0;
+            lastConstantWriteTick_ = 0;
+            spdlog::info("WheelFFB: ConstantForce created with 1-axis CARTESIAN fallback");
+""",
 )
 verify()
 commit("fix: reset ConstantForce cache on effect creation [skip ci]", ffb)
@@ -204,8 +211,7 @@ commit("fix: reset ConstantForce cache on effect creation [skip ci]", ffb)
 replace_once(
     verifier,
     "req(input_cpp, 'InputManager_SteeringValue()', 'SAT reads active InputManager steering')\n",
-    "req(input_cpp, 'float InputManager_SteeringValue()', 'InputManager steering bridge exported')\n"
-    "req(ffb, 'const float steering = InputManager_SteeringValue();', 'SAT reads active InputManager steering')\n",
+    "req(input_cpp, 'float InputManager_SteeringValue()', 'InputManager steering bridge exported')\nreq(ffb, 'const float steering = InputManager_SteeringValue();', 'SAT reads active InputManager steering')\n",
 )
 text = read(verifier)
 anchor = "print('CURRENT WHEEL FFB STRUCTURE VERIFIED; run verify_wheel_ffb_math.py for numerical tests')\n"
