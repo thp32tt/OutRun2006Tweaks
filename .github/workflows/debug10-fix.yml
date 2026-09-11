@@ -1,0 +1,56 @@
+name: Debug 10-pass Fixes
+
+on:
+  push:
+    branches: [ wheel-ffb ]
+    paths:
+      - '.github/debug10_patch.py'
+      - '.github/workflows/debug10-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  debug10:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Apply 10-pass debug fixes
+        run: python .github/debug10_patch.py
+
+      - name: Run current source verifier
+        run: python tools/verify_wheel_ffb_current.py
+
+      - name: Compile and run production-header numeric tests
+        run: |
+          g++ -std=c++20 -Isrc tools/test_wheel_ffb_current.cpp -o /tmp/wheel_ffb_current_test
+          /tmp/wheel_ffb_current_test
+
+      - name: Check whitespace
+        run: git diff --check
+
+      - name: Commit verified product fixes
+        run: |
+          git add src/overlay/input_bindings_ui.cpp \
+                  src/overlay/wheel_setup_ui.cpp \
+                  src/wheel_profile_store.hpp \
+                  tools/verify_wheel_ffb_current.py
+          if ! git diff --cached --quiet; then
+            git commit -m "fix: harden wheel setup after 10-pass debug [skip ci]"
+            git push origin HEAD:wheel-ffb
+          fi
+
+      - name: Remove temporary debug harness
+        run: |
+          git pull --rebase origin wheel-ffb
+          git rm .github/debug10_patch.py .github/workflows/debug10-fix.yml
+          git commit -m "chore: remove temporary 10-pass debug harness"
+          git push origin HEAD:wheel-ffb
