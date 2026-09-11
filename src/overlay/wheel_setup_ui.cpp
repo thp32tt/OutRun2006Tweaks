@@ -1292,8 +1292,8 @@ namespace
             ImGui::Spacing();
             ImGui::TextDisabled(
                 Settings::UseNewInput
-                    ? "Input setup: Input Bindings only. FFB setup: this Force Feedback page only. Restart after switching to a different physical wheel."
-                    : "Legacy input and DirectInput FFB output are selected separately on this page. Restart after switching physical devices.");
+                    ? "Input setup: Input Bindings only. FFB selection and tuning apply live; Save Force Feedback persists them."
+                    : "Legacy input and DirectInput FFB output are selected separately on this page. FFB selection and tuning apply live.");
         }
 
         static WheelSetupWindow instance;

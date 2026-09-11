@@ -789,13 +789,13 @@ namespace
                     physicsSatTorque = 0.0f;
             }
 
-            // During basis calibration retain only a small Natural SAT safety
-            // net, then crossfade over valid dynamics ticks. Invalid telemetry
-            // decays/clears dynamics state instead of leaking stale slide values.
+            // Keep full Natural SAT while calibration/current motion is unavailable,
+            // then crossfade over valid dynamics ticks. Invalid telemetry falls
+            // back immediately instead of leaking stale Physics SAT values.
             const float physicsMix = vehicleDynamics_.sampleValid()
                 ? vehicleDynamics_.activationBlend()
                 : 0.0f;
-            // Keep the Natural safety net alive throughout the activation ramp.
+            // Natural SAT remains the fallback throughout the activation ramp.
             // Dropping it on the calibration tick created a short SAT hole while
             // physicsMix was still near zero.
             const float physicsFallback = naturalSatTorque;
@@ -890,7 +890,7 @@ namespace
             prevStructuralLevel_ = structuralLevel;
 
             // Hardware periodics are preferred. If unavailable, inject a capped
-            // low-frequency sine after the tanh compressor. Road/slip signals
+            // low-frequency sine after the structural soft-knee limiter. Road/slip signals
             // share the same startup/recreate ramp as structural force.
             const float effectRampScale = warmupScale * recreateScale;
             float fallbackVibration = 0.0f;
@@ -2753,7 +2753,7 @@ namespace
                 satTorque,
                 Settings::WheelFFBPhysicsSat
                     ? (vehicleDynamics_.calibrated()
-                        ? (vehicleDynamics_.sampleValid() ? "ACTIVE" : "HOLD")
+                        ? (vehicleDynamics_.sampleValid() ? "ACTIVE" : "FALLBACK")
                         : "CAL")
                     : "OFF",
                 vehicleDynamics_.forwardAxis(),
