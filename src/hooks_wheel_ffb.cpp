@@ -224,12 +224,23 @@ namespace
     public:
         void update(EVWORK_CAR* car)
         {
-            if (!car || panicStopped_)
+            if (panicStopped_)
                 return;
 
             if (disable_live_if_needed())
                 return;
             enabledLastTick_ = true;
+
+            if (!car)
+            {
+                if (initialized_)
+                {
+                    zero_all_forces();
+                    reset_signal_state();
+                }
+                lastCar_ = nullptr;
+                return;
+            }
 
             // Safety first for a DD base: WM_ACTIVATEAPP releases exclusive
             // ownership when the game loses focus. Do not let the 60 Hz update

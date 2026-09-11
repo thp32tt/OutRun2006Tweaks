@@ -200,4 +200,5 @@ if not (0 <= dynamic_reset_start < dynamic_reset_end):
 dynamic_reset = dyn[dynamic_reset_start:dynamic_reset_end]
 req(dynamic_reset, 'motionScaleEma_ = 0.0f;', 'dynamic reset clears old motion-scale EMA')
 req(dynamic_reset, 'motionScaleSamples_ = 0;', 'dynamic reset clears old motion-scale sample count')
+req(ffb, 'if (!car)\n            {\n                if (initialized_)\n                {\n                    zero_all_forces();', 'null car immediately clears active DD torque')
 print('CURRENT WHEEL FFB STRUCTURE VERIFIED; run verify_wheel_ffb_math.py for numerical tests')
