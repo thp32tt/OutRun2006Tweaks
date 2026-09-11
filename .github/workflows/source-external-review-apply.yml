@@ -5,6 +5,7 @@ on:
     branches: [ wheel-ffb ]
     paths:
       - '.github/second_external_review_apply.py'
+      - '.github/second_external_review_verify_fix.py'
       - '.github/workflows/source-external-review-apply.yml'
 
 permissions:
@@ -22,6 +23,9 @@ jobs:
 
       - name: Apply externally reviewed FFB refinements
         run: python .github/second_external_review_apply.py
+
+      - name: Align verifier with split SAT inputs
+        run: python .github/second_external_review_verify_fix.py
 
       - name: Verify current source invariants
         run: python tools/verify_wheel_ffb_current.py
