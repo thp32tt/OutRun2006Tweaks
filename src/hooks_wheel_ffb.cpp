@@ -1730,6 +1730,8 @@ namespace
                 if (SUCCEEDED(hr) && constantEffect_)
                 {
                     constantEffectPolar_ = true;
+                    prevConstantLevel_ = 0;
+                    lastConstantWriteTick_ = 0;
                     spdlog::info("WheelFFB: ConstantForce created with 2-axis POLAR actuator encoding");
                     return true;
                 }
@@ -1752,6 +1754,8 @@ namespace
             }
 
             constantEffectPolar_ = false;
+            prevConstantLevel_ = 0;
+            lastConstantWriteTick_ = 0;
             spdlog::info("WheelFFB: ConstantForce created with 1-axis CARTESIAN fallback");
             return true;
         }
