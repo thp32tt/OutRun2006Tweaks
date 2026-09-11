@@ -19,4 +19,11 @@ new = """            if (!(valueStream >> value) || !std::isfinite(value) ||\n  
 if text.count(old) != 1:
     raise SystemExit(f'expected one response LUT token parser, found {text.count(old)}')
 p.write_text(text.replace(old, new), encoding='utf-8', newline='\n')
-print('updated verifier and made response LUT token parsing portable')
+
+# Keep exactly one terminating newline after appended research documentation.
+for rel in ('README.md', 'WHEEL_FFB.md'):
+    p = Path(rel)
+    text = p.read_text(encoding='utf-8')
+    p.write_text(text.rstrip() + '\n', encoding='utf-8', newline='\n')
+
+print('updated verifier, portable LUT parsing, and documentation EOF whitespace')
