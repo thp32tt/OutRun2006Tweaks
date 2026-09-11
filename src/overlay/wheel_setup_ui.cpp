@@ -45,7 +45,10 @@ namespace Settings
     extern Setting<float> WheelFFBSteeringWeight;
     extern Setting<bool> WheelFFBPhysicsSat;
     extern Setting<float> WheelFFBGripLoss;
+    extern Setting<float> WheelFFBLateralDeadzone;
     extern Setting<float> WheelFFBWeightTransfer;
+    extern Setting<float> WheelFFBGearShift;
+    extern Setting<float> WheelFFBEngineIdle;
     extern Setting<float> WheelFFBSlewRate;
     extern Setting<int> VibrationMode;
     extern Setting<float> WheelFFBRoadTexture;
@@ -977,6 +980,10 @@ namespace
             {
                 ImGui::TextWrapped(
                     "Force feedback only. With UseNewInput enabled, steering, pedals, buttons, menu controls and calibration come only from Input Bindings. This page does not create input bindings; it only selects the DirectInput FFB wheel and tunes its forces.");
+                if (ImGui::Button("Open Input Bindings"))
+                    Overlay::RequestBindingDialog = true;
+                ImGui::SameLine();
+                ImGui::TextDisabled("Configure steering, pedals, shifter and menu controls there first.");
             }
             else
             {
@@ -1188,6 +1195,20 @@ namespace
             ImGui::SameLine();
             ImGui::Checkbox("Hardware GUID_Damper", Settings::WheelFFBUseHardwareDamper.ptr());
             ImGui::Checkbox("Hardware road/slip sine effects", Settings::WheelFFBUsePeriodicEffects.ptr());
+
+            if (ImGui::CollapsingHeader("Advanced FFB tuning"))
+            {
+                ImGui::SliderFloat("Spring Saturation", Settings::WheelFFBSpringSaturation.ptr(), 0.10f, 1.0f, "%.3f");
+                ImGui::SliderFloat("Weight Transfer", Settings::WheelFFBWeightTransfer.ptr(), 0.0f, 1.5f, "%.2f");
+                ImGui::SliderFloat("Lateral Signal Deadzone", Settings::WheelFFBLateralDeadzone.ptr(), 0.0f, 8.0f, "%.2f");
+                ImGui::SliderFloat("Gear Shift", Settings::WheelFFBGearShift.ptr(), 0.0f, 1.0f, "%.2f");
+                ImGui::SliderFloat("Engine Idle", Settings::WheelFFBEngineIdle.ptr(), 0.0f, 0.50f, "%.2f");
+                ImGui::SliderFloat("Force Slew Rate", Settings::WheelFFBSlewRate.ptr(), 0.01f, 1.0f, "%.3f");
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Maximum structural-force change per 60 Hz tick. Lower is smoother/slower; higher responds faster.");
+                ImGui::TextDisabled("Advanced values apply live like the main controls; use Save Force Feedback to persist them.");
+            }
+
             ImGui::SameLine();
             ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr());
             ImGui::Checkbox("Record driving telemetry (10 Hz)", Settings::WheelFFBTelemetry.ptr());
