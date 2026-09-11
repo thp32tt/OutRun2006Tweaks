@@ -21,57 +21,55 @@ This separation avoids having an input poller and an FFB backend fight over the 
 
 ## Input setup
 
-F11 provides:
+With the default `UseNewInput=true` path, **Input Bindings** is the single owner of steering, pedals, shifter/buttons and menu controls. Open it from the game's Controller Configuration screen, from **Settings → Controls → Configure Input Bindings**, or directly from **F11 → Force Feedback → Open Input Bindings**.
 
-- startup device enumeration and hotplug handling;
-- per-device button / axis / hat bindings;
-- VID/PID plus serial/path identity where available;
-- Steering / Accelerator / Brake calibration with Min / Rest / Max;
-- axis inversion / positive-side selection;
-- guided Quick Setup;
-- live input display and binding persistence.
+Quick Setup currently walks through Steering, Accelerator, Brake, Shift Up/Down, Start, Confirm, Back and Menu Up/Right/Down/Left. Each captured raw-device source replaces only the same broad source family, so configuring a wheel does not erase existing gamepad bindings. A step can be skipped when the wheel has no matching control. After the wizard, **Keep & Fine-tune** retains all captures and returns to the editor for per-axis Min / Rest / Max calibration.
 
-Quick Setup waits for the captured control to be released before moving to the next step, including raw pedal axes. This prevents a held accelerator from being mistaken for the following brake step.
+Bindings are live immediately but are not durable until saved. Manual edits expose **Save & Return to game** so it is explicit whether the current mapping has been persisted.
+
+The Controllers page provides live raw axis/button/hat diagnostics and hotplugged devices appear automatically. Binding identity prefers VID/PID plus serial when available; USB path is only a duplicate-device fallback rather than a hard requirement.
 
 ## Force model
 
-The FFB model uses the real game steering input and game-physics signals rather than the previously unverified `field_1D0` steering assumption.
+The FFB owner is the custom DirectInput COM engine and remains separate from SDL input ownership. The main steering model now has two SAT paths:
 
-Main channels:
+1. **Physics SAT** — estimates front slip from steering angle, body slip and yaw, then shapes it with a pneumatic-trail-like curve. It requires a current valid motion sample.
+2. **Natural SAT** — steering-angle based progressive restoring torque. It is also the full-strength fallback while Physics SAT is calibrating or temporarily lacks valid motion telemetry.
+3. **Centering Spring** — low-speed stabilizer, preferably DirectInput `GUID_Spring` when supported.
+4. **Dynamic Damping** — resists steering velocity and releases with real front scrub/body slide.
+5. **Weight Transfer** — filtered longitudinal acceleration/braking modulation of steering load.
+6. **Collision / Gear Shift** — short event impulses kept separate from sustained steering slew.
+7. **Road Detail / Tire Slip** — hardware sine effects where available, with a ConstantForce fallback that only uses remaining steering headroom.
 
-1. **Aligning / Spring** — speed-dependent centering based on actual steering position.
-2. **Dynamic Damping** — resists steering velocity without being another centering spring.
-3. **Cornering Load** — adds load from OutRun lateral physics.
-4. **Grip-loss Unload** — reduces cornering/spring load in a deep drift.
-5. **Weight Transfer** — acceleration/braking modulation.
-6. **Collision** — short directional impact impulse.
-7. **Gear Shift** — short symmetric shift thunk.
-8. **Road Detail** — periodic texture derived from the game's surface roughness information.
-9. **Tire Slip** — periodic chatter that increases with drift depth.
+`field_264/268` are used as lateral-load magnitude only; grip/slip decisions come from the vehicle-dynamics estimator. GlobalStrength is software model gain, while DirectInput device/effect gain stays at `DI_FFNOMINALMAX`. Sustained force passes through the production soft-knee limiter and DD-safe slew path.
 
-Signal conditioning applies master gain before soft saturation/slew. DirectInput effect `dwGain` remains at `DI_FFNOMINALMAX`; the 0-150% master control is software model gain, not an out-of-range driver gain.
+The dedicated Force Feedback page exposes common controls directly and keeps lower-level but still supported values under **Advanced FFB tuning** (Spring Saturation, Weight Transfer, Lateral Signal Deadzone, Gear Shift, Engine Idle and Force Slew Rate).
 
-## MOZA R3 v0.1 default profile
+## MOZA R3 recommended profiles
 
-The release default intentionally adds steering resistance without making collision feedback too strong.
+The current UI provides two saved starting points rather than the obsolete single `v0.1 default` button.
 
 ```text
+Load MOZA R3 Physics SAT
 Overall Strength       0.70
-Aligning / Spring      0.60
-Dynamic Damping        0.42
-Cornering Load         0.38
-Grip-loss Unload       0.65
-Collision              0.38
+Centering Spring       0.65
+Spring Saturation      0.95
+Dynamic Damping        0.28
+Self-aligning Torque   1.45
+Grip-loss Response     0.65
+Weight Transfer        0.15
+Force Slew Rate        0.040
 Road Detail            0.30
 Tire Slip              0.20
-Low-speed Aligning     0.08
-Corner-load Boost      0.35
+Collision              0.38
 Hardware Spring        ON
 Hardware Damper        ON
-Reverse Spring         OFF (MOZA R3 tested direction)
+Hardware sine effects  ON
+Reverse SAT/CF         ON
+Reverse Spring         OFF
 ```
 
-F11 exposes this as **MOZA R3 v0.1 (default)**. The older Simulation Balanced / Arcade Light / Arcade Strong presets remain available as comparison references.
+`Load MOZA R3 Natural SAT` keeps the same overall/effect baseline but disables Physics SAT and uses Steering Weight 1.75, Dynamic Damping 0.30, Weight Transfer 0.20 and Slew 0.045. Treat both as starting points: verify ConstantForce and Spring direction with the 20% safe tests before increasing hardware torque.
 
 ## Safety and lifecycle
 
