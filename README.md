@@ -34,6 +34,8 @@ This is not an official SEGA, MOZA, or upstream OutRun2006Tweaks release.
 
 The tested R3 path deliberately favors the game's SAT over artificial centering. The v0.1 R3 compatibility layer uses the ConstantForce fallback for road texture because the driver can report sine-effect support without producing useful physical road detail on the tested wheel.
 
+The F11 Force Feedback page still provides `Load MOZA R3 Physics SAT` and `Load MOZA R3 Natural SAT` as starting profiles. The live R3 compatibility layer then applies the R3-specific road-output handling used by this release.
+
 For curb / shoulder contact, the code compares all four wheel-surface samples. A mixed surface is detected while only part of the car is on the curb, and a fully rough surface remains tactile after the car crosses completely onto it. Snow stages receive additional compensation so curb detail is not lost under the snow-road attenuation.
 
 The exact feel still depends on wheel-base firmware and MOZA Pit House settings. Keep base-side centering, damping, inertia and friction conservative while evaluating game-side FFB.
