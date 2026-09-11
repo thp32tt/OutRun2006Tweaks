@@ -461,6 +461,13 @@ namespace
             Settings::WheelMenuR3RightButton.needs_restart();
             Settings::WheelMenuR3DownButton.needs_restart();
             Settings::WheelMenuR3LeftButton.needs_restart();
+
+            Settings::WheelMenuR3DirectDPad.hidden(Settings::UseNewInput);
+            Settings::WheelMenuR3DeviceName.hidden(Settings::UseNewInput);
+            Settings::WheelMenuR3UpButton.hidden(Settings::UseNewInput);
+            Settings::WheelMenuR3RightButton.hidden(Settings::UseNewInput);
+            Settings::WheelMenuR3DownButton.hidden(Settings::UseNewInput);
+            Settings::WheelMenuR3LeftButton.hidden(Settings::UseNewInput);
         }
 
         bool apply() override

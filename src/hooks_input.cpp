@@ -404,6 +404,7 @@ public:
     void declare_settings() override
     {
         Settings::WheelMenuDirectionFilter.needs_restart();
+        Settings::WheelMenuDirectionFilter.hidden(Settings::UseNewInput);
     }
 
     bool apply() override

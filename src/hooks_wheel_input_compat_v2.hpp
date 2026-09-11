@@ -329,6 +329,9 @@ namespace
         {
             Settings::WheelPedalSplitFix.needs_restart();
             Settings::WheelMenuBackAlias.needs_restart();
+            Settings::WheelPedalSplitFix.hidden(Settings::UseNewInput);
+            Settings::WheelPedalSplitThreshold.hidden(Settings::UseNewInput);
+            Settings::WheelMenuBackAlias.hidden(Settings::UseNewInput);
         }
 
         bool apply() override

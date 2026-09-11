@@ -706,6 +706,25 @@ namespace
         }
 
         std::string_view description() override { return "Universal DirectInput Wheel Setup"; }
+        // The dedicated Legacy Wheel Setup page owns every WheelUniversal*
+        // setting. Keeping the raw axis/button numbers in generic Controls
+        // created a second, competing setup UI. Pedal invert is also exposed on
+        // the dedicated axis rows, so hide those duplicate controls as well.
+        void declare_settings() override
+        {
+            constexpr std::string_view prefix = "WheelUniversal";
+            for (auto* setting : Settings::SettingBase::registry())
+            {
+                if (!setting || setting->section() != "Controls")
+                    continue;
+                const std::string_view key = setting->key();
+                if (key.size() >= prefix.size() && key.substr(0, prefix.size()) == prefix)
+                    setting->hidden(true);
+            }
+            Settings::WheelAccelerationInvert.hidden(true);
+            Settings::WheelBrakeInvert.hidden(true);
+        }
+
         // Install with the legacy stack; active() gates live F11 ownership.
         bool validate() override { return Settings::WheelInputCompatibility && !Settings::UseNewInput; }
         bool apply() override

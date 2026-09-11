@@ -425,6 +425,9 @@ namespace
             Settings::WheelMenuR3DirectAB.needs_restart();
             Settings::WheelMenuR3AButton.needs_restart();
             Settings::WheelMenuR3BButton.needs_restart();
+            Settings::WheelMenuR3DirectAB.hidden(Settings::UseNewInput);
+            Settings::WheelMenuR3AButton.hidden(Settings::UseNewInput);
+            Settings::WheelMenuR3BButton.hidden(Settings::UseNewInput);
         }
 
         bool apply() override

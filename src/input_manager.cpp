@@ -16,7 +16,7 @@ namespace Settings
 		{ "Automatic", "RawInput", "DirectInput", "XInput" } };
 
 	Setting<bool> WheelInputCompatibility{ "Controls", "WheelInputCompatibility", false,
-		"Use the original-game DirectInput wheel path as a compatibility fallback. Disable UseNewInput when enabling this." };
+		"Advanced fallback for the original-game DirectInput wheel path. It only activates when UseNewInput is false at launch; both mode changes require a restart." };
 
 	Setting<bool> UseNewInput{ "Controls", "UseNewInput", true,
 		"Enables new SDL-based input system, allowing game to see full trigger range without any shared trigger axes issues "
@@ -262,7 +262,11 @@ public:
 	void declare_settings() override
 	{
 		Settings::UseNewInput.needs_restart();
-		Settings::UseNewInput.hidden(Settings::UseNewInput); // Unhide if UseNewInput is disabled for some reason, hide if it's enabled
+		// Keep this hidden while the modern path is active: changing it live
+		// would stop SDL updates before the legacy hooks exist. It becomes visible
+		// after a user explicitly boots with UseNewInput=false.
+		Settings::UseNewInput.hidden(Settings::UseNewInput);
+		Settings::WheelInputCompatibility.needs_restart();
 		Settings::InputBackend.needs_restart();
 	}
 
