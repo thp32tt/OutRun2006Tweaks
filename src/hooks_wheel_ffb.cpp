@@ -327,6 +327,7 @@ namespace
                 {
                     selectedConfiguredGuid_ = guidNow;
                     selectedConfiguredName_ = nameNow;
+                    directionTested_ = false;
                     request_device_reinitialize("configured wheel identity changed", S_OK);
                     return;
                 }
@@ -1251,6 +1252,11 @@ namespace
             spdlog::info(
                 "WheelFFB: queued safe {} direction test at fixed 20% output",
                 manualTestDirection_ < 0 ? "left" : "right");
+        }
+
+        void reset_direction_test()
+        {
+            directionTested_ = false;
         }
 
         void settings_transition()
@@ -3344,6 +3350,11 @@ void WheelFFB_RequestDirectionTest(int direction)
 void WheelFFB_RequestSettingsTransition()
 {
     gWheelFFB.settings_transition();
+}
+
+void WheelFFB_ResetDirectionTest()
+{
+    gWheelFFB.reset_direction_test();
 }
 
 WheelFFBHeadroomSnapshot WheelFFB_GetHeadroomSnapshot()

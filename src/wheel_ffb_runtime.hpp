@@ -60,6 +60,7 @@ struct WheelFFBGraphSnapshot
 
 void WheelFFB_RequestDirectionTest(int direction);
 void WheelFFB_RequestSettingsTransition();
+void WheelFFB_ResetDirectionTest();
 WheelFFBHeadroomSnapshot WheelFFB_GetHeadroomSnapshot();
 WheelFFBStatusSnapshot WheelFFB_GetStatusSnapshot();
 WheelFFBGraphSnapshot WheelFFB_GetGraphSnapshot();

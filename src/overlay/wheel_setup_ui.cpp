@@ -13,7 +13,6 @@
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
-#include <cstdint>
 #include <cstring>
 #include <string>
 #include <utility>
@@ -809,6 +808,8 @@ namespace
             bool invertForce = true;
             bool invertSpring = false;
             bool responseCorrection = false;
+            bool debugLog = true;
+            bool telemetry = false;
             float global = 0.70f;
             float spring = 0.65f;
             float springSaturation = 0.95f;
@@ -841,6 +842,8 @@ namespace
             savedFfb_.invertForce = Settings::WheelFFBInvertForce;
             savedFfb_.invertSpring = Settings::WheelFFBInvertSpring;
             savedFfb_.responseCorrection = Settings::WheelFFBResponseCorrection;
+            savedFfb_.debugLog = Settings::WheelFFBDebugLog;
+            savedFfb_.telemetry = Settings::WheelFFBTelemetry;
             savedFfb_.global = Settings::WheelFFBGlobalStrength;
             savedFfb_.spring = Settings::WheelFFBSpringStrength;
             savedFfb_.springSaturation = Settings::WheelFFBSpringSaturation;
@@ -873,6 +876,8 @@ namespace
             Settings::WheelFFBInvertForce = savedFfb_.invertForce;
             Settings::WheelFFBInvertSpring = savedFfb_.invertSpring;
             Settings::WheelFFBResponseCorrection = savedFfb_.responseCorrection;
+            Settings::WheelFFBDebugLog = savedFfb_.debugLog;
+            Settings::WheelFFBTelemetry = savedFfb_.telemetry;
             Settings::WheelFFBGlobalStrength = savedFfb_.global;
             Settings::WheelFFBSpringStrength = savedFfb_.spring;
             Settings::WheelFFBSpringSaturation = savedFfb_.springSaturation;
@@ -978,6 +983,8 @@ namespace
                     {
                         const bool currentSaved = Settings::write(Module::UserIniPath);
                         ffbDirty_ = !currentSaved;
+                        if (currentSaved)
+                            capture_saved_ffb();
                         status_ = currentSaved
                             ? "FFB profile saved: " + requested
                             : "FFB profile saved, but current user.ini settings could not be persisted.";
@@ -1069,8 +1076,13 @@ namespace
                     status_ = "That DirectInput interface does not advertise force feedback.";
                     return;
                 }
+                const bool changedOutput =
+                    lower_identity(Settings::WheelFFBDeviceGuid.get()) != info.guidKey ||
+                    Settings::WheelFFBDeviceName.get() != info.name;
                 Settings::WheelFFBDeviceName = info.name;
                 Settings::WheelFFBDeviceGuid = info.guidKey;
+                if (changedOutput)
+                    WheelFFB_ResetDirectionTest();
                 if (Settings::write(Module::UserIniPath))
                 {
                     ffbDirty_ = false;
@@ -1489,8 +1501,9 @@ namespace
                 ImGui::SameLine(); readiness("Pedals", accelReady && brakeReady);
                 ImGui::SameLine(); readiness("Shifters", driveButtonsReady);
                 readiness("Menu controls", menuReady);
-                ImGui::SameLine(); readiness("FFB device", ffbStatus.initialized || !Settings::WheelFFBDeviceGuid.get().empty());
-                ImGui::SameLine(); readiness("Direction test", ffbStatus.directionTested);
+                const bool ffbReady = !Settings::WheelFFBEnable || ffbStatus.initialized;
+                ImGui::SameLine(); readiness(Settings::WheelFFBEnable ? "FFB device" : "FFB disabled", ffbReady);
+                ImGui::SameLine(); readiness("Direction test", !Settings::WheelFFBEnable || ffbStatus.directionTested);
 
                 ImGui::SeparatorText("FFB Runtime Status");
                 ImGui::Text("Engine: %s   Device: %s   Output owner: %s",
@@ -1515,12 +1528,16 @@ namespace
                         ImGui::TextColored(ImVec4(1.0f, 0.45f, 0.25f, 1.0f),
                             "Wheel/driver explicitly reports FFB disabled or unavailable. This page will not override a hardware safety/user switch.");
                 }
+                const auto capability_text = [](bool known, bool dynamic)
+                {
+                    return !known ? "unknown" : (dynamic ? "yes" : "no");
+                };
                 ImGui::TextDisabled("Dynamic effect capability: Constant %s, POLAR direction %s, Spring %s, Damper %s, Sine %s",
-                    ffbStatus.constantDynamic ? "yes" : "no",
-                    ffbStatus.polarDirectionDynamic ? "yes" : "no",
-                    ffbStatus.springDynamic ? "yes" : "no",
-                    ffbStatus.damperDynamic ? "yes" : "no",
-                    ffbStatus.periodicDynamic ? "yes" : "no");
+                    capability_text(ffbStatus.constantCapsKnown, ffbStatus.constantDynamic),
+                    capability_text(ffbStatus.constantCapsKnown, ffbStatus.polarDirectionDynamic),
+                    capability_text(ffbStatus.springCapsKnown, ffbStatus.springDynamic),
+                    capability_text(ffbStatus.damperCapsKnown, ffbStatus.damperDynamic),
+                    capability_text(ffbStatus.periodicCapsKnown, ffbStatus.periodicDynamic));
             }
 
             draw_ffb_profiles();

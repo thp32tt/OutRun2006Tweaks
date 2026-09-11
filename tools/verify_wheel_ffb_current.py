@@ -372,3 +372,17 @@ req(wheel_ui, 'ffbStatus.powerOff || ffbStatus.safetySwitchOff || ffbStatus.user
 forbid(ffb, 'rejecting this FFB interface', 'ConstantForce capability metadata cannot falsely reject the only actuator path')
 req(wheel_ui, 'if (persisted)\n                            capture_saved_ffb();', 'loaded FFB profile updates revert baseline after persistence')
 req(wheel_ui, 'listeningHere ? "LISTENING..." : "Bind"', 'legacy manual binding also highlights current target')
+
+# final-postfix-regression-guards
+req(bind_ui, 'prepared.axisMinimum = prepared.axisRest;', 'fresh Quick Setup raw axes start uncalibrated')
+req(bind_ui, 'const bool readyToSaveAndDrive = coreControlsPresent && guidedCalibrationReady;', 'Quick Setup gates Save & Drive on core controls and raw calibration')
+req(bind_ui, 'WheelFFB_ResetDirectionTest();', 'loading a wheel profile invalidates the old direction test')
+req(runtime, 'void WheelFFB_ResetDirectionTest();', 'direction-test reset API')
+req(ffb, 'directionTested_ = false;\n                    request_device_reinitialize("configured wheel identity changed", S_OK);', 'external FFB device identity changes invalidate direction test')
+req(wheel_ui, 'if (changedOutput)\n                    WheelFFB_ResetDirectionTest();', 'F11 FFB device selection invalidates direction test immediately')
+req(wheel_ui, 'bool debugLog = true;', 'FFB revert baseline includes diagnostic logging')
+req(wheel_ui, 'savedFfb_.telemetry = Settings::WheelFFBTelemetry;', 'FFB revert baseline includes telemetry')
+req(wheel_ui, 'if (currentSaved)\n                            capture_saved_ffb();', 'saving a named FFB profile refreshes the revert baseline')
+req(wheel_ui, 'return !known ? "unknown" : (dynamic ? "yes" : "no");', 'FFB capability UI distinguishes unknown from yes')
+req(wheel_ui, 'const bool ffbReady = !Settings::WheelFFBEnable || ffbStatus.initialized;', 'Ready checklist does not treat a disconnected saved GUID as ready')
+forbid(wheel_ui, '#include <cstdint>\n#include <cstdio>\n#include <cstdint>', 'duplicate cstdint include')

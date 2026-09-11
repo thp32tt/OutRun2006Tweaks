@@ -1,5 +1,6 @@
 #include "input_manager.hpp"
 #include "wheel_profile_store.hpp"
+#include "wheel_ffb_runtime.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -374,20 +375,27 @@ public:
 		// what is already bound.
 		const auto commit = [&](const InputBinding& binding)
 		{
-			const std::string conflicts = binding_conflicts(binding, bindTarget);
+			InputBinding prepared = binding;
+			if (quickSetupActive && prepared.kind == InputBinding::Kind::JoyAxis)
+			{
+				prepared.axisMinimum = prepared.axisRest;
+				prepared.axisMaximum = prepared.axisRest;
+			}
+
+			const std::string conflicts = binding_conflicts(prepared, bindTarget);
 			if (!conflicts.empty())
 				persistenceStatus = "Note: this control is also bound to " + conflicts + ".";
 			if (quickSetupActive)
 			{
-				quickSetupCandidate = binding;
+				quickSetupCandidate = prepared;
 				return;
 			}
 			else if (bindIndex >= 0 && bindIndex < int(bindings.size()))
-				bindings[bindIndex] = binding;
+				bindings[bindIndex] = prepared;
 			else
-				action.add(binding);
+				action.add(prepared);
 
-			releaseGuardBinding = binding;
+			releaseGuardBinding = prepared;
 			isListeningForInput = ListenState::WaitForBindButtonRelease;
 			ImGui::CloseCurrentPopup();
 		};
@@ -993,6 +1001,7 @@ private:
 				{
 					const bool currentSaved = manager.saveBindingIni(Module::BindingsIniPath);
 					const bool optionsSaved = Settings::write(Module::UserIniPath);
+					WheelFFB_ResetDirectionTest();
 					unsavedChanges = !currentSaved;
 					persistenceStatus = currentSaved && optionsSaved
 						? "Wheel profile loaded and made current: " + *selected
@@ -1294,16 +1303,30 @@ private:
 		quick_calibration_row("Steering", { Vol, int(ADChannel::Steering) });
 		quick_calibration_row("Accelerator", { Vol, int(ADChannel::Acceleration) });
 		quick_calibration_row("Brake", { Vol, int(ADChannel::Brake) });
+		const Selection steeringSelection{ Vol, int(ADChannel::Steering) };
+		const Selection acceleratorSelection{ Vol, int(ADChannel::Acceleration) };
+		const Selection brakeSelection{ Vol, int(ADChannel::Brake) };
+		const bool coreControlsPresent =
+			!action_for(steeringSelection).bindings().empty() &&
+			!action_for(acceleratorSelection).bindings().empty() &&
+			!action_for(brakeSelection).bindings().empty();
 		const bool guidedCalibrationReady =
-			axis_calibrated({ Vol, int(ADChannel::Steering) }) &&
-			axis_calibrated({ Vol, int(ADChannel::Acceleration) }) &&
-			axis_calibrated({ Vol, int(ADChannel::Brake) });
-		if (!guidedCalibrationReady)
+			axis_calibrated(steeringSelection) &&
+			axis_calibrated(acceleratorSelection) &&
+			axis_calibrated(brakeSelection);
+		const bool readyToSaveAndDrive = coreControlsPresent && guidedCalibrationReady;
+		if (!coreControlsPresent)
 			ImGui::TextColored(ImVec4(1.0f, 0.70f, 0.20f, 1.0f),
-				"Raw wheel/pedal axes still need calibration; Save & Drive remains available if you intentionally want the current ranges.");
+				"Steering, accelerator and brake need bindings before Save & Drive.");
+		else if (!guidedCalibrationReady)
+			ImGui::TextColored(ImVec4(1.0f, 0.70f, 0.20f, 1.0f),
+				"Calibrate the raw wheel/pedal axes above before Save & Drive.");
 
 		ImGui::Spacing();
-		if (ImGui::Button("Save & Drive"))
+		if (!readyToSaveAndDrive) ImGui::BeginDisabled();
+		const bool saveAndDrive = ImGui::Button("Save & Drive");
+		if (!readyToSaveAndDrive) ImGui::EndDisabled();
+		if (saveAndDrive)
 		{
 			if (InputManager::instance.saveBindingIni(Module::BindingsIniPath))
 			{
