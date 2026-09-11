@@ -190,4 +190,6 @@ req(ffb, 'const float softwareSpringSign = Settings::WheelFFBInvertSpring', 'Rev
 req(ffb, 'driver autocenter state could not be read; leaving it unchanged', 'unknown driver autocenter state is never mutated')
 req(ffb, 'smoothedLongAccel_ +=', 'weight-transfer acceleration is filtered')
 req(ffb, 'std::clamp(configuredWeightTransfer, 0.0f, 1.5f)', 'weight-transfer setting is finite and bounded')
+req(ffb, 'const LONG vibrationHeadroom =', 'software vibration cannot clip steering torque')
+req(ffb, 'const LONG level = baseSteeringLevel + vibrationLevel;', 'fallback vibration uses only remaining output headroom')
 print('CURRENT WHEEL FFB STRUCTURE VERIFIED; run verify_wheel_ffb_math.py for numerical tests')

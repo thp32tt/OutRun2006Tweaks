@@ -875,11 +875,17 @@ namespace
                     slipPhase_, slipAmp * effectRampScale, std::min(slipFreq, 15.0f));
             }
 
-            const LONG level = std::clamp(
-                structuralLevel + eventLevel +
-                    static_cast<LONG>(fallbackVibration * static_cast<float>(DI_FFNOMINALMAX)),
+            const LONG baseSteeringLevel = std::clamp(
+                structuralLevel + eventLevel,
                 -static_cast<LONG>(DI_FFNOMINALMAX),
                 static_cast<LONG>(DI_FFNOMINALMAX));
+            const LONG vibrationRequested = static_cast<LONG>(
+                fallbackVibration * static_cast<float>(DI_FFNOMINALMAX));
+            const LONG vibrationHeadroom =
+                static_cast<LONG>(DI_FFNOMINALMAX) - std::abs(baseSteeringLevel);
+            const LONG vibrationLevel = std::clamp(
+                vibrationRequested, -vibrationHeadroom, vibrationHeadroom);
+            const LONG level = baseSteeringLevel + vibrationLevel;
 
             if (std::abs(level - prevConstantLevel_) > 15 || eventLevel != 0 ||
                 (level != 0 && GetTickCount() - lastConstantWriteTick_ >= FFB_EFFECT_REFRESH_MS))
