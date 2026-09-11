@@ -1,13 +1,11 @@
-# one-shot source application workflow
+# one-shot post-review workflow
 name: Apply FFB and setup UX review
 
 on:
   push:
     branches: [ wheel-ffb ]
     paths:
-      - '.github/apply_ffb_ui_all.py'
-      - '.github/fix_ffb_ui_verifier.py'
-      - '.github/fix_ffb_ui_verifier2.py'
+      - '.github/postreview_ffb_ui_fix.py'
       - '.github/workflows/apply_ffb_ui_all.yml'
   workflow_dispatch:
 
@@ -23,25 +21,14 @@ jobs:
         with:
           ref: wheel-ffb
           fetch-depth: 0
-
-      - name: Apply reviewed FFB/UI changes
-        run: python .github/apply_ffb_ui_all.py
-
-      - name: Align legacy verifier with reversal release
-        run: python .github/fix_ffb_ui_verifier.py
-
-      - name: Fix verifier variable names
-        run: python .github/fix_ffb_ui_verifier2.py
-
+      - name: Apply post-review safeguards
+        run: python .github/postreview_ffb_ui_fix.py
       - name: Verify current source invariants
         run: python tools/verify_wheel_ffb_current.py
-
       - name: Compile production-header math tests
         run: python tools/verify_wheel_ffb_math.py
-
       - name: Check whitespace
         run: git diff --check
-
       - name: Commit verified source changes
         run: |
           if git diff --quiet; then
@@ -51,5 +38,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "feat: improve wheel setup and FFB diagnostics [skip ci]"
+          git commit -m "fix: harden FFB status and setup UX [skip ci]"
           git push origin HEAD:wheel-ffb
