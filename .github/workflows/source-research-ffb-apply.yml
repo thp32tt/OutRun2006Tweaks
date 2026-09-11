@@ -1,5 +1,6 @@
 name: Source-only research-informed FFB update
 
+# Trigger the one-time research-informed source application.
 on:
   push:
     branches: [ wheel-ffb ]
