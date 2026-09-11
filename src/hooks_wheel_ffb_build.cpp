@@ -124,7 +124,9 @@ namespace
 // Looking only at max roughness therefore misses a curb whose contacted wheels
 // become *less* rough than the snow. The min/max spread across all four wheels
 // catches that mixed-surface case regardless of which material has the larger
-// scalar value.
+// scalar value. Once every sampled wheel is on a genuinely rough surface
+// (minimum >= 0.60), keep the same strong tactile profile instead of dropping
+// back to the weaker uniform-road profile.
 void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
 {
     const bool r3Compatibility = r3_road_texture_compatibility_needed();
@@ -150,6 +152,9 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
         const bool mixedSurface =
             surface.validSamples >= 2 && surface.spread >= 0.08f;
         const bool genuinelyRough = surface.maximum >= 0.60f;
+        const bool fullyRough =
+            surface.validSamples >= 2 && surface.minimum >= 0.60f;
+        const bool strongTactile = mixedSurface || fullyRough;
         const bool tactileSurface = mixedSurface || genuinelyRough;
 
         if (tactileSurface)
@@ -166,10 +171,10 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
             const bool snowStage = is_snow_or_ice_stage_for_ffb();
             const float coreStageScale = snowStage ? 0.04f : 1.0f;
 
-            // Aim for a consistent normalized tactile ripple instead of simply
-            // multiplying the user's RoadTexture everywhere. Mixed curb/edge
-            // contact is deliberately stronger than a fully rough road.
-            const float desiredRoadAmp = mixedSurface ? 0.30f : 0.22f;
+            // Half-on-curb mixed contact is already clearly perceptible on the
+            // user's R3. Fully crossing onto the same rough surface must not
+            // become weaker merely because all four samples now agree.
+            const float desiredRoadAmp = strongTactile ? 0.30f : 0.22f;
             const float envelope =
                 textureRoughness * roadSpeedGate * outputStrength * coreStageScale;
             if (envelope > 0.0005f)
@@ -185,11 +190,12 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
                     0.0f, 120.0f);
             }
 
-            // A curb hit should be felt as a brief rack unload/rattle, not be
-            // buried underneath the cornering torque. Only relax these while a
-            // mixed/rough surface is actually under the tyres.
-            const float steeringScale = mixedSurface ? 0.72f : 0.80f;
-            const float damperScale = mixedSurface ? 0.55f : 0.70f;
+            // Keep exactly the same SAT/damper relief when the car completes the
+            // transition onto a fully rough curb/shoulder. Previously mixed=false
+            // immediately weakened these values, which matched the reported
+            // vibration disappearing as the remaining tyres crossed the edge.
+            const float steeringScale = strongTactile ? 0.72f : 0.80f;
+            const float damperScale = strongTactile ? 0.55f : 0.70f;
             Settings::WheelFFBSteeringWeight =
                 originalSteeringWeight * steeringScale;
             Settings::WheelFFBDamperStrength =
@@ -202,9 +208,9 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
             {
                 lastRoadCompatibilityLogTick = now;
                 spdlog::info(
-                    "WheelFFB ROAD: min={:.2f} max={:.2f} spread={:.2f} mixed={} snow={} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
+                    "WheelFFB ROAD: min={:.2f} max={:.2f} spread={:.2f} mixed={} fullRough={} snow={} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
                     surface.minimum, surface.maximum, surface.spread,
-                    mixedSurface, snowStage, desiredRoadAmp,
+                    mixedSurface, fullyRough, snowStage, desiredRoadAmp,
                     static_cast<float>(Settings::WheelFFBRoadTexture),
                     steeringScale, damperScale);
             }
