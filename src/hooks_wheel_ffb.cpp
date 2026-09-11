@@ -892,7 +892,7 @@ namespace
                 set_constant_force(level);
 
             ++updateCounter_;
-            if (periodicsActive_ && (updateCounter_ % 4) == 0)
+            if (periodicsActive_ && (updateCounter_ % 2) == 0)
             {
                 update_periodic(roadTextureEffect_, roadState_, roadAmp * effectRampScale, roadFreq);
                 update_periodic(tireSlipEffect_, slipState_, slipAmp * effectRampScale, slipFreq);
