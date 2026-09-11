@@ -29,9 +29,9 @@ bool WheelFFB_IsOutputOwnerActive();
 
 void SetVibration(int userId, float leftMotor, float rightMotor)
 {
-    // Suppress the independent gamepad-rumble path only after the
-    // DirectInput WheelFFBEngine has actually initialized an output device.
-    // A configured-but-missing/failed wheel must not disable controller rumble.
+    // Suppress the independent gamepad-rumble path only while the
+    // DirectInput WheelFFBEngine currently owns an acquired output device.
+    // A configured-but-missing/lost/unacquired wheel must not disable controller rumble.
     static bool wheelOwnedLastCall = false;
     if (WheelFFB_IsOutputOwnerActive())
     {

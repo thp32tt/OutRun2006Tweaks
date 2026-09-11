@@ -227,17 +227,8 @@ namespace
             if (!car || panicStopped_)
                 return;
 
-            if (!Settings::WheelFFBEnable)
-            {
-                if (initialized_ && enabledLastTick_)
-                {
-                    zero_all_forces();
-                    reset_signal_state();
-                    enabledLastTick_ = false;
-                    spdlog::info("WheelFFB: disabled live; all effects zeroed immediately");
-                }
+            if (disable_live_if_needed())
                 return;
-            }
             enabledLastTick_ = true;
 
             // Safety first for a DD base: WM_ACTIVATEAPP releases exclusive
@@ -923,7 +914,8 @@ namespace
 
         bool output_owner_active() const
         {
-            return Settings::WheelFFBEnable && initialized_ && device_ && !panicStopped_;
+            return Settings::WheelFFBEnable && initialized_ && device_ &&
+                deviceAcquired_ && !deviceReinitPending_ && !panicStopped_;
         }
 
         void request_direction_test(int direction)
@@ -977,15 +969,18 @@ namespace
 
         void service_safety()
         {
-            if (!initialized_ || panicStopped_) return;
+            if (panicStopped_) return;
+            if (disable_live_if_needed()) return;
+            if (!initialized_) return;
+
             const bool gameplay = Game::current_mode && *Game::current_mode == STATE_GAME;
             const bool foreground = gameHwnd_ && GetForegroundWindow() == gameHwnd_;
-            if (!Settings::WheelFFBEnable || !gameplay || !foreground ||
+            if (!gameplay || !foreground ||
                 ((Overlay::IsActive || Overlay::IsBindingDialogActive) && manualTestFrames_ == 0))
             {
                 zero_all_forces();
                 reset_signal_state();
-                if ((!gameplay || !foreground || !Settings::WheelFFBEnable) && device_ && deviceAcquired_)
+                if ((!gameplay || !foreground) && device_ && deviceAcquired_)
                 {
                     device_->Unacquire();
                     deviceAcquired_ = false;
@@ -1143,6 +1138,32 @@ namespace
             return DIENUM_STOP;
         }
 
+        bool disable_live_if_needed()
+        {
+            if (Settings::WheelFFBEnable)
+                return false;
+
+            const bool hadInitializedOutput = initialized_;
+            if (initialized_)
+            {
+                if (device_ && deviceAcquired_)
+                    zero_all_forces();
+                teardown_for_reinitialize("live disable");
+                initialized_ = false;
+                deviceReinitPending_ = false;
+                deviceFailureSince_ = 0;
+                deviceReinitAfter_ = 0;
+                retryAfter_ = 0;
+                failedInterfaceGuid_.clear();
+                failedInterfaceUntil_ = 0;
+            }
+
+            enabledLastTick_ = false;
+            if (hadInitializedOutput)
+                spdlog::info("WheelFFB: disabled live; output released and driver autocenter restored");
+            return true;
+        }
+
         void clear_device_failure()
         {
             deviceFailureSince_ = 0;
@@ -1245,7 +1266,7 @@ namespace
             periodicStrategy_ = 1;
         }
 
-        void teardown_for_reinitialize()
+        void teardown_for_reinitialize(const char* autocenterReason = "device reinitialize")
         {
             if (device_)
             {
@@ -1265,7 +1286,7 @@ namespace
             release_effects_for_reinitialize();
             deviceAcquired_ = false;
 
-            restore_driver_autocenter("device reinitialize");
+            restore_driver_autocenter(autocenterReason);
             release_device();
             release_directinput();
             selectedName_.clear();

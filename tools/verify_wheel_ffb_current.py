@@ -60,6 +60,9 @@ req(compat_v2, 'return Settings::WheelInputCompatibility && !Settings::UseNewInp
 req(wheel_ui, 'bool validate() override { return Settings::WheelInputCompatibility && !Settings::UseNewInput; }', 'universal legacy hook installed for live switching')
 req(r3_dpad, '!Settings::UseNewInput &&\n                Settings::WheelMenuR3DirectDPad;', 'R3 DPad hook can remain dormant under universal ownership')
 req(r3_ab, '!Settings::UseNewInput &&\n                Settings::WheelMenuR3DirectAB;', 'R3 AB hook can remain dormant under universal ownership')
+forbid(wheel_ui, 'Settings::WheelMenuR3DirectDPad = false;', 'universal toggle preserves R3 DPad preference')
+forbid(wheel_ui, 'Settings::WheelMenuR3DirectAB = false;', 'universal toggle preserves R3 AB preference')
+forbid(wheel_ui, 'Restart after changing the physical wheel base', 'FFB selector does not demand unnecessary restart')
 
 req(ffb, 'GUID_ConstantForce', 'DirectInput ConstantForce effect')
 req(ffb, 'GUID_Spring', 'DirectInput Spring effect')
@@ -68,6 +71,8 @@ req(ffb, 'WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)', 'post-physics FFB entry
 forbid(ffb, 'CalcVibrationHook_', 'no competing CalcVibrationValues FFB hook')
 req(vib, 'if (WheelFFB_IsOutputOwnerActive())', 'rumble suppression follows actual FFB ownership')
 req(ffb, 'bool WheelFFB_IsOutputOwnerActive()', 'FFB ownership query exported')
+req(ffb, 'deviceAcquired_ && !deviceReinitPending_ && !panicStopped_', 'FFB ownership requires acquired healthy output')
+req(ffb, 'teardown_for_reinitialize("live disable")', 'live FFB disable fully releases output')
 req(ffb, 'setting->hidden(true);', 'generic WheelFFB settings hidden')
 req(vib, 'GamePlCar_Ctrl.call(car);\n        WheelFFB_UpdateAfterPhysics(car);', 'post-physics execution order')
 

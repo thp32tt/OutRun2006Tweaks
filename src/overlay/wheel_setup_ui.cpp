@@ -767,7 +767,7 @@ namespace
                 Settings::WheelFFBDeviceName = info.name;
                 Settings::WheelFFBDeviceGuid = info.guidKey;
                 Settings::write(Module::UserIniPath);
-                status_ = "Selected FFB output and saved its exact DirectInput GUID. Restart after changing the physical wheel base.";
+                status_ = "Selected FFB output and saved its exact DirectInput GUID. The FFB engine will reinitialize automatically on the next gameplay update.";
                 return;
             }
 
@@ -1119,16 +1119,9 @@ namespace
 
             if (ImGui::Checkbox("Enable F11 universal wheel profile", Settings::WheelUniversalSetupEnable.ptr()))
             {
-                if (Settings::WheelUniversalSetupEnable)
-                {
-                    // The old R3-specific readers assume fixed button numbers.
-                    // Once a universal profile is active, its own bindings must
-                    // be the sole wheel-menu source so Logitech/Thrustmaster/
-                    // Fanatec/Simagic/etc. do not inherit R3 button mappings.
-                    Settings::WheelMenuR3DirectDPad = false;
-                    Settings::WheelMenuR3DirectAB = false;
-                    status_ = "Universal profile enabled; legacy R3 fixed-button menu helpers were disabled.";
-                }
+                status_ = Settings::WheelUniversalSetupEnable
+                    ? "Universal profile owns legacy menu input while enabled; configured R3 helpers remain saved and dormant."
+                    : "Universal profile disabled; configured legacy R3 helpers can resume automatically.";
             }
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("When enabled, these bindings are written into OutRun's original legacy DirectInput device mapping.");
@@ -1139,9 +1132,7 @@ namespace
                 if (UniversalWheelProfile::copy_current_mapping())
                 {
                     Settings::WheelUniversalSetupEnable = true;
-                    Settings::WheelMenuR3DirectDPad = false;
-                    Settings::WheelMenuR3DirectAB = false;
-                    status_ = "Imported current steering/pedal/shift bindings. Universal menu ownership enabled; add menu bindings below.";
+                    status_ = "Imported current steering/pedal/shift bindings. Universal menu ownership enabled; saved R3 helpers remain dormant until Universal is disabled.";
                 }
                 else
                     status_ = "No regular legacy DirectInput game device is ready yet.";
