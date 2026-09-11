@@ -174,3 +174,7 @@ For the original project's complete feature list, releases and community links, 
 The project targets **Win32 Release** and uses Visual Studio 2022, CMake and Git. The `wheel-ffb` branch applies the wheel/input hardening passes during CI before compiling `dinput8.dll`.
 
 See [WHEEL_FFB.md](WHEEL_FFB.md) for architecture and tuning details.
+
+### Research-informed steering force model
+
+Physics SAT uses a split pneumatic + mechanical/caster trail model instead of one all-purpose falloff curve. Front-slip filtering accelerates with vehicle speed to reduce countersteer lag, while the existing Natural SAT remains the full fallback whenever Physics SAT telemetry is not valid. F11 also includes structural FFB headroom/P95/P99 diagnostics and an optional per-wheel response LUT; hardware correction is disabled by default and should only be enabled from measured wheel behavior.

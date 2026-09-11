@@ -118,3 +118,13 @@ The implementation and design work builds on community references from:
 - [d-b-c-e/OutRun2006Tweaks-FFB](https://github.com/d-b-c-e/OutRun2006Tweaks-FFB)
 
 Thank you to those authors and community testers for making their work and hardware observations available. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for license/attribution details.
+
+## Research-informed SAT and wheel-response model
+
+Physics SAT now separates a **pneumatic-trail** component from a bounded **mechanical/caster-trail** component. Both are driven by the estimated front-slip/lateral-force proxy; mechanical trail is not a centre spring. Pneumatic SAT peaks around the normal loaded-corner region and falls first as front slip grows, while the mechanical contribution preserves some steering authority through deeper understeer instead of letting the wheel go artificially dead.
+
+The vehicle estimator keeps the existing bicycle-model-inspired `roadWheelAngle - bodySlip - yawRate * yawLeadSeconds` relation, but its body-slip/yaw/front-slip filters are now speed-adaptive. This is a relaxation-length-inspired approximation: at higher vehicle speed the same fixed time low-pass created too much countersteer/SAT lag. Telemetry records both raw and filtered states plus the active blend values (`WheelFFB SATMODEL`).
+
+`Force Feedback -> FFB Headroom / Clipping` measures sustained structural demand only. Crash/gear events, startup/recreate ramps and near-stop frames are excluded. P95/P99, soft-knee occupancy and hard-cap demand are reported, with a non-automatic Overall Strength suggestion targeting roughly 90% P99 demand.
+
+Wheel-specific response correction is optional and **off by default**. A wheel profile can store `ResponseCorrection`, an 11-point monotonic `ResponseLUT` (desired torque 0..100% in 10% steps -> DirectInput command), and optional `MaxTorqueNm` for diagnostics. These hardware properties are deliberately excluded from named FFB feel profiles. Leave correction linear/off on a DD wheel unless a measured response curve justifies it.

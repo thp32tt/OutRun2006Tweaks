@@ -24,10 +24,9 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "overlay.hpp"
+#include "wheel_ffb_math.hpp"
+#include "wheel_ffb_runtime.hpp"
 #include "wheel_profile_store.hpp"
-
-void WheelFFB_RequestDirectionTest(int direction);
-void WheelFFB_RequestSettingsTransition();
 
 namespace Settings
 {
@@ -45,6 +44,7 @@ namespace Settings
     extern Setting<float> WheelFFBSpringSaturation;
     extern Setting<float> WheelFFBDamperStrength;
     extern Setting<float> WheelFFBSteeringWeight;
+    extern Setting<float> WheelFFBMechanicalTrail;
     extern Setting<bool> WheelFFBPhysicsSat;
     extern Setting<float> WheelFFBGripLoss;
     extern Setting<float> WheelFFBLateralDeadzone;
@@ -63,6 +63,9 @@ namespace Settings
     extern Setting<bool> WheelFFBUsePeriodicEffects;
     extern Setting<bool> WheelFFBDebugLog;
     extern Setting<bool> WheelFFBTelemetry;
+    extern Setting<bool> WheelFFBResponseCorrection;
+    extern Setting<std::string> WheelFFBResponseLUT;
+    extern Setting<float> WheelFFBMaxTorqueNm;
 
     Setting<bool> WheelUniversalSetupEnable{
         "Controls", "WheelUniversalSetupEnable", false,
@@ -819,7 +822,7 @@ namespace
                 refresh_ffb_profiles();
 
             ImGui::SeparatorText("Force Feedback Profiles");
-            ImGui::TextWrapped("Save several force-feel setups and switch between them. Profiles store force behavior only; the selected FFB Output wheel and diagnostic logging stay global.");
+            ImGui::TextWrapped("Save several force-feel setups and switch between them. Profiles store force behavior only; the selected FFB Output wheel, hardware response correction and diagnostic logging stay with the wheel/global setup.");
 
             const std::string* selected = selected_ffb_profile();
             const char* preview = selected ? selected->c_str() : "Select a saved FFB profile";
@@ -1173,7 +1176,10 @@ namespace
             const auto track_ffb_change = [this](bool changed)
             {
                 if (changed)
+                {
                     ffbDirty_ = true;
+                    WheelFFB_ResetHeadroomStats();
+                }
                 return changed;
             };
 
@@ -1377,26 +1383,37 @@ namespace
             track_ffb_change(ImGui::Checkbox("Enable Force Feedback", Settings::WheelFFBEnable.ptr()));
             ImGui::TextDisabled("gameplay FFB follows the exact selected DirectInput GUID.");
             ImGui::TextWrapped(
-                "Single-owner wheel FFB: DirectInput COM only. field_264/268 are lateral load only; body slip releases damping, while front slip drives Physics SAT and tire scrub. Centering Spring remains a low-speed stabilizer.");
+                "Single-owner wheel FFB: DirectInput COM only. field_264/268 are lateral load only; front slip drives a pneumatic + mechanical/caster SAT model, while body/front slip release damping. Centering Spring remains a low-speed stabilizer.");
             ImGui::TextDisabled("Settings > WheelFFB is hidden; changes on this page apply live. Gamepad rumble is suppressed only while DirectInput FFB owns an output device.");
 
+            ImGui::SeparatorText("Physics / Structural");
             track_ffb_change(ImGui::SliderFloat("Overall Strength", Settings::WheelFFBGlobalStrength.ptr(), 0.0f, 1.5f, "%.2f"));
             if (Settings::WheelFFBGlobalStrength.get() > 1.0f)
                 ImGui::TextColored(ImVec4(1.0f, 0.65f, 0.25f, 1.0f),
                     "Above 100% trades force-detail contrast for extra weight.");
-            track_ffb_change(ImGui::SliderFloat("Centering Spring (low speed)", Settings::WheelFFBSpringStrength.ptr(), 0.0f, 1.0f, "%.2f"));
-            track_ffb_change(ImGui::SliderFloat("Dynamic Damping", Settings::WheelFFBDamperStrength.ptr(), 0.0f, 1.0f, "%.2f"));
             track_ffb_change(ImGui::SliderFloat("Self-aligning Torque (SAT)", Settings::WheelFFBSteeringWeight.ptr(), 0.0f, 2.00f, "%.2f"));
             track_ffb_change(ImGui::Checkbox("Physics SAT (body slip + yaw)", Settings::WheelFFBPhysicsSat.ptr()));
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Uses post-physics OutRun car motion/body heading to estimate front slip. Disable for the Natural SAT comparison.");
+            if (Settings::WheelFFBPhysicsSat)
+            {
+                track_ffb_change(ImGui::SliderFloat("Mechanical / Caster Trail", Settings::WheelFFBMechanicalTrail.ptr(), 0.0f, 0.60f, "%.2f"));
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Adds bounded front-lateral-force restoring torque as pneumatic trail fades. This is not a centre spring; 0 disables the mechanical/caster contribution.");
+            }
             track_ffb_change(ImGui::SliderFloat("Grip-loss Response", Settings::WheelFFBGripLoss.ptr(), 0.0f, 1.0f, "%.2f"));
-            track_ffb_change(ImGui::SliderFloat("Road Detail", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 0.50f, "%.2f"));
-            track_ffb_change(ImGui::SliderFloat("Tire Slip", Settings::WheelFFBTireSlip.ptr(), 0.0f, 0.50f, "%.2f"));
-            track_ffb_change(ImGui::SliderFloat("Collision", Settings::WheelFFBWallImpact.ptr(), 0.0f, 1.0f, "%.2f"));
+
+            ImGui::SeparatorText("Steering Feel");
+            track_ffb_change(ImGui::SliderFloat("Centering Spring (low speed)", Settings::WheelFFBSpringStrength.ptr(), 0.0f, 1.0f, "%.2f"));
+            track_ffb_change(ImGui::SliderFloat("Dynamic Damping", Settings::WheelFFBDamperStrength.ptr(), 0.0f, 1.0f, "%.2f"));
             track_ffb_change(ImGui::Checkbox("Hardware GUID_Spring", Settings::WheelFFBUseHardwareSpring.ptr()));
             ImGui::SameLine();
             track_ffb_change(ImGui::Checkbox("Hardware GUID_Damper", Settings::WheelFFBUseHardwareDamper.ptr()));
+
+            ImGui::SeparatorText("Effects");
+            track_ffb_change(ImGui::SliderFloat("Road Detail", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 0.50f, "%.2f"));
+            track_ffb_change(ImGui::SliderFloat("Tire Slip", Settings::WheelFFBTireSlip.ptr(), 0.0f, 0.50f, "%.2f"));
+            track_ffb_change(ImGui::SliderFloat("Collision", Settings::WheelFFBWallImpact.ptr(), 0.0f, 1.0f, "%.2f"));
             track_ffb_change(ImGui::Checkbox("Hardware road/slip sine effects", Settings::WheelFFBUsePeriodicEffects.ptr()));
 
             if (ImGui::CollapsingHeader("Advanced FFB tuning"))
@@ -1409,6 +1426,43 @@ namespace
                 track_ffb_change(ImGui::SliderFloat("Force Slew Rate", Settings::WheelFFBSlewRate.ptr(), 0.01f, 1.0f, "%.3f"));
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip("Maximum structural-force change per 60 Hz tick. Lower is smoother/slower; higher responds faster.");
+
+                ImGui::SeparatorText("Wheel hardware calibration");
+                track_ffb_change(ImGui::Checkbox("Enable wheel response correction", Settings::WheelFFBResponseCorrection.ptr()));
+                track_ffb_change(ImGui::SliderFloat("Wheel peak torque (Nm, 0=unknown)", Settings::WheelFFBMaxTorqueNm.ptr(), 0.0f, 30.0f, "%.1f"));
+
+                WheelFFBMath::ResponseLUT responseLut{};
+                const bool responseLutValid = WheelFFBMath::parse_response_lut(
+                    Settings::WheelFFBResponseLUT.get(), responseLut);
+                if (!responseLutValid)
+                {
+                    ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.3f, 1.0f),
+                        "Response LUT is invalid; output remains linear.");
+                    if (ImGui::Button("Reset response LUT to linear"))
+                    {
+                        Settings::WheelFFBResponseLUT = WheelFFBMath::format_response_lut(
+                            WheelFFBMath::linear_response_lut());
+                        track_ffb_change(true);
+                    }
+                }
+                else if (Settings::WheelFFBResponseCorrection)
+                {
+                    ImGui::TextDisabled("Desired torque -> DirectInput command. Endpoints stay fixed at 0%% / 100%%.");
+                    for (size_t point = 1; point + 1 < responseLut.size(); ++point)
+                    {
+                        float value = responseLut[point];
+                        char label[64]{};
+                        std::snprintf(label, sizeof(label), "%u%% desired torque##ResponseLut%u",
+                            static_cast<unsigned>(point * 10), static_cast<unsigned>(point));
+                        if (ImGui::SliderFloat(label, &value, responseLut[point - 1], responseLut[point + 1], "%.3f"))
+                        {
+                            responseLut[point] = value;
+                            Settings::WheelFFBResponseLUT = WheelFFBMath::format_response_lut(responseLut);
+                            track_ffb_change(true);
+                        }
+                    }
+                }
+                ImGui::TextDisabled("Response correction / max torque are stored with the wheel profile, not named FFB feel profiles. Leave correction off for a linear DD wheel unless measured.");
                 ImGui::TextDisabled("Advanced values apply live like the main controls; use Save Force Feedback to persist them.");
             }
 
@@ -1433,6 +1487,31 @@ namespace
                     status_ = "Could not save force feedback settings.";
             }
 
+            ImGui::SeparatorText("FFB Headroom / Clipping");
+            const WheelFFBHeadroomSnapshot headroom = WheelFFB_GetHeadroomSnapshot();
+            ImGui::Text("Current structural demand: %.0f%%   Peak: %.0f%%",
+                headroom.currentDemand * 100.0f, headroom.peakDemand * 100.0f);
+            ImGui::Text("P95: %.0f%%   P99: %.0f%%   samples: %llu (%.1fs)",
+                headroom.p95Demand * 100.0f, headroom.p99Demand * 100.0f,
+                static_cast<unsigned long long>(headroom.samples),
+                static_cast<float>(headroom.samples) / 60.0f);
+            ImGui::Text("Soft-knee demand (>75%%): %.1f%%   hard-cap demand (>=135%%): %.2f%%",
+                headroom.softKneePercent, headroom.hardClipPercent);
+            if (Settings::WheelFFBMaxTorqueNm.get() > 0.0f && headroom.samples > 0)
+            {
+                ImGui::TextDisabled("P99 requested equivalent: %.2f Nm on a %.1f Nm wheel (before hardware LUT/cap).",
+                    headroom.p99Demand * Settings::WheelFFBMaxTorqueNm.get(),
+                    Settings::WheelFFBMaxTorqueNm.get());
+            }
+            if (headroom.samples >= 600)
+                ImGui::Text("Suggested Overall Strength: %.2f  (targets structural P99 near 90%% before wheel LUT)",
+                    headroom.suggestedOverall);
+            else
+                ImGui::TextDisabled("Drive normally for at least 10 seconds; 20-30 seconds with several corners is better before trusting the suggestion.");
+            ImGui::TextDisabled("Collision, gear events, startup/recreate ramps and near-stop frames are excluded from the statistics.");
+            if (ImGui::Button("Reset headroom analysis"))
+                WheelFFB_ResetHeadroomStats();
+
             ImGui::SeparatorText("Safe direction test");
             if (ImGui::Button("Test Left (20%)"))
                 WheelFFB_RequestDirectionTest(-1);
@@ -1453,6 +1532,7 @@ namespace
                 Settings::WheelFFBSpringSaturation = 0.95f;
                 Settings::WheelFFBDamperStrength = 0.28f;
                 Settings::WheelFFBSteeringWeight = 1.45f;
+                Settings::WheelFFBMechanicalTrail = 0.25f;
                 Settings::WheelFFBGripLoss = 0.65f;
                 Settings::WheelFFBWeightTransfer = 0.15f;
                 Settings::WheelFFBSlewRate = 0.040f;
@@ -1470,7 +1550,7 @@ namespace
                 if (Settings::write(Module::UserIniPath))
                 {
                     ffbDirty_ = false;
-                    status_ = "Loaded MOZA R3 Physics SAT: lateral load, body slide and front scrub are separated; diagnostic logging enabled. Saved to user.ini.";
+                    status_ = "Loaded MOZA R3 Physics SAT: speed-adaptive front slip plus pneumatic/mechanical trail SAT; diagnostic logging enabled. Saved to user.ini.";
                 }
                 else
                 {
@@ -1489,6 +1569,7 @@ namespace
                 Settings::WheelFFBSpringSaturation = 0.95f;
                 Settings::WheelFFBDamperStrength = 0.30f;
                 Settings::WheelFFBSteeringWeight = 1.75f;
+                Settings::WheelFFBMechanicalTrail = 0.25f;
                 Settings::WheelFFBGripLoss = 0.65f;
                 Settings::WheelFFBWeightTransfer = 0.20f;
                 Settings::WheelFFBSlewRate = 0.045f;

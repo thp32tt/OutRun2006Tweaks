@@ -31,6 +31,12 @@ public:
         bodySlip_ = 0.0f;
         yawRate_ = 0.0f;
         frontSlip_ = 0.0f;
+        rawBodySlip_ = 0.0f;
+        rawYawRate_ = 0.0f;
+        rawFrontSlip_ = 0.0f;
+        bodySlipBlend_ = 0.18f;
+        yawRateBlend_ = 0.20f;
+        frontSlipBlend_ = 0.24f;
         vLong_ = 0.0f;
         vLat_ = 0.0f;
         positionStep_ = 0.0f;
@@ -220,10 +226,23 @@ public:
             clear_dynamic_state();
             return;
         }
-        const float rawBodySlip = std::clamp(
+        rawBodySlip_ = std::clamp(
             std::atan2(vLat_, std::max(std::abs(vLong_), 0.00001f)),
             -0.70f, 0.70f);
-        bodySlip_ += (rawBodySlip - bodySlip_) * 0.18f;
+
+        // Tyre transient response is fundamentally distance-based (relaxation
+        // length), so a fixed time-domain low-pass becomes increasingly late as
+        // speed rises. OutRun does not expose a physical metres/second scale,
+        // therefore use a conservative speed-adaptive blend while retaining
+        // smoothing at parking/launch speeds.
+        const float transientT0 = std::clamp(
+            (speedNorm - 0.08f) / 0.72f, 0.0f, 1.0f);
+        const float transientT =
+            transientT0 * transientT0 * (3.0f - 2.0f * transientT0);
+        bodySlipBlend_ = 0.18f + (0.34f - 0.18f) * transientT;
+        yawRateBlend_ = 0.20f + (0.38f - 0.20f) * transientT;
+        frontSlipBlend_ = 0.24f + (0.58f - 0.24f) * transientT;
+        bodySlip_ += (rawBodySlip_ - bodySlip_) * bodySlipBlend_;
 
         const float heading = std::atan2(forwardX, forwardZ);
         if (!headingValid_)
@@ -249,18 +268,18 @@ public:
         }
 
         // Called once per fixed OutRun simulation tick, independent of render FPS.
-        const float rawYawRate = std::clamp(headingDelta * 60.0f, -3.5f, 3.5f);
-        yawRate_ += (rawYawRate - yawRate_) * 0.20f;
+        rawYawRate_ = std::clamp(headingDelta * 60.0f, -3.5f, 3.5f);
+        yawRate_ += (rawYawRate_ - yawRate_) * yawRateBlend_;
 
         // Bicycle-model-inspired front-slip proxy:
         // alpha_f ~= road-wheel-angle - beta - a*r/v.
         constexpr float RoadWheelLockRad = 0.52f;
         const float roadWheelAngle = steer * RoadWheelLockRad;
         const float yawLeadSeconds = 0.10f - 0.045f * speedNorm;
-        const float rawFrontSlip = std::clamp(
+        rawFrontSlip_ = std::clamp(
             roadWheelAngle - bodySlip_ - yawRate_ * yawLeadSeconds,
             -0.70f, 0.70f);
-        frontSlip_ += (rawFrontSlip - frontSlip_) * 0.22f;
+        frontSlip_ += (rawFrontSlip_ - frontSlip_) * frontSlipBlend_;
 
         // Telemetry-only validation for the game's native speed vector.
         const float spdX = car->spd_mb_20.x;
@@ -288,6 +307,12 @@ public:
     float bodySlip() const { return bodySlip_; }
     float yawRate() const { return yawRate_; }
     float frontSlip() const { return frontSlip_; }
+    float rawBodySlip() const { return rawBodySlip_; }
+    float rawYawRate() const { return rawYawRate_; }
+    float rawFrontSlip() const { return rawFrontSlip_; }
+    float bodySlipBlend() const { return bodySlipBlend_; }
+    float yawRateBlend() const { return yawRateBlend_; }
+    float frontSlipBlend() const { return frontSlipBlend_; }
     float vLong() const { return vLong_; }
     float vLat() const { return vLat_; }
     float positionStep() const { return positionStep_; }
@@ -304,6 +329,12 @@ private:
         bodySlip_ = 0.0f;
         yawRate_ = 0.0f;
         frontSlip_ = 0.0f;
+        rawBodySlip_ = 0.0f;
+        rawYawRate_ = 0.0f;
+        rawFrontSlip_ = 0.0f;
+        bodySlipBlend_ = 0.18f;
+        yawRateBlend_ = 0.20f;
+        frontSlipBlend_ = 0.24f;
         vLong_ = 0.0f;
         vLat_ = 0.0f;
         activationBlend_ = 0.0f;
@@ -322,6 +353,9 @@ private:
         bodySlip_ *= 0.55f;
         yawRate_ *= 0.55f;
         frontSlip_ *= 0.55f;
+        rawBodySlip_ *= 0.55f;
+        rawYawRate_ *= 0.55f;
+        rawFrontSlip_ *= 0.55f;
         activationBlend_ *= 0.85f;
 
         // Once telemetry has been invalid for several ticks, clear all dynamic
@@ -350,6 +384,12 @@ private:
     float bodySlip_ = 0.0f;
     float yawRate_ = 0.0f;
     float frontSlip_ = 0.0f;
+    float rawBodySlip_ = 0.0f;
+    float rawYawRate_ = 0.0f;
+    float rawFrontSlip_ = 0.0f;
+    float bodySlipBlend_ = 0.18f;
+    float yawRateBlend_ = 0.20f;
+    float frontSlipBlend_ = 0.24f;
     float vLong_ = 0.0f;
     float vLat_ = 0.0f;
     float positionStep_ = 0.0f;

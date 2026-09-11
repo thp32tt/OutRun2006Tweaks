@@ -16,6 +16,9 @@ namespace Settings
 {
     extern Setting<std::string> WheelFFBDeviceName;
     extern Setting<std::string> WheelFFBDeviceGuid;
+    extern Setting<bool> WheelFFBResponseCorrection;
+    extern Setting<std::string> WheelFFBResponseLUT;
+    extern Setting<float> WheelFFBMaxTorqueNm;
 }
 
 // Named wheel/input and force-feedback profiles live beside the DLL instead of
@@ -211,6 +214,9 @@ namespace WheelProfileStore
         std::string bypassSensitivity;
         std::string ffbDeviceName;
         std::string ffbDeviceGuid;
+        std::string ffbResponseCorrection;
+        std::string ffbResponseLut;
+        std::string ffbMaxTorqueNm;
     };
 
     inline InputOptionsSnapshot capture_input_options()
@@ -221,6 +227,9 @@ namespace WheelProfileStore
             Settings::BypassGameSensitivity.to_string(),
             Settings::WheelFFBDeviceName.to_string(),
             Settings::WheelFFBDeviceGuid.to_string(),
+            Settings::WheelFFBResponseCorrection.to_string(),
+            Settings::WheelFFBResponseLUT.to_string(),
+            Settings::WheelFFBMaxTorqueNm.to_string(),
         };
     }
 
@@ -231,6 +240,9 @@ namespace WheelProfileStore
         Settings::BypassGameSensitivity.set_from_string(snapshot.bypassSensitivity);
         Settings::WheelFFBDeviceName.set_from_string(snapshot.ffbDeviceName);
         Settings::WheelFFBDeviceGuid.set_from_string(snapshot.ffbDeviceGuid);
+        Settings::WheelFFBResponseCorrection.set_from_string(snapshot.ffbResponseCorrection);
+        Settings::WheelFFBResponseLUT.set_from_string(snapshot.ffbResponseLut);
+        Settings::WheelFFBMaxTorqueNm.set_from_string(snapshot.ffbMaxTorqueNm);
     }
 
     inline bool append_input_options(const std::filesystem::path& path, std::string* error = nullptr)
@@ -248,6 +260,9 @@ namespace WheelProfileStore
         file << "BypassGameSensitivity = " << Settings::BypassGameSensitivity.to_string() << "\n";
         file << "FFBDeviceName = " << Settings::WheelFFBDeviceName.to_string() << "\n";
         file << "FFBDeviceGuid = " << Settings::WheelFFBDeviceGuid.to_string() << "\n";
+        file << "FFBResponseCorrection = " << Settings::WheelFFBResponseCorrection.to_string() << "\n";
+        file << "FFBResponseLUT = " << Settings::WheelFFBResponseLUT.to_string() << "\n";
+        file << "FFBMaxTorqueNm = " << Settings::WheelFFBMaxTorqueNm.to_string() << "\n";
         file.flush();
         if (!file)
         {
@@ -282,7 +297,10 @@ namespace WheelProfileStore
             !apply("SteeringDeadZone", Settings::SteeringDeadZone) ||
             !apply("BypassGameSensitivity", Settings::BypassGameSensitivity) ||
             !apply("FFBDeviceName", Settings::WheelFFBDeviceName) ||
-            !apply("FFBDeviceGuid", Settings::WheelFFBDeviceGuid))
+            !apply("FFBDeviceGuid", Settings::WheelFFBDeviceGuid) ||
+            !apply("FFBResponseCorrection", Settings::WheelFFBResponseCorrection) ||
+            !apply("FFBResponseLUT", Settings::WheelFFBResponseLUT) ||
+            !apply("FFBMaxTorqueNm", Settings::WheelFFBMaxTorqueNm))
         {
             restore_input_options(before);
             if (error) *error = "Input profile contains an invalid wheel-specific option.";
@@ -302,7 +320,9 @@ namespace WheelProfileStore
         // Device routing and diagnostics stay global. A feel profile must never
         // silently redirect torque to another wheel or turn verbose logging on.
         return key != "DeviceName" && key != "DeviceGuid" &&
-            key != "Telemetry" && key != "DebugLog";
+            key != "Telemetry" && key != "DebugLog" &&
+            key != "ResponseCorrection" && key != "ResponseLUT" &&
+            key != "MaxTorqueNm";
     }
 
     inline std::vector<Settings::SettingBase*> ffb_settings()

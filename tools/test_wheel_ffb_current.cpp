@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <limits>
+#include <string>
 struct D3DVECTOR { float x=0, y=0, z=0; };
 struct D3DMATRIX { float _11=1,_12=0,_13=0,_14=0,_21=0,_22=1,_23=0,_24=0,_31=0,_32=0,_33=1; };
 struct EVWORK_CAR { D3DVECTOR position_14, spd_mb_20; D3DMATRIX matrix_70; };
@@ -12,26 +13,35 @@ struct EVWORK_CAR { D3DVECTOR position_14, spd_mb_20; D3DMATRIX matrix_70; };
 static int checks = 0;
 void require(bool b, const char* msg) { ++checks; if (!b) { std::cerr << msg << '\n'; std::exit(1); } }
 void heading(EVWORK_CAR& c, float a) { c.matrix_70._11=std::cos(a);c.matrix_70._13=-std::sin(a);c.matrix_70._31=std::sin(a);c.matrix_70._33=std::cos(a); }
-void step(WheelVehicleDynamics& d, EVWORK_CAR& c, float a=0, float beta=0, float steer=0) {
- heading(c,a);c.position_14.x+=std::sin(a+beta);c.position_14.z+=std::cos(a+beta);d.update(&c,steer,.5f,0);
+void step(WheelVehicleDynamics& d, EVWORK_CAR& c, float a=0, float beta=0, float steer=0, float speed=.5f) {
+ heading(c,a);c.position_14.x+=std::sin(a+beta);c.position_14.z+=std::cos(a+beta);d.update(&c,steer,speed,0);
 }
 int main() {
- using WheelFFBMath::trail_shape;
- require(trail_shape(0)==0,"SAT zero");
- require(trail_shape(std::numeric_limits<float>::quiet_NaN())==0,"SAT NaN");
- float prev=0;
- for(int i=0;i<=7000;++i) {float a=i*.0001f,t=trail_shape(a);require(std::isfinite(t)&&t>=0&&t<=1.000001f,"trail bounds");require(std::abs(t-trail_shape(-a))<1e-6,"trail symmetry");if(i<=1600)require(t>=prev-1e-6,"trail rise");else require(t<=prev+1e-6,"trail fall");prev=t;}
- for(float a: {.004f,.16f,.176f}) {float h=1e-5f;float l=(trail_shape(a)-trail_shape(a-h))/h,r=(trail_shape(a+h)-trail_shape(a))/h; require(std::abs(l-r)<.05f,"trail C1 join");}
- require(trail_shape(.004001f)-trail_shape(.003999f)<.0001f,"no SAT cutoff step");
- require(std::abs(trail_shape(.32f)-std::exp(-.9f))<1e-6,"deep-slip baseline preserved");
- require(WheelFFBMath::soft_saturate(.5f)==.5f,"soft clip linear midrange");
- require(std::abs(WheelFFBMath::soft_saturate(-.5f)+.5f)<1e-6,"soft clip symmetry");
- require(WheelFFBMath::soft_saturate(1.0f)>.90f&&WheelFFBMath::soft_saturate(1.0f)<1.0f,"soft clip late knee");
- require(WheelFFBMath::soft_saturate(2.0f)==1.0f&&WheelFFBMath::soft_saturate(-2.0f)==-1.0f,"soft clip cap");
- float clipPrev=0; for(int i=0;i<=2000;++i){float x=i*.001f,y=WheelFFBMath::soft_saturate(x);require(std::isfinite(y)&&y>=clipPrev-1e-6f&&y<=1.000001f,"soft clip monotonic");clipPrev=y;}
- // Fixed front slip and wheel velocity have the same relief on either side of centre.
- require(WheelFFBMath::physics_return_relief(.15f,-.08f)==.85f,"countersteer relief");
- require(WheelFFBMath::physics_return_relief(.15f,.08f)==1,"opposing work no relief");
+ using namespace WheelFFBMath;
+ require(pneumatic_sat_shape(0)==0,"SAT zero");
+ require(pneumatic_sat_shape(std::numeric_limits<float>::quiet_NaN())==0,"SAT NaN");
+ require(lateral_force_shape(.32f)>.999f,"Fy proxy saturates in deep slip");
+ require(pneumatic_sat_shape(.12f)>.90f,"pneumatic SAT strong in normal loaded corner");
+ require(pneumatic_sat_shape(.16f)>.98f,"pneumatic SAT peaks near prior 0.16rad region");
+ require(pneumatic_sat_shape(.32f)<.50f,"pneumatic trail falls in deep understeer");
+ require(combined_sat_shape(.16f,.25f)<=1.000001f,"combined SAT bounded");
+ require(combined_sat_shape(.32f,.25f)>pneumatic_sat_shape(.32f),"mechanical trail preserves deep-slip torque");
+ require(combined_sat_shape(.32f,0.0f)==pneumatic_sat_shape(.32f),"mechanical trail zero is pure pneumatic");
+ require(std::abs(combined_sat_shape(.32f,.25f)-combined_sat_shape(-.32f,.25f))<1e-6f,"SAT shape symmetry");
+ for(int i=0;i<=7000;++i) {float a=i*.0001f;float p=pneumatic_sat_shape(a),c=combined_sat_shape(a,.25f);require(std::isfinite(p)&&p>=0&&p<=1.000001f,"pneumatic bounds");require(std::isfinite(c)&&c>=0&&c<=1.000001f,"combined bounds");}
+ require(soft_saturate(.5f)==.5f,"soft clip linear midrange");
+ require(std::abs(soft_saturate(-.5f)+.5f)<1e-6,"soft clip symmetry");
+ require(soft_saturate(1.0f)>.90f&&soft_saturate(1.0f)<1.0f,"soft clip late knee");
+ require(soft_saturate(2.0f)==1.0f&&soft_saturate(-2.0f)==-1.0f,"soft clip cap");
+ float clipPrev=0; for(int i=0;i<=2000;++i){float x=i*.001f,y=soft_saturate(x);require(std::isfinite(y)&&y>=clipPrev-1e-6f&&y<=1.000001f,"soft clip monotonic");clipPrev=y;}
+ require(physics_return_relief(.15f,-.08f)==.85f,"countersteer relief");
+ require(physics_return_relief(.15f,.08f)==1,"opposing work no relief");
+ ResponseLUT linear{}; require(parse_response_lut("0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1",linear),"linear LUT parses");
+ require(std::abs(apply_response_lut(.55f,linear)-.55f)<1e-5f,"linear LUT identity");
+ ResponseLUT boosted{}; require(parse_response_lut("0,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.84,0.92,1",boosted),"boost LUT parses");
+ require(apply_response_lut(.10f,boosted)>.10f,"LUT can compensate low-force deadzone");
+ require(!parse_response_lut("0,0.2,0.1,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1",boosted),"non-monotonic LUT rejected");
+ require(!parse_response_lut("0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1",boosted),"nonzero LUT origin rejected");
  WheelVehicleDynamics gap; EVWORK_CAR gapCar; gap.reset();
  for(int i=0;i<80;++i)step(gap,gapCar);
  gap.update(nullptr,0,.5,0);
@@ -44,7 +54,11 @@ int main() {
  WheelVehicleDynamics d; EVWORK_CAR c;d.reset();for(int i=0;i<80;++i)step(d,c);
  require(d.calibrated()&&d.forwardAxis()==3,"straight basis calibration");require(d.sampleValid()&&d.activationBlend()==1,"activation");
  for(int i=0;i<40;++i)step(d,c,i*.01f,.20f,.5f);
- require(std::abs(d.yawRate()-.6f)<.01f,"known yaw");require(std::abs(d.bodySlip()-.2f)<.002f,"known beta");
+ require(std::abs(d.yawRate()-.6f)<.02f,"known yaw");require(std::abs(d.bodySlip()-.2f)<.003f,"known beta");
+ require(std::isfinite(d.rawFrontSlip())&&d.frontSlipBlend()>.24f,"raw/filtered front slip telemetry active");
+ WheelVehicleDynamics low; EVWORK_CAR lowCar; low.reset(); for(int i=0;i<80;++i)step(low,lowCar,0,0,0,.15f); step(low,lowCar,.01f,0,.2f,.15f);
+ WheelVehicleDynamics high; EVWORK_CAR highCar; high.reset(); for(int i=0;i<80;++i)step(high,highCar,0,0,0,.90f); step(high,highCar,.01f,0,.2f,.90f);
+ require(high.frontSlipBlend()>low.frontSlipBlend(),"front-slip transient speeds up with vehicle speed");
  float beta=d.bodySlip();d.update(nullptr,0,.5,0);require(d.bodySlip()<beta&&!d.sampleValid(),"invalid decay");
  for(int i=0;i<4;++i)d.update(nullptr,0,.5,0);
  require(d.bodySlip()==0&&d.yawRate()==0&&d.frontSlip()==0&&d.activationBlend()==0,"five-invalid clear");

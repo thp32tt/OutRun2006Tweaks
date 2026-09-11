@@ -9,6 +9,7 @@
 #pragma comment(lib, "Comctl32.lib")
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cctype>
 #include <cstring>
@@ -21,6 +22,7 @@
 #include "game_addrs.hpp"
 #include "hooks_wheel_vehicle_dynamics.hpp"
 #include "wheel_ffb_math.hpp"
+#include "wheel_ffb_runtime.hpp"
 #include "overlay/overlay.hpp"
 
 extern "C"
@@ -48,6 +50,22 @@ namespace Settings
     Setting<std::string> WheelFFBDeviceGuid{
         "WheelFFB", "DeviceGuid", "",
         "Exact DirectInput instance GUID selected by F11 Wheel Setup; a saved GUID never falls back to a different device automatically."
+    };
+
+    Setting<bool> WheelFFBResponseCorrection{
+        "WheelFFB", "ResponseCorrection", false,
+        "Optional wheel-specific ConstantForce response correction. Store this with the wheel profile, not a force-feel profile."
+    };
+
+    Setting<std::string> WheelFFBResponseLUT{
+        "WheelFFB", "ResponseLUT", "0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0",
+        "Eleven monotonic command samples for desired torque 0..100% in 10% steps. Linear by default."
+    };
+
+    Setting<float> WheelFFBMaxTorqueNm{
+        "WheelFFB", "MaxTorqueNm", 0.0f,
+        "Optional physical wheel peak torque for diagnostics only. 0 means unknown.",
+        Range<float>{ 0.0f, 30.0f }
     };
 
     Setting<float> WheelFFBGlobalStrength{
@@ -83,6 +101,12 @@ namespace Settings
     Setting<float> WheelFFBSteeringWeight{
         "WheelFFB", "SteeringWeight", 1.45f,
         "Self-aligning torque strength. Physics SAT direction/trail comes from front slip; field_264/268 only scale lateral load.", Range<float>{ 0.0f, 2.0f }
+    };
+
+    Setting<float> WheelFFBMechanicalTrail{
+        "WheelFFB", "MechanicalTrail", 0.25f,
+        "Physics SAT mechanical/caster-trail contribution after pneumatic trail begins to fade. Not a centre spring.",
+        Range<float>{ 0.0f, 0.60f }
     };
 
     Setting<bool> WheelFFBPhysicsSat{
@@ -767,13 +791,27 @@ namespace
                 steerForSat * satSpeed * satLoadBoost * naturalSlideRelief *
                 satReturnRelief * satStrength;
 
-            // Physics SAT force shaping lives here, separate from the vehicle
-            // estimator. Front slip determines both direction and the pneumatic-
-            // trail-like rise/fall. Body slide only applies a mild rear-slide
-            // relief so counter-steer SAT is not double-unloaded.
+            // Physics SAT separates tyre pneumatic trail from a bounded
+            // mechanical/caster-trail contribution. Both are driven by the
+            // front lateral-force proxy, so the mechanical term cannot become
+            // an artificial speed-dependent centre spring. Pneumatic SAT drops
+            // first near understeer while mechanical trail keeps useful rack
+            // torque alive instead of making the wheel suddenly go dead.
             const float frontSlip = vehicleDynamics_.frontSlip();
             float physicsSatTorque = 0.0f;
-            const float trailShape = WheelFFBMath::trail_shape(frontSlip);
+            const float lateralForceShape = WheelFFBMath::lateral_force_shape(frontSlip);
+            const float pneumaticTrail = WheelFFBMath::pneumatic_trail_factor(frontSlip);
+            const float pneumaticSatShape = WheelFFBMath::pneumatic_sat_shape(frontSlip);
+            const float configuredMechanicalTrail =
+                static_cast<float>(Settings::WheelFFBMechanicalTrail);
+            const float mechanicalTrailMix = std::isfinite(configuredMechanicalTrail)
+                ? std::clamp(configuredMechanicalTrail, 0.0f, 0.60f)
+                : 0.25f;
+            const float mechanicalContribution =
+                mechanicalTrailMix * lateralForceShape * (1.0f - pneumaticSatShape);
+            const float physicsShape =
+                WheelFFBMath::combined_sat_shape(frontSlip, mechanicalTrailMix);
+            const float trailShape = pneumaticSatShape; // legacy telemetry field name
             const float physicsLoad = 0.62f + 0.48f * lateralLoadSmooth;
             const float rearSlideRelief = 1.0f - 0.15f * gripLoss * bodySlide;
             if (vehicleDynamics_.calibrated() && vehicleDynamics_.sampleValid())
@@ -783,7 +821,7 @@ namespace
 
                 physicsSatTorque =
                     (frontSlip > 0.0f ? -1.0f : 1.0f) *
-                    trailShape * satSpeed * physicsLoad * rearSlideRelief *
+                    physicsShape * satSpeed * physicsLoad * rearSlideRelief *
                     physicsReturnRelief * satStrength;
                 if (!std::isfinite(physicsSatTorque))
                     physicsSatTorque = 0.0f;
@@ -825,6 +863,14 @@ namespace
             if (crashImpulseTimer_ <= CrashCooldownFrames)
                 structural = (softwareSpring + selfAligningTorque) * loadMod + damper;
 
+            // Headroom analysis uses sustained structural steering only. Do not
+            // let a wall hit, gear thunk, startup ramp or nearly-stopped frame
+            // teach the gain recommendation the wrong lesson.
+            const bool headroomEligible =
+                crashImpulseTimer_ <= 0 && gearShiftTimer_ <= 0 &&
+                warmupScale >= 0.999f && recreateScale >= 0.999f &&
+                speedNorm > 0.08f;
+
             float events = update_event_force();
 
             // Sustained steering and short events have different timing needs.
@@ -839,6 +885,7 @@ namespace
                 total = 0.0f;
             if (!std::isfinite(eventOutput))
                 eventOutput = 0.0f;
+            record_headroom(std::abs(total), headroomEligible);
 
             // Preserve ordinary SAT linearly; bend only near the force cap.
             const float compressed = WheelFFBMath::soft_saturate(total);
@@ -912,7 +959,8 @@ namespace
                 static_cast<LONG>(DI_FFNOMINALMAX) - std::abs(baseSteeringLevel);
             const LONG vibrationLevel = std::clamp(
                 vibrationRequested, -vibrationHeadroom, vibrationHeadroom);
-            const LONG level = baseSteeringLevel + vibrationLevel;
+            const LONG levelBeforeResponse = baseSteeringLevel + vibrationLevel;
+            const LONG level = apply_response_correction(levelBeforeResponse);
 
             if (std::abs(level - prevConstantLevel_) > 15 || eventLevel != 0 ||
                 (level != 0 && GetTickCount() - lastConstantWriteTick_ >= FFB_EFFECT_REFRESH_MS))
@@ -972,6 +1020,15 @@ namespace
                     constantEffectPolar_, springEffect_ != nullptr, damperEffect_ != nullptr,
                     periodicsActive_, outputStrength, bool(Settings::WheelFFBInvertForce),
                     bool(Settings::WheelFFBInvertSpring));
+                spdlog::info(
+                    "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} rawFrontSlip={} frontSlip={} frontBlend={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} diPreResponse={} diCorrected={} responseCorrection={}",
+                    telemetryNow,
+                    vehicleDynamics_.rawBodySlip(), vehicleDynamics_.bodySlip(), vehicleDynamics_.bodySlipBlend(),
+                    vehicleDynamics_.rawYawRate(), vehicleDynamics_.yawRate(), vehicleDynamics_.yawRateBlend(),
+                    vehicleDynamics_.rawFrontSlip(), vehicleDynamics_.frontSlip(), vehicleDynamics_.frontSlipBlend(),
+                    lateralForceShape, pneumaticTrail, pneumaticSatShape, mechanicalTrailMix,
+                    mechanicalContribution, physicsShape, levelBeforeResponse, level,
+                    bool(Settings::WheelFFBResponseCorrection));
                 // Raw horizontal bases allow row/column x X/Z candidates to be
                 // compared offline without changing the active steering model.
                 spdlog::info(
@@ -988,6 +1045,63 @@ namespace
         {
             return Settings::WheelFFBEnable && initialized_ && device_ &&
                 deviceAcquired_ && !deviceReinitPending_ && !panicStopped_;
+        }
+
+        WheelFFBHeadroomSnapshot headroom_snapshot() const
+        {
+            WheelFFBHeadroomSnapshot result{};
+            result.samples = headroomSamples_;
+            result.currentDemand = headroomCurrentDemand_;
+            result.peakDemand = headroomPeakDemand_;
+
+            const auto percentile = [&](double q)
+            {
+                if (headroomSamples_ == 0)
+                    return 0.0f;
+                const std::uint64_t target = std::max<std::uint64_t>(
+                    1, static_cast<std::uint64_t>(std::ceil(headroomSamples_ * q)));
+                std::uint64_t cumulative = 0;
+                for (size_t i = 0; i < headroomHistogram_.size(); ++i)
+                {
+                    cumulative += headroomHistogram_[i];
+                    if (cumulative >= target)
+                    {
+                        return static_cast<float>(i) *
+                            (HeadroomHistogramMax / static_cast<float>(HeadroomHistogramBins - 1));
+                    }
+                }
+                return HeadroomHistogramMax;
+            };
+
+            result.p95Demand = percentile(0.95);
+            result.p99Demand = percentile(0.99);
+            if (headroomSamples_ > 0)
+            {
+                const float inv = 100.0f / static_cast<float>(headroomSamples_);
+                result.softKneePercent = static_cast<float>(headroomSoftKneeSamples_) * inv;
+                result.hardClipPercent = static_cast<float>(headroomHardClipSamples_) * inv;
+            }
+
+            const float currentOverall = std::clamp(
+                static_cast<float>(Settings::WheelFFBGlobalStrength), 0.0f, 1.5f);
+            result.suggestedOverall = currentOverall;
+            if (headroomSamples_ >= 600 && result.p99Demand > 0.05f)
+            {
+                result.suggestedOverall = std::clamp(
+                    currentOverall * (0.90f / result.p99Demand),
+                    0.05f, 1.5f);
+            }
+            return result;
+        }
+
+        void reset_headroom_stats()
+        {
+            headroomHistogram_.fill(0);
+            headroomSamples_ = 0;
+            headroomSoftKneeSamples_ = 0;
+            headroomHardClipSamples_ = 0;
+            headroomCurrentDemand_ = 0.0f;
+            headroomPeakDemand_ = 0.0f;
         }
 
         void request_direction_test(int direction)
@@ -1045,6 +1159,7 @@ namespace
             if (initialized_ && device_ && deviceAcquired_ && !panicStopped_)
                 zero_all_forces();
             reset_signal_state();
+            reset_headroom_stats();
             // Re-enable any hardware effect selected by the new profile on the
             // first active gameplay tick instead of waiting up to one second.
             // The normal warm-up ramp is already reset by reset_signal_state().
@@ -1167,6 +1282,8 @@ namespace
         static constexpr int RecreateRampFrames = 15;
         static constexpr int CrashTimerFrames = 90;
         static constexpr int CrashCooldownFrames = 80;
+        static constexpr size_t HeadroomHistogramBins = 201;
+        static constexpr float HeadroomHistogramMax = 2.0f;
 
         struct EnumContext
         {
@@ -1671,6 +1788,7 @@ namespace
             deviceReinitAfter_ = 0;
             retryAfter_ = 0;
             reset_signal_state();
+            reset_headroom_stats();
 
             failedInterfaceGuid_.clear();
             failedInterfaceUntil_ = 0;
@@ -2276,6 +2394,66 @@ namespace
             periodicsActive_ = false;
         }
 
+        void record_headroom(float demand, bool eligible)
+        {
+            if (!std::isfinite(demand))
+                return;
+            demand = std::max(0.0f, demand);
+            headroomCurrentDemand_ = demand;
+            if (!eligible)
+                return;
+
+            headroomPeakDemand_ = std::max(headroomPeakDemand_, demand);
+            ++headroomSamples_;
+            if (demand > 0.75f)
+                ++headroomSoftKneeSamples_;
+            if (demand >= 1.35f)
+                ++headroomHardClipSamples_;
+
+            const float normalized = std::clamp(demand / HeadroomHistogramMax, 0.0f, 1.0f);
+            const size_t bin = std::min<size_t>(
+                HeadroomHistogramBins - 1,
+                static_cast<size_t>(std::lround(
+                    normalized * static_cast<float>(HeadroomHistogramBins - 1))));
+            ++headroomHistogram_[bin];
+        }
+
+        LONG apply_response_correction(LONG requestedLevel)
+        {
+            if (!Settings::WheelFFBResponseCorrection || requestedLevel == 0)
+                return requestedLevel;
+
+            const std::string spec = Settings::WheelFFBResponseLUT.get();
+            if (spec != responseLutSpec_)
+            {
+                responseLutSpec_ = spec;
+                WheelFFBMath::ResponseLUT parsed{};
+                responseLutValid_ = WheelFFBMath::parse_response_lut(spec, parsed);
+                if (responseLutValid_)
+                {
+                    responseLut_ = parsed;
+                    spdlog::info("WheelFFB: loaded valid wheel response LUT");
+                }
+                else
+                {
+                    responseLut_ = WheelFFBMath::linear_response_lut();
+                    spdlog::warn(
+                        "WheelFFB: invalid ResponseLUT; leaving ConstantForce linear until corrected");
+                }
+            }
+
+            if (!responseLutValid_)
+                return requestedLevel;
+
+            const float normalized =
+                static_cast<float>(requestedLevel) / static_cast<float>(DI_FFNOMINALMAX);
+            const float corrected = WheelFFBMath::apply_response_lut(normalized, responseLut_);
+            return std::clamp(
+                static_cast<LONG>(std::lround(corrected * static_cast<float>(DI_FFNOMINALMAX))),
+                -static_cast<LONG>(DI_FFNOMINALMAX),
+                static_cast<LONG>(DI_FFNOMINALMAX));
+        }
+
         void set_constant_force(LONG requestedLevel)
         {
             if (!device_ || panicStopped_)
@@ -2862,6 +3040,18 @@ namespace
         float smoothedSteerRate_ = 0.0f;
         bool steerSampleValid_ = false;
         WheelVehicleDynamics vehicleDynamics_{};
+
+        std::array<std::uint64_t, HeadroomHistogramBins> headroomHistogram_{};
+        std::uint64_t headroomSamples_ = 0;
+        std::uint64_t headroomSoftKneeSamples_ = 0;
+        std::uint64_t headroomHardClipSamples_ = 0;
+        float headroomCurrentDemand_ = 0.0f;
+        float headroomPeakDemand_ = 0.0f;
+
+        WheelFFBMath::ResponseLUT responseLut_ = WheelFFBMath::linear_response_lut();
+        std::string responseLutSpec_;
+        bool responseLutValid_ = true;
+
         float crashImpulseForce_ = 0.0f;
         float roadPhase_ = 0.0f;
         float slipPhase_ = 0.0f;
@@ -2963,4 +3153,14 @@ void WheelFFB_RequestDirectionTest(int direction)
 void WheelFFB_RequestSettingsTransition()
 {
     gWheelFFB.settings_transition();
+}
+
+WheelFFBHeadroomSnapshot WheelFFB_GetHeadroomSnapshot()
+{
+    return gWheelFFB.headroom_snapshot();
+}
+
+void WheelFFB_ResetHeadroomStats()
+{
+    gWheelFFB.reset_headroom_stats();
 }
