@@ -645,7 +645,8 @@ namespace
             if (!Settings::WheelFFBUseHardwareSpring && springEffect_)
             {
                 update_spring(0.0f);
-                springEffect_->Stop();
+                if (springEffect_)
+                    springEffect_->Stop();
                 safe_release_effect(springEffect_, "hardware spring disabled");
                 prevSpringCoefficient_ = 0;
                 prevSpringSaturation_ = 0;
@@ -689,7 +690,8 @@ namespace
             if (!Settings::WheelFFBUseHardwareDamper && damperEffect_)
             {
                 update_damper(0.0f);
-                damperEffect_->Stop();
+                if (damperEffect_)
+                    damperEffect_->Stop();
                 safe_release_effect(damperEffect_, "hardware damper disabled");
                 prevDamperCoefficient_ = 0;
                 damperStrategy_ = -1;
