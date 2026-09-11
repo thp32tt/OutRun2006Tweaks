@@ -23,9 +23,9 @@ This separation avoids having an input poller and an FFB backend fight over the 
 
 With the default `UseNewInput=true` path, **Input Bindings** is the single owner of steering, pedals, shifter/buttons and menu controls. Open it from the game's Controller Configuration screen, from **Settings → Controls → Configure Input Bindings**, or directly from **F11 → Force Feedback → Open Input Bindings**.
 
-Quick Setup currently walks through Steering, Accelerator, Brake, Shift Up/Down, Start, Confirm, Back and Menu Up/Right/Down/Left. Each captured raw-device source replaces only the same broad source family, so configuring a wheel does not erase existing gamepad bindings. A step can be skipped when the wheel has no matching control. After the wizard, **Keep & Fine-tune** retains all captures and returns to the editor for per-axis Min / Rest / Max calibration.
+Quick Setup currently walks through Steering, Accelerator, Brake, Shift Up/Down, Start, Confirm, Back and Menu Up/Right/Down/Left. Each captured raw-device source replaces bindings only from the same currently resolved physical SDL device, so a wheel pass does not erase separate pedals, a shifter/button box or the default gamepad bindings. A step can be skipped when the wheel has no matching control. After the wizard, **Keep & Fine-tune** retains all captures and returns to the editor for per-axis Min / Rest / Max calibration.
 
-Bindings are live immediately but are not durable until saved. Manual edits expose **Save & Return to game** so it is explicit whether the current mapping has been persisted.
+Bindings are live immediately but are not durable until saved. Manual edits expose **Save & Return to game** so it is explicit whether the current mapping has been persisted. The **Profiles** tab can save the complete multi-device binding set as `OutRun2006Tweaks.profiles/Input/<name>.ini`; steering deadzone, sensitivity bypass and input backend travel with that wheel profile. Loading a profile also updates the normal `OutRun2006Tweaks.input.ini`, so the selected setup survives the next restart.
 
 The Controllers page provides live raw axis/button/hat diagnostics and hotplugged devices appear automatically. Binding identity prefers VID/PID plus serial when available; USB path is only a duplicate-device fallback rather than a hard requirement.
 
@@ -43,7 +43,7 @@ The FFB owner is the custom DirectInput COM engine and remains separate from SDL
 
 `field_264/268` are used as lateral-load magnitude only; grip/slip decisions come from the vehicle-dynamics estimator. GlobalStrength is software model gain, while DirectInput device/effect gain stays at `DI_FFNOMINALMAX`. Sustained force passes through the production soft-knee limiter and DD-safe slew path.
 
-The dedicated Force Feedback page exposes common controls directly and keeps lower-level but still supported values under **Advanced FFB tuning** (Spring Saturation, Weight Transfer, Lateral Signal Deadzone, Gear Shift, Engine Idle and Force Slew Rate).
+The dedicated Force Feedback page exposes common controls directly and keeps lower-level but still supported values under **Advanced FFB tuning** (Spring Saturation, Weight Transfer, Lateral Signal Deadzone, Gear Shift, Engine Idle and Force Slew Rate). Named feel profiles are stored separately under `OutRun2006Tweaks.profiles/FFB/<name>.ini`. They intentionally exclude the DirectInput output-device GUID/name and diagnostic logging, so switching a force profile cannot silently redirect torque to another wheel. Loading a profile zeroes the current effects and restarts the normal DD-safe warm-up ramp before the new values take over.
 
 ## MOZA R3 recommended profiles
 

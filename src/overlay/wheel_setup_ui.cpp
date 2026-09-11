@@ -24,8 +24,10 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "overlay.hpp"
+#include "wheel_profile_store.hpp"
 
 void WheelFFB_RequestDirectionTest(int direction);
+void WheelFFB_RequestSettingsTransition();
 
 namespace Settings
 {
@@ -770,6 +772,154 @@ namespace
         bool baselineValid_ = false;
         std::string status_;
         bool ffbDirty_ = false;
+        std::vector<std::string> ffbProfiles_;
+        int selectedFfbProfile_ = -1;
+        char ffbProfileName_[65]{};
+        bool ffbProfilesLoaded_ = false;
+        bool confirmingFfbOverwrite_ = false;
+        bool confirmingFfbDelete_ = false;
+
+        void refresh_ffb_profiles(const std::string& selectName = {})
+        {
+            ffbProfiles_ = WheelProfileStore::list_profiles(WheelProfileStore::Kind::ForceFeedback);
+            selectedFfbProfile_ = -1;
+            const std::string wanted = WheelProfileStore::normalize_profile_name(selectName);
+            if (!wanted.empty())
+            {
+                for (size_t i = 0; i < ffbProfiles_.size(); ++i)
+                    if (WheelProfileStore::lower_ascii(ffbProfiles_[i]) == WheelProfileStore::lower_ascii(wanted))
+                    {
+                        selectedFfbProfile_ = int(i);
+                        break;
+                    }
+            }
+            if (selectedFfbProfile_ >= 0)
+                strncpy_s(ffbProfileName_, ffbProfiles_[selectedFfbProfile_].c_str(), sizeof(ffbProfileName_) - 1);
+            ffbProfilesLoaded_ = true;
+        }
+
+        const std::string* selected_ffb_profile() const
+        {
+            return selectedFfbProfile_ >= 0 && selectedFfbProfile_ < int(ffbProfiles_.size())
+                ? &ffbProfiles_[selectedFfbProfile_] : nullptr;
+        }
+
+        void draw_ffb_profiles()
+        {
+            if (!ffbProfilesLoaded_)
+                refresh_ffb_profiles();
+
+            ImGui::SeparatorText("Force Feedback Profiles");
+            ImGui::TextWrapped("Save several force-feel setups and switch between them. Profiles store force behavior only; the selected FFB Output wheel and diagnostic logging stay global.");
+
+            const std::string* selected = selected_ffb_profile();
+            const char* preview = selected ? selected->c_str() : "Select a saved FFB profile";
+            if (ImGui::BeginCombo("Saved FFB profile", preview))
+            {
+                for (size_t i = 0; i < ffbProfiles_.size(); ++i)
+                {
+                    const bool selectedNow = int(i) == selectedFfbProfile_;
+                    if (ImGui::Selectable(ffbProfiles_[i].c_str(), selectedNow))
+                    {
+                        selectedFfbProfile_ = int(i);
+                        strncpy_s(ffbProfileName_, ffbProfiles_[i].c_str(), sizeof(ffbProfileName_) - 1);
+                        confirmingFfbOverwrite_ = false;
+                        confirmingFfbDelete_ = false;
+                    }
+                    if (selectedNow) ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+
+            if (ImGui::InputText("FFB profile name", ffbProfileName_, sizeof(ffbProfileName_)))
+                confirmingFfbOverwrite_ = false;
+            const std::string requested = WheelProfileStore::normalize_profile_name(ffbProfileName_);
+            const bool exists = !requested.empty() &&
+                WheelProfileStore::profile_exists(WheelProfileStore::Kind::ForceFeedback, requested);
+            const char* saveLabel = confirmingFfbOverwrite_
+                ? "Confirm overwrite##ffbProfileSave"
+                : (exists ? "Overwrite profile##ffbProfileSave" : "Save as profile##ffbProfileSave");
+            if (ImGui::Button(saveLabel))
+            {
+                if (exists && !confirmingFfbOverwrite_)
+                {
+                    confirmingFfbOverwrite_ = true;
+                    status_ = "Click Confirm overwrite to replace the existing FFB profile.";
+                }
+                else
+                {
+                    std::string error;
+                    if (WheelProfileStore::save_ffb_profile(requested, &error))
+                    {
+                        const bool currentSaved = Settings::write(Module::UserIniPath);
+                        ffbDirty_ = !currentSaved;
+                        status_ = currentSaved
+                            ? "FFB profile saved: " + requested
+                            : "FFB profile saved, but current user.ini settings could not be persisted.";
+                        confirmingFfbOverwrite_ = false;
+                        refresh_ffb_profiles(requested);
+                    }
+                    else
+                        status_ = error;
+                }
+            }
+
+            ImGui::SameLine();
+            const bool canUseProfile = selected_ffb_profile() != nullptr;
+            if (!canUseProfile) ImGui::BeginDisabled();
+            if (ImGui::Button("Load selected##ffbProfileLoad"))
+            {
+                if (const std::string* profile = selected_ffb_profile())
+                {
+                    int applied = 0;
+                    std::string error;
+                    if (WheelProfileStore::load_ffb_profile(*profile, &applied, &error))
+                    {
+                        WheelFFB_RequestSettingsTransition();
+                        const bool persisted = Settings::write(Module::UserIniPath);
+                        ffbDirty_ = !persisted;
+                        status_ = persisted
+                            ? "Loaded FFB profile '" + *profile + "' (" + std::to_string(applied) + " settings)."
+                            : "FFB profile is active now, but could not be persisted to user.ini.";
+                    }
+                    else
+                        status_ = error;
+                }
+            }
+            if (!canUseProfile) ImGui::EndDisabled();
+
+            ImGui::SameLine();
+            if (!canUseProfile) ImGui::BeginDisabled();
+            const char* deleteLabel = confirmingFfbDelete_
+                ? "Confirm delete##ffbProfileDelete" : "Delete selected##ffbProfileDelete";
+            if (ImGui::Button(deleteLabel))
+            {
+                if (!confirmingFfbDelete_)
+                {
+                    confirmingFfbDelete_ = true;
+                    status_ = "Click Confirm delete to remove the selected FFB profile. Current forces will not change.";
+                }
+                else if (const std::string* profile = selected_ffb_profile())
+                {
+                    std::string error;
+                    if (WheelProfileStore::delete_profile(WheelProfileStore::Kind::ForceFeedback, *profile, &error))
+                    {
+                        status_ = "Deleted FFB profile: " + *profile;
+                        ffbProfileName_[0] = ' ';
+                        refresh_ffb_profiles();
+                    }
+                    else
+                        status_ = error;
+                    confirmingFfbDelete_ = false;
+                }
+            }
+            if (!canUseProfile) ImGui::EndDisabled();
+
+            ImGui::SameLine();
+            if (ImGui::Button("Refresh FFB profiles"))
+                refresh_ffb_profiles(selected_ffb_profile() ? *selected_ffb_profile() : std::string{});
+            ImGui::TextDisabled("Profile folder: OutRun2006Tweaks.profiles\FFB");
+        }
 
         void save()
         {
@@ -1132,6 +1282,8 @@ namespace
                     Settings::WheelFFBDeviceGuid.get(), Settings::WheelFFBDeviceName.get(), true);
             }
 
+            draw_ffb_profiles();
+
             if (!Settings::UseNewInput)
             {
             const int regularSlots = UniversalWheelProfile::regular_device_count();
@@ -1223,7 +1375,7 @@ namespace
                 ImGui::TextColored(ImVec4(1.0f, 0.65f, 0.25f, 1.0f),
                     "Above 100% trades force-detail contrast for extra weight.");
             track_ffb_change(ImGui::SliderFloat("Centering Spring (low speed)", Settings::WheelFFBSpringStrength.ptr(), 0.0f, 1.0f, "%.2f"));
-            track_ffb_change(ImGui::SliderFloat("Dynamic Damping", Settings::WheelFFBDamperStrength.ptr(), 0.0f, 0.80f, "%.2f"));
+            track_ffb_change(ImGui::SliderFloat("Dynamic Damping", Settings::WheelFFBDamperStrength.ptr(), 0.0f, 1.0f, "%.2f"));
             track_ffb_change(ImGui::SliderFloat("Self-aligning Torque (SAT)", Settings::WheelFFBSteeringWeight.ptr(), 0.0f, 2.00f, "%.2f"));
             track_ffb_change(ImGui::Checkbox("Physics SAT (body slip + yaw)", Settings::WheelFFBPhysicsSat.ptr()));
             if (ImGui::IsItemHovered())
@@ -1304,6 +1456,7 @@ namespace
                 Settings::WheelFFBInvertSpring = false;
                 Settings::WheelFFBDebugLog = true;
                 Settings::VibrationMode = 0;
+                WheelFFB_RequestSettingsTransition();
                 if (Settings::write(Module::UserIniPath))
                 {
                     ffbDirty_ = false;
@@ -1338,6 +1491,7 @@ namespace
                 Settings::WheelFFBInvertForce = true;
                 Settings::WheelFFBInvertSpring = false;
                 Settings::VibrationMode = 0;
+                WheelFFB_RequestSettingsTransition();
                 if (Settings::write(Module::UserIniPath))
                 {
                     ffbDirty_ = false;

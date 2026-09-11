@@ -1,4 +1,5 @@
 #include "input_manager.hpp"
+#include "wheel_profile_store.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -123,6 +124,13 @@ private:
 	bool confirmingReset = false;
 	bool confirmingLoad = false;
 	std::string persistenceStatus;
+	std::vector<std::string> wheelProfiles;
+	int selectedWheelProfile = -1;
+	char wheelProfileName[65]{};
+	bool wheelProfilesLoaded = false;
+	bool confirmingProfileLoad = false;
+	bool confirmingProfileDelete = false;
+	bool confirmingProfileOverwrite = false;
 	bool calibrationOpen = false;
 	Selection calibrationTarget;
 	int calibrationIndex = -1;
@@ -774,6 +782,189 @@ private:
 		Settings::write(Module::UserIniPath);
 	}
 
+
+	void refresh_wheel_profiles(const std::string& selectName = {})
+	{
+		wheelProfiles = WheelProfileStore::list_profiles(WheelProfileStore::Kind::Input);
+		selectedWheelProfile = -1;
+		const std::string wanted = WheelProfileStore::normalize_profile_name(selectName);
+		if (!wanted.empty())
+		{
+			for (size_t i = 0; i < wheelProfiles.size(); ++i)
+				if (WheelProfileStore::lower_ascii(wheelProfiles[i]) == WheelProfileStore::lower_ascii(wanted))
+				{
+					selectedWheelProfile = int(i);
+					break;
+				}
+		}
+		if (selectedWheelProfile >= 0)
+			strncpy_s(wheelProfileName, wheelProfiles[selectedWheelProfile].c_str(), sizeof(wheelProfileName) - 1);
+		wheelProfilesLoaded = true;
+	}
+
+	const std::string* selected_wheel_profile() const
+	{
+		return selectedWheelProfile >= 0 && selectedWheelProfile < int(wheelProfiles.size())
+			? &wheelProfiles[selectedWheelProfile] : nullptr;
+	}
+
+	void draw_profiles()
+	{
+		auto& manager = InputManager::instance;
+		if (!wheelProfilesLoaded)
+			refresh_wheel_profiles();
+
+		ImGui::TextWrapped(
+			"Named wheel profiles store the complete multi-device binding set, so a wheel can stay paired with its pedals, shifter and button box. Steering deadzone, sensitivity bypass and input backend are stored with the profile too.");
+		ImGui::TextDisabled("Loading a profile also updates OutRun2006Tweaks.input.ini, so it remains active after restart.");
+		ImGui::Spacing();
+
+		const std::string* selectedProfile = selected_wheel_profile();
+		const char* preview = selectedProfile ? selectedProfile->c_str() : "Select a saved wheel profile";
+		if (ImGui::BeginCombo("Saved wheel profile", preview))
+		{
+			for (size_t i = 0; i < wheelProfiles.size(); ++i)
+			{
+				const bool selectedNow = int(i) == selectedWheelProfile;
+				if (ImGui::Selectable(wheelProfiles[i].c_str(), selectedNow))
+				{
+					selectedWheelProfile = int(i);
+					strncpy_s(wheelProfileName, wheelProfiles[i].c_str(), sizeof(wheelProfileName) - 1);
+					confirmingProfileLoad = false;
+					confirmingProfileDelete = false;
+					confirmingProfileOverwrite = false;
+				}
+				if (selectedNow)
+					ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+
+		if (ImGui::InputText("Profile name", wheelProfileName, sizeof(wheelProfileName)))
+			confirmingProfileOverwrite = false;
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Letters, numbers, spaces, '.', '_' and '-' are supported. '.ini' is optional.");
+
+		const std::string requestedName = WheelProfileStore::normalize_profile_name(wheelProfileName);
+		const bool profileAlreadyExists =
+			!requestedName.empty() && WheelProfileStore::profile_exists(WheelProfileStore::Kind::Input, requestedName);
+		const char* saveLabel = confirmingProfileOverwrite
+			? "Confirm overwrite##inputProfileSave"
+			: (profileAlreadyExists ? "Overwrite profile##inputProfileSave" : "Save as profile##inputProfileSave");
+		if (ImGui::Button(saveLabel))
+		{
+			std::string error;
+			if (profileAlreadyExists && !confirmingProfileOverwrite)
+			{
+				confirmingProfileOverwrite = true;
+				persistenceStatus = "Click Confirm overwrite to replace the existing wheel profile.";
+			}
+			else if (auto profilePath = WheelProfileStore::profile_path(
+				WheelProfileStore::Kind::Input, requestedName, &error))
+			{
+				if (!manager.saveBindingIni(*profilePath))
+				{
+					persistenceStatus = "Could not save wheel profile bindings.";
+				}
+				else if (!WheelProfileStore::append_input_options(*profilePath, &error))
+				{
+					std::error_code ignored;
+					std::filesystem::remove(*profilePath, ignored);
+					persistenceStatus = error;
+				}
+				else
+				{
+					const bool currentSaved = manager.saveBindingIni(Module::BindingsIniPath);
+					const bool optionsSaved = Settings::write(Module::UserIniPath);
+					unsavedChanges = !currentSaved;
+					persistenceStatus = currentSaved && optionsSaved
+						? "Wheel profile saved and made current: " + requestedName
+						: "Wheel profile saved, but part of the current configuration could not be persisted.";
+					confirmingProfileOverwrite = false;
+					refresh_wheel_profiles(requestedName);
+				}
+			}
+			else
+				persistenceStatus = error;
+		}
+
+		ImGui::SameLine();
+		const bool canLoadProfile = selected_wheel_profile() != nullptr;
+		if (!canLoadProfile) ImGui::BeginDisabled();
+		const char* loadLabel = unsavedChanges && confirmingProfileLoad
+			? "Discard edits & load profile?##inputProfileLoad" : "Load selected##inputProfileLoad";
+		if (ImGui::Button(loadLabel))
+		{
+			if (unsavedChanges && !confirmingProfileLoad)
+			{
+				confirmingProfileLoad = true;
+				persistenceStatus = "Click again to discard unsaved binding edits and load the selected wheel profile.";
+			}
+			else if (const std::string* selected = selected_wheel_profile())
+			{
+				std::string error;
+				auto profilePath = WheelProfileStore::profile_path(WheelProfileStore::Kind::Input, *selected, &error);
+				const auto optionBackup = WheelProfileStore::capture_input_options();
+				if (!profilePath || !WheelProfileStore::load_input_options(*profilePath, &error))
+				{
+					persistenceStatus = error.empty() ? "Could not load wheel profile options." : error;
+				}
+				else if (!manager.readBindingIni(*profilePath))
+				{
+					WheelProfileStore::restore_input_options(optionBackup);
+					persistenceStatus = "Could not load wheel profile bindings; current bindings were preserved.";
+				}
+				else
+				{
+					const bool currentSaved = manager.saveBindingIni(Module::BindingsIniPath);
+					const bool optionsSaved = Settings::write(Module::UserIniPath);
+					unsavedChanges = !currentSaved;
+					persistenceStatus = currentSaved && optionsSaved
+						? "Wheel profile loaded and made current: " + *selected
+						: "Wheel profile is active now, but part of it could not be persisted for restart.";
+					if (Settings::InputBackend.changed_since_startup())
+						persistenceStatus += " Restart the game to apply its input backend.";
+				}
+				confirmingProfileLoad = false;
+			}
+		}
+		if (!canLoadProfile) ImGui::EndDisabled();
+
+		ImGui::SameLine();
+		if (!canLoadProfile) ImGui::BeginDisabled();
+		const char* deleteLabel = confirmingProfileDelete
+			? "Confirm delete##inputProfileDelete" : "Delete selected##inputProfileDelete";
+		if (ImGui::Button(deleteLabel))
+		{
+			if (!confirmingProfileDelete)
+			{
+				confirmingProfileDelete = true;
+				persistenceStatus = "Click Confirm delete to remove the selected profile file. Current bindings will not change.";
+			}
+			else if (const std::string* selected = selected_wheel_profile())
+			{
+				std::string error;
+				if (WheelProfileStore::delete_profile(WheelProfileStore::Kind::Input, *selected, &error))
+				{
+					persistenceStatus = "Deleted wheel profile: " + *selected;
+					wheelProfileName[0] = '\0';
+					refresh_wheel_profiles();
+				}
+				else
+					persistenceStatus = error;
+				confirmingProfileDelete = false;
+			}
+		}
+		if (!canLoadProfile) ImGui::EndDisabled();
+
+		ImGui::SameLine();
+		if (ImGui::Button("Refresh profile list"))
+			refresh_wheel_profiles(selected_wheel_profile() ? *selected_wheel_profile() : std::string{});
+
+		ImGui::Spacing();
+		ImGui::TextDisabled("Profile folder: OutRun2006Tweaks.profiles\\Input");
+	}
+
 	void draw_options()
 	{
 		auto& manager = InputManager::instance;
@@ -1135,6 +1326,11 @@ public:
 					ImGui::EndTabItem();
 				}
 
+				if (ImGui::BeginTabItem("Profiles"))
+				{
+					draw_profiles();
+					ImGui::EndTabItem();
+				}
 
 				if (ImGui::BeginTabItem("Options"))
 				{
@@ -1219,6 +1415,9 @@ public:
 			Overlay::IsBindingDialogActive = false;
 			Overlay::RequestMouseHide = true;
 			confirmingReset = false;
+			confirmingProfileLoad = false;
+			confirmingProfileDelete = false;
+			confirmingProfileOverwrite = false;
 		}
 	}
 

@@ -1039,6 +1039,19 @@ namespace
                 manualTestDirection_ < 0 ? "left" : "right");
         }
 
+        void settings_transition()
+        {
+            manualTestFrames_ = 0;
+            if (initialized_ && device_ && deviceAcquired_ && !panicStopped_)
+                zero_all_forces();
+            reset_signal_state();
+            // Re-enable any hardware effect selected by the new profile on the
+            // first active gameplay tick instead of waiting up to one second.
+            // The normal warm-up ramp is already reset by reset_signal_state().
+            updateCounter_ = 59;
+            spdlog::info("WheelFFB: settings/profile transition; forces zeroed and warm-up restarted");
+        }
+
         void service_safety()
         {
             if (panicStopped_) return;
@@ -2945,4 +2958,9 @@ bool WheelFFB_IsOutputOwnerActive()
 void WheelFFB_RequestDirectionTest(int direction)
 {
     gWheelFFB.request_direction_test(direction);
+}
+
+void WheelFFB_RequestSettingsTransition()
+{
+    gWheelFFB.settings_transition();
 }
