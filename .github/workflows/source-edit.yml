@@ -1,0 +1,33 @@
+name: Final five-pass source review
+
+on:
+  push:
+    branches:
+      - wheel-ffb
+    paths:
+      - '.github/workflows/source-edit.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  source-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout wheel-ffb
+        uses: actions/checkout@v4
+        with:
+          ref: wheel-ffb
+          fetch-depth: 0
+
+      - name: Apply and verify source-only fixes
+        run: python3 .github/finalize_review.py
+
+      - name: Commit reviewed source
+        run: |
+          rm -f .github/finalize_review.py .github/workflows/source-edit.yml
+          git config user.name "thp32tt"
+          git config user.email "129367814+thp32tt@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: finalize five-pass wheel source review [skip ci]"
+          git push origin HEAD:wheel-ffb
