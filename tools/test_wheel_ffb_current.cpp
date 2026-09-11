@@ -37,6 +37,10 @@ int main() {
  gap.update(nullptr,0,.5,0);
  step(gap,gapCar,.2f);step(gap,gapCar,.2f);
  require(std::abs(gap.yawRate())<.01f,"short-gap derivative baseline");
+ WheelVehicleDynamics resume; EVWORK_CAR resumeCar;resume.reset();for(int i=0;i<80;++i)step(resume,resumeCar);
+ require(resume.calibrated()&&resume.motionScale()>0,"resume baseline ready");
+ resume.reset_dynamic();
+ require(resume.calibrated()&&resume.motionScale()==0&&!resume.sampleValid(),"dynamic reset preserves basis but clears motion scale");
  WheelVehicleDynamics d; EVWORK_CAR c;d.reset();for(int i=0;i<80;++i)step(d,c);
  require(d.calibrated()&&d.forwardAxis()==3,"straight basis calibration");require(d.sampleValid()&&d.activationBlend()==1,"activation");
  for(int i=0;i<40;++i)step(d,c,i*.01f,.20f,.5f);

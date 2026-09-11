@@ -43,12 +43,15 @@ public:
     void reset_dynamic()
     {
         // Preserve the proven matrix basis while dropping every time-domain
-        // sample. Menu/focus/F11 transitions must not force another straight-
-        // line calibration before Physics SAT can return.
+        // sample, including the warp-detection motion scale. Menu/focus/F11
+        // transitions must not compare a new segment against the old segment's
+        // movement scale before Physics SAT resumes.
         positionValid_ = false;
         headingValid_ = false;
         prevPosition_ = D3DVECTOR{};
         positionStep_ = 0.0f;
+        motionScaleEma_ = 0.0f;
+        motionScaleSamples_ = 0;
         spdLen_ = 0.0f;
         spdCorrelation_ = 0.0f;
         clear_dynamic_state();

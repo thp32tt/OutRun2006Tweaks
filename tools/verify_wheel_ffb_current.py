@@ -193,4 +193,11 @@ req(ffb, 'std::clamp(configuredWeightTransfer, 0.0f, 1.5f)', 'weight-transfer se
 req(ffb, 'const LONG vibrationHeadroom =', 'software vibration cannot clip steering torque')
 req(ffb, 'const LONG level = baseSteeringLevel + vibrationLevel;', 'fallback vibration uses only remaining output headroom')
 req(ffb, 'periodicsActive_ && (updateCounter_ % 2) == 0', 'hardware periodic envelopes update at about 30 Hz')
+dynamic_reset_start = dyn.find('void reset_dynamic()')
+dynamic_reset_end = dyn.find('void update(', dynamic_reset_start)
+if not (0 <= dynamic_reset_start < dynamic_reset_end):
+    raise SystemExit('CURRENT VERIFY FAILED [dynamic reset section]')
+dynamic_reset = dyn[dynamic_reset_start:dynamic_reset_end]
+req(dynamic_reset, 'motionScaleEma_ = 0.0f;', 'dynamic reset clears old motion-scale EMA')
+req(dynamic_reset, 'motionScaleSamples_ = 0;', 'dynamic reset clears old motion-scale sample count')
 print('CURRENT WHEEL FFB STRUCTURE VERIFIED; run verify_wheel_ffb_math.py for numerical tests')
