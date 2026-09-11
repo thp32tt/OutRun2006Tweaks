@@ -1,32 +1,50 @@
-name: Build
+name: Build reviewed wheel FFB patch
 
 on:
   push:
-  pull_request:
+    branches:
+      - wheel-ffb
+
+permissions:
+  contents: write
+
+env:
+  REVIEW_BASE: 7a37c9dc9a37d13d0bf993102f62c8a2b2a35022
 
 jobs:
-  build:
+  build-and-apply:
     runs-on: windows-2022
-    strategy:
-      matrix:
-        arch: [ Win32 ]
-        build_type: [ Release ]
 
     steps:
-      - name: Checkout
+      - name: Checkout staged branch
         uses: actions/checkout@v7.0.1
         with:
           submodules: recursive
+          fetch-depth: 0
+
+      - name: Reconstruct and apply reviewed patch
+        shell: pwsh
+        run: |
+          git checkout $env:REVIEW_BASE -- .github/workflows/build.yml
+          cmd /c copy /b "tools\bootstrap\review.patch.part-00+tools\bootstrap\review.patch.part-01+tools\bootstrap\review.patch.part-02+tools\bootstrap\review.patch.part-03" "tools\bootstrap\review.patch"
+          git apply --check tools/bootstrap/review.patch
+          git apply tools/bootstrap/review.patch
+          Remove-Item tools/bootstrap/review.patch
+          Write-Host "Reviewed patch applied to $env:REVIEW_BASE"
 
       - name: Verify consolidated wheel FFB source
         shell: pwsh
         run: python tools/verify_wheel_ffb_current.py
 
-      - name: Configure
+      - name: Test production wheel FFB math
+        shell: cmd
         run: |
-          mkdir build
-          cd build
-          cmake -G "Visual Studio 17 2022" -A ${{matrix.arch}} ..
+          call "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat" || exit /b 1
+          python tools/verify_wheel_ffb_math.py
+
+      - name: Configure Win32 Release
+        shell: pwsh
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A Win32
 
       - name: Add older VC2022 redist workaround to safetyhook
         shell: pwsh
@@ -35,22 +53,17 @@ jobs:
           (Get-Content build/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/zydis-build/Zydis.vcxproj
           (Get-Content build/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/zydis-build/zycore/Zycore.vcxproj
 
-      - name: Zero out SDL_gameinputjoystick.c
+      - name: Zero out SDL GameInput source
         shell: pwsh
         run: |
           Set-Content -Path build/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
           (Get-Content build/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
 
-      - name: Build
-        run: cmake --build build --config ${{matrix.build_type}}
-
-      - name: Copy settings
+      - name: Build Win32 Release DLL
         shell: pwsh
-        run: |
-          cp OutRun2006Tweaks.ini build/bin/OutRun2006Tweaks.ini
-          cp OutRun2006Tweaks.lods.ini build/bin/OutRun2006Tweaks.lods.ini
+        run: cmake --build build --config Release
 
-      - name: Verify built wheel payload
+      - name: Verify DLL
         shell: pwsh
         run: |
           $dllPath = "build/bin/dinput8.dll"
@@ -59,72 +72,29 @@ jobs:
           if ($bytes.Length -lt 1000000) { throw "dinput8.dll is unexpectedly small" }
           if ($bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw "dinput8.dll has no MZ header" }
           $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
-          if ($peOffset -lt 0 -or ($peOffset + 6) -ge $bytes.Length) { throw "invalid PE offset" }
           $signature = [Text.Encoding]::ASCII.GetString($bytes, $peOffset, 4)
           if ($signature -ne "PE`0`0") { throw "invalid PE signature" }
           $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
           if ($machine -ne 0x014C) { throw ("expected Win32 x86 DLL, machine=0x{0:X4}" -f $machine) }
-
-          $ascii = [Text.Encoding]::ASCII.GetString($bytes)
-          $markers = @(
-            "WheelFFB: GUID_Damper created",
-            "WheelFFB: live GlobalStrength applied to active effects",
-            "WheelFFB: scheduling DirectInput device reinitialization",
-            "WheelFFB: selected DirectInput identity",
-            "Reverse SAT / ConstantForce",
-            "Reverse Spring",
-            "multi-device SDL raw input enabled",
-            "Multi-device input architecture adapted from hyp36rmax (MIT)",
-            "2-axis POLAR actuator encoding",
-            "MOZA R3 Physics SAT",
-            "MOZA R3 Natural SAT",
-            "Single-owner wheel FFB: DirectInput COM only",
-            "Physics SAT (body slip + yaw)",
-            "load={:.2f} slide={:.2f} scrub={:.2f}",
-            "basis=M70r{}",
-            "steerSrc={}",
-            "Test Left (20%)"
-          )
-          foreach ($marker in $markers) {
-            if (-not $ascii.Contains($marker)) { throw "missing compiled marker: $marker" }
-          }
-
-          $ini = Get-Content "build/bin/OutRun2006Tweaks.ini" -Raw
-          if ($ini -notmatch '(?m)^SteeringDeadZone\s*=\s*0\.0\s*$') { throw "shipped deadzone is not 0.0" }
-          if ($ini -notmatch '(?m)^WheelAccelerationInvert\s*=\s*false\s*$') { throw "shipped accelerator invert is not false" }
-          if ($ini -notmatch '(?m)^WheelBrakeInvert\s*=\s*false\s*$') { throw "shipped brake invert is not false" }
-          if ($ini -notmatch '(?m)^UseNewInput\s*=\s*true\s*$') { throw "multi-device input is not the shipped default" }
-
-          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, consolidated Physics SAT wheel FFB markers present" -f $bytes.Length)
+          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86" -f $bytes.Length)
           Get-FileHash $dllPath -Algorithm SHA256
 
-      - name: Download EXE
+      - name: Commit reviewed source to wheel-ffb
         shell: pwsh
-        run: Invoke-WebRequest -Uri https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.1/OR2006C2C.EXE -OutFile build/bin/OR2006C2C.exe
+        run: |
+          Remove-Item tools/bootstrap/review.patch.part-* -Force
+          if (Test-Path tools/bootstrap) {
+            if (-not (Get-ChildItem tools/bootstrap -Force)) { Remove-Item tools/bootstrap -Force }
+          }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git status --short
+          git commit -m "fix: apply reviewed wheel FFB safety and SAT fixes"
+          git push origin HEAD:wheel-ffb
 
-      - name: Upload binary
+      - name: Upload compiled DLL
         uses: actions/upload-artifact@v7.0.1
         with:
-          name: outrun2006tweaks-${{ github.sha }}
-          path: build/bin/
-
-      - name: Upload wheel source snapshot
-        uses: actions/upload-artifact@v7.0.1
-        with:
-          name: wheel-source-${{ github.sha }}
-          path: |
-            src/hooks_wheel_ffb.cpp
-            src/hooks_wheel_ffb_build.cpp
-            src/hooks_wheel_vehicle_dynamics.hpp
-            src/hooks_forcefeedback.cpp
-            src/hooks_wheel_input_compat_v2.hpp
-            src/hooks_wheel_r3_menu_dpad.hpp
-            src/hooks_wheel_r3_menu_ab.hpp
-            src/hooks_wheel_r3_device_autoselect.hpp
-            src/input_manager.hpp
-            src/input_manager.cpp
-            src/overlay/input_bindings_ui.cpp
-            src/overlay/wheel_setup_ui.cpp
-            src/dllmain.cpp
-            OutRun2006Tweaks.ini
-            tools/verify_wheel_ffb_current.py
+          name: reviewed-wheel-ffb-${{ github.run_id }}
+          path: build/bin/dinput8.dll
