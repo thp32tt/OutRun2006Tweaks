@@ -1052,7 +1052,7 @@ namespace
             ImGui::SameLine();
             if (ImGui::Button("Refresh FFB profiles"))
                 refresh_ffb_profiles(selected_ffb_profile() ? *selected_ffb_profile() : std::string{});
-            ImGui::TextDisabled("Profile folder: OutRun2006Tweaks.profiles\FFB");
+            ImGui::TextDisabled("Profile folder: OutRun2006Tweaks.profiles\\FFB");
         }
 
         void save()

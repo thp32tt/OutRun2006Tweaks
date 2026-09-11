@@ -402,3 +402,4 @@ req(profiles, 'Failed while closing staged FFB profile.', 'FFB profile close fai
 req(profiles, 'Failed while closing wheel-specific input options.', 'input profile option close failures are reported')
 req(wheel_ui, 'capture_saved_ffb();\n                status_ = "Saved to OutRun2006Tweaks.user.ini";', 'legacy full user.ini save refreshes FFB revert baseline')
 req(wheel_ui, 'capture_saved_ffb();\n                    status_ = "Selected FFB output and saved its exact DirectInput GUID.', 'FFB output selection refreshes revert baseline after full user.ini persistence')
+req(wheel_ui, 'OutRun2006Tweaks.profiles\\\\FFB', 'FFB profile folder path escapes backslash')
