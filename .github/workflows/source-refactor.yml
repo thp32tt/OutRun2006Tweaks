@@ -22,6 +22,22 @@ jobs:
         shell: pwsh
         run: python tools/refactor_wheel_dynamics_once.py
 
+      - name: Normalize verifier formatting expectations
+        shell: pwsh
+        run: |
+          @'
+          from pathlib import Path
+          p = Path('tools/verify_wheel_ffb_current.py')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace(
+              "req(ffb, 'const float naturalSlideRelief = 1.0f - 0.25f * gripLoss * bodySlide;', 'Natural SAT unloads from real slide')",
+              "req(ffb, 'const float naturalSlideRelief =\\n                1.0f - 0.25f * gripLoss * bodySlide;', 'Natural SAT unloads from real slide')")
+          s = s.replace(
+              "req(ffb, 'const float rearSlideRelief = 1.0f - 0.15f * gripLoss * bodySlide;', 'Physics SAT avoids body-slip double unload')",
+              "req(ffb, 'const float rearSlideRelief =\\n                    1.0f - 0.15f * gripLoss * bodySlide;', 'Physics SAT avoids body-slip double unload')")
+          p.write_text(s, encoding='utf-8')
+          '@ | python -
+
       - name: Verify consolidated source
         shell: pwsh
         run: python tools/verify_wheel_ffb_current.py
