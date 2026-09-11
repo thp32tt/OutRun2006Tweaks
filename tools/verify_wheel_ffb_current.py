@@ -179,4 +179,6 @@ req(ffb, 'const bool unloadingStructural = sameTorqueDirection &&', 'force unloa
 req(ffb, 'maxSlew * 2', 'stale torque can decay twice as fast')
 req(ffb, 'std::abs(structuralDelta) > appliedMaxSlew', 'asymmetric slew applied to structural force')
 forbid(ffb, 'naturalSatTorque * 0.15f', 'Physics mode never falls back to weak 15 percent steering')
+req(ffb, 'vehicleDynamics_.calibrated() && vehicleDynamics_.sampleValid()', 'Physics SAT requires a current valid motion sample')
+req(ffb, 'const float physicsMix = vehicleDynamics_.sampleValid()', 'invalid dynamics falls back to Natural SAT immediately')
 print('CURRENT WHEEL FFB STRUCTURE VERIFIED; run verify_wheel_ffb_math.py for numerical tests')

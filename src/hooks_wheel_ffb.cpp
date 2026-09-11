@@ -763,7 +763,7 @@ namespace
             const float trailShape = WheelFFBMath::trail_shape(frontSlip);
             const float physicsLoad = 0.62f + 0.48f * lateralLoadSmooth;
             const float rearSlideRelief = 1.0f - 0.15f * gripLoss * bodySlide;
-            if (vehicleDynamics_.calibrated())
+            if (vehicleDynamics_.calibrated() && vehicleDynamics_.sampleValid())
             {
                 const float physicsReturnRelief =
                     WheelFFBMath::physics_return_relief(frontSlip, steerRate);
@@ -779,7 +779,9 @@ namespace
             // During basis calibration retain only a small Natural SAT safety
             // net, then crossfade over valid dynamics ticks. Invalid telemetry
             // decays/clears dynamics state instead of leaking stale slide values.
-            const float physicsMix = vehicleDynamics_.activationBlend();
+            const float physicsMix = vehicleDynamics_.sampleValid()
+                ? vehicleDynamics_.activationBlend()
+                : 0.0f;
             // Keep the Natural safety net alive throughout the activation ramp.
             // Dropping it on the calibration tick created a short SAT hole while
             // physicsMix was still near zero.
