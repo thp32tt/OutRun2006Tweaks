@@ -769,12 +769,18 @@ namespace
         DIJOYSTATE2 baseline_{};
         bool baselineValid_ = false;
         std::string status_;
+        bool ffbDirty_ = false;
 
         void save()
         {
             UniversalWheelProfile::apply_now();
-            Settings::write(Module::UserIniPath);
-            status_ = "Saved to OutRun2006Tweaks.user.ini";
+            if (Settings::write(Module::UserIniPath))
+            {
+                ffbDirty_ = false;
+                status_ = "Saved to OutRun2006Tweaks.user.ini";
+            }
+            else
+                status_ = "Could not save OutRun2006Tweaks.user.ini.";
         }
 
         void select_device(const DeviceInfo& info, bool ffbOutput)
@@ -788,18 +794,28 @@ namespace
                 }
                 Settings::WheelFFBDeviceName = info.name;
                 Settings::WheelFFBDeviceGuid = info.guidKey;
-                Settings::write(Module::UserIniPath);
-                status_ = "Selected FFB output and saved its exact DirectInput GUID. The FFB engine will reinitialize automatically on the next gameplay update.";
+                if (Settings::write(Module::UserIniPath))
+                {
+                    ffbDirty_ = false;
+                    status_ = "Selected FFB output and saved its exact DirectInput GUID. The FFB engine will reinitialize automatically on the next gameplay update.";
+                }
+                else
+                {
+                    ffbDirty_ = true;
+                    status_ = "Selected FFB output for this session, but could not save user.ini.";
+                }
                 return;
             }
 
             Settings::WheelUniversalDeviceName = info.name;
             Settings::WheelUniversalDeviceGuid = info.guidKey;
             gReader.select_by_identity(info.guidKey, info.name);
-            Settings::write(Module::UserIniPath);
-            status_ = UniversalWheelProfile::regular_device_count() > 1
-                ? "Selected legacy input device. Confirm the OutRun legacy input slot below when multiple controllers are present."
-                : "Selected legacy input device. FFB output is configured separately below.";
+            const bool saved = Settings::write(Module::UserIniPath);
+            status_ = !saved
+                ? "Selected legacy input device for this session, but could not save user.ini."
+                : (UniversalWheelProfile::regular_device_count() > 1
+                    ? "Selected legacy input device. Confirm the OutRun legacy input slot below when multiple controllers are present."
+                    : "Selected legacy input device. FFB output is configured separately below.");
         }
 
         void begin_bind(BindTarget target)
@@ -994,6 +1010,12 @@ namespace
         void render(bool) override
         {
             listen_for_binding();
+            const auto track_ffb_change = [this](bool changed)
+            {
+                if (changed)
+                    ffbDirty_ = true;
+                return changed;
+            };
 
             if (Settings::UseNewInput)
             {
@@ -1190,55 +1212,64 @@ namespace
             }
 
             ImGui::SeparatorText("Simulation FFB");
-            ImGui::Checkbox("Enable Force Feedback", Settings::WheelFFBEnable.ptr());
+            track_ffb_change(ImGui::Checkbox("Enable Force Feedback", Settings::WheelFFBEnable.ptr()));
             ImGui::TextDisabled("gameplay FFB follows the exact selected DirectInput GUID.");
             ImGui::TextWrapped(
                 "Single-owner wheel FFB: DirectInput COM only. field_264/268 are lateral load only; body slip releases damping, while front slip drives Physics SAT and tire scrub. Centering Spring remains a low-speed stabilizer.");
             ImGui::TextDisabled("Settings > WheelFFB is hidden; changes on this page apply live. Gamepad rumble is suppressed only while DirectInput FFB owns an output device.");
 
-            ImGui::SliderFloat("Overall Strength", Settings::WheelFFBGlobalStrength.ptr(), 0.0f, 1.5f, "%.2f");
+            track_ffb_change(ImGui::SliderFloat("Overall Strength", Settings::WheelFFBGlobalStrength.ptr(), 0.0f, 1.5f, "%.2f"));
             if (Settings::WheelFFBGlobalStrength.get() > 1.0f)
                 ImGui::TextColored(ImVec4(1.0f, 0.65f, 0.25f, 1.0f),
                     "Above 100% trades force-detail contrast for extra weight.");
-            ImGui::SliderFloat("Centering Spring (low speed)", Settings::WheelFFBSpringStrength.ptr(), 0.0f, 1.0f, "%.2f");
-            ImGui::SliderFloat("Dynamic Damping", Settings::WheelFFBDamperStrength.ptr(), 0.0f, 0.80f, "%.2f");
-            ImGui::SliderFloat("Self-aligning Torque (SAT)", Settings::WheelFFBSteeringWeight.ptr(), 0.0f, 2.00f, "%.2f");
-            ImGui::Checkbox("Physics SAT (body slip + yaw)", Settings::WheelFFBPhysicsSat.ptr());
+            track_ffb_change(ImGui::SliderFloat("Centering Spring (low speed)", Settings::WheelFFBSpringStrength.ptr(), 0.0f, 1.0f, "%.2f"));
+            track_ffb_change(ImGui::SliderFloat("Dynamic Damping", Settings::WheelFFBDamperStrength.ptr(), 0.0f, 0.80f, "%.2f"));
+            track_ffb_change(ImGui::SliderFloat("Self-aligning Torque (SAT)", Settings::WheelFFBSteeringWeight.ptr(), 0.0f, 2.00f, "%.2f"));
+            track_ffb_change(ImGui::Checkbox("Physics SAT (body slip + yaw)", Settings::WheelFFBPhysicsSat.ptr()));
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Uses post-physics OutRun car motion/body heading to estimate front slip. Disable for the Natural SAT comparison.");
-            ImGui::SliderFloat("Grip-loss Response", Settings::WheelFFBGripLoss.ptr(), 0.0f, 1.0f, "%.2f");
-            ImGui::SliderFloat("Road Detail", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 0.50f, "%.2f");
-            ImGui::SliderFloat("Tire Slip", Settings::WheelFFBTireSlip.ptr(), 0.0f, 0.50f, "%.2f");
-            ImGui::SliderFloat("Collision", Settings::WheelFFBWallImpact.ptr(), 0.0f, 1.0f, "%.2f");
-            ImGui::Checkbox("Hardware GUID_Spring", Settings::WheelFFBUseHardwareSpring.ptr());
+            track_ffb_change(ImGui::SliderFloat("Grip-loss Response", Settings::WheelFFBGripLoss.ptr(), 0.0f, 1.0f, "%.2f"));
+            track_ffb_change(ImGui::SliderFloat("Road Detail", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 0.50f, "%.2f"));
+            track_ffb_change(ImGui::SliderFloat("Tire Slip", Settings::WheelFFBTireSlip.ptr(), 0.0f, 0.50f, "%.2f"));
+            track_ffb_change(ImGui::SliderFloat("Collision", Settings::WheelFFBWallImpact.ptr(), 0.0f, 1.0f, "%.2f"));
+            track_ffb_change(ImGui::Checkbox("Hardware GUID_Spring", Settings::WheelFFBUseHardwareSpring.ptr()));
             ImGui::SameLine();
-            ImGui::Checkbox("Hardware GUID_Damper", Settings::WheelFFBUseHardwareDamper.ptr());
-            ImGui::Checkbox("Hardware road/slip sine effects", Settings::WheelFFBUsePeriodicEffects.ptr());
+            track_ffb_change(ImGui::Checkbox("Hardware GUID_Damper", Settings::WheelFFBUseHardwareDamper.ptr()));
+            track_ffb_change(ImGui::Checkbox("Hardware road/slip sine effects", Settings::WheelFFBUsePeriodicEffects.ptr()));
 
             if (ImGui::CollapsingHeader("Advanced FFB tuning"))
             {
-                ImGui::SliderFloat("Spring Saturation", Settings::WheelFFBSpringSaturation.ptr(), 0.10f, 1.0f, "%.3f");
-                ImGui::SliderFloat("Weight Transfer", Settings::WheelFFBWeightTransfer.ptr(), 0.0f, 1.5f, "%.2f");
-                ImGui::SliderFloat("Lateral Signal Deadzone", Settings::WheelFFBLateralDeadzone.ptr(), 0.0f, 8.0f, "%.2f");
-                ImGui::SliderFloat("Gear Shift", Settings::WheelFFBGearShift.ptr(), 0.0f, 1.0f, "%.2f");
-                ImGui::SliderFloat("Engine Idle", Settings::WheelFFBEngineIdle.ptr(), 0.0f, 0.50f, "%.2f");
-                ImGui::SliderFloat("Force Slew Rate", Settings::WheelFFBSlewRate.ptr(), 0.01f, 1.0f, "%.3f");
+                track_ffb_change(ImGui::SliderFloat("Spring Saturation", Settings::WheelFFBSpringSaturation.ptr(), 0.10f, 1.0f, "%.3f"));
+                track_ffb_change(ImGui::SliderFloat("Weight Transfer", Settings::WheelFFBWeightTransfer.ptr(), 0.0f, 1.5f, "%.2f"));
+                track_ffb_change(ImGui::SliderFloat("Lateral Signal Deadzone", Settings::WheelFFBLateralDeadzone.ptr(), 0.0f, 8.0f, "%.2f"));
+                track_ffb_change(ImGui::SliderFloat("Gear Shift", Settings::WheelFFBGearShift.ptr(), 0.0f, 1.0f, "%.2f"));
+                track_ffb_change(ImGui::SliderFloat("Engine Idle", Settings::WheelFFBEngineIdle.ptr(), 0.0f, 0.50f, "%.2f"));
+                track_ffb_change(ImGui::SliderFloat("Force Slew Rate", Settings::WheelFFBSlewRate.ptr(), 0.01f, 1.0f, "%.3f"));
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip("Maximum structural-force change per 60 Hz tick. Lower is smoother/slower; higher responds faster.");
                 ImGui::TextDisabled("Advanced values apply live like the main controls; use Save Force Feedback to persist them.");
             }
 
-            ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr());
-            ImGui::Checkbox("Record driving telemetry (10 Hz)", Settings::WheelFFBTelemetry.ptr());
-            ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr());
+            track_ffb_change(ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr()));
+            track_ffb_change(ImGui::Checkbox("Record driving telemetry (10 Hz)", Settings::WheelFFBTelemetry.ptr()));
+            track_ffb_change(ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr()));
             ImGui::SameLine();
-            ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr());
+            track_ffb_change(ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr()));
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Use Reverse Spring only if the wheel pushes farther away from centre. ConstantForce direction is independent.");
 
-            if (ImGui::Button("Save Force Feedback"))
-                status_ = Settings::write(Module::UserIniPath)
-                    ? "Force feedback settings saved." : "Could not save force feedback settings.";
+            if (ffbDirty_)
+                ImGui::TextDisabled("Unsaved FFB changes are active now but will be lost after restart.");
+            if (ImGui::Button(ffbDirty_ ? "Save Force Feedback*" : "Save Force Feedback"))
+            {
+                if (Settings::write(Module::UserIniPath))
+                {
+                    ffbDirty_ = false;
+                    status_ = "Force feedback settings saved.";
+                }
+                else
+                    status_ = "Could not save force feedback settings.";
+            }
 
             ImGui::SeparatorText("Safe direction test");
             if (ImGui::Button("Test Left (20%)"))
@@ -1273,8 +1304,16 @@ namespace
                 Settings::WheelFFBInvertSpring = false;
                 Settings::WheelFFBDebugLog = true;
                 Settings::VibrationMode = 0;
-                Settings::write(Module::UserIniPath);
-                status_ = "Loaded MOZA R3 Physics SAT: lateral load, body slide and front scrub are separated; diagnostic logging enabled. Saved to user.ini.";
+                if (Settings::write(Module::UserIniPath))
+                {
+                    ffbDirty_ = false;
+                    status_ = "Loaded MOZA R3 Physics SAT: lateral load, body slide and front scrub are separated; diagnostic logging enabled. Saved to user.ini.";
+                }
+                else
+                {
+                    ffbDirty_ = true;
+                    status_ = "Loaded MOZA R3 Physics SAT for this session, but could not save user.ini.";
+                }
             }
             ImGui::SameLine();
 
@@ -1299,8 +1338,16 @@ namespace
                 Settings::WheelFFBInvertForce = true;
                 Settings::WheelFFBInvertSpring = false;
                 Settings::VibrationMode = 0;
-                Settings::write(Module::UserIniPath);
-                status_ = "Loaded MOZA R3 Natural SAT: smooth progressive SAT, low-speed-only spring assist and single DirectInput COM wheel FFB. Saved to user.ini.";
+                if (Settings::write(Module::UserIniPath))
+                {
+                    ffbDirty_ = false;
+                    status_ = "Loaded MOZA R3 Natural SAT: smooth progressive SAT, low-speed-only spring assist and single DirectInput COM wheel FFB. Saved to user.ini.";
+                }
+                else
+                {
+                    ffbDirty_ = true;
+                    status_ = "Loaded MOZA R3 Natural SAT for this session, but could not save user.ini.";
+                }
             }
 
             if (!Settings::UseNewInput)
