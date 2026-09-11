@@ -3,6 +3,7 @@
 // collide with std::min/std::max/std::clamp in the DirectInput FFB engine.
 #define NOMINMAX
 #include "hooks_wheel_ffb.cpp"
+#include "input_manager.hpp"
 #include "hooks_wheel_input_compat_v2.hpp"
 #include "hooks_wheel_r3_menu_dpad.hpp"
 #include "hooks_wheel_r3_menu_ab.hpp"
