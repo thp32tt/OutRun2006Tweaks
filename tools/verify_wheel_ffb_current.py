@@ -386,3 +386,19 @@ req(wheel_ui, 'if (currentSaved)\n                            capture_saved_ffb(
 req(wheel_ui, 'return !known ? "unknown" : (dynamic ? "yes" : "no");', 'FFB capability UI distinguishes unknown from yes')
 req(wheel_ui, 'const bool ffbReady = !Settings::WheelFFBEnable || ffbStatus.initialized;', 'Ready checklist does not treat a disconnected saved GUID as ready')
 forbid(wheel_ui, '#include <cstdint>\n#include <cstdio>\n#include <cstdint>', 'duplicate cstdint include')
+
+# debug10-regression-guards
+req(bind_ui, 'void arm_release_guard(const InputBinding& binding)', 'Quick Setup owns a raw-axis release guard independent of calibration span')
+req(bind_ui, 'releaseGuardBinding->axisMinimum = -32768;', 'zero-span Quick Setup axis gets transient release range')
+if bind_ui.count('arm_release_guard(*quickSetupCandidate);') != 2:
+    raise SystemExit('CURRENT VERIFY FAILED [Quick Setup confirm/retry both arm the axis release guard]')
+print('OK [Quick Setup confirm/retry both arm the axis release guard]')
+forbid(bind_ui, 'releaseGuardBinding = *quickSetupCandidate;', 'Quick Setup never uses zero-span candidate directly as release guard')
+req(profiles, 'commit_staged_profile(', 'named profile writes use staged replacement')
+req(bind_ui, 'WheelProfileStore::staged_profile_path(*profilePath)', 'input profile is fully staged before overwrite')
+req(bind_ui, 'WheelProfileStore::commit_staged_profile(stagedPath, *profilePath, &error)', 'input profile overwrite preserves previous file until staged write completes')
+req(profiles, 'const auto staged = staged_profile_path(*path);', 'FFB profile is fully staged before overwrite')
+req(profiles, 'Failed while closing staged FFB profile.', 'FFB profile close failures are reported')
+req(profiles, 'Failed while closing wheel-specific input options.', 'input profile option close failures are reported')
+req(wheel_ui, 'capture_saved_ffb();\n                status_ = "Saved to OutRun2006Tweaks.user.ini";', 'legacy full user.ini save refreshes FFB revert baseline')
+req(wheel_ui, 'capture_saved_ffb();\n                    status_ = "Selected FFB output and saved its exact DirectInput GUID.', 'FFB output selection refreshes revert baseline after full user.ini persistence')

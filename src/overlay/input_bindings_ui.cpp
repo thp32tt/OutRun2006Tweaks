@@ -332,6 +332,21 @@ public:
 		return binding;
 	}
 
+	void arm_release_guard(const InputBinding& binding)
+	{
+		releaseGuardBinding = binding;
+		if (releaseGuardBinding->kind == InputBinding::Kind::JoyAxis &&
+			releaseGuardBinding->axisMinimum == releaseGuardBinding->axisRest &&
+			releaseGuardBinding->axisMaximum == releaseGuardBinding->axisRest)
+		{
+			// Quick Setup stores a zero-span axis until guided calibration. The
+			// release guard is transient only, so restore the raw SDL range here
+			// to make read() wait for the physical control to return near rest.
+			releaseGuardBinding->axisMinimum = -32768;
+			releaseGuardBinding->axisMaximum = 32767;
+		}
+	}
+
 	//
 	// Listens for any input at all rather than being told up front whether to
 	// expect a key or a pad: the binding records which it was. Escape cancels
@@ -395,7 +410,7 @@ public:
 			else
 				action.add(prepared);
 
-			releaseGuardBinding = prepared;
+			arm_release_guard(prepared);
 			isListeningForInput = ListenState::WaitForBindButtonRelease;
 			ImGui::CloseCurrentPopup();
 		};
@@ -945,14 +960,25 @@ private:
 			else if (auto profilePath = WheelProfileStore::profile_path(
 				WheelProfileStore::Kind::Input, requestedName, &error))
 			{
-				if (!manager.saveBindingIni(*profilePath))
-				{
-					persistenceStatus = "Could not save wheel profile bindings.";
-				}
-				else if (!WheelProfileStore::append_input_options(*profilePath, &error))
+				const auto stagedPath = WheelProfileStore::staged_profile_path(*profilePath);
 				{
 					std::error_code ignored;
-					std::filesystem::remove(*profilePath, ignored);
+					std::filesystem::remove(stagedPath, ignored);
+				}
+				if (!manager.saveBindingIni(stagedPath))
+				{
+					persistenceStatus = "Could not stage wheel profile bindings.";
+				}
+				else if (!WheelProfileStore::append_input_options(stagedPath, &error))
+				{
+					std::error_code ignored;
+					std::filesystem::remove(stagedPath, ignored);
+					persistenceStatus = error;
+				}
+				else if (!WheelProfileStore::commit_staged_profile(stagedPath, *profilePath, &error))
+				{
+					std::error_code ignored;
+					std::filesystem::remove(stagedPath, ignored);
 					persistenceStatus = error;
 				}
 				else
@@ -1176,7 +1202,7 @@ private:
 					std::erase_if(bindings, [&](const InputBinding& existing)
 						{ return same_source_family(existing, *quickSetupCandidate); });
 					action_for(bindTarget).add(*quickSetupCandidate);
-					releaseGuardBinding = *quickSetupCandidate;
+					arm_release_guard(*quickSetupCandidate);
 					quickSetupCandidate.reset();
 					++quickSetupStep;
 					unsavedChanges = true;
@@ -1186,7 +1212,7 @@ private:
 				ImGui::SameLine();
 				if (ImGui::Button("Try again"))
 				{
-					releaseGuardBinding = *quickSetupCandidate;
+					arm_release_guard(*quickSetupCandidate);
 					quickSetupCandidate.reset();
 					isListeningForInput = ListenState::WaitForBindButtonRelease;
 					ImGui::CloseCurrentPopup();

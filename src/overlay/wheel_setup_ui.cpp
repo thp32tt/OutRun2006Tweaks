@@ -1061,6 +1061,7 @@ namespace
             if (Settings::write(Module::UserIniPath))
             {
                 ffbDirty_ = false;
+                capture_saved_ffb();
                 status_ = "Saved to OutRun2006Tweaks.user.ini";
             }
             else
@@ -1086,6 +1087,7 @@ namespace
                 if (Settings::write(Module::UserIniPath))
                 {
                     ffbDirty_ = false;
+                    capture_saved_ffb();
                     status_ = "Selected FFB output and saved its exact DirectInput GUID. The FFB engine will reinitialize automatically on the next gameplay update.";
                 }
                 else

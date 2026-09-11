@@ -154,6 +154,89 @@ namespace WheelProfileStore
         return std::filesystem::is_regular_file(*path, ec) && !ec;
     }
 
+    inline std::filesystem::path staged_profile_path(const std::filesystem::path& finalPath)
+    {
+        auto staged = finalPath;
+        staged += ".tmp";
+        return staged;
+    }
+
+    inline bool commit_staged_profile(
+        const std::filesystem::path& staged,
+        const std::filesystem::path& finalPath,
+        std::string* error = nullptr)
+    {
+        auto backup = finalPath;
+        backup += ".bak";
+        std::error_code ec;
+
+        bool finalExists = std::filesystem::is_regular_file(finalPath, ec);
+        if (ec)
+        {
+            if (error) *error = "Could not inspect the existing profile: " + ec.message();
+            return false;
+        }
+
+        // Recover a previous interrupted replacement before starting another.
+        if (!finalExists && std::filesystem::is_regular_file(backup, ec) && !ec)
+        {
+            std::filesystem::rename(backup, finalPath, ec);
+            if (ec)
+            {
+                if (error) *error = "Could not recover the previous profile backup: " + ec.message();
+                return false;
+            }
+            finalExists = true;
+        }
+        else if (ec)
+        {
+            if (error) *error = "Could not inspect the profile backup: " + ec.message();
+            return false;
+        }
+
+        if (finalExists)
+        {
+            std::filesystem::remove(backup, ec);
+            if (ec)
+            {
+                if (error) *error = "Could not clear a stale profile backup: " + ec.message();
+                return false;
+            }
+            std::filesystem::rename(finalPath, backup, ec);
+            if (ec)
+            {
+                if (error) *error = "Could not preserve the existing profile before overwrite: " + ec.message();
+                return false;
+            }
+        }
+
+        std::filesystem::rename(staged, finalPath, ec);
+        if (ec)
+        {
+            const std::string replaceError = ec.message();
+            if (finalExists)
+            {
+                std::error_code restoreEc;
+                std::filesystem::rename(backup, finalPath, restoreEc);
+                if (restoreEc)
+                {
+                    if (error) *error = "Could not install the new profile (" + replaceError +
+                        ") and could not restore the backup (" + restoreEc.message() + ").";
+                    return false;
+                }
+            }
+            if (error) *error = "Could not install the completed profile: " + replaceError;
+            return false;
+        }
+
+        if (finalExists)
+        {
+            std::error_code ignored;
+            std::filesystem::remove(backup, ignored);
+        }
+        return true;
+    }
+
     inline bool delete_profile(Kind kind, std::string_view rawName, std::string* error = nullptr)
     {
         auto path = profile_path(kind, rawName, error);
@@ -267,6 +350,13 @@ namespace WheelProfileStore
         if (!file)
         {
             if (error) *error = "Failed while writing wheel-specific input options.";
+            file.close();
+            return false;
+        }
+        file.close();
+        if (file.fail())
+        {
+            if (error) *error = "Failed while closing wheel-specific input options.";
             return false;
         }
         return true;
@@ -344,10 +434,15 @@ namespace WheelProfileStore
         if (!path)
             return false;
 
-        std::ofstream file(*path, std::ios::out | std::ios::trunc);
+        const auto staged = staged_profile_path(*path);
+        {
+            std::error_code ignored;
+            std::filesystem::remove(staged, ignored);
+        }
+        std::ofstream file(staged, std::ios::out | std::ios::trunc);
         if (!file)
         {
-            if (error) *error = "Could not open FFB profile for writing.";
+            if (error) *error = "Could not open staged FFB profile for writing.";
             return false;
         }
         file << "# OutRun2006Tweaks named force-feedback feel profile.\n";
@@ -359,7 +454,24 @@ namespace WheelProfileStore
         file.flush();
         if (!file)
         {
-            if (error) *error = "Failed while writing FFB profile.";
+            if (error) *error = "Failed while writing staged FFB profile.";
+            file.close();
+            std::error_code ignored;
+            std::filesystem::remove(staged, ignored);
+            return false;
+        }
+        file.close();
+        if (file.fail())
+        {
+            if (error) *error = "Failed while closing staged FFB profile.";
+            std::error_code ignored;
+            std::filesystem::remove(staged, ignored);
+            return false;
+        }
+        if (!commit_staged_profile(staged, *path, error))
+        {
+            std::error_code ignored;
+            std::filesystem::remove(staged, ignored);
             return false;
         }
         return true;
