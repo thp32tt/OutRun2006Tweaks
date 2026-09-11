@@ -121,6 +121,8 @@ private:
 	// Track binding changes (options tab are handled differently)
 	bool unsavedChanges = false;
 	bool confirmingReset = false;
+	bool confirmingLoad = false;
+	std::string persistenceStatus;
 	bool calibrationOpen = false;
 	Selection calibrationTarget;
 	int calibrationIndex = -1;
@@ -157,12 +159,23 @@ private:
 		return selection.isVolume() && selection.index == int(ADChannel::Steering);
 	}
 
-	// Quick Setup replaces only the same broad input source it just captured.
-	// A wheel/raw-device pass must not erase the default gamepad bindings: the
-	// whole point of this branch is that a wheel, pedals and a pad can coexist.
+	// Quick Setup replaces only the source it just captured. For raw SDL
+	// devices, source family alone is too broad: a wheel, pedal set, shifter,
+	// button box and mapped gamepad may all be Joy* bindings at the same time.
+	// Resolve both bindings to their current physical SDL instance and replace
+	// only bindings from that same device. Disconnected/unresolved bindings are
+	// deliberately preserved rather than guessed away.
 	static bool same_source_family(const InputBinding& existing, const InputBinding& candidate)
 	{
-		if (candidate.isRawDevice()) return existing.isRawDevice();
+		if (candidate.isRawDevice())
+		{
+			if (!existing.isRawDevice())
+				return false;
+			const auto* existingDevice = InputManager::instance.deviceForBinding(existing);
+			const auto* candidateDevice = InputManager::instance.deviceForBinding(candidate);
+			return existingDevice && candidateDevice &&
+				existingDevice->instanceId == candidateDevice->instanceId;
+		}
 		if (candidate.isGamepad()) return existing.isGamepad();
 		if (candidate.isKeyboard()) return existing.isKeyboard();
 		return false;
@@ -237,6 +250,8 @@ private:
 	void start_quick_setup()
 	{
 		quickSetupBackup.clear();
+		confirmingLoad = false;
+		persistenceStatus.clear();
 		quickSetupPreviousUnsaved = unsavedChanges;
 		for (int i = 0; i < int(std::size(QuickSetupSteps)); ++i)
 		{
@@ -972,9 +987,13 @@ private:
 				quickSetupBackup.clear();
 				quickSetupComplete = false;
 				unsavedChanges = false;
+				confirmingLoad = false;
+				persistenceStatus = "Bindings saved.";
 				dialogOpen = false;
 				ImGui::CloseCurrentPopup();
 			}
+			else
+				persistenceStatus = "Could not save bindings. Check folder permissions and OutRun2006Tweaks.log.";
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Keep & Fine-tune"))
@@ -997,6 +1016,8 @@ private:
 			restore_quick_setup_backup();
 			ImGui::CloseCurrentPopup();
 		}
+		if (!persistenceStatus.empty())
+			ImGui::TextWrapped("%s", persistenceStatus.c_str());
 		ImGui::EndPopup();
 	}
 
@@ -1048,17 +1069,45 @@ public:
 
 			ImGui::SameLine();
 			if (ImGui::Button(unsavedChanges ? "Save bindings*##save" : "Save bindings##save"))
+			{
 				if (manager.saveBindingIni(Module::BindingsIniPath))
+				{
 					unsavedChanges = false;
+					confirmingLoad = false;
+					persistenceStatus = "Bindings saved.";
+				}
+				else
+					persistenceStatus = "Could not save bindings. Check folder permissions and OutRun2006Tweaks.log.";
+			}
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("Load bindings"))
-				if (manager.readBindingIni(Module::BindingsIniPath))
-					unsavedChanges = false;
+			const char* loadLabel = unsavedChanges && confirmingLoad
+				? "Discard edits & load?##load" : "Load bindings##load";
+			if (ImGui::Button(loadLabel))
+			{
+				if (unsavedChanges && !confirmingLoad)
+				{
+					confirmingLoad = true;
+					persistenceStatus = "Click again to discard unsaved edits and reload the saved binding file.";
+				}
+				else
+				{
+					if (manager.readBindingIni(Module::BindingsIniPath))
+					{
+						unsavedChanges = false;
+						persistenceStatus = "Saved bindings loaded.";
+					}
+					else
+						persistenceStatus = "Could not load bindings; the current bindings were kept.";
+					confirmingLoad = false;
+				}
+			}
 
-			// Two lines are reserved below: the unsaved note and the button row.
-			const float footerHeight = ImGui::GetFrameHeightWithSpacing() + ImGui::GetTextLineHeightWithSpacing();
+			// Three lines are reserved below: unsaved state, persistence status
+			// and the exit/reset button row.
+			const float footerHeight = ImGui::GetFrameHeightWithSpacing() +
+				(ImGui::GetTextLineHeightWithSpacing() * 2.0f);
 
 			ImGui::BeginChild("##body", ImVec2(0, -footerHeight));
 			if (ImGui::BeginTabBar("##sections"))
@@ -1102,6 +1151,7 @@ public:
 			ImGui::TextDisabled("%s", unsavedChanges
 				? "Note: unsaved bindings are active now but will be lost after restart."
 				: "");
+			ImGui::TextDisabled("%s", persistenceStatus.c_str());
 
 			if (unsavedChanges)
 			{
@@ -1110,8 +1160,12 @@ public:
 					if (manager.saveBindingIni(Module::BindingsIniPath))
 					{
 						unsavedChanges = false;
+						confirmingLoad = false;
+						persistenceStatus = "Bindings saved.";
 						dialogOpen = false;
 					}
+					else
+						persistenceStatus = "Could not save bindings. Check folder permissions and OutRun2006Tweaks.log.";
 				}
 				ImGui::SameLine();
 				if (ImGui::Button("Return to game (not saved)"))
