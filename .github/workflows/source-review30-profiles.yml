@@ -25,11 +25,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Validate correction driver
-        run: python3 -m py_compile .github/profile_postreview_fix.py
+      - name: Validate final review driver
+        run: python3 -m py_compile .github/profile_final_review_fix.py
 
-      - name: Apply post-review profile hardening
-        run: python3 .github/profile_postreview_fix.py
+      - name: Apply final overwrite-safety correction
+        run: python3 .github/profile_final_review_fix.py
 
       - name: Push reviewed source commits
         run: git push origin wheel-ffb
