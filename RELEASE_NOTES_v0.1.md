@@ -20,6 +20,14 @@ First public release of the `wheel-ffb` branch.
 
 Primary hardware validation for v0.1 was performed with **MOZA R3**. Other DirectInput wheels may work but are not considered verified by this release unless separately reported.
 
+## Setup
+
+Use **F11 → Input Bindings** for steering, pedals, shifter and button configuration. After manual binding changes, use **Save & Return to game** to persist them.
+
+For MOZA R3, **F11 → Force Feedback** provides `Load MOZA R3 Physics SAT` and `Load MOZA R3 Natural SAT` as starting profiles. R3 road detail is then routed through the release compatibility layer's ConstantForce fallback.
+
+FFB edits apply live. Use **Save Force Feedback** to persist changes; an unsaved live change can otherwise be lost after restart.
+
 ## Install
 
 Extract `OutRun2006Tweaks-Wheel-FFB-v0.1.zip` into the OutRun 2006: Coast 2 Coast game directory and replace files when prompted.
@@ -40,9 +48,9 @@ The ZIP intentionally contains only the runtime files, the upstream replacement 
 ## Notes
 
 - `DISCORD_SHARE_v0.1.md` is not part of the repository or release package anymore.
-- Use F11 → Input Bindings for input setup.
-- Use F11 → Force Feedback for output-device selection and tuning.
+- Input setup is owned by Input Bindings; the release documentation does not require the old guided Quick Setup path.
 - On MOZA R3, road/slip texture uses the ConstantForce fallback because the hardware sine path was not physically useful in testing.
+- Mixed curb contact and fully crossing onto a rough curb use the same strong tactile profile, including snow-stage compensation.
 - The release is built only after the consolidated source verifier and production FFB math tests pass.
 
 ## Credits

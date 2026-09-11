@@ -26,7 +26,7 @@ This is not an official SEGA, MOZA, or upstream OutRun2006Tweaks release.
 3. Replace files when prompted. The package includes the replacement `OR2006C2C.exe` distributed by the upstream OutRun2006Tweaks v0.1 release.
 4. Connect and power on the wheel and pedals before starting the game.
 5. Open the in-game overlay with **F11**.
-6. Configure steering, pedals, shifter and buttons in **Input Bindings**.
+6. Configure steering, pedals, shifter and buttons in **Input Bindings**. After manual edits, use **Save & Return to game** to persist the bindings before leaving the screen.
 7. Open **Force Feedback**. On MOZA R3 the FFB interface should normally auto-match; otherwise use **Refresh Devices** and select the actual FFB device.
 8. Use the 20% left/right direction tests before raising wheel-base torque. If the steering force is reversed, change `Reverse SAT / ConstantForce`. Change `Reverse Spring` only when the spring itself pushes away from center.
 

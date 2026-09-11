@@ -17,9 +17,9 @@ Other DirectInput wheels may work, but the R3 is the main hardware validation ta
 
 With `UseNewInput=true`, **Input Bindings is the only input-binding owner** for steering, pedals, buttons and menu controls. Wheel, separate pedals, shifter, button box and gamepad can all contribute to one player at the same time.
 
-The older legacy DirectInput path remains available only as a compatibility fallback. The v0.1 release documentation no longer directs users through the removed Quick Setup flow.
+The older legacy DirectInput path remains available only as a compatibility fallback. The v0.1 release documentation no longer directs users through the old guided Quick Setup flow.
 
-Bindings identify raw devices using stable physical identity data where possible and persist separately from named FFB feel profiles.
+Bindings are live while editing, but manual changes should be persisted with **Save & Return to game**. Named input profiles remain available for complete multi-device layouts.
 
 ## FFB ownership
 
@@ -34,6 +34,12 @@ The main steering model contains:
 5. **Dynamic damping** — steering-velocity resistance that releases as the front end scrubs or the car slides.
 6. **Grip-loss unloading** — reduces steering load as usable front grip falls away.
 7. **Road / tire / gear / collision effects** — transient tactile effects layered on top of the structural steering signal.
+
+## Force Feedback UI
+
+The F11 **Force Feedback** page owns output-device selection and game-side tuning. `Load MOZA R3 Physics SAT` and `Load MOZA R3 Natural SAT` provide starting profiles, while **Save Force Feedback** persists live edits.
+
+The **Advanced FFB tuning** section exposes supported lower-level values such as Spring Saturation, Weight Transfer, Force Build Slew Rate, Countersteer Release Rate, Pneumatic Trail Response Lead and optional wheel-response correction. These remain live tuning controls; wheel-specific response data is stored with the wheel profile rather than a generic named feel profile.
 
 ## MOZA R3 compatibility path
 
