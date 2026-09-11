@@ -2,8 +2,6 @@ name: Build
 
 on:
   push:
-    paths-ignore:
-      - '.github/workflows/source-edit.yml'
   pull_request:
 
 jobs:
@@ -76,7 +74,6 @@ jobs:
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
           $markers = @(
             "WheelFFB: GUID_Damper created",
-            "WheelFFB: live GlobalStrength applied to active effects",
             "WheelFFB: scheduling DirectInput device reinitialization",
             "WheelFFB: selected DirectInput identity",
             "Reverse SAT / ConstantForce",
