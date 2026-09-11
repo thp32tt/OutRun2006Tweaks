@@ -1,0 +1,45 @@
+name: Source-only second external FFB review
+
+on:
+  push:
+    branches: [ wheel-ffb ]
+    paths:
+      - '.github/second_external_review_apply.py'
+      - '.github/workflows/source-external-review-apply.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout wheel-ffb
+        uses: actions/checkout@v7.0.1
+        with:
+          ref: wheel-ffb
+          fetch-depth: 0
+
+      - name: Apply externally reviewed FFB refinements
+        run: python .github/second_external_review_apply.py
+
+      - name: Verify current source invariants
+        run: python tools/verify_wheel_ffb_current.py
+
+      - name: Compile production-header math tests
+        run: python tools/verify_wheel_ffb_math.py
+
+      - name: Check whitespace
+        run: git diff --check
+
+      - name: Commit verified source changes
+        run: |
+          if git diff --quiet; then
+            echo "No source changes to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat: refine SAT trail dynamics from external review [skip ci]"
+          git push origin HEAD:wheel-ffb
