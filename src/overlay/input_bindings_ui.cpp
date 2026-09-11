@@ -98,6 +98,10 @@ private:
 		{ "Start",       "Press the button you want to use for Start and Pause.",      Sw,  int(SwitchId::Start) },
 		{ "Confirm",     "Press the button you want to use to confirm menu choices.",  Sw,  int(SwitchId::A) },
 		{ "Back",        "Press the button you want to use to go back.",               Sw,  int(SwitchId::B) },
+		{ "Menu Up",     "Press Up on the wheel D-pad/POV, or another menu button.",    Sw,  int(SwitchId::SelectionUp) },
+		{ "Menu Right",  "Press Right on the wheel D-pad/POV, or another menu button.", Sw,  int(SwitchId::SelectionRight) },
+		{ "Menu Down",   "Press Down on the wheel D-pad/POV, or another menu button.",  Sw,  int(SwitchId::SelectionDown) },
+		{ "Menu Left",   "Press Left on the wheel D-pad/POV, or another menu button.",  Sw,  int(SwitchId::SelectionLeft) },
 	};
 
 	// How far an analog action has to move from rest before its name lights up.
@@ -153,6 +157,17 @@ private:
 		return selection.isVolume() && selection.index == int(ADChannel::Steering);
 	}
 
+	// Quick Setup replaces only the same broad input source it just captured.
+	// A wheel/raw-device pass must not erase the default gamepad bindings: the
+	// whole point of this branch is that a wheel, pedals and a pad can coexist.
+	static bool same_source_family(const InputBinding& existing, const InputBinding& candidate)
+	{
+		if (candidate.isRawDevice()) return existing.isRawDevice();
+		if (candidate.isGamepad()) return existing.isGamepad();
+		if (candidate.isKeyboard()) return existing.isKeyboard();
+		return false;
+	}
+
 	void begin_listening(const Selection& target, int index)
 	{
 		// Waits for the click that got here to be let go of first, otherwise it
@@ -175,6 +190,27 @@ private:
 			baseline.reserve(axisCount);
 			for (int axis = 0; axis < axisCount; ++axis)
 				baseline.push_back(SDL_GetJoystickAxis(device.joystick, axis));
+		}
+	}
+
+	void skip_quick_setup_step()
+	{
+		if (!quickSetupActive || quickSetupStep >= int(std::size(QuickSetupSteps)))
+			return;
+
+		++quickSetupStep;
+		quickSetupCandidate.reset();
+		releaseGuardBinding.reset();
+		quickSetupTimedOut = false;
+		ImGui::CloseCurrentPopup();
+
+		if (quickSetupStep < int(std::size(QuickSetupSteps)))
+			begin_listening(quick_setup_selection(quickSetupStep), -1);
+		else
+		{
+			quickSetupActive = false;
+			quickSetupComplete = true;
+			isListeningForInput = ListenState::False;
 		}
 	}
 
@@ -843,7 +879,8 @@ private:
 				if (ImGui::Button("Use this input"))
 				{
 					auto& bindings = action_for(bindTarget).bindings();
-					std::erase_if(bindings, [](const InputBinding& existing) { return !existing.isKeyboard(); });
+					std::erase_if(bindings, [&](const InputBinding& existing)
+						{ return same_source_family(existing, *quickSetupCandidate); });
 					action_for(bindTarget).add(*quickSetupCandidate);
 					releaseGuardBinding = *quickSetupCandidate;
 					quickSetupCandidate.reset();
@@ -863,18 +900,27 @@ private:
 			}
 			else if (quickSetupActive && quickSetupTimedOut)
 			{
-				ImGui::TextWrapped("No deliberate input was detected. This step was not skipped.");
+				ImGui::TextWrapped("No deliberate input was detected. Retry this control or skip it and keep its existing bindings.");
 				if (ImGui::Button("Try this step again"))
 				{
 					begin_listening(bindTarget, -1);
 					ImGui::CloseCurrentPopup();
 				}
+				ImGui::SameLine();
+				if (ImGui::Button("Skip this step"))
+					skip_quick_setup_step();
 			}
 			else
 			{
 				ImGui::TextDisabled(quickSetupActive ? "Escape to cancel Quick Setup" : "Escape to cancel, Delete to clear");
 				if (HandleNewBinding())
 					unsavedChanges = true;
+				if (quickSetupActive && !quickSetupCandidate)
+				{
+					ImGui::SameLine();
+					if (ImGui::Button("Skip this step"))
+						skip_quick_setup_step();
+				}
 			}
 
 			if (quickSetupActive && (quickSetupCandidate || quickSetupTimedOut))
@@ -929,6 +975,14 @@ private:
 				dialogOpen = false;
 				ImGui::CloseCurrentPopup();
 			}
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Keep & Fine-tune"))
+		{
+			quickSetupBackup.clear();
+			quickSetupComplete = false;
+			unsavedChanges = true;
+			ImGui::CloseCurrentPopup();
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Start Over"))
@@ -1045,9 +1099,25 @@ public:
 
 			// Kept on its own line whether or not there are changes, so the
 			// buttons below don't shift as it appears.
-			ImGui::TextDisabled("%s", unsavedChanges ? "Note: you have unsaved changes!" : "");
+			ImGui::TextDisabled("%s", unsavedChanges
+				? "Note: unsaved bindings are active now but will be lost after restart."
+				: "");
 
-			if (ImGui::Button("Return to game"))
+			if (unsavedChanges)
+			{
+				if (ImGui::Button("Save & Return to game"))
+				{
+					if (manager.saveBindingIni(Module::BindingsIniPath))
+					{
+						unsavedChanges = false;
+						dialogOpen = false;
+					}
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Return to game (not saved)"))
+					dialogOpen = false;
+			}
+			else if (ImGui::Button("Return to game"))
 				dialogOpen = false;
 
 			ImGui::SameLine();
