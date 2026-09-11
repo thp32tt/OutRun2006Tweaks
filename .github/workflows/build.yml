@@ -2,9 +2,6 @@ name: Build
 
 on:
   push:
-    paths-ignore:
-      - '.github/workflows/source-ux-review10.yml'
-      - '.github/source_ux_review10.py'
   pull_request:
 
 jobs:
