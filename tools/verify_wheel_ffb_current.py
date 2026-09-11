@@ -170,4 +170,7 @@ forbid(ffb, 'const float physicsFallback = vehicleDynamics_.calibrated()', 'no c
 req(math, 'inline float soft_saturate(float value)', 'linear-preserving C1 force limiter')
 req(ffb, 'WheelFFBMath::soft_saturate(total)', 'production force path uses soft-knee limiter')
 forbid(ffb, 'std::tanh(total)', 'ordinary SAT is not compressed by tanh')
+req(ffb, 'bool steerSampleValid_ = false;', 'steering derivative has explicit baseline state')
+req(ffb, 'smoothedSteerRate_ += (rawSteerRate - smoothedSteerRate_) * 0.45f;', 'steering-rate quantization filter')
+req(ffb, 'steerRateRaw={} steerRateFiltered={}', 'raw and filtered steering-rate telemetry')
 print('CURRENT WHEEL FFB STRUCTURE VERIFIED; run verify_wheel_ffb_math.py for numerical tests')

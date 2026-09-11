@@ -409,9 +409,22 @@ namespace
                 lastCar_ = car;
             }
 
-            float steer = read_game_steering();
-            float steerRate = steer - prevSteer_;
+            const float steer = read_game_steering();
+            float rawSteerRate = 0.0f;
+            if (steerSampleValid_)
+            {
+                rawSteerRate = steer - prevSteer_;
+                smoothedSteerRate_ += (rawSteerRate - smoothedSteerRate_) * 0.45f;
+            }
+            else
+            {
+                // First sample after menu/race/device transitions is a baseline,
+                // not a one-tick steering velocity.
+                steerSampleValid_ = true;
+                smoothedSteerRate_ = 0.0f;
+            }
             prevSteer_ = steer;
+            const float steerRate = smoothedSteerRate_;
 
             // field_1C4 reaches roughly 2.0 at OutRun top speed. Normalize by 2
             // rather than treating 1.0 as terminal speed.
@@ -887,8 +900,8 @@ namespace
             {
                 lastTelemetryTick_ = telemetryNow;
                 spdlog::info(
-                    "WheelFFB SAMPLE t={} car={} speedRaw={} speedNorm={} steer={} steerRateTick={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperCoefficient={} roadAmp={} slipAmp={} structural={} event={} preClip={} postClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
-                    telemetryNow, static_cast<const void*>(car), speedRaw, speedNorm, steer, steerRate,
+                    "WheelFFB SAMPLE t={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperCoefficient={} roadAmp={} slipAmp={} structural={} event={} preClip={} postClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
+                    telemetryNow, static_cast<const void*>(car), speedRaw, speedNorm, steer, rawSteerRate, steerRate,
                     car->field_264, car->field_268, lateralRaw, smoothedLateral_, lateralLoadSmooth,
                     vehicleDynamics_.bodySlip(), bodySlide, vehicleDynamics_.yawRate(), frontSlip, frontScrub,
                     vehicleDynamics_.vLong(), vehicleDynamics_.vLat(), vehicleDynamics_.positionStep(),
@@ -2392,6 +2405,8 @@ namespace
         {
             smoothedLateral_ = 0.0f;
             prevSteer_ = 0.0f;
+            smoothedSteerRate_ = 0.0f;
+            steerSampleValid_ = false;
             vehicleDynamics_.reset();
             prevStructuralLevel_ = 0;
             prevSpringCoefficient_ = 0;
@@ -2757,6 +2772,8 @@ namespace
 
         float smoothedLateral_ = 0.0f;
         float prevSteer_ = 0.0f;
+        float smoothedSteerRate_ = 0.0f;
+        bool steerSampleValid_ = false;
         WheelVehicleDynamics vehicleDynamics_{};
         float crashImpulseForce_ = 0.0f;
         float roadPhase_ = 0.0f;
