@@ -1,0 +1,120 @@
+name: Fix wheel UI C4129
+
+on:
+  push:
+    branches: [ wheel-ffb ]
+    paths:
+      - '.github/workflows/fix-wheel-ui-c4129.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix-and-build:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          submodules: recursive
+
+      - name: Apply confirmed UI escape fix
+        shell: pwsh
+        run: |
+          @'
+          from pathlib import Path
+
+          ui = Path('src/overlay/wheel_setup_ui.cpp')
+          text = ui.read_text(encoding='utf-8')
+          old = 'ImGui::TextDisabled("Profile folder: OutRun2006Tweaks.profiles\\FFB");'
+          new = 'ImGui::TextDisabled("Profile folder: OutRun2006Tweaks.profiles\\\\FFB");'
+          if old not in text:
+              raise SystemExit('expected bad FFB profile path literal not found')
+          text = text.replace(old, new, 1)
+          ui.write_text(text, encoding='utf-8')
+
+          verifier = Path('tools/verify_wheel_ffb_current.py')
+          v = verifier.read_text(encoding='utf-8')
+          anchor = "req(wheel_ui, 'capture_saved_ffb();\\n                    status_ = \"Selected FFB output and saved its exact DirectInput GUID.', 'FFB output selection refreshes revert baseline after full user.ini persistence')\n"
+          guard = "req(wheel_ui, 'OutRun2006Tweaks.profiles\\\\\\\\FFB', 'FFB profile folder path escapes backslash')\n"
+          if guard not in v:
+              if anchor not in v:
+                  raise SystemExit('verifier insertion anchor not found')
+              v = v.replace(anchor, anchor + guard, 1)
+              verifier.write_text(v, encoding='utf-8')
+          '@ | Set-Content -Encoding utf8 fix_ui_escape.py
+          python fix_ui_escape.py
+          Remove-Item fix_ui_escape.py
+
+      - name: Verify consolidated wheel FFB source
+        shell: pwsh
+        run: python tools/verify_wheel_ffb_current.py
+
+      - name: Test production wheel FFB math
+        shell: cmd
+        run: |
+          call "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat" || exit /b 1
+          python tools/verify_wheel_ffb_math.py
+
+      - name: Configure
+        shell: pwsh
+        run: |
+          mkdir build
+          cd build
+          cmake -G "Visual Studio 17 2022" -A Win32 ..
+
+      - name: Add older VC2022 redist workaround to safetyhook
+        shell: pwsh
+        run: |
+          (Get-Content build/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/zydis-build/zycore/Zycore.vcxproj
+
+      - name: Zero out SDL_gameinputjoystick.c
+        shell: pwsh
+        run: |
+          Set-Content -Path build/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build and reject the escape warning
+        shell: pwsh
+        run: |
+          cmake --build build --config Release 2>&1 | Tee-Object -FilePath build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $log = Get-Content build.log -Raw
+          if ($log -match 'C4129|unrecognized character escape sequence') { throw 'C4129 escape warning still present' }
+
+      - name: Copy settings and verify payload
+        shell: pwsh
+        run: |
+          cp OutRun2006Tweaks.ini build/bin/OutRun2006Tweaks.ini
+          cp OutRun2006Tweaks.lods.ini build/bin/OutRun2006Tweaks.lods.ini
+          $dllPath = 'build/bin/dinput8.dll'
+          if (-not (Test-Path $dllPath)) { throw 'dinput8.dll was not produced' }
+          $bytes = [System.IO.File]::ReadAllBytes($dllPath)
+          if ($bytes.Length -lt 1000000) { throw 'dinput8.dll is unexpectedly small' }
+          if ($bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw 'dinput8.dll has no MZ header' }
+          $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+          $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
+          if ($machine -ne 0x014C) { throw ('expected Win32 x86 DLL, machine=0x{0:X4}' -f $machine) }
+          Get-FileHash $dllPath -Algorithm SHA256
+
+      - name: Download EXE
+        shell: pwsh
+        run: Invoke-WebRequest -Uri https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.1/OR2006C2C.EXE -OutFile build/bin/OR2006C2C.exe
+
+      - name: Upload test binary
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: outrun2006tweaks-c4129-fix-${{ github.run_id }}
+          path: build/bin/
+
+      - name: Commit verified fix and remove temporary workflow
+        shell: pwsh
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/fix-wheel-ui-c4129.yml
+          git add src/overlay/wheel_setup_ui.cpp tools/verify_wheel_ffb_current.py
+          git commit -m 'fix: escape FFB profile folder path [skip ci]'
+          git push origin HEAD:wheel-ffb
