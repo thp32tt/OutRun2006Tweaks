@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <cstdint>
 
+// Read-only snapshots used by the F11 diagnostics/setup UI. Gameplay owns the
+// mutable FFB engine state; the overlay only requests actions and displays it.
 struct WheelFFBHeadroomSnapshot
 {
     std::uint64_t samples = 0;
