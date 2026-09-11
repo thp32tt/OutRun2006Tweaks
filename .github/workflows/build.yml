@@ -6,7 +6,6 @@ on:
 
 jobs:
   build:
-    if: github.event_name != 'push' || github.event.head_commit.message != 'chore: apply wheel dynamics refactor'
     runs-on: windows-2022
     strategy:
       matrix:
