@@ -2,8 +2,6 @@ name: Build
 
 on:
   push:
-    paths-ignore:
-      - '.github/workflows/source-review-round3.yml'
   pull_request:
 
 jobs:
