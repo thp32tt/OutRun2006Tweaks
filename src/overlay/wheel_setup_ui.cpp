@@ -13,6 +13,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
+#include <cstdint>
 #include <cstring>
 #include <string>
 #include <utility>
@@ -1002,6 +1003,8 @@ namespace
                         WheelFFB_RequestSettingsTransition();
                         const bool persisted = Settings::write(Module::UserIniPath);
                         ffbDirty_ = !persisted;
+                        if (persisted)
+                            capture_saved_ffb();
                         status_ = persisted
                             ? "Loaded FFB profile '" + *profile + "' (" + std::to_string(applied) + " settings)."
                             : "FFB profile is active now, but could not be persisted to user.ini.";
@@ -1228,8 +1231,16 @@ namespace
             ImGui::SameLine(180.0f);
             ImGui::TextDisabled("Axis %s", axis_name(int(axisSetting)));
             ImGui::SameLine(290.0f);
-            if (ImGui::Button("Bind", ImVec2(70, 0)))
+            const bool listeningHere = target_ == target;
+            if (listeningHere)
+            {
+                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_Text]);
+                ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
+            }
+            if (ImGui::Button(listeningHere ? "LISTENING..." : "Bind", ImVec2(90, 0)))
                 begin_bind(target);
+            if (listeningHere)
+                ImGui::PopStyleColor(2);
             if (invertPtr)
             {
                 ImGui::SameLine();
@@ -1253,8 +1264,16 @@ namespace
             const std::string name = digital_binding_name(int(setting));
             ImGui::TextDisabled("%s", name.c_str());
             ImGui::SameLine(330.0f);
-            if (ImGui::Button("Bind", ImVec2(70, 0)))
+            const bool listeningHere = target_ == target;
+            if (listeningHere)
+            {
+                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_Text]);
+                ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
+            }
+            if (ImGui::Button(listeningHere ? "LISTENING..." : "Bind", ImVec2(90, 0)))
                 begin_bind(target);
+            if (listeningHere)
+                ImGui::PopStyleColor(2);
             ImGui::SameLine();
             if (ImGui::SmallButton("Clear"))
                 setting = -1;
@@ -1492,9 +1511,9 @@ namespace
                         ffbStatus.userSwitchOn ? "ON" : "OFF",
                         ffbStatus.paused ? " | PAUSED" : "",
                         ffbStatus.deviceLost ? " | DEVICE LOST" : "");
-                    if (!ffbStatus.powerOn || !ffbStatus.safetySwitchOn || !ffbStatus.userSwitchOn || ffbStatus.deviceLost)
+                    if (ffbStatus.powerOff || ffbStatus.safetySwitchOff || ffbStatus.userSwitchOff || ffbStatus.deviceLost)
                         ImGui::TextColored(ImVec4(1.0f, 0.45f, 0.25f, 1.0f),
-                            "Wheel/driver reports FFB disabled or unavailable. This page will not override a hardware safety/user switch.");
+                            "Wheel/driver explicitly reports FFB disabled or unavailable. This page will not override a hardware safety/user switch.");
                 }
                 ImGui::TextDisabled("Dynamic effect capability: Constant %s, POLAR direction %s, Spring %s, Damper %s, Sine %s",
                     ffbStatus.constantDynamic ? "yes" : "no",
@@ -1797,6 +1816,7 @@ namespace
                 if (Settings::write(Module::UserIniPath))
                 {
                     ffbDirty_ = false;
+                    capture_saved_ffb();
                     status_ = "Loaded MOZA R3 Physics SAT: speed-adaptive front slip plus pneumatic/mechanical trail SAT; diagnostic logging enabled. Saved to user.ini.";
                 }
                 else
@@ -1835,6 +1855,7 @@ namespace
                 if (Settings::write(Module::UserIniPath))
                 {
                     ffbDirty_ = false;
+                    capture_saved_ffb();
                     status_ = "Loaded MOZA R3 Natural SAT: smooth progressive SAT, low-speed-only spring assist and single DirectInput COM wheel FFB. Saved to user.ini.";
                 }
                 else

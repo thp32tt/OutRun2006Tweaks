@@ -1163,8 +1163,11 @@ namespace
                     result.ffbStateValid = true;
                     result.actuatorsOn = (state & DIGFFS_ACTUATORSON) != 0;
                     result.powerOn = (state & DIGFFS_POWERON) != 0;
+                    result.powerOff = (state & DIGFFS_POWEROFF) != 0;
                     result.safetySwitchOn = (state & DIGFFS_SAFETYSWITCHON) != 0;
+                    result.safetySwitchOff = (state & DIGFFS_SAFETYSWITCHOFF) != 0;
                     result.userSwitchOn = (state & DIGFFS_USERFFSWITCHON) != 0;
+                    result.userSwitchOff = (state & DIGFFS_USERFFSWITCHOFF) != 0;
                     result.paused = (state & DIGFFS_PAUSED) != 0;
                     result.deviceLost = (state & DIGFFS_DEVICELOST) != 0;
                 }
@@ -1202,8 +1205,6 @@ namespace
 
         void request_direction_test(int direction)
         {
-            if (direction != 0)
-                directionTested_ = true;
             if (direction == 0)
             {
                 const bool hadPendingTest = manualTestFrames_ > 0;
@@ -1244,6 +1245,7 @@ namespace
                 return;
             }
 
+            directionTested_ = true;
             manualTestDirection_ = direction < 0 ? -1 : 1;
             manualTestFrames_ = 18;
             spdlog::info(
@@ -1964,9 +1966,8 @@ namespace
                 constantCapsKnown_, constantDynamicParams_);
             if (constantCapsKnown_ && !liveMagnitude)
             {
-                spdlog::error(
-                    "WheelFFB: ConstantForce reports no live magnitude update support; rejecting this FFB interface");
-                return false;
+                spdlog::warn(
+                    "WheelFFB: ConstantForce metadata reports no live magnitude update support; keeping the compatibility path because no equivalent software actuator exists");
             }
 
             safe_release_effect(constantEffect_, "constant before create");

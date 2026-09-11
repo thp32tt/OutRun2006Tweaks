@@ -23,8 +23,11 @@ struct WheelFFBStatusSnapshot
     bool ffbStateValid = false;
     bool actuatorsOn = false;
     bool powerOn = false;
+    bool powerOff = false;
     bool safetySwitchOn = false;
+    bool safetySwitchOff = false;
     bool userSwitchOn = false;
+    bool userSwitchOff = false;
     bool paused = false;
     bool deviceLost = false;
     bool constantEffect = false;
