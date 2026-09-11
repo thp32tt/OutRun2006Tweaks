@@ -187,4 +187,5 @@ req(dyn, 'calibrationSamples_ >= CalibrationSamplesRequired * 4', 'ambiguous bas
 forbid(ffb, 'bypassSlew', 'events never bypass sustained steering slew')
 req(ffb, 'const LONG eventLevel = static_cast<LONG>', 'events have an independent immediate output path')
 req(ffb, 'const float softwareSpringSign = Settings::WheelFFBInvertSpring', 'Reverse Spring also controls software fallback')
+req(ffb, 'driver autocenter state could not be read; leaving it unchanged', 'unknown driver autocenter state is never mutated')
 print('CURRENT WHEEL FFB STRUCTURE VERIFIED; run verify_wheel_ffb_math.py for numerical tests')

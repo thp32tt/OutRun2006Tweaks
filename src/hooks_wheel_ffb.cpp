@@ -1518,14 +1518,23 @@ namespace
             autocenter.diph.dwHeaderSize = sizeof(DIPROPHEADER);
             autocenter.diph.dwObj = 0;
             autocenter.diph.dwHow = DIPH_DEVICE;
-            autocenterRestoreKnown_ = SUCCEEDED(device_->GetProperty(DIPROP_AUTOCENTER, &autocenter.diph));
-            if (autocenterRestoreKnown_) originalAutocenter_ = autocenter.dwData;
-            autocenter.dwData = DIPROPAUTOCENTER_OFF;
-            hr = device_->SetProperty(DIPROP_AUTOCENTER, &autocenter.diph);
-            if (FAILED(hr))
-                spdlog::warn("WheelFFB: disabling driver autocenter failed (0x{:08X})", (unsigned)hr);
+            autocenterRestoreKnown_ = SUCCEEDED(
+                device_->GetProperty(DIPROP_AUTOCENTER, &autocenter.diph));
+            if (autocenterRestoreKnown_)
+            {
+                originalAutocenter_ = autocenter.dwData;
+                autocenter.dwData = DIPROPAUTOCENTER_OFF;
+                hr = device_->SetProperty(DIPROP_AUTOCENTER, &autocenter.diph);
+                if (FAILED(hr))
+                    spdlog::warn("WheelFFB: disabling driver autocenter failed (0x{:08X})", (unsigned)hr);
+                else
+                    driverAutocenterDisabled_ = true;
+            }
             else
-                driverAutocenterDisabled_ = true;
+            {
+                spdlog::warn(
+                    "WheelFFB: driver autocenter state could not be read; leaving it unchanged for safe restoration semantics");
+            }
 
             hr = device_->Acquire();
             if (FAILED(hr))
