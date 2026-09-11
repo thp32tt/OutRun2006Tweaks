@@ -450,7 +450,6 @@ namespace
         {
             return Settings::WheelInputCompatibility &&
                 !Settings::UseNewInput &&
-                !Settings::WheelUniversalSetupEnable &&
                 Settings::WheelMenuR3DirectDPad;
         }
 

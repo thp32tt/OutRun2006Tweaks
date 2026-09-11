@@ -320,9 +320,9 @@ namespace
 
         bool validate() override
         {
-            return Settings::WheelInputCompatibility &&
-                !Settings::UseNewInput &&
-                !Settings::WheelUniversalSetupEnable;
+            // Install with the legacy stack so F11 can switch the universal
+            // profile live. active() remains the runtime ownership gate.
+            return Settings::WheelInputCompatibility && !Settings::UseNewInput;
         }
 
         void declare_settings() override

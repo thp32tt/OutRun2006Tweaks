@@ -84,7 +84,6 @@ public:
         if (speedNorm <= 0.04f)
         {
             clear_dynamic_state();
-            sampleValid_ = calibrated_;
             return;
         }
 

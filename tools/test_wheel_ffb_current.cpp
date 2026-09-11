@@ -43,6 +43,6 @@ int main() {
  c.position_14.x+=1000;d.update(&c,0,.5,0);require(d.discontinuityCount()>0&&d.frontSlip()==0,"warp clear");
  for(int i=0;i<30;++i)step(d,c,0);
  c.position_14.z-=1;d.update(&c,0,.5,0);require(!d.sampleValid()&&d.frontSlip()==0,"reverse proxy disabled");
- d.update(&c,0,0,0);require(d.frontSlip()==0&&d.yawRate()==0,"stop clear");
+ d.update(&c,0,0,0);require(d.frontSlip()==0&&d.yawRate()==0&&!d.sampleValid(),"stop clear and invalid dynamic sample");
  std::cout<<checks<<" production-header invariants passed\n";
 }

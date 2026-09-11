@@ -703,7 +703,8 @@ namespace
         }
 
         std::string_view description() override { return "Universal DirectInput Wheel Setup"; }
-        bool validate() override { return Settings::WheelInputCompatibility && !Settings::UseNewInput && Settings::WheelUniversalSetupEnable; }
+        // Install with the legacy stack; active() gates live F11 ownership.
+        bool validate() override { return Settings::WheelInputCompatibility && !Settings::UseNewInput; }
         bool apply() override
         {
             ReadIOHook = safetyhook::create_inline(Module::exe_ptr(0x53BB0), ReadIO_dest);
@@ -999,9 +1000,6 @@ namespace
                 const std::string& configuredGuidValue, const std::string& configuredNameValue,
                 bool ffbOutput)
             {
-                std::string preview = configuredNameValue;
-                if (preview.empty())
-                    preview = first_device_name(ffbOnly);
                 const std::string configuredGuid = lower_identity(configuredGuidValue);
                 auto isSelectedDevice = [&](const DeviceInfo& dev)
                 {
@@ -1011,6 +1009,25 @@ namespace
                         ? dev.guidKey == configuredGuid
                         : dev.name == configuredNameValue;
                 };
+
+                std::string preview;
+                for (const auto& dev : devices)
+                {
+                    if (isSelectedDevice(dev))
+                    {
+                        preview = dev.name;
+                        break;
+                    }
+                }
+                if (preview.empty())
+                {
+                    if (!configuredNameValue.empty())
+                        preview = configuredNameValue + " (not connected)";
+                    else if (!configuredGuid.empty())
+                        preview = "Saved DirectInput device (not connected)";
+                    else
+                        preview = first_device_name(ffbOnly);
+                }
 
                 if (ImGui::BeginCombo(label, preview.c_str()))
                 {
@@ -1142,7 +1159,7 @@ namespace
             ImGui::TextDisabled("gameplay FFB follows the exact selected DirectInput GUID.");
             ImGui::TextWrapped(
                 "Single-owner wheel FFB: DirectInput COM only. field_264/268 are lateral load only; body slip releases damping, while front slip drives Physics SAT and tire scrub. Centering Spring remains a low-speed stabilizer.");
-            ImGui::TextDisabled("Settings > WheelFFB is hidden; changes on this page apply live. SDL gamepad rumble is suppressed while wheel FFB is enabled.");
+            ImGui::TextDisabled("Settings > WheelFFB is hidden; changes on this page apply live. Gamepad rumble is suppressed only while DirectInput FFB owns an output device.");
 
             ImGui::SliderFloat("Overall Strength", Settings::WheelFFBGlobalStrength.ptr(), 0.0f, 1.5f, "%.2f");
             if (Settings::WheelFFBGlobalStrength.get() > 1.0f)
