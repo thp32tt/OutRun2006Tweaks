@@ -3,12 +3,14 @@
 // collide with std::min/std::max/std::clamp in the DirectInput FFB engine.
 #define NOMINMAX
 
-// The production FFB implementation is compiled through this shim. Rename its
-// exported update entry point locally so the shim can put a very small R3
-// compatibility layer around one physics tick without duplicating the engine.
+// Compile the core through two narrow compatibility aliases. The surface alias
+// lets this shim provide a temporary roughness floor only while a snow curb is
+// latched; the original game surface LUT remains authoritative everywhere else.
+#define sub_1149C0 WheelFFB_SurfaceRoughnessForCore
 #define WheelFFB_UpdateAfterPhysics WheelFFB_UpdateAfterPhysics_Core
 #include "hooks_wheel_ffb.cpp"
 #undef WheelFFB_UpdateAfterPhysics
+#undef sub_1149C0
 
 #include "input_manager.hpp"
 #include "hooks_wheel_input_compat_v2.hpp"
@@ -21,6 +23,27 @@
 
 #include <imgui.h>
 #include <cstring>
+
+// The core include above declared the macro-renamed surface function. Define it
+// here as a transparent pass-through with one optional, one-tick compatibility
+// floor. This avoids mutating EVWORK_CAR or weakening the core's normal asphalt
+// threshold just to retain a snow curb whose material scalar is below snow.
+extern double __cdecl sub_1149C0(
+    unsigned int surfaceMask, int loadColiType, DWORD* waterFlag);
+namespace
+{
+    bool coreSurfaceRoughnessFloorActive = false;
+    float coreSurfaceRoughnessFloor = 0.0f;
+}
+
+double __cdecl WheelFFB_SurfaceRoughnessForCore(
+    unsigned int surfaceMask, int loadColiType, DWORD* waterFlag)
+{
+    const double original = sub_1149C0(surfaceMask, loadColiType, waterFlag);
+    if (!coreSurfaceRoughnessFloorActive || !std::isfinite(original))
+        return original;
+    return std::max(original, static_cast<double>(coreSurfaceRoughnessFloor));
+}
 
 // The legacy vibration path lives in hooks_forcefeedback.cpp, but this wheel
 // build owns the modern input/FFB integration. Keep its controller routing safe
@@ -111,6 +134,7 @@ namespace
     // mixed test disappears. Retain the material identity until the car returns
     // to the snow baseline instead of lowering the global roughness threshold.
     constexpr float SnowSurfaceBaseline = 0.50f;
+    constexpr float SnowLatchedCoreRoughnessFloor = 0.85f;
     constexpr DWORD SnowCurbHoldMs = 450;
     bool snowCurbLatched = false;
     float snowCurbMaterial = 0.0f;
@@ -214,6 +238,7 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
         static_cast<float>(Settings::WheelFFBDamperStrength);
 
     bool restoreTactileOverrides = false;
+    bool applyCoreSurfaceFloor = false;
 
     if (r3Compatibility && car)
     {
@@ -238,16 +263,18 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
             const float speedNorm = std::clamp(speedRaw / 2.0f, 0.0f, 1.0f);
             const float roadSpeedGate =
                 std::clamp((speedNorm - 0.05f) / 0.20f, 0.0f, 1.0f);
-            const float textureRoughness = std::clamp(
-                std::max(surface.maximum, snowCurbHeld ? snowCurbMaterial : 0.0f) - 0.30f,
-                0.0f, 0.55f) / 0.55f;
+
+            // A latched snow curb is already a positively identified surface
+            // transition. Treat it as full texture in the compatibility envelope
+            // even when its LUT scalar is <=0.30; the core receives the matching
+            // temporary roughness floor immediately before its update below.
+            const float textureRoughness = snowCurbHeld
+                ? 1.0f
+                : std::clamp((surface.maximum - 0.30f) / 0.55f, 0.0f, 1.0f);
             const float outputStrength = std::clamp(
                 static_cast<float>(Settings::WheelFFBGlobalStrength), 0.0f, 1.5f);
             const float coreStageScale = snowStage ? 0.04f : 1.0f;
 
-            // Half-on-curb mixed contact is already clearly perceptible on the
-            // user's R3. Fully crossing onto the identified material must not
-            // become weaker merely because all four samples now agree.
             const float desiredRoadAmp = strongTactile ? 0.30f : 0.22f;
             const float envelope =
                 textureRoughness * roadSpeedGate * outputStrength * coreStageScale;
@@ -264,6 +291,10 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
                     0.0f, 120.0f);
             }
 
+            // Only an already-identified snow curb gets the core surface floor.
+            // Normal snow and ordinary asphalt still use the game's exact LUT.
+            applyCoreSurfaceFloor = snowCurbHeld;
+
             // Keep exactly the same SAT/damper relief when the car completes the
             // transition onto a fully rough or latched snow curb/shoulder.
             const float steeringScale = strongTactile ? 0.72f : 0.80f;
@@ -279,17 +310,22 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
             {
                 lastRoadCompatibilityLogTick = now;
                 spdlog::info(
-                    "WheelFFB ROAD: min={:.2f} max={:.2f} spread={:.2f} mixed={} fullRough={} snow={} snowLatch={} latchMaterial={:.2f} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
+                    "WheelFFB ROAD: min={:.2f} max={:.2f} spread={:.2f} mixed={} fullRough={} snow={} snowLatch={} latchMaterial={:.2f} coreFloor={} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
                     surface.minimum, surface.maximum, surface.spread,
                     mixedSurface, fullyRough, snowStage, snowCurbHeld,
-                    snowCurbMaterial, desiredRoadAmp,
+                    snowCurbMaterial, applyCoreSurfaceFloor, desiredRoadAmp,
                     static_cast<float>(Settings::WheelFFBRoadTexture),
                     steeringScale, damperScale);
             }
         }
     }
 
+    coreSurfaceRoughnessFloorActive = applyCoreSurfaceFloor;
+    coreSurfaceRoughnessFloor = applyCoreSurfaceFloor
+        ? SnowLatchedCoreRoughnessFloor : 0.0f;
     WheelFFB_UpdateAfterPhysics_Core(car);
+    coreSurfaceRoughnessFloorActive = false;
+    coreSurfaceRoughnessFloor = 0.0f;
 
     if (restoreTactileOverrides)
     {
