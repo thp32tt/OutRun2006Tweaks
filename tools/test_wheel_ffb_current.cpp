@@ -63,6 +63,18 @@ int main() {
  WheelVehicleDynamics low; EVWORK_CAR lowCar; low.reset(); for(int i=0;i<80;++i)step(low,lowCar,0,0,0,.15f); step(low,lowCar,.01f,0,.2f,.15f);
  WheelVehicleDynamics high; EVWORK_CAR highCar; high.reset(); for(int i=0;i<80;++i)step(high,highCar,0,0,0,.90f); step(high,highCar,.01f,0,.2f,.90f);
  require(high.frontSlipBlend()>low.frontSlipBlend(),"front-slip transient speeds up with vehicle speed");
+
+ // v0.2: a rapid steering reversal must change the Physics SAT tyre proxy on
+ // the first valid tick instead of carrying stale opposite torque for several
+ // frames. The steering-rate predictor should point in the new direction too.
+ WheelVehicleDynamics reversal; EVWORK_CAR reversalCar; reversal.reset();
+ for(int i=0;i<80;++i)step(reversal,reversalCar);
+ for(int i=0;i<8;++i)step(reversal,reversalCar,0,0,.50f,.55f);
+ require(reversal.frontSlip()>.08f,"front-slip positive corner established");
+ step(reversal,reversalCar,0,0,-.50f,.55f);
+ require(reversal.rawFrontSlip()<0&&reversal.frontSlip()<0,"front-slip reversal crosses in one tick");
+ require(reversal.steerRate()<0,"steering transient lead follows counter-steer direction");
+
  float beta=d.bodySlip();d.update(nullptr,0,.5,0);require(d.bodySlip()<beta&&!d.sampleValid(),"invalid decay");
  for(int i=0;i<4;++i)d.update(nullptr,0,.5,0);
  require(d.bodySlip()==0&&d.yawRate()==0&&d.frontSlip()==0&&d.activationBlend()==0,"five-invalid clear");
