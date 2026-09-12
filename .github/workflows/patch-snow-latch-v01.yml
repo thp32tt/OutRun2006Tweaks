@@ -1,0 +1,32 @@
+name: Patch Snow Latch v0.1
+
+on:
+  push:
+    branches: [ wheel-ffb-v0.2-dev ]
+    paths:
+      - '.github/workflows/patch-snow-latch-v01.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: wheel-ffb-v0.2-dev
+          fetch-depth: 0
+      - name: Apply snow latch route-fork fix
+        run: python tools/_patch_snow_latch_v01.py
+      - name: Validate patch text
+        run: git diff --check
+      - name: Commit fix
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/hooks_wheel_ffb_build.cpp tools/verify_wheel_ffb_current.py RELEASE_NOTES_v0.1.md
+          git commit -m 'fix: stop snow curb latch leaking into route forks [skip ci]'
+          git push origin HEAD:wheel-ffb-v0.2-dev
