@@ -1,0 +1,41 @@
+name: Fix Engine Verifier Defaults
+
+on:
+  push:
+    branches: [ wheel-ffb-v0.2-dev ]
+    paths:
+      - '.github/workflows/fix-engine-verifier-defaults.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: wheel-ffb-v0.2-dev
+          fetch-depth: 0
+      - name: Remove obsolete engine-on verifier guards
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('tools/verify_wheel_ffb_current.py')
+          s = p.read_text(encoding='utf-8')
+          old1 = "req(ini, 'EngineVibration = true', 'shipped config enables engine vibration')\n"
+          old2 = "req(ini, 'EngineIdle = 0.06', 'shipped engine haptic strength')\n"
+          if s.count(old1) != 1 or s.count(old2) != 1:
+              raise SystemExit('obsolete engine verifier guards not found exactly once')
+          s = s.replace(old1, '').replace(old2, '')
+          p.write_text(s, encoding='utf-8', newline='\n')
+          PY
+      - name: Commit verifier fix
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/verify_wheel_ffb_current.py
+          git commit -m 'verify: remove obsolete engine-on defaults [skip ci]'
+          git push origin HEAD:wheel-ffb-v0.2-dev
