@@ -7,21 +7,20 @@
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 
-// Some MOZA R3 driver/firmware combinations expose the wheel to DirectInput
-// without the vendor string "MOZA" in the product/instance name. The game can
-// still use that device perfectly, but our experimental helpers previously
-// filtered it out by name before they ever tried CreateDevice/FFB.
+// Legacy builds shipped an FFB device-name default of "MOZA" and later migrated
+// that exact default to "R3 Racing Wheel". That was useful while R3 was the only
+// tested wheel, but it can prevent every other DirectInput FFB wheel from being
+// selected on a clean install.
 //
-// Keep explicit user device-name overrides intact. Only the shipped R3 default
-// "MOZA" is relaxed to an empty filter, which means:
-//   * menu helpers: first attached DirectInput controller
-//   * FFB engine:   first attached non-virtual FORCEFEEDBACK controller
-// Both helpers log the real selected Windows device name once opened, so a
-// later build can pin a more specific name if needed.
+// Device-specific menu compatibility remains separate. For FFB output, an
+// unpinned legacy default is now relaxed to an empty name filter so the engine
+// chooses the first non-virtual FORCEFEEDBACK device. Once F11 saves an exact
+// DeviceGuid, explicit routing is preserved and never redirected here.
 namespace Settings
 {
     extern Setting<std::string> WheelMenuR3DeviceName;
     extern Setting<std::string> WheelFFBDeviceName;
+    extern Setting<std::string> WheelFFBDeviceGuid;
 }
 
 namespace
@@ -50,22 +49,26 @@ namespace
         {
             bool changed = false;
 
+            // Keep the menu helper's legacy R3 matching behavior. This affects
+            // only front-end input compatibility, never FFB force generation.
             if (r3_autoselect_lower(Settings::WheelMenuR3DeviceName.get()) == "moza")
             {
-                // Keep the name: strict-first/fallback selection happens in the reader.
-                changed = true;
+                // Strict-first/fallback selection remains in the menu reader.
             }
 
-            if (r3_autoselect_lower(Settings::WheelFFBDeviceName.get()) == "moza")
+            const std::string ffbName =
+                r3_autoselect_lower(Settings::WheelFFBDeviceName.get());
+            if (Settings::WheelFFBDeviceGuid.get().empty() &&
+                (ffbName == "moza" || ffbName == "r3 racing wheel"))
             {
-                // Keep the name: strict-first/fallback selection happens in the FFB engine.
+                Settings::WheelFFBDeviceName = "";
                 changed = true;
             }
 
             if (changed)
             {
                 spdlog::info(
-                    "WheelR3DeviceAutoSelect: MOZA default uses strict-name-first selection with an FFB-only fallback");
+                    "WheelFFB device auto-select: cleared legacy MOZA/R3-only default; using first non-virtual FFB device until an exact GUID is saved");
             }
 
             return true;
