@@ -1,0 +1,113 @@
+name: Apply v0.1 Final Engine Haptic Tune
+
+on:
+  push:
+    branches: [ wheel-ffb-v0.2-dev ]
+    paths:
+      - '.github/workflows/apply-v01-release-tune.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: wheel-ffb-v0.2-dev
+          fetch-depth: 0
+      - name: Apply final engine haptic tune
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def read(p): return Path(p).read_text(encoding='utf-8')
+          def write(p,s): Path(p).write_text(s, encoding='utf-8', newline='\n')
+          def one(p, old, new):
+              s=read(p); c=s.count(old)
+              if c != 1: raise SystemExit(f'{p}: anchor count {c} for {old[:100]!r}')
+              write(p, s.replace(old,new,1))
+          def many(p, old, new, n):
+              s=read(p); c=s.count(old)
+              if c != n: raise SystemExit(f'{p}: anchor count {c}, expected {n}, for {old[:100]!r}')
+              write(p, s.replace(old,new))
+
+          math='src/wheel_ffb_math.hpp'
+          one(math,
+'''        out.frequencyHz = 9.0f + 11.0f * out.rpmNorm;\n''',
+'''        // Keep the texture above the heavy low-frequency pulse region while\n        // remaining below the 60 Hz FFB loop Nyquist limit.\n        out.frequencyHz = 13.0f + 11.0f * out.rpmNorm;\n''')
+
+          core='src/hooks_wheel_ffb.cpp'
+          one(core,
+'''    Setting<bool> WheelFFBEngineVibration{\n        "WheelFFB", "EngineVibration", true,\n        "Add a low-amplitude engine-speed haptic through the universal ConstantForce output path."\n    };\n''',
+'''    Setting<bool> WheelFFBEngineVibration{\n        "WheelFFB", "EngineVibration", false,\n        "Optional low-amplitude engine-speed haptic through the universal ConstantForce output path."\n    };\n''')
+          one(core,
+'''    Setting<float> WheelFFBEngineIdle{\n        "WheelFFB", "EngineIdle", 0.06f,\n        "Engine vibration strength (legacy EngineIdle key retained for compatibility).",\n        Range<float>{ 0.0f, 0.5f }\n    };\n''',
+'''    Setting<float> WheelFFBEngineIdle{\n        "WheelFFB", "EngineIdle", 0.20f,\n        "Engine vibration strength (legacy EngineIdle key retained for compatibility).",\n        Range<float>{ 0.0f, 1.0f }\n    };\n''')
+
+          old_block='''            float engineAmp = 0.0f;\n            float engineFreq = 0.0f;\n            if (Settings::WheelFFBEngineVibration)\n            {\n                const auto engineTarget = WheelFFBMath::estimate_engine_haptics(\n                    speedNorm, curGear, throttleNorm);\n                const float rpmBlend = engineTarget.rpmNorm > smoothedEngineRpm_\n                    ? 0.35f : 0.18f;\n                smoothedEngineRpm_ +=\n                    (engineTarget.rpmNorm - smoothedEngineRpm_) * rpmBlend;\n                const float amplitudeScale = std::clamp(\n                    0.45f + 0.40f * smoothedEngineRpm_ + 0.15f * throttleNorm,\n                    0.0f, 1.0f);\n                engineFreq = 9.0f + 11.0f * smoothedEngineRpm_;\n                const float configuredEngineStrength =\n                    static_cast<float>(Settings::WheelFFBEngineIdle);\n                const float engineStrength = std::isfinite(configuredEngineStrength)\n                    ? std::clamp(configuredEngineStrength, 0.0f, 0.5f)\n                    : 0.0f;\n                engineAmp = engineStrength * amplitudeScale * outputStrength;\n            }\n            else\n            {\n                smoothedEngineRpm_ = 0.0f;\n                enginePhase_ = 0.0f;\n            }\n'''
+          new_block='''            float engineAmp = 0.0f;\n            float engineFreq = 0.0f;\n            if (Settings::WheelFFBEngineVibration)\n            {\n                const auto engineTarget = WheelFFBMath::estimate_engine_haptics(\n                    speedNorm, curGear, throttleNorm);\n                const float rpmBlend = engineTarget.rpmNorm > smoothedEngineRpm_\n                    ? 0.24f : 0.12f;\n                smoothedEngineRpm_ +=\n                    (engineTarget.rpmNorm - smoothedEngineRpm_) * rpmBlend;\n\n                const float configuredEngineStrength =\n                    static_cast<float>(Settings::WheelFFBEngineIdle);\n                const float engineStrength = std::isfinite(configuredEngineStrength)\n                    ? std::clamp(configuredEngineStrength, 0.0f, 1.0f)\n                    : 0.0f;\n                const float amplitudeScale = std::clamp(\n                    0.38f + 0.32f * smoothedEngineRpm_ + 0.10f * throttleNorm,\n                    0.0f, 1.0f);\n                // Strength is a user-friendly 0..1 control, not direct wheel torque.\n                // 0.20 therefore remains a subtle texture instead of a 20% torque pulse.\n                const float targetEngineAmp =\n                    engineStrength * 0.22f * amplitudeScale * outputStrength;\n                const float ampBlend = targetEngineAmp > smoothedEngineAmp_ ? 0.16f : 0.08f;\n                smoothedEngineAmp_ +=\n                    (targetEngineAmp - smoothedEngineAmp_) * ampBlend;\n                engineAmp = smoothedEngineAmp_;\n\n                const float targetEngineFreq = 13.0f + 11.0f * smoothedEngineRpm_;\n                if (smoothedEngineFreq_ <= 0.0f)\n                    smoothedEngineFreq_ = targetEngineFreq;\n                else\n                    smoothedEngineFreq_ +=\n                        (targetEngineFreq - smoothedEngineFreq_) * 0.14f;\n                engineFreq = smoothedEngineFreq_;\n            }\n            else\n            {\n                smoothedEngineRpm_ = 0.0f;\n                smoothedEngineAmp_ = 0.0f;\n                smoothedEngineFreq_ = 0.0f;\n                enginePhase_ = 0.0f;\n            }\n'''
+          one(core, old_block, new_block)
+
+          one(core,
+'''            const LONG baseSteeringLevel = std::clamp(\n                structuralLevel + eventLevel,\n                -static_cast<LONG>(DI_FFNOMINALMAX),\n                static_cast<LONG>(DI_FFNOMINALMAX));\n''',
+'''            LONG baseSteeringLevel = std::clamp(\n                structuralLevel + eventLevel,\n                -static_cast<LONG>(DI_FFNOMINALMAX),\n                static_cast<LONG>(DI_FFNOMINALMAX));\n            if (Settings::WheelFFBEngineVibration && engineAmp > 0.0001f && eventLevel == 0)\n            {\n                // Reserve at most 2.5% of the actuator range during ordinary\n                // driving so the optional engine texture does not abruptly vanish\n                // whenever SAT briefly reaches the cap. Impacts keep full priority.\n                const LONG requestedReserve = static_cast<LONG>(\n                    engineAmp * static_cast<float>(DI_FFNOMINALMAX));\n                const LONG engineReserve = std::clamp(\n                    std::abs(requestedReserve), 0L, 250L);\n                const LONG baseCap = static_cast<LONG>(DI_FFNOMINALMAX) - engineReserve;\n                baseSteeringLevel = std::clamp(\n                    structuralLevel + eventLevel, -baseCap, baseCap);\n            }\n''')
+
+          one(core,
+'''            enginePhase_ = 0.0f;\n            smoothedEngineRpm_ = 0.0f;\n            splashTimer_ = 0;\n''',
+'''            enginePhase_ = 0.0f;\n            smoothedEngineRpm_ = 0.0f;\n            smoothedEngineAmp_ = 0.0f;\n            smoothedEngineFreq_ = 0.0f;\n            splashTimer_ = 0;\n''')
+          one(core,
+'''        float enginePhase_ = 0.0f;\n        float smoothedEngineRpm_ = 0.0f;\n        float splashAmp_ = 0.0f;\n''',
+'''        float enginePhase_ = 0.0f;\n        float smoothedEngineRpm_ = 0.0f;\n        float smoothedEngineAmp_ = 0.0f;\n        float smoothedEngineFreq_ = 0.0f;\n        float splashAmp_ = 0.0f;\n''')
+
+          ui='src/overlay/wheel_setup_ui.cpp'
+          one(ui, '            bool engineVibration = true;\n', '            bool engineVibration = false;\n')
+          one(ui, '            float engineIdle = 0.06f;\n', '            float engineIdle = 0.20f;\n')
+          one(ui,
+'''            track_ffb_change(ImGui::SliderFloat("Engine Vibration Strength", Settings::WheelFFBEngineIdle.ptr(), 0.0f, 0.30f, "%.2f"));\n''',
+'''            track_ffb_change(ImGui::SliderFloat("Engine Vibration Strength", Settings::WheelFFBEngineIdle.ptr(), 0.0f, 1.0f, "%.2f"));\n''')
+          one(ui,
+'''                ImGui::SetTooltip("Estimated engine RPM from vehicle speed, current gear and throttle. Uses the same ConstantForce tactile path on every wheel.");\n''',
+'''                ImGui::SetTooltip("Optional estimated-RPM texture. Default OFF. Strength is normalized and internally limited so 0.20 remains subtle.");\n''')
+
+          build='src/hooks_wheel_ffb_build.cpp'
+          many(build,
+'''        Settings::WheelFFBEngineVibration = true;\n        Settings::WheelFFBEngineIdle = 0.06f;\n''',
+'''        Settings::WheelFFBEngineVibration = false;\n        Settings::WheelFFBEngineIdle = 0.20f;\n''', 2)
+
+          ini='OutRun2006Tweaks.ini'
+          one(ini,
+'''EngineVibration = true\nEngineIdle = 0.06\n''',
+'''EngineVibration = false\nEngineIdle = 0.20\n''')
+          one(ini,
+'''; Steering-wheel engine haptics. F11 > Force Feedback exposes the live toggle\n; and strength control. RPM is currently estimated from speed, gear and throttle.\n''',
+'''; Optional steering-wheel engine haptics. Default OFF because continuous engine\n; texture is preference-dependent. F11 > Force Feedback exposes the live toggle\n; and normalized strength control. RPM is estimated from speed, gear and throttle.\n''')
+
+          tests='tools/test_wheel_ffb_current.cpp'
+          one(tests,
+''' require(engineIdle.frequencyHz>=9.0f&&engineIdle.frequencyHz<12.0f,"engine idle haptic frequency");\n''',
+''' require(engineIdle.frequencyHz>=13.0f&&engineIdle.frequencyHz<16.0f,"engine idle haptic frequency");\n''')
+          one(tests,
+''' require(engineGear1.frequencyHz<=20.0001f&&engineGear1.amplitudeScale<=1.0001f,"engine haptic bounded");\n''',
+''' require(engineGear1.frequencyHz<=24.0001f&&engineGear1.amplitudeScale<=1.0001f,"engine haptic bounded");\n''')
+          one(tests,
+''' require(estimate_engine_haptics(std::numeric_limits<float>::quiet_NaN(),99,std::numeric_limits<float>::quiet_NaN()).frequencyHz>=9.0f,"engine haptic rejects non-finite inputs");\n''',
+''' require(estimate_engine_haptics(std::numeric_limits<float>::quiet_NaN(),99,std::numeric_limits<float>::quiet_NaN()).frequencyHz>=13.0f,"engine haptic rejects non-finite inputs");\n''')
+
+          verify='tools/verify_wheel_ffb_current.py'
+          s=read(verify)
+          marker='# v01-final-engine-haptic-guards'
+          if marker not in s:
+              s += '''\n\n# v01-final-engine-haptic-guards\nreq(ffb, '"WheelFFB", "EngineVibration", false', 'engine vibration is opt-in by default')\nreq(ffb, '"WheelFFB", "EngineIdle", 0.20f', 'engine vibration default strength is 0.20')\nreq(ffb, 'engineStrength * 0.22f * amplitudeScale * outputStrength', 'engine strength is internally kept subtle')\nreq(ffb, 'smoothedEngineAmp_', 'engine vibration amplitude is smoothed')\nreq(ffb, 'smoothedEngineFreq_', 'engine vibration frequency is smoothed')\nreq(ffb, 'engineReserve = std::clamp(', 'engine haptic gets a small continuity reserve')\nreq(wheel_ui, 'Engine Vibration Strength', 'engine vibration strength remains user-adjustable')\nreq(wheel_ui, '0.0f, 1.0f, "%.2f"', 'engine vibration strength uses normalized range')\nreq(ini, 'EngineVibration = false', 'shipped engine vibration stays disabled')\nreq(ini, 'EngineIdle = 0.20', 'shipped optional engine strength is 0.20')\n'''
+              write(verify,s)
+          PY
+      - name: Commit tuned sources
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/hooks_wheel_ffb.cpp src/hooks_wheel_ffb_build.cpp src/wheel_ffb_math.hpp src/overlay/wheel_setup_ui.cpp OutRun2006Tweaks.ini tools/test_wheel_ffb_current.cpp tools/verify_wheel_ffb_current.py
+          git commit -m 'ffb v0.1: make engine vibration optional and lighter [skip ci]'
+          git push origin HEAD:wheel-ffb-v0.2-dev
