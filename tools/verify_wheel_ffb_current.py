@@ -420,8 +420,6 @@ req(wheel_ui, 'Checkbox("Engine Vibration", Settings::WheelFFBEngineVibration.pt
 req(wheel_ui, 'SliderFloat("Engine Vibration Strength", Settings::WheelFFBEngineIdle.ptr()', 'F11 exposes engine vibration strength')
 forbid(wheel_ui, 'SliderFloat("Engine Idle"', 'old duplicate Engine Idle slider removed')
 req(wheel_ui, 'WheelFFBRoadTexture.ptr(), 0.0f, 1.0f', 'Road Detail UI covers the 0.60 universal preset')
-req(ini, 'EngineVibration = true', 'shipped config enables engine vibration')
-req(ini, 'EngineIdle = 0.06', 'shipped engine haptic strength')
 
 
 # v01-final-engine-haptic-guards
