@@ -156,16 +156,16 @@ namespace Settings
     };
 
     Setting<bool> WheelFFBEngineVibration{
-        "WheelFFB", "EngineVibration", true,
-        "Add a low-amplitude engine-speed haptic through the universal ConstantForce output path."
+        "WheelFFB", "EngineVibration", false,
+        "Optional low-amplitude engine-speed haptic through the universal ConstantForce output path."
     };
 
     // Keep the legacy EngineIdle key for INI/profile compatibility. It now owns
     // the complete engine-vibration strength rather than only launch/idle rumble.
     Setting<float> WheelFFBEngineIdle{
-        "WheelFFB", "EngineIdle", 0.06f,
+        "WheelFFB", "EngineIdle", 0.20f,
         "Engine vibration strength (legacy EngineIdle key retained for compatibility).",
-        Range<float>{ 0.0f, 0.5f }
+        Range<float>{ 0.0f, 1.0f }
     };
 
     Setting<float> WheelFFBSlewRate{
@@ -503,23 +503,40 @@ namespace
                 const auto engineTarget = WheelFFBMath::estimate_engine_haptics(
                     speedNorm, curGear, throttleNorm);
                 const float rpmBlend = engineTarget.rpmNorm > smoothedEngineRpm_
-                    ? 0.35f : 0.18f;
+                    ? 0.24f : 0.12f;
                 smoothedEngineRpm_ +=
                     (engineTarget.rpmNorm - smoothedEngineRpm_) * rpmBlend;
-                const float amplitudeScale = std::clamp(
-                    0.45f + 0.40f * smoothedEngineRpm_ + 0.15f * throttleNorm,
-                    0.0f, 1.0f);
-                engineFreq = 9.0f + 11.0f * smoothedEngineRpm_;
+
                 const float configuredEngineStrength =
                     static_cast<float>(Settings::WheelFFBEngineIdle);
                 const float engineStrength = std::isfinite(configuredEngineStrength)
-                    ? std::clamp(configuredEngineStrength, 0.0f, 0.5f)
+                    ? std::clamp(configuredEngineStrength, 0.0f, 1.0f)
                     : 0.0f;
-                engineAmp = engineStrength * amplitudeScale * outputStrength;
+                const float amplitudeScale = std::clamp(
+                    0.38f + 0.32f * smoothedEngineRpm_ + 0.10f * throttleNorm,
+                    0.0f, 1.0f);
+                // Strength is a user-friendly 0..1 control, not direct wheel torque.
+                // 0.20 therefore remains subtle instead of becoming a 20% torque pulse.
+                const float targetEngineAmp =
+                    engineStrength * 0.22f * amplitudeScale * outputStrength;
+                const float ampBlend = targetEngineAmp > smoothedEngineAmp_ ? 0.16f : 0.08f;
+                smoothedEngineAmp_ +=
+                    (targetEngineAmp - smoothedEngineAmp_) * ampBlend;
+                engineAmp = smoothedEngineAmp_;
+
+                const float targetEngineFreq = 13.0f + 11.0f * smoothedEngineRpm_;
+                if (smoothedEngineFreq_ <= 0.0f)
+                    smoothedEngineFreq_ = targetEngineFreq;
+                else
+                    smoothedEngineFreq_ +=
+                        (targetEngineFreq - smoothedEngineFreq_) * 0.14f;
+                engineFreq = smoothedEngineFreq_;
             }
             else
             {
                 smoothedEngineRpm_ = 0.0f;
+                smoothedEngineAmp_ = 0.0f;
+                smoothedEngineFreq_ = 0.0f;
                 enginePhase_ = 0.0f;
             }
 
@@ -1020,10 +1037,23 @@ namespace
                     enginePhase_, engineAmp * effectRampScale, engineFreq);
             }
 
-            const LONG baseSteeringLevel = std::clamp(
+            LONG baseSteeringLevel = std::clamp(
                 structuralLevel + eventLevel,
                 -static_cast<LONG>(DI_FFNOMINALMAX),
                 static_cast<LONG>(DI_FFNOMINALMAX));
+            if (Settings::WheelFFBEngineVibration && engineAmp > 0.0001f && eventLevel == 0)
+            {
+                // Reserve at most 2.5% during ordinary driving so the optional
+                // engine texture does not abruptly vanish at brief SAT peaks.
+                // Collision/gear events keep full priority.
+                const LONG requestedReserve = static_cast<LONG>(
+                    engineAmp * static_cast<float>(DI_FFNOMINALMAX));
+                const LONG engineReserve = std::clamp(
+                    std::abs(requestedReserve), 0L, 250L);
+                const LONG baseCap = static_cast<LONG>(DI_FFNOMINALMAX) - engineReserve;
+                baseSteeringLevel = std::clamp(
+                    structuralLevel + eventLevel, -baseCap, baseCap);
+            }
             const LONG vibrationRequested = static_cast<LONG>(
                 fallbackVibration * static_cast<float>(DI_FFNOMINALMAX));
             const LONG vibrationHeadroom =
@@ -2903,6 +2933,8 @@ namespace
             slipPhase_ = 0.0f;
             enginePhase_ = 0.0f;
             smoothedEngineRpm_ = 0.0f;
+            smoothedEngineAmp_ = 0.0f;
+            smoothedEngineFreq_ = 0.0f;
             splashTimer_ = 0;
             splashAmp_ = 0.0f;
             manualTestFrames_ = 0;
@@ -3296,6 +3328,8 @@ namespace
         float slipPhase_ = 0.0f;
         float enginePhase_ = 0.0f;
         float smoothedEngineRpm_ = 0.0f;
+        float smoothedEngineAmp_ = 0.0f;
+        float smoothedEngineFreq_ = 0.0f;
         float splashAmp_ = 0.0f;
 
         float speedHistory_[SpeedHistoryCount]{};

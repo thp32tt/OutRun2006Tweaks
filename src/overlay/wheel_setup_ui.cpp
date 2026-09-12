@@ -811,7 +811,7 @@ namespace
             bool responseCorrection = false;
             bool debugLog = true;
             bool telemetry = false;
-            bool engineVibration = true;
+            bool engineVibration = false;
             float global = 0.70f;
             float spring = 0.65f;
             float springSaturation = 0.95f;
@@ -823,7 +823,7 @@ namespace
             float lateralDeadzone = 1.5f;
             float weightTransfer = 0.15f;
             float gearShift = 0.18f;
-            float engineIdle = 0.06f;
+            float engineIdle = 0.20f;
             float slew = 0.06f;
             float reversalRelease = 0.12f;
             float road = 0.30f;
@@ -1665,9 +1665,9 @@ namespace
             track_ffb_change(ImGui::SliderFloat("Collision", Settings::WheelFFBWallImpact.ptr(), 0.0f, 1.0f, "%.2f"));
             track_ffb_change(ImGui::Checkbox("Engine Vibration", Settings::WheelFFBEngineVibration.ptr()));
             if (!Settings::WheelFFBEngineVibration) ImGui::BeginDisabled();
-            track_ffb_change(ImGui::SliderFloat("Engine Vibration Strength", Settings::WheelFFBEngineIdle.ptr(), 0.0f, 0.30f, "%.2f"));
+            track_ffb_change(ImGui::SliderFloat("Engine Vibration Strength", Settings::WheelFFBEngineIdle.ptr(), 0.0f, 1.0f, "%.2f"));
             if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Estimated engine RPM from vehicle speed, current gear and throttle. Uses the same ConstantForce tactile path on every wheel.");
+                ImGui::SetTooltip("Optional estimated-RPM texture. Default OFF. Strength is normalized and internally limited so 0.20 remains subtle.");
             if (!Settings::WheelFFBEngineVibration) ImGui::EndDisabled();
             track_ffb_change(ImGui::Checkbox("Hardware road/slip sine effects", Settings::WheelFFBUsePeriodicEffects.ptr()));
 

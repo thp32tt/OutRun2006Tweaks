@@ -418,3 +418,15 @@ forbid(wheel_ui, 'SliderFloat("Engine Idle"', 'old duplicate Engine Idle slider 
 req(wheel_ui, 'WheelFFBRoadTexture.ptr(), 0.0f, 1.0f', 'Road Detail UI covers the 0.60 universal preset')
 req(ini, 'EngineVibration = true', 'shipped config enables engine vibration')
 req(ini, 'EngineIdle = 0.06', 'shipped engine haptic strength')
+
+
+# v01-final-engine-haptic-guards
+req(ffb, '"WheelFFB", "EngineVibration", false', 'engine vibration is opt-in by default')
+req(ffb, '"WheelFFB", "EngineIdle", 0.20f', 'engine vibration default strength is 0.20')
+req(ffb, 'engineStrength * 0.22f * amplitudeScale * outputStrength', 'engine strength is internally kept subtle')
+req(ffb, 'smoothedEngineAmp_', 'engine vibration amplitude is smoothed')
+req(ffb, 'smoothedEngineFreq_', 'engine vibration frequency is smoothed')
+req(ffb, 'engineReserve = std::clamp(', 'engine haptic gets a small continuity reserve')
+req(wheel_ui, 'Engine Vibration Strength', 'engine vibration strength remains user-adjustable')
+req(ini, 'EngineVibration = false', 'shipped engine vibration stays disabled')
+req(ini, 'EngineIdle = 0.20', 'shipped optional engine strength is 0.20')

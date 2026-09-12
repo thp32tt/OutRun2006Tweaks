@@ -276,8 +276,8 @@ namespace
         Settings::WheelFFBTireSlip = 0.04f;
         Settings::WheelFFBWallImpact = 0.38f;
         Settings::WheelFFBGearShift = 0.60f;
-        Settings::WheelFFBEngineVibration = true;
-        Settings::WheelFFBEngineIdle = 0.06f;
+        Settings::WheelFFBEngineVibration = false;
+        Settings::WheelFFBEngineIdle = 0.20f;
         Settings::WheelFFBUseHardwareSpring = true;
         Settings::WheelFFBUseHardwareDamper = true;
         Settings::WheelFFBUsePeriodicEffects = false;
@@ -306,8 +306,8 @@ namespace
         Settings::WheelFFBTireSlip = 0.04f;
         Settings::WheelFFBWallImpact = 0.38f;
         Settings::WheelFFBGearShift = 0.60f;
-        Settings::WheelFFBEngineVibration = true;
-        Settings::WheelFFBEngineIdle = 0.06f;
+        Settings::WheelFFBEngineVibration = false;
+        Settings::WheelFFBEngineIdle = 0.20f;
         Settings::WheelFFBUseHardwareSpring = true;
         Settings::WheelFFBUseHardwareDamper = true;
         Settings::WheelFFBUsePeriodicEffects = false;

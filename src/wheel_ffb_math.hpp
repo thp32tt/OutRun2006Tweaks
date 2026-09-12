@@ -50,7 +50,9 @@ namespace WheelFFBMath
         EngineHapticEstimate out{};
         out.rpmNorm = std::clamp(
             std::max({ coupledRpm, idleFloor, freeRev }), 0.08f, 1.0f);
-        out.frequencyHz = 9.0f + 11.0f * out.rpmNorm;
+        // Keep the texture above the heavy low-frequency pulse region while
+        // remaining below the 60 Hz FFB loop Nyquist limit.
+        out.frequencyHz = 13.0f + 11.0f * out.rpmNorm;
         out.amplitudeScale = std::clamp(
             0.45f + 0.40f * out.rpmNorm + 0.15f * throttleNorm,
             0.0f, 1.0f);
