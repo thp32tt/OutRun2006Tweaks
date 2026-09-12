@@ -42,7 +42,10 @@ namespace
 
         bool validate() override
         {
-            return Settings::WheelInputCompatibility && !Settings::UseNewInput;
+            // FFB output selection is independent of the gameplay input backend.
+            // The old UseNewInput/WheelInputCompatibility gate could leave a
+            // model-specific R3 default active for otherwise supported wheels.
+            return true;
         }
 
         bool apply() override
