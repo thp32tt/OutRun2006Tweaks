@@ -36,7 +36,7 @@ namespace Settings
     Setting<int> WheelFFBFeelRevision{
         "WheelFFB", "FeelRevision", 0,
         "Internal one-shot migration version for wheel FFB feel defaults.",
-        Range<int>{ 0, 3 }
+        Range<int>{ 0, 4 }
     };
 }
 
@@ -105,6 +105,76 @@ namespace
         return result;
     }
 
+    // v0.2 snow-curb state. On snow stages a curb can be rougher OR smoother
+    // than the ~0.50 snow baseline. Mixed contact tells us which material is the
+    // curb; once all four tyres cross onto that same material the old per-frame
+    // mixed test disappears. Retain the material identity until the car returns
+    // to the snow baseline instead of lowering the global roughness threshold.
+    constexpr float SnowSurfaceBaseline = 0.50f;
+    constexpr DWORD SnowCurbHoldMs = 450;
+    bool snowCurbLatched = false;
+    float snowCurbMaterial = 0.0f;
+    DWORD snowCurbHoldUntil = 0;
+
+    bool update_snow_curb_latch(
+        const RoadSurfaceProfile& surface,
+        bool snowStage,
+        bool mixedSurface,
+        DWORD now)
+    {
+        if (!snowStage || surface.validSamples < 2)
+        {
+            snowCurbLatched = false;
+            snowCurbHoldUntil = 0;
+            return false;
+        }
+
+        if (mixedSurface)
+        {
+            const float minDistance =
+                std::abs(surface.minimum - SnowSurfaceBaseline);
+            const float maxDistance =
+                std::abs(surface.maximum - SnowSurfaceBaseline);
+            const float candidate = minDistance >= maxDistance
+                ? surface.minimum
+                : surface.maximum;
+
+            // Do not latch ordinary snow noise. This is deliberately tied to the
+            // same 0.08 spread that already qualified as a real mixed surface.
+            if (std::max(minDistance, maxDistance) >= 0.08f)
+            {
+                snowCurbLatched = true;
+                snowCurbMaterial = candidate;
+                snowCurbHoldUntil = now + SnowCurbHoldMs;
+            }
+        }
+
+        if (!snowCurbLatched)
+            return false;
+
+        const float uniformValue =
+            (surface.minimum + surface.maximum) * 0.5f;
+        const bool nearlyUniform = surface.spread < 0.08f;
+        const bool sameCurbMaterial = nearlyUniform &&
+            std::abs(uniformValue - snowCurbMaterial) <= 0.12f;
+
+        if (sameCurbMaterial)
+        {
+            // Extend while all tyres remain on the identified curb/shoulder.
+            snowCurbHoldUntil = now + SnowCurbHoldMs;
+            return true;
+        }
+
+        // Signed subtraction remains correct across GetTickCount wrap.
+        if (snowCurbHoldUntil != 0 &&
+            static_cast<LONG>(now - snowCurbHoldUntil) < 0)
+            return true;
+
+        snowCurbLatched = false;
+        snowCurbHoldUntil = 0;
+        return false;
+    }
+
     DWORD lastRoadCompatibilityLogTick = 0;
 }
 
@@ -124,9 +194,8 @@ namespace
 // Looking only at max roughness therefore misses a curb whose contacted wheels
 // become *less* rough than the snow. The min/max spread across all four wheels
 // catches that mixed-surface case regardless of which material has the larger
-// scalar value. Once every sampled wheel is on a genuinely rough surface
-// (minimum >= 0.60), keep the same strong tactile profile instead of dropping
-// back to the weaker uniform-road profile.
+// scalar value. v0.2 also latches the material discovered during mixed contact,
+// so vibration stays alive after all four tyres finish crossing onto it.
 void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
 {
     const bool r3Compatibility = r3_road_texture_compatibility_needed();
@@ -154,8 +223,13 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
         const bool genuinelyRough = surface.maximum >= 0.60f;
         const bool fullyRough =
             surface.validSamples >= 2 && surface.minimum >= 0.60f;
-        const bool strongTactile = mixedSurface || fullyRough;
-        const bool tactileSurface = mixedSurface || genuinelyRough;
+        const DWORD now = GetTickCount();
+        const bool snowStage = is_snow_or_ice_stage_for_ffb();
+        const bool snowCurbHeld = update_snow_curb_latch(
+            surface, snowStage, mixedSurface, now);
+        const bool strongTactile = mixedSurface || fullyRough || snowCurbHeld;
+        const bool tactileSurface =
+            mixedSurface || genuinelyRough || snowCurbHeld;
 
         if (tactileSurface)
         {
@@ -164,15 +238,15 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
             const float speedNorm = std::clamp(speedRaw / 2.0f, 0.0f, 1.0f);
             const float roadSpeedGate =
                 std::clamp((speedNorm - 0.05f) / 0.20f, 0.0f, 1.0f);
-            const float textureRoughness =
-                std::clamp((surface.maximum - 0.30f) / 0.55f, 0.0f, 1.0f);
+            const float textureRoughness = std::clamp(
+                std::max(surface.maximum, snowCurbHeld ? snowCurbMaterial : 0.0f) - 0.30f,
+                0.0f, 0.55f) / 0.55f;
             const float outputStrength = std::clamp(
                 static_cast<float>(Settings::WheelFFBGlobalStrength), 0.0f, 1.5f);
-            const bool snowStage = is_snow_or_ice_stage_for_ffb();
             const float coreStageScale = snowStage ? 0.04f : 1.0f;
 
             // Half-on-curb mixed contact is already clearly perceptible on the
-            // user's R3. Fully crossing onto the same rough surface must not
+            // user's R3. Fully crossing onto the identified material must not
             // become weaker merely because all four samples now agree.
             const float desiredRoadAmp = strongTactile ? 0.30f : 0.22f;
             const float envelope =
@@ -191,9 +265,7 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
             }
 
             // Keep exactly the same SAT/damper relief when the car completes the
-            // transition onto a fully rough curb/shoulder. Previously mixed=false
-            // immediately weakened these values, which matched the reported
-            // vibration disappearing as the remaining tyres crossed the edge.
+            // transition onto a fully rough or latched snow curb/shoulder.
             const float steeringScale = strongTactile ? 0.72f : 0.80f;
             const float damperScale = strongTactile ? 0.55f : 0.70f;
             Settings::WheelFFBSteeringWeight =
@@ -202,15 +274,15 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
                 originalDamperStrength * damperScale;
             restoreTactileOverrides = true;
 
-            const DWORD now = GetTickCount();
             if (Settings::WheelFFBDebugLog &&
                 now - lastRoadCompatibilityLogTick >= 750)
             {
                 lastRoadCompatibilityLogTick = now;
                 spdlog::info(
-                    "WheelFFB ROAD: min={:.2f} max={:.2f} spread={:.2f} mixed={} fullRough={} snow={} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
+                    "WheelFFB ROAD: min={:.2f} max={:.2f} spread={:.2f} mixed={} fullRough={} snow={} snowLatch={} latchMaterial={:.2f} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
                     surface.minimum, surface.maximum, surface.spread,
-                    mixedSurface, fullyRough, snowStage, desiredRoadAmp,
+                    mixedSurface, fullyRough, snowStage, snowCurbHeld,
+                    snowCurbMaterial, desiredRoadAmp,
                     static_cast<float>(Settings::WheelFFBRoadTexture),
                     steeringScale, damperScale);
             }
@@ -370,6 +442,33 @@ namespace
                 changed = true;
             }
 
+            if (revision < 4 && r3_road_texture_compatibility_needed())
+            {
+                // v0.2 response retune. Only values still equal to v0.1 defaults
+                // are migrated; a user's manual F11 tuning is deliberately kept.
+                // The core still preserves its DD safety slew limiter, but stale
+                // torque is released much faster and ordinary SAT builds twice as
+                // quickly. Pneumatic trail also follows the new fast front-slip
+                // transient more closely during counter-steer.
+                const auto migrate_default = [](auto& setting, float oldValue, float newValue)
+                {
+                    const float current = static_cast<float>(setting);
+                    if (std::isfinite(current) &&
+                        std::abs(current - oldValue) <= 0.0005f)
+                        setting = newValue;
+                };
+
+                migrate_default(Settings::WheelFFBSlewRate, 0.06f, 0.12f);
+                migrate_default(Settings::WheelFFBReversalReleaseRate, 0.12f, 0.30f);
+                migrate_default(Settings::WheelFFBTrailResponseLead, 0.25f, 0.40f);
+                migrate_default(Settings::WheelFFBSteeringWeight, 1.45f, 1.60f);
+                migrate_default(Settings::WheelFFBMechanicalTrail, 0.25f, 0.30f);
+
+                Settings::WheelFFBFeelRevision = 4;
+                revision = 4;
+                changed = true;
+            }
+
             if (!changed)
                 return true;
 
@@ -381,6 +480,11 @@ namespace
                 spdlog::warn(
                     "WheelFFBFeelRetune: applied revision {} for this session but could not persist user.ini",
                     revision);
+            }
+            else if (revision >= 4)
+            {
+                spdlog::info(
+                    "WheelFFBFeelRetune: applied revision 4 (v0.2 SAT response: slew=0.12 reversal=0.30 trailLead=0.40 steeringWeight=1.60 mechanicalTrail=0.30 when still at v0.1 defaults)");
             }
             else if (revision >= 3)
             {
