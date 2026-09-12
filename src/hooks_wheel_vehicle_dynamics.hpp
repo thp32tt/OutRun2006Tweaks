@@ -28,6 +28,9 @@ public:
         discontinuityCount_ = 0;
         prevPosition_ = D3DVECTOR{};
         prevHeading_ = 0.0f;
+        prevSteerValid_ = false;
+        prevSteer_ = 0.0f;
+        steerRate_ = 0.0f;
         bodySlip_ = 0.0f;
         yawRate_ = 0.0f;
         frontSlip_ = 0.0f;
@@ -271,15 +274,43 @@ public:
         rawYawRate_ = std::clamp(headingDelta * 60.0f, -3.5f, 3.5f);
         yawRate_ += (rawYawRate_ - yawRate_) * yawRateBlend_;
 
+        // Track steering velocity separately from body/yaw filtering. Physics SAT
+        // used to wait for several filtered front-slip ticks before reacting to a
+        // fast counter-steer, which made a DD wheel feel strangely passive even
+        // though the steady-state torque was correct. A bounded one-to-two tick
+        // steering lead gives the tyre proxy the phase response it needs without
+        // changing the eventual steady-state slip angle.
+        float rawSteerRate = 0.0f;
+        if (prevSteerValid_)
+            rawSteerRate = std::clamp((steer - prevSteer_) * 60.0f, -12.0f, 12.0f);
+        else
+            prevSteerValid_ = true;
+        prevSteer_ = steer;
+        steerRate_ += (rawSteerRate - steerRate_) * 0.55f;
+
         // Bicycle-model-inspired front-slip proxy:
         // alpha_f ~= road-wheel-angle - beta - a*r/v.
         constexpr float RoadWheelLockRad = 0.52f;
-        const float roadWheelAngle = steer * RoadWheelLockRad;
+        const float steeringLeadSeconds = 0.018f + 0.012f * transientT;
+        const float steeringLead = std::clamp(
+            steerRate_ * steeringLeadSeconds, -0.10f, 0.10f);
+        const float roadWheelAngle = std::clamp(
+            steer + steeringLead, -1.0f, 1.0f) * RoadWheelLockRad;
         const float yawLeadSeconds = 0.10f - 0.045f * speedNorm;
-        rawFrontSlip_ = std::clamp(
-            roadWheelAngle - bodySlip_ - yawRate_ * yawLeadSeconds,
-            -0.70f, 0.70f);
-        frontSlip_ += (rawFrontSlip_ - frontSlip_) * frontSlipBlend_;
+        const float baseFrontSlip =
+            roadWheelAngle - bodySlip_ - yawRate_ * yawLeadSeconds;
+        rawFrontSlip_ = std::clamp(baseFrontSlip, -0.70f, 0.70f);
+
+        // When the desired tyre torque changes side, do not let the old filtered
+        // slip linger for several extra physics ticks. The normal speed-adaptive
+        // filter remains untouched for ordinary force build; only a genuine sign
+        // reversal gets this fast release/cross-over path.
+        const bool frontSlipReversing =
+            rawFrontSlip_ * frontSlip_ < -0.0004f;
+        const float effectiveFrontSlipBlend = frontSlipReversing
+            ? std::max(frontSlipBlend_, 0.82f)
+            : frontSlipBlend_;
+        frontSlip_ += (rawFrontSlip_ - frontSlip_) * effectiveFrontSlipBlend;
 
         // Telemetry-only validation for the game's native speed vector.
         const float spdX = car->spd_mb_20.x;
@@ -310,6 +341,7 @@ public:
     float rawBodySlip() const { return rawBodySlip_; }
     float rawYawRate() const { return rawYawRate_; }
     float rawFrontSlip() const { return rawFrontSlip_; }
+    float steerRate() const { return steerRate_; }
     float bodySlipBlend() const { return bodySlipBlend_; }
     float yawRateBlend() const { return yawRateBlend_; }
     float frontSlipBlend() const { return frontSlipBlend_; }
@@ -326,6 +358,9 @@ private:
         headingValid_ = false;
         sampleValid_ = false;
         prevHeading_ = 0.0f;
+        prevSteerValid_ = false;
+        prevSteer_ = 0.0f;
+        steerRate_ = 0.0f;
         bodySlip_ = 0.0f;
         yawRate_ = 0.0f;
         frontSlip_ = 0.0f;
@@ -346,6 +381,8 @@ private:
         sampleValid_ = false;
         headingValid_ = false; // The next heading is a baseline, not a one-tick derivative.
         positionValid_ = false; // Never span a missing position with a one-tick velocity.
+        prevSteerValid_ = false; // Never derive steering velocity across a missing sample.
+        steerRate_ = 0.0f;
         if (!calibrated_)
             return;
 
@@ -381,6 +418,9 @@ private:
     int discontinuityCount_ = 0;
     D3DVECTOR prevPosition_{};
     float prevHeading_ = 0.0f;
+    bool prevSteerValid_ = false;
+    float prevSteer_ = 0.0f;
+    float steerRate_ = 0.0f;
     float bodySlip_ = 0.0f;
     float yawRate_ = 0.0f;
     float frontSlip_ = 0.0f;
