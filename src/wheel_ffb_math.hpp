@@ -15,6 +15,48 @@ namespace WheelFFBMath
         return t * t * (3.0f - 2.0f * t);
     }
 
+    struct EngineHapticEstimate
+    {
+        float rpmNorm = 0.0f;
+        float frequencyHz = 0.0f;
+        float amplitudeScale = 0.0f;
+    };
+
+    // OutRun does not expose a verified engine-RPM field in EVWORK_CAR yet.
+    // Estimate normalized RPM from vehicle speed, current gear and throttle so
+    // the haptic can be swapped to a real RPM source later without changing the
+    // output path or UI. Frequencies stay below 20 Hz for a stable 60 Hz FFB loop.
+    inline EngineHapticEstimate estimate_engine_haptics(
+        float speedNorm, unsigned int gear, float throttleNorm)
+    {
+        speedNorm = std::isfinite(speedNorm)
+            ? std::clamp(speedNorm, 0.0f, 1.0f) : 0.0f;
+        throttleNorm = std::isfinite(throttleNorm)
+            ? std::clamp(throttleNorm, 0.0f, 1.0f) : 0.0f;
+
+        // Approximate normalized road speed at redline for gears 1..6.
+        // Only the relative drop/rise matters for tactile frequency shaping.
+        static constexpr std::array<float, 6> GearRedlineSpeed = {
+            0.17f, 0.30f, 0.44f, 0.60f, 0.78f, 1.00f
+        };
+        const unsigned int forwardGear = std::clamp(gear, 1u, 6u);
+        const float coupledRpm =
+            speedNorm / GearRedlineSpeed[forwardGear - 1u];
+        const float idleFloor = 0.10f + 0.05f * throttleNorm;
+        const float freeRev = (gear == 0 || speedNorm < 0.025f)
+            ? 0.10f + 0.55f * throttleNorm
+            : 0.0f;
+
+        EngineHapticEstimate out{};
+        out.rpmNorm = std::clamp(
+            std::max({ coupledRpm, idleFloor, freeRev }), 0.08f, 1.0f);
+        out.frequencyHz = 9.0f + 11.0f * out.rpmNorm;
+        out.amplitudeScale = std::clamp(
+            0.45f + 0.40f * out.rpmNorm + 0.15f * throttleNorm,
+            0.0f, 1.0f);
+        return out;
+    }
+
     // Saturating proxy for front-tyre lateral force. OutRun does not expose
     // per-tyre Fy, so use front slip only for the curve shape and keep the
     // game's lateral signal as a separate load modifier in WheelFFBEngine.

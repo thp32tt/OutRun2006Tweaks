@@ -155,9 +155,17 @@ namespace Settings
         "Hardware sine chatter driven mainly by estimated front-tire scrub, with a small chassis-slide contribution.", Range<float>{ 0.0f, 1.0f }
     };
 
+    Setting<bool> WheelFFBEngineVibration{
+        "WheelFFB", "EngineVibration", true,
+        "Add a low-amplitude engine-speed haptic through the universal ConstantForce output path."
+    };
+
+    // Keep the legacy EngineIdle key for INI/profile compatibility. It now owns
+    // the complete engine-vibration strength rather than only launch/idle rumble.
     Setting<float> WheelFFBEngineIdle{
-        "WheelFFB", "EngineIdle", 0.04f,
-        "Low-speed launch/idle vibration.", Range<float>{ 0.0f, 0.5f }
+        "WheelFFB", "EngineIdle", 0.06f,
+        "Engine vibration strength (legacy EngineIdle key retained for compatibility).",
+        Range<float>{ 0.0f, 0.5f }
     };
 
     Setting<float> WheelFFBSlewRate{
@@ -485,6 +493,36 @@ namespace
 
             const uint32_t stateFlags = car->field_8;
             const uint32_t curGear = car->cur_gear_208;
+            const float throttleNorm = std::clamp(
+                static_cast<float>(car->pedal_amount_34) / 255.0f, 0.0f, 1.0f);
+
+            float engineAmp = 0.0f;
+            float engineFreq = 0.0f;
+            if (Settings::WheelFFBEngineVibration)
+            {
+                const auto engineTarget = WheelFFBMath::estimate_engine_haptics(
+                    speedNorm, curGear, throttleNorm);
+                const float rpmBlend = engineTarget.rpmNorm > smoothedEngineRpm_
+                    ? 0.35f : 0.18f;
+                smoothedEngineRpm_ +=
+                    (engineTarget.rpmNorm - smoothedEngineRpm_) * rpmBlend;
+                const float amplitudeScale = std::clamp(
+                    0.45f + 0.40f * smoothedEngineRpm_ + 0.15f * throttleNorm,
+                    0.0f, 1.0f);
+                engineFreq = 9.0f + 11.0f * smoothedEngineRpm_;
+                const float configuredEngineStrength =
+                    static_cast<float>(Settings::WheelFFBEngineIdle);
+                const float engineStrength = std::isfinite(configuredEngineStrength)
+                    ? std::clamp(configuredEngineStrength, 0.0f, 0.5f)
+                    : 0.0f;
+                engineAmp = engineStrength * amplitudeScale * outputStrength;
+            }
+            else
+            {
+                smoothedEngineRpm_ = 0.0f;
+                enginePhase_ = 0.0f;
+            }
+
             const float lateralSum = car->field_264 + car->field_268;
             const float lateralRaw = std::isfinite(lateralSum) ? lateralSum : 0.0f;
 
@@ -615,14 +653,6 @@ namespace
                     slipSeverity * static_cast<float>(Settings::WheelFFBTireSlip) *
                     outputStrength;
                 slipFreq = 40.0f - 12.0f * slipSeverity;
-            }
-            else if (speedNorm < 0.03f && car->pedal_amount_34 > 0)
-            {
-                const float throttleNorm =
-                    std::clamp(static_cast<float>(car->pedal_amount_34) / 255.0f, 0.0f, 1.0f);
-                slipAmp =
-                    static_cast<float>(Settings::WheelFFBEngineIdle) * throttleNorm * outputStrength;
-                slipFreq = 15.0f + 7.0f * throttleNorm;
             }
 
             if (!Settings::WheelFFBUsePeriodicEffects &&
@@ -978,6 +1008,16 @@ namespace
                     roadPhase_, roadAmp * effectRampScale, std::min(roadFreq, 15.0f));
                 fallbackVibration += synth_fallback(
                     slipPhase_, slipAmp * effectRampScale, std::min(slipFreq, 15.0f));
+            }
+
+            // Engine haptics always use the normalized ConstantForce tactile
+            // transport so wheel brand / GUID_Sine support cannot change the feel.
+            // The existing vibration-headroom clamp below guarantees SAT/events
+            // always have priority over this cosmetic engine texture.
+            if (Settings::WheelFFBEngineVibration)
+            {
+                fallbackVibration += synth_fallback(
+                    enginePhase_, engineAmp * effectRampScale, engineFreq);
             }
 
             const LONG baseSteeringLevel = std::clamp(
@@ -2861,6 +2901,8 @@ namespace
             warmupFrames_ = 0;
             roadPhase_ = 0.0f;
             slipPhase_ = 0.0f;
+            enginePhase_ = 0.0f;
+            smoothedEngineRpm_ = 0.0f;
             splashTimer_ = 0;
             splashAmp_ = 0.0f;
             manualTestFrames_ = 0;
@@ -3252,6 +3294,8 @@ namespace
         float crashImpulseForce_ = 0.0f;
         float roadPhase_ = 0.0f;
         float slipPhase_ = 0.0f;
+        float enginePhase_ = 0.0f;
+        float smoothedEngineRpm_ = 0.0f;
         float splashAmp_ = 0.0f;
 
         float speedHistory_[SpeedHistoryCount]{};

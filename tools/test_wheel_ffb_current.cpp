@@ -18,6 +18,16 @@ void step(WheelVehicleDynamics& d, EVWORK_CAR& c, float a=0, float beta=0, float
 }
 int main() {
  using namespace WheelFFBMath;
+ auto engineIdle=estimate_engine_haptics(0.0f,0,0.0f);
+ require(engineIdle.rpmNorm>=.08f&&engineIdle.rpmNorm<.20f,"engine idle RPM estimate");
+ require(engineIdle.frequencyHz>=9.0f&&engineIdle.frequencyHz<12.0f,"engine idle haptic frequency");
+ auto engineFree=estimate_engine_haptics(0.0f,0,1.0f);
+ require(engineFree.rpmNorm>engineIdle.rpmNorm&&engineFree.frequencyHz>engineIdle.frequencyHz,"free-rev haptic rises with throttle");
+ auto engineGear1=estimate_engine_haptics(.15f,1,.5f);
+ auto engineGear2=estimate_engine_haptics(.15f,2,.5f);
+ require(engineGear1.rpmNorm>engineGear2.rpmNorm,"upshift lowers estimated RPM at equal road speed");
+ require(engineGear1.frequencyHz<=20.0001f&&engineGear1.amplitudeScale<=1.0001f,"engine haptic bounded");
+ require(estimate_engine_haptics(std::numeric_limits<float>::quiet_NaN(),99,std::numeric_limits<float>::quiet_NaN()).frequencyHz>=9.0f,"engine haptic rejects non-finite inputs");
  require(pneumatic_sat_shape(0)==0,"SAT zero");
  require(pneumatic_sat_shape(std::numeric_limits<float>::quiet_NaN())==0,"SAT NaN");
  require(lateral_force_shape(.32f)>.999f,"Fy proxy saturates in deep slip");

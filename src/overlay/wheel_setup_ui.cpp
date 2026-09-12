@@ -52,6 +52,7 @@ namespace Settings
     extern Setting<float> WheelFFBLateralDeadzone;
     extern Setting<float> WheelFFBWeightTransfer;
     extern Setting<float> WheelFFBGearShift;
+    extern Setting<bool> WheelFFBEngineVibration;
     extern Setting<float> WheelFFBEngineIdle;
     extern Setting<float> WheelFFBSlewRate;
     extern Setting<float> WheelFFBReversalReleaseRate;
@@ -810,6 +811,7 @@ namespace
             bool responseCorrection = false;
             bool debugLog = true;
             bool telemetry = false;
+            bool engineVibration = true;
             float global = 0.70f;
             float spring = 0.65f;
             float springSaturation = 0.95f;
@@ -821,7 +823,7 @@ namespace
             float lateralDeadzone = 1.5f;
             float weightTransfer = 0.15f;
             float gearShift = 0.18f;
-            float engineIdle = 0.04f;
+            float engineIdle = 0.06f;
             float slew = 0.06f;
             float reversalRelease = 0.12f;
             float road = 0.30f;
@@ -855,6 +857,7 @@ namespace
             savedFfb_.lateralDeadzone = Settings::WheelFFBLateralDeadzone;
             savedFfb_.weightTransfer = Settings::WheelFFBWeightTransfer;
             savedFfb_.gearShift = Settings::WheelFFBGearShift;
+            savedFfb_.engineVibration = Settings::WheelFFBEngineVibration;
             savedFfb_.engineIdle = Settings::WheelFFBEngineIdle;
             savedFfb_.slew = Settings::WheelFFBSlewRate;
             savedFfb_.reversalRelease = Settings::WheelFFBReversalReleaseRate;
@@ -889,6 +892,7 @@ namespace
             Settings::WheelFFBLateralDeadzone = savedFfb_.lateralDeadzone;
             Settings::WheelFFBWeightTransfer = savedFfb_.weightTransfer;
             Settings::WheelFFBGearShift = savedFfb_.gearShift;
+            Settings::WheelFFBEngineVibration = savedFfb_.engineVibration;
             Settings::WheelFFBEngineIdle = savedFfb_.engineIdle;
             Settings::WheelFFBSlewRate = savedFfb_.slew;
             Settings::WheelFFBReversalReleaseRate = savedFfb_.reversalRelease;
@@ -1656,9 +1660,15 @@ namespace
             ImGui::TextDisabled("Wheelbase/driver-side spring, damping, inertia or friction are additional forces; keep them conservative while tuning game-side feel.");
 
             ImGui::SeparatorText("Effects");
-            track_ffb_change(ImGui::SliderFloat("Road Detail", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 0.50f, "%.2f"));
+            track_ffb_change(ImGui::SliderFloat("Road Detail", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 1.0f, "%.2f"));
             track_ffb_change(ImGui::SliderFloat("Tire Slip", Settings::WheelFFBTireSlip.ptr(), 0.0f, 0.50f, "%.2f"));
             track_ffb_change(ImGui::SliderFloat("Collision", Settings::WheelFFBWallImpact.ptr(), 0.0f, 1.0f, "%.2f"));
+            track_ffb_change(ImGui::Checkbox("Engine Vibration", Settings::WheelFFBEngineVibration.ptr()));
+            if (!Settings::WheelFFBEngineVibration) ImGui::BeginDisabled();
+            track_ffb_change(ImGui::SliderFloat("Engine Vibration Strength", Settings::WheelFFBEngineIdle.ptr(), 0.0f, 0.30f, "%.2f"));
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Estimated engine RPM from vehicle speed, current gear and throttle. Uses the same ConstantForce tactile path on every wheel.");
+            if (!Settings::WheelFFBEngineVibration) ImGui::EndDisabled();
             track_ffb_change(ImGui::Checkbox("Hardware road/slip sine effects", Settings::WheelFFBUsePeriodicEffects.ptr()));
 
             if (ImGui::CollapsingHeader("Advanced FFB tuning"))
@@ -1667,7 +1677,6 @@ namespace
                 track_ffb_change(ImGui::SliderFloat("Weight Transfer", Settings::WheelFFBWeightTransfer.ptr(), 0.0f, 1.5f, "%.2f"));
                 track_ffb_change(ImGui::SliderFloat("Lateral Signal Deadzone", Settings::WheelFFBLateralDeadzone.ptr(), 0.0f, 8.0f, "%.2f"));
                 track_ffb_change(ImGui::SliderFloat("Gear Shift", Settings::WheelFFBGearShift.ptr(), 0.0f, 1.0f, "%.2f"));
-                track_ffb_change(ImGui::SliderFloat("Engine Idle", Settings::WheelFFBEngineIdle.ptr(), 0.0f, 0.50f, "%.2f"));
                 track_ffb_change(ImGui::SliderFloat("Force Build Slew Rate", Settings::WheelFFBSlewRate.ptr(), 0.01f, 1.0f, "%.3f"));
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip("Maximum normal structural-force build change per 60 Hz tick. Lower is smoother/slower; higher responds faster.");

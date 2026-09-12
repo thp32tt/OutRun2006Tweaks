@@ -403,3 +403,18 @@ req(profiles, 'Failed while closing wheel-specific input options.', 'input profi
 req(wheel_ui, 'capture_saved_ffb();\n                status_ = "Saved to OutRun2006Tweaks.user.ini";', 'legacy full user.ini save refreshes FFB revert baseline')
 req(wheel_ui, 'capture_saved_ffb();\n                    status_ = "Selected FFB output and saved its exact DirectInput GUID.', 'FFB output selection refreshes revert baseline after full user.ini persistence')
 req(wheel_ui, 'OutRun2006Tweaks.profiles\\\\FFB', 'FFB profile folder path escapes backslash')
+
+
+# engine-vibration-v02-regression-guards
+req(ffb, 'Setting<bool> WheelFFBEngineVibration', 'engine vibration has an independent live toggle')
+req(math, 'EngineHapticEstimate estimate_engine_haptics(', 'engine RPM estimator is production math')
+req(ffb, 'WheelFFBMath::estimate_engine_haptics(', 'FFB core consumes the common engine estimator')
+req(ffb, 'enginePhase_, engineAmp * effectRampScale, engineFreq', 'engine haptic uses ConstantForce fallback layer')
+req(ffb, 'smoothedEngineRpm_ = 0.0f;', 'engine haptic state resets on transitions/off')
+forbid(ffb, 'else if (speedNorm < 0.03f && car->pedal_amount_34 > 0)', 'legacy low-speed-only engine rumble removed')
+req(wheel_ui, 'Checkbox("Engine Vibration", Settings::WheelFFBEngineVibration.ptr())', 'F11 exposes engine vibration toggle')
+req(wheel_ui, 'SliderFloat("Engine Vibration Strength", Settings::WheelFFBEngineIdle.ptr()', 'F11 exposes engine vibration strength')
+forbid(wheel_ui, 'SliderFloat("Engine Idle"', 'old duplicate Engine Idle slider removed')
+req(wheel_ui, 'WheelFFBRoadTexture.ptr(), 0.0f, 1.0f', 'Road Detail UI covers the 0.60 universal preset')
+req(ini, 'EngineVibration = true', 'shipped config enables engine vibration')
+req(ini, 'EngineIdle = 0.06', 'shipped engine haptic strength')
