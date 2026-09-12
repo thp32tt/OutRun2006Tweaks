@@ -29,7 +29,7 @@ Primary physical validation was performed with **MOZA R3**. The current FFB tuni
 
 Use **F11 → Input Bindings** for steering, pedals, shifter and buttons, then **Save & Return to game**. Use **F11 → Force Feedback** to select the actual FFB output wheel and start with **Load Universal Physics SAT**. FFB tuning applies live; use **Save Force Feedback** to persist changes.
 
-Road and snow/curb tactile feedback remain enabled. The snow-stage compensation is retained because it provides useful curb/shoulder feedback in physical testing.
+Road and snow/curb tactile feedback remain enabled. The snow-stage compensation is retained because it provides useful curb/shoulder feedback in physical testing. The v0.1 refresh also fixes a persistent-vibration bug after snow stages: the snow curb latch now expires after its fixed 450 ms grace period, and low-roughness route-fork material changes no longer trigger the curb boost.
 
 Engine Vibration is intentionally an opt-in effect. When enabled, estimated RPM follows speed, current gear and throttle. The v0.1 release smooths amplitude/frequency, shifts the texture away from the heavy low-frequency pulse region and uses only a small output reserve during normal driving so it is less likely to appear/disappear at SAT peaks. Collision and gear events retain priority.
 
@@ -81,7 +81,7 @@ This is an unofficial community fork and is not affiliated with SEGA or MOZA.
 
 **F11 → Input Bindings**에서 스티어링, 페달, 시프터, 버튼을 설정하고 **Save & Return to game**으로 저장합니다. **F11 → Force Feedback**에서 실제 FFB 출력 휠을 선택한 뒤 **Load Universal Physics SAT**를 시작점으로 권장합니다. FFB 변경은 실시간 적용되며 **Save Force Feedback**으로 저장합니다.
 
-노면과 눈길 연석 진동은 유지했습니다. 눈 맵 보정은 실제 테스트에서 연석/숄더 감각을 어느 정도 살려주는 효과가 있어 v0.1에 그대로 포함합니다.
+노면과 눈길 연석 진동은 유지했습니다. 눈 맵 보정은 실제 테스트에서 연석/숄더 감각을 어느 정도 살려주는 효과가 있어 v0.1에 그대로 포함합니다. 이번 v0.1 갱신에서는 눈길 종료 후 진동이 계속되는 버그도 수정했습니다. 눈길 연석 latch는 확인된 mixed 접촉 후 450ms까지만 유지되며, 거칠기가 낮은 일반 갈림길 재질 변화는 연석 진동으로 증폭하지 않습니다.
 
 Engine Vibration은 취향에 따라 켜는 선택 옵션이며 기본 OFF입니다. 켜면 속도, 현재 기어, 스로틀로 RPM을 추정합니다. v0.1에서는 진폭/주파수를 부드럽게 필터링하고 무겁게 느껴지는 저주파 펄스 영역을 피하며, 일반 주행에서 SAT 피크 때문에 진동이 갑자기 사라지는 현상을 줄이기 위해 아주 작은 출력 여유만 확보합니다. 충돌과 기어 이벤트가 우선합니다.
 

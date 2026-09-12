@@ -29,6 +29,7 @@ bind_ui = read('src/overlay/input_bindings_ui.cpp')
 wheel_ui = read('src/overlay/wheel_setup_ui.cpp')
 profiles = read('src/wheel_profile_store.hpp')
 runtime = read('src/wheel_ffb_runtime.hpp')
+build = read('src/hooks_wheel_ffb_build.cpp')
 ini = read('OutRun2006Tweaks.ini')
 
 if (ROOT / 'src/hooks_wheel_physics_sat.hpp').exists():
@@ -36,6 +37,7 @@ if (ROOT / 'src/hooks_wheel_physics_sat.hpp').exists():
 
 for rel, text in [
     ('src/hooks_wheel_ffb.cpp', ffb),
+    ('src/hooks_wheel_ffb_build.cpp', build),
     ('src/hooks_forcefeedback.cpp', vib),
     ('src/hooks_wheel_vehicle_dynamics.hpp', dyn),
     ('src/input_manager.cpp', input_cpp),
@@ -432,3 +434,13 @@ req(ffb, 'engineReserve = std::clamp(', 'engine haptic gets a small continuity r
 req(wheel_ui, 'Engine Vibration Strength', 'engine vibration strength remains user-adjustable')
 req(ini, 'EngineVibration = false', 'shipped engine vibration stays disabled')
 req(ini, 'EngineIdle = 0.20', 'shipped optional engine strength is 0.20')
+
+
+# v01-snow-latch-route-fork-regression-guards
+req(build, 'const bool mixedTouchesSnowBaseline =', 'snow curb latch starts only from a transition touching the snow baseline')
+req(build, 'const bool mixedSurface = rawMixedSurface && genuinelyRough;', 'ordinary low-roughness route-fork material changes do not trigger tactile boost')
+req(build, 'const bool tactileSurface = genuinelyRough || snowCurbHeld;', 'general tactile compatibility path requires real roughness or an active snow latch')
+if build.count('snowCurbHoldUntil = now + SnowCurbHoldMs;') != 1:
+    raise SystemExit('CURRENT VERIFY FAILED [snow curb hold deadline is re-armed outside confirmed mixed snow contact]')
+print('OK [snow curb hold deadline has one confirmed-contact re-arm site]')
+forbid(build, 'Extend while all tyres remain on the identified curb/shoulder.', 'uniform curb contact cannot indefinitely refresh snow latch')

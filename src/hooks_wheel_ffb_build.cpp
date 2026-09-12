@@ -151,19 +151,37 @@ namespace
             return false;
         }
 
-        if (mixedSurface)
-        {
-            const float minDistance =
-                std::abs(surface.minimum - SnowSurfaceBaseline);
-            const float maxDistance =
-                std::abs(surface.maximum - SnowSurfaceBaseline);
-            const float candidate = minDistance >= maxDistance
-                ? surface.minimum
-                : surface.maximum;
+        // A snow-curb latch may only start from a transition that still contains
+        // the real ~0.50 snow baseline. This prevents post-stage asphalt values
+        // such as 0.25/0.35 from being reclassified as a new snow curb.
+        const bool minimumIsSnowBaseline =
+            std::abs(surface.minimum - SnowSurfaceBaseline) <= 0.06f;
+        const bool maximumIsSnowBaseline =
+            std::abs(surface.maximum - SnowSurfaceBaseline) <= 0.06f;
+        const bool mixedTouchesSnowBaseline =
+            mixedSurface && (minimumIsSnowBaseline || maximumIsSnowBaseline);
 
-            // Do not latch ordinary snow noise. This is deliberately tied to the
-            // same 0.08 spread that already qualified as a real mixed surface.
-            if (std::max(minDistance, maxDistance) >= 0.08f)
+        if (mixedTouchesSnowBaseline)
+        {
+            float candidate = surface.minimum;
+            if (minimumIsSnowBaseline && !maximumIsSnowBaseline)
+                candidate = surface.maximum;
+            else if (maximumIsSnowBaseline && !minimumIsSnowBaseline)
+                candidate = surface.minimum;
+            else
+            {
+                const float minDistance =
+                    std::abs(surface.minimum - SnowSurfaceBaseline);
+                const float maxDistance =
+                    std::abs(surface.maximum - SnowSurfaceBaseline);
+                candidate = minDistance >= maxDistance
+                    ? surface.minimum
+                    : surface.maximum;
+            }
+
+            // Only a meaningful departure from snow starts/re-arms the one-shot
+            // hold. The hold deadline is never extended by uniform curb contact.
+            if (std::abs(candidate - SnowSurfaceBaseline) >= 0.08f)
             {
                 snowCurbLatched = true;
                 snowCurbMaterial = candidate;
@@ -178,9 +196,7 @@ namespace
             (surface.minimum + surface.maximum) * 0.5f;
         const bool nearlyUniform = surface.spread < 0.08f;
 
-        // Returning to the normal ~0.50 snow surface must end the latch before
-        // testing whether the value still resembles the curb. A low-scalar curb
-        // around 0.40 used to match both tests and could extend forever on snow.
+        // Returning to the normal ~0.50 snow surface ends the latch immediately.
         if (nearlyUniform &&
             std::abs(uniformValue - SnowSurfaceBaseline) <= 0.05f)
         {
@@ -188,21 +204,9 @@ namespace
             return false;
         }
 
-        const float curbDistance =
-            std::abs(snowCurbMaterial - SnowSurfaceBaseline);
-        const float materialTolerance =
-            std::clamp(curbDistance * 0.35f, 0.025f, 0.06f);
-        const bool sameCurbMaterial = nearlyUniform &&
-            std::abs(uniformValue - snowCurbMaterial) <= materialTolerance;
-
-        if (sameCurbMaterial)
-        {
-            // Extend while all tyres remain on the identified curb/shoulder.
-            snowCurbHoldUntil = now + SnowCurbHoldMs;
-            return true;
-        }
-
-        // Signed subtraction remains correct across GetTickCount wrap.
+        // A completed curb crossing is retained only for the fixed 450 ms grace
+        // period that began at the last confirmed snow<->curb mixed contact.
+        // Uniform curb/road contact must never refresh this deadline.
         if (snowCurbHoldUntil != 0 &&
             static_cast<LONG>(now - snowCurbHoldUntil) < 0)
             return true;
@@ -382,18 +386,21 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
     if (car)
     {
         const RoadSurfaceProfile surface = sample_surface_profile(car);
-        const bool mixedSurface =
+        const bool rawMixedSurface =
             surface.validSamples >= 2 && surface.spread >= 0.08f;
         const bool genuinelyRough = surface.maximum >= 0.60f;
+        // Ordinary route-fork/asphalt material changes (for example 0.25/0.35)
+        // are not tactile curbs. A non-snow mixed transition must include a
+        // genuinely rough material before the compatibility boost is allowed.
+        const bool mixedSurface = rawMixedSurface && genuinelyRough;
         const bool fullyRough =
             surface.validSamples >= 2 && surface.minimum >= 0.60f;
         const DWORD now = GetTickCount();
         const bool snowStage = is_snow_or_ice_stage_for_ffb();
         const bool snowCurbHeld = update_snow_curb_latch(
-            surface, snowStage, mixedSurface, now);
+            surface, snowStage, rawMixedSurface, now);
         const bool strongTactile = mixedSurface || fullyRough || snowCurbHeld;
-        const bool tactileSurface =
-            mixedSurface || genuinelyRough || snowCurbHeld;
+        const bool tactileSurface = genuinelyRough || snowCurbHeld;
 
         if (tactileSurface)
         {
