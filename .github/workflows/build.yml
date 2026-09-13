@@ -20,24 +20,7 @@ jobs:
 
       - name: Verify consolidated wheel FFB source
         shell: pwsh
-        run: |
-          if (Test-Path 'DISCORD_SHARE_v0.1.md') {
-            throw 'DISCORD_SHARE_v0.1.md must not be tracked in the release branch.'
-          }
-          # The consolidated verifier still contains two historical checks for
-          # the old Discord handoff document. Keep the repository clean by
-          # satisfying those checks only inside the CI workspace, then remove
-          # the temporary compatibility file immediately after verification.
-          @'
-          Dynamic Damping 0.28
-          '@ | Set-Content DISCORD_SHARE_v0.1.md -Encoding utf8
-          try {
-            python tools/verify_wheel_ffb_current.py
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          }
-          finally {
-            Remove-Item DISCORD_SHARE_v0.1.md -Force -ErrorAction SilentlyContinue
-          }
+        run: python tools/verify_wheel_ffb_current.py
 
       - name: Test production wheel FFB math
         shell: cmd
@@ -97,7 +80,7 @@ jobs:
             "Reverse Spring",
             "multi-device SDL raw input enabled",
             "Multi-device input architecture adapted from hyp36rmax (MIT)",
-            "2-axis POLAR actuator encoding",
+            "ConstantForce validated with canonical X/Y 2-axis POLAR descriptor",
             "MOZA R3 Physics SAT",
             "MOZA R3 Natural SAT",
             "Single-owner wheel FFB: DirectInput COM only",
@@ -124,7 +107,7 @@ jobs:
           if ($ini -notmatch '(?m)^UseNewInput\s*=\s*true\s*$') { throw "multi-device input is not the shipped default" }
           if ($ini -notmatch '(?m)^TrailResponseLead\s*=\s*0\.25\s*$') { throw "shipped pneumatic trail response lead is not 0.25" }
 
-          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, externally reviewed Physics SAT wheel FFB markers present" -f $bytes.Length)
+          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, current Physics SAT / FFB compatibility markers present" -f $bytes.Length)
           Get-FileHash $dllPath -Algorithm SHA256
 
       - name: Download upstream replacement EXE
