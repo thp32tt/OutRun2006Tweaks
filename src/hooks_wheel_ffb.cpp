@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "hook_mgr.hpp"
+#include "Proxy.hpp"
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "hooks_wheel_vehicle_dynamics.hpp"
@@ -49,7 +50,7 @@ namespace Settings
 
     Setting<std::string> WheelFFBDeviceGuid{
         "WheelFFB", "DeviceGuid", "",
-        "Exact DirectInput instance GUID selected by F11 Wheel Setup; a saved GUID never falls back to a different device automatically."
+        "Preferred DirectInput FFB interface selected by F11 Wheel Setup; if validation fails, a compatible sibling interface can be probed and pinned automatically."
     };
 
     Setting<bool> WheelFFBResponseCorrection{
@@ -214,6 +215,7 @@ namespace
     constexpr DWORD FFB_EFFECT_REFRESH_MS = 100;
     constexpr DWORD FFB_DEVICE_FAILURE_GRACE_MS = 750;
     constexpr DWORD FFB_DEVICE_RETRY_MS = 750;
+    constexpr DWORD FFB_DEVICE_FAILED_BACKOFF_MS = 10000;
 
     // GetTickCount wraps roughly every 49.7 days. Compare deadlines by signed
     // subtraction so retry/holdoff gates remain correct across the wrap.
@@ -361,9 +363,25 @@ namespace
             {
                 if (tick_before(GetTickCount(), retryAfter_))
                     return;
-                if (!initialize())
+
+                bool ready = initialize();
+                if (!ready)
                 {
-                    retryAfter_ = GetTickCount() + 2000;
+                    const DWORD fallbackNow = GetTickCount();
+                    const bool rejectedInterfacePending =
+                        !failedInterfaceGuid_.empty() &&
+                        tick_before(fallbackNow, failedInterfaceUntil_);
+                    if (rejectedInterfacePending)
+                    {
+                        spdlog::info(
+                            "WheelFFB: selected FFB interface failed validation; probing a sibling interface immediately");
+                        ready = initialize();
+                    }
+                }
+
+                if (!ready)
+                {
+                    retryAfter_ = GetTickCount() + FFB_DEVICE_FAILED_BACKOFF_MS;
                     return;
                 }
             }
@@ -1695,9 +1713,9 @@ namespace
         void mark_selected_interface_failed(const char* reason, HRESULT hr)
         {
             failedInterfaceGuid_ = directinput_guid_key(selectedGuid_);
-            failedInterfaceUntil_ = GetTickCount() + 5000;
+            failedInterfaceUntil_ = GetTickCount() + FFB_DEVICE_FAILED_BACKOFF_MS;
             spdlog::warn(
-                "WheelFFB: interface '{}' [{}] rejected {}; will retry this interface (0x{:08X})",
+                "WheelFFB: interface '{}' [{}] rejected {}; temporarily excluding it from automatic selection (0x{:08X})",
                 selectedName_, failedInterfaceGuid_, reason, (unsigned)hr);
         }
 
@@ -1705,7 +1723,23 @@ namespace
         {
             retryAfter_ = 0;
 
-            HRESULT hr = DirectInput8Create(
+            using DirectInput8CreateFn = HRESULT(WINAPI*)(
+                HINSTANCE, DWORD, REFIID, LPVOID*, LPUNKNOWN);
+            auto createDirectInput = proxy::origModule
+                ? reinterpret_cast<DirectInput8CreateFn>(
+                    GetProcAddress(proxy::origModule, "DirectInput8Create"))
+                : nullptr;
+
+            // Prefer the already-loaded original Windows dinput8 module instead
+            // of routing the FFB backend back through this proxy DLL.
+            if (!createDirectInput)
+            {
+                spdlog::warn(
+                    "WheelFFB: original proxy module has no DirectInput8Create export; using linked fallback");
+                createDirectInput = &::DirectInput8Create;
+            }
+
+            HRESULT hr = createDirectInput(
                 GetModuleHandleW(nullptr),
                 DIRECTINPUT_VERSION,
                 IID_IDirectInput8A,
@@ -1715,7 +1749,7 @@ namespace
             if (FAILED(hr) || !directInput_)
             {
                 spdlog::error(
-                    "WheelFFB: DirectInput8Create failed (0x{:08X})",
+                    "WheelFFB: original DirectInput8Create failed (0x{:08X})",
                     (unsigned)hr);
                 return false;
             }
@@ -1738,15 +1772,18 @@ namespace
                 }
                 if (!ctx.found)
                 {
+                    // A physical wheel can expose more than one DirectInput
+                    // interface. Prefer the saved interface, but allow a sibling
+                    // with the same configured device name after validation fails.
                     spdlog::warn(
-                        "WheelFFB: saved GUID unavailable or rejected; select its FFB interface explicitly in Force Feedback");
-                    release_directinput();
-                    return false;
+                        "WheelFFB: saved FFB GUID unavailable or rejected; probing compatible sibling interfaces");
+                    ctx.matchGuidOnly = false;
                 }
             }
 
             if (!ctx.found)
             {
+                ctx.matchGuidOnly = false;
                 hr = directInput_->EnumDevices(
                     DI8DEVCLASS_GAMECTRL, enum_devices_callback, &ctx,
                     DIEDFL_ATTACHEDONLY | DIEDFL_FORCEFEEDBACK);
@@ -1884,7 +1921,7 @@ namespace
             }
 
             hr = device_->Acquire();
-            if (FAILED(hr))
+            if (FAILED(hr) && hr != S_FALSE)
             {
                 mark_selected_interface_failed("Acquire", hr);
                 spdlog::error("WheelFFB: Acquire('{}') failed (0x{:08X})", selectedName_, (unsigned)hr);
@@ -1893,6 +1930,16 @@ namespace
                 return false;
             }
             deviceAcquired_ = true;
+
+            // Some multi-interface wheel drivers need the legacy reset sequence
+            // before the FFB interface will accept actuator/effect commands.
+            const HRESULT resetHr = device_->SendForceFeedbackCommand(DISFFC_RESET);
+            if (FAILED(resetHr))
+            {
+                spdlog::warn(
+                    "WheelFFB: initial DISFFC_RESET rejected (0x{:08X}); continuing with actuator enable",
+                    (unsigned)resetHr);
+            }
 
             const HRESULT actuatorOnHr =
                 device_->SendForceFeedbackCommand(DISFFC_SETACTUATORSON);
@@ -2049,10 +2096,10 @@ namespace
             safe_release_effect(constantEffect_, "constant before create");
             constantEffectPolar_ = false;
 
-            DWORD axes[2] = {
-                primary_actuator_axis(),
-                actuatorAxes_.size() > 1 ? actuatorAxes_[1] : primary_actuator_axis()
-            };
+            // Some wheel bases expose one FFB actuator but require the legacy
+            // DirectInput X/Y POLAR ConstantForce descriptor. Always try that
+            // canonical descriptor first, then use a one-axis X fallback.
+            DWORD axes[2] = { DIJOFS_X, DIJOFS_Y };
             LONG directions[2] = { 9000L, 0L };
             constantParams_ = {};
             constantParams_.lMagnitude = 0;
@@ -2069,45 +2116,82 @@ namespace
             effect.cbTypeSpecificParams = sizeof(constantParams_);
             effect.lpvTypeSpecificParams = &constantParams_;
 
-            HRESULT hr = E_FAIL;
-            const bool polarDirectionDynamic =
-                !constantCapsKnown_ || (constantDynamicParams_ & DIEP_DIRECTION) != 0;
-            if (actuatorAxes_.size() > 1 && polarDirectionDynamic)
+            auto probe_start = [&](const char* descriptor) -> HRESULT
             {
-                effect.dwFlags = DIEFF_POLAR | DIEFF_OBJECTOFFSETS;
-                effect.cAxes = 2;
-                hr = device_->CreateEffect(GUID_ConstantForce, &effect, &constantEffect_, nullptr);
-                if (SUCCEEDED(hr) && constantEffect_)
+                if (!constantEffect_)
+                    return E_POINTER;
+                const HRESULT startHr = constantEffect_->Start(1, 0);
+                if (FAILED(startHr))
+                {
+                    spdlog::warn(
+                        "WheelFFB: ConstantForce {} start probe failed (0x{:08X})",
+                        descriptor, (unsigned)startHr);
+                    return startHr;
+                }
+                const HRESULT stopHr = constantEffect_->Stop();
+                if (FAILED(stopHr))
+                {
+                    spdlog::warn(
+                        "WheelFFB: ConstantForce {} zero-force probe Stop failed (0x{:08X})",
+                        descriptor, (unsigned)stopHr);
+                }
+                return S_OK;
+            };
+
+            HRESULT hr = E_FAIL;
+
+            effect.dwFlags = DIEFF_POLAR | DIEFF_OBJECTOFFSETS;
+            effect.cAxes = 2;
+            hr = device_->CreateEffect(
+                GUID_ConstantForce, &effect, &constantEffect_, nullptr);
+            if (SUCCEEDED(hr) && constantEffect_)
+            {
+                const HRESULT probeHr = probe_start("2-axis POLAR");
+                if (SUCCEEDED(probeHr))
                 {
                     constantEffectPolar_ = true;
                     prevConstantLevel_ = 0;
                     lastConstantWriteTick_ = 0;
-                    spdlog::info("WheelFFB: ConstantForce created with 2-axis POLAR actuator encoding");
+                    spdlog::info(
+                        "WheelFFB: ConstantForce validated with canonical X/Y 2-axis POLAR descriptor");
                     return true;
                 }
-
-                safe_release_effect(constantEffect_, "failed POLAR constant");
-                spdlog::warn(
-                    "WheelFFB: 2-axis POLAR ConstantForce rejected (0x{:08X}); trying one-axis CARTESIAN",
-                    (unsigned)hr);
+                hr = probeHr;
             }
+
+            safe_release_effect(constantEffect_, "failed POLAR constant probe");
+            spdlog::warn(
+                "WheelFFB: 2-axis POLAR ConstantForce unavailable (0x{:08X}); trying canonical one-axis X CARTESIAN",
+                (unsigned)hr);
 
             effect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
             effect.cAxes = 1;
+            axes[0] = DIJOFS_X;
             directions[0] = 1;
-            hr = device_->CreateEffect(GUID_ConstantForce, &effect, &constantEffect_, nullptr);
-            if (FAILED(hr) || !constantEffect_)
+            hr = device_->CreateEffect(
+                GUID_ConstantForce, &effect, &constantEffect_, nullptr);
+            if (SUCCEEDED(hr) && constantEffect_)
             {
-                mark_selected_interface_failed("ConstantForce creation", hr);
-                spdlog::error("WheelFFB: CreateEffect(ConstantForce) failed (0x{:08X})", (unsigned)hr);
-                return false;
+                const HRESULT probeHr = probe_start("1-axis X CARTESIAN");
+                if (SUCCEEDED(probeHr))
+                {
+                    constantEffectPolar_ = false;
+                    prevConstantLevel_ = 0;
+                    lastConstantWriteTick_ = 0;
+                    spdlog::info(
+                        "WheelFFB: ConstantForce validated with canonical one-axis X CARTESIAN fallback");
+                    return true;
+                }
+                hr = probeHr;
             }
 
-            constantEffectPolar_ = false;
-            prevConstantLevel_ = 0;
-            lastConstantWriteTick_ = 0;
-            spdlog::info("WheelFFB: ConstantForce created with 1-axis CARTESIAN fallback");
-            return true;
+            safe_release_effect(constantEffect_, "failed CARTESIAN constant probe");
+            const HRESULT failHr = FAILED(hr) ? hr : E_FAIL;
+            mark_selected_interface_failed("ConstantForce create/start probe", failHr);
+            spdlog::error(
+                "WheelFFB: no usable ConstantForce descriptor on selected interface (0x{:08X})",
+                (unsigned)failHr);
+            return false;
         }
 
         bool create_spring_effect()
