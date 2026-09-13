@@ -386,7 +386,12 @@ namespace
 
                 if (!ready)
                 {
-                    retryAfter_ = GetTickCount() + FFB_DEVICE_FAILED_BACKOFF_MS;
+                    // initialize() can request the short retry interval for
+                    // transient startup/focus conditions. Do not overwrite that
+                    // with the rejected-interface backoff.
+                    const DWORD retryNow = GetTickCount();
+                    if (!tick_before(retryNow, retryAfter_))
+                        retryAfter_ = retryNow + FFB_DEVICE_FAILED_BACKOFF_MS;
                     return;
                 }
             }
@@ -1571,13 +1576,17 @@ namespace
                     zero_all_forces();
                 teardown_for_reinitialize("live disable");
                 initialized_ = false;
-                deviceReinitPending_ = false;
-                deviceFailureSince_ = 0;
-                deviceReinitAfter_ = 0;
-                retryAfter_ = 0;
-                failedInterfaces_.clear();
-                preferredVidPid_ = 0;
             }
+
+            // Disabling FFB is a hard recovery boundary even if initialization
+            // never completed. A previous rejected-interface quarantine must not
+            // survive a deliberate off/on cycle or a fresh device selection.
+            deviceReinitPending_ = false;
+            deviceFailureSince_ = 0;
+            deviceReinitAfter_ = 0;
+            retryAfter_ = 0;
+            failedInterfaces_.clear();
+            preferredVidPid_ = 0;
 
             enabledLastTick_ = false;
             if (hadInitializedOutput)
@@ -1971,9 +1980,10 @@ namespace
             gameHwnd_ = Game::GameHwnd();
             if (!gameHwnd_)
             {
-                spdlog::error("WheelFFB: game window not available yet");
+                spdlog::warn("WheelFFB: game window not available yet; retrying shortly");
                 release_device();
                 release_directinput();
+                retryAfter_ = GetTickCount() + FFB_DEVICE_RETRY_MS;
                 return false;
             }
 
@@ -2545,9 +2555,15 @@ namespace
 
             if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
             {
-                if (reacquire_after_input_loss("GUID_Spring", hr))
-                    hr = springEffect_->SetParameters(
-                        &params, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+                if (!reacquire_after_input_loss("GUID_Spring", hr))
+                    return;
+                hr = springEffect_->SetParameters(
+                    &params, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+                if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
+                {
+                    note_device_failure("GUID_Spring retry", hr);
+                    return;
+                }
             }
 
             if (FAILED(hr))
@@ -2686,9 +2702,15 @@ namespace
 
             if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
             {
-                if (reacquire_after_input_loss("GUID_Damper", hr))
-                    hr = damperEffect_->SetParameters(
-                        &params, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+                if (!reacquire_after_input_loss("GUID_Damper", hr))
+                    return;
+                hr = damperEffect_->SetParameters(
+                    &params, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+                if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
+                {
+                    note_device_failure("GUID_Damper retry", hr);
+                    return;
+                }
             }
 
             if (FAILED(hr))
@@ -2880,9 +2902,15 @@ namespace
 
             if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
             {
-                if (reacquire_after_input_loss("GUID_Sine periodic", hr))
-                    hr = effect->SetParameters(
-                        &params, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+                if (!reacquire_after_input_loss("GUID_Sine periodic", hr))
+                    return;
+                hr = effect->SetParameters(
+                    &params, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+                if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
+                {
+                    note_device_failure("GUID_Sine periodic retry", hr);
+                    return;
+                }
             }
 
             if (FAILED(hr))
@@ -3026,8 +3054,17 @@ namespace
 
             if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
             {
-                if (reacquire_after_input_loss("ConstantForce", hr) && constantEffect_)
-                    hr = constantEffect_->SetParameters(&params, flags);
+                // Input loss is a transient ownership/focus condition, not proof
+                // that this physical DirectInput interface is the wrong FFB port.
+                // Preserve the grace window before any device reinitialization.
+                if (!reacquire_after_input_loss("ConstantForce", hr) || !constantEffect_)
+                    return;
+                hr = constantEffect_->SetParameters(&params, flags);
+                if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
+                {
+                    note_device_failure("ConstantForce retry", hr);
+                    return;
+                }
             }
 
             if (hr == E_HANDLE || hr == DIERR_NOTDOWNLOADED || !constantEffect_)
