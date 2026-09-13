@@ -39,11 +39,11 @@ float3 SrgbToLinear(float3 c)
 float4 PSMain(VSOut input) : SV_Target
 {
     float4 src = SourceTexture.Sample(SourceSampler, input.uv);
-    float3 linear;
+    float3 linearColor;
     if (SourceIsScRgb > 0.5)
-        linear = max(src.rgb, 0.0) / max(SdrWhiteScale, 0.001);
+        linearColor = max(src.rgb, 0.0) / max(SdrWhiteScale, 0.001);
     else
-        linear = SrgbToLinear(saturate(src.rgb));
-    return float4(saturate(linear), 1.0);
+        linearColor = SrgbToLinear(saturate(src.rgb));
+    return float4(saturate(linearColor), 1.0);
 }
 )HLSL";
