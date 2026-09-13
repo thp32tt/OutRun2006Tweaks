@@ -13,8 +13,8 @@ Implemented:
 - predicted OpenXR HMD orientation and position transport
 - left/right OpenXR FOV and recommended eye sizes already included in the IPC ABI
 - renderer-side head tracking at the verified OutRun VS c64 WorldViewProjection upload
-- one OpenXR pose latched per D3D9 `BeginScene`, so all draws in a scene use one pose
-- one renderer telemetry result published at `EndScene`, so `CAMERA APPLIED` describes that completed scene
+- one OpenXR pose latched after each successful D3D9 `BeginScene`, so all draws in a scene use one pose
+- one renderer telemetry result published after successful `EndScene`, so `CAMERA APPLIED` describes that completed scene
 - runtime verification of `c64..c67 = Transpose(WorldView * Projection)` before injection
 - executable-range / readable-memory validation before reverse-engineered renderer globals are read
 - orientation-only head tracking by default
@@ -52,9 +52,9 @@ Quest 3 / OpenXR runtime (SteamVR or VDXR)
                  v
       OutRun2006Tweaks dinput8.dll (x86)
                  |
-                 | BeginScene: latch one HMD pose
+                 | BeginScene success: latch one HMD pose
                  | SetVertexShaderConstantF: verify/patch c64 WVP
-                 | EndScene: publish completed-scene telemetry
+                 | EndScene success: publish completed-scene telemetry
                  v
         OutRun 2006 D3D9 renderer
 ```
@@ -108,12 +108,13 @@ If the OpenXR pose is older than 250 ms, no head transform is applied.
 
 ## Runtime diagnostics
 
-With `[VR] Telemetry = true`, the game logs cumulative `BeginScene`, vertex
-constant, verified, injected, rejected and unsafe-address counts once per second.
-The host's existing `CAMERA APPLIED` indicator is now published once per completed
-D3D9 scene and is set only if at least one verified final c64 upload was actually
-patched in that scene. A scene with no injection therefore clears the previous
-scene's applied result instead of leaving stale success telemetry behind.
+With `[VR] Telemetry = true`, the game logs cumulative `BeginScene`, c64 candidate,
+verified, injected, rejected and unsafe-address counts once per second. The generic
+`SetVertexShaderConstantF` call counter was deliberately removed from the hot path.
+The host's existing `CAMERA APPLIED` indicator is published once per successfully
+completed D3D9 scene and is set only if at least one verified final c64 upload was
+actually patched in that scene. A scene with no injection therefore clears the
+previous scene's applied result instead of leaving stale success telemetry behind.
 
 For a healthy run, `verified` and `injected` should both increase while racing.
 `unsafe` should remain zero. Some `rejected` c64 candidates can be normal because
