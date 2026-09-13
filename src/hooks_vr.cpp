@@ -26,7 +26,7 @@ namespace Settings
 	Setting<float> VRRotationScale{ "VR", "RotationScale", 1.0f,
 		"Scales HMD rotation around the recentered forward direction.", Range<float>{ 0.0f, 2.0f } };
 	Setting<int> VRMatrixOrder{ "VR", "MatrixOrder", 0,
-		"Camera-matrix composition order. The default matches the game's row-vector D3D9 convention; use the alternate only for diagnostics.",
+		"Camera-matrix composition order. Default matches the expected D3D9 row-vector convention.",
 		{ "GameView * HeadInverse", "HeadInverse * GameView" } };
 	Setting<bool> VRDebugPose{ "VR", "DebugPose", false,
 		"Uses the manual debug angles below when no OpenXR host pose is available." };
@@ -42,16 +42,8 @@ namespace OutRunVR
 {
 	namespace
 	{
-		struct Vec3
-		{
-			float x, y, z;
-		};
-
-		struct Quat
-		{
-			float x, y, z, w;
-		};
-
+		struct Vec3 { float x, y, z; };
+		struct Quat { float x, y, z, w; };
 		struct PoseSample
 		{
 			Quat orientation{ 0.0f, 0.0f, 0.0f, 1.0f };
@@ -74,38 +66,32 @@ namespace OutRunVR
 
 		constexpr float Pi = 3.14159265358979323846f;
 
-		float DegToRad(float degrees)
-		{
-			return degrees * (Pi / 180.0f);
-		}
+		float DegToRad(float degrees) { return degrees * (Pi / 180.0f); }
 
 		Quat Normalize(Quat q)
 		{
 			const float lengthSq = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
 			if (lengthSq <= 1.0e-12f)
 				return { 0.0f, 0.0f, 0.0f, 1.0f };
-
 			const float invLength = 1.0f / std::sqrt(lengthSq);
-			q.x *= invLength;
-			q.y *= invLength;
-			q.z *= invLength;
-			q.w *= invLength;
-			return q;
+			return { q.x * invLength, q.y * invLength, q.z * invLength, q.w * invLength };
 		}
 
-		Quat Conjugate(const Quat& q)
-		{
-			return { -q.x, -q.y, -q.z, q.w };
-		}
+		Quat Conjugate(const Quat& q) { return { -q.x, -q.y, -q.z, q.w }; }
 
-		Quat Multiply(const Quat& a, const Quat& b)
+		Quat MultiplyRaw(const Quat& a, const Quat& b)
 		{
-			return Normalize({
+			return {
 				a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
 				a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
 				a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w,
 				a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
-			});
+			};
+		}
+
+		Quat Multiply(const Quat& a, const Quat& b)
+		{
+			return Normalize(MultiplyRaw(a, b));
 		}
 
 		Quat AxisAngle(float x, float y, float z, float radians)
@@ -127,57 +113,38 @@ namespace OutRunVR
 		{
 			q = Normalize(q);
 			if (q.w < 0.0f)
-			{
-				q.x = -q.x;
-				q.y = -q.y;
-				q.z = -q.z;
-				q.w = -q.w;
-			}
+				q = { -q.x, -q.y, -q.z, -q.w };
 
-			const float clampedW = std::clamp(q.w, -1.0f, 1.0f);
-			const float angle = 2.0f * std::acos(clampedW);
-			const float sinHalf = std::sqrt(std::max(0.0f, 1.0f - clampedW * clampedW));
+			const float w = std::clamp(q.w, -1.0f, 1.0f);
+			const float angle = 2.0f * std::acos(w);
+			const float sinHalf = std::sqrt(std::max(0.0f, 1.0f - w * w));
 			if (sinHalf < 1.0e-6f || angle < 1.0e-6f)
 				return { 0.0f, 0.0f, 0.0f, 1.0f };
-
-			const float ax = q.x / sinHalf;
-			const float ay = q.y / sinHalf;
-			const float az = q.z / sinHalf;
-			return AxisAngle(ax, ay, az, angle * scale);
+			return AxisAngle(q.x / sinHalf, q.y / sinHalf, q.z / sinHalf, angle * scale);
 		}
 
 		Vec3 RotateVector(const Quat& qIn, const Vec3& v)
 		{
 			const Quat q = Normalize(qIn);
 			const Quat p{ v.x, v.y, v.z, 0.0f };
-			const Quat r = Multiply(Multiply(q, p), Conjugate(q));
+			const Quat r = MultiplyRaw(MultiplyRaw(q, p), Conjugate(q));
 			return { r.x, r.y, r.z };
 		}
 
 		D3DMATRIX IdentityMatrix()
 		{
 			D3DMATRIX out{};
-			out._11 = 1.0f;
-			out._22 = 1.0f;
-			out._33 = 1.0f;
-			out._44 = 1.0f;
+			out._11 = out._22 = out._33 = out._44 = 1.0f;
 			return out;
 		}
 
 		D3DMATRIX MatrixFromPose(const Quat& qIn, const Vec3& position)
 		{
 			const Quat q = Normalize(qIn);
-			const float xx = q.x * q.x;
-			const float yy = q.y * q.y;
-			const float zz = q.z * q.z;
-			const float xy = q.x * q.y;
-			const float xz = q.x * q.z;
-			const float yz = q.y * q.z;
-			const float xw = q.x * q.w;
-			const float yw = q.y * q.w;
-			const float zw = q.z * q.w;
+			const float xx = q.x * q.x, yy = q.y * q.y, zz = q.z * q.z;
+			const float xy = q.x * q.y, xz = q.x * q.z, yz = q.y * q.z;
+			const float xw = q.x * q.w, yw = q.y * q.w, zw = q.z * q.w;
 
-			// D3D9/D3DX row-vector rotation-matrix convention.
 			D3DMATRIX out = IdentityMatrix();
 			out._11 = 1.0f - 2.0f * (yy + zz);
 			out._12 = 2.0f * (xy + zw);
@@ -198,24 +165,18 @@ namespace OutRunVR
 		{
 			D3DMATRIX out{};
 			for (int row = 0; row < 4; ++row)
-			{
 				for (int col = 0; col < 4; ++col)
-				{
 					for (int k = 0; k < 4; ++k)
 						out.m[row][col] += a.m[row][k] * b.m[k][col];
-				}
-			}
 			return out;
 		}
 
 		D3DMATRIX InverseRigid(const D3DMATRIX& m)
 		{
 			D3DMATRIX out = IdentityMatrix();
-
 			out._11 = m._11; out._12 = m._21; out._13 = m._31;
 			out._21 = m._12; out._22 = m._22; out._23 = m._32;
 			out._31 = m._13; out._32 = m._23; out._33 = m._33;
-
 			out._41 = -(m._41 * out._11 + m._42 * out._21 + m._43 * out._31);
 			out._42 = -(m._41 * out._12 + m._42 * out._22 + m._43 * out._32);
 			out._43 = -(m._41 * out._13 + m._42 * out._23 + m._43 * out._33);
@@ -231,7 +192,6 @@ namespace OutRunVR
 
 			SharedInitAttempted = true;
 			QueryPerformanceFrequency(&QpcFrequency);
-
 			SharedMapping = CreateFileMappingW(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE,
 				0, static_cast<DWORD>(sizeof(SharedPoseState)), SharedMemoryName);
 			if (!SharedMapping)
@@ -277,11 +237,9 @@ namespace OutRunVR
 				const std::uint32_t seqBefore = SharedState->sequence;
 				if (seqBefore & 1u)
 					continue;
-
 				MemoryBarrier();
-				std::memcpy(&snapshot, const_cast<const SharedPoseState*>(SharedState), sizeof(snapshot));
+				std::memcpy(&snapshot, SharedState, sizeof(snapshot));
 				MemoryBarrier();
-
 				const std::uint32_t seqAfter = SharedState->sequence;
 				if (seqBefore == seqAfter && !(seqAfter & 1u))
 				{
@@ -331,19 +289,13 @@ namespace OutRunVR
 			pose.orientationValid = (snapshot.flags & OrientationValid) != 0;
 			pose.positionValid = (snapshot.flags & PositionValid) != 0;
 
-			// OpenXR is right-handed with -Z forward. OutRun's D3D9 camera is
-			// treated as left-handed here by reflecting the Z basis.
+			// OpenXR: right handed, -Z forward. Reflect Z into the D3D9 game's
+			// left-handed basis. B * R * B maps quaternion (x,y,z,w) to (-x,-y,z,w).
 			pose.orientation = Normalize({
-				-snapshot.orientation[0],
-				-snapshot.orientation[1],
-				 snapshot.orientation[2],
-				 snapshot.orientation[3]
+				-snapshot.orientation[0], -snapshot.orientation[1],
+				snapshot.orientation[2], snapshot.orientation[3]
 			});
-			pose.position = {
-				snapshot.position[0],
-				snapshot.position[1],
-				-snapshot.position[2]
-			};
+			pose.position = { snapshot.position[0], snapshot.position[1], -snapshot.position[2] };
 			return pose.orientationValid;
 		}
 
@@ -363,7 +315,6 @@ namespace OutRunVR
 
 			PoseSample sample{};
 			const bool haveHostPose = ReadHostPose(sample);
-
 			Quat relativeOrientation{ 0.0f, 0.0f, 0.0f, 1.0f };
 			Vec3 relativePosition{ 0.0f, 0.0f, 0.0f };
 
@@ -381,15 +332,14 @@ namespace OutRunVR
 
 				const Quat invCenter = Conjugate(Normalize(CenterOrientation));
 				relativeOrientation = Multiply(invCenter, sample.orientation);
-
 				if (Settings::VRPositionalTracking && sample.positionValid)
 				{
-					const Vec3 worldDelta{
+					const Vec3 delta{
 						sample.position.x - CenterPosition.x,
 						sample.position.y - CenterPosition.y,
 						sample.position.z - CenterPosition.z
 					};
-					relativePosition = RotateVector(invCenter, worldDelta);
+					relativePosition = RotateVector(invCenter, delta);
 				}
 			}
 			else if (Settings::VRDebugPose)
@@ -400,22 +350,18 @@ namespace OutRunVR
 					DegToRad(Settings::VRDebugRoll));
 			}
 			else
-			{
 				return;
-			}
 
 			relativeOrientation = ScaleRotation(relativeOrientation, Settings::VRRotationScale);
 			relativePosition.x *= Settings::VRWorldScale;
 			relativePosition.y *= Settings::VRWorldScale;
 			relativePosition.z *= Settings::VRWorldScale;
 
-			const D3DMATRIX headPose = MatrixFromPose(relativeOrientation, relativePosition);
-			const D3DMATRIX headInverse = InverseRigid(headPose);
+			const D3DMATRIX headInverse = InverseRigid(MatrixFromPose(relativeOrientation, relativePosition));
 
-			// CalcCameraMatrix has already generated the normal game view matrix.
-			// Only the matrix consumed by rendering is changed here; cam_pos_F8,
-			// look_pos_104, cam_ang_128 and the camera's previous-state cache remain
-			// untouched, so HMD motion cannot feed back into OutRun's camera/gameplay.
+			// CalcCameraMatrix has already produced the normal game view. Modifying
+			// only d3dmatrix140 means HMD motion never feeds back into OutRun's
+			// cam_pos_F8/look_pos_104/cam_ang_128 or its interpolation cache.
 			if (Settings::VRMatrixOrder == 0)
 				cam->d3dmatrix140 = MultiplyMatrix(cam->d3dmatrix140, headInverse);
 			else
@@ -434,17 +380,8 @@ namespace OutRunVR
 		}
 
 	public:
-		std::string_view description() override
-		{
-			return "OpenXRVRHeadTracking";
-		}
-
-		bool validate() override
-		{
-			// Install the hook even when VR starts disabled so the setting can be
-			// toggled at runtime without patching executable code mid-session.
-			return true;
-		}
+		std::string_view description() override { return "OpenXRVRHeadTracking"; }
+		bool validate() override { return true; }
 
 		bool apply() override
 		{
@@ -455,7 +392,6 @@ namespace OutRunVR
 				spdlog::error("VR: failed to hook CalcCameraMatrix");
 				return false;
 			}
-
 			spdlog::info("VR: CalcCameraMatrix head-tracking hook installed (VR disabled by default)");
 			return true;
 		}
