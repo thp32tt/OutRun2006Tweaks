@@ -31,6 +31,7 @@ profiles = read('src/wheel_profile_store.hpp')
 runtime = read('src/wheel_ffb_runtime.hpp')
 build = read('src/hooks_wheel_ffb_build.cpp')
 ini = read('OutRun2006Tweaks.ini')
+workflow = read('.github/workflows/build.yml')
 
 if (ROOT / 'src/hooks_wheel_physics_sat.hpp').exists():
     raise SystemExit('CURRENT VERIFY FAILED [obsolete Physics SAT helper still active]')
@@ -52,6 +53,13 @@ for rel, text in [
     print(f'OK [brace balance {rel}]')
 
 req(ini, 'UseNewInput = true', 'shipped SDL multi-device input default')
+for rel in (
+    'src/wheel_profile_store.hpp', 'src/hooks_input.cpp',
+    'src/overlay/settings_ui.cpp', 'src/overlay/overlay.cpp',
+    'CMakeLists.txt', 'cmake.toml', 'README.md', 'WHEEL_FFB.md',
+    'RELEASE_NOTES_v0.1.md', '.github/workflows/build.yml',
+):
+    req(workflow, rel, f'source snapshot includes verifier dependency {rel}')
 req(input_cpp, 'float InputManager_SteeringValue()', 'InputManager steering bridge exported')
 req(ffb, 'const float steering = InputManager_SteeringValue();', 'SAT reads active InputManager steering')
 req(input_cpp, 'SDL_GetJoysticks', 'SDL raw joystick enumeration')
@@ -79,9 +87,14 @@ req(ffb, 'GetProcAddress(proxy::origModule, "DirectInput8Create")', 'FFB backend
 forbid(ffb, 'createDirectInput = &::DirectInput8Create;', 'FFB backend never falls back through its own dinput8 proxy export')
 req(ffb, 'std::vector<FailedInterfaceState> failedInterfaces_;', 'FFB backend can quarantine multiple rejected interfaces')
 req(ffb, 'active_failed_interface_count()', 'FFB backend walks all rejected candidates instead of only one sibling')
-req(ffb, 'while (!ready)', 'FFB candidate probing is exhaustive without a fixed interface-count cap')
+req(ffb, 'const bool ready = initialize();', 'FFB candidate probing performs one potentially expensive interface open per update tick')
+req(ffb, 'next compatible interface will be probed on the next update tick', 'rejected sibling probing yields back to the game thread')
+forbid(ffb, 'while (!ready)', 'FFB candidate probing never loops over multiple device opens in one frame')
 forbid(ffb, 'MaxInterfaceProbes', 'FFB candidate probing has no arbitrary interface-count ceiling')
 req(ffb, 'DIPROP_VIDPID', 'FFB sibling selection can prefer matching physical VID/PID')
+req(ffb, 'requirePreferredProductGuid', 'FFB sibling selection prefers the DirectInput product GUID for one physical device')
+req(ffb, 'instance->guidFFDriver', 'FFB sibling selection can use the force-feedback driver identity')
+req(ffb, 'requirePreferredDriverVendor', 'FFB sibling selection can fall back to same FFB driver plus USB vendor')
 req(ffb, 'requirePreferredVidPid', 'FFB sibling selection has a same-VID/PID pass before name fallback')
 req(ffb, 'DWORD axes[2] = { DIJOFS_X, DIJOFS_Y };', 'ConstantForce tries canonical X/Y polar descriptor independent of actuator count')
 req(ffb, 'detected actuator one-axis CARTESIAN descriptor', 'ConstantForce can fall back to the actual enumerated actuator axis')
@@ -89,6 +102,9 @@ req(ffb, 'for (const DWORD detectedAxis : actuatorAxes_)', 'ConstantForce probes
 forbid(ffb, 'actuatorAxes_.size() < 2', 'FFB actuator enumeration is not arbitrarily capped at two objects')
 req(ffb, 'zero-force live SetParameters probe', 'ConstantForce candidate must validate the live update path at zero torque')
 req(ffb, 'mark_selected_interface_failed("ConstantForce live SetParameters", hr)', 'runtime ConstantForce failure quarantines the bad interface before reinit')
+req(ffb, 'FFB_CONSTANT_LIVE_FAILURE_LIMIT = 3', 'runtime ConstantForce quarantine requires repeated live-output failure')
+req(ffb, 'if (!record_constant_live_failure())', 'single ConstantForce live-output failure is retained as transient')
+req(ffb, 'transient ConstantForce update failure', 'transient ConstantForce failures are logged without immediate interface blacklist')
 req(ffb, 'if (!tick_before(retryNow, retryAfter_))', 'transient short retry is not overwritten by rejected-interface backoff')
 req(ffb, 'previous rejected-interface quarantine must not', 'FFB disable hard-resets failed-interface recovery state')
 req(ffb, 'if (!reacquire_after_input_loss("ConstantForce", hr) || !constantEffect_)', 'ConstantForce transient input loss keeps the recovery grace window')

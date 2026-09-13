@@ -216,6 +216,7 @@ namespace
     constexpr DWORD FFB_DEVICE_FAILURE_GRACE_MS = 750;
     constexpr DWORD FFB_DEVICE_RETRY_MS = 750;
     constexpr DWORD FFB_DEVICE_FAILED_BACKOFF_MS = 10000;
+    constexpr unsigned FFB_CONSTANT_LIVE_FAILURE_LIMIT = 3;
 
     // GetTickCount wraps roughly every 49.7 days. Compare deadlines by signed
     // subtraction so retry/holdoff gates remain correct across the wrap.
@@ -248,6 +249,17 @@ namespace
             (unsigned)guid.Data4[4], (unsigned)guid.Data4[5],
             (unsigned)guid.Data4[6], (unsigned)guid.Data4[7]);
         return lower_copy(b);
+    }
+
+    bool directinput_guid_equal(const GUID& a, const GUID& b)
+    {
+        return std::memcmp(&a, &b, sizeof(GUID)) == 0;
+    }
+
+    bool directinput_guid_is_zero(const GUID& guid)
+    {
+        const GUID zero{};
+        return directinput_guid_equal(guid, zero);
     }
 
     bool is_virtual_device_name(const std::string& lowered)
@@ -338,6 +350,9 @@ namespace
                     selectedConfiguredGuid_ = guidNow;
                     selectedConfiguredName_ = nameNow;
                     preferredVidPid_ = 0;
+                    preferredProductGuid_ = {};
+                    preferredFFDriverGuid_ = {};
+                    preferredVendorId_ = 0;
                     failedInterfaces_.clear();
                     directionTested_ = false;
                     request_device_reinitialize("configured wheel identity changed", S_OK);
@@ -366,30 +381,23 @@ namespace
                 if (tick_before(GetTickCount(), retryAfter_))
                     return;
 
-                bool ready = false;
-                size_t failedBefore = active_failed_interface_count();
-                while (!ready)
-                {
-                    ready = initialize();
-                    if (ready)
-                        break;
-
-                    const size_t failedAfter = active_failed_interface_count();
-                    if (failedAfter <= failedBefore)
-                        break;
-
-                    // Every compatibility failure adds one previously unseen GUID
-                    // to failedInterfaces_. That monotonic progress makes this
-                    // exhaustive without an arbitrary device-count limit, while
-                    // transient failures that do not quarantine a GUID break out.
-                    failedBefore = failedAfter;
-                    spdlog::info(
-                        "WheelFFB: FFB interface failed validation; probing the next compatible interface immediately ({} rejected this cycle)",
-                        failedAfter);
-                }
-
+                const size_t failedBefore = active_failed_interface_count();
+                const bool ready = initialize();
                 if (!ready)
                 {
+                    const size_t failedAfter = active_failed_interface_count();
+                    if (failedAfter > failedBefore)
+                    {
+                        // Compatibility rejection is progress, not a reason to
+                        // block the game thread while every sibling is reopened.
+                        // Probe the next candidate on the next update tick.
+                        retryAfter_ = 0;
+                        spdlog::info(
+                            "WheelFFB: FFB interface failed validation; next compatible interface will be probed on the next update tick ({} rejected this cycle)",
+                            failedAfter);
+                        return;
+                    }
+
                     // initialize() can request the short retry interval for
                     // transient startup/focus conditions. Do not overwrite that
                     // with the rejected-interface backoff.
@@ -1503,12 +1511,19 @@ namespace
         {
             WheelFFBEngine* self = nullptr;
             GUID selectedGuid{};
+            GUID selectedProductGuid{};
+            GUID selectedFFDriverGuid{};
             std::string selectedName;
             DWORD selectedVidPid = 0;
+            GUID preferredProductGuid{};
+            GUID preferredFFDriverGuid{};
             DWORD preferredVidPid = 0;
+            WORD preferredVendorId = 0;
             bool found = false;
             bool matchGuidOnly = false;
+            bool requirePreferredProductGuid = false;
             bool requirePreferredVidPid = false;
+            bool requirePreferredDriverVendor = false;
         };
 
         static BOOL CALLBACK enum_devices_callback(
@@ -1543,15 +1558,40 @@ namespace
                 (wantedGuid.empty() || directinput_guid_key(instance->guidInstance) != wantedGuid))
                 return DIENUM_CONTINUE;
 
-            DWORD candidateVidPid = 0;
-            if (ctx->self && ctx->requirePreferredVidPid)
+            if (ctx->requirePreferredProductGuid &&
+                !directinput_guid_equal(instance->guidProduct, ctx->preferredProductGuid))
             {
-                candidateVidPid = ctx->self->query_device_vidpid(instance->guidInstance);
-                if (candidateVidPid == 0 || candidateVidPid != ctx->preferredVidPid)
-                    return DIENUM_CONTINUE;
+                return DIENUM_CONTINUE;
             }
 
-            if (!ctx->matchGuidOnly && !ctx->requirePreferredVidPid && !wanted.empty() &&
+            DWORD candidateVidPid = 0;
+            if (ctx->self &&
+                (ctx->requirePreferredVidPid || ctx->requirePreferredDriverVendor))
+            {
+                candidateVidPid = ctx->self->query_device_vidpid(instance->guidInstance);
+            }
+
+            if (ctx->requirePreferredVidPid &&
+                (candidateVidPid == 0 || candidateVidPid != ctx->preferredVidPid))
+            {
+                return DIENUM_CONTINUE;
+            }
+
+            if (ctx->requirePreferredDriverVendor)
+            {
+                if (candidateVidPid == 0 || LOWORD(candidateVidPid) != ctx->preferredVendorId ||
+                    directinput_guid_is_zero(ctx->preferredFFDriverGuid) ||
+                    !directinput_guid_equal(instance->guidFFDriver, ctx->preferredFFDriverGuid))
+                {
+                    return DIENUM_CONTINUE;
+                }
+            }
+
+            if (!ctx->matchGuidOnly &&
+                !ctx->requirePreferredProductGuid &&
+                !ctx->requirePreferredVidPid &&
+                !ctx->requirePreferredDriverVendor &&
+                !wanted.empty() &&
                 instanceName.find(wanted) == std::string::npos &&
                 productName.find(wanted) == std::string::npos)
             {
@@ -1562,6 +1602,8 @@ namespace
                 candidateVidPid = ctx->self->query_device_vidpid(instance->guidInstance);
 
             ctx->selectedGuid = instance->guidInstance;
+            ctx->selectedProductGuid = instance->guidProduct;
+            ctx->selectedFFDriverGuid = instance->guidFFDriver;
             ctx->selectedName = instance->tszProductName;
             ctx->selectedVidPid = candidateVidPid;
             ctx->found = true;
@@ -1591,11 +1633,26 @@ namespace
             retryAfter_ = 0;
             failedInterfaces_.clear();
             preferredVidPid_ = 0;
+            preferredProductGuid_ = {};
+            preferredFFDriverGuid_ = {};
+            preferredVendorId_ = 0;
 
             enabledLastTick_ = false;
             if (hadInitializedOutput)
                 spdlog::info("WheelFFB: disabled live; output released and driver autocenter restored");
             return true;
+        }
+
+        void clear_constant_live_failure()
+        {
+            constantLiveFailureCount_ = 0;
+        }
+
+        bool record_constant_live_failure()
+        {
+            if (constantLiveFailureCount_ < FFB_CONSTANT_LIVE_FAILURE_LIMIT)
+                ++constantLiveFailureCount_;
+            return constantLiveFailureCount_ >= FFB_CONSTANT_LIVE_FAILURE_LIMIT;
         }
 
         void clear_device_failure()
@@ -1698,6 +1755,7 @@ namespace
             springStrategy_ = 1;
             damperStrategy_ = 1;
             periodicStrategy_ = 1;
+            clear_constant_live_failure();
         }
 
         void teardown_for_reinitialize(const char* autocenterReason = "device reinitialize")
@@ -1874,12 +1932,30 @@ namespace
                 }
                 if (!ctx.found)
                 {
-                    // A physical wheel can expose more than one DirectInput
-                    // interface. Prefer the saved interface, but allow a sibling
-                    // with the same configured device name after validation fails.
                     spdlog::warn(
                         "WheelFFB: saved FFB GUID unavailable or rejected; probing compatible sibling interfaces");
                     ctx.matchGuidOnly = false;
+                }
+            }
+
+            if (!ctx.found && !directinput_guid_is_zero(preferredProductGuid_))
+            {
+                ctx.matchGuidOnly = false;
+                ctx.requirePreferredProductGuid = true;
+                ctx.preferredProductGuid = preferredProductGuid_;
+                hr = directInput_->EnumDevices(
+                    DI8DEVCLASS_GAMECTRL, enum_devices_callback, &ctx,
+                    DIEDFL_ATTACHEDONLY | DIEDFL_FORCEFEEDBACK);
+                ctx.requirePreferredProductGuid = false;
+                if (FAILED(hr))
+                {
+                    release_directinput();
+                    return false;
+                }
+                if (!ctx.found)
+                {
+                    spdlog::warn(
+                        "WheelFFB: no remaining FFB interface shared the preferred DirectInput product GUID");
                 }
             }
 
@@ -1891,6 +1967,7 @@ namespace
                 hr = directInput_->EnumDevices(
                     DI8DEVCLASS_GAMECTRL, enum_devices_callback, &ctx,
                     DIEDFL_ATTACHEDONLY | DIEDFL_FORCEFEEDBACK);
+                ctx.requirePreferredVidPid = false;
                 if (FAILED(hr))
                 {
                     release_directinput();
@@ -1899,15 +1976,40 @@ namespace
                 if (!ctx.found)
                 {
                     spdlog::warn(
-                        "WheelFFB: no remaining FFB interface shared preferred VID/PID 0x{:08X}; falling back to the configured device name",
+                        "WheelFFB: no remaining FFB interface shared preferred VID/PID 0x{:08X}",
                         (unsigned)preferredVidPid_);
+                }
+            }
+
+            if (!ctx.found && !directinput_guid_is_zero(preferredFFDriverGuid_) &&
+                preferredVendorId_ != 0)
+            {
+                ctx.matchGuidOnly = false;
+                ctx.requirePreferredDriverVendor = true;
+                ctx.preferredFFDriverGuid = preferredFFDriverGuid_;
+                ctx.preferredVendorId = preferredVendorId_;
+                hr = directInput_->EnumDevices(
+                    DI8DEVCLASS_GAMECTRL, enum_devices_callback, &ctx,
+                    DIEDFL_ATTACHEDONLY | DIEDFL_FORCEFEEDBACK);
+                ctx.requirePreferredDriverVendor = false;
+                if (FAILED(hr))
+                {
+                    release_directinput();
+                    return false;
+                }
+                if (!ctx.found)
+                {
+                    spdlog::warn(
+                        "WheelFFB: no remaining FFB interface shared preferred FFB driver/vendor; falling back to the configured device name");
                 }
             }
 
             if (!ctx.found)
             {
                 ctx.matchGuidOnly = false;
+                ctx.requirePreferredProductGuid = false;
                 ctx.requirePreferredVidPid = false;
+                ctx.requirePreferredDriverVendor = false;
                 hr = directInput_->EnumDevices(
                     DI8DEVCLASS_GAMECTRL, enum_devices_callback, &ctx,
                     DIEDFL_ATTACHEDONLY | DIEDFL_FORCEFEEDBACK);
@@ -1926,15 +2028,31 @@ namespace
             selectedName_ = ctx.selectedName;
             const bool selectedConfiguredInterface =
                 !configuredGuid.empty() && directinput_guid_key(selectedGuid_) == configuredGuid;
-            if (ctx.selectedVidPid != 0 &&
-                (preferredVidPid_ == 0 || selectedConfiguredInterface))
+            if (!directinput_guid_is_zero(ctx.selectedProductGuid) &&
+                (directinput_guid_is_zero(preferredProductGuid_) || selectedConfiguredInterface))
             {
-                preferredVidPid_ = ctx.selectedVidPid;
+                preferredProductGuid_ = ctx.selectedProductGuid;
+            }
+            if (!directinput_guid_is_zero(ctx.selectedFFDriverGuid) &&
+                (directinput_guid_is_zero(preferredFFDriverGuid_) || selectedConfiguredInterface))
+            {
+                preferredFFDriverGuid_ = ctx.selectedFFDriverGuid;
+            }
+            if (ctx.selectedVidPid != 0)
+            {
+                if (preferredVidPid_ == 0 || selectedConfiguredInterface)
+                    preferredVidPid_ = ctx.selectedVidPid;
+                if (preferredVendorId_ == 0 || selectedConfiguredInterface)
+                    preferredVendorId_ = LOWORD(ctx.selectedVidPid);
             }
             selectedConfiguredGuid_ = lower_copy(Settings::WheelFFBDeviceGuid.get().c_str());
             selectedConfiguredName_ = lower_copy(Settings::WheelFFBDeviceName.get().c_str());
-            spdlog::info("WheelFFB: selected DirectInput identity '{}' / '{}'",
-                selectedName_, directinput_guid_key(selectedGuid_));
+            spdlog::info(
+                "WheelFFB: selected DirectInput identity '{}' / '{}' product={} ffDriver={} vidpid=0x{:08X}",
+                selectedName_, directinput_guid_key(selectedGuid_),
+                directinput_guid_key(ctx.selectedProductGuid),
+                directinput_guid_key(ctx.selectedFFDriverGuid),
+                (unsigned)ctx.selectedVidPid);
 
             hr = directInput_->CreateDevice(selectedGuid_, &device_, nullptr);
             if (FAILED(hr) || !device_)
@@ -2327,6 +2445,7 @@ namespace
                 constantEffectPolar_ = polar;
                 prevConstantLevel_ = 0;
                 lastConstantWriteTick_ = 0;
+                clear_constant_live_failure();
                 spdlog::info(
                     "WheelFFB: ConstantForce validated with {} including zero-force live SetParameters",
                     descriptor);
@@ -3088,20 +3207,31 @@ namespace
                 recreateRampFrames_ = RecreateRampFrames;
                 prevConstantLevel_ = 0;
                 prevStructuralLevel_ = 0;
+                clear_constant_live_failure();
                 spdlog::info("WheelFFB: recreated ConstantForce after handle loss; ramping in");
                 return;
             }
 
             if (FAILED(hr))
             {
+                if (!record_constant_live_failure())
+                {
+                    note_device_failure("ConstantForce live SetParameters", hr);
+                    spdlog::warn(
+                        "WheelFFB: transient ConstantForce update failure {}/{} (0x{:08X}); retaining the current interface",
+                        constantLiveFailureCount_, FFB_CONSTANT_LIVE_FAILURE_LIMIT, (unsigned)hr);
+                    return;
+                }
+
                 mark_selected_interface_failed("ConstantForce live SetParameters", hr);
-                request_device_reinitialize("ConstantForce output failed", hr);
+                request_device_reinitialize("ConstantForce output failed repeatedly", hr);
                 spdlog::warn(
-                    "WheelFFB: constant force update failed (0x{:08X}); current interface will be skipped on reinitialization",
-                    (unsigned)hr);
+                    "WheelFFB: ConstantForce update failed {} consecutive times (0x{:08X}); current interface will be skipped on reinitialization",
+                    constantLiveFailureCount_, (unsigned)hr);
                 return;
             }
 
+            clear_constant_live_failure();
             clear_device_failure();
             prevConstantLevel_ = requestedLevel;
             lastConstantWriteTick_ = GetTickCount();
@@ -3611,6 +3741,9 @@ namespace
         DWORD retryAfter_ = 0;
         std::vector<FailedInterfaceState> failedInterfaces_;
         DWORD preferredVidPid_ = 0;
+        GUID preferredProductGuid_{};
+        GUID preferredFFDriverGuid_{};
+        WORD preferredVendorId_ = 0;
         DWORD constantRecreateHoldoffUntil_ = 0;
         DWORD periodicRecreateHoldoffUntil_ = 0;
         DWORD springRecreateHoldoffUntil_ = 0;
@@ -3618,6 +3751,7 @@ namespace
         DWORD lastUpdateTick_ = 0;
         DWORD lastLogTick_ = 0;
         DWORD deviceFailureSince_ = 0;
+        unsigned constantLiveFailureCount_ = 0;
         DWORD deviceReinitAfter_ = 0;
         bool deviceReinitPending_ = false;
 
