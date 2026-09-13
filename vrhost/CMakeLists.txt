@@ -14,9 +14,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
 
-# Keep the host pinned to the current Khronos public SDK release used by this
-# branch. The game DLL itself has no OpenXR SDK dependency; only this x64 host
-# links the loader.
 set(BUILD_LOADER ON CACHE BOOL "" FORCE)
 set(BUILD_API_LAYERS OFF CACHE BOOL "" FORCE)
 set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -32,11 +29,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(openxr_sdk)
 
-# Build through the compatibility/diagnostic wrapper. It requests OpenXR 1.0,
-# waits until OutRun has a usable window before taking over the headset, mirrors
-# the game into a temporary OpenXR quad, and clips slightly overhanging client
-# rectangles to the monitor selected for DXGI Desktop Duplication.
-add_executable(outrun-vr-host main_compat_clipped.cpp)
+# main_compat.cpp now owns the complete VDXR/OpenXR 1.0 compatibility and
+# diagnostic mono-mirror path. Build it directly so there is no preprocessor
+# wrapper between the source we debug and the executable we test.
+add_executable(outrun-vr-host main_compat.cpp)
 target_include_directories(outrun-vr-host PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
 target_compile_definitions(outrun-vr-host PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi)
