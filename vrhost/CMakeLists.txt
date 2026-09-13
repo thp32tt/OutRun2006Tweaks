@@ -29,21 +29,19 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(openxr_sdk)
 
-# v3 keeps the v2 HDR/color/tracking/exit implementation and routes runtime
-# HLSL compilation through shader_compile_patch.hpp. This fixes the accidental
-# use of HLSL's reserved identifier "linear" without duplicating the host.
-add_executable(outrun-vr-host main_compat_v3.cpp)
+# Standalone true-stereo host. Gameplay consumes the game's SBS backbuffer and
+# submits a two-view XrCompositionLayerProjection. Menus/pause/results keep the
+# LOCAL-space fixed theater quad. No hello_xr interception layer is involved.
+add_executable(outrun-vr-host main_stereo.cpp)
 target_include_directories(outrun-vr-host PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
 target_compile_definitions(outrun-vr-host PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
-target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi d3dcompiler)
+target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi d3dcompiler user32)
 
-# Compile the exact same embedded MirrorShader through the exact same patched
-# D3DCompile path during CI. This catches HLSL syntax/profile errors before an
-# artifact is published, rather than discovering them only after xrCreateSession.
-add_executable(outrun-vr-shader-smoke shader_smoke_test.cpp)
+# Compile the exact HLSL used by main_stereo.cpp during CI.
+add_executable(outrun-vr-shader-smoke stereo_shader_smoke.cpp)
 target_include_directories(outrun-vr-shader-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
 target_compile_definitions(outrun-vr-shader-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
-target_link_libraries(outrun-vr-shader-smoke PRIVATE openxr_loader d3d11 dxgi d3dcompiler)
+target_link_libraries(outrun-vr-shader-smoke PRIVATE d3dcompiler)
 
 set_target_properties(outrun-vr-host PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
