@@ -7,14 +7,14 @@
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 
-// VR settings live here, but camera manipulation no longer does.
+// VR settings live here, but the final camera transform does not.
 //
 // The first prototype hooked CalcCameraMatrix and modified EvWorkCamera::d3dmatrix140.
 // That turned out not to be the authoritative render boundary and also collided with
 // FixZBufferPrecision, which legitimately hooks the same game function. Head tracking
 // is now applied only at the verified D3D9 c64 WorldViewProjection upload in
-// vr_renderer_probe.cpp. Keeping a single render-side path prevents double transforms,
-// handedness drift and misleading telemetry.
+// vr_renderer_probe.cpp. A temporary render-phase cam_pos/look sync is allowed only
+// for culling/billboard/flare consumers and is restored before EndScene returns.
 namespace Settings
 {
 	Setting<bool> VREnabled{ "VR", "Enabled", true,
@@ -25,6 +25,8 @@ namespace Settings
 		"Applies the OpenXR HMD orientation at OutRun's verified D3D9 WorldViewProjection upload." };
 	Setting<bool> VRPositionalTracking{ "VR", "PositionalTracking", false,
 		"Also applies HMD X/Y/Z movement. Experimental; keep disabled until rotation tracking is verified." };
+	Setting<bool> VRCullingCameraSync{ "VR", "CullingCameraSync", true,
+		"Temporarily mirrors the render-time VR camera into OutRun's live camera position/look so render-phase culling and camera-facing effects can follow head motion. Restored before game logic resumes." };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,
 		"Game-world units per metre of OpenXR head movement.", Range<float>{ 0.1f, 10.0f } };
 	Setting<float> VRRotationScale{ "VR", "RotationScale", 1.0f,
