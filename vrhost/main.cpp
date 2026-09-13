@@ -142,6 +142,18 @@ namespace
 		return out;
 	}
 
+	bool IsProcessAlive(DWORD pid)
+	{
+		if (!pid)
+			return false;
+		HANDLE process = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+		if (!process)
+			return false;
+		const DWORD wait = WaitForSingleObject(process, 0);
+		CloseHandle(process);
+		return wait == WAIT_TIMEOUT;
+	}
+
 	class SharedWriter
 	{
 	public:
@@ -151,33 +163,60 @@ namespace
 				0, static_cast<DWORD>(sizeof(OutRunVR::SharedPoseState)), OutRunVR::SharedMemoryName);
 			if (!mapping_)
 				throw std::runtime_error("CreateFileMappingW failed: " + std::to_string(GetLastError()));
+			const bool mappingAlreadyExisted = GetLastError() == ERROR_ALREADY_EXISTS;
+
 			state_ = static_cast<OutRunVR::SharedPoseState*>(MapViewOfFile(
 				mapping_, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(OutRunVR::SharedPoseState)));
 			if (!state_)
 				throw std::runtime_error("MapViewOfFile failed: " + std::to_string(GetLastError()));
-			if (state_->magic != OutRunVR::SharedMagic ||
-				state_->protocolVersion != OutRunVR::SharedProtocolVersion ||
-				state_->structSize != sizeof(OutRunVR::SharedPoseState))
+
+			if (!mappingAlreadyExisted)
 			{
+				// Only the kernel-object creator initializes storage. Publish magic
+				// last so an attaching x86 client never accepts a partial header.
 				std::memset(state_, 0, sizeof(*state_));
-				state_->magic = OutRunVR::SharedMagic;
 				state_->protocolVersion = OutRunVR::SharedProtocolVersion;
 				state_->structSize = sizeof(OutRunVR::SharedPoseState);
+				MemoryBarrier();
+				state_->magic = OutRunVR::SharedMagic;
 			}
+			else
+			{
+				// The game may have created the mapping a few instructions earlier.
+				// Never memset an existing mapping: wait for its creator to finish.
+				for (int attempt = 0; attempt < 200 && !HeaderValid(); ++attempt)
+					Sleep(10);
+				if (!HeaderValid())
+					throw std::runtime_error("existing VR shared-memory mapping never published a valid header");
+			}
+
+			AcquireHostOwnership();
 		}
 
 		~SharedWriter()
 		{
 			if (state_)
 			{
-				BeginWrite();
-				state_->flags = 0;
-				state_->hostPid = 0;
-				EndWrite();
+				if (ownsHost_ && state_->hostPid == GetCurrentProcessId())
+				{
+					BeginWrite();
+					state_->flags = 0;
+					state_->hostPid = 0;
+					EndWrite();
+				}
 				UnmapViewOfFile(state_);
 			}
 			if (mapping_)
 				CloseHandle(mapping_);
+		}
+
+		void NotifyReferenceSpaceChanged()
+		{
+			++referenceSpaceGeneration_;
+			if (referenceSpaceGeneration_ == 0)
+				referenceSpaceGeneration_ = 1;
+			std::cout << "OpenXR reference space changed; generation="
+				<< referenceSpaceGeneration_ << "\n";
 		}
 
 		void Write(const XrSpaceLocation& headLocation,
@@ -211,6 +250,7 @@ namespace
 			state_->position[0] = headLocation.pose.position.x;
 			state_->position[1] = headLocation.pose.position.y;
 			state_->position[2] = headLocation.pose.position.z;
+			state_->reserved[OutRunVR::HostReferenceSpaceGenerationIndex] = referenceSpaceGeneration_;
 
 			for (std::uint32_t eye = 0; eye < 2; ++eye)
 			{
@@ -230,6 +270,42 @@ namespace
 		}
 
 	private:
+		bool HeaderValid() const
+		{
+			return state_ && state_->magic == OutRunVR::SharedMagic &&
+				state_->protocolVersion == OutRunVR::SharedProtocolVersion &&
+				state_->structSize == sizeof(OutRunVR::SharedPoseState);
+		}
+
+		void AcquireHostOwnership()
+		{
+			if (!HeaderValid())
+				throw std::runtime_error("VR shared-memory header is invalid");
+
+			const LONG self = static_cast<LONG>(GetCurrentProcessId());
+			for (int attempt = 0; attempt < 100; ++attempt)
+			{
+				const LONG observed = static_cast<LONG>(state_->hostPid);
+				if (observed == self)
+				{
+					ownsHost_ = true;
+					return;
+				}
+				if (observed != 0 && IsProcessAlive(static_cast<DWORD>(observed)))
+					throw std::runtime_error("another outrun-vr-host process already owns the VR pose bridge");
+
+				const LONG previous = InterlockedCompareExchange(
+					reinterpret_cast<volatile LONG*>(&state_->hostPid), self, observed);
+				if (previous == observed)
+				{
+					ownsHost_ = true;
+					return;
+				}
+				Sleep(1);
+			}
+			throw std::runtime_error("failed to acquire VR pose bridge host ownership");
+		}
+
 		void BeginWrite()
 		{
 			LONG sequence = InterlockedIncrement(reinterpret_cast<volatile LONG*>(&state_->sequence));
@@ -247,6 +323,8 @@ namespace
 
 		HANDLE mapping_ = nullptr;
 		OutRunVR::SharedPoseState* state_ = nullptr;
+		bool ownsHost_ = false;
+		std::uint32_t referenceSpaceGeneration_ = 1;
 	};
 
 	XrEnvironmentBlendMode ChooseBlendMode(XrInstance instance, XrSystemId systemId)
@@ -372,7 +450,7 @@ int main(int argc, char** argv)
 		XrSessionState sessionState = XR_SESSION_STATE_UNKNOWN;
 
 		std::cout << "Pose bridge running. Start OutRun 2006 with [VR] Enabled=true.\n";
-		std::cout << "F10 recenters head tracking in game. Ctrl+C closes this host.\n";
+		std::cout << "F10 recenters yaw in game. Ctrl+C closes this host.\n";
 
 		while (!exitRequested)
 		{
@@ -398,6 +476,10 @@ int main(int argc, char** argv)
 					else if (sessionState == XR_SESSION_STATE_EXITING ||
 						sessionState == XR_SESSION_STATE_LOSS_PENDING)
 						exitRequested = true;
+				}
+				else if (event.type == XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING)
+				{
+					shared.NotifyReferenceSpaceChanged();
 				}
 				event = { XR_TYPE_EVENT_DATA_BUFFER };
 			}
@@ -434,9 +516,6 @@ int main(int argc, char** argv)
 
 			shared.Write(headLocation, views, viewCount, configs, sessionState, instanceProperties.runtimeName);
 
-			// Milestone 1 owns a real OpenXR session and supplies predicted HMD
-			// tracking. Milestone 2 replaces this zero-layer end frame with stereo
-			// projection layers backed by the game's left/right render targets.
 			XrFrameEndInfo frameEnd{ XR_TYPE_FRAME_END_INFO };
 			frameEnd.displayTime = frameState.predictedDisplayTime;
 			frameEnd.environmentBlendMode = blendMode;
