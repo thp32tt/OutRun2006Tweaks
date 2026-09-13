@@ -367,10 +367,9 @@ namespace
                     return;
 
                 bool ready = false;
-                constexpr size_t MaxInterfaceProbes = 16;
-                for (size_t probe = 0; probe < MaxInterfaceProbes && !ready; ++probe)
+                size_t failedBefore = active_failed_interface_count();
+                while (!ready)
                 {
-                    const size_t failedBefore = active_failed_interface_count();
                     ready = initialize();
                     if (ready)
                         break;
@@ -379,9 +378,14 @@ namespace
                     if (failedAfter <= failedBefore)
                         break;
 
+                    // Every compatibility failure adds one previously unseen GUID
+                    // to failedInterfaces_. That monotonic progress makes this
+                    // exhaustive without an arbitrary device-count limit, while
+                    // transient failures that do not quarantine a GUID break out.
+                    failedBefore = failedAfter;
                     spdlog::info(
-                        "WheelFFB: FFB interface failed validation; probing the next compatible interface immediately ({}/{})",
-                        failedAfter, MaxInterfaceProbes);
+                        "WheelFFB: FFB interface failed validation; probing the next compatible interface immediately ({} rejected this cycle)",
+                        failedAfter);
                 }
 
                 if (!ready)

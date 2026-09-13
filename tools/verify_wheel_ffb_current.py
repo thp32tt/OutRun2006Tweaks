@@ -79,6 +79,8 @@ req(ffb, 'GetProcAddress(proxy::origModule, "DirectInput8Create")', 'FFB backend
 forbid(ffb, 'createDirectInput = &::DirectInput8Create;', 'FFB backend never falls back through its own dinput8 proxy export')
 req(ffb, 'std::vector<FailedInterfaceState> failedInterfaces_;', 'FFB backend can quarantine multiple rejected interfaces')
 req(ffb, 'active_failed_interface_count()', 'FFB backend walks all rejected candidates instead of only one sibling')
+req(ffb, 'while (!ready)', 'FFB candidate probing is exhaustive without a fixed interface-count cap')
+forbid(ffb, 'MaxInterfaceProbes', 'FFB candidate probing has no arbitrary interface-count ceiling')
 req(ffb, 'DIPROP_VIDPID', 'FFB sibling selection can prefer matching physical VID/PID')
 req(ffb, 'requirePreferredVidPid', 'FFB sibling selection has a same-VID/PID pass before name fallback')
 req(ffb, 'DWORD axes[2] = { DIJOFS_X, DIJOFS_Y };', 'ConstantForce tries canonical X/Y polar descriptor independent of actuator count')
