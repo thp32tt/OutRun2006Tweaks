@@ -28,9 +28,9 @@
 //
 // Gameplay camera state stays untouched. We patch only a c64 upload that first
 // proves the expected WVP relationship for the running executable. The OpenXR
-// pose is latched at BeginScene, used unchanged by every draw in that scene, and
-// renderer telemetry is published once at EndScene so CAMERA APPLIED describes
-// the completed scene rather than a stale result from a previous frame.
+// pose is latched after a successful BeginScene, used unchanged by every draw in
+// that scene, and telemetry is published after a successful EndScene so CAMERA
+// APPLIED describes the completed scene rather than stale prior-frame state.
 
 namespace Settings
 {
@@ -103,7 +103,6 @@ namespace OutRunVRRenderer
 
 		ULONGLONG LastSummaryMs = 0;
 		std::atomic<std::uint64_t> BeginSceneCalls{ 0 };
-		std::atomic<std::uint64_t> VertexConstantCalls{ 0 };
 		std::atomic<std::uint64_t> WvpCandidateCalls{ 0 };
 		std::atomic<std::uint64_t> WvpVerifiedCalls{ 0 };
 		std::atomic<std::uint64_t> WvpInjectedCalls{ 0 };
@@ -635,9 +634,8 @@ namespace OutRunVRRenderer
 				return;
 			LastSummaryMs = now;
 			spdlog::info(
-				"VR renderer: beginScene={} vsConst={} c64Candidate={} verified={} injected={} rejected={} unsafe={} latchedSeq={}",
+				"VR renderer: beginScene={} c64Candidate={} verified={} injected={} rejected={} unsafe={} latchedSeq={}",
 				BeginSceneCalls.load(std::memory_order_relaxed),
-				VertexConstantCalls.load(std::memory_order_relaxed),
 				WvpCandidateCalls.load(std::memory_order_relaxed),
 				WvpVerifiedCalls.load(std::memory_order_relaxed),
 				WvpInjectedCalls.load(std::memory_order_relaxed),
@@ -648,24 +646,31 @@ namespace OutRunVRRenderer
 
 		HRESULT __stdcall BeginSceneDest(IDirect3DDevice9* device)
 		{
-			LatchFramePose();
-			return BeginSceneHook.stdcall<HRESULT>(device);
+			const HRESULT result = BeginSceneHook.stdcall<HRESULT>(device);
+			if (SUCCEEDED(result))
+				LatchFramePose();
+			else
+				ResetFrameState();
+			return result;
 		}
 
 		HRESULT __stdcall EndSceneDest(IDirect3DDevice9* device)
 		{
-			// One telemetry publication per completed D3D9 scene prevents a prior
-			// frame's CAMERA APPLIED flag from surviving a frame with no injection.
-			PublishClientTelemetry(FrameTelemetryFlags,
-				(FrameTelemetryFlags & ClientPoseApplied) ? LatchedRelativeAngleDeg : 0.0f);
-			MaybeLogSummary();
-			return EndSceneHook.stdcall<HRESULT>(device);
+			const HRESULT result = EndSceneHook.stdcall<HRESULT>(device);
+			if (SUCCEEDED(result))
+			{
+				// One telemetry publication per completed D3D9 scene prevents a prior
+				// frame's CAMERA APPLIED flag from surviving a scene with no injection.
+				PublishClientTelemetry(FrameTelemetryFlags,
+					(FrameTelemetryFlags & ClientPoseApplied) ? LatchedRelativeAngleDeg : 0.0f);
+				MaybeLogSummary();
+			}
+			return result;
 		}
 
 		HRESULT __stdcall SetVertexShaderConstantFDest(
 			IDirect3DDevice9* device, UINT startRegister, const float* constantData, UINT vector4fCount)
 		{
-			VertexConstantCalls.fetch_add(1, std::memory_order_relaxed);
 			if (!constantData || !UploadContainsOutRunWvp(startRegister, vector4fCount))
 				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
 					device, startRegister, constantData, vector4fCount);
