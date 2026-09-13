@@ -1,13 +1,13 @@
 // OpenXR compatibility + diagnostic compositor for VDXR.
 //
-// This milestone is still a mono mirror, but unlike the earlier diagnostic
-// build it is color-managed and resilient enough to use for real head-tracking
-// validation:
-//   * accepts both SDR BGRA8 and HDR/scRGB FP16 desktop-duplication surfaces;
-//   * converts everything to linear SDR on the GPU;
-//   * prefers an OpenXR sRGB swapchain so the runtime interprets colors correctly;
-//   * reports host pose and game-camera telemetry;
-//   * exits the OpenXR session when OutRun closes so Virtual Desktop comes back.
+// The current compositor is still a mono mirror, but it is deliberately split
+// into two presentation modes:
+//   * gameplay: VIEW-space mirror plus renderer-side head tracking;
+//   * menus/pause/results: LOCAL-space theater quad anchored when the mode begins.
+//
+// It also keeps game-exit monitoring independent of xrEndFrame, skips desktop
+// capture/color conversion when OpenXR says shouldRender=false, and reports
+// p95/p99 host timing so performance work is evidence-driven.
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -28,6 +28,7 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
@@ -51,6 +52,86 @@ namespace
             value->Release();
             value = nullptr;
         }
+    }
+
+    using PerfClock = std::chrono::steady_clock;
+
+    class PerfWindow
+    {
+    public:
+        void Add(double ms)
+        {
+            values_[next_] = ms;
+            next_ = (next_ + 1) % values_.size();
+            if (count_ < values_.size())
+                ++count_;
+        }
+
+        double Percentile(double percentile) const
+        {
+            if (!count_)
+                return 0.0;
+            std::vector<double> sorted;
+            sorted.reserve(count_);
+            for (std::size_t i = 0; i < count_; ++i)
+                sorted.push_back(values_[i]);
+            std::sort(sorted.begin(), sorted.end());
+            const double scaled = percentile * static_cast<double>(sorted.size() - 1);
+            const std::size_t index = static_cast<std::size_t>(std::ceil(scaled));
+            return sorted[std::min(index, sorted.size() - 1)];
+        }
+
+        std::size_t Count() const { return count_; }
+
+    private:
+        std::array<double, 240> values_{};
+        std::size_t next_ = 0;
+        std::size_t count_ = 0;
+    };
+
+    class ScopedPerf
+    {
+    public:
+        explicit ScopedPerf(PerfWindow& target) : target_(target), start_(PerfClock::now()) {}
+        ~ScopedPerf()
+        {
+            const auto end = PerfClock::now();
+            const double ms = std::chrono::duration<double, std::milli>(end - start_).count();
+            target_.Add(ms);
+        }
+    private:
+        PerfWindow& target_;
+        PerfClock::time_point start_;
+    };
+
+    PerfWindow WaitFramePerf;
+    PerfWindow CapturePerf;
+    PerfWindow ConvertSubmitPerf;
+    PerfWindow EndFramePerf;
+    ULONGLONG LastPerfReportMs = 0;
+    std::uint64_t ShouldRenderSkippedFrames = 0;
+    bool CurrentFrameShouldRender = true;
+
+    void MaybeReportPerf()
+    {
+        const ULONGLONG now = GetTickCount64();
+        if (now - LastPerfReportMs < 5000)
+            return;
+        LastPerfReportMs = now;
+        std::cout
+            << "VR perf host-ms p95/p99: wait=" << WaitFramePerf.Percentile(0.95) << "/" << WaitFramePerf.Percentile(0.99)
+            << " capture=" << CapturePerf.Percentile(0.95) << "/" << CapturePerf.Percentile(0.99)
+            << " color-submit=" << ConvertSubmitPerf.Percentile(0.95) << "/" << ConvertSubmitPerf.Percentile(0.99)
+            << " xrEnd=" << EndFramePerf.Percentile(0.95) << "/" << EndFramePerf.Percentile(0.99)
+            << " shouldRenderSkipped=" << ShouldRenderSkippedFrames << "\n";
+    }
+
+    XrResult EndFrameMeasured(XrSession session, const XrFrameEndInfo* info)
+    {
+        ScopedPerf timer(EndFramePerf);
+        const XrResult result = ::xrEndFrame(session, info);
+        MaybeReportPerf();
+        return result;
     }
 
     struct WindowSearch
@@ -264,23 +345,31 @@ float4 PSMain(VSOut input) : SV_Target
     float3 linear;
     if (SourceIsScRgb > 0.5)
     {
-        // Windows scRGB is linear and 1.0 == 80 nits. SDR content on an HDR
-        // desktop is multiplied by the user's SDR-white scale, so divide that
-        // boost back out before submitting to the SDR OpenXR compositor.
         linear = max(src.rgb, 0.0) / max(SdrWhiteScale, 0.001);
     }
     else
     {
-        // BGRA8 desktop duplication contains display-referred sRGB values.
         linear = SrgbToLinear(saturate(src.rgb));
     }
-
-    // OutRun itself is SDR. Preserve normal SDR contrast and clip only real HDR
-    // highlight energy instead of passing it through as blown-out white.
     linear = saturate(linear);
     return float4(linear, 1.0);
 }
 )HLSL";
+
+    XrVector3f RotateVector(const XrQuaternionf& q, const XrVector3f& v)
+    {
+        const XrVector3f u{ q.x, q.y, q.z };
+        const XrVector3f t{
+            2.0f * (u.y * v.z - u.z * v.y),
+            2.0f * (u.z * v.x - u.x * v.z),
+            2.0f * (u.x * v.y - u.y * v.x)
+        };
+        return {
+            v.x + q.w * t.x + (u.y * t.z - u.z * t.y),
+            v.y + q.w * t.y + (u.z * t.x - u.x * t.z),
+            v.z + q.w * t.z + (u.x * t.y - u.y * t.x)
+        };
+    }
 
     class MonoMirror
     {
@@ -306,6 +395,8 @@ float4 PSMain(VSOut input) : SV_Target
         }
 
         void OnViewSpaceCreated(XrSpace space) { viewSpace_ = space; }
+        void OnLocalSpaceCreated(XrSpace space) { localSpace_ = space; }
+        void OnReferenceSpaceChanged() { theaterAnchorValid_ = false; }
 
         XrSession Session() const { return session_; }
 
@@ -319,8 +410,25 @@ float4 PSMain(VSOut input) : SV_Target
         void PollClientTelemetry()
         {
             TryOpenSharedTelemetry();
-            if (!sharedState_)
+            if (!sharedState_ ||
+                sharedState_->magic != OutRunVR::SharedMagic ||
+                sharedState_->protocolVersion != OutRunVR::SharedProtocolVersion ||
+                sharedState_->structSize != sizeof(OutRunVR::SharedPoseState))
                 return;
+
+            const std::uint32_t rawPresentation = sharedState_->reserved[OutRunVR::ClientPresentationModeIndex];
+            const auto nextPresentation = rawPresentation == OutRunVR::PresentationGameplay
+                ? OutRunVR::PresentationGameplay
+                : OutRunVR::PresentationTheater;
+            if (nextPresentation != presentationMode_)
+            {
+                presentationMode_ = nextPresentation;
+                theaterAnchorValid_ = false;
+                std::cout << "VR presentation: "
+                          << (presentationMode_ == OutRunVR::PresentationGameplay ? "gameplay/head-tracked" : "theater/LOCAL-fixed")
+                          << ".\n";
+            }
+            clientGameState_ = sharedState_->reserved[OutRunVR::ClientGameStateIndex];
 
             const ULONGLONG now = GetTickCount64();
             if (now - lastClientTelemetryLogMs_ < 1000)
@@ -345,6 +453,7 @@ float4 PSMain(VSOut input) : SV_Target
             {
                 std::cout << "VR bridge: cameraHeartbeat=" << heartbeat
                           << " flags=0x" << std::hex << flags << std::dec
+                          << " gameState=0x" << std::hex << clientGameState_ << std::dec
                           << " appliedAngle=" << angle << "deg"
                           << ((flags & OutRunVR::ClientPoseApplied) ? " [CAMERA APPLIED]" : " [NOT APPLIED]")
                           << "\n";
@@ -428,9 +537,8 @@ float4 PSMain(VSOut input) : SV_Target
             std::cout << "OpenXR mono mirror ready: " << width_ << "x" << height_
                       << ", color-managed GPU conversion enabled.\n"
                       << "Mirror accepts BGRA8 SDR and FP16 scRGB HDR frames.\n"
-                      << "This is still a temporary mono HMD view; true stereo is the next renderer milestone.\n";
-
-            CaptureDesktopFrame(1000);
+                      << "Menus/pause/results use a LOCAL-fixed theater quad; gameplay uses VIEW plus game head tracking.\n"
+                      << "This remains a temporary mono transport; stereo must preserve one simulation/render-queue lifetime for both eyes.\n";
             return true;
         }
 
@@ -440,7 +548,6 @@ float4 PSMain(VSOut input) : SV_Target
                 return false;
 
             CaptureDesktopFrame(haveFrame_ ? 0 : 1000);
-            PollClientTelemetry();
             if (!haveFrame_ || !latestSourceSrv_ || swapchain_ == XR_NULL_HANDLE)
                 return false;
 
@@ -463,18 +570,28 @@ float4 PSMain(VSOut input) : SV_Target
             return XR_SUCCEEDED(xr);
         }
 
-        XrCompositionLayerQuad MakeQuad() const
+        XrCompositionLayerQuad MakeQuad(XrTime displayTime)
         {
             XrCompositionLayerQuad quad{ XR_TYPE_COMPOSITION_LAYER_QUAD };
-            quad.space = viewSpace_;
             quad.eyeVisibility = XR_EYE_VISIBILITY_BOTH;
             quad.subImage.swapchain = swapchain_;
             quad.subImage.imageRect.offset = { 0, 0 };
             quad.subImage.imageRect.extent = {
                 static_cast<std::int32_t>(width_), static_cast<std::int32_t>(height_)
             };
-            quad.pose.orientation.w = 1.0f;
-            quad.pose.position.z = -1.0f;
+
+            if (presentationMode_ != OutRunVR::PresentationGameplay && EnsureTheaterAnchor(displayTime))
+            {
+                quad.space = localSpace_;
+                quad.pose = theaterAnchor_;
+            }
+            else
+            {
+                quad.space = viewSpace_;
+                quad.pose.orientation.w = 1.0f;
+                quad.pose.position.z = -1.0f;
+            }
+
             quad.size.width = 2.0f;
             const float aspect = height_ ? static_cast<float>(width_) / static_cast<float>(height_) : 16.0f / 9.0f;
             quad.size.height = quad.size.width / aspect;
@@ -499,6 +616,30 @@ float4 PSMain(VSOut input) : SV_Target
             float sourceIsScRgb;
             float padding[2];
         };
+
+        bool EnsureTheaterAnchor(XrTime displayTime)
+        {
+            if (theaterAnchorValid_)
+                return true;
+            if (viewSpace_ == XR_NULL_HANDLE || localSpace_ == XR_NULL_HANDLE)
+                return false;
+
+            XrSpaceLocation location{ XR_TYPE_SPACE_LOCATION };
+            const XrResult result = ::xrLocateSpace(viewSpace_, localSpace_, displayTime, &location);
+            const XrSpaceLocationFlags required =
+                XR_SPACE_LOCATION_ORIENTATION_VALID_BIT | XR_SPACE_LOCATION_POSITION_VALID_BIT;
+            if (XR_FAILED(result) || (location.locationFlags & required) != required)
+                return false;
+
+            theaterAnchor_ = location.pose;
+            const XrVector3f forward = RotateVector(location.pose.orientation, { 0.0f, 0.0f, -1.0f });
+            theaterAnchor_.position.x += forward.x;
+            theaterAnchor_.position.y += forward.y;
+            theaterAnchor_.position.z += forward.z;
+            theaterAnchorValid_ = true;
+            std::cout << "VR theater: LOCAL-space quad anchored one metre in front of the menu-entry head pose.\n";
+            return true;
+        }
 
         void TryOpenSharedTelemetry()
         {
@@ -635,6 +776,7 @@ float4 PSMain(VSOut input) : SV_Target
 
         bool CaptureDesktopFrame(DWORD timeoutMs)
         {
+            ScopedPerf timer(CapturePerf);
             if (!IsWindow(hwnd_))
                 return haveFrame_;
             if (!duplication_ && !RecreateDuplication(false))
@@ -673,8 +815,10 @@ float4 PSMain(VSOut input) : SV_Target
                 {
                     if (EnsureSourceTexture(desktopDesc))
                     {
+                        // D3D11/OpenXR synchronization at swapchain release/end-frame
+                        // is sufficient; forcing an immediate Flush here serialized the
+                        // CPU and GPU every frame.
                         context_->CopyResource(latestSource_, desktopTexture);
-                        context_->Flush();
                         copied = true;
                     }
                 }
@@ -772,6 +916,7 @@ float4 PSMain(VSOut input) : SV_Target
 
         void RenderConvertedFrame(std::uint32_t imageIndex)
         {
+            ScopedPerf timer(ConvertSubmitPerf);
             if (imageIndex >= renderTargets_.size() || !renderTargets_[imageIndex] || !latestSourceSrv_)
                 return;
 
@@ -804,7 +949,8 @@ float4 PSMain(VSOut input) : SV_Target
             context_->PSSetShaderResources(0, 1, &nullSrv);
             ID3D11RenderTargetView* nullRtv = nullptr;
             context_->OMSetRenderTargets(1, &nullRtv, nullptr);
-            context_->Flush();
+            // No per-frame Flush: OpenXR swapchain release/end-frame provides the
+            // synchronization boundary without serializing the immediate context.
         }
 
         void ResetAll()
@@ -849,6 +995,11 @@ float4 PSMain(VSOut input) : SV_Target
 
             session_ = XR_NULL_HANDLE;
             viewSpace_ = XR_NULL_HANDLE;
+            localSpace_ = XR_NULL_HANDLE;
+            theaterAnchor_ = {};
+            theaterAnchorValid_ = false;
+            presentationMode_ = OutRunVR::PresentationTheater;
+            clientGameState_ = 0xFFFFFFFFu;
             hwnd_ = nullptr;
             gamePid_ = 0;
             targetMonitor_ = nullptr;
@@ -867,6 +1018,12 @@ float4 PSMain(VSOut input) : SV_Target
 
         XrSession session_ = XR_NULL_HANDLE;
         XrSpace viewSpace_ = XR_NULL_HANDLE;
+        XrSpace localSpace_ = XR_NULL_HANDLE;
+        XrPosef theaterAnchor_{};
+        bool theaterAnchorValid_ = false;
+        OutRunVR::ClientPresentationMode presentationMode_ = OutRunVR::PresentationTheater;
+        std::uint32_t clientGameState_ = 0xFFFFFFFFu;
+
         ID3D11Device* device_ = nullptr;
         ID3D11DeviceContext* context_ = nullptr;
         HWND hwnd_ = nullptr;
@@ -915,6 +1072,20 @@ float4 PSMain(VSOut input) : SV_Target
     bool SyntheticExitSent = false;
     ULONGLONG GameExitRequestMs = 0;
     ULONGLONG LastPoseTelemetryMs = 0;
+
+    void RequestGameExitIfNeeded()
+    {
+        if (GameExitRequested || Mirror.Session() == XR_NULL_HANDLE || Mirror.GameAlive())
+            return;
+
+        GameExitRequested = true;
+        GameExitRequestMs = GetTickCount64();
+        std::cout << "OutRun process exited. Requesting OpenXR session shutdown and Virtual Desktop return...\n";
+        const XrResult request = ::xrRequestExitSession(Mirror.Session());
+        if (XR_FAILED(request))
+            std::cerr << "xrRequestExitSession returned " << request
+                      << "; poll-event cleanup fallback will still release the session.\n";
+    }
 
     XrResult XRAPI_PTR OutRunRetryingXrGetSystem(
         XrInstance instance, const XrSystemGetInfo* getInfo, XrSystemId* systemId)
@@ -980,9 +1151,23 @@ float4 PSMain(VSOut input) : SV_Target
         XrSession session, const XrReferenceSpaceCreateInfo* createInfo, XrSpace* space)
     {
         const XrResult result = ::xrCreateReferenceSpace(session, createInfo, space);
-        if (XR_SUCCEEDED(result) && createInfo && space &&
-            createInfo->referenceSpaceType == XR_REFERENCE_SPACE_TYPE_VIEW)
-            Mirror.OnViewSpaceCreated(*space);
+        if (XR_SUCCEEDED(result) && createInfo && space)
+        {
+            if (createInfo->referenceSpaceType == XR_REFERENCE_SPACE_TYPE_VIEW)
+                Mirror.OnViewSpaceCreated(*space);
+            else if (createInfo->referenceSpaceType == XR_REFERENCE_SPACE_TYPE_LOCAL)
+                Mirror.OnLocalSpaceCreated(*space);
+        }
+        return result;
+    }
+
+    XrResult XRAPI_PTR OutRunTelemetryXrWaitFrame(
+        XrSession session, const XrFrameWaitInfo* waitInfo, XrFrameState* frameState)
+    {
+        ScopedPerf timer(WaitFramePerf);
+        const XrResult result = ::xrWaitFrame(session, waitInfo, frameState);
+        if (XR_SUCCEEDED(result) && frameState)
+            CurrentFrameShouldRender = frameState->shouldRender == XR_TRUE;
         return result;
     }
 
@@ -994,7 +1179,7 @@ float4 PSMain(VSOut input) : SV_Target
             (location->locationFlags & XR_SPACE_LOCATION_ORIENTATION_VALID_BIT))
         {
             const ULONGLONG now = GetTickCount64();
-            if (now - LastPoseTelemetryMs >= 1000)
+            if (now - LastPoseTelemetryMs >= 5000)
             {
                 LastPoseTelemetryMs = now;
                 const auto& q = location->pose.orientation;
@@ -1010,40 +1195,52 @@ float4 PSMain(VSOut input) : SV_Target
     XrResult XRAPI_PTR OutRunMirrorXrEndFrame(XrSession session, const XrFrameEndInfo* frameEndInfo)
     {
         if (!frameEndInfo)
-            return ::xrEndFrame(session, frameEndInfo);
+            return EndFrameMeasured(session, frameEndInfo);
 
-        if (!Mirror.GameAlive())
+        RequestGameExitIfNeeded();
+        Mirror.PollClientTelemetry();
+
+        if (GameExitRequested)
         {
-            if (!GameExitRequested)
-            {
-                GameExitRequested = true;
-                GameExitRequestMs = GetTickCount64();
-                std::cout << "OutRun process exited. Requesting OpenXR session shutdown and Virtual Desktop return...\n";
-                const XrResult request = ::xrRequestExitSession(session);
-                if (XR_FAILED(request))
-                    std::cerr << "xrRequestExitSession returned " << request << "; cleanup fallback will still release the session.\n";
-            }
             XrFrameEndInfo empty = *frameEndInfo;
             empty.layerCount = 0;
             empty.layers = nullptr;
-            return ::xrEndFrame(session, &empty);
+            return EndFrameMeasured(session, &empty);
+        }
+
+        if (!CurrentFrameShouldRender)
+        {
+            ++ShouldRenderSkippedFrames;
+            XrFrameEndInfo empty = *frameEndInfo;
+            empty.layerCount = 0;
+            empty.layers = nullptr;
+            return EndFrameMeasured(session, &empty);
         }
 
         if (frameEndInfo->layerCount != 0 || !Mirror.CaptureAndRenderToSwapchain() || !Mirror.ReadyForLayer())
-            return ::xrEndFrame(session, frameEndInfo);
+            return EndFrameMeasured(session, frameEndInfo);
 
-        XrCompositionLayerQuad quad = Mirror.MakeQuad();
+        XrCompositionLayerQuad quad = Mirror.MakeQuad(frameEndInfo->displayTime);
         const XrCompositionLayerBaseHeader* layer =
             reinterpret_cast<const XrCompositionLayerBaseHeader*>(&quad);
         XrFrameEndInfo patched = *frameEndInfo;
         patched.layerCount = 1;
         patched.layers = &layer;
-        return ::xrEndFrame(session, &patched);
+        return EndFrameMeasured(session, &patched);
     }
 
     XrResult XRAPI_PTR OutRunExitAwareXrPollEvent(XrInstance instance, XrEventDataBuffer* eventData)
     {
+        // This check runs even while sessionRunning=false, unlike xrEndFrame.
+        // A closed game therefore cannot strand the host in an idle OpenXR state.
+        RequestGameExitIfNeeded();
+
         const XrResult result = ::xrPollEvent(instance, eventData);
+        if (result == XR_SUCCESS && eventData &&
+            eventData->type == XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING)
+        {
+            Mirror.OnReferenceSpaceChanged();
+        }
         if (result != XR_EVENT_UNAVAILABLE)
             return result;
 
@@ -1074,6 +1271,7 @@ float4 PSMain(VSOut input) : SV_Target
 #define xrGetSystem OutRunRetryingXrGetSystem
 #define xrCreateSession OutRunMirrorXrCreateSession
 #define xrCreateReferenceSpace OutRunMirrorXrCreateReferenceSpace
+#define xrWaitFrame OutRunTelemetryXrWaitFrame
 #define xrLocateSpace OutRunTelemetryXrLocateSpace
 #define xrEndFrame OutRunMirrorXrEndFrame
 #define xrPollEvent OutRunExitAwareXrPollEvent
