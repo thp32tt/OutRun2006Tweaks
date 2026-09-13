@@ -77,3 +77,18 @@ namespace OutRunVR
 	static_assert(sizeof(SharedFov) == 16);
 	static_assert(sizeof(SharedPoseState) == 248);
 }
+
+// The final D3D9 renderer injector is intentionally a separate implementation
+// from the original game-camera experiment. Re-export only the protocol symbols
+// it consumes so the renderer file can stay in its own namespace without
+// changing the shared-memory ABI or the host/game producer code.
+namespace OutRunVRRenderer
+{
+	using OutRunVR::SharedMemoryName;
+	using OutRunVR::SharedMagic;
+	using OutRunVR::SharedProtocolVersion;
+	using OutRunVR::SharedPoseState;
+	using OutRunVR::HostAlive;
+	using OutRunVR::OrientationValid;
+	using OutRunVR::PositionValid;
+}
