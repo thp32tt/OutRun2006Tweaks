@@ -7,6 +7,8 @@ on:
       - 'src/hooks_vr.cpp'
       - 'src/vr_renderer_probe.cpp'
       - 'src/vr_shared.hpp'
+      - 'src/overlay/notifications.hpp'
+      - 'src/overlay/update_check.cpp'
       - 'cmake.toml'
       - 'vrhost/**'
       - '.github/workflows/vr-openxr.yml'
@@ -15,6 +17,8 @@ on:
       - 'src/hooks_vr.cpp'
       - 'src/vr_renderer_probe.cpp'
       - 'src/vr_shared.hpp'
+      - 'src/overlay/notifications.hpp'
+      - 'src/overlay/update_check.cpp'
       - 'cmake.toml'
       - 'vrhost/**'
       - '.github/workflows/vr-openxr.yml'
@@ -38,6 +42,9 @@ jobs:
           if (-not $legacy.Contains('CalcCameraMatrix remains untouched')) {
             throw 'single-owner VR marker missing from hooks_vr.cpp'
           }
+          if (-not $legacy.Contains('VRCullingCameraSync')) {
+            throw 'render-phase culling camera sync setting is missing'
+          }
 
           $renderer = Get-Content src/vr_renderer_probe.cpp -Raw
           foreach ($marker in @(
@@ -48,17 +55,30 @@ jobs:
             'VirtualQuery',
             'mappingAlreadyExisted',
             'ClientRendererWvpVerified',
-            'ClientRendererPoseInjected',
-            'LatchedHeadInverse',
-            'PublishClientTelemetry(FrameTelemetryFlags',
+            'ClientRendererMatrixPrepared',
+            'ClientRendererUploadFailed',
+            'ClientFrameCompleted',
+            'TryPrepareOutRunWvp',
+            'SUCCEEDED(result)',
+            'ClientCullingCameraSynced',
+            'YawOnly',
+            'referenceSpaceGeneration',
             'frame-latched c64 WVP injection armed'
           )) {
             if (-not $renderer.Contains($marker)) { throw "missing renderer safety marker: $marker" }
           }
+          if ($renderer.Contains('ReadHostPose(sample))`r`n`t`t`t{`r`n`t`t`t`tResetCenter')) {
+            throw 'transient pose-read failure must not reset tracking center'
+          }
 
           $shared = Get-Content src/vr_shared.hpp -Raw
-          if (-not $shared.Contains('static_assert(sizeof(SharedPoseState) == 248)')) {
-            throw 'VR shared-memory ABI size changed unexpectedly'
+          foreach ($marker in @(
+            'static_assert(sizeof(SharedPoseState) == 248)',
+            'HostReferenceSpaceGenerationIndex',
+            'ClientPresentationModeIndex',
+            'ClientFrameCompleted'
+          )) {
+            if (-not $shared.Contains($marker)) { throw "missing shared-memory ABI marker: $marker" }
           }
 
       - name: Configure Win32 VR build
@@ -90,7 +110,9 @@ jobs:
             'VR: renderer-boundary head tracking configured; CalcCameraMatrix remains untouched',
             'VR renderer: D3D9 hooks installed; frame-latched c64 WVP injection armed (vtbl 41/42/94)',
             'VR renderer inject: verified OutRun c64 = Transpose(WorldView*Proj)',
-            'VR renderer inject: HEAD TRACKING ACTIVE at VS c64 render boundary',
+            'VR renderer inject: HEAD TRACKING ACTIVE after successful VS c64 upload',
+            'patched c64 matrix prepared but D3D9 upload failed',
+            'yaw recentered HMD pose',
             'OutRun renderer globals are not safely readable'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR binary marker missing: $marker" }
@@ -123,7 +145,7 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Verify HDR, tracking, exit and HLSL patch paths
+      - name: Verify HDR tracking theater exit performance and HLSL paths
         shell: pwsh
         run: |
           $src = Get-Content vrhost/main_compat_v2.cpp -Raw
@@ -132,11 +154,34 @@ jobs:
             'DXGI_FORMAT_B8G8R8A8_UNORM_SRGB',
             'QuerySdrWhiteScale',
             'SrgbToLinear',
-            'xrRequestExitSession',
+            'RequestGameExitIfNeeded',
+            'OutRunExitAwareXrPollEvent',
+            'OutRunTelemetryXrWaitFrame',
+            'CurrentFrameShouldRender',
+            'PresentationGameplay',
+            'OnLocalSpaceCreated',
+            'EnsureTheaterAnchor',
+            'LOCAL-space quad anchored',
+            'p95/p99',
             'ClientPoseApplied'
           )) {
-            if (-not $src.Contains($marker)) { throw "missing required VR v2 source marker: $marker" }
+            if (-not $src.Contains($marker)) { throw "missing required VR host source marker: $marker" }
           }
+          if ($src.Contains('context_->Flush()')) {
+            throw 'per-frame D3D11 Flush must not return to the mirror hot path'
+          }
+
+          $main = Get-Content vrhost/main.cpp -Raw
+          foreach ($marker in @(
+            'mappingAlreadyExisted',
+            'AcquireHostOwnership',
+            'InterlockedCompareExchange',
+            'HostReferenceSpaceGenerationIndex',
+            'NotifyReferenceSpaceChanged'
+          )) {
+            if (-not $main.Contains($marker)) { throw "missing shared bridge ownership marker: $marker" }
+          }
+
           $patch = Get-Content vrhost/shader_compile_patch.hpp -Raw
           if (-not $patch.Contains('linearColor')) { throw "HLSL reserved-word patch is missing" }
           if (-not $patch.Contains('OutRunVrD3DCompile')) { throw "patched D3DCompile entry point is missing" }
@@ -176,10 +221,13 @@ jobs:
             'FP16 scRGB/HDR',
             'VR pose: q=',
             'CAMERA APPLIED',
+            'LOCAL-space quad anchored',
+            'shouldRenderSkipped',
             'Requesting OpenXR session shutdown and Virtual Desktop return',
+            'another outrun-vr-host process already owns',
             'linearColor'
           )) {
-            if (-not $ascii.Contains($marker)) { throw "host binary missing v3 marker: $marker" }
+            if (-not $ascii.Contains($marker)) { throw "host binary missing hardened marker: $marker" }
           }
 
       - name: Upload host artifact
