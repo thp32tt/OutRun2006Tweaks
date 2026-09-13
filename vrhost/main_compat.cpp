@@ -5,8 +5,9 @@
 //   * request OpenXR 1.0 for broad runtime compatibility;
 //   * retry XR_ERROR_FORM_FACTOR_UNAVAILABLE while Quest/VDXR wakes up;
 //   * do not take over the headset until OR2006C2C.EXE has a real window;
-//   * replace main.cpp's zero-layer frame with a head-locked mono mirror of
-//     the OutRun game window captured through DXGI Desktop Duplication.
+//   * replace main.cpp's zero-layer frame with a head-locked mono mirror;
+//   * automatically recover DXGI Desktop Duplication after OutRun changes
+//     display mode between its boot logo and the actual game.
 //
 // The mono mirror is intentionally NOT the final VR renderer. It exists so the
 // HMD can display the game while the x86 camera bridge is tested. True stereo
@@ -132,19 +133,6 @@ namespace
         }
     }
 
-    bool GetClientScreenRect(HWND hwnd, RECT& rect)
-    {
-        RECT client{};
-        if (!IsWindow(hwnd) || !GetClientRect(hwnd, &client))
-            return false;
-        POINT topLeft{ client.left, client.top };
-        POINT bottomRight{ client.right, client.bottom };
-        if (!ClientToScreen(hwnd, &topLeft) || !ClientToScreen(hwnd, &bottomRight))
-            return false;
-        rect = { topLeft.x, topLeft.y, bottomRight.x, bottomRight.y };
-        return rect.right > rect.left && rect.bottom > rect.top;
-    }
-
     class MonoMirror
     {
     public:
@@ -177,18 +165,6 @@ namespace
                 std::cerr << "VR mirror: session/device/game window is not ready.\n";
                 return false;
             }
-
-            RECT clientScreen{};
-            if (!GetClientScreenRect(hwnd_, clientScreen))
-            {
-                std::cerr << "VR mirror: failed to read game client rectangle.\n";
-                return false;
-            }
-
-            width_ = static_cast<std::uint32_t>(clientScreen.right - clientScreen.left);
-            height_ = static_cast<std::uint32_t>(clientScreen.bottom - clientScreen.top);
-            if (!width_ || !height_)
-                return false;
 
             const HMONITOR targetMonitor = MonitorFromWindow(hwnd_, MONITOR_DEFAULTTONEAREST);
 
@@ -233,37 +209,26 @@ namespace
                 return false;
             }
 
-            IDXGIOutput1* output1 = nullptr;
             const HRESULT outputHr = selectedOutput->QueryInterface(
-                __uuidof(IDXGIOutput1), reinterpret_cast<void**>(&output1));
+                __uuidof(IDXGIOutput1), reinterpret_cast<void**>(&output1_));
             selectedOutput->Release();
-            if (FAILED(outputHr) || !output1)
+            if (FAILED(outputHr) || !output1_)
             {
                 std::cerr << "VR mirror: IDXGIOutput1 is unavailable.\n";
                 return false;
             }
 
-            const HRESULT duplicateHr = output1->DuplicateOutput(device_, &duplication_);
-            output1->Release();
-            if (FAILED(duplicateHr) || !duplication_)
-            {
-                std::cerr << "VR mirror: DuplicateOutput failed, HRESULT="
-                          << static_cast<long>(duplicateHr)
-                          << ". Try borderless/windowed mode if exclusive fullscreen is active.\n";
-                return false;
-            }
-
             outputDesktop_ = selectedDesc.DesktopCoordinates;
-            DXGI_OUTDUPL_DESC duplicationDesc{};
-            duplication_->GetDesc(&duplicationDesc);
-            captureFormat_ = duplicationDesc.ModeDesc.Format;
-
-            if (clientScreen.left < outputDesktop_.left || clientScreen.top < outputDesktop_.top ||
-                clientScreen.right > outputDesktop_.right || clientScreen.bottom > outputDesktop_.bottom)
+            width_ = static_cast<std::uint32_t>(outputDesktop_.right - outputDesktop_.left);
+            height_ = static_cast<std::uint32_t>(outputDesktop_.bottom - outputDesktop_.top);
+            if (!width_ || !height_)
             {
-                std::cerr << "VR mirror: OutRun window spans multiple monitors; keep it on one monitor.\n";
+                std::cerr << "VR mirror: selected monitor has an invalid desktop size.\n";
                 return false;
             }
+
+            if (!RecreateDuplication(true))
+                return false;
 
             std::uint32_t formatCount = 0;
             XrResult xr = ::xrEnumerateSwapchainFormats(session_, 0, &formatCount, nullptr);
@@ -345,6 +310,7 @@ namespace
             initialized_ = true;
             std::cout << "OpenXR mono mirror ready: " << width_ << "x" << height_
                       << " (DXGI format " << static_cast<int>(captureFormat_) << ").\n"
+                      << "Mirror source is now the whole game monitor and will auto-recover after display-mode changes.\n"
                       << "This is a temporary mono HMD view for head-tracking tests; true stereo is next.\n";
             return CaptureDesktopFrame(1000);
         }
@@ -420,10 +386,67 @@ namespace
         }
 
     private:
+        bool RecreateDuplication(bool initial)
+        {
+            if (!output1_ || !device_)
+                return false;
+
+            const ULONGLONG now = GetTickCount64();
+            if (!initial && lastDuplicationRetryMs_ != 0 && now - lastDuplicationRetryMs_ < 500)
+                return false;
+            lastDuplicationRetryMs_ = now;
+
+            if (duplication_)
+            {
+                duplication_->Release();
+                duplication_ = nullptr;
+            }
+
+            const HRESULT hr = output1_->DuplicateOutput(device_, &duplication_);
+            if (FAILED(hr) || !duplication_)
+            {
+                if (initial || hr != lastDuplicationError_)
+                {
+                    std::cerr << "VR mirror: DuplicateOutput failed, HRESULT="
+                              << static_cast<long>(hr)
+                              << ". Will retry automatically.\n";
+                    lastDuplicationError_ = hr;
+                }
+                return false;
+            }
+
+            DXGI_OUTPUT_DESC outputDesc{};
+            output1_->GetDesc(&outputDesc);
+            outputDesktop_ = outputDesc.DesktopCoordinates;
+
+            DXGI_OUTDUPL_DESC duplicationDesc{};
+            duplication_->GetDesc(&duplicationDesc);
+            const DXGI_FORMAT newFormat = duplicationDesc.ModeDesc.Format;
+            if (captureFormat_ != DXGI_FORMAT_UNKNOWN && newFormat != captureFormat_)
+            {
+                std::cerr << "VR mirror: desktop format changed from "
+                          << static_cast<int>(captureFormat_) << " to "
+                          << static_cast<int>(newFormat)
+                          << "; keeping the existing OpenXR swapchain format.\n";
+                duplication_->Release();
+                duplication_ = nullptr;
+                return false;
+            }
+            captureFormat_ = newFormat;
+            lastDuplicationError_ = S_OK;
+
+            if (!initial)
+                std::cout << "VR mirror: desktop duplication recovered after display-mode change.\n";
+            return true;
+        }
+
         bool CaptureDesktopFrame(DWORD timeoutMs)
         {
-            if (!duplication_ || !latestFrame_ || !IsWindow(hwnd_))
+            if (!latestFrame_ || !IsWindow(hwnd_))
                 return false;
+
+            if (!duplication_ && !RecreateDuplication(false))
+                return haveFrame_;
 
             DXGI_OUTDUPL_FRAME_INFO frameInfo{};
             IDXGIResource* desktopResource = nullptr;
@@ -433,10 +456,15 @@ namespace
             if (FAILED(acquireHr) || !desktopResource)
             {
                 if (acquireHr == DXGI_ERROR_ACCESS_LOST)
-                    std::cerr << "VR mirror: desktop duplication access was lost; restart the host after display-mode changes.\n";
+                {
+                    std::cerr << "VR mirror: desktop duplication access was lost; rebuilding capture automatically.\n";
+                    RecreateDuplication(false);
+                }
                 else
+                {
                     std::cerr << "VR mirror: AcquireNextFrame failed, HRESULT="
                               << static_cast<long>(acquireHr) << "\n";
+                }
                 return haveFrame_;
             }
 
@@ -448,27 +476,31 @@ namespace
             bool copied = false;
             if (SUCCEEDED(textureHr) && desktopTexture)
             {
-                RECT clientScreen{};
-                if (GetClientScreenRect(hwnd_, clientScreen))
+                D3D11_TEXTURE2D_DESC desktopDesc{};
+                desktopTexture->GetDesc(&desktopDesc);
+                if (desktopDesc.Format == captureFormat_)
                 {
-                    const std::uint32_t currentWidth = static_cast<std::uint32_t>(clientScreen.right - clientScreen.left);
-                    const std::uint32_t currentHeight = static_cast<std::uint32_t>(clientScreen.bottom - clientScreen.top);
-                    if (currentWidth == width_ && currentHeight == height_ &&
-                        clientScreen.left >= outputDesktop_.left && clientScreen.top >= outputDesktop_.top &&
-                        clientScreen.right <= outputDesktop_.right && clientScreen.bottom <= outputDesktop_.bottom)
+                    const UINT copyWidth = std::min<UINT>(width_, desktopDesc.Width);
+                    const UINT copyHeight = std::min<UINT>(height_, desktopDesc.Height);
+                    if (copyWidth && copyHeight)
                     {
                         D3D11_BOX sourceBox{};
-                        sourceBox.left = static_cast<UINT>(clientScreen.left - outputDesktop_.left);
-                        sourceBox.top = static_cast<UINT>(clientScreen.top - outputDesktop_.top);
+                        sourceBox.left = 0;
+                        sourceBox.top = 0;
                         sourceBox.front = 0;
-                        sourceBox.right = sourceBox.left + width_;
-                        sourceBox.bottom = sourceBox.top + height_;
+                        sourceBox.right = copyWidth;
+                        sourceBox.bottom = copyHeight;
                         sourceBox.back = 1;
                         context_->CopySubresourceRegion(
                             latestFrame_, 0, 0, 0, 0, desktopTexture, 0, &sourceBox);
                         context_->Flush();
                         copied = true;
                     }
+                }
+                else
+                {
+                    std::cerr << "VR mirror: duplicated desktop format changed unexpectedly ("
+                              << static_cast<int>(desktopDesc.Format) << ").\n";
                 }
                 desktopTexture->Release();
             }
@@ -497,6 +529,11 @@ namespace
                 duplication_->Release();
                 duplication_ = nullptr;
             }
+            if (output1_)
+            {
+                output1_->Release();
+                output1_ = nullptr;
+            }
             if (context_)
             {
                 context_->Release();
@@ -515,6 +552,8 @@ namespace
             outputDesktop_ = {};
             initialized_ = false;
             haveFrame_ = false;
+            lastDuplicationRetryMs_ = 0;
+            lastDuplicationError_ = S_OK;
         }
 
         XrSession session_ = XR_NULL_HANDLE;
@@ -522,6 +561,7 @@ namespace
         ID3D11Device* device_ = nullptr;
         ID3D11DeviceContext* context_ = nullptr;
         HWND hwnd_ = nullptr;
+        IDXGIOutput1* output1_ = nullptr;
         IDXGIOutputDuplication* duplication_ = nullptr;
         ID3D11Texture2D* latestFrame_ = nullptr;
         RECT outputDesktop_{};
@@ -532,6 +572,8 @@ namespace
         std::uint32_t height_ = 0;
         bool initialized_ = false;
         bool haveFrame_ = false;
+        ULONGLONG lastDuplicationRetryMs_ = 0;
+        HRESULT lastDuplicationError_ = S_OK;
     };
 
     MonoMirror Mirror;
