@@ -17,9 +17,9 @@ namespace OutRunVR
 		SessionFocused = 1u << 4,
 	};
 
-	// reserved[] stays inside protocol v1 so we can add diagnostics without
+	// reserved[] stays inside protocol v1 so diagnostics can evolve without
 	// changing the x86/x64 ABI. The x86 game writes these values and the x64
-	// host only reads them.
+	// host reads them.
 	inline constexpr std::uint32_t ClientHeartbeatIndex = 0;
 	inline constexpr std::uint32_t ClientFlagsIndex = 1;
 	inline constexpr std::uint32_t ClientLastAngleBitsIndex = 2;
@@ -28,8 +28,12 @@ namespace OutRunVR
 	{
 		ClientHookAlive = 1u << 0,
 		ClientHostPoseValid = 1u << 1,
+		// Kept for host compatibility. This bit is now set only after the final
+		// renderer c64 upload was actually patched, not by the old camera hook.
 		ClientPoseApplied = 1u << 2,
 		ClientAutoEnabled = 1u << 3,
+		ClientRendererWvpVerified = 1u << 4,
+		ClientRendererPoseInjected = 1u << 5,
 	};
 
 #pragma pack(push, 4)
@@ -78,10 +82,7 @@ namespace OutRunVR
 	static_assert(sizeof(SharedPoseState) == 248);
 }
 
-// The final D3D9 renderer injector is intentionally a separate implementation
-// from the original game-camera experiment. Re-export only the protocol symbols
-// it consumes so the renderer file can stay in its own namespace without
-// changing the shared-memory ABI or the host/game producer code.
+// Renderer-side aliases. These do not change protocol layout or ownership.
 namespace OutRunVRRenderer
 {
 	using OutRunVR::SharedMemoryName;
@@ -91,4 +92,13 @@ namespace OutRunVRRenderer
 	using OutRunVR::HostAlive;
 	using OutRunVR::OrientationValid;
 	using OutRunVR::PositionValid;
+	using OutRunVR::ClientHeartbeatIndex;
+	using OutRunVR::ClientFlagsIndex;
+	using OutRunVR::ClientLastAngleBitsIndex;
+	using OutRunVR::ClientHookAlive;
+	using OutRunVR::ClientHostPoseValid;
+	using OutRunVR::ClientPoseApplied;
+	using OutRunVR::ClientAutoEnabled;
+	using OutRunVR::ClientRendererWvpVerified;
+	using OutRunVR::ClientRendererPoseInjected;
 }
