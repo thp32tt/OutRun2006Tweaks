@@ -52,6 +52,7 @@ namespace OutRunVR
 		ClientRendererMatrixPrepared = 1u << 6,
 		ClientRendererUploadFailed = 1u << 7,
 		ClientCullingCameraSynced = 1u << 8,
+		ClientFrameCompleted = 1u << 9,
 	};
 
 #pragma pack(push, 4)
@@ -129,4 +130,5 @@ namespace OutRunVRRenderer
 	using OutRunVR::ClientRendererMatrixPrepared;
 	using OutRunVR::ClientRendererUploadFailed;
 	using OutRunVR::ClientCullingCameraSynced;
+	using OutRunVR::ClientFrameCompleted;
 }
