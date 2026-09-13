@@ -26,10 +26,11 @@
 // with the live View at 0x0095D860. The game camera is right-handed and uses
 // D3DXMatrixLookAtRH / D3DXMatrixPerspectiveFovRH, matching OpenXR's RH basis.
 //
-// We therefore leave gameplay camera state untouched and patch only a c64 upload
-// that first proves the expected WVP relationship for the running executable.
-// The OpenXR pose is latched once at BeginScene so every draw in one D3D9 scene
-// uses exactly the same HMD transform. Unknown executable layouts fail closed.
+// Gameplay camera state stays untouched. We patch only a c64 upload that first
+// proves the expected WVP relationship for the running executable. The OpenXR
+// pose is latched at BeginScene, used unchanged by every draw in that scene, and
+// renderer telemetry is published once at EndScene so CAMERA APPLIED describes
+// the completed scene rather than a stale result from a previous frame.
 
 namespace Settings
 {
@@ -59,6 +60,7 @@ namespace OutRunVRRenderer
 		};
 
 		constexpr std::size_t BeginSceneVtableIndex = 41;
+		constexpr std::size_t EndSceneVtableIndex = 42;
 		constexpr std::size_t SetVertexShaderConstantFVtableIndex = 94;
 		constexpr UINT OutRunWvpRegister = 64;
 		constexpr UINT OutRunWvpRegisterCount = 4;
@@ -73,11 +75,18 @@ namespace OutRunVRRenderer
 		constexpr LONGLONG HostPoseStaleMs = 250;
 
 		SafetyHookInline BeginSceneHook{};
+		SafetyHookInline EndSceneHook{};
 		SafetyHookInline SetVertexShaderConstantFHook{};
 
 		HANDLE SharedMapping = nullptr;
 		SharedPoseState* SharedState = nullptr;
 		LARGE_INTEGER QpcFrequency{};
+
+		const D3DMATRIX* RendererView = nullptr;
+		const D3DMATRIX* RendererProjection = nullptr;
+		const D3DMATRIX* RendererWorldView = nullptr;
+		bool RendererGlobalsChecked = false;
+		bool RendererGlobalsValid = false;
 
 		Quat CenterOrientation{ 0.0f, 0.0f, 0.0f, 1.0f };
 		Vec3 CenterPosition{ 0.0f, 0.0f, 0.0f };
@@ -88,7 +97,7 @@ namespace OutRunVRRenderer
 
 		D3DMATRIX LatchedHeadInverse{};
 		bool LatchedHeadInverseValid = false;
-		std::uint32_t LatchedTelemetryFlags = ClientHookAlive;
+		std::uint32_t FrameTelemetryFlags = ClientHookAlive;
 		float LatchedRelativeAngleDeg = 0.0f;
 		std::uint32_t LatchedPoseSequence = 0;
 
@@ -301,16 +310,42 @@ namespace OutRunVRRenderer
 			return rva <= imageSize && size <= imageSize - rva;
 		}
 
-		bool ReadImageMatrix(std::uintptr_t rva, D3DMATRIX& out)
+		bool ValidateRendererGlobals()
 		{
-			if (!ImageContainsRange(rva, sizeof(out)))
+			if (RendererGlobalsChecked)
+				return RendererGlobalsValid;
+			RendererGlobalsChecked = true;
+
+			if (!ImageContainsRange(OutRunViewRva, sizeof(D3DMATRIX)) ||
+				!ImageContainsRange(OutRunProjectionRva, sizeof(D3DMATRIX)) ||
+				!ImageContainsRange(OutRunWorldViewRva, sizeof(D3DMATRIX)))
 				return false;
-			const void* source = reinterpret_cast<const void*>(
-				reinterpret_cast<std::uintptr_t>(Module::ExeHandle) + rva);
-			if (!IsReadableRange(source, sizeof(out)))
+
+			RendererView = Module::exe_ptr<D3DMATRIX>(OutRunViewRva);
+			RendererProjection = Module::exe_ptr<D3DMATRIX>(OutRunProjectionRva);
+			RendererWorldView = Module::exe_ptr<D3DMATRIX>(OutRunWorldViewRva);
+			if (!IsReadableRange(RendererView, sizeof(D3DMATRIX)) ||
+				!IsReadableRange(RendererProjection, sizeof(D3DMATRIX)) ||
+				!IsReadableRange(RendererWorldView, sizeof(D3DMATRIX)))
+			{
+				RendererView = nullptr;
+				RendererProjection = nullptr;
+				RendererWorldView = nullptr;
 				return false;
-			std::memcpy(&out, source, sizeof(out));
-			return MatrixFinite(out);
+			}
+
+			RendererGlobalsValid = true;
+			return true;
+		}
+
+		bool ReadRendererMatrices(D3DMATRIX& view, D3DMATRIX& projection, D3DMATRIX& worldView)
+		{
+			if (!ValidateRendererGlobals())
+				return false;
+			std::memcpy(&view, RendererView, sizeof(view));
+			std::memcpy(&projection, RendererProjection, sizeof(projection));
+			std::memcpy(&worldView, RendererWorldView, sizeof(worldView));
+			return MatrixFinite(view) && MatrixFinite(projection) && MatrixFinite(worldView);
 		}
 
 		bool EnsureSharedState()
@@ -322,6 +357,7 @@ namespace OutRunVRRenderer
 				0, static_cast<DWORD>(sizeof(SharedPoseState)), SharedMemoryName);
 			if (!SharedMapping)
 				return false;
+			const bool mappingAlreadyExisted = GetLastError() == ERROR_ALREADY_EXISTS;
 
 			SharedState = static_cast<SharedPoseState*>(MapViewOfFile(
 				SharedMapping, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(SharedPoseState)));
@@ -332,9 +368,10 @@ namespace OutRunVRRenderer
 				return false;
 			}
 
-			if (SharedState->magic != SharedMagic ||
-				SharedState->protocolVersion != SharedProtocolVersion ||
-				SharedState->structSize != sizeof(SharedPoseState))
+			// Only the process that actually created the kernel mapping initializes
+			// its header. If the host created it concurrently, never memset an
+			// existing mapping while the host may be publishing its first seqlock.
+			if (!mappingAlreadyExisted)
 			{
 				std::memset(SharedState, 0, sizeof(SharedPoseState));
 				SharedState->magic = SharedMagic;
@@ -345,8 +382,6 @@ namespace OutRunVRRenderer
 			QueryPerformanceFrequency(&QpcFrequency);
 			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientPid),
 				static_cast<LONG>(GetCurrentProcessId()));
-			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[ClientFlagsIndex]),
-				static_cast<LONG>(ClientHookAlive));
 			spdlog::info("VR renderer: shared pose bridge ready (protocol {}, client pid={})",
 				SharedProtocolVersion, GetCurrentProcessId());
 			return true;
@@ -360,6 +395,10 @@ namespace OutRunVRRenderer
 			std::uint32_t angleBits = 0;
 			static_assert(sizeof(angleBits) == sizeof(relativeAngleDeg));
 			std::memcpy(&angleBits, &relativeAngleDeg, sizeof(angleBits));
+			// Reassert clientPid because a simultaneously-starting host may have
+			// initialized the mapping after our first attachment.
+			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientPid),
+				static_cast<LONG>(GetCurrentProcessId()));
 			InterlockedIncrement(reinterpret_cast<volatile LONG*>(&SharedState->reserved[ClientHeartbeatIndex]));
 			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[ClientFlagsIndex]),
 				static_cast<LONG>(flags));
@@ -435,10 +474,10 @@ namespace OutRunVRRenderer
 			return Game::current_mode && Game::game_start_progress_code && Game::is_in_game();
 		}
 
-		void ResetLatchedPose()
+		void ResetFrameState()
 		{
 			LatchedHeadInverseValid = false;
-			LatchedTelemetryFlags = ClientHookAlive;
+			FrameTelemetryFlags = ClientHookAlive;
 			LatchedRelativeAngleDeg = 0.0f;
 			LatchedPoseSequence = 0;
 		}
@@ -446,7 +485,7 @@ namespace OutRunVRRenderer
 		void LatchFramePose()
 		{
 			BeginSceneCalls.fetch_add(1, std::memory_order_relaxed);
-			ResetLatchedPose();
+			ResetFrameState();
 
 			if (!GameRendererIsActive())
 				return;
@@ -456,17 +495,16 @@ namespace OutRunVRRenderer
 			{
 				CenterValid = false;
 				CenterHostPid = 0;
-				PublishClientTelemetry(ClientHookAlive, 0.0f);
 				return;
 			}
 
-			LatchedTelemetryFlags |= ClientHostPoseValid;
+			FrameTelemetryFlags |= ClientHostPoseValid;
 			const bool autoEnabled = Settings::VRAutoEnableWhenHostPresent;
 			const bool trackingEnabled = Settings::VRHeadTracking || autoEnabled;
 			const bool enabled = (Settings::VREnabled || autoEnabled) && trackingEnabled;
 			if (autoEnabled && (!Settings::VREnabled || !Settings::VRHeadTracking))
 			{
-				LatchedTelemetryFlags |= ClientAutoEnabled;
+				FrameTelemetryFlags |= ClientAutoEnabled;
 				if (!AutoEnableLogged)
 				{
 					spdlog::info("VR renderer: live host pose auto-enabled renderer-side head tracking");
@@ -475,10 +513,7 @@ namespace OutRunVRRenderer
 			}
 
 			if (!enabled)
-			{
-				PublishClientTelemetry(LatchedTelemetryFlags, 0.0f);
 				return;
-			}
 
 			const bool recenter = RendererRecenterPressed();
 			if (!CenterValid || CenterHostPid != sample.hostPid || recenter)
@@ -514,20 +549,21 @@ namespace OutRunVRRenderer
 
 			const float w = std::clamp(std::fabs(relativeOrientation.w), 0.0f, 1.0f);
 			LatchedRelativeAngleDeg = 2.0f * std::acos(w) * (180.0f / Pi);
-			if (!LatchedHeadInverseValid)
-				PublishClientTelemetry(LatchedTelemetryFlags, 0.0f);
+		}
+
+		bool UploadContainsOutRunWvp(UINT startRegister, UINT vector4fCount)
+		{
+			if (vector4fCount == 0 || vector4fCount > 256 || startRegister > OutRunWvpRegister)
+				return false;
+			const UINT offset = OutRunWvpRegister - startRegister;
+			return vector4fCount >= offset + OutRunWvpRegisterCount;
 		}
 
 		bool TryInjectOutRunWvp(
 			UINT startRegister, const float* constantData, UINT vector4fCount,
 			float* patchedData)
 		{
-			if (!constantData || !patchedData || vector4fCount == 0 || vector4fCount > 256)
-				return false;
-			if (startRegister > OutRunWvpRegister)
-				return false;
-			const UINT wvpOffsetRegisters = OutRunWvpRegister - startRegister;
-			if (vector4fCount < wvpOffsetRegisters + OutRunWvpRegisterCount)
+			if (!constantData || !patchedData || !UploadContainsOutRunWvp(startRegister, vector4fCount))
 				return false;
 			if (!GameRendererIsActive())
 				return false;
@@ -537,9 +573,7 @@ namespace OutRunVRRenderer
 			D3DMATRIX view{};
 			D3DMATRIX projection{};
 			D3DMATRIX worldView{};
-			if (!ReadImageMatrix(OutRunViewRva, view) ||
-				!ReadImageMatrix(OutRunProjectionRva, projection) ||
-				!ReadImageMatrix(OutRunWorldViewRva, worldView))
+			if (!ReadRendererMatrices(view, projection, worldView))
 			{
 				UnsafeAddressRejects.fetch_add(1, std::memory_order_relaxed);
 				if (!FirstUnsafeAddressLogged.exchange(true, std::memory_order_relaxed))
@@ -547,6 +581,7 @@ namespace OutRunVRRenderer
 				return false;
 			}
 
+			const UINT wvpOffsetRegisters = OutRunWvpRegister - startRegister;
 			const float* uploadedWvp = constantData + wvpOffsetRegisters * 4;
 			const D3DMATRIX expectedWvp = MultiplyMatrix(worldView, projection);
 			if (!MatrixNear(uploadedWvp, expectedWvp, true, WvpVerifyAbsoluteEpsilon))
@@ -558,15 +593,12 @@ namespace OutRunVRRenderer
 			}
 
 			WvpVerifiedCalls.fetch_add(1, std::memory_order_relaxed);
+			FrameTelemetryFlags |= ClientRendererWvpVerified;
 			if (!FirstVerifiedLogged.exchange(true, std::memory_order_relaxed))
 				spdlog::info("VR renderer inject: verified OutRun c64 = Transpose(WorldView*Proj)");
 
-			std::uint32_t telemetryFlags = LatchedTelemetryFlags | ClientRendererWvpVerified;
 			if (!LatchedHeadInverseValid)
-			{
-				PublishClientTelemetry(telemetryFlags, 0.0f);
 				return false;
-			}
 
 			D3DMATRIX correctedWvp{};
 			if (Settings::VRMatrixOrder == 0)
@@ -581,18 +613,14 @@ namespace OutRunVRRenderer
 					MultiplyMatrix(MultiplyMatrix(world, LatchedHeadInverse), view), projection);
 			}
 			if (!MatrixFinite(correctedWvp))
-			{
-				PublishClientTelemetry(telemetryFlags, 0.0f);
 				return false;
-			}
 
 			std::memcpy(patchedData, constantData, sizeof(float) * vector4fCount * 4);
 			const D3DMATRIX transposed = TransposeMatrix(correctedWvp);
 			std::memcpy(patchedData + wvpOffsetRegisters * 4, &transposed, sizeof(transposed));
 
 			WvpInjectedCalls.fetch_add(1, std::memory_order_relaxed);
-			telemetryFlags |= ClientRendererPoseInjected | ClientPoseApplied;
-			PublishClientTelemetry(telemetryFlags, LatchedRelativeAngleDeg);
+			FrameTelemetryFlags |= ClientRendererPoseInjected | ClientPoseApplied;
 			if (!FirstInjectedLogged.exchange(true, std::memory_order_relaxed))
 				spdlog::info("VR renderer inject: HEAD TRACKING ACTIVE at VS c64 render boundary");
 			return true;
@@ -621,18 +649,30 @@ namespace OutRunVRRenderer
 		HRESULT __stdcall BeginSceneDest(IDirect3DDevice9* device)
 		{
 			LatchFramePose();
-			MaybeLogSummary();
 			return BeginSceneHook.stdcall<HRESULT>(device);
+		}
+
+		HRESULT __stdcall EndSceneDest(IDirect3DDevice9* device)
+		{
+			// One telemetry publication per completed D3D9 scene prevents a prior
+			// frame's CAMERA APPLIED flag from surviving a frame with no injection.
+			PublishClientTelemetry(FrameTelemetryFlags,
+				(FrameTelemetryFlags & ClientPoseApplied) ? LatchedRelativeAngleDeg : 0.0f);
+			MaybeLogSummary();
+			return EndSceneHook.stdcall<HRESULT>(device);
 		}
 
 		HRESULT __stdcall SetVertexShaderConstantFDest(
 			IDirect3DDevice9* device, UINT startRegister, const float* constantData, UINT vector4fCount)
 		{
 			VertexConstantCalls.fetch_add(1, std::memory_order_relaxed);
+			if (!constantData || !UploadContainsOutRunWvp(startRegister, vector4fCount))
+				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
+					device, startRegister, constantData, vector4fCount);
+
 			float patchedData[256 * 4];
 			const bool injected = TryInjectOutRunWvp(
 				startRegister, constantData, vector4fCount, patchedData);
-			MaybeLogSummary();
 			return SetVertexShaderConstantFHook.stdcall<HRESULT>(
 				device, startRegister, injected ? patchedData : constantData, vector4fCount);
 		}
@@ -645,20 +685,31 @@ namespace OutRunVRRenderer
 			if (!vtable)
 				return false;
 
+			// Validate the reverse-engineered static locations once. Their pages and
+			// addresses do not move during the process; the matrix values themselves
+			// are still copied and finite-checked per candidate draw.
+			if (!ValidateRendererGlobals() &&
+				!FirstUnsafeAddressLogged.exchange(true, std::memory_order_relaxed))
+			{
+				spdlog::warn("VR renderer: OutRun renderer globals failed executable/readability validation; c64 injection will fail closed");
+			}
+
 			BeginSceneHook = safetyhook::create_inline(vtable[BeginSceneVtableIndex], BeginSceneDest);
+			EndSceneHook = safetyhook::create_inline(vtable[EndSceneVtableIndex], EndSceneDest);
 			SetVertexShaderConstantFHook = safetyhook::create_inline(
 				vtable[SetVertexShaderConstantFVtableIndex], SetVertexShaderConstantFDest);
 
-			if (!BeginSceneHook || !SetVertexShaderConstantFHook)
+			if (!BeginSceneHook || !EndSceneHook || !SetVertexShaderConstantFHook)
 			{
 				BeginSceneHook = {};
+				EndSceneHook = {};
 				SetVertexShaderConstantFHook = {};
 				spdlog::error("VR renderer: failed to hook D3D9 renderer boundary");
 				return false;
 			}
 
 			EnsureSharedState();
-			spdlog::info("VR renderer: D3D9 hooks installed; frame-latched c64 WVP injection armed (vtbl 41/94)");
+			spdlog::info("VR renderer: D3D9 hooks installed; frame-latched c64 WVP injection armed (vtbl 41/42/94)");
 			return true;
 		}
 
