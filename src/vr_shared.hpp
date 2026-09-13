@@ -15,19 +15,35 @@ namespace OutRunVR
 		PositionValid = 1u << 2,
 		SessionVisible = 1u << 3,
 		SessionFocused = 1u << 4,
+		StereoViewsValid = 1u << 5,
 	};
 
 	// reserved[] stays inside protocol v1 so diagnostics and renderer/host
-	// coordination can evolve without changing the x86/x64 ABI. Indices 0..2
-	// are written by the x86 client, index 3 by the x64 host, and 4..5 by the
-	// x86 client. Keep ownership disjoint so host seqlock writes never need to
-	// overwrite client telemetry.
+	// coordination can evolve without changing the x86/x64 ABI. Ownership is
+	// deliberately disjoint so host seqlock writes never overwrite client state.
 	inline constexpr std::uint32_t ClientHeartbeatIndex = 0;
 	inline constexpr std::uint32_t ClientFlagsIndex = 1;
 	inline constexpr std::uint32_t ClientLastAngleBitsIndex = 2;
 	inline constexpr std::uint32_t HostReferenceSpaceGenerationIndex = 3;
 	inline constexpr std::uint32_t ClientPresentationModeIndex = 4;
 	inline constexpr std::uint32_t ClientGameStateIndex = 5;
+
+	// Host-owned stereo eye offsets, stored as float bits in head-local metres.
+	// [6..8] = left XYZ, [9..11] = right XYZ.
+	inline constexpr std::uint32_t HostEyeOffsetLeftXIndex = 6;
+	inline constexpr std::uint32_t HostEyeOffsetLeftYIndex = 7;
+	inline constexpr std::uint32_t HostEyeOffsetLeftZIndex = 8;
+	inline constexpr std::uint32_t HostEyeOffsetRightXIndex = 9;
+	inline constexpr std::uint32_t HostEyeOffsetRightYIndex = 10;
+	inline constexpr std::uint32_t HostEyeOffsetRightZIndex = 11;
+
+	// Client-owned true-stereo transport state. The x64 host uses these to
+	// decide whether gameplay contains a left/right SBS frame ready for an
+	// XrCompositionLayerProjection submission.
+	inline constexpr std::uint32_t ClientStereoStateIndex = 12;
+	inline constexpr std::uint32_t ClientStereoFrameIndex = 13;
+	inline constexpr std::uint32_t ClientStereoBackbufferWidthIndex = 14;
+	inline constexpr std::uint32_t ClientStereoBackbufferHeightIndex = 15;
 
 	enum ClientPresentationMode : std::uint32_t
 	{
@@ -36,23 +52,28 @@ namespace OutRunVR
 		PresentationTheater = 2,
 	};
 
+	enum ClientStereoState : std::uint32_t
+	{
+		StereoDisabled = 0,
+		StereoSbsActive = 1,
+		StereoSbsFallbackMono = 2,
+	};
+
 	enum ClientTelemetryFlags : std::uint32_t
 	{
 		ClientHookAlive = 1u << 0,
 		ClientHostPoseValid = 1u << 1,
-		// Set only after the final D3D9 constant upload succeeds and then
-		// published only after a successful EndScene. It no longer means merely
-		// that a corrected matrix was calculated.
 		ClientPoseApplied = 1u << 2,
 		ClientAutoEnabled = 1u << 3,
 		ClientRendererWvpVerified = 1u << 4,
-		// Kept for host compatibility; now means the original D3D9 upload
-		// returned success for the patched c64 data.
 		ClientRendererPoseInjected = 1u << 5,
 		ClientRendererMatrixPrepared = 1u << 6,
 		ClientRendererUploadFailed = 1u << 7,
 		ClientCullingCameraSynced = 1u << 8,
 		ClientFrameCompleted = 1u << 9,
+		ClientStereoActive = 1u << 10,
+		ClientStereoWorldDraw = 1u << 11,
+		ClientStereoDrawDuplicated = 1u << 12,
 	};
 
 #pragma pack(push, 4)
@@ -86,8 +107,8 @@ namespace OutRunVR
 		float position[3];
 		float reservedPose;
 
-		// Kept in the protocol now so the stereo milestone can render true
-		// stereo without changing the x86/x64 IPC ABI.
+		// Per-eye OpenXR FOV and recommended sizes are part of protocol v1 so
+		// true stereo never needs an ABI-breaking pose bridge revision.
 		SharedFov eyeFov[2];
 		std::uint32_t recommendedWidth[2];
 		std::uint32_t recommendedHeight[2];
@@ -101,26 +122,40 @@ namespace OutRunVR
 	static_assert(sizeof(SharedPoseState) == 248);
 }
 
-// Renderer-side aliases. These do not change protocol layout or ownership.
 namespace OutRunVRRenderer
 {
 	using OutRunVR::SharedMemoryName;
 	using OutRunVR::SharedMagic;
 	using OutRunVR::SharedProtocolVersion;
 	using OutRunVR::SharedPoseState;
+	using OutRunVR::SharedFov;
 	using OutRunVR::HostAlive;
 	using OutRunVR::OrientationValid;
 	using OutRunVR::PositionValid;
+	using OutRunVR::StereoViewsValid;
 	using OutRunVR::ClientHeartbeatIndex;
 	using OutRunVR::ClientFlagsIndex;
 	using OutRunVR::ClientLastAngleBitsIndex;
 	using OutRunVR::HostReferenceSpaceGenerationIndex;
 	using OutRunVR::ClientPresentationModeIndex;
 	using OutRunVR::ClientGameStateIndex;
+	using OutRunVR::HostEyeOffsetLeftXIndex;
+	using OutRunVR::HostEyeOffsetLeftYIndex;
+	using OutRunVR::HostEyeOffsetLeftZIndex;
+	using OutRunVR::HostEyeOffsetRightXIndex;
+	using OutRunVR::HostEyeOffsetRightYIndex;
+	using OutRunVR::HostEyeOffsetRightZIndex;
+	using OutRunVR::ClientStereoStateIndex;
+	using OutRunVR::ClientStereoFrameIndex;
+	using OutRunVR::ClientStereoBackbufferWidthIndex;
+	using OutRunVR::ClientStereoBackbufferHeightIndex;
 	using OutRunVR::ClientPresentationMode;
 	using OutRunVR::PresentationUnknown;
 	using OutRunVR::PresentationGameplay;
 	using OutRunVR::PresentationTheater;
+	using OutRunVR::StereoDisabled;
+	using OutRunVR::StereoSbsActive;
+	using OutRunVR::StereoSbsFallbackMono;
 	using OutRunVR::ClientHookAlive;
 	using OutRunVR::ClientHostPoseValid;
 	using OutRunVR::ClientPoseApplied;
@@ -131,4 +166,7 @@ namespace OutRunVRRenderer
 	using OutRunVR::ClientRendererUploadFailed;
 	using OutRunVR::ClientCullingCameraSynced;
 	using OutRunVR::ClientFrameCompleted;
+	using OutRunVR::ClientStereoActive;
+	using OutRunVR::ClientStereoWorldDraw;
+	using OutRunVR::ClientStereoDrawDuplicated;
 }
