@@ -83,6 +83,9 @@ jobs:
             "zero-force live SetParameters",
             "temporarily excluding it from automatic selection",
             "ConstantForce is using detected actuator offset",
+            "next compatible interface will be probed on the next update tick",
+            "transient ConstantForce update failure",
+            "preferred FFB driver/vendor",
             "MOZA R3 Physics SAT",
             "MOZA R3 Natural SAT",
             "Single-owner wheel FFB: DirectInput COM only",
@@ -181,8 +184,19 @@ jobs:
             src/input_manager.cpp
             src/overlay/input_bindings_ui.cpp
             src/overlay/wheel_setup_ui.cpp
+            src/wheel_profile_store.hpp
+            src/hooks_input.cpp
+            src/overlay/settings_ui.cpp
+            src/overlay/overlay.cpp
             src/dllmain.cpp
             OutRun2006Tweaks.ini
+            CMakeLists.txt
+            cmake.toml
+            README.md
+            WHEEL_FFB.md
+            RELEASE_NOTES_v0.1.md
             LICENSE.md
             THIRD_PARTY_NOTICES.md
             tools/verify_wheel_ffb_current.py
+            .github/workflows/build.yml
+          include-hidden-files: true
