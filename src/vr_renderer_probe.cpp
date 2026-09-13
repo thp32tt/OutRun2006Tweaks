@@ -32,9 +32,14 @@
 //   0x0095D8A0  Projection
 //   VS c64..c67 = Transpose(WorldView * Projection)
 //
-// with the live camera View at 0x0095D860. This explains why changing only
-// camera+0x140 can be invisible. We therefore verify that exact relation at
-// runtime and, only when it matches, replace the c64 matrix with:
+// with the live camera View at 0x0095D860. That same analysis identifies the
+// render camera/projection as D3DXMatrixLookAtRH / D3DXMatrixPerspectiveFovRH.
+// OpenXR is also right-handed with -Z forward, so this final-render path keeps
+// the OpenXR quaternion in its RH basis instead of applying the older LH
+// reflection used by the initial camera-object experiment.
+//
+// We verify the c64 relation at runtime and, only when it matches, replace it
+// with:
 //
 //   Transpose(WorldView * HeadInverse * Projection)
 //
@@ -331,13 +336,12 @@ namespace OutRunVRRenderer
 				(now.QuadPart - snapshot.sampleQpc) > (QpcFrequency.QuadPart * 2))
 				return false;
 
-			// Same OpenXR RH (-Z forward) -> OutRun/D3D game-basis reflection used
-			// by hooks_vr.cpp. Keep both paths bit-for-bit consistent.
+			// OpenXR and OR2006's actual render camera are both RH with -Z forward.
 			pose.orientation = Normalize({
-				-snapshot.orientation[0], -snapshot.orientation[1],
+				snapshot.orientation[0], snapshot.orientation[1],
 				snapshot.orientation[2], snapshot.orientation[3]
 			});
-			pose.position = { snapshot.position[0], snapshot.position[1], -snapshot.position[2] };
+			pose.position = { snapshot.position[0], snapshot.position[1], snapshot.position[2] };
 			pose.positionValid = (snapshot.flags & PositionValid) != 0;
 			pose.hostPid = snapshot.hostPid;
 			return true;
@@ -603,7 +607,7 @@ namespace OutRunVRRenderer
 					ProbeMatrix(constantData + offset * 4, ProbeApi::VertexConstants, startRegister + offset);
 			}
 
-			float patchedData[256 * 4]{};
+			float patchedData[256 * 4];
 			const bool injected = TryInjectOutRunWvp(
 				startRegister, constantData, vector4fCount, patchedData);
 			MaybeLogSummary();
