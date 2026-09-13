@@ -54,6 +54,12 @@ jobs:
           if (-not $ascii.Contains("VR: CalcCameraMatrix head-tracking hook installed")) {
             throw "VR marker missing: hooks_vr.cpp was not linked into dinput8.dll"
           }
+          if (-not $ascii.Contains("auto-enable with live host is ON")) {
+            throw "auto-enable head tracking path is missing from dinput8.dll"
+          }
+          if (-not $ascii.Contains("VR: tracking applied host=")) {
+            throw "camera-application telemetry is missing from dinput8.dll"
+          }
           $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
           $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
           if ($machine -ne 0x014C) { throw ("expected x86 DLL, machine=0x{0:X4}" -f $machine) }
@@ -82,18 +88,22 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Verify Desktop Duplication format assumptions
+      - name: Verify HDR and OpenXR color paths
         shell: pwsh
         run: |
-          $src = Get-Content vrhost/main_compat.cpp -Raw
-          if ($src -match 'captureFormat_\s*=\s*duplicationDesc\.ModeDesc\.Format') {
-            throw "Regression: DXGI_OUTDUPL_DESC.ModeDesc.Format must not be used as the duplicated surface format"
+          $src = Get-Content vrhost/main_compat_v2.cpp -Raw
+          foreach ($marker in @(
+            'DXGI_FORMAT_R16G16B16A16_FLOAT',
+            'DXGI_FORMAT_B8G8R8A8_UNORM_SRGB',
+            'QuerySdrWhiteScale',
+            'SrgbToLinear',
+            'xrRequestExitSession',
+            'ClientPoseApplied'
+          )) {
+            if (-not $src.Contains($marker)) { throw "missing required VR v2 source marker: $marker" }
           }
-          if (-not $src.Contains('DesktopDuplicationSurfaceFormat = DXGI_FORMAT_B8G8R8A8_UNORM')) {
-            throw "BGRA8 Desktop Duplication contract marker is missing"
-          }
-          if (-not $src.Contains('desktopDesc.Format != DesktopDuplicationSurfaceFormat')) {
-            throw "Acquired-frame format validation is missing"
+          if ($src.Contains('API-contract violation')) {
+            throw "old hard-coded BGRA8 failure path must not survive in VR v2"
           }
 
       - name: Configure x64 OpenXR host
@@ -114,11 +124,14 @@ jobs:
           $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
           if ($machine -ne 0x8664) { throw ("expected x64 host, machine=0x{0:X4}" -f $machine) }
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
-          if (-not $ascii.Contains("OpenXR BGRA8 swapchain support confirmed")) {
-            throw "new BGRA8 OpenXR diagnostic path is missing from the host binary"
-          }
-          if (-not $ascii.Contains("first duplicated frame")) {
-            throw "first-frame DXGI format validation is missing from the host binary"
+          foreach ($marker in @(
+            'color-managed GPU conversion enabled',
+            'FP16 scRGB/HDR',
+            'VR pose: q=',
+            'CAMERA APPLIED',
+            'Requesting OpenXR session shutdown and Virtual Desktop return'
+          )) {
+            if (-not $ascii.Contains($marker)) { throw "host binary missing v2 marker: $marker" }
           }
 
       - name: Upload host artifact
