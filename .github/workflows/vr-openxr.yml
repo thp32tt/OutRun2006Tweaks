@@ -88,7 +88,7 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Verify HDR and OpenXR color paths
+      - name: Verify HDR, tracking, exit and HLSL patch paths
         shell: pwsh
         run: |
           $src = Get-Content vrhost/main_compat_v2.cpp -Raw
@@ -102,15 +102,27 @@ jobs:
           )) {
             if (-not $src.Contains($marker)) { throw "missing required VR v2 source marker: $marker" }
           }
-          if ($src.Contains('API-contract violation')) {
-            throw "old hard-coded BGRA8 failure path must not survive in VR v2"
+          $patch = Get-Content vrhost/shader_compile_patch.hpp -Raw
+          if (-not $patch.Contains('linearColor')) { throw "HLSL reserved-word patch is missing" }
+          if (-not $patch.Contains('OutRunVrD3DCompile')) { throw "patched D3DCompile entry point is missing" }
+          $wrapper = Get-Content vrhost/main_compat_v3.cpp -Raw
+          if (-not $wrapper.Contains('#define D3DCompile OutRunVrD3DCompile')) {
+            throw "host is not routed through patched HLSL compiler"
           }
 
       - name: Configure x64 OpenXR host
         run: cmake -S vrhost -B build-vrhost -G "Visual Studio 17 2022" -A x64
 
-      - name: Build x64 OpenXR host
+      - name: Build x64 OpenXR host and shader test
         run: cmake --build build-vrhost --config Release
+
+      - name: Compile exact embedded HLSL shader
+        shell: pwsh
+        run: |
+          $test = "build-vrhost/bin/outrun-vr-shader-smoke.exe"
+          if (-not (Test-Path $test)) { throw "shader smoke-test executable was not produced" }
+          & $test
+          if ($LASTEXITCODE -ne 0) { throw "embedded MirrorShader failed real D3DCompile smoke test" }
 
       - name: Verify host binary
         shell: pwsh
@@ -129,9 +141,10 @@ jobs:
             'FP16 scRGB/HDR',
             'VR pose: q=',
             'CAMERA APPLIED',
-            'Requesting OpenXR session shutdown and Virtual Desktop return'
+            'Requesting OpenXR session shutdown and Virtual Desktop return',
+            'linearColor'
           )) {
-            if (-not $ascii.Contains($marker)) { throw "host binary missing v2 marker: $marker" }
+            if (-not $ascii.Contains($marker)) { throw "host binary missing v3 marker: $marker" }
           }
 
       - name: Upload host artifact
