@@ -29,8 +29,9 @@
 // Gameplay camera state stays untouched. We patch only a c64 upload that first
 // proves the expected WVP relationship for the running executable. The OpenXR
 // pose is latched after a successful BeginScene, used unchanged by every draw in
-// that scene, and telemetry is published after a successful EndScene so CAMERA
-// APPLIED describes the completed scene rather than stale prior-frame state.
+// that scene, and telemetry is published after a successful EndScene. Because
+// vtable inline hooks affect the D3D9 implementation rather than one COM object,
+// every callback is additionally restricted to OutRun's current game device.
 
 namespace Settings
 {
@@ -91,6 +92,7 @@ namespace OutRunVRRenderer
 		Quat CenterOrientation{ 0.0f, 0.0f, 0.0f, 1.0f };
 		Vec3 CenterPosition{ 0.0f, 0.0f, 0.0f };
 		bool CenterValid = false;
+		bool CenterPositionValid = false;
 		std::uint32_t CenterHostPid = 0;
 		bool RecenterWasDown = false;
 		bool AutoEnableLogged = false;
@@ -112,6 +114,11 @@ namespace OutRunVRRenderer
 		std::atomic<bool> FirstInjectedLogged{ false };
 		std::atomic<bool> FirstRejectedLogged{ false };
 		std::atomic<bool> FirstUnsafeAddressLogged{ false };
+
+		bool IsGameDevice(IDirect3DDevice9* device)
+		{
+			return device && Game::D3DDevice_ptr && *Game::D3DDevice_ptr == device;
+		}
 
 		Quat Normalize(Quat q)
 		{
@@ -481,6 +488,13 @@ namespace OutRunVRRenderer
 			LatchedPoseSequence = 0;
 		}
 
+		void ResetCenter()
+		{
+			CenterValid = false;
+			CenterPositionValid = false;
+			CenterHostPid = 0;
+		}
+
 		void LatchFramePose()
 		{
 			BeginSceneCalls.fetch_add(1, std::memory_order_relaxed);
@@ -492,8 +506,7 @@ namespace OutRunVRRenderer
 			PoseSample sample{};
 			if (!ReadHostPose(sample))
 			{
-				CenterValid = false;
-				CenterHostPid = 0;
+				ResetCenter();
 				return;
 			}
 
@@ -518,7 +531,8 @@ namespace OutRunVRRenderer
 			if (!CenterValid || CenterHostPid != sample.hostPid || recenter)
 			{
 				CenterOrientation = sample.orientation;
-				CenterPosition = sample.position;
+				CenterPosition = sample.positionValid ? sample.position : Vec3{ 0.0f, 0.0f, 0.0f };
+				CenterPositionValid = sample.positionValid;
 				CenterHostPid = sample.hostPid;
 				CenterValid = true;
 				if (recenter)
@@ -530,15 +544,26 @@ namespace OutRunVRRenderer
 			Vec3 relativePosition{ 0.0f, 0.0f, 0.0f };
 			if (Settings::VRPositionalTracking && sample.positionValid)
 			{
-				const Vec3 delta{
-					sample.position.x - CenterPosition.x,
-					sample.position.y - CenterPosition.y,
-					sample.position.z - CenterPosition.z
-				};
-				relativePosition = RotateVector(invCenter, delta);
-				relativePosition.x *= Settings::VRWorldScale;
-				relativePosition.y *= Settings::VRWorldScale;
-				relativePosition.z *= Settings::VRWorldScale;
+				if (!CenterPositionValid)
+				{
+					// Position validity can appear later than orientation validity. Use
+					// the first valid positional sample as the positional origin instead
+					// of subtracting an invalid value captured at orientation recenter.
+					CenterPosition = sample.position;
+					CenterPositionValid = true;
+				}
+				else
+				{
+					const Vec3 delta{
+						sample.position.x - CenterPosition.x,
+						sample.position.y - CenterPosition.y,
+						sample.position.z - CenterPosition.z
+					};
+					relativePosition = RotateVector(invCenter, delta);
+					relativePosition.x *= Settings::VRWorldScale;
+					relativePosition.y *= Settings::VRWorldScale;
+					relativePosition.z *= Settings::VRWorldScale;
+				}
 			}
 
 			relativeOrientation = ScaleRotation(relativeOrientation, Settings::VRRotationScale);
@@ -647,6 +672,8 @@ namespace OutRunVRRenderer
 		HRESULT __stdcall BeginSceneDest(IDirect3DDevice9* device)
 		{
 			const HRESULT result = BeginSceneHook.stdcall<HRESULT>(device);
+			if (!IsGameDevice(device))
+				return result;
 			if (SUCCEEDED(result))
 				LatchFramePose();
 			else
@@ -657,10 +684,8 @@ namespace OutRunVRRenderer
 		HRESULT __stdcall EndSceneDest(IDirect3DDevice9* device)
 		{
 			const HRESULT result = EndSceneHook.stdcall<HRESULT>(device);
-			if (SUCCEEDED(result))
+			if (IsGameDevice(device) && SUCCEEDED(result))
 			{
-				// One telemetry publication per completed D3D9 scene prevents a prior
-				// frame's CAMERA APPLIED flag from surviving a scene with no injection.
 				PublishClientTelemetry(FrameTelemetryFlags,
 					(FrameTelemetryFlags & ClientPoseApplied) ? LatchedRelativeAngleDeg : 0.0f);
 				MaybeLogSummary();
@@ -671,9 +696,12 @@ namespace OutRunVRRenderer
 		HRESULT __stdcall SetVertexShaderConstantFDest(
 			IDirect3DDevice9* device, UINT startRegister, const float* constantData, UINT vector4fCount)
 		{
-			if (!constantData || !UploadContainsOutRunWvp(startRegister, vector4fCount))
+			if (!IsGameDevice(device) || !constantData ||
+				!UploadContainsOutRunWvp(startRegister, vector4fCount))
+			{
 				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
 					device, startRegister, constantData, vector4fCount);
+			}
 
 			float patchedData[256 * 4];
 			const bool injected = TryInjectOutRunWvp(
@@ -690,9 +718,9 @@ namespace OutRunVRRenderer
 			if (!vtable)
 				return false;
 
-			// Validate the reverse-engineered static locations once. Their pages and
-			// addresses do not move during the process; the matrix values themselves
-			// are still copied and finite-checked per candidate draw.
+			// Validate reverse-engineered static locations once. Their pages and
+			// addresses do not move during the process; matrix values are still copied
+			// and finite-checked for every candidate draw.
 			if (!ValidateRendererGlobals() &&
 				!FirstUnsafeAddressLogged.exchange(true, std::memory_order_relaxed))
 			{
@@ -724,7 +752,8 @@ namespace OutRunVRRenderer
 			{
 				if (Game::D3DDevice_ptr && *Game::D3DDevice_ptr)
 				{
-					InstallD3D9Hooks(*Game::D3DDevice_ptr);
+					if (!InstallD3D9Hooks(*Game::D3DDevice_ptr))
+						spdlog::error("VR renderer: renderer hook installation failed");
 					return 0;
 				}
 				Sleep(100);
