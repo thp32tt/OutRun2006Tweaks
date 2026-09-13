@@ -1,0 +1,50 @@
+name: OpenXR VR Host
+
+on:
+  push:
+    branches: [ vr-openxr ]
+    paths:
+      - 'src/hooks_vr.cpp'
+      - 'src/vr_shared.hpp'
+      - 'vrhost/**'
+      - '.github/workflows/vr-openxr.yml'
+  pull_request:
+    paths:
+      - 'src/hooks_vr.cpp'
+      - 'src/vr_shared.hpp'
+      - 'vrhost/**'
+      - '.github/workflows/vr-openxr.yml'
+
+jobs:
+  host-x64:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          submodules: recursive
+
+      - name: Configure x64 OpenXR host
+        run: cmake -S vrhost -B build-vrhost -G "Visual Studio 17 2022" -A x64
+
+      - name: Build x64 OpenXR host
+        run: cmake --build build-vrhost --config Release
+
+      - name: Verify host binary
+        shell: pwsh
+        run: |
+          $hostPath = "build-vrhost/bin/outrun-vr-host.exe"
+          if (-not (Test-Path $hostPath)) { throw "outrun-vr-host.exe was not produced" }
+          $bytes = [System.IO.File]::ReadAllBytes($hostPath)
+          if ($bytes.Length -lt 10000) { throw "outrun-vr-host.exe is unexpectedly small" }
+          if ($bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw "host has no MZ header" }
+          $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+          $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
+          if ($machine -ne 0x8664) { throw ("expected x64 host, machine=0x{0:X4}" -f $machine) }
+
+      - name: Upload host artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: outrun-vr-host-x64
+          path: build-vrhost/bin/outrun-vr-host.exe
+          if-no-files-found: error
