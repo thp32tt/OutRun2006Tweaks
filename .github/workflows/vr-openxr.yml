@@ -1,4 +1,4 @@
-name: OpenXR VR Host
+name: OpenXR VR
 
 on:
   push:
@@ -6,16 +6,77 @@ on:
     paths:
       - 'src/hooks_vr.cpp'
       - 'src/vr_shared.hpp'
+      - 'cmake.toml'
       - 'vrhost/**'
       - '.github/workflows/vr-openxr.yml'
   pull_request:
     paths:
       - 'src/hooks_vr.cpp'
       - 'src/vr_shared.hpp'
+      - 'cmake.toml'
       - 'vrhost/**'
       - '.github/workflows/vr-openxr.yml'
 
 jobs:
+  game-x86:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          submodules: recursive
+
+      # The repository's cmkr bootstrap intentionally skips regeneration when
+      # CI is defined. Remove CI only for configure so the source glob is
+      # regenerated and this branch's new hooks_vr.cpp is actually compiled.
+      - name: Configure Win32 VR build
+        shell: cmd
+        run: |
+          set CI=
+          cmake -S . -B build-vr-game -G "Visual Studio 17 2022" -A Win32
+
+      - name: Apply existing dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-vr-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-game/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-vr-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-vr-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-game/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-vr-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build-vr-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-vr-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build Win32 VR DLL
+        run: cmake --build build-vr-game --config Release
+
+      - name: Verify VR code is in DLL
+        shell: pwsh
+        run: |
+          $dllPath = "build-vr-game/bin/dinput8.dll"
+          if (-not (Test-Path $dllPath)) { throw "dinput8.dll was not produced" }
+          $bytes = [System.IO.File]::ReadAllBytes($dllPath)
+          $ascii = [Text.Encoding]::ASCII.GetString($bytes)
+          if (-not $ascii.Contains("VR: CalcCameraMatrix head-tracking hook installed")) {
+            throw "VR marker missing: hooks_vr.cpp was not linked into dinput8.dll"
+          }
+          $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+          $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
+          if ($machine -ne 0x014C) { throw ("expected x86 DLL, machine=0x{0:X4}" -f $machine) }
+
+      - name: Package game artifact
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build-vr-game/package | Out-Null
+          Copy-Item build-vr-game/bin/dinput8.dll build-vr-game/package/dinput8.dll
+          Copy-Item OutRun2006Tweaks.ini build-vr-game/package/OutRun2006Tweaks.ini
+          Copy-Item OutRun2006Tweaks.lods.ini build-vr-game/package/OutRun2006Tweaks.lods.ini
+          Copy-Item VR_OPENXR.md build-vr-game/package/VR_OPENXR.md
+
+      - name: Upload Win32 VR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: outrun2006-vr-x86
+          path: build-vr-game/package
+          if-no-files-found: error
+
   host-x64:
     runs-on: windows-2022
     steps:
