@@ -20,8 +20,10 @@ jobs:
         shell: bash
         run: |
           git merge-base --is-ancestor a8059c5c1bda07c292847e9cbc4a830181456ce0 HEAD
-          test "$(git diff --name-only a8059c5c1bda07c292847e9cbc4a830181456ce0..HEAD | sort)" = ".github/workflows/apply_ffb_recovery_hardening.yml
-tools/apply_ffb_recovery_hardening.py"
+          git diff --name-only a8059c5c1bda07c292847e9cbc4a830181456ce0..HEAD | sort > /tmp/ffb-stage-files.txt
+          test "$(wc -l < /tmp/ffb-stage-files.txt)" -eq 2
+          grep -qx '.github/workflows/apply_ffb_recovery_hardening.yml' /tmp/ffb-stage-files.txt
+          grep -qx 'tools/apply_ffb_recovery_hardening.py' /tmp/ffb-stage-files.txt
 
       - name: Apply reviewed source changes
         shell: bash
