@@ -29,13 +29,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(openxr_sdk)
 
-# main_compat.cpp now owns the complete VDXR/OpenXR 1.0 compatibility and
-# diagnostic mono-mirror path. Build it directly so there is no preprocessor
-# wrapper between the source we debug and the executable we test.
-add_executable(outrun-vr-host main_compat.cpp)
+# v2 keeps the OpenXR 1.0 compatibility wrapper but adds a real GPU color
+# conversion path for SDR BGRA8 and HDR FP16/scRGB desktop frames, plus pose
+# telemetry and automatic session exit when OutRun closes.
+add_executable(outrun-vr-host main_compat_v2.cpp)
 target_include_directories(outrun-vr-host PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
 target_compile_definitions(outrun-vr-host PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
-target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi)
+target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi d3dcompiler)
 
 set_target_properties(outrun-vr-host PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
