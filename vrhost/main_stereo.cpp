@@ -99,6 +99,15 @@ namespace
     struct D3DObjects
     {
         ID3D11Device* device = nullptr; ID3D11DeviceContext* context = nullptr;
+        D3DObjects() = default;
+        D3DObjects(const D3DObjects&) = delete;
+        D3DObjects& operator=(const D3DObjects&) = delete;
+        D3DObjects(D3DObjects&& other) noexcept : device(std::exchange(other.device, nullptr)), context(std::exchange(other.context, nullptr)) {}
+        D3DObjects& operator=(D3DObjects&& other) noexcept
+        {
+            if (this != &other) { ReleaseCom(context); ReleaseCom(device); device = std::exchange(other.device, nullptr); context = std::exchange(other.context, nullptr); }
+            return *this;
+        }
         ~D3DObjects() { ReleaseCom(context); ReleaseCom(device); }
     };
 
@@ -280,6 +289,7 @@ namespace
         ~StereoCompositor(){ Reset(); ReleaseCom(context_); ReleaseCom(device_); if(gameProcess_)CloseHandle(gameProcess_); }
         bool GameAlive() const { return gameProcess_ ? WaitForSingleObject(gameProcess_,0)==WAIT_TIMEOUT : IsWindow(hwnd_)!=FALSE; }
         void ReferenceSpaceChanged(){ theaterAnchorValid_=false; }
+        void Shutdown(){ Reset(); session_=XR_NULL_HANDLE; }
 
         bool Initialize()
         {
@@ -417,6 +427,7 @@ int main(int argc,char**argv)
             }
             end.layerCount=layerReady?1:0;end.layers=layerReady?layers:nullptr;CheckXr(xrEndFrame(session,&end),"xrEndFrame");
         }
+        compositor.Shutdown();
         if(viewSpace!=XR_NULL_HANDLE)xrDestroySpace(viewSpace);if(localSpace!=XR_NULL_HANDLE)xrDestroySpace(localSpace);if(session!=XR_NULL_HANDLE)xrDestroySession(session);if(instance!=XR_NULL_HANDLE)xrDestroyInstance(instance);return 0;
     }
     catch(const std::exception&e)
