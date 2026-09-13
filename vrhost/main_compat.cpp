@@ -1,18 +1,16 @@
 // Compatibility / diagnostic compositor translation unit for OpenXR runtimes
 // such as VDXR.
 //
-// Milestone 1.5 goals:
-//   * request OpenXR 1.0 for broad runtime compatibility;
-//   * retry XR_ERROR_FORM_FACTOR_UNAVAILABLE while Quest/VDXR wakes up;
-//   * do not take over the headset until OR2006C2C.EXE has a real window;
-//   * replace main.cpp's zero-layer frame with a head-locked mono mirror;
-//   * automatically recover DXGI Desktop Duplication after OutRun changes
-//     display mode between its boot logo and the actual game.
+// Milestone 1.5 is intentionally a mono diagnostic mirror. It lets us verify
+// the x86 pose/camera bridge in the headset before true per-eye D3D9 rendering
+// is implemented.
 //
-// The mono mirror is intentionally NOT the final VR renderer. It exists so the
-// HMD can display the game while the x86 camera bridge is tested. True stereo
-// still requires rendering the D3D9 scene once per eye and submitting a
-// XrCompositionLayerProjection.
+// Important DXGI rule: IDXGIOutputDuplication::GetDesc().ModeDesc.Format is
+// the DISPLAY MODE format, not the format of the duplicated desktop surface.
+// The Desktop Duplication API guarantees that the acquired desktop image is
+// DXGI_FORMAT_B8G8R8A8_UNORM. HDR displays can therefore report display mode
+// format 10 (R16G16B16A16_FLOAT) while AcquireNextFrame returns format 87
+// (B8G8R8A8_UNORM). Do not use ModeDesc.Format for capture textures/swapchains.
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -41,6 +39,9 @@
 namespace
 {
     constexpr wchar_t GameExeName[] = L"OR2006C2C.EXE";
+    constexpr DXGI_FORMAT DesktopDuplicationSurfaceFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+    static_assert(DXGI_FORMAT_B8G8R8A8_UNORM == 87,
+        "Unexpected Windows SDK value for DXGI_FORMAT_B8G8R8A8_UNORM");
 
     struct WindowSearch
     {
@@ -227,6 +228,9 @@ namespace
                 return false;
             }
 
+            // DuplicateOutput surfaces are always BGRA8. RecreateDuplication()
+            // logs ModeDesc.Format separately only as display-mode diagnostics.
+            captureFormat_ = DesktopDuplicationSurfaceFormat;
             if (!RecreateDuplication(true))
                 return false;
 
@@ -248,11 +252,14 @@ namespace
             const std::int64_t wantedFormat = static_cast<std::int64_t>(captureFormat_);
             if (std::find(formats.begin(), formats.end(), wantedFormat) == formats.end())
             {
-                std::cerr << "VR mirror: VDXR does not expose the desktop capture DXGI format ("
-                          << static_cast<int>(captureFormat_)
-                          << "). A format-conversion path is required.\n";
+                std::cerr << "VR mirror: OpenXR runtime does not expose required BGRA8 swapchain format (87).\n"
+                          << "VR mirror: runtime formats:";
+                for (const auto format : formats)
+                    std::cerr << " " << format;
+                std::cerr << "\n";
                 return false;
             }
+            std::cout << "VR mirror: OpenXR BGRA8 swapchain support confirmed (format 87).\n";
 
             D3D11_TEXTURE2D_DESC captureDesc{};
             captureDesc.Width = width_;
@@ -309,10 +316,17 @@ namespace
 
             initialized_ = true;
             std::cout << "OpenXR mono mirror ready: " << width_ << "x" << height_
-                      << " (DXGI format " << static_cast<int>(captureFormat_) << ").\n"
-                      << "Mirror source is now the whole game monitor and will auto-recover after display-mode changes.\n"
+                      << " (Desktop Duplication surface format " << static_cast<int>(captureFormat_) << ").\n"
+                      << "Mirror source is the whole game monitor and will auto-recover after display-mode changes.\n"
                       << "This is a temporary mono HMD view for head-tracking tests; true stereo is next.\n";
-            return CaptureDesktopFrame(1000);
+
+            // Not receiving a frame during the first second is not fatal. Keep
+            // the OpenXR session alive and retry every xrEndFrame instead of
+            // converting a transient timeout into a fake xrCreateSession error.
+            CaptureDesktopFrame(1000);
+            if (!haveFrame_)
+                std::cout << "VR mirror: no desktop frame yet; continuing and retrying in the frame loop.\n";
+            return true;
         }
 
         bool CaptureAndCopyToSwapchain()
@@ -421,20 +435,18 @@ namespace
 
             DXGI_OUTDUPL_DESC duplicationDesc{};
             duplication_->GetDesc(&duplicationDesc);
-            const DXGI_FORMAT newFormat = duplicationDesc.ModeDesc.Format;
-            if (captureFormat_ != DXGI_FORMAT_UNKNOWN && newFormat != captureFormat_)
-            {
-                std::cerr << "VR mirror: desktop format changed from "
-                          << static_cast<int>(captureFormat_) << " to "
-                          << static_cast<int>(newFormat)
-                          << "; keeping the existing OpenXR swapchain format.\n";
-                duplication_->Release();
-                duplication_ = nullptr;
-                return false;
-            }
-            captureFormat_ = newFormat;
+            lastDisplayModeFormat_ = duplicationDesc.ModeDesc.Format;
+
+            // ModeDesc.Format can be HDR/FP16 (for example value 10). The
+            // actual duplicated desktop surface from DuplicateOutput is BGRA8.
+            captureFormat_ = DesktopDuplicationSurfaceFormat;
             lastDuplicationError_ = S_OK;
 
+            std::cout << "VR mirror: DXGI display mode format="
+                      << static_cast<int>(lastDisplayModeFormat_)
+                      << ", Desktop Duplication surface format="
+                      << static_cast<int>(captureFormat_)
+                      << " (BGRA8, fixed by API contract).\n";
             if (!initial)
                 std::cout << "VR mirror: desktop duplication recovered after display-mode change.\n";
             return true;
@@ -458,6 +470,11 @@ namespace
                 if (acquireHr == DXGI_ERROR_ACCESS_LOST)
                 {
                     std::cerr << "VR mirror: desktop duplication access was lost; rebuilding capture automatically.\n";
+                    if (duplication_)
+                    {
+                        duplication_->Release();
+                        duplication_ = nullptr;
+                    }
                     RecreateDuplication(false);
                 }
                 else
@@ -478,7 +495,22 @@ namespace
             {
                 D3D11_TEXTURE2D_DESC desktopDesc{};
                 desktopTexture->GetDesc(&desktopDesc);
-                if (desktopDesc.Format == captureFormat_)
+
+                if (!firstFrameLogged_)
+                {
+                    std::cout << "VR mirror: first duplicated frame "
+                              << desktopDesc.Width << "x" << desktopDesc.Height
+                              << ", format=" << static_cast<int>(desktopDesc.Format) << ".\n";
+                    firstFrameLogged_ = true;
+                }
+
+                if (desktopDesc.Format != DesktopDuplicationSurfaceFormat)
+                {
+                    std::cerr << "VR mirror: API-contract violation: acquired desktop surface format="
+                              << static_cast<int>(desktopDesc.Format)
+                              << ", expected BGRA8 format 87.\n";
+                }
+                else
                 {
                     const UINT copyWidth = std::min<UINT>(width_, desktopDesc.Width);
                     const UINT copyHeight = std::min<UINT>(height_, desktopDesc.Height);
@@ -496,11 +528,6 @@ namespace
                         context_->Flush();
                         copied = true;
                     }
-                }
-                else
-                {
-                    std::cerr << "VR mirror: duplicated desktop format changed unexpectedly ("
-                              << static_cast<int>(desktopDesc.Format) << ").\n";
                 }
                 desktopTexture->Release();
             }
@@ -549,9 +576,11 @@ namespace
             hwnd_ = nullptr;
             width_ = height_ = 0;
             captureFormat_ = DXGI_FORMAT_UNKNOWN;
+            lastDisplayModeFormat_ = DXGI_FORMAT_UNKNOWN;
             outputDesktop_ = {};
             initialized_ = false;
             haveFrame_ = false;
+            firstFrameLogged_ = false;
             lastDuplicationRetryMs_ = 0;
             lastDuplicationError_ = S_OK;
         }
@@ -566,12 +595,14 @@ namespace
         ID3D11Texture2D* latestFrame_ = nullptr;
         RECT outputDesktop_{};
         DXGI_FORMAT captureFormat_ = DXGI_FORMAT_UNKNOWN;
+        DXGI_FORMAT lastDisplayModeFormat_ = DXGI_FORMAT_UNKNOWN;
         XrSwapchain swapchain_ = XR_NULL_HANDLE;
         std::vector<XrSwapchainImageD3D11KHR> images_;
         std::uint32_t width_ = 0;
         std::uint32_t height_ = 0;
         bool initialized_ = false;
         bool haveFrame_ = false;
+        bool firstFrameLogged_ = false;
         ULONGLONG lastDuplicationRetryMs_ = 0;
         HRESULT lastDuplicationError_ = S_OK;
     };
@@ -663,8 +694,11 @@ namespace
         XrSession session,
         const XrFrameEndInfo* frameEndInfo)
     {
-        if (!frameEndInfo || frameEndInfo->layerCount != 0 || !Mirror.CaptureAndCopyToSwapchain() || !Mirror.ReadyForLayer())
+        if (!frameEndInfo || frameEndInfo->layerCount != 0 ||
+            !Mirror.CaptureAndCopyToSwapchain() || !Mirror.ReadyForLayer())
+        {
             return ::xrEndFrame(session, frameEndInfo);
+        }
 
         XrCompositionLayerQuad quad = Mirror.MakeQuad();
         const XrCompositionLayerBaseHeader* layer =
