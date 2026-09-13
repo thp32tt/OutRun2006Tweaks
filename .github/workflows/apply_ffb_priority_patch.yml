@@ -1,0 +1,42 @@
+name: Apply priority FFB hardening
+
+on:
+  push:
+    branches:
+      - wheel-ffb-v0.2-dev
+    paths:
+      - tools/apply_ffb_priority_patch.py
+
+permissions:
+  contents: write
+
+jobs:
+  apply-priority-patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: wheel-ffb-v0.2-dev
+          fetch-depth: 0
+
+      - name: Apply reviewed FFB priority patch
+        run: python tools/apply_ffb_priority_patch.py
+
+      - name: Verify consolidated wheel FFB source
+        run: python tools/verify_wheel_ffb_current.py
+
+      - name: Check patch whitespace
+        run: git diff --check
+
+      - name: Commit reviewed source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm tools/apply_ffb_priority_patch.py .github/workflows/apply_ffb_priority_patch.yml
+          git add src/hooks_wheel_ffb.cpp tools/verify_wheel_ffb_current.py .github/workflows/build.yml
+          git commit -m "fix: harden Fanatec FFB interface recovery"
+          git push origin HEAD:wheel-ffb-v0.2-dev
