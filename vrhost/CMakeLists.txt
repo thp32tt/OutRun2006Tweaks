@@ -32,7 +32,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(openxr_sdk)
 
-add_executable(outrun-vr-host main.cpp)
+# Build through a compatibility translation unit that requests the OpenXR 1.0
+# core API while still using the newer SDK headers/loader. This keeps VDXR and
+# other 1.0-only runtimes compatible with milestone 1.
+add_executable(outrun-vr-host main_compat.cpp)
 target_include_directories(outrun-vr-host PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
 target_compile_definitions(outrun-vr-host PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi)
