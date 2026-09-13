@@ -19,7 +19,7 @@ namespace Settings
 	Setting<bool> VREnabled{ "VR", "Enabled", true,
 		"Enables the experimental OpenXR VR camera bridge. The dedicated vr-openxr branch defaults this on." };
 	Setting<bool> VRAutoEnableWhenHostPresent{ "VR", "AutoEnableWhenHostPresent", true,
-		"Automatically applies head tracking whenever outrun-vr-host.exe is supplying a valid pose. This also overrides an old Enabled=false user setting." };
+		"Automatically applies head tracking whenever outrun-vr-host.exe is supplying a valid pose. This also overrides old Enabled=false or HeadTracking=false user settings." };
 	Setting<bool> VRHeadTracking{ "VR", "HeadTracking", true,
 		"Applies the OpenXR HMD orientation to the rendered camera without changing gameplay camera state." };
 	Setting<bool> VRPositionalTracking{ "VR", "PositionalTracking", false,
@@ -335,18 +335,19 @@ namespace OutRunVR
 
 		void ApplyPose(EvWorkCamera* cam)
 		{
-			if (!cam || !Settings::VRHeadTracking || !Game::is_in_game())
+			if (!cam || !Game::is_in_game())
 				return;
 
 			PoseSample sample{};
 			const bool haveHostPose = ReadHostPose(sample);
 			const bool autoEnabled = haveHostPose && Settings::VRAutoEnableWhenHostPresent;
-			const bool enabled = Settings::VREnabled || autoEnabled;
+			const bool trackingEnabled = Settings::VRHeadTracking || autoEnabled;
+			const bool enabled = (Settings::VREnabled || autoEnabled) && trackingEnabled;
 
 			std::uint32_t telemetryFlags = ClientHookAlive;
 			if (haveHostPose)
 				telemetryFlags |= ClientHostPoseValid;
-			if (autoEnabled && !Settings::VREnabled)
+			if (autoEnabled && (!Settings::VREnabled || !Settings::VRHeadTracking))
 				telemetryFlags |= ClientAutoEnabled;
 
 			if (!enabled)
@@ -355,9 +356,9 @@ namespace OutRunVR
 				return;
 			}
 
-			if (autoEnabled && !Settings::VREnabled && !AutoEnableLogged)
+			if (autoEnabled && (!Settings::VREnabled || !Settings::VRHeadTracking) && !AutoEnableLogged)
 			{
-				spdlog::info("VR: valid host pose detected; AutoEnableWhenHostPresent is overriding legacy Enabled=false");
+				spdlog::info("VR: valid host pose detected; AutoEnableWhenHostPresent is overriding legacy Enabled/HeadTracking=false");
 				AutoEnableLogged = true;
 			}
 
@@ -388,7 +389,7 @@ namespace OutRunVR
 					relativePosition = RotateVector(invCenter, delta);
 				}
 			}
-			else if (Settings::VRDebugPose && Settings::VREnabled)
+			else if (Settings::VRDebugPose && Settings::VREnabled && Settings::VRHeadTracking)
 			{
 				relativeOrientation = DebugEuler(
 					DegToRad(Settings::VRDebugPitch),
