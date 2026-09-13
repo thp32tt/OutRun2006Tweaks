@@ -14,6 +14,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "vr_shared.hpp"
@@ -37,13 +38,11 @@ namespace
 		std::uint32_t count = 0;
 		CheckXr(xrEnumerateInstanceExtensionProperties(nullptr, 0, &count, nullptr),
 			"xrEnumerateInstanceExtensionProperties(count)");
-
 		std::vector<XrExtensionProperties> extensions(count);
 		for (auto& ext : extensions)
 			ext = { XR_TYPE_EXTENSION_PROPERTIES };
 		CheckXr(xrEnumerateInstanceExtensionProperties(nullptr, count, &count, extensions.data()),
 			"xrEnumerateInstanceExtensionProperties(list)");
-
 		for (const auto& ext : extensions)
 			if (std::strcmp(ext.extensionName, wanted) == 0)
 				return true;
@@ -67,7 +66,6 @@ namespace
 			IDXGIAdapter1* adapter = nullptr;
 			if (factory->EnumAdapters1(i, &adapter) == DXGI_ERROR_NOT_FOUND)
 				break;
-
 			DXGI_ADAPTER_DESC1 desc{};
 			adapter->GetDesc1(&desc);
 			if (SameLuid(desc.AdapterLuid, wanted))
@@ -77,7 +75,6 @@ namespace
 			}
 			adapter->Release();
 		}
-
 		factory->Release();
 		if (!match)
 			throw std::runtime_error("OpenXR runtime D3D11 adapter was not found");
@@ -89,6 +86,26 @@ namespace
 		ID3D11Device* device = nullptr;
 		ID3D11DeviceContext* context = nullptr;
 
+		D3DObjects() = default;
+		D3DObjects(const D3DObjects&) = delete;
+		D3DObjects& operator=(const D3DObjects&) = delete;
+		D3DObjects(D3DObjects&& other) noexcept
+			: device(std::exchange(other.device, nullptr)),
+			  context(std::exchange(other.context, nullptr))
+		{
+		}
+		D3DObjects& operator=(D3DObjects&& other) noexcept
+		{
+			if (this == &other)
+				return *this;
+			if (context)
+				context->Release();
+			if (device)
+				device->Release();
+			device = std::exchange(other.device, nullptr);
+			context = std::exchange(other.context, nullptr);
+			return *this;
+		}
 		~D3DObjects()
 		{
 			if (context)
@@ -101,14 +118,10 @@ namespace
 	D3DObjects CreateD3D11Device(const XrGraphicsRequirementsD3D11KHR& requirements)
 	{
 		IDXGIAdapter1* adapter = FindAdapter(requirements.adapterLuid);
-
 		const std::array<D3D_FEATURE_LEVEL, 7> allLevels{
-			D3D_FEATURE_LEVEL_12_1,
-			D3D_FEATURE_LEVEL_12_0,
-			D3D_FEATURE_LEVEL_11_1,
-			D3D_FEATURE_LEVEL_11_0,
-			D3D_FEATURE_LEVEL_10_1,
-			D3D_FEATURE_LEVEL_10_0,
+			D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0,
+			D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0,
+			D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0,
 			D3D_FEATURE_LEVEL_9_3,
 		};
 		std::vector<D3D_FEATURE_LEVEL> levels;
@@ -121,16 +134,9 @@ namespace
 		D3DObjects out;
 		D3D_FEATURE_LEVEL selected{};
 		const HRESULT hr = D3D11CreateDevice(
-			adapter,
-			D3D_DRIVER_TYPE_UNKNOWN,
-			nullptr,
-			D3D11_CREATE_DEVICE_BGRA_SUPPORT,
-			levels.data(),
-			static_cast<UINT>(levels.size()),
-			D3D11_SDK_VERSION,
-			&out.device,
-			&selected,
-			&out.context);
+			adapter, D3D_DRIVER_TYPE_UNKNOWN, nullptr, D3D11_CREATE_DEVICE_BGRA_SUPPORT,
+			levels.data(), static_cast<UINT>(levels.size()), D3D11_SDK_VERSION,
+			&out.device, &selected, &out.context);
 		adapter->Release();
 		CheckHr(hr, "D3D11CreateDevice");
 		return out;
@@ -145,12 +151,10 @@ namespace
 				0, static_cast<DWORD>(sizeof(OutRunVR::SharedPoseState)), OutRunVR::SharedMemoryName);
 			if (!mapping_)
 				throw std::runtime_error("CreateFileMappingW failed: " + std::to_string(GetLastError()));
-
 			state_ = static_cast<OutRunVR::SharedPoseState*>(MapViewOfFile(
 				mapping_, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(OutRunVR::SharedPoseState)));
 			if (!state_)
 				throw std::runtime_error("MapViewOfFile failed: " + std::to_string(GetLastError()));
-
 			if (state_->magic != OutRunVR::SharedMagic ||
 				state_->protocolVersion != OutRunVR::SharedProtocolVersion ||
 				state_->structSize != sizeof(OutRunVR::SharedPoseState))
@@ -185,7 +189,6 @@ namespace
 		{
 			LARGE_INTEGER qpc{};
 			QueryPerformanceCounter(&qpc);
-
 			std::uint32_t flags = OutRunVR::HostAlive;
 			if (headLocation.locationFlags & XR_SPACE_LOCATION_ORIENTATION_VALID_BIT)
 				flags |= OutRunVR::OrientationValid;
@@ -201,7 +204,6 @@ namespace
 			state_->flags = flags;
 			state_->heartbeat += 1;
 			state_->sampleQpc = qpc.QuadPart;
-
 			state_->orientation[0] = headLocation.pose.orientation.x;
 			state_->orientation[1] = headLocation.pose.orientation.y;
 			state_->orientation[2] = headLocation.pose.orientation.z;
@@ -222,7 +224,6 @@ namespace
 				state_->recommendedWidth[eye] = configs[eye].recommendedImageRectWidth;
 				state_->recommendedHeight[eye] = configs[eye].recommendedImageRectHeight;
 			}
-
 			strncpy_s(state_->runtimeName, sizeof(state_->runtimeName),
 				runtimeName ? runtimeName : "unknown", _TRUNCATE);
 			EndWrite();
@@ -236,7 +237,6 @@ namespace
 				InterlockedIncrement(reinterpret_cast<volatile LONG*>(&state_->sequence));
 			MemoryBarrier();
 		}
-
 		void EndWrite()
 		{
 			MemoryBarrier();
@@ -257,19 +257,17 @@ namespace
 			"xrEnumerateEnvironmentBlendModes(count)");
 		if (!count)
 			throw std::runtime_error("OpenXR runtime returned no environment blend modes");
-
 		std::vector<XrEnvironmentBlendMode> modes(count);
 		CheckXr(xrEnumerateEnvironmentBlendModes(instance, systemId,
 			XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO, count, &count, modes.data()),
 			"xrEnumerateEnvironmentBlendModes(list)");
-
 		for (const auto mode : modes)
 			if (mode == XR_ENVIRONMENT_BLEND_MODE_OPAQUE)
 				return mode;
 		return modes.front();
 	}
 
-	bool ParseRuntimeOverride(int argc, char** argv)
+	void ParseRuntimeOverride(int argc, char** argv)
 	{
 		for (int i = 1; i + 1 < argc; ++i)
 		{
@@ -278,10 +276,9 @@ namespace
 				if (!SetEnvironmentVariableA("XR_RUNTIME_JSON", argv[i + 1]))
 					throw std::runtime_error("failed to set XR_RUNTIME_JSON");
 				std::cout << "XR_RUNTIME_JSON=" << argv[i + 1] << "\n";
-				return true;
+				return;
 			}
 		}
-		return false;
 	}
 }
 
@@ -290,7 +287,6 @@ int main(int argc, char** argv)
 	try
 	{
 		ParseRuntimeOverride(argc, argv);
-
 		if (!HasExtension(XR_KHR_D3D11_ENABLE_EXTENSION_NAME))
 			throw std::runtime_error("active OpenXR runtime does not expose XR_KHR_D3D11_enable");
 
@@ -338,26 +334,22 @@ int main(int argc, char** argv)
 		XrSessionCreateInfo sessionInfo{ XR_TYPE_SESSION_CREATE_INFO };
 		sessionInfo.next = &graphicsBinding;
 		sessionInfo.systemId = systemId;
-
 		XrSession session = XR_NULL_HANDLE;
 		CheckXr(xrCreateSession(instance, &sessionInfo, &session), "xrCreateSession");
 
 		XrPosef identityPose{};
 		identityPose.orientation.w = 1.0f;
-
 		XrReferenceSpaceCreateInfo localInfo{ XR_TYPE_REFERENCE_SPACE_CREATE_INFO };
 		localInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_LOCAL;
 		localInfo.poseInReferenceSpace = identityPose;
 		XrSpace localSpace = XR_NULL_HANDLE;
-		CheckXr(xrCreateReferenceSpace(session, &localInfo, &localSpace),
-			"xrCreateReferenceSpace(LOCAL)");
+		CheckXr(xrCreateReferenceSpace(session, &localInfo, &localSpace), "xrCreateReferenceSpace(LOCAL)");
 
 		XrReferenceSpaceCreateInfo viewInfo{ XR_TYPE_REFERENCE_SPACE_CREATE_INFO };
 		viewInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_VIEW;
 		viewInfo.poseInReferenceSpace = identityPose;
 		XrSpace viewSpace = XR_NULL_HANDLE;
-		CheckXr(xrCreateReferenceSpace(session, &viewInfo, &viewSpace),
-			"xrCreateReferenceSpace(VIEW)");
+		CheckXr(xrCreateReferenceSpace(session, &viewInfo, &viewSpace), "xrCreateReferenceSpace(VIEW)");
 
 		std::uint32_t configCount = 0;
 		CheckXr(xrEnumerateViewConfigurationViews(instance, systemId,
@@ -365,18 +357,16 @@ int main(int argc, char** argv)
 			"xrEnumerateViewConfigurationViews(count)");
 		if (configCount < 2)
 			throw std::runtime_error("OpenXR runtime did not expose two stereo views");
-
 		std::vector<XrViewConfigurationView> configVector(configCount);
 		for (auto& config : configVector)
 			config = { XR_TYPE_VIEW_CONFIGURATION_VIEW };
 		CheckXr(xrEnumerateViewConfigurationViews(instance, systemId,
 			XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO, configCount, &configCount, configVector.data()),
 			"xrEnumerateViewConfigurationViews(list)");
-
 		std::array<XrViewConfigurationView, 2> configs{ configVector[0], configVector[1] };
+
 		const XrEnvironmentBlendMode blendMode = ChooseBlendMode(instance, systemId);
 		SharedWriter shared;
-
 		bool exitRequested = false;
 		bool sessionRunning = false;
 		XrSessionState sessionState = XR_SESSION_STATE_UNKNOWN;
@@ -393,7 +383,6 @@ int main(int argc, char** argv)
 				{
 					const auto* changed = reinterpret_cast<const XrEventDataSessionStateChanged*>(&event);
 					sessionState = changed->state;
-
 					if (sessionState == XR_SESSION_STATE_READY && !sessionRunning)
 					{
 						XrSessionBeginInfo beginInfo{ XR_TYPE_SESSION_BEGIN_INFO };
@@ -408,11 +397,8 @@ int main(int argc, char** argv)
 					}
 					else if (sessionState == XR_SESSION_STATE_EXITING ||
 						sessionState == XR_SESSION_STATE_LOSS_PENDING)
-					{
 						exitRequested = true;
-					}
 				}
-
 				event = { XR_TYPE_EVENT_DATA_BUFFER };
 			}
 
@@ -427,7 +413,6 @@ int main(int argc, char** argv)
 			XrFrameWaitInfo waitInfo{ XR_TYPE_FRAME_WAIT_INFO };
 			XrFrameState frameState{ XR_TYPE_FRAME_STATE };
 			CheckXr(xrWaitFrame(session, &waitInfo, &frameState), "xrWaitFrame");
-
 			XrFrameBeginInfo frameBegin{ XR_TYPE_FRAME_BEGIN_INFO };
 			CheckXr(xrBeginFrame(session, &frameBegin), "xrBeginFrame");
 
@@ -445,16 +430,13 @@ int main(int argc, char** argv)
 			locateInfo.space = localSpace;
 			std::uint32_t viewCount = 0;
 			CheckXr(xrLocateViews(session, &locateInfo, &viewState,
-				static_cast<std::uint32_t>(views.size()), &viewCount, views.data()),
-				"xrLocateViews");
+				static_cast<std::uint32_t>(views.size()), &viewCount, views.data()), "xrLocateViews");
 
-			shared.Write(headLocation, views, viewCount, configs, sessionState,
-				instanceProperties.runtimeName);
+			shared.Write(headLocation, views, viewCount, configs, sessionState, instanceProperties.runtimeName);
 
 			// Milestone 1 owns a real OpenXR session and supplies predicted HMD
-			// tracking, but does not submit the game's D3D9 images yet. The next
-			// milestone replaces this zero-layer end frame with stereo projection
-			// layers backed by the x86 bridge's left/right render targets.
+			// tracking. Milestone 2 replaces this zero-layer end frame with stereo
+			// projection layers backed by the game's left/right render targets.
 			XrFrameEndInfo frameEnd{ XR_TYPE_FRAME_END_INFO };
 			frameEnd.displayTime = frameState.predictedDisplayTime;
 			frameEnd.environmentBlendMode = blendMode;
@@ -463,14 +445,10 @@ int main(int argc, char** argv)
 			CheckXr(xrEndFrame(session, &frameEnd), "xrEndFrame");
 		}
 
-		if (viewSpace != XR_NULL_HANDLE)
-			xrDestroySpace(viewSpace);
-		if (localSpace != XR_NULL_HANDLE)
-			xrDestroySpace(localSpace);
-		if (session != XR_NULL_HANDLE)
-			xrDestroySession(session);
-		if (instance != XR_NULL_HANDLE)
-			xrDestroyInstance(instance);
+		if (viewSpace != XR_NULL_HANDLE) xrDestroySpace(viewSpace);
+		if (localSpace != XR_NULL_HANDLE) xrDestroySpace(localSpace);
+		if (session != XR_NULL_HANDLE) xrDestroySession(session);
+		if (instance != XR_NULL_HANDLE) xrDestroyInstance(instance);
 		return 0;
 	}
 	catch (const std::exception& e)
