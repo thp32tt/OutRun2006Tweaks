@@ -1,0 +1,215 @@
+from pathlib import Path
+import re
+
+src_path = Path('src/hooks_wheel_ffb.cpp')
+verify_path = Path('tools/verify_wheel_ffb_current.py')
+src = src_path.read_text(encoding='utf-8')
+verify = verify_path.read_text(encoding='utf-8')
+
+
+def replace_once(text, old, new, label):
+    count = text.count(old)
+    if count != 1:
+        raise SystemExit(f'{label}: expected exactly one match, got {count}')
+    return text.replace(old, new, 1)
+
+
+src = replace_once(
+    src,
+    '#include "hook_mgr.hpp"\n#include "plugin.hpp"',
+    '#include "hook_mgr.hpp"\n#include "Proxy.hpp"\n#include "plugin.hpp"',
+    'include Proxy.hpp')
+
+src = replace_once(
+    src,
+    '        "Exact DirectInput instance GUID selected by F11 Wheel Setup; a saved GUID never falls back to a different device automatically."',
+    '        "Preferred DirectInput FFB interface selected by F11 Wheel Setup; if validation fails, a compatible sibling interface can be probed and pinned automatically."',
+    'DeviceGuid description')
+
+src = replace_once(
+    src,
+    '    constexpr DWORD FFB_DEVICE_FAILURE_GRACE_MS = 750;\n    constexpr DWORD FFB_DEVICE_RETRY_MS = 750;',
+    '    constexpr DWORD FFB_DEVICE_FAILURE_GRACE_MS = 750;\n    constexpr DWORD FFB_DEVICE_RETRY_MS = 750;\n    constexpr DWORD FFB_DEVICE_FAILED_BACKOFF_MS = 10000;',
+    'retry constants')
+
+old_update = '''            if (!initialized_)\n            {\n                if (tick_before(GetTickCount(), retryAfter_))\n                    return;\n                if (!initialize())\n                {\n                    retryAfter_ = GetTickCount() + 2000;\n                    return;\n                }\n            }'''
+new_update = '''            if (!initialized_)\n            {\n                if (tick_before(GetTickCount(), retryAfter_))\n                    return;\n\n                bool ready = initialize();\n                if (!ready)\n                {\n                    const DWORD fallbackNow = GetTickCount();\n                    const bool rejectedInterfacePending =\n                        !failedInterfaceGuid_.empty() &&\n                        tick_before(fallbackNow, failedInterfaceUntil_);\n                    if (rejectedInterfacePending)\n                    {\n                        spdlog::info(\n                            "WheelFFB: selected FFB interface failed validation; probing a sibling interface immediately");\n                        ready = initialize();\n                    }\n                }\n\n                if (!ready)\n                {\n                    retryAfter_ = GetTickCount() + FFB_DEVICE_FAILED_BACKOFF_MS;\n                    return;\n                }\n            }'''
+src = replace_once(src, old_update, new_update, 'initialize retry/fallback block')
+
+src = replace_once(
+    src,
+    '            failedInterfaceUntil_ = GetTickCount() + 5000;\n            spdlog::warn(\n                "WheelFFB: interface \'{}\' [{}] rejected {}; will retry this interface (0x{:08X})",',
+    '            failedInterfaceUntil_ = GetTickCount() + FFB_DEVICE_FAILED_BACKOFF_MS;\n            spdlog::warn(\n                "WheelFFB: interface \'{}\' [{}] rejected {}; temporarily excluding it from automatic selection (0x{:08X})",',
+    'failed interface backoff')
+
+old_di = '''            HRESULT hr = DirectInput8Create(\n                GetModuleHandleW(nullptr),\n                DIRECTINPUT_VERSION,\n                IID_IDirectInput8A,\n                reinterpret_cast<void**>(&directInput_),\n                nullptr);\n\n            if (FAILED(hr) || !directInput_)\n            {\n                spdlog::error(\n                    "WheelFFB: DirectInput8Create failed (0x{:08X})",\n                    (unsigned)hr);\n                return false;\n            }'''
+new_di = '''            using DirectInput8CreateFn = HRESULT(WINAPI*)(\n                HINSTANCE, DWORD, REFIID, LPVOID*, LPUNKNOWN);\n            auto createDirectInput = proxy::origModule\n                ? reinterpret_cast<DirectInput8CreateFn>(\n                    GetProcAddress(proxy::origModule, "DirectInput8Create"))\n                : nullptr;\n\n            // Prefer the already-loaded original Windows dinput8 module instead\n            // of routing the FFB backend back through this proxy DLL.\n            if (!createDirectInput)\n            {\n                spdlog::warn(\n                    "WheelFFB: original proxy module has no DirectInput8Create export; using linked fallback");\n                createDirectInput = &::DirectInput8Create;\n            }\n\n            HRESULT hr = createDirectInput(\n                GetModuleHandleW(nullptr),\n                DIRECTINPUT_VERSION,\n                IID_IDirectInput8A,\n                reinterpret_cast<void**>(&directInput_),\n                nullptr);\n\n            if (FAILED(hr) || !directInput_)\n            {\n                spdlog::error(\n                    "WheelFFB: original DirectInput8Create failed (0x{:08X})",\n                    (unsigned)hr);\n                return false;\n            }'''
+src = replace_once(src, old_di, new_di, 'original DirectInput8Create')
+
+old_guid = '''            if (!configuredGuid.empty())\n            {\n                ctx.matchGuidOnly = true;\n                hr = directInput_->EnumDevices(\n                    DI8DEVCLASS_GAMECTRL, enum_devices_callback, &ctx,\n                    DIEDFL_ATTACHEDONLY | DIEDFL_FORCEFEEDBACK);\n                if (FAILED(hr))\n                {\n                    release_directinput();\n                    return false;\n                }\n                if (!ctx.found)\n                {\n                    spdlog::warn(\n                        "WheelFFB: saved GUID unavailable or rejected; select its FFB interface explicitly in Force Feedback");\n                    release_directinput();\n                    return false;\n                }\n            }\n\n            if (!ctx.found)\n            {\n                hr = directInput_->EnumDevices(\n                    DI8DEVCLASS_GAMECTRL, enum_devices_callback, &ctx,\n                    DIEDFL_ATTACHEDONLY | DIEDFL_FORCEFEEDBACK);\n            }'''
+new_guid = '''            if (!configuredGuid.empty())\n            {\n                ctx.matchGuidOnly = true;\n                hr = directInput_->EnumDevices(\n                    DI8DEVCLASS_GAMECTRL, enum_devices_callback, &ctx,\n                    DIEDFL_ATTACHEDONLY | DIEDFL_FORCEFEEDBACK);\n                if (FAILED(hr))\n                {\n                    release_directinput();\n                    return false;\n                }\n                if (!ctx.found)\n                {\n                    // A physical wheel can expose more than one DirectInput\n                    // interface. Prefer the saved interface, but allow a sibling\n                    // with the same configured device name after validation fails.\n                    spdlog::warn(\n                        "WheelFFB: saved FFB GUID unavailable or rejected; probing compatible sibling interfaces");\n                    ctx.matchGuidOnly = false;\n                }\n            }\n\n            if (!ctx.found)\n            {\n                ctx.matchGuidOnly = false;\n                hr = directInput_->EnumDevices(\n                    DI8DEVCLASS_GAMECTRL, enum_devices_callback, &ctx,\n                    DIEDFL_ATTACHEDONLY | DIEDFL_FORCEFEEDBACK);\n            }'''
+src = replace_once(src, old_guid, new_guid, 'saved GUID sibling fallback')
+
+old_acquire = '''            hr = device_->Acquire();\n            if (FAILED(hr))\n            {\n                mark_selected_interface_failed("Acquire", hr);\n                spdlog::error("WheelFFB: Acquire('{}') failed (0x{:08X})", selectedName_, (unsigned)hr);\n                release_device();\n                release_directinput();\n                return false;\n            }\n            deviceAcquired_ = true;\n\n            const HRESULT actuatorOnHr =\n                device_->SendForceFeedbackCommand(DISFFC_SETACTUATORSON);'''
+new_acquire = '''            hr = device_->Acquire();\n            if (FAILED(hr) && hr != S_FALSE)\n            {\n                mark_selected_interface_failed("Acquire", hr);\n                spdlog::error("WheelFFB: Acquire('{}') failed (0x{:08X})", selectedName_, (unsigned)hr);\n                release_device();\n                release_directinput();\n                return false;\n            }\n            deviceAcquired_ = true;\n\n            // Some multi-interface wheel drivers need the legacy reset sequence\n            // before the FFB interface will accept actuator/effect commands.\n            const HRESULT resetHr = device_->SendForceFeedbackCommand(DISFFC_RESET);\n            if (FAILED(resetHr))\n            {\n                spdlog::warn(\n                    "WheelFFB: initial DISFFC_RESET rejected (0x{:08X}); continuing with actuator enable",\n                    (unsigned)resetHr);\n            }\n\n            const HRESULT actuatorOnHr =\n                device_->SendForceFeedbackCommand(DISFFC_SETACTUATORSON);'''
+src = replace_once(src, old_acquire, new_acquire, 'initial reset sequence')
+
+new_constant = r'''        bool create_constant_effect()
+        {
+            if (!device_)
+                return false;
+
+            const bool liveMagnitude = query_dynamic_effect_capability(
+                GUID_ConstantForce, "ConstantForce", DIEP_TYPESPECIFICPARAMS,
+                constantCapsKnown_, constantDynamicParams_);
+            if (constantCapsKnown_ && !liveMagnitude)
+            {
+                spdlog::warn(
+                    "WheelFFB: ConstantForce metadata reports no live magnitude update support; keeping the compatibility path because no equivalent software actuator exists");
+            }
+
+            safe_release_effect(constantEffect_, "constant before create");
+            constantEffectPolar_ = false;
+
+            // Some wheel bases expose one FFB actuator but require the legacy
+            // DirectInput X/Y POLAR ConstantForce descriptor. Always try that
+            // canonical descriptor first, then use a one-axis X fallback.
+            DWORD axes[2] = { DIJOFS_X, DIJOFS_Y };
+            LONG directions[2] = { 9000L, 0L };
+            constantParams_ = {};
+            constantParams_.lMagnitude = 0;
+
+            DIEFFECT effect{};
+            effect.dwSize = sizeof(effect);
+            effect.dwDuration = FFB_EFFECT_LEASE_US;
+            effect.dwSamplePeriod = 0;
+            effect.dwGain = DI_FFNOMINALMAX;
+            effect.dwTriggerButton = DIEB_NOTRIGGER;
+            effect.dwTriggerRepeatInterval = 0;
+            effect.rgdwAxes = axes;
+            effect.rglDirection = directions;
+            effect.cbTypeSpecificParams = sizeof(constantParams_);
+            effect.lpvTypeSpecificParams = &constantParams_;
+
+            auto probe_start = [&](const char* descriptor) -> HRESULT
+            {
+                if (!constantEffect_)
+                    return E_POINTER;
+                const HRESULT startHr = constantEffect_->Start(1, 0);
+                if (FAILED(startHr))
+                {
+                    spdlog::warn(
+                        "WheelFFB: ConstantForce {} start probe failed (0x{:08X})",
+                        descriptor, (unsigned)startHr);
+                    return startHr;
+                }
+                const HRESULT stopHr = constantEffect_->Stop();
+                if (FAILED(stopHr))
+                {
+                    spdlog::warn(
+                        "WheelFFB: ConstantForce {} zero-force probe Stop failed (0x{:08X})",
+                        descriptor, (unsigned)stopHr);
+                }
+                return S_OK;
+            };
+
+            HRESULT hr = E_FAIL;
+
+            effect.dwFlags = DIEFF_POLAR | DIEFF_OBJECTOFFSETS;
+            effect.cAxes = 2;
+            hr = device_->CreateEffect(
+                GUID_ConstantForce, &effect, &constantEffect_, nullptr);
+            if (SUCCEEDED(hr) && constantEffect_)
+            {
+                const HRESULT probeHr = probe_start("2-axis POLAR");
+                if (SUCCEEDED(probeHr))
+                {
+                    constantEffectPolar_ = true;
+                    prevConstantLevel_ = 0;
+                    lastConstantWriteTick_ = 0;
+                    spdlog::info(
+                        "WheelFFB: ConstantForce validated with canonical X/Y 2-axis POLAR descriptor");
+                    return true;
+                }
+                hr = probeHr;
+            }
+
+            safe_release_effect(constantEffect_, "failed POLAR constant probe");
+            spdlog::warn(
+                "WheelFFB: 2-axis POLAR ConstantForce unavailable (0x{:08X}); trying canonical one-axis X CARTESIAN",
+                (unsigned)hr);
+
+            effect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
+            effect.cAxes = 1;
+            axes[0] = DIJOFS_X;
+            directions[0] = 1;
+            hr = device_->CreateEffect(
+                GUID_ConstantForce, &effect, &constantEffect_, nullptr);
+            if (SUCCEEDED(hr) && constantEffect_)
+            {
+                const HRESULT probeHr = probe_start("1-axis X CARTESIAN");
+                if (SUCCEEDED(probeHr))
+                {
+                    constantEffectPolar_ = false;
+                    prevConstantLevel_ = 0;
+                    lastConstantWriteTick_ = 0;
+                    spdlog::info(
+                        "WheelFFB: ConstantForce validated with canonical one-axis X CARTESIAN fallback");
+                    return true;
+                }
+                hr = probeHr;
+            }
+
+            safe_release_effect(constantEffect_, "failed CARTESIAN constant probe");
+            const HRESULT failHr = FAILED(hr) ? hr : E_FAIL;
+            mark_selected_interface_failed("ConstantForce create/start probe", failHr);
+            spdlog::error(
+                "WheelFFB: no usable ConstantForce descriptor on selected interface (0x{:08X})",
+                (unsigned)failHr);
+            return false;
+        }
+
+        bool create_spring_effect()'''
+pattern = re.compile(
+    r'        bool create_constant_effect\(\)\n        \{.*?\n        \}\n\n        bool create_spring_effect\(\)',
+    re.S)
+src, count = pattern.subn(new_constant, src, count=1)
+if count != 1:
+    raise SystemExit(f'create_constant_effect replacement: expected one match, got {count}')
+
+verify_anchor = "req(ffb, 'GUID_ConstantForce', 'DirectInput ConstantForce effect')\n"
+verify_add = """req(ffb, '#include \"Proxy.hpp\"', 'FFB backend can access original proxy module')
+req(ffb, 'GetProcAddress(proxy::origModule, \"DirectInput8Create\")', 'FFB backend uses original Windows DirectInput export')
+req(ffb, 'DWORD axes[2] = { DIJOFS_X, DIJOFS_Y };', 'ConstantForce tries canonical X/Y polar descriptor independent of actuator count')
+req(ffb, 'ConstantForce validated with canonical X/Y 2-axis POLAR descriptor', '2-axis ConstantForce create/start probe required')
+req(ffb, 'saved FFB GUID unavailable or rejected; probing compatible sibling interfaces', 'saved FFB GUID can fall back to sibling interface')
+req(ffb, 'selected FFB interface failed validation; probing a sibling interface immediately', 'failed interface gets immediate sibling probe')
+req(ffb, 'FFB_DEVICE_FAILED_BACKOFF_MS = 10000', 'failed FFB interface retry is throttled')
+req(ffb, 'device_->SendForceFeedbackCommand(DISFFC_RESET)', 'FFB interface reset before actuator enable')
+"""
+if verify_add not in verify:
+    if verify_anchor not in verify:
+        raise SystemExit('verifier anchor not found')
+    verify = verify.replace(verify_anchor, verify_anchor + verify_add, 1)
+
+for needle in (
+    'if (actuatorAxes_.size() > 1 && polarDirectionDynamic)',
+    'saved GUID unavailable or rejected; select its FFB interface explicitly',
+    'retryAfter_ = GetTickCount() + 2000;',
+):
+    if needle in src:
+        raise SystemExit(f'old incompatible path still present: {needle}')
+
+for needle in (
+    'GetProcAddress(proxy::origModule, "DirectInput8Create")',
+    'DWORD axes[2] = { DIJOFS_X, DIJOFS_Y };',
+    'ConstantForce create/start probe',
+    'probing compatible sibling interfaces',
+    'probing a sibling interface immediately',
+):
+    if needle not in src:
+        raise SystemExit(f'missing patched source invariant: {needle}')
+
+src_path.write_text(src, encoding='utf-8')
+verify_path.write_text(verify, encoding='utf-8')
+print('FFB interface compatibility patch applied')
