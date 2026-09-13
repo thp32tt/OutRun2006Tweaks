@@ -49,13 +49,13 @@ jobs:
           }
 
           $stereo = Get-Content src/vr_stereo.cpp -Raw
-          foreach ($marker in @('DrawPrimitiveVtableIndex = 81','DrawIndexedPrimitiveVtableIndex = 82','DrawPrimitiveUPVtableIndex = 83','DrawIndexedPrimitiveUPVtableIndex = 84','StereoSbsActive','BuildEyeProjection','GetVertexShaderConstantF','simulation/input/FFB remain single-pass','Rt0IsBackbuffer')) {
+          foreach ($marker in @('DrawPrimitiveVtableIndex = 81','DrawIndexedPrimitiveVtableIndex = 82','DrawPrimitiveUPVtableIndex = 83','DrawIndexedPrimitiveUPVtableIndex = 84','SetDepthStencilSurfaceVtableIndex = 39','StereoSbsActive','ProjectionFromFov','BuildEyeConstants','GetVertexShaderConstantF','SetWvpOneRegisterAtATime','ComposeSbs','RightEyeSurface','simulation, input, timers, native FFB')) {
             if (-not $stereo.Contains($marker)) { throw "missing stereo renderer marker: $marker" }
           }
-          if ($stereo.Contains('SceneControl')) { throw 'stereo must never replay SceneControl/render queues' }
+          if ($stereo.Contains('Game::ModeControl()') -or $stereo.Contains('Game::EventControl()') -or $stereo.Contains('WheelFFB_ServiceSafety')) { throw 'stereo renderer must never execute simulation/input/FFB' }
 
           $shared = Get-Content src/vr_shared.hpp -Raw
-          foreach ($marker in @('static_assert(sizeof(SharedPoseState) == 248)','StereoViewsValid','HostEyeOffsetLeftXIndex','HostEyeOffsetRightXIndex','ClientStereoStateIndex','ClientStereoFrameIndex')) {
+          foreach ($marker in @('static_assert(sizeof(SharedPoseState) == 248)','StereoViewsValid','HostEyeOffsetLeftXIndex','HostEyeOffsetRightXIndex','ClientStereoStateIndex','ClientStereoFrameIndex','ClientStereoBackbufferWidthIndex','ClientStereoBackbufferHeightIndex')) {
             if (-not $shared.Contains($marker)) { throw "missing stereo IPC ABI marker: $marker" }
           }
 
@@ -84,7 +84,7 @@ jobs:
           if (-not (Test-Path $dllPath)) { throw "dinput8.dll was not produced" }
           $bytes = [System.IO.File]::ReadAllBytes($dllPath)
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
-          foreach ($marker in @('renderer-boundary head tracking + true stereo configured','VR renderer inject: verified OutRun c64 = Transpose(WorldView*Proj)','VR stereo: D3D9 SBS hooks installed','VR stereo: true SBS draw duplication active; simulation/input/FFB remain single-pass')) {
+          foreach ($marker in @('renderer-boundary head tracking + true stereo configured','VR renderer inject: verified OutRun c64 = Transpose(WorldView*Proj)','VR stereo: D3D9 full-eye renderer installed','VR stereo: TRUE GEOMETRY STEREO active','VR stereo: SBS transport active')) {
             if (-not $ascii.Contains($marker)) { throw "VR binary marker missing: $marker" }
           }
           $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
@@ -124,7 +124,7 @@ jobs:
           }
           if ($src.Contains('context_->Flush()')) { throw 'per-frame D3D11 Flush must not return' }
           $shader = Get-Content vrhost/stereo_shader.hpp -Raw
-          foreach ($marker in @('UvScale','UvOffset','SrgbToLinear','SourceIsScRgb')) { if (-not $shader.Contains($marker)) { throw "missing stereo shader marker: $marker" } }
+          foreach ($marker in @('UvScale','UvOffset','SrgbToLinear','SourceIsScRgb','linearColor')) { if (-not $shader.Contains($marker)) { throw "missing stereo shader marker: $marker" } }
 
       - name: Configure x64 OpenXR host
         run: cmake -S vrhost -B build-vrhost -G "Visual Studio 17 2022" -A x64
