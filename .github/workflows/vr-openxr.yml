@@ -26,9 +26,6 @@ jobs:
         with:
           submodules: recursive
 
-      # The repository's cmkr bootstrap intentionally skips regeneration when
-      # CI is defined. Remove CI only for configure so the source glob is
-      # regenerated and this branch's new hooks_vr.cpp is actually compiled.
       - name: Configure Win32 VR build
         shell: cmd
         run: |
@@ -85,6 +82,20 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Verify Desktop Duplication format assumptions
+        shell: pwsh
+        run: |
+          $src = Get-Content vrhost/main_compat.cpp -Raw
+          if ($src -match 'captureFormat_\s*=\s*duplicationDesc\.ModeDesc\.Format') {
+            throw "Regression: DXGI_OUTDUPL_DESC.ModeDesc.Format must not be used as the duplicated surface format"
+          }
+          if (-not $src.Contains('DesktopDuplicationSurfaceFormat = DXGI_FORMAT_B8G8R8A8_UNORM')) {
+            throw "BGRA8 Desktop Duplication contract marker is missing"
+          }
+          if (-not $src.Contains('desktopDesc.Format != DesktopDuplicationSurfaceFormat')) {
+            throw "Acquired-frame format validation is missing"
+          }
+
       - name: Configure x64 OpenXR host
         run: cmake -S vrhost -B build-vrhost -G "Visual Studio 17 2022" -A x64
 
@@ -102,6 +113,13 @@ jobs:
           $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
           $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
           if ($machine -ne 0x8664) { throw ("expected x64 host, machine=0x{0:X4}" -f $machine) }
+          $ascii = [Text.Encoding]::ASCII.GetString($bytes)
+          if (-not $ascii.Contains("OpenXR BGRA8 swapchain support confirmed")) {
+            throw "new BGRA8 OpenXR diagnostic path is missing from the host binary"
+          }
+          if (-not $ascii.Contains("first duplicated frame")) {
+            throw "first-frame DXGI format validation is missing from the host binary"
+          }
 
       - name: Upload host artifact
         uses: actions/upload-artifact@v4
