@@ -16,8 +16,10 @@
 
 namespace Settings
 {
-	Setting<bool> VREnabled{ "VR", "Enabled", false,
-		"Enables the experimental OpenXR VR camera bridge. Start outrun-vr-host.exe first." };
+	Setting<bool> VREnabled{ "VR", "Enabled", true,
+		"Enables the experimental OpenXR VR camera bridge. The dedicated vr-openxr branch defaults this on." };
+	Setting<bool> VRAutoEnableWhenHostPresent{ "VR", "AutoEnableWhenHostPresent", true,
+		"Automatically applies head tracking whenever outrun-vr-host.exe is supplying a valid pose. This also overrides an old Enabled=false user setting." };
 	Setting<bool> VRHeadTracking{ "VR", "HeadTracking", true,
 		"Applies the OpenXR HMD orientation to the rendered camera without changing gameplay camera state." };
 	Setting<bool> VRPositionalTracking{ "VR", "PositionalTracking", false,
@@ -29,6 +31,8 @@ namespace Settings
 	Setting<int> VRMatrixOrder{ "VR", "MatrixOrder", 0,
 		"Camera-matrix composition order. Default matches the expected D3D9 row-vector convention.",
 		{ "GameView * HeadInverse", "HeadInverse * GameView" } };
+	Setting<bool> VRTelemetry{ "VR", "Telemetry", true,
+		"Logs one head-tracking diagnostic line per second while VR is active." };
 	Setting<bool> VRDebugPose{ "VR", "DebugPose", false,
 		"Uses the manual debug angles below when no OpenXR host pose is available." };
 	Setting<float> VRDebugPitch{ "VR", "DebugPitch", 0.0f,
@@ -64,6 +68,8 @@ namespace OutRunVR
 		Quat CenterOrientation{ 0.0f, 0.0f, 0.0f, 1.0f };
 		Vec3 CenterPosition{ 0.0f, 0.0f, 0.0f };
 		bool CenterValid = false;
+		bool AutoEnableLogged = false;
+		ULONGLONG LastTrackingLogMs = 0;
 
 		constexpr float Pi = 3.14159265358979323846f;
 
@@ -222,8 +228,26 @@ namespace OutRunVR
 			}
 
 			SharedState->clientPid = GetCurrentProcessId();
-			spdlog::info("VR: shared pose bridge ready (protocol {})", SharedProtocolVersion);
+			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[ClientFlagsIndex]),
+				static_cast<LONG>(ClientHookAlive));
+			spdlog::info("VR: shared pose bridge ready (protocol {}, client pid={})",
+				SharedProtocolVersion, GetCurrentProcessId());
 			return true;
+		}
+
+		void PublishClientTelemetry(std::uint32_t flags, float relativeAngleDeg)
+		{
+			if (!SharedState)
+				return;
+
+			std::uint32_t angleBits = 0;
+			static_assert(sizeof(angleBits) == sizeof(relativeAngleDeg));
+			std::memcpy(&angleBits, &relativeAngleDeg, sizeof(angleBits));
+			InterlockedIncrement(reinterpret_cast<volatile LONG*>(&SharedState->reserved[ClientHeartbeatIndex]));
+			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[ClientFlagsIndex]),
+				static_cast<LONG>(flags));
+			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[ClientLastAngleBitsIndex]),
+				static_cast<LONG>(angleBits));
 		}
 
 		bool ReadHostPose(PoseSample& pose)
@@ -311,11 +335,32 @@ namespace OutRunVR
 
 		void ApplyPose(EvWorkCamera* cam)
 		{
-			if (!cam || !Settings::VREnabled || !Settings::VRHeadTracking || !Game::is_in_game())
+			if (!cam || !Settings::VRHeadTracking || !Game::is_in_game())
 				return;
 
 			PoseSample sample{};
 			const bool haveHostPose = ReadHostPose(sample);
+			const bool autoEnabled = haveHostPose && Settings::VRAutoEnableWhenHostPresent;
+			const bool enabled = Settings::VREnabled || autoEnabled;
+
+			std::uint32_t telemetryFlags = ClientHookAlive;
+			if (haveHostPose)
+				telemetryFlags |= ClientHostPoseValid;
+			if (autoEnabled && !Settings::VREnabled)
+				telemetryFlags |= ClientAutoEnabled;
+
+			if (!enabled)
+			{
+				PublishClientTelemetry(telemetryFlags, 0.0f);
+				return;
+			}
+
+			if (autoEnabled && !Settings::VREnabled && !AutoEnableLogged)
+			{
+				spdlog::info("VR: valid host pose detected; AutoEnableWhenHostPresent is overriding legacy Enabled=false");
+				AutoEnableLogged = true;
+			}
+
 			Quat relativeOrientation{ 0.0f, 0.0f, 0.0f, 1.0f };
 			Vec3 relativePosition{ 0.0f, 0.0f, 0.0f };
 
@@ -343,7 +388,7 @@ namespace OutRunVR
 					relativePosition = RotateVector(invCenter, delta);
 				}
 			}
-			else if (Settings::VRDebugPose)
+			else if (Settings::VRDebugPose && Settings::VREnabled)
 			{
 				relativeOrientation = DebugEuler(
 					DegToRad(Settings::VRDebugPitch),
@@ -351,13 +396,19 @@ namespace OutRunVR
 					DegToRad(Settings::VRDebugRoll));
 			}
 			else
+			{
+				PublishClientTelemetry(telemetryFlags, 0.0f);
 				return;
+			}
 
 			relativeOrientation = ScaleRotation(relativeOrientation, Settings::VRRotationScale);
 			relativePosition.x *= Settings::VRWorldScale;
 			relativePosition.y *= Settings::VRWorldScale;
 			relativePosition.z *= Settings::VRWorldScale;
 
+			const float w = std::clamp(std::fabs(relativeOrientation.w), 0.0f, 1.0f);
+			const float relativeAngleDeg = 2.0f * std::acos(w) * (180.0f / Pi);
+			const D3DMATRIX before = cam->d3dmatrix140;
 			const D3DMATRIX headInverse = InverseRigid(MatrixFromPose(relativeOrientation, relativePosition));
 
 			// CalcCameraMatrix has already produced the normal game view. Modifying
@@ -367,6 +418,29 @@ namespace OutRunVR
 				cam->d3dmatrix140 = MultiplyMatrix(cam->d3dmatrix140, headInverse);
 			else
 				cam->d3dmatrix140 = MultiplyMatrix(headInverse, cam->d3dmatrix140);
+
+			telemetryFlags |= ClientPoseApplied;
+			PublishClientTelemetry(telemetryFlags, relativeAngleDeg);
+
+			if (Settings::VRTelemetry)
+			{
+				const ULONGLONG nowMs = GetTickCount64();
+				if (nowMs - LastTrackingLogMs >= 1000)
+				{
+					LastTrackingLogMs = nowMs;
+					const float matrixDelta =
+						std::fabs(cam->d3dmatrix140._11 - before._11) +
+						std::fabs(cam->d3dmatrix140._12 - before._12) +
+						std::fabs(cam->d3dmatrix140._13 - before._13) +
+						std::fabs(cam->d3dmatrix140._21 - before._21) +
+						std::fabs(cam->d3dmatrix140._22 - before._22) +
+						std::fabs(cam->d3dmatrix140._23 - before._23);
+					spdlog::info(
+						"VR: tracking applied host={} angle={:.2f}deg matrixDelta={:.5f} order={} q=({:.3f},{:.3f},{:.3f},{:.3f})",
+						sample.hostPid, relativeAngleDeg, matrixDelta, Settings::VRMatrixOrder.get(),
+						relativeOrientation.x, relativeOrientation.y, relativeOrientation.z, relativeOrientation.w);
+				}
+			}
 		}
 	}
 
@@ -386,6 +460,11 @@ namespace OutRunVR
 
 		bool apply() override
 		{
+			// Register the x86 client as soon as the DLL loads, rather than waiting
+			// until a race and an enabled camera setting. The x64 host can now prove
+			// that the game-side bridge is present and can detect when the game exits.
+			EnsureSharedMemory();
+
 			CalcCameraMatrixHook = safetyhook::create_inline(
 				Module::exe_ptr(GameAddr::CalcCameraMatrix), CalcCameraMatrixDest);
 			if (!CalcCameraMatrixHook)
@@ -393,7 +472,7 @@ namespace OutRunVR
 				spdlog::error("VR: failed to hook CalcCameraMatrix");
 				return false;
 			}
-			spdlog::info("VR: CalcCameraMatrix head-tracking hook installed (VR disabled by default)");
+			spdlog::info("VR: CalcCameraMatrix head-tracking hook installed (auto-enable with live host is ON)");
 			return true;
 		}
 
