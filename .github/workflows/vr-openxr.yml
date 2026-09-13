@@ -5,6 +5,7 @@ on:
     branches: [ vr-openxr ]
     paths:
       - 'src/hooks_vr.cpp'
+      - 'src/vr_renderer_probe.cpp'
       - 'src/vr_shared.hpp'
       - 'cmake.toml'
       - 'vrhost/**'
@@ -12,6 +13,7 @@ on:
   pull_request:
     paths:
       - 'src/hooks_vr.cpp'
+      - 'src/vr_renderer_probe.cpp'
       - 'src/vr_shared.hpp'
       - 'cmake.toml'
       - 'vrhost/**'
@@ -59,6 +61,12 @@ jobs:
           }
           if (-not $ascii.Contains("VR: tracking applied host=")) {
             throw "camera-application telemetry is missing from dinput8.dll"
+          }
+          if (-not $ascii.Contains("VR renderer inject: verified OutRun c64 = Transpose(WorldView*Proj)")) {
+            throw "renderer-boundary WVP verification path is missing from dinput8.dll"
+          }
+          if (-not $ascii.Contains("VR renderer inject: HEAD TRACKING ACTIVE at VS c64 render boundary")) {
+            throw "renderer-boundary head tracking injector is missing from dinput8.dll"
           }
           $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
           $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
