@@ -60,5 +60,5 @@ namespace OutRunVR
 #pragma pack(pop)
 
 	static_assert(sizeof(SharedFov) == 16);
-	static_assert(sizeof(SharedPoseState) == 196);
+	static_assert(sizeof(SharedPoseState) == 248);
 }
