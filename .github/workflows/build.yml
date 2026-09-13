@@ -4,9 +4,6 @@ on:
   push:
   pull_request:
 
-permissions:
-  contents: write
-
 jobs:
   build:
     runs-on: windows-2022
@@ -20,11 +17,6 @@ jobs:
         uses: actions/checkout@v7.0.1
         with:
           submodules: recursive
-
-      - name: Apply reviewed exhaustive FFB interface probing
-        if: github.ref == 'refs/heads/wheel-ffb-v0.2-dev' && github.event_name == 'push'
-        shell: pwsh
-        run: python tools/apply_ffb_exhaustive_probe.py
 
       - name: Verify consolidated wheel FFB source
         shell: pwsh
@@ -194,16 +186,3 @@ jobs:
             LICENSE.md
             THIRD_PARTY_NOTICES.md
             tools/verify_wheel_ffb_current.py
-
-      - name: Finalize reviewed FFB source
-        if: success() && github.ref == 'refs/heads/wheel-ffb-v0.2-dev' && github.event_name == 'push'
-        shell: pwsh
-        run: |
-          git config user.name "thp32tt"
-          git config user.email "129367814+thp32tt@users.noreply.github.com"
-          git checkout HEAD^ -- .github/workflows/build.yml
-          git rm tools/apply_ffb_exhaustive_probe.py
-          git add src/hooks_wheel_ffb.cpp tools/verify_wheel_ffb_current.py .github/workflows/build.yml
-          git -c core.whitespace=cr-at-eol diff --cached --check
-          git commit -m "fix: exhaust FFB interface probing [skip ci]"
-          git push origin HEAD:wheel-ffb-v0.2-dev
