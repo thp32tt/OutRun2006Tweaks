@@ -2348,9 +2348,17 @@ namespace
 
             safe_release_effect(constantEffect_, "failed X CARTESIAN constant probe");
 
-            const DWORD detectedAxis = primary_actuator_axis();
-            if (detectedAxis != DIJOFS_X)
+            // A device may expose more than one FFB actuator object. X was
+            // already tried above; probe every other reported actuator offset
+            // once so enumeration order cannot hide the steering actuator.
+            std::vector<DWORD> triedActuatorAxes{ DIJOFS_X };
+            for (const DWORD detectedAxis : actuatorAxes_)
             {
+                if (std::find(triedActuatorAxes.begin(), triedActuatorAxes.end(), detectedAxis) !=
+                    triedActuatorAxes.end())
+                    continue;
+                triedActuatorAxes.push_back(detectedAxis);
+
                 axes[0] = detectedAxis;
                 hr = device_->CreateEffect(
                     GUID_ConstantForce, &effect, &constantEffect_, nullptr);
