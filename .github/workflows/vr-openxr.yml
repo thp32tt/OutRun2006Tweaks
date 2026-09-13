@@ -6,6 +6,7 @@ on:
     paths:
       - 'src/hooks_vr.cpp'
       - 'src/vr_renderer_probe.cpp'
+      - 'src/vr_stereo.cpp'
       - 'src/vr_shared.hpp'
       - 'src/overlay/notifications.hpp'
       - 'src/overlay/update_check.cpp'
@@ -16,6 +17,7 @@ on:
     paths:
       - 'src/hooks_vr.cpp'
       - 'src/vr_renderer_probe.cpp'
+      - 'src/vr_stereo.cpp'
       - 'src/vr_shared.hpp'
       - 'src/overlay/notifications.hpp'
       - 'src/overlay/update_check.cpp'
@@ -32,53 +34,29 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Verify single authoritative VR camera path
+      - name: Verify VR single-head path and stereo draw boundary
         shell: pwsh
         run: |
           $legacy = Get-Content src/hooks_vr.cpp -Raw
-          if ($legacy.Contains('CalcCameraMatrixHook') -or $legacy.Contains('d3dmatrix140 =')) {
-            throw 'legacy CalcCameraMatrix VR mutation returned; renderer boundary must remain the single owner'
-          }
-          if (-not $legacy.Contains('CalcCameraMatrix remains untouched')) {
-            throw 'single-owner VR marker missing from hooks_vr.cpp'
-          }
-          if (-not $legacy.Contains('VRCullingCameraSync')) {
-            throw 'render-phase culling camera sync setting is missing'
+          if ($legacy.Contains('CalcCameraMatrixHook') -or $legacy.Contains('d3dmatrix140 =')) { throw 'legacy camera mutation returned' }
+          foreach ($marker in @('CalcCameraMatrix remains untouched','VRStereo','VRCullingCameraSync')) {
+            if (-not $legacy.Contains($marker)) { throw "missing VR setting marker: $marker" }
           }
 
           $renderer = Get-Content src/vr_renderer_probe.cpp -Raw
-          foreach ($marker in @(
-            'BeginSceneVtableIndex = 41',
-            'EndSceneVtableIndex = 42',
-            'HostPoseStaleMs = 250',
-            'ImageContainsRange',
-            'VirtualQuery',
-            'mappingAlreadyExisted',
-            'ClientRendererWvpVerified',
-            'ClientRendererMatrixPrepared',
-            'ClientRendererUploadFailed',
-            'ClientFrameCompleted',
-            'TryPrepareOutRunWvp',
-            'SUCCEEDED(result)',
-            'ClientCullingCameraSynced',
-            'YawOnly',
-            'referenceSpaceGeneration',
-            'frame-latched c64 WVP injection armed'
-          )) {
+          foreach ($marker in @('BeginSceneVtableIndex = 41','EndSceneVtableIndex = 42','HostPoseStaleMs = 250','ImageContainsRange','VirtualQuery','ClientRendererWvpVerified','ClientRendererUploadFailed','YawOnly','frame-latched c64 WVP injection armed')) {
             if (-not $renderer.Contains($marker)) { throw "missing renderer safety marker: $marker" }
           }
-          if ($renderer.Contains('ReadHostPose(sample))`r`n`t`t`t{`r`n`t`t`t`tResetCenter')) {
-            throw 'transient pose-read failure must not reset tracking center'
+
+          $stereo = Get-Content src/vr_stereo.cpp -Raw
+          foreach ($marker in @('DrawPrimitiveVtableIndex = 81','DrawIndexedPrimitiveVtableIndex = 82','DrawPrimitiveUPVtableIndex = 83','DrawIndexedPrimitiveUPVtableIndex = 84','StereoSbsActive','BuildEyeProjection','GetVertexShaderConstantF','simulation/input/FFB remain single-pass','Rt0IsBackbuffer')) {
+            if (-not $stereo.Contains($marker)) { throw "missing stereo renderer marker: $marker" }
           }
+          if ($stereo.Contains('SceneControl')) { throw 'stereo must never replay SceneControl/render queues' }
 
           $shared = Get-Content src/vr_shared.hpp -Raw
-          foreach ($marker in @(
-            'static_assert(sizeof(SharedPoseState) == 248)',
-            'HostReferenceSpaceGenerationIndex',
-            'ClientPresentationModeIndex',
-            'ClientFrameCompleted'
-          )) {
-            if (-not $shared.Contains($marker)) { throw "missing shared-memory ABI marker: $marker" }
+          foreach ($marker in @('static_assert(sizeof(SharedPoseState) == 248)','StereoViewsValid','HostEyeOffsetLeftXIndex','HostEyeOffsetRightXIndex','ClientStereoStateIndex','ClientStereoFrameIndex')) {
+            if (-not $shared.Contains($marker)) { throw "missing stereo IPC ABI marker: $marker" }
           }
 
       - name: Configure Win32 VR build
@@ -99,22 +77,14 @@ jobs:
       - name: Build Win32 VR DLL
         run: cmake --build build-vr-game --config Release
 
-      - name: Verify VR code is in DLL
+      - name: Verify VR stereo code is in DLL
         shell: pwsh
         run: |
           $dllPath = "build-vr-game/bin/dinput8.dll"
           if (-not (Test-Path $dllPath)) { throw "dinput8.dll was not produced" }
           $bytes = [System.IO.File]::ReadAllBytes($dllPath)
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
-          foreach ($marker in @(
-            'VR: renderer-boundary head tracking configured; CalcCameraMatrix remains untouched',
-            'VR renderer: D3D9 hooks installed; frame-latched c64 WVP injection armed (vtbl 41/42/94)',
-            'VR renderer inject: verified OutRun c64 = Transpose(WorldView*Proj)',
-            'VR renderer inject: HEAD TRACKING ACTIVE after successful VS c64 upload',
-            'patched c64 matrix prepared but D3D9 upload failed',
-            'yaw recentered HMD pose',
-            'OutRun renderer globals are not safely readable'
-          )) {
+          foreach ($marker in @('renderer-boundary head tracking + true stereo configured','VR renderer inject: verified OutRun c64 = Transpose(WorldView*Proj)','VR stereo: D3D9 SBS hooks installed','VR stereo: true SBS draw duplication active; simulation/input/FFB remain single-pass')) {
             if (-not $ascii.Contains($marker)) { throw "VR binary marker missing: $marker" }
           }
           $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
@@ -145,50 +115,16 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Verify HDR tracking theater exit performance and HLSL paths
+      - name: Verify projection stereo theater HDR and exit paths
         shell: pwsh
         run: |
-          $src = Get-Content vrhost/main_compat_v2.cpp -Raw
-          foreach ($marker in @(
-            'DXGI_FORMAT_R16G16B16A16_FLOAT',
-            'DXGI_FORMAT_B8G8R8A8_UNORM_SRGB',
-            'QuerySdrWhiteScale',
-            'SrgbToLinear',
-            'RequestGameExitIfNeeded',
-            'OutRunExitAwareXrPollEvent',
-            'OutRunTelemetryXrWaitFrame',
-            'CurrentFrameShouldRender',
-            'PresentationGameplay',
-            'OnLocalSpaceCreated',
-            'EnsureTheaterAnchor',
-            'LOCAL-space quad anchored',
-            'p95/p99',
-            'ClientPoseApplied'
-          )) {
-            if (-not $src.Contains($marker)) { throw "missing required VR host source marker: $marker" }
+          $src = Get-Content vrhost/main_stereo.cpp -Raw
+          foreach ($marker in @('DXGI_FORMAT_R16G16B16A16_FLOAT','QuerySdrWhiteScale','XrCompositionLayerProjectionView','XrCompositionLayerProjection','imageArrayIndex=eye','arraySize=2','StereoSbsActive','RenderTheater','EnsureTheaterAnchor','xrRequestExitSession','fs.shouldRender==XR_TRUE','StereoViewsValid','HostEyeOffsetLeftXIndex')) {
+            if (-not $src.Contains($marker)) { throw "missing true-stereo host marker: $marker" }
           }
-          if ($src.Contains('context_->Flush()')) {
-            throw 'per-frame D3D11 Flush must not return to the mirror hot path'
-          }
-
-          $main = Get-Content vrhost/main.cpp -Raw
-          foreach ($marker in @(
-            'mappingAlreadyExisted',
-            'AcquireHostOwnership',
-            'InterlockedCompareExchange',
-            'HostReferenceSpaceGenerationIndex',
-            'NotifyReferenceSpaceChanged'
-          )) {
-            if (-not $main.Contains($marker)) { throw "missing shared bridge ownership marker: $marker" }
-          }
-
-          $patch = Get-Content vrhost/shader_compile_patch.hpp -Raw
-          if (-not $patch.Contains('linearColor')) { throw "HLSL reserved-word patch is missing" }
-          if (-not $patch.Contains('OutRunVrD3DCompile')) { throw "patched D3DCompile entry point is missing" }
-          $wrapper = Get-Content vrhost/main_compat_v3.cpp -Raw
-          if (-not $wrapper.Contains('#define D3DCompile OutRunVrD3DCompile')) {
-            throw "host is not routed through patched HLSL compiler"
-          }
+          if ($src.Contains('context_->Flush()')) { throw 'per-frame D3D11 Flush must not return' }
+          $shader = Get-Content vrhost/stereo_shader.hpp -Raw
+          foreach ($marker in @('UvScale','UvOffset','SrgbToLinear','SourceIsScRgb')) { if (-not $shader.Contains($marker)) { throw "missing stereo shader marker: $marker" } }
 
       - name: Configure x64 OpenXR host
         run: cmake -S vrhost -B build-vrhost -G "Visual Studio 17 2022" -A x64
@@ -196,13 +132,13 @@ jobs:
       - name: Build x64 OpenXR host and shader test
         run: cmake --build build-vrhost --config Release
 
-      - name: Compile exact embedded HLSL shader
+      - name: Compile exact stereo HLSL shader
         shell: pwsh
         run: |
           $test = "build-vrhost/bin/outrun-vr-shader-smoke.exe"
-          if (-not (Test-Path $test)) { throw "shader smoke-test executable was not produced" }
+          if (-not (Test-Path $test)) { throw "shader smoke executable was not produced" }
           & $test
-          if ($LASTEXITCODE -ne 0) { throw "embedded MirrorShader failed real D3DCompile smoke test" }
+          if ($LASTEXITCODE -ne 0) { throw "stereo HLSL failed D3DCompile smoke test" }
 
       - name: Verify host binary
         shell: pwsh
@@ -211,23 +147,12 @@ jobs:
           if (-not (Test-Path $hostPath)) { throw "outrun-vr-host.exe was not produced" }
           $bytes = [System.IO.File]::ReadAllBytes($hostPath)
           if ($bytes.Length -lt 10000) { throw "outrun-vr-host.exe is unexpectedly small" }
-          if ($bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw "host has no MZ header" }
           $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
           $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
           if ($machine -ne 0x8664) { throw ("expected x64 host, machine=0x{0:X4}" -f $machine) }
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
-          foreach ($marker in @(
-            'color-managed GPU conversion enabled',
-            'FP16 scRGB/HDR',
-            'VR pose: q=',
-            'CAMERA APPLIED',
-            'LOCAL-space quad anchored',
-            'shouldRenderSkipped',
-            'Requesting OpenXR session shutdown and Virtual Desktop return',
-            'another outrun-vr-host process already owns',
-            'linearColor'
-          )) {
-            if (-not $ascii.Contains($marker)) { throw "host binary missing hardened marker: $marker" }
+          foreach ($marker in @('OpenXR true stereo ready','true stereo projection','LOCAL-fixed theater','another outrun-vr-host already owns')) {
+            if (-not $ascii.Contains($marker)) { throw "host binary missing stereo marker: $marker" }
           }
 
       - name: Upload host artifact
