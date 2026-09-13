@@ -28,6 +28,36 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Verify single authoritative VR camera path
+        shell: pwsh
+        run: |
+          $legacy = Get-Content src/hooks_vr.cpp -Raw
+          if ($legacy.Contains('CalcCameraMatrixHook') -or $legacy.Contains('d3dmatrix140 =')) {
+            throw 'legacy CalcCameraMatrix VR mutation returned; renderer boundary must remain the single owner'
+          }
+          if (-not $legacy.Contains('CalcCameraMatrix remains untouched')) {
+            throw 'single-owner VR marker missing from hooks_vr.cpp'
+          }
+
+          $renderer = Get-Content src/vr_renderer_probe.cpp -Raw
+          foreach ($marker in @(
+            'BeginSceneVtableIndex = 41',
+            'HostPoseStaleMs = 250',
+            'ImageContainsRange',
+            'VirtualQuery',
+            'ClientRendererWvpVerified',
+            'ClientRendererPoseInjected',
+            'LatchedHeadInverse',
+            'frame-latched c64 WVP injection armed'
+          )) {
+            if (-not $renderer.Contains($marker)) { throw "missing renderer safety marker: $marker" }
+          }
+
+          $shared = Get-Content src/vr_shared.hpp -Raw
+          if (-not $shared.Contains('static_assert(sizeof(SharedPoseState) == 248)')) {
+            throw 'VR shared-memory ABI size changed unexpectedly'
+          }
+
       - name: Configure Win32 VR build
         shell: cmd
         run: |
@@ -53,20 +83,14 @@ jobs:
           if (-not (Test-Path $dllPath)) { throw "dinput8.dll was not produced" }
           $bytes = [System.IO.File]::ReadAllBytes($dllPath)
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
-          if (-not $ascii.Contains("VR: CalcCameraMatrix head-tracking hook installed")) {
-            throw "VR marker missing: hooks_vr.cpp was not linked into dinput8.dll"
-          }
-          if (-not $ascii.Contains("auto-enable with live host is ON")) {
-            throw "auto-enable head tracking path is missing from dinput8.dll"
-          }
-          if (-not $ascii.Contains("VR: tracking applied host=")) {
-            throw "camera-application telemetry is missing from dinput8.dll"
-          }
-          if (-not $ascii.Contains("VR renderer inject: verified OutRun c64 = Transpose(WorldView*Proj)")) {
-            throw "renderer-boundary WVP verification path is missing from dinput8.dll"
-          }
-          if (-not $ascii.Contains("VR renderer inject: HEAD TRACKING ACTIVE at VS c64 render boundary")) {
-            throw "renderer-boundary head tracking injector is missing from dinput8.dll"
+          foreach ($marker in @(
+            'VR: renderer-boundary head tracking configured; CalcCameraMatrix remains untouched',
+            'VR renderer: D3D9 hooks installed; frame-latched c64 WVP injection armed (vtbl 41/94)',
+            'VR renderer inject: verified OutRun c64 = Transpose(WorldView*Proj)',
+            'VR renderer inject: HEAD TRACKING ACTIVE at VS c64 render boundary',
+            'OutRun renderer globals are not safely readable'
+          )) {
+            if (-not $ascii.Contains($marker)) { throw "VR binary marker missing: $marker" }
           }
           $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
           $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
