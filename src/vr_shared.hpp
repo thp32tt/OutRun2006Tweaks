@@ -17,6 +17,21 @@ namespace OutRunVR
 		SessionFocused = 1u << 4,
 	};
 
+	// reserved[] stays inside protocol v1 so we can add diagnostics without
+	// changing the x86/x64 ABI. The x86 game writes these values and the x64
+	// host only reads them.
+	inline constexpr std::uint32_t ClientHeartbeatIndex = 0;
+	inline constexpr std::uint32_t ClientFlagsIndex = 1;
+	inline constexpr std::uint32_t ClientLastAngleBitsIndex = 2;
+
+	enum ClientTelemetryFlags : std::uint32_t
+	{
+		ClientHookAlive = 1u << 0,
+		ClientHostPoseValid = 1u << 1,
+		ClientPoseApplied = 1u << 2,
+		ClientAutoEnabled = 1u << 3,
+	};
+
 #pragma pack(push, 4)
 	struct SharedFov
 	{
