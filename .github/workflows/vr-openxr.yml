@@ -42,12 +42,15 @@ jobs:
           $renderer = Get-Content src/vr_renderer_probe.cpp -Raw
           foreach ($marker in @(
             'BeginSceneVtableIndex = 41',
+            'EndSceneVtableIndex = 42',
             'HostPoseStaleMs = 250',
             'ImageContainsRange',
             'VirtualQuery',
+            'mappingAlreadyExisted',
             'ClientRendererWvpVerified',
             'ClientRendererPoseInjected',
             'LatchedHeadInverse',
+            'PublishClientTelemetry(FrameTelemetryFlags',
             'frame-latched c64 WVP injection armed'
           )) {
             if (-not $renderer.Contains($marker)) { throw "missing renderer safety marker: $marker" }
@@ -85,7 +88,7 @@ jobs:
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
           foreach ($marker in @(
             'VR: renderer-boundary head tracking configured; CalcCameraMatrix remains untouched',
-            'VR renderer: D3D9 hooks installed; frame-latched c64 WVP injection armed (vtbl 41/94)',
+            'VR renderer: D3D9 hooks installed; frame-latched c64 WVP injection armed (vtbl 41/42/94)',
             'VR renderer inject: verified OutRun c64 = Transpose(WorldView*Proj)',
             'VR renderer inject: HEAD TRACKING ACTIVE at VS c64 render boundary',
             'OutRun renderer globals are not safely readable'
