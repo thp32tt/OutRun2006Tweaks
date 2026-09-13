@@ -21,6 +21,9 @@ jobs:
       - name: Apply compatibility patch
         run: python tools/patch_ffb_interface_compat.py
 
+      - name: Update verifier for validated fallback structure
+        run: python tools/fix_ffb_verifier_indent.py
+
       - name: Verify patched source
         run: python tools/verify_wheel_ffb_current.py
 
@@ -31,6 +34,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git rm .github/workflows/patch-ffb-interface-compat.yml
           git rm tools/patch_ffb_interface_compat.py
+          git rm tools/fix_ffb_verifier_indent.py
           git add src/hooks_wheel_ffb.cpp tools/verify_wheel_ffb_current.py
           git commit -m "fix: validate and auto-select FFB interfaces"
           git push origin HEAD:wheel-ffb-v0.2-dev
