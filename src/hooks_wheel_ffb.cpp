@@ -1725,8 +1725,15 @@ namespace
             auto* self = static_cast<WheelFFBEngine*>(context);
             if (!self || !object)
                 return DIENUM_CONTINUE;
-            if ((object->dwType & DIDFT_FFACTUATOR) != 0 && self->actuatorAxes_.size() < 2)
-                self->actuatorAxes_.push_back(object->dwOfs);
+            if ((object->dwType & DIDFT_FFACTUATOR) != 0)
+            {
+                const DWORD offset = object->dwOfs;
+                if (std::find(self->actuatorAxes_.begin(), self->actuatorAxes_.end(), offset) ==
+                    self->actuatorAxes_.end())
+                {
+                    self->actuatorAxes_.push_back(offset);
+                }
+            }
             return DIENUM_CONTINUE;
         }
 

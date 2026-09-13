@@ -84,6 +84,7 @@ req(ffb, 'requirePreferredVidPid', 'FFB sibling selection has a same-VID/PID pas
 req(ffb, 'DWORD axes[2] = { DIJOFS_X, DIJOFS_Y };', 'ConstantForce tries canonical X/Y polar descriptor independent of actuator count')
 req(ffb, 'detected actuator one-axis CARTESIAN descriptor', 'ConstantForce can fall back to the actual enumerated actuator axis')
 req(ffb, 'for (const DWORD detectedAxis : actuatorAxes_)', 'ConstantForce probes every enumerated actuator axis after canonical X')
+forbid(ffb, 'actuatorAxes_.size() < 2', 'FFB actuator enumeration is not arbitrarily capped at two objects')
 req(ffb, 'zero-force live SetParameters probe', 'ConstantForce candidate must validate the live update path at zero torque')
 req(ffb, 'mark_selected_interface_failed("ConstantForce live SetParameters", hr)', 'runtime ConstantForce failure quarantines the bad interface before reinit')
 req(ffb, 'Settings::write(Module::UserIniPath)', 'auto-selected working FFB GUID is persisted for the next launch')
