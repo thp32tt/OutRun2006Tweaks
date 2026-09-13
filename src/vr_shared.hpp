@@ -17,23 +17,41 @@ namespace OutRunVR
 		SessionFocused = 1u << 4,
 	};
 
-	// reserved[] stays inside protocol v1 so diagnostics can evolve without
-	// changing the x86/x64 ABI. The x86 game writes these values and the x64
-	// host reads them.
+	// reserved[] stays inside protocol v1 so diagnostics and renderer/host
+	// coordination can evolve without changing the x86/x64 ABI. Indices 0..2
+	// are written by the x86 client, index 3 by the x64 host, and 4..5 by the
+	// x86 client. Keep ownership disjoint so host seqlock writes never need to
+	// overwrite client telemetry.
 	inline constexpr std::uint32_t ClientHeartbeatIndex = 0;
 	inline constexpr std::uint32_t ClientFlagsIndex = 1;
 	inline constexpr std::uint32_t ClientLastAngleBitsIndex = 2;
+	inline constexpr std::uint32_t HostReferenceSpaceGenerationIndex = 3;
+	inline constexpr std::uint32_t ClientPresentationModeIndex = 4;
+	inline constexpr std::uint32_t ClientGameStateIndex = 5;
+
+	enum ClientPresentationMode : std::uint32_t
+	{
+		PresentationUnknown = 0,
+		PresentationGameplay = 1,
+		PresentationTheater = 2,
+	};
 
 	enum ClientTelemetryFlags : std::uint32_t
 	{
 		ClientHookAlive = 1u << 0,
 		ClientHostPoseValid = 1u << 1,
-		// Kept for host compatibility. This bit is now set only after the final
-		// renderer c64 upload was actually patched, not by the old camera hook.
+		// Set only after the final D3D9 constant upload succeeds and then
+		// published only after a successful EndScene. It no longer means merely
+		// that a corrected matrix was calculated.
 		ClientPoseApplied = 1u << 2,
 		ClientAutoEnabled = 1u << 3,
 		ClientRendererWvpVerified = 1u << 4,
+		// Kept for host compatibility; now means the original D3D9 upload
+		// returned success for the patched c64 data.
 		ClientRendererPoseInjected = 1u << 5,
+		ClientRendererMatrixPrepared = 1u << 6,
+		ClientRendererUploadFailed = 1u << 7,
+		ClientCullingCameraSynced = 1u << 8,
 	};
 
 #pragma pack(push, 4)
@@ -67,8 +85,8 @@ namespace OutRunVR
 		float position[3];
 		float reservedPose;
 
-		// Kept in the protocol now so the next milestone can render true stereo
-		// without changing the x86/x64 IPC ABI.
+		// Kept in the protocol now so the stereo milestone can render true
+		// stereo without changing the x86/x64 IPC ABI.
 		SharedFov eyeFov[2];
 		std::uint32_t recommendedWidth[2];
 		std::uint32_t recommendedHeight[2];
@@ -95,10 +113,20 @@ namespace OutRunVRRenderer
 	using OutRunVR::ClientHeartbeatIndex;
 	using OutRunVR::ClientFlagsIndex;
 	using OutRunVR::ClientLastAngleBitsIndex;
+	using OutRunVR::HostReferenceSpaceGenerationIndex;
+	using OutRunVR::ClientPresentationModeIndex;
+	using OutRunVR::ClientGameStateIndex;
+	using OutRunVR::ClientPresentationMode;
+	using OutRunVR::PresentationUnknown;
+	using OutRunVR::PresentationGameplay;
+	using OutRunVR::PresentationTheater;
 	using OutRunVR::ClientHookAlive;
 	using OutRunVR::ClientHostPoseValid;
 	using OutRunVR::ClientPoseApplied;
 	using OutRunVR::ClientAutoEnabled;
 	using OutRunVR::ClientRendererWvpVerified;
 	using OutRunVR::ClientRendererPoseInjected;
+	using OutRunVR::ClientRendererMatrixPrepared;
+	using OutRunVR::ClientRendererUploadFailed;
+	using OutRunVR::ClientCullingCameraSynced;
 }
