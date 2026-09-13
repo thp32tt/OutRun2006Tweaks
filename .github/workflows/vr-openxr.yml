@@ -49,7 +49,7 @@ jobs:
           }
 
           $stereo = Get-Content src/vr_stereo.cpp -Raw
-          foreach ($marker in @('DrawPrimitiveVtableIndex = 81','DrawIndexedPrimitiveVtableIndex = 82','DrawPrimitiveUPVtableIndex = 83','DrawIndexedPrimitiveUPVtableIndex = 84','SetDepthStencilSurfaceVtableIndex = 39','StereoSbsActive','ProjectionFromFov','BuildEyeConstants','GetVertexShaderConstantF','SetWvpOneRegisterAtATime','ComposeSbs','RightEyeSurface','simulation, input, timers, native FFB')) {
+          foreach ($marker in @('DrawPrimitiveVtableIndex = 81','DrawIndexedPrimitiveVtableIndex = 82','DrawPrimitiveUPVtableIndex = 83','DrawIndexedPrimitiveUPVtableIndex = 84','SetDepthStencilSurfaceVtableIndex = 39','StereoSbsActive','ProjectionFromFov','BuildEyeConstants','GetVertexShaderConstantF','SetWvpOneRegisterAtATime','ComposeSbs','RightEyeSurface','Simulation, input, timers, native FFB')) {
             if (-not $stereo.Contains($marker)) { throw "missing stereo renderer marker: $marker" }
           }
           if ($stereo.Contains('Game::ModeControl()') -or $stereo.Contains('Game::EventControl()') -or $stereo.Contains('WheelFFB_ServiceSafety')) { throw 'stereo renderer must never execute simulation/input/FFB' }
