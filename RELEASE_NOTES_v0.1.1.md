@@ -5,9 +5,7 @@
 <a id="english"></a>
 ## English
 
-v0.1.1 is a compatibility and stability update to the first Wheel FFB release. It keeps the same Modern / Physics SAT direction of the project and focuses on making the existing force-feedback implementation work more reliably across real DirectInput wheel-driver layouts.
-
-**X-Force is not included in this release.** The experimental X-Force work remains separate; v0.1.1 uses the project's own Physics SAT / Natural SAT force path.
+v0.1.1 is a compatibility and stability update to the first Wheel FFB release. It keeps the established Physics SAT / Natural SAT force model and focuses on making the existing implementation work more reliably across real DirectInput wheel-driver layouts.
 
 ### Changes since v0.1
 
@@ -60,9 +58,7 @@ This is an unofficial community fork and is not affiliated with SEGA, MOZA, Fana
 <a id="한국어"></a>
 ## 한국어
 
-v0.1.1은 첫 Wheel FFB 공개 버전인 v0.1의 **호환성·안정화 업데이트**입니다. 새로운 FFB 성격을 추가하기보다 기존에 만든 Modern / Physics SAT 계열을 유지하면서 실제 DirectInput 휠 드라이버 구성에서 더 안정적으로 동작하도록 개선했습니다.
-
-**이번 릴리즈에는 X-Force를 포함하지 않습니다.** X-Force 실험은 별도 작업으로 남겨 두며, v0.1.1은 우리가 만든 Physics SAT / Natural SAT FFB 경로를 사용합니다.
+v0.1.1은 첫 Wheel FFB 공개 버전인 v0.1의 **호환성·안정화 업데이트**입니다. 기존 Physics SAT / Natural SAT 힘 계산 구조를 유지하면서 실제 DirectInput 휠 드라이버 환경에서 더 안정적으로 동작하도록 개선했습니다.
 
 ### v0.1 이후 변경 사항
 
