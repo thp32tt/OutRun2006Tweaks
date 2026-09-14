@@ -33,6 +33,10 @@
 // physics tick. The sync is restored before EndScene calls the original D3D9
 // function. This intentionally does not claim to fix culling that happens before
 // BeginScene; that boundary still needs runtime visibility testing.
+//
+// Stereo eye FOV/IPD are latched from the SAME seqlock snapshot as the head pose
+// once per successful game BeginScene. vr_stereo.cpp consumes that immutable
+// packet instead of sampling the host independently for every draw.
 
 namespace Settings
 {
@@ -61,6 +65,9 @@ namespace OutRunVRRenderer
 			std::uint32_t hostPid = 0;
 			std::uint32_t sequence = 0;
 			std::uint32_t referenceSpaceGeneration = 0;
+			bool stereoValid = false;
+			SharedFov eyeFov[2]{};
+			float eyeOffset[2][3]{};
 		};
 
 		constexpr std::size_t BeginSceneVtableIndex = 41;
@@ -103,9 +110,15 @@ namespace OutRunVRRenderer
 
 		D3DMATRIX LatchedHeadInverse{};
 		bool LatchedHeadInverseValid = false;
+		LatchedStereoFrame LatchedStereo{};
 		std::uint32_t FrameTelemetryFlags = ClientHookAlive;
 		float LatchedRelativeAngleDeg = 0.0f;
 		std::uint32_t LatchedPoseSequence = 0;
+
+		float LastVerifiedWvp[16]{};
+		bool LastVerifiedWvpValid = false;
+		std::uint32_t LastVerifiedWvpGeneration = 0;
+		std::uint32_t LastVerifiedWvpPoseSequence = 0;
 
 		D3DVECTOR CullingCameraSavedPos{};
 		D3DVECTOR CullingCameraSavedLook{};
@@ -153,6 +166,24 @@ namespace OutRunVRRenderer
 		bool VectorIsFinite(const Vec3& v)
 		{
 			return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z);
+		}
+
+		bool FovValid(const SharedFov& fov)
+		{
+			constexpr float limit = 1.56f;
+			return std::isfinite(fov.angleLeft) && std::isfinite(fov.angleRight) &&
+				std::isfinite(fov.angleUp) && std::isfinite(fov.angleDown) &&
+				fov.angleLeft > -limit && fov.angleRight < limit &&
+				fov.angleDown > -limit && fov.angleUp < limit &&
+				fov.angleRight > fov.angleLeft + 0.05f &&
+				fov.angleUp > fov.angleDown + 0.05f;
+		}
+
+		float FloatFromBits(std::uint32_t bits)
+		{
+			float value = 0.0f;
+			std::memcpy(&value, &bits, sizeof(value));
+			return value;
 		}
 
 		Quat Conjugate(const Quat& q) { return { -q.x, -q.y, -q.z, q.w }; }
@@ -529,6 +560,31 @@ namespace OutRunVRRenderer
 			pose.positionValid = (snapshot.flags & PositionValid) != 0 && VectorIsFinite(pose.position);
 			pose.hostPid = snapshot.hostPid;
 			pose.referenceSpaceGeneration = snapshot.reserved[HostReferenceSpaceGenerationIndex];
+
+			pose.stereoValid = (snapshot.flags & StereoViewsValid) != 0 &&
+				FovValid(snapshot.eyeFov[0]) && FovValid(snapshot.eyeFov[1]);
+			if (pose.stereoValid)
+			{
+				pose.eyeFov[0] = snapshot.eyeFov[0];
+				pose.eyeFov[1] = snapshot.eyeFov[1];
+				const std::uint32_t indexes[2][3] = {
+					{ HostEyeOffsetLeftXIndex, HostEyeOffsetLeftYIndex, HostEyeOffsetLeftZIndex },
+					{ HostEyeOffsetRightXIndex, HostEyeOffsetRightYIndex, HostEyeOffsetRightZIndex }
+				};
+				for (int eye = 0; eye < 2 && pose.stereoValid; ++eye)
+				{
+					for (int axis = 0; axis < 3; ++axis)
+					{
+						const float value = FloatFromBits(snapshot.reserved[indexes[eye][axis]]);
+						if (!std::isfinite(value) || std::fabs(value) > 0.25f)
+						{
+							pose.stereoValid = false;
+							break;
+						}
+						pose.eyeOffset[eye][axis] = value;
+					}
+				}
+			}
 			return true;
 		}
 
@@ -548,6 +604,9 @@ namespace OutRunVRRenderer
 		void ResetFrameState()
 		{
 			LatchedHeadInverseValid = false;
+			LatchedStereo = {};
+			LastVerifiedWvpValid = false;
+			LastVerifiedWvpPoseSequence = 0;
 			FrameTelemetryFlags = ClientHookAlive;
 			LatchedRelativeAngleDeg = 0.0f;
 			LatchedPoseSequence = 0;
@@ -706,6 +765,15 @@ namespace OutRunVRRenderer
 			LatchedHeadInverseValid = MatrixFinite(LatchedHeadInverse);
 			LatchedPoseSequence = sample.sequence;
 
+			if (LatchedHeadInverseValid && sample.stereoValid)
+			{
+				LatchedStereo.valid = true;
+				LatchedStereo.poseSequence = sample.sequence;
+				LatchedStereo.eyeFov[0] = sample.eyeFov[0];
+				LatchedStereo.eyeFov[1] = sample.eyeFov[1];
+				std::memcpy(LatchedStereo.eyeOffset, sample.eyeOffset, sizeof(LatchedStereo.eyeOffset));
+			}
+
 			const float w = std::clamp(std::fabs(relativeOrientation.w), 0.0f, 1.0f);
 			LatchedRelativeAngleDeg = 2.0f * std::acos(w) * (180.0f / Pi);
 
@@ -792,6 +860,17 @@ namespace OutRunVRRenderer
 			return true;
 		}
 
+		void RecordVerifiedWvp(const float* constants)
+		{
+			if (!constants || LatchedPoseSequence == 0)
+				return;
+			std::memcpy(LastVerifiedWvp, constants, sizeof(LastVerifiedWvp));
+			if (++LastVerifiedWvpGeneration == 0)
+				++LastVerifiedWvpGeneration;
+			LastVerifiedWvpPoseSequence = LatchedPoseSequence;
+			LastVerifiedWvpValid = true;
+		}
+
 		void MaybeLogSummary()
 		{
 			if (!Settings::VRTelemetry)
@@ -801,16 +880,16 @@ namespace OutRunVRRenderer
 				return;
 			LastSummaryMs = now;
 			spdlog::info(
-				"VR renderer: beginScene={} c64Candidate={} verified={} prepared={} uploadOk={} uploadFail={} rejected={} unsafe={} latchedSeq={}",
+				"VR renderer: beginScene={} c64Candidate={} verified={} prepared={} uploadOk={} uploadFail={} rejected={} unsafe={} latchedSeq={} wvpGen={}",
 				BeginSceneCalls, WvpCandidateCalls, WvpVerifiedCalls, WvpPreparedCalls,
 				WvpUploadSucceededCalls, WvpUploadFailedCalls, WvpRejectedCalls,
-				UnsafeAddressRejects, LatchedPoseSequence);
+				UnsafeAddressRejects, LatchedPoseSequence, LastVerifiedWvpGeneration);
 		}
 
 		HRESULT __stdcall BeginSceneDest(IDirect3DDevice9* device)
 		{
 			const HRESULT result = BeginSceneHook.stdcall<HRESULT>(device);
-			if (!IsGameDevice(device))
+			if (!IsGameDevice(device) || OutRunVRStereo::IsInternalStereoPassActive())
 				return result;
 			if (SUCCEEDED(result))
 				LatchFramePose();
@@ -821,7 +900,7 @@ namespace OutRunVRRenderer
 
 		HRESULT __stdcall EndSceneDest(IDirect3DDevice9* device)
 		{
-			if (!IsGameDevice(device))
+			if (!IsGameDevice(device) || OutRunVRStereo::IsInternalStereoPassActive())
 				return EndSceneHook.stdcall<HRESULT>(device);
 
 			// Camera live-state sync is only for render-time culling/effects. Restore
@@ -869,6 +948,8 @@ namespace OutRunVRRenderer
 				{
 					++WvpUploadSucceededCalls;
 					FrameTelemetryFlags |= ClientRendererPoseInjected;
+					const UINT wvpOffsetRegisters = OutRunWvpRegister - startRegister;
+					RecordVerifiedWvp(patchedData + wvpOffsetRegisters * 4);
 					if (!FirstInjectedLogged)
 					{
 						FirstInjectedLogged = true;
@@ -938,6 +1019,24 @@ namespace OutRunVRRenderer
 			spdlog::warn("VR renderer: D3D9 device did not appear; renderer hook not installed");
 			return 0;
 		}
+	}
+
+	bool GetLatchedStereoFrame(LatchedStereoFrame& out)
+	{
+		out = LatchedStereo;
+		return out.valid && out.poseSequence != 0;
+	}
+
+	bool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
+		std::uint32_t& poseSequence)
+	{
+		if (!outConstants || !LastVerifiedWvpValid || LastVerifiedWvpGeneration == 0 ||
+			LastVerifiedWvpPoseSequence == 0)
+			return false;
+		std::memcpy(outConstants, LastVerifiedWvp, sizeof(LastVerifiedWvp));
+		generation = LastVerifiedWvpGeneration;
+		poseSequence = LastVerifiedWvpPoseSequence;
+		return true;
 	}
 
 	class VRRendererHook : public Hook
