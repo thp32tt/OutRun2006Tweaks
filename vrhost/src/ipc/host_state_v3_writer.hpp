@@ -93,6 +93,11 @@ namespace OutRunVR::Host
                 referenceSpaceGeneration_ = 1;
         }
 
+        void SyncReferenceSpaceGeneration(std::uint32_t generation) noexcept
+        {
+            referenceSpaceGeneration_ = generation ? generation : 1u;
+        }
+
         std::uint32_t ReferenceSpaceGeneration() const noexcept
         {
             return referenceSpaceGeneration_;
