@@ -903,6 +903,8 @@ namespace OutRunVRRenderer
 				ApplyCullingCameraSync();
 		}
 
+		void InvalidateVerifiedWvp();
+
 		void ReusePresentPoseForScene()
 		{
 			// Additional BeginScene calls before the same Present reuse the exact
