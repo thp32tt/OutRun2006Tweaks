@@ -86,7 +86,7 @@ namespace OutRunVRStereo
 		HANDLE SharedMapping = nullptr;
 		OutRunVR::SharedPoseState* SharedState = nullptr;
 		HANDLE RenderFrameMapping = nullptr;
-		OutRunVR::SharedRenderFrameState* RenderFrameState = nullptr;
+		OutRunVR::SharedRenderFrameRing* RenderFrameRing = nullptr;
 
 		IDirect3DSurface9* BackBuffer = nullptr;
 		IDirect3DSurface9* TrackedRenderTarget = nullptr;
@@ -98,16 +98,29 @@ namespace OutRunVRStereo
 		IDirect3DTexture9* RightResolveTexture = nullptr;
 		IDirect3DSurface9* RightResolveSurface = nullptr;
 
-		IDirect3DTexture9* DirectLeftTexture = nullptr;
-		IDirect3DSurface9* DirectLeftSurface = nullptr;
-		IDirect3DTexture9* DirectRightTexture = nullptr;
-		IDirect3DSurface9* DirectRightSurface = nullptr;
-		IDirect3DQuery9* DirectTransportFence = nullptr;
-		HANDLE DirectLeftSharedHandle = nullptr;
-		HANDLE DirectRightSharedHandle = nullptr;
+		struct DirectTransportSlot
+		{
+			IDirect3DTexture9* leftTexture = nullptr;
+			IDirect3DSurface9* leftSurface = nullptr;
+			IDirect3DTexture9* rightTexture = nullptr;
+			IDirect3DSurface9* rightSurface = nullptr;
+			IDirect3DQuery9* fence = nullptr;
+			HANDLE leftHandle = nullptr;
+			HANDLE rightHandle = nullptr;
+			std::uint32_t frameId = 0;
+		};
+
+		std::array<DirectTransportSlot, OutRunVR::RenderFrameRingSize> DirectTransportSlots{};
+		IDirect3DTexture9* DirectInteropProbeTexture = nullptr;
+		IDirect3DSurface9* DirectInteropProbeSurface = nullptr;
+		IDirect3DQuery9* DirectInteropProbeFence = nullptr;
+		HANDLE DirectInteropProbeHandle = nullptr;
+		std::uint32_t DirectInteropProbeToken = 0;
+		std::uint32_t ActiveDirectTransportSlot = 0;
 		D3DFORMAT DirectTransportFormat = D3DFMT_UNKNOWN;
 		std::uint32_t DirectTransportGeneration = 0;
 		bool DirectTransportResourcesReady = false;
+		bool DirectInteropVerified = false;
 
 		D3DSURFACE_DESC BackBufferDesc{};
 		bool StereoResourcesReady = false;
@@ -157,6 +170,8 @@ namespace OutRunVRStereo
 		std::uint64_t DirectTransportFrames = 0;
 		std::uint64_t DirectTransportFallbacks = 0;
 		std::uint64_t DirectTransportFenceTimeouts = 0;
+		std::uint64_t DirectTransportRingBackpressure = 0;
+		std::uint64_t DirectInteropProbeFailures = 0;
 		std::array<std::uint64_t, 32> FailureCounts{};
 		bool FirstStereoActiveLogged = false;
 		bool FirstWorldStereoLogged = false;
@@ -167,6 +182,9 @@ namespace OutRunVRStereo
 		bool FirstOcclusionRejectLogged = false;
 		bool FirstDirectTransportLogged = false;
 		bool FirstDirectFallbackLogged = false;
+		bool FirstD3D9ExUnavailableLogged = false;
+		bool FirstAdapterMismatchLogged = false;
+		bool FirstInteropVerifiedLogged = false;
 
 		template <typename T>
 		void ReleaseCom(T*& value)
@@ -487,11 +505,37 @@ namespace OutRunVRStereo
 
 		bool EnsureRenderFrameState()
 		{
-			if (RenderFrameState) return RenderFrameState->magic==OutRunVR::RenderFrameMagic && RenderFrameState->protocolVersion==OutRunVR::RenderFrameProtocolVersion && RenderFrameState->structSize==sizeof(OutRunVR::SharedRenderFrameState);
-			RenderFrameMapping=CreateFileMappingW(INVALID_HANDLE_VALUE,nullptr,PAGE_READWRITE,0,static_cast<DWORD>(sizeof(OutRunVR::SharedRenderFrameState)),OutRunVR::RenderFrameMemoryName); if(!RenderFrameMapping)return false;
-			const bool existed=GetLastError()==ERROR_ALREADY_EXISTS; RenderFrameState=static_cast<OutRunVR::SharedRenderFrameState*>(MapViewOfFile(RenderFrameMapping,FILE_MAP_ALL_ACCESS,0,0,sizeof(OutRunVR::SharedRenderFrameState))); if(!RenderFrameState)return false;
-			if(!existed){std::memset(RenderFrameState,0,sizeof(*RenderFrameState));RenderFrameState->protocolVersion=OutRunVR::RenderFrameProtocolVersion;RenderFrameState->structSize=sizeof(*RenderFrameState);MemoryBarrier();RenderFrameState->magic=OutRunVR::RenderFrameMagic;}
-			return RenderFrameState->magic==OutRunVR::RenderFrameMagic && RenderFrameState->protocolVersion==OutRunVR::RenderFrameProtocolVersion && RenderFrameState->structSize==sizeof(*RenderFrameState);
+			if (RenderFrameRing)
+				return RenderFrameRing->magic == OutRunVR::RenderFrameMagic &&
+					RenderFrameRing->protocolVersion == OutRunVR::RenderFrameProtocolVersion &&
+					RenderFrameRing->structSize == sizeof(OutRunVR::SharedRenderFrameRing) &&
+					RenderFrameRing->slotCount == OutRunVR::RenderFrameRingSize;
+			RenderFrameMapping = CreateFileMappingW(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0,
+				static_cast<DWORD>(sizeof(OutRunVR::SharedRenderFrameRing)), OutRunVR::RenderFrameMemoryName);
+			if (!RenderFrameMapping) return false;
+			const bool existed = GetLastError() == ERROR_ALREADY_EXISTS;
+			RenderFrameRing = static_cast<OutRunVR::SharedRenderFrameRing*>(MapViewOfFile(
+				RenderFrameMapping, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(OutRunVR::SharedRenderFrameRing)));
+			if (!RenderFrameRing) return false;
+			if (!existed)
+			{
+				std::memset(RenderFrameRing, 0, sizeof(*RenderFrameRing));
+				RenderFrameRing->protocolVersion = OutRunVR::RenderFrameProtocolVersion;
+				RenderFrameRing->structSize = sizeof(*RenderFrameRing);
+				RenderFrameRing->slotCount = OutRunVR::RenderFrameRingSize;
+				for (auto& slot : RenderFrameRing->slots)
+				{
+					slot.protocolVersion = OutRunVR::RenderFrameProtocolVersion;
+					slot.structSize = sizeof(slot);
+					slot.magic = OutRunVR::RenderFrameMagic;
+				}
+				MemoryBarrier();
+				RenderFrameRing->magic = OutRunVR::RenderFrameMagic;
+			}
+			return RenderFrameRing->magic == OutRunVR::RenderFrameMagic &&
+				RenderFrameRing->protocolVersion == OutRunVR::RenderFrameProtocolVersion &&
+				RenderFrameRing->structSize == sizeof(*RenderFrameRing) &&
+				RenderFrameRing->slotCount == OutRunVR::RenderFrameRingSize;
 		}
 		void PoisonFrame(OutRunVR::StereoFailureReason reason)
 		{
@@ -704,13 +748,26 @@ namespace OutRunVRStereo
 		{
 			StereoResourcesReady = false;
 			DirectTransportResourcesReady = false;
-			ReleaseCom(DirectTransportFence);
-			ReleaseCom(DirectLeftSurface);
-			ReleaseCom(DirectLeftTexture);
-			ReleaseCom(DirectRightSurface);
-			ReleaseCom(DirectRightTexture);
-			DirectLeftSharedHandle = nullptr;
-			DirectRightSharedHandle = nullptr;
+			for (auto& slot : DirectTransportSlots)
+			{
+				ReleaseCom(slot.fence);
+				ReleaseCom(slot.leftSurface);
+				ReleaseCom(slot.leftTexture);
+				ReleaseCom(slot.rightSurface);
+				ReleaseCom(slot.rightTexture);
+				slot = {};
+			}
+			ReleaseCom(DirectInteropProbeFence);
+			ReleaseCom(DirectInteropProbeSurface);
+			ReleaseCom(DirectInteropProbeTexture);
+			DirectInteropProbeHandle = nullptr;
+			DirectInteropProbeToken = 0;
+			DirectInteropVerified = false;
+			if (SharedState && SharedState->magic == OutRunVR::SharedMagic)
+			{
+				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientInteropProbeHandle), 0);
+				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientInteropProbeToken), 0);
+			}
 			DirectTransportFormat = D3DFMT_UNKNOWN;
 			ProjectionInverseValid = false;
 			ReleaseCom(RightEyeSurface);
@@ -760,10 +817,6 @@ namespace OutRunVRStereo
 
 		D3DFORMAT ChooseDirectTransportFormat(D3DFORMAT source)
 		{
-			// D3D9 -> D3D11 OpenSharedResource is restricted to the DXGI
-			// equivalents of R8G8B8A8_UNORM, R10G10B10A2_UNORM and
-			// R16G16B16A16_FLOAT. Use a conversion target the D3D9 driver can
-			// StretchRect into instead of assuming the monitor backbuffer format.
 			switch (source)
 			{
 			case D3DFMT_A2B10G10R10: return D3DFMT_A2B10G10R10;
@@ -784,82 +837,189 @@ namespace OutRunVRStereo
 			return SUCCEEDED(hr);
 		}
 
-		bool EnsureDirectTransportResources(IDirect3DDevice9* device)
+		bool FrameIdAtOrAfter(std::uint32_t candidate, std::uint32_t reference)
 		{
-			if (!HostDirectTransportSupported() || !device || !BackBufferDesc.Width || !BackBufferDesc.Height)
-				return false;
-			if (DirectTransportResourcesReady && DirectLeftTexture && DirectRightTexture &&
-				DirectLeftSurface && DirectRightSurface && DirectLeftSharedHandle && DirectRightSharedHandle)
-				return true;
+			return reference == 0 || static_cast<std::int32_t>(candidate - reference) >= 0;
+		}
 
-			ReleaseCom(DirectTransportFence);
-			ReleaseCom(DirectLeftSurface);
-			ReleaseCom(DirectLeftTexture);
-			ReleaseCom(DirectRightSurface);
-			ReleaseCom(DirectRightTexture);
-			DirectLeftSharedHandle = nullptr;
-			DirectRightSharedHandle = nullptr;
-			DirectTransportFormat = ChooseDirectTransportFormat(BackBufferDesc.Format);
-
-			if (!CanConvertForDirectTransport(device, BackBufferDesc.Format, DirectTransportFormat))
-				return false;
-
-			HANDLE leftHandle = nullptr;
-			HANDLE rightHandle = nullptr;
-			const HRESULT leftHr = device->CreateTexture(BackBufferDesc.Width, BackBufferDesc.Height, 1,
-				D3DUSAGE_RENDERTARGET, DirectTransportFormat, D3DPOOL_DEFAULT, &DirectLeftTexture, &leftHandle);
-			const HRESULT rightHr = SUCCEEDED(leftHr)
-				? device->CreateTexture(BackBufferDesc.Width, BackBufferDesc.Height, 1, D3DUSAGE_RENDERTARGET,
-					DirectTransportFormat, D3DPOOL_DEFAULT, &DirectRightTexture, &rightHandle)
-				: E_FAIL;
-			if (FAILED(leftHr) || FAILED(rightHr) || !DirectLeftTexture || !DirectRightTexture ||
-				!leftHandle || !rightHandle ||
-				FAILED(DirectLeftTexture->GetSurfaceLevel(0, &DirectLeftSurface)) ||
-				FAILED(DirectRightTexture->GetSurfaceLevel(0, &DirectRightSurface)) ||
-				FAILED(device->CreateQuery(D3DQUERYTYPE_EVENT, &DirectTransportFence)) || !DirectTransportFence)
+		bool WaitForEventQuery(IDirect3DQuery9* query, ULONGLONG timeoutMs)
+		{
+			if (!query) return false;
+			const ULONGLONG deadline = GetTickCount64() + timeoutMs;
+			for (;;)
 			{
-				ReleaseCom(DirectTransportFence);
-				ReleaseCom(DirectLeftSurface); ReleaseCom(DirectLeftTexture);
-				ReleaseCom(DirectRightSurface); ReleaseCom(DirectRightTexture);
-				DirectLeftSharedHandle = nullptr; DirectRightSharedHandle = nullptr;
+				const HRESULT ready = query->GetData(nullptr, 0, D3DGETDATA_FLUSH);
+				if (ready == S_OK) return true;
+				if (ready != S_FALSE) return false;
+				if (GetTickCount64() >= deadline) return false;
+				Sleep(0);
+			}
+		}
+
+		bool QueryGameAdapterLuid(IDirect3DDevice9* device, LUID& luid)
+		{
+			IDirect3DDevice9Ex* deviceEx = nullptr;
+			if (!device || FAILED(device->QueryInterface(__uuidof(IDirect3DDevice9Ex),
+				reinterpret_cast<void**>(&deviceEx))) || !deviceEx)
+			{
+				if (!FirstD3D9ExUnavailableLogged)
+				{
+					FirstD3D9ExUnavailableLogged = true;
+					spdlog::warn("VR direct transport: game device is not D3D9Ex; zero-copy disabled, SBS/Desktop Duplication remains active");
+				}
+				return false;
+			}
+			D3DDEVICE_CREATION_PARAMETERS cp{};
+			IDirect3D9* base = nullptr;
+			IDirect3D9Ex* d3dEx = nullptr;
+			const bool ok = SUCCEEDED(deviceEx->GetCreationParameters(&cp)) &&
+				SUCCEEDED(deviceEx->GetDirect3D(&base)) && base &&
+				SUCCEEDED(base->QueryInterface(__uuidof(IDirect3D9Ex), reinterpret_cast<void**>(&d3dEx))) && d3dEx &&
+				SUCCEEDED(d3dEx->GetAdapterLUID(cp.AdapterOrdinal, &luid));
+			ReleaseCom(d3dEx);
+			ReleaseCom(base);
+			ReleaseCom(deviceEx);
+			return ok;
+		}
+
+		bool EnsureDirectInteropProbe(IDirect3DDevice9* device)
+		{
+			if (!HostDirectTransportSupported() || !EnsureSharedState() ||
+				(SharedState->flags & OutRunVR::HostAdapterLuidValid) == 0) return false;
+
+			LUID gameLuid{};
+			if (!QueryGameAdapterLuid(device, gameLuid)) return false;
+			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientAdapterLuidLow),
+				static_cast<LONG>(gameLuid.LowPart));
+			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientAdapterLuidHigh),
+				static_cast<LONG>(gameLuid.HighPart));
+			const bool adapterMatches = SharedState->hostAdapterLuidLow == gameLuid.LowPart &&
+				SharedState->hostAdapterLuidHigh == static_cast<std::uint32_t>(gameLuid.HighPart);
+			if (!adapterMatches)
+			{
+				if (!FirstAdapterMismatchLogged)
+				{
+					FirstAdapterMismatchLogged = true;
+					spdlog::warn("VR direct transport: OpenXR D3D11 adapter LUID does not match the game D3D9Ex adapter; forcing SBS fallback");
+				}
 				return false;
 			}
 
-			DirectLeftSharedHandle = leftHandle;
-			DirectRightSharedHandle = rightHandle;
+			if (DirectInteropProbeToken &&
+				SharedState->hostInteropProbeAckToken == DirectInteropProbeToken)
+			{
+				DirectInteropVerified = true;
+				if (!FirstInteropVerifiedLogged)
+				{
+					FirstInteropVerifiedLogged = true;
+					spdlog::info("VR direct transport: D3D9Ex -> D3D11 shared-resource probe verified on the OpenXR adapter");
+				}
+				return true;
+			}
+
+			if (!DirectInteropProbeTexture)
+			{
+				HANDLE handle = nullptr;
+				if (FAILED(device->CreateTexture(1, 1, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8B8G8R8,
+					D3DPOOL_DEFAULT, &DirectInteropProbeTexture, &handle)) || !DirectInteropProbeTexture || !handle ||
+					FAILED(DirectInteropProbeTexture->GetSurfaceLevel(0, &DirectInteropProbeSurface)) ||
+					FAILED(device->ColorFill(DirectInteropProbeSurface, nullptr, D3DCOLOR_ARGB(0xFF, 0x7B, 0x7B, 0x7B))) ||
+					FAILED(device->CreateQuery(D3DQUERYTYPE_EVENT, &DirectInteropProbeFence)) || !DirectInteropProbeFence ||
+					FAILED(DirectInteropProbeFence->Issue(D3DISSUE_END)) || !WaitForEventQuery(DirectInteropProbeFence, 50))
+				{
+					++DirectInteropProbeFailures;
+					ReleaseCom(DirectInteropProbeFence);
+					ReleaseCom(DirectInteropProbeSurface);
+					ReleaseCom(DirectInteropProbeTexture);
+					DirectInteropProbeHandle = nullptr;
+					return false;
+				}
+				DirectInteropProbeHandle = handle;
+				DirectInteropProbeToken = static_cast<std::uint32_t>(GetTickCount()) ^ GetCurrentProcessId() ^ 0x4F525652u;
+				if (!DirectInteropProbeToken) DirectInteropProbeToken = 1;
+				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->hostInteropProbeAckToken), 0);
+				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientInteropProbeHandle),
+					static_cast<LONG>(reinterpret_cast<std::uintptr_t>(DirectInteropProbeHandle)));
+				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientInteropProbeToken),
+					static_cast<LONG>(DirectInteropProbeToken));
+			}
+			return false;
+		}
+
+		void ReleaseDirectTransportSlots()
+		{
+			DirectTransportResourcesReady = false;
+			for (auto& slot : DirectTransportSlots)
+			{
+				ReleaseCom(slot.fence);
+				ReleaseCom(slot.leftSurface);
+				ReleaseCom(slot.leftTexture);
+				ReleaseCom(slot.rightSurface);
+				ReleaseCom(slot.rightTexture);
+				slot = {};
+			}
+		}
+
+		bool EnsureDirectTransportResources(IDirect3DDevice9* device)
+		{
+			if (!device || !BackBufferDesc.Width || !BackBufferDesc.Height || !EnsureDirectInteropProbe(device))
+				return false;
+			if (DirectTransportResourcesReady) return true;
+
+			ReleaseDirectTransportSlots();
+			DirectTransportFormat = ChooseDirectTransportFormat(BackBufferDesc.Format);
+			if (!CanConvertForDirectTransport(device, BackBufferDesc.Format, DirectTransportFormat)) return false;
+
+			for (auto& slot : DirectTransportSlots)
+			{
+				HANDLE leftHandle = nullptr, rightHandle = nullptr;
+				const HRESULT leftHr = device->CreateTexture(BackBufferDesc.Width, BackBufferDesc.Height, 1,
+					D3DUSAGE_RENDERTARGET, DirectTransportFormat, D3DPOOL_DEFAULT, &slot.leftTexture, &leftHandle);
+				const HRESULT rightHr = SUCCEEDED(leftHr) ? device->CreateTexture(BackBufferDesc.Width, BackBufferDesc.Height, 1,
+					D3DUSAGE_RENDERTARGET, DirectTransportFormat, D3DPOOL_DEFAULT, &slot.rightTexture, &rightHandle) : E_FAIL;
+				if (FAILED(leftHr) || FAILED(rightHr) || !leftHandle || !rightHandle ||
+					FAILED(slot.leftTexture->GetSurfaceLevel(0, &slot.leftSurface)) ||
+					FAILED(slot.rightTexture->GetSurfaceLevel(0, &slot.rightSurface)) ||
+					FAILED(device->CreateQuery(D3DQUERYTYPE_EVENT, &slot.fence)) || !slot.fence)
+				{
+					ReleaseDirectTransportSlots();
+					return false;
+				}
+				slot.leftHandle = leftHandle;
+				slot.rightHandle = rightHandle;
+			}
 			if (++DirectTransportGeneration == 0) ++DirectTransportGeneration;
 			DirectTransportResourcesReady = true;
-			spdlog::info("VR stereo: direct D3D9->D3D11 eye transport ready {}x{} format={} generation={} handles=0x{:08X}/0x{:08X}",
-				BackBufferDesc.Width, BackBufferDesc.Height, static_cast<int>(DirectTransportFormat),
-				DirectTransportGeneration, static_cast<unsigned>(reinterpret_cast<std::uintptr_t>(DirectLeftSharedHandle)),
-				static_cast<unsigned>(reinterpret_cast<std::uintptr_t>(DirectRightSharedHandle)));
+			spdlog::info("VR stereo: verified 4-slot D3D9Ex shared eye ring ready {}x{} format={} generation={}",
+				BackBufferDesc.Width, BackBufferDesc.Height, static_cast<int>(DirectTransportFormat), DirectTransportGeneration);
 			return true;
 		}
 
-		bool ResolveDirectTransport(IDirect3DDevice9* device)
+		bool ResolveDirectTransport(IDirect3DDevice9* device, std::uint32_t frameId)
 		{
-			if (!EnsureDirectTransportResources(device) || !BackBuffer || !RightEyeSurface) return false;
+			if (!frameId || !EnsureDirectTransportResources(device) || !BackBuffer || !RightEyeSurface) return false;
+			const std::uint32_t slotIndex = (frameId - 1u) % OutRunVR::RenderFrameRingSize;
+			auto& slot = DirectTransportSlots[slotIndex];
+			const std::uint32_t consumed = SharedState ? SharedState->hostDirectConsumedFrameId : 0;
+			if (slot.frameId && !FrameIdAtOrAfter(consumed, slot.frameId))
+			{
+				++DirectTransportRingBackpressure;
+				return false;
+			}
 			{
 				InternalPassScope guard;
-				if (FAILED(device->StretchRect(BackBuffer, nullptr, DirectLeftSurface, nullptr, D3DTEXF_NONE)) ||
-					FAILED(device->StretchRect(RightEyeSurface, nullptr, DirectRightSurface, nullptr, D3DTEXF_NONE)) ||
-					FAILED(DirectTransportFence->Issue(D3DISSUE_END)))
-					return false;
+				if (FAILED(device->StretchRect(BackBuffer, nullptr, slot.leftSurface, nullptr, D3DTEXF_NONE)) ||
+					FAILED(device->StretchRect(RightEyeSurface, nullptr, slot.rightSurface, nullptr, D3DTEXF_NONE)) ||
+					FAILED(slot.fence->Issue(D3DISSUE_END))) return false;
 			}
-
-			const ULONGLONG deadline = GetTickCount64() + 50;
-			for (;;)
+			if (!WaitForEventQuery(slot.fence, 12))
 			{
-				const HRESULT ready = DirectTransportFence->GetData(nullptr, 0, D3DGETDATA_FLUSH);
-				if (ready == S_OK) return true;
-				if (ready != S_FALSE) return false;
-				if (GetTickCount64() >= deadline)
-				{
-					++DirectTransportFenceTimeouts;
-					return false;
-				}
-				Sleep(0);
+				++DirectTransportFenceTimeouts;
+				return false;
 			}
+			slot.frameId = frameId;
+			ActiveDirectTransportSlot = slotIndex;
+			return true;
 		}
 
 		bool EnsureStereoResources(IDirect3DDevice9* device)
@@ -1052,13 +1212,72 @@ namespace OutRunVRStereo
 				static_cast<LONG>(frameId));
 		}
 
-		void PublishRenderFrame(std::uint32_t state,std::uint32_t frameId,std::uint32_t sourcePoseSequence,std::int64_t presentQpc,OutRunVR::StereoFailureReason failureReason,const OutRunVRRenderer::LatchedStereoFrame* stereo,bool presentInFlight=false,bool directTransport=false)
+		void PublishRenderFrame(std::uint32_t state, std::uint32_t frameId, std::uint32_t sourcePoseSequence,
+			std::int64_t presentQpc, OutRunVR::StereoFailureReason failureReason,
+			const OutRunVRRenderer::LatchedStereoFrame* stereo, bool presentInFlight = false, bool directTransport = false)
 		{
-			if(!EnsureRenderFrameState())return; LONG seq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameState->sequence));if((seq&1)==0)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameState->sequence));MemoryBarrier();
-			RenderFrameState->clientPid=GetCurrentProcessId();RenderFrameState->state=state;RenderFrameState->frameId=frameId;RenderFrameState->sourcePoseSequence=sourcePoseSequence;RenderFrameState->presentationMode=GameplayActive()?OutRunVR::PresentationGameplay:OutRunVR::PresentationTheater;RenderFrameState->flags=presentInFlight?OutRunVR::RenderFramePresentInFlight:0;RenderFrameState->failureReason=static_cast<std::uint32_t>(failureReason);RenderFrameState->backbufferWidth=BackBufferDesc.Width;RenderFrameState->backbufferHeight=BackBufferDesc.Height;RenderFrameState->presentQpc=presentQpc;std::memset(RenderFrameState->eye,0,sizeof(RenderFrameState->eye));std::memset(RenderFrameState->reserved,0,sizeof(RenderFrameState->reserved));
-			if(directTransport&&DirectTransportResourcesReady&&DirectLeftSharedHandle&&DirectRightSharedHandle){RenderFrameState->flags|=OutRunVR::RenderFrameDirectGpuTransport;RenderFrameState->reserved[OutRunVR::RenderFrameDirectLeftHandleIndex]=static_cast<std::uint32_t>(reinterpret_cast<std::uintptr_t>(DirectLeftSharedHandle));RenderFrameState->reserved[OutRunVR::RenderFrameDirectRightHandleIndex]=static_cast<std::uint32_t>(reinterpret_cast<std::uintptr_t>(DirectRightSharedHandle));RenderFrameState->reserved[OutRunVR::RenderFrameDirectWidthIndex]=BackBufferDesc.Width;RenderFrameState->reserved[OutRunVR::RenderFrameDirectHeightIndex]=BackBufferDesc.Height;RenderFrameState->reserved[OutRunVR::RenderFrameDirectFormatIndex]=static_cast<std::uint32_t>(DirectTransportFormat);RenderFrameState->reserved[OutRunVR::RenderFrameDirectGenerationIndex]=DirectTransportGeneration;}
-			if(!presentInFlight&&state==OutRunVR::StereoSbsActive&&stereo&&stereo->valid&&frameId){const std::uint32_t transportFlag=RenderFrameState->flags&OutRunVR::RenderFrameDirectGpuTransport;RenderFrameState->flags=transportFlag|OutRunVR::RenderFrameStereoComplete|OutRunVR::RenderFrameWorldStereo|OutRunVR::RenderFrameDrawDuplicated|OutRunVR::RenderFrameEffectivePoseValid;for(int eye=0;eye<2;++eye){std::memcpy(RenderFrameState->eye[eye].orientation,stereo->effectiveEyeOrientation[eye],sizeof(RenderFrameState->eye[eye].orientation));std::memcpy(RenderFrameState->eye[eye].position,stereo->effectiveEyePosition[eye],sizeof(RenderFrameState->eye[eye].position));RenderFrameState->eye[eye].fov=stereo->eyeFov[eye];}}
-			MemoryBarrier();seq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameState->sequence));if(seq&1)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameState->sequence));
+			if (!EnsureRenderFrameState()) return;
+			const std::uint32_t slotIndex = frameId ? (frameId - 1u) % OutRunVR::RenderFrameRingSize
+				: (RenderFrameRing->latestSlot + 1u) % OutRunVR::RenderFrameRingSize;
+			auto& frame = RenderFrameRing->slots[slotIndex];
+			LONG seq = InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));
+			if ((seq & 1) == 0) InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));
+			MemoryBarrier();
+			frame.magic = OutRunVR::RenderFrameMagic;
+			frame.protocolVersion = OutRunVR::RenderFrameProtocolVersion;
+			frame.structSize = sizeof(frame);
+			frame.clientPid = GetCurrentProcessId();
+			frame.state = state;
+			frame.frameId = frameId;
+			frame.sourcePoseSequence = sourcePoseSequence;
+			frame.presentationMode = GameplayActive() ? OutRunVR::PresentationGameplay : OutRunVR::PresentationTheater;
+			frame.flags = presentInFlight ? OutRunVR::RenderFramePresentInFlight : 0;
+			frame.failureReason = static_cast<std::uint32_t>(failureReason);
+			frame.backbufferWidth = BackBufferDesc.Width;
+			frame.backbufferHeight = BackBufferDesc.Height;
+			frame.presentQpc = presentQpc;
+			std::memset(frame.eye, 0, sizeof(frame.eye));
+			std::memset(frame.reserved, 0, sizeof(frame.reserved));
+
+			if (directTransport && DirectTransportResourcesReady && ActiveDirectTransportSlot < DirectTransportSlots.size())
+			{
+				const auto& transport = DirectTransportSlots[ActiveDirectTransportSlot];
+				if (transport.leftHandle && transport.rightHandle && transport.frameId == frameId)
+				{
+					frame.flags |= OutRunVR::RenderFrameDirectGpuTransport;
+					frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex] = static_cast<std::uint32_t>(reinterpret_cast<std::uintptr_t>(transport.leftHandle));
+					frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex] = static_cast<std::uint32_t>(reinterpret_cast<std::uintptr_t>(transport.rightHandle));
+					frame.reserved[OutRunVR::RenderFrameDirectWidthIndex] = BackBufferDesc.Width;
+					frame.reserved[OutRunVR::RenderFrameDirectHeightIndex] = BackBufferDesc.Height;
+					frame.reserved[OutRunVR::RenderFrameDirectFormatIndex] = static_cast<std::uint32_t>(DirectTransportFormat);
+					frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex] = DirectTransportGeneration;
+					frame.reserved[OutRunVR::RenderFrameDirectSlotIndex] = ActiveDirectTransportSlot;
+				}
+			}
+			if (!presentInFlight && state == OutRunVR::StereoSbsActive && stereo && stereo->valid && frameId)
+			{
+				const std::uint32_t transportFlag = frame.flags & OutRunVR::RenderFrameDirectGpuTransport;
+				frame.flags = transportFlag | OutRunVR::RenderFrameStereoComplete | OutRunVR::RenderFrameWorldStereo |
+					OutRunVR::RenderFrameDrawDuplicated | OutRunVR::RenderFrameEffectivePoseValid;
+				for (int eye = 0; eye < 2; ++eye)
+				{
+					std::memcpy(frame.eye[eye].orientation, stereo->effectiveEyeOrientation[eye], sizeof(frame.eye[eye].orientation));
+					std::memcpy(frame.eye[eye].position, stereo->effectiveEyePosition[eye], sizeof(frame.eye[eye].position));
+					frame.eye[eye].fov = stereo->eyeFov[eye];
+				}
+			}
+			MemoryBarrier();
+			seq = InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));
+			if (seq & 1) InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));
+
+			LONG ringSeq = InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
+			if ((ringSeq & 1) == 0) InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
+			MemoryBarrier();
+			RenderFrameRing->clientPid = GetCurrentProcessId();
+			RenderFrameRing->latestSlot = slotIndex;
+			MemoryBarrier();
+			ringSeq = InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
+			if (ringSeq & 1) InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
 		}
 
 		struct ScreenVertex
@@ -1454,23 +1673,98 @@ namespace OutRunVRStereo
 				FailureCounts[OutRunVR::StereoFailureOffscreenWorld], FailureCounts[OutRunVR::StereoFailureOcclusionQueryActive]);
 		}
 
-		HRESULT __stdcall PresentDest(IDirect3DDevice9* device,const RECT* sourceRect,const RECT* destRect,HWND destWindowOverride,const RGNDATA* dirtyRegion)
+		HRESULT __stdcall PresentDest(IDirect3DDevice9* device, const RECT* sourceRect, const RECT* destRect,
+			HWND destWindowOverride, const RGNDATA* dirtyRegion)
 		{
-			if(!IsGameDevice(device))return PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);const std::uint64_t beginNow=OutRunVRRenderer::GetBeginSceneCallCount();const std::uint64_t beginDelta=beginNow>=LastBeginSceneCountAtPresent?beginNow-LastBeginSceneCountAtPresent:0;LastBeginSceneCountAtPresent=beginNow;if(GameplayActive()){if(beginDelta>1)++MultiBeginScenePresents;MaxBeginScenesPerPresent=std::max(MaxBeginScenesPerPresent,beginDelta);}const bool stereoRequested=StereoWanted();bool composedStereo=false;std::uint32_t pendingPoseSequence=0;
-			bool directTransport=false;
-			if(stereoRequested&&FrameHadWorldStereo&&FrameHadDuplicatedDraw&&!FrameRightDrawFailed&&!FrameStereoIncomplete&&FrameStereoPoseSequence&&FrameStereoMetadata.valid&&EnsureStereoResources(device)){
-				directTransport=ResolveDirectTransport(device);
-				if(directTransport){++DirectTransportFrames;composedStereo=true;pendingPoseSequence=FrameStereoPoseSequence;if(!FirstDirectTransportLogged){FirstDirectTransportLogged=true;spdlog::info("VR stereo: direct GPU eye transport armed; source eye={}x{}, VDXR target is reported separately by host",BackBufferDesc.Width,BackBufferDesc.Height);}
-					if(!HostDirectTransportReady()){if(ComposeSbs(device))++StereoComposeSuccess;else ++StereoComposeFailure;}
-				}
-				else if(ComposeSbs(device)){++StereoComposeSuccess;composedStereo=true;pendingPoseSequence=FrameStereoPoseSequence;++DirectTransportFallbacks;if(!FirstDirectFallbackLogged){FirstDirectFallbackLogged=true;spdlog::warn("VR stereo: direct GPU transport unavailable; keeping SBS/Desktop Duplication fallback");}}
-				else{++StereoComposeFailure;PoisonFrame(OutRunVR::StereoFailureComposeFailed);}
+			if (!IsGameDevice(device))
+				return PresentHook.stdcall<HRESULT>(device, sourceRect, destRect, destWindowOverride, dirtyRegion);
+			const std::uint64_t beginNow = OutRunVRRenderer::GetBeginSceneCallCount();
+			const std::uint64_t beginDelta = beginNow >= LastBeginSceneCountAtPresent ? beginNow - LastBeginSceneCountAtPresent : 0;
+			LastBeginSceneCountAtPresent = beginNow;
+			if (GameplayActive())
+			{
+				if (beginDelta > 1) ++MultiBeginScenePresents;
+				MaxBeginScenesPerPresent = std::max(MaxBeginScenesPerPresent, beginDelta);
 			}
-			MaybeLogSummary();LARGE_INTEGER presentStart{};QueryPerformanceCounter(&presentStart);const std::uint32_t pendingFrameId=stereoRequested?NextStereoFrameId():0;if(stereoRequested)PublishRenderFrame(OutRunVR::StereoSbsFallbackMono,pendingFrameId,pendingPoseSequence,presentStart.QuadPart,OutRunVR::StereoFailureNone,nullptr,true,directTransport);const HRESULT hr=PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);
-			if(composedStereo&&SUCCEEDED(hr)&&!FrameStereoIncomplete){PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,pendingFrameId);PublishRenderFrame(OutRunVR::StereoSbsActive,pendingFrameId,pendingPoseSequence,presentStart.QuadPart,OutRunVR::StereoFailureNone,&FrameStereoMetadata,false,directTransport);if(!FirstStereoActiveLogged){FirstStereoActiveLogged=true;spdlog::info("VR stereo: TRUE STEREO active; transport={} sourceEye={}x{} PC={}",directTransport?"direct D3D9->D3D11":"SBS Desktop Duplication",BackBufferDesc.Width,BackBufferDesc.Height,(directTransport&&HostDirectTransportReady())?"left-eye mirror":"SBS fallback");}}
-			else{if(FAILED(hr)&&FrameFailureReason==OutRunVR::StereoFailureNone)PoisonFrame(OutRunVR::StereoFailurePresentFailed);const std::uint32_t fallback=stereoRequested?OutRunVR::StereoSbsFallbackMono:OutRunVR::StereoDisabled;PublishStereoState(fallback,false,0,0);PublishRenderFrame(fallback,0,0,presentStart.QuadPart,FrameFailureReason,nullptr);}
+
+			const bool stereoRequested = StereoWanted();
+			const std::uint32_t pendingFrameId = stereoRequested ? NextStereoFrameId() : 0;
+			bool composedStereo = false;
+			bool directTransport = false;
+			std::uint32_t pendingPoseSequence = 0;
+			if (stereoRequested && FrameHadWorldStereo && FrameHadDuplicatedDraw && !FrameRightDrawFailed &&
+				!FrameStereoIncomplete && FrameStereoPoseSequence && FrameStereoMetadata.valid && EnsureStereoResources(device))
+			{
+				directTransport = ResolveDirectTransport(device, pendingFrameId);
+				if (directTransport)
+				{
+					++DirectTransportFrames;
+					composedStereo = true;
+					pendingPoseSequence = FrameStereoPoseSequence;
+					if (!FirstDirectTransportLogged)
+					{
+						FirstDirectTransportLogged = true;
+						spdlog::info("VR stereo: verified 4-slot direct GPU eye transport armed; source eye={}x{}",
+							BackBufferDesc.Width, BackBufferDesc.Height);
+					}
+					if (!HostDirectTransportReady())
+					{
+						if (ComposeSbs(device)) ++StereoComposeSuccess; else ++StereoComposeFailure;
+					}
+				}
+				else if (ComposeSbs(device))
+				{
+					++StereoComposeSuccess;
+					composedStereo = true;
+					pendingPoseSequence = FrameStereoPoseSequence;
+					++DirectTransportFallbacks;
+					if (!FirstDirectFallbackLogged)
+					{
+						FirstDirectFallbackLogged = true;
+						spdlog::warn("VR stereo: direct transport not verified/available; keeping SBS/Desktop Duplication fallback");
+					}
+				}
+				else
+				{
+					++StereoComposeFailure;
+					PoisonFrame(OutRunVR::StereoFailureComposeFailed);
+				}
+			}
+
+			MaybeLogSummary();
+			LARGE_INTEGER presentStart{};
+			QueryPerformanceCounter(&presentStart);
+			if (stereoRequested)
+				PublishRenderFrame(OutRunVR::StereoSbsFallbackMono, pendingFrameId, pendingPoseSequence,
+					presentStart.QuadPart, OutRunVR::StereoFailureNone, nullptr, true, directTransport);
+			const HRESULT hr = PresentHook.stdcall<HRESULT>(device, sourceRect, destRect, destWindowOverride, dirtyRegion);
+			if (composedStereo && SUCCEEDED(hr) && !FrameStereoIncomplete)
+			{
+				PublishStereoState(OutRunVR::StereoSbsActive, true, pendingPoseSequence, pendingFrameId);
+				PublishRenderFrame(OutRunVR::StereoSbsActive, pendingFrameId, pendingPoseSequence, presentStart.QuadPart,
+					OutRunVR::StereoFailureNone, &FrameStereoMetadata, false, directTransport);
+				if (!FirstStereoActiveLogged)
+				{
+					FirstStereoActiveLogged = true;
+					spdlog::info("VR stereo: TRUE STEREO active; transport={} sourceEye={}x{} PC={}",
+						directTransport ? "verified D3D9Ex->D3D11 ring" : "SBS Desktop Duplication",
+						BackBufferDesc.Width, BackBufferDesc.Height,
+						(directTransport && HostDirectTransportReady()) ? "left-eye mirror" : "SBS fallback");
+				}
+			}
+			else
+			{
+				if (FAILED(hr) && FrameFailureReason == OutRunVR::StereoFailureNone)
+					PoisonFrame(OutRunVR::StereoFailurePresentFailed);
+				const std::uint32_t fallback = stereoRequested ? OutRunVR::StereoSbsFallbackMono : OutRunVR::StereoDisabled;
+				PublishStereoState(fallback, false, 0, 0);
+				PublishRenderFrame(fallback, 0, 0, presentStart.QuadPart, FrameFailureReason, nullptr);
+			}
 			OutRunVRRenderer::NotifyGamePresent();
-			FrameHadDuplicatedDraw=false;FrameHadWorldStereo=false;FrameRightDrawFailed=false;FrameStereoIncomplete=false;FramePoseMismatchLogged=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoPoseSequence=0;FrameStereoMetadata={};return hr;
+			FrameHadDuplicatedDraw = false; FrameHadWorldStereo = false; FrameRightDrawFailed = false;
+			FrameStereoIncomplete = false; FramePoseMismatchLogged = false; FrameFailureReason = OutRunVR::StereoFailureNone;
+			FrameStereoPoseSequence = 0; FrameStereoMetadata = {};
+			return hr;
 		}
 
 		HRESULT __stdcall ResetDest(IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params)

@@ -17,8 +17,8 @@
 // it duplicates final D3D9 draws into full-size left/right eye surfaces and replaces
 // only verified world-draw c64 constants with true per-eye OpenXR transforms.
 // Simulation, input, timers and native FFB are never replayed for the second eye.
-// Pose.v1 remains layout-compatible; exact rendered-frame timing/effective eye poses
-// are published separately through Frame.v1 after a successful real D3D9 Present.
+// Pose.v2 carries the OpenXR adapter/interop contract; exact rendered-frame timing/effective eye poses
+// are published through the 4-slot Frame.v2 ring after a successful real D3D9 Present.
 //
 // The PC monitor is the transport surface, not a third 3D view: gameplay Present
 // contains the two already-rendered eyes side-by-side. The x64 host Desktop-Duplicates

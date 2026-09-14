@@ -862,7 +862,7 @@ namespace OutRunVRRenderer
 				std::memcpy(LatchedStereo.eyeOffset, sample.eyeOffset, sizeof(LatchedStereo.eyeOffset));
 				const Quat effectiveHeadOrientation = Normalize(
 					Multiply(Normalize(CenterOrientation), relativeOrientation));
-				// Frame.v1 positions are OpenXR LOCAL-space metres. WorldScale is
+				// Frame.v2 positions are OpenXR LOCAL-space metres. WorldScale is
 				// only the metres->game-units conversion used by LatchedHeadInverse.
 				Vec3 effectiveHeadPosition = CenterPositionValid ? CenterPosition : sample.position;
 				if (Settings::VRPositionalTracking && sample.positionValid)

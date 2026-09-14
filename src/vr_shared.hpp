@@ -5,13 +5,14 @@
 
 namespace OutRunVR
 {
-    inline constexpr wchar_t SharedMemoryName[] = L"Local\\OutRun2006Tweaks.VR.Pose.v1";
+    inline constexpr wchar_t SharedMemoryName[] = L"Local\\OutRun2006Tweaks.VR.Pose.v2";
     inline constexpr std::uint32_t SharedMagic = 0x5256524Fu; // 'ORVR' in little endian
-    inline constexpr std::uint32_t SharedProtocolVersion = 1;
+    inline constexpr std::uint32_t SharedProtocolVersion = 2;
 
-    inline constexpr wchar_t RenderFrameMemoryName[] = L"Local\\OutRun2006Tweaks.VR.Frame.v1";
+    inline constexpr wchar_t RenderFrameMemoryName[] = L"Local\\OutRun2006Tweaks.VR.Frame.v2";
     inline constexpr std::uint32_t RenderFrameMagic = 0x4656524Fu; // 'ORVF'
-    inline constexpr std::uint32_t RenderFrameProtocolVersion = 1;
+    inline constexpr std::uint32_t RenderFrameProtocolVersion = 2;
+    inline constexpr std::uint32_t RenderFrameRingSize = 4;
     inline constexpr std::size_t PackedEyeOrientationOffset = 48;
     inline constexpr std::size_t PackedEyeOrientationBytes = 16;
 
@@ -27,6 +28,7 @@ namespace OutRunVR
         HostShouldRender = 1u << 7,
         HostDirectGpuTransport = 1u << 8,
         HostDirectGpuReady = 1u << 9,
+        HostAdapterLuidValid = 1u << 10,
     };
 
     inline constexpr std::uint32_t ClientHeartbeatIndex = 0;
@@ -97,6 +99,7 @@ namespace OutRunVR
     inline constexpr std::uint32_t RenderFrameDirectHeightIndex = 3;
     inline constexpr std::uint32_t RenderFrameDirectFormatIndex = 4;
     inline constexpr std::uint32_t RenderFrameDirectGenerationIndex = 5;
+    inline constexpr std::uint32_t RenderFrameDirectSlotIndex = 6;
 
     enum StereoFailureReason : std::uint32_t
     {
@@ -149,6 +152,14 @@ namespace OutRunVR
         SharedFov eyeFov[2];
         std::uint32_t recommendedWidth[2];
         std::uint32_t recommendedHeight[2];
+        std::uint32_t hostAdapterLuidLow;
+        std::uint32_t hostAdapterLuidHigh;
+        volatile std::uint32_t clientAdapterLuidLow;
+        volatile std::uint32_t clientAdapterLuidHigh;
+        volatile std::uint32_t clientInteropProbeHandle;
+        volatile std::uint32_t clientInteropProbeToken;
+        volatile std::uint32_t hostInteropProbeAckToken;
+        volatile std::uint32_t hostDirectConsumedFrameId;
         char runtimeName[64];
         std::uint32_t reserved[16];
     };
@@ -180,17 +191,32 @@ namespace OutRunVR
         SharedRenderEye eye[2];
         std::uint32_t reserved[25];
     };
+
+    struct SharedRenderFrameRing
+    {
+        std::uint32_t magic;
+        std::uint32_t protocolVersion;
+        std::uint32_t structSize;
+        std::uint32_t slotCount;
+        volatile std::uint32_t publishSequence;
+        volatile std::uint32_t latestSlot;
+        volatile std::uint32_t clientPid;
+        std::uint32_t reserved0;
+        SharedRenderFrameState slots[RenderFrameRingSize];
+    };
 #pragma pack(pop)
 
     static_assert(sizeof(SharedFov) == 16);
-    static_assert(sizeof(SharedPoseState) == 248);
+    static_assert(sizeof(SharedPoseState) == 280);
     static_assert(offsetof(SharedPoseState, recommendedWidth) == 104);
     static_assert(offsetof(SharedPoseState, recommendedHeight) == 112);
-    static_assert(offsetof(SharedPoseState, runtimeName) == 120);
-    static_assert(offsetof(SharedPoseState, reserved) == 184);
+    static_assert(offsetof(SharedPoseState, hostAdapterLuidLow) == 120);
+    static_assert(offsetof(SharedPoseState, runtimeName) == 152);
+    static_assert(offsetof(SharedPoseState, reserved) == 216);
     static_assert(PackedEyeOrientationOffset + PackedEyeOrientationBytes == 64);
     static_assert(sizeof(SharedRenderEye) == 48);
     static_assert(sizeof(SharedRenderFrameState) == 256);
+    static_assert(sizeof(SharedRenderFrameRing) == 1056);
 }
 
 namespace OutRunVRRenderer
