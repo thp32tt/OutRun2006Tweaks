@@ -1,242 +1,223 @@
 # OutRun 2006 OpenXR VR
 
-This branch is the experimental VR development branch for the `wheel-ffb` fork.
-It keeps the existing wheel / multi-device / FFB work intact and adds VR as an
-independent rendering-side feature.
+This is the VR development branch for the `wheel-ffb` fork. It preserves the existing wheel / multi-device / native FFB implementation and adds an independent x86 D3D9 + x64 OpenXR VR path.
 
-## Current status: milestone 1 hardened
+## Current status: true stereo implemented, runtime validation pending
 
-Implemented:
+The code now contains the complete intended rendering path:
 
 - x64 OpenXR host using `XR_KHR_D3D11_enable`
-- versioned x86/x64 shared-memory IPC with a seqlock and single-host ownership
-- predicted OpenXR HMD orientation and position transport
-- left/right OpenXR FOV and recommended eye sizes already included in the IPC ABI
-- renderer-side head tracking at the verified OutRun VS c64 WorldViewProjection upload
-- one OpenXR pose latched after each successful D3D9 `BeginScene`, so all draws in a scene use one pose
-- render-time culling/billboard/flare camera synchronization with immediate restoration at `EndScene`
-- runtime verification of `c64..c67 = Transpose(WorldView * Projection)` before injection
-- executable-range / readable-memory validation before reverse-engineered renderer globals are read
-- D3D9 upload success and frame-completion telemetry; `CAMERA APPLIED` is no longer set merely because a matrix was prepared
-- orientation-only head tracking by default, with optional experimental positional tracking
-- F10 yaw-only recenter; pitch/roll stay physically correct
-- OpenXR reference-space change detection and automatic tracking-origin refresh
-- transient IPC read failures skip only that render scene instead of silently changing the center
-- 250 ms stale-pose fail-safe
-- explicit gameplay vs theater presentation state exported by the x86 renderer
-- menus, pause, goal, retry and result screens anchored as a LOCAL-space theater quad
-- game-process exit monitoring independent of `xrEndFrame`, including while an OpenXR session is not running
-- `shouldRender=false` fast path that skips desktop capture and color conversion
-- removal of the two per-frame D3D11 `Flush()` calls from the mirror path
-- rolling host p95/p99 timings for `xrWaitFrame`, desktop capture, color-submit and `xrEndFrame`
+- Quest/VDXR predicted head pose and two PRIMARY_STEREO views
+- protocol-v1 x86/x64 shared memory, still exactly 248 bytes
+- single-host ownership and creator-only mapping initialization
+- renderer-side head tracking at OutRun's verified VS c64 WorldViewProjection upload
+- one HMD pose latched per D3D9 scene
+- F10 yaw-only recenter and optional positional tracking
+- temporary render-time culling/billboard/flare camera synchronization
+- true per-eye geometry rendering with OpenXR asymmetric FOV and eye offsets
+- full-size left and right D3D9 eye surfaces; the simulation and render queue are not replayed
+- zero-disparity duplication for screen-space/non-world draws such as HUD sprites
+- side-by-side transport only at final Present
+- x64 SBS crop into a two-slice OpenXR swapchain
+- gameplay submission as two `XrCompositionLayerProjectionView` entries in one `XrCompositionLayerProjection`
+- menus, pause, goal, retry and result screens submitted as a LOCAL-space fixed theater quad
+- SDR/scRGB HDR conversion in the x64 compositor
+- `shouldRender=false` fast path and game-exit monitoring independent of frame submission
+- build-time compilation of the exact HLSL used by the stereo compositor
 
-The old experimental `CalcCameraMatrix` / `d3dmatrix140` VR mutation has been
-removed. `FixZBufferPrecision` remains the sole owner of its existing camera hook,
-while VR head tracking is applied only at the final D3D9 renderer boundary.
+This is **compile-validated, not Quest-runtime-validated**. A real Quest 3 / VDXR run is still required before calling the mod production-ready.
 
-## Important limitation before true stereo
+## Renderer basis
 
-The c64 injector is authoritative for final GPU transforms, and the renderer now
-also keeps OutRun's live camera position/look synchronized with the same latched
-head pose for the duration of the D3D9 scene. That improves agreement for render-
-time culling, billboards and flares without introducing a second camera transform.
-
-It does **not** prove that every stage object is queued after `BeginScene`. If the
-game builds or culls part of its render queue before the synchronized camera state
-is installed, extreme head turns can still expose missing geometry. Runtime testing
-should specifically check +/-90 degree head turns and objects behind the car. If
-missing geometry remains, the next fix belongs at the pre-scene render-queue/culling
-boundary, not in the shader injector.
-
-## Architecture
+OutRun's renderer was independently reverse engineered by the MIT-licensed OutRun 2006 Remix Wrapper. The relevant path is:
 
 ```text
-Quest 3 / OpenXR runtime (VDXR recommended for current testing)
-                 |
-                 | OpenXR, x64 / predicted display pose
-                 v
-        outrun-vr-host.exe
-                 |
-                 | Local\\OutRun2006Tweaks.VR.Pose.v1
-                 | versioned shared memory
-                 v
-      OutRun2006Tweaks dinput8.dll (x86)
-                 |
-                 | BeginScene success: latch one HMD pose
-                 | gameplay: sync live culling camera for this scene
-                 | SetVertexShaderConstantF: verify/patch c64 WVP
-                 | EndScene: restore camera + publish actual upload result
-                 v
-        OutRun 2006 D3D9 renderer
+0x0095DB20  WorldView = World * View
+0x0095D860  View
+0x0095D8A0  Projection
+VS c64..c67 = Transpose(WorldView * Projection)
 ```
 
-The split process design is intentional. It keeps the 32-bit game free from a
-hard OpenXR loader dependency while the x64 host owns the OpenXR session.
+The PC renderer is right-handed and uses a D3D RH projection, so the OpenXR RH eye basis is used directly instead of copying the old FEAR-style RH/LH reflection prototype.
+
+The final c64 upload remains the authoritative head-tracking boundary. The old `CalcCameraMatrix` / `d3dmatrix140` mutation is removed; `FixZBufferPrecision` remains the sole owner of its existing camera hook.
+
+## True-stereo architecture
+
+```text
+Quest 3 / VDXR
+      |
+      | xrWaitFrame -> predictedDisplayTime
+      | xrLocateSpace + xrLocateViews (2 eyes)
+      v
+outrun-vr-host.exe (x64)
+      |
+      | pose + per-eye FOV + head-local eye offsets
+      | Local\OutRun2006Tweaks.VR.Pose.v1
+      v
+OutRun2006Tweaks dinput8.dll (x86)
+      |
+      | one normal game update only
+      | input / physics / timers / FFB once
+      | one game render queue
+      v
+D3D9 world draw
+      |
+      +--> LEFT: head-corrected c64 + left eye offset/FOV -> real backbuffer
+      |
+      +--> RIGHT: same draw/state + right eye offset/FOV -> full-size right RT/depth
+
+D3D9 UI/non-world draw
+      |
+      +--> same screen-space draw to both full-size eye surfaces
+
+Present
+      |
+      | resolve left/right and compose SBS transport
+      v
+Windows desktop output / Desktop Duplication
+      |
+      | crop SBS halves + HDR/scRGB conversion
+      v
+2-slice D3D11 OpenXR swapchain
+      |
+      +--> projection view 0
+      +--> projection view 1
+      v
+XrCompositionLayerProjection
+```
+
+### Why `SceneControl()` is never called twice
+
+OutRun has render data that is consumed/unlinked during rendering. Replaying the whole scene-control path could consume queues twice and, more importantly, could re-run game-side work. The stereo renderer therefore duplicates only final D3D9 draw calls while the original renderer state is still alive.
+
+This preserves the required invariant:
+
+```text
+simulation / input / physics / native FFB = once
+left/right GPU draw submission             = twice
+```
+
+The stereo module is deliberately checked in CI for the absence of direct `ModeControl`, `EventControl` and `WheelFFB_ServiceSafety` calls.
+
+## Per-eye projection
+
+`vr_renderer_probe.cpp` first produces the already head-corrected mono WVP. `vr_stereo.cpp` then:
+
+1. reads the current c64 matrix,
+2. removes only OutRun's projection,
+3. verifies that the recovered head delta is rigid-like,
+4. applies the OpenXR eye position in the same RH camera basis,
+5. creates the eye's asymmetric D3D projection from `angleLeft/right/up/down`, and
+6. writes the per-eye transposed WVP back to c64 for that one eye draw.
+
+The asymmetric projection layout follows the Khronos OpenXR `xr_linear.h` D3D projection convention (`-Z` forward, `+Y` up, D3D `[0,1]` depth). OutRun's existing near/far depth terms are preserved.
+
+The per-eye c64 values are written one register at a time so the authoritative mono c64 hook does not mistake those internal eye uploads for a new game WVP and re-apply head tracking.
+
+## Eye surfaces and HUD
+
+The normal game backbuffer acts as the full-resolution left eye. A second full-resolution render target plus matching depth-stencil stores the right eye. This avoids rendering directly into half-width viewports, which would distort HUD coordinates and change rasterization behavior.
+
+Only render-target-0 draws targeting the real game backbuffer are duplicated. Offscreen render targets remain single-pass. This is intentional: blindly duplicating shadow/reflection/post-process buffers is less safe than failing closed. If runtime testing shows that the main 3D scene itself is rendered to an unidentified offscreen target, stereo will fall back instead of replaying simulation; that target must then be explicitly classified.
+
+Screen-space and non-world draws are copied to both full-size eyes unchanged, which gives a zero-disparity HUD. A separate OpenXR HUD layer can be added later for comfort, but it is not required for true geometry stereo.
 
 ## Presentation modes
 
-The x86 renderer publishes the game's current state through the existing reserved
-IPC words without changing the 248-byte protocol-v1 ABI.
+The x86 renderer publishes the current presentation state through reserved protocol-v1 words.
 
-- **Gameplay**: active race render. The temporary mono mirror remains VIEW-space
-  while renderer-side head tracking changes the 3D camera.
-- **Theater**: menus, pause, goal, time-up, try-again and result states. The host
-  samples the HMD pose at theater entry and places the quad 1 metre in front of
-  that LOCAL-space anchor. Turning the head no longer makes the menu follow the
-  face like a cinema screen glued to the headset.
+- **Gameplay**: true stereo projection layer when a valid stereo SBS frame was produced.
+- **Theater**: menus, pause, goal, time-up, try-again, result and unknown/startup states. The host anchors a normal 2D quad in LOCAL space one metre in front of the viewer at theater entry.
+- **Fail-closed fallback**: if eye data, the right-eye draw, SBS composition or world-stereo verification fails, the host does not pretend the frame is stereo. It falls back to the theater presentation path.
 
-Unknown/startup states default to theater mode. This is deliberate: applying a
-head-tracked 3D camera to an unclassified menu is more disruptive than temporarily
-showing the normal screen on a fixed quad.
+## Build
 
-## Build the normal x86 Tweaks DLL
-
-From the repository root:
+### x86 game DLL
 
 ```powershell
 cmake -S . -B build -G "Visual Studio 17 2022" -A Win32
 cmake --build build --config Release
 ```
 
-The existing source glob includes `src/hooks_vr.cpp` and
-`src/vr_renderer_probe.cpp` automatically when the project is configured.
+The source glob includes `src/hooks_vr.cpp`, `src/vr_renderer_probe.cpp` and `src/vr_stereo.cpp` automatically.
 
-## Build the x64 OpenXR host
+### x64 OpenXR host
 
 ```powershell
 cmake -S vrhost -B build-vrhost -G "Visual Studio 17 2022" -A x64
 cmake --build build-vrhost --config Release
 ```
 
-`vrhost/CMakeLists.txt` fetches and pins Khronos OpenXR-SDK `release-1.1.63`.
-The resulting executable is `build-vrhost/bin/outrun-vr-host.exe`.
+The host pins Khronos OpenXR-SDK `release-1.1.63`. CI also builds and runs `outrun-vr-shader-smoke.exe`, which D3DCompiles the exact `VSMain` and `PSMain` embedded in the host.
 
-## First runtime validation
+## Recommended first Quest 3 validation
 
-1. Make Virtual Desktop's VDXR the active OpenXR runtime.
-2. Start `outrun-vr-host.exe`.
-3. Start OutRun 2006 with the `vr-openxr` build of `dinput8.dll`.
-4. Keep `VR -> PositionalTracking` disabled for the first test.
-5. Enter a race and turn your head.
-6. Press **F10** while looking straight ahead to recenter yaw.
-7. Pause and verify that the menu stays at a fixed location in the room rather
-   than following the headset.
-8. Turn +/-90 degrees while racing and check for missing buildings, roadside
-   objects, traffic and flares.
-9. Exit the game while the HMD/session is both active and inactive; the host
-   should release the OpenXR session in both cases.
+Use VDXR as the active OpenXR runtime. For the first run, leave positional tracking disabled and keep `[VR] Stereo = true`.
 
-The game log should contain these markers in order:
+Check these in this order:
+
+1. Enter a race and confirm head yaw/pitch/roll move the world in the correct direction.
+2. Press **F10** while looking straight ahead and confirm only yaw recenters.
+3. Confirm genuine depth separation: cockpit/nearby traffic should have visibly more disparity than the horizon.
+4. Confirm left/right are not swapped. Moving your head slightly right should produce natural parallax rather than inverted depth.
+5. Check HUD/text: it should appear at zero disparity and remain readable, not split into half-width layouts.
+6. Pause. The game should switch to a fixed LOCAL-space theater screen rather than keep the menu attached to your face.
+7. Turn the head roughly +/-90 degrees and look for missing buildings, roadside objects, traffic, billboards and flares.
+8. Check bright sky/white UI in Windows HDR for clipping or washed-out colors.
+9. Drive with the wheel and verify steering, pedals and FFB feel unchanged.
+10. Exit the game both while the HMD is active and after making the OpenXR session non-visible; the host should terminate cleanly.
+
+## Expected logs
+
+The game log should contain the following milestones:
 
 ```text
-VR: renderer-boundary head tracking configured; CalcCameraMatrix remains untouched
+VR: renderer-boundary head tracking + true stereo configured; CalcCameraMatrix remains untouched
 VR renderer: D3D9 hooks installed; frame-latched c64 WVP injection armed (vtbl 41/42/94)
 VR renderer inject: verified OutRun c64 = Transpose(WorldView*Proj)
 VR renderer inject: HEAD TRACKING ACTIVE after successful VS c64 upload
+VR stereo: D3D9 full-eye renderer installed (Reset/Present/RT/Depth/Clear/Draw*/VS)
+VR stereo: full-size eye surfaces ready ...
+VR stereo: TRUE GEOMETRY STEREO active; per-eye c64 + OpenXR asymmetric FOV confirmed
+VR stereo: SBS transport active; x64 host can submit XrCompositionLayerProjection
 ```
 
-If the renderer globals do not match the expected executable layout, or the c64
-upload does not match the expected WVP relationship, that draw is left untouched.
-If the OpenXR pose is older than 250 ms, no head transform is applied for that
-scene and the previous center is retained.
-
-## Runtime diagnostics
-
-With `[VR] Telemetry = true`, the game logs cumulative values approximately once
-every five seconds:
+The host should print:
 
 ```text
-beginScene
-c64Candidate
-verified
-prepared
-uploadOk
-uploadFail
-rejected
-unsafe
-latchedSeq
+OpenXR true stereo ready: projection ...x...x2; theater ...x...
+VR presentation: true stereo projection.
 ```
 
-Interpretation:
+If the first four renderer lines appear but `TRUE GEOMETRY STEREO` does not, the stereo classifier did not see a valid world draw. If `TRUE GEOMETRY STEREO` appears but `SBS transport active` does not, inspect right-eye draw or resolve/composition failure. If both appear but the host stays in theater mode, inspect the shared stereo-state publication/capture timing.
 
-- `verified`: the game's c64 upload really matched `Transpose(WorldView*Proj)`.
-- `prepared`: a finite head-corrected WVP was built.
-- `uploadOk`: the original D3D9 `SetVertexShaderConstantF` accepted that patched data.
-- `uploadFail`: a patched matrix was prepared but D3D9 rejected the upload.
-- `CAMERA APPLIED`: at least one patched c64 upload succeeded **and** the scene
-  completed successfully. A failed upload or failed `EndScene` cannot leave a
-  stale success flag behind.
+## Culling limitation
 
-The x64 host also prints rolling timings approximately every five seconds:
+The final WVP and the render-time live camera are both head-corrected, but it is still possible that some stage visibility decisions happen before D3D9 `BeginScene`. Runtime testing at large head angles is therefore still required. If geometry is missing, the fix belongs at the pre-scene queue/culling boundary; it should not be worked around by rendering the simulation twice.
 
-```text
-VR perf host-ms p95/p99: wait=... capture=... color-submit=... xrEnd=... shouldRenderSkipped=...
-```
+## Performance characteristics
 
-These isolate host-side desktop duplication/color conversion/OpenXR overhead.
-They do not by themselves identify CPU/GPU cost inside OutRun's D3D9 renderer.
+True stereo roughly doubles the backbuffer world/HUD draw cost and adds one final resolve/SBS composite. Offscreen passes remain single-pass. The x64 host then performs one desktop duplication copy, two eye crops/color conversions and one OpenXR projection submission.
 
-## Shared-memory ownership
+This is intentionally more conservative than replaying the entire renderer. The first performance investigation should separate:
 
-The IPC ABI remains protocol v1 and 248 bytes. Reserved words are deliberately
-partitioned between host and client.
+- OutRun D3D9 left/right draw cost,
+- SBS resolve/composition,
+- Desktop Duplication,
+- D3D11 color conversion/crop,
+- OpenXR wait/end-frame time.
 
-The process that actually creates the Windows file mapping initializes it. An
-attaching process never clears an existing mapping just because the protocol
-header has not been published yet. The creator writes protocol/size first and
-publishes `magic` last. The x64 writer also claims `hostPid` atomically; starting
-a second live host therefore fails instead of letting two OpenXR sessions write
-poses into the same mapping.
+No per-frame D3D11 `Flush()` is used.
 
-## True stereo implementation boundary
+## Shared-memory ownership and failure behavior
 
-The next renderer milestone is true geometry stereo. **Do not implement this by
-simply calling `SceneControl()` twice.** OutRun has renderer paths that consume and
-clear queued scene data, and replaying the whole scene-control function would also
-risk running game-side work twice.
+The mapping remains protocol v1 / 248 bytes. Stereo reuses reserved words for eye offsets and client stereo status; no ABI size change is required. The mapping creator initializes it and publishes `magic` last. The host claims `hostPid` atomically so two live hosts cannot write poses concurrently.
 
-The required model is:
+Pose/view samples older than 250 ms are rejected. Invalid eye FOV/offsets, unsafe executable addresses, non-finite matrices, failed D3D uploads and failed right-eye rendering all fail closed instead of leaving a stale success flag.
 
-```text
-one 60 Hz simulation/input/physics/FFB update
-                 |
-                 v
-       build one render-data snapshot
-                 |
-          +------+------+
-          |             |
-          v             v
-   left-eye render   right-eye render
-          |             |
-          +------+------+
-                 |
-             HUD/UI pass
-```
+## What CI proves and what it does not
 
-Rules for the stereo implementation:
+CI verifies both architectures, the exact HLSL, binary architecture/markers, the shared IPC ABI, the no-simulation-replay invariant, existing wheel/FFB source checks and production FFB math tests.
 
-1. **Input, physics, timers and native FFB execute once per game tick.** Eye
-   rendering must never call those systems a second time.
-2. Identify the point after scene data has been built but before the renderer
-   consumes/clears it. Both eyes must see the same snapshot.
-3. Preserve or replay only renderer-owned command/model data required for the
-   second eye. Do not rerun `SceneControl()` as a shortcut.
-4. Use each OpenXR eye's transported FOV to build a real asymmetric projection;
-   do not fake stereo by shifting the final mono image.
-5. Use per-eye view offsets/IPD in the same RH camera basis already confirmed for
-   OutRun and OpenXR.
-6. Keep HUD/menu drawing out of the per-eye world render where possible. Gameplay
-   HUD can then be submitted as its own comfortable quad/layer instead of living
-   at road depth.
-7. Transfer the resulting left/right D3D9 eye textures to the x64 host and submit
-   them as `XrCompositionLayerProjectionView` entries in one
-   `XrCompositionLayerProjection`.
-8. Retain the fixed LOCAL-space theater path for menus/pause/results.
-9. Keep the current mono mirror as a diagnostic fallback until projection-layer
-   stereo is proven stable on VDXR.
-10. Preserve the existing wheel/multi-device/FFB code and verify its production
-    math tests after every stereo milestone.
-
-The current renderer already transports per-eye FOV and recommended dimensions,
-so the stereo milestone must reuse those fields instead of inventing a second
-OpenXR view protocol.
+CI cannot prove Quest optics, stereo eye order, VDXR presentation timing, object culling at extreme head angles, or subjective FFB feel. Those are the remaining real-device acceptance tests.
