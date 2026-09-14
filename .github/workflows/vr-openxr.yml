@@ -47,13 +47,17 @@ jobs:
           foreach ($marker in @(
             'BeginSceneVtableIndex = 41','EndSceneVtableIndex = 42','HostPoseStaleMs = 250',
             'ImageContainsRange','VirtualQuery','ClientRendererWvpVerified','ClientRendererUploadFailed',
-            'YawOnly','frame-latched c64 WVP injection armed','GetLatchedStereoFrame','GetCurrentShaderEpoch',
-            'IsInternalStereoPassActive','InvalidateVerifiedWvp','StereoEyeOrientationValid',
-            'DecodePackedEyeOrientations','PackedEyeOrientationOffset',
-            'effectiveHeadPosition','delta.x * Settings::VRWorldScale',
-            'sample.eyeOffset[eye][0] * Settings::VRWorldScale')) {
+            'YawOnly','frame-latched c64 WVP injection armed','GetLatchedStereoFrame','GetRendererBaseProjection',
+            'GetCurrentShaderEpoch','IsInternalStereoPassActive','InvalidateVerifiedWvp','StereoEyeOrientationValid',
+            'DecodePackedEyeOrientations','PackedEyeOrientationOffset','effectiveHeadPosition',
+            'Frame.v1 positions are OpenXR LOCAL-space metres','eyeOffset is already head-local metres')) {
             if (-not $renderer.Contains($marker)) { throw "missing renderer safety marker: $marker" }
           }
+          $effectiveStart = $renderer.IndexOf('Frame.v1 positions are OpenXR LOCAL-space metres')
+          $effectiveEnd = if ($effectiveStart -ge 0) { $renderer.IndexOf('const float w =', $effectiveStart) } else { -1 }
+          if ($effectiveStart -lt 0 -or $effectiveEnd -lt 0) { throw 'effective pose block not found' }
+          $effectiveBlock = $renderer.Substring($effectiveStart, $effectiveEnd - $effectiveStart)
+          if ($effectiveBlock.Contains('* Settings::VRWorldScale')) { throw 'Frame.v1 OpenXR pose must remain in metres' }
 
           $stereo = Get-Content src/vr_stereo.cpp -Raw
           foreach ($marker in @(
@@ -62,10 +66,11 @@ jobs:
             'SetDepthStencilSurfaceVtableIndex = 39','StereoSbsActive','ProjectionFromFov',
             'BuildEyeConstants','GetVertexShaderConstantF','SetWvpOneRegisterAtATime','ComposeSbs',
             'RightEyeSurface','Simulation, input, timers, native FFB','GetLatchedStereoFrame',
-            'GetCurrentShaderEpoch','AnyAuxRenderTargetActive','GetViewport','SetViewport',
+            'GetRendererBaseProjection','GetCurrentShaderEpoch','AnyAuxRenderTargetActive','GetViewport','SetViewport',
             'PublishRenderFrame','SharedRenderFrameState','FrameStereoIncomplete',
-            'StereoFailureDepthUnsynchronized','RightDepthSynchronized','presentStart.QuadPart',
-            'D3DCLEAR_ZBUFFER) != 0 && count == 0')) {
+            'StereoFailureDepthUnsynchronized','StereoFailureRightStateFailed','StereoFailureRightWvpUploadFailed',
+            'StereoFailureRightDrawFailed','PoisonFrame(rightFailure)','RightDepthSynchronized','presentStart.QuadPart',
+            'D3DCLEAR_ZBUFFER) != 0 && count == 0','ClientStereoBackbufferWidthIndex')) {
             if (-not $stereo.Contains($marker)) { throw "missing stereo renderer marker: $marker" }
           }
           if ($stereo.Contains('ReadStereoSnapshot')) { throw 'stereo renderer must not resample shared pose per draw' }
@@ -89,6 +94,7 @@ jobs:
             'offsetof(SharedPoseState, reserved) == 184',
             'PackedEyeOrientationOffset = 48','PackedEyeOrientationBytes = 16',
             'recommendedWidth[2]','recommendedHeight[2]','runtimeName[64]',
+            'ClientStereoBackbufferWidthIndex = 14','ClientStereoBackbufferHeightIndex = 15',
             'static_assert(sizeof(SharedRenderFrameState) == 256)',
             'StereoViewsValid','StereoEyeOrientationValid','RenderFrameMemoryName',
             'SharedRenderFrameState','RenderFrameEffectivePoseValid','StereoFailureReason',
@@ -164,7 +170,7 @@ jobs:
             'StereoEyeOrientationValid','ToHeadLocalOrientation','StorePackedEyeOrientations',
             'PackedEyeOrientationOffset','recommendedImageRectWidth','RenderFrameReader','SharedRenderFrameState',
             'QpcAtOrAfter','BindCaptureOutput','CommitStereoSource','StereoGraceMs','HostTimings',
-            'pendingReferenceSpaceChangeTime')) {
+            'pendingReferenceSpaceChangeTime','lastStereoMatchMs = 0;','viewHistory.Clear();')) {
             if (-not $src.Contains($marker)) { throw "missing true-stereo host marker: $marker" }
           }
           if ($src.Contains('InitializeLegacyCaptureRemoved')) { throw 'duplicate legacy capture initializer returned' }
