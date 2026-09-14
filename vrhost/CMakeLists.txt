@@ -30,7 +30,10 @@ FetchContent_MakeAvailable(openxr_sdk)
 
 # Legacy runtime entrypoint. Runtime behavior is migrated behind the interfaces
 # under src/runtime and frame_source.hpp one ownership boundary at a time.
-add_executable(outrun-vr-host src/main.cpp)
+add_executable(outrun-vr-host
+    src/main.cpp
+    src/ipc/v3_shadow_bridge.cpp
+)
 target_include_directories(outrun-vr-host PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/../src"
     "${CMAKE_CURRENT_LIST_DIR}/src"
