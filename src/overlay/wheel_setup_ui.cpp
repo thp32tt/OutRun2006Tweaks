@@ -48,6 +48,9 @@ namespace Settings
     extern Setting<float> WheelFFBMechanicalTrail;
     extern Setting<float> WheelFFBTrailResponseLead;
     extern Setting<bool> WheelFFBPhysicsSat;
+    extern Setting<int> WheelFFBFeedbackCharacter;
+    extern Setting<float> WheelFFBXForceMix;
+    extern Setting<bool> WheelFFBXForceInvert;
     extern Setting<float> WheelFFBGripLoss;
     extern Setting<float> WheelFFBLateralDeadzone;
     extern Setting<float> WheelFFBWeightTransfer;
@@ -803,6 +806,9 @@ namespace
             bool valid = false;
             bool enable = true;
             bool physicsSat = true;
+            int feedbackCharacter = 0;
+            float xForceMix = 0.50f;
+            bool xForceInvert = false;
             bool hwSpring = true;
             bool hwDamper = true;
             bool periodic = true;
@@ -838,6 +844,9 @@ namespace
             savedFfb_.valid = true;
             savedFfb_.enable = Settings::WheelFFBEnable;
             savedFfb_.physicsSat = Settings::WheelFFBPhysicsSat;
+            savedFfb_.feedbackCharacter = Settings::WheelFFBFeedbackCharacter;
+            savedFfb_.xForceMix = Settings::WheelFFBXForceMix;
+            savedFfb_.xForceInvert = Settings::WheelFFBXForceInvert;
             savedFfb_.hwSpring = Settings::WheelFFBUseHardwareSpring;
             savedFfb_.hwDamper = Settings::WheelFFBUseHardwareDamper;
             savedFfb_.periodic = Settings::WheelFFBUsePeriodicEffects;
@@ -873,6 +882,9 @@ namespace
             if (!savedFfb_.valid) return;
             Settings::WheelFFBEnable = savedFfb_.enable;
             Settings::WheelFFBPhysicsSat = savedFfb_.physicsSat;
+            Settings::WheelFFBFeedbackCharacter = savedFfb_.feedbackCharacter;
+            Settings::WheelFFBXForceMix = savedFfb_.xForceMix;
+            Settings::WheelFFBXForceInvert = savedFfb_.xForceInvert;
             Settings::WheelFFBUseHardwareSpring = savedFfb_.hwSpring;
             Settings::WheelFFBUseHardwareDamper = savedFfb_.hwDamper;
             Settings::WheelFFBUsePeriodicEffects = savedFfb_.periodic;
@@ -1631,7 +1643,7 @@ namespace
             track_ffb_change(ImGui::Checkbox("Enable Force Feedback", Settings::WheelFFBEnable.ptr()));
             ImGui::TextDisabled("gameplay FFB follows the exact selected DirectInput GUID.");
             ImGui::TextWrapped(
-                "Single-owner wheel FFB: DirectInput COM only. field_264/268 are lateral load only; front slip drives a pneumatic + mechanical/caster SAT model, while body/front slip release damping. Centering Spring remains a low-speed stabilizer.");
+                "Single-owner wheel FFB: DirectInput COM only. v0.3 can keep the Modern DD front-slip SAT, test the game's actionforce_DBC as an X-Force candidate, or blend both. Centering Spring remains a low-speed stabilizer and every character shares the same DD safety/output path.");
             ImGui::TextDisabled("Settings > WheelFFB is hidden; changes on this page apply live. Gamepad rumble is suppressed only while DirectInput FFB owns an output device.");
 
             ImGui::SeparatorText("Physics / Structural");
@@ -1640,9 +1652,48 @@ namespace
                 ImGui::TextColored(ImVec4(1.0f, 0.65f, 0.25f, 1.0f),
                     "Above 100% trades force-detail contrast for extra weight.");
             track_ffb_change(ImGui::SliderFloat("Self-aligning Torque (SAT)", Settings::WheelFFBSteeringWeight.ptr(), 0.0f, 2.00f, "%.2f"));
-            track_ffb_change(ImGui::Checkbox("Physics SAT (body slip + yaw)", Settings::WheelFFBPhysicsSat.ptr()));
+
+            static constexpr const char* FeedbackCharacters[] = {
+                "Modern DD", "Arcade / X-Force candidate", "Hybrid"
+            };
+            int feedbackCharacter = std::clamp(int(Settings::WheelFFBFeedbackCharacter), 0, 2);
+            if (ImGui::BeginCombo("Feedback Character", FeedbackCharacters[feedbackCharacter]))
+            {
+                for (int character = 0; character < 3; ++character)
+                {
+                    const bool selected = character == feedbackCharacter;
+                    if (ImGui::Selectable(FeedbackCharacters[character], selected))
+                    {
+                        Settings::WheelFFBFeedbackCharacter = character;
+                        feedbackCharacter = character;
+                        track_ffb_change(true);
+                        WheelFFB_RequestSettingsTransition();
+                    }
+                    if (selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+
+            if (feedbackCharacter == 0)
+                ImGui::TextDisabled("Modern DD: v0.2 front-slip / pneumatic + mechanical-trail SAT behavior.");
+            else if (feedbackCharacter == 1)
+                ImGui::TextDisabled("Arcade: guarded actionforce_DBC candidate drives SAT; invalid/dead samples fall back to Modern SAT.");
+            else
+            {
+                ImGui::TextDisabled("Hybrid: blends the guarded actionforce_DBC candidate with Modern SAT.");
+                track_ffb_change(ImGui::SliderFloat("X-Force Mix", Settings::WheelFFBXForceMix.ptr(), 0.0f, 1.0f, "%.2f"));
+            }
+            if (feedbackCharacter != 0)
+                ImGui::TextColored(ImVec4(1.0f, 0.75f, 0.25f, 1.0f),
+                    "Experimental: actionforce_DBC is a strong X-Force candidate, not yet proven. Enable telemetry before judging the native signal.");
+
+            const char* physicsSatLabel = feedbackCharacter == 0
+                ? "Physics SAT (body slip + yaw)"
+                : "Modern fallback uses Physics SAT";
+            track_ffb_change(ImGui::Checkbox(physicsSatLabel, Settings::WheelFFBPhysicsSat.ptr()));
             if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Uses post-physics OutRun car motion/body heading to estimate front slip. Disable for the Natural SAT comparison.");
+                ImGui::SetTooltip("Uses post-physics OutRun car motion/body heading to estimate front slip. In Arcade/Hybrid this is also the safe fallback when the X-Force candidate is invalid.");
             if (Settings::WheelFFBPhysicsSat)
             {
                 track_ffb_change(ImGui::SliderFloat("Mechanical / Caster Trail", Settings::WheelFFBMechanicalTrail.ptr(), 0.0f, 0.60f, "%.2f"));
@@ -1688,6 +1739,16 @@ namespace
                 ImGui::TextDisabled("Approx full-scale ramp: build %.0f ms | stale reversal release %.0f ms at 60 Hz.",
                     (1.0f / buildRate) * (1000.0f / 60.0f),
                     (1.0f / reversalRate) * (1000.0f / 60.0f));
+                const int advancedFeedbackCharacter = std::clamp(int(Settings::WheelFFBFeedbackCharacter), 0, 2);
+                if (advancedFeedbackCharacter != 0)
+                {
+                    ImGui::SeparatorText("Native X-Force candidate");
+                    track_ffb_change(ImGui::Checkbox("Reverse X-Force candidate only", Settings::WheelFFBXForceInvert.ptr()));
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Use this only if Arcade/Hybrid steering force is reversed relative to Modern DD. Global Reverse SAT / ConstantForce still applies after the mix.");
+                    if (advancedFeedbackCharacter != 2)
+                        track_ffb_change(ImGui::SliderFloat("X-Force Mix (used by Hybrid)", Settings::WheelFFBXForceMix.ptr(), 0.0f, 1.0f, "%.2f"));
+                }
                 if (Settings::WheelFFBPhysicsSat)
                 {
                     ImGui::SeparatorText("Physics SAT transient");
@@ -1819,6 +1880,9 @@ namespace
             {
                 Settings::WheelFFBEnable = true;
                 Settings::WheelFFBPhysicsSat = true;
+                Settings::WheelFFBFeedbackCharacter = 0;
+                Settings::WheelFFBXForceMix = 0.50f;
+                Settings::WheelFFBXForceInvert = false;
                 Settings::WheelFFBGlobalStrength = 0.70f;
                 Settings::WheelFFBSpringStrength = 0.65f;
                 Settings::WheelFFBSpringSaturation = 0.95f;
@@ -1858,6 +1922,9 @@ namespace
             if (ImGui::Button("Load MOZA R3 Natural SAT"))
             {
                 Settings::WheelFFBPhysicsSat = false;
+                Settings::WheelFFBFeedbackCharacter = 0;
+                Settings::WheelFFBXForceMix = 0.50f;
+                Settings::WheelFFBXForceInvert = false;
                 Settings::WheelFFBEnable = true;
                 Settings::WheelFFBGlobalStrength = 0.70f;
                 Settings::WheelFFBSpringStrength = 0.65f;

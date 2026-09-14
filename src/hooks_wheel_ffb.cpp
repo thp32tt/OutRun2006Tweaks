@@ -121,6 +121,27 @@ namespace Settings
         "Experimental body-slip/yaw SAT instead of steering-centre direction alone."
     };
 
+    // v0.3 steering-character experiment. Modern preserves the v0.2 model exactly;
+    // Arcade/Hybrid can consume the game's actionforce_DBC field only after
+    // conservative plausibility checks. Until that field is proven to be Howard
+    // Castro's X-Force, it is deliberately treated as a candidate signal.
+    Setting<int> WheelFFBFeedbackCharacter{
+        "WheelFFB", "FeedbackCharacter", 0,
+        "Steering-force character: 0=Modern DD, 1=Arcade X-Force candidate, 2=Hybrid.",
+        Range<int>{ 0, 2 }
+    };
+
+    Setting<float> WheelFFBXForceMix{
+        "WheelFFB", "XForceMix", 0.50f,
+        "Hybrid share of the guarded native X-Force candidate. 0=Modern SAT, 1=native candidate.",
+        Range<float>{ 0.0f, 1.0f }
+    };
+
+    Setting<bool> WheelFFBXForceInvert{
+        "WheelFFB", "XForceInvert", false,
+        "Reverse only the native X-Force candidate before it is mixed with Modern SAT."
+    };
+
     Setting<float> WheelFFBGripLoss{
         "WheelFFB", "GripLoss", 0.65f,
         "How strongly real chassis/front-slip signals release damping and unload SAT. Lateral G is load only, never a drift detector.", Range<float>{ 0.0f, 1.0f }
@@ -947,9 +968,69 @@ namespace
             // Dropping it on the calibration tick created a short SAT hole while
             // physicsMix was still near zero.
             const float physicsFallback = naturalSatTorque;
-            const float selfAligningTorque = Settings::WheelFFBPhysicsSat
+            const float modernSelfAligningTorque = Settings::WheelFFBPhysicsSat
                 ? physicsFallback + (physicsSatTorque - physicsFallback) * physicsMix
                 : naturalSatTorque;
+
+            // v0.3 native steering-force experiment. Howard Castro described an
+            // internal OutRun steering-force value with a nominal low-speed span
+            // around +/-62. actionforce_DBC is a promising existing EVWORK_CAR
+            // field, but it is not yet proven to be that exact value. Therefore:
+            //   * Modern DD never consumes it.
+            //   * Arcade/Hybrid accept it only inside a conservative finite/range
+            //     envelope and require a non-trivial response while steering.
+            //   * any suspicious or apparently dead signal falls back to the
+            //     already-proven Modern SAT for that tick.
+            //   * all modes still pass through the common DD slew, soft limiter,
+            //     focus watchdog and DirectInput safety path below.
+            constexpr float XForceNominalFullScale = 62.0f;
+            constexpr float XForceAbsoluteSafetyLimit = 128.0f;
+            constexpr float XForceNoiseFloor = 0.20f;
+            const float xForceRaw = car->actionforce_DBC;
+            const bool xForceFinite = std::isfinite(xForceRaw);
+            const bool xForceRangeValid =
+                xForceFinite && std::abs(xForceRaw) <= XForceAbsoluteSafetyLimit;
+            const bool xForceResponsive =
+                std::abs(xForceRaw) >= 0.05f || steerAbs < 0.05f || speedNorm < 0.04f;
+            const bool xForceValid = xForceRangeValid && xForceResponsive;
+
+            float xForceNormalized = 0.0f;
+            if (xForceValid)
+            {
+                const float magnitude = std::max(0.0f, std::abs(xForceRaw) - XForceNoiseFloor);
+                const float normalizedMagnitude = std::clamp(
+                    magnitude / (XForceNominalFullScale - XForceNoiseFloor),
+                    0.0f, 1.0f);
+                xForceNormalized = std::copysign(normalizedMagnitude, xForceRaw);
+                if (Settings::WheelFFBXForceInvert)
+                    xForceNormalized = -xForceNormalized;
+            }
+
+            // Keep the original low-speed character but protect a modern DD base
+            // from the candidate signal's historically large parking-speed force.
+            // Above the launch/parking region the native magnitude is left intact.
+            const float xForceLowSpeedT = std::clamp(
+                (speedNorm - 0.015f) / 0.12f, 0.0f, 1.0f);
+            const float xForceLowSpeedSmooth =
+                xForceLowSpeedT * xForceLowSpeedT * (3.0f - 2.0f * xForceLowSpeedT);
+            const float xForceLowSpeedGuard = 0.30f + 0.70f * xForceLowSpeedSmooth;
+            const float nativeXForceTorque =
+                xForceNormalized * xForceLowSpeedGuard * satStrength;
+
+            const int feedbackCharacter = std::clamp(
+                static_cast<int>(Settings::WheelFFBFeedbackCharacter), 0, 2);
+            const float configuredXForceMix =
+                static_cast<float>(Settings::WheelFFBXForceMix);
+            const float xForceMix = std::isfinite(configuredXForceMix)
+                ? std::clamp(configuredXForceMix, 0.0f, 1.0f)
+                : 0.50f;
+
+            float selfAligningTorque = modernSelfAligningTorque;
+            if (xForceValid && feedbackCharacter == 1)
+                selfAligningTorque = nativeXForceTorque;
+            else if (xForceValid && feedbackCharacter == 2)
+                selfAligningTorque = modernSelfAligningTorque +
+                    (nativeXForceTorque - modernSelfAligningTorque) * xForceMix;
 
             float loadMod = 1.0f;
             if (speedHistoryIndex_ > 6)
@@ -1166,6 +1247,11 @@ namespace
                     constantEffectPolar_, springEffect_ != nullptr, damperEffect_ != nullptr,
                     periodicsActive_, outputStrength, bool(Settings::WheelFFBInvertForce),
                     bool(Settings::WheelFFBInvertSpring));
+                spdlog::info(
+                    "WheelFFB XFORCE t={} character={} raw={} finite={} valid={} normalized={} nativeTorque={} modernTorque={} finalSat={} mix={} candidateInvert={}",
+                    telemetryNow, feedbackCharacter, xForceRaw, xForceFinite, xForceValid,
+                    xForceNormalized, nativeXForceTorque, modernSelfAligningTorque,
+                    selfAligningTorque, xForceMix, bool(Settings::WheelFFBXForceInvert));
                 spdlog::info(
                     "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} rawFrontSlip={} frontSlip={} frontBlend={} trailResponseSlip={} trailResponseLead={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} diPreResponse={} diCorrected={} responseCorrection={}",
                     telemetryNow,
