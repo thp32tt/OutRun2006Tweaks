@@ -910,6 +910,15 @@ namespace OutRunVRRenderer
 			return vector4fCount >= offset + OutRunWvpRegisterCount;
 		}
 
+		bool UploadTouchesOutRunWvp(UINT startRegister, UINT vector4fCount)
+		{
+			if (vector4fCount == 0 || vector4fCount > 256) return false;
+			const std::uint64_t first = startRegister;
+			const std::uint64_t lastExclusive = first + vector4fCount;
+			return first < OutRunWvpRegister + OutRunWvpRegisterCount &&
+				lastExclusive > OutRunWvpRegister;
+		}
+
 		bool TryPrepareOutRunWvp(
 			UINT startRegister, const float* constantData, UINT vector4fCount,
 			float* patchedData)
@@ -1064,17 +1073,26 @@ namespace OutRunVRRenderer
 		HRESULT __stdcall SetVertexShaderConstantFDest(
 			IDirect3DDevice9* device, UINT startRegister, const float* constantData, UINT vector4fCount)
 		{
-			if (!IsGameDevice(device) || !constantData ||
-				!UploadContainsOutRunWvp(startRegister, vector4fCount))
+			if (!IsGameDevice(device) || !constantData || OutRunVRStereo::IsInternalStereoPassActive())
+			{
+				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
+					device, startRegister, constantData, vector4fCount);
+			}
+			if (!UploadTouchesOutRunWvp(startRegister, vector4fCount))
 			{
 				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
 					device, startRegister, constantData, vector4fCount);
 			}
 
-			// Any game c64..c67 upload supersedes the previous world marker. Only an
-			// independently verified and successfully uploaded OutRun WVP below can
-			// arm stereo geometry again.
+			// Any GAME write touching c64..c67 supersedes the previous marker, even
+			// if it updates only one register. Stereo's own per-register writes are
+			// protected by InternalStereoPass above and must not disarm the marker.
 			InvalidateVerifiedWvp();
+			if (!UploadContainsOutRunWvp(startRegister, vector4fCount))
+			{
+				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
+					device, startRegister, constantData, vector4fCount);
+			}
 
 			float patchedData[256 * 4];
 			const bool prepared = TryPrepareOutRunWvp(
