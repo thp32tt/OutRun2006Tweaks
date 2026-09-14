@@ -119,6 +119,7 @@ namespace OutRunVRRenderer
 		std::uint32_t FrameTelemetryFlags = ClientHookAlive;
 		float LatchedRelativeAngleDeg = 0.0f;
 		std::uint32_t LatchedPoseSequence = 0;
+		bool PresentPoseLocked = false;
 
 		float LastVerifiedWvp[16]{};
 		bool LastVerifiedWvpValid = false;
@@ -143,6 +144,7 @@ namespace OutRunVRRenderer
 		std::uint64_t WvpUploadFailedCalls = 0;
 		std::uint64_t WvpRejectedCalls = 0;
 		std::uint64_t UnsafeAddressRejects = 0;
+		std::uint64_t ReusedPoseSceneCalls = 0;
 		bool FirstVerifiedLogged = false;
 		bool FirstInjectedLogged = false;
 		bool FirstRejectedLogged = false;
@@ -764,7 +766,6 @@ namespace OutRunVRRenderer
 
 		void LatchFramePose()
 		{
-			++BeginSceneCalls;
 			ResetFrameState();
 			RestoreCullingCamera();
 
@@ -902,6 +903,20 @@ namespace OutRunVRRenderer
 				ApplyCullingCameraSync();
 		}
 
+		void ReusePresentPoseForScene()
+		{
+			// Additional BeginScene calls before the same Present reuse the exact
+			// pose chosen by the first scene. Only scene-local WVP classification
+			// state is reset. This prevents mixed-pose geometry in one desktop frame.
+			++ReusedPoseSceneCalls;
+			InvalidateVerifiedWvp();
+			RestoreCullingCamera();
+			FrameTelemetryFlags = ClientHookAlive;
+			if (LatchedPoseSequence != 0) FrameTelemetryFlags |= ClientHostPoseValid;
+			if (Settings::VRAutoEnableWhenHostPresent) FrameTelemetryFlags |= ClientAutoEnabled;
+			if (LatchedHeadInverseValid) ApplyCullingCameraSync();
+		}
+
 		bool UploadContainsOutRunWvp(UINT startRegister, UINT vector4fCount)
 		{
 			if (vector4fCount == 0 || vector4fCount > 256 || startRegister > OutRunWvpRegister)
@@ -1024,10 +1039,10 @@ namespace OutRunVRRenderer
 				return;
 			LastSummaryMs = now;
 			spdlog::info(
-				"VR renderer: beginScene={} c64Candidate={} verified={} prepared={} uploadOk={} uploadFail={} rejected={} unsafe={} latchedSeq={} wvpGen={}",
-				BeginSceneCalls, WvpCandidateCalls, WvpVerifiedCalls, WvpPreparedCalls,
+				"VR renderer: beginScene={} poseReuse={} c64Candidate={} verified={} prepared={} uploadOk={} uploadFail={} rejected={} unsafe={} latchedSeq={} wvpGen={} presentPoseLocked={}",
+				BeginSceneCalls, ReusedPoseSceneCalls, WvpCandidateCalls, WvpVerifiedCalls, WvpPreparedCalls,
 				WvpUploadSucceededCalls, WvpUploadFailedCalls, WvpRejectedCalls,
-				UnsafeAddressRejects, LatchedPoseSequence, LastVerifiedWvpGeneration);
+				UnsafeAddressRejects, LatchedPoseSequence, LastVerifiedWvpGeneration, PresentPoseLocked ? 1 : 0);
 		}
 
 		HRESULT __stdcall BeginSceneDest(IDirect3DDevice9* device)
@@ -1036,9 +1051,21 @@ namespace OutRunVRRenderer
 			if (!IsGameDevice(device) || OutRunVRStereo::IsInternalStereoPassActive())
 				return result;
 			if (SUCCEEDED(result))
-				LatchFramePose();
+			{
+				++BeginSceneCalls;
+				if (!PresentPoseLocked)
+				{
+					LatchFramePose();
+					PresentPoseLocked = GameRendererIsActive();
+				}
+				else
+					ReusePresentPoseForScene();
+			}
 			else
+			{
+				PresentPoseLocked = false;
 				ResetFrameState();
+			}
 			return result;
 		}
 
@@ -1188,6 +1215,20 @@ namespace OutRunVRRenderer
 	std::uint64_t GetBeginSceneCallCount()
 	{
 		return BeginSceneCalls;
+	}
+
+	void NotifyGamePresent()
+	{
+		PresentPoseLocked = false;
+		InvalidateVerifiedWvp();
+		RestoreCullingCamera();
+	}
+
+	void NotifyGameReset()
+	{
+		PresentPoseLocked = false;
+		RestoreCullingCamera();
+		ResetFrameState();
 	}
 
 	bool GetRendererBaseProjection(float outMatrix[16])

@@ -108,6 +108,8 @@ namespace OutRunVR
         StereoFailureClearFailed = 16,
         StereoFailureWorldClassificationFailed = 17,
         StereoFailureStencilUnsynchronized = 18,
+        StereoFailureOffscreenWorld = 19,
+        StereoFailureOcclusionQueryActive = 20,
     };
 
 #pragma pack(push, 4)
@@ -249,6 +251,8 @@ namespace OutRunVRRenderer
         std::uint32_t& poseSequence, std::uintptr_t& shaderIdentity,
         std::uint64_t& shaderSerial);
     std::uint64_t GetBeginSceneCallCount();
+    void NotifyGamePresent();
+    void NotifyGameReset();
 }
 
 namespace OutRunVRStereo

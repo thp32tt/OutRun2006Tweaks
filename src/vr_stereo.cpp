@@ -63,6 +63,8 @@ namespace OutRunVRStereo
 		constexpr std::size_t DrawPrimitiveUPVtableIndex = 83;
 		constexpr std::size_t DrawIndexedPrimitiveUPVtableIndex = 84;
 		constexpr std::size_t SetVertexShaderVtableIndex = 92;
+		constexpr std::size_t CreateQueryVtableIndex = 118;
+		constexpr std::size_t QueryIssueVtableIndex = 6;
 		constexpr UINT OutRunWvpRegister = 64;
 		constexpr UINT OutRunWvpRegisterCount = 4;
 		constexpr std::uintptr_t OutRunProjectionRva = 0x0095D8A0u - 0x00400000u;
@@ -78,6 +80,8 @@ namespace OutRunVRStereo
 		SafetyHookInline DrawPrimitiveUPHook{};
 		SafetyHookInline DrawIndexedPrimitiveUPHook{};
 		SafetyHookInline SetVertexShaderHook{};
+		SafetyHookInline CreateQueryHook{};
+		SafetyHookInline QueryIssueHook{};
 
 		HANDLE SharedMapping = nullptr;
 		OutRunVR::SharedPoseState* SharedState = nullptr;
@@ -101,6 +105,7 @@ namespace OutRunVRStereo
 
 		std::atomic<std::uintptr_t> CurrentVertexShaderIdentity{ 0 };
 		std::atomic<std::uint64_t> VertexShaderSerial{ 0 };
+		std::atomic<int> ActiveOcclusionQueries{ 0 };
 
 		D3DMATRIX CachedProjection{};
 		D3DMATRIX CachedInverseProjection{};
@@ -133,6 +138,11 @@ namespace OutRunVRStereo
 		std::uint64_t MultiBeginScenePresents = 0;
 		std::uint64_t MaxBeginScenesPerPresent = 0;
 		std::uint64_t LastBeginSceneCountAtPresent = 0;
+		std::uint64_t FixedFunctionNonWorldDraws = 0;
+		std::uint64_t OcclusionQueriesCreated = 0;
+		std::uint64_t OcclusionQueryBegins = 0;
+		std::uint64_t OcclusionQueryEnds = 0;
+		std::uint64_t OcclusionStereoRejects = 0;
 		std::array<std::uint64_t, 32> FailureCounts{};
 		bool FirstStereoActiveLogged = false;
 		bool FirstWorldStereoLogged = false;
@@ -140,6 +150,7 @@ namespace OutRunVRStereo
 		bool FirstMrtRejectLogged = false;
 		bool FirstOffscreenWorldLogged = false;
 		bool FirstClassificationFailureLogged = false;
+		bool FirstOcclusionRejectLogged = false;
 
 		template <typename T>
 		void ReleaseCom(T*& value)
@@ -495,10 +506,15 @@ namespace OutRunVRStereo
 				verifiedPoseSequence, verifiedShaderIdentity, verifiedShaderSerial))
 				return EyeBuildResult::NonWorld;
 
+			if (CurrentVertexShaderIdentity.load(std::memory_order_acquire) == 0)
+			{
+				++FixedFunctionNonWorldDraws;
+				return EyeBuildResult::NonWorld;
+			}
 			std::uintptr_t shaderIdentity = 0;
 			std::uint64_t shaderSerial = 0;
 			if (!GetCurrentShaderEpoch(shaderIdentity, shaderSerial))
-				return EyeBuildResult::NonWorld;
+				return EyeBuildResult::FatalError;
 			if (verifiedShaderIdentity != shaderIdentity || verifiedShaderSerial != shaderSerial)
 				return EyeBuildResult::NonWorld;
 			if (verifiedGeneration == 0 || verifiedPoseSequence != stereo.poseSequence)
@@ -1022,6 +1038,7 @@ namespace OutRunVRStereo
 		{
 			if (InternalStereoPass || !StereoWanted() || !TargetIsBackBuffer()) return false;
 			if (AnyAuxRenderTargetActive()){PoisonFrame(OutRunVR::StereoFailureMrtActive);++MrtRejectedDraws;if(!FirstMrtRejectLogged){FirstMrtRejectLogged=true;spdlog::info("VR stereo: auxiliary MRT active; current Present is marked incomplete");}return false;}
+			if (ActiveOcclusionQueries.load(std::memory_order_acquire) > 0){++OcclusionStereoRejects;PoisonFrame(OutRunVR::StereoFailureOcclusionQueryActive);if(!FirstOcclusionRejectLogged){FirstOcclusionRejectLogged=true;spdlog::warn("VR stereo: active D3D9 occlusion query detected; right-eye draw suppressed so the game query remains single-render accurate");}return false;}
 			if(!EnsureStereoResources(device)){PoisonFrame(OutRunVR::StereoFailureResourceUnavailable);return false;}
 			if(TrackedDepthStencil&&!RightDepthSynchronized&&DepthTestActive(device)){PoisonFrame(OutRunVR::StereoFailureDepthUnsynchronized);return false;}
 			if(TrackedDepthStencil&&!RightStencilSynchronized&&StencilTestActive(device)){PoisonFrame(OutRunVR::StereoFailureStencilUnsynchronized);return false;}
@@ -1042,10 +1059,17 @@ namespace OutRunVRStereo
 				if (CurrentDrawMatchesVerifiedWorld(device))
 				{
 					++OffscreenVerifiedWorldDraws;
+					PoisonFrame(OutRunVR::StereoFailureOffscreenWorld);
 					if (!FirstOffscreenWorldLogged)
 					{
 						FirstOffscreenWorldLogged = true;
-						spdlog::warn("VR stereo: verified world geometry rendered to an offscreen RT; pass remains single-eye and is telemetry-only until its role is identified");
+						D3DSURFACE_DESC rtDesc{}, depthDesc{};
+						const bool rtOk = TrackedRenderTarget && SUCCEEDED(TrackedRenderTarget->GetDesc(&rtDesc));
+						const bool depthOk = TrackedDepthStencil && SUCCEEDED(TrackedDepthStencil->GetDesc(&depthDesc));
+						spdlog::warn("VR stereo: VERIFIED WORLD draw hit offscreen RT; Present forced to fallback. rt={}x{} fmt={} msaa={} depthFmt={} depthMsaa={}",
+							rtOk ? rtDesc.Width : 0u, rtOk ? rtDesc.Height : 0u, rtOk ? static_cast<int>(rtDesc.Format) : -1,
+							rtOk ? static_cast<int>(rtDesc.MultiSampleType) : -1, depthOk ? static_cast<int>(depthDesc.Format) : -1,
+							depthOk ? static_cast<int>(depthDesc.MultiSampleType) : -1);
 					}
 				}
 				InvalidateRightDepthStencilIfLeftMayWrite(device);
@@ -1216,6 +1240,44 @@ namespace OutRunVRStereo
 			return hr;
 		}
 
+		HRESULT __stdcall QueryIssueDest(IDirect3DQuery9* query, DWORD issueFlags)
+		{
+			const HRESULT hr = QueryIssueHook.stdcall<HRESULT>(query, issueFlags);
+			if (FAILED(hr) || !query || query->GetType() != D3DQUERYTYPE_OCCLUSION) return hr;
+			IDirect3DDevice9* queryDevice = nullptr;
+			if (FAILED(query->GetDevice(&queryDevice)) || !queryDevice) return hr;
+			const bool gameQuery = IsGameDevice(queryDevice);
+			queryDevice->Release();
+			if (!gameQuery) return hr;
+			if ((issueFlags & D3DISSUE_BEGIN) != 0)
+			{
+				ActiveOcclusionQueries.fetch_add(1, std::memory_order_acq_rel);
+				++OcclusionQueryBegins;
+			}
+			if ((issueFlags & D3DISSUE_END) != 0)
+			{
+				int current = ActiveOcclusionQueries.load(std::memory_order_acquire);
+				while (current > 0 && !ActiveOcclusionQueries.compare_exchange_weak(current, current - 1, std::memory_order_acq_rel, std::memory_order_acquire)) {}
+				++OcclusionQueryEnds;
+			}
+			return hr;
+		}
+
+		HRESULT __stdcall CreateQueryDest(IDirect3DDevice9* device, D3DQUERYTYPE type, IDirect3DQuery9** query)
+		{
+			const HRESULT hr = CreateQueryHook.stdcall<HRESULT>(device, type, query);
+			if (!IsGameDevice(device) || FAILED(hr) || type != D3DQUERYTYPE_OCCLUSION || !query || !*query) return hr;
+			++OcclusionQueriesCreated;
+			if (!QueryIssueHook)
+			{
+				void** queryVtable = *reinterpret_cast<void***>(*query);
+				if (queryVtable) QueryIssueHook = safetyhook::create_inline(queryVtable[QueryIssueVtableIndex], QueryIssueDest);
+				if (QueryIssueHook) spdlog::info("VR stereo: occlusion-query Issue hook armed; active queries fail closed instead of counting the right-eye duplicate");
+				else spdlog::warn("VR stereo: failed to hook IDirect3DQuery9::Issue; query protection unavailable");
+			}
+			return hr;
+		}
+
 		HRESULT __stdcall SetVertexShaderDest(IDirect3DDevice9* device, IDirect3DVertexShader9* shader)
 		{
 			const HRESULT hr = SetVertexShaderHook.stdcall<HRESULT>(device, shader);
@@ -1234,11 +1296,12 @@ namespace OutRunVRStereo
 			if (now - LastSummaryMs < 5000)
 				return;
 			LastSummaryMs = now;
-			spdlog::info("VR stereo: draws={} world={} ui/effect={} offscreenWorld={} classifyFail={} composeOk={} composeFail={} rightFail={} mrtReject={} restoreFail={} poseMismatchFrames={} multiBeginPresent={} maxBeginPerPresent={} poseSeq={} failures[pose={},res={},mrt={},viewport={},classify={},depth={},stencil={},clear={},rightState={},rightWvp={},rightDraw={},restore={},compose={},present={},depthState={},poseMismatch={}]",
-				DuplicatedDraws, WorldStereoDraws, NonWorldDuplicatedDraws, OffscreenVerifiedWorldDraws,
+			spdlog::info("VR stereo: draws={} world={} ui/effect={} fixedFn={} offscreenWorld={} classifyFail={} composeOk={} composeFail={} rightFail={} mrtReject={} restoreFail={} poseMismatchFrames={} multiBeginPresent={} maxBeginPerPresent={} poseSeq={} occ[created={},begin={},end={},active={},reject={}] failures[pose={},res={},mrt={},viewport={},classify={},depth={},stencil={},clear={},rightState={},rightWvp={},rightDraw={},restore={},compose={},present={},depthState={},poseMismatch={},offscreen={},occlusion={}]",
+				DuplicatedDraws, WorldStereoDraws, NonWorldDuplicatedDraws, FixedFunctionNonWorldDraws, OffscreenVerifiedWorldDraws,
 				WorldClassificationFailures, StereoComposeSuccess, StereoComposeFailure, FrameRightDrawFailed ? 1 : 0,
 				MrtRejectedDraws, RestoreFailures, PoseSequenceMismatchFrames, MultiBeginScenePresents,
 				MaxBeginScenesPerPresent, FrameStereoPoseSequence,
+				OcclusionQueriesCreated, OcclusionQueryBegins, OcclusionQueryEnds, ActiveOcclusionQueries.load(std::memory_order_acquire), OcclusionStereoRejects,
 				FailureCounts[OutRunVR::StereoFailureMissingLatchedPose], FailureCounts[OutRunVR::StereoFailureResourceUnavailable],
 				FailureCounts[OutRunVR::StereoFailureMrtActive], FailureCounts[OutRunVR::StereoFailureViewportUnavailable],
 				FailureCounts[OutRunVR::StereoFailureWorldClassificationFailed], FailureCounts[OutRunVR::StereoFailureDepthUnsynchronized],
@@ -1246,7 +1309,8 @@ namespace OutRunVRStereo
 				FailureCounts[OutRunVR::StereoFailureRightStateFailed], FailureCounts[OutRunVR::StereoFailureRightWvpUploadFailed],
 				FailureCounts[OutRunVR::StereoFailureRightDrawFailed], FailureCounts[OutRunVR::StereoFailureRestoreFailed],
 				FailureCounts[OutRunVR::StereoFailureComposeFailed], FailureCounts[OutRunVR::StereoFailurePresentFailed],
-				FailureCounts[OutRunVR::StereoFailureDepthStateChanged], FailureCounts[OutRunVR::StereoFailurePoseSequenceMismatch]);
+				FailureCounts[OutRunVR::StereoFailureDepthStateChanged], FailureCounts[OutRunVR::StereoFailurePoseSequenceMismatch],
+				FailureCounts[OutRunVR::StereoFailureOffscreenWorld], FailureCounts[OutRunVR::StereoFailureOcclusionQueryActive]);
 		}
 
 		HRESULT __stdcall PresentDest(IDirect3DDevice9* device,const RECT* sourceRect,const RECT* destRect,HWND destWindowOverride,const RGNDATA* dirtyRegion)
@@ -1254,8 +1318,9 @@ namespace OutRunVRStereo
 			if(!IsGameDevice(device))return PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);const std::uint64_t beginNow=OutRunVRRenderer::GetBeginSceneCallCount();const std::uint64_t beginDelta=beginNow>=LastBeginSceneCountAtPresent?beginNow-LastBeginSceneCountAtPresent:0;LastBeginSceneCountAtPresent=beginNow;if(GameplayActive()){if(beginDelta>1)++MultiBeginScenePresents;MaxBeginScenesPerPresent=std::max(MaxBeginScenesPerPresent,beginDelta);}const bool stereoRequested=StereoWanted();bool composedStereo=false;std::uint32_t pendingPoseSequence=0;
 			if(stereoRequested&&FrameHadWorldStereo&&FrameHadDuplicatedDraw&&!FrameRightDrawFailed&&!FrameStereoIncomplete&&FrameStereoPoseSequence&&FrameStereoMetadata.valid&&EnsureStereoResources(device)){if(ComposeSbs(device)){++StereoComposeSuccess;composedStereo=true;pendingPoseSequence=FrameStereoPoseSequence;}else{++StereoComposeFailure;PoisonFrame(OutRunVR::StereoFailureComposeFailed);}}
 			MaybeLogSummary();LARGE_INTEGER presentStart{};QueryPerformanceCounter(&presentStart);const std::uint32_t pendingFrameId=stereoRequested?NextStereoFrameId():0;if(stereoRequested)PublishRenderFrame(OutRunVR::StereoSbsFallbackMono,pendingFrameId,pendingPoseSequence,presentStart.QuadPart,OutRunVR::StereoFailureNone,nullptr,true);const HRESULT hr=PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);
-			if(composedStereo&&SUCCEEDED(hr)&&!FrameStereoIncomplete){PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,pendingFrameId);PublishRenderFrame(OutRunVR::StereoSbsActive,pendingFrameId,pendingPoseSequence,presentStart.QuadPart,OutRunVR::StereoFailureNone,&FrameStereoMetadata);if(!FirstStereoActiveLogged){FirstStereoActiveLogged=true;spdlog::info("VR stereo: SBS transport active; two-phase Present commit + effective eye pose published in Frame.v1");}}
+			if(composedStereo&&SUCCEEDED(hr)&&!FrameStereoIncomplete){PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,pendingFrameId);PublishRenderFrame(OutRunVR::StereoSbsActive,pendingFrameId,pendingPoseSequence,presentStart.QuadPart,OutRunVR::StereoFailureNone,&FrameStereoMetadata);if(!FirstStereoActiveLogged){FirstStereoActiveLogged=true;spdlog::info("VR stereo: TRUE STEREO active; PC backbuffer is SBS transport {}x{} from the two eye renders; no third scene render", BackBufferDesc.Width, BackBufferDesc.Height);}}
 			else{if(FAILED(hr)&&FrameFailureReason==OutRunVR::StereoFailureNone)PoisonFrame(OutRunVR::StereoFailurePresentFailed);const std::uint32_t fallback=stereoRequested?OutRunVR::StereoSbsFallbackMono:OutRunVR::StereoDisabled;PublishStereoState(fallback,false,0,0);PublishRenderFrame(fallback,0,0,presentStart.QuadPart,FrameFailureReason,nullptr);}
+			OutRunVRRenderer::NotifyGamePresent();
 			FrameHadDuplicatedDraw=false;FrameHadWorldStereo=false;FrameRightDrawFailed=false;FrameStereoIncomplete=false;FramePoseMismatchLogged=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoPoseSequence=0;FrameStereoMetadata={};return hr;
 		}
 
@@ -1263,8 +1328,10 @@ namespace OutRunVRStereo
 		{
 			if (!IsGameDevice(device))
 				return ResetHook.stdcall<HRESULT>(device, params);
+			OutRunVRRenderer::NotifyGameReset();
 			ReleaseStereoResources();
 			AuxRenderTargetActive = {};
+			ActiveOcclusionQueries.store(0, std::memory_order_release);
 			CurrentVertexShaderIdentity.store(0, std::memory_order_release);
 			VertexShaderSerial.store(0, std::memory_order_release);
 			LastStereoWanted = false;
@@ -1298,10 +1365,11 @@ namespace OutRunVRStereo
 			DrawIndexedPrimitiveUPHook = safetyhook::create_inline(
 				vtable[DrawIndexedPrimitiveUPVtableIndex], DrawIndexedPrimitiveUPDest);
 			SetVertexShaderHook = safetyhook::create_inline(vtable[SetVertexShaderVtableIndex], SetVertexShaderDest);
+			CreateQueryHook = safetyhook::create_inline(vtable[CreateQueryVtableIndex], CreateQueryDest);
 
 			if (!ResetHook || !PresentHook || !SetRenderTargetHook || !SetDepthStencilSurfaceHook ||
 				!ClearHook || !DrawPrimitiveHook || !DrawIndexedPrimitiveHook ||
-				!DrawPrimitiveUPHook || !DrawIndexedPrimitiveUPHook || !SetVertexShaderHook)
+				!DrawPrimitiveUPHook || !DrawIndexedPrimitiveUPHook || !SetVertexShaderHook || !CreateQueryHook)
 			{
 				spdlog::error("VR stereo: failed to install one or more D3D9 hooks");
 				return false;
@@ -1314,12 +1382,14 @@ namespace OutRunVRStereo
 				VertexShaderSerial.store(1, std::memory_order_release);
 				shader->Release();
 			}
+			IDirect3DQuery9* queryProbe = nullptr;
+			if (SUCCEEDED(device->CreateQuery(D3DQUERYTYPE_OCCLUSION, &queryProbe)) && queryProbe) queryProbe->Release();
 			InitializeAuxRenderTargetState(device);
 			LastBeginSceneCountAtPresent = OutRunVRRenderer::GetBeginSceneCallCount();
 			EnsureSharedState();
 			EnsureRenderFrameState();
 			EnsureStereoResources(device);
-			spdlog::info("VR stereo: D3D9 full-eye renderer installed (Reset/Present/RT/Depth/Clear/Draw*/VS)");
+			spdlog::info("VR stereo: D3D9 full-eye renderer installed (Reset/Present/RT/Depth/Clear/Draw*/VS/CreateQuery)");
 			return true;
 		}
 
