@@ -21,8 +21,30 @@ jobs:
           submodules: recursive
 
       - name: Apply reviewed X-Force deepening patch
-        shell: pwsh
-        run: python tools/apply_v03_xforce_deepening.py
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/apply_v03_xforce_deepening.py')
+          s=p.read_text(encoding='utf-8')
+          old="text = replace_all_exact(text, preset, preset_new, 2, 'UI presets native gain')"
+          new="text = replace_all_exact(text, preset, preset_new, 1, 'UI Physics preset native gain')"
+          if s.count(old)!=1:
+              raise SystemExit('could not adapt Physics preset patch count')
+          p.write_text(s.replace(old,new),encoding='utf-8',newline='\n')
+          PY
+          python tools/apply_v03_xforce_deepening.py
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('src/overlay/wheel_setup_ui.cpp')
+          s=p.read_text(encoding='utf-8')
+          old='''                Settings::WheelFFBPhysicsSat = false;\n                Settings::WheelFFBFeedbackCharacter = 0;\n                Settings::WheelFFBXForceMix = 0.50f;\n                Settings::WheelFFBXForceInvert = false;\n                Settings::WheelFFBEnable = true;\n'''
+          new='''                Settings::WheelFFBPhysicsSat = false;\n                Settings::WheelFFBFeedbackCharacter = 0;\n                Settings::WheelFFBXForceMix = 0.50f;\n                Settings::WheelFFBXForceInvert = false;\n                Settings::WheelFFBXForceGain = 1.00f;\n                Settings::WheelFFBEnable = true;\n'''
+          if s.count(old)!=1:
+              raise SystemExit(f'Natural preset patch expected one match, got {s.count(old)}')
+          p.write_text(s.replace(old,new,1),encoding='utf-8',newline='\n')
+          PY
 
       - name: Debug pass 1 - consolidated source verifier
         shell: pwsh
