@@ -153,14 +153,14 @@ jobs:
           if ($ini -notmatch '(?m)^XForceCapture60Hz\s*=\s*false\s*$') { throw "60 Hz capture is not disabled by default" }
           Get-FileHash $dllPath -Algorithm SHA256
 
-      - name: Commit reviewed source and remove one-shot tooling
+      - name: Commit reviewed source without workflow files
         shell: bash
         run: |
           set -euo pipefail
-          git rm -f tools/apply_v03_xforce_deepening.py tools/v03_xforce_deepening.trigger .github/workflows/v03-xforce-deepening.yml
+          git rm -f tools/apply_v03_xforce_deepening.py tools/v03_xforce_deepening.trigger
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src OutRun2006Tweaks.ini tools/test_wheel_ffb_current.cpp tools/verify_wheel_ffb_current.py .github/workflows/build.yml
+          git add src OutRun2006Tweaks.ini tools/test_wheel_ffb_current.cpp tools/verify_wheel_ffb_current.py
           git diff --cached --check
           git commit -m "feat: deepen v0.3 native X-Force validation and controls [skip ci]"
           git push origin HEAD:wheel-ffb-v0.3-xforce
