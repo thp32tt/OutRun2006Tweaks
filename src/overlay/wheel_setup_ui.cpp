@@ -1678,7 +1678,7 @@ namespace
             if (feedbackCharacter == 0)
                 ImGui::TextDisabled("Modern DD: v0.2 front-slip / pneumatic + mechanical-trail SAT behavior.");
             else if (feedbackCharacter == 1)
-                ImGui::TextDisabled("Arcade: guarded actionforce_DBC candidate drives SAT; invalid/dead samples fall back to Modern SAT.");
+                ImGui::TextDisabled("Arcade: guarded actionforce_DBC candidate drives SAT; stop/restart and invalid samples crossfade safely to Modern SAT.");
             else
             {
                 ImGui::TextDisabled("Hybrid: blends the guarded actionforce_DBC candidate with Modern SAT.");
@@ -1743,7 +1743,8 @@ namespace
                 if (advancedFeedbackCharacter != 0)
                 {
                     ImGui::SeparatorText("Native X-Force candidate");
-                    track_ffb_change(ImGui::Checkbox("Reverse X-Force candidate only", Settings::WheelFFBXForceInvert.ptr()));
+                    if (track_ffb_change(ImGui::Checkbox("Reverse X-Force candidate only", Settings::WheelFFBXForceInvert.ptr())))
+                        WheelFFB_RequestSettingsTransition();
                     if (ImGui::IsItemHovered())
                         ImGui::SetTooltip("Use this only if Arcade/Hybrid steering force is reversed relative to Modern DD. Global Reverse SAT / ConstantForce still applies after the mix.");
                     if (advancedFeedbackCharacter != 2)
@@ -1861,6 +1862,13 @@ namespace
                 ImGui::PlotLines("Soft limited", graph.softLimited.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 46));
                 ImGui::PlotLines("Post slew", graph.postSlew.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 46));
                 ImGui::PlotLines("Final DirectInput", graph.finalOutput.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 46));
+                if (std::clamp(int(Settings::WheelFFBFeedbackCharacter), 0, 2) != 0)
+                {
+                    ImGui::PlotLines("X-Force normalized", graph.xForceNormalized.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 40));
+                    ImGui::PlotLines("Modern SAT", graph.modernSat.data(), int(graph.count), 0, nullptr, -2.1f, 2.1f, ImVec2(0, 40));
+                    ImGui::PlotLines("Native SAT", graph.nativeSat.data(), int(graph.count), 0, nullptr, -2.1f, 2.1f, ImVec2(0, 40));
+                    ImGui::PlotLines("Native share", graph.nativeShare.data(), int(graph.count), 0, nullptr, 0.0f, 1.0f, ImVec2(0, 40));
+                }
             }
             else
                 ImGui::TextDisabled("Drive for a moment, then open F11 to inspect the captured force pipeline.");

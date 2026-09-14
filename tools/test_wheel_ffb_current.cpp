@@ -56,6 +56,37 @@ int main() {
  require(apply_response_lut(.10f,boosted)>.10f,"LUT can compensate low-force deadzone");
  require(!parse_response_lut("0,0.2,0.1,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1",boosted),"non-monotonic LUT rejected");
  require(!parse_response_lut("0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1",boosted),"nonzero LUT origin rejected");
+ // v0.3 guarded native X-Force candidate. These tests exercise the
+ // production state machine, not a duplicate formula in the test.
+ XForceGuard xg; xg.reset();
+ auto xStop=xg.update(62.0f,0.0f,.5f,false);
+ require(xStop.stopped&&xStop.nativeBlend==0.0f&&xStop.normalized==0.0f,"X-Force hard zero at stop");
+ auto xResumeStale=xg.update(62.0f,.20f,.5f,false);
+ require(!xResumeStale.valid&&xResumeStale.nativeBlend==0.0f,"X-Force stale stop value not replayed on resume");
+ auto xFresh=xg.update(58.0f,.20f,.5f,false);
+ require(xFresh.valid&&xFresh.freshAfterStop&&xFresh.nativeBlend>0.0f,"X-Force fresh post-stop sample arms native path");
+ for(int i=0;i<12;++i)xFresh=xg.update(58.0f,.20f,.5f,false);
+ require(xFresh.nativeBlend>.99f,"X-Force native path ramps fully in");
+ auto xZero=xg.update(0.0f,.20f,.5f,false);
+ require(xZero.valid&&xZero.responsive&&xZero.normalized==0.0f&&xZero.nativeBlend>.99f,"X-Force zero crossing stays valid after response observed");
+ XForceGuard xd; xd.reset(); xd.update(0.0f,0.0f,.5f,false); xd.update(40.0f,.20f,.5f,false);
+ auto xDead=xd.update(38.0f,.20f,.5f,false);
+ for(unsigned i=0;i<XForceUnresponsiveLimitTicks;++i)xDead=xd.update(0.0f,.20f,.5f,false);
+ require(!xDead.responsive&&!xDead.valid,"X-Force prolonged zero under steering falls back to Modern");
+ auto xBad=xg.update(129.0f,.20f,.5f,false);
+ require(!xBad.rangeValid&&!xBad.valid&&xBad.nativeBlend<xZero.nativeBlend,"X-Force out-of-range sample fades toward Modern");
+ XForceGuard xi; xi.reset(); xi.update(0.0f,0.0f,.5f,true); xi.update(40.0f,.20f,.5f,true);
+ auto xInvert=xi.update(38.0f,.20f,.5f,true);
+ require(xInvert.valid&&xInvert.normalized<0.0f,"X-Force candidate-only inversion");
+ XForceGuard xn; xn.reset();
+ require(!xn.update(std::numeric_limits<float>::quiet_NaN(),.5f,.5f,false).rangeValid,"X-Force rejects NaN");
+ auto mixModern=mix_xforce_character(.4f,-.6f,0,.5f,1.0f);
+ auto mixHalf=mix_xforce_character(.4f,-.6f,2,.5f,1.0f);
+ auto mixArcade=mix_xforce_character(.4f,-.6f,1,.5f,1.0f);
+ require(std::abs(mixModern.torque-.4f)<1e-6f&&mixModern.nativeShare==0.0f,"X-Force Modern character identity");
+ require(std::abs(mixHalf.torque+.1f)<1e-6f&&std::abs(mixHalf.nativeShare-.5f)<1e-6f,"X-Force Hybrid 50 percent mix");
+ require(std::abs(mixArcade.torque+.6f)<1e-6f&&mixArcade.nativeShare==1.0f,"X-Force Arcade full native after guard");
+
  WheelVehicleDynamics gap; EVWORK_CAR gapCar; gap.reset();
  for(int i=0;i<80;++i)step(gap,gapCar);
  gap.update(nullptr,0,.5,0);

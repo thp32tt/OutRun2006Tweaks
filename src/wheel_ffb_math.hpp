@@ -150,6 +150,216 @@ namespace WheelFFBMath
         return pneumatic_sat_shape(alpha);
     }
 
+    // Guarded native steering-force candidate for v0.3. actionforce_DBC is
+    // still an unverified X-Force candidate, so this state machine treats the
+    // memory value as data rather than assuming every in-range sample is useful.
+    //
+    // Safety/continuity rules:
+    //  * stopped means zero native contribution immediately (Howard noted the
+    //    original value can remain stale while the car is stopped),
+    //  * after a stop, require a fresh update before native torque can return,
+    //  * once a real response has been observed, a legitimate zero crossing is
+    //    still valid and must not bounce to the Modern fallback for one frame,
+    //  * invalid/range-failed data fades back to Modern instead of hard-switching.
+    inline constexpr float XForceNominalFullScale = 62.0f;
+    inline constexpr float XForceAbsoluteSafetyLimit = 128.0f;
+    inline constexpr float XForceNoiseFloor = 0.20f;
+    inline constexpr float XForceResponseThreshold = 0.05f;
+    inline constexpr float XForceStoppedSpeed = 0.025f;
+    inline constexpr float XForceResumeSpeed = 0.040f;
+    inline constexpr float XForceFreshDelta = 0.020f;
+    inline constexpr unsigned XForceUnresponsiveLimitTicks = 30;
+
+    struct XForceGuardSample
+    {
+        bool finite = false;
+        bool rangeValid = false;
+        bool responseObserved = false;
+        bool responsive = false;
+        bool freshAfterStop = false;
+        bool valid = false;
+        bool stopped = true;
+        float normalized = 0.0f;
+        float motionGate = 0.0f;
+        float nativeBlend = 0.0f;
+    };
+
+    class XForceGuard
+    {
+    public:
+        void reset()
+        {
+            responseObserved_ = false;
+            stopped_ = true;
+            awaitingFreshAfterStop_ = true;
+            stoppedRaw_ = 0.0f;
+            lastNormalized_ = 0.0f;
+            nativeBlend_ = 0.0f;
+            unresponsiveTicks_ = 0;
+        }
+
+        XForceGuardSample update(
+            float raw, float speedNorm, float steerAbs, bool invert)
+        {
+            XForceGuardSample out{};
+            speedNorm = std::isfinite(speedNorm)
+                ? std::clamp(speedNorm, 0.0f, 1.0f) : 0.0f;
+            steerAbs = std::isfinite(steerAbs)
+                ? std::clamp(steerAbs, 0.0f, 1.0f) : 0.0f;
+
+            out.finite = std::isfinite(raw);
+            out.rangeValid = out.finite &&
+                std::abs(raw) <= XForceAbsoluteSafetyLimit;
+
+            // Hysteresis prevents near-zero speed noise from repeatedly
+            // entering/leaving the stopped state. Stopped native torque is a
+            // hard zero because the source can retain its last value at rest.
+            if (stopped_)
+            {
+                if (speedNorm < XForceResumeSpeed)
+                {
+                    if (out.rangeValid)
+                        stoppedRaw_ = raw;
+                    nativeBlend_ = 0.0f;
+                    lastNormalized_ = 0.0f;
+                    out.responseObserved = responseObserved_;
+                    out.stopped = true;
+                    return out;
+                }
+                stopped_ = false;
+                awaitingFreshAfterStop_ = true;
+                // Keep stoppedRaw_ from the last stopped tick. The first
+                // moving sample may already be the fresh update we need.
+            }
+            else if (speedNorm <= XForceStoppedSpeed)
+            {
+                stopped_ = true;
+                awaitingFreshAfterStop_ = true;
+                if (out.rangeValid)
+                    stoppedRaw_ = raw;
+                nativeBlend_ = 0.0f;
+                lastNormalized_ = 0.0f;
+                out.responseObserved = responseObserved_;
+                out.stopped = true;
+                return out;
+            }
+
+            if (out.rangeValid && steerAbs >= 0.05f &&
+                std::abs(raw) >= XForceResponseThreshold)
+            {
+                responseObserved_ = true;
+            }
+
+            // A non-zero value frozen at the stop point must not be replayed
+            // when the car starts moving. Zero is safe to accept immediately;
+            // otherwise wait until the game changes the source value.
+            if (awaitingFreshAfterStop_ && out.rangeValid &&
+                (std::abs(raw) < XForceResponseThreshold ||
+                 std::abs(raw - stoppedRaw_) >= XForceFreshDelta))
+            {
+                awaitingFreshAfterStop_ = false;
+            }
+
+            // A true zero crossing is allowed. Only call the candidate dead
+            // after about half a second of near-zero output while the driver is
+            // clearly steering a moving car. This avoids the old one-frame
+            // Modern/native bounce without trusting a permanently zero field.
+            if (out.rangeValid && steerAbs >= 0.15f && speedNorm >= 0.08f)
+            {
+                if (std::abs(raw) < XForceResponseThreshold)
+                    unresponsiveTicks_ = std::min(
+                        unresponsiveTicks_ + 1u, XForceUnresponsiveLimitTicks);
+                else
+                    unresponsiveTicks_ = 0;
+            }
+            else
+            {
+                unresponsiveTicks_ = 0;
+            }
+            const bool responsiveNow = responseObserved_ &&
+                unresponsiveTicks_ < XForceUnresponsiveLimitTicks;
+
+            float currentNormalized = 0.0f;
+            if (out.rangeValid)
+            {
+                const float magnitude = std::max(
+                    0.0f, std::abs(raw) - XForceNoiseFloor);
+                const float normalizedMagnitude = std::clamp(
+                    magnitude / (XForceNominalFullScale - XForceNoiseFloor),
+                    0.0f, 1.0f);
+                currentNormalized = std::copysign(normalizedMagnitude, raw);
+                if (invert)
+                    currentNormalized = -currentNormalized;
+            }
+
+            out.valid = out.rangeValid && responsiveNow &&
+                !awaitingFreshAfterStop_;
+            if (out.valid)
+                lastNormalized_ = currentNormalized;
+
+            // Native force enters more slowly than it leaves. A bad candidate
+            // therefore returns to the proven Modern model in about six 60-Hz
+            // ticks without producing a one-frame torque discontinuity.
+            const float targetBlend = out.valid ? 1.0f : 0.0f;
+            constexpr float BlendInPerTick = 1.0f / 12.0f;
+            constexpr float BlendOutPerTick = 1.0f / 6.0f;
+            const float delta = targetBlend - nativeBlend_;
+            nativeBlend_ += std::clamp(
+                delta, -BlendOutPerTick, BlendInPerTick);
+            nativeBlend_ = std::clamp(nativeBlend_, 0.0f, 1.0f);
+
+            out.responseObserved = responseObserved_;
+            out.responsive = responsiveNow;
+            out.freshAfterStop = !awaitingFreshAfterStop_;
+            out.stopped = false;
+            out.normalized = out.valid ? currentNormalized : lastNormalized_;
+            out.motionGate = smoothstep01(
+                (speedNorm - XForceResumeSpeed) / 0.12f);
+            out.nativeBlend = nativeBlend_;
+            return out;
+        }
+
+    private:
+        bool responseObserved_ = false;
+        bool stopped_ = true;
+        bool awaitingFreshAfterStop_ = true;
+        float stoppedRaw_ = 0.0f;
+        float lastNormalized_ = 0.0f;
+        float nativeBlend_ = 0.0f;
+        unsigned unresponsiveTicks_ = 0;
+    };
+
+    struct XForceMixResult
+    {
+        float torque = 0.0f;
+        float nativeShare = 0.0f;
+    };
+
+    inline XForceMixResult mix_xforce_character(
+        float modernTorque,
+        float nativeTorque,
+        int feedbackCharacter,
+        float configuredMix,
+        float guardBlend)
+    {
+        modernTorque = std::isfinite(modernTorque) ? modernTorque : 0.0f;
+        nativeTorque = std::isfinite(nativeTorque) ? nativeTorque : 0.0f;
+        configuredMix = std::isfinite(configuredMix)
+            ? std::clamp(configuredMix, 0.0f, 1.0f) : 0.50f;
+        guardBlend = std::isfinite(guardBlend)
+            ? std::clamp(guardBlend, 0.0f, 1.0f) : 0.0f;
+        feedbackCharacter = std::clamp(feedbackCharacter, 0, 2);
+
+        XForceMixResult out{};
+        if (feedbackCharacter == 1)
+            out.nativeShare = guardBlend;
+        else if (feedbackCharacter == 2)
+            out.nativeShare = configuredMix * guardBlend;
+        out.torque = modernTorque +
+            (nativeTorque - modernTorque) * out.nativeShare;
+        return out;
+    }
+
     // Symmetric C1 soft limiter. Preserve low/mid-range force exactly, then
     // bend only the final quarter toward the DirectInput cap. This keeps SAT
     // detail and weight intact while still preventing hard clipping at 100%.

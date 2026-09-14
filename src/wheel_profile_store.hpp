@@ -19,6 +19,9 @@ namespace Settings
     extern Setting<bool> WheelFFBResponseCorrection;
     extern Setting<std::string> WheelFFBResponseLUT;
     extern Setting<float> WheelFFBMaxTorqueNm;
+    extern Setting<int> WheelFFBFeedbackCharacter;
+    extern Setting<float> WheelFFBXForceMix;
+    extern Setting<bool> WheelFFBXForceInvert;
 }
 
 // Named wheel/input and force-feedback profiles live beside the DLL instead of
@@ -496,6 +499,8 @@ namespace WheelProfileStore
 
         int applied = 0;
         std::vector<Settings::SettingBase*> changed;
+
+
         for (size_t i = 0; i < settings.size(); ++i)
         {
             Settings::SettingBase* setting = settings[i];
@@ -518,6 +523,29 @@ namespace WheelProfileStore
         {
             if (error) *error = "FFB profile contains no recognized force settings.";
             return false;
+        }
+
+
+        // Profiles saved before v0.3 have no steering-character keys. They were
+        // authored for the Modern/Natural force model, so loading one while the
+        // current session happens to be in Arcade/Hybrid must not silently reinterpret
+        // that old profile through the experimental native signal.
+        const bool preV03Profile =
+            values.find("feedbackcharacter") == values.end() &&
+            values.find("xforcemix") == values.end() &&
+            values.find("xforceinvert") == values.end();
+        if (preV03Profile)
+        {
+            const auto migrate_legacy_character = [&](Settings::SettingBase& setting, const char* value)
+            {
+                const std::string oldValue = setting.to_string();
+                setting.set_from_string(value);
+                if (setting.to_string() != oldValue)
+                    changed.push_back(&setting);
+            };
+            migrate_legacy_character(Settings::WheelFFBFeedbackCharacter, "0");
+            migrate_legacy_character(Settings::WheelFFBXForceMix, "0.50");
+            migrate_legacy_character(Settings::WheelFFBXForceInvert, "false");
         }
 
         for (Settings::SettingBase* setting : changed)

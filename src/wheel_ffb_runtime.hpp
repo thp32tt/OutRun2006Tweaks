@@ -56,6 +56,10 @@ struct WheelFFBGraphSnapshot
     std::array<float, WheelFFBGraphCapacity> softLimited{};
     std::array<float, WheelFFBGraphCapacity> postSlew{};
     std::array<float, WheelFFBGraphCapacity> finalOutput{};
+    std::array<float, WheelFFBGraphCapacity> xForceNormalized{};
+    std::array<float, WheelFFBGraphCapacity> modernSat{};
+    std::array<float, WheelFFBGraphCapacity> nativeSat{};
+    std::array<float, WheelFFBGraphCapacity> nativeShare{};
 };
 
 void WheelFFB_RequestDirectionTest(int direction);

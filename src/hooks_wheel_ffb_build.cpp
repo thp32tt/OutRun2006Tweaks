@@ -265,6 +265,9 @@ namespace
     {
         Settings::WheelFFBEnable = true;
         Settings::WheelFFBPhysicsSat = true;
+        Settings::WheelFFBFeedbackCharacter = 0;
+        Settings::WheelFFBXForceMix = 0.50f;
+        Settings::WheelFFBXForceInvert = false;
         Settings::WheelFFBGlobalStrength = 0.70f;
         Settings::WheelFFBSpringStrength = 0.22f;
         Settings::WheelFFBSpringSaturation = 0.55f;
@@ -295,6 +298,9 @@ namespace
     {
         Settings::WheelFFBEnable = true;
         Settings::WheelFFBPhysicsSat = false;
+        Settings::WheelFFBFeedbackCharacter = 0;
+        Settings::WheelFFBXForceMix = 0.50f;
+        Settings::WheelFFBXForceInvert = false;
         Settings::WheelFFBGlobalStrength = 0.70f;
         Settings::WheelFFBSpringStrength = 0.22f;
         Settings::WheelFFBSpringSaturation = 0.55f;

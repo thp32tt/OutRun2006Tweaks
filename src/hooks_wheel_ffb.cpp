@@ -12,6 +12,7 @@
 #include <array>
 #include <cmath>
 #include <cctype>
+#include <cstddef>
 #include <cstring>
 #include <cstdio>
 #include <string>
@@ -33,6 +34,9 @@ extern "C"
 
 extern double __cdecl sub_1149C0(unsigned int surfaceMask, int loadColiType, DWORD* waterFlag);
 extern float InputManager_SteeringValue();
+
+static_assert(offsetof(EVWORK_CAR, actionforce_DBC) == 0xDBC,
+    "EVWORK_CAR::actionforce_DBC offset drifted; native X-Force candidate would read the wrong memory");
 
 namespace Settings
 {
@@ -972,50 +976,16 @@ namespace
                 ? physicsFallback + (physicsSatTorque - physicsFallback) * physicsMix
                 : naturalSatTorque;
 
-            // v0.3 native steering-force experiment. Howard Castro described an
-            // internal OutRun steering-force value with a nominal low-speed span
-            // around +/-62. actionforce_DBC is a promising existing EVWORK_CAR
-            // field, but it is not yet proven to be that exact value. Therefore:
-            //   * Modern DD never consumes it.
-            //   * Arcade/Hybrid accept it only inside a conservative finite/range
-            //     envelope and require a non-trivial response while steering.
-            //   * any suspicious or apparently dead signal falls back to the
-            //     already-proven Modern SAT for that tick.
-            //   * all modes still pass through the common DD slew, soft limiter,
-            //     focus watchdog and DirectInput safety path below.
-            constexpr float XForceNominalFullScale = 62.0f;
-            constexpr float XForceAbsoluteSafetyLimit = 128.0f;
-            constexpr float XForceNoiseFloor = 0.20f;
+            // v0.3 native steering-force experiment. actionforce_DBC remains a
+            // candidate until telemetry proves it is Howard Castro's X-Force.
+            // The production guard handles the two important DD-wheel hazards:
+            // stale force at a stop/restart and one-frame fallback at a legitimate
+            // zero crossing. Modern DD never consumes the candidate.
             const float xForceRaw = car->actionforce_DBC;
-            const bool xForceFinite = std::isfinite(xForceRaw);
-            const bool xForceRangeValid =
-                xForceFinite && std::abs(xForceRaw) <= XForceAbsoluteSafetyLimit;
-            const bool xForceResponsive =
-                std::abs(xForceRaw) >= 0.05f || steerAbs < 0.05f || speedNorm < 0.04f;
-            const bool xForceValid = xForceRangeValid && xForceResponsive;
-
-            float xForceNormalized = 0.0f;
-            if (xForceValid)
-            {
-                const float magnitude = std::max(0.0f, std::abs(xForceRaw) - XForceNoiseFloor);
-                const float normalizedMagnitude = std::clamp(
-                    magnitude / (XForceNominalFullScale - XForceNoiseFloor),
-                    0.0f, 1.0f);
-                xForceNormalized = std::copysign(normalizedMagnitude, xForceRaw);
-                if (Settings::WheelFFBXForceInvert)
-                    xForceNormalized = -xForceNormalized;
-            }
-
-            // Keep the original low-speed character but protect a modern DD base
-            // from the candidate signal's historically large parking-speed force.
-            // Above the launch/parking region the native magnitude is left intact.
-            const float xForceLowSpeedT = std::clamp(
-                (speedNorm - 0.015f) / 0.12f, 0.0f, 1.0f);
-            const float xForceLowSpeedSmooth =
-                xForceLowSpeedT * xForceLowSpeedT * (3.0f - 2.0f * xForceLowSpeedT);
-            const float xForceLowSpeedGuard = 0.30f + 0.70f * xForceLowSpeedSmooth;
+            const WheelFFBMath::XForceGuardSample xForceSample = xForceGuard_.update(
+                xForceRaw, speedNorm, steerAbs, bool(Settings::WheelFFBXForceInvert));
             const float nativeXForceTorque =
-                xForceNormalized * xForceLowSpeedGuard * satStrength;
+                xForceSample.normalized * xForceSample.motionGate * satStrength;
 
             const int feedbackCharacter = std::clamp(
                 static_cast<int>(Settings::WheelFFBFeedbackCharacter), 0, 2);
@@ -1024,13 +994,11 @@ namespace
             const float xForceMix = std::isfinite(configuredXForceMix)
                 ? std::clamp(configuredXForceMix, 0.0f, 1.0f)
                 : 0.50f;
-
-            float selfAligningTorque = modernSelfAligningTorque;
-            if (xForceValid && feedbackCharacter == 1)
-                selfAligningTorque = nativeXForceTorque;
-            else if (xForceValid && feedbackCharacter == 2)
-                selfAligningTorque = modernSelfAligningTorque +
-                    (nativeXForceTorque - modernSelfAligningTorque) * xForceMix;
+            const WheelFFBMath::XForceMixResult xForceMixResult =
+                WheelFFBMath::mix_xforce_character(
+                    modernSelfAligningTorque, nativeXForceTorque,
+                    feedbackCharacter, xForceMix, xForceSample.nativeBlend);
+            const float selfAligningTorque = xForceMixResult.torque;
 
             float loadMod = 1.0f;
             if (speedHistoryIndex_ > 6)
@@ -1050,9 +1018,27 @@ namespace
                     -smoothedLongAccel_ * weightTransfer, -0.06f, 0.08f);
             }
 
+            // Preserve v0.2 exactly in Modern mode. As the guarded native
+            // share rises, stop layering the synthetic longitudinal weight-
+            // transfer modulation onto X-Force itself; Spring keeps its existing
+            // load modulation and fallback Modern SAT regains it automatically.
+            const float satLoadMod = 1.0f +
+                (loadMod - 1.0f) * (1.0f - xForceMixResult.nativeShare);
             float structural = 0.0f;
             if (crashImpulseTimer_ <= CrashCooldownFrames)
-                structural = (softwareSpring + selfAligningTorque) * loadMod + damper;
+            {
+                if (xForceMixResult.nativeShare <= 0.0f)
+                {
+                    // Keep the established v0.2 arithmetic path bit-for-bit in
+                    // Modern mode and whenever the native guard has fallen back.
+                    structural = (softwareSpring + selfAligningTorque) * loadMod + damper;
+                }
+                else
+                {
+                    structural = softwareSpring * loadMod +
+                        selfAligningTorque * satLoadMod + damper;
+                }
+            }
 
             // Headroom analysis uses sustained structural steering only. Do not
             // let a wall hit, gear thunk, startup ramp or nearly-stopped frame
@@ -1187,7 +1173,9 @@ namespace
                 total,
                 compressed,
                 static_cast<float>(structuralLevel) / static_cast<float>(DI_FFNOMINALMAX),
-                static_cast<float>(level) / static_cast<float>(DI_FFNOMINALMAX));
+                static_cast<float>(level) / static_cast<float>(DI_FFNOMINALMAX),
+                xForceSample.normalized, modernSelfAligningTorque,
+                nativeXForceTorque, xForceMixResult.nativeShare);
 
             if (std::abs(level - prevConstantLevel_) > 15 || eventLevel != 0 ||
                 (level != 0 && GetTickCount() - lastConstantWriteTick_ >= FFB_EFFECT_REFRESH_MS))
@@ -1248,9 +1236,12 @@ namespace
                     periodicsActive_, outputStrength, bool(Settings::WheelFFBInvertForce),
                     bool(Settings::WheelFFBInvertSpring));
                 spdlog::info(
-                    "WheelFFB XFORCE t={} character={} raw={} finite={} valid={} normalized={} nativeTorque={} modernTorque={} finalSat={} mix={} candidateInvert={}",
-                    telemetryNow, feedbackCharacter, xForceRaw, xForceFinite, xForceValid,
-                    xForceNormalized, nativeXForceTorque, modernSelfAligningTorque,
+                    "WheelFFB XFORCE t={} character={} raw={} finite={} range={} observed={} responsive={} fresh={} stopped={} valid={} normalized={} motionGate={} guardBlend={} nativeShare={} nativeTorque={} modernTorque={} finalSat={} mix={} candidateInvert={}",
+                    telemetryNow, feedbackCharacter, xForceRaw, xForceSample.finite,
+                    xForceSample.rangeValid, xForceSample.responseObserved, xForceSample.responsive,
+                    xForceSample.freshAfterStop, xForceSample.stopped, xForceSample.valid,
+                    xForceSample.normalized, xForceSample.motionGate, xForceSample.nativeBlend,
+                    xForceMixResult.nativeShare, nativeXForceTorque, modernSelfAligningTorque,
                     selfAligningTorque, xForceMix, bool(Settings::WheelFFBXForceInvert));
                 spdlog::info(
                     "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} rawFrontSlip={} frontSlip={} frontBlend={} trailResponseSlip={} trailResponseLead={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} diPreResponse={} diCorrected={} responseCorrection={}",
@@ -1386,6 +1377,10 @@ namespace
                 result.softLimited[i] = graphSoftLimited_[src];
                 result.postSlew[i] = graphPostSlew_[src];
                 result.finalOutput[i] = graphFinalOutput_[src];
+                result.xForceNormalized[i] = graphXForceNormalized_[src];
+                result.modernSat[i] = graphModernSat_[src];
+                result.nativeSat[i] = graphNativeSat_[src];
+                result.nativeShare[i] = graphNativeShare_[src];
             }
             return result;
         }
@@ -3153,13 +3148,20 @@ namespace
             periodicsActive_ = false;
         }
 
-        void record_graph_sample(float rawStructural, float softLimited, float postSlew, float finalOutput)
+        void record_graph_sample(
+            float rawStructural, float softLimited, float postSlew, float finalOutput,
+            float xForceNormalized, float modernSat, float nativeSat, float nativeShare)
         {
             const size_t slot = graphWriteIndex_ % WheelFFBGraphCapacity;
             graphRawStructural_[slot] = std::isfinite(rawStructural) ? rawStructural : 0.0f;
             graphSoftLimited_[slot] = std::isfinite(softLimited) ? softLimited : 0.0f;
             graphPostSlew_[slot] = std::isfinite(postSlew) ? postSlew : 0.0f;
             graphFinalOutput_[slot] = std::isfinite(finalOutput) ? finalOutput : 0.0f;
+            graphXForceNormalized_[slot] = std::isfinite(xForceNormalized) ? xForceNormalized : 0.0f;
+            graphModernSat_[slot] = std::isfinite(modernSat) ? modernSat : 0.0f;
+            graphNativeSat_[slot] = std::isfinite(nativeSat) ? nativeSat : 0.0f;
+            graphNativeShare_[slot] = std::isfinite(nativeShare)
+                ? std::clamp(nativeShare, 0.0f, 1.0f) : 0.0f;
             ++graphWriteIndex_;
             graphCount_ = std::min<std::size_t>(graphCount_ + 1, WheelFFBGraphCapacity);
         }
@@ -3464,6 +3466,7 @@ namespace
             smoothedSteerRate_ = 0.0f;
             steerSampleValid_ = false;
             vehicleDynamics_.reset_dynamic();
+            xForceGuard_.reset();
             prevStructuralLevel_ = 0;
             prevSpringCoefficient_ = 0;
             prevDamperCoefficient_ = 0;
@@ -3850,6 +3853,7 @@ namespace
         float smoothedSteerRate_ = 0.0f;
         bool steerSampleValid_ = false;
         WheelVehicleDynamics vehicleDynamics_{};
+        WheelFFBMath::XForceGuard xForceGuard_{};
 
         std::array<std::uint64_t, HeadroomHistogramBins> headroomHistogram_{};
         std::uint64_t headroomSamples_ = 0;
@@ -3862,6 +3866,10 @@ namespace
         std::array<float, WheelFFBGraphCapacity> graphSoftLimited_{};
         std::array<float, WheelFFBGraphCapacity> graphPostSlew_{};
         std::array<float, WheelFFBGraphCapacity> graphFinalOutput_{};
+        std::array<float, WheelFFBGraphCapacity> graphXForceNormalized_{};
+        std::array<float, WheelFFBGraphCapacity> graphModernSat_{};
+        std::array<float, WheelFFBGraphCapacity> graphNativeSat_{};
+        std::array<float, WheelFFBGraphCapacity> graphNativeShare_{};
         std::size_t graphWriteIndex_ = 0;
         std::size_t graphCount_ = 0;
 
