@@ -191,10 +191,12 @@ namespace OutRunVRRenderer
 
 	// The mono renderer records only c64 uploads that were independently verified
 	// as OutRun's Transpose(WorldView*Projection) and successfully uploaded after
-	// head correction. Stereo uses this generation marker to avoid treating stale
-	// c64 values from HUD/effect shaders as geometry.
+	// head correction. Stereo additionally requires the exact vertex-shader epoch
+	// that was active at that upload, preventing HUD/effect shaders from inheriting
+	// a stale world c64 and being misclassified as geometry.
 	bool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
-		std::uint32_t& poseSequence);
+		std::uint32_t& poseSequence, std::uintptr_t& shaderIdentity,
+		std::uint64_t& shaderSerial);
 }
 
 namespace OutRunVRStereo
@@ -203,4 +205,9 @@ namespace OutRunVRStereo
 	// renderer uses this guard so that pass cannot relatch pose or publish fake
 	// game-frame telemetry.
 	bool IsInternalStereoPassActive();
+
+	// Current vertex-shader identity plus a monotonically increasing serial that
+	// changes on every successful game SetVertexShader call. The mono c64 hook
+	// samples this at the exact verified upload boundary.
+	bool GetCurrentShaderEpoch(std::uintptr_t& shaderIdentity, std::uint64_t& serial);
 }
