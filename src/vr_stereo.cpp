@@ -4,6 +4,8 @@
 #include <d3d9.h>
 
 #include <algorithm>
+#include <array>
+#include <atomic>
 #include <cmath>
 #include <cstdint>
 #include <cstring>
@@ -20,17 +22,22 @@
 // Simulation, input, timers, native FFB and OutRun's render queue are never
 // replayed. For draws targeting the real game backbuffer, the normal draw is
 // turned into the LEFT eye and the same D3D draw is repeated once into a
-// matching RIGHT-eye render target while all renderer state is still alive.
+// matching full-size RIGHT-eye render target while all renderer state is alive.
 //
-// vr_renderer_probe.cpp remains the single head-tracking/recenter authority.
-// This file reads the c64 WVP that probe already uploaded, removes only the game
-// projection, appends the OpenXR per-eye position, and installs the OpenXR
-// asymmetric per-eye FOV. HUD/non-world draws are duplicated unchanged to the
-// two full-size eye surfaces, so screen-space UI does not get cut in half.
+// vr_renderer_probe.cpp remains the single head-tracking/recenter authority and
+// latches one immutable head/FOV/IPD packet per successful game BeginScene. This
+// file consumes that packet for every draw in the scene; it never re-samples the
+// x64 host on a per-draw basis.
+//
+// World geometry is promoted to per-eye projection only when its live c64..c67
+// values exactly correspond to a renderer-probe-verified OutRun WVP upload AND
+// the current vertex-shader epoch is the same epoch that performed that upload.
+// HUD/effect draws therefore fall back to identical zero-disparity duplication.
 //
 // At Present both full-size eye surfaces are resolved and drawn side-by-side to
 // the real backbuffer. The x64 host crops that SBS transport and submits it as
-// XrCompositionLayerProjection.
+// XrCompositionLayerProjection using the exact host pose sequence published by
+// this renderer.
 
 namespace Settings
 {
@@ -58,8 +65,7 @@ namespace OutRunVRStereo
 		constexpr UINT OutRunWvpRegister = 64;
 		constexpr UINT OutRunWvpRegisterCount = 4;
 		constexpr std::uintptr_t OutRunProjectionRva = 0x0095D8A0u - 0x00400000u;
-		constexpr std::uintptr_t OutRunWorldViewRva = 0x0095DB20u - 0x00400000u;
-		constexpr LONGLONG HostPoseStaleMs = 250;
+		constexpr float VerifiedWvpEpsilon = 1.0e-4f;
 
 		SafetyHookInline ResetHook{};
 		SafetyHookInline PresentHook{};
@@ -74,7 +80,6 @@ namespace OutRunVRStereo
 
 		HANDLE SharedMapping = nullptr;
 		OutRunVR::SharedPoseState* SharedState = nullptr;
-		LARGE_INTEGER QpcFrequency{};
 
 		IDirect3DSurface9* BackBuffer = nullptr;
 		IDirect3DSurface9* TrackedRenderTarget = nullptr;
@@ -85,23 +90,37 @@ namespace OutRunVRStereo
 		IDirect3DSurface9* LeftResolveSurface = nullptr;
 		IDirect3DTexture9* RightResolveTexture = nullptr;
 		IDirect3DSurface9* RightResolveSurface = nullptr;
-		IDirect3DVertexShader9* CurrentVertexShader = nullptr; // weak; device owns state ref
 
 		D3DSURFACE_DESC BackBufferDesc{};
 		bool StereoResourcesReady = false;
 		bool InternalStereoPass = false;
+		std::array<bool, 3> AuxRenderTargetActive{};
+
+		std::atomic<std::uintptr_t> CurrentVertexShaderIdentity{ 0 };
+		std::atomic<std::uint64_t> VertexShaderSerial{ 0 };
+
+		D3DMATRIX CachedProjection{};
+		D3DMATRIX CachedInverseProjection{};
+		bool ProjectionInverseValid = false;
+
 		bool FrameHadDuplicatedDraw = false;
 		bool FrameHadWorldStereo = false;
 		bool FrameRightDrawFailed = false;
+		std::uint32_t FrameStereoPoseSequence = 0;
 		std::uint32_t StereoFrameCounter = 0;
+
 		ULONGLONG LastSummaryMs = 0;
 		std::uint64_t DuplicatedDraws = 0;
 		std::uint64_t WorldStereoDraws = 0;
 		std::uint64_t NonWorldDuplicatedDraws = 0;
 		std::uint64_t StereoComposeSuccess = 0;
 		std::uint64_t StereoComposeFailure = 0;
+		std::uint64_t MrtRejectedDraws = 0;
+		std::uint64_t RestoreFailures = 0;
 		bool FirstStereoActiveLogged = false;
 		bool FirstWorldStereoLogged = false;
+		bool FirstRestoreFailureLogged = false;
+		bool FirstMrtRejectLogged = false;
 
 		template <typename T>
 		void ReleaseCom(T*& value)
@@ -121,6 +140,13 @@ namespace OutRunVRStereo
 			slot = value;
 		}
 
+		struct InternalPassScope
+		{
+			bool previous = false;
+			InternalPassScope() : previous(InternalStereoPass) { InternalStereoPass = true; }
+			~InternalPassScope() { InternalStereoPass = previous; }
+		};
+
 		bool IsGameDevice(IDirect3DDevice9* device)
 		{
 			return device && Game::D3DDevice_ptr && *Game::D3DDevice_ptr == device;
@@ -134,6 +160,23 @@ namespace OutRunVRStereo
 				return true;
 			return *Game::current_mode == GameState::STATE_START &&
 				Game::game_start_progress_code && *Game::game_start_progress_code == 65;
+		}
+
+		bool StereoWanted()
+		{
+			if (!Settings::VRStereo || !GameplayActive())
+				return false;
+			return Settings::VREnabled || Settings::VRAutoEnableWhenHostPresent;
+		}
+
+		bool AnyAuxRenderTargetActive()
+		{
+			return AuxRenderTargetActive[0] || AuxRenderTargetActive[1] || AuxRenderTargetActive[2];
+		}
+
+		bool TargetIsBackBuffer()
+		{
+			return BackBuffer && TrackedRenderTarget && TrackedRenderTarget == BackBuffer;
 		}
 
 		bool IsReadableRange(const void* address, std::size_t size)
@@ -249,44 +292,65 @@ namespace OutRunVRStereo
 			return MatrixFinite(out);
 		}
 
-		bool Rigidish(const D3DMATRIX& m)
+		bool FloatArrayNear(const float* a, const float* b, std::size_t count, float epsilon)
 		{
-			if (!MatrixFinite(m) || std::fabs(m._14) > 0.1f || std::fabs(m._24) > 0.1f ||
-				std::fabs(m._34) > 0.1f || std::fabs(m._44 - 1.0f) > 0.15f)
+			if (!a || !b)
 				return false;
-			const float rows[3][3] = {
-				{m._11, m._12, m._13}, {m._21, m._22, m._23}, {m._31, m._32, m._33}
-			};
-			for (int r = 0; r < 3; ++r)
-			{
-				float len = 0.0f;
-				for (int c = 0; c < 3; ++c) len += rows[r][c] * rows[r][c];
-				if (!std::isfinite(len) || std::fabs(len - 1.0f) > 0.30f)
+			for (std::size_t i = 0; i < count; ++i)
+				if (!std::isfinite(a[i]) || !std::isfinite(b[i]) || std::fabs(a[i] - b[i]) > epsilon)
 					return false;
-			}
-			for (int a = 0; a < 3; ++a)
-				for (int b = a + 1; b < 3; ++b)
-				{
-					float dot = 0.0f;
-					for (int c = 0; c < 3; ++c) dot += rows[a][c] * rows[b][c];
-					if (std::fabs(dot) > 0.20f)
-						return false;
-				}
 			return true;
 		}
 
-		float FloatFromBits(std::uint32_t bits)
+		D3DMATRIX ProjectionFromFov(const D3DMATRIX& base, const OutRunVR::SharedFov& fov)
 		{
-			float value = 0.0f;
-			std::memcpy(&value, &bits, sizeof(value));
-			return value;
+			const float tanLeft = std::tan(fov.angleLeft);
+			const float tanRight = std::tan(fov.angleRight);
+			const float tanUp = std::tan(fov.angleUp);
+			const float tanDown = std::tan(fov.angleDown);
+			const float width = tanRight - tanLeft;
+			const float height = tanUp - tanDown;
+			D3DMATRIX out{};
+			// Matches Khronos OpenXR-SDK xr_linear.h GRAPHICS_D3D projection
+			// layout (-Z forward, +Y up, D3D [0,1] depth).
+			out._11 = 2.0f / width;
+			out._22 = 2.0f / height;
+			out._31 = (tanRight + tanLeft) / width;
+			out._32 = (tanUp + tanDown) / height;
+			// Preserve OutRun's exact near/far/depth mapping.
+			out._33 = base._33;
+			out._34 = base._34;
+			out._43 = base._43;
+			out._44 = base._44;
+			return out;
 		}
 
-		struct StereoSnapshot
+		bool ReadProjection(D3DMATRIX& projection)
 		{
-			OutRunVR::SharedFov fov[2]{};
-			float eyeOffset[2][3]{};
-		};
+			if (!ImageContainsRange(OutRunProjectionRva, sizeof(D3DMATRIX)))
+				return false;
+			const auto* projectionPtr = Module::exe_ptr<D3DMATRIX>(OutRunProjectionRva);
+			if (!IsReadableRange(projectionPtr, sizeof(D3DMATRIX)))
+				return false;
+			std::memcpy(&projection, projectionPtr, sizeof(projection));
+			return MatrixFinite(projection) &&
+				std::fabs(projection._34 + 1.0f) < 0.25f && std::fabs(projection._44) < 0.25f;
+		}
+
+		bool GetInverseProjection(const D3DMATRIX& projection, D3DMATRIX& inverse)
+		{
+			if (!ProjectionInverseValid || std::memcmp(&projection, &CachedProjection, sizeof(projection)) != 0)
+			{
+				D3DMATRIX candidate{};
+				if (!InvertMatrix(projection, candidate))
+					return false;
+				CachedProjection = projection;
+				CachedInverseProjection = candidate;
+				ProjectionInverseValid = true;
+			}
+			inverse = CachedInverseProjection;
+			return true;
+		}
 
 		bool EnsureSharedState()
 		{
@@ -315,112 +379,7 @@ namespace OutRunVRStereo
 				MemoryBarrier();
 				SharedState->magic = OutRunVR::SharedMagic;
 			}
-			QueryPerformanceFrequency(&QpcFrequency);
 			return true;
-		}
-
-		bool FovValid(const OutRunVR::SharedFov& fov)
-		{
-			const float limit = 1.56f;
-			return std::isfinite(fov.angleLeft) && std::isfinite(fov.angleRight) &&
-				std::isfinite(fov.angleUp) && std::isfinite(fov.angleDown) &&
-				fov.angleLeft > -limit && fov.angleRight < limit &&
-				fov.angleDown > -limit && fov.angleUp < limit &&
-				fov.angleRight > fov.angleLeft + 0.05f &&
-				fov.angleUp > fov.angleDown + 0.05f;
-		}
-
-		bool ReadStereoSnapshot(StereoSnapshot& out)
-		{
-			if (!EnsureSharedState())
-				return false;
-			if (QpcFrequency.QuadPart <= 0)
-				QueryPerformanceFrequency(&QpcFrequency);
-			OutRunVR::SharedPoseState snapshot{};
-			bool stable = false;
-			for (int attempt = 0; attempt < 4; ++attempt)
-			{
-				const std::uint32_t before = SharedState->sequence;
-				if (before & 1u)
-					continue;
-				MemoryBarrier();
-				std::memcpy(&snapshot, SharedState, sizeof(snapshot));
-				MemoryBarrier();
-				const std::uint32_t after = SharedState->sequence;
-				if (before == after && !(after & 1u))
-				{
-					stable = true;
-					break;
-				}
-			}
-			if (!stable || snapshot.magic != OutRunVR::SharedMagic ||
-				snapshot.protocolVersion != OutRunVR::SharedProtocolVersion ||
-				snapshot.structSize != sizeof(snapshot) ||
-				(snapshot.flags & (OutRunVR::HostAlive | OutRunVR::StereoViewsValid)) !=
-					(OutRunVR::HostAlive | OutRunVR::StereoViewsValid))
-				return false;
-			LARGE_INTEGER now{};
-			QueryPerformanceCounter(&now);
-			if (snapshot.sampleQpc <= 0 || QpcFrequency.QuadPart <= 0)
-				return false;
-			const LONGLONG age = now.QuadPart - snapshot.sampleQpc;
-			if (age < 0 || age > (QpcFrequency.QuadPart * HostPoseStaleMs) / 1000)
-				return false;
-			out.fov[0] = snapshot.eyeFov[0];
-			out.fov[1] = snapshot.eyeFov[1];
-			if (!FovValid(out.fov[0]) || !FovValid(out.fov[1]))
-				return false;
-			const std::uint32_t indexes[2][3] = {
-				{ OutRunVR::HostEyeOffsetLeftXIndex, OutRunVR::HostEyeOffsetLeftYIndex, OutRunVR::HostEyeOffsetLeftZIndex },
-				{ OutRunVR::HostEyeOffsetRightXIndex, OutRunVR::HostEyeOffsetRightYIndex, OutRunVR::HostEyeOffsetRightZIndex }
-			};
-			for (int eye = 0; eye < 2; ++eye)
-				for (int axis = 0; axis < 3; ++axis)
-				{
-					out.eyeOffset[eye][axis] = FloatFromBits(snapshot.reserved[indexes[eye][axis]]);
-					if (!std::isfinite(out.eyeOffset[eye][axis]) || std::fabs(out.eyeOffset[eye][axis]) > 0.25f)
-						return false;
-				}
-			return true;
-		}
-
-		D3DMATRIX ProjectionFromFov(const D3DMATRIX& base, const OutRunVR::SharedFov& fov)
-		{
-			const float tanLeft = std::tan(fov.angleLeft);
-			const float tanRight = std::tan(fov.angleRight);
-			const float tanUp = std::tan(fov.angleUp);
-			const float tanDown = std::tan(fov.angleDown);
-			const float width = tanRight - tanLeft;
-			const float height = tanUp - tanDown;
-			D3DMATRIX out{};
-			// Matches Khronos OpenXR-SDK xr_linear.h GRAPHICS_D3D projection
-			// layout (-Z forward, +Y up, D3D [0,1] depth).
-			out._11 = 2.0f / width;
-			out._22 = 2.0f / height;
-			out._31 = (tanRight + tanLeft) / width;
-			out._32 = (tanUp + tanDown) / height;
-			// Preserve OutRun's exact near/far/depth mapping.
-			out._33 = base._33;
-			out._34 = base._34;
-			out._43 = base._43;
-			out._44 = base._44;
-			return out;
-		}
-
-		bool ReadRendererMatrices(D3DMATRIX& projection, D3DMATRIX& worldView)
-		{
-			if (!ImageContainsRange(OutRunProjectionRva, sizeof(D3DMATRIX)) ||
-				!ImageContainsRange(OutRunWorldViewRva, sizeof(D3DMATRIX)))
-				return false;
-			const auto* projectionPtr = Module::exe_ptr<D3DMATRIX>(OutRunProjectionRva);
-			const auto* worldViewPtr = Module::exe_ptr<D3DMATRIX>(OutRunWorldViewRva);
-			if (!IsReadableRange(projectionPtr, sizeof(D3DMATRIX)) ||
-				!IsReadableRange(worldViewPtr, sizeof(D3DMATRIX)))
-				return false;
-			std::memcpy(&projection, projectionPtr, sizeof(projection));
-			std::memcpy(&worldView, worldViewPtr, sizeof(worldView));
-			return MatrixFinite(projection) && MatrixFinite(worldView) &&
-				std::fabs(projection._34 + 1.0f) < 0.25f && std::fabs(projection._44) < 0.25f;
 		}
 
 		struct DrawStereoState
@@ -428,30 +387,44 @@ namespace OutRunVRStereo
 			float originalConstants[16]{};
 			float eyeConstants[2][16]{};
 			bool worldStereo = false;
+			std::uint32_t poseSequence = 0;
 		};
 
-		bool BuildEyeConstants(IDirect3DDevice9* device, const StereoSnapshot& stereo, DrawStereoState& state)
+		bool BuildEyeConstants(IDirect3DDevice9* device,
+			const OutRunVRRenderer::LatchedStereoFrame& stereo, DrawStereoState& state)
 		{
-			if (!CurrentVertexShader)
+			std::uintptr_t shaderIdentity = 0;
+			std::uint64_t shaderSerial = 0;
+			if (!GetCurrentShaderEpoch(shaderIdentity, shaderSerial))
 				return false;
+
 			if (FAILED(device->GetVertexShaderConstantF(OutRunWvpRegister,
 				state.originalConstants, OutRunWvpRegisterCount)))
 				return false;
-			D3DMATRIX projection{};
-			D3DMATRIX worldView{};
-			if (!ReadRendererMatrices(projection, worldView))
+
+			float verifiedConstants[16]{};
+			std::uint32_t verifiedGeneration = 0;
+			std::uint32_t verifiedPoseSequence = 0;
+			std::uintptr_t verifiedShaderIdentity = 0;
+			std::uint64_t verifiedShaderSerial = 0;
+			if (!OutRunVRRenderer::GetLastVerifiedWvp(verifiedConstants, verifiedGeneration,
+				verifiedPoseSequence, verifiedShaderIdentity, verifiedShaderSerial))
 				return false;
+			if (verifiedGeneration == 0 || verifiedPoseSequence != stereo.poseSequence ||
+				verifiedShaderIdentity != shaderIdentity || verifiedShaderSerial != shaderSerial ||
+				!FloatArrayNear(state.originalConstants, verifiedConstants, 16, VerifiedWvpEpsilon))
+				return false;
+
+			D3DMATRIX projection{};
+			D3DMATRIX invProjection{};
+			if (!ReadProjection(projection) || !GetInverseProjection(projection, invProjection))
+				return false;
+
 			D3DMATRIX uploadedT{};
 			std::memcpy(&uploadedT, state.originalConstants, sizeof(uploadedT));
 			const D3DMATRIX currentWvp = TransposeMatrix(uploadedT);
-			D3DMATRIX invProjection{};
-			D3DMATRIX invWorldView{};
-			if (!InvertMatrix(projection, invProjection) || !InvertMatrix(worldView, invWorldView))
-				return false;
-			// currentWvp already contains the mono renderer-probe head correction.
 			const D3DMATRIX correctedWorldView = MultiplyMatrix(currentWvp, invProjection);
-			const D3DMATRIX headDelta = MultiplyMatrix(invWorldView, correctedWorldView);
-			if (!Rigidish(headDelta))
+			if (!MatrixFinite(correctedWorldView))
 				return false;
 
 			for (int eye = 0; eye < 2; ++eye)
@@ -460,7 +433,7 @@ namespace OutRunVRStereo
 				eyeInverse._41 = -stereo.eyeOffset[eye][0] * Settings::VRWorldScale;
 				eyeInverse._42 = -stereo.eyeOffset[eye][1] * Settings::VRWorldScale;
 				eyeInverse._43 = -stereo.eyeOffset[eye][2] * Settings::VRWorldScale;
-				const D3DMATRIX eyeProjection = ProjectionFromFov(projection, stereo.fov[eye]);
+				const D3DMATRIX eyeProjection = ProjectionFromFov(projection, stereo.eyeFov[eye]);
 				const D3DMATRIX eyeWvp = MultiplyMatrix(
 					MultiplyMatrix(correctedWorldView, eyeInverse), eyeProjection);
 				if (!MatrixFinite(eyeWvp))
@@ -468,7 +441,9 @@ namespace OutRunVRStereo
 				const D3DMATRIX eyeWvpT = TransposeMatrix(eyeWvp);
 				std::memcpy(state.eyeConstants[eye], &eyeWvpT, sizeof(eyeWvpT));
 			}
+
 			state.worldStereo = true;
+			state.poseSequence = stereo.poseSequence;
 			return true;
 		}
 
@@ -476,7 +451,7 @@ namespace OutRunVRStereo
 		{
 			// The mono renderer hook only recognizes a candidate when c64..c67 are
 			// present in one call. Four 1-register writes deliberately pass through
-			// unchanged, avoiding a second hook on SetVertexShaderConstantF.
+			// unchanged, avoiding a second head transform.
 			for (UINT reg = 0; reg < OutRunWvpRegisterCount; ++reg)
 				if (FAILED(device->SetVertexShaderConstantF(
 					OutRunWvpRegister + reg, constants + reg * 4, 1)))
@@ -484,21 +459,24 @@ namespace OutRunVRStereo
 			return true;
 		}
 
-		bool StereoWanted()
+		bool FormatHasStencil(D3DFORMAT format)
 		{
-			if (!Settings::VRStereo || !GameplayActive())
+			switch (format)
+			{
+			case D3DFMT_D15S1:
+			case D3DFMT_D24S8:
+			case D3DFMT_D24X4S4:
+			case D3DFMT_D24FS8:
+				return true;
+			default:
 				return false;
-			return Settings::VREnabled || Settings::VRAutoEnableWhenHostPresent;
-		}
-
-		bool TargetIsBackBuffer()
-		{
-			return BackBuffer && TrackedRenderTarget && TrackedRenderTarget == BackBuffer;
+			}
 		}
 
 		void ReleaseStereoResources()
 		{
 			StereoResourcesReady = false;
+			ProjectionInverseValid = false;
 			ReleaseCom(RightEyeSurface);
 			ReleaseCom(RightEyeDepth);
 			ReleaseCom(LeftResolveSurface);
@@ -511,26 +489,56 @@ namespace OutRunVRStereo
 			BackBufferDesc = {};
 		}
 
+		bool CreateRightDepthForTracked(IDirect3DDevice9* device)
+		{
+			ReleaseCom(RightEyeDepth);
+			if (!TrackedDepthStencil)
+				return true;
+
+			D3DSURFACE_DESC depthDesc{};
+			if (FAILED(TrackedDepthStencil->GetDesc(&depthDesc)))
+				return false;
+			return SUCCEEDED(device->CreateDepthStencilSurface(
+				BackBufferDesc.Width, BackBufferDesc.Height, depthDesc.Format,
+				depthDesc.MultiSampleType, depthDesc.MultiSampleQuality, FALSE,
+				&RightEyeDepth, nullptr));
+		}
+
+		bool InitializeAuxRenderTargetState(IDirect3DDevice9* device)
+		{
+			for (DWORD index = 1; index <= 3; ++index)
+			{
+				IDirect3DSurface9* surface = nullptr;
+				const HRESULT hr = device->GetRenderTarget(index, &surface);
+				AuxRenderTargetActive[index - 1] = SUCCEEDED(hr) && surface != nullptr;
+				if (surface)
+					surface->Release();
+			}
+			return true;
+		}
+
 		bool EnsureStereoResources(IDirect3DDevice9* device)
 		{
 			if (!device)
 				return false;
+			if (StereoResourcesReady && BackBuffer && RightEyeSurface &&
+				LeftResolveSurface && RightResolveSurface)
+				return true;
+
 			IDirect3DSurface9* newBackBuffer = nullptr;
 			if (FAILED(device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &newBackBuffer)) || !newBackBuffer)
 				return false;
 			D3DSURFACE_DESC desc{};
-			newBackBuffer->GetDesc(&desc);
-			if (StereoResourcesReady && BackBuffer && newBackBuffer == BackBuffer &&
-				desc.Width == BackBufferDesc.Width && desc.Height == BackBufferDesc.Height &&
-				desc.Format == BackBufferDesc.Format && desc.MultiSampleType == BackBufferDesc.MultiSampleType)
+			if (FAILED(newBackBuffer->GetDesc(&desc)))
 			{
 				newBackBuffer->Release();
-				return true;
+				return false;
 			}
 
 			ReleaseStereoResources();
 			BackBuffer = newBackBuffer;
 			BackBufferDesc = desc;
+
 			IDirect3DSurface9* currentRt = nullptr;
 			if (SUCCEEDED(device->GetRenderTarget(0, &currentRt)) && currentRt)
 				TrackedRenderTarget = currentRt;
@@ -539,25 +547,16 @@ namespace OutRunVRStereo
 			IDirect3DSurface9* currentDepth = nullptr;
 			if (SUCCEEDED(device->GetDepthStencilSurface(&currentDepth)) && currentDepth)
 				TrackedDepthStencil = currentDepth;
+			InitializeAuxRenderTargetState(device);
 
 			if (FAILED(device->CreateRenderTarget(desc.Width, desc.Height, desc.Format,
-				desc.MultiSampleType, desc.MultiSampleQuality, FALSE, &RightEyeSurface, nullptr)))
+				desc.MultiSampleType, desc.MultiSampleQuality, FALSE, &RightEyeSurface, nullptr)) ||
+				!CreateRightDepthForTracked(device))
 			{
 				ReleaseStereoResources();
 				return false;
 			}
-			if (TrackedDepthStencil)
-			{
-				D3DSURFACE_DESC depthDesc{};
-				TrackedDepthStencil->GetDesc(&depthDesc);
-				if (FAILED(device->CreateDepthStencilSurface(desc.Width, desc.Height, depthDesc.Format,
-					depthDesc.MultiSampleType, depthDesc.MultiSampleQuality, FALSE,
-					&RightEyeDepth, nullptr)))
-				{
-					ReleaseStereoResources();
-					return false;
-				}
-			}
+
 			if (FAILED(device->CreateTexture(desc.Width, desc.Height, 1, D3DUSAGE_RENDERTARGET,
 				desc.Format, D3DPOOL_DEFAULT, &LeftResolveTexture, nullptr)) ||
 				FAILED(LeftResolveTexture->GetSurfaceLevel(0, &LeftResolveSurface)) ||
@@ -569,22 +568,61 @@ namespace OutRunVRStereo
 				return false;
 			}
 
-			InternalStereoPass = true;
-			SetRenderTargetHook.stdcall<HRESULT>(device, 0u, RightEyeSurface);
-			if (SetDepthStencilSurfaceHook)
-				SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, RightEyeDepth);
-			else
-				device->SetDepthStencilSurface(RightEyeDepth);
-			ClearHook.stdcall<HRESULT>(device, 0u, static_cast<const D3DRECT*>(nullptr),
-				D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL,
-				D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0u);
-			if (TrackedRenderTarget)
-				SetRenderTargetHook.stdcall<HRESULT>(device, 0u, TrackedRenderTarget);
-			if (SetDepthStencilSurfaceHook)
-				SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, TrackedDepthStencil);
-			else
-				device->SetDepthStencilSurface(TrackedDepthStencil);
-			InternalStereoPass = false;
+			D3DVIEWPORT9 savedViewport{};
+			if (FAILED(device->GetViewport(&savedViewport)))
+			{
+				ReleaseStereoResources();
+				return false;
+			}
+
+			bool initOk = true;
+			{
+				InternalPassScope guard;
+				if (FAILED(SetRenderTargetHook.stdcall<HRESULT>(device, 0u, RightEyeSurface)))
+					initOk = false;
+				if (initOk)
+				{
+					const HRESULT depthHr = SetDepthStencilSurfaceHook
+						? SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, RightEyeDepth)
+						: device->SetDepthStencilSurface(RightEyeDepth);
+					if (FAILED(depthHr)) initOk = false;
+				}
+				if (initOk && FAILED(device->SetViewport(&savedViewport)))
+					initOk = false;
+
+				DWORD clearFlags = D3DCLEAR_TARGET;
+				if (RightEyeDepth)
+				{
+					D3DSURFACE_DESC depthDesc{};
+					if (FAILED(RightEyeDepth->GetDesc(&depthDesc)))
+						initOk = false;
+					else
+					{
+						clearFlags |= D3DCLEAR_ZBUFFER;
+						if (FormatHasStencil(depthDesc.Format))
+							clearFlags |= D3DCLEAR_STENCIL;
+					}
+				}
+				if (initOk && FAILED(ClearHook.stdcall<HRESULT>(device, 0u,
+					static_cast<const D3DRECT*>(nullptr), clearFlags,
+					D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0u)))
+					initOk = false;
+
+				if (TrackedRenderTarget && FAILED(SetRenderTargetHook.stdcall<HRESULT>(
+					device, 0u, TrackedRenderTarget)))
+					initOk = false;
+				const HRESULT restoreDepthHr = SetDepthStencilSurfaceHook
+					? SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, TrackedDepthStencil)
+					: device->SetDepthStencilSurface(TrackedDepthStencil);
+				if (FAILED(restoreDepthHr)) initOk = false;
+				if (FAILED(device->SetViewport(&savedViewport))) initOk = false;
+			}
+
+			if (!initOk)
+			{
+				ReleaseStereoResources();
+				return false;
+			}
 
 			StereoResourcesReady = true;
 			spdlog::info("VR stereo: full-size eye surfaces ready {}x{} format={} msaa={} quality={}",
@@ -593,25 +631,59 @@ namespace OutRunVRStereo
 			return true;
 		}
 
-		void PublishStereoState(std::uint32_t state, bool worldStereo)
+		void NoteRestoreFailure(const char* what)
+		{
+			FrameRightDrawFailed = true;
+			++RestoreFailures;
+			if (!FirstRestoreFailureLogged)
+			{
+				FirstRestoreFailureLogged = true;
+				spdlog::warn("VR stereo: renderer state restore failed at {}; frame forced to mono fallback", what);
+			}
+		}
+
+		bool RestoreRightPassState(IDirect3DDevice9* device, IDirect3DSurface9* savedRt,
+			IDirect3DSurface9* savedDepth, const D3DVIEWPORT9& savedViewport,
+			const float* originalConstants, bool restoreWvp)
+		{
+			bool ok = true;
+			if (savedRt && FAILED(SetRenderTargetHook.stdcall<HRESULT>(device, 0u, savedRt))) ok = false;
+			const HRESULT depthHr = SetDepthStencilSurfaceHook
+				? SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, savedDepth)
+				: device->SetDepthStencilSurface(savedDepth);
+			if (FAILED(depthHr)) ok = false;
+			if (FAILED(device->SetViewport(&savedViewport))) ok = false;
+			if (restoreWvp && !SetWvpOneRegisterAtATime(device, originalConstants)) ok = false;
+			return ok;
+		}
+
+		void PublishStereoState(std::uint32_t state, bool worldStereo, std::uint32_t poseSequence)
 		{
 			if (!EnsureSharedState())
 				return;
-			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoStateIndex]),
-				static_cast<LONG>(state));
-			if (state == OutRunVR::StereoSbsActive)
+
+			if (state != OutRunVR::StereoSbsActive || poseSequence == 0)
 			{
-				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoFrameIndex]),
-					static_cast<LONG>(++StereoFrameCounter));
-				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferWidthIndex]),
-					static_cast<LONG>(BackBufferDesc.Width));
-				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferHeightIndex]),
-					static_cast<LONG>(BackBufferDesc.Height));
-				LONG bits = static_cast<LONG>(OutRunVR::ClientStereoActive | OutRunVR::ClientStereoDrawDuplicated);
-				if (worldStereo)
-					bits |= static_cast<LONG>(OutRunVR::ClientStereoWorldDraw);
-				InterlockedOr(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientFlagsIndex]), bits);
+				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientStereoPoseSequence), 0);
+				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoStateIndex]),
+					static_cast<LONG>(state));
+				return;
 			}
+
+			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientStereoPoseSequence),
+				static_cast<LONG>(poseSequence));
+			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferWidthIndex]),
+				static_cast<LONG>(BackBufferDesc.Width));
+			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferHeightIndex]),
+				static_cast<LONG>(BackBufferDesc.Height));
+			LONG bits = static_cast<LONG>(OutRunVR::ClientStereoActive | OutRunVR::ClientStereoDrawDuplicated);
+			if (worldStereo)
+				bits |= static_cast<LONG>(OutRunVR::ClientStereoWorldDraw);
+			InterlockedOr(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientFlagsIndex]), bits);
+			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoStateIndex]),
+				static_cast<LONG>(OutRunVR::StereoSbsActive));
+			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoFrameIndex]),
+				static_cast<LONG>(++StereoFrameCounter));
 		}
 
 		struct ScreenVertex
@@ -652,91 +724,98 @@ namespace OutRunVRStereo
 			IDirect3DStateBlock9* stateBlock = nullptr;
 			if (FAILED(device->CreateStateBlock(D3DSBT_ALL, &stateBlock)) || !stateBlock)
 				return false;
-			stateBlock->Capture();
+
 			IDirect3DSurface9* savedRt = nullptr;
 			IDirect3DSurface9* savedDepth = nullptr;
-			device->GetRenderTarget(0, &savedRt);
-			device->GetDepthStencilSurface(&savedDepth);
 			D3DVIEWPORT9 savedViewport{};
-			device->GetViewport(&savedViewport);
-			const std::uint32_t savedClientFlags = SharedState
-				? SharedState->reserved[OutRunVR::ClientFlagsIndex] : 0;
+			if (FAILED(device->GetRenderTarget(0, &savedRt)) || !savedRt ||
+				FAILED(device->GetDepthStencilSurface(&savedDepth)) ||
+				FAILED(device->GetViewport(&savedViewport)))
+			{
+				if (savedRt) savedRt->Release();
+				if (savedDepth) savedDepth->Release();
+				stateBlock->Release();
+				return false;
+			}
 
 			bool success = false;
-			InternalStereoPass = true;
-			do
+			bool beganScene = false;
 			{
-				if (FAILED(SetRenderTargetHook.stdcall<HRESULT>(device, 0u, BackBuffer))) break;
-				if (SetDepthStencilSurfaceHook)
-					SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, static_cast<IDirect3DSurface9*>(nullptr));
-				else
-					device->SetDepthStencilSurface(nullptr);
-				if (FAILED(device->BeginScene())) break;
-				device->SetVertexShader(nullptr);
-				device->SetPixelShader(nullptr);
-				device->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
-				device->SetRenderState(D3DRS_ZENABLE, FALSE);
-				device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-				device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-				device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-				device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-				device->SetRenderState(D3DRS_LIGHTING, FALSE);
-				device->SetRenderState(D3DRS_FOGENABLE, FALSE);
-				device->SetRenderState(D3DRS_STENCILENABLE, FALSE);
-				device->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
-				device->SetRenderState(D3DRS_SRGBWRITEENABLE, FALSE);
-				device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-				device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-				device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-				device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-				device->SetTextureStageState(0, D3DTSS_TEXCOORDINDEX, 0);
-				device->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_DISABLE);
-				device->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-				device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-				device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-				device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-				device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-				device->SetSamplerState(0, D3DSAMP_SRGBTEXTURE, FALSE);
-				D3DVIEWPORT9 full{ 0, 0, BackBufferDesc.Width, BackBufferDesc.Height, 0.0f, 1.0f };
-				device->SetViewport(&full);
-				device->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-				const bool leftOk = DrawTextureHalf(device, LeftResolveTexture, false);
-				const bool rightOk = DrawTextureHalf(device, RightResolveTexture, true);
-				device->SetTexture(0, nullptr);
-				const HRESULT endHr = device->EndScene();
-				success = leftOk && rightOk && SUCCEEDED(endHr);
-			} while (false);
-			InternalStereoPass = false;
-
-			stateBlock->Apply();
-			stateBlock->Release();
-			if (savedRt)
-			{
-				SetRenderTargetHook.stdcall<HRESULT>(device, 0u, savedRt);
-				savedRt->Release();
+				InternalPassScope guard;
+				if (SUCCEEDED(SetRenderTargetHook.stdcall<HRESULT>(device, 0u, BackBuffer)) &&
+					SUCCEEDED(SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, static_cast<IDirect3DSurface9*>(nullptr))) &&
+					SUCCEEDED(device->BeginScene()))
+				{
+					beganScene = true;
+					device->SetVertexShader(nullptr);
+					device->SetPixelShader(nullptr);
+					device->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
+					device->SetRenderState(D3DRS_ZENABLE, FALSE);
+					device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+					device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+					device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+					device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+					device->SetRenderState(D3DRS_LIGHTING, FALSE);
+					device->SetRenderState(D3DRS_FOGENABLE, FALSE);
+					device->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+					device->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
+					device->SetRenderState(D3DRS_SRGBWRITEENABLE, FALSE);
+					device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+					device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+					device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+					device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+					device->SetTextureStageState(0, D3DTSS_TEXCOORDINDEX, 0);
+					device->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_DISABLE);
+					device->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+					device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+					device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+					device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+					device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+					device->SetSamplerState(0, D3DSAMP_SRGBTEXTURE, FALSE);
+					D3DVIEWPORT9 full{ 0, 0, BackBufferDesc.Width, BackBufferDesc.Height, 0.0f, 1.0f };
+					const bool stateOk = SUCCEEDED(device->SetViewport(&full)) &&
+						SUCCEEDED(device->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0));
+					const bool leftOk = stateOk && DrawTextureHalf(device, LeftResolveTexture, false);
+					const bool rightOk = leftOk && DrawTextureHalf(device, RightResolveTexture, true);
+					device->SetTexture(0, nullptr);
+					const HRESULT endHr = device->EndScene();
+					beganScene = false;
+					success = leftOk && rightOk && SUCCEEDED(endHr);
+				}
+				if (beganScene)
+					device->EndScene();
 			}
-			if (SetDepthStencilSurfaceHook)
-				SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, savedDepth);
-			else
-				device->SetDepthStencilSurface(savedDepth);
-			if (savedDepth) savedDepth->Release();
-			device->SetViewport(&savedViewport);
 
-			// The extra D3D BeginScene/EndScene is compositor-only. Preserve the
-			// real game scene's client telemetry after vr_renderer_probe observes it.
-			if (SharedState)
-				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientFlagsIndex]),
-					static_cast<LONG>(savedClientFlags));
-			return success;
+			const HRESULT applyHr = stateBlock->Apply();
+			stateBlock->Release();
+			bool restoreOk = SUCCEEDED(applyHr);
+			if (FAILED(SetRenderTargetHook.stdcall<HRESULT>(device, 0u, savedRt))) restoreOk = false;
+			if (FAILED(SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, savedDepth))) restoreOk = false;
+			if (FAILED(device->SetViewport(&savedViewport))) restoreOk = false;
+			savedRt->Release();
+			savedDepth->Release();
+			return success && restoreOk;
 		}
 
 		bool PrepareDuplicatedDraw(IDirect3DDevice9* device, DrawStereoState& draw)
 		{
-			if (InternalStereoPass || !StereoWanted() || !TargetIsBackBuffer() ||
-				!EnsureStereoResources(device))
+			if (InternalStereoPass || !StereoWanted() || !TargetIsBackBuffer())
 				return false;
-			StereoSnapshot stereo{};
-			if (!ReadStereoSnapshot(stereo))
+			if (AnyAuxRenderTargetActive())
+			{
+				++MrtRejectedDraws;
+				if (!FirstMrtRejectLogged)
+				{
+					FirstMrtRejectLogged = true;
+					spdlog::info("VR stereo: auxiliary MRT active; draw left untouched to avoid double-writing RT1+");
+				}
+				return false;
+			}
+			if (!EnsureStereoResources(device))
+				return false;
+
+			OutRunVRRenderer::LatchedStereoFrame stereo{};
+			if (!OutRunVRRenderer::GetLatchedStereoFrame(stereo))
 				return false;
 			BuildEyeConstants(device, stereo, draw);
 			return true;
@@ -749,45 +828,54 @@ namespace OutRunVRStereo
 			if (!PrepareDuplicatedDraw(device, draw))
 				return drawCall();
 
+			D3DVIEWPORT9 savedViewport{};
+			if (FAILED(device->GetViewport(&savedViewport)))
+				return drawCall();
+
 			if (draw.worldStereo && !SetWvpOneRegisterAtATime(device, draw.eyeConstants[0]))
 				return drawCall();
+
 			const HRESULT leftHr = drawCall();
 			if (FAILED(leftHr))
 			{
-				if (draw.worldStereo)
-					SetWvpOneRegisterAtATime(device, draw.originalConstants);
+				if (draw.worldStereo && !SetWvpOneRegisterAtATime(device, draw.originalConstants))
+					NoteRestoreFailure("left draw c64");
 				return leftHr;
 			}
 
 			IDirect3DSurface9* savedRt = TrackedRenderTarget;
 			IDirect3DSurface9* savedDepth = TrackedDepthStencil;
-			InternalStereoPass = true;
-			HRESULT rightHr = SetRenderTargetHook.stdcall<HRESULT>(device, 0u, RightEyeSurface);
-			if (SUCCEEDED(rightHr))
+			HRESULT rightHr = D3D_OK;
+			bool restoreOk = true;
 			{
-				if (SetDepthStencilSurfaceHook)
+				InternalPassScope guard;
+				rightHr = SetRenderTargetHook.stdcall<HRESULT>(device, 0u, RightEyeSurface);
+				if (SUCCEEDED(rightHr))
+				{
 					rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, RightEyeDepth);
-				else
-					rightHr = device->SetDepthStencilSurface(RightEyeDepth);
+				}
+				if (SUCCEEDED(rightHr))
+					rightHr = device->SetViewport(&savedViewport);
+				if (SUCCEEDED(rightHr) && draw.worldStereo)
+					rightHr = SetWvpOneRegisterAtATime(device, draw.eyeConstants[1]) ? D3D_OK : E_FAIL;
+				if (SUCCEEDED(rightHr))
+					rightHr = drawCall();
+
+				restoreOk = RestoreRightPassState(device, savedRt, savedDepth,
+					savedViewport, draw.originalConstants, draw.worldStereo);
 			}
-			if (SUCCEEDED(rightHr) && draw.worldStereo)
-				rightHr = SetWvpOneRegisterAtATime(device, draw.eyeConstants[1]) ? D3D_OK : E_FAIL;
-			if (SUCCEEDED(rightHr))
-				rightHr = drawCall();
-			if (savedRt)
-				SetRenderTargetHook.stdcall<HRESULT>(device, 0u, savedRt);
-			if (SetDepthStencilSurfaceHook)
-				SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, savedDepth);
-			else
-				device->SetDepthStencilSurface(savedDepth);
-			if (draw.worldStereo)
-				SetWvpOneRegisterAtATime(device, draw.originalConstants);
-			InternalStereoPass = false;
 
 			FrameHadDuplicatedDraw = true;
 			++DuplicatedDraws;
 			if (draw.worldStereo)
 			{
+				if (FrameStereoPoseSequence == 0)
+					FrameStereoPoseSequence = draw.poseSequence;
+				else if (FrameStereoPoseSequence != draw.poseSequence)
+				{
+					FrameRightDrawFailed = true;
+					spdlog::warn("VR stereo: multiple host pose sequences reached one Present; frame forced to mono fallback");
+				}
 				FrameHadWorldStereo = true;
 				++WorldStereoDraws;
 				if (!FirstWorldStereoLogged)
@@ -798,8 +886,11 @@ namespace OutRunVRStereo
 			}
 			else
 				++NonWorldDuplicatedDraws;
+
 			if (FAILED(rightHr))
 				FrameRightDrawFailed = true;
+			if (!restoreOk)
+				NoteRestoreFailure("right-eye draw");
 			return leftHr;
 		}
 
@@ -839,37 +930,53 @@ namespace OutRunVRStereo
 		HRESULT __stdcall ClearDest(IDirect3DDevice9* device, DWORD count, const D3DRECT* rects,
 			DWORD flags, D3DCOLOR color, float z, DWORD stencil)
 		{
-			StereoSnapshot snapshot{};
+			OutRunVRRenderer::LatchedStereoFrame stereo{};
 			const bool duplicate = !InternalStereoPass && StereoWanted() && TargetIsBackBuffer() &&
-				EnsureStereoResources(device) && ReadStereoSnapshot(snapshot);
+				!AnyAuxRenderTargetActive() && EnsureStereoResources(device) &&
+				OutRunVRRenderer::GetLatchedStereoFrame(stereo);
 			const HRESULT leftHr = ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
 			if (!duplicate || FAILED(leftHr))
 				return leftHr;
 
+			D3DVIEWPORT9 savedViewport{};
+			if (FAILED(device->GetViewport(&savedViewport)))
+				return leftHr;
+
 			IDirect3DSurface9* savedRt = TrackedRenderTarget;
 			IDirect3DSurface9* savedDepth = TrackedDepthStencil;
-			InternalStereoPass = true;
-			SetRenderTargetHook.stdcall<HRESULT>(device, 0u, RightEyeSurface);
-			if (SetDepthStencilSurfaceHook)
-				SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, RightEyeDepth);
-			else
-				device->SetDepthStencilSurface(RightEyeDepth);
-			ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
-			if (savedRt)
-				SetRenderTargetHook.stdcall<HRESULT>(device, 0u, savedRt);
-			if (SetDepthStencilSurfaceHook)
-				SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, savedDepth);
-			else
-				device->SetDepthStencilSurface(savedDepth);
-			InternalStereoPass = false;
+			HRESULT rightHr = D3D_OK;
+			bool restoreOk = true;
+			{
+				InternalPassScope guard;
+				rightHr = SetRenderTargetHook.stdcall<HRESULT>(device, 0u, RightEyeSurface);
+				if (SUCCEEDED(rightHr))
+					rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, RightEyeDepth);
+				if (SUCCEEDED(rightHr))
+					rightHr = device->SetViewport(&savedViewport);
+				if (SUCCEEDED(rightHr))
+					rightHr = ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
+				restoreOk = RestoreRightPassState(device, savedRt, savedDepth,
+					savedViewport, nullptr, false);
+			}
+			if (FAILED(rightHr)) FrameRightDrawFailed = true;
+			if (!restoreOk) NoteRestoreFailure("right-eye clear");
 			return leftHr;
 		}
 
 		HRESULT __stdcall SetRenderTargetDest(IDirect3DDevice9* device, DWORD index, IDirect3DSurface9* surface)
 		{
 			const HRESULT hr = SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);
-			if (!InternalStereoPass && IsGameDevice(device) && index == 0 && SUCCEEDED(hr))
-				ReplaceSurfaceRef(TrackedRenderTarget, surface);
+			if (!InternalStereoPass && IsGameDevice(device) && SUCCEEDED(hr))
+			{
+				if (index == 0)
+				{
+					ReplaceSurfaceRef(TrackedRenderTarget, surface);
+					if (StereoResourcesReady && TargetIsBackBuffer() && !CreateRightDepthForTracked(device))
+						StereoResourcesReady = false;
+				}
+				else if (index >= 1 && index <= 3)
+					AuxRenderTargetActive[index - 1] = surface != nullptr;
+			}
 			return hr;
 		}
 
@@ -877,7 +984,11 @@ namespace OutRunVRStereo
 		{
 			const HRESULT hr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface);
 			if (!InternalStereoPass && IsGameDevice(device) && SUCCEEDED(hr))
+			{
 				ReplaceSurfaceRef(TrackedDepthStencil, surface);
+				if (StereoResourcesReady && TargetIsBackBuffer() && !CreateRightDepthForTracked(device))
+					StereoResourcesReady = false;
+			}
 			return hr;
 		}
 
@@ -885,7 +996,12 @@ namespace OutRunVRStereo
 		{
 			const HRESULT hr = SetVertexShaderHook.stdcall<HRESULT>(device, shader);
 			if (!InternalStereoPass && IsGameDevice(device) && SUCCEEDED(hr))
-				CurrentVertexShader = shader;
+			{
+				CurrentVertexShaderIdentity.store(reinterpret_cast<std::uintptr_t>(shader), std::memory_order_release);
+				std::uint64_t serial = VertexShaderSerial.fetch_add(1, std::memory_order_acq_rel) + 1;
+				if (serial == 0)
+					VertexShaderSerial.fetch_add(1, std::memory_order_acq_rel);
+			}
 			return hr;
 		}
 
@@ -897,9 +1013,10 @@ namespace OutRunVRStereo
 			if (now - LastSummaryMs < 5000)
 				return;
 			LastSummaryMs = now;
-			spdlog::info("VR stereo: draws={} world={} ui/effect={} composeOk={} composeFail={} rightFail={}",
+			spdlog::info("VR stereo: draws={} world={} ui/effect={} composeOk={} composeFail={} rightFail={} mrtReject={} restoreFail={} poseSeq={}",
 				DuplicatedDraws, WorldStereoDraws, NonWorldDuplicatedDraws,
-				StereoComposeSuccess, StereoComposeFailure, FrameRightDrawFailed ? 1 : 0);
+				StereoComposeSuccess, StereoComposeFailure, FrameRightDrawFailed ? 1 : 0,
+				MrtRejectedDraws, RestoreFailures, FrameStereoPoseSequence);
 		}
 
 		HRESULT __stdcall PresentDest(IDirect3DDevice9* device, const RECT* sourceRect,
@@ -908,33 +1025,35 @@ namespace OutRunVRStereo
 			if (!IsGameDevice(device))
 				return PresentHook.stdcall<HRESULT>(device, sourceRect, destRect, destWindowOverride, dirtyRegion);
 
-			if (StereoWanted() && FrameHadWorldStereo && FrameHadDuplicatedDraw && !FrameRightDrawFailed &&
-				EnsureStereoResources(device))
+			if (StereoWanted() && FrameHadWorldStereo && FrameHadDuplicatedDraw &&
+				!FrameRightDrawFailed && FrameStereoPoseSequence != 0 && EnsureStereoResources(device))
 			{
 				if (ComposeSbs(device))
 				{
 					++StereoComposeSuccess;
-					PublishStereoState(OutRunVR::StereoSbsActive, true);
+					PublishStereoState(OutRunVR::StereoSbsActive, true, FrameStereoPoseSequence);
 					if (!FirstStereoActiveLogged)
 					{
 						FirstStereoActiveLogged = true;
-						spdlog::info("VR stereo: SBS transport active; x64 host can submit XrCompositionLayerProjection");
+						spdlog::info("VR stereo: SBS transport active; exact pose sequence published for XrCompositionLayerProjection");
 					}
 				}
 				else
 				{
 					++StereoComposeFailure;
-					PublishStereoState(OutRunVR::StereoSbsFallbackMono, false);
+					PublishStereoState(OutRunVR::StereoSbsFallbackMono, false, 0);
 				}
 			}
 			else
-				PublishStereoState(StereoWanted() ? OutRunVR::StereoSbsFallbackMono : OutRunVR::StereoDisabled, false);
+				PublishStereoState(StereoWanted() ? OutRunVR::StereoSbsFallbackMono : OutRunVR::StereoDisabled,
+					false, 0);
 
 			MaybeLogSummary();
 			const HRESULT hr = PresentHook.stdcall<HRESULT>(device, sourceRect, destRect, destWindowOverride, dirtyRegion);
 			FrameHadDuplicatedDraw = false;
 			FrameHadWorldStereo = false;
 			FrameRightDrawFailed = false;
+			FrameStereoPoseSequence = 0;
 			return hr;
 		}
 
@@ -943,7 +1062,9 @@ namespace OutRunVRStereo
 			if (!IsGameDevice(device))
 				return ResetHook.stdcall<HRESULT>(device, params);
 			ReleaseStereoResources();
-			CurrentVertexShader = nullptr;
+			AuxRenderTargetActive = {};
+			CurrentVertexShaderIdentity.store(0, std::memory_order_release);
+			VertexShaderSerial.store(0, std::memory_order_release);
 			const HRESULT hr = ResetHook.stdcall<HRESULT>(device, params);
 			if (SUCCEEDED(hr))
 				EnsureStereoResources(device);
@@ -983,9 +1104,11 @@ namespace OutRunVRStereo
 			IDirect3DVertexShader9* shader = nullptr;
 			if (SUCCEEDED(device->GetVertexShader(&shader)) && shader)
 			{
-				CurrentVertexShader = shader;
+				CurrentVertexShaderIdentity.store(reinterpret_cast<std::uintptr_t>(shader), std::memory_order_release);
+				VertexShaderSerial.store(1, std::memory_order_release);
 				shader->Release();
 			}
+			InitializeAuxRenderTargetState(device);
 			EnsureSharedState();
 			EnsureStereoResources(device);
 			spdlog::info("VR stereo: D3D9 full-eye renderer installed (Reset/Present/RT/Depth/Clear/Draw*/VS)");
@@ -1008,6 +1131,30 @@ namespace OutRunVRStereo
 			spdlog::warn("VR stereo: D3D9 device did not appear; stereo hooks not installed");
 			return 0;
 		}
+	}
+
+	bool IsInternalStereoPassActive()
+	{
+		return InternalStereoPass;
+	}
+
+	bool GetCurrentShaderEpoch(std::uintptr_t& shaderIdentity, std::uint64_t& serial)
+	{
+		for (int attempt = 0; attempt < 3; ++attempt)
+		{
+			const std::uint64_t before = VertexShaderSerial.load(std::memory_order_acquire);
+			const std::uintptr_t identity = CurrentVertexShaderIdentity.load(std::memory_order_acquire);
+			const std::uint64_t after = VertexShaderSerial.load(std::memory_order_acquire);
+			if (before == after)
+			{
+				shaderIdentity = identity;
+				serial = after;
+				return identity != 0 && after != 0;
+			}
+		}
+		shaderIdentity = 0;
+		serial = 0;
+		return false;
 	}
 
 	class VRStereoHook : public Hook
