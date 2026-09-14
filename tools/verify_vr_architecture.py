@@ -10,6 +10,7 @@ required = [
     'src/vr/ipc/protocol.hpp',
     # New architecture foundation.
     'src/vr/core/frame_types.hpp',
+    'src/vr/core/matrix.hpp',
     'src/vr/core/transport.hpp',
     'src/vr/game/game_adapter.hpp',
     'src/vr/d3d9/stereo_backend.hpp',
@@ -18,6 +19,7 @@ required = [
     'vrhost/src/runtime/vr_runtime.hpp',
     'vrhost/src/frame_source.hpp',
     'vrhost/tests/protocol_v3_smoke.cpp',
+    'vrhost/tests/core_math_smoke.cpp',
     'vrhost/src/main.cpp',
     'vrhost/src/stereo_shader.hpp',
     'vrhost/tests/stereo_shader_smoke.cpp',
@@ -49,7 +51,7 @@ for rel in forbidden:
     if (ROOT / rel).exists():
         raise SystemExit(f'legacy/prototype artifact still present: {rel}')
 
-# v2 remains only as the live compatibility runtime while behavior is moved.
+# v2 is only the live comparison oracle while behavior moves to the new skeleton.
 protocol_v2 = (ROOT / 'src/vr/ipc/protocol.hpp').read_text(encoding='utf-8')
 for marker in (
     'SharedProtocolVersion = 2', 'RenderFrameProtocolVersion = 2',
@@ -58,17 +60,16 @@ for marker in (
     'SharedRenderFrameRing',
 ):
     if marker not in protocol_v2:
-        raise SystemExit(f'missing live v2 compatibility invariant: {marker}')
+        raise SystemExit(f'missing live v2 comparison invariant: {marker}')
 
-# v3 is the target contract. Ownership is explicit and cross-bitness fields are
-# fixed width; no reserved-word semantic extensions are allowed.
 protocol_v3 = (ROOT / 'src/vr/ipc/protocol_v3.hpp').read_text(encoding='utf-8')
 for marker in (
     'ProtocolVersion = 3', 'HostStateName', 'ClientStateName',
     'FrameRingName', 'AckStateName', 'struct HostState',
     'struct ClientState', 'struct FrameRing', 'struct AckState',
     'using WireHandle = std::uint64_t', 'WireHandle leftHandle',
-    'WireHandle rightHandle',
+    'WireHandle rightHandle', 'sizeof(HostState) == 268',
+    'sizeof(ClientState) == 88', 'sizeof(FrameRing) == 720',
 ):
     if marker not in protocol_v3:
         raise SystemExit(f'missing v3 ownership/cross-bitness invariant: {marker}')
@@ -76,6 +77,13 @@ for forbidden_marker in ('reserved[', 'std::uintptr_t interopProbeHandle',
                          'std::uintptr_t leftHandle', 'std::uintptr_t rightHandle'):
     if forbidden_marker in protocol_v3:
         raise SystemExit(f'v3 protocol reintroduced implicit ABI debt: {forbidden_marker}')
+
+math_core = (ROOT / 'src/vr/core/matrix.hpp').read_text(encoding='utf-8')
+for marker in ('struct Matrix4', 'ProjectionFromOpenXrFov', 'InverseRigid', 'Invert('):
+    if marker not in math_core:
+        raise SystemExit(f'missing renderer-independent math boundary: {marker}')
+if '#include <d3d9.h>' in math_core or '#include <openxr/' in math_core:
+    raise SystemExit('core matrix layer must not depend on D3D9 or OpenXR headers')
 
 core_transport = (ROOT / 'src/vr/core/transport.hpp').read_text(encoding='utf-8')
 for marker in ('class IFrameProducer', 'class IFrameConsumer',
@@ -108,7 +116,7 @@ for marker in (
     'ResolveDirectTransport', 'StereoFailurePoseSequenceMismatch',
 ):
     if marker not in stereo:
-        raise SystemExit(f'missing live D3D9 stereo invariant: {marker}')
+        raise SystemExit(f'missing live D3D9 stereo comparison invariant: {marker}')
 for forbidden_call in ('Game::ModeControl()', 'Game::EventControl()', 'WheelFFB_ServiceSafety'):
     if forbidden_call in stereo:
         raise SystemExit(f'VR render backend must not execute game/FFB tick: {forbidden_call}')
@@ -121,7 +129,7 @@ for marker in (
     'DuplicateOutput', 'HostTimings',
 ):
     if marker not in host:
-        raise SystemExit(f'missing live host invariant: {marker}')
+        raise SystemExit(f'missing live host comparison invariant: {marker}')
 
 runtime_boundary = (ROOT / 'vrhost/src/runtime/vr_runtime.hpp').read_text(encoding='utf-8')
 if 'class IVrRuntime' not in runtime_boundary or 'requiredAdapter' not in runtime_boundary:
@@ -132,7 +140,8 @@ if 'class IFrameSource' not in frame_source or 'TransportKind' not in frame_sour
     raise SystemExit('missing host frame-source boundary')
 
 cmake = (ROOT / 'vrhost/CMakeLists.txt').read_text(encoding='utf-8')
-for marker in ('src/main.cpp', 'tests/stereo_shader_smoke.cpp', 'tests/protocol_v3_smoke.cpp'):
+for marker in ('src/main.cpp', 'tests/stereo_shader_smoke.cpp', 'tests/protocol_v3_smoke.cpp',
+               'tests/core_math_smoke.cpp'):
     if marker not in cmake:
         raise SystemExit(f'host CMake missing reconstructed target: {marker}')
 
