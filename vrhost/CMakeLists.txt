@@ -41,11 +41,13 @@ target_include_directories(outrun-vr-host PRIVATE
 )
 target_compile_definitions(outrun-vr-host PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 if(MSVC)
-    # main.cpp is intentionally kept on an OpenXR 1.0 application baseline.
-    # The forced include loads the SDK header first, then pins
-    # XR_CURRENT_API_VERSION to XR_API_VERSION_1_0 before main.cpp uses it.
+    # Keep the application API at OpenXR 1.0 for VDXR 1.0.x, then layer the
+    # R10 independent Desktop-Duplication/SBS output bridge on top.  The R10
+    # header includes the compatibility header itself; listing both explicitly
+    # documents and CI-locks the intended forced-include order.
     target_compile_options(outrun-vr-host PRIVATE
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/openxr_api_compat.hpp"
+        "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/sbs_capture_override.hpp"
     )
 endif()
 target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi d3dcompiler user32)
