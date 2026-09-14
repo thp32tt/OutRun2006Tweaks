@@ -32,6 +32,14 @@ namespace OutRunVR::Host::Diagnostics
             return s.str();
         }
 
+        std::string BoundedString(const char* text, std::size_t capacity)
+        {
+            if (!text || !capacity) return {};
+            std::size_t length = 0;
+            while (length < capacity && text[length] != '\0') ++length;
+            return std::string(text, length);
+        }
+
         class Log
         {
         public:
@@ -47,9 +55,25 @@ namespace OutRunVR::Host::Diagnostics
         };
 
         template <typename T>
-        bool StableReadHeader(const Ipc::ReadOnlyMapping<T>& mapping, T& out) noexcept
+        bool StableReadState(const Ipc::ReadOnlyMapping<T>& mapping, T& out) noexcept
         {
             return mapping.IsOpen() && Ipc::StableRead(mapping.Get(), out);
+        }
+
+        bool StableReadFrameRing(const IpcV3::FrameRing* shared, IpcV3::FrameRing& out) noexcept
+        {
+            if (!shared) return false;
+            for (int attempt = 0; attempt < 6; ++attempt)
+            {
+                const std::uint32_t before = shared->publishSequence;
+                if (before & 1u) continue;
+                MemoryBarrier();
+                std::memcpy(&out, shared, sizeof(out));
+                MemoryBarrier();
+                const std::uint32_t after = shared->publishSequence;
+                if (before == after && !(after & 1u)) return true;
+            }
+            return false;
         }
 
         bool HeaderValid(const IpcV3::ClientState& s) noexcept
@@ -127,11 +151,11 @@ namespace OutRunVR::Host::Diagnostics
                     }
 
                     IpcV3::ClientState client{};
-                    const bool haveClient = v3Client.IsOpen() && StableReadHeader(v3Client, client) && HeaderValid(client);
+                    const bool haveClient = v3Client.IsOpen() && StableReadState(v3Client, client) && HeaderValid(client);
                     IpcV3::FrameRing frame3{};
-                    const bool haveFrame3 = v3Frames.IsOpen() && StableReadHeader(v3Frames, frame3) && HeaderValid(frame3);
+                    const bool haveFrame3 = v3Frames.IsOpen() && StableReadFrameRing(v3Frames.Get(), frame3) && HeaderValid(frame3);
                     IpcV3::AckState ack{};
-                    const bool haveAck = v3Ack.IsOpen() && StableReadHeader(v3Ack, ack) && HeaderValid(ack);
+                    const bool haveAck = v3Ack.IsOpen() && StableReadState(v3Ack, ack) && HeaderValid(ack);
 
                     const ULONGLONG now = GetTickCount64();
                     if (havePose && pose.hostPid == GetCurrentProcessId() && !activeSince)
@@ -139,7 +163,8 @@ namespace OutRunVR::Host::Diagnostics
                         activeSince = now;
                         lastPoseChange = now;
                         lastFrameChange = now;
-                        log.Write("INFO", "host_pose_active runtime=" + std::string(pose.runtimeName));
+                        log.Write("INFO", "host_pose_active runtime=" +
+                            BoundedString(pose.runtimeName, sizeof(pose.runtimeName)));
                     }
 
                     if (havePose)
@@ -178,7 +203,8 @@ namespace OutRunVR::Host::Diagnostics
                             poseStallWarned = true;
                             log.Write("WARN", "pose_stalled: OpenXR host pose sequence has not advanced for 2s");
                         }
-                        if (!frameStallWarned && lastFrameId && now - lastFrameChange > 3000 && haveClient && client.presentationMode == PresentationGameplay)
+                        if (!frameStallWarned && lastFrameId && now - lastFrameChange > 3000 &&
+                            haveClient && client.presentationMode == PresentationGameplay)
                         {
                             frameStallWarned = true;
                             log.Write("WARN", "frame_stalled: game reports gameplay but stereo frame id has not advanced for 3s");
