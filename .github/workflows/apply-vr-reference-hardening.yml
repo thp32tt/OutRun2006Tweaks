@@ -1,0 +1,52 @@
+name: Apply VR reference hardening
+
+on:
+  push:
+    branches: [vr-openxr]
+    paths:
+      - 'tools/apply_vr_reference_hardening.py'
+      - '.github/workflows/apply-vr-reference-hardening.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: vr-openxr
+          fetch-depth: 0
+      - name: Validate patcher
+        run: python3 -m py_compile tools/apply_vr_reference_hardening.py
+      - name: Apply hardening
+        run: python3 tools/apply_vr_reference_hardening.py
+      - name: Verify key contracts
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          checks = {
+              'src/vr_shared.hpp': ['SharedRenderFrameRing', 'RenderFrameRingSize = 4', 'HostAdapterLuidValid', 'clientInteropProbeHandle', 'hostDirectConsumedFrameId'],
+              'src/vr_stereo.cpp': ['QueryGameAdapterLuid', 'DirectInteropProbeToken', 'verified 4-slot D3D9Ex shared eye ring', 'ResolveDirectTransport(device, pendingFrameId)'],
+              'vrhost/main_stereo.cpp': ['ServiceInteropProbe', 'AckDirectFrame', 'SharedRenderFrameRing', 'RenderFrameDirectSlotIndex'],
+          }
+          for name, markers in checks.items():
+              text = Path(name).read_text(encoding='utf-8')
+              for marker in markers:
+                  if marker not in text:
+                      raise SystemExit(f'{name}: missing {marker}')
+          PY
+      - run: git diff --check
+      - name: Commit source changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+thp32tt@users.noreply.github.com'
+          git add src/vr_shared.hpp src/vr_stereo.cpp src/vr_renderer_probe.cpp src/hooks_vr.cpp vrhost/main_stereo.cpp .github/workflows/vr-openxr.yml
+          if git diff --cached --quiet; then
+            echo 'No source changes required.'
+            exit 0
+          fi
+          git commit -m 'vr: harden interop and frame transport'
+          git push origin HEAD:vr-openxr
