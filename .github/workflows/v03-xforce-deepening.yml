@@ -32,7 +32,12 @@ jobs:
           new="text = replace_all_exact(text, preset, preset_new, 1, 'UI Physics preset native gain')"
           if s.count(old)!=1:
               raise SystemExit('could not adapt Physics preset patch count')
-          p.write_text(s.replace(old,new),encoding='utf-8',newline='\n')
+          s=s.replace(old,new)
+          old2='std::abs(frontSlip - previousFrontSlip_) >= 0.015f ||'
+          new2='std::abs(frontSlip - previousFrontSlip_) >= 0.005f ||'
+          if s.count(old2)!=1:
+              raise SystemExit('could not tune diagnostic front-slip freeze threshold')
+          p.write_text(s.replace(old2,new2),encoding='utf-8',newline='\n')
           PY
           python tools/apply_v03_xforce_deepening.py
           python - <<'PY'
