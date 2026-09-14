@@ -490,3 +490,9 @@ req(wheel_ui, 'Direction test (not run)', 'direction-test checklist distinguishe
 req(wheel_ui, 'Waiting / released / inactive is normal outside gameplay.', 'runtime status explains menu-time idle state')
 req(wheel_ui, 'FFB profile save failed:', 'profile persistence failures are explicit')
 req(wheel_ui, 'spdlog::error("{}", status_);', 'profile persistence failure is logged for remote testers')
+
+# first-save profile regression guards
+req(profiles, 'ec == std::errc::no_such_file_or_directory', 'missing profile is a normal first-save state')
+req(profiles, 'inspect_regular_file(finalPath, finalExists, "the existing profile")', 'final profile existence check uses missing-safe helper')
+req(profiles, 'inspect_regular_file(backup, backupExists, "the profile backup")', 'backup existence check uses missing-safe helper')
+forbid(profiles, 'if (!finalExists && std::filesystem::is_regular_file(backup, ec) && !ec)', 'backup probe no longer treats missing backup as filesystem failure')
