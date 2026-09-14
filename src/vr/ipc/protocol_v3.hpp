@@ -23,6 +23,20 @@ namespace OutRunVR::IpcV3
     inline constexpr std::uint32_t FrameMagic = 0x3346524Fu;  // ORF3
     inline constexpr std::uint32_t AckMagic = 0x3341524Fu;    // ORA3
 
+    enum HostFlags : std::uint32_t
+    {
+        HostAlive = 1u << 0,
+        OrientationValid = 1u << 1,
+        PositionValid = 1u << 2,
+        SessionVisible = 1u << 3,
+        SessionFocused = 1u << 4,
+        StereoViewsValid = 1u << 5,
+        HostShouldRender = 1u << 6,
+        DirectGpuTransportSupported = 1u << 7,
+        DirectGpuTransportReady = 1u << 8,
+        AdapterLuidValid = 1u << 9,
+    };
+
 #pragma pack(push, 4)
     struct WireFov
     {
