@@ -119,6 +119,8 @@ namespace OutRunVRRenderer
 		bool LastVerifiedWvpValid = false;
 		std::uint32_t LastVerifiedWvpGeneration = 0;
 		std::uint32_t LastVerifiedWvpPoseSequence = 0;
+		std::uintptr_t LastVerifiedShaderIdentity = 0;
+		std::uint64_t LastVerifiedShaderSerial = 0;
 
 		D3DVECTOR CullingCameraSavedPos{};
 		D3DVECTOR CullingCameraSavedLook{};
@@ -607,6 +609,8 @@ namespace OutRunVRRenderer
 			LatchedStereo = {};
 			LastVerifiedWvpValid = false;
 			LastVerifiedWvpPoseSequence = 0;
+			LastVerifiedShaderIdentity = 0;
+			LastVerifiedShaderSerial = 0;
 			FrameTelemetryFlags = ClientHookAlive;
 			LatchedRelativeAngleDeg = 0.0f;
 			LatchedPoseSequence = 0;
@@ -860,14 +864,28 @@ namespace OutRunVRRenderer
 			return true;
 		}
 
+		void InvalidateVerifiedWvp()
+		{
+			LastVerifiedWvpValid = false;
+			LastVerifiedWvpPoseSequence = 0;
+			LastVerifiedShaderIdentity = 0;
+			LastVerifiedShaderSerial = 0;
+		}
+
 		void RecordVerifiedWvp(const float* constants)
 		{
 			if (!constants || LatchedPoseSequence == 0)
+				return;
+			std::uintptr_t shaderIdentity = 0;
+			std::uint64_t shaderSerial = 0;
+			if (!OutRunVRStereo::GetCurrentShaderEpoch(shaderIdentity, shaderSerial))
 				return;
 			std::memcpy(LastVerifiedWvp, constants, sizeof(LastVerifiedWvp));
 			if (++LastVerifiedWvpGeneration == 0)
 				++LastVerifiedWvpGeneration;
 			LastVerifiedWvpPoseSequence = LatchedPoseSequence;
+			LastVerifiedShaderIdentity = shaderIdentity;
+			LastVerifiedShaderSerial = shaderSerial;
 			LastVerifiedWvpValid = true;
 		}
 
@@ -935,6 +953,11 @@ namespace OutRunVRRenderer
 				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
 					device, startRegister, constantData, vector4fCount);
 			}
+
+			// Any game c64..c67 upload supersedes the previous world marker. Only an
+			// independently verified and successfully uploaded OutRun WVP below can
+			// arm stereo geometry again.
+			InvalidateVerifiedWvp();
 
 			float patchedData[256 * 4];
 			const bool prepared = TryPrepareOutRunWvp(
@@ -1028,14 +1051,18 @@ namespace OutRunVRRenderer
 	}
 
 	bool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
-		std::uint32_t& poseSequence)
+		std::uint32_t& poseSequence, std::uintptr_t& shaderIdentity,
+		std::uint64_t& shaderSerial)
 	{
 		if (!outConstants || !LastVerifiedWvpValid || LastVerifiedWvpGeneration == 0 ||
-			LastVerifiedWvpPoseSequence == 0)
+			LastVerifiedWvpPoseSequence == 0 || LastVerifiedShaderIdentity == 0 ||
+			LastVerifiedShaderSerial == 0)
 			return false;
 		std::memcpy(outConstants, LastVerifiedWvp, sizeof(LastVerifiedWvp));
 		generation = LastVerifiedWvpGeneration;
 		poseSequence = LastVerifiedWvpPoseSequence;
+		shaderIdentity = LastVerifiedShaderIdentity;
+		shaderSerial = LastVerifiedShaderSerial;
 		return true;
 	}
 
