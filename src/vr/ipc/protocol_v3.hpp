@@ -12,6 +12,7 @@ namespace OutRunVR::IpcV3
 {
     inline constexpr std::uint32_t ProtocolVersion = 3;
     inline constexpr std::uint32_t RingSize = 4;
+    using WireHandle = std::uint64_t;
 
     inline constexpr wchar_t HostStateName[] = L"Local\\OutRun2006Tweaks.VR.v3.HostState";
     inline constexpr wchar_t ClientStateName[] = L"Local\\OutRun2006Tweaks.VR.v3.ClientState";
@@ -81,7 +82,7 @@ namespace OutRunVR::IpcV3
         std::int32_t adapterLuidHigh{};
         std::uint32_t interopProbeGeneration{};
         std::uint32_t interopProbeToken{};
-        std::uintptr_t interopProbeHandle{};
+        WireHandle interopProbeHandle{};
         std::uint32_t backbufferWidth{};
         std::uint32_t backbufferHeight{};
         std::uint64_t lastPresentedFrameId{};
@@ -102,8 +103,8 @@ namespace OutRunVR::IpcV3
         std::uint32_t width{};
         std::uint32_t height{};
         std::uint32_t format{};
-        std::uintptr_t leftHandle{};
-        std::uintptr_t rightHandle{};
+        WireHandle leftHandle{};
+        WireHandle rightHandle{};
         WireEyeView renderedEyes[2]{};
     };
 
@@ -138,15 +139,12 @@ namespace OutRunVR::IpcV3
     };
 #pragma pack(pop)
 
+    static_assert(sizeof(WireHandle) == 8);
+    static_assert(sizeof(WireFov) == 16);
+    static_assert(sizeof(WireEyeView) == 48);
     static_assert(std::is_standard_layout_v<HostState>);
     static_assert(std::is_standard_layout_v<ClientState>);
     static_assert(std::is_standard_layout_v<FrameDescriptor>);
     static_assert(std::is_standard_layout_v<FrameRing>);
     static_assert(std::is_standard_layout_v<AckState>);
-    static_assert(sizeof(void*) == sizeof(std::uintptr_t));
-
-    // A cross-bitness wire handle must never rely on pointer width. The active
-    // implementation converts native HANDLE values to this fixed representation
-    // before v3 becomes the runtime protocol.
-    using WireHandle = std::uint64_t;
 }
