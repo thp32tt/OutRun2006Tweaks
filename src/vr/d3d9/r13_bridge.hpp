@@ -4,15 +4,7 @@
 #include <d3d9.h>
 #include <cstdint>
 
-namespace OutRunVRR13
-{
-    // SharedPoseState::reserved slot owned by R13.  The legacy
-    // hostDirectConsumedFrameId means that the host opened/accepted a direct
-    // frame.  This slot means the D3D11 GPU has finished sampling that frame,
-    // which is the only acknowledgement the D3D9 producer may use for slot
-    // reuse.
-    inline constexpr std::uint32_t HostDirectGpuCompletedFrameIndex = 15;
-}
+#include "vr/ipc/direct_ack_r13.hpp"
 
 namespace OutRunVRD3D9ExUpgradeR13
 {
