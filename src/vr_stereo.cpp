@@ -37,7 +37,8 @@
 // At Present both full-size eye surfaces are resolved and drawn side-by-side to
 // the real backbuffer. The x64 host crops that SBS transport and submits it as
 // XrCompositionLayerProjection using the exact host pose sequence published by
-// this renderer.
+// this renderer. Stereo metadata is published only after the real D3D9 Present
+// succeeds, so Desktop Duplication can never pair a new pose with an older frame.
 
 namespace Settings
 {
@@ -545,8 +546,11 @@ namespace OutRunVRStereo
 			else
 				ReplaceSurfaceRef(TrackedRenderTarget, BackBuffer);
 			IDirect3DSurface9* currentDepth = nullptr;
-			if (SUCCEEDED(device->GetDepthStencilSurface(&currentDepth)) && currentDepth)
+			const HRESULT depthStateHr = device->GetDepthStencilSurface(&currentDepth);
+			if (SUCCEEDED(depthStateHr) && currentDepth)
 				TrackedDepthStencil = currentDepth;
+			else if (depthStateHr == D3DERR_NOTFOUND)
+				TrackedDepthStencil = nullptr;
 			InitializeAuxRenderTargetState(device);
 
 			if (FAILED(device->CreateRenderTarget(desc.Width, desc.Height, desc.Format,
@@ -657,14 +661,28 @@ namespace OutRunVRStereo
 			return ok;
 		}
 
-		void PublishStereoState(std::uint32_t state, bool worldStereo, std::uint32_t poseSequence)
+		std::uint32_t NextStereoFrameId()
+		{
+			if (++StereoFrameCounter == 0)
+				++StereoFrameCounter;
+			return StereoFrameCounter;
+		}
+
+		void PublishStereoState(std::uint32_t state, bool worldStereo,
+			std::uint32_t poseSequence, std::uint32_t frameId,
+			std::uint32_t presentQpcLow)
 		{
 			if (!EnsureSharedState())
 				return;
 
-			if (state != OutRunVR::StereoSbsActive || poseSequence == 0)
+			// Frame=0 is the client-side publication guard. The host refuses frame 0,
+			// so it cannot accept fields while this packet is being rewritten.
+			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoFrameIndex]), 0);
+
+			if (state != OutRunVR::StereoSbsActive || poseSequence == 0 || frameId == 0 || presentQpcLow == 0)
 			{
 				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientStereoPoseSequence), 0);
+				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoPresentQpcLowIndex]), 0);
 				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoStateIndex]),
 					static_cast<LONG>(state));
 				return;
@@ -672,8 +690,8 @@ namespace OutRunVRStereo
 
 			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientStereoPoseSequence),
 				static_cast<LONG>(poseSequence));
-			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferWidthIndex]),
-				static_cast<LONG>(BackBufferDesc.Width));
+			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoPresentQpcLowIndex]),
+				static_cast<LONG>(presentQpcLow));
 			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferHeightIndex]),
 				static_cast<LONG>(BackBufferDesc.Height));
 			LONG bits = static_cast<LONG>(OutRunVR::ClientStereoActive | OutRunVR::ClientStereoDrawDuplicated);
@@ -682,8 +700,10 @@ namespace OutRunVRStereo
 			InterlockedOr(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientFlagsIndex]), bits);
 			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoStateIndex]),
 				static_cast<LONG>(OutRunVR::StereoSbsActive));
+			MemoryBarrier();
+			// Publish last: non-zero frame means all metadata above is coherent.
 			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoFrameIndex]),
-				static_cast<LONG>(++StereoFrameCounter));
+				static_cast<LONG>(frameId));
 		}
 
 		struct ScreenVertex
@@ -728,9 +748,11 @@ namespace OutRunVRStereo
 			IDirect3DSurface9* savedRt = nullptr;
 			IDirect3DSurface9* savedDepth = nullptr;
 			D3DVIEWPORT9 savedViewport{};
-			if (FAILED(device->GetRenderTarget(0, &savedRt)) || !savedRt ||
-				FAILED(device->GetDepthStencilSurface(&savedDepth)) ||
-				FAILED(device->GetViewport(&savedViewport)))
+			const HRESULT rtHr = device->GetRenderTarget(0, &savedRt);
+			const HRESULT depthHr = device->GetDepthStencilSurface(&savedDepth);
+			const HRESULT viewportHr = device->GetViewport(&savedViewport);
+			const bool depthOk = SUCCEEDED(depthHr) || depthHr == D3DERR_NOTFOUND;
+			if (FAILED(rtHr) || !savedRt || !depthOk || FAILED(viewportHr))
 			{
 				if (savedRt) savedRt->Release();
 				if (savedDepth) savedDepth->Release();
@@ -793,7 +815,7 @@ namespace OutRunVRStereo
 			if (FAILED(SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, savedDepth))) restoreOk = false;
 			if (FAILED(device->SetViewport(&savedViewport))) restoreOk = false;
 			savedRt->Release();
-			savedDepth->Release();
+			if (savedDepth) savedDepth->Release();
 			return success && restoreOk;
 		}
 
@@ -851,9 +873,7 @@ namespace OutRunVRStereo
 				InternalPassScope guard;
 				rightHr = SetRenderTargetHook.stdcall<HRESULT>(device, 0u, RightEyeSurface);
 				if (SUCCEEDED(rightHr))
-				{
 					rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, RightEyeDepth);
-				}
 				if (SUCCEEDED(rightHr))
 					rightHr = device->SetViewport(&savedViewport);
 				if (SUCCEEDED(rightHr) && draw.worldStereo)
@@ -971,8 +991,6 @@ namespace OutRunVRStereo
 				if (index == 0)
 				{
 					ReplaceSurfaceRef(TrackedRenderTarget, surface);
-					if (StereoResourcesReady && TargetIsBackBuffer() && !CreateRightDepthForTracked(device))
-						StereoResourcesReady = false;
 				}
 				else if (index >= 1 && index <= 3)
 					AuxRenderTargetActive[index - 1] = surface != nullptr;
@@ -985,8 +1003,9 @@ namespace OutRunVRStereo
 			const HRESULT hr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface);
 			if (!InternalStereoPass && IsGameDevice(device) && SUCCEEDED(hr))
 			{
+				const bool changed = TrackedDepthStencil != surface;
 				ReplaceSurfaceRef(TrackedDepthStencil, surface);
-				if (StereoResourcesReady && TargetIsBackBuffer() && !CreateRightDepthForTracked(device))
+				if (changed && StereoResourcesReady && !CreateRightDepthForTracked(device))
 					StereoResourcesReady = false;
 			}
 			return hr;
@@ -1025,31 +1044,47 @@ namespace OutRunVRStereo
 			if (!IsGameDevice(device))
 				return PresentHook.stdcall<HRESULT>(device, sourceRect, destRect, destWindowOverride, dirtyRegion);
 
-			if (StereoWanted() && FrameHadWorldStereo && FrameHadDuplicatedDraw &&
+			const bool stereoRequested = StereoWanted();
+			bool composedStereo = false;
+			std::uint32_t pendingPoseSequence = 0;
+			if (stereoRequested && FrameHadWorldStereo && FrameHadDuplicatedDraw &&
 				!FrameRightDrawFailed && FrameStereoPoseSequence != 0 && EnsureStereoResources(device))
 			{
 				if (ComposeSbs(device))
 				{
 					++StereoComposeSuccess;
-					PublishStereoState(OutRunVR::StereoSbsActive, true, FrameStereoPoseSequence);
-					if (!FirstStereoActiveLogged)
-					{
-						FirstStereoActiveLogged = true;
-						spdlog::info("VR stereo: SBS transport active; exact pose sequence published for XrCompositionLayerProjection");
-					}
+					composedStereo = true;
+					pendingPoseSequence = FrameStereoPoseSequence;
 				}
 				else
-				{
 					++StereoComposeFailure;
-					PublishStereoState(OutRunVR::StereoSbsFallbackMono, false, 0);
+			}
+
+			MaybeLogSummary();
+			LARGE_INTEGER presentStart{};
+			QueryPerformanceCounter(&presentStart);
+			const HRESULT hr = PresentHook.stdcall<HRESULT>(device, sourceRect, destRect, destWindowOverride, dirtyRegion);
+
+			if (composedStereo && SUCCEEDED(hr))
+			{
+				const std::uint32_t frameId = NextStereoFrameId();
+				std::uint32_t presentQpcLow = static_cast<std::uint32_t>(presentStart.QuadPart);
+				if (presentQpcLow == 0)
+					presentQpcLow = 1;
+				PublishStereoState(OutRunVR::StereoSbsActive, true, pendingPoseSequence,
+					frameId, presentQpcLow);
+				if (!FirstStereoActiveLogged)
+				{
+					FirstStereoActiveLogged = true;
+					spdlog::info("VR stereo: SBS transport active; exact pose sequence published for XrCompositionLayerProjection");
 				}
 			}
 			else
-				PublishStereoState(StereoWanted() ? OutRunVR::StereoSbsFallbackMono : OutRunVR::StereoDisabled,
-					false, 0);
+			{
+				PublishStereoState(stereoRequested ? OutRunVR::StereoSbsFallbackMono : OutRunVR::StereoDisabled,
+					false, 0, 0, 0);
+			}
 
-			MaybeLogSummary();
-			const HRESULT hr = PresentHook.stdcall<HRESULT>(device, sourceRect, destRect, destWindowOverride, dirtyRegion);
 			FrameHadDuplicatedDraw = false;
 			FrameHadWorldStereo = false;
 			FrameRightDrawFailed = false;
@@ -1065,6 +1100,7 @@ namespace OutRunVRStereo
 			AuxRenderTargetActive = {};
 			CurrentVertexShaderIdentity.store(0, std::memory_order_release);
 			VertexShaderSerial.store(0, std::memory_order_release);
+			PublishStereoState(OutRunVR::StereoDisabled, false, 0, 0, 0);
 			const HRESULT hr = ResetHook.stdcall<HRESULT>(device, params);
 			if (SUCCEEDED(hr))
 				EnsureStereoResources(device);
