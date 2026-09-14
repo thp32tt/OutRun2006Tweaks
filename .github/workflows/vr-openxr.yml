@@ -1,0 +1,180 @@
+name: OpenXR VR v2
+
+on:
+  push:
+    branches: [ vr-openxr ]
+    paths:
+      - 'src/hooks_vr.cpp'
+      - 'src/vr_renderer_probe.cpp'
+      - 'src/vr_stereo.cpp'
+      - 'src/vr_shared.hpp'
+      - 'src/overlay/notifications.hpp'
+      - 'src/overlay/update_check.cpp'
+      - 'cmake.toml'
+      - 'vrhost/**'
+      - 'tools/verify_vr_reference_hardening.py'
+      - '.github/workflows/vr-openxr.yml'
+  pull_request:
+    paths:
+      - 'src/hooks_vr.cpp'
+      - 'src/vr_renderer_probe.cpp'
+      - 'src/vr_stereo.cpp'
+      - 'src/vr_shared.hpp'
+      - 'src/overlay/notifications.hpp'
+      - 'src/overlay/update_check.cpp'
+      - 'cmake.toml'
+      - 'vrhost/**'
+      - 'tools/verify_vr_reference_hardening.py'
+      - '.github/workflows/vr-openxr.yml'
+
+jobs:
+  game-x86:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Verify VR v2 render and transport contract
+        shell: pwsh
+        run: |
+          $hooks = Get-Content src/hooks_vr.cpp -Raw
+          if ($hooks.Contains('CalcCameraMatrixHook') -or $hooks.Contains('d3dmatrix140 =')) { throw 'legacy camera mutation returned' }
+          foreach ($marker in @('CalcCameraMatrix remains untouched','VRStereo','VRCullingCameraSync','VRCullingUnionFov','Pose.v2','Frame.v2')) {
+            if (-not $hooks.Contains($marker)) { throw "missing VR hook marker: $marker" }
+          }
+
+          $renderer = Get-Content src/vr_renderer_probe.cpp -Raw
+          foreach ($marker in @('BeginSceneVtableIndex = 41','EndSceneVtableIndex = 42','frame-latched c64 WVP injection armed','GetLatchedStereoFrame','Frame.v2 positions are OpenXR LOCAL-space metres','eyeOffset is already head-local metres')) {
+            if (-not $renderer.Contains($marker)) { throw "missing renderer marker: $marker" }
+          }
+          $effectiveStart = $renderer.IndexOf('Frame.v2 positions are OpenXR LOCAL-space metres')
+          $effectiveEnd = if ($effectiveStart -ge 0) { $renderer.IndexOf('const float w =', $effectiveStart) } else { -1 }
+          if ($effectiveStart -lt 0 -or $effectiveEnd -lt 0) { throw 'effective pose block not found' }
+          if ($renderer.Substring($effectiveStart, $effectiveEnd - $effectiveStart).Contains('* Settings::VRWorldScale')) { throw 'OpenXR effective pose must remain in metres' }
+
+          $shared = Get-Content src/vr_shared.hpp -Raw
+          foreach ($marker in @(
+            'SharedProtocolVersion = 2','RenderFrameProtocolVersion = 2','RenderFrameRingSize = 4',
+            'static_assert(sizeof(SharedPoseState) == 280)','offsetof(SharedPoseState, hostAdapterLuidLow) == 120',
+            'offsetof(SharedPoseState, runtimeName) == 152','offsetof(SharedPoseState, reserved) == 216',
+            'static_assert(sizeof(SharedRenderFrameState) == 256)','static_assert(sizeof(SharedRenderFrameRing) == 1056)',
+            'HostAdapterLuidValid','clientAdapterLuidLow','clientInteropProbeHandle','hostInteropProbeAckToken','hostDirectConsumedFrameId',
+            'RenderFrameDirectSlotIndex','SharedRenderFrameRing')) {
+            if (-not $shared.Contains($marker)) { throw "missing VR v2 ABI marker: $marker" }
+          }
+
+          $stereo = Get-Content src/vr_stereo.cpp -Raw
+          foreach ($marker in @(
+            'Simulation, input, timers, native FFB','PublishRenderFrame','SharedRenderFrameRing',
+            'QueryGameAdapterLuid','IDirect3DDevice9Ex','GetAdapterLUID','DirectInteropProbeToken',
+            'D3DCOLOR_ARGB(0xFF, 0x7B, 0x7B, 0x7B)','RenderFrameRingSize','RenderFrameDirectSlotIndex',
+            'hostDirectConsumedFrameId','ResolveDirectTransport(device, pendingFrameId)',
+            'SBS/Desktop Duplication fallback','StereoFailurePoseSequenceMismatch')) {
+            if (-not $stereo.Contains($marker)) { throw "missing stereo hardening marker: $marker" }
+          }
+          if ($stereo.Contains('ReadStereoSnapshot')) { throw 'stereo renderer must not resample shared pose per draw' }
+          if ($stereo.Contains('Game::ModeControl()') -or $stereo.Contains('Game::EventControl()') -or $stereo.Contains('WheelFFB_ServiceSafety')) { throw 'stereo renderer must never execute simulation/input/FFB' }
+
+      - name: Configure Win32 VR build
+        shell: cmd
+        run: |
+          set CI=
+          cmake -S . -B build-vr-game -G "Visual Studio 17 2022" -A Win32
+
+      - name: Apply existing dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-vr-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-game/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-vr-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-vr-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-game/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-vr-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build-vr-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-vr-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build Win32 VR DLL
+        run: cmake --build build-vr-game --config Release
+
+      - name: Verify Win32 binary
+        shell: pwsh
+        run: |
+          $dllPath = 'build-vr-game/bin/dinput8.dll'
+          if (-not (Test-Path $dllPath)) { throw 'dinput8.dll was not produced' }
+          $bytes = [System.IO.File]::ReadAllBytes($dllPath)
+          $ascii = [Text.Encoding]::ASCII.GetString($bytes)
+          foreach ($marker in @('renderer-boundary head tracking + true stereo configured','VR stereo: D3D9 full-eye renderer installed','VR stereo: TRUE GEOMETRY STEREO active')) {
+            if (-not $ascii.Contains($marker)) { throw "VR DLL marker missing: $marker" }
+          }
+          $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+          if ([BitConverter]::ToUInt16($bytes, $peOffset + 4) -ne 0x014C) { throw 'expected x86 DLL' }
+
+      - name: Package game artifact
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build-vr-game/package | Out-Null
+          Copy-Item build-vr-game/bin/dinput8.dll build-vr-game/package/dinput8.dll
+          Copy-Item OutRun2006Tweaks.ini build-vr-game/package/OutRun2006Tweaks.ini
+          Copy-Item OutRun2006Tweaks.lods.ini build-vr-game/package/OutRun2006Tweaks.lods.ini
+          Copy-Item VR_OPENXR.md build-vr-game/package/VR_OPENXR.md
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: outrun2006-vr-x86
+          path: build-vr-game/package
+          if-no-files-found: error
+
+  host-x64:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Verify OpenXR host v2 contract
+        shell: pwsh
+        run: |
+          $src = Get-Content vrhost/main_stereo.cpp -Raw
+          foreach ($marker in @(
+            'recommendedImageRectWidth','ReadRenderScale','OUTRUN_VR_RENDER_SCALE','--render-scale',
+            'RenderFrameReader','SharedRenderFrameRing','ServiceInteropProbe','OpenSharedResource',
+            'clientAdapterLuidLow','AckDirectFrame','RenderFrameDirectSlotIndex','CommitDirectStereoSource',
+            'XrCompositionLayerProjection','before.eye[eye].orientation','before.eye[eye].position',
+            'RenderTheater','xrRequestExitSession','pendingReferenceSpaceChangeTime','HostTimings')) {
+            if (-not $src.Contains($marker)) { throw "missing host v2 marker: $marker" }
+          }
+          if ($src.Contains('context_->Flush()')) { throw 'per-frame D3D11 Flush must not return' }
+          $shader = Get-Content vrhost/stereo_shader.hpp -Raw
+          foreach ($marker in @('SrgbToLinear','SourceIsScRgb','linearColor')) {
+            if (-not $shader.Contains($marker)) { throw "missing color-space marker: $marker" }
+          }
+
+      - name: Configure x64 OpenXR host
+        run: cmake -S vrhost -B build-vrhost -G "Visual Studio 17 2022" -A x64
+
+      - name: Build x64 OpenXR host and shader test
+        run: cmake --build build-vrhost --config Release
+
+      - name: Compile exact stereo HLSL shader
+        shell: pwsh
+        run: |
+          $test = 'build-vrhost/bin/outrun-vr-shader-smoke.exe'
+          if (-not (Test-Path $test)) { throw 'shader smoke executable was not produced' }
+          & $test
+          if ($LASTEXITCODE -ne 0) { throw 'stereo HLSL failed D3DCompile smoke test' }
+
+      - name: Verify x64 host binary
+        shell: pwsh
+        run: |
+          $hostPath = 'build-vrhost/bin/outrun-vr-host.exe'
+          if (-not (Test-Path $hostPath)) { throw 'outrun-vr-host.exe was not produced' }
+          $bytes = [System.IO.File]::ReadAllBytes($hostPath)
+          if ($bytes.Length -lt 10000) { throw 'outrun-vr-host.exe is unexpectedly small' }
+          $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+          if ([BitConverter]::ToUInt16($bytes, $peOffset + 4) -ne 0x8664) { throw 'expected x64 host' }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: outrun-vr-host-x64
+          path: build-vrhost/bin/outrun-vr-host.exe
+          if-no-files-found: error
