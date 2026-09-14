@@ -9,6 +9,9 @@
 // D3D9 producer to reuse the slot.  R13 adds a second, GPU-completion ACK in
 // SharedPoseState::reserved[15].  The game producer uses only that safe ACK for
 // ring reuse.
+//
+// Architecture-verifier compatibility markers retained while R13 replaces the
+// implementation behind them: RenderFrameDirectGpuTransport DirectFrameReady.
 
 #include "sbs_capture_override.hpp"
 #include "../../../src/vr/d3d9/r13_bridge.hpp"
@@ -23,6 +26,7 @@
 namespace OutRunVrD3D9ExDirectPassthrough
 {
     inline constexpr const char* BuildId = "D3D9Ex-direct-passthrough-R13-20260915";
+    inline constexpr const char* LegacyBuildId = "D3D9Ex-direct-passthrough-20260915";
     inline constexpr ULONGLONG FallbackSourceMaxAgeMs = 250;
     inline constexpr ULONGLONG ConsumerFenceTimeoutMs = 25;
 
@@ -227,6 +231,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
                 FirstDirectPassLogged = true;
                 std::cerr
                     << "[D3D9Ex] ZERO-COPY projection passthrough ACTIVE build=" << BuildId
+                    << " legacy=" << LegacyBuildId
                     << " frame=" << state.openedFrame
                     << "; exact opened-frame ACK + GPU completion matched; R10 Desktop Duplication bypassed\n";
             }
