@@ -13,7 +13,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
-
 set(BUILD_LOADER ON CACHE BOOL "" FORCE)
 set(BUILD_API_LAYERS OFF CACHE BOOL "" FORCE)
 set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -29,25 +28,25 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(openxr_sdk)
 
-# Standalone true-stereo host. Gameplay consumes the game's SBS backbuffer and
-# submits a two-view XrCompositionLayerProjection. Menus/pause/results keep the
-# LOCAL-space fixed theater quad. No hello_xr interception layer is involved.
-add_executable(outrun-vr-host main_stereo.cpp)
-target_include_directories(outrun-vr-host PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
+# The host is intentionally separate from the 32-bit game DLL.  The current
+# implementation remains in one TU while it is being decomposed behind the
+# architecture boundaries documented in docs/VR_ARCHITECTURE.md.
+add_executable(outrun-vr-host src/main.cpp)
+target_include_directories(outrun-vr-host PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src"
+    "${CMAKE_CURRENT_LIST_DIR}/src"
+)
 target_compile_definitions(outrun-vr-host PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi d3dcompiler user32)
 
-# Compile the exact HLSL used by main_stereo.cpp during CI.
-add_executable(outrun-vr-shader-smoke stereo_shader_smoke.cpp)
-target_include_directories(outrun-vr-shader-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_executable(outrun-vr-shader-smoke tests/stereo_shader_smoke.cpp)
+target_include_directories(outrun-vr-shader-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
 target_compile_definitions(outrun-vr-shader-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 target_link_libraries(outrun-vr-shader-smoke PRIVATE d3dcompiler)
 
-set_target_properties(outrun-vr-host PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
-    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin"
-)
-set_target_properties(outrun-vr-shader-smoke PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
-    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin"
-)
+foreach(target outrun-vr-host outrun-vr-shader-smoke)
+    set_target_properties(${target} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
+        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin"
+    )
+endforeach()
