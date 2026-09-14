@@ -267,7 +267,7 @@ namespace OutRunVRD3D9ExUpgrade
     {
     public:
         std::string_view description() override { return "OpenXRVRD3D9ExUpgrade"; }
-        void declare_settings() override { Settings::VRPreferD3D9Ex.watch(); }
+        void declare_settings() override { Settings::VRPreferD3D9Ex.needs_restart(); }
         bool validate() override { return Settings::VRPreferD3D9Ex; }
         bool apply() override
         {
