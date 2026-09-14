@@ -58,13 +58,17 @@ jobs:
           $bytes = [System.IO.File]::ReadAllBytes($dllPath)
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
           foreach ($marker in @(
-            'renderer-boundary head tracking + true stereo + 6DoF + plain-D3D9 SBS fallback default',
+            'renderer-boundary head tracking + true stereo + 6DoF + classic-D3D9 SBS fallback default',
+            'D3D9Ex managed-resource-compatible zero-copy remains opt-in',
             'VR stereo: D3D9 full-eye renderer installed',
             'VR stereo: TRUE GEOMETRY STEREO active',
             'VR v3 shadow: live dual-protocol diagnostics active',
             'protocol v3 pose is PRIMARY',
             'v3-primary/v2-fallback frame-latched c64 WVP injection armed',
             'VR D3D9Ex upgrade: Direct3DCreate9 IAT hook armed before game device creation',
+            'managed-resource compatibility hooks installed',
+            'MANAGED vertex buffer translated to DEFAULT',
+            'game CreateDevice promoted to CreateDeviceEx with managed-resource compatibility',
             'VR D3D9 probe: deviceType=',
             'VR helper D3D9Ex probe:',
             'R9-finaltest-20260915',
@@ -161,7 +165,9 @@ jobs:
             'R9-finaltest-host-20260915',
             '[finaltest] build=',
             '[finaltest] endFrame total=',
-            'no-layer OpenXR test pattern ready'
+            'no-layer OpenXR test pattern ready',
+            'D3D9Ex-direct-passthrough-20260915',
+            'ZERO-COPY projection passthrough ACTIVE'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR host marker missing: $marker" }
           }
