@@ -24,8 +24,8 @@ jobs:
         run: |
           set -euo pipefail
           for patch in tools/v03_review_fix_*.patch; do
-            git apply --check "$patch"
-            git apply "$patch"
+            git apply --check --ignore-space-change --ignore-whitespace "$patch"
+            git apply --ignore-space-change --ignore-whitespace "$patch"
           done
 
       - name: Static source verification only
