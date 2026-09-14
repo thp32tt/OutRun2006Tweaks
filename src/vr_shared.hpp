@@ -105,7 +105,12 @@ namespace OutRunVR
 		// Raw OpenXR LOCAL-space head pose. Quaternion order is x,y,z,w.
 		float orientation[4];
 		float position[3];
-		float reservedPose;
+
+		// Client-owned. When an SBS frame is published this is the exact stable
+		// host seqlock sequence that was latched at the game's BeginScene and used
+		// for both head tracking and stereo-eye construction. This reuses the old
+		// reservedPose slot, preserving protocol-v1 layout and sizeof()==248.
+		volatile std::uint32_t clientStereoPoseSequence;
 
 		// Per-eye OpenXR FOV and recommended sizes are part of protocol v1 so
 		// true stereo never needs an ABI-breaking pose bridge revision.
@@ -169,4 +174,33 @@ namespace OutRunVRRenderer
 	using OutRunVR::ClientStereoActive;
 	using OutRunVR::ClientStereoWorldDraw;
 	using OutRunVR::ClientStereoDrawDuplicated;
+
+	// One immutable OpenXR eye packet, latched by vr_renderer_probe.cpp on the
+	// successful game BeginScene. vr_stereo.cpp consumes this instead of reading
+	// shared memory independently for every draw, so head pose/FOV/IPD all belong
+	// to the exact same host sequence.
+	struct LatchedStereoFrame
+	{
+		bool valid = false;
+		std::uint32_t poseSequence = 0;
+		SharedFov eyeFov[2]{};
+		float eyeOffset[2][3]{};
+	};
+
+	bool GetLatchedStereoFrame(LatchedStereoFrame& out);
+
+	// The mono renderer records only c64 uploads that were independently verified
+	// as OutRun's Transpose(WorldView*Projection) and successfully uploaded after
+	// head correction. Stereo uses this generation marker to avoid treating stale
+	// c64 values from HUD/effect shaders as geometry.
+	bool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
+		std::uint32_t& poseSequence);
+}
+
+namespace OutRunVRStereo
+{
+	// ComposeSbs performs one compositor-only BeginScene/EndScene. The mono
+	// renderer uses this guard so that pass cannot relatch pose or publish fake
+	// game-frame telemetry.
+	bool IsInternalStereoPassActive();
 }
