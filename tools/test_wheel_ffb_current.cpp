@@ -56,32 +56,40 @@ int main() {
  require(apply_response_lut(.10f,boosted)>.10f,"LUT can compensate low-force deadzone");
  require(!parse_response_lut("0,0.2,0.1,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1",boosted),"non-monotonic LUT rejected");
  require(!parse_response_lut("0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1",boosted),"nonzero LUT origin rejected");
- // v0.3 guarded native X-Force candidate. These tests exercise the
- // production state machine, including cadence-independent timing.
+
+ // v0.3 guarded native X-Force candidate. These tests execute the production
+ // state machine without a DirectInput device.
  XForceGuard xg; xg.reset();
  auto xStop=xg.update(62.0f,0.0f,.5f,false);
- require(xStop.stopped&&xStop.nativeBlend==0.0f&&xStop.normalized==0.0f,"X-Force hard zero at stop");
+ require(xStop.stopped&&xStop.nativeBlend==0.0f&&xStop.normalized==0.0f&&!xStop.responseObserved,"X-Force hard zero and trust reset at stop");
  auto xResumeStale=xg.update(62.0f,.20f,.5f,false);
- require(!xResumeStale.valid&&xResumeStale.nativeBlend==0.0f,"X-Force stale stop value not replayed on resume");
+ require(!xResumeStale.valid&&!xResumeStale.responseObserved&&xResumeStale.nativeBlend==0.0f,"X-Force stale stop value cannot establish liveness on resume");
  auto xFresh=xg.update(58.0f,.20f,.5f,false);
  require(xFresh.valid&&xFresh.freshAfterStop&&xFresh.nativeBlend>0.0f,"X-Force fresh post-stop sample arms native path");
  for(int i=0;i<14;++i)xFresh=xg.update(58.0f,.20f,.5f,false,1.0f/60.0f);
  require(xFresh.nativeBlend>.99f,"X-Force native path ramps fully in by elapsed time");
  auto xZero=xg.update(0.0f,.20f,.5f,false);
  require(xZero.valid&&xZero.responsive&&xZero.normalized==0.0f&&xZero.nativeBlend>.80f,"X-Force zero crossing stays valid after response observed");
+
  XForceGuard xd; xd.reset(); xd.update(0.0f,0.0f,.5f,false); xd.update(40.0f,.20f,.5f,false);
  auto xDead=xd.update(38.0f,.20f,.5f,false);
  for(int i=0;i<31;++i)xDead=xd.update(0.0f,.20f,.5f,false,1.0f/60.0f);
- require(!xDead.responsive&&!xDead.valid&&xDead.unresponsiveSeconds>=XForceUnresponsiveSeconds,"X-Force prolonged zero under steering falls back to Modern by elapsed time");
- auto xBad=xg.update(129.0f,.20f,.5f,false);
- require(!xBad.rangeValid&&!xBad.valid&&xBad.nativeBlend<xZero.nativeBlend,"X-Force out-of-range sample fades toward Modern");
- XForceGuard xi; xi.reset(); xi.update(0.0f,0.0f,.5f,true); xi.update(40.0f,.20f,.5f,true);
- auto xInvert=xi.update(38.0f,.20f,.5f,true);
- require(xInvert.valid&&xInvert.normalized<0.0f,"X-Force candidate-only inversion");
- XForceGuard xn; xn.reset();
- require(!xn.update(std::numeric_limits<float>::quiet_NaN(),.5f,.5f,false).rangeValid,"X-Force rejects NaN");
+ require(!xDead.responseObserved&&!xDead.responsive&&!xDead.valid&&xDead.unresponsiveSeconds>=XForceUnresponsiveSeconds,"X-Force prolonged zero revokes old liveness trust");
 
- // Values inside the normalization noise floor must never prove the source
+ // Hard source faults are fail-closed. No stale native torque is replayed
+ // during the ordinary 100 ms blend-out path.
+ auto xBad=xg.update(129.0f,.20f,.5f,false);
+ require(!xBad.rangeValid&&!xBad.responseObserved&&!xBad.valid&&xBad.nativeBlend==0.0f&&xBad.normalized==0.0f,"X-Force out-of-range sample fails closed immediately");
+ auto xRecoverBaseline=xg.update(30.0f,.20f,.5f,false);
+ auto xRecovered=xg.update(29.0f,.20f,.5f,false);
+ require(!xRecoverBaseline.valid&&!xRecoverBaseline.freshAfterStop&&xRecoverBaseline.nativeBlend==0.0f,"X-Force post-fault first moving sample is baseline only");
+ require(xRecovered.valid&&xRecovered.freshAfterStop&&xRecovered.nativeBlend>0.0f,"X-Force changed sample re-arms after hard fault baseline");
+
+ XForceGuard xn; xn.reset();
+ auto xNan=xn.update(std::numeric_limits<float>::quiet_NaN(),.5f,.5f,false);
+ require(!xNan.rangeValid&&!xNan.valid&&xNan.nativeBlend==0.0f&&xNan.normalized==0.0f,"X-Force NaN stays fail closed");
+
+ // Values inside the normalization/near-zero band must never prove the source
  // alive and fade Modern SAT away by themselves.
  XForceGuard xNoise; xNoise.reset(); xNoise.update(0.0f,0.0f,.5f,false);
  XForceGuardSample xNoiseSample{};
@@ -96,17 +104,24 @@ int main() {
  auto xMovingSame=xMovingReset.update(20.0f,.20f,.5f,false);
  auto xMovingFresh=xMovingReset.update(21.0f,.20f,.5f,false);
  require(!xMovingBaseline.valid&&!xMovingBaseline.freshAfterStop&&xMovingBaseline.nativeBlend==0.0f,"X-Force moving reset first sample is baseline only");
- require(!xMovingSame.valid&&!xMovingSame.freshAfterStop,"X-Force moving reset rejects unchanged baseline");
+ require(!xMovingSame.valid&&!xMovingSame.freshAfterStop&&!xMovingSame.responseObserved,"X-Force moving reset rejects unchanged baseline without liveness trust");
  require(xMovingFresh.valid&&xMovingFresh.freshAfterStop,"X-Force moving reset requires a subsequent fresh sample");
 
- // Analyzer freeze suspicion is a safety input to the production guard:
- // native output must fade toward Modern instead of holding stale torque.
+ // Analyzer freeze suspicion is a hard safety input to the production guard.
+ // It must zero native output immediately and require a fresh-baseline cycle.
  XForceGuard xFreezeGuard; xFreezeGuard.reset(); xFreezeGuard.update(0.0f,0.0f,.5f,false);
  auto xFreezeLive=xFreezeGuard.update(20.0f,.20f,.5f,false);
  for(int i=0;i<14;++i)xFreezeLive=xFreezeGuard.update(20.0f,.20f,.5f,false,1.0f/60.0f);
- const float xFreezeBlendBefore=xFreezeLive.nativeBlend;
  auto xFreezeFallback=xFreezeGuard.update(20.0f,.20f,.5f,false,1.0f/60.0f,true);
- require(!xFreezeFallback.valid&&!xFreezeFallback.responsive&&xFreezeFallback.nativeBlend<xFreezeBlendBefore,"X-Force frozen source fades to Modern");
+ require(!xFreezeFallback.valid&&!xFreezeFallback.responsive&&!xFreezeFallback.responseObserved&&xFreezeFallback.nativeBlend==0.0f&&xFreezeFallback.normalized==0.0f,"X-Force frozen source fails closed immediately");
+ auto xFreezeBaseline=xFreezeGuard.update(19.0f,.20f,.5f,false,1.0f/60.0f,false);
+ auto xFreezeRecovered=xFreezeGuard.update(18.0f,.20f,.5f,false,1.0f/60.0f,false);
+ require(!xFreezeBaseline.valid&&!xFreezeBaseline.freshAfterStop,"X-Force post-freeze first sample is baseline only");
+ require(xFreezeRecovered.valid&&xFreezeRecovered.freshAfterStop,"X-Force post-freeze changed sample can re-arm");
+
+ XForceGuard xi; xi.reset(); xi.update(0.0f,0.0f,.5f,true); xi.update(40.0f,.20f,.5f,true);
+ auto xInvert=xi.update(38.0f,.20f,.5f,true);
+ require(xInvert.valid&&xInvert.normalized<0.0f,"X-Force candidate-only inversion");
 
  // Equal elapsed time at 60/120 Hz must produce nearly the same native blend.
  XForceGuard x60; x60.reset(); x60.update(0.0f,0.0f,.5f,false); x60.update(40.0f,.2f,.5f,false,1.0f/60.0f);
@@ -123,8 +138,8 @@ int main() {
  require(std::abs(mixHalf.torque+.1f)<1e-6f&&std::abs(mixHalf.nativeShare-.5f)<1e-6f,"X-Force Hybrid 50 percent mix");
  require(std::abs(mixArcade.torque+.6f)<1e-6f&&mixArcade.nativeShare==1.0f,"X-Force Arcade full native after guard");
 
- // Diagnostic analyzer must identify a coherent signed steering signal without
- // affecting the torque guard, and flag only sustained frozen-data suspicion.
+ // Diagnostic analyzer must identify a coherent signed steering signal and
+ // flag a sustained non-zero freeze using a short integration window.
  XForceSignalAnalyzer xa; xa.reset();
  for(int i=0;i<180;++i){
    float phase=float(i)*.08f; float steerSig=std::sin(phase)*.7f;
@@ -136,13 +151,11 @@ int main() {
  require(xaSnap.confidence>.75f&&xaSnap.p95Abs>25.0f&&xaSnap.maxAbs>35.0f,"X-Force analyzer confidence/distribution");
  XForceSignalAnalyzer xf; xf.reset();
  for(int i=0;i<60;++i){
-   // Deliberately small per-frame movement: the detector must integrate
-   // ordinary smooth change across its short observation window.
    float changing=float(i)*.003f;
    xf.update(20.0f,.40f,changing,changing,changing*.2f,changing*.3f,1.0f/60.0f);
  }
  auto xfSnap=xf.snapshot();
- require(xfSnap.frozenSuspicious&&xfSnap.frozenSeconds>=.50f,"X-Force diagnostic non-zero freeze detector");
+ require(xfSnap.frozenSuspicious&&xfSnap.frozenSeconds>=XForceFrozenFallbackSeconds,"X-Force diagnostic non-zero freeze detector");
 
  WheelVehicleDynamics gap; EVWORK_CAR gapCar; gap.reset();
  for(int i=0;i<80;++i)step(gap,gapCar);
