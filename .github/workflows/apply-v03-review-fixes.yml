@@ -28,6 +28,13 @@ jobs:
             git apply --ignore-space-change --ignore-whitespace "$patch"
           done
 
+      - name: Restore verifier-only workflow dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .github/workflows
+          git show d7c9dc6c44a8659cc4877fb553644bb7bb68abb9:.github/workflows/build.yml > .github/workflows/build.yml
+
       - name: Static source verification only
         shell: bash
         run: |
