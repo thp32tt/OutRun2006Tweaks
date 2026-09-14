@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <cmath>
+#include <cstddef>
 #include <cstdint>
 
 #include "hook_mgr.hpp"
@@ -28,6 +30,7 @@ namespace Settings
     extern Setting<bool> UseNewInput;
     extern Setting<bool> WheelInputCompatibility;
     extern Setting<bool> WheelUniversalSetupEnable;
+    extern Setting<bool> WheelFFBXForceCapture60Hz; // hooks_wheel_ffb.cpp
 
     Setting<bool> WheelPedalSplitFix{
         "Controls", "WheelPedalSplitFix", false,
@@ -48,6 +51,14 @@ namespace Settings
 
 namespace
 {
+    // These adjacent floats are research candidates only. Keep their offsets
+    // locked so a future game-struct edit cannot silently turn the diagnostic
+    // capture into reads from unrelated memory. They never feed wheel torque.
+    static_assert(offsetof(EVWORK_CAR, field_DC0) == 0xDC0,
+        "EVWORK_CAR::field_DC0 offset drifted; X-Force neighbor capture would read the wrong memory");
+    static_assert(offsetof(EVWORK_CAR, field_DC4) == 0xDC4,
+        "EVWORK_CAR::field_DC4 offset drifted; X-Force neighbor capture would read the wrong memory");
+
     class WheelInputCompatibilityV2 : public Hook
     {
         struct Direction
@@ -83,6 +94,17 @@ namespace
         inline static DWORD lastPedalSplitLogTick = 0;
         inline static bool backAliasLogged = false;
 
+        // Research-only neighbor capture for actionforce_DBC. ReadIO already has
+        // an established compatibility hook in this build, so piggybacking here
+        // avoids adding a second physics/FFB owner hook. The timestamp lets the
+        // offline analyzer align these samples with the physics-side XFORCE60
+        // lines. No value below is ever consumed by the force model.
+        inline static DWORD xForceResearchLastLogTick = 0;
+        inline static bool xForceResearchBaselineValid = false;
+        inline static float xForceResearchPrevDbc = 0.0f;
+        inline static float xForceResearchPrevDc0 = 0.0f;
+        inline static float xForceResearchPrevDc4 = 0.0f;
+
         static bool active()
         {
             return Settings::WheelInputCompatibility &&
@@ -98,6 +120,74 @@ namespace
         static bool keyboardHeld(const Direction& direction)
         {
             return (GetAsyncKeyState(direction.virtualKey) & 0x8000) != 0;
+        }
+
+        static void resetXForceResearchCapture()
+        {
+            xForceResearchLastLogTick = 0;
+            xForceResearchBaselineValid = false;
+            xForceResearchPrevDbc = 0.0f;
+            xForceResearchPrevDc0 = 0.0f;
+            xForceResearchPrevDc4 = 0.0f;
+        }
+
+        static void captureXForceNeighbors()
+        {
+            if (!Settings::WheelFFBXForceCapture60Hz ||
+                !Game::current_mode || *Game::current_mode != STATE_GAME)
+            {
+                resetXForceResearchCapture();
+                return;
+            }
+
+            EVWORK_CAR* car = Game::pl_car();
+            if (!car)
+            {
+                resetXForceResearchCapture();
+                return;
+            }
+
+            const DWORD now = GetTickCount();
+            // ReadIO can run faster than the fixed 60 Hz physics loop. Bound this
+            // auxiliary stream to roughly the same cadence so opt-in diagnostics
+            // do not become render-rate-sized logs on high-refresh systems.
+            if (xForceResearchLastLogTick != 0 &&
+                static_cast<DWORD>(now - xForceResearchLastLogTick) < 15u)
+                return;
+
+            const float dbc = car->actionforce_DBC;
+            const float dc0 = car->field_DC0;
+            const float dc4 = car->field_DC4;
+            const bool finite =
+                std::isfinite(dbc) && std::isfinite(dc0) && std::isfinite(dc4);
+
+            const float dDbc = finite && xForceResearchBaselineValid
+                ? dbc - xForceResearchPrevDbc : 0.0f;
+            const float dDc0 = finite && xForceResearchBaselineValid
+                ? dc0 - xForceResearchPrevDc0 : 0.0f;
+            const float dDc4 = finite && xForceResearchBaselineValid
+                ? dc4 - xForceResearchPrevDc4 : 0.0f;
+            const DWORD dtMs = xForceResearchLastLogTick != 0
+                ? static_cast<DWORD>(now - xForceResearchLastLogTick) : 0u;
+
+            spdlog::info(
+                "WheelFFB XFORCE_NEIGHBORS t={} dtMs={} dbc={} dc0={} dc4={} dDbc={} dDc0={} dDc4={} speed={} carSteer={} lat264={} lat268={} finite={}",
+                now, dtMs, dbc, dc0, dc4, dDbc, dDc0, dDc4,
+                car->field_1C4, car->field_1D0, car->field_264, car->field_268,
+                finite);
+
+            xForceResearchLastLogTick = now;
+            if (finite)
+            {
+                xForceResearchPrevDbc = dbc;
+                xForceResearchPrevDc0 = dc0;
+                xForceResearchPrevDc4 = dc4;
+                xForceResearchBaselineValid = true;
+            }
+            else
+            {
+                xForceResearchBaselineValid = false;
+            }
         }
 
         static void learnRawDirections(SumoDInputState* state)
@@ -249,6 +339,10 @@ namespace
             const int result = ReadIOHook.ccall<int>();
             if (active() && Settings::WheelMenuDirectionFilter)
                 filterRawDirections(Game::dinput_state);
+
+            // Diagnostic only. This is intentionally after the game's ReadIO so
+            // its timestamp can be paired with the following physics-side sample.
+            captureXForceNeighbors();
             return result;
         }
 
