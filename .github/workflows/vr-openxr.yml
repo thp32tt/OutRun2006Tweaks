@@ -29,7 +29,7 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Verify VR architecture boundaries
+      - name: Verify reconstructed VR architecture boundaries
         run: python tools/verify_vr_architecture.py
 
       - name: Configure Win32 VR build
@@ -47,7 +47,7 @@ jobs:
           Set-Content -Path build-vr-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
           (Get-Content build-vr-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-vr-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
 
-      - name: Build Win32 VR DLL
+      - name: Build Win32 VR DLL and v3 contract
         run: cmake --build build-vr-game --config Release
 
       - name: Verify Win32 binary
@@ -76,13 +76,13 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Verify VR architecture boundaries
+      - name: Verify reconstructed VR architecture boundaries
         run: python tools/verify_vr_architecture.py
 
       - name: Configure x64 OpenXR host
         run: cmake -S vrhost -B build-vrhost -G "Visual Studio 17 2022" -A x64
 
-      - name: Build x64 OpenXR host and shader test
+      - name: Build x64 OpenXR host and architecture tests
         run: cmake --build build-vrhost --config Release
 
       - name: Compile exact stereo HLSL shader
@@ -92,6 +92,14 @@ jobs:
           if (-not (Test-Path $test)) { throw 'shader smoke executable was not produced' }
           & $test
           if ($LASTEXITCODE -ne 0) { throw 'stereo HLSL failed D3DCompile smoke test' }
+
+      - name: Run protocol v3 cross-bitness contract smoke
+        shell: pwsh
+        run: |
+          $test = 'build-vrhost/bin/outrun-vr-protocol-v3-smoke.exe'
+          if (-not (Test-Path $test)) { throw 'protocol v3 smoke executable was not produced' }
+          & $test
+          if ($LASTEXITCODE -ne 0) { throw 'protocol v3 contract smoke failed' }
 
       - name: Verify x64 host binary
         shell: pwsh
