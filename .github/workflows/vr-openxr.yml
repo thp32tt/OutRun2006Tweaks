@@ -57,7 +57,7 @@ jobs:
           if (-not (Test-Path $dllPath)) { throw 'dinput8.dll was not produced' }
           $bytes = [System.IO.File]::ReadAllBytes($dllPath)
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
-          foreach ($marker in @('renderer-boundary head tracking + true stereo + 6DoF configured','VR stereo: D3D9 full-eye renderer installed','VR stereo: TRUE GEOMETRY STEREO active','VR v3 shadow: live dual-protocol diagnostics active','protocol v3 pose is PRIMARY','v3-primary/v2-fallback frame-latched c64 WVP injection armed')) {
+          foreach ($marker in @('renderer-boundary head tracking + true stereo + 6DoF + D3D9Ex-preferred transport configured','VR stereo: D3D9 full-eye renderer installed','VR stereo: TRUE GEOMETRY STEREO active','VR v3 shadow: live dual-protocol diagnostics active','protocol v3 pose is PRIMARY','v3-primary/v2-fallback frame-latched c64 WVP injection armed','VR D3D9Ex upgrade: Direct3DCreate9 IAT hook armed before game device creation','VR D3D9 probe: deviceType=','VR helper D3D9Ex probe:')) {
             if (-not $ascii.Contains($marker)) { throw "VR DLL marker missing: $marker" }
           }
           $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
@@ -141,7 +141,7 @@ jobs:
           $bytes = [System.IO.File]::ReadAllBytes($hostPath)
           if ($bytes.Length -lt 10000) { throw 'outrun-vr-host.exe is unexpectedly small' }
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
-          foreach ($marker in @('[v3] live shadow HostState/AckState bridge ready.','outrun-vr-host-v3.log')) {
+          foreach ($marker in @('[v3] live shadow HostState/AckState bridge ready.','outrun-vr-host-v3.log','outrun-vr-watchdog.log')) {
             if (-not $ascii.Contains($marker)) { throw "VR host marker missing: $marker" }
           }
           $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
