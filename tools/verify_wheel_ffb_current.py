@@ -428,7 +428,7 @@ req(wheel_ui, 'bool debugLog = true;', 'FFB revert baseline includes diagnostic 
 req(wheel_ui, 'savedFfb_.telemetry = Settings::WheelFFBTelemetry;', 'FFB revert baseline includes telemetry')
 req(wheel_ui, 'if (currentSaved)\n                            capture_saved_ffb();', 'saving a named FFB profile refreshes the revert baseline')
 req(wheel_ui, 'return !known ? "unknown" : (dynamic ? "yes" : "no");', 'FFB capability UI distinguishes unknown from yes')
-req(wheel_ui, 'const bool ffbReady = !Settings::WheelFFBEnable || ffbStatus.initialized;', 'Ready checklist does not treat a disconnected saved GUID as ready')
+req(wheel_ui, 'pending(\"FFB device (starts in gameplay)\");', 'Ready checklist treats menu-time FFB runtime as pending, not failed')
 forbid(wheel_ui, '#include <cstdint>\n#include <cstdio>\n#include <cstdint>', 'duplicate cstdint include')
 
 # debug10-regression-guards
@@ -446,7 +446,7 @@ req(profiles, 'Failed while closing staged FFB profile.', 'FFB profile close fai
 req(profiles, 'Failed while closing wheel-specific input options.', 'input profile option close failures are reported')
 req(wheel_ui, 'capture_saved_ffb();\n                status_ = "Saved to OutRun2006Tweaks.user.ini";', 'legacy full user.ini save refreshes FFB revert baseline')
 req(wheel_ui, 'capture_saved_ffb();\n                    status_ = "Selected FFB output and saved its exact DirectInput GUID.', 'FFB output selection refreshes revert baseline after full user.ini persistence')
-req(wheel_ui, 'OutRun2006Tweaks.profiles\\\\FFB', 'FFB profile folder path escapes backslash')
+req(wheel_ui, 'WheelProfileStore::directory(WheelProfileStore::Kind::ForceFeedback).string()', 'FFB page shows the actual runtime profile folder')
 
 
 # engine-vibration-v02-regression-guards
@@ -482,3 +482,11 @@ if build.count('snowCurbHoldUntil = now + SnowCurbHoldMs;') != 1:
     raise SystemExit('CURRENT VERIFY FAILED [snow curb hold deadline is re-armed outside confirmed mixed snow contact]')
 print('OK [snow curb hold deadline has one confirmed-contact re-arm site]')
 forbid(build, 'Extend while all tyres remain on the identified curb/shoulder.', 'uniform curb contact cannot indefinitely refresh snow latch')
+
+# v0.3 hardware compatibility regression guards
+req(profiles, 'std::filesystem::copy_file(', 'named profile save has rename-to-copy fallback for Windows driver/filter edge cases')
+req(profiles, 'Profile installation could not be verified.', 'named profile save verifies the final file exists')
+req(wheel_ui, 'Direction test (not run)', 'direction-test checklist distinguishes pending from failure')
+req(wheel_ui, 'Waiting / released / inactive is normal outside gameplay.', 'runtime status explains menu-time idle state')
+req(wheel_ui, 'FFB profile save failed:', 'profile persistence failures are explicit')
+req(wheel_ui, 'spdlog::error("{}", status_);', 'profile persistence failure is logged for remote testers')

@@ -210,25 +210,61 @@ namespace WheelProfileStore
             }
         }
 
+        bool installedByCopyFallback = false;
         std::filesystem::rename(staged, finalPath, ec);
         if (ec)
         {
-            const std::string replaceError = ec.message();
+            const std::string renameError = ec.message();
+            std::error_code copyEc;
+            std::filesystem::copy_file(
+                staged, finalPath, std::filesystem::copy_options::overwrite_existing, copyEc);
+            if (copyEc)
+            {
+                if (finalExists)
+                {
+                    std::error_code restoreEc;
+                    std::filesystem::rename(backup, finalPath, restoreEc);
+                    if (restoreEc)
+                    {
+                        if (error) *error = "Could not install the new profile (rename: " + renameError +
+                            "; copy fallback: " + copyEc.message() + ") and could not restore the backup (" +
+                            restoreEc.message() + "). Destination: " + finalPath.string();
+                        return false;
+                    }
+                }
+                if (error) *error = "Could not install the completed profile (rename: " + renameError +
+                    "; copy fallback: " + copyEc.message() + "). Destination: " + finalPath.string();
+                return false;
+            }
+            installedByCopyFallback = true;
+        }
+
+        std::error_code verifyEc;
+        const bool installed = std::filesystem::is_regular_file(finalPath, verifyEc) && !verifyEc;
+        if (!installed)
+        {
+            std::error_code ignored;
+            std::filesystem::remove(finalPath, ignored);
             if (finalExists)
             {
                 std::error_code restoreEc;
                 std::filesystem::rename(backup, finalPath, restoreEc);
                 if (restoreEc)
                 {
-                    if (error) *error = "Could not install the new profile (" + replaceError +
-                        ") and could not restore the backup (" + restoreEc.message() + ").";
+                    if (error) *error = "Profile installation could not be verified and the previous profile could not be restored: " +
+                        restoreEc.message() + ". Destination: " + finalPath.string();
                     return false;
                 }
             }
-            if (error) *error = "Could not install the completed profile: " + replaceError;
+            if (error) *error = "Profile installation could not be verified. Destination: " + finalPath.string();
             return false;
         }
 
+        if (installedByCopyFallback)
+        {
+            std::error_code ignored;
+            std::filesystem::remove(staged, ignored);
+        }
         if (finalExists)
         {
             std::error_code ignored;
