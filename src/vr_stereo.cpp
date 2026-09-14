@@ -115,6 +115,7 @@ namespace OutRunVRStereo
 		OutRunVRRenderer::LatchedStereoFrame FrameStereoMetadata{};
 		std::uint32_t StereoFrameCounter = 0;
 		bool RightDepthSynchronized = true;
+		bool LastHostRenderEligible = false;
 
 		ULONGLONG LastSummaryMs = 0;
 		std::uint64_t DuplicatedDraws = 0;
@@ -183,7 +184,16 @@ namespace OutRunVRStereo
 
 		bool StereoWanted()
 		{
-			if (!Settings::VRStereo || !GameplayActive() || !HostRenderEligible())
+			const bool hostEligible = HostRenderEligible();
+			if (hostEligible && !LastHostRenderEligible && TrackedDepthStencil)
+			{
+				// The left/game depth may have advanced while OpenXR asked us not to
+				// render. Require the next full duplicated Z clear before reusing the
+				// right-eye depth surface.
+				RightDepthSynchronized = false;
+			}
+			LastHostRenderEligible = hostEligible;
+			if (!Settings::VRStereo || !GameplayActive() || !hostEligible)
 				return false;
 			return Settings::VREnabled || Settings::VRAutoEnableWhenHostPresent;
 		}
@@ -1129,6 +1139,7 @@ namespace OutRunVRStereo
 			AuxRenderTargetActive = {};
 			CurrentVertexShaderIdentity.store(0, std::memory_order_release);
 			VertexShaderSerial.store(0, std::memory_order_release);
+			LastHostRenderEligible = false;
 			FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoMetadata={};PublishStereoState(OutRunVR::StereoDisabled,false,0,0);PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,OutRunVR::StereoFailureNone,nullptr);const HRESULT hr=ResetHook.stdcall<HRESULT>(device,params);
 			if (SUCCEEDED(hr))
 				EnsureStereoResources(device);
