@@ -1,0 +1,38 @@
+name: Apply VR final test hardening
+
+on:
+  push:
+    branches: [vr-openxr]
+    paths:
+      - 'tools/apply_vr_final_test_hardening.py'
+      - '.github/workflows/apply-vr-final-test-hardening.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: vr-openxr
+          fetch-depth: 0
+      - name: Apply reviewed source hardening
+        run: python3 tools/apply_vr_final_test_hardening.py
+      - name: Verify patch cleanliness
+        run: |
+          git diff --check
+          git status --short
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/vr_shared.hpp src/vr_renderer_probe.cpp src/vr_stereo.cpp
+          if git diff --cached --quiet; then
+            echo 'No source changes to commit.'
+            exit 0
+          fi
+          git commit -m 'vr: finalize true stereo test hardening and telemetry'
+          git push origin HEAD:vr-openxr
