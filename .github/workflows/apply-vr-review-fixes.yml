@@ -21,16 +21,16 @@ jobs:
           fetch-depth: 0
       - name: Apply reviewed source changes
         run: python tools/apply_vr_review_fixes.py
-      - name: Validate and commit
+      - name: Validate and commit source only
         shell: bash
         run: |
           git diff --check
-          if git diff --quiet; then
-            echo 'patch produced no changes' >&2
-            exit 1
-          fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add src/vr_shared.hpp src/hooks_vr.cpp src/vr_renderer_probe.cpp src/vr_stereo.cpp vrhost/main_stereo.cpp VR_OPENXR.md .github/workflows/vr-openxr.yml
+          git add src/vr_shared.hpp src/hooks_vr.cpp src/vr_renderer_probe.cpp src/vr_stereo.cpp vrhost/main_stereo.cpp VR_OPENXR.md
+          if git diff --cached --quiet; then
+            echo 'patch produced no staged source changes' >&2
+            exit 1
+          fi
           git commit -m 'vr: apply stereo integrity and pose contract hardening'
           git push origin HEAD:vr-openxr
