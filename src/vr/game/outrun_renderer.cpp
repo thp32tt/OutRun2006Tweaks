@@ -15,6 +15,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr_shared.hpp"
+#include "vr/ipc/host_pose_v3.hpp"
 
 // Authoritative renderer-side OpenXR head-pose injector for OutRun 2006.
 //
@@ -34,9 +35,10 @@
 // function. This intentionally does not claim to fix culling that happens before
 // BeginScene; that boundary still needs runtime visibility testing.
 //
-// Stereo eye FOV/IPD are latched from the SAME seqlock snapshot as the head pose
-// once per successful game BeginScene. vr_stereo.cpp consumes that immutable
-// packet instead of sampling the host independently for every draw.
+// Stereo eye FOV/IPD are latched from the SAME immutable host snapshot as the
+// head pose once per successful game BeginScene. Protocol v3 is the primary
+// source; the proven v2 bridge remains a same-frame fallback until transport v3
+// fully replaces the legacy frame ring.
 
 namespace Settings
 {
@@ -97,6 +99,7 @@ namespace OutRunVRRenderer
 		HANDLE SharedMapping = nullptr;
 		SharedPoseState* SharedState = nullptr;
 		LARGE_INTEGER QpcFrequency{};
+		OutRunVR::IpcV3::HostPoseV3Source V3PoseSource{};
 
 		const D3DMATRIX* RendererView = nullptr;
 		const D3DMATRIX* RendererProjection = nullptr;
@@ -120,6 +123,7 @@ namespace OutRunVRRenderer
 		float LatchedRelativeAngleDeg = 0.0f;
 		std::uint32_t LatchedPoseSequence = 0;
 		bool PresentPoseLocked = false;
+		bool LastPoseSourceV3 = false;
 
 		float LastVerifiedWvp[16]{};
 		bool LastVerifiedWvpValid = false;
@@ -145,12 +149,16 @@ namespace OutRunVRRenderer
 		std::uint64_t WvpRejectedCalls = 0;
 		std::uint64_t UnsafeAddressRejects = 0;
 		std::uint64_t ReusedPoseSceneCalls = 0;
+		std::uint64_t V3PoseReads = 0;
+		std::uint64_t V2PoseFallbacks = 0;
 		bool FirstVerifiedLogged = false;
 		bool FirstInjectedLogged = false;
 		bool FirstRejectedLogged = false;
 		bool FirstUnsafeAddressLogged = false;
 		bool FirstUploadFailedLogged = false;
 		bool CullingUnionFovDeferredLogged = false;
+		bool FirstV3PoseLogged = false;
+		bool FirstV2FallbackLogged = false;
 
 		bool IsGameDevice(IDirect3DDevice9* device)
 		{
@@ -572,6 +580,62 @@ namespace OutRunVRRenderer
 
 		bool ReadHostPose(PoseSample& pose)
 		{
+			OutRunVR::IpcV3::HostPoseSnapshot v3{};
+			if (V3PoseSource.Read(v3))
+			{
+				const std::uint32_t legacySequence = static_cast<std::uint32_t>(v3.poseId & 0xFFFFFFFFu);
+				if (legacySequence != 0)
+				{
+					pose = {};
+					pose.sequence = legacySequence;
+					pose.hostPid = v3.hostPid;
+					pose.referenceSpaceGeneration = v3.referenceSpaceGeneration;
+					pose.orientation = {
+						v3.headOrientation[0], v3.headOrientation[1],
+						v3.headOrientation[2], v3.headOrientation[3]
+					};
+					pose.position = {
+						v3.headPositionMeters[0], v3.headPositionMeters[1], v3.headPositionMeters[2]
+					};
+					pose.positionValid = v3.positionValid;
+					pose.stereoValid = v3.stereoValid;
+					if (pose.stereoValid)
+					{
+						for (int eye = 0; eye < 2; ++eye)
+						{
+							pose.eyeFov[eye] = {
+								v3.eyes[eye].fov.angleLeft,
+								v3.eyes[eye].fov.angleRight,
+								v3.eyes[eye].fov.angleUp,
+								v3.eyes[eye].fov.angleDown
+							};
+							for (int axis = 0; axis < 3; ++axis)
+								pose.eyeOffset[eye][axis] = v3.eyes[eye].positionMeters[axis];
+							pose.eyeOrientation[eye] = {
+								v3.eyes[eye].orientation[0], v3.eyes[eye].orientation[1],
+								v3.eyes[eye].orientation[2], v3.eyes[eye].orientation[3]
+							};
+						}
+					}
+					LastPoseSourceV3 = true;
+					++V3PoseReads;
+					if (!FirstV3PoseLogged)
+					{
+						FirstV3PoseLogged = true;
+						spdlog::info("VR renderer: protocol v3 pose is PRIMARY; legacy v2 remains automatic fallback");
+					}
+					return true;
+				}
+			}
+
+			LastPoseSourceV3 = false;
+			++V2PoseFallbacks;
+			if (!FirstV2FallbackLogged && V3PoseReads != 0)
+			{
+				FirstV2FallbackLogged = true;
+				spdlog::warn("VR renderer: protocol v3 pose unavailable/stale; falling back to legacy v2 pose without dropping the frame");
+			}
+
 			if (!EnsureSharedState())
 				return false;
 
@@ -1041,10 +1105,11 @@ namespace OutRunVRRenderer
 				return;
 			LastSummaryMs = now;
 			spdlog::info(
-				"VR renderer: beginScene={} poseReuse={} c64Candidate={} verified={} prepared={} uploadOk={} uploadFail={} rejected={} unsafe={} latchedSeq={} wvpGen={} presentPoseLocked={}",
+				"VR renderer: beginScene={} poseReuse={} c64Candidate={} verified={} prepared={} uploadOk={} uploadFail={} rejected={} unsafe={} latchedSeq={} poseSource={} v3Reads={} v2Fallbacks={} wvpGen={} presentPoseLocked={}",
 				BeginSceneCalls, ReusedPoseSceneCalls, WvpCandidateCalls, WvpVerifiedCalls, WvpPreparedCalls,
 				WvpUploadSucceededCalls, WvpUploadFailedCalls, WvpRejectedCalls,
-				UnsafeAddressRejects, LatchedPoseSequence, LastVerifiedWvpGeneration, PresentPoseLocked ? 1 : 0);
+				UnsafeAddressRejects, LatchedPoseSequence, LastPoseSourceV3 ? "v3" : "v2",
+				V3PoseReads, V2PoseFallbacks, LastVerifiedWvpGeneration, PresentPoseLocked ? 1 : 0);
 		}
 
 		HRESULT __stdcall BeginSceneDest(IDirect3DDevice9* device)
@@ -1187,7 +1252,7 @@ namespace OutRunVRRenderer
 			}
 
 			EnsureSharedState();
-			spdlog::info("VR renderer: D3D9 hooks installed; frame-latched c64 WVP injection armed (vtbl 41/42/94)");
+			spdlog::info("VR renderer: D3D9 hooks installed; v3-primary/v2-fallback frame-latched c64 WVP injection armed (vtbl 41/42/94)");
 			return true;
 		}
 
