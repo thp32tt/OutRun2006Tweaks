@@ -148,6 +148,7 @@ namespace OutRunVRRenderer
 		bool FirstRejectedLogged = false;
 		bool FirstUnsafeAddressLogged = false;
 		bool FirstUploadFailedLogged = false;
+		bool CullingUnionFovDeferredLogged = false;
 
 		bool IsGameDevice(IDirect3DDevice9* device)
 		{
@@ -596,7 +597,9 @@ namespace OutRunVRRenderer
 				snapshot.structSize != sizeof(SharedPoseState))
 				return false;
 			if ((snapshot.flags & HostAlive) == 0 ||
-				(snapshot.flags & OrientationValid) == 0 || snapshot.hostPid == 0)
+				(snapshot.flags & OrientationValid) == 0 ||
+				(snapshot.flags & SessionVisible) == 0 ||
+				(snapshot.flags & HostShouldRender) == 0 || snapshot.hostPid == 0)
 				return false;
 
 			LARGE_INTEGER now{};
@@ -751,22 +754,10 @@ namespace OutRunVRRenderer
 				cameraWorld._43 + forward.z * lookDistance
 			};
 			CullingCameraOverridden = true;
-			if (Settings::VRCullingUnionFov && LatchedStereo.valid && RendererProjection)
+			if (Settings::VRCullingUnionFov && !CullingUnionFovDeferredLogged)
 			{
-				auto* projection = const_cast<D3DMATRIX*>(RendererProjection);
-				D3DMATRIX baseProjection{}; std::memcpy(&baseProjection, RendererProjection, sizeof(baseProjection));
-				SharedFov unionFov{};
-				unionFov.angleLeft = std::min(LatchedStereo.eyeFov[0].angleLeft, LatchedStereo.eyeFov[1].angleLeft);
-				unionFov.angleRight = std::max(LatchedStereo.eyeFov[0].angleRight, LatchedStereo.eyeFov[1].angleRight);
-				unionFov.angleUp = std::max(LatchedStereo.eyeFov[0].angleUp, LatchedStereo.eyeFov[1].angleUp);
-				unionFov.angleDown = std::min(LatchedStereo.eyeFov[0].angleDown, LatchedStereo.eyeFov[1].angleDown);
-				const D3DMATRIX widened = ProjectionFromFov(baseProjection, unionFov);
-				if (MatrixFinite(widened) && IsWritableRange(projection, sizeof(D3DMATRIX)))
-				{
-					CullingProjectionSaved = baseProjection;
-					std::memcpy(projection, &widened, sizeof(widened));
-					CullingProjectionOverridden = true;
-				}
+				CullingUnionFovDeferredLogged = true;
+				spdlog::warn("VR renderer: CullingUnionFov is deferred until a culling-only frustum boundary is verified; live projection remains untouched");
 			}
 			FrameTelemetryFlags |= ClientCullingCameraSynced;
 		}
@@ -849,6 +840,12 @@ namespace OutRunVRRenderer
 					relativePosition.y *= Settings::VRWorldScale;
 					relativePosition.z *= Settings::VRWorldScale;
 				}
+			}
+
+			if (!CenterPositionValid && sample.positionValid)
+			{
+				CenterPosition = sample.position;
+				CenterPositionValid = true;
 			}
 
 			relativeOrientation = ScaleRotation(relativeOrientation, Settings::VRRotationScale);

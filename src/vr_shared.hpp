@@ -24,6 +24,7 @@ namespace OutRunVR
         SessionFocused = 1u << 4,
         StereoViewsValid = 1u << 5,
         StereoEyeOrientationValid = 1u << 6,
+        HostShouldRender = 1u << 7,
     };
 
     inline constexpr std::uint32_t ClientHeartbeatIndex = 0;
@@ -83,6 +84,7 @@ namespace OutRunVR
         RenderFrameWorldStereo = 1u << 1,
         RenderFrameDrawDuplicated = 1u << 2,
         RenderFrameEffectivePoseValid = 1u << 3,
+        RenderFramePresentInFlight = 1u << 4,
     };
 
     enum StereoFailureReason : std::uint32_t
@@ -188,6 +190,8 @@ namespace OutRunVRRenderer
     using OutRunVR::PositionValid;
     using OutRunVR::StereoViewsValid;
     using OutRunVR::StereoEyeOrientationValid;
+    using OutRunVR::SessionVisible;
+    using OutRunVR::HostShouldRender;
     using OutRunVR::ClientHeartbeatIndex;
     using OutRunVR::ClientFlagsIndex;
     using OutRunVR::ClientLastAngleBitsIndex;
