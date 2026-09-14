@@ -61,7 +61,7 @@ for marker in (
 stereo = (ROOT / 'src/vr/d3d9/stereo_renderer.cpp').read_text(encoding='utf-8')
 for marker in (
     'RenderFrameRingSize', 'IDirect3DDevice9Ex', 'GetAdapterLUID',
-    'ResolveDirectTransport', 'OpenXR LOCAL-space metres',
+    'ResolveDirectTransport', 'StereoFailurePoseSequenceMismatch',
 ):
     if marker not in stereo:
         raise SystemExit(f'missing D3D9 stereo invariant: {marker}')
