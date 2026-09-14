@@ -68,7 +68,7 @@ compile-options = ["/utf-8"]
 [fetch-content]
 ogg = { git = "https://github.com/xiph/ogg", tag = "v1.3.6" }
 flac = { git = "https://github.com/xiph/flac", tag = "1.5.0" }
-miniupnpc = { git = "https://github.com/miniupnp/miniupnp", tag = "miniupnpcd_2_3_10", subdir = "miniupnpc" }
+miniupnpc = { git = "https://github.com/miniupnp/miniupnp", tag = "miniupnpc_2_3_10", subdir = "miniupnpc" }
 jsoncpp = { git = "https://github.com/open-source-parsers/jsoncpp.git", tag = "1.9.8" }
 zlib = { git = "https://github.com/madler/zlib", tag = "v1.3.2" }
 sdl = { git = "https://github.com/libsdl-org/SDL", tag = "release-3.4.12" }
