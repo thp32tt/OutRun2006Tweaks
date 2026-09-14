@@ -37,13 +37,17 @@ namespace OutRunVR
 	inline constexpr std::uint32_t HostEyeOffsetRightYIndex = 10;
 	inline constexpr std::uint32_t HostEyeOffsetRightZIndex = 11;
 
-	// Client-owned true-stereo transport state. The x64 host uses these to
-	// decide whether gameplay contains a left/right SBS frame ready for an
-	// XrCompositionLayerProjection submission.
+	// Client-owned true-stereo transport state. StereoFrame is a publication
+	// token written only AFTER the corresponding D3D9 Present succeeds. The QPC
+	// low word is sampled immediately before Present and lets Desktop Duplication
+	// prove that its cached image is not older than the published SBS frame.
 	inline constexpr std::uint32_t ClientStereoStateIndex = 12;
 	inline constexpr std::uint32_t ClientStereoFrameIndex = 13;
-	inline constexpr std::uint32_t ClientStereoBackbufferWidthIndex = 14;
+	inline constexpr std::uint32_t ClientStereoPresentQpcLowIndex = 14;
 	inline constexpr std::uint32_t ClientStereoBackbufferHeightIndex = 15;
+	// Legacy diagnostic alias retained so protocol-v1 tooling/source checks do not
+	// break. Index 14 now carries ClientStereoPresentQpcLowIndex, not width.
+	inline constexpr std::uint32_t ClientStereoBackbufferWidthIndex = ClientStereoPresentQpcLowIndex;
 
 	enum ClientPresentationMode : std::uint32_t
 	{
@@ -152,6 +156,7 @@ namespace OutRunVRRenderer
 	using OutRunVR::HostEyeOffsetRightZIndex;
 	using OutRunVR::ClientStereoStateIndex;
 	using OutRunVR::ClientStereoFrameIndex;
+	using OutRunVR::ClientStereoPresentQpcLowIndex;
 	using OutRunVR::ClientStereoBackbufferWidthIndex;
 	using OutRunVR::ClientStereoBackbufferHeightIndex;
 	using OutRunVR::ClientPresentationMode;
