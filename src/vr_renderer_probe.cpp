@@ -1167,6 +1167,11 @@ namespace OutRunVRRenderer
 		return out.valid && out.poseSequence != 0;
 	}
 
+	std::uint64_t GetBeginSceneCallCount()
+	{
+		return BeginSceneCalls;
+	}
+
 	bool GetRendererBaseProjection(float outMatrix[16])
 	{
 		if (!outMatrix || !ValidateRendererGlobals() || !RendererProjection)

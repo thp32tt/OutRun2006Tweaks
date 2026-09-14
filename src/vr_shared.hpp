@@ -106,6 +106,8 @@ namespace OutRunVR
         StereoFailurePoseSequenceMismatch = 14,
         StereoFailureDepthUnsynchronized = 15,
         StereoFailureClearFailed = 16,
+        StereoFailureWorldClassificationFailed = 17,
+        StereoFailureStencilUnsynchronized = 18,
     };
 
 #pragma pack(push, 4)
@@ -246,6 +248,7 @@ namespace OutRunVRRenderer
     bool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
         std::uint32_t& poseSequence, std::uintptr_t& shaderIdentity,
         std::uint64_t& shaderSerial);
+    std::uint64_t GetBeginSceneCallCount();
 }
 
 namespace OutRunVRStereo
