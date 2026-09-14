@@ -70,7 +70,9 @@ jobs:
             'PublishRenderFrame','SharedRenderFrameState','FrameStereoIncomplete',
             'StereoFailureDepthUnsynchronized','StereoFailureRightStateFailed','StereoFailureRightWvpUploadFailed',
             'StereoFailureRightDrawFailed','PoisonFrame(rightFailure)','RightDepthSynchronized','presentStart.QuadPart',
-            'D3DCLEAR_ZBUFFER) != 0 && count == 0','ClientStereoBackbufferWidthIndex')) {
+            'D3DCLEAR_ZBUFFER) != 0 && count == 0','ViewportCoversStereoBackbuffer',
+            'viewport.Width == BackBufferDesc.Width','viewport.Height == BackBufferDesc.Height',
+            'ClientStereoBackbufferWidthIndex')) {
             if (-not $stereo.Contains($marker)) { throw "missing stereo renderer marker: $marker" }
           }
           if ($stereo.Contains('ReadStereoSnapshot')) { throw 'stereo renderer must not resample shared pose per draw' }
