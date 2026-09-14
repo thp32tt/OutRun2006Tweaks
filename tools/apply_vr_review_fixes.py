@@ -15,187 +15,161 @@ def replace_once(path: str, old: str, new: str) -> None:
     text = read(path)
     count = text.count(old)
     if count != 1:
-        raise RuntimeError(f"{path}: expected one match, found {count}: {old[:160]!r}")
+        raise RuntimeError(f"{path}: expected one match, found {count}: {old[:180]!r}")
     write(path, text.replace(old, new, 1))
 
 
-# Pose.v1 reserved slots 14/15 retain their original width/height meaning.
-replace_once(
-    "src/vr_shared.hpp",
-    '''    inline constexpr std::uint32_t ClientStereoStateIndex = 12;
-    inline constexpr std::uint32_t ClientStereoFrameIndex = 13;
-    inline constexpr std::uint32_t ClientStereoPresentQpcLowIndex = 14;
-    inline constexpr std::uint32_t ClientStereoBackbufferHeightIndex = 15;
-    inline constexpr std::uint32_t ClientStereoBackbufferWidthIndex = ClientStereoPresentQpcLowIndex;
-''',
-    '''    inline constexpr std::uint32_t ClientStereoStateIndex = 12;
-    inline constexpr std::uint32_t ClientStereoFrameIndex = 13;
-    inline constexpr std::uint32_t ClientStereoBackbufferWidthIndex = 14;
-    inline constexpr std::uint32_t ClientStereoBackbufferHeightIndex = 15;
-    // Source-compatibility alias only. Slot 14 remains backbuffer width;
-    // exact presentation timing is transported by Frame.v1::presentQpc.
-    inline constexpr std::uint32_t ClientStereoPresentQpcLowIndex = ClientStereoBackbufferWidthIndex;
-''',
-)
-replace_once(
-    "src/vr_shared.hpp",
-    '''    bool GetLatchedStereoFrame(LatchedStereoFrame& out);
-    bool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
-''',
-    '''    bool GetLatchedStereoFrame(LatchedStereoFrame& out);
-    bool GetRendererBaseProjection(float outMatrix[16]);
-    bool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
-''',
-)
-
-# Export the exact original projection used by mono WVP verification. This keeps
-# stereo eye reconstruction correct while CullingUnionFov temporarily widens the
-# game projection global during BeginScene..EndScene.
+# Frame.v1 eye positions are XrPosef positions and therefore remain in metres.
+# VRWorldScale converts metres to OutRun game units only inside the D3D9 camera
+# transform; applying it to the OpenXR submission pose would double-apply scale.
 replace_once(
     "src/vr_renderer_probe.cpp",
-    '''\tbool GetLatchedStereoFrame(LatchedStereoFrame& out)
-\t{
-\t\tout = LatchedStereo;
-\t\treturn out.valid && out.poseSequence != 0;
-\t}
-
-\tbool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
+    '''\t\t\t\tVec3 effectiveHeadPosition = CenterPositionValid ? CenterPosition : sample.position;
+\t\t\t\tif (Settings::VRPositionalTracking && sample.positionValid && CenterPositionValid)
+\t\t\t\t{
+\t\t\t\t\tconst Vec3 delta{
+\t\t\t\t\t\tsample.position.x - CenterPosition.x,
+\t\t\t\t\t\tsample.position.y - CenterPosition.y,
+\t\t\t\t\t\tsample.position.z - CenterPosition.z
+\t\t\t\t\t};
+\t\t\t\t\teffectiveHeadPosition = {
+\t\t\t\t\t\tCenterPosition.x + delta.x * Settings::VRWorldScale,
+\t\t\t\t\t\tCenterPosition.y + delta.y * Settings::VRWorldScale,
+\t\t\t\t\t\tCenterPosition.z + delta.z * Settings::VRWorldScale
+\t\t\t\t\t};
+\t\t\t\t}
 ''',
-    '''\tbool GetLatchedStereoFrame(LatchedStereoFrame& out)
-\t{
-\t\tout = LatchedStereo;
-\t\treturn out.valid && out.poseSequence != 0;
-\t}
+    '''\t\t\t\t// Frame.v1 positions are OpenXR LOCAL-space metres. WorldScale is
+\t\t\t\t// only the metres->game-units conversion used by LatchedHeadInverse.
+\t\t\t\tVec3 effectiveHeadPosition = CenterPositionValid ? CenterPosition : sample.position;
+\t\t\t\tif (Settings::VRPositionalTracking && sample.positionValid)
+\t\t\t\t\teffectiveHeadPosition = sample.position;
+''',
+)
+replace_once(
+    "src/vr_renderer_probe.cpp",
+    '''\t\t\t\t\tconst Vec3 localEye{
+\t\t\t\t\t\tsample.eyeOffset[eye][0] * Settings::VRWorldScale,
+\t\t\t\t\t\tsample.eyeOffset[eye][1] * Settings::VRWorldScale,
+\t\t\t\t\t\tsample.eyeOffset[eye][2] * Settings::VRWorldScale
+\t\t\t\t\t};
+''',
+    '''\t\t\t\t\t// eyeOffset is already head-local metres; keep the projection-layer
+\t\t\t\t\t// pose in OpenXR units even though D3D9 multiplies IPD by WorldScale.
+\t\t\t\t\tconst Vec3 localEye{
+\t\t\t\t\t\tsample.eyeOffset[eye][0],
+\t\t\t\t\t\tsample.eyeOffset[eye][1],
+\t\t\t\t\t\tsample.eyeOffset[eye][2]
+\t\t\t\t\t};
+''',
+)
 
-\tbool GetRendererBaseProjection(float outMatrix[16])
-\t{
-\t\tif (!outMatrix || !ValidateRendererGlobals() || !RendererProjection)
-\t\t\treturn false;
-\t\tD3DMATRIX projection{};
-\t\tif (CullingProjectionOverridden)
-\t\t\tprojection = CullingProjectionSaved;
-\t\telse
-\t\t\tstd::memcpy(&projection, RendererProjection, sizeof(projection));
-\t\tif (!MatrixFinite(projection))
-\t\t\treturn false;
-\t\tstd::memcpy(outMatrix, &projection, sizeof(projection));
-\t\treturn true;
-\t}
+# Record the actual right-eye failure stage instead of reporting every world-draw
+# right-side error as a WVP upload failure. Correctness was already fail-closed;
+# this makes limited-device diagnostics actionable.
+replace_once(
+    "src/vr_stereo.cpp",
+    '''\t\t\tIDirect3DSurface9* savedRt = TrackedRenderTarget;
+\t\t\tIDirect3DSurface9* savedDepth = TrackedDepthStencil;
+\t\t\tHRESULT rightHr = D3D_OK;
+\t\t\tbool restoreOk = true;
+\t\t\t{
+\t\t\t\tInternalPassScope guard;
+\t\t\t\trightHr = SetRenderTargetHook.stdcall<HRESULT>(device, 0u, RightEyeSurface);
+\t\t\t\tif (SUCCEEDED(rightHr))
+\t\t\t\t\trightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, RightEyeDepth);
+\t\t\t\tif (SUCCEEDED(rightHr))
+\t\t\t\t\trightHr = device->SetViewport(&savedViewport);
+\t\t\t\tif (SUCCEEDED(rightHr) && draw.worldStereo)
+\t\t\t\t\trightHr = SetWvpOneRegisterAtATime(device, draw.eyeConstants[1]) ? D3D_OK : E_FAIL;
+\t\t\t\tif (SUCCEEDED(rightHr))
+\t\t\t\t\trightHr = drawCall();
 
-\tbool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
+\t\t\t\trestoreOk = RestoreRightPassState(device, savedRt, savedDepth,
+\t\t\t\t\tsavedViewport, draw.originalConstants, draw.worldStereo);
+\t\t\t}
+''',
+    '''\t\t\tIDirect3DSurface9* savedRt = TrackedRenderTarget;
+\t\t\tIDirect3DSurface9* savedDepth = TrackedDepthStencil;
+\t\t\tHRESULT rightHr = D3D_OK;
+\t\t\tOutRunVR::StereoFailureReason rightFailure = OutRunVR::StereoFailureRightStateFailed;
+\t\t\tbool restoreOk = true;
+\t\t\t{
+\t\t\t\tInternalPassScope guard;
+\t\t\t\trightHr = SetRenderTargetHook.stdcall<HRESULT>(device, 0u, RightEyeSurface);
+\t\t\t\tif (SUCCEEDED(rightHr))
+\t\t\t\t\trightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, RightEyeDepth);
+\t\t\t\tif (SUCCEEDED(rightHr))
+\t\t\t\t\trightHr = device->SetViewport(&savedViewport);
+\t\t\t\tif (SUCCEEDED(rightHr) && draw.worldStereo &&
+\t\t\t\t\t!SetWvpOneRegisterAtATime(device, draw.eyeConstants[1]))
+\t\t\t\t{
+\t\t\t\t\trightFailure = OutRunVR::StereoFailureRightWvpUploadFailed;
+\t\t\t\t\trightHr = E_FAIL;
+\t\t\t\t}
+\t\t\t\tif (SUCCEEDED(rightHr))
+\t\t\t\t{
+\t\t\t\t\trightFailure = OutRunVR::StereoFailureRightDrawFailed;
+\t\t\t\t\trightHr = drawCall();
+\t\t\t\t}
+
+\t\t\t\trestoreOk = RestoreRightPassState(device, savedRt, savedDepth,
+\t\t\t\t\tsavedViewport, draw.originalConstants, draw.worldStereo);
+\t\t\t}
 ''',
 )
 replace_once(
     "src/vr_stereo.cpp",
-    '''\t\tbool ReadProjection(D3DMATRIX& projection)
-\t\t{
-\t\t\tif (!ImageContainsRange(OutRunProjectionRva, sizeof(D3DMATRIX)))
-\t\t\t\treturn false;
-\t\t\tconst auto* projectionPtr = Module::exe_ptr<D3DMATRIX>(OutRunProjectionRva);
-\t\t\tif (!IsReadableRange(projectionPtr, sizeof(D3DMATRIX)))
-\t\t\t\treturn false;
-\t\t\tstd::memcpy(&projection, projectionPtr, sizeof(projection));
-\t\t\treturn MatrixFinite(projection) &&
-\t\t\t\tstd::fabs(projection._34 + 1.0f) < 0.25f && std::fabs(projection._44) < 0.25f;
-\t\t}
+    '''\t\t\tif(FAILED(rightHr)){FrameRightDrawFailed=true;PoisonFrame(draw.worldStereo?OutRunVR::StereoFailureRightWvpUploadFailed:OutRunVR::StereoFailureRightDrawFailed);}
 ''',
-    '''\t\tbool ReadProjection(D3DMATRIX& projection)
-\t\t{
-\t\t\tfloat rendererProjection[16]{};
-\t\t\tif (OutRunVRRenderer::GetRendererBaseProjection(rendererProjection))
+    '''\t\t\tif (FAILED(rightHr))
 \t\t\t{
-\t\t\t\tstd::memcpy(&projection, rendererProjection, sizeof(projection));
+\t\t\t\tFrameRightDrawFailed = true;
+\t\t\t\tPoisonFrame(rightFailure);
 \t\t\t}
-\t\t\telse
-\t\t\t{
-\t\t\t\tif (!ImageContainsRange(OutRunProjectionRva, sizeof(D3DMATRIX)))
-\t\t\t\t\treturn false;
-\t\t\t\tconst auto* projectionPtr = Module::exe_ptr<D3DMATRIX>(OutRunProjectionRva);
-\t\t\t\tif (!IsReadableRange(projectionPtr, sizeof(D3DMATRIX)))
-\t\t\t\t\treturn false;
-\t\t\t\tstd::memcpy(&projection, projectionPtr, sizeof(projection));
-\t\t\t}
-\t\t\treturn MatrixFinite(projection) &&
-\t\t\t\tstd::fabs(projection._34 + 1.0f) < 0.25f && std::fabs(projection._44) < 0.25f;
-\t\t}
 ''',
 )
 
-# Remove QPC-low publication from Pose.v1. Width/height are restored; Frame.v1
-# is the sole exact frame-timing contract.
+# Session STOPPING invalidates cached captured/projection data and pose history so
+# a resumed OpenXR session cannot use the previous grace-window stereo frame.
+replace_once(
+    "vrhost/main_stereo.cpp",
+    '''                    else if (state == XR_SESSION_STATE_STOPPING && running)
+                    {
+                        CheckXr(xrEndSession(session), "xrEndSession");
+                        running = false;
+                    }
+''',
+    '''                    else if (state == XR_SESSION_STATE_STOPPING && running)
+                    {
+                        CheckXr(xrEndSession(session), "xrEndSession");
+                        running = false;
+                        viewHistory.Clear();
+                        matchedStereoValid = false;
+                        lastStereoMatchMs = 0;
+                        compositor.ReferenceSpaceChanged();
+                        OutRunVR::SharedRenderFrameState rf{};
+                        if (renderFrames.Read(rf))
+                            lastProcessedStereoFrame = rf.frameId;
+                    }
+''',
+)
+
+# Final unit/lifecycle/diagnostic invariants.
+renderer = read("src/vr_renderer_probe.cpp")
+if "delta.x * Settings::VRWorldScale" in renderer[renderer.find("effectiveHeadPosition"):renderer.find("const float w =", renderer.find("effectiveHeadPosition"))]:
+    raise RuntimeError("Frame.v1 effective head pose still applies WorldScale")
+if "sample.eyeOffset[eye][0] * Settings::VRWorldScale" in renderer:
+    raise RuntimeError("Frame.v1 effective eye pose still applies WorldScale")
+
 stereo = read("src/vr_stereo.cpp")
-old_signature = '''\t\tvoid PublishStereoState(std::uint32_t state, bool worldStereo,
-\t\t\tstd::uint32_t poseSequence, std::uint32_t frameId,
-\t\t\tstd::uint32_t presentQpcLow)
-'''
-new_signature = '''\t\tvoid PublishStereoState(std::uint32_t state, bool worldStereo,
-\t\t\tstd::uint32_t poseSequence, std::uint32_t frameId)
-'''
-if stereo.count(old_signature) != 1:
-    raise RuntimeError("src/vr_stereo.cpp: PublishStereoState old signature not found")
-stereo = stereo.replace(old_signature, new_signature, 1)
-
-old_body = '''\t\t\tif (state != OutRunVR::StereoSbsActive || poseSequence == 0 || frameId == 0 || presentQpcLow == 0)
-\t\t\t{
-\t\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientStereoPoseSequence), 0);
-\t\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoPresentQpcLowIndex]), 0);
-\t\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoStateIndex]),
-\t\t\t\t\tstatic_cast<LONG>(state));
-\t\t\t\treturn;
-\t\t\t}
-
-\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientStereoPoseSequence),
-\t\t\t\tstatic_cast<LONG>(poseSequence));
-\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoPresentQpcLowIndex]),
-\t\t\t\tstatic_cast<LONG>(presentQpcLow));
-\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferHeightIndex]),
-\t\t\t\tstatic_cast<LONG>(BackBufferDesc.Height));
-'''
-new_body = '''\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferWidthIndex]),
-\t\t\t\tstatic_cast<LONG>(BackBufferDesc.Width));
-\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferHeightIndex]),
-\t\t\t\tstatic_cast<LONG>(BackBufferDesc.Height));
-
-\t\t\tif (state != OutRunVR::StereoSbsActive || poseSequence == 0 || frameId == 0)
-\t\t\t{
-\t\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientStereoPoseSequence), 0);
-\t\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoStateIndex]),
-\t\t\t\t\tstatic_cast<LONG>(state));
-\t\t\t\treturn;
-\t\t\t}
-
-\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientStereoPoseSequence),
-\t\t\t\tstatic_cast<LONG>(poseSequence));
-'''
-if stereo.count(old_body) != 1:
-    raise RuntimeError("src/vr_stereo.cpp: old Pose.v1 QPC publication block not found")
-stereo = stereo.replace(old_body, new_body, 1)
-
-old_active = '''std::uint32_t low=static_cast<std::uint32_t>(presentStart.QuadPart);if(!low)low=1;PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,frameId,low);'''
-if stereo.count(old_active) != 1:
-    raise RuntimeError("src/vr_stereo.cpp: active low-QPC call not found")
-stereo = stereo.replace(old_active, '''PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,frameId);''', 1)
-stereo = stereo.replace("PublishStereoState(fallback,false,0,0,0);", "PublishStereoState(fallback,false,0,0);", 1)
-stereo = stereo.replace("PublishStereoState(OutRunVR::StereoDisabled,false,0,0,0);", "PublishStereoState(OutRunVR::StereoDisabled,false,0,0);", 1)
-write("src/vr_stereo.cpp", stereo)
+for marker in ("StereoFailureRightStateFailed", "StereoFailureRightWvpUploadFailed", "StereoFailureRightDrawFailed", "PoisonFrame(rightFailure)"):
+    if marker not in stereo:
+        raise RuntimeError(f"right-pass diagnostic marker missing: {marker}")
 
 host = read("vrhost/main_stereo.cpp")
-host = host.replace("        std::uint32_t presentQpcLow = 0;\n", "", 1)
-host = host.replace("                out.presentQpcLow = state_->reserved[OutRunVR::ClientStereoPresentQpcLowIndex];\n", "", 1)
-write("vrhost/main_stereo.cpp", host)
+for marker in ("viewHistory.Clear();", "matchedStereoValid = false;", "lastStereoMatchMs = 0;", "compositor.ReferenceSpaceChanged();"):
+    if marker not in host:
+        raise RuntimeError(f"session lifecycle marker missing: {marker}")
 
-# Contract checks.
-checks = {
-    "src/vr_shared.hpp": ["ClientStereoBackbufferWidthIndex = 14", "GetRendererBaseProjection"],
-    "src/vr_renderer_probe.cpp": ["bool GetRendererBaseProjection", "CullingProjectionSaved"],
-    "src/vr_stereo.cpp": ["GetRendererBaseProjection", "ClientStereoBackbufferWidthIndex"],
-}
-for path, markers in checks.items():
-    text = read(path)
-    for marker in markers:
-        if marker not in text:
-            raise RuntimeError(f"{path}: missing invariant {marker}")
-if "presentQpcLow" in read("vrhost/main_stereo.cpp"):
-    raise RuntimeError("host still interprets Pose.v1 width slot as QPC")
-
-print("final semantic cleanup applied successfully")
+print("OpenXR metre-space pose, right-pass diagnostics, and resume hygiene finalized")
