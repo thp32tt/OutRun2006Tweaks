@@ -864,20 +864,11 @@ namespace OutRunVRRenderer
 				std::memcpy(LatchedStereo.eyeOffset, sample.eyeOffset, sizeof(LatchedStereo.eyeOffset));
 				const Quat effectiveHeadOrientation = Normalize(
 					Multiply(Normalize(CenterOrientation), relativeOrientation));
+				// Frame.v1 positions are OpenXR LOCAL-space metres. WorldScale is
+				// only the metres->game-units conversion used by LatchedHeadInverse.
 				Vec3 effectiveHeadPosition = CenterPositionValid ? CenterPosition : sample.position;
-				if (Settings::VRPositionalTracking && sample.positionValid && CenterPositionValid)
-				{
-					const Vec3 delta{
-						sample.position.x - CenterPosition.x,
-						sample.position.y - CenterPosition.y,
-						sample.position.z - CenterPosition.z
-					};
-					effectiveHeadPosition = {
-						CenterPosition.x + delta.x * Settings::VRWorldScale,
-						CenterPosition.y + delta.y * Settings::VRWorldScale,
-						CenterPosition.z + delta.z * Settings::VRWorldScale
-					};
-				}
+				if (Settings::VRPositionalTracking && sample.positionValid)
+					effectiveHeadPosition = sample.position;
 				for (int eye = 0; eye < 2; ++eye)
 				{
 					const Quat eyeOrientation = sample.eyeOrientation[eye];
@@ -893,10 +884,12 @@ namespace OutRunVRRenderer
 					LatchedStereo.effectiveEyeOrientation[eye][2] = effectiveEyeOrientation.z;
 					LatchedStereo.effectiveEyeOrientation[eye][3] = effectiveEyeOrientation.w;
 
+					// eyeOffset is already head-local metres; keep the projection-layer
+					// pose in OpenXR units even though D3D9 multiplies IPD by WorldScale.
 					const Vec3 localEye{
-						sample.eyeOffset[eye][0] * Settings::VRWorldScale,
-						sample.eyeOffset[eye][1] * Settings::VRWorldScale,
-						sample.eyeOffset[eye][2] * Settings::VRWorldScale
+						sample.eyeOffset[eye][0],
+						sample.eyeOffset[eye][1],
+						sample.eyeOffset[eye][2]
 					};
 					const Vec3 worldEye = RotateVector(effectiveHeadOrientation, localEye);
 					LatchedStereo.effectiveEyePosition[eye][0] = effectiveHeadPosition.x + worldEye.x;

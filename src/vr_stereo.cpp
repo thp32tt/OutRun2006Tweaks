@@ -894,6 +894,7 @@ namespace OutRunVRStereo
 			IDirect3DSurface9* savedRt = TrackedRenderTarget;
 			IDirect3DSurface9* savedDepth = TrackedDepthStencil;
 			HRESULT rightHr = D3D_OK;
+			OutRunVR::StereoFailureReason rightFailure = OutRunVR::StereoFailureRightStateFailed;
 			bool restoreOk = true;
 			{
 				InternalPassScope guard;
@@ -902,10 +903,17 @@ namespace OutRunVRStereo
 					rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, RightEyeDepth);
 				if (SUCCEEDED(rightHr))
 					rightHr = device->SetViewport(&savedViewport);
-				if (SUCCEEDED(rightHr) && draw.worldStereo)
-					rightHr = SetWvpOneRegisterAtATime(device, draw.eyeConstants[1]) ? D3D_OK : E_FAIL;
+				if (SUCCEEDED(rightHr) && draw.worldStereo &&
+					!SetWvpOneRegisterAtATime(device, draw.eyeConstants[1]))
+				{
+					rightFailure = OutRunVR::StereoFailureRightWvpUploadFailed;
+					rightHr = E_FAIL;
+				}
 				if (SUCCEEDED(rightHr))
+				{
+					rightFailure = OutRunVR::StereoFailureRightDrawFailed;
 					rightHr = drawCall();
+				}
 
 				restoreOk = RestoreRightPassState(device, savedRt, savedDepth,
 					savedViewport, draw.originalConstants, draw.worldStereo);
@@ -928,7 +936,11 @@ namespace OutRunVRStereo
 			else
 				++NonWorldDuplicatedDraws;
 
-			if(FAILED(rightHr)){FrameRightDrawFailed=true;PoisonFrame(draw.worldStereo?OutRunVR::StereoFailureRightWvpUploadFailed:OutRunVR::StereoFailureRightDrawFailed);}
+			if (FAILED(rightHr))
+			{
+				FrameRightDrawFailed = true;
+				PoisonFrame(rightFailure);
+			}
 			if (!restoreOk)
 				NoteRestoreFailure("right-eye draw");
 			return leftHr;

@@ -1335,6 +1335,13 @@ int main(int argc, char** argv)
                     {
                         CheckXr(xrEndSession(session), "xrEndSession");
                         running = false;
+                        viewHistory.Clear();
+                        matchedStereoValid = false;
+                        lastStereoMatchMs = 0;
+                        compositor.ReferenceSpaceChanged();
+                        OutRunVR::SharedRenderFrameState rf{};
+                        if (renderFrames.Read(rf))
+                            lastProcessedStereoFrame = rf.frameId;
                     }
                     else if (state == XR_SESSION_STATE_EXITING || state == XR_SESSION_STATE_LOSS_PENDING)
                         quit = true;
