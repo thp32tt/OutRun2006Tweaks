@@ -195,6 +195,28 @@ namespace OutRunVRRenderer
 			return value;
 		}
 
+		bool DecodePackedEyeOrientations(const SharedPoseState& snapshot, Quat out[2])
+		{
+			std::int16_t packed[8]{};
+			static_assert(sizeof(packed) == OutRunVR::PackedEyeOrientationBytes);
+			std::memcpy(packed,
+				snapshot.runtimeName + OutRunVR::PackedEyeOrientationOffset,
+				sizeof(packed));
+			for (int eye = 0; eye < 2; ++eye)
+			{
+				Quat q{
+					static_cast<float>(packed[eye * 4 + 0]) / 32767.0f,
+					static_cast<float>(packed[eye * 4 + 1]) / 32767.0f,
+					static_cast<float>(packed[eye * 4 + 2]) / 32767.0f,
+					static_cast<float>(packed[eye * 4 + 3]) / 32767.0f
+				};
+				if (!QuaternionIsSane(q))
+					return false;
+				out[eye] = Normalize(q);
+			}
+			return true;
+		}
+
 		Quat Conjugate(const Quat& q) { return { -q.x, -q.y, -q.z, q.w }; }
 
 		Quat MultiplyRaw(const Quat& a, const Quat& b)
@@ -606,6 +628,9 @@ namespace OutRunVRRenderer
 			{
 				pose.eyeFov[0] = snapshot.eyeFov[0];
 				pose.eyeFov[1] = snapshot.eyeFov[1];
+				Quat eyeOrientation[2]{};
+				if (!DecodePackedEyeOrientations(snapshot, eyeOrientation))
+					pose.stereoValid = false;
 				const std::uint32_t indexes[2][3] = {
 					{ HostEyeOffsetLeftXIndex, HostEyeOffsetLeftYIndex, HostEyeOffsetLeftZIndex },
 					{ HostEyeOffsetRightXIndex, HostEyeOffsetRightYIndex, HostEyeOffsetRightZIndex }
@@ -622,10 +647,7 @@ namespace OutRunVRRenderer
 						}
 						pose.eyeOffset[eye][axis] = value;
 					}
-					const Quat eyeQ{ snapshot.eyeOrientation[eye][0], snapshot.eyeOrientation[eye][1],
-						snapshot.eyeOrientation[eye][2], snapshot.eyeOrientation[eye][3] };
-					if (!QuaternionIsSane(eyeQ)) pose.stereoValid = false;
-					else pose.eyeOrientation[eye] = Normalize(eyeQ);
+					pose.eyeOrientation[eye] = eyeOrientation[eye];
 				}
 			}
 			return true;

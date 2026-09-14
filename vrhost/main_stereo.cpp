@@ -261,6 +261,27 @@ namespace
         return b;
     }
 
+    std::int16_t PackSnorm16(float value)
+    {
+        const float clamped = std::clamp(value, -1.0f, 1.0f);
+        return static_cast<std::int16_t>(std::lround(clamped * 32767.0f));
+    }
+
+    void StorePackedEyeOrientations(char runtimeName[64], const XrQuaternionf eyeOrientation[2])
+    {
+        std::int16_t packed[8]{};
+        for (int eye = 0; eye < 2; ++eye)
+        {
+            const XrQuaternionf q = NormalizeQuaternion(eyeOrientation[eye]);
+            packed[eye * 4 + 0] = PackSnorm16(q.x);
+            packed[eye * 4 + 1] = PackSnorm16(q.y);
+            packed[eye * 4 + 2] = PackSnorm16(q.z);
+            packed[eye * 4 + 3] = PackSnorm16(q.w);
+        }
+        static_assert(sizeof(packed) == OutRunVR::PackedEyeOrientationBytes);
+        std::memcpy(runtimeName + OutRunVR::PackedEyeOrientationOffset, packed, sizeof(packed));
+    }
+
     bool IsProcessAlive(DWORD pid)
     {
         if (!pid) return false;
@@ -397,6 +418,8 @@ namespace
             state_->reserved[OutRunVR::HostReferenceSpaceGenerationIndex] = referenceGeneration_;
             for (std::uint32_t eye = 0; eye < 2; ++eye)
             {
+                state_->recommendedWidth[eye] = configs[eye].recommendedImageRectWidth;
+                state_->recommendedHeight[eye] = configs[eye].recommendedImageRectHeight;
                 if (eye < viewCount)
                 {
                     state_->eyeFov[eye] = {
@@ -405,12 +428,19 @@ namespace
                     };
                 }
             }
-            (void)configs;
-            if(stereoValid)
+
+            std::memset(state_->runtimeName, 0, sizeof(state_->runtimeName));
+            strncpy_s(state_->runtimeName, OutRunVR::PackedEyeOrientationOffset,
+                runtime ? runtime : "unknown", _TRUNCATE);
+            if (stereoValid)
             {
-                const XrVector3f left=ToHeadLocal(head.pose,views[0].pose.position),right=ToHeadLocal(head.pose,views[1].pose.position);
-                const XrQuaternionf eq[2]={ToHeadLocalOrientation(head.pose,views[0].pose),ToHeadLocalOrientation(head.pose,views[1].pose)};
-                for(int eye=0;eye<2;++eye){state_->eyeOrientation[eye][0]=eq[eye].x;state_->eyeOrientation[eye][1]=eq[eye].y;state_->eyeOrientation[eye][2]=eq[eye].z;state_->eyeOrientation[eye][3]=eq[eye].w;}
+                const XrVector3f left = ToHeadLocal(head.pose, views[0].pose.position);
+                const XrVector3f right = ToHeadLocal(head.pose, views[1].pose.position);
+                const XrQuaternionf eyeOrientation[2]{
+                    ToHeadLocalOrientation(head.pose, views[0].pose),
+                    ToHeadLocalOrientation(head.pose, views[1].pose)
+                };
+                StorePackedEyeOrientations(state_->runtimeName, eyeOrientation);
                 state_->reserved[OutRunVR::HostEyeOffsetLeftXIndex] = FloatBits(left.x);
                 state_->reserved[OutRunVR::HostEyeOffsetLeftYIndex] = FloatBits(left.y);
                 state_->reserved[OutRunVR::HostEyeOffsetLeftZIndex] = FloatBits(left.z);
@@ -418,8 +448,6 @@ namespace
                 state_->reserved[OutRunVR::HostEyeOffsetRightYIndex] = FloatBits(right.y);
                 state_->reserved[OutRunVR::HostEyeOffsetRightZIndex] = FloatBits(right.z);
             }
-            strncpy_s(state_->runtimeName, sizeof(state_->runtimeName),
-                runtime ? runtime : "unknown", _TRUNCATE);
             return End();
         }
 
@@ -1154,12 +1182,6 @@ namespace
     bool QpcAtOrAfter(std::int64_t capture,std::int64_t present){return capture>0&&present>0&&capture>=present;}
     struct TimingSeries{std::array<double,256>samples{};std::size_t count=0,cursor=0;void Add(double ms){samples[cursor++%samples.size()]=ms;if(count<samples.size())++count;}double Percentile(double p)const{if(!count)return 0;auto c=samples;std::sort(c.begin(),c.begin()+count);const std::size_t i=std::min<std::size_t>(count-1,static_cast<std::size_t>(std::ceil(p*count))-1);return c[i];}};
     struct HostTimings{TimingSeries wait,capture,render,end;LARGE_INTEGER f{};ULONGLONG last=0;HostTimings(){QueryPerformanceFrequency(&f);}double Ms(const LARGE_INTEGER&a,const LARGE_INTEGER&b)const{return f.QuadPart?double(b.QuadPart-a.QuadPart)*1000.0/double(f.QuadPart):0;}void MaybeLog(){const auto n=GetTickCount64();if(n-last<5000)return;last=n;std::cout<<"VR host timing ms p95/p99: wait "<<wait.Percentile(.95)<<"/"<<wait.Percentile(.99)<<" capture "<<capture.Percentile(.95)<<"/"<<capture.Percentile(.99)<<" render "<<render.Percentile(.95)<<"/"<<render.Percentile(.99)<<" end "<<end.Percentile(.95)<<"/"<<end.Percentile(.99)<<"\n";}};
-
-    bool QpcLowAtOrAfter(std::uint32_t capture, std::uint32_t present)
-    {
-        if (capture == 0 || present == 0) return false;
-        return static_cast<std::int32_t>(capture - present) >= 0;
-    }
 
     XrEnvironmentBlendMode ChooseBlendMode(XrInstance instance, XrSystemId system)
     {

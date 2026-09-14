@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 
 namespace OutRunVR
@@ -11,6 +12,8 @@ namespace OutRunVR
     inline constexpr wchar_t RenderFrameMemoryName[] = L"Local\\OutRun2006Tweaks.VR.Frame.v1";
     inline constexpr std::uint32_t RenderFrameMagic = 0x4656524Fu; // 'ORVF'
     inline constexpr std::uint32_t RenderFrameProtocolVersion = 1;
+    inline constexpr std::size_t PackedEyeOrientationOffset = 48;
+    inline constexpr std::size_t PackedEyeOrientationBytes = 16;
 
     enum SharedFlags : std::uint32_t
     {
@@ -125,8 +128,9 @@ namespace OutRunVR
         float position[3];
         volatile std::uint32_t clientStereoPoseSequence;
         SharedFov eyeFov[2];
-        float eyeOrientation[2][4];
-        char runtimeName[48];
+        std::uint32_t recommendedWidth[2];
+        std::uint32_t recommendedHeight[2];
+        char runtimeName[64];
         std::uint32_t reserved[16];
     };
 
@@ -161,6 +165,11 @@ namespace OutRunVR
 
     static_assert(sizeof(SharedFov) == 16);
     static_assert(sizeof(SharedPoseState) == 248);
+    static_assert(offsetof(SharedPoseState, recommendedWidth) == 104);
+    static_assert(offsetof(SharedPoseState, recommendedHeight) == 112);
+    static_assert(offsetof(SharedPoseState, runtimeName) == 120);
+    static_assert(offsetof(SharedPoseState, reserved) == 184);
+    static_assert(PackedEyeOrientationOffset + PackedEyeOrientationBytes == 64);
     static_assert(sizeof(SharedRenderEye) == 48);
     static_assert(sizeof(SharedRenderFrameState) == 256);
 }
