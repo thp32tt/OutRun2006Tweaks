@@ -8,9 +8,9 @@
 
 // Research-only capture for the two unknown floats adjacent to
 // EVWORK_CAR::actionforce_DBC. These values are intentionally never consumed by
-// the force model. Their only purpose is to produce a timestamped stream that
-// can be aligned with the physics-side XFORCE60 telemetry and inspected offline
-// before any native field is trusted as tyre/rack force.
+// the force model. Their only purpose is to produce a timestamped input-side
+// stream that can be aligned with the physics-side XFORCE60 telemetry and
+// inspected offline before any native field is trusted as tyre/rack force.
 namespace Settings
 {
     extern Setting<bool> WheelFFBXForceCapture60Hz; // hooks_wheel_ffb.cpp
@@ -38,7 +38,7 @@ namespace WheelXForceResearch
         prevDc4 = 0.0f;
     }
 
-    inline void capture_neighbors_after_read_io()
+    inline void capture_neighbors()
     {
         if (!Settings::WheelFFBXForceCapture60Hz ||
             !Game::current_mode || *Game::current_mode != STATE_GAME)
@@ -55,8 +55,8 @@ namespace WheelXForceResearch
         }
 
         const DWORD now = GetTickCount();
-        // ReadIO can run faster than the fixed 60 Hz physics loop. Bound this
-        // auxiliary stream to approximately the same cadence so an opt-in
+        // Input update can run faster than the fixed 60 Hz physics loop. Bound
+        // this auxiliary stream to approximately the same cadence so an opt-in
         // capture does not scale its log volume with render refresh rate.
         if (lastLogTick != 0 && static_cast<DWORD>(now - lastLogTick) < 15u)
             return;
