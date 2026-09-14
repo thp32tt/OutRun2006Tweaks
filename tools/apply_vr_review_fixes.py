@@ -1,5 +1,4 @@
 from pathlib import Path
-import re
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -14,324 +13,196 @@ def write(path: str, text: str) -> None:
 
 def replace_once(path: str, old: str, new: str) -> None:
     text = read(path)
-    if text.count(old) != 1:
-        raise RuntimeError(f"{path}: expected exactly one match for {old[:120]!r}")
+    count = text.count(old)
+    if count != 1:
+        raise RuntimeError(f"{path}: expected one match, found {count}: {old[:160]!r}")
     write(path, text.replace(old, new, 1))
 
 
-def regex_once(path: str, pattern: str, replacement: str, flags=0) -> None:
-    text = read(path)
-    updated, count = re.subn(pattern, replacement, text, count=1, flags=flags)
-    if count != 1:
-        raise RuntimeError(f"{path}: expected exactly one regex match for {pattern[:120]!r}, got {count}")
-    write(path, updated)
-
-
 # ---------------------------------------------------------------------------
-# Pose.v1: restore the exact original semantic layout and offsets.
-# Eye orientation uses runtimeName[48..63] as an extension tail. New hosts keep
-# the first 48 bytes NUL-terminated, so legacy C-string readers remain safe.
+# Pose.v1 reserved-slot semantics: restore slot 14/15 to width/height. Full QPC
+# now belongs exclusively to Frame.v1, so no existing Pose.v1 field is repurposed.
 # ---------------------------------------------------------------------------
-shared = read("src/vr_shared.hpp")
-if "#include <cstddef>" not in shared:
-    shared = shared.replace("#include <cstdint>\n", "#include <cstddef>\n#include <cstdint>\n", 1)
-
-shared = shared.replace(
-    "    inline constexpr std::uint32_t RenderFrameProtocolVersion = 1;\n",
-    "    inline constexpr std::uint32_t RenderFrameProtocolVersion = 1;\n"
-    "    inline constexpr std::size_t PackedEyeOrientationOffset = 48;\n"
-    "    inline constexpr std::size_t PackedEyeOrientationBytes = 16;\n",
-    1,
+replace_once(
+    "src/vr_shared.hpp",
+    '''    inline constexpr std::uint32_t ClientStereoStateIndex = 12;
+    inline constexpr std::uint32_t ClientStereoFrameIndex = 13;
+    inline constexpr std::uint32_t ClientStereoPresentQpcLowIndex = 14;
+    inline constexpr std::uint32_t ClientStereoBackbufferHeightIndex = 15;
+    inline constexpr std::uint32_t ClientStereoBackbufferWidthIndex = ClientStereoPresentQpcLowIndex;
+''',
+    '''    inline constexpr std::uint32_t ClientStereoStateIndex = 12;
+    inline constexpr std::uint32_t ClientStereoFrameIndex = 13;
+    inline constexpr std::uint32_t ClientStereoBackbufferWidthIndex = 14;
+    inline constexpr std::uint32_t ClientStereoBackbufferHeightIndex = 15;
+    // Source-compatibility alias only. Slot 14 retains its original width semantics;
+    // exact presentation timing is carried by SharedRenderFrameState::presentQpc.
+    inline constexpr std::uint32_t ClientStereoPresentQpcLowIndex = ClientStereoBackbufferWidthIndex;
+''',
 )
 
-old_layout = (
-    "        SharedFov eyeFov[2];\n"
-    "        float eyeOrientation[2][4];\n"
-    "        char runtimeName[48];\n"
-    "        std::uint32_t reserved[16];\n"
+# Provide stereo with the same original projection that renderer verification uses
+# when the optional culling-union projection temporarily overrides the game global.
+replace_once(
+    "src/vr_shared.hpp",
+    '''    bool GetLatchedStereoFrame(LatchedStereoFrame& out);
+    bool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
+''',
+    '''    bool GetLatchedStereoFrame(LatchedStereoFrame& out);
+    bool GetRendererBaseProjection(float outMatrix[16]);
+    bool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
+''',
 )
-new_layout = (
-    "        SharedFov eyeFov[2];\n"
-    "        std::uint32_t recommendedWidth[2];\n"
-    "        std::uint32_t recommendedHeight[2];\n"
-    "        char runtimeName[64];\n"
-    "        std::uint32_t reserved[16];\n"
-)
-if old_layout not in shared:
-    raise RuntimeError("src/vr_shared.hpp: modified Pose.v1 layout not found")
-shared = shared.replace(old_layout, new_layout, 1)
 
-old_asserts = (
-    "    static_assert(sizeof(SharedPoseState) == 248);\n"
-    "    static_assert(sizeof(SharedRenderEye) == 48);\n"
-)
-new_asserts = (
-    "    static_assert(sizeof(SharedPoseState) == 248);\n"
-    "    static_assert(offsetof(SharedPoseState, recommendedWidth) == 104);\n"
-    "    static_assert(offsetof(SharedPoseState, recommendedHeight) == 112);\n"
-    "    static_assert(offsetof(SharedPoseState, runtimeName) == 120);\n"
-    "    static_assert(offsetof(SharedPoseState, reserved) == 184);\n"
-    "    static_assert(PackedEyeOrientationOffset + PackedEyeOrientationBytes == 64);\n"
-    "    static_assert(sizeof(SharedRenderEye) == 48);\n"
-)
-if old_asserts not in shared:
-    raise RuntimeError("src/vr_shared.hpp: Pose.v1 static assert block not found")
-shared = shared.replace(old_asserts, new_asserts, 1)
-write("src/vr_shared.hpp", shared)
-
-
-# ---------------------------------------------------------------------------
-# Host: pack per-eye relative orientation as two SNORM16 quaternions and restore
-# original recommended eye-size publication.
-# ---------------------------------------------------------------------------
-host = read("vrhost/main_stereo.cpp")
-float_bits = '''    std::uint32_t FloatBits(float v)
-    {
-        std::uint32_t b = 0;
-        std::memcpy(&b, &v, sizeof(b));
-        return b;
-    }
-'''
-pack_helpers = float_bits + '''
-    std::int16_t PackSnorm16(float value)
-    {
-        const float clamped = std::clamp(value, -1.0f, 1.0f);
-        return static_cast<std::int16_t>(std::lround(clamped * 32767.0f));
-    }
-
-    void StorePackedEyeOrientations(char runtimeName[64], const XrQuaternionf eyeOrientation[2])
-    {
-        std::int16_t packed[8]{};
-        for (int eye = 0; eye < 2; ++eye)
-        {
-            const XrQuaternionf q = NormalizeQuaternion(eyeOrientation[eye]);
-            packed[eye * 4 + 0] = PackSnorm16(q.x);
-            packed[eye * 4 + 1] = PackSnorm16(q.y);
-            packed[eye * 4 + 2] = PackSnorm16(q.z);
-            packed[eye * 4 + 3] = PackSnorm16(q.w);
-        }
-        static_assert(sizeof(packed) == OutRunVR::PackedEyeOrientationBytes);
-        std::memcpy(runtimeName + OutRunVR::PackedEyeOrientationOffset, packed, sizeof(packed));
-    }
-'''
-if "StorePackedEyeOrientations" not in host:
-    if host.count(float_bits) != 1:
-        raise RuntimeError("vrhost/main_stereo.cpp: FloatBits helper not uniquely found")
-    host = host.replace(float_bits, pack_helpers, 1)
-
-write_block_pattern = re.compile(
-    r'''            for \(std::uint32_t eye = 0; eye < 2; \+\+eye\)\n'''
-    r'''            \{\n'''
-    r'''                if \(eye < viewCount\)\n'''
-    r'''                \{\n'''
-    r'''                    state_->eyeFov\[eye\] = \{\n'''
-    r'''                        views\[eye\]\.fov\.angleLeft, views\[eye\]\.fov\.angleRight,\n'''
-    r'''                        views\[eye\]\.fov\.angleUp, views\[eye\]\.fov\.angleDown\n'''
-    r'''                    \};\n'''
-    r'''                \}\n'''
-    r'''            \}\n'''
-    r'''            \(void\)configs;\n'''
-    r'''            if\(stereoValid\)\n'''
-    r'''            \{\n'''
-    r'''                const XrVector3f left=ToHeadLocal\(head\.pose,views\[0\]\.pose\.position\),right=ToHeadLocal\(head\.pose,views\[1\]\.pose\.position\);\n'''
-    r'''                const XrQuaternionf eq\[2\]=\{ToHeadLocalOrientation\(head\.pose,views\[0\]\.pose\),ToHeadLocalOrientation\(head\.pose,views\[1\]\.pose\)\};\n'''
-    r'''                for\(int eye=0;eye<2;\+\+eye\)\{state_->eyeOrientation\[eye\]\[0\]=eq\[eye\]\.x;state_->eyeOrientation\[eye\]\[1\]=eq\[eye\]\.y;state_->eyeOrientation\[eye\]\[2\]=eq\[eye\]\.z;state_->eyeOrientation\[eye\]\[3\]=eq\[eye\]\.w;\}\n'''
-    r'''                state_->reserved\[OutRunVR::HostEyeOffsetLeftXIndex\] = FloatBits\(left\.x\);\n'''
-    r'''                state_->reserved\[OutRunVR::HostEyeOffsetLeftYIndex\] = FloatBits\(left\.y\);\n'''
-    r'''                state_->reserved\[OutRunVR::HostEyeOffsetLeftZIndex\] = FloatBits\(left\.z\);\n'''
-    r'''                state_->reserved\[OutRunVR::HostEyeOffsetRightXIndex\] = FloatBits\(right\.x\);\n'''
-    r'''                state_->reserved\[OutRunVR::HostEyeOffsetRightYIndex\] = FloatBits\(right\.y\);\n'''
-    r'''                state_->reserved\[OutRunVR::HostEyeOffsetRightZIndex\] = FloatBits\(right\.z\);\n'''
-    r'''            \}\n'''
-    r'''            strncpy_s\(state_->runtimeName, sizeof\(state_->runtimeName\),\n'''
-    r'''                runtime \? runtime : "unknown", _TRUNCATE\);\n'''
-)
-write_block = '''            for (std::uint32_t eye = 0; eye < 2; ++eye)
-            {
-                state_->recommendedWidth[eye] = configs[eye].recommendedImageRectWidth;
-                state_->recommendedHeight[eye] = configs[eye].recommendedImageRectHeight;
-                if (eye < viewCount)
-                {
-                    state_->eyeFov[eye] = {
-                        views[eye].fov.angleLeft, views[eye].fov.angleRight,
-                        views[eye].fov.angleUp, views[eye].fov.angleDown
-                    };
-                }
-            }
-
-            std::memset(state_->runtimeName, 0, sizeof(state_->runtimeName));
-            strncpy_s(state_->runtimeName, OutRunVR::PackedEyeOrientationOffset,
-                runtime ? runtime : "unknown", _TRUNCATE);
-            if (stereoValid)
-            {
-                const XrVector3f left = ToHeadLocal(head.pose, views[0].pose.position);
-                const XrVector3f right = ToHeadLocal(head.pose, views[1].pose.position);
-                const XrQuaternionf eyeOrientation[2]{
-                    ToHeadLocalOrientation(head.pose, views[0].pose),
-                    ToHeadLocalOrientation(head.pose, views[1].pose)
-                };
-                StorePackedEyeOrientations(state_->runtimeName, eyeOrientation);
-                state_->reserved[OutRunVR::HostEyeOffsetLeftXIndex] = FloatBits(left.x);
-                state_->reserved[OutRunVR::HostEyeOffsetLeftYIndex] = FloatBits(left.y);
-                state_->reserved[OutRunVR::HostEyeOffsetLeftZIndex] = FloatBits(left.z);
-                state_->reserved[OutRunVR::HostEyeOffsetRightXIndex] = FloatBits(right.x);
-                state_->reserved[OutRunVR::HostEyeOffsetRightYIndex] = FloatBits(right.y);
-                state_->reserved[OutRunVR::HostEyeOffsetRightZIndex] = FloatBits(right.z);
-            }
-'''
-host, count = write_block_pattern.subn(write_block, host, count=1)
-if count != 1:
-    raise RuntimeError(f"vrhost/main_stereo.cpp: SharedWriter old eye block match count={count}")
-
-qpc_low = '''    bool QpcLowAtOrAfter(std::uint32_t capture, std::uint32_t present)
-    {
-        if (capture == 0 || present == 0) return false;
-        return static_cast<std::int32_t>(capture - present) >= 0;
-    }
-
-'''
-if qpc_low in host:
-    host = host.replace(qpc_low, "", 1)
-write("vrhost/main_stereo.cpp", host)
-
-
-# ---------------------------------------------------------------------------
-# x86 pose reader: decode packed eye quaternions from the compatible tail.
-# ---------------------------------------------------------------------------
 renderer = read("src/vr_renderer_probe.cpp")
-float_from_bits = '''\t\tfloat FloatFromBits(std::uint32_t bits)
-\t\t{
-\t\t\tfloat value = 0.0f;
-\t\t\tstd::memcpy(&value, &bits, sizeof(value));
-\t\t\treturn value;
-\t\t}
+anchor = '''\tbool GetLatchedStereoFrame(LatchedStereoFrame& out)
+\t{
+\t\tout = LatchedStereo;
+\t\treturn out.valid;
+\t}
 '''
-decode_helper = float_from_bits + '''
-\t\tbool DecodePackedEyeOrientations(const SharedPoseState& snapshot, Quat out[2])
-\t\t{
-\t\t\tstd::int16_t packed[8]{};
-\t\t\tstatic_assert(sizeof(packed) == OutRunVR::PackedEyeOrientationBytes);
-\t\t\tstd::memcpy(packed,
-\t\t\t\tsnapshot.runtimeName + OutRunVR::PackedEyeOrientationOffset,
-\t\t\t\tsizeof(packed));
-\t\t\tfor (int eye = 0; eye < 2; ++eye)
-\t\t\t{
-\t\t\t\tQuat q{
-\t\t\t\t\tstatic_cast<float>(packed[eye * 4 + 0]) / 32767.0f,
-\t\t\t\t\tstatic_cast<float>(packed[eye * 4 + 1]) / 32767.0f,
-\t\t\t\t\tstatic_cast<float>(packed[eye * 4 + 2]) / 32767.0f,
-\t\t\t\t\tstatic_cast<float>(packed[eye * 4 + 3]) / 32767.0f
-\t\t\t\t};
-\t\t\t\tif (!QuaternionIsSane(q))
-\t\t\t\t\treturn false;
-\t\t\t\tout[eye] = Normalize(q);
-\t\t\t}
-\t\t\treturn true;
-\t\t}
+if anchor not in renderer:
+    raise RuntimeError("src/vr_renderer_probe.cpp: GetLatchedStereoFrame anchor not found")
+projection_export = anchor + '''
+\tbool GetRendererBaseProjection(float outMatrix[16])
+\t{
+\t\tif (!outMatrix || !ValidateRendererGlobals() || !RendererProjection)
+\t\t\treturn false;
+\t\tD3DMATRIX projection{};
+\t\tif (CullingProjectionOverridden)
+\t\t\tprojection = CullingProjectionSaved;
+\t\telse
+\t\t\tstd::memcpy(&projection, RendererProjection, sizeof(projection));
+\t\tif (!MatrixFinite(projection))
+\t\t\treturn false;
+\t\tstd::memcpy(outMatrix, &projection, sizeof(projection));
+\t\treturn true;
+\t}
 '''
-if "DecodePackedEyeOrientations" not in renderer:
-    if renderer.count(float_from_bits) != 1:
-        raise RuntimeError("src/vr_renderer_probe.cpp: FloatFromBits helper not uniquely found")
-    renderer = renderer.replace(float_from_bits, decode_helper, 1)
-
-old_eye_decode = '''\t\t\t\tconst std::uint32_t indexes[2][3] = {
-\t\t\t\t\t{ HostEyeOffsetLeftXIndex, HostEyeOffsetLeftYIndex, HostEyeOffsetLeftZIndex },
-\t\t\t\t\t{ HostEyeOffsetRightXIndex, HostEyeOffsetRightYIndex, HostEyeOffsetRightZIndex }
-\t\t\t\t};
-\t\t\t\tfor (int eye = 0; eye < 2 && pose.stereoValid; ++eye)
-\t\t\t\t{
-\t\t\t\t\tfor (int axis = 0; axis < 3; ++axis)
-\t\t\t\t\t{
-\t\t\t\t\t\tconst float value = FloatFromBits(snapshot.reserved[indexes[eye][axis]]);
-\t\t\t\t\t\tif (!std::isfinite(value) || std::fabs(value) > 0.25f)
-\t\t\t\t\t\t{
-\t\t\t\t\t\t\tpose.stereoValid = false;
-\t\t\t\t\t\t\tbreak;
-\t\t\t\t\t\t}
-\t\t\t\t\t\tpose.eyeOffset[eye][axis] = value;
-\t\t\t\t\t}
-\t\t\t\t\tconst Quat eyeQ{ snapshot.eyeOrientation[eye][0], snapshot.eyeOrientation[eye][1],
-\t\t\t\t\t\tsnapshot.eyeOrientation[eye][2], snapshot.eyeOrientation[eye][3] };
-\t\t\t\t\tif (!QuaternionIsSane(eyeQ)) pose.stereoValid = false;
-\t\t\t\t\telse pose.eyeOrientation[eye] = Normalize(eyeQ);
-\t\t\t\t}
-'''
-new_eye_decode = '''\t\t\t\tQuat eyeOrientation[2]{};
-\t\t\t\tif (!DecodePackedEyeOrientations(snapshot, eyeOrientation))
-\t\t\t\t\tpose.stereoValid = false;
-\t\t\t\tconst std::uint32_t indexes[2][3] = {
-\t\t\t\t\t{ HostEyeOffsetLeftXIndex, HostEyeOffsetLeftYIndex, HostEyeOffsetLeftZIndex },
-\t\t\t\t\t{ HostEyeOffsetRightXIndex, HostEyeOffsetRightYIndex, HostEyeOffsetRightZIndex }
-\t\t\t\t};
-\t\t\t\tfor (int eye = 0; eye < 2 && pose.stereoValid; ++eye)
-\t\t\t\t{
-\t\t\t\t\tfor (int axis = 0; axis < 3; ++axis)
-\t\t\t\t\t{
-\t\t\t\t\t\tconst float value = FloatFromBits(snapshot.reserved[indexes[eye][axis]]);
-\t\t\t\t\t\tif (!std::isfinite(value) || std::fabs(value) > 0.25f)
-\t\t\t\t\t\t{
-\t\t\t\t\t\t\tpose.stereoValid = false;
-\t\t\t\t\t\t\tbreak;
-\t\t\t\t\t\t}
-\t\t\t\t\t\tpose.eyeOffset[eye][axis] = value;
-\t\t\t\t\t}
-\t\t\t\t\tpose.eyeOrientation[eye] = eyeOrientation[eye];
-\t\t\t\t}
-'''
-if renderer.count(old_eye_decode) != 1:
-    raise RuntimeError("src/vr_renderer_probe.cpp: old eye orientation decode block not found")
-renderer = renderer.replace(old_eye_decode, new_eye_decode, 1)
+renderer = renderer.replace(anchor, projection_export, 1)
 write("src/vr_renderer_probe.cpp", renderer)
 
+replace_once(
+    "src/vr_stereo.cpp",
+    '''\t\tbool ReadProjection(D3DMATRIX& projection)
+\t\t{
+\t\t\tif (!ImageContainsRange(OutRunProjectionRva, sizeof(D3DMATRIX)))
+\t\t\t\treturn false;
+\t\t\tconst auto* projectionPtr = Module::exe_ptr<D3DMATRIX>(OutRunProjectionRva);
+\t\t\tif (!IsReadableRange(projectionPtr, sizeof(D3DMATRIX)))
+\t\t\t\treturn false;
+\t\t\tstd::memcpy(&projection, projectionPtr, sizeof(projection));
+\t\t\treturn MatrixFinite(projection) &&
+\t\t\t\tstd::fabs(projection._34 + 1.0f) < 0.25f && std::fabs(projection._44) < 0.25f;
+\t\t}
+''',
+    '''\t\tbool ReadProjection(D3DMATRIX& projection)
+\t\t{
+\t\t\tfloat rendererProjection[16]{};
+\t\t\tif (OutRunVRRenderer::GetRendererBaseProjection(rendererProjection))
+\t\t\t{
+\t\t\t\tstd::memcpy(&projection, rendererProjection, sizeof(projection));
+\t\t\t}
+\t\t\telse
+\t\t\t{
+\t\t\t\tif (!ImageContainsRange(OutRunProjectionRva, sizeof(D3DMATRIX)))
+\t\t\t\t\treturn false;
+\t\t\t\tconst auto* projectionPtr = Module::exe_ptr<D3DMATRIX>(OutRunProjectionRva);
+\t\t\t\tif (!IsReadableRange(projectionPtr, sizeof(D3DMATRIX)))
+\t\t\t\t\treturn false;
+\t\t\t\tstd::memcpy(&projection, projectionPtr, sizeof(projection));
+\t\t\t}
+\t\t\treturn MatrixFinite(projection) &&
+\t\t\t\tstd::fabs(projection._34 + 1.0f) < 0.25f && std::fabs(projection._44) < 0.25f;
+\t\t}
+''',
+)
 
-# ---------------------------------------------------------------------------
-# Right-eye depth is considered synchronized only by a full-surface Z clear.
-# ---------------------------------------------------------------------------
+# Pose.v1 publication no longer accepts/writes a QPC low word. Keep width/height
+# coherent for legacy diagnostics; Frame.v1 is the only exact timing source.
 stereo = read("src/vr_stereo.cpp")
-old_depth = "else if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=true;"
-if old_depth in stereo:
-    stereo = stereo.replace(
-        old_depth,
-        "else if ((flags & D3DCLEAR_ZBUFFER) != 0 && count == 0) RightDepthSynchronized = true;",
-        1,
-    )
-elif "D3DCLEAR_ZBUFFER) != 0 && count == 0" not in stereo:
-    raise RuntimeError("src/vr_stereo.cpp: right-depth synchronization marker not found")
+stereo = stereo.replace(
+    '''\t\tvoid PublishStereoState(std::uint32_t state, bool worldStereo,
+\t\t\tstd::uint32_t poseSequence, std::uint32_t frameId,
+\t\t\tstd::uint32_t presentQpcLow)
+''',
+    '''\t\tvoid PublishStereoState(std::uint32_t state, bool worldStereo,
+\t\t\tstd::uint32_t poseSequence, std::uint32_t frameId)
+''',
+    1,
+)
+stereo = stereo.replace(
+    '''\t\t\tif (state != OutRunVR::StereoSbsActive || poseSequence == 0 || frameId == 0 || presentQpcLow == 0)
+\t\t\t{
+\t\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientStereoPoseSequence), 0);
+\t\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoPresentQpcLowIndex]), 0);
+\t\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoStateIndex]),
+\t\t\t\t\tstatic_cast<LONG>(state));
+\t\t\t\treturn;
+\t\t\t}
+
+\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientStereoPoseSequence),
+\t\t\t\tstatic_cast<LONG>(poseSequence));
+\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoPresentQpcLowIndex]),
+\t\t\t\tstatic_cast<LONG>(presentQpcLow));
+\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferHeightIndex]),
+\t\t\t\tstatic_cast<LONG>(BackBufferDesc.Height));
+''',
+    '''\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferWidthIndex]),
+\t\t\t\tstatic_cast<LONG>(BackBufferDesc.Width));
+\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferHeightIndex]),
+\t\t\t\tstatic_cast<LONG>(BackBufferDesc.Height));
+\n\t\t\tif (state != OutRunVR::StereoSbsActive || poseSequence == 0 || frameId == 0)
+\t\t\t{
+\t\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientStereoPoseSequence), 0);
+\t\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoStateIndex]),
+\t\t\t\t\tstatic_cast<LONG>(state));
+\t\t\t\treturn;
+\t\t\t}
+
+\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientStereoPoseSequence),
+\t\t\t\tstatic_cast<LONG>(poseSequence));
+''',
+    1,
+)
+# Active/fallback/reset callers.
+stereo = stereo.replace(
+    '''std::uint32_t low=static_cast<std::uint32_t>(presentStart.QuadPart);if(!low)low=1;PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,frameId,low);''',
+    '''PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,frameId);''',
+    1,
+)
+stereo = stereo.replace("PublishStereoState(fallback,false,0,0,0);", "PublishStereoState(fallback,false,0,0);", 1)
+stereo = stereo.replace("PublishStereoState(OutRunVR::StereoDisabled,false,0,0,0);", "PublishStereoState(OutRunVR::StereoDisabled,false,0,0);", 1)
 write("src/vr_stereo.cpp", stereo)
 
+# Host legacy metadata reader must not reinterpret width as QPC.
+host = read("vrhost/main_stereo.cpp")
+host = host.replace("        std::uint32_t presentQpcLow = 0;\n", "", 1)
+host = host.replace("                out.presentQpcLow = state_->reserved[OutRunVR::ClientStereoPresentQpcLowIndex];\n", "", 1)
+write("vrhost/main_stereo.cpp", host)
 
-# Final invariants.
+# Final invariants for this pass.
 required = {
     "src/vr_shared.hpp": [
-        "static_assert(sizeof(SharedPoseState) == 248)",
-        "offsetof(SharedPoseState, recommendedWidth) == 104",
-        "offsetof(SharedPoseState, recommendedHeight) == 112",
-        "offsetof(SharedPoseState, runtimeName) == 120",
-        "offsetof(SharedPoseState, reserved) == 184",
-        "PackedEyeOrientationOffset = 48",
-        "recommendedWidth[2]",
-        "runtimeName[64]",
+        "ClientStereoBackbufferWidthIndex = 14",
+        "ClientStereoBackbufferHeightIndex = 15",
+        "SharedRenderFrameState::presentQpc",
+        "GetRendererBaseProjection",
     ],
-    "vrhost/main_stereo.cpp": [
-        "StorePackedEyeOrientations",
-        "recommendedImageRectWidth",
-        "QpcAtOrAfter",
-    ],
-    "src/vr_renderer_probe.cpp": [
-        "DecodePackedEyeOrientations",
-        "PackedEyeOrientationOffset",
-        "delta.x * Settings::VRWorldScale",
-        "sample.eyeOffset[eye][0] * Settings::VRWorldScale",
-    ],
+    "src/vr_renderer_probe.cpp": ["GetRendererBaseProjection", "CullingProjectionSaved"],
     "src/vr_stereo.cpp": [
-        "D3DCLEAR_ZBUFFER) != 0 && count == 0",
-        "StereoFailureDepthUnsynchronized",
+        "GetRendererBaseProjection",
+        "ClientStereoBackbufferWidthIndex",
+        "PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,frameId)",
     ],
 }
 for path, markers in required.items():
     text = read(path)
     for marker in markers:
         if marker not in text:
-            raise RuntimeError(f"{path}: missing final invariant: {marker}")
+            raise RuntimeError(f"{path}: final semantic invariant missing: {marker}")
 
-print("Pose.v1 ABI and final stereo safety pass applied successfully")
+if "presentQpcLow" in read("vrhost/main_stereo.cpp"):
+    raise RuntimeError("host still treats Pose.v1 slot 14 as QPC low word")
+
+print("Pose.v1 reserved semantics and culling projection contract finalized")
