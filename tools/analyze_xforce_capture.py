@@ -2,7 +2,7 @@
 """Analyze OutRun wheel X-Force research captures.
 
 This tool is deliberately diagnostic-only. It pairs the physics-side
-"WheelFFB XFORCE60" records with the ReadIO-side
+"WheelFFB XFORCE60" records with the input-side
 "WheelFFB XFORCE_NEIGHBORS" records and compares actionforce_DBC plus its two
 adjacent unknown floats (field_DC0 / field_DC4) against steering, the Modern SAT
 model, estimated front slip and yaw rate.
@@ -21,7 +21,7 @@ import statistics
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 
 PHYSICS_MARKER = "WheelFFB XFORCE60 "
@@ -38,7 +38,7 @@ class Row:
 
 
 def parse_number(text: str) -> Optional[float]:
-    text = text.rstrip(",;)"]")
+    text = text.rstrip(",;)]")
     lowered = text.lower()
     if lowered in {"true", "false"}:
         return 1.0 if lowered == "true" else 0.0
@@ -86,10 +86,10 @@ def load_capture(path: Path) -> Tuple[List[Row], List[Row]]:
 def monotonic_segment(rows: Sequence[Row]) -> List[Row]:
     """Keep the largest nondecreasing GetTickCount segment.
 
-    A single log can contain several game launches, where GetTickCount can move
-    backwards relative to an earlier session. Pairing across launches is worse
-    than discarding the shorter segment. Normal 49.7-day wrap is irrelevant for
-    practical capture sessions and is treated the same way.
+    A single log can span a Windows restart, where GetTickCount moves backwards.
+    Pairing across that boundary is worse than discarding the shorter segment.
+    Normal 49.7-day wrap is irrelevant for practical capture sessions and is
+    treated the same way.
     """
     if not rows:
         return []
@@ -277,7 +277,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 2
     if not neighbors:
         print(
-            "No XFORCE_NEIGHBORS records found. This capture requires the legacy DirectInput compatibility ReadIO hook.",
+            "No XFORCE_NEIGHBORS records found. Confirm this wheel build contains the research capture hook and that XForceCapture60Hz is enabled.",
             file=sys.stderr,
         )
         return 3
