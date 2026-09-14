@@ -109,6 +109,14 @@ jobs:
           & $test
           if ($LASTEXITCODE -ne 0) { throw "HostState v3 channel smoke failed: $LASTEXITCODE" }
 
+      - name: Run v2 to v3 shadow conversion regression
+        shell: pwsh
+        run: |
+          $test = 'build-vrhost/bin/outrun-vr-v2-v3-shadow-conversion-smoke.exe'
+          if (-not (Test-Path $test)) { throw 'v2-v3 shadow conversion smoke executable was not produced' }
+          & $test
+          if ($LASTEXITCODE -ne 0) { throw "v2-v3 shadow conversion regression failed: $LASTEXITCODE" }
+
       - name: Run renderer-independent core math regression
         shell: pwsh
         run: |
