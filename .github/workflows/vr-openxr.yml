@@ -101,6 +101,14 @@ jobs:
           & $test
           if ($LASTEXITCODE -ne 0) { throw 'protocol v3 contract smoke failed' }
 
+      - name: Run v3 HostState named mapping round-trip
+        shell: pwsh
+        run: |
+          $test = 'build-vrhost/bin/outrun-vr-host-state-v3-channel-smoke.exe'
+          if (-not (Test-Path $test)) { throw 'HostState v3 channel smoke executable was not produced' }
+          & $test
+          if ($LASTEXITCODE -ne 0) { throw "HostState v3 channel smoke failed: $LASTEXITCODE" }
+
       - name: Run renderer-independent core math regression
         shell: pwsh
         run: |
