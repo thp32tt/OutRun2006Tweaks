@@ -176,6 +176,7 @@ jobs:
             tools/test_wheel_ffb_current.cpp
             tools/verify_wheel_ffb_math.py
             src/hooks_forcefeedback.cpp
+            src/hooks_framerate.cpp
             src/hooks_wheel_input_compat_v2.hpp
             src/hooks_wheel_r3_menu_dpad.hpp
             src/hooks_wheel_r3_menu_ab.hpp
