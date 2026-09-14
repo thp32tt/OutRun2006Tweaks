@@ -1,0 +1,42 @@
+name: Apply VR host hotfix
+
+on:
+  push:
+    branches: [vr-openxr]
+    paths:
+      - 'tools/fix_vr_host_interop_block.py'
+      - '.github/workflows/apply-vr-host-hotfix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: vr-openxr
+          fetch-depth: 0
+      - run: python3 tools/fix_vr_host_interop_block.py
+      - name: Verify normalized source
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s = Path('vrhost/main_stereo.cpp').read_text(encoding='utf-8')
+          if r'\n        bool ServiceInteropProbe' in s:
+              raise SystemExit('literal newline escapes remain in ServiceInteropProbe')
+          for marker in ('bool ServiceInteropProbe(', 'void AckDirectFrame(', 'interop verification pixel passed'):
+              if marker not in s:
+                  raise SystemExit(f'missing {marker}')
+          PY
+          git diff --check
+      - name: Commit host fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+thp32tt@users.noreply.github.com'
+          git add vrhost/main_stereo.cpp
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'vr: fix host interop probe source formatting'
+          git push origin HEAD:vr-openxr
