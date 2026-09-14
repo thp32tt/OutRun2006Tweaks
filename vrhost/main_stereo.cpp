@@ -382,7 +382,70 @@ namespace
             return {};
         }
 
-\n        bool ServiceInteropProbe(ID3D11Device* device, ID3D11DeviceContext* context)\n        {\n            if (!HeaderValid() || !device || !context) return false;\n            const std::uint32_t handleValue = state_->clientInteropProbeHandle;\n            const std::uint32_t token = state_->clientInteropProbeToken;\n            if (!handleValue || !token) return false;\n            if (interopVerifiedToken_ == token && state_->hostInteropProbeAckToken == token) return true;\n            if (state_->clientAdapterLuidLow != adapterLuid_.LowPart ||\n                state_->clientAdapterLuidHigh != static_cast<std::uint32_t>(adapterLuid_.HighPart)) return false;\n\n            ID3D11Resource* resource = nullptr;\n            ID3D11Texture2D* texture = nullptr;\n            ID3D11Texture2D* staging = nullptr;\n            const HANDLE handle = reinterpret_cast<HANDLE>(static_cast<std::uintptr_t>(handleValue));\n            bool verified = false;\n            if (SUCCEEDED(device->OpenSharedResource(handle, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&resource))) && resource &&\n                SUCCEEDED(resource->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&texture))) && texture)\n            {\n                D3D11_TEXTURE2D_DESC desc{};\n                texture->GetDesc(&desc);\n                if (desc.Width == 1 && desc.Height == 1 && desc.SampleDesc.Count == 1 &&\n                    (desc.Format == DXGI_FORMAT_R8G8B8A8_UNORM || desc.Format == DXGI_FORMAT_B8G8R8A8_UNORM))\n                {\n                    D3D11_TEXTURE2D_DESC sd = desc;\n                    sd.BindFlags = 0; sd.MiscFlags = 0; sd.Usage = D3D11_USAGE_STAGING;\n                    sd.CPUAccessFlags = D3D11_CPU_ACCESS_READ;\n                    if (SUCCEEDED(device->CreateTexture2D(&sd, nullptr, &staging)) && staging)\n                    {\n                        context->CopyResource(staging, texture);\n                        D3D11_MAPPED_SUBRESOURCE mapped{};\n                        if (SUCCEEDED(context->Map(staging, 0, D3D11_MAP_READ, 0, &mapped)) && mapped.pData)\n                        {\n                            const auto* px = static_cast<const std::uint8_t*>(mapped.pData);\n                            verified = px[0] == 0x7B && px[1] == 0x7B && px[2] == 0x7B && px[3] == 0xFF;\n                            context->Unmap(staging, 0);\n                        }\n                    }\n                }\n            }\n            ReleaseCom(staging); ReleaseCom(texture); ReleaseCom(resource);\n            if (verified)\n            {\n                interopVerifiedToken_ = token;\n                InterlockedExchange(reinterpret_cast<volatile LONG*>(&state_->hostInteropProbeAckToken), static_cast<LONG>(token));\n                if (!interopVerifiedLogged_)\n                {\n                    interopVerifiedLogged_ = true;\n                    std::cout << "D3D9Ex/D3D11 interop verification pixel passed on the OpenXR adapter.\\n";\n                }\n            }\n            return verified;\n        }\n\n        void AckDirectFrame(std::uint32_t frameId)\n        {\n            if (HeaderValid() && frameId)\n                InterlockedExchange(reinterpret_cast<volatile LONG*>(&state_->hostDirectConsumedFrameId), static_cast<LONG>(frameId));\n        }\n
+
+        bool ServiceInteropProbe(ID3D11Device* device, ID3D11DeviceContext* context)
+        {
+            if (!HeaderValid() || !device || !context) return false;
+            const std::uint32_t handleValue = state_->clientInteropProbeHandle;
+            const std::uint32_t token = state_->clientInteropProbeToken;
+            if (!handleValue || !token) return false;
+            if (interopVerifiedToken_ == token && state_->hostInteropProbeAckToken == token) return true;
+            if (state_->clientAdapterLuidLow != adapterLuid_.LowPart ||
+                state_->clientAdapterLuidHigh != static_cast<std::uint32_t>(adapterLuid_.HighPart)) return false;
+
+            ID3D11Resource* resource = nullptr;
+            ID3D11Texture2D* texture = nullptr;
+            ID3D11Texture2D* staging = nullptr;
+            const HANDLE handle = reinterpret_cast<HANDLE>(static_cast<std::uintptr_t>(handleValue));
+            bool verified = false;
+            if (SUCCEEDED(device->OpenSharedResource(handle, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&resource))) && resource &&
+                SUCCEEDED(resource->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&texture))) && texture)
+            {
+                D3D11_TEXTURE2D_DESC desc{};
+                texture->GetDesc(&desc);
+                if (desc.Width == 1 && desc.Height == 1 && desc.SampleDesc.Count == 1 &&
+                    (desc.Format == DXGI_FORMAT_R8G8B8A8_UNORM || desc.Format == DXGI_FORMAT_B8G8R8A8_UNORM))
+                {
+                    D3D11_TEXTURE2D_DESC sd = desc;
+                    sd.BindFlags = 0;
+                    sd.MiscFlags = 0;
+                    sd.Usage = D3D11_USAGE_STAGING;
+                    sd.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+                    if (SUCCEEDED(device->CreateTexture2D(&sd, nullptr, &staging)) && staging)
+                    {
+                        context->CopyResource(staging, texture);
+                        D3D11_MAPPED_SUBRESOURCE mapped{};
+                        if (SUCCEEDED(context->Map(staging, 0, D3D11_MAP_READ, 0, &mapped)) && mapped.pData)
+                        {
+                            const auto* px = static_cast<const std::uint8_t*>(mapped.pData);
+                            verified = px[0] == 0x7B && px[1] == 0x7B && px[2] == 0x7B && px[3] == 0xFF;
+                            context->Unmap(staging, 0);
+                        }
+                    }
+                }
+            }
+            ReleaseCom(staging);
+            ReleaseCom(texture);
+            ReleaseCom(resource);
+            if (verified)
+            {
+                interopVerifiedToken_ = token;
+                InterlockedExchange(reinterpret_cast<volatile LONG*>(&state_->hostInteropProbeAckToken), static_cast<LONG>(token));
+                if (!interopVerifiedLogged_)
+                {
+                    interopVerifiedLogged_ = true;
+                    std::cout << "D3D9Ex/D3D11 interop verification pixel passed on the OpenXR adapter.\n";
+                }
+            }
+            return verified;
+        }
+
+        void AckDirectFrame(std::uint32_t frameId)
+        {
+            if (HeaderValid() && frameId)
+                InterlockedExchange(reinterpret_cast<volatile LONG*>(&state_->hostDirectConsumedFrameId), static_cast<LONG>(frameId));
+        }
+
         std::uint32_t Write(const XrSpaceLocation& head,
             const std::array<XrView, 2>& views, std::uint32_t viewCount,
             const std::array<XrViewConfigurationView, 2>& configs,
