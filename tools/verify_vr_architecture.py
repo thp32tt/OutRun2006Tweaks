@@ -182,16 +182,20 @@ for marker in (
     if marker not in host:
         raise SystemExit(f'missing live host comparison invariant: {marker}')
 
-# R13 separates "host opened this shared frame" from "the D3D11 GPU finished
-# sampling this shared frame". Only the latter may authorize D3D9 ring reuse.
+# R13 makes the ownership boundary explicit: direct shared eyes are copied on
+# the GPU into host-owned textures, the copy EVENT must retire, and only then is
+# the producer slot acknowledged. Reprojection/repeat frames sample the safe
+# host-owned copies instead of the reusable D3D9 shared slot.
 direct_arbitration = (ROOT / 'vrhost/src/runtime/d3d9ex_direct_passthrough.hpp').read_text(encoding='utf-8')
 for marker in (
     'IncomingProjectionValid', 'HostDirectGpuReady', 'hostDirectConsumedFrameId',
     'HostDirectGpuCompletedFrameIndex', 'D3D11_QUERY_EVENT',
-    'MarkGpuConsumptionComplete', 'GPU-consumer completion ACK active',
+    'CopySharedFrameToSafeEyes', 'CopyResource(SafeEye[0], shared[0])',
+    'host-owned GPU eye copies + completion ACK active',
+    'RenderSafeProjection', 'SafeEyeSrv',
     'FallbackSourceMaxAgeMs', 'stale Desktop Duplication source invalidated',
-    'ZERO-COPY projection passthrough ACTIVE',
-    'OutRunVrFinalTest::EndFrame(session, endInfo)',
+    'DIRECT GPU-COPY projection passthrough ACTIVE',
+    'OutRunVrFinalTest::EndFrame(session, &patched)',
     'OutRunVrSbsCaptureOverride::EndFrame(session, endInfo)',
 ):
     if marker not in direct_arbitration:
