@@ -19,10 +19,7 @@ def replace_once(path: str, old: str, new: str) -> None:
     write(path, text.replace(old, new, 1))
 
 
-# ---------------------------------------------------------------------------
-# Pose.v1 reserved-slot semantics: restore slot 14/15 to width/height. Full QPC
-# now belongs exclusively to Frame.v1, so no existing Pose.v1 field is repurposed.
-# ---------------------------------------------------------------------------
+# Pose.v1 reserved slots 14/15 retain their original width/height meaning.
 replace_once(
     "src/vr_shared.hpp",
     '''    inline constexpr std::uint32_t ClientStereoStateIndex = 12;
@@ -35,14 +32,11 @@ replace_once(
     inline constexpr std::uint32_t ClientStereoFrameIndex = 13;
     inline constexpr std::uint32_t ClientStereoBackbufferWidthIndex = 14;
     inline constexpr std::uint32_t ClientStereoBackbufferHeightIndex = 15;
-    // Source-compatibility alias only. Slot 14 retains its original width semantics;
-    // exact presentation timing is carried by SharedRenderFrameState::presentQpc.
+    // Source-compatibility alias only. Slot 14 remains backbuffer width;
+    // exact presentation timing is transported by Frame.v1::presentQpc.
     inline constexpr std::uint32_t ClientStereoPresentQpcLowIndex = ClientStereoBackbufferWidthIndex;
 ''',
 )
-
-# Provide stereo with the same original projection that renderer verification uses
-# when the optional culling-union projection temporarily overrides the game global.
 replace_once(
     "src/vr_shared.hpp",
     '''    bool GetLatchedStereoFrame(LatchedStereoFrame& out);
@@ -54,16 +48,25 @@ replace_once(
 ''',
 )
 
-renderer = read("src/vr_renderer_probe.cpp")
-anchor = '''\tbool GetLatchedStereoFrame(LatchedStereoFrame& out)
+# Export the exact original projection used by mono WVP verification. This keeps
+# stereo eye reconstruction correct while CullingUnionFov temporarily widens the
+# game projection global during BeginScene..EndScene.
+replace_once(
+    "src/vr_renderer_probe.cpp",
+    '''\tbool GetLatchedStereoFrame(LatchedStereoFrame& out)
 \t{
 \t\tout = LatchedStereo;
-\t\treturn out.valid;
+\t\treturn out.valid && out.poseSequence != 0;
 \t}
-'''
-if anchor not in renderer:
-    raise RuntimeError("src/vr_renderer_probe.cpp: GetLatchedStereoFrame anchor not found")
-projection_export = anchor + '''
+
+\tbool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
+''',
+    '''\tbool GetLatchedStereoFrame(LatchedStereoFrame& out)
+\t{
+\t\tout = LatchedStereo;
+\t\treturn out.valid && out.poseSequence != 0;
+\t}
+
 \tbool GetRendererBaseProjection(float outMatrix[16])
 \t{
 \t\tif (!outMatrix || !ValidateRendererGlobals() || !RendererProjection)
@@ -78,10 +81,10 @@ projection_export = anchor + '''
 \t\tstd::memcpy(outMatrix, &projection, sizeof(projection));
 \t\treturn true;
 \t}
-'''
-renderer = renderer.replace(anchor, projection_export, 1)
-write("src/vr_renderer_probe.cpp", renderer)
 
+\tbool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
+''',
+)
 replace_once(
     "src/vr_stereo.cpp",
     '''\t\tbool ReadProjection(D3DMATRIX& projection)
@@ -118,21 +121,21 @@ replace_once(
 ''',
 )
 
-# Pose.v1 publication no longer accepts/writes a QPC low word. Keep width/height
-# coherent for legacy diagnostics; Frame.v1 is the only exact timing source.
+# Remove QPC-low publication from Pose.v1. Width/height are restored; Frame.v1
+# is the sole exact frame-timing contract.
 stereo = read("src/vr_stereo.cpp")
-stereo = stereo.replace(
-    '''\t\tvoid PublishStereoState(std::uint32_t state, bool worldStereo,
+old_signature = '''\t\tvoid PublishStereoState(std::uint32_t state, bool worldStereo,
 \t\t\tstd::uint32_t poseSequence, std::uint32_t frameId,
 \t\t\tstd::uint32_t presentQpcLow)
-''',
-    '''\t\tvoid PublishStereoState(std::uint32_t state, bool worldStereo,
+'''
+new_signature = '''\t\tvoid PublishStereoState(std::uint32_t state, bool worldStereo,
 \t\t\tstd::uint32_t poseSequence, std::uint32_t frameId)
-''',
-    1,
-)
-stereo = stereo.replace(
-    '''\t\t\tif (state != OutRunVR::StereoSbsActive || poseSequence == 0 || frameId == 0 || presentQpcLow == 0)
+'''
+if stereo.count(old_signature) != 1:
+    raise RuntimeError("src/vr_stereo.cpp: PublishStereoState old signature not found")
+stereo = stereo.replace(old_signature, new_signature, 1)
+
+old_body = '''\t\t\tif (state != OutRunVR::StereoSbsActive || poseSequence == 0 || frameId == 0 || presentQpcLow == 0)
 \t\t\t{
 \t\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientStereoPoseSequence), 0);
 \t\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoPresentQpcLowIndex]), 0);
@@ -147,12 +150,13 @@ stereo = stereo.replace(
 \t\t\t\tstatic_cast<LONG>(presentQpcLow));
 \t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferHeightIndex]),
 \t\t\t\tstatic_cast<LONG>(BackBufferDesc.Height));
-''',
-    '''\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferWidthIndex]),
+'''
+new_body = '''\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferWidthIndex]),
 \t\t\t\tstatic_cast<LONG>(BackBufferDesc.Width));
 \t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferHeightIndex]),
 \t\t\t\tstatic_cast<LONG>(BackBufferDesc.Height));
-\n\t\t\tif (state != OutRunVR::StereoSbsActive || poseSequence == 0 || frameId == 0)
+
+\t\t\tif (state != OutRunVR::StereoSbsActive || poseSequence == 0 || frameId == 0)
 \t\t\t{
 \t\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientStereoPoseSequence), 0);
 \t\t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoStateIndex]),
@@ -162,47 +166,36 @@ stereo = stereo.replace(
 
 \t\t\tInterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientStereoPoseSequence),
 \t\t\t\tstatic_cast<LONG>(poseSequence));
-''',
-    1,
-)
-# Active/fallback/reset callers.
-stereo = stereo.replace(
-    '''std::uint32_t low=static_cast<std::uint32_t>(presentStart.QuadPart);if(!low)low=1;PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,frameId,low);''',
-    '''PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,frameId);''',
-    1,
-)
+'''
+if stereo.count(old_body) != 1:
+    raise RuntimeError("src/vr_stereo.cpp: old Pose.v1 QPC publication block not found")
+stereo = stereo.replace(old_body, new_body, 1)
+
+old_active = '''std::uint32_t low=static_cast<std::uint32_t>(presentStart.QuadPart);if(!low)low=1;PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,frameId,low);'''
+if stereo.count(old_active) != 1:
+    raise RuntimeError("src/vr_stereo.cpp: active low-QPC call not found")
+stereo = stereo.replace(old_active, '''PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,frameId);''', 1)
 stereo = stereo.replace("PublishStereoState(fallback,false,0,0,0);", "PublishStereoState(fallback,false,0,0);", 1)
 stereo = stereo.replace("PublishStereoState(OutRunVR::StereoDisabled,false,0,0,0);", "PublishStereoState(OutRunVR::StereoDisabled,false,0,0);", 1)
 write("src/vr_stereo.cpp", stereo)
 
-# Host legacy metadata reader must not reinterpret width as QPC.
 host = read("vrhost/main_stereo.cpp")
 host = host.replace("        std::uint32_t presentQpcLow = 0;\n", "", 1)
 host = host.replace("                out.presentQpcLow = state_->reserved[OutRunVR::ClientStereoPresentQpcLowIndex];\n", "", 1)
 write("vrhost/main_stereo.cpp", host)
 
-# Final invariants for this pass.
-required = {
-    "src/vr_shared.hpp": [
-        "ClientStereoBackbufferWidthIndex = 14",
-        "ClientStereoBackbufferHeightIndex = 15",
-        "SharedRenderFrameState::presentQpc",
-        "GetRendererBaseProjection",
-    ],
-    "src/vr_renderer_probe.cpp": ["GetRendererBaseProjection", "CullingProjectionSaved"],
-    "src/vr_stereo.cpp": [
-        "GetRendererBaseProjection",
-        "ClientStereoBackbufferWidthIndex",
-        "PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,frameId)",
-    ],
+# Contract checks.
+checks = {
+    "src/vr_shared.hpp": ["ClientStereoBackbufferWidthIndex = 14", "GetRendererBaseProjection"],
+    "src/vr_renderer_probe.cpp": ["bool GetRendererBaseProjection", "CullingProjectionSaved"],
+    "src/vr_stereo.cpp": ["GetRendererBaseProjection", "ClientStereoBackbufferWidthIndex"],
 }
-for path, markers in required.items():
+for path, markers in checks.items():
     text = read(path)
     for marker in markers:
         if marker not in text:
-            raise RuntimeError(f"{path}: final semantic invariant missing: {marker}")
-
+            raise RuntimeError(f"{path}: missing invariant {marker}")
 if "presentQpcLow" in read("vrhost/main_stereo.cpp"):
-    raise RuntimeError("host still treats Pose.v1 slot 14 as QPC low word")
+    raise RuntimeError("host still interprets Pose.v1 width slot as QPC")
 
-print("Pose.v1 reserved semantics and culling projection contract finalized")
+print("final semantic cleanup applied successfully")
