@@ -1,0 +1,468 @@
+name: One-shot X-Force safety patch
+
+on:
+  push:
+    branches: [ wheel-ffb-v0.3-xforce ]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: ${{ !contains(github.event.head_commit.message, '[xforce-safety-patched]') }}
+    runs-on: windows-2022
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v7.0.1
+        with:
+          ref: wheel-ffb-v0.3-xforce
+          fetch-depth: 0
+
+      - name: Apply reviewed X-Force safety fixes
+        shell: pwsh
+        run: |
+          @'
+          from pathlib import Path
+
+          def replace_once(path, old, new, label):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected exactly one match, found {count}")
+              p.write_text(text.replace(old, new, 1), encoding='utf-8', newline='\n')
+              print(f"patched {label}")
+
+          math = 'src/wheel_ffb_math.hpp'
+          replace_once(math,
+          '''    inline constexpr float XForceNoiseFloor = 0.20f;
+              inline constexpr float XForceResponseThreshold = 0.05f;
+              inline constexpr float XForceStoppedSpeed = 0.025f;
+              inline constexpr float XForceResumeSpeed = 0.040f;
+              inline constexpr float XForceFreshDelta = 0.020f;
+              inline constexpr float XForceUnresponsiveSeconds = 0.50f;
+              inline constexpr float XForceBlendInSeconds = 0.20f;
+              inline constexpr float XForceBlendOutSeconds = 0.10f;
+          ''',
+          '''    inline constexpr float XForceNoiseFloor = 0.20f;
+              // A candidate must first exceed the normalization noise floor by a
+              // meaningful margin before it can prove that the native source is alive.
+              // Once armed, true zero crossings remain valid for the timed grace period.
+              inline constexpr float XForceResponseThreshold = 0.50f;
+              inline constexpr float XForceNearZeroThreshold = 0.25f;
+              inline constexpr float XForceStoppedSpeed = 0.025f;
+              inline constexpr float XForceResumeSpeed = 0.040f;
+              inline constexpr float XForceFreshDelta = 0.020f;
+              inline constexpr float XForceUnresponsiveSeconds = 0.50f;
+              inline constexpr float XForceBlendInSeconds = 0.20f;
+              inline constexpr float XForceBlendOutSeconds = 0.10f;
+              inline constexpr float XForceFreezeWindowSeconds = 0.20f;
+              inline constexpr float XForceFrozenFallbackSeconds = 0.50f;
+          ''', 'X-Force thresholds')
+
+          replace_once(math,
+          '''            responseObserved_ = false;
+                      stopped_ = true;
+                      awaitingFreshAfterStop_ = true;
+                      stoppedRaw_ = 0.0f;
+                      lastNormalized_ = 0.0f;
+                      nativeBlend_ = 0.0f;
+                      unresponsiveSeconds_ = 0.0f;
+          ''',
+          '''            responseObserved_ = false;
+                      stopped_ = true;
+                      awaitingFreshAfterStop_ = true;
+                      baselineCaptured_ = false;
+                      stoppedRaw_ = 0.0f;
+                      lastNormalized_ = 0.0f;
+                      nativeBlend_ = 0.0f;
+                      unresponsiveSeconds_ = 0.0f;
+          ''', 'guard reset baseline')
+
+          replace_once(math,
+          '''        XForceGuardSample update(
+                      float raw, float speedNorm, float steerAbs, bool invert,
+                      float deltaSeconds = 1.0f / 60.0f)
+          ''',
+          '''        XForceGuardSample update(
+                      float raw, float speedNorm, float steerAbs, bool invert,
+                      float deltaSeconds = 1.0f / 60.0f,
+                      bool sourceFrozen = false)
+          ''', 'guard freeze input')
+
+          replace_once(math,
+          '''            if (stopped_)
+                      {
+                          if (speedNorm < XForceResumeSpeed)
+                          {
+                              if (out.rangeValid)
+                                  stoppedRaw_ = raw;
+                              nativeBlend_ = 0.0f;
+                              lastNormalized_ = 0.0f;
+                              unresponsiveSeconds_ = 0.0f;
+                              out.responseObserved = responseObserved_;
+                              out.stopped = true;
+                              return out;
+                          }
+                          stopped_ = false;
+                          awaitingFreshAfterStop_ = true;
+                      }
+                      else if (speedNorm <= XForceStoppedSpeed)
+                      {
+                          stopped_ = true;
+                          awaitingFreshAfterStop_ = true;
+                          if (out.rangeValid)
+                              stoppedRaw_ = raw;
+                          nativeBlend_ = 0.0f;
+                          lastNormalized_ = 0.0f;
+                          unresponsiveSeconds_ = 0.0f;
+                          out.responseObserved = responseObserved_;
+                          out.stopped = true;
+                          return out;
+                      }
+          ''',
+          '''            if (stopped_)
+                      {
+                          if (speedNorm < XForceResumeSpeed)
+                          {
+                              if (out.rangeValid)
+                              {
+                                  stoppedRaw_ = raw;
+                                  baselineCaptured_ = true;
+                              }
+                              nativeBlend_ = 0.0f;
+                              lastNormalized_ = 0.0f;
+                              unresponsiveSeconds_ = 0.0f;
+                              out.responseObserved = responseObserved_;
+                              out.stopped = true;
+                              return out;
+                          }
+
+                          // reset_signal_state() can run while the car is already
+                          // moving (for example after closing F11). In that case the
+                          // first moving native sample is only a baseline; it must not
+                          // certify its own freshness in the same frame.
+                          if (!baselineCaptured_)
+                          {
+                              if (out.rangeValid)
+                              {
+                                  stoppedRaw_ = raw;
+                                  baselineCaptured_ = true;
+                              }
+                              nativeBlend_ = 0.0f;
+                              lastNormalized_ = 0.0f;
+                              unresponsiveSeconds_ = 0.0f;
+                              out.responseObserved = responseObserved_;
+                              out.stopped = false;
+                              return out;
+                          }
+
+                          stopped_ = false;
+                          awaitingFreshAfterStop_ = true;
+                      }
+                      else if (speedNorm <= XForceStoppedSpeed)
+                      {
+                          stopped_ = true;
+                          awaitingFreshAfterStop_ = true;
+                          baselineCaptured_ = false;
+                          if (out.rangeValid)
+                          {
+                              stoppedRaw_ = raw;
+                              baselineCaptured_ = true;
+                          }
+                          nativeBlend_ = 0.0f;
+                          lastNormalized_ = 0.0f;
+                          unresponsiveSeconds_ = 0.0f;
+                          out.responseObserved = responseObserved_;
+                          out.stopped = true;
+                          return out;
+                      }
+          ''', 'moving reset freshness baseline')
+
+          replace_once(math,
+          '''                (std::abs(raw) < XForceResponseThreshold ||
+                           std::abs(raw - stoppedRaw_) >= XForceFreshDelta))
+          ''',
+          '''                (std::abs(raw) < XForceNearZeroThreshold ||
+                           std::abs(raw - stoppedRaw_) >= XForceFreshDelta))
+          ''', 'fresh near-zero threshold')
+
+          replace_once(math,
+          '''                if (std::abs(raw) < XForceResponseThreshold)
+          ''',
+          '''                if (std::abs(raw) < XForceNearZeroThreshold)
+          ''', 'unresponsive near-zero threshold')
+
+          replace_once(math,
+          '''            const bool responsiveNow = responseObserved_ &&
+                      unresponsiveSeconds_ < XForceUnresponsiveSeconds;
+          ''',
+          '''            const bool responsiveNow = responseObserved_ &&
+                      unresponsiveSeconds_ < XForceUnresponsiveSeconds &&
+                      !sourceFrozen;
+          ''', 'freeze gates native validity')
+
+          replace_once(math,
+          '''        bool responseObserved_ = false;
+                  bool stopped_ = true;
+                  bool awaitingFreshAfterStop_ = true;
+                  float stoppedRaw_ = 0.0f;
+          ''',
+          '''        bool responseObserved_ = false;
+                  bool stopped_ = true;
+                  bool awaitingFreshAfterStop_ = true;
+                  bool baselineCaptured_ = false;
+                  float stoppedRaw_ = 0.0f;
+          ''', 'guard baseline state')
+
+          replace_once(math,
+          '''            previousValid_ = false;
+                      previousRaw_ = 0.0f;
+                      previousSteer_ = 0.0f;
+                      previousFrontSlip_ = 0.0f;
+                      previousYawRate_ = 0.0f;
+                      frozenSeconds_ = 0.0f;
+          ''',
+          '''            freezeWindowValid_ = false;
+                      freezeWindowRaw_ = 0.0f;
+                      freezeWindowSteer_ = 0.0f;
+                      freezeWindowFrontSlip_ = 0.0f;
+                      freezeWindowYawRate_ = 0.0f;
+                      freezeWindowSeconds_ = 0.0f;
+                      frozenSeconds_ = 0.0f;
+          ''', 'analyzer reset window')
+
+          replace_once(math,
+          '''                previousValid_ = false;
+                          frozenSeconds_ = std::max(0.0f, frozenSeconds_ - deltaSeconds * 2.0f);
+                          return;
+          ''',
+          '''                freezeWindowValid_ = false;
+                          freezeWindowSeconds_ = 0.0f;
+                          frozenSeconds_ = std::max(0.0f, frozenSeconds_ - deltaSeconds * 2.0f);
+                          return;
+          ''', 'analyzer invalid reset')
+
+          replace_once(math,
+          '''            if (previousValid_ && speedNorm >= 0.08f &&
+                          absRaw >= XForceResponseThreshold)
+                      {
+                          const bool stateChanged =
+                              std::abs(steer - previousSteer_) >= 0.025f ||
+                              std::abs(frontSlip - previousFrontSlip_) >= 0.005f ||
+                              std::abs(yawRate - previousYawRate_) >= 0.020f;
+                          const bool rawFrozen = std::abs(raw - previousRaw_) < 0.010f;
+                          if (stateChanged && rawFrozen)
+                              frozenSeconds_ += deltaSeconds;
+                          else
+                              frozenSeconds_ = std::max(
+                                  0.0f, frozenSeconds_ - deltaSeconds * 2.0f);
+                      }
+                      else
+                      {
+                          frozenSeconds_ = std::max(0.0f, frozenSeconds_ - deltaSeconds);
+                      }
+
+                      previousValid_ = true;
+                      previousRaw_ = raw;
+                      previousSteer_ = steer;
+                      previousFrontSlip_ = frontSlip;
+                      previousYawRate_ = yawRate;
+          ''',
+          '''            if (speedNorm >= 0.08f && absRaw >= XForceResponseThreshold)
+                      {
+                          if (!freezeWindowValid_)
+                          {
+                              freezeWindowValid_ = true;
+                              freezeWindowRaw_ = raw;
+                              freezeWindowSteer_ = steer;
+                              freezeWindowFrontSlip_ = frontSlip;
+                              freezeWindowYawRate_ = yawRate;
+                              freezeWindowSeconds_ = 0.0f;
+                          }
+                          else
+                          {
+                              freezeWindowSeconds_ += deltaSeconds;
+                              if (freezeWindowSeconds_ >= XForceFreezeWindowSeconds)
+                              {
+                                  // Compare over a short window instead of one frame so
+                                  // ordinary smooth steering/body motion can still prove
+                                  // that a non-zero native value is suspiciously frozen.
+                                  const bool stateChanged =
+                                      std::abs(steer - freezeWindowSteer_) >= 0.025f ||
+                                      std::abs(frontSlip - freezeWindowFrontSlip_) >= 0.005f ||
+                                      std::abs(yawRate - freezeWindowYawRate_) >= 0.020f;
+                                  const bool rawFrozen =
+                                      std::abs(raw - freezeWindowRaw_) < 0.010f;
+                                  if (stateChanged && rawFrozen)
+                                      frozenSeconds_ += freezeWindowSeconds_;
+                                  else
+                                      frozenSeconds_ = std::max(
+                                          0.0f, frozenSeconds_ - freezeWindowSeconds_ * 2.0f);
+
+                                  freezeWindowRaw_ = raw;
+                                  freezeWindowSteer_ = steer;
+                                  freezeWindowFrontSlip_ = frontSlip;
+                                  freezeWindowYawRate_ = yawRate;
+                                  freezeWindowSeconds_ = 0.0f;
+                              }
+                          }
+                      }
+                      else
+                      {
+                          freezeWindowValid_ = false;
+                          freezeWindowSeconds_ = 0.0f;
+                          frozenSeconds_ = std::max(0.0f, frozenSeconds_ - deltaSeconds);
+                      }
+          ''', 'windowed non-zero freeze detector')
+
+          replace_once(math,
+          '''            out.frozenSuspicious = frozenSeconds_ >= 0.50f;
+          ''',
+          '''            out.frozenSuspicious =
+                          frozenSeconds_ >= XForceFrozenFallbackSeconds;
+          ''', 'freeze fallback duration')
+
+          replace_once(math,
+          '''        bool previousValid_ = false;
+                  float previousRaw_ = 0.0f;
+                  float previousSteer_ = 0.0f;
+                  float previousFrontSlip_ = 0.0f;
+                  float previousYawRate_ = 0.0f;
+                  float frozenSeconds_ = 0.0f;
+          ''',
+          '''        bool freezeWindowValid_ = false;
+                  float freezeWindowRaw_ = 0.0f;
+                  float freezeWindowSteer_ = 0.0f;
+                  float freezeWindowFrontSlip_ = 0.0f;
+                  float freezeWindowYawRate_ = 0.0f;
+                  float freezeWindowSeconds_ = 0.0f;
+                  float frozenSeconds_ = 0.0f;
+          ''', 'analyzer window state')
+
+          ffb = 'src/hooks_wheel_ffb.cpp'
+          replace_once(ffb,
+          '''            const float xForceRaw = car->actionforce_DBC;
+                      const WheelFFBMath::XForceGuardSample xForceSample = xForceGuard_.update(
+                          xForceRaw, speedNorm, steerAbs, bool(Settings::WheelFFBXForceInvert),
+                          xForceDeltaSeconds);
+          ''',
+          '''            const float xForceRaw = car->actionforce_DBC;
+                      xForceAnalyzer_.update(
+                          xForceRaw, speedNorm, steer, modernSelfAligningTorque,
+                          frontSlip, vehicleDynamics_.yawRate(), xForceDeltaSeconds);
+                      const WheelFFBMath::XForceAnalysisSnapshot xForceAnalysis =
+                          xForceAnalyzer_.snapshot();
+                      const WheelFFBMath::XForceGuardSample xForceSample = xForceGuard_.update(
+                          xForceRaw, speedNorm, steerAbs, bool(Settings::WheelFFBXForceInvert),
+                          xForceDeltaSeconds, xForceAnalysis.frozenSuspicious);
+          ''', 'runtime analyzer before guard')
+
+          replace_once(ffb,
+          '''            xForceAnalyzer_.update(
+                          xForceRaw, speedNorm, steer, modernSelfAligningTorque,
+                          frontSlip, vehicleDynamics_.yawRate(), xForceDeltaSeconds);
+                      const WheelFFBMath::XForceAnalysisSnapshot xForceAnalysis =
+                          xForceAnalyzer_.snapshot();
+
+                      const int feedbackCharacter = std::clamp(
+          ''',
+          '''            const int feedbackCharacter = std::clamp(
+          ''', 'remove duplicate analyzer block')
+
+          tests = 'tools/test_wheel_ffb_current.cpp'
+          replace_once(tests,
+          ''' XForceGuard xn; xn.reset();
+           require(!xn.update(std::numeric_limits<float>::quiet_NaN(),.5f,.5f,false).rangeValid,"X-Force rejects NaN");
+
+           // Equal elapsed time at 60/120 Hz must produce nearly the same native blend.
+          ''',
+          ''' XForceGuard xn; xn.reset();
+           require(!xn.update(std::numeric_limits<float>::quiet_NaN(),.5f,.5f,false).rangeValid,"X-Force rejects NaN");
+
+           // Values inside the normalization noise floor must never prove the source
+           // alive and fade Modern SAT away by themselves.
+           XForceGuard xNoise; xNoise.reset(); xNoise.update(0.0f,0.0f,.5f,false);
+           XForceGuardSample xNoiseSample{};
+           for(int i=0;i<60;++i)xNoiseSample=xNoise.update(.10f,.20f,.5f,false,1.0f/60.0f);
+           require(!xNoiseSample.responseObserved&&!xNoiseSample.valid&&xNoiseSample.nativeBlend==0.0f,"X-Force sub-noise signal cannot arm native path");
+
+           // A reset that occurs while already moving has no trustworthy stopped
+           // reference. The first moving sample is baseline-only and cannot certify
+           // itself as fresh; an actual subsequent native change is required.
+           XForceGuard xMovingReset; xMovingReset.reset();
+           auto xMovingBaseline=xMovingReset.update(20.0f,.20f,.5f,false);
+           auto xMovingSame=xMovingReset.update(20.0f,.20f,.5f,false);
+           auto xMovingFresh=xMovingReset.update(21.0f,.20f,.5f,false);
+           require(!xMovingBaseline.valid&&!xMovingBaseline.freshAfterStop&&xMovingBaseline.nativeBlend==0.0f,"X-Force moving reset first sample is baseline only");
+           require(!xMovingSame.valid&&!xMovingSame.freshAfterStop,"X-Force moving reset rejects unchanged baseline");
+           require(xMovingFresh.valid&&xMovingFresh.freshAfterStop,"X-Force moving reset requires a subsequent fresh sample");
+
+           // Analyzer freeze suspicion is a safety input to the production guard:
+           // native output must fade toward Modern instead of holding stale torque.
+           XForceGuard xFreezeGuard; xFreezeGuard.reset(); xFreezeGuard.update(0.0f,0.0f,.5f,false);
+           auto xFreezeLive=xFreezeGuard.update(20.0f,.20f,.5f,false);
+           for(int i=0;i<14;++i)xFreezeLive=xFreezeGuard.update(20.0f,.20f,.5f,false,1.0f/60.0f);
+           const float xFreezeBlendBefore=xFreezeLive.nativeBlend;
+           auto xFreezeFallback=xFreezeGuard.update(20.0f,.20f,.5f,false,1.0f/60.0f,true);
+           require(!xFreezeFallback.valid&&!xFreezeFallback.responsive&&xFreezeFallback.nativeBlend<xFreezeBlendBefore,"X-Force frozen source fades to Modern");
+
+           // Equal elapsed time at 60/120 Hz must produce nearly the same native blend.
+          ''', 'new guard regression tests')
+
+          replace_once(tests,
+          ''' for(int i=0;i<45;++i){
+             float changing=float(i)*.04f;
+             xf.update(20.0f,.40f,changing,changing,changing*.2f,changing*.3f,1.0f/60.0f);
+           }
+          ''',
+          ''' for(int i=0;i<60;++i){
+             // Deliberately small per-frame movement: the detector must integrate
+             // ordinary smooth change across its short observation window.
+             float changing=float(i)*.003f;
+             xf.update(20.0f,.40f,changing,changing,changing*.2f,changing*.3f,1.0f/60.0f);
+           }
+          ''', 'gradual freeze regression test')
+
+          verify = 'tools/verify_wheel_ffb_current.py'
+          replace_once(verify,
+          '''req(math, 'XForceUnresponsiveSeconds = 0.50f', 'prolonged dead native signal uses elapsed time')
+          ''',
+          '''req(math, 'XForceUnresponsiveSeconds = 0.50f', 'prolonged dead native signal uses elapsed time')
+          req(math, 'XForceNearZeroThreshold = 0.25f', 'native arming and near-zero detection use separate thresholds')
+          req(math, 'baselineCaptured_', 'moving-state reset captures a baseline before native freshness can arm')
+          req(math, '!sourceFrozen', 'diagnostic non-zero freeze suspicion gates native validity')
+          req(math, 'XForceFreezeWindowSeconds = 0.20f', 'freeze detection integrates smooth state movement over time')
+          ''', 'verifier X-Force safety invariants')
+
+          workflow = '.github/workflows/build.yml'
+          replace_once(workflow,
+          '''          if ($ini -notmatch '(?m)^XForceInvert\\s*=\\s*false\\s*$') { throw "v0.3 candidate direction override must ship disabled" }
+          ''',
+          '''          if ($ini -notmatch '(?m)^XForceInvert\\s*=\\s*false\\s*$') { throw "v0.3 candidate direction override must ship disabled" }
+                    if ($ini -notmatch '(?m)^XForceGain\\s*=\\s*1\\.00\\s*$') { throw "v0.3 native X-Force gain must ship neutral at 1.00" }
+                    if ($ini -notmatch '(?m)^XForceCapture60Hz\\s*=\\s*false\\s*$') { throw "v0.3 60 Hz X-Force capture must ship disabled" }
+          ''', 'CI safe X-Force defaults')
+          '@ | Set-Content -Path patch_xforce_safety.py -Encoding utf8
+          python patch_xforce_safety.py
+          Remove-Item patch_xforce_safety.py
+
+      - name: Verify consolidated source
+        shell: pwsh
+        run: python tools/verify_wheel_ffb_current.py
+
+      - name: Test production wheel FFB math
+        shell: cmd
+        run: |
+          call "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat" || exit /b 1
+          python tools\verify_wheel_ffb_math.py || exit /b 1
+
+      - name: Commit tested safety fixes
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/wheel_ffb_math.hpp src/hooks_wheel_ffb.cpp tools/test_wheel_ffb_current.cpp tools/verify_wheel_ffb_current.py .github/workflows/build.yml
+          if (git diff --cached --quiet) { throw "Patch produced no changes" }
+          git commit -m "fix: harden v0.3 X-Force native guard [xforce-safety-patched]"
+          git push origin HEAD:wheel-ffb-v0.3-xforce
