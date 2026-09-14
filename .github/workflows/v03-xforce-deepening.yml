@@ -1,0 +1,145 @@
+name: v0.3 X-Force deepening and five-pass debug
+
+on:
+  push:
+    branches:
+      - wheel-ffb-v0.3-xforce
+    paths:
+      - tools/v03_xforce_deepening.trigger
+
+permissions:
+  contents: write
+
+jobs:
+  deepen-build-debug:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Apply reviewed X-Force deepening patch
+        shell: pwsh
+        run: python tools/apply_v03_xforce_deepening.py
+
+      - name: Debug pass 1 - consolidated source verifier
+        shell: pwsh
+        run: python tools/verify_wheel_ffb_current.py
+
+      - name: Debug pass 2 - production math and state-machine tests
+        shell: cmd
+        run: |
+          call "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat" || exit /b 1
+          python tools/verify_wheel_ffb_math.py
+
+      - name: Debug pass 3 - semantic safety and migration audit
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path('.')
+          core=(root/'src/hooks_wheel_ffb.cpp').read_text(encoding='utf-8')
+          math=(root/'src/wheel_ffb_math.hpp').read_text(encoding='utf-8')
+          ui=(root/'src/overlay/wheel_setup_ui.cpp').read_text(encoding='utf-8')
+          profiles=(root/'src/wheel_profile_store.hpp').read_text(encoding='utf-8')
+          runtime=(root/'src/wheel_ffb_runtime.hpp').read_text(encoding='utf-8')
+          ini=(root/'OutRun2006Tweaks.ini').read_text(encoding='utf-8')
+          checks={
+            'confidence remains diagnostic only': 'if (xForceAnalysis.confidence' not in core and 'if (xForceAnalysis.frozenSuspicious' not in core,
+            'time-based guard': 'XForceUnresponsiveSeconds' in math and 'unresponsiveTicks_' not in math,
+            'cadence-independent blend': 'XForceBlendInSeconds' in math and 'XForceBlendOutSeconds' in math,
+            '60Hz capture opt-in': 'WheelFFBXForceCapture60Hz' in core and 'XForceCapture60Hz = false' in ini,
+            'capture excluded from named profiles': 'key != "XForceCapture60Hz"' in profiles,
+            'native gain migrated': 'values.find("xforcegain") == values.end()' in profiles,
+            'runtime analysis API wired': 'WheelFFB_GetXForceAnalysisSnapshot' in runtime and 'WheelFFB_GetXForceAnalysisSnapshot' in ui,
+            'live controls smoothed': 'smoothedXForceMix_' in core and 'smoothedXForceGain_' in core,
+            'no accidental CR characters in runtime header': '\r' not in runtime,
+          }
+          failed=[name for name,ok in checks.items() if not ok]
+          for name,ok in checks.items(): print(('OK ' if ok else 'FAIL ')+name)
+          if failed: raise SystemExit('semantic audit failed: '+', '.join(failed))
+          PY
+
+      - name: Configure Win32 Release
+        shell: pwsh
+        run: |
+          mkdir build
+          cd build
+          cmake -G "Visual Studio 17 2022" -A Win32 ..
+
+      - name: Add older VC2022 redist workaround to safetyhook
+        shell: pwsh
+        run: |
+          (Get-Content build/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/zydis-build/zycore/Zycore.vcxproj
+
+      - name: Zero out SDL_gameinputjoystick.c
+        shell: pwsh
+        run: |
+          Set-Content -Path build/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Debug pass 4 - Win32 Release compile
+        shell: pwsh
+        run: cmake --build build --config Release
+
+      - name: Copy settings
+        shell: pwsh
+        run: |
+          cp OutRun2006Tweaks.ini build/bin/OutRun2006Tweaks.ini
+          cp OutRun2006Tweaks.lods.ini build/bin/OutRun2006Tweaks.lods.ini
+
+      - name: Debug pass 5 - payload, markers and repeated regressions
+        shell: pwsh
+        run: |
+          python tools/verify_wheel_ffb_current.py
+          cmd /c 'call "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat" && python tools/verify_wheel_ffb_math.py' | Write-Host
+          if ($LASTEXITCODE -ne 0) { throw "repeated math verification failed" }
+          $dllPath = "build/bin/dinput8.dll"
+          if (-not (Test-Path $dllPath)) { throw "dinput8.dll was not produced" }
+          $bytes = [System.IO.File]::ReadAllBytes($dllPath)
+          if ($bytes.Length -lt 1000000) { throw "dinput8.dll is unexpectedly small" }
+          if ($bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw "dinput8.dll has no MZ header" }
+          $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+          $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
+          if ($machine -ne 0x014C) { throw ("expected Win32 x86 DLL, machine=0x{0:X4}" -f $machine) }
+          $ascii = [Text.Encoding]::ASCII.GetString($bytes)
+          foreach ($marker in @(
+            "WheelFFB XFORCE60",
+            "WheelFFB XFORCE ANALYSIS",
+            "X-Force signal confidence",
+            "Native X-Force Gain",
+            "Capture X-Force validation at 60 Hz",
+            "Feedback Character",
+            "Arcade / X-Force candidate",
+            "zero-force live SetParameters",
+            "next compatible interface will be probed on the next update tick"
+          )) {
+            if (-not $ascii.Contains($marker)) { throw "missing compiled marker: $marker" }
+          }
+          $ini = Get-Content build/bin/OutRun2006Tweaks.ini -Raw
+          if ($ini -notmatch '(?m)^FeedbackCharacter\s*=\s*0\s*$') { throw "Modern DD is not default" }
+          if ($ini -notmatch '(?m)^XForceGain\s*=\s*1\.00\s*$') { throw "native gain is not neutral" }
+          if ($ini -notmatch '(?m)^XForceCapture60Hz\s*=\s*false\s*$') { throw "60 Hz capture is not disabled by default" }
+          Get-FileHash $dllPath -Algorithm SHA256
+
+      - name: Commit reviewed source and remove one-shot tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm tools/apply_v03_xforce_deepening.py tools/v03_xforce_deepening.trigger .github/workflows/v03-xforce-deepening.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src OutRun2006Tweaks.ini tools/test_wheel_ffb_current.cpp tools/verify_wheel_ffb_current.py .github/workflows/build.yml
+          git diff --cached --check
+          git commit -m "feat: deepen v0.3 native X-Force validation and controls [skip ci]"
+          git push origin HEAD:wheel-ffb-v0.3-xforce
+
+      - name: Upload compiled v0.3 test build
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: outrun2006tweaks-v0.3-xforce-deepened-${{ github.run_id }}
+          path: build/bin/
