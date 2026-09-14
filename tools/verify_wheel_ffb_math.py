@@ -4,7 +4,13 @@ import os
 import shutil
 import subprocess
 import tempfile
+
 ROOT = Path(__file__).resolve().parent.parent
+ANALYZER = ROOT / 'tools/analyze_xforce_capture.py'
+# Keep the diagnostic analyzer under CI syntax coverage without executing its
+# CLI or requiring a captured game log.
+compile(ANALYZER.read_text(encoding='utf-8'), str(ANALYZER), 'exec')
+
 compiler = os.environ.get('CXX') or shutil.which('c++') or shutil.which('g++') or shutil.which('clang++') or shutil.which('cl')
 if not compiler:
     raise SystemExit('C++ compiler required: run in VS Developer Prompt or set CXX')
