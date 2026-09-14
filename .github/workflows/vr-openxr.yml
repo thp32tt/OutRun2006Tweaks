@@ -44,18 +44,22 @@ jobs:
           }
 
           $renderer = Get-Content src/vr_renderer_probe.cpp -Raw
-          foreach ($marker in @('BeginSceneVtableIndex = 41','EndSceneVtableIndex = 42','HostPoseStaleMs = 250','ImageContainsRange','VirtualQuery','ClientRendererWvpVerified','ClientRendererUploadFailed','YawOnly','frame-latched c64 WVP injection armed')) {
+          foreach ($marker in @('BeginSceneVtableIndex = 41','EndSceneVtableIndex = 42','HostPoseStaleMs = 250','ImageContainsRange','VirtualQuery','ClientRendererWvpVerified','ClientRendererUploadFailed','YawOnly','frame-latched c64 WVP injection armed','GetLatchedStereoFrame','GetCurrentShaderEpoch','IsInternalStereoPassActive','InvalidateVerifiedWvp')) {
             if (-not $renderer.Contains($marker)) { throw "missing renderer safety marker: $marker" }
           }
 
           $stereo = Get-Content src/vr_stereo.cpp -Raw
-          foreach ($marker in @('DrawPrimitiveVtableIndex = 81','DrawIndexedPrimitiveVtableIndex = 82','DrawPrimitiveUPVtableIndex = 83','DrawIndexedPrimitiveUPVtableIndex = 84','SetDepthStencilSurfaceVtableIndex = 39','StereoSbsActive','ProjectionFromFov','BuildEyeConstants','GetVertexShaderConstantF','SetWvpOneRegisterAtATime','ComposeSbs','RightEyeSurface','Simulation, input, timers, native FFB')) {
+          foreach ($marker in @('DrawPrimitiveVtableIndex = 81','DrawIndexedPrimitiveVtableIndex = 82','DrawPrimitiveUPVtableIndex = 83','DrawIndexedPrimitiveUPVtableIndex = 84','SetDepthStencilSurfaceVtableIndex = 39','StereoSbsActive','ProjectionFromFov','BuildEyeConstants','GetVertexShaderConstantF','SetWvpOneRegisterAtATime','ComposeSbs','RightEyeSurface','Simulation, input, timers, native FFB','GetLatchedStereoFrame','GetCurrentShaderEpoch','AnyAuxRenderTargetActive','GetViewport','SetViewport','ClientStereoPresentQpcLowIndex','QueryPerformanceCounter(&presentStart)','FrameStereoPoseSequence')) {
             if (-not $stereo.Contains($marker)) { throw "missing stereo renderer marker: $marker" }
           }
+          if ($stereo.Contains('ReadStereoSnapshot')) { throw 'stereo renderer must not resample shared pose per draw' }
           if ($stereo.Contains('Game::ModeControl()') -or $stereo.Contains('Game::EventControl()') -or $stereo.Contains('WheelFFB_ServiceSafety')) { throw 'stereo renderer must never execute simulation/input/FFB' }
+          $presentCall = $stereo.IndexOf('const HRESULT hr = PresentHook.stdcall<HRESULT>')
+          $activePublish = $stereo.IndexOf('PublishStereoState(OutRunVR::StereoSbsActive', $presentCall)
+          if ($presentCall -lt 0 -or $activePublish -lt $presentCall) { throw 'active stereo metadata must publish only after the real Present call' }
 
           $shared = Get-Content src/vr_shared.hpp -Raw
-          foreach ($marker in @('static_assert(sizeof(SharedPoseState) == 248)','StereoViewsValid','HostEyeOffsetLeftXIndex','HostEyeOffsetRightXIndex','ClientStereoStateIndex','ClientStereoFrameIndex','ClientStereoBackbufferWidthIndex','ClientStereoBackbufferHeightIndex')) {
+          foreach ($marker in @('static_assert(sizeof(SharedPoseState) == 248)','StereoViewsValid','HostEyeOffsetLeftXIndex','HostEyeOffsetRightXIndex','ClientStereoStateIndex','ClientStereoFrameIndex','ClientStereoBackbufferWidthIndex','ClientStereoBackbufferHeightIndex','clientStereoPoseSequence','ClientStereoPresentQpcLowIndex','LatchedStereoFrame')) {
             if (-not $shared.Contains($marker)) { throw "missing stereo IPC ABI marker: $marker" }
           }
 
@@ -119,10 +123,14 @@ jobs:
         shell: pwsh
         run: |
           $src = Get-Content vrhost/main_stereo.cpp -Raw
-          foreach ($marker in @('DXGI_FORMAT_R16G16B16A16_FLOAT','QuerySdrWhiteScale','XrCompositionLayerProjectionView','XrCompositionLayerProjection','imageArrayIndex=eye','arraySize=2','StereoSbsActive','RenderTheater','EnsureTheaterAnchor','xrRequestExitSession','fs.shouldRender==XR_TRUE','StereoViewsValid','HostEyeOffsetLeftXIndex')) {
+          foreach ($marker in @('DXGI_FORMAT_R16G16B16A16_FLOAT','QuerySdrWhiteScale','XrCompositionLayerProjectionView','XrCompositionLayerProjection','imageArrayIndex=eye','arraySize=2','StereoSbsActive','RenderTheater','EnsureTheaterAnchor','xrRequestExitSession','fs.shouldRender==XR_TRUE','StereoViewsValid','HostEyeOffsetLeftXIndex','ViewHistory','ReadStereoMeta','CommitStereoSource','StereoGraceMs','ClientStereoPresentQpcLowIndex','QpcLowAtOrAfter')) {
             if (-not $src.Contains($marker)) { throw "missing true-stereo host marker: $marker" }
           }
           if ($src.Contains('context_->Flush()')) { throw 'per-frame D3D11 Flush must not return' }
+          $gameplayStart = $src.IndexOf('if (presentation == OutRunVR::PresentationGameplay)')
+          $theaterCall = $src.IndexOf('compositor.RenderTheater', $gameplayStart)
+          $gameplayClose = $src.IndexOf('else if (capture.available', $gameplayStart)
+          if ($gameplayStart -lt 0 -or $gameplayClose -lt 0 -or $theaterCall -lt $gameplayClose) { throw 'gameplay stereo miss must not fall through to LOCAL theater' }
           $shader = Get-Content vrhost/stereo_shader.hpp -Raw
           foreach ($marker in @('UvScale','UvOffset','SrgbToLinear','SourceIsScRgb','linearColor')) { if (-not $shader.Contains($marker)) { throw "missing stereo shader marker: $marker" } }
 
