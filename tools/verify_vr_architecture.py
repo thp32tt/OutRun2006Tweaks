@@ -6,8 +6,12 @@ required = [
     # Verified OutRun-specific assets retained during reconstruction.
     'src/vr/settings.cpp',
     'src/vr/game/outrun_renderer.cpp',
+    'src/vr/game/outrun_renderer_r13.cpp',
     'src/vr/d3d9/stereo_renderer.cpp',
+    'src/vr/d3d9/stereo_renderer_r13.cpp',
     'src/vr/d3d9/ex_device_upgrade.cpp',
+    'src/vr/d3d9/ex_device_upgrade_r13.cpp',
+    'src/vr/d3d9/r13_bridge.hpp',
     'src/vr/ipc/protocol.hpp',
     # New architecture foundation.
     'src/vr/core/frame_types.hpp',
@@ -112,6 +116,15 @@ for marker in (
     if marker not in renderer:
         raise SystemExit(f'missing OutRun renderer invariant: {marker}')
 
+renderer_r13 = (ROOT / 'src/vr/game/outrun_renderer_r13.cpp').read_text(encoding='utf-8')
+for marker in (
+    'IsMainBackbufferPoseInjectionPass',
+    'auxiliary/offscreen c64 WVP kept stock',
+    'SetVertexShaderConstantFDestR13',
+):
+    if marker not in renderer_r13:
+        raise SystemExit(f'missing R13 offscreen-WVP hardening invariant: {marker}')
+
 stereo = (ROOT / 'src/vr/d3d9/stereo_renderer.cpp').read_text(encoding='utf-8')
 for marker in (
     'RenderFrameRingSize', 'IDirect3DDevice9Ex', 'GetAdapterLUID',
@@ -122,6 +135,15 @@ for marker in (
 for forbidden_call in ('Game::ModeControl()', 'Game::EventControl()', 'WheelFFB_ServiceSafety'):
     if forbidden_call in stereo:
         raise SystemExit(f'VR render backend must not execute game/FFB tick: {forbidden_call}')
+
+stereo_r13 = (ROOT / 'src/vr/d3d9/stereo_renderer_r13.cpp').read_text(encoding='utf-8')
+for marker in (
+    'ResetDestR13', 'ResetCompatDevice', 'ResolveDirectTransportR13',
+    'HostDirectGpuCompletedFrameIndex', 'GPU-completion direct-ring backpressure',
+    'IsMainBackbufferPoseInjectionPass',
+):
+    if marker not in stereo_r13:
+        raise SystemExit(f'missing R13 stereo hardening invariant: {marker}')
 
 # D3D9Ex stays opt-in, but when selected it must preserve the legacy game's
 # managed-resource expectations without changing the COM identity of the game
@@ -141,6 +163,15 @@ for marker in (
 if 'Settings::VRPreferD3D9Ex.needs_restart()' not in ex_compat:
     raise SystemExit('D3D9Ex promotion must remain an explicit restart-only option')
 
+ex_r13 = (ROOT / 'src/vr/d3d9/ex_device_upgrade_r13.cpp').read_text(encoding='utf-8')
+for marker in (
+    'DisarmLegacyResetHook', 'ResetCompatDevice', 'TextureLockRectR13',
+    'TextureUnlockRectR13', 'translated MANAGED texture LockRect',
+    'stereo Reset callback is sole reset owner',
+):
+    if marker not in ex_r13:
+        raise SystemExit(f'missing R13 D3D9Ex compatibility invariant: {marker}')
+
 host = (ROOT / 'vrhost/src/main.cpp').read_text(encoding='utf-8')
 for marker in (
     'XR_KHR_D3D11_ENABLE_EXTENSION_NAME', 'OpenSharedResource',
@@ -151,21 +182,30 @@ for marker in (
     if marker not in host:
         raise SystemExit(f'missing live host comparison invariant: {marker}')
 
-# R10 remains the fallback for classic D3D9. A direct Frame.v2 may bypass R10
-# only after the host has proved that shared L/R textures are ready and ACKed
-# the exact same frameId. This prevents a published-but-unopened shared handle
-# from being mistaken for a successful zero-copy projection.
+# R13 separates "host opened this shared frame" from "the D3D11 GPU finished
+# sampling this shared frame". Only the latter may authorize D3D9 ring reuse.
 direct_arbitration = (ROOT / 'vrhost/src/runtime/d3d9ex_direct_passthrough.hpp').read_text(encoding='utf-8')
 for marker in (
-    'RenderFrameDirectGpuTransport', 'IncomingProjectionValid',
-    'HostDirectGpuReady', 'hostDirectConsumedFrameId', 'HostAckedDirectFrame',
-    'DirectFrameReady', 'ZERO-COPY projection passthrough ACTIVE',
-    'exact host shared-eye ACK',
+    'IncomingProjectionValid', 'HostDirectGpuReady', 'hostDirectConsumedFrameId',
+    'HostDirectGpuCompletedFrameIndex', 'D3D11_QUERY_EVENT',
+    'MarkGpuConsumptionComplete', 'GPU-consumer completion ACK active',
+    'FallbackSourceMaxAgeMs', 'stale Desktop Duplication source invalidated',
+    'ZERO-COPY projection passthrough ACTIVE',
     'OutRunVrFinalTest::EndFrame(session, endInfo)',
     'OutRunVrSbsCaptureOverride::EndFrame(session, endInfo)',
 ):
     if marker not in direct_arbitration:
-        raise SystemExit(f'missing D3D9Ex/R10 output arbitration invariant: {marker}')
+        raise SystemExit(f'missing R13 D3D9Ex/R10 arbitration invariant: {marker}')
+
+bridge = (ROOT / 'src/vr/d3d9/r13_bridge.hpp').read_text(encoding='utf-8')
+for marker in ('HostDirectGpuCompletedFrameIndex = 15', 'ResetCompatDevice', 'IsMainBackbufferPoseInjectionPass'):
+    if marker not in bridge:
+        raise SystemExit(f'missing R13 cross-TU bridge invariant: {marker}')
+
+cmake_root = (ROOT / 'cmake.toml').read_text(encoding='utf-8')
+for marker in ('ex_device_upgrade.cpp', 'stereo_renderer.cpp', 'outrun_renderer.cpp', 'HEADER_FILE_ONLY TRUE'):
+    if marker not in cmake_root:
+        raise SystemExit(f'root build does not preserve R13 wrapper ownership: {marker}')
 
 runtime_boundary = (ROOT / 'vrhost/src/runtime/vr_runtime.hpp').read_text(encoding='utf-8')
 if 'class IVrRuntime' not in runtime_boundary or 'requiredAdapter' not in runtime_boundary:
