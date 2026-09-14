@@ -21,19 +21,22 @@
 // exact rendered-frame timing/effective eye poses remain published through the 4-slot
 // frame ring until the frame transport itself is fully migrated.
 //
-// PreferD3D9Ex remains an experimental opt-in. Hardware crash evidence on the stock
-// OutRun renderer shows that native D3D9Ex rejects classic D3DPOOL_MANAGED resources
-// still used by the game/Tweaks after CreateDeviceEx succeeds. The safe default therefore
-// keeps the original D3D9 device and uses the true-stereo SBS -> Desktop Duplication ->
-// OpenXR transport. When explicitly enabled, the existing same-adapter shared-eye ring
-// can still be exercised for targeted D3D9Ex/zero-copy diagnostics. A third-party d3d9
-// provider is never bypassed, and CreateDeviceEx failure still falls back immediately.
+// PreferD3D9Ex remains an experimental opt-in. Hardware testing proved that simply
+// promoting the stock game to IDirect3DDevice9Ex is insufficient because OutRun/Tweaks
+// still requests classic D3DPOOL_MANAGED resources. The experimental path now installs
+// a managed-resource compatibility layer before the Ex device is returned to the game:
+// legacy MANAGED buffers are translated to persistent DEFAULT resources, lockable
+// texture families prefer DEFAULT|DYNAMIC, and legacy Reset calls are redirected to
+// ResetEx so those translated resources survive swap-chain resets. The safe default
+// remains classic D3D9 until the compatibility layer and direct shared-eye ring are
+// hardware-proven. Third-party d3d9 providers are never bypassed; any Ex creation or
+// compatibility-hook failure falls back to the original D3D9 CreateDevice path.
 //
-// The PC monitor is the transport surface, not a third 3D view: gameplay Present
-// contains the two already-rendered eyes side-by-side. The x64 host Desktop-Duplicates
-// that SBS image and crops each half for OpenXR when verified shared-eye transport is
-// unavailable. This costs resolve/copy bandwidth but does not execute OutRun's scene a
-// third time for the monitor.
+// The PC monitor is the transport surface only on the classic fallback path: gameplay
+// Present contains the two already-rendered eyes side-by-side and the x64 host crops
+// each half after Desktop Duplication. With verified D3D9Ex direct transport the host
+// instead opens the shared L/R eye textures on the same adapter and submits those to
+// OpenXR without recapturing the desktop.
 namespace Settings
 {
 	Setting<bool> VREnabled{ "VR", "Enabled", true,
@@ -45,7 +48,7 @@ namespace Settings
 	Setting<bool> VRStereo{ "VR", "Stereo", true,
 		"Renders true left/right geometry stereo into an SBS game frame or verified shared-eye transport. Menus remain on the fixed theater quad." };
 	Setting<bool> VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", false,
-		"Experimental zero-copy transport. Native D3D9Ex rejects classic D3DPOOL_MANAGED resources used by OutRun/Tweaks, so this is disabled by default. Leave false for the compatible true-stereo SBS/Desktop Duplication path; enable only for targeted D3D9Ex diagnostics." };
+		"Experimental zero-copy transport. Enables the D3D9Ex managed-resource compatibility layer and shared L/R GPU eye ring. Leave false for the proven classic-D3D9 SBS/Desktop Duplication fallback until Ex hardware validation is complete." };
 	Setting<bool> VRPositionalTracking{ "VR", "PositionalTracking", true,
 		"Applies 6DoF HMD X/Y/Z movement in addition to orientation. Disable this option if a title-specific camera/culling issue is observed; stereo eye separation is independent." };
 	Setting<bool> VRCullingCameraSync{ "VR", "CullingCameraSync", true,
@@ -73,7 +76,7 @@ namespace OutRunVR
 
 		bool apply() override
 		{
-			spdlog::info("VR: renderer-boundary head tracking + true stereo + 6DoF + plain-D3D9 SBS fallback default; D3D9Ex zero-copy remains opt-in; CalcCameraMatrix remains untouched");
+			spdlog::info("VR: renderer-boundary head tracking + true stereo + 6DoF + classic-D3D9 SBS fallback default; D3D9Ex managed-resource-compatible zero-copy remains opt-in; CalcCameraMatrix remains untouched");
 			return true;
 		}
 
