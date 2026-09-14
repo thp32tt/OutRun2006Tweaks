@@ -677,53 +677,6 @@ namespace
             return true;
         }
 
-        bool InitializeLegacyCaptureRemoved()
-        {
-            targetMonitor_ = MonitorFromWindow(hwnd_, MONITOR_DEFAULTTONEAREST);
-            sdrWhiteScale_ = QuerySdrWhiteScale(targetMonitor_);
-
-            IDXGIDevice* dxgi = nullptr;
-            CheckHr(device_->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(&dxgi)),
-                "ID3D11Device->IDXGIDevice");
-            IDXGIAdapter* adapter = nullptr;
-            CheckHr(dxgi->GetAdapter(&adapter), "IDXGIDevice::GetAdapter");
-            dxgi->Release();
-
-            IDXGIOutput* selected = nullptr;
-            DXGI_OUTPUT_DESC desc{};
-            for (UINT i = 0;; ++i)
-            {
-                IDXGIOutput* out = nullptr;
-                if (adapter->EnumOutputs(i, &out) == DXGI_ERROR_NOT_FOUND) break;
-                DXGI_OUTPUT_DESC d{};
-                out->GetDesc(&d);
-                if (d.Monitor == targetMonitor_)
-                {
-                    selected = out;
-                    desc = d;
-                    break;
-                }
-                out->Release();
-            }
-            adapter->Release();
-            if (!selected) throw std::runtime_error("game monitor is not on OpenXR GPU");
-            selected->QueryInterface(__uuidof(IDXGIOutput1), reinterpret_cast<void**>(&output1_));
-            selected->QueryInterface(__uuidof(IDXGIOutput5), reinterpret_cast<void**>(&output5_));
-            selected->Release();
-            if (!output1_) throw std::runtime_error("IDXGIOutput1 unavailable");
-            outputDesktop_ = desc.DesktopCoordinates;
-
-            CreateShaders();
-            RecreateDuplication(true);
-            ChooseSwapchainFormat();
-            CreateProjectionSwapchain();
-            CreateTheaterSwapchain();
-            std::cout << "OpenXR true stereo ready: projection " << projection_.width << "x"
-                << projection_.height << "x2; theater " << theater_.width << "x"
-                << theater_.height << ".\n";
-            return true;
-        }
-
         CaptureStatus Capture(DWORD timeoutMs=0)
         {
             if(!IsWindow(hwnd_)){if(HWND replacement=FindGameWindow(gamePid_))hwnd_=replacement;}

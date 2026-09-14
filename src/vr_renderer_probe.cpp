@@ -840,22 +840,46 @@ namespace OutRunVRRenderer
 				LatchedStereo.poseSequence = sample.sequence;
 				LatchedStereo.eyeFov[0] = sample.eyeFov[0]; LatchedStereo.eyeFov[1] = sample.eyeFov[1];
 				std::memcpy(LatchedStereo.eyeOffset, sample.eyeOffset, sizeof(LatchedStereo.eyeOffset));
-				const Quat effectiveHeadOrientation = Multiply(Normalize(CenterOrientation), relativeOrientation);
-				Vec3 effectiveHeadPosition = sample.position;
-				if (!Settings::VRPositionalTracking || !sample.positionValid) effectiveHeadPosition = CenterPositionValid ? CenterPosition : sample.position;
+				const Quat effectiveHeadOrientation = Normalize(
+					Multiply(Normalize(CenterOrientation), relativeOrientation));
+				Vec3 effectiveHeadPosition = CenterPositionValid ? CenterPosition : sample.position;
+				if (Settings::VRPositionalTracking && sample.positionValid && CenterPositionValid)
+				{
+					const Vec3 delta{
+						sample.position.x - CenterPosition.x,
+						sample.position.y - CenterPosition.y,
+						sample.position.z - CenterPosition.z
+					};
+					effectiveHeadPosition = {
+						CenterPosition.x + delta.x * Settings::VRWorldScale,
+						CenterPosition.y + delta.y * Settings::VRWorldScale,
+						CenterPosition.z + delta.z * Settings::VRWorldScale
+					};
+				}
 				for (int eye = 0; eye < 2; ++eye)
 				{
 					const Quat eyeOrientation = sample.eyeOrientation[eye];
-					LatchedStereo.eyeOrientation[eye][0]=eyeOrientation.x; LatchedStereo.eyeOrientation[eye][1]=eyeOrientation.y;
-					LatchedStereo.eyeOrientation[eye][2]=eyeOrientation.z; LatchedStereo.eyeOrientation[eye][3]=eyeOrientation.w;
-					const Quat effectiveEyeOrientation = Multiply(effectiveHeadOrientation, eyeOrientation);
-					LatchedStereo.effectiveEyeOrientation[eye][0]=effectiveEyeOrientation.x; LatchedStereo.effectiveEyeOrientation[eye][1]=effectiveEyeOrientation.y;
-					LatchedStereo.effectiveEyeOrientation[eye][2]=effectiveEyeOrientation.z; LatchedStereo.effectiveEyeOrientation[eye][3]=effectiveEyeOrientation.w;
-					const Vec3 localEye{sample.eyeOffset[eye][0], sample.eyeOffset[eye][1], sample.eyeOffset[eye][2]};
+					LatchedStereo.eyeOrientation[eye][0] = eyeOrientation.x;
+					LatchedStereo.eyeOrientation[eye][1] = eyeOrientation.y;
+					LatchedStereo.eyeOrientation[eye][2] = eyeOrientation.z;
+					LatchedStereo.eyeOrientation[eye][3] = eyeOrientation.w;
+
+					const Quat effectiveEyeOrientation = Normalize(
+						Multiply(effectiveHeadOrientation, eyeOrientation));
+					LatchedStereo.effectiveEyeOrientation[eye][0] = effectiveEyeOrientation.x;
+					LatchedStereo.effectiveEyeOrientation[eye][1] = effectiveEyeOrientation.y;
+					LatchedStereo.effectiveEyeOrientation[eye][2] = effectiveEyeOrientation.z;
+					LatchedStereo.effectiveEyeOrientation[eye][3] = effectiveEyeOrientation.w;
+
+					const Vec3 localEye{
+						sample.eyeOffset[eye][0] * Settings::VRWorldScale,
+						sample.eyeOffset[eye][1] * Settings::VRWorldScale,
+						sample.eyeOffset[eye][2] * Settings::VRWorldScale
+					};
 					const Vec3 worldEye = RotateVector(effectiveHeadOrientation, localEye);
-					LatchedStereo.effectiveEyePosition[eye][0]=effectiveHeadPosition.x+worldEye.x;
-					LatchedStereo.effectiveEyePosition[eye][1]=effectiveHeadPosition.y+worldEye.y;
-					LatchedStereo.effectiveEyePosition[eye][2]=effectiveHeadPosition.z+worldEye.z;
+					LatchedStereo.effectiveEyePosition[eye][0] = effectiveHeadPosition.x + worldEye.x;
+					LatchedStereo.effectiveEyePosition[eye][1] = effectiveHeadPosition.y + worldEye.y;
+					LatchedStereo.effectiveEyePosition[eye][2] = effectiveHeadPosition.z + worldEye.z;
 				}
 			}
 
