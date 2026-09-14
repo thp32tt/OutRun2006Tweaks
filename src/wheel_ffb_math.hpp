@@ -166,7 +166,10 @@ namespace WheelFFBMath
     inline constexpr float XForceNearZeroThreshold = 0.25f;
     inline constexpr float XForceStoppedSpeed = 0.025f;
     inline constexpr float XForceResumeSpeed = 0.040f;
-    inline constexpr float XForceFreshDelta = 0.020f;
+    // A post-stop value must move at least one near-zero/noise-band unit before
+    // a non-zero native source can be trusted again. This prevents sub-noise
+    // jitter from certifying a stale actionforce_DBC sample as fresh.
+    inline constexpr float XForceFreshDelta = 0.25f;
     inline constexpr float XForceUnresponsiveSeconds = 0.50f;
     inline constexpr float XForceBlendInSeconds = 0.20f;
     inline constexpr float XForceBlendOutSeconds = 0.10f;
@@ -229,6 +232,8 @@ namespace WheelFFBMath
             // Hysteresis prevents near-zero speed noise from repeatedly
             // entering/leaving the stopped state. Stopped native torque is a
             // hard zero because the source can retain its last value at rest.
+            // A real stop is also a trust boundary: a future launch must prove
+            // freshness again rather than inheriting old session state.
             if (stopped_)
             {
                 if (speedNorm < XForceResumeSpeed)
@@ -238,10 +243,11 @@ namespace WheelFFBMath
                         stoppedRaw_ = raw;
                         baselineCaptured_ = true;
                     }
+                    responseObserved_ = false;
                     nativeBlend_ = 0.0f;
                     lastNormalized_ = 0.0f;
                     unresponsiveSeconds_ = 0.0f;
-                    out.responseObserved = responseObserved_;
+                    out.responseObserved = false;
                     out.stopped = true;
                     return out;
                 }
@@ -257,10 +263,11 @@ namespace WheelFFBMath
                         stoppedRaw_ = raw;
                         baselineCaptured_ = true;
                     }
+                    responseObserved_ = false;
                     nativeBlend_ = 0.0f;
                     lastNormalized_ = 0.0f;
                     unresponsiveSeconds_ = 0.0f;
-                    out.responseObserved = responseObserved_;
+                    out.responseObserved = false;
                     out.stopped = false;
                     return out;
                 }
@@ -278,34 +285,87 @@ namespace WheelFFBMath
                     stoppedRaw_ = raw;
                     baselineCaptured_ = true;
                 }
+                responseObserved_ = false;
                 nativeBlend_ = 0.0f;
                 lastNormalized_ = 0.0f;
                 unresponsiveSeconds_ = 0.0f;
-                out.responseObserved = responseObserved_;
+                out.responseObserved = false;
                 out.stopped = true;
                 return out;
             }
 
-            if (out.rangeValid && steerAbs >= 0.05f &&
-                std::abs(raw) >= XForceResponseThreshold)
+            const float motionGate = smoothstep01(
+                (speedNorm - XForceResumeSpeed) / 0.12f);
+
+            // NaN/Inf or an implausible magnitude is not an ordinary zero
+            // crossing. Fail closed immediately and require a new moving
+            // baseline before native torque may arm again. The downstream
+            // structural slew limiter still smooths the physical wheel output.
+            if (!out.rangeValid)
             {
-                responseObserved_ = true;
+                responseObserved_ = false;
+                stopped_ = true;
+                awaitingFreshAfterStop_ = true;
+                baselineCaptured_ = false;
+                nativeBlend_ = 0.0f;
+                lastNormalized_ = 0.0f;
+                unresponsiveSeconds_ = 0.0f;
+                out.responseObserved = false;
+                out.responsive = false;
+                out.freshAfterStop = false;
+                out.valid = false;
+                out.stopped = false;
+                out.normalized = 0.0f;
+                out.motionGate = motionGate;
+                out.nativeBlend = 0.0f;
+                out.unresponsiveSeconds = 0.0f;
+                return out;
             }
 
-            // A non-zero value frozen at the stop point must not be replayed
-            // when the car starts moving. Zero is safe to accept immediately;
-            // otherwise wait until the game changes the source value.
-            if (awaitingFreshAfterStop_ && out.rangeValid &&
+            // The analyzer observes signed steering, front slip and yaw over a
+            // short time window. A confirmed non-zero freeze is therefore a
+            // hard source fault, not something that should replay last torque
+            // during the normal 100 ms crossfade. Force a fresh-baseline cycle.
+            if (sourceFrozen)
+            {
+                responseObserved_ = false;
+                stopped_ = true;
+                awaitingFreshAfterStop_ = true;
+                baselineCaptured_ = false;
+                nativeBlend_ = 0.0f;
+                lastNormalized_ = 0.0f;
+                unresponsiveSeconds_ = 0.0f;
+                out.responseObserved = false;
+                out.responsive = false;
+                out.freshAfterStop = false;
+                out.valid = false;
+                out.stopped = false;
+                out.normalized = 0.0f;
+                out.motionGate = motionGate;
+                out.nativeBlend = 0.0f;
+                out.unresponsiveSeconds = 0.0f;
+                return out;
+            }
+
+            // Freshness is a prerequisite for liveness. A stale non-zero stop
+            // value must never set responseObserved_ before it has changed.
+            if (awaitingFreshAfterStop_ &&
                 (std::abs(raw) < XForceNearZeroThreshold ||
                  std::abs(raw - stoppedRaw_) >= XForceFreshDelta))
             {
                 awaitingFreshAfterStop_ = false;
             }
 
+            if (!awaitingFreshAfterStop_ && steerAbs >= 0.05f &&
+                std::abs(raw) >= XForceResponseThreshold)
+            {
+                responseObserved_ = true;
+            }
+
             // A true zero crossing is allowed. Only call the candidate dead
             // after about half a second of near-zero output while the driver is
             // clearly steering a moving car. The timer is cadence-independent.
-            if (out.rangeValid && steerAbs >= 0.15f && speedNorm >= 0.08f)
+            if (steerAbs >= 0.15f && speedNorm >= 0.08f)
             {
                 if (std::abs(raw) < XForceNearZeroThreshold)
                     unresponsiveSeconds_ = std::min(
@@ -317,12 +377,17 @@ namespace WheelFFBMath
             {
                 unresponsiveSeconds_ = 0.0f;
             }
+
+            // A confirmed dead source must not carry old session trust into a
+            // later sample. A subsequent non-zero sample can prove liveness again.
+            if (unresponsiveSeconds_ >= XForceUnresponsiveSeconds)
+                responseObserved_ = false;
+
             const bool responsiveNow = responseObserved_ &&
                 unresponsiveSeconds_ < XForceUnresponsiveSeconds &&
-            !sourceFrozen;
+                !sourceFrozen;
 
             float currentNormalized = 0.0f;
-            if (out.rangeValid)
             {
                 const float magnitude = std::max(
                     0.0f, std::abs(raw) - XForceNoiseFloor);
@@ -351,8 +416,7 @@ namespace WheelFFBMath
             out.freshAfterStop = !awaitingFreshAfterStop_;
             out.stopped = false;
             out.normalized = out.valid ? currentNormalized : lastNormalized_;
-            out.motionGate = smoothstep01(
-                (speedNorm - XForceResumeSpeed) / 0.12f);
+            out.motionGate = motionGate;
             out.nativeBlend = nativeBlend_;
             out.unresponsiveSeconds = unresponsiveSeconds_;
             return out;
@@ -400,7 +464,6 @@ namespace WheelFFBMath
         return out;
     }
 
-
     struct XForceAnalysisSnapshot
     {
         std::uint64_t samples = 0;
@@ -419,8 +482,8 @@ namespace WheelFFBMath
     };
 
     // Diagnostic-only analyzer for proving what actionforce_DBC represents.
-    // Confidence and freeze detection never gate wheel torque; they exist to
-    // collect evidence before any stronger native-force assumptions are made.
+    // Confidence and freeze detection are evidence outputs; frozenSuspicious is
+    // also consumed by XForceGuard as a fail-closed safety input.
     class XForceSignalAnalyzer
     {
     public:
