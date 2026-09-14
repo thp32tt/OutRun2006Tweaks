@@ -10,9 +10,6 @@
 #include "game_addrs.hpp"
 #include "hooks_wheel_xforce_research.hpp"
 
-// Implemented by input_manager.cpp. The wheel build already calls this from the
-// normal new-input path; the research hook below only observes after that update.
-void InputManager_Update();
 
 // Second-stage compatibility fixes for legacy DirectInput steering wheels.
 //
@@ -53,43 +50,6 @@ namespace Settings
 
 namespace
 {
-    // The default wheel build uses UseNewInput=true, so the legacy ReadIO hook
-    // below is not installed. Observe the already-existing InputManager_Update
-    // call in that mode instead. This is deliberately an input-side hook, not a
-    // second GamePlCar/physics hook; actual FFB update ownership stays unchanged.
-    class WheelXForceResearchNewInput : public Hook
-    {
-        inline static SafetyHookInline InputUpdateHook = {};
-
-        static void InputManager_Update_dest()
-        {
-            InputUpdateHook.ccall<void>();
-            WheelXForceResearch::capture_neighbors();
-        }
-
-    public:
-        std::string_view description() override
-        {
-            return "WheelXForceResearchNewInput";
-        }
-
-        bool validate() override
-        {
-            return Settings::UseNewInput;
-        }
-
-        bool apply() override
-        {
-            InputUpdateHook = safetyhook::create_inline(
-                reinterpret_cast<void*>(&InputManager_Update), InputManager_Update_dest);
-            return !!InputUpdateHook;
-        }
-
-        static WheelXForceResearchNewInput instance;
-    };
-
-    WheelXForceResearchNewInput WheelXForceResearchNewInput::instance;
-
     class WheelInputCompatibilityV2 : public Hook
     {
         struct Direction

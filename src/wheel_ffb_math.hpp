@@ -243,6 +243,14 @@ namespace WheelFFBMath
                         stoppedRaw_ = raw;
                         baselineCaptured_ = true;
                     }
+                    else
+                    {
+                        // Invalid data at rest is still a hard trust fault. Do
+                        // not retain a pre-fault stopped baseline into launch.
+                        stoppedRaw_ = 0.0f;
+                        baselineCaptured_ = false;
+                    }
+                    awaitingFreshAfterStop_ = true;
                     responseObserved_ = false;
                     nativeBlend_ = 0.0f;
                     lastNormalized_ = 0.0f;

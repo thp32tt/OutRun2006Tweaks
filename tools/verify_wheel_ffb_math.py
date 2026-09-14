@@ -3,6 +3,7 @@ from pathlib import Path
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -10,6 +11,7 @@ ANALYZER = ROOT / 'tools/analyze_xforce_capture.py'
 # Keep the diagnostic analyzer under CI syntax coverage without executing its
 # CLI or requiring a captured game log.
 compile(ANALYZER.read_text(encoding='utf-8'), str(ANALYZER), 'exec')
+subprocess.run([sys.executable, str(ROOT / 'tools/test_xforce_analyzer.py')], check=True)
 
 compiler = os.environ.get('CXX') or shutil.which('c++') or shutil.which('g++') or shutil.which('clang++') or shutil.which('cl')
 if not compiler:

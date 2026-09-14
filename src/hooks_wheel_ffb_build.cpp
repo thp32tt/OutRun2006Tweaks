@@ -716,6 +716,11 @@ namespace
         {
             InputUpdateHook.ccall<void>();
 
+            // Reuse this established input hook for diagnostic capture rather
+            // than stacking another inline hook on InputManager_Update.
+            if (Settings::UseNewInput)
+                WheelXForceResearch::capture_neighbors();
+
             if (!Settings::UseNewInput || !Game::current_mode ||
                 *Game::current_mode == STATE_GAME)
                 return;

@@ -89,6 +89,16 @@ int main() {
  auto xNan=xn.update(std::numeric_limits<float>::quiet_NaN(),.5f,.5f,false);
  require(!xNan.rangeValid&&!xNan.valid&&xNan.nativeBlend==0.0f&&xNan.normalized==0.0f,"X-Force NaN stays fail closed");
 
+ // Invalid data while stopped must discard any pre-fault stopped baseline.
+ XForceGuard xStopFault; xStopFault.reset();
+ xStopFault.update(62.0f,0.0f,.5f,false);
+ auto xStopNan=xStopFault.update(std::numeric_limits<float>::quiet_NaN(),0.0f,.5f,false);
+ auto xStopFaultBaseline=xStopFault.update(40.0f,.20f,.5f,false);
+ auto xStopFaultRecovered=xStopFault.update(39.0f,.20f,.5f,false);
+ require(!xStopNan.rangeValid&&xStopNan.stopped&&!xStopNan.valid,"X-Force stopped hard-invalid is rejected");
+ require(!xStopFaultBaseline.valid&&!xStopFaultBaseline.freshAfterStop&&xStopFaultBaseline.nativeBlend==0.0f,"X-Force stopped fault invalidates old baseline before launch");
+ require(xStopFaultRecovered.valid&&xStopFaultRecovered.freshAfterStop,"X-Force stopped fault requires changed post-baseline sample to re-arm");
+
  // Values inside the normalization/near-zero band must never prove the source
  // alive and fade Modern SAT away by themselves.
  XForceGuard xNoise; xNoise.reset(); xNoise.update(0.0f,0.0f,.5f,false);

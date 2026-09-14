@@ -104,19 +104,27 @@ def pair_rows(physics: Sequence[Row], neighbors: Sequence[Row]) -> List[Tuple[Ro
 
     neighbor_ticks = [row.tick for row in neighbors]
     pairs: List[Tuple[Row, Row, int]] = []
+    next_neighbor = 0
     for physics_row in physics:
-        index = bisect.bisect_left(neighbor_ticks, physics_row.tick)
-        candidates = []
+        # Match only against still-unused input-side records. Reusing one
+        # candidate sample for multiple physics rows biases distributions and
+        # can artificially strengthen correlation.
+        index = bisect.bisect_left(
+            neighbor_ticks, physics_row.tick, lo=next_neighbor)
+        candidate_indices: List[int] = []
         if index < len(neighbors):
-            candidates.append(neighbors[index])
-        if index > 0:
-            candidates.append(neighbors[index - 1])
-        if not candidates:
+            candidate_indices.append(index)
+        if index > next_neighbor:
+            candidate_indices.append(index - 1)
+        if not candidate_indices:
             continue
-        neighbor = min(candidates, key=lambda row: abs(row.tick - physics_row.tick))
-        delta = abs(neighbor.tick - physics_row.tick)
+        chosen = min(
+            candidate_indices,
+            key=lambda i: abs(neighbors[i].tick - physics_row.tick))
+        delta = abs(neighbors[chosen].tick - physics_row.tick)
         if delta <= PAIR_TOLERANCE_MS:
-            pairs.append((physics_row, neighbor, delta))
+            pairs.append((physics_row, neighbors[chosen], delta))
+            next_neighbor = chosen + 1
     return pairs
 
 
