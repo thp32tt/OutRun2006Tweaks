@@ -17,25 +17,27 @@
 // it duplicates final D3D9 draws into full-size left/right eye surfaces and replaces
 // only verified world-draw c64 constants with true per-eye OpenXR transforms.
 // Simulation, input, timers and native FFB are never replayed for the second eye.
-// Pose.v2 carries the OpenXR adapter/interop contract; exact rendered-frame timing/effective eye poses
-// are published through the 4-slot Frame.v2 ring after a successful real D3D9 Present.
+// Pose.v3 is the primary render-pose source with Pose.v2 retained as fail-open fallback;
+// exact rendered-frame timing/effective eye poses remain published through the 4-slot
+// frame ring until the frame transport itself is fully migrated.
 //
 // The PC monitor is the transport surface, not a third 3D view: gameplay Present
 // contains the two already-rendered eyes side-by-side. The x64 host Desktop-Duplicates
-// that SBS image and crops each half for OpenXR. This costs resolve/copy bandwidth but
-// does not execute OutRun's scene a third time for the monitor.
+// that SBS image and crops each half for OpenXR when verified shared-eye transport is
+// unavailable. This costs resolve/copy bandwidth but does not execute OutRun's scene a
+// third time for the monitor.
 namespace Settings
 {
 	Setting<bool> VREnabled{ "VR", "Enabled", true,
-		"Enables the experimental OpenXR renderer-side head-tracking bridge." };
+		"Enables the OpenXR renderer-side VR bridge." };
 	Setting<bool> VRAutoEnableWhenHostPresent{ "VR", "AutoEnableWhenHostPresent", true,
-		"Automatically applies renderer-side head tracking whenever outrun-vr-host.exe is supplying a valid pose." };
+		"Automatically applies renderer-side tracking whenever outrun-vr-host.exe is supplying a valid pose." };
 	Setting<bool> VRHeadTracking{ "VR", "HeadTracking", true,
 		"Applies the OpenXR HMD orientation at OutRun's verified D3D9 WorldViewProjection upload." };
 	Setting<bool> VRStereo{ "VR", "Stereo", true,
-		"Renders true left/right geometry stereo into an SBS game frame. The PC monitor shows that SBS transport; the x64 host splits the two eyes and submits an OpenXR projection layer. Menus remain on the fixed theater quad." };
-	Setting<bool> VRPositionalTracking{ "VR", "PositionalTracking", false,
-		"Also applies HMD X/Y/Z movement. Experimental; eye separation for stereo is applied independently of this setting." };
+		"Renders true left/right geometry stereo into an SBS game frame or verified shared-eye transport. Menus remain on the fixed theater quad." };
+	Setting<bool> VRPositionalTracking{ "VR", "PositionalTracking", true,
+		"Applies 6DoF HMD X/Y/Z movement in addition to orientation. Disable this option if a title-specific camera/culling issue is observed; stereo eye separation is independent." };
 	Setting<bool> VRCullingCameraSync{ "VR", "CullingCameraSync", true,
 		"Temporarily mirrors the render-time VR camera into OutRun's live camera position/look so render-phase culling and camera-facing effects can follow head motion. Restored before game logic resumes." };
 	Setting<bool> VRCullingUnionFov{ "VR", "CullingUnionFov", false,
@@ -48,7 +50,7 @@ namespace Settings
 		"Renderer-side camera-matrix composition order. Leave at 0 unless runtime validation shows the alternate path is required.",
 		{ "WorldView * HeadInverse * Projection", "World * HeadInverse * View * Projection" } };
 	Setting<bool> VRTelemetry{ "VR", "Telemetry", true,
-		"Logs renderer-boundary verification, stereo draw duplication and head-tracking diagnostics." };
+		"Logs renderer-boundary verification, stereo draw duplication, pose source/fallback and head-tracking diagnostics." };
 }
 
 namespace OutRunVR
@@ -61,7 +63,7 @@ namespace OutRunVR
 
 		bool apply() override
 		{
-			spdlog::info("VR: renderer-boundary head tracking + true stereo configured; CalcCameraMatrix remains untouched");
+			spdlog::info("VR: renderer-boundary head tracking + true stereo + 6DoF configured; CalcCameraMatrix remains untouched");
 			return true;
 		}
 
