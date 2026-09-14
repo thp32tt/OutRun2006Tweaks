@@ -1003,9 +1003,14 @@ namespace
             lastXForceFrameTick_ = xForceNow;
 
             const float xForceRaw = car->actionforce_DBC;
+            xForceAnalyzer_.update(
+                xForceRaw, speedNorm, steer, modernSelfAligningTorque,
+                frontSlip, vehicleDynamics_.yawRate(), xForceDeltaSeconds);
+            const WheelFFBMath::XForceAnalysisSnapshot xForceAnalysis =
+                xForceAnalyzer_.snapshot();
             const WheelFFBMath::XForceGuardSample xForceSample = xForceGuard_.update(
                 xForceRaw, speedNorm, steerAbs, bool(Settings::WheelFFBXForceInvert),
-                xForceDeltaSeconds);
+                xForceDeltaSeconds, xForceAnalysis.frozenSuspicious);
 
             const float configuredXForceMix = std::isfinite(
                     static_cast<float>(Settings::WheelFFBXForceMix))
@@ -1031,12 +1036,6 @@ namespace
             const float nativeXForceTorque =
                 xForceSample.normalized * xForceSample.motionGate * satStrength *
                 smoothedXForceGain_;
-
-            xForceAnalyzer_.update(
-                xForceRaw, speedNorm, steer, modernSelfAligningTorque,
-                frontSlip, vehicleDynamics_.yawRate(), xForceDeltaSeconds);
-            const WheelFFBMath::XForceAnalysisSnapshot xForceAnalysis =
-                xForceAnalyzer_.snapshot();
 
             const int feedbackCharacter = std::clamp(
                 static_cast<int>(Settings::WheelFFBFeedbackCharacter), 0, 2);

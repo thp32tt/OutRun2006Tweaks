@@ -81,6 +81,33 @@ int main() {
  XForceGuard xn; xn.reset();
  require(!xn.update(std::numeric_limits<float>::quiet_NaN(),.5f,.5f,false).rangeValid,"X-Force rejects NaN");
 
+ // Values inside the normalization noise floor must never prove the source
+ // alive and fade Modern SAT away by themselves.
+ XForceGuard xNoise; xNoise.reset(); xNoise.update(0.0f,0.0f,.5f,false);
+ XForceGuardSample xNoiseSample{};
+ for(int i=0;i<60;++i)xNoiseSample=xNoise.update(.10f,.20f,.5f,false,1.0f/60.0f);
+ require(!xNoiseSample.responseObserved&&!xNoiseSample.valid&&xNoiseSample.nativeBlend==0.0f,"X-Force sub-noise signal cannot arm native path");
+
+ // A reset that occurs while already moving has no trustworthy stopped
+ // reference. The first moving sample is baseline-only and cannot certify
+ // itself as fresh; an actual subsequent native change is required.
+ XForceGuard xMovingReset; xMovingReset.reset();
+ auto xMovingBaseline=xMovingReset.update(20.0f,.20f,.5f,false);
+ auto xMovingSame=xMovingReset.update(20.0f,.20f,.5f,false);
+ auto xMovingFresh=xMovingReset.update(21.0f,.20f,.5f,false);
+ require(!xMovingBaseline.valid&&!xMovingBaseline.freshAfterStop&&xMovingBaseline.nativeBlend==0.0f,"X-Force moving reset first sample is baseline only");
+ require(!xMovingSame.valid&&!xMovingSame.freshAfterStop,"X-Force moving reset rejects unchanged baseline");
+ require(xMovingFresh.valid&&xMovingFresh.freshAfterStop,"X-Force moving reset requires a subsequent fresh sample");
+
+ // Analyzer freeze suspicion is a safety input to the production guard:
+ // native output must fade toward Modern instead of holding stale torque.
+ XForceGuard xFreezeGuard; xFreezeGuard.reset(); xFreezeGuard.update(0.0f,0.0f,.5f,false);
+ auto xFreezeLive=xFreezeGuard.update(20.0f,.20f,.5f,false);
+ for(int i=0;i<14;++i)xFreezeLive=xFreezeGuard.update(20.0f,.20f,.5f,false,1.0f/60.0f);
+ const float xFreezeBlendBefore=xFreezeLive.nativeBlend;
+ auto xFreezeFallback=xFreezeGuard.update(20.0f,.20f,.5f,false,1.0f/60.0f,true);
+ require(!xFreezeFallback.valid&&!xFreezeFallback.responsive&&xFreezeFallback.nativeBlend<xFreezeBlendBefore,"X-Force frozen source fades to Modern");
+
  // Equal elapsed time at 60/120 Hz must produce nearly the same native blend.
  XForceGuard x60; x60.reset(); x60.update(0.0f,0.0f,.5f,false); x60.update(40.0f,.2f,.5f,false,1.0f/60.0f);
  XForceGuard x120; x120.reset(); x120.update(0.0f,0.0f,.5f,false); x120.update(40.0f,.2f,.5f,false,1.0f/120.0f);
@@ -108,8 +135,10 @@ int main() {
  require(xaSnap.samples==180&&std::abs(xaSnap.corrSteer)>.95f&&std::abs(xaSnap.corrModernSat)>.95f,"X-Force analyzer correlations");
  require(xaSnap.confidence>.75f&&xaSnap.p95Abs>25.0f&&xaSnap.maxAbs>35.0f,"X-Force analyzer confidence/distribution");
  XForceSignalAnalyzer xf; xf.reset();
- for(int i=0;i<45;++i){
-   float changing=float(i)*.04f;
+ for(int i=0;i<60;++i){
+   // Deliberately small per-frame movement: the detector must integrate
+   // ordinary smooth change across its short observation window.
+   float changing=float(i)*.003f;
    xf.update(20.0f,.40f,changing,changing,changing*.2f,changing*.3f,1.0f/60.0f);
  }
  auto xfSnap=xf.snapshot();

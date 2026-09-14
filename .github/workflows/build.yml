@@ -118,6 +118,8 @@ jobs:
           if ($ini -notmatch '(?m)^FeedbackCharacter\s*=\s*0\s*$') { throw "v0.3 must ship with Modern DD as the default feedback character" }
           if ($ini -notmatch '(?m)^XForceMix\s*=\s*0\.50\s*$') { throw "v0.3 Hybrid X-Force mix is not 0.50" }
           if ($ini -notmatch '(?m)^XForceInvert\s*=\s*false\s*$') { throw "v0.3 candidate direction override must ship disabled" }
+          if ($ini -notmatch '(?m)^XForceGain\s*=\s*1\.00\s*$') { throw "v0.3 native X-Force gain must ship neutral at 1.00" }
+          if ($ini -notmatch '(?m)^XForceCapture60Hz\s*=\s*false\s*$') { throw "v0.3 60 Hz X-Force capture must ship disabled" }
 
           Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, v0.3 X-Force character markers present" -f $bytes.Length)
           Get-FileHash $dllPath -Algorithm SHA256

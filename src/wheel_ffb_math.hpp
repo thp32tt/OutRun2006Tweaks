@@ -159,13 +159,19 @@ namespace WheelFFBMath
     inline constexpr float XForceNominalFullScale = 62.0f;
     inline constexpr float XForceAbsoluteSafetyLimit = 128.0f;
     inline constexpr float XForceNoiseFloor = 0.20f;
-    inline constexpr float XForceResponseThreshold = 0.05f;
+    // A candidate must first exceed the normalization noise floor by a
+    // meaningful margin before it can prove that the native source is alive.
+    // Once armed, true zero crossings remain valid for the timed grace period.
+    inline constexpr float XForceResponseThreshold = 0.50f;
+    inline constexpr float XForceNearZeroThreshold = 0.25f;
     inline constexpr float XForceStoppedSpeed = 0.025f;
     inline constexpr float XForceResumeSpeed = 0.040f;
     inline constexpr float XForceFreshDelta = 0.020f;
     inline constexpr float XForceUnresponsiveSeconds = 0.50f;
     inline constexpr float XForceBlendInSeconds = 0.20f;
     inline constexpr float XForceBlendOutSeconds = 0.10f;
+    inline constexpr float XForceFreezeWindowSeconds = 0.20f;
+    inline constexpr float XForceFrozenFallbackSeconds = 0.50f;
 
     inline float sanitize_frame_seconds(float deltaSeconds)
     {
@@ -197,6 +203,7 @@ namespace WheelFFBMath
             responseObserved_ = false;
             stopped_ = true;
             awaitingFreshAfterStop_ = true;
+            baselineCaptured_ = false;
             stoppedRaw_ = 0.0f;
             lastNormalized_ = 0.0f;
             nativeBlend_ = 0.0f;
@@ -205,7 +212,8 @@ namespace WheelFFBMath
 
         XForceGuardSample update(
             float raw, float speedNorm, float steerAbs, bool invert,
-            float deltaSeconds = 1.0f / 60.0f)
+            float deltaSeconds = 1.0f / 60.0f,
+            bool sourceFrozen = false)
         {
             XForceGuardSample out{};
             deltaSeconds = sanitize_frame_seconds(deltaSeconds);
@@ -226,7 +234,10 @@ namespace WheelFFBMath
                 if (speedNorm < XForceResumeSpeed)
                 {
                     if (out.rangeValid)
+                    {
                         stoppedRaw_ = raw;
+                        baselineCaptured_ = true;
+                    }
                     nativeBlend_ = 0.0f;
                     lastNormalized_ = 0.0f;
                     unresponsiveSeconds_ = 0.0f;
@@ -234,6 +245,26 @@ namespace WheelFFBMath
                     out.stopped = true;
                     return out;
                 }
+
+                // reset_signal_state() can run while the car is already
+                // moving (for example after closing F11). In that case the
+                // first moving native sample is only a baseline; it must not
+                // certify its own freshness in the same frame.
+                if (!baselineCaptured_)
+                {
+                    if (out.rangeValid)
+                    {
+                        stoppedRaw_ = raw;
+                        baselineCaptured_ = true;
+                    }
+                    nativeBlend_ = 0.0f;
+                    lastNormalized_ = 0.0f;
+                    unresponsiveSeconds_ = 0.0f;
+                    out.responseObserved = responseObserved_;
+                    out.stopped = false;
+                    return out;
+                }
+
                 stopped_ = false;
                 awaitingFreshAfterStop_ = true;
             }
@@ -241,8 +272,12 @@ namespace WheelFFBMath
             {
                 stopped_ = true;
                 awaitingFreshAfterStop_ = true;
+                baselineCaptured_ = false;
                 if (out.rangeValid)
+                {
                     stoppedRaw_ = raw;
+                    baselineCaptured_ = true;
+                }
                 nativeBlend_ = 0.0f;
                 lastNormalized_ = 0.0f;
                 unresponsiveSeconds_ = 0.0f;
@@ -261,7 +296,7 @@ namespace WheelFFBMath
             // when the car starts moving. Zero is safe to accept immediately;
             // otherwise wait until the game changes the source value.
             if (awaitingFreshAfterStop_ && out.rangeValid &&
-                (std::abs(raw) < XForceResponseThreshold ||
+                (std::abs(raw) < XForceNearZeroThreshold ||
                  std::abs(raw - stoppedRaw_) >= XForceFreshDelta))
             {
                 awaitingFreshAfterStop_ = false;
@@ -272,7 +307,7 @@ namespace WheelFFBMath
             // clearly steering a moving car. The timer is cadence-independent.
             if (out.rangeValid && steerAbs >= 0.15f && speedNorm >= 0.08f)
             {
-                if (std::abs(raw) < XForceResponseThreshold)
+                if (std::abs(raw) < XForceNearZeroThreshold)
                     unresponsiveSeconds_ = std::min(
                         XForceUnresponsiveSeconds, unresponsiveSeconds_ + deltaSeconds);
                 else
@@ -283,7 +318,8 @@ namespace WheelFFBMath
                 unresponsiveSeconds_ = 0.0f;
             }
             const bool responsiveNow = responseObserved_ &&
-                unresponsiveSeconds_ < XForceUnresponsiveSeconds;
+                unresponsiveSeconds_ < XForceUnresponsiveSeconds &&
+            !sourceFrozen;
 
             float currentNormalized = 0.0f;
             if (out.rangeValid)
@@ -326,6 +362,7 @@ namespace WheelFFBMath
         bool responseObserved_ = false;
         bool stopped_ = true;
         bool awaitingFreshAfterStop_ = true;
+        bool baselineCaptured_ = false;
         float stoppedRaw_ = 0.0f;
         float lastNormalized_ = 0.0f;
         float nativeBlend_ = 0.0f;
@@ -395,11 +432,12 @@ namespace WheelFFBMath
             count_ = 0;
             totalSamples_ = 0;
             maxAbs_ = 0.0f;
-            previousValid_ = false;
-            previousRaw_ = 0.0f;
-            previousSteer_ = 0.0f;
-            previousFrontSlip_ = 0.0f;
-            previousYawRate_ = 0.0f;
+            freezeWindowValid_ = false;
+            freezeWindowRaw_ = 0.0f;
+            freezeWindowSteer_ = 0.0f;
+            freezeWindowFrontSlip_ = 0.0f;
+            freezeWindowYawRate_ = 0.0f;
+            freezeWindowSeconds_ = 0.0f;
             frozenSeconds_ = 0.0f;
         }
 
@@ -415,7 +453,8 @@ namespace WheelFFBMath
                 std::abs(raw) > XForceAbsoluteSafetyLimit ||
                 speedNorm < XForceResumeSpeed)
             {
-                previousValid_ = false;
+                freezeWindowValid_ = false;
+                freezeWindowSeconds_ = 0.0f;
                 frozenSeconds_ = std::max(0.0f, frozenSeconds_ - deltaSeconds * 2.0f);
                 return;
             }
@@ -440,30 +479,51 @@ namespace WheelFFBMath
             ++totalSamples_;
             maxAbs_ = std::max(maxAbs_, absRaw);
 
-            if (previousValid_ && speedNorm >= 0.08f &&
-                absRaw >= XForceResponseThreshold)
+            if (speedNorm >= 0.08f && absRaw >= XForceResponseThreshold)
             {
-                const bool stateChanged =
-                    std::abs(steer - previousSteer_) >= 0.025f ||
-                    std::abs(frontSlip - previousFrontSlip_) >= 0.005f ||
-                    std::abs(yawRate - previousYawRate_) >= 0.020f;
-                const bool rawFrozen = std::abs(raw - previousRaw_) < 0.010f;
-                if (stateChanged && rawFrozen)
-                    frozenSeconds_ += deltaSeconds;
+                if (!freezeWindowValid_)
+                {
+                    freezeWindowValid_ = true;
+                    freezeWindowRaw_ = raw;
+                    freezeWindowSteer_ = steer;
+                    freezeWindowFrontSlip_ = frontSlip;
+                    freezeWindowYawRate_ = yawRate;
+                    freezeWindowSeconds_ = 0.0f;
+                }
                 else
-                    frozenSeconds_ = std::max(
-                        0.0f, frozenSeconds_ - deltaSeconds * 2.0f);
+                {
+                    freezeWindowSeconds_ += deltaSeconds;
+                    if (freezeWindowSeconds_ >= XForceFreezeWindowSeconds)
+                    {
+                        // Compare over a short window instead of one frame so
+                        // ordinary smooth steering/body motion can still prove
+                        // that a non-zero native value is suspiciously frozen.
+                        const bool stateChanged =
+                            std::abs(steer - freezeWindowSteer_) >= 0.025f ||
+                            std::abs(frontSlip - freezeWindowFrontSlip_) >= 0.005f ||
+                            std::abs(yawRate - freezeWindowYawRate_) >= 0.020f;
+                        const bool rawFrozen =
+                            std::abs(raw - freezeWindowRaw_) < 0.010f;
+                        if (stateChanged && rawFrozen)
+                            frozenSeconds_ += freezeWindowSeconds_;
+                        else
+                            frozenSeconds_ = std::max(
+                                0.0f, frozenSeconds_ - freezeWindowSeconds_ * 2.0f);
+
+                        freezeWindowRaw_ = raw;
+                        freezeWindowSteer_ = steer;
+                        freezeWindowFrontSlip_ = frontSlip;
+                        freezeWindowYawRate_ = yawRate;
+                        freezeWindowSeconds_ = 0.0f;
+                    }
+                }
             }
             else
             {
+                freezeWindowValid_ = false;
+                freezeWindowSeconds_ = 0.0f;
                 frozenSeconds_ = std::max(0.0f, frozenSeconds_ - deltaSeconds);
             }
-
-            previousValid_ = true;
-            previousRaw_ = raw;
-            previousSteer_ = steer;
-            previousFrontSlip_ = frontSlip;
-            previousYawRate_ = yawRate;
         }
 
         XForceAnalysisSnapshot snapshot() const
@@ -475,7 +535,8 @@ namespace WheelFFBMath
             out.corrFrontSlip = correlation(&Sample::frontSlip);
             out.corrYawRate = correlation(&Sample::yawRate);
             out.frozenSeconds = frozenSeconds_;
-            out.frozenSuspicious = frozenSeconds_ >= 0.50f;
+            out.frozenSuspicious =
+                frozenSeconds_ >= XForceFrozenFallbackSeconds;
             out.p50Abs = percentile(0.50);
             out.p90Abs = percentile(0.90);
             out.p95Abs = percentile(0.95);
@@ -561,11 +622,12 @@ namespace WheelFFBMath
         std::size_t count_ = 0;
         std::uint64_t totalSamples_ = 0;
         float maxAbs_ = 0.0f;
-        bool previousValid_ = false;
-        float previousRaw_ = 0.0f;
-        float previousSteer_ = 0.0f;
-        float previousFrontSlip_ = 0.0f;
-        float previousYawRate_ = 0.0f;
+        bool freezeWindowValid_ = false;
+        float freezeWindowRaw_ = 0.0f;
+        float freezeWindowSteer_ = 0.0f;
+        float freezeWindowFrontSlip_ = 0.0f;
+        float freezeWindowYawRate_ = 0.0f;
+        float freezeWindowSeconds_ = 0.0f;
         float frozenSeconds_ = 0.0f;
     };
 
