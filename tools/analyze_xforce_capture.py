@@ -27,6 +27,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 PHYSICS_MARKER = "WheelFFB XFORCE60 "
 NEIGHBOR_MARKER = "WheelFFB XFORCE_NEIGHBORS "
 PAIR_TOLERANCE_MS = 25
+MAX_SAMPLE_LAG = 2
 CURRENT_XFORCE_FULL_SCALE = 62.0
 KEY_VALUE_RE = re.compile(r"([A-Za-z][A-Za-z0-9_]*)=([^\s]+)")
 
@@ -84,13 +85,7 @@ def load_capture(path: Path) -> Tuple[List[Row], List[Row]]:
 
 
 def monotonic_segment(rows: Sequence[Row]) -> List[Row]:
-    """Keep the largest nondecreasing GetTickCount segment.
-
-    A single log can span a Windows restart, where GetTickCount moves backwards.
-    Pairing across that boundary is worse than discarding the shorter segment.
-    Normal 49.7-day wrap is irrelevant for practical capture sessions and is
-    treated the same way.
-    """
+    """Keep the largest nondecreasing GetTickCount segment."""
     if not rows:
         return []
     segments: List[List[Row]] = [[]]
@@ -155,14 +150,26 @@ def pearson(xs: Sequence[float], ys: Sequence[float]) -> Optional[float]:
     return sum(a * b for a, b in zip(dx, dy)) / denom
 
 
-def paired_values(
+def lagged_paired_values(
     pairs: Sequence[Tuple[Row, Row, int]],
     candidate: str,
     target: str,
+    lag: int,
 ) -> Tuple[List[float], List[float]]:
+    """Return candidate/target samples with an input-record lag.
+
+    lag +1 means the candidate comes from the next input record relative to the
+    current physics record; lag -1 means it comes from the previous input record.
+    This matters because input sampling can occur just before the physics update.
+    """
     xs: List[float] = []
     ys: List[float] = []
-    for physics, neighbor, _ in pairs:
+    start = max(0, -lag)
+    stop = min(len(pairs), len(pairs) - lag)
+    for physics_index in range(start, stop):
+        neighbor_index = physics_index + lag
+        physics = pairs[physics_index][0]
+        neighbor = pairs[neighbor_index][1]
         x = neighbor.values.get(candidate)
         y = physics.values.get(target)
         if x is None or y is None:
@@ -172,15 +179,35 @@ def paired_values(
     return xs, ys
 
 
+def best_lag_correlation(
+    pairs: Sequence[Tuple[Row, Row, int]], candidate: str, target: str
+) -> Tuple[Optional[float], int]:
+    best_r: Optional[float] = None
+    best_lag = 0
+    for lag in range(-MAX_SAMPLE_LAG, MAX_SAMPLE_LAG + 1):
+        xs, ys = lagged_paired_values(pairs, candidate, target, lag)
+        r = pearson(xs, ys)
+        if r is not None and (best_r is None or abs(r) > abs(best_r)):
+            best_r = r
+            best_lag = lag
+    return best_r, best_lag
+
+
 def fmt(value: Optional[float], digits: int = 4) -> str:
     if value is None or not math.isfinite(value):
         return "n/a"
     return f"{value:.{digits}f}"
 
 
+def fmt_corr(value: Optional[float], lag: int) -> str:
+    if value is None:
+        return "n/a"
+    return f"{value:+.3f}@{lag:+d}"
+
+
 def summarize_candidate(
     pairs: Sequence[Tuple[Row, Row, int]], candidate: str
-) -> Dict[str, Optional[float]]:
+) -> Dict[str, object]:
     samples = [
         neighbor.values[candidate]
         for _, neighbor, _ in pairs
@@ -194,8 +221,8 @@ def summarize_candidate(
             deltas.append(value - previous)
         previous = value
 
-    result: Dict[str, Optional[float]] = {
-        "count": float(len(samples)),
+    result: Dict[str, object] = {
+        "count": len(samples),
         "p50": percentile(magnitudes, 0.50),
         "p90": percentile(magnitudes, 0.90),
         "p95": percentile(magnitudes, 0.95),
@@ -207,13 +234,14 @@ def summarize_candidate(
     p99 = result["p99"]
     result["equivalent_gain"] = (
         CURRENT_XFORCE_FULL_SCALE / p99
-        if p99 is not None and p99 > 1e-6
+        if isinstance(p99, float) and p99 > 1e-6
         else None
     )
 
     for target in ("steer", "modern", "frontSlip", "yaw"):
-        xs, ys = paired_values(pairs, candidate, target)
-        result[f"corr_{target}"] = pearson(xs, ys)
+        corr, lag = best_lag_correlation(pairs, candidate, target)
+        result[f"corr_{target}"] = corr
+        result[f"lag_{target}"] = lag
     return result
 
 
@@ -226,33 +254,28 @@ def print_table(pairs: Sequence[Tuple[Row, Row, int]]) -> None:
     for name in candidates:
         s = summaries[name]
         print(
-            f"{name:9s} {int(s['count'] or 0):7d} "
+            f"{name:9s} {int(s['count']):7d} "
             f"{fmt(s['p50']):>8s} {fmt(s['p90']):>8s} {fmt(s['p95']):>8s} "
             f"{fmt(s['p99']):>8s} {fmt(s['max']):>8s} {fmt(s['delta_rms']):>10s} "
             f"{fmt(s['equivalent_gain'], 3):>7s}"
         )
 
-    print("\nSigned Pearson correlation")
-    print("candidate   steer    modern   frontSlip      yaw")
+    print(f"\nBest signed Pearson correlation within +/-{MAX_SAMPLE_LAG} input records (r@lag)")
+    print("candidate       steer       modern    frontSlip          yaw")
     for name in candidates:
         s = summaries[name]
         print(
-            f"{name:9s} {fmt(s['corr_steer'], 3):>7s} "
-            f"{fmt(s['corr_modern'], 3):>9s} {fmt(s['corr_frontSlip'], 3):>11s} "
-            f"{fmt(s['corr_yaw'], 3):>8s}"
+            f"{name:9s} "
+            f"{fmt_corr(s['corr_steer'], int(s['lag_steer'])):>11s} "
+            f"{fmt_corr(s['corr_modern'], int(s['lag_modern'])):>12s} "
+            f"{fmt_corr(s['corr_frontSlip'], int(s['lag_frontSlip'])):>12s} "
+            f"{fmt_corr(s['corr_yaw'], int(s['lag_yaw'])):>12s}"
         )
 
-    # DBC is sampled independently on both streams. A near-1 correlation here
-    # is a useful sanity check that timestamp pairing is working.
-    physics_raw: List[float] = []
-    neighbor_dbc: List[float] = []
-    for physics, neighbor, _ in pairs:
-        if "raw" in physics.values and "dbc" in neighbor.values:
-            physics_raw.append(physics.values["raw"])
-            neighbor_dbc.append(neighbor.values["dbc"])
+    sanity_r, sanity_lag = best_lag_correlation(pairs, "dbc", "raw")
     print(
-        "\nPairing sanity: corr(XFORCE60.raw, NEIGHBORS.dbc) = "
-        f"{fmt(pearson(physics_raw, neighbor_dbc), 5)}"
+        "\nPairing sanity: best corr(XFORCE60.raw, NEIGHBORS.dbc) = "
+        f"{fmt_corr(sanity_r, sanity_lag)}"
     )
 
 
@@ -300,7 +323,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     print_table(pairs)
 
     print(
-        "\nInterpretation guard: correlation and p99 magnitude can identify promising fields, "
+        "\nLag convention: +1 uses the next input-side candidate record against the current physics record; "
+        "-1 uses the previous record. This protects the comparison from a one-tick input/physics phase offset."
+    )
+    print(
+        "Interpretation guard: correlation and p99 magnitude can identify promising fields, "
         "but they do not prove tyre/rack-force semantics. Confirm a candidate from its write-site "
         "or controlled driving tests before routing it into FFB. The 62/p99 column is only the "
         "gain that would map that observed p99 to the current DBC nominal scale; it is not an "
