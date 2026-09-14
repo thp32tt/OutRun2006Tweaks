@@ -33,6 +33,7 @@ FetchContent_MakeAvailable(openxr_sdk)
 add_executable(outrun-vr-host
     src/main.cpp
     src/ipc/v3_shadow_bridge.cpp
+    src/diagnostics/runtime_watchdog.cpp
 )
 target_include_directories(outrun-vr-host PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/../src"
