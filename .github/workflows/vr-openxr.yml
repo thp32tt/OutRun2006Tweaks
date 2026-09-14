@@ -101,6 +101,14 @@ jobs:
           & $test
           if ($LASTEXITCODE -ne 0) { throw 'protocol v3 contract smoke failed' }
 
+      - name: Run renderer-independent core math regression
+        shell: pwsh
+        run: |
+          $test = 'build-vrhost/bin/outrun-vr-core-math-smoke.exe'
+          if (-not (Test-Path $test)) { throw 'core math smoke executable was not produced' }
+          & $test
+          if ($LASTEXITCODE -ne 0) { throw "core stereo math regression failed: $LASTEXITCODE" }
+
       - name: Verify x64 host binary
         shell: pwsh
         run: |
