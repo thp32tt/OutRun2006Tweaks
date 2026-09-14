@@ -49,6 +49,7 @@ jobs:
             'ImageContainsRange','VirtualQuery','ClientRendererWvpVerified','ClientRendererUploadFailed',
             'YawOnly','frame-latched c64 WVP injection armed','GetLatchedStereoFrame','GetCurrentShaderEpoch',
             'IsInternalStereoPassActive','InvalidateVerifiedWvp','StereoEyeOrientationValid',
+            'DecodePackedEyeOrientations','PackedEyeOrientationOffset',
             'effectiveHeadPosition','delta.x * Settings::VRWorldScale',
             'sample.eyeOffset[eye][0] * Settings::VRWorldScale')) {
             if (-not $renderer.Contains($marker)) { throw "missing renderer safety marker: $marker" }
@@ -63,7 +64,8 @@ jobs:
             'RightEyeSurface','Simulation, input, timers, native FFB','GetLatchedStereoFrame',
             'GetCurrentShaderEpoch','AnyAuxRenderTargetActive','GetViewport','SetViewport',
             'PublishRenderFrame','SharedRenderFrameState','FrameStereoIncomplete',
-            'StereoFailureDepthUnsynchronized','RightDepthSynchronized','presentStart.QuadPart')) {
+            'StereoFailureDepthUnsynchronized','RightDepthSynchronized','presentStart.QuadPart',
+            'D3DCLEAR_ZBUFFER) != 0 && count == 0')) {
             if (-not $stereo.Contains($marker)) { throw "missing stereo renderer marker: $marker" }
           }
           if ($stereo.Contains('ReadStereoSnapshot')) { throw 'stereo renderer must not resample shared pose per draw' }
@@ -81,6 +83,12 @@ jobs:
           $shared = Get-Content src/vr_shared.hpp -Raw
           foreach ($marker in @(
             'static_assert(sizeof(SharedPoseState) == 248)',
+            'offsetof(SharedPoseState, recommendedWidth) == 104',
+            'offsetof(SharedPoseState, recommendedHeight) == 112',
+            'offsetof(SharedPoseState, runtimeName) == 120',
+            'offsetof(SharedPoseState, reserved) == 184',
+            'PackedEyeOrientationOffset = 48','PackedEyeOrientationBytes = 16',
+            'recommendedWidth[2]','recommendedHeight[2]','runtimeName[64]',
             'static_assert(sizeof(SharedRenderFrameState) == 256)',
             'StereoViewsValid','StereoEyeOrientationValid','RenderFrameMemoryName',
             'SharedRenderFrameState','RenderFrameEffectivePoseValid','StereoFailureReason',
@@ -153,12 +161,14 @@ jobs:
             'DXGI_FORMAT_R16G16B16A16_FLOAT','QuerySdrWhiteScale',
             'XrCompositionLayerProjectionView','XrCompositionLayerProjection','imageArrayIndex=eye','arraySize=2',
             'StereoSbsActive','RenderTheater','EnsureTheaterAnchor','xrRequestExitSession','fs.shouldRender==XR_TRUE',
-            'StereoEyeOrientationValid','ToHeadLocalOrientation','RenderFrameReader','SharedRenderFrameState',
+            'StereoEyeOrientationValid','ToHeadLocalOrientation','StorePackedEyeOrientations',
+            'PackedEyeOrientationOffset','recommendedImageRectWidth','RenderFrameReader','SharedRenderFrameState',
             'QpcAtOrAfter','BindCaptureOutput','CommitStereoSource','StereoGraceMs','HostTimings',
             'pendingReferenceSpaceChangeTime')) {
             if (-not $src.Contains($marker)) { throw "missing true-stereo host marker: $marker" }
           }
           if ($src.Contains('InitializeLegacyCaptureRemoved')) { throw 'duplicate legacy capture initializer returned' }
+          if ($src.Contains('QpcLowAtOrAfter')) { throw 'obsolete 32-bit QPC matching returned' }
           if ($src.Contains('context_->Flush()')) { throw 'per-frame D3D11 Flush must not return' }
 
           $metaBefore = $src.IndexOf('renderFrames.Read(before)')
