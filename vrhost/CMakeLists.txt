@@ -40,6 +40,14 @@ target_include_directories(outrun-vr-host PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/src"
 )
 target_compile_definitions(outrun-vr-host PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
+if(MSVC)
+    # main.cpp is intentionally kept on an OpenXR 1.0 application baseline.
+    # The forced include loads the SDK header first, then pins
+    # XR_CURRENT_API_VERSION to XR_API_VERSION_1_0 before main.cpp uses it.
+    target_compile_options(outrun-vr-host PRIVATE
+        "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/openxr_api_compat.hpp"
+    )
+endif()
 target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi d3dcompiler user32)
 
 add_executable(outrun-vr-shader-smoke tests/stereo_shader_smoke.cpp)
