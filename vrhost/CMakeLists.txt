@@ -67,12 +67,20 @@ target_include_directories(outrun-vr-host-state-v3-channel-smoke PRIVATE
 )
 target_compile_definitions(outrun-vr-host-state-v3-channel-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 
+add_executable(outrun-vr-v2-v3-shadow-conversion-smoke tests/v2_v3_shadow_conversion_smoke.cpp)
+target_include_directories(outrun-vr-v2-v3-shadow-conversion-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src"
+    "${CMAKE_CURRENT_LIST_DIR}/src"
+)
+target_compile_definitions(outrun-vr-v2-v3-shadow-conversion-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
+
 foreach(target
     outrun-vr-host
     outrun-vr-shader-smoke
     outrun-vr-protocol-v3-smoke
     outrun-vr-core-math-smoke
-    outrun-vr-host-state-v3-channel-smoke)
+    outrun-vr-host-state-v3-channel-smoke
+    outrun-vr-v2-v3-shadow-conversion-smoke)
     set_target_properties(${target} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin"
