@@ -73,7 +73,12 @@ jobs:
             'VR helper D3D9Ex probe:',
             'R9-finaltest-20260915',
             'VR R9 FIRST FAILURE:',
-            'mono safety shadow ready'
+            'mono safety shadow ready',
+            'VR D3D9Ex R13: compatibility hardening active',
+            'translated MANAGED texture LockRect',
+            'VR R13: stereo hardening ACTIVE',
+            'GPU-completion direct-ring backpressure',
+            'VR R13: auxiliary/offscreen c64 WVP kept stock'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR DLL marker missing: $marker" }
           }
@@ -166,8 +171,10 @@ jobs:
             '[finaltest] build=',
             '[finaltest] endFrame total=',
             'no-layer OpenXR test pattern ready',
-            'D3D9Ex-direct-passthrough-20260915',
-            'ZERO-COPY projection passthrough ACTIVE'
+            'D3D9Ex-direct-gpu-copy-R13-20260915',
+            'host-owned GPU eye copies + completion ACK active',
+            'DIRECT GPU-COPY projection passthrough ACTIVE',
+            'stale Desktop Duplication source invalidated'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR host marker missing: $marker" }
           }
