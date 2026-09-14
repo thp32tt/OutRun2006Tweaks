@@ -62,9 +62,7 @@ jobs:
           $licenses = $licenses -replace 'OutRun2006Tweaks Wheel FFB v0\.1 - bundled open-source notices', 'OutRun2006Tweaks Wheel FFB v0.1.1 - bundled open-source notices'
           $licenses | Set-Content release-bin/LICENSES.txt -Encoding utf8
 
-          # The package README is the release-specific bilingual guide so an old
-          # repository README cannot make the binary package look like v0.1.
-          Copy-Item RELEASE_NOTES_v0.1.1.md release-bin/README.md
+          Copy-Item README.md release-bin/README.md
           Copy-Item RELEASE_NOTES_v0.1.1.md release-bin/RELEASE_NOTES_v0.1.1.md
 
           foreach ($required in @('dinput8.dll','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','OR2006C2C.exe','README.md','RELEASE_NOTES_v0.1.1.md','LICENSES.txt')) {
@@ -87,3 +85,76 @@ jobs:
             --title 'OutRun2006Tweaks Wheel FFB v0.1.1' `
             --notes-file RELEASE_NOTES_v0.1.1.md `
             --latest
+
+  sync-public-docs:
+    if: "${{ github.event.head_commit.message == 'docs: sync v0.1.1 public documentation' }}"
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout documentation commit
+        uses: actions/checkout@v7.0.1
+
+      - name: Wait for successful Win32 build
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $runId = $null
+          for ($i = 0; $i -lt 90; $i++) {
+            $runs = gh run list --repo $env:GITHUB_REPOSITORY --workflow build.yml --commit $env:GITHUB_SHA --limit 10 --json databaseId,status,conclusion | ConvertFrom-Json
+            $candidate = $runs | Where-Object { $_.status -eq 'completed' } | Select-Object -First 1
+            if ($candidate) {
+              if ($candidate.conclusion -ne 'success') {
+                throw "Wheel build completed with conclusion '$($candidate.conclusion)'"
+              }
+              $runId = $candidate.databaseId
+              break
+            }
+            Start-Sleep -Seconds 10
+          }
+          if (-not $runId) { throw 'Timed out waiting for the documentation-sync build artifact.' }
+          "BUILD_RUN_ID=$runId" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Download tested build artifact
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          New-Item -ItemType Directory -Force -Path artifact-bin | Out-Null
+          gh run download $env:BUILD_RUN_ID --repo $env:GITHUB_REPOSITORY -n "outrun2006tweaks-$env:GITHUB_SHA" -D artifact-bin
+          foreach ($required in @('dinput8.dll','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','OR2006C2C.exe','LICENSES.txt')) {
+            if (-not (Test-Path (Join-Path 'artifact-bin' $required))) { throw "$required missing from tested build artifact" }
+          }
+
+      - name: Repackage v0.1.1 with current bilingual docs
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path release-bin | Out-Null
+          foreach ($file in @('dinput8.dll','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','OR2006C2C.exe')) {
+            Copy-Item (Join-Path 'artifact-bin' $file) (Join-Path 'release-bin' $file)
+          }
+
+          $licenses = Get-Content artifact-bin/LICENSES.txt -Raw
+          $licenses = $licenses -replace 'OutRun2006Tweaks Wheel FFB v0\.1 - bundled open-source notices', 'OutRun2006Tweaks Wheel FFB v0.1.1 - bundled open-source notices'
+          $licenses | Set-Content release-bin/LICENSES.txt -Encoding utf8
+
+          Copy-Item README.md release-bin/README.md
+          Copy-Item RELEASE_NOTES_v0.1.1.md release-bin/RELEASE_NOTES_v0.1.1.md
+
+          New-Item -ItemType Directory -Force -Path release | Out-Null
+          Compress-Archive -Path release-bin/* -DestinationPath release/OutRun2006Tweaks-Wheel-FFB-v0.1.1.zip -Force
+          Get-FileHash release/OutRun2006Tweaks-Wheel-FFB-v0.1.1.zip -Algorithm SHA256
+
+      - name: Sync GitHub release page and asset
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release edit v0.1.1 `
+            --repo $env:GITHUB_REPOSITORY `
+            --title 'OutRun2006Tweaks Wheel FFB v0.1.1' `
+            --notes-file RELEASE_NOTES_v0.1.1.md `
+            --latest
+          gh release upload v0.1.1 release/OutRun2006Tweaks-Wheel-FFB-v0.1.1.zip `
+            --repo $env:GITHUB_REPOSITORY `
+            --clobber
