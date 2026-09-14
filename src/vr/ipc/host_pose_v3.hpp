@@ -7,6 +7,7 @@
 #include <cstdint>
 
 #include "vr/ipc/host_state_v3_reader.hpp"
+#include "vr/ipc/protocol.hpp"
 
 namespace OutRunVR::IpcV3
 {
@@ -46,6 +47,13 @@ namespace OutRunVR::IpcV3
             fov.angleDown > -limit && fov.angleUp < limit &&
             fov.angleRight > fov.angleLeft + 0.05f &&
             fov.angleUp > fov.angleDown + 0.05f;
+    }
+
+    inline bool PoseSequenceMatchesLegacy(
+        std::uint64_t poseId, std::uint32_t legacySequence) noexcept
+    {
+        return poseId != 0 && legacySequence != 0 &&
+            static_cast<std::uint32_t>(poseId & 0xFFFFFFFFull) == legacySequence;
     }
 
     inline bool HostStateUsable(
@@ -101,6 +109,22 @@ namespace OutRunVR::IpcV3
             if (!HostStateUsable(state, now.QuadPart, frequency.QuadPart))
                 return false;
 
+            // The current v3 HostState publisher shadows the same host sample that
+            // still keys Frame.v2. Never accept a shadow pose that is one host frame
+            // behind: fall back to the legacy pose for that game frame instead. This
+            // keeps v3 primary when caught up while guaranteeing no added head latency.
+            if (legacy_.EnsureOpen(OutRunVR::SharedMemoryName))
+            {
+                OutRunVR::SharedPoseState legacy{};
+                if (OutRunVR::Ipc::StableRead(legacy_.Get(), legacy) &&
+                    legacy.magic == OutRunVR::SharedMagic &&
+                    legacy.protocolVersion == OutRunVR::SharedProtocolVersion &&
+                    legacy.structSize == sizeof(legacy) &&
+                    legacy.hostPid == state.hostPid &&
+                    !PoseSequenceMatchesLegacy(state.poseId, legacy.sequence))
+                    return false;
+            }
+
             out = {};
             out.poseId = state.poseId;
             out.hostPid = state.hostPid;
@@ -114,10 +138,15 @@ namespace OutRunVR::IpcV3
             return true;
         }
 
-        void Reset() noexcept { reader_.Reset(); }
+        void Reset() noexcept
+        {
+            reader_.Reset();
+            legacy_.Reset();
+        }
         bool IsOpen() const noexcept { return reader_.IsOpen(); }
 
     private:
         HostStateReader reader_{};
+        OutRunVR::Ipc::ReadOnlyMapping<OutRunVR::SharedPoseState> legacy_{};
     };
 }
