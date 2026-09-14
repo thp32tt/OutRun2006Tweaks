@@ -25,6 +25,8 @@ namespace OutRunVR
         StereoViewsValid = 1u << 5,
         StereoEyeOrientationValid = 1u << 6,
         HostShouldRender = 1u << 7,
+        HostDirectGpuTransport = 1u << 8,
+        HostDirectGpuReady = 1u << 9,
     };
 
     inline constexpr std::uint32_t ClientHeartbeatIndex = 0;
@@ -85,7 +87,16 @@ namespace OutRunVR
         RenderFrameDrawDuplicated = 1u << 2,
         RenderFrameEffectivePoseValid = 1u << 3,
         RenderFramePresentInFlight = 1u << 4,
+        RenderFrameDirectGpuTransport = 1u << 5,
     };
+
+    // Frame.v1 reserved-word extension. The 256-byte ABI stays unchanged.
+    inline constexpr std::uint32_t RenderFrameDirectLeftHandleIndex = 0;
+    inline constexpr std::uint32_t RenderFrameDirectRightHandleIndex = 1;
+    inline constexpr std::uint32_t RenderFrameDirectWidthIndex = 2;
+    inline constexpr std::uint32_t RenderFrameDirectHeightIndex = 3;
+    inline constexpr std::uint32_t RenderFrameDirectFormatIndex = 4;
+    inline constexpr std::uint32_t RenderFrameDirectGenerationIndex = 5;
 
     enum StereoFailureReason : std::uint32_t
     {

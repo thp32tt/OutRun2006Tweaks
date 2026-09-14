@@ -98,6 +98,17 @@ namespace OutRunVRStereo
 		IDirect3DTexture9* RightResolveTexture = nullptr;
 		IDirect3DSurface9* RightResolveSurface = nullptr;
 
+		IDirect3DTexture9* DirectLeftTexture = nullptr;
+		IDirect3DSurface9* DirectLeftSurface = nullptr;
+		IDirect3DTexture9* DirectRightTexture = nullptr;
+		IDirect3DSurface9* DirectRightSurface = nullptr;
+		IDirect3DQuery9* DirectTransportFence = nullptr;
+		HANDLE DirectLeftSharedHandle = nullptr;
+		HANDLE DirectRightSharedHandle = nullptr;
+		D3DFORMAT DirectTransportFormat = D3DFMT_UNKNOWN;
+		std::uint32_t DirectTransportGeneration = 0;
+		bool DirectTransportResourcesReady = false;
+
 		D3DSURFACE_DESC BackBufferDesc{};
 		bool StereoResourcesReady = false;
 		thread_local bool InternalStereoPass = false;
@@ -143,6 +154,9 @@ namespace OutRunVRStereo
 		std::uint64_t OcclusionQueryBegins = 0;
 		std::uint64_t OcclusionQueryEnds = 0;
 		std::uint64_t OcclusionStereoRejects = 0;
+		std::uint64_t DirectTransportFrames = 0;
+		std::uint64_t DirectTransportFallbacks = 0;
+		std::uint64_t DirectTransportFenceTimeouts = 0;
 		std::array<std::uint64_t, 32> FailureCounts{};
 		bool FirstStereoActiveLogged = false;
 		bool FirstWorldStereoLogged = false;
@@ -151,6 +165,8 @@ namespace OutRunVRStereo
 		bool FirstOffscreenWorldLogged = false;
 		bool FirstClassificationFailureLogged = false;
 		bool FirstOcclusionRejectLogged = false;
+		bool FirstDirectTransportLogged = false;
+		bool FirstDirectFallbackLogged = false;
 
 		template <typename T>
 		void ReleaseCom(T*& value)
@@ -204,6 +220,16 @@ namespace OutRunVRStereo
 			return (flags & OutRunVR::HostAlive) != 0 &&
 				(flags & OutRunVR::SessionVisible) != 0 &&
 				(flags & OutRunVR::HostShouldRender) != 0;
+		}
+
+		bool HostDirectTransportSupported()
+		{
+			return SharedState && (SharedState->flags & OutRunVR::HostDirectGpuTransport) != 0;
+		}
+
+		bool HostDirectTransportReady()
+		{
+			return SharedState && (SharedState->flags & OutRunVR::HostDirectGpuReady) != 0;
 		}
 
 		bool StereoWanted()
@@ -677,6 +703,15 @@ namespace OutRunVRStereo
 		void ReleaseStereoResources()
 		{
 			StereoResourcesReady = false;
+			DirectTransportResourcesReady = false;
+			ReleaseCom(DirectTransportFence);
+			ReleaseCom(DirectLeftSurface);
+			ReleaseCom(DirectLeftTexture);
+			ReleaseCom(DirectRightSurface);
+			ReleaseCom(DirectRightTexture);
+			DirectLeftSharedHandle = nullptr;
+			DirectRightSharedHandle = nullptr;
+			DirectTransportFormat = D3DFMT_UNKNOWN;
 			ProjectionInverseValid = false;
 			ReleaseCom(RightEyeSurface);
 			ReleaseCom(RightEyeDepth);
@@ -721,6 +756,110 @@ namespace OutRunVRStereo
 					surface->Release();
 			}
 			return true;
+		}
+
+		D3DFORMAT ChooseDirectTransportFormat(D3DFORMAT source)
+		{
+			// D3D9 -> D3D11 OpenSharedResource is restricted to the DXGI
+			// equivalents of R8G8B8A8_UNORM, R10G10B10A2_UNORM and
+			// R16G16B16A16_FLOAT. Use a conversion target the D3D9 driver can
+			// StretchRect into instead of assuming the monitor backbuffer format.
+			switch (source)
+			{
+			case D3DFMT_A2B10G10R10: return D3DFMT_A2B10G10R10;
+			case D3DFMT_A16B16G16R16F: return D3DFMT_A16B16G16R16F;
+			default: return D3DFMT_A8B8G8R8;
+			}
+		}
+
+		bool CanConvertForDirectTransport(IDirect3DDevice9* device, D3DFORMAT source, D3DFORMAT target)
+		{
+			if (!device) return false;
+			D3DDEVICE_CREATION_PARAMETERS cp{};
+			if (FAILED(device->GetCreationParameters(&cp))) return false;
+			IDirect3D9* d3d = nullptr;
+			if (FAILED(device->GetDirect3D(&d3d)) || !d3d) return false;
+			const HRESULT hr = d3d->CheckDeviceFormatConversion(cp.AdapterOrdinal, cp.DeviceType, source, target);
+			d3d->Release();
+			return SUCCEEDED(hr);
+		}
+
+		bool EnsureDirectTransportResources(IDirect3DDevice9* device)
+		{
+			if (!HostDirectTransportSupported() || !device || !BackBufferDesc.Width || !BackBufferDesc.Height)
+				return false;
+			if (DirectTransportResourcesReady && DirectLeftTexture && DirectRightTexture &&
+				DirectLeftSurface && DirectRightSurface && DirectLeftSharedHandle && DirectRightSharedHandle)
+				return true;
+
+			ReleaseCom(DirectTransportFence);
+			ReleaseCom(DirectLeftSurface);
+			ReleaseCom(DirectLeftTexture);
+			ReleaseCom(DirectRightSurface);
+			ReleaseCom(DirectRightTexture);
+			DirectLeftSharedHandle = nullptr;
+			DirectRightSharedHandle = nullptr;
+			DirectTransportFormat = ChooseDirectTransportFormat(BackBufferDesc.Format);
+
+			if (!CanConvertForDirectTransport(device, BackBufferDesc.Format, DirectTransportFormat))
+				return false;
+
+			HANDLE leftHandle = nullptr;
+			HANDLE rightHandle = nullptr;
+			const HRESULT leftHr = device->CreateTexture(BackBufferDesc.Width, BackBufferDesc.Height, 1,
+				D3DUSAGE_RENDERTARGET, DirectTransportFormat, D3DPOOL_DEFAULT, &DirectLeftTexture, &leftHandle);
+			const HRESULT rightHr = SUCCEEDED(leftHr)
+				? device->CreateTexture(BackBufferDesc.Width, BackBufferDesc.Height, 1, D3DUSAGE_RENDERTARGET,
+					DirectTransportFormat, D3DPOOL_DEFAULT, &DirectRightTexture, &rightHandle)
+				: E_FAIL;
+			if (FAILED(leftHr) || FAILED(rightHr) || !DirectLeftTexture || !DirectRightTexture ||
+				!leftHandle || !rightHandle ||
+				FAILED(DirectLeftTexture->GetSurfaceLevel(0, &DirectLeftSurface)) ||
+				FAILED(DirectRightTexture->GetSurfaceLevel(0, &DirectRightSurface)) ||
+				FAILED(device->CreateQuery(D3DQUERYTYPE_EVENT, &DirectTransportFence)) || !DirectTransportFence)
+			{
+				ReleaseCom(DirectTransportFence);
+				ReleaseCom(DirectLeftSurface); ReleaseCom(DirectLeftTexture);
+				ReleaseCom(DirectRightSurface); ReleaseCom(DirectRightTexture);
+				DirectLeftSharedHandle = nullptr; DirectRightSharedHandle = nullptr;
+				return false;
+			}
+
+			DirectLeftSharedHandle = leftHandle;
+			DirectRightSharedHandle = rightHandle;
+			if (++DirectTransportGeneration == 0) ++DirectTransportGeneration;
+			DirectTransportResourcesReady = true;
+			spdlog::info("VR stereo: direct D3D9->D3D11 eye transport ready {}x{} format={} generation={} handles=0x{:08X}/0x{:08X}",
+				BackBufferDesc.Width, BackBufferDesc.Height, static_cast<int>(DirectTransportFormat),
+				DirectTransportGeneration, static_cast<unsigned>(reinterpret_cast<std::uintptr_t>(DirectLeftSharedHandle)),
+				static_cast<unsigned>(reinterpret_cast<std::uintptr_t>(DirectRightSharedHandle)));
+			return true;
+		}
+
+		bool ResolveDirectTransport(IDirect3DDevice9* device)
+		{
+			if (!EnsureDirectTransportResources(device) || !BackBuffer || !RightEyeSurface) return false;
+			{
+				InternalPassScope guard;
+				if (FAILED(device->StretchRect(BackBuffer, nullptr, DirectLeftSurface, nullptr, D3DTEXF_NONE)) ||
+					FAILED(device->StretchRect(RightEyeSurface, nullptr, DirectRightSurface, nullptr, D3DTEXF_NONE)) ||
+					FAILED(DirectTransportFence->Issue(D3DISSUE_END)))
+					return false;
+			}
+
+			const ULONGLONG deadline = GetTickCount64() + 50;
+			for (;;)
+			{
+				const HRESULT ready = DirectTransportFence->GetData(nullptr, 0, D3DGETDATA_FLUSH);
+				if (ready == S_OK) return true;
+				if (ready != S_FALSE) return false;
+				if (GetTickCount64() >= deadline)
+				{
+					++DirectTransportFenceTimeouts;
+					return false;
+				}
+				Sleep(0);
+			}
 		}
 
 		bool EnsureStereoResources(IDirect3DDevice9* device)
@@ -913,11 +1052,12 @@ namespace OutRunVRStereo
 				static_cast<LONG>(frameId));
 		}
 
-		void PublishRenderFrame(std::uint32_t state,std::uint32_t frameId,std::uint32_t sourcePoseSequence,std::int64_t presentQpc,OutRunVR::StereoFailureReason failureReason,const OutRunVRRenderer::LatchedStereoFrame* stereo,bool presentInFlight=false)
+		void PublishRenderFrame(std::uint32_t state,std::uint32_t frameId,std::uint32_t sourcePoseSequence,std::int64_t presentQpc,OutRunVR::StereoFailureReason failureReason,const OutRunVRRenderer::LatchedStereoFrame* stereo,bool presentInFlight=false,bool directTransport=false)
 		{
 			if(!EnsureRenderFrameState())return; LONG seq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameState->sequence));if((seq&1)==0)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameState->sequence));MemoryBarrier();
-			RenderFrameState->clientPid=GetCurrentProcessId();RenderFrameState->state=state;RenderFrameState->frameId=frameId;RenderFrameState->sourcePoseSequence=sourcePoseSequence;RenderFrameState->presentationMode=GameplayActive()?OutRunVR::PresentationGameplay:OutRunVR::PresentationTheater;RenderFrameState->flags=presentInFlight?OutRunVR::RenderFramePresentInFlight:0;RenderFrameState->failureReason=static_cast<std::uint32_t>(failureReason);RenderFrameState->backbufferWidth=BackBufferDesc.Width;RenderFrameState->backbufferHeight=BackBufferDesc.Height;RenderFrameState->presentQpc=presentQpc;std::memset(RenderFrameState->eye,0,sizeof(RenderFrameState->eye));
-			if(!presentInFlight&&state==OutRunVR::StereoSbsActive&&stereo&&stereo->valid&&frameId){RenderFrameState->flags=OutRunVR::RenderFrameStereoComplete|OutRunVR::RenderFrameWorldStereo|OutRunVR::RenderFrameDrawDuplicated|OutRunVR::RenderFrameEffectivePoseValid;for(int eye=0;eye<2;++eye){std::memcpy(RenderFrameState->eye[eye].orientation,stereo->effectiveEyeOrientation[eye],sizeof(RenderFrameState->eye[eye].orientation));std::memcpy(RenderFrameState->eye[eye].position,stereo->effectiveEyePosition[eye],sizeof(RenderFrameState->eye[eye].position));RenderFrameState->eye[eye].fov=stereo->eyeFov[eye];}}
+			RenderFrameState->clientPid=GetCurrentProcessId();RenderFrameState->state=state;RenderFrameState->frameId=frameId;RenderFrameState->sourcePoseSequence=sourcePoseSequence;RenderFrameState->presentationMode=GameplayActive()?OutRunVR::PresentationGameplay:OutRunVR::PresentationTheater;RenderFrameState->flags=presentInFlight?OutRunVR::RenderFramePresentInFlight:0;RenderFrameState->failureReason=static_cast<std::uint32_t>(failureReason);RenderFrameState->backbufferWidth=BackBufferDesc.Width;RenderFrameState->backbufferHeight=BackBufferDesc.Height;RenderFrameState->presentQpc=presentQpc;std::memset(RenderFrameState->eye,0,sizeof(RenderFrameState->eye));std::memset(RenderFrameState->reserved,0,sizeof(RenderFrameState->reserved));
+			if(directTransport&&DirectTransportResourcesReady&&DirectLeftSharedHandle&&DirectRightSharedHandle){RenderFrameState->flags|=OutRunVR::RenderFrameDirectGpuTransport;RenderFrameState->reserved[OutRunVR::RenderFrameDirectLeftHandleIndex]=static_cast<std::uint32_t>(reinterpret_cast<std::uintptr_t>(DirectLeftSharedHandle));RenderFrameState->reserved[OutRunVR::RenderFrameDirectRightHandleIndex]=static_cast<std::uint32_t>(reinterpret_cast<std::uintptr_t>(DirectRightSharedHandle));RenderFrameState->reserved[OutRunVR::RenderFrameDirectWidthIndex]=BackBufferDesc.Width;RenderFrameState->reserved[OutRunVR::RenderFrameDirectHeightIndex]=BackBufferDesc.Height;RenderFrameState->reserved[OutRunVR::RenderFrameDirectFormatIndex]=static_cast<std::uint32_t>(DirectTransportFormat);RenderFrameState->reserved[OutRunVR::RenderFrameDirectGenerationIndex]=DirectTransportGeneration;}
+			if(!presentInFlight&&state==OutRunVR::StereoSbsActive&&stereo&&stereo->valid&&frameId){const std::uint32_t transportFlag=RenderFrameState->flags&OutRunVR::RenderFrameDirectGpuTransport;RenderFrameState->flags=transportFlag|OutRunVR::RenderFrameStereoComplete|OutRunVR::RenderFrameWorldStereo|OutRunVR::RenderFrameDrawDuplicated|OutRunVR::RenderFrameEffectivePoseValid;for(int eye=0;eye<2;++eye){std::memcpy(RenderFrameState->eye[eye].orientation,stereo->effectiveEyeOrientation[eye],sizeof(RenderFrameState->eye[eye].orientation));std::memcpy(RenderFrameState->eye[eye].position,stereo->effectiveEyePosition[eye],sizeof(RenderFrameState->eye[eye].position));RenderFrameState->eye[eye].fov=stereo->eyeFov[eye];}}
 			MemoryBarrier();seq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameState->sequence));if(seq&1)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameState->sequence));
 		}
 
@@ -1296,11 +1436,12 @@ namespace OutRunVRStereo
 			if (now - LastSummaryMs < 5000)
 				return;
 			LastSummaryMs = now;
-			spdlog::info("VR stereo: draws={} world={} ui/effect={} fixedFn={} offscreenWorld={} classifyFail={} composeOk={} composeFail={} rightFail={} mrtReject={} restoreFail={} poseMismatchFrames={} multiBeginPresent={} maxBeginPerPresent={} poseSeq={} occ[created={},begin={},end={},active={},reject={}] failures[pose={},res={},mrt={},viewport={},classify={},depth={},stencil={},clear={},rightState={},rightWvp={},rightDraw={},restore={},compose={},present={},depthState={},poseMismatch={},offscreen={},occlusion={}]",
+			spdlog::info("VR stereo: draws={} world={} ui/effect={} fixedFn={} offscreenWorld={} classifyFail={} composeOk={} composeFail={} rightFail={} mrtReject={} restoreFail={} poseMismatchFrames={} multiBeginPresent={} maxBeginPerPresent={} poseSeq={} direct[frames={},fallbacks={},fenceTimeout={}] occ[created={},begin={},end={},active={},reject={}] failures[pose={},res={},mrt={},viewport={},classify={},depth={},stencil={},clear={},rightState={},rightWvp={},rightDraw={},restore={},compose={},present={},depthState={},poseMismatch={},offscreen={},occlusion={}]",
 				DuplicatedDraws, WorldStereoDraws, NonWorldDuplicatedDraws, FixedFunctionNonWorldDraws, OffscreenVerifiedWorldDraws,
 				WorldClassificationFailures, StereoComposeSuccess, StereoComposeFailure, FrameRightDrawFailed ? 1 : 0,
 				MrtRejectedDraws, RestoreFailures, PoseSequenceMismatchFrames, MultiBeginScenePresents,
 				MaxBeginScenesPerPresent, FrameStereoPoseSequence,
+				DirectTransportFrames, DirectTransportFallbacks, DirectTransportFenceTimeouts,
 				OcclusionQueriesCreated, OcclusionQueryBegins, OcclusionQueryEnds, ActiveOcclusionQueries.load(std::memory_order_acquire), OcclusionStereoRejects,
 				FailureCounts[OutRunVR::StereoFailureMissingLatchedPose], FailureCounts[OutRunVR::StereoFailureResourceUnavailable],
 				FailureCounts[OutRunVR::StereoFailureMrtActive], FailureCounts[OutRunVR::StereoFailureViewportUnavailable],
@@ -1316,9 +1457,17 @@ namespace OutRunVRStereo
 		HRESULT __stdcall PresentDest(IDirect3DDevice9* device,const RECT* sourceRect,const RECT* destRect,HWND destWindowOverride,const RGNDATA* dirtyRegion)
 		{
 			if(!IsGameDevice(device))return PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);const std::uint64_t beginNow=OutRunVRRenderer::GetBeginSceneCallCount();const std::uint64_t beginDelta=beginNow>=LastBeginSceneCountAtPresent?beginNow-LastBeginSceneCountAtPresent:0;LastBeginSceneCountAtPresent=beginNow;if(GameplayActive()){if(beginDelta>1)++MultiBeginScenePresents;MaxBeginScenesPerPresent=std::max(MaxBeginScenesPerPresent,beginDelta);}const bool stereoRequested=StereoWanted();bool composedStereo=false;std::uint32_t pendingPoseSequence=0;
-			if(stereoRequested&&FrameHadWorldStereo&&FrameHadDuplicatedDraw&&!FrameRightDrawFailed&&!FrameStereoIncomplete&&FrameStereoPoseSequence&&FrameStereoMetadata.valid&&EnsureStereoResources(device)){if(ComposeSbs(device)){++StereoComposeSuccess;composedStereo=true;pendingPoseSequence=FrameStereoPoseSequence;}else{++StereoComposeFailure;PoisonFrame(OutRunVR::StereoFailureComposeFailed);}}
-			MaybeLogSummary();LARGE_INTEGER presentStart{};QueryPerformanceCounter(&presentStart);const std::uint32_t pendingFrameId=stereoRequested?NextStereoFrameId():0;if(stereoRequested)PublishRenderFrame(OutRunVR::StereoSbsFallbackMono,pendingFrameId,pendingPoseSequence,presentStart.QuadPart,OutRunVR::StereoFailureNone,nullptr,true);const HRESULT hr=PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);
-			if(composedStereo&&SUCCEEDED(hr)&&!FrameStereoIncomplete){PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,pendingFrameId);PublishRenderFrame(OutRunVR::StereoSbsActive,pendingFrameId,pendingPoseSequence,presentStart.QuadPart,OutRunVR::StereoFailureNone,&FrameStereoMetadata);if(!FirstStereoActiveLogged){FirstStereoActiveLogged=true;spdlog::info("VR stereo: TRUE STEREO active; PC backbuffer is SBS transport {}x{} from the two eye renders; no third scene render", BackBufferDesc.Width, BackBufferDesc.Height);}}
+			bool directTransport=false;
+			if(stereoRequested&&FrameHadWorldStereo&&FrameHadDuplicatedDraw&&!FrameRightDrawFailed&&!FrameStereoIncomplete&&FrameStereoPoseSequence&&FrameStereoMetadata.valid&&EnsureStereoResources(device)){
+				directTransport=ResolveDirectTransport(device);
+				if(directTransport){++DirectTransportFrames;composedStereo=true;pendingPoseSequence=FrameStereoPoseSequence;if(!FirstDirectTransportLogged){FirstDirectTransportLogged=true;spdlog::info("VR stereo: direct GPU eye transport armed; source eye={}x{}, VDXR target is reported separately by host",BackBufferDesc.Width,BackBufferDesc.Height);}
+					if(!HostDirectTransportReady()){if(ComposeSbs(device))++StereoComposeSuccess;else ++StereoComposeFailure;}
+				}
+				else if(ComposeSbs(device)){++StereoComposeSuccess;composedStereo=true;pendingPoseSequence=FrameStereoPoseSequence;++DirectTransportFallbacks;if(!FirstDirectFallbackLogged){FirstDirectFallbackLogged=true;spdlog::warn("VR stereo: direct GPU transport unavailable; keeping SBS/Desktop Duplication fallback");}}
+				else{++StereoComposeFailure;PoisonFrame(OutRunVR::StereoFailureComposeFailed);}
+			}
+			MaybeLogSummary();LARGE_INTEGER presentStart{};QueryPerformanceCounter(&presentStart);const std::uint32_t pendingFrameId=stereoRequested?NextStereoFrameId():0;if(stereoRequested)PublishRenderFrame(OutRunVR::StereoSbsFallbackMono,pendingFrameId,pendingPoseSequence,presentStart.QuadPart,OutRunVR::StereoFailureNone,nullptr,true,directTransport);const HRESULT hr=PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);
+			if(composedStereo&&SUCCEEDED(hr)&&!FrameStereoIncomplete){PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,pendingFrameId);PublishRenderFrame(OutRunVR::StereoSbsActive,pendingFrameId,pendingPoseSequence,presentStart.QuadPart,OutRunVR::StereoFailureNone,&FrameStereoMetadata,false,directTransport);if(!FirstStereoActiveLogged){FirstStereoActiveLogged=true;spdlog::info("VR stereo: TRUE STEREO active; transport={} sourceEye={}x{} PC={}",directTransport?"direct D3D9->D3D11":"SBS Desktop Duplication",BackBufferDesc.Width,BackBufferDesc.Height,(directTransport&&HostDirectTransportReady())?"left-eye mirror":"SBS fallback");}}
 			else{if(FAILED(hr)&&FrameFailureReason==OutRunVR::StereoFailureNone)PoisonFrame(OutRunVR::StereoFailurePresentFailed);const std::uint32_t fallback=stereoRequested?OutRunVR::StereoSbsFallbackMono:OutRunVR::StereoDisabled;PublishStereoState(fallback,false,0,0);PublishRenderFrame(fallback,0,0,presentStart.QuadPart,FrameFailureReason,nullptr);}
 			OutRunVRRenderer::NotifyGamePresent();
 			FrameHadDuplicatedDraw=false;FrameHadWorldStereo=false;FrameRightDrawFailed=false;FrameStereoIncomplete=false;FramePoseMismatchLogged=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoPoseSequence=0;FrameStereoMetadata={};return hr;

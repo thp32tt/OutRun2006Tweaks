@@ -382,7 +382,7 @@ namespace
             const std::array<XrView, 2>& views, std::uint32_t viewCount,
             const std::array<XrViewConfigurationView, 2>& configs,
             XrSessionState sessionState, XrViewStateFlags viewFlags, bool shouldRender,
-            const char* runtime)
+            bool directTransportEnabled, bool directTransportReady, const char* runtime)
         {
             LARGE_INTEGER qpc{};
             QueryPerformanceCounter(&qpc);
@@ -393,6 +393,8 @@ namespace
                 flags |= OutRunVR::SessionVisible;
             if (sessionState == XR_SESSION_STATE_FOCUSED) flags |= OutRunVR::SessionFocused;
             if (shouldRender) flags |= OutRunVR::HostShouldRender;
+            if (directTransportEnabled) flags |= OutRunVR::HostDirectGpuTransport;
+            if (directTransportEnabled && directTransportReady) flags |= OutRunVR::HostDirectGpuReady;
 
             const XrViewStateFlags required = XR_VIEW_STATE_ORIENTATION_VALID_BIT |
                 XR_VIEW_STATE_POSITION_VALID_BIT;
@@ -659,8 +661,9 @@ namespace
     {
     public:
         StereoCompositor(XrSession session, ID3D11Device* device, ID3D11DeviceContext* context,
-            HWND hwnd, const std::array<XrViewConfigurationView, 2>& configs)
-            : session_(session), device_(device), context_(context), hwnd_(hwnd), configs_(configs)
+            HWND hwnd, const std::array<XrViewConfigurationView, 2>& configs, bool directTransportEnabled, float renderScale)
+            : session_(session), device_(device), context_(context), hwnd_(hwnd), configs_(configs),
+              directTransportEnabled_(directTransportEnabled), renderScale_(renderScale)
         {
             device_->AddRef();
             context_->AddRef();
@@ -685,6 +688,7 @@ namespace
         {
             theaterAnchorValid_ = false;
             stereoSourceValid_ = false;
+            directFrameValid_ = false;
         }
 
         void Shutdown()
@@ -700,7 +704,12 @@ namespace
             ChooseSwapchainFormat();
             CreateProjectionSwapchain();
             CreateTheaterSwapchain();
-            std::cout << "OpenXR true stereo ready: projection " << projection_.width << "x" << projection_.height << "x2; theater " << theater_.width << "x" << theater_.height << ".\n";
+            std::cout << "OpenXR true stereo ready: runtime recommended "
+                << std::max(configs_[0].recommendedImageRectWidth, configs_[1].recommendedImageRectWidth) << "x"
+                << std::max(configs_[0].recommendedImageRectHeight, configs_[1].recommendedImageRectHeight)
+                << " per eye; projection " << projection_.width << "x" << projection_.height << "x2 (scale=" << renderScale_
+                << "); theater " << theater_.width << "x" << theater_.height
+                << "; directGPU=" << (directTransportEnabled_ ? "enabled" : "disabled") << ".\n";
             return true;
         }
 
@@ -751,6 +760,80 @@ namespace
             return status;
         }
 
+        bool CommitDirectStereoSource(const OutRunVR::SharedRenderFrameState& frame)
+        {
+            if (!directTransportEnabled_ || (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0)
+                return false;
+            const std::uint32_t leftHandleValue = frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex];
+            const std::uint32_t rightHandleValue = frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex];
+            const std::uint32_t width = frame.reserved[OutRunVR::RenderFrameDirectWidthIndex];
+            const std::uint32_t height = frame.reserved[OutRunVR::RenderFrameDirectHeightIndex];
+            const std::uint32_t generation = frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+            if (!leftHandleValue || !rightHandleValue || !width || !height || !generation)
+                return false;
+
+            const bool same = directLeft_ && directRight_ && directLeftSrv_ && directRightSrv_ &&
+                directLeftHandle_ == leftHandleValue && directRightHandle_ == rightHandleValue &&
+                directGeneration_ == generation;
+            if (!same)
+            {
+                ReleaseCom(directLeftSrv_); ReleaseCom(directLeft_);
+                ReleaseCom(directRightSrv_); ReleaseCom(directRight_);
+                directFrameValid_ = false;
+
+                auto openOne = [&](std::uint32_t raw, ID3D11Texture2D** texture, ID3D11ShaderResourceView** srv) -> bool
+                {
+                    ID3D11Resource* resource = nullptr;
+                    const HANDLE handle = reinterpret_cast<HANDLE>(static_cast<std::uintptr_t>(raw));
+                    if (FAILED(device_->OpenSharedResource(handle, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&resource))) || !resource)
+                        return false;
+                    const HRESULT q = resource->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void**>(texture));
+                    resource->Release();
+                    if (FAILED(q) || !*texture) return false;
+                    D3D11_TEXTURE2D_DESC d{}; (*texture)->GetDesc(&d);
+                    if (d.Width != width || d.Height != height || d.SampleDesc.Count != 1 ||
+                        FAILED(device_->CreateShaderResourceView(*texture, nullptr, srv)) || !*srv)
+                    {
+                        ReleaseCom(*texture); ReleaseCom(*srv); return false;
+                    }
+                    return true;
+                };
+
+                if (!openOne(leftHandleValue, &directLeft_, &directLeftSrv_) ||
+                    !openOne(rightHandleValue, &directRight_, &directRightSrv_))
+                {
+                    ReleaseCom(directLeftSrv_); ReleaseCom(directLeft_);
+                    ReleaseCom(directRightSrv_); ReleaseCom(directRight_);
+                    directTransportReady_ = false;
+                    if (!directOpenFailureLogged_)
+                    {
+                        directOpenFailureLogged_ = true;
+                        std::cout << "Direct GPU eye transport open failed; host will request SBS fallback.\n";
+                    }
+                    return false;
+                }
+                D3D11_TEXTURE2D_DESC ld{}; directLeft_->GetDesc(&ld);
+                D3D11_TEXTURE2D_DESC rd{}; directRight_->GetDesc(&rd);
+                if (ld.Format != rd.Format)
+                {
+                    ReleaseCom(directLeftSrv_); ReleaseCom(directLeft_);
+                    ReleaseCom(directRightSrv_); ReleaseCom(directRight_);
+                    directTransportReady_ = false;
+                    return false;
+                }
+                directLeftHandle_ = leftHandleValue; directRightHandle_ = rightHandleValue;
+                directGeneration_ = generation; directWidth_ = width; directHeight_ = height;
+                directFormat_ = ld.Format; directTransportReady_ = true;
+                std::cout << "Direct GPU eye transport opened: source " << directWidth_ << "x" << directHeight_
+                    << " per eye -> OpenXR " << projection_.width << "x" << projection_.height
+                    << " per eye (generation=" << directGeneration_ << ").\n";
+            }
+            directFrameValid_ = true;
+            return true;
+        }
+
+        bool DirectTransportReady() const { return directTransportEnabled_ && directTransportReady_; }
+
         bool CommitStereoSource()
         {
             if (!source_ || !sourceSrv_ || !sourceWidth_ || !sourceHeight_) return false;
@@ -787,25 +870,37 @@ namespace
             return true;
         }
 
-        bool HasStereoSource() const { return stereoSourceValid_ && stereoSourceSrv_; }
+        bool HasStereoSource() const { return directFrameValid_ || (stereoSourceValid_ && stereoSourceSrv_); }
 
         bool RenderProjection(const std::array<XrView, 2>& views,
             std::array<XrCompositionLayerProjectionView, 2>& pv)
         {
             if (!HasStereoSource()) return false;
-            UvRect whole{};
-            if (!GetGameUv(whole)) return false;
-            UvRect eyes[2]{
-                { whole.x, whole.y, whole.w * 0.5f, whole.h },
-                { whole.x + whole.w * 0.5f, whole.y, whole.w * 0.5f, whole.h }
-            };
+            UvRect eyes[2]{};
+            ID3D11ShaderResourceView* eyeSrv[2]{};
+            DXGI_FORMAT eyeFormat[2]{ DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN };
+            if (directFrameValid_ && directLeftSrv_ && directRightSrv_)
+            {
+                eyes[0] = eyes[1] = { 0.f, 0.f, 1.f, 1.f };
+                eyeSrv[0] = directLeftSrv_; eyeSrv[1] = directRightSrv_;
+                eyeFormat[0] = eyeFormat[1] = directFormat_;
+            }
+            else
+            {
+                UvRect whole{};
+                if (!GetGameUv(whole)) return false;
+                eyes[0] = { whole.x, whole.y, whole.w * 0.5f, whole.h };
+                eyes[1] = { whole.x + whole.w * 0.5f, whole.y, whole.w * 0.5f, whole.h };
+                eyeSrv[0] = eyeSrv[1] = stereoSourceSrv_;
+                eyeFormat[0] = eyeFormat[1] = stereoSourceFormat_;
+            }
 
             std::uint32_t image = 0;
             Acquire(projection_, image);
             bool ok = RenderTo(projection_.rtvs[image][0], projection_.width, projection_.height,
-                eyes[0], stereoSourceSrv_, stereoSourceFormat_);
+                eyes[0], eyeSrv[0], eyeFormat[0]);
             ok = RenderTo(projection_.rtvs[image][1], projection_.width, projection_.height,
-                eyes[1], stereoSourceSrv_, stereoSourceFormat_) && ok;
+                eyes[1], eyeSrv[1], eyeFormat[1]) && ok;
             Release(projection_);
             if (!ok) return false;
 
@@ -865,6 +960,10 @@ namespace
             theater_.Destroy();
             ReleaseCom(stereoSourceSrv_);
             ReleaseCom(stereoSource_);
+            ReleaseCom(directLeftSrv_); ReleaseCom(directLeft_);
+            ReleaseCom(directRightSrv_); ReleaseCom(directRight_);
+            directFrameValid_ = false; directTransportReady_ = false;
+            directLeftHandle_ = directRightHandle_ = directGeneration_ = 0;
             ReleaseCom(sourceSrv_);
             ReleaseCom(source_);
             ReleaseCom(constantBuffer_);
@@ -905,10 +1004,12 @@ namespace
 
         void CreateProjectionSwapchain()
         {
-            projection_.width = std::max(configs_[0].recommendedImageRectWidth,
-                configs_[1].recommendedImageRectWidth);
-            projection_.height = std::max(configs_[0].recommendedImageRectHeight,
-                configs_[1].recommendedImageRectHeight);
+            const std::uint32_t recommendedW = std::max(configs_[0].recommendedImageRectWidth, configs_[1].recommendedImageRectWidth);
+            const std::uint32_t recommendedH = std::max(configs_[0].recommendedImageRectHeight, configs_[1].recommendedImageRectHeight);
+            const std::uint32_t maxW = std::max(configs_[0].maxImageRectWidth, configs_[1].maxImageRectWidth);
+            const std::uint32_t maxH = std::max(configs_[0].maxImageRectHeight, configs_[1].maxImageRectHeight);
+            projection_.width = std::clamp(static_cast<std::uint32_t>(std::lround(recommendedW * renderScale_)), 1u, maxW);
+            projection_.height = std::clamp(static_cast<std::uint32_t>(std::lround(recommendedH * renderScale_)), 1u, maxH);
             projection_.arraySize=2;
             projection_.format = swapFormat_;
             CreateSwapchain(projection_);
@@ -1166,6 +1267,19 @@ namespace
         DXGI_FORMAT stereoSourceFormat_ = DXGI_FORMAT_UNKNOWN;
         bool stereoSourceValid_ = false;
 
+        ID3D11Texture2D* directLeft_ = nullptr;
+        ID3D11Texture2D* directRight_ = nullptr;
+        ID3D11ShaderResourceView* directLeftSrv_ = nullptr;
+        ID3D11ShaderResourceView* directRightSrv_ = nullptr;
+        std::uint32_t directLeftHandle_ = 0, directRightHandle_ = 0, directGeneration_ = 0;
+        std::uint32_t directWidth_ = 0, directHeight_ = 0;
+        DXGI_FORMAT directFormat_ = DXGI_FORMAT_UNKNOWN;
+        bool directTransportEnabled_ = true;
+        bool directTransportReady_ = false;
+        bool directFrameValid_ = false;
+        bool directOpenFailureLogged_ = false;
+        float renderScale_ = 1.0f;
+
         ID3D11VertexShader* vs_ = nullptr;
         ID3D11PixelShader* ps_ = nullptr;
         ID3D11SamplerState* sampler_ = nullptr;
@@ -1197,6 +1311,31 @@ namespace
         return modes.front();
     }
 
+    float ReadRenderScale(int argc, char** argv)
+    {
+        float scale = 1.0f;
+        char env[64]{};
+        const DWORD n = GetEnvironmentVariableA("OUTRUN_VR_RENDER_SCALE", env, sizeof(env));
+        if (n > 0 && n < sizeof(env))
+        {
+            char* end = nullptr; const float v = std::strtof(env, &end);
+            if (end != env && std::isfinite(v)) scale = v;
+        }
+        for (int i = 1; i + 1 < argc; ++i)
+            if (std::strcmp(argv[i], "--render-scale") == 0)
+            {
+                const float v = std::strtof(argv[i + 1], nullptr);
+                if (std::isfinite(v)) scale = v;
+            }
+        return std::clamp(scale, 0.5f, 2.0f);
+    }
+
+    bool DirectTransportEnabled()
+    {
+        char env[16]{}; const DWORD n = GetEnvironmentVariableA("OUTRUN_VR_DIRECT_TRANSPORT", env, sizeof(env));
+        return !(n > 0 && n < sizeof(env) && (env[0] == '0' || _stricmp(env, "false") == 0 || _stricmp(env, "off") == 0));
+    }
+
     void ParseRuntimeOverride(int argc, char** argv)
     {
         for (int i = 1; i + 1 < argc; ++i)
@@ -1222,6 +1361,8 @@ int main(int argc, char** argv)
     {
         SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
         ParseRuntimeOverride(argc, argv);
+        const float renderScale = ReadRenderScale(argc, argv);
+        const bool directTransportEnabled = DirectTransportEnabled();
         HWND gameWindow = WaitForGameWindow();
         DWORD gamePid = 0;
         GetWindowThreadProcessId(gameWindow, &gamePid);
@@ -1296,7 +1437,7 @@ int main(int argc, char** argv)
             "xrEnumerateViewConfigurationViews list");
         std::array<XrViewConfigurationView, 2> configs{ cv[0], cv[1] };
 
-        SharedWriter shared;RenderFrameReader renderFrames;StereoCompositor compositor(session,d3d.device,d3d.context,gameWindow,configs);compositor.Initialize();ViewHistory viewHistory;HostTimings timings;
+        SharedWriter shared;RenderFrameReader renderFrames;StereoCompositor compositor(session,d3d.device,d3d.context,gameWindow,configs,directTransportEnabled,renderScale);compositor.Initialize();ViewHistory viewHistory;HostTimings timings;
         const XrEnvironmentBlendMode blend = ChooseBlendMode(instance, system);
 
         bool running = false, quit = false, exitRequested = false;
@@ -1375,7 +1516,8 @@ int main(int argc, char** argv)
             CheckXr(xrLocateViews(session, &vl, &vs, 2, &vc, views.data()), "xrLocateViews");
 
             const std::uint32_t hostSequence = shared.Write(head, views, vc, configs,
-                state, vs.viewStateFlags, fs.shouldRender == XR_TRUE, ip.runtimeName);
+                state, vs.viewStateFlags, fs.shouldRender == XR_TRUE, directTransportEnabled,
+                compositor.DirectTransportReady(), ip.runtimeName);
             const XrViewStateFlags neededViews = XR_VIEW_STATE_ORIENTATION_VALID_BIT |
                 XR_VIEW_STATE_POSITION_VALID_BIT;
             if (vc >= 2 && (vs.viewStateFlags & neededViews) == neededViews)
@@ -1402,7 +1544,7 @@ int main(int argc, char** argv)
             bool layerReady=false;
             if(fs.shouldRender==XR_TRUE&&vc>=2){
                 if(presentation==OutRunVR::PresentationGameplay){OutRunVR::SharedRenderFrameState before{};const bool have=renderFrames.Read(before);const std::uint32_t need=OutRunVR::RenderFrameStereoComplete|OutRunVR::RenderFrameWorldStereo|OutRunVR::RenderFrameDrawDuplicated|OutRunVR::RenderFrameEffectivePoseValid;
-                    if(have&&(before.flags&OutRunVR::RenderFramePresentInFlight)==0&&before.state==OutRunVR::StereoSbsActive&&before.frameId&&before.frameId!=lastProcessedStereoFrame&&before.sourcePoseSequence&&(before.flags&need)==need){std::array<XrView,2> history{};if(viewHistory.Find(before.sourcePoseSequence,history)){LARGE_INTEGER cs{},ce{};QueryPerformanceCounter(&cs);const CaptureStatus capture=compositor.Capture(2);QueryPerformanceCounter(&ce);timings.capture.Add(timings.Ms(cs,ce));OutRunVR::SharedRenderFrameState after{};const bool same=renderFrames.Read(after)&&(after.flags&OutRunVR::RenderFramePresentInFlight)==0&&after.state==before.state&&after.frameId==before.frameId&&after.sourcePoseSequence==before.sourcePoseSequence&&after.presentQpc==before.presentQpc&&after.flags==before.flags&&after.failureReason==before.failureReason;if(capture.available&&QpcAtOrAfter(capture.lastPresentQpc,before.presentQpc)&&same&&compositor.CommitStereoSource()){for(int eye=0;eye<2;++eye){matchedViews[eye]={XR_TYPE_VIEW};matchedViews[eye].pose.orientation={before.eye[eye].orientation[0],before.eye[eye].orientation[1],before.eye[eye].orientation[2],before.eye[eye].orientation[3]};matchedViews[eye].pose.position={before.eye[eye].position[0],before.eye[eye].position[1],before.eye[eye].position[2]};matchedViews[eye].fov={before.eye[eye].fov.angleLeft,before.eye[eye].fov.angleRight,before.eye[eye].fov.angleUp,before.eye[eye].fov.angleDown};}matchedStereoValid=true;lastProcessedStereoFrame=before.frameId;lastStereoMatchMs=GetTickCount64();}}}
+                    if(have&&(before.flags&OutRunVR::RenderFramePresentInFlight)==0&&before.state==OutRunVR::StereoSbsActive&&before.frameId&&before.frameId!=lastProcessedStereoFrame&&before.sourcePoseSequence&&(before.flags&need)==need){std::array<XrView,2> history{};if(viewHistory.Find(before.sourcePoseSequence,history)){bool sourceReady=false;const bool directFrame=(before.flags&OutRunVR::RenderFrameDirectGpuTransport)!=0;LARGE_INTEGER cs{},ce{};QueryPerformanceCounter(&cs);if(directFrame){sourceReady=compositor.CommitDirectStereoSource(before);}else{const CaptureStatus capture=compositor.Capture(2);sourceReady=capture.available&&QpcAtOrAfter(capture.lastPresentQpc,before.presentQpc)&&compositor.CommitStereoSource();}QueryPerformanceCounter(&ce);timings.capture.Add(timings.Ms(cs,ce));OutRunVR::SharedRenderFrameState after{};const bool same=renderFrames.Read(after)&&(after.flags&OutRunVR::RenderFramePresentInFlight)==0&&after.state==before.state&&after.frameId==before.frameId&&after.sourcePoseSequence==before.sourcePoseSequence&&after.presentQpc==before.presentQpc&&after.flags==before.flags&&after.failureReason==before.failureReason;if(sourceReady&&same){for(int eye=0;eye<2;++eye){matchedViews[eye]={XR_TYPE_VIEW};matchedViews[eye].pose.orientation={before.eye[eye].orientation[0],before.eye[eye].orientation[1],before.eye[eye].orientation[2],before.eye[eye].orientation[3]};matchedViews[eye].pose.position={before.eye[eye].position[0],before.eye[eye].position[1],before.eye[eye].position[2]};matchedViews[eye].fov={before.eye[eye].fov.angleLeft,before.eye[eye].fov.angleRight,before.eye[eye].fov.angleUp,before.eye[eye].fov.angleDown};}matchedStereoValid=true;lastProcessedStereoFrame=before.frameId;lastStereoMatchMs=GetTickCount64();}}}
                     const bool grace=matchedStereoValid&&compositor.HasStereoSource()&&GetTickCount64()-lastStereoMatchMs<=StereoGraceMs;LARGE_INTEGER rs{},re{};QueryPerformanceCounter(&rs);if(grace&&compositor.RenderProjection(matchedViews,pv)){projection.space=localSpace;projection.viewCount=2;projection.views=pv.data();layers[0]=reinterpret_cast<const XrCompositionLayerBaseHeader*>(&projection);layerReady=true;}QueryPerformanceCounter(&re);timings.render.Add(timings.Ms(rs,re));
                 }else{LARGE_INTEGER cs{},ce{};QueryPerformanceCounter(&cs);const CaptureStatus capture=compositor.Capture();QueryPerformanceCounter(&ce);timings.capture.Add(timings.Ms(cs,ce));LARGE_INTEGER rs{},re{};QueryPerformanceCounter(&rs);if(capture.available&&compositor.RenderTheater(viewSpace,localSpace,fs.predictedDisplayTime,quad)){layers[0]=reinterpret_cast<const XrCompositionLayerBaseHeader*>(&quad);layerReady=true;}QueryPerformanceCounter(&re);timings.render.Add(timings.Ms(rs,re));}}
             end.layerCount=layerReady?1:0;end.layers=layerReady?layers:nullptr;LARGE_INTEGER es{},ee{};QueryPerformanceCounter(&es);CheckXr(xrEndFrame(session,&end),"xrEndFrame");QueryPerformanceCounter(&ee);timings.end.Add(timings.Ms(es,ee));timings.MaybeLog();
