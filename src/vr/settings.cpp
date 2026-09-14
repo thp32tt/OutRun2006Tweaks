@@ -21,10 +21,13 @@
 // exact rendered-frame timing/effective eye poses remain published through the 4-slot
 // frame ring until the frame transport itself is fully migrated.
 //
-// For system D3D9, PreferD3D9Ex upgrades Direct3DCreate9/CreateDevice to an Ex device
-// before game device creation. That makes the existing verified shared-eye ring eligible
-// for zero-copy D3D9Ex -> D3D11 transport. A third-party d3d9 provider is never bypassed,
-// and CreateDeviceEx failure immediately falls back to the original CreateDevice path.
+// PreferD3D9Ex remains an experimental opt-in. Hardware crash evidence on the stock
+// OutRun renderer shows that native D3D9Ex rejects classic D3DPOOL_MANAGED resources
+// still used by the game/Tweaks after CreateDeviceEx succeeds. The safe default therefore
+// keeps the original D3D9 device and uses the true-stereo SBS -> Desktop Duplication ->
+// OpenXR transport. When explicitly enabled, the existing same-adapter shared-eye ring
+// can still be exercised for targeted D3D9Ex/zero-copy diagnostics. A third-party d3d9
+// provider is never bypassed, and CreateDeviceEx failure still falls back immediately.
 //
 // The PC monitor is the transport surface, not a third 3D view: gameplay Present
 // contains the two already-rendered eyes side-by-side. The x64 host Desktop-Duplicates
@@ -41,8 +44,8 @@ namespace Settings
 		"Applies the OpenXR HMD orientation at OutRun's verified D3D9 WorldViewProjection upload." };
 	Setting<bool> VRStereo{ "VR", "Stereo", true,
 		"Renders true left/right geometry stereo into an SBS game frame or verified shared-eye transport. Menus remain on the fixed theater quad." };
-	Setting<bool> VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", true,
-		"When the game uses the Windows system D3D9 runtime, attempts to create the game device as D3D9Ex so verified zero-copy shared-eye transport can be used. Automatically preserves third-party d3d9 wrappers and falls back to normal D3D9 if Ex creation fails." };
+	Setting<bool> VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", false,
+		"Experimental zero-copy transport. Native D3D9Ex rejects classic D3DPOOL_MANAGED resources used by OutRun/Tweaks, so this is disabled by default. Leave false for the compatible true-stereo SBS/Desktop Duplication path; enable only for targeted D3D9Ex diagnostics." };
 	Setting<bool> VRPositionalTracking{ "VR", "PositionalTracking", true,
 		"Applies 6DoF HMD X/Y/Z movement in addition to orientation. Disable this option if a title-specific camera/culling issue is observed; stereo eye separation is independent." };
 	Setting<bool> VRCullingCameraSync{ "VR", "CullingCameraSync", true,
@@ -70,7 +73,7 @@ namespace OutRunVR
 
 		bool apply() override
 		{
-			spdlog::info("VR: renderer-boundary head tracking + true stereo + 6DoF + D3D9Ex-preferred transport configured; CalcCameraMatrix remains untouched");
+			spdlog::info("VR: renderer-boundary head tracking + true stereo + 6DoF + plain-D3D9 SBS fallback default; D3D9Ex zero-copy remains opt-in; CalcCameraMatrix remains untouched");
 			return true;
 		}
 
