@@ -59,7 +59,7 @@ for marker in (
     'SharedProtocolVersion = 2', 'RenderFrameProtocolVersion = 2',
     'RenderFrameRingSize = 4', 'HostAdapterLuidValid',
     'clientInteropProbeHandle', 'hostInteropProbeAckToken',
-    'SharedRenderFrameRing',
+    'hostDirectConsumedFrameId', 'SharedRenderFrameRing',
 ):
     if marker not in protocol_v2:
         raise SystemExit(f'missing live v2 comparison invariant: {marker}')
@@ -144,21 +144,23 @@ if 'Settings::VRPreferD3D9Ex.needs_restart()' not in ex_compat:
 host = (ROOT / 'vrhost/src/main.cpp').read_text(encoding='utf-8')
 for marker in (
     'XR_KHR_D3D11_ENABLE_EXTENSION_NAME', 'OpenSharedResource',
-    'RenderFrameReader', 'ServiceInteropProbe',
+    'RenderFrameReader', 'ServiceInteropProbe', 'AckDirectFrame',
     'XrCompositionLayerProjection', 'RenderTheater',
     'DuplicateOutput', 'HostTimings',
 ):
     if marker not in host:
         raise SystemExit(f'missing live host comparison invariant: {marker}')
 
-# R10 remains the fallback for classic D3D9. A verified direct Frame.v2 must be
-# allowed to keep the legacy host projection produced from shared L/R textures,
-# otherwise the host would silently fall back to Desktop Duplication even after
-# D3D9Ex zero-copy succeeded.
+# R10 remains the fallback for classic D3D9. A direct Frame.v2 may bypass R10
+# only after the host has proved that shared L/R textures are ready and ACKed
+# the exact same frameId. This prevents a published-but-unopened shared handle
+# from being mistaken for a successful zero-copy projection.
 direct_arbitration = (ROOT / 'vrhost/src/runtime/d3d9ex_direct_passthrough.hpp').read_text(encoding='utf-8')
 for marker in (
     'RenderFrameDirectGpuTransport', 'IncomingProjectionValid',
+    'HostDirectGpuReady', 'hostDirectConsumedFrameId', 'HostAckedDirectFrame',
     'DirectFrameReady', 'ZERO-COPY projection passthrough ACTIVE',
+    'exact host shared-eye ACK',
     'OutRunVrFinalTest::EndFrame(session, endInfo)',
     'OutRunVrSbsCaptureOverride::EndFrame(session, endInfo)',
 ):
