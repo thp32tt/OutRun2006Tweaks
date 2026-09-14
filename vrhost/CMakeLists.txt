@@ -28,9 +28,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(openxr_sdk)
 
-# The host is intentionally separate from the 32-bit game DLL.  The current
-# implementation remains in one TU while it is being decomposed behind the
-# architecture boundaries documented in docs/VR_ARCHITECTURE.md.
+# Legacy runtime entrypoint. Runtime behavior is migrated behind the interfaces
+# under src/runtime and frame_source.hpp one ownership boundary at a time.
 add_executable(outrun-vr-host src/main.cpp)
 target_include_directories(outrun-vr-host PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/../src"
@@ -44,7 +43,16 @@ target_include_directories(outrun-vr-shader-smoke PRIVATE "${CMAKE_CURRENT_LIST_
 target_compile_definitions(outrun-vr-shader-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 target_link_libraries(outrun-vr-shader-smoke PRIVATE d3dcompiler)
 
-foreach(target outrun-vr-host outrun-vr-shader-smoke)
+# Architecture smoke target. This is intentionally independent from main.cpp so
+# the new cross-bitness v3 contract must compile on x64 before runtime migration.
+add_executable(outrun-vr-protocol-v3-smoke tests/protocol_v3_smoke.cpp)
+target_include_directories(outrun-vr-protocol-v3-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src"
+    "${CMAKE_CURRENT_LIST_DIR}/src"
+)
+target_compile_definitions(outrun-vr-protocol-v3-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
+
+foreach(target outrun-vr-host outrun-vr-shader-smoke outrun-vr-protocol-v3-smoke)
     set_target_properties(${target} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin"
