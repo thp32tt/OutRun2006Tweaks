@@ -40,7 +40,6 @@ namespace OutRunVR::IpcV3
         WireFov fov{};
     };
 
-    // Single writer: x64 host. Single reader: x86 game.
     struct HostState
     {
         std::uint32_t magic{HostMagic};
@@ -64,7 +63,6 @@ namespace OutRunVR::IpcV3
         char runtimeName[64]{};
     };
 
-    // Single writer: x86 game. Single reader: x64 host.
     struct ClientState
     {
         std::uint32_t magic{ClientMagic};
@@ -107,7 +105,6 @@ namespace OutRunVR::IpcV3
         WireEyeView renderedEyes[2]{};
     };
 
-    // Single producer: x86 game. Single consumer: x64 host.
     struct FrameRing
     {
         std::uint32_t magic{FrameMagic};
@@ -121,7 +118,6 @@ namespace OutRunVR::IpcV3
         FrameDescriptor slots[RingSize]{};
     };
 
-    // Single writer: x64 host. Single reader: x86 game.
     struct AckState
     {
         std::uint32_t magic{AckMagic};
@@ -147,6 +143,11 @@ namespace OutRunVR::IpcV3
     static_assert(sizeof(WireHandle) == 8);
     static_assert(sizeof(WireFov) == 16);
     static_assert(sizeof(WireEyeView) == 48);
+    static_assert(sizeof(HostState) == 268);
+    static_assert(sizeof(ClientState) == 88);
+    static_assert(sizeof(FrameDescriptor) == 172);
+    static_assert(sizeof(FrameRing) == 720);
+    static_assert(sizeof(AckState) == 48);
     static_assert(std::is_standard_layout_v<HostState> && std::is_trivially_copyable_v<HostState>);
     static_assert(std::is_standard_layout_v<ClientState> && std::is_trivially_copyable_v<ClientState>);
     static_assert(std::is_standard_layout_v<FrameDescriptor> && std::is_trivially_copyable_v<FrameDescriptor>);
