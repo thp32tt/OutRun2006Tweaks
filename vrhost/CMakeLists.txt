@@ -93,7 +93,7 @@ target_include_directories(outrun-vr-host-pose-v3-validation-smoke PRIVATE
 )
 target_compile_definitions(outrun-vr-host-pose-v3-validation-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 
-foreach(target IN ITEMS
+foreach(target
     outrun-vr-host
     outrun-vr-shader-smoke
     outrun-vr-protocol-v3-smoke
@@ -102,7 +102,7 @@ foreach(target IN ITEMS
     outrun-vr-v2-v3-shadow-conversion-smoke
     outrun-vr-host-pose-v3-validation-smoke)
     set_target_properties(${target} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
-        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin")
+        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin"
+    )
 endforeach()
