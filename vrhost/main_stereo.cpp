@@ -239,6 +239,10 @@ namespace
         };
     }
 
+    XrQuaternionf NormalizeQuaternion(XrQuaternionf q){const float l=q.x*q.x+q.y*q.y+q.z*q.z+q.w*q.w;if(!std::isfinite(l)||l<=1e-12f)return{0,0,0,1};const float i=1.0f/std::sqrt(l);q.x*=i;q.y*=i;q.z*=i;q.w*=i;return q;}
+    XrQuaternionf ConjugateQuaternion(XrQuaternionf q){q=NormalizeQuaternion(q);return{-q.x,-q.y,-q.z,q.w};}
+    XrQuaternionf MultiplyQuaternion(const XrQuaternionf&aIn,const XrQuaternionf&bIn){const auto a=NormalizeQuaternion(aIn),b=NormalizeQuaternion(bIn);return NormalizeQuaternion({a.w*b.x+a.x*b.w+a.y*b.z-a.z*b.y,a.w*b.y-a.x*b.z+a.y*b.w+a.z*b.x,a.w*b.z+a.x*b.y-a.y*b.x+a.z*b.w,a.w*b.w-a.x*b.x-a.y*b.y-a.z*b.z});}
+
     XrVector3f ToHeadLocal(const XrPosef& head, const XrVector3f& world)
     {
         XrVector3f delta{
@@ -246,12 +250,9 @@ namespace
             world.y - head.position.y,
             world.z - head.position.z
         };
-        XrQuaternionf inv{
-            -head.orientation.x, -head.orientation.y,
-            -head.orientation.z, head.orientation.w
-        };
-        return RotateVector(inv, delta);
+        return RotateVector(ConjugateQuaternion(head.orientation),delta);
     }
+    XrQuaternionf ToHeadLocalOrientation(const XrPosef& head,const XrPosef& eye){return MultiplyQuaternion(ConjugateQuaternion(head.orientation),eye.orientation);}
 
     std::uint32_t FloatBits(float v)
     {
@@ -379,7 +380,7 @@ namespace
                 (head.locationFlags & (XR_SPACE_LOCATION_ORIENTATION_VALID_BIT |
                     XR_SPACE_LOCATION_POSITION_VALID_BIT)) ==
                 (XR_SPACE_LOCATION_ORIENTATION_VALID_BIT | XR_SPACE_LOCATION_POSITION_VALID_BIT);
-            if (stereoValid) flags |= OutRunVR::StereoViewsValid;
+            if(stereoValid)flags|=OutRunVR::StereoViewsValid|OutRunVR::StereoEyeOrientationValid;
 
             Begin();
             state_->hostPid = GetCurrentProcessId();
@@ -403,13 +404,13 @@ namespace
                         views[eye].fov.angleUp, views[eye].fov.angleDown
                     };
                 }
-                state_->recommendedWidth[eye] = configs[eye].recommendedImageRectWidth;
-                state_->recommendedHeight[eye] = configs[eye].recommendedImageRectHeight;
             }
-            if (stereoValid)
+            (void)configs;
+            if(stereoValid)
             {
-                const XrVector3f left = ToHeadLocal(head.pose, views[0].pose.position);
-                const XrVector3f right = ToHeadLocal(head.pose, views[1].pose.position);
+                const XrVector3f left=ToHeadLocal(head.pose,views[0].pose.position),right=ToHeadLocal(head.pose,views[1].pose.position);
+                const XrQuaternionf eq[2]={ToHeadLocalOrientation(head.pose,views[0].pose),ToHeadLocalOrientation(head.pose,views[1].pose)};
+                for(int eye=0;eye<2;++eye){state_->eyeOrientation[eye][0]=eq[eye].x;state_->eyeOrientation[eye][1]=eq[eye].y;state_->eyeOrientation[eye][2]=eq[eye].z;state_->eyeOrientation[eye][3]=eq[eye].w;}
                 state_->reserved[OutRunVR::HostEyeOffsetLeftXIndex] = FloatBits(left.x);
                 state_->reserved[OutRunVR::HostEyeOffsetLeftYIndex] = FloatBits(left.y);
                 state_->reserved[OutRunVR::HostEyeOffsetLeftZIndex] = FloatBits(left.z);
@@ -471,6 +472,15 @@ namespace
         OutRunVR::SharedPoseState* state_ = nullptr;
         bool owns_ = false;
         std::uint32_t referenceGeneration_ = 1;
+    };
+
+    class RenderFrameReader
+    {
+    public:
+        RenderFrameReader(){mapping_=CreateFileMappingW(INVALID_HANDLE_VALUE,nullptr,PAGE_READWRITE,0,static_cast<DWORD>(sizeof(OutRunVR::SharedRenderFrameState)),OutRunVR::RenderFrameMemoryName);if(!mapping_)throw std::runtime_error("CreateFileMappingW Frame.v1 failed");const bool existed=GetLastError()==ERROR_ALREADY_EXISTS;state_=static_cast<OutRunVR::SharedRenderFrameState*>(MapViewOfFile(mapping_,FILE_MAP_ALL_ACCESS,0,0,sizeof(OutRunVR::SharedRenderFrameState)));if(!state_)throw std::runtime_error("MapViewOfFile Frame.v1 failed");if(!existed){std::memset(state_,0,sizeof(*state_));state_->protocolVersion=OutRunVR::RenderFrameProtocolVersion;state_->structSize=sizeof(*state_);MemoryBarrier();state_->magic=OutRunVR::RenderFrameMagic;}}
+        ~RenderFrameReader(){if(state_)UnmapViewOfFile(state_);if(mapping_)CloseHandle(mapping_);}
+        bool Read(OutRunVR::SharedRenderFrameState&out)const{if(!state_||state_->magic!=OutRunVR::RenderFrameMagic||state_->protocolVersion!=OutRunVR::RenderFrameProtocolVersion||state_->structSize!=sizeof(*state_))return false;for(int a=0;a<4;++a){const auto b=state_->sequence;if(b&1u)continue;MemoryBarrier();std::memcpy(&out,state_,sizeof(out));MemoryBarrier();const auto e=state_->sequence;if(b==e&&!(e&1u)&&out.magic==OutRunVR::RenderFrameMagic&&out.protocolVersion==OutRunVR::RenderFrameProtocolVersion&&out.structSize==sizeof(out))return true;}return false;}
+    private: HANDLE mapping_=nullptr;OutRunVR::SharedRenderFrameState*state_=nullptr;
     };
 
     struct ViewHistoryEntry
@@ -616,12 +626,7 @@ namespace
         ~SwapchainSet() { Destroy(); }
     };
 
-    struct CaptureStatus
-    {
-        bool available = false;
-        bool fresh = false;
-        std::uint32_t lastPresentQpcLow = 0;
-    };
+    struct CaptureStatus{bool available=false;bool fresh=false;std::int64_t lastPresentQpc=0;std::uint32_t lastPresentQpcLow=0;};
 
     class StereoCompositor
     {
@@ -662,6 +667,17 @@ namespace
         }
 
         bool Initialize()
+        {
+            if(!BindCaptureOutput(true))throw std::runtime_error("failed to bind game capture output");
+            CreateShaders();
+            ChooseSwapchainFormat();
+            CreateProjectionSwapchain();
+            CreateTheaterSwapchain();
+            std::cout << "OpenXR true stereo ready: projection " << projection_.width << "x" << projection_.height << "x2; theater " << theater_.width << "x" << theater_.height << ".\n";
+            return true;
+        }
+
+        bool InitializeLegacyCaptureRemoved()
         {
             targetMonitor_ = MonitorFromWindow(hwnd_, MONITOR_DEFAULTTONEAREST);
             sdrWhiteScale_ = QuerySdrWhiteScale(targetMonitor_);
@@ -708,25 +724,24 @@ namespace
             return true;
         }
 
-        CaptureStatus Capture()
+        CaptureStatus Capture(DWORD timeoutMs=0)
         {
-            CaptureStatus status{ haveFrame_, false, lastCapturePresentQpcLow_ };
+            if(!IsWindow(hwnd_)){if(HWND replacement=FindGameWindow(gamePid_))hwnd_=replacement;}
+            const HMONITOR monitorNow=IsWindow(hwnd_)?MonitorFromWindow(hwnd_,MONITOR_DEFAULTTONEAREST):nullptr;if(!duplication_||(monitorNow&&monitorNow!=targetMonitor_))BindCaptureOutput(false);
+            CaptureStatus status{haveFrame_,false,lastCapturePresentQpc_,lastCapturePresentQpcLow_};
             if (!duplication_ && !RecreateDuplication(false)) return status;
 
             DXGI_OUTDUPL_FRAME_INFO fi{};
             IDXGIResource* res = nullptr;
-            const HRESULT hr = duplication_->AcquireNextFrame(haveFrame_ ? 0 : 1000, &fi, &res);
+            if(!duplication_)return status;const DWORD waitMs=haveFrame_?timeoutMs:std::max<DWORD>(timeoutMs,1000);const HRESULT hr=duplication_->AcquireNextFrame(waitMs,&fi,&res);
             if (hr == DXGI_ERROR_WAIT_TIMEOUT) return status;
             if (FAILED(hr) || !res)
             {
                 if (hr == DXGI_ERROR_ACCESS_LOST)
                 {
-                    ReleaseCom(duplication_);
-                    haveFrame_ = false;
-                    stereoSourceValid_ = false;
-                    RecreateDuplication(false);
+                    haveFrame_=false;stereoSourceValid_=false;BindCaptureOutput(false);
                 }
-                return { haveFrame_, false, lastCapturePresentQpcLow_ };
+                return {haveFrame_,false,lastCapturePresentQpc_,lastCapturePresentQpcLow_};
             }
 
             ID3D11Texture2D* tex = nullptr;
@@ -750,11 +765,8 @@ namespace
             if (copied)
             {
                 haveFrame_ = true;
-                if (fi.LastPresentTime.QuadPart != 0)
-                    lastCapturePresentQpcLow_ = static_cast<std::uint32_t>(fi.LastPresentTime.QuadPart);
-                status.available = true;
-                status.fresh = fi.AccumulatedFrames > 0;
-                status.lastPresentQpcLow = lastCapturePresentQpcLow_;
+                if(fi.LastPresentTime.QuadPart!=0){lastCapturePresentQpc_=fi.LastPresentTime.QuadPart;lastCapturePresentQpcLow_=static_cast<std::uint32_t>(fi.LastPresentTime.QuadPart);}
+                status.available=true;status.fresh=fi.AccumulatedFrames>0;status.lastPresentQpc=lastCapturePresentQpc_;status.lastPresentQpcLow=lastCapturePresentQpcLow_;
             }
             return status;
         }
@@ -1018,6 +1030,12 @@ namespace
             CheckHr(device_->CreateBuffer(&bd, nullptr, &constantBuffer_), "CreateBuffer");
         }
 
+        bool BindCaptureOutput(bool initial)
+        {
+            if(HWND replacement=FindGameWindow(gamePid_))hwnd_=replacement;if(!IsWindow(hwnd_))return false;targetMonitor_=MonitorFromWindow(hwnd_,MONITOR_DEFAULTTONEAREST);if(!targetMonitor_)return false;ReleaseCom(duplication_);ReleaseCom(output5_);ReleaseCom(output1_);
+            IDXGIDevice*dxgi=nullptr;if(FAILED(device_->QueryInterface(__uuidof(IDXGIDevice),reinterpret_cast<void**>(&dxgi)))||!dxgi)return false;IDXGIAdapter*adapter=nullptr;const HRESULT ah=dxgi->GetAdapter(&adapter);dxgi->Release();if(FAILED(ah)||!adapter)return false;IDXGIOutput*selected=nullptr;DXGI_OUTPUT_DESC desc{};for(UINT i=0;;++i){IDXGIOutput*out=nullptr;if(adapter->EnumOutputs(i,&out)==DXGI_ERROR_NOT_FOUND)break;DXGI_OUTPUT_DESC d{};out->GetDesc(&d);if(d.Monitor==targetMonitor_){selected=out;desc=d;break;}out->Release();}adapter->Release();if(!selected)return false;selected->QueryInterface(__uuidof(IDXGIOutput1),reinterpret_cast<void**>(&output1_));selected->QueryInterface(__uuidof(IDXGIOutput5),reinterpret_cast<void**>(&output5_));selected->Release();if(!output1_)return false;outputDesktop_=desc.DesktopCoordinates;sdrWhiteScale_=QuerySdrWhiteScale(targetMonitor_);haveFrame_=false;stereoSourceValid_=false;lastCapturePresentQpc_=0;lastCapturePresentQpcLow_=0;return RecreateDuplication(initial);
+        }
+
         bool RecreateDuplication(bool initial)
         {
             ReleaseCom(duplication_);
@@ -1160,8 +1178,7 @@ namespace
         ID3D11ShaderResourceView* sourceSrv_ = nullptr;
         std::uint32_t sourceWidth_ = 0, sourceHeight_ = 0;
         DXGI_FORMAT sourceFormat_ = DXGI_FORMAT_UNKNOWN;
-        bool haveFrame_ = false;
-        std::uint32_t lastCapturePresentQpcLow_ = 0;
+        bool haveFrame_=false;std::int64_t lastCapturePresentQpc_=0;std::uint32_t lastCapturePresentQpcLow_=0;
 
         ID3D11Texture2D* stereoSource_ = nullptr;
         ID3D11ShaderResourceView* stereoSourceSrv_ = nullptr;
@@ -1180,6 +1197,10 @@ namespace
         XrPosef theaterAnchor_{};
         bool theaterAnchorValid_ = false;
     };
+
+    bool QpcAtOrAfter(std::int64_t capture,std::int64_t present){return capture>0&&present>0&&capture>=present;}
+    struct TimingSeries{std::array<double,256>samples{};std::size_t count=0,cursor=0;void Add(double ms){samples[cursor++%samples.size()]=ms;if(count<samples.size())++count;}double Percentile(double p)const{if(!count)return 0;auto c=samples;std::sort(c.begin(),c.begin()+count);const std::size_t i=std::min<std::size_t>(count-1,static_cast<std::size_t>(std::ceil(p*count))-1);return c[i];}};
+    struct HostTimings{TimingSeries wait,capture,render,end;LARGE_INTEGER f{};ULONGLONG last=0;HostTimings(){QueryPerformanceFrequency(&f);}double Ms(const LARGE_INTEGER&a,const LARGE_INTEGER&b)const{return f.QuadPart?double(b.QuadPart-a.QuadPart)*1000.0/double(f.QuadPart):0;}void MaybeLog(){const auto n=GetTickCount64();if(n-last<5000)return;last=n;std::cout<<"VR host timing ms p95/p99: wait "<<wait.Percentile(.95)<<"/"<<wait.Percentile(.99)<<" capture "<<capture.Percentile(.95)<<"/"<<capture.Percentile(.99)<<" render "<<render.Percentile(.95)<<"/"<<render.Percentile(.99)<<" end "<<end.Percentile(.95)<<"/"<<end.Percentile(.99)<<"\n";}};
 
     bool QpcLowAtOrAfter(std::uint32_t capture, std::uint32_t present)
     {
@@ -1301,10 +1322,7 @@ int main(int argc, char** argv)
             "xrEnumerateViewConfigurationViews list");
         std::array<XrViewConfigurationView, 2> configs{ cv[0], cv[1] };
 
-        SharedWriter shared;
-        StereoCompositor compositor(session, d3d.device, d3d.context, gameWindow, configs);
-        compositor.Initialize();
-        ViewHistory viewHistory;
+        SharedWriter shared;RenderFrameReader renderFrames;StereoCompositor compositor(session,d3d.device,d3d.context,gameWindow,configs);compositor.Initialize();ViewHistory viewHistory;HostTimings timings;
         const XrEnvironmentBlendMode blend = ChooseBlendMode(instance, system);
 
         bool running = false, quit = false, exitRequested = false;
@@ -1314,7 +1332,7 @@ int main(int argc, char** argv)
         std::array<XrView, 2> matchedViews{};
         bool matchedStereoValid = false;
         std::uint32_t lastProcessedStereoFrame = 0;
-        ULONGLONG lastStereoMatchMs = 0;
+        ULONGLONG lastStereoMatchMs=0;bool pendingReferenceSpaceChange=false;XrTime pendingReferenceSpaceChangeTime=0;
 
         while (!quit)
         {
@@ -1348,14 +1366,7 @@ int main(int argc, char** argv)
                     else if (state == XR_SESSION_STATE_EXITING || state == XR_SESSION_STATE_LOSS_PENDING)
                         quit = true;
                 }
-                else if (event.type == XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING)
-                {
-                    shared.ReferenceSpaceChanged();
-                    compositor.ReferenceSpaceChanged();
-                    viewHistory.Clear();
-                    matchedStereoValid = false;
-                    lastProcessedStereoFrame = shared.ReadStereoMeta().frame;
-                }
+                else if(event.type==XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING){const auto*e=reinterpret_cast<XrEventDataReferenceSpaceChangePending*>(&event);if(e->referenceSpaceType==XR_REFERENCE_SPACE_TYPE_LOCAL){pendingReferenceSpaceChange=true;pendingReferenceSpaceChangeTime=e->changeTime;}}
                 event = { XR_TYPE_EVENT_DATA_BUFFER };
             }
 
@@ -1365,7 +1376,8 @@ int main(int argc, char** argv)
 
             XrFrameWaitInfo wi{ XR_TYPE_FRAME_WAIT_INFO };
             XrFrameState fs{ XR_TYPE_FRAME_STATE };
-            CheckXr(xrWaitFrame(session, &wi, &fs), "xrWaitFrame");
+            LARGE_INTEGER ws{},we{};QueryPerformanceCounter(&ws);CheckXr(xrWaitFrame(session,&wi,&fs),"xrWaitFrame");QueryPerformanceCounter(&we);timings.wait.Add(timings.Ms(ws,we));
+            if(pendingReferenceSpaceChange&&(pendingReferenceSpaceChangeTime==0||fs.predictedDisplayTime>=pendingReferenceSpaceChangeTime)){shared.ReferenceSpaceChanged();compositor.ReferenceSpaceChanged();viewHistory.Clear();matchedStereoValid=false;OutRunVR::SharedRenderFrameState rf{};lastProcessedStereoFrame=renderFrames.Read(rf)?rf.frameId:shared.ReadStereoMeta().frame;pendingReferenceSpaceChange=false;pendingReferenceSpaceChangeTime=0;}
             XrFrameBeginInfo bi{ XR_TYPE_FRAME_BEGIN_INFO };
             CheckXr(xrBeginFrame(session, &bi), "xrBeginFrame");
 
@@ -1400,63 +1412,19 @@ int main(int argc, char** argv)
             if (presentation != lastPresentation)
             {
                 compositor.ReferenceSpaceChanged();
-                matchedStereoValid = false;
-                lastProcessedStereoFrame = shared.ReadStereoMeta().frame;
-                lastPresentation = presentation;
+                matchedStereoValid=false;OutRunVR::SharedRenderFrameState rf{};lastProcessedStereoFrame=renderFrames.Read(rf)?rf.frameId:shared.ReadStereoMeta().frame;lastPresentation=presentation;
                 std::cout << "VR presentation: "
                     << (presentation == OutRunVR::PresentationGameplay
                         ? "true stereo projection" : "LOCAL-fixed theater") << ".\n";
             }
 
-            bool layerReady = false;
-            CaptureStatus capture{};
-            if (fs.shouldRender==XR_TRUE)
-                capture = compositor.Capture();
-
-            if (fs.shouldRender==XR_TRUE && vc >= 2)
-            {
-                if (presentation == OutRunVR::PresentationGameplay)
-                {
-                    const ClientStereoMeta meta = shared.ReadStereoMeta();
-                    if (meta.valid && meta.state == OutRunVR::StereoSbsActive && meta.frame != 0 &&
-                        meta.frame != lastProcessedStereoFrame && meta.poseSequence != 0 && capture.available)
-                    {
-                        std::array<XrView, 2> exactViews{};
-                        const bool captureContainsFrame = meta.presentQpcLow == 0
-                            ? capture.fresh
-                            : QpcLowAtOrAfter(capture.lastPresentQpcLow, meta.presentQpcLow);
-                        if (captureContainsFrame && viewHistory.Find(meta.poseSequence, exactViews) &&
-                            compositor.CommitStereoSource())
-                        {
-                            matchedViews = exactViews;
-                            matchedStereoValid = true;
-                            lastProcessedStereoFrame = meta.frame;
-                            lastStereoMatchMs = GetTickCount64();
-                        }
-                    }
-
-                    const bool withinGrace = matchedStereoValid && compositor.HasStereoSource() &&
-                        GetTickCount64() - lastStereoMatchMs <= StereoGraceMs;
-                    if (withinGrace && compositor.RenderProjection(matchedViews, pv))
-                    {
-                        projection.space = localSpace;
-                        projection.viewCount = 2;
-                        projection.views = pv.data();
-                        layers[0] = reinterpret_cast<const XrCompositionLayerBaseHeader*>(&projection);
-                        layerReady = true;
-                    }
-                }
-                else if (capture.available &&
-                    compositor.RenderTheater(viewSpace, localSpace, fs.predictedDisplayTime, quad))
-                {
-                    layers[0] = reinterpret_cast<const XrCompositionLayerBaseHeader*>(&quad);
-                    layerReady = true;
-                }
-            }
-
-            end.layerCount = layerReady ? 1 : 0;
-            end.layers = layerReady ? layers : nullptr;
-            CheckXr(xrEndFrame(session, &end), "xrEndFrame");
+            bool layerReady=false;
+            if(fs.shouldRender==XR_TRUE&&vc>=2){
+                if(presentation==OutRunVR::PresentationGameplay){OutRunVR::SharedRenderFrameState before{};const bool have=renderFrames.Read(before);const std::uint32_t need=OutRunVR::RenderFrameStereoComplete|OutRunVR::RenderFrameWorldStereo|OutRunVR::RenderFrameDrawDuplicated|OutRunVR::RenderFrameEffectivePoseValid;
+                    if(have&&before.state==OutRunVR::StereoSbsActive&&before.frameId&&before.frameId!=lastProcessedStereoFrame&&before.sourcePoseSequence&&(before.flags&need)==need){std::array<XrView,2> history{};if(viewHistory.Find(before.sourcePoseSequence,history)){LARGE_INTEGER cs{},ce{};QueryPerformanceCounter(&cs);const CaptureStatus capture=compositor.Capture(2);QueryPerformanceCounter(&ce);timings.capture.Add(timings.Ms(cs,ce));OutRunVR::SharedRenderFrameState after{};const bool same=renderFrames.Read(after)&&after.state==before.state&&after.frameId==before.frameId&&after.sourcePoseSequence==before.sourcePoseSequence&&after.presentQpc==before.presentQpc;if(capture.available&&QpcAtOrAfter(capture.lastPresentQpc,before.presentQpc)&&same&&compositor.CommitStereoSource()){for(int eye=0;eye<2;++eye){matchedViews[eye]={XR_TYPE_VIEW};matchedViews[eye].pose.orientation={before.eye[eye].orientation[0],before.eye[eye].orientation[1],before.eye[eye].orientation[2],before.eye[eye].orientation[3]};matchedViews[eye].pose.position={before.eye[eye].position[0],before.eye[eye].position[1],before.eye[eye].position[2]};matchedViews[eye].fov={before.eye[eye].fov.angleLeft,before.eye[eye].fov.angleRight,before.eye[eye].fov.angleUp,before.eye[eye].fov.angleDown};}matchedStereoValid=true;lastProcessedStereoFrame=before.frameId;lastStereoMatchMs=GetTickCount64();}}}
+                    const bool grace=matchedStereoValid&&compositor.HasStereoSource()&&GetTickCount64()-lastStereoMatchMs<=StereoGraceMs;LARGE_INTEGER rs{},re{};QueryPerformanceCounter(&rs);if(grace&&compositor.RenderProjection(matchedViews,pv)){projection.space=localSpace;projection.viewCount=2;projection.views=pv.data();layers[0]=reinterpret_cast<const XrCompositionLayerBaseHeader*>(&projection);layerReady=true;}QueryPerformanceCounter(&re);timings.render.Add(timings.Ms(rs,re));
+                }else{LARGE_INTEGER cs{},ce{};QueryPerformanceCounter(&cs);const CaptureStatus capture=compositor.Capture();QueryPerformanceCounter(&ce);timings.capture.Add(timings.Ms(cs,ce));LARGE_INTEGER rs{},re{};QueryPerformanceCounter(&rs);if(capture.available&&compositor.RenderTheater(viewSpace,localSpace,fs.predictedDisplayTime,quad)){layers[0]=reinterpret_cast<const XrCompositionLayerBaseHeader*>(&quad);layerReady=true;}QueryPerformanceCounter(&re);timings.render.Add(timings.Ms(rs,re));}}
+            end.layerCount=layerReady?1:0;end.layers=layerReady?layers:nullptr;LARGE_INTEGER es{},ee{};QueryPerformanceCounter(&es);CheckXr(xrEndFrame(session,&end),"xrEndFrame");QueryPerformanceCounter(&ee);timings.end.Add(timings.Ms(es,ee));timings.MaybeLog();
         }
 
         compositor.Shutdown();

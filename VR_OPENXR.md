@@ -2,7 +2,7 @@
 
 This is the VR development branch for the `wheel-ffb` fork. It preserves the existing wheel / multi-device / native FFB implementation and adds an independent x86 D3D9 + x64 OpenXR VR path.
 
-## Current status: true stereo implemented, runtime validation pending
+## Current status: true stereo + frame-integrity hardening implemented, runtime validation pending
 
 The code now contains the complete intended rendering path:
 
@@ -221,3 +221,8 @@ Pose/view samples older than 250 ms are rejected. Invalid eye FOV/offsets, unsaf
 CI verifies both architectures, the exact HLSL, binary architecture/markers, the shared IPC ABI, the no-simulation-replay invariant, existing wheel/FFB source checks and production FFB math tests.
 
 CI cannot prove Quest optics, stereo eye order, VDXR presentation timing, object culling at extreme head angles, or subjective FFB feel. Those are the remaining real-device acceptance tests.
+
+
+## Review-hardening contract
+
+`Pose.v1` remains the 248-byte Host->Game packet. `Local\OutRun2006Tweaks.VR.Frame.v1` is the authoritative 256-byte Game->Host presented-frame contract with full Present QPC, failure reason and effective LOCAL eye poses/FOV. A required backbuffer draw/clear/depth operation that cannot be reproduced for both eyes poisons that Present, so partial stereo is never published active. The host reads metadata before capture, validates full Desktop Duplication `LastPresentTime`, rereads unchanged metadata, then freezes the SBS source. Full head-local eye orientation is applied in addition to IPD translation. `CullingUnionFov` is opt-in and affects only render-phase culling; pre-BeginScene visibility remains runtime-test territory.

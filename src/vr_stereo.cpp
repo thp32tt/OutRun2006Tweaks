@@ -81,6 +81,8 @@ namespace OutRunVRStereo
 
 		HANDLE SharedMapping = nullptr;
 		OutRunVR::SharedPoseState* SharedState = nullptr;
+		HANDLE RenderFrameMapping = nullptr;
+		OutRunVR::SharedRenderFrameState* RenderFrameState = nullptr;
 
 		IDirect3DSurface9* BackBuffer = nullptr;
 		IDirect3DSurface9* TrackedRenderTarget = nullptr;
@@ -107,8 +109,12 @@ namespace OutRunVRStereo
 		bool FrameHadDuplicatedDraw = false;
 		bool FrameHadWorldStereo = false;
 		bool FrameRightDrawFailed = false;
+		bool FrameStereoIncomplete = false;
+		OutRunVR::StereoFailureReason FrameFailureReason = OutRunVR::StereoFailureNone;
 		std::uint32_t FrameStereoPoseSequence = 0;
+		OutRunVRRenderer::LatchedStereoFrame FrameStereoMetadata{};
 		std::uint32_t StereoFrameCounter = 0;
+		bool RightDepthSynchronized = true;
 
 		ULONGLONG LastSummaryMs = 0;
 		std::uint64_t DuplicatedDraws = 0;
@@ -227,6 +233,20 @@ namespace OutRunVRStereo
 			D3DMATRIX out{};
 			out._11 = out._22 = out._33 = out._44 = 1.0f;
 			return out;
+		}
+
+		D3DMATRIX MatrixFromQuaternionTranslation(const float qIn[4], const float position[3], float positionScale)
+		{
+			float x=qIn[0],y=qIn[1],z=qIn[2],w=qIn[3]; const float lenSq=x*x+y*y+z*z+w*w;
+			if (!std::isfinite(lenSq)||lenSq<=1.0e-12f) return IdentityMatrix(); const float inv=1.0f/std::sqrt(lenSq); x*=inv;y*=inv;z*=inv;w*=inv;
+			D3DMATRIX out=IdentityMatrix(); const float xx=x*x,yy=y*y,zz=z*z,xy=x*y,xz=x*z,yz=y*z,xw=x*w,yw=y*w,zw=z*w;
+			out._11=1-2*(yy+zz);out._12=2*(xy+zw);out._13=2*(xz-yw);out._21=2*(xy-zw);out._22=1-2*(xx+zz);out._23=2*(yz+xw);
+			out._31=2*(xz+yw);out._32=2*(yz-xw);out._33=1-2*(xx+yy);out._41=position[0]*positionScale;out._42=position[1]*positionScale;out._43=position[2]*positionScale; return out;
+		}
+		D3DMATRIX InverseRigid(const D3DMATRIX& m)
+		{
+			D3DMATRIX out=IdentityMatrix(); out._11=m._11;out._12=m._21;out._13=m._31;out._21=m._12;out._22=m._22;out._23=m._32;out._31=m._13;out._32=m._23;out._33=m._33;
+			out._41=-(m._41*out._11+m._42*out._21+m._43*out._31);out._42=-(m._41*out._12+m._42*out._22+m._43*out._32);out._43=-(m._41*out._13+m._42*out._23+m._43*out._33); return out;
 		}
 
 		D3DMATRIX MultiplyMatrix(const D3DMATRIX& a, const D3DMATRIX& b)
@@ -383,12 +403,23 @@ namespace OutRunVRStereo
 			return true;
 		}
 
+		bool EnsureRenderFrameState()
+		{
+			if (RenderFrameState) return RenderFrameState->magic==OutRunVR::RenderFrameMagic && RenderFrameState->protocolVersion==OutRunVR::RenderFrameProtocolVersion && RenderFrameState->structSize==sizeof(OutRunVR::SharedRenderFrameState);
+			RenderFrameMapping=CreateFileMappingW(INVALID_HANDLE_VALUE,nullptr,PAGE_READWRITE,0,static_cast<DWORD>(sizeof(OutRunVR::SharedRenderFrameState)),OutRunVR::RenderFrameMemoryName); if(!RenderFrameMapping)return false;
+			const bool existed=GetLastError()==ERROR_ALREADY_EXISTS; RenderFrameState=static_cast<OutRunVR::SharedRenderFrameState*>(MapViewOfFile(RenderFrameMapping,FILE_MAP_ALL_ACCESS,0,0,sizeof(OutRunVR::SharedRenderFrameState))); if(!RenderFrameState)return false;
+			if(!existed){std::memset(RenderFrameState,0,sizeof(*RenderFrameState));RenderFrameState->protocolVersion=OutRunVR::RenderFrameProtocolVersion;RenderFrameState->structSize=sizeof(*RenderFrameState);MemoryBarrier();RenderFrameState->magic=OutRunVR::RenderFrameMagic;}
+			return RenderFrameState->magic==OutRunVR::RenderFrameMagic && RenderFrameState->protocolVersion==OutRunVR::RenderFrameProtocolVersion && RenderFrameState->structSize==sizeof(*RenderFrameState);
+		}
+		void PoisonFrame(OutRunVR::StereoFailureReason reason){FrameStereoIncomplete=true;if(FrameFailureReason==OutRunVR::StereoFailureNone)FrameFailureReason=reason;}
+
 		struct DrawStereoState
 		{
 			float originalConstants[16]{};
 			float eyeConstants[2][16]{};
 			bool worldStereo = false;
 			std::uint32_t poseSequence = 0;
+			OutRunVRRenderer::LatchedStereoFrame stereoFrame{};
 		};
 
 		bool BuildEyeConstants(IDirect3DDevice9* device,
@@ -430,10 +461,8 @@ namespace OutRunVRStereo
 
 			for (int eye = 0; eye < 2; ++eye)
 			{
-				D3DMATRIX eyeInverse = IdentityMatrix();
-				eyeInverse._41 = -stereo.eyeOffset[eye][0] * Settings::VRWorldScale;
-				eyeInverse._42 = -stereo.eyeOffset[eye][1] * Settings::VRWorldScale;
-				eyeInverse._43 = -stereo.eyeOffset[eye][2] * Settings::VRWorldScale;
+				const D3DMATRIX eyePose = MatrixFromQuaternionTranslation(stereo.eyeOrientation[eye], stereo.eyeOffset[eye], Settings::VRWorldScale);
+				const D3DMATRIX eyeInverse = InverseRigid(eyePose);
 				const D3DMATRIX eyeProjection = ProjectionFromFov(projection, stereo.eyeFov[eye]);
 				const D3DMATRIX eyeWvp = MultiplyMatrix(
 					MultiplyMatrix(correctedWorldView, eyeInverse), eyeProjection);
@@ -493,6 +522,7 @@ namespace OutRunVRStereo
 		bool CreateRightDepthForTracked(IDirect3DDevice9* device)
 		{
 			ReleaseCom(RightEyeDepth);
+			RightDepthSynchronized = TrackedDepthStencil == nullptr;
 			if (!TrackedDepthStencil)
 				return true;
 
@@ -638,6 +668,7 @@ namespace OutRunVRStereo
 		void NoteRestoreFailure(const char* what)
 		{
 			FrameRightDrawFailed = true;
+			PoisonFrame(OutRunVR::StereoFailureRestoreFailed);
 			++RestoreFailures;
 			if (!FirstRestoreFailureLogged)
 			{
@@ -678,6 +709,8 @@ namespace OutRunVRStereo
 			// Frame=0 is the client-side publication guard. The host refuses frame 0,
 			// so it cannot accept fields while this packet is being rewritten.
 			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoFrameIndex]), 0);
+			const LONG stereoBits=static_cast<LONG>(OutRunVR::ClientStereoActive|OutRunVR::ClientStereoWorldDraw|OutRunVR::ClientStereoDrawDuplicated);
+			InterlockedAnd(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientFlagsIndex]), ~stereoBits);
 
 			if (state != OutRunVR::StereoSbsActive || poseSequence == 0 || frameId == 0 || presentQpcLow == 0)
 			{
@@ -704,6 +737,14 @@ namespace OutRunVRStereo
 			// Publish last: non-zero frame means all metadata above is coherent.
 			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoFrameIndex]),
 				static_cast<LONG>(frameId));
+		}
+
+		void PublishRenderFrame(std::uint32_t state,std::uint32_t frameId,std::uint32_t sourcePoseSequence,std::int64_t presentQpc,OutRunVR::StereoFailureReason failureReason,const OutRunVRRenderer::LatchedStereoFrame* stereo)
+		{
+			if(!EnsureRenderFrameState())return; LONG seq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameState->sequence));if((seq&1)==0)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameState->sequence));MemoryBarrier();
+			RenderFrameState->clientPid=GetCurrentProcessId();RenderFrameState->state=state;RenderFrameState->frameId=frameId;RenderFrameState->sourcePoseSequence=sourcePoseSequence;RenderFrameState->presentationMode=GameplayActive()?OutRunVR::PresentationGameplay:OutRunVR::PresentationTheater;RenderFrameState->flags=0;RenderFrameState->failureReason=static_cast<std::uint32_t>(failureReason);RenderFrameState->backbufferWidth=BackBufferDesc.Width;RenderFrameState->backbufferHeight=BackBufferDesc.Height;RenderFrameState->presentQpc=presentQpc;std::memset(RenderFrameState->eye,0,sizeof(RenderFrameState->eye));
+			if(state==OutRunVR::StereoSbsActive&&stereo&&stereo->valid&&frameId){RenderFrameState->flags=OutRunVR::RenderFrameStereoComplete|OutRunVR::RenderFrameWorldStereo|OutRunVR::RenderFrameDrawDuplicated|OutRunVR::RenderFrameEffectivePoseValid;for(int eye=0;eye<2;++eye){std::memcpy(RenderFrameState->eye[eye].orientation,stereo->effectiveEyeOrientation[eye],sizeof(RenderFrameState->eye[eye].orientation));std::memcpy(RenderFrameState->eye[eye].position,stereo->effectiveEyePosition[eye],sizeof(RenderFrameState->eye[eye].position));RenderFrameState->eye[eye].fov=stereo->eyeFov[eye];}}
+			MemoryBarrier();seq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameState->sequence));if(seq&1)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameState->sequence));
 		}
 
 		struct ScreenVertex
@@ -821,26 +862,12 @@ namespace OutRunVRStereo
 
 		bool PrepareDuplicatedDraw(IDirect3DDevice9* device, DrawStereoState& draw)
 		{
-			if (InternalStereoPass || !StereoWanted() || !TargetIsBackBuffer())
-				return false;
-			if (AnyAuxRenderTargetActive())
-			{
-				++MrtRejectedDraws;
-				if (!FirstMrtRejectLogged)
-				{
-					FirstMrtRejectLogged = true;
-					spdlog::info("VR stereo: auxiliary MRT active; draw left untouched to avoid double-writing RT1+");
-				}
-				return false;
-			}
-			if (!EnsureStereoResources(device))
-				return false;
-
-			OutRunVRRenderer::LatchedStereoFrame stereo{};
-			if (!OutRunVRRenderer::GetLatchedStereoFrame(stereo))
-				return false;
-			BuildEyeConstants(device, stereo, draw);
-			return true;
+			if (InternalStereoPass || !StereoWanted() || !TargetIsBackBuffer()) return false;
+			if (AnyAuxRenderTargetActive()){PoisonFrame(OutRunVR::StereoFailureMrtActive);++MrtRejectedDraws;if(!FirstMrtRejectLogged){FirstMrtRejectLogged=true;spdlog::info("VR stereo: auxiliary MRT active; current Present is marked incomplete");}return false;}
+			if(!EnsureStereoResources(device)){PoisonFrame(OutRunVR::StereoFailureResourceUnavailable);return false;}
+			if(TrackedDepthStencil&&!RightDepthSynchronized){PoisonFrame(OutRunVR::StereoFailureDepthUnsynchronized);return false;}
+			OutRunVRRenderer::LatchedStereoFrame stereo{};if(!OutRunVRRenderer::GetLatchedStereoFrame(stereo)){PoisonFrame(OutRunVR::StereoFailureMissingLatchedPose);return false;}
+			draw.stereoFrame=stereo;BuildEyeConstants(device,stereo,draw);return true;
 		}
 
 		template <typename DrawCall>
@@ -851,19 +878,11 @@ namespace OutRunVRStereo
 				return drawCall();
 
 			D3DVIEWPORT9 savedViewport{};
-			if (FAILED(device->GetViewport(&savedViewport)))
-				return drawCall();
-
-			if (draw.worldStereo && !SetWvpOneRegisterAtATime(device, draw.eyeConstants[0]))
-				return drawCall();
+			if(FAILED(device->GetViewport(&savedViewport))){PoisonFrame(OutRunVR::StereoFailureViewportUnavailable);return drawCall();}
+			if(draw.worldStereo&&!SetWvpOneRegisterAtATime(device,draw.eyeConstants[0])){const bool rolledBack=SetWvpOneRegisterAtATime(device,draw.originalConstants);PoisonFrame(OutRunVR::StereoFailureLeftWvpUploadFailed);if(!rolledBack)NoteRestoreFailure("left-eye c64 rollback");return drawCall();}
 
 			const HRESULT leftHr = drawCall();
-			if (FAILED(leftHr))
-			{
-				if (draw.worldStereo && !SetWvpOneRegisterAtATime(device, draw.originalConstants))
-					NoteRestoreFailure("left draw c64");
-				return leftHr;
-			}
+			if(FAILED(leftHr)){PoisonFrame(OutRunVR::StereoFailureLeftDrawFailed);if(draw.worldStereo&&!SetWvpOneRegisterAtATime(device,draw.originalConstants))NoteRestoreFailure("left draw c64");return leftHr;}
 
 			IDirect3DSurface9* savedRt = TrackedRenderTarget;
 			IDirect3DSurface9* savedDepth = TrackedDepthStencil;
@@ -889,13 +908,8 @@ namespace OutRunVRStereo
 			++DuplicatedDraws;
 			if (draw.worldStereo)
 			{
-				if (FrameStereoPoseSequence == 0)
-					FrameStereoPoseSequence = draw.poseSequence;
-				else if (FrameStereoPoseSequence != draw.poseSequence)
-				{
-					FrameRightDrawFailed = true;
-					spdlog::warn("VR stereo: multiple host pose sequences reached one Present; frame forced to mono fallback");
-				}
+				if(FrameStereoPoseSequence==0){FrameStereoPoseSequence=draw.poseSequence;FrameStereoMetadata=draw.stereoFrame;}
+				else if(FrameStereoPoseSequence!=draw.poseSequence){FrameRightDrawFailed=true;PoisonFrame(OutRunVR::StereoFailurePoseSequenceMismatch);spdlog::warn("VR stereo: multiple host pose sequences reached one Present; frame forced to mono fallback");}
 				FrameHadWorldStereo = true;
 				++WorldStereoDraws;
 				if (!FirstWorldStereoLogged)
@@ -907,8 +921,7 @@ namespace OutRunVRStereo
 			else
 				++NonWorldDuplicatedDraws;
 
-			if (FAILED(rightHr))
-				FrameRightDrawFailed = true;
+			if(FAILED(rightHr)){FrameRightDrawFailed=true;PoisonFrame(draw.worldStereo?OutRunVR::StereoFailureRightWvpUploadFailed:OutRunVR::StereoFailureRightDrawFailed);}
 			if (!restoreOk)
 				NoteRestoreFailure("right-eye draw");
 			return leftHr;
@@ -947,43 +960,20 @@ namespace OutRunVRStereo
 			return ExecuteStereoDraw(device, call);
 		}
 
-		HRESULT __stdcall ClearDest(IDirect3DDevice9* device, DWORD count, const D3DRECT* rects,
-			DWORD flags, D3DCOLOR color, float z, DWORD stencil)
-		{
-			OutRunVRRenderer::LatchedStereoFrame stereo{};
-			const bool duplicate = !InternalStereoPass && StereoWanted() && TargetIsBackBuffer() &&
-				!AnyAuxRenderTargetActive() && EnsureStereoResources(device) &&
-				OutRunVRRenderer::GetLatchedStereoFrame(stereo);
-			const HRESULT leftHr = ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
-			if (!duplicate || FAILED(leftHr))
-				return leftHr;
+\t\tHRESULT __stdcall ClearDest(IDirect3DDevice9* device, DWORD count, const D3DRECT* rects,
+\t\t\tDWORD flags, D3DCOLOR color, float z, DWORD stencil)
+\t\t{
+\t\t\tconst bool candidate=!InternalStereoPass&&StereoWanted()&&TargetIsBackBuffer();bool duplicate=candidate;
+\t\t\tif(duplicate&&AnyAuxRenderTargetActive()){PoisonFrame(OutRunVR::StereoFailureMrtActive);duplicate=false;}
+\t\t\tif(duplicate&&!EnsureStereoResources(device)){PoisonFrame(OutRunVR::StereoFailureResourceUnavailable);duplicate=false;}
+\t\t\tconst HRESULT leftHr=ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);if(!duplicate||FAILED(leftHr)){if(candidate&&FAILED(leftHr))PoisonFrame(OutRunVR::StereoFailureClearFailed);return leftHr;}
+\t\t\tD3DVIEWPORT9 savedViewport{};if(FAILED(device->GetViewport(&savedViewport))){PoisonFrame(OutRunVR::StereoFailureViewportUnavailable);return leftHr;}
+\t\t\tIDirect3DSurface9* savedRt=TrackedRenderTarget;IDirect3DSurface9* savedDepth=TrackedDepthStencil;HRESULT rightHr=D3D_OK;bool restoreOk=true;{
+\t\t\t\tInternalPassScope guard;rightHr=SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface);if(SUCCEEDED(rightHr))rightHr=SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth);if(SUCCEEDED(rightHr))rightHr=device->SetViewport(&savedViewport);if(SUCCEEDED(rightHr))rightHr=ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);restoreOk=RestoreRightPassState(device,savedRt,savedDepth,savedViewport,nullptr,false);}
+\t\t\tif(FAILED(rightHr)){FrameRightDrawFailed=true;PoisonFrame(OutRunVR::StereoFailureClearFailed);}else if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=true;if(!restoreOk)NoteRestoreFailure("right-eye clear");return leftHr;
+\t\t}
 
-			D3DVIEWPORT9 savedViewport{};
-			if (FAILED(device->GetViewport(&savedViewport)))
-				return leftHr;
-
-			IDirect3DSurface9* savedRt = TrackedRenderTarget;
-			IDirect3DSurface9* savedDepth = TrackedDepthStencil;
-			HRESULT rightHr = D3D_OK;
-			bool restoreOk = true;
-			{
-				InternalPassScope guard;
-				rightHr = SetRenderTargetHook.stdcall<HRESULT>(device, 0u, RightEyeSurface);
-				if (SUCCEEDED(rightHr))
-					rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, RightEyeDepth);
-				if (SUCCEEDED(rightHr))
-					rightHr = device->SetViewport(&savedViewport);
-				if (SUCCEEDED(rightHr))
-					rightHr = ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
-				restoreOk = RestoreRightPassState(device, savedRt, savedDepth,
-					savedViewport, nullptr, false);
-			}
-			if (FAILED(rightHr)) FrameRightDrawFailed = true;
-			if (!restoreOk) NoteRestoreFailure("right-eye clear");
-			return leftHr;
-		}
-
-		HRESULT __stdcall SetRenderTargetDest(IDirect3DDevice9* device, DWORD index, IDirect3DSurface9* surface)
+\t\tHRESULT __stdcall SetRenderTargetDest(IDirect3DDevice9* device, DWORD index, IDirect3DSurface9* surface)
 		{
 			const HRESULT hr = SetRenderTargetHook.stdcall<HRESULT>(device, index, surface);
 			if (!InternalStereoPass && IsGameDevice(device) && SUCCEEDED(hr))
@@ -1003,10 +993,7 @@ namespace OutRunVRStereo
 			const HRESULT hr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface);
 			if (!InternalStereoPass && IsGameDevice(device) && SUCCEEDED(hr))
 			{
-				const bool changed = TrackedDepthStencil != surface;
-				ReplaceSurfaceRef(TrackedDepthStencil, surface);
-				if (changed && StereoResourcesReady && !CreateRightDepthForTracked(device))
-					StereoResourcesReady = false;
+				const bool changed=TrackedDepthStencil!=surface;ReplaceSurfaceRef(TrackedDepthStencil,surface);if(changed){if(StereoWanted()&&TargetIsBackBuffer())PoisonFrame(OutRunVR::StereoFailureDepthStateChanged);if(StereoResourcesReady&&!CreateRightDepthForTracked(device))StereoResourcesReady=false;}
 			}
 			return hr;
 		}
@@ -1016,10 +1003,7 @@ namespace OutRunVRStereo
 			const HRESULT hr = SetVertexShaderHook.stdcall<HRESULT>(device, shader);
 			if (!InternalStereoPass && IsGameDevice(device) && SUCCEEDED(hr))
 			{
-				CurrentVertexShaderIdentity.store(reinterpret_cast<std::uintptr_t>(shader), std::memory_order_release);
-				std::uint64_t serial = VertexShaderSerial.fetch_add(1, std::memory_order_acq_rel) + 1;
-				if (serial == 0)
-					VertexShaderSerial.fetch_add(1, std::memory_order_acq_rel);
+				const std::uintptr_t next=reinterpret_cast<std::uintptr_t>(shader);const std::uintptr_t previous=CurrentVertexShaderIdentity.load(std::memory_order_acquire);if(next!=previous){CurrentVertexShaderIdentity.store(next,std::memory_order_release);std::uint64_t serial=VertexShaderSerial.fetch_add(1,std::memory_order_acq_rel)+1;if(serial==0)VertexShaderSerial.fetch_add(1,std::memory_order_acq_rel);}
 			}
 			return hr;
 		}
@@ -1038,61 +1022,17 @@ namespace OutRunVRStereo
 				MrtRejectedDraws, RestoreFailures, FrameStereoPoseSequence);
 		}
 
-		HRESULT __stdcall PresentDest(IDirect3DDevice9* device, const RECT* sourceRect,
-			const RECT* destRect, HWND destWindowOverride, const RGNDATA* dirtyRegion)
-		{
-			if (!IsGameDevice(device))
-				return PresentHook.stdcall<HRESULT>(device, sourceRect, destRect, destWindowOverride, dirtyRegion);
+\t\tHRESULT __stdcall PresentDest(IDirect3DDevice9* device,const RECT* sourceRect,const RECT* destRect,HWND destWindowOverride,const RGNDATA* dirtyRegion)
+\t\t{
+\t\t\tif(!IsGameDevice(device))return PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);const bool stereoRequested=StereoWanted();bool composedStereo=false;std::uint32_t pendingPoseSequence=0;
+\t\t\tif(stereoRequested&&FrameHadWorldStereo&&FrameHadDuplicatedDraw&&!FrameRightDrawFailed&&!FrameStereoIncomplete&&FrameStereoPoseSequence&&FrameStereoMetadata.valid&&EnsureStereoResources(device)){if(ComposeSbs(device)){++StereoComposeSuccess;composedStereo=true;pendingPoseSequence=FrameStereoPoseSequence;}else{++StereoComposeFailure;PoisonFrame(OutRunVR::StereoFailureComposeFailed);}}
+\t\t\tMaybeLogSummary();LARGE_INTEGER presentStart{};QueryPerformanceCounter(&presentStart);const HRESULT hr=PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);
+\t\t\tif(composedStereo&&SUCCEEDED(hr)&&!FrameStereoIncomplete){const std::uint32_t frameId=NextStereoFrameId();std::uint32_t low=static_cast<std::uint32_t>(presentStart.QuadPart);if(!low)low=1;PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,frameId,low);PublishRenderFrame(OutRunVR::StereoSbsActive,frameId,pendingPoseSequence,presentStart.QuadPart,OutRunVR::StereoFailureNone,&FrameStereoMetadata);if(!FirstStereoActiveLogged){FirstStereoActiveLogged=true;spdlog::info("VR stereo: SBS transport active; exact effective eye pose published in Frame.v1");}}
+\t\t\telse{if(FAILED(hr)&&FrameFailureReason==OutRunVR::StereoFailureNone)FrameFailureReason=OutRunVR::StereoFailurePresentFailed;const std::uint32_t fallback=stereoRequested?OutRunVR::StereoSbsFallbackMono:OutRunVR::StereoDisabled;PublishStereoState(fallback,false,0,0,0);PublishRenderFrame(fallback,0,0,presentStart.QuadPart,FrameFailureReason,nullptr);}
+\t\t\tFrameHadDuplicatedDraw=false;FrameHadWorldStereo=false;FrameRightDrawFailed=false;FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoPoseSequence=0;FrameStereoMetadata={};return hr;
+\t\t}
 
-			const bool stereoRequested = StereoWanted();
-			bool composedStereo = false;
-			std::uint32_t pendingPoseSequence = 0;
-			if (stereoRequested && FrameHadWorldStereo && FrameHadDuplicatedDraw &&
-				!FrameRightDrawFailed && FrameStereoPoseSequence != 0 && EnsureStereoResources(device))
-			{
-				if (ComposeSbs(device))
-				{
-					++StereoComposeSuccess;
-					composedStereo = true;
-					pendingPoseSequence = FrameStereoPoseSequence;
-				}
-				else
-					++StereoComposeFailure;
-			}
-
-			MaybeLogSummary();
-			LARGE_INTEGER presentStart{};
-			QueryPerformanceCounter(&presentStart);
-			const HRESULT hr = PresentHook.stdcall<HRESULT>(device, sourceRect, destRect, destWindowOverride, dirtyRegion);
-
-			if (composedStereo && SUCCEEDED(hr))
-			{
-				const std::uint32_t frameId = NextStereoFrameId();
-				std::uint32_t presentQpcLow = static_cast<std::uint32_t>(presentStart.QuadPart);
-				if (presentQpcLow == 0)
-					presentQpcLow = 1;
-				PublishStereoState(OutRunVR::StereoSbsActive, true, pendingPoseSequence,
-					frameId, presentQpcLow);
-				if (!FirstStereoActiveLogged)
-				{
-					FirstStereoActiveLogged = true;
-					spdlog::info("VR stereo: SBS transport active; exact pose sequence published for XrCompositionLayerProjection");
-				}
-			}
-			else
-			{
-				PublishStereoState(stereoRequested ? OutRunVR::StereoSbsFallbackMono : OutRunVR::StereoDisabled,
-					false, 0, 0, 0);
-			}
-
-			FrameHadDuplicatedDraw = false;
-			FrameHadWorldStereo = false;
-			FrameRightDrawFailed = false;
-			FrameStereoPoseSequence = 0;
-			return hr;
-		}
-
-		HRESULT __stdcall ResetDest(IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params)
+\t\tHRESULT __stdcall ResetDest(IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params)
 		{
 			if (!IsGameDevice(device))
 				return ResetHook.stdcall<HRESULT>(device, params);
@@ -1100,8 +1040,7 @@ namespace OutRunVRStereo
 			AuxRenderTargetActive = {};
 			CurrentVertexShaderIdentity.store(0, std::memory_order_release);
 			VertexShaderSerial.store(0, std::memory_order_release);
-			PublishStereoState(OutRunVR::StereoDisabled, false, 0, 0, 0);
-			const HRESULT hr = ResetHook.stdcall<HRESULT>(device, params);
+			FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoMetadata={};PublishStereoState(OutRunVR::StereoDisabled,false,0,0,0);PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,OutRunVR::StereoFailureNone,nullptr);const HRESULT hr=ResetHook.stdcall<HRESULT>(device,params);
 			if (SUCCEEDED(hr))
 				EnsureStereoResources(device);
 			return hr;
@@ -1146,6 +1085,7 @@ namespace OutRunVRStereo
 			}
 			InitializeAuxRenderTargetState(device);
 			EnsureSharedState();
+			EnsureRenderFrameState();
 			EnsureStereoResources(device);
 			spdlog::info("VR stereo: D3D9 full-eye renderer installed (Reset/Present/RT/Depth/Clear/Draw*/VS)");
 			return true;

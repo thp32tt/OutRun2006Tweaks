@@ -45,6 +45,7 @@ namespace Settings
 	extern Setting<bool> VRHeadTracking;
 	extern Setting<bool> VRPositionalTracking;
 	extern Setting<bool> VRCullingCameraSync;
+	extern Setting<bool> VRCullingUnionFov;
 	extern Setting<float> VRWorldScale;
 	extern Setting<float> VRRotationScale;
 	extern Setting<int> VRMatrixOrder;
@@ -68,6 +69,10 @@ namespace OutRunVRRenderer
 			bool stereoValid = false;
 			SharedFov eyeFov[2]{};
 			float eyeOffset[2][3]{};
+			Quat eyeOrientation[2]{
+				{ 0.0f, 0.0f, 0.0f, 1.0f },
+				{ 0.0f, 0.0f, 0.0f, 1.0f }
+			};
 		};
 
 		constexpr std::size_t BeginSceneVtableIndex = 41;
@@ -126,6 +131,8 @@ namespace OutRunVRRenderer
 		D3DVECTOR CullingCameraSavedLook{};
 		EvWorkCamera* CullingCameraObject = nullptr;
 		bool CullingCameraOverridden = false;
+		D3DMATRIX CullingProjectionSaved{};
+		bool CullingProjectionOverridden = false;
 
 		ULONGLONG LastSummaryMs = 0;
 		std::uint64_t BeginSceneCalls = 0;
@@ -316,6 +323,18 @@ namespace OutRunVRRenderer
 			return true;
 		}
 
+		D3DMATRIX ProjectionFromFov(const D3DMATRIX& base, const SharedFov& fov)
+		{
+			const float tanLeft = std::tan(fov.angleLeft), tanRight = std::tan(fov.angleRight);
+			const float tanUp = std::tan(fov.angleUp), tanDown = std::tan(fov.angleDown);
+			const float width = tanRight - tanLeft, height = tanUp - tanDown;
+			D3DMATRIX out{};
+			out._11 = 2.0f / width; out._22 = 2.0f / height;
+			out._31 = (tanRight + tanLeft) / width; out._32 = (tanUp + tanDown) / height;
+			out._33 = base._33; out._34 = base._34; out._43 = base._43; out._44 = base._44;
+			return out;
+		}
+
 		bool MatrixNear(const float* candidate, const D3DMATRIX& matrix, bool transposed, float epsilon)
 		{
 			for (int row = 0; row < 4; ++row)
@@ -350,6 +369,22 @@ namespace OutRunVRRenderer
 			const auto regionBegin = reinterpret_cast<std::uintptr_t>(info.BaseAddress);
 			const auto regionEnd = regionBegin + info.RegionSize;
 			return begin >= regionBegin && begin + size <= regionEnd;
+		}
+
+		bool IsWritableRange(void* address, std::size_t size)
+		{
+			if (!address || size == 0) return false;
+			MEMORY_BASIC_INFORMATION info{};
+			if (VirtualQuery(address, &info, sizeof(info)) != sizeof(info) || info.State != MEM_COMMIT ||
+				(info.Protect & PAGE_GUARD) || (info.Protect & PAGE_NOACCESS)) return false;
+			const DWORD protect = info.Protect & 0xFFu;
+			const bool writable = protect == PAGE_READWRITE || protect == PAGE_WRITECOPY ||
+				protect == PAGE_EXECUTE_READWRITE || protect == PAGE_EXECUTE_WRITECOPY;
+			if (!writable) return false;
+			const auto begin = reinterpret_cast<std::uintptr_t>(address);
+			const auto regionBegin = reinterpret_cast<std::uintptr_t>(info.BaseAddress);
+			const auto regionEnd = regionBegin + info.RegionSize;
+			return begin >= regionBegin && begin + size >= begin && begin + size <= regionEnd;
 		}
 
 		bool ImageContainsRange(std::uintptr_t rva, std::size_t size)
@@ -406,7 +441,8 @@ namespace OutRunVRRenderer
 			if (!ValidateRendererGlobals())
 				return false;
 			std::memcpy(&view, RendererView, sizeof(view));
-			std::memcpy(&projection, RendererProjection, sizeof(projection));
+			if (CullingProjectionOverridden) projection = CullingProjectionSaved;
+			else std::memcpy(&projection, RendererProjection, sizeof(projection));
 			std::memcpy(&worldView, RendererWorldView, sizeof(worldView));
 			return MatrixFinite(view) && MatrixFinite(projection) && MatrixFinite(worldView);
 		}
@@ -564,6 +600,7 @@ namespace OutRunVRRenderer
 			pose.referenceSpaceGeneration = snapshot.reserved[HostReferenceSpaceGenerationIndex];
 
 			pose.stereoValid = (snapshot.flags & StereoViewsValid) != 0 &&
+				(snapshot.flags & StereoEyeOrientationValid) != 0 &&
 				FovValid(snapshot.eyeFov[0]) && FovValid(snapshot.eyeFov[1]);
 			if (pose.stereoValid)
 			{
@@ -585,6 +622,10 @@ namespace OutRunVRRenderer
 						}
 						pose.eyeOffset[eye][axis] = value;
 					}
+					const Quat eyeQ{ snapshot.eyeOrientation[eye][0], snapshot.eyeOrientation[eye][1],
+						snapshot.eyeOrientation[eye][2], snapshot.eyeOrientation[eye][3] };
+					if (!QuaternionIsSane(eyeQ)) pose.stereoValid = false;
+					else pose.eyeOrientation[eye] = Normalize(eyeQ);
 				}
 			}
 			return true;
@@ -626,12 +667,19 @@ namespace OutRunVRRenderer
 
 		void RestoreCullingCamera()
 		{
-			if (!CullingCameraOverridden || !CullingCameraObject)
-				return;
-			CullingCameraObject->cam_pos_F8 = CullingCameraSavedPos;
-			CullingCameraObject->look_pos_104 = CullingCameraSavedLook;
+			if (CullingCameraOverridden && CullingCameraObject)
+			{
+				CullingCameraObject->cam_pos_F8 = CullingCameraSavedPos;
+				CullingCameraObject->look_pos_104 = CullingCameraSavedLook;
+			}
 			CullingCameraObject = nullptr;
 			CullingCameraOverridden = false;
+			if (CullingProjectionOverridden && RendererProjection)
+			{
+				auto* projection = const_cast<D3DMATRIX*>(RendererProjection);
+				if (IsWritableRange(projection, sizeof(D3DMATRIX))) std::memcpy(projection, &CullingProjectionSaved, sizeof(D3DMATRIX));
+			}
+			CullingProjectionOverridden = false;
 		}
 
 		void ApplyCullingCameraSync()
@@ -681,6 +729,23 @@ namespace OutRunVRRenderer
 				cameraWorld._43 + forward.z * lookDistance
 			};
 			CullingCameraOverridden = true;
+			if (Settings::VRCullingUnionFov && LatchedStereo.valid && RendererProjection)
+			{
+				auto* projection = const_cast<D3DMATRIX*>(RendererProjection);
+				D3DMATRIX baseProjection{}; std::memcpy(&baseProjection, RendererProjection, sizeof(baseProjection));
+				SharedFov unionFov{};
+				unionFov.angleLeft = std::min(LatchedStereo.eyeFov[0].angleLeft, LatchedStereo.eyeFov[1].angleLeft);
+				unionFov.angleRight = std::max(LatchedStereo.eyeFov[0].angleRight, LatchedStereo.eyeFov[1].angleRight);
+				unionFov.angleUp = std::max(LatchedStereo.eyeFov[0].angleUp, LatchedStereo.eyeFov[1].angleUp);
+				unionFov.angleDown = std::min(LatchedStereo.eyeFov[0].angleDown, LatchedStereo.eyeFov[1].angleDown);
+				const D3DMATRIX widened = ProjectionFromFov(baseProjection, unionFov);
+				if (MatrixFinite(widened) && IsWritableRange(projection, sizeof(D3DMATRIX)))
+				{
+					CullingProjectionSaved = baseProjection;
+					std::memcpy(projection, &widened, sizeof(widened));
+					CullingProjectionOverridden = true;
+				}
+			}
 			FrameTelemetryFlags |= ClientCullingCameraSynced;
 		}
 
@@ -773,9 +838,25 @@ namespace OutRunVRRenderer
 			{
 				LatchedStereo.valid = true;
 				LatchedStereo.poseSequence = sample.sequence;
-				LatchedStereo.eyeFov[0] = sample.eyeFov[0];
-				LatchedStereo.eyeFov[1] = sample.eyeFov[1];
+				LatchedStereo.eyeFov[0] = sample.eyeFov[0]; LatchedStereo.eyeFov[1] = sample.eyeFov[1];
 				std::memcpy(LatchedStereo.eyeOffset, sample.eyeOffset, sizeof(LatchedStereo.eyeOffset));
+				const Quat effectiveHeadOrientation = Multiply(Normalize(CenterOrientation), relativeOrientation);
+				Vec3 effectiveHeadPosition = sample.position;
+				if (!Settings::VRPositionalTracking || !sample.positionValid) effectiveHeadPosition = CenterPositionValid ? CenterPosition : sample.position;
+				for (int eye = 0; eye < 2; ++eye)
+				{
+					const Quat eyeOrientation = sample.eyeOrientation[eye];
+					LatchedStereo.eyeOrientation[eye][0]=eyeOrientation.x; LatchedStereo.eyeOrientation[eye][1]=eyeOrientation.y;
+					LatchedStereo.eyeOrientation[eye][2]=eyeOrientation.z; LatchedStereo.eyeOrientation[eye][3]=eyeOrientation.w;
+					const Quat effectiveEyeOrientation = Multiply(effectiveHeadOrientation, eyeOrientation);
+					LatchedStereo.effectiveEyeOrientation[eye][0]=effectiveEyeOrientation.x; LatchedStereo.effectiveEyeOrientation[eye][1]=effectiveEyeOrientation.y;
+					LatchedStereo.effectiveEyeOrientation[eye][2]=effectiveEyeOrientation.z; LatchedStereo.effectiveEyeOrientation[eye][3]=effectiveEyeOrientation.w;
+					const Vec3 localEye{sample.eyeOffset[eye][0], sample.eyeOffset[eye][1], sample.eyeOffset[eye][2]};
+					const Vec3 worldEye = RotateVector(effectiveHeadOrientation, localEye);
+					LatchedStereo.effectiveEyePosition[eye][0]=effectiveHeadPosition.x+worldEye.x;
+					LatchedStereo.effectiveEyePosition[eye][1]=effectiveHeadPosition.y+worldEye.y;
+					LatchedStereo.effectiveEyePosition[eye][2]=effectiveHeadPosition.z+worldEye.z;
+				}
 			}
 
 			const float w = std::clamp(std::fabs(relativeOrientation.w), 0.0f, 1.0f);

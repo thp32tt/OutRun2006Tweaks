@@ -14,9 +14,9 @@
 // FixZBufferPrecision, which legitimately hooks the same game function. Head tracking
 // is now applied only at the verified D3D9 c64 WorldViewProjection upload in
 // vr_renderer_probe.cpp. vr_stereo.cpp builds on that already-verified mono transform:
-// it duplicates D3D9 draws into left/right SBS viewports and replaces only world-draw
-// c64 constants with true per-eye OpenXR view/projection matrices. Simulation, input,
-// timers and native FFB are never replayed for the second eye.
+// it duplicates final D3D9 draws into full-size left/right eye surfaces and replaces
+// only verified world-draw c64 constants with true per-eye OpenXR transforms.
+// Simulation, input, timers and native FFB are never replayed for the second eye.
 namespace Settings
 {
 	Setting<bool> VREnabled{ "VR", "Enabled", true,
@@ -31,6 +31,8 @@ namespace Settings
 		"Also applies HMD X/Y/Z movement. Experimental; eye separation for stereo is applied independently of this setting." };
 	Setting<bool> VRCullingCameraSync{ "VR", "CullingCameraSync", true,
 		"Temporarily mirrors the render-time VR camera into OutRun's live camera position/look so render-phase culling and camera-facing effects can follow head motion. Restored before game logic resumes." };
+	Setting<bool> VRCullingUnionFov{ "VR", "CullingUnionFov", false,
+		"Experimental: temporarily widens the verified render-time projection to the union of both OpenXR eye FOVs for render-phase culling. It cannot fix visibility lists built before BeginScene." };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,
 		"Game-world units per metre of OpenXR head/eye movement.", Range<float>{ 0.1f, 10.0f } };
 	Setting<float> VRRotationScale{ "VR", "RotationScale", 1.0f,
