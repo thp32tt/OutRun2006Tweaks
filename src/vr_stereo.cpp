@@ -348,12 +348,20 @@ namespace OutRunVRStereo
 
 		bool ReadProjection(D3DMATRIX& projection)
 		{
-			if (!ImageContainsRange(OutRunProjectionRva, sizeof(D3DMATRIX)))
-				return false;
-			const auto* projectionPtr = Module::exe_ptr<D3DMATRIX>(OutRunProjectionRva);
-			if (!IsReadableRange(projectionPtr, sizeof(D3DMATRIX)))
-				return false;
-			std::memcpy(&projection, projectionPtr, sizeof(projection));
+			float rendererProjection[16]{};
+			if (OutRunVRRenderer::GetRendererBaseProjection(rendererProjection))
+			{
+				std::memcpy(&projection, rendererProjection, sizeof(projection));
+			}
+			else
+			{
+				if (!ImageContainsRange(OutRunProjectionRva, sizeof(D3DMATRIX)))
+					return false;
+				const auto* projectionPtr = Module::exe_ptr<D3DMATRIX>(OutRunProjectionRva);
+				if (!IsReadableRange(projectionPtr, sizeof(D3DMATRIX)))
+					return false;
+				std::memcpy(&projection, projectionPtr, sizeof(projection));
+			}
 			return MatrixFinite(projection) &&
 				std::fabs(projection._34 + 1.0f) < 0.25f && std::fabs(projection._44) < 0.25f;
 		}
@@ -700,8 +708,7 @@ namespace OutRunVRStereo
 		}
 
 		void PublishStereoState(std::uint32_t state, bool worldStereo,
-			std::uint32_t poseSequence, std::uint32_t frameId,
-			std::uint32_t presentQpcLow)
+			std::uint32_t poseSequence, std::uint32_t frameId)
 		{
 			if (!EnsureSharedState())
 				return;
@@ -712,10 +719,14 @@ namespace OutRunVRStereo
 			const LONG stereoBits=static_cast<LONG>(OutRunVR::ClientStereoActive|OutRunVR::ClientStereoWorldDraw|OutRunVR::ClientStereoDrawDuplicated);
 			InterlockedAnd(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientFlagsIndex]), ~stereoBits);
 
-			if (state != OutRunVR::StereoSbsActive || poseSequence == 0 || frameId == 0 || presentQpcLow == 0)
+			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferWidthIndex]),
+				static_cast<LONG>(BackBufferDesc.Width));
+			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferHeightIndex]),
+				static_cast<LONG>(BackBufferDesc.Height));
+
+			if (state != OutRunVR::StereoSbsActive || poseSequence == 0 || frameId == 0)
 			{
 				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientStereoPoseSequence), 0);
-				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoPresentQpcLowIndex]), 0);
 				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoStateIndex]),
 					static_cast<LONG>(state));
 				return;
@@ -723,10 +734,6 @@ namespace OutRunVRStereo
 
 			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientStereoPoseSequence),
 				static_cast<LONG>(poseSequence));
-			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoPresentQpcLowIndex]),
-				static_cast<LONG>(presentQpcLow));
-			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[OutRunVR::ClientStereoBackbufferHeightIndex]),
-				static_cast<LONG>(BackBufferDesc.Height));
 			LONG bits = static_cast<LONG>(OutRunVR::ClientStereoActive | OutRunVR::ClientStereoDrawDuplicated);
 			if (worldStereo)
 				bits |= static_cast<LONG>(OutRunVR::ClientStereoWorldDraw);
@@ -1027,8 +1034,8 @@ namespace OutRunVRStereo
 			if(!IsGameDevice(device))return PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);const bool stereoRequested=StereoWanted();bool composedStereo=false;std::uint32_t pendingPoseSequence=0;
 			if(stereoRequested&&FrameHadWorldStereo&&FrameHadDuplicatedDraw&&!FrameRightDrawFailed&&!FrameStereoIncomplete&&FrameStereoPoseSequence&&FrameStereoMetadata.valid&&EnsureStereoResources(device)){if(ComposeSbs(device)){++StereoComposeSuccess;composedStereo=true;pendingPoseSequence=FrameStereoPoseSequence;}else{++StereoComposeFailure;PoisonFrame(OutRunVR::StereoFailureComposeFailed);}}
 			MaybeLogSummary();LARGE_INTEGER presentStart{};QueryPerformanceCounter(&presentStart);const HRESULT hr=PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);
-			if(composedStereo&&SUCCEEDED(hr)&&!FrameStereoIncomplete){const std::uint32_t frameId=NextStereoFrameId();std::uint32_t low=static_cast<std::uint32_t>(presentStart.QuadPart);if(!low)low=1;PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,frameId,low);PublishRenderFrame(OutRunVR::StereoSbsActive,frameId,pendingPoseSequence,presentStart.QuadPart,OutRunVR::StereoFailureNone,&FrameStereoMetadata);if(!FirstStereoActiveLogged){FirstStereoActiveLogged=true;spdlog::info("VR stereo: SBS transport active; exact effective eye pose published in Frame.v1");}}
-			else{if(FAILED(hr)&&FrameFailureReason==OutRunVR::StereoFailureNone)FrameFailureReason=OutRunVR::StereoFailurePresentFailed;const std::uint32_t fallback=stereoRequested?OutRunVR::StereoSbsFallbackMono:OutRunVR::StereoDisabled;PublishStereoState(fallback,false,0,0,0);PublishRenderFrame(fallback,0,0,presentStart.QuadPart,FrameFailureReason,nullptr);}
+			if(composedStereo&&SUCCEEDED(hr)&&!FrameStereoIncomplete){const std::uint32_t frameId=NextStereoFrameId();PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,frameId);PublishRenderFrame(OutRunVR::StereoSbsActive,frameId,pendingPoseSequence,presentStart.QuadPart,OutRunVR::StereoFailureNone,&FrameStereoMetadata);if(!FirstStereoActiveLogged){FirstStereoActiveLogged=true;spdlog::info("VR stereo: SBS transport active; exact effective eye pose published in Frame.v1");}}
+			else{if(FAILED(hr)&&FrameFailureReason==OutRunVR::StereoFailureNone)FrameFailureReason=OutRunVR::StereoFailurePresentFailed;const std::uint32_t fallback=stereoRequested?OutRunVR::StereoSbsFallbackMono:OutRunVR::StereoDisabled;PublishStereoState(fallback,false,0,0);PublishRenderFrame(fallback,0,0,presentStart.QuadPart,FrameFailureReason,nullptr);}
 			FrameHadDuplicatedDraw=false;FrameHadWorldStereo=false;FrameRightDrawFailed=false;FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoPoseSequence=0;FrameStereoMetadata={};return hr;
 		}
 
@@ -1040,7 +1047,7 @@ namespace OutRunVRStereo
 			AuxRenderTargetActive = {};
 			CurrentVertexShaderIdentity.store(0, std::memory_order_release);
 			VertexShaderSerial.store(0, std::memory_order_release);
-			FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoMetadata={};PublishStereoState(OutRunVR::StereoDisabled,false,0,0,0);PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,OutRunVR::StereoFailureNone,nullptr);const HRESULT hr=ResetHook.stdcall<HRESULT>(device,params);
+			FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoMetadata={};PublishStereoState(OutRunVR::StereoDisabled,false,0,0);PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,OutRunVR::StereoFailureNone,nullptr);const HRESULT hr=ResetHook.stdcall<HRESULT>(device,params);
 			if (SUCCEEDED(hr))
 				EnsureStereoResources(device);
 			return hr;

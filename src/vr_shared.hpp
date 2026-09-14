@@ -40,9 +40,11 @@ namespace OutRunVR
     inline constexpr std::uint32_t HostEyeOffsetRightZIndex = 11;
     inline constexpr std::uint32_t ClientStereoStateIndex = 12;
     inline constexpr std::uint32_t ClientStereoFrameIndex = 13;
-    inline constexpr std::uint32_t ClientStereoPresentQpcLowIndex = 14;
+    inline constexpr std::uint32_t ClientStereoBackbufferWidthIndex = 14;
     inline constexpr std::uint32_t ClientStereoBackbufferHeightIndex = 15;
-    inline constexpr std::uint32_t ClientStereoBackbufferWidthIndex = ClientStereoPresentQpcLowIndex;
+    // Source-compatibility alias only. Slot 14 remains backbuffer width;
+    // exact presentation timing is transported by Frame.v1::presentQpc.
+    inline constexpr std::uint32_t ClientStereoPresentQpcLowIndex = ClientStereoBackbufferWidthIndex;
 
     enum ClientPresentationMode : std::uint32_t
     {
@@ -236,6 +238,7 @@ namespace OutRunVRRenderer
     };
 
     bool GetLatchedStereoFrame(LatchedStereoFrame& out);
+    bool GetRendererBaseProjection(float outMatrix[16]);
     bool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
         std::uint32_t& poseSequence, std::uintptr_t& shaderIdentity,
         std::uint64_t& shaderSerial);

@@ -1177,6 +1177,21 @@ namespace OutRunVRRenderer
 		return out.valid && out.poseSequence != 0;
 	}
 
+	bool GetRendererBaseProjection(float outMatrix[16])
+	{
+		if (!outMatrix || !ValidateRendererGlobals() || !RendererProjection)
+			return false;
+		D3DMATRIX projection{};
+		if (CullingProjectionOverridden)
+			projection = CullingProjectionSaved;
+		else
+			std::memcpy(&projection, RendererProjection, sizeof(projection));
+		if (!MatrixFinite(projection))
+			return false;
+		std::memcpy(outMatrix, &projection, sizeof(projection));
+		return true;
+	}
+
 	bool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
 		std::uint32_t& poseSequence, std::uintptr_t& shaderIdentity,
 		std::uint64_t& shaderSerial)

@@ -298,7 +298,6 @@ namespace
         std::uint32_t state = OutRunVR::StereoDisabled;
         std::uint32_t frame = 0;
         std::uint32_t poseSequence = 0;
-        std::uint32_t presentQpcLow = 0;
     };
 
     class SharedWriter
@@ -367,7 +366,6 @@ namespace
                 MemoryBarrier();
                 out.state = state_->reserved[OutRunVR::ClientStereoStateIndex];
                 out.poseSequence = state_->clientStereoPoseSequence;
-                out.presentQpcLow = state_->reserved[OutRunVR::ClientStereoPresentQpcLowIndex];
                 MemoryBarrier();
                 const std::uint32_t after = state_->reserved[OutRunVR::ClientStereoFrameIndex];
                 if (before == after)
