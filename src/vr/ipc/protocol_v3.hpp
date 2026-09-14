@@ -3,7 +3,6 @@
 #include "vr/core/frame_types.hpp"
 #include "vr/core/transport.hpp"
 
-#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
@@ -46,7 +45,7 @@ namespace OutRunVR::IpcV3
     {
         std::uint32_t magic{HostMagic};
         std::uint32_t version{ProtocolVersion};
-        std::uint32_t structSize{sizeof(HostState)};
+        std::uint32_t structSize{};
         volatile std::uint32_t sequence{};
         std::uint32_t hostPid{};
         std::uint32_t flags{};
@@ -70,7 +69,7 @@ namespace OutRunVR::IpcV3
     {
         std::uint32_t magic{ClientMagic};
         std::uint32_t version{ProtocolVersion};
-        std::uint32_t structSize{sizeof(ClientState)};
+        std::uint32_t structSize{};
         volatile std::uint32_t sequence{};
         std::uint32_t clientPid{};
         std::uint32_t flags{};
@@ -113,7 +112,7 @@ namespace OutRunVR::IpcV3
     {
         std::uint32_t magic{FrameMagic};
         std::uint32_t version{ProtocolVersion};
-        std::uint32_t structSize{sizeof(FrameRing)};
+        std::uint32_t structSize{};
         std::uint32_t slotCount{RingSize};
         volatile std::uint32_t publishSequence{};
         volatile std::uint32_t latestSlot{};
@@ -127,7 +126,7 @@ namespace OutRunVR::IpcV3
     {
         std::uint32_t magic{AckMagic};
         std::uint32_t version{ProtocolVersion};
-        std::uint32_t structSize{sizeof(AckState)};
+        std::uint32_t structSize{};
         volatile std::uint32_t sequence{};
         std::uint32_t consumerPid{};
         std::uint32_t acceptedProbeGeneration{};
@@ -139,12 +138,18 @@ namespace OutRunVR::IpcV3
     };
 #pragma pack(pop)
 
+    template <typename T>
+    constexpr void InitializeWireState(T& state) noexcept
+    {
+        state.structSize = static_cast<std::uint32_t>(sizeof(T));
+    }
+
     static_assert(sizeof(WireHandle) == 8);
     static_assert(sizeof(WireFov) == 16);
     static_assert(sizeof(WireEyeView) == 48);
-    static_assert(std::is_standard_layout_v<HostState>);
-    static_assert(std::is_standard_layout_v<ClientState>);
-    static_assert(std::is_standard_layout_v<FrameDescriptor>);
-    static_assert(std::is_standard_layout_v<FrameRing>);
-    static_assert(std::is_standard_layout_v<AckState>);
+    static_assert(std::is_standard_layout_v<HostState> && std::is_trivially_copyable_v<HostState>);
+    static_assert(std::is_standard_layout_v<ClientState> && std::is_trivially_copyable_v<ClientState>);
+    static_assert(std::is_standard_layout_v<FrameDescriptor> && std::is_trivially_copyable_v<FrameDescriptor>);
+    static_assert(std::is_standard_layout_v<FrameRing> && std::is_trivially_copyable_v<FrameRing>);
+    static_assert(std::is_standard_layout_v<AckState> && std::is_trivially_copyable_v<AckState>);
 }
