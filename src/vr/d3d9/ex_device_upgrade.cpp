@@ -26,10 +26,39 @@ namespace OutRunVRD3D9ExUpgrade
         using Direct3DCreate9Fn = IDirect3D9* (WINAPI*)(UINT);
         using Direct3DCreate9ExFn = HRESULT (WINAPI*)(UINT, IDirect3D9Ex**);
 
+        constexpr std::size_t ResetVtableIndex = 16;
+        constexpr std::size_t CreateTextureVtableIndex = 23;
+        constexpr std::size_t CreateVolumeTextureVtableIndex = 24;
+        constexpr std::size_t CreateCubeTextureVtableIndex = 25;
+        constexpr std::size_t CreateVertexBufferVtableIndex = 26;
+        constexpr std::size_t CreateIndexBufferVtableIndex = 27;
+
         Direct3DCreate9Fn OriginalDirect3DCreate9 = nullptr;
         std::atomic<bool> FirstUpgradeLogged{false};
         std::atomic<bool> FirstFallbackLogged{false};
         std::atomic<bool> ThirdPartyLogged{false};
+        std::atomic<IDirect3DDevice9*> CompatDevice{nullptr};
+
+        SafetyHookInline ResetCompatHook{};
+        SafetyHookInline CreateTextureCompatHook{};
+        SafetyHookInline CreateVolumeTextureCompatHook{};
+        SafetyHookInline CreateCubeTextureCompatHook{};
+        SafetyHookInline CreateVertexBufferCompatHook{};
+        SafetyHookInline CreateIndexBufferCompatHook{};
+
+        std::atomic<std::uint64_t> ManagedTextureCreates{0};
+        std::atomic<std::uint64_t> ManagedVolumeTextureCreates{0};
+        std::atomic<std::uint64_t> ManagedCubeTextureCreates{0};
+        std::atomic<std::uint64_t> ManagedVertexBufferCreates{0};
+        std::atomic<std::uint64_t> ManagedIndexBufferCreates{0};
+        std::atomic<std::uint64_t> ManagedCreateFailures{0};
+        std::atomic<std::uint64_t> ManagedTextureDynamicFallbacks{0};
+        std::atomic<std::uint64_t> ResetExRedirects{0};
+
+        bool IsCompatDevice(IDirect3DDevice9* device) noexcept
+        {
+            return device && CompatDevice.load(std::memory_order_acquire) == device;
+        }
 
         bool IsSystemModuleForAddress(const void* address, HMODULE& module) noexcept
         {
@@ -51,6 +80,230 @@ namespace OutRunVRD3D9ExUpgrade
                 return false;
             const wchar_t separator = modulePath[dirLength];
             return separator == L'\\' || separator == L'/';
+        }
+
+        D3DDISPLAYMODEEX* BuildFullscreenMode(
+            IDirect3DDevice9Ex* deviceEx,
+            D3DPRESENT_PARAMETERS* params,
+            D3DDISPLAYMODEEX& fullscreen) noexcept
+        {
+            if (!params || params->Windowed)
+                return nullptr;
+
+            fullscreen = {};
+            fullscreen.Size = sizeof(fullscreen);
+            fullscreen.Width = params->BackBufferWidth;
+            fullscreen.Height = params->BackBufferHeight;
+            fullscreen.RefreshRate = params->FullScreen_RefreshRateInHz;
+            fullscreen.Format = params->BackBufferFormat;
+            fullscreen.ScanLineOrdering = D3DSCANLINEORDERING_PROGRESSIVE;
+
+            if ((fullscreen.Width == 0 || fullscreen.Height == 0 || fullscreen.Format == D3DFMT_UNKNOWN) && deviceEx)
+            {
+                D3DDEVICE_CREATION_PARAMETERS creation{};
+                D3DDISPLAYROTATION rotation = D3DDISPLAYROTATION_IDENTITY;
+                D3DDISPLAYMODEEX current{};
+                current.Size = sizeof(current);
+                if (SUCCEEDED(deviceEx->GetCreationParameters(&creation)) &&
+                    SUCCEEDED(deviceEx->GetDisplayModeEx(0, &current, &rotation)))
+                {
+                    if (!fullscreen.Width) fullscreen.Width = current.Width;
+                    if (!fullscreen.Height) fullscreen.Height = current.Height;
+                    if (fullscreen.Format == D3DFMT_UNKNOWN) fullscreen.Format = current.Format;
+                    if (!fullscreen.RefreshRate) fullscreen.RefreshRate = current.RefreshRate;
+                }
+            }
+            return &fullscreen;
+        }
+
+        HRESULT __stdcall ResetCompatDest(IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params)
+        {
+            if (!IsCompatDevice(device) || !params)
+                return ResetCompatHook.stdcall<HRESULT>(device, params);
+
+            IDirect3DDevice9Ex* deviceEx = nullptr;
+            const HRESULT qi = device->QueryInterface(__uuidof(IDirect3DDevice9Ex), reinterpret_cast<void**>(&deviceEx));
+            if (FAILED(qi) || !deviceEx)
+                return ResetCompatHook.stdcall<HRESULT>(device, params);
+
+            D3DDISPLAYMODEEX fullscreen{};
+            D3DDISPLAYMODEEX* fullscreenPtr = BuildFullscreenMode(deviceEx, params, fullscreen);
+            const HRESULT hr = deviceEx->ResetEx(params, fullscreenPtr);
+            deviceEx->Release();
+            ++ResetExRedirects;
+            spdlog::info(
+                "VR D3D9Ex compat: IDirect3DDevice9::Reset redirected to ResetEx hr=0x{:08X}; emulated MANAGED resources remain persistent",
+                static_cast<unsigned>(hr));
+            return hr;
+        }
+
+        HRESULT __stdcall CreateVertexBufferCompatDest(
+            IDirect3DDevice9* device, UINT length, DWORD usage, DWORD fvf, D3DPOOL pool,
+            IDirect3DVertexBuffer9** buffer, HANDLE* sharedHandle)
+        {
+            if (!IsCompatDevice(device) || pool != D3DPOOL_MANAGED)
+                return CreateVertexBufferCompatHook.stdcall<HRESULT>(
+                    device, length, usage, fvf, pool, buffer, sharedHandle);
+
+            const HRESULT hr = CreateVertexBufferCompatHook.stdcall<HRESULT>(
+                device, length, usage, fvf, D3DPOOL_DEFAULT, buffer, sharedHandle);
+            ++ManagedVertexBufferCreates;
+            if (FAILED(hr)) ++ManagedCreateFailures;
+            if (ManagedVertexBufferCreates.load() == 1)
+            {
+                spdlog::info(
+                    "VR D3D9Ex compat: MANAGED vertex buffer translated to DEFAULT (length={} usage=0x{:08X} hr=0x{:08X})",
+                    length, static_cast<unsigned>(usage), static_cast<unsigned>(hr));
+            }
+            return hr;
+        }
+
+        HRESULT __stdcall CreateIndexBufferCompatDest(
+            IDirect3DDevice9* device, UINT length, DWORD usage, D3DFORMAT format, D3DPOOL pool,
+            IDirect3DIndexBuffer9** buffer, HANDLE* sharedHandle)
+        {
+            if (!IsCompatDevice(device) || pool != D3DPOOL_MANAGED)
+                return CreateIndexBufferCompatHook.stdcall<HRESULT>(
+                    device, length, usage, format, pool, buffer, sharedHandle);
+
+            const HRESULT hr = CreateIndexBufferCompatHook.stdcall<HRESULT>(
+                device, length, usage, format, D3DPOOL_DEFAULT, buffer, sharedHandle);
+            ++ManagedIndexBufferCreates;
+            if (FAILED(hr)) ++ManagedCreateFailures;
+            if (ManagedIndexBufferCreates.load() == 1)
+            {
+                spdlog::info(
+                    "VR D3D9Ex compat: MANAGED index buffer translated to DEFAULT (length={} usage=0x{:08X} fmt={} hr=0x{:08X})",
+                    length, static_cast<unsigned>(usage), static_cast<int>(format), static_cast<unsigned>(hr));
+            }
+            return hr;
+        }
+
+        template <typename CreateFn>
+        HRESULT CreateManagedTextureCompat(
+            const char* label,
+            std::atomic<std::uint64_t>& counter,
+            DWORD usage,
+            CreateFn&& create)
+        {
+            const DWORD dynamicUsage = usage | D3DUSAGE_DYNAMIC;
+            HRESULT hr = create(dynamicUsage, D3DPOOL_DEFAULT);
+            ++counter;
+            if (SUCCEEDED(hr))
+            {
+                if (counter.load() == 1)
+                {
+                    spdlog::info(
+                        "VR D3D9Ex compat: MANAGED {} translated to lockable DEFAULT|DYNAMIC (usage 0x{:08X}->0x{:08X})",
+                        label, static_cast<unsigned>(usage), static_cast<unsigned>(dynamicUsage));
+                }
+                return hr;
+            }
+
+            // Some legacy formats reject DYNAMIC even though a DEFAULT texture is valid.
+            // Retry without DYNAMIC so non-locking resources can still render. If the game
+            // later requires LockRect on such a texture the failure will remain visible in
+            // the game log instead of crashing at creation time.
+            ++ManagedTextureDynamicFallbacks;
+            hr = create(usage, D3DPOOL_DEFAULT);
+            if (FAILED(hr)) ++ManagedCreateFailures;
+            spdlog::warn(
+                "VR D3D9Ex compat: {} DYNAMIC retry path used; final hr=0x{:08X} usage=0x{:08X}. A later Lock* on a non-dynamic DEFAULT texture may require shadow emulation.",
+                label, static_cast<unsigned>(hr), static_cast<unsigned>(usage));
+            return hr;
+        }
+
+        HRESULT __stdcall CreateTextureCompatDest(
+            IDirect3DDevice9* device, UINT width, UINT height, UINT levels, DWORD usage,
+            D3DFORMAT format, D3DPOOL pool, IDirect3DTexture9** texture, HANDLE* sharedHandle)
+        {
+            if (!IsCompatDevice(device) || pool != D3DPOOL_MANAGED)
+                return CreateTextureCompatHook.stdcall<HRESULT>(
+                    device, width, height, levels, usage, format, pool, texture, sharedHandle);
+
+            return CreateManagedTextureCompat("texture", ManagedTextureCreates, usage,
+                [&](DWORD translatedUsage, D3DPOOL translatedPool)
+                {
+                    return CreateTextureCompatHook.stdcall<HRESULT>(
+                        device, width, height, levels, translatedUsage, format,
+                        translatedPool, texture, sharedHandle);
+                });
+        }
+
+        HRESULT __stdcall CreateVolumeTextureCompatDest(
+            IDirect3DDevice9* device, UINT width, UINT height, UINT depth, UINT levels, DWORD usage,
+            D3DFORMAT format, D3DPOOL pool, IDirect3DVolumeTexture9** texture, HANDLE* sharedHandle)
+        {
+            if (!IsCompatDevice(device) || pool != D3DPOOL_MANAGED)
+                return CreateVolumeTextureCompatHook.stdcall<HRESULT>(
+                    device, width, height, depth, levels, usage, format, pool, texture, sharedHandle);
+
+            return CreateManagedTextureCompat("volume texture", ManagedVolumeTextureCreates, usage,
+                [&](DWORD translatedUsage, D3DPOOL translatedPool)
+                {
+                    return CreateVolumeTextureCompatHook.stdcall<HRESULT>(
+                        device, width, height, depth, levels, translatedUsage, format,
+                        translatedPool, texture, sharedHandle);
+                });
+        }
+
+        HRESULT __stdcall CreateCubeTextureCompatDest(
+            IDirect3DDevice9* device, UINT edgeLength, UINT levels, DWORD usage,
+            D3DFORMAT format, D3DPOOL pool, IDirect3DCubeTexture9** texture, HANDLE* sharedHandle)
+        {
+            if (!IsCompatDevice(device) || pool != D3DPOOL_MANAGED)
+                return CreateCubeTextureCompatHook.stdcall<HRESULT>(
+                    device, edgeLength, levels, usage, format, pool, texture, sharedHandle);
+
+            return CreateManagedTextureCompat("cube texture", ManagedCubeTextureCreates, usage,
+                [&](DWORD translatedUsage, D3DPOOL translatedPool)
+                {
+                    return CreateCubeTextureCompatHook.stdcall<HRESULT>(
+                        device, edgeLength, levels, translatedUsage, format,
+                        translatedPool, texture, sharedHandle);
+                });
+        }
+
+        void ClearCompatHooks() noexcept
+        {
+            CompatDevice.store(nullptr, std::memory_order_release);
+            ResetCompatHook = {};
+            CreateTextureCompatHook = {};
+            CreateVolumeTextureCompatHook = {};
+            CreateCubeTextureCompatHook = {};
+            CreateVertexBufferCompatHook = {};
+            CreateIndexBufferCompatHook = {};
+        }
+
+        bool InstallManagedResourceCompat(IDirect3DDevice9Ex* deviceEx)
+        {
+            if (!deviceEx)
+                return false;
+
+            auto* baseDevice = static_cast<IDirect3DDevice9*>(deviceEx);
+            void** vtable = *reinterpret_cast<void***>(baseDevice);
+            if (!vtable)
+                return false;
+
+            ResetCompatHook = safetyhook::create_inline(vtable[ResetVtableIndex], ResetCompatDest);
+            CreateTextureCompatHook = safetyhook::create_inline(vtable[CreateTextureVtableIndex], CreateTextureCompatDest);
+            CreateVolumeTextureCompatHook = safetyhook::create_inline(vtable[CreateVolumeTextureVtableIndex], CreateVolumeTextureCompatDest);
+            CreateCubeTextureCompatHook = safetyhook::create_inline(vtable[CreateCubeTextureVtableIndex], CreateCubeTextureCompatDest);
+            CreateVertexBufferCompatHook = safetyhook::create_inline(vtable[CreateVertexBufferVtableIndex], CreateVertexBufferCompatDest);
+            CreateIndexBufferCompatHook = safetyhook::create_inline(vtable[CreateIndexBufferVtableIndex], CreateIndexBufferCompatDest);
+
+            if (!ResetCompatHook || !CreateTextureCompatHook || !CreateVolumeTextureCompatHook ||
+                !CreateCubeTextureCompatHook || !CreateVertexBufferCompatHook || !CreateIndexBufferCompatHook)
+            {
+                spdlog::error("VR D3D9Ex compat: failed to install one or more managed-resource hooks; rejecting Ex device");
+                ClearCompatHooks();
+                return false;
+            }
+
+            CompatDevice.store(baseDevice, std::memory_order_release);
+            spdlog::info(
+                "VR D3D9Ex compat: managed-resource compatibility hooks installed (Reset/CreateTexture/Volume/Cube/VB/IB); MANAGED buffers -> DEFAULT, MANAGED textures -> DEFAULT|DYNAMIC");
+            return true;
         }
 
         class Direct3D9ExCompat final : public IDirect3D9
@@ -161,11 +414,23 @@ namespace OutRunVRD3D9ExUpgrade
                     params, fullscreenPtr, &deviceEx) : E_FAIL;
                 if (SUCCEEDED(hr) && deviceEx)
                 {
+                    if (!InstallManagedResourceCompat(deviceEx))
+                    {
+                        deviceEx->Release();
+                        deviceEx = nullptr;
+                        if (!FirstFallbackLogged.exchange(true))
+                        {
+                            spdlog::warn(
+                                "VR D3D9Ex upgrade: Ex device created but managed-resource compatibility layer could not be installed; falling back to original D3D9 device");
+                        }
+                        return fallback_->CreateDevice(adapter, type, focusWindow, behaviorFlags, params, device);
+                    }
+
                     *device = static_cast<IDirect3DDevice9*>(deviceEx);
                     if (!FirstUpgradeLogged.exchange(true))
                     {
                         spdlog::info(
-                            "VR D3D9Ex upgrade: game CreateDevice promoted to CreateDeviceEx; existing 4-slot zero-copy eye transport is eligible");
+                            "VR D3D9Ex upgrade: game CreateDevice promoted to CreateDeviceEx with managed-resource compatibility; existing 4-slot zero-copy eye transport is eligible");
                     }
                     return hr;
                 }
