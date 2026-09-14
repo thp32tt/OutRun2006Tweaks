@@ -1,0 +1,47 @@
+name: Apply v0.3 review fixes without compile
+
+on:
+  push:
+    branches:
+      - wheel-ffb-v0.3-xforce
+    paths:
+      - tools/v03_review_fix.trigger
+
+permissions:
+  contents: write
+
+jobs:
+  apply-source-only:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Apply reviewed source patches
+        shell: bash
+        run: |
+          set -euo pipefail
+          for patch in tools/v03_review_fix_*.patch; do
+            git apply --check "$patch"
+            git apply "$patch"
+          done
+
+      - name: Static source verification only
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/verify_wheel_ffb_current.py
+          python -m py_compile tools/verify_wheel_ffb_current.py tools/verify_wheel_ffb_math.py
+
+      - name: Commit source-only fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm tools/v03_review_fix_*.patch tools/v03_review_fix.trigger
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src tools
+          git commit -m "fix: harden v0.3 X-Force source after five-pass review [skip ci]"
+          git push origin HEAD:wheel-ffb-v0.3-xforce
