@@ -157,7 +157,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git rm tools/apply_v03_xforce_deepening.py tools/v03_xforce_deepening.trigger .github/workflows/v03-xforce-deepening.yml
+          git rm -f tools/apply_v03_xforce_deepening.py tools/v03_xforce_deepening.trigger .github/workflows/v03-xforce-deepening.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add src OutRun2006Tweaks.ini tools/test_wheel_ffb_current.cpp tools/verify_wheel_ffb_current.py .github/workflows/build.yml
