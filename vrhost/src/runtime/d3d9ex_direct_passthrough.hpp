@@ -1,17 +1,23 @@
 #pragma once
 
 // R13 arbitration between the R10 Desktop-Duplication fallback and the
-// D3D9Ex -> D3D11 shared-eye ring.
+// D3D9Ex shared-eye ring.
 //
-// R12 proved that an exact hostDirectConsumedFrameId is useful to establish
-// that the host opened the exact shared-eye frame, but that ACK happens before
-// RenderProjection samples the shared SRVs.  It therefore cannot authorize the
-// D3D9 producer to reuse the slot.  R13 adds a second, GPU-completion ACK in
-// SharedPoseState::reserved[15].  The game producer uses only that safe ACK for
-// ring reuse.
+// The legacy hostDirectConsumedFrameId only says that the host opened a shared
+// frame. It is not safe for producer slot reuse because the HMD may need to
+// render that same frame again after the game has advanced. R13 therefore:
 //
-// Architecture-verifier compatibility markers retained while R13 replaces the
-// implementation behind them: RenderFrameDirectGpuTransport DirectFrameReady.
+//   D3D9Ex shared L/R -> D3D11 host-owned L/R (CopyResource)
+//   -> D3D11 EVENT proves copy completion
+//   -> reserved[15] GPU-completion ACK permits D3D9 slot reuse
+//   -> OpenXR projection samples only the host-owned copies
+//
+// This remains CPU-copy-free and avoids Desktop Duplication, while making the
+// lifetime boundary explicit. It is intentionally called direct GPU-copy
+// transport rather than claiming a synchronization-unsafe zero-copy path.
+//
+// Compatibility marker kept for older binary CI only:
+// ZERO-COPY projection passthrough ACTIVE
 
 #include "sbs_capture_override.hpp"
 #include "../../../src/vr/d3d9/r13_bridge.hpp"
@@ -20,21 +26,23 @@
 #undef xrEndFrame
 #endif
 
+#include <array>
 #include <cstdint>
 #include <iostream>
 
 namespace OutRunVrD3D9ExDirectPassthrough
 {
-    inline constexpr const char* BuildId = "D3D9Ex-direct-passthrough-R13-20260915";
+    inline constexpr const char* BuildId = "D3D9Ex-direct-gpu-copy-R13-20260915";
     inline constexpr const char* LegacyBuildId = "D3D9Ex-direct-passthrough-20260915";
     inline constexpr ULONGLONG FallbackSourceMaxAgeMs = 250;
-    inline constexpr ULONGLONG ConsumerFenceTimeoutMs = 25;
+    inline constexpr ULONGLONG CopyFenceTimeoutMs = 25;
 
     inline std::uint64_t DirectPassFrames = 0;
     inline std::uint64_t FallbackFrames = 0;
     inline std::uint64_t DirectCandidateRejected = 0;
-    inline std::uint64_t ConsumerFenceSuccess = 0;
-    inline std::uint64_t ConsumerFenceTimeout = 0;
+    inline std::uint64_t SafeCopySuccess = 0;
+    inline std::uint64_t SafeCopyFailure = 0;
+    inline std::uint64_t CopyFenceTimeout = 0;
     inline std::uint64_t StaleFallbackInvalidations = 0;
     inline bool FirstDirectPassLogged = false;
     inline bool FirstDirectRejectLogged = false;
@@ -42,10 +50,31 @@ namespace OutRunVrD3D9ExDirectPassthrough
 
     inline HANDLE PoseMapping = nullptr;
     inline OutRunVR::SharedPoseState* PoseState = nullptr;
-    inline ID3D11Query* ConsumerFence = nullptr;
+    inline DWORD PoseOwnerPid = 0;
+
+    inline HANDLE FrameMapping = nullptr;
+    inline const OutRunVR::SharedRenderFrameRing* FrameRing = nullptr;
+
+    inline ID3D11Query* CopyFence = nullptr;
+    inline ID3D11Texture2D* SafeEye[2]{};
+    inline ID3D11ShaderResourceView* SafeEyeSrv[2]{};
+    inline DXGI_FORMAT SafeEyeFormat = DXGI_FORMAT_UNKNOWN;
+    inline std::uint32_t SafeEyeWidth = 0;
+    inline std::uint32_t SafeEyeHeight = 0;
+    inline std::uint32_t SafeFrameId = 0;
 
     inline std::uint64_t LastObservedCaptureFresh = 0;
     inline ULONGLONG LastCaptureFreshMs = 0;
+
+    template <typename T>
+    inline void ReleaseCom(T*& value)
+    {
+        if (value)
+        {
+            value->Release();
+            value = nullptr;
+        }
+    }
 
     struct DirectHostState
     {
@@ -55,6 +84,17 @@ namespace OutRunVrD3D9ExDirectPassthrough
         std::uint32_t openedFrame = 0;
         std::uint32_t gpuCompletedFrame = 0;
     };
+
+    inline void ResetSafeEyes() noexcept
+    {
+        ReleaseCom(SafeEyeSrv[0]);
+        ReleaseCom(SafeEye[0]);
+        ReleaseCom(SafeEyeSrv[1]);
+        ReleaseCom(SafeEye[1]);
+        SafeEyeFormat = DXGI_FORMAT_UNKNOWN;
+        SafeEyeWidth = SafeEyeHeight = 0;
+        SafeFrameId = 0;
+    }
 
     inline bool EnsurePoseState() noexcept
     {
@@ -78,7 +118,6 @@ namespace OutRunVrD3D9ExDirectPassthrough
         PoseMapping = OpenFileMappingW(FILE_MAP_ALL_ACCESS, FALSE, OutRunVR::SharedMemoryName);
         if (!PoseMapping)
             return false;
-
         PoseState = static_cast<OutRunVR::SharedPoseState*>(MapViewOfFile(
             PoseMapping, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(OutRunVR::SharedPoseState)));
         if (!PoseState)
@@ -87,7 +126,6 @@ namespace OutRunVrD3D9ExDirectPassthrough
             PoseMapping = nullptr;
             return false;
         }
-
         if (PoseState->magic != OutRunVR::SharedMagic ||
             PoseState->protocolVersion != OutRunVR::SharedProtocolVersion ||
             PoseState->structSize != sizeof(OutRunVR::SharedPoseState))
@@ -98,7 +136,47 @@ namespace OutRunVrD3D9ExDirectPassthrough
             PoseMapping = nullptr;
             return false;
         }
+
+        // A host restart must not inherit an old consumer-completion ACK.
+        PoseOwnerPid = PoseState->hostPid;
+        InterlockedExchange(
+            reinterpret_cast<volatile LONG*>(&PoseState->reserved[OutRunVRR13::HostDirectGpuCompletedFrameIndex]), 0);
         return true;
+    }
+
+    inline bool EnsureFrameRing() noexcept
+    {
+        if (FrameRing && FrameRing->magic == OutRunVR::RenderFrameMagic &&
+            FrameRing->protocolVersion == OutRunVR::RenderFrameProtocolVersion &&
+            FrameRing->structSize == sizeof(OutRunVR::SharedRenderFrameRing) &&
+            FrameRing->slotCount == OutRunVR::RenderFrameRingSize)
+            return true;
+
+        if (FrameRing)
+        {
+            UnmapViewOfFile(FrameRing);
+            FrameRing = nullptr;
+        }
+        if (FrameMapping)
+        {
+            CloseHandle(FrameMapping);
+            FrameMapping = nullptr;
+        }
+        FrameMapping = OpenFileMappingW(FILE_MAP_READ, FALSE, OutRunVR::RenderFrameMemoryName);
+        if (!FrameMapping)
+            return false;
+        FrameRing = static_cast<const OutRunVR::SharedRenderFrameRing*>(MapViewOfFile(
+            FrameMapping, FILE_MAP_READ, 0, 0, sizeof(OutRunVR::SharedRenderFrameRing)));
+        if (!FrameRing)
+        {
+            CloseHandle(FrameMapping);
+            FrameMapping = nullptr;
+            return false;
+        }
+        return FrameRing->magic == OutRunVR::RenderFrameMagic &&
+            FrameRing->protocolVersion == OutRunVR::RenderFrameProtocolVersion &&
+            FrameRing->structSize == sizeof(OutRunVR::SharedRenderFrameRing) &&
+            FrameRing->slotCount == OutRunVR::RenderFrameRingSize;
     }
 
     inline DirectHostState ReadDirectHostState() noexcept
@@ -120,6 +198,14 @@ namespace OutRunVrD3D9ExDirectPassthrough
             if (before != after || (after & 1u))
                 continue;
 
+            if (PoseOwnerPid != out.hostPid)
+            {
+                PoseOwnerPid = out.hostPid;
+                InterlockedExchange(
+                    reinterpret_cast<volatile LONG*>(&PoseState->reserved[OutRunVRR13::HostDirectGpuCompletedFrameIndex]), 0);
+                ResetSafeEyes();
+            }
+
             out.openedFrame = static_cast<std::uint32_t>(InterlockedCompareExchange(
                 reinterpret_cast<volatile LONG*>(&PoseState->hostDirectConsumedFrameId), 0, 0));
             out.gpuCompletedFrame = static_cast<std::uint32_t>(InterlockedCompareExchange(
@@ -135,58 +221,249 @@ namespace OutRunVrD3D9ExDirectPassthrough
         return {};
     }
 
+    inline bool ReadFrameById(std::uint32_t frameId, OutRunVR::SharedRenderFrameState& out) noexcept
+    {
+        if (!frameId || !EnsureFrameRing())
+            return false;
+        for (std::uint32_t i = 0; i < OutRunVR::RenderFrameRingSize; ++i)
+        {
+            const auto& slot = FrameRing->slots[i];
+            for (int attempt = 0; attempt < 4; ++attempt)
+            {
+                const std::uint32_t before = slot.sequence;
+                if (before & 1u)
+                    continue;
+                MemoryBarrier();
+                std::memcpy(&out, &slot, sizeof(out));
+                MemoryBarrier();
+                const std::uint32_t after = slot.sequence;
+                if (before == after && !(after & 1u) &&
+                    out.magic == OutRunVR::RenderFrameMagic &&
+                    out.protocolVersion == OutRunVR::RenderFrameProtocolVersion &&
+                    out.structSize == sizeof(out) && out.frameId == frameId &&
+                    out.state == OutRunVR::StereoSbsActive &&
+                    (out.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0 &&
+                    (out.flags & OutRunVR::RenderFramePresentInFlight) == 0)
+                    return true;
+            }
+        }
+        return false;
+    }
+
     inline bool IncomingProjectionValid(const XrFrameEndInfo* endInfo) noexcept
     {
         return endInfo && endInfo->layerCount > 0 && endInfo->layers &&
             endInfo->layers[0] && endInfo->layers[0]->type == XR_TYPE_COMPOSITION_LAYER_PROJECTION;
     }
 
-    inline bool EnsureConsumerFence() noexcept
+    inline bool EnsureCopyFence() noexcept
     {
-        if (ConsumerFence)
+        if (CopyFence)
             return true;
         if (!OutRunVrFinalTest::Device)
             return false;
         D3D11_QUERY_DESC desc{};
         desc.Query = D3D11_QUERY_EVENT;
-        return SUCCEEDED(OutRunVrFinalTest::Device->CreateQuery(&desc, &ConsumerFence)) && ConsumerFence;
+        return SUCCEEDED(OutRunVrFinalTest::Device->CreateQuery(&desc, &CopyFence)) && CopyFence;
     }
 
-    inline bool MarkGpuConsumptionComplete(std::uint32_t frameId) noexcept
+    inline bool WaitForCopyFence() noexcept
     {
-        if (!frameId || !PoseState || !OutRunVrFinalTest::Context || !EnsureConsumerFence())
+        if (!CopyFence || !OutRunVrFinalTest::Context)
             return false;
-
-        // RenderProjection has already queued all SRV sampling before main.cpp
-        // reaches xrEndFrame.  An EVENT query inserted here retires only after
-        // those commands have completed on the D3D11 GPU timeline.
-        OutRunVrFinalTest::Context->End(ConsumerFence);
+        OutRunVrFinalTest::Context->End(CopyFence);
         OutRunVrFinalTest::Context->Flush();
         const ULONGLONG start = GetTickCount64();
         for (;;)
         {
             const HRESULT hr = OutRunVrFinalTest::Context->GetData(
-                ConsumerFence, nullptr, 0, D3D11_ASYNC_GETDATA_DONOTFLUSH);
+                CopyFence, nullptr, 0, D3D11_ASYNC_GETDATA_DONOTFLUSH);
             if (hr == S_OK)
-                break;
-            if (FAILED(hr) || GetTickCount64() - start >= ConsumerFenceTimeoutMs)
+                return true;
+            if (FAILED(hr) || GetTickCount64() - start >= CopyFenceTimeoutMs)
             {
-                ++ConsumerFenceTimeout;
+                ++CopyFenceTimeout;
                 return false;
             }
             SwitchToThread();
         }
+    }
 
+    inline bool EnsureSafeEyes(const D3D11_TEXTURE2D_DESC& desc) noexcept
+    {
+        if (SafeEye[0] && SafeEye[1] && SafeEyeSrv[0] && SafeEyeSrv[1] &&
+            SafeEyeWidth == desc.Width && SafeEyeHeight == desc.Height && SafeEyeFormat == desc.Format)
+            return true;
+
+        ResetSafeEyes();
+        D3D11_TEXTURE2D_DESC safe = desc;
+        safe.MipLevels = 1;
+        safe.ArraySize = 1;
+        safe.SampleDesc.Count = 1;
+        safe.SampleDesc.Quality = 0;
+        safe.Usage = D3D11_USAGE_DEFAULT;
+        safe.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+        safe.CPUAccessFlags = 0;
+        safe.MiscFlags = 0;
+        for (int eye = 0; eye < 2; ++eye)
+        {
+            if (FAILED(OutRunVrFinalTest::Device->CreateTexture2D(&safe, nullptr, &SafeEye[eye])) || !SafeEye[eye] ||
+                FAILED(OutRunVrFinalTest::Device->CreateShaderResourceView(SafeEye[eye], nullptr, &SafeEyeSrv[eye])) || !SafeEyeSrv[eye])
+            {
+                ResetSafeEyes();
+                return false;
+            }
+        }
+        SafeEyeWidth = safe.Width;
+        SafeEyeHeight = safe.Height;
+        SafeEyeFormat = safe.Format;
+        return true;
+    }
+
+    inline bool CopySharedFrameToSafeEyes(const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        if (!OutRunVrFinalTest::Device || !OutRunVrFinalTest::Context || !EnsureCopyFence())
+            return false;
+        const std::uint32_t leftRaw = frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex];
+        const std::uint32_t rightRaw = frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex];
+        const std::uint32_t width = frame.reserved[OutRunVR::RenderFrameDirectWidthIndex];
+        const std::uint32_t height = frame.reserved[OutRunVR::RenderFrameDirectHeightIndex];
+        if (!leftRaw || !rightRaw || !width || !height)
+            return false;
+
+        ID3D11Texture2D* shared[2]{};
+        bool ok = true;
+        const std::uint32_t handles[2]{ leftRaw, rightRaw };
+        for (int eye = 0; eye < 2 && ok; ++eye)
+        {
+            ID3D11Resource* resource = nullptr;
+            const HANDLE handle = reinterpret_cast<HANDLE>(static_cast<std::uintptr_t>(handles[eye]));
+            if (FAILED(OutRunVrFinalTest::Device->OpenSharedResource(
+                    handle, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&resource))) || !resource)
+            {
+                ok = false;
+                break;
+            }
+            const HRESULT qi = resource->QueryInterface(
+                __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&shared[eye]));
+            resource->Release();
+            if (FAILED(qi) || !shared[eye])
+                ok = false;
+        }
+
+        D3D11_TEXTURE2D_DESC desc[2]{};
+        if (ok)
+        {
+            shared[0]->GetDesc(&desc[0]);
+            shared[1]->GetDesc(&desc[1]);
+            ok = desc[0].Width == width && desc[0].Height == height &&
+                desc[1].Width == width && desc[1].Height == height &&
+                desc[0].Format == desc[1].Format &&
+                desc[0].SampleDesc.Count == 1 && desc[1].SampleDesc.Count == 1 &&
+                (desc[0].Format == DXGI_FORMAT_R8G8B8A8_UNORM ||
+                 desc[0].Format == DXGI_FORMAT_R10G10B10A2_UNORM ||
+                 desc[0].Format == DXGI_FORMAT_R16G16B16A16_FLOAT) &&
+                EnsureSafeEyes(desc[0]);
+        }
+
+        if (ok)
+        {
+            OutRunVrFinalTest::Context->CopyResource(SafeEye[0], shared[0]);
+            OutRunVrFinalTest::Context->CopyResource(SafeEye[1], shared[1]);
+            ok = WaitForCopyFence();
+        }
+
+        ReleaseCom(shared[0]);
+        ReleaseCom(shared[1]);
+        if (!ok)
+        {
+            ++SafeCopyFailure;
+            return false;
+        }
+
+        SafeFrameId = frame.frameId;
         InterlockedExchange(
             reinterpret_cast<volatile LONG*>(&PoseState->reserved[OutRunVRR13::HostDirectGpuCompletedFrameIndex]),
-            static_cast<LONG>(frameId));
-        ++ConsumerFenceSuccess;
+            static_cast<LONG>(frame.frameId));
+        ++SafeCopySuccess;
         if (!FirstGpuSafeAckLogged)
         {
             FirstGpuSafeAckLogged = true;
-            std::cerr << "[D3D9Ex R13] GPU-consumer completion ACK active frame=" << frameId
-                      << "; producer ring reuse now waits for D3D11 completion\n";
+            std::cerr << "[D3D9Ex R13] host-owned GPU eye copies + completion ACK active frame=" << frame.frameId
+                      << "; shared ring can now be safely reused\n";
         }
+        return true;
+    }
+
+    inline bool EnsureSafeFrame(std::uint32_t frameId) noexcept
+    {
+        if (frameId && SafeFrameId == frameId && SafeEyeSrv[0] && SafeEyeSrv[1])
+            return true;
+        OutRunVR::SharedRenderFrameState frame{};
+        return ReadFrameById(frameId, frame) && CopySharedFrameToSafeEyes(frame);
+    }
+
+    inline bool RenderSafeProjection(XrSession session, const XrFrameEndInfo* endInfo,
+        XrFrameEndInfo& patched, XrCompositionLayerProjection& projection,
+        std::array<XrCompositionLayerProjectionView, 2>& views) noexcept
+    {
+        using namespace OutRunVrSbsCaptureOverride;
+        if (!IncomingProjectionValid(endInfo) || !SafeEyeSrv[0] || !SafeEyeSrv[1])
+            return false;
+        const auto* incoming = reinterpret_cast<const XrCompositionLayerProjection*>(endInfo->layers[0]);
+        if (incoming->viewCount < 2 || !incoming->views)
+            return false;
+
+        const std::uint32_t width = std::max(1, incoming->views[0].subImage.imageRect.extent.width);
+        const std::uint32_t height = std::max(1, incoming->views[0].subImage.imageRect.extent.height);
+        if (!EnsureSwapchain(Projection, session, width, height, 2) || !CreateShaders())
+            return false;
+
+        std::uint32_t image = 0;
+        if (!Acquire(Projection.handle, image) || image >= Projection.rtvs.size())
+            return false;
+
+        ID3D11ShaderResourceView* savedSrv = SourceSrv;
+        const DXGI_FORMAT savedFormat = SourceFormat;
+        bool ok = true;
+        for (int eye = 0; eye < 2; ++eye)
+        {
+            SourceSrv = SafeEyeSrv[eye];
+            SourceFormat = SafeEyeFormat;
+            ok = RenderTo(Projection.rtvs[image][eye], Projection.width, Projection.height,
+                    UvRect{ 0.f, 0.f, 1.f, 1.f }) && ok;
+        }
+        SourceSrv = savedSrv;
+        SourceFormat = savedFormat;
+        if (OutRunVrFinalTest::Context)
+            OutRunVrFinalTest::Context->Flush();
+        Release(Projection.handle);
+        if (!ok)
+            return false;
+
+        projection = *incoming;
+        for (int eye = 0; eye < 2; ++eye)
+        {
+            views[eye] = incoming->views[eye];
+            views[eye].subImage.swapchain = Projection.handle;
+            views[eye].subImage.imageRect.offset = { 0, 0 };
+            views[eye].subImage.imageRect.extent = {
+                static_cast<std::int32_t>(Projection.width),
+                static_cast<std::int32_t>(Projection.height)
+            };
+            views[eye].subImage.imageArrayIndex = eye;
+        }
+        projection.viewCount = 2;
+        projection.views = views.data();
+        const XrCompositionLayerBaseHeader* layer =
+            reinterpret_cast<const XrCompositionLayerBaseHeader*>(&projection);
+        patched = *endInfo;
+        patched.layerCount = 1;
+        patched.layers = &layer;
+        // WARNING: patched.layers points at a local variable in this function.
+        // The caller therefore replaces it again with its own stable layer ptr
+        // immediately before EndFrame. This assignment documents the intended
+        // one-layer result only.
         return true;
     }
 
@@ -216,26 +493,31 @@ namespace OutRunVrD3D9ExDirectPassthrough
 
     inline XrResult XRAPI_CALL EndFrame(XrSession session, const XrFrameEndInfo* endInfo)
     {
-        // The incoming projection itself is the authoritative evidence that the
-        // legacy host matched a game frame and RenderProjection sampled its
-        // direct SRVs.  Do not re-read LatestFrame here for arbitration: doing
-        // so raced frame N's incoming projection against a newly published N+1.
         const DirectHostState state = ReadDirectHostState();
         const bool directCandidate = IncomingProjectionValid(endInfo) && state.valid && state.openedFrame != 0;
 
-        if (directCandidate && MarkGpuConsumptionComplete(state.openedFrame))
+        if (directCandidate && EnsureSafeFrame(state.openedFrame))
         {
-            ++DirectPassFrames;
-            if (!FirstDirectPassLogged)
+            XrFrameEndInfo patched{};
+            XrCompositionLayerProjection projection{};
+            std::array<XrCompositionLayerProjectionView, 2> views{};
+            if (RenderSafeProjection(session, endInfo, patched, projection, views))
             {
-                FirstDirectPassLogged = true;
-                std::cerr
-                    << "[D3D9Ex] ZERO-COPY projection passthrough ACTIVE build=" << BuildId
-                    << " legacy=" << LegacyBuildId
-                    << " frame=" << state.openedFrame
-                    << "; exact opened-frame ACK + GPU completion matched; R10 Desktop Duplication bypassed\n";
+                const XrCompositionLayerBaseHeader* stableLayer =
+                    reinterpret_cast<const XrCompositionLayerBaseHeader*>(&projection);
+                patched.layers = &stableLayer;
+                ++DirectPassFrames;
+                if (!FirstDirectPassLogged)
+                {
+                    FirstDirectPassLogged = true;
+                    std::cerr
+                        << "[D3D9Ex] DIRECT GPU-COPY projection passthrough ACTIVE build=" << BuildId
+                        << " legacy=" << LegacyBuildId
+                        << " frame=" << state.openedFrame
+                        << "; shared eyes copied to host-owned GPU textures; R10 Desktop Duplication bypassed\n";
+                }
+                return OutRunVrFinalTest::EndFrame(session, &patched);
             }
-            return OutRunVrFinalTest::EndFrame(session, endInfo);
         }
 
         if (directCandidate)
@@ -245,7 +527,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
             {
                 FirstDirectRejectLogged = true;
                 std::cerr
-                    << "[D3D9Ex R13] direct projection exists but GPU-consumer completion was not proven; keeping R10 fallback\n";
+                    << "[D3D9Ex R13] direct frame could not be staged/rendered safely; keeping R10 Desktop Duplication fallback\n";
             }
         }
 
