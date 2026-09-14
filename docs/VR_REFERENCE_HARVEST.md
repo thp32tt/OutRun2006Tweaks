@@ -1,117 +1,142 @@
-# VR Reference Harvest
+# VR reference harvest
 
-This document records which proven VR-mod patterns are used by the `vr-openxr` branch and, just as importantly, which external code is **not** copied into this fork.
+This document records the external patterns used to design the `vr-openxr` branch. It is a design/reference ledger, not a source-copy ledger.
 
-The goal is to avoid reinventing solved problems while keeping the OutRun implementation independently authored and preserving the existing wheel / multi-device / native FFB code paths.
+The primary architecture is documented in `docs/VR_ARCHITECTURE.md`.
 
-## Architecture tracks
+## Evidence hierarchy
 
-| Track | Purpose | Status |
+Reference material is used in this order:
+
+1. Microsoft / Khronos API contracts for graphics interop and OpenXR behavior.
+2. Mature open-source VR injectors for architecture and failure-mode patterns.
+3. D3D9 VR projects for legacy-renderer techniques.
+4. Old wrappers/injectors only as historical hints that must be re-verified.
+
+No behavior is accepted merely because another mod used it.
+
+## References retained
+
+| Reference | Lesson retained | OutRun use |
 | --- | --- | --- |
-| A. Native D3D9 -> x64 OpenXR | Primary OutRun VR path | ACTIVE |
-| B. D3D9 -> DXVK -> VR | Isolated renderer experiment | POC ONLY |
-| C. Stereo -> OpenXR viewer/capture | Compatibility and diagnostics fallback | ACTIVE FALLBACK via SBS/Desktop Duplication |
+| Microsoft D3D9Ex / DXGI surface-sharing documentation | D3D9Ex-to-DXGI sharing is an unsynchronized producer/consumer problem; explicit synchronization and a queue of surfaces are required | LUID/probe gate + four-slot producer queue + host ACK |
+| Microsoft `ID3D11Device::OpenSharedResource` documentation | D3D9/D3D11 shared textures have strict format/resource restrictions | direct transport validates format/resource creation and fails closed |
+| Khronos OpenXR | runtime-selected graphics adapter, predicted display time, view pose/FOV, session/reference-space lifecycle | x64 host and render-pose/frame matching |
+| REFramework | separate generic VR/runtime infrastructure from game-specific engine work | OutRun adapter separated from runtime/transport layers |
+| UEVR | isolate D3D backends, runtime components and overlay/submission concerns | architecture target for further decomposition |
+| `elliotttate/vrframework` | explicit universal-core / engine-adapter / per-game-data layering and frame-timing discipline | used as structural guidance, not copied runtime code |
+| openRBRVR / `dxvk-openRBRVR` | a DXVK-based D3D9 VR path is viable, but it makes the graphics translation layer part of the mod | DXVK remains an isolated measured experiment |
+| ReShade / D3D wrappers | robust device/reset/present lifecycle interception patterns | compared against D3D9 hook lifecycle |
+| iZ3D / historical stereo wrappers | final-draw duplication, stereo projection and zero-disparity UI concepts | historical reference only; no incompatible source imported |
 
-Track B must never silently replace Track A. A DXVK experiment is only promoted after real-device latency, image quality, compatibility, and maintenance cost are compared against the native path.
+## Important conclusion: D3D9Ex is a backend, not an assumption
 
-## Reference-to-OutRun map
+Microsoft's graphics-API surface-sharing guidance distinguishes D3D9Ex from classic D3D9c: shared-surface interoperability with DXGI-based APIs is a D3D9Ex path, while classic D3D9c/older paths require copying.
 
-| Reference family | Pattern harvested | OutRun location | Integration policy | Status |
-| --- | --- | --- | --- | --- |
-| FEAR-style split host | x86 game + x64 OpenXR host, versioned IPC, heartbeat/fallback | `src/vr_shared.hpp`, `src/hooks_vr.cpp`, `vrhost/main_stereo.cpp` | independently implemented | APPLIED |
-| COD4-style GPU transport | adapter identity check, interop proof, multi-buffer shared-eye queue, frame/pose pairing | `src/vr_stereo.cpp`, `vrhost/main_stereo.cpp` | clean-room behavior only | APPLIED |
-| BFVR-style legacy bridge | runtime-selected graphics adapter, reset-safe resources, color-space handling | `src/vr_stereo.cpp`, `vrhost/main_stereo.cpp`, `vrhost/stereo_shader.hpp` | independently implemented | APPLIED / depth later |
-| iZ3D/wiz3D concepts | D3D9 RT/depth/state tracking, draw duplication, stereo projection, zero-disparity UI | `src/vr_stereo.cpp`, `src/vr_renderer_probe.cpp` | compare behavior, do not import incompatible-license code | APPLIED |
-| Dishonored-style classification | world vs HUD/offscreen/MRT/depth-safe draw classification | `src/vr_stereo.cpp` | behavior comparison | APPLIED; stage-specific tuning remains |
-| ReShade lifecycle patterns | Create/Reset/Present/resource lifetime discipline | D3D9 hooks and reset paths | behavior comparison | APPLIED |
-| REFramework/vrframework concepts | universal VR core vs game-specific adapter separation | x86 renderer probe/stereo + x64 host split | structural guidance | PARTIAL; no disruptive refactor yet |
-| UEVR/UUVR concepts | render-vs-submit pose discipline, recommended resolution, render scale, runtime lifecycle | `vrhost/main_stereo.cpp` | algorithm/reference only | APPLIED |
-| Cyberpunk/Ghost Recon concepts | submit the FOV/pose that actually rendered the texture, desktop-independent eye resolution | frame metadata + OpenXR projection path | behavior comparison | APPLIED |
-| openRBRVR/DXVK concepts | Vulkan-side alternative renderer/interception path | `tools/vr_dxvk_poc.ps1` | isolated experiment | POC |
+That means the OutRun renderer must not be designed around the assumption that the stock 2006 device is already `IDirect3DDevice9Ex`.
 
-## Transport v2 contract
-
-The direct path is deliberately fail-closed:
+The current direct path therefore remains conditional:
 
 ```text
-OpenXR D3D11 adapter LUID
-        |
-        v
-Pose.v2 host adapter contract
-        |
-        v
-Game must expose IDirect3DDevice9Ex
-        |
-        v
-D3D9Ex adapter LUID == OpenXR D3D11 adapter LUID
-        |
-        v
-1x1 shared-resource verification pixel
-        |
-        v
-host opens/readbacks/ACKs exact probe token
-        |
-        v
-4-slot shared stereo texture ring enabled
+OpenXR-required D3D11 adapter LUID
+             |
+             v
+compatible D3D9Ex device exists
+             |
+             v
+D3D9Ex adapter LUID == OpenXR adapter LUID
+             |
+             v
+shared verification texture opens and reads correctly
+             |
+             v
+host ACKs exact probe generation
+             |
+             v
+four-slot direct eye transport enabled
 ```
 
-If any step fails, the native direct transport is not trusted. The already implemented SBS/Desktop Duplication route remains available instead of guessing that cross-API sharing is safe.
+If any step fails, backend selection falls back instead of weakening validation.
 
-### Frame ring
+Converting an old D3D9 game wholesale to D3D9Ex is a separate compatibility project. Existing open-source wrappers show that this can work for some titles but can fail on legacy resource formats/pool behavior. It must therefore be tested on OutRun rather than silently built into the renderer core.
 
-`Frame.v2` is a four-slot metadata ring. A completed stereo frame carries:
+## What is kept from the existing OutRun work
 
-- non-zero frame ID and source pose sequence
-- full 64-bit Present QPC
-- exact effective per-eye pose and FOV used for rendering
-- stereo completeness/failure flags
-- direct transport slot, generation, dimensions, format and shared handles
+These are based on game-specific evidence and are more valuable than the prototype file layout:
 
-The x86 producer does not overwrite a direct texture slot until the x64 consumer acknowledges the previous frame associated with that slot. Each slot also has a D3D9 event query before publication. This removes the previous single-pair overwrite race and gives producer/consumer backpressure without a CPU texture readback path.
+- verified renderer globals for View / Projection / WorldView;
+- VS c64..c67 as the authoritative `Transpose(WorldView * Projection)` upload boundary;
+- one immutable pose per presented game frame;
+- no replay of simulation, input, timers or native FFB;
+- second-eye duplication at the D3D draw boundary while renderer state is live;
+- fail-closed classification for unsafe MRT/depth/offscreen/query cases;
+- frame ID + pose sequence + full QPC association;
+- submit the pose/FOV that rendered the accepted texture;
+- reset/session changes invalidate stale history/resources.
 
-The consumer caches all four D3D11 shared-resource views instead of reopening the same handles every frame.
+## What is discarded
 
-## Existing features retained rather than rewritten
+The following are development history, not architecture:
 
-The branch already had several items requested by the reference review, so they remain the source of truth instead of being duplicated:
+- `main.cpp`, `main_compat.cpp`, `main_compat_v2.cpp`, `main_compat_v3.cpp` host generations;
+- one-shot source mutation workflows;
+- one-shot Python patch scripts;
+- old root-level VR implementation filenames;
+- the idea that Desktop Duplication should define the renderer design;
+- the idea that a successful `QueryInterface(IDirect3DDevice9Ex)` can be assumed before runtime proof.
 
-- OpenXR runtime recommended eye dimensions
-- `OUTRUN_VR_RENDER_SCALE` / `--render-scale`
-- renderer-effective pose/FOV metadata rather than current-HMD-pose substitution
-- full 64-bit QPC frame matching
-- SDR/scRGB conversion in the x64 compositor
-- Desktop Duplication fallback
-- zero-disparity HUD duplication
-- theater presentation for non-gameplay screens
-- OpenXR session/reference-space lifecycle handling
-- no replay of simulation, input, timers or native FFB
+## Current source map
 
-## Draw-classification policy
+```text
+src/vr/settings.cpp
+    VR settings/bootstrap
 
-The safe default remains conservative:
+src/vr/game/outrun_renderer.cpp
+    OutRun-specific renderer facts, c64 verification, frame pose latch,
+    recenter and render-only camera synchronization
 
-- verified world draw to the real backbuffer: duplicate as true stereo
-- screen-space/non-world draw: duplicate identically for zero disparity
-- offscreen RT: single pass unless explicitly proven to be a full-world pass
-- active MRT or unsafe depth/state transition: fail closed for that stereo frame
-- shadows/reflections/post-process: never blindly replayed just because another title did so
+src/vr/d3d9/stereo_renderer.cpp
+    D3D9 state tracking, draw classification, stereo draw duplication,
+    current native shared transport and SBS fallback implementation
 
-This intentionally follows proven stereo-wrapper practice while keeping game-specific classification evidence mandatory.
+src/vr/ipc/protocol.hpp
+    current cross-bitness Pose.v2 / Frame.v2 wire contract
+
+vrhost/src/main.cpp
+    current x64 host implementation
+
+vrhost/src/stereo_shader.hpp
+    compositor shader
+
+vrhost/tests/stereo_shader_smoke.cpp
+    exact shader compile smoke test
+```
+
+The two large runtime translation units are intentionally moved before being split. Moving first keeps behavior identical and gives CI a clean checkpoint. Further decomposition should be behavior-preserving and one boundary at a time.
+
+## Next extraction order
+
+Game side:
+
+1. shared-memory pose client;
+2. stereo projection/math;
+3. draw classifier/state tracker;
+4. D3D9Ex direct transport backend;
+5. SBS fallback backend;
+6. diagnostics.
+
+Host side:
+
+1. OpenXR runtime/session owner;
+2. D3D11 device/adapter owner;
+3. IPC bridge;
+4. direct shared-frame source;
+5. Desktop Duplication frame source;
+6. compositor/theater layer;
+7. timing/config.
+
+Only after this extraction and a Quest/VDXR smoke run should the wire protocol move to a cleaner ownership-separated v3.
 
 ## License boundary
 
-No GPL/all-rights-reserved reference implementation is copied into this branch. Such projects are used only to identify observable behavior, invariants, failure cases, queue topology, timing contracts and test ideas. The OutRun code is independently written around those requirements.
-
-Code from permissive references may only be ported later when its exact license and attribution requirements are recorded beside the import. LGPL/MPL components require module/file-level review before any code reuse. When uncertain, use clean-room reimplementation.
-
-## Deferred work
-
-These are intentionally not forced into the primary renderer before Quest/VDXR validation:
-
-1. Vulkan/DXVK stereo interception replacing the native D3D9 path.
-2. OpenXR depth-layer submission and depth transport.
-3. Per-stage offscreen world-pass classification.
-4. Large directory refactor into universal/game-specific VR layers.
-5. Separate OpenXR HUD layer.
-
-They are not missing accidentally: each can change compatibility or latency and therefore needs an isolated proof before promotion.
+GPL or otherwise incompatible reference implementations are used only for observable behavior, algorithms, failure cases and architecture comparison. Their code is not copied into this fork. Permissively licensed code may be imported only after its exact license and attribution requirements are recorded with the import.
