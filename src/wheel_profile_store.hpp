@@ -22,6 +22,7 @@ namespace Settings
     extern Setting<int> WheelFFBFeedbackCharacter;
     extern Setting<float> WheelFFBXForceMix;
     extern Setting<bool> WheelFFBXForceInvert;
+    extern Setting<float> WheelFFBXForceGain;
 }
 
 // Named wheel/input and force-feedback profiles live beside the DLL instead of
@@ -414,6 +415,7 @@ namespace WheelProfileStore
         // silently redirect torque to another wheel or turn verbose logging on.
         return key != "DeviceName" && key != "DeviceGuid" &&
             key != "Telemetry" && key != "DebugLog" &&
+            key != "XForceCapture60Hz" &&
             key != "ResponseCorrection" && key != "ResponseLUT" &&
             key != "MaxTorqueNm";
     }
@@ -546,6 +548,17 @@ namespace WheelProfileStore
             migrate_legacy_character(Settings::WheelFFBFeedbackCharacter, "0");
             migrate_legacy_character(Settings::WheelFFBXForceMix, "0.50");
             migrate_legacy_character(Settings::WheelFFBXForceInvert, "false");
+        }
+
+        // Early v0.3 profiles predate the independent native gain. Preserve
+        // their original behavior by supplying the neutral 1.00 default rather
+        // than inheriting whatever live gain happened to be selected.
+        if (values.find("xforcegain") == values.end())
+        {
+            const std::string oldValue = Settings::WheelFFBXForceGain.to_string();
+            Settings::WheelFFBXForceGain.set_from_string("1.00");
+            if (Settings::WheelFFBXForceGain.to_string() != oldValue)
+                changed.push_back(&Settings::WheelFFBXForceGain);
         }
 
         for (Settings::SettingBase* setting : changed)

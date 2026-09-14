@@ -62,10 +62,29 @@ struct WheelFFBGraphSnapshot
     std::array<float, WheelFFBGraphCapacity> nativeShare{};
 };
 
+
+struct WheelFFBXForceAnalysisSnapshot
+{
+    std::uint64_t samples = 0;
+    float corrSteer = 0.0f;
+    float corrModernSat = 0.0f;
+    float corrFrontSlip = 0.0f;
+    float corrYawRate = 0.0f;
+    float confidence = 0.0f;
+    bool frozenSuspicious = false;
+    float frozenSeconds = 0.0f;
+    float p50Abs = 0.0f;
+    float p90Abs = 0.0f;
+    float p95Abs = 0.0f;
+    float p99Abs = 0.0f;
+    float maxAbs = 0.0f;
+};
+
 void WheelFFB_RequestDirectionTest(int direction);
 void WheelFFB_RequestSettingsTransition();
 void WheelFFB_ResetDirectionTest();
 WheelFFBHeadroomSnapshot WheelFFB_GetHeadroomSnapshot();
 WheelFFBStatusSnapshot WheelFFB_GetStatusSnapshot();
 WheelFFBGraphSnapshot WheelFFB_GetGraphSnapshot();
+WheelFFBXForceAnalysisSnapshot WheelFFB_GetXForceAnalysisSnapshot();
 void WheelFFB_ResetHeadroomStats();

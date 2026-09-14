@@ -146,6 +146,17 @@ namespace Settings
         "Reverse only the native X-Force candidate before it is mixed with Modern SAT."
     };
 
+    Setting<float> WheelFFBXForceGain{
+        "WheelFFB", "XForceGain", 1.00f,
+        "Native X-Force candidate gain after normalization. Default 1.0; keep conservative until actionforce_DBC is proven.",
+        Range<float>{ 0.0f, 2.0f }
+    };
+
+    Setting<bool> WheelFFBXForceCapture60Hz{
+        "WheelFFB", "XForceCapture60Hz", false,
+        "Very verbose 60 Hz X-Force validation capture in OutRun2006Tweaks.log. Diagnostic only; does not alter force selection."
+    };
+
     Setting<float> WheelFFBGripLoss{
         "WheelFFB", "GripLoss", 0.65f,
         "How strongly real chassis/front-slip signals release damping and unload SAT. Lateral G is load only, never a drift detector.", Range<float>{ 0.0f, 1.0f }
@@ -981,19 +992,55 @@ namespace
             // The production guard handles the two important DD-wheel hazards:
             // stale force at a stop/restart and one-frame fallback at a legitimate
             // zero crossing. Modern DD never consumes the candidate.
+            const DWORD xForceNow = GetTickCount();
+            float xForceDeltaSeconds = 1.0f / 60.0f;
+            if (lastXForceFrameTick_ != 0)
+            {
+                xForceDeltaSeconds = std::clamp(
+                    static_cast<float>(xForceNow - lastXForceFrameTick_) / 1000.0f,
+                    1.0f / 240.0f, 0.10f);
+            }
+            lastXForceFrameTick_ = xForceNow;
+
             const float xForceRaw = car->actionforce_DBC;
             const WheelFFBMath::XForceGuardSample xForceSample = xForceGuard_.update(
-                xForceRaw, speedNorm, steerAbs, bool(Settings::WheelFFBXForceInvert));
+                xForceRaw, speedNorm, steerAbs, bool(Settings::WheelFFBXForceInvert),
+                xForceDeltaSeconds);
+
+            const float configuredXForceMix = std::isfinite(
+                    static_cast<float>(Settings::WheelFFBXForceMix))
+                ? std::clamp(static_cast<float>(Settings::WheelFFBXForceMix), 0.0f, 1.0f)
+                : 0.50f;
+            const float configuredXForceGain = std::isfinite(
+                    static_cast<float>(Settings::WheelFFBXForceGain))
+                ? std::clamp(static_cast<float>(Settings::WheelFFBXForceGain), 0.0f, 2.0f)
+                : 1.00f;
+            const float tuneAlpha = 1.0f - std::exp(
+                -xForceDeltaSeconds / 0.12f);
+            if (smoothedXForceMix_ < 0.0f)
+                smoothedXForceMix_ = configuredXForceMix;
+            else
+                smoothedXForceMix_ +=
+                    (configuredXForceMix - smoothedXForceMix_) * tuneAlpha;
+            if (smoothedXForceGain_ < 0.0f)
+                smoothedXForceGain_ = configuredXForceGain;
+            else
+                smoothedXForceGain_ +=
+                    (configuredXForceGain - smoothedXForceGain_) * tuneAlpha;
+
             const float nativeXForceTorque =
-                xForceSample.normalized * xForceSample.motionGate * satStrength;
+                xForceSample.normalized * xForceSample.motionGate * satStrength *
+                smoothedXForceGain_;
+
+            xForceAnalyzer_.update(
+                xForceRaw, speedNorm, steer, modernSelfAligningTorque,
+                frontSlip, vehicleDynamics_.yawRate(), xForceDeltaSeconds);
+            const WheelFFBMath::XForceAnalysisSnapshot xForceAnalysis =
+                xForceAnalyzer_.snapshot();
 
             const int feedbackCharacter = std::clamp(
                 static_cast<int>(Settings::WheelFFBFeedbackCharacter), 0, 2);
-            const float configuredXForceMix =
-                static_cast<float>(Settings::WheelFFBXForceMix);
-            const float xForceMix = std::isfinite(configuredXForceMix)
-                ? std::clamp(configuredXForceMix, 0.0f, 1.0f)
-                : 0.50f;
+            const float xForceMix = std::clamp(smoothedXForceMix_, 0.0f, 1.0f);
             const WheelFFBMath::XForceMixResult xForceMixResult =
                 WheelFFBMath::mix_xforce_character(
                     modernSelfAligningTorque, nativeXForceTorque,
@@ -1177,6 +1224,24 @@ namespace
                 xForceSample.normalized, modernSelfAligningTorque,
                 nativeXForceTorque, xForceMixResult.nativeShare);
 
+            if (Settings::WheelFFBXForceCapture60Hz)
+            {
+                spdlog::info(
+                    "WheelFFB XFORCE60 tick={} t={} dt={} raw={} speed={} steer={} frontSlip={} yaw={} modern={} native={} finalSat={} normalized={} valid={} blend={} share={} gain={} mix={} confidence={} corrSteer={} corrModern={} corrFront={} corrYaw={} frozen={} frozenSec={} p50={} p90={} p95={} p99={} max={}",
+                    updateCounter_, xForceNow, xForceDeltaSeconds, xForceRaw,
+                    speedNorm, steer, frontSlip, vehicleDynamics_.yawRate(),
+                    modernSelfAligningTorque, nativeXForceTorque, selfAligningTorque,
+                    xForceSample.normalized, xForceSample.valid,
+                    xForceSample.nativeBlend, xForceMixResult.nativeShare,
+                    smoothedXForceGain_, xForceMix, xForceAnalysis.confidence,
+                    xForceAnalysis.corrSteer, xForceAnalysis.corrModernSat,
+                    xForceAnalysis.corrFrontSlip, xForceAnalysis.corrYawRate,
+                    xForceAnalysis.frozenSuspicious, xForceAnalysis.frozenSeconds,
+                    xForceAnalysis.p50Abs, xForceAnalysis.p90Abs,
+                    xForceAnalysis.p95Abs, xForceAnalysis.p99Abs,
+                    xForceAnalysis.maxAbs);
+            }
+
             if (std::abs(level - prevConstantLevel_) > 15 || eventLevel != 0 ||
                 (level != 0 && GetTickCount() - lastConstantWriteTick_ >= FFB_EFFECT_REFRESH_MS))
                 set_constant_force(level);
@@ -1243,6 +1308,15 @@ namespace
                     xForceSample.normalized, xForceSample.motionGate, xForceSample.nativeBlend,
                     xForceMixResult.nativeShare, nativeXForceTorque, modernSelfAligningTorque,
                     selfAligningTorque, xForceMix, bool(Settings::WheelFFBXForceInvert));
+                spdlog::info(
+                    "WheelFFB XFORCE ANALYSIS t={} samples={} confidence={} corrSteer={} corrModern={} corrFront={} corrYaw={} frozen={} frozenSec={} p50={} p90={} p95={} p99={} max={} gain={}",
+                    telemetryNow, xForceAnalysis.samples, xForceAnalysis.confidence,
+                    xForceAnalysis.corrSteer, xForceAnalysis.corrModernSat,
+                    xForceAnalysis.corrFrontSlip, xForceAnalysis.corrYawRate,
+                    xForceAnalysis.frozenSuspicious, xForceAnalysis.frozenSeconds,
+                    xForceAnalysis.p50Abs, xForceAnalysis.p90Abs,
+                    xForceAnalysis.p95Abs, xForceAnalysis.p99Abs,
+                    xForceAnalysis.maxAbs, smoothedXForceGain_);
                 spdlog::info(
                     "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} rawFrontSlip={} frontSlip={} frontBlend={} trailResponseSlip={} trailResponseLead={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} diPreResponse={} diCorrected={} responseCorrection={}",
                     telemetryNow,
@@ -1383,6 +1457,26 @@ namespace
                 result.nativeShare[i] = graphNativeShare_[src];
             }
             return result;
+        }
+
+        WheelFFBXForceAnalysisSnapshot xforce_analysis_snapshot() const
+        {
+            const WheelFFBMath::XForceAnalysisSnapshot source = xForceAnalyzer_.snapshot();
+            WheelFFBXForceAnalysisSnapshot out{};
+            out.samples = source.samples;
+            out.corrSteer = source.corrSteer;
+            out.corrModernSat = source.corrModernSat;
+            out.corrFrontSlip = source.corrFrontSlip;
+            out.corrYawRate = source.corrYawRate;
+            out.confidence = source.confidence;
+            out.frozenSuspicious = source.frozenSuspicious;
+            out.frozenSeconds = source.frozenSeconds;
+            out.p50Abs = source.p50Abs;
+            out.p90Abs = source.p90Abs;
+            out.p95Abs = source.p95Abs;
+            out.p99Abs = source.p99Abs;
+            out.maxAbs = source.maxAbs;
+            return out;
         }
 
         void reset_headroom_stats()
@@ -3467,6 +3561,10 @@ namespace
             steerSampleValid_ = false;
             vehicleDynamics_.reset_dynamic();
             xForceGuard_.reset();
+            xForceAnalyzer_.reset();
+            lastXForceFrameTick_ = 0;
+            smoothedXForceMix_ = -1.0f;
+            smoothedXForceGain_ = -1.0f;
             prevStructuralLevel_ = 0;
             prevSpringCoefficient_ = 0;
             prevDamperCoefficient_ = 0;
@@ -3775,6 +3873,7 @@ namespace
         }
 
         DWORD lastTelemetryTick_ = 0;
+        DWORD lastXForceFrameTick_ = 0;
         DWORD lastConstantWriteTick_ = 0;
         DWORD lastSpringWriteTick_ = 0;
         DWORD lastDamperWriteTick_ = 0;
@@ -3849,11 +3948,14 @@ namespace
 
         float smoothedLateral_ = 0.0f;
         float smoothedLongAccel_ = 0.0f;
+        float smoothedXForceMix_ = -1.0f;
+        float smoothedXForceGain_ = -1.0f;
         float prevSteer_ = 0.0f;
         float smoothedSteerRate_ = 0.0f;
         bool steerSampleValid_ = false;
         WheelVehicleDynamics vehicleDynamics_{};
         WheelFFBMath::XForceGuard xForceGuard_{};
+        WheelFFBMath::XForceSignalAnalyzer xForceAnalyzer_{};
 
         std::array<std::uint64_t, HeadroomHistogramBins> headroomHistogram_{};
         std::uint64_t headroomSamples_ = 0;
@@ -4002,6 +4104,11 @@ WheelFFBStatusSnapshot WheelFFB_GetStatusSnapshot()
 WheelFFBGraphSnapshot WheelFFB_GetGraphSnapshot()
 {
     return gWheelFFB.graph_snapshot();
+}
+
+WheelFFBXForceAnalysisSnapshot WheelFFB_GetXForceAnalysisSnapshot()
+{
+    return gWheelFFB.xforce_analysis_snapshot();
 }
 
 void WheelFFB_ResetHeadroomStats()

@@ -51,6 +51,8 @@ namespace Settings
     extern Setting<int> WheelFFBFeedbackCharacter;
     extern Setting<float> WheelFFBXForceMix;
     extern Setting<bool> WheelFFBXForceInvert;
+    extern Setting<float> WheelFFBXForceGain;
+    extern Setting<bool> WheelFFBXForceCapture60Hz;
     extern Setting<float> WheelFFBGripLoss;
     extern Setting<float> WheelFFBLateralDeadzone;
     extern Setting<float> WheelFFBWeightTransfer;
@@ -809,6 +811,8 @@ namespace
             int feedbackCharacter = 0;
             float xForceMix = 0.50f;
             bool xForceInvert = false;
+            float xForceGain = 1.00f;
+            bool xForceCapture60Hz = false;
             bool hwSpring = true;
             bool hwDamper = true;
             bool periodic = true;
@@ -847,6 +851,8 @@ namespace
             savedFfb_.feedbackCharacter = Settings::WheelFFBFeedbackCharacter;
             savedFfb_.xForceMix = Settings::WheelFFBXForceMix;
             savedFfb_.xForceInvert = Settings::WheelFFBXForceInvert;
+            savedFfb_.xForceGain = Settings::WheelFFBXForceGain;
+            savedFfb_.xForceCapture60Hz = Settings::WheelFFBXForceCapture60Hz;
             savedFfb_.hwSpring = Settings::WheelFFBUseHardwareSpring;
             savedFfb_.hwDamper = Settings::WheelFFBUseHardwareDamper;
             savedFfb_.periodic = Settings::WheelFFBUsePeriodicEffects;
@@ -885,6 +891,8 @@ namespace
             Settings::WheelFFBFeedbackCharacter = savedFfb_.feedbackCharacter;
             Settings::WheelFFBXForceMix = savedFfb_.xForceMix;
             Settings::WheelFFBXForceInvert = savedFfb_.xForceInvert;
+            Settings::WheelFFBXForceGain = savedFfb_.xForceGain;
+            Settings::WheelFFBXForceCapture60Hz = savedFfb_.xForceCapture60Hz;
             Settings::WheelFFBUseHardwareSpring = savedFfb_.hwSpring;
             Settings::WheelFFBUseHardwareDamper = savedFfb_.hwDamper;
             Settings::WheelFFBUsePeriodicEffects = savedFfb_.periodic;
@@ -1688,6 +1696,27 @@ namespace
                 ImGui::TextColored(ImVec4(1.0f, 0.75f, 0.25f, 1.0f),
                     "Experimental: actionforce_DBC is a strong X-Force candidate, not yet proven. Enable telemetry before judging the native signal.");
 
+            if (feedbackCharacter != 0)
+            {
+                const WheelFFBXForceAnalysisSnapshot xAnalysis =
+                    WheelFFB_GetXForceAnalysisSnapshot();
+                ImGui::Text("X-Force signal confidence: %.0f%%  samples: %llu",
+                    xAnalysis.confidence * 100.0f,
+                    static_cast<unsigned long long>(xAnalysis.samples));
+                ImGui::TextDisabled(
+                    "corr steer %.2f | Modern %.2f | front slip %.2f | yaw %.2f",
+                    xAnalysis.corrSteer, xAnalysis.corrModernSat,
+                    xAnalysis.corrFrontSlip, xAnalysis.corrYawRate);
+                ImGui::TextDisabled(
+                    "|raw| P50 %.1f  P90 %.1f  P95 %.1f  P99 %.1f  max %.1f",
+                    xAnalysis.p50Abs, xAnalysis.p90Abs, xAnalysis.p95Abs,
+                    xAnalysis.p99Abs, xAnalysis.maxAbs);
+                if (xAnalysis.frozenSuspicious)
+                    ImGui::TextColored(ImVec4(1.0f, 0.45f, 0.25f, 1.0f),
+                        "Diagnostic: X-Force stayed fixed while vehicle/steering state changed (%.2fs). This does not auto-disable torque yet.",
+                        xAnalysis.frozenSeconds);
+            }
+
             const char* physicsSatLabel = feedbackCharacter == 0
                 ? "Physics SAT (body slip + yaw)"
                 : "Modern fallback uses Physics SAT";
@@ -1747,6 +1776,9 @@ namespace
                         WheelFFB_RequestSettingsTransition();
                     if (ImGui::IsItemHovered())
                         ImGui::SetTooltip("Use this only if Arcade/Hybrid steering force is reversed relative to Modern DD. Global Reverse SAT / ConstantForce still applies after the mix.");
+                    track_ffb_change(ImGui::SliderFloat("Native X-Force Gain", Settings::WheelFFBXForceGain.ptr(), 0.0f, 2.0f, "%.2f"));
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Post-normalization gain for the native candidate. Default 1.00. Live changes are smoothed; keep conservative until the source signal is proven.");
                     if (advancedFeedbackCharacter != 2)
                         track_ffb_change(ImGui::SliderFloat("X-Force Mix (used by Hybrid)", Settings::WheelFFBXForceMix.ptr(), 0.0f, 1.0f, "%.2f"));
                 }
@@ -1799,6 +1831,9 @@ namespace
 
             track_ffb_change(ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr()));
             track_ffb_change(ImGui::Checkbox("Record driving telemetry (10 Hz)", Settings::WheelFFBTelemetry.ptr()));
+            track_ffb_change(ImGui::Checkbox("Capture X-Force validation at 60 Hz (very verbose)", Settings::WheelFFBXForceCapture60Hz.ptr()));
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Writes one WheelFFB XFORCE60 line every physics update for short validation runs. This is diagnostic only and can grow the log quickly.");
             track_ffb_change(ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr()));
             ImGui::SameLine();
             track_ffb_change(ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr()));
@@ -1891,6 +1926,7 @@ namespace
                 Settings::WheelFFBFeedbackCharacter = 0;
                 Settings::WheelFFBXForceMix = 0.50f;
                 Settings::WheelFFBXForceInvert = false;
+                Settings::WheelFFBXForceGain = 1.00f;
                 Settings::WheelFFBGlobalStrength = 0.70f;
                 Settings::WheelFFBSpringStrength = 0.65f;
                 Settings::WheelFFBSpringSaturation = 0.95f;
@@ -1933,6 +1969,7 @@ namespace
                 Settings::WheelFFBFeedbackCharacter = 0;
                 Settings::WheelFFBXForceMix = 0.50f;
                 Settings::WheelFFBXForceInvert = false;
+                Settings::WheelFFBXForceGain = 1.00f;
                 Settings::WheelFFBEnable = true;
                 Settings::WheelFFBGlobalStrength = 0.70f;
                 Settings::WheelFFBSpringStrength = 0.65f;

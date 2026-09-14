@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstdint>
 #include <iomanip>
 #include <sstream>
 #include <string>
@@ -153,14 +154,8 @@ namespace WheelFFBMath
     // Guarded native steering-force candidate for v0.3. actionforce_DBC is
     // still an unverified X-Force candidate, so this state machine treats the
     // memory value as data rather than assuming every in-range sample is useful.
-    //
-    // Safety/continuity rules:
-    //  * stopped means zero native contribution immediately (Howard noted the
-    //    original value can remain stale while the car is stopped),
-    //  * after a stop, require a fresh update before native torque can return,
-    //  * once a real response has been observed, a legitimate zero crossing is
-    //    still valid and must not bounce to the Modern fallback for one frame,
-    //  * invalid/range-failed data fades back to Modern instead of hard-switching.
+    // Durations are expressed in seconds rather than fixed physics ticks so the
+    // safety behavior remains stable if the host update cadence ever changes.
     inline constexpr float XForceNominalFullScale = 62.0f;
     inline constexpr float XForceAbsoluteSafetyLimit = 128.0f;
     inline constexpr float XForceNoiseFloor = 0.20f;
@@ -168,7 +163,16 @@ namespace WheelFFBMath
     inline constexpr float XForceStoppedSpeed = 0.025f;
     inline constexpr float XForceResumeSpeed = 0.040f;
     inline constexpr float XForceFreshDelta = 0.020f;
-    inline constexpr unsigned XForceUnresponsiveLimitTicks = 30;
+    inline constexpr float XForceUnresponsiveSeconds = 0.50f;
+    inline constexpr float XForceBlendInSeconds = 0.20f;
+    inline constexpr float XForceBlendOutSeconds = 0.10f;
+
+    inline float sanitize_frame_seconds(float deltaSeconds)
+    {
+        if (!std::isfinite(deltaSeconds) || deltaSeconds <= 0.0f)
+            return 1.0f / 60.0f;
+        return std::clamp(deltaSeconds, 1.0f / 240.0f, 0.10f);
+    }
 
     struct XForceGuardSample
     {
@@ -182,6 +186,7 @@ namespace WheelFFBMath
         float normalized = 0.0f;
         float motionGate = 0.0f;
         float nativeBlend = 0.0f;
+        float unresponsiveSeconds = 0.0f;
     };
 
     class XForceGuard
@@ -195,13 +200,15 @@ namespace WheelFFBMath
             stoppedRaw_ = 0.0f;
             lastNormalized_ = 0.0f;
             nativeBlend_ = 0.0f;
-            unresponsiveTicks_ = 0;
+            unresponsiveSeconds_ = 0.0f;
         }
 
         XForceGuardSample update(
-            float raw, float speedNorm, float steerAbs, bool invert)
+            float raw, float speedNorm, float steerAbs, bool invert,
+            float deltaSeconds = 1.0f / 60.0f)
         {
             XForceGuardSample out{};
+            deltaSeconds = sanitize_frame_seconds(deltaSeconds);
             speedNorm = std::isfinite(speedNorm)
                 ? std::clamp(speedNorm, 0.0f, 1.0f) : 0.0f;
             steerAbs = std::isfinite(steerAbs)
@@ -222,14 +229,13 @@ namespace WheelFFBMath
                         stoppedRaw_ = raw;
                     nativeBlend_ = 0.0f;
                     lastNormalized_ = 0.0f;
+                    unresponsiveSeconds_ = 0.0f;
                     out.responseObserved = responseObserved_;
                     out.stopped = true;
                     return out;
                 }
                 stopped_ = false;
                 awaitingFreshAfterStop_ = true;
-                // Keep stoppedRaw_ from the last stopped tick. The first
-                // moving sample may already be the fresh update we need.
             }
             else if (speedNorm <= XForceStoppedSpeed)
             {
@@ -239,6 +245,7 @@ namespace WheelFFBMath
                     stoppedRaw_ = raw;
                 nativeBlend_ = 0.0f;
                 lastNormalized_ = 0.0f;
+                unresponsiveSeconds_ = 0.0f;
                 out.responseObserved = responseObserved_;
                 out.stopped = true;
                 return out;
@@ -262,22 +269,21 @@ namespace WheelFFBMath
 
             // A true zero crossing is allowed. Only call the candidate dead
             // after about half a second of near-zero output while the driver is
-            // clearly steering a moving car. This avoids the old one-frame
-            // Modern/native bounce without trusting a permanently zero field.
+            // clearly steering a moving car. The timer is cadence-independent.
             if (out.rangeValid && steerAbs >= 0.15f && speedNorm >= 0.08f)
             {
                 if (std::abs(raw) < XForceResponseThreshold)
-                    unresponsiveTicks_ = std::min(
-                        unresponsiveTicks_ + 1u, XForceUnresponsiveLimitTicks);
+                    unresponsiveSeconds_ = std::min(
+                        XForceUnresponsiveSeconds, unresponsiveSeconds_ + deltaSeconds);
                 else
-                    unresponsiveTicks_ = 0;
+                    unresponsiveSeconds_ = 0.0f;
             }
             else
             {
-                unresponsiveTicks_ = 0;
+                unresponsiveSeconds_ = 0.0f;
             }
             const bool responsiveNow = responseObserved_ &&
-                unresponsiveTicks_ < XForceUnresponsiveLimitTicks;
+                unresponsiveSeconds_ < XForceUnresponsiveSeconds;
 
             float currentNormalized = 0.0f;
             if (out.rangeValid)
@@ -297,15 +303,11 @@ namespace WheelFFBMath
             if (out.valid)
                 lastNormalized_ = currentNormalized;
 
-            // Native force enters more slowly than it leaves. A bad candidate
-            // therefore returns to the proven Modern model in about six 60-Hz
-            // ticks without producing a one-frame torque discontinuity.
             const float targetBlend = out.valid ? 1.0f : 0.0f;
-            constexpr float BlendInPerTick = 1.0f / 12.0f;
-            constexpr float BlendOutPerTick = 1.0f / 6.0f;
+            const float blendInStep = deltaSeconds / XForceBlendInSeconds;
+            const float blendOutStep = deltaSeconds / XForceBlendOutSeconds;
             const float delta = targetBlend - nativeBlend_;
-            nativeBlend_ += std::clamp(
-                delta, -BlendOutPerTick, BlendInPerTick);
+            nativeBlend_ += std::clamp(delta, -blendOutStep, blendInStep);
             nativeBlend_ = std::clamp(nativeBlend_, 0.0f, 1.0f);
 
             out.responseObserved = responseObserved_;
@@ -316,6 +318,7 @@ namespace WheelFFBMath
             out.motionGate = smoothstep01(
                 (speedNorm - XForceResumeSpeed) / 0.12f);
             out.nativeBlend = nativeBlend_;
+            out.unresponsiveSeconds = unresponsiveSeconds_;
             return out;
         }
 
@@ -326,7 +329,7 @@ namespace WheelFFBMath
         float stoppedRaw_ = 0.0f;
         float lastNormalized_ = 0.0f;
         float nativeBlend_ = 0.0f;
-        unsigned unresponsiveTicks_ = 0;
+        float unresponsiveSeconds_ = 0.0f;
     };
 
     struct XForceMixResult
@@ -359,6 +362,212 @@ namespace WheelFFBMath
             (nativeTorque - modernTorque) * out.nativeShare;
         return out;
     }
+
+
+    struct XForceAnalysisSnapshot
+    {
+        std::uint64_t samples = 0;
+        float corrSteer = 0.0f;
+        float corrModernSat = 0.0f;
+        float corrFrontSlip = 0.0f;
+        float corrYawRate = 0.0f;
+        float confidence = 0.0f;
+        bool frozenSuspicious = false;
+        float frozenSeconds = 0.0f;
+        float p50Abs = 0.0f;
+        float p90Abs = 0.0f;
+        float p95Abs = 0.0f;
+        float p99Abs = 0.0f;
+        float maxAbs = 0.0f;
+    };
+
+    // Diagnostic-only analyzer for proving what actionforce_DBC represents.
+    // Confidence and freeze detection never gate wheel torque; they exist to
+    // collect evidence before any stronger native-force assumptions are made.
+    class XForceSignalAnalyzer
+    {
+    public:
+        void reset()
+        {
+            samples_.fill(Sample{});
+            histogram_.fill(0);
+            writeIndex_ = 0;
+            count_ = 0;
+            totalSamples_ = 0;
+            maxAbs_ = 0.0f;
+            previousValid_ = false;
+            previousRaw_ = 0.0f;
+            previousSteer_ = 0.0f;
+            previousFrontSlip_ = 0.0f;
+            previousYawRate_ = 0.0f;
+            frozenSeconds_ = 0.0f;
+        }
+
+        void update(
+            float raw, float speedNorm, float steer, float modernSat,
+            float frontSlip, float yawRate,
+            float deltaSeconds = 1.0f / 60.0f)
+        {
+            deltaSeconds = sanitize_frame_seconds(deltaSeconds);
+            speedNorm = std::isfinite(speedNorm)
+                ? std::clamp(speedNorm, 0.0f, 1.0f) : 0.0f;
+            if (!std::isfinite(raw) ||
+                std::abs(raw) > XForceAbsoluteSafetyLimit ||
+                speedNorm < XForceResumeSpeed)
+            {
+                previousValid_ = false;
+                frozenSeconds_ = std::max(0.0f, frozenSeconds_ - deltaSeconds * 2.0f);
+                return;
+            }
+
+            steer = std::isfinite(steer) ? std::clamp(steer, -1.0f, 1.0f) : 0.0f;
+            modernSat = std::isfinite(modernSat) ? modernSat : 0.0f;
+            frontSlip = std::isfinite(frontSlip) ? frontSlip : 0.0f;
+            yawRate = std::isfinite(yawRate) ? yawRate : 0.0f;
+
+            const Sample sample{ raw, steer, modernSat, frontSlip, yawRate };
+            samples_[writeIndex_ % WindowSamples] = sample;
+            ++writeIndex_;
+            count_ = std::min<std::size_t>(count_ + 1, WindowSamples);
+
+            const float absRaw = std::abs(raw);
+            const std::size_t bin = std::min<std::size_t>(
+                HistogramBins - 1,
+                static_cast<std::size_t>(std::lround(
+                    absRaw * static_cast<float>(HistogramBins - 1) /
+                    XForceAbsoluteSafetyLimit)));
+            ++histogram_[bin];
+            ++totalSamples_;
+            maxAbs_ = std::max(maxAbs_, absRaw);
+
+            if (previousValid_ && speedNorm >= 0.08f &&
+                absRaw >= XForceResponseThreshold)
+            {
+                const bool stateChanged =
+                    std::abs(steer - previousSteer_) >= 0.025f ||
+                    std::abs(frontSlip - previousFrontSlip_) >= 0.005f ||
+                    std::abs(yawRate - previousYawRate_) >= 0.020f;
+                const bool rawFrozen = std::abs(raw - previousRaw_) < 0.010f;
+                if (stateChanged && rawFrozen)
+                    frozenSeconds_ += deltaSeconds;
+                else
+                    frozenSeconds_ = std::max(
+                        0.0f, frozenSeconds_ - deltaSeconds * 2.0f);
+            }
+            else
+            {
+                frozenSeconds_ = std::max(0.0f, frozenSeconds_ - deltaSeconds);
+            }
+
+            previousValid_ = true;
+            previousRaw_ = raw;
+            previousSteer_ = steer;
+            previousFrontSlip_ = frontSlip;
+            previousYawRate_ = yawRate;
+        }
+
+        XForceAnalysisSnapshot snapshot() const
+        {
+            XForceAnalysisSnapshot out{};
+            out.samples = totalSamples_;
+            out.corrSteer = correlation(&Sample::steer);
+            out.corrModernSat = correlation(&Sample::modernSat);
+            out.corrFrontSlip = correlation(&Sample::frontSlip);
+            out.corrYawRate = correlation(&Sample::yawRate);
+            out.frozenSeconds = frozenSeconds_;
+            out.frozenSuspicious = frozenSeconds_ >= 0.50f;
+            out.p50Abs = percentile(0.50);
+            out.p90Abs = percentile(0.90);
+            out.p95Abs = percentile(0.95);
+            out.p99Abs = percentile(0.99);
+            out.maxAbs = maxAbs_;
+
+            const float primary = std::max({
+                std::abs(out.corrSteer),
+                std::abs(out.corrModernSat),
+                std::abs(out.corrFrontSlip) });
+            const float secondary = std::max(
+                std::abs(out.corrFrontSlip), std::abs(out.corrYawRate));
+            const float sampleRamp = std::clamp(
+                static_cast<float>(count_) / 120.0f, 0.0f, 1.0f);
+            const float freezePenalty = out.frozenSuspicious ? 0.35f : 1.0f;
+            out.confidence = std::clamp(
+                (0.70f * primary + 0.30f * secondary) * sampleRamp * freezePenalty,
+                0.0f, 1.0f);
+            return out;
+        }
+
+    private:
+        struct Sample
+        {
+            float raw = 0.0f;
+            float steer = 0.0f;
+            float modernSat = 0.0f;
+            float frontSlip = 0.0f;
+            float yawRate = 0.0f;
+        };
+
+        static constexpr std::size_t WindowSamples = 180;
+        static constexpr std::size_t HistogramBins = 257;
+
+        using SampleMember = float Sample::*;
+        float correlation(SampleMember member) const
+        {
+            if (count_ < 12)
+                return 0.0f;
+            double sx = 0.0, sy = 0.0, sxx = 0.0, syy = 0.0, sxy = 0.0;
+            for (std::size_t i = 0; i < count_; ++i)
+            {
+                const double x = samples_[i].raw;
+                const double y = samples_[i].*member;
+                sx += x;
+                sy += y;
+                sxx += x * x;
+                syy += y * y;
+                sxy += x * y;
+            }
+            const double n = static_cast<double>(count_);
+            const double vx = n * sxx - sx * sx;
+            const double vy = n * syy - sy * sy;
+            if (vx <= 1.0e-9 || vy <= 1.0e-9)
+                return 0.0f;
+            const double value = (n * sxy - sx * sy) / std::sqrt(vx * vy);
+            return static_cast<float>(std::clamp(value, -1.0, 1.0));
+        }
+
+        float percentile(double q) const
+        {
+            if (totalSamples_ == 0)
+                return 0.0f;
+            const std::uint64_t target = std::max<std::uint64_t>(
+                1, static_cast<std::uint64_t>(std::ceil(totalSamples_ * q)));
+            std::uint64_t cumulative = 0;
+            for (std::size_t i = 0; i < histogram_.size(); ++i)
+            {
+                cumulative += histogram_[i];
+                if (cumulative >= target)
+                {
+                    return static_cast<float>(i) *
+                        (XForceAbsoluteSafetyLimit /
+                         static_cast<float>(HistogramBins - 1));
+                }
+            }
+            return XForceAbsoluteSafetyLimit;
+        }
+
+        std::array<Sample, WindowSamples> samples_{};
+        std::array<std::uint64_t, HistogramBins> histogram_{};
+        std::size_t writeIndex_ = 0;
+        std::size_t count_ = 0;
+        std::uint64_t totalSamples_ = 0;
+        float maxAbs_ = 0.0f;
+        bool previousValid_ = false;
+        float previousRaw_ = 0.0f;
+        float previousSteer_ = 0.0f;
+        float previousFrontSlip_ = 0.0f;
+        float previousYawRate_ = 0.0f;
+        float frozenSeconds_ = 0.0f;
+    };
 
     // Symmetric C1 soft limiter. Preserve low/mid-range force exactly, then
     // bend only the final quarter toward the DirectInput cap. This keeps SAT
