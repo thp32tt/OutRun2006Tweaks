@@ -194,13 +194,9 @@ jobs:
           ''', 'unresponsive near-zero threshold')
 
           replace_once(math,
-          '''            const bool responsiveNow = responseObserved_ &&
-                      unresponsiveSeconds_ < XForceUnresponsiveSeconds;
-          ''',
-          '''            const bool responsiveNow = responseObserved_ &&
-                      unresponsiveSeconds_ < XForceUnresponsiveSeconds &&
-                      !sourceFrozen;
-          ''', 'freeze gates native validity')
+          '''unresponsiveSeconds_ < XForceUnresponsiveSeconds;''',
+          '''unresponsiveSeconds_ < XForceUnresponsiveSeconds &&
+                      !sourceFrozen;''', 'freeze gates native validity')
 
           replace_once(math,
           '''        bool responseObserved_ = false;
