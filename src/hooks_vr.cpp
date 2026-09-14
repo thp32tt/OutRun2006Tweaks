@@ -19,6 +19,11 @@
 // Simulation, input, timers and native FFB are never replayed for the second eye.
 // Pose.v1 remains layout-compatible; exact rendered-frame timing/effective eye poses
 // are published separately through Frame.v1 after a successful real D3D9 Present.
+//
+// The PC monitor is the transport surface, not a third 3D view: gameplay Present
+// contains the two already-rendered eyes side-by-side. The x64 host Desktop-Duplicates
+// that SBS image and crops each half for OpenXR. This costs resolve/copy bandwidth but
+// does not execute OutRun's scene a third time for the monitor.
 namespace Settings
 {
 	Setting<bool> VREnabled{ "VR", "Enabled", true,
@@ -28,13 +33,13 @@ namespace Settings
 	Setting<bool> VRHeadTracking{ "VR", "HeadTracking", true,
 		"Applies the OpenXR HMD orientation at OutRun's verified D3D9 WorldViewProjection upload." };
 	Setting<bool> VRStereo{ "VR", "Stereo", true,
-		"Renders true left/right geometry stereo into an SBS game frame. The x64 host splits the two eyes and submits an OpenXR projection layer. Menus remain on the fixed theater quad." };
+		"Renders true left/right geometry stereo into an SBS game frame. The PC monitor shows that SBS transport; the x64 host splits the two eyes and submits an OpenXR projection layer. Menus remain on the fixed theater quad." };
 	Setting<bool> VRPositionalTracking{ "VR", "PositionalTracking", false,
 		"Also applies HMD X/Y/Z movement. Experimental; eye separation for stereo is applied independently of this setting." };
 	Setting<bool> VRCullingCameraSync{ "VR", "CullingCameraSync", true,
 		"Temporarily mirrors the render-time VR camera into OutRun's live camera position/look so render-phase culling and camera-facing effects can follow head motion. Restored before game logic resumes." };
 	Setting<bool> VRCullingUnionFov{ "VR", "CullingUnionFov", false,
-		"Experimental: temporarily widens the verified render-time projection to the union of both OpenXR eye FOVs for render-phase culling. It cannot fix visibility lists built before BeginScene." };
+		"Reserved diagnostic option. Union-FOV culling is intentionally deferred until a culling-only frustum boundary is verified; the live game projection is not modified." };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,
 		"Game-world units per metre of OpenXR head/eye movement.", Range<float>{ 0.1f, 10.0f } };
 	Setting<float> VRRotationScale{ "VR", "RotationScale", 1.0f,
