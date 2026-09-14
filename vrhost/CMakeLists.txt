@@ -41,13 +41,14 @@ target_include_directories(outrun-vr-host PRIVATE
 )
 target_compile_definitions(outrun-vr-host PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 if(MSVC)
-    # Keep the application API at OpenXR 1.0 for VDXR 1.0.x, then layer the
-    # R10 independent Desktop-Duplication/SBS output bridge on top.  The R10
-    # header includes the compatibility header itself; listing both explicitly
-    # documents and CI-locks the intended forced-include order.
+    # Keep the application API at OpenXR 1.0 for VDXR 1.0.x. R10 supplies the
+    # stable classic-D3D9/Desktop-Dup fallback; the final forced include gives a
+    # verified D3D9Ex shared-eye projection priority when direct transport is
+    # actually active. Forced-include order is intentional.
     target_compile_options(outrun-vr-host PRIVATE
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/openxr_api_compat.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/sbs_capture_override.hpp"
+        "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/d3d9ex_direct_passthrough.hpp"
     )
 endif()
 target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi d3dcompiler user32)
@@ -92,7 +93,7 @@ target_include_directories(outrun-vr-host-pose-v3-validation-smoke PRIVATE
 )
 target_compile_definitions(outrun-vr-host-pose-v3-validation-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 
-foreach(target
+foreach(target IN ITEMS
     outrun-vr-host
     outrun-vr-shader-smoke
     outrun-vr-protocol-v3-smoke
@@ -101,7 +102,7 @@ foreach(target
     outrun-vr-v2-v3-shadow-conversion-smoke
     outrun-vr-host-pose-v3-validation-smoke)
     set_target_properties(${target} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
-        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin"
-    )
+        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin")
 endforeach()
