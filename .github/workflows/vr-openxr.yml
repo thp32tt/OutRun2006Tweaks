@@ -6,7 +6,12 @@ on:
     paths:
       - 'src/vr/**'
       - 'src/vr_shared.hpp'
+      - 'src/hooks_wheel_ffb*.cpp'
+      - 'src/wheel_profile_store.hpp'
+      - 'src/overlay/wheel_setup_ui.cpp'
       - 'cmake.toml'
+      - 'CMakeLists.txt'
+      - 'cmkr.cmake'
       - 'vrhost/**'
       - 'tools/verify_vr_architecture.py'
       - 'docs/VR_ARCHITECTURE.md'
@@ -15,7 +20,12 @@ on:
     paths:
       - 'src/vr/**'
       - 'src/vr_shared.hpp'
+      - 'src/hooks_wheel_ffb*.cpp'
+      - 'src/wheel_profile_store.hpp'
+      - 'src/overlay/wheel_setup_ui.cpp'
       - 'cmake.toml'
+      - 'CMakeLists.txt'
+      - 'cmkr.cmake'
       - 'vrhost/**'
       - 'tools/verify_vr_architecture.py'
       - 'docs/VR_ARCHITECTURE.md'
@@ -37,6 +47,34 @@ jobs:
         run: |
           set CI=
           cmake -S . -B build-vr-game -G "Visual Studio 17 2022" -A Win32
+
+      - name: Verify regenerated R13 source graph
+        shell: pwsh
+        run: |
+          $projects = Get-ChildItem build-vr-game -Filter *.vcxproj -Recurse
+          if (-not $projects) { throw 'no Visual Studio project files were generated' }
+          $projectText = ($projects | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
+
+          foreach ($required in @(
+            'ex_device_upgrade_r13.cpp',
+            'stereo_renderer_r13.cpp',
+            'outrun_renderer_r13.cpp'
+          )) {
+            if (-not $projectText.Contains($required)) {
+              throw "R13 wrapper translation unit missing from generated build graph: $required"
+            }
+          }
+
+          foreach ($legacy in @(
+            'ex_device_upgrade.cpp',
+            'stereo_renderer.cpp',
+            'outrun_renderer.cpp'
+          )) {
+            $escaped = [regex]::Escape($legacy)
+            if ($projectText -match "<ClCompile Include=\"[^\"]*[\\/]$escaped\"") {
+              throw "legacy VR translation unit is still compiled independently: $legacy"
+            }
+          }
 
       - name: Apply dependency workarounds
         shell: pwsh
