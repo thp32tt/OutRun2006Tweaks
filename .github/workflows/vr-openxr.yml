@@ -49,7 +49,11 @@ jobs:
             'src/vr/d3d9/stereo_renderer_r7.inc' = @(
               'transaction was partial; all base hooks rolled back immediately',
               'StereoInstallState.store(StereoInstallReady',
-              'StereoInstalledDevice.store(device'
+              'StereoInstalledDevice.store(device',
+              'OcclusionQueryTrackingUnavailable',
+              'stereo duplication disabled fail-closed for query safety',
+              'promoted D3D9Ex device lost ResetEx fallback ownership',
+              'No fixed startup delay'
             )
             'src/vr/d3d9/stereo_renderer.cpp' = @(
               'callback policy transaction was partial',
@@ -59,16 +63,44 @@ jobs:
             'src/vr/d3d9/stereo_renderer_r13.cpp' = @(
               'R9InstallState.load(std::memory_order_acquire)',
               'atomic R7/R9 install handoff',
-              'all R13 overlay hooks rolled back immediately'
+              'all R13 overlay hooks rolled back immediately',
+              'R13InstallState.store(R13InstallReady',
+              'transactional R13 install state=READY',
+              'OcclusionQueryTrackingUnavailable.load'
+            )
+            'src/vr/game/outrun_renderer.cpp' = @(
+              'RendererInstallState',
+              'RendererInjectionAllowed',
+              'atomic renderer install state=READY',
+              'transactional rollback completed'
+            )
+            'src/vr/game/outrun_renderer_r13.cpp' = @(
+              'RendererInstallState.load(std::memory_order_acquire)',
+              'atomic renderer install handoff',
+              'WVP injection disabled atomically to fail closed'
             )
             'vrhost/src/runtime/sbs_capture_override.hpp' = @(
               'result == XR_TIMEOUT_EXPIRED',
               'The same acquired image must be waited again',
-              'Release(Projection.handle);',
-              'Release(Theater.handle);'
+              'bool acquired = false',
+              'Preserve acquiredImage',
+              'Release(Projection);',
+              'Release(Theater);'
             )
             'vrhost/src/runtime/d3d9ex_direct_passthrough.hpp' = @(
-              'Release(Projection.handle);'
+              'SafeTransportGeneration',
+              'SafeTransportGeneration == generation',
+              'Release(Projection);'
+            )
+            'vrhost/src/ipc/host_state_v3_writer.hpp' = @(
+              'enum class ProcessLiveness',
+              'ProcessLiveness::Unknown',
+              'another or unverified outrun-vr-host owns HostState.v3'
+            )
+            'vrhost/src/main.cpp' = @(
+              'enum class ProcessLiveness',
+              'ProcessLiveness::Unknown',
+              'another or unverified outrun-vr-host already owns the bridge'
             )
             'src/vr/ipc/v3_game_shadow_bridge.cpp' = @(
               'enum class ProcessLiveness',
@@ -138,7 +170,7 @@ jobs:
         shell: pwsh
         run: |
           (Get-Content build-vr-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-game/_deps/safetyhook-build/src/safetyhook.vcxproj
-          (Get-Content build-vr-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-vr-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-game/_deps/zydis-build/Zycore.vcxproj
           (Get-Content build-vr-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-game/_deps/zydis-build/zycore/Zycore.vcxproj
           Set-Content -Path build-vr-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
           (Get-Content build-vr-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-vr-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
@@ -177,10 +209,12 @@ jobs:
             'VR D3D9Ex R13: compatibility hardening active',
             'translated MANAGED texture LockRect',
             'VR R13: stereo hardening ACTIVE',
+            'transactional R13 install state=READY',
             'atomic R7/R9 install handoff',
             'GPU-completion direct-ring backpressure',
             'single-execution MRT/occlusion fallback',
-            'VR R13: auxiliary/offscreen c64 WVP kept stock'
+            'VR R13: auxiliary/offscreen c64 WVP kept stock',
+            'atomic renderer install handoff'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR DLL marker missing: $marker" }
           }
