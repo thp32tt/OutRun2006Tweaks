@@ -49,6 +49,7 @@ if(MSVC)
         "/FI${CMAKE_CURRENT_LIST_DIR}/../src/runtime/d3d9ex_direct_passthrough.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/../src/runtime/review_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/../src/runtime/capture_chain_diagnostic.hpp"
+        "/FI${CMAKE_CURRENT_LIST_DIR}/../src/runtime/r18_host_pipeline_diagnostic.hpp"
     )
 endif()
 target_link_libraries(outrun-vr-capture-diagnostic PRIVATE
