@@ -26,6 +26,7 @@ namespace OutRunVRStereo
         constexpr std::uint32_t R13InstallReady = 1;
         constexpr std::uint32_t R13InstallFailed = 2;
         std::atomic<std::uint32_t> R13InstallState{R13InstallPending};
+        std::atomic<bool> R13OverlayReady{false};
 
         std::uint64_t R13SafeAckBackpressure = 0;
         bool R13FirstSafeAckBlockLogged = false;
@@ -129,6 +130,9 @@ namespace OutRunVRStereo
 
         bool ResolveDirectTransportR13(IDirect3DDevice9* device, std::uint32_t frameId)
         {
+            if (!R13OverlayReady.load(std::memory_order_acquire))
+                return R13ResolveDirectHook.call<bool>(device, frameId);
+
             if (frameId && SharedState)
             {
                 const std::uint32_t slotIndex =
@@ -157,7 +161,7 @@ namespace OutRunVRStereo
             return R13ResolveDirectHook.call<bool>(device, frameId);
         }
 
-        void R13ResetCommonPre(IDirect3DDevice9* device)
+        void R13ResetCommonPre(IDirect3DDevice9*)
         {
             R13ForceMonoShadow = false;
             R9ReleaseMonoResources();
@@ -166,6 +170,7 @@ namespace OutRunVRStereo
             R9MonoSeeded = false;
             R9MonoBackupGap = false;
             R9ExpectMainDepthAfterReset = true;
+            R9FirstFailureEpoch = 0;
 
             OutRunVRRenderer::NotifyGameReset();
             ReleaseStereoResources();
@@ -197,6 +202,9 @@ namespace OutRunVRStereo
         HRESULT __stdcall ResetDestR13(IDirect3DDevice9* device,
             D3DPRESENT_PARAMETERS* params)
         {
+            if (!R13OverlayReady.load(std::memory_order_acquire))
+                return R13ResetR9Hook.stdcall<HRESULT>(device, params);
+
             if (!IsGameDevice(device) ||
                 !OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device))
                 return R13ResetR9Hook.stdcall<HRESULT>(device, params);
@@ -240,25 +248,38 @@ namespace OutRunVRStereo
 
             const bool mayWriteDepth = LeftDrawMayWriteDepth(device);
             const bool mayWriteStencil = LeftDrawMayWriteStencil(device);
-            const HRESULT hr = actualDraw();
+            const HRESULT drawHr = actualDraw();
             const bool restoreOk =
                 R9RestoreGameTarget(device, savedRt, savedDepth, savedViewport);
-            if (FAILED(hr) || !restoreOk)
+
+            if (FAILED(drawHr))
             {
+                ++R9MonoBackupDrawFailures;
                 R9MonoBackupGap = true;
-                R9Poison(OutRunVR::StereoFailureRestoreFailed, site, hr);
-                return hr;
+                R9Poison(OutRunVR::StereoFailureLeftDrawFailed, site, drawHr);
+                return drawHr;
             }
+            if (!restoreOk)
+            {
+                ++R9MonoBackupDrawFailures;
+                R9MonoBackupGap = true;
+                R9Poison(OutRunVR::StereoFailureRestoreFailed, site, E_FAIL);
+                return E_FAIL;
+            }
+
             ++R9MonoBackupDraws;
             if (mayWriteDepth || mayWriteStencil)
                 ++R9MonoDepthContentSerial;
-            return hr;
+            return drawHr;
         }
 
         template <typename ActualDraw, typename LegacyDraw>
         HRESULT R13GuardedDraw(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, LegacyDraw&& legacyDraw, const char* site)
         {
+            if (!R13OverlayReady.load(std::memory_order_acquire))
+                return legacyDraw();
+
             const bool gameDevice = IsGameDevice(device);
             const bool internalStereo = InternalStereoPass;
             if (!gameDevice || internalStereo)
@@ -379,6 +400,12 @@ namespace OutRunVRStereo
             const RECT* sourceRect, const RECT* destRect,
             HWND destWindowOverride, const RGNDATA* dirtyRegion)
         {
+            if (!R13OverlayReady.load(std::memory_order_acquire))
+            {
+                return R13PresentR9Hook.stdcall<HRESULT>(device,
+                    sourceRect, destRect, destWindowOverride, dirtyRegion);
+            }
+
             const HRESULT hr = R13PresentR9Hook.stdcall<HRESULT>(device,
                 sourceRect, destRect, destWindowOverride, dirtyRegion);
             if (IsGameDevice(device))
@@ -388,6 +415,7 @@ namespace OutRunVRStereo
 
         void R13RollbackOverlayHooks() noexcept
         {
+            R13OverlayReady.store(false, std::memory_order_release);
             R13ResetR9Hook = {};
             R13ResolveDirectHook = {};
             R13PresentR9Hook = {};
@@ -398,14 +426,28 @@ namespace OutRunVRStereo
             R13InstallState.store(R13InstallFailed, std::memory_order_release);
         }
 
+        bool R13EnableOverlayHooks() noexcept
+        {
+            if (!R13ResetR9Hook.enable()) return false;
+            if (!R13ResolveDirectHook.enable()) return false;
+            if (!R13PresentR9Hook.enable()) return false;
+            if (!R13DrawPrimitiveR9Hook.enable()) return false;
+            if (!R13DrawIndexedPrimitiveR9Hook.enable()) return false;
+            if (!R13DrawPrimitiveUPR9Hook.enable()) return false;
+            if (!R13DrawIndexedPrimitiveUPR9Hook.enable()) return false;
+            return true;
+        }
+
         DWORD WINAPI R13StereoInstallThread(void*)
         {
+            R13OverlayReady.store(false, std::memory_order_release);
             R13InstallState.store(R13InstallPending, std::memory_order_release);
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
                 const std::uint32_t r9State = R9InstallState.load(std::memory_order_acquire);
                 if (r9State == R9InstallFailed)
                 {
+                    R13OverlayReady.store(false, std::memory_order_release);
                     R13InstallState.store(R13InstallFailed, std::memory_order_release);
                     spdlog::error(
                         "VR R13: R9 callback transaction failed; hardening overlay not installed");
@@ -413,46 +455,53 @@ namespace OutRunVRStereo
                 }
                 if (r9State == R9InstallReady)
                 {
+                    constexpr auto disabled = safetyhook::InlineHook::StartDisabled;
                     R13ResetR9Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&ResetDestR9), ResetDestR13);
+                        reinterpret_cast<void*>(&ResetDestR9), ResetDestR13, disabled);
                     R13ResolveDirectHook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&ResolveDirectTransport),
-                        ResolveDirectTransportR13);
+                        ResolveDirectTransportR13, disabled);
                     R13PresentR9Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&PresentDestR9), PresentDestR13);
+                        reinterpret_cast<void*>(&PresentDestR9), PresentDestR13, disabled);
                     R13DrawPrimitiveR9Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&DrawPrimitiveDestR9),
-                        DrawPrimitiveDestR13);
+                        DrawPrimitiveDestR13, disabled);
                     R13DrawIndexedPrimitiveR9Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR9),
-                        DrawIndexedPrimitiveDestR13);
+                        DrawIndexedPrimitiveDestR13, disabled);
                     R13DrawPrimitiveUPR9Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&DrawPrimitiveUPDestR9),
-                        DrawPrimitiveUPDestR13);
+                        DrawPrimitiveUPDestR13, disabled);
                     R13DrawIndexedPrimitiveUPR9Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR9),
-                        DrawIndexedPrimitiveUPDestR13);
+                        DrawIndexedPrimitiveUPDestR13, disabled);
 
-                    if (R13ResetR9Hook && R13ResolveDirectHook &&
+                    const bool created =
+                        R13ResetR9Hook && R13ResolveDirectHook &&
                         R13PresentR9Hook && R13DrawPrimitiveR9Hook &&
                         R13DrawIndexedPrimitiveR9Hook && R13DrawPrimitiveUPR9Hook &&
-                        R13DrawIndexedPrimitiveUPR9Hook)
+                        R13DrawIndexedPrimitiveUPR9Hook;
+                    const bool enabled = created && R13EnableOverlayHooks();
+
+                    if (enabled)
                     {
+                        R13OverlayReady.store(true, std::memory_order_release);
                         R13InstallState.store(R13InstallReady, std::memory_order_release);
                         spdlog::info(
-                            "VR R13: stereo hardening ACTIVE; transactional R13 install state=READY + atomic R7/R9 install handoff + single ResetEx owner + GPU-completion direct-ring backpressure + single-execution MRT/occlusion fallback");
+                            "VR R13: stereo hardening ACTIVE; disabled-first transactional hooks=READY + atomic R7/R9 install handoff + single ResetEx owner + GPU-completion direct-ring backpressure + single-execution MRT/occlusion fallback");
                     }
                     else
                     {
                         R13RollbackOverlayHooks();
                         spdlog::error(
-                            "VR R13: overlay hook installation was partial; all R13 overlay hooks rolled back immediately");
+                            "VR R13: overlay hook create/enable transaction was partial; all R13 overlay hooks rolled back immediately");
                     }
                     return 0;
                 }
                 Sleep(25);
             }
 
+            R13OverlayReady.store(false, std::memory_order_release);
             R13InstallState.store(R13InstallFailed, std::memory_order_release);
             spdlog::warn(
                 "VR R13: R9 transactional install did not become ready; hardening overlay not installed");
@@ -469,6 +518,7 @@ namespace OutRunVRStereo
             bool validate() override { return true; }
             bool apply() override
             {
+                R13OverlayReady.store(false, std::memory_order_release);
                 HANDLE thread = CreateThread(
                     nullptr, 0, R13StereoInstallThread, nullptr, 0, nullptr);
                 if (!thread)
