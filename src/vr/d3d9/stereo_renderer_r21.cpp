@@ -1,15 +1,9 @@
 // R21 game-side host-death fail-closed overlay.
 //
-// R20/R13/R9 remain the renderer implementation. R21 adds a Present-boundary
-// liveness check so a dead/stalled x64 OpenXR host cannot leave the game
-// indefinitely attempting stereo with stale HostAlive state.
-//
-// Review hardening: SharedPoseState host fields are host-owned. The game no
-// longer clears HostAlive/HostShouldRender in that shared seqlock domain. A
-// stale/unreadable host instead closes the game-local R20 stereo eligibility
-// gate. On the first stale Present, an already-complete mono shadow may still be
-// restored; subsequent frames remain ordinary mono until a stable fresh host
-// sample reopens the local gate.
+// R20/R13/R9 remain the renderer implementation. R21 owns the Present-boundary
+// host freshness decision. R23 review hardening aligns that decision with the
+// 250 ms pose-reader budget and publishes it through RuntimeEligibility so WVP
+// injection, stereo replay and bootstrap share one authority.
 
 #include "stereo_renderer_r20.cpp"
 
@@ -17,15 +11,12 @@ namespace OutRunVRStereo
 {
     namespace
     {
-        // Keep the frame-boundary eligibility decision aligned with the pose
-        // reader's 250 ms freshness budget. R22 makes this local gate
-        // authoritative for clear/draw callbacks for the entire following
-        // Present interval.
-        constexpr std::int64_t R21HostStaleMs = 250;
+        constexpr std::int64_t R21HostStaleMs =
+            OutRunVR::RuntimeEligibility::HostStaleMs;
 
         SafetyHookInline R21PresentR9Hook{};
         std::atomic<bool> R21PresentGuardReady{false};
-        bool R21HostFailClosed = false;
+        bool R21HostFailClosed = true;
         std::uint32_t R21LastHealthyHostPid = 0;
 
         bool R21ComputeAgeMs(std::int64_t sampleQpc,
@@ -58,6 +49,8 @@ namespace OutRunVRStereo
                 SharedState->structSize != sizeof(OutRunVR::SharedPoseState))
                 return false;
 
+            // Raw values are diagnostics only. Only a stable even sequence may
+            // reopen HostFresh; an odd/stuck writer always fails closed.
             hostPid = SharedState->hostPid;
             flags = SharedState->flags;
             heartbeat = SharedState->heartbeat;
@@ -84,9 +77,11 @@ namespace OutRunVRStereo
                 heartbeat = currentHeartbeat;
                 sampleQpc = currentSampleQpc;
 
-                if (!hostPid ||
-                    (flags & (OutRunVR::HostAlive | OutRunVR::HostShouldRender)) !=
-                        (OutRunVR::HostAlive | OutRunVR::HostShouldRender) ||
+                constexpr std::uint32_t required =
+                    OutRunVR::HostAlive |
+                    OutRunVR::SessionVisible |
+                    OutRunVR::HostShouldRender;
+                if (!hostPid || (flags & required) != required ||
                     !R21ComputeAgeMs(sampleQpc, ageMs))
                     return false;
 
@@ -108,30 +103,39 @@ namespace OutRunVRStereo
             if (fresh)
             {
                 R21LastHealthyHostPid = hostPid;
-                const bool wasClosed = R21HostFailClosed ||
-                    !R20StereoEligibilityGate.load(std::memory_order_acquire);
-                R20StereoEligibilityGate.store(true, std::memory_order_release);
-                if (wasClosed)
+                OutRunVR::RuntimeEligibility::ObserveFreshHost();
+
+                if (R21HostFailClosed)
                 {
-                    // Recovery becomes eligible only for the following frame.
-                    // Never carry a pre-stall seed across the transition.
+                    // Never carry a pre-stall seed into recovery. Host freshness
+                    // alone is insufficient: R20 must observe a new validated
+                    // color/depth baseline before StereoAllowed becomes true.
                     R9StereoSeeded = false;
                     R9MonoSeeded = false;
                     R9MonoBackupGap = false;
+                    R20StereoEligibilityGate.store(false, std::memory_order_release);
                     R21HostFailClosed = false;
                     spdlog::info(
-                        "VR R21: fresh stable host pose recovered pid={} heartbeat={}; game-local stereo gate reopened for next frame with a new baseline required",
+                        "VR R21/R23: fresh host recovered pid={} heartbeat={}; waiting for a new verified stereo baseline before WVP/stereo resume",
                         hostPid, heartbeat);
+                }
+                else
+                {
+                    R20StereoEligibilityGate.store(
+                        OutRunVR::RuntimeEligibility::MayInjectStereo(),
+                        std::memory_order_release);
                 }
                 return;
             }
 
+            OutRunVR::RuntimeEligibility::FailClosed();
             R20StereoEligibilityGate.store(false, std::memory_order_release);
 
+            // If this frame already owns a complete mono shadow, let R9 restore
+            // it. Otherwise cancel both seeds so an incomplete shadow is never
+            // copied over the real game backbuffer.
             if (R9MonoSeeded && !R9MonoBackupGap)
-            {
                 R9StereoSeeded = false;
-            }
             else
             {
                 R9StereoSeeded = false;
@@ -142,10 +146,11 @@ namespace OutRunVRStereo
             {
                 R21HostFailClosed = true;
                 spdlog::warn(
-                    "VR R21 FAIL-CLOSED: OpenXR host pose stale/unavailable at Present (lastPid={} currentPid={} heartbeat={} flags=0x{:08x} ageMs={}); game-local stereo gate closed without modifying host-owned SharedPoseState",
+                    "VR R21 FAIL-CLOSED: OpenXR host stale/unavailable (lastPid={} currentPid={} heartbeat={} flags=0x{:08x} ageMs={} threshold={}ms); shared WVP/stereo/bootstrap gate closed",
                     R21LastHealthyHostPid, hostPid, heartbeat,
                     static_cast<unsigned>(flags),
-                    ageMs == INT64_MAX ? -1 : ageMs);
+                    ageMs == INT64_MAX ? -1 : ageMs,
+                    R21HostStaleMs);
             }
         }
 
@@ -161,12 +166,13 @@ namespace OutRunVRStereo
 
         DWORD WINAPI R21GameInstallThread(void*)
         {
+            OutRunVR::RuntimeEligibility::FailClosed();
+            R20StereoEligibilityGate.store(false, std::memory_order_release);
+
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                const std::uint32_t r9 =
-                    R9InstallState.load(std::memory_order_acquire);
-                const std::uint32_t r13 =
-                    R13InstallState.load(std::memory_order_acquire);
+                const std::uint32_t r9 = R9InstallState.load(std::memory_order_acquire);
+                const std::uint32_t r13 = R13InstallState.load(std::memory_order_acquire);
 
                 if (r9 == R9InstallFailed || r13 == R13InstallFailed)
                 {
@@ -187,7 +193,7 @@ namespace OutRunVRStereo
                     }
                     R21PresentGuardReady.store(true, std::memory_order_release);
                     spdlog::info(
-                        "VR R21 GAME: host-death mono fail-closed guard ACTIVE threshold={}ms; game-local eligibility gate only, host-owned seqlock is never written",
+                        "VR R21/R23 GAME: common host freshness gate ACTIVE threshold={}ms; recovery requires a new verified baseline",
                         R21HostStaleMs);
                     return 0;
                 }
