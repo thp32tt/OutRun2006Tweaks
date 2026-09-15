@@ -18,8 +18,9 @@ namespace OutRunVRRenderer
             if (IsGameDevice(device) && constantData &&
                 !OutRunVRStereo::IsInternalStereoPassActive() &&
                 UploadTouchesOutRunWvp(startRegister, vector4fCount) &&
-                !OutRunVR::PassPolicy::AllowsPoseInjection(
-                    OutRunVRStereo::CurrentPoseInjectionPolicy()))
+                // Compatibility helper is backed by the centralized R13
+                // PassPolicy, so renderer and stereo replay share one class.
+                !OutRunVRStereo::IsMainBackbufferPoseInjectionPass())
             {
                 // Reflection, shadow and other auxiliary world targets must keep
                 // the stock game WVP. Applying the HMD transform here bakes a
