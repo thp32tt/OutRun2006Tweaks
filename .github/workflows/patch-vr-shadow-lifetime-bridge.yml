@@ -1,0 +1,30 @@
+name: Patch VR shadow lifetime bridge
+
+on:
+  push:
+    branches: [ vr-openxr ]
+    paths:
+      - '.github/workflows/patch-vr-shadow-lifetime-bridge.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply optional shadow lifetime callback registration
+        run: python tools/patch_vr_shadow_lifetime_bridge_once.py
+
+      - name: Verify and commit
+        shell: bash
+        run: |
+          git diff --check
+          python tools/verify_vr_architecture.py
+          git config user.name 'thp32tt'
+          git config user.email '129367814+thp32tt@users.noreply.github.com'
+          git add src/vr/ipc/v3_game_shadow_bridge.cpp .github/workflows/vr-openxr.yml
+          git commit -m 'vr: register optional shadow lifetime stop callback'
+          git push origin HEAD:vr-openxr
