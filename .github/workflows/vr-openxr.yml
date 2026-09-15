@@ -75,14 +75,19 @@ jobs:
               'ProcessLiveness::Unknown',
               'GET_MODULE_HANDLE_EX_FLAG_PIN',
               'process-lifetime worker tracked with stop event',
-              'RequestShadowBridgeStop'
+              'RequestShadowBridgeStop',
+              'RegisterShadowBridgeStopCallback'
+            )
+            'src/vr/ipc/shadow_lifetime_bridge.hpp' = @(
+              'ShadowBridgeStopCallbackSlot',
+              'RequestRegisteredShadowBridgeStop'
             )
             'vrhost/src/ipc/v3_shadow_bridge.cpp' = @(
               'enum class ProcessLiveness',
               'ProcessLiveness::Unknown'
             )
             'src/dllmain.cpp' = @(
-              'OutRunVR::IpcV3::RequestShadowBridgeStop();'
+              'OutRunVR::IpcV3::RequestRegisteredShadowBridgeStop();'
             )
           }
           foreach ($path in $checks.Keys) {
@@ -156,6 +161,7 @@ jobs:
             'VR stereo: TRUE GEOMETRY STEREO active',
             'VR v3 shadow: live dual-protocol diagnostics active',
             'process-lifetime worker tracked with stop event',
+            'detach callback registered',
             'protocol v3 pose is PRIMARY',
             'v3-primary/v2-fallback frame-latched c64 WVP injection armed',
             'VR D3D9Ex upgrade: Direct3DCreate9 IAT hook armed before game device creation',
