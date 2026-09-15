@@ -147,6 +147,8 @@ for marker in (
     'auxiliary/offscreen c64 WVP kept stock',
     'PolicyMismatch', 'main-pass classifiers disagreed',
     'R13WvpHookReady', 'std::memory_order_acquire',
+    'InlineHook::StartDisabled', 'enableResult.has_value()',
+    'disabled-first trampoline publish',
     'failed to create renderer hardening installer thread',
     'SetVertexShaderConstantFDestR13',
 ):
@@ -171,6 +173,10 @@ for marker in (
     'GPU-completion direct-ring backpressure', 'IsMainBackbufferPoseInjectionPass',
     'PoseInjectionSnapshot CurrentPoseInjectionSnapshot',
     'legacyMainBackbufferInvariant', 'auxiliaryRenderTargetActive',
+    'R13OverlayReady', 'R13EnableOverlayHooks', 'InlineHook::StartDisabled',
+    'disabled-first transactional hooks=READY',
+    'StereoFailureLeftDrawFailed', 'StereoFailureRestoreFailed',
+    'R9FirstFailureEpoch = 0',
 ):
     if marker not in stereo_r13:
         raise SystemExit(f'missing R13 stereo hardening invariant: {marker}')
