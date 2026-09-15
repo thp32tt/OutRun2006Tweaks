@@ -7,9 +7,9 @@
 #include "resource.h"
 #include "plugin.hpp"
 #include "game_addrs.hpp"
+#include "vr/ipc/shadow_lifetime_bridge.hpp"
 
 void InitExceptionHandler(); // hooks_exceptions.cpp
-namespace OutRunVR::IpcV3 { void RequestShadowBridgeStop() noexcept; }
 
 namespace Module
 {
@@ -167,7 +167,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, int ul_reason_for_call, LPVOID lpReserved
 	}
 	else if (ul_reason_for_call == DLL_PROCESS_DETACH)
 	{
-		OutRunVR::IpcV3::RequestShadowBridgeStop();
+		OutRunVR::IpcV3::RequestRegisteredShadowBridgeStop();
 		proxy::on_detach();
 	}
 
