@@ -31,6 +31,8 @@ namespace OutRunVrR22RuntimeHardening
     inline bool FirstActiveLogged = false;
     inline bool FirstBundleRejectLogged = false;
     inline bool FirstClassicFallbackBlockedLogged = false;
+    inline bool FirstDirectRecoveryLogged = false;
+    inline bool FirstClassicAfterDirectBlockedLogged = false;
 
     inline bool Near(float a, float b, float epsilon = 1.0e-4f) noexcept
     {
@@ -93,6 +95,57 @@ namespace OutRunVrR22RuntimeHardening
         return OutRunVrFinalTest::EndFrame(session, &safe);
     }
 
+    inline bool DirectOpenMatchesLatest(
+        const OutRunVrD3D9ExDirectPassthrough::DirectHostState& state,
+        const OutRunVR::SharedRenderFrameState& latest) noexcept
+    {
+        constexpr std::uint32_t required =
+            OutRunVR::HostAlive | OutRunVR::HostDirectGpuTransport;
+        return state.hostPid == GetCurrentProcessId() &&
+            (state.flags & required) == required &&
+            state.openedFrame != 0 && state.openedFrame == latest.frameId;
+    }
+
+    inline XrResult RenderExactDirect(XrSession session,
+        const XrFrameEndInfo* endInfo,
+        const OutRunVR::SharedRenderFrameState& latest)
+    {
+        using namespace OutRunVrD3D9ExDirectPassthrough;
+        if (!OutRunVrR21RuntimeHardening::DirectTransportRequested() ||
+            !IncomingProjectionValid(endInfo))
+            return SubmitNoLayer(session, endInfo);
+
+        // hostDirectConsumedFrameId is written only after main.cpp opened the
+        // frame and its before/after Frame.v2 metadata check succeeded. That
+        // exact-frame acknowledgement is stronger evidence than a stale
+        // HostDirectGpuReady bit and also lets a valid cached slot recover after
+        // an earlier candidate failure cleared Ready.
+        const auto state =
+            OutRunVrR21RuntimeHardening::ReadDirectHostStateReadonly();
+        if (!DirectOpenMatchesLatest(state, latest) ||
+            !EnsureSafeFrame(latest.frameId))
+            return SubmitNoLayer(session, endInfo);
+
+        OutRunVrR21RuntimeHardening::BindLegacyBlitConstantBufferToVs();
+        XrCompositionLayerProjection projection{};
+        std::array<XrCompositionLayerProjectionView, 2> views{};
+        if (!RenderSafeProjection(session, endInfo, projection, views))
+            return SubmitNoLayer(session, endInfo);
+
+        const XrCompositionLayerBaseHeader* layer =
+            reinterpret_cast<const XrCompositionLayerBaseHeader*>(&projection);
+        XrFrameEndInfo patched = *endInfo;
+        patched.layerCount = 1;
+        patched.layers = &layer;
+        if (!FirstDirectRecoveryLogged && !state.valid)
+        {
+            FirstDirectRecoveryLogged = true;
+            std::cerr
+                << "[R22] direct cached-slot recovery accepted by exact openedFrame==latest.frameId evidence even though Ready bit was cleared\n";
+        }
+        return OutRunVrFinalTest::EndFrame(session, &patched);
+    }
+
     inline XrResult XRAPI_CALL EndFrame(XrSession session,
         const XrFrameEndInfo* endInfo)
     {
@@ -106,11 +159,9 @@ namespace OutRunVrR22RuntimeHardening
                    "QPC-only classic fallback disabled\n";
         }
 
-        // Theater/quad layers are not Frame.v2 gameplay projections.
         if (OutRunVrReviewHardening::HasIncomingNonProjectionLayer(endInfo))
             return OutRunVrFinalTest::EndFrame(session, endInfo);
 
-        // Preserve OpenXR shouldRender/session-visible fail-closed semantics.
         if (!OutRunVrR21RuntimeHardening::HostShouldRenderReadonly())
             return OutRunVrFinalTest::EndFrame(session, endInfo);
 
@@ -119,16 +170,39 @@ namespace OutRunVrR22RuntimeHardening
         const bool haveLatest =
             OutRunVrFinalTest::ReadLatestFrame(latest, publish);
 
-        // Direct frames retain R21's exact openedFrame==latest.frameId staging
-        // and host-owned safe-eye copy path.
         if (haveLatest &&
             (latest.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0)
-            return OutRunVrR21RuntimeHardening::EndFrame(session, endInfo);
+            return RenderExactDirect(session, endInfo, latest);
 
         if (OutRunVrReviewHardening::IncomingProjectionValid(endInfo))
         {
             if (haveLatest && ProjectionMatchesFrame(endInfo, latest))
+            {
+                // When direct transport is enabled and has already consumed an
+                // older direct frame, main.cpp's legacy directFrameValid_ can
+                // otherwise win over a newly committed classic source. Until
+                // the core compositor owns an explicit source-kind state, never
+                // submit that ambiguous direct->classic transition. Current
+                // production testing runs with direct transport disabled, so
+                // ordinary classic/SBS projection is unaffected.
+                if (OutRunVrR21RuntimeHardening::DirectTransportRequested())
+                {
+                    const auto directState =
+                        OutRunVrR21RuntimeHardening::ReadDirectHostStateReadonly();
+                    if (directState.openedFrame != 0 &&
+                        directState.openedFrame != latest.frameId)
+                    {
+                        if (!FirstClassicAfterDirectBlockedLogged)
+                        {
+                            FirstClassicAfterDirectBlockedLogged = true;
+                            std::cerr
+                                << "[R22] classic projection after an older direct-open frame dropped; stale directFrameValid cannot override classic source\n";
+                        }
+                        return SubmitNoLayer(session, endInfo);
+                    }
+                }
                 return OutRunVrFinalTest::EndFrame(session, endInfo);
+            }
 
             if (!FirstBundleRejectLogged)
             {
@@ -141,9 +215,6 @@ namespace OutRunVrR22RuntimeHardening
             return SubmitNoLayer(session, endInfo);
         }
 
-        // Do not synthesize gameplay projection from only captureQpc >=
-        // frame.presentQpc. Without an explicit validated source/frame bundle,
-        // dropping the frame is safer than guessing capture identity.
         if (!FirstClassicFallbackBlockedLogged &&
             OutRunVrReviewHardening::FreshClassicFallbackAvailable())
         {
