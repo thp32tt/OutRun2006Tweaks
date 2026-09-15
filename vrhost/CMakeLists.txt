@@ -43,15 +43,18 @@ if(MSVC)
     # xrEndFrame owner: it skips direct-only IPC for classic frames, performs
     # read-only seqlock loads for direct state, and preserves R15 fail-closed
     # ownership while binding the legacy R19 blit constants to VS when needed.
+    # Crash diagnostics are last and do not alter OpenXR dispatch; they only
+    # capture unhandled exception module/RVA plus a minidump.
     target_compile_options(outrun-vr-host PRIVATE
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/openxr_api_compat.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/sbs_capture_override.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/d3d9ex_direct_passthrough.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/review_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r21_runtime_hardening.hpp"
+        "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r21_crash_diagnostics.hpp"
     )
 endif()
-target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi d3dcompiler user32)
+target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi d3dcompiler user32 dbghelp)
 
 # Renderer-independent hardware diagnostic. This intentionally does not use the
 # host forced-include runtime wrappers and does not depend on the game process.
