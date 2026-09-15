@@ -42,6 +42,58 @@ jobs:
       - name: Verify reconstructed VR architecture boundaries
         run: python tools/verify_vr_architecture.py
 
+      - name: Verify remaining 10-pass review hardening guards
+        shell: pwsh
+        run: |
+          $checks = @{
+            'src/vr/d3d9/stereo_renderer_r7.inc' = @(
+              'transaction was partial; all base hooks rolled back immediately',
+              'StereoInstallState.store(StereoInstallReady',
+              'StereoInstalledDevice.store(device'
+            )
+            'src/vr/d3d9/stereo_renderer.cpp' = @(
+              'callback policy transaction was partial',
+              'StereoInstallState.load(std::memory_order_acquire)',
+              'R9InstallState.store(R9InstallReady'
+            )
+            'src/vr/d3d9/stereo_renderer_r13.cpp' = @(
+              'R9InstallState.load(std::memory_order_acquire)',
+              'atomic R7/R9 install handoff',
+              'all R13 overlay hooks rolled back immediately'
+            )
+            'vrhost/src/runtime/sbs_capture_override.hpp' = @(
+              'result == XR_TIMEOUT_EXPIRED',
+              'The same acquired image must be waited again',
+              'Release(Projection.handle);',
+              'Release(Theater.handle);'
+            )
+            'vrhost/src/runtime/d3d9ex_direct_passthrough.hpp' = @(
+              'Release(Projection.handle);'
+            )
+            'src/vr/ipc/v3_game_shadow_bridge.cpp' = @(
+              'enum class ProcessLiveness',
+              'ProcessLiveness::Unknown',
+              'GET_MODULE_HANDLE_EX_FLAG_PIN',
+              'process-lifetime worker tracked with stop event',
+              'RequestShadowBridgeStop'
+            )
+            'vrhost/src/ipc/v3_shadow_bridge.cpp' = @(
+              'enum class ProcessLiveness',
+              'ProcessLiveness::Unknown'
+            )
+            'src/dllmain.cpp' = @(
+              'OutRunVR::IpcV3::RequestShadowBridgeStop();'
+            )
+          }
+          foreach ($path in $checks.Keys) {
+            $text = Get-Content $path -Raw
+            foreach ($marker in $checks[$path]) {
+              if (-not $text.Contains($marker)) {
+                throw "10-pass hardening guard missing: $path :: $marker"
+              }
+            }
+          }
+
       - name: Configure Win32 VR build
         shell: cmd
         run: |
@@ -100,8 +152,10 @@ jobs:
             'classic-D3D9 exact projection preferred',
             'D3D9Ex host-owned GPU safety-copy transport remains opt-in',
             'VR stereo: D3D9 full-eye renderer installed',
+            'transactional install state=READY',
             'VR stereo: TRUE GEOMETRY STEREO active',
             'VR v3 shadow: live dual-protocol diagnostics active',
+            'process-lifetime worker tracked with stop event',
             'protocol v3 pose is PRIMARY',
             'v3-primary/v2-fallback frame-latched c64 WVP injection armed',
             'VR D3D9Ex upgrade: Direct3DCreate9 IAT hook armed before game device creation',
@@ -111,11 +165,13 @@ jobs:
             'VR D3D9 probe: deviceType=',
             'VR helper D3D9Ex probe:',
             'R9-finaltest-20260915',
+            'transactional=READY',
             'VR R9 FIRST FAILURE:',
             'mono safety shadow ready',
             'VR D3D9Ex R13: compatibility hardening active',
             'translated MANAGED texture LockRect',
             'VR R13: stereo hardening ACTIVE',
+            'atomic R7/R9 install handoff',
             'GPU-completion direct-ring backpressure',
             'single-execution MRT/occlusion fallback',
             'VR R13: auxiliary/offscreen c64 WVP kept stock'
