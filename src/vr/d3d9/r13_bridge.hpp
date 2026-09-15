@@ -17,6 +17,7 @@
 #include <cstdint>
 
 #include "vr/ipc/direct_ack_r13.hpp"
+#include "vr/d3d9/vr_pass_policy.hpp"
 
 namespace OutRunVRD3D9ExUpgradeR13
 {
@@ -48,9 +49,15 @@ namespace OutRunVRStereo
     // Occlusion-query tracking is a correctness boundary. If IDirect3DQuery9::
     // Issue cannot be observed, stereo duplication fails closed to one execution
     // instead of risking duplicated query/MRT side effects.
+    //
+    // Render-pass classification is centralized in vr_pass_policy.hpp. Both the
+    // stereo draw replay layer and renderer-pose layer consume this policy so an
+    // auxiliary/MRT pass cannot be treated as world stereo by one layer and as
+    // stock/offscreen by the other.
 
-    // Renderer-pose injection must only affect the main game backbuffer.
-    // Reflection/shadow/auxiliary world passes intentionally retain the stock
-    // game WVP and are sampled by both eyes later.
+    OutRunVR::PassPolicy::PoseInjectionPolicy CurrentPoseInjectionPolicy() noexcept;
+
+    // Compatibility helper used by the validated base renderer. New R13 code
+    // should prefer CurrentPoseInjectionPolicy() when it needs the full class.
     bool IsMainBackbufferPoseInjectionPass() noexcept;
 }
