@@ -42,11 +42,14 @@ if(MSVC)
     # Forced-include order is the runtime ownership stack. R22 is the final
     # xrEndFrame owner: R21 retains readonly/direct/shouldRender policy and R22
     # adds latest-Frame.v2 pose/FOV bundle validation while blocking QPC-only
-    # gameplay fallback synthesis. Crash diagnostics remain last and do not
-    # alter OpenXR dispatch.
+    # gameplay fallback synthesis. R22 capture diagnostics replace only the
+    # production ReleaseFrame instrumentation with a non-blocking game-UV
+    # staging/query sampler. Crash diagnostics remain last and do not alter
+    # OpenXR dispatch.
     target_compile_options(outrun-vr-host PRIVATE
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/openxr_api_compat.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/sbs_capture_override.hpp"
+        "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r22_capture_diagnostics.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/d3d9ex_direct_passthrough.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/review_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r21_runtime_hardening.hpp"
