@@ -3,6 +3,7 @@
 #include <atomic>
 #include <cstdint>
 
+#include "sbs_capture_override.hpp"
 #include "vr_shared.hpp"
 
 namespace OutRunVrR23VerifiedBundle
@@ -44,6 +45,12 @@ namespace OutRunVrR23VerifiedBundle
     inline void Publish(const OutRunVR::SharedRenderFrameState& frame,
         SourceKind kind, std::int64_t sourceCaptureQpc = 0) noexcept
     {
+        // main_r23 publishes the production capture before it promotes a classic
+        // candidate. When the caller does not pass the QPC explicitly, snapshot
+        // the exact R19 production source that is current at this transaction.
+        if (kind == SourceKind::ClassicSbs && sourceCaptureQpc <= 0)
+            sourceCaptureQpc = OutRunVrSbsCaptureOverride::LastProductionPresentQpc;
+
         PublishSequence.fetch_add(1, std::memory_order_acq_rel);
         FrameId.store(frame.frameId, std::memory_order_relaxed);
         PoseSequence.store(frame.sourcePoseSequence, std::memory_order_relaxed);
