@@ -1,6 +1,6 @@
 #pragma once
 
-// Final runtime ownership policy after the five-pass source review.
+// Final runtime ownership policy after the source review passes.
 //
 // Classic D3D9:
 //   1. The main host's frame/QPC/pose-matched projection is authoritative.
@@ -8,6 +8,11 @@
 //      produced and a NEW complete classic frame has advanced recently.
 //   3. A stale Frame.v2 mapping can no longer refresh fallback freshness merely
 //      because xrEndFrame keeps reading the same frame id.
+//   4. Fallback freshness is additionally bounded by the producer's presentQpc;
+//      first observing an old frame after a mode/session transition cannot make
+//      that frame fresh again.
+//   5. An incoming non-projection layer (notably the theater quad) is owned by
+//      the main host and must never be replaced by an old gameplay SBS frame.
 //
 // D3D9Ex direct:
 //   1. R13 host-owned SafeEye copies remain the only final projection source.
@@ -32,16 +37,19 @@
 namespace OutRunVrReviewHardening
 {
     inline constexpr const char* BuildId = "R14-review-hardening-20260915";
+    inline constexpr const char* Review10BuildId = "R15-source-review-10pass-20260915";
     inline constexpr ULONGLONG ClassicFallbackFreshMs = 500;
 
     inline std::uint32_t LastClassicFrameId = 0;
     inline ULONGLONG LastClassicAdvanceMs = 0;
     inline std::uint64_t ExactCoreProjectionFrames = 0;
+    inline std::uint64_t PreservedNonProjectionLayers = 0;
     inline std::uint64_t ClassicFallbackFrames = 0;
     inline std::uint64_t StaleClassicFallbackBlocks = 0;
     inline std::uint64_t DirectSafeFrames = 0;
     inline std::uint64_t DirectUnsafeFallbackBlocks = 0;
     inline bool FirstCoreAuthorityLogged = false;
+    inline bool FirstNonProjectionPreserveLogged = false;
     inline bool FirstStaleBlockLogged = false;
     inline bool FirstDirectAuthorityLogged = false;
     inline bool FirstDirectBlockLogged = false;
@@ -51,6 +59,19 @@ namespace OutRunVrReviewHardening
         return endInfo && endInfo->layerCount > 0 && endInfo->layers &&
             endInfo->layers[0] &&
             endInfo->layers[0]->type == XR_TYPE_COMPOSITION_LAYER_PROJECTION;
+    }
+
+    inline bool HasIncomingNonProjectionLayer(const XrFrameEndInfo* endInfo) noexcept
+    {
+        if (!endInfo || endInfo->layerCount == 0 || !endInfo->layers)
+            return false;
+        for (std::uint32_t i = 0; i < endInfo->layerCount; ++i)
+        {
+            const XrCompositionLayerBaseHeader* layer = endInfo->layers[i];
+            if (layer && layer->type != XR_TYPE_COMPOSITION_LAYER_PROJECTION)
+                return true;
+        }
+        return false;
     }
 
     inline bool ReadLatestFrame(OutRunVR::SharedRenderFrameState& frame) noexcept
@@ -67,12 +88,29 @@ namespace OutRunVrReviewHardening
         return (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0;
     }
 
+    inline bool ProducerPresentFresh(
+        const OutRunVR::SharedRenderFrameState& frame,
+        std::int64_t maxAgeMs = static_cast<std::int64_t>(ClassicFallbackFreshMs)) noexcept
+    {
+        if (frame.presentQpc <= 0 || maxAgeMs <= 0)
+            return false;
+        LARGE_INTEGER now{};
+        LARGE_INTEGER frequency{};
+        if (!QueryPerformanceCounter(&now) || !QueryPerformanceFrequency(&frequency) ||
+            frequency.QuadPart <= 0)
+            return false;
+        const std::int64_t age = now.QuadPart - frame.presentQpc;
+        const std::int64_t maxAge = (frequency.QuadPart * maxAgeMs) / 1000;
+        return age >= 0 && age <= maxAge;
+    }
+
     inline bool FreshClassicFallbackAvailable() noexcept
     {
         OutRunVR::SharedRenderFrameState frame{};
         if (!ReadLatestFrame(frame) ||
             !OutRunVrSbsCaptureOverride::FrameComplete(frame) ||
-            (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0)
+            (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0 ||
+            !ProducerPresentFresh(frame))
             return false;
 
         const ULONGLONG now = GetTickCount64();
@@ -88,6 +126,23 @@ namespace OutRunVrReviewHardening
     inline XrResult XRAPI_CALL EndFrame(XrSession session,
         const XrFrameEndInfo* endInfo)
     {
+        // A quad (theater/menu) or any other non-projection layer is already a
+        // deliberate main-host presentation decision. Never reinterpret a stale
+        // gameplay Frame.v2 entry as authority over that layer.
+        if (HasIncomingNonProjectionLayer(endInfo))
+        {
+            ++PreservedNonProjectionLayers;
+            if (!FirstNonProjectionPreserveLogged)
+            {
+                FirstNonProjectionPreserveLogged = true;
+                std::cerr
+                    << "[R15] incoming non-projection layer preserved; classic/direct "
+                       "gameplay fallback cannot replace theater/menu content build="
+                    << Review10BuildId << "\n";
+            }
+            return OutRunVrFinalTest::EndFrame(session, endInfo);
+        }
+
         OutRunVR::SharedRenderFrameState latest{};
         const bool latestDirect = LatestCompleteDirectFrame(latest);
         const auto directState =
@@ -162,8 +217,9 @@ namespace OutRunVrReviewHardening
         {
             FirstStaleBlockLogged = true;
             std::cerr
-                << "[R14] stale classic SBS frame blocked; fallback freshness now advances "
-                   "only when Frame.v2 frameId advances\n";
+                << "[R15] stale classic SBS frame blocked; fallback requires both a new "
+                   "Frame.v2 id and producer presentQpc freshness build="
+                << Review10BuildId << "\n";
         }
         return OutRunVrFinalTest::EndFrame(session, endInfo);
     }
