@@ -12,9 +12,11 @@ namespace OutRunVRRenderer
         std::uint64_t R13OffscreenWvpBypasses = 0;
         std::uint64_t R13ScreenSpaceWvpBypasses = 0;
         std::uint64_t R13UnknownProjectionWvpBypasses = 0;
+        std::uint64_t R13PolicyMismatchBypasses = 0;
         bool R13FirstOffscreenBypassLogged = false;
         bool R13FirstScreenSpaceBypassLogged = false;
         bool R13FirstUnknownProjectionLogged = false;
+        bool R13FirstPolicyMismatchLogged = false;
         bool R13FirstPerspectiveWorldLogged = false;
 
         OutRunVR::PassPolicy::RenderSemantic R13CurrentRenderSemantic(
@@ -27,19 +29,11 @@ namespace OutRunVRRenderer
             const bool mainBackbufferPosePass =
                 OutRunVRStereo::IsMainBackbufferPoseInjectionPass();
 
-            // Preserve the original R13 cross-TU invariant while consuming the
-            // richer centralized policy. The compatibility helper and enum must
-            // describe the same pass; disagreement fails closed instead of
-            // guessing whether HMD pose injection is safe.
-            const bool policySaysMain =
-                targetPolicy == OutRunVR::PassPolicy::PoseInjectionPolicy::MainBackbuffer;
-            if (mainBackbufferPosePass != policySaysMain)
-                return OutRunVR::PassPolicy::RenderSemantic::Unknown;
-
             if (targetPolicy != OutRunVR::PassPolicy::PoseInjectionPolicy::MainBackbuffer)
             {
-                return OutRunVR::PassPolicy::ClassifyRenderSemantic(
-                    targetPolicy, OutRunVR::PassPolicy::ProjectionClass::Unknown);
+                return OutRunVR::PassPolicy::ClassifyRenderSemanticChecked(
+                    targetPolicy, mainBackbufferPosePass,
+                    OutRunVR::PassPolicy::ProjectionClass::Unknown);
             }
 
             float projection[16]{};
@@ -55,8 +49,8 @@ namespace OutRunVRRenderer
                     projectionM34, projectionM44);
             }
 
-            return OutRunVR::PassPolicy::ClassifyRenderSemantic(
-                targetPolicy, projectionClass);
+            return OutRunVR::PassPolicy::ClassifyRenderSemanticChecked(
+                targetPolicy, mainBackbufferPosePass, projectionClass);
         }
 
         HRESULT __stdcall SetVertexShaderConstantFDestR13(
@@ -76,8 +70,9 @@ namespace OutRunVRRenderer
                     // Emulator-inspired fail-closed classification: only a
                     // perspective + main-backbuffer + verified c64 upload may
                     // enter the head-tracked world path. Reflections/shadows,
-                    // orthographic HUD/UI, and unknown projections keep stock
-                    // game matrices and cannot seed stereo world replay.
+                    // orthographic HUD/UI, policy disagreement, and unknown
+                    // projections keep stock game matrices and cannot seed
+                    // stereo world replay.
                     InvalidateVerifiedWvp();
 
                     if (semantic == OutRunVR::PassPolicy::RenderSemantic::Auxiliary)
@@ -99,6 +94,16 @@ namespace OutRunVRRenderer
                             spdlog::info(
                                 "VR R13 emulator policy: orthographic/screen-space c64 WVP kept stock; HUD/UI stays zero-disparity (_34={:.3f} _44={:.3f})",
                                 projectionM34, projectionM44);
+                        }
+                    }
+                    else if (semantic == OutRunVR::PassPolicy::RenderSemantic::PolicyMismatch)
+                    {
+                        ++R13PolicyMismatchBypasses;
+                        if (!R13FirstPolicyMismatchLogged)
+                        {
+                            R13FirstPolicyMismatchLogged = true;
+                            spdlog::error(
+                                "VR R13 emulator policy: main-pass classifiers disagreed; c64 WVP kept stock fail-closed");
                         }
                     }
                     else
