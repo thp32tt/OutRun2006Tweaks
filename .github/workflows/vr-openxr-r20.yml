@@ -123,11 +123,11 @@ jobs:
           $bytes = [IO.File]::ReadAllBytes($hostPath)
           if ($bytes.Length -lt 10000) { throw 'outrun-vr-host.exe unexpectedly small' }
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
+          $unicode = [Text.Encoding]::Unicode.GetString($bytes)
           foreach ($marker in @(
             'R21-readonly-ipc-vs-cbuffer-20260916',
             '[R21] final OpenXR presentation owner ACTIVE',
             'R21-crash-dump-20260916',
-            'outrun-vr-host-crash.dmp',
             'R20-production-host-20260916',
             'testPattern=removed',
             'R19-production-capture-reuse-20260916',
@@ -135,6 +135,7 @@ jobs:
           )) {
             if (-not $ascii.Contains($marker)) { throw "R21 host marker missing: $marker" }
           }
+          if (-not $unicode.Contains('outrun-vr-host-crash.dmp')) { throw 'R21 UTF-16 crash dump filename missing' }
           if ($ascii.Contains('no-layer OpenXR test pattern ready')) { throw 'obsolete no-layer OpenXR test pattern leaked into R21 host' }
           $pe = [BitConverter]::ToInt32($bytes,0x3C)
           if ([BitConverter]::ToUInt16($bytes,$pe+4) -ne 0x8664) { throw 'expected x64 host' }
