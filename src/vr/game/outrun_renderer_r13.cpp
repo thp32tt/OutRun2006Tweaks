@@ -10,31 +10,107 @@ namespace OutRunVRRenderer
     {
         SafetyHookInline R13WvpCallbackHook{};
         std::uint64_t R13OffscreenWvpBypasses = 0;
+        std::uint64_t R13ScreenSpaceWvpBypasses = 0;
+        std::uint64_t R13UnknownProjectionWvpBypasses = 0;
         bool R13FirstOffscreenBypassLogged = false;
+        bool R13FirstScreenSpaceBypassLogged = false;
+        bool R13FirstUnknownProjectionLogged = false;
+        bool R13FirstPerspectiveWorldLogged = false;
+
+        OutRunVR::PassPolicy::RenderSemantic R13CurrentRenderSemantic(
+            float& projectionM34, float& projectionM44) noexcept
+        {
+            projectionM34 = 0.0f;
+            projectionM44 = 0.0f;
+
+            const auto targetPolicy = OutRunVRStereo::CurrentPoseInjectionPolicy();
+            if (targetPolicy != OutRunVR::PassPolicy::PoseInjectionPolicy::MainBackbuffer)
+            {
+                return OutRunVR::PassPolicy::ClassifyRenderSemantic(
+                    targetPolicy, OutRunVR::PassPolicy::ProjectionClass::Unknown);
+            }
+
+            float projection[16]{};
+            auto projectionClass = OutRunVR::PassPolicy::ProjectionClass::Unknown;
+            if (GetRendererBaseProjection(projection))
+            {
+                // D3DMATRIX memory layout: [11] == _34, [15] == _44.
+                // OutRun's D3DXMatrixPerspectiveFovRH path normally reports
+                // _34=-1/_44=0; orthographic screen-space reports _34=0/_44=1.
+                projectionM34 = projection[11];
+                projectionM44 = projection[15];
+                projectionClass = OutRunVR::PassPolicy::ClassifyProjectionSignature(
+                    projectionM34, projectionM44);
+            }
+
+            return OutRunVR::PassPolicy::ClassifyRenderSemantic(
+                targetPolicy, projectionClass);
+        }
 
         HRESULT __stdcall SetVertexShaderConstantFDestR13(
             IDirect3DDevice9* device, UINT startRegister, const float* constantData, UINT vector4fCount)
         {
             if (IsGameDevice(device) && constantData &&
                 !OutRunVRStereo::IsInternalStereoPassActive() &&
-                UploadTouchesOutRunWvp(startRegister, vector4fCount) &&
-                // Compatibility helper is backed by the centralized R13
-                // PassPolicy, so renderer and stereo replay share one class.
-                !OutRunVRStereo::IsMainBackbufferPoseInjectionPass())
+                UploadTouchesOutRunWvp(startRegister, vector4fCount))
             {
-                // Reflection, shadow and other auxiliary world targets must keep
-                // the stock game WVP. Applying the HMD transform here bakes a
-                // head-relative view into textures later sampled by both eyes.
-                InvalidateVerifiedWvp();
-                ++R13OffscreenWvpBypasses;
-                if (!R13FirstOffscreenBypassLogged)
+                float projectionM34 = 0.0f;
+                float projectionM44 = 0.0f;
+                const auto semantic = R13CurrentRenderSemantic(
+                    projectionM34, projectionM44);
+
+                if (!OutRunVR::PassPolicy::AllowsWorldStereo(semantic))
                 {
-                    R13FirstOffscreenBypassLogged = true;
-                    spdlog::info(
-                        "VR R13: auxiliary/offscreen c64 WVP kept stock; HMD transform is main-backbuffer-only");
+                    // Emulator-inspired fail-closed classification: only a
+                    // perspective + main-backbuffer + verified c64 upload may
+                    // enter the head-tracked world path. Reflections/shadows,
+                    // orthographic HUD/UI, and unknown projections keep stock
+                    // game matrices and cannot seed stereo world replay.
+                    InvalidateVerifiedWvp();
+
+                    if (semantic == OutRunVR::PassPolicy::RenderSemantic::Auxiliary)
+                    {
+                        ++R13OffscreenWvpBypasses;
+                        if (!R13FirstOffscreenBypassLogged)
+                        {
+                            R13FirstOffscreenBypassLogged = true;
+                            spdlog::info(
+                                "VR R13: auxiliary/offscreen c64 WVP kept stock; HMD transform is main-backbuffer-only");
+                        }
+                    }
+                    else if (semantic == OutRunVR::PassPolicy::RenderSemantic::ScreenSpace2D)
+                    {
+                        ++R13ScreenSpaceWvpBypasses;
+                        if (!R13FirstScreenSpaceBypassLogged)
+                        {
+                            R13FirstScreenSpaceBypassLogged = true;
+                            spdlog::info(
+                                "VR R13 emulator policy: orthographic/screen-space c64 WVP kept stock; HUD/UI stays zero-disparity (_34={:.3f} _44={:.3f})",
+                                projectionM34, projectionM44);
+                        }
+                    }
+                    else
+                    {
+                        ++R13UnknownProjectionWvpBypasses;
+                        if (!R13FirstUnknownProjectionLogged)
+                        {
+                            R13FirstUnknownProjectionLogged = true;
+                            spdlog::warn(
+                                "VR R13 emulator policy: unknown main-backbuffer projection kept stock fail-closed (_34={:.3f} _44={:.3f})",
+                                projectionM34, projectionM44);
+                        }
+                    }
+
+                    return SetVertexShaderConstantFHook.stdcall<HRESULT>(
+                        device, startRegister, constantData, vector4fCount);
                 }
-                return SetVertexShaderConstantFHook.stdcall<HRESULT>(
-                    device, startRegister, constantData, vector4fCount);
+
+                if (!R13FirstPerspectiveWorldLogged)
+                {
+                    R13FirstPerspectiveWorldLogged = true;
+                    spdlog::info(
+                        "VR R13 emulator policy: main-backbuffer perspective class confirmed; c64 remains subject to authoritative WorldView*Projection verification");
+                }
             }
 
             return R13WvpCallbackHook.stdcall<HRESULT>(
@@ -63,7 +139,7 @@ namespace OutRunVRRenderer
                     if (R13WvpCallbackHook)
                     {
                         spdlog::info(
-                            "VR R13: renderer WVP target-classification guard armed via atomic renderer install handoff");
+                            "VR R13: renderer WVP target+projection classification guard armed via atomic renderer install handoff");
                     }
                     else
                     {
