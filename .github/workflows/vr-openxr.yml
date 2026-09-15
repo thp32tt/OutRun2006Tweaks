@@ -59,7 +59,7 @@ jobs:
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
           foreach ($marker in @(
             'classic-D3D9 exact projection preferred',
-            'host-owned D3D11 safety-copy transport remains opt-in',
+            'D3D9Ex host-owned GPU safety-copy transport remains opt-in',
             'VR stereo: D3D9 full-eye renderer installed',
             'VR stereo: TRUE GEOMETRY STEREO active',
             'VR v3 shadow: live dual-protocol diagnostics active',
