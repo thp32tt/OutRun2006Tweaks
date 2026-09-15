@@ -1,0 +1,56 @@
+name: Apply VR review round 2
+
+on:
+  push:
+    branches: [ vr-openxr ]
+    paths:
+      - 'tools/apply_vr_review_round2_once.py'
+      - '.github/workflows/apply-vr-review-round2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: vr-openxr
+          fetch-depth: 0
+      - name: Apply exact source hardening
+        run: python tools/apply_vr_review_round2_once.py
+      - name: Verify only intended source files changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          changed="$(git diff --name-only | sort)"
+          printf '%s\n' "$changed"
+          expected="$(printf '%s\n' \
+            src/vr/d3d9/stereo_renderer_r7.inc \
+            src/vr/d3d9/stereo_renderer_r13.cpp \
+            src/vr/game/outrun_renderer.cpp \
+            src/vr/game/outrun_renderer_r13.cpp \
+            vrhost/src/ipc/host_state_v3_writer.hpp \
+            vrhost/src/main.cpp \
+            vrhost/src/runtime/d3d9ex_direct_passthrough.hpp \
+            vrhost/src/runtime/sbs_capture_override.hpp | sort)"
+          test "$changed" = "$expected"
+      - name: Commit source hardening
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add \
+            src/vr/d3d9/stereo_renderer_r7.inc \
+            src/vr/d3d9/stereo_renderer_r13.cpp \
+            src/vr/game/outrun_renderer.cpp \
+            src/vr/game/outrun_renderer_r13.cpp \
+            vrhost/src/ipc/host_state_v3_writer.hpp \
+            vrhost/src/main.cpp \
+            vrhost/src/runtime/d3d9ex_direct_passthrough.hpp \
+            vrhost/src/runtime/sbs_capture_override.hpp
+          git commit -m "vr: harden reset IPC swapchain and renderer ownership"
+          git push origin HEAD:vr-openxr
