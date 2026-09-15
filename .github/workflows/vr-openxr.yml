@@ -212,10 +212,12 @@ jobs:
             '[finaltest] endFrame total=',
             'no-layer OpenXR test pattern ready',
             'R14-review-hardening-20260915',
+            'R15-source-review-10pass-20260915',
             '[R14] classic D3D9 exact core projection is authoritative',
             '[R14] D3D9Ex final authority: host-owned SafeEye projection',
             'desktop SBS fallback disabled for direct frames',
-            '[R14] stale classic SBS frame blocked',
+            '[R15] incoming non-projection layer preserved',
+            '[R15] stale classic SBS frame blocked',
             'host-owned GPU eye copies + completion ACK active'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR host marker missing: $marker" }
