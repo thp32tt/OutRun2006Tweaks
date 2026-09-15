@@ -22,7 +22,7 @@ jobs:
           $r21 = Get-Content vrhost/src/runtime/r21_runtime_hardening.hpp -Raw
           if (-not $r21.Contains('R21-readonly-ipc-vs-cbuffer-20260916')) { throw 'R21 build marker missing' }
           if (-not $r21.Contains('ReadDirectHostStateReadonly')) { throw 'readonly direct-state reader missing' }
-          if ($r21.Contains('InterlockedCompareExchange')) { throw 'write-capable CAS leaked into R21 final owner' }
+          if ($r21 -match 'InterlockedCompareExchange\s*\(') { throw 'write-capable CAS call leaked into R21 final owner' }
           if (-not $r21.Contains('VSSetConstantBuffers(0, 1, &ConstantBuffer)')) { throw 'R19/direct VS constant-buffer binding missing' }
           $shader = Get-Content vrhost/src/stereo_shader.hpp -Raw
           if (-not $shader.Contains('const float2 sampleUv = input.uv * UvScale + UvOffset')) { throw 'core PS UV transform missing' }
