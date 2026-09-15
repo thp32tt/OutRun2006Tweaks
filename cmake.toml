@@ -6,9 +6,9 @@
 name = "outrun2006tweaks-proj"
 cmake-after = """
 set_source_files_properties(src/hooks_wheel_ffb.cpp PROPERTIES HEADER_FILE_ONLY TRUE)
-# R22 keeps the validated R21/R20/R13/R9/R12 implementation files intact and
-# compiles one wrapper translation unit that adds scissor/bootstrap/liveness
-# hardening without compiling the included implementation chain twice.
+# R23 keeps the validated R21/R20/R13/R9/R12 implementation chain intact and
+# compiles only the final game/renderer wrapper TUs. Included implementation
+# files are header-only here so no hook body is linked twice.
 set_source_files_properties(
     src/vr/d3d9/ex_device_upgrade.cpp
     src/vr/d3d9/stereo_renderer.cpp
@@ -16,6 +16,7 @@ set_source_files_properties(
     src/vr/d3d9/stereo_renderer_r20.cpp
     src/vr/d3d9/stereo_renderer_r21.cpp
     src/vr/game/outrun_renderer.cpp
+    src/vr/game/outrun_renderer_r13.cpp
     PROPERTIES HEADER_FILE_ONLY TRUE)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
