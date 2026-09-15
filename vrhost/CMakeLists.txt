@@ -39,15 +39,16 @@ target_include_directories(outrun-vr-host PRIVATE
 )
 target_compile_definitions(outrun-vr-host PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 if(MSVC)
-    # Forced-include order is the runtime ownership stack. The final review
-    # hardening layer makes the exact core projection authoritative, uses R10
-    # only as a fresh classic-D3D9 fallback, and prevents direct D3D9Ex failure
-    # from being misinterpreted as an SBS desktop frame.
+    # Forced-include order is the runtime ownership stack. R21 is the final
+    # xrEndFrame owner: it skips direct-only IPC for classic frames, performs
+    # read-only seqlock loads for direct state, and preserves R15 fail-closed
+    # ownership while binding the legacy R19 blit constants to VS when needed.
     target_compile_options(outrun-vr-host PRIVATE
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/openxr_api_compat.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/sbs_capture_override.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/d3d9ex_direct_passthrough.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/review_hardening.hpp"
+        "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r21_runtime_hardening.hpp"
     )
 endif()
 target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi d3dcompiler user32)
