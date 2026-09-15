@@ -6,12 +6,13 @@
 name = "outrun2006tweaks-proj"
 cmake-after = """
 set_source_files_properties(src/hooks_wheel_ffb.cpp PROPERTIES HEADER_FILE_ONLY TRUE)
-# R20 keeps the validated R13/R9/R12 implementation files intact and compiles
-# wrapper translation units that include them plus narrowly scoped hardening.
+# R21 keeps the validated R20/R13/R9/R12 implementation files intact and
+# compiles one wrapper translation unit that adds host-death fail-closed logic.
 set_source_files_properties(
     src/vr/d3d9/ex_device_upgrade.cpp
     src/vr/d3d9/stereo_renderer.cpp
     src/vr/d3d9/stereo_renderer_r13.cpp
+    src/vr/d3d9/stereo_renderer_r20.cpp
     src/vr/game/outrun_renderer.cpp
     PROPERTIES HEADER_FILE_ONLY TRUE)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
