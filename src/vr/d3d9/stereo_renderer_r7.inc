@@ -806,98 +806,98 @@ namespace OutRunVRStereo
 
 		HRESULT __stdcall ResetDest(IDirect3DDevice9*device,D3DPRESENT_PARAMETERS*params){if(!IsGameDevice(device))return ResetHook.stdcall<HRESULT>(device,params);OutRunVRRenderer::NotifyGameReset();ReleaseStereoResources();AuxRenderTargetActive={};ActiveOcclusionQueries.store(0,std::memory_order_release);CurrentVertexShaderIdentity.store(0,std::memory_order_release);VertexShaderSerial.store(0,std::memory_order_release);LastStereoWanted=false;RightStencilSynchronized=true;FramePoseMismatchLogged=false;FirstMainDepthReuseLogged=false;FirstMainClearLogged=false;FirstDepthBootstrapLogged=false;PresentEpoch=1;LastMainDepthClearEpoch=0;LastMainDepthClearFlags=0;LastMainDepthClearZ=1.0f;LastMainDepthClearStencil=0;LastMainDepthClearDesc={};LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoMetadata={};PublishStereoState(OutRunVR::StereoDisabled,false,0,0);PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,OutRunVR::StereoFailureNone,nullptr);const HRESULT hr=ResetHook.stdcall<HRESULT>(device,params);if(SUCCEEDED(hr))EnsureStereoResources(device);return hr;}
 
-\t\tconstexpr std::uint32_t StereoInstallPending = 0;
-\t\tconstexpr std::uint32_t StereoInstallReady = 1;
-\t\tconstexpr std::uint32_t StereoInstallFailed = 2;
-\t\tstd::atomic<std::uint32_t> StereoInstallState{StereoInstallPending};
-\t\tstd::atomic<IDirect3DDevice9*> StereoInstalledDevice{nullptr};
+		constexpr std::uint32_t StereoInstallPending = 0;
+		constexpr std::uint32_t StereoInstallReady = 1;
+		constexpr std::uint32_t StereoInstallFailed = 2;
+		std::atomic<std::uint32_t> StereoInstallState{StereoInstallPending};
+		std::atomic<IDirect3DDevice9*> StereoInstalledDevice{nullptr};
 
-\t\tvoid RollbackStereoHooks() noexcept
-\t\t{
-\t\t\tQueryIssueHook = {};
-\t\t\tCreateQueryHook = {};
-\t\t\tSetVertexShaderHook = {};
-\t\t\tDrawIndexedPrimitiveUPHook = {};
-\t\t\tDrawPrimitiveUPHook = {};
-\t\t\tDrawIndexedPrimitiveHook = {};
-\t\t\tDrawPrimitiveHook = {};
-\t\t\tClearHook = {};
-\t\t\tSetDepthStencilSurfaceHook = {};
-\t\t\tSetRenderTargetHook = {};
-\t\t\tPresentHook = {};
-\t\t\tResetHook = {};
-\t\t\tStereoInstalledDevice.store(nullptr, std::memory_order_release);
-\t\t}
+		void RollbackStereoHooks() noexcept
+		{
+			QueryIssueHook = {};
+			CreateQueryHook = {};
+			SetVertexShaderHook = {};
+			DrawIndexedPrimitiveUPHook = {};
+			DrawPrimitiveUPHook = {};
+			DrawIndexedPrimitiveHook = {};
+			DrawPrimitiveHook = {};
+			ClearHook = {};
+			SetDepthStencilSurfaceHook = {};
+			SetRenderTargetHook = {};
+			PresentHook = {};
+			ResetHook = {};
+			StereoInstalledDevice.store(nullptr, std::memory_order_release);
+		}
 
-\t\tbool InstallStereoHooks(IDirect3DDevice9*device)
-\t\t{
-\t\t\tif(!device)
-\t\t\t{
-\t\t\t\tStereoInstallState.store(StereoInstallFailed,std::memory_order_release);
-\t\t\t\treturn false;
-\t\t\t}
-\t\t\tvoid**vtable=*reinterpret_cast<void***>(device);
-\t\t\tif(!vtable)
-\t\t\t{
-\t\t\t\tStereoInstallState.store(StereoInstallFailed,std::memory_order_release);
-\t\t\t\treturn false;
-\t\t\t}
-\t\t\tStereoInstallState.store(StereoInstallPending,std::memory_order_release);
-\t\t\tResetHook=safetyhook::create_inline(vtable[ResetVtableIndex],ResetDest);
-\t\t\tPresentHook=safetyhook::create_inline(vtable[PresentVtableIndex],PresentDest);
-\t\t\tSetRenderTargetHook=safetyhook::create_inline(vtable[SetRenderTargetVtableIndex],SetRenderTargetDest);
-\t\t\tSetDepthStencilSurfaceHook=safetyhook::create_inline(vtable[SetDepthStencilSurfaceVtableIndex],SetDepthStencilSurfaceDest);
-\t\t\tClearHook=safetyhook::create_inline(vtable[ClearVtableIndex],ClearDest);
-\t\t\tDrawPrimitiveHook=safetyhook::create_inline(vtable[DrawPrimitiveVtableIndex],DrawPrimitiveDest);
-\t\t\tDrawIndexedPrimitiveHook=safetyhook::create_inline(vtable[DrawIndexedPrimitiveVtableIndex],DrawIndexedPrimitiveDest);
-\t\t\tDrawPrimitiveUPHook=safetyhook::create_inline(vtable[DrawPrimitiveUPVtableIndex],DrawPrimitiveUPDest);
-\t\t\tDrawIndexedPrimitiveUPHook=safetyhook::create_inline(vtable[DrawIndexedPrimitiveUPVtableIndex],DrawIndexedPrimitiveUPDest);
-\t\t\tSetVertexShaderHook=safetyhook::create_inline(vtable[SetVertexShaderVtableIndex],SetVertexShaderDest);
-\t\t\tCreateQueryHook=safetyhook::create_inline(vtable[CreateQueryVtableIndex],CreateQueryDest);
-\t\t\tif(!ResetHook||!PresentHook||!SetRenderTargetHook||!SetDepthStencilSurfaceHook||!ClearHook||!DrawPrimitiveHook||!DrawIndexedPrimitiveHook||!DrawPrimitiveUPHook||!DrawIndexedPrimitiveUPHook||!SetVertexShaderHook||!CreateQueryHook)
-\t\t\t{
-\t\t\t\tRollbackStereoHooks();
-\t\t\t\tStereoInstallState.store(StereoInstallFailed,std::memory_order_release);
-\t\t\t\tspdlog::error("VR stereo: D3D9 hook transaction was partial; all base hooks rolled back immediately");
-\t\t\t\treturn false;
-\t\t\t}
-\t\t\tIDirect3DVertexShader9*shader=nullptr;
-\t\t\tif(SUCCEEDED(device->GetVertexShader(&shader))&&shader)
-\t\t\t{
-\t\t\t\tCurrentVertexShaderIdentity.store(reinterpret_cast<std::uintptr_t>(shader),std::memory_order_release);
-\t\t\t\tVertexShaderSerial.store(1,std::memory_order_release);
-\t\t\t\tshader->Release();
-\t\t\t}
-\t\t\tIDirect3DQuery9*queryProbe=nullptr;
-\t\t\tif(SUCCEEDED(device->CreateQuery(D3DQUERYTYPE_OCCLUSION,&queryProbe))&&queryProbe)queryProbe->Release();
-\t\t\tInitializeAuxRenderTargetState(device);
-\t\t\tLastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();
-\t\t\tEnsureSharedState();
-\t\t\tEnsureRenderFrameState();
-\t\t\tEnsureStereoResources(device);
-\t\t\tStereoInstalledDevice.store(device,std::memory_order_release);
-\t\t\tStereoInstallState.store(StereoInstallReady,std::memory_order_release);
-\t\t\tspdlog::info("VR stereo: D3D9 full-eye renderer installed (Reset/Present/RT/Depth/Clear/Draw*/VS/CreateQuery); transactional install state=READY");
-\t\t\treturn true;
-\t\t}
+		bool InstallStereoHooks(IDirect3DDevice9*device)
+		{
+			if(!device)
+			{
+				StereoInstallState.store(StereoInstallFailed,std::memory_order_release);
+				return false;
+			}
+			void**vtable=*reinterpret_cast<void***>(device);
+			if(!vtable)
+			{
+				StereoInstallState.store(StereoInstallFailed,std::memory_order_release);
+				return false;
+			}
+			StereoInstallState.store(StereoInstallPending,std::memory_order_release);
+			ResetHook=safetyhook::create_inline(vtable[ResetVtableIndex],ResetDest);
+			PresentHook=safetyhook::create_inline(vtable[PresentVtableIndex],PresentDest);
+			SetRenderTargetHook=safetyhook::create_inline(vtable[SetRenderTargetVtableIndex],SetRenderTargetDest);
+			SetDepthStencilSurfaceHook=safetyhook::create_inline(vtable[SetDepthStencilSurfaceVtableIndex],SetDepthStencilSurfaceDest);
+			ClearHook=safetyhook::create_inline(vtable[ClearVtableIndex],ClearDest);
+			DrawPrimitiveHook=safetyhook::create_inline(vtable[DrawPrimitiveVtableIndex],DrawPrimitiveDest);
+			DrawIndexedPrimitiveHook=safetyhook::create_inline(vtable[DrawIndexedPrimitiveVtableIndex],DrawIndexedPrimitiveDest);
+			DrawPrimitiveUPHook=safetyhook::create_inline(vtable[DrawPrimitiveUPVtableIndex],DrawPrimitiveUPDest);
+			DrawIndexedPrimitiveUPHook=safetyhook::create_inline(vtable[DrawIndexedPrimitiveUPVtableIndex],DrawIndexedPrimitiveUPDest);
+			SetVertexShaderHook=safetyhook::create_inline(vtable[SetVertexShaderVtableIndex],SetVertexShaderDest);
+			CreateQueryHook=safetyhook::create_inline(vtable[CreateQueryVtableIndex],CreateQueryDest);
+			if(!ResetHook||!PresentHook||!SetRenderTargetHook||!SetDepthStencilSurfaceHook||!ClearHook||!DrawPrimitiveHook||!DrawIndexedPrimitiveHook||!DrawPrimitiveUPHook||!DrawIndexedPrimitiveUPHook||!SetVertexShaderHook||!CreateQueryHook)
+			{
+				RollbackStereoHooks();
+				StereoInstallState.store(StereoInstallFailed,std::memory_order_release);
+				spdlog::error("VR stereo: D3D9 hook transaction was partial; all base hooks rolled back immediately");
+				return false;
+			}
+			IDirect3DVertexShader9*shader=nullptr;
+			if(SUCCEEDED(device->GetVertexShader(&shader))&&shader)
+			{
+				CurrentVertexShaderIdentity.store(reinterpret_cast<std::uintptr_t>(shader),std::memory_order_release);
+				VertexShaderSerial.store(1,std::memory_order_release);
+				shader->Release();
+			}
+			IDirect3DQuery9*queryProbe=nullptr;
+			if(SUCCEEDED(device->CreateQuery(D3DQUERYTYPE_OCCLUSION,&queryProbe))&&queryProbe)queryProbe->Release();
+			InitializeAuxRenderTargetState(device);
+			LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();
+			EnsureSharedState();
+			EnsureRenderFrameState();
+			EnsureStereoResources(device);
+			StereoInstalledDevice.store(device,std::memory_order_release);
+			StereoInstallState.store(StereoInstallReady,std::memory_order_release);
+			spdlog::info("VR stereo: D3D9 full-eye renderer installed (Reset/Present/RT/Depth/Clear/Draw*/VS/CreateQuery); transactional install state=READY");
+			return true;
+		}
 
-\t\tDWORD WINAPI StereoInstallThread(void*)
-\t\t{
-\t\t\tSleep(250);
-\t\t\tfor(int attempt=0;attempt<1200;++attempt)
-\t\t\t{
-\t\t\t\tif(Game::D3DDevice_ptr&&*Game::D3DDevice_ptr)
-\t\t\t\t{
-\t\t\t\t\tif(!InstallStereoHooks(*Game::D3DDevice_ptr))
-\t\t\t\t\t\tspdlog::error("VR stereo: renderer hook installation failed closed");
-\t\t\t\t\treturn 0;
-\t\t\t\t}
-\t\t\t\tSleep(100);
-\t\t\t}
-\t\t\tStereoInstallState.store(StereoInstallFailed,std::memory_order_release);
-\t\t\tspdlog::warn("VR stereo: D3D9 device did not appear; stereo hooks not installed");
-\t\t\treturn 0;
-\t\t}
+		DWORD WINAPI StereoInstallThread(void*)
+		{
+			Sleep(250);
+			for(int attempt=0;attempt<1200;++attempt)
+			{
+				if(Game::D3DDevice_ptr&&*Game::D3DDevice_ptr)
+				{
+					if(!InstallStereoHooks(*Game::D3DDevice_ptr))
+						spdlog::error("VR stereo: renderer hook installation failed closed");
+					return 0;
+				}
+				Sleep(100);
+			}
+			StereoInstallState.store(StereoInstallFailed,std::memory_order_release);
+			spdlog::warn("VR stereo: D3D9 device did not appear; stereo hooks not installed");
+			return 0;
+		}
 
 	}
 
