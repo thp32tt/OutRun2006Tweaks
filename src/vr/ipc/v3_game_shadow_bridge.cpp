@@ -17,9 +17,12 @@
 #include "vr/ipc/protocol_v3.hpp"
 #include "vr/ipc/shadow_legacy_v2.hpp"
 #include "vr/ipc/win32_channel.hpp"
+#include "vr/ipc/shadow_lifetime_bridge.hpp"
 
 namespace OutRunVR::IpcV3
 {
+    void RequestShadowBridgeStop() noexcept;
+
     namespace
     {
         enum class ProcessLiveness : std::uint8_t
@@ -592,7 +595,8 @@ namespace OutRunVR::IpcV3
                     return false;
                 }
                 ShadowBridgeThreadHandle = thread;
-                spdlog::info("VR v3 shadow: process-lifetime worker tracked with stop event; plugin module pinned");
+                RegisterShadowBridgeStopCallback(&RequestShadowBridgeStop);
+                spdlog::info("VR v3 shadow: process-lifetime worker tracked with stop event; plugin module pinned; detach callback registered");
                 return true;
             }
 
@@ -604,6 +608,7 @@ namespace OutRunVR::IpcV3
 
     void RequestShadowBridgeStop() noexcept
     {
+        RegisterShadowBridgeStopCallback(nullptr);
         ShadowBridgeStop.store(true, std::memory_order_release);
         if (ShadowBridgeStopEvent)
             SetEvent(ShadowBridgeStopEvent);
