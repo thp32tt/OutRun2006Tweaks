@@ -28,6 +28,11 @@ namespace OutRunVRD3D9ExUpgradeR13
 
 namespace OutRunVRStereo
 {
+    // Installer ownership contract: R7 publishes its completed device/hooks via
+    // release/acquire atomics, R9 publishes its callback-policy state the same
+    // way, and R13 consumes only those states. SafetyHookInline objects are not
+    // used as cross-thread readiness flags.
+
     // Renderer-pose injection must only affect the main game backbuffer.
     // Reflection/shadow/auxiliary world passes intentionally retain the stock
     // game WVP and are sampled by both eyes later.
