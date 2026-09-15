@@ -58,14 +58,18 @@ namespace OutRunVRRenderer
         HRESULT __stdcall SetVertexShaderConstantFDestR13(
             IDirect3DDevice9* device, UINT startRegister, const float* constantData, UINT vector4fCount)
         {
-            // SafetyHook activates the target detour as part of create_inline().
-            // A render thread can therefore enter this callback in the tiny
-            // interval before the returned trampoline object is assigned to the
-            // global R13WvpCallbackHook. Never dereference that not-yet-published
-            // trampoline. One stock D3D9 upload is safer than recursion/crash.
+            // R13 creates its callback hook disabled, publishes the trampoline,
+            // then explicitly enables it. If a render thread enters while the
+            // enable transaction is completing, the already-owned trampoline
+            // is safe to call and preserves the validated base renderer path.
             if (!R13WvpHookReady.load(std::memory_order_acquire))
             {
                 InvalidateVerifiedWvp();
+                if (R13WvpCallbackHook)
+                {
+                    return R13WvpCallbackHook.stdcall<HRESULT>(
+                        device, startRegister, constantData, vector4fCount);
+                }
                 return SetVertexShaderConstantFHook.stdcall<HRESULT>(
                     device, startRegister, constantData, vector4fCount);
             }
@@ -168,23 +172,30 @@ namespace OutRunVRRenderer
                 {
                     R13WvpCallbackHook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&SetVertexShaderConstantFDest),
-                        SetVertexShaderConstantFDestR13);
+                        SetVertexShaderConstantFDestR13,
+                        safetyhook::InlineHook::StartDisabled);
+
+                    bool enabled = false;
                     if (R13WvpCallbackHook)
+                    {
+                        const auto enableResult = R13WvpCallbackHook.enable();
+                        enabled = enableResult.has_value();
+                    }
+
+                    if (enabled)
                     {
                         R13WvpHookReady.store(true, std::memory_order_release);
                         spdlog::info(
-                            "VR R13: renderer WVP target+projection classification guard armed via atomic renderer install handoff");
+                            "VR R13: renderer WVP target+projection classification guard armed after disabled-first trampoline publish");
                     }
                     else
                     {
                         R13WvpHookReady.store(false, std::memory_order_release);
-                        // Do not mutate a SafetyHookInline owned by another thread.
-                        // The base callback stays installed but becomes a stock-WVP
-                        // pass-through through this release/acquire policy flag.
+                        R13WvpCallbackHook = {};
                         RendererInjectionAllowed.store(false, std::memory_order_release);
                         InvalidateVerifiedWvp();
                         spdlog::error(
-                            "VR R13: failed to hook renderer c64 callback; WVP injection disabled atomically to fail closed");
+                            "VR R13: failed to create/enable renderer c64 callback hook; WVP injection disabled atomically to fail closed");
                     }
                     return 0;
                 }
