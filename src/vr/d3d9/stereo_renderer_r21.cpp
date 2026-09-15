@@ -17,7 +17,11 @@ namespace OutRunVRStereo
 {
     namespace
     {
-        constexpr std::int64_t R21HostStaleMs = 1000;
+        // Keep the frame-boundary eligibility decision aligned with the pose
+        // reader's 250 ms freshness budget. R22 makes this local gate
+        // authoritative for clear/draw callbacks for the entire following
+        // Present interval.
+        constexpr std::int64_t R21HostStaleMs = 250;
 
         SafetyHookInline R21PresentR9Hook{};
         std::atomic<bool> R21PresentGuardReady{false};
@@ -54,10 +58,6 @@ namespace OutRunVRStereo
                 SharedState->structSize != sizeof(OutRunVR::SharedPoseState))
                 return false;
 
-            // Best-effort raw snapshot is retained for diagnostics/fail-closed
-            // decisions even if the host died while sequence was odd. We never
-            // treat this raw snapshot as fresh; only a stable seqlock read may
-            // reopen stereo.
             hostPid = SharedState->hostPid;
             flags = SharedState->flags;
             heartbeat = SharedState->heartbeat;
@@ -92,10 +92,6 @@ namespace OutRunVRStereo
 
                 return ageMs <= R21HostStaleMs;
             }
-
-            // An odd/stuck seqlock is itself a fail-closed condition. This is
-            // the important host-crashed-mid-write case that the old R21 path
-            // accidentally ignored when its output flags remained zero.
             return false;
         }
 
@@ -112,12 +108,19 @@ namespace OutRunVRStereo
             if (fresh)
             {
                 R21LastHealthyHostPid = hostPid;
+                const bool wasClosed = R21HostFailClosed ||
+                    !R20StereoEligibilityGate.load(std::memory_order_acquire);
                 R20StereoEligibilityGate.store(true, std::memory_order_release);
-                if (R21HostFailClosed)
+                if (wasClosed)
                 {
+                    // Recovery becomes eligible only for the following frame.
+                    // Never carry a pre-stall seed across the transition.
+                    R9StereoSeeded = false;
+                    R9MonoSeeded = false;
+                    R9MonoBackupGap = false;
                     R21HostFailClosed = false;
                     spdlog::info(
-                        "VR R21: fresh stable host pose recovered pid={} heartbeat={}; game-local stereo gate reopened",
+                        "VR R21: fresh stable host pose recovered pid={} heartbeat={}; game-local stereo gate reopened for next frame with a new baseline required",
                         hostPid, heartbeat);
                 }
                 return;
@@ -125,10 +128,6 @@ namespace OutRunVRStereo
 
             R20StereoEligibilityGate.store(false, std::memory_order_release);
 
-            // If this frame already built a verified complete mono shadow, let
-            // R9 restore it by cancelling stereo only. If the shadow is not
-            // complete, cancel both seeds so Present leaves the real backbuffer
-            // untouched rather than restoring incomplete content.
             if (R9MonoSeeded && !R9MonoBackupGap)
             {
                 R9StereoSeeded = false;
