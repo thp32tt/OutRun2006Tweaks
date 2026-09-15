@@ -11,8 +11,8 @@
 // had already diverged between the main and right-eye depth surfaces. This
 // version keeps the relaxed color-clear bootstrap only when we can first build
 // a complete zero-disparity color baseline for both the right eye and mono
-// shadow, and (when depth/stencil is active) when a verified full depth/stencil
-// clear occurred in this Present with no intervening draws.
+// shadow, and (when depth/stencil is active) when verified full depth/stencil
+// clears belong to the current depth generation and have no intervening draw.
 
 #include "stereo_renderer_r13.cpp"
 
@@ -32,9 +32,15 @@ namespace OutRunVRStereo
         std::uint64_t R20BaselineCopyFailures = 0;
         std::uint64_t R20DepthGateRejects = 0;
 
-        std::uint64_t R20DepthSeedEpoch = 0;
-        std::uint64_t R20DrawCallsAtDepthSeed = 0;
-        DWORD R20DepthSeedFlags = 0;
+        // Track Z and stencil independently. The previous OR-ed flag history
+        // could combine two clears separated by a draw and incorrectly treat
+        // them as one synchronized depth/stencil baseline.
+        std::uint64_t R20DepthClearEpoch = 0;
+        std::uint64_t R20DepthClearDrawSerial = 0;
+        std::uint64_t R20DepthClearGeneration = 0;
+        std::uint64_t R20StencilClearEpoch = 0;
+        std::uint64_t R20StencilClearDrawSerial = 0;
+        std::uint64_t R20StencilClearGeneration = 0;
 
         void R20ObserveFullDepthSeed(IDirect3DDevice9* device, DWORD count,
             const D3DRECT* rects, DWORD flags, HRESULT hr) noexcept
@@ -48,13 +54,22 @@ namespace OutRunVRStereo
             if (!depthFlags || !ClearCoversStereoBackbuffer(device, count, rects))
                 return;
 
-            if (R20DepthSeedEpoch != PresentEpoch)
+            // R9DrawCalls is intentionally conservative: any intervening draw,
+            // including an offscreen draw, prevents relaxed bootstrap. Safety is
+            // preferred over availability here until a dedicated main-depth
+            // mutation serial replaces this coarse counter.
+            if ((depthFlags & D3DCLEAR_ZBUFFER) != 0)
             {
-                R20DepthSeedEpoch = PresentEpoch;
-                R20DepthSeedFlags = 0;
+                R20DepthClearEpoch = PresentEpoch;
+                R20DepthClearDrawSerial = R9DrawCalls;
+                R20DepthClearGeneration = R9MainDepthGeneration;
             }
-            R20DepthSeedFlags |= depthFlags;
-            R20DrawCallsAtDepthSeed = R9DrawCalls;
+            if ((depthFlags & D3DCLEAR_STENCIL) != 0)
+            {
+                R20StencilClearEpoch = PresentEpoch;
+                R20StencilClearDrawSerial = R9DrawCalls;
+                R20StencilClearGeneration = R9MainDepthGeneration;
+            }
         }
 
         bool R20DepthHistorySafeForRelaxedSeed(IDirect3DDevice9* device) noexcept
@@ -62,14 +77,22 @@ namespace OutRunVRStereo
             if (!TrackedDepthStencil)
                 return true;
 
-            DWORD required = D3DCLEAR_ZBUFFER;
-            if (StencilTestActive(device))
-                required |= D3DCLEAR_STENCIL;
-
-            const bool safe = R20DepthSeedEpoch == PresentEpoch &&
-                (R20DepthSeedFlags & required) == required &&
-                R20DrawCallsAtDepthSeed == R9DrawCalls &&
+            const bool depthSafe =
+                R20DepthClearEpoch == PresentEpoch &&
+                R20DepthClearDrawSerial == R9DrawCalls &&
+                R20DepthClearGeneration == R9MainDepthGeneration &&
                 R9MonoDepth != nullptr;
+
+            bool stencilSafe = true;
+            if (StencilTestActive(device))
+            {
+                stencilSafe =
+                    R20StencilClearEpoch == PresentEpoch &&
+                    R20StencilClearDrawSerial == R9DrawCalls &&
+                    R20StencilClearGeneration == R9MainDepthGeneration;
+            }
+
+            const bool safe = depthSafe && stencilSafe;
             if (!safe)
                 ++R20DepthGateRejects;
             return safe;
@@ -128,9 +151,10 @@ namespace OutRunVRStereo
                 FrameFailureReason != OutRunVR::StereoFailureNone)
                 return hr;
 
-            // If depth/stencil exists, a full clear must have synchronized the
-            // main/right/mono depth history after the last pre-seed draw. This
-            // preserves R9's no-mid-frame-depth-divergence invariant.
+            // If depth/stencil exists, each required buffer must have a full
+            // clear in this Present, in the current depth generation, with no
+            // draw since that clear. Z and stencil may be separate clear calls
+            // only when no draw occurs between either clear and this seed.
             if (!R20DepthHistorySafeForRelaxedSeed(device))
                 return hr;
 
@@ -171,7 +195,7 @@ namespace OutRunVRStereo
             {
                 R20FirstRelaxedSeedLogged = true;
                 spdlog::info(
-                    "VR R20: relaxed color bootstrap SAFE; complete backbuffer baseline copied to right+mono and depth/stencil full-clear/no-intervening-draw gate passed (rectCount={}, flags=0x{:08x})",
+                    "VR R20: relaxed color bootstrap SAFE; complete backbuffer baseline copied to right+mono and per-buffer depth/stencil clear generation/draw-serial gates passed (rectCount={}, flags=0x{:08x})",
                     count, static_cast<unsigned>(flags));
             }
             return hr;
@@ -205,7 +229,7 @@ namespace OutRunVRStereo
                     }
                     R20BootstrapReady.store(true, std::memory_order_release);
                     spdlog::info(
-                        "VR R20 PRODUCTION: stereo bootstrap overlay ACTIVE; relaxed color seed requires complete right/mono baseline plus full depth/stencil clear with no intervening draws");
+                        "VR R20 PRODUCTION: stereo bootstrap overlay ACTIVE; relaxed color seed requires complete right/mono baseline plus current-generation Z/stencil full clears with no intervening draw");
                     return 0;
                 }
                 Sleep(25);

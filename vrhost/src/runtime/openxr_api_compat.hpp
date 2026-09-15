@@ -121,6 +121,7 @@ namespace OutRunVrFinalTest
         EnsureFrameMapping();
         if (!FrameRing || FrameRing->magic != OutRunVR::RenderFrameMagic ||
             FrameRing->protocolVersion != OutRunVR::RenderFrameProtocolVersion ||
+            FrameRing->structSize != sizeof(OutRunVR::SharedRenderFrameRing) ||
             FrameRing->slotCount != OutRunVR::RenderFrameRingSize)
             return false;
 
@@ -147,7 +148,8 @@ namespace OutRunVrFinalTest
             {
                 publishSequence = after;
                 return out.magic == OutRunVR::RenderFrameMagic &&
-                    out.protocolVersion == OutRunVR::RenderFrameProtocolVersion;
+                    out.protocolVersion == OutRunVR::RenderFrameProtocolVersion &&
+                    out.structSize == sizeof(out);
             }
         }
         return false;

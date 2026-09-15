@@ -892,6 +892,7 @@ namespace
                 haveFrame_ = true;
                 if(fi.LastPresentTime.QuadPart!=0){lastCapturePresentQpc_=fi.LastPresentTime.QuadPart;lastCapturePresentQpcLow_=static_cast<std::uint32_t>(fi.LastPresentTime.QuadPart);}
                 status.available=true;status.fresh=fi.AccumulatedFrames>0;status.lastPresentQpc=lastCapturePresentQpc_;status.lastPresentQpcLow=lastCapturePresentQpcLow_;
+                MaybeLogCapturePixels();
             }
             return status;
         }
@@ -899,13 +900,21 @@ namespace
         bool CommitDirectStereoSource(const OutRunVR::SharedRenderFrameState& frame)
         {
             if (!directTransportEnabled_ || (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0) return false;
+            auto invalidateDirect = [&]() {
+                directFrameValid_ = false;
+                directTransportReady_ = false;
+            };
             const std::uint32_t slot = frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
             const std::uint32_t leftHandleValue = frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex];
             const std::uint32_t rightHandleValue = frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex];
             const std::uint32_t width = frame.reserved[OutRunVR::RenderFrameDirectWidthIndex];
             const std::uint32_t height = frame.reserved[OutRunVR::RenderFrameDirectHeightIndex];
             const std::uint32_t generation = frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-            if (slot >= OutRunVR::RenderFrameRingSize || !leftHandleValue || !rightHandleValue || !width || !height || !generation) return false;
+            if (slot >= OutRunVR::RenderFrameRingSize || !leftHandleValue || !rightHandleValue || !width || !height || !generation)
+            {
+                invalidateDirect();
+                return false;
+            }
 
             const bool same = directLeft_[slot] && directRight_[slot] && directLeftSrv_[slot] && directRightSrv_[slot] &&
                 directLeftHandle_[slot] == leftHandleValue && directRightHandle_[slot] == rightHandleValue &&
@@ -914,7 +923,7 @@ namespace
             {
                 ReleaseCom(directLeftSrv_[slot]); ReleaseCom(directLeft_[slot]);
                 ReleaseCom(directRightSrv_[slot]); ReleaseCom(directRight_[slot]);
-                directFrameValid_ = false;
+                invalidateDirect();
                 auto openOne = [&](std::uint32_t raw, ID3D11Texture2D** texture, ID3D11ShaderResourceView** srv) -> bool
                 {
                     ID3D11Resource* resource = nullptr;
@@ -938,7 +947,9 @@ namespace
                 {
                     ReleaseCom(directLeftSrv_[slot]); ReleaseCom(directLeft_[slot]);
                     ReleaseCom(directRightSrv_[slot]); ReleaseCom(directRight_[slot]);
-                    directTransportReady_ = false;
+                    directLeftHandle_[slot] = directRightHandle_[slot] = directGeneration_[slot] = 0;
+                    directFormat_[slot] = DXGI_FORMAT_UNKNOWN;
+                    invalidateDirect();
                     if (!directOpenFailureLogged_)
                     {
                         directOpenFailureLogged_ = true;
@@ -948,7 +959,16 @@ namespace
                 }
                 D3D11_TEXTURE2D_DESC ld{}; directLeft_[slot]->GetDesc(&ld);
                 D3D11_TEXTURE2D_DESC rd{}; directRight_[slot]->GetDesc(&rd);
-                if (ld.Format != rd.Format) return false;
+                if (ld.Format != rd.Format)
+                {
+                    ReleaseCom(directLeftSrv_[slot]); ReleaseCom(directLeft_[slot]);
+                    ReleaseCom(directRightSrv_[slot]); ReleaseCom(directRight_[slot]);
+                    directLeftHandle_[slot] = directRightHandle_[slot] = directGeneration_[slot] = 0;
+                    directFormat_[slot] = DXGI_FORMAT_UNKNOWN;
+                    invalidateDirect();
+                    std::cout << "Direct GPU eye ring format mismatch; Ready cleared and SBS fallback requested.\n";
+                    return false;
+                }
                 directLeftHandle_[slot] = leftHandleValue; directRightHandle_[slot] = rightHandleValue;
                 directGeneration_[slot] = generation; directFormat_[slot] = ld.Format;
                 directTransportReady_ = true;
@@ -1083,6 +1103,152 @@ namespace
         }
 
     private:
+        static float HalfToFloat(std::uint16_t value)
+        {
+            const std::uint32_t sign = static_cast<std::uint32_t>(value & 0x8000u) << 16;
+            std::uint32_t exponent = (value >> 10) & 0x1Fu;
+            std::uint32_t mantissa = value & 0x03FFu;
+            std::uint32_t bits = 0;
+            if (exponent == 0)
+            {
+                if (mantissa == 0)
+                    bits = sign;
+                else
+                {
+                    int unbiased = -14;
+                    while ((mantissa & 0x0400u) == 0)
+                    {
+                        mantissa <<= 1;
+                        --unbiased;
+                    }
+                    mantissa &= 0x03FFu;
+                    bits = sign |
+                        (static_cast<std::uint32_t>(unbiased + 127) << 23) |
+                        (mantissa << 13);
+                }
+            }
+            else if (exponent == 0x1Fu)
+            {
+                bits = sign | 0x7F800000u | (mantissa << 13);
+            }
+            else
+            {
+                bits = sign | ((exponent + (127u - 15u)) << 23) | (mantissa << 13);
+            }
+            float out = 0.0f;
+            std::memcpy(&out, &bits, sizeof(out));
+            return out;
+        }
+
+        void MaybeLogCapturePixels()
+        {
+            const ULONGLONG now = GetTickCount64();
+            if (lastPixelDiagnosticMs_ != 0 && now - lastPixelDiagnosticMs_ < 5000)
+                return;
+            lastPixelDiagnosticMs_ = now;
+            if (!source_ || !context_ || !device_ || !sourceWidth_ || !sourceHeight_)
+                return;
+            if (sourceFormat_ != DXGI_FORMAT_B8G8R8A8_UNORM &&
+                sourceFormat_ != DXGI_FORMAT_R16G16B16A16_FLOAT)
+                return;
+
+            D3D11_TEXTURE2D_DESC sourceDesc{};
+            source_->GetDesc(&sourceDesc);
+            const UINT sampleW = std::min<UINT>(16, sourceDesc.Width);
+            const UINT sampleH = std::min<UINT>(16, sourceDesc.Height);
+            if (!sampleW || !sampleH)
+                return;
+
+            D3D11_TEXTURE2D_DESC stagingDesc{};
+            stagingDesc.Width = sampleW;
+            stagingDesc.Height = sampleH;
+            stagingDesc.MipLevels = 1;
+            stagingDesc.ArraySize = 1;
+            stagingDesc.Format = sourceDesc.Format;
+            stagingDesc.SampleDesc.Count = 1;
+            stagingDesc.Usage = D3D11_USAGE_STAGING;
+            stagingDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+
+            ID3D11Texture2D* staging = nullptr;
+            if (FAILED(device_->CreateTexture2D(&stagingDesc, nullptr, &staging)) || !staging)
+                return;
+
+            const UINT left = (sourceDesc.Width - sampleW) / 2;
+            const UINT top = (sourceDesc.Height - sampleH) / 2;
+            D3D11_BOX box{ left, top, 0, left + sampleW, top + sampleH, 1 };
+            context_->CopySubresourceRegion(staging, 0, 0, 0, 0, source_, 0, &box);
+
+            D3D11_MAPPED_SUBRESOURCE mapped{};
+            if (FAILED(context_->Map(staging, 0, D3D11_MAP_READ, 0, &mapped)) || !mapped.pData)
+            {
+                ReleaseCom(staging);
+                return;
+            }
+
+            float minRgb[3]{ 1.0e30f, 1.0e30f, 1.0e30f };
+            float maxRgb[3]{ -1.0e30f, -1.0e30f, -1.0e30f };
+            double sumRgb[3]{};
+            std::uint32_t finitePixels = 0;
+            std::uint32_t nonFiniteValues = 0;
+
+            for (UINT y = 0; y < sampleH; ++y)
+            {
+                const auto* row = static_cast<const std::uint8_t*>(mapped.pData) +
+                    static_cast<std::size_t>(y) * mapped.RowPitch;
+                for (UINT x = 0; x < sampleW; ++x)
+                {
+                    float rgb[3]{};
+                    if (sourceFormat_ == DXGI_FORMAT_B8G8R8A8_UNORM)
+                    {
+                        const auto* px = row + static_cast<std::size_t>(x) * 4;
+                        rgb[0] = static_cast<float>(px[2]) / 255.0f;
+                        rgb[1] = static_cast<float>(px[1]) / 255.0f;
+                        rgb[2] = static_cast<float>(px[0]) / 255.0f;
+                    }
+                    else
+                    {
+                        const auto* px = reinterpret_cast<const std::uint16_t*>(
+                            row + static_cast<std::size_t>(x) * 8);
+                        rgb[0] = HalfToFloat(px[0]);
+                        rgb[1] = HalfToFloat(px[1]);
+                        rgb[2] = HalfToFloat(px[2]);
+                    }
+
+                    bool pixelFinite = true;
+                    for (int c = 0; c < 3; ++c)
+                    {
+                        if (!std::isfinite(rgb[c]))
+                        {
+                            ++nonFiniteValues;
+                            pixelFinite = false;
+                            continue;
+                        }
+                        minRgb[c] = std::min(minRgb[c], rgb[c]);
+                        maxRgb[c] = std::max(maxRgb[c], rgb[c]);
+                        sumRgb[c] += rgb[c];
+                    }
+                    if (pixelFinite)
+                        ++finitePixels;
+                }
+            }
+            context_->Unmap(staging, 0);
+            ReleaseCom(staging);
+
+            UvRect uv{};
+            const bool uvOk = GetGameUv(uv);
+            const double denom = finitePixels ? static_cast<double>(finitePixels) : 1.0;
+            std::cout << "[R22 capture-pixel] source=" << sourceWidth_ << "x" << sourceHeight_
+                << " fmt=" << static_cast<int>(sourceFormat_)
+                << " sample=" << sampleW << "x" << sampleH
+                << " rgbMin=" << minRgb[0] << "," << minRgb[1] << "," << minRgb[2]
+                << " rgbMax=" << maxRgb[0] << "," << maxRgb[1] << "," << maxRgb[2]
+                << " rgbMean=" << (sumRgb[0] / denom) << "," << (sumRgb[1] / denom) << "," << (sumRgb[2] / denom)
+                << " nonFinite=" << nonFiniteValues
+                << " sdrWhiteScale=" << sdrWhiteScale_
+                << " uv=" << (uvOk ? "ok" : "invalid") << "["
+                << uv.x << "," << uv.y << "," << uv.w << "," << uv.h << "]\n";
+        }
+
         void Reset()
         {
             projection_.Destroy();
@@ -1108,6 +1274,7 @@ namespace
             ReleaseCom(output1_);
             haveFrame_ = false;
             stereoSourceValid_ = false;
+            lastPixelDiagnosticMs_ = 0;
         }
 
         void ChooseSwapchainFormat()
@@ -1393,6 +1560,7 @@ namespace
         std::uint32_t sourceWidth_ = 0, sourceHeight_ = 0;
         DXGI_FORMAT sourceFormat_ = DXGI_FORMAT_UNKNOWN;
         bool haveFrame_=false;std::int64_t lastCapturePresentQpc_=0;std::uint32_t lastCapturePresentQpcLow_=0;
+        ULONGLONG lastPixelDiagnosticMs_ = 0;
 
         ID3D11Texture2D* stereoSource_ = nullptr;
         ID3D11ShaderResourceView* stereoSourceSrv_ = nullptr;

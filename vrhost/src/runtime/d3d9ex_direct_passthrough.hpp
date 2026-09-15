@@ -315,6 +315,9 @@ namespace OutRunVrD3D9ExDirectPassthrough
         if (!EnsurePoseState())
             return out;
 
+        // PoseState is mapped FILE_MAP_READ. Keep every field, including the
+        // legacy consumed-frame id, inside the same stable seqlock snapshot and
+        // never issue a write-capable interlocked instruction against this view.
         for (int attempt = 0; attempt < 4; ++attempt)
         {
             const std::uint32_t before = PoseState->sequence;
@@ -323,15 +326,12 @@ namespace OutRunVrD3D9ExDirectPassthrough
             MemoryBarrier();
             out.flags = PoseState->flags;
             out.hostPid = PoseState->hostPid;
+            out.openedFrame = PoseState->hostDirectConsumedFrameId;
             MemoryBarrier();
             const std::uint32_t after = PoseState->sequence;
             if (before != after || (after & 1u))
                 continue;
 
-            out.openedFrame = static_cast<std::uint32_t>(InterlockedCompareExchange(
-                reinterpret_cast<volatile LONG*>(
-                    const_cast<volatile std::uint32_t*>(&PoseState->hostDirectConsumedFrameId)),
-                0, 0));
             constexpr std::uint32_t required =
                 OutRunVR::HostAlive |
                 OutRunVR::HostDirectGpuTransport |
