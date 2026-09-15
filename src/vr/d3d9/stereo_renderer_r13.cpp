@@ -485,15 +485,31 @@ namespace OutRunVRStereo
         VRStereoR13HardeningHook VRStereoR13HardeningHook::instance;
     }
 
+    PoseInjectionSnapshot CurrentPoseInjectionSnapshot() noexcept
+    {
+        // Sample all mutable pass signals exactly once. The legacy invariant is
+        // intentionally calculated from the raw signals rather than from the
+        // enum result, so the checked classifier can catch future policy drift
+        // without observing two different moments of D3D9 state.
+        const bool internalStereo = InternalStereoPass;
+        const bool mainBackbuffer = TargetIsBackBuffer();
+        const bool auxiliaryRenderTargetActive = AnyAuxRenderTargetActive();
+
+        PoseInjectionSnapshot snapshot{};
+        snapshot.policy = OutRunVR::PassPolicy::ClassifyPoseInjection(
+            internalStereo, mainBackbuffer, auxiliaryRenderTargetActive);
+        snapshot.legacyMainBackbufferInvariant =
+            !internalStereo && mainBackbuffer && !auxiliaryRenderTargetActive;
+        return snapshot;
+    }
+
     OutRunVR::PassPolicy::PoseInjectionPolicy CurrentPoseInjectionPolicy() noexcept
     {
-        return OutRunVR::PassPolicy::ClassifyPoseInjection(
-            InternalStereoPass, TargetIsBackBuffer(), AnyAuxRenderTargetActive());
+        return CurrentPoseInjectionSnapshot().policy;
     }
 
     bool IsMainBackbufferPoseInjectionPass() noexcept
     {
-        return OutRunVR::PassPolicy::AllowsPoseInjection(
-            CurrentPoseInjectionPolicy());
+        return CurrentPoseInjectionSnapshot().legacyMainBackbufferInvariant;
     }
 }
