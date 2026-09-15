@@ -6,15 +6,13 @@
 // any stereo draw could start. Real OutRun render paths can use a rect/scissored
 // main color clear.
 //
-// The original R20 relaxation was too broad: it could mark a partially-cleared
-// mono shadow as complete and could start stereo after depth-writing geometry
-// had already diverged between the main and right-eye depth surfaces. This
-// version keeps the relaxed color-clear bootstrap only when we can first build
-// a complete zero-disparity color baseline for both the right eye and mono
-// shadow, and (when depth/stencil is active) when verified full depth/stencil
-// clears belong to the current depth generation and have no intervening draw.
+// R23 review hardening makes the depth/stencil baseline rule common to every
+// first stereo seed. A legacy R9 full-color clear and the relaxed R20 bootstrap
+// must both prove current-generation depth/stencil synchronization before eye
+// transforms become eligible.
 
 #include "stereo_renderer_r13.cpp"
+#include "../runtime_eligibility.hpp"
 
 namespace OutRunVRStereo
 {
@@ -23,18 +21,20 @@ namespace OutRunVRStereo
         SafetyHookInline R20ClearR9Hook{};
         std::atomic<bool> R20BootstrapReady{false};
 
-        // R21 host-liveness policy toggles this game-local gate. It deliberately
-        // does not mutate host-owned SharedPoseState flags.
-        std::atomic<bool> R20StereoEligibilityGate{true};
+        // Compatibility gate consumed by R21/R23 overlays. RuntimeEligibility is
+        // authoritative; this mirror remains so older R20 call sites fail closed.
+        std::atomic<bool> R20StereoEligibilityGate{false};
 
         bool R20FirstRelaxedSeedLogged = false;
+        bool R20FirstLegacySeedValidatedLogged = false;
         std::uint64_t R20RelaxedSeeds = 0;
+        std::uint64_t R20LegacySeedsRejected = 0;
         std::uint64_t R20BaselineCopyFailures = 0;
         std::uint64_t R20DepthGateRejects = 0;
 
-        // Track Z and stencil independently. The previous OR-ed flag history
-        // could combine two clears separated by a draw and incorrectly treat
-        // them as one synchronized depth/stencil baseline.
+        // Track Z and stencil independently. Never OR clear flags from different
+        // moments into one synthetic baseline: each required buffer must belong
+        // to this Present, this depth generation, and have no draw after clear.
         std::uint64_t R20DepthClearEpoch = 0;
         std::uint64_t R20DepthClearDrawSerial = 0;
         std::uint64_t R20DepthClearGeneration = 0;
@@ -54,10 +54,9 @@ namespace OutRunVRStereo
             if (!depthFlags || !ClearCoversStereoBackbuffer(device, count, rects))
                 return;
 
-            // R9DrawCalls is intentionally conservative: any intervening draw,
-            // including an offscreen draw, prevents relaxed bootstrap. Safety is
-            // preferred over availability here until a dedicated main-depth
-            // mutation serial replaces this coarse counter.
+            // R9DrawCalls is deliberately conservative. Until a dedicated
+            // main-depth mutation serial exists, even an offscreen draw prevents
+            // a relaxed first seed rather than risking divergent depth history.
             if ((depthFlags & D3DCLEAR_ZBUFFER) != 0)
             {
                 R20DepthClearEpoch = PresentEpoch;
@@ -72,7 +71,7 @@ namespace OutRunVRStereo
             }
         }
 
-        bool R20DepthHistorySafeForRelaxedSeed(IDirect3DDevice9* device) noexcept
+        bool R20DepthHistorySafeForInitialSeed(IDirect3DDevice9* device) noexcept
         {
             if (!TrackedDepthStencil)
                 return true;
@@ -96,6 +95,28 @@ namespace OutRunVRStereo
             if (!safe)
                 ++R20DepthGateRejects;
             return safe;
+        }
+
+        void R20CancelInitialSeed(IDirect3DDevice9* device) noexcept
+        {
+            R9StereoSeeded = false;
+            R9MonoSeeded = false;
+            if (TrackedDepthStencil)
+            {
+                RightDepthSynchronized = false;
+                if (StencilTestActive(device))
+                    RightStencilSynchronized = false;
+            }
+            OutRunVR::RuntimeEligibility::StereoAllowed.store(false, std::memory_order_release);
+            OutRunVR::RuntimeEligibility::RecoveryPending.store(true, std::memory_order_release);
+            R20StereoEligibilityGate.store(false, std::memory_order_release);
+        }
+
+        void R20AcceptVerifiedBaseline() noexcept
+        {
+            OutRunVR::RuntimeEligibility::BaselineVerified();
+            const bool allowed = OutRunVR::RuntimeEligibility::MayInjectStereo();
+            R20StereoEligibilityGate.store(allowed, std::memory_order_release);
         }
 
         bool R20BuildCompleteColorBaseline(IDirect3DDevice9* device) noexcept
@@ -122,46 +143,73 @@ namespace OutRunVRStereo
             const D3DRECT* rects, DWORD flags, D3DCOLOR color, float z,
             DWORD stencil)
         {
+            const bool seededBefore = R9StereoSeeded;
             const HRESULT hr = R20ClearR9Hook.stdcall<HRESULT>(
                 device, count, rects, flags, color, z, stencil);
 
             R20ObserveFullDepthSeed(device, count, rects, flags, hr);
 
-            // A stale/dead host is a game-local eligibility decision. R9 may
-            // have provisionally seeded from a full clear before this wrapper
-            // regains control, so explicitly cancel both seeds. The real game
-            // backbuffer remains authoritative and subsequent draws stay mono.
-            if (!R20StereoEligibilityGate.load(std::memory_order_acquire))
+            // Host freshness is the common frame-boundary authority. Recovery is
+            // allowed to observe clears while StereoAllowed is still false so a
+            // newly verified baseline can reopen the gate without a deadlock.
+            if (!OutRunVR::RuntimeEligibility::HostFresh.load(std::memory_order_acquire))
             {
-                R9StereoSeeded = false;
-                R9MonoSeeded = false;
+                R20CancelInitialSeed(device);
                 return hr;
             }
 
             if (FAILED(hr) || !R20BootstrapReady.load(std::memory_order_acquire) ||
-                !IsGameDevice(device) || InternalStereoPass ||
-                (flags & D3DCLEAR_TARGET) == 0 || R9StereoSeeded)
+                !IsGameDevice(device) || InternalStereoPass)
                 return hr;
 
-            // ClearDestR9 has already executed the game clear, mono-shadow
-            // clear and legacy eye clear before control returns here.
+            // R9 may have promoted false->true on its legacy full TARGET clear.
+            // That path must pass the exact same depth/stencil history gate as
+            // the relaxed R20 path; a full color clear alone is not sufficient.
+            const bool legacyFirstSeed = !seededBefore && R9StereoSeeded;
+            if (legacyFirstSeed)
+            {
+                if (!R20DepthHistorySafeForInitialSeed(device))
+                {
+                    ++R20LegacySeedsRejected;
+                    R20CancelInitialSeed(device);
+                    return hr;
+                }
+
+                R20AcceptVerifiedBaseline();
+                if (!OutRunVR::RuntimeEligibility::MayInjectStereo())
+                {
+                    R20CancelInitialSeed(device);
+                    return hr;
+                }
+
+                if (!R20FirstLegacySeedValidatedLogged)
+                {
+                    R20FirstLegacySeedValidatedLogged = true;
+                    spdlog::info(
+                        "VR R20/R23: legacy full-color first seed accepted only after common depth/stencil generation+draw-serial validation");
+                }
+                return hr;
+            }
+
+            if ((flags & D3DCLEAR_TARGET) == 0 || R9StereoSeeded)
+                return hr;
+
+            // ClearDestR9 has already executed the game clear, mono-shadow clear
+            // and legacy eye clear before control returns here. The recovery
+            // bootstrap may proceed while StereoAllowed=false, but only with a
+            // fresh host and all normal R9 safety predicates satisfied.
             if (!StereoWanted() || !TargetIsBackBuffer() || R9DeferredDepth ||
                 !R9CurrentDepthCanMirror() || !R9MonoSurface ||
                 R9MonoBackupGap || FrameStereoIncomplete ||
                 FrameFailureReason != OutRunVR::StereoFailureNone)
                 return hr;
 
-            // If depth/stencil exists, each required buffer must have a full
-            // clear in this Present, in the current depth generation, with no
-            // draw since that clear. Z and stencil may be separate clear calls
-            // only when no draw occurs between either clear and this seed.
-            if (!R20DepthHistorySafeForRelaxedSeed(device))
+            if (!R20DepthHistorySafeForInitialSeed(device))
                 return hr;
 
             // A rect/scissored color clear alone does not make a newly-created
-            // mono RT complete. Snapshot the whole current backbuffer into both
-            // the right eye and mono safety shadow first. Any earlier color
-            // content becomes zero-disparity rather than missing/uninitialized.
+            // mono RT complete. Snapshot the entire current backbuffer into both
+            // right eye and mono shadow so earlier color becomes zero-disparity.
             if (!R20BuildCompleteColorBaseline(device))
             {
                 R9MonoBackupGap = true;
@@ -170,6 +218,10 @@ namespace OutRunVRStereo
                 return hr;
             }
 
+            R20AcceptVerifiedBaseline();
+            if (!OutRunVR::RuntimeEligibility::MayInjectStereo())
+                return hr;
+
             R9StereoSeeded = true;
             R9MonoSeeded = true;
             R9MonoBackupGap = false;
@@ -177,9 +229,6 @@ namespace OutRunVRStereo
 
             if (TrackedDepthStencil)
             {
-                // The verified full clear plus no-intervening-draw gate proves
-                // the three depth histories share a baseline. Start a new
-                // diagnostic serial epoch instead of double-counting this clear.
                 std::uint64_t baseline = std::max(
                     R9MainDepthContentSerial, R9MonoDepthContentSerial);
                 if (++baseline == 0)
@@ -195,7 +244,7 @@ namespace OutRunVRStereo
             {
                 R20FirstRelaxedSeedLogged = true;
                 spdlog::info(
-                    "VR R20: relaxed color bootstrap SAFE; complete backbuffer baseline copied to right+mono and per-buffer depth/stencil clear generation/draw-serial gates passed (rectCount={}, flags=0x{:08x})",
+                    "VR R20/R23: relaxed bootstrap accepted after complete right+mono color baseline and common depth/stencil generation/draw-serial validation (rectCount={}, flags=0x{:08x})",
                     count, static_cast<unsigned>(flags));
             }
             return hr;
@@ -205,10 +254,8 @@ namespace OutRunVRStereo
         {
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                const std::uint32_t r9 =
-                    R9InstallState.load(std::memory_order_acquire);
-                const std::uint32_t r13 =
-                    R13InstallState.load(std::memory_order_acquire);
+                const std::uint32_t r9 = R9InstallState.load(std::memory_order_acquire);
+                const std::uint32_t r13 = R13InstallState.load(std::memory_order_acquire);
 
                 if (r9 == R9InstallFailed || r13 == R13InstallFailed)
                 {
@@ -229,7 +276,7 @@ namespace OutRunVRStereo
                     }
                     R20BootstrapReady.store(true, std::memory_order_release);
                     spdlog::info(
-                        "VR R20 PRODUCTION: stereo bootstrap overlay ACTIVE; relaxed color seed requires complete right/mono baseline plus current-generation Z/stencil full clears with no intervening draw");
+                        "VR R20 PRODUCTION: first stereo seed (legacy or relaxed) requires current-generation Z/stencil clears with no intervening draw");
                     return 0;
                 }
                 Sleep(25);
@@ -252,8 +299,7 @@ namespace OutRunVRStereo
 
             bool apply() override
             {
-                HANDLE thread = CreateThread(
-                    nullptr, 0, R20InstallThread, nullptr, 0, nullptr);
+                HANDLE thread = CreateThread(nullptr, 0, R20InstallThread, nullptr, 0, nullptr);
                 if (!thread)
                 {
                     spdlog::error(
