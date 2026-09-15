@@ -31,7 +31,7 @@ namespace OutRunVRRenderer
                 {
                     R13FirstOffscreenBypassLogged = true;
                     spdlog::info(
-                        "VR R13 pass policy: auxiliary/offscreen c64 WVP kept stock; HMD transform is main-backbuffer-only");
+                        "VR R13: auxiliary/offscreen c64 WVP kept stock; HMD transform is main-backbuffer-only");
                 }
                 return SetVertexShaderConstantFHook.stdcall<HRESULT>(
                     device, startRegister, constantData, vector4fCount);
