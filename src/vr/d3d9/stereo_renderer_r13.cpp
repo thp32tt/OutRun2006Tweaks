@@ -259,47 +259,55 @@ namespace OutRunVRStereo
         HRESULT R13GuardedDraw(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, LegacyDraw&& legacyDraw, const char* site)
         {
-            if (!IsGameDevice(device) || InternalStereoPass)
+            const bool gameDevice = IsGameDevice(device);
+            const bool internalStereo = InternalStereoPass;
+            if (!gameDevice || internalStereo)
                 return legacyDraw();
 
             const bool mainTarget = TargetIsBackBuffer();
-            if (R13ForceMonoShadow && mainTarget)
+            if (!mainTarget)
+                return legacyDraw();
+
+            const bool unsafeMrt = AnyAuxRenderTargetActive();
+            const bool unsafeOcclusion =
+                ActiveOcclusionQueries.load(std::memory_order_acquire) > 0 ||
+                OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire);
+            const bool stereoWanted = StereoWanted();
+            const auto replayPolicy = OutRunVR::PassPolicy::ClassifyDrawReplay(
+                gameDevice, internalStereo, mainTarget, R13ForceMonoShadow,
+                stereoWanted, R9StereoSeeded, unsafeMrt, unsafeOcclusion);
+
+            if (replayPolicy == OutRunVR::PassPolicy::DrawReplayPolicy::Legacy)
+                return legacyDraw();
+            if (replayPolicy == OutRunVR::PassPolicy::DrawReplayPolicy::ForcedMonoShadow)
                 return R13DrawMonoShadowOnce(device, actualDraw, site);
 
-            const bool unsafeMrt = mainTarget && AnyAuxRenderTargetActive();
-            const bool unsafeOcclusion = mainTarget &&
-                (ActiveOcclusionQueries.load(std::memory_order_acquire) > 0 ||
-                 OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire));
-            if (StereoWanted() && R9StereoSeeded &&
-                (unsafeMrt || unsafeOcclusion))
+            // UnsafeSingleExecution is the fail-closed class: MRT/query side
+            // effects must execute only once even if stereo had already begun.
+            const auto reason = unsafeMrt
+                ? OutRunVR::StereoFailureMrtActive
+                : OutRunVR::StereoFailureOcclusionQueryActive;
+            R9Poison(reason, site);
+            ++R13UnsafeTransitionFrames;
+
+            if (R9MonoSeeded && !R9MonoBackupGap &&
+                R9CurrentDepthCanMirror())
             {
-                const auto reason = unsafeMrt
-                    ? OutRunVR::StereoFailureMrtActive
-                    : OutRunVR::StereoFailureOcclusionQueryActive;
-                R9Poison(reason, site);
-                ++R13UnsafeTransitionFrames;
-
-                if (R9MonoSeeded && !R9MonoBackupGap &&
-                    R9CurrentDepthCanMirror())
+                R13ForceMonoShadow = true;
+                if (!R13FirstUnsafeTransitionLogged)
                 {
-                    R13ForceMonoShadow = true;
-                    if (!R13FirstUnsafeTransitionLogged)
-                    {
-                        R13FirstUnsafeTransitionLogged = true;
-                        spdlog::info(
-                            "VR R13 review hardening: unsafe MRT/occlusion transition switches the remainder of the Present to single-execution mono shadow; no duplicate query/MRT side effects");
-                    }
-                    return R13DrawMonoShadowOnce(device, actualDraw, site);
+                    R13FirstUnsafeTransitionLogged = true;
+                    spdlog::info(
+                        "VR R13 pass policy: unsafe MRT/occlusion classified single-execution; remainder of Present uses mono shadow without duplicated side effects");
                 }
-
-                // If the independent mono history is unavailable, do not replay
-                // a side-effecting draw. Continue the real target once and mark
-                // the shadow unusable for Present restoration.
-                R9MonoBackupGap = true;
-                return actualDraw();
+                return R13DrawMonoShadowOnce(device, actualDraw, site);
             }
 
-            return legacyDraw();
+            // If the independent mono history is unavailable, do not replay a
+            // side-effecting draw. Continue the real target once and mark the
+            // shadow unusable for Present restoration.
+            R9MonoBackupGap = true;
+            return actualDraw();
         }
 
         HRESULT __stdcall DrawPrimitiveDestR13(IDirect3DDevice9* device,
@@ -477,9 +485,15 @@ namespace OutRunVRStereo
         VRStereoR13HardeningHook VRStereoR13HardeningHook::instance;
     }
 
+    OutRunVR::PassPolicy::PoseInjectionPolicy CurrentPoseInjectionPolicy() noexcept
+    {
+        return OutRunVR::PassPolicy::ClassifyPoseInjection(
+            InternalStereoPass, TargetIsBackBuffer(), AnyAuxRenderTargetActive());
+    }
+
     bool IsMainBackbufferPoseInjectionPass() noexcept
     {
-        return TargetIsBackBuffer() && !AnyAuxRenderTargetActive() &&
-            !InternalStereoPass;
+        return OutRunVR::PassPolicy::AllowsPoseInjection(
+            CurrentPoseInjectionPolicy());
     }
 }
