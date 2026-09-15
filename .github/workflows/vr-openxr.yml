@@ -58,8 +58,8 @@ jobs:
           $bytes = [System.IO.File]::ReadAllBytes($dllPath)
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
           foreach ($marker in @(
-            'renderer-boundary head tracking + true stereo + 6DoF + classic-D3D9 SBS fallback default',
-            'D3D9Ex managed-resource-compatible zero-copy remains opt-in',
+            'classic-D3D9 exact projection preferred',
+            'host-owned D3D11 safety-copy transport remains opt-in',
             'VR stereo: D3D9 full-eye renderer installed',
             'VR stereo: TRUE GEOMETRY STEREO active',
             'VR v3 shadow: live dual-protocol diagnostics active',
@@ -78,6 +78,7 @@ jobs:
             'translated MANAGED texture LockRect',
             'VR R13: stereo hardening ACTIVE',
             'GPU-completion direct-ring backpressure',
+            'single-execution MRT/occlusion fallback',
             'VR R13: auxiliary/offscreen c64 WVP kept stock'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR DLL marker missing: $marker" }
@@ -171,10 +172,12 @@ jobs:
             '[finaltest] build=',
             '[finaltest] endFrame total=',
             'no-layer OpenXR test pattern ready',
-            'D3D9Ex-direct-gpu-copy-R13-20260915',
-            'host-owned GPU eye copies + completion ACK active',
-            'DIRECT GPU-COPY projection passthrough ACTIVE',
-            'stale Desktop Duplication source invalidated'
+            'R14-review-hardening-20260915',
+            '[R14] classic D3D9 exact core projection is authoritative',
+            '[R14] D3D9Ex final authority: host-owned SafeEye projection',
+            'desktop SBS fallback disabled for direct frames',
+            '[R14] stale classic SBS frame blocked',
+            'host-owned GPU eye copies + completion ACK active'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR host marker missing: $marker" }
           }
