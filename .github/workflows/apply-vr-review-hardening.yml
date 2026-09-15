@@ -1,0 +1,49 @@
+name: Apply remaining VR review hardening
+
+on:
+  push:
+    branches: [ vr-openxr ]
+    paths:
+      - '.github/workflows/apply-vr-review-hardening.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Apply reviewed source hardening
+        run: python tools/apply_vr_review_hardening_once.py
+
+      - name: Verify patch shape
+        shell: bash
+        run: |
+          git diff --check
+          python tools/verify_vr_architecture.py
+          git diff --stat
+          if git diff --quiet; then
+            echo 'Expected source changes were not produced.' >&2
+            exit 1
+          fi
+
+      - name: Commit reviewed source hardening
+        shell: bash
+        run: |
+          git config user.name 'thp32tt'
+          git config user.email '129367814+thp32tt@users.noreply.github.com'
+          git add \
+            src/vr/d3d9/stereo_renderer_r7.inc \
+            src/vr/d3d9/stereo_renderer.cpp \
+            src/vr/d3d9/stereo_renderer_r13.cpp \
+            src/vr/ipc/v3_game_shadow_bridge.cpp \
+            src/dllmain.cpp \
+            vrhost/src/runtime/sbs_capture_override.hpp \
+            vrhost/src/runtime/d3d9ex_direct_passthrough.hpp \
+            vrhost/src/ipc/v3_shadow_bridge.cpp
+          git commit -m 'vr: apply remaining 10-pass review hardening'
+          git push origin HEAD:vr-openxr
