@@ -1,125 +1,78 @@
-// R23 render-state hardening overlay.
+// R23 recovery hardening overlay.
 //
-// The validated R21->R20->R13->R9->R7 implementation stays intact. This final
-// game-side TU fixes render-target state that D3D9 may reset when internal mono
-// and right-eye targets are bound, and prevents a scissored game clear from
-// being misclassified as the first full-frame seed.
+// R22 already owns scissor preservation, original-game-state full-clear
+// classification, common first-seed validation and fail-closed draw callbacks.
+// R23 deliberately layers on top of that validated implementation instead of
+// installing a second set of render-target/scissor hooks.
+//
+// The remaining recovery edge is subtle: after a host stall, the common
+// RuntimeEligibility gate stays closed until a new safe color/depth baseline is
+// observed. R22 correctly blocks stereo draws while the gate is closed, but its
+// clear fast-path also bypasses R20. That would make it impossible for R20 to
+// observe the very baseline required to reopen the gate. R23 allows ONLY clear
+// callbacks through the R20/R22 baseline validator while HostFresh=true and
+// RecoveryPending=true; draw callbacks remain blocked by R22 until the verified
+// baseline calls RuntimeEligibility::BaselineVerified().
 
-#include "stereo_renderer_r21.cpp"
+#include "stereo_renderer_r22.cpp"
 
 namespace OutRunVRStereo
 {
     namespace
     {
-        SafetyHookInline R23SetRenderTargetTrampolineHook{};
-        SafetyHookInline R23ClearR20Hook{};
-        std::atomic<bool> R23StateGuardReady{ false };
+        SafetyHookInline R23ClearR22Hook{};
+        std::atomic<bool> R23RecoveryGuardReady{ false };
+        std::uint64_t R23RecoveryClearPasses = 0;
+        bool R23FirstRecoveryClearLogged = false;
 
-        struct ReplayClipState
+        bool R23RecoveryNeedsBaseline() noexcept
         {
-            bool active = false;
-            bool valid = false;
-            IDirect3DSurface9* gameTarget = nullptr;
-            D3DVIEWPORT9 viewport{};
-            RECT scissor{};
-            DWORD scissorEnabled = FALSE;
-        };
-
-        thread_local ReplayClipState R23ReplayClip{};
-        std::uint64_t R23ClipCaptureFailures = 0;
-        std::uint64_t R23ClipRestoreFailures = 0;
-        std::uint64_t R23ScissoredLegacySeedsRejected = 0;
-        bool R23FirstClipLogged = false;
-
-        bool R23CaptureClipState(IDirect3DDevice9* device,
-            ReplayClipState& state) noexcept
-        {
-            state.valid = false;
-            if (!device || FAILED(device->GetViewport(&state.viewport)) ||
-                FAILED(device->GetRenderState(
-                    D3DRS_SCISSORTESTENABLE, &state.scissorEnabled)) ||
-                FAILED(device->GetScissorRect(&state.scissor)))
-            {
-                ++R23ClipCaptureFailures;
-                return false;
-            }
-            state.valid = true;
-            return true;
+            return OutRunVR::RuntimeEligibility::HostFresh.load(
+                       std::memory_order_acquire) &&
+                OutRunVR::RuntimeEligibility::RecoveryPending.load(
+                    std::memory_order_acquire) &&
+                !OutRunVR::RuntimeEligibility::StereoAllowed.load(
+                    std::memory_order_acquire);
         }
 
-        bool R23ApplyClipState(IDirect3DDevice9* device,
-            const ReplayClipState& state) noexcept
+        HRESULT R23RunRecoveryClearThroughBaselinePolicy(
+            IDirect3DDevice9* device, DWORD count, const D3DRECT* rects,
+            DWORD flags, D3DCOLOR color, float z, DWORD stencil)
         {
-            if (!device || !state.valid)
-                return false;
-            const HRESULT viewportHr = device->SetViewport(&state.viewport);
-            const HRESULT scissorHr = device->SetScissorRect(&state.scissor);
-            const HRESULT enableHr = device->SetRenderState(
-                D3DRS_SCISSORTESTENABLE, state.scissorEnabled);
-            if (FAILED(viewportHr) || FAILED(scissorHr) || FAILED(enableHr))
+            // Mirror R22's normal clear transaction, except that recovery is
+            // permitted to reach R20 while stereo draw callbacks remain closed.
+            R22ReplayScope replay(device);
+            const bool mainBefore = TargetIsBackBuffer();
+            const bool seedBefore = R9StereoSeeded;
+            const bool depthSyncBefore = RightDepthSynchronized;
+            const bool stencilSyncBefore = RightStencilSynchronized;
+            const bool fullGameClear = R22GameClearCoversBackbuffer(
+                count, rects, R22GameScissor);
+
+            const HRESULT hr = R22ClearR20Hook.stdcall<HRESULT>(
+                device, count, rects, flags, color, z, stencil);
+
+            R22ObserveDepthBaseline(mainBefore, fullGameClear, flags, hr);
+
+            // R7/R9/R20 classifiers do not know the pre-replay scissor state.
+            // A clear that was partial in the real game state may never promote
+            // right-eye synchronization or become an initial stereo seed.
+            if (SUCCEEDED(hr) && mainBefore && !fullGameClear)
             {
-                ++R23ClipRestoreFailures;
-                return false;
+                if ((flags & D3DCLEAR_ZBUFFER) != 0)
+                    RightDepthSynchronized = depthSyncBefore;
+                if ((flags & D3DCLEAR_STENCIL) != 0)
+                    RightStencilSynchronized = stencilSyncBefore;
             }
-            return true;
-        }
+            R22CancelUnsafeFirstSeed(device, seedBefore, fullGameClear);
 
-        bool R23ScissorRestrictsBackbuffer(IDirect3DDevice9* device) noexcept
-        {
-            if (!device || !BackBufferDesc.Width || !BackBufferDesc.Height)
-                return true; // fail closed when classification state is unknown
-            DWORD enabled = FALSE;
-            if (FAILED(device->GetRenderState(D3DRS_SCISSORTESTENABLE, &enabled)))
-                return true;
-            if (!enabled)
-                return false;
-            RECT rect{};
-            if (FAILED(device->GetScissorRect(&rect)))
-                return true;
-            return rect.left > 0 || rect.top > 0 ||
-                rect.right < static_cast<LONG>(BackBufferDesc.Width) ||
-                rect.bottom < static_cast<LONG>(BackBufferDesc.Height);
-        }
-
-        HRESULT __stdcall SetRenderTargetTrampolineDestR23(
-            IDirect3DDevice9* device, DWORD index, IDirect3DSurface9* surface)
-        {
-            const bool enteringReplay = InternalStereoPass && index == 0 &&
-                (surface == R9MonoSurface || surface == RightEyeSurface) &&
-                !R23ReplayClip.active;
-
-            if (enteringReplay)
+            ++R23RecoveryClearPasses;
+            if (!R23FirstRecoveryClearLogged)
             {
-                R23ReplayClip = {};
-                R23ReplayClip.active = true;
-                R23ReplayClip.gameTarget = TrackedRenderTarget;
-                if (!R23CaptureClipState(device, R23ReplayClip))
-                    R9Poison(OutRunVR::StereoFailureViewportUnavailable,
-                        "R23/scissor-capture");
+                R23FirstRecoveryClearLogged = true;
+                spdlog::info(
+                    "VR R23: host recovered; clear callbacks may establish a new R22/R20 verified baseline while stereo draws/WVP remain fail-closed");
             }
-
-            const bool restoringReplay = R23ReplayClip.active && index == 0 &&
-                surface == R23ReplayClip.gameTarget;
-
-            const HRESULT hr = R23SetRenderTargetTrampolineHook.stdcall<HRESULT>(
-                device, index, surface);
-
-            if (SUCCEEDED(hr) && (enteringReplay || restoringReplay) &&
-                R23ReplayClip.valid)
-            {
-                if (!R23ApplyClipState(device, R23ReplayClip))
-                    R9Poison(OutRunVR::StereoFailureViewportUnavailable,
-                        "R23/scissor-restore");
-                else if (!R23FirstClipLogged)
-                {
-                    R23FirstClipLogged = true;
-                    spdlog::info(
-                        "VR R23: viewport + scissor rectangle + SCISSORTESTENABLE preserved across internal mono/right-eye render-target switches");
-                }
-            }
-
-            if (restoringReplay || FAILED(hr))
-                R23ReplayClip = {};
             return hr;
         }
 
@@ -127,67 +80,18 @@ namespace OutRunVRStereo
             const D3DRECT* rects, DWORD flags, D3DCOLOR color, float z,
             DWORD stencil)
         {
-            const bool gameMain = IsGameDevice(device) && !InternalStereoPass &&
-                TargetIsBackBuffer();
-            const bool scissorRestricted = gameMain &&
-                R23ScissorRestrictsBackbuffer(device);
-            const bool seededBefore = R9StereoSeeded;
-            const bool depthSyncBefore = RightDepthSynchronized;
-            const bool stencilSyncBefore = RightStencilSynchronized;
-            const auto relaxedBefore = R20RelaxedSeeds;
+            if (IsGameDevice(device) && !InternalStereoPass &&
+                R23RecoveryNeedsBaseline())
+            {
+                return R23RunRecoveryClearThroughBaselinePolicy(
+                    device, count, rects, flags, color, z, stencil);
+            }
 
-            const auto oldDepthEpoch = R20DepthClearEpoch;
-            const auto oldDepthDraw = R20DepthClearDrawSerial;
-            const auto oldDepthGeneration = R20DepthClearGeneration;
-            const auto oldStencilEpoch = R20StencilClearEpoch;
-            const auto oldStencilDraw = R20StencilClearDrawSerial;
-            const auto oldStencilGeneration = R20StencilClearGeneration;
-
-            const HRESULT hr = R23ClearR20Hook.stdcall<HRESULT>(
+            return R23ClearR22Hook.stdcall<HRESULT>(
                 device, count, rects, flags, color, z, stencil);
-
-            if (!scissorRestricted || FAILED(hr))
-                return hr;
-
-            // R7/R9 ClearCoversStereoBackbuffer historically considered only
-            // viewport+clear rectangles. Restore the pre-call full-clear records
-            // so a scissored clear cannot manufacture a new full depth baseline.
-            if ((flags & D3DCLEAR_ZBUFFER) != 0)
-            {
-                R20DepthClearEpoch = oldDepthEpoch;
-                R20DepthClearDrawSerial = oldDepthDraw;
-                R20DepthClearGeneration = oldDepthGeneration;
-            }
-            if ((flags & D3DCLEAR_STENCIL) != 0)
-            {
-                R20StencilClearEpoch = oldStencilEpoch;
-                R20StencilClearDrawSerial = oldStencilDraw;
-                R20StencilClearGeneration = oldStencilGeneration;
-            }
-
-            const bool relaxedAccepted = R20RelaxedSeeds != relaxedBefore;
-            if (!seededBefore && R9StereoSeeded && !relaxedAccepted)
-            {
-                // This was R9's legacy full-clear promotion, not R20's explicit
-                // relaxed baseline-copy path. Reject it because the original game
-                // clip state proves the clear was not actually full-frame.
-                ++R23ScissoredLegacySeedsRejected;
-                R20CancelInitialSeed(device);
-            }
-
-            // A scissored clear applied equally to already-synchronized eyes may
-            // preserve a previous true state, but it may not upgrade false->true.
-            if (!relaxedAccepted)
-            {
-                if (!depthSyncBefore)
-                    RightDepthSynchronized = false;
-                if (!stencilSyncBefore)
-                    RightStencilSynchronized = false;
-            }
-            return hr;
         }
 
-        DWORD WINAPI R23StateInstallThread(void*)
+        DWORD WINAPI R23RecoveryInstallThread(void*)
         {
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
@@ -195,62 +99,60 @@ namespace OutRunVRStereo
                     R13InstallState.load(std::memory_order_acquire) == R13InstallFailed)
                     return 0;
 
-                if (R9InstallState.load(std::memory_order_acquire) == R9InstallReady &&
-                    R13InstallState.load(std::memory_order_acquire) == R13InstallReady &&
-                    R20BootstrapReady.load(std::memory_order_acquire) &&
-                    R21PresentGuardReady.load(std::memory_order_acquire) &&
-                    SetRenderTargetHook && SetRenderTargetHook.trampoline())
+                if (R22InstallReady.load(std::memory_order_acquire))
                 {
-                    R23SetRenderTargetTrampolineHook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(SetRenderTargetHook.trampoline().address()),
-                        SetRenderTargetTrampolineDestR23);
-                    R23ClearR20Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&ClearDestR20), ClearDestR23);
-                    if (!R23SetRenderTargetTrampolineHook || !R23ClearR20Hook)
+                    R23ClearR22Hook = safetyhook::create_inline(
+                        reinterpret_cast<void*>(&ClearDestR22), ClearDestR23);
+                    if (!R23ClearR22Hook)
                     {
-                        R23SetRenderTargetTrampolineHook = {};
-                        R23ClearR20Hook = {};
-                        spdlog::error(
-                            "VR R23: failed to install scissor/bootstrap state guards; stereo remains fail-closed until corrected");
                         OutRunVR::RuntimeEligibility::FailClosed();
-                        R20StereoEligibilityGate.store(false, std::memory_order_release);
+                        R20StereoEligibilityGate.store(false,
+                            std::memory_order_release);
+                        spdlog::error(
+                            "VR R23: failed to install recovery-clear baseline guard; stereo remains fail-closed");
                         return 0;
                     }
-                    R23StateGuardReady.store(true, std::memory_order_release);
+
+                    R23RecoveryGuardReady.store(true, std::memory_order_release);
                     spdlog::info(
-                        "VR R23 GAME: scissor-preserving target replay + original-game-state first-seed classifier ACTIVE");
+                        "VR R23 GAME: R22 scissor/state policy retained; recovery-clear-only baseline reopening guard ACTIVE");
                     return 0;
                 }
                 Sleep(25);
             }
-            spdlog::error("VR R23: timed out installing render-state guards");
+
             OutRunVR::RuntimeEligibility::FailClosed();
+            R20StereoEligibilityGate.store(false, std::memory_order_release);
+            spdlog::error(
+                "VR R23: timed out waiting for R22 safety overlay; stereo kept fail-closed");
             return 0;
         }
 
-        class VRRenderStateHardeningR23Hook final : public Hook
+        class VRRecoveryBaselineR23Hook final : public Hook
         {
         public:
             std::string_view description() override
             {
-                return "OpenXRVRRenderStateHardeningR23";
+                return "OpenXRVRRecoveryBaselineR23";
             }
             bool validate() override { return true; }
             bool apply() override
             {
-                HANDLE thread = CreateThread(nullptr, 0, R23StateInstallThread,
-                    nullptr, 0, nullptr);
+                HANDLE thread = CreateThread(nullptr, 0,
+                    R23RecoveryInstallThread, nullptr, 0, nullptr);
                 if (!thread)
                 {
                     OutRunVR::RuntimeEligibility::FailClosed();
+                    R20StereoEligibilityGate.store(false,
+                        std::memory_order_release);
                     return false;
                 }
                 CloseHandle(thread);
                 return true;
             }
-            static VRRenderStateHardeningR23Hook instance;
+            static VRRecoveryBaselineR23Hook instance;
         };
 
-        VRRenderStateHardeningR23Hook VRRenderStateHardeningR23Hook::instance;
+        VRRecoveryBaselineR23Hook VRRecoveryBaselineR23Hook::instance;
     }
 }
