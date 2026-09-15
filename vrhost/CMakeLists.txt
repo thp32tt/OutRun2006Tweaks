@@ -39,19 +39,24 @@ target_include_directories(outrun-vr-host PRIVATE
 )
 target_compile_definitions(outrun-vr-host PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 if(MSVC)
-    # Forced-include order is the runtime ownership stack. R21 is the final
-    # xrEndFrame owner: it skips direct-only IPC for classic frames, performs
-    # read-only seqlock loads for direct state, and preserves R15 fail-closed
-    # ownership while binding the legacy R19 blit constants to VS when needed.
-    # Crash diagnostics are last and do not alter OpenXR dispatch; they only
-    # capture unhandled exception module/RVA plus a minidump.
+    # Forced-include order is the runtime ownership stack. R22 is the final
+    # xrEndFrame owner: R21 retains readonly/direct/shouldRender policy and R22
+    # adds latest-Frame.v2 pose/FOV bundle validation while blocking QPC-only
+    # gameplay fallback synthesis. Crash diagnostics remain last and do not
+    # alter OpenXR dispatch.
     target_compile_options(outrun-vr-host PRIVATE
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/openxr_api_compat.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/sbs_capture_override.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/d3d9ex_direct_passthrough.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/review_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r21_runtime_hardening.hpp"
+        "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r22_runtime_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r21_crash_diagnostics.hpp"
+        "$<$<CONFIG:Release>:/Zi>"
+    )
+    target_link_options(outrun-vr-host PRIVATE
+        "$<$<CONFIG:Release>:/DEBUG:FULL>"
+        "$<$<CONFIG:RelWithDebInfo>:/DEBUG:FULL>"
     )
 endif()
 target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi d3dcompiler user32 dbghelp)
@@ -118,5 +123,7 @@ foreach(target
     set_target_properties(${target} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin"
+        PDB_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
+        PDB_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin"
     )
 endforeach()
