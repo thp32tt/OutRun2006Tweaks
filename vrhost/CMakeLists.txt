@@ -52,6 +52,16 @@ if(MSVC)
 endif()
 target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi d3dcompiler user32)
 
+# Renderer-independent hardware diagnostic. This intentionally does not use the
+# host forced-include runtime wrappers and does not depend on the game process.
+# It submits deterministic color patterns directly through OpenXR/D3D11 so
+# VDXR swapchain/layer behavior can be isolated from D3D9 capture/stereo logic.
+add_executable(outrun-vr-diagnostic
+    src/diagnostic_pattern.cpp
+)
+target_compile_definitions(outrun-vr-diagnostic PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
+target_link_libraries(outrun-vr-diagnostic PRIVATE openxr_loader d3d11 dxgi user32)
+
 add_executable(outrun-vr-shader-smoke tests/stereo_shader_smoke.cpp)
 target_include_directories(outrun-vr-shader-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
 target_compile_definitions(outrun-vr-shader-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
@@ -94,6 +104,7 @@ target_compile_definitions(outrun-vr-host-pose-v3-validation-smoke PRIVATE WIN32
 
 foreach(target
     outrun-vr-host
+    outrun-vr-diagnostic
     outrun-vr-shader-smoke
     outrun-vr-protocol-v3-smoke
     outrun-vr-core-math-smoke
