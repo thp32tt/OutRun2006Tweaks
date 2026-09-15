@@ -1,24 +1,23 @@
 #pragma once
 
-// R10 hardware-fix bridge.
+// R19 single-owner classic-D3D9 SBS fallback.
 //
-// R9 proved that the game-side renderer is now producing complete SBS frames
-// (StereoSbsActive, composeOk increasing, no depth/stencil/depthState failures),
-// but the Quest still did not receive the game image.  This module bypasses the
-// legacy host's fragile frame/QPC matching and crop path at the final OpenXR
-// submission boundary:
+// R18 proved the OpenXR swapchain, RTV, acquire/wait/release sequence and the
+// production blit shader are healthy, while a second Desktop Duplication object
+// created by the old R10 fallback fails with E_INVALIDARG.  The production
+// StereoCompositor already owns the one and only IDXGIOutputDuplication object,
+// so this layer no longer creates or acquires a second duplication at all.
 //
-//   D3D9 SBS on monitor -> Desktop Duplication -> host-owned D3D11 texture
-//   -> split left/right -> dedicated OpenXR projection swapchain.
+// Production path:
+//   StereoCompositor::Capture()
+//     Desktop Duplication -> production source_ (host-owned D3D11 texture)
+//     -> PublishProductionCapture() -> R19 Source (host-owned D3D11 texture)
+//     -> split left/right -> dedicated OpenXR projection swapchain.
 //
-// It deliberately keeps the exact projection poses/FOV already chosen by the
-// legacy host when those are available.  If the frame ring advances while the
-// desktop capture is copied, the copied texture stays valid because it is
-// host-owned; the ring no longer has to remain byte-identical after capture.
-//
-// Menus are also mirrored through an independent VIEW-space quad so the HMD does
-// not depend on the old theater blit path.  Set OUTRUN_VR_CAPTURE_OVERRIDE=0 to
-// disable this bridge without changing binaries.
+// The extra CopyResource is intentional: the fallback owns a stable snapshot
+// and never depends on IDXGIResource/AcquireNextFrame lifetime.  The snapshot is
+// accepted for gameplay only when its Desktop Duplication LastPresentTime QPC is
+// at or after the complete game's Frame.v2 presentQpc.
 
 #include "openxr_api_compat.hpp"
 
@@ -44,8 +43,9 @@
 
 namespace OutRunVrSbsCaptureOverride
 {
-    inline constexpr const char* BuildId = "R10-sbs-capture-override-20260915";
+    inline constexpr const char* BuildId = "R19-production-capture-reuse-20260916";
     inline constexpr wchar_t GameExeName[] = L"OR2006C2C.EXE";
+    inline constexpr ULONGLONG PublishedSourceMaxAgeMs = 500;
 
     template <typename T>
     inline void ReleaseCom(T*& value)
@@ -60,7 +60,8 @@ namespace OutRunVrSbsCaptureOverride
     inline bool Enabled()
     {
         const char* value = std::getenv("OUTRUN_VR_CAPTURE_OVERRIDE");
-        return !value || (std::strcmp(value, "0") != 0 && _stricmp(value, "false") != 0 && _stricmp(value, "off") != 0);
+        return !value || (std::strcmp(value, "0") != 0 &&
+            _stricmp(value, "false") != 0 && _stricmp(value, "off") != 0);
     }
 
     inline DWORD FindGamePid()
@@ -217,9 +218,6 @@ float4 PSMain(VSOut input) : SV_Target
     inline HWND GameWindow = nullptr;
     inline HMONITOR TargetMonitor = nullptr;
     inline RECT OutputDesktop{};
-    inline IDXGIOutput1* Output1 = nullptr;
-    inline IDXGIOutput5* Output5 = nullptr;
-    inline IDXGIOutputDuplication* Duplication = nullptr;
     inline ID3D11Texture2D* Source = nullptr;
     inline ID3D11ShaderResourceView* SourceSrv = nullptr;
     inline std::uint32_t SourceWidth = 0;
@@ -227,6 +225,8 @@ float4 PSMain(VSOut input) : SV_Target
     inline DXGI_FORMAT SourceFormat = DXGI_FORMAT_UNKNOWN;
     inline bool HaveSource = false;
     inline float SdrWhiteScale = 1.f;
+    inline ULONGLONG LastProductionPublishMs = 0;
+    inline std::int64_t LastProductionPresentQpc = 0;
 
     inline ID3D11VertexShader* Vs = nullptr;
     inline ID3D11PixelShader* Ps = nullptr;
@@ -244,6 +244,8 @@ float4 PSMain(VSOut input) : SV_Target
     inline std::uint64_t CaptureFresh = 0;
     inline std::uint64_t CaptureTimeout = 0;
     inline std::uint64_t CaptureFailure = 0;
+    inline std::uint64_t ProductionPublishes = 0;
+    inline std::uint64_t SourceQpcRejects = 0;
     inline std::uint64_t ProjectionAttempts = 0;
     inline std::uint64_t ProjectionSuccess = 0;
     inline std::uint64_t TheaterAttempts = 0;
@@ -254,19 +256,19 @@ float4 PSMain(VSOut input) : SV_Target
     inline bool CaptureInfoLogged = false;
     inline bool ProjectionLogged = false;
     inline bool TheaterLogged = false;
+    inline bool FirstQpcRejectLogged = false;
 
     inline void ResetCapture()
     {
         ReleaseCom(SourceSrv);
         ReleaseCom(Source);
-        ReleaseCom(Duplication);
-        ReleaseCom(Output5);
-        ReleaseCom(Output1);
         TargetMonitor = nullptr;
         OutputDesktop = {};
         SourceWidth = SourceHeight = 0;
         SourceFormat = DXGI_FORMAT_UNKNOWN;
         HaveSource = false;
+        LastProductionPublishMs = 0;
+        LastProductionPresentQpc = 0;
         CaptureInfoLogged = false;
     }
 
@@ -289,186 +291,16 @@ float4 PSMain(VSOut input) : SV_Target
         LastStereoFrameMs = 0;
     }
 
-    inline float QuerySdrWhiteScale(HMONITOR monitor)
-    {
-        char value[64]{};
-        const DWORD n = GetEnvironmentVariableA("OUTRUN_VR_SDR_WHITE_SCALE", value, sizeof(value));
-        if (n > 0 && n < sizeof(value))
-        {
-            char* end = nullptr;
-            const float v = std::strtof(value, &end);
-            if (end != value && std::isfinite(v) && v >= 0.25f && v <= 8.f)
-                return v;
-        }
-
-        MONITORINFOEXW mi{};
-        mi.cbSize = sizeof(mi);
-        if (!monitor || !GetMonitorInfoW(monitor, &mi))
-            return 1.f;
-        UINT32 pc = 0, mc = 0;
-        if (GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, &pc, &mc) != ERROR_SUCCESS)
-            return 1.f;
-        std::vector<DISPLAYCONFIG_PATH_INFO> paths(pc);
-        std::vector<DISPLAYCONFIG_MODE_INFO> modes(mc);
-        if (QueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, &pc, paths.data(), &mc, modes.data(), nullptr) != ERROR_SUCCESS)
-            return 1.f;
-        for (UINT32 i = 0; i < pc; ++i)
-        {
-            DISPLAYCONFIG_SOURCE_DEVICE_NAME src{};
-            src.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME;
-            src.header.size = sizeof(src);
-            src.header.adapterId = paths[i].sourceInfo.adapterId;
-            src.header.id = paths[i].sourceInfo.id;
-            if (DisplayConfigGetDeviceInfo(&src.header) != ERROR_SUCCESS ||
-                _wcsicmp(src.viewGdiDeviceName, mi.szDevice) != 0)
-                continue;
-            DISPLAYCONFIG_SDR_WHITE_LEVEL white{};
-            white.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_SDR_WHITE_LEVEL;
-            white.header.size = sizeof(white);
-            white.header.adapterId = paths[i].targetInfo.adapterId;
-            white.header.id = paths[i].targetInfo.id;
-            if (DisplayConfigGetDeviceInfo(&white.header) == ERROR_SUCCESS && white.SDRWhiteLevel > 0)
-                return std::clamp(static_cast<float>(white.SDRWhiteLevel) / 1000.f, 0.25f, 8.f);
-        }
-        return 1.f;
-    }
-
-    inline bool CreateShaders()
-    {
-        if (Vs && Ps && Sampler && ConstantBuffer)
-            return true;
-        if (!OutRunVrFinalTest::Device)
-            return false;
-
-        ID3DBlob* vsCode = nullptr;
-        ID3DBlob* psCode = nullptr;
-        ID3DBlob* errors = nullptr;
-        HRESULT hr = D3DCompile(BlitShader, std::strlen(BlitShader), "OutRunR10Blit", nullptr, nullptr,
-            "VSMain", "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
-            0, &vsCode, &errors);
-        ReleaseCom(errors);
-        if (FAILED(hr) || !vsCode)
-            return false;
-        hr = D3DCompile(BlitShader, std::strlen(BlitShader), "OutRunR10Blit", nullptr, nullptr,
-            "PSMain", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
-            0, &psCode, &errors);
-        ReleaseCom(errors);
-        if (FAILED(hr) || !psCode)
-        {
-            ReleaseCom(vsCode);
-            return false;
-        }
-        hr = OutRunVrFinalTest::Device->CreateVertexShader(vsCode->GetBufferPointer(), vsCode->GetBufferSize(), nullptr, &Vs);
-        if (SUCCEEDED(hr))
-            hr = OutRunVrFinalTest::Device->CreatePixelShader(psCode->GetBufferPointer(), psCode->GetBufferSize(), nullptr, &Ps);
-        ReleaseCom(vsCode);
-        ReleaseCom(psCode);
-        if (FAILED(hr) || !Vs || !Ps)
-            return false;
-
-        D3D11_SAMPLER_DESC sd{};
-        sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-        sd.AddressU = sd.AddressV = sd.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-        if (FAILED(OutRunVrFinalTest::Device->CreateSamplerState(&sd, &Sampler)))
-            return false;
-
-        D3D11_BUFFER_DESC bd{};
-        bd.ByteWidth = sizeof(BlitParams);
-        bd.Usage = D3D11_USAGE_DYNAMIC;
-        bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-        if (FAILED(OutRunVrFinalTest::Device->CreateBuffer(&bd, nullptr, &ConstantBuffer)))
-            return false;
-        return true;
-    }
-
-    inline bool BindOutput()
-    {
-        if (!OutRunVrFinalTest::Device)
-            return false;
-        if (!GameWindow || !IsWindow(GameWindow))
-            GameWindow = FindGameWindow();
-        if (!GameWindow)
-            return false;
-        const HMONITOR monitor = MonitorFromWindow(GameWindow, MONITOR_DEFAULTTONEAREST);
-        if (!monitor)
-            return false;
-        if (Duplication && monitor == TargetMonitor)
-            return true;
-
-        ResetCapture();
-        TargetMonitor = monitor;
-
-        IDXGIDevice* dxgiDevice = nullptr;
-        if (FAILED(OutRunVrFinalTest::Device->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(&dxgiDevice))) || !dxgiDevice)
-            return false;
-        IDXGIAdapter* adapter = nullptr;
-        const HRESULT adapterHr = dxgiDevice->GetAdapter(&adapter);
-        dxgiDevice->Release();
-        if (FAILED(adapterHr) || !adapter)
-            return false;
-
-        IDXGIOutput* selected = nullptr;
-        DXGI_OUTPUT_DESC outputDesc{};
-        for (UINT i = 0;; ++i)
-        {
-            IDXGIOutput* output = nullptr;
-            if (adapter->EnumOutputs(i, &output) == DXGI_ERROR_NOT_FOUND)
-                break;
-            DXGI_OUTPUT_DESC d{};
-            output->GetDesc(&d);
-            if (d.Monitor == TargetMonitor)
-            {
-                selected = output;
-                outputDesc = d;
-                break;
-            }
-            output->Release();
-        }
-        adapter->Release();
-        if (!selected)
-            return false;
-
-        selected->QueryInterface(__uuidof(IDXGIOutput1), reinterpret_cast<void**>(&Output1));
-        selected->QueryInterface(__uuidof(IDXGIOutput5), reinterpret_cast<void**>(&Output5));
-        selected->Release();
-        if (!Output1)
-            return false;
-
-        OutputDesktop = outputDesc.DesktopCoordinates;
-        SdrWhiteScale = QuerySdrWhiteScale(TargetMonitor);
-
-        HRESULT hr = E_FAIL;
-        if (Output5)
-        {
-            const DXGI_FORMAT formats[]{ DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_B8G8R8A8_UNORM };
-            hr = Output5->DuplicateOutput1(OutRunVrFinalTest::Device, 0, 2, formats, &Duplication);
-        }
-        if ((FAILED(hr) || !Duplication) && Output1)
-        {
-            ReleaseCom(Duplication);
-            hr = Output1->DuplicateOutput(OutRunVrFinalTest::Device, &Duplication);
-        }
-        if (FAILED(hr) || !Duplication)
-        {
-            ++CaptureFailure;
-            return false;
-        }
-
-        std::cerr << "[R10] capture output bound desktop="
-                  << (OutputDesktop.right - OutputDesktop.left) << "x"
-                  << (OutputDesktop.bottom - OutputDesktop.top)
-                  << " sdrWhiteScale=" << SdrWhiteScale << "\n";
-        return true;
-    }
-
     inline bool EnsureSource(const D3D11_TEXTURE2D_DESC& desc)
     {
-        if (Source && SourceSrv && SourceWidth == desc.Width && SourceHeight == desc.Height && SourceFormat == desc.Format)
+        if (!OutRunVrFinalTest::Device)
+            return false;
+        if (Source && SourceSrv && SourceWidth == desc.Width &&
+            SourceHeight == desc.Height && SourceFormat == desc.Format)
             return true;
+
         ReleaseCom(SourceSrv);
         ReleaseCom(Source);
-
         D3D11_TEXTURE2D_DESC d{};
         d.Width = desc.Width;
         d.Height = desc.Height;
@@ -480,6 +312,7 @@ float4 PSMain(VSOut input) : SV_Target
         d.BindFlags = D3D11_BIND_SHADER_RESOURCE;
         if (FAILED(OutRunVrFinalTest::Device->CreateTexture2D(&d, nullptr, &Source)) || !Source)
             return false;
+
         D3D11_SHADER_RESOURCE_VIEW_DESC vd{};
         vd.Format = d.Format;
         vd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
@@ -496,62 +329,119 @@ float4 PSMain(VSOut input) : SV_Target
         return true;
     }
 
-    inline bool CaptureDesktop(DWORD timeoutMs)
+    // Called from the production StereoCompositor immediately after its sole
+    // IDXGIOutputDuplication frame has been copied into production source_.
+    // No duplication COM object crosses this boundary.
+    inline bool PublishProductionCapture(ID3D11Texture2D* productionSource,
+        const RECT& outputDesktop, HMONITOR monitor, float sdrWhiteScale,
+        std::int64_t lastPresentQpc) noexcept
     {
-        if (!BindOutput() || !Duplication || !OutRunVrFinalTest::Context)
-            return HaveSource;
+        if (!productionSource || !OutRunVrFinalTest::Device || !OutRunVrFinalTest::Context)
+            return false;
 
-        DXGI_OUTDUPL_FRAME_INFO info{};
-        IDXGIResource* resource = nullptr;
-        const DWORD waitMs = HaveSource ? timeoutMs : std::max<DWORD>(timeoutMs, 1000);
-        const HRESULT hr = Duplication->AcquireNextFrame(waitMs, &info, &resource);
-        if (hr == DXGI_ERROR_WAIT_TIMEOUT)
+        D3D11_TEXTURE2D_DESC desc{};
+        productionSource->GetDesc(&desc);
+        if (desc.SampleDesc.Count != 1 ||
+            (desc.Format != DXGI_FORMAT_B8G8R8A8_UNORM &&
+             desc.Format != DXGI_FORMAT_R16G16B16A16_FLOAT))
+        {
+            ++CaptureFailure;
+            return false;
+        }
+        if (!EnsureSource(desc))
+        {
+            ++CaptureFailure;
+            return false;
+        }
+
+        OutRunVrFinalTest::Context->CopyResource(Source, productionSource);
+        TargetMonitor = monitor;
+        OutputDesktop = outputDesktop;
+        SdrWhiteScale = std::clamp(sdrWhiteScale, 0.25f, 8.f);
+        LastProductionPresentQpc = lastPresentQpc;
+        LastProductionPublishMs = GetTickCount64();
+        HaveSource = true;
+        ++ProductionPublishes;
+        ++CaptureFresh;
+
+        if (!CaptureInfoLogged)
+        {
+            CaptureInfoLogged = true;
+            std::cerr << "[R19] production capture reuse ACTIVE source="
+                      << SourceWidth << "x" << SourceHeight
+                      << " fmt=" << static_cast<int>(SourceFormat)
+                      << " qpc=" << LastProductionPresentQpc
+                      << " duplicateOwner=StereoCompositor-only\n";
+        }
+        return true;
+    }
+
+    // Compatibility name retained for the R10/R13 call graph.  R19 never calls
+    // DuplicateOutput*, AcquireNextFrame or ReleaseFrame here; it only consumes
+    // the latest host-owned texture published by StereoCompositor::Capture().
+    inline bool CaptureDesktop(DWORD /*timeoutMs*/)
+    {
+        if (!HaveSource || !Source || !SourceSrv || !LastProductionPublishMs)
+            return false;
+        if (GetTickCount64() - LastProductionPublishMs > PublishedSourceMaxAgeMs)
         {
             ++CaptureTimeout;
-            return HaveSource;
+            return false;
         }
-        if (FAILED(hr) || !resource)
+        return true;
+    }
+
+    inline bool CreateShaders()
+    {
+        if (Vs && Ps && Sampler && ConstantBuffer)
+            return true;
+        if (!OutRunVrFinalTest::Device)
+            return false;
+
+        ID3DBlob* vsCode = nullptr;
+        ID3DBlob* psCode = nullptr;
+        ID3DBlob* errors = nullptr;
+        HRESULT hr = D3DCompile(BlitShader, std::strlen(BlitShader), "OutRunR19Blit",
+            nullptr, nullptr, "VSMain", "vs_5_0",
+            D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
+            0, &vsCode, &errors);
+        ReleaseCom(errors);
+        if (FAILED(hr) || !vsCode)
+            return false;
+        hr = D3DCompile(BlitShader, std::strlen(BlitShader), "OutRunR19Blit",
+            nullptr, nullptr, "PSMain", "ps_5_0",
+            D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
+            0, &psCode, &errors);
+        ReleaseCom(errors);
+        if (FAILED(hr) || !psCode)
         {
-            ++CaptureFailure;
-            if (hr == DXGI_ERROR_ACCESS_LOST)
-                ResetCapture();
-            return HaveSource;
+            ReleaseCom(vsCode);
+            return false;
         }
 
-        ID3D11Texture2D* texture = nullptr;
-        const HRESULT qi = resource->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&texture));
-        resource->Release();
-        bool copied = false;
-        if (SUCCEEDED(qi) && texture)
-        {
-            D3D11_TEXTURE2D_DESC desc{};
-            texture->GetDesc(&desc);
-            if ((desc.Format == DXGI_FORMAT_B8G8R8A8_UNORM || desc.Format == DXGI_FORMAT_R16G16B16A16_FLOAT) && EnsureSource(desc))
-            {
-                OutRunVrFinalTest::Context->CopyResource(Source, texture);
-                copied = true;
-            }
-            texture->Release();
-        }
-        Duplication->ReleaseFrame();
+        hr = OutRunVrFinalTest::Device->CreateVertexShader(vsCode->GetBufferPointer(),
+            vsCode->GetBufferSize(), nullptr, &Vs);
+        if (SUCCEEDED(hr))
+            hr = OutRunVrFinalTest::Device->CreatePixelShader(psCode->GetBufferPointer(),
+                psCode->GetBufferSize(), nullptr, &Ps);
+        ReleaseCom(vsCode);
+        ReleaseCom(psCode);
+        if (FAILED(hr) || !Vs || !Ps)
+            return false;
 
-        if (copied)
-        {
-            HaveSource = true;
-            ++CaptureFresh;
-            if (!CaptureInfoLogged)
-            {
-                CaptureInfoLogged = true;
-                std::cerr << "[R10] desktop source=" << SourceWidth << "x" << SourceHeight
-                          << " fmt=" << static_cast<int>(SourceFormat)
-                          << " accumulated=" << info.AccumulatedFrames << "\n";
-            }
-        }
-        else
-        {
-            ++CaptureFailure;
-        }
-        return HaveSource;
+        D3D11_SAMPLER_DESC sd{};
+        sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+        sd.AddressU = sd.AddressV = sd.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+        if (FAILED(OutRunVrFinalTest::Device->CreateSamplerState(&sd, &Sampler)))
+            return false;
+
+        D3D11_BUFFER_DESC bd{};
+        bd.ByteWidth = sizeof(BlitParams);
+        bd.Usage = D3D11_USAGE_DYNAMIC;
+        bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+        return SUCCEEDED(OutRunVrFinalTest::Device->CreateBuffer(&bd, nullptr, &ConstantBuffer)) &&
+            ConstantBuffer;
     }
 
     inline bool GetGameUv(UvRect& uv)
@@ -576,7 +466,8 @@ float4 PSMain(VSOut input) : SV_Target
         const long clientW = br.x - tl.x;
         const long clientH = br.y - tl.y;
         if (outputW > 0 && outputH > 0 &&
-            clientW >= static_cast<long>(outputW * 0.90) && clientH >= static_cast<long>(outputH * 0.90))
+            clientW >= static_cast<long>(outputW * 0.90) &&
+            clientH >= static_cast<long>(outputH * 0.90))
         {
             uv = { 0.f, 0.f, 1.f, 1.f };
             return true;
@@ -615,20 +506,23 @@ float4 PSMain(VSOut input) : SV_Target
         return DXGI_FORMAT_UNKNOWN;
     }
 
-    inline bool EnsureSwapchain(Swapchain& swapchain, XrSession session, std::uint32_t width,
-        std::uint32_t height, std::uint32_t arraySize)
+    inline bool EnsureSwapchain(Swapchain& swapchain, XrSession session,
+        std::uint32_t width, std::uint32_t height, std::uint32_t arraySize)
     {
-        if (swapchain.handle != XR_NULL_HANDLE && swapchain.width == width && swapchain.height == height &&
-            swapchain.arraySize == arraySize && !swapchain.images.empty())
+        if (swapchain.handle != XR_NULL_HANDLE && swapchain.width == width &&
+            swapchain.height == height && swapchain.arraySize == arraySize &&
+            !swapchain.images.empty())
             return true;
 
         swapchain.Destroy();
         const DXGI_FORMAT format = ChooseSwapchainFormat(session);
-        if (format == DXGI_FORMAT_UNKNOWN || !width || !height || (arraySize != 1 && arraySize != 2))
+        if (format == DXGI_FORMAT_UNKNOWN || !width || !height ||
+            (arraySize != 1 && arraySize != 2))
             return false;
 
         XrSwapchainCreateInfo create{ XR_TYPE_SWAPCHAIN_CREATE_INFO };
-        create.usageFlags = XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT | XR_SWAPCHAIN_USAGE_SAMPLED_BIT;
+        create.usageFlags = XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT |
+            XR_SWAPCHAIN_USAGE_SAMPLED_BIT;
         create.format = static_cast<std::int64_t>(format);
         create.sampleCount = 1;
         create.width = width;
@@ -640,7 +534,8 @@ float4 PSMain(VSOut input) : SV_Target
             return false;
 
         std::uint32_t imageCount = 0;
-        if (XR_FAILED(::xrEnumerateSwapchainImages(swapchain.handle, 0, &imageCount, nullptr)) || !imageCount)
+        if (XR_FAILED(::xrEnumerateSwapchainImages(swapchain.handle, 0, &imageCount, nullptr)) ||
+            !imageCount)
         {
             swapchain.Destroy();
             return false;
@@ -674,7 +569,8 @@ float4 PSMain(VSOut input) : SV_Target
                     rd.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
                     rd.Texture2D.MipSlice = 0;
                 }
-                if (FAILED(OutRunVrFinalTest::Device->CreateRenderTargetView(swapchain.images[i].texture, &rd, &swapchain.rtvs[i][slice])))
+                if (FAILED(OutRunVrFinalTest::Device->CreateRenderTargetView(
+                    swapchain.images[i].texture, &rd, &swapchain.rtvs[i][slice])))
                 {
                     swapchain.Destroy();
                     return false;
@@ -689,13 +585,16 @@ float4 PSMain(VSOut input) : SV_Target
         return true;
     }
 
-    inline bool RenderTo(ID3D11RenderTargetView* rtv, std::uint32_t width, std::uint32_t height, const UvRect& uv)
+    inline bool RenderTo(ID3D11RenderTargetView* rtv, std::uint32_t width,
+        std::uint32_t height, const UvRect& uv)
     {
-        if (!rtv || !SourceSrv || !ConstantBuffer || !CreateShaders() || !OutRunVrFinalTest::Context)
+        if (!rtv || !SourceSrv || !ConstantBuffer || !CreateShaders() ||
+            !OutRunVrFinalTest::Context)
             return false;
 
         D3D11_MAPPED_SUBRESOURCE mapped{};
-        if (FAILED(OutRunVrFinalTest::Context->Map(ConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped)))
+        if (FAILED(OutRunVrFinalTest::Context->Map(ConstantBuffer, 0,
+            D3D11_MAP_WRITE_DISCARD, 0, &mapped)))
             return false;
         auto* params = static_cast<BlitParams*>(mapped.pData);
         params->uvScale[0] = uv.w;
@@ -732,8 +631,8 @@ float4 PSMain(VSOut input) : SV_Target
         if (!swapchain.acquired)
         {
             XrSwapchainImageAcquireInfo acquire{ XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO };
-            if (XR_FAILED(::xrAcquireSwapchainImage(
-                    swapchain.handle, &acquire, &swapchain.acquiredImage)))
+            if (XR_FAILED(::xrAcquireSwapchainImage(swapchain.handle, &acquire,
+                &swapchain.acquiredImage)))
                 return false;
             swapchain.acquired = true;
             swapchain.waited = false;
@@ -781,8 +680,10 @@ float4 PSMain(VSOut input) : SV_Target
         constexpr std::uint32_t need = OutRunVR::RenderFrameStereoComplete |
             OutRunVR::RenderFrameWorldStereo | OutRunVR::RenderFrameDrawDuplicated |
             OutRunVR::RenderFrameEffectivePoseValid;
-        return frame.state == OutRunVR::StereoSbsActive && frame.frameId && frame.sourcePoseSequence &&
-            (frame.flags & OutRunVR::RenderFramePresentInFlight) == 0 && (frame.flags & need) == need;
+        return frame.state == OutRunVR::StereoSbsActive && frame.frameId &&
+            frame.sourcePoseSequence &&
+            (frame.flags & OutRunVR::RenderFramePresentInFlight) == 0 &&
+            (frame.flags & need) == need;
     }
 
     inline void UpdateStereoFrameCache()
@@ -791,25 +692,50 @@ float4 PSMain(VSOut input) : SV_Target
         std::uint32_t publish = 0;
         if (OutRunVrFinalTest::ReadLatestFrame(frame, publish) && FrameComplete(frame))
         {
+            if (!LastStereoFrameValid || frame.frameId != LastStereoFrame.frameId ||
+                frame.presentQpc != LastStereoFrame.presentQpc)
+                LastStereoFrameMs = GetTickCount64();
             LastStereoFrame = frame;
             LastStereoFrameValid = true;
-            LastStereoFrameMs = GetTickCount64();
         }
     }
 
-    inline bool RenderProjectionOverride(XrSession session, const XrFrameEndInfo* endInfo,
-        XrCompositionLayerProjection& projectionLayer,
+    inline bool PublishedSourceMatches(const OutRunVR::SharedRenderFrameState& frame)
+    {
+        const bool qpcOk = LastProductionPresentQpc > 0 && frame.presentQpc > 0 &&
+            LastProductionPresentQpc >= frame.presentQpc;
+        const bool ageOk = LastProductionPublishMs != 0 &&
+            GetTickCount64() - LastProductionPublishMs <= PublishedSourceMaxAgeMs;
+        if (qpcOk && ageOk)
+            return true;
+        ++SourceQpcRejects;
+        if (!FirstQpcRejectLogged)
+        {
+            FirstQpcRejectLogged = true;
+            std::cerr << "[R19] published source rejected: captureQpc="
+                      << LastProductionPresentQpc << " framePresentQpc=" << frame.presentQpc
+                      << " ageMs=" << (LastProductionPublishMs ?
+                          GetTickCount64() - LastProductionPublishMs : 0)
+                      << " (fallback requires production capture at/after game present)\n";
+        }
+        return false;
+    }
+
+    inline bool RenderProjectionOverride(XrSession session,
+        const XrFrameEndInfo* endInfo, XrCompositionLayerProjection& projectionLayer,
         std::array<XrCompositionLayerProjectionView, 2>& views)
     {
         ++ProjectionAttempts;
         UpdateStereoFrameCache();
         if (!LastStereoFrameValid || GetTickCount64() - LastStereoFrameMs > 500)
             return false;
-        if (!CaptureDesktop(8) || !HaveSource || !SourceSrv || !CreateShaders())
+        if (!CaptureDesktop(0) || !HaveSource || !SourceSrv ||
+            !PublishedSourceMatches(LastStereoFrame) || !CreateShaders())
             return false;
 
         const XrCompositionLayerProjection* incoming = nullptr;
-        if (endInfo && endInfo->layerCount > 0 && endInfo->layers && endInfo->layers[0] &&
+        if (endInfo && endInfo->layerCount > 0 && endInfo->layers &&
+            endInfo->layers[0] &&
             endInfo->layers[0]->type == XR_TYPE_COMPOSITION_LAYER_PROJECTION)
         {
             incoming = reinterpret_cast<const XrCompositionLayerProjection*>(endInfo->layers[0]);
@@ -842,10 +768,12 @@ float4 PSMain(VSOut input) : SV_Target
             Release(Projection);
             return false;
         }
-        bool ok = RenderTo(Projection.rtvs[image][0], Projection.width, Projection.height, eyeUv[0]);
-        ok = RenderTo(Projection.rtvs[image][1], Projection.width, Projection.height, eyeUv[1]) && ok;
-        Release(Projection);
-        if (!ok)
+        bool ok = RenderTo(Projection.rtvs[image][0], Projection.width,
+            Projection.height, eyeUv[0]);
+        ok = RenderTo(Projection.rtvs[image][1], Projection.width,
+            Projection.height, eyeUv[1]) && ok;
+        const bool released = Release(Projection);
+        if (!ok || !released)
             return false;
 
         for (int eye = 0; eye < 2; ++eye)
@@ -859,37 +787,46 @@ float4 PSMain(VSOut input) : SV_Target
             else
             {
                 views[eye].pose.orientation = {
-                    LastStereoFrame.eye[eye].orientation[0], LastStereoFrame.eye[eye].orientation[1],
-                    LastStereoFrame.eye[eye].orientation[2], LastStereoFrame.eye[eye].orientation[3]
+                    LastStereoFrame.eye[eye].orientation[0],
+                    LastStereoFrame.eye[eye].orientation[1],
+                    LastStereoFrame.eye[eye].orientation[2],
+                    LastStereoFrame.eye[eye].orientation[3]
                 };
                 views[eye].pose.position = {
-                    LastStereoFrame.eye[eye].position[0], LastStereoFrame.eye[eye].position[1],
+                    LastStereoFrame.eye[eye].position[0],
+                    LastStereoFrame.eye[eye].position[1],
                     LastStereoFrame.eye[eye].position[2]
                 };
                 views[eye].fov = {
-                    LastStereoFrame.eye[eye].fov.angleLeft, LastStereoFrame.eye[eye].fov.angleRight,
-                    LastStereoFrame.eye[eye].fov.angleUp, LastStereoFrame.eye[eye].fov.angleDown
+                    LastStereoFrame.eye[eye].fov.angleLeft,
+                    LastStereoFrame.eye[eye].fov.angleRight,
+                    LastStereoFrame.eye[eye].fov.angleUp,
+                    LastStereoFrame.eye[eye].fov.angleDown
                 };
             }
             views[eye].subImage.swapchain = Projection.handle;
             views[eye].subImage.imageRect.offset = { 0, 0 };
             views[eye].subImage.imageRect.extent = {
-                static_cast<std::int32_t>(Projection.width), static_cast<std::int32_t>(Projection.height)
+                static_cast<std::int32_t>(Projection.width),
+                static_cast<std::int32_t>(Projection.height)
             };
             views[eye].subImage.imageArrayIndex = eye;
         }
 
         projectionLayer = { XR_TYPE_COMPOSITION_LAYER_PROJECTION };
-        projectionLayer.space = incoming && incoming->space != XR_NULL_HANDLE ? incoming->space : OutRunVrFinalTest::LocalSpace;
+        projectionLayer.space = incoming && incoming->space != XR_NULL_HANDLE
+            ? incoming->space : OutRunVrFinalTest::LocalSpace;
         projectionLayer.viewCount = 2;
         projectionLayer.views = views.data();
         ++ProjectionSuccess;
         if (!ProjectionLogged)
         {
             ProjectionLogged = true;
-            std::cerr << "[R10] GAME projection override ACTIVE source=" << SourceWidth << "x" << SourceHeight
+            std::cerr << "[R19] GAME projection fallback ACTIVE productionSource="
+                      << SourceWidth << "x" << SourceHeight
                       << " eyeSwapchain=" << Projection.width << "x" << Projection.height
-                      << " uv=" << whole.x << "," << whole.y << "," << whole.w << "," << whole.h << "\n";
+                      << " captureQpc=" << LastProductionPresentQpc
+                      << " framePresentQpc=" << LastStereoFrame.presentQpc << "\n";
         }
         return true;
     }
@@ -907,17 +844,16 @@ float4 PSMain(VSOut input) : SV_Target
     inline bool RenderTheaterOverride(XrSession session, XrCompositionLayerQuad& quad)
     {
         ++TheaterAttempts;
-        if (!CaptureDesktop(0) || !HaveSource || !SourceSrv || !CreateShaders() || !EnsureViewSpace(session))
+        if (!CaptureDesktop(0) || !HaveSource || !SourceSrv ||
+            !CreateShaders() || !EnsureViewSpace(session))
             return false;
 
         UvRect whole{};
         if (!GetGameUv(whole))
             return false;
-
-        const std::uint32_t width = 1920;
-        const std::uint32_t height = 1080;
-        if (!EnsureSwapchain(Theater, session, width, height, 1))
+        if (!EnsureSwapchain(Theater, session, 1920, 1080, 1))
             return false;
+
         std::uint32_t image = 0;
         if (!Acquire(Theater, image))
             return false;
@@ -927,8 +863,8 @@ float4 PSMain(VSOut input) : SV_Target
             return false;
         }
         const bool ok = RenderTo(Theater.rtvs[image][0], Theater.width, Theater.height, whole);
-        Release(Theater);
-        if (!ok)
+        const bool released = Release(Theater);
+        if (!ok || !released)
             return false;
 
         quad = { XR_TYPE_COMPOSITION_LAYER_QUAD };
@@ -938,17 +874,21 @@ float4 PSMain(VSOut input) : SV_Target
         quad.pose.position.z = -1.5f;
         quad.subImage.swapchain = Theater.handle;
         quad.subImage.imageRect.offset = { 0, 0 };
-        quad.subImage.imageRect.extent = { static_cast<std::int32_t>(Theater.width), static_cast<std::int32_t>(Theater.height) };
+        quad.subImage.imageRect.extent = {
+            static_cast<std::int32_t>(Theater.width),
+            static_cast<std::int32_t>(Theater.height)
+        };
         quad.subImage.imageArrayIndex = 0;
-        const float aspect = whole.h > 0.f ? (whole.w * SourceWidth) / (whole.h * SourceHeight) : (16.f / 9.f);
+        const float aspect = whole.h > 0.f
+            ? (whole.w * SourceWidth) / (whole.h * SourceHeight) : (16.f / 9.f);
         quad.size.width = 2.f;
         quad.size.height = 2.f / std::max(0.5f, aspect);
         ++TheaterSuccess;
         if (!TheaterLogged)
         {
             TheaterLogged = true;
-            std::cerr << "[R10] MENU theater override ACTIVE source=" << SourceWidth << "x" << SourceHeight
-                      << " uv=" << whole.x << "," << whole.y << "," << whole.w << "," << whole.h << "\n";
+            std::cerr << "[R19] MENU theater fallback ACTIVE source="
+                      << SourceWidth << "x" << SourceHeight << "\n";
         }
         return true;
     }
@@ -959,31 +899,40 @@ float4 PSMain(VSOut input) : SV_Target
         if (now - LastSummaryMs < 5000)
             return;
         LastSummaryMs = now;
-        std::cerr << "[R10] summary build=" << BuildId
+        std::cerr << "[R19] summary build=" << BuildId
                   << " end=" << EndFrames
-                  << " capture[fresh=" << CaptureFresh << ",timeout=" << CaptureTimeout << ",fail=" << CaptureFailure << "]"
-                  << " projection[try=" << ProjectionAttempts << ",ok=" << ProjectionSuccess << ",mainSeen=" << MainProjectionSeen << "]"
-                  << " theater[try=" << TheaterAttempts << ",ok=" << TheaterSuccess << ",mainSeen=" << MainQuadSeen << "]"
-                  << " source=" << SourceWidth << "x" << SourceHeight << " fmt=" << static_cast<int>(SourceFormat)
-                  << " frame=" << (LastStereoFrameValid ? LastStereoFrame.frameId : 0) << "\n";
+                  << " capture[published=" << ProductionPublishes
+                  << ",fresh=" << CaptureFresh << ",stale=" << CaptureTimeout
+                  << ",fail=" << CaptureFailure << ",qpcReject=" << SourceQpcRejects << "]"
+                  << " projection[try=" << ProjectionAttempts << ",ok=" << ProjectionSuccess
+                  << ",mainSeen=" << MainProjectionSeen << "]"
+                  << " theater[try=" << TheaterAttempts << ",ok=" << TheaterSuccess
+                  << ",mainSeen=" << MainQuadSeen << "]"
+                  << " source=" << SourceWidth << "x" << SourceHeight
+                  << " fmt=" << static_cast<int>(SourceFormat)
+                  << " captureQpc=" << LastProductionPresentQpc
+                  << " frame=" << (LastStereoFrameValid ? LastStereoFrame.frameId : 0)
+                  << "\n";
     }
 
     inline XrResult XRAPI_CALL EndFrame(XrSession session, const XrFrameEndInfo* endInfo)
     {
         ++EndFrames;
-        if (!Enabled() || !endInfo || !OutRunVrFinalTest::Device || !OutRunVrFinalTest::Context)
+        if (!Enabled() || !endInfo || !OutRunVrFinalTest::Device ||
+            !OutRunVrFinalTest::Context)
             return OutRunVrFinalTest::EndFrame(session, endInfo);
 
         UpdateStereoFrameCache();
-        const bool gameplay = LastStereoFrameValid && GetTickCount64() - LastStereoFrameMs <= 500;
+        const bool gameplay = LastStereoFrameValid &&
+            GetTickCount64() - LastStereoFrameMs <= 500;
 
         XrFrameEndInfo patched = *endInfo;
         const XrCompositionLayerBaseHeader* layerPtr = nullptr;
         XrCompositionLayerProjection projection{};
         std::array<XrCompositionLayerProjectionView, 2> views{};
         XrCompositionLayerQuad quad{};
-
         bool replaced = false;
+
         if (gameplay)
         {
             if (RenderProjectionOverride(session, endInfo, projection, views))
@@ -1021,3 +970,17 @@ float4 PSMain(VSOut input) : SV_Target
 
 #define xrEndFrame OutRunVrSbsCaptureOverride::EndFrame
 #define xrDestroySession OutRunVrSbsCaptureOverride::DestroySession
+
+// The production StereoCompositor is defined later in main.cpp.  That source has
+// exactly one IDXGIOutputDuplication::ReleaseFrame() call.  Because this header is
+// MSVC forced-included before main.cpp, instrument that one call to publish the
+// already-copied production source_ into the R19 fallback snapshot.  The macro's
+// self-token is not recursively expanded during its own replacement.
+//
+// IMPORTANT: this does not create, acquire, release or retain a second
+// IDXGIOutputDuplication object; it only performs a D3D11 CopyResource from the
+// production-owned source_ after the production duplication frame is released.
+#define ReleaseFrame() ReleaseFrame(); \
+    OutRunVrSbsCaptureOverride::PublishProductionCapture( \
+        copied ? source_ : nullptr, outputDesktop_, targetMonitor_, sdrWhiteScale_, \
+        fi.LastPresentTime.QuadPart)
