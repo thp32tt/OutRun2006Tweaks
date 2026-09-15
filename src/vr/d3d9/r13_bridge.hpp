@@ -55,9 +55,22 @@ namespace OutRunVRStereo
     // auxiliary/MRT pass cannot be treated as world stereo by one layer and as
     // stock/offscreen by the other.
 
+    struct PoseInjectionSnapshot
+    {
+        OutRunVR::PassPolicy::PoseInjectionPolicy policy =
+            OutRunVR::PassPolicy::PoseInjectionPolicy::AuxiliaryStock;
+        bool legacyMainBackbufferInvariant = false;
+    };
+
+    // Read the mutable D3D9 pass signals once, then derive both the centralized
+    // policy and the legacy compatibility invariant from that same snapshot.
+    // This prevents a render-state transition between two separate reads from
+    // being misdiagnosed as a classifier disagreement.
+    PoseInjectionSnapshot CurrentPoseInjectionSnapshot() noexcept;
+
     OutRunVR::PassPolicy::PoseInjectionPolicy CurrentPoseInjectionPolicy() noexcept;
 
     // Compatibility helper used by the validated base renderer. New R13 code
-    // should prefer CurrentPoseInjectionPolicy() when it needs the full class.
+    // that compares both classifications should prefer CurrentPoseInjectionSnapshot().
     bool IsMainBackbufferPoseInjectionPass() noexcept;
 }
