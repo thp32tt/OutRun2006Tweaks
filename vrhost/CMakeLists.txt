@@ -28,8 +28,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(openxr_sdk)
 
-# Legacy runtime entrypoint. Runtime behavior is migrated behind the interfaces
-# under src/runtime and frame_source.hpp one ownership boundary at a time.
 add_executable(outrun-vr-host
     src/main.cpp
     src/ipc/v3_shadow_bridge.cpp
@@ -41,14 +39,15 @@ target_include_directories(outrun-vr-host PRIVATE
 )
 target_compile_definitions(outrun-vr-host PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 if(MSVC)
-    # Keep the application API at OpenXR 1.0 for VDXR 1.0.x. R10 supplies the
-    # stable classic-D3D9/Desktop-Dup fallback; the final forced include gives a
-    # verified D3D9Ex shared-eye projection priority when direct transport is
-    # actually active. Forced-include order is intentional.
+    # Forced-include order is the runtime ownership stack. The final review
+    # hardening layer makes the exact core projection authoritative, uses R10
+    # only as a fresh classic-D3D9 fallback, and prevents direct D3D9Ex failure
+    # from being misinterpreted as an SBS desktop frame.
     target_compile_options(outrun-vr-host PRIVATE
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/openxr_api_compat.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/sbs_capture_override.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/d3d9ex_direct_passthrough.hpp"
+        "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/review_hardening.hpp"
     )
 endif()
 target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi d3dcompiler user32)

@@ -31,6 +31,7 @@ profiles = read('src/wheel_profile_store.hpp')
 runtime = read('src/wheel_ffb_runtime.hpp')
 build = read('src/hooks_wheel_ffb_build.cpp')
 ini = read('OutRun2006Tweaks.ini')
+workflow = read('.github/workflows/build.yml')
 
 if (ROOT / 'src/hooks_wheel_physics_sat.hpp').exists():
     raise SystemExit('CURRENT VERIFY FAILED [obsolete Physics SAT helper still active]')
@@ -52,6 +53,13 @@ for rel, text in [
     print(f'OK [brace balance {rel}]')
 
 req(ini, 'UseNewInput = true', 'shipped SDL multi-device input default')
+for rel in (
+    'src/wheel_profile_store.hpp', 'src/hooks_input.cpp',
+    'src/overlay/settings_ui.cpp', 'src/overlay/overlay.cpp',
+    'CMakeLists.txt', 'cmake.toml', 'README.md', 'WHEEL_FFB.md',
+    'RELEASE_NOTES_v0.1.md', '.github/workflows/build.yml',
+):
+    req(workflow, rel, f'source snapshot includes verifier dependency {rel}')
 req(input_cpp, 'float InputManager_SteeringValue()', 'InputManager steering bridge exported')
 req(ffb, 'const float steering = InputManager_SteeringValue();', 'SAT reads active InputManager steering')
 req(input_cpp, 'SDL_GetJoysticks', 'SDL raw joystick enumeration')
@@ -74,6 +82,40 @@ forbid(wheel_ui, 'Settings::WheelMenuR3DirectAB = false;', 'universal toggle pre
 forbid(wheel_ui, 'Restart after changing the physical wheel base', 'FFB selector does not demand unnecessary restart')
 
 req(ffb, 'GUID_ConstantForce', 'DirectInput ConstantForce effect')
+req(ffb, '#include "Proxy.hpp"', 'FFB backend can access original proxy module')
+req(ffb, 'GetProcAddress(proxy::origModule, "DirectInput8Create")', 'FFB backend uses original Windows DirectInput export')
+forbid(ffb, 'createDirectInput = &::DirectInput8Create;', 'FFB backend never falls back through its own dinput8 proxy export')
+req(ffb, 'std::vector<FailedInterfaceState> failedInterfaces_;', 'FFB backend can quarantine multiple rejected interfaces')
+req(ffb, 'active_failed_interface_count()', 'FFB backend walks all rejected candidates instead of only one sibling')
+req(ffb, 'const bool ready = initialize();', 'FFB candidate probing performs one potentially expensive interface open per update tick')
+req(ffb, 'next compatible interface will be probed on the next update tick', 'rejected sibling probing yields back to the game thread')
+forbid(ffb, 'while (!ready)', 'FFB candidate probing never loops over multiple device opens in one frame')
+forbid(ffb, 'MaxInterfaceProbes', 'FFB candidate probing has no arbitrary interface-count ceiling')
+req(ffb, 'DIPROP_VIDPID', 'FFB sibling selection can prefer matching physical VID/PID')
+req(ffb, 'requirePreferredProductGuid', 'FFB sibling selection prefers the DirectInput product GUID for one physical device')
+req(ffb, 'instance->guidFFDriver', 'FFB sibling selection can use the force-feedback driver identity')
+req(ffb, 'requirePreferredDriverVendor', 'FFB sibling selection can fall back to same FFB driver plus USB vendor')
+req(ffb, 'requirePreferredVidPid', 'FFB sibling selection has a same-VID/PID pass before name fallback')
+req(ffb, 'DWORD axes[2] = { DIJOFS_X, DIJOFS_Y };', 'ConstantForce tries canonical X/Y polar descriptor independent of actuator count')
+req(ffb, 'detected actuator one-axis CARTESIAN descriptor', 'ConstantForce can fall back to the actual enumerated actuator axis')
+req(ffb, 'for (const DWORD detectedAxis : actuatorAxes_)', 'ConstantForce probes every enumerated actuator axis after canonical X')
+forbid(ffb, 'actuatorAxes_.size() < 2', 'FFB actuator enumeration is not arbitrarily capped at two objects')
+req(ffb, 'zero-force live SetParameters probe', 'ConstantForce candidate must validate the live update path at zero torque')
+req(ffb, 'mark_selected_interface_failed("ConstantForce live SetParameters", hr)', 'runtime ConstantForce failure quarantines the bad interface before reinit')
+req(ffb, 'FFB_CONSTANT_LIVE_FAILURE_LIMIT = 3', 'runtime ConstantForce quarantine requires repeated live-output failure')
+req(ffb, 'if (!record_constant_live_failure())', 'single ConstantForce live-output failure is retained as transient')
+req(ffb, 'transient ConstantForce update failure', 'transient ConstantForce failures are logged without immediate interface blacklist')
+req(ffb, 'if (!tick_before(retryNow, retryAfter_))', 'transient short retry is not overwritten by rejected-interface backoff')
+req(ffb, 'previous rejected-interface quarantine must not', 'FFB disable hard-resets failed-interface recovery state')
+req(ffb, 'if (!reacquire_after_input_loss("ConstantForce", hr) || !constantEffect_)', 'ConstantForce transient input loss keeps the recovery grace window')
+req(ffb, 'if (!reacquire_after_input_loss("GUID_Spring", hr))', 'Spring transient input loss keeps the recovery grace window')
+req(ffb, 'if (!reacquire_after_input_loss("GUID_Damper", hr))', 'Damper transient input loss keeps the recovery grace window')
+req(ffb, 'if (!reacquire_after_input_loss("GUID_Sine periodic", hr))', 'Periodic transient input loss keeps the recovery grace window')
+req(ffb, 'game window not available yet; retrying shortly', 'missing game window uses the short device retry')
+req(ffb, 'Settings::write(Module::UserIniPath)', 'auto-selected working FFB GUID is persisted for the next launch')
+req(ffb, 'saved FFB GUID unavailable or rejected; probing compatible sibling interfaces', 'saved FFB GUID can fall back to sibling interface')
+req(ffb, 'FFB_DEVICE_FAILED_BACKOFF_MS = 10000', 'failed FFB interface retry is throttled')
+req(ffb, 'device_->SendForceFeedbackCommand(DISFFC_RESET)', 'FFB interface reset before actuator enable')
 req(ffb, 'GUID_Spring', 'DirectInput Spring effect')
 req(ffb, 'GUID_Damper', 'DirectInput Damper effect')
 req(ffb, 'WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)', 'post-physics FFB entry point')
@@ -294,8 +336,7 @@ req(ffb, 'DWORD constantRecreateHoldoffUntil_ = 0;', 'ConstantForce recreation h
 req(ffb, 'DWORD periodicRecreateHoldoffUntil_ = 0;', 'periodic recreation has an independent holdoff')
 req(ffb, 'tick_before(now, constantRecreateHoldoffUntil_)', 'ConstantForce retries use the steering-specific holdoff')
 req(ffb, 'tick_reached(GetTickCount(), periodicRecreateHoldoffUntil_)', 'periodic retries use the periodic-specific holdoff')
-req(ffb, 'constantEffectPolar_ = true;\n                    prevConstantLevel_ = 0;\n                    lastConstantWriteTick_ = 0;', 'new POLAR ConstantForce resets accepted-output cache')
-req(ffb, 'constantEffectPolar_ = false;\n            prevConstantLevel_ = 0;\n            lastConstantWriteTick_ = 0;', 'new CARTESIAN ConstantForce resets accepted-output cache')
+req(ffb, 'constantEffectPolar_ = polar;\n                prevConstantLevel_ = 0;\n                lastConstantWriteTick_ = 0;', 'validated ConstantForce descriptor resets accepted-output cache')
 req(bind_ui, 'Press Up on the wheel D-pad/POV, or another menu button.', 'Quick Setup captures menu Up')
 req(bind_ui, 'Press Right on the wheel D-pad/POV, or another menu button.', 'Quick Setup captures menu Right')
 req(bind_ui, 'Press Down on the wheel D-pad/POV, or another menu button.', 'Quick Setup captures menu Down')
@@ -339,7 +380,6 @@ req(read('src/hooks_wheel_r3_menu_ab.hpp'), 'Settings::WheelMenuR3DirectAB.hidde
 req(read('src/overlay/settings_ui.cpp'), 'matches_search("Input Bindings", search)', 'settings search can still surface Input Bindings')
 req(read('src/overlay/overlay.cpp'), 'Wheel users: configure steering, pedals, buttons and menu controls in Input Bindings', 'first-run overlay explains wheel input ownership')
 release_notes = read('RELEASE_NOTES_v0.1.md')
-discord_share = read('DISCORD_SHARE_v0.1.md')
 req(release_notes, 'Load Universal Physics SAT', 'release notes name the current universal Physics preset')
 req(release_notes, 'Save Force Feedback', 'release notes explain FFB persistence')
 req(readme, 'Engine Vibration', 'README documents optional engine vibration')
@@ -348,8 +388,6 @@ req(release_notes, 'Engine Vibration', 'release notes document optional engine v
 req(release_notes, '기본 OFF', 'Korean release notes document engine vibration default off')
 forbid(release_notes, 'MOZA R3 v0.1 (default)', 'release notes have no deleted preset button')
 forbid(release_notes, 'Dynamic Damping** | **0.42', 'release notes have no obsolete damping table')
-req(discord_share, 'Dynamic Damping 0.28', 'Discord share uses the current Physics damping')
-forbid(discord_share, 'Damping 0.42', 'Discord share has no obsolete damping value')
 print('CURRENT WHEEL FFB STRUCTURE VERIFIED; run verify_wheel_ffb_math.py for numerical tests')
 
 
@@ -390,7 +428,7 @@ req(wheel_ui, 'bool debugLog = true;', 'FFB revert baseline includes diagnostic 
 req(wheel_ui, 'savedFfb_.telemetry = Settings::WheelFFBTelemetry;', 'FFB revert baseline includes telemetry')
 req(wheel_ui, 'if (currentSaved)\n                            capture_saved_ffb();', 'saving a named FFB profile refreshes the revert baseline')
 req(wheel_ui, 'return !known ? "unknown" : (dynamic ? "yes" : "no");', 'FFB capability UI distinguishes unknown from yes')
-req(wheel_ui, 'const bool ffbReady = !Settings::WheelFFBEnable || ffbStatus.initialized;', 'Ready checklist does not treat a disconnected saved GUID as ready')
+req(wheel_ui, 'pending(\"FFB device (starts in gameplay)\");', 'Ready checklist treats menu-time FFB runtime as pending, not failed')
 forbid(wheel_ui, '#include <cstdint>\n#include <cstdio>\n#include <cstdint>', 'duplicate cstdint include')
 
 # debug10-regression-guards
@@ -408,7 +446,7 @@ req(profiles, 'Failed while closing staged FFB profile.', 'FFB profile close fai
 req(profiles, 'Failed while closing wheel-specific input options.', 'input profile option close failures are reported')
 req(wheel_ui, 'capture_saved_ffb();\n                status_ = "Saved to OutRun2006Tweaks.user.ini";', 'legacy full user.ini save refreshes FFB revert baseline')
 req(wheel_ui, 'capture_saved_ffb();\n                    status_ = "Selected FFB output and saved its exact DirectInput GUID.', 'FFB output selection refreshes revert baseline after full user.ini persistence')
-req(wheel_ui, 'OutRun2006Tweaks.profiles\\\\FFB', 'FFB profile folder path escapes backslash')
+req(wheel_ui, 'WheelProfileStore::directory(WheelProfileStore::Kind::ForceFeedback).string()', 'FFB page shows the actual runtime profile folder')
 
 
 # engine-vibration-v02-regression-guards
@@ -444,3 +482,17 @@ if build.count('snowCurbHoldUntil = now + SnowCurbHoldMs;') != 1:
     raise SystemExit('CURRENT VERIFY FAILED [snow curb hold deadline is re-armed outside confirmed mixed snow contact]')
 print('OK [snow curb hold deadline has one confirmed-contact re-arm site]')
 forbid(build, 'Extend while all tyres remain on the identified curb/shoulder.', 'uniform curb contact cannot indefinitely refresh snow latch')
+
+# v0.3 hardware compatibility regression guards
+req(profiles, 'std::filesystem::copy_file(', 'named profile save has rename-to-copy fallback for Windows driver/filter edge cases')
+req(profiles, 'Profile installation could not be verified.', 'named profile save verifies the final file exists')
+req(wheel_ui, 'Direction test (not run)', 'direction-test checklist distinguishes pending from failure')
+req(wheel_ui, 'Waiting / released / inactive is normal outside gameplay.', 'runtime status explains menu-time idle state')
+req(wheel_ui, 'FFB profile save failed:', 'profile persistence failures are explicit')
+req(wheel_ui, 'spdlog::error("{}", status_);', 'profile persistence failure is logged for remote testers')
+
+# first-save profile regression guards
+req(profiles, 'ec == std::errc::no_such_file_or_directory', 'missing profile is a normal first-save state')
+req(profiles, 'inspect_regular_file(finalPath, finalExists, "the existing profile")', 'final profile existence check uses missing-safe helper')
+req(profiles, 'inspect_regular_file(backup, backupExists, "the profile backup")', 'backup existence check uses missing-safe helper')
+forbid(profiles, 'if (!finalExists && std::filesystem::is_regular_file(backup, ec) && !ec)', 'backup probe no longer treats missing backup as filesystem failure')

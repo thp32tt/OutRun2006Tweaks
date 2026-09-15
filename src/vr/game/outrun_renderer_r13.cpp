@@ -1,4 +1,4 @@
-// R13 renderer-pose hardening wrapper.  The validated renderer is included in
+// R13 renderer-pose hardening wrapper. The validated renderer is included in
 // this TU; cmake marks outrun_renderer.cpp HEADER_FILE_ONLY.
 
 #include "vr/d3d9/r13_bridge.hpp"
@@ -21,7 +21,7 @@ namespace OutRunVRRenderer
                 !OutRunVRStereo::IsMainBackbufferPoseInjectionPass())
             {
                 // Reflection, shadow and other auxiliary world targets must keep
-                // the stock game WVP.  Applying the HMD transform here bakes a
+                // the stock game WVP. Applying the HMD transform here bakes a
                 // head-relative view into textures later sampled by both eyes.
                 InvalidateVerifiedWvp();
                 ++R13OffscreenWvpBypasses;
@@ -49,13 +49,26 @@ namespace OutRunVRRenderer
                         reinterpret_cast<void*>(&SetVertexShaderConstantFDest),
                         SetVertexShaderConstantFDestR13);
                     if (R13WvpCallbackHook)
+                    {
                         spdlog::info("VR R13: renderer WVP target-classification guard armed");
+                    }
                     else
-                        spdlog::error("VR R13: failed to hook renderer c64 callback");
+                    {
+                        // The offscreen guard is a correctness boundary, not an
+                        // optional diagnostic. If it cannot be installed, remove
+                        // the base c64 injection hook instead of allowing HMD WVP
+                        // transforms to leak into reflection/shadow targets.
+                        SetVertexShaderConstantFHook = {};
+                        InvalidateVerifiedWvp();
+                        spdlog::error(
+                            "VR R13: failed to hook renderer c64 callback; base WVP injection removed to fail closed");
+                    }
                     return 0;
                 }
                 Sleep(25);
             }
+            spdlog::warn(
+                "VR R13: renderer c64 callback did not become ready; target-classification guard not installed");
             return 0;
         }
 

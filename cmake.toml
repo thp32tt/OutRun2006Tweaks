@@ -60,15 +60,12 @@ type = "static"
 sources = ["external/spdlog/src/*.cpp"]
 include-directories = ["external/spdlog/include"]
 compile-definitions = ["SPDLOG_COMPILED_LIB", "_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR"]
-# /utf-8: newer fmt (bundled in spdlog) #errors out on MSVC unless the source
-# and execution charsets are both UTF-8. It is a header-level check, so every
-# TU that includes spdlog needs this - see outrun2006tweaks below.
 compile-options = ["/utf-8"]
 
 [fetch-content]
 ogg = { git = "https://github.com/xiph/ogg", tag = "v1.3.6" }
 flac = { git = "https://github.com/xiph/flac", tag = "1.5.0" }
-miniupnpc = { git = "https://github.com/miniupnp/miniupnp", tag = "miniupnpc_2_3_10", subdir = "miniupnpc" }
+miniupnpc = { git = "https://github.com/miniupnp/miniupnp", tag = "miniupnpd_2_3_10", subdir = "miniupnpc" }
 jsoncpp = { git = "https://github.com/open-source-parsers/jsoncpp.git", tag = "1.9.8" }
 zlib = { git = "https://github.com/madler/zlib", tag = "v1.3.2" }
 sdl = { git = "https://github.com/libsdl-org/SDL", tag = "release-3.4.12" }

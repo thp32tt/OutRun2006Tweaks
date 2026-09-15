@@ -989,14 +989,22 @@ namespace
                         ffbDirty_ = !currentSaved;
                         if (currentSaved)
                             capture_saved_ffb();
+                        std::string pathError;
+                        const auto savedPath = WheelProfileStore::profile_path(
+                            WheelProfileStore::Kind::ForceFeedback, requested, &pathError);
+                        const std::string savedWhere = savedPath ? savedPath->string() : requested;
                         status_ = currentSaved
-                            ? "FFB profile saved: " + requested
-                            : "FFB profile saved, but current user.ini settings could not be persisted.";
+                            ? "FFB profile saved: " + savedWhere
+                            : "FFB profile saved to " + savedWhere + ", but current user.ini settings could not be persisted.";
                         confirmingFfbOverwrite_ = false;
                         refresh_ffb_profiles(requested);
                     }
                     else
-                        status_ = error;
+                    {
+                        status_ = "FFB profile save failed: " + error + " Folder: " +
+                            WheelProfileStore::directory(WheelProfileStore::Kind::ForceFeedback).string();
+                        spdlog::error("{}", status_);
+                    }
                 }
             }
 
@@ -1056,7 +1064,9 @@ namespace
             ImGui::SameLine();
             if (ImGui::Button("Refresh FFB profiles"))
                 refresh_ffb_profiles(selected_ffb_profile() ? *selected_ffb_profile() : std::string{});
-            ImGui::TextDisabled("Profile folder: OutRun2006Tweaks.profiles\\FFB");
+            const std::string ffbProfileFolder =
+                WheelProfileStore::directory(WheelProfileStore::Kind::ForceFeedback).string();
+            ImGui::TextDisabled("Profile folder: %s", ffbProfileFolder.c_str());
         }
 
         void save()
@@ -1500,22 +1510,42 @@ namespace
                     bound(InputManager::ActionKind::Switch, int(SwitchId::SelectionRight));
                 const auto readiness = [](const char* label, bool ok)
                 {
-                    ImGui::TextColored(ok ? ImVec4(0.35f, 0.90f, 0.45f, 1.0f) : ImVec4(1.0f, 0.70f, 0.20f, 1.0f),
+                    ImGui::TextColored(ok ? ImVec4(0.35f, 0.90f, 0.45f, 1.0f) : ImVec4(1.0f, 0.45f, 0.25f, 1.0f),
                         "%s %s", ok ? "[OK]" : "[!]", label);
+                };
+                const auto pending = [](const char* label)
+                {
+                    ImGui::TextColored(ImVec4(0.85f, 0.78f, 0.35f, 1.0f), "[..] %s", label);
                 };
                 readiness("Steering", steeringReady);
                 ImGui::SameLine(); readiness("Pedals", accelReady && brakeReady);
                 ImGui::SameLine(); readiness("Shifters", driveButtonsReady);
                 readiness("Menu controls", menuReady);
-                const bool ffbReady = !Settings::WheelFFBEnable || ffbStatus.initialized;
-                ImGui::SameLine(); readiness(Settings::WheelFFBEnable ? "FFB device" : "FFB disabled", ffbReady);
-                ImGui::SameLine(); readiness("Direction test", !Settings::WheelFFBEnable || ffbStatus.directionTested);
+                const bool gameplayFfbWindow = Game::is_in_game();
+                ImGui::SameLine();
+                if (!Settings::WheelFFBEnable)
+                    readiness("FFB disabled", true);
+                else if (ffbStatus.initialized)
+                    readiness("FFB device", true);
+                else if (!gameplayFfbWindow)
+                    pending("FFB device (starts in gameplay)");
+                else
+                    readiness("FFB device", false);
+                ImGui::SameLine();
+                if (!Settings::WheelFFBEnable || ffbStatus.directionTested)
+                    readiness("Direction test", true);
+                else
+                    pending("Direction test (not run)");
 
                 ImGui::SeparatorText("FFB Runtime Status");
                 ImGui::Text("Engine: %s   Device: %s   Output owner: %s",
                     ffbStatus.initialized ? "ready" : "waiting",
                     ffbStatus.acquired ? "acquired" : "released",
                     ffbStatus.outputOwner ? "active" : "inactive");
+                if (Settings::WheelFFBEnable && !ffbStatus.initialized && !gameplayFfbWindow)
+                    ImGui::TextDisabled("Waiting / released / inactive is normal outside gameplay. The saved FFB GUID is acquired when driving starts.");
+                if (Settings::WheelFFBEnable && !ffbStatus.directionTested)
+                    ImGui::TextDisabled("Direction test is a setup confirmation, not a hardware error. Run Test Left/Right after the FFB engine is ready.");
                 ImGui::Text("Effects: Constant %s | Spring %s | Damper %s | Periodic %s",
                     ffbStatus.constantEffect ? "HW" : "-",
                     ffbStatus.springEffect ? "HW" : "SW",
