@@ -24,6 +24,18 @@ namespace OutRunVRRenderer
             projectionM44 = 0.0f;
 
             const auto targetPolicy = OutRunVRStereo::CurrentPoseInjectionPolicy();
+            const bool mainBackbufferPosePass =
+                OutRunVRStereo::IsMainBackbufferPoseInjectionPass();
+
+            // Preserve the original R13 cross-TU invariant while consuming the
+            // richer centralized policy. The compatibility helper and enum must
+            // describe the same pass; disagreement fails closed instead of
+            // guessing whether HMD pose injection is safe.
+            const bool policySaysMain =
+                targetPolicy == OutRunVR::PassPolicy::PoseInjectionPolicy::MainBackbuffer;
+            if (mainBackbufferPosePass != policySaysMain)
+                return OutRunVR::PassPolicy::RenderSemantic::Unknown;
+
             if (targetPolicy != OutRunVR::PassPolicy::PoseInjectionPolicy::MainBackbuffer)
             {
                 return OutRunVR::PassPolicy::ClassifyRenderSemantic(
