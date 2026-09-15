@@ -41,34 +41,46 @@ namespace OutRunVRRenderer
 
         DWORD WINAPI R13RendererInstallThread(void*)
         {
-            for (int attempt = 0; attempt < 1200; ++attempt)
+            for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                if (SetVertexShaderConstantFHook)
+                const std::uint32_t rendererState =
+                    RendererInstallState.load(std::memory_order_acquire);
+                if (rendererState == RendererInstallFailed)
+                {
+                    RendererInjectionAllowed.store(false, std::memory_order_release);
+                    InvalidateVerifiedWvp();
+                    spdlog::error(
+                        "VR R13: base renderer hook transaction failed; WVP injection remains disabled");
+                    return 0;
+                }
+                if (rendererState == RendererInstallReady)
                 {
                     R13WvpCallbackHook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&SetVertexShaderConstantFDest),
                         SetVertexShaderConstantFDestR13);
                     if (R13WvpCallbackHook)
                     {
-                        spdlog::info("VR R13: renderer WVP target-classification guard armed");
+                        spdlog::info(
+                            "VR R13: renderer WVP target-classification guard armed via atomic renderer install handoff");
                     }
                     else
                     {
-                        // The offscreen guard is a correctness boundary, not an
-                        // optional diagnostic. If it cannot be installed, remove
-                        // the base c64 injection hook instead of allowing HMD WVP
-                        // transforms to leak into reflection/shadow targets.
-                        SetVertexShaderConstantFHook = {};
+                        // Do not mutate a SafetyHookInline owned by another thread.
+                        // The base callback stays installed but becomes a stock-WVP
+                        // pass-through through this release/acquire policy flag.
+                        RendererInjectionAllowed.store(false, std::memory_order_release);
                         InvalidateVerifiedWvp();
                         spdlog::error(
-                            "VR R13: failed to hook renderer c64 callback; base WVP injection removed to fail closed");
+                            "VR R13: failed to hook renderer c64 callback; WVP injection disabled atomically to fail closed");
                     }
                     return 0;
                 }
                 Sleep(25);
             }
+            RendererInjectionAllowed.store(false, std::memory_order_release);
+            InvalidateVerifiedWvp();
             spdlog::warn(
-                "VR R13: renderer c64 callback did not become ready; target-classification guard not installed");
+                "VR R13: renderer transaction did not become ready; WVP injection disabled fail-closed");
             return 0;
         }
 

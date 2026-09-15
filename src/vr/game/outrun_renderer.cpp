@@ -96,6 +96,12 @@ namespace OutRunVRRenderer
 		SafetyHookInline EndSceneHook{};
 		SafetyHookInline SetVertexShaderConstantFHook{};
 
+		constexpr std::uint32_t RendererInstallPending = 0;
+		constexpr std::uint32_t RendererInstallReady = 1;
+		constexpr std::uint32_t RendererInstallFailed = 2;
+		std::atomic<std::uint32_t> RendererInstallState{RendererInstallPending};
+		std::atomic<bool> RendererInjectionAllowed{true};
+
 		HANDLE SharedMapping = nullptr;
 		SharedPoseState* SharedState = nullptr;
 		LARGE_INTEGER QpcFrequency{};
@@ -1004,7 +1010,8 @@ namespace OutRunVRRenderer
 			UINT startRegister, const float* constantData, UINT vector4fCount,
 			float* patchedData)
 		{
-			if (!LatchedHeadInverseValid || !GameRendererIsActive())
+			if (!RendererInjectionAllowed.load(std::memory_order_acquire) ||
+				!LatchedHeadInverseValid || !GameRendererIsActive())
 				return false;
 			if (!constantData || !patchedData || !UploadContainsOutRunWvp(startRegister, vector4fCount))
 				return false;
@@ -1237,6 +1244,8 @@ namespace OutRunVRRenderer
 				spdlog::warn("VR renderer: OutRun renderer globals failed executable/readability validation; c64 injection will fail closed");
 			}
 
+			RendererInstallState.store(RendererInstallPending, std::memory_order_release);
+			RendererInjectionAllowed.store(true, std::memory_order_release);
 			BeginSceneHook = safetyhook::create_inline(vtable[BeginSceneVtableIndex], BeginSceneDest);
 			EndSceneHook = safetyhook::create_inline(vtable[EndSceneVtableIndex], EndSceneDest);
 			SetVertexShaderConstantFHook = safetyhook::create_inline(
@@ -1247,12 +1256,15 @@ namespace OutRunVRRenderer
 				BeginSceneHook = {};
 				EndSceneHook = {};
 				SetVertexShaderConstantFHook = {};
-				spdlog::error("VR renderer: failed to hook D3D9 renderer boundary");
+				RendererInjectionAllowed.store(false, std::memory_order_release);
+				RendererInstallState.store(RendererInstallFailed, std::memory_order_release);
+				spdlog::error("VR renderer: failed to hook D3D9 renderer boundary; transactional rollback completed");
 				return false;
 			}
 
 			EnsureSharedState();
-			spdlog::info("VR renderer: D3D9 hooks installed; v3-primary/v2-fallback frame-latched c64 WVP injection armed (vtbl 41/42/94)");
+			RendererInstallState.store(RendererInstallReady, std::memory_order_release);
+			spdlog::info("VR renderer: D3D9 hooks installed; atomic renderer install state=READY; v3-primary/v2-fallback frame-latched c64 WVP injection armed (vtbl 41/42/94)");
 			return true;
 		}
 
@@ -1268,6 +1280,8 @@ namespace OutRunVRRenderer
 				}
 				Sleep(100);
 			}
+			RendererInjectionAllowed.store(false, std::memory_order_release);
+			RendererInstallState.store(RendererInstallFailed, std::memory_order_release);
 			spdlog::warn("VR renderer: D3D9 device did not appear; renderer hook not installed");
 			return 0;
 		}
@@ -1340,6 +1354,8 @@ namespace OutRunVRRenderer
 			HANDLE thread = CreateThread(nullptr, 0, RendererInstallThread, nullptr, 0, nullptr);
 			if (!thread)
 			{
+				RendererInjectionAllowed.store(false, std::memory_order_release);
+				RendererInstallState.store(RendererInstallFailed, std::memory_order_release);
 				spdlog::error("VR renderer: failed to create installer thread: {}", GetLastError());
 				return false;
 			}

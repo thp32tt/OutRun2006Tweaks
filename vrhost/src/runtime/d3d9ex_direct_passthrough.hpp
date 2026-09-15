@@ -69,6 +69,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
     inline std::uint32_t SafeEyeWidth = 0;
     inline std::uint32_t SafeEyeHeight = 0;
     inline std::uint32_t SafeFrameId = 0;
+    inline std::uint32_t SafeTransportGeneration = 0;
 
     inline std::uint64_t LastObservedCaptureFresh = 0;
     inline ULONGLONG LastCaptureFreshMs = 0;
@@ -100,6 +101,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
         SafeEyeFormat = DXGI_FORMAT_UNKNOWN;
         SafeEyeWidth = SafeEyeHeight = 0;
         SafeFrameId = 0;
+        SafeTransportGeneration = 0;
     }
 
     inline void CloseDirectAckMapping() noexcept
@@ -542,6 +544,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
         }
 
         SafeFrameId = frame.frameId;
+        SafeTransportGeneration =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
         ++SafeCopySuccess;
         if (!FirstGpuSafeAckLogged)
         {
@@ -556,11 +560,16 @@ namespace OutRunVrD3D9ExDirectPassthrough
 
     inline bool EnsureSafeFrame(std::uint32_t frameId) noexcept
     {
-        if (frameId && SafeFrameId == frameId && SafeEyeSrv[0] && SafeEyeSrv[1])
-            return true;
         OutRunVR::SharedRenderFrameState frame{};
-        return ReadFrameById(frameId, frame) &&
-            CopySharedFrameToSafeEyes(frame);
+        if (!ReadFrameById(frameId, frame))
+            return false;
+        const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        if (frameId && generation && SafeFrameId == frameId &&
+            SafeTransportGeneration == generation &&
+            SafeEyeSrv[0] && SafeEyeSrv[1])
+            return true;
+        return CopySharedFrameToSafeEyes(frame);
     }
 
     inline bool RenderSafeProjection(XrSession session,
@@ -585,11 +594,11 @@ namespace OutRunVrD3D9ExDirectPassthrough
             return false;
 
         std::uint32_t image = 0;
-        if (!Acquire(Projection.handle, image))
+        if (!Acquire(Projection, image))
             return false;
         if (image >= Projection.rtvs.size())
         {
-            Release(Projection.handle);
+            Release(Projection);
             return false;
         }
 
@@ -608,7 +617,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
         SourceFormat = savedFormat;
         if (OutRunVrFinalTest::Context)
             OutRunVrFinalTest::Context->Flush();
-        Release(Projection.handle);
+        Release(Projection);
         if (!ok)
             return false;
 

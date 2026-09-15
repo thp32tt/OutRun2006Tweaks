@@ -282,14 +282,26 @@ namespace
         std::memcpy(runtimeName + OutRunVR::PackedEyeOrientationOffset, packed, sizeof(packed));
     }
 
-    bool IsProcessAlive(DWORD pid)
+    enum class ProcessLiveness : std::uint8_t
     {
-        if (!pid) return false;
+        Dead,
+        Alive,
+        Unknown
+    };
+
+    ProcessLiveness QueryProcessLiveness(DWORD pid)
+    {
+        if (!pid) return ProcessLiveness::Dead;
         HANDLE p = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
-        if (!p) return false;
-        const bool alive = WaitForSingleObject(p, 0) == WAIT_TIMEOUT;
+        if (!p)
+            return GetLastError() == ERROR_INVALID_PARAMETER
+                ? ProcessLiveness::Dead
+                : ProcessLiveness::Unknown;
+        const DWORD wait = WaitForSingleObject(p, 0);
         CloseHandle(p);
-        return alive;
+        if (wait == WAIT_TIMEOUT) return ProcessLiveness::Alive;
+        if (wait == WAIT_OBJECT_0) return ProcessLiveness::Dead;
+        return ProcessLiveness::Unknown;
     }
 
     struct ClientStereoMeta
@@ -536,8 +548,9 @@ namespace
             {
                 const LONG observed = static_cast<LONG>(state_->hostPid);
                 if (observed == self) { owns_ = true; return; }
-                if (observed != 0 && IsProcessAlive(static_cast<DWORD>(observed)))
-                    throw std::runtime_error("another outrun-vr-host already owns the bridge");
+                if (observed != 0 &&
+                    QueryProcessLiveness(static_cast<DWORD>(observed)) != ProcessLiveness::Dead)
+                    throw std::runtime_error("another or unverified outrun-vr-host already owns the bridge");
                 if (InterlockedCompareExchange(reinterpret_cast<volatile LONG*>(&state_->hostPid),
                     self, observed) == observed)
                 {

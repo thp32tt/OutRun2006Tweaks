@@ -131,16 +131,29 @@ namespace OutRunVR::Host
                 state.structSize == sizeof(IpcV3::HostState);
         }
 
-        static bool ProcessAlive(DWORD pid) noexcept
+        enum class ProcessLiveness : std::uint8_t
+        {
+            Dead,
+            Alive,
+            Unknown
+        };
+
+        static ProcessLiveness QueryProcessLiveness(DWORD pid) noexcept
         {
             if (!pid)
-                return false;
+                return ProcessLiveness::Dead;
             HANDLE process = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
             if (!process)
-                return false;
-            const bool alive = WaitForSingleObject(process, 0) == WAIT_TIMEOUT;
+                return GetLastError() == ERROR_INVALID_PARAMETER
+                    ? ProcessLiveness::Dead
+                    : ProcessLiveness::Unknown;
+            const DWORD wait = WaitForSingleObject(process, 0);
             CloseHandle(process);
-            return alive;
+            if (wait == WAIT_TIMEOUT)
+                return ProcessLiveness::Alive;
+            if (wait == WAIT_OBJECT_0)
+                return ProcessLiveness::Dead;
+            return ProcessLiveness::Unknown;
         }
 
         void AcquireOwnership()
@@ -154,8 +167,9 @@ namespace OutRunVR::Host
                     owns_ = true;
                     return;
                 }
-                if (observed != 0 && ProcessAlive(static_cast<DWORD>(observed)))
-                    throw std::runtime_error("another outrun-vr-host owns HostState.v3");
+                if (observed != 0 &&
+                    QueryProcessLiveness(static_cast<DWORD>(observed)) != ProcessLiveness::Dead)
+                    throw std::runtime_error("another or unverified outrun-vr-host owns HostState.v3");
                 if (InterlockedCompareExchange(
                     reinterpret_cast<volatile LONG*>(&state_->hostPid), self, observed) == observed)
                 {

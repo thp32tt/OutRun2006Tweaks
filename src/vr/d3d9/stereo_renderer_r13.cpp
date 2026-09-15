@@ -22,6 +22,11 @@ namespace OutRunVRStereo
         SafetyHookInline R13DrawPrimitiveUPR9Hook{};
         SafetyHookInline R13DrawIndexedPrimitiveUPR9Hook{};
 
+        constexpr std::uint32_t R13InstallPending = 0;
+        constexpr std::uint32_t R13InstallReady = 1;
+        constexpr std::uint32_t R13InstallFailed = 2;
+        std::atomic<std::uint32_t> R13InstallState{R13InstallPending};
+
         std::uint64_t R13SafeAckBackpressure = 0;
         bool R13FirstSafeAckBlockLogged = false;
         bool R13FirstAckMappingLogged = false;
@@ -263,7 +268,8 @@ namespace OutRunVRStereo
 
             const bool unsafeMrt = mainTarget && AnyAuxRenderTargetActive();
             const bool unsafeOcclusion = mainTarget &&
-                ActiveOcclusionQueries.load(std::memory_order_acquire) > 0;
+                (ActiveOcclusionQueries.load(std::memory_order_acquire) > 0 ||
+                 OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire));
             if (StereoWanted() && R9StereoSeeded &&
                 (unsafeMrt || unsafeOcclusion))
             {
@@ -381,15 +387,18 @@ namespace OutRunVRStereo
             R13DrawIndexedPrimitiveR9Hook = {};
             R13DrawPrimitiveUPR9Hook = {};
             R13DrawIndexedPrimitiveUPR9Hook = {};
+            R13InstallState.store(R13InstallFailed, std::memory_order_release);
         }
 
         DWORD WINAPI R13StereoInstallThread(void*)
         {
+            R13InstallState.store(R13InstallPending, std::memory_order_release);
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
                 const std::uint32_t r9State = R9InstallState.load(std::memory_order_acquire);
                 if (r9State == R9InstallFailed)
                 {
+                    R13InstallState.store(R13InstallFailed, std::memory_order_release);
                     spdlog::error(
                         "VR R13: R9 callback transaction failed; hardening overlay not installed");
                     return 0;
@@ -421,8 +430,9 @@ namespace OutRunVRStereo
                         R13DrawIndexedPrimitiveR9Hook && R13DrawPrimitiveUPR9Hook &&
                         R13DrawIndexedPrimitiveUPR9Hook)
                     {
+                        R13InstallState.store(R13InstallReady, std::memory_order_release);
                         spdlog::info(
-                            "VR R13: stereo hardening ACTIVE; atomic R7/R9 install handoff + single ResetEx owner + GPU-completion direct-ring backpressure + single-execution MRT/occlusion fallback");
+                            "VR R13: stereo hardening ACTIVE; transactional R13 install state=READY + atomic R7/R9 handoff + single ResetEx owner + GPU-completion direct-ring backpressure + single-execution MRT/occlusion fallback");
                     }
                     else
                     {
@@ -435,6 +445,7 @@ namespace OutRunVRStereo
                 Sleep(25);
             }
 
+            R13InstallState.store(R13InstallFailed, std::memory_order_release);
             spdlog::warn(
                 "VR R13: R9 transactional install did not become ready; hardening overlay not installed");
             return 0;
@@ -453,7 +464,10 @@ namespace OutRunVRStereo
                 HANDLE thread = CreateThread(
                     nullptr, 0, R13StereoInstallThread, nullptr, 0, nullptr);
                 if (!thread)
+                {
+                    R13InstallState.store(R13InstallFailed, std::memory_order_release);
                     return false;
+                }
                 CloseHandle(thread);
                 return true;
             }

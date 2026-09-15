@@ -187,6 +187,9 @@ float4 PSMain(VSOut input) : SV_Target
         DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
         std::vector<XrSwapchainImageD3D11KHR> images;
         std::vector<std::array<ID3D11RenderTargetView*, 2>> rtvs;
+        bool acquired = false;
+        bool waited = false;
+        std::uint32_t acquiredImage = 0;
 
         void Destroy()
         {
@@ -205,6 +208,9 @@ float4 PSMain(VSOut input) : SV_Target
             width = height = 0;
             arraySize = 1;
             format = DXGI_FORMAT_UNKNOWN;
+            acquired = false;
+            waited = false;
+            acquiredImage = 0;
         }
     };
 
@@ -721,26 +727,53 @@ float4 PSMain(VSOut input) : SV_Target
         return true;
     }
 
-    inline bool Acquire(XrSwapchain swapchain, std::uint32_t& image)
+    inline bool Acquire(Swapchain& swapchain, std::uint32_t& image)
     {
-        XrSwapchainImageAcquireInfo acquire{ XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO };
-        if (XR_FAILED(::xrAcquireSwapchainImage(swapchain, &acquire, &image)))
-            return false;
+        if (!swapchain.acquired)
+        {
+            XrSwapchainImageAcquireInfo acquire{ XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO };
+            if (XR_FAILED(::xrAcquireSwapchainImage(
+                    swapchain.handle, &acquire, &swapchain.acquiredImage)))
+                return false;
+            swapchain.acquired = true;
+            swapchain.waited = false;
+        }
+        image = swapchain.acquiredImage;
+        if (swapchain.waited)
+            return true;
+
         XrSwapchainImageWaitInfo wait{ XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO };
         wait.timeout = XR_INFINITE_DURATION;
         for (;;)
         {
-            const XrResult result = ::xrWaitSwapchainImage(swapchain, &wait);
+            const XrResult result = ::xrWaitSwapchainImage(swapchain.handle, &wait);
             if (result == XR_TIMEOUT_EXPIRED)
                 continue; // The same acquired image must be waited again; it cannot be released yet.
-            return XR_SUCCEEDED(result);
+            if (XR_FAILED(result))
+            {
+                // Preserve acquiredImage. A later attempt must wait this oldest
+                // acquired image again instead of violating acquire/wait order.
+                return false;
+            }
+            swapchain.waited = true;
+            return true;
         }
     }
 
-    inline void Release(XrSwapchain swapchain)
+    inline bool Release(Swapchain& swapchain)
     {
+        if (!swapchain.acquired || !swapchain.waited)
+            return false;
         XrSwapchainImageReleaseInfo release{ XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO };
-        ::xrReleaseSwapchainImage(swapchain, &release);
+        const XrResult result = ::xrReleaseSwapchainImage(swapchain.handle, &release);
+        if (XR_SUCCEEDED(result))
+        {
+            swapchain.acquired = false;
+            swapchain.waited = false;
+            swapchain.acquiredImage = 0;
+            return true;
+        }
+        return false;
     }
 
     inline bool FrameComplete(const OutRunVR::SharedRenderFrameState& frame)
@@ -802,16 +835,16 @@ float4 PSMain(VSOut input) : SV_Target
         };
 
         std::uint32_t image = 0;
-        if (!Acquire(Projection.handle, image))
+        if (!Acquire(Projection, image))
             return false;
         if (image >= Projection.rtvs.size())
         {
-            Release(Projection.handle);
+            Release(Projection);
             return false;
         }
         bool ok = RenderTo(Projection.rtvs[image][0], Projection.width, Projection.height, eyeUv[0]);
         ok = RenderTo(Projection.rtvs[image][1], Projection.width, Projection.height, eyeUv[1]) && ok;
-        Release(Projection.handle);
+        Release(Projection);
         if (!ok)
             return false;
 
@@ -886,15 +919,15 @@ float4 PSMain(VSOut input) : SV_Target
         if (!EnsureSwapchain(Theater, session, width, height, 1))
             return false;
         std::uint32_t image = 0;
-        if (!Acquire(Theater.handle, image))
+        if (!Acquire(Theater, image))
             return false;
         if (image >= Theater.rtvs.size())
         {
-            Release(Theater.handle);
+            Release(Theater);
             return false;
         }
         const bool ok = RenderTo(Theater.rtvs[image][0], Theater.width, Theater.height, whole);
-        Release(Theater.handle);
+        Release(Theater);
         if (!ok)
             return false;
 
