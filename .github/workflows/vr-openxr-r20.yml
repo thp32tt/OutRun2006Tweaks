@@ -1,4 +1,4 @@
-name: OpenXR VR R20 production build
+name: OpenXR VR production build
 
 on:
   push:
@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  game-x86-r20:
+  game-x86:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
@@ -27,16 +27,16 @@ jobs:
         shell: cmd
         run: |
           set CI=
-          cmake -S . -B build-r20-game -G "Visual Studio 17 2022" -A Win32
+          cmake -S . -B build-vr-game -G "Visual Studio 17 2022" -A Win32
 
-      - name: Verify R20 source graph
+      - name: Verify R21 source graph
         shell: pwsh
         run: |
-          $projects = Get-ChildItem build-r20-game -Filter *.vcxproj -Recurse
+          $projects = Get-ChildItem build-vr-game -Filter *.vcxproj -Recurse
           if (-not $projects) { throw 'no Visual Studio project files generated' }
           $text = ($projects | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
-          if (-not $text.Contains('stereo_renderer_r20.cpp')) { throw 'R20 wrapper missing from build graph' }
-          foreach ($legacy in @('stereo_renderer.cpp','stereo_renderer_r13.cpp')) {
+          if (-not $text.Contains('stereo_renderer_r21.cpp')) { throw 'R21 wrapper missing from build graph' }
+          foreach ($legacy in @('stereo_renderer.cpp','stereo_renderer_r13.cpp','stereo_renderer_r20.cpp')) {
             $escaped = [regex]::Escape($legacy)
             $pattern = '<ClCompile Include="[^"]*[\\/]' + $escaped + '"'
             if ($text -match $pattern) { throw "legacy stereo TU compiled independently: $legacy" }
@@ -45,19 +45,19 @@ jobs:
       - name: Apply dependency workarounds
         shell: pwsh
         run: |
-          (Get-Content build-r20-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-r20-game/_deps/safetyhook-build/src/safetyhook.vcxproj
-          (Get-Content build-r20-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-r20-game/_deps/zydis-build/Zydis.vcxproj
-          (Get-Content build-r20-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-r20-game/_deps/zydis-build/zycore/Zycore.vcxproj
-          Set-Content -Path build-r20-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
-          (Get-Content build-r20-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-r20-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+          (Get-Content build-vr-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-game/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-vr-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-vr-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-game/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-vr-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build-vr-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-vr-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
 
-      - name: Build Win32 R20 DLL
-        run: cmake --build build-r20-game --config Release
+      - name: Build Win32 R21 DLL
+        run: cmake --build build-vr-game --config Release
 
-      - name: Verify Win32 R20 binary
+      - name: Verify Win32 R21 binary
         shell: pwsh
         run: |
-          $dll = 'build-r20-game/bin/dinput8.dll'
+          $dll = 'build-vr-game/bin/dinput8.dll'
           if (-not (Test-Path $dll)) { throw 'dinput8.dll was not produced' }
           $bytes = [IO.File]::ReadAllBytes($dll)
           if ($bytes.Length -lt 10000) { throw 'dinput8.dll unexpectedly small' }
@@ -67,21 +67,22 @@ jobs:
             'VR stereo: TRUE GEOMETRY STEREO active',
             'VR R13: stereo hardening ACTIVE',
             'VR R20 PRODUCTION: stereo bootstrap overlay ACTIVE',
-            'VR R20: main-target color clear accepted as stereo bootstrap',
+            'VR R21 GAME: host-death mono fail-closed guard ACTIVE',
+            'VR R21 FAIL-CLOSED:',
             'VR v3 shadow: live dual-protocol diagnostics active'
           )) {
-            if (-not $ascii.Contains($marker)) { throw "R20 DLL marker missing: $marker" }
+            if (-not $ascii.Contains($marker)) { throw "R21 DLL marker missing: $marker" }
           }
           $pe = [BitConverter]::ToInt32($bytes,0x3C)
           if ([BitConverter]::ToUInt16($bytes,$pe+4) -ne 0x014C) { throw 'expected x86 DLL' }
 
       - uses: actions/upload-artifact@v4
         with:
-          name: outrun-vr-r20-game-x86
-          path: build-r20-game/bin/dinput8.dll
+          name: outrun-vr-r21-game-x86
+          path: build-vr-game/bin/dinput8.dll
           if-no-files-found: error
 
-  host-x64-r20:
+  host-x64:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
@@ -92,10 +93,10 @@ jobs:
         run: python tools/verify_vr_architecture.py
 
       - name: Configure x64 host
-        run: cmake -S vrhost -B build-r20-host -G "Visual Studio 17 2022" -A x64
+        run: cmake -S vrhost -B build-vr-host -G "Visual Studio 17 2022" -A x64
 
       - name: Build x64 host and tests
-        run: cmake --build build-r20-host --config Release
+        run: cmake --build build-vr-host --config Release
 
       - name: Run host smoke tests
         shell: pwsh
@@ -108,37 +109,36 @@ jobs:
             'outrun-vr-host-pose-v3-validation-smoke.exe',
             'outrun-vr-core-math-smoke.exe'
           )) {
-            $path = Join-Path 'build-r20-host/bin' $test
+            $path = Join-Path 'build-vr-host/bin' $test
             if (-not (Test-Path $path)) { throw "missing smoke executable: $test" }
             & $path
             if ($LASTEXITCODE -ne 0) { throw "smoke failed: $test code=$LASTEXITCODE" }
           }
 
-      - name: Verify x64 R20 host binary
+      - name: Verify x64 R21 host binary
         shell: pwsh
         run: |
-          $hostPath = 'build-r20-host/bin/outrun-vr-host.exe'
+          $hostPath = 'build-vr-host/bin/outrun-vr-host.exe'
           if (-not (Test-Path $hostPath)) { throw 'outrun-vr-host.exe was not produced' }
           $bytes = [IO.File]::ReadAllBytes($hostPath)
           if ($bytes.Length -lt 10000) { throw 'outrun-vr-host.exe unexpectedly small' }
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
           foreach ($marker in @(
+            'R21-readonly-ipc-vs-cbuffer-20260916',
+            '[R21] final OpenXR presentation owner ACTIVE',
             'R20-production-host-20260916',
-            '[R20] build=',
             'testPattern=removed',
             'R19-production-capture-reuse-20260916',
-            '[R19] production capture reuse ACTIVE',
-            '[v3] live shadow HostState/AckState bridge ready.',
-            'host-owned GPU eye copies + completion ACK active'
+            '[v3] live shadow HostState/AckState bridge ready.'
           )) {
-            if (-not $ascii.Contains($marker)) { throw "R20 host marker missing: $marker" }
+            if (-not $ascii.Contains($marker)) { throw "R21 host marker missing: $marker" }
           }
-          if ($ascii.Contains('no-layer OpenXR test pattern ready')) { throw 'obsolete no-layer test pattern leaked into R20 host' }
+          if ($ascii.Contains('no-layer OpenXR test pattern ready')) { throw 'obsolete no-layer test pattern leaked into R21 host' }
           $pe = [BitConverter]::ToInt32($bytes,0x3C)
           if ([BitConverter]::ToUInt16($bytes,$pe+4) -ne 0x8664) { throw 'expected x64 host' }
 
       - uses: actions/upload-artifact@v4
         with:
-          name: outrun-vr-r20-host-x64
-          path: build-r20-host/bin/outrun-vr-host.exe
+          name: outrun-vr-r21-host-x64-production
+          path: build-vr-host/bin/outrun-vr-host.exe
           if-no-files-found: error
