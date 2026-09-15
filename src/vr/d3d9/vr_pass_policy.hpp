@@ -3,10 +3,14 @@
 #include <cstdint>
 
 // Explicit VR render-pass policy shared by the D3D9 stereo and renderer-pose
-// hardening layers.  The idea mirrors the compatibility/pass classification
-// used by mature emulator VR implementations: classify first, then choose the
-// least invasive rendering action.  This file intentionally contains no D3D9
+// hardening layers. The design follows the same conservative principle used by
+// mature emulator VR implementations: classify each pass first, then choose the
+// least invasive rendering action. This file intentionally contains no D3D9
 // state access so the policy remains deterministic and compile-time testable.
+//
+// OutRun-specific rule: only the real main backbuffer may receive the HMD WVP.
+// Auxiliary/reflection/shadow targets keep stock matrices, while MRT/query
+// hazards are classified single-execution rather than replayed per eye.
 namespace OutRunVR::PassPolicy
 {
     enum class PoseInjectionPolicy : std::uint8_t
@@ -70,6 +74,8 @@ namespace OutRunVR::PassPolicy
 
     static_assert(ClassifyDrawReplay(true, false, true, false, true, true, true, false) ==
         DrawReplayPolicy::UnsafeSingleExecution);
+    static_assert(ClassifyDrawReplay(true, false, true, false, true, false, true, true) ==
+        DrawReplayPolicy::Legacy);
     static_assert(ClassifyDrawReplay(true, false, true, true, true, true, false, false) ==
         DrawReplayPolicy::ForcedMonoShadow);
     static_assert(ClassifyDrawReplay(true, false, false, false, true, true, true, true) ==
