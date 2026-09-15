@@ -106,9 +106,6 @@ namespace OutRunVrR21RuntimeHardening
     inline XrResult XRAPI_CALL EndFrame(XrSession session,
         const XrFrameEndInfo* endInfo)
     {
-        using namespace OutRunVrReviewHardening;
-        using namespace OutRunVrD3D9ExDirectPassthrough;
-
         if (!FirstActiveLogged)
         {
             FirstActiveLogged = true;
@@ -120,11 +117,12 @@ namespace OutRunVrR21RuntimeHardening
         // Menu/theater content is already a deliberate core-compositor layer.
         // Preserve it exactly as R15 did; the core shader fix makes its UV path
         // independent of a VS constant-buffer binding.
-        if (HasIncomingNonProjectionLayer(endInfo))
+        if (OutRunVrReviewHardening::HasIncomingNonProjectionLayer(endInfo))
             return OutRunVrFinalTest::EndFrame(session, endInfo);
 
         OutRunVR::SharedRenderFrameState latest{};
-        const bool latestDirect = LatestCompleteDirectFrame(latest);
+        const bool latestDirect =
+            OutRunVrReviewHardening::LatestCompleteDirectFrame(latest);
         const bool directRequested = DirectTransportRequested();
 
         // Critical R21 ordering: when this is a classic frame, do not even map
@@ -132,12 +130,15 @@ namespace OutRunVrR21RuntimeHardening
         // OUTRUN_VR_DIRECT_TRANSPORT=0.
         if (latestDirect && directRequested)
         {
-            const DirectHostState directState = ReadDirectHostStateReadonly();
-            const bool exactIncoming = IncomingProjectionValid(endInfo);
+            const auto directState = ReadDirectHostStateReadonly();
+            const bool exactIncoming =
+                OutRunVrReviewHardening::IncomingProjectionValid(endInfo);
             const bool directCandidate = directState.valid &&
                 directState.openedFrame != 0 && exactIncoming;
 
-            if (directCandidate && EnsureSafeFrame(directState.openedFrame))
+            if (directCandidate &&
+                OutRunVrD3D9ExDirectPassthrough::EnsureSafeFrame(
+                    directState.openedFrame))
             {
                 // RenderSafeProjection reuses R19 RenderTo(). Bind its shared
                 // BlitParams buffer to VS before the draw; RenderTo already binds
@@ -145,7 +146,8 @@ namespace OutRunVrR21RuntimeHardening
                 BindLegacyBlitConstantBufferToVs();
                 XrCompositionLayerProjection projection{};
                 std::array<XrCompositionLayerProjectionView, 2> views{};
-                if (RenderSafeProjection(session, endInfo, projection, views))
+                if (OutRunVrD3D9ExDirectPassthrough::RenderSafeProjection(
+                        session, endInfo, projection, views))
                 {
                     const XrCompositionLayerBaseHeader* layer =
                         reinterpret_cast<const XrCompositionLayerBaseHeader*>(
@@ -175,12 +177,12 @@ namespace OutRunVrR21RuntimeHardening
         }
 
         // A valid core projection is authoritative for classic D3D9.
-        if (IncomingProjectionValid(endInfo))
+        if (OutRunVrReviewHardening::IncomingProjectionValid(endInfo))
             return OutRunVrFinalTest::EndFrame(session, endInfo);
 
         // Only a fresh, complete classic frame may enter the R19 Desktop
         // Duplication fallback. Ensure its VS sees BlitParams first.
-        if (FreshClassicFallbackAvailable())
+        if (OutRunVrReviewHardening::FreshClassicFallbackAvailable())
         {
             BindLegacyBlitConstantBufferToVs();
             return OutRunVrSbsCaptureOverride::EndFrame(session, endInfo);
