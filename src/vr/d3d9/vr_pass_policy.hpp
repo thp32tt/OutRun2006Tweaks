@@ -91,6 +91,7 @@ namespace OutRunVR::PassPolicy
         Auxiliary,
         World3D,
         ScreenSpace2D,
+        PolicyMismatch,
         Unknown
     };
 
@@ -107,6 +108,24 @@ namespace OutRunVR::PassPolicy
         if (projectionClass == ProjectionClass::Orthographic2D)
             return RenderSemantic::ScreenSpace2D;
         return RenderSemantic::Unknown;
+    }
+
+    // Preserve the independently validated R13 compatibility helper as a
+    // second signal. If the helper and the richer enum disagree, the safe
+    // interpretation is not "unknown projection" but an explicit policy
+    // consistency failure. Keeping this distinction makes runtime diagnostics
+    // actionable and prevents a future refactor from silently widening the
+    // world-stereo class.
+    constexpr RenderSemantic ClassifyRenderSemanticChecked(
+        PoseInjectionPolicy targetPolicy,
+        bool legacyMainBackbufferInvariant,
+        ProjectionClass projectionClass) noexcept
+    {
+        const bool policySaysMain =
+            targetPolicy == PoseInjectionPolicy::MainBackbuffer;
+        if (legacyMainBackbufferInvariant != policySaysMain)
+            return RenderSemantic::PolicyMismatch;
+        return ClassifyRenderSemantic(targetPolicy, projectionClass);
     }
 
     constexpr bool AllowsWorldStereo(RenderSemantic semantic) noexcept
@@ -169,6 +188,16 @@ namespace OutRunVR::PassPolicy
         RenderSemantic::Auxiliary);
     static_assert(!AllowsWorldStereo(ClassifyRenderSemantic(
         PoseInjectionPolicy::MainBackbuffer, ProjectionClass::Unknown)));
+    static_assert(ClassifyRenderSemanticChecked(
+        PoseInjectionPolicy::MainBackbuffer, true,
+        ProjectionClass::Perspective3D) == RenderSemantic::World3D);
+    static_assert(ClassifyRenderSemanticChecked(
+        PoseInjectionPolicy::MainBackbuffer, false,
+        ProjectionClass::Perspective3D) == RenderSemantic::PolicyMismatch);
+    static_assert(ClassifyRenderSemanticChecked(
+        PoseInjectionPolicy::AuxiliaryStock, true,
+        ProjectionClass::Unknown) == RenderSemantic::PolicyMismatch);
+    static_assert(!AllowsWorldStereo(RenderSemantic::PolicyMismatch));
 
     static_assert(ClassifyDrawReplay(true, false, true, false, true, true, true, false) ==
         DrawReplayPolicy::UnsafeSingleExecution);
