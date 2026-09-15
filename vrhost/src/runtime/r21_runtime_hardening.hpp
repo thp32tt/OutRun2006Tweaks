@@ -10,6 +10,9 @@
 //  3. Keep the existing R15 ownership policy, but make the final xrEndFrame
 //     branch explicit and bind the legacy R19 blit constant buffer to VS before
 //     any R19/direct fallback rendering.
+//  4. Source-review hardening: never synthesize a fallback layer when the host
+//     says shouldRender=false, and require the opened direct frame to match the
+//     exact latest direct frame before safe staging/presentation.
 //
 // The main StereoCompositor shader is fixed separately so its UV transform is
 // evaluated in PS (where the constant buffer is already bound).
@@ -30,17 +33,49 @@
 namespace OutRunVrR21RuntimeHardening
 {
     inline constexpr const char* BuildId = "R21-readonly-ipc-vs-cbuffer-20260916";
+    inline constexpr const char* ReviewFixBuildId = "R22-source-review-fixes-20260916";
 
     inline bool FirstActiveLogged = false;
     inline bool FirstReadonlyDirectReadLogged = false;
     inline bool FirstLegacyVsBindingLogged = false;
     inline bool FirstDirectDisabledSkipLogged = false;
+    inline bool FirstShouldRenderBlockLogged = false;
+    inline bool FirstDirectExactFrameBlockLogged = false;
 
     inline bool DirectTransportRequested() noexcept
     {
         const char* value = std::getenv("OUTRUN_VR_DIRECT_TRANSPORT");
         return !value || (std::strcmp(value, "0") != 0 &&
             _stricmp(value, "false") != 0 && _stricmp(value, "off") != 0);
+    }
+
+    inline bool HostShouldRenderReadonly() noexcept
+    {
+        using namespace OutRunVrD3D9ExDirectPassthrough;
+        if (!EnsurePoseState())
+            return false;
+
+        for (int attempt = 0; attempt < 4; ++attempt)
+        {
+            const std::uint32_t before = PoseState->sequence;
+            if (before & 1u)
+                continue;
+            MemoryBarrier();
+            const std::uint32_t flags = PoseState->flags;
+            const std::uint32_t hostPid = PoseState->hostPid;
+            MemoryBarrier();
+            const std::uint32_t after = PoseState->sequence;
+            if (before != after || (after & 1u))
+                continue;
+
+            constexpr std::uint32_t required =
+                OutRunVR::HostAlive |
+                OutRunVR::SessionVisible |
+                OutRunVR::HostShouldRender;
+            return hostPid == GetCurrentProcessId() &&
+                (flags & required) == required;
+        }
+        return false;
     }
 
     inline OutRunVrD3D9ExDirectPassthrough::DirectHostState
@@ -111,14 +146,28 @@ namespace OutRunVrR21RuntimeHardening
             FirstActiveLogged = true;
             std::cerr
                 << "[R21] final OpenXR presentation owner ACTIVE build=" << BuildId
-                << "; readonly direct IPC + deterministic classic blit policy\n";
+                << " reviewFix=" << ReviewFixBuildId
+                << "; readonly IPC + deterministic classic/direct presentation policy\n";
         }
 
         // Menu/theater content is already a deliberate core-compositor layer.
-        // Preserve it exactly as R15 did; the core shader fix makes its UV path
-        // independent of a VS constant-buffer binding.
+        // Preserve it exactly as R15 did.
         if (OutRunVrReviewHardening::HasIncomingNonProjectionLayer(endInfo))
             return OutRunVrFinalTest::EndFrame(session, endInfo);
+
+        // Main.cpp intentionally submits zero layers when OpenXR says
+        // shouldRender=false. Do not turn that deliberate no-layer frame into a
+        // stale desktop/direct fallback merely because Frame.v2 is still fresh.
+        if (!HostShouldRenderReadonly())
+        {
+            if (!FirstShouldRenderBlockLogged)
+            {
+                FirstShouldRenderBlockLogged = true;
+                std::cerr
+                    << "[R22] host shouldRender/session-visible gate closed; preserving incoming/no-layer frame without fallback synthesis\n";
+            }
+            return OutRunVrFinalTest::EndFrame(session, endInfo);
+        }
 
         OutRunVR::SharedRenderFrameState latest{};
         const bool latestDirect =
@@ -126,19 +175,18 @@ namespace OutRunVrR21RuntimeHardening
         const bool directRequested = DirectTransportRequested();
 
         // Critical R21 ordering: when this is a classic frame, do not even map
-        // or read direct-only state. This removes the R20 crash path even when
-        // OUTRUN_VR_DIRECT_TRANSPORT=0.
+        // or read direct-only state.
         if (latestDirect && directRequested)
         {
             const auto directState = ReadDirectHostStateReadonly();
             const bool exactIncoming =
                 OutRunVrReviewHardening::IncomingProjectionValid(endInfo);
-            const bool directCandidate = directState.valid &&
-                directState.openedFrame != 0 && exactIncoming;
+            const bool directCandidate = directState.valid && exactIncoming &&
+                directState.openedFrame != 0 &&
+                directState.openedFrame == latest.frameId;
 
             if (directCandidate &&
-                OutRunVrD3D9ExDirectPassthrough::EnsureSafeFrame(
-                    directState.openedFrame))
+                OutRunVrD3D9ExDirectPassthrough::EnsureSafeFrame(latest.frameId))
             {
                 // RenderSafeProjection reuses R19 RenderTo(). Bind its shared
                 // BlitParams buffer to VS before the draw; RenderTo already binds
@@ -157,6 +205,13 @@ namespace OutRunVrR21RuntimeHardening
                     patched.layers = &layer;
                     return OutRunVrFinalTest::EndFrame(session, &patched);
                 }
+            }
+
+            if (!directCandidate && !FirstDirectExactFrameBlockLogged)
+            {
+                FirstDirectExactFrameBlockLogged = true;
+                std::cerr
+                    << "[R22] direct frame rejected because host-opened frame is not the exact latest direct frame; stale Ready/openedFrame state cannot present an older eye pair\n";
             }
 
             // A frame explicitly marked as direct must never be reinterpreted as

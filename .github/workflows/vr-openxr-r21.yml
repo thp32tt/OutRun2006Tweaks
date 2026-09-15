@@ -21,7 +21,10 @@ jobs:
         run: |
           $r21 = Get-Content vrhost/src/runtime/r21_runtime_hardening.hpp -Raw
           if (-not $r21.Contains('R21-readonly-ipc-vs-cbuffer-20260916')) { throw 'R21 build marker missing' }
+          if (-not $r21.Contains('R22-source-review-fixes-20260916')) { throw 'R22 review-fix marker missing' }
           if (-not $r21.Contains('ReadDirectHostStateReadonly')) { throw 'readonly direct-state reader missing' }
+          if (-not $r21.Contains('HostShouldRenderReadonly')) { throw 'shouldRender readonly gate missing' }
+          if (-not $r21.Contains('directState.openedFrame == latest.frameId')) { throw 'exact direct-frame freshness gate missing' }
           if ($r21 -match 'InterlockedCompareExchange\s*\(') { throw 'write-capable CAS call leaked into R21 final owner' }
           if (-not $r21.Contains('VSSetConstantBuffers(0, 1, &ConstantBuffer)')) { throw 'R19/direct VS constant-buffer binding missing' }
           $shader = Get-Content vrhost/src/stereo_shader.hpp -Raw
@@ -66,6 +69,7 @@ jobs:
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
           foreach ($marker in @(
             'R21-readonly-ipc-vs-cbuffer-20260916',
+            'R22-source-review-fixes-20260916',
             '[R21] final OpenXR presentation owner ACTIVE',
             'write-capable CAS removed from final presentation path',
             'legacy R19/direct blit constant buffer bound to VS+PS',

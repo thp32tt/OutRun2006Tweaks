@@ -1,17 +1,15 @@
 // R21 game-side host-death fail-closed overlay.
 //
-// R20/R13/R9 remain the renderer implementation.  R21 only adds a Present
-// boundary liveness check so a dead/stalled x64 OpenXR host cannot leave the
-// game indefinitely attempting stereo with an old HostAlive flag.
+// R20/R13/R9 remain the renderer implementation. R21 adds a Present-boundary
+// liveness check so a dead/stalled x64 OpenXR host cannot leave the game
+// indefinitely attempting stereo with stale HostAlive state.
 //
-// The check runs immediately before R9 Present processing.  If the host's
-// sequence-protected sampleQpc is older than one second, HostAlive and
-// HostShouldRender are cleared in the game's writable shared mapping.  R9 then
-// follows its existing explicit failure-output policy: restore the independently
-// rendered mono shadow before Present and publish StereoDisabled.  No inline
-// hooks are removed and no D3D resources are destroyed from a draw callback.
-// A restarted/healthy host republishes its flags and fresh sample on its next
-// update, so VR can become eligible again without touching user settings.
+// Review hardening: SharedPoseState host fields are host-owned. The game no
+// longer clears HostAlive/HostShouldRender in that shared seqlock domain. A
+// stale/unreadable host instead closes the game-local R20 stereo eligibility
+// gate. On the first stale Present, an already-complete mono shadow may still be
+// restored; subsequent frames remain ordinary mono until a stable fresh host
+// sample reopens the local gate.
 
 #include "stereo_renderer_r20.cpp"
 
@@ -26,6 +24,23 @@ namespace OutRunVRStereo
         bool R21HostFailClosed = false;
         std::uint32_t R21LastHealthyHostPid = 0;
 
+        bool R21ComputeAgeMs(std::int64_t sampleQpc,
+            std::int64_t& ageMs) noexcept
+        {
+            ageMs = INT64_MAX;
+            if (sampleQpc <= 0)
+                return false;
+            LARGE_INTEGER now{};
+            LARGE_INTEGER frequency{};
+            if (!QueryPerformanceCounter(&now) ||
+                !QueryPerformanceFrequency(&frequency) ||
+                frequency.QuadPart <= 0 || now.QuadPart < sampleQpc)
+                return false;
+            const std::int64_t delta = now.QuadPart - sampleQpc;
+            ageMs = (delta * 1000) / frequency.QuadPart;
+            return true;
+        }
+
         bool R21ReadHostFreshness(std::uint32_t& hostPid,
             std::uint32_t& flags, std::uint32_t& heartbeat,
             std::int64_t& sampleQpc, std::int64_t& ageMs) noexcept
@@ -38,6 +53,16 @@ namespace OutRunVRStereo
                 SharedState->protocolVersion != OutRunVR::SharedProtocolVersion ||
                 SharedState->structSize != sizeof(OutRunVR::SharedPoseState))
                 return false;
+
+            // Best-effort raw snapshot is retained for diagnostics/fail-closed
+            // decisions even if the host died while sequence was odd. We never
+            // treat this raw snapshot as fresh; only a stable seqlock read may
+            // reopen stereo.
+            hostPid = SharedState->hostPid;
+            flags = SharedState->flags;
+            heartbeat = SharedState->heartbeat;
+            sampleQpc = SharedState->sampleQpc;
+            R21ComputeAgeMs(sampleQpc, ageMs);
 
             for (int attempt = 0; attempt < 4; ++attempt)
             {
@@ -59,20 +84,18 @@ namespace OutRunVRStereo
                 heartbeat = currentHeartbeat;
                 sampleQpc = currentSampleQpc;
 
-                if (!hostPid || sampleQpc <= 0)
+                if (!hostPid ||
+                    (flags & (OutRunVR::HostAlive | OutRunVR::HostShouldRender)) !=
+                        (OutRunVR::HostAlive | OutRunVR::HostShouldRender) ||
+                    !R21ComputeAgeMs(sampleQpc, ageMs))
                     return false;
 
-                LARGE_INTEGER now{};
-                LARGE_INTEGER frequency{};
-                if (!QueryPerformanceCounter(&now) ||
-                    !QueryPerformanceFrequency(&frequency) ||
-                    frequency.QuadPart <= 0 || now.QuadPart < sampleQpc)
-                    return false;
-
-                const std::int64_t delta = now.QuadPart - sampleQpc;
-                ageMs = (delta * 1000) / frequency.QuadPart;
                 return ageMs <= R21HostStaleMs;
             }
+
+            // An odd/stuck seqlock is itself a fail-closed condition. This is
+            // the important host-crashed-mid-write case that the old R21 path
+            // accidentally ignored when its output flags remained zero.
             return false;
         }
 
@@ -89,36 +112,40 @@ namespace OutRunVRStereo
             if (fresh)
             {
                 R21LastHealthyHostPid = hostPid;
+                R20StereoEligibilityGate.store(true, std::memory_order_release);
                 if (R21HostFailClosed)
                 {
                     R21HostFailClosed = false;
                     spdlog::info(
-                        "VR R21: fresh host pose recovered pid={} heartbeat={}; stereo may reactivate on a clean frame",
+                        "VR R21: fresh stable host pose recovered pid={} heartbeat={}; game-local stereo gate reopened",
                         hostPid, heartbeat);
                 }
                 return;
             }
 
-            if (!SharedState ||
-                (flags & (OutRunVR::HostAlive | OutRunVR::HostShouldRender)) == 0)
-                return;
+            R20StereoEligibilityGate.store(false, std::memory_order_release);
 
-            // The game maps SharedPoseState PAGE_READWRITE/FILE_MAP_ALL_ACCESS.
-            // Only clear the two eligibility bits; the host remains sole owner
-            // of pose/orientation/session data and will republish these flags if
-            // it is actually alive again.
-            constexpr std::uint32_t clearBits =
-                OutRunVR::HostAlive | OutRunVR::HostShouldRender;
-            InterlockedAnd(
-                reinterpret_cast<volatile LONG*>(&SharedState->flags),
-                static_cast<LONG>(~clearBits));
+            // If this frame already built a verified complete mono shadow, let
+            // R9 restore it by cancelling stereo only. If the shadow is not
+            // complete, cancel both seeds so Present leaves the real backbuffer
+            // untouched rather than restoring incomplete content.
+            if (R9MonoSeeded && !R9MonoBackupGap)
+            {
+                R9StereoSeeded = false;
+            }
+            else
+            {
+                R9StereoSeeded = false;
+                R9MonoSeeded = false;
+            }
 
             if (!R21HostFailClosed)
             {
                 R21HostFailClosed = true;
                 spdlog::warn(
-                    "VR R21 FAIL-CLOSED: OpenXR host pose stale/unavailable at Present (lastPid={} currentPid={} heartbeat={} ageMs={}); HostAlive/HostShouldRender cleared so R9 restores mono and stops stereo until a fresh host update",
+                    "VR R21 FAIL-CLOSED: OpenXR host pose stale/unavailable at Present (lastPid={} currentPid={} heartbeat={} flags=0x{:08x} ageMs={}); game-local stereo gate closed without modifying host-owned SharedPoseState",
                     R21LastHealthyHostPid, hostPid, heartbeat,
+                    static_cast<unsigned>(flags),
                     ageMs == INT64_MAX ? -1 : ageMs);
             }
         }
@@ -161,7 +188,7 @@ namespace OutRunVRStereo
                     }
                     R21PresentGuardReady.store(true, std::memory_order_release);
                     spdlog::info(
-                        "VR R21 GAME: host-death mono fail-closed guard ACTIVE threshold={}ms; no hook removal/resource destruction on failure",
+                        "VR R21 GAME: host-death mono fail-closed guard ACTIVE threshold={}ms; game-local eligibility gate only, host-owned seqlock is never written",
                         R21HostStaleMs);
                     return 0;
                 }
