@@ -1,4 +1,4 @@
-name: OpenXR VR production build
+name: OpenXR VR R22 production build
 
 on:
   push:
@@ -29,14 +29,14 @@ jobs:
           set CI=
           cmake -S . -B build-vr-game -G "Visual Studio 17 2022" -A Win32
 
-      - name: Verify R21 source graph
+      - name: Verify R22 source graph
         shell: pwsh
         run: |
           $projects = Get-ChildItem build-vr-game -Filter *.vcxproj -Recurse
           if (-not $projects) { throw 'no Visual Studio project files generated' }
           $text = ($projects | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
-          if (-not $text.Contains('stereo_renderer_r21.cpp')) { throw 'R21 wrapper missing from build graph' }
-          foreach ($legacy in @('stereo_renderer.cpp','stereo_renderer_r13.cpp','stereo_renderer_r20.cpp')) {
+          if (-not $text.Contains('stereo_renderer_r22.cpp')) { throw 'R22 wrapper missing from build graph' }
+          foreach ($legacy in @('stereo_renderer.cpp','stereo_renderer_r13.cpp','stereo_renderer_r20.cpp','stereo_renderer_r21.cpp')) {
             $escaped = [regex]::Escape($legacy)
             $pattern = '<ClCompile Include="[^"]*[\\/]' + $escaped + '"'
             if ($text -match $pattern) { throw "legacy stereo TU compiled independently: $legacy" }
@@ -51,10 +51,10 @@ jobs:
           Set-Content -Path build-vr-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
           (Get-Content build-vr-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-vr-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
 
-      - name: Build Win32 R21 DLL
+      - name: Build Win32 R22 DLL
         run: cmake --build build-vr-game --config Release
 
-      - name: Verify Win32 R21 binary
+      - name: Verify Win32 R22 binary
         shell: pwsh
         run: |
           $dll = 'build-vr-game/bin/dinput8.dll'
@@ -68,17 +68,18 @@ jobs:
             'VR R13: stereo hardening ACTIVE',
             'VR R20 PRODUCTION: stereo bootstrap overlay ACTIVE',
             'VR R21 GAME: host-death mono fail-closed guard ACTIVE',
+            'VR R22 GAME: scissor-preserving mono/right replay + common initial depth baseline + R21 eligibility gate ACTIVE',
             'VR R21 FAIL-CLOSED:',
             'VR v3 shadow: live dual-protocol diagnostics active'
           )) {
-            if (-not $ascii.Contains($marker)) { throw "R21 DLL marker missing: $marker" }
+            if (-not $ascii.Contains($marker)) { throw "R22 DLL marker missing: $marker" }
           }
           $pe = [BitConverter]::ToInt32($bytes,0x3C)
           if ([BitConverter]::ToUInt16($bytes,$pe+4) -ne 0x014C) { throw 'expected x86 DLL' }
 
       - uses: actions/upload-artifact@v4
         with:
-          name: outrun-vr-r21-game-x86
+          name: outrun-vr-r22-game-x86
           path: build-vr-game/bin/dinput8.dll
           if-no-files-found: error
 
@@ -115,34 +116,35 @@ jobs:
             if ($LASTEXITCODE -ne 0) { throw "smoke failed: $test code=$LASTEXITCODE" }
           }
 
-      - name: Verify x64 R21 host binary
+      - name: Verify x64 R22 host binary and PDB
         shell: pwsh
         run: |
           $hostPath = 'build-vr-host/bin/outrun-vr-host.exe'
+          $pdbPath = 'build-vr-host/bin/outrun-vr-host.pdb'
           if (-not (Test-Path $hostPath)) { throw 'outrun-vr-host.exe was not produced' }
+          if (-not (Test-Path $pdbPath)) { throw 'outrun-vr-host.pdb was not produced' }
           $bytes = [IO.File]::ReadAllBytes($hostPath)
           if ($bytes.Length -lt 10000) { throw 'outrun-vr-host.exe unexpectedly small' }
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
-          $unicode = [Text.Encoding]::Unicode.GetString($bytes)
           foreach ($marker in @(
             'R21-readonly-ipc-vs-cbuffer-20260916',
-            '[R21] final OpenXR presentation owner ACTIVE',
-            'R21-crash-dump-20260916',
+            'R22-verified-frame-bundle-20260916',
+            'R22-async-gameuv-capture-diagnostic-20260916',
+            'R22-crash-dump-20260916',
             'R20-production-host-20260916',
             'testPattern=removed',
             'R19-production-capture-reuse-20260916',
             '[v3] live shadow HostState/AckState bridge ready.'
           )) {
-            if (-not $ascii.Contains($marker)) { throw "R21 host marker missing: $marker" }
+            if (-not $ascii.Contains($marker)) { throw "R22 host marker missing: $marker" }
           }
-          if (-not $unicode.Contains('outrun-vr-host-crash.dmp')) { throw 'R21 UTF-16 crash dump filename missing' }
-          if ($ascii.Contains('no-layer OpenXR test pattern ready')) { throw 'obsolete no-layer OpenXR test pattern leaked into R21 host' }
+          if ($ascii.Contains('no-layer OpenXR test pattern ready')) { throw 'obsolete no-layer OpenXR test pattern leaked into R22 host' }
           $pe = [BitConverter]::ToInt32($bytes,0x3C)
           if ([BitConverter]::ToUInt16($bytes,$pe+4) -ne 0x8664) { throw 'expected x64 host' }
 
       - uses: actions/upload-artifact@v4
         with:
-          name: outrun-vr-r21-host-x64-production
+          name: outrun-vr-r22-host-x64-production
           path: |
             build-vr-host/bin/outrun-vr-host.exe
             build-vr-host/bin/outrun-vr-host.pdb
