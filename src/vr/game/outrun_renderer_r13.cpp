@@ -9,6 +9,7 @@ namespace OutRunVRRenderer
     namespace
     {
         SafetyHookInline R13WvpCallbackHook{};
+        std::atomic<bool> R13WvpHookReady{false};
         std::uint64_t R13OffscreenWvpBypasses = 0;
         std::uint64_t R13ScreenSpaceWvpBypasses = 0;
         std::uint64_t R13UnknownProjectionWvpBypasses = 0;
@@ -56,6 +57,18 @@ namespace OutRunVRRenderer
         HRESULT __stdcall SetVertexShaderConstantFDestR13(
             IDirect3DDevice9* device, UINT startRegister, const float* constantData, UINT vector4fCount)
         {
+            // SafetyHook activates the target detour as part of create_inline().
+            // A render thread can therefore enter this callback in the tiny
+            // interval before the returned trampoline object is assigned to the
+            // global R13WvpCallbackHook. Never dereference that not-yet-published
+            // trampoline. One stock D3D9 upload is safer than recursion/crash.
+            if (!R13WvpHookReady.load(std::memory_order_acquire))
+            {
+                InvalidateVerifiedWvp();
+                return SetVertexShaderConstantFHook.stdcall<HRESULT>(
+                    device, startRegister, constantData, vector4fCount);
+            }
+
             if (IsGameDevice(device) && constantData &&
                 !OutRunVRStereo::IsInternalStereoPassActive() &&
                 UploadTouchesOutRunWvp(startRegister, vector4fCount))
@@ -136,12 +149,14 @@ namespace OutRunVRRenderer
 
         DWORD WINAPI R13RendererInstallThread(void*)
         {
+            R13WvpHookReady.store(false, std::memory_order_release);
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
                 const std::uint32_t rendererState =
                     RendererInstallState.load(std::memory_order_acquire);
                 if (rendererState == RendererInstallFailed)
                 {
+                    R13WvpHookReady.store(false, std::memory_order_release);
                     RendererInjectionAllowed.store(false, std::memory_order_release);
                     InvalidateVerifiedWvp();
                     spdlog::error(
@@ -155,11 +170,13 @@ namespace OutRunVRRenderer
                         SetVertexShaderConstantFDestR13);
                     if (R13WvpCallbackHook)
                     {
+                        R13WvpHookReady.store(true, std::memory_order_release);
                         spdlog::info(
                             "VR R13: renderer WVP target+projection classification guard armed via atomic renderer install handoff");
                     }
                     else
                     {
+                        R13WvpHookReady.store(false, std::memory_order_release);
                         // Do not mutate a SafetyHookInline owned by another thread.
                         // The base callback stays installed but becomes a stock-WVP
                         // pass-through through this release/acquire policy flag.
@@ -172,6 +189,7 @@ namespace OutRunVRRenderer
                 }
                 Sleep(25);
             }
+            R13WvpHookReady.store(false, std::memory_order_release);
             RendererInjectionAllowed.store(false, std::memory_order_release);
             InvalidateVerifiedWvp();
             spdlog::warn(
@@ -186,9 +204,20 @@ namespace OutRunVRRenderer
             bool validate() override { return true; }
             bool apply() override
             {
+                R13WvpHookReady.store(false, std::memory_order_release);
                 HANDLE thread = CreateThread(nullptr, 0, R13RendererInstallThread, nullptr, 0, nullptr);
                 if (!thread)
+                {
+                    // Without the R13 classifier the base c64 injector must not
+                    // continue in a less-safe mode. Treat installer-thread
+                    // creation failure the same as hook-install failure.
+                    RendererInjectionAllowed.store(false, std::memory_order_release);
+                    InvalidateVerifiedWvp();
+                    spdlog::error(
+                        "VR R13: failed to create renderer hardening installer thread; WVP injection disabled fail-closed: {}",
+                        GetLastError());
                     return false;
+                }
                 CloseHandle(thread);
                 return true;
             }
