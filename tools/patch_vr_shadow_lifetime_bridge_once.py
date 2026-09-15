@@ -47,8 +47,8 @@ text = replace_once(
     'dllmain callback guard')
 text = replace_once(
     text,
-    "            'process-lifetime worker tracked with stop event',\n",
-    "            'process-lifetime worker tracked with stop event',\n            'detach callback registered',\n",
+    "            'process-lifetime worker tracked with stop event',\n            'protocol v3 pose is PRIMARY',\n",
+    "            'process-lifetime worker tracked with stop event',\n            'detach callback registered',\n            'protocol v3 pose is PRIMARY',\n",
     'binary callback marker')
 path.write_text(text, encoding='utf-8', newline='\n')
 
