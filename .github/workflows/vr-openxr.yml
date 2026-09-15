@@ -71,7 +71,8 @@ jobs:
             'outrun_renderer.cpp'
           )) {
             $escaped = [regex]::Escape($legacy)
-            if ($projectText -match "<ClCompile Include=\"[^\"]*[\\/]$escaped\"") {
+            $pattern = '<ClCompile Include="[^"]*[\\/]' + $escaped + '"'
+            if ($projectText -match $pattern) {
               throw "legacy VR translation unit is still compiled independently: $legacy"
             }
           }
