@@ -20,6 +20,11 @@
 
 namespace OutRunVRD3D9ExUpgradeR13
 {
+    // Reset ownership contract (second review pass): once a game device is
+    // promoted to D3D9Ex, every stereo Reset path must retain a direct ResetEx
+    // fallback. R13 may replace the later callback policy, but a failed/partial
+    // R13 overlay is never allowed to strand the promoted device with neither
+    // a legacy Reset shim nor a ResetEx-capable stereo callback.
     bool IsCompatDevice(IDirect3DDevice9* device) noexcept;
     bool ResetCompatDevice(IDirect3DDevice9* device,
         D3DPRESENT_PARAMETERS* params, HRESULT& result) noexcept;
@@ -30,8 +35,19 @@ namespace OutRunVRStereo
 {
     // Installer ownership contract: R7 publishes its completed device/hooks via
     // release/acquire atomics, R9 publishes its callback-policy state the same
-    // way, and R13 consumes only those states. SafetyHookInline objects are not
-    // used as cross-thread readiness flags.
+    // way, and R13 consumes only those states. R13 also publishes an explicit
+    // Pending/Ready/Failed transaction state for diagnostics. SafetyHookInline
+    // objects are not used as cross-thread readiness flags.
+    //
+    // The renderer-side c64/WVP hook follows the same policy: the base renderer
+    // publishes RendererInstallState, while R13 consumes that atomic state and
+    // disables pose injection through an atomic policy flag if its offscreen
+    // classification guard cannot be installed. It never clears another
+    // thread's SafetyHookInline as a readiness/failure signal.
+    //
+    // Occlusion-query tracking is a correctness boundary. If IDirect3DQuery9::
+    // Issue cannot be observed, stereo duplication fails closed to one execution
+    // instead of risking duplicated query/MRT side effects.
 
     // Renderer-pose injection must only affect the main game backbuffer.
     // Reflection/shadow/auxiliary world passes intentionally retain the stock
