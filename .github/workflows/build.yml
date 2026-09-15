@@ -29,7 +29,12 @@ jobs:
           python tools/verify_wheel_ffb_math.py
 
       - name: Configure
+        shell: pwsh
         run: |
+          # cmkr intentionally skips regeneration when CI is set. vr-openxr uses
+          # cmake.toml as the canonical source graph, so remove CI here just as
+          # the dedicated VR workflow does before configuring.
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
           mkdir build
           cd build
           cmake -G "Visual Studio 17 2022" -A ${{matrix.arch}} ..
@@ -56,7 +61,7 @@ jobs:
           cp OutRun2006Tweaks.ini build/bin/OutRun2006Tweaks.ini
           cp OutRun2006Tweaks.lods.ini build/bin/OutRun2006Tweaks.lods.ini
 
-      - name: Verify built wheel payload
+      - name: Verify built wheel and VR payload
         shell: pwsh
         run: |
           $dllPath = "build/bin/dinput8.dll"
@@ -99,7 +104,11 @@ jobs:
             "load={:.2f} slide={:.2f} scrub={:.2f}",
             "basis=M70r{}",
             "steerSrc={}",
-            "Test Left (20%)"
+            "Test Left (20%)",
+            "VR stereo: D3D9 full-eye renderer installed",
+            "VR R13: stereo hardening ACTIVE",
+            "VR R13: auxiliary/offscreen c64 WVP kept stock",
+            "VR v3 shadow: live dual-protocol diagnostics active"
           )
           foreach ($marker in $markers) {
             if (-not $ascii.Contains($marker)) { throw "missing compiled marker: $marker" }
@@ -112,7 +121,7 @@ jobs:
           if ($ini -notmatch '(?m)^UseNewInput\s*=\s*true\s*$') { throw "multi-device input is not the shipped default" }
           if ($ini -notmatch '(?m)^TrailResponseLead\s*=\s*0\.25\s*$') { throw "shipped pneumatic trail response lead is not 0.25" }
 
-          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, current Physics SAT / FFB compatibility markers present" -f $bytes.Length)
+          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, current wheel FFB + OpenXR VR markers present" -f $bytes.Length)
           Get-FileHash $dllPath -Algorithm SHA256
 
       - name: Download upstream replacement EXE
