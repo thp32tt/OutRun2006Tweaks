@@ -1,5 +1,17 @@
 #pragma once
 
+// This header is included before the legacy renderer implementation by the R13
+// wrapper translation units. Define the lean Windows contract here, before the
+// first Windows.h include, so Win32 multimedia/min/max macros cannot rewrite
+// OutRun's SOUND_CMD names or std::min/std::max expressions in the included
+// implementation.
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include <Windows.h>
 #include <d3d9.h>
 #include <cstdint>
