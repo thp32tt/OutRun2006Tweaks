@@ -12,6 +12,7 @@ required = [
     'src/vr/d3d9/ex_device_upgrade.cpp',
     'src/vr/d3d9/ex_device_upgrade_r13.cpp',
     'src/vr/d3d9/r13_bridge.hpp',
+    'src/vr/d3d9/vr_pass_policy.hpp',
     'src/vr/ipc/protocol.hpp',
     'src/vr/ipc/direct_ack_r13.hpp',
     # New architecture foundation.
@@ -122,6 +123,15 @@ for marker in ('class IStereoBackend', 'DrawClass', 'drawWorldStereo', 'drawScre
     if marker not in stereo_backend:
         raise SystemExit(f'missing stereo backend boundary: {marker}')
 
+pass_policy = (ROOT / 'src/vr/d3d9/vr_pass_policy.hpp').read_text(encoding='utf-8')
+for marker in (
+    'ClassifyProjectionSignature', 'Perspective3D', 'Orthographic2D',
+    'ClassifyRenderSemanticChecked', 'PolicyMismatch', 'AllowsWorldStereo',
+    'ClassifyDrawReplay', 'UnsafeSingleExecution',
+):
+    if marker not in pass_policy:
+        raise SystemExit(f'missing emulator-inspired render-pass policy invariant: {marker}')
+
 renderer = (ROOT / 'src/vr/game/outrun_renderer.cpp').read_text(encoding='utf-8')
 for marker in (
     'OutRunWvpRegister = 64', 'BeginSceneVtableIndex = 41',
@@ -133,12 +143,15 @@ for marker in (
 
 renderer_r13 = (ROOT / 'src/vr/game/outrun_renderer_r13.cpp').read_text(encoding='utf-8')
 for marker in (
-    'IsMainBackbufferPoseInjectionPass',
+    'CurrentPoseInjectionSnapshot',
     'auxiliary/offscreen c64 WVP kept stock',
+    'PolicyMismatch', 'main-pass classifiers disagreed',
+    'R13WvpHookReady', 'std::memory_order_acquire',
+    'failed to create renderer hardening installer thread',
     'SetVertexShaderConstantFDestR13',
 ):
     if marker not in renderer_r13:
-        raise SystemExit(f'missing R13 offscreen-WVP hardening invariant: {marker}')
+        raise SystemExit(f'missing R13 renderer hardening invariant: {marker}')
 
 stereo = (ROOT / 'src/vr/d3d9/stereo_renderer.cpp').read_text(encoding='utf-8')
 for marker in (
@@ -156,6 +169,8 @@ for marker in (
     'ResetDestR13', 'ResetCompatDevice', 'ResolveDirectTransportR13',
     'DirectGpuAckName', 'completedFrameId[slotIndex]', 'transportGeneration',
     'GPU-completion direct-ring backpressure', 'IsMainBackbufferPoseInjectionPass',
+    'PoseInjectionSnapshot CurrentPoseInjectionSnapshot',
+    'legacyMainBackbufferInvariant', 'auxiliaryRenderTargetActive',
 ):
     if marker not in stereo_r13:
         raise SystemExit(f'missing R13 stereo hardening invariant: {marker}')
@@ -221,7 +236,11 @@ if 'PoseState->reserved[OutRunVRR13::HostDirectGpuCompletedFrameIndex]' in direc
     raise SystemExit('host still writes R13 GPU ACK into legacy pose reserved words')
 
 bridge = (ROOT / 'src/vr/d3d9/r13_bridge.hpp').read_text(encoding='utf-8')
-for marker in ('direct_ack_r13.hpp', 'ResetCompatDevice', 'IsMainBackbufferPoseInjectionPass'):
+for marker in (
+    'direct_ack_r13.hpp', 'ResetCompatDevice',
+    'struct PoseInjectionSnapshot', 'CurrentPoseInjectionSnapshot',
+    'IsMainBackbufferPoseInjectionPass',
+):
     if marker not in bridge:
         raise SystemExit(f'missing R13 cross-TU bridge invariant: {marker}')
 
