@@ -29,7 +29,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(openxr_sdk)
 
 add_executable(outrun-vr-host
-    src/main.cpp
+    src/main_r23.cpp
     src/ipc/v3_shadow_bridge.cpp
     src/diagnostics/runtime_watchdog.cpp
 )
@@ -39,13 +39,11 @@ target_include_directories(outrun-vr-host PRIVATE
 )
 target_compile_definitions(outrun-vr-host PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 if(MSVC)
-    # Forced-include order is the runtime ownership stack. R22 is the final
-    # xrEndFrame owner: R21 retains readonly/direct/shouldRender policy and R22
-    # adds latest-Frame.v2 pose/FOV bundle validation while blocking QPC-only
-    # gameplay fallback synthesis. R22 capture diagnostics replace only the
-    # production ReleaseFrame instrumentation with a non-blocking game-UV
-    # staging/query sampler. Crash diagnostics remain last and do not alter
-    # OpenXR dispatch.
+    # R23 is the final presentation owner. R21 retains readonly direct-state and
+    # shouldRender policy, R22 retains pose/FOV validation, and R23 additionally
+    # requires the exact Frame.v2 + image-source bundle committed by main_r23.
+    # R22 capture diagnostics remain available for the legacy implementation;
+    # main_r23 adds source + post-blit eye probes without synchronous Map waits.
     target_compile_options(outrun-vr-host PRIVATE
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/openxr_api_compat.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/sbs_capture_override.hpp"
@@ -54,6 +52,7 @@ if(MSVC)
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/review_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r21_runtime_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r22_runtime_hardening.hpp"
+        "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r23_runtime_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r21_crash_diagnostics.hpp"
         "$<$<CONFIG:Release>:/Zi>"
     )
@@ -66,8 +65,6 @@ target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi d3dcompile
 
 # Renderer-independent hardware diagnostic. This intentionally does not use the
 # host forced-include runtime wrappers and does not depend on the game process.
-# It submits deterministic color patterns directly through OpenXR/D3D11 so
-# VDXR swapchain/layer behavior can be isolated from D3D9 capture/stereo logic.
 add_executable(outrun-vr-diagnostic
     src/diagnostic_pattern.cpp
 )
