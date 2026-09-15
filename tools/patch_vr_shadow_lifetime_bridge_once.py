@@ -32,44 +32,14 @@ text = replace_once(
     'callback unregister')
 path.write_text(text, encoding='utf-8', newline='\n')
 
-# Update the permanent CI source guards to the optional callback bridge contract.
-path = Path('.github/workflows/vr-openxr.yml')
-text = path.read_text(encoding='utf-8')
-text = replace_once(
-    text,
-    "              'RequestShadowBridgeStop'\n",
-    "              'RequestShadowBridgeStop',\n              'RegisterShadowBridgeStopCallback'\n",
-    'game source callback guard')
-text = replace_once(
-    text,
-    "              'OutRunVR::IpcV3::RequestShadowBridgeStop();'\n",
-    "              'OutRunVR::IpcV3::RequestRegisteredShadowBridgeStop();'\n",
-    'dllmain callback guard')
-text = replace_once(
-    text,
-    "            'process-lifetime worker tracked with stop event',\n            'protocol v3 pose is PRIMARY',\n",
-    "            'process-lifetime worker tracked with stop event',\n            'detach callback registered',\n            'protocol v3 pose is PRIMARY',\n",
-    'binary callback marker')
-path.write_text(text, encoding='utf-8', newline='\n')
-
-# Exact postconditions.
-checks = {
-    'src/vr/ipc/v3_game_shadow_bridge.cpp': [
-        '#include "vr/ipc/shadow_lifetime_bridge.hpp"',
-        'RegisterShadowBridgeStopCallback(&RequestShadowBridgeStop);',
-        'RegisterShadowBridgeStopCallback(nullptr);',
-        'detach callback registered',
-    ],
-    '.github/workflows/vr-openxr.yml': [
-        'RequestRegisteredShadowBridgeStop();',
-        'RegisterShadowBridgeStopCallback',
-        'detach callback registered',
-    ],
-}
-for file, markers in checks.items():
-    body = Path(file).read_text(encoding='utf-8')
-    for marker in markers:
-        if marker not in body:
-            raise RuntimeError(f'missing {marker!r} in {file}')
+body = path.read_text(encoding='utf-8')
+for marker in (
+    '#include "vr/ipc/shadow_lifetime_bridge.hpp"',
+    'RegisterShadowBridgeStopCallback(&RequestShadowBridgeStop);',
+    'RegisterShadowBridgeStopCallback(nullptr);',
+    'detach callback registered',
+):
+    if marker not in body:
+        raise RuntimeError(f'missing {marker!r} in {path}')
 
 print('shadow lifetime callback registration applied')
