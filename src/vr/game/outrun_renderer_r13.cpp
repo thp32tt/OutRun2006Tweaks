@@ -186,7 +186,7 @@ namespace OutRunVRRenderer
                     {
                         R13WvpHookReady.store(true, std::memory_order_release);
                         spdlog::info(
-                            "VR R13: renderer WVP target+projection classification guard armed after disabled-first trampoline publish");
+                            "VR R13: renderer WVP target+projection classification guard armed via atomic renderer install handoff; disabled-first trampoline publish complete");
                     }
                     else
                     {
