@@ -27,7 +27,13 @@ endif()
 project(outrun2006tweaks-proj)
 
 set_source_files_properties(src/hooks_wheel_ffb.cpp PROPERTIES HEADER_FILE_ONLY TRUE)
-
+# R13 keeps the validated R9/R12 implementation files intact and compiles
+# wrapper translation units that include them plus narrowly scoped hardening.
+set_source_files_properties(
+    src/vr/d3d9/ex_device_upgrade.cpp
+    src/vr/d3d9/stereo_renderer.cpp
+    src/vr/game/outrun_renderer.cpp
+    PROPERTIES HEADER_FILE_ONLY TRUE)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 
@@ -300,13 +306,22 @@ set(outrun2006tweaks_SOURCES
 	"src/hooks_exceptions.cpp"
 	"src/hooks_flac.cpp"
 	"src/hooks_forcefeedback.cpp"
-	"src/hooks_wheel_ffb_build.cpp"
 	"src/hooks_framerate.cpp"
 	"src/hooks_graphics.cpp"
 	"src/hooks_input.cpp"
 	"src/hooks_misc.cpp"
 	"src/hooks_textures.cpp"
 	"src/hooks_uiscaling.cpp"
+	"src/hooks_wheel_ffb.cpp"
+	"src/hooks_wheel_ffb_build.cpp"
+	"src/hooks_wheel_input_compat_v2.hpp"
+	"src/hooks_wheel_legacy_blank_defaults.hpp"
+	"src/hooks_wheel_menu_keyboard_back.hpp"
+	"src/hooks_wheel_menu_keyboard_select.hpp"
+	"src/hooks_wheel_r3_device_autoselect.hpp"
+	"src/hooks_wheel_r3_menu_ab.hpp"
+	"src/hooks_wheel_r3_menu_dpad.hpp"
+	"src/hooks_wheel_vehicle_dynamics.hpp"
 	"src/input_manager.cpp"
 	"src/input_manager.hpp"
 	"src/input_names.hpp"
@@ -319,7 +334,6 @@ set(outrun2006tweaks_SOURCES
 	"src/overlay/debug_ui.cpp"
 	"src/overlay/hooks_overlay.cpp"
 	"src/overlay/input_bindings_ui.cpp"
-	"src/overlay/wheel_setup_ui.cpp"
 	"src/overlay/networking_ui.cpp"
 	"src/overlay/notifications.hpp"
 	"src/overlay/overlay.cpp"
@@ -328,12 +342,43 @@ set(outrun2006tweaks_SOURCES
 	"src/overlay/server_notifications.cpp"
 	"src/overlay/settings_ui.cpp"
 	"src/overlay/update_check.cpp"
+	"src/overlay/wheel_setup_ui.cpp"
 	"src/plugin.hpp"
 	"src/resource.h"
 	"src/settings.cpp"
 	"src/settings.hpp"
 	"src/upnp.cpp"
 	"src/upnp.hpp"
+	"src/vr/core/frame_types.hpp"
+	"src/vr/core/matrix.hpp"
+	"src/vr/core/transport.hpp"
+	"src/vr/d3d9/device_probe.cpp"
+	"src/vr/d3d9/ex_device_upgrade.cpp"
+	"src/vr/d3d9/ex_device_upgrade_r13.cpp"
+	"src/vr/d3d9/helper_ex_probe.cpp"
+	"src/vr/d3d9/r13_bridge.hpp"
+	"src/vr/d3d9/stereo_backend.hpp"
+	"src/vr/d3d9/stereo_renderer.cpp"
+	"src/vr/d3d9/stereo_renderer_r13.cpp"
+	"src/vr/d3d9/vr_pass_policy.hpp"
+	"src/vr/game/game_adapter.hpp"
+	"src/vr/game/outrun_renderer.cpp"
+	"src/vr/game/outrun_renderer_r13.cpp"
+	"src/vr/ipc/direct_ack_r13.hpp"
+	"src/vr/ipc/host_pose_v3.hpp"
+	"src/vr/ipc/host_state_v3_reader.hpp"
+	"src/vr/ipc/protocol.hpp"
+	"src/vr/ipc/protocol_v3.hpp"
+	"src/vr/ipc/protocol_v3_smoke.cpp"
+	"src/vr/ipc/shadow_legacy_v2.hpp"
+	"src/vr/ipc/shadow_lifetime_bridge.hpp"
+	"src/vr/ipc/v3_game_shadow_bridge.cpp"
+	"src/vr/ipc/win32_channel.hpp"
+	"src/vr/settings.cpp"
+	"src/vr_shared.hpp"
+	"src/wheel_ffb_math.hpp"
+	"src/wheel_ffb_runtime.hpp"
+	"src/wheel_profile_store.hpp"
 )
 
 add_library(outrun2006tweaks SHARED)
