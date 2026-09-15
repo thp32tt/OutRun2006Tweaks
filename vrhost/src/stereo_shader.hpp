@@ -1,5 +1,10 @@
 #pragma once
 
+// R21: BlitParams is intentionally consumed by PSMain. The host RenderTo()
+// path already binds b0 to the pixel shader, while R20 never bound it to VS.
+// Keeping the fullscreen-triangle VS free of constant-buffer dependencies makes
+// the core compositor deterministic and removes the all-black single-sample UV
+// failure mode without relying on inherited VS bindings.
 inline constexpr const char* OutRunStereoBlitShader = R"HLSL(
 Texture2D SourceTexture : register(t0);
 SamplerState SourceSampler : register(s0);
@@ -24,7 +29,7 @@ VSOut VSMain(uint id : SV_VertexID)
     VSOut o;
     float2 uv = float2((id << 1) & 2, id & 2);
     o.position = float4(uv * float2(2.0, -2.0) + float2(-1.0, 1.0), 0.0, 1.0);
-    o.uv = uv * UvScale + UvOffset;
+    o.uv = uv;
     return o;
 }
 
@@ -38,7 +43,8 @@ float3 SrgbToLinear(float3 c)
 
 float4 PSMain(VSOut input) : SV_Target
 {
-    float4 src = SourceTexture.Sample(SourceSampler, input.uv);
+    const float2 sampleUv = input.uv * UvScale + UvOffset;
+    float4 src = SourceTexture.Sample(SourceSampler, sampleUv);
     float3 linearColor;
     if (SourceIsScRgb > 0.5)
         linearColor = max(src.rgb, 0.0) / max(SdrWhiteScale, 0.001);
