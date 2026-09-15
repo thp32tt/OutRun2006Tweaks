@@ -432,7 +432,7 @@ namespace OutRunVRStereo
                     {
                         R13InstallState.store(R13InstallReady, std::memory_order_release);
                         spdlog::info(
-                            "VR R13: stereo hardening ACTIVE; transactional R13 install state=READY + atomic R7/R9 handoff + single ResetEx owner + GPU-completion direct-ring backpressure + single-execution MRT/occlusion fallback");
+                            "VR R13: stereo hardening ACTIVE; transactional R13 install state=READY + atomic R7/R9 install handoff + single ResetEx owner + GPU-completion direct-ring backpressure + single-execution MRT/occlusion fallback");
                     }
                     else
                     {
