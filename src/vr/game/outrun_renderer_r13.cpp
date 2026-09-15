@@ -26,9 +26,10 @@ namespace OutRunVRRenderer
             projectionM34 = 0.0f;
             projectionM44 = 0.0f;
 
-            const auto targetPolicy = OutRunVRStereo::CurrentPoseInjectionPolicy();
+            const auto passSnapshot = OutRunVRStereo::CurrentPoseInjectionSnapshot();
+            const auto targetPolicy = passSnapshot.policy;
             const bool mainBackbufferPosePass =
-                OutRunVRStereo::IsMainBackbufferPoseInjectionPass();
+                passSnapshot.legacyMainBackbufferInvariant;
 
             if (targetPolicy != OutRunVR::PassPolicy::PoseInjectionPolicy::MainBackbuffer)
             {
