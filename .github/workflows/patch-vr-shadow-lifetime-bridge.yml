@@ -15,6 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # One-shot exact-match patch; it fails closed if the reviewed source shape changes.
       - name: Apply optional shadow lifetime callback registration
         run: python tools/patch_vr_shadow_lifetime_bridge_once.py
 
