@@ -3,6 +3,7 @@
 #include <Windows.h>
 
 #include <algorithm>
+#include <atomic>
 #include <cmath>
 #include <cstdint>
 #include <cstring>
@@ -21,16 +22,50 @@ namespace OutRunVR::IpcV3
 {
     namespace
     {
-        bool ProcessAlive(DWORD pid) noexcept
+        enum class ProcessLiveness : std::uint8_t
+        {
+            Dead,
+            Alive,
+            Unknown
+        };
+
+        ProcessLiveness QueryProcessLiveness(DWORD pid) noexcept
         {
             if (!pid)
-                return false;
+                return ProcessLiveness::Dead;
             HANDLE process = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
             if (!process)
-                return false;
-            const bool alive = WaitForSingleObject(process, 0) == WAIT_TIMEOUT;
+            {
+                // ERROR_INVALID_PARAMETER is the normal signal for a PID that no
+                // longer exists. Any permission/transient failure is fail-closed:
+                // do not steal ownership from a process we cannot prove dead.
+                return GetLastError() == ERROR_INVALID_PARAMETER
+                    ? ProcessLiveness::Dead
+                    : ProcessLiveness::Unknown;
+            }
+            const DWORD wait = WaitForSingleObject(process, 0);
             CloseHandle(process);
-            return alive;
+            if (wait == WAIT_TIMEOUT)
+                return ProcessLiveness::Alive;
+            if (wait == WAIT_OBJECT_0)
+                return ProcessLiveness::Dead;
+            return ProcessLiveness::Unknown;
+        }
+
+        std::atomic<bool> ShadowBridgeStop{false};
+        HANDLE ShadowBridgeStopEvent = nullptr;
+        HANDLE ShadowBridgeThreadHandle = nullptr;
+
+        bool ShadowBridgeWait(DWORD timeoutMs) noexcept
+        {
+            if (ShadowBridgeStop.load(std::memory_order_acquire))
+                return true;
+            if (!ShadowBridgeStopEvent)
+            {
+                Sleep(timeoutMs);
+                return ShadowBridgeStop.load(std::memory_order_acquire);
+            }
+            return WaitForSingleObject(ShadowBridgeStopEvent, timeoutMs) == WAIT_OBJECT_0;
         }
 
         class ClientStateWriter
@@ -118,7 +153,8 @@ namespace OutRunVR::IpcV3
                     const LONG observed = static_cast<LONG>(pid);
                     if (observed == self)
                         return true;
-                    if (observed != 0 && ProcessAlive(static_cast<DWORD>(observed)))
+                    if (observed != 0 &&
+                        QueryProcessLiveness(static_cast<DWORD>(observed)) != ProcessLiveness::Dead)
                         return false;
                     if (InterlockedCompareExchange(
                         reinterpret_cast<volatile LONG*>(&pid), self, observed) == observed)
@@ -236,7 +272,8 @@ namespace OutRunVR::IpcV3
                     const LONG observed = *atomicPid;
                     if (observed == self)
                         return true;
-                    if (observed != 0 && ProcessAlive(static_cast<DWORD>(observed)))
+                    if (observed != 0 &&
+                        QueryProcessLiveness(static_cast<DWORD>(observed)) != ProcessLiveness::Dead)
                         return false;
                     if (InterlockedCompareExchange(atomicPid, self, observed) == observed)
                         return true;
@@ -357,18 +394,20 @@ namespace OutRunVR::IpcV3
             std::uint64_t ackParityLag = 0;
             bool readyLogged = false;
 
-            for (;;)
+            while (!ShadowBridgeStop.load(std::memory_order_acquire))
             {
                 if (!legacyPoseMapping.EnsureOpen(SharedMemoryName))
                 {
-                    Sleep(100);
+                    if (ShadowBridgeWait(100))
+                        break;
                     continue;
                 }
 
                 SharedPoseState pose{};
                 if (!ShadowV2::StableReadPose(legacyPoseMapping.Get(), pose))
                 {
-                    Sleep(2);
+                    if (ShadowBridgeWait(2))
+                        break;
                     continue;
                 }
 
@@ -507,8 +546,10 @@ namespace OutRunVR::IpcV3
                         pose.reserved[ClientStereoStateIndex]);
                 }
 
-                Sleep(2);
+                if (ShadowBridgeWait(2))
+                    break;
             }
+            return 0;
         }
 
         class VRV3ShadowHook final : public Hook
@@ -519,13 +560,39 @@ namespace OutRunVR::IpcV3
 
             bool apply() override
             {
+                if (ShadowBridgeThreadHandle)
+                    return true;
+                if (!ShadowBridgeStopEvent)
+                    ShadowBridgeStopEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+                if (!ShadowBridgeStopEvent)
+                {
+                    spdlog::error("VR v3 shadow: failed to create stop event: {}", GetLastError());
+                    return false;
+                }
+                ShadowBridgeStop.store(false, std::memory_order_release);
+                ResetEvent(ShadowBridgeStopEvent);
+
+                // The bridge executes plugin code for the entire game process.
+                // Pin the module so an unexpected FreeLibrary cannot unload code
+                // underneath the worker; normal process shutdown still receives
+                // DLL_PROCESS_DETACH and signals the stop event.
+                HMODULE pinnedModule = nullptr;
+                if (!GetModuleHandleExW(
+                        GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_PIN,
+                        reinterpret_cast<LPCWSTR>(&ShadowBridgeStop), &pinnedModule))
+                {
+                    spdlog::error("VR v3 shadow: failed to pin plugin module: {}", GetLastError());
+                    return false;
+                }
+
                 HANDLE thread = CreateThread(nullptr, 0, ShadowBridgeThread, nullptr, 0, nullptr);
                 if (!thread)
                 {
                     spdlog::error("VR v3 shadow: failed to create bridge thread: {}", GetLastError());
                     return false;
                 }
-                CloseHandle(thread);
+                ShadowBridgeThreadHandle = thread;
+                spdlog::info("VR v3 shadow: process-lifetime worker tracked with stop event; plugin module pinned");
                 return true;
             }
 
@@ -533,5 +600,17 @@ namespace OutRunVR::IpcV3
         };
 
         VRV3ShadowHook VRV3ShadowHook::instance;
+    }
+
+    void RequestShadowBridgeStop() noexcept
+    {
+        ShadowBridgeStop.store(true, std::memory_order_release);
+        if (ShadowBridgeStopEvent)
+            SetEvent(ShadowBridgeStopEvent);
+        if (ShadowBridgeThreadHandle)
+        {
+            CloseHandle(ShadowBridgeThreadHandle);
+            ShadowBridgeThreadHandle = nullptr;
+        }
     }
 }

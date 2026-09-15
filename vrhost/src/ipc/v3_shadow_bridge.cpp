@@ -24,16 +24,34 @@ namespace OutRunVR::Host
 {
     namespace
     {
-        bool ProcessAlive(DWORD pid) noexcept
+        enum class ProcessLiveness : std::uint8_t
+        {
+            Dead,
+            Alive,
+            Unknown
+        };
+
+        ProcessLiveness QueryProcessLiveness(DWORD pid) noexcept
         {
             if (!pid)
-                return false;
+                return ProcessLiveness::Dead;
             HANDLE process = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
             if (!process)
-                return false;
-            const bool alive = WaitForSingleObject(process, 0) == WAIT_TIMEOUT;
+            {
+                // ERROR_INVALID_PARAMETER is the normal signal for a PID that no
+                // longer exists. Any permission/transient failure is fail-closed:
+                // do not steal ownership from a process we cannot prove dead.
+                return GetLastError() == ERROR_INVALID_PARAMETER
+                    ? ProcessLiveness::Dead
+                    : ProcessLiveness::Unknown;
+            }
+            const DWORD wait = WaitForSingleObject(process, 0);
             CloseHandle(process);
-            return alive;
+            if (wait == WAIT_TIMEOUT)
+                return ProcessLiveness::Alive;
+            if (wait == WAIT_OBJECT_0)
+                return ProcessLiveness::Dead;
+            return ProcessLiveness::Unknown;
         }
 
         class JsonLog
@@ -174,7 +192,8 @@ namespace OutRunVR::Host
                     const LONG observed = *pid;
                     if (observed == self)
                         return true;
-                    if (observed != 0 && ProcessAlive(static_cast<DWORD>(observed)))
+                    if (observed != 0 &&
+                        QueryProcessLiveness(static_cast<DWORD>(observed)) != ProcessLiveness::Dead)
                         return false;
                     if (InterlockedCompareExchange(pid, self, observed) == observed)
                         return true;

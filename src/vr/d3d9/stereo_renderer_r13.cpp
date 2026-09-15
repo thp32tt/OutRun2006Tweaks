@@ -383,34 +383,18 @@ namespace OutRunVRStereo
             R13DrawIndexedPrimitiveUPR9Hook = {};
         }
 
-        void R13RollbackPartialR9Policy() noexcept
-        {
-            R9ResetCallbackHook = {};
-            R9PresentCallbackHook = {};
-            R9SetRenderTargetCallbackHook = {};
-            R9SetDepthCallbackHook = {};
-            R9ClearCallbackHook = {};
-            R9DrawPrimitiveCallbackHook = {};
-            R9DrawIndexedPrimitiveCallbackHook = {};
-            R9DrawPrimitiveUPCallbackHook = {};
-            R9DrawIndexedPrimitiveUPCallbackHook = {};
-        }
-
-        bool R13R9PolicyComplete() noexcept
-        {
-            return R9ResetCallbackHook && R9PresentCallbackHook &&
-                R9SetRenderTargetCallbackHook && R9SetDepthCallbackHook &&
-                R9ClearCallbackHook && R9DrawPrimitiveCallbackHook &&
-                R9DrawIndexedPrimitiveCallbackHook && R9DrawPrimitiveUPCallbackHook &&
-                R9DrawIndexedPrimitiveUPCallbackHook;
-        }
-
         DWORD WINAPI R13StereoInstallThread(void*)
         {
-            for (int attempt = 0; attempt < 1200; ++attempt)
+            for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                if (R13R9PolicyComplete() && Game::D3DDevice_ptr &&
-                    *Game::D3DDevice_ptr)
+                const std::uint32_t r9State = R9InstallState.load(std::memory_order_acquire);
+                if (r9State == R9InstallFailed)
+                {
+                    spdlog::error(
+                        "VR R13: R9 callback transaction failed; hardening overlay not installed");
+                    return 0;
+                }
+                if (r9State == R9InstallReady)
                 {
                     R13ResetR9Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&ResetDestR9), ResetDestR13);
@@ -438,34 +422,21 @@ namespace OutRunVRStereo
                         R13DrawIndexedPrimitiveUPR9Hook)
                     {
                         spdlog::info(
-                            "VR R13: stereo hardening ACTIVE; single ResetEx owner + GPU-completion direct-ring backpressure + single-execution MRT/occlusion fallback");
+                            "VR R13: stereo hardening ACTIVE; atomic R7/R9 install handoff + single ResetEx owner + GPU-completion direct-ring backpressure + single-execution MRT/occlusion fallback");
                     }
                     else
                     {
                         R13RollbackOverlayHooks();
                         spdlog::error(
-                            "VR R13: overlay hook installation was partial; all R13 overlay hooks rolled back");
+                            "VR R13: overlay hook installation was partial; all R13 overlay hooks rolled back immediately");
                     }
                     return 0;
                 }
                 Sleep(25);
             }
 
-            if (R9ResetCallbackHook || R9PresentCallbackHook ||
-                R9SetRenderTargetCallbackHook || R9SetDepthCallbackHook ||
-                R9ClearCallbackHook || R9DrawPrimitiveCallbackHook ||
-                R9DrawIndexedPrimitiveCallbackHook || R9DrawPrimitiveUPCallbackHook ||
-                R9DrawIndexedPrimitiveUPCallbackHook)
-            {
-                R13RollbackPartialR9Policy();
-                spdlog::error(
-                    "VR R13: R9 callback policy was only partially installed; partial policy rolled back to fail closed");
-            }
-            else
-            {
-                spdlog::warn(
-                    "VR R13: R9 callback policy did not become ready; hardening overlay not installed");
-            }
+            spdlog::warn(
+                "VR R13: R9 transactional install did not become ready; hardening overlay not installed");
             return 0;
         }
 

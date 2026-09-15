@@ -585,8 +585,13 @@ namespace OutRunVrD3D9ExDirectPassthrough
             return false;
 
         std::uint32_t image = 0;
-        if (!Acquire(Projection.handle, image) || image >= Projection.rtvs.size())
+        if (!Acquire(Projection.handle, image))
             return false;
+        if (image >= Projection.rtvs.size())
+        {
+            Release(Projection.handle);
+            return false;
+        }
 
         ID3D11ShaderResourceView* savedSrv = SourceSrv;
         const DXGI_FORMAT savedFormat = SourceFormat;

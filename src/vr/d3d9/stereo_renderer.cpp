@@ -44,6 +44,11 @@ namespace OutRunVRStereo
 		SafetyHookInline R9DrawPrimitiveUPCallbackHook{};
 		SafetyHookInline R9DrawIndexedPrimitiveUPCallbackHook{};
 
+		constexpr std::uint32_t R9InstallPending = 0;
+		constexpr std::uint32_t R9InstallReady = 1;
+		constexpr std::uint32_t R9InstallFailed = 2;
+		std::atomic<std::uint32_t> R9InstallState{R9InstallPending};
+
 		IDirect3DSurface9* R9MainDepthIdentity = nullptr;
 		IDirect3DSurface9* R9DeferredDepthIdentity = nullptr;
 		IDirect3DSurface9* R9MonoSurface = nullptr;
@@ -768,56 +773,87 @@ namespace OutRunVRStereo
 			return hr;
 		}
 
-		bool R9InstallCallbackPolicy(IDirect3DDevice9* device)
-		{
-			if (!device)
-				return false;
-			R9ResetCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&ResetDest), ResetDestR9);
-			R9PresentCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&PresentDest), PresentDestR9);
-			R9SetRenderTargetCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&SetRenderTargetDest), SetRenderTargetDestR9);
-			R9SetDepthCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&SetDepthStencilSurfaceDest), SetDepthStencilSurfaceDestR9);
-			R9ClearCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&ClearDest), ClearDestR9);
-			R9DrawPrimitiveCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&DrawPrimitiveDest), DrawPrimitiveDestR9);
-			R9DrawIndexedPrimitiveCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&DrawIndexedPrimitiveDest), DrawIndexedPrimitiveDestR9);
-			R9DrawPrimitiveUPCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&DrawPrimitiveUPDest), DrawPrimitiveUPDestR9);
-			R9DrawIndexedPrimitiveUPCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDest), DrawIndexedPrimitiveUPDestR9);
-			if (!R9ResetCallbackHook || !R9PresentCallbackHook || !R9SetRenderTargetCallbackHook ||
-				!R9SetDepthCallbackHook || !R9ClearCallbackHook || !R9DrawPrimitiveCallbackHook ||
-				!R9DrawIndexedPrimitiveCallbackHook || !R9DrawPrimitiveUPCallbackHook ||
-				!R9DrawIndexedPrimitiveUPCallbackHook)
-				return false;
+\t\tvoid R9RollbackCallbackPolicy() noexcept
+\t\t{
+\t\t\tR9DrawIndexedPrimitiveUPCallbackHook = {};
+\t\t\tR9DrawPrimitiveUPCallbackHook = {};
+\t\t\tR9DrawIndexedPrimitiveCallbackHook = {};
+\t\t\tR9DrawPrimitiveCallbackHook = {};
+\t\t\tR9ClearCallbackHook = {};
+\t\t\tR9SetDepthCallbackHook = {};
+\t\t\tR9SetRenderTargetCallbackHook = {};
+\t\t\tR9PresentCallbackHook = {};
+\t\t\tR9ResetCallbackHook = {};
+\t\t\tR9InstallState.store(R9InstallFailed, std::memory_order_release);
+\t\t}
 
-			if (TrackedDepthStencil)
-				R9CaptureMainDepth(TrackedDepthStencil, "policy-install");
-			else
-				R9MainDepthKnown = false;
-			spdlog::info(
-				"VR R9 FINAL TEST: callback policy ACTIVE build={} depthHook=detour-callback monoFallback=shadow fullClearSeed=required nullDepth=mirrored",
-				R9BuildId);
-			R9LogSurface("initial RT", TrackedRenderTarget);
-			R9LogSurface("initial DS", TrackedDepthStencil);
-			return true;
-		}
+\t\tbool R9InstallCallbackPolicy(IDirect3DDevice9* device)
+\t\t{
+\t\t\tif (!device)
+\t\t\t{
+\t\t\t\tR9InstallState.store(R9InstallFailed, std::memory_order_release);
+\t\t\t\treturn false;
+\t\t\t}
+\t\t\tR9InstallState.store(R9InstallPending, std::memory_order_release);
+\t\t\tR9ResetCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&ResetDest), ResetDestR9);
+\t\t\tR9PresentCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&PresentDest), PresentDestR9);
+\t\t\tR9SetRenderTargetCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&SetRenderTargetDest), SetRenderTargetDestR9);
+\t\t\tR9SetDepthCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&SetDepthStencilSurfaceDest), SetDepthStencilSurfaceDestR9);
+\t\t\tR9ClearCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&ClearDest), ClearDestR9);
+\t\t\tR9DrawPrimitiveCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&DrawPrimitiveDest), DrawPrimitiveDestR9);
+\t\t\tR9DrawIndexedPrimitiveCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&DrawIndexedPrimitiveDest), DrawIndexedPrimitiveDestR9);
+\t\t\tR9DrawPrimitiveUPCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&DrawPrimitiveUPDest), DrawPrimitiveUPDestR9);
+\t\t\tR9DrawIndexedPrimitiveUPCallbackHook = safetyhook::create_inline(reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDest), DrawIndexedPrimitiveUPDestR9);
+\t\t\tif (!R9ResetCallbackHook || !R9PresentCallbackHook || !R9SetRenderTargetCallbackHook ||
+\t\t\t\t!R9SetDepthCallbackHook || !R9ClearCallbackHook || !R9DrawPrimitiveCallbackHook ||
+\t\t\t\t!R9DrawIndexedPrimitiveCallbackHook || !R9DrawPrimitiveUPCallbackHook ||
+\t\t\t\t!R9DrawIndexedPrimitiveUPCallbackHook)
+\t\t\t{
+\t\t\t\tR9RollbackCallbackPolicy();
+\t\t\t\tspdlog::error("VR R9 FINAL TEST: callback policy transaction was partial; all R9 callback hooks rolled back immediately");
+\t\t\t\treturn false;
+\t\t\t}
 
-		DWORD WINAPI R9InstallThread(void*)
-		{
-			for (int attempt = 0; attempt < 1200; ++attempt)
-			{
-				if (Game::D3DDevice_ptr && *Game::D3DDevice_ptr &&
-					ResetHook && PresentHook && SetRenderTargetHook && SetDepthStencilSurfaceHook &&
-					ClearHook && DrawPrimitiveHook && DrawIndexedPrimitiveHook &&
-					DrawPrimitiveUPHook && DrawIndexedPrimitiveUPHook)
-				{
-					if (R9InstallCallbackPolicy(*Game::D3DDevice_ptr))
-						return 0;
-					spdlog::error("VR R9 FINAL TEST: failed to hook one or more R7 callback entry points");
-					return 0;
-				}
-				Sleep(25);
-			}
-			spdlog::warn("VR R9 FINAL TEST: R7 callbacks did not become ready; policy not installed");
-			return 0;
-		}
+\t\t\tif (TrackedDepthStencil)
+\t\t\t\tR9CaptureMainDepth(TrackedDepthStencil, "policy-install");
+\t\t\telse
+\t\t\t\tR9MainDepthKnown = false;
+\t\t\tR9InstallState.store(R9InstallReady, std::memory_order_release);
+\t\t\tspdlog::info(
+\t\t\t\t"VR R9 FINAL TEST: callback policy ACTIVE build={} depthHook=detour-callback monoFallback=shadow fullClearSeed=required nullDepth=mirrored transactional=READY",
+\t\t\t\tR9BuildId);
+\t\t\tR9LogSurface("initial RT", TrackedRenderTarget);
+\t\t\tR9LogSurface("initial DS", TrackedDepthStencil);
+\t\t\treturn true;
+\t\t}
+
+\t\tDWORD WINAPI R9InstallThread(void*)
+\t\t{
+\t\t\tfor (int attempt = 0; attempt < 4800; ++attempt)
+\t\t\t{
+\t\t\t\tconst std::uint32_t baseState = StereoInstallState.load(std::memory_order_acquire);
+\t\t\t\tif (baseState == StereoInstallFailed)
+\t\t\t\t{
+\t\t\t\t\tR9InstallState.store(R9InstallFailed, std::memory_order_release);
+\t\t\t\t\tspdlog::error("VR R9 FINAL TEST: R7 base hook transaction failed; callback policy not attempted");
+\t\t\t\t\treturn 0;
+\t\t\t\t}
+\t\t\t\tif (baseState == StereoInstallReady)
+\t\t\t\t{
+\t\t\t\t\tIDirect3DDevice9* const device = StereoInstalledDevice.load(std::memory_order_acquire);
+\t\t\t\t\tif (device && R9InstallCallbackPolicy(device))
+\t\t\t\t\t\treturn 0;
+\t\t\t\t\tif (R9InstallState.load(std::memory_order_acquire) != R9InstallFailed)
+\t\t\t\t\t\tR9InstallState.store(R9InstallFailed, std::memory_order_release);
+\t\t\t\t\tspdlog::error("VR R9 FINAL TEST: failed to install callback policy; fail-closed rollback complete");
+\t\t\t\t\treturn 0;
+\t\t\t\t}
+\t\t\t\tSleep(25);
+\t\t\t}
+\t\t\tR9InstallState.store(R9InstallFailed, std::memory_order_release);
+\t\t\tspdlog::warn("VR R9 FINAL TEST: R7 transactional install did not become ready; policy not installed");
+\t\t\treturn 0;
+\t\t}
 
 		class VRFinalTestR9Hook : public Hook
 		{
@@ -829,6 +865,7 @@ namespace OutRunVRStereo
 				HANDLE thread = CreateThread(nullptr, 0, R9InstallThread, nullptr, 0, nullptr);
 				if (!thread)
 				{
+					R9InstallState.store(R9InstallFailed, std::memory_order_release);
 					spdlog::error("VR R9 FINAL TEST: failed to create policy installer thread: {}", GetLastError());
 					return false;
 				}

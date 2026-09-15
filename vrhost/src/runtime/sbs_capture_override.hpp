@@ -728,7 +728,13 @@ float4 PSMain(VSOut input) : SV_Target
             return false;
         XrSwapchainImageWaitInfo wait{ XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO };
         wait.timeout = XR_INFINITE_DURATION;
-        return XR_SUCCEEDED(::xrWaitSwapchainImage(swapchain, &wait));
+        for (;;)
+        {
+            const XrResult result = ::xrWaitSwapchainImage(swapchain, &wait);
+            if (result == XR_TIMEOUT_EXPIRED)
+                continue; // The same acquired image must be waited again; it cannot be released yet.
+            return XR_SUCCEEDED(result);
+        }
     }
 
     inline void Release(XrSwapchain swapchain)
@@ -796,8 +802,13 @@ float4 PSMain(VSOut input) : SV_Target
         };
 
         std::uint32_t image = 0;
-        if (!Acquire(Projection.handle, image) || image >= Projection.rtvs.size())
+        if (!Acquire(Projection.handle, image))
             return false;
+        if (image >= Projection.rtvs.size())
+        {
+            Release(Projection.handle);
+            return false;
+        }
         bool ok = RenderTo(Projection.rtvs[image][0], Projection.width, Projection.height, eyeUv[0]);
         ok = RenderTo(Projection.rtvs[image][1], Projection.width, Projection.height, eyeUv[1]) && ok;
         Release(Projection.handle);
@@ -875,8 +886,13 @@ float4 PSMain(VSOut input) : SV_Target
         if (!EnsureSwapchain(Theater, session, width, height, 1))
             return false;
         std::uint32_t image = 0;
-        if (!Acquire(Theater.handle, image) || image >= Theater.rtvs.size())
+        if (!Acquire(Theater.handle, image))
             return false;
+        if (image >= Theater.rtvs.size())
+        {
+            Release(Theater.handle);
+            return false;
+        }
         const bool ok = RenderTo(Theater.rtvs[image][0], Theater.width, Theater.height, whole);
         Release(Theater.handle);
         if (!ok)
