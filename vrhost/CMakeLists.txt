@@ -40,14 +40,14 @@ target_include_directories(outrun-vr-host PRIVATE
 target_compile_definitions(outrun-vr-host PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 if(MSVC)
     # R23 is the final presentation owner. R21 retains readonly direct-state and
-    # shouldRender policy, R22 retains pose/FOV validation, and R23 additionally
-    # requires the exact Frame.v2 + image-source bundle committed by main_r23.
-    # R22 capture diagnostics remain available for the legacy implementation;
-    # main_r23 adds source + post-blit eye probes without synchronous Map waits.
+    # shouldRender policy, R22 retains pose/FOV/direct fail-closed validation,
+    # and R23 additionally requires the exact Frame.v2 + image-source bundle
+    # committed by main_r23. main_r23 owns the asynchronous game-UV source and
+    # post-blit left/right output probes, so no second capture diagnostic layer
+    # is force-included here.
     target_compile_options(outrun-vr-host PRIVATE
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/openxr_api_compat.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/sbs_capture_override.hpp"
-        "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r22_capture_diagnostics.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/d3d9ex_direct_passthrough.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/review_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r21_runtime_hardening.hpp"
@@ -65,6 +65,8 @@ target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi d3dcompile
 
 # Renderer-independent hardware diagnostic. This intentionally does not use the
 # host forced-include runtime wrappers and does not depend on the game process.
+# It submits deterministic color patterns directly through OpenXR/D3D11 so
+# VDXR swapchain/layer behavior can be isolated from D3D9 capture/stereo logic.
 add_executable(outrun-vr-diagnostic
     src/diagnostic_pattern.cpp
 )
