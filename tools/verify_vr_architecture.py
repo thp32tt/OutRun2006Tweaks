@@ -13,6 +13,7 @@ required = [
     'src/vr/d3d9/ex_device_upgrade_r13.cpp',
     'src/vr/d3d9/r13_bridge.hpp',
     'src/vr/ipc/protocol.hpp',
+    'src/vr/ipc/direct_ack_r13.hpp',
     # New architecture foundation.
     'src/vr/core/frame_types.hpp',
     'src/vr/core/matrix.hpp',
@@ -64,9 +65,23 @@ for marker in (
     'RenderFrameRingSize = 4', 'HostAdapterLuidValid',
     'clientInteropProbeHandle', 'hostInteropProbeAckToken',
     'hostDirectConsumedFrameId', 'SharedRenderFrameRing',
+    'ClientStereoBackbufferHeightIndex = 15',
 ):
     if marker not in protocol_v2:
         raise SystemExit(f'missing live v2 comparison invariant: {marker}')
+
+# R13 must not steal a legacy v2 reserved word for consumer completion.  The
+# dedicated mapping is fixed-size and per-slot so frame wrap/ring reuse remains
+# explicit without changing either v2 or v3 ABI.
+direct_ack = (ROOT / 'src/vr/ipc/direct_ack_r13.hpp').read_text(encoding='utf-8')
+for marker in (
+    'DirectGpuAckName', 'DirectGpuAckMagic', 'DirectGpuAckVersion = 1',
+    'DirectGpuAckRingSize = 4', 'struct DirectGpuAckState',
+    'transportGeneration', 'completedFrameId[DirectGpuAckRingSize]',
+    'sizeof(DirectGpuAckState) == 48',
+):
+    if marker not in direct_ack:
+        raise SystemExit(f'missing R13 direct GPU ACK invariant: {marker}')
 
 protocol_v3 = (ROOT / 'src/vr/ipc/protocol_v3.hpp').read_text(encoding='utf-8')
 for marker in (
@@ -139,11 +154,13 @@ for forbidden_call in ('Game::ModeControl()', 'Game::EventControl()', 'WheelFFB_
 stereo_r13 = (ROOT / 'src/vr/d3d9/stereo_renderer_r13.cpp').read_text(encoding='utf-8')
 for marker in (
     'ResetDestR13', 'ResetCompatDevice', 'ResolveDirectTransportR13',
-    'HostDirectGpuCompletedFrameIndex', 'GPU-completion direct-ring backpressure',
-    'IsMainBackbufferPoseInjectionPass',
+    'DirectGpuAckName', 'completedFrameId[slotIndex]', 'transportGeneration',
+    'GPU-completion direct-ring backpressure', 'IsMainBackbufferPoseInjectionPass',
 ):
     if marker not in stereo_r13:
         raise SystemExit(f'missing R13 stereo hardening invariant: {marker}')
+if 'SharedState->reserved[OutRunVRR13::HostDirectGpuCompletedFrameIndex]' in stereo_r13:
+    raise SystemExit('R13 GPU ACK must not collide with legacy SharedPoseState reserved words')
 
 # D3D9Ex stays opt-in, but when selected it must preserve the legacy game's
 # managed-resource expectations without changing the COM identity of the game
@@ -184,14 +201,14 @@ for marker in (
 
 # R13 makes the ownership boundary explicit: direct shared eyes are copied on
 # the GPU into host-owned textures, the copy EVENT must retire, and only then is
-# the producer slot acknowledged. Reprojection/repeat frames sample the safe
-# host-owned copies instead of the reusable D3D9 shared slot.
+# the producer slot acknowledged through the dedicated per-slot mapping.
 direct_arbitration = (ROOT / 'vrhost/src/runtime/d3d9ex_direct_passthrough.hpp').read_text(encoding='utf-8')
 for marker in (
     'IncomingProjectionValid', 'HostDirectGpuReady', 'hostDirectConsumedFrameId',
-    'HostDirectGpuCompletedFrameIndex', 'D3D11_QUERY_EVENT',
+    'DirectGpuAckName', 'PublishCompletedFrame', 'D3D11_QUERY_EVENT',
     'CopySharedFrameToSafeEyes', 'CopyResource(SafeEye[0], shared[0])',
     'host-owned GPU eye copies + completion ACK active',
+    'completedFrameId[slot]', 'transportGeneration',
     'RenderSafeProjection', 'SafeEyeSrv',
     'FallbackSourceMaxAgeMs', 'stale Desktop Duplication source invalidated',
     'DIRECT GPU-COPY projection passthrough ACTIVE',
@@ -200,9 +217,11 @@ for marker in (
 ):
     if marker not in direct_arbitration:
         raise SystemExit(f'missing R13 D3D9Ex/R10 arbitration invariant: {marker}')
+if 'PoseState->reserved[OutRunVRR13::HostDirectGpuCompletedFrameIndex]' in direct_arbitration:
+    raise SystemExit('host still writes R13 GPU ACK into legacy pose reserved words')
 
 bridge = (ROOT / 'src/vr/d3d9/r13_bridge.hpp').read_text(encoding='utf-8')
-for marker in ('HostDirectGpuCompletedFrameIndex = 15', 'ResetCompatDevice', 'IsMainBackbufferPoseInjectionPass'):
+for marker in ('direct_ack_r13.hpp', 'ResetCompatDevice', 'IsMainBackbufferPoseInjectionPass'):
     if marker not in bridge:
         raise SystemExit(f'missing R13 cross-TU bridge invariant: {marker}')
 
