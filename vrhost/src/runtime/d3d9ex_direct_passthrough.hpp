@@ -1,23 +1,8 @@
 #pragma once
 
-// R13 arbitration between the R10 Desktop-Duplication fallback and the
-// D3D9Ex shared-eye ring.
-//
-// The legacy hostDirectConsumedFrameId only says that the host opened a shared
-// frame. It is not safe for producer slot reuse because the HMD may need to
-// render that same frame again after the game has advanced. R13 therefore:
-//
-//   D3D9Ex shared L/R -> D3D11 host-owned L/R (CopyResource)
-//   -> D3D11 EVENT proves copy completion
-//   -> dedicated per-slot DirectGpuAck mapping permits D3D9 slot reuse
-//   -> OpenXR projection samples only the host-owned copies
-//
-// This remains CPU-copy-free and avoids Desktop Duplication, while making the
-// lifetime boundary explicit. It is intentionally called direct GPU-copy
-// transport rather than claiming a synchronization-unsafe zero-copy path.
-//
-// Compatibility marker kept for older source/binary comparisons only:
-// ZERO-COPY projection passthrough ACTIVE
+// R13 arbitration between the Desktop-Duplication fallback and the D3D9Ex
+// shared-eye ring. Shared producer textures are copied into host-owned D3D11
+// textures before the producer slot is acknowledged for reuse.
 
 #include "sbs_capture_override.hpp"
 #include "../../../src/vr/ipc/direct_ack_r13.hpp"
@@ -29,6 +14,7 @@
 #undef xrDestroySession
 #endif
 
+#include <d3d9types.h>
 #include <array>
 #include <cstdint>
 #include <cstring>
@@ -36,10 +22,14 @@
 
 namespace OutRunVrD3D9ExDirectPassthrough
 {
-    inline constexpr const char* BuildId = "D3D9Ex-direct-gpu-copy-R13-20260915";
+    inline constexpr const char* BuildId = "D3D9Ex-direct-gpu-copy-R23-20260916";
     inline constexpr const char* LegacyBuildId = "D3D9Ex-direct-passthrough-20260915";
     inline constexpr ULONGLONG FallbackSourceMaxAgeMs = 250;
-    inline constexpr ULONGLONG CopyFenceTimeoutMs = 25;
+
+    // 90 Hz gives roughly 11.1 ms for a complete frame. A 25 ms synchronous
+    // GPU fence wait could consume more than two frames before fallback. Keep
+    // this bounded so a delayed direct copy fails closed to the classic path.
+    inline constexpr ULONGLONG CopyFenceTimeoutMs = 8;
 
     inline std::uint64_t DirectPassFrames = 0;
     inline std::uint64_t FallbackFrames = 0;
@@ -52,13 +42,13 @@ namespace OutRunVrD3D9ExDirectPassthrough
     inline bool FirstDirectRejectLogged = false;
     inline bool FirstGpuSafeAckLogged = false;
     inline bool FirstAckMappingLogged = false;
+    inline bool FirstCopyFenceTimeoutLogged = false;
+    inline bool FirstDeclaredFormatMismatchLogged = false;
 
     inline HANDLE PoseMapping = nullptr;
     inline const OutRunVR::SharedPoseState* PoseState = nullptr;
-
     inline HANDLE FrameMapping = nullptr;
     inline const OutRunVR::SharedRenderFrameRing* FrameRing = nullptr;
-
     inline HANDLE DirectAckMapping = nullptr;
     inline OutRunVR::R13::DirectGpuAckState* DirectAckState = nullptr;
 
@@ -91,6 +81,21 @@ namespace OutRunVrD3D9ExDirectPassthrough
         std::uint32_t hostPid = 0;
         std::uint32_t openedFrame = 0;
     };
+
+    inline DXGI_FORMAT ExpectedDeclaredFormat(std::uint32_t raw) noexcept
+    {
+        switch (static_cast<D3DFORMAT>(raw))
+        {
+        case D3DFMT_A8B8G8R8:
+            return DXGI_FORMAT_R8G8B8A8_UNORM;
+        case D3DFMT_A2B10G10R10:
+            return DXGI_FORMAT_R10G10B10A2_UNORM;
+        case D3DFMT_A16B16G16R16F:
+            return DXGI_FORMAT_R16G16B16A16_FLOAT;
+        default:
+            return DXGI_FORMAT_UNKNOWN;
+        }
+    }
 
     inline void ResetSafeEyes() noexcept
     {
@@ -144,8 +149,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
 
     inline bool EnsurePoseState() noexcept
     {
-        if (PoseState &&
-            PoseState->magic == OutRunVR::SharedMagic &&
+        if (PoseState && PoseState->magic == OutRunVR::SharedMagic &&
             PoseState->protocolVersion == OutRunVR::SharedProtocolVersion &&
             PoseState->structSize == sizeof(OutRunVR::SharedPoseState))
             return true;
@@ -203,21 +207,28 @@ namespace OutRunVrD3D9ExDirectPassthrough
             CloseHandle(FrameMapping);
             FrameMapping = nullptr;
         }
-        FrameMapping = OpenFileMappingW(FILE_MAP_READ, FALSE, OutRunVR::RenderFrameMemoryName);
+        FrameMapping = OpenFileMappingW(FILE_MAP_READ, FALSE,
+            OutRunVR::RenderFrameMemoryName);
         if (!FrameMapping)
             return false;
         FrameRing = static_cast<const OutRunVR::SharedRenderFrameRing*>(MapViewOfFile(
-            FrameMapping, FILE_MAP_READ, 0, 0, sizeof(OutRunVR::SharedRenderFrameRing)));
+            FrameMapping, FILE_MAP_READ, 0, 0,
+            sizeof(OutRunVR::SharedRenderFrameRing)));
         if (!FrameRing)
         {
             CloseHandle(FrameMapping);
             FrameMapping = nullptr;
             return false;
         }
-        return FrameRing->magic == OutRunVR::RenderFrameMagic &&
-            FrameRing->protocolVersion == OutRunVR::RenderFrameProtocolVersion &&
-            FrameRing->structSize == sizeof(OutRunVR::SharedRenderFrameRing) &&
-            FrameRing->slotCount == OutRunVR::RenderFrameRingSize;
+        if (FrameRing->magic != OutRunVR::RenderFrameMagic ||
+            FrameRing->protocolVersion != OutRunVR::RenderFrameProtocolVersion ||
+            FrameRing->structSize != sizeof(OutRunVR::SharedRenderFrameRing) ||
+            FrameRing->slotCount != OutRunVR::RenderFrameRingSize)
+        {
+            CloseReadMappings();
+            return false;
+        }
+        return true;
     }
 
     inline bool BeginAckWrite() noexcept
@@ -227,7 +238,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
         LONG seq = InterlockedIncrement(
             reinterpret_cast<volatile LONG*>(&DirectAckState->sequence));
         if ((seq & 1) == 0)
-            InterlockedIncrement(reinterpret_cast<volatile LONG*>(&DirectAckState->sequence));
+            InterlockedIncrement(
+                reinterpret_cast<volatile LONG*>(&DirectAckState->sequence));
         MemoryBarrier();
         return true;
     }
@@ -238,7 +250,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
         LONG seq = InterlockedIncrement(
             reinterpret_cast<volatile LONG*>(&DirectAckState->sequence));
         if (seq & 1)
-            InterlockedIncrement(reinterpret_cast<volatile LONG*>(&DirectAckState->sequence));
+            InterlockedIncrement(
+                reinterpret_cast<volatile LONG*>(&DirectAckState->sequence));
     }
 
     inline bool EnsureDirectAckState() noexcept
@@ -274,7 +287,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
             DirectAckState->structSize == sizeof(OutRunVR::R13::DirectGpuAckState);
         if (existed && !validExisting)
         {
-            std::cerr << "[D3D9Ex R13] incompatible DirectGpuAck mapping already exists; safe direct path disabled\n";
+            std::cerr
+                << "[D3D9Ex R23] incompatible DirectGpuAck mapping; direct path disabled\n";
             CloseDirectAckMapping();
             return false;
         }
@@ -304,7 +318,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
         if (!FirstAckMappingLogged)
         {
             FirstAckMappingLogged = true;
-            std::cerr << "[D3D9Ex R13] dedicated per-slot DirectGpuAck mapping ready; v2/v3 ABI unchanged\n";
+            std::cerr
+                << "[D3D9Ex R23] dedicated per-slot DirectGpuAck mapping ready\n";
         }
         return true;
     }
@@ -315,9 +330,6 @@ namespace OutRunVrD3D9ExDirectPassthrough
         if (!EnsurePoseState())
             return out;
 
-        // PoseState is mapped FILE_MAP_READ. Keep every field, including the
-        // legacy consumed-frame id, inside the same stable seqlock snapshot and
-        // never issue a write-capable interlocked instruction against this view.
         for (int attempt = 0; attempt < 4; ++attempt)
         {
             const std::uint32_t before = PoseState->sequence;
@@ -408,6 +420,14 @@ namespace OutRunVrD3D9ExDirectPassthrough
             if (FAILED(hr) || GetTickCount64() - start >= CopyFenceTimeoutMs)
             {
                 ++CopyFenceTimeout;
+                if (!FirstCopyFenceTimeoutLogged)
+                {
+                    FirstCopyFenceTimeoutLogged = true;
+                    std::cerr
+                        << "[D3D9Ex R23] direct copy fence exceeded "
+                        << CopyFenceTimeoutMs
+                        << "ms VR budget; dropping direct candidate to fallback\n";
+                }
                 return false;
             }
             SwitchToThread();
@@ -480,6 +500,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
         if (!OutRunVrFinalTest::Device || !OutRunVrFinalTest::Context ||
             !EnsureCopyFence())
             return false;
+
         const std::uint32_t leftRaw =
             frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex];
         const std::uint32_t rightRaw =
@@ -488,7 +509,10 @@ namespace OutRunVrD3D9ExDirectPassthrough
             frame.reserved[OutRunVR::RenderFrameDirectWidthIndex];
         const std::uint32_t height =
             frame.reserved[OutRunVR::RenderFrameDirectHeightIndex];
-        if (!leftRaw || !rightRaw || !width || !height)
+        const DXGI_FORMAT declared = ExpectedDeclaredFormat(
+            frame.reserved[OutRunVR::RenderFrameDirectFormatIndex]);
+        if (!leftRaw || !rightRaw || !width || !height ||
+            declared == DXGI_FORMAT_UNKNOWN)
             return false;
 
         ID3D11Texture2D* shared[2]{};
@@ -521,11 +545,17 @@ namespace OutRunVrD3D9ExDirectPassthrough
             ok = desc[0].Width == width && desc[0].Height == height &&
                 desc[1].Width == width && desc[1].Height == height &&
                 desc[0].Format == desc[1].Format &&
-                desc[0].SampleDesc.Count == 1 && desc[1].SampleDesc.Count == 1 &&
-                (desc[0].Format == DXGI_FORMAT_R8G8B8A8_UNORM ||
-                 desc[0].Format == DXGI_FORMAT_R10G10B10A2_UNORM ||
-                 desc[0].Format == DXGI_FORMAT_R16G16B16A16_FLOAT) &&
+                desc[0].Format == declared &&
+                desc[0].SampleDesc.Count == 1 &&
+                desc[1].SampleDesc.Count == 1 &&
                 EnsureSafeEyes(desc[0]);
+            if (!ok && desc[0].Format != declared &&
+                !FirstDeclaredFormatMismatchLogged)
+            {
+                FirstDeclaredFormatMismatchLogged = true;
+                std::cerr
+                    << "[D3D9Ex R23] Frame.v2 declared direct format does not match opened D3D11 texture; candidate rejected\n";
+            }
         }
 
         if (ok)
@@ -551,7 +581,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
         {
             FirstGpuSafeAckLogged = true;
             std::cerr
-                << "[D3D9Ex R13] host-owned GPU eye copies + completion ACK active frame="
+                << "[D3D9Ex R23] host-owned GPU eye copies + completion ACK active frame="
                 << frame.frameId
                 << "; dedicated per-slot ACK allows shared ring reuse\n";
         }
@@ -580,8 +610,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
         using namespace OutRunVrSbsCaptureOverride;
         if (!IncomingProjectionValid(endInfo) || !SafeEyeSrv[0] || !SafeEyeSrv[1])
             return false;
-        const auto* incoming =
-            reinterpret_cast<const XrCompositionLayerProjection*>(endInfo->layers[0]);
+        const auto* incoming = reinterpret_cast<const XrCompositionLayerProjection*>(
+            endInfo->layers[0]);
         if (incoming->viewCount < 2 || !incoming->views)
             return false;
 
@@ -609,9 +639,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
         {
             SourceSrv = SafeEyeSrv[eye];
             SourceFormat = SafeEyeFormat;
-            ok = RenderTo(
-                Projection.rtvs[image][eye], Projection.width, Projection.height,
-                UvRect{ 0.f, 0.f, 1.f, 1.f }) && ok;
+            ok = RenderTo(Projection.rtvs[image][eye], Projection.width,
+                Projection.height, UvRect{ 0.f, 0.f, 1.f, 1.f }) && ok;
         }
         SourceSrv = savedSrv;
         SourceFormat = savedFormat;
@@ -657,9 +686,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
         {
             HaveSource = false;
             ++StaleFallbackInvalidations;
-            std::cerr << "[R13] stale Desktop Duplication source invalidated after "
-                      << FallbackSourceMaxAgeMs
-                      << "ms without a fresh capture\n";
+            std::cerr << "[R23] stale Desktop Duplication source invalidated after "
+                      << FallbackSourceMaxAgeMs << "ms without a fresh capture\n";
         }
     }
 
@@ -699,8 +727,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
                         << "[D3D9Ex] DIRECT GPU-COPY projection passthrough ACTIVE build="
                         << BuildId << " legacy=" << LegacyBuildId
                         << " frame=" << state.openedFrame
-                        << "; shared eyes copied to host-owned GPU textures; "
-                           "R10 Desktop Duplication bypassed\n";
+                        << "; shared eyes copied to host-owned GPU textures\n";
                 }
                 return OutRunVrFinalTest::EndFrame(session, &patched);
             }
@@ -713,8 +740,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
             {
                 FirstDirectRejectLogged = true;
                 std::cerr
-                    << "[D3D9Ex R13] direct frame could not be staged/rendered safely; "
-                       "keeping R10 Desktop Duplication fallback\n";
+                    << "[D3D9Ex R23] direct frame could not be staged/rendered safely; keeping Desktop Duplication fallback\n";
             }
         }
 
