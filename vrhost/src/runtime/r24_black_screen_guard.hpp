@@ -7,7 +7,7 @@
 // ownership, but on a headset it is indistinguishable from a broken renderer.
 // R24 keeps the same stereo-safety rules while adding a visible degradation
 // ladder:
-//   1. preserve validated incoming projection + non-projection layers;
+//   1. preserve validated classic projection + non-projection layers;
 //   2. render DirectGPU only from host-owned SafeEye copies and completion ACK;
 //   3. allow a short display-only grace for an already committed bundle;
 //   4. fall back to a live theater capture, then to the last released theater/
@@ -122,7 +122,7 @@ namespace OutRunVrR24BlackScreenGuard
             {
                 FirstSoftGraceLogged = true;
                 std::cerr
-                    << "[R24] display-only grace accepted an already-rendered committed projection; game-side stereo eligibility remains unchanged build="
+                    << "[R24] display-only grace accepted an already-rendered committed classic projection; game-side stereo eligibility remains unchanged build="
                     << BuildId << "\n";
             }
         }
@@ -133,7 +133,7 @@ namespace OutRunVrR24BlackScreenGuard
             {
                 FirstExactProjectionLogged = true;
                 std::cerr
-                    << "[R24] exact committed incoming projection submitted directly; no redundant black-frame gate build="
+                    << "[R24] exact committed classic projection submitted directly; no redundant black-frame gate build="
                     << BuildId << "\n";
             }
         }
@@ -174,15 +174,16 @@ namespace OutRunVrR24BlackScreenGuard
         return RenderSafeProjection(session, endInfo, projection, views);
     }
 
-    inline XrResult SubmitDirectSafeProjection(
+    inline bool TrySubmitDirectSafeProjection(
         XrSession session, const XrFrameEndInfo* endInfo,
-        const OutRunVrR23VerifiedBundle::Snapshot& snapshot) noexcept
+        const OutRunVrR23VerifiedBundle::Snapshot& snapshot,
+        XrResult& result) noexcept
     {
         XrCompositionLayerProjection projection{};
         std::array<XrCompositionLayerProjectionView, 2> views{};
         if (!TryBuildDirectSafeProjection(
                 session, endInfo, snapshot, projection, views))
-            return XR_ERROR_VALIDATION_FAILURE;
+            return false;
 
         const XrCompositionLayerBaseHeader* layer =
             reinterpret_cast<const XrCompositionLayerBaseHeader*>(&projection);
@@ -199,7 +200,8 @@ namespace OutRunVrR24BlackScreenGuard
                 << "[R24] DirectGPU final submit uses host-owned SafeEye + per-slot completion ACK; failure now falls back visibly instead of no-layer build="
                 << BuildId << "\n";
         }
-        return OutRunVrFinalTest::EndFrame(session, &patched);
+        result = OutRunVrFinalTest::EndFrame(session, &patched);
+        return true;
     }
 
     inline bool BuildCachedVisibleQuad(
@@ -257,7 +259,7 @@ namespace OutRunVrR24BlackScreenGuard
         const char* reason) noexcept
     {
         XrCompositionLayerQuad quad{};
-        bool live = OutRunVrSbsCaptureOverride::RenderTheaterOverride(
+        const bool live = OutRunVrSbsCaptureOverride::RenderTheaterOverride(
             session, quad);
         if (!live && !BuildCachedVisibleQuad(session, quad))
         {
@@ -332,9 +334,10 @@ namespace OutRunVrR24BlackScreenGuard
             OutRunVrR23VerifiedBundle::ReadFresh(verified) &&
             OutRunVrSbsCaptureOverride::FrameComplete(verified.frame);
 
-        // Mixed layers are valid when the single projection independently
-        // matches the committed bundle. Preserve the original ordering/content.
+        // Mixed classic layers are valid when the single projection independently
+        // matches the committed bundle. DirectGPU must still go through SafeEye.
         if (hasNonProjection && projection.count == 1 && exactBundle &&
+            verified.kind == SourceKind::ClassicSbs &&
             ProjectionMatchesSnapshot(endInfo, verified))
         {
             ++MixedValidatedSubmits;
@@ -342,7 +345,7 @@ namespace OutRunVrR24BlackScreenGuard
             {
                 FirstMixedValidatedLogged = true;
                 std::cerr
-                    << "[R24] mixed frame preserved after independent projection bundle validation build="
+                    << "[R24] mixed classic frame preserved after independent projection bundle validation build="
                     << BuildId << "\n";
             }
             OutRunVrR23RuntimeHardening::RecordFinalSubmission(
@@ -357,10 +360,10 @@ namespace OutRunVrR24BlackScreenGuard
         {
             if (verified.kind == SourceKind::DirectGpu)
             {
-                const XrResult direct = SubmitDirectSafeProjection(
-                    session, endInfo, verified);
-                if (direct != XR_ERROR_VALIDATION_FAILURE)
-                    return direct;
+                XrResult directResult = XR_SUCCESS;
+                if (TrySubmitDirectSafeProjection(
+                        session, endInfo, verified, directResult))
+                    return directResult;
                 return SubmitVisibleFallback(
                     session, endInfo, "direct-safe-copy/render rejected");
             }
@@ -387,12 +390,27 @@ namespace OutRunVrR24BlackScreenGuard
         }
 
         // If the core rendered a projection just before the 250ms R23 TTL
-        // boundary, allow only that already-rendered pose-matched projection for
-        // another short interval. No new game-side transform is enabled here.
+        // boundary, allow only that already-rendered pose-matched source for
+        // another short interval. DirectGPU still performs SafeEye copy + ACK.
         OutRunVrR23VerifiedBundle::Snapshot grace{};
-        if (ReadDisplayGraceSnapshot(grace) &&
-            ProjectionMatchesSnapshot(endInfo, grace))
-            return SubmitOriginal(session, endInfo, grace, true);
+        if (ReadDisplayGraceSnapshot(grace))
+        {
+            if (grace.kind == SourceKind::DirectGpu)
+            {
+                XrResult directResult = XR_SUCCESS;
+                if (TrySubmitDirectSafeProjection(
+                        session, endInfo, grace, directResult))
+                {
+                    ++SoftGraceProjectionSubmits;
+                    return directResult;
+                }
+            }
+            else if (grace.kind == SourceKind::ClassicSbs &&
+                ProjectionMatchesSnapshot(endInfo, grace))
+            {
+                return SubmitOriginal(session, endInfo, grace, true);
+            }
+        }
 
         // A fresh classic fallback remains preferable to a frozen image.
         if (OutRunVrReviewHardening::FreshClassicFallbackAvailable())
