@@ -19,7 +19,8 @@ namespace OutRunVRStereo
     namespace
     {
         SafetyHookInline R20ClearR9Hook{};
-        std::atomic<bool> R20BootstrapReady{false};
+        std::atomic<OutRunVR::RuntimeEligibility::InstallState> R20InstallState{
+            OutRunVR::RuntimeEligibility::InstallState::Pending };
 
         // Compatibility gate consumed by R21/R23 overlays. RuntimeEligibility is
         // authoritative; this mirror remains so older R20 call sites fail closed.
@@ -54,9 +55,6 @@ namespace OutRunVRStereo
             if (!depthFlags || !ClearCoversStereoBackbuffer(device, count, rects))
                 return;
 
-            // R9DrawCalls is deliberately conservative. Until a dedicated
-            // main-depth mutation serial exists, even an offscreen draw prevents
-            // a relaxed first seed rather than risking divergent depth history.
             if ((depthFlags & D3DCLEAR_ZBUFFER) != 0)
             {
                 R20DepthClearEpoch = PresentEpoch;
@@ -149,22 +147,16 @@ namespace OutRunVRStereo
 
             R20ObserveFullDepthSeed(device, count, rects, flags, hr);
 
-            // Host freshness is the common frame-boundary authority. Recovery is
-            // allowed to observe clears while StereoAllowed is still false so a
-            // newly verified baseline can reopen the gate without a deadlock.
             if (!OutRunVR::RuntimeEligibility::HostFresh.load(std::memory_order_acquire))
             {
                 R20CancelInitialSeed(device);
                 return hr;
             }
 
-            if (FAILED(hr) || !R20BootstrapReady.load(std::memory_order_acquire) ||
+            if (FAILED(hr) || !OutRunVR::RuntimeEligibility::IsReady(R20InstallState) ||
                 !IsGameDevice(device) || InternalStereoPass)
                 return hr;
 
-            // R9 may have promoted false->true on its legacy full TARGET clear.
-            // That path must pass the exact same depth/stencil history gate as
-            // the relaxed R20 path; a full color clear alone is not sufficient.
             const bool legacyFirstSeed = !seededBefore && R9StereoSeeded;
             if (legacyFirstSeed)
             {
@@ -194,10 +186,6 @@ namespace OutRunVRStereo
             if ((flags & D3DCLEAR_TARGET) == 0 || R9StereoSeeded)
                 return hr;
 
-            // ClearDestR9 has already executed the game clear, mono-shadow clear
-            // and legacy eye clear before control returns here. The recovery
-            // bootstrap may proceed while StereoAllowed=false, but only with a
-            // fresh host and all normal R9 safety predicates satisfied.
             if (!StereoWanted() || !TargetIsBackBuffer() || R9DeferredDepth ||
                 !R9CurrentDepthCanMirror() || !R9MonoSurface ||
                 R9MonoBackupGap || FrameStereoIncomplete ||
@@ -207,9 +195,6 @@ namespace OutRunVRStereo
             if (!R20DepthHistorySafeForInitialSeed(device))
                 return hr;
 
-            // A rect/scissored color clear alone does not make a newly-created
-            // mono RT complete. Snapshot the entire current backbuffer into both
-            // right eye and mono shadow so earlier color becomes zero-disparity.
             if (!R20BuildCompleteColorBaseline(device))
             {
                 R9MonoBackupGap = true;
@@ -252,6 +237,8 @@ namespace OutRunVRStereo
 
         DWORD WINAPI R20InstallThread(void*)
         {
+            using State = OutRunVR::RuntimeEligibility::InstallState;
+            R20InstallState.store(State::Pending, std::memory_order_release);
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
                 const std::uint32_t r9 = R9InstallState.load(std::memory_order_acquire);
@@ -259,6 +246,7 @@ namespace OutRunVRStereo
 
                 if (r9 == R9InstallFailed || r13 == R13InstallFailed)
                 {
+                    R20InstallState.store(State::Failed, std::memory_order_release);
                     spdlog::error(
                         "VR R20: base R9/R13 transaction failed; relaxed bootstrap not installed");
                     return 0;
@@ -267,23 +255,29 @@ namespace OutRunVRStereo
                 if (r9 == R9InstallReady && r13 == R13InstallReady)
                 {
                     R20ClearR9Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&ClearDestR9), ClearDestR20);
-                    if (!R20ClearR9Hook)
+                        reinterpret_cast<void*>(&ClearDestR9), ClearDestR20,
+                        safetyhook::InlineHook::StartDisabled);
+                    const bool enabled = R20ClearR9Hook &&
+                        R20ClearR9Hook.enable().has_value();
+                    if (!enabled)
                     {
+                        R20ClearR9Hook = {};
+                        R20InstallState.store(State::Failed, std::memory_order_release);
                         spdlog::error(
-                            "VR R20: failed to hook R9 clear bootstrap; base fail-closed policy remains active");
+                            "VR R20: failed to enable R9 clear bootstrap transaction; base fail-closed policy remains active");
                         return 0;
                     }
-                    R20BootstrapReady.store(true, std::memory_order_release);
+                    R20InstallState.store(State::Ready, std::memory_order_release);
                     spdlog::info(
-                        "VR R20 PRODUCTION: first stereo seed (legacy or relaxed) requires current-generation Z/stencil clears with no intervening draw");
+                        "VR R20 PRODUCTION: first stereo seed requires current-generation Z/stencil clears; disabled-first bootstrap transaction READY");
                     return 0;
                 }
                 Sleep(25);
             }
 
+            R20InstallState.store(State::Failed, std::memory_order_release);
             spdlog::warn(
-                "VR R20: timed out waiting for R9/R13 renderer transaction; bootstrap overlay not installed");
+                "VR R20: timed out waiting for R9/R13 renderer transaction; bootstrap overlay FAILED");
             return 0;
         }
 
@@ -299,9 +293,12 @@ namespace OutRunVRStereo
 
             bool apply() override
             {
+                using State = OutRunVR::RuntimeEligibility::InstallState;
+                R20InstallState.store(State::Pending, std::memory_order_release);
                 HANDLE thread = CreateThread(nullptr, 0, R20InstallThread, nullptr, 0, nullptr);
                 if (!thread)
                 {
+                    R20InstallState.store(State::Failed, std::memory_order_release);
                     spdlog::error(
                         "VR R20: failed to create bootstrap installer thread: {}",
                         GetLastError());
