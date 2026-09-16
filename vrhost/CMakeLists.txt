@@ -54,6 +54,7 @@ if(MSVC)
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r22_runtime_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r23_runtime_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r24_black_screen_guard.hpp"
+        "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r26_recenter_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/capture_wait_guard.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r21_crash_diagnostics.hpp"
         "$<$<CONFIG:Release>:/Zi>"
