@@ -10,6 +10,23 @@ namespace OutRunVR::RuntimeEligibility
     // single frame-boundary decision instead of maintaining independent clocks.
     inline constexpr std::int64_t HostStaleMs = 250;
 
+    enum class InstallState : std::uint32_t
+    {
+        Pending = 0,
+        Ready = 1,
+        Failed = 2
+    };
+
+    inline bool IsReady(const std::atomic<InstallState>& state) noexcept
+    {
+        return state.load(std::memory_order_acquire) == InstallState::Ready;
+    }
+
+    inline bool IsFailed(const std::atomic<InstallState>& state) noexcept
+    {
+        return state.load(std::memory_order_acquire) == InstallState::Failed;
+    }
+
     inline std::atomic<bool> HostFresh{ false };
     inline std::atomic<bool> StereoAllowed{ false };
     inline std::atomic<bool> RecoveryPending{ true };
