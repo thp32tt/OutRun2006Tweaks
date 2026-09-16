@@ -40,10 +40,10 @@ target_include_directories(outrun-vr-host PRIVATE
 target_compile_definitions(outrun-vr-host PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 if(MSVC)
     # R23 remains the verified source/pose owner. R24 is the final submission
-    # guard: it keeps R23 ownership checks but degrades visibly (live/cached
-    # theater) rather than turning every recoverable mismatch into layerCount=0.
-    # Infinite OpenXR image waits are also bounded so a runtime stall cannot
-    # leave the host alive forever on a black frame.
+    # guard: it keeps R23 ownership checks but degrades visibly instead of
+    # turning every recoverable mismatch into layerCount=0. OpenXR image waits
+    # and Desktop Duplication waits are both bounded so runtime/capture stalls
+    # cannot leave the HMD sitting on black while the host appears alive.
     target_compile_options(outrun-vr-host PRIVATE
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/openxr_api_compat.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/bounded_swapchain_wait.hpp"
@@ -54,6 +54,7 @@ if(MSVC)
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r22_runtime_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r23_runtime_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r24_black_screen_guard.hpp"
+        "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/capture_wait_guard.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r21_crash_diagnostics.hpp"
         "$<$<CONFIG:Release>:/Zi>"
     )
