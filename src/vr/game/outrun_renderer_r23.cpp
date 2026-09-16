@@ -273,7 +273,7 @@ namespace OutRunVRRenderer
                     HookManager::ReportAsyncResult(
                         "OpenXRVRRendererR23Eligibility", true);
                     spdlog::info(
-                        "VR R23 RENDERER: BeginScene/WVP guards READY; R27 world-effect correction active; recovery pose warmup is stock-visible and stereo injection still requires the authoritative baseline gate");
+                        "VR R23 RENDERER: BeginScene/WVP guards READY; recovery pose warmup is stock-visible and stereo injection still requires the authoritative baseline gate; R27 world-effect correction active");
                     return 0;
                 }
                 Sleep(25);
