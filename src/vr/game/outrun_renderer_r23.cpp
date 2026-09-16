@@ -18,6 +18,18 @@ namespace OutRunVRRenderer
         bool R23FirstEligibilityBypassLogged = false;
         bool R23FirstCullingEligibilityBypassLogged = false;
 
+        // Hook application is asynchronous, but base renderer installer threads
+        // can start immediately after Hook registration. Close injection during
+        // static initialization so there is no base-ready -> R23-apply gap.
+        struct R23EarlyRendererFailClosed
+        {
+            R23EarlyRendererFailClosed() noexcept
+            {
+                RendererInjectionAllowed.store(false, std::memory_order_release);
+            }
+        };
+        R23EarlyRendererFailClosed R23EarlyRendererFailClosedState{};
+
         void R23DropIneligibleLatchedPose() noexcept
         {
             RestoreCullingCamera();
@@ -57,6 +69,9 @@ namespace OutRunVRRenderer
         {
             if (!R23WvpEligibilityReady.load(std::memory_order_acquire))
             {
+                // The wrapper is deliberately armed before R13/base readiness.
+                // Keep injection disabled and use R13's trampoline path until the
+                // full renderer transaction is ready.
                 if (R23WvpEligibilityHook)
                     return R23WvpEligibilityHook.stdcall<HRESULT>(
                         device, startRegister, constantData, vector4fCount);
@@ -93,6 +108,43 @@ namespace OutRunVRRenderer
         DWORD WINAPI R23RendererInstallThread(void*)
         {
             R23WvpEligibilityReady.store(false, std::memory_order_release);
+            RendererInjectionAllowed.store(false, std::memory_order_release);
+
+            // These wrappers target our callback functions, not the D3D device
+            // vtable, so install them before waiting for RendererInstallReady.
+            // They remain dormant until the lower layers route calls here, which
+            // removes the former base-ready -> R23-hook race window.
+            R23BeginSceneEligibilityHook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&BeginSceneDest), BeginSceneDestR23,
+                safetyhook::InlineHook::StartDisabled);
+            const bool beginEnabled = R23BeginSceneEligibilityHook &&
+                R23BeginSceneEligibilityHook.enable().has_value();
+            if (!beginEnabled)
+            {
+                R23BeginSceneEligibilityHook = {};
+                RendererInjectionAllowed.store(false, std::memory_order_release);
+                R23DropIneligibleLatchedPose();
+                spdlog::error(
+                    "VR R23: failed to install early BeginScene culling eligibility hook; renderer injection disabled fail-closed");
+                return 0;
+            }
+
+            R23WvpEligibilityHook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&SetVertexShaderConstantFDestR13),
+                SetVertexShaderConstantFDestR23,
+                safetyhook::InlineHook::StartDisabled);
+            const bool wvpEnabled = R23WvpEligibilityHook &&
+                R23WvpEligibilityHook.enable().has_value();
+            if (!wvpEnabled)
+            {
+                R23WvpEligibilityHook = {};
+                RendererInjectionAllowed.store(false, std::memory_order_release);
+                R23DropIneligibleLatchedPose();
+                spdlog::error(
+                    "VR R23: failed to install early WVP eligibility hook; injection disabled while BeginScene culling guard remains active");
+                return 0;
+            }
+
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
                 if (RendererInstallState.load(std::memory_order_acquire) == RendererInstallFailed)
@@ -105,44 +157,10 @@ namespace OutRunVRRenderer
                 if (RendererInstallState.load(std::memory_order_acquire) == RendererInstallReady &&
                     R13WvpHookReady.load(std::memory_order_acquire))
                 {
-                    // Guard BeginScene first. If the WVP wrapper later fails,
-                    // retain the BeginScene guard with injection disabled so the
-                    // culling camera still fails closed.
-                    R23BeginSceneEligibilityHook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&BeginSceneDest), BeginSceneDestR23,
-                        safetyhook::InlineHook::StartDisabled);
-                    const bool beginEnabled = R23BeginSceneEligibilityHook &&
-                        R23BeginSceneEligibilityHook.enable().has_value();
-                    if (!beginEnabled)
-                    {
-                        R23BeginSceneEligibilityHook = {};
-                        RendererInjectionAllowed.store(false, std::memory_order_release);
-                        R23DropIneligibleLatchedPose();
-                        spdlog::error(
-                            "VR R23: failed to install BeginScene culling eligibility hook; renderer injection disabled fail-closed");
-                        return 0;
-                    }
-
-                    R23WvpEligibilityHook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&SetVertexShaderConstantFDestR13),
-                        SetVertexShaderConstantFDestR23,
-                        safetyhook::InlineHook::StartDisabled);
-                    const bool wvpEnabled = R23WvpEligibilityHook &&
-                        R23WvpEligibilityHook.enable().has_value();
-                    if (!wvpEnabled)
-                    {
-                        R23WvpEligibilityHook = {};
-                        RendererInjectionAllowed.store(false, std::memory_order_release);
-                        R23DropIneligibleLatchedPose();
-                        spdlog::error(
-                            "VR R23: failed to install common WVP eligibility hook; injection disabled while BeginScene culling guard remains active");
-                        return 0;
-                    }
-
                     R23WvpEligibilityReady.store(true, std::memory_order_release);
                     RendererInjectionAllowed.store(true, std::memory_order_release);
                     spdlog::info(
-                        "VR R23 RENDERER: WVP injection + BeginScene culling camera now consume the same 250ms host freshness + recovery-baseline gate");
+                        "VR R23 RENDERER: early BeginScene/WVP guards armed before base readiness; injection + culling now consume the same 250ms host freshness + recovery-baseline gate");
                     return 0;
                 }
                 Sleep(25);
@@ -162,9 +180,6 @@ namespace OutRunVRRenderer
             bool validate() override { return true; }
             bool apply() override
             {
-                // The final eligibility wrapper installs asynchronously. Close
-                // base WVP injection synchronously so no early c64 upload can
-                // escape before the R23 transaction is armed.
                 RendererInjectionAllowed.store(false, std::memory_order_release);
                 R23DropIneligibleLatchedPose();
 
