@@ -9,7 +9,6 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include <mutex>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -24,6 +23,9 @@ namespace OutRunVR::Host
 {
     namespace
     {
+        constexpr DWORD ShadowIdlePollMs = 8;
+        constexpr DWORD ShadowWriterRetryMs = 250;
+
         enum class ProcessLiveness : std::uint8_t
         {
             Dead,
@@ -35,12 +37,10 @@ namespace OutRunVR::Host
         {
             if (!pid)
                 return ProcessLiveness::Dead;
-            HANDLE process = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+            HANDLE process = OpenProcess(
+                SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
             if (!process)
             {
-                // ERROR_INVALID_PARAMETER is the normal signal for a PID that no
-                // longer exists. Any permission/transient failure is fail-closed:
-                // do not steal ownership from a process we cannot prove dead.
                 return GetLastError() == ERROR_INVALID_PARAMETER
                     ? ProcessLiveness::Dead
                     : ProcessLiveness::Unknown;
@@ -62,7 +62,8 @@ namespace OutRunVR::Host
                 stream_.open("outrun-vr-host-v3.log", std::ios::out | std::ios::trunc);
             }
 
-            void Write(const char* level, const char* event, const std::string& message) noexcept
+            void Write(const char* level, const char* event,
+                const std::string& message) noexcept
             {
                 try
                 {
@@ -111,8 +112,9 @@ namespace OutRunVR::Host
         public:
             AckStateWriter()
             {
-                mapping_ = CreateFileMappingW(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0,
-                    static_cast<DWORD>(sizeof(IpcV3::AckState)), IpcV3::AckStateName);
+                mapping_ = CreateFileMappingW(INVALID_HANDLE_VALUE, nullptr,
+                    PAGE_READWRITE, 0, static_cast<DWORD>(sizeof(IpcV3::AckState)),
+                    IpcV3::AckStateName);
                 if (!mapping_)
                     return;
                 const bool existed = GetLastError() == ERROR_ALREADY_EXISTS;
@@ -120,8 +122,7 @@ namespace OutRunVR::Host
                     mapping_, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(IpcV3::AckState)));
                 if (!state_)
                 {
-                    CloseHandle(mapping_);
-                    mapping_ = nullptr;
+                    Reset();
                     return;
                 }
                 if (!existed)
@@ -147,9 +148,11 @@ namespace OutRunVR::Host
 
             ~AckStateWriter()
             {
-                if (state_ && owns_ && state_->consumerPid == GetCurrentProcessId())
+                if (state_ && owns_ &&
+                    state_->consumerPid == GetCurrentProcessId())
                 {
-                    const std::uint32_t odd = Ipc::BeginSeqlockWrite(state_->sequence);
+                    const std::uint32_t odd =
+                        Ipc::BeginSeqlockWrite(state_->sequence);
                     state_->sequence = odd;
                     state_->flags = 0;
                     state_->consumerPid = 0;
@@ -168,7 +171,8 @@ namespace OutRunVR::Host
                 next.version = IpcV3::ProtocolVersion;
                 next.structSize = sizeof(IpcV3::AckState);
                 next.consumerPid = GetCurrentProcessId();
-                const std::uint32_t odd = Ipc::BeginSeqlockWrite(state_->sequence);
+                const std::uint32_t odd =
+                    Ipc::BeginSeqlockWrite(state_->sequence);
                 next.sequence = odd;
                 std::memcpy(state_, &next, sizeof(next));
                 MemoryBarrier();
@@ -193,7 +197,8 @@ namespace OutRunVR::Host
                     if (observed == self)
                         return true;
                     if (observed != 0 &&
-                        QueryProcessLiveness(static_cast<DWORD>(observed)) != ProcessLiveness::Dead)
+                        QueryProcessLiveness(static_cast<DWORD>(observed)) !=
+                            ProcessLiveness::Dead)
                         return false;
                     if (InterlockedCompareExchange(pid, self, observed) == observed)
                         return true;
@@ -214,6 +219,7 @@ namespace OutRunVR::Host
                     CloseHandle(mapping_);
                     mapping_ = nullptr;
                 }
+                owns_ = false;
             }
 
             HANDLE mapping_ = nullptr;
@@ -256,7 +262,8 @@ namespace OutRunVR::Host
             return false;
         }
 
-        bool LatestV3Frame(const IpcV3::FrameRing& ring, IpcV3::FrameDescriptor& out) noexcept
+        bool LatestV3Frame(const IpcV3::FrameRing& ring,
+            IpcV3::FrameDescriptor& out) noexcept
         {
             if (ring.latestSlot >= IpcV3::RingSize)
                 return false;
@@ -267,10 +274,6 @@ namespace OutRunVR::Host
         bool FrameParity(const SharedRenderFrameState& v2,
             const IpcV3::FrameDescriptor& v3) noexcept
         {
-            if (v3.frameId != v2.frameId || v3.renderPoseId != v2.sourcePoseSequence ||
-                v3.presentQpc != v2.presentQpc || v3.presentationMode != v2.presentationMode ||
-                v3.flags != v2.flags || v3.failureReason != v2.failureReason)
-                return false;
             const auto expected = IpcV3::ShadowV2::FrameDescriptorFromV2(v2);
             return std::memcmp(&expected, &v3, sizeof(expected)) == 0;
         }
@@ -278,10 +281,7 @@ namespace OutRunVR::Host
         class ShadowBridgeRuntime
         {
         public:
-            ShadowBridgeRuntime()
-                : worker_([this] { Run(); })
-            {
-            }
+            ShadowBridgeRuntime() : worker_([this] { Run(); }) {}
 
             ~ShadowBridgeRuntime()
             {
@@ -295,7 +295,7 @@ namespace OutRunVR::Host
             {
                 JsonLog log;
                 log.Write("INFO", "shadow_start",
-                    "v3 shadow bridge started; v2 remains runtime authority until parity is proven");
+                    "v3 shadow bridge started; bounded polling and retryable writers active; v2 remains runtime authority until parity is proven");
 
                 Ipc::ReadOnlyMapping<SharedPoseState> legacyPoseMapping;
                 Ipc::ReadOnlyMapping<SharedRenderFrameRing> legacyFrameMapping;
@@ -315,7 +315,9 @@ namespace OutRunVR::Host
                 std::uint64_t frameParityLag = 0;
                 ULONGLONG lastSummaryMs = 0;
                 ULONGLONG firstActiveMs = 0;
+                ULONGLONG nextWriterRetryMs = 0;
                 bool fallbackHintLogged = false;
+                bool readyLogged = false;
 
                 while (!stop_.load(std::memory_order_acquire))
                 {
@@ -326,14 +328,15 @@ namespace OutRunVR::Host
                     }
 
                     SharedPoseState pose{};
-                    if (!IpcV3::ShadowV2::StableReadPose(legacyPoseMapping.Get(), pose))
+                    if (!IpcV3::ShadowV2::StableReadPose(
+                            legacyPoseMapping.Get(), pose))
                     {
-                        Sleep(1);
+                        Sleep(ShadowIdlePollMs);
                         continue;
                     }
                     if (pose.hostPid != GetCurrentProcessId())
                     {
-                        Sleep(10);
+                        Sleep(ShadowIdlePollMs);
                         continue;
                     }
 
@@ -345,33 +348,54 @@ namespace OutRunVR::Host
                     if (legacyFrameMapping.EnsureOpen(RenderFrameMemoryName))
                     {
                         SharedRenderFrameRing ring{};
-                        if (IpcV3::ShadowV2::StableReadFrameRing(legacyFrameMapping.Get(), ring))
-                            haveLatestFrame = IpcV3::ShadowV2::LatestFrame(ring, latestFrame);
+                        if (IpcV3::ShadowV2::StableReadFrameRing(
+                                legacyFrameMapping.Get(), ring))
+                            haveLatestFrame =
+                                IpcV3::ShadowV2::LatestFrame(ring, latestFrame);
                     }
 
                     const std::uint32_t directGeneration = haveLatestFrame &&
                         (latestFrame.flags & RenderFrameDirectGpuTransport)
                         ? latestFrame.reserved[RenderFrameDirectGenerationIndex] : 0;
 
-                    if (!hostWriter)
+                    const ULONGLONG now = GetTickCount64();
+                    const bool writerMissing = !hostWriter || !ackWriter ||
+                        (ackWriter && !ackWriter->Ready());
+                    if (writerMissing && now >= nextWriterRetryMs)
                     {
-                        try
+                        if (ackWriter && !ackWriter->Ready())
+                            ackWriter.reset();
+                        if (!hostWriter)
                         {
-                            hostWriter = std::make_unique<HostStateV3Writer>(
-                                pose.hostAdapterLuidLow,
-                                IpcV3::ShadowV2::SignedBits(pose.hostAdapterLuidHigh));
+                            try
+                            {
+                                hostWriter = std::make_unique<HostStateV3Writer>(
+                                    pose.hostAdapterLuidLow,
+                                    IpcV3::ShadowV2::SignedBits(
+                                        pose.hostAdapterLuidHigh));
+                            }
+                            catch (const std::exception& error)
+                            {
+                                log.Write("ERROR", "host_v3_create_failed",
+                                    error.what());
+                                hostWriter.reset();
+                            }
+                        }
+                        if (hostWriter && !ackWriter)
                             ackWriter = std::make_unique<AckStateWriter>();
+                        nextWriterRetryMs = now + ShadowWriterRetryMs;
+
+                        if (hostWriter && ackWriter && ackWriter->Ready() &&
+                            !readyLogged)
+                        {
+                            readyLogged = true;
                             std::ostringstream message;
                             message << "host v3 writer ready adapter="
-                                << pose.hostAdapterLuidHigh << ':' << pose.hostAdapterLuidLow;
+                                << pose.hostAdapterLuidHigh << ':'
+                                << pose.hostAdapterLuidLow;
                             log.Write("INFO", "host_v3_ready", message.str());
-                            std::cout << "[v3] live shadow HostState/AckState bridge ready.\n";
-                        }
-                        catch (const std::exception& error)
-                        {
-                            log.Write("ERROR", "host_v3_create_failed", error.what());
-                            Sleep(250);
-                            continue;
+                            std::cout
+                                << "[v3] live shadow HostState/AckState bridge ready.\n";
                         }
                     }
 
@@ -379,7 +403,8 @@ namespace OutRunVR::Host
                     {
                         hostWriter->SyncReferenceSpaceGeneration(
                             pose.reserved[HostReferenceSpaceGenerationIndex]);
-                        auto state = IpcV3::ShadowV2::HostStateFromV2(pose, directGeneration);
+                        auto state = IpcV3::ShadowV2::HostStateFromV2(
+                            pose, directGeneration);
                         hostWriter->Publish(state);
                         lastPoseSequence = pose.sequence;
                         ++hostPublishes;
@@ -401,8 +426,9 @@ namespace OutRunVR::Host
                     IpcV3::ClientState client{};
                     if (ReadClient(clientMapping, client))
                     {
-                        const auto expected = IpcV3::ShadowV2::ClientStateFromV2(
-                            pose, haveLatestFrame ? &latestFrame : nullptr);
+                        const auto expected =
+                            IpcV3::ShadowV2::ClientStateFromV2(
+                                pose, haveLatestFrame ? &latestFrame : nullptr);
                         if (client.clientPid == pose.clientPid &&
                             client.flags == expected.flags &&
                             client.presentationMode == expected.presentationMode &&
@@ -416,27 +442,30 @@ namespace OutRunVR::Host
                             ++clientParityLag;
                     }
 
-                    if (haveLatestFrame && v3FrameMapping.EnsureOpen(IpcV3::FrameRingName))
+                    if (haveLatestFrame &&
+                        v3FrameMapping.EnsureOpen(IpcV3::FrameRingName))
                     {
                         IpcV3::FrameRing ring{};
                         IpcV3::FrameDescriptor frame{};
-                        if (StableReadV3FrameRing(v3FrameMapping.Get(), ring) && LatestV3Frame(ring, frame))
+                        if (StableReadV3FrameRing(v3FrameMapping.Get(), ring) &&
+                            LatestV3Frame(ring, frame))
                         {
-                            if (frame.frameId == latestFrame.frameId && FrameParity(latestFrame, frame))
+                            if (frame.frameId == latestFrame.frameId &&
+                                FrameParity(latestFrame, frame))
                                 ++frameParityOk;
                             else
                                 ++frameParityLag;
                         }
                     }
 
-                    const ULONGLONG now = GetTickCount64();
-                    if (!fallbackHintLogged && firstActiveMs && now - firstActiveMs > 5000 &&
+                    if (!fallbackHintLogged && firstActiveMs &&
+                        now - firstActiveMs > 5000 &&
                         (pose.flags & HostDirectGpuTransport) &&
                         !(pose.flags & HostDirectGpuReady))
                     {
                         fallbackHintLogged = true;
                         log.Write("WARN", "direct_gpu_not_ready",
-                            "D3D9Ex direct sharing is not ready after 5s; Desktop Duplication fallback remains active. Plain IDirect3DDevice9 is a likely cause when no interop probe handle appears.");
+                            "D3D9Ex direct sharing is not ready after 5s; Desktop Duplication fallback remains active.");
                     }
 
                     if (now - lastSummaryMs >= 5000)
@@ -453,8 +482,10 @@ namespace OutRunVR::Host
                             << " frame=" << (haveLatestFrame ? latestFrame.frameId : 0)
                             << " failure=" << (haveLatestFrame ? latestFrame.failureReason : 0)
                             << " hostFlags=0x" << std::hex << pose.flags << std::dec
-                            << " directSupported=" << ((pose.flags & HostDirectGpuTransport) ? 1 : 0)
-                            << " directReady=" << ((pose.flags & HostDirectGpuReady) ? 1 : 0)
+                            << " directSupported="
+                            << ((pose.flags & HostDirectGpuTransport) ? 1 : 0)
+                            << " directReady="
+                            << ((pose.flags & HostDirectGpuReady) ? 1 : 0)
                             << " probeHandle=" << pose.clientInteropProbeHandle
                             << " probeToken=" << pose.clientInteropProbeToken
                             << " probeAck=" << pose.hostInteropProbeAckToken
@@ -463,7 +494,7 @@ namespace OutRunVR::Host
                         std::cout << "[v3] " << message.str() << '\n';
                     }
 
-                    Sleep(1);
+                    Sleep(ShadowIdlePollMs);
                 }
 
                 log.Write("INFO", "shadow_stop", "v3 shadow bridge stopped");
