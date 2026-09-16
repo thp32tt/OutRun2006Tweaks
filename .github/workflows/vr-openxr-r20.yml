@@ -97,7 +97,7 @@ jobs:
       - name: Verify architecture boundaries
         run: python tools/verify_vr_architecture.py
 
-      - name: Verify R21 source invariants
+      - name: Verify superseded runtime source invariants
         shell: pwsh
         run: |
           $r21 = Get-Content vrhost/src/runtime/r21_runtime_hardening.hpp -Raw
@@ -107,6 +107,14 @@ jobs:
             'HostShouldRenderReadonly'
           )) {
             if (-not $r21.Contains($marker)) { throw "R21 source invariant missing: $marker" }
+          }
+          $r22 = Get-Content vrhost/src/runtime/r22_runtime_hardening.hpp -Raw
+          foreach ($marker in @(
+            'R22-verified-frame-bundle-20260916',
+            'ProjectionMatchesFrame',
+            'DirectOpenMatchesLatest'
+          )) {
+            if (-not $r22.Contains($marker)) { throw "R22 source invariant missing: $marker" }
           }
 
       - name: Configure x64 host
@@ -143,7 +151,6 @@ jobs:
           if ($bytes.Length -lt 10000) { throw 'outrun-vr-host.exe unexpectedly small' }
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
           foreach ($marker in @(
-            'R22-verified-frame-bundle-20260916',
             'R23-owned-verified-bundle-submit-20260916',
             '[R23] final presentation authority ACTIVE',
             '[R23 pixel]',
