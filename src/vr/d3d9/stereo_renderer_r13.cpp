@@ -34,6 +34,9 @@ namespace OutRunVRStereo
         bool R13ForceMonoShadow = false;
         std::uint64_t R13UnsafeTransitionFrames = 0;
         bool R13FirstUnsafeTransitionLogged = false;
+        std::uint64_t R13DrawTimeZeroDisparityDraws = 0;
+        bool R13FirstDrawTimeZeroDisparityLogged = false;
+        bool R13FirstDrawTimeStateReadFailureLogged = false;
 
         HANDLE R13AckMapping = nullptr;
         const OutRunVR::R13::DirectGpuAckState* R13AckState = nullptr;
@@ -273,6 +276,72 @@ namespace OutRunVRStereo
             return drawHr;
         }
 
+        bool R13DrawTimeFragileEffectNeedsZeroDisparity(
+            IDirect3DDevice9* device) noexcept
+        {
+            if (!device)
+                return false;
+
+            DWORD alphaBlend = FALSE;
+            DWORD alphaTest = FALSE;
+            DWORD zWrite = TRUE;
+            DWORD cullMode = D3DCULL_CCW;
+            if (FAILED(device->GetRenderState(D3DRS_ALPHABLENDENABLE, &alphaBlend)) ||
+                FAILED(device->GetRenderState(D3DRS_ALPHATESTENABLE, &alphaTest)) ||
+                FAILED(device->GetRenderState(D3DRS_ZWRITEENABLE, &zWrite)) ||
+                FAILED(device->GetRenderState(D3DRS_CULLMODE, &cullMode)))
+            {
+                if (!R13FirstDrawTimeStateReadFailureLogged)
+                {
+                    R13FirstDrawTimeStateReadFailureLogged = true;
+                    spdlog::warn(
+                        "VR R13 effect policy: draw-time render-state snapshot unavailable; retaining normal stereo classification");
+                }
+                return false;
+            }
+
+            const auto policy = OutRunVR::PassPolicy::ClassifyEffectStereo(
+                alphaBlend != FALSE,
+                alphaTest != FALSE,
+                zWrite != FALSE,
+                cullMode == D3DCULL_NONE);
+            return !OutRunVR::PassPolicy::AllowsEffectWorldStereo(policy);
+        }
+
+        template <typename LegacyDraw>
+        HRESULT R13RunLegacyDrawWithDrawTimeEffectPolicy(
+            IDirect3DDevice9* device, bool stereoActive,
+            LegacyDraw&& legacyDraw) noexcept
+        {
+            if (!stereoActive ||
+                !R13DrawTimeFragileEffectNeedsZeroDisparity(device))
+                return legacyDraw();
+
+            // BuildEyeConstants treats a zero shader identity as NonWorld and
+            // therefore replays the draw to both eyes with the untouched stock
+            // WVP. Temporarily mask only this draw. Restore the identity only if
+            // no nested SetVertexShader changed it while the draw was executing.
+            const std::uintptr_t savedIdentity =
+                CurrentVertexShaderIdentity.exchange(0, std::memory_order_acq_rel);
+            const HRESULT hr = legacyDraw();
+            if (savedIdentity != 0)
+            {
+                std::uintptr_t expected = 0;
+                CurrentVertexShaderIdentity.compare_exchange_strong(
+                    expected, savedIdentity,
+                    std::memory_order_acq_rel, std::memory_order_acquire);
+            }
+
+            ++R13DrawTimeZeroDisparityDraws;
+            if (!R13FirstDrawTimeZeroDisparityLogged)
+            {
+                R13FirstDrawTimeZeroDisparityLogged = true;
+                spdlog::info(
+                    "VR R13 effect policy: draw-time alpha/billboard/shadow state confirmed; current draw duplicated zero-disparity with stock WVP");
+            }
+            return hr;
+        }
+
         template <typename ActualDraw, typename LegacyDraw>
         HRESULT R13GuardedDraw(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, LegacyDraw&& legacyDraw, const char* site)
@@ -299,7 +368,11 @@ namespace OutRunVRStereo
                 stereoWanted, R9StereoSeeded, unsafeMrt, unsafeOcclusion);
 
             if (replayPolicy == OutRunVR::PassPolicy::DrawReplayPolicy::Legacy)
-                return legacyDraw();
+            {
+                return R13RunLegacyDrawWithDrawTimeEffectPolicy(
+                    device, stereoWanted && R9StereoSeeded,
+                    std::forward<LegacyDraw>(legacyDraw));
+            }
             if (replayPolicy == OutRunVR::PassPolicy::DrawReplayPolicy::ForcedMonoShadow)
                 return R13DrawMonoShadowOnce(device, actualDraw, site);
 
@@ -488,7 +561,7 @@ namespace OutRunVRStereo
                         R13OverlayReady.store(true, std::memory_order_release);
                         R13InstallState.store(R13InstallReady, std::memory_order_release);
                         spdlog::info(
-                            "VR R13: stereo hardening ACTIVE; disabled-first transactional hooks=READY + atomic R7/R9 install handoff + single ResetEx owner + GPU-completion direct-ring backpressure + single-execution MRT/occlusion fallback");
+                            "VR R13: stereo hardening ACTIVE; disabled-first transactional hooks=READY + atomic R7/R9 install handoff + draw-time fragile-effect validation + single ResetEx owner + GPU-completion direct-ring backpressure + single-execution MRT/occlusion fallback");
                     }
                     else
                     {
@@ -537,7 +610,7 @@ namespace OutRunVRStereo
 
     PoseInjectionSnapshot CurrentPoseInjectionSnapshot() noexcept
     {
-        // Sample all mutable pass signals exactly once. The legacy invariant is
+        // Sample all mutable D3D9 pass signals exactly once. The legacy invariant is
         // intentionally calculated from the raw signals rather than from the
         // enum result, so the checked classifier can catch future policy drift
         // without observing two different moments of D3D9 state.
