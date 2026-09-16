@@ -39,12 +39,9 @@ target_include_directories(outrun-vr-host PRIVATE
 )
 target_compile_definitions(outrun-vr-host PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 if(MSVC)
-    # R23 is the final presentation owner. R21 retains readonly direct-state and
-    # shouldRender policy, R22 retains pose/FOV/direct fail-closed validation,
-    # and R23 additionally requires the exact Frame.v2 + image-source bundle
-    # committed by main_r23. main_r23 owns the asynchronous game-UV source and
-    # post-blit left/right output probes, so no second capture diagnostic layer
-    # is force-included here.
+    # R23 remains the verified source/pose owner. R24 is the final submission
+    # guard: it keeps R23 ownership checks but degrades visibly (live/cached
+    # theater) rather than turning every recoverable mismatch into layerCount=0.
     target_compile_options(outrun-vr-host PRIVATE
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/openxr_api_compat.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/sbs_capture_override.hpp"
@@ -53,6 +50,7 @@ if(MSVC)
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r21_runtime_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r22_runtime_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r23_runtime_hardening.hpp"
+        "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r24_black_screen_guard.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r21_crash_diagnostics.hpp"
         "$<$<CONFIG:Release>:/Zi>"
     )
