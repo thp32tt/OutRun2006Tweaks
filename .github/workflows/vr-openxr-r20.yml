@@ -1,4 +1,4 @@
-name: OpenXR VR R22 production build
+name: OpenXR VR R23 production build
 
 on:
   push:
@@ -29,17 +29,18 @@ jobs:
           set CI=
           cmake -S . -B build-vr-game -G "Visual Studio 17 2022" -A Win32
 
-      - name: Verify R22 source graph
+      - name: Verify R23 source graph
         shell: pwsh
         run: |
           $projects = Get-ChildItem build-vr-game -Filter *.vcxproj -Recurse
           if (-not $projects) { throw 'no Visual Studio project files generated' }
           $text = ($projects | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
-          if (-not $text.Contains('stereo_renderer_r22.cpp')) { throw 'R22 wrapper missing from build graph' }
-          foreach ($legacy in @('stereo_renderer.cpp','stereo_renderer_r13.cpp','stereo_renderer_r20.cpp','stereo_renderer_r21.cpp')) {
+          if (-not $text.Contains('stereo_renderer_r23.cpp')) { throw 'R23 stereo wrapper missing from build graph' }
+          if (-not $text.Contains('outrun_renderer_r23.cpp')) { throw 'R23 renderer wrapper missing from build graph' }
+          foreach ($legacy in @('stereo_renderer.cpp','stereo_renderer_r13.cpp','stereo_renderer_r20.cpp','stereo_renderer_r21.cpp','outrun_renderer.cpp','outrun_renderer_r13.cpp')) {
             $escaped = [regex]::Escape($legacy)
             $pattern = '<ClCompile Include="[^"]*[\\/]' + $escaped + '"'
-            if ($text -match $pattern) { throw "legacy stereo TU compiled independently: $legacy" }
+            if ($text -match $pattern) { throw "legacy VR TU compiled independently: $legacy" }
           }
 
       - name: Apply dependency workarounds
@@ -51,10 +52,10 @@ jobs:
           Set-Content -Path build-vr-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
           (Get-Content build-vr-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-vr-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
 
-      - name: Build Win32 R22 DLL
+      - name: Build Win32 R23 DLL
         run: cmake --build build-vr-game --config Release
 
-      - name: Verify Win32 R22 binary
+      - name: Verify Win32 R23 binary
         shell: pwsh
         run: |
           $dll = 'build-vr-game/bin/dinput8.dll'
@@ -67,19 +68,20 @@ jobs:
             'VR stereo: TRUE GEOMETRY STEREO active',
             'VR R13: stereo hardening ACTIVE',
             'VR R20 PRODUCTION: stereo bootstrap overlay ACTIVE',
-            'VR R21 GAME: host-death mono fail-closed guard ACTIVE',
-            'VR R22 GAME: scissor-preserving mono/right replay + common initial depth baseline + R21 eligibility gate ACTIVE',
+            'VR R21/R23 GAME: common host freshness gate ACTIVE',
+            'VR R23 GAME: scissor-preserving target replay + original-game-state first-seed classifier ACTIVE',
+            'VR R23 RENDERER: WVP injection now consumes the same 250ms host freshness + recovery-baseline gate as stereo replay',
             'VR R21 FAIL-CLOSED:',
             'VR v3 shadow: live dual-protocol diagnostics active'
           )) {
-            if (-not $ascii.Contains($marker)) { throw "R22 DLL marker missing: $marker" }
+            if (-not $ascii.Contains($marker)) { throw "R23 DLL marker missing: $marker" }
           }
           $pe = [BitConverter]::ToInt32($bytes,0x3C)
           if ([BitConverter]::ToUInt16($bytes,$pe+4) -ne 0x014C) { throw 'expected x86 DLL' }
 
       - uses: actions/upload-artifact@v4
         with:
-          name: outrun-vr-r22-game-x86
+          name: outrun-vr-r23-game-x86
           path: build-vr-game/bin/dinput8.dll
           if-no-files-found: error
 
@@ -116,7 +118,7 @@ jobs:
             if ($LASTEXITCODE -ne 0) { throw "smoke failed: $test code=$LASTEXITCODE" }
           }
 
-      - name: Verify x64 R22 host binary and PDB
+      - name: Verify x64 R23 host binary and PDB
         shell: pwsh
         run: |
           $hostPath = 'build-vr-host/bin/outrun-vr-host.exe'
@@ -129,22 +131,24 @@ jobs:
           foreach ($marker in @(
             'R21-readonly-ipc-vs-cbuffer-20260916',
             'R22-verified-frame-bundle-20260916',
-            'R22-async-gameuv-capture-diagnostic-20260916',
+            'R23-atomic-verified-source-bundle-20260916',
+            '[R23] final presentation authority ACTIVE',
+            '[R23 pixel]',
             'R22-crash-dump-20260916',
             'R20-production-host-20260916',
             'testPattern=removed',
             'R19-production-capture-reuse-20260916',
             '[v3] live shadow HostState/AckState bridge ready.'
           )) {
-            if (-not $ascii.Contains($marker)) { throw "R22 host marker missing: $marker" }
+            if (-not $ascii.Contains($marker)) { throw "R23 host marker missing: $marker" }
           }
-          if ($ascii.Contains('no-layer OpenXR test pattern ready')) { throw 'obsolete no-layer OpenXR test pattern leaked into R22 host' }
+          if ($ascii.Contains('no-layer OpenXR test pattern ready')) { throw 'obsolete no-layer OpenXR test pattern leaked into R23 host' }
           $pe = [BitConverter]::ToInt32($bytes,0x3C)
           if ([BitConverter]::ToUInt16($bytes,$pe+4) -ne 0x8664) { throw 'expected x64 host' }
 
       - uses: actions/upload-artifact@v4
         with:
-          name: outrun-vr-r22-host-x64-production
+          name: outrun-vr-r23-host-x64-production
           path: |
             build-vr-host/bin/outrun-vr-host.exe
             build-vr-host/bin/outrun-vr-host.pdb
