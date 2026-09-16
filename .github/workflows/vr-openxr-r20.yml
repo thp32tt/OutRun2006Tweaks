@@ -67,9 +67,10 @@ jobs:
             'VR stereo: D3D9 full-eye renderer installed',
             'VR stereo: TRUE GEOMETRY STEREO active',
             'VR R13: stereo hardening ACTIVE',
-            'VR R20 PRODUCTION: stereo bootstrap overlay ACTIVE',
+            'VR R20 PRODUCTION: first stereo seed (legacy or relaxed) requires current-generation Z/stencil clears with no intervening draw',
             'VR R21/R23 GAME: common host freshness gate ACTIVE',
             'VR R22 GAME: scissor-preserving mono/right replay + common initial depth baseline + R21 eligibility gate ACTIVE',
+            'VR R22 REVIEW: Reset recovery gate + unsafe-seed common rollback + replay-state capture fail-closed ACTIVE',
             'VR R23 GAME: R22 scissor/state policy retained; recovery-clear-only baseline reopening guard ACTIVE',
             'VR R23 RENDERER: WVP injection now consumes the same 250ms host freshness + recovery-baseline gate as stereo replay',
             'VR R21 FAIL-CLOSED:',
@@ -95,6 +96,18 @@ jobs:
 
       - name: Verify architecture boundaries
         run: python tools/verify_vr_architecture.py
+
+      - name: Verify R21 source invariants
+        shell: pwsh
+        run: |
+          $r21 = Get-Content vrhost/src/runtime/r21_runtime_hardening.hpp -Raw
+          foreach ($marker in @(
+            'R21-readonly-ipc-vs-cbuffer-20260916',
+            'ReadDirectHostStateReadonly',
+            'HostShouldRenderReadonly'
+          )) {
+            if (-not $r21.Contains($marker)) { throw "R21 source invariant missing: $marker" }
+          }
 
       - name: Configure x64 host
         run: cmake -S vrhost -B build-vr-host -G "Visual Studio 17 2022" -A x64
@@ -130,7 +143,6 @@ jobs:
           if ($bytes.Length -lt 10000) { throw 'outrun-vr-host.exe unexpectedly small' }
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
           foreach ($marker in @(
-            'R21-readonly-ipc-vs-cbuffer-20260916',
             'R22-verified-frame-bundle-20260916',
             'R23-owned-verified-bundle-submit-20260916',
             '[R23] final presentation authority ACTIVE',
