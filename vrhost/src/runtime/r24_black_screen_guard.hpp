@@ -10,8 +10,9 @@
 //   1. preserve validated classic projection + non-projection layers;
 //   2. render DirectGPU only from host-owned SafeEye copies and completion ACK;
 //   3. allow a short display-only grace for an already committed bundle;
-//   4. fall back to a live theater capture, then to the last released theater/
-//      projection swapchain image instead of submitting an empty frame.
+//   4. fall back to a live theater capture, then a host-owned Direct SafeEye
+//      flat view, then a last-known released image, then an emergency visible
+//      quad instead of repeatedly submitting an empty frame.
 //
 // The display-only grace never reopens game-side WVP/stereo injection. It only
 // prevents a 250ms boundary race from turning a frame that was already rendered
@@ -33,14 +34,16 @@
 namespace OutRunVrR24BlackScreenGuard
 {
     inline constexpr const char* BuildId =
-        "R24-visible-fallback-final-20260916";
+        "R24-black-screen-recovery-20260916";
     inline constexpr ULONGLONG DisplayOnlyGraceMs = 500;
 
     inline std::uint64_t ExactProjectionSubmits = 0;
     inline std::uint64_t SoftGraceProjectionSubmits = 0;
     inline std::uint64_t DirectSafeProjectionSubmits = 0;
     inline std::uint64_t LiveTheaterFallbacks = 0;
+    inline std::uint64_t DirectFlatFallbacks = 0;
     inline std::uint64_t CachedLayerFallbacks = 0;
+    inline std::uint64_t EmergencyLayerFallbacks = 0;
     inline std::uint64_t EmptyFrameFallbacks = 0;
     inline std::uint64_t MixedValidatedSubmits = 0;
 
@@ -48,9 +51,16 @@ namespace OutRunVrR24BlackScreenGuard
     inline bool FirstSoftGraceLogged = false;
     inline bool FirstDirectSafeLogged = false;
     inline bool FirstLiveTheaterLogged = false;
+    inline bool FirstDirectFlatLogged = false;
     inline bool FirstCachedLayerLogged = false;
+    inline bool FirstEmergencyLayerLogged = false;
     inline bool FirstEmptyFallbackLogged = false;
     inline bool FirstMixedValidatedLogged = false;
+
+    // A swapchain handle alone does not prove that any image was ever rendered
+    // and successfully released. Track only images R24 itself has committed.
+    inline bool ProjectionImageCommitted = false;
+    inline bool TheaterImageCommitted = false;
 
     struct ProjectionSelection
     {
@@ -140,6 +150,103 @@ namespace OutRunVrR24BlackScreenGuard
         return OutRunVrFinalTest::EndFrame(session, endInfo);
     }
 
+    inline void BuildViewQuad(XrSwapchain handle, std::uint32_t width,
+        std::uint32_t height, std::uint32_t arrayIndex,
+        XrCompositionLayerQuad& quad) noexcept
+    {
+        using namespace OutRunVrSbsCaptureOverride;
+        quad = { XR_TYPE_COMPOSITION_LAYER_QUAD };
+        quad.space = ViewSpace;
+        quad.eyeVisibility = XR_EYE_VISIBILITY_BOTH;
+        quad.pose.orientation.w = 1.0f;
+        quad.pose.position.z = -1.5f;
+        quad.subImage.swapchain = handle;
+        quad.subImage.imageRect.offset = { 0, 0 };
+        quad.subImage.imageRect.extent = {
+            static_cast<std::int32_t>(width),
+            static_cast<std::int32_t>(height)
+        };
+        quad.subImage.imageArrayIndex = arrayIndex;
+        const float aspect = height ? static_cast<float>(width) /
+            static_cast<float>(height) : (16.0f / 9.0f);
+        quad.size.width = 2.0f;
+        quad.size.height = 2.0f / std::max(0.5f, aspect);
+    }
+
+    // R13's legacy RenderSafeProjection did not propagate xrReleaseSwapchainImage
+    // failure. R24 owns the final visible path, so duplicate the small blit here
+    // and treat acquire/wait/render/release as one transaction.
+    inline bool RenderSafeProjectionChecked(
+        XrSession session, const XrFrameEndInfo* endInfo,
+        XrCompositionLayerProjection& projection,
+        std::array<XrCompositionLayerProjectionView, 2>& views) noexcept
+    {
+        using namespace OutRunVrSbsCaptureOverride;
+        using namespace OutRunVrD3D9ExDirectPassthrough;
+
+        const auto selected = FindProjection(endInfo);
+        if (!selected.header || selected.count != 1 ||
+            !SafeEyeSrv[0] || !SafeEyeSrv[1])
+            return false;
+        const auto* incoming =
+            reinterpret_cast<const XrCompositionLayerProjection*>(selected.header);
+        if (incoming->viewCount < 2 || !incoming->views)
+            return false;
+
+        const std::uint32_t width = std::max(
+            1, incoming->views[0].subImage.imageRect.extent.width);
+        const std::uint32_t height = std::max(
+            1, incoming->views[0].subImage.imageRect.extent.height);
+        if (!EnsureSwapchain(Projection, session, width, height, 2) ||
+            !CreateShaders())
+            return false;
+
+        std::uint32_t image = 0;
+        if (!Acquire(Projection, image))
+            return false;
+        if (image >= Projection.rtvs.size())
+        {
+            Release(Projection);
+            return false;
+        }
+
+        ID3D11ShaderResourceView* savedSrv = SourceSrv;
+        const DXGI_FORMAT savedFormat = SourceFormat;
+        bool ok = true;
+        for (int eye = 0; eye < 2; ++eye)
+        {
+            SourceSrv = SafeEyeSrv[eye];
+            SourceFormat = SafeEyeFormat;
+            ok = RenderTo(Projection.rtvs[image][eye], Projection.width,
+                Projection.height, UvRect{ 0.f, 0.f, 1.f, 1.f }) && ok;
+        }
+        SourceSrv = savedSrv;
+        SourceFormat = savedFormat;
+        if (OutRunVrFinalTest::Context)
+            OutRunVrFinalTest::Context->Flush();
+
+        const bool released = Release(Projection);
+        if (!ok || !released)
+            return false;
+
+        ProjectionImageCommitted = true;
+        projection = *incoming;
+        for (int eye = 0; eye < 2; ++eye)
+        {
+            views[eye] = incoming->views[eye];
+            views[eye].subImage.swapchain = Projection.handle;
+            views[eye].subImage.imageRect.offset = { 0, 0 };
+            views[eye].subImage.imageRect.extent = {
+                static_cast<std::int32_t>(Projection.width),
+                static_cast<std::int32_t>(Projection.height)
+            };
+            views[eye].subImage.imageArrayIndex = eye;
+        }
+        projection.viewCount = 2;
+        projection.views = views.data();
+        return true;
+    }
+
     inline bool TryBuildDirectSafeProjection(
         XrSession session, const XrFrameEndInfo* endInfo,
         const OutRunVrR23VerifiedBundle::Snapshot& snapshot,
@@ -170,8 +277,9 @@ namespace OutRunVrR24BlackScreenGuard
                 snapshot.frame))
             return false;
 
-        OutRunVrR21RuntimeHardening::BindLegacyBlitConstantBufferToVs();
-        return RenderSafeProjection(session, endInfo, projection, views);
+        if (!OutRunVrR21RuntimeHardening::BindLegacyBlitConstantBufferToVs())
+            return false;
+        return RenderSafeProjectionChecked(session, endInfo, projection, views);
     }
 
     inline bool TrySubmitDirectSafeProjection(
@@ -197,10 +305,53 @@ namespace OutRunVrR24BlackScreenGuard
         {
             FirstDirectSafeLogged = true;
             std::cerr
-                << "[R24] DirectGPU final submit uses host-owned SafeEye + per-slot completion ACK; failure now falls back visibly instead of no-layer build="
+                << "[R24] DirectGPU final submit uses host-owned SafeEye + checked acquire/wait/render/release transaction build="
                 << BuildId << "\n";
         }
         result = OutRunVrFinalTest::EndFrame(session, &patched);
+        return true;
+    }
+
+    inline bool RenderDirectFlatFallback(
+        XrSession session, XrCompositionLayerQuad& quad) noexcept
+    {
+        using namespace OutRunVrSbsCaptureOverride;
+        using namespace OutRunVrD3D9ExDirectPassthrough;
+
+        if (!SafeFrameId || !SafeEyeSrv[0] || !SafeEyeWidth || !SafeEyeHeight ||
+            !EnsureViewSpace(session) || !CreateShaders() ||
+            !EnsureSwapchain(Theater, session, 1920, 1080, 1))
+            return false;
+
+        std::uint32_t image = 0;
+        if (!Acquire(Theater, image))
+            return false;
+        if (image >= Theater.rtvs.size())
+        {
+            Release(Theater);
+            return false;
+        }
+
+        ID3D11ShaderResourceView* savedSrv = SourceSrv;
+        const DXGI_FORMAT savedFormat = SourceFormat;
+        SourceSrv = SafeEyeSrv[0];
+        SourceFormat = SafeEyeFormat;
+        const bool ok = RenderTo(Theater.rtvs[image][0], Theater.width,
+            Theater.height, UvRect{ 0.f, 0.f, 1.f, 1.f });
+        SourceSrv = savedSrv;
+        SourceFormat = savedFormat;
+        if (OutRunVrFinalTest::Context)
+            OutRunVrFinalTest::Context->Flush();
+        const bool released = Release(Theater);
+        if (!ok || !released)
+            return false;
+
+        TheaterImageCommitted = true;
+        BuildViewQuad(Theater.handle, Theater.width, Theater.height, 0, quad);
+        const float aspect = SafeEyeHeight
+            ? static_cast<float>(SafeEyeWidth) / static_cast<float>(SafeEyeHeight)
+            : (16.0f / 9.0f);
+        quad.size.height = quad.size.width / std::max(0.5f, aspect);
         return true;
     }
 
@@ -211,46 +362,47 @@ namespace OutRunVrR24BlackScreenGuard
         if (!EnsureViewSpace(session))
             return false;
 
-        XrSwapchain handle = XR_NULL_HANDLE;
-        std::uint32_t width = 0;
-        std::uint32_t height = 0;
-        std::uint32_t arrayIndex = 0;
+        if (Theater.handle != XR_NULL_HANDLE && Theater.width && Theater.height &&
+            (TheaterImageCommitted || TheaterSuccess > 0))
+        {
+            BuildViewQuad(Theater.handle, Theater.width, Theater.height, 0, quad);
+            return true;
+        }
+        if (Projection.handle != XR_NULL_HANDLE && Projection.width &&
+            Projection.height && (ProjectionImageCommitted || ProjectionSuccess > 0))
+        {
+            BuildViewQuad(Projection.handle, Projection.width, Projection.height, 0, quad);
+            return true;
+        }
+        return false;
+    }
 
-        if (Theater.handle != XR_NULL_HANDLE && Theater.width && Theater.height)
+    inline bool BuildEmergencyVisibleQuad(
+        XrSession session, XrCompositionLayerQuad& quad) noexcept
+    {
+        using namespace OutRunVrSbsCaptureOverride;
+        if (!OutRunVrFinalTest::Context || !EnsureViewSpace(session) ||
+            !EnsureSwapchain(Theater, session, 1920, 1080, 1))
+            return false;
+
+        std::uint32_t image = 0;
+        if (!Acquire(Theater, image))
+            return false;
+        if (image >= Theater.rtvs.size())
         {
-            handle = Theater.handle;
-            width = Theater.width;
-            height = Theater.height;
-        }
-        else if (Projection.handle != XR_NULL_HANDLE &&
-            Projection.width && Projection.height)
-        {
-            handle = Projection.handle;
-            width = Projection.width;
-            height = Projection.height;
-            arrayIndex = 0;
-        }
-        else
-        {
+            Release(Theater);
             return false;
         }
 
-        quad = { XR_TYPE_COMPOSITION_LAYER_QUAD };
-        quad.space = ViewSpace;
-        quad.eyeVisibility = XR_EYE_VISIBILITY_BOTH;
-        quad.pose.orientation.w = 1.0f;
-        quad.pose.position.z = -1.5f;
-        quad.subImage.swapchain = handle;
-        quad.subImage.imageRect.offset = { 0, 0 };
-        quad.subImage.imageRect.extent = {
-            static_cast<std::int32_t>(width),
-            static_cast<std::int32_t>(height)
-        };
-        quad.subImage.imageArrayIndex = arrayIndex;
-        const float aspect = height ? static_cast<float>(width) /
-            static_cast<float>(height) : (16.0f / 9.0f);
-        quad.size.width = 2.0f;
-        quad.size.height = 2.0f / std::max(0.5f, aspect);
+        const float visibleError[4]{ 0.12f, 0.025f, 0.025f, 1.0f };
+        OutRunVrFinalTest::Context->ClearRenderTargetView(
+            Theater.rtvs[image][0], visibleError);
+        OutRunVrFinalTest::Context->Flush();
+        if (!Release(Theater))
+            return false;
+
+        TheaterImageCommitted = true;
+        BuildViewQuad(Theater.handle, Theater.width, Theater.height, 0, quad);
         return true;
     }
 
@@ -259,16 +411,28 @@ namespace OutRunVrR24BlackScreenGuard
         const char* reason) noexcept
     {
         XrCompositionLayerQuad quad{};
+
+        // The legacy R19 shader consumes UVScale/UvOffset in VSMain. Do not
+        // depend on inherited D3D11 state when R24 invokes it directly.
+        OutRunVrR21RuntimeHardening::BindLegacyBlitConstantBufferToVs();
         const bool live = OutRunVrSbsCaptureOverride::RenderTheaterOverride(
             session, quad);
-        if (!live && !BuildCachedVisibleQuad(session, quad))
+        if (live)
+            TheaterImageCommitted = true;
+
+        const bool directFlat = !live && RenderDirectFlatFallback(session, quad);
+        const bool cached = !live && !directFlat && BuildCachedVisibleQuad(session, quad);
+        const bool emergency = !live && !directFlat && !cached &&
+            BuildEmergencyVisibleQuad(session, quad);
+
+        if (!live && !directFlat && !cached && !emergency)
         {
             ++EmptyFrameFallbacks;
             if (!FirstEmptyFallbackLogged)
             {
                 FirstEmptyFallbackLogged = true;
                 std::cerr
-                    << "[R24] no live/cached visible fallback exists yet; one empty frame may remain reason="
+                    << "[R24] every visible fallback failed; submitting no layer reason="
                     << reason << " build=" << BuildId << "\n";
             }
             OutRunVrR23RuntimeHardening::RecordFinalSubmission(
@@ -291,18 +455,40 @@ namespace OutRunVrR24BlackScreenGuard
             {
                 FirstLiveTheaterLogged = true;
                 std::cerr
-                    << "[R24] live theater fallback replaced an unsafe/absent gameplay projection instead of submitting black reason="
+                    << "[R24] live theater fallback replaced an unsafe/absent gameplay projection reason="
                     << reason << " build=" << BuildId << "\n";
             }
         }
-        else
+        else if (directFlat)
+        {
+            ++DirectFlatFallbacks;
+            if (!FirstDirectFlatLogged)
+            {
+                FirstDirectFlatLogged = true;
+                std::cerr
+                    << "[R24] host-owned Direct SafeEye shown as a flat view while stereo projection recovers reason="
+                    << reason << " build=" << BuildId << "\n";
+            }
+        }
+        else if (cached)
         {
             ++CachedLayerFallbacks;
             if (!FirstCachedLayerLogged)
             {
                 FirstCachedLayerLogged = true;
                 std::cerr
-                    << "[R24] cached released OpenXR image preserved visibility while stereo recovers reason="
+                    << "[R24] last successfully released OpenXR image preserved visibility while stereo recovers reason="
+                    << reason << " build=" << BuildId << "\n";
+            }
+        }
+        else
+        {
+            ++EmergencyLayerFallbacks;
+            if (!FirstEmergencyLayerLogged)
+            {
+                FirstEmergencyLayerLogged = true;
+                std::cerr
+                    << "[R24] emergency visible quad submitted because no game image was safely displayable; black/no-layer loop avoided reason="
                     << reason << " build=" << BuildId << "\n";
             }
         }
@@ -380,6 +566,7 @@ namespace OutRunVrR24BlackScreenGuard
             if (exactClassicSource &&
                 OutRunVrReviewHardening::FreshClassicFallbackAvailable())
             {
+                OutRunVrR21RuntimeHardening::BindLegacyBlitConstantBufferToVs();
                 OutRunVrR23RuntimeHardening::RecordFinalSubmission(
                     verified.frameId, verified.kind, true);
                 return OutRunVrSbsCaptureOverride::EndFrame(session, endInfo);
@@ -414,7 +601,10 @@ namespace OutRunVrR24BlackScreenGuard
 
         // A fresh classic fallback remains preferable to a frozen image.
         if (OutRunVrReviewHardening::FreshClassicFallbackAvailable())
+        {
+            OutRunVrR21RuntimeHardening::BindLegacyBlitConstantBufferToVs();
             return OutRunVrSbsCaptureOverride::EndFrame(session, endInfo);
+        }
 
         return SubmitVisibleFallback(
             session, endInfo, "no fresh verified gameplay bundle");
@@ -426,9 +616,13 @@ namespace OutRunVrR24BlackScreenGuard
         SoftGraceProjectionSubmits = 0;
         DirectSafeProjectionSubmits = 0;
         LiveTheaterFallbacks = 0;
+        DirectFlatFallbacks = 0;
         CachedLayerFallbacks = 0;
+        EmergencyLayerFallbacks = 0;
         EmptyFrameFallbacks = 0;
         MixedValidatedSubmits = 0;
+        ProjectionImageCommitted = false;
+        TheaterImageCommitted = false;
         return OutRunVrR23RuntimeHardening::DestroySession(session);
     }
 }
