@@ -25,6 +25,9 @@ namespace OutRunVR::IpcV3
 
     namespace
     {
+        constexpr DWORD ShadowIdlePollMs = 8;
+        constexpr DWORD ShadowRetryMs = 250;
+
         enum class ProcessLiveness : std::uint8_t
         {
             Dead,
@@ -39,9 +42,6 @@ namespace OutRunVR::IpcV3
             HANDLE process = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
             if (!process)
             {
-                // ERROR_INVALID_PARAMETER is the normal signal for a PID that no
-                // longer exists. Any permission/transient failure is fail-closed:
-                // do not steal ownership from a process we cannot prove dead.
                 return GetLastError() == ERROR_INVALID_PARAMETER
                     ? ProcessLiveness::Dead
                     : ProcessLiveness::Unknown;
@@ -85,8 +85,7 @@ namespace OutRunVR::IpcV3
                     mapping_, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(ClientState)));
                 if (!state_)
                 {
-                    CloseHandle(mapping_);
-                    mapping_ = nullptr;
+                    Reset();
                     return;
                 }
                 if (!existed)
@@ -179,6 +178,7 @@ namespace OutRunVR::IpcV3
                     CloseHandle(mapping_);
                     mapping_ = nullptr;
                 }
+                owns_ = false;
             }
 
             HANDLE mapping_ = nullptr;
@@ -200,8 +200,7 @@ namespace OutRunVR::IpcV3
                     mapping_, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(FrameRing)));
                 if (!ring_)
                 {
-                    CloseHandle(mapping_);
-                    mapping_ = nullptr;
+                    Reset();
                     return;
                 }
                 if (!existed)
@@ -297,6 +296,7 @@ namespace OutRunVR::IpcV3
                     CloseHandle(mapping_);
                     mapping_ = nullptr;
                 }
+                owns_ = false;
             }
 
             HANDLE mapping_ = nullptr;
@@ -385,7 +385,11 @@ namespace OutRunVR::IpcV3
             std::uint32_t lastLegacyPoseSequence = 0;
             std::uint32_t lastLegacyHeartbeat = 0;
             std::uint64_t lastLegacyFrameId = 0;
+            std::uint64_t lastClientPublishedFrameId = 0;
+            std::uint32_t lastClientPresentation = UINT32_MAX;
+            std::uint32_t lastClientStereoState = UINT32_MAX;
             std::uint32_t lastFailureReason = StereoFailureNone;
+            ULONGLONG nextWriterRetryMs = 0;
             ULONGLONG lastSummaryMs = 0;
             std::uint64_t poseParityOk = 0;
             std::uint64_t poseParityLag = 0;
@@ -409,15 +413,25 @@ namespace OutRunVR::IpcV3
                 SharedPoseState pose{};
                 if (!ShadowV2::StableReadPose(legacyPoseMapping.Get(), pose))
                 {
-                    if (ShadowBridgeWait(2))
+                    if (ShadowBridgeWait(ShadowIdlePollMs))
                         break;
                     continue;
                 }
 
-                if (!clientWriter)
-                    clientWriter = std::make_unique<ClientStateWriter>();
-                if (!frameWriter)
-                    frameWriter = std::make_unique<FrameRingWriter>();
+                const ULONGLONG loopNow = GetTickCount64();
+                if ((!clientWriter || !clientWriter->Ready() ||
+                     !frameWriter || !frameWriter->Ready()) && loopNow >= nextWriterRetryMs)
+                {
+                    if (clientWriter && !clientWriter->Ready())
+                        clientWriter.reset();
+                    if (frameWriter && !frameWriter->Ready())
+                        frameWriter.reset();
+                    if (!clientWriter)
+                        clientWriter = std::make_unique<ClientStateWriter>();
+                    if (!frameWriter)
+                        frameWriter = std::make_unique<FrameRingWriter>();
+                    nextWriterRetryMs = loopNow + ShadowRetryMs;
+                }
 
                 SharedRenderFrameState latestFrame{};
                 bool haveLatestFrame = false;
@@ -428,7 +442,9 @@ namespace OutRunVR::IpcV3
                         haveLatestFrame = ShadowV2::LatestFrame(ring, latestFrame);
                 }
 
-                if (haveLatestFrame && latestFrame.frameId != lastLegacyFrameId)
+                const bool frameChanged = haveLatestFrame &&
+                    latestFrame.frameId != lastLegacyFrameId;
+                if (frameChanged)
                 {
                     lastLegacyFrameId = latestFrame.frameId;
                     if (frameWriter && frameWriter->Ready())
@@ -450,14 +466,23 @@ namespace OutRunVR::IpcV3
                 }
 
                 const std::uint32_t heartbeat = pose.reserved[ClientHeartbeatIndex];
-                if ((heartbeat != lastLegacyHeartbeat || lastLegacyFrameId != 0) &&
-                    clientWriter && clientWriter->Ready())
+                const std::uint32_t presentation = pose.reserved[ClientPresentationModeIndex];
+                const std::uint32_t stereoState = pose.reserved[ClientStereoStateIndex];
+                const std::uint64_t currentFrameId = haveLatestFrame ? latestFrame.frameId : 0;
+                const bool clientChanged = heartbeat != lastLegacyHeartbeat ||
+                    currentFrameId != lastClientPublishedFrameId ||
+                    presentation != lastClientPresentation ||
+                    stereoState != lastClientStereoState;
+                if (clientChanged && clientWriter && clientWriter->Ready())
                 {
                     ClientState client = ShadowV2::ClientStateFromV2(
                         pose, haveLatestFrame ? &latestFrame : nullptr);
                     clientWriter->Publish(client);
                     ++clientPublishes;
                     lastLegacyHeartbeat = heartbeat;
+                    lastClientPublishedFrameId = currentFrameId;
+                    lastClientPresentation = presentation;
+                    lastClientStereoState = stereoState;
                 }
 
                 const std::uint32_t directGeneration = haveLatestFrame &&
@@ -527,7 +552,7 @@ namespace OutRunVR::IpcV3
                 {
                     readyLogged = true;
                     spdlog::info(
-                        "VR v3 shadow: live dual-protocol diagnostics active; v2 remains render authority until parity is proven");
+                        "VR v3 shadow: live dual-protocol diagnostics active; change-driven publication + bounded polling; v2 remains render authority until parity is proven");
                 }
 
                 const ULONGLONG now = GetTickCount64();
@@ -549,7 +574,7 @@ namespace OutRunVR::IpcV3
                         pose.reserved[ClientStereoStateIndex]);
                 }
 
-                if (ShadowBridgeWait(2))
+                if (ShadowBridgeWait(ShadowIdlePollMs))
                     break;
             }
             return 0;
@@ -575,10 +600,6 @@ namespace OutRunVR::IpcV3
                 ShadowBridgeStop.store(false, std::memory_order_release);
                 ResetEvent(ShadowBridgeStopEvent);
 
-                // The bridge executes plugin code for the entire game process.
-                // Pin the module so an unexpected FreeLibrary cannot unload code
-                // underneath the worker; normal process shutdown still receives
-                // DLL_PROCESS_DETACH and signals the stop event.
                 HMODULE pinnedModule = nullptr;
                 if (!GetModuleHandleExW(
                         GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_PIN,
