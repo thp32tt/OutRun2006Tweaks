@@ -150,10 +150,10 @@ namespace OutRunVRD3D9ExUpgradeR13
         DWORD R14SanitizeLockFlags(DWORD flags) noexcept
         {
             // DISCARD/NOOVERWRITE are GPU-dynamic hints and are invalid or
-            // meaningless on SYSTEMMEM. NODIRTYUPDATE would suppress the dirty
+            // meaningless on SYSTEMMEM. NO_DIRTY_UPDATE would suppress the dirty
             // tracking UpdateTexture may rely on, so R14 owns that policy too.
             return flags & ~(D3DLOCK_DISCARD | D3DLOCK_NOOVERWRITE |
-                D3DLOCK_NODIRTYUPDATE);
+                D3DLOCK_NO_DIRTY_UPDATE);
         }
 
         HRESULT __stdcall TextureLockRectR14(IDirect3DTexture9* texture,
