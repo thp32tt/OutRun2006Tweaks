@@ -135,6 +135,8 @@ namespace OutRunVRRenderer
                 R23BeginSceneEligibilityHook = {};
                 R23RendererInstallState.store(State::Failed, std::memory_order_release);
                 R23RequestFailClosedCleanup();
+                HookManager::ReportAsyncResult(
+                    "OpenXRVRRendererR23Eligibility", false);
                 spdlog::error(
                     "VR R23: failed to install early BeginScene culling eligibility hook; renderer injection disabled fail-closed");
                 return 0;
@@ -151,6 +153,8 @@ namespace OutRunVRRenderer
                 R23WvpEligibilityHook = {};
                 R23RendererInstallState.store(State::Failed, std::memory_order_release);
                 R23RequestFailClosedCleanup();
+                HookManager::ReportAsyncResult(
+                    "OpenXRVRRendererR23Eligibility", false);
                 spdlog::error(
                     "VR R23: failed to install early WVP eligibility hook; injection disabled while BeginScene culling guard remains active");
                 return 0;
@@ -162,6 +166,8 @@ namespace OutRunVRRenderer
                 {
                     R23RendererInstallState.store(State::Failed, std::memory_order_release);
                     R23RequestFailClosedCleanup();
+                    HookManager::ReportAsyncResult(
+                        "OpenXRVRRendererR23Eligibility", false);
                     return 0;
                 }
 
@@ -171,6 +177,8 @@ namespace OutRunVRRenderer
                     R23WvpEligibilityReady.store(true, std::memory_order_release);
                     RendererInjectionAllowed.store(true, std::memory_order_release);
                     R23RendererInstallState.store(State::Ready, std::memory_order_release);
+                    HookManager::ReportAsyncResult(
+                        "OpenXRVRRendererR23Eligibility", true);
                     spdlog::info(
                         "VR R23 RENDERER: early BeginScene/WVP guards READY; fail-closed cleanup is render-thread-owned; injection + culling consume the same 250ms host freshness + recovery-baseline gate");
                     return 0;
@@ -179,6 +187,8 @@ namespace OutRunVRRenderer
             }
             R23RendererInstallState.store(State::Failed, std::memory_order_release);
             R23RequestFailClosedCleanup();
+            HookManager::ReportAsyncResult(
+                "OpenXRVRRendererR23Eligibility", false);
             spdlog::error(
                 "VR R23 RENDERER: timed out waiting for base/R13 renderer transaction; injection remains fail-closed");
             return 0;
