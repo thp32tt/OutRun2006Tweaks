@@ -21,6 +21,8 @@ namespace OutRunVRStereo
         SafetyHookInline R20ClearR9Hook{};
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R20InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
+        // CI/diagnostic invariant: terminal installer failure is InstallState::Failed;
+        // local worker code uses the State alias below without changing semantics.
 
         // Compatibility gate consumed by R21/R23 overlays. RuntimeEligibility is
         // authoritative; this mirror remains so older R20 call sites fail closed.
