@@ -1,7 +1,11 @@
 // R23 renderer eligibility overlay. The R13 semantic classifier remains the
-// normal path; this wrapper prevents both head-tracked WVP injection and the
-// render-time culling-camera override whenever the common host/baseline gate is
-// not eligible.
+// normal path; this wrapper prevents head-tracked WVP injection and render-time
+// culling-camera override until the common game-side baseline gate is eligible.
+//
+// Recovery uses a separate pose-warmup phase. During that phase BeginScene may
+// latch a fresh host pose for the upcoming authoritative clear, but the stock
+// camera and stock c64 values remain on screen. The x86 recovery coordinator can
+// then open stereo at a safe full clear without reusing the previous frame pose.
 
 #include "../runtime_eligibility.hpp"
 #include "outrun_renderer_r13.cpp"
@@ -18,12 +22,11 @@ namespace OutRunVRRenderer
             OutRunVR::RuntimeEligibility::InstallState::Pending };
         std::uint64_t R23EligibilityBypasses = 0;
         std::uint64_t R23CullingEligibilityBypasses = 0;
+        std::uint64_t R23WarmupPosePreserves = 0;
         bool R23FirstEligibilityBypassLogged = false;
         bool R23FirstCullingEligibilityBypassLogged = false;
+        bool R23FirstWarmupPoseLogged = false;
 
-        // Hook application is asynchronous, but base renderer installer threads
-        // can start immediately after Hook registration. Close injection during
-        // static initialization so there is no base-ready -> R23-apply gap.
         struct R23EarlyRendererFailClosed
         {
             R23EarlyRendererFailClosed() noexcept
@@ -44,6 +47,25 @@ namespace OutRunVRRenderer
             InvalidateVerifiedWvp();
         }
 
+        void R23KeepWarmupPoseStockOnRenderThread() noexcept
+        {
+            // LatchFramePose may have temporarily applied the culling camera.
+            // Recovery warmup keeps the immutable pose packet but never exposes
+            // its camera/WVP transform to the monoscopic game frame.
+            RestoreCullingCamera();
+            FrameTelemetryFlags &= ~OutRunVR::ClientCullingCameraSynced;
+            FrameTelemetryFlags &= ~OutRunVR::ClientRendererPoseInjected;
+            FrameTelemetryFlags &= ~OutRunVR::ClientPoseApplied;
+            InvalidateVerifiedWvp();
+            ++R23WarmupPosePreserves;
+            if (!R23FirstWarmupPoseLogged)
+            {
+                R23FirstWarmupPoseLogged = true;
+                spdlog::info(
+                    "VR R23/R25 RENDERER: recovery pose warmup latched a fresh pose while stock camera/WVP remain authoritative");
+            }
+        }
+
         void R23RequestFailClosedCleanup() noexcept
         {
             RendererInjectionAllowed.store(false, std::memory_order_release);
@@ -56,9 +78,6 @@ namespace OutRunVRRenderer
             if (R23RenderThreadCleanupRequested.exchange(false,
                     std::memory_order_acq_rel))
             {
-                // RestoreCullingCamera writes live game camera/projection memory.
-                // It is intentionally executed only from the D3D render callback
-                // thread, never from an asynchronous installer worker.
                 R23DropIneligibleLatchedPoseOnRenderThread();
             }
         }
@@ -71,13 +90,17 @@ namespace OutRunVRRenderer
                 !OutRunVRStereo::IsInternalStereoPassActive() &&
                 !OutRunVR::RuntimeEligibility::MayInjectStereo())
             {
-                R23DropIneligibleLatchedPoseOnRenderThread();
+                if (OutRunVR::RuntimeEligibility::PoseWarmupAllowed())
+                    R23KeepWarmupPoseStockOnRenderThread();
+                else
+                    R23DropIneligibleLatchedPoseOnRenderThread();
+
                 ++R23CullingEligibilityBypasses;
                 if (!R23FirstCullingEligibilityBypassLogged)
                 {
                     R23FirstCullingEligibilityBypassLogged = true;
                     spdlog::info(
-                        "VR R23: BeginScene culling-camera/head pose held stock until common host-fresh + verified-baseline eligibility is true");
+                        "VR R23: BeginScene culling-camera/head transform held stock until common host-fresh + verified-baseline eligibility is true");
                 }
             }
             return result;
@@ -103,7 +126,11 @@ namespace OutRunVRRenderer
 
             if (candidateWvp && !OutRunVR::RuntimeEligibility::MayInjectStereo())
             {
-                R23DropIneligibleLatchedPoseOnRenderThread();
+                if (OutRunVR::RuntimeEligibility::PoseWarmupAllowed())
+                    R23KeepWarmupPoseStockOnRenderThread();
+                else
+                    R23DropIneligibleLatchedPoseOnRenderThread();
+
                 ++R23EligibilityBypasses;
                 if (!R23FirstEligibilityBypassLogged)
                 {
@@ -180,7 +207,7 @@ namespace OutRunVRRenderer
                     HookManager::ReportAsyncResult(
                         "OpenXRVRRendererR23Eligibility", true);
                     spdlog::info(
-                        "VR R23 RENDERER: early BeginScene/WVP guards READY; fail-closed cleanup is render-thread-owned; injection + culling consume the same 250ms host freshness + recovery-baseline gate");
+                        "VR R23 RENDERER: BeginScene/WVP guards READY; recovery pose warmup is stock-visible and stereo injection still requires the authoritative baseline gate");
                     return 0;
                 }
                 Sleep(25);
