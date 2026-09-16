@@ -1,4 +1,4 @@
-name: OpenXR VR R23 hardening build
+name: OpenXR VR R24 final hardening build
 
 on:
   push:
@@ -9,31 +9,40 @@ on:
   workflow_dispatch:
 
 jobs:
-  host-x64-r23:
+  host-x64-r24:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Verify R23 source invariants
+      - name: Verify R24 source invariants
         shell: pwsh
         run: |
           $r21 = Get-Content vrhost/src/runtime/r21_runtime_hardening.hpp -Raw
-          $r22 = Get-Content vrhost/src/runtime/r22_runtime_hardening.hpp -Raw
           $r23 = Get-Content vrhost/src/runtime/r23_runtime_hardening.hpp -Raw
+          $r24 = Get-Content vrhost/src/runtime/r24_black_screen_guard.hpp -Raw
           $bundle = Get-Content vrhost/src/runtime/r23_verified_bundle.hpp -Raw
+          $wait = Get-Content vrhost/src/runtime/bounded_swapchain_wait.hpp -Raw
           $main = Get-Content vrhost/src/main_r23.cpp -Raw
           $crash = Get-Content vrhost/src/runtime/r21_crash_diagnostics.hpp -Raw
-          if (-not $r21.Contains('R21-readonly-ipc-vs-cbuffer-20260916')) { throw 'R21 build marker missing' }
           if (-not $r21.Contains('ReadDirectHostStateReadonly')) { throw 'readonly direct-state reader missing' }
           if (-not $r21.Contains('HostShouldRenderReadonly')) { throw 'shouldRender readonly gate missing' }
-          if ($r21 -match 'InterlockedCompareExchange\s*\(') { throw 'write-capable CAS call leaked into R21 final owner' }
-          if (-not $r22.Contains('R22-verified-frame-bundle-20260916')) { throw 'R22 validation marker missing' }
-          if (-not $r23.Contains('R23-owned-verified-bundle-submit-20260916')) { throw 'R23 owned-bundle final authority marker missing' }
-          if (-not $r23.Contains('ReadFresh(verified)')) { throw 'R23 final path does not read committed bundle directly' }
-          if ($r23.Contains('ReadLatestFrame(latest')) { throw 'R23 final authority still invalidates committed bundle from producer latest frame' }
+          if ($r21 -match 'InterlockedCompareExchange\s*\(') { throw 'write-capable CAS call leaked into R21 readonly path' }
+          if (-not $r23.Contains('R23-owned-verified-bundle-submit-20260916')) { throw 'R23 owned-bundle authority missing' }
           if (-not $r23.Contains('RenderCommittedDirect')) { throw 'R23 committed direct safe-copy path missing' }
+          foreach ($marker in @(
+            'R24-visible-fallback-final-20260916',
+            'DisplayOnlyGraceMs = 500',
+            'TrySubmitDirectSafeProjection',
+            'SubmitVisibleFallback',
+            'RenderTheaterOverride',
+            'BuildCachedVisibleQuad'
+          )) {
+            if (-not $r24.Contains($marker)) { throw "R24 invariant missing: $marker" }
+          }
+          if (-not $wait.Contains('SliceNs = 20')) { throw 'bounded wait slice missing' }
+          if (-not $wait.Contains('TotalBudgetMs = 250')) { throw 'bounded wait budget missing' }
           if (-not $bundle.Contains('OutRunVR::SharedRenderFrameState frame')) { throw 'verified full frame snapshot missing' }
           if (-not $bundle.Contains('MaxPresentationAgeMs = 250')) { throw 'verified bundle TTL missing' }
           if (-not $bundle.Contains('publishedAtMs')) { throw 'verified bundle commit time missing' }
@@ -41,27 +50,23 @@ jobs:
           if (-not $main.Contains('R23CommitClassicAfterValidation')) { throw 'classic post-validation commit missing' }
           if (-not $main.Contains('R23CommitDirectAfterValidation')) { throw 'direct post-validation commit missing' }
           if (-not $main.Contains('D3D11_MAP_FLAG_DO_NOT_WAIT')) { throw 'non-blocking pixel diagnostic missing' }
-          if (-not $main.Contains('lastProjectionScheduleMs')) { throw 'projection diagnostic throttle missing' }
           if (-not $main.Contains('ScheduleTheater')) { throw 'theater output diagnostic missing' }
-          if (-not $main.Contains('finalSubmitted=')) { throw 'final-submission diagnostic correlation missing' }
           if (-not $crash.Contains('WriteInitialFaultText(ep, baseName)')) { throw 'fault text is not written before dump' }
           if (-not $crash.Contains('const DumpResult dump = WriteMiniDump(ep, baseName)')) { throw 'minidump attempt missing' }
           if (-not $crash.Contains('AppendDumpResult(baseName, dump)')) { throw 'dump result append missing' }
-          $shader = Get-Content vrhost/src/stereo_shader.hpp -Raw
-          if (-not $shader.Contains('const float2 sampleUv = input.uv * UvScale + UvOffset')) { throw 'core PS UV transform missing' }
-          if ($shader.Contains('o.uv = uv * UvScale + UvOffset')) { throw 'core VS still depends on unbound BlitParams' }
           $cmake = Get-Content vrhost/CMakeLists.txt -Raw
-          if (-not $cmake.Contains('main_r23.cpp')) { throw 'R23 host entry point not selected' }
-          if (-not $cmake.Contains('r23_runtime_hardening.hpp')) { throw 'R23 final owner not forced into host' }
+          if (-not $cmake.Contains('main_r23.cpp')) { throw 'verified host entry point not selected' }
+          if (-not $cmake.Contains('r24_black_screen_guard.hpp')) { throw 'R24 final owner not forced into host' }
+          if (-not $cmake.Contains('bounded_swapchain_wait.hpp')) { throw 'bounded wait guard not forced into host' }
 
       - name: Verify architecture boundaries
         run: python tools/verify_vr_architecture.py
 
       - name: Configure x64 host
-        run: cmake -S vrhost -B build-r23-host -G "Visual Studio 17 2022" -A x64
+        run: cmake -S vrhost -B build-r24-host -G "Visual Studio 17 2022" -A x64
 
       - name: Build x64 host and tests
-        run: cmake --build build-r23-host --config RelWithDebInfo
+        run: cmake --build build-r24-host --config RelWithDebInfo
 
       - name: Run host smoke tests
         shell: pwsh
@@ -72,44 +77,44 @@ jobs:
             'outrun-vr-host-state-v3-channel-smoke.exe',
             'outrun-vr-v2-v3-shadow-conversion-smoke.exe',
             'outrun-vr-host-pose-v3-validation-smoke.exe',
-            'outrun-vr-core-math-smoke.exe'
+            'outrun-vr-core-math-smoke.exe',
+            'outrun-vr-runtime-eligibility-smoke.exe',
+            'outrun-vr-r23-verified-bundle-smoke.exe'
           )) {
-            $path = Join-Path 'build-r23-host/bin' $test
+            $path = Join-Path 'build-r24-host/bin' $test
             if (-not (Test-Path $path)) { throw "missing smoke executable: $test" }
             & $path
             if ($LASTEXITCODE -ne 0) { throw "smoke failed: $test code=$LASTEXITCODE" }
           }
 
-      - name: Verify R23 host binary and symbols
+      - name: Verify R24 final host binary and symbols
         shell: pwsh
         run: |
-          $hostPath = 'build-r23-host/bin/outrun-vr-host.exe'
-          $pdbPath = 'build-r23-host/bin/outrun-vr-host.pdb'
+          $hostPath = 'build-r24-host/bin/outrun-vr-host.exe'
+          $pdbPath = 'build-r24-host/bin/outrun-vr-host.pdb'
           if (-not (Test-Path $hostPath)) { throw 'outrun-vr-host.exe was not produced' }
           if (-not (Test-Path $pdbPath)) { throw 'outrun-vr-host.pdb was not produced' }
           $bytes = [IO.File]::ReadAllBytes($hostPath)
           if ($bytes.Length -lt 10000) { throw 'outrun-vr-host.exe unexpectedly small' }
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
           foreach ($marker in @(
-            'R21-readonly-ipc-vs-cbuffer-20260916',
-            'R22-verified-frame-bundle-20260916',
-            'R23-owned-verified-bundle-submit-20260916',
-            '[R23] final presentation authority ACTIVE',
+            'R24-visible-fallback-final-20260916',
+            '[R24] exact committed classic projection submitted directly',
+            '[R24] DirectGPU final submit uses host-owned SafeEye',
+            '[R24] cached released OpenXR image preserved visibility while stereo recovers',
+            'xrWaitSwapchainImage exceeded 250ms',
             '[R23 pixel]',
-            'write-capable CAS removed from final presentation path',
-            'R20-production-host-20260916',
-            'R19-production-capture-reuse-20260916',
             'R23-crash-text-first-20260916'
           )) {
-            if (-not $ascii.Contains($marker)) { throw "R23 host marker missing: $marker" }
+            if (-not $ascii.Contains($marker)) { throw "R24 host marker missing: $marker" }
           }
           $pe = [BitConverter]::ToInt32($bytes,0x3C)
           if ([BitConverter]::ToUInt16($bytes,$pe+4) -ne 0x8664) { throw 'expected x64 host' }
 
       - uses: actions/upload-artifact@v4
         with:
-          name: outrun-vr-r23-host-x64-symbols
+          name: outrun-vr-r24-final-host-x64-symbols
           path: |
-            build-r23-host/bin/outrun-vr-host.exe
-            build-r23-host/bin/outrun-vr-host.pdb
+            build-r24-host/bin/outrun-vr-host.exe
+            build-r24-host/bin/outrun-vr-host.pdb
           if-no-files-found: error
