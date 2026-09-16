@@ -73,9 +73,12 @@ namespace OutRunVrR23RuntimeHardening
 
         if (direct)
         {
-            // R21 remains the direct GPU safe-copy authority, but only after the
-            // R23 host loop has committed the exact direct frame as its bundle.
-            return OutRunVrR21RuntimeHardening::EndFrame(session, endInfo);
+            // The R23 host loop already committed this exact direct bundle. Use
+            // R22's stronger exact openedFrame==latest.frameId safe-copy path so
+            // the first recovered cached slot does not depend on a Ready bit that
+            // was published before this frame's successful commit.
+            return OutRunVrR22RuntimeHardening::RenderExactDirect(
+                session, endInfo, latest);
         }
 
         if (OutRunVrReviewHardening::IncomingProjectionValid(endInfo))
