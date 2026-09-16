@@ -42,8 +42,11 @@ if(MSVC)
     # R23 remains the verified source/pose owner. R24 is the final submission
     # guard: it keeps R23 ownership checks but degrades visibly (live/cached
     # theater) rather than turning every recoverable mismatch into layerCount=0.
+    # Infinite OpenXR image waits are also bounded so a runtime stall cannot
+    # leave the host alive forever on a black frame.
     target_compile_options(outrun-vr-host PRIVATE
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/openxr_api_compat.hpp"
+        "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/bounded_swapchain_wait.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/sbs_capture_override.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/d3d9ex_direct_passthrough.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/review_hardening.hpp"
