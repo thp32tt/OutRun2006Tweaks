@@ -13,12 +13,13 @@
 // second eye. Pose.v3 is primary with v2 retained as automatic compatibility
 // fallback while frame transport migration is still in progress.
 //
-// PreferD3D9Ex remains experimental. OutRun/Tweaks uses classic
-// D3DPOOL_MANAGED semantics, so the Ex path translates legacy resources and
-// must still prove lock/update behavior on real drivers. The current R13 path
-// is not literal zero-copy: shared D3D9Ex eyes are copied on the GPU into
-// host-owned D3D11 safety textures before the producer slot is acknowledged.
-// Classic D3D9 therefore remains the default compatibility path.
+// D3D9Ex is preferred on the VR branch because it preserves the full-size L/R
+// eye textures instead of squeezing them into SBS halves before Desktop
+// Duplication. R14 services legacy MANAGED 2D LockRect through SYSTEMMEM CPU
+// shadows, while device-promotion/setup failures still fall back to classic
+// D3D9. Cube/volume legacy resources remain hardware-validation items. The
+// shared-eye path is GPU-direct transport, not literal zero-copy: the host takes
+// a D3D11 safety copy before it ACKs a producer ring slot.
 namespace Settings
 {
 	Setting<bool> VREnabled{ "VR", "Enabled", true,
@@ -29,8 +30,8 @@ namespace Settings
 		"Applies the OpenXR HMD orientation at OutRun's verified D3D9 WorldViewProjection upload." };
 	Setting<bool> VRStereo{ "VR", "Stereo", true,
 		"Renders true left/right geometry stereo into an SBS game frame or verified shared-eye transport. Menus remain on the fixed theater quad." };
-	Setting<bool> VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", false,
-		"Experimental direct GPU transport. Uses D3D9Ex compatibility translation, shared L/R eye textures and a host-owned D3D11 safety copy before ACK. Leave false until MANAGED-resource compatibility and direct transport are fully hardware-proven." };
+	Setting<bool> VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", true,
+		"Prefers the guarded D3D9Ex shared-eye transport so each eye keeps full backbuffer resolution and Desktop Duplication can be skipped. R14 CPU-shadows legacy MANAGED 2D texture locks and device setup still falls back to classic D3D9; set false if a driver/resource compatibility issue is observed." };
 	Setting<bool> VRPositionalTracking{ "VR", "PositionalTracking", true,
 		"Applies 6DoF HMD X/Y/Z movement in addition to orientation. Disable this option if a title-specific camera/culling issue is observed; stereo eye separation is independent." };
 	Setting<bool> VRCullingCameraSync{ "VR", "CullingCameraSync", true,
@@ -58,7 +59,7 @@ namespace OutRunVR
 
 		bool apply() override
 		{
-			spdlog::info("VR: classic-D3D9 exact projection preferred; fresh SBS fallback retained; D3D9Ex host-owned GPU safety-copy transport remains opt-in; CalcCameraMatrix untouched");
+			spdlog::info("VR: guarded D3D9Ex full-eye transport preferred; classic D3D9 + fresh SBS/Desktop Duplication retained as automatic compatibility fallback; CalcCameraMatrix untouched");
 			return true;
 		}
 
