@@ -18,6 +18,7 @@
 namespace OutRunVRRenderer
 {
     void R29InvalidateRawWvpGeneration() noexcept;
+    OutRunVR::RuntimeEligibility::InstallState R29RendererState() noexcept;
 }
 
 namespace OutRunVRStereo
@@ -388,17 +389,18 @@ namespace OutRunVRStereo
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
                 const auto r26 = R26InstallState.load(std::memory_order_acquire);
-                if (r26 == State::Failed)
+                const auto rendererR29 = OutRunVRRenderer::R29RendererState();
+                if (r26 == State::Failed || rendererR29 == State::Failed)
                 {
                     R29StereoInstallState.store(State::Failed,
                         std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR29", false);
                     spdlog::error(
-                        "VR R29 STEREO: R26 prerequisite failed; R26/R28 remains active");
+                        "VR R29 STEREO: R26 or renderer-R29 prerequisite failed; R26/R28 remains active");
                     return 0;
                 }
 
-                if (r26 == State::Ready)
+                if (r26 == State::Ready && rendererR29 == State::Ready)
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
                     R29DrawPrimitiveR27Hook = safetyhook::create_inline(
@@ -447,7 +449,7 @@ namespace OutRunVRStereo
             R29StereoInstallState.store(State::Failed, std::memory_order_release);
             HookManager::ReportAsyncResult("OpenXRVRStereoR29", false);
             spdlog::error(
-                "VR R29 STEREO: timed out waiting for R26; R26/R28 remains active");
+                "VR R29 STEREO: timed out waiting for R26/renderer-R29; R26/R28 remains active");
             return 0;
         }
 
