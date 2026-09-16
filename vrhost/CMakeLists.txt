@@ -63,10 +63,6 @@ if(MSVC)
 endif()
 target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi d3dcompiler user32 dbghelp)
 
-# Renderer-independent hardware diagnostic. This intentionally does not use the
-# host forced-include runtime wrappers and does not depend on the game process.
-# It submits deterministic color patterns directly through OpenXR/D3D11 so
-# VDXR swapchain/layer behavior can be isolated from D3D9 capture/stereo logic.
 add_executable(outrun-vr-diagnostic
     src/diagnostic_pattern.cpp
 )
@@ -113,6 +109,24 @@ target_include_directories(outrun-vr-host-pose-v3-validation-smoke PRIVATE
 )
 target_compile_definitions(outrun-vr-host-pose-v3-validation-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 
+# R23 behavior regressions. These are intentionally small enough to run in CI
+# without a headset/game process and cover the fail-closed state machine plus
+# host-owned verified-bundle identity/TTL semantics.
+add_executable(outrun-vr-runtime-eligibility-smoke tests/runtime_eligibility_smoke.cpp)
+target_include_directories(outrun-vr-runtime-eligibility-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src"
+)
+target_compile_definitions(outrun-vr-runtime-eligibility-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
+
+add_executable(outrun-vr-r23-verified-bundle-smoke tests/r23_verified_bundle_smoke.cpp)
+target_include_directories(outrun-vr-r23-verified-bundle-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src"
+    "${CMAKE_CURRENT_LIST_DIR}/src"
+)
+target_compile_definitions(outrun-vr-r23-verified-bundle-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
+target_link_libraries(outrun-vr-r23-verified-bundle-smoke PRIVATE
+    openxr_loader d3d11 dxgi d3dcompiler user32)
+
 foreach(target
     outrun-vr-host
     outrun-vr-diagnostic
@@ -121,7 +135,9 @@ foreach(target
     outrun-vr-core-math-smoke
     outrun-vr-host-state-v3-channel-smoke
     outrun-vr-v2-v3-shadow-conversion-smoke
-    outrun-vr-host-pose-v3-validation-smoke)
+    outrun-vr-host-pose-v3-validation-smoke
+    outrun-vr-runtime-eligibility-smoke
+    outrun-vr-r23-verified-bundle-smoke)
     set_target_properties(${target} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin"
