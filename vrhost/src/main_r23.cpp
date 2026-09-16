@@ -3,8 +3,8 @@
 // Reuse the validated host implementation types, but replace the frame loop so
 // a candidate capture/direct source is never made presentation-authoritative
 // until the surrounding Frame.v2 metadata has been re-read and proven stable.
-// This TU also replaces the old synchronous center-tile pixel diagnostic with
-// reusable asynchronous game-UV and per-eye output probes.
+// Pixel diagnostics use reusable non-blocking staging resources and independently
+// probe source, left/right projection output, and theater output.
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -55,6 +55,17 @@ namespace
 {
     constexpr ULONGLONG R23PixelIntervalMs = 5000;
     constexpr UINT R23SourceSamples = 8;
+
+    const char* R23SourceKindName(OutRunVrR23VerifiedBundle::SourceKind kind)
+    {
+        using OutRunVrR23VerifiedBundle::SourceKind;
+        switch (kind)
+        {
+        case SourceKind::ClassicSbs: return "classic-sbs";
+        case SourceKind::DirectGpu: return "direct-gpu";
+        default: return "none";
+        }
+    }
 
     float R23HalfToFloat(std::uint16_t value)
     {
@@ -115,19 +126,33 @@ namespace
     struct R23AsyncPixelProbe
     {
         ID3D11Texture2D* sourceStage = nullptr;
-        ID3D11Texture2D* outputStage = nullptr;
+        ID3D11Texture2D* projectionStage = nullptr;
+        ID3D11Texture2D* theaterStage = nullptr;
         DXGI_FORMAT sourceFormat = DXGI_FORMAT_UNKNOWN;
-        DXGI_FORMAT outputFormat = DXGI_FORMAT_UNKNOWN;
+        DXGI_FORMAT projectionFormat = DXGI_FORMAT_UNKNOWN;
+        DXGI_FORMAT theaterFormat = DXGI_FORMAT_UNKNOWN;
         bool sourcePending = false;
-        bool outputPending = false;
-        ULONGLONG lastScheduleMs = 0;
+        bool projectionPending = false;
+        bool theaterPending = false;
+        ULONGLONG lastSourceScheduleMs = 0;
+        ULONGLONG lastProjectionScheduleMs = 0;
+        ULONGLONG lastTheaterScheduleMs = 0;
         std::uint64_t sourceMapDefers = 0;
-        std::uint64_t outputMapDefers = 0;
+        std::uint64_t projectionMapDefers = 0;
+        std::uint64_t theaterMapDefers = 0;
+        std::uint32_t projectionFrameId = 0;
+        OutRunVrR23VerifiedBundle::SourceKind projectionKind =
+            OutRunVrR23VerifiedBundle::SourceKind::None;
+        bool projectionFinalKnown = false;
+        bool projectionFinalSubmitted = false;
+        bool theaterFinalKnown = false;
+        bool theaterFinalSubmitted = false;
 
         ~R23AsyncPixelProbe()
         {
             ReleaseCom(sourceStage);
-            ReleaseCom(outputStage);
+            ReleaseCom(projectionStage);
+            ReleaseCom(theaterStage);
         }
 
         bool EnsureStage(ID3D11Device* device, ID3D11Texture2D*& stage,
@@ -152,24 +177,18 @@ namespace
             return true;
         }
 
-        void Consume(ID3D11DeviceContext* context, ID3D11Texture2D* stage,
-            DXGI_FORMAT format, UINT samples, bool& pending, const char* label,
-            std::uint64_t& defers)
+        void ConsumeSource(ID3D11DeviceContext* context)
         {
-            if (!pending || !stage || !context) return;
+            if (!sourcePending || !sourceStage || !context) return;
             D3D11_MAPPED_SUBRESOURCE mapped{};
-            const HRESULT hr = context->Map(stage, 0, D3D11_MAP_READ,
+            const HRESULT hr = context->Map(sourceStage, 0, D3D11_MAP_READ,
                 D3D11_MAP_FLAG_DO_NOT_WAIT, &mapped);
-            if (hr == DXGI_ERROR_WAS_STILL_DRAWING)
-            {
-                ++defers;
-                return;
-            }
+            if (hr == DXGI_ERROR_WAS_STILL_DRAWING) { ++sourceMapDefers; return; }
             if (FAILED(hr) || !mapped.pData)
             {
-                std::cerr << "[R23 pixel] " << label << " async Map failed hr=0x"
+                std::cerr << "[R23 pixel] source-game-uv async Map failed hr=0x"
                           << std::hex << static_cast<unsigned long>(hr) << std::dec << "\n";
-                pending = false;
+                sourcePending = false;
                 return;
             }
 
@@ -177,12 +196,12 @@ namespace
             float maxRgb[3]{ -1.0e30f, -1.0e30f, -1.0e30f };
             double sumRgb[3]{};
             std::uint32_t finitePixels = 0, nonFinitePixels = 0;
-            const UINT bpp = R23BytesPerPixel(format);
+            const UINT bpp = R23BytesPerPixel(sourceFormat);
             const auto* row = static_cast<const std::uint8_t*>(mapped.pData);
-            for (UINT i = 0; i < samples; ++i)
+            for (UINT i = 0; i < R23SourceSamples; ++i)
             {
                 float rgb[3]{};
-                if (!R23DecodeRgb(row + static_cast<std::size_t>(i) * bpp, format, rgb))
+                if (!R23DecodeRgb(row + static_cast<std::size_t>(i) * bpp, sourceFormat, rgb))
                     continue;
                 const bool finite = std::isfinite(rgb[0]) && std::isfinite(rgb[1]) && std::isfinite(rgb[2]);
                 if (!finite) { ++nonFinitePixels; continue; }
@@ -194,29 +213,118 @@ namespace
                     sumRgb[c] += rgb[c];
                 }
             }
-            context->Unmap(stage, 0);
-            pending = false;
+            context->Unmap(sourceStage, 0);
+            sourcePending = false;
             const double denom = finitePixels ? static_cast<double>(finitePixels) : 1.0;
-            std::cout << "[R23 pixel] " << label << " samples=" << samples
+            std::cout << "[R23 pixel] source-game-uv samples=" << R23SourceSamples
                       << " finite=" << finitePixels << " nonFinitePixels=" << nonFinitePixels
                       << " rgbMin=" << minRgb[0] << "," << minRgb[1] << "," << minRgb[2]
                       << " rgbMax=" << maxRgb[0] << "," << maxRgb[1] << "," << maxRgb[2]
                       << " rgbMean=" << sumRgb[0] / denom << "," << sumRgb[1] / denom << "," << sumRgb[2] / denom
-                      << " mapDefers=" << defers << "\n";
+                      << " mapDefers=" << sourceMapDefers << "\n";
+        }
+
+        void ConsumeProjection(ID3D11DeviceContext* context)
+        {
+            if (!projectionPending || !projectionStage || !context) return;
+            D3D11_MAPPED_SUBRESOURCE mapped{};
+            const HRESULT hr = context->Map(projectionStage, 0, D3D11_MAP_READ,
+                D3D11_MAP_FLAG_DO_NOT_WAIT, &mapped);
+            if (hr == DXGI_ERROR_WAS_STILL_DRAWING) { ++projectionMapDefers; return; }
+            if (FAILED(hr) || !mapped.pData)
+            {
+                std::cerr << "[R23 pixel] projection async Map failed hr=0x"
+                          << std::hex << static_cast<unsigned long>(hr) << std::dec << "\n";
+                projectionPending = false;
+                return;
+            }
+
+            const UINT bpp = R23BytesPerPixel(projectionFormat);
+            const auto* row = static_cast<const std::uint8_t*>(mapped.pData);
+            float left[3]{}, right[3]{};
+            const bool leftDecoded = R23DecodeRgb(row, projectionFormat, left);
+            const bool rightDecoded = R23DecodeRgb(row + bpp, projectionFormat, right);
+            const bool leftFinite = leftDecoded && std::isfinite(left[0]) &&
+                std::isfinite(left[1]) && std::isfinite(left[2]);
+            const bool rightFinite = rightDecoded && std::isfinite(right[0]) &&
+                std::isfinite(right[1]) && std::isfinite(right[2]);
+            context->Unmap(projectionStage, 0);
+            projectionPending = false;
+
+            std::cout << "[R23 pixel] projection frame=" << projectionFrameId
+                      << " source=" << R23SourceKindName(projectionKind)
+                      << " finalSubmissionKnown=" << (projectionFinalKnown ? 1 : 0)
+                      << " finalSubmitted=" << (projectionFinalSubmitted ? 1 : 0)
+                      << " leftFinite=" << (leftFinite ? 1 : 0)
+                      << " leftRgb=" << left[0] << "," << left[1] << "," << left[2]
+                      << " rightFinite=" << (rightFinite ? 1 : 0)
+                      << " rightRgb=" << right[0] << "," << right[1] << "," << right[2]
+                      << " mapDefers=" << projectionMapDefers << "\n";
+        }
+
+        void ConsumeTheater(ID3D11DeviceContext* context)
+        {
+            if (!theaterPending || !theaterStage || !context) return;
+            D3D11_MAPPED_SUBRESOURCE mapped{};
+            const HRESULT hr = context->Map(theaterStage, 0, D3D11_MAP_READ,
+                D3D11_MAP_FLAG_DO_NOT_WAIT, &mapped);
+            if (hr == DXGI_ERROR_WAS_STILL_DRAWING) { ++theaterMapDefers; return; }
+            if (FAILED(hr) || !mapped.pData)
+            {
+                std::cerr << "[R23 pixel] theater async Map failed hr=0x"
+                          << std::hex << static_cast<unsigned long>(hr) << std::dec << "\n";
+                theaterPending = false;
+                return;
+            }
+            float rgb[3]{};
+            const bool decoded = R23DecodeRgb(
+                static_cast<const std::uint8_t*>(mapped.pData), theaterFormat, rgb);
+            const bool finite = decoded && std::isfinite(rgb[0]) &&
+                std::isfinite(rgb[1]) && std::isfinite(rgb[2]);
+            context->Unmap(theaterStage, 0);
+            theaterPending = false;
+            std::cout << "[R23 pixel] theater finalSubmissionKnown="
+                      << (theaterFinalKnown ? 1 : 0)
+                      << " finalSubmitted=" << (theaterFinalSubmitted ? 1 : 0)
+                      << " finite=" << (finite ? 1 : 0)
+                      << " rgb=" << rgb[0] << "," << rgb[1] << "," << rgb[2]
+                      << " mapDefers=" << theaterMapDefers << "\n";
         }
 
         void TryConsume(ID3D11DeviceContext* context)
         {
-            Consume(context, sourceStage, sourceFormat, R23SourceSamples,
-                sourcePending, "source-game-uv", sourceMapDefers);
-            Consume(context, outputStage, outputFormat, 2,
-                outputPending, "projection-left-right", outputMapDefers);
+            ConsumeSource(context);
+            ConsumeProjection(context);
+            ConsumeTheater(context);
+        }
+
+        void NoteFinalSubmission()
+        {
+            const bool submitted =
+                OutRunVrR23RuntimeHardening::LastSubmittedLayer.load(std::memory_order_acquire);
+            const std::uint32_t frameId =
+                OutRunVrR23RuntimeHardening::LastSubmittedFrameId.load(std::memory_order_acquire);
+            const auto kind = static_cast<OutRunVrR23VerifiedBundle::SourceKind>(
+                OutRunVrR23RuntimeHardening::LastSubmittedKind.load(std::memory_order_acquire));
+
+            if (projectionPending && !projectionFinalKnown &&
+                frameId == projectionFrameId && kind == projectionKind)
+            {
+                projectionFinalKnown = true;
+                projectionFinalSubmitted = submitted;
+            }
+            if (theaterPending && !theaterFinalKnown &&
+                kind == OutRunVrR23VerifiedBundle::SourceKind::None)
+            {
+                theaterFinalKnown = true;
+                theaterFinalSubmitted = submitted;
+            }
         }
 
         void ScheduleSource(StereoCompositor& c)
         {
             const ULONGLONG now = GetTickCount64();
-            if (sourcePending || now - lastScheduleMs < R23PixelIntervalMs ||
+            if (sourcePending || now - lastSourceScheduleMs < R23PixelIntervalMs ||
                 !c.source_ || !c.device_ || !c.context_) return;
             UvRect uv{};
             if (!c.GetGameUv(uv)) return;
@@ -240,16 +348,17 @@ namespace
                 }
             }
             sourcePending = true;
-            lastScheduleMs = now;
+            lastSourceScheduleMs = now;
             std::cout << "[R23 pixel] scheduled game-UV distributed source probe uv=["
                       << uv.x << "," << uv.y << "," << uv.w << "," << uv.h << "]\n";
         }
 
         void ScheduleProjection(StereoCompositor& c, std::uint32_t image)
         {
-            if (outputPending || image >= c.projection_.images.size() ||
-                !c.device_ || !c.context_) return;
-            if (!EnsureStage(c.device_, outputStage, outputFormat,
+            const ULONGLONG now = GetTickCount64();
+            if (projectionPending || now - lastProjectionScheduleMs < R23PixelIntervalMs ||
+                image >= c.projection_.images.size() || !c.device_ || !c.context_) return;
+            if (!EnsureStage(c.device_, projectionStage, projectionFormat,
                     c.projection_.format, 2)) return;
             ID3D11Texture2D* texture = c.projection_.images[image].texture;
             if (!texture) return;
@@ -258,10 +367,44 @@ namespace
                 const UINT sx = c.projection_.width / 2;
                 const UINT sy = c.projection_.height / 2;
                 D3D11_BOX box{ sx, sy, 0, sx + 1, sy + 1, 1 };
-                c.context_->CopySubresourceRegion(outputStage, 0, eye, 0, 0,
+                c.context_->CopySubresourceRegion(projectionStage, 0, eye, 0, 0,
                     texture, D3D11CalcSubresource(0, eye, 1), &box);
             }
-            outputPending = true;
+            OutRunVrR23VerifiedBundle::Snapshot verified{};
+            if (OutRunVrR23VerifiedBundle::ReadFresh(verified))
+            {
+                projectionFrameId = verified.frameId;
+                projectionKind = verified.kind;
+            }
+            else
+            {
+                projectionFrameId = 0;
+                projectionKind = OutRunVrR23VerifiedBundle::SourceKind::None;
+            }
+            projectionFinalKnown = false;
+            projectionFinalSubmitted = false;
+            projectionPending = true;
+            lastProjectionScheduleMs = now;
+        }
+
+        void ScheduleTheater(StereoCompositor& c, std::uint32_t image)
+        {
+            const ULONGLONG now = GetTickCount64();
+            if (theaterPending || now - lastTheaterScheduleMs < R23PixelIntervalMs ||
+                image >= c.theater_.images.size() || !c.device_ || !c.context_) return;
+            if (!EnsureStage(c.device_, theaterStage, theaterFormat,
+                    c.theater_.format, 1)) return;
+            ID3D11Texture2D* texture = c.theater_.images[image].texture;
+            if (!texture) return;
+            const UINT sx = c.theater_.width / 2;
+            const UINT sy = c.theater_.height / 2;
+            D3D11_BOX box{ sx, sy, 0, sx + 1, sy + 1, 1 };
+            c.context_->CopySubresourceRegion(theaterStage, 0, 0, 0, 0,
+                texture, 0, &box);
+            theaterFinalKnown = false;
+            theaterFinalSubmitted = false;
+            theaterPending = true;
+            lastTheaterScheduleMs = now;
         }
     };
 
@@ -375,9 +518,6 @@ namespace
             R23InvalidateDirect(c);
             return false;
         }
-        // CommitDirectStereoSource historically restored Ready only when a slot
-        // was newly opened. Successful validation of a cached slot is equally
-        // authoritative and must recover the advertised Ready state.
         c.directTransportReady_ = true;
         c.directFrameValid_ = true;
         c.stereoSourceValid_ = false;
@@ -386,8 +526,6 @@ namespace
 
     bool R23CommitClassicAfterValidation(StereoCompositor& c)
     {
-        // Source kind is explicit: a verified classic commit cannot leave an old
-        // direct eye pair as the renderer-preferred source.
         c.directFrameValid_ = false;
         if (!c.CommitStereoSource()) return false;
         c.stereoSourceValid_ = true;
@@ -443,6 +581,39 @@ namespace
                 static_cast<int32_t>(c.projection_.height) };
             pv[eye].subImage.imageArrayIndex = eye;
         }
+        return true;
+    }
+
+    bool R23RenderTheater(StereoCompositor& c, XrSpace viewSpace,
+        XrSpace localSpace, XrTime displayTime, XrCompositionLayerQuad& quad)
+    {
+        R23Pixels.TryConsume(c.context_);
+        if (!c.haveFrame_ || !c.sourceSrv_) return false;
+        UvRect whole{};
+        if (!c.GetGameUv(whole)) return false;
+        std::uint32_t image = 0;
+        c.Acquire(c.theater_, image);
+        const bool ok = c.RenderTo(c.theater_.rtvs[image][0], c.theater_.width,
+            c.theater_.height, whole, c.sourceSrv_, c.sourceFormat_);
+        if (ok) R23Pixels.ScheduleTheater(c, image);
+        c.Release(c.theater_);
+        if (!ok || !c.EnsureTheaterAnchor(viewSpace, localSpace, displayTime)) return false;
+
+        quad = { XR_TYPE_COMPOSITION_LAYER_QUAD };
+        quad.space = localSpace;
+        quad.eyeVisibility = XR_EYE_VISIBILITY_BOTH;
+        quad.pose = c.theaterAnchor_;
+        quad.subImage.swapchain = c.theater_.handle;
+        quad.subImage.imageRect.offset = { 0, 0 };
+        quad.subImage.imageRect.extent = {
+            static_cast<int32_t>(c.theater_.width), static_cast<int32_t>(c.theater_.height) };
+        RECT cr{};
+        GetClientRect(c.hwnd_, &cr);
+        const float aspect = (cr.bottom > cr.top)
+            ? static_cast<float>(cr.right - cr.left) / static_cast<float>(cr.bottom - cr.top)
+            : 16.f / 9.f;
+        quad.size.width = 2.f;
+        quad.size.height = 2.f / aspect;
         return true;
     }
 
@@ -699,8 +870,6 @@ int main(int argc, char** argv)
                             }
                             QueryPerformanceCounter(&ce); timings.capture.Add(timings.Ms(cs, ce));
 
-                            // Critical ordering: validate Frame.v2 again before a
-                            // candidate source can replace the current bundle.
                             const bool same = candidateReady && R23FrameUnchanged(renderFrames, before);
                             bool committed = false;
                             if (same)
@@ -741,8 +910,8 @@ int main(int argc, char** argv)
                     const CaptureStatus capture = R23Capture(compositor);
                     QueryPerformanceCounter(&ce); timings.capture.Add(timings.Ms(cs, ce));
                     LARGE_INTEGER rs{}, re{}; QueryPerformanceCounter(&rs);
-                    if (capture.available && compositor.RenderTheater(viewSpace, localSpace,
-                        fs.predictedDisplayTime, quad))
+                    if (capture.available && R23RenderTheater(compositor, viewSpace,
+                        localSpace, fs.predictedDisplayTime, quad))
                     {
                         layers[0] = reinterpret_cast<const XrCompositionLayerBaseHeader*>(&quad);
                         layerReady = true;
@@ -753,7 +922,9 @@ int main(int argc, char** argv)
 
             end.layerCount = layerReady ? 1 : 0; end.layers = layerReady ? layers : nullptr;
             LARGE_INTEGER es{}, ee{}; QueryPerformanceCounter(&es);
-            CheckXr(xrEndFrame(session, &end), "xrEndFrame");
+            const XrResult endResult = xrEndFrame(session, &end);
+            R23Pixels.NoteFinalSubmission();
+            CheckXr(endResult, "xrEndFrame");
             QueryPerformanceCounter(&ee); timings.end.Add(timings.Ms(es, ee)); timings.MaybeLog();
         }
 
