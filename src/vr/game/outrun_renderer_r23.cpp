@@ -2,12 +2,19 @@
 // normal path; this wrapper prevents head-tracked WVP injection and render-time
 // culling-camera override until the common game-side baseline gate is eligible.
 //
+// R27 narrows R13's old alpha-state heuristic: a c64 upload that is already
+// proven to be the main-backbuffer perspective world path is allowed to reach
+// the authoritative WVP verifier regardless of alpha/cull state. Confirmed
+// orthographic UI and auxiliary passes still stay stock. R27 also publishes F10
+// to the host from every game BeginScene, including menus/theater mode.
+//
 // Recovery uses a separate pose-warmup phase. During that phase BeginScene may
 // latch a fresh host pose for the upcoming authoritative clear, but the stock
 // camera and stock c64 values remain on screen. The x86 recovery coordinator can
 // then open stereo at a safe full clear without reusing the previous frame pose.
 
 #include "../runtime_eligibility.hpp"
+#include "../ipc/recenter_request.hpp"
 #include "outrun_renderer_r13.cpp"
 
 namespace OutRunVRRenderer
@@ -23,9 +30,12 @@ namespace OutRunVRRenderer
         std::uint64_t R23EligibilityBypasses = 0;
         std::uint64_t R23CullingEligibilityBypasses = 0;
         std::uint64_t R23WarmupPosePreserves = 0;
+        std::uint64_t R27PerspectiveEffectWorldUploads = 0;
         bool R23FirstEligibilityBypassLogged = false;
         bool R23FirstCullingEligibilityBypassLogged = false;
         bool R23FirstWarmupPoseLogged = false;
+        bool R27FirstPerspectiveEffectWorldLogged = false;
+        bool R27HostRecenterWasDown = false;
 
         struct R23EarlyRendererFailClosed
         {
@@ -82,8 +92,37 @@ namespace OutRunVRRenderer
             }
         }
 
+        void R27PublishHostRecenterIfPressed() noexcept
+        {
+            const bool down = (GetAsyncKeyState(VK_F10) & 0x8000) != 0;
+            const bool pressed = down && !R27HostRecenterWasDown;
+            R27HostRecenterWasDown = down;
+            if (!pressed)
+                return;
+
+            const LONG requestId = OutRunVR::RecenterIpc::SharedChannel().Publish();
+            if (requestId != 0)
+            {
+                spdlog::info(
+                    "VR R27 recenter: F10 game->host request published requestId={} pid={} presentation={}",
+                    requestId, GetCurrentProcessId(),
+                    static_cast<unsigned>(CurrentPresentationMode()));
+            }
+            else
+            {
+                spdlog::warn(
+                    "VR R27 recenter: F10 pressed but game->host request mapping is unavailable");
+            }
+        }
+
         HRESULT __stdcall BeginSceneDestR23(IDirect3DDevice9* device)
         {
+            // Do this before the gameplay eligibility branch. Menus render
+            // BeginScene too, so F10 can re-anchor the host theater even though
+            // LatchFramePose intentionally skips gameplay tracking there.
+            if (IsGameDevice(device) && !OutRunVRStereo::IsInternalStereoPassActive())
+                R27PublishHostRecenterIfPressed();
+
             R23ServiceRenderThreadCleanup();
             const HRESULT result = R23BeginSceneEligibilityHook.stdcall<HRESULT>(device);
             if (SUCCEEDED(result) && IsGameDevice(device) &&
@@ -140,6 +179,33 @@ namespace OutRunVRRenderer
                 }
                 return SetVertexShaderConstantFHook.stdcall<HRESULT>(
                     device, startRegister, constantData, vector4fCount);
+            }
+
+            if (candidateWvp && OutRunVR::RuntimeEligibility::MayInjectStereo())
+            {
+                float projectionM34 = 0.0f;
+                float projectionM44 = 0.0f;
+                const auto semantic = R13CurrentRenderSemantic(
+                    projectionM34, projectionM44);
+                if (OutRunVR::PassPolicy::AllowsWorldStereo(semantic))
+                {
+                    // R13's alpha/cull-only ZeroDisparity heuristic mixed two
+                    // camera spaces: opaque world geometry used the HMD eye WVP
+                    // while projected shadows/billboards retained the stock WVP.
+                    // Once the target+projection classifier proves this is the
+                    // perspective world pass, let the authoritative base c64
+                    // verifier decide. Orthographic HUD and auxiliary passes
+                    // still flow through R13 and remain stock.
+                    ++R27PerspectiveEffectWorldUploads;
+                    if (!R27FirstPerspectiveEffectWorldLogged)
+                    {
+                        R27FirstPerspectiveEffectWorldLogged = true;
+                        spdlog::info(
+                            "VR R27 EFFECT: main-backbuffer perspective c64 now follows the verified per-eye world WVP regardless of alpha/cull state; orthographic HUD and auxiliary passes remain stock");
+                    }
+                    return R13WvpCallbackHook.stdcall<HRESULT>(
+                        device, startRegister, constantData, vector4fCount);
+                }
             }
 
             return R23WvpEligibilityHook.stdcall<HRESULT>(
@@ -207,7 +273,7 @@ namespace OutRunVRRenderer
                     HookManager::ReportAsyncResult(
                         "OpenXRVRRendererR23Eligibility", true);
                     spdlog::info(
-                        "VR R23 RENDERER: BeginScene/WVP guards READY; recovery pose warmup is stock-visible and stereo injection still requires the authoritative baseline gate");
+                        "VR R23 RENDERER: BeginScene/WVP guards READY; R27 world-effect correction active; recovery pose warmup is stock-visible and stereo injection still requires the authoritative baseline gate");
                     return 0;
                 }
                 Sleep(25);

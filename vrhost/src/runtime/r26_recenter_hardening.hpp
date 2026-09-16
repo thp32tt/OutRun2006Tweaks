@@ -1,16 +1,14 @@
 #pragma once
 
-// R26 Quest/VDXR theater recenter bridge.
+// R26/R27 Quest/VDXR theater recenter bridge.
 //
-// Some runtimes do not report a user recenter as a LOCAL-only reference-space
-// change. The legacy host loop intentionally listened only for LOCAL changes,
-// which could leave the theater quad anchored at an old upper-left position.
-// Normalize any reference-space-change event to the existing LOCAL reanchor
-// path, and queue one synthetic LOCAL change when the session regains FOCUSED.
-// The latter covers Quest system-overlay recenter and headset re-wear without
-// changing the compositor's established theater-anchor math.
+// Runtime reference-space changes and focus-return events continue to normalize
+// into the existing LOCAL theater-anchor invalidation path. R27 additionally
+// consumes the explicit F10 request published by the 32-bit game hook, so menu
+// theater recenter no longer depends on a runtime-generated OpenXR event.
 
 #include <openxr/openxr.h>
+#include "vr/ipc/recenter_request.hpp"
 
 #include <cstdint>
 #include <cstring>
@@ -26,23 +24,52 @@ namespace OutRunVrR26RecenterHardening
     inline XrSession PendingFocusSession = XR_NULL_HANDLE;
     inline std::uint64_t ReferenceChangesNormalized = 0;
     inline std::uint64_t FocusRecentersQueued = 0;
+    inline std::uint64_t GameRequestsDelivered = 0;
     inline bool FirstReferenceChangeLogged = false;
     inline bool FirstFocusRecenterLogged = false;
+
+    inline void WriteSyntheticLocalChange(XrEventDataBuffer* eventData,
+        XrSession session) noexcept
+    {
+        XrEventDataReferenceSpaceChangePending synthetic{
+            XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING };
+        synthetic.session = session;
+        synthetic.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_LOCAL;
+        synthetic.changeTime = 0;
+        synthetic.poseValid = XR_FALSE;
+        std::memset(eventData, 0, sizeof(*eventData));
+        std::memcpy(eventData, &synthetic, sizeof(synthetic));
+    }
 
     inline XrResult XRAPI_CALL PollEvent(XrInstance instance,
         XrEventDataBuffer* eventData) noexcept
     {
+        if (eventData)
+        {
+            LONG requestId = 0;
+            DWORD requesterPid = 0;
+            auto& channel = OutRunVR::RecenterIpc::SharedChannel();
+            if (channel.Pending(requestId, requesterPid))
+            {
+                // The host main loop only needs LOCAL + changeTime=0. It will
+                // invalidate compositor.theaterAnchor_ before the next frame and
+                // EnsureTheaterAnchor will rebuild it from the current HMD pose.
+                WriteSyntheticLocalChange(eventData, XR_NULL_HANDLE);
+                channel.MarkReceived(requestId);
+                channel.MarkApplied(requestId);
+                ++GameRequestsDelivered;
+                std::cerr
+                    << "[R27 recenter] F10 request received requestId="
+                    << requestId << " pid=" << requesterPid
+                    << "; LOCAL theater reanchor delivered appliedId="
+                    << requestId << "\n";
+                return XR_SUCCESS;
+            }
+        }
+
         if (PendingFocusRecenter && eventData)
         {
-            XrEventDataReferenceSpaceChangePending synthetic{
-                XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING };
-            synthetic.session = PendingFocusSession;
-            synthetic.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_LOCAL;
-            synthetic.changeTime = 0;
-            synthetic.poseValid = XR_FALSE;
-
-            std::memset(eventData, 0, sizeof(*eventData));
-            std::memcpy(eventData, &synthetic, sizeof(synthetic));
+            WriteSyntheticLocalChange(eventData, PendingFocusSession);
             PendingFocusRecenter = false;
             PendingFocusSession = XR_NULL_HANDLE;
             return XR_SUCCESS;
