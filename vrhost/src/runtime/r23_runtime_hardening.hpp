@@ -16,6 +16,7 @@
 #undef xrDestroySession
 #endif
 
+#include <d3d9types.h>
 #include <atomic>
 #include <cmath>
 #include <iostream>
@@ -28,9 +29,8 @@ namespace OutRunVrR23RuntimeHardening
     inline bool FirstFallbackLogged = false;
     inline bool FirstFallbackSourceMismatchLogged = false;
     inline bool FirstDirectSafeReuseLogged = false;
+    inline bool FirstDirectFormatMismatchLogged = false;
 
-    // Diagnostic publication describing what the final authority actually sent
-    // to the OpenXR base path. main_r23 uses this only for delayed pixel logs.
     inline std::atomic<std::uint32_t> LastSubmittedFrameId{ 0 };
     inline std::atomic<std::uint32_t> LastSubmittedKind{
         static_cast<std::uint32_t>(OutRunVrR23VerifiedBundle::SourceKind::None) };
@@ -95,6 +95,44 @@ namespace OutRunVrR23RuntimeHardening
         return true;
     }
 
+    inline DXGI_FORMAT ExpectedDirectDxgiFormat(std::uint32_t declared) noexcept
+    {
+        switch (static_cast<D3DFORMAT>(declared))
+        {
+        case D3DFMT_A8B8G8R8:
+            return DXGI_FORMAT_R8G8B8A8_UNORM;
+        case D3DFMT_A2B10G10R10:
+            return DXGI_FORMAT_R10G10B10A2_UNORM;
+        case D3DFMT_A16B16G16R16F:
+            return DXGI_FORMAT_R16G16B16A16_FLOAT;
+        default:
+            return DXGI_FORMAT_UNKNOWN;
+        }
+    }
+
+    inline bool DirectSafeEyeMatchesCommittedFrame(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        using namespace OutRunVrD3D9ExDirectPassthrough;
+        const auto expected = ExpectedDirectDxgiFormat(
+            frame.reserved[OutRunVR::RenderFrameDirectFormatIndex]);
+        const std::uint32_t width =
+            frame.reserved[OutRunVR::RenderFrameDirectWidthIndex];
+        const std::uint32_t height =
+            frame.reserved[OutRunVR::RenderFrameDirectHeightIndex];
+        const bool match = expected != DXGI_FORMAT_UNKNOWN &&
+            SafeEyeFormat == expected && width != 0 && height != 0 &&
+            SafeEyeWidth == width && SafeEyeHeight == height &&
+            width == frame.backbufferWidth && height == frame.backbufferHeight;
+        if (!match && !FirstDirectFormatMismatchLogged)
+        {
+            FirstDirectFormatMismatchLogged = true;
+            std::cerr
+                << "[R23] direct safe-eye rejected: actual resource format/size does not match committed Frame.v2 declaration\n";
+        }
+        return match;
+    }
+
     inline XrResult RenderCommittedDirect(XrSession session,
         const XrFrameEndInfo* endInfo,
         const OutRunVrR23VerifiedBundle::Snapshot& verified)
@@ -121,8 +159,15 @@ namespace OutRunVrR23RuntimeHardening
         // independent of producer ring reuse. Reuse it directly even when the
         // original Frame.v2 slot has already advanced/been overwritten.
         const bool safeAlreadyOwned = SafeFrameId == frame.frameId &&
+            SafeTransportGeneration ==
+                frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex] &&
             SafeEyeSrv[0] && SafeEyeSrv[1];
         if (!safeAlreadyOwned && !EnsureSafeFrame(frame.frameId))
+        {
+            RecordFinalSubmission(frame.frameId, kind, false);
+            return SubmitNoLayer(session, endInfo);
+        }
+        if (!DirectSafeEyeMatchesCommittedFrame(frame))
         {
             RecordFinalSubmission(frame.frameId, kind, false);
             return SubmitNoLayer(session, endInfo);
@@ -167,9 +212,6 @@ namespace OutRunVrR23RuntimeHardening
                 << OutRunVrR23VerifiedBundle::MaxPresentationAgeMs << "ms\n";
         }
 
-        // Theater/quad is deliberately independent of gameplay Frame.v2 and is
-        // passed through unchanged. This also makes its final-submission state
-        // observable by the asynchronous output diagnostics.
         if (OutRunVrReviewHardening::HasIncomingNonProjectionLayer(endInfo))
         {
             RecordFinalSubmission(0, SourceKind::None,
@@ -197,10 +239,6 @@ namespace OutRunVrR23RuntimeHardening
             return SubmitNoLayer(session, endInfo);
         }
 
-        // Do not re-read the producer's latest Frame.v2 here. The game may have
-        // legitimately published B after the host committed/rendered A. Bundle A
-        // remains valid until its TTL expires or main_r23 invalidates it because
-        // of session/reference-space/presentation/source lifetime changes.
         if (verified.kind == SourceKind::DirectGpu)
             return RenderCommittedDirect(session, endInfo, verified);
 
@@ -221,9 +259,6 @@ namespace OutRunVrR23RuntimeHardening
             return SubmitNoLayer(session, endInfo);
         }
 
-        // R19 fallback remains tied to the exact production capture committed in
-        // this bundle; a later candidate capture changes the QPC and invalidates
-        // only this fallback, not an already-rendered incoming projection.
         const bool exactClassicSource = verified.sourceCaptureQpc > 0 &&
             OutRunVrSbsCaptureOverride::LastProductionPresentQpc ==
                 verified.sourceCaptureQpc;
