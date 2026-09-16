@@ -2,15 +2,13 @@
 //
 // Keeps the R21/R20/R13/R9 implementation intact while closing review gaps
 // that are easiest to enforce at the final game-side callback boundary:
-//   * preserve the game's scissor state across internal mono/right-eye RT swaps;
-//   * validate every first stereo seed (full-clear and relaxed) against one
-//     common game-state depth/stencil baseline;
-//   * make the R21 game-local host-liveness gate authoritative for clear/draw
-//     callbacks so stale host flags cannot keep stereo work alive;
-//   * after D3D9 Reset, require a new host-fresh verified baseline before WVP or
-//     stereo replay may resume;
-//   * if replay state cannot be captured or the overlay cannot install, fail
-//     closed instead of attempting stereo with unknown viewport/scissor state.
+//   * preserve the game's viewport/scissor state across internal replay;
+//   * shadow viewport/scissor state instead of querying D3D9 on every draw;
+//   * validate every first stereo seed against one depth/stencil baseline;
+//   * make the R21 game-local host-liveness gate authoritative;
+//   * after D3D9 Reset, require a new host-fresh verified baseline;
+//   * install every overlay hook disabled-first and publish READY only after the
+//     complete callback transaction is enabled.
 
 #include "stereo_renderer_r21.cpp"
 
@@ -19,25 +17,38 @@ namespace OutRunVRStereo
     namespace
     {
         constexpr std::size_t R22SetViewportVtableIndex = 47;
+        constexpr std::size_t R22SetRenderStateVtableIndex = 57;
+        constexpr std::size_t R22SetScissorRectVtableIndex = 75;
 
         SafetyHookInline R22SetViewportHook{};
+        SafetyHookInline R22SetRenderStateHook{};
+        SafetyHookInline R22SetScissorRectHook{};
         SafetyHookInline R22ResetR13Hook{};
         SafetyHookInline R22ClearR20Hook{};
         SafetyHookInline R22DrawPrimitiveR9Hook{};
         SafetyHookInline R22DrawIndexedPrimitiveR9Hook{};
         SafetyHookInline R22DrawPrimitiveUPR9Hook{};
         SafetyHookInline R22DrawIndexedPrimitiveUPR9Hook{};
-        std::atomic<bool> R22InstallReady{false};
+        std::atomic<OutRunVR::RuntimeEligibility::InstallState> R22InstallState{
+            OutRunVR::RuntimeEligibility::InstallState::Pending };
 
         struct R22ScissorSnapshot
         {
             RECT rect{};
             DWORD enabled = FALSE;
             D3DVIEWPORT9 viewport{};
-            bool valid = false;
+            bool viewportValid = false;
+            bool rectValid = false;
+            bool enableValid = false;
+
+            bool Valid() const noexcept
+            {
+                return viewportValid && rectValid && enableValid;
+            }
         };
 
         thread_local R22ScissorSnapshot R22GameScissor{};
+        thread_local R22ScissorSnapshot R22ShadowState{};
         thread_local std::uint32_t R22InternalReplayDepth = 0;
 
         std::uint64_t R22DepthClearEpoch = 0;
@@ -48,6 +59,7 @@ namespace OutRunVRStereo
         std::uint64_t R22StencilClearGeneration = 0;
         std::uint64_t R22RejectedInitialSeeds = 0;
         std::uint64_t R22ReplayStateCaptureFailures = 0;
+        std::uint64_t R22ReplayStateGetterFallbacks = 0;
         bool R22FirstSeedRejectLogged = false;
         bool R22FirstReplayStateCaptureFailureLogged = false;
 
@@ -83,14 +95,41 @@ namespace OutRunVRStereo
                 FAILED(device->GetScissorRect(&out.rect)) ||
                 FAILED(device->GetRenderState(D3DRS_SCISSORTESTENABLE, &out.enabled)))
                 return false;
-            out.valid = true;
+            out.viewportValid = out.rectValid = out.enableValid = true;
+            return true;
+        }
+
+        bool R22PrimeShadowState(IDirect3DDevice9* device) noexcept
+        {
+            R22ScissorSnapshot captured{};
+            if (!R22CaptureGameScissor(device, captured))
+            {
+                R22ShadowState = {};
+                return false;
+            }
+            R22ShadowState = captured;
+            return true;
+        }
+
+        bool R22SnapshotShadowedGameState(IDirect3DDevice9* device,
+            R22ScissorSnapshot& out) noexcept
+        {
+            if (R22ShadowState.Valid())
+            {
+                out = R22ShadowState;
+                return true;
+            }
+            ++R22ReplayStateGetterFallbacks;
+            if (!R22CaptureGameScissor(device, out))
+                return false;
+            R22ShadowState = out;
             return true;
         }
 
         bool R22ApplyGameScissor(IDirect3DDevice9* device,
             const R22ScissorSnapshot& state) noexcept
         {
-            if (!device || !state.valid)
+            if (!device || !state.Valid())
                 return false;
             bool ok = true;
             if (FAILED(device->SetScissorRect(&state.rect)))
@@ -111,9 +150,9 @@ namespace OutRunVRStereo
             {
                 outer = R22InternalReplayDepth++ == 0;
                 if (outer)
-                    stateValid = R22CaptureGameScissor(device, R22GameScissor);
+                    stateValid = R22SnapshotShadowedGameState(device, R22GameScissor);
                 else
-                    stateValid = R22GameScissor.valid;
+                    stateValid = R22GameScissor.Valid();
             }
 
             ~R22ReplayScope()
@@ -122,12 +161,9 @@ namespace OutRunVRStereo
                     --R22InternalReplayDepth;
                 if (outer)
                 {
-                    if (R22GameScissor.valid &&
+                    if (R22GameScissor.Valid() &&
                         !R22ApplyGameScissor(device, R22GameScissor))
                     {
-                        // Final scope restoration is as authoritative as the
-                        // per-viewport replay restoration. Never leave the
-                        // common gate open after an unknown scissor state.
                         R20CancelInitialSeed(device);
                         R9MonoBackupGap = true;
                         NoteRestoreFailure("R22 final scissor restore");
@@ -141,10 +177,6 @@ namespace OutRunVRStereo
             const char* site) noexcept
         {
             ++R22ReplayStateCaptureFailures;
-            // Do not allow a draw/clear with unknown replay state to leave the
-            // common WVP/stereo gate open. The current callback executes exactly
-            // once on the real game target; recovery requires a later verified
-            // baseline before stereo is allowed again.
             R20CancelInitialSeed(device);
             R9MonoBackupGap = true;
             R9Poison(OutRunVR::StereoFailureViewportUnavailable, site);
@@ -160,11 +192,43 @@ namespace OutRunVRStereo
             const D3DVIEWPORT9* viewport)
         {
             const HRESULT hr = R22SetViewportHook.stdcall<HRESULT>(device, viewport);
-            if (SUCCEEDED(hr) && IsGameDevice(device) && InternalStereoPass &&
-                R22InternalReplayDepth && R22GameScissor.valid)
+            if (SUCCEEDED(hr) && IsGameDevice(device))
             {
-                if (!R22ApplyGameScissor(device, R22GameScissor))
+                if (!InternalStereoPass && viewport)
+                {
+                    R22ShadowState.viewport = *viewport;
+                    R22ShadowState.viewportValid = true;
+                }
+                else if (InternalStereoPass && R22InternalReplayDepth &&
+                    R22GameScissor.Valid() && !R22ApplyGameScissor(device, R22GameScissor))
+                {
                     NoteRestoreFailure("R22 scissor replay");
+                }
+            }
+            return hr;
+        }
+
+        HRESULT __stdcall SetScissorRectDestR22(IDirect3DDevice9* device,
+            const RECT* rect)
+        {
+            const HRESULT hr = R22SetScissorRectHook.stdcall<HRESULT>(device, rect);
+            if (SUCCEEDED(hr) && IsGameDevice(device) && !InternalStereoPass && rect)
+            {
+                R22ShadowState.rect = *rect;
+                R22ShadowState.rectValid = true;
+            }
+            return hr;
+        }
+
+        HRESULT __stdcall SetRenderStateDestR22(IDirect3DDevice9* device,
+            D3DRENDERSTATETYPE state, DWORD value)
+        {
+            const HRESULT hr = R22SetRenderStateHook.stdcall<HRESULT>(device, state, value);
+            if (SUCCEEDED(hr) && IsGameDevice(device) && !InternalStereoPass &&
+                state == D3DRS_SCISSORTESTENABLE)
+            {
+                R22ShadowState.enabled = value;
+                R22ShadowState.enableValid = true;
             }
             return hr;
         }
@@ -179,7 +243,7 @@ namespace OutRunVRStereo
         bool R22GameClearCoversBackbuffer(DWORD count,
             const D3DRECT* rects, const R22ScissorSnapshot& state) noexcept
         {
-            if (!state.valid || !BackBufferDesc.Width || !BackBufferDesc.Height)
+            if (!state.Valid() || !BackBufferDesc.Width || !BackBufferDesc.Height)
                 return false;
             if (state.viewport.X != 0 || state.viewport.Y != 0 ||
                 state.viewport.Width != BackBufferDesc.Width ||
@@ -250,10 +314,6 @@ namespace OutRunVRStereo
             if (fullGameClear && R22InitialDepthBaselineSafe(device))
                 return;
 
-            // R20 may already have promoted RuntimeEligibility after its older
-            // viewport/rect-only classifier. Roll back the entire common state,
-            // not just the R9 seed bits, so WVP injection cannot remain enabled
-            // after R22 proves the real scissored game clear was unsafe.
             R20CancelInitialSeed(device);
             ++R22RejectedInitialSeeds;
             if (!R22FirstSeedRejectLogged)
@@ -272,17 +332,19 @@ namespace OutRunVRStereo
         HRESULT __stdcall ResetDestR22(IDirect3DDevice9* device,
             D3DPRESENT_PARAMETERS* params)
         {
-            if (IsGameDevice(device))
+            const bool gameDevice = IsGameDevice(device);
+            if (gameDevice)
             {
-                // Reset invalidates every render-target/depth baseline. Even if
-                // the host remains fresh, do not carry a pre-Reset eligibility
-                // decision into the new device state.
                 R22FailClosedEligibility();
                 R22ResetBaselineTracking();
+                R22ShadowState = {};
                 spdlog::info(
                     "VR R22 RESET: common eligibility closed; waiting for a new host-fresh verified color/depth baseline");
             }
-            return R22ResetR13Hook.stdcall<HRESULT>(device, params);
+            const HRESULT hr = R22ResetR13Hook.stdcall<HRESULT>(device, params);
+            if (gameDevice && SUCCEEDED(hr))
+                R22PrimeShadowState(device);
+            return hr;
         }
 
         HRESULT __stdcall ClearDestR22(IDirect3DDevice9* device, DWORD count,
@@ -293,9 +355,6 @@ namespace OutRunVRStereo
                 return R22ClearR20Hook.stdcall<HRESULT>(
                     device, count, rects, flags, color, z, stencil);
 
-            // R21's Present-boundary freshness decision is authoritative for the
-            // entire next game frame. When closed, bypass every stereo replay and
-            // execute only the game's real clear.
             if (!R22StereoCallbacksEligible())
                 return ClearHook.stdcall<HRESULT>(
                     device, count, rects, flags, color, z, stencil);
@@ -320,9 +379,6 @@ namespace OutRunVRStereo
 
             R22ObserveDepthBaseline(mainBefore, fullGameClear, flags, hr);
 
-            // Legacy full-clear classifiers did not include the pre-replay
-            // scissor state. Undo any synchronization promotion they made for a
-            // clear that was only partial in the real game state.
             if (SUCCEEDED(hr) && mainBefore && !fullGameClear)
             {
                 if ((flags & D3DCLEAR_ZBUFFER) != 0)
@@ -331,8 +387,6 @@ namespace OutRunVRStereo
                     RightStencilSynchronized = stencilSyncBefore;
             }
 
-            // Applies equally to the R9 full-color bootstrap and R20 relaxed
-            // bootstrap because this wrapper runs after both have completed.
             R22CancelUnsafeFirstSeed(device, seedBefore, fullGameClear);
             return hr;
         }
@@ -432,31 +486,63 @@ namespace OutRunVRStereo
                 indexFormat, vertexData, stride);
         }
 
+        void R22RollbackHooks() noexcept
+        {
+            R22SetViewportHook = {};
+            R22SetRenderStateHook = {};
+            R22SetScissorRectHook = {};
+            R22ResetR13Hook = {};
+            R22ClearR20Hook = {};
+            R22DrawPrimitiveR9Hook = {};
+            R22DrawIndexedPrimitiveR9Hook = {};
+            R22DrawPrimitiveUPR9Hook = {};
+            R22DrawIndexedPrimitiveUPR9Hook = {};
+        }
+
+        bool R22EnableHooks() noexcept
+        {
+            SafetyHookInline* hooks[]{
+                &R22SetViewportHook, &R22SetRenderStateHook, &R22SetScissorRectHook,
+                &R22ResetR13Hook, &R22ClearR20Hook, &R22DrawPrimitiveR9Hook,
+                &R22DrawIndexedPrimitiveR9Hook, &R22DrawPrimitiveUPR9Hook,
+                &R22DrawIndexedPrimitiveUPR9Hook
+            };
+            for (auto* hook : hooks)
+            {
+                if (!*hook || !hook->enable().has_value())
+                    return false;
+            }
+            return true;
+        }
+
         DWORD WINAPI R22InstallThread(void*)
         {
-            // Until every R22 callback is installed transactionally, no earlier
-            // layer may reopen WVP/stereo eligibility on its own.
-            R22InstallReady.store(false, std::memory_order_release);
+            using State = OutRunVR::RuntimeEligibility::InstallState;
+            R22InstallState.store(State::Pending, std::memory_order_release);
             R22FailClosedEligibility();
 
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
                 if (R9InstallState.load(std::memory_order_acquire) == R9InstallFailed ||
-                    R13InstallState.load(std::memory_order_acquire) == R13InstallFailed)
+                    R13InstallState.load(std::memory_order_acquire) == R13InstallFailed ||
+                    OutRunVR::RuntimeEligibility::IsFailed(R20InstallState) ||
+                    OutRunVR::RuntimeEligibility::IsFailed(R21InstallState))
                 {
+                    R22InstallState.store(State::Failed, std::memory_order_release);
                     spdlog::error(
-                        "VR R22: base R9/R13 transaction failed; safety overlay remains fail-closed");
+                        "VR R22: prerequisite hook transaction failed; safety overlay remains fail-closed");
                     return 0;
                 }
                 if (R9InstallState.load(std::memory_order_acquire) == R9InstallReady &&
                     R13InstallState.load(std::memory_order_acquire) == R13InstallReady &&
-                    R20BootstrapReady.load(std::memory_order_acquire) &&
-                    R21PresentGuardReady.load(std::memory_order_acquire))
+                    OutRunVR::RuntimeEligibility::IsReady(R20InstallState) &&
+                    OutRunVR::RuntimeEligibility::IsReady(R21InstallState))
                 {
                     IDirect3DDevice9* device =
                         StereoInstalledDevice.load(std::memory_order_acquire);
                     if (!device)
                     {
+                        R22InstallState.store(State::Failed, std::memory_order_release);
                         spdlog::error(
                             "VR R22: installed game device unavailable; safety overlay remains fail-closed");
                         return 0;
@@ -464,61 +550,61 @@ namespace OutRunVRStereo
                     void** vtable = *reinterpret_cast<void***>(device);
                     if (!vtable)
                     {
+                        R22InstallState.store(State::Failed, std::memory_order_release);
                         spdlog::error(
                             "VR R22: game device vtable unavailable; safety overlay remains fail-closed");
                         return 0;
                     }
 
+                    const auto disabled = safetyhook::InlineHook::StartDisabled;
                     R22SetViewportHook = safetyhook::create_inline(
-                        vtable[R22SetViewportVtableIndex], SetViewportDestR22);
+                        vtable[R22SetViewportVtableIndex], SetViewportDestR22, disabled);
+                    R22SetRenderStateHook = safetyhook::create_inline(
+                        vtable[R22SetRenderStateVtableIndex], SetRenderStateDestR22, disabled);
+                    R22SetScissorRectHook = safetyhook::create_inline(
+                        vtable[R22SetScissorRectVtableIndex], SetScissorRectDestR22, disabled);
                     R22ResetR13Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&ResetDestR13), ResetDestR22);
+                        reinterpret_cast<void*>(&ResetDestR13), ResetDestR22, disabled);
                     R22ClearR20Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&ClearDestR20), ClearDestR22);
+                        reinterpret_cast<void*>(&ClearDestR20), ClearDestR22, disabled);
                     R22DrawPrimitiveR9Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveDestR9),
-                        DrawPrimitiveDestR22);
+                        reinterpret_cast<void*>(&DrawPrimitiveDestR9), DrawPrimitiveDestR22, disabled);
                     R22DrawIndexedPrimitiveR9Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR9),
-                        DrawIndexedPrimitiveDestR22);
+                        reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR9), DrawIndexedPrimitiveDestR22, disabled);
                     R22DrawPrimitiveUPR9Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveUPDestR9),
-                        DrawPrimitiveUPDestR22);
+                        reinterpret_cast<void*>(&DrawPrimitiveUPDestR9), DrawPrimitiveUPDestR22, disabled);
                     R22DrawIndexedPrimitiveUPR9Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR9),
-                        DrawIndexedPrimitiveUPDestR22);
+                        reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR9), DrawIndexedPrimitiveUPDestR22, disabled);
 
-                    if (!R22SetViewportHook || !R22ResetR13Hook ||
+                    if (!R22SetViewportHook || !R22SetRenderStateHook ||
+                        !R22SetScissorRectHook || !R22ResetR13Hook ||
                         !R22ClearR20Hook || !R22DrawPrimitiveR9Hook ||
                         !R22DrawIndexedPrimitiveR9Hook ||
-                        !R22DrawPrimitiveUPR9Hook ||
-                        !R22DrawIndexedPrimitiveUPR9Hook)
+                        !R22DrawPrimitiveUPR9Hook || !R22DrawIndexedPrimitiveUPR9Hook ||
+                        !R22EnableHooks())
                     {
-                        R22SetViewportHook = {};
-                        R22ResetR13Hook = {};
-                        R22ClearR20Hook = {};
-                        R22DrawPrimitiveR9Hook = {};
-                        R22DrawIndexedPrimitiveR9Hook = {};
-                        R22DrawPrimitiveUPR9Hook = {};
-                        R22DrawIndexedPrimitiveUPR9Hook = {};
+                        R22RollbackHooks();
                         R22FailClosedEligibility();
+                        R22InstallState.store(State::Failed, std::memory_order_release);
                         spdlog::error(
-                            "VR R22: reset/scissor/bootstrap hardening hook transaction failed closed");
+                            "VR R22: disabled-first reset/state/bootstrap hook transaction failed closed");
                         return 0;
                     }
 
-                    R22InstallReady.store(true, std::memory_order_release);
+                    R22PrimeShadowState(device);
+                    R22InstallState.store(State::Ready, std::memory_order_release);
                     spdlog::info(
-                        "VR R22 GAME: scissor-preserving mono/right replay + common initial depth baseline + R21 eligibility gate ACTIVE");
+                        "VR R22 GAME: shadow-tracked viewport/scissor replay + common initial depth baseline + R21 eligibility gate ACTIVE");
                     spdlog::info(
-                        "VR R22 REVIEW: Reset recovery gate + unsafe-seed common rollback + replay-state capture fail-closed ACTIVE");
+                        "VR R22 REVIEW: disabled-first transaction READY; per-draw GetViewport/GetScissorRect/GetRenderState eliminated after initial state prime");
                     return 0;
                 }
                 Sleep(25);
             }
             R22FailClosedEligibility();
+            R22InstallState.store(State::Failed, std::memory_order_release);
             spdlog::error(
-                "VR R22: timed out waiting for prerequisite hook transactions; safety overlay remains fail-closed");
+                "VR R22: timed out waiting for prerequisite hook transactions; safety overlay FAILED closed");
             return 0;
         }
 
@@ -532,11 +618,14 @@ namespace OutRunVRStereo
             bool validate() override { return true; }
             bool apply() override
             {
+                using State = OutRunVR::RuntimeEligibility::InstallState;
+                R22InstallState.store(State::Pending, std::memory_order_release);
                 HANDLE thread = CreateThread(
                     nullptr, 0, R22InstallThread, nullptr, 0, nullptr);
                 if (!thread)
                 {
                     R22FailClosedEligibility();
+                    R22InstallState.store(State::Failed, std::memory_order_release);
                     spdlog::error(
                         "VR R22: failed to create safety-overlay installer thread; eligibility remains fail-closed: {}",
                         GetLastError());
