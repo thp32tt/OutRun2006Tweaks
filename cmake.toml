@@ -6,7 +6,7 @@
 name = "outrun2006tweaks-proj"
 cmake-after = """
 set_source_files_properties(src/hooks_wheel_ffb.cpp PROPERTIES HEADER_FILE_ONLY TRUE)
-# R23 keeps the validated R22/R21/R20/R13/R9/R12 implementation chain intact and
+# R26 keeps the validated R23/R22/R21/R20/R13/R9/R12 implementation chain intact and
 # compiles only the final game/renderer wrapper TUs. Included implementation
 # files are header-only here so no hook body is linked twice.
 set_source_files_properties(
@@ -16,6 +16,7 @@ set_source_files_properties(
     src/vr/d3d9/stereo_renderer_r20.cpp
     src/vr/d3d9/stereo_renderer_r21.cpp
     src/vr/d3d9/stereo_renderer_r22.cpp
+    src/vr/d3d9/stereo_renderer_r23.cpp
     src/vr/game/outrun_renderer.cpp
     src/vr/game/outrun_renderer_r13.cpp
     PROPERTIES HEADER_FILE_ONLY TRUE)
@@ -73,7 +74,7 @@ ogg = { git = "https://github.com/xiph/ogg", tag = "v1.3.6" }
 flac = { git = "https://github.com/xiph/flac", tag = "1.5.0" }
 miniupnpc = { git = "https://github.com/miniupnp/miniupnp", tag = "miniupnpd_2_3_10", subdir = "miniupnpc" }
 jsoncpp = { git = "https://github.com/open-source-parsers/jsoncpp.git", tag = "1.9.8" }
-zlib = { git = "https://github.com/madler/zlib", tag = "v1.3.2" }
+zlib = { git = "https://github.com/madler/zlib.git", tag = "v1.3.2" }
 sdl = { git = "https://github.com/libsdl-org/SDL", tag = "release-3.4.12" }
 
 [fetch-content.safetyhook]
