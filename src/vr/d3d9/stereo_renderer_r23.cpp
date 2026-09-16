@@ -111,6 +111,8 @@ namespace OutRunVRStereo
                     OutRunVR::RuntimeEligibility::MarkSafetyOverlayUnavailable();
                     R20StereoEligibilityGate.store(false,
                         std::memory_order_release);
+                    HookManager::ReportAsyncResult(
+                        "OpenXRVRRecoveryBaselineR23", false);
                     spdlog::error(
                         "VR R23: prerequisite overlay FAILED; recovery guard remains fail-closed");
                     return 0;
@@ -130,6 +132,8 @@ namespace OutRunVRStereo
                         OutRunVR::RuntimeEligibility::MarkSafetyOverlayUnavailable();
                         R20StereoEligibilityGate.store(false,
                             std::memory_order_release);
+                        HookManager::ReportAsyncResult(
+                            "OpenXRVRRecoveryBaselineR23", false);
                         spdlog::error(
                             "VR R23: failed to install recovery-clear baseline guard; stereo remains fail-closed");
                         return 0;
@@ -139,6 +143,8 @@ namespace OutRunVRStereo
                     R20StereoEligibilityGate.store(false,
                         std::memory_order_release);
                     R23InstallState.store(State::Ready, std::memory_order_release);
+                    HookManager::ReportAsyncResult(
+                        "OpenXRVRRecoveryBaselineR23", true);
                     spdlog::info(
                         "VR R23 GAME: R22 shadow-state policy retained; recovery-clear-only baseline reopening guard ACTIVE; safety overlay transaction READY");
                     return 0;
@@ -149,6 +155,8 @@ namespace OutRunVRStereo
             R23InstallState.store(State::Failed, std::memory_order_release);
             OutRunVR::RuntimeEligibility::MarkSafetyOverlayUnavailable();
             R20StereoEligibilityGate.store(false, std::memory_order_release);
+            HookManager::ReportAsyncResult(
+                "OpenXRVRRecoveryBaselineR23", false);
             spdlog::error(
                 "VR R23: timed out waiting for R22 safety overlay; stereo kept fail-closed");
             return 0;
