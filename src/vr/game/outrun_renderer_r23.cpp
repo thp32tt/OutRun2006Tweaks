@@ -8,6 +8,11 @@
 // orthographic UI and auxiliary passes still stay stock. R27 also publishes F10
 // to the host from every game BeginScene, including menus/theater mode.
 //
+// R28 keeps a stock-game shadow of c64..c67 so partial constant uploads cannot
+// strand the device with a mixture of old head-patched rows and new stock rows.
+// Perspective-world partial writes are rebuilt as one verified full WVP upload;
+// non-world partial writes restore one coherent stock c64..c67 block.
+//
 // Recovery uses a separate pose-warmup phase. During that phase BeginScene may
 // latch a fresh host pose for the upcoming authoritative clear, but the stock
 // camera and stock c64 values remain on screen. The x86 recovery coordinator can
@@ -37,6 +42,19 @@ namespace OutRunVRRenderer
         bool R27FirstPerspectiveEffectWorldLogged = false;
         bool R27HostRecenterWasDown = false;
 
+        float R28RawWvp[16]{};
+        std::uint32_t R28RawWvpMask = 0;
+        float R28VerifiedProjection[16]{};
+        std::uint32_t R28VerifiedProjectionGeneration = 0;
+        std::uint32_t R28VerifiedProjectionPoseSequence = 0;
+        bool R28VerifiedProjectionValid = false;
+        std::uint64_t R28PartialWorldRebuilds = 0;
+        std::uint64_t R28PartialStockRestores = 0;
+        std::uint64_t R28PartialShadowMisses = 0;
+        bool R28FirstPartialWorldLogged = false;
+        bool R28FirstPartialStockLogged = false;
+        bool R28FirstPartialMissLogged = false;
+
         struct R23EarlyRendererFailClosed
         {
             R23EarlyRendererFailClosed() noexcept
@@ -47,6 +65,68 @@ namespace OutRunVRRenderer
         };
         R23EarlyRendererFailClosed R23EarlyRendererFailClosedState{};
 
+        void R28InvalidateProjectionSnapshot() noexcept
+        {
+            R28VerifiedProjectionValid = false;
+            R28VerifiedProjectionGeneration = 0;
+            R28VerifiedProjectionPoseSequence = 0;
+        }
+
+        void R28TrackRawWvpWrite(UINT startRegister, const float* constantData,
+            UINT vector4fCount) noexcept
+        {
+            if (!constantData || vector4fCount == 0 || vector4fCount > 256)
+                return;
+            const std::uint64_t first = startRegister;
+            const std::uint64_t last = first + vector4fCount;
+            for (UINT reg = OutRunWvpRegister;
+                reg < OutRunWvpRegister + OutRunWvpRegisterCount; ++reg)
+            {
+                if (reg < first || reg >= last)
+                    continue;
+                const UINT sourceOffset = reg - startRegister;
+                const UINT destOffset = reg - OutRunWvpRegister;
+                std::memcpy(R28RawWvp + destOffset * 4,
+                    constantData + sourceOffset * 4, sizeof(float) * 4);
+                R28RawWvpMask |= (1u << destOffset);
+            }
+        }
+
+        bool R28RawWvpComplete() noexcept
+        {
+            return (R28RawWvpMask & 0x0Fu) == 0x0Fu;
+        }
+
+        void R28CaptureVerifiedProjection() noexcept
+        {
+            float verified[16]{};
+            std::uint32_t generation = 0;
+            std::uint32_t poseSequence = 0;
+            std::uintptr_t shaderIdentity = 0;
+            std::uint64_t shaderSerial = 0;
+            float projection[16]{};
+            if (!GetLastVerifiedWvp(verified, generation, poseSequence,
+                    shaderIdentity, shaderSerial) ||
+                !GetRendererBaseProjection(projection))
+            {
+                R28InvalidateProjectionSnapshot();
+                return;
+            }
+            std::memcpy(R28VerifiedProjection, projection,
+                sizeof(R28VerifiedProjection));
+            R28VerifiedProjectionGeneration = generation;
+            R28VerifiedProjectionPoseSequence = poseSequence;
+            R28VerifiedProjectionValid = true;
+        }
+
+        HRESULT R28RestoreStockWvp(IDirect3DDevice9* device) noexcept
+        {
+            InvalidateVerifiedWvp();
+            R28InvalidateProjectionSnapshot();
+            return SetVertexShaderConstantFHook.stdcall<HRESULT>(
+                device, OutRunWvpRegister, R28RawWvp, OutRunWvpRegisterCount);
+        }
+
         void R23DropIneligibleLatchedPoseOnRenderThread() noexcept
         {
             RestoreCullingCamera();
@@ -55,6 +135,7 @@ namespace OutRunVRRenderer
             LatchedPoseSequence = 0;
             FrameTelemetryFlags &= ~OutRunVR::ClientCullingCameraSynced;
             InvalidateVerifiedWvp();
+            R28InvalidateProjectionSnapshot();
         }
 
         void R23KeepWarmupPoseStockOnRenderThread() noexcept
@@ -67,6 +148,7 @@ namespace OutRunVRRenderer
             FrameTelemetryFlags &= ~OutRunVR::ClientRendererPoseInjected;
             FrameTelemetryFlags &= ~OutRunVR::ClientPoseApplied;
             InvalidateVerifiedWvp();
+            R28InvalidateProjectionSnapshot();
             ++R23WarmupPosePreserves;
             if (!R23FirstWarmupPoseLogged)
             {
@@ -81,6 +163,7 @@ namespace OutRunVRRenderer
             RendererInjectionAllowed.store(false, std::memory_order_release);
             R23WvpEligibilityReady.store(false, std::memory_order_release);
             R23RenderThreadCleanupRequested.store(true, std::memory_order_release);
+            R28InvalidateProjectionSnapshot();
         }
 
         void R23ServiceRenderThreadCleanup() noexcept
@@ -162,6 +245,10 @@ namespace OutRunVRRenderer
             const bool candidateWvp = IsGameDevice(device) && constantData &&
                 !OutRunVRStereo::IsInternalStereoPassActive() &&
                 UploadTouchesOutRunWvp(startRegister, vector4fCount);
+            const bool partialWvp = candidateWvp &&
+                !UploadContainsOutRunWvp(startRegister, vector4fCount);
+            if (candidateWvp)
+                R28TrackRawWvpWrite(startRegister, constantData, vector4fCount);
 
             if (candidateWvp && !OutRunVR::RuntimeEligibility::MayInjectStereo())
             {
@@ -177,8 +264,14 @@ namespace OutRunVRRenderer
                     spdlog::info(
                         "VR R23: c64 WVP head injection held stock until common host-fresh + verified-baseline eligibility is true");
                 }
-                return SetVertexShaderConstantFHook.stdcall<HRESULT>(
+                HRESULT hr = SetVertexShaderConstantFHook.stdcall<HRESULT>(
                     device, startRegister, constantData, vector4fCount);
+                if (SUCCEEDED(hr) && partialWvp && R28RawWvpComplete())
+                {
+                    hr = R28RestoreStockWvp(device);
+                    ++R28PartialStockRestores;
+                }
+                return hr;
             }
 
             if (candidateWvp && OutRunVR::RuntimeEligibility::MayInjectStereo())
@@ -203,13 +296,64 @@ namespace OutRunVRRenderer
                         spdlog::info(
                             "VR R27 EFFECT: main-backbuffer perspective c64 now follows the verified per-eye world WVP regardless of alpha/cull state; orthographic HUD and auxiliary passes remain stock");
                     }
-                    return R13WvpCallbackHook.stdcall<HRESULT>(
+
+                    if (partialWvp)
+                    {
+                        const HRESULT partialHr = R13WvpCallbackHook.stdcall<HRESULT>(
+                            device, startRegister, constantData, vector4fCount);
+                        if (FAILED(partialHr))
+                            return partialHr;
+                        if (!R28RawWvpComplete())
+                        {
+                            ++R28PartialShadowMisses;
+                            if (!R28FirstPartialMissLogged)
+                            {
+                                R28FirstPartialMissLogged = true;
+                                spdlog::warn(
+                                    "VR R28 WVP: partial c64..c67 write arrived before all stock rows were observed; keeping fail-closed classification until the shadow is complete");
+                            }
+                            return partialHr;
+                        }
+
+                        const HRESULT rebuildHr = R13WvpCallbackHook.stdcall<HRESULT>(
+                            device, OutRunWvpRegister, R28RawWvp,
+                            OutRunWvpRegisterCount);
+                        if (SUCCEEDED(rebuildHr))
+                        {
+                            R28CaptureVerifiedProjection();
+                            ++R28PartialWorldRebuilds;
+                            if (!R28FirstPartialWorldLogged)
+                            {
+                                R28FirstPartialWorldLogged = true;
+                                spdlog::info(
+                                    "VR R28 WVP: partial world c64..c67 writes now rebuild one coherent verified full WVP before stereo draw classification");
+                            }
+                        }
+                        return rebuildHr;
+                    }
+
+                    const HRESULT hr = R13WvpCallbackHook.stdcall<HRESULT>(
                         device, startRegister, constantData, vector4fCount);
+                    if (SUCCEEDED(hr))
+                        R28CaptureVerifiedProjection();
+                    return hr;
                 }
             }
 
-            return R23WvpEligibilityHook.stdcall<HRESULT>(
+            HRESULT hr = R23WvpEligibilityHook.stdcall<HRESULT>(
                 device, startRegister, constantData, vector4fCount);
+            if (SUCCEEDED(hr) && partialWvp && R28RawWvpComplete())
+            {
+                hr = R28RestoreStockWvp(device);
+                ++R28PartialStockRestores;
+                if (!R28FirstPartialStockLogged)
+                {
+                    R28FirstPartialStockLogged = true;
+                    spdlog::info(
+                        "VR R28 WVP: non-world partial c64..c67 writes restore a coherent stock WVP instead of retaining head-patched rows");
+                }
+            }
+            return hr;
         }
 
         DWORD WINAPI R23RendererInstallThread(void*)
@@ -273,7 +417,7 @@ namespace OutRunVRRenderer
                     HookManager::ReportAsyncResult(
                         "OpenXRVRRendererR23Eligibility", true);
                     spdlog::info(
-                        "VR R23 RENDERER: BeginScene/WVP guards READY; recovery pose warmup is stock-visible and stereo injection still requires the authoritative baseline gate; R27 world-effect correction active");
+                        "VR R23 RENDERER: BeginScene/WVP guards READY; recovery pose warmup is stock-visible and stereo injection still requires the authoritative baseline gate; R28 partial-WVP reconstruction active");
                     return 0;
                 }
                 Sleep(25);
@@ -316,5 +460,27 @@ namespace OutRunVRRenderer
         };
 
         VRRendererR23EligibilityHook VRRendererR23EligibilityHook::instance;
+    }
+
+    bool GetR28VerifiedProjection(float outProjection[16],
+        std::uint32_t& generation, std::uint32_t& poseSequence) noexcept
+    {
+        if (!outProjection || !R28VerifiedProjectionValid ||
+            R28VerifiedProjectionGeneration == 0 ||
+            R28VerifiedProjectionPoseSequence == 0)
+            return false;
+        std::memcpy(outProjection, R28VerifiedProjection,
+            sizeof(R28VerifiedProjection));
+        generation = R28VerifiedProjectionGeneration;
+        poseSequence = R28VerifiedProjectionPoseSequence;
+        return true;
+    }
+
+    bool R28PerspectiveWorldSemantic() noexcept
+    {
+        float projectionM34 = 0.0f;
+        float projectionM44 = 0.0f;
+        return OutRunVR::PassPolicy::AllowsWorldStereo(
+            R13CurrentRenderSemantic(projectionM34, projectionM44));
     }
 }
