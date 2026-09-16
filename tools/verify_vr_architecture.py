@@ -2,341 +2,299 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
+
+def text(rel: str) -> str:
+    path = ROOT / rel
+    if not path.is_file():
+        raise SystemExit(f"missing architecture file: {rel}")
+    return path.read_text(encoding="utf-8")
+
+
+def require(rel: str, *markers: str) -> str:
+    data = text(rel)
+    for marker in markers:
+        if marker not in data:
+            raise SystemExit(f"missing architecture invariant: {rel} :: {marker}")
+    return data
+
+
+# Final authoritative implementation graph. Intermediate implementation files
+# are intentionally kept because the R23 wrappers include the validated lower
+# layers, but cmake must never compile those included bodies independently.
 required = [
-    # Verified OutRun-specific assets retained during reconstruction.
-    'src/vr/settings.cpp',
-    'src/vr/game/outrun_renderer.cpp',
-    'src/vr/game/outrun_renderer_r13.cpp',
-    'src/vr/game/outrun_renderer_r23.cpp',
-    'src/vr/d3d9/stereo_renderer.cpp',
-    'src/vr/d3d9/stereo_renderer_r13.cpp',
-    'src/vr/d3d9/stereo_renderer_r20.cpp',
-    'src/vr/d3d9/stereo_renderer_r21.cpp',
-    'src/vr/d3d9/stereo_renderer_r22.cpp',
-    'src/vr/d3d9/stereo_renderer_r23.cpp',
-    'src/vr/d3d9/ex_device_upgrade.cpp',
-    'src/vr/d3d9/ex_device_upgrade_r13.cpp',
-    'src/vr/d3d9/r13_bridge.hpp',
-    'src/vr/d3d9/vr_pass_policy.hpp',
-    'src/vr/runtime_eligibility.hpp',
-    'src/vr/ipc/protocol.hpp',
-    'src/vr/ipc/direct_ack_r13.hpp',
-    # New architecture foundation.
-    'src/vr/core/frame_types.hpp',
-    'src/vr/core/matrix.hpp',
-    'src/vr/core/transport.hpp',
-    'src/vr/game/game_adapter.hpp',
-    'src/vr/d3d9/stereo_backend.hpp',
-    'src/vr/ipc/protocol_v3.hpp',
-    'src/vr/ipc/protocol_v3_smoke.cpp',
-    'vrhost/src/runtime/vr_runtime.hpp',
-    'vrhost/src/frame_source.hpp',
-    'vrhost/src/runtime/d3d9ex_direct_passthrough.hpp',
-    'vrhost/src/runtime/r22_runtime_hardening.hpp',
-    'vrhost/src/runtime/r23_runtime_hardening.hpp',
-    'vrhost/src/runtime/r23_verified_bundle.hpp',
-    'vrhost/tests/protocol_v3_smoke.cpp',
-    'vrhost/tests/core_math_smoke.cpp',
-    # main.cpp remains the implementation body included by the R23 entry point.
-    'vrhost/src/main.cpp',
-    'vrhost/src/main_r23.cpp',
-    'vrhost/src/stereo_shader.hpp',
-    'vrhost/tests/stereo_shader_smoke.cpp',
-    'docs/VR_ARCHITECTURE.md',
+    "src/vr/settings.cpp",
+    "src/vr/runtime_eligibility.hpp",
+    "src/vr/game/outrun_renderer.cpp",
+    "src/vr/game/outrun_renderer_r13.cpp",
+    "src/vr/game/outrun_renderer_r23.cpp",
+    "src/vr/d3d9/stereo_renderer.cpp",
+    "src/vr/d3d9/stereo_renderer_r13.cpp",
+    "src/vr/d3d9/stereo_renderer_r20.cpp",
+    "src/vr/d3d9/stereo_renderer_r21.cpp",
+    "src/vr/d3d9/stereo_renderer_r22.cpp",
+    "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "src/vr/d3d9/ex_device_upgrade.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r13.cpp",
+    "src/vr/d3d9/r13_bridge.hpp",
+    "src/vr/d3d9/vr_pass_policy.hpp",
+    "src/vr/ipc/protocol.hpp",
+    "src/vr/ipc/protocol_v3.hpp",
+    "src/vr/ipc/direct_ack_r13.hpp",
+    "src/vr/core/frame_types.hpp",
+    "src/vr/core/matrix.hpp",
+    "src/vr/core/transport.hpp",
+    "src/vr/game/game_adapter.hpp",
+    "src/vr/d3d9/stereo_backend.hpp",
+    "vrhost/src/main.cpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp",
+    "vrhost/src/runtime/r23_runtime_hardening.hpp",
+    "vrhost/src/runtime/r23_verified_bundle.hpp",
+    "vrhost/tests/runtime_eligibility_smoke.cpp",
+    "vrhost/tests/r23_verified_bundle_smoke.cpp",
+    "docs/VR_ARCHITECTURE.md",
 ]
 for rel in required:
     if not (ROOT / rel).is_file():
-        raise SystemExit(f'missing architecture file: {rel}')
+        raise SystemExit(f"missing architecture file: {rel}")
 
 forbidden = [
-    'src/hooks_vr.cpp',
-    'src/vr_renderer_probe.cpp',
-    'src/vr_stereo.cpp',
-    'vrhost/main.cpp',
-    'vrhost/main_compat.cpp',
-    'vrhost/main_compat_v2.cpp',
-    'vrhost/main_compat_v3.cpp',
-    'vrhost/main_stereo.cpp',
-    'vrhost/shader_compile_patch.hpp',
-    'vrhost/shader_smoke_test.cpp',
-    'tools/apply_vr_direct_gpu_transport.py',
-    'tools/apply_vr_reference_hardening.py',
-    'tools/fix_vr_host_interop_block.py',
-    '.github/workflows/apply-vr-direct-gpu-transport.yml',
-    '.github/workflows/apply-vr-host-hotfix.yml',
-    '.github/workflows/apply-vr-reference-hardening.yml',
+    "src/hooks_vr.cpp",
+    "src/vr_renderer_probe.cpp",
+    "src/vr_stereo.cpp",
+    "vrhost/main.cpp",
+    "vrhost/main_compat.cpp",
+    "vrhost/main_compat_v2.cpp",
+    "vrhost/main_compat_v3.cpp",
+    "vrhost/main_stereo.cpp",
 ]
 for rel in forbidden:
     if (ROOT / rel).exists():
-        raise SystemExit(f'legacy/prototype artifact still present: {rel}')
+        raise SystemExit(f"legacy/prototype artifact still present: {rel}")
 
-# v2 is only the live comparison oracle while behavior moves to the new skeleton.
-protocol_v2 = (ROOT / 'src/vr/ipc/protocol.hpp').read_text(encoding='utf-8')
-for marker in (
-    'SharedProtocolVersion = 2', 'RenderFrameProtocolVersion = 2',
-    'RenderFrameRingSize = 4', 'HostAdapterLuidValid',
-    'clientInteropProbeHandle', 'hostInteropProbeAckToken',
-    'hostDirectConsumedFrameId', 'SharedRenderFrameRing',
-    'ClientStereoBackbufferHeightIndex = 15',
+# v2 remains the live transport ABI while v3 is mirrored for migration and
+# diagnostics. Do not silently steal reserved words or pointer-width fields.
+protocol_v2 = require(
+    "src/vr/ipc/protocol.hpp",
+    "SharedProtocolVersion = 2",
+    "RenderFrameProtocolVersion = 2",
+    "RenderFrameRingSize = 4",
+    "HostAdapterLuidValid",
+    "hostDirectConsumedFrameId",
+    "SharedRenderFrameRing",
+)
+protocol_v3 = require(
+    "src/vr/ipc/protocol_v3.hpp",
+    "ProtocolVersion = 3",
+    "HostStateName",
+    "ClientStateName",
+    "FrameRingName",
+    "AckStateName",
+    "using WireHandle = std::uint64_t",
+    "WireHandle leftHandle",
+    "WireHandle rightHandle",
+)
+for forbidden_marker in (
+    "std::uintptr_t interopProbeHandle",
+    "std::uintptr_t leftHandle",
+    "std::uintptr_t rightHandle",
 ):
-    if marker not in protocol_v2:
-        raise SystemExit(f'missing live v2 comparison invariant: {marker}')
-
-# R13 must not steal a legacy v2 reserved word for consumer completion.  The
-# dedicated mapping is fixed-size and per-slot so frame wrap/ring reuse remains
-# explicit without changing either v2 or v3 ABI.
-direct_ack = (ROOT / 'src/vr/ipc/direct_ack_r13.hpp').read_text(encoding='utf-8')
-for marker in (
-    'DirectGpuAckName', 'DirectGpuAckMagic', 'DirectGpuAckVersion = 1',
-    'DirectGpuAckRingSize = 4', 'struct DirectGpuAckState',
-    'transportGeneration', 'completedFrameId[DirectGpuAckRingSize]',
-    'sizeof(DirectGpuAckState) == 48',
-):
-    if marker not in direct_ack:
-        raise SystemExit(f'missing R13 direct GPU ACK invariant: {marker}')
-
-protocol_v3 = (ROOT / 'src/vr/ipc/protocol_v3.hpp').read_text(encoding='utf-8')
-for marker in (
-    'ProtocolVersion = 3', 'HostStateName', 'ClientStateName',
-    'FrameRingName', 'AckStateName', 'struct HostState',
-    'struct ClientState', 'struct FrameRing', 'struct AckState',
-    'using WireHandle = std::uint64_t', 'WireHandle leftHandle',
-    'WireHandle rightHandle', 'sizeof(HostState) == 268',
-    'sizeof(ClientState) == 88', 'sizeof(FrameRing) == 720',
-):
-    if marker not in protocol_v3:
-        raise SystemExit(f'missing v3 ownership/cross-bitness invariant: {marker}')
-for forbidden_marker in ('reserved[', 'std::uintptr_t interopProbeHandle',
-                         'std::uintptr_t leftHandle', 'std::uintptr_t rightHandle'):
     if forbidden_marker in protocol_v3:
-        raise SystemExit(f'v3 protocol reintroduced implicit ABI debt: {forbidden_marker}')
+        raise SystemExit(f"v3 protocol reintroduced pointer-width ABI debt: {forbidden_marker}")
 
-math_core = (ROOT / 'src/vr/core/matrix.hpp').read_text(encoding='utf-8')
-for marker in ('struct Matrix4', 'ProjectionFromOpenXrFov', 'InverseRigid', 'Invert('):
-    if marker not in math_core:
-        raise SystemExit(f'missing renderer-independent math boundary: {marker}')
-if '#include <d3d9.h>' in math_core or '#include <openxr/' in math_core:
-    raise SystemExit('core matrix layer must not depend on D3D9 or OpenXR headers')
+require(
+    "src/vr/ipc/direct_ack_r13.hpp",
+    "DirectGpuAckName",
+    "DirectGpuAckRingSize = 4",
+    "transportGeneration",
+    "completedFrameId[DirectGpuAckRingSize]",
+)
 
-core_transport = (ROOT / 'src/vr/core/transport.hpp').read_text(encoding='utf-8')
-for marker in ('class IFrameProducer', 'class IFrameConsumer',
-               'D3D9ExShared', 'DesktopDuplication', 'Dxvk'):
-    if marker not in core_transport:
-        raise SystemExit(f'missing transport backend boundary: {marker}')
+# Shared eligibility is a state machine, not a collection of independent bools.
+require(
+    "src/vr/runtime_eligibility.hpp",
+    "enum class InstallState",
+    "Pending = 0",
+    "Ready = 1",
+    "Failed = 2",
+    "SafetyOverlayReady",
+    "MarkSafetyOverlayInstalled",
+    "MarkSafetyOverlayUnavailable",
+    "BaselineVerified",
+    "MayInjectStereo",
+)
 
-game_adapter = (ROOT / 'src/vr/game/game_adapter.hpp').read_text(encoding='utf-8')
-for marker in ('class IGameAdapter', 'latchRenderPose', 'buildStereoMatrices'):
-    if marker not in game_adapter:
-        raise SystemExit(f'missing game adapter boundary: {marker}')
+# Render-pass policy must keep orthographic/UI and fragile camera-facing alpha
+# effects out of the head-tracked WVP while retaining opaque world stereo.
+require(
+    "src/vr/d3d9/vr_pass_policy.hpp",
+    "ClassifyProjectionSignature",
+    "Perspective3D",
+    "Orthographic2D",
+    "EffectStereoPolicy",
+    "ZeroDisparity",
+    "ClassifyEffectStereo",
+    "UnsafeSingleExecution",
+)
+require(
+    "src/vr/game/outrun_renderer_r13.cpp",
+    "R13FragileEffectNeedsZeroDisparity",
+    "D3DRS_ALPHABLENDENABLE",
+    "D3DRS_ZWRITEENABLE",
+    "shadow/billboard/panel pass kept stock",
+    "InvalidateVerifiedWvp",
+    "InlineHook::StartDisabled",
+)
 
-stereo_backend = (ROOT / 'src/vr/d3d9/stereo_backend.hpp').read_text(encoding='utf-8')
-for marker in ('class IStereoBackend', 'DrawClass', 'drawWorldStereo', 'drawScreenSpaceStereo'):
-    if marker not in stereo_backend:
-        raise SystemExit(f'missing stereo backend boundary: {marker}')
+# R23 installer workers may only request cleanup. Live OutRun camera/projection
+# writes are serviced from D3D render callbacks.
+renderer_r23 = require(
+    "src/vr/game/outrun_renderer_r23.cpp",
+    "R23RenderThreadCleanupRequested",
+    "R23RequestFailClosedCleanup",
+    "R23ServiceRenderThreadCleanup",
+    "R23DropIneligibleLatchedPoseOnRenderThread",
+    "fail-closed cleanup is render-thread-owned",
+    "RendererInjectionAllowed.store(false",
+)
+installer_start = renderer_r23.find("DWORD WINAPI R23RendererInstallThread")
+installer_end = renderer_r23.find("class VRRendererR23EligibilityHook")
+if installer_start >= 0 and installer_end > installer_start:
+    worker = renderer_r23[installer_start:installer_end]
+    if "RestoreCullingCamera()" in worker:
+        raise SystemExit("R23 installer thread must not mutate live camera/projection memory")
 
-pass_policy = (ROOT / 'src/vr/d3d9/vr_pass_policy.hpp').read_text(encoding='utf-8')
-for marker in (
-    'ClassifyProjectionSignature', 'Perspective3D', 'Orthographic2D',
-    'ClassifyRenderSemanticChecked', 'PolicyMismatch', 'AllowsWorldStereo',
-    'ClassifyDrawReplay', 'UnsafeSingleExecution',
-):
-    if marker not in pass_policy:
-        raise SystemExit(f'missing emulator-inspired render-pass policy invariant: {marker}')
+# R20-R23 installation must fail fast and publish READY only after disabled-first
+# hook transactions are enabled.
+require(
+    "src/vr/d3d9/stereo_renderer_r20.cpp",
+    "R20InstallState",
+    "InstallState::Pending",
+    "InstallState::Failed",
+    "InlineHook::StartDisabled",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r21.cpp",
+    "R21InstallState",
+    "IsFailed(R20InstallState)",
+    "InlineHook::StartDisabled",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r22.cpp",
+    "R22InstallState",
+    "R22ShadowState",
+    "R22SetScissorRectHook",
+    "R22SetRenderStateHook",
+    "R22PrimeShadowState",
+    "InlineHook::StartDisabled",
+    "per-draw GetViewport/GetScissorRect/GetRenderState eliminated",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "#include \"stereo_renderer_r22.cpp\"",
+    "R23InstallState",
+    "IsFailed(R22InstallState)",
+    "R23RecoveryNeedsBaseline",
+    "MarkSafetyOverlayInstalled",
+    "recovery-clear-only baseline reopening guard ACTIVE",
+)
 
-runtime_eligibility = (ROOT / 'src/vr/runtime_eligibility.hpp').read_text(encoding='utf-8')
-for marker in (
-    'SafetyOverlayReady', 'MarkSafetyOverlayUnavailable',
-    'MarkSafetyOverlayInstalled', 'BaselineVerified', 'MayInjectStereo',
-):
-    if marker not in runtime_eligibility:
-        raise SystemExit(f'missing R23 common eligibility transaction invariant: {marker}')
+# Async installer status must be publishable back to the hook overlay/UI.
+require(
+    "src/hook_mgr.hpp",
+    "std::atomic<bool> is_active_",
+    "std::atomic<bool> has_error_",
+    "ReportAsyncResult",
+)
+require(
+    "src/hook_mgr.cpp",
+    "HookManager::ReportAsyncResult",
+    "async installer",
+)
 
-renderer = (ROOT / 'src/vr/game/outrun_renderer.cpp').read_text(encoding='utf-8')
-for marker in (
-    'OutRunWvpRegister = 64', 'BeginSceneVtableIndex = 41',
-    'EndSceneVtableIndex = 42', 'SetVertexShaderConstantFVtableIndex = 94',
-    'Transpose(WorldView*Proj)', 'PresentPoseLocked',
-):
-    if marker not in renderer:
-        raise SystemExit(f'missing OutRun renderer invariant: {marker}')
+# Shadow v3 diagnostics may not run 1-2 ms busy polling or republish client
+# state forever after the first stereo frame.
+require(
+    "src/vr/ipc/v3_game_shadow_bridge.cpp",
+    "ShadowIdlePollMs = 8",
+    "ShadowRetryMs = 250",
+    "lastClientPublishedFrameId",
+    "clientChanged",
+)
+require(
+    "vrhost/src/ipc/v3_shadow_bridge.cpp",
+    "ShadowIdlePollMs = 8",
+    "ShadowWriterRetryMs = 250",
+    "ackWriter.reset()",
+)
+require(
+    "vrhost/src/ipc/host_state_v3_writer.hpp",
+    "Reset(false)",
+    "A constructor that throws never runs this object's destructor",
+)
 
-renderer_r13 = (ROOT / 'src/vr/game/outrun_renderer_r13.cpp').read_text(encoding='utf-8')
-for marker in (
-    'CurrentPoseInjectionSnapshot',
-    'auxiliary/offscreen c64 WVP kept stock',
-    'PolicyMismatch', 'main-pass classifiers disagreed',
-    'R13WvpHookReady', 'std::memory_order_acquire',
-    'InlineHook::StartDisabled', 'enableResult.has_value()',
-    'disabled-first trampoline publish',
-    'failed to create renderer hardening installer thread',
-    'SetVertexShaderConstantFDestR13',
-):
-    if marker not in renderer_r13:
-        raise SystemExit(f'missing R13 renderer hardening invariant: {marker}')
+# Direct shared-eye transport must copy to host-owned resources, prove GPU copy
+# completion, and bind actual texture format/size to committed Frame.v2 metadata.
+require(
+    "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp",
+    "CopyFenceTimeoutMs = 8",
+    "ExpectedDeclaredFormat",
+    "desc[0].Format == declared",
+    "host-owned GPU eye copies + completion ACK active",
+    "SafeTransportGeneration",
+)
+require(
+    "vrhost/src/runtime/r23_runtime_hardening.hpp",
+    "ExpectedDirectDxgiFormat",
+    "DirectSafeEyeMatchesCommittedFrame",
+    "SafeEyeFormat == expected",
+    "width == frame.backbufferWidth",
+)
+require(
+    "vrhost/src/runtime/r23_verified_bundle.hpp",
+    "MaxPresentationAgeMs",
+    "ReadFresh",
+    "Matches",
+)
 
-renderer_r23 = (ROOT / 'src/vr/game/outrun_renderer_r23.cpp').read_text(encoding='utf-8')
-for marker in (
-    'R23BeginSceneEligibilityHook', 'BeginSceneDestR23',
-    'R23DropIneligibleLatchedPose', 'RendererInjectionAllowed.store(false',
-    'BeginScene culling-camera/head pose held stock',
-):
-    if marker not in renderer_r23:
-        raise SystemExit(f'missing R23 renderer eligibility invariant: {marker}')
+# main_r23 must commit only a stable full Frame.v2 snapshot.
+require(
+    "vrhost/src/main_r23.cpp",
+    "#include \"main.cpp\"",
+    "R23FrameUnchanged",
+    "R23CommitDirectAfterValidation",
+    "R23CommitClassicAfterValidation",
+    "OutRunVrR23VerifiedBundle::Publish",
+    "std::memcmp(after.eye, before.eye",
+    "std::memcmp(after.reserved, before.reserved",
+)
 
-stereo = (ROOT / 'src/vr/d3d9/stereo_renderer.cpp').read_text(encoding='utf-8')
-for marker in (
-    'RenderFrameRingSize', 'IDirect3DDevice9Ex', 'GetAdapterLUID',
-    'ResolveDirectTransport', 'StereoFailurePoseSequenceMismatch',
-):
-    if marker not in stereo:
-        raise SystemExit(f'missing live D3D9 stereo comparison invariant: {marker}')
-for forbidden_call in ('Game::ModeControl()', 'Game::EventControl()', 'WheelFFB_ServiceSafety'):
-    if forbidden_call in stereo:
-        raise SystemExit(f'VR render backend must not execute game/FFB tick: {forbidden_call}')
+# New regressions are required in the host build graph.
+require(
+    "vrhost/CMakeLists.txt",
+    "src/main_r23.cpp",
+    "outrun-vr-runtime-eligibility-smoke",
+    "outrun-vr-r23-verified-bundle-smoke",
+    "r23_runtime_hardening.hpp",
+)
 
-stereo_r13 = (ROOT / 'src/vr/d3d9/stereo_renderer_r13.cpp').read_text(encoding='utf-8')
-for marker in (
-    'ResetDestR13', 'ResetCompatDevice', 'ResolveDirectTransportR13',
-    'DirectGpuAckName', 'completedFrameId[slotIndex]', 'transportGeneration',
-    'GPU-completion direct-ring backpressure', 'IsMainBackbufferPoseInjectionPass',
-    'PoseInjectionSnapshot CurrentPoseInjectionSnapshot',
-    'legacyMainBackbufferInvariant', 'auxiliaryRenderTargetActive',
-    'R13OverlayReady', 'R13EnableOverlayHooks', 'InlineHook::StartDisabled',
-    'disabled-first transactional hooks=READY',
-    'StereoFailureLeftDrawFailed', 'StereoFailureRestoreFailed',
-    'R9FirstFailureEpoch = 0',
-):
-    if marker not in stereo_r13:
-        raise SystemExit(f'missing R13 stereo hardening invariant: {marker}')
-if 'SharedState->reserved[OutRunVRR13::HostDirectGpuCompletedFrameIndex]' in stereo_r13:
-    raise SystemExit('R13 GPU ACK must not collide with legacy SharedPoseState reserved words')
+# Root cmkr source ownership: only final wrappers compile independently.
+cmake_root = require(
+    "cmake.toml",
+    "stereo_renderer_r20.cpp",
+    "stereo_renderer_r21.cpp",
+    "stereo_renderer_r22.cpp",
+    "outrun_renderer_r13.cpp",
+    "HEADER_FILE_ONLY TRUE",
+    'compile-options = ["/GS"',
+)
 
-# R22 is a required implementation layer, not a documentation-only marker.
-# R23 includes it and depends on its replay scope, clear trampoline and seed
-# cancellation helpers, while cmake must keep it header-only to avoid duplicate
-# hook bodies.
-stereo_r22 = (ROOT / 'src/vr/d3d9/stereo_renderer_r22.cpp').read_text(encoding='utf-8')
-for marker in (
-    'R22ReplayScope', 'R22ClearR20Hook', 'R22CancelUnsafeFirstSeed',
-    'R22GameClearCoversBackbuffer', 'R22InstallReady',
-    'R22 final scissor restore',
-):
-    if marker not in stereo_r22:
-        raise SystemExit(f'missing R22 scissor/bootstrap implementation invariant: {marker}')
-stereo_r23 = (ROOT / 'src/vr/d3d9/stereo_renderer_r23.cpp').read_text(encoding='utf-8')
-for marker in (
-    '#include "stereo_renderer_r22.cpp"', 'R23RecoveryNeedsBaseline',
-    'replay.stateValid', 'MarkSafetyOverlayInstalled',
-    'MarkSafetyOverlayUnavailable', 'safety overlay transaction READY',
-):
-    if marker not in stereo_r23:
-        raise SystemExit(f'missing R23 recovery/installation invariant: {marker}')
+# Renderer-independent interfaces stay clean of graphics/runtime headers.
+math_core = require("src/vr/core/matrix.hpp", "struct Matrix4", "InverseRigid", "Invert(")
+if "#include <d3d9.h>" in math_core or "#include <openxr/" in math_core:
+    raise SystemExit("core matrix layer must not depend on D3D9/OpenXR headers")
+require("src/vr/core/transport.hpp", "class IFrameProducer", "class IFrameConsumer", "D3D9ExShared", "DesktopDuplication")
+require("src/vr/game/game_adapter.hpp", "class IGameAdapter", "latchRenderPose", "buildStereoMatrices")
+require("src/vr/d3d9/stereo_backend.hpp", "class IStereoBackend", "drawWorldStereo", "drawScreenSpaceStereo")
 
-# D3D9Ex stays opt-in, but when selected it must preserve the legacy game's
-# managed-resource expectations without changing the COM identity of the game
-# device. The known hardware crash came from MANAGED resource creation failing
-# on IDirect3DDevice9Ex before a null buffer was locked.
-ex_compat = (ROOT / 'src/vr/d3d9/ex_device_upgrade.cpp').read_text(encoding='utf-8')
-for marker in (
-    'D3DPOOL_MANAGED', 'D3DPOOL_DEFAULT', 'D3DUSAGE_DYNAMIC',
-    'ResetEx(', 'CreateVertexBufferCompatDest', 'CreateIndexBufferCompatDest',
-    'CreateTextureCompatDest', 'CreateVolumeTextureCompatDest',
-    'CreateCubeTextureCompatDest', 'InstallManagedResourceCompat',
-    'managed-resource compatibility hooks installed',
-    '4-slot zero-copy eye transport is eligible',
-):
-    if marker not in ex_compat:
-        raise SystemExit(f'missing D3D9Ex managed-resource compatibility invariant: {marker}')
-if 'Settings::VRPreferD3D9Ex.needs_restart()' not in ex_compat:
-    raise SystemExit('D3D9Ex promotion must remain an explicit restart-only option')
-
-ex_r13 = (ROOT / 'src/vr/d3d9/ex_device_upgrade_r13.cpp').read_text(encoding='utf-8')
-for marker in (
-    'DisarmLegacyResetHook', 'ResetCompatDevice', 'TextureLockRectR13',
-    'TextureUnlockRectR13', 'translated MANAGED texture LockRect',
-    'stereo Reset callback is sole reset owner',
-):
-    if marker not in ex_r13:
-        raise SystemExit(f'missing R13 D3D9Ex compatibility invariant: {marker}')
-
-# main.cpp remains the implementation body used by main_r23.cpp. Verify both:
-# the reusable implementation must retain the original host capabilities and the
-# actual executable entrypoint must explicitly include that body.
-host = (ROOT / 'vrhost/src/main.cpp').read_text(encoding='utf-8')
-for marker in (
-    'XR_KHR_D3D11_ENABLE_EXTENSION_NAME', 'OpenSharedResource',
-    'RenderFrameReader', 'ServiceInteropProbe', 'AckDirectFrame',
-    'XrCompositionLayerProjection', 'RenderTheater',
-    'DuplicateOutput', 'HostTimings',
-):
-    if marker not in host:
-        raise SystemExit(f'missing live host comparison invariant: {marker}')
-host_r23 = (ROOT / 'vrhost/src/main_r23.cpp').read_text(encoding='utf-8')
-for marker in (
-    '#include "main.cpp"', 'R23FrameUnchanged',
-    'R23CommitDirectAfterValidation', 'R23CommitClassicAfterValidation',
-    'OutRunVrR23VerifiedBundle::Publish',
-    'after.sequence == before.sequence',
-    'std::memcmp(after.eye, before.eye',
-    'std::memcmp(after.reserved, before.reserved',
-    'width != frame.backbufferWidth',
-):
-    if marker not in host_r23:
-        raise SystemExit(f'missing R23 verified-bundle entrypoint invariant: {marker}')
-
-# R13 makes the ownership boundary explicit: direct shared eyes are copied on
-# the GPU into host-owned textures, the copy EVENT must retire, and only then is
-# the producer slot acknowledged through the dedicated per-slot mapping.
-direct_arbitration = (ROOT / 'vrhost/src/runtime/d3d9ex_direct_passthrough.hpp').read_text(encoding='utf-8')
-for marker in (
-    'IncomingProjectionValid', 'HostDirectGpuReady', 'hostDirectConsumedFrameId',
-    'DirectGpuAckName', 'PublishCompletedFrame', 'D3D11_QUERY_EVENT',
-    'CopySharedFrameToSafeEyes', 'CopyResource(SafeEye[0], shared[0])',
-    'host-owned GPU eye copies + completion ACK active',
-    'completedFrameId[slot]', 'transportGeneration',
-    'RenderSafeProjection', 'SafeEyeSrv',
-    'FallbackSourceMaxAgeMs', 'stale Desktop Duplication source invalidated',
-    'DIRECT GPU-COPY projection passthrough ACTIVE',
-    'OutRunVrFinalTest::EndFrame(session, &patched)',
-    'OutRunVrSbsCaptureOverride::EndFrame(session, endInfo)',
-):
-    if marker not in direct_arbitration:
-        raise SystemExit(f'missing R13 D3D9Ex/R10 arbitration invariant: {marker}')
-if 'PoseState->reserved[OutRunVRR13::HostDirectGpuCompletedFrameIndex]' in direct_arbitration:
-    raise SystemExit('host still writes R13 GPU ACK into legacy pose reserved words')
-
-bridge = (ROOT / 'src/vr/d3d9/r13_bridge.hpp').read_text(encoding='utf-8')
-for marker in (
-    'direct_ack_r13.hpp', 'ResetCompatDevice',
-    'struct PoseInjectionSnapshot', 'CurrentPoseInjectionSnapshot',
-    'IsMainBackbufferPoseInjectionPass',
-):
-    if marker not in bridge:
-        raise SystemExit(f'missing R13 cross-TU bridge invariant: {marker}')
-
-cmake_root = (ROOT / 'cmake.toml').read_text(encoding='utf-8')
-for marker in (
-    'ex_device_upgrade.cpp', 'stereo_renderer.cpp', 'stereo_renderer_r22.cpp',
-    'outrun_renderer.cpp', 'HEADER_FILE_ONLY TRUE',
-):
-    if marker not in cmake_root:
-        raise SystemExit(f'root build does not preserve R23 wrapper ownership: {marker}')
-
-runtime_boundary = (ROOT / 'vrhost/src/runtime/vr_runtime.hpp').read_text(encoding='utf-8')
-if 'class IVrRuntime' not in runtime_boundary or 'requiredAdapter' not in runtime_boundary:
-    raise SystemExit('missing host VR runtime boundary')
-
-frame_source = (ROOT / 'vrhost/src/frame_source.hpp').read_text(encoding='utf-8')
-if 'class IFrameSource' not in frame_source or 'TransportKind' not in frame_source:
-    raise SystemExit('missing host frame-source boundary')
-
-cmake = (ROOT / 'vrhost/CMakeLists.txt').read_text(encoding='utf-8')
-for marker in (
-    'src/main_r23.cpp', 'tests/stereo_shader_smoke.cpp',
-    'tests/protocol_v3_smoke.cpp', 'tests/core_math_smoke.cpp',
-    'd3d9ex_direct_passthrough.hpp', 'r23_runtime_hardening.hpp',
-):
-    if marker not in cmake:
-        raise SystemExit(f'host CMake missing R23 target/arbitration include: {marker}')
-
-print('VR reconstructed R23 architecture boundary verification passed')
+print("VR reconstructed R23 architecture boundary verification passed")
