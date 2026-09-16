@@ -484,10 +484,17 @@ namespace
         OutRunVR::SharedRenderFrameState after{};
         return reader.Read(after) &&
             (after.flags & OutRunVR::RenderFramePresentInFlight) == 0 &&
+            after.sequence == before.sequence &&
+            after.clientPid == before.clientPid &&
             after.state == before.state && after.frameId == before.frameId &&
             after.sourcePoseSequence == before.sourcePoseSequence &&
+            after.presentationMode == before.presentationMode &&
             after.presentQpc == before.presentQpc && after.flags == before.flags &&
-            after.failureReason == before.failureReason;
+            after.failureReason == before.failureReason &&
+            after.backbufferWidth == before.backbufferWidth &&
+            after.backbufferHeight == before.backbufferHeight &&
+            std::memcmp(after.eye, before.eye, sizeof(before.eye)) == 0 &&
+            std::memcmp(after.reserved, before.reserved, sizeof(before.reserved)) == 0;
     }
 
     bool R23ValidateDirectResourceSize(StereoCompositor& c,
@@ -497,6 +504,7 @@ namespace
         const std::uint32_t width = frame.reserved[OutRunVR::RenderFrameDirectWidthIndex];
         const std::uint32_t height = frame.reserved[OutRunVR::RenderFrameDirectHeightIndex];
         if (slot >= OutRunVR::RenderFrameRingSize || !width || !height ||
+            width != frame.backbufferWidth || height != frame.backbufferHeight ||
             !c.directLeft_[slot] || !c.directRight_[slot]) return false;
         D3D11_TEXTURE2D_DESC l{}, r{};
         c.directLeft_[slot]->GetDesc(&l); c.directRight_[slot]->GetDesc(&r);

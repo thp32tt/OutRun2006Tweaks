@@ -143,6 +143,14 @@ for marker in (
     if marker not in pass_policy:
         raise SystemExit(f'missing emulator-inspired render-pass policy invariant: {marker}')
 
+runtime_eligibility = (ROOT / 'src/vr/runtime_eligibility.hpp').read_text(encoding='utf-8')
+for marker in (
+    'SafetyOverlayReady', 'MarkSafetyOverlayUnavailable',
+    'MarkSafetyOverlayInstalled', 'BaselineVerified', 'MayInjectStereo',
+):
+    if marker not in runtime_eligibility:
+        raise SystemExit(f'missing R23 common eligibility transaction invariant: {marker}')
+
 renderer = (ROOT / 'src/vr/game/outrun_renderer.cpp').read_text(encoding='utf-8')
 for marker in (
     'OutRunWvpRegister = 64', 'BeginSceneVtableIndex = 41',
@@ -165,6 +173,15 @@ for marker in (
 ):
     if marker not in renderer_r13:
         raise SystemExit(f'missing R13 renderer hardening invariant: {marker}')
+
+renderer_r23 = (ROOT / 'src/vr/game/outrun_renderer_r23.cpp').read_text(encoding='utf-8')
+for marker in (
+    'R23BeginSceneEligibilityHook', 'BeginSceneDestR23',
+    'R23DropIneligibleLatchedPose', 'RendererInjectionAllowed.store(false',
+    'BeginScene culling-camera/head pose held stock',
+):
+    if marker not in renderer_r23:
+        raise SystemExit(f'missing R23 renderer eligibility invariant: {marker}')
 
 stereo = (ROOT / 'src/vr/d3d9/stereo_renderer.cpp').read_text(encoding='utf-8')
 for marker in (
@@ -202,12 +219,18 @@ stereo_r22 = (ROOT / 'src/vr/d3d9/stereo_renderer_r22.cpp').read_text(encoding='
 for marker in (
     'R22ReplayScope', 'R22ClearR20Hook', 'R22CancelUnsafeFirstSeed',
     'R22GameClearCoversBackbuffer', 'R22InstallReady',
+    'R22 final scissor restore',
 ):
     if marker not in stereo_r22:
         raise SystemExit(f'missing R22 scissor/bootstrap implementation invariant: {marker}')
 stereo_r23 = (ROOT / 'src/vr/d3d9/stereo_renderer_r23.cpp').read_text(encoding='utf-8')
-if '#include "stereo_renderer_r22.cpp"' not in stereo_r23:
-    raise SystemExit('R23 game wrapper no longer owns the required R22 implementation layer')
+for marker in (
+    '#include "stereo_renderer_r22.cpp"', 'R23RecoveryNeedsBaseline',
+    'replay.stateValid', 'MarkSafetyOverlayInstalled',
+    'MarkSafetyOverlayUnavailable', 'safety overlay transaction READY',
+):
+    if marker not in stereo_r23:
+        raise SystemExit(f'missing R23 recovery/installation invariant: {marker}')
 
 # D3D9Ex stays opt-in, but when selected it must preserve the legacy game's
 # managed-resource expectations without changing the COM identity of the game
@@ -253,6 +276,10 @@ for marker in (
     '#include "main.cpp"', 'R23FrameUnchanged',
     'R23CommitDirectAfterValidation', 'R23CommitClassicAfterValidation',
     'OutRunVrR23VerifiedBundle::Publish',
+    'after.sequence == before.sequence',
+    'std::memcmp(after.eye, before.eye',
+    'std::memcmp(after.reserved, before.reserved',
+    'width != frame.backbufferWidth',
 ):
     if marker not in host_r23:
         raise SystemExit(f'missing R23 verified-bundle entrypoint invariant: {marker}')

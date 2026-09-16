@@ -1,6 +1,7 @@
 // R23 renderer eligibility overlay. The R13 semantic classifier remains the
-// normal path; this wrapper only prevents head-tracked WVP injection whenever
-// the Present-boundary host freshness/baseline state is not eligible.
+// normal path; this wrapper prevents both head-tracked WVP injection and the
+// render-time culling-camera override whenever the common host/baseline gate is
+// not eligible.
 
 #include "../runtime_eligibility.hpp"
 #include "outrun_renderer_r13.cpp"
@@ -9,10 +10,46 @@ namespace OutRunVRRenderer
 {
     namespace
     {
+        SafetyHookInline R23BeginSceneEligibilityHook{};
         SafetyHookInline R23WvpEligibilityHook{};
         std::atomic<bool> R23WvpEligibilityReady{ false };
         std::uint64_t R23EligibilityBypasses = 0;
+        std::uint64_t R23CullingEligibilityBypasses = 0;
         bool R23FirstEligibilityBypassLogged = false;
+        bool R23FirstCullingEligibilityBypassLogged = false;
+
+        void R23DropIneligibleLatchedPose() noexcept
+        {
+            RestoreCullingCamera();
+            LatchedHeadInverseValid = false;
+            LatchedStereo = {};
+            LatchedPoseSequence = 0;
+            FrameTelemetryFlags &= ~OutRunVR::ClientCullingCameraSynced;
+            InvalidateVerifiedWvp();
+        }
+
+        HRESULT __stdcall BeginSceneDestR23(IDirect3DDevice9* device)
+        {
+            const HRESULT result = R23BeginSceneEligibilityHook.stdcall<HRESULT>(device);
+            if (SUCCEEDED(result) && IsGameDevice(device) &&
+                !OutRunVRStereo::IsInternalStereoPassActive() &&
+                !OutRunVR::RuntimeEligibility::MayInjectStereo())
+            {
+                // Base BeginScene may have latched a fresh HMD pose and applied
+                // the culling-camera override before the stereo baseline gate
+                // reopened. Restore stock camera state before control returns to
+                // the game so culling and visible WVP always use the same policy.
+                R23DropIneligibleLatchedPose();
+                ++R23CullingEligibilityBypasses;
+                if (!R23FirstCullingEligibilityBypassLogged)
+                {
+                    R23FirstCullingEligibilityBypassLogged = true;
+                    spdlog::info(
+                        "VR R23: BeginScene culling-camera/head pose held stock until common host-fresh + verified-baseline eligibility is true");
+                }
+            }
+            return result;
+        }
 
         HRESULT __stdcall SetVertexShaderConstantFDestR23(
             IDirect3DDevice9* device, UINT startRegister,
@@ -34,9 +71,10 @@ namespace OutRunVRRenderer
             if (candidateWvp && !OutRunVR::RuntimeEligibility::MayInjectStereo())
             {
                 // One authority for host freshness and recovery: keep the stock
-                // game matrix and invalidate any previously verified WVP so R7
-                // cannot classify a later draw as head-tracked world geometry.
-                InvalidateVerifiedWvp();
+                // game matrix, restore any culling-camera override and invalidate
+                // verified WVP state so R7 cannot classify a later draw as a
+                // head-tracked world draw.
+                R23DropIneligibleLatchedPose();
                 ++R23EligibilityBypasses;
                 if (!R23FirstEligibilityBypassLogged)
                 {
@@ -58,36 +96,59 @@ namespace OutRunVRRenderer
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
                 if (RendererInstallState.load(std::memory_order_acquire) == RendererInstallFailed)
+                {
+                    RendererInjectionAllowed.store(false, std::memory_order_release);
+                    R23DropIneligibleLatchedPose();
                     return 0;
+                }
 
                 if (RendererInstallState.load(std::memory_order_acquire) == RendererInstallReady &&
                     R13WvpHookReady.load(std::memory_order_acquire))
                 {
+                    // Guard BeginScene first. If the WVP wrapper later fails,
+                    // retain the BeginScene guard with injection disabled so the
+                    // culling camera still fails closed.
+                    R23BeginSceneEligibilityHook = safetyhook::create_inline(
+                        reinterpret_cast<void*>(&BeginSceneDest), BeginSceneDestR23,
+                        safetyhook::InlineHook::StartDisabled);
+                    const bool beginEnabled = R23BeginSceneEligibilityHook &&
+                        R23BeginSceneEligibilityHook.enable().has_value();
+                    if (!beginEnabled)
+                    {
+                        R23BeginSceneEligibilityHook = {};
+                        RendererInjectionAllowed.store(false, std::memory_order_release);
+                        R23DropIneligibleLatchedPose();
+                        spdlog::error(
+                            "VR R23: failed to install BeginScene culling eligibility hook; renderer injection disabled fail-closed");
+                        return 0;
+                    }
+
                     R23WvpEligibilityHook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&SetVertexShaderConstantFDestR13),
                         SetVertexShaderConstantFDestR23,
                         safetyhook::InlineHook::StartDisabled);
-                    bool enabled = false;
-                    if (R23WvpEligibilityHook)
-                        enabled = R23WvpEligibilityHook.enable().has_value();
-                    if (!enabled)
+                    const bool wvpEnabled = R23WvpEligibilityHook &&
+                        R23WvpEligibilityHook.enable().has_value();
+                    if (!wvpEnabled)
                     {
                         R23WvpEligibilityHook = {};
                         RendererInjectionAllowed.store(false, std::memory_order_release);
-                        InvalidateVerifiedWvp();
+                        R23DropIneligibleLatchedPose();
                         spdlog::error(
-                            "VR R23: failed to install common WVP eligibility hook; injection disabled fail-closed");
+                            "VR R23: failed to install common WVP eligibility hook; injection disabled while BeginScene culling guard remains active");
                         return 0;
                     }
+
                     R23WvpEligibilityReady.store(true, std::memory_order_release);
+                    RendererInjectionAllowed.store(true, std::memory_order_release);
                     spdlog::info(
-                        "VR R23 RENDERER: WVP injection now consumes the same 250ms host freshness + recovery-baseline gate as stereo replay");
+                        "VR R23 RENDERER: WVP injection + BeginScene culling camera now consume the same 250ms host freshness + recovery-baseline gate");
                     return 0;
                 }
                 Sleep(25);
             }
             RendererInjectionAllowed.store(false, std::memory_order_release);
-            InvalidateVerifiedWvp();
+            R23DropIneligibleLatchedPose();
             return 0;
         }
 
@@ -101,12 +162,18 @@ namespace OutRunVRRenderer
             bool validate() override { return true; }
             bool apply() override
             {
+                // The final eligibility wrapper installs asynchronously. Close
+                // base WVP injection synchronously so no early c64 upload can
+                // escape before the R23 transaction is armed.
+                RendererInjectionAllowed.store(false, std::memory_order_release);
+                R23DropIneligibleLatchedPose();
+
                 HANDLE thread = CreateThread(nullptr, 0, R23RendererInstallThread,
                     nullptr, 0, nullptr);
                 if (!thread)
                 {
                     RendererInjectionAllowed.store(false, std::memory_order_release);
-                    InvalidateVerifiedWvp();
+                    R23DropIneligibleLatchedPose();
                     return false;
                 }
                 CloseHandle(thread);

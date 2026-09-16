@@ -122,8 +122,16 @@ namespace OutRunVRStereo
                     --R22InternalReplayDepth;
                 if (outer)
                 {
-                    if (R22GameScissor.valid)
-                        R22ApplyGameScissor(device, R22GameScissor);
+                    if (R22GameScissor.valid &&
+                        !R22ApplyGameScissor(device, R22GameScissor))
+                    {
+                        // Final scope restoration is as authoritative as the
+                        // per-viewport replay restoration. Never leave the
+                        // common gate open after an unknown scissor state.
+                        R20CancelInitialSeed(device);
+                        R9MonoBackupGap = true;
+                        NoteRestoreFailure("R22 final scissor restore");
+                    }
                     R22GameScissor = {};
                 }
             }
