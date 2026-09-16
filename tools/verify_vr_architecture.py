@@ -169,8 +169,9 @@ if installer_start >= 0 and installer_end > installer_start:
 require(
     "src/vr/d3d9/stereo_renderer_r20.cpp",
     "R20InstallState",
-    "InstallState::Pending",
-    "InstallState::Failed",
+    "using State = OutRunVR::RuntimeEligibility::InstallState",
+    "State::Pending",
+    "State::Failed",
     "InlineHook::StartDisabled",
 )
 require(
