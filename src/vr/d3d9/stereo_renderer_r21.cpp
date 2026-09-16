@@ -15,7 +15,8 @@ namespace OutRunVRStereo
             OutRunVR::RuntimeEligibility::HostStaleMs;
 
         SafetyHookInline R21PresentR9Hook{};
-        std::atomic<bool> R21PresentGuardReady{false};
+        std::atomic<OutRunVR::RuntimeEligibility::InstallState> R21InstallState{
+            OutRunVR::RuntimeEligibility::InstallState::Pending };
         bool R21HostFailClosed = true;
         std::uint32_t R21LastHealthyHostPid = 0;
 
@@ -49,8 +50,6 @@ namespace OutRunVRStereo
                 SharedState->structSize != sizeof(OutRunVR::SharedPoseState))
                 return false;
 
-            // Raw values are diagnostics only. Only a stable even sequence may
-            // reopen HostFresh; an odd/stuck writer always fails closed.
             hostPid = SharedState->hostPid;
             flags = SharedState->flags;
             heartbeat = SharedState->heartbeat;
@@ -107,9 +106,6 @@ namespace OutRunVRStereo
 
                 if (R21HostFailClosed)
                 {
-                    // Never carry a pre-stall seed into recovery. Host freshness
-                    // alone is insufficient: R20 must observe a new validated
-                    // color/depth baseline before StereoAllowed becomes true.
                     R9StereoSeeded = false;
                     R9MonoSeeded = false;
                     R9MonoBackupGap = false;
@@ -131,9 +127,6 @@ namespace OutRunVRStereo
             OutRunVR::RuntimeEligibility::FailClosed();
             R20StereoEligibilityGate.store(false, std::memory_order_release);
 
-            // If this frame already owns a complete mono shadow, let R9 restore
-            // it. Otherwise cancel both seeds so an incomplete shadow is never
-            // copied over the real game backbuffer.
             if (R9MonoSeeded && !R9MonoBackupGap)
                 R9StereoSeeded = false;
             else
@@ -166,6 +159,8 @@ namespace OutRunVRStereo
 
         DWORD WINAPI R21GameInstallThread(void*)
         {
+            using State = OutRunVR::RuntimeEligibility::InstallState;
+            R21InstallState.store(State::Pending, std::memory_order_release);
             OutRunVR::RuntimeEligibility::FailClosed();
             R20StereoEligibilityGate.store(false, std::memory_order_release);
 
@@ -174,34 +169,43 @@ namespace OutRunVRStereo
                 const std::uint32_t r9 = R9InstallState.load(std::memory_order_acquire);
                 const std::uint32_t r13 = R13InstallState.load(std::memory_order_acquire);
 
-                if (r9 == R9InstallFailed || r13 == R13InstallFailed)
+                if (r9 == R9InstallFailed || r13 == R13InstallFailed ||
+                    OutRunVR::RuntimeEligibility::IsFailed(R20InstallState))
                 {
+                    R21InstallState.store(State::Failed, std::memory_order_release);
                     spdlog::error(
-                        "VR R21: base R9/R13 transaction failed; host-death Present guard not installed");
+                        "VR R21: prerequisite R9/R13/R20 transaction failed; host-death Present guard not installed");
                     return 0;
                 }
 
-                if (r9 == R9InstallReady && r13 == R13InstallReady)
+                if (r9 == R9InstallReady && r13 == R13InstallReady &&
+                    OutRunVR::RuntimeEligibility::IsReady(R20InstallState))
                 {
                     R21PresentR9Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&PresentDestR9), PresentDestR21);
-                    if (!R21PresentR9Hook)
+                        reinterpret_cast<void*>(&PresentDestR9), PresentDestR21,
+                        safetyhook::InlineHook::StartDisabled);
+                    const bool enabled = R21PresentR9Hook &&
+                        R21PresentR9Hook.enable().has_value();
+                    if (!enabled)
                     {
+                        R21PresentR9Hook = {};
+                        R21InstallState.store(State::Failed, std::memory_order_release);
                         spdlog::error(
-                            "VR R21: failed to hook R9 Present for host-death fail-closed guard");
+                            "VR R21: failed to enable R9 Present host-death guard transaction");
                         return 0;
                     }
-                    R21PresentGuardReady.store(true, std::memory_order_release);
+                    R21InstallState.store(State::Ready, std::memory_order_release);
                     spdlog::info(
-                        "VR R21/R23 GAME: common host freshness gate ACTIVE threshold={}ms; recovery requires a new verified baseline",
+                        "VR R21/R23 GAME: common host freshness gate ACTIVE threshold={}ms; disabled-first transaction READY; recovery requires a new verified baseline",
                         R21HostStaleMs);
                     return 0;
                 }
                 Sleep(25);
             }
 
+            R21InstallState.store(State::Failed, std::memory_order_release);
             spdlog::warn(
-                "VR R21: timed out waiting for R9/R13 renderer transaction; host-death guard not installed");
+                "VR R21: timed out waiting for prerequisite renderer transactions; host-death guard FAILED");
             return 0;
         }
 
@@ -217,10 +221,13 @@ namespace OutRunVRStereo
 
             bool apply() override
             {
+                using State = OutRunVR::RuntimeEligibility::InstallState;
+                R21InstallState.store(State::Pending, std::memory_order_release);
                 HANDLE thread = CreateThread(
                     nullptr, 0, R21GameInstallThread, nullptr, 0, nullptr);
                 if (!thread)
                 {
+                    R21InstallState.store(State::Failed, std::memory_order_release);
                     spdlog::error(
                         "VR R21: failed to create host-death guard installer thread: {}",
                         GetLastError());
