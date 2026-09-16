@@ -24,6 +24,7 @@ jobs:
           $r24 = Get-Content vrhost/src/runtime/r24_black_screen_guard.hpp -Raw
           $bundle = Get-Content vrhost/src/runtime/r23_verified_bundle.hpp -Raw
           $wait = Get-Content vrhost/src/runtime/bounded_swapchain_wait.hpp -Raw
+          $captureWait = Get-Content vrhost/src/runtime/capture_wait_guard.hpp -Raw
           $main = Get-Content vrhost/src/main_r23.cpp -Raw
           $crash = Get-Content vrhost/src/runtime/r21_crash_diagnostics.hpp -Raw
           if (-not $r21.Contains('ReadDirectHostStateReadonly')) { throw 'readonly direct-state reader missing' }
@@ -34,7 +35,10 @@ jobs:
           foreach ($marker in @(
             'R24-visible-fallback-final-20260916',
             'DisplayOnlyGraceMs = 500',
+            'RenderSafeProjectionChecked',
             'TrySubmitDirectSafeProjection',
+            'RenderDirectFlatFallback',
+            'BuildEmergencyVisibleQuad',
             'SubmitVisibleFallback',
             'RenderTheaterOverride',
             'BuildCachedVisibleQuad'
@@ -43,6 +47,8 @@ jobs:
           }
           if (-not $wait.Contains('SliceNs = 20')) { throw 'bounded wait slice missing' }
           if (-not $wait.Contains('TotalBudgetMs = 250')) { throw 'bounded wait budget missing' }
+          if (-not $captureWait.Contains('MaxAcquireWaitMs = 2')) { throw 'desktop capture wait clamp missing' }
+          if (-not $captureWait.Contains('ClampDesktopDuplicationWait')) { throw 'desktop capture wait guard missing' }
           if (-not $bundle.Contains('OutRunVR::SharedRenderFrameState frame')) { throw 'verified full frame snapshot missing' }
           if (-not $bundle.Contains('MaxPresentationAgeMs = 250')) { throw 'verified bundle TTL missing' }
           if (-not $bundle.Contains('publishedAtMs')) { throw 'verified bundle commit time missing' }
@@ -58,6 +64,7 @@ jobs:
           if (-not $cmake.Contains('main_r23.cpp')) { throw 'verified host entry point not selected' }
           if (-not $cmake.Contains('r24_black_screen_guard.hpp')) { throw 'R24 final owner not forced into host' }
           if (-not $cmake.Contains('bounded_swapchain_wait.hpp')) { throw 'bounded wait guard not forced into host' }
+          if (-not $cmake.Contains('capture_wait_guard.hpp')) { throw 'desktop capture wait guard not forced into host' }
 
       - name: Verify architecture boundaries
         run: python tools/verify_vr_architecture.py
@@ -101,7 +108,9 @@ jobs:
             'R24-visible-fallback-final-20260916',
             '[R24] exact committed classic projection submitted directly',
             '[R24] DirectGPU final submit uses host-owned SafeEye',
-            '[R24] cached released OpenXR image preserved visibility while stereo recovers',
+            '[R24] last successfully released OpenXR image preserved visibility while stereo recovers',
+            '[R24] host-owned Direct SafeEye shown as a flat view while stereo projection recovers',
+            '[R24] emergency visible quad submitted because no game image was safely displayable',
             'xrWaitSwapchainImage exceeded 250ms',
             '[R23 pixel]',
             'R23-crash-text-first-20260916'
