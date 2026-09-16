@@ -33,8 +33,10 @@
 
 namespace OutRunVrR24BlackScreenGuard
 {
+    // Keep the production marker stable because release CI and field logs use it
+    // to prove that the final R24 owner is present in the shipped host binary.
     inline constexpr const char* BuildId =
-        "R24-black-screen-recovery-20260916";
+        "R24-visible-fallback-final-20260916";
     inline constexpr ULONGLONG DisplayOnlyGraceMs = 500;
 
     inline std::uint64_t ExactProjectionSubmits = 0;
@@ -455,7 +457,7 @@ namespace OutRunVrR24BlackScreenGuard
             {
                 FirstLiveTheaterLogged = true;
                 std::cerr
-                    << "[R24] live theater fallback replaced an unsafe/absent gameplay projection reason="
+                    << "[R24] live theater fallback replaced an unsafe/absent gameplay projection instead of submitting black reason="
                     << reason << " build=" << BuildId << "\n";
             }
         }
