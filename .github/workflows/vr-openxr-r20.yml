@@ -67,12 +67,12 @@ jobs:
             'VR stereo: D3D9 full-eye renderer installed',
             'VR stereo: TRUE GEOMETRY STEREO active',
             'VR R13: stereo hardening ACTIVE',
-            'VR R20 PRODUCTION: first stereo seed (legacy or relaxed) requires current-generation Z/stencil clears with no intervening draw',
+            'VR R20 PRODUCTION: first stereo seed requires current-generation Z/stencil clears; disabled-first bootstrap transaction READY',
             'VR R21/R23 GAME: common host freshness gate ACTIVE',
-            'VR R22 GAME: scissor-preserving mono/right replay + common initial depth baseline + R21 eligibility gate ACTIVE',
-            'VR R22 REVIEW: Reset recovery gate + unsafe-seed common rollback + replay-state capture fail-closed ACTIVE',
-            'VR R23 GAME: R22 scissor/state policy retained; recovery-clear-only baseline reopening guard ACTIVE',
-            'VR R23 RENDERER: WVP injection now consumes the same 250ms host freshness + recovery-baseline gate as stereo replay',
+            'VR R22 GAME: shadow-tracked viewport/scissor replay + common initial depth baseline + R21 eligibility gate ACTIVE',
+            'VR R22 REVIEW: disabled-first transaction READY; per-draw GetViewport/GetScissorRect/GetRenderState eliminated after initial state prime',
+            'VR R23 GAME: R22 shadow-state policy retained; recovery-clear-only baseline reopening guard ACTIVE; safety overlay transaction READY',
+            'VR R23 RENDERER: early BeginScene/WVP guards READY; fail-closed cleanup is render-thread-owned',
             'VR R21 FAIL-CLOSED:',
             'VR v3 shadow: live dual-protocol diagnostics active'
           )) {
