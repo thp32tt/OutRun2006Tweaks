@@ -139,10 +139,12 @@ namespace OutRunVR::PassPolicy
     // passes independently for both eyes can produce torn shadows, crossed
     // billboards or visibly different panel quads in the SBS transport.
     //
-    // Keep opaque, depth-writing geometry in true stereo. Fragile translucent
-    // passes (blend on + depth writes off) and two-sided alpha billboard/cutout
-    // passes are replayed to both eyes with the stock game WVP instead. This is
-    // zero-disparity, not single-eye: both SBS halves receive the same object.
+    // Do not demote a draw from a single alpha-blend signal. Real world geometry
+    // can legitimately blend while remaining spatially 3D. Zero-disparity now
+    // requires the corroborating two-sided (cull-none) signal plus either a
+    // translucent no-Z-write pass or an alpha-tested cutout pass. This retains
+    // the shadow/billboard safety behavior without allowing an unexpectedly
+    // broad alpha state to remove every true-world draw from a frame.
     enum class EffectStereoPolicy : std::uint8_t
     {
         WorldStereo,
@@ -155,9 +157,10 @@ namespace OutRunVR::PassPolicy
         bool depthWriteEnabled,
         bool cullNone) noexcept
     {
-        if (alphaBlendEnabled && !depthWriteEnabled)
-            return EffectStereoPolicy::ZeroDisparity;
-        if (cullNone && (alphaBlendEnabled || alphaTestEnabled))
+        const bool twoSidedTranslucent =
+            cullNone && alphaBlendEnabled && !depthWriteEnabled;
+        const bool twoSidedCutout = cullNone && alphaTestEnabled;
+        if (twoSidedTranslucent || twoSidedCutout)
             return EffectStereoPolicy::ZeroDisparity;
         return EffectStereoPolicy::WorldStereo;
     }
@@ -236,6 +239,8 @@ namespace OutRunVR::PassPolicy
     static_assert(ClassifyEffectStereo(false, false, true, false) ==
         EffectStereoPolicy::WorldStereo);
     static_assert(ClassifyEffectStereo(true, false, false, false) ==
+        EffectStereoPolicy::WorldStereo);
+    static_assert(ClassifyEffectStereo(true, false, false, true) ==
         EffectStereoPolicy::ZeroDisparity);
     static_assert(ClassifyEffectStereo(false, true, true, true) ==
         EffectStereoPolicy::ZeroDisparity);
