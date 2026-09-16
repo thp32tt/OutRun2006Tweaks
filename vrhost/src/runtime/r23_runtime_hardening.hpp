@@ -17,6 +17,7 @@
 #endif
 
 #include <d3d9types.h>
+#include <array>
 #include <atomic>
 #include <cmath>
 #include <iostream>
@@ -30,6 +31,7 @@ namespace OutRunVrR23RuntimeHardening
     inline bool FirstFallbackSourceMismatchLogged = false;
     inline bool FirstDirectSafeReuseLogged = false;
     inline bool FirstDirectFormatMismatchLogged = false;
+    inline bool FirstMixedLayerBlockLogged = false;
 
     inline std::atomic<std::uint32_t> LastSubmittedFrameId{ 0 };
     inline std::atomic<std::uint32_t> LastSubmittedKind{
@@ -55,6 +57,45 @@ namespace OutRunVrR23RuntimeHardening
         XrFrameEndInfo safe = *endInfo;
         safe.layerCount = 0;
         safe.layers = nullptr;
+        return OutRunVrFinalTest::EndFrame(session, &safe);
+    }
+
+    inline bool IncomingContainsProjectionLayer(
+        const XrFrameEndInfo* endInfo) noexcept
+    {
+        if (!endInfo || !endInfo->layers)
+            return false;
+        for (std::uint32_t i = 0; i < endInfo->layerCount; ++i)
+        {
+            const auto* layer = endInfo->layers[i];
+            if (layer && layer->type == XR_TYPE_COMPOSITION_LAYER_PROJECTION)
+                return true;
+        }
+        return false;
+    }
+
+    inline XrResult SubmitNonProjectionOnly(XrSession session,
+        const XrFrameEndInfo* endInfo) noexcept
+    {
+        if (!endInfo || !endInfo->layers)
+            return SubmitNoLayer(session, endInfo);
+
+        constexpr std::size_t MaxPreservedLayers = 16;
+        std::array<const XrCompositionLayerBaseHeader*, MaxPreservedLayers> layers{};
+        std::uint32_t count = 0;
+        for (std::uint32_t i = 0; i < endInfo->layerCount; ++i)
+        {
+            const auto* layer = endInfo->layers[i];
+            if (!layer || layer->type == XR_TYPE_COMPOSITION_LAYER_PROJECTION)
+                continue;
+            if (count >= layers.size())
+                return SubmitNoLayer(session, endInfo);
+            layers[count++] = layer;
+        }
+
+        XrFrameEndInfo safe = *endInfo;
+        safe.layerCount = count;
+        safe.layers = count ? layers.data() : nullptr;
         return OutRunVrFinalTest::EndFrame(session, &safe);
     }
 
@@ -212,11 +253,25 @@ namespace OutRunVrR23RuntimeHardening
                 << OutRunVrR23VerifiedBundle::MaxPresentationAgeMs << "ms\n";
         }
 
-        if (OutRunVrReviewHardening::HasIncomingNonProjectionLayer(endInfo))
+        const bool hasNonProjection =
+            OutRunVrReviewHardening::HasIncomingNonProjectionLayer(endInfo);
+        const bool hasProjection = IncomingContainsProjectionLayer(endInfo);
+        if (hasNonProjection && !hasProjection)
         {
             RecordFinalSubmission(0, SourceKind::None,
                 endInfo && endInfo->layerCount > 0);
             return OutRunVrFinalTest::EndFrame(session, endInfo);
+        }
+        if (hasNonProjection && hasProjection)
+        {
+            if (!FirstMixedLayerBlockLogged)
+            {
+                FirstMixedLayerBlockLogged = true;
+                std::cerr
+                    << "[R23] mixed projection/non-projection frame detected; dropping unverified projection while preserving non-projection layers\n";
+            }
+            RecordFinalSubmission(0, SourceKind::None, true);
+            return SubmitNonProjectionOnly(session, endInfo);
         }
 
         if (!OutRunVrR21RuntimeHardening::HostShouldRenderReadonly())
