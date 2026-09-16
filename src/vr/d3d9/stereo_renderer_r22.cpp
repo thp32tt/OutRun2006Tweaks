@@ -50,6 +50,7 @@ namespace OutRunVRStereo
         thread_local R22ScissorSnapshot R22GameScissor{};
         thread_local R22ScissorSnapshot R22ShadowState{};
         thread_local std::uint32_t R22InternalReplayDepth = 0;
+        thread_local bool R22InternalViewportTouched = false;
 
         std::uint64_t R22DepthClearEpoch = 0;
         std::uint64_t R22DepthClearDrawSerial = 0;
@@ -150,7 +151,10 @@ namespace OutRunVRStereo
             {
                 outer = R22InternalReplayDepth++ == 0;
                 if (outer)
+                {
+                    R22InternalViewportTouched = false;
                     stateValid = R22SnapshotShadowedGameState(device, R22GameScissor);
+                }
                 else
                     stateValid = R22GameScissor.Valid();
             }
@@ -161,13 +165,32 @@ namespace OutRunVRStereo
                     --R22InternalReplayDepth;
                 if (outer)
                 {
-                    if (R22GameScissor.Valid() &&
-                        !R22ApplyGameScissor(device, R22GameScissor))
+                    bool restored = true;
+                    if (R22GameScissor.Valid())
+                    {
+                        // SetViewportDestR22 intentionally restores only scissor state
+                        // while an internal eye pass is active. Restoring the viewport
+                        // there would immediately undo the eye-specific viewport and can
+                        // recurse through the detour. Once the complete outer replay has
+                        // returned, use the SafetyHook trampoline to restore the game's
+                        // original viewport without re-entering SetViewportDestR22.
+                        if (R22InternalViewportTouched &&
+                            (!R22SetViewportHook ||
+                             FAILED(R22SetViewportHook.stdcall<HRESULT>(
+                                 device, &R22GameScissor.viewport))))
+                        {
+                            restored = false;
+                        }
+                        if (!R22ApplyGameScissor(device, R22GameScissor))
+                            restored = false;
+                    }
+                    if (!restored)
                     {
                         R20CancelInitialSeed(device);
                         R9MonoBackupGap = true;
-                        NoteRestoreFailure("R22 final scissor restore");
+                        NoteRestoreFailure("R22 final viewport/scissor restore");
                     }
+                    R22InternalViewportTouched = false;
                     R22GameScissor = {};
                 }
             }
@@ -200,9 +223,11 @@ namespace OutRunVRStereo
                     R22ShadowState.viewportValid = true;
                 }
                 else if (InternalStereoPass && R22InternalReplayDepth &&
-                    R22GameScissor.Valid() && !R22ApplyGameScissor(device, R22GameScissor))
+                    R22GameScissor.Valid())
                 {
-                    NoteRestoreFailure("R22 scissor replay");
+                    R22InternalViewportTouched = true;
+                    if (!R22ApplyGameScissor(device, R22GameScissor))
+                        NoteRestoreFailure("R22 scissor replay");
                 }
             }
             return hr;
@@ -597,6 +622,8 @@ namespace OutRunVRStereo
                         "VR R22 GAME: shadow-tracked viewport/scissor replay + common initial depth baseline + R21 eligibility gate ACTIVE");
                     spdlog::info(
                         "VR R22 REVIEW: disabled-first transaction READY; per-draw GetViewport/GetScissorRect/GetRenderState eliminated after initial state prime");
+                    spdlog::info(
+                        "VR R24 GAME FIX: internal stereo viewport touches restore the game viewport at outer replay exit");
                     return 0;
                 }
                 Sleep(25);
