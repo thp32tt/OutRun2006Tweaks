@@ -14,11 +14,14 @@ namespace OutRunVRRenderer
         std::uint64_t R13ScreenSpaceWvpBypasses = 0;
         std::uint64_t R13UnknownProjectionWvpBypasses = 0;
         std::uint64_t R13PolicyMismatchBypasses = 0;
+        std::uint64_t R13FragileEffectWvpBypasses = 0;
         bool R13FirstOffscreenBypassLogged = false;
         bool R13FirstScreenSpaceBypassLogged = false;
         bool R13FirstUnknownProjectionLogged = false;
         bool R13FirstPolicyMismatchLogged = false;
         bool R13FirstPerspectiveWorldLogged = false;
+        bool R13FirstFragileEffectLogged = false;
+        bool R13FirstFragileStateReadFailureLogged = false;
 
         OutRunVR::PassPolicy::RenderSemantic R13CurrentRenderSemantic(
             float& projectionM34, float& projectionM44) noexcept
@@ -53,6 +56,40 @@ namespace OutRunVRRenderer
 
             return OutRunVR::PassPolicy::ClassifyRenderSemanticChecked(
                 targetPolicy, mainBackbufferPosePass, projectionClass);
+        }
+
+        bool R13FragileEffectNeedsZeroDisparity(IDirect3DDevice9* device) noexcept
+        {
+            if (!device)
+                return false;
+
+            DWORD alphaBlend = FALSE;
+            DWORD alphaTest = FALSE;
+            DWORD zWrite = TRUE;
+            DWORD cullMode = D3DCULL_CCW;
+            if (FAILED(device->GetRenderState(D3DRS_ALPHABLENDENABLE, &alphaBlend)) ||
+                FAILED(device->GetRenderState(D3DRS_ALPHATESTENABLE, &alphaTest)) ||
+                FAILED(device->GetRenderState(D3DRS_ZWRITEENABLE, &zWrite)) ||
+                FAILED(device->GetRenderState(D3DRS_CULLMODE, &cullMode)))
+            {
+                // A failed state read is not enough evidence to demote all world
+                // geometry. Keep the existing world classifier authoritative,
+                // but leave a diagnostic breadcrumb for hardware testing.
+                if (!R13FirstFragileStateReadFailureLogged)
+                {
+                    R13FirstFragileStateReadFailureLogged = true;
+                    spdlog::warn(
+                        "VR R13 effect policy: render-state snapshot unavailable; retaining normal world-stereo classification");
+                }
+                return false;
+            }
+
+            const auto policy = OutRunVR::PassPolicy::ClassifyEffectStereo(
+                alphaBlend != FALSE,
+                alphaTest != FALSE,
+                zWrite != FALSE,
+                cullMode == D3DCULL_NONE);
+            return !OutRunVR::PassPolicy::AllowsEffectWorldStereo(policy);
         }
 
         HRESULT __stdcall SetVertexShaderConstantFDestR13(
@@ -140,6 +177,27 @@ namespace OutRunVRRenderer
                         device, startRegister, constantData, vector4fCount);
                 }
 
+                // Projected shadows and camera-facing alpha panels are prepared
+                // against OutRun's stock camera. Applying an HMD WVP to them can
+                // make the SBS halves disagree even though the opaque world is
+                // correct. Keep these fragile effect classes zero-disparity by
+                // deliberately preventing this WVP upload from becoming the
+                // verified world draw. ExecuteStereoDraw will still replay the
+                // object to BOTH eyes with the unmodified game WVP.
+                if (R13FragileEffectNeedsZeroDisparity(device))
+                {
+                    InvalidateVerifiedWvp();
+                    ++R13FragileEffectWvpBypasses;
+                    if (!R13FirstFragileEffectLogged)
+                    {
+                        R13FirstFragileEffectLogged = true;
+                        spdlog::info(
+                            "VR R13 effect policy: translucent shadow/billboard/panel pass kept stock and duplicated zero-disparity in both SBS eyes");
+                    }
+                    return SetVertexShaderConstantFHook.stdcall<HRESULT>(
+                        device, startRegister, constantData, vector4fCount);
+                }
+
                 if (!R13FirstPerspectiveWorldLogged)
                 {
                     R13FirstPerspectiveWorldLogged = true;
@@ -186,7 +244,7 @@ namespace OutRunVRRenderer
                     {
                         R13WvpHookReady.store(true, std::memory_order_release);
                         spdlog::info(
-                            "VR R13: renderer WVP target+projection classification guard armed via atomic renderer install handoff; disabled-first trampoline publish complete");
+                            "VR R13: renderer WVP target+projection+effect classification guard armed via atomic renderer install handoff; disabled-first trampoline publish complete");
                     }
                     else
                     {
