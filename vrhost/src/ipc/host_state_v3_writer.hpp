@@ -22,44 +22,51 @@ namespace OutRunVR::Host
             if (!mapping_)
                 throw std::runtime_error("CreateFileMappingW HostState.v3 failed");
 
-            const bool existed = GetLastError() == ERROR_ALREADY_EXISTS;
-            state_ = static_cast<IpcV3::HostState*>(MapViewOfFile(
-                mapping_, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(IpcV3::HostState)));
-            if (!state_)
+            try
             {
-                CloseHandle(mapping_);
-                mapping_ = nullptr;
-                throw std::runtime_error("MapViewOfFile HostState.v3 failed");
-            }
+                const bool existed = GetLastError() == ERROR_ALREADY_EXISTS;
+                state_ = static_cast<IpcV3::HostState*>(MapViewOfFile(
+                    mapping_, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(IpcV3::HostState)));
+                if (!state_)
+                    throw std::runtime_error("MapViewOfFile HostState.v3 failed");
 
-            if (!existed)
+                if (!existed)
+                {
+                    std::memset(state_, 0, sizeof(*state_));
+                    state_->version = IpcV3::ProtocolVersion;
+                    state_->structSize = sizeof(*state_);
+                    MemoryBarrier();
+                    state_->magic = IpcV3::HostMagic;
+                }
+                else
+                {
+                    for (int i = 0; i < 200 && !HeaderValid(*state_); ++i)
+                        Sleep(10);
+                    if (!HeaderValid(*state_))
+                        throw std::runtime_error("existing HostState.v3 mapping is not ready");
+                }
+
+                AcquireOwnership();
+                referenceSpaceGeneration_ = state_->referenceSpaceGeneration + 1u;
+                if (referenceSpaceGeneration_ == 0)
+                    referenceSpaceGeneration_ = 1;
+
+                IpcV3::HostState initial{};
+                IpcV3::InitializeWireState(initial);
+                initial.hostPid = GetCurrentProcessId();
+                initial.referenceSpaceGeneration = referenceSpaceGeneration_;
+                initial.adapterLuidLow = adapterLuidLow_;
+                initial.adapterLuidHigh = adapterLuidHigh_;
+                Publish(initial);
+            }
+            catch (...)
             {
-                std::memset(state_, 0, sizeof(*state_));
-                state_->version = IpcV3::ProtocolVersion;
-                state_->structSize = sizeof(*state_);
-                MemoryBarrier();
-                state_->magic = IpcV3::HostMagic;
+                // A constructor that throws never runs this object's destructor.
+                // Release the mapped view/handle here so ownership/header races
+                // cannot leak a named mapping until process exit.
+                Reset(false);
+                throw;
             }
-            else
-            {
-                for (int i = 0; i < 200 && !HeaderValid(*state_); ++i)
-                    Sleep(10);
-                if (!HeaderValid(*state_))
-                    throw std::runtime_error("existing HostState.v3 mapping is not ready");
-            }
-
-            AcquireOwnership();
-            referenceSpaceGeneration_ = state_->referenceSpaceGeneration + 1u;
-            if (referenceSpaceGeneration_ == 0)
-                referenceSpaceGeneration_ = 1;
-
-            IpcV3::HostState initial{};
-            IpcV3::InitializeWireState(initial);
-            initial.hostPid = GetCurrentProcessId();
-            initial.referenceSpaceGeneration = referenceSpaceGeneration_;
-            initial.adapterLuidLow = adapterLuidLow_;
-            initial.adapterLuidHigh = adapterLuidHigh_;
-            Publish(initial);
         }
 
         HostStateV3Writer(const HostStateV3Writer&) = delete;
@@ -67,24 +74,7 @@ namespace OutRunVR::Host
 
         ~HostStateV3Writer()
         {
-            if (state_)
-            {
-                if (owns_ && state_->hostPid == GetCurrentProcessId())
-                {
-                    const std::uint32_t odd = Ipc::BeginSeqlockWrite(state_->sequence);
-                    state_->sequence = odd;
-                    state_->flags = 0;
-                    state_->hostPid = 0;
-                    Ipc::EndSeqlockWrite(state_->sequence);
-                }
-                UnmapViewOfFile(state_);
-                state_ = nullptr;
-            }
-            if (mapping_)
-            {
-                CloseHandle(mapping_);
-                mapping_ = nullptr;
-            }
+            Reset(true);
         }
 
         void ReferenceSpaceChanged() noexcept
@@ -179,6 +169,30 @@ namespace OutRunVR::Host
                 Sleep(1);
             }
             throw std::runtime_error("failed to acquire HostState.v3 ownership");
+        }
+
+        void Reset(bool publishDead) noexcept
+        {
+            if (state_)
+            {
+                if (publishDead && owns_ &&
+                    state_->hostPid == GetCurrentProcessId())
+                {
+                    const std::uint32_t odd = Ipc::BeginSeqlockWrite(state_->sequence);
+                    state_->sequence = odd;
+                    state_->flags = 0;
+                    state_->hostPid = 0;
+                    Ipc::EndSeqlockWrite(state_->sequence);
+                }
+                UnmapViewOfFile(state_);
+                state_ = nullptr;
+            }
+            if (mapping_)
+            {
+                CloseHandle(mapping_);
+                mapping_ = nullptr;
+            }
+            owns_ = false;
         }
 
         HANDLE mapping_ = nullptr;
