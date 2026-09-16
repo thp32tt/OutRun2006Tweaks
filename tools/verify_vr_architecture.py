@@ -147,14 +147,16 @@ require(
 )
 
 # R23 installer workers may only request cleanup. Live OutRun camera/projection
-# writes are serviced from D3D render callbacks.
+# writes are serviced from D3D render callbacks; recovery pose warmup keeps the
+# stock camera/WVP visible until the next-frame authoritative seed is accepted.
 renderer_r23 = require(
     "src/vr/game/outrun_renderer_r23.cpp",
     "R23RenderThreadCleanupRequested",
     "R23RequestFailClosedCleanup",
     "R23ServiceRenderThreadCleanup",
     "R23DropIneligibleLatchedPoseOnRenderThread",
-    "fail-closed cleanup is render-thread-owned",
+    "R23KeepWarmupPoseStockOnRenderThread",
+    "recovery pose warmup is stock-visible",
     "RendererInjectionAllowed.store(false",
 )
 installer_start = renderer_r23.find("DWORD WINAPI R23RendererInstallThread")
@@ -190,14 +192,23 @@ require(
     "InlineHook::StartDisabled",
     "per-draw GetViewport/GetScissorRect/GetRenderState eliminated",
 )
+
+# R23/R25 is the single recovery/baseline authority. Recovery Clear must remain
+# a passive original call, while live viewport/scissor, full game draw serial,
+# MRT safety and a fresh next-frame pose gate the first stereo initialization.
 require(
     "src/vr/d3d9/stereo_renderer_r23.cpp",
     "#include \"stereo_renderer_r22.cpp\"",
     "R23InstallState",
     "IsFailed(R22InstallState)",
     "R23RecoveryNeedsBaseline",
+    "R23CaptureActualGameState",
+    "R23GameDrawSerial",
+    "R23DiagnoseHostFreshness",
+    "passive original Clear only",
+    "authoritative first seed",
+    "mrtActive",
     "MarkSafetyOverlayInstalled",
-    "recovery-clear-only baseline reopening guard ACTIVE",
 )
 
 # Async installer status must be publishable back to the hook overlay/UI.
@@ -258,13 +269,18 @@ require(
     "Matches",
 )
 
-# main_r23 must commit only a stable full Frame.v2 snapshot.
+# main_r23 must commit only a stable full Frame.v2 snapshot. If stereo metadata
+# is not ready, it may refresh Desktop Duplication only for the theater fallback;
+# that mono source must never become a validated stereo projection.
 require(
     "vrhost/src/main_r23.cpp",
     "#include \"main.cpp\"",
     "R23FrameUnchanged",
     "R23CommitDirectAfterValidation",
     "R23CommitClassicAfterValidation",
+    "R23RefreshTheaterFallbackCapture",
+    "allowInitialWarmupWait",
+    "theater-only fallback",
     "OutRunVrR23VerifiedBundle::Publish",
     "std::memcmp(after.eye, before.eye",
     "std::memcmp(after.reserved, before.reserved",
@@ -298,4 +314,4 @@ require("src/vr/core/transport.hpp", "class IFrameProducer", "class IFrameConsum
 require("src/vr/game/game_adapter.hpp", "class IGameAdapter", "latchRenderPose", "buildStereoMatrices")
 require("src/vr/d3d9/stereo_backend.hpp", "class IStereoBackend", "drawWorldStereo", "drawScreenSpaceStereo")
 
-print("VR reconstructed R23 architecture boundary verification passed")
+print("VR reconstructed R23/R25 architecture boundary verification passed")

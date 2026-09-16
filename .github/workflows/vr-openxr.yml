@@ -42,7 +42,7 @@ jobs:
       - name: Verify reconstructed VR architecture boundaries
         run: python tools/verify_vr_architecture.py
 
-      - name: Verify R23 review hardening guards
+      - name: Verify R23/R25 review hardening guards
         shell: pwsh
         run: |
           $checks = @{
@@ -73,7 +73,10 @@ jobs:
             'src/vr/d3d9/stereo_renderer_r23.cpp' = @(
               'R23InstallState',
               'IsFailed(R22InstallState)',
-              'recovery-clear-only baseline reopening guard ACTIVE'
+              'R23CaptureActualGameState',
+              'R23GameDrawSerial',
+              'passive original Clear only',
+              'authoritative first seed'
             )
             'src/vr/d3d9/vr_pass_policy.hpp' = @(
               'EffectStereoPolicy',
@@ -88,7 +91,8 @@ jobs:
             'src/vr/game/outrun_renderer_r23.cpp' = @(
               'R23RenderThreadCleanupRequested',
               'R23ServiceRenderThreadCleanup',
-              'fail-closed cleanup is render-thread-owned'
+              'R23KeepWarmupPoseStockOnRenderThread',
+              'recovery pose warmup is stock-visible'
             )
             'src/vr/ipc/v3_game_shadow_bridge.cpp' = @(
               'ShadowIdlePollMs = 8',
@@ -117,6 +121,11 @@ jobs:
               'Release(Projection);',
               'Release(Theater);'
             )
+            'vrhost/src/main_r23.cpp' = @(
+              'R23RefreshTheaterFallbackCapture',
+              'allowInitialWarmupWait',
+              'theater-only fallback'
+            )
             'vrhost/src/runtime/d3d9ex_direct_passthrough.hpp' = @(
               'SafeTransportGeneration',
               'SafeTransportGeneration == generation',
@@ -134,7 +143,7 @@ jobs:
             $text = Get-Content $path -Raw
             foreach ($marker in $checks[$path]) {
               if (-not $text.Contains($marker)) {
-                throw "R23 hardening guard missing: $path :: $marker"
+                throw "R23/R25 hardening guard missing: $path :: $marker"
               }
             }
           }
@@ -191,7 +200,7 @@ jobs:
       - name: Build Win32 VR DLL and v3 contract
         run: cmake --build build-vr-game --config Release
 
-      - name: Verify Win32 R23 binary markers
+      - name: Verify Win32 R23/R25 binary markers
         shell: pwsh
         run: |
           $dllPath = 'build-vr-game/bin/dinput8.dll'
@@ -203,9 +212,9 @@ jobs:
             'VR R13: stereo hardening ACTIVE',
             'VR R13 effect policy: translucent shadow/billboard/panel pass kept stock',
             'VR R22 GAME: shadow-tracked viewport/scissor replay',
-            'VR R23 GAME:',
-            'VR R23 RENDERER:',
-            'fail-closed cleanup is render-thread-owned',
+            'VR R23 GAME: single-owner live-state recovery baseline ACTIVE',
+            'VR R23/R25 BASELINE: authoritative first seed',
+            'VR R23 RENDERER: BeginScene/WVP guards READY; recovery pose warmup is stock-visible',
             'VR v3 shadow: live dual-protocol diagnostics active'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR DLL marker missing: $marker" }
@@ -283,7 +292,7 @@ jobs:
           & 'build-vrhost/bin/outrun-vr-r23-verified-bundle-smoke.exe'
           if ($LASTEXITCODE -ne 0) { throw "R23 verified bundle regression failed: $LASTEXITCODE" }
 
-      - name: Verify x64 R23 host binary
+      - name: Verify x64 R23/R25 host binary
         shell: pwsh
         run: |
           $hostPath = 'build-vrhost/bin/outrun-vr-host.exe'
@@ -298,7 +307,8 @@ jobs:
             '[R23] final presentation authority ACTIVE',
             'direct safe-eye rejected: actual resource format/size',
             'gameplay layer blocked: no fresh committed host-owned frame/source/pose bundle',
-            'host-owned GPU eye copies + completion ACK active'
+            'host-owned GPU eye copies + completion ACK active',
+            '[R23 mono] gameplay stereo pending: bounded Desktop Duplication refresh for theater-only fallback'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR host marker missing: $marker" }
           }

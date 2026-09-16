@@ -55,6 +55,11 @@ namespace
 {
     constexpr ULONGLONG R23PixelIntervalMs = 5000;
     constexpr UINT R23SourceSamples = 8;
+    constexpr DWORD R23TheaterRefreshWaitMs = 2;
+    constexpr ULONGLONG R23TheaterRefreshLogIntervalMs = 5000;
+    std::uint64_t R23TheaterRefreshAttempts = 0;
+    std::uint64_t R23TheaterRefreshFresh = 0;
+    ULONGLONG R23LastTheaterRefreshLogMs = 0;
 
     const char* R23SourceKindName(OutRunVrR23VerifiedBundle::SourceKind kind)
     {
@@ -410,7 +415,8 @@ namespace
 
     R23AsyncPixelProbe R23Pixels{};
 
-    CaptureStatus R23Capture(StereoCompositor& c, DWORD timeoutMs = 0)
+    CaptureStatus R23Capture(StereoCompositor& c, DWORD timeoutMs = 0,
+        bool allowInitialWarmupWait = true)
     {
         R23Pixels.TryConsume(c.context_);
         if (!IsWindow(c.hwnd_))
@@ -425,7 +431,8 @@ namespace
         DXGI_OUTDUPL_FRAME_INFO fi{};
         IDXGIResource* resource = nullptr;
         if (!c.duplication_) return status;
-        const DWORD waitMs = c.haveFrame_ ? timeoutMs : std::max<DWORD>(timeoutMs, 1000);
+        const DWORD waitMs = (c.haveFrame_ || !allowInitialWarmupWait)
+            ? timeoutMs : std::max<DWORD>(timeoutMs, 1000);
         const HRESULT hr = c.duplication_->AcquireNextFrame(waitMs, &fi, &resource);
         if (hr == DXGI_ERROR_WAIT_TIMEOUT) return status;
         if (FAILED(hr) || !resource)
@@ -474,6 +481,35 @@ namespace
                 c.source_, c.outputDesktop_, c.targetMonitor_, c.sdrWhiteScale_,
                 fi.LastPresentTime.QuadPart);
             R23Pixels.ScheduleSource(c);
+        }
+        return status;
+    }
+
+    CaptureStatus R23RefreshTheaterFallbackCapture(StereoCompositor& c)
+    {
+        ++R23TheaterRefreshAttempts;
+        const CaptureStatus status = R23Capture(
+            c, R23TheaterRefreshWaitMs, false);
+        if (status.fresh)
+            ++R23TheaterRefreshFresh;
+
+        const ULONGLONG now = GetTickCount64();
+        if (R23LastTheaterRefreshLogMs == 0 ||
+            now - R23LastTheaterRefreshLogMs >= R23TheaterRefreshLogIntervalMs)
+        {
+            R23LastTheaterRefreshLogMs = now;
+            const ULONGLONG publishedAt =
+                OutRunVrSbsCaptureOverride::LastProductionPublishMs;
+            const long long publishAgeMs = publishedAt && now >= publishedAt
+                ? static_cast<long long>(now - publishedAt) : -1;
+            std::cout
+                << "[R23 mono] gameplay stereo pending: bounded Desktop Duplication refresh for theater-only fallback"
+                << " attempts=" << R23TheaterRefreshAttempts
+                << " fresh=" << R23TheaterRefreshFresh
+                << " available=" << (status.available ? 1 : 0)
+                << " captureQpc=" << status.lastPresentQpc
+                << " publishAgeMs=" << publishAgeMs
+                << " waitMs=" << R23TheaterRefreshWaitMs << "\n";
         }
         return status;
     }
@@ -854,6 +890,7 @@ int main(int argc, char** argv)
             {
                 if (presentation == OutRunVR::PresentationGameplay)
                 {
+                    bool productionCaptureAttempted = false;
                     OutRunVR::SharedRenderFrameState before{};
                     const bool have = renderFrames.Read(before);
                     constexpr std::uint32_t need = OutRunVR::RenderFrameStereoComplete |
@@ -873,6 +910,7 @@ int main(int argc, char** argv)
                             LARGE_INTEGER cs{}, ce{}; QueryPerformanceCounter(&cs);
                             if (!directFrame)
                             {
+                                productionCaptureAttempted = true;
                                 capture = R23Capture(compositor, 2);
                                 candidateReady = capture.available && QpcAtOrAfter(capture.lastPresentQpc, before.presentQpc);
                             }
@@ -911,6 +949,16 @@ int main(int argc, char** argv)
                         layerReady = true;
                     }
                     QueryPerformanceCounter(&re); timings.render.Add(timings.Ms(rs, re));
+
+                    // Keep the desktop source current while stereo is unavailable,
+                    // but never treat this mono capture as a validated projection.
+                    // R24 can consume it only through the theater fallback ladder.
+                    if (!layerReady && !productionCaptureAttempted)
+                    {
+                        LARGE_INTEGER cs{}, ce{}; QueryPerformanceCounter(&cs);
+                        R23RefreshTheaterFallbackCapture(compositor);
+                        QueryPerformanceCounter(&ce); timings.capture.Add(timings.Ms(cs, ce));
+                    }
                 }
                 else
                 {
