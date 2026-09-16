@@ -126,7 +126,7 @@ namespace OutRunVRD3D9ExUpgradeR13
                 device, width, height, levels, usage, format, pool,
                 texture, sharedHandle);
             if (FAILED(hr) || pool != D3DPOOL_MANAGED || !texture || !*texture ||
-                !ExDevice.load(std::memory_order_acquire))
+                !OutRunVRD3D9ExUpgrade::IsCompatDevice(device))
                 return hr;
 
             IDirect3DTexture9* shadow = nullptr;
