@@ -1,15 +1,24 @@
-// R26/R27 tracked-occlusion + world-effect correction overlay.
+// R26/R28 tracked-occlusion + world classification correction overlay.
 //
 // R23 remains the recovery/baseline authority. R26 keeps proven write-free
 // D3D9 occlusion-query proxy draws single-execution without poisoning the whole
-// Present. R27 also removes R13's draw-time shader-identity masking for a
-// perspective world effect whose c64 upload is now handled by the verified
-// per-eye WVP path. Orthographic UI and auxiliary passes are untouched.
+// Present. R27 removes R13's draw-time shader-identity masking for perspective
+// effects. R28 additionally recognizes a verified perspective-world WVP that
+// legitimately survives a vertex-shader switch: when c64..c67, pose generation,
+// and the saved projection still match, the existing R9 per-eye path is reused
+// instead of silently demoting the draw to zero-disparity NonWorld.
 //
-// MRT hazards, query tracking failures, and occlusion draws that may write color,
-// depth, or stencil remain fail-closed through the existing R13/R23 chain.
+// MRT hazards, query tracking failures, fixed-function draws, projection changes,
+// unknown WVPs, and constant mismatches remain fail-closed through R13/R23/R9.
 
 #include "stereo_renderer_r23.cpp"
+
+namespace OutRunVRRenderer
+{
+    bool GetR28VerifiedProjection(float outProjection[16],
+        std::uint32_t& generation, std::uint32_t& poseSequence) noexcept;
+    bool R28PerspectiveWorldSemantic() noexcept;
+}
 
 namespace OutRunVRStereo
 {
@@ -37,9 +46,16 @@ namespace OutRunVRStereo
         std::uint64_t R27EffectStateResyncs = 0;
         std::uint64_t R27LastEffectStateSyncDrawSerial = 0;
         std::uint64_t R27EffectStateSyncEpoch = ~std::uint64_t{0};
+        std::uint64_t R28ShaderEpochWorldRebinds = 0;
+        std::uint64_t R28RebindNoVerified = 0;
+        std::uint64_t R28RebindConstantMismatch = 0;
+        std::uint64_t R28RebindProjectionMismatch = 0;
+        std::uint64_t R28RebindSemanticReject = 0;
+        std::uint64_t R28RebindPoseReject = 0;
         bool R26FirstTrackedOcclusionLogged = false;
         bool R26FirstOcclusionWriteRejectLogged = false;
         bool R27FirstWorldEffectLogged = false;
+        bool R28FirstShaderEpochWorldLogged = false;
 
         LARGE_INTEGER R27PerfFrequency{};
         ULONGLONG R27PerfLastLogMs = 0;
@@ -104,7 +120,7 @@ namespace OutRunVRStereo
                 {
                     R26FirstOcclusionWriteRejectLogged = true;
                     spdlog::warn(
-                        "VR R27 occlusion: active query draw can write color/depth/stencil (or state is unreadable); keeping fail-closed replay policy");
+                        "VR R28 occlusion: active query draw can write color/depth/stencil (or state is unreadable); keeping fail-closed replay policy");
                 }
                 return normalR23Draw();
             }
@@ -120,12 +136,136 @@ namespace OutRunVRStereo
             {
                 R26FirstTrackedOcclusionLogged = true;
                 spdlog::info(
-                    "VR R27 occlusion: proven write-free active-query proxy executes once on the real game target; stereo Present remains eligible");
+                    "VR R28 occlusion: proven write-free active-query proxy executes once on the real game target; stereo Present remains eligible");
             }
 
             const HRESULT hr = actualDraw();
             if (FAILED(hr))
                 R9Poison(OutRunVR::StereoFailureLeftDrawFailed, site, hr);
+            return hr;
+        }
+
+        bool R28CanRebindVerifiedWorld(IDirect3DDevice9* device,
+            std::uintptr_t& verifiedShaderIdentity,
+            std::uint64_t& verifiedShaderSerial) noexcept
+        {
+            verifiedShaderIdentity = 0;
+            verifiedShaderSerial = 0;
+            if (!IsGameDevice(device) || InternalStereoPass ||
+                !TargetIsBackBuffer() || !StereoWanted() || !R9StereoSeeded)
+                return false;
+            if (AnyAuxRenderTargetActive() || R13ForceMonoShadow ||
+                OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire) ||
+                ActiveOcclusionQueries.load(std::memory_order_acquire) > 0)
+                return false;
+            if (CurrentVertexShaderIdentity.load(std::memory_order_acquire) == 0)
+                return false;
+            if (!OutRunVRRenderer::R28PerspectiveWorldSemantic())
+            {
+                ++R28RebindSemanticReject;
+                return false;
+            }
+
+            float verified[16]{};
+            std::uint32_t generation = 0;
+            std::uint32_t poseSequence = 0;
+            std::uintptr_t storedShader = 0;
+            std::uint64_t storedSerial = 0;
+            if (!OutRunVRRenderer::GetLastVerifiedWvp(verified, generation,
+                    poseSequence, storedShader, storedSerial))
+            {
+                ++R28RebindNoVerified;
+                return false;
+            }
+
+            std::uintptr_t currentShader = 0;
+            std::uint64_t currentSerial = 0;
+            if (!GetCurrentShaderEpoch(currentShader, currentSerial))
+                return false;
+            if (currentShader == storedShader && currentSerial == storedSerial)
+                return false; // R9 already has the exact verified epoch.
+
+            OutRunVRRenderer::LatchedStereoFrame stereo{};
+            if (!OutRunVRRenderer::GetLatchedStereoFrame(stereo) ||
+                generation == 0 || poseSequence == 0 ||
+                poseSequence != stereo.poseSequence)
+            {
+                ++R28RebindPoseReject;
+                return false;
+            }
+
+            float current[16]{};
+            if (FAILED(device->GetVertexShaderConstantF(
+                    OutRunWvpRegister, current, OutRunWvpRegisterCount)) ||
+                !FloatArrayNear(current, verified, 16, VerifiedWvpEpsilon))
+            {
+                ++R28RebindConstantMismatch;
+                return false;
+            }
+
+            float verifiedProjection[16]{};
+            std::uint32_t projectionGeneration = 0;
+            std::uint32_t projectionPoseSequence = 0;
+            if (!OutRunVRRenderer::GetR28VerifiedProjection(verifiedProjection,
+                    projectionGeneration, projectionPoseSequence) ||
+                projectionGeneration != generation ||
+                projectionPoseSequence != poseSequence)
+            {
+                ++R28RebindProjectionMismatch;
+                return false;
+            }
+
+            D3DMATRIX currentProjection{};
+            if (!ReadProjection(currentProjection) ||
+                !FloatArrayNear(reinterpret_cast<const float*>(&currentProjection),
+                    verifiedProjection, 16, VerifiedWvpEpsilon))
+            {
+                ++R28RebindProjectionMismatch;
+                return false;
+            }
+
+            verifiedShaderIdentity = storedShader;
+            verifiedShaderSerial = storedSerial;
+            return true;
+        }
+
+        template <typename R9Draw>
+        HRESULT R28RunWithVerifiedWorldEpoch(IDirect3DDevice9* device,
+            R9Draw&& r9Draw)
+        {
+            std::uintptr_t verifiedShaderIdentity = 0;
+            std::uint64_t verifiedShaderSerial = 0;
+            if (!R28CanRebindVerifiedWorld(device,
+                    verifiedShaderIdentity, verifiedShaderSerial))
+                return E_NOTIMPL;
+
+            const std::uintptr_t savedIdentity =
+                CurrentVertexShaderIdentity.exchange(
+                    verifiedShaderIdentity, std::memory_order_acq_rel);
+            const std::uint64_t savedSerial =
+                VertexShaderSerial.exchange(
+                    verifiedShaderSerial, std::memory_order_acq_rel);
+
+            const HRESULT hr = r9Draw();
+
+            // A D3D draw should not change the bound vertex shader. Restore only
+            // if no unexpected nested setter changed the synthetic epoch.
+            std::uintptr_t expectedIdentity = verifiedShaderIdentity;
+            CurrentVertexShaderIdentity.compare_exchange_strong(
+                expectedIdentity, savedIdentity,
+                std::memory_order_acq_rel, std::memory_order_acquire);
+            std::uint64_t expectedSerial = verifiedShaderSerial;
+            VertexShaderSerial.compare_exchange_strong(
+                expectedSerial, savedSerial,
+                std::memory_order_acq_rel, std::memory_order_acquire);
+
+            ++R28ShaderEpochWorldRebinds;
+            if (!R28FirstShaderEpochWorldLogged)
+            {
+                R28FirstShaderEpochWorldLogged = true;
+                spdlog::info(
+                    "VR R28 WORLD: perspective draw kept verified per-eye WVP across a vertex-shader epoch change because c64..c67, projection, and pose generation still match");
+            }
             return hr;
         }
 
@@ -150,7 +290,7 @@ namespace OutRunVRStereo
             {
                 R22ScissorSnapshot actual{};
                 if (!R23CaptureActualGameState(
-                        device, actual, "R27EffectDraw", true))
+                        device, actual, "R28EffectDraw", true))
                     return false;
                 R27EffectStateSyncEpoch = PresentEpoch;
                 R27LastEffectStateSyncDrawSerial = R23GameDrawSerial;
@@ -163,6 +303,14 @@ namespace OutRunVRStereo
         HRESULT R27GuardWorldEffect(IDirect3DDevice9* device,
             R9Draw&& r9Draw, LegacyR13Draw&& legacyR13Draw)
         {
+            // First recover ordinary perspective world draws that only lost the
+            // upload-time shader epoch. This is deliberately stricter than the
+            // old NonWorld fallback: the WVP, projection and pose must all match.
+            const HRESULT rebound = R28RunWithVerifiedWorldEpoch(
+                device, std::forward<R9Draw>(r9Draw));
+            if (rebound != E_NOTIMPL)
+                return rebound;
+
             if (!R27ShouldBypassLegacyZeroDisparity(device))
                 return legacyR13Draw();
 
@@ -171,7 +319,7 @@ namespace OutRunVRStereo
             {
                 R27FirstWorldEffectLogged = true;
                 spdlog::info(
-                    "VR R27 EFFECT: legacy alpha/billboard/shadow shader-identity mask bypassed; perspective effect draw keeps verified per-eye world WVP");
+                    "VR R28 EFFECT: legacy alpha/billboard/shadow shader-identity mask bypassed; perspective effect draw keeps verified per-eye world WVP");
             }
             return r9Draw();
         }
@@ -254,7 +402,7 @@ namespace OutRunVRStereo
                     device, type, startVertex, primitiveCount);
             };
             return R26GuardTrackedOcclusion(
-                device, actual, normal, "R27/DrawPrimitive");
+                device, actual, normal, "R28/DrawPrimitive");
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveDestR26(IDirect3DDevice9* device,
@@ -272,7 +420,7 @@ namespace OutRunVRStereo
                     primitiveCount);
             };
             return R26GuardTrackedOcclusion(
-                device, actual, normal, "R27/DrawIndexedPrimitive");
+                device, actual, normal, "R28/DrawIndexedPrimitive");
         }
 
         HRESULT __stdcall DrawPrimitiveUPDestR26(IDirect3DDevice9* device,
@@ -288,7 +436,7 @@ namespace OutRunVRStereo
                     device, type, primitiveCount, data, stride);
             };
             return R26GuardTrackedOcclusion(
-                device, actual, normal, "R27/DrawPrimitiveUP");
+                device, actual, normal, "R28/DrawPrimitiveUP");
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveUPDestR26(
@@ -308,7 +456,7 @@ namespace OutRunVRStereo
                     indexFormat, vertexData, stride);
             };
             return R26GuardTrackedOcclusion(
-                device, actual, normal, "R27/DrawIndexedPrimitiveUP");
+                device, actual, normal, "R28/DrawIndexedPrimitiveUP");
         }
 
         HRESULT __stdcall PresentDestR27(IDirect3DDevice9* device,
@@ -346,9 +494,12 @@ namespace OutRunVRStereo
                     const double drawsPerPresent = sampleDelta ?
                         static_cast<double>(drawDelta) / static_cast<double>(sampleDelta) : 0.0;
                     spdlog::info(
-                        "VR R27 PERF: lower-Present avgMs={:.3f} maxMs={:.3f} drawsPerPresent={:.1f} worldEffectDraws={} effectStateResync={} occSingle={} occWriteReject={}",
+                        "VR R28 PERF: lower-Present avgMs={:.3f} maxMs={:.3f} drawsPerPresent={:.1f} worldEffectDraws={} worldEpochRebind={} noVerified={} constMismatch={} projMismatch={} semanticReject={} poseReject={} effectStateResync={} occSingle={} occWriteReject={}",
                         avg, R27PresentMaxMs, drawsPerPresent,
-                        R27WorldEffectDraws, R27EffectStateResyncs,
+                        R27WorldEffectDraws, R28ShaderEpochWorldRebinds,
+                        R28RebindNoVerified, R28RebindConstantMismatch,
+                        R28RebindProjectionMismatch, R28RebindSemanticReject,
+                        R28RebindPoseReject, R27EffectStateResyncs,
                         R26TrackedOcclusionSingleExec, R26OcclusionWriteRejects);
                     R27PerfLastLogMs = now;
                     R27PerfLastDrawSerial = R23GameDrawSerial;
@@ -405,7 +556,7 @@ namespace OutRunVRStereo
                     R26InstallState.store(State::Failed, std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVROcclusionR26", false);
                     spdlog::error(
-                        "VR R26/R27: R23 prerequisite failed; correction overlay not installed");
+                        "VR R26/R28: R23 prerequisite failed; correction overlay not installed");
                     return 0;
                 }
 
@@ -448,14 +599,14 @@ namespace OutRunVRStereo
                         R26InstallState.store(State::Failed, std::memory_order_release);
                         HookManager::ReportAsyncResult("OpenXRVROcclusionR26", false);
                         spdlog::error(
-                            "VR R26/R27: disabled-first correction transaction failed; R23 remains active");
+                            "VR R26/R28: disabled-first correction transaction failed; R23 remains active");
                         return 0;
                     }
 
                     R26InstallState.store(State::Ready, std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVROcclusionR26", true);
                     spdlog::info(
-                        "VR R26/R27 GAME: world-effect WVP/draw correction + write-free occlusion single-execution + bounded live-state resync ACTIVE");
+                        "VR R26/R28 GAME: verified-world shader-epoch recovery + partial-WVP reconstruction + effect correction + write-free occlusion single-execution ACTIVE");
                     return 0;
                 }
                 Sleep(25);
@@ -464,7 +615,7 @@ namespace OutRunVRStereo
             R26InstallState.store(State::Failed, std::memory_order_release);
             HookManager::ReportAsyncResult("OpenXRVROcclusionR26", false);
             spdlog::error(
-                "VR R26/R27: timed out waiting for R23; correction overlay not installed");
+                "VR R26/R28: timed out waiting for R23; correction overlay not installed");
             return 0;
         }
 
