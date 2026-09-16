@@ -53,8 +53,8 @@ if ("${CMAKE_BUILD_TYPE}" MATCHES "Release")
     # Statically compile runtime
     string(REGEX REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     string(REGEX REPLACE "/MD" "/MT" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-    string(REGEX REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-    string(REGEX REPLACE "/MD" "/MT" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+    string(REGEX REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE")
+    string(REGEX REPLACE "/MD" "/MT" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE")
 
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
     message(NOTICE "Building in Release mode")
@@ -107,7 +107,7 @@ include-directories = ["shared/", "src/", "include/",
     "external/imgui/",
 	"external/IXWebSocket/"
 ]
-compile-options = ["/GS-", "/bigobj", "/EHa", "/MP", "/utf-8"]
+compile-options = ["/GS", "/bigobj", "/EHa", "/MP", "/utf-8"]
 link-options = ["/DEBUG", "/OPT:REF", "/OPT:ICF"]
 compile-features = ["cxx_std_20"]
 compile-definitions = ["_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING", "_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR", "DIRECTINPUT_VERSION=0x0800"]
