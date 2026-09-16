@@ -8,11 +8,9 @@
 // The remaining recovery edge is subtle: after a host stall, the common
 // RuntimeEligibility gate stays closed until a new safe color/depth baseline is
 // observed. R22 correctly blocks stereo draws while the gate is closed, but its
-// clear fast-path also bypasses R20. That would make it impossible for R20 to
-// observe the very baseline required to reopen the gate. R23 allows ONLY clear
-// callbacks through the R20/R22 baseline validator while HostFresh=true and
-// RecoveryPending=true; draw callbacks remain blocked by R22 until the verified
-// baseline calls RuntimeEligibility::BaselineVerified().
+// clear fast-path also bypasses R20. R23 allows ONLY clear callbacks through the
+// R20/R22 baseline validator while HostFresh=true and RecoveryPending=true;
+// draw callbacks remain blocked until BaselineVerified().
 
 #include "stereo_renderer_r22.cpp"
 
@@ -21,7 +19,8 @@ namespace OutRunVRStereo
     namespace
     {
         SafetyHookInline R23ClearR22Hook{};
-        std::atomic<bool> R23RecoveryGuardReady{ false };
+        std::atomic<OutRunVR::RuntimeEligibility::InstallState> R23InstallState{
+            OutRunVR::RuntimeEligibility::InstallState::Pending };
         std::uint64_t R23RecoveryClearPasses = 0;
         bool R23FirstRecoveryClearLogged = false;
 
@@ -41,8 +40,6 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, DWORD count, const D3DRECT* rects,
             DWORD flags, D3DCOLOR color, float z, DWORD stencil)
         {
-            // Mirror R22's normal clear transaction, except that recovery is
-            // permitted to reach R20 while stereo draw callbacks remain closed.
             R22ReplayScope replay(device);
             if (!replay.stateValid)
             {
@@ -64,9 +61,6 @@ namespace OutRunVRStereo
 
             R22ObserveDepthBaseline(mainBefore, fullGameClear, flags, hr);
 
-            // R7/R9/R20 classifiers do not know the pre-replay scissor state.
-            // A clear that was partial in the real game state may never promote
-            // right-eye synchronization or become an initial stereo seed.
             if (SUCCEEDED(hr) && mainBefore && !fullGameClear)
             {
                 if ((flags & D3DCLEAR_ZBUFFER) != 0)
@@ -103,18 +97,26 @@ namespace OutRunVRStereo
 
         DWORD WINAPI R23RecoveryInstallThread(void*)
         {
+            using State = OutRunVR::RuntimeEligibility::InstallState;
+            R23InstallState.store(State::Pending, std::memory_order_release);
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
                 if (R9InstallState.load(std::memory_order_acquire) == R9InstallFailed ||
-                    R13InstallState.load(std::memory_order_acquire) == R13InstallFailed)
+                    R13InstallState.load(std::memory_order_acquire) == R13InstallFailed ||
+                    OutRunVR::RuntimeEligibility::IsFailed(R20InstallState) ||
+                    OutRunVR::RuntimeEligibility::IsFailed(R21InstallState) ||
+                    OutRunVR::RuntimeEligibility::IsFailed(R22InstallState))
                 {
+                    R23InstallState.store(State::Failed, std::memory_order_release);
                     OutRunVR::RuntimeEligibility::MarkSafetyOverlayUnavailable();
                     R20StereoEligibilityGate.store(false,
                         std::memory_order_release);
+                    spdlog::error(
+                        "VR R23: prerequisite overlay FAILED; recovery guard remains fail-closed");
                     return 0;
                 }
 
-                if (R22InstallReady.load(std::memory_order_acquire))
+                if (OutRunVR::RuntimeEligibility::IsReady(R22InstallState))
                 {
                     R23ClearR22Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&ClearDestR22), ClearDestR23,
@@ -124,6 +126,7 @@ namespace OutRunVRStereo
                     if (!enabled)
                     {
                         R23ClearR22Hook = {};
+                        R23InstallState.store(State::Failed, std::memory_order_release);
                         OutRunVR::RuntimeEligibility::MarkSafetyOverlayUnavailable();
                         R20StereoEligibilityGate.store(false,
                             std::memory_order_release);
@@ -132,20 +135,18 @@ namespace OutRunVRStereo
                         return 0;
                     }
 
-                    // R22/R23 are now both authoritative. Discard any baseline
-                    // seen while installation was in progress and require the
-                    // next Present + verified clear to reopen eligibility.
                     OutRunVR::RuntimeEligibility::MarkSafetyOverlayInstalled();
                     R20StereoEligibilityGate.store(false,
                         std::memory_order_release);
-                    R23RecoveryGuardReady.store(true, std::memory_order_release);
+                    R23InstallState.store(State::Ready, std::memory_order_release);
                     spdlog::info(
-                        "VR R23 GAME: R22 scissor/state policy retained; recovery-clear-only baseline reopening guard ACTIVE; safety overlay transaction READY");
+                        "VR R23 GAME: R22 shadow-state policy retained; recovery-clear-only baseline reopening guard ACTIVE; safety overlay transaction READY");
                     return 0;
                 }
                 Sleep(25);
             }
 
+            R23InstallState.store(State::Failed, std::memory_order_release);
             OutRunVR::RuntimeEligibility::MarkSafetyOverlayUnavailable();
             R20StereoEligibilityGate.store(false, std::memory_order_release);
             spdlog::error(
@@ -163,8 +164,8 @@ namespace OutRunVRStereo
             bool validate() override { return true; }
             bool apply() override
             {
-                // Close the common gate synchronously before the asynchronous
-                // installer can race R20/R21 on the render thread.
+                using State = OutRunVR::RuntimeEligibility::InstallState;
+                R23InstallState.store(State::Pending, std::memory_order_release);
                 OutRunVR::RuntimeEligibility::MarkSafetyOverlayUnavailable();
                 R20StereoEligibilityGate.store(false,
                     std::memory_order_release);
@@ -173,6 +174,7 @@ namespace OutRunVRStereo
                     R23RecoveryInstallThread, nullptr, 0, nullptr);
                 if (!thread)
                 {
+                    R23InstallState.store(State::Failed, std::memory_order_release);
                     OutRunVR::RuntimeEligibility::MarkSafetyOverlayUnavailable();
                     R20StereoEligibilityGate.store(false,
                         std::memory_order_release);
