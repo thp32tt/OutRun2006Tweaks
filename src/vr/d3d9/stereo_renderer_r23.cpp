@@ -11,6 +11,15 @@
 // clear fast-path also bypasses R20. R23 allows ONLY clear callbacks through the
 // R20/R22 baseline validator while HostFresh=true and RecoveryPending=true;
 // draw callbacks remain blocked until BaselineVerified().
+//
+// R24 black-screen review found one additional bootstrap deadlock: R20's relaxed
+// path can prove a full color baseline by copying the complete backbuffer after
+// a rect/scissored color clear, but R22 would then cancel that newly verified
+// seed solely because the triggering game clear was not itself full-screen.
+// During recovery, preserve that seed only when R20 has already opened the
+// common eligibility gate AND mono/right depth+stencil synchronization is still
+// proven. This retains the stronger R20 copy/depth proof without requiring the
+// game to issue a full-screen color clear it may never emit.
 
 #include "stereo_renderer_r22.cpp"
 
@@ -22,7 +31,9 @@ namespace OutRunVRStereo
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R23InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
         std::uint64_t R23RecoveryClearPasses = 0;
+        std::uint64_t R23RelaxedRecoveryBaselines = 0;
         bool R23FirstRecoveryClearLogged = false;
+        bool R23FirstRelaxedRecoveryBaselineLogged = false;
 
         bool R23RecoveryNeedsBaseline() noexcept
         {
@@ -34,6 +45,23 @@ namespace OutRunVRStereo
                     std::memory_order_acquire) &&
                 !OutRunVR::RuntimeEligibility::StereoAllowed.load(
                     std::memory_order_acquire);
+        }
+
+        bool R23R20RelaxedBaselineIsAuthoritative(
+            IDirect3DDevice9* device, bool fullGameClear) noexcept
+        {
+            if (fullGameClear || !R9StereoSeeded || !R9MonoSeeded ||
+                R9MonoBackupGap ||
+                !OutRunVR::RuntimeEligibility::MayInjectStereo())
+                return false;
+
+            if (!TrackedDepthStencil)
+                return true;
+            if (!RightDepthSynchronized)
+                return false;
+            if (StencilTestActive(device) && !RightStencilSynchronized)
+                return false;
+            return true;
         }
 
         HRESULT R23RunRecoveryClearThroughBaselinePolicy(
@@ -68,7 +96,23 @@ namespace OutRunVRStereo
                 if ((flags & D3DCLEAR_STENCIL) != 0)
                     RightStencilSynchronized = stencilSyncBefore;
             }
-            R22CancelUnsafeFirstSeed(device, seedBefore, fullGameClear);
+
+            const bool relaxedVerified =
+                R23R20RelaxedBaselineIsAuthoritative(device, fullGameClear);
+            if (!relaxedVerified)
+            {
+                R22CancelUnsafeFirstSeed(device, seedBefore, fullGameClear);
+            }
+            else
+            {
+                ++R23RelaxedRecoveryBaselines;
+                if (!R23FirstRelaxedRecoveryBaselineLogged)
+                {
+                    R23FirstRelaxedRecoveryBaselineLogged = true;
+                    spdlog::info(
+                        "VR R23/R24: preserving R20 relaxed recovery seed after complete backbuffer color-copy + verified current-generation depth/stencil synchronization; full-screen game color clear not required");
+                }
+            }
 
             ++R23RecoveryClearPasses;
             if (!R23FirstRecoveryClearLogged)
