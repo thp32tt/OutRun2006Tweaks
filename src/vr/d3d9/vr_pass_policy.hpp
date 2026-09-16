@@ -133,6 +133,40 @@ namespace OutRunVR::PassPolicy
         return semantic == RenderSemantic::World3D;
     }
 
+    // Main-backbuffer perspective draws are not automatically safe for an HMD
+    // WVP. OutRun has projected shadows and camera-facing textured panels whose
+    // geometry/material state is prepared for one camera. Re-projecting those
+    // passes independently for both eyes can produce torn shadows, crossed
+    // billboards or visibly different panel quads in the SBS transport.
+    //
+    // Keep opaque, depth-writing geometry in true stereo. Fragile translucent
+    // passes (blend on + depth writes off) and two-sided alpha billboard/cutout
+    // passes are replayed to both eyes with the stock game WVP instead. This is
+    // zero-disparity, not single-eye: both SBS halves receive the same object.
+    enum class EffectStereoPolicy : std::uint8_t
+    {
+        WorldStereo,
+        ZeroDisparity
+    };
+
+    constexpr EffectStereoPolicy ClassifyEffectStereo(
+        bool alphaBlendEnabled,
+        bool alphaTestEnabled,
+        bool depthWriteEnabled,
+        bool cullNone) noexcept
+    {
+        if (alphaBlendEnabled && !depthWriteEnabled)
+            return EffectStereoPolicy::ZeroDisparity;
+        if (cullNone && (alphaBlendEnabled || alphaTestEnabled))
+            return EffectStereoPolicy::ZeroDisparity;
+        return EffectStereoPolicy::WorldStereo;
+    }
+
+    constexpr bool AllowsEffectWorldStereo(EffectStereoPolicy policy) noexcept
+    {
+        return policy == EffectStereoPolicy::WorldStereo;
+    }
+
     enum class DrawReplayPolicy : std::uint8_t
     {
         Legacy,
@@ -198,6 +232,15 @@ namespace OutRunVR::PassPolicy
         PoseInjectionPolicy::AuxiliaryStock, true,
         ProjectionClass::Unknown) == RenderSemantic::PolicyMismatch);
     static_assert(!AllowsWorldStereo(RenderSemantic::PolicyMismatch));
+
+    static_assert(ClassifyEffectStereo(false, false, true, false) ==
+        EffectStereoPolicy::WorldStereo);
+    static_assert(ClassifyEffectStereo(true, false, false, false) ==
+        EffectStereoPolicy::ZeroDisparity);
+    static_assert(ClassifyEffectStereo(false, true, true, true) ==
+        EffectStereoPolicy::ZeroDisparity);
+    static_assert(AllowsEffectWorldStereo(
+        ClassifyEffectStereo(false, false, true, false)));
 
     static_assert(ClassifyDrawReplay(true, false, true, false, true, true, true, false) ==
         DrawReplayPolicy::UnsafeSingleExecution);
