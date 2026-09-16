@@ -7,12 +7,18 @@ required = [
     'src/vr/settings.cpp',
     'src/vr/game/outrun_renderer.cpp',
     'src/vr/game/outrun_renderer_r13.cpp',
+    'src/vr/game/outrun_renderer_r23.cpp',
     'src/vr/d3d9/stereo_renderer.cpp',
     'src/vr/d3d9/stereo_renderer_r13.cpp',
+    'src/vr/d3d9/stereo_renderer_r20.cpp',
+    'src/vr/d3d9/stereo_renderer_r21.cpp',
+    'src/vr/d3d9/stereo_renderer_r22.cpp',
+    'src/vr/d3d9/stereo_renderer_r23.cpp',
     'src/vr/d3d9/ex_device_upgrade.cpp',
     'src/vr/d3d9/ex_device_upgrade_r13.cpp',
     'src/vr/d3d9/r13_bridge.hpp',
     'src/vr/d3d9/vr_pass_policy.hpp',
+    'src/vr/runtime_eligibility.hpp',
     'src/vr/ipc/protocol.hpp',
     'src/vr/ipc/direct_ack_r13.hpp',
     # New architecture foundation.
@@ -26,9 +32,14 @@ required = [
     'vrhost/src/runtime/vr_runtime.hpp',
     'vrhost/src/frame_source.hpp',
     'vrhost/src/runtime/d3d9ex_direct_passthrough.hpp',
+    'vrhost/src/runtime/r22_runtime_hardening.hpp',
+    'vrhost/src/runtime/r23_runtime_hardening.hpp',
+    'vrhost/src/runtime/r23_verified_bundle.hpp',
     'vrhost/tests/protocol_v3_smoke.cpp',
     'vrhost/tests/core_math_smoke.cpp',
+    # main.cpp remains the implementation body included by the R23 entry point.
     'vrhost/src/main.cpp',
+    'vrhost/src/main_r23.cpp',
     'vrhost/src/stereo_shader.hpp',
     'vrhost/tests/stereo_shader_smoke.cpp',
     'docs/VR_ARCHITECTURE.md',
@@ -183,6 +194,21 @@ for marker in (
 if 'SharedState->reserved[OutRunVRR13::HostDirectGpuCompletedFrameIndex]' in stereo_r13:
     raise SystemExit('R13 GPU ACK must not collide with legacy SharedPoseState reserved words')
 
+# R22 is a required implementation layer, not a documentation-only marker.
+# R23 includes it and depends on its replay scope, clear trampoline and seed
+# cancellation helpers, while cmake must keep it header-only to avoid duplicate
+# hook bodies.
+stereo_r22 = (ROOT / 'src/vr/d3d9/stereo_renderer_r22.cpp').read_text(encoding='utf-8')
+for marker in (
+    'R22ReplayScope', 'R22ClearR20Hook', 'R22CancelUnsafeFirstSeed',
+    'R22GameClearCoversBackbuffer', 'R22InstallReady',
+):
+    if marker not in stereo_r22:
+        raise SystemExit(f'missing R22 scissor/bootstrap implementation invariant: {marker}')
+stereo_r23 = (ROOT / 'src/vr/d3d9/stereo_renderer_r23.cpp').read_text(encoding='utf-8')
+if '#include "stereo_renderer_r22.cpp"' not in stereo_r23:
+    raise SystemExit('R23 game wrapper no longer owns the required R22 implementation layer')
+
 # D3D9Ex stays opt-in, but when selected it must preserve the legacy game's
 # managed-resource expectations without changing the COM identity of the game
 # device. The known hardware crash came from MANAGED resource creation failing
@@ -210,6 +236,9 @@ for marker in (
     if marker not in ex_r13:
         raise SystemExit(f'missing R13 D3D9Ex compatibility invariant: {marker}')
 
+# main.cpp remains the implementation body used by main_r23.cpp. Verify both:
+# the reusable implementation must retain the original host capabilities and the
+# actual executable entrypoint must explicitly include that body.
 host = (ROOT / 'vrhost/src/main.cpp').read_text(encoding='utf-8')
 for marker in (
     'XR_KHR_D3D11_ENABLE_EXTENSION_NAME', 'OpenSharedResource',
@@ -219,6 +248,14 @@ for marker in (
 ):
     if marker not in host:
         raise SystemExit(f'missing live host comparison invariant: {marker}')
+host_r23 = (ROOT / 'vrhost/src/main_r23.cpp').read_text(encoding='utf-8')
+for marker in (
+    '#include "main.cpp"', 'R23FrameUnchanged',
+    'R23CommitDirectAfterValidation', 'R23CommitClassicAfterValidation',
+    'OutRunVrR23VerifiedBundle::Publish',
+):
+    if marker not in host_r23:
+        raise SystemExit(f'missing R23 verified-bundle entrypoint invariant: {marker}')
 
 # R13 makes the ownership boundary explicit: direct shared eyes are copied on
 # the GPU into host-owned textures, the copy EVENT must retire, and only then is
@@ -251,9 +288,12 @@ for marker in (
         raise SystemExit(f'missing R13 cross-TU bridge invariant: {marker}')
 
 cmake_root = (ROOT / 'cmake.toml').read_text(encoding='utf-8')
-for marker in ('ex_device_upgrade.cpp', 'stereo_renderer.cpp', 'outrun_renderer.cpp', 'HEADER_FILE_ONLY TRUE'):
+for marker in (
+    'ex_device_upgrade.cpp', 'stereo_renderer.cpp', 'stereo_renderer_r22.cpp',
+    'outrun_renderer.cpp', 'HEADER_FILE_ONLY TRUE',
+):
     if marker not in cmake_root:
-        raise SystemExit(f'root build does not preserve R13 wrapper ownership: {marker}')
+        raise SystemExit(f'root build does not preserve R23 wrapper ownership: {marker}')
 
 runtime_boundary = (ROOT / 'vrhost/src/runtime/vr_runtime.hpp').read_text(encoding='utf-8')
 if 'class IVrRuntime' not in runtime_boundary or 'requiredAdapter' not in runtime_boundary:
@@ -264,9 +304,12 @@ if 'class IFrameSource' not in frame_source or 'TransportKind' not in frame_sour
     raise SystemExit('missing host frame-source boundary')
 
 cmake = (ROOT / 'vrhost/CMakeLists.txt').read_text(encoding='utf-8')
-for marker in ('src/main.cpp', 'tests/stereo_shader_smoke.cpp', 'tests/protocol_v3_smoke.cpp',
-               'tests/core_math_smoke.cpp', 'd3d9ex_direct_passthrough.hpp'):
+for marker in (
+    'src/main_r23.cpp', 'tests/stereo_shader_smoke.cpp',
+    'tests/protocol_v3_smoke.cpp', 'tests/core_math_smoke.cpp',
+    'd3d9ex_direct_passthrough.hpp', 'r23_runtime_hardening.hpp',
+):
     if marker not in cmake:
-        raise SystemExit(f'host CMake missing reconstructed target/arbitration include: {marker}')
+        raise SystemExit(f'host CMake missing R23 target/arbitration include: {marker}')
 
-print('VR reconstructed architecture boundary verification passed')
+print('VR reconstructed R23 architecture boundary verification passed')
