@@ -42,81 +42,89 @@ jobs:
       - name: Verify reconstructed VR architecture boundaries
         run: python tools/verify_vr_architecture.py
 
-      - name: Verify remaining 10-pass review hardening guards
+      - name: Verify R23 review hardening guards
         shell: pwsh
         run: |
           $checks = @{
-            'src/vr/d3d9/stereo_renderer_r7.inc' = @(
-              'transaction was partial; all base hooks rolled back immediately',
-              'StereoInstallState.store(StereoInstallReady',
-              'StereoInstalledDevice.store(device',
-              'OcclusionQueryTrackingUnavailable',
-              'stereo duplication disabled fail-closed for query safety',
-              'promoted D3D9Ex device lost ResetEx fallback ownership',
-              'No fixed startup delay'
+            'src/vr/runtime_eligibility.hpp' = @(
+              'enum class InstallState',
+              'InstallState::Failed',
+              'SafetyOverlayReady',
+              'BaselineVerified'
             )
-            'src/vr/d3d9/stereo_renderer.cpp' = @(
-              'callback policy transaction was partial',
-              'StereoInstallState.load(std::memory_order_acquire)',
-              'R9InstallState.store(R9InstallReady'
+            'src/vr/d3d9/stereo_renderer_r20.cpp' = @(
+              'R20InstallState',
+              'StartDisabled',
+              'InstallState::Failed'
             )
-            'src/vr/d3d9/stereo_renderer_r13.cpp' = @(
-              'R9InstallState.load(std::memory_order_acquire)',
-              'atomic R7/R9 install handoff',
-              'all R13 overlay hooks rolled back immediately',
-              'R13InstallState.store(R13InstallReady',
-              'transactional R13 install state=READY',
-              'OcclusionQueryTrackingUnavailable.load'
+            'src/vr/d3d9/stereo_renderer_r21.cpp' = @(
+              'R21InstallState',
+              'IsFailed(R20InstallState)',
+              'StartDisabled'
             )
-            'src/vr/game/outrun_renderer.cpp' = @(
-              'RendererInstallState',
-              'RendererInjectionAllowed',
-              'atomic renderer install state=READY',
-              'transactional rollback completed'
+            'src/vr/d3d9/stereo_renderer_r22.cpp' = @(
+              'R22InstallState',
+              'R22ShadowState',
+              'R22SetScissorRectHook',
+              'R22SetRenderStateHook',
+              'StartDisabled',
+              'per-draw GetViewport/GetScissorRect/GetRenderState eliminated'
+            )
+            'src/vr/d3d9/stereo_renderer_r23.cpp' = @(
+              'R23InstallState',
+              'IsFailed(R22InstallState)',
+              'recovery-clear-only baseline reopening guard ACTIVE'
+            )
+            'src/vr/d3d9/vr_pass_policy.hpp' = @(
+              'EffectStereoPolicy',
+              'ZeroDisparity',
+              'ClassifyEffectStereo'
             )
             'src/vr/game/outrun_renderer_r13.cpp' = @(
-              'RendererInstallState.load(std::memory_order_acquire)',
-              'atomic renderer install handoff',
-              'WVP injection disabled atomically to fail closed'
+              'R13FragileEffectNeedsZeroDisparity',
+              'shadow/billboard/panel pass kept stock',
+              'InvalidateVerifiedWvp'
+            )
+            'src/vr/game/outrun_renderer_r23.cpp' = @(
+              'R23RenderThreadCleanupRequested',
+              'R23ServiceRenderThreadCleanup',
+              'fail-closed cleanup is render-thread-owned'
+            )
+            'src/vr/ipc/v3_game_shadow_bridge.cpp' = @(
+              'ShadowIdlePollMs = 8',
+              'lastClientPublishedFrameId',
+              'clientChanged',
+              'ShadowRetryMs'
+            )
+            'vrhost/src/ipc/v3_shadow_bridge.cpp' = @(
+              'ShadowIdlePollMs = 8',
+              'ShadowWriterRetryMs',
+              'ackWriter.reset()'
+            )
+            'vrhost/src/ipc/host_state_v3_writer.hpp' = @(
+              'Reset(false)',
+              'constructor that throws never runs this object',
+              'ProcessLiveness::Unknown'
+            )
+            'vrhost/src/runtime/r23_runtime_hardening.hpp' = @(
+              'ExpectedDirectDxgiFormat',
+              'DirectSafeEyeMatchesCommittedFrame',
+              'SafeTransportGeneration'
             )
             'vrhost/src/runtime/sbs_capture_override.hpp' = @(
-              'result == XR_TIMEOUT_EXPIRED',
-              'The same acquired image must be waited again',
-              'bool acquired = false',
               'Preserve acquiredImage',
+              'bool acquired = false',
               'Release(Projection);',
               'Release(Theater);'
             )
             'vrhost/src/runtime/d3d9ex_direct_passthrough.hpp' = @(
               'SafeTransportGeneration',
               'SafeTransportGeneration == generation',
-              'Release(Projection);'
-            )
-            'vrhost/src/ipc/host_state_v3_writer.hpp' = @(
-              'enum class ProcessLiveness',
-              'ProcessLiveness::Unknown',
-              'another or unverified outrun-vr-host owns HostState.v3'
-            )
-            'vrhost/src/main.cpp' = @(
-              'enum class ProcessLiveness',
-              'ProcessLiveness::Unknown',
-              'another or unverified outrun-vr-host already owns the bridge'
-            )
-            'src/vr/ipc/v3_game_shadow_bridge.cpp' = @(
-              'enum class ProcessLiveness',
-              'ProcessLiveness::Unknown',
-              'GET_MODULE_HANDLE_EX_FLAG_PIN',
-              'process-lifetime worker tracked with stop event',
-              'RequestShadowBridgeStop',
-              'RegisterShadowBridgeStopCallback'
+              'host-owned GPU eye copies + completion ACK active'
             )
             'src/vr/ipc/shadow_lifetime_bridge.hpp' = @(
               'ShadowBridgeStopCallbackSlot',
               'RequestRegisteredShadowBridgeStop'
-            )
-            'vrhost/src/ipc/v3_shadow_bridge.cpp' = @(
-              'enum class ProcessLiveness',
-              'ProcessLiveness::Unknown'
             )
             'src/dllmain.cpp' = @(
               'OutRunVR::IpcV3::RequestRegisteredShadowBridgeStop();'
@@ -126,7 +134,7 @@ jobs:
             $text = Get-Content $path -Raw
             foreach ($marker in $checks[$path]) {
               if (-not $text.Contains($marker)) {
-                throw "10-pass hardening guard missing: $path :: $marker"
+                throw "R23 hardening guard missing: $path :: $marker"
               }
             }
           }
@@ -137,7 +145,7 @@ jobs:
           set CI=
           cmake -S . -B build-vr-game -G "Visual Studio 17 2022" -A Win32
 
-      - name: Verify regenerated R13 source graph
+      - name: Verify regenerated R23 source graph
         shell: pwsh
         run: |
           $projects = Get-ChildItem build-vr-game -Filter *.vcxproj -Recurse
@@ -146,23 +154,28 @@ jobs:
 
           foreach ($required in @(
             'ex_device_upgrade_r13.cpp',
-            'stereo_renderer_r13.cpp',
-            'outrun_renderer_r13.cpp'
+            'stereo_renderer_r23.cpp',
+            'outrun_renderer_r23.cpp'
           )) {
             if (-not $projectText.Contains($required)) {
-              throw "R13 wrapper translation unit missing from generated build graph: $required"
+              throw "R23 authoritative translation unit missing from generated build graph: $required"
             }
           }
 
-          foreach ($legacy in @(
+          foreach ($includedOnly in @(
             'ex_device_upgrade.cpp',
             'stereo_renderer.cpp',
-            'outrun_renderer.cpp'
+            'stereo_renderer_r13.cpp',
+            'stereo_renderer_r20.cpp',
+            'stereo_renderer_r21.cpp',
+            'stereo_renderer_r22.cpp',
+            'outrun_renderer.cpp',
+            'outrun_renderer_r13.cpp'
           )) {
-            $escaped = [regex]::Escape($legacy)
+            $escaped = [regex]::Escape($includedOnly)
             $pattern = '<ClCompile Include="[^"]*[\\/]' + $escaped + '"'
             if ($projectText -match $pattern) {
-              throw "legacy VR translation unit is still compiled independently: $legacy"
+              throw "included VR implementation is compiled independently: $includedOnly"
             }
           }
 
@@ -178,7 +191,7 @@ jobs:
       - name: Build Win32 VR DLL and v3 contract
         run: cmake --build build-vr-game --config Release
 
-      - name: Verify Win32 binary
+      - name: Verify Win32 R23 binary markers
         shell: pwsh
         run: |
           $dllPath = 'build-vr-game/bin/dinput8.dll'
@@ -186,35 +199,14 @@ jobs:
           $bytes = [System.IO.File]::ReadAllBytes($dllPath)
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
           foreach ($marker in @(
-            'classic-D3D9 exact projection preferred',
-            'D3D9Ex host-owned GPU safety-copy transport remains opt-in',
             'VR stereo: D3D9 full-eye renderer installed',
-            'transactional install state=READY',
-            'VR stereo: TRUE GEOMETRY STEREO active',
-            'VR v3 shadow: live dual-protocol diagnostics active',
-            'process-lifetime worker tracked with stop event',
-            'detach callback registered',
-            'protocol v3 pose is PRIMARY',
-            'v3-primary/v2-fallback frame-latched c64 WVP injection armed',
-            'VR D3D9Ex upgrade: Direct3DCreate9 IAT hook armed before game device creation',
-            'managed-resource compatibility hooks installed',
-            'MANAGED vertex buffer translated to DEFAULT',
-            'game CreateDevice promoted to CreateDeviceEx with managed-resource compatibility',
-            'VR D3D9 probe: deviceType=',
-            'VR helper D3D9Ex probe:',
-            'R9-finaltest-20260915',
-            'transactional=READY',
-            'VR R9 FIRST FAILURE:',
-            'mono safety shadow ready',
-            'VR D3D9Ex R13: compatibility hardening active',
-            'translated MANAGED texture LockRect',
             'VR R13: stereo hardening ACTIVE',
-            'transactional R13 install state=READY',
-            'atomic R7/R9 install handoff',
-            'GPU-completion direct-ring backpressure',
-            'single-execution MRT/occlusion fallback',
-            'VR R13: auxiliary/offscreen c64 WVP kept stock',
-            'atomic renderer install handoff'
+            'VR R13 effect policy: translucent shadow/billboard/panel pass kept stock',
+            'VR R22 GAME: shadow-tracked viewport/scissor replay',
+            'VR R23 GAME:',
+            'VR R23 RENDERER:',
+            'fail-closed cleanup is render-thread-owned',
+            'VR v3 shadow: live dual-protocol diagnostics active'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR DLL marker missing: $marker" }
           }
@@ -246,52 +238,52 @@ jobs:
       - name: Compile exact stereo HLSL shader
         shell: pwsh
         run: |
-          $test = 'build-vrhost/bin/outrun-vr-shader-smoke.exe'
-          if (-not (Test-Path $test)) { throw 'shader smoke executable was not produced' }
-          & $test
+          & 'build-vrhost/bin/outrun-vr-shader-smoke.exe'
           if ($LASTEXITCODE -ne 0) { throw 'stereo HLSL failed D3DCompile smoke test' }
 
       - name: Run protocol v3 cross-bitness contract smoke
         shell: pwsh
         run: |
-          $test = 'build-vrhost/bin/outrun-vr-protocol-v3-smoke.exe'
-          if (-not (Test-Path $test)) { throw 'protocol v3 smoke executable was not produced' }
-          & $test
+          & 'build-vrhost/bin/outrun-vr-protocol-v3-smoke.exe'
           if ($LASTEXITCODE -ne 0) { throw 'protocol v3 contract smoke failed' }
 
       - name: Run v3 HostState named mapping round-trip
         shell: pwsh
         run: |
-          $test = 'build-vrhost/bin/outrun-vr-host-state-v3-channel-smoke.exe'
-          if (-not (Test-Path $test)) { throw 'HostState v3 channel smoke executable was not produced' }
-          & $test
+          & 'build-vrhost/bin/outrun-vr-host-state-v3-channel-smoke.exe'
           if ($LASTEXITCODE -ne 0) { throw "HostState v3 channel smoke failed: $LASTEXITCODE" }
 
       - name: Run v2 to v3 shadow conversion regression
         shell: pwsh
         run: |
-          $test = 'build-vrhost/bin/outrun-vr-v2-v3-shadow-conversion-smoke.exe'
-          if (-not (Test-Path $test)) { throw 'v2-v3 shadow conversion smoke executable was not produced' }
-          & $test
+          & 'build-vrhost/bin/outrun-vr-v2-v3-shadow-conversion-smoke.exe'
           if ($LASTEXITCODE -ne 0) { throw "v2-v3 shadow conversion regression failed: $LASTEXITCODE" }
 
       - name: Run v3 primary pose validation regression
         shell: pwsh
         run: |
-          $test = 'build-vrhost/bin/outrun-vr-host-pose-v3-validation-smoke.exe'
-          if (-not (Test-Path $test)) { throw 'v3 pose validation smoke executable was not produced' }
-          & $test
+          & 'build-vrhost/bin/outrun-vr-host-pose-v3-validation-smoke.exe'
           if ($LASTEXITCODE -ne 0) { throw "v3 pose validation regression failed: $LASTEXITCODE" }
 
       - name: Run renderer-independent core math regression
         shell: pwsh
         run: |
-          $test = 'build-vrhost/bin/outrun-vr-core-math-smoke.exe'
-          if (-not (Test-Path $test)) { throw 'core math smoke executable was not produced' }
-          & $test
+          & 'build-vrhost/bin/outrun-vr-core-math-smoke.exe'
           if ($LASTEXITCODE -ne 0) { throw "core stereo math regression failed: $LASTEXITCODE" }
 
-      - name: Verify x64 host binary
+      - name: Run R23 runtime eligibility recovery regression
+        shell: pwsh
+        run: |
+          & 'build-vrhost/bin/outrun-vr-runtime-eligibility-smoke.exe'
+          if ($LASTEXITCODE -ne 0) { throw "runtime eligibility regression failed: $LASTEXITCODE" }
+
+      - name: Run R23 verified bundle identity/TTL regression
+        shell: pwsh
+        run: |
+          & 'build-vrhost/bin/outrun-vr-r23-verified-bundle-smoke.exe'
+          if ($LASTEXITCODE -ne 0) { throw "R23 verified bundle regression failed: $LASTEXITCODE" }
+
+      - name: Verify x64 R23 host binary
         shell: pwsh
         run: |
           $hostPath = 'build-vrhost/bin/outrun-vr-host.exe'
@@ -303,17 +295,9 @@ jobs:
             '[v3] live shadow HostState/AckState bridge ready.',
             'outrun-vr-host-v3.log',
             'outrun-vr-watchdog.log',
-            'R9-finaltest-host-20260915',
-            '[finaltest] build=',
-            '[finaltest] endFrame total=',
-            'no-layer OpenXR test pattern ready',
-            'R14-review-hardening-20260915',
-            'R15-source-review-10pass-20260915',
-            '[R14] classic D3D9 exact core projection is authoritative',
-            '[R14] D3D9Ex final authority: host-owned SafeEye projection',
-            'desktop SBS fallback disabled for direct frames',
-            '[R15] incoming non-projection layer preserved',
-            '[R15] stale classic SBS frame blocked',
+            '[R23] final presentation authority ACTIVE',
+            'direct safe-eye rejected: actual resource format/size',
+            'gameplay layer blocked: no fresh committed host-owned frame/source/pose bundle',
             'host-owned GPU eye copies + completion ACK active'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR host marker missing: $marker" }
