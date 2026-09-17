@@ -8,10 +8,10 @@
 //
 // R31 hardening removes the old 256-entry overwrite ring. Entries now live until
 // the tracked texture's final COM Release, and a shared entry keeps an in-flight
-// Lock/Unlock operation stable while the registry is changed. Any write path
-// which R14 cannot mirror (direct GPU Lock fallback, external GetSurfaceLevel,
-// UpdateSurface or UpdateTexture) permanently retires that texture's shadow
-// instead of allowing stale CPU data to overwrite newer GPU contents.
+// Lock/Unlock operation stable while the registry is changed. Borrowing a
+// level surface is allowed while its mutating entry points are observed; actual
+// external writes (surface LockRect/GetDC, StretchRect, ColorFill, Update*, or
+// mip generation) retire the shadow instead of risking a stale CPU overwrite.
 
 #include <algorithm>
 #include <memory>
@@ -697,13 +697,19 @@ namespace OutRunVRD3D9ExUpgradeR13
             }
 
             if (shadow) shadow->Release();
+            if (*texture)
+            {
+                (*texture)->Release();
+                *texture = nullptr;
+            }
             ++R14ShadowCreateFailed;
+            ++OutRunVRD3D9ExUpgrade::ManagedCreateFailures;
             if (!R14FirstFallbackLogged.exchange(true))
             {
-                spdlog::warn(
-                    "VR R14 EX: lifetime/coherency hooks or CPU shadow unavailable; this MANAGED texture remains on the R13 direct-GPU compatibility path");
+                spdlog::error(
+                    "VR R14 EX: MANAGED 2D compatibility shadow/hooks unavailable; resource creation fails closed instead of exposing weaker R13 direct-lock semantics");
             }
-            return hr;
+            return D3DERR_NOTAVAILABLE;
         }
 
         DWORD R14SanitizeLockFlags(DWORD flags) noexcept

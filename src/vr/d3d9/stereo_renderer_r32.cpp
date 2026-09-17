@@ -783,9 +783,13 @@ namespace OutRunVRStereo
         {
             if (!R13OverlayReady.load(std::memory_order_acquire))
                 return R32ResolveDirectR13Hook.call<bool>(device, frameId);
-            if (!frameId || R32DirectCopyPathRejected ||
-                !R32EnsureDirectResources(device) ||
+            if (!frameId || !R32EnsureDirectResources(device) ||
                 !BackBuffer || !RightEyeSurface)
+                return false;
+            // R32EnsureDirectResources must run before this cached rejection:
+            // host PID/LUID or transport-generation changes invalidate the old
+            // interop identity and clear the rejection automatically.
+            if (R32DirectCopyPathRejected)
                 return false;
 
             const std::uint32_t slotIndex =

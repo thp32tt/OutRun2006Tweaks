@@ -3,12 +3,14 @@
 #include <Windows.h>
 #include <d3d9.h>
 
+#include <algorithm>
 #include <atomic>
 #include <cstdint>
 #include <cstring>
 #include <cwchar>
 #include <new>
 #include <mutex>
+#include <utility>
 #include <vector>
 
 #include <spdlog/spdlog.h>
@@ -184,7 +186,10 @@ namespace OutRunVRD3D9ExUpgrade
             D3DCAPS9 caps{};
             const UINT streams = SUCCEEDED(device->GetDeviceCaps(&caps))
                 ? std::min<UINT>(caps.MaxStreams, 16u) : 16u;
-            for (DWORD stage = 0; stage < 16; ++stage)
+            // Classic D3D9 exposes eight fixed-function texture stages.
+            // Do not count VS sampler aliases (16..19) or invalid pixel stages
+            // as Reset replay failures.
+            for (DWORD stage = 0; stage < 8; ++stage)
                 if (FAILED(device->SetTexture(stage, nullptr))) ++failures;
             for (UINT stream = 0; stream < streams; ++stream)
             {
