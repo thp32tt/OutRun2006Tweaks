@@ -5,6 +5,10 @@
 // exact single-count draw dispatch. Reset now simply chains through R32, whose
 // trampoline is installed above R22, so R22 is authoritative in both the R32
 // fallback and the final R33 path.
+//
+// R33 is also the final top-level draw boundary: when telemetry is disabled,
+// route accounting and diagnostic counter writes are skipped so the steady
+// draw path pays only for correctness checks required by stereo rendering.
 
 #include "stereo_renderer_r32.cpp"
 
@@ -64,6 +68,11 @@ namespace OutRunVRStereo
         };
         R33PerfSnapshot R33Perf{};
 
+        inline bool R33TelemetryEnabled() noexcept
+        {
+            return Settings::VRTelemetry;
+        }
+
         void R33InvalidateDepthStencilCache() noexcept
         {
             R33DepthStencilState.valid = false;
@@ -90,14 +99,16 @@ namespace OutRunVRStereo
                 next.stateBlockRecordings = R31StateBlockRecordings;
                 next.stateBlockApplies = R31StateBlockApplies;
                 R33DepthStencilState = next;
-                ++R33DepthStencilSyncs;
+                if (R33TelemetryEnabled())
+                    ++R33DepthStencilSyncs;
                 return true;
             }
 
             if (FAILED(device->GetRenderState(D3DRS_ZENABLE, &next.zEnable)) ||
                 FAILED(device->GetRenderState(D3DRS_ZWRITEENABLE, &next.zWrite)))
             {
-                ++R33DepthStencilReadFailures;
+                if (R33TelemetryEnabled())
+                    ++R33DepthStencilReadFailures;
                 R33InvalidateDepthStencilCache();
                 return false;
             }
@@ -123,7 +134,8 @@ namespace OutRunVRStereo
                     FAILED(device->GetRenderState(
                         D3DRS_CCW_STENCILPASS, &next.ccwStencilPass)))
                 {
-                    ++R33DepthStencilReadFailures;
+                    if (R33TelemetryEnabled())
+                        ++R33DepthStencilReadFailures;
                     R33InvalidateDepthStencilCache();
                     return false;
                 }
@@ -134,7 +146,8 @@ namespace OutRunVRStereo
             next.stateBlockRecordings = R31StateBlockRecordings;
             next.stateBlockApplies = R31StateBlockApplies;
             R33DepthStencilState = next;
-            ++R33DepthStencilSyncs;
+            if (R33TelemetryEnabled())
+                ++R33DepthStencilSyncs;
             if (!R33FirstDepthStencilCacheLogged)
             {
                 R33FirstDepthStencilCacheLogged = true;
@@ -163,7 +176,8 @@ namespace OutRunVRStereo
 
             if (!R31StateBlockTrackingReliable.load(std::memory_order_acquire))
             {
-                ++R33DepthStencilLiveFallbacks;
+                if (R33TelemetryEnabled())
+                    ++R33DepthStencilLiveFallbacks;
                 mayWriteDepth = LeftDrawMayWriteDepth(device);
                 mayWriteStencil = LeftDrawMayWriteStencil(device);
                 return true;
@@ -174,7 +188,7 @@ namespace OutRunVRStereo
                 if (!R33ReadDepthStencilWriteState(device))
                     return false;
             }
-            else
+            else if (R33TelemetryEnabled())
             {
                 ++R33DepthStencilCacheHits;
             }
@@ -280,8 +294,8 @@ namespace OutRunVRStereo
         {
             if (R31StateBlockRecording || !R29StableStereoBase(device))
             {
-                if (IsGameDevice(device) && !InternalStereoPass &&
-                    TargetIsBackBuffer())
+                if (R33TelemetryEnabled() && IsGameDevice(device) &&
+                    !InternalStereoPass && TargetIsBackBuffer())
                     ++R31Frame.unstable;
                 return {};
             }
@@ -296,7 +310,8 @@ namespace OutRunVRStereo
                 return {};
             if (fragile)
             {
-                ++R31Frame.fragile;
+                if (R33TelemetryEnabled())
+                    ++R31Frame.fragile;
                 return {};
             }
 
@@ -415,8 +430,11 @@ namespace OutRunVRStereo
             ++DuplicatedDraws;
             ++WorldStereoDraws;
             ++R29StableTwoEyeDraws;
-            ++R31FastWorldDraws;
-            ++R31Frame.fastWorld;
+            if (R33TelemetryEnabled())
+            {
+                ++R31FastWorldDraws;
+                ++R31Frame.fastWorld;
+            }
 
             if (FrameStereoPoseSequence == 0)
             {
@@ -578,8 +596,11 @@ namespace OutRunVRStereo
             ++NonWorldDuplicatedDraws;
             ++R29StableTwoEyeDraws;
             ++R30ScreenSpaceFovDraws;
-            ++R31HudDraws;
-            ++R31Frame.hud;
+            if (R33TelemetryEnabled())
+            {
+                ++R31HudDraws;
+                ++R31Frame.hud;
+            }
 
             if (FAILED(rightHr))
             {
@@ -604,11 +625,14 @@ namespace OutRunVRStereo
             ActualDraw&& actualDraw, LowerR29Draw&& lowerR29Draw,
             const char* site) noexcept
         {
-            R31ObserveDraw(device);
+            const bool telemetry = R33TelemetryEnabled();
+            if (telemetry)
+                R31ObserveDraw(device);
 
             if (R31StateBlockRecording)
             {
-                ++R31Frame.fallback;
+                if (telemetry)
+                    ++R31Frame.fallback;
                 return actualDraw();
             }
 
@@ -627,7 +651,8 @@ namespace OutRunVRStereo
                     return fast.hr;
             }
 
-            ++R31Frame.fallback;
+            if (telemetry)
+                ++R31Frame.fallback;
             return R32LowerFailClosed(device,
                 std::forward<LowerR29Draw>(lowerR29Draw));
         }
@@ -726,7 +751,7 @@ namespace OutRunVRStereo
 
         void R33LogPerfWindow() noexcept
         {
-            if (!Settings::VRTelemetry)
+            if (!R33TelemetryEnabled())
                 return;
             const ULONGLONG now = GetTickCount64();
             if (R33Perf.lastLogMs == 0)
@@ -855,7 +880,7 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR33Dispatch", true);
                     spdlog::info(
-                        "VR R33 DISPATCH: R33TryFastWorld/R33TryHud + direct R29 fallback READY; top-level telemetry counted once; corrected R32->R22 Reset lifecycle + depth/stencil cache ACTIVE");
+                        "VR R33 DISPATCH: R33TryFastWorld/R33TryHud + direct R29 fallback READY; top-level telemetry counted once when enabled; corrected R32->R22 Reset lifecycle + depth/stencil cache ACTIVE");
                     return 0;
                 }
                 Sleep(25);
