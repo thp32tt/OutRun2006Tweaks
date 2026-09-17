@@ -1,16 +1,8 @@
 // R32 review-consolidation overlay.
 //
-// This is the final game-side TU. It keeps R31/R29/R14 correctness policy and
-// applies the two 10-pass reviews without weakening recovery behavior:
-//  * Reset rearms the R29 mono-safety epoch relative to the reset Present epoch;
-//  * render-state snapshot failures fail closed to stock-WVP zero disparity;
-//  * verified steady LEFT/RIGHT WVP uploads use one c64..c67 batch call;
-//  * unreliable StateBlock mode live-validates the state R32 actually consumes
-//    instead of discarding every lower cache on a successfully handled world draw;
-//  * D3D9Ex direct transport caches the verified host/LUID identity and bounds
-//    the producer event-query stall to a 2 ms budget with one explicit FLUSH;
-//  * five-second R32 telemetry reports deltas for counters that R31 logged as
-//    lifetime totals.
+// Keeps R31/R29/R14 correctness policy while consolidating the reviewed hot
+// paths. Review-2 additionally makes R22 the reset owner and prevents reuse of a
+// DirectGPU producer slot while a timed-out D3D9 EVENT query is still pending.
 
 #include "r32_policy.hpp"
 #include "stereo_renderer_r31.cpp"
@@ -19,7 +11,7 @@ namespace OutRunVRStereo
 {
     namespace
     {
-        SafetyHookInline R32ResetR13Hook{};
+        SafetyHookInline R32ResetR22Hook{};
         SafetyHookInline R32ResolveDirectR13Hook{};
         SafetyHookInline R32PresentR13Hook{};
         SafetyHookInline R32DrawPrimitiveR31Hook{};
@@ -35,18 +27,25 @@ namespace OutRunVRStereo
         std::uint64_t R32StateSnapshotFailures = 0;
         std::uint64_t R32FailClosedZeroDisparityDraws = 0;
         std::uint64_t R32ResetEpochRearms = 0;
+        std::uint64_t R32ResetFailures = 0;
         std::uint64_t R32DirectProbeCacheHits = 0;
         std::uint64_t R32DirectFenceSuccess = 0;
         std::uint64_t R32DirectFenceBudgetFallbacks = 0;
         std::uint64_t R32DirectIdentityInvalidations = 0;
+        std::uint64_t R32PendingFenceDrains = 0;
+        std::uint64_t R32PendingFenceBlocks = 0;
+        std::uint64_t R32PendingFenceErrors = 0;
         bool R32FirstStateSnapshotFailureLogged = false;
         bool R32FirstBatchWvpLogged = false;
         bool R32FirstFenceBudgetLogged = false;
         bool R32FirstResetRearmLogged = false;
+        bool R32FirstPendingFenceLogged = false;
 
         std::uint32_t R32DirectHostPid = 0;
         std::uint32_t R32DirectHostLuidLow = 0;
         std::uint32_t R32DirectHostLuidHigh = 0;
+        std::array<bool, OutRunVR::RenderFrameRingSize> R32ProducerFencePending{};
+        std::array<std::uint32_t, OutRunVR::RenderFrameRingSize> R32ProducerPendingFrame{};
 
         struct R32CounterSnapshot
         {
@@ -63,7 +62,11 @@ namespace OutRunVRStereo
             std::uint64_t directFenceOk = 0;
             std::uint64_t directFenceFallback = 0;
             std::uint64_t directBackpressure = 0;
+            std::uint64_t pendingDrain = 0;
+            std::uint64_t pendingBlock = 0;
+            std::uint64_t pendingError = 0;
             std::uint64_t resetRearm = 0;
+            std::uint64_t resetFail = 0;
         };
         R32CounterSnapshot R32Counters{};
 
@@ -597,6 +600,12 @@ namespace OutRunVRStereo
             R32DirectHostLuidHigh = 0;
         }
 
+        void R32ClearPendingProducerFences() noexcept
+        {
+            R32ProducerFencePending.fill(false);
+            R32ProducerPendingFrame.fill(0);
+        }
+
         bool R32DirectIdentityMatches() noexcept
         {
             return SharedState && DirectInteropVerified &&
@@ -608,6 +617,7 @@ namespace OutRunVRStereo
 
         void R32InvalidateDirectInteropOnly() noexcept
         {
+            R32ClearPendingProducerFences();
             ReleaseDirectTransportSlots();
             ReleaseCom(DirectInteropProbeFence);
             ReleaseCom(DirectInteropProbeSurface);
@@ -637,6 +647,8 @@ namespace OutRunVRStereo
             if (DirectTransportResourcesReady && !R32DirectIdentityMatches())
                 R32InvalidateDirectInteropOnly();
 
+            if (!DirectTransportResourcesReady)
+                R32ClearPendingProducerFences();
             if (!EnsureDirectTransportResources(device))
                 return false;
             if (!SharedState || !DirectInteropVerified)
@@ -688,6 +700,48 @@ namespace OutRunVRStereo
             }
         }
 
+        bool R32DrainPendingProducerFence(std::uint32_t slotIndex) noexcept
+        {
+            if (slotIndex >= R32ProducerFencePending.size() ||
+                !R32ProducerFencePending[slotIndex])
+                return true;
+
+            auto& slot = DirectTransportSlots[slotIndex];
+            if (!slot.fence)
+            {
+                R32ProducerFencePending[slotIndex] = false;
+                R32ProducerPendingFrame[slotIndex] = 0;
+                ++R32PendingFenceErrors;
+                return false;
+            }
+
+            const HRESULT ready = slot.fence->GetData(nullptr, 0, 0);
+            if (ready == S_OK)
+            {
+                R32ProducerFencePending[slotIndex] = false;
+                R32ProducerPendingFrame[slotIndex] = 0;
+                ++R32PendingFenceDrains;
+                return true;
+            }
+            if (ready == S_FALSE)
+            {
+                ++R32PendingFenceBlocks;
+                ++DirectTransportRingBackpressure;
+                if (!R32FirstPendingFenceLogged)
+                {
+                    R32FirstPendingFenceLogged = true;
+                    spdlog::info(
+                        "VR R32 D3D9Ex: timed-out producer EVENT remains pending; the ring slot is blocked from reuse until the GPU reports completion");
+                }
+                return false;
+            }
+
+            R32ProducerFencePending[slotIndex] = false;
+            R32ProducerPendingFrame[slotIndex] = 0;
+            ++R32PendingFenceErrors;
+            return false;
+        }
+
         bool ResolveDirectTransportR32(IDirect3DDevice9* device,
             std::uint32_t frameId) noexcept
         {
@@ -699,6 +753,9 @@ namespace OutRunVRStereo
 
             const std::uint32_t slotIndex =
                 (frameId - 1u) % OutRunVR::RenderFrameRingSize;
+            if (!R32DrainPendingProducerFence(slotIndex))
+                return false;
+
             auto& slot = DirectTransportSlots[slotIndex];
             if (slot.frameId)
             {
@@ -722,44 +779,66 @@ namespace OutRunVRStereo
                     FAILED(slot.fence->Issue(D3DISSUE_END)))
                     return false;
             }
+
+            R32ProducerFencePending[slotIndex] = true;
+            R32ProducerPendingFrame[slotIndex] = frameId;
             if (!R32WaitProducerFence(slot.fence))
                 return false;
 
+            R32ProducerFencePending[slotIndex] = false;
+            R32ProducerPendingFrame[slotIndex] = 0;
             slot.frameId = frameId;
             ActiveDirectTransportSlot = slotIndex;
             return true;
         }
 
-        void R32ResetAfterGameReset() noexcept
+        void R32InvalidateResetCaches() noexcept
         {
-            R29MonoSafetyThroughEpoch = OutRunVR::R32::RearmMonoSafetyEpoch(
-                PresentEpoch);
             R29Effect = {};
             R31BlockedVerifiedGeneration = 0;
             R31FastWorldCandidates = 0;
             R31EyeCache = {};
             R31Frame = {};
             R31Window = {};
-            R22ShadowState = {};
             R23LastStateSampleDrawSerial = 0;
             R23LastStateSampleEpoch = 0;
             OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
             R32ForgetDirectIdentity();
+            R32ClearPendingProducerFences();
+        }
+
+        void R32ResetAfterGameReset() noexcept
+        {
+            R29MonoSafetyThroughEpoch = OutRunVR::R32::RearmMonoSafetyEpoch(
+                PresentEpoch);
+            R32InvalidateResetCaches();
             ++R32ResetEpochRearms;
             if (!R32FirstResetRearmLogged)
             {
                 R32FirstResetRearmLogged = true;
                 spdlog::info(
-                    "VR R32 RESET: R29 mono-safety horizon rearmed relative to reset PresentEpoch; stale pre-reset epoch can no longer suppress fast stereo for thousands of Presents");
+                    "VR R32 RESET: R22 completed Reset lifecycle first; mono-safety/cache generations were rearmed without discarding the freshly primed viewport/scissor shadow");
             }
         }
 
         HRESULT __stdcall ResetDestR32(IDirect3DDevice9* device,
             D3DPRESENT_PARAMETERS* params)
         {
-            const HRESULT hr = R32ResetR13Hook.stdcall<HRESULT>(device, params);
-            if (IsGameDevice(device))
-                R32ResetAfterGameReset();
+            const bool gameDevice = IsGameDevice(device);
+            if (gameDevice)
+                R32ClearPendingProducerFences();
+
+            const HRESULT hr = R32ResetR22Hook.stdcall<HRESULT>(device, params);
+            if (gameDevice)
+            {
+                if (SUCCEEDED(hr))
+                    R32ResetAfterGameReset();
+                else
+                {
+                    R32InvalidateResetCaches();
+                    ++R32ResetFailures;
+                }
+            }
             return hr;
         }
 
@@ -783,14 +862,18 @@ namespace OutRunVRStereo
                 R32Counters.directFenceOk = R32DirectFenceSuccess;
                 R32Counters.directFenceFallback = R32DirectFenceBudgetFallbacks;
                 R32Counters.directBackpressure = DirectTransportRingBackpressure;
+                R32Counters.pendingDrain = R32PendingFenceDrains;
+                R32Counters.pendingBlock = R32PendingFenceBlocks;
+                R32Counters.pendingError = R32PendingFenceErrors;
                 R32Counters.resetRearm = R32ResetEpochRearms;
+                R32Counters.resetFail = R32ResetFailures;
                 return;
             }
             if (now - R32Counters.lastLogMs < 5000)
                 return;
 
             spdlog::info(
-                "VR R32 PERF 5s: liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},producerFenceOk={},producerBudgetFallback={},backpressure={}] resetRearm={}",
+                "VR R32 PERF 5s: liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},producerFenceOk={},producerBudgetFallback={},backpressure={},pendingDrain={},pendingBlock={},pendingError={}] reset[rearm={},fail={}]",
                 R31FastWorldLiveValidations - R32Counters.liveWvp,
                 R31FastWorldValidationRejects - R32Counters.liveReject,
                 R31StateBlockRecordings - R32Counters.stateRecord,
@@ -803,7 +886,11 @@ namespace OutRunVRStereo
                 R32DirectFenceSuccess - R32Counters.directFenceOk,
                 R32DirectFenceBudgetFallbacks - R32Counters.directFenceFallback,
                 DirectTransportRingBackpressure - R32Counters.directBackpressure,
-                R32ResetEpochRearms - R32Counters.resetRearm);
+                R32PendingFenceDrains - R32Counters.pendingDrain,
+                R32PendingFenceBlocks - R32Counters.pendingBlock,
+                R32PendingFenceErrors - R32Counters.pendingError,
+                R32ResetEpochRearms - R32Counters.resetRearm,
+                R32ResetFailures - R32Counters.resetFail);
 
             R32Counters.lastLogMs = now;
             R32Counters.liveWvp = R31FastWorldLiveValidations;
@@ -818,7 +905,11 @@ namespace OutRunVRStereo
             R32Counters.directFenceOk = R32DirectFenceSuccess;
             R32Counters.directFenceFallback = R32DirectFenceBudgetFallbacks;
             R32Counters.directBackpressure = DirectTransportRingBackpressure;
+            R32Counters.pendingDrain = R32PendingFenceDrains;
+            R32Counters.pendingBlock = R32PendingFenceBlocks;
+            R32Counters.pendingError = R32PendingFenceErrors;
             R32Counters.resetRearm = R32ResetEpochRearms;
+            R32Counters.resetFail = R32ResetFailures;
         }
 
         HRESULT __stdcall PresentDestR32(IDirect3DDevice9* device,
@@ -840,13 +931,13 @@ namespace OutRunVRStereo
             R32DrawPrimitiveR31Hook = {};
             R32PresentR13Hook = {};
             R32ResolveDirectR13Hook = {};
-            R32ResetR13Hook = {};
+            R32ResetR22Hook = {};
         }
 
         bool R32EnableHooks() noexcept
         {
             SafetyHookInline* hooks[]{
-                &R32ResetR13Hook,
+                &R32ResetR22Hook,
                 &R32ResolveDirectR13Hook,
                 &R32PresentR13Hook,
                 &R32DrawPrimitiveR31Hook,
@@ -867,18 +958,21 @@ namespace OutRunVRStereo
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
                 const auto r31 = R31InstallState.load(std::memory_order_acquire);
+                const auto r22 = R22InstallState.load(std::memory_order_acquire);
                 const auto r13 = R13InstallState.load(std::memory_order_acquire);
-                if (r31 == State::Failed || r13 == R13InstallFailed)
+                if (r31 == State::Failed || r22 == State::Failed ||
+                    r13 == R13InstallFailed)
                 {
                     R32InstallState.store(State::Failed, std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR32Review", false);
                     return 0;
                 }
-                if (r31 == State::Ready && r13 == R13InstallReady)
+                if (r31 == State::Ready && r22 == State::Ready &&
+                    r13 == R13InstallReady)
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
-                    R32ResetR13Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&ResetDestR13), ResetDestR32, disabled);
+                    R32ResetR22Hook = safetyhook::create_inline(
+                        reinterpret_cast<void*>(&ResetDestR22), ResetDestR32, disabled);
                     R32ResolveDirectR13Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&ResolveDirectTransportR13),
                         ResolveDirectTransportR32, disabled);
@@ -905,14 +999,14 @@ namespace OutRunVRStereo
                         HookManager::ReportAsyncResult(
                             "OpenXRVRStereoR32Review", false);
                         spdlog::error(
-                            "VR R32: review/optimization hook transaction was partial; R31 remains authoritative");
+                            "VR R32: review/optimization hook transaction was partial; R31/R22 remain authoritative");
                         return 0;
                     }
 
                     R32InstallState.store(State::Ready, std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR32Review", true);
                     spdlog::info(
-                        "VR R32 REVIEW: reset epoch fix + fail-closed state reads + batched WVP + cached D3D9Ex interop + bounded producer fence + delta telemetry READY");
+                        "VR R32 REVIEW2: R22-owned Reset lifecycle + fail-closed state reads + batched WVP + cached D3D9Ex interop + pending-fence-safe producer ring + delta telemetry READY");
                     return 0;
                 }
                 Sleep(25);
@@ -920,7 +1014,7 @@ namespace OutRunVRStereo
 
             R32InstallState.store(State::Failed, std::memory_order_release);
             HookManager::ReportAsyncResult("OpenXRVRStereoR32Review", false);
-            spdlog::error("VR R32: timed out waiting for R31/R13 prerequisites");
+            spdlog::error("VR R32: timed out waiting for R31/R22/R13 prerequisites");
             return 0;
         }
 
