@@ -1,11 +1,21 @@
-// R33 final dispatch accounting overlay.
+// R33 final dispatch + post-review hot-path hardening.
 //
-// R32 owns all correctness/performance changes from the two 10-pass reviews.
-// This final thin layer fixes one integration detail: if an R32 fast candidate
-// fell through to the R31 function body, R31ObserveDraw would count the same
-// top-level game draw a second time. Reuse the R32 fast paths, but dispatch a
-// rejected candidate directly to the exact R30/R29 lower path R31 would have
-// selected after its own fallback decision.
+// R32 owns the two 10-pass review fixes. R33 remains the final game-side
+// callback boundary and now also closes the follow-up review findings without
+// flattening the validated revision chain:
+//  * Reset reaches R22's authoritative eligibility/baseline lifecycle before
+//    R32 rearms its local fast-path epoch/cache state;
+//  * steady-state depth/stencil write classification is shadowed from the
+//    existing R29 SetRenderState path and invalidated by StateBlock/depth
+//    generations, eliminating per-draw GetRenderState/GetDesc calls when R31
+//    StateBlock tracking is reliable;
+//  * unreliable StateBlock mode keeps the old live getter path fail-closed;
+//  * top-level draw telemetry is counted exactly once.
+//
+// R32TryFastWorld/R32TryHud remain the proven lower implementations this layer
+// derives from; R33 duplicates only the final owned draw sequence so it can use
+// the cached depth/stencil write decision. R32LowerFailClosed remains the exact
+// safety fallback authority.
 
 #include "stereo_renderer_r32.cpp"
 
@@ -13,6 +23,9 @@ namespace OutRunVRStereo
 {
     namespace
     {
+        SafetyHookInline R33ResetR32Hook{};
+        SafetyHookInline R33PresentR32Hook{};
+        SafetyHookInline R33SetRenderStateR29Hook{};
         SafetyHookInline R33DrawPrimitiveR32Hook{};
         SafetyHookInline R33DrawIndexedPrimitiveR32Hook{};
         SafetyHookInline R33DrawPrimitiveUPR32Hook{};
@@ -20,6 +33,582 @@ namespace OutRunVRStereo
 
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R33InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
+
+        struct R33DepthStencilWriteState
+        {
+            DWORD zEnable = D3DZB_TRUE;
+            DWORD zWrite = TRUE;
+            DWORD stencilEnable = FALSE;
+            DWORD stencilWriteMask = 0xFFFFFFFFu;
+            DWORD stencilFail = D3DSTENCILOP_KEEP;
+            DWORD stencilZFail = D3DSTENCILOP_KEEP;
+            DWORD stencilPass = D3DSTENCILOP_KEEP;
+            DWORD twoSided = FALSE;
+            DWORD ccwStencilFail = D3DSTENCILOP_KEEP;
+            DWORD ccwStencilZFail = D3DSTENCILOP_KEEP;
+            DWORD ccwStencilPass = D3DSTENCILOP_KEEP;
+            std::uint64_t depthGeneration = 0;
+            std::uint64_t stateBlockRecordings = 0;
+            std::uint64_t stateBlockApplies = 0;
+            bool valid = false;
+        };
+
+        thread_local R33DepthStencilWriteState R33DepthStencilState{};
+        std::uint64_t R33DepthStencilSyncs = 0;
+        std::uint64_t R33DepthStencilCacheHits = 0;
+        std::uint64_t R33DepthStencilLiveFallbacks = 0;
+        std::uint64_t R33DepthStencilReadFailures = 0;
+        std::uint64_t R33ResetSuccesses = 0;
+        std::uint64_t R33ResetFailures = 0;
+        bool R33FirstDepthStencilCacheLogged = false;
+        bool R33FirstResetLifecycleLogged = false;
+
+        struct R33PerfSnapshot
+        {
+            ULONGLONG lastLogMs = 0;
+            std::uint64_t syncs = 0;
+            std::uint64_t hits = 0;
+            std::uint64_t live = 0;
+            std::uint64_t readFail = 0;
+            std::uint64_t resetOk = 0;
+            std::uint64_t resetFail = 0;
+        };
+        R33PerfSnapshot R33Perf{};
+
+        void R33InvalidateDepthStencilCache() noexcept
+        {
+            R33DepthStencilState.valid = false;
+        }
+
+        bool R33TrackedDepthHasStencil() noexcept
+        {
+            if (!TrackedDepthStencil || !R9MainDepthKnown ||
+                TrackedDepthStencil != R9MainDepthIdentity)
+                return false;
+            return FormatHasStencil(R9MainDepthDesc.Format);
+        }
+
+        bool R33ReadDepthStencilWriteState(IDirect3DDevice9* device) noexcept
+        {
+            if (!device)
+                return false;
+
+            R33DepthStencilWriteState next{};
+            if (!TrackedDepthStencil)
+            {
+                next.valid = true;
+                next.depthGeneration = R9MainDepthGeneration;
+                next.stateBlockRecordings = R31StateBlockRecordings;
+                next.stateBlockApplies = R31StateBlockApplies;
+                R33DepthStencilState = next;
+                ++R33DepthStencilSyncs;
+                return true;
+            }
+
+            if (FAILED(device->GetRenderState(D3DRS_ZENABLE, &next.zEnable)) ||
+                FAILED(device->GetRenderState(D3DRS_ZWRITEENABLE, &next.zWrite)))
+            {
+                ++R33DepthStencilReadFailures;
+                R33InvalidateDepthStencilCache();
+                return false;
+            }
+
+            if (R33TrackedDepthHasStencil())
+            {
+                if (FAILED(device->GetRenderState(
+                        D3DRS_STENCILENABLE, &next.stencilEnable)) ||
+                    FAILED(device->GetRenderState(
+                        D3DRS_STENCILWRITEMASK, &next.stencilWriteMask)) ||
+                    FAILED(device->GetRenderState(
+                        D3DRS_STENCILFAIL, &next.stencilFail)) ||
+                    FAILED(device->GetRenderState(
+                        D3DRS_STENCILZFAIL, &next.stencilZFail)) ||
+                    FAILED(device->GetRenderState(
+                        D3DRS_STENCILPASS, &next.stencilPass)) ||
+                    FAILED(device->GetRenderState(
+                        D3DRS_TWOSIDEDSTENCILMODE, &next.twoSided)) ||
+                    FAILED(device->GetRenderState(
+                        D3DRS_CCW_STENCILFAIL, &next.ccwStencilFail)) ||
+                    FAILED(device->GetRenderState(
+                        D3DRS_CCW_STENCILZFAIL, &next.ccwStencilZFail)) ||
+                    FAILED(device->GetRenderState(
+                        D3DRS_CCW_STENCILPASS, &next.ccwStencilPass)))
+                {
+                    ++R33DepthStencilReadFailures;
+                    R33InvalidateDepthStencilCache();
+                    return false;
+                }
+            }
+
+            next.valid = true;
+            next.depthGeneration = R9MainDepthGeneration;
+            next.stateBlockRecordings = R31StateBlockRecordings;
+            next.stateBlockApplies = R31StateBlockApplies;
+            R33DepthStencilState = next;
+            ++R33DepthStencilSyncs;
+            if (!R33FirstDepthStencilCacheLogged)
+            {
+                R33FirstDepthStencilCacheLogged = true;
+                spdlog::info(
+                    "VR R33 PERF: depth/stencil write shadow cache ACTIVE; steady draws no longer query Z/stencil state or depth GetDesc when StateBlock tracking is reliable");
+            }
+            return true;
+        }
+
+        bool R33DepthStencilCacheCurrent() noexcept
+        {
+            return R33DepthStencilState.valid &&
+                R33DepthStencilState.depthGeneration == R9MainDepthGeneration &&
+                R33DepthStencilState.stateBlockRecordings ==
+                    R31StateBlockRecordings &&
+                R33DepthStencilState.stateBlockApplies == R31StateBlockApplies;
+        }
+
+        bool R33GetWriteFlags(IDirect3DDevice9* device,
+            bool& mayWriteDepth, bool& mayWriteStencil) noexcept
+        {
+            mayWriteDepth = false;
+            mayWriteStencil = false;
+            if (!TrackedDepthStencil)
+                return true;
+
+            if (!R31StateBlockTrackingReliable.load(std::memory_order_acquire))
+            {
+                ++R33DepthStencilLiveFallbacks;
+                mayWriteDepth = LeftDrawMayWriteDepth(device);
+                mayWriteStencil = LeftDrawMayWriteStencil(device);
+                return true;
+            }
+
+            if (!R33DepthStencilCacheCurrent())
+            {
+                if (!R33ReadDepthStencilWriteState(device))
+                    return false;
+            }
+            else
+            {
+                ++R33DepthStencilCacheHits;
+            }
+
+            const auto& s = R33DepthStencilState;
+            mayWriteDepth = s.zEnable != D3DZB_FALSE && s.zWrite != FALSE;
+
+            if (!R33TrackedDepthHasStencil() || s.stencilEnable == FALSE ||
+                s.stencilWriteMask == 0)
+                return true;
+
+            const bool frontWrites =
+                s.stencilFail != D3DSTENCILOP_KEEP ||
+                s.stencilZFail != D3DSTENCILOP_KEEP ||
+                s.stencilPass != D3DSTENCILOP_KEEP;
+            const bool backWrites = s.twoSided != FALSE &&
+                (s.ccwStencilFail != D3DSTENCILOP_KEEP ||
+                 s.ccwStencilZFail != D3DSTENCILOP_KEEP ||
+                 s.ccwStencilPass != D3DSTENCILOP_KEEP);
+            mayWriteStencil = frontWrites || backWrites;
+            return true;
+        }
+
+        void R33InvalidateRightForLeftWrite(
+            bool mayWriteDepth, bool mayWriteStencil) noexcept
+        {
+            if (mayWriteDepth)
+                RightDepthSynchronized = false;
+            if (mayWriteStencil)
+                RightStencilSynchronized = false;
+        }
+
+        HRESULT __stdcall SetRenderStateDestR33(IDirect3DDevice9* device,
+            D3DRENDERSTATETYPE state, DWORD value)
+        {
+            const HRESULT hr = R33SetRenderStateR29Hook.stdcall<HRESULT>(
+                device, state, value);
+            if (FAILED(hr) || !IsGameDevice(device) || InternalStereoPass)
+                return hr;
+
+            if (R31StateBlockRecording)
+            {
+                R33InvalidateDepthStencilCache();
+                return hr;
+            }
+            if (!R33DepthStencilState.valid)
+                return hr;
+
+            bool tracked = true;
+            switch (state)
+            {
+            case D3DRS_ZENABLE:
+                R33DepthStencilState.zEnable = value;
+                break;
+            case D3DRS_ZWRITEENABLE:
+                R33DepthStencilState.zWrite = value;
+                break;
+            case D3DRS_STENCILENABLE:
+                R33DepthStencilState.stencilEnable = value;
+                break;
+            case D3DRS_STENCILWRITEMASK:
+                R33DepthStencilState.stencilWriteMask = value;
+                break;
+            case D3DRS_STENCILFAIL:
+                R33DepthStencilState.stencilFail = value;
+                break;
+            case D3DRS_STENCILZFAIL:
+                R33DepthStencilState.stencilZFail = value;
+                break;
+            case D3DRS_STENCILPASS:
+                R33DepthStencilState.stencilPass = value;
+                break;
+            case D3DRS_TWOSIDEDSTENCILMODE:
+                R33DepthStencilState.twoSided = value;
+                break;
+            case D3DRS_CCW_STENCILFAIL:
+                R33DepthStencilState.ccwStencilFail = value;
+                break;
+            case D3DRS_CCW_STENCILZFAIL:
+                R33DepthStencilState.ccwStencilZFail = value;
+                break;
+            case D3DRS_CCW_STENCILPASS:
+                R33DepthStencilState.ccwStencilPass = value;
+                break;
+            default:
+                tracked = false;
+                break;
+            }
+
+            if (tracked)
+            {
+                R33DepthStencilState.depthGeneration = R9MainDepthGeneration;
+                R33DepthStencilState.stateBlockRecordings =
+                    R31StateBlockRecordings;
+                R33DepthStencilState.stateBlockApplies = R31StateBlockApplies;
+            }
+            return hr;
+        }
+
+        template <typename ActualDraw>
+        R31OwnedResult R33TryFastWorld(IDirect3DDevice9* device,
+            ActualDraw&& actualDraw, const char* site)
+        {
+            if (R31StateBlockRecording || !R29StableStereoBase(device))
+            {
+                if (IsGameDevice(device) && !InternalStereoPass &&
+                    TargetIsBackBuffer())
+                    ++R31Frame.unstable;
+                return {};
+            }
+
+            bool fragile = true;
+            const bool stateBlocksReliable =
+                R31StateBlockTrackingReliable.load(std::memory_order_acquire);
+            const bool effectKnown = stateBlocksReliable
+                ? R29FragileEffectCached(device, fragile)
+                : R32EffectIsFragileLive(device, fragile);
+            if (!effectKnown)
+                return {};
+            if (fragile)
+            {
+                ++R31Frame.fragile;
+                return {};
+            }
+
+            if (!EnsureStereoResources(device))
+                return {};
+            if (TrackedDepthStencil &&
+                (!RightDepthSynchronized || !RightStencilSynchronized))
+                TryBootstrapRightDepthFromRecentClear(device);
+            if (TrackedDepthStencil && !RightDepthSynchronized &&
+                DepthTestActive(device))
+                return {};
+            if (TrackedDepthStencil && !RightStencilSynchronized &&
+                StencilTestActive(device))
+                return {};
+
+            OutRunVRRenderer::LatchedStereoFrame stereo{};
+            if (!OutRunVRRenderer::GetLatchedStereoFrame(stereo) ||
+                stereo.poseSequence == 0)
+                return {};
+            if (FrameStereoPoseSequence != 0 &&
+                FrameStereoPoseSequence != stereo.poseSequence)
+                return {};
+
+            DrawStereoState draw{};
+            if (!R31BuildFastWorldConstants(device, stereo, draw))
+                return {};
+
+            D3DVIEWPORT9 savedViewport{};
+            if (!R32GetSavedViewport(device, savedViewport))
+                return {};
+
+            bool mayWriteDepth = false;
+            bool mayWriteStencil = false;
+            if (!R33GetWriteFlags(device, mayWriteDepth, mayWriteStencil))
+                return {};
+
+            bool leftWvpOk = false;
+            {
+                InternalPassScope guard;
+                leftWvpOk = R32SetWvpBatch(device, draw.eyeConstants[0]);
+            }
+            if (!leftWvpOk)
+            {
+                bool rolledBack = false;
+                {
+                    InternalPassScope guard;
+                    rolledBack = R32SetWvpBatch(device, draw.originalConstants);
+                }
+                if (!rolledBack)
+                {
+                    R9Poison(OutRunVR::StereoFailureRestoreFailed,
+                        "R33/fast-left-WVP-rollback");
+                    NoteRestoreFailure("R33 fast left-eye c64 rollback");
+                    R29ArmMonoSafety();
+                    return { true, E_FAIL };
+                }
+                return {};
+            }
+
+            ++R9DrawCalls;
+            R9MonoBackupGap = true;
+            if (mayWriteDepth || mayWriteStencil)
+                ++R9MainDepthContentSerial;
+
+            R31OwnedResult result{ true, actualDraw() };
+            if (FAILED(result.hr))
+            {
+                R33InvalidateRightForLeftWrite(
+                    mayWriteDepth, mayWriteStencil);
+                R9Poison(OutRunVR::StereoFailureLeftDrawFailed, site, result.hr);
+                bool restored = false;
+                {
+                    InternalPassScope guard;
+                    restored = R32SetWvpBatch(device, draw.originalConstants);
+                }
+                if (!restored)
+                    NoteRestoreFailure("R33 fast left draw c64");
+                R29ArmMonoSafety();
+                return result;
+            }
+
+            IDirect3DSurface9* savedRt = TrackedRenderTarget;
+            IDirect3DSurface9* savedDepth = TrackedDepthStencil;
+            HRESULT rightHr = D3D_OK;
+            OutRunVR::StereoFailureReason rightFailure =
+                OutRunVR::StereoFailureRightStateFailed;
+            bool restoreOk = true;
+            {
+                InternalPassScope guard;
+                rightHr = SetRenderTargetHook.stdcall<HRESULT>(
+                    device, 0u, RightEyeSurface);
+                if (SUCCEEDED(rightHr))
+                    rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
+                        device, TrackedDepthStencil ? RightEyeDepth : nullptr);
+                if (SUCCEEDED(rightHr))
+                    rightHr = device->SetViewport(&savedViewport);
+                if (SUCCEEDED(rightHr) &&
+                    !R32SetWvpBatch(device, draw.eyeConstants[1]))
+                {
+                    rightFailure =
+                        OutRunVR::StereoFailureRightWvpUploadFailed;
+                    rightHr = E_FAIL;
+                }
+                if (SUCCEEDED(rightHr))
+                {
+                    rightFailure = OutRunVR::StereoFailureRightDrawFailed;
+                    rightHr = actualDraw();
+                }
+                restoreOk = R32RestoreRightPassState(
+                    device, savedRt, savedDepth, savedViewport,
+                    draw.originalConstants, true);
+            }
+
+            FrameHadDuplicatedDraw = true;
+            FrameHadWorldStereo = true;
+            ++DuplicatedDraws;
+            ++WorldStereoDraws;
+            ++R29StableTwoEyeDraws;
+            ++R31FastWorldDraws;
+            ++R31Frame.fastWorld;
+
+            if (FrameStereoPoseSequence == 0)
+            {
+                FrameStereoPoseSequence = draw.poseSequence;
+                FrameStereoMetadata = draw.stereoFrame;
+            }
+
+            if (FAILED(rightHr))
+            {
+                FrameRightDrawFailed = true;
+                R33InvalidateRightForLeftWrite(
+                    mayWriteDepth, mayWriteStencil);
+                R9Poison(rightFailure, site, rightHr);
+                R29ArmMonoSafety();
+            }
+            if (!restoreOk)
+            {
+                R33InvalidateRightForLeftWrite(
+                    mayWriteDepth, mayWriteStencil);
+                NoteRestoreFailure("R33 fast right-eye draw");
+                R29ArmMonoSafety();
+            }
+            return result;
+        }
+
+        template <typename ActualDraw>
+        R31OwnedResult R33TryHud(IDirect3DDevice9* device,
+            ActualDraw&& actualDraw, const char* site)
+        {
+            if (R31StateBlockRecording || !R29StableStereoBase(device) ||
+                !R30CurrentPassIsScreenSpace2D())
+                return {};
+
+            if (!R31StateBlockTrackingReliable.load(std::memory_order_acquire))
+            {
+                R31DiscardUnreliableDrawCaches();
+                const std::uintptr_t cachedShader =
+                    CurrentVertexShaderIdentity.load(std::memory_order_acquire);
+                if (!R31LiveShaderMatches(device, cachedShader))
+                    return {};
+            }
+
+            if (!EnsureStereoResources(device))
+                return {};
+            if (TrackedDepthStencil &&
+                (!RightDepthSynchronized || !RightStencilSynchronized))
+                TryBootstrapRightDepthFromRecentClear(device);
+            if (TrackedDepthStencil && !RightDepthSynchronized &&
+                DepthTestActive(device))
+                return {};
+            if (TrackedDepthStencil && !RightStencilSynchronized &&
+                StencilTestActive(device))
+                return {};
+
+            OutRunVRRenderer::LatchedStereoFrame stereo{};
+            if (!OutRunVRRenderer::GetLatchedStereoFrame(stereo) ||
+                stereo.poseSequence == 0)
+                return {};
+            if (FrameStereoPoseSequence != 0 &&
+                FrameStereoPoseSequence != stereo.poseSequence)
+                return {};
+
+            float original[16]{};
+            float eyeConstants[2][16]{};
+            float eyeScale[2]{};
+            float eyeOffset[2]{};
+            if (!R30BuildScreenSpaceEyeConstants(device, stereo, original,
+                    eyeConstants, eyeScale, eyeOffset))
+                return {};
+
+            D3DVIEWPORT9 savedViewport{};
+            if (!R32GetSavedViewport(device, savedViewport))
+                return {};
+
+            bool mayWriteDepth = false;
+            bool mayWriteStencil = false;
+            if (!R33GetWriteFlags(device, mayWriteDepth, mayWriteStencil))
+                return {};
+
+            bool leftWvpOk = false;
+            {
+                InternalPassScope guard;
+                leftWvpOk = R32SetWvpBatch(device, eyeConstants[0]);
+            }
+            if (!leftWvpOk)
+            {
+                bool rolledBack = false;
+                {
+                    InternalPassScope guard;
+                    rolledBack = R32SetWvpBatch(device, original);
+                }
+                if (!rolledBack)
+                {
+                    R9Poison(OutRunVR::StereoFailureRestoreFailed,
+                        "R33/HUD-left-WVP-rollback");
+                    NoteRestoreFailure("R33 HUD left-eye c64 rollback");
+                    R29ArmMonoSafety();
+                    return { true, E_FAIL };
+                }
+                return {};
+            }
+
+            ++R9DrawCalls;
+            R9MonoBackupGap = true;
+            if (mayWriteDepth || mayWriteStencil)
+                ++R9MainDepthContentSerial;
+
+            R31OwnedResult result{ true, actualDraw() };
+            if (FAILED(result.hr))
+            {
+                R33InvalidateRightForLeftWrite(
+                    mayWriteDepth, mayWriteStencil);
+                bool restored = false;
+                {
+                    InternalPassScope guard;
+                    restored = R32SetWvpBatch(device, original);
+                }
+                R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
+                    site, result.hr);
+                if (!restored)
+                    NoteRestoreFailure("R33 HUD left draw c64");
+                R29ArmMonoSafety();
+                return result;
+            }
+
+            IDirect3DSurface9* savedRt = TrackedRenderTarget;
+            IDirect3DSurface9* savedDepth = TrackedDepthStencil;
+            HRESULT rightHr = D3D_OK;
+            OutRunVR::StereoFailureReason rightFailure =
+                OutRunVR::StereoFailureRightStateFailed;
+            bool restoreOk = true;
+            {
+                InternalPassScope guard;
+                rightHr = SetRenderTargetHook.stdcall<HRESULT>(
+                    device, 0u, RightEyeSurface);
+                if (SUCCEEDED(rightHr))
+                    rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
+                        device, TrackedDepthStencil ? RightEyeDepth : nullptr);
+                if (SUCCEEDED(rightHr))
+                    rightHr = device->SetViewport(&savedViewport);
+                if (SUCCEEDED(rightHr) &&
+                    !R32SetWvpBatch(device, eyeConstants[1]))
+                {
+                    rightFailure =
+                        OutRunVR::StereoFailureRightWvpUploadFailed;
+                    rightHr = E_FAIL;
+                }
+                if (SUCCEEDED(rightHr))
+                {
+                    rightFailure = OutRunVR::StereoFailureRightDrawFailed;
+                    rightHr = actualDraw();
+                }
+                restoreOk = R32RestoreRightPassState(
+                    device, savedRt, savedDepth, savedViewport, original, true);
+            }
+
+            FrameHadDuplicatedDraw = true;
+            ++DuplicatedDraws;
+            ++NonWorldDuplicatedDraws;
+            ++R29StableTwoEyeDraws;
+            ++R30ScreenSpaceFovDraws;
+            ++R31HudDraws;
+            ++R31Frame.hud;
+
+            if (FAILED(rightHr))
+            {
+                FrameRightDrawFailed = true;
+                R33InvalidateRightForLeftWrite(
+                    mayWriteDepth, mayWriteStencil);
+                R9Poison(rightFailure, site, rightHr);
+                R29ArmMonoSafety();
+            }
+            if (!restoreOk)
+            {
+                R33InvalidateRightForLeftWrite(
+                    mayWriteDepth, mayWriteStencil);
+                NoteRestoreFailure("R33 HUD right-eye draw");
+                R29ArmMonoSafety();
+            }
+            return result;
+        }
 
         template <typename ActualDraw, typename LowerR29Draw>
         HRESULT R33Dispatch(IDirect3DDevice9* device,
@@ -36,14 +625,14 @@ namespace OutRunVRStereo
 
             if (R30CurrentPassIsScreenSpace2D())
             {
-                const auto hud = R32TryHud(device,
+                const auto hud = R33TryHud(device,
                     std::forward<ActualDraw>(actualDraw), site);
                 if (hud.handled)
                     return hud.hr;
             }
             else
             {
-                const auto fast = R32TryFastWorld(device,
+                const auto fast = R33TryFastWorld(device,
                     std::forward<ActualDraw>(actualDraw), site);
                 if (fast.handled)
                     return fast.hr;
@@ -122,17 +711,101 @@ namespace OutRunVRStereo
                 "R33/DrawIndexedPrimitiveUP");
         }
 
+        HRESULT __stdcall ResetDestR33(IDirect3DDevice9* device,
+            D3DPRESENT_PARAMETERS* params)
+        {
+            const bool gameDevice = IsGameDevice(device);
+
+            // R32 originally called its ResetDestR13 trampoline directly. That
+            // could bypass R22's authoritative pre-reset fail-close and baseline
+            // reset. Enter R22 explicitly; its R22ResetR13Hook trampoline reaches
+            // the original R13 Reset/ResetEx owner without re-entering R32.
+            const HRESULT hr = ResetDestR22(device, params);
+
+            if (gameDevice)
+            {
+                R32ResetAfterGameReset();
+                R33InvalidateDepthStencilCache();
+                if (SUCCEEDED(hr))
+                    ++R33ResetSuccesses;
+                else
+                    ++R33ResetFailures;
+
+                if (!R33FirstResetLifecycleLogged)
+                {
+                    R33FirstResetLifecycleLogged = true;
+                    spdlog::info(
+                        "VR R33 RESET: R22 eligibility/depth-stencil baseline lifecycle is authoritative before R32 epoch/cache rearm");
+                }
+            }
+            return hr;
+        }
+
+        void R33LogPerfWindow() noexcept
+        {
+            if (!Settings::VRTelemetry)
+                return;
+            const ULONGLONG now = GetTickCount64();
+            if (R33Perf.lastLogMs == 0)
+            {
+                R33Perf.lastLogMs = now;
+                R33Perf.syncs = R33DepthStencilSyncs;
+                R33Perf.hits = R33DepthStencilCacheHits;
+                R33Perf.live = R33DepthStencilLiveFallbacks;
+                R33Perf.readFail = R33DepthStencilReadFailures;
+                R33Perf.resetOk = R33ResetSuccesses;
+                R33Perf.resetFail = R33ResetFailures;
+                return;
+            }
+            if (now - R33Perf.lastLogMs < 5000)
+                return;
+
+            spdlog::info(
+                "VR R33 PERF 5s: depthStencil[cacheHit={},liveSync={},unreliableLive={},readFail={}] reset[ok={},fail={}]",
+                R33DepthStencilCacheHits - R33Perf.hits,
+                R33DepthStencilSyncs - R33Perf.syncs,
+                R33DepthStencilLiveFallbacks - R33Perf.live,
+                R33DepthStencilReadFailures - R33Perf.readFail,
+                R33ResetSuccesses - R33Perf.resetOk,
+                R33ResetFailures - R33Perf.resetFail);
+
+            R33Perf.lastLogMs = now;
+            R33Perf.syncs = R33DepthStencilSyncs;
+            R33Perf.hits = R33DepthStencilCacheHits;
+            R33Perf.live = R33DepthStencilLiveFallbacks;
+            R33Perf.readFail = R33DepthStencilReadFailures;
+            R33Perf.resetOk = R33ResetSuccesses;
+            R33Perf.resetFail = R33ResetFailures;
+        }
+
+        HRESULT __stdcall PresentDestR33(IDirect3DDevice9* device,
+            const RECT* sourceRect, const RECT* destRect,
+            HWND destWindowOverride, const RGNDATA* dirtyRegion)
+        {
+            const HRESULT hr = R33PresentR32Hook.stdcall<HRESULT>(device,
+                sourceRect, destRect, destWindowOverride, dirtyRegion);
+            if (IsGameDevice(device))
+                R33LogPerfWindow();
+            return hr;
+        }
+
         void R33RollbackHooks() noexcept
         {
             R33DrawIndexedPrimitiveUPR32Hook = {};
             R33DrawPrimitiveUPR32Hook = {};
             R33DrawIndexedPrimitiveR32Hook = {};
             R33DrawPrimitiveR32Hook = {};
+            R33SetRenderStateR29Hook = {};
+            R33PresentR32Hook = {};
+            R33ResetR32Hook = {};
         }
 
         bool R33EnableHooks() noexcept
         {
             SafetyHookInline* hooks[]{
+                &R33ResetR32Hook,
+                &R33PresentR32Hook,
+                &R33SetRenderStateR29Hook,
                 &R33DrawPrimitiveR32Hook,
                 &R33DrawIndexedPrimitiveR32Hook,
                 &R33DrawPrimitiveUPR32Hook,
@@ -154,12 +827,22 @@ namespace OutRunVRStereo
                 if (r32 == State::Failed)
                 {
                     R33InstallState.store(State::Failed, std::memory_order_release);
-                    HookManager::ReportAsyncResult("OpenXRVRStereoR33Dispatch", false);
+                    HookManager::ReportAsyncResult(
+                        "OpenXRVRStereoR33Dispatch", false);
                     return 0;
                 }
                 if (r32 == State::Ready)
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
+                    R33ResetR32Hook = safetyhook::create_inline(
+                        reinterpret_cast<void*>(&ResetDestR32),
+                        ResetDestR33, disabled);
+                    R33PresentR32Hook = safetyhook::create_inline(
+                        reinterpret_cast<void*>(&PresentDestR32),
+                        PresentDestR33, disabled);
+                    R33SetRenderStateR29Hook = safetyhook::create_inline(
+                        reinterpret_cast<void*>(&SetRenderStateDestR29),
+                        SetRenderStateDestR33, disabled);
                     R33DrawPrimitiveR32Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&DrawPrimitiveDestR32),
                         DrawPrimitiveDestR33, disabled);
@@ -181,14 +864,15 @@ namespace OutRunVRStereo
                         HookManager::ReportAsyncResult(
                             "OpenXRVRStereoR33Dispatch", false);
                         spdlog::error(
-                            "VR R33: dispatch hook transaction was partial; R32 remains authoritative");
+                            "VR R33: final reset/state/draw hook transaction was partial; R32 remains authoritative");
                         return 0;
                     }
 
                     R33InstallState.store(State::Ready, std::memory_order_release);
-                    HookManager::ReportAsyncResult("OpenXRVRStereoR33Dispatch", true);
+                    HookManager::ReportAsyncResult(
+                        "OpenXRVRStereoR33Dispatch", true);
                     spdlog::info(
-                        "VR R33 DISPATCH: R32 fast paths + direct R29 fallback READY; top-level draw telemetry is counted exactly once");
+                        "VR R33 DISPATCH: R32 fast paths + direct R29 fallback READY; top-level draw telemetry is counted exactly once; R22 Reset lifecycle + depth/stencil write cache ACTIVE");
                     return 0;
                 }
                 Sleep(25);
