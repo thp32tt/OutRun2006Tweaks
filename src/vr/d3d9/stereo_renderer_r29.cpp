@@ -18,6 +18,7 @@
 namespace OutRunVRRenderer
 {
     void R29InvalidateRawWvpGeneration() noexcept;
+    void R29InvalidateRendererStateAfterExternalRestore() noexcept;
     OutRunVR::RuntimeEligibility::InstallState R29RendererState() noexcept;
 }
 

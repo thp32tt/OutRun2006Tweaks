@@ -10,9 +10,10 @@
 //  * verified c64..c67 from the renderer hook is the authoritative stock WVP;
 //  * shader epoch + pose sequence must still match exactly;
 //  * eyeInverse*eyeProjection is cached per pose/projection/world-scale;
-//  * one live c64 validation is retained every 16 fast world draws;
-//  * IDirect3DStateBlock9::Apply immediately blocks the current verified WVP
-//    generation until the game uploads a newer verified c64 block;
+//  * one live c64 validation is retained every 16 fast world draws only after
+//    StateBlock interception is proven; otherwise every candidate is validated;
+//  * Begin/End/Apply invalidate and resynchronize WVP, projection, shader,
+//    effect, viewport and scissor caches as one state generation;
 //  * HUD draws use R30 math but an explicit {handled,hr} result, removing the
 //    E_NOTIMPL sentinel/double-draw ambiguity;
 //  * a five-second route summary separates main/offscreen/aux/world/HUD/fallback
@@ -25,6 +26,7 @@ namespace OutRunVRStereo
     namespace
     {
         constexpr std::size_t CreateStateBlockVtableIndex = 59;
+        constexpr std::size_t BeginStateBlockVtableIndex = 60;
         constexpr std::size_t EndStateBlockVtableIndex = 61;
         constexpr std::size_t StateBlockApplyVtableIndex = 5;
         constexpr std::uint64_t LiveWvpValidationInterval = 16;
@@ -34,8 +36,10 @@ namespace OutRunVRStereo
         SafetyHookInline R31DrawPrimitiveUPR30Hook{};
         SafetyHookInline R31DrawIndexedPrimitiveUPR30Hook{};
         SafetyHookInline R31CreateStateBlockHook{};
+        SafetyHookInline R31BeginStateBlockHook{};
         SafetyHookInline R31EndStateBlockHook{};
         SafetyHookInline R31StateBlockApplyHook{};
+        void* R31StateBlockApplyTarget = nullptr;
 
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R31InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
@@ -46,9 +50,14 @@ namespace OutRunVRStereo
         std::uint64_t R31FastWorldLiveValidations = 0;
         std::uint64_t R31FastWorldValidationRejects = 0;
         std::uint64_t R31StateBlockApplies = 0;
+        std::uint64_t R31StateBlockRecordings = 0;
         std::uint64_t R31HudDraws = 0;
+        std::atomic<bool> R31StateBlockTrackingReliable{ false };
+        std::atomic<bool> R31StateBlockCoverageLost{ false };
+        thread_local bool R31StateBlockRecording = false;
         bool R31FirstFastWorldLogged = false;
         bool R31FirstStateBlockLogged = false;
+        bool R31FirstAlternateStateBlockLogged = false;
         bool R31FirstHudLogged = false;
 
         struct R31EyeTailCache
@@ -119,13 +128,13 @@ namespace OutRunVRStereo
                 const double avg = static_cast<double>(R31Window.draws) /
                     static_cast<double>(R31Window.presents);
                 spdlog::info(
-                    "VR R31 PERF: gameDraws/present avg={:.1f} max={} presents={} routes[main={},offscreen={},aux={},fastWorld={},hud={},fragile={},unstable={},fallback={}] liveWvpCheck={} liveReject={} stateBlockApply={}",
+                    "VR R31 PERF: topLevelGameCalls/present avg={:.1f} max={} presents={} targets[main={},offscreen={},auxOverlay={}] ownedEyeRoutes[fastWorld={},hud={}] fallbackReasons[fragile={},unstable={}] fallbackDispatch={} liveWvpCheck={} liveReject={} stateBlock[record={},apply={}]",
                     avg, R31Window.maxDraws, R31Window.presents,
                     R31Window.main, R31Window.offscreen, R31Window.aux,
                     R31Window.fastWorld, R31Window.hud, R31Window.fragile,
                     R31Window.unstable, R31Window.fallback,
                     R31FastWorldLiveValidations, R31FastWorldValidationRejects,
-                    R31StateBlockApplies);
+                    R31StateBlockRecordings, R31StateBlockApplies);
                 R31Window = {};
                 R31Window.lastLogMs = now;
             }
@@ -162,6 +171,30 @@ namespace OutRunVRStereo
             const D3DMATRIX& b) noexcept
         {
             return std::memcmp(&a, &b, sizeof(D3DMATRIX)) == 0;
+        }
+
+        bool R31LiveShaderMatches(IDirect3DDevice9* device,
+            std::uintptr_t expected) noexcept
+        {
+            if (!device || expected == 0)
+                return false;
+            IDirect3DVertexShader9* shader = nullptr;
+            if (FAILED(device->GetVertexShader(&shader)))
+                return false;
+            const std::uintptr_t actual =
+                reinterpret_cast<std::uintptr_t>(shader);
+            if (shader) shader->Release();
+            return actual == expected;
+        }
+
+        void R31DiscardUnreliableDrawCaches() noexcept
+        {
+            if (R31StateBlockTrackingReliable.load(std::memory_order_acquire))
+                return;
+            R29Effect.valid = false;
+            R22ShadowState = {};
+            R23LastStateSampleDrawSerial = 0;
+            R23LastStateSampleEpoch = 0;
         }
 
         bool R31PrepareEyeTailCache(
@@ -220,10 +253,19 @@ namespace OutRunVRStereo
                 currentShaderSerial != verifiedShaderSerial)
                 return false;
 
+            // Until Apply interception is proven, the cached shader epoch can
+            // have been bypassed by a StateBlock created before R31 installed.
+            // Query the actual binding on every candidate instead of trusting it.
+            if (!R31StateBlockTrackingReliable.load(std::memory_order_acquire) &&
+                !R31LiveShaderMatches(device, verifiedShader))
+                return false;
+
             ++R31FastWorldCandidates;
-            if ((R31FastWorldCandidates % LiveWvpValidationInterval) == 0)
+            float live[16]{};
+            bool liveValidated = false;
+            if (!R31StateBlockTrackingReliable.load(std::memory_order_acquire) ||
+                (R31FastWorldCandidates % LiveWvpValidationInterval) == 0)
             {
-                float live[16]{};
                 ++R31FastWorldLiveValidations;
                 if (FAILED(device->GetVertexShaderConstantF(
                         OutRunWvpRegister, live, OutRunWvpRegisterCount)) ||
@@ -233,16 +275,31 @@ namespace OutRunVRStereo
                     ++R31FastWorldValidationRejects;
                     return false;
                 }
+                liveValidated = true;
             }
 
             D3DMATRIX projection{};
             D3DMATRIX inverseProjection{};
-            if (!ReadProjection(projection) ||
+            float verifiedProjection[16]{};
+            std::uint32_t projectionGeneration = 0;
+            std::uint32_t projectionPoseSequence = 0;
+            if (!OutRunVRRenderer::GetR28VerifiedProjection(
+                    verifiedProjection, projectionGeneration,
+                    projectionPoseSequence) ||
+                projectionGeneration != generation ||
+                projectionPoseSequence != poseSequence)
+                return false;
+            std::memcpy(&projection, verifiedProjection, sizeof(projection));
+            if (!MatrixFinite(projection) ||
                 !GetInverseProjection(projection, inverseProjection) ||
                 !R31PrepareEyeTailCache(stereo, projection, inverseProjection))
                 return false;
 
-            std::memcpy(draw.originalConstants, verified, sizeof(verified));
+            // When live validation is required, restore the exact constants
+            // observed on the device. Never let a stale cache overwrite the
+            // state that the validation was intended to check.
+            std::memcpy(draw.originalConstants,
+                liveValidated ? live : verified, sizeof(verified));
             D3DMATRIX uploadedT{};
             std::memcpy(&uploadedT, verified, sizeof(uploadedT));
             const D3DMATRIX currentWvp = TransposeMatrix(uploadedT);
@@ -277,7 +334,7 @@ namespace OutRunVRStereo
         R31OwnedResult R31TryFastWorld(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
-            if (!R29StableStereoBase(device))
+            if (R31StateBlockRecording || !R29StableStereoBase(device))
             {
                 if (IsGameDevice(device) && !InternalStereoPass && TargetIsBackBuffer())
                     ++R31Frame.unstable;
@@ -329,8 +386,21 @@ namespace OutRunVRStereo
             }
             if (!leftWvpOk)
             {
-                InternalPassScope guard;
-                SetWvpOneRegisterAtATime(device, draw.originalConstants);
+                bool rolledBack = false;
+                {
+                    InternalPassScope guard;
+                    rolledBack = SetWvpOneRegisterAtATime(
+                        device, draw.originalConstants);
+                }
+                InvalidateRightDepthStencilIfLeftMayWrite(device);
+                R9Poison(OutRunVR::StereoFailureLeftWvpUploadFailed,
+                    site, E_FAIL);
+                R29ArmMonoSafety();
+                if (!rolledBack)
+                {
+                    NoteRestoreFailure("R31 fast left-eye c64 rollback");
+                    return { true, E_FAIL };
+                }
                 return {};
             }
 
@@ -428,9 +498,16 @@ namespace OutRunVRStereo
         R31OwnedResult R31TryHud(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
-            if (!R29StableStereoBase(device) ||
+            if (R31StateBlockRecording || !R29StableStereoBase(device) ||
                 !R30CurrentPassIsScreenSpace2D())
                 return {};
+            if (!R31StateBlockTrackingReliable.load(std::memory_order_acquire))
+            {
+                const std::uintptr_t cachedShader =
+                    CurrentVertexShaderIdentity.load(std::memory_order_acquire);
+                if (!R31LiveShaderMatches(device, cachedShader))
+                    return {};
+            }
             if (!EnsureStereoResources(device))
                 return {};
             if (TrackedDepthStencil &&
@@ -470,8 +547,20 @@ namespace OutRunVRStereo
             }
             if (!leftWvpOk)
             {
-                InternalPassScope guard;
-                SetWvpOneRegisterAtATime(device, original);
+                bool rolledBack = false;
+                {
+                    InternalPassScope guard;
+                    rolledBack = SetWvpOneRegisterAtATime(device, original);
+                }
+                InvalidateRightDepthStencilIfLeftMayWrite(device);
+                R9Poison(OutRunVR::StereoFailureLeftWvpUploadFailed,
+                    site, E_FAIL);
+                R29ArmMonoSafety();
+                if (!rolledBack)
+                {
+                    NoteRestoreFailure("R31 HUD left-eye c64 rollback");
+                    return { true, E_FAIL };
+                }
                 return {};
             }
 
@@ -560,6 +649,16 @@ namespace OutRunVRStereo
             R29Draw&& r29Draw, const char* site)
         {
             R31ObserveDraw(device);
+            R31DiscardUnreliableDrawCaches();
+
+            // Draw calls are not part of a D3D9 StateBlock's recorded state.
+            // If a title issues one anyway, preserve the device's one-call
+            // behavior and never route it through a stereo replay layer.
+            if (R31StateBlockRecording)
+            {
+                ++R31Frame.fallback;
+                return actualDraw();
+            }
 
             if (R30CurrentPassIsScreenSpace2D())
             {
@@ -660,43 +759,141 @@ namespace OutRunVRStereo
             R31EyeCache.valid = false;
         }
 
+        void R31ResynchronizeShaderEpoch(IDirect3DDevice9* device) noexcept
+        {
+            IDirect3DVertexShader9* shader = nullptr;
+            const HRESULT hr = device
+                ? device->GetVertexShader(&shader) : D3DERR_INVALIDCALL;
+            const std::uintptr_t identity = SUCCEEDED(hr)
+                ? reinterpret_cast<std::uintptr_t>(shader) : 0;
+            if (shader) shader->Release();
+
+            CurrentVertexShaderIdentity.store(identity,
+                std::memory_order_release);
+            std::uint64_t serial = VertexShaderSerial.fetch_add(
+                1, std::memory_order_acq_rel) + 1;
+            if (serial == 0)
+                VertexShaderSerial.fetch_add(1, std::memory_order_acq_rel);
+        }
+
+        void R31InvalidateAndResynchronizeStateBlockCaches(
+            IDirect3DDevice9* device) noexcept
+        {
+            R31BlockCurrentVerifiedGeneration();
+            OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
+
+            // Apply and recorded-state setters bypass or pollute every lower
+            // layer's shadow independently. Treat them as one state generation.
+            R29Effect = {};
+            R22ShadowState = {};
+            R23LastStateSampleDrawSerial = 0;
+            R23LastStateSampleEpoch = 0;
+            R31EyeCache.valid = false;
+            R31ResynchronizeShaderEpoch(device);
+            if (device)
+                R22PrimeShadowState(device);
+        }
+
         HRESULT __stdcall StateBlockApplyDestR31(IDirect3DStateBlock9* block)
         {
             const HRESULT hr = R31StateBlockApplyHook.stdcall<HRESULT>(block);
-            if (FAILED(hr) || !block || InternalStereoPass)
+            if (!block)
                 return hr;
             IDirect3DDevice9* device = nullptr;
             if (SUCCEEDED(block->GetDevice(&device)) && device)
             {
                 const bool game = IsGameDevice(device);
-                device->Release();
                 if (game)
                 {
                     ++R31StateBlockApplies;
-                    R31BlockCurrentVerifiedGeneration();
+                    R31InvalidateAndResynchronizeStateBlockCaches(device);
                     if (!R31FirstStateBlockLogged)
                     {
                         R31FirstStateBlockLogged = true;
                         spdlog::info(
-                            "VR R31 PERF: StateBlock::Apply observed; current verified WVP generation blocked until a newer game c64 upload");
+                            "VR R31 STATE: StateBlock::Apply observed hr=0x{:08x}; WVP/projection/shader/effect/viewport caches invalidated as one generation and live state resynchronized",
+                            static_cast<unsigned>(hr));
                     }
                 }
+                device->Release();
+            }
+            else
+            {
+                R31StateBlockCoverageLost.store(true,
+                    std::memory_order_release);
+                R31StateBlockTrackingReliable.store(false,
+                    std::memory_order_release);
             }
             return hr;
         }
 
-        void R31EnsureStateBlockApplyHook(IDirect3DStateBlock9* block) noexcept
+        bool R31EnsureStateBlockApplyHook(IDirect3DStateBlock9* block) noexcept
         {
-            if (!block || R31StateBlockApplyHook)
-                return;
+            if (!block)
+            {
+                R31StateBlockCoverageLost.store(true,
+                    std::memory_order_release);
+                R31StateBlockTrackingReliable.store(false,
+                    std::memory_order_release);
+                return false;
+            }
             void** vtable = *reinterpret_cast<void***>(block);
             if (!vtable)
-                return;
+            {
+                R31StateBlockCoverageLost.store(true,
+                    std::memory_order_release);
+                R31StateBlockTrackingReliable.store(false,
+                    std::memory_order_release);
+                return false;
+            }
+
+            if (R31StateBlockApplyHook)
+            {
+                const bool reliable = R31CreateStateBlockHook &&
+                    R31BeginStateBlockHook && R31EndStateBlockHook &&
+                    !R31StateBlockCoverageLost.load(std::memory_order_acquire) &&
+                    R31StateBlockApplyTarget ==
+                        vtable[StateBlockApplyVtableIndex];
+                if (!reliable && R31StateBlockApplyTarget !=
+                        vtable[StateBlockApplyVtableIndex])
+                {
+                    R31StateBlockCoverageLost.store(true,
+                        std::memory_order_release);
+                    if (!R31FirstAlternateStateBlockLogged)
+                    {
+                        R31FirstAlternateStateBlockLogged = true;
+                        spdlog::warn(
+                            "VR R31 STATE: alternate StateBlock::Apply implementation observed; fast-path cache trust is disabled for the process");
+                    }
+                }
+                R31StateBlockTrackingReliable.store(reliable,
+                    std::memory_order_release);
+                return reliable;
+            }
             R31StateBlockApplyHook = safetyhook::create_inline(
-                vtable[StateBlockApplyVtableIndex], StateBlockApplyDestR31);
-            if (!R31StateBlockApplyHook)
+                vtable[StateBlockApplyVtableIndex], StateBlockApplyDestR31,
+                safetyhook::InlineHook::StartDisabled);
+            if (!R31StateBlockApplyHook ||
+                !R31StateBlockApplyHook.enable().has_value())
+            {
+                R31StateBlockApplyHook = {};
+                R31StateBlockApplyTarget = nullptr;
+                R31StateBlockCoverageLost.store(true,
+                    std::memory_order_release);
+                R31StateBlockTrackingReliable.store(false,
+                    std::memory_order_release);
                 spdlog::warn(
-                    "VR R31 PERF: could not hook StateBlock::Apply; periodic live c64 validation remains active");
+                    "VR R31 STATE: could not hook StateBlock::Apply; per-draw live WVP/shader/render-state validation remains active");
+                return false;
+            }
+            R31StateBlockApplyTarget =
+                vtable[StateBlockApplyVtableIndex];
+            const bool reliable = R31CreateStateBlockHook &&
+                R31BeginStateBlockHook && R31EndStateBlockHook &&
+                !R31StateBlockCoverageLost.load(std::memory_order_acquire);
+            R31StateBlockTrackingReliable.store(reliable,
+                std::memory_order_release);
+            return reliable;
         }
 
         HRESULT __stdcall CreateStateBlockDestR31(IDirect3DDevice9* device,
@@ -709,12 +906,43 @@ namespace OutRunVRStereo
             return hr;
         }
 
+        HRESULT __stdcall BeginStateBlockDestR31(IDirect3DDevice9* device)
+        {
+            const HRESULT hr = R31BeginStateBlockHook.stdcall<HRESULT>(device);
+            if (SUCCEEDED(hr) && IsGameDevice(device) && !InternalStereoPass)
+            {
+                R31StateBlockRecording = true;
+                ++R31StateBlockRecordings;
+                R31InvalidateAndResynchronizeStateBlockCaches(device);
+            }
+            return hr;
+        }
+
         HRESULT __stdcall EndStateBlockDestR31(IDirect3DDevice9* device,
             IDirect3DStateBlock9** block)
         {
             const HRESULT hr = R31EndStateBlockHook.stdcall<HRESULT>(device, block);
-            if (SUCCEEDED(hr) && IsGameDevice(device) && block && *block)
-                R31EnsureStateBlockApplyHook(*block);
+            if (IsGameDevice(device) &&
+                (!InternalStereoPass || R31StateBlockRecording))
+            {
+                if (SUCCEEDED(hr))
+                {
+                    R31StateBlockRecording = false;
+                }
+                else if (R31StateBlockRecording)
+                {
+                    // D3D9 does not expose whether a failed End left recording
+                    // active. Retain the recording guard and disable cache trust
+                    // until a later successful End establishes the boundary.
+                    R31StateBlockCoverageLost.store(true,
+                        std::memory_order_release);
+                    R31StateBlockTrackingReliable.store(false,
+                        std::memory_order_release);
+                }
+                R31InvalidateAndResynchronizeStateBlockCaches(device);
+                if (SUCCEEDED(hr) && block && *block)
+                    R31EnsureStateBlockApplyHook(*block);
+            }
             return hr;
         }
 
@@ -786,6 +1014,10 @@ namespace OutRunVRStereo
 
                     IDirect3DDevice9* const device =
                         StereoInstalledDevice.load(std::memory_order_acquire);
+                    R31StateBlockTrackingReliable.store(false,
+                        std::memory_order_release);
+                    R31StateBlockCoverageLost.store(false,
+                        std::memory_order_release);
                     if (device)
                     {
                         void** vtable = *reinterpret_cast<void***>(device);
@@ -794,19 +1026,32 @@ namespace OutRunVRStereo
                             R31CreateStateBlockHook = safetyhook::create_inline(
                                 vtable[CreateStateBlockVtableIndex],
                                 CreateStateBlockDestR31, disabled);
+                            R31BeginStateBlockHook = safetyhook::create_inline(
+                                vtable[BeginStateBlockVtableIndex],
+                                BeginStateBlockDestR31, disabled);
                             R31EndStateBlockHook = safetyhook::create_inline(
                                 vtable[EndStateBlockVtableIndex],
                                 EndStateBlockDestR31, disabled);
                             const bool stateHooks = R31CreateStateBlockHook &&
+                                R31BeginStateBlockHook &&
                                 R31EndStateBlockHook &&
                                 R31CreateStateBlockHook.enable().has_value() &&
+                                R31BeginStateBlockHook.enable().has_value() &&
                                 R31EndStateBlockHook.enable().has_value();
                             if (!stateHooks)
                             {
+                                R31StateBlockCoverageLost.store(true,
+                                    std::memory_order_release);
                                 R31CreateStateBlockHook = {};
+                                R31BeginStateBlockHook = {};
                                 R31EndStateBlockHook = {};
                                 spdlog::warn(
-                                    "VR R31 PERF: StateBlock creation hooks unavailable; 1/16 live c64 validation remains the safety backstop");
+                                    "VR R31 STATE: Begin/Create/End StateBlock hooks unavailable; every fast-path candidate will live-validate WVP, shader, render state and viewport");
+                            }
+                            else
+                            {
+                                spdlog::info(
+                                    "VR R31 STATE: Begin/Create/End StateBlock recording hooks armed; per-draw validation remains active until Apply interception is proven");
                             }
                         }
                     }
@@ -852,5 +1097,15 @@ namespace OutRunVRStereo
         };
 
         VRStereoR31PerfHook VRStereoR31PerfHook::instance;
+    }
+
+    bool IsGameStateBlockRecording() noexcept
+    {
+        return R31StateBlockRecording;
+    }
+
+    bool IsStateBlockTrackingReliable() noexcept
+    {
+        return R31StateBlockTrackingReliable.load(std::memory_order_acquire);
     }
 }

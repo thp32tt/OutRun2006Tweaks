@@ -295,5 +295,7 @@ namespace OutRunVRRenderer
 namespace OutRunVRStereo
 {
     bool IsInternalStereoPassActive();
+    bool IsGameStateBlockRecording() noexcept;
+    bool IsStateBlockTrackingReliable() noexcept;
     bool GetCurrentShaderEpoch(std::uintptr_t& shaderIdentity, std::uint64_t& serial);
 }

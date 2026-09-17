@@ -4,13 +4,20 @@
 // MANAGED 2D textures to DEFAULT|DYNAMIC, but a few drivers/resources still
 // reject LockRect on those translated GPU textures. R14 keeps a SYSTEMMEM CPU
 // shadow for every successfully translated MANAGED 2D texture and services the
-// game's LockRect/UnlockRect against that shadow. Written regions are uploaded
-// to the DEFAULT texture with UpdateSurface (UpdateTexture fallback).
+// game's LockRect/UnlockRect against that shadow.
 //
-// This makes the high-quality D3D9Ex shared-eye transport substantially safer
-// without pretending that every possible legacy resource class has been proven:
-// cube/volume MANAGED resources remain on the R13 compatibility path and the
-// whole Ex promotion can still fail closed to classic D3D9 during device setup.
+// R31 hardening removes the old 256-entry overwrite ring. Entries now live until
+// the tracked texture's final COM Release, and a shared entry keeps an in-flight
+// Lock/Unlock operation stable while the registry is changed. Any write path
+// which R14 cannot mirror (direct GPU Lock fallback, external GetSurfaceLevel,
+// UpdateSurface or UpdateTexture) permanently retires that texture's shadow
+// instead of allowing stale CPU data to overwrite newer GPU contents.
+
+#include <algorithm>
+#include <memory>
+#include <mutex>
+#include <unordered_map>
+#include <vector>
 
 #include "ex_device_upgrade_r13.cpp"
 
@@ -18,81 +25,303 @@ namespace OutRunVRD3D9ExUpgradeR13
 {
     namespace
     {
-        constexpr std::size_t R14ShadowCapacity = 256;
         constexpr std::uint32_t R14MaxTrackedLevels = 32;
+        constexpr std::size_t R14TextureReleaseVtableIndex = 2;
+        constexpr std::size_t R14TextureGenerateMipSubLevelsVtableIndex = 16;
+        constexpr std::size_t R14TextureGetSurfaceLevelVtableIndex = 18;
+        constexpr std::size_t R14TextureAddDirtyRectVtableIndex = 21;
+        constexpr std::size_t R14DeviceUpdateSurfaceVtableIndex = 30;
+        constexpr std::size_t R14DeviceUpdateTextureVtableIndex = 31;
 
         SafetyHookInline R14CreateTextureR13Hook{};
         SafetyHookInline R14TextureLockR13Hook{};
         SafetyHookInline R14TextureUnlockR13Hook{};
+        SafetyHookInline R14InstallCompatR13Hook{};
+        SafetyHookInline R14TextureReleaseHook{};
+        SafetyHookInline R14TextureGenerateMipSubLevelsHook{};
+        SafetyHookInline R14TextureGetSurfaceLevelHook{};
+        SafetyHookInline R14TextureAddDirtyRectHook{};
+        SafetyHookInline R14DeviceUpdateSurfaceHook{};
+        SafetyHookInline R14DeviceUpdateTextureHook{};
+
+        void* R14TextureReleaseTarget = nullptr;
+        void* R14TextureGenerateMipSubLevelsTarget = nullptr;
+        void* R14TextureGetSurfaceLevelTarget = nullptr;
+        void* R14TextureAddDirtyRectTarget = nullptr;
+        void* R14DeviceUpdateSurfaceTarget = nullptr;
+        void* R14DeviceUpdateTextureTarget = nullptr;
+
+        enum class R14ShadowMode : std::uint8_t
+        {
+            Shadow,
+            DirectOnly
+        };
+
+        thread_local std::uint32_t R14InternalReleaseDepth = 0;
 
         struct R14ShadowEntry
         {
-            IDirect3DTexture9* gpu = nullptr;
+            std::mutex mutex;
+            IDirect3DTexture9* gpu = nullptr; // identity only; registry owns no ref
             IDirect3DTexture9* cpu = nullptr;
             IDirect3DDevice9* device = nullptr;
+            R14ShadowMode mode = R14ShadowMode::Shadow;
+            std::uint32_t validMask = 0;
+            std::uint32_t dirtyMask = 0;
             std::uint32_t lockedMask = 0;
             std::uint32_t readOnlyMask = 0;
             RECT lockRect[R14MaxTrackedLevels]{};
             bool lockRectValid[R14MaxTrackedLevels]{};
+            bool retirePending = false;
+            bool externalWriteDuringLock = false;
+
+            ~R14ShadowEntry()
+            {
+                ++R14InternalReleaseDepth;
+                if (cpu) cpu->Release();
+                if (device) device->Release();
+                --R14InternalReleaseDepth;
+            }
         };
 
-        std::array<R14ShadowEntry, R14ShadowCapacity> R14Shadows{};
-        std::size_t R14ShadowCursor = 0;
-        std::uint64_t R14ShadowCreated = 0;
-        std::uint64_t R14ShadowCreateFailed = 0;
-        std::uint64_t R14ShadowLocks = 0;
-        std::uint64_t R14ShadowUploads = 0;
-        std::uint64_t R14ShadowUploadFailed = 0;
-        bool R14FirstActiveLogged = false;
-        bool R14FirstFallbackLogged = false;
-        bool R14FirstUploadFailureLogged = false;
+        using R14EntryPtr = std::shared_ptr<R14ShadowEntry>;
+        std::mutex R14RegistryMutex;
+        std::mutex R14ResourceHookMutex;
+        std::unordered_map<IDirect3DTexture9*, R14EntryPtr> R14Shadows;
+        IDirect3DDevice9* R14RegistryDevice = nullptr; // identity only
+        thread_local std::uint32_t R14InternalUploadDepth = 0;
 
-        void R14ReleaseEntry(R14ShadowEntry& entry) noexcept
+        std::atomic<std::uint64_t> R14ShadowCreated{0};
+        std::atomic<std::uint64_t> R14ShadowCreateFailed{0};
+        std::atomic<std::uint64_t> R14ShadowReleased{0};
+        std::atomic<std::uint64_t> R14ShadowRetired{0};
+        std::atomic<std::uint64_t> R14DeviceReplacementRetires{0};
+        std::atomic<std::uint64_t> R14ShadowLocks{0};
+        std::atomic<std::uint64_t> R14ShadowUploads{0};
+        std::atomic<std::uint64_t> R14ShadowUploadFailed{0};
+        std::atomic<bool> R14FirstActiveLogged{false};
+        std::atomic<bool> R14FirstFallbackLogged{false};
+        std::atomic<bool> R14FirstUploadFailureLogged{false};
+        std::atomic<bool> R14FirstRetireLogged{false};
+        std::atomic<bool> R14FirstConcurrentWriteLogged{false};
+
+        struct R14InternalUploadScope
         {
-            if (entry.cpu)
+            R14InternalUploadScope() noexcept { ++R14InternalUploadDepth; }
+            ~R14InternalUploadScope()
             {
-                entry.cpu->Release();
-                entry.cpu = nullptr;
+                if (R14InternalUploadDepth) --R14InternalUploadDepth;
             }
-            entry = {};
+        };
+
+        R14EntryPtr R14Find(IDirect3DTexture9* texture) noexcept
+        {
+            if (!texture) return {};
+            std::lock_guard<std::mutex> lock(R14RegistryMutex);
+            const auto found = R14Shadows.find(texture);
+            return found == R14Shadows.end() ? R14EntryPtr{} : found->second;
         }
 
-        R14ShadowEntry* R14Find(IDirect3DTexture9* texture) noexcept
+        void R14Erase(IDirect3DTexture9* texture) noexcept
         {
-            if (!texture) return nullptr;
-            for (auto& entry : R14Shadows)
-                if (entry.gpu == texture && entry.cpu)
-                    return &entry;
-            return nullptr;
-        }
-
-        void R14Track(IDirect3DDevice9* device, IDirect3DTexture9* gpu,
-            IDirect3DTexture9* cpu) noexcept
-        {
-            if (!device || !gpu || !cpu) return;
-            R14ShadowEntry* slot = nullptr;
-            for (auto& entry : R14Shadows)
+            R14EntryPtr released;
             {
-                if (entry.gpu == gpu)
+                std::lock_guard<std::mutex> lock(R14RegistryMutex);
+                const auto found = R14Shadows.find(texture);
+                if (found == R14Shadows.end())
+                    return;
+                released = std::move(found->second);
+                R14Shadows.erase(found);
+            }
+            ++R14ShadowReleased;
+        }
+
+        IDirect3DTexture9* R14DetachShadowLocked(
+            R14ShadowEntry& entry) noexcept
+        {
+            IDirect3DTexture9* cpu = entry.cpu;
+            entry.cpu = nullptr;
+            entry.mode = R14ShadowMode::DirectOnly;
+            entry.validMask = 0;
+            entry.dirtyMask = 0;
+            entry.lockedMask = 0;
+            entry.readOnlyMask = 0;
+            entry.retirePending = false;
+            entry.externalWriteDuringLock = false;
+            for (std::uint32_t level = 0; level < R14MaxTrackedLevels; ++level)
+                entry.lockRectValid[level] = false;
+            return cpu;
+        }
+
+        void R14LogRetiredShadow(const char* reason) noexcept;
+
+        void R14AdoptCompatDevice(IDirect3DDevice9* device) noexcept
+        {
+            if (!device) return;
+
+            std::vector<R14EntryPtr> oldDeviceEntries;
+            {
+                std::lock_guard<std::mutex> lock(R14RegistryMutex);
+                if (!R14RegistryDevice)
                 {
-                    slot = &entry;
-                    break;
+                    R14RegistryDevice = device;
+                    return;
+                }
+                if (R14RegistryDevice == device)
+                    return;
+
+                // Snapshot without removing records. A texture may still be
+                // CPU-shadow locked while its owning device is being replaced;
+                // its matching Unlock must continue to find the same entry.
+                try
+                {
+                    oldDeviceEntries.reserve(R14Shadows.size());
+                    for (const auto& item : R14Shadows)
+                    {
+                        if (item.second && item.second->device == R14RegistryDevice)
+                            oldDeviceEntries.push_back(item.second);
+                    }
+                }
+                catch (...)
+                {
+                    // Keep the old identity authoritative so new resources fail
+                    // open to R13 rather than mixing two shadow generations.
+                    spdlog::error(
+                        "VR R14 EX: could not snapshot old-device shadows during replacement; new-device shadows remain disabled");
+                    return;
+                }
+                R14RegistryDevice = device;
+            }
+
+            std::size_t retiredNow = 0;
+            std::size_t pendingUnlock = 0;
+            for (const auto& entry : oldDeviceEntries)
+            {
+                IDirect3DTexture9* cpu = nullptr;
+                {
+                    std::lock_guard<std::mutex> lock(entry->mutex);
+                    if (entry->mode == R14ShadowMode::DirectOnly)
+                        continue;
+                    entry->retirePending = true;
+                    if (entry->lockedMask == 0)
+                    {
+                        cpu = R14DetachShadowLocked(*entry);
+                        ++retiredNow;
+                    }
+                    else
+                    {
+                        ++pendingUnlock;
+                    }
+                }
+                if (cpu) cpu->Release();
+                if (cpu) R14LogRetiredShadow("compat device replacement");
+            }
+
+            ++R14DeviceReplacementRetires;
+            spdlog::info(
+                "VR R14 EX: compat device replacement retired {} old texture shadows immediately and deferred {} locked shadows until matching Unlock",
+                retiredNow, pendingUnlock);
+        }
+
+        void R14LogRetiredShadow(const char* reason) noexcept
+        {
+            ++R14ShadowRetired;
+            if (!R14FirstRetireLogged.exchange(true))
+            {
+                spdlog::warn(
+                    "VR R14 EX: first CPU shadow retired reason={}; this texture now stays on one coherent direct-GPU path",
+                    reason ? reason : "unknown");
+            }
+        }
+
+        bool R14RetireShadow(const R14EntryPtr& entry,
+            const char* reason) noexcept
+        {
+            if (!entry) return true;
+            IDirect3DTexture9* cpu = nullptr;
+            {
+                std::lock_guard<std::mutex> lock(entry->mutex);
+                if (entry->mode == R14ShadowMode::DirectOnly)
+                    return true;
+                if (entry->lockedMask != 0)
+                    return false;
+                cpu = R14DetachShadowLocked(*entry);
+            }
+            if (cpu) cpu->Release();
+            R14LogRetiredShadow(reason);
+            return true;
+        }
+
+        void R14MarkExternalGpuWrite(IDirect3DTexture9* texture,
+            const char* reason) noexcept
+        {
+            const R14EntryPtr entry = R14Find(texture);
+            if (!entry) return;
+
+            IDirect3DTexture9* cpu = nullptr;
+            bool retired = false;
+            bool concurrent = false;
+            {
+                std::lock_guard<std::mutex> lock(entry->mutex);
+                if (entry->mode == R14ShadowMode::DirectOnly)
+                    return;
+                concurrent = entry->lockedMask != 0;
+                entry->validMask = 0;
+                entry->externalWriteDuringLock |= concurrent;
+                entry->retirePending = true;
+                if (!concurrent)
+                {
+                    cpu = R14DetachShadowLocked(*entry);
+                    retired = true;
                 }
             }
-            if (!slot)
-                slot = &R14Shadows[R14ShadowCursor++ % R14Shadows.size()];
-            R14ReleaseEntry(*slot);
-            slot->gpu = gpu;
-            slot->cpu = cpu;
-            slot->device = device;
-            ++R14ShadowCreated;
-
-            if (!R14FirstActiveLogged)
+            if (cpu) cpu->Release();
+            if (retired) R14LogRetiredShadow(reason);
+            if (concurrent && !R14FirstConcurrentWriteLogged.exchange(true))
             {
-                R14FirstActiveLogged = true;
-                spdlog::info(
-                    "VR R14 EX: MANAGED 2D CPU-shadow upload path ACTIVE; LockRect no longer depends on translated DEFAULT texture lockability");
+                spdlog::error(
+                    "VR R14 EX: external GPU texture write overlapped a CPU-shadow Lock; upload is suppressed and the shadow will retire at the final Unlock");
             }
+        }
+
+        bool R14Track(IDirect3DDevice9* device, IDirect3DTexture9* gpu,
+            IDirect3DTexture9* cpu) noexcept
+        {
+            if (!device || !gpu || !cpu) return false;
+            try
+            {
+                auto entry = std::make_shared<R14ShadowEntry>();
+                entry->gpu = gpu;
+                entry->device = device;
+                const UINT levels = gpu->GetLevelCount();
+                entry->validMask = levels >= R14MaxTrackedLevels
+                    ? 0xFFFFFFFFu : ((1u << levels) - 1u);
+                device->AddRef();
+
+                std::lock_guard<std::mutex> lock(R14RegistryMutex);
+                if (!R14RegistryDevice)
+                    R14RegistryDevice = device;
+                if (R14RegistryDevice != device)
+                    return false;
+                const auto inserted = R14Shadows.emplace(gpu, entry);
+                if (!inserted.second)
+                    return false;
+                // Ownership transfers only after insertion succeeds. On every
+                // failure path the caller still owns and releases cpu exactly once.
+                entry->cpu = cpu;
+            }
+            catch (...)
+            {
+                return false;
+            }
+
+            ++R14ShadowCreated;
+            if (!R14FirstActiveLogged.exchange(true))
+            {
+                spdlog::info(
+                    "VR R14 EX: lifetime-bound MANAGED 2D CPU-shadow path ACTIVE; no live or locked texture can be evicted by a fixed-capacity ring");
+            }
+            return true;
         }
 
         bool R14CreateCpuShadow(IDirect3DDevice9* device,
@@ -108,13 +337,211 @@ namespace OutRunVRD3D9ExUpgradeR13
             if (levels == 0 || levels > R14MaxTrackedLevels)
                 return false;
 
-            // SYSTEMMEM is deliberately created with usage=0. Legacy MANAGED
-            // textures cannot be render targets/depth surfaces, and stripping
-            // DYNAMIC/AUTOGEN flags avoids invalid SYSTEMMEM combinations.
             const HRESULT hr = device->CreateTexture(
                 desc.Width, desc.Height, levels, 0, desc.Format,
                 D3DPOOL_SYSTEMMEM, &shadow, nullptr);
             return SUCCEEDED(hr) && shadow;
+        }
+
+        ULONG __stdcall TextureReleaseDestR14(IDirect3DTexture9* texture)
+        {
+            const ULONG remaining =
+                R14TextureReleaseHook.stdcall<ULONG>(texture);
+            if (remaining == 0 && R14InternalReleaseDepth == 0)
+                R14Erase(texture);
+            return remaining;
+        }
+
+        HRESULT __stdcall TextureGetSurfaceLevelDestR14(
+            IDirect3DTexture9* texture, UINT level, IDirect3DSurface9** surface)
+        {
+            const R14EntryPtr entry = R14Find(texture);
+            if (entry && !R14RetireShadow(entry, "external GetSurfaceLevel"))
+            {
+                if (surface) *surface = nullptr;
+                return D3DERR_INVALIDCALL;
+            }
+            return R14TextureGetSurfaceLevelHook.stdcall<HRESULT>(
+                texture, level, surface);
+        }
+
+        void __stdcall TextureGenerateMipSubLevelsDestR14(
+            IDirect3DTexture9* texture)
+        {
+            R14TextureGenerateMipSubLevelsHook.stdcall<void>(texture);
+            if (R14InternalUploadDepth == 0)
+            {
+                R14MarkExternalGpuWrite(texture,
+                    "external GenerateMipSubLevels");
+            }
+        }
+
+        HRESULT __stdcall TextureAddDirtyRectDestR14(
+            IDirect3DTexture9* texture, const RECT* rect)
+        {
+            const R14EntryPtr entry = R14Find(texture);
+            if (entry)
+            {
+                std::lock_guard<std::mutex> lock(entry->mutex);
+                if (entry->mode == R14ShadowMode::Shadow &&
+                    !entry->retirePending)
+                {
+                    // Every writable shadow Unlock is explicitly uploaded.
+                    // Preserve MANAGED AddDirtyRect success semantics without
+                    // relying on level-zero UpdateTexture dirty propagation.
+                    return D3D_OK;
+                }
+            }
+            return R14TextureAddDirtyRectHook.stdcall<HRESULT>(texture, rect);
+        }
+
+        HRESULT __stdcall UpdateSurfaceDestR14(IDirect3DDevice9* device,
+            IDirect3DSurface9* source, const RECT* sourceRect,
+            IDirect3DSurface9* destination, const POINT* destinationPoint)
+        {
+            const HRESULT hr = R14DeviceUpdateSurfaceHook.stdcall<HRESULT>(
+                device, source, sourceRect, destination, destinationPoint);
+            if (destination && R14InternalUploadDepth == 0)
+            {
+                IDirect3DTexture9* texture = nullptr;
+                if (SUCCEEDED(destination->GetContainer(
+                        __uuidof(IDirect3DTexture9),
+                        reinterpret_cast<void**>(&texture))) && texture)
+                {
+                    R14MarkExternalGpuWrite(texture, "external UpdateSurface");
+                    texture->Release();
+                }
+            }
+            return hr;
+        }
+
+        HRESULT __stdcall UpdateTextureDestR14(IDirect3DDevice9* device,
+            IDirect3DBaseTexture9* source,
+            IDirect3DBaseTexture9* destination)
+        {
+            const HRESULT hr = R14DeviceUpdateTextureHook.stdcall<HRESULT>(
+                device, source, destination);
+            if (destination && R14InternalUploadDepth == 0)
+            {
+                IDirect3DTexture9* texture = nullptr;
+                if (SUCCEEDED(destination->QueryInterface(
+                        __uuidof(IDirect3DTexture9),
+                        reinterpret_cast<void**>(&texture))) && texture)
+                {
+                    R14MarkExternalGpuWrite(texture, "external UpdateTexture");
+                    texture->Release();
+                }
+            }
+            return hr;
+        }
+
+        bool InstallManagedResourceCompatR14(IDirect3DDevice9Ex* deviceEx)
+        {
+            const bool installed =
+                R14InstallCompatR13Hook.call<bool>(deviceEx);
+            if (installed && deviceEx)
+            {
+                R14AdoptCompatDevice(
+                    static_cast<IDirect3DDevice9*>(deviceEx));
+            }
+            return installed;
+        }
+
+        bool R14EnsureResourceHooks(IDirect3DDevice9* device,
+            IDirect3DTexture9* texture) noexcept
+        {
+            if (!device || !texture) return false;
+            std::lock_guard<std::mutex> installLock(R14ResourceHookMutex);
+
+            void** textureVtable = *reinterpret_cast<void***>(texture);
+            void** deviceVtable = *reinterpret_cast<void***>(device);
+            if (!textureVtable || !deviceVtable)
+                return false;
+
+            if (R14TextureReleaseHook &&
+                R14TextureGenerateMipSubLevelsHook &&
+                R14TextureGetSurfaceLevelHook &&
+                R14TextureAddDirtyRectHook && R14DeviceUpdateSurfaceHook &&
+                R14DeviceUpdateTextureHook)
+            {
+                // A replacement device may be supplied by a wrapper with a
+                // different implementation vtable. Never claim coverage from
+                // hooks installed on the old implementation.
+                return R14TextureReleaseTarget ==
+                        textureVtable[R14TextureReleaseVtableIndex] &&
+                    R14TextureGenerateMipSubLevelsTarget ==
+                        textureVtable[
+                            R14TextureGenerateMipSubLevelsVtableIndex] &&
+                    R14TextureGetSurfaceLevelTarget ==
+                        textureVtable[R14TextureGetSurfaceLevelVtableIndex] &&
+                    R14TextureAddDirtyRectTarget ==
+                        textureVtable[R14TextureAddDirtyRectVtableIndex] &&
+                    R14DeviceUpdateSurfaceTarget ==
+                        deviceVtable[R14DeviceUpdateSurfaceVtableIndex] &&
+                    R14DeviceUpdateTextureTarget ==
+                        deviceVtable[R14DeviceUpdateTextureVtableIndex];
+            }
+
+            const auto disabled = safetyhook::InlineHook::StartDisabled;
+            R14TextureReleaseHook = safetyhook::create_inline(
+                textureVtable[R14TextureReleaseVtableIndex],
+                TextureReleaseDestR14, disabled);
+            R14TextureGenerateMipSubLevelsHook = safetyhook::create_inline(
+                textureVtable[R14TextureGenerateMipSubLevelsVtableIndex],
+                TextureGenerateMipSubLevelsDestR14, disabled);
+            R14TextureGetSurfaceLevelHook = safetyhook::create_inline(
+                textureVtable[R14TextureGetSurfaceLevelVtableIndex],
+                TextureGetSurfaceLevelDestR14, disabled);
+            R14TextureAddDirtyRectHook = safetyhook::create_inline(
+                textureVtable[R14TextureAddDirtyRectVtableIndex],
+                TextureAddDirtyRectDestR14, disabled);
+            R14DeviceUpdateSurfaceHook = safetyhook::create_inline(
+                deviceVtable[R14DeviceUpdateSurfaceVtableIndex],
+                UpdateSurfaceDestR14, disabled);
+            R14DeviceUpdateTextureHook = safetyhook::create_inline(
+                deviceVtable[R14DeviceUpdateTextureVtableIndex],
+                UpdateTextureDestR14, disabled);
+
+            SafetyHookInline* hooks[]{
+                &R14TextureReleaseHook,
+                &R14TextureGenerateMipSubLevelsHook,
+                &R14TextureGetSurfaceLevelHook,
+                &R14TextureAddDirtyRectHook,
+                &R14DeviceUpdateSurfaceHook,
+                &R14DeviceUpdateTextureHook
+            };
+            for (auto* hook : hooks)
+            {
+                if (!*hook || !hook->enable().has_value())
+                {
+                    R14DeviceUpdateTextureHook = {};
+                    R14DeviceUpdateSurfaceHook = {};
+                    R14TextureAddDirtyRectHook = {};
+                    R14TextureGetSurfaceLevelHook = {};
+                    R14TextureGenerateMipSubLevelsHook = {};
+                    R14TextureReleaseHook = {};
+                    R14TextureReleaseTarget = nullptr;
+                    R14TextureGenerateMipSubLevelsTarget = nullptr;
+                    R14TextureGetSurfaceLevelTarget = nullptr;
+                    R14TextureAddDirtyRectTarget = nullptr;
+                    R14DeviceUpdateSurfaceTarget = nullptr;
+                    R14DeviceUpdateTextureTarget = nullptr;
+                    return false;
+                }
+            }
+            R14TextureReleaseTarget =
+                textureVtable[R14TextureReleaseVtableIndex];
+            R14TextureGenerateMipSubLevelsTarget =
+                textureVtable[R14TextureGenerateMipSubLevelsVtableIndex];
+            R14TextureGetSurfaceLevelTarget =
+                textureVtable[R14TextureGetSurfaceLevelVtableIndex];
+            R14TextureAddDirtyRectTarget =
+                textureVtable[R14TextureAddDirtyRectVtableIndex];
+            R14DeviceUpdateSurfaceTarget =
+                deviceVtable[R14DeviceUpdateSurfaceVtableIndex];
+            R14DeviceUpdateTextureTarget =
+                deviceVtable[R14DeviceUpdateTextureVtableIndex];
+            return true;
         }
 
         HRESULT __stdcall CreateTextureCompatDestR14(
@@ -130,28 +557,25 @@ namespace OutRunVRD3D9ExUpgradeR13
                 return hr;
 
             IDirect3DTexture9* shadow = nullptr;
-            if (R14CreateCpuShadow(device, *texture, shadow))
+            if (R14CreateCpuShadow(device, *texture, shadow) &&
+                R14EnsureResourceHooks(device, *texture) &&
+                R14Track(device, *texture, shadow))
             {
-                R14Track(device, *texture, shadow);
+                return hr; // registry owns shadow on success
             }
-            else
+
+            if (shadow) shadow->Release();
+            ++R14ShadowCreateFailed;
+            if (!R14FirstFallbackLogged.exchange(true))
             {
-                ++R14ShadowCreateFailed;
-                if (!R14FirstFallbackLogged)
-                {
-                    R14FirstFallbackLogged = true;
-                    spdlog::warn(
-                        "VR R14 EX: CPU shadow unavailable for one MANAGED 2D texture; retaining R13 DEFAULT|DYNAMIC LockRect compatibility for that resource");
-                }
+                spdlog::warn(
+                    "VR R14 EX: lifetime/coherency hooks or CPU shadow unavailable; this MANAGED texture remains on the R13 direct-GPU compatibility path");
             }
             return hr;
         }
 
         DWORD R14SanitizeLockFlags(DWORD flags) noexcept
         {
-            // DISCARD/NOOVERWRITE are GPU-dynamic hints and are invalid or
-            // meaningless on SYSTEMMEM. NO_DIRTY_UPDATE would suppress the dirty
-            // tracking UpdateTexture may rely on, so R14 owns that policy too.
             return flags & ~(D3DLOCK_DISCARD | D3DLOCK_NOOVERWRITE |
                 D3DLOCK_NO_DIRTY_UPDATE);
         }
@@ -159,38 +583,152 @@ namespace OutRunVRD3D9ExUpgradeR13
         HRESULT __stdcall TextureLockRectR14(IDirect3DTexture9* texture,
             UINT level, D3DLOCKED_RECT* locked, const RECT* rect, DWORD flags)
         {
-            R14ShadowEntry* entry = R14Find(texture);
+            const R14EntryPtr entry = R14Find(texture);
             if (!entry || level >= R14MaxTrackedLevels)
                 return R14TextureLockR13Hook.stdcall<HRESULT>(
                     texture, level, locked, rect, flags);
 
-            const DWORD sanitized = R14SanitizeLockFlags(flags);
-            const HRESULT hr = entry->cpu->LockRect(
-                level, locked, rect, sanitized);
-            if (FAILED(hr))
+            IDirect3DTexture9* cpuToRelease = nullptr;
+            HRESULT shadowHr = D3DERR_INVALIDCALL;
             {
-                // Fail open to the proven R13 dynamic-texture path. This keeps
-                // startup compatible on drivers that reject the SYSTEMMEM form.
-                return R14TextureLockR13Hook.stdcall<HRESULT>(
-                    texture, level, locked, rect, flags);
+                std::unique_lock<std::mutex> lock(entry->mutex);
+                if (entry->mode == R14ShadowMode::DirectOnly)
+                {
+                    lock.unlock();
+                    return R14TextureLockR13Hook.stdcall<HRESULT>(
+                        texture, level, locked, rect, flags);
+                }
+                if (entry->retirePending)
+                {
+                    if (entry->lockedMask != 0)
+                        return D3DERR_INVALIDCALL;
+                    cpuToRelease = R14DetachShadowLocked(*entry);
+                }
+                else
+                {
+                    const std::uint32_t bit = 1u << level;
+                    if ((entry->validMask & bit) == 0)
+                    {
+                        entry->retirePending = true;
+                        if (entry->lockedMask != 0)
+                            return D3DERR_INVALIDCALL;
+                        cpuToRelease = R14DetachShadowLocked(*entry);
+                        lock.unlock();
+                        if (cpuToRelease) cpuToRelease->Release();
+                        R14LogRetiredShadow("invalid mip shadow");
+                        return R14TextureLockR13Hook.stdcall<HRESULT>(
+                            texture, level, locked, rect, flags);
+                    }
+                    shadowHr = entry->cpu->LockRect(
+                        level, locked, rect, R14SanitizeLockFlags(flags));
+                    if (SUCCEEDED(shadowHr))
+                    {
+                        entry->lockedMask |= bit;
+                        if ((flags & D3DLOCK_READONLY) != 0)
+                            entry->readOnlyMask |= bit;
+                        else
+                        {
+                            entry->readOnlyMask &= ~bit;
+                            entry->dirtyMask |= bit;
+                        }
+                        if (rect)
+                        {
+                            entry->lockRect[level] = *rect;
+                            entry->lockRectValid[level] = true;
+                        }
+                        else
+                        {
+                            entry->lockRect[level] = {};
+                            entry->lockRectValid[level] = false;
+                        }
+                        ++R14ShadowLocks;
+                        return shadowHr;
+                    }
+
+                    // Never mix a direct GPU lock with outstanding shadow locks.
+                    // Once they drain, retire the shadow and use one path only.
+                    entry->retirePending = true;
+                    if (entry->lockedMask != 0)
+                        return shadowHr;
+                    cpuToRelease = R14DetachShadowLocked(*entry);
+                }
             }
 
-            const std::uint32_t bit = 1u << level;
-            entry->lockedMask |= bit;
-            if ((flags & D3DLOCK_READONLY) != 0) entry->readOnlyMask |= bit;
-            else entry->readOnlyMask &= ~bit;
-            if (rect)
+            if (cpuToRelease) cpuToRelease->Release();
+            R14LogRetiredShadow("CPU shadow LockRect failure");
+            return R14TextureLockR13Hook.stdcall<HRESULT>(
+                texture, level, locked, rect, flags);
+        }
+
+        bool R14BlockCompressed(D3DFORMAT format) noexcept
+        {
+            return format == D3DFMT_DXT1 || format == D3DFMT_DXT2 ||
+                format == D3DFMT_DXT3 || format == D3DFMT_DXT4 ||
+                format == D3DFMT_DXT5;
+        }
+
+        HRESULT R14CopyWholeLevelByLock(R14ShadowEntry& entry,
+            UINT level) noexcept
+        {
+            D3DSURFACE_DESC desc{};
+            if (FAILED(entry.cpu->GetLevelDesc(level, &desc)))
+                return D3DERR_INVALIDCALL;
+
+            D3DLOCKED_RECT source{};
+            D3DLOCKED_RECT destination{};
+            HRESULT hr = R14TextureLockR13Hook.stdcall<HRESULT>(
+                entry.cpu, level, &source, nullptr, D3DLOCK_READONLY);
+            if (FAILED(hr)) return hr;
+
+            hr = R14TextureLockR13Hook.stdcall<HRESULT>(
+                entry.gpu, level, &destination, nullptr, D3DLOCK_DISCARD);
+            if (FAILED(hr))
             {
-                entry->lockRect[level] = *rect;
-                entry->lockRectValid[level] = true;
+                hr = R14TextureLockR13Hook.stdcall<HRESULT>(
+                    entry.gpu, level, &destination, nullptr, 0);
             }
-            else
+
+            const bool destinationLocked = SUCCEEDED(hr);
+            if (destinationLocked)
             {
-                entry->lockRect[level] = {};
-                entry->lockRectValid[level] = false;
+                const UINT rows = R14BlockCompressed(desc.Format)
+                    ? std::max<UINT>(1, (desc.Height + 3) / 4)
+                    : desc.Height;
+                const std::size_t sourcePitch = static_cast<std::size_t>(
+                    source.Pitch < 0 ? -static_cast<std::int64_t>(source.Pitch)
+                                     : source.Pitch);
+                const std::size_t destinationPitch = static_cast<std::size_t>(
+                    destination.Pitch < 0
+                        ? -static_cast<std::int64_t>(destination.Pitch)
+                        : destination.Pitch);
+                const std::size_t rowBytes =
+                    std::min(sourcePitch, destinationPitch);
+                if (!source.pBits || !destination.pBits || rowBytes == 0)
+                {
+                    hr = E_FAIL;
+                }
+                else for (UINT row = 0; row < rows; ++row)
+                {
+                    const auto* src = static_cast<const std::uint8_t*>(
+                        source.pBits) + static_cast<std::ptrdiff_t>(row) *
+                        source.Pitch;
+                    auto* dst = static_cast<std::uint8_t*>(destination.pBits) +
+                        static_cast<std::ptrdiff_t>(row) * destination.Pitch;
+                    std::memcpy(dst, src, rowBytes);
+                }
             }
-            ++R14ShadowLocks;
-            return hr;
+
+            HRESULT destinationUnlock = D3D_OK;
+            if (destinationLocked)
+            {
+                destinationUnlock =
+                    R14TextureUnlockR13Hook.stdcall<HRESULT>(entry.gpu, level);
+            }
+            const HRESULT sourceUnlock =
+                R14TextureUnlockR13Hook.stdcall<HRESULT>(entry.cpu, level);
+            if (FAILED(hr)) return hr;
+            if (FAILED(destinationUnlock)) return destinationUnlock;
+            return sourceUnlock;
         }
 
         HRESULT R14UploadLevel(R14ShadowEntry& entry, UINT level) noexcept
@@ -198,69 +736,118 @@ namespace OutRunVRD3D9ExUpgradeR13
             if (!entry.device || !entry.cpu || !entry.gpu)
                 return E_FAIL;
 
-            IDirect3DSurface9* src = nullptr;
-            IDirect3DSurface9* dst = nullptr;
-            HRESULT hr = entry.cpu->GetSurfaceLevel(level, &src);
-            if (SUCCEEDED(hr)) hr = entry.gpu->GetSurfaceLevel(level, &dst);
-            if (SUCCEEDED(hr) && src && dst)
+            R14InternalUploadScope internal;
+            IDirect3DSurface9* source = nullptr;
+            IDirect3DSurface9* destination = nullptr;
+            HRESULT hr = R14TextureGetSurfaceLevelHook.stdcall<HRESULT>(
+                entry.cpu, level, &source);
+            if (SUCCEEDED(hr))
+            {
+                hr = R14TextureGetSurfaceLevelHook.stdcall<HRESULT>(
+                    entry.gpu, level, &destination);
+            }
+            if (SUCCEEDED(hr) && source && destination)
             {
                 const RECT* rect = entry.lockRectValid[level]
                     ? &entry.lockRect[level] : nullptr;
                 POINT point{};
-                POINT* dstPoint = nullptr;
+                POINT* destinationPoint = nullptr;
                 if (rect)
                 {
                     point.x = rect->left;
                     point.y = rect->top;
-                    dstPoint = &point;
+                    destinationPoint = &point;
                 }
-                hr = entry.device->UpdateSurface(src, rect, dst, dstPoint);
+                hr = entry.device->UpdateSurface(
+                    source, rect, destination, destinationPoint);
             }
-            if (src) src->Release();
-            if (dst) dst->Release();
+            else if (SUCCEEDED(hr))
+            {
+                hr = E_FAIL;
+            }
+            if (source) source->Release();
+            if (destination) destination->Release();
 
-            // Some compressed/driver-specific resources reject UpdateSurface
-            // but accept the documented SYSTEMMEM -> DEFAULT UpdateTexture path.
+            // UpdateTexture's level-zero dirty propagation cannot prove that an
+            // independently changed lower mip is copied. The fallback therefore
+            // copies this exact mip in full through the translated texture's
+            // direct lock path, or fails without overwriting unrelated content.
             if (FAILED(hr))
-                hr = entry.device->UpdateTexture(entry.cpu, entry.gpu);
+                hr = R14CopyWholeLevelByLock(entry, level);
             return hr;
         }
 
         HRESULT __stdcall TextureUnlockRectR14(IDirect3DTexture9* texture,
             UINT level)
         {
-            R14ShadowEntry* entry = R14Find(texture);
+            const R14EntryPtr entry = R14Find(texture);
             if (!entry || level >= R14MaxTrackedLevels)
                 return R14TextureUnlockR13Hook.stdcall<HRESULT>(texture, level);
 
-            const std::uint32_t bit = 1u << level;
-            if ((entry->lockedMask & bit) == 0)
-                return R14TextureUnlockR13Hook.stdcall<HRESULT>(texture, level);
-
-            const bool readOnly = (entry->readOnlyMask & bit) != 0;
-            const HRESULT unlockHr = entry->cpu->UnlockRect(level);
-            entry->lockedMask &= ~bit;
-            entry->readOnlyMask &= ~bit;
-            if (FAILED(unlockHr) || readOnly)
-                return unlockHr;
-
-            const HRESULT uploadHr = R14UploadLevel(*entry, level);
-            entry->lockRectValid[level] = false;
-            if (SUCCEEDED(uploadHr))
+            IDirect3DTexture9* cpuToRelease = nullptr;
+            HRESULT result = D3D_OK;
+            bool retired = false;
             {
-                ++R14ShadowUploads;
-                return unlockHr;
+                std::unique_lock<std::mutex> lock(entry->mutex);
+                const std::uint32_t bit = 1u << level;
+                if (entry->mode == R14ShadowMode::DirectOnly ||
+                    (entry->lockedMask & bit) == 0)
+                {
+                    lock.unlock();
+                    return R14TextureUnlockR13Hook.stdcall<HRESULT>(
+                        texture, level);
+                }
+
+                const bool readOnly = (entry->readOnlyMask & bit) != 0;
+                const HRESULT unlockHr = entry->cpu->UnlockRect(level);
+                entry->lockedMask &= ~bit;
+                entry->readOnlyMask &= ~bit;
+
+                if (FAILED(unlockHr))
+                {
+                    entry->validMask &= ~bit;
+                    entry->retirePending = true;
+                    result = unlockHr;
+                }
+                else if (entry->externalWriteDuringLock)
+                {
+                    // Preserve the externally-written GPU contents. The caller's
+                    // overlapping CPU write cannot be committed coherently.
+                    result = D3DERR_INVALIDCALL;
+                }
+                else if (!readOnly)
+                {
+                    result = R14UploadLevel(*entry, level);
+                    entry->lockRectValid[level] = false;
+                    if (SUCCEEDED(result))
+                    {
+                        entry->dirtyMask &= ~bit;
+                        ++R14ShadowUploads;
+                    }
+                    else
+                    {
+                        entry->validMask &= ~bit;
+                        ++R14ShadowUploadFailed;
+                        entry->retirePending = true;
+                        if (!R14FirstUploadFailureLogged.exchange(true))
+                        {
+                            spdlog::error(
+                                "VR R14 EX: exact mip CPU-shadow upload failed hr=0x{:08x}; shadow will retire instead of risking a stale later overwrite",
+                                static_cast<unsigned>(result));
+                        }
+                    }
+                }
+
+                if (entry->retirePending && entry->lockedMask == 0)
+                {
+                    cpuToRelease = R14DetachShadowLocked(*entry);
+                    retired = true;
+                }
             }
 
-            ++R14ShadowUploadFailed;
-            if (!R14FirstUploadFailureLogged)
-            {
-                R14FirstUploadFailureLogged = true;
-                spdlog::error(
-                    "VR R14 EX: first CPU-shadow upload failed hr=0x{:08x}; texture remains tracked but direct D3D9Ex compatibility is not hardware-proven",
-                    static_cast<unsigned>(uploadHr));
-            }
-            return uploadHr;
+            if (cpuToRelease) cpuToRelease->Release();
+            if (retired) R14LogRetiredShadow("coherency path retired at Unlock");
+            return result;
         }
 
         void R14RollbackHooks() noexcept
@@ -268,6 +855,7 @@ namespace OutRunVRD3D9ExUpgradeR13
             R14TextureUnlockR13Hook = {};
             R14TextureLockR13Hook = {};
             R14CreateTextureR13Hook = {};
+            R14InstallCompatR13Hook = {};
         }
 
         class VRD3D9ExUpgradeR14Hook final : public Hook
@@ -293,8 +881,12 @@ namespace OutRunVRD3D9ExUpgradeR13
                 R14TextureUnlockR13Hook = safetyhook::create_inline(
                     reinterpret_cast<void*>(&TextureUnlockRectR13),
                     TextureUnlockRectR14, disabled);
+                R14InstallCompatR13Hook = safetyhook::create_inline(
+                    reinterpret_cast<void*>(&InstallManagedResourceCompatR13),
+                    InstallManagedResourceCompatR14, disabled);
 
                 SafetyHookInline* hooks[]{
+                    &R14InstallCompatR13Hook,
                     &R14CreateTextureR13Hook,
                     &R14TextureLockR13Hook,
                     &R14TextureUnlockR13Hook
@@ -310,7 +902,7 @@ namespace OutRunVRD3D9ExUpgradeR13
                     }
                 }
                 spdlog::info(
-                    "VR R14 EX: MANAGED 2D CPU-shadow compatibility armed before D3D9Ex device promotion");
+                    "VR R14 EX: lifetime-bound, coherency-fail-closed MANAGED 2D shadow compatibility armed");
                 return true;
             }
             static VRD3D9ExUpgradeR14Hook instance;

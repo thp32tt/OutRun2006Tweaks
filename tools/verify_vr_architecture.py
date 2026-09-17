@@ -27,14 +27,19 @@ required = [
     "src/vr/game/outrun_renderer.cpp",
     "src/vr/game/outrun_renderer_r13.cpp",
     "src/vr/game/outrun_renderer_r23.cpp",
+    "src/vr/game/outrun_renderer_r29.cpp",
     "src/vr/d3d9/stereo_renderer.cpp",
     "src/vr/d3d9/stereo_renderer_r13.cpp",
     "src/vr/d3d9/stereo_renderer_r20.cpp",
     "src/vr/d3d9/stereo_renderer_r21.cpp",
     "src/vr/d3d9/stereo_renderer_r22.cpp",
     "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "src/vr/d3d9/stereo_renderer_r29.cpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r31.cpp",
     "src/vr/d3d9/ex_device_upgrade.cpp",
     "src/vr/d3d9/ex_device_upgrade_r13.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r14.cpp",
     "src/vr/d3d9/r13_bridge.hpp",
     "src/vr/d3d9/vr_pass_policy.hpp",
     "src/vr/ipc/protocol.hpp",
@@ -144,6 +149,57 @@ require(
     "shadow/billboard/panel pass kept stock",
     "InvalidateVerifiedWvp",
     "InlineHook::StartDisabled",
+)
+
+# R29/R31 correctness overlays must preserve constant registers surrounding a
+# partial c64..c67 write, pair fast-path WVP with its captured projection, and
+# make StateBlock bypasses an explicit full-cache generation boundary.
+require(
+    "src/vr/game/outrun_renderer_r29.cpp",
+    "R29BuildCoherentUploadEnvelope",
+    "envelopeStart",
+    "envelopeCount",
+    "IsGameStateBlockRecording",
+    "IsStateBlockTrackingReliable",
+    "recorded stock",
+    "R29InvalidateRendererStateAfterExternalRestore",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r31.cpp",
+    "GetR28VerifiedProjection",
+    "projectionGeneration != generation",
+    "BeginStateBlockDestR31",
+    "R31StateBlockTrackingReliable",
+    "per-draw live WVP/shader/render-state validation",
+    "R31 fast left-eye c64 rollback",
+    "R31 HUD left-eye c64 rollback",
+)
+
+# R14 shadows are resource-lifetime-bound and fail closed to one direct path on
+# any write route that cannot be mirrored. A lower-mip fallback must copy that
+# exact level rather than relying on UpdateTexture's level-zero dirty rules.
+r14 = require(
+    "src/vr/d3d9/ex_device_upgrade_r14.cpp",
+    "std::unordered_map<IDirect3DTexture9*, R14EntryPtr>",
+    "TextureReleaseDestR14",
+    "InstallManagedResourceCompatR14",
+    "R14AdoptCompatDevice",
+    "TextureGenerateMipSubLevelsDestR14",
+    "TextureGetSurfaceLevelDestR14",
+    "UpdateSurfaceDestR14",
+    "UpdateTextureDestR14",
+    "validMask",
+    "dirtyMask",
+    "R14CopyWholeLevelByLock",
+    "exact mip CPU-shadow upload failed",
+)
+if "R14ShadowCapacity" in r14 or "R14ShadowCursor" in r14:
+    raise SystemExit("R14 reintroduced fixed-capacity live-shadow eviction")
+
+settings = require(
+    "src/vr/settings.cpp",
+    'VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", false',
+    "D3D9Ex full-eye transport remains opt-in pending hardware validation",
 )
 
 # R23 installer workers may only request cleanup. Live OutRun camera/projection

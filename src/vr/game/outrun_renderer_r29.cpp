@@ -15,6 +15,8 @@
 //  * R28 projection snapshots are kept only when R13 actually accepted a
 //    verified world WVP. No draw-time shader identity substitution is needed.
 
+#include <limits>
+
 #include "outrun_renderer_r23.cpp"
 
 namespace OutRunVRRenderer
@@ -31,8 +33,10 @@ namespace OutRunVRRenderer
         std::uint64_t R29RawWvpSeedFailures = 0;
         std::uint64_t R29R13ClassifiedUploads = 0;
         std::uint64_t R29PartialFullRebuilds = 0;
+        std::uint64_t R29StateBlockStockWrites = 0;
         bool R29FirstSeedLogged = false;
         bool R29FirstR13RestoreLogged = false;
+        bool R29FirstStateBlockStockLogged = false;
 
         void R29InvalidateRawWvpGenerationImpl() noexcept
         {
@@ -70,6 +74,66 @@ namespace OutRunVRRenderer
             return true;
         }
 
+        bool R29BuildCoherentUploadEnvelope(UINT startRegister,
+            const float* constantData, UINT vector4fCount,
+            UINT& envelopeStart, UINT& envelopeCount,
+            float envelopeData[256 * 4]) noexcept
+        {
+            if (!constantData || !envelopeData || !R28RawWvpComplete() ||
+                vector4fCount == 0 || vector4fCount > 256)
+                return false;
+
+            const std::uint64_t requestFirst = startRegister;
+            const std::uint64_t requestLast = requestFirst + vector4fCount;
+            const std::uint64_t wvpFirst = OutRunWvpRegister;
+            const std::uint64_t wvpLast =
+                OutRunWvpRegister + OutRunWvpRegisterCount;
+            const std::uint64_t first = std::min(requestFirst, wvpFirst);
+            const std::uint64_t last = std::max(requestLast, wvpLast);
+            const std::uint64_t maxRegisterPlusOne =
+                static_cast<std::uint64_t>(
+                    std::numeric_limits<UINT>::max()) + 1;
+            if (last <= first || last - first > 256 ||
+                last > maxRegisterPlusOne)
+                return false;
+
+            envelopeStart = static_cast<UINT>(first);
+            envelopeCount = static_cast<UINT>(last - first);
+            std::memset(envelopeData, 0,
+                sizeof(float) * envelopeCount * 4);
+
+            // Rebuild c64..c67 from the generation-local stock shadow, then
+            // preserve every register in the caller's original range outside
+            // that block. A single widened D3D call retains the base renderer's
+            // all-or-nothing failure handling without dropping c63 or c68+.
+            const UINT wvpOffset = OutRunWvpRegister - envelopeStart;
+            std::memcpy(envelopeData + wvpOffset * 4, R28RawWvp,
+                sizeof(R28RawWvp));
+
+            if (requestFirst < wvpFirst)
+            {
+                const std::uint64_t prefixLast = std::min(requestLast, wvpFirst);
+                const UINT prefixCount = static_cast<UINT>(
+                    prefixLast - requestFirst);
+                std::memcpy(envelopeData +
+                        static_cast<UINT>(requestFirst - first) * 4,
+                    constantData, sizeof(float) * prefixCount * 4);
+            }
+            if (requestLast > wvpLast)
+            {
+                const std::uint64_t suffixFirst = std::max(requestFirst, wvpLast);
+                const UINT suffixCount = static_cast<UINT>(requestLast - suffixFirst);
+                const UINT sourceOffset = static_cast<UINT>(
+                    suffixFirst - requestFirst);
+                const UINT destinationOffset = static_cast<UINT>(
+                    suffixFirst - first);
+                std::memcpy(envelopeData + destinationOffset * 4,
+                    constantData + sourceOffset * 4,
+                    sizeof(float) * suffixCount * 4);
+            }
+            return true;
+        }
+
         HRESULT __stdcall BeginSceneDestR29(IDirect3DDevice9* device)
         {
             // BeginScene is the cheapest authoritative generation boundary we
@@ -99,13 +163,37 @@ namespace OutRunVRRenderer
                     device, startRegister, constantData, vector4fCount);
             }
 
+            if (OutRunVRStereo::IsGameStateBlockRecording())
+            {
+                // A recorded StateBlock must contain the game's stock values,
+                // not a pose-patched matrix that could be replayed in a later
+                // generation. Bypass every renderer injection layer while D3D9
+                // records this call; EndStateBlock will resynchronize live state.
+                InvalidateVerifiedWvp();
+                R29InvalidateRawWvpGenerationImpl();
+                ++R29StateBlockStockWrites;
+                if (!R29FirstStateBlockStockLogged)
+                {
+                    R29FirstStateBlockStockLogged = true;
+                    spdlog::info(
+                        "VR R29 STATE: c64 write inside Begin/EndStateBlock recorded stock; pose-patched WVP values are never persisted in a game StateBlock");
+                }
+                return SetVertexShaderConstantFHook.stdcall<HRESULT>(
+                    device, startRegister, constantData, vector4fCount);
+            }
+
             const bool partialWvp =
                 !UploadContainsOutRunWvp(startRegister, vector4fCount);
 
             // This deliberately happens BEFORE the R23 eligibility gate. The
             // old implementation returned early while closed and silently lost
             // stock row updates, leaving an old 0xF mask reusable later.
-            if (partialWvp && !R28RawWvpComplete())
+            // Until every StateBlock::Apply is intercepted, a cached raw block
+            // may have been replaced without traversing this setter. Re-seed
+            // from the live device before every partial update in that mode so
+            // matrix B can never be combined with cached rows from matrix A.
+            if (partialWvp && (!R28RawWvpComplete() ||
+                    !OutRunVRStereo::IsStateBlockTrackingReliable()))
                 R29SeedCurrentStockWvp(device);
             R28TrackRawWvpWrite(startRegister, constantData, vector4fCount);
 
@@ -115,14 +203,19 @@ namespace OutRunVRRenderer
             if (!R23WvpEligibilityReady.load(std::memory_order_acquire) ||
                 !OutRunVR::RuntimeEligibility::MayInjectStereo())
             {
-                const HRESULT hr = R29WvpR23Hook.stdcall<HRESULT>(
+                HRESULT hr = R29WvpR23Hook.stdcall<HRESULT>(
                     device, startRegister, constantData, vector4fCount);
                 if (SUCCEEDED(hr) && partialWvp && R28RawWvpComplete() &&
                     !OutRunVR::RuntimeEligibility::MayInjectStereo())
                 {
                     // Make recovery/warmup coherent even if only one row was
                     // written after a previously head-patched device state.
-                    return R28RestoreStockWvp(device);
+                    hr = R28RestoreStockWvp(device);
+                }
+                if (FAILED(hr))
+                {
+                    InvalidateVerifiedWvp();
+                    R29InvalidateRawWvpGenerationImpl();
                 }
                 return hr;
             }
@@ -142,9 +235,21 @@ namespace OutRunVRRenderer
                         device, startRegister, constantData, vector4fCount);
                 }
 
+                UINT envelopeStart = 0;
+                UINT envelopeCount = 0;
+                float envelopeData[256 * 4]{};
+                if (!R29BuildCoherentUploadEnvelope(startRegister,
+                        constantData, vector4fCount, envelopeStart,
+                        envelopeCount, envelopeData))
+                {
+                    InvalidateVerifiedWvp();
+                    R29InvalidateRawWvpGenerationImpl();
+                    return R23WvpEligibilityHook.stdcall<HRESULT>(
+                        device, startRegister, constantData, vector4fCount);
+                }
+
                 hr = R23WvpEligibilityHook.stdcall<HRESULT>(
-                    device, OutRunWvpRegister, R28RawWvp,
-                    OutRunWvpRegisterCount);
+                    device, envelopeStart, envelopeData, envelopeCount);
                 if (SUCCEEDED(hr))
                     ++R29PartialFullRebuilds;
             }
@@ -158,7 +263,10 @@ namespace OutRunVRRenderer
             if (SUCCEEDED(hr))
                 R28CaptureVerifiedProjection();
             else
-                R28InvalidateProjectionSnapshot();
+            {
+                InvalidateVerifiedWvp();
+                R29InvalidateRawWvpGenerationImpl();
+            }
 
             if (!R29FirstR13RestoreLogged)
             {
@@ -273,6 +381,15 @@ namespace OutRunVRRenderer
 
     void R29InvalidateRawWvpGeneration() noexcept
     {
+        R29InvalidateRawWvpGenerationImpl();
+    }
+
+    void R29InvalidateRendererStateAfterExternalRestore() noexcept
+    {
+        // StateBlock::Apply bypasses every renderer setter detour. Discard both
+        // the raw stock rows and the verified/patched WVP as one generation so
+        // a later partial upload must seed from the live device again.
+        InvalidateVerifiedWvp();
         R29InvalidateRawWvpGenerationImpl();
     }
 
