@@ -182,4 +182,4 @@ if host_cmake.find("r32_direct_submit.hpp") < \
         host_cmake.find("r26_recenter_hardening.hpp"):
     raise SystemExit("R32 direct submit must be final xrEndFrame owner after R26")
 
-print("R32/R33 review-2 consolidation verification passed")
+print("R32/R33 review-3 correctness verification passed")
