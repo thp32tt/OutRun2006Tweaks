@@ -27,13 +27,53 @@ endif()
 project(outrun2006tweaks-proj)
 
 set_source_files_properties(src/hooks_wheel_ffb.cpp PROPERTIES HEADER_FILE_ONLY TRUE)
-# R13 keeps the validated R9/R12 implementation files intact and compiles
-# wrapper translation units that include them plus narrowly scoped hardening.
-set_source_files_properties(
+# R33/R14 keep the validated R32/R31/R30/R29/R26/R23/R22/R21/R20/R13/R9/R12
+# implementation chains intact and compile only the final game/stereo/Ex wrapper
+# TUs. Included implementation files are header-only here so no hook body is
+# linked twice.
+set(OUTRUN_VR_INCLUDED_IMPL_TUS
     src/vr/d3d9/ex_device_upgrade.cpp
+    src/vr/d3d9/ex_device_upgrade_r13.cpp
     src/vr/d3d9/stereo_renderer.cpp
+    src/vr/d3d9/stereo_renderer_r13.cpp
+    src/vr/d3d9/stereo_renderer_r20.cpp
+    src/vr/d3d9/stereo_renderer_r21.cpp
+    src/vr/d3d9/stereo_renderer_r22.cpp
+    src/vr/d3d9/stereo_renderer_r23.cpp
+    src/vr/d3d9/stereo_renderer_r26.cpp
+    src/vr/d3d9/stereo_renderer_r29.cpp
+    src/vr/d3d9/stereo_renderer_r30.cpp
+    src/vr/d3d9/stereo_renderer_r31.cpp
+    src/vr/d3d9/stereo_renderer_r32.cpp
     src/vr/game/outrun_renderer.cpp
+    src/vr/game/outrun_renderer_r13.cpp
+    src/vr/game/outrun_renderer_r23.cpp)
+set_source_files_properties(${OUTRUN_VR_INCLUDED_IMPL_TUS}
     PROPERTIES HEADER_FILE_ONLY TRUE)
+
+set(OUTRUN_VR_FINAL_TUS
+    src/vr/d3d9/ex_device_upgrade_r14.cpp
+    src/vr/d3d9/stereo_renderer_r33.cpp
+    src/vr/game/outrun_renderer_r29.cpp)
+foreach(_vr_source IN LISTS OUTRUN_VR_INCLUDED_IMPL_TUS OUTRUN_VR_FINAL_TUS)
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_vr_source}")
+        message(FATAL_ERROR "VR source graph references missing TU: ${_vr_source}")
+    endif()
+endforeach()
+foreach(_vr_source IN LISTS OUTRUN_VR_INCLUDED_IMPL_TUS)
+    get_source_file_property(_vr_header_only "${_vr_source}" HEADER_FILE_ONLY)
+    if(NOT _vr_header_only)
+        message(FATAL_ERROR "VR included implementation TU must be HEADER_FILE_ONLY: ${_vr_source}")
+    endif()
+endforeach()
+foreach(_vr_source IN LISTS OUTRUN_VR_FINAL_TUS)
+    get_source_file_property(_vr_header_only "${_vr_source}" HEADER_FILE_ONLY)
+    if(_vr_header_only)
+        message(FATAL_ERROR "VR final wrapper TU must compile normally: ${_vr_source}")
+    endif()
+endforeach()
+unset(_vr_source)
+unset(_vr_header_only)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 

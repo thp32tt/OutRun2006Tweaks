@@ -40,6 +40,8 @@ r32 = require(
     "R32SetWvpBatch",
     "OutRunWvpRegisterCount",
     "R32WaitProducerFence",
+    "QueryPerformanceCounter",
+    "Budget starts before the FLUSH request",
     "R32ProducerFencePending",
     "R32DrainPendingProducerFence",
     "timed-out producer EVENT remains pending",
@@ -59,6 +61,8 @@ r33 = require(
     "R31OwnedResult R33TryHud",
     "R31ObserveDraw(device)",
     "R32LowerFailClosed",
+    "R31DiscardUnreliableDrawCaches();",
+    "changing one tracked render state cannot",
     "R30DrawPrimitiveR29Hook",
     "R33ResetR32Hook.stdcall<HRESULT>",
     "R33 -> R32 -> R22",
@@ -86,6 +90,8 @@ host_direct = require(
     "flushIssued",
     "deferred until actual direct-ring slot pressure",
     "PublishCompletedFrame",
+    "AckedFrame",
+    "AckedGeneration",
     "R32 direct PERF 5s",
     "verified incoming DirectGPU projection submitted once",
     "OutRunVrR26RecenterHardening::EndFrame",
@@ -94,6 +100,20 @@ host_direct = require(
 # old unconditional End(query)+Flush() sequence.
 if "Context->End(pending.fence);\n        OutRunVrFinalTest::Context->Flush();" in host_direct:
     raise SystemExit("R32 host must not Flush every direct frame")
+
+require(
+    "vrhost/src/main_r23.cpp",
+    "R23DirectHoldState",
+    "R23StageDirectHold",
+    "grace projection no longer samples ACK-reusable producer slots",
+    "srv[0] = R23DirectHold.srv[0]",
+)
+
+require(
+    "src/vr/d3d9/ex_device_upgrade_r14.cpp",
+    "singleLevelTexture",
+    "entry.gpu->GetLevelCount() <= 1",
+)
 
 require(
     "vrhost/tests/r32_policy_smoke.cpp",
@@ -111,17 +131,43 @@ cmake = require(
     "stereo_renderer_r32.cpp",
     "PROPERTIES HEADER_FILE_ONLY TRUE",
 )
-vr_start = cmake.find(
-    "set_source_files_properties(\n    src/vr/d3d9/ex_device_upgrade.cpp")
-vr_end = cmake.find("PROPERTIES HEADER_FILE_ONLY TRUE", vr_start)
-if vr_start < 0 or vr_end < 0:
-    raise SystemExit("could not locate VR HEADER_FILE_ONLY ownership block")
-header_section = cmake[vr_start:vr_end]
+included_start = cmake.find("set(OUTRUN_VR_INCLUDED_IMPL_TUS")
+included_end = cmake.find(
+    "set_source_files_properties(${OUTRUN_VR_INCLUDED_IMPL_TUS}",
+    included_start)
+final_start = cmake.find("set(OUTRUN_VR_FINAL_TUS", included_end)
+final_end = cmake.find("foreach(_vr_source", final_start)
+if min(included_start, included_end, final_start, final_end) < 0:
+    raise SystemExit("could not locate list-based VR source ownership blocks")
+header_section = cmake[included_start:included_end]
+final_section = cmake[final_start:final_end]
 if "stereo_renderer_r31.cpp" not in header_section or \
         "stereo_renderer_r32.cpp" not in header_section:
     raise SystemExit("R31/R32 must be include-only implementation TUs")
 if "stereo_renderer_r33.cpp" in header_section:
-    raise SystemExit("R33 final TU must remain independently compiled")
+    raise SystemExit("R33 final TU must not be include-only")
+if "stereo_renderer_r33.cpp" not in final_section or \
+        "ex_device_upgrade_r14.cpp" not in final_section or \
+        "outrun_renderer_r29.cpp" not in final_section:
+    raise SystemExit("final VR wrapper TU list is incomplete")
+
+generated = require(
+    "CMakeLists.txt",
+    "set(OUTRUN_VR_INCLUDED_IMPL_TUS",
+    "set(OUTRUN_VR_FINAL_TUS",
+    "stereo_renderer_r33.cpp",
+    "ex_device_upgrade_r14.cpp",
+    "outrun_renderer_r29.cpp",
+)
+for source in (
+    "src/vr/d3d9/stereo_renderer_r31.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r14.cpp",
+    "src/vr/game/outrun_renderer_r29.cpp",
+):
+    if source not in generated:
+        raise SystemExit(f"generated CMakeLists is stale: missing {source}")
 
 host_cmake = require(
     "vrhost/CMakeLists.txt",

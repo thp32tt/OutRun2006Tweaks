@@ -680,9 +680,12 @@ namespace OutRunVRD3D9ExUpgradeR13
                 entry.cpu, level, &source, nullptr, D3DLOCK_READONLY);
             if (FAILED(hr)) return hr;
 
+            const bool singleLevelTexture = entry.gpu->GetLevelCount() <= 1;
+            const DWORD destinationFlags =
+                singleLevelTexture ? D3DLOCK_DISCARD : 0;
             hr = R14TextureLockR13Hook.stdcall<HRESULT>(
-                entry.gpu, level, &destination, nullptr, D3DLOCK_DISCARD);
-            if (FAILED(hr))
+                entry.gpu, level, &destination, nullptr, destinationFlags);
+            if (FAILED(hr) && destinationFlags != 0)
             {
                 hr = R14TextureLockR13Hook.stdcall<HRESULT>(
                     entry.gpu, level, &destination, nullptr, 0);

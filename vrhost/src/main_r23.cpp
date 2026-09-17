@@ -61,6 +61,134 @@ namespace
     std::uint64_t R23TheaterRefreshFresh = 0;
     ULONGLONG R23LastTheaterRefreshLogMs = 0;
 
+
+    struct R23DirectHoldState
+    {
+        ID3D11Texture2D* eye[2]{};
+        ID3D11ShaderResourceView* srv[2]{};
+        DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
+        UINT width = 0;
+        UINT height = 0;
+        UINT mipLevels = 0;
+        UINT arraySize = 0;
+        std::uint32_t frameId = 0;
+        std::uint32_t generation = 0;
+        bool valid = false;
+
+        ~R23DirectHoldState()
+        {
+            for (int eyeIndex = 0; eyeIndex < 2; ++eyeIndex)
+            {
+                if (srv[eyeIndex]) srv[eyeIndex]->Release();
+                if (eye[eyeIndex]) eye[eyeIndex]->Release();
+            }
+        }
+    };
+    R23DirectHoldState R23DirectHold{};
+    bool R23FirstDirectHoldLogged = false;
+
+    void R23ReleaseDirectHoldResources() noexcept
+    {
+        for (int eye = 0; eye < 2; ++eye)
+        {
+            ReleaseCom(R23DirectHold.srv[eye]);
+            ReleaseCom(R23DirectHold.eye[eye]);
+        }
+        R23DirectHold.format = DXGI_FORMAT_UNKNOWN;
+        R23DirectHold.width = 0;
+        R23DirectHold.height = 0;
+        R23DirectHold.mipLevels = 0;
+        R23DirectHold.arraySize = 0;
+        R23DirectHold.frameId = 0;
+        R23DirectHold.generation = 0;
+        R23DirectHold.valid = false;
+    }
+
+    void R23InvalidateDirectHold() noexcept
+    {
+        R23DirectHold.frameId = 0;
+        R23DirectHold.generation = 0;
+        R23DirectHold.valid = false;
+    }
+
+    bool R23StageDirectHold(StereoCompositor& c,
+        const OutRunVR::SharedRenderFrameState& frame)
+    {
+        const std::uint32_t slot =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        if (!c.context_ || !c.device_ || slot >= OutRunVR::RenderFrameRingSize ||
+            !frame.frameId || !generation || !c.directLeft_[slot] ||
+            !c.directRight_[slot])
+            return false;
+
+        D3D11_TEXTURE2D_DESC left{};
+        D3D11_TEXTURE2D_DESC right{};
+        c.directLeft_[slot]->GetDesc(&left);
+        c.directRight_[slot]->GetDesc(&right);
+        if (!left.Width || !left.Height || left.Width != right.Width ||
+            left.Height != right.Height || left.MipLevels != right.MipLevels ||
+            left.ArraySize != right.ArraySize || left.Format != right.Format ||
+            left.SampleDesc.Count != 1 || right.SampleDesc.Count != 1 ||
+            left.Width != frame.backbufferWidth ||
+            left.Height != frame.backbufferHeight)
+            return false;
+
+        const bool recreate =
+            !R23DirectHold.eye[0] || !R23DirectHold.eye[1] ||
+            !R23DirectHold.srv[0] || !R23DirectHold.srv[1] ||
+            R23DirectHold.width != left.Width ||
+            R23DirectHold.height != left.Height ||
+            R23DirectHold.mipLevels != left.MipLevels ||
+            R23DirectHold.arraySize != left.ArraySize ||
+            R23DirectHold.format != left.Format;
+        if (recreate)
+        {
+            R23ReleaseDirectHoldResources();
+            D3D11_TEXTURE2D_DESC hold = left;
+            hold.Usage = D3D11_USAGE_DEFAULT;
+            hold.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+            hold.CPUAccessFlags = 0;
+            hold.MiscFlags = 0;
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                if (FAILED(c.device_->CreateTexture2D(
+                        &hold, nullptr, &R23DirectHold.eye[eye])) ||
+                    !R23DirectHold.eye[eye] ||
+                    FAILED(c.device_->CreateShaderResourceView(
+                        R23DirectHold.eye[eye], nullptr,
+                        &R23DirectHold.srv[eye])) ||
+                    !R23DirectHold.srv[eye])
+                {
+                    R23ReleaseDirectHoldResources();
+                    return false;
+                }
+            }
+            R23DirectHold.width = left.Width;
+            R23DirectHold.height = left.Height;
+            R23DirectHold.mipLevels = left.MipLevels;
+            R23DirectHold.arraySize = left.ArraySize;
+            R23DirectHold.format = left.Format;
+        }
+
+        // Immediate-context ordering guarantees that both copies execute before
+        // the following projection draw samples this host-owned pair. The R32
+        // EVENT fence then covers the copy + projection work before producer ACK.
+        c.context_->CopyResource(R23DirectHold.eye[0], c.directLeft_[slot]);
+        c.context_->CopyResource(R23DirectHold.eye[1], c.directRight_[slot]);
+        R23DirectHold.frameId = frame.frameId;
+        R23DirectHold.generation = generation;
+        R23DirectHold.valid = true;
+        if (!R23FirstDirectHoldLogged)
+        {
+            R23FirstDirectHoldLogged = true;
+            std::cout
+                << "DirectGPU host-owned hold active; grace projection no longer samples ACK-reusable producer slots.\n";
+        }
+        return true;
+    }
+
     const char* R23SourceKindName(OutRunVrR23VerifiedBundle::SourceKind kind)
     {
         using OutRunVrR23VerifiedBundle::SourceKind;
@@ -552,12 +680,15 @@ namespace
     {
         c.directFrameValid_ = false;
         c.directTransportReady_ = false;
+        R23InvalidateDirectHold();
     }
 
     bool R23CommitDirectAfterValidation(StereoCompositor& c,
         const OutRunVR::SharedRenderFrameState& frame)
     {
-        if (!c.CommitDirectStereoSource(frame) || !R23ValidateDirectResourceSize(c, frame))
+        if (!c.CommitDirectStereoSource(frame) ||
+            !R23ValidateDirectResourceSize(c, frame) ||
+            !R23StageDirectHold(c, frame))
         {
             R23InvalidateDirect(c);
             return false;
@@ -585,13 +716,13 @@ namespace
         UvRect eyes[2]{};
         ID3D11ShaderResourceView* srv[2]{};
         DXGI_FORMAT fmt[2]{ DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN };
-        if (c.directFrameValid_ && c.directActiveSlot_ < OutRunVR::RenderFrameRingSize &&
-            c.directLeftSrv_[c.directActiveSlot_] && c.directRightSrv_[c.directActiveSlot_])
+        if (c.directFrameValid_ && R23DirectHold.valid &&
+            R23DirectHold.srv[0] && R23DirectHold.srv[1])
         {
             eyes[0] = eyes[1] = { 0.f, 0.f, 1.f, 1.f };
-            srv[0] = c.directLeftSrv_[c.directActiveSlot_];
-            srv[1] = c.directRightSrv_[c.directActiveSlot_];
-            fmt[0] = fmt[1] = c.directFormat_[c.directActiveSlot_];
+            srv[0] = R23DirectHold.srv[0];
+            srv[1] = R23DirectHold.srv[1];
+            fmt[0] = fmt[1] = R23DirectHold.format;
         }
         else
         {

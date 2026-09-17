@@ -124,7 +124,8 @@ namespace OutRunVRStereo
         {
             if (!device || !constants)
                 return false;
-            ++R32BatchWvpUploads;
+            if (Settings::VRTelemetry)
+                ++R32BatchWvpUploads;
             const HRESULT hr = device->SetVertexShaderConstantF(
                 OutRunWvpRegister, constants, OutRunWvpRegisterCount);
             if (FAILED(hr))
@@ -132,7 +133,7 @@ namespace OutRunVRStereo
                 ++R32BatchWvpFailures;
                 return false;
             }
-            if (!R32FirstBatchWvpLogged)
+            if (Settings::VRTelemetry && !R32FirstBatchWvpLogged)
             {
                 R32FirstBatchWvpLogged = true;
                 spdlog::info(
@@ -664,6 +665,23 @@ namespace OutRunVRStereo
         {
             if (!query)
                 return false;
+
+            LARGE_INTEGER frequency{};
+            LARGE_INTEGER start{};
+            const bool highResolutionClock =
+                QueryPerformanceFrequency(&frequency) != FALSE &&
+                frequency.QuadPart > 0 &&
+                QueryPerformanceCounter(&start) != FALSE;
+            const ULONGLONG fallbackDeadline = highResolutionClock ? 0 :
+                GetTickCount64() + OutRunVR::R32::ProducerFenceBudgetMs;
+            const LONGLONG budgetTicks = highResolutionClock
+                ? (frequency.QuadPart *
+                    static_cast<LONGLONG>(OutRunVR::R32::ProducerFenceBudgetMs) +
+                    999) / 1000
+                : 0;
+
+            // Budget starts before the FLUSH request so a slow first GetData is
+            // accounted for instead of being hidden outside the 2 ms window.
             HRESULT ready = query->GetData(nullptr, 0, D3DGETDATA_FLUSH);
             if (ready == S_OK)
             {
@@ -673,8 +691,6 @@ namespace OutRunVRStereo
             if (ready != S_FALSE)
                 return false;
 
-            const ULONGLONG deadline = GetTickCount64() +
-                OutRunVR::R32::ProducerFenceBudgetMs;
             for (;;)
             {
                 ready = query->GetData(nullptr, 0, 0);
@@ -683,7 +699,20 @@ namespace OutRunVRStereo
                     ++R32DirectFenceSuccess;
                     return true;
                 }
-                if (ready != S_FALSE || GetTickCount64() >= deadline)
+
+                bool expired = ready != S_FALSE;
+                if (!expired && highResolutionClock)
+                {
+                    LARGE_INTEGER now{};
+                    expired = QueryPerformanceCounter(&now) == FALSE ||
+                        now.QuadPart - start.QuadPart >= budgetTicks;
+                }
+                else if (!expired)
+                {
+                    expired = GetTickCount64() >= fallbackDeadline;
+                }
+
+                if (expired)
                 {
                     ++R32DirectFenceBudgetFallbacks;
                     ++DirectTransportFenceTimeouts;

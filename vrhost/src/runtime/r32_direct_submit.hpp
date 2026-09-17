@@ -42,6 +42,8 @@ namespace OutRunVrR32DirectSubmit
     };
 
     inline std::array<PendingAck, OutRunVR::RenderFrameRingSize> Pending{};
+    inline std::array<std::uint32_t, OutRunVR::RenderFrameRingSize> AckedFrame{};
+    inline std::array<std::uint32_t, OutRunVR::RenderFrameRingSize> AckedGeneration{};
     inline std::uint64_t FastDirectSubmits = 0;
     inline std::uint64_t FastDirectRejects = 0;
     inline std::uint64_t AckArmed = 0;
@@ -83,6 +85,8 @@ namespace OutRunVrR32DirectSubmit
             pending.flushIssued = false;
             pending.frame = {};
         }
+        AckedFrame.fill(0);
+        AckedGeneration.fill(0);
     }
 
     inline bool EnsureFence(std::uint32_t slot) noexcept
@@ -116,6 +120,15 @@ namespace OutRunVrR32DirectSubmit
                 ++AckPublishRetry;
                 continue;
             }
+            const std::uint32_t slot =
+                pending.frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+            const std::uint32_t generation =
+                pending.frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+            if (slot < AckedFrame.size())
+            {
+                AckedFrame[slot] = pending.frame.frameId;
+                AckedGeneration[slot] = generation;
+            }
             pending.armed = false;
             pending.flushIssued = false;
             pending.frame = {};
@@ -136,8 +149,19 @@ namespace OutRunVrR32DirectSubmit
             return false;
         const std::uint32_t slot =
             frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
-        if (slot >= Pending.size() || !EnsureFence(slot))
+        const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        if (slot >= Pending.size() || !generation || !EnsureFence(slot))
             return false;
+
+        if (AckedGeneration[slot] == generation &&
+            AckedFrame[slot] == frame.frameId)
+            return true;
+        if (AckedGeneration[slot] != 0 && AckedGeneration[slot] != generation)
+        {
+            AckedGeneration[slot] = 0;
+            AckedFrame[slot] = 0;
+        }
 
         auto& pending = Pending[slot];
         if (pending.armed)
@@ -162,6 +186,10 @@ namespace OutRunVrR32DirectSubmit
                 return false;
             }
         }
+
+        if (AckedGeneration[slot] == generation &&
+            AckedFrame[slot] == frame.frameId)
+            return true;
 
         OutRunVrFinalTest::Context->End(pending.fence);
         pending.frame = frame;

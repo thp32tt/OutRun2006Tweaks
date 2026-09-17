@@ -237,7 +237,6 @@ namespace OutRunVRStereo
             if (!R33DepthStencilState.valid)
                 return hr;
 
-            bool tracked = true;
             switch (state)
             {
             case D3DRS_ZENABLE:
@@ -274,17 +273,12 @@ namespace OutRunVRStereo
                 R33DepthStencilState.ccwStencilPass = value;
                 break;
             default:
-                tracked = false;
                 break;
             }
 
-            if (tracked)
-            {
-                R33DepthStencilState.depthGeneration = R9MainDepthGeneration;
-                R33DepthStencilState.stateBlockRecordings =
-                    R31StateBlockRecordings;
-                R33DepthStencilState.stateBlockApplies = R31StateBlockApplies;
-            }
+            // Do not rewrite depth/state-block generations here. If a StateBlock
+            // made this snapshot stale, changing one tracked render state cannot
+            // make the untouched fields authoritative again.
             return hr;
         }
 
@@ -651,6 +645,10 @@ namespace OutRunVRStereo
                     return fast.hr;
             }
 
+            // Preserve R31's fail-closed boundary when StateBlock tracking
+            // is unreliable. Otherwise stale R29 effect/shadow caches can
+            // reclassify a draw that R33 already rejected using live state.
+            R31DiscardUnreliableDrawCaches();
             if (telemetry)
                 ++R31Frame.fallback;
             return R32LowerFailClosed(device,
