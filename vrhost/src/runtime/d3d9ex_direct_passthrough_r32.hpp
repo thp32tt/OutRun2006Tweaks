@@ -264,7 +264,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
         {
             R32FirstSafeSwapLogged = true;
             std::cerr
-                << "[D3D9Ex R32] SafeEye A/B staging + per-slot shared-resource cache ACTIVE build="
+                << "[D3D9Ex R32] SafeEye A/B staging + per-slot shared-resource cache ACTIVE; host-owned GPU eye copies + completion ACK active build="
                 << R32SafeEyeBuildId << "\n";
         }
         return true;
