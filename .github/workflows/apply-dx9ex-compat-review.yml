@@ -1,0 +1,40 @@
+name: Apply DX9Ex compatibility review patch
+
+on:
+  push:
+    branches: [ vr-openxr ]
+    paths:
+      - tools/apply_dx9ex_compat_review.py
+      - .github/workflows/apply-dx9ex-compat-review.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: vr-openxr
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Apply source patch
+        shell: pwsh
+        run: python tools/apply_dx9ex_compat_review.py
+      - name: Remove staging helpers
+        shell: pwsh
+        run: |
+          Remove-Item tools/apply_dx9ex_compat_review.py
+          Remove-Item .github/workflows/apply-dx9ex-compat-review.yml
+      - name: Commit source changes
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if (git diff --cached --quiet) { exit 0 }
+          git commit -m "fix(vr): harden D3D9Ex compatibility contract"
+          git push origin HEAD:vr-openxr
