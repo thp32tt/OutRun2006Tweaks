@@ -169,6 +169,31 @@ for source in (
     if source not in generated:
         raise SystemExit(f"generated CMakeLists is stale: missing {source}")
 
+source_list_start = generated.find("set(outrun2006tweaks_SOURCES")
+source_list_end = generated.find(
+    ")\n\nadd_library(outrun2006tweaks SHARED)", source_list_start)
+if source_list_start < 0 or source_list_end < 0:
+    raise SystemExit("could not locate generated outrun2006tweaks target source list")
+target_sources = generated[source_list_start:source_list_end]
+for source in (
+    "src/vr/d3d9/ex_device_upgrade_r14.cpp",
+    "src/vr/d3d9/stereo_renderer_r20.cpp",
+    "src/vr/d3d9/stereo_renderer_r21.cpp",
+    "src/vr/d3d9/stereo_renderer_r22.cpp",
+    "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "src/vr/d3d9/stereo_renderer_r26.cpp",
+    "src/vr/d3d9/stereo_renderer_r29.cpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r31.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/game/outrun_renderer_r23.cpp",
+    "src/vr/game/outrun_renderer_r29.cpp",
+):
+    if source not in target_sources:
+        raise SystemExit(
+            f"generated target source list is stale: missing {source}")
+
 host_cmake = require(
     "vrhost/CMakeLists.txt",
     "d3d9ex_direct_passthrough_r32.hpp",
@@ -182,4 +207,4 @@ if host_cmake.find("r32_direct_submit.hpp") < \
         host_cmake.find("r26_recenter_hardening.hpp"):
     raise SystemExit("R32 direct submit must be final xrEndFrame owner after R26")
 
-print("R32/R33 review-3 correctness verification passed")
+print("R32/R33 review-4 correctness verification passed")
