@@ -18,38 +18,54 @@ def require(rel: str, *markers: str) -> str:
     return data
 
 
-require(
+policy = require(
     "src/vr/d3d9/r32_policy.hpp",
     "RearmMonoSafetyEpoch",
     "ForceZeroDisparity",
     "ProducerFenceBudgetMs = 2",
+    "PendingFenceDecision",
+    "ClassifyPendingFence",
 )
-require(
+
+r32 = require(
     "src/vr/d3d9/stereo_renderer_r32.cpp",
     '#include "stereo_renderer_r31.cpp"',
+    "R32ResetR22Hook",
+    "reinterpret_cast<void*>(&ResetDestR22)",
     "R32ResetAfterGameReset",
+    "R32InvalidateResetCaches",
     "R29MonoSafetyThroughEpoch = OutRunVR::R32::RearmMonoSafetyEpoch",
     "R32EffectIsFragileLive",
     "draw is forced to stock-WVP zero disparity",
     "R32SetWvpBatch",
     "OutRunWvpRegisterCount",
     "R32WaitProducerFence",
-    "D3DGETDATA_FLUSH",
-    "ProducerFenceBudgetMs",
+    "R32ProducerFencePending",
+    "R32DrainPendingProducerFence",
+    "timed-out producer EVENT remains pending",
     "R32DirectIdentityMatches",
     "VR R32 PERF 5s",
-    "VR R32 REVIEW",
+    "VR R32 REVIEW2",
 )
-require(
+if "R32ResetR13Hook" in r32:
+    raise SystemExit("R32 must no longer install a competing ResetDestR13 hook")
+if "R22ShadowState = {};" in r32[r32.find("void R32ResetAfterGameReset"):]:
+    raise SystemExit("R32 successful Reset post-processing must preserve R22's freshly primed viewport/scissor shadow")
+
+r33 = require(
     "src/vr/d3d9/stereo_renderer_r33.cpp",
     '#include "stereo_renderer_r32.cpp"',
+    "R31OwnedResult R33TryFastWorld",
+    "R31OwnedResult R33TryHud",
     "R31ObserveDraw(device)",
-    "R32TryFastWorld",
-    "R32TryHud",
     "R32LowerFailClosed",
     "R30DrawPrimitiveR29Hook",
-    "top-level draw telemetry is counted exactly once",
+    "R33ResetR32Hook.stdcall<HRESULT>",
+    "R33 -> R32 -> R22",
+    "top-level telemetry counted once",
 )
+if "const HRESULT hr = ResetDestR22" in r33:
+    raise SystemExit("R33 must not bypass the corrected R32 Reset lifecycle")
 
 require(
     "vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp",
@@ -60,22 +76,32 @@ require(
     "queued copy cannot mutate SafeFrameId image identity",
     "EnsureSafeFrameR32",
 )
-require(
+
+host_direct = require(
     "vrhost/src/runtime/r32_direct_submit.hpp",
     "CanFastSubmit",
     "ProjectionMatchesSnapshot",
     "ArmConsumptionFence",
     "D3D11_ASYNC_GETDATA_DONOTFLUSH",
+    "flushIssued",
+    "deferred until actual direct-ring slot pressure",
     "PublishCompletedFrame",
+    "R32 direct PERF 5s",
     "verified incoming DirectGPU projection submitted once",
-    "redundant SafeEye copy + second projection removed",
     "OutRunVrR26RecenterHardening::EndFrame",
 )
+# Flush remains permitted only in the slot-pressure escalation block. Reject the
+# old unconditional End(query)+Flush() sequence.
+if "Context->End(pending.fence);\n        OutRunVrFinalTest::Context->Flush();" in host_direct:
+    raise SystemExit("R32 host must not Flush every direct frame")
+
 require(
     "vrhost/tests/r32_policy_smoke.cpp",
     "RearmMonoSafetyEpoch(1) == 3",
     "EffectSnapshotDecision::ForceZeroDisparity",
     "ProducerFenceBudgetMs <= 2",
+    "PendingFenceDecision::BlockReuse",
+    "PendingFenceDecision::QueryError",
 )
 
 cmake = require(
@@ -110,4 +136,4 @@ if host_cmake.find("r32_direct_submit.hpp") < \
         host_cmake.find("r26_recenter_hardening.hpp"):
     raise SystemExit("R32 direct submit must be final xrEndFrame owner after R26")
 
-print("R32/R33 review consolidation verification passed")
+print("R32/R33 review-2 consolidation verification passed")
