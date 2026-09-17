@@ -89,6 +89,9 @@ ex = require(
     "deviceEx->CheckDeviceState(window)",
     "S_PRESENT_MODE_CHANGED",
     "D3DERR_DEVICENOTRESET",
+    "D3DERR_DEVICEHUNG",
+    "D3DERR_DEVICEREMOVED",
+    "D3DERR_DRIVERINTERNALERROR",
     "EvictManagedResourcesCompatDest",
     "CaptureClassicBaseline",
     "RestoreClassicResetState",
@@ -103,6 +106,12 @@ ex = require(
 if "for (DWORD stage = 0; stage < 16; ++stage)\n                if (FAILED(device->SetTexture" in ex:
     raise SystemExit("classic Reset replay must not treat invalid texture stages 8..15 as failures")
 
+bridge = require(
+    "src/vr/d3d9/r13_bridge.hpp",
+    "NormalizeLegacyPresentResult",
+    "ResetCompatDevice",
+)
+
 ex_r13 = require(
     "src/vr/d3d9/ex_device_upgrade_r13.cpp",
     "ResetCompatDevice",
@@ -110,11 +119,29 @@ ex_r13 = require(
     "UpdateCompatPresentationState(device, params)",
     "RestoreClassicResetState(device)",
     "ResetEx + classic-state replay",
+    "NormalizeLegacyPresentResult",
+    "S_PRESENT_MODE_CHANGED",
+    "S_PRESENT_OCCLUDED",
+    "CompatWindowed.load",
 )
 resetex = ex_r13.find("deviceEx->ResetEx")
 restore = ex_r13.find("RestoreClassicResetState(device)", resetex)
 if resetex < 0 or restore < resetex:
     raise SystemExit("authoritative R13 ResetEx path must replay classic state after successful ResetEx")
+
+r9 = require(
+    "src/vr/d3d9/stereo_renderer.cpp",
+    "rawPresentHr = PresentHook.stdcall<HRESULT>",
+    "OutRunVRD3D9ExUpgradeR13::NormalizeLegacyPresentResult",
+    "if (composedStereo && SUCCEEDED(hr) && !FrameStereoIncomplete)",
+)
+raw_present = r9.find("rawPresentHr = PresentHook.stdcall<HRESULT>")
+normalized_present = r9.find("NormalizeLegacyPresentResult", raw_present)
+present_success = r9.find("if (composedStereo && SUCCEEDED(hr)", normalized_present)
+if min(raw_present, normalized_present, present_success) < 0 or not (
+        raw_present < normalized_present < present_success):
+    raise SystemExit(
+        "legacy Present normalization must happen before stereo success/publication decisions")
 
 require(
     "vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp",
@@ -266,4 +293,4 @@ if host_cmake.find("r32_direct_submit.hpp") < \
         host_cmake.find("r26_recenter_hardening.hpp"):
     raise SystemExit("R32 direct submit must be final xrEndFrame owner after R26")
 
-print("R32/R33 review-5 + D3D9Ex compatibility verification passed")
+print("R32/R33 review-6 + D3D9Ex compatibility/Present verification passed")
