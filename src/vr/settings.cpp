@@ -29,7 +29,7 @@ namespace Settings
 	Setting<bool> VRStereo{ "VR", "Stereo", true,
 		"Renders true left/right geometry stereo into an SBS game frame or verified shared-eye transport. Menus remain on the fixed theater quad." };
 	Setting<bool> VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", false,
-		"Opt-in guarded D3D9Ex shared-eye transport. R14 binds MANAGED 2D CPU shadows to texture lifetime and retires them on unmirrorable writes, but hardware validation is still required before making this the default." };
+		"Opt-in guarded D3D9Ex shared-eye transport. Legacy lost-device/Reset semantics are translated, R14 tracks actual external 2D writes, and unsupported cube/volume lock fallbacks fail closed; hardware validation is still required before making this the default." };
 	Setting<bool> VRPositionalTracking{ "VR", "PositionalTracking", true,
 		"Applies 6DoF HMD X/Y/Z movement in addition to orientation. Disable this option if a title-specific camera/culling issue is observed; stereo eye separation is independent." };
 	Setting<bool> VRCullingCameraSync{ "VR", "CullingCameraSync", true,

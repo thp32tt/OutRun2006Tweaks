@@ -40,6 +40,9 @@ namespace OutRunVRStereo
         bool R32FirstFenceBudgetLogged = false;
         bool R32FirstResetRearmLogged = false;
         bool R32FirstPendingFenceLogged = false;
+        bool R32FirstDirectCopyRejectLogged = false;
+        bool R32DirectCopyPathRejected = false;
+        HRESULT R32DirectCopyRejectHr = D3D_OK;
 
         std::uint32_t R32DirectHostPid = 0;
         std::uint32_t R32DirectHostLuidLow = 0;
@@ -619,6 +622,8 @@ namespace OutRunVRStereo
         void R32InvalidateDirectInteropOnly() noexcept
         {
             R32ClearPendingProducerFences();
+            R32DirectCopyPathRejected = false;
+            R32DirectCopyRejectHr = D3D_OK;
             ReleaseDirectTransportSlots();
             ReleaseCom(DirectInteropProbeFence);
             ReleaseCom(DirectInteropProbeSurface);
@@ -641,7 +646,7 @@ namespace OutRunVRStereo
         {
             if (DirectTransportResourcesReady && R32DirectIdentityMatches())
             {
-                ++R32DirectProbeCacheHits;
+                if (Settings::VRTelemetry) ++R32DirectProbeCacheHits;
                 return true;
             }
 
@@ -666,16 +671,18 @@ namespace OutRunVRStereo
             if (!query)
                 return false;
 
-            LARGE_INTEGER frequency{};
+            static const LONGLONG qpcFrequency = []() noexcept {
+                LARGE_INTEGER value{};
+                return QueryPerformanceFrequency(&value) != FALSE
+                    ? value.QuadPart : 0;
+            }();
             LARGE_INTEGER start{};
-            const bool highResolutionClock =
-                QueryPerformanceFrequency(&frequency) != FALSE &&
-                frequency.QuadPart > 0 &&
+            const bool highResolutionClock = qpcFrequency > 0 &&
                 QueryPerformanceCounter(&start) != FALSE;
             const ULONGLONG fallbackDeadline = highResolutionClock ? 0 :
                 GetTickCount64() + OutRunVR::R32::ProducerFenceBudgetMs;
             const LONGLONG budgetTicks = highResolutionClock
-                ? (frequency.QuadPart *
+                ? (qpcFrequency *
                     static_cast<LONGLONG>(OutRunVR::R32::ProducerFenceBudgetMs) +
                     999) / 1000
                 : 0;
@@ -685,7 +692,7 @@ namespace OutRunVRStereo
             HRESULT ready = query->GetData(nullptr, 0, D3DGETDATA_FLUSH);
             if (ready == S_OK)
             {
-                ++R32DirectFenceSuccess;
+                if (Settings::VRTelemetry) ++R32DirectFenceSuccess;
                 return true;
             }
             if (ready != S_FALSE)
@@ -696,7 +703,7 @@ namespace OutRunVRStereo
                 ready = query->GetData(nullptr, 0, 0);
                 if (ready == S_OK)
                 {
-                    ++R32DirectFenceSuccess;
+                    if (Settings::VRTelemetry) ++R32DirectFenceSuccess;
                     return true;
                 }
 
@@ -714,7 +721,7 @@ namespace OutRunVRStereo
 
                 if (expired)
                 {
-                    ++R32DirectFenceBudgetFallbacks;
+                    if (Settings::VRTelemetry) ++R32DirectFenceBudgetFallbacks;
                     ++DirectTransportFenceTimeouts;
                     if (!R32FirstFenceBudgetLogged)
                     {
@@ -740,7 +747,7 @@ namespace OutRunVRStereo
             {
                 R32ProducerFencePending[slotIndex] = false;
                 R32ProducerPendingFrame[slotIndex] = 0;
-                ++R32PendingFenceErrors;
+                if (Settings::VRTelemetry) ++R32PendingFenceErrors;
                 return false;
             }
 
@@ -749,12 +756,12 @@ namespace OutRunVRStereo
             {
                 R32ProducerFencePending[slotIndex] = false;
                 R32ProducerPendingFrame[slotIndex] = 0;
-                ++R32PendingFenceDrains;
+                if (Settings::VRTelemetry) ++R32PendingFenceDrains;
                 return true;
             }
             if (ready == S_FALSE)
             {
-                ++R32PendingFenceBlocks;
+                if (Settings::VRTelemetry) ++R32PendingFenceBlocks;
                 ++DirectTransportRingBackpressure;
                 if (!R32FirstPendingFenceLogged)
                 {
@@ -767,7 +774,7 @@ namespace OutRunVRStereo
 
             R32ProducerFencePending[slotIndex] = false;
             R32ProducerPendingFrame[slotIndex] = 0;
-            ++R32PendingFenceErrors;
+            if (Settings::VRTelemetry) ++R32PendingFenceErrors;
             return false;
         }
 
@@ -776,7 +783,8 @@ namespace OutRunVRStereo
         {
             if (!R13OverlayReady.load(std::memory_order_acquire))
                 return R32ResolveDirectR13Hook.call<bool>(device, frameId);
-            if (!frameId || !R32EnsureDirectResources(device) ||
+            if (!frameId || R32DirectCopyPathRejected ||
+                !R32EnsureDirectResources(device) ||
                 !BackBuffer || !RightEyeSurface)
                 return false;
 
@@ -801,11 +809,27 @@ namespace OutRunVRStereo
 
             {
                 InternalPassScope guard;
-                if (FAILED(device->StretchRect(BackBuffer, nullptr,
-                        slot.leftSurface, nullptr, D3DTEXF_NONE)) ||
-                    FAILED(device->StretchRect(RightEyeSurface, nullptr,
-                        slot.rightSurface, nullptr, D3DTEXF_NONE)) ||
-                    FAILED(slot.fence->Issue(D3DISSUE_END)))
+                const HRESULT leftCopy = device->StretchRect(BackBuffer, nullptr,
+                    slot.leftSurface, nullptr, D3DTEXF_NONE);
+                const HRESULT rightCopy = SUCCEEDED(leftCopy)
+                    ? device->StretchRect(RightEyeSurface, nullptr,
+                        slot.rightSurface, nullptr, D3DTEXF_NONE)
+                    : leftCopy;
+                if (FAILED(leftCopy) || FAILED(rightCopy))
+                {
+                    R32DirectCopyPathRejected = true;
+                    R32DirectCopyRejectHr = FAILED(leftCopy)
+                        ? leftCopy : rightCopy;
+                    if (!R32FirstDirectCopyRejectLogged)
+                    {
+                        R32FirstDirectCopyRejectLogged = true;
+                        spdlog::warn(
+                            "VR R32 D3D9Ex: shared-eye StretchRect rejected hr=0x{:08X}; DirectGPU copy path is disabled until Reset/interop revalidation instead of retrying every Present",
+                            static_cast<unsigned>(R32DirectCopyRejectHr));
+                    }
+                    return false;
+                }
+                if (FAILED(slot.fence->Issue(D3DISSUE_END)))
                     return false;
             }
 
@@ -834,6 +858,8 @@ namespace OutRunVRStereo
             OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
             R32ForgetDirectIdentity();
             R32ClearPendingProducerFences();
+            R32DirectCopyPathRejected = false;
+            R32DirectCopyRejectHr = D3D_OK;
         }
 
         void R32ResetAfterGameReset() noexcept

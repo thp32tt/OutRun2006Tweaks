@@ -231,9 +231,14 @@ namespace OutRunVRD3D9ExUpgradeR13
                 deviceEx, params, fullscreen);
         result = deviceEx->ResetEx(params, fullscreenPtr);
         deviceEx->Release();
+        if (SUCCEEDED(result))
+        {
+            OutRunVRD3D9ExUpgrade::UpdateCompatPresentationState(device, params);
+            OutRunVRD3D9ExUpgrade::RestoreClassicResetState(device);
+        }
         ++OutRunVRD3D9ExUpgrade::ResetExRedirects;
         spdlog::info(
-            "VR D3D9Ex R13: authoritative stereo Reset path called ResetEx hr=0x{:08X}; no competing Reset inline hook",
+            "VR D3D9Ex R13: authoritative stereo Reset path called ResetEx + classic-state replay hr=0x{:08X}; no competing Reset inline hook",
             static_cast<unsigned>(result));
         return true;
     }

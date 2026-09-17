@@ -32,6 +32,10 @@ namespace OutRunVRD3D9ExUpgradeR13
         constexpr std::size_t R14TextureAddDirtyRectVtableIndex = 21;
         constexpr std::size_t R14DeviceUpdateSurfaceVtableIndex = 30;
         constexpr std::size_t R14DeviceUpdateTextureVtableIndex = 31;
+        constexpr std::size_t R14DeviceStretchRectVtableIndex = 34;
+        constexpr std::size_t R14DeviceColorFillVtableIndex = 35;
+        constexpr std::size_t R14SurfaceLockRectVtableIndex = 13;
+        constexpr std::size_t R14SurfaceGetDCVtableIndex = 15;
 
         SafetyHookInline R14CreateTextureR13Hook{};
         SafetyHookInline R14TextureLockR13Hook{};
@@ -43,6 +47,10 @@ namespace OutRunVRD3D9ExUpgradeR13
         SafetyHookInline R14TextureAddDirtyRectHook{};
         SafetyHookInline R14DeviceUpdateSurfaceHook{};
         SafetyHookInline R14DeviceUpdateTextureHook{};
+        SafetyHookInline R14DeviceStretchRectHook{};
+        SafetyHookInline R14DeviceColorFillHook{};
+        SafetyHookInline R14SurfaceLockRectHook{};
+        SafetyHookInline R14SurfaceGetDCHook{};
 
         void* R14TextureReleaseTarget = nullptr;
         void* R14TextureGenerateMipSubLevelsTarget = nullptr;
@@ -50,6 +58,10 @@ namespace OutRunVRD3D9ExUpgradeR13
         void* R14TextureAddDirtyRectTarget = nullptr;
         void* R14DeviceUpdateSurfaceTarget = nullptr;
         void* R14DeviceUpdateTextureTarget = nullptr;
+        void* R14DeviceStretchRectTarget = nullptr;
+        void* R14DeviceColorFillTarget = nullptr;
+        void* R14SurfaceLockRectTarget = nullptr;
+        void* R14SurfaceGetDCTarget = nullptr;
 
         enum class R14ShadowMode : std::uint8_t
         {
@@ -352,17 +364,28 @@ namespace OutRunVRD3D9ExUpgradeR13
             return remaining;
         }
 
+        bool R14EnsureSurfaceHooks(IDirect3DSurface9* surface) noexcept;
+
         HRESULT __stdcall TextureGetSurfaceLevelDestR14(
             IDirect3DTexture9* texture, UINT level, IDirect3DSurface9** surface)
         {
             const R14EntryPtr entry = R14Find(texture);
-            if (entry && !R14RetireShadow(entry, "external GetSurfaceLevel"))
-            {
-                if (surface) *surface = nullptr;
-                return D3DERR_INVALIDCALL;
-            }
-            return R14TextureGetSurfaceLevelHook.stdcall<HRESULT>(
+            const HRESULT hr = R14TextureGetSurfaceLevelHook.stdcall<HRESULT>(
                 texture, level, surface);
+            if (!entry || FAILED(hr) || !surface || !*surface)
+                return hr;
+
+            // Merely borrowing a level surface is not a write. Keep the CPU
+            // shadow alive when we can observe the surface's mutating entry
+            // points; otherwise retire before exposing an untracked alias.
+            if (R14EnsureSurfaceHooks(*surface))
+                return hr;
+            if (R14RetireShadow(entry, "untracked external level surface"))
+                return hr;
+
+            (*surface)->Release();
+            *surface = nullptr;
+            return D3DERR_INVALIDCALL;
         }
 
         void __stdcall TextureGenerateMipSubLevelsDestR14(
@@ -401,7 +424,7 @@ namespace OutRunVRD3D9ExUpgradeR13
         {
             const HRESULT hr = R14DeviceUpdateSurfaceHook.stdcall<HRESULT>(
                 device, source, sourceRect, destination, destinationPoint);
-            if (destination && R14InternalUploadDepth == 0)
+            if (SUCCEEDED(hr) && destination && R14InternalUploadDepth == 0)
             {
                 IDirect3DTexture9* texture = nullptr;
                 if (SUCCEEDED(destination->GetContainer(
@@ -421,7 +444,7 @@ namespace OutRunVRD3D9ExUpgradeR13
         {
             const HRESULT hr = R14DeviceUpdateTextureHook.stdcall<HRESULT>(
                 device, source, destination);
-            if (destination && R14InternalUploadDepth == 0)
+            if (SUCCEEDED(hr) && destination && R14InternalUploadDepth == 0)
             {
                 IDirect3DTexture9* texture = nullptr;
                 if (SUCCEEDED(destination->QueryInterface(
@@ -432,6 +455,94 @@ namespace OutRunVRD3D9ExUpgradeR13
                     texture->Release();
                 }
             }
+            return hr;
+        }
+
+        void R14MarkSurfaceExternalWrite(IDirect3DSurface9* surface,
+            const char* reason) noexcept
+        {
+            if (!surface) return;
+            IDirect3DTexture9* texture = nullptr;
+            if (SUCCEEDED(surface->GetContainer(__uuidof(IDirect3DTexture9),
+                    reinterpret_cast<void**>(&texture))) && texture)
+            {
+                R14MarkExternalGpuWrite(texture, reason);
+                texture->Release();
+            }
+        }
+
+        HRESULT __stdcall SurfaceLockRectDestR14(IDirect3DSurface9* surface,
+            D3DLOCKED_RECT* locked, const RECT* rect, DWORD flags)
+        {
+            const HRESULT hr = R14SurfaceLockRectHook.stdcall<HRESULT>(
+                surface, locked, rect, flags);
+            if (SUCCEEDED(hr) && (flags & D3DLOCK_READONLY) == 0)
+                R14MarkSurfaceExternalWrite(surface, "external level-surface LockRect");
+            return hr;
+        }
+
+        HRESULT __stdcall SurfaceGetDCDestR14(IDirect3DSurface9* surface,
+            HDC* dc)
+        {
+            const HRESULT hr = R14SurfaceGetDCHook.stdcall<HRESULT>(surface, dc);
+            if (SUCCEEDED(hr))
+                R14MarkSurfaceExternalWrite(surface, "external level-surface GetDC");
+            return hr;
+        }
+
+        bool R14EnsureSurfaceHooks(IDirect3DSurface9* surface) noexcept
+        {
+            if (!surface) return false;
+            std::lock_guard<std::mutex> installLock(R14ResourceHookMutex);
+            void** vtable = *reinterpret_cast<void***>(surface);
+            if (!vtable) return false;
+            if (R14SurfaceLockRectHook && R14SurfaceGetDCHook)
+            {
+                return R14SurfaceLockRectTarget ==
+                        vtable[R14SurfaceLockRectVtableIndex] &&
+                    R14SurfaceGetDCTarget == vtable[R14SurfaceGetDCVtableIndex];
+            }
+            const auto disabled = safetyhook::InlineHook::StartDisabled;
+            R14SurfaceLockRectHook = safetyhook::create_inline(
+                vtable[R14SurfaceLockRectVtableIndex], SurfaceLockRectDestR14,
+                disabled);
+            R14SurfaceGetDCHook = safetyhook::create_inline(
+                vtable[R14SurfaceGetDCVtableIndex], SurfaceGetDCDestR14,
+                disabled);
+            if (!R14SurfaceLockRectHook || !R14SurfaceGetDCHook ||
+                !R14SurfaceLockRectHook.enable().has_value() ||
+                !R14SurfaceGetDCHook.enable().has_value())
+            {
+                R14SurfaceGetDCHook = {};
+                R14SurfaceLockRectHook = {};
+                R14SurfaceLockRectTarget = nullptr;
+                R14SurfaceGetDCTarget = nullptr;
+                return false;
+            }
+            R14SurfaceLockRectTarget = vtable[R14SurfaceLockRectVtableIndex];
+            R14SurfaceGetDCTarget = vtable[R14SurfaceGetDCVtableIndex];
+            return true;
+        }
+
+        HRESULT __stdcall StretchRectDestR14(IDirect3DDevice9* device,
+            IDirect3DSurface9* source, const RECT* sourceRect,
+            IDirect3DSurface9* destination, const RECT* destinationRect,
+            D3DTEXTUREFILTERTYPE filter)
+        {
+            const HRESULT hr = R14DeviceStretchRectHook.stdcall<HRESULT>(
+                device, source, sourceRect, destination, destinationRect, filter);
+            if (SUCCEEDED(hr) && destination && R14InternalUploadDepth == 0)
+                R14MarkSurfaceExternalWrite(destination, "external StretchRect");
+            return hr;
+        }
+
+        HRESULT __stdcall ColorFillDestR14(IDirect3DDevice9* device,
+            IDirect3DSurface9* surface, const RECT* rect, D3DCOLOR color)
+        {
+            const HRESULT hr = R14DeviceColorFillHook.stdcall<HRESULT>(
+                device, surface, rect, color);
+            if (SUCCEEDED(hr) && surface && R14InternalUploadDepth == 0)
+                R14MarkSurfaceExternalWrite(surface, "external ColorFill");
             return hr;
         }
 
@@ -462,7 +573,8 @@ namespace OutRunVRD3D9ExUpgradeR13
                 R14TextureGenerateMipSubLevelsHook &&
                 R14TextureGetSurfaceLevelHook &&
                 R14TextureAddDirtyRectHook && R14DeviceUpdateSurfaceHook &&
-                R14DeviceUpdateTextureHook)
+                R14DeviceUpdateTextureHook && R14DeviceStretchRectHook &&
+                R14DeviceColorFillHook)
             {
                 // A replacement device may be supplied by a wrapper with a
                 // different implementation vtable. Never claim coverage from
@@ -479,7 +591,11 @@ namespace OutRunVRD3D9ExUpgradeR13
                     R14DeviceUpdateSurfaceTarget ==
                         deviceVtable[R14DeviceUpdateSurfaceVtableIndex] &&
                     R14DeviceUpdateTextureTarget ==
-                        deviceVtable[R14DeviceUpdateTextureVtableIndex];
+                        deviceVtable[R14DeviceUpdateTextureVtableIndex] &&
+                    R14DeviceStretchRectTarget ==
+                        deviceVtable[R14DeviceStretchRectVtableIndex] &&
+                    R14DeviceColorFillTarget ==
+                        deviceVtable[R14DeviceColorFillVtableIndex];
             }
 
             const auto disabled = safetyhook::InlineHook::StartDisabled;
@@ -501,6 +617,12 @@ namespace OutRunVRD3D9ExUpgradeR13
             R14DeviceUpdateTextureHook = safetyhook::create_inline(
                 deviceVtable[R14DeviceUpdateTextureVtableIndex],
                 UpdateTextureDestR14, disabled);
+            R14DeviceStretchRectHook = safetyhook::create_inline(
+                deviceVtable[R14DeviceStretchRectVtableIndex],
+                StretchRectDestR14, disabled);
+            R14DeviceColorFillHook = safetyhook::create_inline(
+                deviceVtable[R14DeviceColorFillVtableIndex],
+                ColorFillDestR14, disabled);
 
             SafetyHookInline* hooks[]{
                 &R14TextureReleaseHook,
@@ -508,12 +630,16 @@ namespace OutRunVRD3D9ExUpgradeR13
                 &R14TextureGetSurfaceLevelHook,
                 &R14TextureAddDirtyRectHook,
                 &R14DeviceUpdateSurfaceHook,
-                &R14DeviceUpdateTextureHook
+                &R14DeviceUpdateTextureHook,
+                &R14DeviceStretchRectHook,
+                &R14DeviceColorFillHook
             };
             for (auto* hook : hooks)
             {
                 if (!*hook || !hook->enable().has_value())
                 {
+                    R14DeviceColorFillHook = {};
+                    R14DeviceStretchRectHook = {};
                     R14DeviceUpdateTextureHook = {};
                     R14DeviceUpdateSurfaceHook = {};
                     R14TextureAddDirtyRectHook = {};
@@ -526,6 +652,8 @@ namespace OutRunVRD3D9ExUpgradeR13
                     R14TextureAddDirtyRectTarget = nullptr;
                     R14DeviceUpdateSurfaceTarget = nullptr;
                     R14DeviceUpdateTextureTarget = nullptr;
+                    R14DeviceStretchRectTarget = nullptr;
+                    R14DeviceColorFillTarget = nullptr;
                     return false;
                 }
             }
@@ -541,6 +669,10 @@ namespace OutRunVRD3D9ExUpgradeR13
                 deviceVtable[R14DeviceUpdateSurfaceVtableIndex];
             R14DeviceUpdateTextureTarget =
                 deviceVtable[R14DeviceUpdateTextureVtableIndex];
+            R14DeviceStretchRectTarget =
+                deviceVtable[R14DeviceStretchRectVtableIndex];
+            R14DeviceColorFillTarget =
+                deviceVtable[R14DeviceColorFillVtableIndex];
             return true;
         }
 
