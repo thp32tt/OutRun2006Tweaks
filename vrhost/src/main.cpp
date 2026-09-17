@@ -31,6 +31,7 @@ namespace
     constexpr wchar_t GameExeName[] = L"OR2006C2C.EXE";
     constexpr ULONGLONG StereoGraceMs = 250;
     constexpr std::size_t ViewHistorySize = 128;
+    constexpr ULONGLONG DirectCopyFenceBudgetMs = 8;
 
     template <typename T>
     void ReleaseCom(T*& p)
@@ -900,84 +901,38 @@ namespace
         bool CommitDirectStereoSource(const OutRunVR::SharedRenderFrameState& frame)
         {
             if (!directTransportEnabled_ || (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0) return false;
-            auto invalidateDirect = [&]() {
-                directFrameValid_ = false;
-                directTransportReady_ = false;
-            };
+            auto invalidateDirect = [&]() { directFrameValid_ = false; directTransportReady_ = false; };
             const std::uint32_t slot = frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
             const std::uint32_t leftHandleValue = frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex];
             const std::uint32_t rightHandleValue = frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex];
             const std::uint32_t width = frame.reserved[OutRunVR::RenderFrameDirectWidthIndex];
             const std::uint32_t height = frame.reserved[OutRunVR::RenderFrameDirectHeightIndex];
             const std::uint32_t generation = frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-            if (slot >= OutRunVR::RenderFrameRingSize || !leftHandleValue || !rightHandleValue || !width || !height || !generation)
-            {
-                invalidateDirect();
-                return false;
-            }
-
-            const bool same = directLeft_[slot] && directRight_[slot] && directLeftSrv_[slot] && directRightSrv_[slot] &&
-                directLeftHandle_[slot] == leftHandleValue && directRightHandle_[slot] == rightHandleValue &&
-                directGeneration_[slot] == generation;
+            if (slot >= OutRunVR::RenderFrameRingSize || !leftHandleValue || !rightHandleValue || !width || !height || !generation){invalidateDirect();return false;}
+            const bool same = directLeft_[slot] && directRight_[slot] && directLeftSrv_[slot] && directRightSrv_[slot] && directLeftHandle_[slot] == leftHandleValue && directRightHandle_[slot] == rightHandleValue && directGeneration_[slot] == generation;
             if (!same)
             {
-                ReleaseCom(directLeftSrv_[slot]); ReleaseCom(directLeft_[slot]);
-                ReleaseCom(directRightSrv_[slot]); ReleaseCom(directRight_[slot]);
-                invalidateDirect();
+                ReleaseCom(directLeftSrv_[slot]); ReleaseCom(directLeft_[slot]); ReleaseCom(directRightSrv_[slot]); ReleaseCom(directRight_[slot]); invalidateDirect();
                 auto openOne = [&](std::uint32_t raw, ID3D11Texture2D** texture, ID3D11ShaderResourceView** srv) -> bool
                 {
-                    ID3D11Resource* resource = nullptr;
-                    const HANDLE handle = reinterpret_cast<HANDLE>(static_cast<std::uintptr_t>(raw));
+                    ID3D11Resource* resource = nullptr; const HANDLE handle = reinterpret_cast<HANDLE>(static_cast<std::uintptr_t>(raw));
                     if (FAILED(device_->OpenSharedResource(handle, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&resource))) || !resource) return false;
-                    const HRESULT q = resource->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void**>(texture));
-                    resource->Release();
-                    if (FAILED(q) || !*texture) return false;
+                    const HRESULT q = resource->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void**>(texture)); resource->Release(); if (FAILED(q) || !*texture) return false;
                     D3D11_TEXTURE2D_DESC d{}; (*texture)->GetDesc(&d);
-                    if (d.Width != width || d.Height != height || d.SampleDesc.Count != 1 ||
-                        (d.Format != DXGI_FORMAT_R8G8B8A8_UNORM && d.Format != DXGI_FORMAT_R10G10B10A2_UNORM &&
-                         d.Format != DXGI_FORMAT_R16G16B16A16_FLOAT) ||
-                        FAILED(device_->CreateShaderResourceView(*texture, nullptr, srv)) || !*srv)
-                    {
-                        ReleaseCom(*texture); ReleaseCom(*srv); return false;
-                    }
+                    if (d.Width != width || d.Height != height || d.SampleDesc.Count != 1 || (d.Format != DXGI_FORMAT_R8G8B8A8_UNORM && d.Format != DXGI_FORMAT_R10G10B10A2_UNORM && d.Format != DXGI_FORMAT_R16G16B16A16_FLOAT) || FAILED(device_->CreateShaderResourceView(*texture, nullptr, srv)) || !*srv){ReleaseCom(*texture);ReleaseCom(*srv);return false;}
                     return true;
                 };
-                if (!openOne(leftHandleValue, &directLeft_[slot], &directLeftSrv_[slot]) ||
-                    !openOne(rightHandleValue, &directRight_[slot], &directRightSrv_[slot]))
-                {
-                    ReleaseCom(directLeftSrv_[slot]); ReleaseCom(directLeft_[slot]);
-                    ReleaseCom(directRightSrv_[slot]); ReleaseCom(directRight_[slot]);
-                    directLeftHandle_[slot] = directRightHandle_[slot] = directGeneration_[slot] = 0;
-                    directFormat_[slot] = DXGI_FORMAT_UNKNOWN;
-                    invalidateDirect();
-                    if (!directOpenFailureLogged_)
-                    {
-                        directOpenFailureLogged_ = true;
-                        std::cout << "Direct GPU eye ring open failed; host will request SBS fallback.\n";
-                    }
-                    return false;
-                }
-                D3D11_TEXTURE2D_DESC ld{}; directLeft_[slot]->GetDesc(&ld);
-                D3D11_TEXTURE2D_DESC rd{}; directRight_[slot]->GetDesc(&rd);
-                if (ld.Format != rd.Format)
-                {
-                    ReleaseCom(directLeftSrv_[slot]); ReleaseCom(directLeft_[slot]);
-                    ReleaseCom(directRightSrv_[slot]); ReleaseCom(directRight_[slot]);
-                    directLeftHandle_[slot] = directRightHandle_[slot] = directGeneration_[slot] = 0;
-                    directFormat_[slot] = DXGI_FORMAT_UNKNOWN;
-                    invalidateDirect();
-                    std::cout << "Direct GPU eye ring format mismatch; Ready cleared and SBS fallback requested.\n";
-                    return false;
-                }
-                directLeftHandle_[slot] = leftHandleValue; directRightHandle_[slot] = rightHandleValue;
-                directGeneration_[slot] = generation; directFormat_[slot] = ld.Format;
-                directTransportReady_ = true;
-                std::cout << "Direct GPU eye ring slot " << slot << " opened: source " << width << "x" << height
-                    << " -> OpenXR " << projection_.width << "x" << projection_.height << ".\n";
+                if (!openOne(leftHandleValue,&directLeft_[slot],&directLeftSrv_[slot]) || !openOne(rightHandleValue,&directRight_[slot],&directRightSrv_[slot])){ReleaseCom(directLeftSrv_[slot]);ReleaseCom(directLeft_[slot]);ReleaseCom(directRightSrv_[slot]);ReleaseCom(directRight_[slot]);directLeftHandle_[slot]=directRightHandle_[slot]=directGeneration_[slot]=0;directFormat_[slot]=DXGI_FORMAT_UNKNOWN;invalidateDirect();if(!directOpenFailureLogged_){directOpenFailureLogged_=true;std::cout<<"Direct GPU eye ring open failed; host will request SBS fallback.\n";}return false;}
+                D3D11_TEXTURE2D_DESC ld{}; directLeft_[slot]->GetDesc(&ld); D3D11_TEXTURE2D_DESC rd{}; directRight_[slot]->GetDesc(&rd);
+                if(ld.Format!=rd.Format){ReleaseCom(directLeftSrv_[slot]);ReleaseCom(directLeft_[slot]);ReleaseCom(directRightSrv_[slot]);ReleaseCom(directRight_[slot]);directLeftHandle_[slot]=directRightHandle_[slot]=directGeneration_[slot]=0;directFormat_[slot]=DXGI_FORMAT_UNKNOWN;invalidateDirect();std::cout<<"Direct GPU eye ring format mismatch; Ready cleared and SBS fallback requested.\n";return false;}
+                directLeftHandle_[slot]=leftHandleValue;directRightHandle_[slot]=rightHandleValue;directGeneration_[slot]=generation;directFormat_[slot]=ld.Format;std::cout<<"Direct GPU eye ring slot "<<slot<<" opened: source "<<width<<"x"<<height<<" -> OpenXR "<<projection_.width<<"x"<<projection_.height<<".\n";
             }
-            directActiveSlot_ = slot;
-            directFrameValid_ = true;
-            return true;
+            D3D11_TEXTURE2D_DESC sourceDesc{};directLeft_[slot]->GetDesc(&sourceDesc);
+            if(!directSnapshotLeft_||!directSnapshotRight_||directSnapshotWidth_!=sourceDesc.Width||directSnapshotHeight_!=sourceDesc.Height||directSnapshotFormat_!=sourceDesc.Format){ReleaseCom(directSnapshotLeftSrv_);ReleaseCom(directSnapshotLeft_);ReleaseCom(directSnapshotRightSrv_);ReleaseCom(directSnapshotRight_);D3D11_TEXTURE2D_DESC d=sourceDesc;d.MipLevels=1;d.ArraySize=1;d.SampleDesc.Count=1;d.SampleDesc.Quality=0;d.Usage=D3D11_USAGE_DEFAULT;d.BindFlags=D3D11_BIND_SHADER_RESOURCE;d.CPUAccessFlags=0;d.MiscFlags=0;if(FAILED(device_->CreateTexture2D(&d,nullptr,&directSnapshotLeft_))||FAILED(device_->CreateTexture2D(&d,nullptr,&directSnapshotRight_))||FAILED(device_->CreateShaderResourceView(directSnapshotLeft_,nullptr,&directSnapshotLeftSrv_))||FAILED(device_->CreateShaderResourceView(directSnapshotRight_,nullptr,&directSnapshotRightSrv_))){ReleaseCom(directSnapshotLeftSrv_);ReleaseCom(directSnapshotLeft_);ReleaseCom(directSnapshotRightSrv_);ReleaseCom(directSnapshotRight_);directSnapshotWidth_=directSnapshotHeight_=0;directSnapshotFormat_=DXGI_FORMAT_UNKNOWN;invalidateDirect();return false;}directSnapshotWidth_=sourceDesc.Width;directSnapshotHeight_=sourceDesc.Height;directSnapshotFormat_=sourceDesc.Format;}
+            context_->CopyResource(directSnapshotLeft_,directLeft_[slot]);context_->CopyResource(directSnapshotRight_,directRight_[slot]);
+            ID3D11Query* copyFence=nullptr;D3D11_QUERY_DESC q{};q.Query=D3D11_QUERY_EVENT;if(FAILED(device_->CreateQuery(&q,&copyFence))||!copyFence){invalidateDirect();return false;}context_->End(copyFence);context_->Flush();const ULONGLONG deadline=GetTickCount64()+DirectCopyFenceBudgetMs;HRESULT ready=S_FALSE;do{ready=context_->GetData(copyFence,nullptr,0,D3D11_ASYNC_GETDATA_DONOTFLUSH);if(ready==S_OK||FAILED(ready))break;Sleep(0);}while(GetTickCount64()<deadline);copyFence->Release();
+            if(ready!=S_OK){invalidateDirect();if(!directCopyFenceFailureLogged_){directCopyFenceFailureLogged_=true;std::cout<<"Direct GPU private snapshot copy did not complete inside the safety budget; ACK withheld and SBS fallback requested.\n";}return false;}
+            directActiveSlot_=slot;directFrameValid_=true;directTransportReady_=true;return true;
         }
 
         bool DirectTransportReady() const { return directTransportEnabled_ && directTransportReady_; }
@@ -1027,12 +982,11 @@ namespace
             UvRect eyes[2]{};
             ID3D11ShaderResourceView* eyeSrv[2]{};
             DXGI_FORMAT eyeFormat[2]{ DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN };
-            if (directFrameValid_ && directActiveSlot_ < OutRunVR::RenderFrameRingSize &&
-                directLeftSrv_[directActiveSlot_] && directRightSrv_[directActiveSlot_])
+            if (directFrameValid_ && directSnapshotLeftSrv_ && directSnapshotRightSrv_)
             {
                 eyes[0] = eyes[1] = { 0.f, 0.f, 1.f, 1.f };
-                eyeSrv[0] = directLeftSrv_[directActiveSlot_]; eyeSrv[1] = directRightSrv_[directActiveSlot_];
-                eyeFormat[0] = eyeFormat[1] = directFormat_[directActiveSlot_];
+                eyeSrv[0] = directSnapshotLeftSrv_; eyeSrv[1] = directSnapshotRightSrv_;
+                eyeFormat[0] = eyeFormat[1] = directSnapshotFormat_;
             }
             else
             {
@@ -1262,6 +1216,10 @@ namespace
                 directLeftHandle_[slot] = directRightHandle_[slot] = directGeneration_[slot] = 0;
                 directFormat_[slot] = DXGI_FORMAT_UNKNOWN;
             }
+            ReleaseCom(directSnapshotLeftSrv_); ReleaseCom(directSnapshotLeft_);
+            ReleaseCom(directSnapshotRightSrv_); ReleaseCom(directSnapshotRight_);
+            directSnapshotWidth_ = directSnapshotHeight_ = 0;
+            directSnapshotFormat_ = DXGI_FORMAT_UNKNOWN;
             directFrameValid_ = false; directTransportReady_ = false;
             ReleaseCom(sourceSrv_);
             ReleaseCom(source_);
@@ -1576,11 +1534,18 @@ namespace
         std::array<std::uint32_t, OutRunVR::RenderFrameRingSize> directRightHandle_{};
         std::array<std::uint32_t, OutRunVR::RenderFrameRingSize> directGeneration_{};
         std::array<DXGI_FORMAT, OutRunVR::RenderFrameRingSize> directFormat_{};
+        ID3D11Texture2D* directSnapshotLeft_ = nullptr;
+        ID3D11Texture2D* directSnapshotRight_ = nullptr;
+        ID3D11ShaderResourceView* directSnapshotLeftSrv_ = nullptr;
+        ID3D11ShaderResourceView* directSnapshotRightSrv_ = nullptr;
+        std::uint32_t directSnapshotWidth_ = 0, directSnapshotHeight_ = 0;
+        DXGI_FORMAT directSnapshotFormat_ = DXGI_FORMAT_UNKNOWN;
         std::uint32_t directActiveSlot_ = 0;
         bool directTransportEnabled_ = true;
         bool directTransportReady_ = false;
         bool directFrameValid_ = false;
         bool directOpenFailureLogged_ = false;
+        bool directCopyFenceFailureLogged_ = false;
         float renderScale_ = 1.0f;
 
         ID3D11VertexShader* vs_ = nullptr;

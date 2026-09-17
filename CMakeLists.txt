@@ -74,6 +74,23 @@ foreach(_vr_source IN LISTS OUTRUN_VR_FINAL_TUS)
 endforeach()
 unset(_vr_source)
 unset(_vr_header_only)
+
+# R15/R34 are post-review correctness overlays. They include the complete R14
+# and R33 chains respectively, so the former final wrappers become include-only.
+set(OUTRUN_VR_POST_REVIEW_FINAL_TUS
+    src/vr/d3d9/ex_device_upgrade_r15.cpp
+    src/vr/d3d9/stereo_renderer_r34.cpp)
+foreach(_vr_source IN LISTS OUTRUN_VR_POST_REVIEW_FINAL_TUS)
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_vr_source}")
+        message(FATAL_ERROR "VR post-review final TU missing: ${_vr_source}")
+    endif()
+endforeach()
+set_source_files_properties(
+    src/vr/d3d9/ex_device_upgrade_r14.cpp
+    src/vr/d3d9/stereo_renderer_r33.cpp
+    PROPERTIES HEADER_FILE_ONLY TRUE)
+unset(_vr_source)
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 
@@ -396,6 +413,7 @@ set(outrun2006tweaks_SOURCES
 	"src/vr/d3d9/ex_device_upgrade.cpp"
 	"src/vr/d3d9/ex_device_upgrade_r13.cpp"
 	"src/vr/d3d9/ex_device_upgrade_r14.cpp"
+	"src/vr/d3d9/ex_device_upgrade_r15.cpp"
 	"src/vr/d3d9/helper_ex_probe.cpp"
 	"src/vr/d3d9/r13_bridge.hpp"
 	"src/vr/d3d9/r32_policy.hpp"
@@ -412,6 +430,7 @@ set(outrun2006tweaks_SOURCES
 	"src/vr/d3d9/stereo_renderer_r31.cpp"
 	"src/vr/d3d9/stereo_renderer_r32.cpp"
 	"src/vr/d3d9/stereo_renderer_r33.cpp"
+	"src/vr/d3d9/stereo_renderer_r34.cpp"
 	"src/vr/d3d9/stereo_renderer_r7.inc"
 	"src/vr/d3d9/vr_pass_policy.hpp"
 	"src/vr/game/game_adapter.hpp"

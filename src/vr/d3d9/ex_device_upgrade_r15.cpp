@@ -43,7 +43,7 @@ namespace OutRunVRD3D9ExUpgradeR13
             std::array<D3DMATRIX, 8> texture{};
             D3DMATERIAL9 material{};
             D3DCLIPSTATUS9 clipStatus{};
-            DWORD currentPalette = 0;
+            UINT currentPalette = 0;
             float nPatchMode = 0.0f;
             bool clipStatusValid = false;
             bool paletteValid = false;
@@ -51,6 +51,7 @@ namespace OutRunVRD3D9ExUpgradeR13
         };
 
         R15ClassicExtraBaseline R15ClassicExtra{};
+        IDirect3DStateBlock9* R15ClassicAllState = nullptr;
         std::mutex R15ClassicExtraMutex;
 
         bool R15CaptureClassicExtraBaseline(IDirect3DDevice9* device) noexcept
@@ -59,12 +60,19 @@ namespace OutRunVRD3D9ExUpgradeR13
                 return false;
 
             R15ClassicExtraBaseline next{};
+            IDirect3DStateBlock9* allState = nullptr;
+            if (FAILED(device->CreateStateBlock(D3DSBT_ALL, &allState)) || !allState)
+                return false;
+
             if (FAILED(device->GetTransform(D3DTS_WORLD, &next.world)) ||
                 FAILED(device->GetTransform(D3DTS_VIEW, &next.view)) ||
                 FAILED(device->GetTransform(D3DTS_PROJECTION,
                     &next.projection)) ||
                 FAILED(device->GetMaterial(&next.material)))
+            {
+                allState->Release();
                 return false;
+            }
 
             for (DWORD stage = 0; stage < next.texture.size(); ++stage)
             {
@@ -72,7 +80,10 @@ namespace OutRunVRD3D9ExUpgradeR13
                         static_cast<D3DTRANSFORMSTATETYPE>(
                             D3DTS_TEXTURE0 + stage),
                         &next.texture[stage])))
+                {
+                    allState->Release();
                     return false;
+                }
             }
 
             next.clipStatusValid =
@@ -84,6 +95,9 @@ namespace OutRunVRD3D9ExUpgradeR13
             next.ready = true;
 
             std::lock_guard<std::mutex> lock(R15ClassicExtraMutex);
+            if (R15ClassicAllState)
+                R15ClassicAllState->Release();
+            R15ClassicAllState = allState;
             R15ClassicExtra = next;
             R15ResetStateHealthy.store(true, std::memory_order_release);
             return true;
@@ -154,6 +168,23 @@ namespace OutRunVRD3D9ExUpgradeR13
             return ok;
         }
 
+        bool R15RestoreClassicAllState(IDirect3DDevice9* device) noexcept
+        {
+            if (!device)
+                return false;
+            IDirect3DStateBlock9* state = nullptr;
+            {
+                std::lock_guard<std::mutex> lock(R15ClassicExtraMutex);
+                state = R15ClassicAllState;
+                if (state) state->AddRef();
+            }
+            if (!state)
+                return false;
+            const HRESULT hr = state->Apply();
+            state->Release();
+            return SUCCEEDED(hr);
+        }
+
         bool R15RestoreClassicExtraBaseline(IDirect3DDevice9* device) noexcept
         {
             if (!device)
@@ -212,13 +243,24 @@ namespace OutRunVRD3D9ExUpgradeR13
             if (!R15CaptureClassicExtraBaseline(device))
             {
                 R15ResetStateHealthy.store(false, std::memory_order_release);
+                R14AbandonCompatDevice(device);
+                OutRunVRD3D9ExUpgrade::ClearCompatHooks();
+                {
+                    std::lock_guard<std::mutex> lock(R15ClassicExtraMutex);
+                    if (R15ClassicAllState)
+                    {
+                        R15ClassicAllState->Release();
+                        R15ClassicAllState = nullptr;
+                    }
+                    R15ClassicExtra = {};
+                }
                 spdlog::error(
-                    "VR R15 EX: could not capture fresh-device transform/material/shader baseline; rejecting Ex promotion");
+                    "VR R15 EX: could not capture fresh-device full classic-state baseline; Ex promotion rolled back transactionally");
                 return false;
             }
 
             spdlog::info(
-                "VR R15 EX: classic Reset extra-state baseline captured; partial-RECT and generated-mip correctness overlay ACTIVE");
+                "VR R15 EX: full D3DSBT_ALL + extra classic Reset baseline captured; partial-RECT and generated-mip correctness overlay ACTIVE");
             return true;
         }
 
@@ -423,9 +465,10 @@ namespace OutRunVRD3D9ExUpgradeR13
             // restore state families that R13 did not cover.
             const bool coreHealthy =
                 OutRunVRD3D9ExUpgrade::RestoreClassicResetState(device);
+            const bool allStateHealthy = R15RestoreClassicAllState(device);
             const bool extraHealthy =
                 R15RestoreClassicExtraBaseline(device);
-            const bool healthy = coreHealthy && extraHealthy;
+            const bool healthy = coreHealthy && allStateHealthy && extraHealthy;
             R15ResetStateHealthy.store(healthy, std::memory_order_release);
 
             if (healthy)

@@ -216,6 +216,9 @@ cmake = require(
     "stereo_renderer_r31.cpp",
     "stereo_renderer_r32.cpp",
     "PROPERTIES HEADER_FILE_ONLY TRUE",
+    "OUTRUN_VR_POST_REVIEW_FINAL_TUS",
+    "ex_device_upgrade_r15.cpp",
+    "stereo_renderer_r34.cpp",
 )
 included_start = cmake.find("set(OUTRUN_VR_INCLUDED_IMPL_TUS")
 included_end = cmake.find(
@@ -244,6 +247,8 @@ generated = require(
     "stereo_renderer_r33.cpp",
     "ex_device_upgrade_r14.cpp",
     "outrun_renderer_r29.cpp",
+    "ex_device_upgrade_r15.cpp",
+    "stereo_renderer_r34.cpp",
 )
 for source in (
     "src/vr/d3d9/stereo_renderer_r31.cpp",
@@ -263,6 +268,7 @@ if source_list_start < 0 or source_list_end < 0:
 target_sources = generated[source_list_start:source_list_end]
 for source in (
     "src/vr/d3d9/ex_device_upgrade_r14.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r15.cpp",
     "src/vr/d3d9/stereo_renderer_r20.cpp",
     "src/vr/d3d9/stereo_renderer_r21.cpp",
     "src/vr/d3d9/stereo_renderer_r22.cpp",
@@ -273,6 +279,7 @@ for source in (
     "src/vr/d3d9/stereo_renderer_r31.cpp",
     "src/vr/d3d9/stereo_renderer_r32.cpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/d3d9/stereo_renderer_r34.cpp",
     "src/vr/game/outrun_renderer_r23.cpp",
     "src/vr/game/outrun_renderer_r29.cpp",
 ):
@@ -293,4 +300,4 @@ if host_cmake.find("r32_direct_submit.hpp") < \
         host_cmake.find("r26_recenter_hardening.hpp"):
     raise SystemExit("R32 direct submit must be final xrEndFrame owner after R26")
 
-print("R32/R33 review-6 + D3D9Ex compatibility/Present verification passed")
+print("R32-R34 + R15 D3D9Ex compatibility/Present verification passed")

@@ -235,6 +235,14 @@ namespace OutRunVRD3D9ExUpgradeR13
                 retiredNow, pendingUnlock);
         }
 
+        void R14AbandonCompatDevice(IDirect3DDevice9* device) noexcept
+        {
+            if (!device) return;
+            std::lock_guard<std::mutex> lock(R14RegistryMutex);
+            if (R14RegistryDevice == device && R14Shadows.empty())
+                R14RegistryDevice = nullptr;
+        }
+
         void R14LogRetiredShadow(const char* reason) noexcept
         {
             ++R14ShadowRetired;

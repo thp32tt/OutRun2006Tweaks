@@ -46,7 +46,7 @@ jobs:
           python tools/verify_vr_architecture.py
           python tools/verify_vr_r32_review.py
 
-      - name: Verify R23-R33 review hardening guards
+      - name: Verify R23-R34 review hardening guards
         shell: pwsh
         run: |
           $checks = @{
@@ -110,6 +110,17 @@ jobs:
               'std::unordered_map<IDirect3DTexture9*, R14EntryPtr>',
               'R14CopyWholeLevelByLock',
               'exact mip CPU-shadow upload failed'
+            )
+            'src/vr/d3d9/ex_device_upgrade_r15.cpp' = @(
+              'R15ClassicAllState',
+              'D3DSBT_ALL',
+              'R15RestoreClassicAllState',
+              'Ex promotion rolled back transactionally'
+            )
+            'src/vr/d3d9/stereo_renderer_r34.cpp' = @(
+              'R34ResetReplayBlocked',
+              'LastResetStateReplaySucceeded',
+              'stereo remains fail-closed'
             )
             'src/vr/d3d9/vr_pass_policy.hpp' = @(
               'EffectStereoPolicy',
@@ -204,7 +215,7 @@ jobs:
           set CI=
           cmake -S . -B build-vr-game -G "Visual Studio 17 2022" -A Win32
 
-      - name: Verify regenerated R33 source graph
+      - name: Verify regenerated R34 source graph
         shell: pwsh
         run: |
           $projects = Get-ChildItem build-vr-game -Filter *.vcxproj -Recurse
@@ -212,8 +223,8 @@ jobs:
           $projectText = ($projects | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
 
           foreach ($required in @(
-            'ex_device_upgrade_r14.cpp',
-            'stereo_renderer_r33.cpp',
+            'ex_device_upgrade_r15.cpp',
+            'stereo_renderer_r34.cpp',
             'outrun_renderer_r29.cpp'
           )) {
             if (-not $projectText.Contains($required)) {
@@ -235,6 +246,8 @@ jobs:
             'stereo_renderer_r30.cpp',
             'stereo_renderer_r31.cpp',
             'stereo_renderer_r32.cpp',
+            'stereo_renderer_r33.cpp',
+            'ex_device_upgrade_r14.cpp',
             'outrun_renderer.cpp',
             'outrun_renderer_r13.cpp',
             'outrun_renderer_r23.cpp'
@@ -258,7 +271,7 @@ jobs:
       - name: Build Win32 VR DLL and v3 contract
         run: cmake --build build-vr-game --config Release
 
-      - name: Verify Win32 R33 binary markers
+      - name: Verify Win32 R34/R15 binary markers
         shell: pwsh
         run: |
           $dllPath = 'build-vr-game/bin/dinput8.dll'
@@ -274,8 +287,10 @@ jobs:
             'VR R23/R25 BASELINE: authoritative first seed',
             'VR R23 RENDERER: BeginScene/WVP guards READY; recovery pose warmup is stock-visible',
             'VR R14 EX: lifetime-bound MANAGED 2D CPU-shadow path ACTIVE',
+            'VR R15 EX: full D3DSBT_ALL + extra classic Reset baseline captured',
             'VR R32 REVIEW2: R22-owned Reset lifecycle',
             'VR R33 DISPATCH: R33TryFastWorld/R33TryHud + direct R29 fallback READY',
+            'VR R34 RESET GUARD: R15 classic-state replay health now gates post-Reset stereo eligibility',
             'VR v3 shadow: live dual-protocol diagnostics active'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR DLL marker missing: $marker" }
