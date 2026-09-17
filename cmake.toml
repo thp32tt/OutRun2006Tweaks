@@ -58,6 +58,25 @@ endforeach()
 unset(_vr_source)
 unset(_vr_header_only)
 
+# R15/R34 are post-review correctness overlays. They include the complete R14
+# and R33 chains respectively, so the former final wrappers become include-only
+# only after the legacy graph guards above have verified their expected state.
+# The target source glob automatically compiles R15/R34 as the authoritative
+# final Ex/stereo TUs.
+set(OUTRUN_VR_POST_REVIEW_FINAL_TUS
+    src/vr/d3d9/ex_device_upgrade_r15.cpp
+    src/vr/d3d9/stereo_renderer_r34.cpp)
+foreach(_vr_source IN LISTS OUTRUN_VR_POST_REVIEW_FINAL_TUS)
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_vr_source}")
+        message(FATAL_ERROR "VR post-review final TU missing: ${_vr_source}")
+    endif()
+endforeach()
+set_source_files_properties(
+    src/vr/d3d9/ex_device_upgrade_r14.cpp
+    src/vr/d3d9/stereo_renderer_r33.cpp
+    PROPERTIES HEADER_FILE_ONLY TRUE)
+unset(_vr_source)
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 
@@ -110,7 +129,7 @@ compile-options = ["/utf-8"]
 [fetch-content]
 ogg = { git = "https://github.com/xiph/ogg", tag = "v1.3.6" }
 flac = { git = "https://github.com/xiph/flac", tag = "1.5.0" }
-miniupnpc = { git = "https://github.com/miniupnp/miniupnp", tag = "miniupnpd_2_3_10", subdir = "miniupnpc" }
+miniupnpc = { git = "https://github.com/miniupnp/miniupnp", tag = "miniupnpc_2_3_10", subdir = "miniupnpc" }
 jsoncpp = { git = "https://github.com/open-source-parsers/jsoncpp.git", tag = "1.9.8" }
 zlib = { git = "https://github.com/madler/zlib", tag = "v1.3.2" }
 sdl = { git = "https://github.com/libsdl-org/SDL", tag = "release-3.4.12" }
@@ -135,7 +154,7 @@ sources = ["*.ini", "src/**.cpp", "src/**.c", "src/**.def", "src/Resource.rc",
     "external/imgui/imgui_draw.cpp",
     "external/imgui/imgui_tables.cpp",
     "external/imgui/imgui_widgets.cpp",
-	"external/IXWebSocket/ixwebsocket/**"
+    "external/IXWebSocket/ixwebsocket/**"
 ]
 headers = ["src/**.hpp", "src/**.h", "external/ModUtils/Patterns.h", "external/ModUtils/MemoryMgr.h", "external/xxHash/xxhash.h", "external/miniz/miniz.h", "external/ini-cpp/ini/ini.h"]
 include-directories = ["shared/", "src/", "include/", 
@@ -144,7 +163,7 @@ include-directories = ["shared/", "src/", "include/",
     "external/xxHash/",
     "external/miniz/",
     "external/imgui/",
-	"external/IXWebSocket/"
+    "external/IXWebSocket/"
 ]
 compile-options = ["/GS", "/bigobj", "/EHa", "/MP", "/utf-8"]
 link-options = ["/DEBUG", "/OPT:REF", "/OPT:ICF"]
