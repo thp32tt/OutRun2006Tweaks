@@ -1,0 +1,1 @@
+src/vr/d3d9/stereo_renderer_r32.cpp: expected at least 2 occurrence(s), found 1: '                ++R32DirectFenceSuccess;\n                return true;'
