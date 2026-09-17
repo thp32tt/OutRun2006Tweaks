@@ -253,9 +253,6 @@ namespace OutRunVRStereo
                 currentShaderSerial != verifiedShaderSerial)
                 return false;
 
-            // Until Apply interception is proven, the cached shader epoch can
-            // have been bypassed by a StateBlock created before R31 installed.
-            // Query the actual binding on every candidate instead of trusting it.
             if (!R31StateBlockTrackingReliable.load(std::memory_order_acquire) &&
                 !R31LiveShaderMatches(device, verifiedShader))
                 return false;
@@ -295,9 +292,6 @@ namespace OutRunVRStereo
                 !R31PrepareEyeTailCache(stereo, projection, inverseProjection))
                 return false;
 
-            // When live validation is required, restore the exact constants
-            // observed on the device. Never let a stale cache overwrite the
-            // state that the validation was intended to check.
             std::memcpy(draw.originalConstants,
                 liveValidated ? live : verified, sizeof(verified));
             D3DMATRIX uploadedT{};
@@ -392,13 +386,12 @@ namespace OutRunVRStereo
                     rolledBack = SetWvpOneRegisterAtATime(
                         device, draw.originalConstants);
                 }
-                InvalidateRightDepthStencilIfLeftMayWrite(device);
-                R9Poison(OutRunVR::StereoFailureLeftWvpUploadFailed,
-                    site, E_FAIL);
-                R29ArmMonoSafety();
                 if (!rolledBack)
                 {
+                    R9Poison(OutRunVR::StereoFailureRestoreFailed,
+                        "R31/fast-left-WVP-rollback");
                     NoteRestoreFailure("R31 fast left-eye c64 rollback");
+                    R29ArmMonoSafety();
                     return { true, E_FAIL };
                 }
                 return {};
@@ -552,13 +545,12 @@ namespace OutRunVRStereo
                     InternalPassScope guard;
                     rolledBack = SetWvpOneRegisterAtATime(device, original);
                 }
-                InvalidateRightDepthStencilIfLeftMayWrite(device);
-                R9Poison(OutRunVR::StereoFailureLeftWvpUploadFailed,
-                    site, E_FAIL);
-                R29ArmMonoSafety();
                 if (!rolledBack)
                 {
+                    R9Poison(OutRunVR::StereoFailureRestoreFailed,
+                        "R31/HUD-left-WVP-rollback");
                     NoteRestoreFailure("R31 HUD left-eye c64 rollback");
+                    R29ArmMonoSafety();
                     return { true, E_FAIL };
                 }
                 return {};
@@ -651,9 +643,6 @@ namespace OutRunVRStereo
             R31ObserveDraw(device);
             R31DiscardUnreliableDrawCaches();
 
-            // Draw calls are not part of a D3D9 StateBlock's recorded state.
-            // If a title issues one anyway, preserve the device's one-call
-            // behavior and never route it through a stereo replay layer.
             if (R31StateBlockRecording)
             {
                 ++R31Frame.fallback;
@@ -781,9 +770,6 @@ namespace OutRunVRStereo
         {
             R31BlockCurrentVerifiedGeneration();
             OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
-
-            // Apply and recorded-state setters bypass or pollute every lower
-            // layer's shadow independently. Treat them as one state generation.
             R29Effect = {};
             R22ShadowState = {};
             R23LastStateSampleDrawSerial = 0;
@@ -931,9 +917,6 @@ namespace OutRunVRStereo
                 }
                 else if (R31StateBlockRecording)
                 {
-                    // D3D9 does not expose whether a failed End left recording
-                    // active. Retain the recording guard and disable cache trust
-                    // until a later successful End establishes the boundary.
                     R31StateBlockCoverageLost.store(true,
                         std::memory_order_release);
                     R31StateBlockTrackingReliable.store(false,
