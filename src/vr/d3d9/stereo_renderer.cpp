@@ -715,7 +715,9 @@ namespace OutRunVRStereo
 				PublishRenderFrame(OutRunVR::StereoSbsFallbackMono, pendingFrameId, pendingPoseSequence,
 					presentStart.QuadPart, FrameFailureReason, nullptr, true, directTransport);
 
-			const HRESULT hr = PresentHook.stdcall<HRESULT>(device, sourceRect, destRect, destWindowOverride, dirtyRegion);
+			const HRESULT rawPresentHr = PresentHook.stdcall<HRESULT>(device, sourceRect, destRect, destWindowOverride, dirtyRegion);
+			const HRESULT hr = OutRunVRD3D9ExUpgradeR13::NormalizeLegacyPresentResult(
+				device, rawPresentHr);
 			if (composedStereo && SUCCEEDED(hr) && !FrameStereoIncomplete)
 			{
 				PublishStereoState(OutRunVR::StereoSbsActive, true, pendingPoseSequence, pendingFrameId);

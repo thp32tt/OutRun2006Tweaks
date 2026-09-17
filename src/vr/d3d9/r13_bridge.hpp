@@ -29,6 +29,8 @@ namespace OutRunVRD3D9ExUpgradeR13
     bool IsCompatDevice(IDirect3DDevice9* device) noexcept;
     bool ResetCompatDevice(IDirect3DDevice9* device,
         D3DPRESENT_PARAMETERS* params, HRESULT& result) noexcept;
+    HRESULT NormalizeLegacyPresentResult(
+        IDirect3DDevice9* device, HRESULT result) noexcept;
     void DisarmLegacyResetHook() noexcept;
 }
 

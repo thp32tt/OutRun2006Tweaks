@@ -331,8 +331,11 @@ namespace OutRunVRD3D9ExUpgrade
                     ? D3D_OK : D3DERR_DEVICELOST;
             else if (state == D3DERR_DEVICELOST)
                 translated = D3DERR_DEVICELOST;
+            else if (state == D3DERR_DEVICEHUNG ||
+                state == D3DERR_DEVICEREMOVED)
+                translated = D3DERR_DRIVERINTERNALERROR;
             else if (FAILED(state))
-                translated = D3DERR_DEVICELOST;
+                translated = D3DERR_DRIVERINTERNALERROR;
 
             if (!FirstCooperativeTranslationLogged.exchange(true))
                 spdlog::info(

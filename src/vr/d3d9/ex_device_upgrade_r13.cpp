@@ -212,6 +212,22 @@ namespace OutRunVRD3D9ExUpgradeR13
         }
     }
 
+    HRESULT NormalizeLegacyPresentResult(
+        IDirect3DDevice9* device, HRESULT result) noexcept
+    {
+        if (!OutRunVRD3D9ExUpgrade::IsCompatDevice(device))
+            return result;
+        if (result == S_PRESENT_MODE_CHANGED)
+            return D3DERR_DEVICELOST;
+        if (result == S_PRESENT_OCCLUDED)
+        {
+            return OutRunVRD3D9ExUpgrade::CompatWindowed.load(
+                std::memory_order_acquire)
+                ? D3D_OK : D3DERR_DEVICELOST;
+        }
+        return result;
+    }
+
     bool ResetCompatDevice(IDirect3DDevice9* device,
         D3DPRESENT_PARAMETERS* params, HRESULT& result) noexcept
     {
