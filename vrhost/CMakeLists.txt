@@ -39,22 +39,23 @@ target_include_directories(outrun-vr-host PRIVATE
 )
 target_compile_definitions(outrun-vr-host PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 if(MSVC)
-    # R23 remains the verified source/pose owner. R24 is the final submission
-    # guard: it keeps R23 ownership checks but degrades visibly instead of
-    # turning every recoverable mismatch into layerCount=0. OpenXR image waits
-    # and Desktop Duplication waits are both bounded so runtime/capture stalls
-    # cannot leave the HMD sitting on black while the host appears alive.
+    # R23 remains the verified source/pose owner. R24 remains the visible
+    # fallback authority. R32 adds an A/B SafeEye fallback and a final verified
+    # DirectGPU single-projection path with asynchronous producer ACK; every
+    # uncertain case still falls through to R26/R24.
     target_compile_options(outrun-vr-host PRIVATE
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/openxr_api_compat.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/bounded_swapchain_wait.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/sbs_capture_override.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/d3d9ex_direct_passthrough.hpp"
+        "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/d3d9ex_direct_passthrough_r32.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/review_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r21_runtime_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r22_runtime_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r23_runtime_hardening.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r24_black_screen_guard.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r26_recenter_hardening.hpp"
+        "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r32_direct_submit.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/capture_wait_guard.hpp"
         "/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r21_crash_diagnostics.hpp"
         "$<$<CONFIG:Release>:/Zi>"
@@ -130,6 +131,14 @@ target_compile_definitions(outrun-vr-r23-verified-bundle-smoke PRIVATE WIN32_LEA
 target_link_libraries(outrun-vr-r23-verified-bundle-smoke PRIVATE
     openxr_loader d3d11 dxgi d3dcompiler user32)
 
+# R32 review regressions are pure policy tests: no headset, game or graphics
+# device is needed to validate reset-relative safety and fail-closed decisions.
+add_executable(outrun-vr-r32-policy-smoke tests/r32_policy_smoke.cpp)
+target_include_directories(outrun-vr-r32-policy-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src"
+)
+target_compile_definitions(outrun-vr-r32-policy-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
+
 foreach(target
     outrun-vr-host
     outrun-vr-diagnostic
@@ -140,7 +149,8 @@ foreach(target
     outrun-vr-v2-v3-shadow-conversion-smoke
     outrun-vr-host-pose-v3-validation-smoke
     outrun-vr-runtime-eligibility-smoke
-    outrun-vr-r23-verified-bundle-smoke)
+    outrun-vr-r23-verified-bundle-smoke
+    outrun-vr-r32-policy-smoke)
     set_target_properties(${target} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin"

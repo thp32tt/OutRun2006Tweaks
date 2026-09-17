@@ -14,6 +14,7 @@ on:
       - 'cmkr.cmake'
       - 'vrhost/**'
       - 'tools/verify_vr_architecture.py'
+      - 'tools/verify_vr_r32_review.py'
       - 'docs/VR_ARCHITECTURE.md'
       - '.github/workflows/vr-openxr.yml'
   pull_request:
@@ -28,6 +29,7 @@ on:
       - 'cmkr.cmake'
       - 'vrhost/**'
       - 'tools/verify_vr_architecture.py'
+      - 'tools/verify_vr_r32_review.py'
       - 'docs/VR_ARCHITECTURE.md'
       - '.github/workflows/vr-openxr.yml'
 
@@ -40,9 +42,11 @@ jobs:
           submodules: recursive
 
       - name: Verify reconstructed VR architecture boundaries
-        run: python tools/verify_vr_architecture.py
+        run: |
+          python tools/verify_vr_architecture.py
+          python tools/verify_vr_r32_review.py
 
-      - name: Verify R23/R25 review hardening guards
+      - name: Verify R23-R33 review hardening guards
         shell: pwsh
         run: |
           $checks = @{
@@ -78,6 +82,29 @@ jobs:
               'passive original Clear only',
               'authoritative first seed'
             )
+            'src/vr/d3d9/stereo_renderer_r31.cpp' = @(
+              'R31StateBlockTrackingReliable',
+              'GetR28VerifiedProjection',
+              'R31 fast left-eye c64 rollback'
+            )
+            'src/vr/d3d9/stereo_renderer_r32.cpp' = @(
+              'R32ResetAfterGameReset',
+              'R32SetWvpBatch',
+              'R32WaitProducerFence',
+              'draw is forced to stock-WVP zero disparity',
+              'VR R32 REVIEW'
+            )
+            'src/vr/d3d9/stereo_renderer_r33.cpp' = @(
+              'R32TryFastWorld',
+              'R32LowerFailClosed',
+              'R30DrawPrimitiveR29Hook',
+              'top-level draw telemetry is counted exactly once'
+            )
+            'src/vr/d3d9/ex_device_upgrade_r14.cpp' = @(
+              'std::unordered_map<IDirect3DTexture9*, R14EntryPtr>',
+              'R14CopyWholeLevelByLock',
+              'exact mip CPU-shadow upload failed'
+            )
             'src/vr/d3d9/vr_pass_policy.hpp' = @(
               'EffectStereoPolicy',
               'ZeroDisparity',
@@ -87,6 +114,10 @@ jobs:
               'R13FragileEffectNeedsZeroDisparity',
               'shadow/billboard/panel pass kept stock',
               'InvalidateVerifiedWvp'
+            )
+            'src/vr/game/outrun_renderer_r29.cpp' = @(
+              'R29BuildCoherentUploadEnvelope',
+              'R29InvalidateRendererStateAfterExternalRestore'
             )
             'src/vr/game/outrun_renderer_r23.cpp' = @(
               'R23RenderThreadCleanupRequested',
@@ -114,6 +145,16 @@ jobs:
               'ExpectedDirectDxgiFormat',
               'DirectSafeEyeMatchesCommittedFrame',
               'SafeTransportGeneration'
+            )
+            'vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp' = @(
+              'R32SharedSlotCache',
+              'R32InactiveEye',
+              'queued copy cannot mutate SafeFrameId image identity'
+            )
+            'vrhost/src/runtime/r32_direct_submit.hpp' = @(
+              'ArmConsumptionFence',
+              'D3D11_ASYNC_GETDATA_DONOTFLUSH',
+              'verified incoming DirectGPU projection submitted once'
             )
             'vrhost/src/runtime/sbs_capture_override.hpp' = @(
               'Preserve acquiredImage',
@@ -143,7 +184,7 @@ jobs:
             $text = Get-Content $path -Raw
             foreach ($marker in $checks[$path]) {
               if (-not $text.Contains($marker)) {
-                throw "R23/R25 hardening guard missing: $path :: $marker"
+                throw "VR hardening guard missing: $path :: $marker"
               }
             }
           }
@@ -154,7 +195,7 @@ jobs:
           set CI=
           cmake -S . -B build-vr-game -G "Visual Studio 17 2022" -A Win32
 
-      - name: Verify regenerated R23 source graph
+      - name: Verify regenerated R33 source graph
         shell: pwsh
         run: |
           $projects = Get-ChildItem build-vr-game -Filter *.vcxproj -Recurse
@@ -162,24 +203,32 @@ jobs:
           $projectText = ($projects | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
 
           foreach ($required in @(
-            'ex_device_upgrade_r13.cpp',
-            'stereo_renderer_r23.cpp',
-            'outrun_renderer_r23.cpp'
+            'ex_device_upgrade_r14.cpp',
+            'stereo_renderer_r33.cpp',
+            'outrun_renderer_r29.cpp'
           )) {
             if (-not $projectText.Contains($required)) {
-              throw "R23 authoritative translation unit missing from generated build graph: $required"
+              throw "authoritative VR translation unit missing from generated build graph: $required"
             }
           }
 
           foreach ($includedOnly in @(
             'ex_device_upgrade.cpp',
+            'ex_device_upgrade_r13.cpp',
             'stereo_renderer.cpp',
             'stereo_renderer_r13.cpp',
             'stereo_renderer_r20.cpp',
             'stereo_renderer_r21.cpp',
             'stereo_renderer_r22.cpp',
+            'stereo_renderer_r23.cpp',
+            'stereo_renderer_r26.cpp',
+            'stereo_renderer_r29.cpp',
+            'stereo_renderer_r30.cpp',
+            'stereo_renderer_r31.cpp',
+            'stereo_renderer_r32.cpp',
             'outrun_renderer.cpp',
-            'outrun_renderer_r13.cpp'
+            'outrun_renderer_r13.cpp',
+            'outrun_renderer_r23.cpp'
           )) {
             $escaped = [regex]::Escape($includedOnly)
             $pattern = '<ClCompile Include="[^"]*[\\/]' + $escaped + '"'
@@ -200,7 +249,7 @@ jobs:
       - name: Build Win32 VR DLL and v3 contract
         run: cmake --build build-vr-game --config Release
 
-      - name: Verify Win32 R23/R25 binary markers
+      - name: Verify Win32 R33 binary markers
         shell: pwsh
         run: |
           $dllPath = 'build-vr-game/bin/dinput8.dll'
@@ -215,6 +264,9 @@ jobs:
             'VR R23 GAME: single-owner live-state recovery baseline ACTIVE',
             'VR R23/R25 BASELINE: authoritative first seed',
             'VR R23 RENDERER: BeginScene/WVP guards READY; recovery pose warmup is stock-visible',
+            'VR R14 EX: lifetime-bound MANAGED 2D CPU-shadow path ACTIVE',
+            'VR R32 REVIEW: reset epoch fix + fail-closed state reads + batched WVP',
+            'VR R33 DISPATCH: R32 fast paths + direct R29 fallback READY',
             'VR v3 shadow: live dual-protocol diagnostics active'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR DLL marker missing: $marker" }
@@ -236,7 +288,9 @@ jobs:
           submodules: recursive
 
       - name: Verify reconstructed VR architecture boundaries
-        run: python tools/verify_vr_architecture.py
+        run: |
+          python tools/verify_vr_architecture.py
+          python tools/verify_vr_r32_review.py
 
       - name: Configure x64 OpenXR host
         run: cmake -S vrhost -B build-vrhost -G "Visual Studio 17 2022" -A x64
@@ -292,7 +346,13 @@ jobs:
           & 'build-vrhost/bin/outrun-vr-r23-verified-bundle-smoke.exe'
           if ($LASTEXITCODE -ne 0) { throw "R23 verified bundle regression failed: $LASTEXITCODE" }
 
-      - name: Verify x64 R23/R25 host binary
+      - name: Run R32 reset/fail-closed policy regression
+        shell: pwsh
+        run: |
+          & 'build-vrhost/bin/outrun-vr-r32-policy-smoke.exe'
+          if ($LASTEXITCODE -ne 0) { throw "R32 policy regression failed: $LASTEXITCODE" }
+
+      - name: Verify x64 R32 host binary
         shell: pwsh
         run: |
           $hostPath = 'build-vrhost/bin/outrun-vr-host.exe'
@@ -308,6 +368,8 @@ jobs:
             'direct safe-eye rejected: actual resource format/size',
             'gameplay layer blocked: no fresh committed host-owned frame/source/pose bundle',
             'host-owned GPU eye copies + completion ACK active',
+            '[D3D9Ex R32] SafeEye A/B staging + per-slot shared-resource cache ACTIVE',
+            '[R32 direct] verified incoming DirectGPU projection submitted once',
             '[R23 mono] gameplay stereo pending: bounded Desktop Duplication refresh for theater-only fallback'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR host marker missing: $marker" }

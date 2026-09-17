@@ -6,7 +6,7 @@
 name = "outrun2006tweaks-proj"
 cmake-after = """
 set_source_files_properties(src/hooks_wheel_ffb.cpp PROPERTIES HEADER_FILE_ONLY TRUE)
-# R31/R14 keep the validated R30/R29/R26/R23/R22/R21/R20/R13/R9/R12
+# R33/R14 keep the validated R32/R31/R30/R29/R26/R23/R22/R21/R20/R13/R9/R12
 # implementation chains intact and compile only the final game/stereo/Ex wrapper
 # TUs. Included implementation files are header-only here so no hook body is
 # linked twice.
@@ -22,6 +22,8 @@ set_source_files_properties(
     src/vr/d3d9/stereo_renderer_r26.cpp
     src/vr/d3d9/stereo_renderer_r29.cpp
     src/vr/d3d9/stereo_renderer_r30.cpp
+    src/vr/d3d9/stereo_renderer_r31.cpp
+    src/vr/d3d9/stereo_renderer_r32.cpp
     src/vr/game/outrun_renderer.cpp
     src/vr/game/outrun_renderer_r13.cpp
     src/vr/game/outrun_renderer_r23.cpp
