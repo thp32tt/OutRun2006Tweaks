@@ -41,11 +41,15 @@ r32 = require(
     "OutRunWvpRegisterCount",
     "R32WaitProducerFence",
     "QueryPerformanceCounter",
+    "static const LONGLONG qpcFrequency",
     "Budget starts before the FLUSH request",
     "R32ProducerFencePending",
     "R32DrainPendingProducerFence",
     "timed-out producer EVENT remains pending",
     "R32DirectIdentityMatches",
+    "R32DirectCopyPathRejected",
+    "DirectGPU copy path is disabled until Reset/interop revalidation",
+    "R32EnsureDirectResources must run before this cached rejection",
     "VR R32 PERF 5s",
     "VR R32 REVIEW2",
 )
@@ -53,6 +57,12 @@ if "R32ResetR13Hook" in r32:
     raise SystemExit("R32 must no longer install a competing ResetDestR13 hook")
 if "R22ShadowState = {};" in r32[r32.find("void R32ResetAfterGameReset"):]:
     raise SystemExit("R32 successful Reset post-processing must preserve R22's freshly primed viewport/scissor shadow")
+resolve_start = r32.find("bool ResolveDirectTransportR32")
+ensure_direct = r32.find("R32EnsureDirectResources(device)", resolve_start)
+copy_reject = r32.find("if (R32DirectCopyPathRejected)", resolve_start)
+if min(resolve_start, ensure_direct, copy_reject) < 0 or ensure_direct > copy_reject:
+    raise SystemExit(
+        "R32 DirectGPU copy rejection must be checked only after host identity/interop revalidation")
 
 r33 = require(
     "src/vr/d3d9/stereo_renderer_r33.cpp",
@@ -70,6 +80,41 @@ r33 = require(
 )
 if "const HRESULT hr = ResetDestR22" in r33:
     raise SystemExit("R33 must not bypass the corrected R32 Reset lifecycle")
+
+ex = require(
+    "src/vr/d3d9/ex_device_upgrade.cpp",
+    "#include <algorithm>",
+    "#include <utility>",
+    "TestCooperativeLevelCompatDest",
+    "deviceEx->CheckDeviceState(window)",
+    "S_PRESENT_MODE_CHANGED",
+    "D3DERR_DEVICENOTRESET",
+    "EvictManagedResourcesCompatDest",
+    "CaptureClassicBaseline",
+    "RestoreClassicResetState",
+    "fresh-device classic state baseline",
+    "for (DWORD stage = 0; stage < 8; ++stage)",
+    "fullscreen.ScanLineOrdering = current.ScanLineOrdering",
+    "a second promoted game device was requested",
+    "bool allowNonDynamicFallback",
+    "failing closed hr=0x{:08X}",
+    "compatibility hook transaction was partial",
+)
+if "for (DWORD stage = 0; stage < 16; ++stage)\n                if (FAILED(device->SetTexture" in ex:
+    raise SystemExit("classic Reset replay must not treat invalid texture stages 8..15 as failures")
+
+ex_r13 = require(
+    "src/vr/d3d9/ex_device_upgrade_r13.cpp",
+    "ResetCompatDevice",
+    "deviceEx->ResetEx",
+    "UpdateCompatPresentationState(device, params)",
+    "RestoreClassicResetState(device)",
+    "ResetEx + classic-state replay",
+)
+resetex = ex_r13.find("deviceEx->ResetEx")
+restore = ex_r13.find("RestoreClassicResetState(device)", resetex)
+if resetex < 0 or restore < resetex:
+    raise SystemExit("authoritative R13 ResetEx path must replay classic state after successful ResetEx")
 
 require(
     "vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp",
@@ -109,11 +154,25 @@ require(
     "srv[0] = R23DirectHold.srv[0]",
 )
 
-require(
+r14 = require(
     "src/vr/d3d9/ex_device_upgrade_r14.cpp",
     "singleLevelTexture",
     "entry.gpu->GetLevelCount() <= 1",
+    "R14EnsureSurfaceHooks",
+    "SurfaceLockRectDestR14",
+    "SurfaceGetDCDestR14",
+    "StretchRectDestR14",
+    "ColorFillDestR14",
+    "SUCCEEDED(hr) && destination && R14InternalUploadDepth == 0",
+    "resource creation fails closed instead of exposing weaker R13 direct-lock semantics",
+    "return D3DERR_NOTAVAILABLE;",
 )
+if "external GetSurfaceLevel" in r14:
+    raise SystemExit("R14 must not retire the CPU shadow merely because GetSurfaceLevel borrowed a read-only alias")
+create_r14 = r14.find("HRESULT __stdcall CreateTextureCompatDestR14")
+fail_closed_r14 = r14.find("return D3DERR_NOTAVAILABLE;", create_r14)
+if create_r14 < 0 or fail_closed_r14 < create_r14:
+    raise SystemExit("R14 MANAGED 2D shadow setup failure must fail resource creation closed")
 
 require(
     "vrhost/tests/r32_policy_smoke.cpp",
@@ -207,4 +266,4 @@ if host_cmake.find("r32_direct_submit.hpp") < \
         host_cmake.find("r26_recenter_hardening.hpp"):
     raise SystemExit("R32 direct submit must be final xrEndFrame owner after R26")
 
-print("R32/R33 review-4 correctness verification passed")
+print("R32/R33 review-5 + D3D9Ex compatibility verification passed")
