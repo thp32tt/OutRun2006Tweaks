@@ -88,17 +88,23 @@ jobs:
               'R31 fast left-eye c64 rollback'
             )
             'src/vr/d3d9/stereo_renderer_r32.cpp' = @(
+              'R32ResetR22Hook',
+              'ResetDestR22',
               'R32ResetAfterGameReset',
               'R32SetWvpBatch',
               'R32WaitProducerFence',
+              'R32DrainPendingProducerFence',
+              'R32ProducerFencePending',
               'draw is forced to stock-WVP zero disparity',
-              'VR R32 REVIEW'
+              'VR R32 REVIEW2'
             )
             'src/vr/d3d9/stereo_renderer_r33.cpp' = @(
-              'R32TryFastWorld',
+              'R31OwnedResult R33TryFastWorld',
+              'R31OwnedResult R33TryHud',
               'R32LowerFailClosed',
               'R30DrawPrimitiveR29Hook',
-              'top-level draw telemetry is counted exactly once'
+              'R33ResetR32Hook.stdcall<HRESULT>',
+              'top-level telemetry counted once'
             )
             'src/vr/d3d9/ex_device_upgrade_r14.cpp' = @(
               'std::unordered_map<IDirect3DTexture9*, R14EntryPtr>',
@@ -154,6 +160,9 @@ jobs:
             'vrhost/src/runtime/r32_direct_submit.hpp' = @(
               'ArmConsumptionFence',
               'D3D11_ASYNC_GETDATA_DONOTFLUSH',
+              'flushIssued',
+              'deferred until actual direct-ring slot pressure',
+              'R32 direct PERF 5s',
               'verified incoming DirectGPU projection submitted once'
             )
             'vrhost/src/runtime/sbs_capture_override.hpp' = @(
@@ -265,8 +274,8 @@ jobs:
             'VR R23/R25 BASELINE: authoritative first seed',
             'VR R23 RENDERER: BeginScene/WVP guards READY; recovery pose warmup is stock-visible',
             'VR R14 EX: lifetime-bound MANAGED 2D CPU-shadow path ACTIVE',
-            'VR R32 REVIEW: reset epoch fix + fail-closed state reads + batched WVP',
-            'VR R33 DISPATCH: R32 fast paths + direct R29 fallback READY',
+            'VR R32 REVIEW2: R22-owned Reset lifecycle',
+            'VR R33 DISPATCH: R33TryFastWorld/R33TryHud + direct R29 fallback READY',
             'VR v3 shadow: live dual-protocol diagnostics active'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR DLL marker missing: $marker" }
@@ -370,6 +379,7 @@ jobs:
             'host-owned GPU eye copies + completion ACK active',
             '[D3D9Ex R32] SafeEye A/B staging + per-slot shared-resource cache ACTIVE',
             '[R32 direct] verified incoming DirectGPU projection submitted once',
+            '[R32 direct] D3D11 Flush is deferred until actual direct-ring slot pressure',
             '[R23 mono] gameplay stereo pending: bounded Desktop Duplication refresh for theater-only fallback'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR host marker missing: $marker" }
