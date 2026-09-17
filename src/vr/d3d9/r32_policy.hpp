@@ -33,4 +33,26 @@ namespace OutRunVR::R32
             ? EffectSnapshotDecision::UseCapturedPolicy
             : EffectSnapshotDecision::ForceZeroDisparity;
     }
+
+    enum class PendingFenceDecision : std::uint8_t
+    {
+        ReuseSlot,
+        BlockReuse,
+        QueryError
+    };
+
+    constexpr PendingFenceDecision ClassifyPendingFence(
+        bool pending, bool queryExists, bool queryComplete,
+        bool queryStillPending) noexcept
+    {
+        if (!pending)
+            return PendingFenceDecision::ReuseSlot;
+        if (!queryExists)
+            return PendingFenceDecision::QueryError;
+        if (queryComplete)
+            return PendingFenceDecision::ReuseSlot;
+        return queryStillPending
+            ? PendingFenceDecision::BlockReuse
+            : PendingFenceDecision::QueryError;
+    }
 }
