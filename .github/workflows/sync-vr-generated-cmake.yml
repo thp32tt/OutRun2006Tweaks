@@ -1,0 +1,44 @@
+name: Sync VR generated CMake
+
+on:
+  push:
+    branches:
+      - vr-openxr
+    paths:
+      - .github/workflows/sync-vr-generated-cmake.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: vr-openxr
+          fetch-depth: 0
+      - name: Sync checked-in VR target source list
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('CMakeLists.txt')
+          s = p.read_text(encoding='utf-8')
+          old = '''\t"src/vr/d3d9/device_probe.cpp"\n\t"src/vr/d3d9/ex_device_upgrade.cpp"\n\t"src/vr/d3d9/ex_device_upgrade_r13.cpp"\n\t"src/vr/d3d9/helper_ex_probe.cpp"\n\t"src/vr/d3d9/r13_bridge.hpp"\n\t"src/vr/d3d9/stereo_backend.hpp"\n\t"src/vr/d3d9/stereo_renderer.cpp"\n\t"src/vr/d3d9/stereo_renderer_r13.cpp"\n\t"src/vr/d3d9/vr_pass_policy.hpp"\n\t"src/vr/game/game_adapter.hpp"\n\t"src/vr/game/outrun_renderer.cpp"\n\t"src/vr/game/outrun_renderer_r13.cpp"\n'''
+          new = '''\t"src/vr/d3d9/device_probe.cpp"\n\t"src/vr/d3d9/ex_device_upgrade.cpp"\n\t"src/vr/d3d9/ex_device_upgrade_r13.cpp"\n\t"src/vr/d3d9/ex_device_upgrade_r14.cpp"\n\t"src/vr/d3d9/helper_ex_probe.cpp"\n\t"src/vr/d3d9/r13_bridge.hpp"\n\t"src/vr/d3d9/r32_policy.hpp"\n\t"src/vr/d3d9/stereo_backend.hpp"\n\t"src/vr/d3d9/stereo_renderer.cpp"\n\t"src/vr/d3d9/stereo_renderer_r13.cpp"\n\t"src/vr/d3d9/stereo_renderer_r20.cpp"\n\t"src/vr/d3d9/stereo_renderer_r21.cpp"\n\t"src/vr/d3d9/stereo_renderer_r22.cpp"\n\t"src/vr/d3d9/stereo_renderer_r23.cpp"\n\t"src/vr/d3d9/stereo_renderer_r26.cpp"\n\t"src/vr/d3d9/stereo_renderer_r29.cpp"\n\t"src/vr/d3d9/stereo_renderer_r30.cpp"\n\t"src/vr/d3d9/stereo_renderer_r31.cpp"\n\t"src/vr/d3d9/stereo_renderer_r32.cpp"\n\t"src/vr/d3d9/stereo_renderer_r33.cpp"\n\t"src/vr/d3d9/stereo_renderer_r7.inc"\n\t"src/vr/d3d9/vr_pass_policy.hpp"\n\t"src/vr/game/game_adapter.hpp"\n\t"src/vr/game/outrun_renderer.cpp"\n\t"src/vr/game/outrun_renderer_r13.cpp"\n\t"src/vr/game/outrun_renderer_r23.cpp"\n\t"src/vr/game/outrun_renderer_r29.cpp"\n'''
+          if s.count(old) != 1:
+              raise SystemExit(f'expected stale VR source block once, found {s.count(old)}')
+          p.write_text(s.replace(old, new, 1), encoding='utf-8', newline='\n')
+          PY
+      - name: Commit synchronized generated file
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/sync-vr-generated-cmake.yml
+          git add -A
+          git diff --cached --check
+          git commit -m "fix(vr): sync generated CMake target sources"
+          git push origin HEAD:vr-openxr
