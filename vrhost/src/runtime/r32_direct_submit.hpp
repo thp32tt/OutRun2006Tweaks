@@ -10,6 +10,10 @@
 // sampling commands. Producer-ring ACK is published asynchronously only after
 // that event completes. Any uncertainty falls through to R26/R24, preserving
 // SafeEye A/B and visible fallback behavior.
+//
+// Review-2 hardening removes the unconditional per-frame D3D11 Flush. A Flush is
+// issued only when a producer slot is actually blocked by a still-pending ACK,
+// so normal command batching is preserved without weakening reuse safety.
 
 #include "r26_recenter_hardening.hpp"
 
@@ -27,12 +31,13 @@
 namespace OutRunVrR32DirectSubmit
 {
     inline constexpr const char* BuildId =
-        "R32-direct-single-projection-async-ack-20260917";
+        "R32-direct-single-projection-async-ack-review2-20260917";
 
     struct PendingAck
     {
         ID3D11Query* fence = nullptr;
         bool armed = false;
+        bool flushIssued = false;
         OutRunVR::SharedRenderFrameState frame{};
     };
 
@@ -43,9 +48,27 @@ namespace OutRunVrR32DirectSubmit
     inline std::uint64_t AckCompleted = 0;
     inline std::uint64_t AckPublishRetry = 0;
     inline std::uint64_t AckSlotBusy = 0;
+    inline std::uint64_t AckFlushEscalations = 0;
     inline ULONGLONG LastPerfLogMs = 0;
     inline bool FirstFastSubmitLogged = false;
     inline bool FirstAsyncAckLogged = false;
+    inline bool FirstDeferredFlushLogged = false;
+
+    struct PerfSnapshot
+    {
+        std::uint64_t fastSubmit = 0;
+        std::uint64_t reject = 0;
+        std::uint64_t ackArmed = 0;
+        std::uint64_t ackCompleted = 0;
+        std::uint64_t ackRetry = 0;
+        std::uint64_t ackSlotBusy = 0;
+        std::uint64_t flushEscalations = 0;
+        std::uint64_t safeCacheHit = 0;
+        std::uint64_t safeCacheMiss = 0;
+        std::uint64_t safeSwap = 0;
+        std::uint64_t timeoutPreserve = 0;
+    };
+    inline PerfSnapshot Perf{};
 
     inline void ReleasePending() noexcept
     {
@@ -57,6 +80,7 @@ namespace OutRunVrR32DirectSubmit
                 pending.fence = nullptr;
             }
             pending.armed = false;
+            pending.flushIssued = false;
             pending.frame = {};
         }
     }
@@ -93,6 +117,7 @@ namespace OutRunVrR32DirectSubmit
                 continue;
             }
             pending.armed = false;
+            pending.flushIssued = false;
             pending.frame = {};
             ++AckCompleted;
             if (!FirstAsyncAckLogged)
@@ -117,8 +142,20 @@ namespace OutRunVrR32DirectSubmit
         auto& pending = Pending[slot];
         if (pending.armed)
         {
-            // Poll once more after all rendering for this frame was queued.
             PollCompletedAcks();
+            if (pending.armed && !pending.flushIssued)
+            {
+                OutRunVrFinalTest::Context->Flush();
+                pending.flushIssued = true;
+                ++AckFlushEscalations;
+                if (!FirstDeferredFlushLogged)
+                {
+                    FirstDeferredFlushLogged = true;
+                    std::cerr
+                        << "[R32 direct] D3D11 Flush is deferred until actual direct-ring slot pressure; steady frames keep driver batching intact\n";
+                }
+                PollCompletedAcks();
+            }
             if (pending.armed)
             {
                 ++AckSlotBusy;
@@ -127,9 +164,9 @@ namespace OutRunVrR32DirectSubmit
         }
 
         OutRunVrFinalTest::Context->End(pending.fence);
-        OutRunVrFinalTest::Context->Flush();
         pending.frame = frame;
         pending.armed = true;
+        pending.flushIssued = false;
         ++AckArmed;
         return true;
     }
@@ -178,33 +215,51 @@ namespace OutRunVrR32DirectSubmit
             state, verified.frame);
     }
 
+    inline void CapturePerfSnapshot() noexcept
+    {
+        Perf.fastSubmit = FastDirectSubmits;
+        Perf.reject = FastDirectRejects;
+        Perf.ackArmed = AckArmed;
+        Perf.ackCompleted = AckCompleted;
+        Perf.ackRetry = AckPublishRetry;
+        Perf.ackSlotBusy = AckSlotBusy;
+        Perf.flushEscalations = AckFlushEscalations;
+        Perf.safeCacheHit = OutRunVrD3D9ExDirectPassthrough::R32SharedCacheHits;
+        Perf.safeCacheMiss = OutRunVrD3D9ExDirectPassthrough::R32SharedCacheMisses;
+        Perf.safeSwap = OutRunVrD3D9ExDirectPassthrough::R32SafeSwaps;
+        Perf.timeoutPreserve = OutRunVrD3D9ExDirectPassthrough::R32SafeTimeoutPreserves;
+    }
+
     inline void MaybeLogPerf() noexcept
     {
         const ULONGLONG now = GetTickCount64();
         if (LastPerfLogMs == 0)
         {
             LastPerfLogMs = now;
+            CapturePerfSnapshot();
             return;
         }
         if (now - LastPerfLogMs < 5000)
             return;
         LastPerfLogMs = now;
         std::cerr
-            << "[R32 direct PERF] fastSubmit=" << FastDirectSubmits
-            << " reject=" << FastDirectRejects
-            << " ackArmed=" << AckArmed
-            << " ackCompleted=" << AckCompleted
-            << " ackRetry=" << AckPublishRetry
-            << " ackSlotBusy=" << AckSlotBusy
+            << "[R32 direct PERF 5s] fastSubmit=" << FastDirectSubmits - Perf.fastSubmit
+            << " reject=" << FastDirectRejects - Perf.reject
+            << " ackArmed=" << AckArmed - Perf.ackArmed
+            << " ackCompleted=" << AckCompleted - Perf.ackCompleted
+            << " ackRetry=" << AckPublishRetry - Perf.ackRetry
+            << " ackSlotBusy=" << AckSlotBusy - Perf.ackSlotBusy
+            << " deferredFlush=" << AckFlushEscalations - Perf.flushEscalations
             << " safeCacheHit="
-            << OutRunVrD3D9ExDirectPassthrough::R32SharedCacheHits
+            << OutRunVrD3D9ExDirectPassthrough::R32SharedCacheHits - Perf.safeCacheHit
             << " safeCacheMiss="
-            << OutRunVrD3D9ExDirectPassthrough::R32SharedCacheMisses
+            << OutRunVrD3D9ExDirectPassthrough::R32SharedCacheMisses - Perf.safeCacheMiss
             << " safeSwap="
-            << OutRunVrD3D9ExDirectPassthrough::R32SafeSwaps
+            << OutRunVrD3D9ExDirectPassthrough::R32SafeSwaps - Perf.safeSwap
             << " timeoutPreserve="
-            << OutRunVrD3D9ExDirectPassthrough::R32SafeTimeoutPreserves
+            << OutRunVrD3D9ExDirectPassthrough::R32SafeTimeoutPreserves - Perf.timeoutPreserve
             << "\n";
+        CapturePerfSnapshot();
     }
 
     inline XrResult XRAPI_CALL EndFrame(
