@@ -1,21 +1,10 @@
 // R33 final dispatch + post-review hot-path hardening.
 //
-// R32 owns the two 10-pass review fixes. R33 remains the final game-side
-// callback boundary and now also closes the follow-up review findings without
-// flattening the validated revision chain:
-//  * Reset reaches R22's authoritative eligibility/baseline lifecycle before
-//    R32 rearms its local fast-path epoch/cache state;
-//  * steady-state depth/stencil write classification is shadowed from the
-//    existing R29 SetRenderState path and invalidated by StateBlock/depth
-//    generations, eliminating per-draw GetRenderState/GetDesc calls when R31
-//    StateBlock tracking is reliable;
-//  * unreliable StateBlock mode keeps the old live getter path fail-closed;
-//  * top-level draw telemetry is counted exactly once.
-//
-// R32TryFastWorld/R32TryHud remain the proven lower implementations this layer
-// derives from; R33 duplicates only the final owned draw sequence so it can use
-// the cached depth/stencil write decision. R32LowerFailClosed remains the exact
-// safety fallback authority.
+// R32 owns reset/direct-transport review-2 safety. R33 remains the final
+// game-side callback boundary and owns depth/stencil write-state caching plus
+// exact single-count draw dispatch. Reset now simply chains through R32, whose
+// trampoline is installed above R22, so R22 is authoritative in both the R32
+// fallback and the final R33 path.
 
 #include "stereo_renderer_r32.cpp"
 
@@ -715,16 +704,10 @@ namespace OutRunVRStereo
             D3DPRESENT_PARAMETERS* params)
         {
             const bool gameDevice = IsGameDevice(device);
-
-            // R32 originally called its ResetDestR13 trampoline directly. That
-            // could bypass R22's authoritative pre-reset fail-close and baseline
-            // reset. Enter R22 explicitly; its R22ResetR13Hook trampoline reaches
-            // the original R13 Reset/ResetEx owner without re-entering R32.
-            const HRESULT hr = ResetDestR22(device, params);
+            const HRESULT hr = R33ResetR32Hook.stdcall<HRESULT>(device, params);
 
             if (gameDevice)
             {
-                R32ResetAfterGameReset();
                 R33InvalidateDepthStencilCache();
                 if (SUCCEEDED(hr))
                     ++R33ResetSuccesses;
@@ -735,7 +718,7 @@ namespace OutRunVRStereo
                 {
                     R33FirstResetLifecycleLogged = true;
                     spdlog::info(
-                        "VR R33 RESET: R22 eligibility/depth-stencil baseline lifecycle is authoritative before R32 epoch/cache rearm");
+                        "VR R33 RESET: chained R33 -> R32 -> R22; R22 owns fail-close/baseline and R32 rearms caches only after successful Reset");
                 }
             }
             return hr;
@@ -864,7 +847,7 @@ namespace OutRunVRStereo
                         HookManager::ReportAsyncResult(
                             "OpenXRVRStereoR33Dispatch", false);
                         spdlog::error(
-                            "VR R33: final reset/state/draw hook transaction was partial; R32 remains authoritative");
+                            "VR R33: final reset/state/draw hook transaction was partial; corrected R32 remains authoritative");
                         return 0;
                     }
 
@@ -872,7 +855,7 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR33Dispatch", true);
                     spdlog::info(
-                        "VR R33 DISPATCH: R32 fast paths + direct R29 fallback READY; top-level draw telemetry is counted exactly once; R22 Reset lifecycle + depth/stencil write cache ACTIVE");
+                        "VR R33 DISPATCH: R33TryFastWorld/R33TryHud + direct R29 fallback READY; top-level telemetry counted once; corrected R32->R22 Reset lifecycle + depth/stencil cache ACTIVE");
                     return 0;
                 }
                 Sleep(25);
