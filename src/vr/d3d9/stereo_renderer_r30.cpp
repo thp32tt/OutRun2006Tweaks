@@ -12,6 +12,7 @@
 // perspective effects remain entirely owned by R29/R13.
 
 #include "stereo_renderer_r29.cpp"
+#include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
 #include <mutex>
@@ -21,6 +22,7 @@
 namespace Settings
 {
     extern Setting<float> VRHudScale;
+    extern Setting<int> SkyGlowFactor;
 }
 
 namespace OutRunVRStereo
@@ -532,6 +534,452 @@ namespace OutRunVRStereo
             if (!R30CreateVertexBufferHook || !R30CreateIndexBufferHook)
                 spdlog::warn(
                     "VR R30.6 BUFFER SHADOW: creation hook incomplete; existing/dynamic buffers still register lazily on draw/Lock");
+        }
+
+        // R30.6 stereo sky glow.
+        //
+        // The original game samples D3DBACKBUFFER_TYPE_MONO and owns only one
+        // glow chain. In true stereo that is necessarily the left eye. Keep the
+        // original mono post-process disabled and run a completely separate
+        // reduced/blurred chain for each completed eye immediately before the
+        // renderer composes/publishes the stereo frame.
+        SafetyHookInline R30PresentR29Hook{};
+        SafetyHookInline R30ResetR29Hook{};
+
+        struct R30SkyGlowResources
+        {
+            IDirect3DTexture9* reduced[2]{};
+            IDirect3DTexture9* temp[2]{};
+            IDirect3DPixelShader9* bright = nullptr;
+            IDirect3DPixelShader9* blur = nullptr;
+            IDirect3DPixelShader9* composite = nullptr;
+            UINT eyeWidth = 0;
+            UINT eyeHeight = 0;
+            UINT glowWidth = 0;
+            UINT glowHeight = 0;
+            int factor = 0;
+        };
+        R30SkyGlowResources R30SkyGlow{};
+        std::uint64_t R30SkyGlowFrames = 0;
+        std::uint64_t R30SkyGlowFailures = 0;
+        bool R30FirstSkyGlowLogged = false;
+        bool R30FirstSkyGlowFailureLogged = false;
+
+        void R30ReleaseSkyGlowResources() noexcept
+        {
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                ReleaseCom(R30SkyGlow.reduced[eye]);
+                ReleaseCom(R30SkyGlow.temp[eye]);
+            }
+            ReleaseCom(R30SkyGlow.bright);
+            ReleaseCom(R30SkyGlow.blur);
+            ReleaseCom(R30SkyGlow.composite);
+            R30SkyGlow.eyeWidth = 0;
+            R30SkyGlow.eyeHeight = 0;
+            R30SkyGlow.glowWidth = 0;
+            R30SkyGlow.glowHeight = 0;
+            R30SkyGlow.factor = 0;
+        }
+
+        bool R30CompilePixelShader(IDirect3DDevice9* device,
+            const char* source, const char* entry,
+            IDirect3DPixelShader9** shader)
+        {
+            if (!device || !source || !entry || !shader)
+                return false;
+            ID3DBlob* bytecode = nullptr;
+            ID3DBlob* errors = nullptr;
+            const HRESULT compile = D3DCompile(
+                source, std::strlen(source),
+                "OutRunVR-StereoSkyGlow", nullptr, nullptr,
+                entry, "ps_2_0",
+                D3DCOMPILE_ENABLE_STRICTNESS |
+                    D3DCOMPILE_OPTIMIZATION_LEVEL3,
+                0, &bytecode, &errors);
+            if (FAILED(compile) || !bytecode)
+            {
+                if (errors && errors->GetBufferPointer())
+                    spdlog::warn(
+                        "VR SKY GLOW: pixel shader compile failed: {}",
+                        static_cast<const char*>(
+                            errors->GetBufferPointer()));
+                ReleaseCom(errors);
+                ReleaseCom(bytecode);
+                return false;
+            }
+            const HRESULT create = device->CreatePixelShader(
+                static_cast<const DWORD*>(bytecode->GetBufferPointer()),
+                shader);
+            ReleaseCom(errors);
+            ReleaseCom(bytecode);
+            return SUCCEEDED(create) && *shader;
+        }
+
+        bool R30EnsureSkyGlowResources(IDirect3DDevice9* device)
+        {
+            if (!device || !BackBufferDesc.Width || !BackBufferDesc.Height)
+                return false;
+            const int factor =
+                std::clamp(Settings::SkyGlowFactor.get(), 1, 16);
+            const UINT glowWidth = std::max<UINT>(
+                160u, BackBufferDesc.Width /
+                    static_cast<UINT>(factor));
+            const UINT glowHeight = std::max<UINT>(
+                120u, BackBufferDesc.Height /
+                    static_cast<UINT>(factor));
+
+            if (R30SkyGlow.reduced[0] && R30SkyGlow.reduced[1] &&
+                R30SkyGlow.temp[0] && R30SkyGlow.temp[1] &&
+                R30SkyGlow.bright && R30SkyGlow.blur &&
+                R30SkyGlow.composite &&
+                R30SkyGlow.eyeWidth == BackBufferDesc.Width &&
+                R30SkyGlow.eyeHeight == BackBufferDesc.Height &&
+                R30SkyGlow.glowWidth == glowWidth &&
+                R30SkyGlow.glowHeight == glowHeight &&
+                R30SkyGlow.factor == factor)
+                return true;
+
+            R30ReleaseSkyGlowResources();
+
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                if (FAILED(device->CreateTexture(
+                        glowWidth, glowHeight, 1,
+                        D3DUSAGE_RENDERTARGET,
+                        D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT,
+                        &R30SkyGlow.reduced[eye], nullptr)) ||
+                    FAILED(device->CreateTexture(
+                        glowWidth, glowHeight, 1,
+                        D3DUSAGE_RENDERTARGET,
+                        D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT,
+                        &R30SkyGlow.temp[eye], nullptr)))
+                {
+                    R30ReleaseSkyGlowResources();
+                    return false;
+                }
+            }
+
+            static constexpr char BrightPs[] = R"(
+                sampler2D Scene : register(s0);
+                float4 Bright(float2 uv : TEXCOORD0) : COLOR0
+                {
+                    float4 c = tex2D(Scene, uv);
+                    float peak = max(c.r, max(c.g, c.b));
+                    float bright = saturate((peak - 0.58) * 2.75);
+                    // World HDR/exposure draws normally leave useful alpha below
+                    // one, while most fixed HUD art is opaque. This is not used
+                    // for eye identity; it only suppresses UI contamination.
+                    float worldMask = max(0.15,
+                        saturate((1.0 - c.a) * 2.0));
+                    float m = bright * worldMask;
+                    return float4(c.rgb * m, m);
+                })";
+            static constexpr char BlurPs[] = R"(
+                sampler2D Source : register(s0);
+                float4 Texel : register(c0);
+                float4 Blur(float2 uv : TEXCOORD0) : COLOR0
+                {
+                    float2 d = Texel.xy;
+                    float4 c = tex2D(Source, uv) * 0.40;
+                    c += tex2D(Source, uv + d * 1.5) * 0.24;
+                    c += tex2D(Source, uv - d * 1.5) * 0.24;
+                    c += tex2D(Source, uv + d * 3.5) * 0.06;
+                    c += tex2D(Source, uv - d * 3.5) * 0.06;
+                    return c;
+                })";
+            static constexpr char CompositePs[] = R"(
+                sampler2D Glow : register(s0);
+                float4 Params : register(c0);
+                float4 Composite(float2 uv : TEXCOORD0) : COLOR0
+                {
+                    float4 g = tex2D(Glow, uv);
+                    return float4(g.rgb * Params.x, 0.0);
+                })";
+
+            if (!R30CompilePixelShader(
+                    device, BrightPs, "Bright",
+                    &R30SkyGlow.bright) ||
+                !R30CompilePixelShader(
+                    device, BlurPs, "Blur",
+                    &R30SkyGlow.blur) ||
+                !R30CompilePixelShader(
+                    device, CompositePs, "Composite",
+                    &R30SkyGlow.composite))
+            {
+                R30ReleaseSkyGlowResources();
+                return false;
+            }
+
+            R30SkyGlow.eyeWidth = BackBufferDesc.Width;
+            R30SkyGlow.eyeHeight = BackBufferDesc.Height;
+            R30SkyGlow.glowWidth = glowWidth;
+            R30SkyGlow.glowHeight = glowHeight;
+            R30SkyGlow.factor = factor;
+            return true;
+        }
+
+        struct R30GlowVertex
+        {
+            float x, y, z, rhw;
+            float u, v;
+        };
+
+        bool R30DrawSkyGlowPass(IDirect3DDevice9* device,
+            IDirect3DSurface9* target, UINT width, UINT height,
+            IDirect3DTexture9* source,
+            IDirect3DPixelShader9* shader,
+            const float constant[4],
+            bool additive)
+        {
+            if (!device || !target || !source || !shader ||
+                !width || !height)
+                return false;
+
+            if (FAILED(device->SetRenderTarget(0, target)) ||
+                FAILED(device->SetDepthStencilSurface(nullptr)))
+                return false;
+
+            D3DVIEWPORT9 viewport{};
+            viewport.Width = width;
+            viewport.Height = height;
+            viewport.MinZ = 0.0f;
+            viewport.MaxZ = 1.0f;
+            if (FAILED(device->SetViewport(&viewport)))
+                return false;
+
+            const R30GlowVertex v[4]{
+                { -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f },
+                { static_cast<float>(width) - 0.5f, -0.5f,
+                    0.0f, 1.0f, 1.0f, 0.0f },
+                { -0.5f, static_cast<float>(height) - 0.5f,
+                    0.0f, 1.0f, 0.0f, 1.0f },
+                { static_cast<float>(width) - 0.5f,
+                    static_cast<float>(height) - 0.5f,
+                    0.0f, 1.0f, 1.0f, 1.0f }
+            };
+
+            device->SetVertexShader(nullptr);
+            device->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
+            device->SetPixelShader(shader);
+            device->SetTexture(0, source);
+            device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+            device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+            device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+            device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+            device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+            device->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
+            device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+            device->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+            device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+            device->SetRenderState(D3DRS_ALPHABLENDENABLE,
+                additive ? TRUE : FALSE);
+            if (additive)
+            {
+                device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+                device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+                device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+                device->SetRenderState(D3DRS_COLORWRITEENABLE,
+                    D3DCOLORWRITEENABLE_RED |
+                    D3DCOLORWRITEENABLE_GREEN |
+                    D3DCOLORWRITEENABLE_BLUE);
+            }
+            else
+            {
+                device->SetRenderState(D3DRS_COLORWRITEENABLE,
+                    D3DCOLORWRITEENABLE_RED |
+                    D3DCOLORWRITEENABLE_GREEN |
+                    D3DCOLORWRITEENABLE_BLUE |
+                    D3DCOLORWRITEENABLE_ALPHA);
+            }
+            device->SetPixelShaderConstantF(0, constant, 1);
+            const HRESULT hr = device->DrawPrimitiveUP(
+                D3DPT_TRIANGLESTRIP, 2, v, sizeof(R30GlowVertex));
+            device->SetTexture(0, nullptr);
+            return SUCCEEDED(hr);
+        }
+
+        bool R30ApplyStereoSkyGlow(IDirect3DDevice9* device)
+        {
+            if (!device || Settings::SkyGlowFactor <= 0 ||
+                !StereoWanted() || !FrameHadWorldStereo ||
+                !FrameHadDuplicatedDraw || FrameRightDrawFailed ||
+                FrameStereoIncomplete || !BackBuffer ||
+                !RightEyeSurface)
+                return true;
+
+            if (!R30EnsureSkyGlowResources(device))
+                return false;
+
+            IDirect3DStateBlock9* stateBlock = nullptr;
+            IDirect3DSurface9* savedRt = nullptr;
+            IDirect3DSurface9* savedDepth = nullptr;
+            D3DVIEWPORT9 savedViewport{};
+            if (FAILED(device->CreateStateBlock(
+                    D3DSBT_ALL, &stateBlock)) ||
+                !stateBlock ||
+                FAILED(device->GetRenderTarget(0, &savedRt)) ||
+                !savedRt ||
+                FAILED(device->GetViewport(&savedViewport)))
+            {
+                if (savedRt) savedRt->Release();
+                if (stateBlock) stateBlock->Release();
+                return false;
+            }
+            const HRESULT depthHr =
+                device->GetDepthStencilSurface(&savedDepth);
+            const bool depthOk =
+                SUCCEEDED(depthHr) || depthHr == D3DERR_NOTFOUND;
+            if (!depthOk)
+            {
+                savedRt->Release();
+                stateBlock->Release();
+                return false;
+            }
+
+            bool ok = true;
+            IDirect3DSurface9* eyeSurface[2]{
+                BackBuffer, RightEyeSurface
+            };
+            for (int eye = 0; eye < 2 && ok; ++eye)
+            {
+                IDirect3DSurface9* reduced = nullptr;
+                IDirect3DSurface9* temp = nullptr;
+                if (FAILED(R30SkyGlow.reduced[eye]->GetSurfaceLevel(
+                        0, &reduced)) || !reduced ||
+                    FAILED(R30SkyGlow.temp[eye]->GetSurfaceLevel(
+                        0, &temp)) || !temp)
+                {
+                    if (temp) temp->Release();
+                    if (reduced) reduced->Release();
+                    ok = false;
+                    break;
+                }
+
+                ok = SUCCEEDED(device->StretchRect(
+                    eyeSurface[eye], nullptr, reduced, nullptr,
+                    D3DTEXF_LINEAR));
+                const float zero[4]{ 0, 0, 0, 0 };
+                if (ok)
+                {
+                    device->Clear(0, nullptr, D3DCLEAR_TARGET,
+                        0x00000000, 1.0f, 0);
+                    ok = R30DrawSkyGlowPass(
+                        device, temp,
+                        R30SkyGlow.glowWidth,
+                        R30SkyGlow.glowHeight,
+                        R30SkyGlow.reduced[eye],
+                        R30SkyGlow.bright, zero, false);
+                }
+
+                const float horizontal[4]{
+                    1.0f /
+                        static_cast<float>(R30SkyGlow.glowWidth),
+                    0.0f, 0.0f, 0.0f
+                };
+                if (ok)
+                    ok = R30DrawSkyGlowPass(
+                        device, reduced,
+                        R30SkyGlow.glowWidth,
+                        R30SkyGlow.glowHeight,
+                        R30SkyGlow.temp[eye],
+                        R30SkyGlow.blur, horizontal, false);
+
+                const float vertical[4]{
+                    0.0f,
+                    1.0f /
+                        static_cast<float>(R30SkyGlow.glowHeight),
+                    0.0f, 0.0f
+                };
+                if (ok)
+                    ok = R30DrawSkyGlowPass(
+                        device, temp,
+                        R30SkyGlow.glowWidth,
+                        R30SkyGlow.glowHeight,
+                        R30SkyGlow.reduced[eye],
+                        R30SkyGlow.blur, vertical, false);
+
+                const float composite[4]{ 0.38f, 0, 0, 0 };
+                if (ok)
+                    ok = R30DrawSkyGlowPass(
+                        device, eyeSurface[eye],
+                        BackBufferDesc.Width,
+                        BackBufferDesc.Height,
+                        R30SkyGlow.temp[eye],
+                        R30SkyGlow.composite, composite, true);
+
+                temp->Release();
+                reduced->Release();
+            }
+
+            // Restore render targets explicitly; state blocks do not own render
+            // target/depth bindings in a way we rely on here.
+            bool restoreOk =
+                SUCCEEDED(device->SetRenderTarget(0, savedRt));
+            const HRESULT restoreDepth =
+                device->SetDepthStencilSurface(savedDepth);
+            restoreOk =
+                (SUCCEEDED(restoreDepth) ||
+                 (!savedDepth && restoreDepth == D3D_OK)) &&
+                restoreOk;
+            restoreOk =
+                SUCCEEDED(device->SetViewport(&savedViewport)) &&
+                restoreOk;
+            restoreOk =
+                SUCCEEDED(stateBlock->Apply()) && restoreOk;
+            savedRt->Release();
+            if (savedDepth) savedDepth->Release();
+            stateBlock->Release();
+
+            if (ok && restoreOk)
+            {
+                ++R30SkyGlowFrames;
+                if (!R30FirstSkyGlowLogged)
+                {
+                    R30FirstSkyGlowLogged = true;
+                    spdlog::info(
+                        "VR SKY GLOW: independent L/R extract + 2-pass blur + additive composite ACTIVE factor={} buffer={}x{}",
+                        R30SkyGlow.factor,
+                        R30SkyGlow.glowWidth,
+                        R30SkyGlow.glowHeight);
+                }
+                return true;
+            }
+
+            ++R30SkyGlowFailures;
+            if (!R30FirstSkyGlowFailureLogged)
+            {
+                R30FirstSkyGlowFailureLogged = true;
+                spdlog::warn(
+                    "VR SKY GLOW: stereo eye post-process failed; frame continues without enabling the stock mono glow chain");
+            }
+            return false;
+        }
+
+        HRESULT __stdcall PresentDestR30(
+            IDirect3DDevice9* device, const RECT* sourceRect,
+            const RECT* destRect, HWND destWindowOverride,
+            const RGNDATA* dirtyRegion)
+        {
+            if (Settings::SkyGlowFactor > 0 &&
+                StereoWanted() && FrameHadWorldStereo &&
+                FrameHadDuplicatedDraw &&
+                !FrameRightDrawFailed && !FrameStereoIncomplete)
+            {
+                InternalPassScope guard;
+                R30ApplyStereoSkyGlow(device);
+            }
+            return R30PresentR29Hook.stdcall<HRESULT>(
+                device, sourceRect, destRect,
+                destWindowOverride, dirtyRegion);
+        }
+
+        HRESULT __stdcall ResetDestR30(
+            IDirect3DDevice9* device,
+            D3DPRESENT_PARAMETERS* params)
+        {
+            R30ReleaseSkyGlowResources();
+            return R30ResetR29Hook.stdcall<HRESULT>(device, params);
         }
 
         // User-adjustable projection-space HUD scale. The per-eye FOV affine
@@ -2057,6 +2505,8 @@ namespace OutRunVRStereo
 
         void R30RollbackHooks() noexcept
         {
+            R30ResetR29Hook = {};
+            R30PresentR29Hook = {};
             R30DrawIndexedPrimitiveUPR29Hook = {};
             R30DrawPrimitiveUPR29Hook = {};
             R30DrawIndexedPrimitiveR29Hook = {};
@@ -2066,6 +2516,8 @@ namespace OutRunVRStereo
         bool R30EnableHooks() noexcept
         {
             SafetyHookInline* hooks[]{
+                &R30PresentR29Hook,
+                &R30ResetR29Hook,
                 &R30DrawPrimitiveR29Hook,
                 &R30DrawIndexedPrimitiveR29Hook,
                 &R30DrawPrimitiveUPR29Hook,
@@ -2101,6 +2553,12 @@ namespace OutRunVRStereo
                 if (r29 == State::Ready)
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
+                    R30PresentR29Hook = safetyhook::create_inline(
+                        reinterpret_cast<void*>(&PresentDest),
+                        PresentDestR30, disabled);
+                    R30ResetR29Hook = safetyhook::create_inline(
+                        reinterpret_cast<void*>(&ResetDest),
+                        ResetDestR30, disabled);
                     R30DrawPrimitiveR29Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&DrawPrimitiveDestR29),
                         DrawPrimitiveDestR30, disabled);
