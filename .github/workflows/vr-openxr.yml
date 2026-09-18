@@ -389,6 +389,178 @@ jobs:
           path: build-vr-safe-draw/bin/dinput8.dll
           if-no-files-found: error
 
+
+  game-x86-c1-r29-r28-classify:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure Win32 C1 comparison build
+        shell: cmd
+        run: |
+          set CI=
+          cmake -S . -B build-vr-c1 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_C1_COMPARE=ON
+
+      - name: Verify C1 source graph
+        shell: pwsh
+        run: |
+          $projects = Get-ChildItem build-vr-c1 -Filter *.vcxproj -Recurse
+          if (-not $projects) { throw 'no Visual Studio project files were generated' }
+          $projectText = ($projects | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
+          foreach ($required in @(
+            'stereo_renderer_r29_c1_compare.cpp',
+            'outrun_renderer_r29.cpp',
+            'ex_device_upgrade_r15.cpp'
+          )) {
+            if (-not $projectText.Contains($required)) {
+              throw "C1 required TU missing: $required"
+            }
+          }
+          foreach ($excluded in @(
+            'stereo_renderer_r30_c2_compare.cpp',
+            'stereo_renderer_r31.cpp',
+            'stereo_renderer_r32.cpp',
+            'stereo_renderer_r33.cpp',
+            'stereo_renderer_r34.cpp'
+          )) {
+            $escaped = [regex]::Escape($excluded)
+            $pattern = '<ClCompile Include="[^"]*[\\/]' + $escaped + '"'
+            if ($projectText -match $pattern) {
+              throw "C1 unexpectedly compiles excluded TU: $excluded"
+            }
+          }
+
+      - name: Apply dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-vr-c1/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-c1/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-vr-c1/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-c1/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-vr-c1/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-c1/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-vr-c1/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build-vr-c1/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-vr-c1/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build Win32 C1 DLL
+        run: cmake --build build-vr-c1 --config Release
+
+      - name: Verify C1 binary markers
+        shell: pwsh
+        run: |
+          $dllPath = 'build-vr-c1/bin/dinput8.dll'
+          if (-not (Test-Path $dllPath)) { throw 'C1 dinput8.dll was not produced' }
+          $bytes = [System.IO.File]::ReadAllBytes($dllPath)
+          $ascii = [Text.Encoding]::ASCII.GetString($bytes)
+          foreach ($marker in @(
+            'VR C1 COMPARE: R29 fast L+R + R23/R27/R28 perspective classification ACTIVE; R30-R34 excluded',
+            'VR C1/C2 CLASSIFY: R29 renderer delegates candidate WVP uploads to R23/R27/R28 perspective-world classification',
+            'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
+            'VR R27 EFFECT: main-backbuffer perspective c64 now follows the verified per-eye world WVP'
+          )) {
+            if (-not $ascii.Contains($marker)) { throw "C1 marker missing: $marker" }
+          }
+          foreach ($forbidden in @(
+            'VR R30 HUD: ScreenSpace2D asymmetric-FOV correction overlay READY',
+            'VR R31 PERF: cached world stereo + draw-route telemetry READY',
+            'VR R34 RESET GUARD: R15 classic-state replay health now gates post-Reset stereo eligibility'
+          )) {
+            if ($ascii.Contains($forbidden)) { throw "C1 excluded marker present: $forbidden" }
+          }
+          $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+          if ([BitConverter]::ToUInt16($bytes, $peOffset + 4) -ne 0x014C) { throw 'expected x86 DLL' }
+          Get-FileHash $dllPath -Algorithm SHA256
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: outrun2006-vr-x86-c1-r29-r28-classify
+          path: build-vr-c1/bin/dinput8.dll
+          if-no-files-found: error
+
+  game-x86-c2-r30-hud:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure Win32 C2 comparison build
+        shell: cmd
+        run: |
+          set CI=
+          cmake -S . -B build-vr-c2 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_C2_COMPARE=ON
+
+      - name: Verify C2 source graph
+        shell: pwsh
+        run: |
+          $projects = Get-ChildItem build-vr-c2 -Filter *.vcxproj -Recurse
+          if (-not $projects) { throw 'no Visual Studio project files were generated' }
+          $projectText = ($projects | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
+          foreach ($required in @(
+            'stereo_renderer_r30_c2_compare.cpp',
+            'outrun_renderer_r29.cpp',
+            'ex_device_upgrade_r15.cpp'
+          )) {
+            if (-not $projectText.Contains($required)) {
+              throw "C2 required TU missing: $required"
+            }
+          }
+          foreach ($excluded in @(
+            'stereo_renderer_r29_c1_compare.cpp',
+            'stereo_renderer_r31.cpp',
+            'stereo_renderer_r32.cpp',
+            'stereo_renderer_r33.cpp',
+            'stereo_renderer_r34.cpp'
+          )) {
+            $escaped = [regex]::Escape($excluded)
+            $pattern = '<ClCompile Include="[^"]*[\\/]' + $escaped + '"'
+            if ($projectText -match $pattern) {
+              throw "C2 unexpectedly compiles excluded TU: $excluded"
+            }
+          }
+
+      - name: Apply dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-vr-c2/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-c2/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-vr-c2/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-c2/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-vr-c2/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-c2/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-vr-c2/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build-vr-c2/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-vr-c2/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build Win32 C2 DLL
+        run: cmake --build build-vr-c2 --config Release
+
+      - name: Verify C2 binary markers
+        shell: pwsh
+        run: |
+          $dllPath = 'build-vr-c2/bin/dinput8.dll'
+          if (-not (Test-Path $dllPath)) { throw 'C2 dinput8.dll was not produced' }
+          $bytes = [System.IO.File]::ReadAllBytes($dllPath)
+          $ascii = [Text.Encoding]::ASCII.GetString($bytes)
+          foreach ($marker in @(
+            'VR C2 COMPARE: C1 R29+R27/R28 classification + R30 HUD correction ACTIVE; R31-R34 excluded',
+            'VR C1/C2 CLASSIFY: R29 renderer delegates candidate WVP uploads to R23/R27/R28 perspective-world classification',
+            'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
+            'VR R30 HUD: ScreenSpace2D asymmetric-FOV correction overlay READY'
+          )) {
+            if (-not $ascii.Contains($marker)) { throw "C2 marker missing: $marker" }
+          }
+          foreach ($forbidden in @(
+            'VR R31 PERF: cached world stereo + draw-route telemetry READY',
+            'VR R34 RESET GUARD: R15 classic-state replay health now gates post-Reset stereo eligibility'
+          )) {
+            if ($ascii.Contains($forbidden)) { throw "C2 excluded marker present: $forbidden" }
+          }
+          $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+          if ([BitConverter]::ToUInt16($bytes, $peOffset + 4) -ne 0x014C) { throw 'expected x86 DLL' }
+          Get-FileHash $dllPath -Algorithm SHA256
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: outrun2006-vr-x86-c2-r30-hud
+          path: build-vr-c2/bin/dinput8.dll
+          if-no-files-found: error
+
   host-x64:
     runs-on: windows-2022
     steps:
