@@ -455,6 +455,8 @@ jobs:
             'VR C1 COMPARE: R29 fast L+R + R23/R27/R28 perspective classification ACTIVE; R30-R34 excluded',
             'VR C1/C2 CLASSIFY: R29 renderer delegates candidate WVP uploads to R23/R27/R28 perspective-world classification',
             'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
+            'VR C1.1 BASELINE: authoritative color clear replay seeds right/mono surfaces; two full-surface StretchRect baseline copies removed',
+            'VR C1.1 FIXEDFN: perspective fixed-function XYZ draw now receives per-eye view/projection; XYZRHW/orthographic UI remains zero-disparity',
             'VR R27 EFFECT: main-backbuffer perspective c64 now follows the verified per-eye world WVP'
           )) {
             if (-not $ascii.Contains($marker)) { throw "C1 marker missing: $marker" }
@@ -541,6 +543,8 @@ jobs:
             'VR C2 COMPARE: C1 R29+R27/R28 classification + R30 HUD correction ACTIVE; R31-R34 excluded',
             'VR C1/C2 CLASSIFY: R29 renderer delegates candidate WVP uploads to R23/R27/R28 perspective-world classification',
             'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
+            'VR C1.1 BASELINE: authoritative color clear replay seeds right/mono surfaces; two full-surface StretchRect baseline copies removed',
+            'VR C1.1 FIXEDFN: perspective fixed-function XYZ draw now receives per-eye view/projection; XYZRHW/orthographic UI remains zero-disparity',
             'VR R30 HUD: ScreenSpace2D asymmetric-FOV correction overlay READY'
           )) {
             if (-not $ascii.Contains($marker)) { throw "C2 marker missing: $marker" }

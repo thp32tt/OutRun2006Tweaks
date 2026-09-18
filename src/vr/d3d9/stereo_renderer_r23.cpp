@@ -57,6 +57,7 @@ namespace OutRunVRStereo
         bool R23FirstPassiveLogged = false;
         bool R23FirstWarmupArmedLogged = false;
         bool R23FirstSeedLogged = false;
+        bool R23FirstColorBaselineLogged = false;
         bool R23FirstImplicitViewportResyncLogged = false;
 
         bool R23SnapshotSame(const R22ScissorSnapshot& a,
@@ -264,7 +265,8 @@ namespace OutRunVRStereo
 
         bool R23InitializeStereoFromAuthoritativeBaseline(
             IDirect3DDevice9* device, const R22ScissorSnapshot& state,
-            bool stencilSafe) noexcept
+            bool stencilSafe, DWORD colorRectCount,
+            const D3DRECT* colorRects, D3DCOLOR color) noexcept
         {
             if (!device || AnyAuxRenderTargetActive() ||
                 !EnsureStereoResources(device) || !R9EnsureMonoResources(device) ||
@@ -287,17 +289,42 @@ namespace OutRunVRStereo
             {
                 InternalPassScope guard;
 
-                if (FAILED(device->StretchRect(BackBuffer, nullptr,
-                        RightEyeSurface, nullptr, D3DTEXF_NONE)))
-                    ok = false;
-                else
-                    ++R23RecoveryVrSurfaceWrites;
+                auto replayColorClear = [&](IDirect3DSurface9* target) noexcept {
+                    if (!target ||
+                        FAILED(SetRenderTargetHook.stdcall<HRESULT>(
+                            device, 0u, target)) ||
+                        FAILED(SetDepthStencilSurfaceHook.stdcall<HRESULT>(
+                            device, static_cast<IDirect3DSurface9*>(nullptr))) ||
+                        FAILED(device->SetViewport(&state.viewport)) ||
+                        FAILED(device->SetScissorRect(&state.rect)) ||
+                        FAILED(device->SetRenderState(D3DRS_SCISSORTESTENABLE,
+                            state.enabled)))
+                        return false;
 
-                if (ok && FAILED(device->StretchRect(BackBuffer, nullptr,
-                        R9MonoSurface, nullptr, D3DTEXF_NONE)))
-                    ok = false;
-                else if (ok)
+                    const HRESULT colorHr = ClearHook.stdcall<HRESULT>(
+                        device, colorRectCount, colorRects,
+                        D3DCLEAR_TARGET, color, 1.0f, 0u);
                     ++R23RecoveryVrSurfaceWrites;
+                    return SUCCEEDED(colorHr);
+                };
+
+                // The authoritative candidate is already proven to cover the
+                // complete game backbuffer. Replaying that exact clear into
+                // the private eye/mono targets is equivalent to copying the
+                // just-cleared backbuffer, but avoids two 3440x1440 full-surface
+                // StretchRect copies per Present and cannot carry stale eye
+                // color history into translucent right-eye passes.
+                if (!replayColorClear(RightEyeSurface))
+                    ok = false;
+                if (ok && !replayColorClear(R9MonoSurface))
+                    ok = false;
+
+                if (ok && !R23FirstColorBaselineLogged)
+                {
+                    R23FirstColorBaselineLogged = true;
+                    spdlog::info(
+                        "VR C1.1 BASELINE: authoritative color clear replay seeds right/mono surfaces; two full-surface StretchRect baseline copies removed");
+                }
 
                 if (ok && TrackedDepthStencil)
                 {
@@ -471,7 +498,7 @@ namespace OutRunVRStereo
             }
 
             if (!R23InitializeStereoFromAuthoritativeBaseline(
-                    device, actual, stencilSafe))
+                    device, actual, stencilSafe, count, rects, color))
                 R23Reject("eye-mono-initialization-failed");
             return hr;
         }
