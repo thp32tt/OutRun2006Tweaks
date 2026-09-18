@@ -17,6 +17,7 @@ namespace Settings
 	// gets composited into the right eye as a translucent ghost.
 	extern Setting<bool> VREnabled;
 	extern Setting<bool> VRStereo;
+	extern Setting<bool> VRMirrorFitDesktop;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
 
@@ -1208,10 +1209,35 @@ class WindowedBorderless : public Hook
 	static void destination(safetyhook::Context& ctx)
 	{
 		HWND window = HWND(ctx.ebp);
-		SetWindowPos(window, 0,
-			Settings::WindowPositionX, Settings::WindowPositionY, 
-			Game::screen_resolution->x, Game::screen_resolution->y,
-			0x40);
+		int x = Settings::WindowPositionX;
+		int y = Settings::WindowPositionY;
+		int width = Game::screen_resolution->x;
+		int height = Game::screen_resolution->y;
+
+		// VR may intentionally render a larger internal backbuffer than the PC
+		// desktop. Keep that render resolution for the HMD/SBS source, but fit the
+		// borderless mirror window to the current monitor so a 3840x2160 render on
+		// a 3440x1440 display is scaled instead of extending off-screen.
+		if (Settings::VREnabled && Settings::VRMirrorFitDesktop)
+		{
+			MONITORINFO monitorInfo{};
+			monitorInfo.cbSize = sizeof(monitorInfo);
+			const HMONITOR monitor = MonitorFromWindow(
+				window, MONITOR_DEFAULTTOPRIMARY);
+			if (monitor && GetMonitorInfoW(monitor, &monitorInfo))
+			{
+				x = monitorInfo.rcMonitor.left;
+				y = monitorInfo.rcMonitor.top;
+				width = monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
+				height = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
+				spdlog::info(
+					"VR PC MIRROR: fitting borderless window to monitor {}x{} while internal backbuffer remains {}x{}",
+					width, height,
+					Game::screen_resolution->x, Game::screen_resolution->y);
+			}
+		}
+
+		SetWindowPos(window, 0, x, y, width, height, 0x40);
 	}
 
 public:
