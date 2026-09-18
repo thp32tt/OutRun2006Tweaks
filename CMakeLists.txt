@@ -302,6 +302,18 @@ target_include_directories(spdlog PUBLIC
 	"external/spdlog/include"
 )
 
+# Build identity used by VR cross-process diagnostics.
+execute_process(
+	COMMAND git rev-parse --short=12 HEAD
+	WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+	OUTPUT_VARIABLE OUTRUN_VR_GIT_SHA
+	OUTPUT_STRIP_TRAILING_WHITESPACE
+	ERROR_QUIET
+)
+if(NOT OUTRUN_VR_GIT_SHA)
+	set(OUTRUN_VR_GIT_SHA "unknown")
+endif()
+
 # Target: outrun2006tweaks
 set(outrun2006tweaks_SOURCES
 	OutRun2006Tweaks.ini
@@ -532,6 +544,7 @@ target_compile_definitions(outrun2006tweaks PUBLIC
 	_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
 	_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
 	DIRECTINPUT_VERSION=0x0800
+	OUTRUN_VR_BUILD_SHA="${OUTRUN_VR_GIT_SHA}"
 )
 
 target_compile_features(outrun2006tweaks PUBLIC
