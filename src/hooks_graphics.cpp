@@ -672,6 +672,23 @@ class RestoreSkyGlow : public Hook
 
 		spdlog::info("RestoreSkyGlow: glow buffers sized {}x{}", w, h);
 
+		// True-stereo VR owns its own per-eye R30 glow chain. Do not allocate
+		// the game's mono glow render targets here: besides wasting a large
+		// buffer at 4K, that chain can only sample D3DBACKBUFFER_TYPE_MONO and
+		// would later leak left-eye content into the right eye.
+		if (Settings::VREnabled && Settings::VRStereo)
+		{
+			if (ReduceHalf)
+			{
+				ReduceHalf->Release();
+				ReduceHalf = nullptr;
+			}
+			spdlog::info(
+				"RestoreSkyGlow: stock mono buffers skipped in true-stereo VR; R30 owns independent eye buffers factor={}",
+				Settings::SkyGlowFactor.get());
+			return;
+		}
+
 		GlowInit_hook.stdcall();
 
 		// Halfway stage for the reduce, so neither StretchRect does more than a 2x.
@@ -754,7 +771,7 @@ public:
 		// Note: hooks/patches are always applied regardless of INI settings, so they can be changed at runtime
 		Memory::VP::Patch(Module::exe_ptr<uint8_t>(GlowEnabled_Addr), uint8_t(SkyGlowAllowed() ? 1 : 0));
 		if (Settings::SkyGlowFactor > 0 && !SkyGlowAllowed())
-			spdlog::warn("VR SKY GLOW GUARD: disabled mono-backbuffer sky glow while true stereo is active to prevent left-eye ghosting in the right eye");
+			spdlog::info("VR SKY GLOW: stock mono-backbuffer chain disabled; stereo renderer owns independent left/right glow extraction and blur");
 
 		Memory::VP::Patch(Module::exe_ptr(AlphaOpTable_ps11_Entry0Snippet), uintptr_t(Snippet_ps11));
 		Memory::VP::Patch(Module::exe_ptr(AlphaOpTable_ps14_Entry0Snippet), uintptr_t(Snippet_ps14));
