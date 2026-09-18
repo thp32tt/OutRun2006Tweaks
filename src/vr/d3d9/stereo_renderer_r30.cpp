@@ -49,6 +49,8 @@ namespace OutRunVRStereo
         bool R30FirstXyzrhwRhwPromotionLogged = false;
         std::uint64_t R30XyzrhwAtomicFallbacks = 0;
         bool R30FirstXyzrhwAtomicFallbackLogged = false;
+        std::uint64_t R30XyzrhwBilateralFallbacks = 0;
+        bool R30FirstXyzrhwBilateralFallbackLogged = false;
 
 
         // R30.6 CPU shadows for XYZRHW vertex/index buffers.
@@ -857,14 +859,19 @@ namespace OutRunVRStereo
         bool R30TransformXyzrhwVertices(
             const void* source, UINT vertexCount, UINT stride,
             const R30XyzrhwState& state, int eye,
-            std::vector<std::uint8_t>& out) noexcept
+            std::vector<std::uint8_t>& out,
+            const std::vector<std::uint8_t>* usedMask,
+            bool allowFullReprojection, bool& usedFullReprojection) noexcept
         {
+            usedFullReprojection = false;
             if (!source || vertexCount == 0 || stride < sizeof(float) * 4 ||
                 eye < 0 || eye > 1)
                 return false;
             const std::size_t bytes =
                 static_cast<std::size_t>(vertexCount) * stride;
             if (bytes == 0 || bytes > 4u * 1024u * 1024u)
+                return false;
+            if (usedMask && usedMask->size() < vertexCount)
                 return false;
 
             try
@@ -881,9 +888,17 @@ namespace OutRunVRStereo
             const float y0 = static_cast<float>(state.viewport.Y);
             const float width = static_cast<float>(state.viewport.Width);
             const float height = static_cast<float>(state.viewport.Height);
-            if (width <= 0.0f || height <= 0.0f)
+            const float minZ = state.viewport.MinZ;
+            const float maxZ = state.viewport.MaxZ;
+            const float depthSpan = maxZ - minZ;
+            if (width <= 0.0f || height <= 0.0f ||
+                !std::isfinite(depthSpan) || depthSpan <= 1.0e-6f)
                 return false;
 
+            auto selected = [&](UINT i) noexcept
+            {
+                return !usedMask || (*usedMask)[i] != 0;
+            };
             auto sourceVertex = [&](UINT i) noexcept -> const float*
             {
                 return reinterpret_cast<const float*>(
@@ -896,25 +911,25 @@ namespace OutRunVRStereo
                     out.data() + static_cast<std::size_t>(i) * stride);
             };
 
-            // Full reprojection must be draw-atomic. The previous per-vertex
-            // fallback could leave one triangle with a mixture of reprojected
-            // Z/RHW and legacy Z/RHW vertices, which tears smoke/skid quads and
-            // corrupts perspective interpolation. Try the entire draw first;
-            // if any vertex is unsafe, discard all partial results and use the
-            // conservative affine path for every vertex in this eye.
-            if (state.worldEffect && state.fullWorldReprojection)
+            if (state.worldEffect && state.fullWorldReprojection &&
+                allowFullReprojection)
             {
                 bool fullDrawOk = true;
+                UINT selectedVertices = 0;
                 for (UINT i = 0; i < vertexCount; ++i)
                 {
+                    if (!selected(i))
+                        continue;
+                    ++selectedVertices;
+
                     const float* src = sourceVertex(i);
                     float* dst = outputVertex(i);
                     const float x = src[0];
                     const float y = src[1];
-                    const float z = src[2];
+                    const float screenZ = src[2];
                     const float rhw = src[3];
                     if (!std::isfinite(x) || !std::isfinite(y) ||
-                        !std::isfinite(z) || !std::isfinite(rhw) ||
+                        !std::isfinite(screenZ) || !std::isfinite(rhw) ||
                         rhw <= 1.0e-6f || rhw >= 1000.0f)
                     {
                         fullDrawOk = false;
@@ -924,40 +939,54 @@ namespace OutRunVRStereo
                     const float ndcX = ((x - x0) / width) * 2.0f - 1.0f;
                     const float ndcY =
                         1.0f - ((y - y0) / height) * 2.0f;
-                    const float invRhw = 1.0f / rhw;
-                    const float clip[4]{
-                        ndcX * invRhw,
-                        ndcY * invRhw,
-                        z * invRhw,
-                        invRhw
-                    };
-
-                    float view[4]{};
-                    for (int col = 0; col < 4; ++col)
-                        for (int row = 0; row < 4; ++row)
-                            view[col] += clip[row] *
-                                state.inverseBaseProjection.m[row][col];
-
-                    if (!std::isfinite(view[0]) ||
-                        !std::isfinite(view[1]) ||
-                        !std::isfinite(view[2]) ||
-                        !std::isfinite(view[3]) ||
-                        std::fabs(view[3]) <= 1.0e-6f)
+                    const float ndcZ = (screenZ - minZ) / depthSpan;
+                    if (!std::isfinite(ndcZ) ||
+                        ndcZ < -0.10f || ndcZ > 1.10f)
                     {
                         fullDrawOk = false;
                         break;
                     }
 
-                    const float invViewW = 1.0f / view[3];
-                    const float eyeView[4]{
-                        view[0] * invViewW -
-                            state.eyeLocalTranslation[eye][0],
-                        view[1] * invViewW -
-                            state.eyeLocalTranslation[eye][1],
-                        view[2] * invViewW -
-                            state.eyeLocalTranslation[eye][2],
+                    const float clipW = 1.0f / rhw;
+                    const float clip[4]{
+                        ndcX * clipW,
+                        ndcY * clipW,
+                        ndcZ * clipW,
+                        clipW
+                    };
+
+                    float restoredViewH[4]{};
+                    for (int col = 0; col < 4; ++col)
+                        for (int row = 0; row < 4; ++row)
+                            restoredViewH[col] += clip[row] *
+                                state.inverseBaseProjection.m[row][col];
+
+                    if (!std::isfinite(restoredViewH[0]) ||
+                        !std::isfinite(restoredViewH[1]) ||
+                        !std::isfinite(restoredViewH[2]) ||
+                        !std::isfinite(restoredViewH[3]) ||
+                        std::fabs(restoredViewH[3]) <= 1.0e-6f)
+                    {
+                        fullDrawOk = false;
+                        break;
+                    }
+
+                    const float invRestoredW = 1.0f / restoredViewH[3];
+                    const float restoredView[4]{
+                        restoredViewH[0] * invRestoredW,
+                        restoredViewH[1] * invRestoredW,
+                        restoredViewH[2] * invRestoredW,
                         1.0f
                     };
+
+                    // Match the normal world path exactly: the reconstructed
+                    // game-view point receives the same rigid eyeInverse that
+                    // BuildEyeConstants/fixed-function world draws use.
+                    float eyeView[4]{};
+                    for (int col = 0; col < 4; ++col)
+                        for (int row = 0; row < 4; ++row)
+                            eyeView[col] += restoredView[row] *
+                                state.eyeInverse[eye].m[row][col];
 
                     float clipEye[4]{};
                     for (int col = 0; col < 4; ++col)
@@ -965,11 +994,14 @@ namespace OutRunVRStereo
                             clipEye[col] += eyeView[row] *
                                 state.eyeProjection[eye].m[row][col];
 
+                    // D3D9 perspective clip-W must stay in front of the eye.
+                    // abs(W) would accept a point behind the camera and mirror
+                    // it back into the visible image.
                     if (!std::isfinite(clipEye[0]) ||
                         !std::isfinite(clipEye[1]) ||
                         !std::isfinite(clipEye[2]) ||
                         !std::isfinite(clipEye[3]) ||
-                        std::fabs(clipEye[3]) <= 1.0e-6f)
+                        clipEye[3] <= 1.0e-6f)
                     {
                         fullDrawOk = false;
                         break;
@@ -982,7 +1014,7 @@ namespace OutRunVRStereo
                     if (!std::isfinite(fullX) ||
                         !std::isfinite(fullY) ||
                         !std::isfinite(fullZ) ||
-                        fullZ < -0.25f || fullZ > 1.25f)
+                        fullZ < -0.05f || fullZ > 1.05f)
                     {
                         fullDrawOk = false;
                         break;
@@ -992,8 +1024,11 @@ namespace OutRunVRStereo
                         x0 + (fullX + 1.0f) * 0.5f * width;
                     const float transformedY =
                         y0 + (1.0f - fullY) * 0.5f * height;
+                    const float transformedZ =
+                        minZ + fullZ * depthSpan;
                     if (!std::isfinite(transformedX) ||
-                        !std::isfinite(transformedY))
+                        !std::isfinite(transformedY) ||
+                        !std::isfinite(transformedZ))
                     {
                         fullDrawOk = false;
                         break;
@@ -1001,25 +1036,31 @@ namespace OutRunVRStereo
 
                     dst[0] = transformedX;
                     dst[1] = transformedY;
-                    dst[2] = fullZ;
+                    dst[2] = transformedZ;
                     dst[3] = invEyeW;
                 }
 
-                if (fullDrawOk)
+                if (fullDrawOk && selectedVertices != 0)
+                {
+                    usedFullReprojection = true;
                     return true;
+                }
 
                 ++R30XyzrhwAtomicFallbacks;
                 if (!R30FirstXyzrhwAtomicFallbackLogged)
                 {
                     R30FirstXyzrhwAtomicFallbackLogged = true;
                     spdlog::info(
-                        "VR R30.5 XYZRHW WORLD: full reprojection rejected for one or more vertices; entire draw uses affine fallback to keep Z/RHW interpolation coherent");
+                        "VR R30.6 XYZRHW WORLD: full reprojection rejected for a referenced vertex; this eye candidate is discarded before bilateral fallback selection");
                 }
                 std::memcpy(out.data(), source, bytes);
             }
 
             for (UINT i = 0; i < vertexCount; ++i)
             {
+                if (!selected(i))
+                    continue;
+
                 float* p = outputVertex(i);
                 const float x = p[0];
                 const float y = p[1];
@@ -1050,9 +1091,7 @@ namespace OutRunVRStereo
                         correctedY +=
                             state.parallaxPerRhwY[eye] * rhw;
                     }
-                    // Keep the original Z/RHW pair together on the fallback
-                    // path. This preserves the game's perspective interpolation
-                    // instead of mixing coordinate spaces inside a primitive.
+                    // Fallback keeps the game's original Z/RHW pair intact.
                 }
                 else
                 {
@@ -1071,6 +1110,40 @@ namespace OutRunVRStereo
                     return false;
                 p[0] = transformedX;
                 p[1] = transformedY;
+            }
+            return true;
+        }
+
+        bool R30TransformXyzrhwStereo(
+            const void* source, UINT vertexCount, UINT stride,
+            const R30XyzrhwState& state,
+            std::vector<std::uint8_t>& left,
+            std::vector<std::uint8_t>& right,
+            const std::vector<std::uint8_t>* usedMask = nullptr) noexcept
+        {
+            bool leftFull = false;
+            bool rightFull = false;
+            if (!R30TransformXyzrhwVertices(source, vertexCount, stride,
+                    state, 0, left, usedMask, true, leftFull) ||
+                !R30TransformXyzrhwVertices(source, vertexCount, stride,
+                    state, 1, right, usedMask, true, rightFull))
+                return false;
+
+            if (leftFull != rightFull)
+            {
+                ++R30XyzrhwBilateralFallbacks;
+                if (!R30FirstXyzrhwBilateralFallbackLogged)
+                {
+                    R30FirstXyzrhwBilateralFallbackLogged = true;
+                    spdlog::info(
+                        "VR R30.6 XYZRHW WORLD: one eye rejected full reprojection; both eyes are forced onto the same affine fallback policy");
+                }
+                bool ignored = false;
+                if (!R30TransformXyzrhwVertices(source, vertexCount, stride,
+                        state, 0, left, usedMask, false, ignored) ||
+                    !R30TransformXyzrhwVertices(source, vertexCount, stride,
+                        state, 1, right, usedMask, false, ignored))
+                    return false;
             }
             return true;
         }
