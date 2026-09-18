@@ -851,6 +851,17 @@ float4 PSMain(VSOut input) : SV_Target
         UvRect whole{};
         if (!GetGameUv(whole))
             return false;
+
+        // This override is reached from an SBS capture path. A theater quad is
+        // visible to both eyes, so showing the complete game UV would expose
+        // left+right side-by-side as a flat panel in the HMD. Recovery theater
+        // is intentionally mono: show only the left-eye half until projection
+        // stereo is valid again.
+        UvRect theaterUv = whole;
+        theaterUv.w *= 0.5f;
+        if (theaterUv.w <= 0.0f)
+            return false;
+
         if (!EnsureSwapchain(Theater, session, 1920, 1080, 1))
             return false;
 
@@ -862,7 +873,8 @@ float4 PSMain(VSOut input) : SV_Target
             Release(Theater);
             return false;
         }
-        const bool ok = RenderTo(Theater.rtvs[image][0], Theater.width, Theater.height, whole);
+        const bool ok = RenderTo(Theater.rtvs[image][0], Theater.width,
+            Theater.height, theaterUv);
         const bool released = Release(Theater);
         if (!ok || !released)
             return false;
@@ -879,15 +891,17 @@ float4 PSMain(VSOut input) : SV_Target
             static_cast<std::int32_t>(Theater.height)
         };
         quad.subImage.imageArrayIndex = 0;
-        const float aspect = whole.h > 0.f
-            ? (whole.w * SourceWidth) / (whole.h * SourceHeight) : (16.f / 9.f);
+        const float aspect = theaterUv.h > 0.f
+            ? (theaterUv.w * SourceWidth) /
+                (theaterUv.h * SourceHeight)
+            : (16.f / 9.f);
         quad.size.width = 2.f;
         quad.size.height = 2.f / std::max(0.5f, aspect);
         ++TheaterSuccess;
         if (!TheaterLogged)
         {
             TheaterLogged = true;
-            std::cerr << "[R19] MENU theater fallback ACTIVE source="
+            std::cerr << "[R19] MENU theater fallback ACTIVE left-eye-only source="
                       << SourceWidth << "x" << SourceHeight << "\n";
         }
         return true;
