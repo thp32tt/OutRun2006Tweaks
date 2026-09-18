@@ -19,7 +19,7 @@ namespace OutRunVrR23VerifiedBundle
     // Keep the same grace budget as the host compositor. A newer game frame may
     // be published while this bundle is still valid; that must not invalidate a
     // texture/pose pair the host already owns and is about to submit.
-    inline constexpr std::uint64_t MaxPresentationAgeMs = 250;
+    inline constexpr std::uint64_t MaxPresentationAgeMs = 1000;
 
     struct Snapshot
     {
