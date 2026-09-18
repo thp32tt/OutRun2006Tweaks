@@ -1428,7 +1428,8 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R30 HUD: ScreenSpace2D correction READY with 0.65 common-center HUD scale; R30.3 XYZRHW game-FOV -> OpenXR-FOV world reprojection + RHW eye parallax READY");
+                        "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale default/current={:.2f}; R30.4 XYZRHW full game-projection -> OpenXR-eye reprojection READY",
+                        R30HudScaleValue());
                     return 0;
                 }
                 Sleep(25);
