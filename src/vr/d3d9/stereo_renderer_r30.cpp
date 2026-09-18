@@ -841,7 +841,7 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R30.1 HUD/EFFECT: shader ScreenSpace2D + fixed-function XYZRHW UP stereo correction READY");
+                        "VR R30 HUD: ScreenSpace2D asymmetric-FOV correction overlay READY; R30.1 fixed-function XYZRHW UP stereo correction READY");
                     return 0;
                 }
                 Sleep(25);
