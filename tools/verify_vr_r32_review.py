@@ -18,6 +18,21 @@ def require(rel: str, *markers: str) -> str:
     return data
 
 
+eligibility = require(
+    "src/vr/runtime_eligibility.hpp",
+    "ExternalSafetyBlock",
+    "SetExternalSafetyBlock",
+    "!ExternalSafetyBlock.load(std::memory_order_acquire)",
+)
+baseline_verified = eligibility.find("inline void BaselineVerified()")
+baseline_block = eligibility.find(
+    "ExternalSafetyBlock.load(std::memory_order_acquire)", baseline_verified)
+stereo_open = eligibility.find(
+    "StereoAllowed.store(true, std::memory_order_release)", baseline_verified)
+if min(baseline_verified, baseline_block, stereo_open) < 0 or         not (baseline_verified < baseline_block < stereo_open):
+    raise SystemExit(
+        "external ResetEx safety block must be checked before BaselineVerified reopens stereo")
+
 policy = require(
     "src/vr/d3d9/r32_policy.hpp",
     "RearmMonoSafetyEpoch",
@@ -48,6 +63,8 @@ r32 = require(
     "timed-out producer EVENT remains pending",
     "R32DirectIdentityMatches",
     "R32DirectCopyPathRejected",
+    "A query error does not prove GPU completion",
+    "StretchRect commands are already queued",
     "DirectGPU copy path is disabled until Reset/interop revalidation",
     "R32EnsureDirectResources must run before this cached rejection",
     "VR R32 PERF 5s",
@@ -63,6 +80,21 @@ copy_reject = r32.find("if (R32DirectCopyPathRejected)", resolve_start)
 if min(resolve_start, ensure_direct, copy_reject) < 0 or ensure_direct > copy_reject:
     raise SystemExit(
         "R32 DirectGPU copy rejection must be checked only after host identity/interop revalidation")
+
+drain_start = r32.find("bool R32DrainPendingProducerFence")
+drain_error = r32.find("A query error does not prove GPU completion", drain_start)
+drain_end = r32.find("bool ResolveDirectTransportR32", drain_start)
+if min(drain_start, drain_error, drain_end) < 0:
+    raise SystemExit("could not locate R32 pending-fence query-error quarantine")
+if "R32ProducerFencePending[slotIndex] = false;" in r32[drain_error:drain_end]:
+    raise SystemExit(
+        "R32 query-error path must not mark a producer EVENT complete/reusable")
+
+issue_marker = r32.find("StretchRect commands are already queued", resolve_start)
+issue_reject = r32.find("R32DirectCopyPathRejected = true;", issue_marker)
+if min(issue_marker, issue_reject) < 0 or issue_reject < issue_marker:
+    raise SystemExit(
+        "R32 EVENT Issue failure must quarantine DirectGPU after queued eye copies")
 
 r33 = require(
     "src/vr/d3d9/stereo_renderer_r33.cpp",
@@ -139,6 +171,8 @@ if resetex < 0 or restore < resetex:
 ex_r15 = require(
     "src/vr/d3d9/ex_device_upgrade_r15.cpp",
     "SetFinalCompatOverlayReady(false)",
+    "SetExternalSafetyBlock(true)",
+    "SetExternalSafetyBlock(!healthy)",
     "SetFinalCompatOverlayReady(true)",
     "DisarmLegacyResetHook()",
     "InstallStereoHooksSynchronously(device)",
@@ -151,6 +185,9 @@ if ex_r15.find("DisarmLegacyResetHook()") > ex_r15.find("InstallStereoHooksSynch
 stereo_base = require(
     "src/vr/d3d9/stereo_renderer_r7.inc",
     "#include <mutex>",
+    "StereoBaseCallbacksArmed",
+    "InlineHook::StartDisabled",
+    "disabled-first callbacks armed atomically at the behavior boundary",
     "std::mutex StereoInstallMutex",
     "std::lock_guard<std::mutex> installLock",
     "InstallStereoHooksSynchronously",
@@ -189,6 +226,9 @@ require(
 host_direct = require(
     "vrhost/src/runtime/r32_direct_submit.hpp",
     "CanFastSubmit",
+    "AckFaultGeneration",
+    "Completion is unknowable",
+    "SafeEye fallback perform a separately fenced copy/ACK",
     "ProjectionMatchesSnapshot",
     "ArmConsumptionFence",
     "D3D11_ASYNC_GETDATA_DONOTFLUSH",
@@ -205,6 +245,31 @@ host_direct = require(
 # old unconditional End(query)+Flush() sequence.
 if "Context->End(pending.fence);\n        OutRunVrFinalTest::Context->Flush();" in host_direct:
     raise SystemExit("R32 host must not Flush every direct frame")
+query_error = host_direct.find("if (FAILED(hr))")
+fault_generation = host_direct.find("AckFaultGeneration = generation", query_error)
+fast_gate = host_direct.find("AckFaultGeneration == generation")
+if min(query_error, fault_generation, fast_gate) < 0:
+    raise SystemExit("R32 host ACK query failure must disable fast-submit for that generation")
+if not (query_error < fault_generation < fast_gate):
+    raise SystemExit("R32 host ACK fault must be recorded before the fast-submit generation gate")
+
+r34 = require(
+    "src/vr/d3d9/stereo_renderer_r34.cpp",
+    "SetExternalSafetyBlock(true)",
+    "SetExternalSafetyBlock(!healthy)",
+    "Install/state-sync",
+    "Present/pre",
+)
+if r34.find("Present/pre") > r34.find("R34PresentR33Hook.stdcall<HRESULT>"):
+    raise SystemExit("R34 must reassert Reset replay fail-close before lower Present work")
+
+r31 = load("src/vr/d3d9/stereo_renderer_r31.cpp")
+state_enable = r31.find("const bool stateHooks =")
+end_enable = r31.find("R31EndStateBlockHook.enable()", state_enable)
+begin_enable = r31.find("R31BeginStateBlockHook.enable()", state_enable)
+create_enable = r31.find("R31CreateStateBlockHook.enable()", state_enable)
+if min(state_enable, end_enable, begin_enable, create_enable) < 0 or         not (end_enable < begin_enable < create_enable):
+    raise SystemExit("R31 StateBlock hooks must arm End before Begin before Create")
 
 host_main = require(
     "vrhost/src/main.cpp",
@@ -250,6 +315,13 @@ create_r14 = r14.find("HRESULT __stdcall CreateTextureCompatDestR14")
 fail_closed_r14 = r14.find("return D3DERR_NOTAVAILABLE;", create_r14)
 if create_r14 < 0 or fail_closed_r14 < create_r14:
     raise SystemExit("R14 MANAGED 2D shadow setup failure must fail resource creation closed")
+
+require(
+    "vrhost/tests/runtime_eligibility_smoke.cpp",
+    "SetExternalSafetyBlock(true)",
+    "BaselineVerified();",
+    "assert(!MayInjectStereo());",
+)
 
 require(
     "vrhost/tests/r32_policy_smoke.cpp",
