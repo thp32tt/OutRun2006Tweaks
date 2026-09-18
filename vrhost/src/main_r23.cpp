@@ -85,6 +85,7 @@ namespace
 
     struct R23FinalCounters
     {
+        std::uint64_t r32FastDirect = 0;
         std::uint64_t exact = 0;
         std::uint64_t softGrace = 0;
         std::uint64_t direct = 0;
@@ -100,6 +101,7 @@ namespace
     {
         using namespace OutRunVrR24BlackScreenGuard;
         return {
+            OutRunVrR32DirectSubmit::FastDirectSubmits,
             ExactProjectionSubmits,
             SoftGraceProjectionSubmits,
             DirectSafeProjectionSubmits,
@@ -117,6 +119,8 @@ namespace
         const R23FinalCounters& after,
         const char* requested) noexcept
     {
+        if (after.r32FastDirect != before.r32FastDirect)
+            return "projection-direct-r32-fast";
         if (after.exact != before.exact) return "projection-exact";
         if (after.softGrace != before.softGrace) return "projection-soft-grace";
         if (after.direct != before.direct) return "projection-direct-safe";
