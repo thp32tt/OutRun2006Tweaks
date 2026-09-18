@@ -40,8 +40,12 @@ namespace Settings
 		"Applies the OpenXR HMD orientation at OutRun's verified D3D9 WorldViewProjection upload." };
 	Setting<bool> VRStereo{ "VR", "Stereo", true,
 		"Renders true left/right geometry stereo into an SBS game frame or verified shared-eye transport. Menus remain on the fixed theater quad." };
-	Setting<bool> VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", false,
-		"Opt-in guarded D3D9Ex shared-eye transport. Legacy lost-device/Reset semantics are translated, R14 tracks actual external 2D writes, and unsupported cube/volume lock fallbacks fail closed; hardware validation is still required before making this the default." };
+	Setting<bool> VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", true,
+		"Prefers guarded D3D9Ex shared-eye transport so gameplay can bypass Desktop Duplication. Disable to return to classic D3D9/SBS capture." };
+	Setting<bool> VRDirectGpuOnly{ "VR", "DirectGpuOnly", true,
+		"During gameplay, rejects classic Desktop-Duplication stereo candidates and keeps DirectGPU/cached OpenXR projection paths only. Menus may still use the mono theater capture path." };
+	Setting<float> VRTargetRefreshRateHz{ "VR", "TargetRefreshRateHz", 120.0f,
+		"Requests this headset refresh rate through XR_FB_display_refresh_rate when the runtime supports it. 120 Hz is cadence-friendly for a 60 Hz game. Set 0 to leave the runtime rate unchanged.", Range<float>{ 0.0f, 144.0f } };
 	Setting<bool> VRPositionalTracking{ "VR", "PositionalTracking", true,
 		"Applies 6DoF HMD X/Y/Z movement in addition to orientation. Disable this option if a title-specific camera/culling issue is observed; stereo eye separation is independent." };
 	Setting<bool> VRCullingCameraSync{ "VR", "CullingCameraSync", true,
@@ -97,6 +101,17 @@ namespace OutRunVR
 					spdlog::warn("VR AUTO HOST: {} not found; start the host manually", hostPath.string());
 					return false;
 				}
+				// The host inherits these test-mode switches. Keeping transport
+				// policy in the same [VR] config as D3D9Ex avoids mismatched
+				// game/host modes during cadence testing.
+				SetEnvironmentVariableA("OUTRUN_VR_DIRECT_TRANSPORT", "1");
+				SetEnvironmentVariableA("OUTRUN_VR_DIRECT_ONLY",
+					Settings::VRDirectGpuOnly ? "1" : "0");
+				const std::string refreshHz =
+					std::to_string(Settings::VRTargetRefreshRateHz.get());
+				SetEnvironmentVariableA("OUTRUN_VR_TARGET_REFRESH_HZ",
+					refreshHz.c_str());
+
 				std::wstring command = L"\"" + hostPath.wstring() + L"\"";
 				std::wstring workingDir = gameDir.wstring();
 				STARTUPINFOW si{};
@@ -151,11 +166,18 @@ namespace OutRunVR
 			Settings::VRAutoLaunchHost.needs_restart();
 			Settings::VRMirrorFitDesktop.needs_restart();
 			Settings::VRDisableDesktopVsync.needs_restart();
+			Settings::VRPreferD3D9Ex.needs_restart();
+			Settings::VRDirectGpuOnly.needs_restart();
+			Settings::VRTargetRefreshRateHz.needs_restart();
 		}
 
 		bool apply() override
 		{
-			spdlog::info("VR: classic D3D9 + fresh SBS/Desktop Duplication is the validated default; guarded D3D9Ex full-eye transport remains opt-in pending hardware validation; CalcCameraMatrix untouched");
+			spdlog::info(
+				"VR: D3D9Ex DirectGPU preference={} directOnly={} targetRefreshHz={:.1f}; classic SBS remains a configurable fallback; CalcCameraMatrix untouched",
+				Settings::VRPreferD3D9Ex.get(),
+				Settings::VRDirectGpuOnly.get(),
+				Settings::VRTargetRefreshRateHz.get());
 			if (Settings::VREnabled && Settings::VRAutoLaunchHost)
 			{
 				HANDLE thread = CreateThread(nullptr, 0, VRAutoLaunchHostThread, nullptr, 0, nullptr);
