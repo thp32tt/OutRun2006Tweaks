@@ -198,8 +198,12 @@ if "R14ShadowCapacity" in r14 or "R14ShadowCursor" in r14:
 
 settings = require(
     "src/vr/settings.cpp",
-    'VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", false',
-    "D3D9Ex full-eye transport remains opt-in pending hardware validation",
+    'VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", true',
+    'VRDirectGpuOnly{ "VR", "DirectGpuOnly", true',
+    'VRTargetRefreshRateHz{ "VR", "TargetRefreshRateHz", 120.0f',
+    "OUTRUN_VR_DIRECT_TRANSPORT",
+    "OUTRUN_VR_DIRECT_ONLY",
+    "OUTRUN_VR_TARGET_REFRESH_HZ",
 )
 
 # R23 installer workers may only request cleanup. Live OutRun camera/projection
