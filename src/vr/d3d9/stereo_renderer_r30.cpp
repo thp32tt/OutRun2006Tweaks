@@ -42,7 +42,7 @@ namespace OutRunVRStereo
         // Keep the fixed-function HUD comfortably inside the Quest 3 visible
         // area. This is a projection-space scale around the optical centre, not
         // a game UI layout change, so menu/UI coordinates remain untouched.
-        constexpr float R30HudScale = 0.82f;
+        constexpr float R30HudScale = 0.65f;
 
         bool R30CurrentPassIsScreenSpace2D() noexcept
         {
@@ -401,9 +401,12 @@ namespace OutRunVRStereo
                     // HUD is head-relative. Keep the asymmetric-FOV correction,
                     // then shrink the complete HUD toward the optical centre so
                     // speed/time/position remain inside the Quest 3 view.
-                    correctedX = R30HudScale *
-                        (state.eyeScale[eye] * ndcX +
-                         state.eyeOffset[eye]);
+                    // Scale the common HUD coordinate first, then apply the
+                    // eye-specific asymmetric-FOV offset. Scaling the offset
+                    // itself makes convergence drift as HUD size changes.
+                    correctedX =
+                        state.eyeScale[eye] * (R30HudScale * ndcX) +
+                        state.eyeOffset[eye];
                     correctedY = R30HudScale * ndcY;
                 }
 
@@ -632,6 +635,305 @@ namespace OutRunVRStereo
                 "R30.2/DrawIndexedPrimitiveUP-XYZRHW");
         }
 
+
+        HRESULT R30TryXyzrhwPrimitiveVB(
+            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+            UINT startVertex, UINT primitiveCount)
+        {
+            R30XyzrhwState state{};
+            if (!R30PrepareXyzrhwState(device, state))
+                return E_NOTIMPL;
+
+            const UINT vertexCount =
+                R30PrimitiveElementCount(type, primitiveCount);
+            if (!vertexCount || vertexCount > 262144u)
+                return E_NOTIMPL;
+
+            IDirect3DVertexBuffer9* vb = nullptr;
+            UINT streamOffset = 0;
+            UINT stride = 0;
+            if (FAILED(device->GetStreamSource(
+                    0, &vb, &streamOffset, &stride)) ||
+                !vb || stride < sizeof(float) * 4)
+            {
+                if (vb) vb->Release();
+                return E_NOTIMPL;
+            }
+
+            D3DVERTEXBUFFER_DESC desc{};
+            const std::uint64_t firstByte =
+                static_cast<std::uint64_t>(streamOffset) +
+                static_cast<std::uint64_t>(startVertex) * stride;
+            const std::uint64_t byteCount =
+                static_cast<std::uint64_t>(vertexCount) * stride;
+            if (FAILED(vb->GetDesc(&desc)) || firstByte > desc.Size ||
+                byteCount > desc.Size - firstByte ||
+                firstByte > UINT_MAX || byteCount > UINT_MAX)
+            {
+                vb->Release();
+                return E_NOTIMPL;
+            }
+
+            void* source = nullptr;
+            if (FAILED(vb->Lock(static_cast<UINT>(firstByte),
+                    static_cast<UINT>(byteCount), &source, D3DLOCK_READONLY)) ||
+                !source)
+            {
+                vb->Release();
+                return E_NOTIMPL;
+            }
+
+            const bool configured = R30ConfigureXyzrhwWorldEffect(
+                device, source, vertexCount, stride, state);
+            std::vector<std::uint8_t> left;
+            std::vector<std::uint8_t> right;
+            const bool transformed = configured &&
+                R30TransformXyzrhwVertices(
+                    source, vertexCount, stride, state, 0, left) &&
+                R30TransformXyzrhwVertices(
+                    source, vertexCount, stride, state, 1, right);
+            vb->Unlock();
+
+            if (!transformed)
+            {
+                vb->Release();
+                ++R30XyzrhwFallbacks;
+                return E_NOTIMPL;
+            }
+
+            auto leftDraw = [&]() {
+                return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                    device, type, primitiveCount, left.data(), stride);
+            };
+            auto rightDraw = [&]() {
+                return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                    device, type, primitiveCount, right.data(), stride);
+            };
+            const HRESULT hr = R30ExecuteXyzrhwStereo(
+                device, state, leftDraw, rightDraw,
+                "R30.4/DrawPrimitiveVB-XYZRHW");
+
+            // DrawPrimitiveUP clears stream 0. Restore the game's VB binding so
+            // the next draw sees exactly the state that preceded this conversion.
+            {
+                InternalPassScope guard;
+                if (FAILED(device->SetStreamSource(
+                        0, vb, streamOffset, stride)))
+                {
+                    NoteRestoreFailure("R30.4 VB stream restore");
+                    R29ArmMonoSafety();
+                }
+            }
+            vb->Release();
+            return hr;
+        }
+
+        HRESULT R30TryXyzrhwIndexedPrimitiveVB(
+            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+            INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
+            UINT startIndex, UINT primitiveCount)
+        {
+            R30XyzrhwState state{};
+            if (!R30PrepareXyzrhwState(device, state))
+                return E_NOTIMPL;
+
+            const UINT indexCount =
+                R30PrimitiveElementCount(type, primitiveCount);
+            if (!indexCount || !numVertices || indexCount > 524288u)
+                return E_NOTIMPL;
+
+            IDirect3DVertexBuffer9* vb = nullptr;
+            IDirect3DIndexBuffer9* ib = nullptr;
+            UINT streamOffset = 0;
+            UINT stride = 0;
+            if (FAILED(device->GetStreamSource(
+                    0, &vb, &streamOffset, &stride)) ||
+                !vb || stride < sizeof(float) * 4 ||
+                FAILED(device->GetIndices(&ib)) || !ib)
+            {
+                if (ib) ib->Release();
+                if (vb) vb->Release();
+                return E_NOTIMPL;
+            }
+
+            D3DINDEXBUFFER_DESC ibDesc{};
+            if (FAILED(ib->GetDesc(&ibDesc)) ||
+                (ibDesc.Format != D3DFMT_INDEX16 &&
+                 ibDesc.Format != D3DFMT_INDEX32))
+            {
+                ib->Release();
+                vb->Release();
+                return E_NOTIMPL;
+            }
+            const UINT indexSize =
+                ibDesc.Format == D3DFMT_INDEX16 ? 2u : 4u;
+            const std::uint64_t firstIndexByte =
+                static_cast<std::uint64_t>(startIndex) * indexSize;
+            const std::uint64_t indexBytes =
+                static_cast<std::uint64_t>(indexCount) * indexSize;
+            if (firstIndexByte > ibDesc.Size ||
+                indexBytes > ibDesc.Size - firstIndexByte ||
+                firstIndexByte > UINT_MAX || indexBytes > UINT_MAX)
+            {
+                ib->Release();
+                vb->Release();
+                return E_NOTIMPL;
+            }
+
+            void* rawIndices = nullptr;
+            if (FAILED(ib->Lock(static_cast<UINT>(firstIndexByte),
+                    static_cast<UINT>(indexBytes), &rawIndices,
+                    D3DLOCK_READONLY)) || !rawIndices)
+            {
+                ib->Release();
+                vb->Release();
+                return E_NOTIMPL;
+            }
+
+            std::vector<std::uint32_t> physical(indexCount);
+            std::int64_t minPhysical = INT64_MAX;
+            std::int64_t maxPhysical = INT64_MIN;
+            for (UINT i = 0; i < indexCount; ++i)
+            {
+                const std::uint32_t raw =
+                    ibDesc.Format == D3DFMT_INDEX16
+                    ? static_cast<const std::uint16_t*>(rawIndices)[i]
+                    : static_cast<const std::uint32_t*>(rawIndices)[i];
+                const std::int64_t p =
+                    static_cast<std::int64_t>(baseVertexIndex) + raw;
+                if (p < 0 || p > UINT_MAX)
+                {
+                    ib->Unlock();
+                    ib->Release();
+                    vb->Release();
+                    return E_NOTIMPL;
+                }
+                physical[i] = static_cast<std::uint32_t>(p);
+                minPhysical = std::min(minPhysical, p);
+                maxPhysical = std::max(maxPhysical, p);
+            }
+            ib->Unlock();
+
+            if (minPhysical == INT64_MAX || maxPhysical < minPhysical)
+            {
+                ib->Release();
+                vb->Release();
+                return E_NOTIMPL;
+            }
+            const std::uint64_t vertexCount64 =
+                static_cast<std::uint64_t>(maxPhysical - minPhysical) + 1u;
+            if (!vertexCount64 || vertexCount64 > 262144u)
+            {
+                ib->Release();
+                vb->Release();
+                return E_NOTIMPL;
+            }
+            const UINT vertexCount = static_cast<UINT>(vertexCount64);
+
+            D3DVERTEXBUFFER_DESC vbDesc{};
+            const std::uint64_t firstVertexByte =
+                static_cast<std::uint64_t>(streamOffset) +
+                static_cast<std::uint64_t>(minPhysical) * stride;
+            const std::uint64_t vertexBytes =
+                static_cast<std::uint64_t>(vertexCount) * stride;
+            if (FAILED(vb->GetDesc(&vbDesc)) ||
+                firstVertexByte > vbDesc.Size ||
+                vertexBytes > vbDesc.Size - firstVertexByte ||
+                firstVertexByte > UINT_MAX || vertexBytes > UINT_MAX)
+            {
+                ib->Release();
+                vb->Release();
+                return E_NOTIMPL;
+            }
+
+            void* source = nullptr;
+            if (FAILED(vb->Lock(static_cast<UINT>(firstVertexByte),
+                    static_cast<UINT>(vertexBytes), &source,
+                    D3DLOCK_READONLY)) || !source)
+            {
+                ib->Release();
+                vb->Release();
+                return E_NOTIMPL;
+            }
+
+            const bool configured = R30ConfigureXyzrhwWorldEffect(
+                device, source, vertexCount, stride, state);
+            std::vector<std::uint8_t> left;
+            std::vector<std::uint8_t> right;
+            const bool transformed = configured &&
+                R30TransformXyzrhwVertices(
+                    source, vertexCount, stride, state, 0, left) &&
+                R30TransformXyzrhwVertices(
+                    source, vertexCount, stride, state, 1, right);
+            vb->Unlock();
+            if (!transformed)
+            {
+                ib->Release();
+                vb->Release();
+                ++R30XyzrhwFallbacks;
+                return E_NOTIMPL;
+            }
+
+            std::vector<std::uint16_t> indices16;
+            std::vector<std::uint32_t> indices32;
+            const void* rebased = nullptr;
+            if (ibDesc.Format == D3DFMT_INDEX16)
+            {
+                indices16.resize(indexCount);
+                for (UINT i = 0; i < indexCount; ++i)
+                {
+                    const std::uint64_t v =
+                        physical[i] - static_cast<std::uint64_t>(minPhysical);
+                    if (v > 0xFFFFu)
+                    {
+                        ib->Release();
+                        vb->Release();
+                        return E_NOTIMPL;
+                    }
+                    indices16[i] = static_cast<std::uint16_t>(v);
+                }
+                rebased = indices16.data();
+            }
+            else
+            {
+                indices32.resize(indexCount);
+                for (UINT i = 0; i < indexCount; ++i)
+                    indices32[i] = physical[i] -
+                        static_cast<std::uint32_t>(minPhysical);
+                rebased = indices32.data();
+            }
+
+            auto leftDraw = [&]() {
+                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+                    device, type, 0u, vertexCount, primitiveCount,
+                    rebased, ibDesc.Format, left.data(), stride);
+            };
+            auto rightDraw = [&]() {
+                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+                    device, type, 0u, vertexCount, primitiveCount,
+                    rebased, ibDesc.Format, right.data(), stride);
+            };
+            const HRESULT hr = R30ExecuteXyzrhwStereo(
+                device, state, leftDraw, rightDraw,
+                "R30.4/DrawIndexedPrimitiveVB-XYZRHW");
+
+            // DrawIndexedPrimitiveUP clears stream 0 and the index buffer.
+            {
+                InternalPassScope guard;
+                bool restoreOk = SUCCEEDED(device->SetStreamSource(
+                    0, vb, streamOffset, stride));
+                restoreOk = SUCCEEDED(device->SetIndices(ib)) && restoreOk;
+                if (!restoreOk)
+                {
+                    NoteRestoreFailure("R30.4 VB/IB restore");
+                    R29ArmMonoSafety();
+                }
+            }
+            ib->Release();
+            vb->Release();
+            return hr;
+        }
+
         bool R30BuildScreenSpaceEyeConstants(
             IDirect3DDevice9* device,
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
@@ -665,8 +967,7 @@ namespace OutRunVRStereo
                 clipCorrection._44 = 1.0f;
                 // Row-vector clip transform. Scale both axes around clip-space
                 // centre and preserve the eye-specific asymmetric-FOV offset.
-                clipCorrection._41 =
-                    eyeOffset[eye] * R30HudScale;
+                clipCorrection._41 = eyeOffset[eye];
 
                 const D3DMATRIX corrected =
                     MultiplyMatrix(stockWvp, clipCorrection);
@@ -856,6 +1157,11 @@ namespace OutRunVRStereo
         HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
+            const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
+                device, type, startVertex, primitiveCount);
+            if (xyzrhw != E_NOTIMPL)
+                return xyzrhw;
+
             auto actual = [&]() {
                 return DrawPrimitiveHook.stdcall<HRESULT>(
                     device, type, startVertex, primitiveCount);
@@ -873,6 +1179,12 @@ namespace OutRunVRStereo
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
+            const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
+                device, type, baseVertexIndex, minVertexIndex, numVertices,
+                startIndex, primitiveCount);
+            if (xyzrhw != E_NOTIMPL)
+                return xyzrhw;
+
             auto actual = [&]() {
                 return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
                     baseVertexIndex, minVertexIndex, numVertices, startIndex,
@@ -1010,7 +1322,7 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R30 HUD: ScreenSpace2D correction READY with 0.82 centered HUD scale; R30.3 XYZRHW game-FOV -> OpenXR-FOV world reprojection + RHW eye parallax READY");
+                        "VR R30 HUD: ScreenSpace2D correction READY with 0.65 common-center HUD scale; R30.3 XYZRHW game-FOV -> OpenXR-FOV world reprojection + RHW eye parallax READY");
                     return 0;
                 }
                 Sleep(25);
