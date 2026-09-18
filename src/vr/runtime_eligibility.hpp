@@ -37,6 +37,22 @@ namespace OutRunVR::RuntimeEligibility
     // current full color/depth/stencil baseline before StereoAllowed opens.
     inline std::atomic<bool> RecoveryPoseWarmup{ false };
 
+    // Compatibility layers can hold stereo closed independently of host freshness
+    // and baseline recovery. ResetEx replay health uses this gate so a later
+    // BaselineVerified() cannot reopen injection while classic state is unsafe.
+    inline std::atomic<bool> ExternalSafetyBlock{ false };
+
+    inline void SetExternalSafetyBlock(bool blocked) noexcept
+    {
+        ExternalSafetyBlock.store(blocked, std::memory_order_release);
+        if (blocked)
+        {
+            StereoAllowed.store(false, std::memory_order_release);
+            RecoveryPending.store(true, std::memory_order_release);
+            RecoveryPoseWarmup.store(false, std::memory_order_release);
+        }
+    }
+
     // R22/R23 are the final game-side safety overlays. Earlier layers may see a
     // fresh host or plausible clear while those hooks are still being installed,
     // but that must never make stereo/WVP eligible.
@@ -75,6 +91,7 @@ namespace OutRunVR::RuntimeEligibility
     {
         if (!SafetyOverlayReady.load(std::memory_order_acquire) ||
             !HostFresh.load(std::memory_order_acquire) ||
+            ExternalSafetyBlock.load(std::memory_order_acquire) ||
             !RecoveryPending.load(std::memory_order_acquire))
             return;
         RecoveryPoseWarmup.store(true, std::memory_order_release);
@@ -84,6 +101,7 @@ namespace OutRunVR::RuntimeEligibility
     {
         return SafetyOverlayReady.load(std::memory_order_acquire) &&
             HostFresh.load(std::memory_order_acquire) &&
+            !ExternalSafetyBlock.load(std::memory_order_acquire) &&
             RecoveryPending.load(std::memory_order_acquire) &&
             RecoveryPoseWarmup.load(std::memory_order_acquire) &&
             !StereoAllowed.load(std::memory_order_acquire);
@@ -92,7 +110,8 @@ namespace OutRunVR::RuntimeEligibility
     inline void BaselineVerified() noexcept
     {
         if (!SafetyOverlayReady.load(std::memory_order_acquire) ||
-            !HostFresh.load(std::memory_order_acquire))
+            !HostFresh.load(std::memory_order_acquire) ||
+            ExternalSafetyBlock.load(std::memory_order_acquire))
             return;
         RecoveryPoseWarmup.store(false, std::memory_order_release);
         RecoveryPending.store(false, std::memory_order_release);
@@ -103,6 +122,7 @@ namespace OutRunVR::RuntimeEligibility
     {
         return SafetyOverlayReady.load(std::memory_order_acquire) &&
             HostFresh.load(std::memory_order_acquire) &&
+            !ExternalSafetyBlock.load(std::memory_order_acquire) &&
             StereoAllowed.load(std::memory_order_acquire) &&
             !RecoveryPending.load(std::memory_order_acquire);
     }
