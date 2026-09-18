@@ -536,6 +536,13 @@ class RestoreSkyGlow : public Hook
 	inline static SafetyHookInline MakeReduceBuff_hook = {};
 	static void __stdcall MakeReduceBuff_dest()
 	{
+		// True stereo owns two independent eye images. The stock glow reducer
+		// samples D3DBACKBUFFER_TYPE_MONO, which is the left/game backbuffer in
+		// the VR renderer; letting this run would bake left-eye scenery into a
+		// texture that is later composited into both eyes.
+		if (!SkyGlowAllowed())
+			return;
+
 		// Checked here rather than in apply so the setting can be changed while the
 		// game runs.
 		if (!Settings::SkyGlowTwoStep || !ReduceHalf)
@@ -607,6 +614,12 @@ class RestoreSkyGlow : public Hook
 	inline static SafetyHookInline BlurGlowImage_hook = {};
 	static void __stdcall BlurGlowImage_dest()
 	{
+		// Keep the whole post-process chain inert while true stereo is active.
+		// This is a second fail-safe behind g_GlowEnabled for paths that can be
+		// entered from cached game state during a mode transition.
+		if (!SkyGlowAllowed())
+			return;
+
 		float* offset = Module::exe_ptr<float>(BlurOffset_Addr);
 		float* step = Module::exe_ptr<float>(BlurOffsetStep_Addr);
 
@@ -667,7 +680,7 @@ class RestoreSkyGlow : public Hook
 			ReduceHalf = nullptr;
 		}
 
-		if (Settings::SkyGlowFactor > 2)
+		if (SkyGlowAllowed() && Settings::SkyGlowFactor > 2)
 		{
 			if (IDirect3DDevice9* device = Game::D3DDevice())
 			{
@@ -687,6 +700,12 @@ class RestoreSkyGlow : public Hook
 	inline static SafetyHookInline ClearBuffer_hook = {};
 	static int __cdecl ClearBuffer_dest(int a1)
 	{
+		// When glow is disabled (including true-stereo VR), preserve the game's
+		// original clear alpha exactly. The exposure seed only exists to feed the
+		// mono sky-glow extraction pass.
+		if (!SkyGlowAllowed())
+			return ClearBuffer_hook.ccall<int>(a1);
+
 		uint32_t* backColor = Module::exe_ptr<uint32_t>(BackColor_Addr);
 		const uint32_t prevColor = *backColor;
 
