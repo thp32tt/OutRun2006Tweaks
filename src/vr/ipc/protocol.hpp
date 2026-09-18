@@ -100,6 +100,12 @@ namespace OutRunVR
     inline constexpr std::uint32_t RenderFrameDirectFormatIndex = 4;
     inline constexpr std::uint32_t RenderFrameDirectGenerationIndex = 5;
     inline constexpr std::uint32_t RenderFrameDirectSlotIndex = 6;
+    // Three reserved words carry the producer DLL's 12-character git tag as
+    // raw ASCII. This keeps the Frame.v2 ABI fixed while making mixed binary
+    // test sessions obvious in host logs.
+    inline constexpr std::uint32_t RenderFrameGameBuildTag0Index = 7;
+    inline constexpr std::uint32_t RenderFrameGameBuildTag1Index = 8;
+    inline constexpr std::uint32_t RenderFrameGameBuildTag2Index = 9;
 
     enum StereoFailureReason : std::uint32_t
     {
