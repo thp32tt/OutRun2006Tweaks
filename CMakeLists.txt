@@ -91,11 +91,12 @@ set_source_files_properties(
     PROPERTIES HEADER_FILE_ONLY TRUE)
 unset(_vr_source)
 
-# Optional regression-isolation build. The normal build remains R34. When this
-# option is enabled only the stereo final TU is replaced by an R26 wrapper, so
-# current R15 D3D9Ex, DirectGPU/host transport, renderer R29 and texture fixes
-# stay in place while R29-R34 stereo draw overlays are excluded.
-option(OUTRUN_VR_SAFE_DRAW_COMPARE "Build R26/R23 safe stereo draw comparison DLL" OFF)
+# Production-safe stereo draw owner. The user-visible regression reproduced on
+# Quest while the monitor SBS remained individually plausible is tied to the
+# post-e20 R29+ fast L+R/HUD dispatch chain. Default back to the last proven
+# R26/R23/R22/R13/R9 draw + R23 renderer boundary. R29-R34 comparison builds
+# remain available only when this option is explicitly disabled.
+option(OUTRUN_VR_SAFE_DRAW_COMPARE "Use proven R26/R23 safe stereo draw production path" ON)
 set_source_files_properties(
     src/vr/d3d9/stereo_renderer_r26_compare.cpp
     PROPERTIES HEADER_FILE_ONLY TRUE)
