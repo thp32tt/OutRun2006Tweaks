@@ -2004,11 +2004,120 @@ namespace
         return std::clamp(scale, 0.5f, 2.0f);
     }
 
+    bool ReadBoolEnvironment(const char* name, bool defaultValue)
+    {
+        char env[32]{};
+        const DWORD n = GetEnvironmentVariableA(name, env, sizeof(env));
+        if (n == 0 || n >= sizeof(env))
+            return defaultValue;
+        if (env[0] == '0' || _stricmp(env, "false") == 0 ||
+            _stricmp(env, "off") == 0 || _stricmp(env, "no") == 0)
+            return false;
+        if (env[0] == '1' || _stricmp(env, "true") == 0 ||
+            _stricmp(env, "on") == 0 || _stricmp(env, "yes") == 0)
+            return true;
+        return defaultValue;
+    }
+
     bool DirectTransportEnabled()
     {
-        char env[16]{}; const DWORD n = GetEnvironmentVariableA("OUTRUN_VR_DIRECT_TRANSPORT", env, sizeof(env));
-        return !(n > 0 && n < sizeof(env) && (env[0] == '0' || _stricmp(env, "false") == 0 || _stricmp(env, "off") == 0));
+        return ReadBoolEnvironment("OUTRUN_VR_DIRECT_TRANSPORT", true);
     }
+
+    bool DirectTransportOnly()
+    {
+        return ReadBoolEnvironment("OUTRUN_VR_DIRECT_ONLY", false);
+    }
+
+    float RequestedRefreshRateHz()
+    {
+        char env[32]{};
+        const DWORD n = GetEnvironmentVariableA(
+            "OUTRUN_VR_TARGET_REFRESH_HZ", env, sizeof(env));
+        if (n == 0 || n >= sizeof(env))
+            return 0.0f;
+        char* end = nullptr;
+        const float value = std::strtof(env, &end);
+        if (end == env || !std::isfinite(value))
+            return 0.0f;
+        return std::clamp(value, 0.0f, 240.0f);
+    }
+
+#ifdef XR_FB_display_refresh_rate
+    bool TryRequestDisplayRefreshRate(
+        XrInstance instance, XrSession session, float requestedHz)
+    {
+        if (requestedHz <= 0.0f)
+            return false;
+
+        PFN_xrEnumerateDisplayRefreshRatesFB enumerateRates = nullptr;
+        PFN_xrGetDisplayRefreshRateFB getRate = nullptr;
+        PFN_xrRequestDisplayRefreshRateFB requestRate = nullptr;
+        if (XR_FAILED(xrGetInstanceProcAddr(
+                instance, "xrEnumerateDisplayRefreshRatesFB",
+                reinterpret_cast<PFN_xrVoidFunction*>(&enumerateRates))) ||
+            XR_FAILED(xrGetInstanceProcAddr(
+                instance, "xrGetDisplayRefreshRateFB",
+                reinterpret_cast<PFN_xrVoidFunction*>(&getRate))) ||
+            XR_FAILED(xrGetInstanceProcAddr(
+                instance, "xrRequestDisplayRefreshRateFB",
+                reinterpret_cast<PFN_xrVoidFunction*>(&requestRate))) ||
+            !enumerateRates || !getRate || !requestRate)
+        {
+            std::cout
+                << "XR_FB_display_refresh_rate advertised but function lookup failed; keeping runtime cadence.\n";
+            return false;
+        }
+
+        std::uint32_t count = 0;
+        if (XR_FAILED(enumerateRates(session, 0, &count, nullptr)) ||
+            count == 0)
+        {
+            std::cout
+                << "OpenXR runtime exposed no selectable display refresh rates.\n";
+            return false;
+        }
+
+        std::vector<float> rates(count);
+        if (XR_FAILED(enumerateRates(
+                session, count, &count, rates.data())) ||
+            count == 0)
+            return false;
+        rates.resize(count);
+
+        float current = 0.0f;
+        getRate(session, &current);
+
+        float chosen = rates.front();
+        float bestDistance = std::fabs(chosen - requestedHz);
+        for (float rate : rates)
+        {
+            const float distance = std::fabs(rate - requestedHz);
+            if (distance < bestDistance)
+            {
+                chosen = rate;
+                bestDistance = distance;
+            }
+        }
+
+        std::cout << "OpenXR refresh rates:";
+        for (float rate : rates)
+            std::cout << " " << rate;
+        std::cout << " Hz; current=" << current
+                  << " requested=" << requestedHz
+                  << " selected=" << chosen << " Hz\n";
+
+        const XrResult result = requestRate(session, chosen);
+        if (XR_FAILED(result))
+        {
+            std::cout
+                << "xrRequestDisplayRefreshRateFB failed result="
+                << result << "; keeping runtime cadence.\n";
+            return false;
+        }
+        return true;
+    }
+#endif
 
     void ParseRuntimeOverride(int argc, char** argv)
     {
