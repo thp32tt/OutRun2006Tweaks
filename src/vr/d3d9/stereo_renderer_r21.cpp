@@ -151,7 +151,7 @@ namespace OutRunVRStereo
                 {
                     R21HostSoftSuspended = true;
                     spdlog::info(
-                        "VR R21 SOFT-SUSPEND: shouldRender=0 is host-only scheduling advice; verified game-side stereo source remains active");
+                        "VR R21 SOFT-SUSPEND: shouldRender=0 is host-only scheduling advice; verified game-side stereo source remains active without baseline reset");
                 }
                 return;
             }
