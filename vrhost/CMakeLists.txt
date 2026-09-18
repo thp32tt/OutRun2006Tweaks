@@ -28,6 +28,17 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(openxr_sdk)
 
+execute_process(
+    COMMAND git rev-parse --short=12 HEAD
+    WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/.."
+    OUTPUT_VARIABLE OUTRUN_VR_GIT_SHA
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+)
+if(NOT OUTRUN_VR_GIT_SHA)
+    set(OUTRUN_VR_GIT_SHA "unknown")
+endif()
+
 add_executable(outrun-vr-host
     src/main_r23.cpp
     src/ipc/v3_shadow_bridge.cpp
@@ -37,7 +48,10 @@ target_include_directories(outrun-vr-host PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/../src"
     "${CMAKE_CURRENT_LIST_DIR}/src"
 )
-target_compile_definitions(outrun-vr-host PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
+target_compile_definitions(outrun-vr-host PRIVATE
+    WIN32_LEAN_AND_MEAN NOMINMAX
+    OUTRUN_VR_BUILD_SHA="${OUTRUN_VR_GIT_SHA}"
+)
 if(MSVC)
     # R23 remains the verified source/pose owner. R24 remains the visible
     # fallback authority. R32 adds an A/B SafeEye fallback and a final verified
