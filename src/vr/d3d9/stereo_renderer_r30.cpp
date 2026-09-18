@@ -114,6 +114,7 @@ namespace OutRunVRStereo
         struct R30ScratchBuffers
         {
             std::vector<std::uint8_t> source;
+            std::vector<std::uint8_t> indexSource;
             std::vector<std::uint8_t> left;
             std::vector<std::uint8_t> right;
             std::vector<std::uint8_t> used;
@@ -1256,18 +1257,22 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             const UINT vertexCount =
                 R30PrimitiveElementCount(type, primitiveCount);
+            if (!vertexCount || vertexCount > 262144u)
+                return E_NOTIMPL;
             if (!R30ConfigureXyzrhwWorldEffect(
                     device, data, vertexCount, stride, state))
             {
                 ++R30XyzrhwFallbacks;
                 return E_NOTIMPL;
             }
-            std::vector<std::uint8_t> left;
-            std::vector<std::uint8_t> right;
-            if (!R30TransformXyzrhwVertices(
-                    data, vertexCount, stride, state, 0, left) ||
-                !R30TransformXyzrhwVertices(
-                    data, vertexCount, stride, state, 1, right))
+
+            R30ScratchLease lease;
+            if (!lease)
+                return E_NOTIMPL;
+            auto& scratch = *lease.buffers;
+            if (!R30TransformXyzrhwStereo(
+                    data, vertexCount, stride, state,
+                    scratch.left, scratch.right))
             {
                 ++R30XyzrhwFallbacks;
                 return E_NOTIMPL;
@@ -1275,15 +1280,17 @@ namespace OutRunVRStereo
 
             auto leftDraw = [&]() {
                 return DrawPrimitiveUPHook.stdcall<HRESULT>(
-                    device, type, primitiveCount, left.data(), stride);
+                    device, type, primitiveCount,
+                    scratch.left.data(), stride);
             };
             auto rightDraw = [&]() {
                 return DrawPrimitiveUPHook.stdcall<HRESULT>(
-                    device, type, primitiveCount, right.data(), stride);
+                    device, type, primitiveCount,
+                    scratch.right.data(), stride);
             };
             return R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
-                "R30.2/DrawPrimitiveUP-XYZRHW");
+                "R30.6/DrawPrimitiveUP-XYZRHW");
         }
 
         HRESULT R30TryXyzrhwIndexedPrimitiveUP(
@@ -1298,7 +1305,7 @@ namespace OutRunVRStereo
 
             const UINT indexCount =
                 R30PrimitiveElementCount(type, primitiveCount);
-            if (!indexData || indexCount == 0 ||
+            if (!indexData || !vertexData || indexCount == 0 ||
                 (indexFormat != D3DFMT_INDEX16 &&
                  indexFormat != D3DFMT_INDEX32))
                 return E_NOTIMPL;
@@ -1325,19 +1332,40 @@ namespace OutRunVRStereo
             if (vertexCount == 0 || vertexCount > 262144u)
                 return E_NOTIMPL;
 
+            R30ScratchLease lease;
+            if (!lease)
+                return E_NOTIMPL;
+            auto& scratch = *lease.buffers;
+            try
+            {
+                scratch.used.assign(vertexCount, 0);
+            }
+            catch (...)
+            {
+                return E_NOTIMPL;
+            }
+            for (UINT i = 0; i < indexCount; ++i)
+            {
+                const std::uint32_t raw =
+                    indexFormat == D3DFMT_INDEX16
+                    ? static_cast<const std::uint16_t*>(indexData)[i]
+                    : static_cast<const std::uint32_t*>(indexData)[i];
+                if (raw >= vertexCount)
+                    return E_NOTIMPL;
+                scratch.used[raw] = 1;
+            }
+
             if (!R30ConfigureXyzrhwWorldEffect(
-                    device, vertexData, vertexCount, stride, state))
+                    device, vertexData, vertexCount, stride, state,
+                    &scratch.used))
             {
                 ++R30XyzrhwFallbacks;
                 return E_NOTIMPL;
             }
 
-            std::vector<std::uint8_t> left;
-            std::vector<std::uint8_t> right;
-            if (!R30TransformXyzrhwVertices(
-                    vertexData, vertexCount, stride, state, 0, left) ||
-                !R30TransformXyzrhwVertices(
-                    vertexData, vertexCount, stride, state, 1, right))
+            if (!R30TransformXyzrhwStereo(
+                    vertexData, vertexCount, stride, state,
+                    scratch.left, scratch.right, &scratch.used))
             {
                 ++R30XyzrhwFallbacks;
                 return E_NOTIMPL;
@@ -1347,17 +1375,17 @@ namespace OutRunVRStereo
                 return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, minVertexIndex, numVertices,
                     primitiveCount, indexData, indexFormat,
-                    left.data(), stride);
+                    scratch.left.data(), stride);
             };
             auto rightDraw = [&]() {
                 return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, minVertexIndex, numVertices,
                     primitiveCount, indexData, indexFormat,
-                    right.data(), stride);
+                    scratch.right.data(), stride);
             };
             return R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
-                "R30.2/DrawIndexedPrimitiveUP-XYZRHW");
+                "R30.6/DrawIndexedPrimitiveUP-XYZRHW");
         }
 
 
@@ -1385,6 +1413,9 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             }
 
+            R30EnsureVertexBufferHooks(vb);
+            R30EnsureVertexShadow(vb);
+
             D3DVERTEXBUFFER_DESC desc{};
             const std::uint64_t firstByte =
                 static_cast<std::uint64_t>(streamOffset) +
@@ -1399,27 +1430,28 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             }
 
-            void* source = nullptr;
-            if (FAILED(vb->Lock(static_cast<UINT>(firstByte),
-                    static_cast<UINT>(byteCount), &source, D3DLOCK_READONLY)) ||
-                !source)
+            R30ScratchLease lease;
+            if (!lease)
             {
                 vb->Release();
                 return E_NOTIMPL;
             }
+            auto& scratch = *lease.buffers;
+            if (!R30CopyVertexShadow(vb,
+                    static_cast<UINT>(firstByte),
+                    static_cast<UINT>(byteCount), scratch.source))
+            {
+                vb->Release();
+                ++R30XyzrhwFallbacks;
+                return E_NOTIMPL;
+            }
 
-            const bool configured = R30ConfigureXyzrhwWorldEffect(
-                device, source, vertexCount, stride, state);
-            std::vector<std::uint8_t> left;
-            std::vector<std::uint8_t> right;
-            const bool transformed = configured &&
-                R30TransformXyzrhwVertices(
-                    source, vertexCount, stride, state, 0, left) &&
-                R30TransformXyzrhwVertices(
-                    source, vertexCount, stride, state, 1, right);
-            vb->Unlock();
-
-            if (!transformed)
+            if (!R30ConfigureXyzrhwWorldEffect(
+                    device, scratch.source.data(), vertexCount,
+                    stride, state) ||
+                !R30TransformXyzrhwStereo(
+                    scratch.source.data(), vertexCount, stride, state,
+                    scratch.left, scratch.right))
             {
                 vb->Release();
                 ++R30XyzrhwFallbacks;
@@ -1428,24 +1460,24 @@ namespace OutRunVRStereo
 
             auto leftDraw = [&]() {
                 return DrawPrimitiveUPHook.stdcall<HRESULT>(
-                    device, type, primitiveCount, left.data(), stride);
+                    device, type, primitiveCount,
+                    scratch.left.data(), stride);
             };
             auto rightDraw = [&]() {
                 return DrawPrimitiveUPHook.stdcall<HRESULT>(
-                    device, type, primitiveCount, right.data(), stride);
+                    device, type, primitiveCount,
+                    scratch.right.data(), stride);
             };
             const HRESULT hr = R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
-                "R30.4/DrawPrimitiveVB-XYZRHW");
+                "R30.6/DrawPrimitiveVB-ShadowXYZRHW");
 
-            // DrawPrimitiveUP clears stream 0. Restore the game's VB binding so
-            // the next draw sees exactly the state that preceded this conversion.
             {
                 InternalPassScope guard;
                 if (FAILED(device->SetStreamSource(
                         0, vb, streamOffset, stride)))
                 {
-                    NoteRestoreFailure("R30.4 VB stream restore");
+                    NoteRestoreFailure("R30.6 VB stream restore");
                     R29ArmMonoSafety();
                 }
             }
@@ -1481,6 +1513,11 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             }
 
+            R30EnsureVertexBufferHooks(vb);
+            R30EnsureIndexBufferHooks(ib);
+            R30EnsureVertexShadow(vb);
+            R30EnsureIndexShadow(ib);
+
             D3DINDEXBUFFER_DESC ibDesc{};
             if (FAILED(ib->GetDesc(&ibDesc)) ||
                 (ibDesc.Format != D3DFMT_INDEX16 &&
@@ -1505,39 +1542,57 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             }
 
-            void* rawIndices = nullptr;
-            if (FAILED(ib->Lock(static_cast<UINT>(firstIndexByte),
-                    static_cast<UINT>(indexBytes), &rawIndices,
-                    D3DLOCK_READONLY)) || !rawIndices)
+            R30ScratchLease lease;
+            if (!lease)
+            {
+                ib->Release();
+                vb->Release();
+                return E_NOTIMPL;
+            }
+            auto& scratch = *lease.buffers;
+            if (!R30CopyIndexShadow(ib,
+                    static_cast<UINT>(firstIndexByte),
+                    static_cast<UINT>(indexBytes), scratch.indexSource))
+            {
+                ib->Release();
+                vb->Release();
+                ++R30XyzrhwFallbacks;
+                return E_NOTIMPL;
+            }
+
+            try
+            {
+                scratch.physical.resize(indexCount);
+            }
+            catch (...)
             {
                 ib->Release();
                 vb->Release();
                 return E_NOTIMPL;
             }
 
-            std::vector<std::uint32_t> physical(indexCount);
             std::int64_t minPhysical = INT64_MAX;
             std::int64_t maxPhysical = INT64_MIN;
             for (UINT i = 0; i < indexCount; ++i)
             {
                 const std::uint32_t raw =
                     ibDesc.Format == D3DFMT_INDEX16
-                    ? static_cast<const std::uint16_t*>(rawIndices)[i]
-                    : static_cast<const std::uint32_t*>(rawIndices)[i];
+                    ? static_cast<const std::uint16_t*>(
+                        static_cast<const void*>(scratch.indexSource.data()))[i]
+                    : static_cast<const std::uint32_t*>(
+                        static_cast<const void*>(scratch.indexSource.data()))[i];
                 const std::int64_t p =
                     static_cast<std::int64_t>(baseVertexIndex) + raw;
                 if (p < 0 || p > UINT_MAX)
                 {
-                    ib->Unlock();
                     ib->Release();
                     vb->Release();
                     return E_NOTIMPL;
                 }
-                physical[i] = static_cast<std::uint32_t>(p);
+                scratch.physical[i] = static_cast<std::uint32_t>(p);
                 minPhysical = std::min(minPhysical, p);
                 maxPhysical = std::max(maxPhysical, p);
             }
-            ib->Unlock();
 
             if (minPhysical == INT64_MAX || maxPhysical < minPhysical)
             {
@@ -1545,6 +1600,7 @@ namespace OutRunVRStereo
                 vb->Release();
                 return E_NOTIMPL;
             }
+
             const std::uint64_t vertexCount64 =
                 static_cast<std::uint64_t>(maxPhysical - minPhysical) + 1u;
             if (!vertexCount64 || vertexCount64 > 262144u)
@@ -1571,27 +1627,9 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             }
 
-            void* source = nullptr;
-            if (FAILED(vb->Lock(static_cast<UINT>(firstVertexByte),
-                    static_cast<UINT>(vertexBytes), &source,
-                    D3DLOCK_READONLY)) || !source)
-            {
-                ib->Release();
-                vb->Release();
-                return E_NOTIMPL;
-            }
-
-            const bool configured = R30ConfigureXyzrhwWorldEffect(
-                device, source, vertexCount, stride, state);
-            std::vector<std::uint8_t> left;
-            std::vector<std::uint8_t> right;
-            const bool transformed = configured &&
-                R30TransformXyzrhwVertices(
-                    source, vertexCount, stride, state, 0, left) &&
-                R30TransformXyzrhwVertices(
-                    source, vertexCount, stride, state, 1, right);
-            vb->Unlock();
-            if (!transformed)
+            if (!R30CopyVertexShadow(vb,
+                    static_cast<UINT>(firstVertexByte),
+                    static_cast<UINT>(vertexBytes), scratch.source))
             {
                 ib->Release();
                 vb->Release();
@@ -1599,50 +1637,96 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             }
 
-            std::vector<std::uint16_t> indices16;
-            std::vector<std::uint32_t> indices32;
+            try
+            {
+                scratch.used.assign(vertexCount, 0);
+            }
+            catch (...)
+            {
+                ib->Release();
+                vb->Release();
+                return E_NOTIMPL;
+            }
+            for (UINT i = 0; i < indexCount; ++i)
+            {
+                const std::uint64_t local =
+                    scratch.physical[i] -
+                    static_cast<std::uint64_t>(minPhysical);
+                if (local >= vertexCount)
+                {
+                    ib->Release();
+                    vb->Release();
+                    return E_NOTIMPL;
+                }
+                scratch.used[static_cast<std::size_t>(local)] = 1;
+            }
+
+            if (!R30ConfigureXyzrhwWorldEffect(
+                    device, scratch.source.data(), vertexCount,
+                    stride, state, &scratch.used) ||
+                !R30TransformXyzrhwStereo(
+                    scratch.source.data(), vertexCount, stride, state,
+                    scratch.left, scratch.right, &scratch.used))
+            {
+                ib->Release();
+                vb->Release();
+                ++R30XyzrhwFallbacks;
+                return E_NOTIMPL;
+            }
+
             const void* rebased = nullptr;
             if (ibDesc.Format == D3DFMT_INDEX16)
             {
-                indices16.resize(indexCount);
+                try { scratch.indices16.resize(indexCount); }
+                catch (...) {
+                    ib->Release();
+                    vb->Release();
+                    return E_NOTIMPL;
+                }
                 for (UINT i = 0; i < indexCount; ++i)
                 {
                     const std::uint64_t v =
-                        physical[i] - static_cast<std::uint64_t>(minPhysical);
+                        scratch.physical[i] -
+                        static_cast<std::uint64_t>(minPhysical);
                     if (v > 0xFFFFu)
                     {
                         ib->Release();
                         vb->Release();
                         return E_NOTIMPL;
                     }
-                    indices16[i] = static_cast<std::uint16_t>(v);
+                    scratch.indices16[i] = static_cast<std::uint16_t>(v);
                 }
-                rebased = indices16.data();
+                rebased = scratch.indices16.data();
             }
             else
             {
-                indices32.resize(indexCount);
+                try { scratch.indices32.resize(indexCount); }
+                catch (...) {
+                    ib->Release();
+                    vb->Release();
+                    return E_NOTIMPL;
+                }
                 for (UINT i = 0; i < indexCount; ++i)
-                    indices32[i] = physical[i] -
+                    scratch.indices32[i] =
+                        scratch.physical[i] -
                         static_cast<std::uint32_t>(minPhysical);
-                rebased = indices32.data();
+                rebased = scratch.indices32.data();
             }
 
             auto leftDraw = [&]() {
                 return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, 0u, vertexCount, primitiveCount,
-                    rebased, ibDesc.Format, left.data(), stride);
+                    rebased, ibDesc.Format, scratch.left.data(), stride);
             };
             auto rightDraw = [&]() {
                 return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, 0u, vertexCount, primitiveCount,
-                    rebased, ibDesc.Format, right.data(), stride);
+                    rebased, ibDesc.Format, scratch.right.data(), stride);
             };
             const HRESULT hr = R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
-                "R30.4/DrawIndexedPrimitiveVB-XYZRHW");
+                "R30.6/DrawIndexedPrimitiveVB-ShadowXYZRHW");
 
-            // DrawIndexedPrimitiveUP clears stream 0 and the index buffer.
             {
                 InternalPassScope guard;
                 bool restoreOk = SUCCEEDED(device->SetStreamSource(
@@ -1650,7 +1734,7 @@ namespace OutRunVRStereo
                 restoreOk = SUCCEEDED(device->SetIndices(ib)) && restoreOk;
                 if (!restoreOk)
                 {
-                    NoteRestoreFailure("R30.4 VB/IB restore");
+                    NoteRestoreFailure("R30.6 VB/IB restore");
                     R29ArmMonoSafety();
                 }
             }
