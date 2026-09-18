@@ -37,7 +37,9 @@ namespace OutRunVrR24BlackScreenGuard
     // to prove that the final R24 owner is present in the shipped host binary.
     inline constexpr const char* BuildId =
         "R24-visible-fallback-final-20260916";
-    inline constexpr ULONGLONG DisplayOnlyGraceMs = 500;
+    inline constexpr ULONGLONG DisplayOnlyGraceMs =
+        static_cast<ULONGLONG>(
+            OutRunVrR23VerifiedBundle::MaxPresentationAgeMs);
 
     inline std::uint64_t ExactProjectionSubmits = 0;
     inline std::uint64_t SoftGraceProjectionSubmits = 0;
@@ -364,16 +366,19 @@ namespace OutRunVrR24BlackScreenGuard
         if (!EnsureViewSpace(session))
             return false;
 
-        if (Theater.handle != XR_NULL_HANDLE && Theater.width && Theater.height &&
-            (TheaterImageCommitted || TheaterSuccess > 0))
-        {
-            BuildViewQuad(Theater.handle, Theater.width, Theater.height, 0, quad);
-            return true;
-        }
+        // Never prefer a previously committed theater image over a
+        // released projection image. The theater source may be a desktop SBS
+        // capture, while Projection is already separated per eye.
         if (Projection.handle != XR_NULL_HANDLE && Projection.width &&
             Projection.height && (ProjectionImageCommitted || ProjectionSuccess > 0))
         {
             BuildViewQuad(Projection.handle, Projection.width, Projection.height, 0, quad);
+            return true;
+        }
+        if (Theater.handle != XR_NULL_HANDLE && Theater.width && Theater.height &&
+            (TheaterImageCommitted || TheaterSuccess > 0))
+        {
+            BuildViewQuad(Theater.handle, Theater.width, Theater.height, 0, quad);
             return true;
         }
         return false;
@@ -414,20 +419,24 @@ namespace OutRunVrR24BlackScreenGuard
     {
         XrCompositionLayerQuad quad{};
 
+        // Degradation order is stereo-safe first: keep a released image
+        // before attempting any new desktop/theater capture. This keeps a short
+        // capture gap from exposing the monitor's raw SBS layout in the HMD.
+        const bool cached = BuildCachedVisibleQuad(session, quad);
+        const bool directFlat = !cached && RenderDirectFlatFallback(session, quad);
+
         // The legacy R19 shader consumes UVScale/UvOffset in VSMain. Do not
         // depend on inherited D3D11 state when R24 invokes it directly.
         OutRunVrR21RuntimeHardening::BindLegacyBlitConstantBufferToVs();
-        const bool live = OutRunVrSbsCaptureOverride::RenderTheaterOverride(
-            session, quad);
+        const bool live = !cached && !directFlat &&
+            OutRunVrSbsCaptureOverride::RenderTheaterOverride(session, quad);
         if (live)
             TheaterImageCommitted = true;
 
-        const bool directFlat = !live && RenderDirectFlatFallback(session, quad);
-        const bool cached = !live && !directFlat && BuildCachedVisibleQuad(session, quad);
-        const bool emergency = !live && !directFlat && !cached &&
+        const bool emergency = !cached && !directFlat && !live &&
             BuildEmergencyVisibleQuad(session, quad);
 
-        if (!live && !directFlat && !cached && !emergency)
+        if (!cached && !directFlat && !live && !emergency)
         {
             ++EmptyFrameFallbacks;
             if (!FirstEmptyFallbackLogged)
@@ -450,14 +459,14 @@ namespace OutRunVrR24BlackScreenGuard
         OutRunVrR23RuntimeHardening::RecordFinalSubmission(
             0, OutRunVrR23VerifiedBundle::SourceKind::None, true);
 
-        if (live)
+        if (cached)
         {
-            ++LiveTheaterFallbacks;
-            if (!FirstLiveTheaterLogged)
+            ++CachedLayerFallbacks;
+            if (!FirstCachedLayerLogged)
             {
-                FirstLiveTheaterLogged = true;
+                FirstCachedLayerLogged = true;
                 std::cerr
-                    << "[R24] live theater fallback replaced an unsafe/absent gameplay projection instead of submitting black reason="
+                    << "[R24] last successfully released projection/theater image preserved visibility while stereo recovers reason="
                     << reason << " build=" << BuildId << "\n";
             }
         }
@@ -472,17 +481,18 @@ namespace OutRunVrR24BlackScreenGuard
                     << reason << " build=" << BuildId << "\n";
             }
         }
-        else if (cached)
+        else if (live)
         {
-            ++CachedLayerFallbacks;
-            if (!FirstCachedLayerLogged)
+            ++LiveTheaterFallbacks;
+            if (!FirstLiveTheaterLogged)
             {
-                FirstCachedLayerLogged = true;
+                FirstLiveTheaterLogged = true;
                 std::cerr
-                    << "[R24] last successfully released OpenXR image preserved visibility while stereo recovers reason="
+                    << "[R24] live theater fallback replaced an unsafe/absent gameplay projection instead of submitting black reason="
                     << reason << " build=" << BuildId << "\n";
             }
         }
+
         else
         {
             ++EmergencyLayerFallbacks;
