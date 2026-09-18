@@ -140,11 +140,10 @@ namespace OutRunVRD3D9ExUpgradeR13
             if (!installed)
                 return false;
 
-            // R12 temporarily hooks IDirect3DDevice9::Reset while setting up the
-            // MANAGED-resource compatibility layer. Remove that hook NOW, before
-            // CreateDeviceEx returns. The renderer's Reset callback becomes the
-            // sole reset owner and will call ResetEx directly for this device.
-            DisarmLegacyResetHook();
+            // Keep the temporary ResetEx shim armed through R14/R15 validation.
+            // The final R15 wrapper performs the synchronous same-thread handoff
+            // immediately before the promoted device is allowed to escape
+            // CreateDeviceEx, so there is no externally visible Reset gap.
 
             if (!R13CreateTextureCallbackHook)
             {
@@ -161,7 +160,7 @@ namespace OutRunVRD3D9ExUpgradeR13
             else if (!CompatHardeningLogged.exchange(true))
             {
                 spdlog::info(
-                    "VR D3D9Ex R13: compatibility hardening active; Reset hook removed synchronously before device exposure and translated MANAGED texture Lock/Unlock diagnostics armed");
+                    "VR D3D9Ex R13: compatibility hardening active; legacy ResetEx shim retained through final R15 validation and translated MANAGED texture Lock/Unlock diagnostics armed");
             }
             return true;
         }

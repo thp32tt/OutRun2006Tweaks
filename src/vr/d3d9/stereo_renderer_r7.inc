@@ -9,6 +9,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <mutex>
 
 #include <spdlog/spdlog.h>
 
@@ -847,6 +848,7 @@ namespace OutRunVRStereo
 		constexpr std::uint32_t StereoInstallFailed = 2;
 		std::atomic<std::uint32_t> StereoInstallState{StereoInstallPending};
 		std::atomic<IDirect3DDevice9*> StereoInstalledDevice{nullptr};
+		std::mutex StereoInstallMutex;
 
 		void RollbackStereoHooks() noexcept
 		{
@@ -867,6 +869,9 @@ namespace OutRunVRStereo
 
 		bool InstallStereoHooks(IDirect3DDevice9*device)
 		{
+			std::lock_guard<std::mutex> installLock(StereoInstallMutex);
+			if(StereoInstallState.load(std::memory_order_acquire)==StereoInstallReady)
+				return StereoInstalledDevice.load(std::memory_order_acquire)==device;
 			if(!device)
 			{
 				StereoInstallState.store(StereoInstallFailed,std::memory_order_release);
@@ -919,14 +924,17 @@ namespace OutRunVRStereo
 
 		DWORD WINAPI StereoInstallThread(void*)
 		{
-			// No fixed startup delay: the promoted D3D9Ex Reset shim is handed off
-			// to this base callback as soon as the game publishes its device.
+			// D3D9Ex devices are installed synchronously on their CreateDevice
+			// caller thread. This worker remains only for the classic D3D9 path and
+			// exits before touching a synchronously installed promoted device.
 			for(int attempt=0;attempt<1200;++attempt)
 			{
+				if(StereoInstallState.load(std::memory_order_acquire)==StereoInstallReady)
+					return 0;
 				if(Game::D3DDevice_ptr&&*Game::D3DDevice_ptr)
 				{
 					if(!InstallStereoHooks(*Game::D3DDevice_ptr))
-						spdlog::error("VR stereo: renderer hook installation failed closed");
+						spdlog::error("VR stereo: classic-path renderer hook installation failed closed");
 					return 0;
 				}
 				Sleep(100);
@@ -936,6 +944,14 @@ namespace OutRunVRStereo
 			return 0;
 		}
 
+	}
+
+	bool InstallStereoHooksSynchronously(IDirect3DDevice9* device) noexcept
+	{
+		const bool installed=InstallStereoHooks(device);
+		if(installed)
+			spdlog::info("VR stereo: synchronous CreateDevice-thread base hook handoff READY; promoted D3D9Ex device exposed only after Reset ownership transferred");
+		return installed;
 	}
 
 	bool IsInternalStereoPassActive(){return InternalStereoPass;}

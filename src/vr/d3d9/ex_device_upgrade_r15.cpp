@@ -17,6 +17,11 @@
 
 #include "ex_device_upgrade_r14.cpp"
 
+namespace OutRunVRStereo
+{
+    bool InstallStereoHooksSynchronously(IDirect3DDevice9* device) noexcept;
+}
+
 namespace OutRunVRD3D9ExUpgradeR13
 {
     namespace
@@ -259,8 +264,32 @@ namespace OutRunVRD3D9ExUpgradeR13
                 return false;
             }
 
+            // All Ex compatibility layers are now validated. Transfer Reset
+            // ownership and install the stereo base hooks on this same
+            // CreateDevice caller thread before the device can be returned to
+            // game code. If the handoff fails, reject the Ex device entirely.
+            DisarmLegacyResetHook();
+            if (!OutRunVRStereo::InstallStereoHooksSynchronously(device))
+            {
+                R15ResetStateHealthy.store(false, std::memory_order_release);
+                R14AbandonCompatDevice(device);
+                OutRunVRD3D9ExUpgrade::ClearCompatHooks();
+                {
+                    std::lock_guard<std::mutex> lock(R15ClassicExtraMutex);
+                    if (R15ClassicAllState)
+                    {
+                        R15ClassicAllState->Release();
+                        R15ClassicAllState = nullptr;
+                    }
+                    R15ClassicExtra = {};
+                }
+                spdlog::error(
+                    "VR R15 EX: synchronous CreateDevice-thread stereo handoff failed; Ex promotion rejected before device exposure");
+                return false;
+            }
+
             spdlog::info(
-                "VR R15 EX: full D3DSBT_ALL + extra classic Reset baseline captured; partial-RECT and generated-mip correctness overlay ACTIVE");
+                "VR R15 EX: full D3DSBT_ALL baseline + synchronous Reset/stereo handoff ACTIVE; partial-RECT and generated-mip correctness overlay ACTIVE");
             return true;
         }
 
@@ -509,6 +538,14 @@ namespace OutRunVRD3D9ExUpgradeR13
             }
             bool apply() override
             {
+                OutRunVRD3D9ExUpgrade::SetFinalCompatOverlayReady(false);
+                if (!R14InstallCompatR13Hook || !R14CreateTextureR13Hook ||
+                    !R14TextureLockR13Hook || !R14TextureUnlockR13Hook)
+                {
+                    spdlog::error(
+                        "VR R15 EX: lower R14 compatibility overlay is unavailable; Ex promotion remains disabled");
+                    return false;
+                }
                 const auto disabled = safetyhook::InlineHook::StartDisabled;
                 R15InstallCompatR14Hook = safetyhook::create_inline(
                     reinterpret_cast<void*>(&InstallManagedResourceCompatR14),
@@ -534,14 +571,16 @@ namespace OutRunVRD3D9ExUpgradeR13
                     if (!*hook || !hook->enable().has_value())
                     {
                         R15RollbackHooks();
+                        OutRunVRD3D9ExUpgrade::SetFinalCompatOverlayReady(false);
                         spdlog::error(
                             "VR R15 EX: correctness overlay hook transaction failed; R14 remains authoritative");
                         return false;
                     }
                 }
 
+                OutRunVRD3D9ExUpgrade::SetFinalCompatOverlayReady(true);
                 spdlog::info(
-                    "VR R15 EX: partial-RECT fail-close + generated-mip lifetime + ResetEx classic-state replay READY");
+                    "VR R15 EX: partial-RECT fail-close + generated-mip lifetime + ResetEx classic-state replay READY; final promotion gate ARMED");
                 return true;
             }
 

@@ -43,6 +43,10 @@ namespace OutRunVRD3D9ExUpgrade
         std::atomic<bool> FirstUpgradeLogged{false};
         std::atomic<bool> FirstFallbackLogged{false};
         std::atomic<bool> ThirdPartyLogged{false};
+        std::atomic<bool> FirstCreateFlagsLogged{false};
+        std::atomic<bool> FirstPureDeviceFallbackLogged{false};
+        std::atomic<bool> FirstOverlayUnavailableLogged{false};
+        std::atomic<bool> FinalCompatOverlayReady{false};
         std::atomic<IDirect3DDevice9*> CompatDevice{nullptr};
 
         SafetyHookInline TestCooperativeLevelCompatHook{};
@@ -668,6 +672,33 @@ namespace OutRunVRD3D9ExUpgrade
                 if (!device || !params) return D3DERR_INVALIDCALL;
                 *device = nullptr;
 
+                // D3DPRESENT_PARAMETERS is an in/out contract. Preserve the
+                // game's original request so a failed Ex attempt cannot poison
+                // the classic fallback with mutated presentation values.
+                const D3DPRESENT_PARAMETERS originalParams = *params;
+                auto classicFallback = [&]() -> HRESULT
+                {
+                    *params = originalParams;
+                    return fallback_->CreateDevice(adapter, type, focusWindow,
+                        behaviorFlags, params, device);
+                };
+
+                if (!FirstCreateFlagsLogged.exchange(true))
+                {
+                    spdlog::info(
+                        "VR D3D9Ex startup: CreateDevice flags=0x{:08X} multithreaded={} pureDevice={}",
+                        static_cast<unsigned>(behaviorFlags),
+                        (behaviorFlags & D3DCREATE_MULTITHREADED) != 0,
+                        (behaviorFlags & D3DCREATE_PUREDEVICE) != 0);
+                }
+                if ((behaviorFlags & D3DCREATE_PUREDEVICE) != 0)
+                {
+                    if (!FirstPureDeviceFallbackLogged.exchange(true))
+                        spdlog::warn(
+                            "VR D3D9Ex startup: D3DCREATE_PUREDEVICE detected; Ex promotion skipped and classic D3D9 retained");
+                    return classicFallback();
+                }
+
                 D3DDISPLAYMODEEX fullscreen{};
                 D3DDISPLAYMODEEX* fullscreenPtr = nullptr;
                 if (!params->Windowed)
@@ -711,7 +742,7 @@ namespace OutRunVRD3D9ExUpgrade
                             spdlog::warn(
                                 "VR D3D9Ex upgrade: Ex device created but managed-resource compatibility layer could not be installed; falling back to original D3D9 device");
                         }
-                        return fallback_->CreateDevice(adapter, type, focusWindow, behaviorFlags, params, device);
+                        return classicFallback();
                     }
 
                     *device = static_cast<IDirect3DDevice9*>(deviceEx);
@@ -730,7 +761,7 @@ namespace OutRunVRD3D9ExUpgrade
                         "VR D3D9Ex upgrade: CreateDeviceEx failed HRESULT=0x{:08X}; falling back to original IDirect3D9::CreateDevice",
                         static_cast<unsigned>(hr));
                 }
-                return fallback_->CreateDevice(adapter, type, focusWindow, behaviorFlags, params, device);
+                return classicFallback();
             }
 
         private:
@@ -747,6 +778,13 @@ namespace OutRunVRD3D9ExUpgrade
             IDirect3D9* fallback = OriginalDirect3DCreate9(sdkVersion);
             if (!fallback || !Settings::VRPreferD3D9Ex)
                 return fallback;
+            if (!FinalCompatOverlayReady.load(std::memory_order_acquire))
+            {
+                if (!FirstOverlayUnavailableLogged.exchange(true))
+                    spdlog::error(
+                        "VR D3D9Ex startup: final R15 compatibility overlay is not ready; Ex promotion skipped to preserve classic startup");
+                return fallback;
+            }
 
             HMODULE provider = nullptr;
             if (!IsSystemModuleForAddress(reinterpret_cast<const void*>(OriginalDirect3DCreate9), provider))
@@ -815,6 +853,11 @@ namespace OutRunVRD3D9ExUpgrade
             }
             return false;
         }
+    }
+
+    void SetFinalCompatOverlayReady(bool ready) noexcept
+    {
+        FinalCompatOverlayReady.store(ready, std::memory_order_release);
     }
 
     class D3D9ExUpgradeHook final : public Hook

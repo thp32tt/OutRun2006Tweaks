@@ -102,6 +102,11 @@ ex = require(
     "bool allowNonDynamicFallback",
     "failing closed hr=0x{:08X}",
     "compatibility hook transaction was partial",
+    "const D3DPRESENT_PARAMETERS originalParams = *params",
+    "auto classicFallback = [&]() -> HRESULT",
+    "D3DCREATE_PUREDEVICE",
+    "FinalCompatOverlayReady",
+    "final R15 compatibility overlay is not ready",
 )
 if "for (DWORD stage = 0; stage < 16; ++stage)\n                if (FAILED(device->SetTexture" in ex:
     raise SystemExit("classic Reset replay must not treat invalid texture stages 8..15 as failures")
@@ -123,11 +128,38 @@ ex_r13 = require(
     "S_PRESENT_MODE_CHANGED",
     "S_PRESENT_OCCLUDED",
     "CompatWindowed.load",
+    "legacy ResetEx shim retained through final R15 validation",
 )
 resetex = ex_r13.find("deviceEx->ResetEx")
 restore = ex_r13.find("RestoreClassicResetState(device)", resetex)
 if resetex < 0 or restore < resetex:
     raise SystemExit("authoritative R13 ResetEx path must replay classic state after successful ResetEx")
+
+ex_r15 = require(
+    "src/vr/d3d9/ex_device_upgrade_r15.cpp",
+    "SetFinalCompatOverlayReady(false)",
+    "SetFinalCompatOverlayReady(true)",
+    "DisarmLegacyResetHook()",
+    "InstallStereoHooksSynchronously(device)",
+    "synchronous CreateDevice-thread stereo handoff failed",
+    "R14AbandonCompatDevice(device)",
+)
+if ex_r15.find("DisarmLegacyResetHook()") > ex_r15.find("InstallStereoHooksSynchronously(device)"):
+    raise SystemExit("R15 must disarm the temporary Reset shim immediately before synchronous stereo ownership handoff")
+
+stereo_base = require(
+    "src/vr/d3d9/stereo_renderer_r7.inc",
+    "#include <mutex>",
+    "std::mutex StereoInstallMutex",
+    "std::lock_guard<std::mutex> installLock",
+    "InstallStereoHooksSynchronously",
+    "synchronous CreateDevice-thread base hook handoff READY",
+)
+worker_start = stereo_base.find("DWORD WINAPI StereoInstallThread")
+worker_ready = stereo_base.find("StereoInstallState.load(std::memory_order_acquire)==StereoInstallReady", worker_start)
+worker_device = stereo_base.find("Game::D3DDevice_ptr&&*Game::D3DDevice_ptr", worker_start)
+if min(worker_start, worker_ready, worker_device) < 0 or worker_ready > worker_device:
+    raise SystemExit("stereo worker must exit for synchronously installed Ex devices before touching the game D3D device")
 
 r9 = require(
     "src/vr/d3d9/stereo_renderer.cpp",

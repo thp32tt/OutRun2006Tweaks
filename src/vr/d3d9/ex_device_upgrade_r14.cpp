@@ -1020,6 +1020,12 @@ namespace OutRunVRD3D9ExUpgradeR13
             }
             bool apply() override
             {
+                if (!R13InstallCompatHook)
+                {
+                    spdlog::error(
+                        "VR R14 EX: R13 compatibility installer is unavailable; R14 overlay remains disabled");
+                    return false;
+                }
                 const auto disabled = safetyhook::InlineHook::StartDisabled;
                 R14CreateTextureR13Hook = safetyhook::create_inline(
                     reinterpret_cast<void*>(&CreateTextureCompatDestR13),
