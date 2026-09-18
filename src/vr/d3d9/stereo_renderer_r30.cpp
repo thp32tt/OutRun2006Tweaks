@@ -536,6 +536,29 @@ namespace OutRunVRStereo
                     "VR R30.6 BUFFER SHADOW: creation hook incomplete; existing/dynamic buffers still register lazily on draw/Lock");
         }
 
+        void R30RollbackBufferShadowHooks() noexcept
+        {
+            // Unhook entry points before dropping registry ownership. Any draw
+            // holding a COM reference also holds a shared_ptr acquired from the
+            // registry, so clearing the maps cannot invalidate an in-flight
+            // shadow object.
+            R30CreateIndexBufferHook = {};
+            R30CreateVertexBufferHook = {};
+            R30IndexBufferUnlockHook = {};
+            R30IndexBufferLockHook = {};
+            R30IndexBufferReleaseHook = {};
+            R30VertexBufferUnlockHook = {};
+            R30VertexBufferLockHook = {};
+            R30VertexBufferReleaseHook = {};
+            {
+                std::lock_guard<std::mutex> lock(
+                    R30ShadowRegistryMutex);
+                R30IndexShadows.clear();
+                R30VertexShadows.clear();
+            }
+        }
+
+
         // R30.6 stereo sky glow.
         //
         // The original game samples D3DBACKBUFFER_TYPE_MONO and owns only one
@@ -2569,6 +2592,7 @@ namespace OutRunVRStereo
                     std::memory_order_acquire);
                 if (r29 == State::Failed)
                 {
+                    R30RollbackBufferShadowHooks();
                     R30InstallState.store(State::Failed,
                         std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR30HUD", false);
@@ -2602,6 +2626,7 @@ namespace OutRunVRStereo
                     if (!R30EnableHooks())
                     {
                         R30RollbackHooks();
+                        R30RollbackBufferShadowHooks();
                         R30InstallState.store(State::Failed,
                             std::memory_order_release);
                         HookManager::ReportAsyncResult(
@@ -2623,6 +2648,7 @@ namespace OutRunVRStereo
                 Sleep(25);
             }
 
+            R30RollbackBufferShadowHooks();
             R30InstallState.store(State::Failed, std::memory_order_release);
             HookManager::ReportAsyncResult("OpenXRVRStereoR30HUD", false);
             spdlog::error(
