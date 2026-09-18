@@ -244,11 +244,29 @@ namespace OutRunVRStereo
             }
 
 #if defined(OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE)
-            // C1/C2: preserve R29's two-eye fast path, but restore R27/R28's
-            // proven perspective-world ownership. The old R29 fragile-effect
-            // policy is still used for non-perspective work, including HUD.
-            // This is the exact A/B seam we want to test: classification changes
-            // without reintroducing R26's per-draw mono safety replay.
+            // C1/C2 world-correctness path.
+            //
+            // R28's proven path did more than classify the current target as
+            // perspective world: when the game changed vertex shader AFTER the
+            // verified c64..c67 upload, R28 temporarily rebound the verified
+            // shader epoch before entering R9. Without that step R7 sees the
+            // shader-epoch mismatch, returns NonWorld, and duplicates the draw
+            // with the stock WVP. On hardware this shows up exactly as the road
+            // and car having little/incorrect binocular disparity while nearby
+            // effect/edge geometry still sits at the correct depth.
+            //
+            // Keep R29's two-eye accounting/performance path, but run it inside
+            // the old strict R28 rebind gate when WVP + projection + pose all
+            // still match. If no rebind is needed, fall through to the ordinary
+            // perspective fast path.
+            const HRESULT rebound = R28RunWithVerifiedWorldEpoch(
+                device, [&]() {
+                    return R29DirectTwoEye(
+                        device, stereoR7Draw, false, site);
+                });
+            if (rebound != E_NOTIMPL)
+                return rebound;
+
             if (OutRunVRRenderer::R28PerspectiveWorldSemantic())
             {
                 return R29DirectTwoEye(device,
