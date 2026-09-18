@@ -77,6 +77,25 @@ set_source_files_properties(
     PROPERTIES HEADER_FILE_ONLY TRUE)
 unset(_vr_source)
 
+# Optional regression-isolation build. The normal build remains R34. When this
+# option is enabled only the stereo final TU is replaced by an R26 wrapper, so
+# current R15 D3D9Ex, DirectGPU/host transport, renderer R29 and texture fixes
+# stay in place while R29-R34 stereo draw overlays are excluded.
+option(OUTRUN_VR_SAFE_DRAW_COMPARE "Build R26/R23 safe stereo draw comparison DLL" OFF)
+set_source_files_properties(
+    src/vr/d3d9/stereo_renderer_r26_compare.cpp
+    PROPERTIES HEADER_FILE_ONLY TRUE)
+if(OUTRUN_VR_SAFE_DRAW_COMPARE)
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r34.cpp
+        PROPERTIES HEADER_FILE_ONLY TRUE)
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r26_compare.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    add_compile_definitions(OUTRUN_VR_SAFE_DRAW_COMPARE=1)
+    message(STATUS "OutRun VR safe-draw comparison: R26 final stereo chain enabled")
+endif()
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 
