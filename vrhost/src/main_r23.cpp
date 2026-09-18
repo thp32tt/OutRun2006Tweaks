@@ -774,16 +774,22 @@ namespace
     }
 
     bool R23RenderTheater(StereoCompositor& c, XrSpace viewSpace,
-        XrSpace localSpace, XrTime displayTime, XrCompositionLayerQuad& quad)
+        XrSpace localSpace, XrTime displayTime, XrCompositionLayerQuad& quad,
+        bool sourceIsSbs)
     {
         R23Pixels.TryConsume(c.context_);
         if (!c.haveFrame_ || !c.sourceSrv_) return false;
         UvRect whole{};
         if (!c.GetGameUv(whole)) return false;
+        UvRect theaterUv = whole;
+        if (sourceIsSbs)
+            theaterUv.w *= 0.5f;
+        if (theaterUv.w <= 0.0f)
+            return false;
         std::uint32_t image = 0;
         c.Acquire(c.theater_, image);
         const bool ok = c.RenderTo(c.theater_.rtvs[image][0], c.theater_.width,
-            c.theater_.height, whole, c.sourceSrv_, c.sourceFormat_);
+            c.theater_.height, theaterUv, c.sourceSrv_, c.sourceFormat_);
         if (ok) R23Pixels.ScheduleTheater(c, image);
         c.Release(c.theater_);
         if (!ok || !c.EnsureTheaterAnchor(viewSpace, localSpace, displayTime)) return false;
@@ -799,7 +805,9 @@ namespace
         RECT cr{};
         GetClientRect(c.hwnd_, &cr);
         const float aspect = (cr.bottom > cr.top)
-            ? static_cast<float>(cr.right - cr.left) / static_cast<float>(cr.bottom - cr.top)
+            ? (static_cast<float>(cr.right - cr.left) /
+                static_cast<float>(cr.bottom - cr.top)) *
+                (sourceIsSbs ? 0.5f : 1.0f)
             : 16.f / 9.f;
         quad.size.width = 2.f;
         quad.size.height = 2.f / aspect;
@@ -1193,7 +1201,7 @@ int main(int argc, char** argv)
                         LARGE_INTEGER frs{}, fre{}; QueryPerformanceCounter(&frs);
                         if (fallbackCapture.available &&
                             R23RenderTheater(compositor, viewSpace, localSpace,
-                                fs.predictedDisplayTime, quad))
+                                fs.predictedDisplayTime, quad, true))
                         {
                             layers[0] =
                                 reinterpret_cast<const XrCompositionLayerBaseHeader*>(&quad);
@@ -1205,7 +1213,7 @@ int main(int argc, char** argv)
                             {
                                 R23LastGameplayFallbackLogMs = now;
                                 std::cout
-                                    << "[R23 fallback] no reusable stereo projection remained; using LOCAL-fixed theater until fresh stereo returns"
+                                    << "[R23 fallback] no reusable stereo projection remained; using left-eye-only LOCAL-fixed theater until fresh stereo returns"
                                     << " count=" << R23GameplayTheaterFallbacks
                                     << " productionAttempted=" << (productionCaptureAttempted ? 1 : 0)
                                     << "\n";
@@ -1221,7 +1229,7 @@ int main(int argc, char** argv)
                     QueryPerformanceCounter(&ce); timings.capture.Add(timings.Ms(cs, ce));
                     LARGE_INTEGER rs{}, re{}; QueryPerformanceCounter(&rs);
                     if (capture.available && R23RenderTheater(compositor, viewSpace,
-                        localSpace, fs.predictedDisplayTime, quad))
+                        localSpace, fs.predictedDisplayTime, quad, true))
                     {
                         layers[0] = reinterpret_cast<const XrCompositionLayerBaseHeader*>(&quad);
                         layerReady = true;
