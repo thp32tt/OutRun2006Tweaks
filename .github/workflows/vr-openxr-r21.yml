@@ -167,8 +167,8 @@ jobs:
           foreach ($marker in @(
             'VR C2 COMPARE: C1 R29+R27/R28 classification + R30 HUD correction ACTIVE; R31-R34 excluded',
             'VR R30 HUD: orthographic ScreenSpace2D asymmetric-FOV correction ACTIVE',
-            'VR R30.3 XYZRHW WORLD',
-            'R30.4/DrawIndexedPrimitiveVB-XYZRHW',
+            'VR R30.6 XYZRHW WORLD',
+            'R30.6/DrawIndexedPrimitiveVB-ShadowXYZRHW',
             'VR AUTO HOST: launched',
             'VR PC MIRROR: fitting borderless window to monitor',
             'VR PRESENT: desktop D3D9 VSync bypass active',
