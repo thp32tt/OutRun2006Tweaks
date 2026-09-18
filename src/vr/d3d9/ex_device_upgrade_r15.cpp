@@ -16,6 +16,7 @@
 #include <mutex>
 
 #include "ex_device_upgrade_r14.cpp"
+#include "../runtime_eligibility.hpp"
 
 namespace OutRunVRStereo
 {
@@ -105,6 +106,7 @@ namespace OutRunVRD3D9ExUpgradeR13
             R15ClassicAllState = allState;
             R15ClassicExtra = next;
             R15ResetStateHealthy.store(true, std::memory_order_release);
+            OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(false);
             return true;
         }
 
@@ -485,6 +487,8 @@ namespace OutRunVRD3D9ExUpgradeR13
             D3DPRESENT_PARAMETERS* params, HRESULT& result) noexcept
         {
             R15ResetStateHealthy.store(false, std::memory_order_release);
+            if (IsCompatDevice(device))
+                OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
             const bool handled = R15ResetCompatR13Hook.call<bool>(
                 device, params, result);
             if (!handled || FAILED(result))
@@ -500,6 +504,7 @@ namespace OutRunVRD3D9ExUpgradeR13
                 R15RestoreClassicExtraBaseline(device);
             const bool healthy = coreHealthy && allStateHealthy && extraHealthy;
             R15ResetStateHealthy.store(healthy, std::memory_order_release);
+            OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(!healthy);
 
             if (healthy)
             {
