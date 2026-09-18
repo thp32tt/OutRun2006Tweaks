@@ -106,6 +106,15 @@ if(OUTRUN_VR_SAFE_DRAW_COMPARE)
     set_source_files_properties(
         src/vr/d3d9/stereo_renderer_r26_compare.cpp
         PROPERTIES HEADER_FILE_ONLY FALSE)
+    # Renderer R29 depends on R31 StateBlock exports. For this regression
+    # comparison, use the R23 renderer owner that paired with the known-good
+    # R26 stereo path instead of introducing fake R31 stubs.
+    set_source_files_properties(
+        src/vr/game/outrun_renderer_r29.cpp
+        PROPERTIES HEADER_FILE_ONLY TRUE)
+    set_source_files_properties(
+        src/vr/game/outrun_renderer_r23.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
     add_compile_definitions(OUTRUN_VR_SAFE_DRAW_COMPARE=1)
     message(STATUS "OutRun VR safe-draw comparison: R26 final stereo chain enabled")
 endif()
