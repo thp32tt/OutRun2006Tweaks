@@ -32,6 +32,7 @@ namespace OutRunVRStereo
             if (!device || !IsGameDevice(device))
                 return;
 
+            OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
             R22FailClosedEligibility();
             R22ResetBaselineTracking();
             R22ShadowState = {};
@@ -61,12 +62,14 @@ namespace OutRunVRStereo
             if (!OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device))
             {
                 R34ResetReplayBlocked.store(false, std::memory_order_release);
+                OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(false);
                 return hr;
             }
 
             const bool healthy = SUCCEEDED(hr) &&
                 OutRunVRD3D9ExUpgradeR13::LastResetStateReplaySucceeded();
             R34ResetReplayBlocked.store(!healthy, std::memory_order_release);
+            OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(!healthy);
             if (!healthy)
             {
                 ++R34ReplayBlocks;
@@ -79,14 +82,16 @@ namespace OutRunVRStereo
             const RECT* sourceRect, const RECT* destRect,
             HWND destWindowOverride, const RGNDATA* dirtyRegion)
         {
+            const bool blocked = IsGameDevice(device) &&
+                R34ResetReplayBlocked.load(std::memory_order_acquire);
+            if (blocked)
+                R34ForceResetReplayFailClosed(device, "Present/pre");
+
             const HRESULT hr = R34PresentR33Hook.stdcall<HRESULT>(device,
                 sourceRect, destRect, destWindowOverride, dirtyRegion);
 
-            if (IsGameDevice(device) &&
-                R34ResetReplayBlocked.load(std::memory_order_acquire))
-            {
-                R34ForceResetReplayFailClosed(device, "Present");
-            }
+            if (blocked)
+                R34ForceResetReplayFailClosed(device, "Present/post");
             return hr;
         }
 
@@ -147,6 +152,22 @@ namespace OutRunVRStereo
                         spdlog::error(
                             "VR R34: Reset/Present guard transaction failed; R33 remains authoritative");
                         return 0;
+                    }
+
+                    IDirect3DDevice9* const installedDevice =
+                        StereoInstalledDevice.load(std::memory_order_acquire);
+                    if (installedDevice &&
+                        OutRunVRD3D9ExUpgradeR13::IsCompatDevice(installedDevice))
+                    {
+                        const bool healthy =
+                            OutRunVRD3D9ExUpgradeR13::LastResetStateReplaySucceeded();
+                        R34ResetReplayBlocked.store(!healthy,
+                            std::memory_order_release);
+                        OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(
+                            !healthy);
+                        if (!healthy)
+                            R34ForceResetReplayFailClosed(
+                                installedDevice, "Install/state-sync");
                     }
 
                     R34InstallState.store(State::Ready,
