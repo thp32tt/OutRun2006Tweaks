@@ -858,7 +858,16 @@ namespace
         ~SwapchainSet() { Destroy(); }
     };
 
-    struct CaptureStatus{bool available=false;bool fresh=false;std::int64_t lastPresentQpc=0;std::uint32_t lastPresentQpcLow=0;};
+    struct CaptureStatus
+    {
+        bool available = false;
+        bool fresh = false;
+        std::int64_t lastPresentQpc = 0;
+        std::uint32_t lastPresentQpcLow = 0;
+        bool fullGameClientVisible = false;
+        bool gameRegionChanged = false;
+        std::uint32_t accumulatedFrames = 0;
+    };
 
     class StereoCompositor
     {
@@ -918,34 +927,161 @@ namespace
 
         CaptureStatus Capture(DWORD timeoutMs=0)
         {
-            if(!IsWindow(hwnd_)){if(HWND replacement=FindGameWindow(gamePid_))hwnd_=replacement;}
-            const HMONITOR monitorNow=IsWindow(hwnd_)?MonitorFromWindow(hwnd_,MONITOR_DEFAULTTONEAREST):nullptr;if(!duplication_||(monitorNow&&monitorNow!=targetMonitor_))BindCaptureOutput(false);
-            CaptureStatus status{haveFrame_,false,lastCapturePresentQpc_,lastCapturePresentQpcLow_};
-            if (!duplication_ && !RecreateDuplication(false)) return status;
+            if (!IsWindow(hwnd_))
+            {
+                if (HWND replacement = FindGameWindow(gamePid_))
+                    hwnd_ = replacement;
+            }
+            const HMONITOR monitorNow = IsWindow(hwnd_)
+                ? MonitorFromWindow(hwnd_, MONITOR_DEFAULTTONEAREST)
+                : nullptr;
+            if (!duplication_ ||
+                (monitorNow && monitorNow != targetMonitor_))
+                BindCaptureOutput(false);
+
+            CaptureStatus status{};
+            status.available = haveFrame_;
+            status.lastPresentQpc = lastCapturePresentQpc_;
+            status.lastPresentQpcLow = lastCapturePresentQpcLow_;
+            RECT gameRect{};
+            status.fullGameClientVisible =
+                GetGameClientOutputRect(gameRect);
+
+            if (!duplication_ && !RecreateDuplication(false))
+                return status;
 
             DXGI_OUTDUPL_FRAME_INFO fi{};
             IDXGIResource* res = nullptr;
-            if(!duplication_)return status;const DWORD waitMs=haveFrame_?timeoutMs:std::max<DWORD>(timeoutMs,1000);const HRESULT hr=duplication_->AcquireNextFrame(waitMs,&fi,&res);
-            if (hr == DXGI_ERROR_WAIT_TIMEOUT) return status;
+            if (!duplication_)
+                return status;
+
+            const DWORD waitMs = haveFrame_
+                ? timeoutMs : std::max<DWORD>(timeoutMs, 1000);
+            const HRESULT hr =
+                duplication_->AcquireNextFrame(waitMs, &fi, &res);
+            if (hr == DXGI_ERROR_WAIT_TIMEOUT)
+                return status;
             if (FAILED(hr) || !res)
             {
                 if (hr == DXGI_ERROR_ACCESS_LOST)
                 {
-                    haveFrame_=false;stereoSourceValid_=false;BindCaptureOutput(false);
+                    haveFrame_ = false;
+                    stereoSourceValid_ = false;
+                    BindCaptureOutput(false);
                 }
-                return {haveFrame_,false,lastCapturePresentQpc_,lastCapturePresentQpcLow_};
+                status.available = haveFrame_;
+                return status;
             }
 
+            // Desktop Duplication's LastPresentTime describes the output, not
+            // a particular application. Track dirty/move rectangles while the
+            // frame is acquired so a desktop update outside the game window
+            // cannot be mistaken for a new OutRun SBS image.
+            bool gameRegionChanged = false;
+            auto intersectsGame = [&](const RECT& r) noexcept
+            {
+                RECT intersection{};
+                return status.fullGameClientVisible &&
+                    IntersectRect(&intersection, &r, &gameRect) != FALSE &&
+                    intersection.right > intersection.left &&
+                    intersection.bottom > intersection.top;
+            };
+
+            UINT dirtyBytes = 0;
+            HRESULT dirtyHr =
+                duplication_->GetFrameDirtyRects(0, nullptr, &dirtyBytes);
+            if ((dirtyHr == DXGI_ERROR_MORE_DATA || SUCCEEDED(dirtyHr)) &&
+                dirtyBytes >= sizeof(RECT))
+            {
+                try
+                {
+                    std::vector<RECT> dirty(
+                        (dirtyBytes + sizeof(RECT) - 1) / sizeof(RECT));
+                    UINT actual = dirtyBytes;
+                    if (SUCCEEDED(duplication_->GetFrameDirtyRects(
+                            static_cast<UINT>(
+                                dirty.size() * sizeof(RECT)),
+                            dirty.data(), &actual)))
+                    {
+                        const UINT count =
+                            std::min<UINT>(
+                                static_cast<UINT>(dirty.size()),
+                                actual / sizeof(RECT));
+                        for (UINT i = 0; i < count; ++i)
+                        {
+                            if (intersectsGame(dirty[i]))
+                            {
+                                gameRegionChanged = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                catch (...) {}
+            }
+
+            if (!gameRegionChanged)
+            {
+                UINT moveBytes = 0;
+                HRESULT moveHr =
+                    duplication_->GetFrameMoveRects(0, nullptr, &moveBytes);
+                if ((moveHr == DXGI_ERROR_MORE_DATA || SUCCEEDED(moveHr)) &&
+                    moveBytes >= sizeof(DXGI_OUTDUPL_MOVE_RECT))
+                {
+                    try
+                    {
+                        std::vector<DXGI_OUTDUPL_MOVE_RECT> moves(
+                            (moveBytes + sizeof(DXGI_OUTDUPL_MOVE_RECT) - 1) /
+                            sizeof(DXGI_OUTDUPL_MOVE_RECT));
+                        UINT actual = moveBytes;
+                        if (SUCCEEDED(duplication_->GetFrameMoveRects(
+                                static_cast<UINT>(
+                                    moves.size() *
+                                    sizeof(DXGI_OUTDUPL_MOVE_RECT)),
+                                moves.data(), &actual)))
+                        {
+                            const UINT count =
+                                std::min<UINT>(
+                                    static_cast<UINT>(moves.size()),
+                                    actual /
+                                    sizeof(DXGI_OUTDUPL_MOVE_RECT));
+                            for (UINT i = 0; i < count; ++i)
+                            {
+                                if (intersectsGame(
+                                        moves[i].DestinationRect))
+                                {
+                                    gameRegionChanged = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    catch (...) {}
+                }
+            }
+
+            // If multiple output frames accumulated, metadata can be coalesced
+            // and an individual dirty rect may no longer describe every update.
+            // It is still safe to regard the game region as changed only when
+            // the whole game client is visible.
+            if (!gameRegionChanged && status.fullGameClientVisible &&
+                fi.AccumulatedFrames > 1)
+                gameRegionChanged = true;
+
             ID3D11Texture2D* tex = nullptr;
-            const HRESULT q = res->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&tex));
+            const HRESULT q = res->QueryInterface(
+                __uuidof(ID3D11Texture2D),
+                reinterpret_cast<void**>(&tex));
             res->Release();
+
             bool copied = false;
             if (SUCCEEDED(q) && tex)
             {
                 D3D11_TEXTURE2D_DESC d{};
                 tex->GetDesc(&d);
                 if ((d.Format == DXGI_FORMAT_B8G8R8A8_UNORM ||
-                     d.Format == DXGI_FORMAT_R16G16B16A16_FLOAT) && EnsureSource(d))
+                     d.Format == DXGI_FORMAT_R16G16B16A16_FLOAT) &&
+                    EnsureSource(d))
                 {
                     context_->CopyResource(source_, tex);
                     copied = true;
@@ -957,8 +1093,21 @@ namespace
             if (copied)
             {
                 haveFrame_ = true;
-                if(fi.LastPresentTime.QuadPart!=0){lastCapturePresentQpc_=fi.LastPresentTime.QuadPart;lastCapturePresentQpcLow_=static_cast<std::uint32_t>(fi.LastPresentTime.QuadPart);}
-                status.available=true;status.fresh=fi.AccumulatedFrames>0;status.lastPresentQpc=lastCapturePresentQpc_;status.lastPresentQpcLow=lastCapturePresentQpcLow_;
+                if (fi.LastPresentTime.QuadPart != 0)
+                {
+                    lastCapturePresentQpc_ =
+                        fi.LastPresentTime.QuadPart;
+                    lastCapturePresentQpcLow_ =
+                        static_cast<std::uint32_t>(
+                            fi.LastPresentTime.QuadPart);
+                }
+                status.available = true;
+                status.fresh = fi.AccumulatedFrames > 0;
+                status.lastPresentQpc = lastCapturePresentQpc_;
+                status.lastPresentQpcLow =
+                    lastCapturePresentQpcLow_;
+                status.gameRegionChanged = gameRegionChanged;
+                status.accumulatedFrames = fi.AccumulatedFrames;
                 MaybeLogCapturePixels();
             }
             return status;
@@ -1075,7 +1224,7 @@ namespace
             else
             {
                 UvRect whole{};
-                if (!GetGameUv(whole)) return false;
+                if (!GetGameUv(whole, true)) return false;
                 eyes[0] = { whole.x, whole.y, whole.w * 0.5f, whole.h };
                 eyes[1] = { whole.x + whole.w * 0.5f, whole.y, whole.w * 0.5f, whole.h };
                 eyeSrv[0] = eyeSrv[1] = stereoSourceSrv_;
@@ -1511,17 +1660,70 @@ namespace
             return true;
         }
 
-        bool GetGameUv(UvRect& uv)
+        bool GetGameClientOutputRect(RECT& rect) const
         {
-            if (!sourceWidth_ || !sourceHeight_ || !IsWindow(hwnd_)) return false;
-            RECT cr{};
-            if (!GetClientRect(hwnd_, &cr)) return false;
-            POINT tl{ cr.left, cr.top }, br{ cr.right, cr.bottom };
-            if (!ClientToScreen(hwnd_, &tl) || !ClientToScreen(hwnd_, &br)) return false;
-            const float l = static_cast<float>(tl.x - outputDesktop_.left) / sourceWidth_;
-            const float t = static_cast<float>(tl.y - outputDesktop_.top) / sourceHeight_;
-            const float r = static_cast<float>(br.x - outputDesktop_.left) / sourceWidth_;
-            const float b = static_cast<float>(br.y - outputDesktop_.top) / sourceHeight_;
+            rect = {};
+            if (!sourceWidth_ || !sourceHeight_ || !IsWindow(hwnd_))
+                return false;
+
+            RECT client{};
+            if (!GetClientRect(hwnd_, &client))
+                return false;
+            POINT tl{ client.left, client.top };
+            POINT br{ client.right, client.bottom };
+            if (!ClientToScreen(hwnd_, &tl) ||
+                !ClientToScreen(hwnd_, &br))
+                return false;
+
+            const long left = tl.x - outputDesktop_.left;
+            const long top = tl.y - outputDesktop_.top;
+            const long right = br.x - outputDesktop_.left;
+            const long bottom = br.y - outputDesktop_.top;
+            rect = { left, top, right, bottom };
+
+            // Projection/SBS transport requires the complete client rectangle.
+            // Do not clamp a partially off-screen 4K window and then split the
+            // surviving pixels in half: that moves the true SBS centre seam.
+            return left >= 0 && top >= 0 &&
+                right <= static_cast<long>(sourceWidth_) &&
+                bottom <= static_cast<long>(sourceHeight_) &&
+                right > left && bottom > top;
+        }
+
+        bool GetGameUv(UvRect& uv, bool requireFullyVisible = false)
+        {
+            if (!sourceWidth_ || !sourceHeight_ || !IsWindow(hwnd_))
+                return false;
+
+            RECT client{};
+            if (!GetClientRect(hwnd_, &client))
+                return false;
+            POINT tl{ client.left, client.top };
+            POINT br{ client.right, client.bottom };
+            if (!ClientToScreen(hwnd_, &tl) ||
+                !ClientToScreen(hwnd_, &br))
+                return false;
+
+            const long leftPx = tl.x - outputDesktop_.left;
+            const long topPx = tl.y - outputDesktop_.top;
+            const long rightPx = br.x - outputDesktop_.left;
+            const long bottomPx = br.y - outputDesktop_.top;
+            const bool fullyVisible =
+                leftPx >= 0 && topPx >= 0 &&
+                rightPx <= static_cast<long>(sourceWidth_) &&
+                bottomPx <= static_cast<long>(sourceHeight_) &&
+                rightPx > leftPx && bottomPx > topPx;
+            if (requireFullyVisible && !fullyVisible)
+                return false;
+
+            const float l =
+                static_cast<float>(leftPx) / sourceWidth_;
+            const float t =
+                static_cast<float>(topPx) / sourceHeight_;
+            const float r =
+                static_cast<float>(rightPx) / sourceWidth_;
+            const float b =
+                static_cast<float>(bottomPx) / sourceHeight_;
             uv.x = std::clamp(l, 0.f, 1.f);
             uv.y = std::clamp(t, 0.f, 1.f);
             const float rr = std::clamp(r, 0.f, 1.f);
