@@ -16,6 +16,7 @@
 #include "game_addrs.hpp"
 #include "vr_shared.hpp"
 #include "vr/ipc/host_pose_v3.hpp"
+#include "vr/ipc/cadence_v1.hpp"
 
 // Authoritative renderer-side OpenXR head-pose injector for OutRun 2006.
 //
@@ -52,6 +53,8 @@ namespace Settings
 	extern Setting<float> VRRotationScale;
 	extern Setting<int> VRMatrixOrder;
 	extern Setting<bool> VRTelemetry;
+	extern Setting<int> VRFrameCadenceMode;
+	extern Setting<float> VRFrameCadenceTimeoutMs;
 }
 
 namespace OutRunVRRenderer
@@ -106,6 +109,22 @@ namespace OutRunVRRenderer
 		SharedPoseState* SharedState = nullptr;
 		LARGE_INTEGER QpcFrequency{};
 		OutRunVR::IpcV3::HostPoseV3Source V3PoseSource{};
+
+		HANDLE CadenceHostMapping = nullptr;
+		const OutRunVR::CadenceV1::HostState* CadenceHostState = nullptr;
+		HANDLE CadenceClientMapping = nullptr;
+		OutRunVR::CadenceV1::ClientState* CadenceClientState = nullptr;
+		HANDLE CadenceRequestEvent = nullptr;
+		HANDLE CadencePresentedEvent = nullptr;
+		std::atomic<std::uint32_t> ActiveCadenceRequestId{0};
+		std::uint32_t CadenceAcceptedRequestId = 0;
+		std::uint32_t CadencePresentedRequestId = 0;
+		std::uint32_t CadenceTimeoutCount = 0;
+		std::uint32_t CadenceLastWaitUs = 0;
+		std::int64_t CadenceAcceptedQpc = 0;
+		std::int64_t CadencePresentedQpc = 0;
+		bool FirstCadenceAcceptedLogged = false;
+		bool FirstCadenceTimeoutLogged = false;
 
 		const D3DMATRIX* RendererView = nullptr;
 		const D3DMATRIX* RendererProjection = nullptr;
@@ -750,6 +769,226 @@ namespace OutRunVRRenderer
 			return CurrentPresentationMode() == PresentationGameplay;
 		}
 
+
+        bool CadenceHostHeaderValid(const OutRunVR::CadenceV1::HostState& state) noexcept
+        {
+            return state.magic == OutRunVR::CadenceV1::HostMagic &&
+                state.version == OutRunVR::CadenceV1::ProtocolVersion &&
+                state.structSize == sizeof(OutRunVR::CadenceV1::HostState);
+        }
+
+        bool EnsureCadenceChannel() noexcept
+        {
+            if (!CadenceHostState)
+            {
+                CadenceHostMapping = OpenFileMappingW(
+                    FILE_MAP_READ, FALSE, OutRunVR::CadenceV1::HostStateName);
+                if (!CadenceHostMapping)
+                    return false;
+                CadenceHostState =
+                    static_cast<const OutRunVR::CadenceV1::HostState*>(
+                        MapViewOfFile(CadenceHostMapping, FILE_MAP_READ, 0, 0,
+                            sizeof(OutRunVR::CadenceV1::HostState)));
+                if (!CadenceHostState)
+                {
+                    CloseHandle(CadenceHostMapping);
+                    CadenceHostMapping = nullptr;
+                    return false;
+                }
+            }
+
+            if (!CadenceClientState)
+            {
+                CadenceClientMapping = CreateFileMappingW(
+                    INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0,
+                    static_cast<DWORD>(sizeof(OutRunVR::CadenceV1::ClientState)),
+                    OutRunVR::CadenceV1::ClientStateName);
+                if (!CadenceClientMapping)
+                    return false;
+                CadenceClientState =
+                    static_cast<OutRunVR::CadenceV1::ClientState*>(
+                        MapViewOfFile(CadenceClientMapping, FILE_MAP_ALL_ACCESS, 0, 0,
+                            sizeof(OutRunVR::CadenceV1::ClientState)));
+                if (!CadenceClientState)
+                {
+                    CloseHandle(CadenceClientMapping);
+                    CadenceClientMapping = nullptr;
+                    return false;
+                }
+                std::memset(CadenceClientState, 0, sizeof(*CadenceClientState));
+                CadenceClientState->version = OutRunVR::CadenceV1::ProtocolVersion;
+                CadenceClientState->structSize = sizeof(*CadenceClientState);
+                CadenceClientState->clientPid = GetCurrentProcessId();
+                MemoryBarrier();
+                CadenceClientState->magic = OutRunVR::CadenceV1::ClientMagic;
+            }
+
+            if (!CadenceRequestEvent)
+                CadenceRequestEvent = CreateEventW(
+                    nullptr, FALSE, FALSE, OutRunVR::CadenceV1::RequestEventName);
+            if (!CadencePresentedEvent)
+                CadencePresentedEvent = CreateEventW(
+                    nullptr, FALSE, FALSE, OutRunVR::CadenceV1::PresentedEventName);
+
+            return CadenceHostState && CadenceClientState &&
+                CadenceRequestEvent && CadencePresentedEvent;
+        }
+
+        bool ReadCadenceHost(OutRunVR::CadenceV1::HostState& out) noexcept
+        {
+            if (!EnsureCadenceChannel())
+                return false;
+            for (int attempt = 0; attempt < 4; ++attempt)
+            {
+                const std::uint32_t before = CadenceHostState->sequence;
+                if (before & 1u)
+                    continue;
+                MemoryBarrier();
+                std::memcpy(&out, CadenceHostState, sizeof(out));
+                MemoryBarrier();
+                const std::uint32_t after = CadenceHostState->sequence;
+                if (before == after && !(after & 1u) &&
+                    CadenceHostHeaderValid(out))
+                    return true;
+            }
+            return false;
+        }
+
+        void PublishCadenceClient(std::uint32_t flags) noexcept
+        {
+            if (!CadenceClientState)
+                return;
+            LONG seq = InterlockedIncrement(
+                reinterpret_cast<volatile LONG*>(&CadenceClientState->sequence));
+            if ((seq & 1) == 0)
+                InterlockedIncrement(
+                    reinterpret_cast<volatile LONG*>(&CadenceClientState->sequence));
+            MemoryBarrier();
+            CadenceClientState->magic = OutRunVR::CadenceV1::ClientMagic;
+            CadenceClientState->version = OutRunVR::CadenceV1::ProtocolVersion;
+            CadenceClientState->structSize = sizeof(*CadenceClientState);
+            CadenceClientState->clientPid = GetCurrentProcessId();
+            CadenceClientState->flags = flags;
+            CadenceClientState->acceptedRequestId = CadenceAcceptedRequestId;
+            CadenceClientState->presentedRequestId = CadencePresentedRequestId;
+            CadenceClientState->timeoutCount = CadenceTimeoutCount;
+            CadenceClientState->lastWaitUs = CadenceLastWaitUs;
+            CadenceClientState->acceptedQpc = CadenceAcceptedQpc;
+            CadenceClientState->presentedQpc = CadencePresentedQpc;
+            MemoryBarrier();
+            seq = InterlockedIncrement(
+                reinterpret_cast<volatile LONG*>(&CadenceClientState->sequence));
+            if (seq & 1)
+                InterlockedIncrement(
+                    reinterpret_cast<volatile LONG*>(&CadenceClientState->sequence));
+        }
+
+        void AcceptCadenceRequest(std::uint32_t requestId,
+            std::uint32_t waitUs) noexcept
+        {
+            LARGE_INTEGER now{};
+            QueryPerformanceCounter(&now);
+            ActiveCadenceRequestId.store(requestId, std::memory_order_release);
+            CadenceAcceptedRequestId = requestId;
+            CadenceAcceptedQpc = now.QuadPart;
+            CadenceLastWaitUs = waitUs;
+            PublishCadenceClient(OutRunVR::CadenceV1::ClientEnabled);
+            if (!FirstCadenceAcceptedLogged)
+            {
+                FirstCadenceAcceptedLogged = true;
+                spdlog::info(
+                    "VR R35 CADENCE: XR-driven PhaseLock active; request={} game frames are released only at bounded host cadence boundaries",
+                    requestId);
+            }
+        }
+
+        void MarkCadencePresented() noexcept
+        {
+            if (Settings::VRFrameCadenceMode <= 0 || !EnsureCadenceChannel())
+                return;
+            const std::uint32_t active =
+                ActiveCadenceRequestId.load(std::memory_order_acquire);
+            if (!active || active == CadencePresentedRequestId)
+                return;
+            LARGE_INTEGER now{};
+            QueryPerformanceCounter(&now);
+            CadencePresentedRequestId = active;
+            CadencePresentedQpc = now.QuadPart;
+            PublishCadenceClient(OutRunVR::CadenceV1::ClientEnabled);
+            SetEvent(CadencePresentedEvent);
+        }
+
+        void WaitForNextCadenceRequest() noexcept
+        {
+            if (Settings::VRFrameCadenceMode <= 0 || !GameRendererIsActive())
+                return;
+
+            OutRunVR::CadenceV1::HostState host{};
+            if (!ReadCadenceHost(host))
+                return;
+            const std::uint32_t required =
+                OutRunVR::CadenceV1::HostEnabled |
+                OutRunVR::CadenceV1::HostRunning;
+            if ((host.flags & required) != required || !host.hostPid)
+                return;
+
+            const std::uint32_t current =
+                ActiveCadenceRequestId.load(std::memory_order_acquire);
+            LARGE_INTEGER start{}, end{}, frequency{};
+            QueryPerformanceCounter(&start);
+            QueryPerformanceFrequency(&frequency);
+
+            if (host.requestId && host.requestId != current)
+            {
+                AcceptCadenceRequest(host.requestId, 0);
+                return;
+            }
+
+            PublishCadenceClient(
+                OutRunVR::CadenceV1::ClientEnabled |
+                OutRunVR::CadenceV1::ClientWaiting);
+            const DWORD timeoutMs = static_cast<DWORD>(std::clamp(
+                Settings::VRFrameCadenceTimeoutMs.get(), 5.0f, 100.0f));
+            const DWORD wait = WaitForSingleObject(CadenceRequestEvent, timeoutMs);
+            QueryPerformanceCounter(&end);
+            const std::uint32_t waitUs =
+                frequency.QuadPart > 0 && end.QuadPart >= start.QuadPart
+                ? static_cast<std::uint32_t>(std::min<LONGLONG>(
+                    0xFFFFFFFFll,
+                    ((end.QuadPart - start.QuadPart) * 1000000ll) /
+                        frequency.QuadPart))
+                : 0u;
+
+            OutRunVR::CadenceV1::HostState after{};
+            if (ReadCadenceHost(after) && after.requestId &&
+                after.requestId != current &&
+                (after.flags & required) == required)
+            {
+                AcceptCadenceRequest(after.requestId, waitUs);
+                return;
+            }
+
+            CadenceLastWaitUs = waitUs;
+            if (wait == WAIT_TIMEOUT)
+            {
+                ++CadenceTimeoutCount;
+                PublishCadenceClient(
+                    OutRunVR::CadenceV1::ClientEnabled |
+                    OutRunVR::CadenceV1::ClientLastWaitTimedOut);
+                if (!FirstCadenceTimeoutLogged)
+                {
+                    FirstCadenceTimeoutLogged = true;
+                    spdlog::warn(
+                        "VR R35 CADENCE: host request timeout after {} ms; failing open so OutRun cannot hang",
+                        timeoutMs);
+                }
+            }
+            else
+            {
+                PublishCadenceClient(OutRunVR::CadenceV1::ClientEnabled);
+            }
+        }
+
 		void ResetFrameState()
 		{
 			LatchedHeadInverseValid = false;
@@ -1296,6 +1535,11 @@ namespace OutRunVRRenderer
 		}
 	}
 
+	std::uint32_t GetActiveCadenceRequestId() noexcept
+	{
+		return ActiveCadenceRequestId.load(std::memory_order_acquire);
+	}
+
 	bool GetLatchedStereoFrame(LatchedStereoFrame& out)
 	{
 		out = LatchedStereo;
@@ -1309,13 +1553,18 @@ namespace OutRunVRRenderer
 
 	void NotifyGamePresent()
 	{
+		MarkCadencePresented();
 		PresentPoseLocked = false;
 		InvalidateVerifiedWvp();
 		RestoreCullingCamera();
+		WaitForNextCadenceRequest();
 	}
 
 	void NotifyGameReset()
 	{
+		ActiveCadenceRequestId.store(0, std::memory_order_release);
+		CadenceAcceptedRequestId = 0;
+		CadencePresentedRequestId = 0;
 		PresentPoseLocked = false;
 		RestoreCullingCamera();
 		ResetFrameState();

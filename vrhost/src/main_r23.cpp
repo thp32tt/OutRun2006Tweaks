@@ -34,6 +34,7 @@
 #include "vr_shared.hpp"
 #include "stereo_shader.hpp"
 #include "runtime/r23_verified_bundle.hpp"
+#include "vr/ipc/cadence_v1.hpp"
 
 #ifndef OUTRUN_VR_BUILD_SHA
 #define OUTRUN_VR_BUILD_SHA "unknown"
@@ -1200,6 +1201,365 @@ namespace
                 frame.eye[eye].fov.angleUp, frame.eye[eye].fov.angleDown };
         }
     }
+
+    int R35ReadEnvInt(const char* name, int fallback) noexcept
+    {
+        const char* value = std::getenv(name);
+        if (!value || !*value)
+            return fallback;
+        char* end = nullptr;
+        const long parsed = std::strtol(value, &end, 10);
+        return end && end != value ? static_cast<int>(parsed) : fallback;
+    }
+
+    float R35ReadEnvFloat(const char* name, float fallback) noexcept
+    {
+        const char* value = std::getenv(name);
+        if (!value || !*value)
+            return fallback;
+        char* end = nullptr;
+        const float parsed = std::strtof(value, &end);
+        return end && end != value && std::isfinite(parsed)
+            ? parsed : fallback;
+    }
+
+    class R35CadenceHost
+    {
+    public:
+        struct Request
+        {
+            std::uint32_t id = 0;
+            bool issued = false;
+        };
+
+        R35CadenceHost(int mode, float targetHz, std::uint32_t timeoutMs)
+            : mode_(std::clamp(mode, 0, 2)),
+              targetHz_(std::clamp(targetHz, 30.0f, 120.0f)),
+              timeoutMs_(std::clamp<std::uint32_t>(timeoutMs, 5u, 100u))
+        {
+            if (mode_ == 0)
+                return;
+
+            hostMapping_ = CreateFileMappingW(
+                INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0,
+                static_cast<DWORD>(sizeof(OutRunVR::CadenceV1::HostState)),
+                OutRunVR::CadenceV1::HostStateName);
+            if (!hostMapping_)
+                throw std::runtime_error("CreateFileMappingW Cadence.v1 host failed");
+            host_ = static_cast<OutRunVR::CadenceV1::HostState*>(
+                MapViewOfFile(hostMapping_, FILE_MAP_ALL_ACCESS, 0, 0,
+                    sizeof(OutRunVR::CadenceV1::HostState)));
+            if (!host_)
+                throw std::runtime_error("MapViewOfFile Cadence.v1 host failed");
+
+            requestEvent_ = CreateEventW(
+                nullptr, FALSE, FALSE, OutRunVR::CadenceV1::RequestEventName);
+            presentedEvent_ = CreateEventW(
+                nullptr, FALSE, FALSE, OutRunVR::CadenceV1::PresentedEventName);
+            if (!requestEvent_ || !presentedEvent_)
+                throw std::runtime_error("CreateEventW Cadence.v1 failed");
+
+            std::memset(host_, 0, sizeof(*host_));
+            host_->version = OutRunVR::CadenceV1::ProtocolVersion;
+            host_->structSize = sizeof(*host_);
+            host_->hostPid = GetCurrentProcessId();
+            MemoryBarrier();
+            host_->magic = OutRunVR::CadenceV1::HostMagic;
+            Publish();
+        }
+
+        ~R35CadenceHost()
+        {
+            if (host_)
+            {
+                running_ = false;
+                enabled_ = false;
+                Publish();
+                UnmapViewOfFile(host_);
+            }
+            if (client_)
+                UnmapViewOfFile(client_);
+            if (clientMapping_)
+                CloseHandle(clientMapping_);
+            if (requestEvent_)
+                CloseHandle(requestEvent_);
+            if (presentedEvent_)
+                CloseHandle(presentedEvent_);
+            if (hostMapping_)
+                CloseHandle(hostMapping_);
+        }
+
+        bool Enabled() const noexcept { return mode_ != 0 && enabled_; }
+        int Mode() const noexcept { return mode_; }
+        float TargetHz() const noexcept { return targetHz_; }
+        std::uint32_t TimeoutMs() const noexcept { return timeoutMs_; }
+
+        void SetRunning(bool running) noexcept
+        {
+            running_ = running;
+            enabled_ = mode_ != 0;
+            Publish();
+        }
+
+        Request IssueIfDue(const XrFrameState& frame,
+            std::uint32_t poseSequence) noexcept
+        {
+            ++intervalXrFrames_;
+            if (!Enabled() || !running_ ||
+                frame.predictedDisplayPeriod <= 0 ||
+                frame.predictedDisplayTime <= 0)
+                return { requestId_, false };
+
+            const XrTime targetPeriod = static_cast<XrTime>(
+                std::llround(1000000000.0 / static_cast<double>(targetHz_)));
+            if (nextRequestDisplayTime_ == 0)
+                nextRequestDisplayTime_ = frame.predictedDisplayTime;
+
+            if (frame.predictedDisplayTime < nextRequestDisplayTime_)
+                return { requestId_, false };
+
+            do
+            {
+                nextRequestDisplayTime_ += targetPeriod;
+            } while (nextRequestDisplayTime_ <= frame.predictedDisplayTime);
+
+            if (++requestId_ == 0)
+                ++requestId_;
+            poseSequence_ = poseSequence;
+            predictedDisplayTime_ = frame.predictedDisplayTime;
+            predictedDisplayPeriod_ = frame.predictedDisplayPeriod;
+            LARGE_INTEGER now{};
+            QueryPerformanceCounter(&now);
+            requestQpc_ = now.QuadPart;
+            Publish();
+            SetEvent(requestEvent_);
+            ++intervalRequests_;
+            return { requestId_, true };
+        }
+
+        double WaitForPresented(const Request& request,
+            const XrFrameState& frame) noexcept
+        {
+            if (mode_ < 2 || !request.issued || !request.id)
+                return 0.0;
+
+            OutRunVR::CadenceV1::ClientState client{};
+            if (ReadClient(client) &&
+                client.presentedRequestId == request.id)
+                return 0.0;
+
+            const double periodMs = frame.predictedDisplayPeriod > 0
+                ? static_cast<double>(frame.predictedDisplayPeriod) / 1000000.0
+                : 0.0;
+            const DWORD budgetMs = static_cast<DWORD>(std::clamp(
+                periodMs > 0.0 ? periodMs * 0.65 : 2.0,
+                1.0, static_cast<double>(timeoutMs_)));
+
+            LARGE_INTEGER start{}, end{}, frequency{};
+            QueryPerformanceCounter(&start);
+            QueryPerformanceFrequency(&frequency);
+            WaitForSingleObject(presentedEvent_, budgetMs);
+            QueryPerformanceCounter(&end);
+            const double waitedMs =
+                frequency.QuadPart > 0 && end.QuadPart >= start.QuadPart
+                ? static_cast<double>(end.QuadPart - start.QuadPart) *
+                    1000.0 / static_cast<double>(frequency.QuadPart)
+                : 0.0;
+
+            ++intervalSerialWaitCount_;
+            intervalSerialWaitMs_ += waitedMs;
+            intervalSerialWaitMaxMs_ =
+                std::max(intervalSerialWaitMaxMs_, waitedMs);
+
+            if (!ReadClient(client) ||
+                client.presentedRequestId != request.id)
+                ++intervalSerialTimeouts_;
+            else
+                ++intervalSerializedMatches_;
+            return waitedMs;
+        }
+
+        void NoteFrame(bool freshProjection, bool cachedProjection,
+            bool layerReady, std::uint32_t candidateRequestId) noexcept
+        {
+            if (freshProjection)
+                ++intervalFresh_;
+            else if (cachedProjection)
+                ++intervalCached_;
+            else if (!layerReady)
+                ++intervalNoLayer_;
+            else
+                ++intervalOtherLayer_;
+
+            lastCandidateRequestId_ = candidateRequestId;
+            if (candidateRequestId)
+            {
+                ++intervalTaggedCandidates_;
+                if (candidateRequestId == requestId_)
+                    ++intervalLatestRequestMatches_;
+            }
+        }
+
+        void AppendAndReset(std::ostringstream& out)
+        {
+            OutRunVR::CadenceV1::ClientState client{};
+            const bool haveClient = ReadClient(client);
+            out << " cadence={mode:" << mode_
+                << ",targetHz:" << targetHz_
+                << ",xr:" << intervalXrFrames_
+                << ",req:" << intervalRequests_
+                << ",fresh:" << intervalFresh_
+                << ",cached:" << intervalCached_
+                << ",other:" << intervalOtherLayer_
+                << ",noLayer:" << intervalNoLayer_
+                << ",tagged:" << intervalTaggedCandidates_
+                << ",latestMatch:" << intervalLatestRequestMatches_
+                << ",latestReq:" << requestId_
+                << ",candidateReq:" << lastCandidateRequestId_
+                << ",clientAccepted:"
+                << (haveClient ? client.acceptedRequestId : 0u)
+                << ",clientPresented:"
+                << (haveClient ? client.presentedRequestId : 0u)
+                << ",clientTimeouts:"
+                << (haveClient ? client.timeoutCount : 0u)
+                << ",clientWaitUs:"
+                << (haveClient ? client.lastWaitUs : 0u)
+                << ",serialMatch:" << intervalSerializedMatches_
+                << ",serialTimeout:" << intervalSerialTimeouts_
+                << ",serialWaitAvgMax:";
+            const double avg = intervalSerialWaitCount_
+                ? intervalSerialWaitMs_ /
+                    static_cast<double>(intervalSerialWaitCount_)
+                : 0.0;
+            out << avg << "/" << intervalSerialWaitMaxMs_ << "}";
+
+            intervalXrFrames_ = 0;
+            intervalRequests_ = 0;
+            intervalFresh_ = 0;
+            intervalCached_ = 0;
+            intervalOtherLayer_ = 0;
+            intervalNoLayer_ = 0;
+            intervalTaggedCandidates_ = 0;
+            intervalLatestRequestMatches_ = 0;
+            intervalSerializedMatches_ = 0;
+            intervalSerialTimeouts_ = 0;
+            intervalSerialWaitCount_ = 0;
+            intervalSerialWaitMs_ = 0.0;
+            intervalSerialWaitMaxMs_ = 0.0;
+        }
+
+    private:
+        void Publish() noexcept
+        {
+            if (!host_)
+                return;
+            LONG seq = InterlockedIncrement(
+                reinterpret_cast<volatile LONG*>(&host_->sequence));
+            if ((seq & 1) == 0)
+                InterlockedIncrement(
+                    reinterpret_cast<volatile LONG*>(&host_->sequence));
+            MemoryBarrier();
+            host_->magic = OutRunVR::CadenceV1::HostMagic;
+            host_->version = OutRunVR::CadenceV1::ProtocolVersion;
+            host_->structSize = sizeof(*host_);
+            host_->hostPid = GetCurrentProcessId();
+            host_->flags =
+                (enabled_ ? OutRunVR::CadenceV1::HostEnabled : 0u) |
+                (running_ ? OutRunVR::CadenceV1::HostRunning : 0u) |
+                (mode_ >= 2
+                    ? OutRunVR::CadenceV1::HostSerializedProbe : 0u);
+            host_->requestId = requestId_;
+            host_->poseSequence = poseSequence_;
+            host_->targetHzMilli = static_cast<std::uint32_t>(
+                std::lround(targetHz_ * 1000.0f));
+            host_->timeoutMs = timeoutMs_;
+            host_->requestQpc = requestQpc_;
+            host_->predictedDisplayTime = predictedDisplayTime_;
+            host_->predictedDisplayPeriod = predictedDisplayPeriod_;
+            MemoryBarrier();
+            seq = InterlockedIncrement(
+                reinterpret_cast<volatile LONG*>(&host_->sequence));
+            if (seq & 1)
+                InterlockedIncrement(
+                    reinterpret_cast<volatile LONG*>(&host_->sequence));
+        }
+
+        bool EnsureClient() noexcept
+        {
+            if (client_)
+                return true;
+            clientMapping_ = OpenFileMappingW(
+                FILE_MAP_READ, FALSE, OutRunVR::CadenceV1::ClientStateName);
+            if (!clientMapping_)
+                return false;
+            client_ = static_cast<const OutRunVR::CadenceV1::ClientState*>(
+                MapViewOfFile(clientMapping_, FILE_MAP_READ, 0, 0,
+                    sizeof(OutRunVR::CadenceV1::ClientState)));
+            if (!client_)
+            {
+                CloseHandle(clientMapping_);
+                clientMapping_ = nullptr;
+                return false;
+            }
+            return true;
+        }
+
+        bool ReadClient(OutRunVR::CadenceV1::ClientState& out) noexcept
+        {
+            if (!EnsureClient())
+                return false;
+            for (int attempt = 0; attempt < 4; ++attempt)
+            {
+                const std::uint32_t before = client_->sequence;
+                if (before & 1u)
+                    continue;
+                MemoryBarrier();
+                std::memcpy(&out, client_, sizeof(out));
+                MemoryBarrier();
+                const std::uint32_t after = client_->sequence;
+                if (before == after && !(after & 1u) &&
+                    out.magic == OutRunVR::CadenceV1::ClientMagic &&
+                    out.version == OutRunVR::CadenceV1::ProtocolVersion &&
+                    out.structSize == sizeof(out))
+                    return true;
+            }
+            return false;
+        }
+
+        int mode_ = 0;
+        float targetHz_ = 60.0f;
+        std::uint32_t timeoutMs_ = 35;
+        bool enabled_ = false;
+        bool running_ = false;
+        HANDLE hostMapping_ = nullptr;
+        OutRunVR::CadenceV1::HostState* host_ = nullptr;
+        HANDLE clientMapping_ = nullptr;
+        const OutRunVR::CadenceV1::ClientState* client_ = nullptr;
+        HANDLE requestEvent_ = nullptr;
+        HANDLE presentedEvent_ = nullptr;
+        std::uint32_t requestId_ = 0;
+        std::uint32_t poseSequence_ = 0;
+        std::int64_t requestQpc_ = 0;
+        XrTime predictedDisplayTime_ = 0;
+        XrDuration predictedDisplayPeriod_ = 0;
+        XrTime nextRequestDisplayTime_ = 0;
+
+        std::uint64_t intervalXrFrames_ = 0;
+        std::uint64_t intervalRequests_ = 0;
+        std::uint64_t intervalFresh_ = 0;
+        std::uint64_t intervalCached_ = 0;
+        std::uint64_t intervalOtherLayer_ = 0;
+        std::uint64_t intervalNoLayer_ = 0;
+        std::uint64_t intervalTaggedCandidates_ = 0;
+        std::uint64_t intervalLatestRequestMatches_ = 0;
+        std::uint64_t intervalSerializedMatches_ = 0;
+        std::uint64_t intervalSerialTimeouts_ = 0;
+        std::uint64_t intervalSerialWaitCount_ = 0;
+        double intervalSerialWaitMs_ = 0.0;
+        double intervalSerialWaitMaxMs_ = 0.0;
+        std::uint32_t lastCandidateRequestId_ = 0;
+    };
+
 }
 
 int main(int argc, char** argv)
@@ -1218,6 +1578,15 @@ int main(int argc, char** argv)
         const bool directTransportOnly =
             directTransportEnabled && DirectTransportOnly();
         const float targetRefreshRateHz = RequestedRefreshRateHz();
+        const int cadenceMode = std::clamp(
+            R35ReadEnvInt("OUTRUN_VR_CADENCE_MODE", 0), 0, 2);
+        const float cadenceTargetHz = std::clamp(
+            R35ReadEnvFloat("OUTRUN_VR_CADENCE_TARGET_HZ", 60.0f),
+            30.0f, 120.0f);
+        const std::uint32_t cadenceTimeoutMs =
+            static_cast<std::uint32_t>(std::clamp(
+                R35ReadEnvFloat("OUTRUN_VR_CADENCE_TIMEOUT_MS", 35.0f),
+                5.0f, 100.0f));
         HWND gameWindow = WaitForGameWindow();
         DWORD gamePid = 0; GetWindowThreadProcessId(gameWindow, &gamePid);
 
@@ -1286,6 +1655,9 @@ int main(int argc, char** argv)
             << (directTransportEnabled ? 1 : 0)
             << " directOnly=" << (directTransportOnly ? 1 : 0)
             << " targetRefreshHz=" << targetRefreshRateHz
+            << " cadenceMode=" << cadenceMode
+            << " cadenceTargetHz=" << cadenceTargetHz
+            << " cadenceTimeoutMs=" << cadenceTimeoutMs
             << "\n";
 #ifdef XR_FB_display_refresh_rate
         if (displayRefreshExtensionEnabled)
@@ -1321,6 +1693,8 @@ int main(int argc, char** argv)
         std::array<XrViewConfigurationView, 2> configs{ cv[0], cv[1] };
 
         SharedWriter shared(req.adapterLuid);
+        R35CadenceHost cadence(cadenceMode, cadenceTargetHz,
+            cadenceTimeoutMs);
         RenderFrameReader renderFrames;
         StereoCompositor compositor(session, d3d.device, d3d.context, gameWindow,
             configs, directTransportEnabled, renderScale);
@@ -1338,6 +1712,7 @@ int main(int argc, char** argv)
         bool running = false, quit = false, exitRequested = false;
         ULONGLONG exitRequestMs = 0;
         XrSessionState state = XR_SESSION_STATE_UNKNOWN;
+        LARGE_INTEGER lastXrWaitReturnQpc{};
         OutRunVR::ClientPresentationMode lastPresentation = OutRunVR::PresentationUnknown;
         std::array<XrView, 2> matchedViews{};
         bool matchedStereoValid = false;
@@ -1393,11 +1768,12 @@ int main(int argc, char** argv)
                         begin.primaryViewConfigurationType = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
                         CheckXr(xrBeginSession(session, &begin), "xrBeginSession");
                         running = true;
+                        cadence.SetRunning(true);
                     }
                     else if (state == XR_SESSION_STATE_STOPPING && running)
                     {
                         CheckXr(xrEndSession(session), "xrEndSession");
-                        running = false; viewHistory.Clear(); matchedStereoValid = false;
+                        running = false; cadence.SetRunning(false); viewHistory.Clear(); matchedStereoValid = false;
                         lastStereoMatchMs = 0; cachedProjectionValid = false;
                         cachedProjectionRenderedMs = 0;
                         compositor.ReferenceSpaceChanged();
@@ -1425,7 +1801,16 @@ int main(int argc, char** argv)
             XrFrameState fs{ XR_TYPE_FRAME_STATE };
             LARGE_INTEGER ws{}, we{}; QueryPerformanceCounter(&ws);
             CheckXr(xrWaitFrame(session, &wi, &fs), "xrWaitFrame");
-            QueryPerformanceCounter(&we); timings.wait.Add(timings.Ms(ws, we));
+            QueryPerformanceCounter(&we);
+            const double xrWaitFrameMs = timings.Ms(ws, we);
+            timings.wait.Add(xrWaitFrameMs);
+            const double xrFrameIntervalMs =
+                lastXrWaitReturnQpc.QuadPart > 0 && qpcFrequency.QuadPart > 0 &&
+                we.QuadPart >= lastXrWaitReturnQpc.QuadPart
+                ? static_cast<double>(we.QuadPart - lastXrWaitReturnQpc.QuadPart) *
+                    1000.0 / static_cast<double>(qpcFrequency.QuadPart)
+                : 0.0;
+            lastXrWaitReturnQpc = we;
 
             if (pendingReferenceSpaceChange &&
                 (pendingReferenceSpaceChangeTime == 0 || fs.predictedDisplayTime >= pendingReferenceSpaceChangeTime))
@@ -1459,6 +1844,13 @@ int main(int argc, char** argv)
                 XR_VIEW_STATE_POSITION_VALID_BIT;
             if (vc >= 2 && (vs.viewStateFlags & neededViews) == neededViews)
                 viewHistory.Store(hostSequence, views);
+
+            // R35: xrBeginFrame has already succeeded and the due pose has
+            // been published. Only now release the next game frame.
+            const auto cadenceRequest =
+                cadence.IssueIfDue(fs, hostSequence);
+            const double cadenceSerialWaitMs =
+                cadence.WaitForPresented(cadenceRequest, fs);
 
             XrFrameEndInfo end{ XR_TYPE_FRAME_END_INFO };
             end.displayTime = fs.predictedDisplayTime; end.environmentBlendMode = blend;
@@ -1510,6 +1902,10 @@ int main(int argc, char** argv)
             std::uint32_t candidateGameFrameId = 0;
             std::uint32_t candidatePoseSequence = 0;
             std::int64_t candidateGamePresentQpc = 0;
+            std::uint32_t candidateCadenceRequestId = 0;
+            double candidateConsumeAgeMs = -1.0;
+            bool frameFreshProjection = false;
+            bool frameCachedProjection = false;
             std::int64_t candidateCaptureQpc = 0;
             double candidateCaptureAgeMs = -1.0;
             double candidateCaptureMs = 0.0;
@@ -1536,6 +1932,8 @@ int main(int argc, char** argv)
                         candidateGameFrameId = before.frameId;
                         candidatePoseSequence = before.sourcePoseSequence;
                         candidateGamePresentQpc = before.presentQpc;
+                        candidateCadenceRequestId =
+                            before.reserved[OutRunVR::RenderFrameCadenceRequestIndex];
                     }
                     if (!have)
                         candidateRejectReason = "no-frame-state";
@@ -1701,6 +2099,15 @@ int main(int argc, char** argv)
                             matchedStereoValid = true;
                             newStereoCommitted = true;
                             candidateRejectReason = "committed-pending-render";
+                            if (candidate.presentQpc > 0 && qpcFrequency.QuadPart > 0)
+                            {
+                                LARGE_INTEGER consumedNow{};
+                                QueryPerformanceCounter(&consumedNow);
+                                if (consumedNow.QuadPart >= candidate.presentQpc)
+                                    candidateConsumeAgeMs =
+                                        static_cast<double>(consumedNow.QuadPart - candidate.presentQpc) *
+                                        1000.0 / static_cast<double>(qpcFrequency.QuadPart);
+                            }
 
                             // Do not replace the verified/display authority yet.
                             // The source becomes authoritative only after a new
@@ -1749,6 +2156,7 @@ int main(int argc, char** argv)
                                 &projection);
                         layerReady = true;
                         finalLayerKind = "projection-fresh";
+                        frameFreshProjection = true;
                         cachedProjectionViews = pv;
                         cachedProjectionValid = true;
                         cachedProjectionRenderedMs = projectionNow;
@@ -1775,6 +2183,7 @@ int main(int argc, char** argv)
                                 &projection);
                         layerReady = true;
                         finalLayerKind = "projection-cached";
+                        frameCachedProjection = true;
                         ++R23CachedProjectionSubmits;
 
                         if (R23LastCachedProjectionLogMs == 0 ||
@@ -1887,6 +2296,9 @@ int main(int argc, char** argv)
             CheckXr(endResult, "xrEndFrame");
             const double endFrameMs = timings.Ms(es, ee);
             timings.end.Add(endFrameMs);
+            cadence.NoteFrame(frameFreshProjection,
+                frameCachedProjection, layerReady,
+                candidateCadenceRequestId);
             pipelineWindow.Note(candidateRejectReason,
                 actualFinalLayerKind, candidateCaptureMs,
                 candidateCommitCopyMs, frameRenderMs, endFrameMs);
@@ -1935,10 +2347,16 @@ int main(int argc, char** argv)
                     << " captureMs=" << candidateCaptureMs
                     << " commitCopyMs=" << candidateCommitCopyMs
                     << " renderMs=" << frameRenderMs
+                    << " xrWaitFrameMs=" << xrWaitFrameMs
+                    << " xrFrameIntervalMs=" << xrFrameIntervalMs
+                    << " cadenceSerialWaitMs=" << cadenceSerialWaitMs
+                    << " candidateCadenceReq=" << candidateCadenceRequestId
+                    << " gamePresentToConsumeMs=" << candidateConsumeAgeMs
                     << " xrEndFrameMs=" << endFrameMs
                     << " displayPeriodMs="
                     << (static_cast<double>(fs.predictedDisplayPeriod) / 1000000.0);
                 pipelineWindow.AppendAndReset(pipelineLine);
+                cadence.AppendAndReset(pipelineLine);
                 pipelineLine << "\n";
                 const std::string line = pipelineLine.str();
                 std::cout << line;

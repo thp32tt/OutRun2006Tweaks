@@ -106,6 +106,9 @@ namespace OutRunVR
     inline constexpr std::uint32_t RenderFrameGameBuildTag0Index = 7;
     inline constexpr std::uint32_t RenderFrameGameBuildTag1Index = 8;
     inline constexpr std::uint32_t RenderFrameGameBuildTag2Index = 9;
+    // R35 cadence identity. The game stamps the XR pacing request that released
+    // this game frame. Word 10 was previously unused; Frame.v2 ABI stays fixed.
+    inline constexpr std::uint32_t RenderFrameCadenceRequestIndex = 10;
 
     enum StereoFailureReason : std::uint32_t
     {
@@ -295,6 +298,7 @@ namespace OutRunVRRenderer
         std::uint64_t& shaderSerial);
     std::uint64_t GetBeginSceneCallCount();
     void NotifyGamePresent();
+    std::uint32_t GetActiveCadenceRequestId() noexcept;
     void NotifyGameReset();
 }
 

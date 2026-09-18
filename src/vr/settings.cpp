@@ -46,6 +46,13 @@ namespace Settings
 		"During gameplay, rejects classic Desktop-Duplication stereo candidates and keeps DirectGPU/cached OpenXR projection paths only. Menus may still use the mono theater capture path." };
 	Setting<float> VRTargetRefreshRateHz{ "VR", "TargetRefreshRateHz", 120.0f,
 		"Requests this headset refresh rate through XR_FB_display_refresh_rate when the runtime supports it. 120 Hz is cadence-friendly for a 60 Hz game. Set 0 to leave the runtime rate unchanged.", Range<float>{ 0.0f, 144.0f } };
+	Setting<int> VRFrameCadenceMode{ "VR", "FrameCadenceMode", 1,
+		"Synchronizes the next OutRun frame to the OpenXR clock. PhaseLock is the production-safe R35 path; SerializedProbe additionally waits a bounded part of the XR frame for the requested game Present. Off restores the pre-R35 cadence.",
+		{ "Off", "PhaseLock", "SerializedProbe" } };
+	Setting<float> VRFrameCadenceTargetHz{ "VR", "FrameCadenceTargetHz", 60.0f,
+		"Target game-frame cadence while XR pacing is enabled. 60 Hz pairs cleanly with the default 120 Hz Quest refresh.", Range<float>{ 30.0f, 120.0f } };
+	Setting<float> VRFrameCadenceTimeoutMs{ "VR", "FrameCadenceTimeoutMs", 35.0f,
+		"Maximum game-side wait for the next XR cadence request before failing open. This prevents a stopped host from hanging OutRun.", Range<float>{ 5.0f, 100.0f } };
 	Setting<bool> VRPositionalTracking{ "VR", "PositionalTracking", true,
 		"Applies 6DoF HMD X/Y/Z movement in addition to orientation. Disable this option if a title-specific camera/culling issue is observed; stereo eye separation is independent." };
 	Setting<bool> VRCullingCameraSync{ "VR", "CullingCameraSync", true,
@@ -111,6 +118,15 @@ namespace OutRunVR
 					std::to_string(Settings::VRTargetRefreshRateHz.get());
 				SetEnvironmentVariableA("OUTRUN_VR_TARGET_REFRESH_HZ",
 					refreshHz.c_str());
+				const std::string cadenceMode =
+					std::to_string(Settings::VRFrameCadenceMode.get());
+				const std::string cadenceTargetHz =
+					std::to_string(Settings::VRFrameCadenceTargetHz.get());
+				const std::string cadenceTimeoutMs =
+					std::to_string(Settings::VRFrameCadenceTimeoutMs.get());
+				SetEnvironmentVariableA("OUTRUN_VR_CADENCE_MODE", cadenceMode.c_str());
+				SetEnvironmentVariableA("OUTRUN_VR_CADENCE_TARGET_HZ", cadenceTargetHz.c_str());
+				SetEnvironmentVariableA("OUTRUN_VR_CADENCE_TIMEOUT_MS", cadenceTimeoutMs.c_str());
 
 				std::wstring command = L"\"" + hostPath.wstring() + L"\"";
 				std::wstring workingDir = gameDir.wstring();
