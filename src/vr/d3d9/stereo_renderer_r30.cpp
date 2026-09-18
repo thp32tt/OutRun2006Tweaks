@@ -388,11 +388,11 @@ namespace OutRunVRStereo
             }
 
             auto leftDraw = [&]() {
-                return DrawPrimitiveHook.stdcall<HRESULT>(
+                return DrawPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, primitiveCount, left.data(), stride);
             };
             auto rightDraw = [&]() {
-                return DrawPrimitiveHook.stdcall<HRESULT>(
+                return DrawPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, primitiveCount, right.data(), stride);
             };
             return R30ExecuteXyzrhwStereo(
