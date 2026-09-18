@@ -1359,9 +1359,12 @@ int main(int argc, char** argv)
                     }
 
                     const ULONGLONG projectionNow = GetTickCount64();
-                    const bool grace = matchedStereoValid &&
-                        compositor.HasStereoSource() &&
-                        projectionNow - lastStereoMatchMs <= StereoGraceMs;
+                    const bool grace =
+                        newStereoCommitted ||
+                        (matchedStereoValid &&
+                         compositor.HasStereoSource() &&
+                         projectionNow >= lastStereoMatchMs &&
+                         projectionNow - lastStereoMatchMs <= StereoGraceMs);
                     const bool cachedHold = cachedProjectionValid &&
                         projectionNow >= cachedProjectionRenderedMs &&
                         projectionNow - cachedProjectionRenderedMs <=
