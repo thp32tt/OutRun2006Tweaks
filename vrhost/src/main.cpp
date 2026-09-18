@@ -91,21 +91,75 @@ namespace
         return TRUE;
     }
 
+    DWORD SharedClientPid()
+    {
+        HANDLE mapping = OpenFileMappingW(FILE_MAP_READ, FALSE, OutRunVR::SharedMemoryName);
+        if (!mapping)
+            return 0;
+        auto* state = static_cast<const OutRunVR::SharedPoseState*>(
+            MapViewOfFile(mapping, FILE_MAP_READ, 0, 0, sizeof(OutRunVR::SharedPoseState)));
+        DWORD pid = 0;
+        if (state)
+        {
+            if (state->magic == OutRunVR::SharedMagic &&
+                state->protocolVersion == OutRunVR::SharedProtocolVersion &&
+                state->structSize == sizeof(OutRunVR::SharedPoseState))
+                pid = state->clientPid;
+            UnmapViewOfFile(state);
+        }
+        CloseHandle(mapping);
+        return pid;
+    }
+
+    ULONGLONG ProcessCreationKey(DWORD pid)
+    {
+        HANDLE process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+        if (!process)
+            return 0;
+        FILETIME created{}, exited{}, kernel{}, user{};
+        const bool ok = GetProcessTimes(process, &created, &exited, &kernel, &user) != FALSE;
+        CloseHandle(process);
+        if (!ok)
+            return 0;
+        ULARGE_INTEGER value{};
+        value.LowPart = created.dwLowDateTime;
+        value.HighPart = created.dwHighDateTime;
+        return value.QuadPart;
+    }
+
     DWORD FindGameProcess()
     {
+        // Prefer the PID published by the x86 plugin. This prevents the host
+        // from binding to an older OR2006C2C.EXE that is still alive after a
+        // restart. The 2026-09-19 diagnostic captured exactly that failure:
+        // the host/watchdog followed one client PID while the active game log
+        // belonged to another process, leaving stereoFrame=0 indefinitely.
+        const DWORD sharedPid = SharedClientPid();
+        if (sharedPid &&
+            QueryProcessLiveness(sharedPid) == ProcessLiveness::Alive)
+            return sharedPid;
+
+        // No valid shared client yet (host launched before the game). If more
+        // than one copy exists, choose the newest process rather than the first
+        // Toolhelp entry, whose ordering is not a binding contract.
         HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
         if (snap == INVALID_HANDLE_VALUE) return 0;
         PROCESSENTRY32W e{};
         e.dwSize = sizeof(e);
         DWORD pid = 0;
+        ULONGLONG newest = 0;
         if (Process32FirstW(snap, &e))
         {
             do
             {
                 if (_wcsicmp(e.szExeFile, GameExeName) == 0)
                 {
-                    pid = e.th32ProcessID;
-                    break;
+                    const ULONGLONG created = ProcessCreationKey(e.th32ProcessID);
+                    if (!pid || created >= newest)
+                    {
+                        newest = created;
+                        pid = e.th32ProcessID;
+                    }
                 }
             } while (Process32NextW(snap, &e));
         }
