@@ -12,6 +12,10 @@
 // perspective effects remain entirely owned by R29/R13.
 
 #include "stereo_renderer_r29.cpp"
+#include <algorithm>
+#include <memory>
+#include <mutex>
+#include <unordered_map>
 #include <vector>
 
 namespace Settings
@@ -45,6 +49,487 @@ namespace OutRunVRStereo
         bool R30FirstXyzrhwRhwPromotionLogged = false;
         std::uint64_t R30XyzrhwAtomicFallbacks = 0;
         bool R30FirstXyzrhwAtomicFallbackLogged = false;
+
+
+        // R30.6 CPU shadows for XYZRHW vertex/index buffers.
+        //
+        // The old VB/IB conversion path called Lock(READONLY) from inside Draw,
+        // which can block behind the GPU and also fails for WRITEONLY buffers.
+        // Observe the game's own Lock/Unlock writes instead and keep the exact
+        // CPU byte ranges that are known current. Draw then consumes only this
+        // shadow and fails open to R29 when a range was never observed.
+        constexpr std::size_t R30CreateVertexBufferVtableIndex = 26;
+        constexpr std::size_t R30CreateIndexBufferVtableIndex = 27;
+        constexpr std::size_t R30BufferReleaseVtableIndex = 2;
+        constexpr std::size_t R30BufferLockVtableIndex = 11;
+        constexpr std::size_t R30BufferUnlockVtableIndex = 12;
+        constexpr UINT R30MaxShadowBytes = 16u * 1024u * 1024u;
+
+        SafetyHookInline R30CreateVertexBufferHook{};
+        SafetyHookInline R30CreateIndexBufferHook{};
+        SafetyHookInline R30VertexBufferReleaseHook{};
+        SafetyHookInline R30VertexBufferLockHook{};
+        SafetyHookInline R30VertexBufferUnlockHook{};
+        SafetyHookInline R30IndexBufferReleaseHook{};
+        SafetyHookInline R30IndexBufferLockHook{};
+        SafetyHookInline R30IndexBufferUnlockHook{};
+
+        struct R30ByteRange
+        {
+            UINT begin = 0;
+            UINT end = 0; // exclusive
+        };
+
+        struct R30BufferShadow
+        {
+            std::mutex mutex;
+            UINT size = 0;
+            DWORD usage = 0;
+            D3DPOOL pool = D3DPOOL_DEFAULT;
+            D3DFORMAT indexFormat = D3DFMT_UNKNOWN;
+            std::vector<std::uint8_t> bytes;
+            std::vector<R30ByteRange> valid;
+            void* lockPtr = nullptr;
+            UINT lockOffset = 0;
+            UINT lockSize = 0;
+            DWORD lockFlags = 0;
+            bool writeLock = false;
+        };
+
+        using R30ShadowPtr = std::shared_ptr<R30BufferShadow>;
+        std::mutex R30ShadowRegistryMutex;
+        std::mutex R30ShadowHookMutex;
+        std::unordered_map<IDirect3DVertexBuffer9*, R30ShadowPtr>
+            R30VertexShadows;
+        std::unordered_map<IDirect3DIndexBuffer9*, R30ShadowPtr>
+            R30IndexShadows;
+        std::uint64_t R30ShadowWrites = 0;
+        std::uint64_t R30ShadowReadHits = 0;
+        std::uint64_t R30ShadowReadMisses = 0;
+        std::uint64_t R30ShadowDiscardInvalidations = 0;
+        bool R30FirstShadowMissLogged = false;
+
+        struct R30ScratchBuffers
+        {
+            std::vector<std::uint8_t> source;
+            std::vector<std::uint8_t> left;
+            std::vector<std::uint8_t> right;
+            std::vector<std::uint8_t> used;
+            std::vector<std::uint32_t> physical;
+            std::vector<std::uint16_t> indices16;
+            std::vector<std::uint32_t> indices32;
+            bool busy = false;
+        };
+        thread_local R30ScratchBuffers R30Scratch;
+
+        struct R30ScratchLease
+        {
+            R30ScratchBuffers* buffers = nullptr;
+            R30ScratchLease() noexcept
+            {
+                if (!R30Scratch.busy)
+                {
+                    R30Scratch.busy = true;
+                    buffers = &R30Scratch;
+                }
+            }
+            ~R30ScratchLease()
+            {
+                if (buffers)
+                    buffers->busy = false;
+            }
+            explicit operator bool() const noexcept { return buffers != nullptr; }
+        };
+
+        void R30MergeValidRange(std::vector<R30ByteRange>& ranges,
+            UINT begin, UINT end)
+        {
+            if (begin >= end)
+                return;
+            R30ByteRange merged{ begin, end };
+            auto it = ranges.begin();
+            while (it != ranges.end() && it->end < merged.begin)
+                ++it;
+            while (it != ranges.end() && it->begin <= merged.end)
+            {
+                merged.begin = std::min(merged.begin, it->begin);
+                merged.end = std::max(merged.end, it->end);
+                it = ranges.erase(it);
+            }
+            ranges.insert(it, merged);
+        }
+
+        bool R30RangeValid(const std::vector<R30ByteRange>& ranges,
+            UINT begin, UINT end) noexcept
+        {
+            if (begin >= end)
+                return false;
+            for (const auto& range : ranges)
+            {
+                if (range.begin <= begin && range.end >= end)
+                    return true;
+                if (range.begin > begin)
+                    break;
+            }
+            return false;
+        }
+
+        R30ShadowPtr R30FindVertexShadow(IDirect3DVertexBuffer9* buffer)
+        {
+            std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
+            const auto it = R30VertexShadows.find(buffer);
+            return it == R30VertexShadows.end() ? nullptr : it->second;
+        }
+
+        R30ShadowPtr R30FindIndexShadow(IDirect3DIndexBuffer9* buffer)
+        {
+            std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
+            const auto it = R30IndexShadows.find(buffer);
+            return it == R30IndexShadows.end() ? nullptr : it->second;
+        }
+
+        R30ShadowPtr R30EnsureVertexShadow(IDirect3DVertexBuffer9* buffer)
+        {
+            if (!buffer)
+                return nullptr;
+            if (auto existing = R30FindVertexShadow(buffer))
+                return existing;
+            D3DVERTEXBUFFER_DESC desc{};
+            if (FAILED(buffer->GetDesc(&desc)) || !desc.Size ||
+                desc.Size > R30MaxShadowBytes)
+                return nullptr;
+            auto entry = std::make_shared<R30BufferShadow>();
+            entry->size = desc.Size;
+            entry->usage = desc.Usage;
+            entry->pool = desc.Pool;
+            std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
+            auto [it, inserted] = R30VertexShadows.emplace(buffer, entry);
+            return inserted ? entry : it->second;
+        }
+
+        R30ShadowPtr R30EnsureIndexShadow(IDirect3DIndexBuffer9* buffer)
+        {
+            if (!buffer)
+                return nullptr;
+            if (auto existing = R30FindIndexShadow(buffer))
+                return existing;
+            D3DINDEXBUFFER_DESC desc{};
+            if (FAILED(buffer->GetDesc(&desc)) || !desc.Size ||
+                desc.Size > R30MaxShadowBytes ||
+                (desc.Format != D3DFMT_INDEX16 &&
+                 desc.Format != D3DFMT_INDEX32))
+                return nullptr;
+            auto entry = std::make_shared<R30BufferShadow>();
+            entry->size = desc.Size;
+            entry->usage = desc.Usage;
+            entry->pool = desc.Pool;
+            entry->indexFormat = desc.Format;
+            std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
+            auto [it, inserted] = R30IndexShadows.emplace(buffer, entry);
+            return inserted ? entry : it->second;
+        }
+
+        void R30BeginObservedLock(const R30ShadowPtr& entry,
+            UINT offset, UINT size, void* data, DWORD flags)
+        {
+            if (!entry || !data)
+                return;
+            std::lock_guard<std::mutex> lock(entry->mutex);
+            if (offset > entry->size)
+                return;
+            const UINT effectiveSize =
+                size == 0 ? entry->size - offset : size;
+            if (!effectiveSize || effectiveSize > entry->size - offset)
+                return;
+            entry->lockPtr = data;
+            entry->lockOffset = offset;
+            entry->lockSize = effectiveSize;
+            entry->lockFlags = flags;
+            entry->writeLock = (flags & D3DLOCK_READONLY) == 0;
+            if (entry->writeLock && (flags & D3DLOCK_DISCARD))
+            {
+                entry->valid.clear();
+                ++R30ShadowDiscardInvalidations;
+            }
+        }
+
+        void R30FinishObservedLock(const R30ShadowPtr& entry,
+            bool unlockSucceeded)
+        {
+            if (!entry)
+                return;
+            std::lock_guard<std::mutex> lock(entry->mutex);
+            if (unlockSucceeded && entry->writeLock && entry->lockPtr &&
+                entry->lockSize && entry->lockOffset <= entry->size &&
+                entry->lockSize <= entry->size - entry->lockOffset)
+            {
+                try
+                {
+                    if (entry->bytes.size() != entry->size)
+                        entry->bytes.resize(entry->size);
+                    std::memcpy(entry->bytes.data() + entry->lockOffset,
+                        entry->lockPtr, entry->lockSize);
+                    R30MergeValidRange(entry->valid, entry->lockOffset,
+                        entry->lockOffset + entry->lockSize);
+                    ++R30ShadowWrites;
+                }
+                catch (...)
+                {
+                    entry->bytes.clear();
+                    entry->valid.clear();
+                }
+            }
+            else if (!unlockSucceeded && entry->writeLock)
+            {
+                entry->valid.clear();
+            }
+            entry->lockPtr = nullptr;
+            entry->lockOffset = 0;
+            entry->lockSize = 0;
+            entry->lockFlags = 0;
+            entry->writeLock = false;
+        }
+
+        bool R30CopyVertexShadow(IDirect3DVertexBuffer9* buffer,
+            UINT offset, UINT size, std::vector<std::uint8_t>& out)
+        {
+            const auto entry = R30FindVertexShadow(buffer);
+            if (!entry)
+            {
+                ++R30ShadowReadMisses;
+                return false;
+            }
+            std::lock_guard<std::mutex> lock(entry->mutex);
+            if (offset > entry->size || size > entry->size - offset ||
+                entry->bytes.size() != entry->size ||
+                !R30RangeValid(entry->valid, offset, offset + size))
+            {
+                ++R30ShadowReadMisses;
+                if (!R30FirstShadowMissLogged)
+                {
+                    R30FirstShadowMissLogged = true;
+                    spdlog::info(
+                        "VR R30.6 BUFFER SHADOW: draw-time GPU Lock removed; an unobserved VB/IB range will fail open until the game's next write Lock/Unlock supplies CPU bytes");
+                }
+                return false;
+            }
+            try
+            {
+                out.resize(size);
+                std::memcpy(out.data(), entry->bytes.data() + offset, size);
+            }
+            catch (...)
+            {
+                return false;
+            }
+            ++R30ShadowReadHits;
+            return true;
+        }
+
+        bool R30CopyIndexShadow(IDirect3DIndexBuffer9* buffer,
+            UINT offset, UINT size, std::vector<std::uint8_t>& out)
+        {
+            const auto entry = R30FindIndexShadow(buffer);
+            if (!entry)
+            {
+                ++R30ShadowReadMisses;
+                return false;
+            }
+            std::lock_guard<std::mutex> lock(entry->mutex);
+            if (offset > entry->size || size > entry->size - offset ||
+                entry->bytes.size() != entry->size ||
+                !R30RangeValid(entry->valid, offset, offset + size))
+            {
+                ++R30ShadowReadMisses;
+                return false;
+            }
+            try
+            {
+                out.resize(size);
+                std::memcpy(out.data(), entry->bytes.data() + offset, size);
+            }
+            catch (...)
+            {
+                return false;
+            }
+            ++R30ShadowReadHits;
+            return true;
+        }
+
+        HRESULT __stdcall R30VertexBufferLockDest(
+            IDirect3DVertexBuffer9* buffer, UINT offset, UINT size,
+            void** data, DWORD flags)
+        {
+            const HRESULT hr = R30VertexBufferLockHook.stdcall<HRESULT>(
+                buffer, offset, size, data, flags);
+            if (SUCCEEDED(hr) && data && *data)
+                R30BeginObservedLock(
+                    R30EnsureVertexShadow(buffer), offset, size, *data, flags);
+            return hr;
+        }
+
+        HRESULT __stdcall R30VertexBufferUnlockDest(
+            IDirect3DVertexBuffer9* buffer)
+        {
+            const auto entry = R30FindVertexShadow(buffer);
+            // The pointer returned by Lock is guaranteed valid until Unlock,
+            // so snapshot bytes before forwarding the real Unlock.
+            if (entry)
+                R30FinishObservedLock(entry, true);
+            const HRESULT hr =
+                R30VertexBufferUnlockHook.stdcall<HRESULT>(buffer);
+            if (FAILED(hr) && entry)
+            {
+                std::lock_guard<std::mutex> lock(entry->mutex);
+                entry->valid.clear();
+            }
+            return hr;
+        }
+
+        ULONG __stdcall R30VertexBufferReleaseDest(
+            IDirect3DVertexBuffer9* buffer)
+        {
+            const ULONG refs =
+                R30VertexBufferReleaseHook.stdcall<ULONG>(buffer);
+            if (refs == 0)
+            {
+                std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
+                R30VertexShadows.erase(buffer);
+            }
+            return refs;
+        }
+
+        HRESULT __stdcall R30IndexBufferLockDest(
+            IDirect3DIndexBuffer9* buffer, UINT offset, UINT size,
+            void** data, DWORD flags)
+        {
+            const HRESULT hr = R30IndexBufferLockHook.stdcall<HRESULT>(
+                buffer, offset, size, data, flags);
+            if (SUCCEEDED(hr) && data && *data)
+                R30BeginObservedLock(
+                    R30EnsureIndexShadow(buffer), offset, size, *data, flags);
+            return hr;
+        }
+
+        HRESULT __stdcall R30IndexBufferUnlockDest(
+            IDirect3DIndexBuffer9* buffer)
+        {
+            const auto entry = R30FindIndexShadow(buffer);
+            if (entry)
+                R30FinishObservedLock(entry, true);
+            const HRESULT hr =
+                R30IndexBufferUnlockHook.stdcall<HRESULT>(buffer);
+            if (FAILED(hr) && entry)
+            {
+                std::lock_guard<std::mutex> lock(entry->mutex);
+                entry->valid.clear();
+            }
+            return hr;
+        }
+
+        ULONG __stdcall R30IndexBufferReleaseDest(
+            IDirect3DIndexBuffer9* buffer)
+        {
+            const ULONG refs =
+                R30IndexBufferReleaseHook.stdcall<ULONG>(buffer);
+            if (refs == 0)
+            {
+                std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
+                R30IndexShadows.erase(buffer);
+            }
+            return refs;
+        }
+
+        bool R30EnsureVertexBufferHooks(IDirect3DVertexBuffer9* buffer)
+        {
+            if (!buffer)
+                return false;
+            std::lock_guard<std::mutex> lock(R30ShadowHookMutex);
+            auto** vtable = *reinterpret_cast<void***>(buffer);
+            if (!R30VertexBufferLockHook)
+                R30VertexBufferLockHook = safetyhook::create_inline(
+                    vtable[R30BufferLockVtableIndex],
+                    R30VertexBufferLockDest);
+            if (!R30VertexBufferUnlockHook)
+                R30VertexBufferUnlockHook = safetyhook::create_inline(
+                    vtable[R30BufferUnlockVtableIndex],
+                    R30VertexBufferUnlockDest);
+            if (!R30VertexBufferReleaseHook)
+                R30VertexBufferReleaseHook = safetyhook::create_inline(
+                    vtable[R30BufferReleaseVtableIndex],
+                    R30VertexBufferReleaseDest);
+            return R30VertexBufferLockHook &&
+                R30VertexBufferUnlockHook && R30VertexBufferReleaseHook;
+        }
+
+        bool R30EnsureIndexBufferHooks(IDirect3DIndexBuffer9* buffer)
+        {
+            if (!buffer)
+                return false;
+            std::lock_guard<std::mutex> lock(R30ShadowHookMutex);
+            auto** vtable = *reinterpret_cast<void***>(buffer);
+            if (!R30IndexBufferLockHook)
+                R30IndexBufferLockHook = safetyhook::create_inline(
+                    vtable[R30BufferLockVtableIndex],
+                    R30IndexBufferLockDest);
+            if (!R30IndexBufferUnlockHook)
+                R30IndexBufferUnlockHook = safetyhook::create_inline(
+                    vtable[R30BufferUnlockVtableIndex],
+                    R30IndexBufferUnlockDest);
+            if (!R30IndexBufferReleaseHook)
+                R30IndexBufferReleaseHook = safetyhook::create_inline(
+                    vtable[R30BufferReleaseVtableIndex],
+                    R30IndexBufferReleaseDest);
+            return R30IndexBufferLockHook &&
+                R30IndexBufferUnlockHook && R30IndexBufferReleaseHook;
+        }
+
+        HRESULT __stdcall R30CreateVertexBufferDest(
+            IDirect3DDevice9* device, UINT length, DWORD usage, DWORD fvf,
+            D3DPOOL pool, IDirect3DVertexBuffer9** out, HANDLE* shared)
+        {
+            const HRESULT hr = R30CreateVertexBufferHook.stdcall<HRESULT>(
+                device, length, usage, fvf, pool, out, shared);
+            if (SUCCEEDED(hr) && out && *out)
+            {
+                R30EnsureVertexBufferHooks(*out);
+                R30EnsureVertexShadow(*out);
+            }
+            return hr;
+        }
+
+        HRESULT __stdcall R30CreateIndexBufferDest(
+            IDirect3DDevice9* device, UINT length, DWORD usage,
+            D3DFORMAT format, D3DPOOL pool,
+            IDirect3DIndexBuffer9** out, HANDLE* shared)
+        {
+            const HRESULT hr = R30CreateIndexBufferHook.stdcall<HRESULT>(
+                device, length, usage, format, pool, out, shared);
+            if (SUCCEEDED(hr) && out && *out)
+            {
+                R30EnsureIndexBufferHooks(*out);
+                R30EnsureIndexShadow(*out);
+            }
+            return hr;
+        }
+
+        void R30InstallBufferCreationHooks(IDirect3DDevice9* device)
+        {
+            if (!device)
+                return;
+            auto** vtable = *reinterpret_cast<void***>(device);
+            if (!R30CreateVertexBufferHook)
+                R30CreateVertexBufferHook = safetyhook::create_inline(
+                    vtable[R30CreateVertexBufferVtableIndex],
+                    R30CreateVertexBufferDest);
+            if (!R30CreateIndexBufferHook)
+                R30CreateIndexBufferHook = safetyhook::create_inline(
+                    vtable[R30CreateIndexBufferVtableIndex],
+                    R30CreateIndexBufferDest);
+            if (!R30CreateVertexBufferHook || !R30CreateIndexBufferHook)
+                spdlog::warn(
+                    "VR R30.6 BUFFER SHADOW: creation hook incomplete; existing/dynamic buffers still register lazily on draw/Lock");
+        }
 
         // User-adjustable projection-space HUD scale. The per-eye FOV affine
         // remains automatic; this value is only a common-centre size trim after
