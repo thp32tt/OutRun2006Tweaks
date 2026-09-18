@@ -272,6 +272,7 @@ namespace OutRunVRD3D9ExUpgradeR13
             if (!OutRunVRStereo::InstallStereoHooksSynchronously(device))
             {
                 R15ResetStateHealthy.store(false, std::memory_order_release);
+                OutRunVRD3D9ExUpgrade::SetFinalCompatOverlayReady(false);
                 R14AbandonCompatDevice(device);
                 OutRunVRD3D9ExUpgrade::ClearCompatHooks();
                 {
