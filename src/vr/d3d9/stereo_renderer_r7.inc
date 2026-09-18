@@ -132,6 +132,7 @@ namespace OutRunVRStereo
 		std::atomic<std::uint64_t> VertexShaderSerial{ 0 };
 		std::atomic<int> ActiveOcclusionQueries{ 0 };
 		std::atomic<bool> OcclusionQueryTrackingUnavailable{ false };
+		std::atomic<bool> StereoBaseCallbacksArmed{ false };
 
 		D3DMATRIX CachedProjection{};
 		D3DMATRIX CachedInverseProjection{};
@@ -722,7 +723,7 @@ namespace OutRunVRStereo
 		template <typename DrawCall>
 		HRESULT ExecuteStereoDraw(IDirect3DDevice9* device,DrawCall&& drawCall)
 		{
-			if(!IsGameDevice(device))return drawCall();
+			if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))return drawCall();
 			if(StereoWanted()&&!TargetIsBackBuffer())
 			{
 				if(CurrentDrawMatchesVerifiedWorld(device))
@@ -759,7 +760,7 @@ namespace OutRunVRStereo
 
 		HRESULT __stdcall ClearDest(IDirect3DDevice9*device,DWORD count,const D3DRECT*rects,DWORD flags,D3DCOLOR color,float z,DWORD stencil)
 		{
-			if(!IsGameDevice(device)||InternalStereoPass)return ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);if(StereoWanted()&&!TargetIsBackBuffer()){const HRESULT hr=ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);return hr;}const bool candidate=StereoWanted()&&TargetIsBackBuffer();bool duplicate=candidate;if(duplicate&&AnyAuxRenderTargetActive()){PoisonFrame(OutRunVR::StereoFailureMrtActive);duplicate=false;}if(duplicate&&!EnsureStereoResources(device)){PoisonFrame(OutRunVR::StereoFailureResourceUnavailable);duplicate=false;}const HRESULT leftHr=ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);if(SUCCEEDED(leftHr))RecordFullMainDepthClear(device,count,rects,flags,z,stencil);if(!duplicate||FAILED(leftHr)){if(candidate&&FAILED(leftHr))PoisonFrame(OutRunVR::StereoFailureClearFailed);if(SUCCEEDED(leftHr)&&candidate){if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=false;if((flags&D3DCLEAR_STENCIL)!=0&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=false;}return leftHr;}D3DVIEWPORT9 savedViewport{};if(FAILED(device->GetViewport(&savedViewport))){if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=false;if((flags&D3DCLEAR_STENCIL)!=0&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=false;PoisonFrame(OutRunVR::StereoFailureViewportUnavailable);return leftHr;}IDirect3DSurface9*savedRt=TrackedRenderTarget,*savedDepth=TrackedDepthStencil;HRESULT rightHr=D3D_OK;bool restoreOk=true;{InternalPassScope guard;rightHr=SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface);if(SUCCEEDED(rightHr))rightHr=SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth);if(SUCCEEDED(rightHr))rightHr=device->SetViewport(&savedViewport);if(SUCCEEDED(rightHr))rightHr=ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);restoreOk=RestoreRightPassState(device,savedRt,savedDepth,savedViewport,nullptr,false);}if(FAILED(rightHr)){FrameRightDrawFailed=true;if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=false;if((flags&D3DCLEAR_STENCIL)!=0&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=false;PoisonFrame(OutRunVR::StereoFailureClearFailed);}else if(ClearCoversStereoBackbuffer(device,count,rects)){if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=true;if((flags&D3DCLEAR_STENCIL)!=0&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=true;}if(!restoreOk){if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=false;if((flags&D3DCLEAR_STENCIL)!=0&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=false;NoteRestoreFailure("right-eye clear");}return leftHr;
+			if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device)||InternalStereoPass)return ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);if(StereoWanted()&&!TargetIsBackBuffer()){const HRESULT hr=ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);return hr;}const bool candidate=StereoWanted()&&TargetIsBackBuffer();bool duplicate=candidate;if(duplicate&&AnyAuxRenderTargetActive()){PoisonFrame(OutRunVR::StereoFailureMrtActive);duplicate=false;}if(duplicate&&!EnsureStereoResources(device)){PoisonFrame(OutRunVR::StereoFailureResourceUnavailable);duplicate=false;}const HRESULT leftHr=ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);if(SUCCEEDED(leftHr))RecordFullMainDepthClear(device,count,rects,flags,z,stencil);if(!duplicate||FAILED(leftHr)){if(candidate&&FAILED(leftHr))PoisonFrame(OutRunVR::StereoFailureClearFailed);if(SUCCEEDED(leftHr)&&candidate){if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=false;if((flags&D3DCLEAR_STENCIL)!=0&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=false;}return leftHr;}D3DVIEWPORT9 savedViewport{};if(FAILED(device->GetViewport(&savedViewport))){if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=false;if((flags&D3DCLEAR_STENCIL)!=0&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=false;PoisonFrame(OutRunVR::StereoFailureViewportUnavailable);return leftHr;}IDirect3DSurface9*savedRt=TrackedRenderTarget,*savedDepth=TrackedDepthStencil;HRESULT rightHr=D3D_OK;bool restoreOk=true;{InternalPassScope guard;rightHr=SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface);if(SUCCEEDED(rightHr))rightHr=SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth);if(SUCCEEDED(rightHr))rightHr=device->SetViewport(&savedViewport);if(SUCCEEDED(rightHr))rightHr=ClearHook.stdcall<HRESULT>(device,count,rects,flags,color,z,stencil);restoreOk=RestoreRightPassState(device,savedRt,savedDepth,savedViewport,nullptr,false);}if(FAILED(rightHr)){FrameRightDrawFailed=true;if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=false;if((flags&D3DCLEAR_STENCIL)!=0&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=false;PoisonFrame(OutRunVR::StereoFailureClearFailed);}else if(ClearCoversStereoBackbuffer(device,count,rects)){if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=true;if((flags&D3DCLEAR_STENCIL)!=0&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=true;}if(!restoreOk){if((flags&D3DCLEAR_ZBUFFER)!=0)RightDepthSynchronized=false;if((flags&D3DCLEAR_STENCIL)!=0&&SurfaceHasStencil(TrackedDepthStencil))RightStencilSynchronized=false;NoteRestoreFailure("right-eye clear");}return leftHr;
 		}
 
 		HRESULT __stdcall SetRenderTargetDest(IDirect3DDevice9*device,DWORD index,IDirect3DSurface9*surface){const HRESULT hr=SetRenderTargetHook.stdcall<HRESULT>(device,index,surface);if(!InternalStereoPass&&IsGameDevice(device)&&SUCCEEDED(hr)){if(index==0)ReplaceSurfaceRef(TrackedRenderTarget,surface);else if(index>=1&&index<=3)AuxRenderTargetActive[index-1]=surface!=nullptr;}return hr;}
@@ -821,7 +822,7 @@ namespace OutRunVRStereo
 
 		HRESULT __stdcall PresentDest(IDirect3DDevice9*device,const RECT*sourceRect,const RECT*destRect,HWND destWindowOverride,const RGNDATA*dirtyRegion)
 		{
-			if(!IsGameDevice(device))return PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);
+			if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))return PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);
 			const std::uint64_t beginNow=OutRunVRRenderer::GetBeginSceneCallCount(),beginDelta=beginNow>=LastBeginSceneCountAtPresent?beginNow-LastBeginSceneCountAtPresent:0;LastBeginSceneCountAtPresent=beginNow;if(GameplayActive()){if(beginDelta>1)++MultiBeginScenePresents;MaxBeginScenesPerPresent=std::max(MaxBeginScenesPerPresent,beginDelta);}
 			const bool stereoRequested=StereoWanted();const std::uint32_t pendingFrameId=stereoRequested?NextStereoFrameId():0;bool composedStereo=false,directTransport=false;std::uint32_t pendingPoseSequence=0;
 			if(stereoRequested&&FrameHadWorldStereo&&FrameHadDuplicatedDraw&&!FrameRightDrawFailed&&!FrameStereoIncomplete&&FrameStereoPoseSequence&&FrameStereoMetadata.valid&&EnsureStereoResources(device)){
@@ -841,7 +842,7 @@ namespace OutRunVRStereo
 			OutRunVRRenderer::NotifyGamePresent();FrameHadDuplicatedDraw=false;FrameHadWorldStereo=false;FrameRightDrawFailed=false;FrameStereoIncomplete=false;FramePoseMismatchLogged=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoPoseSequence=0;FrameStereoMetadata={};if(++PresentEpoch==0)PresentEpoch=1;return hr;
 		}
 
-		HRESULT __stdcall ResetDest(IDirect3DDevice9*device,D3DPRESENT_PARAMETERS*params){if(!IsGameDevice(device))return ResetHook.stdcall<HRESULT>(device,params);OutRunVRRenderer::NotifyGameReset();ReleaseStereoResources();AuxRenderTargetActive={};ActiveOcclusionQueries.store(0,std::memory_order_release);CurrentVertexShaderIdentity.store(0,std::memory_order_release);VertexShaderSerial.store(0,std::memory_order_release);LastStereoWanted=false;RightStencilSynchronized=true;FramePoseMismatchLogged=false;FirstMainDepthReuseLogged=false;FirstMainClearLogged=false;FirstDepthBootstrapLogged=false;PresentEpoch=1;LastMainDepthClearEpoch=0;LastMainDepthClearFlags=0;LastMainDepthClearZ=1.0f;LastMainDepthClearStencil=0;LastMainDepthClearDesc={};LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoMetadata={};PublishStereoState(OutRunVR::StereoDisabled,false,0,0);PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,OutRunVR::StereoFailureNone,nullptr);HRESULT hr=D3DERR_INVALIDCALL;if(OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device)){if(!OutRunVRD3D9ExUpgradeR13::ResetCompatDevice(device,params,hr)){spdlog::error("VR stereo: promoted D3D9Ex device lost ResetEx fallback ownership");return D3DERR_INVALIDCALL;}}else hr=ResetHook.stdcall<HRESULT>(device,params);if(SUCCEEDED(hr))EnsureStereoResources(device);return hr;}
+		HRESULT __stdcall ResetDest(IDirect3DDevice9*device,D3DPRESENT_PARAMETERS*params){if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))return ResetHook.stdcall<HRESULT>(device,params);OutRunVRRenderer::NotifyGameReset();ReleaseStereoResources();AuxRenderTargetActive={};ActiveOcclusionQueries.store(0,std::memory_order_release);CurrentVertexShaderIdentity.store(0,std::memory_order_release);VertexShaderSerial.store(0,std::memory_order_release);LastStereoWanted=false;RightStencilSynchronized=true;FramePoseMismatchLogged=false;FirstMainDepthReuseLogged=false;FirstMainClearLogged=false;FirstDepthBootstrapLogged=false;PresentEpoch=1;LastMainDepthClearEpoch=0;LastMainDepthClearFlags=0;LastMainDepthClearZ=1.0f;LastMainDepthClearStencil=0;LastMainDepthClearDesc={};LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoMetadata={};PublishStereoState(OutRunVR::StereoDisabled,false,0,0);PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,OutRunVR::StereoFailureNone,nullptr);HRESULT hr=D3DERR_INVALIDCALL;if(OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device)){if(!OutRunVRD3D9ExUpgradeR13::ResetCompatDevice(device,params,hr)){spdlog::error("VR stereo: promoted D3D9Ex device lost ResetEx fallback ownership");return D3DERR_INVALIDCALL;}}else hr=ResetHook.stdcall<HRESULT>(device,params);if(SUCCEEDED(hr))EnsureStereoResources(device);return hr;}
 
 		constexpr std::uint32_t StereoInstallPending = 0;
 		constexpr std::uint32_t StereoInstallReady = 1;
@@ -852,6 +853,7 @@ namespace OutRunVRStereo
 
 		void RollbackStereoHooks() noexcept
 		{
+			StereoBaseCallbacksArmed.store(false, std::memory_order_release);
 			QueryIssueHook = {};
 			CreateQueryHook = {};
 			SetVertexShaderHook = {};
@@ -884,23 +886,36 @@ namespace OutRunVRStereo
 				return false;
 			}
 			StereoInstallState.store(StereoInstallPending,std::memory_order_release);
-			ResetHook=safetyhook::create_inline(vtable[ResetVtableIndex],ResetDest);
-			PresentHook=safetyhook::create_inline(vtable[PresentVtableIndex],PresentDest);
-			SetRenderTargetHook=safetyhook::create_inline(vtable[SetRenderTargetVtableIndex],SetRenderTargetDest);
-			SetDepthStencilSurfaceHook=safetyhook::create_inline(vtable[SetDepthStencilSurfaceVtableIndex],SetDepthStencilSurfaceDest);
-			ClearHook=safetyhook::create_inline(vtable[ClearVtableIndex],ClearDest);
-			DrawPrimitiveHook=safetyhook::create_inline(vtable[DrawPrimitiveVtableIndex],DrawPrimitiveDest);
-			DrawIndexedPrimitiveHook=safetyhook::create_inline(vtable[DrawIndexedPrimitiveVtableIndex],DrawIndexedPrimitiveDest);
-			DrawPrimitiveUPHook=safetyhook::create_inline(vtable[DrawPrimitiveUPVtableIndex],DrawPrimitiveUPDest);
-			DrawIndexedPrimitiveUPHook=safetyhook::create_inline(vtable[DrawIndexedPrimitiveUPVtableIndex],DrawIndexedPrimitiveUPDest);
-			SetVertexShaderHook=safetyhook::create_inline(vtable[SetVertexShaderVtableIndex],SetVertexShaderDest);
-			CreateQueryHook=safetyhook::create_inline(vtable[CreateQueryVtableIndex],CreateQueryDest);
+			StereoBaseCallbacksArmed.store(false,std::memory_order_release);
+			const auto disabled=safetyhook::InlineHook::StartDisabled;
+			ResetHook=safetyhook::create_inline(vtable[ResetVtableIndex],ResetDest,disabled);
+			PresentHook=safetyhook::create_inline(vtable[PresentVtableIndex],PresentDest,disabled);
+			SetRenderTargetHook=safetyhook::create_inline(vtable[SetRenderTargetVtableIndex],SetRenderTargetDest,disabled);
+			SetDepthStencilSurfaceHook=safetyhook::create_inline(vtable[SetDepthStencilSurfaceVtableIndex],SetDepthStencilSurfaceDest,disabled);
+			ClearHook=safetyhook::create_inline(vtable[ClearVtableIndex],ClearDest,disabled);
+			DrawPrimitiveHook=safetyhook::create_inline(vtable[DrawPrimitiveVtableIndex],DrawPrimitiveDest,disabled);
+			DrawIndexedPrimitiveHook=safetyhook::create_inline(vtable[DrawIndexedPrimitiveVtableIndex],DrawIndexedPrimitiveDest,disabled);
+			DrawPrimitiveUPHook=safetyhook::create_inline(vtable[DrawPrimitiveUPVtableIndex],DrawPrimitiveUPDest,disabled);
+			DrawIndexedPrimitiveUPHook=safetyhook::create_inline(vtable[DrawIndexedPrimitiveUPVtableIndex],DrawIndexedPrimitiveUPDest,disabled);
+			SetVertexShaderHook=safetyhook::create_inline(vtable[SetVertexShaderVtableIndex],SetVertexShaderDest,disabled);
+			CreateQueryHook=safetyhook::create_inline(vtable[CreateQueryVtableIndex],CreateQueryDest,disabled);
 			if(!ResetHook||!PresentHook||!SetRenderTargetHook||!SetDepthStencilSurfaceHook||!ClearHook||!DrawPrimitiveHook||!DrawIndexedPrimitiveHook||!DrawPrimitiveUPHook||!DrawIndexedPrimitiveUPHook||!SetVertexShaderHook||!CreateQueryHook)
 			{
 				RollbackStereoHooks();
 				StereoInstallState.store(StereoInstallFailed,std::memory_order_release);
 				spdlog::error("VR stereo: D3D9 hook transaction was partial; all base hooks rolled back immediately");
 				return false;
+			}
+			SafetyHookInline*baseHooks[]{&SetRenderTargetHook,&SetDepthStencilSurfaceHook,&SetVertexShaderHook,&CreateQueryHook,&ClearHook,&DrawPrimitiveHook,&DrawIndexedPrimitiveHook,&DrawPrimitiveUPHook,&DrawIndexedPrimitiveUPHook,&PresentHook,&ResetHook};
+			for(auto*hook:baseHooks)
+			{
+				if(!hook->enable().has_value())
+				{
+					RollbackStereoHooks();
+					StereoInstallState.store(StereoInstallFailed,std::memory_order_release);
+					spdlog::error("VR stereo: disabled-first D3D9 hook transaction could not be enabled completely; callbacks remain disarmed");
+					return false;
+				}
 			}
 			IDirect3DVertexShader9*shader=nullptr;
 			if(SUCCEEDED(device->GetVertexShader(&shader))&&shader)
@@ -917,8 +932,9 @@ namespace OutRunVRStereo
 			EnsureRenderFrameState();
 			EnsureStereoResources(device);
 			StereoInstalledDevice.store(device,std::memory_order_release);
+			StereoBaseCallbacksArmed.store(true,std::memory_order_release);
 			StereoInstallState.store(StereoInstallReady,std::memory_order_release);
-			spdlog::info("VR stereo: D3D9 full-eye renderer installed (Reset/Present/RT/Depth/Clear/Draw*/VS/CreateQuery); transactional install state=READY");
+			spdlog::info("VR stereo: D3D9 full-eye renderer installed (Reset/Present/RT/Depth/Clear/Draw*/VS/CreateQuery); disabled-first callbacks armed atomically at the behavior boundary; transactional install state=READY");
 			return true;
 		}
 
