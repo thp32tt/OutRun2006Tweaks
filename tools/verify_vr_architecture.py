@@ -200,10 +200,14 @@ settings = require(
     "src/vr/settings.cpp",
     'VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", true',
     'VRDirectGpuOnly{ "VR", "DirectGpuOnly", true',
-    'VRTargetRefreshRateHz{ "VR", "TargetRefreshRateHz", 120.0f',
+    'VRTargetRefreshRateHz{ "VR", "TargetRefreshRateHz", 0.0f',
+    'VRFrameCadenceMode{ "VR", "FrameCadenceMode", 1',
+    'VRFrameCadenceTargetHz{ "VR", "FrameCadenceTargetHz", 60.0f',
     "OUTRUN_VR_DIRECT_TRANSPORT",
     "OUTRUN_VR_DIRECT_ONLY",
     "OUTRUN_VR_TARGET_REFRESH_HZ",
+    "OUTRUN_VR_CADENCE_MODE",
+    "OUTRUN_VR_CADENCE_TARGET_HZ",
 )
 
 # R23 installer workers may only request cleanup. Live OutRun camera/projection
