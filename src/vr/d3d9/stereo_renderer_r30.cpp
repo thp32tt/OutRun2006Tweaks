@@ -43,6 +43,8 @@ namespace OutRunVRStereo
         bool R30FirstXyzrhwHudLogged = false;
         bool R30FirstXyzrhwWorldLogged = false;
         bool R30FirstXyzrhwRhwPromotionLogged = false;
+        std::uint64_t R30XyzrhwAtomicFallbacks = 0;
+        bool R30FirstXyzrhwAtomicFallbackLogged = false;
 
         // User-adjustable projection-space HUD scale. The per-eye FOV affine
         // remains automatic; this value is only a common-centre size trim after
