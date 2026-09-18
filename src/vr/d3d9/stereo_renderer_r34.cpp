@@ -287,7 +287,7 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR34ResetGuard", true);
                     spdlog::info(
-                        "VR R34 RESET/RASTER GUARD: R15 reset replay health gates stereo and final draw dispatch preserves viewport/scissor across eye-target switches");
+                        "VR R34 RESET GUARD: R15 classic-state replay health now gates post-Reset stereo eligibility; raster guard preserves viewport/scissor across final stereo draw dispatch");
                     return 0;
                 }
                 Sleep(25);
