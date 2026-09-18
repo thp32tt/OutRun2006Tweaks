@@ -43,6 +43,23 @@ int main()
     BaselineVerified();
     assert(MayInjectStereo());
 
+    // ResetEx/classic-state health is an independent persistent safety gate.
+    // A later baseline must not reopen stereo until the compatibility owner
+    // explicitly clears the block.
+    SetExternalSafetyBlock(true);
+    assert(ExternalSafetyBlock.load());
+    assert(!StereoAllowed.load());
+    assert(RecoveryPending.load());
+    assert(!MayInjectStereo());
+    BaselineVerified();
+    assert(!MayInjectStereo());
+
+    SetExternalSafetyBlock(false);
+    assert(!ExternalSafetyBlock.load());
+    assert(!MayInjectStereo());
+    BaselineVerified();
+    assert(MayInjectStereo());
+
     std::atomic<InstallState> state{ InstallState::Pending };
     assert(!IsReady(state));
     assert(!IsFailed(state));
