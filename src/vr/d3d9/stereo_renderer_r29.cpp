@@ -243,6 +243,20 @@ namespace OutRunVRStereo
                 return legacyR13Draw();
             }
 
+#if defined(OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE)
+            // C1/C2: preserve R29's two-eye fast path, but restore R27/R28's
+            // proven perspective-world ownership. The old R29 fragile-effect
+            // policy is still used for non-perspective work, including HUD.
+            // This is the exact A/B seam we want to test: classification changes
+            // without reintroducing R26's per-draw mono safety replay.
+            if (OutRunVRRenderer::R28PerspectiveWorldSemantic())
+            {
+                return R29DirectTwoEye(device,
+                    std::forward<StereoR7Draw>(stereoR7Draw),
+                    false, site);
+            }
+#endif
+
             bool fragile = true;
             if (!R29FragileEffectCached(device, fragile))
             {
