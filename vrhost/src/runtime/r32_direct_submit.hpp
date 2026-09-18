@@ -51,6 +51,8 @@ namespace OutRunVrR32DirectSubmit
     inline std::uint64_t AckPublishRetry = 0;
     inline std::uint64_t AckSlotBusy = 0;
     inline std::uint64_t AckFlushEscalations = 0;
+    inline std::uint64_t AckQueryErrors = 0;
+    inline std::uint32_t AckFaultGeneration = 0;
     inline ULONGLONG LastPerfLogMs = 0;
     inline bool FirstFastSubmitLogged = false;
     inline bool FirstAsyncAckLogged = false;
@@ -65,6 +67,7 @@ namespace OutRunVrR32DirectSubmit
         std::uint64_t ackRetry = 0;
         std::uint64_t ackSlotBusy = 0;
         std::uint64_t flushEscalations = 0;
+        std::uint64_t ackQueryError = 0;
         std::uint64_t safeCacheHit = 0;
         std::uint64_t safeCacheMiss = 0;
         std::uint64_t safeSwap = 0;
@@ -87,6 +90,7 @@ namespace OutRunVrR32DirectSubmit
         }
         AckedFrame.fill(0);
         AckedGeneration.fill(0);
+        AckFaultGeneration = 0;
     }
 
     inline bool EnsureFence(std::uint32_t slot) noexcept
@@ -112,8 +116,26 @@ namespace OutRunVrR32DirectSubmit
                 continue;
             const HRESULT hr = OutRunVrFinalTest::Context->GetData(
                 pending.fence, nullptr, 0, D3D11_ASYNC_GETDATA_DONOTFLUSH);
-            if (hr != S_OK)
+            if (hr == S_FALSE)
                 continue;
+            if (FAILED(hr))
+            {
+                // Completion is unknowable, so never ACK this producer frame.
+                // Disable fast-submit for its transport generation and let the
+                // SafeEye fallback perform a separately fenced copy/ACK.
+                const std::uint32_t generation =
+                    pending.frame.reserved[
+                        OutRunVR::RenderFrameDirectGenerationIndex];
+                if (generation)
+                    AckFaultGeneration = generation;
+                ++AckQueryErrors;
+                pending.armed = false;
+                pending.flushIssued = false;
+                pending.frame = {};
+                pending.fence->Release();
+                pending.fence = nullptr;
+                continue;
+            }
             if (!OutRunVrD3D9ExDirectPassthrough::PublishCompletedFrame(
                     pending.frame))
             {
@@ -237,6 +259,11 @@ namespace OutRunVrR32DirectSubmit
             !OutRunVrR21RuntimeHardening::DirectTransportRequested())
             return false;
 
+        const std::uint32_t generation =
+            verified.frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        if (generation != 0 && AckFaultGeneration == generation)
+            return false;
+
         const auto state =
             OutRunVrR21RuntimeHardening::ReadDirectHostStateReadonly();
         return OutRunVrR22RuntimeHardening::DirectOpenMatchesLatest(
@@ -252,6 +279,7 @@ namespace OutRunVrR32DirectSubmit
         Perf.ackRetry = AckPublishRetry;
         Perf.ackSlotBusy = AckSlotBusy;
         Perf.flushEscalations = AckFlushEscalations;
+        Perf.ackQueryError = AckQueryErrors;
         Perf.safeCacheHit = OutRunVrD3D9ExDirectPassthrough::R32SharedCacheHits;
         Perf.safeCacheMiss = OutRunVrD3D9ExDirectPassthrough::R32SharedCacheMisses;
         Perf.safeSwap = OutRunVrD3D9ExDirectPassthrough::R32SafeSwaps;
@@ -278,6 +306,7 @@ namespace OutRunVrR32DirectSubmit
             << " ackRetry=" << AckPublishRetry - Perf.ackRetry
             << " ackSlotBusy=" << AckSlotBusy - Perf.ackSlotBusy
             << " deferredFlush=" << AckFlushEscalations - Perf.flushEscalations
+            << " ackQueryError=" << AckQueryErrors - Perf.ackQueryError
             << " safeCacheHit="
             << OutRunVrD3D9ExDirectPassthrough::R32SharedCacheHits - Perf.safeCacheHit
             << " safeCacheMiss="
