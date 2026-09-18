@@ -2126,12 +2126,13 @@ namespace OutRunVRStereo
                         return 0;
                     }
 
+                    R30InstallBufferCreationHooks(Game::D3DDevice());
                     R30InstallState.store(State::Ready,
                         std::memory_order_release);
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale default/current={:.2f}; R30.5 XYZRHW draw-atomic full game-projection -> OpenXR-eye reprojection READY",
+                        "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current={:.2f}; R30.6 XYZRHW bilateral world-transform + CPU VB/IB shadow path READY",
                         R30HudScaleValue());
                     return 0;
                 }
