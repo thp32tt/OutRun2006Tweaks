@@ -34,6 +34,19 @@ int main()
     BaselineVerified();
     assert(MayInjectStereo());
 
+    // A transient shouldRender=false frame pauses injection but preserves the
+    // proven baseline. Fresh renderability resumes immediately without a new
+    // recovery seed.
+    ObserveSoftHostSuspend();
+    assert(HostFresh.load());
+    assert(!HostRenderable.load());
+    assert(StereoAllowed.load());
+    assert(!RecoveryPending.load());
+    assert(!MayInjectStereo());
+    ObserveFreshHost();
+    assert(HostRenderable.load());
+    assert(MayInjectStereo());
+
     // Host death immediately closes the gate and recovery again requires both
     // a fresh host observation and a new baseline.
     FailClosed();

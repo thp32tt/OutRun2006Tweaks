@@ -78,6 +78,7 @@ namespace OutRunVRStereo
             DWORD alphaBlend = FALSE;
             DWORD alphaTest = FALSE;
             DWORD zWrite = TRUE;
+            DWORD zEnable = D3DZB_TRUE;
             DWORD cullMode = D3DCULL_CCW;
         };
 
@@ -93,6 +94,8 @@ namespace OutRunVRStereo
                     D3DRS_ALPHATESTENABLE, &out.alphaTest)) &&
                 SUCCEEDED(device->GetRenderState(
                     D3DRS_ZWRITEENABLE, &out.zWrite)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_ZENABLE, &out.zEnable)) &&
                 SUCCEEDED(device->GetRenderState(D3DRS_CULLMODE, &out.cullMode));
             if (!ok)
             {
@@ -117,6 +120,7 @@ namespace OutRunVRStereo
                 state.alphaBlend != FALSE,
                 state.alphaTest != FALSE,
                 state.zWrite != FALSE,
+                state.zEnable != D3DZB_FALSE,
                 state.cullMode == D3DCULL_NONE);
             fragile = !OutRunVR::PassPolicy::AllowsEffectWorldStereo(policy);
             return true;

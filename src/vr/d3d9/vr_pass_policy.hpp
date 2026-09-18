@@ -139,12 +139,11 @@ namespace OutRunVR::PassPolicy
     // passes independently for both eyes can produce torn shadows, crossed
     // billboards or visibly different panel quads in the SBS transport.
     //
-    // Do not demote a draw from a single alpha-blend signal. Real world geometry
-    // can legitimately blend while remaining spatially 3D. Zero-disparity now
-    // requires the corroborating two-sided (cull-none) signal plus either a
-    // translucent no-Z-write pass or an alpha-tested cutout pass. This retains
-    // the shadow/billboard safety behavior without allowing an unexpectedly
-    // broad alpha state to remove every true-world draw from a frame.
+    // Do not demote a draw from alpha/cutout state alone. Hardware evidence on
+    // OutRun showed the car/projected-shadow pass can be two-sided, blended and
+    // no-Z-write while still being world-space. Depth testing is the decisive
+    // corroborating signal: depth-tested effects keep spatial world stereo;
+    // zero-disparity is reserved for two-sided effects with depth testing off.
     enum class EffectStereoPolicy : std::uint8_t
     {
         WorldStereo,
@@ -155,12 +154,13 @@ namespace OutRunVR::PassPolicy
         bool alphaBlendEnabled,
         bool alphaTestEnabled,
         bool depthWriteEnabled,
+        bool depthTestEnabled,
         bool cullNone) noexcept
     {
-        const bool twoSidedTranslucent =
-            cullNone && alphaBlendEnabled && !depthWriteEnabled;
-        const bool twoSidedCutout = cullNone && alphaTestEnabled;
-        if (twoSidedTranslucent || twoSidedCutout)
+        const bool depthDisabledFlatEffect =
+            cullNone && !depthTestEnabled &&
+            ((alphaBlendEnabled && !depthWriteEnabled) || alphaTestEnabled);
+        if (depthDisabledFlatEffect)
             return EffectStereoPolicy::ZeroDisparity;
         return EffectStereoPolicy::WorldStereo;
     }
@@ -236,16 +236,18 @@ namespace OutRunVR::PassPolicy
         ProjectionClass::Unknown) == RenderSemantic::PolicyMismatch);
     static_assert(!AllowsWorldStereo(RenderSemantic::PolicyMismatch));
 
-    static_assert(ClassifyEffectStereo(false, false, true, false) ==
+    static_assert(ClassifyEffectStereo(false, false, true, true, false) ==
         EffectStereoPolicy::WorldStereo);
-    static_assert(ClassifyEffectStereo(true, false, false, false) ==
+    static_assert(ClassifyEffectStereo(true, false, false, true, true) ==
         EffectStereoPolicy::WorldStereo);
-    static_assert(ClassifyEffectStereo(true, false, false, true) ==
+    static_assert(ClassifyEffectStereo(true, false, false, false, true) ==
         EffectStereoPolicy::ZeroDisparity);
-    static_assert(ClassifyEffectStereo(false, true, true, true) ==
+    static_assert(ClassifyEffectStereo(false, true, true, true, true) ==
+        EffectStereoPolicy::WorldStereo);
+    static_assert(ClassifyEffectStereo(false, true, true, false, true) ==
         EffectStereoPolicy::ZeroDisparity);
     static_assert(AllowsEffectWorldStereo(
-        ClassifyEffectStereo(false, false, true, false)));
+        ClassifyEffectStereo(false, false, true, true, false)));
 
     static_assert(ClassifyDrawReplay(true, false, true, false, true, true, true, false) ==
         DrawReplayPolicy::UnsafeSingleExecution);

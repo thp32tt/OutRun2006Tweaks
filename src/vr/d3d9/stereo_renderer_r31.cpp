@@ -54,6 +54,7 @@ namespace OutRunVRStereo
         std::uint64_t R31HudDraws = 0;
         std::atomic<bool> R31StateBlockTrackingReliable{ false };
         std::atomic<bool> R31StateBlockCoverageLost{ false };
+        thread_local bool R31StateBlockResyncPending = false;
         thread_local bool R31StateBlockRecording = false;
         bool R31FirstFastWorldLogged = false;
         bool R31FirstStateBlockLogged = false;
@@ -757,16 +758,19 @@ namespace OutRunVRStereo
                 ? reinterpret_cast<std::uintptr_t>(shader) : 0;
             if (shader) shader->Release();
 
-            CurrentVertexShaderIdentity.store(identity,
-                std::memory_order_release);
-            std::uint64_t serial = VertexShaderSerial.fetch_add(
-                1, std::memory_order_acq_rel) + 1;
-            if (serial == 0)
-                VertexShaderSerial.fetch_add(1, std::memory_order_acq_rel);
+            const std::uintptr_t previous =
+                CurrentVertexShaderIdentity.exchange(identity,
+                    std::memory_order_acq_rel);
+            if (previous != identity)
+            {
+                std::uint64_t serial = VertexShaderSerial.fetch_add(
+                    1, std::memory_order_acq_rel) + 1;
+                if (serial == 0)
+                    VertexShaderSerial.fetch_add(1, std::memory_order_acq_rel);
+            }
         }
 
-        void R31InvalidateAndResynchronizeStateBlockCaches(
-            IDirect3DDevice9* device) noexcept
+        void R31MarkStateBlockCachesDirty() noexcept
         {
             R31BlockCurrentVerifiedGeneration();
             OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
@@ -775,9 +779,22 @@ namespace OutRunVRStereo
             R23LastStateSampleDrawSerial = 0;
             R23LastStateSampleEpoch = 0;
             R31EyeCache.valid = false;
+            R31StateBlockResyncPending = true;
+        }
+
+        void R31FlushPendingStateBlockResync(IDirect3DDevice9* device) noexcept
+        {
+            if (!R31StateBlockResyncPending || !device)
+                return;
+            R31StateBlockResyncPending = false;
             R31ResynchronizeShaderEpoch(device);
-            if (device)
-                R22PrimeShadowState(device);
+            if (!R22PrimeShadowState(device))
+            {
+                R31StateBlockTrackingReliable.store(false,
+                    std::memory_order_release);
+                R31StateBlockCoverageLost.store(true,
+                    std::memory_order_release);
+            }
         }
 
         HRESULT __stdcall StateBlockApplyDestR31(IDirect3DStateBlock9* block)
@@ -792,12 +809,12 @@ namespace OutRunVRStereo
                 if (game)
                 {
                     ++R31StateBlockApplies;
-                    R31InvalidateAndResynchronizeStateBlockCaches(device);
+                    R31MarkStateBlockCachesDirty();
                     if (!R31FirstStateBlockLogged)
                     {
                         R31FirstStateBlockLogged = true;
                         spdlog::info(
-                            "VR R31 STATE: StateBlock::Apply observed hr=0x{:08x}; WVP/projection/shader/effect/viewport caches invalidated as one generation and live state resynchronized",
+                            "VR R31 STATE: StateBlock::Apply observed hr=0x{:08x}; caches invalidate immediately and live D3D state is lazily re-primed at the next actual draw",
                             static_cast<unsigned>(hr));
                     }
                 }

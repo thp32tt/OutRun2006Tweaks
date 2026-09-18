@@ -57,6 +57,7 @@ namespace OutRunVRStereo
         bool R23FirstPassiveLogged = false;
         bool R23FirstWarmupArmedLogged = false;
         bool R23FirstSeedLogged = false;
+        bool R23FirstImplicitViewportResyncLogged = false;
 
         bool R23SnapshotSame(const R22ScissorSnapshot& a,
             const R22ScissorSnapshot& b) noexcept
@@ -96,26 +97,40 @@ namespace OutRunVRStereo
 
             if (R22ShadowState.Valid() && !R23SnapshotSame(actual, R22ShadowState))
             {
-                ++R23StateMismatches;
-                const ULONGLONG now = GetTickCount64();
-                if (R23LastStateMismatchLogMs == 0 ||
-                    now - R23LastStateMismatchLogMs >= 5000)
+                const bool implicitRenderTargetViewport =
+                    site && std::strcmp(site, "SetRenderTarget") == 0;
+                if (implicitRenderTargetViewport)
                 {
-                    R23LastStateMismatchLogMs = now;
-                    spdlog::warn(
-                        "VR R23/R25 STATE: actual/cache viewport-scissor mismatch site={} actualVP={},{},{}x{} actualScissor={} [{},{},{},{}] cacheVP={},{},{}x{} cacheScissor={} [{},{},{},{}]",
-                        site,
-                        actual.viewport.X, actual.viewport.Y,
-                        actual.viewport.Width, actual.viewport.Height,
-                        actual.enabled ? 1 : 0,
-                        actual.rect.left, actual.rect.top,
-                        actual.rect.right, actual.rect.bottom,
-                        R22ShadowState.viewport.X, R22ShadowState.viewport.Y,
-                        R22ShadowState.viewport.Width,
-                        R22ShadowState.viewport.Height,
-                        R22ShadowState.enabled ? 1 : 0,
-                        R22ShadowState.rect.left, R22ShadowState.rect.top,
-                        R22ShadowState.rect.right, R22ShadowState.rect.bottom);
+                    if (!R23FirstImplicitViewportResyncLogged)
+                    {
+                        R23FirstImplicitViewportResyncLogged = true;
+                        spdlog::info(
+                            "VR R23 STATE: SetRenderTarget implicit viewport/scissor transition observed and shadow state resynchronized immediately");
+                    }
+                }
+                else
+                {
+                    ++R23StateMismatches;
+                    const ULONGLONG now = GetTickCount64();
+                    if (R23LastStateMismatchLogMs == 0 ||
+                        now - R23LastStateMismatchLogMs >= 5000)
+                    {
+                        R23LastStateMismatchLogMs = now;
+                        spdlog::warn(
+                            "VR R23/R25 STATE: actual/cache viewport-scissor mismatch site={} actualVP={},{},{}x{} actualScissor={} [{},{},{},{}] cacheVP={},{},{}x{} cacheScissor={} [{},{},{},{}]",
+                            site,
+                            actual.viewport.X, actual.viewport.Y,
+                            actual.viewport.Width, actual.viewport.Height,
+                            actual.enabled ? 1 : 0,
+                            actual.rect.left, actual.rect.top,
+                            actual.rect.right, actual.rect.bottom,
+                            R22ShadowState.viewport.X, R22ShadowState.viewport.Y,
+                            R22ShadowState.viewport.Width,
+                            R22ShadowState.viewport.Height,
+                            R22ShadowState.enabled ? 1 : 0,
+                            R22ShadowState.rect.left, R22ShadowState.rect.top,
+                            R22ShadowState.rect.right, R22ShadowState.rect.bottom);
+                    }
                 }
             }
 
@@ -517,8 +532,15 @@ namespace OutRunVRStereo
                 !InternalStereoPass)
             {
                 R22ScissorSnapshot actual{};
-                R23CaptureActualGameState(device, actual,
-                    "SetRenderTarget", true);
+                if (!R23CaptureActualGameState(device, actual,
+                        "SetRenderTarget", true))
+                {
+                    R22ShadowState = {};
+                    R23LastStateSampleDrawSerial = 0;
+                    R23LastStateSampleEpoch = 0;
+                    R22FailClosedReplayState(
+                        device, "R23/SetRenderTarget/live-state-capture");
+                }
             }
             return hr;
         }
@@ -604,9 +626,11 @@ namespace OutRunVRStereo
             {
                 R23LastHostReason = reason;
                 spdlog::info(
-                    "VR R23/R25 HOST: freshnessReason={} ageMs={} runtimeHostFresh={} (host alive/session visible/shouldRender/seqlock are logged separately; criteria not relaxed)",
+                    "VR R23/R25 HOST: freshnessReason={} ageMs={} runtimeHostFresh={} renderable={} (hard freshness and transient shouldRender are separate gates)",
                     reason, ageMs,
                     OutRunVR::RuntimeEligibility::HostFresh.load(
+                        std::memory_order_acquire) ? 1 : 0,
+                    OutRunVR::RuntimeEligibility::HostRenderable.load(
                         std::memory_order_acquire) ? 1 : 0);
             }
 

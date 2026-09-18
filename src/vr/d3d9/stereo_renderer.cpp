@@ -72,6 +72,7 @@ namespace OutRunVRStereo
 		std::uint64_t R9PresentCalls = 0;
 		std::uint64_t R9TransientDepthBinds = 0;
 		std::uint64_t R9MainDepthRestores = 0;
+		ULONGLONG R9LastMainDepthRestoreLogMs = 0;
 		std::uint64_t R9NullDepthBinds = 0;
 		std::uint64_t R9MainDepthReacquires = 0;
 		std::uint64_t R9FullClearSeeds = 0;
@@ -427,7 +428,16 @@ namespace OutRunVRStereo
 					R9DeferredDepth = false;
 					ReleaseCom(R9DeferredDepthIdentity);
 					++R9MainDepthRestores;
-					spdlog::info("VR R9: exact MAIN depth identity restored after auxiliary bind; no frame poison");
+					const ULONGLONG now = GetTickCount64();
+					if (Settings::VRTelemetry &&
+						(R9LastMainDepthRestoreLogMs == 0 ||
+						 now - R9LastMainDepthRestoreLogMs >= 5000))
+					{
+						R9LastMainDepthRestoreLogMs = now;
+						spdlog::info(
+							"VR R9: exact MAIN depth identity restored after auxiliary bind; no frame poison (totalRestores={})",
+							R9MainDepthRestores);
+					}
 				}
 				return hr;
 			}

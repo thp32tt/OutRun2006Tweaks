@@ -18,7 +18,15 @@ namespace OutRunVRStereo
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R21InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
         bool R21HostFailClosed = true;
+        bool R21HostSoftSuspended = false;
         std::uint32_t R21LastHealthyHostPid = 0;
+
+        enum class R21HostStatus : std::uint8_t
+        {
+            Stale,
+            SoftSuspend,
+            Fresh
+        };
 
         bool R21ComputeAgeMs(std::int64_t sampleQpc,
             std::int64_t& ageMs) noexcept
@@ -37,7 +45,7 @@ namespace OutRunVRStereo
             return true;
         }
 
-        bool R21ReadHostFreshness(std::uint32_t& hostPid,
+        R21HostStatus R21ReadHostFreshness(std::uint32_t& hostPid,
             std::uint32_t& flags, std::uint32_t& heartbeat,
             std::int64_t& sampleQpc, std::int64_t& ageMs) noexcept
         {
@@ -48,13 +56,7 @@ namespace OutRunVRStereo
             if (!SharedState || SharedState->magic != OutRunVR::SharedMagic ||
                 SharedState->protocolVersion != OutRunVR::SharedProtocolVersion ||
                 SharedState->structSize != sizeof(OutRunVR::SharedPoseState))
-                return false;
-
-            hostPid = SharedState->hostPid;
-            flags = SharedState->flags;
-            heartbeat = SharedState->heartbeat;
-            sampleQpc = SharedState->sampleQpc;
-            R21ComputeAgeMs(sampleQpc, ageMs);
+                return R21HostStatus::Stale;
 
             for (int attempt = 0; attempt < 4; ++attempt)
             {
@@ -76,17 +78,18 @@ namespace OutRunVRStereo
                 heartbeat = currentHeartbeat;
                 sampleQpc = currentSampleQpc;
 
-                constexpr std::uint32_t required =
-                    OutRunVR::HostAlive |
-                    OutRunVR::SessionVisible |
-                    OutRunVR::HostShouldRender;
-                if (!hostPid || (flags & required) != required ||
-                    !R21ComputeAgeMs(sampleQpc, ageMs))
-                    return false;
+                constexpr std::uint32_t hardRequired =
+                    OutRunVR::HostAlive | OutRunVR::SessionVisible;
+                if (!hostPid || (flags & hardRequired) != hardRequired ||
+                    !R21ComputeAgeMs(sampleQpc, ageMs) ||
+                    ageMs > R21HostStaleMs)
+                    return R21HostStatus::Stale;
 
-                return ageMs <= R21HostStaleMs;
+                if ((flags & OutRunVR::HostShouldRender) == 0)
+                    return R21HostStatus::SoftSuspend;
+                return R21HostStatus::Fresh;
             }
-            return false;
+            return R21HostStatus::Stale;
         }
 
         void R21ApplyHostFailClosedAtPresent() noexcept
@@ -96,10 +99,10 @@ namespace OutRunVRStereo
             std::uint32_t heartbeat = 0;
             std::int64_t sampleQpc = 0;
             std::int64_t ageMs = INT64_MAX;
-            const bool fresh = R21ReadHostFreshness(
+            const R21HostStatus status = R21ReadHostFreshness(
                 hostPid, flags, heartbeat, sampleQpc, ageMs);
 
-            if (fresh)
+            if (status == R21HostStatus::Fresh)
             {
                 R21LastHealthyHostPid = hostPid;
                 OutRunVR::RuntimeEligibility::ObserveFreshHost();
@@ -111,19 +114,41 @@ namespace OutRunVRStereo
                     R9MonoBackupGap = false;
                     R20StereoEligibilityGate.store(false, std::memory_order_release);
                     R21HostFailClosed = false;
+                    R21HostSoftSuspended = false;
                     spdlog::info(
                         "VR R21/R23: fresh host recovered pid={} heartbeat={}; waiting for a new verified stereo baseline before WVP/stereo resume",
                         hostPid, heartbeat);
                 }
                 else
                 {
+                    const bool resumedSoft = R21HostSoftSuspended;
+                    R21HostSoftSuspended = false;
                     R20StereoEligibilityGate.store(
                         OutRunVR::RuntimeEligibility::MayInjectStereo(),
                         std::memory_order_release);
+                    if (resumedSoft)
+                    {
+                        spdlog::info(
+                            "VR R21 SOFT-RESUME: shouldRender returned without discarding the verified stereo baseline");
+                    }
                 }
                 return;
             }
 
+            if (status == R21HostStatus::SoftSuspend)
+            {
+                OutRunVR::RuntimeEligibility::ObserveSoftHostSuspend();
+                R20StereoEligibilityGate.store(false, std::memory_order_release);
+                if (!R21HostSoftSuspended)
+                {
+                    R21HostSoftSuspended = true;
+                    spdlog::info(
+                        "VR R21 SOFT-SUSPEND: host heartbeat/session remain fresh but shouldRender=0; stereo injection paused without baseline reset");
+                }
+                return;
+            }
+
+            R21HostSoftSuspended = false;
             OutRunVR::RuntimeEligibility::FailClosed();
             R20StereoEligibilityGate.store(false, std::memory_order_release);
 

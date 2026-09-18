@@ -105,6 +105,7 @@ namespace OutRunVRD3D9ExUpgradeR13
 
         std::atomic<std::uint64_t> R14ShadowCreated{0};
         std::atomic<std::uint64_t> R14ShadowCreateFailed{0};
+        std::atomic<std::uint64_t> R14DirectOnlyFallbacks{0};
         std::atomic<std::uint64_t> R14ShadowReleased{0};
         std::atomic<std::uint64_t> R14ShadowRetired{0};
         std::atomic<std::uint64_t> R14DeviceReplacementRetires{0};
@@ -113,6 +114,7 @@ namespace OutRunVRD3D9ExUpgradeR13
         std::atomic<std::uint64_t> R14ShadowUploadFailed{0};
         std::atomic<bool> R14FirstActiveLogged{false};
         std::atomic<bool> R14FirstFallbackLogged{false};
+        std::atomic<bool> R14FirstHardFailureLogged{false};
         std::atomic<bool> R14FirstUploadFailureLogged{false};
         std::atomic<bool> R14FirstRetireLogged{false};
         std::atomic<bool> R14FirstConcurrentWriteLogged{false};
@@ -344,23 +346,53 @@ namespace OutRunVRD3D9ExUpgradeR13
             return true;
         }
 
-        bool R14CreateCpuShadow(IDirect3DDevice9* device,
+        bool R14TrackDirectOnly(IDirect3DDevice9* device,
+            IDirect3DTexture9* gpu) noexcept
+        {
+            if (!device || !gpu) return false;
+            try
+            {
+                auto entry = std::make_shared<R14ShadowEntry>();
+                entry->gpu = gpu;
+                entry->device = device;
+                entry->mode = R14ShadowMode::DirectOnly;
+                entry->validMask = 0;
+                device->AddRef();
+
+                std::lock_guard<std::mutex> lock(R14RegistryMutex);
+                if (!R14RegistryDevice)
+                    R14RegistryDevice = device;
+                if (R14RegistryDevice != device)
+                    return false;
+                const auto inserted = R14Shadows.emplace(gpu, entry);
+                if (!inserted.second)
+                    return false;
+            }
+            catch (...)
+            {
+                return false;
+            }
+            ++R14DirectOnlyFallbacks;
+            return true;
+        }
+
+        HRESULT R14CreateCpuShadow(IDirect3DDevice9* device,
             IDirect3DTexture9* gpu, IDirect3DTexture9*& shadow) noexcept
         {
             shadow = nullptr;
-            if (!device || !gpu) return false;
+            if (!device || !gpu) return D3DERR_INVALIDCALL;
             D3DSURFACE_DESC desc{};
-            if (FAILED(gpu->GetLevelDesc(0, &desc)) ||
-                desc.Width == 0 || desc.Height == 0)
-                return false;
+            const HRESULT descHr = gpu->GetLevelDesc(0, &desc);
+            if (FAILED(descHr) || desc.Width == 0 || desc.Height == 0)
+                return FAILED(descHr) ? descHr : D3DERR_INVALIDCALL;
             const UINT levels = gpu->GetLevelCount();
             if (levels == 0 || levels > R14MaxTrackedLevels)
-                return false;
+                return D3DERR_NOTAVAILABLE;
 
             const HRESULT hr = device->CreateTexture(
                 desc.Width, desc.Height, levels, 0, desc.Format,
                 D3DPOOL_SYSTEMMEM, &shadow, nullptr);
-            return SUCCEEDED(hr) && shadow;
+            return SUCCEEDED(hr) && shadow ? D3D_OK : hr;
         }
 
         ULONG __stdcall TextureReleaseDestR14(IDirect3DTexture9* texture)
@@ -697,11 +729,37 @@ namespace OutRunVRD3D9ExUpgradeR13
                 return hr;
 
             IDirect3DTexture9* shadow = nullptr;
-            if (R14CreateCpuShadow(device, *texture, shadow) &&
-                R14EnsureResourceHooks(device, *texture) &&
+            const HRESULT shadowHr = R14CreateCpuShadow(
+                device, *texture, shadow);
+            const bool hooksReady = R14EnsureResourceHooks(device, *texture);
+
+            if (SUCCEEDED(shadowHr) && shadow && hooksReady &&
                 R14Track(device, *texture, shadow))
             {
                 return hr; // registry owns shadow on success
+            }
+
+            // Hardware evidence from f15f1acd showed some translated MANAGED
+            // textures cannot allocate a SYSTEMMEM peer even though the created
+            // DEFAULT texture itself is usable. Preserve the game's successful
+            // CreateTexture result only for that narrow case, and keep the
+            // resource in the lifecycle registry as DirectOnly so LockRect
+            // falls through to the already-instrumented R13 path.
+            if (FAILED(shadowHr) && hooksReady &&
+                R14TrackDirectOnly(device, *texture))
+            {
+                ++R14ShadowCreateFailed;
+                if (!R14FirstFallbackLogged.exchange(true))
+                {
+                    D3DSURFACE_DESC desc{};
+                    (*texture)->GetLevelDesc(0, &desc);
+                    spdlog::warn(
+                        "VR R14 EX: CPU shadow unavailable hr=0x{:08x} size={}x{} fmt={} levels={}; keeping translated MANAGED texture on tracked DirectOnly compatibility path",
+                        static_cast<unsigned>(shadowHr), desc.Width, desc.Height,
+                        static_cast<unsigned>(desc.Format),
+                        (*texture)->GetLevelCount());
+                }
+                return hr;
             }
 
             if (shadow) shadow->Release();
@@ -712,10 +770,10 @@ namespace OutRunVRD3D9ExUpgradeR13
             }
             ++R14ShadowCreateFailed;
             ++OutRunVRD3D9ExUpgrade::ManagedCreateFailures;
-            if (!R14FirstFallbackLogged.exchange(true))
+            if (!R14FirstHardFailureLogged.exchange(true))
             {
                 spdlog::error(
-                    "VR R14 EX: MANAGED 2D compatibility shadow/hooks unavailable; resource creation fails closed instead of exposing weaker R13 direct-lock semantics");
+                    "VR R14 EX: MANAGED 2D resource hook/registry coverage unavailable; hard fail-close retained because DirectOnly lifetime cannot be proven");
             }
             return D3DERR_NOTAVAILABLE;
         }

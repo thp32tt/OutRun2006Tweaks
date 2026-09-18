@@ -40,6 +40,7 @@ namespace OutRunVRStereo
             DWORD alphaBlend = FALSE;
             DWORD alphaTest = FALSE;
             DWORD zWrite = TRUE;
+            DWORD zEnable = D3DZB_TRUE;
             DWORD cullMode = D3DCULL_CCW;
             bool valid = false;
             std::uint64_t presentEpoch = 0;
@@ -79,12 +80,14 @@ namespace OutRunVRStereo
             DWORD alphaBlend = FALSE;
             DWORD alphaTest = FALSE;
             DWORD zWrite = TRUE;
+            DWORD zEnable = D3DZB_TRUE;
             DWORD cullMode = D3DCULL_CCW;
             if (FAILED(device->GetRenderState(
                     D3DRS_ALPHABLENDENABLE, &alphaBlend)) ||
                 FAILED(device->GetRenderState(
                     D3DRS_ALPHATESTENABLE, &alphaTest)) ||
                 FAILED(device->GetRenderState(D3DRS_ZWRITEENABLE, &zWrite)) ||
+                FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable)) ||
                 FAILED(device->GetRenderState(D3DRS_CULLMODE, &cullMode)))
             {
                 R29Effect.valid = false;
@@ -94,6 +97,7 @@ namespace OutRunVRStereo
             R29Effect.alphaBlend = alphaBlend;
             R29Effect.alphaTest = alphaTest;
             R29Effect.zWrite = zWrite;
+            R29Effect.zEnable = zEnable;
             R29Effect.cullMode = cullMode;
             R29Effect.valid = true;
             R29Effect.presentEpoch = PresentEpoch;
@@ -113,6 +117,7 @@ namespace OutRunVRStereo
                 R29Effect.alphaBlend != FALSE,
                 R29Effect.alphaTest != FALSE,
                 R29Effect.zWrite != FALSE,
+                R29Effect.zEnable != D3DZB_FALSE,
                 R29Effect.cullMode == D3DCULL_NONE);
             fragile = !OutRunVR::PassPolicy::AllowsEffectWorldStereo(policy);
             return true;
@@ -203,7 +208,7 @@ namespace OutRunVRStereo
                 {
                     R29FirstZeroDisparityLogged = true;
                     spdlog::info(
-                        "VR R29 EFFECT: fragile alpha/billboard/shadow draw uses stock-WVP zero disparity in LEFT+RIGHT only; R27/R28 world promotion disabled");
+                        "VR R29 EFFECT: depth-disabled two-sided alpha effect uses stock-WVP zero disparity; depth-tested projected shadows/cutouts remain spatial world stereo");
                 }
             }
 
@@ -338,6 +343,9 @@ namespace OutRunVRStereo
                 break;
             case D3DRS_ZWRITEENABLE:
                 R29Effect.zWrite = value;
+                break;
+            case D3DRS_ZENABLE:
+                R29Effect.zEnable = value;
                 break;
             case D3DRS_CULLMODE:
                 R29Effect.cullMode = value;

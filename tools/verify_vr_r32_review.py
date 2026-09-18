@@ -306,21 +306,69 @@ r14 = require(
     "StretchRectDestR14",
     "ColorFillDestR14",
     "SUCCEEDED(hr) && destination && R14InternalUploadDepth == 0",
-    "resource creation fails closed instead of exposing weaker R13 direct-lock semantics",
+    "keeping translated MANAGED texture on tracked DirectOnly compatibility path",
+    "hard fail-close retained because DirectOnly lifetime cannot be proven",
+    "R14TrackDirectOnly",
     "return D3DERR_NOTAVAILABLE;",
 )
 if "external GetSurfaceLevel" in r14:
     raise SystemExit("R14 must not retire the CPU shadow merely because GetSurfaceLevel borrowed a read-only alias")
 create_r14 = r14.find("HRESULT __stdcall CreateTextureCompatDestR14")
-fail_closed_r14 = r14.find("return D3DERR_NOTAVAILABLE;", create_r14)
-if create_r14 < 0 or fail_closed_r14 < create_r14:
-    raise SystemExit("R14 MANAGED 2D shadow setup failure must fail resource creation closed")
+direct_r14 = r14.find("R14TrackDirectOnly(device, *texture)", create_r14)
+hard_fail_r14 = r14.find("return D3DERR_NOTAVAILABLE;", direct_r14)
+if min(create_r14, direct_r14, hard_fail_r14) < 0 or \
+        not (create_r14 < direct_r14 < hard_fail_r14):
+    raise SystemExit(
+        "R14 must degrade CPU-shadow allocation failure to tracked DirectOnly before the hard coverage fail-close")
 
 require(
     "vrhost/tests/runtime_eligibility_smoke.cpp",
     "SetExternalSafetyBlock(true)",
+    "ObserveSoftHostSuspend()",
+    "assert(!HostRenderable.load());",
     "BaselineVerified();",
     "assert(!MayInjectStereo());",
+)
+
+require(
+    "src/vr/d3d9/stereo_renderer_r21.cpp",
+    "R21HostStatus::SoftSuspend",
+    "VR R21 SOFT-SUSPEND",
+    "without baseline reset",
+)
+
+require(
+    "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "SetRenderTarget implicit viewport/scissor transition observed",
+    "R23/SetRenderTarget/live-state-capture",
+)
+
+require(
+    "src/vr/d3d9/stereo_renderer.cpp",
+    "R9LastMainDepthRestoreLogMs",
+    "totalRestores={}",
+)
+
+effect_policy = require(
+    "src/vr/d3d9/vr_pass_policy.hpp",
+    "Depth testing is the decisive",
+    "depthTestEnabled",
+    "depthDisabledFlatEffect",
+)
+if "cullNone && alphaBlendEnabled && !depthWriteEnabled;" in effect_policy:
+    raise SystemExit(
+        "effect policy regressed to zero-disparity classification without the depth-test signal")
+
+r31_lazy = require(
+    "src/vr/d3d9/stereo_renderer_r31.cpp",
+    "R31StateBlockResyncPending",
+    "R31MarkStateBlockCachesDirty",
+    "R31FlushPendingStateBlockResync",
+    "lazily re-primed at the next actual draw",
+)
+r33_lazy = require(
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "R31FlushPendingStateBlockResync(device);",
 )
 
 require(

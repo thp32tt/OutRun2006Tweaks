@@ -28,6 +28,7 @@ namespace OutRunVR::RuntimeEligibility
     }
 
     inline std::atomic<bool> HostFresh{ false };
+    inline std::atomic<bool> HostRenderable{ false };
     inline std::atomic<bool> StereoAllowed{ false };
     inline std::atomic<bool> RecoveryPending{ true };
 
@@ -61,6 +62,7 @@ namespace OutRunVR::RuntimeEligibility
     inline void FailClosed() noexcept
     {
         HostFresh.store(false, std::memory_order_release);
+        HostRenderable.store(false, std::memory_order_release);
         StereoAllowed.store(false, std::memory_order_release);
         RecoveryPending.store(true, std::memory_order_release);
         RecoveryPoseWarmup.store(false, std::memory_order_release);
@@ -83,14 +85,25 @@ namespace OutRunVR::RuntimeEligibility
     inline void ObserveFreshHost() noexcept
     {
         HostFresh.store(true, std::memory_order_release);
-        // Do not reopen stereo here. A fresh host after a stall still needs a
-        // newly verified baseline.
+        HostRenderable.store(true, std::memory_order_release);
+        // Do not reopen stereo here. A fresh host after a hard stall still
+        // needs a newly verified baseline.
+    }
+
+    inline void ObserveSoftHostSuspend() noexcept
+    {
+        // A transient shouldRender=false with a fresh, visible host is not host
+        // death. Pause injection without discarding the verified game baseline.
+        HostFresh.store(true, std::memory_order_release);
+        HostRenderable.store(false, std::memory_order_release);
+        RecoveryPoseWarmup.store(false, std::memory_order_release);
     }
 
     inline void ArmRecoveryPoseWarmup() noexcept
     {
         if (!SafetyOverlayReady.load(std::memory_order_acquire) ||
             !HostFresh.load(std::memory_order_acquire) ||
+            !HostRenderable.load(std::memory_order_acquire) ||
             ExternalSafetyBlock.load(std::memory_order_acquire) ||
             !RecoveryPending.load(std::memory_order_acquire))
             return;
@@ -101,6 +114,7 @@ namespace OutRunVR::RuntimeEligibility
     {
         return SafetyOverlayReady.load(std::memory_order_acquire) &&
             HostFresh.load(std::memory_order_acquire) &&
+            HostRenderable.load(std::memory_order_acquire) &&
             !ExternalSafetyBlock.load(std::memory_order_acquire) &&
             RecoveryPending.load(std::memory_order_acquire) &&
             RecoveryPoseWarmup.load(std::memory_order_acquire) &&
@@ -111,6 +125,7 @@ namespace OutRunVR::RuntimeEligibility
     {
         if (!SafetyOverlayReady.load(std::memory_order_acquire) ||
             !HostFresh.load(std::memory_order_acquire) ||
+            !HostRenderable.load(std::memory_order_acquire) ||
             ExternalSafetyBlock.load(std::memory_order_acquire))
             return;
         RecoveryPoseWarmup.store(false, std::memory_order_release);
@@ -122,6 +137,7 @@ namespace OutRunVR::RuntimeEligibility
     {
         return SafetyOverlayReady.load(std::memory_order_acquire) &&
             HostFresh.load(std::memory_order_acquire) &&
+            HostRenderable.load(std::memory_order_acquire) &&
             !ExternalSafetyBlock.load(std::memory_order_acquire) &&
             StereoAllowed.load(std::memory_order_acquire) &&
             !RecoveryPending.load(std::memory_order_acquire);
