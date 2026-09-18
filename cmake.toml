@@ -126,9 +126,7 @@ if(OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
     set_source_files_properties(
         src/vr/d3d9/stereo_renderer_r34.cpp
         PROPERTIES HEADER_FILE_ONLY TRUE)
-    add_compile_definitions(
-        OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE=1
-        OUTRUN_VR_FORCE_LIVE_RASTER_COMPARE=1)
+    add_compile_definitions(OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE=1)
 endif()
 
 if(OUTRUN_VR_C1_COMPARE)
