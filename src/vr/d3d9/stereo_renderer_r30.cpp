@@ -14,6 +14,11 @@
 #include "stereo_renderer_r29.cpp"
 #include <vector>
 
+namespace Settings
+{
+    extern Setting<float> VRHudScale;
+}
+
 namespace OutRunVRStereo
 {
     namespace
@@ -39,10 +44,13 @@ namespace OutRunVRStereo
         bool R30FirstXyzrhwWorldLogged = false;
         bool R30FirstXyzrhwRhwPromotionLogged = false;
 
-        // Keep the fixed-function HUD comfortably inside the Quest 3 visible
-        // area. This is a projection-space scale around the optical centre, not
-        // a game UI layout change, so menu/UI coordinates remain untouched.
-        constexpr float R30HudScale = 0.65f;
+        // User-adjustable projection-space HUD scale. The per-eye FOV affine
+        // remains automatic; this value is only a common-centre size trim after
+        // the headset-specific mapping.
+        float R30HudScaleValue() noexcept
+        {
+            return std::clamp(Settings::VRHudScale.get(), 0.30f, 1.20f);
+        }
 
         bool R30CurrentPassIsScreenSpace2D() noexcept
         {
@@ -503,9 +511,9 @@ namespace OutRunVRStereo
                     // eye-specific asymmetric-FOV offset. Scaling the offset
                     // itself makes convergence drift as HUD size changes.
                     correctedX =
-                        state.eyeScale[eye] * (R30HudScale * ndcX) +
+                        state.eyeScale[eye] * (R30HudScaleValue() * ndcX) +
                         state.eyeOffset[eye];
-                    correctedY = R30HudScale * ndcY;
+                    correctedY = R30HudScaleValue() * ndcY;
                 }
 
                 const float transformedX =
@@ -1059,8 +1067,8 @@ namespace OutRunVRStereo
             {
                 D3DMATRIX clipCorrection{};
                 clipCorrection._11 =
-                    eyeScale[eye] * R30HudScale;
-                clipCorrection._22 = R30HudScale;
+                    eyeScale[eye] * R30HudScaleValue();
+                clipCorrection._22 = R30HudScaleValue();
                 clipCorrection._33 = 1.0f;
                 clipCorrection._44 = 1.0f;
                 // Row-vector clip transform. Scale both axes around clip-space
@@ -1218,9 +1226,9 @@ namespace OutRunVRStereo
             {
                 R30FirstScreenSpaceLogged = true;
                 spdlog::info(
-                    "VR R30 HUD: orthographic ScreenSpace2D asymmetric-FOV correction ACTIVE eyeScale[L/R]={:.4f}/{:.4f} offset[L/R]={:.4f}/{:.4f} hudScale={:.2f}; world/effect passes unchanged",
+                    "VR R30 HUD: orthographic ScreenSpace2D asymmetric-FOV correction ACTIVE eyeScale[L/R]={:.4f}/{:.4f} offset[L/R]={:.4f}/{:.4f} hudScale={:.2f}; headset FOV auto-map + user scale active; world/effect passes unchanged",
                     eyeScale[0], eyeScale[1], eyeOffset[0], eyeOffset[1],
-                    R30HudScale);
+                    R30HudScaleValue());
             }
 
             if (FAILED(rightHr))
