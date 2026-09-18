@@ -1018,9 +1018,11 @@ namespace OutRunVRStereo
                             const bool stateHooks = R31CreateStateBlockHook &&
                                 R31BeginStateBlockHook &&
                                 R31EndStateBlockHook &&
-                                R31CreateStateBlockHook.enable().has_value() &&
+                                // Arm End before Begin so a render-thread race
+                                // can never observe an unmatched recording start.
+                                R31EndStateBlockHook.enable().has_value() &&
                                 R31BeginStateBlockHook.enable().has_value() &&
-                                R31EndStateBlockHook.enable().has_value();
+                                R31CreateStateBlockHook.enable().has_value();
                             if (!stateHooks)
                             {
                                 R31StateBlockCoverageLost.store(true,
