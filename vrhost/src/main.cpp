@@ -898,7 +898,7 @@ namespace
             return status;
         }
 
-        bool CommitDirectStereoSource(const OutRunVR::SharedRenderFrameState& frame)
+        bool PrepareDirectStereoSource(const OutRunVR::SharedRenderFrameState& frame)
         {
             if (!directTransportEnabled_ || (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0) return false;
             auto invalidateDirect = [&]() { directFrameValid_ = false; directTransportReady_ = false; };
@@ -927,6 +927,20 @@ namespace
                 if(ld.Format!=rd.Format){ReleaseCom(directLeftSrv_[slot]);ReleaseCom(directLeft_[slot]);ReleaseCom(directRightSrv_[slot]);ReleaseCom(directRight_[slot]);directLeftHandle_[slot]=directRightHandle_[slot]=directGeneration_[slot]=0;directFormat_[slot]=DXGI_FORMAT_UNKNOWN;invalidateDirect();std::cout<<"Direct GPU eye ring format mismatch; Ready cleared and SBS fallback requested.\n";return false;}
                 directLeftHandle_[slot]=leftHandleValue;directRightHandle_[slot]=rightHandleValue;directGeneration_[slot]=generation;directFormat_[slot]=ld.Format;std::cout<<"Direct GPU eye ring slot "<<slot<<" opened: source "<<width<<"x"<<height<<" -> OpenXR "<<projection_.width<<"x"<<projection_.height<<".\n";
             }
+            // Production R23 copies directly into its host-owned hold textures.
+            // Stop here after opening/validating the shared ring so that path
+            // does not pay for the legacy private snapshot + synchronous fence.
+            directActiveSlot_=slot;
+            directFrameValid_=false;
+            directTransportReady_=true;
+            return true;
+        }
+
+        bool CommitDirectStereoSource(const OutRunVR::SharedRenderFrameState& frame)
+        {
+            if (!PrepareDirectStereoSource(frame)) return false;
+            const std::uint32_t slot =
+                frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
             D3D11_TEXTURE2D_DESC sourceDesc{};directLeft_[slot]->GetDesc(&sourceDesc);
             if(!directSnapshotLeft_||!directSnapshotRight_||directSnapshotWidth_!=sourceDesc.Width||directSnapshotHeight_!=sourceDesc.Height||directSnapshotFormat_!=sourceDesc.Format){ReleaseCom(directSnapshotLeftSrv_);ReleaseCom(directSnapshotLeft_);ReleaseCom(directSnapshotRightSrv_);ReleaseCom(directSnapshotRight_);D3D11_TEXTURE2D_DESC d=sourceDesc;d.MipLevels=1;d.ArraySize=1;d.SampleDesc.Count=1;d.SampleDesc.Quality=0;d.Usage=D3D11_USAGE_DEFAULT;d.BindFlags=D3D11_BIND_SHADER_RESOURCE;d.CPUAccessFlags=0;d.MiscFlags=0;if(FAILED(device_->CreateTexture2D(&d,nullptr,&directSnapshotLeft_))||FAILED(device_->CreateTexture2D(&d,nullptr,&directSnapshotRight_))||FAILED(device_->CreateShaderResourceView(directSnapshotLeft_,nullptr,&directSnapshotLeftSrv_))||FAILED(device_->CreateShaderResourceView(directSnapshotRight_,nullptr,&directSnapshotRightSrv_))){ReleaseCom(directSnapshotLeftSrv_);ReleaseCom(directSnapshotLeft_);ReleaseCom(directSnapshotRightSrv_);ReleaseCom(directSnapshotRight_);directSnapshotWidth_=directSnapshotHeight_=0;directSnapshotFormat_=DXGI_FORMAT_UNKNOWN;invalidateDirect();return false;}directSnapshotWidth_=sourceDesc.Width;directSnapshotHeight_=sourceDesc.Height;directSnapshotFormat_=sourceDesc.Format;}
             context_->CopyResource(directSnapshotLeft_,directLeft_[slot]);context_->CopyResource(directSnapshotRight_,directRight_[slot]);

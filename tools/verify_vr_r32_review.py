@@ -107,6 +107,7 @@ ex = require(
     "D3DCREATE_PUREDEVICE",
     "FinalCompatOverlayReady",
     "final R15 compatibility overlay is not ready",
+    "subsequent CreateDevice stays on classic D3D9",
 )
 if "for (DWORD stage = 0; stage < 16; ++stage)\n                if (FAILED(device->SetTexture" in ex:
     raise SystemExit("classic Reset replay must not treat invalid texture stages 8..15 as failures")
@@ -205,13 +206,30 @@ host_direct = require(
 if "Context->End(pending.fence);\n        OutRunVrFinalTest::Context->Flush();" in host_direct:
     raise SystemExit("R32 host must not Flush every direct frame")
 
-require(
+host_main = require(
+    "vrhost/src/main.cpp",
+    "PrepareDirectStereoSource",
+    "CommitDirectStereoSource",
+    "legacy private snapshot + synchronous fence",
+)
+prepare_direct = host_main.find("bool PrepareDirectStereoSource")
+legacy_commit = host_main.find("bool CommitDirectStereoSource", prepare_direct)
+snapshot_use = host_main.find("directSnapshotLeft_", prepare_direct)
+if min(prepare_direct, legacy_commit, snapshot_use) < 0 or snapshot_use < legacy_commit:
+    raise SystemExit(
+        "production DirectGPU prepare path must not execute the legacy private snapshot/fence")
+
+host_r23 = require(
     "vrhost/src/main_r23.cpp",
     "R23DirectHoldState",
     "R23StageDirectHold",
-    "grace projection no longer samples ACK-reusable producer slots",
+    "PrepareDirectStereoSource",
+    "single-copy production path active",
     "srv[0] = R23DirectHold.srv[0]",
 )
+if "c.CommitDirectStereoSource(frame)" in host_r23:
+    raise SystemExit(
+        "R23 production DirectGPU path must bypass legacy snapshot/fence commit")
 
 r14 = require(
     "src/vr/d3d9/ex_device_upgrade_r14.cpp",

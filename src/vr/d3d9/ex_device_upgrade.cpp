@@ -683,6 +683,18 @@ namespace OutRunVRD3D9ExUpgrade
                         behaviorFlags, params, device);
                 };
 
+                // A wrapper may outlive a failed first Ex promotion attempt.
+                // Re-check the final overlay for every CreateDevice call so a
+                // later retry cannot re-enter a compatibility stack that R15
+                // deliberately disarmed after a transactional failure.
+                if (!FinalCompatOverlayReady.load(std::memory_order_acquire))
+                {
+                    if (!FirstOverlayUnavailableLogged.exchange(true))
+                        spdlog::warn(
+                            "VR D3D9Ex startup: final R15 compatibility overlay became unavailable after wrapper creation; subsequent CreateDevice stays on classic D3D9");
+                    return classicFallback();
+                }
+
                 if (!FirstCreateFlagsLogged.exchange(true))
                 {
                     spdlog::info(

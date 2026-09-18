@@ -184,7 +184,7 @@ namespace
         {
             R23FirstDirectHoldLogged = true;
             std::cout
-                << "DirectGPU host-owned hold active; grace projection no longer samples ACK-reusable producer slots.\n";
+                << "DirectGPU single-copy production path active; legacy private snapshot/fence bypassed and grace projection samples only host-owned hold textures.\n";
         }
         return true;
     }
@@ -686,7 +686,7 @@ namespace
     bool R23CommitDirectAfterValidation(StereoCompositor& c,
         const OutRunVR::SharedRenderFrameState& frame)
     {
-        if (!c.CommitDirectStereoSource(frame) ||
+        if (!c.PrepareDirectStereoSource(frame) ||
             !R23ValidateDirectResourceSize(c, frame) ||
             !R23StageDirectHold(c, frame))
         {
