@@ -386,13 +386,146 @@ namespace OutRunVRStereo
             const float y0 = static_cast<float>(state.viewport.Y);
             const float width = static_cast<float>(state.viewport.Width);
             const float height = static_cast<float>(state.viewport.Height);
-            if (height <= 0.0f)
+            if (width <= 0.0f || height <= 0.0f)
                 return false;
+
+            auto sourceVertex = [&](UINT i) noexcept -> const float*
+            {
+                return reinterpret_cast<const float*>(
+                    static_cast<const std::uint8_t*>(source) +
+                    static_cast<std::size_t>(i) * stride);
+            };
+            auto outputVertex = [&](UINT i) noexcept -> float*
+            {
+                return reinterpret_cast<float*>(
+                    out.data() + static_cast<std::size_t>(i) * stride);
+            };
+
+            // Full reprojection must be draw-atomic. The previous per-vertex
+            // fallback could leave one triangle with a mixture of reprojected
+            // Z/RHW and legacy Z/RHW vertices, which tears smoke/skid quads and
+            // corrupts perspective interpolation. Try the entire draw first;
+            // if any vertex is unsafe, discard all partial results and use the
+            // conservative affine path for every vertex in this eye.
+            if (state.worldEffect && state.fullWorldReprojection)
+            {
+                bool fullDrawOk = true;
+                for (UINT i = 0; i < vertexCount; ++i)
+                {
+                    const float* src = sourceVertex(i);
+                    float* dst = outputVertex(i);
+                    const float x = src[0];
+                    const float y = src[1];
+                    const float z = src[2];
+                    const float rhw = src[3];
+                    if (!std::isfinite(x) || !std::isfinite(y) ||
+                        !std::isfinite(z) || !std::isfinite(rhw) ||
+                        rhw <= 1.0e-6f || rhw >= 1000.0f)
+                    {
+                        fullDrawOk = false;
+                        break;
+                    }
+
+                    const float ndcX = ((x - x0) / width) * 2.0f - 1.0f;
+                    const float ndcY =
+                        1.0f - ((y - y0) / height) * 2.0f;
+                    const float invRhw = 1.0f / rhw;
+                    const float clip[4]{
+                        ndcX * invRhw,
+                        ndcY * invRhw,
+                        z * invRhw,
+                        invRhw
+                    };
+
+                    float view[4]{};
+                    for (int col = 0; col < 4; ++col)
+                        for (int row = 0; row < 4; ++row)
+                            view[col] += clip[row] *
+                                state.inverseBaseProjection.m[row][col];
+
+                    if (!std::isfinite(view[0]) ||
+                        !std::isfinite(view[1]) ||
+                        !std::isfinite(view[2]) ||
+                        !std::isfinite(view[3]) ||
+                        std::fabs(view[3]) <= 1.0e-6f)
+                    {
+                        fullDrawOk = false;
+                        break;
+                    }
+
+                    const float invViewW = 1.0f / view[3];
+                    const float eyeView[4]{
+                        view[0] * invViewW -
+                            state.eyeLocalTranslation[eye][0],
+                        view[1] * invViewW -
+                            state.eyeLocalTranslation[eye][1],
+                        view[2] * invViewW -
+                            state.eyeLocalTranslation[eye][2],
+                        1.0f
+                    };
+
+                    float clipEye[4]{};
+                    for (int col = 0; col < 4; ++col)
+                        for (int row = 0; row < 4; ++row)
+                            clipEye[col] += eyeView[row] *
+                                state.eyeProjection[eye].m[row][col];
+
+                    if (!std::isfinite(clipEye[0]) ||
+                        !std::isfinite(clipEye[1]) ||
+                        !std::isfinite(clipEye[2]) ||
+                        !std::isfinite(clipEye[3]) ||
+                        std::fabs(clipEye[3]) <= 1.0e-6f)
+                    {
+                        fullDrawOk = false;
+                        break;
+                    }
+
+                    const float invEyeW = 1.0f / clipEye[3];
+                    const float fullX = clipEye[0] * invEyeW;
+                    const float fullY = clipEye[1] * invEyeW;
+                    const float fullZ = clipEye[2] * invEyeW;
+                    if (!std::isfinite(fullX) ||
+                        !std::isfinite(fullY) ||
+                        !std::isfinite(fullZ) ||
+                        fullZ < -0.25f || fullZ > 1.25f)
+                    {
+                        fullDrawOk = false;
+                        break;
+                    }
+
+                    const float transformedX =
+                        x0 + (fullX + 1.0f) * 0.5f * width;
+                    const float transformedY =
+                        y0 + (1.0f - fullY) * 0.5f * height;
+                    if (!std::isfinite(transformedX) ||
+                        !std::isfinite(transformedY))
+                    {
+                        fullDrawOk = false;
+                        break;
+                    }
+
+                    dst[0] = transformedX;
+                    dst[1] = transformedY;
+                    dst[2] = fullZ;
+                    dst[3] = invEyeW;
+                }
+
+                if (fullDrawOk)
+                    return true;
+
+                ++R30XyzrhwAtomicFallbacks;
+                if (!R30FirstXyzrhwAtomicFallbackLogged)
+                {
+                    R30FirstXyzrhwAtomicFallbackLogged = true;
+                    spdlog::info(
+                        "VR R30.5 XYZRHW WORLD: full reprojection rejected for one or more vertices; entire draw uses affine fallback to keep Z/RHW interpolation coherent");
+                }
+                std::memcpy(out.data(), source, bytes);
+            }
 
             for (UINT i = 0; i < vertexCount; ++i)
             {
-                float* p = reinterpret_cast<float*>(
-                    out.data() + static_cast<std::size_t>(i) * stride);
+                float* p = outputVertex(i);
                 const float x = p[0];
                 const float y = p[1];
                 const float z = p[2];
@@ -409,107 +542,25 @@ namespace OutRunVRStereo
                 float correctedY = 0.0f;
                 if (state.worldEffect)
                 {
-                    bool fullyReprojected = false;
-
-                    // Reconstruct the original clip position from D3D9 XYZRHW,
-                    // unproject it through the game's perspective matrix, apply
-                    // only the eye-relative translation (the common HMD camera
-                    // can already be reflected by VRCullingCameraSync), and
-                    // project through the real OpenXR eye FOV. This updates
-                    // X/Y/Z/RHW together instead of treating RHW as an
-                    // approximate 2D parallax scalar.
-                    if (state.fullWorldReprojection &&
-                        rhw > 1.0e-6f && rhw < 1000.0f)
+                    correctedX =
+                        state.worldScaleX[eye] * ndcX +
+                        state.worldOffsetX[eye];
+                    correctedY =
+                        state.worldScaleY[eye] * ndcY +
+                        state.worldOffsetY[eye];
+                    if (rhw > 0.0f && rhw < 1000.0f)
                     {
-                        const float invRhw = 1.0f / rhw;
-                        const float clip[4]{
-                            ndcX * invRhw,
-                            ndcY * invRhw,
-                            z * invRhw,
-                            invRhw
-                        };
-                        float view[4]{};
-                        for (int col = 0; col < 4; ++col)
-                            for (int row = 0; row < 4; ++row)
-                                view[col] += clip[row] *
-                                    state.inverseBaseProjection.m[row][col];
-
-                        if (std::isfinite(view[0]) &&
-                            std::isfinite(view[1]) &&
-                            std::isfinite(view[2]) &&
-                            std::isfinite(view[3]) &&
-                            std::fabs(view[3]) > 1.0e-6f)
-                        {
-                            const float invViewW = 1.0f / view[3];
-                            float eyeView[4]{
-                                view[0] * invViewW -
-                                    state.eyeLocalTranslation[eye][0],
-                                view[1] * invViewW -
-                                    state.eyeLocalTranslation[eye][1],
-                                view[2] * invViewW -
-                                    state.eyeLocalTranslation[eye][2],
-                                1.0f
-                            };
-
-                            float clipEye[4]{};
-                            for (int col = 0; col < 4; ++col)
-                                for (int row = 0; row < 4; ++row)
-                                    clipEye[col] += eyeView[row] *
-                                        state.eyeProjection[eye].m[row][col];
-
-                            if (std::isfinite(clipEye[0]) &&
-                                std::isfinite(clipEye[1]) &&
-                                std::isfinite(clipEye[2]) &&
-                                std::isfinite(clipEye[3]) &&
-                                std::fabs(clipEye[3]) > 1.0e-6f)
-                            {
-                                const float invEyeW = 1.0f / clipEye[3];
-                                const float fullX = clipEye[0] * invEyeW;
-                                const float fullY = clipEye[1] * invEyeW;
-                                const float fullZ = clipEye[2] * invEyeW;
-                                if (std::isfinite(fullX) &&
-                                    std::isfinite(fullY) &&
-                                    std::isfinite(fullZ) &&
-                                    fullZ >= -0.25f && fullZ <= 1.25f)
-                                {
-                                    correctedX = fullX;
-                                    correctedY = fullY;
-                                    p[2] = fullZ;
-                                    p[3] = invEyeW;
-                                    fullyReprojected = true;
-                                }
-                            }
-                        }
+                        correctedX +=
+                            state.parallaxPerRhwX[eye] * rhw;
+                        correctedY +=
+                            state.parallaxPerRhwY[eye] * rhw;
                     }
-
-                    if (!fullyReprojected)
-                    {
-                        // Conservative compatibility fallback for unusual
-                        // pre-transformed formats that cannot be safely
-                        // unprojected.
-                        correctedX =
-                            state.worldScaleX[eye] * ndcX +
-                            state.worldOffsetX[eye];
-                        correctedY =
-                            state.worldScaleY[eye] * ndcY +
-                            state.worldOffsetY[eye];
-                        if (rhw > 0.0f && rhw < 1000.0f)
-                        {
-                            correctedX +=
-                                state.parallaxPerRhwX[eye] * rhw;
-                            correctedY +=
-                                state.parallaxPerRhwY[eye] * rhw;
-                        }
-                    }
+                    // Keep the original Z/RHW pair together on the fallback
+                    // path. This preserves the game's perspective interpolation
+                    // instead of mixing coordinate spaces inside a primitive.
                 }
                 else
                 {
-                    // HUD is head-relative. Keep the asymmetric-FOV correction,
-                    // then shrink the complete HUD toward the optical centre so
-                    // speed/time/position remain inside the Quest 3 view.
-                    // Scale the common HUD coordinate first, then apply the
-                    // eye-specific asymmetric-FOV offset. Scaling the offset
-                    // itself makes convergence drift as HUD size changes.
                     correctedX =
                         state.eyeScale[eye] * (R30HudScaleValue() * ndcX) +
                         state.eyeOffset[eye];
@@ -1428,7 +1479,7 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale default/current={:.2f}; R30.4 XYZRHW full game-projection -> OpenXR-eye reprojection READY",
+                        "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale default/current={:.2f}; R30.5 XYZRHW draw-atomic full game-projection -> OpenXR-eye reprojection READY",
                         R30HudScaleValue());
                     return 0;
                 }
