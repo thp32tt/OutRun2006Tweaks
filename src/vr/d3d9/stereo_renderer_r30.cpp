@@ -39,6 +39,11 @@ namespace OutRunVRStereo
         bool R30FirstXyzrhwWorldLogged = false;
         bool R30FirstXyzrhwRhwPromotionLogged = false;
 
+        // Keep the fixed-function HUD comfortably inside the Quest 3 visible
+        // area. This is a projection-space scale around the optical centre, not
+        // a game UI layout change, so menu/UI coordinates remain untouched.
+        constexpr float R30HudScale = 0.82f;
+
         bool R30CurrentPassIsScreenSpace2D() noexcept
         {
             if (!TargetIsBackBuffer())
@@ -102,7 +107,12 @@ namespace OutRunVRStereo
             D3DVIEWPORT9 viewport{};
             float eyeScale[2]{};
             float eyeOffset[2]{};
-            float parallaxPerRhw[2]{};
+            float worldScaleX[2]{};
+            float worldOffsetX[2]{};
+            float worldScaleY[2]{};
+            float worldOffsetY[2]{};
+            float parallaxPerRhwX[2]{};
+            float parallaxPerRhwY[2]{};
             bool depthTestEnabled = false;
             bool rhwDepthEvidence = false;
             bool worldEffect = false;
@@ -215,7 +225,10 @@ namespace OutRunVRStereo
                 return false;
             D3DMATRIX baseProjection{};
             std::memcpy(&baseProjection, projectionRaw, sizeof(baseProjection));
-            if (!MatrixFinite(baseProjection))
+            if (!MatrixFinite(baseProjection) ||
+                std::fabs(baseProjection._11) < 0.01f ||
+                std::fabs(baseProjection._22) < 0.01f ||
+                std::fabs(baseProjection._34) < 0.25f)
                 return false;
 
             const float center[3]{
@@ -240,15 +253,52 @@ namespace OutRunVRStereo
                     rel[0] * inverseEyeRotation._11 +
                     rel[1] * inverseEyeRotation._21 +
                     rel[2] * inverseEyeRotation._31;
+                const float localY =
+                    rel[0] * inverseEyeRotation._12 +
+                    rel[1] * inverseEyeRotation._22 +
+                    rel[2] * inverseEyeRotation._32;
                 const D3DMATRIX eyeProjection =
                     ProjectionFromFov(baseProjection,
                         state.stereo.eyeFov[eye]);
-                const float parallax =
+
+                // XYZRHW world effects were projected by the game's original
+                // camera/FOV before reaching D3D9. Mapping only the OpenXR
+                // left/right asymmetry (R30.2) leaves smoke, skid decals and
+                // world rank billboards in the wrong ray whenever the game FOV
+                // differs from the HMD FOV. Reconstruct the projected ray from
+                // the game's projection coefficients, then map that ray into
+                // the real per-eye OpenXR projection. RHW supplies 1/clip-W for
+                // the remaining eye-translation parallax term.
+                state.worldScaleX[eye] =
+                    eyeProjection._11 / baseProjection._11;
+                state.worldOffsetX[eye] =
+                    (eyeProjection._31 -
+                     baseProjection._31 * state.worldScaleX[eye]) /
+                    baseProjection._34;
+                state.worldScaleY[eye] =
+                    eyeProjection._22 / baseProjection._22;
+                state.worldOffsetY[eye] =
+                    (eyeProjection._32 -
+                     baseProjection._32 * state.worldScaleY[eye]) /
+                    baseProjection._34;
+                state.parallaxPerRhwX[eye] =
                     -localX * Settings::VRWorldScale *
                     eyeProjection._11;
-                if (!std::isfinite(parallax))
+                state.parallaxPerRhwY[eye] =
+                    -localY * Settings::VRWorldScale *
+                    eyeProjection._22;
+
+                if (!std::isfinite(state.worldScaleX[eye]) ||
+                    !std::isfinite(state.worldOffsetX[eye]) ||
+                    !std::isfinite(state.worldScaleY[eye]) ||
+                    !std::isfinite(state.worldOffsetY[eye]) ||
+                    !std::isfinite(state.parallaxPerRhwX[eye]) ||
+                    !std::isfinite(state.parallaxPerRhwY[eye]) ||
+                    state.worldScaleX[eye] < 0.20f ||
+                    state.worldScaleX[eye] > 5.0f ||
+                    state.worldScaleY[eye] < 0.20f ||
+                    state.worldScaleY[eye] > 5.0f)
                     return false;
-                state.parallaxPerRhw[eye] = parallax;
             }
 
             if (state.rhwDepthEvidence && !state.depthTestEnabled)
@@ -258,7 +308,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstXyzrhwRhwPromotionLogged = true;
                     spdlog::info(
-                        "VR R30.2 XYZRHW WORLD: RHW depth signature promoted a depth-disabled pre-transformed particle/decal to spatial stereo (skid/smoke candidate)");
+                        "VR R30.3 XYZRHW WORLD: RHW depth signature promoted a depth-disabled pre-transformed particle/decal to game-FOV -> OpenXR-FOV spatial stereo");
                 }
             }
             return true;
@@ -303,32 +353,69 @@ namespace OutRunVRStereo
             std::memcpy(out.data(), source, bytes);
 
             const float x0 = static_cast<float>(state.viewport.X);
+            const float y0 = static_cast<float>(state.viewport.Y);
             const float width = static_cast<float>(state.viewport.Width);
+            const float height = static_cast<float>(state.viewport.Height);
+            if (height <= 0.0f)
+                return false;
+
             for (UINT i = 0; i < vertexCount; ++i)
             {
                 float* p = reinterpret_cast<float*>(
                     out.data() + static_cast<std::size_t>(i) * stride);
                 const float x = p[0];
+                const float y = p[1];
                 const float rhw = p[3];
-                if (!std::isfinite(x) || !std::isfinite(rhw))
+                if (!std::isfinite(x) || !std::isfinite(y) ||
+                    !std::isfinite(rhw))
                     return false;
 
-                const float ndc = ((x - x0) / width) * 2.0f - 1.0f;
-                float corrected =
-                    state.eyeScale[eye] * ndc + state.eyeOffset[eye];
+                const float ndcX = ((x - x0) / width) * 2.0f - 1.0f;
+                const float ndcY =
+                    1.0f - ((y - y0) / height) * 2.0f;
 
-                // CPU-projected particles/billboards are already XYZRHW.
-                // RHW gives 1/clip-W, so lateral eye translation can be
-                // applied as a depth-dependent NDC shift without touching
-                // the game's particle simulation or billboard generation.
-                if (state.worldEffect && rhw > 0.0f && rhw < 1000.0f)
-                    corrected += state.parallaxPerRhw[eye] * rhw;
+                float correctedX = 0.0f;
+                float correctedY = 0.0f;
+                if (state.worldEffect)
+                {
+                    correctedX =
+                        state.worldScaleX[eye] * ndcX +
+                        state.worldOffsetX[eye];
+                    correctedY =
+                        state.worldScaleY[eye] * ndcY +
+                        state.worldOffsetY[eye];
 
-                const float transformed =
-                    x0 + (corrected + 1.0f) * 0.5f * width;
-                if (!std::isfinite(transformed))
+                    // CPU-projected particles/billboards are already XYZRHW.
+                    // RHW gives 1/clip-W, so the per-eye translation can be
+                    // restored after the game-FOV -> OpenXR-FOV ray mapping.
+                    if (rhw > 0.0f && rhw < 1000.0f)
+                    {
+                        correctedX +=
+                            state.parallaxPerRhwX[eye] * rhw;
+                        correctedY +=
+                            state.parallaxPerRhwY[eye] * rhw;
+                    }
+                }
+                else
+                {
+                    // HUD is head-relative. Keep the asymmetric-FOV correction,
+                    // then shrink the complete HUD toward the optical centre so
+                    // speed/time/position remain inside the Quest 3 view.
+                    correctedX = R30HudScale *
+                        (state.eyeScale[eye] * ndcX +
+                         state.eyeOffset[eye]);
+                    correctedY = R30HudScale * ndcY;
+                }
+
+                const float transformedX =
+                    x0 + (correctedX + 1.0f) * 0.5f * width;
+                const float transformedY =
+                    y0 + (1.0f - correctedY) * 0.5f * height;
+                if (!std::isfinite(transformedX) ||
+                    !std::isfinite(transformedY))
                     return false;
-                p[0] = transformed;
+                p[0] = transformedX;
+                p[1] = transformedY;
             }
             return true;
         }
@@ -401,7 +488,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstXyzrhwWorldLogged = true;
                     spdlog::info(
-                        "VR R30.2 XYZRHW WORLD: pre-transformed particle/billboard/decal UP draws receive asymmetric-FOV correction plus RHW/IPD parallax (smoke/rank/skid candidate path)");
+                        "VR R30.3 XYZRHW WORLD: pre-transformed particle/billboard/decal UP draws are reprojected from the game projection into each OpenXR eye plus RHW/IPD parallax (smoke/rank/skid path)");
                 }
             }
             else
@@ -412,7 +499,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstXyzrhwHudLogged = true;
                     spdlog::info(
-                        "VR R30.2 XYZRHW HUD: pre-transformed fixed-function UP draws receive per-eye asymmetric-FOV screen-ray correction");
+                        "VR R30.3 XYZRHW HUD: pre-transformed fixed-function UP draws receive asymmetric-FOV correction plus centered HUD scale");
                 }
             }
 
@@ -571,12 +658,15 @@ namespace OutRunVRStereo
             for (int eye = 0; eye < 2; ++eye)
             {
                 D3DMATRIX clipCorrection{};
-                clipCorrection._11 = eyeScale[eye];
-                clipCorrection._22 = 1.0f;
+                clipCorrection._11 =
+                    eyeScale[eye] * R30HudScale;
+                clipCorrection._22 = R30HudScale;
                 clipCorrection._33 = 1.0f;
                 clipCorrection._44 = 1.0f;
-                // Row-vector clip transform: x' = scale*x + offset*w.
-                clipCorrection._41 = eyeOffset[eye];
+                // Row-vector clip transform. Scale both axes around clip-space
+                // centre and preserve the eye-specific asymmetric-FOV offset.
+                clipCorrection._41 =
+                    eyeOffset[eye] * R30HudScale;
 
                 const D3DMATRIX corrected =
                     MultiplyMatrix(stockWvp, clipCorrection);
@@ -729,8 +819,9 @@ namespace OutRunVRStereo
             {
                 R30FirstScreenSpaceLogged = true;
                 spdlog::info(
-                    "VR R30 HUD: orthographic ScreenSpace2D asymmetric-FOV correction ACTIVE scale[L/R]={:.4f}/{:.4f} offset[L/R]={:.4f}/{:.4f}; world/effect passes unchanged",
-                    eyeScale[0], eyeScale[1], eyeOffset[0], eyeOffset[1]);
+                    "VR R30 HUD: orthographic ScreenSpace2D asymmetric-FOV correction ACTIVE eyeScale[L/R]={:.4f}/{:.4f} offset[L/R]={:.4f}/{:.4f} hudScale={:.2f}; world/effect passes unchanged",
+                    eyeScale[0], eyeScale[1], eyeOffset[0], eyeOffset[1],
+                    R30HudScale);
             }
 
             if (FAILED(rightHr))
@@ -919,7 +1010,7 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R30 HUD: ScreenSpace2D asymmetric-FOV correction overlay READY; R30.2 fixed-function XYZRHW UP stereo correction + RHW world-particle/decal promotion READY");
+                        "VR R30 HUD: ScreenSpace2D correction READY with 0.82 centered HUD scale; R30.3 XYZRHW game-FOV -> OpenXR-FOV world reprojection + RHW eye parallax READY");
                     return 0;
                 }
                 Sleep(25);
