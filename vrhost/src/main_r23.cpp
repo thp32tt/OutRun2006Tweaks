@@ -35,6 +35,10 @@
 #include "stereo_shader.hpp"
 #include "runtime/r23_verified_bundle.hpp"
 
+#ifndef OUTRUN_VR_BUILD_SHA
+#define OUTRUN_VR_BUILD_SHA "unknown"
+#endif
+
 // main.cpp keeps compositor implementation details private. R23 is an overlay
 // TU over that exact implementation and needs access only to stage/commit
 // candidate resources without duplicating the whole compositor. All headers are
@@ -373,6 +377,21 @@ namespace
         case SourceKind::DirectGpu: return "direct-gpu";
         default: return "none";
         }
+    }
+
+    std::string R23GameBuildTag(
+        const OutRunVR::SharedRenderFrameState& frame)
+    {
+        char tag[13]{};
+        std::memcpy(tag,
+            &frame.reserved[
+                OutRunVR::RenderFrameGameBuildTag0Index],
+            12);
+        tag[12] = '\0';
+        std::size_t length = 0;
+        while (length < 12 && tag[length] != '\0')
+            ++length;
+        return std::string(tag, length);
     }
 
     float R23HalfToFloat(std::uint16_t value)
@@ -1702,10 +1721,19 @@ int main(int argc, char** argv)
                     ? static_cast<long long>(
                         pipelineNowMs - bundle.publishedAtMs)
                     : -1;
+                const std::string gameBuildTag =
+                    haveBundle ? R23GameBuildTag(bundle.frame) :
+                    std::string("unknown");
+                const DWORD hostPid = GetCurrentProcessId();
+                const DWORD activeGamePid = gamePid;
                 std::ostringstream pipelineLine;
                 pipelineLine
-                    << "[R23 pipeline] gameFrameId="
-                    << candidateGameFrameId
+                    << "[R23 pipeline] hostBuild=" << OUTRUN_VR_BUILD_SHA
+                    << " gameBuild=" << gameBuildTag
+                    << " hostPid=" << hostPid
+                    << " gamePid=" << activeGamePid
+                    << " runKey=" << hostPid << "-" << activeGamePid
+                    << " gameFrameId=" << candidateGameFrameId
                     << " gamePresentQpc=" << candidateGamePresentQpc
                     << " captureQpc=" << candidateCaptureQpc
                     << " captureAgeMs=" << candidateCaptureAgeMs
