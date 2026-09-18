@@ -113,6 +113,10 @@ namespace OutRunVRStereo
             float worldOffsetY[2]{};
             float parallaxPerRhwX[2]{};
             float parallaxPerRhwY[2]{};
+            D3DMATRIX inverseBaseProjection{};
+            D3DMATRIX eyeProjection[2]{};
+            float eyeLocalTranslation[2][3]{};
+            bool fullWorldReprojection = false;
             bool depthTestEnabled = false;
             bool rhwDepthEvidence = false;
             bool worldEffect = false;
@@ -228,8 +232,11 @@ namespace OutRunVRStereo
             if (!MatrixFinite(baseProjection) ||
                 std::fabs(baseProjection._11) < 0.01f ||
                 std::fabs(baseProjection._22) < 0.01f ||
-                std::fabs(baseProjection._34) < 0.25f)
+                std::fabs(baseProjection._34) < 0.25f ||
+                !InvertMatrix(baseProjection, state.inverseBaseProjection) ||
+                !MatrixFinite(state.inverseBaseProjection))
                 return false;
+            state.fullWorldReprojection = true;
 
             const float center[3]{
                 0.5f * (state.stereo.eyeOffset[0][0] + state.stereo.eyeOffset[1][0]),
@@ -257,9 +264,20 @@ namespace OutRunVRStereo
                     rel[0] * inverseEyeRotation._12 +
                     rel[1] * inverseEyeRotation._22 +
                     rel[2] * inverseEyeRotation._32;
+                const float localZ =
+                    rel[0] * inverseEyeRotation._13 +
+                    rel[1] * inverseEyeRotation._23 +
+                    rel[2] * inverseEyeRotation._33;
                 const D3DMATRIX eyeProjection =
                     ProjectionFromFov(baseProjection,
                         state.stereo.eyeFov[eye]);
+                state.eyeProjection[eye] = eyeProjection;
+                state.eyeLocalTranslation[eye][0] =
+                    localX * Settings::VRWorldScale;
+                state.eyeLocalTranslation[eye][1] =
+                    localY * Settings::VRWorldScale;
+                state.eyeLocalTranslation[eye][2] =
+                    localZ * Settings::VRWorldScale;
 
                 // XYZRHW world effects were projected by the game's original
                 // camera/FOV before reaching D3D9. Mapping only the OpenXR
@@ -294,6 +312,10 @@ namespace OutRunVRStereo
                     !std::isfinite(state.worldOffsetY[eye]) ||
                     !std::isfinite(state.parallaxPerRhwX[eye]) ||
                     !std::isfinite(state.parallaxPerRhwY[eye]) ||
+                    !MatrixFinite(state.eyeProjection[eye]) ||
+                    !std::isfinite(state.eyeLocalTranslation[eye][0]) ||
+                    !std::isfinite(state.eyeLocalTranslation[eye][1]) ||
+                    !std::isfinite(state.eyeLocalTranslation[eye][2]) ||
                     state.worldScaleX[eye] < 0.20f ||
                     state.worldScaleX[eye] > 5.0f ||
                     state.worldScaleY[eye] < 0.20f ||
@@ -365,9 +387,10 @@ namespace OutRunVRStereo
                     out.data() + static_cast<std::size_t>(i) * stride);
                 const float x = p[0];
                 const float y = p[1];
+                const float z = p[2];
                 const float rhw = p[3];
                 if (!std::isfinite(x) || !std::isfinite(y) ||
-                    !std::isfinite(rhw))
+                    !std::isfinite(z) || !std::isfinite(rhw))
                     return false;
 
                 const float ndcX = ((x - x0) / width) * 2.0f - 1.0f;
@@ -378,22 +401,97 @@ namespace OutRunVRStereo
                 float correctedY = 0.0f;
                 if (state.worldEffect)
                 {
-                    correctedX =
-                        state.worldScaleX[eye] * ndcX +
-                        state.worldOffsetX[eye];
-                    correctedY =
-                        state.worldScaleY[eye] * ndcY +
-                        state.worldOffsetY[eye];
+                    bool fullyReprojected = false;
 
-                    // CPU-projected particles/billboards are already XYZRHW.
-                    // RHW gives 1/clip-W, so the per-eye translation can be
-                    // restored after the game-FOV -> OpenXR-FOV ray mapping.
-                    if (rhw > 0.0f && rhw < 1000.0f)
+                    // Reconstruct the original clip position from D3D9 XYZRHW,
+                    // unproject it through the game's perspective matrix, apply
+                    // only the eye-relative translation (the common HMD camera
+                    // can already be reflected by VRCullingCameraSync), and
+                    // project through the real OpenXR eye FOV. This updates
+                    // X/Y/Z/RHW together instead of treating RHW as an
+                    // approximate 2D parallax scalar.
+                    if (state.fullWorldReprojection &&
+                        rhw > 1.0e-6f && rhw < 1000.0f)
                     {
-                        correctedX +=
-                            state.parallaxPerRhwX[eye] * rhw;
-                        correctedY +=
-                            state.parallaxPerRhwY[eye] * rhw;
+                        const float invRhw = 1.0f / rhw;
+                        const float clip[4]{
+                            ndcX * invRhw,
+                            ndcY * invRhw,
+                            z * invRhw,
+                            invRhw
+                        };
+                        float view[4]{};
+                        for (int col = 0; col < 4; ++col)
+                            for (int row = 0; row < 4; ++row)
+                                view[col] += clip[row] *
+                                    state.inverseBaseProjection.m[row][col];
+
+                        if (std::isfinite(view[0]) &&
+                            std::isfinite(view[1]) &&
+                            std::isfinite(view[2]) &&
+                            std::isfinite(view[3]) &&
+                            std::fabs(view[3]) > 1.0e-6f)
+                        {
+                            const float invViewW = 1.0f / view[3];
+                            float eyeView[4]{
+                                view[0] * invViewW -
+                                    state.eyeLocalTranslation[eye][0],
+                                view[1] * invViewW -
+                                    state.eyeLocalTranslation[eye][1],
+                                view[2] * invViewW -
+                                    state.eyeLocalTranslation[eye][2],
+                                1.0f
+                            };
+
+                            float clipEye[4]{};
+                            for (int col = 0; col < 4; ++col)
+                                for (int row = 0; row < 4; ++row)
+                                    clipEye[col] += eyeView[row] *
+                                        state.eyeProjection[eye].m[row][col];
+
+                            if (std::isfinite(clipEye[0]) &&
+                                std::isfinite(clipEye[1]) &&
+                                std::isfinite(clipEye[2]) &&
+                                std::isfinite(clipEye[3]) &&
+                                std::fabs(clipEye[3]) > 1.0e-6f)
+                            {
+                                const float invEyeW = 1.0f / clipEye[3];
+                                const float fullX = clipEye[0] * invEyeW;
+                                const float fullY = clipEye[1] * invEyeW;
+                                const float fullZ = clipEye[2] * invEyeW;
+                                if (std::isfinite(fullX) &&
+                                    std::isfinite(fullY) &&
+                                    std::isfinite(fullZ) &&
+                                    fullZ >= -0.25f && fullZ <= 1.25f)
+                                {
+                                    correctedX = fullX;
+                                    correctedY = fullY;
+                                    p[2] = fullZ;
+                                    p[3] = invEyeW;
+                                    fullyReprojected = true;
+                                }
+                            }
+                        }
+                    }
+
+                    if (!fullyReprojected)
+                    {
+                        // Conservative compatibility fallback for unusual
+                        // pre-transformed formats that cannot be safely
+                        // unprojected.
+                        correctedX =
+                            state.worldScaleX[eye] * ndcX +
+                            state.worldOffsetX[eye];
+                        correctedY =
+                            state.worldScaleY[eye] * ndcY +
+                            state.worldOffsetY[eye];
+                        if (rhw > 0.0f && rhw < 1000.0f)
+                        {
+                            correctedX +=
+                                state.parallaxPerRhwX[eye] * rhw;
+                            correctedY +=
+                                state.parallaxPerRhwY[eye] * rhw;
+                        }
                     }
                 }
                 else
@@ -491,7 +589,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstXyzrhwWorldLogged = true;
                     spdlog::info(
-                        "VR R30.3 XYZRHW WORLD: pre-transformed particle/billboard/decal UP draws are reprojected from the game projection into each OpenXR eye plus RHW/IPD parallax (smoke/rank/skid path)");
+                        "VR R30.4 XYZRHW WORLD: pre-transformed particle/billboard/decal draws reconstruct clip X/Y/Z/RHW, unproject through the game projection, then reproject into each OpenXR eye; affine RHW fallback retained for unsafe vertices");
                 }
             }
             else
