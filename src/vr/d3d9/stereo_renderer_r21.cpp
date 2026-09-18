@@ -20,6 +20,9 @@ namespace OutRunVRStereo
         bool R21HostFailClosed = true;
         bool R21HostSoftSuspended = false;
         std::uint32_t R21LastHealthyHostPid = 0;
+        ULONGLONG R21LastHealthyTickMs = 0;
+        ULONGLONG R21LastTransientGraceLogMs = 0;
+        std::uint64_t R21TransientInvalidReadGrace = 0;
 
         enum class R21HostStatus : std::uint8_t
         {
@@ -105,6 +108,7 @@ namespace OutRunVRStereo
             if (status == R21HostStatus::Fresh)
             {
                 R21LastHealthyHostPid = hostPid;
+                R21LastHealthyTickMs = GetTickCount64();
                 OutRunVR::RuntimeEligibility::ObserveFreshHost();
 
                 if (R21HostFailClosed)
@@ -129,7 +133,7 @@ namespace OutRunVRStereo
                     if (resumedSoft)
                     {
                         spdlog::info(
-                            "VR R21 SOFT-RESUME: shouldRender returned without discarding the verified stereo baseline");
+                            "VR R21 SOFT-RESUME: shouldRender returned; game-side stereo source stayed continuous");
                     }
                 }
                 return;
@@ -137,13 +141,41 @@ namespace OutRunVRStereo
 
             if (status == R21HostStatus::SoftSuspend)
             {
+                R21LastHealthyHostPid = hostPid;
+                R21LastHealthyTickMs = GetTickCount64();
                 OutRunVR::RuntimeEligibility::ObserveSoftHostSuspend();
-                R20StereoEligibilityGate.store(false, std::memory_order_release);
+                R20StereoEligibilityGate.store(
+                    OutRunVR::RuntimeEligibility::MayInjectStereo(),
+                    std::memory_order_release);
                 if (!R21HostSoftSuspended)
                 {
                     R21HostSoftSuspended = true;
                     spdlog::info(
-                        "VR R21 SOFT-SUSPEND: host heartbeat/session remain fresh but shouldRender=0; stereo injection paused without baseline reset");
+                        "VR R21 SOFT-SUSPEND: shouldRender=0 is host-only scheduling advice; verified game-side stereo source remains active");
+                }
+                return;
+            }
+
+            // A single invalid/zero shared-state sample was observed in the
+            // supplied run while the host heartbeat resumed on the very next
+            // Present. Honor the same 250 ms freshness budget before destroying
+            // the verified baseline. This still fail-closes promptly on a real
+            // host death, but avoids a full recovery cycle for a transient
+            // seqlock/mapping handoff.
+            const ULONGLONG nowMs = GetTickCount64();
+            if (!R21HostFailClosed && R21LastHealthyTickMs != 0 &&
+                nowMs >= R21LastHealthyTickMs &&
+                nowMs - R21LastHealthyTickMs <=
+                    static_cast<ULONGLONG>(R21HostStaleMs))
+            {
+                ++R21TransientInvalidReadGrace;
+                if (R21LastTransientGraceLogMs == 0 ||
+                    nowMs - R21LastTransientGraceLogMs >= 5000)
+                {
+                    R21LastTransientGraceLogMs = nowMs;
+                    spdlog::info(
+                        "VR R21 TRANSIENT-GRACE: one invalid host sample kept the verified stereo baseline alive within {}ms freshness budget (count={})",
+                        R21HostStaleMs, R21TransientInvalidReadGrace);
                 }
                 return;
             }
