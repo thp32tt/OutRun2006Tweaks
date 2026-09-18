@@ -249,7 +249,8 @@ link-libraries = [
     "SDL3-static",
     "Winmm.lib",
     "Setupapi.lib",
-    "Crypt32.lib"
+    "Crypt32.lib",
+    "d3dcompiler.lib"
 ]
 
 [target.outrun2006tweaks.properties]
