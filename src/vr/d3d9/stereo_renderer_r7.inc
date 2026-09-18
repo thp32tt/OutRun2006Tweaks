@@ -270,9 +270,15 @@ namespace OutRunVRStereo
 				SharedState->structSize != sizeof(OutRunVR::SharedPoseState))
 				return false;
 			const std::uint32_t flags = SharedState->flags;
+
+			// Game-side stereo source generation is gated only by hard host
+			// liveness/visibility. XrFrameState::shouldRender is transient compositor
+			// advice to the x64 host; using it here used to zero the SBS frame metadata
+			// and tear down the eye source for several Presents even though the host
+			// heartbeat/session remained healthy. The host still decides independently
+			// whether a given OpenXR frame submits a layer.
 			return (flags & OutRunVR::HostAlive) != 0 &&
-				(flags & OutRunVR::SessionVisible) != 0 &&
-				(flags & OutRunVR::HostShouldRender) != 0;
+				(flags & OutRunVR::SessionVisible) != 0;
 		}
 
 		bool HostDirectTransportSupported()
