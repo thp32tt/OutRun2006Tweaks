@@ -1,6 +1,10 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
+#include <TlHelp32.h>
+
+#include <filesystem>
+#include <string>
 
 #include <spdlog/spdlog.h>
 
@@ -24,6 +28,12 @@ namespace Settings
 		"Enables the OpenXR renderer-side VR bridge." };
 	Setting<bool> VRAutoEnableWhenHostPresent{ "VR", "AutoEnableWhenHostPresent", true,
 		"Automatically applies renderer-side tracking whenever outrun-vr-host.exe is supplying a valid pose." };
+	Setting<bool> VRAutoLaunchHost{ "VR", "AutoLaunchHost", true,
+		"Starts outrun-vr-host.exe from the game directory when VR is enabled. A short retry window also covers fast game restarts where the previous host is still shutting down." };
+	Setting<bool> VRMirrorFitDesktop{ "VR", "MirrorFitDesktop", true,
+		"Fits the borderless PC mirror window to the current monitor even when the internal game backbuffer is larger. The VR render resolution is unchanged." };
+	Setting<float> VRHudScale{ "VR", "HudScale", 0.55f,
+		"Projection-space HUD size after the headset-specific asymmetric-FOV correction. Lower values make speed/time/position and menus smaller in the HMD.", Range<float>{ 0.30f, 1.20f } };
 	Setting<bool> VRHeadTracking{ "VR", "HeadTracking", true,
 		"Applies the OpenXR HMD orientation at OutRun's verified D3D9 WorldViewProjection upload." };
 	Setting<bool> VRStereo{ "VR", "Stereo", true,
@@ -49,6 +59,86 @@ namespace Settings
 
 namespace OutRunVR
 {
+	namespace
+	{
+		bool VRHostProcessRunning() noexcept
+		{
+			HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+			if (snapshot == INVALID_HANDLE_VALUE)
+				return false;
+			PROCESSENTRY32W entry{};
+			entry.dwSize = sizeof(entry);
+			bool found = false;
+			if (Process32FirstW(snapshot, &entry))
+			{
+				do
+				{
+					if (_wcsicmp(entry.szExeFile, L"outrun-vr-host.exe") == 0)
+					{
+						found = true;
+						break;
+					}
+				} while (Process32NextW(snapshot, &entry));
+			}
+			CloseHandle(snapshot);
+			return found;
+		}
+
+		bool VRLaunchHostOnce() noexcept
+		{
+			try
+			{
+				const std::filesystem::path gameDir = Module::ExePath.parent_path();
+				const std::filesystem::path hostPath = gameDir / "outrun-vr-host.exe";
+				if (!std::filesystem::exists(hostPath))
+				{
+					spdlog::warn("VR AUTO HOST: {} not found; start the host manually", hostPath.string());
+					return false;
+				}
+				std::wstring command = L"\"" + hostPath.wstring() + L"\"";
+				std::wstring workingDir = gameDir.wstring();
+				STARTUPINFOW si{};
+				si.cb = sizeof(si);
+				PROCESS_INFORMATION pi{};
+				if (!CreateProcessW(nullptr, command.data(), nullptr, nullptr, FALSE,
+					CREATE_NEW_CONSOLE, nullptr, workingDir.c_str(), &si, &pi))
+				{
+					spdlog::warn("VR AUTO HOST: CreateProcess failed error={}", GetLastError());
+					return false;
+				}
+				CloseHandle(pi.hThread);
+				CloseHandle(pi.hProcess);
+				spdlog::info("VR AUTO HOST: launched {}", hostPath.string());
+				return true;
+			}
+			catch (const std::exception& e)
+			{
+				spdlog::warn("VR AUTO HOST: launch exception: {}", e.what());
+				return false;
+			}
+		}
+
+		DWORD WINAPI VRAutoLaunchHostThread(void*)
+		{
+			if (!Settings::VREnabled || !Settings::VRAutoLaunchHost)
+				return 0;
+			bool launched = false;
+			for (int attempt = 0; attempt < 40; ++attempt)
+			{
+				if (!VRHostProcessRunning() && !launched)
+				{
+					launched = VRLaunchHostOnce();
+					if (launched)
+						return 0;
+				}
+				Sleep(500);
+			}
+			if (!VRHostProcessRunning())
+				spdlog::warn("VR AUTO HOST: no host process became available during the startup retry window");
+			return 0;
+		}
+	}
+
 	class VRSettingsHook : public Hook
 	{
 	public:
@@ -58,6 +148,14 @@ namespace OutRunVR
 		bool apply() override
 		{
 			spdlog::info("VR: classic D3D9 + fresh SBS/Desktop Duplication is the validated default; guarded D3D9Ex full-eye transport remains opt-in pending hardware validation; CalcCameraMatrix untouched");
+			if (Settings::VREnabled && Settings::VRAutoLaunchHost)
+			{
+				HANDLE thread = CreateThread(nullptr, 0, VRAutoLaunchHostThread, nullptr, 0, nullptr);
+				if (thread)
+					CloseHandle(thread);
+				else
+					spdlog::warn("VR AUTO HOST: failed to create startup helper thread error={}", GetLastError());
+			}
 			return true;
 		}
 
