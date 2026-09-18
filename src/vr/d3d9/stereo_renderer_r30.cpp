@@ -913,10 +913,14 @@ namespace OutRunVRStereo
                 reduced->Release();
             }
 
-            // Restore render targets explicitly; state blocks do not own render
-            // target/depth bindings in a way we rely on here.
-            bool restoreOk =
-                SUCCEEDED(device->SetRenderTarget(0, savedRt));
+            // Apply the captured pipeline state first, then explicitly restore
+            // RT/depth/viewport last. This guarantees the game bindings win even
+            // if a driver/state-block implementation restores more state than
+            // the code path historically relied on.
+            bool restoreOk = SUCCEEDED(stateBlock->Apply());
+            restoreOk =
+                SUCCEEDED(device->SetRenderTarget(0, savedRt)) &&
+                restoreOk;
             const HRESULT restoreDepth =
                 device->SetDepthStencilSurface(savedDepth);
             restoreOk =
@@ -926,8 +930,6 @@ namespace OutRunVRStereo
             restoreOk =
                 SUCCEEDED(device->SetViewport(&savedViewport)) &&
                 restoreOk;
-            restoreOk =
-                SUCCEEDED(stateBlock->Apply()) && restoreOk;
             savedRt->Release();
             if (savedDepth) savedDepth->Release();
             stateBlock->Release();
@@ -957,11 +959,32 @@ namespace OutRunVRStereo
             return false;
         }
 
+        ULONGLONG R30LastTelemetryMs = 0;
+
+        void R30MaybeLogTelemetry()
+        {
+            if (!Settings::VRTelemetry)
+                return;
+            const ULONGLONG now = GetTickCount64();
+            if (now - R30LastTelemetryMs < 5000)
+                return;
+            R30LastTelemetryMs = now;
+            spdlog::info(
+                "VR R30.6: bufferShadow[writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[atomicFallback={},bilateralFallback={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
+                R30ShadowDiscardInvalidations,
+                R30XyzrhwAtomicFallbacks, R30XyzrhwBilateralFallbacks,
+                R30SkyGlowFrames, R30SkyGlowFailures,
+                R30SkyGlow.factor, R30SkyGlow.glowWidth,
+                R30SkyGlow.glowHeight);
+        }
+
         HRESULT __stdcall PresentDestR30(
             IDirect3DDevice9* device, const RECT* sourceRect,
             const RECT* destRect, HWND destWindowOverride,
             const RGNDATA* dirtyRegion)
         {
+            R30MaybeLogTelemetry();
             if (Settings::SkyGlowFactor > 0 &&
                 StereoWanted() && FrameHadWorldStereo &&
                 FrameHadDuplicatedDraw &&
@@ -2539,6 +2562,9 @@ namespace OutRunVRStereo
 
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
+                if (Game::D3DDevice_ptr && *Game::D3DDevice_ptr)
+                    R30InstallBufferCreationHooks(*Game::D3DDevice_ptr);
+
                 const auto r29 = R29StereoInstallState.load(
                     std::memory_order_acquire);
                 if (r29 == State::Failed)
@@ -2585,7 +2611,6 @@ namespace OutRunVRStereo
                         return 0;
                     }
 
-                    R30InstallBufferCreationHooks(Game::D3DDevice());
                     R30InstallState.store(State::Ready,
                         std::memory_order_release);
                     HookManager::ReportAsyncResult(
