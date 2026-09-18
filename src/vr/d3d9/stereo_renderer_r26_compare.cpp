@@ -28,7 +28,7 @@ namespace OutRunVRStereo
             bool apply() override
             {
                 spdlog::warn(
-                    "VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE; R29-R34 stereo fast/HUD/StateBlock overlays are excluded");
+                    "VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE; R29-R34 stereo overlays + renderer R29 EXCLUDED; current R15/DirectGPU/texture paths preserved");
                 return true;
             }
 
