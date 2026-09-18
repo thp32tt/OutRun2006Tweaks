@@ -610,7 +610,7 @@ namespace OutRunVRStereo
             float parallaxPerRhwY[2]{};
             D3DMATRIX inverseBaseProjection{};
             D3DMATRIX eyeProjection[2]{};
-            float eyeLocalTranslation[2][3]{};
+            D3DMATRIX eyeInverse[2]{};
             bool fullWorldReprojection = false;
             bool depthTestEnabled = false;
             bool rhwDepthEvidence = false;
@@ -640,7 +640,10 @@ namespace OutRunVRStereo
 
             if (!EnsureStereoResources(device) ||
                 FAILED(device->GetViewport(&state.viewport)) ||
-                state.viewport.Width == 0)
+                state.viewport.Width == 0 || state.viewport.Height == 0 ||
+                !std::isfinite(state.viewport.MinZ) ||
+                !std::isfinite(state.viewport.MaxZ) ||
+                state.viewport.MaxZ <= state.viewport.MinZ)
                 return false;
 
             DWORD zEnable = D3DZB_FALSE;
@@ -660,21 +663,26 @@ namespace OutRunVRStereo
         }
 
         bool R30XyzrhwHasProjectedDepthSignature(
-            const void* source, UINT vertexCount, UINT stride) noexcept
+            const void* source, UINT vertexCount, UINT stride,
+            const R30XyzrhwState& state,
+            const std::vector<std::uint8_t>* usedMask) noexcept
         {
             if (!source || vertexCount == 0 || stride < sizeof(float) * 4)
                 return false;
 
-            // UI quads in OutRun normally carry RHW=1. CPU-projected world
-            // particles/decals carry 1/clip-W, often even when Z testing is
-            // disabled for blending or to avoid decal z-fighting. Use that
-            // pre-transformed depth evidence as an additional world-space
-            // signal rather than relying on D3DRS_ZENABLE alone.
-            const UINT sampleCount = std::min<UINT>(vertexCount, 512u);
+            const float depthSpan =
+                state.viewport.MaxZ - state.viewport.MinZ;
+            const float depthLo = state.viewport.MinZ - 0.10f * depthSpan;
+            const float depthHi = state.viewport.MaxZ + 0.10f * depthSpan;
+            UINT sampled = 0;
             UINT valid = 0;
             UINT projected = 0;
-            for (UINT i = 0; i < sampleCount; ++i)
+            for (UINT i = 0; i < vertexCount && sampled < 512u; ++i)
             {
+                if (usedMask &&
+                    (i >= usedMask->size() || (*usedMask)[i] == 0))
+                    continue;
+                ++sampled;
                 const float* p = reinterpret_cast<const float*>(
                     static_cast<const std::uint8_t*>(source) +
                     static_cast<std::size_t>(i) * stride);
@@ -685,7 +693,7 @@ namespace OutRunVRStereo
                     continue;
 
                 ++valid;
-                if (z >= -0.10f && z <= 1.10f &&
+                if (z >= depthLo && z <= depthHi &&
                     std::fabs(rhw - 1.0f) > 0.02f)
                     ++projected;
             }
@@ -695,15 +703,15 @@ namespace OutRunVRStereo
 
         bool R30ConfigureXyzrhwWorldEffect(
             IDirect3DDevice9* device, const void* source,
-            UINT vertexCount, UINT stride, R30XyzrhwState& state) noexcept
+            UINT vertexCount, UINT stride, R30XyzrhwState& state,
+            const std::vector<std::uint8_t>* usedMask = nullptr) noexcept
         {
             state.rhwDepthEvidence =
                 R30XyzrhwHasProjectedDepthSignature(
-                    source, vertexCount, stride);
+                    source, vertexCount, stride, state, usedMask);
 
-            // Preserve the validated R30.1 depth-tested path, but also promote
-            // depth-disabled CPU-projected particles/decals when RHW proves
-            // that the vertices came from a 3D projection.
+            // Z-enable is only one signal. RHW/depth evidence is accepted only
+            // from vertices that the indexed draw actually references.
             state.worldEffect =
                 state.depthTestEnabled || state.rhwDepthEvidence;
             if (!state.worldEffect)
@@ -734,13 +742,36 @@ namespace OutRunVRStereo
             state.fullWorldReprojection = true;
 
             const float center[3]{
-                0.5f * (state.stereo.eyeOffset[0][0] + state.stereo.eyeOffset[1][0]),
-                0.5f * (state.stereo.eyeOffset[0][1] + state.stereo.eyeOffset[1][1]),
-                0.5f * (state.stereo.eyeOffset[0][2] + state.stereo.eyeOffset[1][2])
+                0.5f * (state.stereo.eyeOffset[0][0] +
+                        state.stereo.eyeOffset[1][0]),
+                0.5f * (state.stereo.eyeOffset[0][1] +
+                        state.stereo.eyeOffset[1][1]),
+                0.5f * (state.stereo.eyeOffset[0][2] +
+                        state.stereo.eyeOffset[1][2])
             };
             const float zero[3]{};
+
             for (int eye = 0; eye < 2; ++eye)
             {
+                // Use the exact same per-eye rigid transform convention as the
+                // normal fixed-function/world path: view * eyeInverse *
+                // eyeProjection. The reconstructed CPU-projected point is
+                // already in game view space, so only eyeInverse is applied
+                // here; common head/camera motion must not be applied twice.
+                const D3DMATRIX eyePose =
+                    MatrixFromQuaternionTranslation(
+                        state.stereo.eyeOrientation[eye],
+                        state.stereo.eyeOffset[eye],
+                        Settings::VRWorldScale);
+                state.eyeInverse[eye] = InverseRigid(eyePose);
+                state.eyeProjection[eye] =
+                    ProjectionFromFov(baseProjection,
+                        state.stereo.eyeFov[eye]);
+
+                // Preserve a conservative affine fallback for vertices whose
+                // clip reconstruction is unsafe. Its parallax uses the old
+                // centered IPD estimate, but both eyes are forced to choose the
+                // same fallback mode by R30TransformXyzrhwStereo().
                 const float rel[3]{
                     state.stereo.eyeOffset[eye][0] - center[0],
                     state.stereo.eyeOffset[eye][1] - center[1],
@@ -759,29 +790,8 @@ namespace OutRunVRStereo
                     rel[0] * inverseEyeRotation._12 +
                     rel[1] * inverseEyeRotation._22 +
                     rel[2] * inverseEyeRotation._32;
-                const float localZ =
-                    rel[0] * inverseEyeRotation._13 +
-                    rel[1] * inverseEyeRotation._23 +
-                    rel[2] * inverseEyeRotation._33;
-                const D3DMATRIX eyeProjection =
-                    ProjectionFromFov(baseProjection,
-                        state.stereo.eyeFov[eye]);
-                state.eyeProjection[eye] = eyeProjection;
-                state.eyeLocalTranslation[eye][0] =
-                    localX * Settings::VRWorldScale;
-                state.eyeLocalTranslation[eye][1] =
-                    localY * Settings::VRWorldScale;
-                state.eyeLocalTranslation[eye][2] =
-                    localZ * Settings::VRWorldScale;
 
-                // XYZRHW world effects were projected by the game's original
-                // camera/FOV before reaching D3D9. Mapping only the OpenXR
-                // left/right asymmetry (R30.2) leaves smoke, skid decals and
-                // world rank billboards in the wrong ray whenever the game FOV
-                // differs from the HMD FOV. Reconstruct the projected ray from
-                // the game's projection coefficients, then map that ray into
-                // the real per-eye OpenXR projection. RHW supplies 1/clip-W for
-                // the remaining eye-translation parallax term.
+                const D3DMATRIX& eyeProjection = state.eyeProjection[eye];
                 state.worldScaleX[eye] =
                     eyeProjection._11 / baseProjection._11;
                 state.worldOffsetX[eye] =
@@ -808,9 +818,7 @@ namespace OutRunVRStereo
                     !std::isfinite(state.parallaxPerRhwX[eye]) ||
                     !std::isfinite(state.parallaxPerRhwY[eye]) ||
                     !MatrixFinite(state.eyeProjection[eye]) ||
-                    !std::isfinite(state.eyeLocalTranslation[eye][0]) ||
-                    !std::isfinite(state.eyeLocalTranslation[eye][1]) ||
-                    !std::isfinite(state.eyeLocalTranslation[eye][2]) ||
+                    !MatrixFinite(state.eyeInverse[eye]) ||
                     state.worldScaleX[eye] < 0.20f ||
                     state.worldScaleX[eye] > 5.0f ||
                     state.worldScaleY[eye] < 0.20f ||
@@ -825,7 +833,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstXyzrhwRhwPromotionLogged = true;
                     spdlog::info(
-                        "VR R30.3 XYZRHW WORLD: RHW depth signature promoted a depth-disabled pre-transformed particle/decal to game-FOV -> OpenXR-FOV spatial stereo");
+                        "VR R30.6 XYZRHW WORLD: referenced RHW/depth signature promoted a depth-disabled particle/decal; normal-world eyeInverse/projection transform is shared");
                 }
             }
             return true;
