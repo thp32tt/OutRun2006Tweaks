@@ -34,7 +34,7 @@ jobs:
           if (-not $r23.Contains('RenderCommittedDirect')) { throw 'R23 committed direct safe-copy path missing' }
           foreach ($marker in @(
             'R24-visible-fallback-final-20260916',
-            'DisplayOnlyGraceMs = 500',
+            'OutRunVrR23VerifiedBundle::MaxPresentationAgeMs',
             'RenderSafeProjectionChecked',
             'TrySubmitDirectSafeProjection',
             'RenderDirectFlatFallback',
@@ -50,7 +50,7 @@ jobs:
           if (-not $captureWait.Contains('MaxAcquireWaitMs = 2')) { throw 'desktop capture wait clamp missing' }
           if (-not $captureWait.Contains('ClampDesktopDuplicationWait')) { throw 'desktop capture wait guard missing' }
           if (-not $bundle.Contains('OutRunVR::SharedRenderFrameState frame')) { throw 'verified full frame snapshot missing' }
-          if (-not $bundle.Contains('MaxPresentationAgeMs = 250')) { throw 'verified bundle TTL missing' }
+          if (-not $bundle.Contains('MaxPresentationAgeMs = 1000')) { throw 'verified bundle TTL missing' }
           if (-not $bundle.Contains('publishedAtMs')) { throw 'verified bundle commit time missing' }
           if (-not $main.Contains('R23FrameUnchanged')) { throw 'candidate metadata revalidation missing' }
           if (-not $main.Contains('R23CommitClassicAfterValidation')) { throw 'classic post-validation commit missing' }
