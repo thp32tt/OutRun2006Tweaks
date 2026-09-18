@@ -142,7 +142,7 @@ jobs:
           $r24 = Get-Content vrhost/src/runtime/r24_black_screen_guard.hpp -Raw
           foreach ($marker in @(
             'R24-visible-fallback-final-20260916',
-            'DisplayOnlyGraceMs = 500',
+            'OutRunVrR23VerifiedBundle::MaxPresentationAgeMs',
             'TrySubmitDirectSafeProjection',
             'SubmitVisibleFallback',
             'RenderTheaterOverride',
