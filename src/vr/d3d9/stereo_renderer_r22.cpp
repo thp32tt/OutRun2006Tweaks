@@ -61,6 +61,10 @@ namespace OutRunVRStereo
         std::uint64_t R22RejectedInitialSeeds = 0;
         std::uint64_t R22ReplayStateCaptureFailures = 0;
         std::uint64_t R22ReplayStateGetterFallbacks = 0;
+#if defined(OUTRUN_VR_FORCE_LIVE_RASTER_COMPARE)
+        std::uint64_t R22ForcedLiveRasterSamples = 0;
+        bool R22FirstForcedLiveRasterLogged = false;
+#endif
         bool R22FirstSeedRejectLogged = false;
         bool R22FirstReplayStateCaptureFailureLogged = false;
 
@@ -115,6 +119,34 @@ namespace OutRunVRStereo
         bool R22SnapshotShadowedGameState(IDirect3DDevice9* device,
             R22ScissorSnapshot& out) noexcept
         {
+#if defined(OUTRUN_VR_FORCE_LIVE_RASTER_COMPARE)
+            // C1/C2 raster-correctness comparison: these short chains exclude
+            // R31's StateBlock::Apply interception. OutRun applies StateBlocks
+            // without traversing SetViewport/SetScissorRect/SetRenderState, so
+            // trusting R22ShadowState can replay an old enabled scissor into the
+            // RIGHT eye. That leaves rectangular pieces of the baseline/previous
+            // image untouched while the LEFT eye remains correct.
+            //
+            // Read the three raster values at the outer replay boundary instead.
+            // This intentionally trades some CPU time for an authoritative A/B
+            // result. Once confirmed on hardware we can replace the getters with
+            // a small StateBlock generation tracker without re-enabling R31-R34.
+            ++R22ReplayStateGetterFallbacks;
+            ++R22ForcedLiveRasterSamples;
+            if (!R22CaptureGameScissor(device, out))
+            {
+                R22ShadowState = {};
+                return false;
+            }
+            R22ShadowState = out;
+            if (!R22FirstForcedLiveRasterLogged)
+            {
+                R22FirstForcedLiveRasterLogged = true;
+                spdlog::warn(
+                    "VR C1/C2 RASTER FIX: live viewport/scissor/SCISSORTEST sampled at every stereo replay; stale StateBlock raster cache cannot clip the RIGHT eye");
+            }
+            return true;
+#else
             if (R22ShadowState.Valid())
             {
                 out = R22ShadowState;
@@ -125,6 +157,7 @@ namespace OutRunVRStereo
                 return false;
             R22ShadowState = out;
             return true;
+#endif
         }
 
         bool R22ApplyGameScissor(IDirect3DDevice9* device,
