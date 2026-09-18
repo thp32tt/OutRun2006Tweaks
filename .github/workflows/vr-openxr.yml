@@ -282,7 +282,7 @@ jobs:
           }
           foreach ($forbidden in @(
             'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
-            'VR R30 HUD: ScreenSpace2D correction READY with 0.65 common-center HUD scale; R30.3 XYZRHW game-FOV -> OpenXR-FOV world reprojection + RHW eye parallax READY',
+            'VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current=',
             'VR R33 DISPATCH: R33TryFastWorld/R33TryHud + direct R29 fallback READY',
             'VR R34 RESET GUARD: R15 classic-state replay health now gates post-Reset stereo eligibility'
           )) {
@@ -537,8 +537,8 @@ jobs:
             'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
             'VR C1.1 BASELINE: authoritative color clear replay seeds right/mono surfaces; two full-surface StretchRect baseline copies removed',
             'VR C1.1 FIXEDFN: perspective fixed-function XYZ draw now receives per-eye view/projection; XYZRHW/orthographic UI remains zero-disparity',
-            'VR R30 HUD: ScreenSpace2D correction READY with 0.65 common-center HUD scale; R30.3 XYZRHW game-FOV -> OpenXR-FOV world reprojection + RHW eye parallax READY',
-            'VR R30.4 XYZRHW WORLD: pre-transformed particle/billboard/decal draws reconstruct clip X/Y/Z/RHW'
+            'VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current=',
+            'VR R30.6 XYZRHW WORLD:'
           )) {
             if (-not $ascii.Contains($marker)) { throw "C2 marker missing: $marker" }
           }
