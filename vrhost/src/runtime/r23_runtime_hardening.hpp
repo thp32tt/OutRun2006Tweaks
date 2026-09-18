@@ -38,6 +38,8 @@ namespace OutRunVrR23RuntimeHardening
         static_cast<std::uint32_t>(OutRunVrR23VerifiedBundle::SourceKind::None) };
     inline std::atomic<bool> LastSubmittedLayer{ false };
     inline std::atomic<std::uint64_t> SubmissionSerial{ 0 };
+    inline std::atomic<std::uint64_t> LastSubmissionLogMs{ 0 };
+    inline constexpr std::uint64_t SubmissionLogIntervalMs = 2000;
 
     inline void RecordFinalSubmission(std::uint32_t frameId,
         OutRunVrR23VerifiedBundle::SourceKind kind, bool hasLayer) noexcept
@@ -46,7 +48,23 @@ namespace OutRunVrR23RuntimeHardening
         LastSubmittedKind.store(static_cast<std::uint32_t>(kind),
             std::memory_order_relaxed);
         LastSubmittedLayer.store(hasLayer, std::memory_order_relaxed);
-        SubmissionSerial.fetch_add(1, std::memory_order_release);
+        const std::uint64_t serial =
+            SubmissionSerial.fetch_add(1, std::memory_order_release) + 1;
+
+        const std::uint64_t now = GetTickCount64();
+        std::uint64_t previous =
+            LastSubmissionLogMs.load(std::memory_order_relaxed);
+        if (now >= previous + SubmissionLogIntervalMs &&
+            LastSubmissionLogMs.compare_exchange_strong(
+                previous, now, std::memory_order_relaxed))
+        {
+            std::cerr
+                << "[R23 final-submit] serial=" << serial
+                << " frameId=" << frameId
+                << " sourceKind=" << static_cast<std::uint32_t>(kind)
+                << " layer=" << (hasLayer ? 1 : 0)
+                << "\n";
+        }
     }
 
     inline XrResult SubmitNoLayer(XrSession session,
