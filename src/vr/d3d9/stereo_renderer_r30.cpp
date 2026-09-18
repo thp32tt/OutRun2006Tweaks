@@ -862,8 +862,9 @@ namespace OutRunVRStereo
                 const float zero[4]{ 0, 0, 0, 0 };
                 if (ok)
                 {
-                    device->Clear(0, nullptr, D3DCLEAR_TARGET,
-                        0x00000000, 1.0f, 0);
+                    // Bright pass overwrites the entire reduced target, so no
+                    // Clear is needed. Clearing here before rebinding the RT
+                    // would clear the game's current eye backbuffer.
                     ok = R30DrawSkyGlowPass(
                         device, temp,
                         R30SkyGlow.glowWidth,
