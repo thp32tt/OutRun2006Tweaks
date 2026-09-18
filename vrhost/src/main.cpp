@@ -91,6 +91,19 @@ namespace
         return TRUE;
     }
 
+    bool ProcessAliveForSelection(DWORD pid)
+    {
+        if (!pid)
+            return false;
+        HANDLE process = OpenProcess(
+            SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+        if (!process)
+            return false;
+        const DWORD wait = WaitForSingleObject(process, 0);
+        CloseHandle(process);
+        return wait == WAIT_TIMEOUT;
+    }
+
     DWORD SharedClientPid()
     {
         HANDLE mapping = OpenFileMappingW(FILE_MAP_READ, FALSE, OutRunVR::SharedMemoryName);
@@ -135,8 +148,7 @@ namespace
         // the host/watchdog followed one client PID while the active game log
         // belonged to another process, leaving stereoFrame=0 indefinitely.
         const DWORD sharedPid = SharedClientPid();
-        if (sharedPid &&
-            QueryProcessLiveness(sharedPid) == ProcessLiveness::Alive)
+        if (sharedPid && ProcessAliveForSelection(sharedPid))
             return sharedPid;
 
         // No valid shared client yet (host launched before the game). If more
