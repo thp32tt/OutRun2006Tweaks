@@ -187,7 +187,11 @@ namespace
             double renderMs, double endMs)
         {
             ++frames;
-            if (rejectReason && *rejectReason)
+            if (rejectReason && *rejectReason &&
+                std::strcmp(rejectReason, "not-evaluated") != 0 &&
+                std::strcmp(rejectReason, "already-processed") != 0 &&
+                std::strcmp(rejectReason, "committed-pending-render") != 0 &&
+                std::strcmp(rejectReason, "displayed-fresh") != 0)
                 ++rejects[rejectReason];
             if (finalKind && *finalKind)
                 ++finals[finalKind];
