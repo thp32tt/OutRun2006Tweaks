@@ -919,6 +919,9 @@ int main(int argc, char** argv)
         compositor.Initialize();
         ViewHistory viewHistory;
         HostTimings timings;
+        LARGE_INTEGER qpcFrequency{};
+        QueryPerformanceFrequency(&qpcFrequency);
+        ULONGLONG lastPipelineTelemetryMs = 0;
         const XrEnvironmentBlendMode blend = ChooseBlendMode(instance, system);
 
         bool running = false, quit = false, exitRequested = false;
@@ -1071,6 +1074,16 @@ int main(int argc, char** argv)
             }
 
             bool layerReady = false;
+            const char* finalLayerKind = "none";
+            const char* candidateRejectReason = "not-evaluated";
+            std::uint32_t candidateGameFrameId = 0;
+            std::uint32_t candidatePoseSequence = 0;
+            std::int64_t candidateGamePresentQpc = 0;
+            std::int64_t candidateCaptureQpc = 0;
+            double candidateCaptureAgeMs = -1.0;
+            double candidateCaptureMs = 0.0;
+            double candidateCommitCopyMs = 0.0;
+            double frameRenderMs = 0.0;
             if (fs.shouldRender == XR_TRUE && vc >= 2)
             {
                 if (presentation == OutRunVR::PresentationGameplay)
@@ -1082,6 +1095,29 @@ int main(int argc, char** argv)
                     constexpr std::uint32_t need = OutRunVR::RenderFrameStereoComplete |
                         OutRunVR::RenderFrameWorldStereo | OutRunVR::RenderFrameDrawDuplicated |
                         OutRunVR::RenderFrameEffectivePoseValid;
+                    if (have)
+                    {
+                        candidateGameFrameId = before.frameId;
+                        candidatePoseSequence = before.sourcePoseSequence;
+                        candidateGamePresentQpc = before.presentQpc;
+                    }
+                    if (!have)
+                        candidateRejectReason = "no-frame-state";
+                    else if ((before.flags & OutRunVR::RenderFramePresentInFlight) != 0)
+                        candidateRejectReason = "present-in-flight";
+                    else if (before.state != OutRunVR::StereoSbsActive)
+                        candidateRejectReason = "not-sbs-active";
+                    else if (!before.frameId)
+                        candidateRejectReason = "zero-frame-id";
+                    else if (before.frameId == lastProcessedStereoFrame)
+                        candidateRejectReason = "already-processed";
+                    else if (!before.sourcePoseSequence)
+                        candidateRejectReason = "zero-pose-sequence";
+                    else if ((before.flags & need) != need)
+                        candidateRejectReason = "incomplete-frame-flags";
+                    else
+                        candidateRejectReason = "candidate";
+
                     if (have && (before.flags & OutRunVR::RenderFramePresentInFlight) == 0 &&
                         before.state == OutRunVR::StereoSbsActive && before.frameId &&
                         before.frameId != lastProcessedStereoFrame && before.sourcePoseSequence &&
@@ -1098,17 +1134,54 @@ int main(int argc, char** argv)
                             {
                                 productionCaptureAttempted = true;
                                 capture = R23Capture(compositor, 2);
-                                candidateReady = capture.available && QpcAtOrAfter(capture.lastPresentQpc, before.presentQpc);
+                                candidateCaptureQpc = capture.lastPresentQpc;
+                                candidateReady = capture.available &&
+                                    QpcAtOrAfter(capture.lastPresentQpc, before.presentQpc);
                             }
-                            QueryPerformanceCounter(&ce); timings.capture.Add(timings.Ms(cs, ce));
+                            QueryPerformanceCounter(&ce);
+                            candidateCaptureMs = timings.Ms(cs, ce);
+                            timings.capture.Add(candidateCaptureMs);
 
-                            const bool same = candidateReady && R23FrameUnchanged(renderFrames, before);
+                            if (!directFrame && candidateCaptureQpc > 0 &&
+                                qpcFrequency.QuadPart > 0)
+                            {
+                                LARGE_INTEGER qpcNow{};
+                                QueryPerformanceCounter(&qpcNow);
+                                if (qpcNow.QuadPart >= candidateCaptureQpc)
+                                {
+                                    candidateCaptureAgeMs =
+                                        static_cast<double>(
+                                            qpcNow.QuadPart - candidateCaptureQpc) *
+                                        1000.0 /
+                                        static_cast<double>(qpcFrequency.QuadPart);
+                                }
+                            }
+
+                            if (!candidateReady)
+                            {
+                                candidateRejectReason = !capture.available
+                                    ? "capture-unavailable"
+                                    : "capture-before-game-present";
+                            }
+
+                            const bool same =
+                                candidateReady &&
+                                R23FrameUnchanged(renderFrames, before);
+                            if (candidateReady && !same)
+                                candidateRejectReason = "metadata-changed-during-capture";
+
                             bool committed = false;
                             if (same)
                             {
+                                LARGE_INTEGER cms{}, cme{};
+                                QueryPerformanceCounter(&cms);
                                 committed = directFrame
                                     ? R23CommitDirectAfterValidation(compositor, before)
                                     : R23CommitClassicAfterValidation(compositor);
+                                QueryPerformanceCounter(&cme);
+                                candidateCommitCopyMs = timings.Ms(cms, cme);
+                                if (!committed)
+                                    candidateRejectReason = "commit-copy-failed";
                             }
 
                             if (committed)
@@ -1119,10 +1192,16 @@ int main(int argc, char** argv)
                                 lastProcessedStereoFrame = before.frameId;
                                 lastStereoMatchMs = GetTickCount64();
                                 newStereoCommitted = true;
+                                candidateRejectReason = "committed";
                                 OutRunVrR23VerifiedBundle::Publish(before,
                                     directFrame ? OutRunVrR23VerifiedBundle::SourceKind::DirectGpu
-                                                : OutRunVrR23VerifiedBundle::SourceKind::ClassicSbs);
+                                                : OutRunVrR23VerifiedBundle::SourceKind::ClassicSbs,
+                                    directFrame ? 0 : candidateCaptureQpc);
                             }
+                        }
+                        else
+                        {
+                            candidateRejectReason = "pose-history-miss";
                         }
                     }
 
@@ -1154,6 +1233,7 @@ int main(int argc, char** argv)
                             reinterpret_cast<const XrCompositionLayerBaseHeader*>(
                                 &projection);
                         layerReady = true;
+                        finalLayerKind = "projection-fresh";
                         cachedProjectionViews = pv;
                         cachedProjectionValid = true;
                         cachedProjectionRenderedMs = projectionNow;
@@ -1167,6 +1247,7 @@ int main(int argc, char** argv)
                             reinterpret_cast<const XrCompositionLayerBaseHeader*>(
                                 &projection);
                         layerReady = true;
+                        finalLayerKind = "projection-cached";
                         ++R23CachedProjectionSubmits;
 
                         if (R23LastCachedProjectionLogMs == 0 ||
@@ -1185,6 +1266,7 @@ int main(int argc, char** argv)
                         }
                     }
                     QueryPerformanceCounter(&re);
+                    frameRenderMs += timings.Ms(rs, re);
                     timings.render.Add(timings.Ms(rs, re));
 
                     // Never submit a zero-layer frame just because Desktop
@@ -1206,6 +1288,7 @@ int main(int argc, char** argv)
                             layers[0] =
                                 reinterpret_cast<const XrCompositionLayerBaseHeader*>(&quad);
                             layerReady = true;
+                            finalLayerKind = "recovery-left-eye-theater";
                             ++R23GameplayTheaterFallbacks;
                             const ULONGLONG now = GetTickCount64();
                             if (R23LastGameplayFallbackLogMs == 0 ||
@@ -1219,7 +1302,9 @@ int main(int argc, char** argv)
                                     << "\n";
                             }
                         }
-                        QueryPerformanceCounter(&fre); timings.render.Add(timings.Ms(frs, fre));
+                        QueryPerformanceCounter(&fre);
+                        frameRenderMs += timings.Ms(frs, fre);
+                        timings.render.Add(timings.Ms(frs, fre));
                     }
                 }
                 else
@@ -1233,8 +1318,11 @@ int main(int argc, char** argv)
                     {
                         layers[0] = reinterpret_cast<const XrCompositionLayerBaseHeader*>(&quad);
                         layerReady = true;
+                        finalLayerKind = "menu-left-eye-theater";
                     }
-                    QueryPerformanceCounter(&re); timings.render.Add(timings.Ms(rs, re));
+                    QueryPerformanceCounter(&re);
+                    frameRenderMs += timings.Ms(rs, re);
+                    timings.render.Add(timings.Ms(rs, re));
                 }
             }
 
@@ -1243,7 +1331,44 @@ int main(int argc, char** argv)
             const XrResult endResult = xrEndFrame(session, &end);
             R23Pixels.NoteFinalSubmission();
             CheckXr(endResult, "xrEndFrame");
-            QueryPerformanceCounter(&ee); timings.end.Add(timings.Ms(es, ee)); timings.MaybeLog();
+            QueryPerformanceCounter(&ee);
+            const double endFrameMs = timings.Ms(es, ee);
+            timings.end.Add(endFrameMs);
+
+            const ULONGLONG pipelineNowMs = GetTickCount64();
+            if (lastPipelineTelemetryMs == 0 ||
+                pipelineNowMs - lastPipelineTelemetryMs >= 2000)
+            {
+                lastPipelineTelemetryMs = pipelineNowMs;
+                OutRunVrR23VerifiedBundle::Snapshot bundle{};
+                const bool haveBundle =
+                    OutRunVrR23VerifiedBundle::Read(bundle);
+                const long long bundleAgeMs =
+                    haveBundle && bundle.publishedAtMs &&
+                    pipelineNowMs >= bundle.publishedAtMs
+                    ? static_cast<long long>(
+                        pipelineNowMs - bundle.publishedAtMs)
+                    : -1;
+                std::cout
+                    << "[R23 pipeline] gameFrameId="
+                    << candidateGameFrameId
+                    << " gamePresentQpc=" << candidateGamePresentQpc
+                    << " captureQpc=" << candidateCaptureQpc
+                    << " captureAgeMs=" << candidateCaptureAgeMs
+                    << " committedFrameId=" << lastProcessedStereoFrame
+                    << " sourcePoseSequence=" << candidatePoseSequence
+                    << " rejectReason=" << candidateRejectReason
+                    << " finalLayer=" << finalLayerKind
+                    << " bundleFrameId="
+                    << (haveBundle ? bundle.frameId : 0u)
+                    << " bundleAgeMs=" << bundleAgeMs
+                    << " captureMs=" << candidateCaptureMs
+                    << " commitCopyMs=" << candidateCommitCopyMs
+                    << " renderMs=" << frameRenderMs
+                    << " xrEndFrameMs=" << endFrameMs
+                    << "\n";
+            }
+            timings.MaybeLog();
         }
 
         OutRunVrR23VerifiedBundle::Invalidate();
