@@ -57,6 +57,18 @@ namespace
     constexpr UINT R23SourceSamples = 8;
     constexpr DWORD R23TheaterRefreshWaitMs = 2;
     constexpr ULONGLONG R23TheaterRefreshLogIntervalMs = 5000;
+    // OpenXR/VDXR commonly runs at 90 Hz while OutRun produces stereo at
+    // roughly 60 Hz. Re-rendering the same Desktop Duplication source into the
+    // projection swapchain on every HMD tick wastes GPU work, while falling
+    // back to the theater quad exposes the raw SBS image. Keep the last
+    // successfully released projection alive for intermediate HMD frames and
+    // for short game-state/capture gaps.
+    constexpr ULONGLONG R23CachedProjectionHoldMs = 1000;
+    constexpr ULONGLONG R23PresentationDebounceMs = 750;
+    constexpr ULONGLONG R23CachedProjectionLogIntervalMs = 5000;
+    std::uint64_t R23CachedProjectionSubmits = 0;
+    ULONGLONG R23LastCachedProjectionLogMs = 0;
+    std::uint64_t R23PresentationGraceFrames = 0;
     std::uint64_t R23TheaterRefreshAttempts = 0;
     std::uint64_t R23TheaterRefreshFresh = 0;
     ULONGLONG R23LastTheaterRefreshLogMs = 0;
@@ -909,6 +921,10 @@ int main(int argc, char** argv)
         bool matchedStereoValid = false;
         std::uint32_t lastProcessedStereoFrame = 0;
         ULONGLONG lastStereoMatchMs = 0;
+        std::array<XrCompositionLayerProjectionView, 2>
+            cachedProjectionViews{};
+        bool cachedProjectionValid = false;
+        ULONGLONG cachedProjectionRenderedMs = 0;
         bool pendingReferenceSpaceChange = false;
         XrTime pendingReferenceSpaceChangeTime = 0;
 
@@ -940,7 +956,9 @@ int main(int argc, char** argv)
                     {
                         CheckXr(xrEndSession(session), "xrEndSession");
                         running = false; viewHistory.Clear(); matchedStereoValid = false;
-                        lastStereoMatchMs = 0; compositor.ReferenceSpaceChanged();
+                        lastStereoMatchMs = 0; cachedProjectionValid = false;
+                        cachedProjectionRenderedMs = 0;
+                        compositor.ReferenceSpaceChanged();
                         OutRunVrR23VerifiedBundle::Invalidate();
                         OutRunVR::SharedRenderFrameState rf{};
                         if (renderFrames.Read(rf)) lastProcessedStereoFrame = rf.frameId;
@@ -971,7 +989,9 @@ int main(int argc, char** argv)
                 (pendingReferenceSpaceChangeTime == 0 || fs.predictedDisplayTime >= pendingReferenceSpaceChangeTime))
             {
                 shared.ReferenceSpaceChanged(); compositor.ReferenceSpaceChanged(); viewHistory.Clear();
-                matchedStereoValid = false; OutRunVrR23VerifiedBundle::Invalidate();
+                matchedStereoValid = false; cachedProjectionValid = false;
+                cachedProjectionRenderedMs = 0;
+                OutRunVrR23VerifiedBundle::Invalidate();
                 OutRunVR::SharedRenderFrameState rf{};
                 lastProcessedStereoFrame = renderFrames.Read(rf) ? rf.frameId : shared.ReadStereoMeta().frame;
                 pendingReferenceSpaceChange = false; pendingReferenceSpaceChangeTime = 0;
@@ -1005,13 +1025,37 @@ int main(int argc, char** argv)
             XrCompositionLayerProjection projection{ XR_TYPE_COMPOSITION_LAYER_PROJECTION };
             XrCompositionLayerQuad quad{ XR_TYPE_COMPOSITION_LAYER_QUAD };
 
-            const auto presentation = shared.Presentation();
+            const auto requestedPresentation = shared.Presentation();
+            auto presentation = requestedPresentation;
+            const ULONGLONG presentationNow = GetTickCount64();
+
+            // Race-adjacent game states can briefly publish Theater between
+            // valid gameplay stereo Presents. Do not tear down a healthy
+            // projection immediately: a short debounce prevents the headset
+            // from flashing the raw SBS/theater image during stage/state
+            // transitions. A real menu still switches normally after 750 ms.
+            if (requestedPresentation == OutRunVR::PresentationTheater &&
+                lastPresentation == OutRunVR::PresentationGameplay &&
+                cachedProjectionValid &&
+                presentationNow >= cachedProjectionRenderedMs &&
+                presentationNow - cachedProjectionRenderedMs <=
+                    R23PresentationDebounceMs)
+            {
+                presentation = OutRunVR::PresentationGameplay;
+                ++R23PresentationGraceFrames;
+            }
+
             if (presentation != lastPresentation)
             {
                 compositor.ReferenceSpaceChanged(); matchedStereoValid = false;
                 OutRunVrR23VerifiedBundle::Invalidate();
                 OutRunVR::SharedRenderFrameState rf{};
                 lastProcessedStereoFrame = renderFrames.Read(rf) ? rf.frameId : shared.ReadStereoMeta().frame;
+                if (presentation != OutRunVR::PresentationGameplay)
+                {
+                    cachedProjectionValid = false;
+                    cachedProjectionRenderedMs = 0;
+                }
                 lastPresentation = presentation;
                 std::cout << "VR presentation: "
                     << (presentation == OutRunVR::PresentationGameplay ? "true stereo projection" : "LOCAL-fixed theater")
@@ -1024,6 +1068,7 @@ int main(int argc, char** argv)
                 if (presentation == OutRunVR::PresentationGameplay)
                 {
                     bool productionCaptureAttempted = false;
+                    bool newStereoCommitted = false;
                     OutRunVR::SharedRenderFrameState before{};
                     const bool have = renderFrames.Read(before);
                     constexpr std::uint32_t need = OutRunVR::RenderFrameStereoComplete |
@@ -1065,6 +1110,7 @@ int main(int argc, char** argv)
                                 matchedStereoValid = true;
                                 lastProcessedStereoFrame = before.frameId;
                                 lastStereoMatchMs = GetTickCount64();
+                                newStereoCommitted = true;
                                 OutRunVrR23VerifiedBundle::Publish(before,
                                     directFrame ? OutRunVrR23VerifiedBundle::SourceKind::DirectGpu
                                                 : OutRunVrR23VerifiedBundle::SourceKind::ClassicSbs);
@@ -1072,16 +1118,66 @@ int main(int argc, char** argv)
                         }
                     }
 
-                    const bool grace = matchedStereoValid && compositor.HasStereoSource() &&
-                        GetTickCount64() - lastStereoMatchMs <= StereoGraceMs;
+                    const ULONGLONG projectionNow = GetTickCount64();
+                    const bool grace = matchedStereoValid &&
+                        compositor.HasStereoSource() &&
+                        projectionNow - lastStereoMatchMs <= StereoGraceMs;
+                    const bool cachedHold = cachedProjectionValid &&
+                        projectionNow >= cachedProjectionRenderedMs &&
+                        projectionNow - cachedProjectionRenderedMs <=
+                            R23CachedProjectionHoldMs;
+
                     LARGE_INTEGER rs{}, re{}; QueryPerformanceCounter(&rs);
-                    if (grace && R23RenderProjection(compositor, matchedViews, pv))
+
+                    // Only blit a projection image when the game supplied a new
+                    // committed stereo frame (or when no cached projection
+                    // exists yet). At 90 Hz HMD / 60 Hz game this removes about
+                    // one third of the host-side full-eye blits. Intermediate
+                    // XR frames resubmit the last released projection and let
+                    // the runtime's normal reprojection handle head motion.
+                    if (grace &&
+                        (newStereoCommitted || !cachedProjectionValid) &&
+                        R23RenderProjection(compositor, matchedViews, pv))
                     {
-                        projection.space = localSpace; projection.viewCount = 2; projection.views = pv.data();
-                        layers[0] = reinterpret_cast<const XrCompositionLayerBaseHeader*>(&projection);
+                        projection.space = localSpace;
+                        projection.viewCount = 2;
+                        projection.views = pv.data();
+                        layers[0] =
+                            reinterpret_cast<const XrCompositionLayerBaseHeader*>(
+                                &projection);
                         layerReady = true;
+                        cachedProjectionViews = pv;
+                        cachedProjectionValid = true;
+                        cachedProjectionRenderedMs = projectionNow;
                     }
-                    QueryPerformanceCounter(&re); timings.render.Add(timings.Ms(rs, re));
+                    else if (cachedProjectionValid && (grace || cachedHold))
+                    {
+                        projection.space = localSpace;
+                        projection.viewCount = 2;
+                        projection.views = cachedProjectionViews.data();
+                        layers[0] =
+                            reinterpret_cast<const XrCompositionLayerBaseHeader*>(
+                                &projection);
+                        layerReady = true;
+                        ++R23CachedProjectionSubmits;
+
+                        if (R23LastCachedProjectionLogMs == 0 ||
+                            projectionNow - R23LastCachedProjectionLogMs >=
+                                R23CachedProjectionLogIntervalMs)
+                        {
+                            R23LastCachedProjectionLogMs = projectionNow;
+                            std::cout
+                                << "[R23 projection-hold] reusing last released stereo projection instead of theater/SBS fallback"
+                                << " count=" << R23CachedProjectionSubmits
+                                << " newFrame=" << (newStereoCommitted ? 1 : 0)
+                                << " grace=" << (grace ? 1 : 0)
+                                << " presentationGraceFrames="
+                                << R23PresentationGraceFrames
+                                << "\n";
+                        }
+                    }
+                    QueryPerformanceCounter(&re);
+                    timings.render.Add(timings.Ms(rs, re));
 
                     // Never submit a zero-layer frame just because Desktop
                     // Duplication missed the stereo grace window. VDXR can show a
@@ -1109,7 +1205,7 @@ int main(int argc, char** argv)
                             {
                                 R23LastGameplayFallbackLogMs = now;
                                 std::cout
-                                    << "[R23 fallback] prevented zero-layer gameplay submit; using LOCAL-fixed theater until fresh stereo returns"
+                                    << "[R23 fallback] no reusable stereo projection remained; using LOCAL-fixed theater until fresh stereo returns"
                                     << " count=" << R23GameplayTheaterFallbacks
                                     << " productionAttempted=" << (productionCaptureAttempted ? 1 : 0)
                                     << "\n";
