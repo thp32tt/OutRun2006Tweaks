@@ -548,13 +548,22 @@ namespace OutRunVRRenderer
 
 		ClientPresentationMode CurrentPresentationMode()
 		{
+			// Keep the VR projection alive across OutRun's short gameplay-state
+			// transitions (GOAL/TIMEUP/TRYAGAIN/OUTRUNMILES/pause and brief state
+			// hand-offs). The previous STATE_GAME-only test could drop Frame.v2 to
+			// frame=0 while the desktop continued rendering normally.
+			static ULONGLONG lastGameplayMs = 0;
+			constexpr ULONGLONG GameplayPresentationHoldMs = 1500;
 			if (!Game::current_mode)
 				return PresentationUnknown;
-			const GameState state = *Game::current_mode;
-			if (state == GameState::STATE_GAME)
+
+			const ULONGLONG now = GetTickCount64();
+			if (Game::is_in_game())
+			{
+				lastGameplayMs = now;
 				return PresentationGameplay;
-			if (state == GameState::STATE_START && Game::game_start_progress_code &&
-				*Game::game_start_progress_code == 65)
+			}
+			if (lastGameplayMs != 0 && now - lastGameplayMs <= GameplayPresentationHoldMs)
 				return PresentationGameplay;
 			return PresentationTheater;
 		}

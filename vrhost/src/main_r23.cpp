@@ -60,6 +60,8 @@ namespace
     std::uint64_t R23TheaterRefreshAttempts = 0;
     std::uint64_t R23TheaterRefreshFresh = 0;
     ULONGLONG R23LastTheaterRefreshLogMs = 0;
+    std::uint64_t R23GameplayTheaterFallbacks = 0;
+    ULONGLONG R23LastGameplayFallbackLogMs = 0;
 
 
     struct R23DirectHoldState
@@ -1081,14 +1083,39 @@ int main(int argc, char** argv)
                     }
                     QueryPerformanceCounter(&re); timings.render.Add(timings.Ms(rs, re));
 
-                    // Keep the desktop source current while stereo is unavailable,
-                    // but never treat this mono capture as a validated projection.
-                    // R24 can consume it only through the theater fallback ladder.
-                    if (!layerReady && !productionCaptureAttempted)
+                    // Never submit a zero-layer frame just because Desktop
+                    // Duplication missed the stereo grace window. VDXR can show a
+                    // solid compositor colour / severe HMD stutter even while the
+                    // desktop game keeps running normally.
+                    if (!layerReady)
                     {
                         LARGE_INTEGER cs{}, ce{}; QueryPerformanceCounter(&cs);
-                        R23RefreshTheaterFallbackCapture(compositor);
+                        const CaptureStatus fallbackCapture =
+                            R23RefreshTheaterFallbackCapture(compositor);
                         QueryPerformanceCounter(&ce); timings.capture.Add(timings.Ms(cs, ce));
+
+                        LARGE_INTEGER frs{}, fre{}; QueryPerformanceCounter(&frs);
+                        if (fallbackCapture.available &&
+                            R23RenderTheater(compositor, viewSpace, localSpace,
+                                fs.predictedDisplayTime, quad))
+                        {
+                            layers[0] =
+                                reinterpret_cast<const XrCompositionLayerBaseHeader*>(&quad);
+                            layerReady = true;
+                            ++R23GameplayTheaterFallbacks;
+                            const ULONGLONG now = GetTickCount64();
+                            if (R23LastGameplayFallbackLogMs == 0 ||
+                                now - R23LastGameplayFallbackLogMs >= 5000)
+                            {
+                                R23LastGameplayFallbackLogMs = now;
+                                std::cout
+                                    << "[R23 fallback] prevented zero-layer gameplay submit; using LOCAL-fixed theater until fresh stereo returns"
+                                    << " count=" << R23GameplayTheaterFallbacks
+                                    << " productionAttempted=" << (productionCaptureAttempted ? 1 : 0)
+                                    << "\n";
+                            }
+                        }
+                        QueryPerformanceCounter(&fre); timings.render.Add(timings.Ms(frs, fre));
                     }
                 }
                 else

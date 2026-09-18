@@ -12,6 +12,11 @@ namespace Settings
 	Setting<bool> SkyGlowTwoStep{ "Graphics", "SkyGlowTwoStep", true,
 		"Reduces aliasing in the sky glow effect by handling the SkyGlowFactor in two steps. "
 		"Likely not console-accurate, but can help reduce the aliasing with Factor = 4 or higher." };
+	// Defined by src/vr/settings.cpp. Sky glow samples the mono game backbuffer,
+	// so it must be suppressed while true stereo is active or the left-eye bloom
+	// gets composited into the right eye as a translucent ghost.
+	extern Setting<bool> VREnabled;
+	extern Setting<bool> VRStereo;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
 
@@ -286,6 +291,12 @@ RestoreXboxBrightness RestoreXboxBrightness::instance;
 // more for quality:
 class RestoreSkyGlow : public Hook
 {
+	static bool SkyGlowAllowed() noexcept
+	{
+		return Settings::SkyGlowFactor > 0 &&
+			!(Settings::VREnabled && Settings::VRStereo);
+	}
+
 	// (1) The exposure reaches pixel shader constant c7 alpha, but nothing reads
 	// it. Games pixel shaders are assembled by concatenating ps_1_1 snippets looked
 	// up by combiner encoding, and entry for the HDR alpha op holds an empty snippet 
@@ -713,12 +724,16 @@ public:
 		// SkyGlowTwoStep is read inside MakeReduceBuff on every call, so nothing
 		// needs declaring for it at all.
 		Settings::SkyGlowFactor.watch([] { RebuildGlowBuffers(); });
+		Settings::VREnabled.watch([] { RebuildGlowBuffers(); });
+		Settings::VRStereo.watch([] { RebuildGlowBuffers(); });
 	}
 
 	bool apply() override
 	{
 		// Note: hooks/patches are always applied regardless of INI settings, so they can be changed at runtime
-		Memory::VP::Patch(Module::exe_ptr<uint8_t>(GlowEnabled_Addr), uint8_t(Settings::SkyGlowFactor > 0 ? 1 : 0));
+		Memory::VP::Patch(Module::exe_ptr<uint8_t>(GlowEnabled_Addr), uint8_t(SkyGlowAllowed() ? 1 : 0));
+		if (Settings::SkyGlowFactor > 0 && !SkyGlowAllowed())
+			spdlog::warn("VR SKY GLOW GUARD: disabled mono-backbuffer sky glow while true stereo is active to prevent left-eye ghosting in the right eye");
 
 		Memory::VP::Patch(Module::exe_ptr(AlphaOpTable_ps11_Entry0Snippet), uintptr_t(Snippet_ps11));
 		Memory::VP::Patch(Module::exe_ptr(AlphaOpTable_ps14_Entry0Snippet), uintptr_t(Snippet_ps14));
@@ -763,7 +778,7 @@ public:
 
 		// Release before patching the enabled byte, so it frees resources if needed
 		GlowRelease_dest();
-		Memory::VP::Patch(Module::exe_ptr<uint8_t>(GlowEnabled_Addr), uint8_t(Settings::SkyGlowFactor > 0 ? 1 : 0));
+		Memory::VP::Patch(Module::exe_ptr<uint8_t>(GlowEnabled_Addr), uint8_t(SkyGlowAllowed() ? 1 : 0));
 		GlowInit_dest();
 	}
 
