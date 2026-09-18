@@ -5,6 +5,9 @@ on:
     branches: [ vr-openxr ]
     paths:
       - 'vrhost/**'
+      - 'src/vr/**'
+      - 'src/hooks_graphics.cpp'
+      - 'OutRun2006Tweaks.ini'
       - '.github/workflows/vr-openxr-r21.yml'
   workflow_dispatch:
 
