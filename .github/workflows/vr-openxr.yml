@@ -215,7 +215,7 @@ jobs:
           set CI=
           cmake -S . -B build-vr-game -G "Visual Studio 17 2022" -A Win32
 
-      - name: Verify regenerated R34 source graph
+      - name: Verify regenerated R26 safe production source graph
         shell: pwsh
         run: |
           $projects = Get-ChildItem build-vr-game -Filter *.vcxproj -Recurse
@@ -224,38 +224,27 @@ jobs:
 
           foreach ($required in @(
             'ex_device_upgrade_r15.cpp',
-            'stereo_renderer_r34.cpp',
-            'outrun_renderer_r29.cpp'
+            'stereo_renderer_r26_compare.cpp',
+            'outrun_renderer_r23.cpp'
           )) {
             if (-not $projectText.Contains($required)) {
-              throw "authoritative VR translation unit missing from generated build graph: $required"
+              throw "authoritative safe VR translation unit missing from generated build graph: $required"
             }
           }
 
-          foreach ($includedOnly in @(
-            'ex_device_upgrade.cpp',
-            'ex_device_upgrade_r13.cpp',
-            'stereo_renderer.cpp',
-            'stereo_renderer_r13.cpp',
-            'stereo_renderer_r20.cpp',
-            'stereo_renderer_r21.cpp',
-            'stereo_renderer_r22.cpp',
-            'stereo_renderer_r23.cpp',
-            'stereo_renderer_r26.cpp',
+          foreach ($excluded in @(
             'stereo_renderer_r29.cpp',
             'stereo_renderer_r30.cpp',
             'stereo_renderer_r31.cpp',
             'stereo_renderer_r32.cpp',
             'stereo_renderer_r33.cpp',
-            'ex_device_upgrade_r14.cpp',
-            'outrun_renderer.cpp',
-            'outrun_renderer_r13.cpp',
-            'outrun_renderer_r23.cpp'
+            'stereo_renderer_r34.cpp',
+            'outrun_renderer_r29.cpp'
           )) {
-            $escaped = [regex]::Escape($includedOnly)
+            $escaped = [regex]::Escape($excluded)
             $pattern = '<ClCompile Include="[^"]*[\\/]' + $escaped + '"'
             if ($projectText -match $pattern) {
-              throw "included VR implementation is compiled independently: $includedOnly"
+              throw "post-e20 fast/HUD implementation compiled into safe production build: $excluded"
             }
           }
 
@@ -271,7 +260,7 @@ jobs:
       - name: Build Win32 VR DLL and v3 contract
         run: cmake --build build-vr-game --config Release
 
-      - name: Verify Win32 R34/R15 binary markers
+      - name: Verify Win32 R26-safe/R15 binary markers
         shell: pwsh
         run: |
           $dllPath = 'build-vr-game/bin/dinput8.dll'
@@ -281,20 +270,23 @@ jobs:
           foreach ($marker in @(
             'VR stereo: D3D9 full-eye renderer installed',
             'VR R13: stereo hardening ACTIVE',
-            'VR R13 effect policy: translucent shadow/billboard/panel pass kept stock',
             'VR R22 GAME: shadow-tracked viewport/scissor replay',
             'VR R23 GAME: single-owner live-state recovery baseline ACTIVE',
             'VR R23/R25 BASELINE: authoritative first seed',
             'VR R23 RENDERER: BeginScene/WVP guards READY; recovery pose warmup is stock-visible',
-            'VR R14 EX: lifetime-bound MANAGED 2D CPU-shadow path ACTIVE',
+            'VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE',
             'VR R15 EX: full D3DSBT_ALL baseline + synchronous Reset/stereo handoff ACTIVE',
-            'VR stereo: synchronous CreateDevice-thread base hook handoff READY',
-            'VR R32 REVIEW2: R22-owned Reset lifecycle',
-            'VR R33 DISPATCH: R33TryFastWorld/R33TryHud + direct R29 fallback READY',
-            'VR R34 RESET GUARD: R15 classic-state replay health now gates post-Reset stereo eligibility',
             'VR v3 shadow: live dual-protocol diagnostics active'
           )) {
-            if (-not $ascii.Contains($marker)) { throw "VR DLL marker missing: $marker" }
+            if (-not $ascii.Contains($marker)) { throw "VR safe DLL marker missing: $marker" }
+          }
+          foreach ($forbidden in @(
+            'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
+            'VR R30 HUD: ScreenSpace2D asymmetric-FOV correction overlay READY',
+            'VR R33 DISPATCH: R33TryFastWorld/R33TryHud + direct R29 fallback READY',
+            'VR R34 RESET GUARD: R15 classic-state replay health now gates post-Reset stereo eligibility'
+          )) {
+            if ($ascii.Contains($forbidden)) { throw "regressed fast/HUD marker present: $forbidden" }
           }
           $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
           if ([BitConverter]::ToUInt16($bytes, $peOffset + 4) -ne 0x014C) { throw 'expected x86 DLL' }
@@ -401,7 +393,7 @@ jobs:
         shell: cmd
         run: |
           set CI=
-          cmake -S . -B build-vr-c1 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_C1_COMPARE=ON
+          cmake -S . -B build-vr-c1 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=ON
 
       - name: Verify C1 source graph
         shell: pwsh
@@ -489,7 +481,7 @@ jobs:
         shell: cmd
         run: |
           set CI=
-          cmake -S . -B build-vr-c2 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_C2_COMPARE=ON
+          cmake -S . -B build-vr-c2 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=ON
 
       - name: Verify C2 source graph
         shell: pwsh
