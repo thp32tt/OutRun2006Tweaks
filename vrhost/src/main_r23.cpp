@@ -662,7 +662,7 @@ namespace
         const OutRunVR::SharedRenderFrameState& before)
     {
         OutRunVR::SharedRenderFrameState after{};
-        return reader.Read(after) &&
+        return reader.ReadFrame(before.frameId, after) &&
             (after.flags & OutRunVR::RenderFramePresentInFlight) == 0 &&
             after.sequence == before.sequence &&
             after.clientPid == before.clientPid &&
@@ -675,6 +675,65 @@ namespace
             after.backbufferHeight == before.backbufferHeight &&
             std::memcmp(after.eye, before.eye, sizeof(before.eye)) == 0 &&
             std::memcmp(after.reserved, before.reserved, sizeof(before.reserved)) == 0;
+    }
+
+
+    bool R23SelectClassicFrameForCapture(
+        RenderFrameReader& reader, const CaptureStatus& capture,
+        std::uint32_t lastProcessedFrame,
+        std::uint32_t requiredFlags,
+        OutRunVR::SharedRenderFrameState& selected,
+        std::int64_t maxSkewTicks)
+    {
+        selected = {};
+        if (!capture.available || !capture.fresh ||
+            !capture.fullGameClientVisible ||
+            !capture.gameRegionChanged ||
+            capture.lastPresentQpc <= 0)
+            return false;
+
+        std::array<OutRunVR::SharedRenderFrameState,
+            OutRunVR::RenderFrameRingSize> history{};
+        std::size_t count = 0;
+        if (!reader.ReadHistory(history, count))
+            return false;
+
+        bool found = false;
+        std::int64_t bestPresentQpc = 0;
+        for (std::size_t i = 0; i < count; ++i)
+        {
+            const auto& frame = history[i];
+            if ((frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
+                (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0 ||
+                frame.state != OutRunVR::StereoSbsActive ||
+                !frame.frameId ||
+                frame.frameId == lastProcessedFrame ||
+                !frame.sourcePoseSequence ||
+                (frame.flags & requiredFlags) != requiredFlags ||
+                frame.presentQpc <= 0 ||
+                frame.presentQpc > capture.lastPresentQpc)
+                continue;
+
+            const std::int64_t skew =
+                capture.lastPresentQpc - frame.presentQpc;
+            if (maxSkewTicks > 0 && skew > maxSkewTicks)
+                continue;
+
+            if (!found || frame.presentQpc > bestPresentQpc ||
+                (frame.presentQpc == bestPresentQpc &&
+                 frame.frameId > selected.frameId))
+            {
+                selected = frame;
+                bestPresentQpc = frame.presentQpc;
+                found = true;
+            }
+        }
+
+        // The ring may advance while Desktop Duplication copies the output.
+        // That is fine as long as the exact frameId chosen above is still
+        // present and byte-for-byte stable. We no longer reject merely because
+        // latestSlot moved to the next game frame.
+        return found && R23FrameUnchanged(reader, selected);
     }
 
     bool R23ValidateDirectResourceSize(StereoCompositor& c,
@@ -1114,6 +1173,11 @@ int main(int argc, char** argv)
                 {
                     bool productionCaptureAttempted = false;
                     bool newStereoCommitted = false;
+                    bool pendingBundlePublish = false;
+                    OutRunVR::SharedRenderFrameState pendingBundleFrame{};
+                    OutRunVrR23VerifiedBundle::SourceKind pendingBundleSource =
+                        OutRunVrR23VerifiedBundle::SourceKind::None;
+                    std::int64_t pendingBundleCaptureQpc = 0;
                     OutRunVR::SharedRenderFrameState before{};
                     const bool have = renderFrames.Read(before);
                     constexpr std::uint32_t need = OutRunVR::RenderFrameStereoComplete |
@@ -1142,90 +1206,155 @@ int main(int argc, char** argv)
                     else
                         candidateRejectReason = "candidate";
 
-                    if (have && (before.flags & OutRunVR::RenderFramePresentInFlight) == 0 &&
-                        before.state == OutRunVR::StereoSbsActive && before.frameId &&
-                        before.frameId != lastProcessedStereoFrame && before.sourcePoseSequence &&
+                    if (have &&
+                        (before.flags & OutRunVR::RenderFramePresentInFlight) == 0 &&
+                        before.state == OutRunVR::StereoSbsActive &&
+                        before.frameId &&
+                        before.frameId != lastProcessedStereoFrame &&
+                        before.sourcePoseSequence &&
                         (before.flags & need) == need)
                     {
-                        std::array<XrView, 2> history{};
-                        if (viewHistory.Find(before.sourcePoseSequence, history))
+                        OutRunVR::SharedRenderFrameState candidate = before;
+                        bool directFrame =
+                            (candidate.flags &
+                             OutRunVR::RenderFrameDirectGpuTransport) != 0;
+                        bool candidateReady = directFrame;
+                        CaptureStatus capture{};
+
+                        LARGE_INTEGER cs{}, ce{};
+                        QueryPerformanceCounter(&cs);
+                        if (!directFrame)
                         {
-                            const bool directFrame = (before.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0;
-                            bool candidateReady = directFrame;
-                            CaptureStatus capture{};
-                            LARGE_INTEGER cs{}, ce{}; QueryPerformanceCounter(&cs);
+                            productionCaptureAttempted = true;
+                            capture = R23Capture(compositor, 2);
+                            candidateCaptureQpc = capture.lastPresentQpc;
+
+                            // LastPresentTime is output-global. Require the
+                            // complete OutRun client to be visible and require a
+                            // dirty/move update that intersects that client.
+                            // Then correlate against the four-entry Frame.v2
+                            // history and choose the closest game Present at or
+                            // before the captured output frame.
+                            const std::int64_t maxSkewTicks =
+                                qpcFrequency.QuadPart > 0
+                                ? qpcFrequency.QuadPart / 10 // 100 ms
+                                : 0;
+                            candidateReady =
+                                R23SelectClassicFrameForCapture(
+                                    renderFrames, capture,
+                                    lastProcessedStereoFrame,
+                                    need, candidate, maxSkewTicks);
+                            if (candidateReady)
+                            {
+                                candidateGameFrameId = candidate.frameId;
+                                candidatePoseSequence =
+                                    candidate.sourcePoseSequence;
+                                candidateGamePresentQpc =
+                                    candidate.presentQpc;
+                            }
+                        }
+                        QueryPerformanceCounter(&ce);
+                        candidateCaptureMs = timings.Ms(cs, ce);
+                        timings.capture.Add(candidateCaptureMs);
+
+                        if (!directFrame && candidateCaptureQpc > 0 &&
+                            qpcFrequency.QuadPart > 0)
+                        {
+                            LARGE_INTEGER qpcNow{};
+                            QueryPerformanceCounter(&qpcNow);
+                            if (qpcNow.QuadPart >= candidateCaptureQpc)
+                            {
+                                candidateCaptureAgeMs =
+                                    static_cast<double>(
+                                        qpcNow.QuadPart -
+                                        candidateCaptureQpc) *
+                                    1000.0 /
+                                    static_cast<double>(
+                                        qpcFrequency.QuadPart);
+                            }
+                        }
+
+                        if (!candidateReady)
+                        {
                             if (!directFrame)
                             {
-                                productionCaptureAttempted = true;
-                                capture = R23Capture(compositor, 2);
-                                candidateCaptureQpc = capture.lastPresentQpc;
-                                candidateReady = capture.available &&
-                                    QpcAtOrAfter(capture.lastPresentQpc, before.presentQpc);
-                            }
-                            QueryPerformanceCounter(&ce);
-                            candidateCaptureMs = timings.Ms(cs, ce);
-                            timings.capture.Add(candidateCaptureMs);
-
-                            if (!directFrame && candidateCaptureQpc > 0 &&
-                                qpcFrequency.QuadPart > 0)
-                            {
-                                LARGE_INTEGER qpcNow{};
-                                QueryPerformanceCounter(&qpcNow);
-                                if (qpcNow.QuadPart >= candidateCaptureQpc)
-                                {
-                                    candidateCaptureAgeMs =
-                                        static_cast<double>(
-                                            qpcNow.QuadPart - candidateCaptureQpc) *
-                                        1000.0 /
-                                        static_cast<double>(qpcFrequency.QuadPart);
-                                }
-                            }
-
-                            if (!candidateReady)
-                            {
-                                candidateRejectReason = !capture.available
-                                    ? "capture-unavailable"
-                                    : "capture-before-game-present";
-                            }
-
-                            const bool same =
-                                candidateReady &&
-                                R23FrameUnchanged(renderFrames, before);
-                            if (candidateReady && !same)
-                                candidateRejectReason = "metadata-changed-during-capture";
-
-                            bool committed = false;
-                            if (same)
-                            {
-                                LARGE_INTEGER cms{}, cme{};
-                                QueryPerformanceCounter(&cms);
-                                committed = directFrame
-                                    ? R23CommitDirectAfterValidation(compositor, before)
-                                    : R23CommitClassicAfterValidation(compositor);
-                                QueryPerformanceCounter(&cme);
-                                candidateCommitCopyMs = timings.Ms(cms, cme);
-                                if (!committed)
-                                    candidateRejectReason = "commit-copy-failed";
-                            }
-
-                            if (committed)
-                            {
-                                if (directFrame) shared.AckDirectFrame(before.frameId);
-                                R23CopyMatchedViews(before, matchedViews);
-                                matchedStereoValid = true;
-                                lastProcessedStereoFrame = before.frameId;
-                                lastStereoMatchMs = GetTickCount64();
-                                newStereoCommitted = true;
-                                candidateRejectReason = "committed";
-                                OutRunVrR23VerifiedBundle::Publish(before,
-                                    directFrame ? OutRunVrR23VerifiedBundle::SourceKind::DirectGpu
-                                                : OutRunVrR23VerifiedBundle::SourceKind::ClassicSbs,
-                                    directFrame ? 0 : candidateCaptureQpc);
+                                if (!capture.available)
+                                    candidateRejectReason =
+                                        "capture-unavailable";
+                                else if (!capture.fullGameClientVisible)
+                                    candidateRejectReason =
+                                        "sbs-client-clipped";
+                                else if (!capture.gameRegionChanged)
+                                    candidateRejectReason =
+                                        "desktop-update-outside-game";
+                                else
+                                    candidateRejectReason =
+                                        "capture-frame-history-miss";
                             }
                         }
                         else
                         {
-                            candidateRejectReason = "pose-history-miss";
+                            std::array<XrView, 2> history{};
+                            if (!viewHistory.Find(
+                                    candidate.sourcePoseSequence,
+                                    history))
+                            {
+                                candidateReady = false;
+                                candidateRejectReason =
+                                    "pose-history-miss";
+                            }
+                        }
+
+                        // DirectGPU already carries image, frameId, pose and
+                        // resource generation in one ring entry. Classic SBS
+                        // was re-selected from stable frame history above.
+                        const bool same =
+                            candidateReady &&
+                            R23FrameUnchanged(
+                                renderFrames, candidate);
+                        if (candidateReady && !same)
+                            candidateRejectReason =
+                                "selected-frame-mutated";
+
+                        bool committed = false;
+                        if (same)
+                        {
+                            LARGE_INTEGER cms{}, cme{};
+                            QueryPerformanceCounter(&cms);
+                            committed = directFrame
+                                ? R23CommitDirectAfterValidation(
+                                    compositor, candidate)
+                                : R23CommitClassicAfterValidation(
+                                    compositor);
+                            QueryPerformanceCounter(&cme);
+                            candidateCommitCopyMs =
+                                timings.Ms(cms, cme);
+                            if (!committed)
+                                candidateRejectReason =
+                                    "commit-copy-failed";
+                        }
+
+                        if (committed)
+                        {
+                            if (directFrame)
+                                shared.AckDirectFrame(candidate.frameId);
+                            R23CopyMatchedViews(candidate, matchedViews);
+                            matchedStereoValid = true;
+                            newStereoCommitted = true;
+                            candidateRejectReason = "committed-pending-render";
+
+                            // Do not replace the verified/display authority yet.
+                            // The source becomes authoritative only after a new
+                            // projection swapchain image was rendered
+                            // successfully. If rendering fails, the previously
+                            // released cached projection and bundle stay paired.
+                            pendingBundlePublish = true;
+                            pendingBundleFrame = candidate;
+                            pendingBundleSource = directFrame
+                                ? OutRunVrR23VerifiedBundle::SourceKind::DirectGpu
+                                : OutRunVrR23VerifiedBundle::SourceKind::ClassicSbs;
+                            pendingBundleCaptureQpc =
+                                directFrame ? 0 : candidateCaptureQpc;
                         }
                     }
 
@@ -1261,6 +1390,18 @@ int main(int argc, char** argv)
                         cachedProjectionViews = pv;
                         cachedProjectionValid = true;
                         cachedProjectionRenderedMs = projectionNow;
+                        if (pendingBundlePublish)
+                        {
+                            OutRunVrR23VerifiedBundle::Publish(
+                                pendingBundleFrame,
+                                pendingBundleSource,
+                                pendingBundleCaptureQpc);
+                            lastProcessedStereoFrame =
+                                pendingBundleFrame.frameId;
+                            lastStereoMatchMs = projectionNow;
+                            candidateRejectReason = "displayed-fresh";
+                            pendingBundlePublish = false;
+                        }
                     }
                     else if (cachedProjectionValid && (grace || cachedHold))
                     {
