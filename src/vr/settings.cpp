@@ -144,6 +144,11 @@ namespace OutRunVR
 	public:
 		std::string_view description() override { return "OpenXRVRSettings"; }
 		bool validate() override { return true; }
+		void declare_settings() override
+		{
+			Settings::VRAutoLaunchHost.needs_restart();
+			Settings::VRMirrorFitDesktop.needs_restart();
+		}
 
 		bool apply() override
 		{
