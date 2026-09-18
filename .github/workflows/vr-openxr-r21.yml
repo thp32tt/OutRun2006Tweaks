@@ -108,7 +108,7 @@ jobs:
             'R24-visible-fallback-final-20260916',
             '[R24] exact committed classic projection submitted directly',
             '[R24] DirectGPU final submit uses host-owned SafeEye',
-            '[R24] last successfully released OpenXR image preserved visibility while stereo recovers',
+            '[R24] last successfully released projection/theater image preserved visibility while stereo recovers',
             '[R24] host-owned Direct SafeEye shown as a flat view while stereo projection recovers',
             '[R24] emergency visible quad submitted because no game image was safely displayable',
             'xrWaitSwapchainImage exceeded 250ms',
