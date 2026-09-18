@@ -92,11 +92,13 @@ namespace OutRunVR::RuntimeEligibility
 
     inline void ObserveSoftHostSuspend() noexcept
     {
-        // A transient shouldRender=false with a fresh, visible host is not host
-        // death. Pause injection without discarding the verified game baseline.
+        // A transient shouldRender=false with a fresh, visible host is compositor
+        // scheduling advice, not source invalidation. Keep the verified game-side
+        // stereo source active so the host can immediately reuse/capture it when
+        // shouldRender returns. The x64 host remains the sole authority for
+        // deciding whether the current OpenXR frame actually submits a layer.
         HostFresh.store(true, std::memory_order_release);
-        HostRenderable.store(false, std::memory_order_release);
-        RecoveryPoseWarmup.store(false, std::memory_order_release);
+        HostRenderable.store(true, std::memory_order_release);
     }
 
     inline void ArmRecoveryPoseWarmup() noexcept
