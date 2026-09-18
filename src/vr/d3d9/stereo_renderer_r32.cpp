@@ -745,8 +745,8 @@ namespace OutRunVRStereo
             auto& slot = DirectTransportSlots[slotIndex];
             if (!slot.fence)
             {
-                R32ProducerFencePending[slotIndex] = false;
-                R32ProducerPendingFrame[slotIndex] = 0;
+                R32DirectCopyPathRejected = true;
+                R32DirectCopyRejectHr = E_FAIL;
                 if (Settings::VRTelemetry) ++R32PendingFenceErrors;
                 return false;
             }
@@ -772,8 +772,11 @@ namespace OutRunVRStereo
                 return false;
             }
 
-            R32ProducerFencePending[slotIndex] = false;
-            R32ProducerPendingFrame[slotIndex] = 0;
+            // A query error does not prove GPU completion. Keep the pending
+            // marker intact and quarantine DirectGPU until Reset or interop
+            // identity regeneration recreates the ring.
+            R32DirectCopyPathRejected = true;
+            R32DirectCopyRejectHr = ready;
             if (Settings::VRTelemetry) ++R32PendingFenceErrors;
             return false;
         }
@@ -833,8 +836,18 @@ namespace OutRunVRStereo
                     }
                     return false;
                 }
-                if (FAILED(slot.fence->Issue(D3DISSUE_END)))
+                const HRESULT issueHr = slot.fence->Issue(D3DISSUE_END);
+                if (FAILED(issueHr))
+                {
+                    // StretchRect commands are already queued. Without a valid
+                    // EVENT we cannot prove when this producer slot is reusable,
+                    // so quarantine the whole DirectGPU path until reset/interop
+                    // revalidation rather than cycling back into this slot.
+                    R32DirectCopyPathRejected = true;
+                    R32DirectCopyRejectHr = issueHr;
+                    if (Settings::VRTelemetry) ++R32PendingFenceErrors;
                     return false;
+                }
             }
 
             R32ProducerFencePending[slotIndex] = true;
