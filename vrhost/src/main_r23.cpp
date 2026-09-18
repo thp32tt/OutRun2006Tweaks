@@ -23,6 +23,8 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
+#include <sstream>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -919,6 +921,8 @@ int main(int argc, char** argv)
         compositor.Initialize();
         ViewHistory viewHistory;
         HostTimings timings;
+        std::ofstream pipelineLog("outrun-vr-host-pipeline.log",
+            std::ios::out | std::ios::trunc);
         LARGE_INTEGER qpcFrequency{};
         QueryPerformanceFrequency(&qpcFrequency);
         ULONGLONG lastPipelineTelemetryMs = 0;
@@ -1349,7 +1353,8 @@ int main(int argc, char** argv)
                     ? static_cast<long long>(
                         pipelineNowMs - bundle.publishedAtMs)
                     : -1;
-                std::cout
+                std::ostringstream pipelineLine;
+                pipelineLine
                     << "[R23 pipeline] gameFrameId="
                     << candidateGameFrameId
                     << " gamePresentQpc=" << candidateGamePresentQpc
@@ -1366,7 +1371,16 @@ int main(int argc, char** argv)
                     << " commitCopyMs=" << candidateCommitCopyMs
                     << " renderMs=" << frameRenderMs
                     << " xrEndFrameMs=" << endFrameMs
+                    << " displayPeriodMs="
+                    << (static_cast<double>(fs.predictedDisplayPeriod) / 1000000.0)
                     << "\n";
+                const std::string line = pipelineLine.str();
+                std::cout << line;
+                if (pipelineLog.is_open())
+                {
+                    pipelineLog << line;
+                    pipelineLog.flush();
+                }
             }
             timings.MaybeLog();
         }
