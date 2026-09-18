@@ -746,21 +746,39 @@ namespace
     {
         R23Pixels.TryConsume(c.context_);
         if (!IsWindow(c.hwnd_))
-            if (HWND replacement = FindGameWindow(c.gamePid_)) c.hwnd_ = replacement;
+            if (HWND replacement = FindGameWindow(c.gamePid_))
+                c.hwnd_ = replacement;
+
         const HMONITOR monitorNow = IsWindow(c.hwnd_)
-            ? MonitorFromWindow(c.hwnd_, MONITOR_DEFAULTTONEAREST) : nullptr;
-        if (!c.duplication_ || (monitorNow && monitorNow != c.targetMonitor_))
+            ? MonitorFromWindow(c.hwnd_, MONITOR_DEFAULTTONEAREST)
+            : nullptr;
+        if (!c.duplication_ ||
+            (monitorNow && monitorNow != c.targetMonitor_))
             c.BindCaptureOutput(false);
-        CaptureStatus status{ c.haveFrame_, false, c.lastCapturePresentQpc_, c.lastCapturePresentQpcLow_ };
-        if (!c.duplication_ && !c.RecreateDuplication(false)) return status;
+
+        CaptureStatus status{};
+        status.available = c.haveFrame_;
+        status.lastPresentQpc = c.lastCapturePresentQpc_;
+        status.lastPresentQpcLow = c.lastCapturePresentQpcLow_;
+        RECT gameRect{};
+        status.fullGameClientVisible =
+            c.GetGameClientOutputRect(gameRect);
+
+        if (!c.duplication_ && !c.RecreateDuplication(false))
+            return status;
 
         DXGI_OUTDUPL_FRAME_INFO fi{};
         IDXGIResource* resource = nullptr;
-        if (!c.duplication_) return status;
-        const DWORD waitMs = (c.haveFrame_ || !allowInitialWarmupWait)
+        if (!c.duplication_)
+            return status;
+
+        const DWORD waitMs =
+            (c.haveFrame_ || !allowInitialWarmupWait)
             ? timeoutMs : std::max<DWORD>(timeoutMs, 1000);
-        const HRESULT hr = c.duplication_->AcquireNextFrame(waitMs, &fi, &resource);
-        if (hr == DXGI_ERROR_WAIT_TIMEOUT) return status;
+        const HRESULT hr =
+            c.duplication_->AcquireNextFrame(waitMs, &fi, &resource);
+        if (hr == DXGI_ERROR_WAIT_TIMEOUT)
+            return status;
         if (FAILED(hr) || !resource)
         {
             if (hr == DXGI_ERROR_ACCESS_LOST)
@@ -769,20 +787,117 @@ namespace
                 c.stereoSourceValid_ = false;
                 c.BindCaptureOutput(false);
             }
-            return { c.haveFrame_, false, c.lastCapturePresentQpc_, c.lastCapturePresentQpcLow_ };
+            status.available = c.haveFrame_;
+            return status;
         }
 
+        bool gameRegionChanged = false;
+        auto intersectsGame = [&](const RECT& rect) noexcept
+        {
+            RECT intersection{};
+            return status.fullGameClientVisible &&
+                IntersectRect(&intersection, &rect, &gameRect) != FALSE &&
+                intersection.right > intersection.left &&
+                intersection.bottom > intersection.top;
+        };
+
+        UINT dirtyBytes = 0;
+        HRESULT dirtyHr =
+            c.duplication_->GetFrameDirtyRects(
+                0, nullptr, &dirtyBytes);
+        if ((dirtyHr == DXGI_ERROR_MORE_DATA ||
+             SUCCEEDED(dirtyHr)) &&
+            dirtyBytes >= sizeof(RECT))
+        {
+            try
+            {
+                std::vector<RECT> dirty(
+                    (dirtyBytes + sizeof(RECT) - 1) /
+                    sizeof(RECT));
+                UINT actual = dirtyBytes;
+                if (SUCCEEDED(c.duplication_->GetFrameDirtyRects(
+                        static_cast<UINT>(
+                            dirty.size() * sizeof(RECT)),
+                        dirty.data(), &actual)))
+                {
+                    const UINT count = std::min<UINT>(
+                        static_cast<UINT>(dirty.size()),
+                        actual / sizeof(RECT));
+                    for (UINT i = 0; i < count; ++i)
+                    {
+                        if (intersectsGame(dirty[i]))
+                        {
+                            gameRegionChanged = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (...) {}
+        }
+
+        if (!gameRegionChanged)
+        {
+            UINT moveBytes = 0;
+            HRESULT moveHr =
+                c.duplication_->GetFrameMoveRects(
+                    0, nullptr, &moveBytes);
+            if ((moveHr == DXGI_ERROR_MORE_DATA ||
+                 SUCCEEDED(moveHr)) &&
+                moveBytes >= sizeof(DXGI_OUTDUPL_MOVE_RECT))
+            {
+                try
+                {
+                    std::vector<DXGI_OUTDUPL_MOVE_RECT> moves(
+                        (moveBytes +
+                         sizeof(DXGI_OUTDUPL_MOVE_RECT) - 1) /
+                        sizeof(DXGI_OUTDUPL_MOVE_RECT));
+                    UINT actual = moveBytes;
+                    if (SUCCEEDED(
+                            c.duplication_->GetFrameMoveRects(
+                                static_cast<UINT>(
+                                    moves.size() *
+                                    sizeof(DXGI_OUTDUPL_MOVE_RECT)),
+                                moves.data(), &actual)))
+                    {
+                        const UINT count = std::min<UINT>(
+                            static_cast<UINT>(moves.size()),
+                            actual /
+                            sizeof(DXGI_OUTDUPL_MOVE_RECT));
+                        for (UINT i = 0; i < count; ++i)
+                        {
+                            if (intersectsGame(
+                                    moves[i].DestinationRect))
+                            {
+                                gameRegionChanged = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                catch (...) {}
+            }
+        }
+
+        if (!gameRegionChanged &&
+            status.fullGameClientVisible &&
+            fi.AccumulatedFrames > 1)
+            gameRegionChanged = true;
+
         ID3D11Texture2D* texture = nullptr;
-        const HRESULT qi = resource->QueryInterface(__uuidof(ID3D11Texture2D),
+        const HRESULT qi = resource->QueryInterface(
+            __uuidof(ID3D11Texture2D),
             reinterpret_cast<void**>(&texture));
         resource->Release();
+
         bool copied = false;
         if (SUCCEEDED(qi) && texture)
         {
             D3D11_TEXTURE2D_DESC d{};
             texture->GetDesc(&d);
             if ((d.Format == DXGI_FORMAT_B8G8R8A8_UNORM ||
-                 d.Format == DXGI_FORMAT_R16G16B16A16_FLOAT) && c.EnsureSource(d))
+                 d.Format == DXGI_FORMAT_R16G16B16A16_FLOAT) &&
+                c.EnsureSource(d))
             {
                 c.context_->CopyResource(c.source_, texture);
                 copied = true;
@@ -796,15 +911,23 @@ namespace
             c.haveFrame_ = true;
             if (fi.LastPresentTime.QuadPart != 0)
             {
-                c.lastCapturePresentQpc_ = fi.LastPresentTime.QuadPart;
-                c.lastCapturePresentQpcLow_ = static_cast<std::uint32_t>(fi.LastPresentTime.QuadPart);
+                c.lastCapturePresentQpc_ =
+                    fi.LastPresentTime.QuadPart;
+                c.lastCapturePresentQpcLow_ =
+                    static_cast<std::uint32_t>(
+                        fi.LastPresentTime.QuadPart);
             }
             status.available = true;
             status.fresh = fi.AccumulatedFrames > 0;
-            status.lastPresentQpc = c.lastCapturePresentQpc_;
-            status.lastPresentQpcLow = c.lastCapturePresentQpcLow_;
+            status.lastPresentQpc =
+                c.lastCapturePresentQpc_;
+            status.lastPresentQpcLow =
+                c.lastCapturePresentQpcLow_;
+            status.gameRegionChanged = gameRegionChanged;
+            status.accumulatedFrames = fi.AccumulatedFrames;
             OutRunVrSbsCaptureOverride::PublishProductionCapture(
-                c.source_, c.outputDesktop_, c.targetMonitor_, c.sdrWhiteScale_,
+                c.source_, c.outputDesktop_, c.targetMonitor_,
+                c.sdrWhiteScale_,
                 fi.LastPresentTime.QuadPart);
             R23Pixels.ScheduleSource(c);
         }
