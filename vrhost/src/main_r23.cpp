@@ -1215,12 +1215,29 @@ int main(int argc, char** argv)
         ParseRuntimeOverride(argc, argv);
         const float renderScale = ReadRenderScale(argc, argv);
         const bool directTransportEnabled = DirectTransportEnabled();
+        const bool directTransportOnly =
+            directTransportEnabled && DirectTransportOnly();
+        const float targetRefreshRateHz = RequestedRefreshRateHz();
         HWND gameWindow = WaitForGameWindow();
         DWORD gamePid = 0; GetWindowThreadProcessId(gameWindow, &gamePid);
 
         if (!HasExtension(XR_KHR_D3D11_ENABLE_EXTENSION_NAME))
             throw std::runtime_error("runtime lacks XR_KHR_D3D11_enable");
-        const char* extensions[]{ XR_KHR_D3D11_ENABLE_EXTENSION_NAME };
+
+        std::vector<const char*> extensions{
+            XR_KHR_D3D11_ENABLE_EXTENSION_NAME
+        };
+        bool displayRefreshExtensionEnabled = false;
+#ifdef XR_FB_display_refresh_rate
+        if (targetRefreshRateHz > 0.0f &&
+            HasExtension(XR_FB_DISPLAY_REFRESH_RATE_EXTENSION_NAME))
+        {
+            extensions.push_back(
+                XR_FB_DISPLAY_REFRESH_RATE_EXTENSION_NAME);
+            displayRefreshExtensionEnabled = true;
+        }
+#endif
+
         XrInstanceCreateInfo ii{ XR_TYPE_INSTANCE_CREATE_INFO };
         strncpy_s(ii.applicationInfo.applicationName, sizeof(ii.applicationInfo.applicationName),
             "OutRun 2006 True Stereo VR", _TRUNCATE);
@@ -1229,7 +1246,9 @@ int main(int argc, char** argv)
             "OutRun2006Tweaks", _TRUNCATE);
         ii.applicationInfo.engineVersion = 1;
         ii.applicationInfo.apiVersion = XR_CURRENT_API_VERSION;
-        ii.enabledExtensionCount = 1; ii.enabledExtensionNames = extensions;
+        ii.enabledExtensionCount =
+            static_cast<std::uint32_t>(extensions.size());
+        ii.enabledExtensionNames = extensions.data();
         CheckXr(xrCreateInstance(&ii, &instance), "xrCreateInstance");
 
         XrInstanceProperties ip{ XR_TYPE_INSTANCE_PROPERTIES };
@@ -1261,6 +1280,25 @@ int main(int argc, char** argv)
         XrSessionCreateInfo si{ XR_TYPE_SESSION_CREATE_INFO };
         si.next = &binding; si.systemId = system;
         CheckXr(xrCreateSession(instance, &si, &session), "xrCreateSession");
+
+        std::cout
+            << "VR transport: directEnabled="
+            << (directTransportEnabled ? 1 : 0)
+            << " directOnly=" << (directTransportOnly ? 1 : 0)
+            << " targetRefreshHz=" << targetRefreshRateHz
+            << "\n";
+#ifdef XR_FB_display_refresh_rate
+        if (displayRefreshExtensionEnabled)
+            TryRequestDisplayRefreshRate(
+                instance, session, targetRefreshRateHz);
+        else if (targetRefreshRateHz > 0.0f)
+            std::cout
+                << "XR_FB_display_refresh_rate unavailable; runtime refresh rate unchanged.\n";
+#else
+        if (targetRefreshRateHz > 0.0f)
+            std::cout
+                << "OpenXR headers do not expose XR_FB_display_refresh_rate; runtime refresh rate unchanged.\n";
+#endif
 
         XrPosef identity{}; identity.orientation.w = 1;
         XrReferenceSpaceCreateInfo li{ XR_TYPE_REFERENCE_SPACE_CREATE_INFO };
@@ -1533,7 +1571,13 @@ int main(int argc, char** argv)
 
                         LARGE_INTEGER cs{}, ce{};
                         QueryPerformanceCounter(&cs);
-                        if (!directFrame)
+                        if (!directFrame && directTransportOnly)
+                        {
+                            candidateReady = false;
+                            candidateRejectReason =
+                                "direct-only-classic-rejected";
+                        }
+                        else if (!directFrame)
                         {
                             productionCaptureAttempted = true;
                             capture = R23Capture(compositor, 2);
@@ -1586,7 +1630,12 @@ int main(int argc, char** argv)
 
                         if (!candidateReady)
                         {
-                            if (!directFrame)
+                            if (!directFrame && directTransportOnly)
+                            {
+                                candidateRejectReason =
+                                    "direct-only-classic-rejected";
+                            }
+                            else if (!directFrame)
                             {
                                 if (!capture.available)
                                     candidateRejectReason =
@@ -1751,7 +1800,11 @@ int main(int argc, char** argv)
                     // Duplication missed the stereo grace window. VDXR can show a
                     // solid compositor colour / severe HMD stutter even while the
                     // desktop game keeps running normally.
-                    if (!layerReady)
+                    if (!layerReady && directTransportOnly)
+                    {
+                        finalLayerKind = "direct-only-no-classic-fallback";
+                    }
+                    else if (!layerReady)
                     {
                         LARGE_INTEGER cs{}, ce{}; QueryPerformanceCounter(&cs);
                         const CaptureStatus fallbackCapture =
