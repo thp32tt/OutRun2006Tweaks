@@ -44,13 +44,13 @@ namespace Settings
 		"Prefers guarded D3D9Ex shared-eye transport so gameplay can bypass Desktop Duplication. Disable to return to classic D3D9/SBS capture." };
 	Setting<bool> VRDirectGpuOnly{ "VR", "DirectGpuOnly", true,
 		"During gameplay, rejects classic Desktop-Duplication stereo candidates and keeps DirectGPU/cached OpenXR projection paths only. Menus may still use the mono theater capture path." };
-	Setting<float> VRTargetRefreshRateHz{ "VR", "TargetRefreshRateHz", 120.0f,
-		"Requests this headset refresh rate through XR_FB_display_refresh_rate when the runtime supports it. 120 Hz is cadence-friendly for a 60 Hz game. Set 0 to leave the runtime rate unchanged.", Range<float>{ 0.0f, 144.0f } };
+	Setting<float> VRTargetRefreshRateHz{ "VR", "TargetRefreshRateHz", 0.0f,
+		"Optional OpenXR refresh-rate override through XR_FB_display_refresh_rate. Leave at 0 to respect the refresh rate selected by Virtual Desktop/runtime (for example 72 or 90 Hz).", Range<float>{ 0.0f, 144.0f } };
 	Setting<int> VRFrameCadenceMode{ "VR", "FrameCadenceMode", 1,
 		"Synchronizes the next OutRun frame to the OpenXR clock. PhaseLock is the production-safe R35 path; SerializedProbe additionally waits a bounded part of the XR frame for the requested game Present. Off restores the pre-R35 cadence.",
 		{ "Off", "PhaseLock", "SerializedProbe" } };
 	Setting<float> VRFrameCadenceTargetHz{ "VR", "FrameCadenceTargetHz", 60.0f,
-		"Target game-frame cadence while XR pacing is enabled. 60 Hz pairs cleanly with the default 120 Hz Quest refresh.", Range<float>{ 30.0f, 120.0f } };
+		"Target OutRun game-frame cadence while XR pacing is enabled. Keep 60 Hz for normal game timing; R35 measures the runtime's actual 72/80/90/120 Hz display period independently.", Range<float>{ 30.0f, 120.0f } };
 	Setting<float> VRFrameCadenceTimeoutMs{ "VR", "FrameCadenceTimeoutMs", 35.0f,
 		"Maximum game-side wait for the next XR cadence request before failing open. This prevents a stopped host from hanging OutRun.", Range<float>{ 5.0f, 100.0f } };
 	Setting<bool> VRPositionalTracking{ "VR", "PositionalTracking", true,
@@ -185,15 +185,20 @@ namespace OutRunVR
 			Settings::VRPreferD3D9Ex.needs_restart();
 			Settings::VRDirectGpuOnly.needs_restart();
 			Settings::VRTargetRefreshRateHz.needs_restart();
+			Settings::VRFrameCadenceMode.needs_restart();
+			Settings::VRFrameCadenceTargetHz.needs_restart();
+			Settings::VRFrameCadenceTimeoutMs.needs_restart();
 		}
 
 		bool apply() override
 		{
 			spdlog::info(
-				"VR: D3D9Ex DirectGPU preference={} directOnly={} targetRefreshHz={:.1f}; classic SBS remains a configurable fallback; CalcCameraMatrix untouched",
+				"VR: D3D9Ex DirectGPU preference={} directOnly={} refreshOverrideHz={:.1f} cadenceMode={} cadenceTargetHz={:.1f}; runtime refresh is measured from xrWaitFrame; CalcCameraMatrix untouched",
 				Settings::VRPreferD3D9Ex.get(),
 				Settings::VRDirectGpuOnly.get(),
-				Settings::VRTargetRefreshRateHz.get());
+				Settings::VRTargetRefreshRateHz.get(),
+				Settings::VRFrameCadenceMode.get(),
+				Settings::VRFrameCadenceTargetHz.get());
 			if (Settings::VREnabled && Settings::VRAutoLaunchHost)
 			{
 				HANDLE thread = CreateThread(nullptr, 0, VRAutoLaunchHostThread, nullptr, 0, nullptr);
