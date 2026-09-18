@@ -33,9 +33,11 @@ namespace OutRunVRStereo
 
         std::uint64_t R30XyzrhwHudDraws = 0;
         std::uint64_t R30XyzrhwWorldEffectDraws = 0;
+        std::uint64_t R30XyzrhwRhwWorldPromotions = 0;
         std::uint64_t R30XyzrhwFallbacks = 0;
         bool R30FirstXyzrhwHudLogged = false;
         bool R30FirstXyzrhwWorldLogged = false;
+        bool R30FirstXyzrhwRhwPromotionLogged = false;
 
         bool R30CurrentPassIsScreenSpace2D() noexcept
         {
@@ -101,6 +103,8 @@ namespace OutRunVRStereo
             float eyeScale[2]{};
             float eyeOffset[2]{};
             float parallaxPerRhw[2]{};
+            bool depthTestEnabled = false;
+            bool rhwDepthEvidence = false;
             bool worldEffect = false;
         };
 
@@ -133,17 +137,7 @@ namespace OutRunVRStereo
             DWORD zEnable = D3DZB_FALSE;
             if (FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable)))
                 return false;
-            state.worldEffect = zEnable != D3DZB_FALSE;
-
-            if (state.worldEffect && TrackedDepthStencil &&
-                (!RightDepthSynchronized || !RightStencilSynchronized))
-                TryBootstrapRightDepthFromRecentClear(device);
-            if (state.worldEffect && TrackedDepthStencil &&
-                !RightDepthSynchronized && DepthTestActive(device))
-                return false;
-            if (state.worldEffect && TrackedDepthStencil &&
-                !RightStencilSynchronized && StencilTestActive(device))
-                return false;
+            state.depthTestEnabled = zEnable != D3DZB_FALSE;
 
             if (!OutRunVRRenderer::GetLatchedStereoFrame(state.stereo) ||
                 state.stereo.poseSequence == 0 ||
@@ -153,47 +147,118 @@ namespace OutRunVRStereo
                     state.eyeScale, state.eyeOffset))
                 return false;
 
-            if (state.worldEffect)
-            {
-                float projectionRaw[16]{};
-                if (!OutRunVRRenderer::GetRendererBaseProjection(projectionRaw))
-                    return false;
-                D3DMATRIX baseProjection{};
-                std::memcpy(&baseProjection, projectionRaw, sizeof(baseProjection));
-                if (!MatrixFinite(baseProjection))
-                    return false;
+            return true;
+        }
 
-                const float center[3]{
-                    0.5f * (state.stereo.eyeOffset[0][0] + state.stereo.eyeOffset[1][0]),
-                    0.5f * (state.stereo.eyeOffset[0][1] + state.stereo.eyeOffset[1][1]),
-                    0.5f * (state.stereo.eyeOffset[0][2] + state.stereo.eyeOffset[1][2])
+        bool R30XyzrhwHasProjectedDepthSignature(
+            const void* source, UINT vertexCount, UINT stride) noexcept
+        {
+            if (!source || vertexCount == 0 || stride < sizeof(float) * 4)
+                return false;
+
+            // UI quads in OutRun normally carry RHW=1. CPU-projected world
+            // particles/decals carry 1/clip-W, often even when Z testing is
+            // disabled for blending or to avoid decal z-fighting. Use that
+            // pre-transformed depth evidence as an additional world-space
+            // signal rather than relying on D3DRS_ZENABLE alone.
+            const UINT sampleCount = std::min<UINT>(vertexCount, 512u);
+            UINT valid = 0;
+            UINT projected = 0;
+            for (UINT i = 0; i < sampleCount; ++i)
+            {
+                const float* p = reinterpret_cast<const float*>(
+                    static_cast<const std::uint8_t*>(source) +
+                    static_cast<std::size_t>(i) * stride);
+                const float z = p[2];
+                const float rhw = p[3];
+                if (!std::isfinite(z) || !std::isfinite(rhw) ||
+                    rhw <= 0.0f || rhw >= 1000.0f)
+                    continue;
+
+                ++valid;
+                if (z >= -0.10f && z <= 1.10f &&
+                    std::fabs(rhw - 1.0f) > 0.02f)
+                    ++projected;
+            }
+
+            return valid != 0 && projected * 4u >= valid * 3u;
+        }
+
+        bool R30ConfigureXyzrhwWorldEffect(
+            IDirect3DDevice9* device, const void* source,
+            UINT vertexCount, UINT stride, R30XyzrhwState& state) noexcept
+        {
+            state.rhwDepthEvidence =
+                R30XyzrhwHasProjectedDepthSignature(
+                    source, vertexCount, stride);
+
+            // Preserve the validated R30.1 depth-tested path, but also promote
+            // depth-disabled CPU-projected particles/decals when RHW proves
+            // that the vertices came from a 3D projection.
+            state.worldEffect =
+                state.depthTestEnabled || state.rhwDepthEvidence;
+            if (!state.worldEffect)
+                return true;
+
+            if (TrackedDepthStencil &&
+                (!RightDepthSynchronized || !RightStencilSynchronized))
+                TryBootstrapRightDepthFromRecentClear(device);
+            if (TrackedDepthStencil &&
+                !RightDepthSynchronized && DepthTestActive(device))
+                return false;
+            if (TrackedDepthStencil &&
+                !RightStencilSynchronized && StencilTestActive(device))
+                return false;
+
+            float projectionRaw[16]{};
+            if (!OutRunVRRenderer::GetRendererBaseProjection(projectionRaw))
+                return false;
+            D3DMATRIX baseProjection{};
+            std::memcpy(&baseProjection, projectionRaw, sizeof(baseProjection));
+            if (!MatrixFinite(baseProjection))
+                return false;
+
+            const float center[3]{
+                0.5f * (state.stereo.eyeOffset[0][0] + state.stereo.eyeOffset[1][0]),
+                0.5f * (state.stereo.eyeOffset[0][1] + state.stereo.eyeOffset[1][1]),
+                0.5f * (state.stereo.eyeOffset[0][2] + state.stereo.eyeOffset[1][2])
+            };
+            const float zero[3]{};
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                const float rel[3]{
+                    state.stereo.eyeOffset[eye][0] - center[0],
+                    state.stereo.eyeOffset[eye][1] - center[1],
+                    state.stereo.eyeOffset[eye][2] - center[2]
                 };
-                const float zero[3]{};
-                for (int eye = 0; eye < 2; ++eye)
+                const D3DMATRIX eyeRotation =
+                    MatrixFromQuaternionTranslation(
+                        state.stereo.eyeOrientation[eye], zero, 1.0f);
+                const D3DMATRIX inverseEyeRotation =
+                    InverseRigid(eyeRotation);
+                const float localX =
+                    rel[0] * inverseEyeRotation._11 +
+                    rel[1] * inverseEyeRotation._21 +
+                    rel[2] * inverseEyeRotation._31;
+                const D3DMATRIX eyeProjection =
+                    ProjectionFromFov(baseProjection,
+                        state.stereo.eyeFov[eye]);
+                const float parallax =
+                    -localX * Settings::VRWorldScale *
+                    eyeProjection._11;
+                if (!std::isfinite(parallax))
+                    return false;
+                state.parallaxPerRhw[eye] = parallax;
+            }
+
+            if (state.rhwDepthEvidence && !state.depthTestEnabled)
+            {
+                ++R30XyzrhwRhwWorldPromotions;
+                if (!R30FirstXyzrhwRhwPromotionLogged)
                 {
-                    const float rel[3]{
-                        state.stereo.eyeOffset[eye][0] - center[0],
-                        state.stereo.eyeOffset[eye][1] - center[1],
-                        state.stereo.eyeOffset[eye][2] - center[2]
-                    };
-                    const D3DMATRIX eyeRotation =
-                        MatrixFromQuaternionTranslation(
-                            state.stereo.eyeOrientation[eye], zero, 1.0f);
-                    const D3DMATRIX inverseEyeRotation =
-                        InverseRigid(eyeRotation);
-                    const float localX =
-                        rel[0] * inverseEyeRotation._11 +
-                        rel[1] * inverseEyeRotation._21 +
-                        rel[2] * inverseEyeRotation._31;
-                    const D3DMATRIX eyeProjection =
-                        ProjectionFromFov(baseProjection,
-                            state.stereo.eyeFov[eye]);
-                    const float parallax =
-                        -localX * Settings::VRWorldScale *
-                        eyeProjection._11;
-                    if (!std::isfinite(parallax))
-                        return false;
-                    state.parallaxPerRhw[eye] = parallax;
+                    R30FirstXyzrhwRhwPromotionLogged = true;
+                    spdlog::info(
+                        "VR R30.2 XYZRHW WORLD: RHW depth signature promoted a depth-disabled pre-transformed particle/decal to spatial stereo (skid/smoke candidate)");
                 }
             }
             return true;
@@ -336,7 +401,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstXyzrhwWorldLogged = true;
                     spdlog::info(
-                        "VR R30.1 XYZRHW WORLD: depth-tested pre-transformed particle/billboard UP draws receive asymmetric-FOV correction plus RHW/IPD parallax (smoke/rank/decal candidate path)");
+                        "VR R30.2 XYZRHW WORLD: pre-transformed particle/billboard/decal UP draws receive asymmetric-FOV correction plus RHW/IPD parallax (smoke/rank/skid candidate path)");
                 }
             }
             else
@@ -347,7 +412,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstXyzrhwHudLogged = true;
                     spdlog::info(
-                        "VR R30.1 XYZRHW HUD: pre-transformed fixed-function UP draws receive per-eye asymmetric-FOV screen-ray correction");
+                        "VR R30.2 XYZRHW HUD: pre-transformed fixed-function UP draws receive per-eye asymmetric-FOV screen-ray correction");
                 }
             }
 
@@ -361,7 +426,7 @@ namespace OutRunVRStereo
             if (!restoreOk)
             {
                 InvalidateRightDepthStencilIfLeftMayWrite(device);
-                NoteRestoreFailure("R30.1 XYZRHW right-eye draw");
+                NoteRestoreFailure("R30.2 XYZRHW right-eye draw");
                 R29ArmMonoSafety();
             }
             return leftHr;
@@ -376,6 +441,12 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             const UINT vertexCount =
                 R30PrimitiveElementCount(type, primitiveCount);
+            if (!R30ConfigureXyzrhwWorldEffect(
+                    device, data, vertexCount, stride, state))
+            {
+                ++R30XyzrhwFallbacks;
+                return E_NOTIMPL;
+            }
             std::vector<std::uint8_t> left;
             std::vector<std::uint8_t> right;
             if (!R30TransformXyzrhwVertices(
@@ -397,7 +468,7 @@ namespace OutRunVRStereo
             };
             return R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
-                "R30.1/DrawPrimitiveUP-XYZRHW");
+                "R30.2/DrawPrimitiveUP-XYZRHW");
         }
 
         HRESULT R30TryXyzrhwIndexedPrimitiveUP(
@@ -439,6 +510,13 @@ namespace OutRunVRStereo
             if (vertexCount == 0 || vertexCount > 262144u)
                 return E_NOTIMPL;
 
+            if (!R30ConfigureXyzrhwWorldEffect(
+                    device, vertexData, vertexCount, stride, state))
+            {
+                ++R30XyzrhwFallbacks;
+                return E_NOTIMPL;
+            }
+
             std::vector<std::uint8_t> left;
             std::vector<std::uint8_t> right;
             if (!R30TransformXyzrhwVertices(
@@ -464,7 +542,7 @@ namespace OutRunVRStereo
             };
             return R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
-                "R30.1/DrawIndexedPrimitiveUP-XYZRHW");
+                "R30.2/DrawIndexedPrimitiveUP-XYZRHW");
         }
 
         bool R30BuildScreenSpaceEyeConstants(
@@ -841,7 +919,7 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R30 HUD: ScreenSpace2D asymmetric-FOV correction overlay READY; R30.1 fixed-function XYZRHW UP stereo correction READY");
+                        "VR R30 HUD: ScreenSpace2D asymmetric-FOV correction overlay READY; R30.2 fixed-function XYZRHW UP stereo correction + RHW world-particle/decal promotion READY");
                     return 0;
                 }
                 Sleep(25);
