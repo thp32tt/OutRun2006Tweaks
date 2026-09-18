@@ -10,9 +10,9 @@
 //   1. preserve validated classic projection + non-projection layers;
 //   2. render DirectGPU only from host-owned SafeEye copies and completion ACK;
 //   3. allow a short display-only grace for an already committed bundle;
-//   4. fall back to a live theater capture, then a host-owned Direct SafeEye
-//      flat view, then a last-known released image, then an emergency visible
-//      quad instead of repeatedly submitting an empty frame.
+//   4. prefer the last released projection image, then a host-owned Direct
+//      SafeEye flat view, then a left-eye-only theater recovery capture, then an
+//      emergency visible quad instead of ever exposing the raw SBS desktop.
 //
 // The display-only grace never reopens game-side WVP/stereo injection. It only
 // prevents a 250ms boundary race from turning a frame that was already rendered
