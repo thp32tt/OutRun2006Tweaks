@@ -79,14 +79,17 @@ namespace OutRunVRStereo
         bool R23CaptureActualGameState(IDirect3DDevice9* device,
             R22ScissorSnapshot& out, const char* site, bool force) noexcept
         {
+            // StateBlock::Apply can change viewport/scissor state without
+            // traversing the tracked D3D setters. Never trust an enabled
+            // scissor shadow across a top-level draw: the observed failure was
+            // cache=enabled while the live device was already disabled. For
+            // the common disabled state, bound the stale window to 16 draws.
             if (!force && R23LastStateSampleEpoch == PresentEpoch &&
-                R23GameDrawSerial - R23LastStateSampleDrawSerial < 64)
+                R22ShadowState.Valid() && !R22ShadowState.enabled &&
+                R23GameDrawSerial - R23LastStateSampleDrawSerial < 16)
             {
-                if (R22ShadowState.Valid())
-                {
-                    out = R22ShadowState;
-                    return true;
-                }
+                out = R22ShadowState;
+                return true;
             }
 
             R22ScissorSnapshot actual{};
