@@ -660,22 +660,35 @@ namespace
     public:
         RenderFrameReader()
         {
-            mapping_ = CreateFileMappingW(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0,
-                static_cast<DWORD>(sizeof(OutRunVR::SharedRenderFrameRing)), OutRunVR::RenderFrameMemoryName);
-            if (!mapping_) throw std::runtime_error("CreateFileMappingW Frame.v2 failed");
-            const bool existed = GetLastError() == ERROR_ALREADY_EXISTS;
-            state_ = static_cast<OutRunVR::SharedRenderFrameRing*>(MapViewOfFile(mapping_, FILE_MAP_ALL_ACCESS,
-                0, 0, sizeof(OutRunVR::SharedRenderFrameRing)));
-            if (!state_) throw std::runtime_error("MapViewOfFile Frame.v2 failed");
+            mapping_ = CreateFileMappingW(INVALID_HANDLE_VALUE, nullptr,
+                PAGE_READWRITE, 0,
+                static_cast<DWORD>(
+                    sizeof(OutRunVR::SharedRenderFrameRing)),
+                OutRunVR::RenderFrameMemoryName);
+            if (!mapping_)
+                throw std::runtime_error(
+                    "CreateFileMappingW Frame.v2 failed");
+            const bool existed =
+                GetLastError() == ERROR_ALREADY_EXISTS;
+            state_ =
+                static_cast<OutRunVR::SharedRenderFrameRing*>(
+                    MapViewOfFile(mapping_, FILE_MAP_ALL_ACCESS,
+                        0, 0,
+                        sizeof(OutRunVR::SharedRenderFrameRing)));
+            if (!state_)
+                throw std::runtime_error(
+                    "MapViewOfFile Frame.v2 failed");
             if (!existed)
             {
                 std::memset(state_, 0, sizeof(*state_));
-                state_->protocolVersion = OutRunVR::RenderFrameProtocolVersion;
+                state_->protocolVersion =
+                    OutRunVR::RenderFrameProtocolVersion;
                 state_->structSize = sizeof(*state_);
                 state_->slotCount = OutRunVR::RenderFrameRingSize;
                 for (auto& slot : state_->slots)
                 {
-                    slot.protocolVersion = OutRunVR::RenderFrameProtocolVersion;
+                    slot.protocolVersion =
+                        OutRunVR::RenderFrameProtocolVersion;
                     slot.structSize = sizeof(slot);
                     slot.magic = OutRunVR::RenderFrameMagic;
                 }
@@ -683,34 +696,141 @@ namespace
                 state_->magic = OutRunVR::RenderFrameMagic;
             }
         }
-        ~RenderFrameReader() { if (state_) UnmapViewOfFile(state_); if (mapping_) CloseHandle(mapping_); }
+
+        ~RenderFrameReader()
+        {
+            if (state_) UnmapViewOfFile(state_);
+            if (mapping_) CloseHandle(mapping_);
+        }
 
         bool Read(OutRunVR::SharedRenderFrameState& out) const
         {
-            if (!state_ || state_->magic != OutRunVR::RenderFrameMagic ||
-                state_->protocolVersion != OutRunVR::RenderFrameProtocolVersion ||
-                state_->structSize != sizeof(*state_) || state_->slotCount != OutRunVR::RenderFrameRingSize) return false;
+            if (!ValidateRing())
+                return false;
             for (int attempt = 0; attempt < 6; ++attempt)
             {
-                const std::uint32_t ringBefore = state_->publishSequence;
-                if (ringBefore & 1u) continue;
+                const std::uint32_t ringBefore =
+                    state_->publishSequence;
+                if (ringBefore & 1u)
+                    continue;
                 const std::uint32_t index = state_->latestSlot;
-                if (index >= OutRunVR::RenderFrameRingSize) continue;
-                const auto& slot = state_->slots[index];
+                if (index >= OutRunVR::RenderFrameRingSize)
+                    continue;
+                if (!ReadSlot(index, out))
+                    continue;
+                MemoryBarrier();
+                const std::uint32_t ringAfter =
+                    state_->publishSequence;
+                if (ringBefore == ringAfter &&
+                    !(ringAfter & 1u))
+                    return true;
+            }
+            return false;
+        }
+
+        bool ReadFrame(std::uint32_t frameId,
+            OutRunVR::SharedRenderFrameState& out) const
+        {
+            if (!frameId || !ValidateRing())
+                return false;
+            for (std::uint32_t i = 0;
+                 i < OutRunVR::RenderFrameRingSize; ++i)
+            {
+                OutRunVR::SharedRenderFrameState candidate{};
+                if (ReadSlot(i, candidate) &&
+                    candidate.frameId == frameId)
+                {
+                    out = candidate;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool ReadHistory(
+            std::array<OutRunVR::SharedRenderFrameState,
+                OutRunVR::RenderFrameRingSize>& out,
+            std::size_t& count) const
+        {
+            count = 0;
+            if (!ValidateRing())
+                return false;
+
+            for (int attempt = 0; attempt < 6; ++attempt)
+            {
+                const std::uint32_t ringBefore =
+                    state_->publishSequence;
+                if (ringBefore & 1u)
+                    continue;
+
+                std::array<OutRunVR::SharedRenderFrameState,
+                    OutRunVR::RenderFrameRingSize> snapshot{};
+                std::size_t snapshotCount = 0;
+                bool stable = true;
+                for (std::uint32_t i = 0;
+                     i < OutRunVR::RenderFrameRingSize; ++i)
+                {
+                    OutRunVR::SharedRenderFrameState frame{};
+                    if (!ReadSlot(i, frame))
+                    {
+                        stable = false;
+                        break;
+                    }
+                    snapshot[snapshotCount++] = frame;
+                }
+
+                MemoryBarrier();
+                const std::uint32_t ringAfter =
+                    state_->publishSequence;
+                if (stable && ringBefore == ringAfter &&
+                    !(ringAfter & 1u))
+                {
+                    out = snapshot;
+                    count = snapshotCount;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+    private:
+        bool ValidateRing() const
+        {
+            return state_ &&
+                state_->magic == OutRunVR::RenderFrameMagic &&
+                state_->protocolVersion ==
+                    OutRunVR::RenderFrameProtocolVersion &&
+                state_->structSize == sizeof(*state_) &&
+                state_->slotCount == OutRunVR::RenderFrameRingSize;
+        }
+
+        bool ReadSlot(std::uint32_t index,
+            OutRunVR::SharedRenderFrameState& out) const
+        {
+            if (!ValidateRing() ||
+                index >= OutRunVR::RenderFrameRingSize)
+                return false;
+
+            const auto& slot = state_->slots[index];
+            for (int attempt = 0; attempt < 4; ++attempt)
+            {
                 const std::uint32_t before = slot.sequence;
-                if (before & 1u) continue;
+                if (before & 1u)
+                    continue;
                 MemoryBarrier();
                 std::memcpy(&out, &slot, sizeof(out));
                 MemoryBarrier();
                 const std::uint32_t after = slot.sequence;
-                const std::uint32_t ringAfter = state_->publishSequence;
-                if (ringBefore == ringAfter && !(ringAfter & 1u) && before == after && !(after & 1u) &&
-                    out.magic == OutRunVR::RenderFrameMagic && out.protocolVersion == OutRunVR::RenderFrameProtocolVersion &&
-                    out.structSize == sizeof(out)) return true;
+                if (before == after && !(after & 1u) &&
+                    out.magic == OutRunVR::RenderFrameMagic &&
+                    out.protocolVersion ==
+                        OutRunVR::RenderFrameProtocolVersion &&
+                    out.structSize == sizeof(out))
+                    return true;
             }
             return false;
         }
-    private:
+
         HANDLE mapping_ = nullptr;
         OutRunVR::SharedRenderFrameRing* state_ = nullptr;
     };
