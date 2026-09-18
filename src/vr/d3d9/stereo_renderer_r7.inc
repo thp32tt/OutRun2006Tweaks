@@ -240,10 +240,27 @@ namespace OutRunVRStereo
 		{
 			if (!Game::current_mode)
 				return false;
-			if (*Game::current_mode == GameState::STATE_GAME)
+
+			// Reuse the game's established "in-game" state definition instead of
+			// treating only STATE_GAME as gameplay. GOAL/TIMEUP/TRYAGAIN,
+			// OUTRUNMILES and the single-player pause state can keep rendering the
+			// live 3D scene. Switching those frames to theater immediately clears
+			// stereo metadata and can leave the HMD without a fresh projection
+			// source while the monitor continues normally.
+			if (Game::is_in_game())
 				return true;
-			return *Game::current_mode == GameState::STATE_START &&
-				Game::game_start_progress_code && *Game::game_start_progress_code == 65;
+
+			// WARP/RESTART are short race-adjacent transition states. Preserve
+			// gameplay presentation through them; the following menu/result states
+			// still fall back to theater normally.
+			switch (*Game::current_mode)
+			{
+			case GameState::STATE_WARP:
+			case GameState::STATE_RESTART:
+				return true;
+			default:
+				return false;
+			}
 		}
 
 		bool HostRenderEligible()
