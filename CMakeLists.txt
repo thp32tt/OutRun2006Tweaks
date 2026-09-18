@@ -119,6 +119,44 @@ if(OUTRUN_VR_SAFE_DRAW_COMPARE)
     message(STATUS "OutRun VR safe-draw comparison: R26 final stereo chain enabled")
 endif()
 
+# C1/C2 regression-isolation builds. These keep current R15/transport/texture
+# work and renderer R29 installation, but compile a shorter stereo owner chain.
+# C1 = R29 fast L+R + restored R23/R27/R28 perspective-world classification.
+# C2 = C1 + R30 asymmetric-FOV HUD correction. R31-R34 stay excluded in both.
+option(OUTRUN_VR_C1_COMPARE "Build C1: R29 fast L+R with R27/R28 classification" OFF)
+option(OUTRUN_VR_C2_COMPARE "Build C2: C1 plus R30 HUD correction" OFF)
+set_source_files_properties(
+    src/vr/d3d9/stereo_renderer_r29_c1_compare.cpp
+    src/vr/d3d9/stereo_renderer_r30_c2_compare.cpp
+    PROPERTIES HEADER_FILE_ONLY TRUE)
+
+if((OUTRUN_VR_SAFE_DRAW_COMPARE AND OUTRUN_VR_C1_COMPARE) OR
+   (OUTRUN_VR_SAFE_DRAW_COMPARE AND OUTRUN_VR_C2_COMPARE) OR
+   (OUTRUN_VR_C1_COMPARE AND OUTRUN_VR_C2_COMPARE))
+    message(FATAL_ERROR "Choose only one VR comparison build option")
+endif()
+
+if(OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r34.cpp
+        PROPERTIES HEADER_FILE_ONLY TRUE)
+    add_compile_definitions(OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE=1)
+endif()
+
+if(OUTRUN_VR_C1_COMPARE)
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r29_c1_compare.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    add_compile_definitions(OUTRUN_VR_C1_COMPARE=1)
+    message(STATUS "OutRun VR C1 comparison: R29 fast L+R + R27/R28 classification")
+elseif(OUTRUN_VR_C2_COMPARE)
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r30_c2_compare.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    add_compile_definitions(OUTRUN_VR_C2_COMPARE=1)
+    message(STATUS "OutRun VR C2 comparison: C1 + R30 HUD correction")
+endif()
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 
