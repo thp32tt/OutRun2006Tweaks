@@ -619,7 +619,8 @@ namespace OutRunVRStereo
             ActualDraw&& actualDraw, LowerR29Draw&& lowerR29Draw,
             const char* site) noexcept
         {
-            R31FlushPendingStateBlockResync(device);
+            if (!R31StateBlockRecording)
+                R31FlushPendingStateBlockResync(device);
             const bool telemetry = R33TelemetryEnabled();
             if (telemetry)
                 R31ObserveDraw(device);

@@ -66,10 +66,12 @@ namespace OutRunVRRenderer
             DWORD alphaBlend = FALSE;
             DWORD alphaTest = FALSE;
             DWORD zWrite = TRUE;
+            DWORD zEnable = D3DZB_TRUE;
             DWORD cullMode = D3DCULL_CCW;
             if (FAILED(device->GetRenderState(D3DRS_ALPHABLENDENABLE, &alphaBlend)) ||
                 FAILED(device->GetRenderState(D3DRS_ALPHATESTENABLE, &alphaTest)) ||
                 FAILED(device->GetRenderState(D3DRS_ZWRITEENABLE, &zWrite)) ||
+                FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable)) ||
                 FAILED(device->GetRenderState(D3DRS_CULLMODE, &cullMode)))
             {
                 // A failed state read is not enough evidence to demote all world
@@ -88,6 +90,7 @@ namespace OutRunVRRenderer
                 alphaBlend != FALSE,
                 alphaTest != FALSE,
                 zWrite != FALSE,
+                zEnable != D3DZB_FALSE,
                 cullMode == D3DCULL_NONE);
             return !OutRunVR::PassPolicy::AllowsEffectWorldStereo(policy);
         }

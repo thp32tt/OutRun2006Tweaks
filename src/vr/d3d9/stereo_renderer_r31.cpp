@@ -916,7 +916,7 @@ namespace OutRunVRStereo
             {
                 R31StateBlockRecording = true;
                 ++R31StateBlockRecordings;
-                R31InvalidateAndResynchronizeStateBlockCaches(device);
+                R31MarkStateBlockCachesDirty();
             }
             return hr;
         }
@@ -939,7 +939,7 @@ namespace OutRunVRStereo
                     R31StateBlockTrackingReliable.store(false,
                         std::memory_order_release);
                 }
-                R31InvalidateAndResynchronizeStateBlockCaches(device);
+                R31MarkStateBlockCachesDirty();
                 if (SUCCEEDED(hr) && block && *block)
                     R31EnsureStateBlockApplyHook(*block);
             }
