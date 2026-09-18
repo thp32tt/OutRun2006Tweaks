@@ -18,6 +18,7 @@ namespace Settings
 	extern Setting<bool> VREnabled;
 	extern Setting<bool> VRStereo;
 	extern Setting<bool> VRMirrorFitDesktop;
+	extern Setting<bool> VRDisableDesktopVsync;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
 
@@ -1364,9 +1365,19 @@ class VSyncOverride : public Hook
 	inline static SafetyHookMid dest_hook = {};
 	static void destination(safetyhook::Context& ctx)
 	{
-		Game::D3DPresentParams->PresentationInterval = Settings::VSync;
-		if (!Settings::VSync)
-			Game::D3DPresentParams->PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+		if (Settings::VREnabled && Settings::VRDisableDesktopVsync)
+		{
+			Game::D3DPresentParams->PresentationInterval =
+				D3DPRESENT_INTERVAL_IMMEDIATE;
+			spdlog::info("VR PRESENT: desktop D3D9 VSync bypass active; OpenXR cadence is owned by the host/runtime");
+		}
+		else
+		{
+			Game::D3DPresentParams->PresentationInterval = Settings::VSync;
+			if (!Settings::VSync)
+				Game::D3DPresentParams->PresentationInterval =
+					D3DPRESENT_INTERVAL_IMMEDIATE;
+		}
 
 		// TODO: add MultiSampleType / MultiSampleQuality overrides here?
 		//  (doesn't seem any of them are improvement over vanilla "DX/ANTIALIASING = 2" though...)
@@ -1380,7 +1391,8 @@ public:
 
 	bool validate() override
 	{
-		return Settings::VSync != 1;
+		return Settings::VSync != 1 ||
+			(Settings::VREnabled && Settings::VRDisableDesktopVsync);
 	}
 
 	void declare_settings() override
