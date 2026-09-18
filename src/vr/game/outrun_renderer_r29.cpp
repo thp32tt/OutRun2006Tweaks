@@ -37,6 +37,9 @@ namespace OutRunVRRenderer
         bool R29FirstSeedLogged = false;
         bool R29FirstR13RestoreLogged = false;
         bool R29FirstStateBlockStockLogged = false;
+#if defined(OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE)
+        bool R29FirstR28CompareLogged = false;
+#endif
 
         void R29InvalidateRawWvpGenerationImpl() noexcept
         {
@@ -182,6 +185,22 @@ namespace OutRunVRRenderer
                     device, startRegister, constantData, vector4fCount);
             }
 
+#if defined(OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE)
+            // C1/C2 regression-isolation build: keep the R29 installation and
+            // fast stereo owner, but hand candidate WVP uploads back to the
+            // proven R23/R27/R28 classifier. This restores the known-good rule
+            // that a main-backbuffer perspective pass may remain per-eye world
+            // stereo regardless of alpha/cull state, while orthographic HUD and
+            // auxiliary targets remain stock/fail-closed.
+            if (!R29FirstR28CompareLogged)
+            {
+                R29FirstR28CompareLogged = true;
+                spdlog::warn(
+                    "VR C1/C2 CLASSIFY: R29 renderer delegates candidate WVP uploads to R23/R27/R28 perspective-world classification");
+            }
+            return R29WvpR23Hook.stdcall<HRESULT>(
+                device, startRegister, constantData, vector4fCount);
+#else
             const bool partialWvp =
                 !UploadContainsOutRunWvp(startRegister, vector4fCount);
 
@@ -275,6 +294,7 @@ namespace OutRunVRRenderer
                     "VR R29 EFFECT: eligible WVP uploads restored to R13 classification; fragile alpha/billboard/shadow passes are no longer promoted merely because projection is perspective");
             }
             return hr;
+#endif
         }
 
         void R29RollbackRendererHooks() noexcept
