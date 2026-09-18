@@ -1638,7 +1638,7 @@ int main(int argc, char** argv)
             directTransportEnabled && DirectTransportOnly();
         const float targetRefreshRateHz = RequestedRefreshRateHz();
         const int cadenceMode = std::clamp(
-            R35ReadEnvInt("OUTRUN_VR_CADENCE_MODE", 0), 0, 2);
+            R35ReadEnvInt("OUTRUN_VR_CADENCE_MODE", 1), 0, 2);
         const float cadenceTargetHz = std::clamp(
             R35ReadEnvFloat("OUTRUN_VR_CADENCE_TARGET_HZ", 60.0f),
             30.0f, 120.0f);

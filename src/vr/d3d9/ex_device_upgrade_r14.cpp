@@ -18,6 +18,7 @@
 #include <mutex>
 #include <unordered_map>
 #include <vector>
+#include <limits>
 
 #include "ex_device_upgrade_r13.cpp"
 
@@ -71,6 +72,41 @@ namespace OutRunVRD3D9ExUpgradeR13
 
         thread_local std::uint32_t R14InternalReleaseDepth = 0;
 
+        // R35.1: lifetime-bound shadows fix coherency, but an unbounded set of
+        // SYSTEMMEM peers can exhaust a 32-bit OutRun process when high-res DDS
+        // replacements are also cached. Keep correctness for admitted shadows,
+        // but stop admitting new CPU peers once this conservative budget is
+        // reached. Rejected resources remain tracked on the existing DirectOnly
+        // compatibility path; no live shadow is evicted.
+        constexpr std::uint64_t R14CpuShadowBudgetBytes =
+            256ull * 1024ull * 1024ull;
+        std::atomic<std::uint64_t> R14CpuShadowBytes{0};
+        std::atomic<std::uint64_t> R14ShadowBudgetRejects{0};
+
+        bool R14ReserveShadowBytes(std::uint64_t bytes) noexcept
+        {
+            if (bytes == 0 || bytes > R14CpuShadowBudgetBytes)
+                return false;
+            std::uint64_t current =
+                R14CpuShadowBytes.load(std::memory_order_relaxed);
+            for (;;)
+            {
+                if (current > R14CpuShadowBudgetBytes - bytes)
+                    return false;
+                if (R14CpuShadowBytes.compare_exchange_weak(
+                        current, current + bytes,
+                        std::memory_order_acq_rel,
+                        std::memory_order_relaxed))
+                    return true;
+            }
+        }
+
+        void R14ReleaseShadowBytes(std::uint64_t bytes) noexcept
+        {
+            if (bytes != 0)
+                R14CpuShadowBytes.fetch_sub(bytes, std::memory_order_acq_rel);
+        }
+
         struct R14ShadowEntry
         {
             std::mutex mutex;
@@ -78,6 +114,7 @@ namespace OutRunVRD3D9ExUpgradeR13
             IDirect3DTexture9* cpu = nullptr;
             IDirect3DDevice9* device = nullptr;
             R14ShadowMode mode = R14ShadowMode::Shadow;
+            std::uint64_t shadowBytes = 0;
             std::uint32_t validMask = 0;
             std::uint32_t dirtyMask = 0;
             std::uint32_t lockedMask = 0;
@@ -90,7 +127,12 @@ namespace OutRunVRD3D9ExUpgradeR13
             ~R14ShadowEntry()
             {
                 ++R14InternalReleaseDepth;
-                if (cpu) cpu->Release();
+                if (cpu)
+                {
+                    cpu->Release();
+                    R14ReleaseShadowBytes(shadowBytes);
+                    shadowBytes = 0;
+                }
                 if (device) device->Release();
                 --R14InternalReleaseDepth;
             }
@@ -155,6 +197,8 @@ namespace OutRunVRD3D9ExUpgradeR13
         {
             IDirect3DTexture9* cpu = entry.cpu;
             entry.cpu = nullptr;
+            R14ReleaseShadowBytes(entry.shadowBytes);
+            entry.shadowBytes = 0;
             entry.mode = R14ShadowMode::DirectOnly;
             entry.validMask = 0;
             entry.dirtyMask = 0;
@@ -307,7 +351,7 @@ namespace OutRunVRD3D9ExUpgradeR13
         }
 
         bool R14Track(IDirect3DDevice9* device, IDirect3DTexture9* gpu,
-            IDirect3DTexture9* cpu) noexcept
+            IDirect3DTexture9* cpu, std::uint64_t shadowBytes) noexcept
         {
             if (!device || !gpu || !cpu) return false;
             try
@@ -331,6 +375,7 @@ namespace OutRunVRD3D9ExUpgradeR13
                 // Ownership transfers only after insertion succeeds. On every
                 // failure path the caller still owns and releases cpu exactly once.
                 entry->cpu = cpu;
+                entry->shadowBytes = shadowBytes;
             }
             catch (...)
             {
@@ -341,7 +386,8 @@ namespace OutRunVRD3D9ExUpgradeR13
             if (!R14FirstActiveLogged.exchange(true))
             {
                 spdlog::info(
-                    "VR R14 EX: lifetime-bound MANAGED 2D CPU-shadow path ACTIVE; no live or locked texture can be evicted by a fixed-capacity ring");
+                    "VR R14 EX: lifetime-bound MANAGED 2D CPU-shadow path ACTIVE; live shadows are never evicted and admission is capped at {} MiB for 32-bit address-space safety",
+                    R14CpuShadowBudgetBytes / (1024ull * 1024ull));
             }
             return true;
         }
@@ -376,10 +422,86 @@ namespace OutRunVRD3D9ExUpgradeR13
             return true;
         }
 
+        std::uint64_t R14EstimateLevelBytes(
+            const D3DSURFACE_DESC& desc) noexcept
+        {
+            const std::uint64_t width = std::max<UINT>(1, desc.Width);
+            const std::uint64_t height = std::max<UINT>(1, desc.Height);
+            if (desc.Format == D3DFMT_DXT1)
+                return ((width + 3) / 4) * ((height + 3) / 4) * 8ull;
+            if (desc.Format == D3DFMT_DXT2 ||
+                desc.Format == D3DFMT_DXT3 ||
+                desc.Format == D3DFMT_DXT4 ||
+                desc.Format == D3DFMT_DXT5)
+                return ((width + 3) / 4) * ((height + 3) / 4) * 16ull;
+
+            std::uint64_t bytesPerPixel = 4;
+            switch (desc.Format)
+            {
+            case D3DFMT_A8:
+            case D3DFMT_L8:
+            case D3DFMT_P8:
+            case D3DFMT_A4L4:
+                bytesPerPixel = 1; break;
+            case D3DFMT_R5G6B5:
+            case D3DFMT_X1R5G5B5:
+            case D3DFMT_A1R5G5B5:
+            case D3DFMT_A4R4G4B4:
+            case D3DFMT_A8L8:
+            case D3DFMT_V8U8:
+            case D3DFMT_L6V5U5:
+            case D3DFMT_R16F:
+                bytesPerPixel = 2; break;
+            case D3DFMT_R8G8B8:
+                bytesPerPixel = 3; break;
+            case D3DFMT_A16B16G16R16:
+            case D3DFMT_Q16W16V16U16:
+            case D3DFMT_G32R32F:
+            case D3DFMT_A16B16G16R16F:
+                bytesPerPixel = 8; break;
+            case D3DFMT_A32B32G32R32F:
+                bytesPerPixel = 16; break;
+            default:
+                bytesPerPixel = 4; break;
+            }
+
+            if (width > std::numeric_limits<std::uint64_t>::max() / height ||
+                width * height >
+                    std::numeric_limits<std::uint64_t>::max() / bytesPerPixel)
+                return std::numeric_limits<std::uint64_t>::max();
+            return width * height * bytesPerPixel;
+        }
+
+        std::uint64_t R14EstimateTextureBytes(
+            IDirect3DTexture9* gpu) noexcept
+        {
+            if (!gpu) return 0;
+            const UINT levels = gpu->GetLevelCount();
+            if (levels == 0 || levels > R14MaxTrackedLevels)
+                return 0;
+            std::uint64_t total = 0;
+            for (UINT level = 0; level < levels; ++level)
+            {
+                D3DSURFACE_DESC desc{};
+                if (FAILED(gpu->GetLevelDesc(level, &desc)))
+                    return 0;
+                const std::uint64_t levelBytes =
+                    R14EstimateLevelBytes(desc);
+                if (levelBytes == std::numeric_limits<std::uint64_t>::max() ||
+                    total > std::numeric_limits<std::uint64_t>::max() -
+                        levelBytes)
+                    return std::numeric_limits<std::uint64_t>::max();
+                total += levelBytes;
+            }
+            return total;
+        }
+
         HRESULT R14CreateCpuShadow(IDirect3DDevice9* device,
-            IDirect3DTexture9* gpu, IDirect3DTexture9*& shadow) noexcept
+            IDirect3DTexture9* gpu, IDirect3DTexture9*& shadow,
+            std::uint64_t& reservedBytes) noexcept
         {
             shadow = nullptr;
+            reservedBytes = 0;
             if (!device || !gpu) return D3DERR_INVALIDCALL;
             D3DSURFACE_DESC desc{};
             const HRESULT descHr = gpu->GetLevelDesc(0, &desc);
@@ -389,10 +511,24 @@ namespace OutRunVRD3D9ExUpgradeR13
             if (levels == 0 || levels > R14MaxTrackedLevels)
                 return D3DERR_NOTAVAILABLE;
 
+            const std::uint64_t estimate = R14EstimateTextureBytes(gpu);
+            if (!R14ReserveShadowBytes(estimate))
+            {
+                ++R14ShadowBudgetRejects;
+                return E_OUTOFMEMORY;
+            }
+            reservedBytes = estimate;
+
             const HRESULT hr = device->CreateTexture(
                 desc.Width, desc.Height, levels, 0, desc.Format,
                 D3DPOOL_SYSTEMMEM, &shadow, nullptr);
-            return SUCCEEDED(hr) && shadow ? D3D_OK : hr;
+            if (FAILED(hr) || !shadow)
+            {
+                R14ReleaseShadowBytes(reservedBytes);
+                reservedBytes = 0;
+                return FAILED(hr) ? hr : E_OUTOFMEMORY;
+            }
+            return D3D_OK;
         }
 
         ULONG __stdcall TextureReleaseDestR14(IDirect3DTexture9* texture)
@@ -729,14 +865,16 @@ namespace OutRunVRD3D9ExUpgradeR13
                 return hr;
 
             IDirect3DTexture9* shadow = nullptr;
+            std::uint64_t shadowBytes = 0;
             const HRESULT shadowHr = R14CreateCpuShadow(
-                device, *texture, shadow);
+                device, *texture, shadow, shadowBytes);
             const bool hooksReady = R14EnsureResourceHooks(device, *texture);
 
             if (SUCCEEDED(shadowHr) && shadow && hooksReady &&
-                R14Track(device, *texture, shadow))
+                R14Track(device, *texture, shadow, shadowBytes))
             {
-                return hr; // registry owns shadow on success
+                shadowBytes = 0; // registry owns shadow + reservation
+                return hr;
             }
 
             // Hardware evidence from f15f1acd showed some translated MANAGED
@@ -758,11 +896,18 @@ namespace OutRunVRD3D9ExUpgradeR13
                         static_cast<unsigned>(shadowHr), desc.Width, desc.Height,
                         static_cast<unsigned>(desc.Format),
                         (*texture)->GetLevelCount());
+                    spdlog::warn(
+                        "VR R14 EX: CPU-shadow admission={} MiB / {} MiB, budgetRejects={}",
+                        R14CpuShadowBytes.load(std::memory_order_relaxed) /
+                            (1024ull * 1024ull),
+                        R14CpuShadowBudgetBytes / (1024ull * 1024ull),
+                        R14ShadowBudgetRejects.load(std::memory_order_relaxed));
                 }
                 return hr;
             }
 
             if (shadow) shadow->Release();
+            if (shadowBytes) R14ReleaseShadowBytes(shadowBytes);
             if (*texture)
             {
                 (*texture)->Release();
