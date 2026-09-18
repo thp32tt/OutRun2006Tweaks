@@ -29,6 +29,7 @@
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include <unordered_map>
 #include <vector>
 #include "vr_shared.hpp"
 #include "stereo_shader.hpp"
@@ -77,6 +78,164 @@ namespace
     std::uint64_t R23GameplayTheaterFallbacks = 0;
     ULONGLONG R23LastGameplayFallbackLogMs = 0;
 
+
+    struct R23FinalCounters
+    {
+        std::uint64_t exact = 0;
+        std::uint64_t softGrace = 0;
+        std::uint64_t direct = 0;
+        std::uint64_t liveTheater = 0;
+        std::uint64_t directFlat = 0;
+        std::uint64_t cached = 0;
+        std::uint64_t emergency = 0;
+        std::uint64_t empty = 0;
+        std::uint64_t mixed = 0;
+    };
+
+    R23FinalCounters R23ReadFinalCounters() noexcept
+    {
+        using namespace OutRunVrR24BlackScreenGuard;
+        return {
+            ExactProjectionSubmits,
+            SoftGraceProjectionSubmits,
+            DirectSafeProjectionSubmits,
+            LiveTheaterFallbacks,
+            DirectFlatFallbacks,
+            CachedLayerFallbacks,
+            EmergencyLayerFallbacks,
+            EmptyFrameFallbacks,
+            MixedValidatedSubmits
+        };
+    }
+
+    const char* R23ActualFinalKind(
+        const R23FinalCounters& before,
+        const R23FinalCounters& after,
+        const char* requested) noexcept
+    {
+        if (after.exact != before.exact) return "projection-exact";
+        if (after.softGrace != before.softGrace) return "projection-soft-grace";
+        if (after.direct != before.direct) return "projection-direct-safe";
+        if (after.cached != before.cached) return "fallback-cached-image";
+        if (after.directFlat != before.directFlat) return "fallback-direct-flat";
+        if (after.liveTheater != before.liveTheater) return "fallback-live-theater";
+        if (after.emergency != before.emergency) return "fallback-emergency";
+        if (after.empty != before.empty) return "no-layer";
+        if (after.mixed != before.mixed) return "mixed-validated";
+        return requested ? requested : "unclassified";
+    }
+
+    struct R23MetricWindow
+    {
+        std::vector<double> values;
+        double sum = 0.0;
+        double maximum = 0.0;
+
+        void Add(double value)
+        {
+            if (!std::isfinite(value) || value < 0.0)
+                return;
+            values.push_back(value);
+            sum += value;
+            maximum = std::max(maximum, value);
+        }
+
+        double Average() const noexcept
+        {
+            return values.empty() ? 0.0 :
+                sum / static_cast<double>(values.size());
+        }
+
+        double P95() const
+        {
+            if (values.empty())
+                return 0.0;
+            std::vector<double> sorted = values;
+            std::sort(sorted.begin(), sorted.end());
+            const std::size_t index =
+                std::min<std::size_t>(
+                    sorted.size() - 1,
+                    static_cast<std::size_t>(
+                        std::ceil(sorted.size() * 0.95)) - 1);
+            return sorted[index];
+        }
+
+        void Reset()
+        {
+            values.clear();
+            sum = 0.0;
+            maximum = 0.0;
+        }
+    };
+
+    struct R23PipelineWindow
+    {
+        std::unordered_map<std::string, std::uint64_t> rejects;
+        std::unordered_map<std::string, std::uint64_t> finals;
+        R23MetricWindow capture;
+        R23MetricWindow commit;
+        R23MetricWindow render;
+        R23MetricWindow endFrame;
+        std::uint64_t frames = 0;
+
+        void Note(const char* rejectReason, const char* finalKind,
+            double captureMs, double commitMs,
+            double renderMs, double endMs)
+        {
+            ++frames;
+            if (rejectReason && *rejectReason)
+                ++rejects[rejectReason];
+            if (finalKind && *finalKind)
+                ++finals[finalKind];
+            capture.Add(captureMs);
+            commit.Add(commitMs);
+            render.Add(renderMs);
+            endFrame.Add(endMs);
+        }
+
+        static void AppendCounts(
+            std::ostringstream& out,
+            const std::unordered_map<std::string, std::uint64_t>& counts)
+        {
+            bool first = true;
+            for (const auto& item : counts)
+            {
+                if (!first) out << ",";
+                first = false;
+                out << item.first << ":" << item.second;
+            }
+            if (first) out << "none";
+        }
+
+        void AppendAndReset(std::ostringstream& out)
+        {
+            out << " intervalFrames=" << frames
+                << " actualSubmits={";
+            AppendCounts(out, finals);
+            out << "} rejectCounts={";
+            AppendCounts(out, rejects);
+            out << "}"
+                << " captureAvgMaxP95="
+                << capture.Average() << "/"
+                << capture.maximum << "/" << capture.P95()
+                << " commitAvgMaxP95="
+                << commit.Average() << "/"
+                << commit.maximum << "/" << commit.P95()
+                << " renderAvgMaxP95="
+                << render.Average() << "/"
+                << render.maximum << "/" << render.P95()
+                << " endAvgMaxP95="
+                << endFrame.Average() << "/"
+                << endFrame.maximum << "/" << endFrame.P95();
+            frames = 0;
+            rejects.clear();
+            finals.clear();
+            capture.Reset();
+            commit.Reset();
+            render.Reset();
+            endFrame.Reset();
+        }
+    };
 
     struct R23DirectHoldState
     {
@@ -985,6 +1144,7 @@ int main(int argc, char** argv)
         LARGE_INTEGER qpcFrequency{};
         QueryPerformanceFrequency(&qpcFrequency);
         ULONGLONG lastPipelineTelemetryMs = 0;
+        R23PipelineWindow pipelineWindow;
         const XrEnvironmentBlendMode blend = ChooseBlendMode(instance, system);
 
         bool running = false, quit = false, exitRequested = false;
@@ -1498,14 +1658,35 @@ int main(int argc, char** argv)
                 }
             }
 
-            end.layerCount = layerReady ? 1 : 0; end.layers = layerReady ? layers : nullptr;
-            LARGE_INTEGER es{}, ee{}; QueryPerformanceCounter(&es);
+            end.layerCount = layerReady ? 1 : 0;
+            end.layers = layerReady ? layers : nullptr;
+            const R23FinalCounters finalBefore =
+                R23ReadFinalCounters();
+            LARGE_INTEGER es{}, ee{};
+            QueryPerformanceCounter(&es);
             const XrResult endResult = xrEndFrame(session, &end);
+            QueryPerformanceCounter(&ee);
+            const R23FinalCounters finalAfter =
+                R23ReadFinalCounters();
+            const char* actualFinalLayerKind =
+                R23ActualFinalKind(
+                    finalBefore, finalAfter, finalLayerKind);
+            const std::uint32_t actualSubmittedFrameId =
+                OutRunVrR23RuntimeHardening::LastSubmittedFrameId.load(
+                    std::memory_order_acquire);
+            const std::uint32_t actualSubmittedSourceKind =
+                OutRunVrR23RuntimeHardening::LastSubmittedKind.load(
+                    std::memory_order_acquire);
+            const bool actualSubmittedLayer =
+                OutRunVrR23RuntimeHardening::LastSubmittedLayer.load(
+                    std::memory_order_acquire);
             R23Pixels.NoteFinalSubmission();
             CheckXr(endResult, "xrEndFrame");
-            QueryPerformanceCounter(&ee);
             const double endFrameMs = timings.Ms(es, ee);
             timings.end.Add(endFrameMs);
+            pipelineWindow.Note(candidateRejectReason,
+                actualFinalLayerKind, candidateCaptureMs,
+                candidateCommitCopyMs, frameRenderMs, endFrameMs);
 
             const ULONGLONG pipelineNowMs = GetTickCount64();
             if (lastPipelineTelemetryMs == 0 ||
@@ -1531,7 +1712,11 @@ int main(int argc, char** argv)
                     << " committedFrameId=" << lastProcessedStereoFrame
                     << " sourcePoseSequence=" << candidatePoseSequence
                     << " rejectReason=" << candidateRejectReason
-                    << " finalLayer=" << finalLayerKind
+                    << " requestedLayer=" << finalLayerKind
+                    << " actualFinal=" << actualFinalLayerKind
+                    << " actualFrameId=" << actualSubmittedFrameId
+                    << " actualSourceKind=" << actualSubmittedSourceKind
+                    << " actualLayer=" << (actualSubmittedLayer ? 1 : 0)
                     << " bundleFrameId="
                     << (haveBundle ? bundle.frameId : 0u)
                     << " bundleAgeMs=" << bundleAgeMs
@@ -1540,8 +1725,9 @@ int main(int argc, char** argv)
                     << " renderMs=" << frameRenderMs
                     << " xrEndFrameMs=" << endFrameMs
                     << " displayPeriodMs="
-                    << (static_cast<double>(fs.predictedDisplayPeriod) / 1000000.0)
-                    << "\n";
+                    << (static_cast<double>(fs.predictedDisplayPeriod) / 1000000.0);
+                pipelineWindow.AppendAndReset(pipelineLine);
+                pipelineLine << "\n";
                 const std::string line = pipelineLine.str();
                 std::cout << line;
                 if (pipelineLog.is_open())
