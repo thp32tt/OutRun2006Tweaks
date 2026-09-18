@@ -945,6 +945,26 @@ int main(int argc, char** argv)
 
         while (!quit)
         {
+            // A global legacy bridge can outlive a fast game restart. If a new
+            // live x86 client takes ownership while this host is still bound to
+            // an older game window, shut down cleanly so the game's auto-launch
+            // helper can start a host attached to the new PID.
+            const DWORD publishedClientPid = SharedClientPid();
+            if (!exitRequested && publishedClientPid &&
+                publishedClientPid != gamePid &&
+                QueryProcessLiveness(publishedClientPid) == ProcessLiveness::Alive &&
+                FindGameWindow(publishedClientPid))
+            {
+                exitRequested = true;
+                exitRequestMs = GetTickCount64();
+                OutRunVrR23VerifiedBundle::Invalidate();
+                if (session != XR_NULL_HANDLE)
+                    xrRequestExitSession(session);
+                std::cout << "VR client changed from pid=" << gamePid
+                          << " to pid=" << publishedClientPid
+                          << "; restarting host binding.\n";
+            }
+
             if (!compositor.GameAlive() && !exitRequested)
             {
                 exitRequested = true; exitRequestMs = GetTickCount64();
