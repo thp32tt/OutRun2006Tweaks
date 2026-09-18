@@ -585,6 +585,7 @@ namespace OutRunVRStereo
         R30SkyGlowResources R30SkyGlow{};
         std::uint64_t R30SkyGlowFrames = 0;
         std::uint64_t R30SkyGlowFailures = 0;
+        std::uint64_t R30SkyGlowSceneCaptureEpoch = 0;
         bool R30FirstSkyGlowLogged = false;
         bool R30FirstSkyGlowFailureLogged = false;
 
@@ -822,6 +823,43 @@ namespace OutRunVRStereo
             return SUCCEEDED(hr);
         }
 
+        bool R30CaptureSkyGlowSceneBeforeHud(
+            IDirect3DDevice9* device)
+        {
+            if (!device || Settings::SkyGlowFactor <= 0 ||
+                !FrameHadWorldStereo || !FrameHadDuplicatedDraw ||
+                FrameRightDrawFailed || FrameStereoIncomplete ||
+                !BackBuffer || !RightEyeSurface)
+                return false;
+
+            if (R30SkyGlowSceneCaptureEpoch == PresentEpoch)
+                return true;
+            if (!R30EnsureSkyGlowResources(device))
+                return false;
+
+            IDirect3DSurface9* eyeSurface[2]{
+                BackBuffer, RightEyeSurface
+            };
+            bool ok = true;
+            for (int eye = 0; eye < 2 && ok; ++eye)
+            {
+                IDirect3DSurface9* reduced = nullptr;
+                if (FAILED(R30SkyGlow.reduced[eye]->GetSurfaceLevel(
+                        0, &reduced)) || !reduced)
+                {
+                    ok = false;
+                    break;
+                }
+                ok = SUCCEEDED(device->StretchRect(
+                    eyeSurface[eye], nullptr, reduced, nullptr,
+                    D3DTEXF_LINEAR));
+                reduced->Release();
+            }
+            if (ok)
+                R30SkyGlowSceneCaptureEpoch = PresentEpoch;
+            return ok;
+        }
+
         bool R30ApplyStereoSkyGlow(IDirect3DDevice9* device)
         {
             if (!device || Settings::SkyGlowFactor <= 0 ||
@@ -879,9 +917,12 @@ namespace OutRunVRStereo
                     break;
                 }
 
-                ok = SUCCEEDED(device->StretchRect(
-                    eyeSurface[eye], nullptr, reduced, nullptr,
-                    D3DTEXF_LINEAR));
+                if (R30SkyGlowSceneCaptureEpoch != PresentEpoch)
+                {
+                    ok = SUCCEEDED(device->StretchRect(
+                        eyeSurface[eye], nullptr, reduced, nullptr,
+                        D3DTEXF_LINEAR));
+                }
                 const float zero[4]{ 0, 0, 0, 0 };
                 if (ok)
                 {
@@ -1026,6 +1067,7 @@ namespace OutRunVRStereo
             D3DPRESENT_PARAMETERS* params)
         {
             R30ReleaseSkyGlowResources();
+            R30SkyGlowSceneCaptureEpoch = 0;
             return R30ResetR29Hook.stdcall<HRESULT>(device, params);
         }
 
@@ -1650,6 +1692,9 @@ namespace OutRunVRStereo
             LeftDraw&& leftDraw, RightDraw&& rightDraw,
             const char* site)
         {
+            if (!state.worldEffect)
+                R30CaptureSkyGlowSceneBeforeHud(device);
+
             ++R9DrawCalls;
             R9MonoBackupGap = true;
             if (LeftDrawMayWriteDepth(device) ||
@@ -2332,6 +2377,11 @@ namespace OutRunVRStereo
             D3DVIEWPORT9 savedViewport{};
             if (FAILED(device->GetViewport(&savedViewport)))
                 return E_NOTIMPL;
+
+            // Capture the completed world eyes before the first recognized HUD
+            // draw. Present then extracts glow from this snapshot, so bright HUD
+            // text/icons are never themselves bloom sources.
+            R30CaptureSkyGlowSceneBeforeHud(device);
 
             // From this point the draw is owned by R30. The steady-state frame
             // intentionally has no complete independent mono history.
