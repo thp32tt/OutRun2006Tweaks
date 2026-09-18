@@ -1317,12 +1317,16 @@ int main(int argc, char** argv)
                     const CaptureStatus capture = R23Capture(compositor);
                     QueryPerformanceCounter(&ce); timings.capture.Add(timings.Ms(cs, ce));
                     LARGE_INTEGER rs{}, re{}; QueryPerformanceCounter(&rs);
+                    // Menus are native mono/full-frame content. Only gameplay
+                    // recovery sources can contain SBS and need left-eye extraction.
+                    // Cropping menus to the left half magnifies a 2D menu and clips
+                    // its right side in the HMD.
                     if (capture.available && R23RenderTheater(compositor, viewSpace,
-                        localSpace, fs.predictedDisplayTime, quad, true))
+                        localSpace, fs.predictedDisplayTime, quad, false))
                     {
                         layers[0] = reinterpret_cast<const XrCompositionLayerBaseHeader*>(&quad);
                         layerReady = true;
-                        finalLayerKind = "menu-left-eye-theater";
+                        finalLayerKind = "menu-full-theater";
                     }
                     QueryPerformanceCounter(&re);
                     frameRenderMs += timings.Ms(rs, re);
