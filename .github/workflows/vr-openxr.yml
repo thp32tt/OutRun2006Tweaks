@@ -305,6 +305,86 @@ jobs:
           path: build-vr-game/bin/dinput8.dll
           if-no-files-found: error
 
+
+  game-x86-safe-draw-compare:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure Win32 R26 safe-draw comparison build
+        shell: cmd
+        run: |
+          set CI=
+          cmake -S . -B build-vr-safe-draw -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=ON
+
+      - name: Verify R26 comparison source graph
+        shell: pwsh
+        run: |
+          $projects = Get-ChildItem build-vr-safe-draw -Filter *.vcxproj -Recurse
+          if (-not $projects) { throw 'no Visual Studio project files were generated' }
+          $projectText = ($projects | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
+
+          if (-not $projectText.Contains('stereo_renderer_r26_compare.cpp')) {
+            throw 'safe-draw comparison TU is missing from generated build graph'
+          }
+          foreach ($includedOnly in @(
+            'stereo_renderer_r26.cpp',
+            'stereo_renderer_r29.cpp',
+            'stereo_renderer_r30.cpp',
+            'stereo_renderer_r31.cpp',
+            'stereo_renderer_r32.cpp',
+            'stereo_renderer_r33.cpp',
+            'stereo_renderer_r34.cpp'
+          )) {
+            $escaped = [regex]::Escape($includedOnly)
+            $pattern = '<ClCompile Include="[^"]*[\\/]' + $escaped + '"'
+            if ($projectText -match $pattern) {
+              throw "comparison build unexpectedly compiles excluded stereo TU: $includedOnly"
+            }
+          }
+
+      - name: Apply dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-vr-safe-draw/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-safe-draw/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-vr-safe-draw/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-safe-draw/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-vr-safe-draw/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-vr-safe-draw/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-vr-safe-draw/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build-vr-safe-draw/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-vr-safe-draw/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build Win32 R26 safe-draw comparison DLL
+        run: cmake --build build-vr-safe-draw --config Release
+
+      - name: Verify safe-draw comparison binary marker
+        shell: pwsh
+        run: |
+          $dllPath = 'build-vr-safe-draw/bin/dinput8.dll'
+          if (-not (Test-Path $dllPath)) { throw 'safe-draw dinput8.dll was not produced' }
+          $bytes = [System.IO.File]::ReadAllBytes($dllPath)
+          $ascii = [Text.Encoding]::ASCII.GetString($bytes)
+          if (-not $ascii.Contains('VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE')) {
+            throw 'safe-draw comparison marker missing'
+          }
+          foreach ($forbidden in @(
+            'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
+            'VR R33 DISPATCH: R33TryFastWorld/R33TryHud + direct R29 fallback READY',
+            'VR R34 RESET GUARD: R15 classic-state replay health now gates post-Reset stereo eligibility'
+          )) {
+            if ($ascii.Contains($forbidden)) {
+              throw "excluded fast-path marker unexpectedly present: $forbidden"
+            }
+          }
+          $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+          if ([BitConverter]::ToUInt16($bytes, $peOffset + 4) -ne 0x014C) { throw 'expected x86 DLL' }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: outrun2006-vr-x86-safe-draw-compare
+          path: build-vr-safe-draw/bin/dinput8.dll
+          if-no-files-found: error
+
   host-x64:
     runs-on: windows-2022
     steps:
