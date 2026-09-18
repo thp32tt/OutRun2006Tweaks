@@ -329,6 +329,9 @@ jobs:
           if (-not $projectText.Contains('stereo_renderer_r26_compare.cpp')) {
             throw 'safe-draw comparison TU is missing from generated build graph'
           }
+          if (-not $projectText.Contains('outrun_renderer_r23.cpp')) {
+            throw 'R23 renderer TU is missing from safe-draw comparison build'
+          }
           foreach ($includedOnly in @(
             'stereo_renderer_r26.cpp',
             'stereo_renderer_r29.cpp',
@@ -336,7 +339,8 @@ jobs:
             'stereo_renderer_r31.cpp',
             'stereo_renderer_r32.cpp',
             'stereo_renderer_r33.cpp',
-            'stereo_renderer_r34.cpp'
+            'stereo_renderer_r34.cpp',
+            'outrun_renderer_r29.cpp'
           )) {
             $escaped = [regex]::Escape($includedOnly)
             $pattern = '<ClCompile Include="[^"]*[\\/]' + $escaped + '"'
