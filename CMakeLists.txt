@@ -471,7 +471,7 @@ target_compile_features(outrun2006tweaks PUBLIC
 )
 
 target_compile_options(outrun2006tweaks PUBLIC
-	"/GS-"
+	"/GS"
 	"/bigobj"
 	"/EHa"
 	"/MP"
