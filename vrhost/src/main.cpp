@@ -938,6 +938,10 @@ namespace
 
         bool CommitDirectStereoSource(const OutRunVR::SharedRenderFrameState& frame)
         {
+            auto invalidateDirect = [&]() {
+                directFrameValid_ = false;
+                directTransportReady_ = false;
+            };
             if (!PrepareDirectStereoSource(frame)) return false;
             const std::uint32_t slot =
                 frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
