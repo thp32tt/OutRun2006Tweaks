@@ -259,13 +259,44 @@ namespace OutRunVRStereo
             // the old strict R28 rebind gate when WVP + projection + pose all
             // still match. If no rebind is needed, fall through to the ordinary
             // perspective fast path.
-            const HRESULT rebound = R28RunWithVerifiedWorldEpoch(
-                device, [&]() {
-                    return R29DirectTwoEye(
-                        device, stereoR7Draw, false, site);
-                });
-            if (rebound != E_NOTIMPL)
+            std::uintptr_t verifiedShaderIdentity = 0;
+            std::uint64_t verifiedShaderSerial = 0;
+            if (R28CanRebindVerifiedWorld(
+                    device, verifiedShaderIdentity, verifiedShaderSerial))
+            {
+                // Do not reuse R28RunWithVerifiedWorldEpoch's E_NOTIMPL
+                // sentinel here: a real D3D draw HRESULT must never be mistaken
+                // for "not handled" and executed twice. C1 has a direct boolean
+                // decision from R28CanRebindVerifiedWorld, so preserve the
+                // actual draw result verbatim.
+                const std::uintptr_t savedIdentity =
+                    CurrentVertexShaderIdentity.exchange(
+                        verifiedShaderIdentity, std::memory_order_acq_rel);
+                const std::uint64_t savedSerial =
+                    VertexShaderSerial.exchange(
+                        verifiedShaderSerial, std::memory_order_acq_rel);
+
+                const HRESULT rebound = R29DirectTwoEye(
+                    device, stereoR7Draw, false, site);
+
+                std::uintptr_t expectedIdentity = verifiedShaderIdentity;
+                CurrentVertexShaderIdentity.compare_exchange_strong(
+                    expectedIdentity, savedIdentity,
+                    std::memory_order_acq_rel, std::memory_order_acquire);
+                std::uint64_t expectedSerial = verifiedShaderSerial;
+                VertexShaderSerial.compare_exchange_strong(
+                    expectedSerial, savedSerial,
+                    std::memory_order_acq_rel, std::memory_order_acquire);
+
+                ++R28ShaderEpochWorldRebinds;
+                if (!R28FirstShaderEpochWorldLogged)
+                {
+                    R28FirstShaderEpochWorldLogged = true;
+                    spdlog::info(
+                        "VR C1 WORLD FIX: verified WVP/projection/pose survived a shader switch; R29 fast path rebound the R28 shader epoch so road/car draws keep per-eye world stereo");
+                }
                 return rebound;
+            }
 
             if (OutRunVRRenderer::R28PerspectiveWorldSemantic())
             {
