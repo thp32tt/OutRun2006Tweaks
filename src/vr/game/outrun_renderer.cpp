@@ -941,6 +941,32 @@ namespace OutRunVRRenderer
                 CadencePacingActive.store(false, std::memory_order_release);
                 return;
             }
+
+            HANDLE hostProcess = OpenProcess(SYNCHRONIZE, FALSE, host.hostPid);
+            const bool hostAlive = hostProcess &&
+                WaitForSingleObject(hostProcess, 0) == WAIT_TIMEOUT;
+            if (hostProcess) CloseHandle(hostProcess);
+
+            LARGE_INTEGER cadenceNow{}, cadenceFreq{};
+            QueryPerformanceCounter(&cadenceNow);
+            QueryPerformanceFrequency(&cadenceFreq);
+            const double requestAgeMs =
+                host.requestQpc > 0 && cadenceFreq.QuadPart > 0 &&
+                cadenceNow.QuadPart >= host.requestQpc
+                ? static_cast<double>(cadenceNow.QuadPart - host.requestQpc) *
+                    1000.0 / static_cast<double>(cadenceFreq.QuadPart)
+                : 0.0;
+            const double staleLimitMs = std::max(
+                100.0, static_cast<double>(std::clamp(
+                    Settings::VRFrameCadenceTimeoutMs.get(),
+                    5.0f, 100.0f)) * 4.0);
+            if (!hostAlive ||
+                (host.requestQpc > 0 && requestAgeMs > staleLimitMs))
+            {
+                CadencePacingActive.store(false, std::memory_order_release);
+                ActiveCadenceRequestId.store(0, std::memory_order_release);
+                return;
+            }
             CadencePacingActive.store(true, std::memory_order_release);
 
             const std::uint32_t current =
@@ -958,8 +984,19 @@ namespace OutRunVRRenderer
             PublishCadenceClient(
                 OutRunVR::CadenceV1::ClientEnabled |
                 OutRunVR::CadenceV1::ClientWaiting);
+            const double runtimePeriodMs =
+                host.predictedDisplayPeriod > 0
+                ? static_cast<double>(host.predictedDisplayPeriod) / 1000000.0
+                : 0.0;
+            const double configuredTimeoutMs =
+                static_cast<double>(std::clamp(
+                    Settings::VRFrameCadenceTimeoutMs.get(),
+                    5.0f, 100.0f));
             const DWORD timeoutMs = static_cast<DWORD>(std::clamp(
-                Settings::VRFrameCadenceTimeoutMs.get(), 5.0f, 100.0f));
+                runtimePeriodMs > 0.0
+                    ? runtimePeriodMs * 1.25
+                    : configuredTimeoutMs,
+                5.0, configuredTimeoutMs));
             const DWORD wait = WaitForSingleObject(CadenceRequestEvent, timeoutMs);
             QueryPerformanceCounter(&end);
             const std::uint32_t waitUs =
@@ -983,6 +1020,8 @@ namespace OutRunVRRenderer
             if (wait == WAIT_TIMEOUT)
             {
                 ++CadenceTimeoutCount;
+                CadencePacingActive.store(false, std::memory_order_release);
+                ActiveCadenceRequestId.store(0, std::memory_order_release);
                 PublishCadenceClient(
                     OutRunVR::CadenceV1::ClientEnabled |
                     OutRunVR::CadenceV1::ClientLastWaitTimedOut);

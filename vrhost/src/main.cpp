@@ -994,10 +994,12 @@ namespace
     public:
         StereoCompositor(XrSession session, ID3D11Device* device, ID3D11DeviceContext* context,
             HWND hwnd, const std::array<XrViewConfigurationView, 2>& configs,
-            bool directTransportEnabled, bool directTransportOnly, float renderScale)
+            bool directTransportEnabled, bool directTransportOnly,
+            bool disableDesktopDuplication, float renderScale)
             : session_(session), device_(device), context_(context), hwnd_(hwnd), configs_(configs),
               directTransportEnabled_(directTransportEnabled),
-              directTransportOnly_(directTransportOnly), renderScale_(renderScale)
+              directTransportOnly_(directTransportOnly),
+              disableDesktopDuplication_(disableDesktopDuplication), renderScale_(renderScale)
         {
             device_->AddRef();
             context_->AddRef();
@@ -1035,7 +1037,7 @@ namespace
         {
             // R37: direct-only is a real transport-isolation mode. Do not
             // create IDXGIOutputDuplication while measuring DirectGPU cadence.
-            if (!directTransportOnly_ && !BindCaptureOutput(true))
+            if (!disableDesktopDuplication_ && !BindCaptureOutput(true))
                 throw std::runtime_error("failed to bind game capture output");
             CreateShaders();
             ChooseSwapchainFormat();
@@ -1054,7 +1056,7 @@ namespace
 
         CaptureStatus Capture(DWORD timeoutMs=0)
         {
-            if (directTransportOnly_)
+            if (disableDesktopDuplication_)
                 return {};
             if (!IsWindow(hwnd_))
             {
@@ -1958,6 +1960,7 @@ namespace
         std::uint32_t directActiveSlot_ = 0;
         bool directTransportEnabled_ = true;
         bool directTransportOnly_ = false;
+        bool disableDesktopDuplication_ = false;
         bool directTransportReady_ = false;
         bool directFrameValid_ = false;
         bool directOpenFailureLogged_ = false;
@@ -2037,6 +2040,12 @@ namespace
     bool DirectTransportOnly()
     {
         return ReadBoolEnvironment("OUTRUN_VR_DIRECT_ONLY", true);
+    }
+
+    bool DisableDesktopDuplication()
+    {
+        return ReadBoolEnvironment(
+            "OUTRUN_VR_DISABLE_DESKTOP_DUPLICATION", false);
     }
 
     float RequestedRefreshRateHz()
@@ -2158,6 +2167,7 @@ int main(int argc, char** argv)
         const bool directTransportEnabled = DirectTransportEnabled();
         const bool directTransportOnly =
             directTransportEnabled && DirectTransportOnly();
+        const bool disableDesktopDuplication = DisableDesktopDuplication();
         HWND gameWindow = WaitForGameWindow();
         DWORD gamePid = 0;
         GetWindowThreadProcessId(gameWindow, &gamePid);
@@ -2232,7 +2242,7 @@ int main(int argc, char** argv)
             "xrEnumerateViewConfigurationViews list");
         std::array<XrViewConfigurationView, 2> configs{ cv[0], cv[1] };
 
-        SharedWriter shared(req.adapterLuid);RenderFrameReader renderFrames;StereoCompositor compositor(session,d3d.device,d3d.context,gameWindow,configs,directTransportEnabled,directTransportOnly,renderScale);compositor.Initialize();ViewHistory viewHistory;HostTimings timings;
+        SharedWriter shared(req.adapterLuid);RenderFrameReader renderFrames;StereoCompositor compositor(session,d3d.device,d3d.context,gameWindow,configs,directTransportEnabled,directTransportOnly,disableDesktopDuplication,renderScale);compositor.Initialize();ViewHistory viewHistory;HostTimings timings;
         const XrEnvironmentBlendMode blend = ChooseBlendMode(instance, system);
 
         bool running = false, quit = false, exitRequested = false;

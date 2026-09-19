@@ -43,7 +43,9 @@ namespace Settings
 	Setting<bool> VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", true,
 		"Prefers guarded D3D9Ex shared-eye transport so gameplay can bypass Desktop Duplication. Disable to return to classic D3D9/SBS capture." };
 	Setting<bool> VRDirectGpuOnly{ "VR", "DirectGpuOnly", true,
-		"During gameplay, rejects classic Desktop-Duplication stereo candidates and keeps DirectGPU/cached OpenXR projection paths only. Menus may still use the mono theater capture path." };
+		"During gameplay, rejects classic Desktop-Duplication stereo candidates and keeps DirectGPU/cached OpenXR projection paths only. Menus continue to use mono theater capture." };
+	Setting<bool> VRDisableDesktopDuplication{ "VR", "DisableDesktopDuplication", false,
+		"Diagnostic isolation switch. Disables Desktop Duplication for gameplay and menus. Leave false for normal DirectGPU-only gameplay with visible menus." };
 	Setting<float> VRTargetRefreshRateHz{ "VR", "TargetRefreshRateHz", 0.0f,
 		"Optional OpenXR refresh-rate override through XR_FB_display_refresh_rate. Leave at 0 to respect the refresh rate selected by Virtual Desktop/runtime (for example 72 or 90 Hz).", Range<float>{ 0.0f, 144.0f } };
 	Setting<int> VRFrameCadenceMode{ "VR", "FrameCadenceMode", 1,
@@ -116,6 +118,8 @@ namespace OutRunVR
 				SetEnvironmentVariableA("OUTRUN_VR_DIRECT_TRANSPORT", "1");
 				SetEnvironmentVariableA("OUTRUN_VR_DIRECT_ONLY",
 					Settings::VRDirectGpuOnly ? "1" : "0");
+				SetEnvironmentVariableA("OUTRUN_VR_DISABLE_DESKTOP_DUPLICATION",
+					Settings::VRDisableDesktopDuplication ? "1" : "0");
 				const std::string refreshHz =
 					std::to_string(Settings::VRTargetRefreshRateHz.get());
 				SetEnvironmentVariableA("OUTRUN_VR_TARGET_REFRESH_HZ",
@@ -189,6 +193,7 @@ namespace OutRunVR
 			Settings::VRDisableDesktopVsync.needs_restart();
 			Settings::VRPreferD3D9Ex.needs_restart();
 			Settings::VRDirectGpuOnly.needs_restart();
+			Settings::VRDisableDesktopDuplication.needs_restart();
 			Settings::VRTargetRefreshRateHz.needs_restart();
 			Settings::VRFrameCadenceMode.needs_restart();
 			Settings::VRFrameCadenceTargetHz.needs_restart();

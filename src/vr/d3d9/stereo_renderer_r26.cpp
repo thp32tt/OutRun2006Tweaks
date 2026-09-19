@@ -270,7 +270,8 @@ namespace OutRunVRStereo
         }
 
         bool R27ShouldBypassLegacyZeroDisparity(
-            IDirect3DDevice9* device) noexcept
+            IDirect3DDevice9* device,
+            const R13EffectSnapshot& effect) noexcept
         {
             if (!IsGameDevice(device) || InternalStereoPass ||
                 !TargetIsBackBuffer() || !StereoWanted() || !R9StereoSeeded)
@@ -279,18 +280,12 @@ namespace OutRunVRStereo
                 OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire) ||
                 ActiveOcclusionQueries.load(std::memory_order_acquire) > 0)
                 return false;
-            if (!R13DrawTimeFragileEffectNeedsZeroDisparity(device))
+            if (effect.classification != R13EffectClass::Flat ||
+                !effect.zKnown || !effect.zEnabled)
                 return false;
 
-            // R36: verified WVP alone is not enough to promote screen overlays.
-            // White position/rank glyphs and lens-player flare passes are
-            // depth-disabled but can inherit the last perspective WVP. Keep
-            // those zero-disparity; depth-tested smoke/skid/decal passes remain
-            // eligible for spatial stereo.
-            DWORD zEnable = D3DZB_FALSE;
-            if (FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable)) ||
-                zEnable == D3DZB_FALSE)
-                return false;
+            // Only a positively classified depth-tested fragile effect can
+            // bypass legacy zero-disparity for spatial smoke/skid/decal draws.
 
             // StateBlock::Apply can bypass tracked setters. Resynchronize live
             // viewport/scissor at least once per Present and periodically during
@@ -310,38 +305,34 @@ namespace OutRunVRStereo
         }
 
         bool R37DepthDisabledFragileOverlay(
-            IDirect3DDevice9* device) noexcept
+            const R13EffectSnapshot& effect) noexcept
         {
-            if (!device ||
-                !R13DrawTimeFragileEffectNeedsZeroDisparity(device))
+            if (effect.classification == R13EffectClass::World)
                 return false;
-            DWORD zEnable = D3DZB_TRUE;
-            return SUCCEEDED(device->GetRenderState(
-                       D3DRS_ZENABLE, &zEnable)) &&
-                zEnable == D3DZB_FALSE;
+            return !effect.zKnown || !effect.zEnabled;
         }
 
         template <typename R9Draw, typename LegacyR13Draw>
         HRESULT R27GuardWorldEffect(IDirect3DDevice9* device,
             R9Draw&& r9Draw, LegacyR13Draw&& legacyR13Draw)
         {
-            // R37 screen-space veto must run before R28's verified-WVP rebind.
-            // Rank/lens overlays can inherit a valid perspective WVP from the
-            // preceding world pass; allowing the rebind first turns them into
-            // duplicated spatial geometry.
-            if (R37DepthDisabledFragileOverlay(device))
+            const R13EffectSnapshot effect = R13CaptureDrawTimeEffect(device);
+            auto legacyWithSnapshot = [&]() {
+                R13EffectOverrideScope reuse(effect);
                 return legacyR13Draw();
+            };
 
-            // First recover ordinary perspective world draws that only lost the
-            // upload-time shader epoch. This is deliberately stricter than the
-            // old NonWorld fallback: the WVP, projection and pose must all match.
+            // Screen-space veto runs before R28; unknown state fails closed.
+            if (R37DepthDisabledFragileOverlay(effect))
+                return legacyWithSnapshot();
+
             const HRESULT rebound = R28RunWithVerifiedWorldEpoch(
                 device, std::forward<R9Draw>(r9Draw));
             if (rebound != E_NOTIMPL)
                 return rebound;
 
-            if (!R27ShouldBypassLegacyZeroDisparity(device))
-                return legacyR13Draw();
+            if (!R27ShouldBypassLegacyZeroDisparity(device, effect))
+                return legacyWithSnapshot();
 
             ++R27WorldEffectDraws;
             if (!R27FirstWorldEffectLogged)
@@ -532,7 +523,10 @@ namespace OutRunVRStereo
                         R26TrackedOcclusionSingleExec, R26OcclusionWriteRejects);
                     R27PerfLastLogMs = now;
                     R27PerfLastDrawSerial = R23GameDrawSerial;
-                    R27PerfLastPresentSamples = R27PresentSamples;
+                    R27PresentTotalMs = 0.0;
+                    R27PresentMaxMs = 0.0;
+                    R27PresentSamples = 0;
+                    R27PerfLastPresentSamples = 0;
                 }
             }
             return hr;

@@ -38,6 +38,39 @@ namespace OutRunVRStereo
         bool R13FirstDrawTimeZeroDisparityLogged = false;
         bool R13FirstDrawTimeStateReadFailureLogged = false;
 
+        enum class R13EffectClass : std::uint8_t
+        {
+            Unknown,
+            World,
+            Flat
+        };
+        struct R13EffectSnapshot
+        {
+            R13EffectClass classification = R13EffectClass::Unknown;
+            bool zKnown = false;
+            bool zEnabled = false;
+        };
+        thread_local bool R13EffectOverrideActive = false;
+        thread_local R13EffectSnapshot R13EffectOverride{};
+        struct R13EffectOverrideScope
+        {
+            bool previousActive = false;
+            R13EffectSnapshot previous{};
+            explicit R13EffectOverrideScope(
+                const R13EffectSnapshot& snapshot) noexcept
+                : previousActive(R13EffectOverrideActive),
+                  previous(R13EffectOverride)
+            {
+                R13EffectOverride = snapshot;
+                R13EffectOverrideActive = true;
+            }
+            ~R13EffectOverrideScope()
+            {
+                R13EffectOverride = previous;
+                R13EffectOverrideActive = previousActive;
+            }
+        };
+
         HANDLE R13AckMapping = nullptr;
         const OutRunVR::R13::DirectGpuAckState* R13AckState = nullptr;
 
@@ -276,11 +309,14 @@ namespace OutRunVRStereo
             return drawHr;
         }
 
-        bool R13DrawTimeFragileEffectNeedsZeroDisparity(
+        R13EffectSnapshot R13CaptureDrawTimeEffect(
             IDirect3DDevice9* device) noexcept
         {
+            if (R13EffectOverrideActive)
+                return R13EffectOverride;
+            R13EffectSnapshot snapshot{};
             if (!device)
-                return false;
+                return snapshot;
 
             DWORD alphaBlend = FALSE;
             DWORD alphaTest = FALSE;
@@ -297,18 +333,30 @@ namespace OutRunVRStereo
                 {
                     R13FirstDrawTimeStateReadFailureLogged = true;
                     spdlog::warn(
-                        "VR R13 effect policy: draw-time render-state snapshot unavailable; retaining normal stereo classification");
+                        "VR R13 effect policy: draw-time render-state snapshot unavailable; failing closed to zero-disparity");
                 }
-                return false;
+                return snapshot;
             }
 
+            snapshot.zKnown = true;
+            snapshot.zEnabled = zEnable != D3DZB_FALSE;
             const auto policy = OutRunVR::PassPolicy::ClassifyEffectStereo(
                 alphaBlend != FALSE,
                 alphaTest != FALSE,
                 zWrite != FALSE,
-                zEnable != D3DZB_FALSE,
+                snapshot.zEnabled,
                 cullMode == D3DCULL_NONE);
-            return !OutRunVR::PassPolicy::AllowsEffectWorldStereo(policy);
+            snapshot.classification =
+                OutRunVR::PassPolicy::AllowsEffectWorldStereo(policy)
+                ? R13EffectClass::World : R13EffectClass::Flat;
+            return snapshot;
+        }
+
+        bool R13DrawTimeFragileEffectNeedsZeroDisparity(
+            IDirect3DDevice9* device) noexcept
+        {
+            return R13CaptureDrawTimeEffect(device).classification !=
+                R13EffectClass::World;
         }
 
         template <typename LegacyDraw>

@@ -761,9 +761,10 @@ namespace
     CaptureStatus R23Capture(StereoCompositor& c, DWORD timeoutMs = 0,
         bool allowInitialWarmupWait = true)
     {
-        // R37 direct-only must never lazily recreate Desktop Duplication through
-        // the R23 production capture path.
-        if (c.directTransportOnly_)
+        // DirectGpuOnly is a gameplay source policy. Menus still need their
+        // mono theater source; only explicit diagnostic isolation disables
+        // Desktop Duplication globally.
+        if (c.disableDesktopDuplication_)
             return {};
         R23Pixels.TryConsume(c.context_);
         if (!IsWindow(c.hwnd_))
@@ -1753,6 +1754,7 @@ int main(int argc, char** argv)
         const bool directTransportEnabled = DirectTransportEnabled();
         const bool directTransportOnly =
             directTransportEnabled && DirectTransportOnly();
+        const bool disableDesktopDuplication = DisableDesktopDuplication();
         const float targetRefreshRateHz = RequestedRefreshRateHz();
         const int cadenceMode = std::clamp(
             R35ReadEnvInt("OUTRUN_VR_CADENCE_MODE", 1), 0, 2);
@@ -1879,7 +1881,8 @@ int main(int argc, char** argv)
             cadenceMaxHz, cadenceTimeoutMs, targetRefreshRateHz);
         RenderFrameReader renderFrames;
         StereoCompositor compositor(session, d3d.device, d3d.context, gameWindow,
-            configs, directTransportEnabled, directTransportOnly, renderScale);
+            configs, directTransportEnabled, directTransportOnly,
+            disableDesktopDuplication, renderScale);
         compositor.Initialize();
         ViewHistory viewHistory;
         HostTimings timings;
