@@ -344,8 +344,8 @@ namespace OutRunVRStereo
             if (rebound != E_NOTIMPL)
                 return rebound;
 
-            // Unknown depth-disabled alpha work still fails closed. Only the
-            // verified-world path above may bypass this screen-space veto.
+            // Screen-space veto remains conservative: unknown state fails closed.
+            // Only the positively verified-world path above may bypass it.
             if (R37DepthDisabledFragileOverlay(effect))
                 return legacyWithSnapshot();
 
