@@ -761,6 +761,10 @@ namespace
     CaptureStatus R23Capture(StereoCompositor& c, DWORD timeoutMs = 0,
         bool allowInitialWarmupWait = true)
     {
+        // R37 direct-only must never lazily recreate Desktop Duplication through
+        // the R23 production capture path.
+        if (c.directTransportOnly_)
+            return {};
         R23Pixels.TryConsume(c.context_);
         if (!IsWindow(c.hwnd_))
             if (HWND replacement = FindGameWindow(c.gamePid_))
