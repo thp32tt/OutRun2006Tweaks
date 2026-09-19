@@ -75,7 +75,10 @@ namespace
     constexpr ULONGLONG R23PresentationDebounceMs = 750;
     constexpr ULONGLONG R23CachedProjectionLogIntervalMs = 5000;
     std::uint64_t R23CachedProjectionSubmits = 0;
+    std::uint64_t R42SameFrameProjectionReuses = 0;
+    std::uint64_t R42ProjectionRefreshes = 0;
     ULONGLONG R23LastCachedProjectionLogMs = 0;
+    bool R42FirstProjectionReuseLogged = false;
     std::uint64_t R23PresentationGraceFrames = 0;
     std::uint64_t R23TheaterRefreshAttempts = 0;
     std::uint64_t R23TheaterRefreshFresh = 0;
@@ -2564,17 +2567,20 @@ int main(int argc, char** argv)
 
                     LARGE_INTEGER rs{}, re{}; QueryPerformanceCounter(&rs);
 
-                    // R40 VDXR recovery: acquire/render/release a projection
-                    // image on every renderable XR tick while a valid stereo
-                    // source remains in grace. Reusing an old released image is
-                    // legal OpenXR, but in this VDXR run it correlated with
-                    // fallback-cached-image alternation and black flashes.
-                    // The D3D9 producer is runtime-gated separately, so this
-                    // host-side D3D11 blit can follow xrWaitFrame directly.
+                    // R42: projection pixels are refreshed only when a new game
+                    // source was committed (or when no released projection
+                    // exists yet). Intermediate xrWaitFrame ticks resubmit the
+                    // same released projection image without another pair of
+                    // full-eye blits. R32 keeps the exact producer slot protected
+                    // by the original async EVENT, so same-frame resubmission no
+                    // longer needs the expensive SafeEye recovery path.
                     const bool hadCachedProjection = cachedProjectionValid;
-                    if (grace &&
+                    const bool projectionRefreshNeeded =
+                        newStereoCommitted || !cachedProjectionValid;
+                    if (grace && projectionRefreshNeeded &&
                         R23RenderProjection(compositor, matchedViews, pv))
                     {
+                        ++R42ProjectionRefreshes;
                         projection.space = localSpace;
                         projection.viewCount = 2;
                         projection.views = pv.data();
@@ -2633,6 +2639,16 @@ int main(int argc, char** argv)
                         finalLayerKind = "projection-cached";
                         frameCachedProjection = true;
                         ++R23CachedProjectionSubmits;
+                        if (grace && !newStereoCommitted)
+                        {
+                            ++R42SameFrameProjectionReuses;
+                            if (!R42FirstProjectionReuseLogged)
+                            {
+                                R42FirstProjectionReuseLogged = true;
+                                std::cout
+                                    << "[R42 projection-reuse] unchanged game frame reuses the released projection; duplicate per-XR-tick eye blits disabled.\n";
+                            }
+                        }
 
                         if (R23LastCachedProjectionLogMs == 0 ||
                             projectionNow - R23LastCachedProjectionLogMs >=
@@ -2646,6 +2662,10 @@ int main(int argc, char** argv)
                                 << " grace=" << (grace ? 1 : 0)
                                 << " presentationGraceFrames="
                                 << R23PresentationGraceFrames
+                                << " sameFrameReuse="
+                                << R42SameFrameProjectionReuses
+                                << " sourceRefresh="
+                                << R42ProjectionRefreshes
                                 << "\n";
                         }
                     }

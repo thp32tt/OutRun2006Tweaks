@@ -31,7 +31,25 @@
 namespace OutRunVrR32DirectSubmit
 {
     inline constexpr const char* BuildId =
-        "R32-direct-single-projection-async-ack-review2-20260917";
+        "R42-direct-single-projection-ack-reuse-20260920";
+
+    enum class FastRejectReason : std::uint8_t
+    {
+        None,
+        NoEndInfo,
+        PendingRecenter,
+        PendingGameRequest,
+        NonProjectionLayer,
+        BundleNotFresh,
+        NotDirectGpu,
+        FrameIncomplete,
+        MetadataInvalid,
+        ProjectionMismatch,
+        TransportDisabled,
+        GenerationFault,
+        AckBusy,
+        Count
+    };
 
     struct PendingAck
     {
@@ -52,6 +70,9 @@ namespace OutRunVrR32DirectSubmit
     inline std::uint64_t AckSlotBusy = 0;
     inline std::uint64_t AckFlushEscalations = 0;
     inline std::uint64_t AckQueryErrors = 0;
+    inline std::uint64_t AckSameFramePendingReuse = 0;
+    inline std::array<std::uint64_t,
+        static_cast<std::size_t>(FastRejectReason::Count)> RejectReasons{};
     inline std::uint32_t AckFaultGeneration = 0;
     inline std::uint32_t ActiveAckGeneration = 0;
     inline ULONGLONG LastPerfLogMs = 0;
@@ -69,6 +90,9 @@ namespace OutRunVrR32DirectSubmit
         std::uint64_t ackSlotBusy = 0;
         std::uint64_t flushEscalations = 0;
         std::uint64_t ackQueryError = 0;
+        std::uint64_t sameFramePendingReuse = 0;
+        std::array<std::uint64_t,
+            static_cast<std::size_t>(FastRejectReason::Count)> rejectReasons{};
         std::uint64_t safeCacheHit = 0;
         std::uint64_t safeCacheMiss = 0;
         std::uint64_t safeSwap = 0;
@@ -93,6 +117,8 @@ namespace OutRunVrR32DirectSubmit
         AckedGeneration.fill(0);
         AckFaultGeneration = 0;
         ActiveAckGeneration = 0;
+        AckSameFramePendingReuse = 0;
+        RejectReasons.fill(0);
     }
 
     inline void ObserveGeneration(std::uint32_t generation) noexcept
@@ -212,6 +238,19 @@ namespace OutRunVrR32DirectSubmit
         }
 
         auto& pending = Pending[slot];
+        if (pending.armed &&
+            pending.frame.frameId == frame.frameId &&
+            pending.frame.reserved[
+                OutRunVR::RenderFrameDirectGenerationIndex] == generation)
+        {
+            // R42: xrWaitFrame can submit the same already-rendered projection
+            // more than once before the first EVENT is observed complete. The
+            // existing EVENT already protects the only shared-source sampling
+            // commands for this producer frame, so do not demote a harmless
+            // cached projection tick into the synchronous SafeEye fallback.
+            ++AckSameFramePendingReuse;
+            return true;
+        }
         if (pending.armed)
         {
             PollCompletedAcks();
@@ -268,34 +307,41 @@ namespace OutRunVrR32DirectSubmit
 
     inline bool CanFastSubmit(
         const XrFrameEndInfo* endInfo,
-        OutRunVrR23VerifiedBundle::Snapshot& verified) noexcept
+        OutRunVrR23VerifiedBundle::Snapshot& verified,
+        FastRejectReason& reject) noexcept
     {
         using OutRunVrR23VerifiedBundle::SourceKind;
-        if (!endInfo ||
-            OutRunVrR26RecenterHardening::PendingFocusRecenter ||
-            OutRunVrR26RecenterHardening::PendingGameRequestId.load(
-                std::memory_order_acquire) != 0 ||
-            OutRunVrReviewHardening::HasIncomingNonProjectionLayer(endInfo) ||
-            !OutRunVrR23VerifiedBundle::ReadFresh(verified) ||
-            verified.kind != SourceKind::DirectGpu ||
-            !OutRunVrSbsCaptureOverride::FrameComplete(verified.frame) ||
-            !MetadataValid(verified.frame) ||
-            !OutRunVrR24BlackScreenGuard::ProjectionMatchesSnapshot(
-                endInfo, verified) ||
-            !OutRunVrR21RuntimeHardening::DirectTransportRequested())
-            return false;
+        reject = FastRejectReason::None;
+        if (!endInfo) { reject = FastRejectReason::NoEndInfo; return false; }
+        if (OutRunVrR26RecenterHardening::PendingFocusRecenter)
+        { reject = FastRejectReason::PendingRecenter; return false; }
+        if (OutRunVrR26RecenterHardening::PendingGameRequestId.load(
+                std::memory_order_acquire) != 0)
+        { reject = FastRejectReason::PendingGameRequest; return false; }
+        if (OutRunVrReviewHardening::HasIncomingNonProjectionLayer(endInfo))
+        { reject = FastRejectReason::NonProjectionLayer; return false; }
+        if (!OutRunVrR23VerifiedBundle::ReadFresh(verified))
+        { reject = FastRejectReason::BundleNotFresh; return false; }
+        if (verified.kind != SourceKind::DirectGpu)
+        { reject = FastRejectReason::NotDirectGpu; return false; }
+        if (!OutRunVrSbsCaptureOverride::FrameComplete(verified.frame))
+        { reject = FastRejectReason::FrameIncomplete; return false; }
+        if (!MetadataValid(verified.frame))
+        { reject = FastRejectReason::MetadataInvalid; return false; }
+        if (!OutRunVrR24BlackScreenGuard::ProjectionMatchesSnapshot(
+                endInfo, verified))
+        { reject = FastRejectReason::ProjectionMismatch; return false; }
+        if (!OutRunVrR21RuntimeHardening::DirectTransportRequested())
+        { reject = FastRejectReason::TransportDisabled; return false; }
 
         const std::uint32_t generation =
             verified.frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
         if (generation != 0 && AckFaultGeneration == generation)
-            return false;
+        { reject = FastRejectReason::GenerationFault; return false; }
 
-        // main_r23 has already staged this exact immutable slot, rendered it
-        // into the projection swapchain and published the verified bundle.
-        // The producer cannot reuse that slot until ArmConsumptionFence()
-        // completes and publishes its per-slot GPU ACK. Requiring the frame to
-        // still be the ring's global "latest" here races the producer and was
-        // demoting every valid projection-fresh frame to fallback-cached-image.
+        // main_r23 has already staged this exact immutable slot and rendered the
+        // verified projection. R42 permits repeated submission of that same
+        // projection while its original async EVENT is still pending.
         return true;
     }
 
@@ -309,6 +355,8 @@ namespace OutRunVrR32DirectSubmit
         Perf.ackSlotBusy = AckSlotBusy;
         Perf.flushEscalations = AckFlushEscalations;
         Perf.ackQueryError = AckQueryErrors;
+        Perf.sameFramePendingReuse = AckSameFramePendingReuse;
+        Perf.rejectReasons = RejectReasons;
         Perf.safeCacheHit = OutRunVrD3D9ExDirectPassthrough::R32SharedCacheHits;
         Perf.safeCacheMiss = OutRunVrD3D9ExDirectPassthrough::R32SharedCacheMisses;
         Perf.safeSwap = OutRunVrD3D9ExDirectPassthrough::R32SafeSwaps;
@@ -336,6 +384,29 @@ namespace OutRunVrR32DirectSubmit
             << " ackSlotBusy=" << AckSlotBusy - Perf.ackSlotBusy
             << " deferredFlush=" << AckFlushEscalations - Perf.flushEscalations
             << " ackQueryError=" << AckQueryErrors - Perf.ackQueryError
+            << " sameFrameAckReuse="
+            << AckSameFramePendingReuse - Perf.sameFramePendingReuse
+            << " rejectReason[projection="
+            << RejectReasons[static_cast<std::size_t>(
+                FastRejectReason::ProjectionMismatch)] -
+               Perf.rejectReasons[static_cast<std::size_t>(
+                FastRejectReason::ProjectionMismatch)]
+            << ",ackBusy="
+            << RejectReasons[static_cast<std::size_t>(
+                FastRejectReason::AckBusy)] -
+               Perf.rejectReasons[static_cast<std::size_t>(
+                FastRejectReason::AckBusy)]
+            << ",bundle="
+            << RejectReasons[static_cast<std::size_t>(
+                FastRejectReason::BundleNotFresh)] -
+               Perf.rejectReasons[static_cast<std::size_t>(
+                FastRejectReason::BundleNotFresh)]
+            << ",recenter="
+            << RejectReasons[static_cast<std::size_t>(
+                FastRejectReason::PendingRecenter)] -
+               Perf.rejectReasons[static_cast<std::size_t>(
+                FastRejectReason::PendingRecenter)]
+            << "]"
             << " safeCacheHit="
             << OutRunVrD3D9ExDirectPassthrough::R32SharedCacheHits - Perf.safeCacheHit
             << " safeCacheMiss="
@@ -365,8 +436,11 @@ namespace OutRunVrR32DirectSubmit
         PollCompletedAcks();
 
         OutRunVrR23VerifiedBundle::Snapshot verified{};
-        if (CanFastSubmit(endInfo, verified) &&
-            ArmConsumptionFence(verified.frame))
+        FastRejectReason reject = FastRejectReason::None;
+        const bool fastEligible = CanFastSubmit(endInfo, verified, reject);
+        const bool ackReady =
+            fastEligible && ArmConsumptionFence(verified.frame);
+        if (fastEligible && ackReady)
         {
             const XrResult result =
                 OutRunVrFinalTest::EndFrame(session, endInfo);
@@ -379,15 +453,22 @@ namespace OutRunVrR32DirectSubmit
             {
                 FirstFastSubmitLogged = true;
                 std::cerr
-                    << "[R32 direct] verified incoming DirectGPU projection submitted once; rendered projection is presentation-authoritative while its exact producer slot stays protected by asynchronous GPU ACK; redundant SafeEye copy + second projection removed build="
+                    << "[R32 direct] verified incoming DirectGPU projection submitted once; rendered projection is presentation-authoritative while its exact producer slot stays protected by asynchronous GPU ACK; redundant SafeEye copy + second projection removed; R42 same-frame pending EVENT reuse prevents cached XR ticks from entering SafeEye fallback build="
                     << BuildId << "\n";
             }
             MaybeLogPerf();
             return result;
         }
 
-        if (verified.kind == OutRunVrR23VerifiedBundle::SourceKind::DirectGpu)
+        if (fastEligible && !ackReady)
+            reject = FastRejectReason::AckBusy;
+        if (reject != FastRejectReason::None)
+        {
             ++FastDirectRejects;
+            const auto index = static_cast<std::size_t>(reject);
+            if (index < RejectReasons.size())
+                ++RejectReasons[index];
+        }
         const XrResult result =
             OutRunVrR26RecenterHardening::EndFrame(session, endInfo);
         MaybeLogPerf();
