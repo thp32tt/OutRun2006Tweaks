@@ -275,6 +275,17 @@ namespace
     R23DirectHoldState R23DirectHold{};
     bool R23FirstDirectHoldLogged = false;
     bool R36FirstDirectBootstrapLogged = false;
+    std::array<std::uint32_t, OutRunVR::RenderFrameRingSize>
+        R37BootstrapSubmittedFrame{};
+    std::array<std::uint32_t, OutRunVR::RenderFrameRingSize>
+        R37BootstrapSubmittedGeneration{};
+
+    bool R37FrameIdBefore(
+        std::uint32_t candidate, std::uint32_t reference) noexcept
+    {
+        return candidate != reference &&
+            static_cast<std::int32_t>(candidate - reference) < 0;
+    }
 
     void R23ReleaseDirectHoldResources() noexcept
     {
@@ -1864,7 +1875,7 @@ int main(int argc, char** argv)
             cadenceMaxHz, cadenceTimeoutMs, targetRefreshRateHz);
         RenderFrameReader renderFrames;
         StereoCompositor compositor(session, d3d.device, d3d.context, gameWindow,
-            configs, directTransportEnabled, renderScale);
+            configs, directTransportEnabled, directTransportOnly, renderScale);
         compositor.Initialize();
         ViewHistory viewHistory;
         HostTimings timings;
@@ -2092,47 +2103,65 @@ int main(int argc, char** argv)
                     OutRunVR::SharedRenderFrameState before{};
                     bool have = renderFrames.Read(before);
 
-                    // R36 DirectGPU bootstrap: direct-only testing must not depend
-                    // on the latest ring entry also being a DirectGPU entry. Scan
-                    // the bounded history for the newest completed, unconsumed
-                    // direct frame so the initial 4-slot ring can be ACKed before
-                    // producer backpressure forces the game to wait.
+                    // R37 DirectGPU bootstrap: consume every occupied producer
+                    // slot once per transport generation before waiting for a
+                    // newer frame. Choosing only the newest frame can oscillate
+                    // 4->3->4->3 and leave slots 0/1 permanently un-ACKed.
                     if (directTransportOnly)
                     {
                         std::array<OutRunVR::SharedRenderFrameState,
                             OutRunVR::RenderFrameRingSize> history{};
                         std::size_t historyCount = 0;
-                        OutRunVR::SharedRenderFrameState newestDirect{};
+                        OutRunVR::SharedRenderFrameState selectedDirect{};
                         bool foundDirect = false;
                         if (renderFrames.ReadHistory(history, historyCount))
                         {
                             for (std::size_t i = 0; i < historyCount; ++i)
                             {
                                 const auto& frame = history[i];
+                                const std::uint32_t slot =
+                                    frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+                                const std::uint32_t generation =
+                                    frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
                                 if (!frame.frameId ||
                                     frame.frameId == lastProcessedStereoFrame ||
                                     frame.state != OutRunVR::StereoSbsActive ||
                                     (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
-                                    (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0)
+                                    (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
+                                    slot >= OutRunVR::RenderFrameRingSize ||
+                                    generation == 0)
                                     continue;
-                                if (!foundDirect || frame.frameId > newestDirect.frameId)
+
+                                const bool alreadySubmitted =
+                                    R37BootstrapSubmittedGeneration[slot] == generation &&
+                                    R37BootstrapSubmittedFrame[slot] == frame.frameId;
+                                if (alreadySubmitted)
+                                    continue;
+
+                                if (!foundDirect ||
+                                    R37FrameIdBefore(
+                                        frame.frameId, selectedDirect.frameId))
                                 {
-                                    newestDirect = frame;
+                                    selectedDirect = frame;
                                     foundDirect = true;
                                 }
                             }
                         }
                         if (foundDirect)
                         {
-                            before = newestDirect;
+                            before = selectedDirect;
                             have = true;
                             if (!R36FirstDirectBootstrapLogged)
                             {
                                 R36FirstDirectBootstrapLogged = true;
                                 std::cout
-                                    << "[R36] DirectGPU bootstrap recovered newest completed ring frame="
+                                    << "[R37] DirectGPU bootstrap consumes oldest unseen slot frame first; frame="
                                     << before.frameId
-                                    << "; classic/Desktop Duplication is not allowed to hide initial ACK progress.\n";
+                                    << " slot="
+                                    << before.reserved[OutRunVR::RenderFrameDirectSlotIndex]
+                                    << " generation="
+                                    << before.reserved[OutRunVR::RenderFrameDirectGenerationIndex]
+                                    << ".\n";
                             }
                         }
                     }
@@ -2379,6 +2408,24 @@ int main(int argc, char** argv)
                                 pendingBundleFrame,
                                 pendingBundleSource,
                                 pendingBundleCaptureQpc);
+                            if (pendingBundleSource ==
+                                OutRunVrR23VerifiedBundle::SourceKind::DirectGpu)
+                            {
+                                const std::uint32_t slot =
+                                    pendingBundleFrame.reserved[
+                                        OutRunVR::RenderFrameDirectSlotIndex];
+                                const std::uint32_t generation =
+                                    pendingBundleFrame.reserved[
+                                        OutRunVR::RenderFrameDirectGenerationIndex];
+                                if (slot < OutRunVR::RenderFrameRingSize &&
+                                    generation != 0)
+                                {
+                                    R37BootstrapSubmittedFrame[slot] =
+                                        pendingBundleFrame.frameId;
+                                    R37BootstrapSubmittedGeneration[slot] =
+                                        generation;
+                                }
+                            }
                             lastProcessedStereoFrame =
                                 pendingBundleFrame.frameId;
                             lastStereoMatchMs = projectionNow;
