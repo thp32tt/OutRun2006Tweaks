@@ -993,9 +993,11 @@ namespace
     {
     public:
         StereoCompositor(XrSession session, ID3D11Device* device, ID3D11DeviceContext* context,
-            HWND hwnd, const std::array<XrViewConfigurationView, 2>& configs, bool directTransportEnabled, float renderScale)
+            HWND hwnd, const std::array<XrViewConfigurationView, 2>& configs,
+            bool directTransportEnabled, bool directTransportOnly, float renderScale)
             : session_(session), device_(device), context_(context), hwnd_(hwnd), configs_(configs),
-              directTransportEnabled_(directTransportEnabled), renderScale_(renderScale)
+              directTransportEnabled_(directTransportEnabled),
+              directTransportOnly_(directTransportOnly), renderScale_(renderScale)
         {
             device_->AddRef();
             context_->AddRef();
@@ -1031,7 +1033,10 @@ namespace
 
         bool Initialize()
         {
-            if(!BindCaptureOutput(true))throw std::runtime_error("failed to bind game capture output");
+            // R37: direct-only is a real transport-isolation mode. Do not
+            // create IDXGIOutputDuplication while measuring DirectGPU cadence.
+            if (!directTransportOnly_ && !BindCaptureOutput(true))
+                throw std::runtime_error("failed to bind game capture output");
             CreateShaders();
             ChooseSwapchainFormat();
             CreateProjectionSwapchain();
@@ -1041,12 +1046,16 @@ namespace
                 << std::max(configs_[0].recommendedImageRectHeight, configs_[1].recommendedImageRectHeight)
                 << " per eye; projection " << projection_.width << "x" << projection_.height << "x2 (scale=" << renderScale_
                 << "); theater " << theater_.width << "x" << theater_.height
-                << "; directGPU=" << (directTransportEnabled_ ? "enabled" : "disabled") << ".\n";
+                << "; directGPU=" << (directTransportEnabled_ ? "enabled" : "disabled")
+                << "; desktopDuplication=" << (directTransportOnly_ ? "disabled-direct-only" : "enabled")
+                << ".\n";
             return true;
         }
 
         CaptureStatus Capture(DWORD timeoutMs=0)
         {
+            if (directTransportOnly_)
+                return {};
             if (!IsWindow(hwnd_))
             {
                 if (HWND replacement = FindGameWindow(gamePid_))
@@ -1254,7 +1263,7 @@ namespace
                     if (FAILED(device_->OpenSharedResource(handle, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&resource))) || !resource) return false;
                     const HRESULT q = resource->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void**>(texture)); resource->Release(); if (FAILED(q) || !*texture) return false;
                     D3D11_TEXTURE2D_DESC d{}; (*texture)->GetDesc(&d);
-                    if (d.Width != width || d.Height != height || d.SampleDesc.Count != 1 || (d.Format != DXGI_FORMAT_R8G8B8A8_UNORM && d.Format != DXGI_FORMAT_R10G10B10A2_UNORM && d.Format != DXGI_FORMAT_R16G16B16A16_FLOAT) || FAILED(device_->CreateShaderResourceView(*texture, nullptr, srv)) || !*srv){ReleaseCom(*texture);ReleaseCom(*srv);return false;}
+                    if (d.Width != width || d.Height != height || d.SampleDesc.Count != 1 || (d.Format != DXGI_FORMAT_B8G8R8A8_UNORM && d.Format != DXGI_FORMAT_R8G8B8A8_UNORM && d.Format != DXGI_FORMAT_R10G10B10A2_UNORM && d.Format != DXGI_FORMAT_R16G16B16A16_FLOAT) || FAILED(device_->CreateShaderResourceView(*texture, nullptr, srv)) || !*srv){ReleaseCom(*texture);ReleaseCom(*srv);return false;}
                     return true;
                 };
                 if (!openOne(leftHandleValue,&directLeft_[slot],&directLeftSrv_[slot]) || !openOne(rightHandleValue,&directRight_[slot],&directRightSrv_[slot])){ReleaseCom(directLeftSrv_[slot]);ReleaseCom(directLeft_[slot]);ReleaseCom(directRightSrv_[slot]);ReleaseCom(directRight_[slot]);directLeftHandle_[slot]=directRightHandle_[slot]=directGeneration_[slot]=0;directFormat_[slot]=DXGI_FORMAT_UNKNOWN;invalidateDirect();if(!directOpenFailureLogged_){directOpenFailureLogged_=true;std::cout<<"Direct GPU eye ring open failed; host will request SBS fallback.\n";}return false;}
@@ -1948,6 +1957,7 @@ namespace
         DXGI_FORMAT directSnapshotFormat_ = DXGI_FORMAT_UNKNOWN;
         std::uint32_t directActiveSlot_ = 0;
         bool directTransportEnabled_ = true;
+        bool directTransportOnly_ = false;
         bool directTransportReady_ = false;
         bool directFrameValid_ = false;
         bool directOpenFailureLogged_ = false;
@@ -2146,6 +2156,8 @@ int main(int argc, char** argv)
         ParseRuntimeOverride(argc, argv);
         const float renderScale = ReadRenderScale(argc, argv);
         const bool directTransportEnabled = DirectTransportEnabled();
+        const bool directTransportOnly =
+            directTransportEnabled && DirectTransportOnly();
         HWND gameWindow = WaitForGameWindow();
         DWORD gamePid = 0;
         GetWindowThreadProcessId(gameWindow, &gamePid);
@@ -2220,7 +2232,7 @@ int main(int argc, char** argv)
             "xrEnumerateViewConfigurationViews list");
         std::array<XrViewConfigurationView, 2> configs{ cv[0], cv[1] };
 
-        SharedWriter shared(req.adapterLuid);RenderFrameReader renderFrames;StereoCompositor compositor(session,d3d.device,d3d.context,gameWindow,configs,directTransportEnabled,renderScale);compositor.Initialize();ViewHistory viewHistory;HostTimings timings;
+        SharedWriter shared(req.adapterLuid);RenderFrameReader renderFrames;StereoCompositor compositor(session,d3d.device,d3d.context,gameWindow,configs,directTransportEnabled,directTransportOnly,renderScale);compositor.Initialize();ViewHistory viewHistory;HostTimings timings;
         const XrEnvironmentBlendMode blend = ChooseBlendMode(instance, system);
 
         bool running = false, quit = false, exitRequested = false;
