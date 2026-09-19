@@ -158,6 +158,8 @@ namespace OutRunVrR23RuntimeHardening
     {
         switch (static_cast<D3DFORMAT>(declared))
         {
+        case D3DFMT_A8R8G8B8:
+            return DXGI_FORMAT_B8G8R8A8_UNORM;
         case D3DFMT_A8B8G8R8:
             return DXGI_FORMAT_R8G8B8A8_UNORM;
         case D3DFMT_A2B10G10R10:
