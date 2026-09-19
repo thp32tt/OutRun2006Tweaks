@@ -1462,7 +1462,7 @@ namespace OutRunVRStereo
 			StereoInstalledDevice.store(device,std::memory_order_release);
 			StereoBaseCallbacksArmed.store(true,std::memory_order_release);
 			StereoInstallState.store(StereoInstallReady,std::memory_order_release);
-			spdlog::info("VR stereo: D3D9 full-eye renderer installed (Reset/Present/RT/Depth/Clear/Draw*/RenderState/VS/CreateQuery); R42 render-state shadow validates every 16 reads and c64 world checks use game upload shadow");
+			spdlog::info("VR stereo: D3D9 full-eye renderer installed (Reset/Present/RT/Depth/Clear/Draw*/RenderState/VS/CreateQuery); disabled-first callbacks armed atomically at the behavior boundary; R42 render-state shadow validates every 16 reads and c64 world checks use game upload shadow");
 			return true;
 		}
 
