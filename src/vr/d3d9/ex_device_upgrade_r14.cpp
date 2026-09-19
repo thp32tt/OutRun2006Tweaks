@@ -163,6 +163,12 @@ namespace OutRunVRD3D9ExUpgradeR13
         {
             IDirect3DTexture9* cpu = entry.cpu;
             entry.cpu = nullptr;
+            if (entry.shadowBytes)
+            {
+                R14ShadowBytes.fetch_sub(
+                    entry.shadowBytes, std::memory_order_acq_rel);
+                entry.shadowBytes = 0;
+            }
             entry.mode = R14ShadowMode::DirectOnly;
             entry.validMask = 0;
             entry.dirtyMask = 0;

@@ -120,6 +120,7 @@ namespace OutRunVRRenderer
 		std::atomic<bool> CadencePacingActive{false};
 		std::uint32_t CadenceAcceptedRequestId = 0;
 		std::uint32_t CadencePresentedRequestId = 0;
+		std::uint32_t CadenceTimedOutRequestId = 0;
 		std::uint32_t CadenceTimeoutCount = 0;
 		std::uint32_t CadenceLastWaitUs = 0;
 		std::int64_t CadenceAcceptedQpc = 0;
@@ -971,12 +972,19 @@ namespace OutRunVRRenderer
 
             const std::uint32_t current =
                 ActiveCadenceRequestId.load(std::memory_order_acquire);
+            if (CadenceTimedOutRequestId != 0 &&
+                host.requestId == CadenceTimedOutRequestId)
+            {
+                CadencePacingActive.store(false, std::memory_order_release);
+                return;
+            }
             LARGE_INTEGER start{}, end{}, frequency{};
             QueryPerformanceCounter(&start);
             QueryPerformanceFrequency(&frequency);
 
             if (host.requestId && host.requestId != current)
             {
+                CadenceTimedOutRequestId = 0;
                 AcceptCadenceRequest(host.requestId, 0);
                 return;
             }
@@ -1012,6 +1020,7 @@ namespace OutRunVRRenderer
                 after.requestId != current &&
                 (after.flags & required) == required)
             {
+                CadenceTimedOutRequestId = 0;
                 AcceptCadenceRequest(after.requestId, waitUs);
                 return;
             }
@@ -1020,8 +1029,9 @@ namespace OutRunVRRenderer
             if (wait == WAIT_TIMEOUT)
             {
                 ++CadenceTimeoutCount;
+                CadenceTimedOutRequestId =
+                    current ? current : host.requestId;
                 CadencePacingActive.store(false, std::memory_order_release);
-                ActiveCadenceRequestId.store(0, std::memory_order_release);
                 PublishCadenceClient(
                     OutRunVR::CadenceV1::ClientEnabled |
                     OutRunVR::CadenceV1::ClientLastWaitTimedOut);
@@ -1621,6 +1631,7 @@ namespace OutRunVRRenderer
 		CadencePacingActive.store(false, std::memory_order_release);
 		CadenceAcceptedRequestId = 0;
 		CadencePresentedRequestId = 0;
+		CadenceTimedOutRequestId = 0;
 		PresentPoseLocked = false;
 		RestoreCullingCamera();
 		ResetFrameState();
