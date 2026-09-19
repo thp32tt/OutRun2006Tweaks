@@ -90,6 +90,10 @@ namespace OutRunVRStereo
         std::uint64_t R30Hud2DDraws = 0;
         std::uint64_t R30PerspectiveHudDraws = 0;
         std::uint64_t R30WorldBillboardDraws = 0;
+        std::uint64_t R44OverlayOwnedWvpHits = 0;
+        std::uint64_t R44OverlayOwnedWvpGroupHits = 0;
+        std::uint64_t R44SpatialBillboardClassifications = 0;
+        std::uint64_t R44FlatOverlayClassifications = 0;
         std::uint64_t R30XyzrhwRhwWorldPromotions = 0;
         std::uint64_t R30XyzrhwRhwOnlyDepthEvidence = 0;
         std::uint64_t R30XyzrhwZOnlyDepthEvidence = 0;
@@ -1109,7 +1113,7 @@ namespace OutRunVRStereo
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(
-                "VR R41: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R41: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
@@ -1123,6 +1127,9 @@ namespace OutRunVRStereo
                 R30XyzrhwBilateralFallbacks,
                 R30ScreenSpaceFovDraws, R30Hud2DDraws,
                 R30PerspectiveHudDraws, R30WorldBillboardDraws,
+                R44OverlayOwnedWvpHits, R44OverlayOwnedWvpGroupHits,
+                R44SpatialBillboardClassifications,
+                R44FlatOverlayClassifications,
                 R30SkyGlowFrames, R30SkyGlowFailures,
                 R30SkyGlow.factor, R30SkyGlow.glowWidth,
                 R30SkyGlow.glowHeight);
@@ -1272,63 +1279,96 @@ namespace OutRunVRStereo
             WorldBillboard
         };
 
-        bool R30PerspectiveAlphaLooksWorld(
-            IDirect3DDevice9* device) noexcept
+        constexpr std::uint64_t R44OverlayWvpDrawWindow = 12u;
+
+        bool R44GetOwnedRawOverlayWvp(
+            float outConstants[16], std::uint64_t* drawAge = nullptr) noexcept
         {
-            if (!device ||
+            if (!outConstants ||
                 CurrentVertexShaderIdentity.load(std::memory_order_acquire) == 0)
                 return false;
 
-            float original[16]{};
             std::uint64_t writeSerial = 0;
             std::uint64_t writeDrawSerial = 0;
             std::uintptr_t writeShader = 0;
             std::uint64_t writeShaderSerial = 0;
             std::uintptr_t currentShader = 0;
             std::uint64_t currentShaderSerial = 0;
-            if (!OutRunVRRenderer::GetLastGameWvpWrite(
-                    original, writeSerial, writeDrawSerial,
+            if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                    outConstants, writeSerial, writeDrawSerial,
                     writeShader, writeShaderSerial) ||
                 !GetCurrentShaderEpoch(currentShader, currentShaderSerial) ||
                 writeShader != currentShader ||
                 writeShaderSerial != currentShaderSerial ||
-                writeDrawSerial + 1u != R23GameDrawSerial)
+                R23GameDrawSerial <= writeDrawSerial)
                 return false;
+
+            const std::uint64_t age =
+                R23GameDrawSerial - writeDrawSerial;
+            if (age == 0 || age > R44OverlayWvpDrawWindow)
+                return false;
+
+            ++R44OverlayOwnedWvpHits;
+            if (age > 1)
+                ++R44OverlayOwnedWvpGroupHits;
+            if (drawAge)
+                *drawAge = age;
+            return true;
+        }
+
+        enum class R44OverlayMatrixKind : std::uint8_t
+        {
+            Unknown,
+            FlatHud,
+            SpatialBillboard
+        };
+
+        R44OverlayMatrixKind R44ClassifyOwnedOverlayMatrix(
+            float rawWvp[16]) noexcept
+        {
+            if (!rawWvp)
+                return R44OverlayMatrixKind::Unknown;
 
             float projectionRaw[16]{};
             if (!OutRunVRRenderer::GetRendererBaseProjection(projectionRaw))
-                return false;
+                return R44OverlayMatrixKind::Unknown;
 
             D3DMATRIX uploadedT{};
             D3DMATRIX baseProjection{};
             D3DMATRIX inverseProjection{};
-            std::memcpy(&uploadedT, original, sizeof(uploadedT));
+            std::memcpy(&uploadedT, rawWvp, sizeof(uploadedT));
             std::memcpy(&baseProjection, projectionRaw, sizeof(baseProjection));
             const D3DMATRIX stockWvp = TransposeMatrix(uploadedT);
             if (!MatrixFinite(stockWvp) || !MatrixFinite(baseProjection) ||
                 !InvertMatrix(baseProjection, inverseProjection))
-                return false;
+                return R44OverlayMatrixKind::Unknown;
 
             const D3DMATRIX worldView =
                 MultiplyMatrix(stockWvp, inverseProjection);
             if (!MatrixFinite(worldView))
-                return false;
+                return R44OverlayMatrixKind::Unknown;
 
-            // A real billboard still has an affine world/view matrix after the
-            // perspective projection is removed. Screen/HUD sprites pushed
-            // through a perspective shader do not. The translation depth then
-            // distinguishes a spatial marker above another car from near-plane
-            // HUD such as the large 6th/6 indicator.
             const float affineError =
                 std::fabs(worldView._14) + std::fabs(worldView._24) +
                 std::fabs(worldView._34) + std::fabs(worldView._44 - 1.0f);
             const float viewDepth = std::fabs(worldView._43);
             const float clipW =
                 worldView._43 * baseProjection._34 + baseProjection._44;
-            return std::isfinite(affineError) && affineError <= 0.02f &&
-                std::isfinite(viewDepth) && std::isfinite(clipW) &&
-                clipW > 0.05f &&
-                viewDepth >= 1.25f && viewDepth < 1000000.0f;
+            if (!std::isfinite(affineError) || !std::isfinite(viewDepth) ||
+                !std::isfinite(clipW) || clipW <= 0.05f)
+                return R44OverlayMatrixKind::Unknown;
+
+            // R44: OutRun often uploads one c64 then emits several glyph/sprite
+            // draws with the same shader. A spatial vehicle marker remains an
+            // affine WorldView at real scene depth. Results/time-record text is
+            // a near/screen overlay and must converge on the HUD plane instead
+            // of falling through to R13 zero-disparity replay.
+            if (affineError <= 0.02f &&
+                viewDepth >= 1.25f && viewDepth < 1000000.0f)
+                return R44OverlayMatrixKind::SpatialBillboard;
+            if (viewDepth < 1.25f || affineError > 0.02f)
+                return R44OverlayMatrixKind::FlatHud;
+            return R44OverlayMatrixKind::Unknown;
         }
 
         R30ScreenSpaceKind R30ClassifyScreenSpacePass(
@@ -1362,13 +1402,17 @@ namespace OutRunVRStereo
                 return R30ScreenSpaceKind::None;
 
             DWORD zEnable = D3DZB_TRUE;
+            DWORD zWrite = TRUE;
             DWORD alphaBlend = FALSE;
             DWORD alphaTest = FALSE;
+            DWORD cullMode = D3DCULL_CCW;
             if (!ReadTrackedRenderState(device, D3DRS_ZENABLE, zEnable) ||
+                !ReadTrackedRenderState(device, D3DRS_ZWRITEENABLE, zWrite) ||
                 !ReadTrackedRenderState(
                     device, D3DRS_ALPHABLENDENABLE, alphaBlend) ||
                 !ReadTrackedRenderState(
-                    device, D3DRS_ALPHATESTENABLE, alphaTest))
+                    device, D3DRS_ALPHATESTENABLE, alphaTest) ||
+                !ReadTrackedRenderState(device, D3DRS_CULLMODE, cullMode))
                 return R30ScreenSpaceKind::None;
 
             const bool alphaLike =
@@ -1376,17 +1420,41 @@ namespace OutRunVRStereo
             if (!alphaLike)
                 return R30ScreenSpaceKind::None;
 
-            // R41: positive spatial evidence outranks ZENABLE. The opponent
-            // rank sprites and lens-player/billboard effects can be depth-disabled
-            // (or inherit a stale Z state) even though their c64 matrix still
-            // contains a real affine WorldView at vehicle/world depth. Catch
-            // those here before R13 masks the shader identity and duplicates the
-            // draw zero-disparity with stock WVP.
-            if (R30PerspectiveAlphaLooksWorld(device))
-                return R30ScreenSpaceKind::WorldBillboard;
+            float rawOwnedWvp[16]{};
+            const bool haveOwnedWvp =
+                R44GetOwnedRawOverlayWvp(rawOwnedWvp);
+            if (haveOwnedWvp)
+            {
+                const auto matrixKind =
+                    R44ClassifyOwnedOverlayMatrix(rawOwnedWvp);
+                if (matrixKind == R44OverlayMatrixKind::SpatialBillboard)
+                {
+                    ++R44SpatialBillboardClassifications;
+                    return R30ScreenSpaceKind::WorldBillboard;
+                }
+                if (matrixKind == R44OverlayMatrixKind::FlatHud)
+                {
+                    ++R44FlatOverlayClassifications;
+                    return R30ScreenSpaceKind::PerspectiveHud;
+                }
+            }
 
-            // A depth-tested alpha draw without positive spatial evidence stays
-            // fail-closed instead of being mistaken for cockpit HUD.
+            // Keep R13's fragile-effect shape as an explicit fallback signal.
+            // If the matrix owner is unavailable, depth-disabled/two-sided alpha
+            // is still a flat overlay. Routing it through the finite HUD plane
+            // prevents two visible zero-disparity copies for result text while
+            // preserving depth-tested unknown effects fail-closed.
+            const bool r13FlatEffectShape =
+                cullMode == D3DCULL_NONE &&
+                zEnable == D3DZB_FALSE &&
+                ((alphaBlend != FALSE && zWrite == FALSE) ||
+                 alphaTest != FALSE);
+            if (r13FlatEffectShape)
+            {
+                ++R44FlatOverlayClassifications;
+                return R30ScreenSpaceKind::PerspectiveHud;
+            }
+
             if (zEnable != D3DZB_FALSE)
                 return R30ScreenSpaceKind::None;
             return R30ScreenSpaceKind::PerspectiveHud;
@@ -2953,23 +3021,24 @@ namespace OutRunVRStereo
                 CurrentVertexShaderIdentity.load(std::memory_order_acquire) == 0)
                 return false;
 
-            if (screenKind == R30ScreenSpaceKind::PerspectiveHud)
+            if (screenKind == R30ScreenSpaceKind::PerspectiveHud ||
+                screenKind == R30ScreenSpaceKind::WorldBillboard)
             {
-                std::uint64_t writeSerial = 0;
-                std::uint64_t writeDrawSerial = 0;
-                std::uintptr_t writeShader = 0;
-                std::uint64_t writeShaderSerial = 0;
-                std::uintptr_t currentShader = 0;
-                std::uint64_t currentShaderSerial = 0;
-                if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
-                        original, writeSerial, writeDrawSerial,
-                        writeShader, writeShaderSerial) ||
-                    !GetCurrentShaderEpoch(
-                        currentShader, currentShaderSerial) ||
-                    writeShader != currentShader ||
-                    writeShaderSerial != currentShaderSerial ||
-                    writeDrawSerial + 1u != R23GameDrawSerial)
-                    return false;
+                // R44: glyph/billboard batches commonly reuse one game c64 for
+                // several consecutive draws. Use the original game upload, not
+                // a live register that may already contain our head correction.
+                if (!R44GetOwnedRawOverlayWvp(original))
+                {
+                    // Some flat result overlays never refresh c64 in the short
+                    // ownership window. They are safe only as PerspectiveHud;
+                    // preserve the old live fallback for those, but never for a
+                    // spatial billboard.
+                    if (screenKind == R30ScreenSpaceKind::WorldBillboard ||
+                        FAILED(device->GetVertexShaderConstantF(
+                            OutRunWvpRegister, original,
+                            OutRunWvpRegisterCount)))
+                        return false;
+                }
             }
             else if (FAILED(device->GetVertexShaderConstantF(
                     OutRunWvpRegister, original, OutRunWvpRegisterCount)))
@@ -3303,14 +3372,14 @@ namespace OutRunVRStereo
             {
                 R30FirstFlatPerspectiveLogged = true;
                 spdlog::info(
-                    "VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay is world-locked on a finite virtual plane; R41 spatial vehicle/rank/lens billboards rebuild stock WorldView with head+eye transform");
+                    "VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay is world-locked on a finite virtual plane; R41 spatial vehicle/rank/lens billboards rebuild stock WorldView with head+eye transform; R44 c64 batch ownership keeps multi-draw vehicle ranks spatial");
             }
             if (screenKind == R30ScreenSpaceKind::PerspectiveHud &&
                 !R30FirstPerspectiveHudLogged)
             {
                 R30FirstPerspectiveHudLogged = true;
                 spdlog::info(
-                    "VR R43 PERSPECTIVE HUD: near-plane alpha UI including 6th/6 uses the raw game c64 before stereo head correction, then uniform HudScale on the world-locked finite HUD plane");
+                    "VR R43 PERSPECTIVE HUD: near-plane alpha UI including 6th/6 uses the raw game c64 before stereo head correction, then uniform HudScale on the world-locked finite HUD plane; R44 result/time-record multi-draw overlays bypass R13 zero-disparity");
             }
 
             if (FAILED(rightHr))
