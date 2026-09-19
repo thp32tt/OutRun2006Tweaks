@@ -161,6 +161,13 @@ namespace OutRunVRRenderer
 		std::uintptr_t LastVerifiedShaderIdentity = 0;
 		std::uint64_t LastVerifiedShaderSerial = 0;
 
+		float LastGameWvpWrite[16]{};
+		bool LastGameWvpWriteValid = false;
+		std::uint64_t LastGameWvpWriteSerial = 0;
+		std::uint64_t LastGameWvpTopLevelDrawSerial = 0;
+		std::uintptr_t LastGameWvpShaderIdentity = 0;
+		std::uint64_t LastGameWvpShaderSerial = 0;
+
 		D3DVECTOR CullingCameraSavedPos{};
 		D3DVECTOR CullingCameraSavedLook{};
 		EvWorkCamera* CullingCameraObject = nullptr;
@@ -1433,6 +1440,38 @@ namespace OutRunVRRenderer
 			LastVerifiedShaderSerial = 0;
 		}
 
+		void InvalidateGameWvpWrite() noexcept
+		{
+			LastGameWvpWriteValid = false;
+			LastGameWvpTopLevelDrawSerial = 0;
+			LastGameWvpShaderIdentity = 0;
+			LastGameWvpShaderSerial = 0;
+		}
+
+		void RecordGameWvpWrite(const float* constants) noexcept
+		{
+			if (!constants)
+			{
+				InvalidateGameWvpWrite();
+				return;
+			}
+			std::uintptr_t shaderIdentity = 0;
+			std::uint64_t shaderSerial = 0;
+			if (!OutRunVRStereo::GetCurrentShaderEpoch(shaderIdentity, shaderSerial) ||
+				shaderIdentity == 0 || shaderSerial == 0)
+			{
+				InvalidateGameWvpWrite();
+				return;
+			}
+			std::memcpy(LastGameWvpWrite, constants, sizeof(LastGameWvpWrite));
+			if (++LastGameWvpWriteSerial == 0)
+				++LastGameWvpWriteSerial;
+			LastGameWvpTopLevelDrawSerial = OutRunVRStereo::GetTopLevelDrawSerial();
+			LastGameWvpShaderIdentity = shaderIdentity;
+			LastGameWvpShaderSerial = shaderSerial;
+			LastGameWvpWriteValid = true;
+		}
+
 		void RecordVerifiedWvp(const float* constants)
 		{
 			if (!constants || LatchedPoseSequence == 0)
@@ -1536,6 +1575,7 @@ namespace OutRunVRRenderer
 			// if it updates only one register. Stereo's own per-register writes are
 			// protected by InternalStereoPass above and must not disarm the marker.
 			InvalidateVerifiedWvp();
+			InvalidateGameWvpWrite();
 			if (!UploadContainsOutRunWvp(startRegister, vector4fCount))
 			{
 				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
@@ -1545,8 +1585,15 @@ namespace OutRunVRRenderer
 			float patchedData[256 * 4];
 			const bool prepared = TryPrepareOutRunWvp(
 				startRegister, constantData, vector4fCount, patchedData);
+			const float* uploadedData = prepared ? patchedData : constantData;
 			const HRESULT result = SetVertexShaderConstantFHook.stdcall<HRESULT>(
-				device, startRegister, prepared ? patchedData : constantData, vector4fCount);
+				device, startRegister, uploadedData, vector4fCount);
+
+			if (SUCCEEDED(result))
+			{
+				const UINT wvpOffsetRegisters = OutRunWvpRegister - startRegister;
+				RecordGameWvpWrite(uploadedData + wvpOffsetRegisters * 4);
+			}
 
 			if (prepared)
 			{
@@ -1672,6 +1719,7 @@ namespace OutRunVRRenderer
 		MarkCadencePresented();
 		PresentPoseLocked = false;
 		InvalidateVerifiedWvp();
+		InvalidateGameWvpWrite();
 		RestoreCullingCamera();
 		WaitForNextCadenceRequest();
 	}
@@ -1684,6 +1732,7 @@ namespace OutRunVRRenderer
 		CadencePresentedRequestId = 0;
 		CadenceTimedOutRequestId = 0;
 		PresentPoseLocked = false;
+		InvalidateGameWvpWrite();
 		RestoreCullingCamera();
 		ResetFrameState();
 	}
@@ -1716,6 +1765,22 @@ namespace OutRunVRRenderer
 		poseSequence = LastVerifiedWvpPoseSequence;
 		shaderIdentity = LastVerifiedShaderIdentity;
 		shaderSerial = LastVerifiedShaderSerial;
+		return true;
+	}
+
+	bool GetLastGameWvpWrite(float outConstants[16], std::uint64_t& writeSerial,
+		std::uint64_t& topLevelDrawSerial, std::uintptr_t& shaderIdentity,
+		std::uint64_t& shaderSerial) noexcept
+	{
+		if (!outConstants || !LastGameWvpWriteValid ||
+			LastGameWvpWriteSerial == 0 || LastGameWvpShaderIdentity == 0 ||
+			LastGameWvpShaderSerial == 0)
+			return false;
+		std::memcpy(outConstants, LastGameWvpWrite, sizeof(LastGameWvpWrite));
+		writeSerial = LastGameWvpWriteSerial;
+		topLevelDrawSerial = LastGameWvpTopLevelDrawSerial;
+		shaderIdentity = LastGameWvpShaderIdentity;
+		shaderSerial = LastGameWvpShaderSerial;
 		return true;
 	}
 

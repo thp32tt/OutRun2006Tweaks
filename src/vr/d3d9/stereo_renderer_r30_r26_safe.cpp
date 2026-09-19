@@ -1282,10 +1282,23 @@ namespace OutRunVRStereo
                 return false;
 
             float original[16]{};
+            std::uint64_t writeSerial = 0;
+            std::uint64_t writeDrawSerial = 0;
+            std::uintptr_t writeShader = 0;
+            std::uint64_t writeShaderSerial = 0;
+            std::uintptr_t currentShader = 0;
+            std::uint64_t currentShaderSerial = 0;
+            if (!OutRunVRRenderer::GetLastGameWvpWrite(
+                    original, writeSerial, writeDrawSerial,
+                    writeShader, writeShaderSerial) ||
+                !GetCurrentShaderEpoch(currentShader, currentShaderSerial) ||
+                writeShader != currentShader ||
+                writeShaderSerial != currentShaderSerial ||
+                writeDrawSerial + 1u != R23GameDrawSerial)
+                return false;
+
             float projectionRaw[16]{};
-            if (FAILED(device->GetVertexShaderConstantF(
-                    OutRunWvpRegister, original, OutRunWvpRegisterCount)) ||
-                !OutRunVRRenderer::GetRendererBaseProjection(projectionRaw))
+            if (!OutRunVRRenderer::GetRendererBaseProjection(projectionRaw))
                 return false;
 
             D3DMATRIX uploadedT{};
@@ -1312,8 +1325,11 @@ namespace OutRunVRStereo
                 std::fabs(worldView._14) + std::fabs(worldView._24) +
                 std::fabs(worldView._34) + std::fabs(worldView._44 - 1.0f);
             const float viewDepth = std::fabs(worldView._43);
+            const float clipW =
+                worldView._43 * baseProjection._34 + baseProjection._44;
             return std::isfinite(affineError) && affineError <= 0.02f &&
-                std::isfinite(viewDepth) &&
+                std::isfinite(viewDepth) && std::isfinite(clipW) &&
+                clipW > 0.05f &&
                 viewDepth >= 1.25f && viewDepth < 1000000.0f;
         }
 
@@ -1350,11 +1366,11 @@ namespace OutRunVRStereo
             DWORD zEnable = D3DZB_TRUE;
             DWORD alphaBlend = FALSE;
             DWORD alphaTest = FALSE;
-            if (FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable)) ||
-                FAILED(device->GetRenderState(
-                    D3DRS_ALPHABLENDENABLE, &alphaBlend)) ||
-                FAILED(device->GetRenderState(
-                    D3DRS_ALPHATESTENABLE, &alphaTest)))
+            if (!ReadTrackedRenderState(device, D3DRS_ZENABLE, zEnable) ||
+                !ReadTrackedRenderState(
+                    device, D3DRS_ALPHABLENDENABLE, alphaBlend) ||
+                !ReadTrackedRenderState(
+                    device, D3DRS_ALPHATESTENABLE, alphaTest))
                 return R30ScreenSpaceKind::None;
 
             const bool alphaLike =
@@ -1436,6 +1452,9 @@ namespace OutRunVRStereo
             D3DMATRIX eyeProjection[2]{};
             D3DMATRIX eyeInverse[2]{};
             D3DMATRIX hudViewProjection[2]{};
+            float hudClipX[2][3]{};
+            float hudClipY[2][3]{};
+            float hudClipW[2][3]{};
             bool hudWorldLockValid = false;
             bool fullWorldReprojection = false;
             bool depthTestEnabled = false;
@@ -1473,7 +1492,7 @@ namespace OutRunVRStereo
                 return false;
 
             DWORD zEnable = D3DZB_FALSE;
-            if (FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable)))
+            if (!ReadTrackedRenderState(device, D3DRS_ZENABLE, zEnable))
                 return false;
             state.depthTestEnabled = zEnable != D3DZB_FALSE;
 
@@ -1617,6 +1636,89 @@ namespace OutRunVRStereo
             return exactProjected || rhwDepthOnly || screenZDepthOnly;
         }
 
+        bool R30XyzrhwLooksLikeHudPlane(
+            const void* source, UINT vertexCount, UINT stride,
+            const R30XyzrhwState& state,
+            const std::vector<std::uint8_t>* usedMask) noexcept
+        {
+            if (!source || vertexCount == 0 || stride < sizeof(float) * 4)
+                return false;
+            const float depthSpan = state.viewport.MaxZ - state.viewport.MinZ;
+            if (!std::isfinite(depthSpan) || depthSpan <= 1.0e-6f)
+                return false;
+            UINT sampled = 0, valid = 0, unitRhw = 0;
+            float minZ = 1.0f, maxZ = 0.0f;
+            for (UINT i = 0; i < vertexCount && sampled < 512u; ++i)
+            {
+                if (usedMask &&
+                    (i >= usedMask->size() || (*usedMask)[i] == 0))
+                    continue;
+                ++sampled;
+                const float* p = reinterpret_cast<const float*>(
+                    static_cast<const std::uint8_t*>(source) +
+                    static_cast<std::size_t>(i) * stride);
+                const float z = p[2], rhw = p[3];
+                if (!std::isfinite(z) || !std::isfinite(rhw))
+                    continue;
+                const float ndcZ = (z - state.viewport.MinZ) / depthSpan;
+                if (!std::isfinite(ndcZ) || ndcZ < -0.01f || ndcZ > 1.01f)
+                    continue;
+                ++valid;
+                if (std::fabs(rhw - 1.0f) <= 0.02f) ++unitRhw;
+                minZ = std::min(minZ, ndcZ);
+                maxZ = std::max(maxZ, ndcZ);
+            }
+            return sampled >= 3u && valid >= 3u &&
+                valid * 2u >= sampled &&
+                unitRhw * 4u >= valid * 3u &&
+                std::isfinite(minZ) && std::isfinite(maxZ) &&
+                maxZ - minZ <= 0.0025f;
+        }
+
+        bool R30BuildHudPlaneCoefficients(R30XyzrhwState& state) noexcept
+        {
+            constexpr float HudPlaneViewZ = -2.50f;
+            float scaleX = 1.0f, scaleY = 1.0f;
+            R30HudContainScale(state.stereo, scaleX, scaleY);
+            const D3DMATRIX& bp = state.baseProjection;
+            const float clipW = HudPlaneViewZ * bp._34 + bp._44;
+            const float cx = HudPlaneViewZ * bp._31 + bp._41;
+            const float cy = HudPlaneViewZ * bp._32 + bp._42;
+            const float det = bp._11 * bp._22 - bp._21 * bp._12;
+            if (!std::isfinite(clipW) || !std::isfinite(cx) ||
+                !std::isfinite(cy) || !std::isfinite(det) ||
+                std::fabs(clipW) <= 1.0e-6f ||
+                std::fabs(det) <= 1.0e-6f)
+                return false;
+
+            const float vxX = bp._22 * clipW * scaleX / det;
+            const float vxY = -bp._21 * clipW * scaleY / det;
+            const float vxC = (-cx * bp._22 + bp._21 * cy) / det;
+            const float vyX = -bp._12 * clipW * scaleX / det;
+            const float vyY = bp._11 * clipW * scaleY / det;
+            const float vyC = (-bp._11 * cy + bp._12 * cx) / det;
+
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                const auto& m = state.hudViewProjection[eye];
+                auto build = [&](int col, float out[3]) noexcept {
+                    out[0] = vxX * m.m[0][col] + vyX * m.m[1][col];
+                    out[1] = vxY * m.m[0][col] + vyY * m.m[1][col];
+                    out[2] = vxC * m.m[0][col] + vyC * m.m[1][col] +
+                        HudPlaneViewZ * m.m[2][col] + m.m[3][col];
+                };
+                build(0, state.hudClipX[eye]);
+                build(1, state.hudClipY[eye]);
+                build(3, state.hudClipW[eye]);
+                for (int i = 0; i < 3; ++i)
+                    if (!std::isfinite(state.hudClipX[eye][i]) ||
+                        !std::isfinite(state.hudClipY[eye][i]) ||
+                        !std::isfinite(state.hudClipW[eye][i]))
+                        return false;
+            }
+            return true;
+        }
+
         bool R30ConfigureXyzrhwWorldEffect(
             IDirect3DDevice9* device, const void* source,
             UINT vertexCount, UINT stride, R30XyzrhwState& state,
@@ -1635,13 +1737,15 @@ namespace OutRunVRStereo
                     source, vertexCount, stride, state,
                     baseProjection, usedMask);
 
-            // A coherent screen-Z/RHW relation is stronger evidence than
-            // ZENABLE alone: OutRun can disable Z for smoke/skid/decal
-            // billboards. The previous Z requirement made the test log report
-            // XYZRHW world=0 and pushed every such effect through the HUD path.
-            if (state.depthTestEnabled && !state.rhwDepthEvidence)
-                return false;
+            // R42: depth signature is authoritative world evidence. ZENABLE by
+            // itself is not: several HUD passes leave Z enabled. When depth
+            // evidence is absent, admit only a strongly pre-transformed screen
+            // plane (RHW~=1 with near-constant Z) to the HUD world-lock.
             state.worldEffect = state.rhwDepthEvidence;
+            if (state.depthTestEnabled && !state.worldEffect &&
+                !R30XyzrhwLooksLikeHudPlane(
+                    source, vertexCount, stride, state, usedMask))
+                return false;
             if (!state.worldEffect)
             {
                 // R41: most of OutRun's HUD is fixed-function XYZRHW, not the
@@ -1699,6 +1803,8 @@ namespace OutRunVRStereo
                     if (!MatrixFinite(state.hudViewProjection[eye]))
                         return false;
                 }
+                if (!R30BuildHudPlaneCoefficients(state))
+                    return false;
                 state.hudWorldLockValid = true;
                 return true;
             }
@@ -2152,51 +2258,25 @@ namespace OutRunVRStereo
                     if (!state.hudWorldLockValid)
                         return false;
 
-                    float hudScaleX = 1.0f;
-                    float hudScaleY = 1.0f;
-                    R30HudContainScale(
-                        state.stereo, hudScaleX, hudScaleY);
-                    const float planeNdcX = hudScaleX * ndcX;
-                    const float planeNdcY = hudScaleY * ndcY;
-                    constexpr float HudPlaneViewZ = -2.50f;
-                    const D3DMATRIX& bp = state.baseProjection;
+                    const float clipX =
+                        state.hudClipX[eye][0] * ndcX +
+                        state.hudClipX[eye][1] * ndcY +
+                        state.hudClipX[eye][2];
+                    const float clipY =
+                        state.hudClipY[eye][0] * ndcX +
+                        state.hudClipY[eye][1] * ndcY +
+                        state.hudClipY[eye][2];
                     const float clipW =
-                        HudPlaneViewZ * bp._34 + bp._44;
-                    const float clipX = planeNdcX * clipW;
-                    const float clipY = planeNdcY * clipW;
-                    const float rhsX =
-                        clipX - HudPlaneViewZ * bp._31 - bp._41;
-                    const float rhsY =
-                        clipY - HudPlaneViewZ * bp._32 - bp._42;
-                    const float det =
-                        bp._11 * bp._22 - bp._21 * bp._12;
-                    if (!std::isfinite(clipW) ||
-                        !std::isfinite(rhsX) ||
-                        !std::isfinite(rhsY) ||
-                        !std::isfinite(det) ||
-                        std::fabs(clipW) <= 1.0e-6f ||
-                        std::fabs(det) <= 1.0e-6f)
+                        state.hudClipW[eye][0] * ndcX +
+                        state.hudClipW[eye][1] * ndcY +
+                        state.hudClipW[eye][2];
+                    if (!std::isfinite(clipX) ||
+                        !std::isfinite(clipY) ||
+                        !std::isfinite(clipW) ||
+                        clipW <= 1.0e-6f)
                         return false;
-
-                    const float view[4]{
-                        (rhsX * bp._22 - bp._21 * rhsY) / det,
-                        (bp._11 * rhsY - rhsX * bp._12) / det,
-                        HudPlaneViewZ,
-                        1.0f
-                    };
-                    float clipEye[4]{};
-                    for (int col = 0; col < 4; ++col)
-                        for (int row = 0; row < 4; ++row)
-                            clipEye[col] += view[row] *
-                                state.hudViewProjection[eye].m[row][col];
-
-                    if (!std::isfinite(clipEye[0]) ||
-                        !std::isfinite(clipEye[1]) ||
-                        !std::isfinite(clipEye[3]) ||
-                        clipEye[3] <= 1.0e-6f)
-                        return false;
-                    correctedX = clipEye[0] / clipEye[3];
-                    correctedY = clipEye[1] / clipEye[3];
+                    correctedX = clipX / clipW;
+                    correctedY = clipY / clipW;
                     if (!std::isfinite(correctedX) ||
                         !std::isfinite(correctedY))
                         return false;
@@ -2333,7 +2413,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstXyzrhwHudLogged = true;
                     spdlog::info(
-                        "VR R41 XYZRHW HUD: fixed-function HUD uses HudScale on a finite recentered world-locked plane; screen/head-locked XYZRHW duplication disabled");
+                        "VR R42 XYZRHW HUD: Z-enabled screen-plane HUD is safely world-locked; HudScale uses cached planar coefficients instead of per-vertex 4x4 transforms");
                 }
             }
 

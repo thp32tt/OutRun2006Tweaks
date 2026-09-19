@@ -298,6 +298,9 @@ namespace OutRunVRRenderer
     bool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
         std::uint32_t& poseSequence, std::uintptr_t& shaderIdentity,
         std::uint64_t& shaderSerial);
+    bool GetLastGameWvpWrite(float outConstants[16], std::uint64_t& writeSerial,
+        std::uint64_t& topLevelDrawSerial, std::uintptr_t& shaderIdentity,
+        std::uint64_t& shaderSerial) noexcept;
     std::uint64_t GetBeginSceneCallCount();
     void NotifyGamePresent();
     std::uint32_t GetActiveCadenceRequestId() noexcept;
@@ -311,4 +314,5 @@ namespace OutRunVRStereo
     bool IsGameStateBlockRecording() noexcept;
     bool IsStateBlockTrackingReliable() noexcept;
     bool GetCurrentShaderEpoch(std::uintptr_t& shaderIdentity, std::uint64_t& serial);
+    std::uint64_t GetTopLevelDrawSerial() noexcept;
 }

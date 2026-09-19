@@ -838,4 +838,9 @@ namespace OutRunVRStereo
 
         VRRecoveryBaselineR23Hook VRRecoveryBaselineR23Hook::instance;
     }
+
+    std::uint64_t GetTopLevelDrawSerial() noexcept
+    {
+        return R23GameDrawSerial;
+    }
 }
