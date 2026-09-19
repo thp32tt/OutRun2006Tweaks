@@ -2698,7 +2698,7 @@ namespace OutRunVRStereo
             {
                 R30FirstScreenSpaceLogged = true;
                 spdlog::info(
-                    "VR R36 HUD: common-centre contain-fit + asymmetric-FOV correction ACTIVE offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} sourceOverTarget={:.3f}; full desktop HUD remains inside each eye",
+                    "VR R30 HUD: orthographic ScreenSpace2D asymmetric-FOV correction ACTIVE; R36 common-centre contain-fit offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} sourceOverTarget={:.3f}; full desktop HUD remains inside each eye",
                     eyeOffset[0], eyeOffset[1], R30HudScaleValue(),
                     R30HudAspectCompensation(stereo));
             }
@@ -2915,7 +2915,7 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R36 HUD/EFFECT: contain-fit HUD + depth-disabled overlay zero-disparity + head-relative XYZRHW world reprojection READY hudScale={:.2f}",
+                        "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current={:.2f}; R36 contain-fit + depth-disabled overlay zero-disparity + head-relative XYZRHW reprojection active",
                         R30HudScaleValue());
                     return 0;
                 }
