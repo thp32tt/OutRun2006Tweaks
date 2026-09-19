@@ -532,7 +532,7 @@ jobs:
             'VR C1/C2 CLASSIFY: R29 renderer delegates candidate WVP uploads to R23/R27/R28 perspective-world classification',
             'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
             'VR C1.1 BASELINE: authoritative color clear replay seeds right/mono surfaces; two full-surface StretchRect baseline copies removed',
-            'VR C1.1 FIXEDFN: perspective fixed-function XYZ draw now receives per-eye view/projection; XYZRHW/orthographic UI remains zero-disparity',
+            'VR C1.2 FIXEDFN HEAD: perspective fixed-function XYZ world receives the same latched head inverse',
             'VR R27 EFFECT: main-backbuffer perspective c64 now follows the verified per-eye world WVP'
           )) {
             if (-not $ascii.Contains($marker)) { throw "C1 marker missing: $marker" }
@@ -620,7 +620,7 @@ jobs:
             'VR C1/C2 CLASSIFY: R29 renderer delegates candidate WVP uploads to R23/R27/R28 perspective-world classification',
             'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
             'VR C1.1 BASELINE: authoritative color clear replay seeds right/mono surfaces; two full-surface StretchRect baseline copies removed',
-            'VR C1.1 FIXEDFN: perspective fixed-function XYZ draw now receives per-eye view/projection; XYZRHW/orthographic UI remains zero-disparity',
+            'VR C1.2 FIXEDFN HEAD: perspective fixed-function XYZ world receives the same latched head inverse',
             'VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current=',
             'VR R30.6 XYZRHW WORLD:'
           )) {
