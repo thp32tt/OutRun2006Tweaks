@@ -2116,6 +2116,29 @@ int main(int argc, char** argv)
                         bool foundDirect = false;
                         if (renderFrames.ReadHistory(history, historyCount))
                         {
+                            std::uint32_t currentGeneration = 0;
+                            std::uint32_t newestDirectFrame = 0;
+                            bool haveCurrentGeneration = false;
+                            for (std::size_t i = 0; i < historyCount; ++i)
+                            {
+                                const auto& frame = history[i];
+                                const std::uint32_t generation =
+                                    frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+                                if (!frame.frameId || !generation ||
+                                    frame.state != OutRunVR::StereoSbsActive ||
+                                    (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
+                                    (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0)
+                                    continue;
+                                if (!haveCurrentGeneration ||
+                                    R37FrameIdBefore(
+                                        newestDirectFrame, frame.frameId))
+                                {
+                                    newestDirectFrame = frame.frameId;
+                                    currentGeneration = generation;
+                                    haveCurrentGeneration = true;
+                                }
+                            }
+
                             for (std::size_t i = 0; i < historyCount; ++i)
                             {
                                 const auto& frame = history[i];
@@ -2129,7 +2152,9 @@ int main(int argc, char** argv)
                                     (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
                                     (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
                                     slot >= OutRunVR::RenderFrameRingSize ||
-                                    generation == 0)
+                                    generation == 0 ||
+                                    !haveCurrentGeneration ||
+                                    generation != currentGeneration)
                                     continue;
 
                                 const bool alreadySubmitted =
