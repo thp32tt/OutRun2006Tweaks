@@ -1171,7 +1171,7 @@ namespace
         return true;
     }
 
-    bool R23RenderHeadLockedMenuProjection(
+    bool R23RenderWorldLockedMenuProjection(
         StereoCompositor& c, const std::array<XrView, 2>& views,
         std::array<XrCompositionLayerProjectionView, 2>& pv)
     {
@@ -1245,8 +1245,10 @@ namespace
         c.Release(c.projection_);
         if (!ok) return false;
 
-        // Zero virtual IPD in VIEW space keeps mono menus aligned in both eyes
-        // while remaining on the projection-layer path used efficiently by VDXR.
+        // Zero virtual IPD keeps mono menus aligned in both eyes. The caller
+        // submits these identity projection poses in LOCAL space, so the menu
+        // stays fixed at the recentered world orientation instead of following
+        // the headset as it did in VIEW space.
         for (int eye = 0; eye < 2; ++eye)
         {
             pv[eye] = { XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW };
@@ -2182,7 +2184,7 @@ int main(int argc, char** argv)
                 }
                 lastPresentation = presentation;
                 std::cout << "VR presentation: "
-                    << (presentation == OutRunVR::PresentationGameplay ? "true stereo projection" : "head-locked mono 2D projection menu")
+                    << (presentation == OutRunVR::PresentationGameplay ? "true stereo projection" : "LOCAL-fixed mono 2D projection menu")
                     << ".\n";
             }
 
@@ -2722,18 +2724,18 @@ int main(int argc, char** argv)
                     QueryPerformanceCounter(&ce); timings.capture.Add(timings.Ms(cs, ce));
                     LARGE_INTEGER rs{}, re{}; QueryPerformanceCounter(&rs);
 
-                    // R41: use a true mono 2D VIEW-space projection for menus.
-                    // R39's stereo rasterized plane sheared under head motion;
-                    // R40's LOCAL quad was geometrically stable but VDXR still
-                    // spent ~25 ms in xrEndFrame. This path gives both eyes the
-                    // same desktop pixels, zero virtual IPD and identity VIEW
-                    // pose while staying on VDXR's efficient projection path.
+                    // R43: keep the efficient projection-layer menu, but anchor
+                    // it in LOCAL space. R41 intentionally used VIEW space and
+                    // therefore followed the headset exactly. Both eyes still
+                    // receive identical desktop pixels and zero virtual IPD;
+                    // only the reference space changes so the menu remains at
+                    // the recentered world orientation while the head moves.
                     if (capture.available &&
                         (!cachedMenuProjectionValid || capture.fresh))
                     {
                         std::array<XrCompositionLayerProjectionView, 2>
                             refreshed{};
-                        if (R23RenderHeadLockedMenuProjection(
+                        if (R23RenderWorldLockedMenuProjection(
                                 compositor, views, refreshed))
                         {
                             cachedMenuProjectionViews = refreshed;
@@ -2743,7 +2745,7 @@ int main(int argc, char** argv)
                     if (cachedMenuProjectionValid)
                     {
                         pv = cachedMenuProjectionViews;
-                        projection.space = viewSpace;
+                        projection.space = localSpace;
                         projection.viewCount = 2;
                         projection.views = pv.data();
                         layers[0] =
@@ -2752,8 +2754,8 @@ int main(int argc, char** argv)
                         layerReady = true;
                         intentionalMonoProjection = true;
                         finalLayerKind = capture.fresh
-                            ? "menu-headlocked-projection-fresh"
-                            : "menu-headlocked-projection-cached";
+                            ? "menu-local-fixed-projection-fresh"
+                            : "menu-local-fixed-projection-cached";
                     }
                     QueryPerformanceCounter(&re);
                     frameRenderMs += timings.Ms(rs, re);

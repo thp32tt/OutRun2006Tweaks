@@ -162,6 +162,7 @@ namespace OutRunVRRenderer
 		std::uint64_t LastVerifiedShaderSerial = 0;
 
 		float LastGameWvpWrite[16]{};
+		float LastRawGameWvpWrite[16]{};
 		bool LastGameWvpWriteValid = false;
 		std::uint64_t LastGameWvpWriteSerial = 0;
 		std::uint64_t LastGameWvpTopLevelDrawSerial = 0;
@@ -1448,9 +1449,10 @@ namespace OutRunVRRenderer
 			LastGameWvpShaderSerial = 0;
 		}
 
-		void RecordGameWvpWrite(const float* constants) noexcept
+		void RecordGameWvpWrite(const float* constants,
+			const float* rawConstants) noexcept
 		{
-			if (!constants)
+			if (!constants || !rawConstants)
 			{
 				InvalidateGameWvpWrite();
 				return;
@@ -1464,6 +1466,8 @@ namespace OutRunVRRenderer
 				return;
 			}
 			std::memcpy(LastGameWvpWrite, constants, sizeof(LastGameWvpWrite));
+			std::memcpy(LastRawGameWvpWrite, rawConstants,
+				sizeof(LastRawGameWvpWrite));
 			if (++LastGameWvpWriteSerial == 0)
 				++LastGameWvpWriteSerial;
 			LastGameWvpTopLevelDrawSerial = OutRunVRStereo::GetTopLevelDrawSerial();
@@ -1592,7 +1596,9 @@ namespace OutRunVRRenderer
 			if (SUCCEEDED(result))
 			{
 				const UINT wvpOffsetRegisters = OutRunWvpRegister - startRegister;
-				RecordGameWvpWrite(uploadedData + wvpOffsetRegisters * 4);
+				RecordGameWvpWrite(
+					uploadedData + wvpOffsetRegisters * 4,
+					constantData + wvpOffsetRegisters * 4);
 			}
 
 			if (prepared)
@@ -1777,6 +1783,23 @@ namespace OutRunVRRenderer
 			LastGameWvpShaderSerial == 0)
 			return false;
 		std::memcpy(outConstants, LastGameWvpWrite, sizeof(LastGameWvpWrite));
+		writeSerial = LastGameWvpWriteSerial;
+		topLevelDrawSerial = LastGameWvpTopLevelDrawSerial;
+		shaderIdentity = LastGameWvpShaderIdentity;
+		shaderSerial = LastGameWvpShaderSerial;
+		return true;
+	}
+
+	bool GetLastRawGameWvpWrite(float outConstants[16],
+		std::uint64_t& writeSerial, std::uint64_t& topLevelDrawSerial,
+		std::uintptr_t& shaderIdentity, std::uint64_t& shaderSerial) noexcept
+	{
+		if (!outConstants || !LastGameWvpWriteValid ||
+			LastGameWvpWriteSerial == 0 || LastGameWvpShaderIdentity == 0 ||
+			LastGameWvpShaderSerial == 0)
+			return false;
+		std::memcpy(outConstants, LastRawGameWvpWrite,
+			sizeof(LastRawGameWvpWrite));
 		writeSerial = LastGameWvpWriteSerial;
 		topLevelDrawSerial = LastGameWvpTopLevelDrawSerial;
 		shaderIdentity = LastGameWvpShaderIdentity;

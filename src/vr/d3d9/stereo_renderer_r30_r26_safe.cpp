@@ -27,6 +27,13 @@ namespace Settings
     extern Setting<bool> SkyGlowTwoStep;
 }
 
+namespace OutRunVRRenderer
+{
+    bool GetLastRawGameWvpWrite(float outConstants[16],
+        std::uint64_t& writeSerial, std::uint64_t& topLevelDrawSerial,
+        std::uintptr_t& shaderIdentity, std::uint64_t& shaderSerial) noexcept;
+}
+
 namespace OutRunVRStereo
 {
     namespace
@@ -1244,26 +1251,17 @@ namespace OutRunVRStereo
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
             float& scaleX, float& scaleY) noexcept
         {
+            (void)stereo;
             const float userScale = R30HudScaleValue();
-            const float sourceOverTarget =
-                R30HudAspectCompensation(stereo);
 
-            // "Contain" the original desktop HUD canvas inside one eye before
-            // applying the user scale. The old "cover" mapping multiplied X by
-            // source/target aspect; on 3440x1440 -> Quest eye targets that could
-            // make HudScale=0.55 wider than the visible eye and push rank/time
-            // elements off-screen. Contain preserves sprite pixel aspect while
-            // guaranteeing the whole common-centre HUD stays inside the eye.
-            if (sourceOverTarget >= 1.0f)
-            {
-                scaleX = userScale;
-                scaleY = userScale / sourceOverTarget;
-            }
-            else
-            {
-                scaleX = userScale * sourceOverTarget;
-                scaleY = userScale;
-            }
+            // R43: the finite HUD plane is reconstructed through the game's
+            // base projection and then through each OpenXR eye projection.
+            // Applying sourceAspect/eyeAspect again here was a second,
+            // anisotropic aspect correction. On this run sourceOverTarget=2.569,
+            // so HudScale=0.55 became X=0.55/Y=0.214 and visibly squashed the
+            // complete HUD. Keep HUD scale uniform; projection handles aspect.
+            scaleX = userScale;
+            scaleY = userScale;
         }
 
         enum class R30ScreenSpaceKind : std::uint8_t
@@ -2955,9 +2953,29 @@ namespace OutRunVRStereo
                 CurrentVertexShaderIdentity.load(std::memory_order_acquire) == 0)
                 return false;
 
-            if (FAILED(device->GetVertexShaderConstantF(
+            if (screenKind == R30ScreenSpaceKind::PerspectiveHud)
+            {
+                std::uint64_t writeSerial = 0;
+                std::uint64_t writeDrawSerial = 0;
+                std::uintptr_t writeShader = 0;
+                std::uint64_t writeShaderSerial = 0;
+                std::uintptr_t currentShader = 0;
+                std::uint64_t currentShaderSerial = 0;
+                if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                        original, writeSerial, writeDrawSerial,
+                        writeShader, writeShaderSerial) ||
+                    !GetCurrentShaderEpoch(
+                        currentShader, currentShaderSerial) ||
+                    writeShader != currentShader ||
+                    writeShaderSerial != currentShaderSerial ||
+                    writeDrawSerial + 1u != R23GameDrawSerial)
+                    return false;
+            }
+            else if (FAILED(device->GetVertexShaderConstantF(
                     OutRunWvpRegister, original, OutRunWvpRegisterCount)))
+            {
                 return false;
+            }
             if (!R30BuildEyeAffine(stereo, eyeScale, eyeOffset))
                 return false;
 
@@ -3292,7 +3310,7 @@ namespace OutRunVRStereo
             {
                 R30FirstPerspectiveHudLogged = true;
                 spdlog::info(
-                    "VR R30 PERSPECTIVE HUD: near-plane alpha UI including 6th/6 uses HudScale on the world-locked finite HUD plane; positively spatial rank/lens markers remain world billboards");
+                    "VR R43 PERSPECTIVE HUD: near-plane alpha UI including 6th/6 uses the raw game c64 before stereo head correction, then uniform HudScale on the world-locked finite HUD plane");
             }
 
             if (FAILED(rightHr))
