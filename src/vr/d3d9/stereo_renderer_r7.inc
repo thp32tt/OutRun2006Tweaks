@@ -117,6 +117,9 @@ namespace OutRunVRStereo
 			std::uint32_t frameId = 0;
 			bool producerPending = false;
 			std::uint32_t pendingFrameId = 0;
+			// True only after the producer fence completed and this slot was
+			// advertised to the host. Unpublished timed-out slots need no ACK.
+			bool published = false;
 		};
 
 		std::array<DirectTransportSlot, OutRunVR::RenderFrameRingSize> DirectTransportSlots{};
@@ -208,6 +211,7 @@ namespace OutRunVRStereo
 		bool FirstDirectTransportLogged = false;
 		bool FirstDirectFallbackLogged = false;
 		bool FirstDirectOnlyNoFrameLogged = false;
+		bool FirstDirectDeferredLogged = false;
 		bool FirstD3D9ExUnavailableLogged = false;
 		bool FirstAdapterMismatchLogged = false;
 		bool FirstInteropVerifiedLogged = false;
@@ -851,21 +855,56 @@ namespace OutRunVRStereo
 			const std::uint32_t consumed=SharedState?SharedState->hostDirectConsumedFrameId:0;
 			const std::uint32_t preferred=(frameId-1u)%OutRunVR::RenderFrameRingSize;
 			std::uint32_t selected=OutRunVR::RenderFrameRingSize;
+
+			// Search every ring slot. A slow query must not stall the game thread
+			// or block an otherwise free slot.
 			for(std::uint32_t offset=0;offset<OutRunVR::RenderFrameRingSize;++offset)
 			{
 				const std::uint32_t index=(preferred+offset)%OutRunVR::RenderFrameRingSize;
 				auto&slot=DirectTransportSlots[index];
+
 				if(slot.producerPending)
 				{
 					const HRESULT ready=slot.fence?slot.fence->GetData(nullptr,0,0):E_FAIL;
-					if(ready==S_OK){slot.producerPending=false;slot.pendingFrameId=0;}
-					else continue;
+					if(ready==S_OK)
+					{
+						slot.producerPending=false;
+						slot.pendingFrameId=0;
+						// A frame whose fence missed its publication window was
+						// never visible to the host, so reclaim it without ACK.
+						if(!slot.published)slot.frameId=0;
+					}
+					else if(ready==S_FALSE)
+					{
+						continue;
+					}
+					else
+					{
+						slot.producerPending=false;
+						slot.pendingFrameId=0;
+						slot.frameId=0;
+						slot.published=false;
+					}
 				}
-				if(slot.frameId&&!FrameIdAtOrAfter(consumed,slot.frameId))continue;
+
+				// Published images are immutable until the host ACKs their frame.
+				if(slot.published&&slot.frameId&&!FrameIdAtOrAfter(consumed,slot.frameId))
+					continue;
+				if(slot.published&&slot.frameId&&FrameIdAtOrAfter(consumed,slot.frameId))
+				{
+					slot.frameId=0;
+					slot.published=false;
+				}
 				selected=index;
 				break;
 			}
-			if(selected>=OutRunVR::RenderFrameRingSize){++DirectTransportRingBackpressure;return false;}
+
+			if(selected>=OutRunVR::RenderFrameRingSize)
+			{
+				++DirectTransportRingBackpressure;
+				return false;
+			}
+
 			auto&slot=DirectTransportSlots[selected];
 			{
 				InternalPassScope guard;
@@ -873,11 +912,10 @@ namespace OutRunVRStereo
 					FAILED(StretchDirectEye(device,RightEyeSurface,slot.rightSurface))||
 					FAILED(slot.fence->Issue(D3DISSUE_END)))return false;
 			}
-			// Never busy-wait the game render thread. Present flushes the frame;
-			// the post-Present poll below publishes only completed shared eyes.
 			slot.producerPending=true;
 			slot.pendingFrameId=frameId;
 			slot.frameId=frameId;
+			slot.published=false;
 			ActiveDirectTransportSlot=selected;
 			return true;
 		}
@@ -887,20 +925,29 @@ namespace OutRunVRStereo
 			if(!frameId||ActiveDirectTransportSlot>=DirectTransportSlots.size())return false;
 			auto&slot=DirectTransportSlots[ActiveDirectTransportSlot];
 			if(slot.frameId!=frameId||slot.pendingFrameId!=frameId||!slot.fence)return false;
-			const HRESULT ready=slot.fence->GetData(nullptr,0,0);
-			if(ready==S_OK)
+
+			// Present has already flushed the frame. Allow at most 1 ms of bounded
+			// completion grace here; the old 4 ms pre-Present wait consumed a large
+			// part of a 90/120 Hz frame budget and was visible as VD hitching.
+			if(WaitForEventQuery(slot.fence,1))
 			{
 				slot.producerPending=false;
 				slot.pendingFrameId=0;
+				slot.published=true;
 				return true;
 			}
-			// The host never sees this frame, so it will never ACK its id. Keep an
-			// unfinished query quarantined until a later slot scan observes S_OK,
-			// but clear ownership now so it can be reclaimed once complete.
-			if(ready==S_FALSE)++DirectTransportFenceTimeouts;
-			else slot.producerPending=false;
-			slot.pendingFrameId=0;
-			slot.frameId=0;
+
+			++DirectTransportFenceTimeouts;
+			const HRESULT status=slot.fence->GetData(nullptr,0,0);
+			if(status!=S_FALSE)
+			{
+				slot.producerPending=false;
+				slot.pendingFrameId=0;
+				slot.frameId=0;
+				slot.published=false;
+			}
+			// S_FALSE stays quarantined. A later slot scan reclaims it as soon as
+			// the query completes; it is never published and therefore needs no ACK.
 			return false;
 		}
 
@@ -1076,14 +1123,37 @@ namespace OutRunVRStereo
 		{
 			if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))return PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);
 			const std::uint64_t beginNow=OutRunVRRenderer::GetBeginSceneCallCount(),beginDelta=beginNow>=LastBeginSceneCountAtPresent?beginNow-LastBeginSceneCountAtPresent:0;LastBeginSceneCountAtPresent=beginNow;if(GameplayActive()){if(beginDelta>1)++MultiBeginScenePresents;MaxBeginScenesPerPresent=std::max(MaxBeginScenesPerPresent,beginDelta);}
+
 			const bool stereoRequested=StereoWanted();
 			const std::uint32_t pendingFrameId=stereoRequested?NextStereoFrameId():0;
-			bool composedStereo=false,directTransport=false;
+			const bool stereoFrameEligible=
+				stereoRequested&&FrameHadWorldStereo&&FrameHadDuplicatedDraw&&
+				!FrameRightDrawFailed&&!FrameStereoIncomplete&&
+				FrameStereoPoseSequence&&FrameStereoMetadata.valid&&
+				EnsureStereoResources(device);
+
+			bool composedStereo=false;
+			bool directTransport=false;
+			bool directOnlyHold=false;
 			std::uint32_t pendingPoseSequence=0;
-			if(stereoRequested&&FrameHadWorldStereo&&FrameHadDuplicatedDraw&&!FrameRightDrawFailed&&!FrameStereoIncomplete&&FrameStereoPoseSequence&&FrameStereoMetadata.valid&&EnsureStereoResources(device))
+
+			auto markDirectOnlyHold=[&]()
+			{
+				if(directOnlyHold)return;
+				directOnlyHold=true;
+				++DirectTransportFallbacks;
+				if(!FirstDirectDeferredLogged)
+				{
+					FirstDirectDeferredLogged=true;
+					spdlog::warn("VR DIRECT-ONLY: shared-eye frame deferred without blocking; incomplete handles are never published and OpenXR reuses the last safe projection");
+				}
+			};
+
+			if(stereoFrameEligible)
 			{
 				if(HostDirectTransportReady())
 					directTransport=ResolveDirectTransport(device,pendingFrameId);
+
 				if(directTransport)
 				{
 					composedStereo=true;
@@ -1091,10 +1161,14 @@ namespace OutRunVRStereo
 					if(!FirstDirectTransportLogged)
 					{
 						FirstDirectTransportLogged=true;
-						spdlog::info("VR stereo: non-blocking 4-slot direct GPU eye transport armed; source eye={}x{}",BackBufferDesc.Width,BackBufferDesc.Height);
+						spdlog::info("VR stereo: 4-slot direct GPU transport uses bounded post-Present completion; source eye={}x{}",BackBufferDesc.Width,BackBufferDesc.Height);
 					}
 				}
-				else if(!Settings::VRDirectGpuOnly && ComposeSbs(device))
+				else if(Settings::VRDirectGpuOnly)
+				{
+					markDirectOnlyHold();
+				}
+				else if(ComposeSbs(device))
 				{
 					++StereoComposeSuccess;
 					composedStereo=true;
@@ -1106,37 +1180,38 @@ namespace OutRunVRStereo
 						spdlog::warn("VR stereo: direct transport not ready; keeping SBS/Desktop Duplication fallback");
 					}
 				}
-				else if(Settings::VRDirectGpuOnly)
-				{
-					++DirectTransportFallbacks;
-					if(!FirstDirectOnlyNoFrameLogged)
-					{
-						FirstDirectOnlyNoFrameLogged=true;
-						spdlog::warn("VR DIRECT-ONLY: shared-eye frame unavailable; SBS composition suppressed, PC stays mono/left-eye and host reuses its last safe projection");
-					}
-				}
 				else
 				{
 					++StereoComposeFailure;
 					PoisonFrame(OutRunVR::StereoFailureComposeFailed);
 				}
 			}
+
 			MaybeLogSummary();
 			LARGE_INTEGER presentStart{};
 			QueryPerformanceCounter(&presentStart);
-			if(stereoRequested)PublishRenderFrame(OutRunVR::StereoSbsFallbackMono,pendingFrameId,pendingPoseSequence,presentStart.QuadPart,FrameFailureReason,nullptr,true,directTransport);
+
+			// Never advertise DirectGPU handles before their event query completes.
+			// The classic path keeps its existing pre-Present correlation marker.
+			if(stereoRequested&&!directTransport)
+				PublishRenderFrame(OutRunVR::StereoSbsFallbackMono,pendingFrameId,pendingPoseSequence,presentStart.QuadPart,FrameFailureReason,nullptr,true,false);
+
 			const HRESULT hr=PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);
+
 			if(directTransport)
 			{
 				if(SUCCEEDED(hr)&&DirectTransportFrameReadyAfterPresent(pendingFrameId))
+				{
 					++DirectTransportFrames;
+				}
 				else
 				{
 					directTransport=false;
 					composedStereo=false;
-					++DirectTransportFallbacks;
+					markDirectOnlyHold();
 				}
 			}
+
 			if(composedStereo&&SUCCEEDED(hr)&&!FrameStereoIncomplete)
 			{
 				PublishStereoState(OutRunVR::StereoSbsActive,true,pendingPoseSequence,pendingFrameId);
@@ -1147,13 +1222,17 @@ namespace OutRunVRStereo
 					spdlog::info("VR stereo: TRUE STEREO active; transport={} sourceEye={}x{} PC={}",directTransport?"verified D3D9Ex->D3D11 ring":"SBS Desktop Duplication",BackBufferDesc.Width,BackBufferDesc.Height,(directTransport&&HostDirectTransportReady())?"left-eye mirror":"SBS fallback");
 				}
 			}
-			else
+			else if(!(directOnlyHold&&stereoFrameEligible&&SUCCEEDED(hr)))
 			{
 				if(FAILED(hr)&&FrameFailureReason==OutRunVR::StereoFailureNone)PoisonFrame(OutRunVR::StereoFailurePresentFailed);
 				const std::uint32_t fallback=stereoRequested?OutRunVR::StereoSbsFallbackMono:OutRunVR::StereoDisabled;
 				PublishStereoState(fallback,false,0,0);
 				PublishRenderFrame(fallback,0,0,presentStart.QuadPart,FrameFailureReason,nullptr);
 			}
+			// A transient DirectGPU miss in direct-only mode deliberately leaves the
+			// previous valid stereo metadata intact. The host already owns/reuses the
+			// last released OpenXR projection, avoiding a black/corrupt mode flip.
+
 			OutRunVRRenderer::NotifyGamePresent();
 			FrameHadDuplicatedDraw=false;FrameHadWorldStereo=false;FrameRightDrawFailed=false;FrameStereoIncomplete=false;FramePoseMismatchLogged=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoPoseSequence=0;FrameStereoMetadata={};if(++PresentEpoch==0)PresentEpoch=1;return hr;
 		}

@@ -767,7 +767,7 @@ public:
 	void init(HWND hwnd);
 
 	// Actions introduced after a bindings INI was written load with no entry.
-	// Keep the overlay reachable and give VR recenter its legacy F10 default
+	// Keep the overlay reachable and give VR recenter an F12 default that does not collide with legacy HUD F10
 	// until the user chooses a custom keyboard/wheel/gamepad binding.
 	void ensureOverlayBindable()
 	{
@@ -781,8 +781,8 @@ public:
 		InputAction& recenter = modBindings[size_t(ModAction::VRRecenter)];
 		if (recenter.bindings().empty())
 		{
-			spdlog::info(__FUNCTION__ ": VR recenter had no binding, restoring F10");
-			addModBinding(ModAction::VRRecenter, SDL_SCANCODE_F10);
+			spdlog::info(__FUNCTION__ ": VR recenter had no binding, restoring F12");
+			addModBinding(ModAction::VRRecenter, SDL_SCANCODE_F12);
 		}
 	}
 
@@ -862,7 +862,7 @@ public:
 
 		// Mod actions.
 		addModBinding(ModAction::OverlayToggle, SDL_SCANCODE_F11);
-		addModBinding(ModAction::VRRecenter, SDL_SCANCODE_F10);
+		addModBinding(ModAction::VRRecenter, SDL_SCANCODE_F12);
 		addModBinding(ModAction::OpenChat, SDL_SCANCODE_Y);
 		addModBinding(ModAction::MusicNext, SDL_SCANCODE_X);
 		addModBinding(ModAction::MusicNext, SDL_GAMEPAD_BUTTON_BACK);

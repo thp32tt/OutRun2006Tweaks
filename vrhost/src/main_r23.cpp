@@ -2136,7 +2136,7 @@ int main(int argc, char** argv)
                 }
                 lastPresentation = presentation;
                 std::cout << "VR presentation: "
-                    << (presentation == OutRunVR::PresentationGameplay ? "true stereo projection" : "mono projection menu")
+                    << (presentation == OutRunVR::PresentationGameplay ? "true stereo projection" : "world-fixed mono 6DoF menu")
                     << ".\n";
             }
 
