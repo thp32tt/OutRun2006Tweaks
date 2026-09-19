@@ -1168,36 +1168,45 @@ namespace
         return true;
     }
 
-    bool R23RenderMonoProjection(StereoCompositor& c,
-        const std::array<XrView, 2>& views,
-        std::array<XrCompositionLayerProjectionView, 2>& pv)
+    bool R23RenderHeadLockedMenu(StereoCompositor& c,
+        XrSpace viewSpace, XrCompositionLayerQuad& quad)
     {
         R23Pixels.TryConsume(c.context_);
         if (!c.haveFrame_ || !c.sourceSrv_) return false;
         UvRect whole{};
         if (!c.GetGameUv(whole)) return false;
+
         std::uint32_t image = 0;
-        c.Acquire(c.projection_, image);
-        bool ok = c.RenderTo(c.projection_.rtvs[image][0], c.projection_.width,
-            c.projection_.height, whole, c.sourceSrv_, c.sourceFormat_);
-        ok = c.RenderTo(c.projection_.rtvs[image][1], c.projection_.width,
-            c.projection_.height, whole, c.sourceSrv_, c.sourceFormat_) && ok;
-        if (ok) R23Pixels.ScheduleProjection(c, image);
-        c.Release(c.projection_);
+        c.Acquire(c.theater_, image);
+        const bool ok = c.RenderTo(c.theater_.rtvs[image][0],
+            c.theater_.width, c.theater_.height, whole,
+            c.sourceSrv_, c.sourceFormat_);
+        if (ok) R23Pixels.ScheduleTheater(c, image);
+        c.Release(c.theater_);
         if (!ok) return false;
 
-        for (int eye = 0; eye < 2; ++eye)
-        {
-            pv[eye] = { XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW };
-            pv[eye].pose = views[eye].pose;
-            pv[eye].fov = views[eye].fov;
-            pv[eye].subImage.swapchain = c.projection_.handle;
-            pv[eye].subImage.imageRect.offset = { 0, 0 };
-            pv[eye].subImage.imageRect.extent = {
-                static_cast<int32_t>(c.projection_.width),
-                static_cast<int32_t>(c.projection_.height) };
-            pv[eye].subImage.imageArrayIndex = eye;
-        }
+        // A mono menu is a flat virtual screen, not a stereo camera image.
+        // Submitting the same pixels as two projection views made the runtime
+        // apply two different eye poses/FOVs and produced a visible L/R split.
+        quad = { XR_TYPE_COMPOSITION_LAYER_QUAD };
+        quad.space = viewSpace;
+        quad.eyeVisibility = XR_EYE_VISIBILITY_BOTH;
+        quad.pose.orientation = { 0.f, 0.f, 0.f, 1.f };
+        quad.pose.position = { 0.f, 0.f, -1.55f };
+        quad.subImage.swapchain = c.theater_.handle;
+        quad.subImage.imageRect.offset = { 0, 0 };
+        quad.subImage.imageRect.extent = {
+            static_cast<int32_t>(c.theater_.width),
+            static_cast<int32_t>(c.theater_.height) };
+
+        RECT cr{};
+        GetClientRect(c.hwnd_, &cr);
+        const float aspect = (cr.bottom > cr.top)
+            ? static_cast<float>(cr.right - cr.left) /
+              static_cast<float>(cr.bottom - cr.top)
+            : 16.f / 9.f;
+        quad.size.width = 2.40f;
+        quad.size.height = quad.size.width / std::max(aspect, 0.25f);
         return true;
     }
 
@@ -2579,19 +2588,16 @@ int main(int argc, char** argv)
                     const CaptureStatus capture = R23Capture(compositor);
                     QueryPerformanceCounter(&ce); timings.capture.Add(timings.Ms(cs, ce));
                     LARGE_INTEGER rs{}, re{}; QueryPerformanceCounter(&rs);
-                    // Menus are native mono/full-frame content. Only gameplay
-                    // recovery sources can contain SBS and need left-eye extraction.
-                    // Cropping menus to the left half magnifies a 2D menu and clips
-                    // its right side in the HMD.
-                    if (capture.available && R23RenderMonoProjection(compositor, views, pv))
+                    // Menus are native mono/full-frame content. Present them as
+                    // one head-locked physical plane; do not reinterpret one mono
+                    // image as two eye-camera projection images.
+                    if (capture.available &&
+                        R23RenderHeadLockedMenu(compositor, viewSpace, quad))
                     {
-                        projection.space = localSpace;
-                        projection.viewCount = 2;
-                        projection.views = pv.data();
-                        layers[0] = reinterpret_cast<const XrCompositionLayerBaseHeader*>(&projection);
+                        layers[0] =
+                            reinterpret_cast<const XrCompositionLayerBaseHeader*>(&quad);
                         layerReady = true;
-                        intentionalMonoProjection = true;
-                        finalLayerKind = "menu-mono-projection";
+                        finalLayerKind = "menu-headlocked-quad";
                     }
                     QueryPerformanceCounter(&re);
                     frameRenderMs += timings.Ms(rs, re);

@@ -177,7 +177,7 @@ namespace OutRunVRRenderer
 
         void R27PublishHostRecenterIfPressed() noexcept
         {
-            const bool down = (GetAsyncKeyState(VK_F10) & 0x8000) != 0;
+            const bool down = RendererRecenterActionDown();
             const bool pressed = down && !R27HostRecenterWasDown;
             R27HostRecenterWasDown = down;
             if (!pressed)
@@ -187,21 +187,23 @@ namespace OutRunVRRenderer
             if (requestId != 0)
             {
                 spdlog::info(
-                    "VR R27 recenter: F10 game->host request published requestId={} pid={} presentation={}",
+                    "VR R27 recenter: {} game->host request published requestId={} pid={} presentation={}",
+                    InputManager_ModActionDisplayName(ModAction::VRRecenter),
                     requestId, GetCurrentProcessId(),
                     static_cast<unsigned>(CurrentPresentationMode()));
             }
             else
             {
                 spdlog::warn(
-                    "VR R27 recenter: F10 pressed but game->host request mapping is unavailable");
+                    "VR R27 recenter: {} pressed but game->host request mapping is unavailable",
+                    InputManager_ModActionDisplayName(ModAction::VRRecenter));
             }
         }
 
         HRESULT __stdcall BeginSceneDestR23(IDirect3DDevice9* device)
         {
             // Do this before the gameplay eligibility branch. Menus render
-            // BeginScene too, so F10 can re-anchor the host theater even though
+            // BeginScene too, so the configured VR Recenter action can re-anchor the host menu even though
             // LatchFramePose intentionally skips gameplay tracking there.
             if (IsGameDevice(device) && !OutRunVRStereo::IsInternalStereoPassActive())
                 R27PublishHostRecenterIfPressed();

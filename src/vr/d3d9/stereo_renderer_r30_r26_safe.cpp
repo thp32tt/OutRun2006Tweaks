@@ -22,6 +22,7 @@
 namespace Settings
 {
     extern Setting<float> VRHudScale;
+    extern Setting<float> VRStereoDepth;
     extern Setting<int> SkyGlowFactor;
 }
 
@@ -72,6 +73,7 @@ namespace OutRunVRStereo
         std::uint64_t R30ScreenSpaceFallbacks = 0;
         std::uint64_t R30ScreenSpaceBuildFailures = 0;
         bool R30FirstScreenSpaceLogged = false;
+        bool R30FirstFlatPerspectiveLogged = false;
 
         std::uint64_t R30XyzrhwHudDraws = 0;
         std::uint64_t R30XyzrhwWorldEffectDraws = 0;
@@ -1221,20 +1223,53 @@ namespace OutRunVRStereo
             }
         }
 
-        bool R30CurrentPassIsScreenSpace2D() noexcept
+        enum class R30ScreenSpaceKind : std::uint8_t
         {
-            if (!TargetIsBackBuffer())
-                return false;
+            None,
+            Hud2D,
+            FlatPerspectiveEffect
+        };
+
+        R30ScreenSpaceKind R30ClassifyScreenSpacePass(
+            IDirect3DDevice9* device) noexcept
+        {
+            if (!device || !TargetIsBackBuffer())
+                return R30ScreenSpaceKind::None;
 
             float projection[16]{};
             if (!OutRunVRRenderer::GetRendererBaseProjection(projection))
-                return false;
+                return R30ScreenSpaceKind::None;
 
             const auto projectionClass =
                 OutRunVR::PassPolicy::ClassifyProjectionSignature(
                     projection[11], projection[15]);
-            return projectionClass ==
-                OutRunVR::PassPolicy::ProjectionClass::Orthographic2D;
+            if (projectionClass ==
+                OutRunVR::PassPolicy::ProjectionClass::Orthographic2D)
+                return R30ScreenSpaceKind::Hud2D;
+
+            // R26 keeps depth-disabled alpha/billboard passes zero-disparity.
+            // With asymmetric OpenXR FOVs identical clip coordinates are not
+            // identical visual rays, which shows as doubled rank/lens effects.
+            // Restrict this correction to alpha flat-perspective passes so
+            // opaque postprocess quads remain untouched.
+            if (projectionClass !=
+                OutRunVR::PassPolicy::ProjectionClass::Perspective3D)
+                return R30ScreenSpaceKind::None;
+
+            DWORD zEnable = D3DZB_TRUE;
+            DWORD alphaBlend = FALSE;
+            DWORD alphaTest = FALSE;
+            if (FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_ALPHABLENDENABLE, &alphaBlend)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_ALPHATESTENABLE, &alphaTest)))
+                return R30ScreenSpaceKind::None;
+
+            if (zEnable == D3DZB_FALSE &&
+                (alphaBlend != FALSE || alphaTest != FALSE))
+                return R30ScreenSpaceKind::FlatPerspectiveEffect;
+            return R30ScreenSpaceKind::None;
         }
 
 
@@ -1422,18 +1457,13 @@ namespace OutRunVRStereo
                     source, vertexCount, stride, state,
                     baseProjection, usedMask);
 
-            // Depth-tested particles/decals are world effects. A depth-disabled
-            // XYZRHW draw is promoted only when its Z/RHW pair is mathematically
-            // consistent with the current perspective projection. This keeps
-            // screen-space white rank glyphs together with their black layer.
-            // R36: a depth-disabled XYZRHW draw is screen-space even when RHW
-            // happens to resemble a previous world projection. This prevents
-            // white rank/lens overlays from being promoted into per-eye world
-            // space. Spatial smoke/skid/decal draws keep Z testing enabled.
+            // A coherent screen-Z/RHW relation is stronger evidence than
+            // ZENABLE alone: OutRun can disable Z for smoke/skid/decal
+            // billboards. The previous Z requirement made the test log report
+            // XYZRHW world=0 and pushed every such effect through the HUD path.
             if (state.depthTestEnabled && !state.rhwDepthEvidence)
                 return false;
-            state.worldEffect =
-                state.depthTestEnabled && state.rhwDepthEvidence;
+            state.worldEffect = state.rhwDepthEvidence;
             if (!state.worldEffect)
                 return true;
 
@@ -1493,7 +1523,7 @@ namespace OutRunVRStereo
                 const D3DMATRIX eyePose =
                     MatrixFromQuaternionTranslation(
                         identityOrientation, relativeEye,
-                        Settings::VRWorldScale);
+                        Settings::VRWorldScale * Settings::VRStereoDepth);
                 state.eyeInverse[eye] = InverseRigid(eyePose);
                 state.eyeProjection[eye] =
                     ProjectionFromFov(baseProjection,
@@ -1527,10 +1557,10 @@ namespace OutRunVRStereo
                      baseProjection._32 * state.worldScaleY[eye]) /
                     baseProjection._34;
                 state.parallaxPerRhwX[eye] =
-                    -localX * Settings::VRWorldScale *
+                    -localX * Settings::VRWorldScale * Settings::VRStereoDepth *
                     eyeProjection._11;
                 state.parallaxPerRhwY[eye] =
-                    -localY * Settings::VRWorldScale *
+                    -localY * Settings::VRWorldScale * Settings::VRStereoDepth *
                     eyeProjection._22;
 
                 if (!std::isfinite(state.worldScaleX[eye]) ||
@@ -2540,6 +2570,7 @@ namespace OutRunVRStereo
         bool R30BuildScreenSpaceEyeConstants(
             IDirect3DDevice9* device,
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
+            bool applyHudScale,
             float original[16], float eyeConstants[2][16],
             float eyeScale[2], float eyeOffset[2]) noexcept
         {
@@ -2567,7 +2598,8 @@ namespace OutRunVRStereo
                 // to projection-space world mapping, not 2D sprite dimensions.
                 float hudScaleX = 1.0f;
                 float hudScaleY = 1.0f;
-                R30HudContainScale(stereo, hudScaleX, hudScaleY);
+                if (applyHudScale)
+                    R30HudContainScale(stereo, hudScaleX, hudScaleY);
                 clipCorrection._11 = hudScaleX;
                 clipCorrection._22 = hudScaleY;
                 clipCorrection._33 = 1.0f;
@@ -2593,8 +2625,12 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, ActualDraw&& actualDraw,
             const char* site)
         {
-            if (!R30SafeStereoBase(device) ||
-                !R30CurrentPassIsScreenSpace2D())
+            if (!R30SafeStereoBase(device))
+                return E_NOTIMPL;
+
+            const R30ScreenSpaceKind screenKind =
+                R30ClassifyScreenSpacePass(device);
+            if (screenKind == R30ScreenSpaceKind::None)
                 return E_NOTIMPL;
 
             if (!EnsureStereoResources(device))
@@ -2626,6 +2662,7 @@ namespace OutRunVRStereo
             float eyeScale[2]{};
             float eyeOffset[2]{};
             if (!R30BuildScreenSpaceEyeConstants(device, stereo,
+                    screenKind == R30ScreenSpaceKind::Hud2D,
                     original, eyeConstants, eyeScale, eyeOffset))
             {
                 ++R30ScreenSpaceBuildFailures;
@@ -2732,9 +2769,16 @@ namespace OutRunVRStereo
             {
                 R30FirstScreenSpaceLogged = true;
                 spdlog::info(
-                    "VR R30 HUD: orthographic ScreenSpace2D asymmetric-FOV correction ACTIVE; R36 common-centre contain-fit offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} sourceOverTarget={:.3f}; full desktop HUD remains inside each eye",
+                    "VR R30 HUD: asymmetric-FOV convergence correction ACTIVE; common-centre offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} sourceOverTarget={:.3f}",
                     eyeOffset[0], eyeOffset[1], R30HudScaleValue(),
                     R30HudAspectCompensation(stereo));
+            }
+            if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect &&
+                !R30FirstFlatPerspectiveLogged)
+            {
+                R30FirstFlatPerspectiveLogged = true;
+                spdlog::info(
+                    "VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay receives convergence-only FOV correction (no HudScale)");
             }
 
             if (FAILED(rightHr))

@@ -14,6 +14,7 @@
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "game_addrs.hpp"
+#include "input_manager.hpp"
 #include "vr_shared.hpp"
 #include "vr/ipc/host_pose_v3.hpp"
 #include "vr/ipc/cadence_v1.hpp"
@@ -53,6 +54,7 @@ namespace Settings
 	extern Setting<float> VRRotationScale;
 	extern Setting<int> VRMatrixOrder;
 	extern Setting<bool> VRTelemetry;
+	extern Setting<bool> UseNewInput;
 	extern Setting<int> VRFrameCadenceMode;
 	extern Setting<float> VRFrameCadenceTimeoutMs;
 }
@@ -758,9 +760,16 @@ namespace OutRunVRRenderer
 			return true;
 		}
 
+		bool RendererRecenterActionDown()
+		{
+			if (Settings::UseNewInput)
+				return InputManager_ModActionHeld(ModAction::VRRecenter);
+			return (GetAsyncKeyState(VK_F10) & 0x8000) != 0;
+		}
+
 		bool RendererRecenterPressed()
 		{
-			const bool isDown = (GetAsyncKeyState(VK_F10) & 0x8000) != 0;
+			const bool isDown = RendererRecenterActionDown();
 			const bool pressed = isDown && !RecenterWasDown;
 			RecenterWasDown = isDown;
 			return pressed;
@@ -1192,7 +1201,7 @@ namespace OutRunVRRenderer
 				CenterReferenceSpaceGeneration = sample.referenceSpaceGeneration;
 				CenterValid = true;
 				if (recenter)
-					spdlog::info("VR renderer: yaw recentered HMD pose (F10); pitch/roll preserved");
+					spdlog::info("VR renderer: yaw recentered HMD pose (configured VR Recenter action); pitch/roll preserved");
 				else if (referenceSpaceChanged)
 					spdlog::info("VR renderer: OpenXR reference space changed; tracking origin refreshed");
 			}

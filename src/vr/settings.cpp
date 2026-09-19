@@ -64,7 +64,9 @@ namespace Settings
 	Setting<bool> VRCullingUnionFov{ "VR", "CullingUnionFov", false,
 		"Reserved diagnostic option. Union-FOV culling is intentionally deferred until a culling-only frustum boundary is verified; the live game projection is not modified." };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,
-		"Game-world units per metre of OpenXR head/eye movement.", Range<float>{ 0.1f, 10.0f } };
+		"Game-world units per metre of OpenXR head movement.", Range<float>{ 0.1f, 10.0f } };
+	Setting<float> VRStereoDepth{ "VR", "StereoDepth", 1.0f,
+		"Scales only virtual eye separation/3D parallax without changing head positional movement. 1.0 uses the runtime IPD; raise it for stronger depth.", Range<float>{ 0.50f, 2.00f } };
 	Setting<float> VRRotationScale{ "VR", "RotationScale", 1.0f,
 		"Scales HMD rotation around the recentered forward direction.", Range<float>{ 0.0f, 2.0f } };
 	Setting<int> VRMatrixOrder{ "VR", "MatrixOrder", 0,

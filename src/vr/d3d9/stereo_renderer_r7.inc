@@ -47,6 +47,7 @@ namespace Settings
 	extern Setting<bool> VRAutoEnableWhenHostPresent;
 	extern Setting<bool> VRStereo;
 	extern Setting<float> VRWorldScale;
+	extern Setting<float> VRStereoDepth;
 	extern Setting<bool> VRTelemetry;
 }
 
@@ -654,7 +655,7 @@ namespace OutRunVRStereo
 					const D3DMATRIX eyePose =
 						MatrixFromQuaternionTranslation(
 							stereo.eyeOrientation[eye], stereo.eyeOffset[eye],
-							Settings::VRWorldScale);
+							Settings::VRWorldScale * Settings::VRStereoDepth);
 					const D3DMATRIX eyeInverse = InverseRigid(eyePose);
 					state.fixedEyeView[eye] =
 						MultiplyMatrix(state.fixedOriginalView, eyeInverse);
@@ -699,7 +700,7 @@ namespace OutRunVRStereo
 			if (!MatrixFinite(correctedWorldView)) return EyeBuildResult::FatalError;
 			for (int eye = 0; eye < 2; ++eye)
 			{
-				const D3DMATRIX eyePose = MatrixFromQuaternionTranslation(stereo.eyeOrientation[eye], stereo.eyeOffset[eye], Settings::VRWorldScale);
+				const D3DMATRIX eyePose = MatrixFromQuaternionTranslation(stereo.eyeOrientation[eye], stereo.eyeOffset[eye], Settings::VRWorldScale * Settings::VRStereoDepth);
 				const D3DMATRIX eyeInverse = InverseRigid(eyePose);
 				const D3DMATRIX eyeProjection = ProjectionFromFov(projection, stereo.eyeFov[eye]);
 				const D3DMATRIX eyeWvp = MultiplyMatrix(MultiplyMatrix(correctedWorldView, eyeInverse), eyeProjection);
@@ -813,17 +814,22 @@ namespace OutRunVRStereo
 		void ReleaseDirectTransportSlots(){DirectTransportResourcesReady=false;DirectTransportWidth=0;DirectTransportHeight=0;for(auto&slot:DirectTransportSlots){ReleaseCom(slot.fence);ReleaseCom(slot.leftSurface);ReleaseCom(slot.leftTexture);ReleaseCom(slot.rightSurface);ReleaseCom(slot.rightTexture);slot={};}}
 		void DirectTransportTargetSize(IDirect3DDevice9* device,UINT& width,UINT& height)
 		{
-			width=BackBufferDesc.Width;height=BackBufferDesc.Height;
+			// Once a DirectGPU eye size is active, keep it as the fallback for an
+			// unstable seqlock read. Falling back to the desktop backbuffer for one
+			// read used to recreate the whole 4-slot ring 2124x2284 <-> 3440x1440.
+			width=DirectTransportWidth?DirectTransportWidth:BackBufferDesc.Width;
+			height=DirectTransportHeight?DirectTransportHeight:BackBufferDesc.Height;
 			if(SharedState&&SharedState->magic==OutRunVR::SharedMagic&&SharedState->protocolVersion==OutRunVR::SharedProtocolVersion&&SharedState->structSize==sizeof(OutRunVR::SharedPoseState))
 			{
-				for(int attempt=0;attempt<3;++attempt)
+				for(int attempt=0;attempt<4;++attempt)
 				{
 					const std::uint32_t before=SharedState->sequence;if(before&1u)continue;MemoryBarrier();
 					const UINT w0=SharedState->recommendedWidth[0],w1=SharedState->recommendedWidth[1];
 					const UINT h0=SharedState->recommendedHeight[0],h1=SharedState->recommendedHeight[1];MemoryBarrier();
 					const std::uint32_t after=SharedState->sequence;if(before!=after||(after&1u))continue;
 					const UINT recommendedW=w0>w1?w0:w1;const UINT recommendedH=h0>h1?h0:h1;
-					if(recommendedW&&recommendedH){width=recommendedW;height=recommendedH;}break;
+					if(recommendedW&&recommendedH){width=recommendedW;height=recommendedH;}
+					break;
 				}
 			}
 			D3DCAPS9 caps{};if(device&&SUCCEEDED(device->GetDeviceCaps(&caps))){if(caps.MaxTextureWidth&&width>caps.MaxTextureWidth)width=caps.MaxTextureWidth;if(caps.MaxTextureHeight&&height>caps.MaxTextureHeight)height=caps.MaxTextureHeight;}
@@ -839,7 +845,7 @@ namespace OutRunVRStereo
 		}
 		bool ResolveDirectTransport(IDirect3DDevice9* device,std::uint32_t frameId)
 		{
-			if(!frameId||!EnsureDirectTransportResources(device)||!BackBuffer||!RightEyeSurface)return false;const std::uint32_t slotIndex=(frameId-1u)%OutRunVR::RenderFrameRingSize;auto&slot=DirectTransportSlots[slotIndex];if(slot.producerPending){const HRESULT pending=slot.fence?slot.fence->GetData(nullptr,0,0):E_FAIL;if(pending==S_OK){slot.producerPending=false;slot.pendingFrameId=0;}else{++DirectTransportRingBackpressure;return false;}}const std::uint32_t consumed=SharedState?SharedState->hostDirectConsumedFrameId:0;if(slot.frameId&&!FrameIdAtOrAfter(consumed,slot.frameId)){++DirectTransportRingBackpressure;return false;}{InternalPassScope guard;if(FAILED(StretchDirectEye(device,BackBuffer,slot.leftSurface))||FAILED(StretchDirectEye(device,RightEyeSurface,slot.rightSurface))||FAILED(slot.fence->Issue(D3DISSUE_END)))return false;}slot.producerPending=true;slot.pendingFrameId=frameId;if(!WaitForEventQuery(slot.fence,2)){++DirectTransportFenceTimeouts;return false;}slot.producerPending=false;slot.pendingFrameId=0;slot.frameId=frameId;ActiveDirectTransportSlot=slotIndex;return true;
+			if(!frameId||!EnsureDirectTransportResources(device)||!BackBuffer||!RightEyeSurface)return false;const std::uint32_t slotIndex=(frameId-1u)%OutRunVR::RenderFrameRingSize;auto&slot=DirectTransportSlots[slotIndex];if(slot.producerPending){const HRESULT pending=slot.fence?slot.fence->GetData(nullptr,0,0):E_FAIL;if(pending==S_OK){slot.producerPending=false;slot.pendingFrameId=0;}else{++DirectTransportRingBackpressure;return false;}}const std::uint32_t consumed=SharedState?SharedState->hostDirectConsumedFrameId:0;if(slot.frameId&&!FrameIdAtOrAfter(consumed,slot.frameId)){++DirectTransportRingBackpressure;return false;}{InternalPassScope guard;if(FAILED(StretchDirectEye(device,BackBuffer,slot.leftSurface))||FAILED(StretchDirectEye(device,RightEyeSurface,slot.rightSurface))||FAILED(slot.fence->Issue(D3DISSUE_END)))return false;}slot.producerPending=true;slot.pendingFrameId=frameId;if(!WaitForEventQuery(slot.fence,4)){++DirectTransportFenceTimeouts;return false;}slot.producerPending=false;slot.pendingFrameId=0;slot.frameId=frameId;ActiveDirectTransportSlot=slotIndex;return true;
 		}
 
 		bool EnsureStereoResources(IDirect3DDevice9* device)
