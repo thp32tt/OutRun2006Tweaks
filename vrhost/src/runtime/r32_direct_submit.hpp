@@ -290,10 +290,13 @@ namespace OutRunVrR32DirectSubmit
         if (generation != 0 && AckFaultGeneration == generation)
             return false;
 
-        const auto state =
-            OutRunVrR21RuntimeHardening::ReadDirectHostStateReadonly();
-        return OutRunVrR22RuntimeHardening::DirectOpenMatchesLatest(
-            state, verified.frame);
+        // main_r23 has already staged this exact immutable slot, rendered it
+        // into the projection swapchain and published the verified bundle.
+        // The producer cannot reuse that slot until ArmConsumptionFence()
+        // completes and publishes its per-slot GPU ACK. Requiring the frame to
+        // still be the ring's global "latest" here races the producer and was
+        // demoting every valid projection-fresh frame to fallback-cached-image.
+        return true;
     }
 
     inline void CapturePerfSnapshot() noexcept
@@ -376,7 +379,7 @@ namespace OutRunVrR32DirectSubmit
             {
                 FirstFastSubmitLogged = true;
                 std::cerr
-                    << "[R32 direct] verified incoming DirectGPU projection submitted once; redundant SafeEye copy + second projection removed build="
+                    << "[R32 direct] verified incoming DirectGPU projection submitted once; rendered projection is presentation-authoritative while its exact producer slot stays protected by asynchronous GPU ACK; redundant SafeEye copy + second projection removed build="
                     << BuildId << "\n";
             }
             MaybeLogPerf();

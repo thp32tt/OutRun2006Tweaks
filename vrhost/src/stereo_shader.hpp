@@ -18,6 +18,11 @@ cbuffer BlitParams : register(b0)
     float2 Padding;
 };
 
+cbuffer MenuPlaneParams : register(b1)
+{
+    float4 MenuClip[4];
+};
+
 struct VSOut
 {
     float4 position : SV_Position;
@@ -30,6 +35,16 @@ VSOut VSMain(uint id : SV_VertexID)
     float2 uv = float2((id << 1) & 2, id & 2);
     o.position = float4(uv * float2(2.0, -2.0) + float2(-1.0, 1.0), 0.0, 1.0);
     o.uv = uv;
+    return o;
+}
+
+VSOut VSMenu(uint id : SV_VertexID)
+{
+    VSOut o;
+    const uint corner = min(id, 3u);
+    o.position = MenuClip[corner];
+    o.uv = float2((corner & 1u) ? 1.0 : 0.0,
+                  (corner & 2u) ? 1.0 : 0.0);
     return o;
 }
 

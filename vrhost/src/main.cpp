@@ -951,6 +951,11 @@ namespace
         float padding[2];
     };
 
+    struct MenuPlaneParams
+    {
+        float clip[4][4]{};
+    };
+
     struct SwapchainSet
     {
         XrSwapchain handle = XR_NULL_HANDLE;
@@ -1387,6 +1392,179 @@ namespace
             return true;
         }
 
+        bool RenderMenuPlaneTo(
+            ID3D11RenderTargetView* rtv, std::uint32_t w, std::uint32_t h,
+            const UvRect& uv, ID3D11ShaderResourceView* sourceSrv,
+            DXGI_FORMAT sourceFormat, const float clip[4][4])
+        {
+            if (!rtv || !sourceSrv || !constantBuffer_ ||
+                !menuConstantBuffer_ || !menuVs_)
+                return false;
+
+            D3D11_MAPPED_SUBRESOURCE map{};
+            if (FAILED(context_->Map(
+                    constantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &map)))
+                return false;
+            auto* p = static_cast<BlitParams*>(map.pData);
+            p->uvScale[0] = uv.w;
+            p->uvScale[1] = uv.h;
+            p->uvOffset[0] = uv.x;
+            p->uvOffset[1] = uv.y;
+            p->sdrWhiteScale = sdrWhiteScale_;
+            p->sourceIsScRgb =
+                sourceFormat == DXGI_FORMAT_R16G16B16A16_FLOAT ? 1.f : 0.f;
+            p->padding[0] = p->padding[1] = 0;
+            context_->Unmap(constantBuffer_, 0);
+
+            if (FAILED(context_->Map(
+                    menuConstantBuffer_, 0,
+                    D3D11_MAP_WRITE_DISCARD, 0, &map)))
+                return false;
+            auto* menu = static_cast<MenuPlaneParams*>(map.pData);
+            std::memcpy(menu->clip, clip, sizeof(menu->clip));
+            context_->Unmap(menuConstantBuffer_, 0);
+
+            D3D11_VIEWPORT vp{};
+            vp.Width = static_cast<float>(w);
+            vp.Height = static_cast<float>(h);
+            vp.MaxDepth = 1.f;
+            context_->RSSetViewports(1, &vp);
+
+            const float black[4]{ 0.f, 0.f, 0.f, 1.f };
+            context_->ClearRenderTargetView(rtv, black);
+            context_->OMSetRenderTargets(1, &rtv, nullptr);
+            context_->IASetPrimitiveTopology(
+                D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+            context_->VSSetShader(menuVs_, nullptr, 0);
+            context_->VSSetConstantBuffers(1, 1, &menuConstantBuffer_);
+            context_->PSSetShader(ps_, nullptr, 0);
+            context_->PSSetShaderResources(0, 1, &sourceSrv);
+            context_->PSSetSamplers(0, 1, &sampler_);
+            context_->PSSetConstantBuffers(0, 1, &constantBuffer_);
+            context_->Draw(4, 0);
+
+            ID3D11ShaderResourceView* nullSrv = nullptr;
+            context_->PSSetShaderResources(0, 1, &nullSrv);
+            ID3D11RenderTargetView* nullRtv = nullptr;
+            context_->OMSetRenderTargets(1, &nullRtv, nullptr);
+            return true;
+        }
+
+        bool RenderMenuProjection(
+            XrSpace viewSpace, XrSpace localSpace, XrTime displayTime,
+            const std::array<XrView, 2>& views,
+            std::array<XrCompositionLayerProjectionView, 2>& pv)
+        {
+            if (!haveFrame_ || !sourceSrv_ ||
+                !EnsureTheaterAnchor(viewSpace, localSpace, displayTime))
+                return false;
+
+            UvRect whole{};
+            if (!GetGameUv(whole))
+                return false;
+
+            RECT cr{};
+            GetClientRect(hwnd_, &cr);
+            const float aspect = (cr.bottom > cr.top)
+                ? static_cast<float>(cr.right - cr.left) /
+                    static_cast<float>(cr.bottom - cr.top)
+                : 16.f / 9.f;
+            const float width = 2.0f;
+            const float height = width / std::max(0.5f, aspect);
+            const XrVector3f right =
+                RotateVector(theaterAnchor_.orientation, { 1.f, 0.f, 0.f });
+            const XrVector3f up =
+                RotateVector(theaterAnchor_.orientation, { 0.f, 1.f, 0.f });
+            const float sx[4]{ -1.f, 1.f, -1.f, 1.f };
+            const float sy[4]{ 1.f, 1.f, -1.f, -1.f };
+            XrVector3f corners[4]{};
+            for (int i = 0; i < 4; ++i)
+            {
+                corners[i] = {
+                    theaterAnchor_.position.x +
+                        right.x * sx[i] * width * 0.5f +
+                        up.x * sy[i] * height * 0.5f,
+                    theaterAnchor_.position.y +
+                        right.y * sx[i] * width * 0.5f +
+                        up.y * sy[i] * height * 0.5f,
+                    theaterAnchor_.position.z +
+                        right.z * sx[i] * width * 0.5f +
+                        up.z * sy[i] * height * 0.5f
+                };
+            }
+
+            std::uint32_t image = 0;
+            Acquire(projection_, image);
+            bool ok = image < projection_.rtvs.size();
+            for (int eye = 0; eye < 2 && ok; ++eye)
+            {
+                float clip[4][4]{};
+                const float tanLeft = std::tan(views[eye].fov.angleLeft);
+                const float tanRight = std::tan(views[eye].fov.angleRight);
+                const float tanDown = std::tan(views[eye].fov.angleDown);
+                const float tanUp = std::tan(views[eye].fov.angleUp);
+                const float spanX = tanRight - tanLeft;
+                const float spanY = tanUp - tanDown;
+                if (!std::isfinite(spanX) || !std::isfinite(spanY) ||
+                    spanX <= 0.05f || spanY <= 0.05f)
+                {
+                    ok = false;
+                    break;
+                }
+
+                for (int corner = 0; corner < 4; ++corner)
+                {
+                    const XrVector3f local =
+                        ToHeadLocal(views[eye].pose, corners[corner]);
+                    const float depth = -local.z;
+                    if (!std::isfinite(depth) || depth <= 0.05f)
+                    {
+                        ok = false;
+                        break;
+                    }
+                    const float slopeX = local.x / depth;
+                    const float slopeY = local.y / depth;
+                    const float ndcX =
+                        2.0f * (slopeX - tanLeft) / spanX - 1.0f;
+                    const float ndcY =
+                        2.0f * (slopeY - tanDown) / spanY - 1.0f;
+                    if (!std::isfinite(ndcX) || !std::isfinite(ndcY))
+                    {
+                        ok = false;
+                        break;
+                    }
+                    clip[corner][0] = ndcX;
+                    clip[corner][1] = ndcY;
+                    clip[corner][2] = 0.5f;
+                    clip[corner][3] = 1.0f;
+                }
+
+                if (ok)
+                    ok = RenderMenuPlaneTo(
+                        projection_.rtvs[image][eye],
+                        projection_.width, projection_.height,
+                        whole, sourceSrv_, sourceFormat_, clip);
+            }
+            Release(projection_);
+            if (!ok)
+                return false;
+
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                pv[eye] = { XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW };
+                pv[eye].pose = views[eye].pose;
+                pv[eye].fov = views[eye].fov;
+                pv[eye].subImage.swapchain = projection_.handle;
+                pv[eye].subImage.imageRect.offset = { 0, 0 };
+                pv[eye].subImage.imageRect.extent = {
+                    static_cast<int32_t>(projection_.width),
+                    static_cast<int32_t>(projection_.height)
+                };
+                pv[eye].subImage.imageArrayIndex = eye;
+            }
+            return true;
+        }
+
         bool RenderTheater(XrSpace viewSpace, XrSpace localSpace, XrTime displayTime,
             XrCompositionLayerQuad& quad)
         {
@@ -1587,9 +1765,11 @@ namespace
             directFrameValid_ = false; directTransportReady_ = false;
             ReleaseCom(sourceSrv_);
             ReleaseCom(source_);
+            ReleaseCom(menuConstantBuffer_);
             ReleaseCom(constantBuffer_);
             ReleaseCom(sampler_);
             ReleaseCom(ps_);
+            ReleaseCom(menuVs_);
             ReleaseCom(vs_);
             ReleaseCom(duplication_);
             ReleaseCom(output5_);
@@ -1712,12 +1892,16 @@ namespace
         void CreateShaders()
         {
             ID3DBlob* v = CompileShader("VSMain", "vs_5_0");
+            ID3DBlob* mv = CompileShader("VSMenu", "vs_5_0");
             ID3DBlob* p = CompileShader("PSMain", "ps_5_0");
             CheckHr(device_->CreateVertexShader(v->GetBufferPointer(), v->GetBufferSize(), nullptr, &vs_),
                 "CreateVertexShader");
+            CheckHr(device_->CreateVertexShader(mv->GetBufferPointer(), mv->GetBufferSize(), nullptr, &menuVs_),
+                "CreateVertexShader(VSMenu)");
             CheckHr(device_->CreatePixelShader(p->GetBufferPointer(), p->GetBufferSize(), nullptr, &ps_),
                 "CreatePixelShader");
             v->Release();
+            mv->Release();
             p->Release();
 
             D3D11_SAMPLER_DESC sd{};
@@ -1731,6 +1915,11 @@ namespace
             bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
             bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
             CheckHr(device_->CreateBuffer(&bd, nullptr, &constantBuffer_), "CreateBuffer");
+
+            D3D11_BUFFER_DESC menuBd = bd;
+            menuBd.ByteWidth = sizeof(MenuPlaneParams);
+            CheckHr(device_->CreateBuffer(&menuBd, nullptr, &menuConstantBuffer_),
+                "CreateBuffer(MenuPlaneParams)");
         }
 
         bool BindCaptureOutput(bool initial)
@@ -1968,9 +2157,11 @@ namespace
         float renderScale_ = 1.0f;
 
         ID3D11VertexShader* vs_ = nullptr;
+        ID3D11VertexShader* menuVs_ = nullptr;
         ID3D11PixelShader* ps_ = nullptr;
         ID3D11SamplerState* sampler_ = nullptr;
         ID3D11Buffer* constantBuffer_ = nullptr;
+        ID3D11Buffer* menuConstantBuffer_ = nullptr;
         DXGI_FORMAT swapFormat_ = DXGI_FORMAT_UNKNOWN;
         SwapchainSet projection_{}, theater_{};
         float sdrWhiteScale_ = 1.f;

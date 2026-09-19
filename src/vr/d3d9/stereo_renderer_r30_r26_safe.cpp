@@ -75,11 +75,13 @@ namespace OutRunVRStereo
         std::uint64_t R30ScreenSpaceBuildFailures = 0;
         bool R30FirstScreenSpaceLogged = false;
         bool R30FirstFlatPerspectiveLogged = false;
+        bool R30FirstPerspectiveHudLogged = false;
 
         std::uint64_t R30XyzrhwHudDraws = 0;
         std::uint64_t R30XyzrhwWorldEffectDraws = 0;
         std::uint64_t R30XyzrhwRhwWorldPromotions = 0;
         std::uint64_t R30XyzrhwRhwOnlyDepthEvidence = 0;
+        std::uint64_t R30XyzrhwZOnlyDepthEvidence = 0;
         std::uint64_t R30XyzrhwFallbacks = 0;
         bool R30FirstXyzrhwHudLogged = false;
         bool R30FirstXyzrhwWorldLogged = false;
@@ -1096,13 +1098,14 @@ namespace OutRunVRStereo
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(
-                "VR R30.10: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},rhwPromote={},rhwOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R30.11: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
                 R30XyzrhwWorldEffectDraws, R30XyzrhwHudDraws,
                 R30XyzrhwRhwWorldPromotions,
                 R30XyzrhwRhwOnlyDepthEvidence,
+                R30XyzrhwZOnlyDepthEvidence,
                 R30XyzrhwAtomicFallbacks,
                 R30XyzrhwDepthPreserveFallbacks,
                 R30XyzrhwBilateralFallbacks,
@@ -1260,8 +1263,52 @@ namespace OutRunVRStereo
         {
             None,
             Hud2D,
-            FlatPerspectiveEffect
+            PerspectiveHud,
+            WorldBillboard
         };
+
+        bool R30PerspectiveAlphaLooksWorld(
+            IDirect3DDevice9* device) noexcept
+        {
+            if (!device ||
+                CurrentVertexShaderIdentity.load(std::memory_order_acquire) == 0)
+                return false;
+
+            float original[16]{};
+            float projectionRaw[16]{};
+            if (FAILED(device->GetVertexShaderConstantF(
+                    OutRunWvpRegister, original, OutRunWvpRegisterCount)) ||
+                !OutRunVRRenderer::GetRendererBaseProjection(projectionRaw))
+                return false;
+
+            D3DMATRIX uploadedT{};
+            D3DMATRIX baseProjection{};
+            D3DMATRIX inverseProjection{};
+            std::memcpy(&uploadedT, original, sizeof(uploadedT));
+            std::memcpy(&baseProjection, projectionRaw, sizeof(baseProjection));
+            const D3DMATRIX stockWvp = TransposeMatrix(uploadedT);
+            if (!MatrixFinite(stockWvp) || !MatrixFinite(baseProjection) ||
+                !InvertMatrix(baseProjection, inverseProjection))
+                return false;
+
+            const D3DMATRIX worldView =
+                MultiplyMatrix(stockWvp, inverseProjection);
+            if (!MatrixFinite(worldView))
+                return false;
+
+            // A real billboard still has an affine world/view matrix after the
+            // perspective projection is removed. Screen/HUD sprites pushed
+            // through a perspective shader do not. The translation depth then
+            // distinguishes a spatial marker above another car from near-plane
+            // HUD such as the large 6th/6 indicator.
+            const float affineError =
+                std::fabs(worldView._14) + std::fabs(worldView._24) +
+                std::fabs(worldView._34) + std::fabs(worldView._44 - 1.0f);
+            const float viewDepth = std::fabs(worldView._43);
+            return std::isfinite(affineError) && affineError <= 0.02f &&
+                std::isfinite(viewDepth) &&
+                viewDepth >= 1.25f && viewDepth < 1000000.0f;
+        }
 
         R30ScreenSpaceKind R30ClassifyScreenSpacePass(
             IDirect3DDevice9* device) noexcept
@@ -1279,20 +1326,12 @@ namespace OutRunVRStereo
             if (projectionClass ==
                 OutRunVR::PassPolicy::ProjectionClass::Orthographic2D)
                 return R30ScreenSpaceKind::Hud2D;
-
-            // R26 keeps depth-disabled alpha/billboard passes zero-disparity.
-            // With asymmetric OpenXR FOVs identical clip coordinates are not
-            // identical visual rays, which shows as doubled rank/lens effects.
-            // Restrict this correction to alpha flat-perspective passes so
-            // opaque postprocess quads remain untouched.
             if (projectionClass !=
                 OutRunVR::PassPolicy::ProjectionClass::Perspective3D)
                 return R30ScreenSpaceKind::None;
 
-            // A perspective pass that still carries a verified world c64 WVP
-            // belongs to R26/R28 even if the game disabled Z for sky/cloud or
-            // alpha billboards. The old broad rule intercepted it here and
-            // made world content follow the headset like a HUD.
+            // Verified/rebindable perspective WVP is already owned by the true
+            // world path and must never be intercepted as UI.
             if (CurrentDrawMatchesVerifiedWorld(device))
                 return R30ScreenSpaceKind::None;
             std::uintptr_t reboundShader = 0;
@@ -1311,10 +1350,13 @@ namespace OutRunVRStereo
                     D3DRS_ALPHATESTENABLE, &alphaTest)))
                 return R30ScreenSpaceKind::None;
 
-            if (zEnable == D3DZB_FALSE &&
-                (alphaBlend != FALSE || alphaTest != FALSE))
-                return R30ScreenSpaceKind::FlatPerspectiveEffect;
-            return R30ScreenSpaceKind::None;
+            if (zEnable != D3DZB_FALSE ||
+                (alphaBlend == FALSE && alphaTest == FALSE))
+                return R30ScreenSpaceKind::None;
+
+            return R30PerspectiveAlphaLooksWorld(device)
+                ? R30ScreenSpaceKind::WorldBillboard
+                : R30ScreenSpaceKind::PerspectiveHud;
         }
 
 
@@ -1446,6 +1488,7 @@ namespace OutRunVRStereo
             UINT projected = 0;
             UINT nonUnitRhw = 0;
             UINT plausibleRhwDepth = 0;
+            UINT plausibleScreenZDepth = 0;
             for (UINT i = 0; i < vertexCount && sampled < 512u; ++i)
             {
                 if (usedMask &&
@@ -1474,6 +1517,27 @@ namespace OutRunVRStereo
                     continue;
 
                 ++valid;
+
+                // RHW is often forced to 1.0 by OutRun's pretransformed
+                // particle/marker path. Screen-Z still contains the perspective
+                // depth. Solve the projection equation directly and accept
+                // interior Z only when it reconstructs to a real world distance.
+                const float zDenominator =
+                    actualNdcZ * projection._34 - projection._33;
+                if (actualNdcZ > 1.0e-5f &&
+                    actualNdcZ < 0.99999f &&
+                    std::fabs(zDenominator) > 1.0e-6f)
+                {
+                    const float zOnlyViewZ =
+                        (projection._43 -
+                         actualNdcZ * projection._44) /
+                        zDenominator;
+                    if (std::isfinite(zOnlyViewZ) &&
+                        std::fabs(zOnlyViewZ) >= 0.75f &&
+                        std::fabs(zOnlyViewZ) < 1000000.0f)
+                        ++plausibleScreenZDepth;
+                }
+
                 const bool carriesPerspectiveDepth =
                     std::fabs(rhw - 1.0f) > 0.02f;
                 if (carriesPerspectiveDepth)
@@ -1507,6 +1571,18 @@ namespace OutRunVRStereo
             const bool rhwDepthOnly =
                 nonUnitRhw * 4u >= valid * 3u &&
                 plausibleRhwDepth * 4u >= nonUnitRhw * 3u;
+            const bool screenZDepthOnly =
+                plausibleScreenZDepth * 4u >= valid * 3u;
+            if (screenZDepthOnly && !exactProjected && !rhwDepthOnly)
+            {
+                ++R30XyzrhwZOnlyDepthEvidence;
+                if (!R30FirstXyzrhwRhwOnlyEvidenceLogged)
+                {
+                    R30FirstXyzrhwRhwOnlyEvidenceLogged = true;
+                    spdlog::info(
+                        "VR R30.11 XYZRHW DEPTH: perspective screen-Z accepted as world depth even when RHW=1; near-plane HUD Z remains excluded");
+                }
+            }
             if (rhwDepthOnly && !exactProjected)
             {
                 ++R30XyzrhwRhwOnlyDepthEvidence;
@@ -1517,7 +1593,7 @@ namespace OutRunVRStereo
                         "VR R30.10 XYZRHW DEPTH: stable non-unit RHW accepted as world depth when screen-Z is post-projection biased; RHW=1 HUD remains excluded");
                 }
             }
-            return exactProjected || rhwDepthOnly;
+            return exactProjected || rhwDepthOnly || screenZDepthOnly;
         }
 
         bool R30ConfigureXyzrhwWorldEffect(
@@ -2688,7 +2764,7 @@ namespace OutRunVRStereo
             if (!MatrixFinite(stockWvp))
                 return false;
 
-            if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect)
+            if (screenKind == R30ScreenSpaceKind::WorldBillboard)
             {
                 float baseRaw[16]{};
                 float headRaw[16]{};
@@ -2710,34 +2786,9 @@ namespace OutRunVRStereo
                     !InvertMatrix(baseProjection, inverseBaseProjection))
                     return false;
 
-                // Turn a screen-space alpha overlay into a finite common view
-                // plane before applying the same head/eye transforms as world
-                // geometry. Keeping x/w and y/w while replacing z/w with a
-                // constant preserves the game's original 2D placement at
-                // recenter, but adds real IPD convergence and world locking.
-                constexpr float OverlayPlaneViewZ = -2.50f;
-                const float planeClipW =
-                    OverlayPlaneViewZ * baseProjection._34 +
-                    baseProjection._44;
-                const float planeClipZ =
-                    OverlayPlaneViewZ * baseProjection._33 +
-                    baseProjection._43;
-                if (!std::isfinite(planeClipW) ||
-                    !std::isfinite(planeClipZ) ||
-                    planeClipW <= 1.0e-4f)
-                    return false;
-                const float planeNdcZ = planeClipZ / planeClipW;
-                if (!std::isfinite(planeNdcZ))
-                    return false;
-
-                D3DMATRIX depthReset = IdentityMatrix();
-                depthReset._33 = 0.0f;
-                depthReset._43 = planeNdcZ;
-                const D3DMATRIX commonViewPlane =
-                    MultiplyMatrix(
-                        MultiplyMatrix(stockWvp, depthReset),
-                        inverseBaseProjection);
-                if (!MatrixFinite(commonViewPlane))
+                const D3DMATRIX worldView =
+                    MultiplyMatrix(stockWvp, inverseBaseProjection);
+                if (!MatrixFinite(worldView))
                     return false;
 
                 for (int eye = 0; eye < 2; ++eye)
@@ -2757,7 +2808,7 @@ namespace OutRunVRStereo
                         MultiplyMatrix(
                             MultiplyMatrix(
                                 MultiplyMatrix(
-                                    commonViewPlane, headInverse),
+                                    worldView, headInverse),
                                 eyeInverse),
                             eyeProjection);
                     if (!MatrixFinite(corrected))
@@ -2770,7 +2821,8 @@ namespace OutRunVRStereo
                 return true;
             }
 
-            if (screenKind != R30ScreenSpaceKind::Hud2D)
+            if (screenKind != R30ScreenSpaceKind::Hud2D &&
+                screenKind != R30ScreenSpaceKind::PerspectiveHud)
                 return false;
 
             for (int eye = 0; eye < 2; ++eye)
@@ -2952,12 +3004,19 @@ namespace OutRunVRStereo
                     eyeOffset[0], eyeOffset[1], R30HudScaleValue(),
                     R30HudAspectCompensation(stereo));
             }
-            if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect &&
+            if (screenKind == R30ScreenSpaceKind::WorldBillboard &&
                 !R30FirstFlatPerspectiveLogged)
             {
                 R30FirstFlatPerspectiveLogged = true;
                 spdlog::info(
-                    "VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay is world-locked on a finite virtual plane with real head/IPD/FOV transform (no HudScale)");
+                    "VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay is world-locked on a finite virtual plane; R39 true affine world billboard keeps its original vehicle/world depth and receives head/IPD/FOV transform");
+            }
+            if (screenKind == R30ScreenSpaceKind::PerspectiveHud &&
+                !R30FirstPerspectiveHudLogged)
+            {
+                R30FirstPerspectiveHudLogged = true;
+                spdlog::info(
+                    "VR R30 PERSPECTIVE HUD: near-plane alpha UI receives the same HudScale/asymmetric-FOV mapping as ordinary HUD; vehicle-attached rank markers are excluded as world billboards");
             }
 
             if (FAILED(rightHr))

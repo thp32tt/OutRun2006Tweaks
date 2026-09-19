@@ -651,6 +651,15 @@ namespace OutRunVRStereo
 					return EyeBuildResult::NonWorld;
 				}
 
+				// Car-select and other theater/menu previews also use
+				// fixed-function perspective XYZ. They are not VR world geometry
+				// and must not receive the headset inverse/eye transforms.
+				if (!GameplayActive())
+				{
+					++FixedFunctionNonWorldDraws;
+					return EyeBuildResult::NonWorld;
+				}
+
 				if (stereo.poseSequence == 0 ||
 					!MatrixFinite(state.fixedOriginalView) ||
 					!MatrixFinite(state.fixedOriginalProjection))

@@ -176,7 +176,8 @@ jobs:
               'flushIssued',
               'deferred until actual direct-ring slot pressure',
               'R32 direct PERF 5s',
-              'verified incoming DirectGPU projection submitted once'
+              'verified incoming DirectGPU projection submitted once',
+              'presentation-authoritative while its exact producer slot stays protected'
             )
             'vrhost/src/runtime/sbs_capture_override.hpp' = @(
               'Preserve acquiredImage',
@@ -732,6 +733,7 @@ jobs:
             'host-owned GPU eye copies + completion ACK active',
             '[D3D9Ex R32] SafeEye A/B staging + per-slot shared-resource cache ACTIVE',
             '[R32 direct] verified incoming DirectGPU projection submitted once',
+            'presentation-authoritative while its exact producer slot stays protected',
             '[R32 direct] D3D11 Flush is deferred until actual direct-ring slot pressure',
             '[R23 mono] gameplay stereo pending: bounded Desktop Duplication refresh for theater-only fallback',
             '[R23 final-submit] serial=',

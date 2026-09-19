@@ -116,7 +116,7 @@ jobs:
             '[R24] emergency visible quad submitted because no game image was safely displayable',
             'xrWaitSwapchainImage exceeded 250ms',
             '[R23 pixel]',
-            'menu-local-6dof-quad-cached',
+            'menu-local-6dof-projection-cached',
             'R23-crash-text-first-20260916'
           )) {
             if (-not $ascii.Contains($marker)) { throw "R24 host marker missing: $marker" }
@@ -172,6 +172,7 @@ jobs:
             'VR R35 CADENCE: non-blocking PhaseLock active',
             'VR R30.6 XYZRHW WORLD',
             'VR R30.10 XYZRHW DEPTH: stable non-unit RHW accepted as world depth',
+            'VR R30.11 XYZRHW DEPTH: perspective screen-Z accepted as world depth even when RHW=1',
             'VR R30 BUFFER SHADOW: lazy capture armed only after a real XYZRHW',
             'R30.6/DrawIndexedPrimitiveVB-ShadowXYZRHW',
             'VR D3D9Ex R38: per-slot GPU-completion ACK aware free-slot scan ACTIVE',
