@@ -200,12 +200,14 @@ settings = require(
     "src/vr/settings.cpp",
     'VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", true',
     'VRDirectGpuOnly{ "VR", "DirectGpuOnly", true',
+    'VRDisableDesktopDuplication{ "VR", "DisableDesktopDuplication", false',
     'VRTargetRefreshRateHz{ "VR", "TargetRefreshRateHz", 0.0f',
     'VRFrameCadenceMode{ "VR", "FrameCadenceMode", 1',
     'VRFrameCadenceTargetHz{ "VR", "FrameCadenceTargetHz", 0.0f',
     'VRFrameCadenceMaxHz{ "VR", "FrameCadenceMaxHz", 120.0f',
     "OUTRUN_VR_DIRECT_TRANSPORT",
     "OUTRUN_VR_DIRECT_ONLY",
+    "OUTRUN_VR_DISABLE_DESKTOP_DUPLICATION",
     "OUTRUN_VR_TARGET_REFRESH_HZ",
     "OUTRUN_VR_CADENCE_MODE",
     "OUTRUN_VR_CADENCE_TARGET_HZ",
@@ -349,7 +351,7 @@ require(
     "R23CommitDirectAfterValidation",
     "R23CommitClassicAfterValidation",
     "R23RefreshTheaterFallbackCapture",
-    "if (c.directTransportOnly_)",
+    "if (c.disableDesktopDuplication_)",
     "R37BootstrapSubmittedFrame",
     "R37BootstrapSubmittedGeneration",
     "R37FrameIdBefore",
@@ -377,7 +379,14 @@ require(
 require(
     "src/vr/d3d9/stereo_renderer_r26.cpp",
     "R37DepthDisabledFragileOverlay",
-    "screen-space veto must run before R28",
+    "R13EffectSnapshot effect = R13CaptureDrawTimeEffect",
+    "unknown state fails closed",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    '#include "stereo_renderer_r26.cpp"',
+    "R30SafeStereoBase",
+    "VR R26+HUD SAFE TEST",
 )
 require(
     "src/vr/d3d9/stereo_renderer_r30.cpp",

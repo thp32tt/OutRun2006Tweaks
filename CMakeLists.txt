@@ -99,7 +99,9 @@ unset(_vr_source)
 option(OUTRUN_VR_SAFE_DRAW_COMPARE "Use proven R26/R23 safe stereo draw production path" ON)
 set_source_files_properties(
     src/vr/d3d9/stereo_renderer_r26_compare.cpp
+    src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp
     PROPERTIES HEADER_FILE_ONLY TRUE)
+option(OUTRUN_VR_R26_HUD_COMPARE "Build R26-safe world path with R30 HUD/XYZRHW/SkyGlow overlay" OFF)
 if(OUTRUN_VR_SAFE_DRAW_COMPARE)
     set_source_files_properties(
         src/vr/d3d9/stereo_renderer_r34.cpp
@@ -131,10 +133,38 @@ set_source_files_properties(
     src/vr/d3d9/stereo_renderer_r30_c2_compare.cpp
     PROPERTIES HEADER_FILE_ONLY TRUE)
 
-if((OUTRUN_VR_SAFE_DRAW_COMPARE AND OUTRUN_VR_C1_COMPARE) OR
-   (OUTRUN_VR_SAFE_DRAW_COMPARE AND OUTRUN_VR_C2_COMPARE) OR
-   (OUTRUN_VR_C1_COMPARE AND OUTRUN_VR_C2_COMPARE))
+set(OUTRUN_VR_COMPARE_COUNT 0)
+foreach(_vr_option
+    OUTRUN_VR_SAFE_DRAW_COMPARE
+    OUTRUN_VR_R26_HUD_COMPARE
+    OUTRUN_VR_C1_COMPARE
+    OUTRUN_VR_C2_COMPARE)
+    if(${_vr_option})
+        math(EXPR OUTRUN_VR_COMPARE_COUNT
+            "${OUTRUN_VR_COMPARE_COUNT} + 1")
+    endif()
+endforeach()
+if(OUTRUN_VR_COMPARE_COUNT GREATER 1)
     message(FATAL_ERROR "Choose only one VR comparison build option")
+endif()
+unset(_vr_option)
+
+if(OUTRUN_VR_R26_HUD_COMPARE)
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r34.cpp
+        src/vr/d3d9/stereo_renderer_r26_compare.cpp
+        PROPERTIES HEADER_FILE_ONLY TRUE)
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    set_source_files_properties(
+        src/vr/game/outrun_renderer_r29.cpp
+        PROPERTIES HEADER_FILE_ONLY TRUE)
+    set_source_files_properties(
+        src/vr/game/outrun_renderer_r23.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    add_compile_definitions(OUTRUN_VR_R26_HUD_COMPARE=1)
+    message(STATUS "OutRun VR R26+HUD comparison: safe R26 world + R30 HUD/SkyGlow")
 endif()
 
 if(OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
@@ -157,6 +187,45 @@ elseif(OUTRUN_VR_C2_COMPARE)
     add_compile_definitions(OUTRUN_VR_C2_COMPARE=1)
     message(STATUS "OutRun VR C2 comparison: C1 + R30 HUD correction")
 endif()
+
+# Re-evaluate ownership after every comparison option has mutated
+# HEADER_FILE_ONLY. The configured graph must compile exactly one stereo owner
+# and exactly one renderer owner.
+set(_vr_stereo_owner_candidates
+    src/vr/d3d9/stereo_renderer_r34.cpp
+    src/vr/d3d9/stereo_renderer_r26_compare.cpp
+    src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp
+    src/vr/d3d9/stereo_renderer_r29_c1_compare.cpp
+    src/vr/d3d9/stereo_renderer_r30_c2_compare.cpp)
+set(_vr_renderer_owner_candidates
+    src/vr/game/outrun_renderer_r29.cpp
+    src/vr/game/outrun_renderer_r23.cpp)
+set(_vr_stereo_owner_count 0)
+set(_vr_renderer_owner_count 0)
+foreach(_vr_source IN LISTS _vr_stereo_owner_candidates)
+    get_source_file_property(_vr_header_only "${_vr_source}" HEADER_FILE_ONLY)
+    if(NOT _vr_header_only)
+        math(EXPR _vr_stereo_owner_count
+            "${_vr_stereo_owner_count} + 1")
+    endif()
+endforeach()
+foreach(_vr_source IN LISTS _vr_renderer_owner_candidates)
+    get_source_file_property(_vr_header_only "${_vr_source}" HEADER_FILE_ONLY)
+    if(NOT _vr_header_only)
+        math(EXPR _vr_renderer_owner_count
+            "${_vr_renderer_owner_count} + 1")
+    endif()
+endforeach()
+if(NOT _vr_stereo_owner_count EQUAL 1)
+    message(FATAL_ERROR
+        "VR final graph must have exactly one stereo owner; got ${_vr_stereo_owner_count}")
+endif()
+if(NOT _vr_renderer_owner_count EQUAL 1)
+    message(FATAL_ERROR
+        "VR final graph must have exactly one renderer owner; got ${_vr_renderer_owner_count}")
+endif()
+unset(_vr_source)
+unset(_vr_header_only)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
