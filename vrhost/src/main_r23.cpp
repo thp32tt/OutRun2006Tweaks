@@ -1177,18 +1177,6 @@ namespace
         UvRect whole{};
         if (!c.GetGameUv(whole)) return false;
 
-        std::uint32_t image = 0;
-        c.Acquire(c.projection_, image);
-        bool ok = c.RenderTo(c.projection_.rtvs[image][0],
-            c.projection_.width, c.projection_.height, whole,
-            c.sourceSrv_, c.sourceFormat_);
-        ok = c.RenderTo(c.projection_.rtvs[image][1],
-            c.projection_.width, c.projection_.height, whole,
-            c.sourceSrv_, c.sourceFormat_) && ok;
-        if (ok) R23Pixels.ScheduleProjection(c, image);
-        c.Release(c.projection_);
-        if (!ok) return false;
-
         XrFovf commonFov{};
         commonFov.angleLeft = 0.5f *
             (views[0].fov.angleLeft + views[1].fov.angleLeft);
@@ -1198,6 +1186,61 @@ namespace
             (views[0].fov.angleUp + views[1].fov.angleUp);
         commonFov.angleDown = 0.5f *
             (views[0].fov.angleDown + views[1].fov.angleDown);
+
+        const float tanLeft = std::tan(commonFov.angleLeft);
+        const float tanRight = std::tan(commonFov.angleRight);
+        const float tanDown = std::tan(commonFov.angleDown);
+        const float tanUp = std::tan(commonFov.angleUp);
+        const float spanX = tanRight - tanLeft;
+        const float spanY = tanUp - tanDown;
+        if (!std::isfinite(spanX) || !std::isfinite(spanY) ||
+            spanX <= 0.05f || spanY <= 0.05f)
+            return false;
+
+        RECT cr{};
+        GetClientRect(c.hwnd_, &cr);
+        const float sourceAspect = (cr.bottom > cr.top)
+            ? static_cast<float>(cr.right - cr.left) /
+                static_cast<float>(cr.bottom - cr.top)
+            : 16.0f / 9.0f;
+        const float fovAspect = spanX / spanY;
+        if (!std::isfinite(sourceAspect) || !std::isfinite(fovAspect) ||
+            sourceAspect <= 0.1f || fovAspect <= 0.1f)
+            return false;
+
+        // R41: preserve the desktop/menu aspect inside the HMD projection.
+        // This is a pure 2D clip-space rectangle shared by both eyes; unlike
+        // R39 there is no world plane, head pose or per-eye disparity to shear.
+        float halfWidth = 1.0f;
+        float halfHeight = 1.0f;
+        if (sourceAspect >= fovAspect)
+            halfHeight = std::clamp(fovAspect / sourceAspect, 0.05f, 1.0f);
+        else
+            halfWidth = std::clamp(sourceAspect / fovAspect, 0.05f, 1.0f);
+        const float sx[4]{ -halfWidth, halfWidth, -halfWidth, halfWidth };
+        const float sy[4]{ halfHeight, halfHeight, -halfHeight, -halfHeight };
+        float clip[4][4]{};
+        for (int corner = 0; corner < 4; ++corner)
+        {
+            clip[corner][0] = sx[corner];
+            clip[corner][1] = sy[corner];
+            clip[corner][2] = 0.5f;
+            clip[corner][3] = 1.0f;
+        }
+
+        std::uint32_t image = 0;
+        c.Acquire(c.projection_, image);
+        bool ok = image < c.projection_.rtvs.size();
+        for (int eye = 0; eye < 2 && ok; ++eye)
+        {
+            ok = c.RenderMenuPlaneTo(
+                c.projection_.rtvs[image][eye],
+                c.projection_.width, c.projection_.height,
+                whole, c.sourceSrv_, c.sourceFormat_, clip);
+        }
+        if (ok) R23Pixels.ScheduleProjection(c, image);
+        c.Release(c.projection_);
+        if (!ok) return false;
 
         // Zero virtual IPD in VIEW space keeps mono menus aligned in both eyes
         // while remaining on the projection-layer path used efficiently by VDXR.
