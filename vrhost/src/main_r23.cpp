@@ -1956,9 +1956,9 @@ int main(int argc, char** argv)
             cachedProjectionViews{};
         bool cachedProjectionValid = false;
         ULONGLONG cachedProjectionRenderedMs = 0;
-        XrCompositionLayerQuad cachedMenuQuad{
-            XR_TYPE_COMPOSITION_LAYER_QUAD };
-        bool cachedMenuQuadValid = false;
+        std::array<XrCompositionLayerProjectionView, 2>
+            cachedMenuProjectionViews{};
+        bool cachedMenuProjectionValid = false;
         bool pendingReferenceSpaceChange = false;
         XrTime pendingReferenceSpaceChangeTime = 0;
 
@@ -2013,7 +2013,7 @@ int main(int argc, char** argv)
                         running = false; cadence.SetRunning(false); viewHistory.Clear(); matchedStereoValid = false;
                         lastStereoMatchMs = 0; cachedProjectionValid = false;
                         cachedProjectionRenderedMs = 0;
-                        cachedMenuQuadValid = false;
+                        cachedMenuProjectionValid = false;
                         compositor.ReferenceSpaceChanged();
                         OutRunVrR23VerifiedBundle::Invalidate();
                         OutRunVR::SharedRenderFrameState rf{};
@@ -2056,7 +2056,7 @@ int main(int argc, char** argv)
                 shared.ReferenceSpaceChanged(); compositor.ReferenceSpaceChanged(); viewHistory.Clear();
                 matchedStereoValid = false; cachedProjectionValid = false;
                 cachedProjectionRenderedMs = 0;
-                cachedMenuQuadValid = false;
+                cachedMenuProjectionValid = false;
                 OutRunVrR23VerifiedBundle::Invalidate();
                 OutRunVR::SharedRenderFrameState rf{};
                 lastProcessedStereoFrame = renderFrames.Read(rf) ? rf.frameId : shared.ReadStereoMeta().frame;
@@ -2128,15 +2128,15 @@ int main(int argc, char** argv)
                 {
                     cachedProjectionValid = false;
                     cachedProjectionRenderedMs = 0;
-                    cachedMenuQuadValid = false;
+                    cachedMenuProjectionValid = false;
                 }
                 else
                 {
-                    cachedMenuQuadValid = false;
+                    cachedMenuProjectionValid = false;
                 }
                 lastPresentation = presentation;
                 std::cout << "VR presentation: "
-                    << (presentation == OutRunVR::PresentationGameplay ? "true stereo projection" : "world-fixed mono 6DoF menu")
+                    << (presentation == OutRunVR::PresentationGameplay ? "true stereo projection" : "head-locked mono 2D projection menu")
                     << ".\n";
             }
 
@@ -2170,10 +2170,14 @@ int main(int argc, char** argv)
                     OutRunVR::SharedRenderFrameState before{};
                     bool have = renderFrames.Read(before);
 
-                    // R37 DirectGPU bootstrap: consume every occupied producer
-                    // slot once per transport generation before waiting for a
-                    // newer frame. Choosing only the newest frame can oscillate
-                    // 4->3->4->3 and leave slots 0/1 permanently un-ACKed.
+                    // R41 DirectGPU latest-frame-wins. R37 walked the four
+                    // producer slots oldest-first, which made VDXR display a
+                    // permanent ~4-frame / 40-50 ms history behind the newest
+                    // game Present. Select the newest complete frame in the
+                    // current transport generation. Frames skipped without ever
+                    // being sampled by D3D11 are immediately per-slot ACKed so
+                    // the producer can recycle them; the selected frame keeps
+                    // R32's GPU EVENT completion ACK.
                     if (directTransportOnly)
                     {
                         std::array<OutRunVR::SharedRenderFrameState,
@@ -2224,36 +2228,60 @@ int main(int argc, char** argv)
                                     generation != currentGeneration)
                                     continue;
 
-                                const bool alreadySubmitted =
-                                    R37BootstrapSubmittedGeneration[slot] == generation &&
-                                    R37BootstrapSubmittedFrame[slot] == frame.frameId;
-                                if (alreadySubmitted)
-                                    continue;
-
                                 if (!foundDirect ||
                                     R37FrameIdBefore(
-                                        frame.frameId, selectedDirect.frameId))
+                                        selectedDirect.frameId, frame.frameId))
                                 {
                                     selectedDirect = frame;
                                     foundDirect = true;
                                 }
                             }
-                        }
-                        if (foundDirect)
-                        {
-                            before = selectedDirect;
-                            have = true;
-                            if (!R36FirstDirectBootstrapLogged)
+
+                            if (foundDirect)
                             {
-                                R36FirstDirectBootstrapLogged = true;
-                                std::cout
-                                    << "[R37] DirectGPU bootstrap consumes oldest unseen slot frame first; frame="
-                                    << before.frameId
-                                    << " slot="
-                                    << before.reserved[OutRunVR::RenderFrameDirectSlotIndex]
-                                    << " generation="
-                                    << before.reserved[OutRunVR::RenderFrameDirectGenerationIndex]
-                                    << ".\n";
+                                for (std::size_t i = 0; i < historyCount; ++i)
+                                {
+                                    const auto& frame = history[i];
+                                    const std::uint32_t slot =
+                                        frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+                                    const std::uint32_t generation =
+                                        frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+                                    if (!frame.frameId ||
+                                        frame.frameId == selectedDirect.frameId ||
+                                        frame.frameId == lastProcessedStereoFrame ||
+                                        frame.state != OutRunVR::StereoSbsActive ||
+                                        (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
+                                        (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
+                                        slot >= OutRunVR::RenderFrameRingSize ||
+                                        generation != currentGeneration)
+                                        continue;
+
+                                    // No D3D11 draw/copy references this skipped
+                                    // frame, so producer reuse is safe immediately.
+                                    if (OutRunVrD3D9ExDirectPassthrough::
+                                            PublishCompletedFrame(frame))
+                                    {
+                                        R37BootstrapSubmittedFrame[slot] =
+                                            frame.frameId;
+                                        R37BootstrapSubmittedGeneration[slot] =
+                                            generation;
+                                    }
+                                }
+
+                                before = selectedDirect;
+                                have = true;
+                                if (!R36FirstDirectBootstrapLogged)
+                                {
+                                    R36FirstDirectBootstrapLogged = true;
+                                    std::cout
+                                        << "[R41] DirectGPU latest-frame-wins active; selected frame="
+                                        << before.frameId
+                                        << " slot="
+                                        << before.reserved[OutRunVR::RenderFrameDirectSlotIndex]
+                                        << " generation="
+                                        << before.reserved[OutRunVR::RenderFrameDirectGenerationIndex]
+                                        << "; older unsampled ring frames are ACKed immediately.\n";
+                                }
                             }
                         }
                     }
@@ -2614,34 +2642,38 @@ int main(int argc, char** argv)
                     QueryPerformanceCounter(&ce); timings.capture.Add(timings.Ms(cs, ce));
                     LARGE_INTEGER rs{}, re{}; QueryPerformanceCounter(&rs);
 
-                    // R40: restore the geometrically stable LOCAL quad.
-                    // The R39 rasterized plane inside the stereo projection
-                    // sheared into trapezoids under VDXR reprojection. Refresh
-                    // the quad texture only on a new desktop menu frame and
-                    // reuse the released theater image between updates.
+                    // R41: use a true mono 2D VIEW-space projection for menus.
+                    // R39's stereo rasterized plane sheared under head motion;
+                    // R40's LOCAL quad was geometrically stable but VDXR still
+                    // spent ~25 ms in xrEndFrame. This path gives both eyes the
+                    // same desktop pixels, zero virtual IPD and identity VIEW
+                    // pose while staying on VDXR's efficient projection path.
                     if (capture.available &&
-                        (!cachedMenuQuadValid || capture.fresh))
+                        (!cachedMenuProjectionValid || capture.fresh))
                     {
-                        XrCompositionLayerQuad refreshed{
-                            XR_TYPE_COMPOSITION_LAYER_QUAD };
-                        if (R23RenderTheater(
-                                compositor, viewSpace, localSpace,
-                                fs.predictedDisplayTime, refreshed, false))
+                        std::array<XrCompositionLayerProjectionView, 2>
+                            refreshed{};
+                        if (R23RenderHeadLockedMenuProjection(
+                                compositor, views, refreshed))
                         {
-                            cachedMenuQuad = refreshed;
-                            cachedMenuQuadValid = true;
+                            cachedMenuProjectionViews = refreshed;
+                            cachedMenuProjectionValid = true;
                         }
                     }
-                    if (cachedMenuQuadValid)
+                    if (cachedMenuProjectionValid)
                     {
-                        quad = cachedMenuQuad;
+                        pv = cachedMenuProjectionViews;
+                        projection.space = viewSpace;
+                        projection.viewCount = 2;
+                        projection.views = pv.data();
                         layers[0] =
                             reinterpret_cast<const XrCompositionLayerBaseHeader*>(
-                                &quad);
+                                &projection);
                         layerReady = true;
+                        intentionalMonoProjection = true;
                         finalLayerKind = capture.fresh
-                            ? "menu-local-6dof-quad-fresh"
-                            : "menu-local-6dof-quad-cached";
+                            ? "menu-headlocked-projection-fresh"
+                            : "menu-headlocked-projection-cached";
                     }
                     QueryPerformanceCounter(&re);
                     frameRenderMs += timings.Ms(rs, re);

@@ -1308,8 +1308,13 @@ namespace OutRunVRRenderer
 			const float w = std::clamp(std::fabs(relativeOrientation.w), 0.0f, 1.0f);
 			LatchedRelativeAngleDeg = 2.0f * std::acos(w) * (180.0f / Pi);
 
-			if (LatchedHeadInverseValid)
+			// R41: the live OutRun camera may only follow the HMD during real
+			// gameplay. Menu/car-select scenes do not receive stereo c64 injection;
+			// moving only cam_pos/look there corrupts the preview model transform.
+			if (LatchedHeadInverseValid && GameRendererIsActive())
 				ApplyCullingCameraSync();
+			else
+				RestoreCullingCamera();
 		}
 
 		void InvalidateVerifiedWvp();
@@ -1325,7 +1330,10 @@ namespace OutRunVRRenderer
 			FrameTelemetryFlags = ClientHookAlive;
 			if (LatchedPoseSequence != 0) FrameTelemetryFlags |= ClientHostPoseValid;
 			if (Settings::VRAutoEnableWhenHostPresent) FrameTelemetryFlags |= ClientAutoEnabled;
-			if (LatchedHeadInverseValid) ApplyCullingCameraSync();
+			if (LatchedHeadInverseValid && GameRendererIsActive())
+				ApplyCullingCameraSync();
+			else
+				RestoreCullingCamera();
 		}
 
 		bool UploadContainsOutRunWvp(UINT startRegister, UINT vector4fCount)

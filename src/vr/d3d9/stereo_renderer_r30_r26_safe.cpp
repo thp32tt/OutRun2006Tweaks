@@ -78,7 +78,11 @@ namespace OutRunVRStereo
         bool R30FirstPerspectiveHudLogged = false;
 
         std::uint64_t R30XyzrhwHudDraws = 0;
+        std::uint64_t R30XyzrhwWorldLockedHudDraws = 0;
         std::uint64_t R30XyzrhwWorldEffectDraws = 0;
+        std::uint64_t R30Hud2DDraws = 0;
+        std::uint64_t R30PerspectiveHudDraws = 0;
+        std::uint64_t R30WorldBillboardDraws = 0;
         std::uint64_t R30XyzrhwRhwWorldPromotions = 0;
         std::uint64_t R30XyzrhwRhwOnlyDepthEvidence = 0;
         std::uint64_t R30XyzrhwZOnlyDepthEvidence = 0;
@@ -1098,17 +1102,20 @@ namespace OutRunVRStereo
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(
-                "VR R30.11: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R41: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
                 R30XyzrhwWorldEffectDraws, R30XyzrhwHudDraws,
+                R30XyzrhwWorldLockedHudDraws,
                 R30XyzrhwRhwWorldPromotions,
                 R30XyzrhwRhwOnlyDepthEvidence,
                 R30XyzrhwZOnlyDepthEvidence,
                 R30XyzrhwAtomicFallbacks,
                 R30XyzrhwDepthPreserveFallbacks,
                 R30XyzrhwBilateralFallbacks,
+                R30ScreenSpaceFovDraws, R30Hud2DDraws,
+                R30PerspectiveHudDraws, R30WorldBillboardDraws,
                 R30SkyGlowFrames, R30SkyGlowFailures,
                 R30SkyGlow.factor, R30SkyGlow.glowWidth,
                 R30SkyGlow.glowHeight);
@@ -1350,13 +1357,25 @@ namespace OutRunVRStereo
                     D3DRS_ALPHATESTENABLE, &alphaTest)))
                 return R30ScreenSpaceKind::None;
 
-            if (zEnable != D3DZB_FALSE ||
-                (alphaBlend == FALSE && alphaTest == FALSE))
+            const bool alphaLike =
+                alphaBlend != FALSE || alphaTest != FALSE;
+            if (!alphaLike)
                 return R30ScreenSpaceKind::None;
 
-            return R30PerspectiveAlphaLooksWorld(device)
-                ? R30ScreenSpaceKind::WorldBillboard
-                : R30ScreenSpaceKind::PerspectiveHud;
+            // R41: positive spatial evidence outranks ZENABLE. The opponent
+            // rank sprites and lens-player/billboard effects can be depth-disabled
+            // (or inherit a stale Z state) even though their c64 matrix still
+            // contains a real affine WorldView at vehicle/world depth. Catch
+            // those here before R13 masks the shader identity and duplicates the
+            // draw zero-disparity with stock WVP.
+            if (R30PerspectiveAlphaLooksWorld(device))
+                return R30ScreenSpaceKind::WorldBillboard;
+
+            // A depth-tested alpha draw without positive spatial evidence stays
+            // fail-closed instead of being mistaken for cockpit HUD.
+            if (zEnable != D3DZB_FALSE)
+                return R30ScreenSpaceKind::None;
+            return R30ScreenSpaceKind::PerspectiveHud;
         }
 
 
@@ -1416,6 +1435,8 @@ namespace OutRunVRStereo
             D3DMATRIX inverseBaseProjection{};
             D3DMATRIX eyeProjection[2]{};
             D3DMATRIX eyeInverse[2]{};
+            D3DMATRIX hudViewProjection[2]{};
+            bool hudWorldLockValid = false;
             bool fullWorldReprojection = false;
             bool depthTestEnabled = false;
             bool rhwDepthEvidence = false;
@@ -1622,7 +1643,65 @@ namespace OutRunVRStereo
                 return false;
             state.worldEffect = state.rhwDepthEvidence;
             if (!state.worldEffect)
+            {
+                // R41: most of OutRun's HUD is fixed-function XYZRHW, not the
+                // shader/c64 path. Build a synthetic finite HUD plane in the
+                // recentered gameplay space, then transform that plane by the
+                // current head inverse and relative-eye IPD/FOV. Preserve the
+                // original screen Z/RHW later so only placement is changed.
+                if (!haveBaseProjection || !MatrixFinite(baseProjection))
+                    return false;
+                state.baseProjection = baseProjection;
+
+                float headRaw[16]{};
+                std::uint32_t headPoseSequence = 0;
+                D3DMATRIX headInverse{};
+                if (!OutRunVRRenderer::GetLatchedHeadInverse(
+                        headRaw, headPoseSequence) ||
+                    headPoseSequence != state.stereo.poseSequence)
+                    return false;
+                std::memcpy(&headInverse, headRaw, sizeof(headInverse));
+                if (!MatrixFinite(headInverse))
+                    return false;
+
+                const float centerEye[3]{
+                    0.5f * (state.stereo.eyeOffset[0][0] +
+                            state.stereo.eyeOffset[1][0]),
+                    0.5f * (state.stereo.eyeOffset[0][1] +
+                            state.stereo.eyeOffset[1][1]),
+                    0.5f * (state.stereo.eyeOffset[0][2] +
+                            state.stereo.eyeOffset[1][2])
+                };
+                const float identityOrientation[4]{
+                    0.0f, 0.0f, 0.0f, 1.0f
+                };
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    const float relativeEye[3]{
+                        state.stereo.eyeOffset[eye][0] - centerEye[0],
+                        state.stereo.eyeOffset[eye][1] - centerEye[1],
+                        state.stereo.eyeOffset[eye][2] - centerEye[2]
+                    };
+                    const D3DMATRIX eyePose =
+                        MatrixFromQuaternionTranslation(
+                            identityOrientation, relativeEye,
+                            Settings::VRWorldScale *
+                                Settings::VRStereoDepth);
+                    const D3DMATRIX eyeInverse = InverseRigid(eyePose);
+                    const D3DMATRIX eyeProjection =
+                        ProjectionFromFov(
+                            baseProjection,
+                            state.stereo.eyeFov[eye]);
+                    state.hudViewProjection[eye] =
+                        MultiplyMatrix(
+                            MultiplyMatrix(headInverse, eyeInverse),
+                            eyeProjection);
+                    if (!MatrixFinite(state.hudViewProjection[eye]))
+                        return false;
+                }
+                state.hudWorldLockValid = true;
                 return true;
+            }
 
             if (TrackedDepthStencil &&
                 (!RightDepthSynchronized || !RightStencilSynchronized))
@@ -2066,18 +2145,61 @@ namespace OutRunVRStereo
                 }
                 else
                 {
-                    // Screen-locked HUD must preserve its pixel aspect ratio.
-                    // Applying the horizontal OpenXR FOV scale only to X made
-                    // circular gauges vertically elongated on both SBS and HMD.
-                    // Keep one uniform user scale on X/Y and retain only the
-                    // per-eye asymmetric-FOV centre offset for convergence.
+                    // R41: the real OutRun HUD is overwhelmingly XYZRHW. Put
+                    // those pre-transformed vertices on the same finite,
+                    // recentered plane used by the shader HUD instead of
+                    // copying screen coordinates into both eyes (head-lock).
+                    if (!state.hudWorldLockValid)
+                        return false;
+
                     float hudScaleX = 1.0f;
                     float hudScaleY = 1.0f;
                     R30HudContainScale(
                         state.stereo, hudScaleX, hudScaleY);
-                    correctedX =
-                        hudScaleX * state.eyeScale[eye] * ndcX + state.eyeOffset[eye];
-                    correctedY = hudScaleY * ndcY;
+                    const float planeNdcX = hudScaleX * ndcX;
+                    const float planeNdcY = hudScaleY * ndcY;
+                    constexpr float HudPlaneViewZ = -2.50f;
+                    const D3DMATRIX& bp = state.baseProjection;
+                    const float clipW =
+                        HudPlaneViewZ * bp._34 + bp._44;
+                    const float clipX = planeNdcX * clipW;
+                    const float clipY = planeNdcY * clipW;
+                    const float rhsX =
+                        clipX - HudPlaneViewZ * bp._31 - bp._41;
+                    const float rhsY =
+                        clipY - HudPlaneViewZ * bp._32 - bp._42;
+                    const float det =
+                        bp._11 * bp._22 - bp._21 * bp._12;
+                    if (!std::isfinite(clipW) ||
+                        !std::isfinite(rhsX) ||
+                        !std::isfinite(rhsY) ||
+                        !std::isfinite(det) ||
+                        std::fabs(clipW) <= 1.0e-6f ||
+                        std::fabs(det) <= 1.0e-6f)
+                        return false;
+
+                    const float view[4]{
+                        (rhsX * bp._22 - bp._21 * rhsY) / det,
+                        (bp._11 * rhsY - rhsX * bp._12) / det,
+                        HudPlaneViewZ,
+                        1.0f
+                    };
+                    float clipEye[4]{};
+                    for (int col = 0; col < 4; ++col)
+                        for (int row = 0; row < 4; ++row)
+                            clipEye[col] += view[row] *
+                                state.hudViewProjection[eye].m[row][col];
+
+                    if (!std::isfinite(clipEye[0]) ||
+                        !std::isfinite(clipEye[1]) ||
+                        !std::isfinite(clipEye[3]) ||
+                        clipEye[3] <= 1.0e-6f)
+                        return false;
+                    correctedX = clipEye[0] / clipEye[3];
+                    correctedY = clipEye[1] / clipEye[3];
+                    if (!std::isfinite(correctedX) ||
+                        !std::isfinite(correctedY))
+                        return false;
                 }
 
                 const float transformedX =
@@ -2205,11 +2327,13 @@ namespace OutRunVRStereo
             {
                 ++NonWorldDuplicatedDraws;
                 ++R30XyzrhwHudDraws;
+                if (state.hudWorldLockValid)
+                    ++R30XyzrhwWorldLockedHudDraws;
                 if (!R30FirstXyzrhwHudLogged)
                 {
                     R30FirstXyzrhwHudLogged = true;
                     spdlog::info(
-                        "VR R30.8 XYZRHW HUD: pre-transformed fixed-function HUD applies source-aspect/eye-FOV X compensation before SBS/DirectGPU projection; circular gauges preserve final HMD aspect ratio");
+                        "VR R41 XYZRHW HUD: fixed-function HUD uses HudScale on a finite recentered world-locked plane; screen/head-locked XYZRHW duplication disabled");
                 }
             }
 
@@ -2784,25 +2908,34 @@ namespace OutRunVRStereo
 
             if (screenKind == R30ScreenSpaceKind::WorldBillboard)
             {
-                // R40: stockWvp already contains the common renderer head
-                // transform. Reapplying headInverse/absolute eye orientation
-                // made car rank markers follow the headset. Match the corrected
-                // XYZRHW smoke/skid path: relative IPD + per-eye FOV only.
+                // R41: this path is reached only after the verified/rebindable
+                // renderer-world paths reject the current c64. Therefore the
+                // stock WVP cannot be assumed to contain our latched head
+                // correction. Rebuild the spatial billboard from its stock
+                // WorldView, then apply the same common head inverse and full
+                // head-local eye pose used by raw world geometry.
                 const D3DMATRIX worldView =
                     MultiplyMatrix(stockWvp, inverseBaseProjection);
                 if (!MatrixFinite(worldView))
                     return false;
 
+                float headRaw[16]{};
+                std::uint32_t headPoseSequence = 0;
+                D3DMATRIX headInverse{};
+                if (!OutRunVRRenderer::GetLatchedHeadInverse(
+                        headRaw, headPoseSequence) ||
+                    headPoseSequence != stereo.poseSequence)
+                    return false;
+                std::memcpy(&headInverse, headRaw, sizeof(headInverse));
+                if (!MatrixFinite(headInverse))
+                    return false;
+
                 for (int eye = 0; eye < 2; ++eye)
                 {
-                    const float relativeEye[3]{
-                        stereo.eyeOffset[eye][0] - centerEye[0],
-                        stereo.eyeOffset[eye][1] - centerEye[1],
-                        stereo.eyeOffset[eye][2] - centerEye[2]
-                    };
                     const D3DMATRIX eyePose =
                         MatrixFromQuaternionTranslation(
-                            identityOrientation, relativeEye,
+                            stereo.eyeOrientation[eye],
+                            stereo.eyeOffset[eye],
                             Settings::VRWorldScale *
                                 Settings::VRStereoDepth);
                     const D3DMATRIX eyeInverse = InverseRigid(eyePose);
@@ -2811,7 +2944,9 @@ namespace OutRunVRStereo
                             baseProjection, stereo.eyeFov[eye]);
                     const D3DMATRIX corrected =
                         MultiplyMatrix(
-                            MultiplyMatrix(worldView, eyeInverse),
+                            MultiplyMatrix(
+                                MultiplyMatrix(worldView, headInverse),
+                                eyeInverse),
                             eyeProjection);
                     if (!MatrixFinite(corrected))
                         return false;
@@ -3050,6 +3185,12 @@ namespace OutRunVRStereo
             ++NonWorldDuplicatedDraws;
             ++R30SafeTwoEyeDraws;
             ++R30ScreenSpaceFovDraws;
+            if (screenKind == R30ScreenSpaceKind::Hud2D)
+                ++R30Hud2DDraws;
+            else if (screenKind == R30ScreenSpaceKind::PerspectiveHud)
+                ++R30PerspectiveHudDraws;
+            else if (screenKind == R30ScreenSpaceKind::WorldBillboard)
+                ++R30WorldBillboardDraws;
 
             if (!R30FirstScreenSpaceLogged)
             {
@@ -3064,14 +3205,14 @@ namespace OutRunVRStereo
             {
                 R30FirstFlatPerspectiveLogged = true;
                 spdlog::info(
-                    "VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay is world-locked on a finite virtual plane; R40 affine vehicle marker preserves already head-synchronised depth and receives relative-IPD/FOV only");
+                    "VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay is world-locked on a finite virtual plane; R41 spatial vehicle/rank/lens billboards rebuild stock WorldView with head+eye transform");
             }
             if (screenKind == R30ScreenSpaceKind::PerspectiveHud &&
                 !R30FirstPerspectiveHudLogged)
             {
                 R30FirstPerspectiveHudLogged = true;
                 spdlog::info(
-                    "VR R30 PERSPECTIVE HUD: near-plane alpha UI including 6th/6 uses ordinary HudScale and the same world-locked finite HUD plane; vehicle rank markers remain world billboards");
+                    "VR R30 PERSPECTIVE HUD: near-plane alpha UI including 6th/6 uses HudScale on the world-locked finite HUD plane; positively spatial rank/lens markers remain world billboards");
             }
 
             if (FAILED(rightHr))
@@ -3286,7 +3427,7 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current={:.2f}; R40 world-locked finite HUD plane + perspective-HUD scale + relative-eye billboard/XYZRHW reprojection active",
+                        "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current={:.2f}; R41 shader+XYZRHW finite HUD world-lock + spatial billboard rebuild active",
                         R30HudScaleValue());
                     return 0;
                 }

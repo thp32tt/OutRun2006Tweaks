@@ -116,7 +116,7 @@ jobs:
             '[R24] emergency visible quad submitted because no game image was safely displayable',
             'xrWaitSwapchainImage exceeded 250ms',
             '[R23 pixel]',
-            'menu-local-6dof-quad-cached',
+            'menu-headlocked-projection-cached',
             'R23-crash-text-first-20260916'
           )) {
             if (-not $ascii.Contains($marker)) { throw "R24 host marker missing: $marker" }
@@ -171,6 +171,7 @@ jobs:
             'VR C1.2 FIXEDFN HEAD: perspective fixed-function XYZ world receives the same latched head inverse',
             'VR R40 CADENCE: runtime-gated PhaseLock active',
             'VR R30.6 XYZRHW WORLD',
+            'VR R41 XYZRHW HUD: fixed-function HUD uses HudScale on a finite recentered world-locked plane',
             'VR R30.10 XYZRHW DEPTH: stable non-unit RHW accepted as world depth',
             'VR R30.11 XYZRHW DEPTH: perspective screen-Z accepted as world depth even when RHW=1',
             'VR R30 BUFFER SHADOW: lazy capture armed only after a real XYZRHW',
