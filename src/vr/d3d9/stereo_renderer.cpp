@@ -27,6 +27,7 @@
 
 #include <intrin.h>
 #include <cstdlib>
+#include <cstring>
 #include "stereo_renderer_r7.inc"
 
 namespace OutRunVRStereo
@@ -35,13 +36,28 @@ namespace OutRunVRStereo
 	{
 		constexpr const char* R9BuildId = "R9-finaltest-20260915";
 
+		bool R9ReadBoolEnvironment(const char* name, bool defaultValue) noexcept
+		{
+			const char* value = std::getenv(name);
+			if (!value || !*value)
+				return defaultValue;
+			if (std::strcmp(value, "0") == 0 ||
+				_stricmp(value, "false") == 0 ||
+				_stricmp(value, "off") == 0 ||
+				_stricmp(value, "no") == 0)
+				return false;
+			if (std::strcmp(value, "1") == 0 ||
+				_stricmp(value, "true") == 0 ||
+				_stricmp(value, "on") == 0 ||
+				_stricmp(value, "yes") == 0)
+				return true;
+			return defaultValue;
+		}
+
 		bool R9DirectOnlyTransport() noexcept
 		{
-			const char* value = std::getenv("OUTRUN_VR_DIRECT_ONLY");
-			if (!value || !*value)
-				return true;
-			const char c = value[0];
-			return c != '0' && c != 'f' && c != 'F' && c != 'n' && c != 'N';
+			return R9ReadBoolEnvironment("OUTRUN_VR_DIRECT_TRANSPORT", true) &&
+				R9ReadBoolEnvironment("OUTRUN_VR_DIRECT_ONLY", true);
 		}
 
 		bool R9FirstDirectOnlyWaitLogged = false;
