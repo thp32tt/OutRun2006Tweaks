@@ -2218,7 +2218,10 @@ int main(int argc, char** argv)
                                 const std::uint32_t generation =
                                     frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
                                 if (!frame.frameId ||
-                                    frame.frameId == lastProcessedStereoFrame ||
+                                    (lastProcessedStereoFrame != 0 &&
+                                     !R37FrameIdBefore(
+                                         lastProcessedStereoFrame,
+                                         frame.frameId)) ||
                                     frame.state != OutRunVR::StereoSbsActive ||
                                     (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
                                     (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
@@ -2248,7 +2251,10 @@ int main(int argc, char** argv)
                                         frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
                                     if (!frame.frameId ||
                                         frame.frameId == selectedDirect.frameId ||
-                                        frame.frameId == lastProcessedStereoFrame ||
+                                        (lastProcessedStereoFrame != 0 &&
+                                         !R37FrameIdBefore(
+                                             lastProcessedStereoFrame,
+                                             frame.frameId)) ||
                                         frame.state != OutRunVR::StereoSbsActive ||
                                         (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
                                         (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
@@ -2283,6 +2289,17 @@ int main(int argc, char** argv)
                                         << "; older unsampled ring frames are ACKed immediately.\n";
                                 }
                             }
+                            else
+                            {
+                                // R41: direct-only mode must never fall back to
+                                // renderFrames.Read(before), because that snapshot
+                                // can be an already displayed older ring entry.
+                                have = false;
+                            }
+                        }
+                        else
+                        {
+                            have = false;
                         }
                     }
 

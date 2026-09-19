@@ -357,6 +357,8 @@ require(
     "R37FrameIdBefore",
     "DirectGPU latest-frame-wins active",
     "PublishCompletedFrame(frame)",
+    "!R37FrameIdBefore(",
+    "lastProcessedStereoFrame",
     "allowInitialWarmupWait",
     "theater-only fallback",
     "OutRunVrR23VerifiedBundle::Publish",
@@ -404,6 +406,15 @@ _skipped = [item for item in _history if item != _selected]
 if _selected != (4, 3) or [fid for fid, _ in _skipped] != [1, 2, 3]:
     raise SystemExit(
         f"R41 direct latest-frame model regressed: selected={_selected} skipped={_skipped}"
+    )
+
+# Once frame 4 is displayed, stale ring contents 1..3 must never be selected
+# again while the producer is recycling those ACKed slots.
+_last_processed = _selected[0]
+_remaining_new = [item for item in _history if item[0] > _last_processed]
+if _remaining_new:
+    raise SystemExit(
+        f"R41 direct stale-frame rewind model regressed: {_remaining_new}"
     )
 
 # New regressions are required in the host build graph.
