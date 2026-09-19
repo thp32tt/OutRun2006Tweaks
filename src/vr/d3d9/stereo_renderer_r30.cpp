@@ -2695,7 +2695,7 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R30.7 HUD: ScreenSpace2D uniform-aspect correction READY with configurable common-center HUD scale current={:.2f}; R30.6 XYZRHW world path + CPU VB/IB shadow retained",
+                        "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current={:.2f}; R30.7 uniform-aspect XY correction active; R30.6 XYZRHW world path + CPU VB/IB shadow retained",
                         R30HudScaleValue());
                     return 0;
                 }
