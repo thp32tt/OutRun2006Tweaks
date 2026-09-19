@@ -317,6 +317,8 @@ require(
     "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp",
     "CopyFenceTimeoutMs = 8",
     "ExpectedDeclaredFormat",
+    "case D3DFMT_A8R8G8B8",
+    "DXGI_FORMAT_B8G8R8A8_UNORM",
     "desc[0].Format == declared",
     "host-owned GPU eye copies + completion ACK active",
     "SafeTransportGeneration",
@@ -324,6 +326,8 @@ require(
 require(
     "vrhost/src/runtime/r23_runtime_hardening.hpp",
     "ExpectedDirectDxgiFormat",
+    "case D3DFMT_A8R8G8B8",
+    "DXGI_FORMAT_B8G8R8A8_UNORM",
     "DirectSafeEyeMatchesCommittedFrame",
     "SafeEyeFormat == expected",
     "width == frame.backbufferWidth",
@@ -345,12 +349,54 @@ require(
     "R23CommitDirectAfterValidation",
     "R23CommitClassicAfterValidation",
     "R23RefreshTheaterFallbackCapture",
+    "R37BootstrapSubmittedFrame",
+    "R37BootstrapSubmittedGeneration",
+    "R37FrameIdBefore",
+    "oldest unseen slot frame first",
     "allowInitialWarmupWait",
     "theater-only fallback",
     "OutRunVrR23VerifiedBundle::Publish",
     "std::memcmp(after.eye, before.eye",
     "std::memcmp(after.reserved, before.reserved",
 )
+
+require(
+    "vrhost/src/main.cpp",
+    "directTransportOnly_",
+    "desktopDuplication=",
+    "disabled-direct-only",
+    "DXGI_FORMAT_B8G8R8A8_UNORM",
+)
+require(
+    "src/vr/d3d9/stereo_renderer.cpp",
+    "R9ReadBoolEnvironment",
+    "OUTRUN_VR_DIRECT_TRANSPORT",
+    "OUTRUN_VR_DIRECT_ONLY",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r26.cpp",
+    "R37DepthDisabledFragileOverlay",
+    "screen-space veto must run before R28",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "state.depthTestEnabled && state.rhwDepthEvidence",
+)
+
+# Four occupied producer slots must be visited once each. This models the
+# bootstrap invariant that prevents newest-frame oscillation (4->3->4->3).
+_history = [(1, 0), (2, 1), (3, 2), (4, 3)]
+_seen = {}
+_order = []
+while True:
+    _unseen = [(fid, slot) for fid, slot in _history if _seen.get(slot) != fid]
+    if not _unseen:
+        break
+    _fid, _slot = min(_unseen, key=lambda item: item[0])
+    _seen[_slot] = _fid
+    _order.append(_fid)
+if _order != [1, 2, 3, 4]:
+    raise SystemExit(f"R37 direct bootstrap model regressed: {_order}")
 
 # New regressions are required in the host build graph.
 require(
