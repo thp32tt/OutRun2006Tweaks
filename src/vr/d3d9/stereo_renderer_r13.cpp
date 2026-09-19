@@ -169,32 +169,102 @@ namespace OutRunVRStereo
             if (!R13OverlayReady.load(std::memory_order_acquire))
                 return R13ResolveDirectHook.call<bool>(device, frameId);
 
-            if (frameId && SharedState)
+            if (!frameId || !EnsureDirectTransportResources(device) ||
+                !BackBuffer || !RightEyeSurface)
+                return false;
+
+            const std::uint32_t preferred =
+                (frameId - 1u) % OutRunVR::RenderFrameRingSize;
+            std::uint32_t selected = OutRunVR::RenderFrameRingSize;
+            bool ackBlocked = false;
+
+            // R38: the base producer can choose any free slot, so the safety
+            // gate must validate the actual candidate slot rather than the old
+            // frameId%ring slot. Only the dedicated host GPU-completion ACK can
+            // release a published shared texture; the legacy global consumed
+            // frame id is deliberately ignored here.
+            for (std::uint32_t offset = 0;
+                 offset < OutRunVR::RenderFrameRingSize; ++offset)
             {
-                const std::uint32_t slotIndex =
-                    (frameId - 1u) % OutRunVR::RenderFrameRingSize;
-                const auto& slot = DirectTransportSlots[slotIndex];
-                if (slot.frameId)
+                const std::uint32_t index =
+                    (preferred + offset) % OutRunVR::RenderFrameRingSize;
+                auto& slot = DirectTransportSlots[index];
+
+                if (slot.producerPending)
                 {
-                    std::uint32_t gpuCompleted = 0;
-                    const bool ackValid = R13ReadGpuCompletedFrame(slotIndex, gpuCompleted);
-                    if (!ackValid || !FrameIdAtOrAfter(gpuCompleted, slot.frameId))
+                    const HRESULT ready =
+                        slot.fence ? slot.fence->GetData(nullptr, 0, 0) : E_FAIL;
+                    if (ready == S_OK)
                     {
-                        ++R13SafeAckBackpressure;
-                        ++DirectTransportRingBackpressure;
-                        if (!R13FirstSafeAckBlockLogged)
-                        {
-                            R13FirstSafeAckBlockLogged = true;
-                            spdlog::info(
-                                "VR D3D9Ex R13: GPU-completion direct-ring backpressure active; slot={} slotFrame={} gpuCompleted={} ackValid={} generation={}",
-                                slotIndex, slot.frameId, gpuCompleted, ackValid ? 1 : 0,
-                                DirectTransportGeneration);
-                        }
-                        return false;
+                        slot.producerPending = false;
+                        slot.pendingFrameId = 0;
+                        // A frame that missed its publication window was never
+                        // visible to the host and needs no consumer ACK.
+                        if (!slot.published)
+                            slot.frameId = 0;
+                    }
+                    else if (ready == S_FALSE)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        slot.producerPending = false;
+                        slot.pendingFrameId = 0;
+                        slot.frameId = 0;
+                        slot.published = false;
                     }
                 }
+
+                if (slot.published && slot.frameId)
+                {
+                    std::uint32_t gpuCompleted = 0;
+                    const bool ackValid =
+                        R13ReadGpuCompletedFrame(index, gpuCompleted);
+                    if (!ackValid ||
+                        !FrameIdAtOrAfter(gpuCompleted, slot.frameId))
+                    {
+                        ackBlocked = true;
+                        continue;
+                    }
+                    slot.frameId = 0;
+                    slot.published = false;
+                }
+
+                selected = index;
+                break;
             }
-            return R13ResolveDirectHook.call<bool>(device, frameId);
+
+            if (selected >= OutRunVR::RenderFrameRingSize)
+            {
+                ++R13SafeAckBackpressure;
+                ++DirectTransportRingBackpressure;
+                if (ackBlocked && !R13FirstSafeAckBlockLogged)
+                {
+                    R13FirstSafeAckBlockLogged = true;
+                    spdlog::info(
+                        "VR D3D9Ex R38: per-slot GPU-completion ACK aware free-slot scan ACTIVE; published shared eyes remain immutable until the exact host EVENT fence completes");
+                }
+                return false;
+            }
+
+            auto& slot = DirectTransportSlots[selected];
+            {
+                InternalPassScope guard;
+                if (FAILED(StretchDirectEye(
+                        device, BackBuffer, slot.leftSurface)) ||
+                    FAILED(StretchDirectEye(
+                        device, RightEyeSurface, slot.rightSurface)) ||
+                    FAILED(slot.fence->Issue(D3DISSUE_END)))
+                    return false;
+            }
+
+            slot.producerPending = true;
+            slot.pendingFrameId = frameId;
+            slot.frameId = frameId;
+            slot.published = false;
+            ActiveDirectTransportSlot = selected;
+            return true;
         }
 
         void R13ResetCommonPre(IDirect3DDevice9*)

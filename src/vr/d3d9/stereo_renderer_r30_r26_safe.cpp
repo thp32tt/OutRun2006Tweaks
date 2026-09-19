@@ -79,10 +79,12 @@ namespace OutRunVRStereo
         std::uint64_t R30XyzrhwHudDraws = 0;
         std::uint64_t R30XyzrhwWorldEffectDraws = 0;
         std::uint64_t R30XyzrhwRhwWorldPromotions = 0;
+        std::uint64_t R30XyzrhwRhwOnlyDepthEvidence = 0;
         std::uint64_t R30XyzrhwFallbacks = 0;
         bool R30FirstXyzrhwHudLogged = false;
         bool R30FirstXyzrhwWorldLogged = false;
         bool R30FirstXyzrhwRhwPromotionLogged = false;
+        bool R30FirstXyzrhwRhwOnlyEvidenceLogged = false;
         std::uint64_t R30XyzrhwAtomicFallbacks = 0;
         std::uint64_t R30XyzrhwDepthPreserveFallbacks = 0;
         bool R30FirstXyzrhwAtomicFallbackLogged = false;
@@ -146,7 +148,9 @@ namespace OutRunVRStereo
         std::uint64_t R30ShadowReadHits = 0;
         std::uint64_t R30ShadowReadMisses = 0;
         std::uint64_t R30ShadowDiscardInvalidations = 0;
+        std::atomic<bool> R30BufferShadowCaptureArmed{ false };
         bool R30FirstShadowMissLogged = false;
+        bool R30FirstShadowArmLogged = false;
 
         struct R30ScratchBuffers
         {
@@ -402,7 +406,9 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30VertexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
-            if (SUCCEEDED(hr) && data && *data)
+            if (R30BufferShadowCaptureArmed.load(
+                    std::memory_order_acquire) &&
+                SUCCEEDED(hr) && data && *data)
                 R30BeginObservedLock(
                     R30EnsureVertexShadow(buffer), offset, size, *data, flags);
             return hr;
@@ -445,7 +451,9 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30IndexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
-            if (SUCCEEDED(hr) && data && *data)
+            if (R30BufferShadowCaptureArmed.load(
+                    std::memory_order_acquire) &&
+                SUCCEEDED(hr) && data && *data)
                 R30BeginObservedLock(
                     R30EnsureIndexShadow(buffer), offset, size, *data, flags);
             return hr;
@@ -533,7 +541,9 @@ namespace OutRunVRStereo
             if (SUCCEEDED(hr) && out && *out)
             {
                 R30EnsureVertexBufferHooks(*out);
-                R30EnsureVertexShadow(*out);
+                if (R30BufferShadowCaptureArmed.load(
+                        std::memory_order_acquire))
+                    R30EnsureVertexShadow(*out);
             }
             return hr;
         }
@@ -548,7 +558,9 @@ namespace OutRunVRStereo
             if (SUCCEEDED(hr) && out && *out)
             {
                 R30EnsureIndexBufferHooks(*out);
-                R30EnsureIndexShadow(*out);
+                if (R30BufferShadowCaptureArmed.load(
+                        std::memory_order_acquire))
+                    R30EnsureIndexShadow(*out);
             }
             return hr;
         }
@@ -1078,11 +1090,13 @@ namespace OutRunVRStereo
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(
-                "VR R30.9: bufferShadow[writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},rhwPromote={},atomicFallback={},depthPreserve={},bilateralFallback={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R30.10: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},rhwPromote={},rhwOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
                 R30XyzrhwWorldEffectDraws, R30XyzrhwHudDraws,
                 R30XyzrhwRhwWorldPromotions,
+                R30XyzrhwRhwOnlyDepthEvidence,
                 R30XyzrhwAtomicFallbacks,
                 R30XyzrhwDepthPreserveFallbacks,
                 R30XyzrhwBilateralFallbacks,
@@ -1116,6 +1130,8 @@ namespace OutRunVRStereo
         {
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
+            R30BufferShadowCaptureArmed.store(
+                false, std::memory_order_release);
             return R30ResetR29Hook.stdcall<HRESULT>(device, params);
         }
 
@@ -1267,6 +1283,18 @@ namespace OutRunVRStereo
                 OutRunVR::PassPolicy::ProjectionClass::Perspective3D)
                 return R30ScreenSpaceKind::None;
 
+            // A perspective pass that still carries a verified world c64 WVP
+            // belongs to R26/R28 even if the game disabled Z for sky/cloud or
+            // alpha billboards. The old broad rule intercepted it here and
+            // made world content follow the headset like a HUD.
+            if (CurrentDrawMatchesVerifiedWorld(device))
+                return R30ScreenSpaceKind::None;
+            std::uintptr_t reboundShader = 0;
+            std::uint64_t reboundSerial = 0;
+            if (R28CanRebindVerifiedWorld(
+                    device, reboundShader, reboundSerial))
+                return R30ScreenSpaceKind::None;
+
             DWORD zEnable = D3DZB_TRUE;
             DWORD alphaBlend = FALSE;
             DWORD alphaTest = FALSE;
@@ -1410,6 +1438,8 @@ namespace OutRunVRStereo
             UINT sampled = 0;
             UINT valid = 0;
             UINT projected = 0;
+            UINT nonUnitRhw = 0;
+            UINT plausibleRhwDepth = 0;
             for (UINT i = 0; i < vertexCount && sampled < 512u; ++i)
             {
                 if (usedMask &&
@@ -1438,16 +1468,50 @@ namespace OutRunVRStereo
                     continue;
 
                 ++valid;
-                // True pre-transformed world particles have a coherent
-                // projection relation between screen-Z and RHW. HUD glyphs can
-                // use arbitrary RHW for sorting/scaling, which was the reason
-                // the white position text was incorrectly promoted to 3D.
-                if (std::fabs(rhw - 1.0f) > 0.02f &&
+                const bool carriesPerspectiveDepth =
+                    std::fabs(rhw - 1.0f) > 0.02f;
+                if (carriesPerspectiveDepth)
+                {
+                    ++nonUnitRhw;
+                    // Some OutRun CPU-projected smoke/skid/decal vertices bias
+                    // or clamp screen-Z after projection. RHW still preserves
+                    // clip-W, so accept it as depth evidence when the implied
+                    // view depth is finite and physically plausible.
+                    if (std::isfinite(viewZ) &&
+                        std::fabs(viewZ) > 1.0e-4f &&
+                        std::fabs(viewZ) < 1.0e6f)
+                        ++plausibleRhwDepth;
+                }
+
+                // Strongest path: screen-Z and RHW both match the perspective
+                // projection. HUD glyphs with RHW=1 never satisfy this.
+                if (carriesPerspectiveDepth &&
                     std::fabs(expectedNdcZ - actualNdcZ) <= 0.10f)
                     ++projected;
             }
 
-            return sampled >= 3u && valid >= 3u && valid * 2u >= sampled && projected * 4u >= valid * 3u;
+            const bool enoughEvidence =
+                sampled >= 3u && valid >= 3u &&
+                valid * 2u >= sampled;
+            if (!enoughEvidence)
+                return false;
+
+            const bool exactProjected =
+                projected * 4u >= valid * 3u;
+            const bool rhwDepthOnly =
+                nonUnitRhw * 4u >= valid * 3u &&
+                plausibleRhwDepth * 4u >= nonUnitRhw * 3u;
+            if (rhwDepthOnly && !exactProjected)
+            {
+                ++R30XyzrhwRhwOnlyDepthEvidence;
+                if (!R30FirstXyzrhwRhwOnlyEvidenceLogged)
+                {
+                    R30FirstXyzrhwRhwOnlyEvidenceLogged = true;
+                    spdlog::info(
+                        "VR R30.10 XYZRHW DEPTH: stable non-unit RHW accepted as world depth when screen-Z is post-projection biased; RHW=1 HUD remains excluded");
+                }
+            }
+            return exactProjected || rhwDepthOnly;
         }
 
         bool R30ConfigureXyzrhwWorldEffect(
@@ -2249,7 +2313,15 @@ namespace OutRunVRStereo
             }
 
             R30EnsureVertexBufferHooks(vb);
+            const bool wasArmed = R30BufferShadowCaptureArmed.exchange(
+                true, std::memory_order_acq_rel);
             R30EnsureVertexShadow(vb);
+            if (!wasArmed && !R30FirstShadowArmLogged)
+            {
+                R30FirstShadowArmLogged = true;
+                spdlog::info(
+                    "VR R30 BUFFER SHADOW: lazy capture armed only after a real XYZRHW VB draw; ordinary world buffers no longer pay per-Lock shadow memcpy cost");
+            }
 
             D3DVERTEXBUFFER_DESC desc{};
             const std::uint64_t firstByte =
@@ -2350,8 +2422,16 @@ namespace OutRunVRStereo
 
             R30EnsureVertexBufferHooks(vb);
             R30EnsureIndexBufferHooks(ib);
+            const bool wasArmed = R30BufferShadowCaptureArmed.exchange(
+                true, std::memory_order_acq_rel);
             R30EnsureVertexShadow(vb);
             R30EnsureIndexShadow(ib);
+            if (!wasArmed && !R30FirstShadowArmLogged)
+            {
+                R30FirstShadowArmLogged = true;
+                spdlog::info(
+                    "VR R30 BUFFER SHADOW: lazy capture armed only after a real XYZRHW VB/IB draw; ordinary world buffers no longer pay per-Lock shadow memcpy cost");
+            }
 
             D3DINDEXBUFFER_DESC ibDesc{};
             if (FAILED(ib->GetDesc(&ibDesc)) ||

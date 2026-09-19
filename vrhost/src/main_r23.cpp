@@ -2427,8 +2427,12 @@ int main(int argc, char** argv)
 
                         if (committed)
                         {
-                            if (directFrame)
-                                shared.AckDirectFrame(candidate.frameId);
+                            // Do not publish the legacy global consumed-frame
+                            // ACK here. D3D11 has only queued the sampling/copy
+                            // work at this point. R32 arms an EVENT after the
+                            // actual projection commands and publishes the
+                            // dedicated per-slot GPU-completion ACK only when
+                            // GetData reports completion.
                             R23CopyMatchedViews(candidate, matchedViews);
                             matchedStereoValid = true;
                             newStereoCommitted = true;

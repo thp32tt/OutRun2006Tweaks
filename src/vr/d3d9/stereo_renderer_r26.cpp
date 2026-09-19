@@ -334,14 +334,20 @@ namespace OutRunVRStereo
                 return legacyR13Draw();
             };
 
-            // Screen-space veto runs before R28; unknown state fails closed.
-            if (R37DepthDisabledFragileOverlay(effect))
-                return legacyWithSnapshot();
-
+            // Positive renderer evidence outranks ZENABLE. OutRun disables Z
+            // for legitimate perspective sky/cloud and some billboard passes;
+            // forcing those to zero-disparity made them follow the headset.
+            // R28 proves c64..c67, projection, pose generation and perspective
+            // semantics before allowing the world path.
             const HRESULT rebound = R28RunWithVerifiedWorldEpoch(
                 device, std::forward<R9Draw>(r9Draw));
             if (rebound != E_NOTIMPL)
                 return rebound;
+
+            // Unknown depth-disabled alpha work still fails closed. Only the
+            // verified-world path above may bypass this screen-space veto.
+            if (R37DepthDisabledFragileOverlay(effect))
+                return legacyWithSnapshot();
 
             if (!R27ShouldBypassLegacyZeroDisparity(device, effect))
                 return legacyWithSnapshot();
