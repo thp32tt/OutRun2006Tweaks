@@ -26,6 +26,7 @@
 // StereoFailurePoseSequenceMismatch
 
 #include <intrin.h>
+#include <cstdlib>
 #include "stereo_renderer_r7.inc"
 
 namespace OutRunVRStereo
@@ -33,6 +34,17 @@ namespace OutRunVRStereo
 	namespace
 	{
 		constexpr const char* R9BuildId = "R9-finaltest-20260915";
+
+		bool R9DirectOnlyTransport() noexcept
+		{
+			const char* value = std::getenv("OUTRUN_VR_DIRECT_ONLY");
+			if (!value || !*value)
+				return true;
+			const char c = value[0];
+			return c != '0' && c != 'f' && c != 'F' && c != 'n' && c != 'N';
+		}
+
+		bool R9FirstDirectOnlyWaitLogged = false;
 
 		SafetyHookInline R9ResetCallbackHook{};
 		SafetyHookInline R9PresentCallbackHook{};
@@ -657,6 +669,7 @@ namespace OutRunVRStereo
 			}
 
 			const bool stereoRequested = StereoWanted() && R9StereoSeeded;
+			const bool directOnly = R9DirectOnlyTransport();
 			const std::uint32_t pendingFrameId = stereoRequested ? NextStereoFrameId() : 0;
 			bool composedStereo = false;
 			bool directTransport = false;
@@ -674,7 +687,7 @@ namespace OutRunVRStereo
 					++DirectTransportFrames;
 					composedStereo = true;
 					pendingPoseSequence = FrameStereoPoseSequence;
-					if (!HostDirectTransportReady())
+					if (!HostDirectTransportReady() && !directOnly)
 					{
 						const bool composeOk = ComposeSbs(device);
 						if (composeOk) ++StereoComposeSuccess;
@@ -688,23 +701,36 @@ namespace OutRunVRStereo
 				}
 				else
 				{
-					const bool composeOk = ComposeSbs(device);
-					if (composeOk)
+					if (directOnly)
 					{
-						++StereoComposeSuccess;
 						++DirectTransportFallbacks;
-						composedStereo = true;
-						pendingPoseSequence = FrameStereoPoseSequence;
-						if (!FirstDirectFallbackLogged)
+						composedStereo = false;
+						if (!R9FirstDirectOnlyWaitLogged)
 						{
-							FirstDirectFallbackLogged = true;
-							spdlog::warn("VR stereo: direct transport not verified/available; keeping SBS/Desktop Duplication fallback");
+							R9FirstDirectOnlyWaitLogged = true;
+							spdlog::warn("VR R36 DIRECT-ONLY: shared-eye transport is not ready; SBS/Desktop Duplication fallback suppressed and PC mirror stays mono/left-eye");
 						}
 					}
 					else
 					{
-						++StereoComposeFailure;
-						R9Poison(OutRunVR::StereoFailureComposeFailed, "Present/ComposeSbs");
+						const bool composeOk = ComposeSbs(device);
+						if (composeOk)
+						{
+							++StereoComposeSuccess;
+							++DirectTransportFallbacks;
+							composedStereo = true;
+							pendingPoseSequence = FrameStereoPoseSequence;
+							if (!FirstDirectFallbackLogged)
+							{
+								FirstDirectFallbackLogged = true;
+								spdlog::warn("VR stereo: direct transport not verified/available; keeping SBS/Desktop Duplication fallback");
+							}
+						}
+						else
+						{
+							++StereoComposeFailure;
+							R9Poison(OutRunVR::StereoFailureComposeFailed, "Present/ComposeSbs");
+						}
 					}
 				}
 			}
@@ -721,7 +747,7 @@ namespace OutRunVRStereo
 			MaybeLogSummary();
 			LARGE_INTEGER presentStart{};
 			QueryPerformanceCounter(&presentStart);
-			if (stereoRequested)
+			if (stereoRequested && (!directOnly || directTransport))
 				PublishRenderFrame(OutRunVR::StereoSbsFallbackMono, pendingFrameId, pendingPoseSequence,
 					presentStart.QuadPart, FrameFailureReason, nullptr, true, directTransport);
 
@@ -749,7 +775,11 @@ namespace OutRunVRStereo
 					R9LogFirstFailure("Present/fallback", hr);
 				const std::uint32_t fallback = stereoRequested ? OutRunVR::StereoSbsFallbackMono : OutRunVR::StereoDisabled;
 				PublishStereoState(fallback, false, 0, 0);
-				PublishRenderFrame(fallback, 0, 0, presentStart.QuadPart, FrameFailureReason, nullptr);
+				// In DirectGPU-only mode, do not overwrite the bounded frame ring
+				// with classic fallback descriptors while the host still needs to
+				// consume/ACK one of the initial shared-eye frames.
+				if (!directOnly || !stereoRequested || directTransport)
+					PublishRenderFrame(fallback, 0, 0, presentStart.QuadPart, FrameFailureReason, nullptr);
 			}
 
 			OutRunVRRenderer::NotifyGamePresent();
