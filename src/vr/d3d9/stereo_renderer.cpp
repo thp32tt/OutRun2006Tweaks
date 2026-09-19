@@ -778,8 +778,10 @@ namespace OutRunVRStereo
 				if (!FirstStereoActiveLogged)
 				{
 					FirstStereoActiveLogged = true;
-					spdlog::info("VR R9 FINAL TEST: TRUE STEREO PRESENT COMPLETE transport={} sourceEye={}x{}",
+					spdlog::info("VR R9 FINAL TEST: TRUE STEREO PRESENT COMPLETE transport={} sourceEye={}x{} desktop={}x{}",
 						directTransport ? "D3D9Ex ring" : "SBS Desktop Duplication",
+						directTransport && DirectTransportWidth ? DirectTransportWidth : BackBufferDesc.Width,
+						directTransport && DirectTransportHeight ? DirectTransportHeight : BackBufferDesc.Height,
 						BackBufferDesc.Width, BackBufferDesc.Height);
 				}
 			}

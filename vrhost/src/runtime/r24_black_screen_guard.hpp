@@ -28,6 +28,7 @@
 #endif
 
 #include <array>
+#include <atomic>
 #include <cstdint>
 #include <iostream>
 
@@ -50,6 +51,8 @@ namespace OutRunVrR24BlackScreenGuard
     inline std::uint64_t EmergencyLayerFallbacks = 0;
     inline std::uint64_t EmptyFrameFallbacks = 0;
     inline std::uint64_t MixedValidatedSubmits = 0;
+    inline std::uint64_t IntentionalMonoProjectionSubmits = 0;
+    inline std::atomic<bool> IntentionalMonoProjection{ false };
 
     inline bool FirstExactProjectionLogged = false;
     inline bool FirstSoftGraceLogged = false;
@@ -518,6 +521,18 @@ namespace OutRunVrR24BlackScreenGuard
         const auto projection = FindProjection(endInfo);
         const bool hasNonProjection =
             OutRunVrReviewHardening::HasIncomingNonProjectionLayer(endInfo);
+
+        // Menus use one full mono desktop image in both projection eyes so VDXR
+        // stays on its normal projection cadence instead of the slower theater
+        // quad path. R23 arms this only for PresentationTheater/menu frames.
+        if (IntentionalMonoProjection.load(std::memory_order_acquire) &&
+            projection.count == 1 && !hasNonProjection)
+        {
+            ++IntentionalMonoProjectionSubmits;
+            OutRunVrR23RuntimeHardening::RecordFinalSubmission(
+                0, SourceKind::None, true);
+            return OutRunVrFinalTest::EndFrame(session, endInfo);
+        }
 
         // Theater/menu is already visible and deliberate; do not replace it.
         if (hasNonProjection && projection.count == 0)

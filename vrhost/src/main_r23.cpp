@@ -1168,6 +1168,39 @@ namespace
         return true;
     }
 
+    bool R23RenderMonoProjection(StereoCompositor& c,
+        const std::array<XrView, 2>& views,
+        std::array<XrCompositionLayerProjectionView, 2>& pv)
+    {
+        R23Pixels.TryConsume(c.context_);
+        if (!c.haveFrame_ || !c.sourceSrv_) return false;
+        UvRect whole{};
+        if (!c.GetGameUv(whole)) return false;
+        std::uint32_t image = 0;
+        c.Acquire(c.projection_, image);
+        bool ok = c.RenderTo(c.projection_.rtvs[image][0], c.projection_.width,
+            c.projection_.height, whole, c.sourceSrv_, c.sourceFormat_);
+        ok = c.RenderTo(c.projection_.rtvs[image][1], c.projection_.width,
+            c.projection_.height, whole, c.sourceSrv_, c.sourceFormat_) && ok;
+        if (ok) R23Pixels.ScheduleProjection(c, image);
+        c.Release(c.projection_);
+        if (!ok) return false;
+
+        for (int eye = 0; eye < 2; ++eye)
+        {
+            pv[eye] = { XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW };
+            pv[eye].pose = views[eye].pose;
+            pv[eye].fov = views[eye].fov;
+            pv[eye].subImage.swapchain = c.projection_.handle;
+            pv[eye].subImage.imageRect.offset = { 0, 0 };
+            pv[eye].subImage.imageRect.extent = {
+                static_cast<int32_t>(c.projection_.width),
+                static_cast<int32_t>(c.projection_.height) };
+            pv[eye].subImage.imageArrayIndex = eye;
+        }
+        return true;
+    }
+
     bool R23RenderTheater(StereoCompositor& c, XrSpace viewSpace,
         XrSpace localSpace, XrTime displayTime, XrCompositionLayerQuad& quad,
         bool sourceIsSbs)
@@ -2077,11 +2110,12 @@ int main(int argc, char** argv)
                 }
                 lastPresentation = presentation;
                 std::cout << "VR presentation: "
-                    << (presentation == OutRunVR::PresentationGameplay ? "true stereo projection" : "LOCAL-fixed theater")
+                    << (presentation == OutRunVR::PresentationGameplay ? "true stereo projection" : "mono projection menu")
                     << ".\n";
             }
 
             bool layerReady = false;
+            bool intentionalMonoProjection = false;
             const char* finalLayerKind = "none";
             const char* candidateRejectReason = "not-evaluated";
             std::uint32_t candidateGameFrameId = 0;
@@ -2549,12 +2583,15 @@ int main(int argc, char** argv)
                     // recovery sources can contain SBS and need left-eye extraction.
                     // Cropping menus to the left half magnifies a 2D menu and clips
                     // its right side in the HMD.
-                    if (capture.available && R23RenderTheater(compositor, viewSpace,
-                        localSpace, fs.predictedDisplayTime, quad, false))
+                    if (capture.available && R23RenderMonoProjection(compositor, views, pv))
                     {
-                        layers[0] = reinterpret_cast<const XrCompositionLayerBaseHeader*>(&quad);
+                        projection.space = localSpace;
+                        projection.viewCount = 2;
+                        projection.views = pv.data();
+                        layers[0] = reinterpret_cast<const XrCompositionLayerBaseHeader*>(&projection);
                         layerReady = true;
-                        finalLayerKind = "menu-full-theater";
+                        intentionalMonoProjection = true;
+                        finalLayerKind = "menu-mono-projection";
                     }
                     QueryPerformanceCounter(&re);
                     frameRenderMs += timings.Ms(rs, re);
@@ -2566,10 +2603,14 @@ int main(int argc, char** argv)
             end.layers = layerReady ? layers : nullptr;
             const R23FinalCounters finalBefore =
                 R23ReadFinalCounters();
+            OutRunVrR24BlackScreenGuard::IntentionalMonoProjection.store(
+                intentionalMonoProjection, std::memory_order_release);
             LARGE_INTEGER es{}, ee{};
             QueryPerformanceCounter(&es);
             const XrResult endResult = xrEndFrame(session, &end);
             QueryPerformanceCounter(&ee);
+            OutRunVrR24BlackScreenGuard::IntentionalMonoProjection.store(
+                false, std::memory_order_release);
             const R23FinalCounters finalAfter =
                 R23ReadFinalCounters();
             const char* actualFinalLayerKind =
