@@ -2026,7 +2026,7 @@ namespace
 
     bool DirectTransportOnly()
     {
-        return ReadBoolEnvironment("OUTRUN_VR_DIRECT_ONLY", false);
+        return ReadBoolEnvironment("OUTRUN_VR_DIRECT_ONLY", true);
     }
 
     float RequestedRefreshRateHz()
