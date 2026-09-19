@@ -2634,7 +2634,7 @@ namespace OutRunVRStereo
             {
                 R30FirstScreenSpaceLogged = true;
                 spdlog::info(
-                    "VR R30.8 HUD: orthographic ScreenSpace2D aspect compensation ACTIVE offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} aspectX={:.3f}; HMD final sprite aspect is corrected after source-to-eye projection",
+                    "VR R30 HUD: orthographic ScreenSpace2D asymmetric-FOV correction ACTIVE; R30.9 exact OpenXR pixel-aspect correction offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} aspectX={:.3f}; HMD final sprite aspect is corrected after source-to-eye projection",
                     eyeOffset[0], eyeOffset[1], R30HudScaleValue(),
                     R30HudAspectCompensation(stereo));
             }
