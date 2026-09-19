@@ -1290,7 +1290,7 @@ namespace OutRunVRStereo
 
         bool R30XyzrhwHasProjectedDepthSignature(
             const void* source, UINT vertexCount, UINT stride,
-            const R30XyzrhwState& state,
+            const R30XyzrhwState& state, const D3DMATRIX& projection,
             const std::vector<std::uint8_t>* usedMask) noexcept
         {
             if (!source || vertexCount == 0 || stride < sizeof(float) * 4)
@@ -1298,8 +1298,12 @@ namespace OutRunVRStereo
 
             const float depthSpan =
                 state.viewport.MaxZ - state.viewport.MinZ;
-            const float depthLo = state.viewport.MinZ - 0.10f * depthSpan;
-            const float depthHi = state.viewport.MaxZ + 0.10f * depthSpan;
+            if (!std::isfinite(depthSpan) || depthSpan <= 1.0e-6f ||
+                std::fabs(projection._34) <= 1.0e-5f ||
+                std::fabs(projection._13) > 1.0e-4f ||
+                std::fabs(projection._23) > 1.0e-4f)
+                return false;
+
             UINT sampled = 0;
             UINT valid = 0;
             UINT projected = 0;
@@ -1315,12 +1319,28 @@ namespace OutRunVRStereo
                 const float z = p[2];
                 const float rhw = p[3];
                 if (!std::isfinite(z) || !std::isfinite(rhw) ||
-                    rhw <= 0.0f || rhw >= 1000.0f)
+                    rhw <= 1.0e-6f || rhw >= 1000.0f)
+                    continue;
+
+                const float clipW = 1.0f / rhw;
+                const float viewZ =
+                    (clipW - projection._44) / projection._34;
+                const float clipZ =
+                    viewZ * projection._33 + projection._43;
+                const float expectedNdcZ = clipZ / clipW;
+                const float actualNdcZ =
+                    (z - state.viewport.MinZ) / depthSpan;
+                if (!std::isfinite(expectedNdcZ) ||
+                    !std::isfinite(actualNdcZ))
                     continue;
 
                 ++valid;
-                if (z >= depthLo && z <= depthHi &&
-                    std::fabs(rhw - 1.0f) > 0.02f)
+                // True pre-transformed world particles have a coherent
+                // projection relation between screen-Z and RHW. HUD glyphs can
+                // use arbitrary RHW for sorting/scaling, which was the reason
+                // the white position text was incorrectly promoted to 3D.
+                if (std::fabs(rhw - 1.0f) > 0.02f &&
+                    std::fabs(expectedNdcZ - actualNdcZ) <= 0.06f)
                     ++projected;
             }
 
@@ -1332,12 +1352,23 @@ namespace OutRunVRStereo
             UINT vertexCount, UINT stride, R30XyzrhwState& state,
             const std::vector<std::uint8_t>* usedMask = nullptr) noexcept
         {
-            state.rhwDepthEvidence =
-                R30XyzrhwHasProjectedDepthSignature(
-                    source, vertexCount, stride, state, usedMask);
+            float projectionRaw[16]{};
+            D3DMATRIX baseProjection{};
+            const bool haveBaseProjection =
+                OutRunVRRenderer::GetRendererBaseProjection(projectionRaw);
+            if (haveBaseProjection)
+                std::memcpy(&baseProjection, projectionRaw, sizeof(baseProjection));
 
-            // Z-enable is only one signal. RHW/depth evidence is accepted only
-            // from vertices that the indexed draw actually references.
+            state.rhwDepthEvidence =
+                haveBaseProjection &&
+                R30XyzrhwHasProjectedDepthSignature(
+                    source, vertexCount, stride, state,
+                    baseProjection, usedMask);
+
+            // Depth-tested particles/decals are world effects. A depth-disabled
+            // XYZRHW draw is promoted only when its Z/RHW pair is mathematically
+            // consistent with the current perspective projection. This keeps
+            // screen-space white rank glyphs together with their black layer.
             state.worldEffect =
                 state.depthTestEnabled || state.rhwDepthEvidence;
             if (!state.worldEffect)
@@ -1353,11 +1384,8 @@ namespace OutRunVRStereo
                 !RightStencilSynchronized && StencilTestActive(device))
                 return false;
 
-            float projectionRaw[16]{};
-            if (!OutRunVRRenderer::GetRendererBaseProjection(projectionRaw))
+            if (!haveBaseProjection)
                 return false;
-            D3DMATRIX baseProjection{};
-            std::memcpy(&baseProjection, projectionRaw, sizeof(baseProjection));
             state.baseProjection = baseProjection;
             if (!MatrixFinite(baseProjection) ||
                 std::fabs(baseProjection._11) < 0.01f ||

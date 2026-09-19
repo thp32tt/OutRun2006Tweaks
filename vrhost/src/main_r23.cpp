@@ -1239,10 +1239,11 @@ namespace
             bool issued = false;
         };
 
-        R35CadenceHost(int mode, float targetHz, std::uint32_t timeoutMs,
-            float requestedRefreshHz)
+        R35CadenceHost(int mode, float targetHz, float maxRenderHz,
+            std::uint32_t timeoutMs, float requestedRefreshHz)
             : mode_(std::clamp(mode, 0, 2)),
-              targetHz_(std::clamp(targetHz, 30.0f, 120.0f)),
+              configuredTargetHz_(std::clamp(targetHz, 0.0f, 120.0f)),
+              maxRenderHz_(std::clamp(maxRenderHz, 60.0f, 120.0f)),
               timeoutMs_(std::clamp<std::uint32_t>(timeoutMs, 5u, 100u)),
               requestedRefreshHz_(std::max(0.0f, requestedRefreshHz))
         {
@@ -1300,7 +1301,7 @@ namespace
 
         bool Enabled() const noexcept { return mode_ != 0 && enabled_; }
         int Mode() const noexcept { return mode_; }
-        float TargetHz() const noexcept { return targetHz_; }
+        float TargetHz() const noexcept { return activeRenderHz_; }
         std::uint32_t TimeoutMs() const noexcept { return timeoutMs_; }
 
         void SetRunning(bool running) noexcept
@@ -1310,28 +1311,113 @@ namespace
             Publish();
         }
 
+        static float QuantizeRuntimeHz(double hz) noexcept
+        {
+            constexpr float modes[]{ 60.0f, 72.0f, 80.0f, 90.0f, 120.0f };
+            float best = modes[0];
+            double bestError = std::fabs(hz - static_cast<double>(best));
+            for (float mode : modes)
+            {
+                const double error =
+                    std::fabs(hz - static_cast<double>(mode));
+                if (error < bestError)
+                {
+                    best = mode;
+                    bestError = error;
+                }
+            }
+            return bestError <= 4.0 ? best :
+                static_cast<float>(std::clamp(hz, 60.0, 120.0));
+        }
+
+        void UpdateActiveRenderHz() noexcept
+        {
+            float desired = configuredTargetHz_ > 0.0f
+                ? configuredTargetHz_
+                : QuantizeRuntimeHz(actualXrHz_);
+            desired = std::min(desired, maxRenderHz_);
+            if (desired <= 0.0f || !std::isfinite(desired))
+                return;
+
+            if (activeRenderHz_ <= 0.0f)
+            {
+                activeRenderHz_ = desired;
+                nextRequestDisplayTime_ = 0;
+                return;
+            }
+
+            if (std::fabs(activeRenderHz_ - desired) < 0.5f)
+            {
+                pendingRenderHz_ = 0.0f;
+                pendingRenderHzSamples_ = 0;
+                return;
+            }
+
+            if (std::fabs(pendingRenderHz_ - desired) < 0.5f)
+                ++pendingRenderHzSamples_;
+            else
+            {
+                pendingRenderHz_ = desired;
+                pendingRenderHzSamples_ = 1;
+            }
+
+            // About a quarter second at common Quest rates. This filters
+            // xrWaitFrame period noise but still follows a deliberate VD
+            // 72/80/90/120 Hz mode switch quickly.
+            if (pendingRenderHzSamples_ >= 20)
+            {
+                activeRenderHz_ = pendingRenderHz_;
+                pendingRenderHz_ = 0.0f;
+                pendingRenderHzSamples_ = 0;
+                nextRequestDisplayTime_ = 0;
+                std::cout
+                    << "[R36 cadence] activeRenderHz=" << activeRenderHz_
+                    << " actualXrHz=" << actualXrHz_
+                    << " maxRenderHz=" << maxRenderHz_
+                    << " policy="
+                    << (configuredTargetHz_ > 0.0f ? "fixed" : "auto-native")
+                    << "\n";
+            }
+        }
+
         Request IssueIfDue(const XrFrameState& frame,
             std::uint32_t poseSequence) noexcept
         {
             ++intervalXrFrames_;
             ObserveRuntimeRefresh(frame.predictedDisplayPeriod);
+            UpdateActiveRenderHz();
             if (!Enabled() || !running_ ||
                 frame.predictedDisplayPeriod <= 0 ||
-                frame.predictedDisplayTime <= 0)
+                frame.predictedDisplayTime <= 0 ||
+                activeRenderHz_ <= 0.0f)
                 return { requestId_, false };
 
-            const XrTime targetPeriod = static_cast<XrTime>(
-                std::llround(1000000000.0 / static_cast<double>(targetHz_)));
-            if (nextRequestDisplayTime_ == 0)
-                nextRequestDisplayTime_ = frame.predictedDisplayTime;
+            // In Auto mode, if the cap permits the runtime's native mode,
+            // release exactly one game render per xrWaitFrame. This avoids
+            // 60->90 3:2 cadence and the accumulated rounding drift of an
+            // independently generated target timeline.
+            const float nativeHz = QuantizeRuntimeHz(actualXrHz_);
+            const bool nativeOneToOne =
+                configuredTargetHz_ <= 0.0f &&
+                maxRenderHz_ + 0.5f >= nativeHz &&
+                std::fabs(activeRenderHz_ - nativeHz) < 0.5f;
 
-            if (frame.predictedDisplayTime < nextRequestDisplayTime_)
-                return { requestId_, false };
-
-            do
+            if (!nativeOneToOne)
             {
-                nextRequestDisplayTime_ += targetPeriod;
-            } while (nextRequestDisplayTime_ <= frame.predictedDisplayTime);
+                const XrTime targetPeriod = static_cast<XrTime>(
+                    std::llround(1000000000.0 /
+                        static_cast<double>(activeRenderHz_)));
+                if (nextRequestDisplayTime_ == 0)
+                    nextRequestDisplayTime_ = frame.predictedDisplayTime;
+
+                if (frame.predictedDisplayTime < nextRequestDisplayTime_)
+                    return { requestId_, false };
+
+                do
+                {
+                    nextRequestDisplayTime_ += targetPeriod;
+                } while (nextRequestDisplayTime_ <= frame.predictedDisplayTime);
+            }
 
             if (++requestId_ == 0)
                 ++requestId_;
@@ -1414,14 +1500,16 @@ namespace
         {
             OutRunVR::CadenceV1::ClientState client{};
             const bool haveClient = ReadClient(client);
-            const double ratio = targetHz_ > 0.0f
-                ? actualXrHz_ / static_cast<double>(targetHz_) : 0.0;
+            const double ratio = activeRenderHz_ > 0.0f
+                ? actualXrHz_ / static_cast<double>(activeRenderHz_) : 0.0;
             const double nearestInteger = std::round(ratio);
             const bool integerCadence = ratio >= 1.0 &&
                 nearestInteger >= 1.0 &&
                 std::fabs(ratio - nearestInteger) <= 0.02;
             out << " cadence={mode:" << mode_
-                << ",gameTargetHz:" << targetHz_
+                << ",configuredTargetHz:" << configuredTargetHz_
+                << ",maxRenderHz:" << maxRenderHz_
+                << ",activeRenderHz:" << activeRenderHz_
                 << ",requestedRefreshHz:" << requestedRefreshHz_
                 << ",actualXrHz:" << actualXrHz_
                 << ",xrPeriodMs:" << actualDisplayPeriodMs_
@@ -1493,8 +1581,8 @@ namespace
                 std::fabs(actualXrHz_ - lastLoggedXrHz_) >= 0.75)
             {
                 lastLoggedXrHz_ = actualXrHz_;
-                const double ratio = targetHz_ > 0.0f
-                    ? actualXrHz_ / static_cast<double>(targetHz_) : 0.0;
+                const double ratio = activeRenderHz_ > 0.0f
+                    ? actualXrHz_ / static_cast<double>(activeRenderHz_) : 0.0;
                 const double nearestInteger = std::round(ratio);
                 const bool integerCadence = ratio >= 1.0 &&
                     nearestInteger >= 1.0 &&
@@ -1503,7 +1591,9 @@ namespace
                     << "[R35 refresh] actualXrHz=" << actualXrHz_
                     << " displayPeriodMs=" << actualDisplayPeriodMs_
                     << " requestedOverrideHz=" << requestedRefreshHz_
-                    << " gameTargetHz=" << targetHz_
+                    << " configuredTargetHz=" << configuredTargetHz_
+                    << " maxRenderHz=" << maxRenderHz_
+                    << " activeRenderHz=" << activeRenderHz_
                     << " ratio=" << ratio
                     << " ratioKind="
                     << (integerCadence ? "integer" : "fractional")
@@ -1533,7 +1623,7 @@ namespace
             host_->requestId = requestId_;
             host_->poseSequence = poseSequence_;
             host_->targetHzMilli = static_cast<std::uint32_t>(
-                std::lround(targetHz_ * 1000.0f));
+                std::lround(std::max(0.0f, activeRenderHz_) * 1000.0f));
             host_->timeoutMs = timeoutMs_;
             host_->requestQpc = requestQpc_;
             host_->predictedDisplayTime = predictedDisplayTime_;
@@ -1589,7 +1679,11 @@ namespace
         }
 
         int mode_ = 0;
-        float targetHz_ = 60.0f;
+        float configuredTargetHz_ = 0.0f;
+        float maxRenderHz_ = 120.0f;
+        float activeRenderHz_ = 0.0f;
+        float pendingRenderHz_ = 0.0f;
+        std::uint32_t pendingRenderHzSamples_ = 0;
         std::uint32_t timeoutMs_ = 35;
         float requestedRefreshHz_ = 0.0f;
         double actualXrHz_ = 0.0;
@@ -1647,8 +1741,11 @@ int main(int argc, char** argv)
         const int cadenceMode = std::clamp(
             R35ReadEnvInt("OUTRUN_VR_CADENCE_MODE", 1), 0, 2);
         const float cadenceTargetHz = std::clamp(
-            R35ReadEnvFloat("OUTRUN_VR_CADENCE_TARGET_HZ", 60.0f),
-            30.0f, 120.0f);
+            R35ReadEnvFloat("OUTRUN_VR_CADENCE_TARGET_HZ", 0.0f),
+            0.0f, 120.0f);
+        const float cadenceMaxHz = std::clamp(
+            R35ReadEnvFloat("OUTRUN_VR_CADENCE_MAX_HZ", 120.0f),
+            60.0f, 120.0f);
         const std::uint32_t cadenceTimeoutMs =
             static_cast<std::uint32_t>(std::clamp(
                 R35ReadEnvFloat("OUTRUN_VR_CADENCE_TIMEOUT_MS", 35.0f),
@@ -1725,6 +1822,7 @@ int main(int argc, char** argv)
             << (targetRefreshRateHz > 0.0f ? "explicit-request" : "runtime-owned")
             << " cadenceMode=" << cadenceMode
             << " cadenceTargetHz=" << cadenceTargetHz
+            << " cadenceMaxHz=" << cadenceMaxHz
             << " cadenceTimeoutMs=" << cadenceTimeoutMs
             << "\n";
 #ifdef XR_FB_display_refresh_rate
@@ -1762,7 +1860,7 @@ int main(int argc, char** argv)
 
         SharedWriter shared(req.adapterLuid);
         R35CadenceHost cadence(cadenceMode, cadenceTargetHz,
-            cadenceTimeoutMs, targetRefreshRateHz);
+            cadenceMaxHz, cadenceTimeoutMs, targetRefreshRateHz);
         RenderFrameReader renderFrames;
         StereoCompositor compositor(session, d3d.device, d3d.context, gameWindow,
             configs, directTransportEnabled, renderScale);

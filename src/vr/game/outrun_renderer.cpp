@@ -117,6 +117,7 @@ namespace OutRunVRRenderer
 		HANDLE CadenceRequestEvent = nullptr;
 		HANDLE CadencePresentedEvent = nullptr;
 		std::atomic<std::uint32_t> ActiveCadenceRequestId{0};
+		std::atomic<bool> CadencePacingActive{false};
 		std::uint32_t CadenceAcceptedRequestId = 0;
 		std::uint32_t CadencePresentedRequestId = 0;
 		std::uint32_t CadenceTimeoutCount = 0;
@@ -921,16 +922,26 @@ namespace OutRunVRRenderer
         void WaitForNextCadenceRequest() noexcept
         {
             if (Settings::VRFrameCadenceMode <= 0 || !GameRendererIsActive())
+            {
+                CadencePacingActive.store(false, std::memory_order_release);
                 return;
+            }
 
             OutRunVR::CadenceV1::HostState host{};
             if (!ReadCadenceHost(host))
+            {
+                CadencePacingActive.store(false, std::memory_order_release);
                 return;
+            }
             const std::uint32_t required =
                 OutRunVR::CadenceV1::HostEnabled |
                 OutRunVR::CadenceV1::HostRunning;
             if ((host.flags & required) != required || !host.hostPid)
+            {
+                CadencePacingActive.store(false, std::memory_order_release);
                 return;
+            }
+            CadencePacingActive.store(true, std::memory_order_release);
 
             const std::uint32_t current =
                 ActiveCadenceRequestId.load(std::memory_order_acquire);
@@ -1540,6 +1551,11 @@ namespace OutRunVRRenderer
 		return ActiveCadenceRequestId.load(std::memory_order_acquire);
 	}
 
+	bool IsCadencePacingActive() noexcept
+	{
+		return CadencePacingActive.load(std::memory_order_acquire);
+	}
+
 	bool GetLatchedStereoFrame(LatchedStereoFrame& out)
 	{
 		out = LatchedStereo;
@@ -1563,6 +1579,7 @@ namespace OutRunVRRenderer
 	void NotifyGameReset()
 	{
 		ActiveCadenceRequestId.store(0, std::memory_order_release);
+		CadencePacingActive.store(false, std::memory_order_release);
 		CadenceAcceptedRequestId = 0;
 		CadencePresentedRequestId = 0;
 		PresentPoseLocked = false;

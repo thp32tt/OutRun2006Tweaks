@@ -49,8 +49,10 @@ namespace Settings
 	Setting<int> VRFrameCadenceMode{ "VR", "FrameCadenceMode", 1,
 		"Synchronizes the next OutRun frame to the OpenXR clock. PhaseLock is the production-safe R35 path; SerializedProbe additionally waits a bounded part of the XR frame for the requested game Present. Off restores the pre-R35 cadence.",
 		{ "Off", "PhaseLock", "SerializedProbe" } };
-	Setting<float> VRFrameCadenceTargetHz{ "VR", "FrameCadenceTargetHz", 60.0f,
-		"Target OutRun game-frame cadence while XR pacing is enabled. Keep 60 Hz for normal game timing; R35 measures the runtime's actual 72/80/90/120 Hz display period independently.", Range<float>{ 30.0f, 120.0f } };
+	Setting<float> VRFrameCadenceTargetHz{ "VR", "FrameCadenceTargetHz", 0.0f,
+		"Render cadence override while XR pacing is enabled. 0 = Auto/native OpenXR refresh (72/80/90/120 Hz as reported by xrWaitFrame). Non-zero keeps a fixed diagnostic render cadence.", Range<float>{ 0.0f, 120.0f } };
+	Setting<float> VRFrameCadenceMaxHz{ "VR", "FrameCadenceMaxHz", 120.0f,
+		"Maximum VR render cadence in Auto mode. The 60 Hz simulation remains unchanged; Tweaks interpolation fills intermediate render frames.", Range<float>{ 60.0f, 120.0f } };
 	Setting<float> VRFrameCadenceTimeoutMs{ "VR", "FrameCadenceTimeoutMs", 35.0f,
 		"Maximum game-side wait for the next XR cadence request before failing open. This prevents a stopped host from hanging OutRun.", Range<float>{ 5.0f, 100.0f } };
 	Setting<bool> VRPositionalTracking{ "VR", "PositionalTracking", true,
@@ -122,10 +124,13 @@ namespace OutRunVR
 					std::to_string(Settings::VRFrameCadenceMode.get());
 				const std::string cadenceTargetHz =
 					std::to_string(Settings::VRFrameCadenceTargetHz.get());
+				const std::string cadenceMaxHz =
+					std::to_string(Settings::VRFrameCadenceMaxHz.get());
 				const std::string cadenceTimeoutMs =
 					std::to_string(Settings::VRFrameCadenceTimeoutMs.get());
 				SetEnvironmentVariableA("OUTRUN_VR_CADENCE_MODE", cadenceMode.c_str());
 				SetEnvironmentVariableA("OUTRUN_VR_CADENCE_TARGET_HZ", cadenceTargetHz.c_str());
+				SetEnvironmentVariableA("OUTRUN_VR_CADENCE_MAX_HZ", cadenceMaxHz.c_str());
 				SetEnvironmentVariableA("OUTRUN_VR_CADENCE_TIMEOUT_MS", cadenceTimeoutMs.c_str());
 
 				std::wstring command = L"\"" + hostPath.wstring() + L"\"";
@@ -187,18 +192,20 @@ namespace OutRunVR
 			Settings::VRTargetRefreshRateHz.needs_restart();
 			Settings::VRFrameCadenceMode.needs_restart();
 			Settings::VRFrameCadenceTargetHz.needs_restart();
+			Settings::VRFrameCadenceMaxHz.needs_restart();
 			Settings::VRFrameCadenceTimeoutMs.needs_restart();
 		}
 
 		bool apply() override
 		{
 			spdlog::info(
-				"VR: D3D9Ex DirectGPU preference={} directOnly={} refreshOverrideHz={:.1f} cadenceMode={} cadenceTargetHz={:.1f}; runtime refresh is measured from xrWaitFrame; CalcCameraMatrix untouched",
+				"VR: D3D9Ex DirectGPU preference={} directOnly={} refreshOverrideHz={:.1f} cadenceMode={} cadenceTargetHz={:.1f} cadenceMaxHz={:.1f}; target 0 means XR-native render cadence, simulation remains 60 Hz",
 				Settings::VRPreferD3D9Ex.get(),
 				Settings::VRDirectGpuOnly.get(),
 				Settings::VRTargetRefreshRateHz.get(),
 				Settings::VRFrameCadenceMode.get(),
-				Settings::VRFrameCadenceTargetHz.get());
+				Settings::VRFrameCadenceTargetHz.get(),
+				Settings::VRFrameCadenceMaxHz.get());
 			if (Settings::VREnabled && Settings::VRAutoLaunchHost)
 			{
 				HANDLE thread = CreateThread(nullptr, 0, VRAutoLaunchHostThread, nullptr, 0, nullptr);

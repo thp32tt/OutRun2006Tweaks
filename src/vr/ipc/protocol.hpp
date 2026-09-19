@@ -299,6 +299,7 @@ namespace OutRunVRRenderer
     std::uint64_t GetBeginSceneCallCount();
     void NotifyGamePresent();
     std::uint32_t GetActiveCadenceRequestId() noexcept;
+    bool IsCadencePacingActive() noexcept;
     void NotifyGameReset();
 }
 

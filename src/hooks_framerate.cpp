@@ -4,6 +4,11 @@
 #include "overlay/overlay.hpp"
 #include "interpolation.hpp"
 
+namespace OutRunVRRenderer
+{
+	bool IsCadencePacingActive() noexcept;
+}
+
 // from timeapi.h, which we can't include since our proxy timeBeginPeriod etc funcs will conflict...
 typedef struct timecaps_tag {
 	UINT    wPeriodMin;     /* minimum period supported  */
@@ -308,8 +313,17 @@ class ReplaceGameUpdateLoop : public Hook
 		}
 #endif
 
+		// When R35/R36 OpenXR cadence is active, xrWaitFrame is the render
+		// limiter. Keep the 60 Hz simulation clock below, but never stack the
+		// legacy Tweaks limiter on top of the XR clock.
+		const bool xrCadencePacing =
+			OutRunVRRenderer::IsCadencePacingActive();
+		const bool renderUnlock =
+			Settings::FramerateUnlockExperimental || xrCadencePacing;
+
 		// Skip framelimiter during load screens to help reduce load times
-		bool skipFrameLimiter = Settings::FramerateLimit == 0;
+		bool skipFrameLimiter =
+			Settings::FramerateLimit == 0 || xrCadencePacing;
 		if (Settings::FramerateFastLoad > 0 && !skipFrameLimiter)
 		{
 			if (Settings::FramerateFastLoad != 3)
@@ -415,7 +429,7 @@ class ReplaceGameUpdateLoop : public Hook
 		// when running above 60FPS CalcNumUpdatesToRun would return 0 since game was running fast, for it to skip the current update, but game would still force it to update
 		// if FrameUnlockExperimental is set then we'll allow 0 updates to run, allowing it to skip updating when game is running fast
 
-		int minUpdates = Settings::FramerateUnlockExperimental ? 0 : 1;
+		int minUpdates = renderUnlock ? 0 : 1;
 
 		if (numUpdates < minUpdates)
 			numUpdates = minUpdates;
@@ -476,7 +490,7 @@ class ReplaceGameUpdateLoop : public Hook
 
 		// Keeps tick-drawn UI present on frames that skip a tick. Must sit after
 		// the last tick and before the render path queues any draw of its own.
-		if (Settings::FramerateUnlockExperimental)
+		if (renderUnlock)
 			SumoUISpriteReplay::update(numUpdates);
 
 		// Re-run the display-matrix builders with a fractional alpha. Must be
@@ -486,7 +500,8 @@ class ReplaceGameUpdateLoop : public Hook
 		// Only meaningful when the experimental unlock is on - otherwise
 		// numUpdates is clamped to >=1, alpha sits near 0, and we would render
 		// a frame behind rather than smoothly between frames.
-		if (Settings::FramerateUnlockExperimental && Settings::FramerateInterpolation)
+		if (renderUnlock &&
+			(Settings::FramerateInterpolation || xrCadencePacing))
 			Interp::AfterTicks(FramelimiterFrequency);
 	}
 

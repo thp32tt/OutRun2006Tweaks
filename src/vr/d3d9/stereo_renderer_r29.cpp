@@ -52,6 +52,7 @@ namespace OutRunVRStereo
         std::uint64_t R29ZeroDisparityTwoEyeDraws = 0;
         std::uint64_t R29SafetyFallbackDraws = 0;
         std::uint64_t R29EffectStateSyncs = 0;
+        std::uint64_t R29FragileWorldRetries = 0;
         std::uint64_t R29MonoSafetyThroughEpoch = 2;
         bool R29FirstStableLogged = false;
         bool R29FirstZeroDisparityLogged = false;
@@ -311,6 +312,19 @@ namespace OutRunVRStereo
             {
                 ++R29SafetyFallbackDraws;
                 return legacyR13Draw();
+            }
+
+            // R29 originally forced every depth-disabled two-sided alpha draw
+            // to zero disparity here. That is too broad for OutRun: smoke,
+            // skid/decal billboards and the white floating position glyphs can
+            // be alpha/depth-disabled while still carrying the verified world
+            // WVP. Let the proven R27 gate try the unmasked R7 classifier first.
+            // If the WVP is not actually verified, R7 still fails closed to
+            // NonWorld/stock constants, so screen HUD remains safe.
+            if (fragile && R27ShouldBypassLegacyZeroDisparity(device))
+            {
+                fragile = false;
+                ++R29FragileWorldRetries;
             }
 
             return R29DirectTwoEye(device,
