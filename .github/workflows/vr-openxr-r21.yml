@@ -132,7 +132,60 @@ jobs:
           if-no-files-found: error
 
 
-  game-x86-c2-current:
+  game-x86-r26-hud-current:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure current Win32 R26-safe HUD test build
+        shell: cmd
+        run: |
+          set CI=
+          cmake -S . -B build-r26hud-current -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON
+
+      - name: Apply dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-r26hud-current/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-r26hud-current/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-r26hud-current/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-r26hud-current/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-r26hud-current/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-r26hud-current/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-r26hud-current/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build-r26hud-current/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-r26hud-current/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build current Win32 R26-safe HUD DLL
+        run: cmake --build build-r26hud-current --config Release
+
+      - name: Verify current R26-safe HUD binary
+        shell: pwsh
+        run: |
+          $dllPath = 'build-r26hud-current/bin/dinput8.dll'
+          if (-not (Test-Path $dllPath)) { throw 'current R26-safe HUD dinput8.dll was not produced' }
+          $bytes = [IO.File]::ReadAllBytes($dllPath)
+          $ascii = [Text.Encoding]::ASCII.GetString($bytes)
+          foreach ($marker in @(
+            'VR R26+HUD SAFE TEST: R26/R23 world path + R30 HUD/XYZRHW/SkyGlow overlay ACTIVE',
+            'VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay receives convergence-only FOV correction',
+            'VR R30.6 XYZRHW WORLD',
+            'R30.6/DrawIndexedPrimitiveVB-ShadowXYZRHW',
+            'VR DIRECT-ONLY: shared-eye frame unavailable; SBS composition suppressed',
+            'VR AUTO HOST: launched',
+            'VR PC MIRROR: fitting borderless window to monitor',
+            'VR PRESENT: desktop D3D9 VSync bypass active'
+          )) {
+            if (-not $ascii.Contains($marker)) { throw "current R26-safe HUD marker missing: $marker" }
+          }
+          $pe = [BitConverter]::ToInt32($bytes,0x3C)
+          if ([BitConverter]::ToUInt16($bytes,$pe+4) -ne 0x014C) { throw 'expected x86 R26-safe HUD DLL' }
+          Get-FileHash $dllPath -Algorithm SHA256
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: outrun-vr-current-test-r26-hud-x86
+          path: build-r26hud-current/bin/dinput8.dll
+          if-no-files-found: error
+
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4

@@ -1443,7 +1443,7 @@ namespace OutRunVRStereo
                 // use arbitrary RHW for sorting/scaling, which was the reason
                 // the white position text was incorrectly promoted to 3D.
                 if (std::fabs(rhw - 1.0f) > 0.02f &&
-                    std::fabs(expectedNdcZ - actualNdcZ) <= 0.06f)
+                    std::fabs(expectedNdcZ - actualNdcZ) <= 0.10f)
                     ++projected;
             }
 
@@ -2611,7 +2611,13 @@ namespace OutRunVRStereo
                 float hudScaleY = 1.0f;
                 if (applyHudScale)
                     R30HudContainScale(stereo, hudScaleX, hudScaleY);
-                clipCorrection._11 = hudScaleX * eyeScale[eye];
+                // The regular HUD already looked correct in the headset; keep
+                // its proven contain-fit mapping unchanged. Perspective flat
+                // overlays (white score/rank/lens effects) need the missing
+                // per-eye FOV-width term to converge, but must not inherit
+                // HudScale.
+                clipCorrection._11 =
+                    applyHudScale ? hudScaleX : eyeScale[eye];
                 clipCorrection._22 = hudScaleY;
                 clipCorrection._33 = 1.0f;
                 clipCorrection._44 = 1.0f;

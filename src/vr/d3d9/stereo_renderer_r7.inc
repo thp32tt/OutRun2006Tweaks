@@ -46,6 +46,7 @@ namespace Settings
 	extern Setting<bool> VREnabled;
 	extern Setting<bool> VRAutoEnableWhenHostPresent;
 	extern Setting<bool> VRStereo;
+	extern Setting<bool> VRDirectGpuOnly;
 	extern Setting<float> VRWorldScale;
 	extern Setting<float> VRStereoDepth;
 	extern Setting<bool> VRTelemetry;
@@ -206,6 +207,7 @@ namespace OutRunVRStereo
 		bool FirstOcclusionTrackingUnavailableLogged = false;
 		bool FirstDirectTransportLogged = false;
 		bool FirstDirectFallbackLogged = false;
+		bool FirstDirectOnlyNoFrameLogged = false;
 		bool FirstD3D9ExUnavailableLogged = false;
 		bool FirstAdapterMismatchLogged = false;
 		bool FirstInteropVerifiedLogged = false;
@@ -1092,7 +1094,7 @@ namespace OutRunVRStereo
 						spdlog::info("VR stereo: non-blocking 4-slot direct GPU eye transport armed; source eye={}x{}",BackBufferDesc.Width,BackBufferDesc.Height);
 					}
 				}
-				else if(ComposeSbs(device))
+				else if(!Settings::VRDirectGpuOnly && ComposeSbs(device))
 				{
 					++StereoComposeSuccess;
 					composedStereo=true;
@@ -1102,6 +1104,15 @@ namespace OutRunVRStereo
 					{
 						FirstDirectFallbackLogged=true;
 						spdlog::warn("VR stereo: direct transport not ready; keeping SBS/Desktop Duplication fallback");
+					}
+				}
+				else if(Settings::VRDirectGpuOnly)
+				{
+					++DirectTransportFallbacks;
+					if(!FirstDirectOnlyNoFrameLogged)
+					{
+						FirstDirectOnlyNoFrameLogged=true;
+						spdlog::warn("VR DIRECT-ONLY: shared-eye frame unavailable; SBS composition suppressed, PC stays mono/left-eye and host reuses its last safe projection");
 					}
 				}
 				else

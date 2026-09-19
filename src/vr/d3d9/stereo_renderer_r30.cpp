@@ -1378,7 +1378,7 @@ namespace OutRunVRStereo
                 // use arbitrary RHW for sorting/scaling, which was the reason
                 // the white position text was incorrectly promoted to 3D.
                 if (std::fabs(rhw - 1.0f) > 0.02f &&
-                    std::fabs(expectedNdcZ - actualNdcZ) <= 0.06f)
+                    std::fabs(expectedNdcZ - actualNdcZ) <= 0.10f)
                     ++projected;
             }
 
@@ -2549,7 +2549,10 @@ namespace OutRunVRStereo
                 float hudScaleX = 1.0f;
                 float hudScaleY = 1.0f;
                 R30HudContainScale(stereo, hudScaleX, hudScaleY);
-                clipCorrection._11 = hudScaleX * eyeScale[eye];
+                // Preserve the previously verified HUD mapping in the normal
+                // C2 path. The R26-safe test owner handles flat perspective
+                // overlays separately.
+                clipCorrection._11 = hudScaleX;
                 clipCorrection._22 = hudScaleY;
                 clipCorrection._33 = 1.0f;
                 clipCorrection._44 = 1.0f;

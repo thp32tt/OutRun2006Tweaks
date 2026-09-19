@@ -1956,6 +1956,9 @@ int main(int argc, char** argv)
             cachedProjectionViews{};
         bool cachedProjectionValid = false;
         ULONGLONG cachedProjectionRenderedMs = 0;
+        XrCompositionLayerQuad cachedMenuQuad{
+            XR_TYPE_COMPOSITION_LAYER_QUAD };
+        bool cachedMenuQuadValid = false;
         bool pendingReferenceSpaceChange = false;
         XrTime pendingReferenceSpaceChangeTime = 0;
 
@@ -2010,6 +2013,7 @@ int main(int argc, char** argv)
                         running = false; cadence.SetRunning(false); viewHistory.Clear(); matchedStereoValid = false;
                         lastStereoMatchMs = 0; cachedProjectionValid = false;
                         cachedProjectionRenderedMs = 0;
+                        cachedMenuQuadValid = false;
                         compositor.ReferenceSpaceChanged();
                         OutRunVrR23VerifiedBundle::Invalidate();
                         OutRunVR::SharedRenderFrameState rf{};
@@ -2052,6 +2056,7 @@ int main(int argc, char** argv)
                 shared.ReferenceSpaceChanged(); compositor.ReferenceSpaceChanged(); viewHistory.Clear();
                 matchedStereoValid = false; cachedProjectionValid = false;
                 cachedProjectionRenderedMs = 0;
+                cachedMenuQuadValid = false;
                 OutRunVrR23VerifiedBundle::Invalidate();
                 OutRunVR::SharedRenderFrameState rf{};
                 lastProcessedStereoFrame = renderFrames.Read(rf) ? rf.frameId : shared.ReadStereoMeta().frame;
@@ -2123,6 +2128,11 @@ int main(int argc, char** argv)
                 {
                     cachedProjectionValid = false;
                     cachedProjectionRenderedMs = 0;
+                    cachedMenuQuadValid = false;
+                }
+                else
+                {
+                    cachedMenuQuadValid = false;
                 }
                 lastPresentation = presentation;
                 std::cout << "VR presentation: "
@@ -2595,22 +2605,35 @@ int main(int argc, char** argv)
                     const CaptureStatus capture = R23Capture(compositor);
                     QueryPerformanceCounter(&ce); timings.capture.Add(timings.Ms(cs, ce));
                     LARGE_INTEGER rs{}, re{}; QueryPerformanceCounter(&rs);
-                    // Menus are mono/full-frame, but stay on the projection
-                    // swapchain at zero virtual IPD to avoid both L/R split and
-                    // the slower VDXR quad-layer cadence.
+
+                    // A menu is a physical virtual screen anchored in LOCAL
+                    // space. VIEW-space projection made it follow the headset
+                    // and removed 6DoF. Refresh the quad texture only when
+                    // Desktop Duplication delivered a new frame, then reuse the
+                    // released swapchain image on intermediate XR ticks.
                     if (capture.available &&
-                        R23RenderHeadLockedMenuProjection(
-                            compositor, views, pv))
+                        (!cachedMenuQuadValid || capture.fresh))
                     {
-                        projection.space = viewSpace;
-                        projection.viewCount = 2;
-                        projection.views = pv.data();
+                        XrCompositionLayerQuad refreshed{
+                            XR_TYPE_COMPOSITION_LAYER_QUAD };
+                        if (R23RenderTheater(
+                                compositor, viewSpace, localSpace,
+                                fs.predictedDisplayTime, refreshed, false))
+                        {
+                            cachedMenuQuad = refreshed;
+                            cachedMenuQuadValid = true;
+                        }
+                    }
+                    if (cachedMenuQuadValid)
+                    {
+                        quad = cachedMenuQuad;
                         layers[0] =
                             reinterpret_cast<const XrCompositionLayerBaseHeader*>(
-                                &projection);
+                                &quad);
                         layerReady = true;
-                        intentionalMonoProjection = true;
-                        finalLayerKind = "menu-headlocked-mono-projection";
+                        finalLayerKind = capture.fresh
+                            ? "menu-local-6dof-quad-fresh"
+                            : "menu-local-6dof-quad-cached";
                     }
                     QueryPerformanceCounter(&re);
                     frameRenderMs += timings.Ms(rs, re);
