@@ -1399,7 +1399,8 @@ namespace OutRunVRStereo
             // happens to resemble a previous world projection. This prevents
             // white rank/lens overlays from being promoted into per-eye world
             // space. Spatial smoke/skid/decal draws keep Z testing enabled.
-            state.worldEffect = state.depthTestEnabled;
+            state.worldEffect =
+                state.depthTestEnabled && state.rhwDepthEvidence;
             if (!state.worldEffect)
                 return true;
 
