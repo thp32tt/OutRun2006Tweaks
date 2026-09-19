@@ -35,7 +35,7 @@ namespace Settings
 }
 
 #define MAX_TEXTURE_CACHE_SIZE_MB (1024 + 256)
-#define VR_MAX_TEXTURE_CACHE_SIZE_MB 256
+#define VR_MAX_TEXTURE_CACHE_SIZE_MB 64
 
 #define DDS_MAGIC 0x20534444  // "DDS "
 struct DDS_FILE

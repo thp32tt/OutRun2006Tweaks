@@ -618,8 +618,7 @@ namespace OutRunVRStereo
                 source, std::strlen(source),
                 "OutRunVR-StereoSkyGlow", nullptr, nullptr,
                 entry, "ps_2_0",
-                D3DCOMPILE_ENABLE_STRICTNESS |
-                    D3DCOMPILE_OPTIMIZATION_LEVEL3,
+                D3DCOMPILE_OPTIMIZATION_LEVEL3,
                 0, &bytecode, &errors);
             if (FAILED(compile) || !bytecode)
             {
@@ -685,7 +684,7 @@ namespace OutRunVRStereo
             }
 
             static constexpr char BrightPs[] = R"(
-                sampler2D Scene : register(s0);
+                sampler Scene : register(s0);
                 float4 Bright(float2 uv : TEXCOORD0) : COLOR0
                 {
                     float4 c = tex2D(Scene, uv);
@@ -700,7 +699,7 @@ namespace OutRunVRStereo
                     return float4(c.rgb * m, m);
                 })";
             static constexpr char BlurPs[] = R"(
-                sampler2D Source : register(s0);
+                sampler Source : register(s0);
                 float4 Texel : register(c0);
                 float4 Blur(float2 uv : TEXCOORD0) : COLOR0
                 {
@@ -713,7 +712,7 @@ namespace OutRunVRStereo
                     return c;
                 })";
             static constexpr char CompositePs[] = R"(
-                sampler2D Glow : register(s0);
+                sampler Glow : register(s0);
                 float4 Params : register(c0);
                 float4 Composite(float2 uv : TEXCOORD0) : COLOR0
                 {
@@ -1633,8 +1632,13 @@ namespace OutRunVRStereo
                 }
                 else
                 {
+                    // Screen-locked HUD must preserve its pixel aspect ratio.
+                    // Applying the horizontal OpenXR FOV scale only to X made
+                    // circular gauges vertically elongated on both SBS and HMD.
+                    // Keep one uniform user scale on X/Y and retain only the
+                    // per-eye asymmetric-FOV centre offset for convergence.
                     correctedX =
-                        state.eyeScale[eye] * (R30HudScaleValue() * ndcX) +
+                        R30HudScaleValue() * ndcX +
                         state.eyeOffset[eye];
                     correctedY = R30HudScaleValue() * ndcY;
                 }
@@ -1768,7 +1772,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstXyzrhwHudLogged = true;
                     spdlog::info(
-                        "VR R30.3 XYZRHW HUD: pre-transformed fixed-function UP draws receive asymmetric-FOV correction plus centered HUD scale");
+                        "VR R30.7 XYZRHW HUD: pre-transformed fixed-function UP draws use uniform XY HUD scale plus asymmetric-FOV centre offset; circular gauges preserve aspect ratio");
                 }
             }
 
@@ -2309,8 +2313,9 @@ namespace OutRunVRStereo
             for (int eye = 0; eye < 2; ++eye)
             {
                 D3DMATRIX clipCorrection{};
-                clipCorrection._11 =
-                    eyeScale[eye] * R30HudScaleValue();
+                // Keep HUD geometry isotropic. The eye-specific scale belongs
+                // to projection-space world mapping, not 2D sprite dimensions.
+                clipCorrection._11 = R30HudScaleValue();
                 clipCorrection._22 = R30HudScaleValue();
                 clipCorrection._33 = 1.0f;
                 clipCorrection._44 = 1.0f;
@@ -2474,9 +2479,8 @@ namespace OutRunVRStereo
             {
                 R30FirstScreenSpaceLogged = true;
                 spdlog::info(
-                    "VR R30 HUD: orthographic ScreenSpace2D asymmetric-FOV correction ACTIVE eyeScale[L/R]={:.4f}/{:.4f} offset[L/R]={:.4f}/{:.4f} hudScale={:.2f}; headset FOV auto-map + user scale active; world/effect passes unchanged",
-                    eyeScale[0], eyeScale[1], eyeOffset[0], eyeOffset[1],
-                    R30HudScaleValue());
+                    "VR R30.7 HUD: orthographic ScreenSpace2D uniform XY scale ACTIVE offset[L/R]={:.4f}/{:.4f} hudScale={:.2f}; asymmetric-FOV centre alignment retained without non-uniform sprite scaling",
+                    eyeOffset[0], eyeOffset[1], R30HudScaleValue());
             }
 
             if (FAILED(rightHr))
@@ -2691,7 +2695,7 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current={:.2f}; R30.6 XYZRHW bilateral world-transform + CPU VB/IB shadow path READY",
+                        "VR R30.7 HUD: ScreenSpace2D uniform-aspect correction READY with configurable common-center HUD scale current={:.2f}; R30.6 XYZRHW world path + CPU VB/IB shadow retained",
                         R30HudScaleValue());
                     return 0;
                 }
