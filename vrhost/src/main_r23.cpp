@@ -274,6 +274,7 @@ namespace
     };
     R23DirectHoldState R23DirectHold{};
     bool R23FirstDirectHoldLogged = false;
+    bool R36FirstDirectBootstrapLogged = false;
 
     void R23ReleaseDirectHoldResources() noexcept
     {
@@ -2089,7 +2090,53 @@ int main(int argc, char** argv)
                         OutRunVrR23VerifiedBundle::SourceKind::None;
                     std::int64_t pendingBundleCaptureQpc = 0;
                     OutRunVR::SharedRenderFrameState before{};
-                    const bool have = renderFrames.Read(before);
+                    bool have = renderFrames.Read(before);
+
+                    // R36 DirectGPU bootstrap: direct-only testing must not depend
+                    // on the latest ring entry also being a DirectGPU entry. Scan
+                    // the bounded history for the newest completed, unconsumed
+                    // direct frame so the initial 4-slot ring can be ACKed before
+                    // producer backpressure forces the game to wait.
+                    if (directTransportOnly)
+                    {
+                        std::array<OutRunVR::SharedRenderFrameState,
+                            OutRunVR::RenderFrameRingSize> history{};
+                        std::size_t historyCount = 0;
+                        OutRunVR::SharedRenderFrameState newestDirect{};
+                        bool foundDirect = false;
+                        if (renderFrames.ReadHistory(history, historyCount))
+                        {
+                            for (std::size_t i = 0; i < historyCount; ++i)
+                            {
+                                const auto& frame = history[i];
+                                if (!frame.frameId ||
+                                    frame.frameId == lastProcessedStereoFrame ||
+                                    frame.state != OutRunVR::StereoSbsActive ||
+                                    (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
+                                    (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0)
+                                    continue;
+                                if (!foundDirect || frame.frameId > newestDirect.frameId)
+                                {
+                                    newestDirect = frame;
+                                    foundDirect = true;
+                                }
+                            }
+                        }
+                        if (foundDirect)
+                        {
+                            before = newestDirect;
+                            have = true;
+                            if (!R36FirstDirectBootstrapLogged)
+                            {
+                                R36FirstDirectBootstrapLogged = true;
+                                std::cout
+                                    << "[R36] DirectGPU bootstrap recovered newest completed ring frame="
+                                    << before.frameId
+                                    << "; classic/Desktop Duplication is not allowed to hide initial ACK progress.\n";
+                            }
+                        }
+                    }
+
                     constexpr std::uint32_t need = OutRunVR::RenderFrameStereoComplete |
                         OutRunVR::RenderFrameWorldStereo | OutRunVR::RenderFrameDrawDuplicated |
                         OutRunVR::RenderFrameEffectivePoseValid;
