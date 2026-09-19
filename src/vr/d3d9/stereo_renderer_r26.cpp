@@ -282,6 +282,16 @@ namespace OutRunVRStereo
             if (!R13DrawTimeFragileEffectNeedsZeroDisparity(device))
                 return false;
 
+            // R36: verified WVP alone is not enough to promote screen overlays.
+            // White position/rank glyphs and lens-player flare passes are
+            // depth-disabled but can inherit the last perspective WVP. Keep
+            // those zero-disparity; depth-tested smoke/skid/decal passes remain
+            // eligible for spatial stereo.
+            DWORD zEnable = D3DZB_FALSE;
+            if (FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable)) ||
+                zEnable == D3DZB_FALSE)
+                return false;
+
             // StateBlock::Apply can bypass tracked setters. Resynchronize live
             // viewport/scissor at least once per Present and periodically during
             // effect-heavy passes, without restoring the old per-draw query cost.
