@@ -53,6 +53,7 @@ namespace OutRunVrR32DirectSubmit
     inline std::uint64_t AckFlushEscalations = 0;
     inline std::uint64_t AckQueryErrors = 0;
     inline std::uint32_t AckFaultGeneration = 0;
+    inline std::uint32_t ActiveAckGeneration = 0;
     inline ULONGLONG LastPerfLogMs = 0;
     inline bool FirstFastSubmitLogged = false;
     inline bool FirstAsyncAckLogged = false;
@@ -91,6 +92,16 @@ namespace OutRunVrR32DirectSubmit
         AckedFrame.fill(0);
         AckedGeneration.fill(0);
         AckFaultGeneration = 0;
+        ActiveAckGeneration = 0;
+    }
+
+    inline void ObserveGeneration(std::uint32_t generation) noexcept
+    {
+        if (!generation || ActiveAckGeneration == generation)
+            return;
+        ActiveAckGeneration = generation;
+        AckedFrame.fill(0);
+        AckedGeneration.fill(0);
     }
 
     inline bool EnsureFence(std::uint32_t slot) noexcept
@@ -134,6 +145,21 @@ namespace OutRunVrR32DirectSubmit
                 pending.frame = {};
                 pending.fence->Release();
                 pending.fence = nullptr;
+                continue;
+            }
+            const std::uint32_t completedGeneration =
+                pending.frame.reserved[
+                    OutRunVR::RenderFrameDirectGenerationIndex];
+            if (ActiveAckGeneration != 0 &&
+                completedGeneration != ActiveAckGeneration)
+            {
+                // Late completion from a superseded shared-eye generation is
+                // safe to forget, but must never roll the global ACK generation
+                // backwards and stall the producer's new ring.
+                pending.armed = false;
+                pending.flushIssued = false;
+                pending.frame = {};
+                ++AckCompleted;
                 continue;
             }
             if (!OutRunVrD3D9ExDirectPassthrough::PublishCompletedFrame(
@@ -322,6 +348,17 @@ namespace OutRunVrR32DirectSubmit
     inline XrResult XRAPI_CALL EndFrame(
         XrSession session, const XrFrameEndInfo* endInfo) noexcept
     {
+        // Learn the newest committed DirectGPU generation before polling older
+        // EVENT queries. This closes the reset/recreation ACK rollback window.
+        OutRunVrR23VerifiedBundle::Snapshot observed{};
+        if (OutRunVrR23VerifiedBundle::ReadFresh(observed) &&
+            observed.kind ==
+                OutRunVrR23VerifiedBundle::SourceKind::DirectGpu &&
+            MetadataValid(observed.frame))
+        {
+            ObserveGeneration(observed.frame.reserved[
+                OutRunVR::RenderFrameDirectGenerationIndex]);
+        }
         PollCompletedAcks();
 
         OutRunVrR23VerifiedBundle::Snapshot verified{};

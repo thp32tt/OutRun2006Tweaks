@@ -70,6 +70,10 @@ namespace OutRunVRD3D9ExUpgradeR13
         };
 
         thread_local std::uint32_t R14InternalReleaseDepth = 0;
+        constexpr std::uint64_t R14ShadowBudgetBytes =
+            384ull * 1024ull * 1024ull;
+        std::atomic<std::uint64_t> R14ShadowBytes{0};
+        std::atomic<std::uint64_t> R14ShadowBudgetRejects{0};
 
         struct R14ShadowEntry
         {
@@ -86,12 +90,16 @@ namespace OutRunVRD3D9ExUpgradeR13
             bool lockRectValid[R14MaxTrackedLevels]{};
             bool retirePending = false;
             bool externalWriteDuringLock = false;
+            std::uint64_t shadowBytes = 0;
 
             ~R14ShadowEntry()
             {
                 ++R14InternalReleaseDepth;
                 if (cpu) cpu->Release();
                 if (device) device->Release();
+                if (shadowBytes)
+                    R14ShadowBytes.fetch_sub(
+                        shadowBytes, std::memory_order_acq_rel);
                 --R14InternalReleaseDepth;
             }
         };
@@ -306,6 +314,81 @@ namespace OutRunVRD3D9ExUpgradeR13
             }
         }
 
+        std::uint64_t R14EstimateShadowBytes(
+            IDirect3DTexture9* gpu) noexcept
+        {
+            if (!gpu) return 0;
+            const UINT levels = gpu->GetLevelCount();
+            std::uint64_t total = 0;
+            for (UINT level = 0;
+                 level < levels && level < R14MaxTrackedLevels; ++level)
+            {
+                D3DSURFACE_DESC d{};
+                if (FAILED(gpu->GetLevelDesc(level, &d)) ||
+                    d.Width == 0 || d.Height == 0)
+                    return 0;
+
+                std::uint64_t bytes = 0;
+                if (d.Format == D3DFMT_DXT1)
+                {
+                    bytes = ((static_cast<std::uint64_t>(d.Width) + 3) / 4) *
+                        ((static_cast<std::uint64_t>(d.Height) + 3) / 4) * 8;
+                }
+                else if (d.Format == D3DFMT_DXT2 ||
+                         d.Format == D3DFMT_DXT3 ||
+                         d.Format == D3DFMT_DXT4 ||
+                         d.Format == D3DFMT_DXT5)
+                {
+                    bytes = ((static_cast<std::uint64_t>(d.Width) + 3) / 4) *
+                        ((static_cast<std::uint64_t>(d.Height) + 3) / 4) * 16;
+                }
+                else
+                {
+                    std::uint64_t bpp = 4;
+                    if (d.Format == D3DFMT_A16B16G16R16 ||
+                        d.Format == D3DFMT_A16B16G16R16F)
+                        bpp = 8;
+                    else if (d.Format == D3DFMT_A32B32G32R32F)
+                        bpp = 16;
+                    else if (d.Format == D3DFMT_R5G6B5 ||
+                             d.Format == D3DFMT_A1R5G5B5 ||
+                             d.Format == D3DFMT_A4R4G4B4 ||
+                             d.Format == D3DFMT_A8L8)
+                        bpp = 2;
+                    else if (d.Format == D3DFMT_A8 ||
+                             d.Format == D3DFMT_L8)
+                        bpp = 1;
+                    bytes = static_cast<std::uint64_t>(d.Width) *
+                        static_cast<std::uint64_t>(d.Height) * bpp;
+                }
+
+                if (bytes > R14ShadowBudgetBytes ||
+                    total > R14ShadowBudgetBytes - bytes)
+                    return R14ShadowBudgetBytes + 1;
+                total += bytes;
+            }
+            return total;
+        }
+
+        bool R14ReserveShadowBytes(
+            std::uint64_t bytes) noexcept
+        {
+            if (!bytes || bytes > R14ShadowBudgetBytes)
+                return false;
+            std::uint64_t current =
+                R14ShadowBytes.load(std::memory_order_acquire);
+            for (;;)
+            {
+                if (current > R14ShadowBudgetBytes - bytes)
+                    return false;
+                if (R14ShadowBytes.compare_exchange_weak(
+                        current, current + bytes,
+                        std::memory_order_acq_rel,
+                        std::memory_order_acquire))
+                    return true;
+            }
+        }
+
         bool R14Track(IDirect3DDevice9* device, IDirect3DTexture9* gpu,
             IDirect3DTexture9* cpu) noexcept
         {
@@ -315,6 +398,13 @@ namespace OutRunVRD3D9ExUpgradeR13
                 auto entry = std::make_shared<R14ShadowEntry>();
                 entry->gpu = gpu;
                 entry->device = device;
+                entry->shadowBytes = R14EstimateShadowBytes(gpu);
+                if (!R14ReserveShadowBytes(entry->shadowBytes))
+                {
+                    entry->shadowBytes = 0;
+                    ++R14ShadowBudgetRejects;
+                    return false;
+                }
                 const UINT levels = gpu->GetLevelCount();
                 entry->validMask = levels >= R14MaxTrackedLevels
                     ? 0xFFFFFFFFu : ((1u << levels) - 1u);
@@ -388,6 +478,16 @@ namespace OutRunVRD3D9ExUpgradeR13
             const UINT levels = gpu->GetLevelCount();
             if (levels == 0 || levels > R14MaxTrackedLevels)
                 return D3DERR_NOTAVAILABLE;
+
+            const std::uint64_t estimate = R14EstimateShadowBytes(gpu);
+            const std::uint64_t current =
+                R14ShadowBytes.load(std::memory_order_acquire);
+            if (!estimate || estimate > R14ShadowBudgetBytes ||
+                current > R14ShadowBudgetBytes - estimate)
+            {
+                ++R14ShadowBudgetRejects;
+                return D3DERR_OUTOFVIDEOMEMORY;
+            }
 
             const HRESULT hr = device->CreateTexture(
                 desc.Width, desc.Height, levels, 0, desc.Format,

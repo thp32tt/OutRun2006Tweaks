@@ -500,8 +500,7 @@ class ReplaceGameUpdateLoop : public Hook
 		// Only meaningful when the experimental unlock is on - otherwise
 		// numUpdates is clamped to >=1, alpha sits near 0, and we would render
 		// a frame behind rather than smoothly between frames.
-		if (renderUnlock &&
-			(Settings::FramerateInterpolation || xrCadencePacing))
+		if (renderUnlock && Settings::FramerateInterpolation)
 			Interp::AfterTicks(FramelimiterFrequency);
 	}
 
