@@ -309,10 +309,29 @@ namespace OutRunVRStereo
             return true;
         }
 
+        bool R37DepthDisabledFragileOverlay(
+            IDirect3DDevice9* device) noexcept
+        {
+            if (!device ||
+                !R13DrawTimeFragileEffectNeedsZeroDisparity(device))
+                return false;
+            DWORD zEnable = D3DZB_TRUE;
+            return SUCCEEDED(device->GetRenderState(
+                       D3DRS_ZENABLE, &zEnable)) &&
+                zEnable == D3DZB_FALSE;
+        }
+
         template <typename R9Draw, typename LegacyR13Draw>
         HRESULT R27GuardWorldEffect(IDirect3DDevice9* device,
             R9Draw&& r9Draw, LegacyR13Draw&& legacyR13Draw)
         {
+            // R37 screen-space veto must run before R28's verified-WVP rebind.
+            // Rank/lens overlays can inherit a valid perspective WVP from the
+            // preceding world pass; allowing the rebind first turns them into
+            // duplicated spatial geometry.
+            if (R37DepthDisabledFragileOverlay(device))
+                return legacyR13Draw();
+
             // First recover ordinary perspective world draws that only lost the
             // upload-time shader epoch. This is deliberately stricter than the
             // old NonWorld fallback: the WVP, projection and pose must all match.
