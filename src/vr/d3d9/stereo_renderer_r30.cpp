@@ -645,7 +645,7 @@ namespace OutRunVRStereo
             if (!device || !BackBufferDesc.Width || !BackBufferDesc.Height)
                 return false;
             const int factor =
-                std::clamp(Settings::SkyGlowFactor.get(), 1, 16);
+                std::clamp(Settings::SkyGlowFactor.get(), 2, 16);
             const UINT glowWidth = std::max<UINT>(
                 160u, BackBufferDesc.Width /
                     static_cast<UINT>(factor));
@@ -1164,6 +1164,32 @@ namespace OutRunVRStereo
             return std::clamp(compensation, 0.75f, 3.50f);
         }
 
+        void R30HudContainScale(
+            const OutRunVRRenderer::LatchedStereoFrame& stereo,
+            float& scaleX, float& scaleY) noexcept
+        {
+            const float userScale = R30HudScaleValue();
+            const float sourceOverTarget =
+                R30HudAspectCompensation(stereo);
+
+            // "Contain" the original desktop HUD canvas inside one eye before
+            // applying the user scale. The old "cover" mapping multiplied X by
+            // source/target aspect; on 3440x1440 -> Quest eye targets that could
+            // make HudScale=0.55 wider than the visible eye and push rank/time
+            // elements off-screen. Contain preserves sprite pixel aspect while
+            // guaranteeing the whole common-centre HUD stays inside the eye.
+            if (sourceOverTarget >= 1.0f)
+            {
+                scaleX = userScale;
+                scaleY = userScale / sourceOverTarget;
+            }
+            else
+            {
+                scaleX = userScale * sourceOverTarget;
+                scaleY = userScale;
+            }
+        }
+
         bool R30CurrentPassIsScreenSpace2D() noexcept
         {
             if (!TargetIsBackBuffer())
@@ -1369,8 +1395,11 @@ namespace OutRunVRStereo
             // XYZRHW draw is promoted only when its Z/RHW pair is mathematically
             // consistent with the current perspective projection. This keeps
             // screen-space white rank glyphs together with their black layer.
-            state.worldEffect =
-                state.depthTestEnabled || state.rhwDepthEvidence;
+            // R36: a depth-disabled XYZRHW draw is screen-space even when RHW
+            // happens to resemble a previous world projection. This prevents
+            // white rank/lens overlays from being promoted into per-eye world
+            // space. Spatial smoke/skid/decal draws keep Z testing enabled.
+            state.worldEffect = state.depthTestEnabled;
             if (!state.worldEffect)
                 return true;
 
@@ -1413,10 +1442,23 @@ namespace OutRunVRStereo
                 // eyeProjection. The reconstructed CPU-projected point is
                 // already in game view space, so only eyeInverse is applied
                 // here; common head/camera motion must not be applied twice.
+                // CPU-projected XYZRHW effects were generated from OutRun's
+                // already head-synchronised camera. Reapplying the absolute HMD
+                // eye orientation here rotates them twice and shifts smoke/skid
+                // away from the road. Apply only the eye pose relative to the
+                // common head centre; the asymmetric eye projection still owns
+                // the final FOV.
+                const float relativeEye[3]{
+                    state.stereo.eyeOffset[eye][0] - center[0],
+                    state.stereo.eyeOffset[eye][1] - center[1],
+                    state.stereo.eyeOffset[eye][2] - center[2]
+                };
+                const float identityOrientation[4]{
+                    0.0f, 0.0f, 0.0f, 1.0f
+                };
                 const D3DMATRIX eyePose =
                     MatrixFromQuaternionTranslation(
-                        state.stereo.eyeOrientation[eye],
-                        state.stereo.eyeOffset[eye],
+                        identityOrientation, relativeEye,
                         Settings::VRWorldScale);
                 state.eyeInverse[eye] = InverseRigid(eyePose);
                 state.eyeProjection[eye] =
@@ -1432,19 +1474,10 @@ namespace OutRunVRStereo
                     state.stereo.eyeOffset[eye][1] - center[1],
                     state.stereo.eyeOffset[eye][2] - center[2]
                 };
-                const D3DMATRIX eyeRotation =
-                    MatrixFromQuaternionTranslation(
-                        state.stereo.eyeOrientation[eye], zero, 1.0f);
-                const D3DMATRIX inverseEyeRotation =
-                    InverseRigid(eyeRotation);
-                const float localX =
-                    rel[0] * inverseEyeRotation._11 +
-                    rel[1] * inverseEyeRotation._21 +
-                    rel[2] * inverseEyeRotation._31;
-                const float localY =
-                    rel[0] * inverseEyeRotation._12 +
-                    rel[1] * inverseEyeRotation._22 +
-                    rel[2] * inverseEyeRotation._32;
+                // The source camera already owns common head rotation, so the
+                // conservative affine fallback also uses head-relative IPD only.
+                const float localX = rel[0];
+                const float localY = rel[1];
 
                 const D3DMATRIX& eyeProjection = state.eyeProjection[eye];
                 state.worldScaleX[eye] =
@@ -1817,11 +1850,13 @@ namespace OutRunVRStereo
                     // circular gauges vertically elongated on both SBS and HMD.
                     // Keep one uniform user scale on X/Y and retain only the
                     // per-eye asymmetric-FOV centre offset for convergence.
+                    float hudScaleX = 1.0f;
+                    float hudScaleY = 1.0f;
+                    R30HudContainScale(
+                        state.stereo, hudScaleX, hudScaleY);
                     correctedX =
-                        R30HudAspectCompensation(state.stereo) *
-                        R30HudScaleValue() * ndcX +
-                        state.eyeOffset[eye];
-                    correctedY = R30HudScaleValue() * ndcY;
+                        hudScaleX * ndcX + state.eyeOffset[eye];
+                    correctedY = hudScaleY * ndcY;
                 }
 
                 const float transformedX =
@@ -2496,10 +2531,11 @@ namespace OutRunVRStereo
                 D3DMATRIX clipCorrection{};
                 // Keep HUD geometry isotropic. The eye-specific scale belongs
                 // to projection-space world mapping, not 2D sprite dimensions.
-                clipCorrection._11 =
-                    R30HudAspectCompensation(stereo) *
-                    R30HudScaleValue();
-                clipCorrection._22 = R30HudScaleValue();
+                float hudScaleX = 1.0f;
+                float hudScaleY = 1.0f;
+                R30HudContainScale(stereo, hudScaleX, hudScaleY);
+                clipCorrection._11 = hudScaleX;
+                clipCorrection._22 = hudScaleY;
                 clipCorrection._33 = 1.0f;
                 clipCorrection._44 = 1.0f;
                 // Row-vector clip transform. Scale both axes around clip-space
@@ -2662,7 +2698,7 @@ namespace OutRunVRStereo
             {
                 R30FirstScreenSpaceLogged = true;
                 spdlog::info(
-                    "VR R30 HUD: orthographic ScreenSpace2D asymmetric-FOV correction ACTIVE; R30.9 exact OpenXR pixel-aspect correction offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} aspectX={:.3f}; HMD final sprite aspect is corrected after source-to-eye projection",
+                    "VR R36 HUD: common-centre contain-fit + asymmetric-FOV correction ACTIVE offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} sourceOverTarget={:.3f}; full desktop HUD remains inside each eye",
                     eyeOffset[0], eyeOffset[1], R30HudScaleValue(),
                     R30HudAspectCompensation(stereo));
             }
@@ -2879,7 +2915,7 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current={:.2f}; R30.9 exact OpenXR pixel-aspect HUD + RHW-first XYZRHW world reprojection active",
+                        "VR R36 HUD/EFFECT: contain-fit HUD + depth-disabled overlay zero-disparity + head-relative XYZRHW world reprojection READY hudScale={:.2f}",
                         R30HudScaleValue());
                     return 0;
                 }
