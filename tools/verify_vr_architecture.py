@@ -355,7 +355,8 @@ require(
     "R37BootstrapSubmittedFrame",
     "R37BootstrapSubmittedGeneration",
     "R37FrameIdBefore",
-    "oldest unseen slot frame first",
+    "DirectGPU latest-frame-wins active",
+    "PublishCompletedFrame(frame)",
     "allowInitialWarmupWait",
     "theater-only fallback",
     "OutRunVrR23VerifiedBundle::Publish",
@@ -394,20 +395,16 @@ require(
     "state.rhwDepthEvidence",
 )
 
-# Four occupied producer slots must be visited once each. This models the
-# bootstrap invariant that prevents newest-frame oscillation (4->3->4->3).
+# R41 DirectGPU latency invariant: the newest complete slot is the only frame
+# selected for sampling. Older occupied slots are never rendered later; they are
+# ACKed immediately because no D3D11 work references them.
 _history = [(1, 0), (2, 1), (3, 2), (4, 3)]
-_seen = {}
-_order = []
-while True:
-    _unseen = [(fid, slot) for fid, slot in _history if _seen.get(slot) != fid]
-    if not _unseen:
-        break
-    _fid, _slot = min(_unseen, key=lambda item: item[0])
-    _seen[_slot] = _fid
-    _order.append(_fid)
-if _order != [1, 2, 3, 4]:
-    raise SystemExit(f"R37 direct bootstrap model regressed: {_order}")
+_selected = max(_history, key=lambda item: item[0])
+_skipped = [item for item in _history if item != _selected]
+if _selected != (4, 3) or [fid for fid, _ in _skipped] != [1, 2, 3]:
+    raise SystemExit(
+        f"R41 direct latest-frame model regressed: selected={_selected} skipped={_skipped}"
+    )
 
 # New regressions are required in the host build graph.
 require(
