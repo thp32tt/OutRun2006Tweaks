@@ -22,7 +22,9 @@
 namespace Settings
 {
     extern Setting<float> VRHudScale;
+    extern Setting<float> VRStereoDepth;
     extern Setting<int> SkyGlowFactor;
+    extern Setting<bool> SkyGlowTwoStep;
 }
 
 namespace OutRunVRStereo
@@ -645,7 +647,7 @@ namespace OutRunVRStereo
             if (!device || !BackBufferDesc.Width || !BackBufferDesc.Height)
                 return false;
             const int factor =
-                std::clamp(Settings::SkyGlowFactor.get(), 2, 16);
+                std::clamp(Settings::SkyGlowFactor.get(), 1, 16);
             const UINT glowWidth = std::max<UINT>(
                 160u, BackBufferDesc.Width /
                     static_cast<UINT>(factor));
@@ -950,19 +952,29 @@ namespace OutRunVRStereo
                         R30SkyGlow.temp[eye],
                         R30SkyGlow.blur, horizontal, false);
 
-                const float vertical[4]{
-                    0.0f,
-                    1.0f /
-                        static_cast<float>(R30SkyGlow.glowHeight),
-                    0.0f, 0.0f
-                };
-                if (ok)
-                    ok = R30DrawSkyGlowPass(
-                        device, temp,
-                        R30SkyGlow.glowWidth,
-                        R30SkyGlow.glowHeight,
-                        R30SkyGlow.reduced[eye],
-                        R30SkyGlow.blur, vertical, false);
+                if (Settings::SkyGlowTwoStep)
+                {
+                    const float vertical[4]{
+                        0.0f,
+                        1.0f /
+                            static_cast<float>(R30SkyGlow.glowHeight),
+                        0.0f, 0.0f
+                    };
+                    if (ok)
+                        ok = R30DrawSkyGlowPass(
+                            device, temp,
+                            R30SkyGlow.glowWidth,
+                            R30SkyGlow.glowHeight,
+                            R30SkyGlow.reduced[eye],
+                            R30SkyGlow.blur, vertical, false);
+                }
+                else if (ok)
+                {
+                    // Keep the composite source identical while allowing the
+                    // single-step diagnostic to skip the second blur pass.
+                    ok = SUCCEEDED(device->StretchRect(
+                        reduced, nullptr, temp, nullptr, D3DTEXF_LINEAR));
+                }
 
                 const float composite[4]{ 0.38f, 0, 0, 0 };
                 if (ok)
@@ -1005,8 +1017,8 @@ namespace OutRunVRStereo
                 {
                     R30FirstSkyGlowLogged = true;
                     spdlog::info(
-                        "VR SKY GLOW: independent L/R extract + 2-pass blur + additive composite ACTIVE factor={} buffer={}x{}",
-                        R30SkyGlow.factor,
+                        "VR SKY GLOW: independent L/R extract + stereo blur + additive composite ACTIVE factor={} twoStep={} buffer={}x{}",
+                        R30SkyGlow.factor, Settings::SkyGlowTwoStep.get() ? 1 : 0,
                         R30SkyGlow.glowWidth,
                         R30SkyGlow.glowHeight);
                 }
@@ -1370,7 +1382,7 @@ namespace OutRunVRStereo
                     ++projected;
             }
 
-            return valid != 0 && projected * 4u >= valid * 3u;
+            return sampled >= 3u && valid >= 3u && valid * 2u >= sampled && projected * 4u >= valid * 3u;
         }
 
         bool R30ConfigureXyzrhwWorldEffect(
@@ -1462,7 +1474,7 @@ namespace OutRunVRStereo
                 const D3DMATRIX eyePose =
                     MatrixFromQuaternionTranslation(
                         identityOrientation, relativeEye,
-                        Settings::VRWorldScale);
+                        Settings::VRWorldScale * Settings::VRStereoDepth);
                 state.eyeInverse[eye] = InverseRigid(eyePose);
                 state.eyeProjection[eye] =
                     ProjectionFromFov(baseProjection,
@@ -1496,10 +1508,10 @@ namespace OutRunVRStereo
                      baseProjection._32 * state.worldScaleY[eye]) /
                     baseProjection._34;
                 state.parallaxPerRhwX[eye] =
-                    -localX * Settings::VRWorldScale *
+                    -localX * Settings::VRWorldScale * Settings::VRStereoDepth *
                     eyeProjection._11;
                 state.parallaxPerRhwY[eye] =
-                    -localY * Settings::VRWorldScale *
+                    -localY * Settings::VRWorldScale * Settings::VRStereoDepth *
                     eyeProjection._22;
 
                 if (!std::isfinite(state.worldScaleX[eye]) ||
@@ -1858,7 +1870,7 @@ namespace OutRunVRStereo
                     R30HudContainScale(
                         state.stereo, hudScaleX, hudScaleY);
                     correctedX =
-                        hudScaleX * ndcX + state.eyeOffset[eye];
+                        hudScaleX * state.eyeScale[eye] * ndcX + state.eyeOffset[eye];
                     correctedY = hudScaleY * ndcY;
                 }
 
@@ -2537,7 +2549,7 @@ namespace OutRunVRStereo
                 float hudScaleX = 1.0f;
                 float hudScaleY = 1.0f;
                 R30HudContainScale(stereo, hudScaleX, hudScaleY);
-                clipCorrection._11 = hudScaleX;
+                clipCorrection._11 = hudScaleX * eyeScale[eye];
                 clipCorrection._22 = hudScaleY;
                 clipCorrection._33 = 1.0f;
                 clipCorrection._44 = 1.0f;

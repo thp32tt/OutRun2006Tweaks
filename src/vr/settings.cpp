@@ -39,11 +39,11 @@ namespace Settings
 	Setting<bool> VRHeadTracking{ "VR", "HeadTracking", true,
 		"Applies the OpenXR HMD orientation at OutRun's verified D3D9 WorldViewProjection upload." };
 	Setting<bool> VRStereo{ "VR", "Stereo", true,
-		"Renders true left/right geometry stereo into an SBS game frame or verified shared-eye transport. Menus remain on the fixed theater quad." };
+		"Renders true left/right geometry stereo into verified shared-eye transport. Menus use a zero-IPD head-locked OpenXR projection." };
 	Setting<bool> VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", true,
 		"Prefers guarded D3D9Ex shared-eye transport so gameplay can bypass Desktop Duplication. Disable to return to classic D3D9/SBS capture." };
 	Setting<bool> VRDirectGpuOnly{ "VR", "DirectGpuOnly", true,
-		"During gameplay, rejects classic Desktop-Duplication stereo candidates and keeps DirectGPU/cached OpenXR projection paths only. Menus continue to use mono theater capture." };
+		"During gameplay, rejects classic Desktop-Duplication stereo candidates and keeps DirectGPU/cached OpenXR projection paths only. Menus remain mono through the head-locked projection path." };
 	Setting<bool> VRDisableDesktopDuplication{ "VR", "DisableDesktopDuplication", false,
 		"Diagnostic isolation switch. Disables Desktop Duplication for gameplay and menus. Leave false for normal DirectGPU-only gameplay with visible menus." };
 	Setting<float> VRTargetRefreshRateHz{ "VR", "TargetRefreshRateHz", 0.0f,

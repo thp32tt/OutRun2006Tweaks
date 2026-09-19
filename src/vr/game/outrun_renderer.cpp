@@ -764,7 +764,7 @@ namespace OutRunVRRenderer
 		{
 			if (Settings::UseNewInput)
 				return InputManager_ModActionHeld(ModAction::VRRecenter);
-			return (GetAsyncKeyState(VK_F10) & 0x8000) != 0;
+			return (GetAsyncKeyState(VK_F12) & 0x8000) != 0;
 		}
 
 		bool RendererRecenterPressed()
