@@ -50,6 +50,7 @@ namespace OutRunVRStereo
         bool R30FirstXyzrhwWorldLogged = false;
         bool R30FirstXyzrhwRhwPromotionLogged = false;
         std::uint64_t R30XyzrhwAtomicFallbacks = 0;
+        std::uint64_t R30XyzrhwDepthPreserveFallbacks = 0;
         bool R30FirstXyzrhwAtomicFallbackLogged = false;
         std::uint64_t R30XyzrhwBilateralFallbacks = 0;
         bool R30FirstXyzrhwBilateralFallbackLogged = false;
@@ -1033,10 +1034,14 @@ namespace OutRunVRStereo
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(
-                "VR R30.6: bufferShadow[writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[atomicFallback={},bilateralFallback={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R30.9: bufferShadow[writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},rhwPromote={},atomicFallback={},depthPreserve={},bilateralFallback={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
-                R30XyzrhwAtomicFallbacks, R30XyzrhwBilateralFallbacks,
+                R30XyzrhwWorldEffectDraws, R30XyzrhwHudDraws,
+                R30XyzrhwRhwWorldPromotions,
+                R30XyzrhwAtomicFallbacks,
+                R30XyzrhwDepthPreserveFallbacks,
+                R30XyzrhwBilateralFallbacks,
                 R30SkyGlowFrames, R30SkyGlowFailures,
                 R30SkyGlow.factor, R30SkyGlow.glowWidth,
                 R30SkyGlow.glowHeight);
@@ -1084,50 +1089,79 @@ namespace OutRunVRStereo
             if (!BackBufferDesc.Width || !BackBufferDesc.Height)
                 return 1.0f;
 
-            float fovAspectSum = 0.0f;
-            int validEyes = 0;
-            for (int eye = 0; eye < 2; ++eye)
-            {
-                const float left =
-                    std::tan(stereo.eyeFov[eye].angleLeft);
-                const float right =
-                    std::tan(stereo.eyeFov[eye].angleRight);
-                const float up =
-                    std::tan(stereo.eyeFov[eye].angleUp);
-                const float down =
-                    std::tan(stereo.eyeFov[eye].angleDown);
-                const float horizontal = right - left;
-                const float vertical = up - down;
-                if (!std::isfinite(horizontal) ||
-                    !std::isfinite(vertical) ||
-                    horizontal <= 0.05f || vertical <= 0.05f)
-                    continue;
-                const float aspect = horizontal / vertical;
-                if (!std::isfinite(aspect) ||
-                    aspect < 0.25f || aspect > 4.0f)
-                    continue;
-                fovAspectSum += aspect;
-                ++validEyes;
-            }
-
-            if (!validEyes)
-                return 1.0f;
-
-            const float eyeFovAspect =
-                fovAspectSum / static_cast<float>(validEyes);
             const float sourceAspect =
                 static_cast<float>(BackBufferDesc.Width) /
                 static_cast<float>(BackBufferDesc.Height);
 
-            // The game renders each eye into the ultrawide backbuffer aspect,
-            // while OpenXR displays it in the headset eye-FOV aspect. World
-            // projection naturally compensates for that, but pixel HUD sprites
-            // do not. Pre-stretch X by sourceAspect / eyeFovAspect so a circle
-            // remains a circle after either SBS packing or DirectGPU projection.
-            const float compensation = sourceAspect / eyeFovAspect;
+            // R35.4: SharedPoseState already carries the runtime's actual
+            // recommended per-eye render-target size. That pixel aspect is the
+            // quantity that finally stretches a screen-space HUD sprite in the
+            // OpenXR projection swapchain. Using angular FOV aspect was close,
+            // but on Quest/VDXR it leaves circular HUD elements slightly tall.
+            float targetAspectSum = 0.0f;
+            int targetEyes = 0;
+            if (SharedState &&
+                SharedState->magic == OutRunVR::SharedMagic &&
+                SharedState->protocolVersion ==
+                    OutRunVR::SharedProtocolVersion)
+            {
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    const std::uint32_t w =
+                        SharedState->recommendedWidth[eye];
+                    const std::uint32_t h =
+                        SharedState->recommendedHeight[eye];
+                    if (!w || !h)
+                        continue;
+                    const float aspect =
+                        static_cast<float>(w) /
+                        static_cast<float>(h);
+                    if (!std::isfinite(aspect) ||
+                        aspect < 0.25f || aspect > 4.0f)
+                        continue;
+                    targetAspectSum += aspect;
+                    ++targetEyes;
+                }
+            }
+
+            // Fall back to the old angular estimate only if the host has not
+            // published swapchain dimensions yet (startup/recovery).
+            if (!targetEyes)
+            {
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    const float left =
+                        std::tan(stereo.eyeFov[eye].angleLeft);
+                    const float right =
+                        std::tan(stereo.eyeFov[eye].angleRight);
+                    const float up =
+                        std::tan(stereo.eyeFov[eye].angleUp);
+                    const float down =
+                        std::tan(stereo.eyeFov[eye].angleDown);
+                    const float horizontal = right - left;
+                    const float vertical = up - down;
+                    if (!std::isfinite(horizontal) ||
+                        !std::isfinite(vertical) ||
+                        horizontal <= 0.05f || vertical <= 0.05f)
+                        continue;
+                    const float aspect = horizontal / vertical;
+                    if (!std::isfinite(aspect) ||
+                        aspect < 0.25f || aspect > 4.0f)
+                        continue;
+                    targetAspectSum += aspect;
+                    ++targetEyes;
+                }
+            }
+
+            if (!targetEyes)
+                return 1.0f;
+
+            const float targetAspect =
+                targetAspectSum / static_cast<float>(targetEyes);
+            const float compensation = sourceAspect / targetAspect;
             if (!std::isfinite(compensation))
                 return 1.0f;
-            return std::clamp(compensation, 0.75f, 3.25f);
+            return std::clamp(compensation, 0.75f, 3.50f);
         }
 
         bool R30CurrentPassIsScreenSpace2D() noexcept
@@ -1199,6 +1233,7 @@ namespace OutRunVRStereo
             float worldOffsetY[2]{};
             float parallaxPerRhwX[2]{};
             float parallaxPerRhwY[2]{};
+            D3DMATRIX baseProjection{};
             D3DMATRIX inverseBaseProjection{};
             D3DMATRIX eyeProjection[2]{};
             D3DMATRIX eyeInverse[2]{};
@@ -1323,6 +1358,7 @@ namespace OutRunVRStereo
                 return false;
             D3DMATRIX baseProjection{};
             std::memcpy(&baseProjection, projectionRaw, sizeof(baseProjection));
+            state.baseProjection = baseProjection;
             if (!MatrixFinite(baseProjection) ||
                 std::fabs(baseProjection._11) < 0.01f ||
                 std::fabs(baseProjection._22) < 0.01f ||
@@ -1528,45 +1564,97 @@ namespace OutRunVRStereo
                     const float ndcX = ((x - x0) / width) * 2.0f - 1.0f;
                     const float ndcY =
                         1.0f - ((y - y0) / height) * 2.0f;
-                    const float ndcZ = (screenZ - minZ) / depthSpan;
-                    if (!std::isfinite(ndcZ) ||
-                        ndcZ < -0.10f || ndcZ > 1.10f)
-                    {
-                        fullDrawOk = false;
-                        break;
-                    }
-
                     const float clipW = 1.0f / rhw;
-                    const float clip[4]{
-                        ndcX * clipW,
-                        ndcY * clipW,
-                        ndcZ * clipW,
-                        clipW
-                    };
+                    const float clipX = ndcX * clipW;
+                    const float clipY = ndcY * clipW;
 
-                    float restoredViewH[4]{};
-                    for (int col = 0; col < 4; ++col)
-                        for (int row = 0; row < 4; ++row)
-                            restoredViewH[col] += clip[row] *
-                                state.inverseBaseProjection.m[row][col];
+                    float restoredView[4]{};
+                    bool restored = false;
 
-                    if (!std::isfinite(restoredViewH[0]) ||
-                        !std::isfinite(restoredViewH[1]) ||
-                        !std::isfinite(restoredViewH[2]) ||
-                        !std::isfinite(restoredViewH[3]) ||
-                        std::fabs(restoredViewH[3]) <= 1.0e-6f)
+                    // Pre-transformed D3D9 particles carry RHW = 1/clipW.
+                    // For the normal OutRun perspective matrix, clipW gives
+                    // view-Z directly and X/Y can then be solved from clip X/Y.
+                    // This avoids depending on the particle's biased/clamped
+                    // screen Z, which is exactly what caused smoke/decal draws
+                    // to fall back to the approximate affine path.
+                    const D3DMATRIX& bp = state.baseProjection;
+                    if (std::fabs(bp._14) <= 1.0e-5f &&
+                        std::fabs(bp._24) <= 1.0e-5f &&
+                        std::fabs(bp._34) > 1.0e-5f)
                     {
-                        fullDrawOk = false;
-                        break;
+                        const float viewZ =
+                            (clipW - bp._44) / bp._34;
+                        const float rhsX =
+                            clipX - viewZ * bp._31 - bp._41;
+                        const float rhsY =
+                            clipY - viewZ * bp._32 - bp._42;
+                        const float det =
+                            bp._11 * bp._22 - bp._21 * bp._12;
+                        if (std::isfinite(viewZ) &&
+                            std::isfinite(rhsX) &&
+                            std::isfinite(rhsY) &&
+                            std::isfinite(det) &&
+                            std::fabs(det) > 1.0e-6f)
+                        {
+                            const float viewX =
+                                (rhsX * bp._22 -
+                                 bp._21 * rhsY) / det;
+                            const float viewY =
+                                (bp._11 * rhsY -
+                                 rhsX * bp._12) / det;
+                            if (std::isfinite(viewX) &&
+                                std::isfinite(viewY))
+                            {
+                                restoredView[0] = viewX;
+                                restoredView[1] = viewY;
+                                restoredView[2] = viewZ;
+                                restoredView[3] = 1.0f;
+                                restored = true;
+                            }
+                        }
                     }
 
-                    const float invRestoredW = 1.0f / restoredViewH[3];
-                    const float restoredView[4]{
-                        restoredViewH[0] * invRestoredW,
-                        restoredViewH[1] * invRestoredW,
-                        restoredViewH[2] * invRestoredW,
-                        1.0f
-                    };
+                    // Compatibility fallback for an unusual projection shape:
+                    // retain the previous inverse-projection reconstruction.
+                    if (!restored)
+                    {
+                        const float ndcZ =
+                            (screenZ - minZ) / depthSpan;
+                        if (!std::isfinite(ndcZ) ||
+                            ndcZ < -0.25f || ndcZ > 1.25f)
+                        {
+                            fullDrawOk = false;
+                            break;
+                        }
+                        const float clip[4]{
+                            clipX, clipY, ndcZ * clipW, clipW
+                        };
+                        float restoredViewH[4]{};
+                        for (int col = 0; col < 4; ++col)
+                            for (int row = 0; row < 4; ++row)
+                                restoredViewH[col] += clip[row] *
+                                    state.inverseBaseProjection.m[row][col];
+
+                        if (!std::isfinite(restoredViewH[0]) ||
+                            !std::isfinite(restoredViewH[1]) ||
+                            !std::isfinite(restoredViewH[2]) ||
+                            !std::isfinite(restoredViewH[3]) ||
+                            std::fabs(restoredViewH[3]) <= 1.0e-6f)
+                        {
+                            fullDrawOk = false;
+                            break;
+                        }
+
+                        const float invRestoredW =
+                            1.0f / restoredViewH[3];
+                        restoredView[0] =
+                            restoredViewH[0] * invRestoredW;
+                        restoredView[1] =
+                            restoredViewH[1] * invRestoredW;
+                        restoredView[2] =
+                            restoredViewH[2] * invRestoredW;
+                        restoredView[3] = 1.0f;
+                    }
 
                     // Match the normal world path exactly: the reconstructed
                     // game-view point receives the same rigid eyeInverse that
@@ -1602,8 +1690,7 @@ namespace OutRunVRStereo
                     const float fullZ = clipEye[2] * invEyeW;
                     if (!std::isfinite(fullX) ||
                         !std::isfinite(fullY) ||
-                        !std::isfinite(fullZ) ||
-                        fullZ < -0.05f || fullZ > 1.05f)
+                        !std::isfinite(fullZ))
                     {
                         fullDrawOk = false;
                         break;
@@ -1613,8 +1700,21 @@ namespace OutRunVRStereo
                         x0 + (fullX + 1.0f) * 0.5f * width;
                     const float transformedY =
                         y0 + (1.0f - fullY) * 0.5f * height;
-                    const float transformedZ =
-                        minZ + fullZ * depthSpan;
+
+                    // Decals/particles can intentionally bias screen Z beyond
+                    // the strict viewport interval. Preserve the game's Z in
+                    // that case, while still using the accurately reprojected
+                    // eye X/Y and RHW. Falling the whole quad back to an affine
+                    // shift was the visible left/right smoke/skid offset.
+                    float transformedZ = screenZ;
+                    if (fullZ >= 0.0f && fullZ <= 1.0f)
+                    {
+                        transformedZ = minZ + fullZ * depthSpan;
+                    }
+                    else
+                    {
+                        ++R30XyzrhwDepthPreserveFallbacks;
+                    }
                     if (!std::isfinite(transformedX) ||
                         !std::isfinite(transformedY) ||
                         !std::isfinite(transformedZ))
@@ -2751,7 +2851,7 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current={:.2f}; R30.7 uniform-aspect XY correction active; R30.6 XYZRHW world path + CPU VB/IB shadow retained",
+                        "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current={:.2f}; R30.9 exact OpenXR pixel-aspect HUD + RHW-first XYZRHW world reprojection active",
                         R30HudScaleValue());
                     return 0;
                 }
