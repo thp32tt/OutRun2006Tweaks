@@ -116,7 +116,7 @@ jobs:
             '[R24] emergency visible quad submitted because no game image was safely displayable',
             'xrWaitSwapchainImage exceeded 250ms',
             '[R23 pixel]',
-            'menu-headlocked-projection-cached',
+            'menu-local-fixed-projection-cached',
             'R23-crash-text-first-20260916'
           )) {
             if (-not $ascii.Contains($marker)) { throw "R24 host marker missing: $marker" }
