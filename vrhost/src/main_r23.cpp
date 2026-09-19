@@ -998,9 +998,16 @@ namespace
         selected = {};
         if (!capture.available || !capture.fresh ||
             !capture.fullGameClientVisible ||
-            !capture.gameRegionChanged ||
             capture.lastPresentQpc <= 0)
             return false;
+
+        // R35.3: DXGI Desktop Duplication dirty/move metadata is advisory.
+        // Borderless D3D9Ex presents can advance LastPresentTime while the dirty
+        // rectangles do not intersect the OutRun client. The frame ring gives
+        // us a stronger correlation key: accept the capture only when a stable
+        // completed SBS frame exists at/before this output Present and inside
+        // maxSkewTicks. This prevents healthy stereo from collapsing into the
+        // giant recovery theater solely because dirty metadata was incomplete.
 
         std::array<OutRunVR::SharedRenderFrameState,
             OutRunVR::RenderFrameRingSize> history{};

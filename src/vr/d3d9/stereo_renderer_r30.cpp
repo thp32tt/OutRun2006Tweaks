@@ -1078,6 +1078,58 @@ namespace OutRunVRStereo
             return std::clamp(Settings::VRHudScale.get(), 0.30f, 1.20f);
         }
 
+        float R30HudAspectCompensation(
+            const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+        {
+            if (!BackBufferDesc.Width || !BackBufferDesc.Height)
+                return 1.0f;
+
+            float fovAspectSum = 0.0f;
+            int validEyes = 0;
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                const float left =
+                    std::tan(stereo.eyeFov[eye].angleLeft);
+                const float right =
+                    std::tan(stereo.eyeFov[eye].angleRight);
+                const float up =
+                    std::tan(stereo.eyeFov[eye].angleUp);
+                const float down =
+                    std::tan(stereo.eyeFov[eye].angleDown);
+                const float horizontal = right - left;
+                const float vertical = up - down;
+                if (!std::isfinite(horizontal) ||
+                    !std::isfinite(vertical) ||
+                    horizontal <= 0.05f || vertical <= 0.05f)
+                    continue;
+                const float aspect = horizontal / vertical;
+                if (!std::isfinite(aspect) ||
+                    aspect < 0.25f || aspect > 4.0f)
+                    continue;
+                fovAspectSum += aspect;
+                ++validEyes;
+            }
+
+            if (!validEyes)
+                return 1.0f;
+
+            const float eyeFovAspect =
+                fovAspectSum / static_cast<float>(validEyes);
+            const float sourceAspect =
+                static_cast<float>(BackBufferDesc.Width) /
+                static_cast<float>(BackBufferDesc.Height);
+
+            // The game renders each eye into the ultrawide backbuffer aspect,
+            // while OpenXR displays it in the headset eye-FOV aspect. World
+            // projection naturally compensates for that, but pixel HUD sprites
+            // do not. Pre-stretch X by sourceAspect / eyeFovAspect so a circle
+            // remains a circle after either SBS packing or DirectGPU projection.
+            const float compensation = sourceAspect / eyeFovAspect;
+            if (!std::isfinite(compensation))
+                return 1.0f;
+            return std::clamp(compensation, 0.75f, 3.25f);
+        }
+
         bool R30CurrentPassIsScreenSpace2D() noexcept
         {
             if (!TargetIsBackBuffer())
@@ -1638,6 +1690,7 @@ namespace OutRunVRStereo
                     // Keep one uniform user scale on X/Y and retain only the
                     // per-eye asymmetric-FOV centre offset for convergence.
                     correctedX =
+                        R30HudAspectCompensation(state.stereo) *
                         R30HudScaleValue() * ndcX +
                         state.eyeOffset[eye];
                     correctedY = R30HudScaleValue() * ndcY;
@@ -1772,7 +1825,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstXyzrhwHudLogged = true;
                     spdlog::info(
-                        "VR R30.7 XYZRHW HUD: pre-transformed fixed-function UP draws use uniform XY HUD scale plus asymmetric-FOV centre offset; circular gauges preserve aspect ratio");
+                        "VR R30.8 XYZRHW HUD: pre-transformed fixed-function HUD applies source-aspect/eye-FOV X compensation before SBS/DirectGPU projection; circular gauges preserve final HMD aspect ratio");
                 }
             }
 
@@ -2315,7 +2368,9 @@ namespace OutRunVRStereo
                 D3DMATRIX clipCorrection{};
                 // Keep HUD geometry isotropic. The eye-specific scale belongs
                 // to projection-space world mapping, not 2D sprite dimensions.
-                clipCorrection._11 = R30HudScaleValue();
+                clipCorrection._11 =
+                    R30HudAspectCompensation(stereo) *
+                    R30HudScaleValue();
                 clipCorrection._22 = R30HudScaleValue();
                 clipCorrection._33 = 1.0f;
                 clipCorrection._44 = 1.0f;
@@ -2479,8 +2534,9 @@ namespace OutRunVRStereo
             {
                 R30FirstScreenSpaceLogged = true;
                 spdlog::info(
-                    "VR R30.7 HUD: orthographic ScreenSpace2D uniform XY scale ACTIVE offset[L/R]={:.4f}/{:.4f} hudScale={:.2f}; asymmetric-FOV centre alignment retained without non-uniform sprite scaling",
-                    eyeOffset[0], eyeOffset[1], R30HudScaleValue());
+                    "VR R30.8 HUD: orthographic ScreenSpace2D aspect compensation ACTIVE offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} aspectX={:.3f}; HMD final sprite aspect is corrected after source-to-eye projection",
+                    eyeOffset[0], eyeOffset[1], R30HudScaleValue(),
+                    R30HudAspectCompensation(stereo));
             }
 
             if (FAILED(rightHr))
