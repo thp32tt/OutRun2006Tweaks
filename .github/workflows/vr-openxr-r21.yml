@@ -172,7 +172,7 @@ jobs:
             'VR AUTO HOST: launched',
             'VR PC MIRROR: fitting borderless window to monitor',
             'VR PRESENT: desktop D3D9 VSync bypass active',
-            'headset FOV auto-map + user scale active'
+            'VR R36 DIRECT-ONLY: shared-eye transport is not ready; SBS/Desktop Duplication fallback suppressed and PC mirror stays mono/left-eye'
           )) {
             if (-not $ascii.Contains($marker)) { throw "current C2 marker missing: $marker" }
           }
