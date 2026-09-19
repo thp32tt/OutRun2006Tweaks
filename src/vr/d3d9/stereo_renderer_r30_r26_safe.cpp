@@ -2413,7 +2413,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstXyzrhwHudLogged = true;
                     spdlog::info(
-                        "VR R42 XYZRHW HUD: Z-enabled screen-plane HUD is safely world-locked; HudScale uses cached planar coefficients instead of per-vertex 4x4 transforms");
+                        "VR R41 XYZRHW HUD: fixed-function HUD uses HudScale on a finite recentered world-locked plane; R42 Z-enabled screen-plane HUD is safely admitted and uses cached planar coefficients instead of per-vertex 4x4 transforms");
                 }
             }
 
