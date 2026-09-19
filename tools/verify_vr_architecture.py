@@ -349,6 +349,7 @@ require(
     "R23CommitDirectAfterValidation",
     "R23CommitClassicAfterValidation",
     "R23RefreshTheaterFallbackCapture",
+    "if (c.directTransportOnly_)",
     "R37BootstrapSubmittedFrame",
     "R37BootstrapSubmittedGeneration",
     "R37FrameIdBefore",
