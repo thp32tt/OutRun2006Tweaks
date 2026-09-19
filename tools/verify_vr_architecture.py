@@ -380,7 +380,8 @@ require(
 )
 require(
     "src/vr/d3d9/stereo_renderer_r30.cpp",
-    "state.depthTestEnabled && state.rhwDepthEvidence",
+    "state.depthTestEnabled &&",
+    "state.rhwDepthEvidence",
 )
 
 # Four occupied producer slots must be visited once each. This models the
