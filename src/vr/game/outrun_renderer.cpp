@@ -913,7 +913,7 @@ namespace OutRunVRRenderer
                         requestId);
                 else
                     spdlog::info(
-                        "VR R35 CADENCE: non-blocking PhaseLock active; request={} host clock sampled without waiting on the game Present thread",
+                        "VR R40 CADENCE: runtime-gated PhaseLock active; request={} game Present waits for the next xrWaitFrame token while the host never waits for game Present",
                         requestId);
             }
         }
@@ -1003,19 +1003,15 @@ namespace OutRunVRRenderer
                 return;
             }
 
-            // PhaseLock (mode 1) is advisory and must never block the game
-            // Present thread. The previous implementation waited up to ~13 ms
-            // at 90 Hz even though the host also ran asynchronously, creating a
-            // positive feedback loop when xrEndFrame stalled: host request late
-            // -> game wait -> next Present late -> more compositor stalls.
-            // Only SerializedProbe (mode 2) is allowed to wait.
-            if (Settings::VRFrameCadenceMode < 2)
-            {
-                CadencePacingActive.store(true, std::memory_order_release);
-                PublishCadenceClient(OutRunVR::CadenceV1::ClientEnabled);
-                return;
-            }
-
+            // R40: PhaseLock is host-clock pacing, not merely telemetry.
+            // The game Present thread waits for the NEXT request token, which
+            // is published immediately after the host's xrBeginFrame. Crucially
+            // mode 1 never makes the host wait for game Present, so there is no
+            // circular wait: xrWaitFrame -> publish token -> game renders once.
+            // This prevents the old mode-1 failure where the Tweaks limiter was
+            // disabled while the game still ran uncapped at 100-126 FPS against
+            // a 90 Hz runtime. SerializedProbe (mode 2) keeps the same game-side
+            // gate and additionally enables its bounded host-side diagnostic ACK.
             PublishCadenceClient(
                 OutRunVR::CadenceV1::ClientEnabled |
                 OutRunVR::CadenceV1::ClientWaiting);
@@ -1027,11 +1023,19 @@ namespace OutRunVRRenderer
                 static_cast<double>(std::clamp(
                     Settings::VRFrameCadenceTimeoutMs.get(),
                     5.0f, 100.0f));
-            const DWORD timeoutMs = static_cast<DWORD>(std::clamp(
-                runtimePeriodMs > 0.0
+            // Mode 1 must survive a temporarily late compositor long enough to
+            // remove GPU pressure and recover. Four runtime periods covers the
+            // observed ~39 ms VDXR interval at 90 Hz while still failing open.
+            const double waitBudgetMs =
+                Settings::VRFrameCadenceMode < 2
+                ? std::max(configuredTimeoutMs,
+                    runtimePeriodMs > 0.0 ? runtimePeriodMs * 4.0
+                                          : configuredTimeoutMs)
+                : (runtimePeriodMs > 0.0
                     ? runtimePeriodMs * 1.25
-                    : configuredTimeoutMs,
-                5.0, configuredTimeoutMs));
+                    : configuredTimeoutMs);
+            const DWORD timeoutMs = static_cast<DWORD>(std::clamp(
+                waitBudgetMs, 5.0, 100.0));
             const DWORD wait = WaitForSingleObject(CadenceRequestEvent, timeoutMs);
             QueryPerformanceCounter(&end);
             const std::uint32_t waitUs =

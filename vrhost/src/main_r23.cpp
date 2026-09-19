@@ -1956,9 +1956,9 @@ int main(int argc, char** argv)
             cachedProjectionViews{};
         bool cachedProjectionValid = false;
         ULONGLONG cachedProjectionRenderedMs = 0;
-        std::array<XrCompositionLayerProjectionView, 2>
-            cachedMenuProjectionViews{};
-        bool cachedMenuProjectionValid = false;
+        XrCompositionLayerQuad cachedMenuQuad{
+            XR_TYPE_COMPOSITION_LAYER_QUAD };
+        bool cachedMenuQuadValid = false;
         bool pendingReferenceSpaceChange = false;
         XrTime pendingReferenceSpaceChangeTime = 0;
 
@@ -2013,7 +2013,7 @@ int main(int argc, char** argv)
                         running = false; cadence.SetRunning(false); viewHistory.Clear(); matchedStereoValid = false;
                         lastStereoMatchMs = 0; cachedProjectionValid = false;
                         cachedProjectionRenderedMs = 0;
-                        cachedMenuProjectionValid = false;
+                        cachedMenuQuadValid = false;
                         compositor.ReferenceSpaceChanged();
                         OutRunVrR23VerifiedBundle::Invalidate();
                         OutRunVR::SharedRenderFrameState rf{};
@@ -2056,7 +2056,7 @@ int main(int argc, char** argv)
                 shared.ReferenceSpaceChanged(); compositor.ReferenceSpaceChanged(); viewHistory.Clear();
                 matchedStereoValid = false; cachedProjectionValid = false;
                 cachedProjectionRenderedMs = 0;
-                cachedMenuProjectionValid = false;
+                cachedMenuQuadValid = false;
                 OutRunVrR23VerifiedBundle::Invalidate();
                 OutRunVR::SharedRenderFrameState rf{};
                 lastProcessedStereoFrame = renderFrames.Read(rf) ? rf.frameId : shared.ReadStereoMeta().frame;
@@ -2128,11 +2128,11 @@ int main(int argc, char** argv)
                 {
                     cachedProjectionValid = false;
                     cachedProjectionRenderedMs = 0;
-                    cachedMenuProjectionValid = false;
+                    cachedMenuQuadValid = false;
                 }
                 else
                 {
-                    cachedMenuProjectionValid = false;
+                    cachedMenuQuadValid = false;
                 }
                 lastPresentation = presentation;
                 std::cout << "VR presentation: "
@@ -2476,14 +2476,15 @@ int main(int argc, char** argv)
 
                     LARGE_INTEGER rs{}, re{}; QueryPerformanceCounter(&rs);
 
-                    // Only blit a projection image when the game supplied a new
-                    // committed stereo frame (or when no cached projection
-                    // exists yet). At 90 Hz HMD / 60 Hz game this removes about
-                    // one third of the host-side full-eye blits. Intermediate
-                    // XR frames resubmit the last released projection and let
-                    // the runtime's normal reprojection handle head motion.
+                    // R40 VDXR recovery: acquire/render/release a projection
+                    // image on every renderable XR tick while a valid stereo
+                    // source remains in grace. Reusing an old released image is
+                    // legal OpenXR, but in this VDXR run it correlated with
+                    // fallback-cached-image alternation and black flashes.
+                    // The D3D9 producer is runtime-gated separately, so this
+                    // host-side D3D11 blit can follow xrWaitFrame directly.
+                    const bool hadCachedProjection = cachedProjectionValid;
                     if (grace &&
-                        (newStereoCommitted || !cachedProjectionValid) &&
                         R23RenderProjection(compositor, matchedViews, pv))
                     {
                         projection.space = localSpace;
@@ -2497,7 +2498,10 @@ int main(int argc, char** argv)
                         frameFreshProjection = true;
                         cachedProjectionViews = pv;
                         cachedProjectionValid = true;
-                        cachedProjectionRenderedMs = projectionNow;
+                        // Track source freshness, not repeated XR redraws. This
+                        // lets gameplay->menu/loading debounce expire normally.
+                        if (newStereoCommitted || !hadCachedProjection)
+                            cachedProjectionRenderedMs = projectionNow;
                         if (pendingBundlePublish)
                         {
                             OutRunVrR23VerifiedBundle::Publish(
@@ -2610,38 +2614,34 @@ int main(int argc, char** argv)
                     QueryPerformanceCounter(&ce); timings.capture.Add(timings.Ms(cs, ce));
                     LARGE_INTEGER rs{}, re{}; QueryPerformanceCounter(&rs);
 
-                    // VDXR showed a ~25 ms xrEndFrame cost for LOCAL quad
-                    // composition. Keep the same LOCAL-fixed physical screen,
-                    // but rasterize that screen into the normal stereo
-                    // projection swapchain. The plane corners are reprojected
-                    // from the current eye poses every XR frame, so head
-                    // translation/rotation remains true 6DoF without the slow
-                    // composition-quad path.
-                    if (capture.available)
+                    // R40: restore the geometrically stable LOCAL quad.
+                    // The R39 rasterized plane inside the stereo projection
+                    // sheared into trapezoids under VDXR reprojection. Refresh
+                    // the quad texture only on a new desktop menu frame and
+                    // reuse the released theater image between updates.
+                    if (capture.available &&
+                        (!cachedMenuQuadValid || capture.fresh))
                     {
-                        std::array<XrCompositionLayerProjectionView, 2>
-                            menuViews{};
-                        if (compositor.RenderMenuProjection(
-                                viewSpace, localSpace,
-                                fs.predictedDisplayTime, views, menuViews))
+                        XrCompositionLayerQuad refreshed{
+                            XR_TYPE_COMPOSITION_LAYER_QUAD };
+                        if (R23RenderTheater(
+                                compositor, viewSpace, localSpace,
+                                fs.predictedDisplayTime, refreshed, false))
                         {
-                            cachedMenuProjectionViews = menuViews;
-                            cachedMenuProjectionValid = true;
+                            cachedMenuQuad = refreshed;
+                            cachedMenuQuadValid = true;
                         }
                     }
-                    if (cachedMenuProjectionValid)
+                    if (cachedMenuQuadValid)
                     {
-                        projection.space = localSpace;
-                        projection.viewCount = 2;
-                        projection.views = cachedMenuProjectionViews.data();
+                        quad = cachedMenuQuad;
                         layers[0] =
                             reinterpret_cast<const XrCompositionLayerBaseHeader*>(
-                                &projection);
+                                &quad);
                         layerReady = true;
-                        intentionalMonoProjection = true;
                         finalLayerKind = capture.fresh
-                            ? "menu-local-6dof-projection-fresh"
-                            : "menu-local-6dof-projection-cached";
+                            ? "menu-local-6dof-quad-fresh"
+                            : "menu-local-6dof-quad-cached";
                     }
                     QueryPerformanceCounter(&re);
                     frameRenderMs += timings.Ms(rs, re);

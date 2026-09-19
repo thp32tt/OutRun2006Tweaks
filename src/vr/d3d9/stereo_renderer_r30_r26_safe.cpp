@@ -2754,7 +2754,6 @@ namespace OutRunVRStereo
             if (FAILED(device->GetVertexShaderConstantF(
                     OutRunWvpRegister, original, OutRunWvpRegisterCount)))
                 return false;
-
             if (!R30BuildEyeAffine(stereo, eyeScale, eyeOffset))
                 return false;
 
@@ -2764,28 +2763,31 @@ namespace OutRunVRStereo
             if (!MatrixFinite(stockWvp))
                 return false;
 
+            float baseRaw[16]{};
+            D3DMATRIX baseProjection{};
+            D3DMATRIX inverseBaseProjection{};
+            if (!OutRunVRRenderer::GetRendererBaseProjection(baseRaw))
+                return false;
+            std::memcpy(&baseProjection, baseRaw, sizeof(baseProjection));
+            if (!MatrixFinite(baseProjection) ||
+                !InvertMatrix(baseProjection, inverseBaseProjection))
+                return false;
+
+            const float centerEye[3]{
+                0.5f * (stereo.eyeOffset[0][0] + stereo.eyeOffset[1][0]),
+                0.5f * (stereo.eyeOffset[0][1] + stereo.eyeOffset[1][1]),
+                0.5f * (stereo.eyeOffset[0][2] + stereo.eyeOffset[1][2])
+            };
+            const float identityOrientation[4]{
+                0.0f, 0.0f, 0.0f, 1.0f
+            };
+
             if (screenKind == R30ScreenSpaceKind::WorldBillboard)
             {
-                float baseRaw[16]{};
-                float headRaw[16]{};
-                std::uint32_t headPoseSequence = 0;
-                D3DMATRIX baseProjection{};
-                D3DMATRIX inverseBaseProjection{};
-                D3DMATRIX headInverse{};
-                if (!OutRunVRRenderer::GetRendererBaseProjection(baseRaw) ||
-                    !OutRunVRRenderer::GetLatchedHeadInverse(
-                        headRaw, headPoseSequence) ||
-                    headPoseSequence != stereo.poseSequence)
-                    return false;
-                std::memcpy(&baseProjection, baseRaw,
-                    sizeof(baseProjection));
-                std::memcpy(&headInverse, headRaw,
-                    sizeof(headInverse));
-                if (!MatrixFinite(baseProjection) ||
-                    !MatrixFinite(headInverse) ||
-                    !InvertMatrix(baseProjection, inverseBaseProjection))
-                    return false;
-
+                // R40: stockWvp already contains the common renderer head
+                // transform. Reapplying headInverse/absolute eye orientation
+                // made car rank markers follow the headset. Match the corrected
+                // XYZRHW smoke/skid path: relative IPD + per-eye FOV only.
                 const D3DMATRIX worldView =
                     MultiplyMatrix(stockWvp, inverseBaseProjection);
                 if (!MatrixFinite(worldView))
@@ -2793,28 +2795,27 @@ namespace OutRunVRStereo
 
                 for (int eye = 0; eye < 2; ++eye)
                 {
+                    const float relativeEye[3]{
+                        stereo.eyeOffset[eye][0] - centerEye[0],
+                        stereo.eyeOffset[eye][1] - centerEye[1],
+                        stereo.eyeOffset[eye][2] - centerEye[2]
+                    };
                     const D3DMATRIX eyePose =
                         MatrixFromQuaternionTranslation(
-                            stereo.eyeOrientation[eye],
-                            stereo.eyeOffset[eye],
+                            identityOrientation, relativeEye,
                             Settings::VRWorldScale *
                                 Settings::VRStereoDepth);
-                    const D3DMATRIX eyeInverse =
-                        InverseRigid(eyePose);
+                    const D3DMATRIX eyeInverse = InverseRigid(eyePose);
                     const D3DMATRIX eyeProjection =
                         ProjectionFromFov(
                             baseProjection, stereo.eyeFov[eye]);
                     const D3DMATRIX corrected =
                         MultiplyMatrix(
-                            MultiplyMatrix(
-                                MultiplyMatrix(
-                                    worldView, headInverse),
-                                eyeInverse),
+                            MultiplyMatrix(worldView, eyeInverse),
                             eyeProjection);
                     if (!MatrixFinite(corrected))
                         return false;
-                    const D3DMATRIX correctedT =
-                        TransposeMatrix(corrected);
+                    const D3DMATRIX correctedT = TransposeMatrix(corrected);
                     std::memcpy(eyeConstants[eye], &correctedT,
                         sizeof(correctedT));
                 }
@@ -2825,25 +2826,79 @@ namespace OutRunVRStereo
                 screenKind != R30ScreenSpaceKind::PerspectiveHud)
                 return false;
 
+            // R40: turn all screen HUD into one finite, recentered view plane.
+            // This removes head-lock. HudScale/contain is applied before the
+            // plane conversion, so perspective HUD such as the large 6th/6 uses
+            // exactly the same size rule as ordinary HUD.
+            float headRaw[16]{};
+            std::uint32_t headPoseSequence = 0;
+            D3DMATRIX headInverse{};
+            if (!OutRunVRRenderer::GetLatchedHeadInverse(
+                    headRaw, headPoseSequence) ||
+                headPoseSequence != stereo.poseSequence)
+                return false;
+            std::memcpy(&headInverse, headRaw, sizeof(headInverse));
+            if (!MatrixFinite(headInverse))
+                return false;
+
+            float hudScaleX = 1.0f;
+            float hudScaleY = 1.0f;
+            R30HudContainScale(stereo, hudScaleX, hudScaleY);
+            D3DMATRIX hudScale = IdentityMatrix();
+            hudScale._11 = hudScaleX;
+            hudScale._22 = hudScaleY;
+            const D3DMATRIX scaledClip =
+                MultiplyMatrix(stockWvp, hudScale);
+
+            constexpr float HudPlaneViewZ = -2.50f;
+            const float planeClipW =
+                HudPlaneViewZ * baseProjection._34 +
+                baseProjection._44;
+            const float planeClipZ =
+                HudPlaneViewZ * baseProjection._33 +
+                baseProjection._43;
+            if (!std::isfinite(planeClipW) ||
+                !std::isfinite(planeClipZ) ||
+                std::fabs(planeClipW) <= 1.0e-4f)
+                return false;
+            const float planeNdcZ = planeClipZ / planeClipW;
+            if (!std::isfinite(planeNdcZ))
+                return false;
+
+            D3DMATRIX depthReset = IdentityMatrix();
+            depthReset._33 = 0.0f;
+            depthReset._43 = planeNdcZ;
+            const D3DMATRIX commonViewPlane =
+                MultiplyMatrix(
+                    MultiplyMatrix(scaledClip, depthReset),
+                    inverseBaseProjection);
+            if (!MatrixFinite(commonViewPlane))
+                return false;
+
             for (int eye = 0; eye < 2; ++eye)
             {
-                D3DMATRIX clipCorrection{};
-                float hudScaleX = 1.0f;
-                float hudScaleY = 1.0f;
-                R30HudContainScale(stereo, hudScaleX, hudScaleY);
-                // Keep the already-verified ordinary HUD mapping unchanged.
-                // Only FlatPerspectiveEffect uses the finite 3D plane above.
-                clipCorrection._11 = hudScaleX;
-                clipCorrection._22 = hudScaleY;
-                clipCorrection._33 = 1.0f;
-                clipCorrection._44 = 1.0f;
-                clipCorrection._41 = eyeOffset[eye];
-
+                const float relativeEye[3]{
+                    stereo.eyeOffset[eye][0] - centerEye[0],
+                    stereo.eyeOffset[eye][1] - centerEye[1],
+                    stereo.eyeOffset[eye][2] - centerEye[2]
+                };
+                const D3DMATRIX eyePose =
+                    MatrixFromQuaternionTranslation(
+                        identityOrientation, relativeEye,
+                        Settings::VRWorldScale *
+                            Settings::VRStereoDepth);
+                const D3DMATRIX eyeInverse = InverseRigid(eyePose);
+                const D3DMATRIX eyeProjection =
+                    ProjectionFromFov(
+                        baseProjection, stereo.eyeFov[eye]);
                 const D3DMATRIX corrected =
-                    MultiplyMatrix(stockWvp, clipCorrection);
+                    MultiplyMatrix(
+                        MultiplyMatrix(
+                            MultiplyMatrix(commonViewPlane, headInverse),
+                            eyeInverse),
+                        eyeProjection);
                 if (!MatrixFinite(corrected))
                     return false;
-
                 const D3DMATRIX correctedT = TransposeMatrix(corrected);
                 std::memcpy(eyeConstants[eye], &correctedT,
                     sizeof(correctedT));
@@ -3009,14 +3064,14 @@ namespace OutRunVRStereo
             {
                 R30FirstFlatPerspectiveLogged = true;
                 spdlog::info(
-                    "VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay is world-locked on a finite virtual plane; R39 true affine world billboard keeps its original vehicle/world depth and receives head/IPD/FOV transform");
+                    "VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay is world-locked on a finite virtual plane; R40 affine vehicle marker preserves already head-synchronised depth and receives relative-IPD/FOV only");
             }
             if (screenKind == R30ScreenSpaceKind::PerspectiveHud &&
                 !R30FirstPerspectiveHudLogged)
             {
                 R30FirstPerspectiveHudLogged = true;
                 spdlog::info(
-                    "VR R30 PERSPECTIVE HUD: near-plane alpha UI receives the same HudScale/asymmetric-FOV mapping as ordinary HUD; vehicle-attached rank markers are excluded as world billboards");
+                    "VR R30 PERSPECTIVE HUD: near-plane alpha UI including 6th/6 uses ordinary HudScale and the same world-locked finite HUD plane; vehicle rank markers remain world billboards");
             }
 
             if (FAILED(rightHr))
@@ -3231,7 +3286,7 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current={:.2f}; R36 contain-fit + depth-disabled overlay zero-disparity + head-relative XYZRHW reprojection active",
+                        "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current={:.2f}; R40 world-locked finite HUD plane + perspective-HUD scale + relative-eye billboard/XYZRHW reprojection active",
                         R30HudScaleValue());
                     return 0;
                 }
