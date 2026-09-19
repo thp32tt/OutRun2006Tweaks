@@ -304,6 +304,18 @@ namespace OutRunVRStereo
             return true;
         }
 
+        // Compatibility entry point for R29/C1/C2 comparison owners. The R26
+        // production path passes an already captured snapshot so it still pays
+        // only one live render-state read; older comparison code can request a
+        // fresh snapshot through this overload.
+        bool R27ShouldBypassLegacyZeroDisparity(
+            IDirect3DDevice9* device) noexcept
+        {
+            const R13EffectSnapshot effect =
+                R13CaptureDrawTimeEffect(device);
+            return R27ShouldBypassLegacyZeroDisparity(device, effect);
+        }
+
         bool R37DepthDisabledFragileOverlay(
             const R13EffectSnapshot& effect) noexcept
         {
