@@ -49,14 +49,14 @@ namespace Settings
 	Setting<float> VRTargetRefreshRateHz{ "VR", "TargetRefreshRateHz", 0.0f,
 		"Optional OpenXR refresh-rate override through XR_FB_display_refresh_rate. Leave at 0 to respect the refresh rate selected by Virtual Desktop/runtime (for example 72 or 90 Hz).", Range<float>{ 0.0f, 144.0f } };
 	Setting<int> VRFrameCadenceMode{ "VR", "FrameCadenceMode", 1,
-		"Synchronizes the next OutRun frame to the OpenXR clock. PhaseLock is the production-safe R35 path; SerializedProbe additionally waits a bounded part of the XR frame for the requested game Present. Off restores the pre-R35 cadence.",
+		"Synchronizes rendering to the OpenXR clock. PhaseLock is non-blocking and only samples ready host requests; SerializedProbe is diagnostic and may wait a bounded part of an XR frame. Off restores the pre-R35 cadence.",
 		{ "Off", "PhaseLock", "SerializedProbe" } };
 	Setting<float> VRFrameCadenceTargetHz{ "VR", "FrameCadenceTargetHz", 0.0f,
 		"Render cadence override while XR pacing is enabled. 0 = Auto/native OpenXR refresh (72/80/90/120 Hz as reported by xrWaitFrame). Non-zero keeps a fixed diagnostic render cadence.", Range<float>{ 0.0f, 120.0f } };
 	Setting<float> VRFrameCadenceMaxHz{ "VR", "FrameCadenceMaxHz", 120.0f,
 		"Maximum VR render cadence in Auto mode. The 60 Hz simulation remains unchanged; Tweaks interpolation fills intermediate render frames.", Range<float>{ 60.0f, 120.0f } };
 	Setting<float> VRFrameCadenceTimeoutMs{ "VR", "FrameCadenceTimeoutMs", 35.0f,
-		"Maximum game-side wait for the next XR cadence request before failing open. This prevents a stopped host from hanging OutRun.", Range<float>{ 5.0f, 100.0f } };
+		"Maximum game-side wait used only by SerializedProbe cadence mode. PhaseLock never blocks the Present thread.", Range<float>{ 5.0f, 100.0f } };
 	Setting<bool> VRPositionalTracking{ "VR", "PositionalTracking", true,
 		"Applies 6DoF HMD X/Y/Z movement in addition to orientation. Disable this option if a title-specific camera/culling issue is observed; stereo eye separation is independent." };
 	Setting<bool> VRCullingCameraSync{ "VR", "CullingCameraSync", true,

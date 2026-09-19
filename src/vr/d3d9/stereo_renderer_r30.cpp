@@ -953,7 +953,16 @@ namespace OutRunVRStereo
                         R30SkyGlow.temp[eye],
                         R30SkyGlow.blur, horizontal, false);
 
-                if (Settings::SkyGlowTwoStep)
+                // TwoStep exists to reduce aliasing after a downsample.
+                // At factor=1 there is no downsample, so a second full-resolution
+                // blur only doubles bandwidth. Also make sure the vertical pass,
+                // when requested for factor>1, is actually the composite source.
+                const bool effectiveTwoStep =
+                    Settings::SkyGlowTwoStep.get() &&
+                    R30SkyGlow.factor > 1;
+                IDirect3DTexture9* compositeSource =
+                    R30SkyGlow.temp[eye];
+                if (effectiveTwoStep)
                 {
                     const float vertical[4]{
                         0.0f,
@@ -968,13 +977,8 @@ namespace OutRunVRStereo
                             R30SkyGlow.glowHeight,
                             R30SkyGlow.reduced[eye],
                             R30SkyGlow.blur, vertical, false);
-                }
-                else if (ok)
-                {
-                    // Keep the composite source identical while allowing the
-                    // single-step diagnostic to skip the second blur pass.
-                    ok = SUCCEEDED(device->StretchRect(
-                        reduced, nullptr, temp, nullptr, D3DTEXF_LINEAR));
+                    if (ok)
+                        compositeSource = R30SkyGlow.reduced[eye];
                 }
 
                 const float composite[4]{ 0.38f, 0, 0, 0 };
@@ -983,7 +987,7 @@ namespace OutRunVRStereo
                         device, eyeSurface[eye],
                         BackBufferDesc.Width,
                         BackBufferDesc.Height,
-                        R30SkyGlow.temp[eye],
+                        compositeSource,
                         R30SkyGlow.composite, composite, true);
 
                 temp->Release();
@@ -1018,8 +1022,10 @@ namespace OutRunVRStereo
                 {
                     R30FirstSkyGlowLogged = true;
                     spdlog::info(
-                        "VR SKY GLOW: independent L/R extract + stereo blur + additive composite ACTIVE factor={} twoStep={} buffer={}x{}",
-                        R30SkyGlow.factor, Settings::SkyGlowTwoStep.get() ? 1 : 0,
+                        "VR SKY GLOW: independent L/R extract + stereo blur + additive composite ACTIVE factor={} requestedTwoStep={} effectiveTwoStep={} buffer={}x{}",
+                        R30SkyGlow.factor,
+                        Settings::SkyGlowTwoStep.get() ? 1 : 0,
+                        (Settings::SkyGlowTwoStep.get() && R30SkyGlow.factor > 1) ? 1 : 0,
                         R30SkyGlow.glowWidth,
                         R30SkyGlow.glowHeight);
                 }
@@ -2543,7 +2549,7 @@ namespace OutRunVRStereo
         bool R30BuildScreenSpaceEyeConstants(
             IDirect3DDevice9* device,
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
-            bool applyHudScale,
+            R30ScreenSpaceKind screenKind,
             float original[16], float eyeConstants[2][16],
             float eyeScale[2], float eyeOffset[2]) noexcept
         {
@@ -2564,25 +2570,103 @@ namespace OutRunVRStereo
             if (!MatrixFinite(stockWvp))
                 return false;
 
+            if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect)
+            {
+                float baseRaw[16]{};
+                float headRaw[16]{};
+                std::uint32_t headPoseSequence = 0;
+                D3DMATRIX baseProjection{};
+                D3DMATRIX inverseBaseProjection{};
+                D3DMATRIX headInverse{};
+                if (!OutRunVRRenderer::GetRendererBaseProjection(baseRaw) ||
+                    !OutRunVRRenderer::GetLatchedHeadInverse(
+                        headRaw, headPoseSequence) ||
+                    headPoseSequence != stereo.poseSequence)
+                    return false;
+                std::memcpy(&baseProjection, baseRaw,
+                    sizeof(baseProjection));
+                std::memcpy(&headInverse, headRaw,
+                    sizeof(headInverse));
+                if (!MatrixFinite(baseProjection) ||
+                    !MatrixFinite(headInverse) ||
+                    !InvertMatrix(baseProjection, inverseBaseProjection))
+                    return false;
+
+                // Turn a screen-space alpha overlay into a finite common view
+                // plane before applying the same head/eye transforms as world
+                // geometry. Keeping x/w and y/w while replacing z/w with a
+                // constant preserves the game's original 2D placement at
+                // recenter, but adds real IPD convergence and world locking.
+                constexpr float OverlayPlaneViewZ = -2.50f;
+                const float planeClipW =
+                    OverlayPlaneViewZ * baseProjection._34 +
+                    baseProjection._44;
+                const float planeClipZ =
+                    OverlayPlaneViewZ * baseProjection._33 +
+                    baseProjection._43;
+                if (!std::isfinite(planeClipW) ||
+                    !std::isfinite(planeClipZ) ||
+                    planeClipW <= 1.0e-4f)
+                    return false;
+                const float planeNdcZ = planeClipZ / planeClipW;
+                if (!std::isfinite(planeNdcZ))
+                    return false;
+
+                D3DMATRIX depthReset = IdentityMatrix();
+                depthReset._33 = 0.0f;
+                depthReset._43 = planeNdcZ;
+                const D3DMATRIX commonViewPlane =
+                    MultiplyMatrix(
+                        MultiplyMatrix(stockWvp, depthReset),
+                        inverseBaseProjection);
+                if (!MatrixFinite(commonViewPlane))
+                    return false;
+
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    const D3DMATRIX eyePose =
+                        MatrixFromQuaternionTranslation(
+                            stereo.eyeOrientation[eye],
+                            stereo.eyeOffset[eye],
+                            Settings::VRWorldScale *
+                                Settings::VRStereoDepth);
+                    const D3DMATRIX eyeInverse =
+                        InverseRigid(eyePose);
+                    const D3DMATRIX eyeProjection =
+                        ProjectionFromFov(
+                            baseProjection, stereo.eyeFov[eye]);
+                    const D3DMATRIX corrected =
+                        MultiplyMatrix(
+                            MultiplyMatrix(
+                                MultiplyMatrix(
+                                    commonViewPlane, headInverse),
+                                eyeInverse),
+                            eyeProjection);
+                    if (!MatrixFinite(corrected))
+                        return false;
+                    const D3DMATRIX correctedT =
+                        TransposeMatrix(corrected);
+                    std::memcpy(eyeConstants[eye], &correctedT,
+                        sizeof(correctedT));
+                }
+                return true;
+            }
+
+            if (screenKind != R30ScreenSpaceKind::Hud2D)
+                return false;
+
             for (int eye = 0; eye < 2; ++eye)
             {
                 D3DMATRIX clipCorrection{};
-                // Keep HUD geometry isotropic. The eye-specific scale belongs
-                // to projection-space world mapping, not 2D sprite dimensions.
                 float hudScaleX = 1.0f;
                 float hudScaleY = 1.0f;
-                if (applyHudScale)
-                    R30HudContainScale(stereo, hudScaleX, hudScaleY);
-                // Keep the known-good UI contain-fit unchanged. Only
-                // flat-perspective score/rank/lens overlays receive the missing
-                // eye-width affine, with no HudScale.
-                clipCorrection._11 =
-                    applyHudScale ? hudScaleX : eyeScale[eye];
+                R30HudContainScale(stereo, hudScaleX, hudScaleY);
+                // Keep the already-verified ordinary HUD mapping unchanged.
+                // Only FlatPerspectiveEffect uses the finite 3D plane above.
+                clipCorrection._11 = hudScaleX;
                 clipCorrection._22 = hudScaleY;
                 clipCorrection._33 = 1.0f;
                 clipCorrection._44 = 1.0f;
-                // Row-vector clip transform. Scale both axes around clip-space
-                // centre and preserve the eye-specific asymmetric-FOV offset.
                 clipCorrection._41 = eyeOffset[eye];
 
                 const D3DMATRIX corrected =
@@ -2639,8 +2723,8 @@ namespace OutRunVRStereo
             float eyeScale[2]{};
             float eyeOffset[2]{};
             if (!R30BuildScreenSpaceEyeConstants(device, stereo,
-                    screenKind == R30ScreenSpaceKind::Hud2D,
-                    original, eyeConstants, eyeScale, eyeOffset))
+                    screenKind, original, eyeConstants,
+                    eyeScale, eyeOffset))
             {
                 ++R30ScreenSpaceBuildFailures;
                 return E_NOTIMPL;
@@ -2755,7 +2839,7 @@ namespace OutRunVRStereo
             {
                 R30FirstFlatPerspectiveLogged = true;
                 spdlog::info(
-                    "VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay receives convergence-only FOV correction (no HudScale)");
+                    "VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay is world-locked on a finite virtual plane with real head/IPD/FOV transform (no HudScale)");
             }
 
             if (FAILED(rightHr))

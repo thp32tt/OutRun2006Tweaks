@@ -907,9 +907,14 @@ namespace OutRunVRRenderer
             if (!FirstCadenceAcceptedLogged)
             {
                 FirstCadenceAcceptedLogged = true;
-                spdlog::info(
-                    "VR R35 CADENCE: XR-driven PhaseLock active; request={} game frames are released only at bounded host cadence boundaries",
-                    requestId);
+                if (Settings::VRFrameCadenceMode >= 2)
+                    spdlog::info(
+                        "VR R35 CADENCE: SerializedProbe active; request={} bounded game/host synchronization enabled",
+                        requestId);
+                else
+                    spdlog::info(
+                        "VR R35 CADENCE: non-blocking PhaseLock active; request={} host clock sampled without waiting on the game Present thread",
+                        requestId);
             }
         }
 
@@ -995,6 +1000,19 @@ namespace OutRunVRRenderer
             {
                 CadenceTimedOutRequestId = 0;
                 AcceptCadenceRequest(host.requestId, 0);
+                return;
+            }
+
+            // PhaseLock (mode 1) is advisory and must never block the game
+            // Present thread. The previous implementation waited up to ~13 ms
+            // at 90 Hz even though the host also ran asynchronously, creating a
+            // positive feedback loop when xrEndFrame stalled: host request late
+            // -> game wait -> next Present late -> more compositor stalls.
+            // Only SerializedProbe (mode 2) is allowed to wait.
+            if (Settings::VRFrameCadenceMode < 2)
+            {
+                CadencePacingActive.store(true, std::memory_order_release);
+                PublishCadenceClient(OutRunVR::CadenceV1::ClientEnabled);
                 return;
             }
 
@@ -1618,6 +1636,18 @@ namespace OutRunVRRenderer
 	{
 		out = LatchedStereo;
 		return out.valid && out.poseSequence != 0;
+	}
+
+	bool GetLatchedHeadInverse(float outMatrix[16],
+		std::uint32_t& poseSequence) noexcept
+	{
+		if (!outMatrix || !LatchedHeadInverseValid ||
+			LatchedPoseSequence == 0)
+			return false;
+		std::memcpy(outMatrix, &LatchedHeadInverse,
+			sizeof(LatchedHeadInverse));
+		poseSequence = LatchedPoseSequence;
+		return true;
 	}
 
 	std::uint64_t GetBeginSceneCallCount()

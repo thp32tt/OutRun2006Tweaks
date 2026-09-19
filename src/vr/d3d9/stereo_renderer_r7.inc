@@ -656,6 +656,18 @@ namespace OutRunVRStereo
 					!MatrixFinite(state.fixedOriginalProjection))
 					return EyeBuildResult::FatalError;
 
+				float headInverseRaw[16]{};
+				std::uint32_t headPoseSequence = 0;
+				D3DMATRIX headInverse{};
+				if (!OutRunVRRenderer::GetLatchedHeadInverse(
+						headInverseRaw, headPoseSequence) ||
+					headPoseSequence != stereo.poseSequence)
+					return EyeBuildResult::FatalError;
+				std::memcpy(&headInverse, headInverseRaw,
+					sizeof(headInverse));
+				if (!MatrixFinite(headInverse))
+					return EyeBuildResult::FatalError;
+
 				for (int eye = 0; eye < 2; ++eye)
 				{
 					const D3DMATRIX eyePose =
@@ -664,7 +676,10 @@ namespace OutRunVRStereo
 							Settings::VRWorldScale * Settings::VRStereoDepth);
 					const D3DMATRIX eyeInverse = InverseRigid(eyePose);
 					state.fixedEyeView[eye] =
-						MultiplyMatrix(state.fixedOriginalView, eyeInverse);
+						MultiplyMatrix(
+							MultiplyMatrix(
+								state.fixedOriginalView, headInverse),
+							eyeInverse);
 					state.fixedEyeProjection[eye] =
 						ProjectionFromFov(
 							state.fixedOriginalProjection,
@@ -682,7 +697,7 @@ namespace OutRunVRStereo
 				{
 					FirstFixedFunctionWorldLogged = true;
 					spdlog::info(
-						"VR C1.1 FIXEDFN: perspective fixed-function XYZ draw now receives per-eye view/projection; XYZRHW/orthographic UI remains zero-disparity");
+						"VR C1.2 FIXEDFN HEAD: perspective fixed-function XYZ world receives the same latched head inverse + eye-local IPD/FOV as shader world; sky/cloud fixed-function passes no longer stay head-locked");
 				}
 				return EyeBuildResult::WorldStereo;
 			}

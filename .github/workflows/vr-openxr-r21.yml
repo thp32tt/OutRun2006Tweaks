@@ -167,7 +167,9 @@ jobs:
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
           foreach ($marker in @(
             'VR R26+HUD SAFE TEST: R26/R23 world path + R30 HUD/XYZRHW/SkyGlow overlay ACTIVE',
-            'VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay receives convergence-only FOV correction',
+            'VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay is world-locked on a finite virtual plane',
+            'VR C1.2 FIXEDFN HEAD: perspective fixed-function XYZ world receives the same latched head inverse',
+            'VR R35 CADENCE: non-blocking PhaseLock active',
             'VR R30.6 XYZRHW WORLD',
             'VR R30.10 XYZRHW DEPTH: stable non-unit RHW accepted as world depth',
             'VR R30 BUFFER SHADOW: lazy capture armed only after a real XYZRHW',

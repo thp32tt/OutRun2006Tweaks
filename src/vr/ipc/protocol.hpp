@@ -292,6 +292,8 @@ namespace OutRunVRRenderer
     };
 
     bool GetLatchedStereoFrame(LatchedStereoFrame& out);
+    bool GetLatchedHeadInverse(float outMatrix[16],
+        std::uint32_t& poseSequence) noexcept;
     bool GetRendererBaseProjection(float outMatrix[16]);
     bool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
         std::uint32_t& poseSequence, std::uintptr_t& shaderIdentity,
