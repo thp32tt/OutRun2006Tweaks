@@ -172,7 +172,7 @@ namespace OutRunVRD3D9ExUpgradeR13
             {
                 return "OpenXRVRD3D9ExR13Hardening";
             }
-            bool validate() override { return Settings::VRPreferD3D9Ex; }
+            bool validate() override { return true; }
             bool apply() override
             {
                 R13InstallCompatHook = safetyhook::create_inline(
@@ -182,7 +182,7 @@ namespace OutRunVRD3D9ExUpgradeR13
                 if (!R13InstallCompatHook)
                 {
                     spdlog::error(
-                        "VR D3D9Ex R13: failed to intercept managed compatibility installation; experimental Ex promotion disabled for safety");
+                        "VR D3D9Ex R13: failed to intercept managed compatibility installation; strict D3D9On12 compatibility install failed");
                     return false;
                 }
                 return true;
