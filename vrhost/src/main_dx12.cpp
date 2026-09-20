@@ -1012,6 +1012,11 @@ int main()
             XrView{XR_TYPE_VIEW},XrView{XR_TYPE_VIEW}};
         bool heldRenderViewsValid=false;
         std::uint64_t heldLastUseFence=0;
+        OutRunVR::ClientPresentationMode lastPresentation=
+            OutRunVR::PresentationUnknown;
+        XrPosef theaterAnchor{};
+        theaterAnchor.orientation.w=1.0f;
+        bool theaterAnchorValid=false;
 
         std::cout<<"Runtime: "<<xr.runtimeName<<"\n";
         std::cout<<"Waiting for OpenXR session and DX12 game transport. "
@@ -1067,6 +1072,38 @@ int main()
                 fs.shouldRender!=XR_FALSE,
                 xr.runtimeName.c_str());
 
+            const auto presentation=poseWriter.Presentation();
+            const XrSpaceLocationFlags headRequired=
+                XR_SPACE_LOCATION_ORIENTATION_VALID_BIT|
+                XR_SPACE_LOCATION_POSITION_VALID_BIT;
+            const bool headValid=
+                (head.locationFlags&headRequired)==headRequired;
+            if(presentation!=lastPresentation)
+            {
+                theaterAnchorValid=false;
+                lastPresentation=presentation;
+                std::cout<<"DX12 presentation mode="
+                    <<(presentation==OutRunVR::PresentationGameplay
+                        ?"gameplay true-stereo":"LOCAL fixed theater")
+                    <<"\n";
+            }
+            if(presentation==OutRunVR::PresentationTheater&&
+                !theaterAnchorValid&&headValid)
+            {
+                theaterAnchor=head.pose;
+                const XrVector3f forward=
+                    OutRunVRHostDX12::RotateVector(
+                        head.pose.orientation,{0.0f,0.0f,-1.0f});
+                constexpr float TheaterDistanceMeters=1.8f;
+                theaterAnchor.position.x+=
+                    forward.x*TheaterDistanceMeters;
+                theaterAnchor.position.y+=
+                    forward.y*TheaterDistanceMeters;
+                theaterAnchor.position.z+=
+                    forward.z*TheaterDistanceMeters;
+                theaterAnchorValid=true;
+            }
+
             std::array<XrCompositionLayerProjectionView,2> projectionViews{
                 XrCompositionLayerProjectionView{
                     XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW},
@@ -1074,6 +1111,8 @@ int main()
                     XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW}};
             XrCompositionLayerProjection projection{
                 XR_TYPE_COMPOSITION_LAYER_PROJECTION};
+            XrCompositionLayerQuad theater{
+                XR_TYPE_COMPOSITION_LAYER_QUAD};
             std::array<const XrCompositionLayerBaseHeader*,1> layers{};
             std::uint32_t layerCount=0;
 
@@ -1096,20 +1135,25 @@ int main()
                 }
                 heldFrame=std::move(candidate);
                 heldLastUseFence=0;
-                OutRunVR::SharedRenderFrameState meta{};
-                heldRenderViewsValid=
-                    frameMeta.ReadFrame(
-                        heldFrame.frameId,
-                        heldFrame.poseSequence,
-                        meta)&&
-                    OutRunVRHostDX12::RenderFrameMetaReader::ToXrViews(
-                        meta,heldRenderViews);
-                if(!heldRenderViewsValid)
+                heldRenderViewsValid=false;
+                if(presentation==OutRunVR::PresentationGameplay&&
+                    heldFrame.poseSequence)
                 {
-                    std::cerr
-                        <<"DX12 host: exact rendered-eye metadata unavailable for frame "
-                        <<heldFrame.frameId
-                        <<"; current XR views will be used for this frame.\n";
+                    OutRunVR::SharedRenderFrameState meta{};
+                    heldRenderViewsValid=
+                        frameMeta.ReadFrame(
+                            heldFrame.frameId,
+                            heldFrame.poseSequence,
+                            meta)&&
+                        OutRunVRHostDX12::RenderFrameMetaReader::ToXrViews(
+                            meta,heldRenderViews);
+                    if(!heldRenderViewsValid)
+                    {
+                        std::cerr
+                            <<"DX12 host: exact rendered-eye metadata unavailable for frame "
+                            <<heldFrame.frameId
+                            <<"; current XR views will be used for this frame.\n";
+                    }
                 }
             }
 
@@ -1141,27 +1185,57 @@ int main()
                 if(rendered)
                 {
                     heldLastUseFence=gpuFence;
-                    const auto& submitViews=
-                        heldRenderViewsValid?heldRenderViews:views;
-                    for(std::uint32_t eye=0;eye<2;++eye)
+                    if(presentation==OutRunVR::PresentationTheater&&
+                        theaterAnchorValid)
                     {
-                        projectionViews[eye].pose=submitViews[eye].pose;
-                        projectionViews[eye].fov=submitViews[eye].fov;
-                        projectionViews[eye].subImage.swapchain=
-                            swapchain.handle;
-                        projectionViews[eye].subImage.imageRect.offset={0,0};
-                        projectionViews[eye].subImage.imageRect.extent={
+                        const float aspect=
+                            heldFrame.height
+                            ?static_cast<float>(heldFrame.width)/
+                                static_cast<float>(heldFrame.height)
+                            :16.0f/9.0f;
+                        constexpr float TheaterWidthMeters=2.1f;
+                        theater.space=xr.localSpace;
+                        theater.eyeVisibility=XR_EYE_VISIBILITY_BOTH;
+                        theater.pose=theaterAnchor;
+                        theater.size={
+                            TheaterWidthMeters,
+                            TheaterWidthMeters/
+                                std::clamp(aspect,0.5f,3.0f)};
+                        theater.subImage.swapchain=swapchain.handle;
+                        theater.subImage.imageRect.offset={0,0};
+                        theater.subImage.imageRect.extent={
                             static_cast<std::int32_t>(swapchain.width),
                             static_cast<std::int32_t>(swapchain.height)};
-                        projectionViews[eye].subImage.imageArrayIndex=eye;
+                        theater.subImage.imageArrayIndex=0;
+                        layers[0]=reinterpret_cast<
+                            const XrCompositionLayerBaseHeader*>(
+                                &theater);
+                        layerCount=1;
                     }
-                    projection.space=xr.localSpace;
-                    projection.viewCount=2;
-                    projection.views=projectionViews.data();
-                    layers[0]=reinterpret_cast<
-                        const XrCompositionLayerBaseHeader*>(
-                            &projection);
-                    layerCount=1;
+                    else if(presentation==OutRunVR::PresentationGameplay)
+                    {
+                        const auto& submitViews=
+                            heldRenderViewsValid?heldRenderViews:views;
+                        for(std::uint32_t eye=0;eye<2;++eye)
+                        {
+                            projectionViews[eye].pose=submitViews[eye].pose;
+                            projectionViews[eye].fov=submitViews[eye].fov;
+                            projectionViews[eye].subImage.swapchain=
+                                swapchain.handle;
+                            projectionViews[eye].subImage.imageRect.offset={0,0};
+                            projectionViews[eye].subImage.imageRect.extent={
+                                static_cast<std::int32_t>(swapchain.width),
+                                static_cast<std::int32_t>(swapchain.height)};
+                            projectionViews[eye].subImage.imageArrayIndex=eye;
+                        }
+                        projection.space=xr.localSpace;
+                        projection.viewCount=2;
+                        projection.views=projectionViews.data();
+                        layers[0]=reinterpret_cast<
+                            const XrCompositionLayerBaseHeader*>(
+                                &projection);
+                        layerCount=1;
+                    }
                 }
             }
 
