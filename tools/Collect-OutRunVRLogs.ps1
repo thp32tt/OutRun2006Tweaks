@@ -17,7 +17,23 @@ $base=Join-Path $root "logs/$matrix"
 $dest=Join-Path $base "$variant/$session"; New-Item -ItemType Directory -Force $dest|Out-Null
 $patterns=@('OutRun2006Tweaks*.log','outrun-vr-host*.log','outrun-vr-host-pipeline*.log','outrun-vr-watchdog*.log','backend*.log','*.dmp')
 $copied=@()
-foreach($p in $patterns){Get-ChildItem $root -Filter $p -File -ErrorAction SilentlyContinue|Where-Object{$_.LastWriteTimeUtc -ge $startedUtc}|ForEach-Object{Copy-Item $_.FullName $dest -Force;$copied+=$_.Name}}
+foreach($p in $patterns){
+    foreach($file in Get-ChildItem $root -Filter $p -File -ErrorAction SilentlyContinue){
+        if($file.LastWriteTimeUtc -lt $startedUtc -or $copied -contains $file.Name){continue}
+        $target=Join-Path $dest $file.Name
+        $prior=$state.PreexistingLogs|Where-Object{$_.Name -eq $file.Name}|Select-Object -First 1
+        if($prior -and $file.Extension -ieq '.log' -and $file.Length -ge [int64]$prior.Length){
+            if($file.Length -eq [int64]$prior.Length){continue}
+            $input=[IO.File]::Open($file.FullName,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite)
+            try{
+                [void]$input.Seek([int64]$prior.Length,[IO.SeekOrigin]::Begin)
+                $output=[IO.File]::Open($target,[IO.FileMode]::Create,[IO.FileAccess]::Write,[IO.FileShare]::None)
+                try{$input.CopyTo($output)}finally{$output.Dispose()}
+            }finally{$input.Dispose()}
+        }else{Copy-Item $file.FullName $target -Force}
+        $copied+=$file.Name
+    }
+}
 Copy-Item $active $dest -Force
 Copy-Item $sessionState $dest -Force
 $inputs=Join-Path $root 'BUILD_INPUTS.json'; if(Test-Path $inputs){Copy-Item $inputs $dest -Force}
@@ -26,6 +42,7 @@ $source=Join-Path $root "backends/$payloadBackend/SOURCE_SHA.txt"; $sha=if(Test-
 $configHash=if(Test-Path (Join-Path $root 'OutRun2006Tweaks.ini')){(Get-FileHash (Join-Path $root 'OutRun2006Tweaks.ini') -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
 @("VARIANT=$variant","BACKEND=$backend","SESSION=$session","SESSION_STARTED_UTC=$($startedUtc.ToString('o'))","BUILD_MATRIX=$matrix","SOURCE_SHA=$sha","CONFIG_SHA256=$configHash","FILES=$($copied -join ',')")|Set-Content (Join-Path $dest 'MANIFEST.txt') -Encoding UTF8
 @{SchemaVersion=1;VariantId=$variant;Backend=$backend;SessionId=$session;SessionStartedUtc=$startedUtc.ToString('o');BuildMatrixId=$matrix;GitSha=$sha;ConfigSha256=$configHash;CollectedAtUtc=(Get-Date).ToUniversalTime().ToString('o');CollectedFiles=$copied}|ConvertTo-Json -Depth 4|Set-Content (Join-Path $dest 'variant_manifest.json') -Encoding UTF8
-@('FPS=','HMD_SMOOTHNESS=','STEREO=','RECENTER=','HUD_RANK_SCORE=','SKY_CLOUD=','SMOKE_SKID=','MENU_CAR=','EXIT_YES_NO=','NOTES=')|Set-Content (Join-Path $dest 'TEST_RESULT.txt') -Encoding UTF8
+$resultFile=Join-Path $dest 'TEST_RESULT.txt'
+if(!(Test-Path $resultFile)){@('FPS=','HMD_SMOOTHNESS=','STEREO=','RECENTER=','HUD_RANK_SCORE=','SKY_CLOUD=','SMOKE_SKID=','MENU_CAR=','EXIT_YES_NO=','NOTES=')|Set-Content $resultFile -Encoding UTF8}
 if($All){$zip=Join-Path $root "OutRun2_VR_MATRIX_LOGS_${matrix}_${session}.zip"; if(Test-Path $zip){Remove-Item $zip -Force}; Compress-Archive -Path "$base/*" -DestinationPath $zip}else{$zip=Join-Path $root "OutRun2_VR_LOGS_${matrix}_${variant}_${session}.zip"; if(Test-Path $zip){Remove-Item $zip -Force}; Compress-Archive -Path "$dest/*" -DestinationPath $zip}
 Write-Host "Diagnostic archive: $zip"

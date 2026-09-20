@@ -147,6 +147,17 @@ Set-Content (Join-Path $root "ACTIVE_VR_BACKEND.txt") $activeText -Encoding asci
 
 $configHash = "missing"
 if (Test-Path $ini) { $configHash = (Get-FileHash $ini -Algorithm SHA256).Hash.ToLowerInvariant() }
+$preexistingLogs = @()
+foreach ($pattern in @('OutRun2006Tweaks*.log','outrun-vr-host*.log','outrun-vr-host-pipeline*.log','outrun-vr-watchdog*.log','backend*.log')) {
+    foreach ($file in Get-ChildItem $root -Filter $pattern -File -ErrorAction SilentlyContinue) {
+        if ($preexistingLogs.Name -contains $file.Name) { continue }
+        $preexistingLogs += [ordered]@{
+            Name = $file.Name
+            Length = $file.Length
+            LastWriteUtc = $file.LastWriteTimeUtc.ToString("o")
+        }
+    }
+}
 $sessionManifest = [ordered]@{
     SchemaVersion = 1
     BuildMatrixId = $matrix
@@ -156,9 +167,10 @@ $sessionManifest = [ordered]@{
     StartedUtc = $startedUtc.ToString("o")
     ConfigSha256 = $configHash
     CollectionStatus = "started-before-game-launch"
+    PreexistingLogs = $preexistingLogs
 }
-$sessionManifest | ConvertTo-Json | Set-Content (Join-Path $root "CURRENT_VR_SESSION.json") -Encoding UTF8
-$sessionManifest | ConvertTo-Json | Set-Content (Join-Path $sessionRoot "session_manifest.json") -Encoding UTF8
+$sessionManifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $root "CURRENT_VR_SESSION.json") -Encoding UTF8
+$sessionManifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $sessionRoot "session_manifest.json") -Encoding UTF8
 
 if (Test-Path $ini) {
     $allowed = '^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor)\s*='

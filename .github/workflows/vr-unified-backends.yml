@@ -296,6 +296,7 @@ jobs:
         shell: pwsh
         run: |
           Copy-Item package package-smoke -Recurse
+          Set-Content package-smoke/OutRun2006Tweaks-session.log 'old-before-session'
           foreach ($mode in @('2d','d3d9','dxvk-safe','dxvk','dx12')) {
             & package-smoke/Select-OutRunVRBackend.ps1 -Backend $mode
             $active = Get-Content package-smoke/ACTIVE_VR_BACKEND.txt -Raw
@@ -310,6 +311,12 @@ jobs:
               'dx12' { if ((Test-Path package-smoke/d3d9.dll) -or (Test-Path package-smoke/multiviewpatcher.dll)) { throw 'DX12 STRICT retained DXVK files' } }
             }
             if (-not (Test-Path package-smoke/CURRENT_VR_SESSION.json)) { throw "Session identity missing for $mode" }
+            Add-Content package-smoke/OutRun2006Tweaks-session.log "new-$mode"
+            & package-smoke/Collect-OutRunVRLogs.ps1
+            $sessionState = Get-Content package-smoke/CURRENT_VR_SESSION.json -Raw | ConvertFrom-Json
+            $collectedLog = Join-Path package-smoke ("logs/{0}/{1}/{2}/OutRun2006Tweaks-session.log" -f $sessionState.BuildMatrixId,$sessionState.VariantId,$sessionState.SessionId)
+            $sessionText = Get-Content $collectedLog -Raw
+            if ($sessionText -notmatch "new-$mode" -or $sessionText -match 'old-before-session') { throw "Session log isolation failed for $mode" }
           }
           $zip = Get-ChildItem OutRun2_VR_UNIFIED_*.zip | Select-Object -First 1
           Expand-Archive $zip.FullName zip-verify
