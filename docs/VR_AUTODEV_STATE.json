@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedUtc": "2026-09-20T17:11:30Z",
+  "updatedUtc": "2026-09-20T18:00:50Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -69,5 +69,13 @@
     "artifactId": 10609329194,
     "artifactDigest": "sha256:a21825389f0731ffc62dc23314a1415261bf05fcdf07f4accd4d92a0aa46e630"
   },
-  "nextAction": "Runtime test P1 first on Quest 3/VDXR, then P2 and P3; use P4 only as conservative fallback. Upload each auto-collected DX9EX_LOG ZIP. Select the reference only from identical-scene runtime evidence."
+  "nextAction": "Runtime test P1 first on Quest 3/VDXR, then P2 and P3; use P4 only as conservative fallback. Upload each auto-collected DX9EX_LOG ZIP. Select the reference only from identical-scene runtime evidence.",
+  "scheduledRunHistory": {
+    "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
+    "lastRunId": "RUN-0001",
+    "lastEntryStartKst": "2026-09-21T02:59:17+09:00",
+    "historyCommitSha": "035e061e9331867d993d983e1c4bdb514b12e2f3",
+    "result": "NO MATERIAL CHANGE / NO BUILD NEEDED",
+    "nextAction": "Runtime test P1 first on Quest 3/VDXR, then P2 and P3; use P4 only as conservative fallback. Upload each auto-collected DX9EX_LOG ZIP. Select the reference only from identical-scene runtime evidence."
+  }
 }
