@@ -23,6 +23,7 @@
 #include <utility>
 
 #include "dx12_pose_writer.hpp"
+#include "dx12_host_log.hpp"
 #include "dx12_frame_meta_reader.hpp"
 #include "dx12_transport_consumer.hpp"
 
@@ -980,6 +981,7 @@ float4 PSMain(GSOut input) : SV_Target
 
 int main()
 {
+    OutRunVRHostDX12::ScopedHostLog hostLog;
     try
     {
         std::cout<<"OutRun2 native OpenXR D3D12 host "
