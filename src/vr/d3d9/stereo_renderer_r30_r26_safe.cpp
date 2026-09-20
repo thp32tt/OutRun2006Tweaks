@@ -95,6 +95,10 @@ namespace OutRunVRStereo
         std::uint64_t R44OverlayOwnedWvpGroupHits = 0;
         std::uint64_t R44SpatialBillboardClassifications = 0;
         std::uint64_t R44FlatOverlayClassifications = 0;
+        std::uint64_t R47SmallAlphaCandidates = 0;
+        std::uint64_t R47SmallAlphaHudPromotions = 0;
+        std::uint64_t R47SmallAlphaCommonPromotions = 0;
+        std::uint64_t R47SmallAlphaRejectedByMatrix = 0;
         std::uint64_t R30XyzrhwRhwWorldPromotions = 0;
         std::uint64_t R30XyzrhwRhwOnlyDepthEvidence = 0;
         std::uint64_t R30XyzrhwZOnlyDepthEvidence = 0;
@@ -1114,7 +1118,7 @@ namespace OutRunVRStereo
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(
-                "VR R41: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R41: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] r47small[candidates={},hud={},common={},matrixReject={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
@@ -1131,6 +1135,9 @@ namespace OutRunVRStereo
                 R44OverlayOwnedWvpHits, R44OverlayOwnedWvpGroupHits,
                 R44SpatialBillboardClassifications,
                 R44FlatOverlayClassifications,
+                R47SmallAlphaCandidates, R47SmallAlphaHudPromotions,
+                R47SmallAlphaCommonPromotions,
+                R47SmallAlphaRejectedByMatrix,
                 R30SkyGlowFrames, R30SkyGlowFailures,
                 R30SkyGlow.factor, R30SkyGlow.glowWidth,
                 R30SkyGlow.glowHeight);
@@ -1395,8 +1402,26 @@ namespace OutRunVRStereo
             return R44OverlayMatrixKind::Unknown;
         }
 
+        constexpr UINT R47SmallAlphaPrimitiveLimit() noexcept
+        {
+#if defined(OUTRUN_VR_SMALL_ALPHA_LIMIT_2)
+            return 2u;
+#elif defined(OUTRUN_VR_SMALL_ALPHA_LIMIT_4)
+            return 4u;
+#elif defined(OUTRUN_VR_SMALL_ALPHA_LIMIT_8)
+            return 8u;
+#elif defined(OUTRUN_VR_SMALL_ALPHA_LIMIT_16)
+            return 16u;
+#elif defined(OUTRUN_VR_SMALL_ALPHA_LIMIT_32)
+            return 32u;
+#else
+            return 0u;
+#endif
+        }
+
         R30ScreenSpaceKind R30ClassifyScreenSpacePass(
-            IDirect3DDevice9* device) noexcept
+            IDirect3DDevice9* device, D3DPRIMITIVETYPE primitiveType,
+            UINT primitiveCount) noexcept
         {
             if (!device || !TargetIsBackBuffer())
                 return R30ScreenSpaceKind::None;
@@ -1433,6 +1458,44 @@ namespace OutRunVRStereo
                 alphaBlend != FALSE || alphaTest != FALSE;
             if (!alphaLike)
                 return R30ScreenSpaceKind::None;
+
+            const UINT smallLimit = R47SmallAlphaPrimitiveLimit();
+            const bool triangleLike =
+                primitiveType == D3DPT_TRIANGLELIST ||
+                primitiveType == D3DPT_TRIANGLESTRIP ||
+                primitiveType == D3DPT_TRIANGLEFAN;
+            const bool smallAlphaCandidate =
+                smallLimit != 0u && triangleLike &&
+                primitiveCount > 0u && primitiveCount <= smallLimit;
+            if (smallAlphaCandidate)
+            {
+                ++R47SmallAlphaCandidates;
+#if defined(OUTRUN_VR_SMALL_ALPHA_ANYZ_MATRIX)
+                float liveWvp[16]{};
+                if (SUCCEEDED(device->GetVertexShaderConstantF(
+                        OutRunWvpRegister, liveWvp,
+                        OutRunWvpRegisterCount)) &&
+                    R44ClassifyOwnedOverlayMatrix(liveWvp) ==
+                        R44OverlayMatrixKind::FlatHud)
+                {
+                    ++R47SmallAlphaHudPromotions;
+                    return R30ScreenSpaceKind::PerspectiveHud;
+                }
+                ++R47SmallAlphaRejectedByMatrix;
+#elif defined(OUTRUN_VR_SMALL_ALPHA_COMMON)
+                if (zEnable == D3DZB_FALSE)
+                {
+                    ++R47SmallAlphaCommonPromotions;
+                    return R30ScreenSpaceKind::FlatEffectHud;
+                }
+#elif defined(OUTRUN_VR_SMALL_ALPHA_HUD)
+                if (zEnable == D3DZB_FALSE)
+                {
+                    ++R47SmallAlphaHudPromotions;
+                    return R30ScreenSpaceKind::PerspectiveHud;
+                }
+#endif
+            }
 
             // Focused R13-flat experiment. R13 runs below R30 and masks the
             // vertex-shader identity for depth-off/two-sided alpha draws, then
@@ -3323,14 +3386,16 @@ namespace OutRunVRStereo
 
         template <typename ActualDraw>
         HRESULT R30TryScreenSpaceFovDraw(
-            IDirect3DDevice9* device, ActualDraw&& actualDraw,
+            IDirect3DDevice9* device, D3DPRIMITIVETYPE primitiveType,
+            UINT primitiveCount, ActualDraw&& actualDraw,
             const char* site)
         {
             if (!R30SafeStereoBase(device))
                 return E_NOTIMPL;
 
             const R30ScreenSpaceKind screenKind =
-                R30ClassifyScreenSpacePass(device);
+                R30ClassifyScreenSpacePass(
+                    device, primitiveType, primitiveCount);
             if (screenKind == R30ScreenSpaceKind::None)
                 return E_NOTIMPL;
 
@@ -3515,11 +3580,13 @@ namespace OutRunVRStereo
 
         template <typename ActualDraw, typename R29Draw>
         HRESULT R30GuardScreenSpace(IDirect3DDevice9* device,
+            D3DPRIMITIVETYPE primitiveType, UINT primitiveCount,
             ActualDraw&& actualDraw, R29Draw&& r29Draw,
             const char* site)
         {
             const HRESULT hr = R30TryScreenSpaceFovDraw(
-                device, std::forward<ActualDraw>(actualDraw), site);
+                device, primitiveType, primitiveCount,
+                std::forward<ActualDraw>(actualDraw), site);
             if (hr != E_NOTIMPL)
                 return hr;
             ++R30ScreenSpaceFallbacks;
@@ -3543,7 +3610,8 @@ namespace OutRunVRStereo
                     device, type, startVertex, primitiveCount);
             };
             return R30GuardScreenSpace(
-                device, actual, r29, "R30/DrawPrimitive");
+                device, type, primitiveCount,
+                actual, r29, "R30/DrawPrimitive");
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveDestR30(
@@ -3568,7 +3636,8 @@ namespace OutRunVRStereo
                     primitiveCount);
             };
             return R30GuardScreenSpace(
-                device, actual, r29, "R30/DrawIndexedPrimitive");
+                device, type, primitiveCount,
+                actual, r29, "R30/DrawIndexedPrimitive");
         }
 
         HRESULT __stdcall DrawPrimitiveUPDestR30(
@@ -3589,7 +3658,8 @@ namespace OutRunVRStereo
                     device, type, primitiveCount, data, stride);
             };
             return R30GuardScreenSpace(
-                device, actual, r29, "R30/DrawPrimitiveUP");
+                device, type, primitiveCount,
+                actual, r29, "R30/DrawPrimitiveUP");
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveUPDestR30(
@@ -3615,7 +3685,8 @@ namespace OutRunVRStereo
                     indexData, indexFormat, vertexData, stride);
             };
             return R30GuardScreenSpace(
-                device, actual, r29, "R30/DrawIndexedPrimitiveUP");
+                device, type, primitiveCount,
+                actual, r29, "R30/DrawIndexedPrimitiveUP");
         }
 
         void R30RollbackHooks() noexcept
