@@ -9,7 +9,7 @@
 
 #include "hook_mgr.hpp"
 #include "game_addrs.hpp"
-#include "d3d12/d3d9on12_compat.hpp"
+#include "../d3d12/d3d9on12_compat.hpp"
 
 namespace OutRunVRDeviceProbe
 {
