@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "role": "B",
+  "runId": "B-20260921T0818KST-compliance",
+  "startedKst": "2026-09-21T08:18:00+09:00",
+  "completedKst": "2026-09-21T08:29:00+09:00",
+  "baseSha": "e5e35f483cf7f8d36f99a87807ba6cb9d4b7eccd",
+  "findingIds": ["DX9EX-COMPLIANCE-001"],
+  "sourceReviewRun": "A-20260921T070113KST-dx9fp",
+  "candidateBranch": "vr-d3d9ex-candidate/DX9EX-COMPLIANCE-001-B-20260921T0818KST",
+  "candidateSha": "d8d8982cd18da6d7e0f3fb33ad6a9d56ff8887c7",
+  "changedPaths": [".github/workflows/vr-dx9ex-active.yml"],
+  "runtimeCandidate": false,
+  "testLevel": "LEVEL0",
+  "implementation": [
+    "Added a separate same-SHA GPL compliance companion artifact to DX9Ex Active Validation.",
+    "Compliance payload contains COPYING.GPL3, LICENSE.md, LICENSE-3DMIGOTO-GPL-3.0.txt, THIRD_PARTY_GPL_NOTICES.txt, adapted shader_fingerprint_gpl.hpp, SOURCE_SHA.txt and COMPLIANCE_MANIFEST.json.",
+    "Package job now depends on compliance success so a runtime artifact cannot complete without its companion compliance artifact.",
+    "Runtime tester ZIP remains lean; compliance material is not copied into the tester ZIP."
+  ],
+  "ci": {
+    "workflow": "DX9Ex Active Validation",
+    "trigger": "candidate branch push",
+    "status": "trigger-requested-by-push; run id not yet visible at first post-push check",
+    "artifactExpected": "OutRun2-VR-DX9EX-COMPLIANCE-<candidate-sha>"
+  },
+  "evidenceLevel": "IMPLEMENTED_NEEDS_VALIDATION",
+  "blockers": [],
+  "retryCount": 0,
+  "nextAction": "C validates the immutable candidate SHA and workflow run when visible: policy, compliance payload exact same SHA, required files/adapted source, host/game/package success, and both runtime + compliance artifacts. D integrates only after C marks VALIDATED.",
+  "slotUtilization": {
+    "subBatches": [
+      "Recovered integration state and queue",
+      "Verified VR-HOST-002 CI already succeeded and left it to C/D ownership",
+      "Consumed completed A review DX9EX-COMPLIANCE-001",
+      "Inspected active workflow and repository compliance inputs",
+      "Implemented isolated workflow-only compliance companion candidate",
+      "Triggered candidate CI by branch push",
+      "Persisted immutable B handoff"
+    ],
+    "fallbackStagesAttempted": ["READY B item from completed A handoff", "workflow/CI candidate"],
+    "earlyFinishReason": "A newer 07:29 review remained explicitly IN_PROGRESS and instructed B not to consume its proposed fixes until COMPLETE; after publishing this independent LEVEL0 candidate, further production candidates would risk racing incomplete A evidence."
+  }
+}
