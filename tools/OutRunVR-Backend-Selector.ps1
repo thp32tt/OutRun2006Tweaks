@@ -231,7 +231,7 @@ $logInfo.Location = New-Object System.Drawing.Point(44,505)
 $form.Controls.Add($logInfo)
 
 $captureInfo = New-Object System.Windows.Forms.Label
-$captureInfo.Text = "VR 진단 캡처는 별도 저부하 기능으로 단계 적용 중이며, 기존 F11 Overlay는 유지합니다."
+$captureInfo.Text = "VR 진단 캡처: 게임 중 Ctrl+F9. 약 10초 전 + 2초 후 텔레메트리를 저장하며 F11 Overlay/F12 recenter는 유지합니다."
 $captureInfo.Font = New-Object System.Drawing.Font("Segoe UI",9)
 $captureInfo.AutoSize = $false
 $captureInfo.Size = New-Object System.Drawing.Size(430,42)
