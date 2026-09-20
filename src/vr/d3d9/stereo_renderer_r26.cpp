@@ -172,6 +172,95 @@ namespace OutRunVRStereo
             return hr;
         }
 
+        // Comparison-only compatibility gate restored from the e20/R28
+        // hardware-good path. Current production R46 remains fail-closed on
+        // shader-epoch changes; C1/C2/P4 explicitly opt into this stricter
+        // historical experiment so we can isolate the regression without
+        // changing the production path.
+        bool R28CanRebindVerifiedWorld(IDirect3DDevice9* device,
+            std::uintptr_t& verifiedShaderIdentity,
+            std::uint64_t& verifiedShaderSerial) noexcept
+        {
+            verifiedShaderIdentity = 0;
+            verifiedShaderSerial = 0;
+            if (!IsGameDevice(device) || InternalStereoPass ||
+                !TargetIsBackBuffer() || !StereoWanted() || !R9StereoSeeded)
+                return false;
+            if (AnyAuxRenderTargetActive() || R13ForceMonoShadow ||
+                OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire) ||
+                ActiveOcclusionQueries.load(std::memory_order_acquire) > 0)
+                return false;
+            if (CurrentVertexShaderIdentity.load(std::memory_order_acquire) == 0)
+                return false;
+            if (!OutRunVRRenderer::R28PerspectiveWorldSemantic())
+            {
+                ++R28RebindSemanticReject;
+                return false;
+            }
+
+            float verified[16]{};
+            std::uint32_t generation = 0;
+            std::uint32_t poseSequence = 0;
+            std::uintptr_t storedShader = 0;
+            std::uint64_t storedSerial = 0;
+            if (!OutRunVRRenderer::GetLastVerifiedWvp(verified, generation,
+                    poseSequence, storedShader, storedSerial))
+            {
+                ++R28RebindNoVerified;
+                return false;
+            }
+
+            std::uintptr_t currentShader = 0;
+            std::uint64_t currentSerial = 0;
+            if (!GetCurrentShaderEpoch(currentShader, currentSerial))
+                return false;
+            if (currentShader == storedShader && currentSerial == storedSerial)
+                return false;
+
+            OutRunVRRenderer::LatchedStereoFrame stereo{};
+            if (!OutRunVRRenderer::GetLatchedStereoFrame(stereo) ||
+                generation == 0 || poseSequence == 0 ||
+                poseSequence != stereo.poseSequence)
+            {
+                ++R28RebindPoseReject;
+                return false;
+            }
+
+            float current[16]{};
+            if (FAILED(device->GetVertexShaderConstantF(
+                    OutRunWvpRegister, current, OutRunWvpRegisterCount)) ||
+                !FloatArrayNear(current, verified, 16, VerifiedWvpEpsilon))
+            {
+                ++R28RebindConstantMismatch;
+                return false;
+            }
+
+            float verifiedProjection[16]{};
+            std::uint32_t projectionGeneration = 0;
+            std::uint32_t projectionPoseSequence = 0;
+            if (!OutRunVRRenderer::GetR28VerifiedProjection(verifiedProjection,
+                    projectionGeneration, projectionPoseSequence) ||
+                projectionGeneration != generation ||
+                projectionPoseSequence != poseSequence)
+            {
+                ++R28RebindProjectionMismatch;
+                return false;
+            }
+
+            D3DMATRIX currentProjection{};
+            if (!ReadProjection(currentProjection) ||
+                !FloatArrayNear(reinterpret_cast<const float*>(&currentProjection),
+                    verifiedProjection, 16, VerifiedWvpEpsilon))
+            {
+                ++R28RebindProjectionMismatch;
+                return false;
+            }
+
+            verifiedShaderIdentity = storedShader;
+            verifiedShaderSerial = storedSerial;
+            return true;
+        }
+
         template <typename R9Draw>
         HRESULT R28RunWithVerifiedWorldEpoch(IDirect3DDevice9* device,
             R9Draw&&)
