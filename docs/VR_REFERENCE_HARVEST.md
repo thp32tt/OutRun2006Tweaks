@@ -139,4 +139,15 @@ Only after this extraction and a Quest/VDXR smoke run should the wire protocol m
 
 ## License boundary
 
-GPL or otherwise incompatible reference implementations are used only for observable behavior, algorithms, failure cases and architecture comparison. Their code is not copied into this fork. Permissively licensed code may be imported only after its exact license and attribution requirements are recorded with the import.
+The policy differs by branch:
+
+- `vr-openxr` keeps the previous no-GPL-source-copy boundary unless separately changed.
+- `vr-openxr-gpl-reuse` may import GPL/LGPL source when the imported file is clearly identified, its upstream attribution is preserved, the exact license is recorded, and the combined branch is distributed under compatible GPL terms.
+- Existing MIT-covered OutRun2006Tweaks material retains its original MIT notice and permissions.
+
+### Imported GPL source ledger
+
+- **3Dmigoto / GPLv3:** `src/vr/d3d9/shader_fingerprint_gpl.hpp` adapts the D3D9 shader-bytecode fingerprint approach and FNV-1 64-bit buffer hash from 3Dmigoto's `DirectX9/Direct3DDevice9Functions.h` and `util.h`. It is used only for opt-in diagnostics and does not alter draw output.
+- Full GPLv3 terms are stored in `COPYING.GPL3`.
+
+Further GPL/LGPL imports must be added to this ledger before release.
