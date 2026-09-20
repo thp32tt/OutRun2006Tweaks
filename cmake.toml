@@ -213,6 +213,17 @@ endif()
 unset(_vr_source)
 unset(_vr_header_only)
 
+# Focused white-overlay regression experiments. These are only used by
+# vr-d3d9ex-white-overlay-test with the R26+R30 HUD owner.
+option(OUTRUN_VR_WHITE_PERSPECTIVE_COMMON "Make PerspectiveHud use identical world-locked clip transform in both eyes" OFF)
+option(OUTRUN_VR_WHITE_XYZRHW_COMMON "Make non-world XYZRHW HUD use identical world-locked projection in both eyes" OFF)
+if(OUTRUN_VR_WHITE_PERSPECTIVE_COMMON)
+    add_compile_definitions(OUTRUN_VR_WHITE_PERSPECTIVE_COMMON=1)
+endif()
+if(OUTRUN_VR_WHITE_XYZRHW_COMMON)
+    add_compile_definitions(OUTRUN_VR_WHITE_XYZRHW_COMMON=1)
+endif()
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 
