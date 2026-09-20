@@ -18,11 +18,21 @@ namespace OutRunVRStereo
     {
         constexpr std::size_t R22SetViewportVtableIndex = 47;
         constexpr std::size_t R22SetRenderStateVtableIndex = 57;
+        constexpr std::size_t R22CreateStateBlockVtableIndex = 59;
+        constexpr std::size_t R22BeginStateBlockVtableIndex = 60;
+        constexpr std::size_t R22EndStateBlockVtableIndex = 61;
         constexpr std::size_t R22SetScissorRectVtableIndex = 75;
+        constexpr std::size_t R22StateBlockApplyVtableIndex = 5;
 
         SafetyHookInline R22SetViewportHook{};
         SafetyHookInline R22SetRenderStateHook{};
         SafetyHookInline R22SetScissorRectHook{};
+        SafetyHookInline R22CreateStateBlockHook{};
+        SafetyHookInline R22BeginStateBlockHook{};
+        SafetyHookInline R22EndStateBlockHook{};
+        SafetyHookInline R22StateBlockApplyHook{};
+        void* R22StateBlockApplyTarget = nullptr;
+        std::atomic<bool> R22StateBlockTrackingReliable{ false };
         SafetyHookInline R22ResetR13Hook{};
         SafetyHookInline R22ClearR20Hook{};
         SafetyHookInline R22DrawPrimitiveR9Hook{};
@@ -114,6 +124,132 @@ namespace OutRunVRStereo
             }
             R22ShadowState = captured;
             return true;
+        }
+
+        void R22ResynchronizeShaderEpoch(IDirect3DDevice9* device) noexcept
+        {
+            IDirect3DVertexShader9* shader = nullptr;
+            const HRESULT hr = device
+                ? device->GetVertexShader(&shader) : D3DERR_INVALIDCALL;
+            const std::uintptr_t identity = SUCCEEDED(hr)
+                ? reinterpret_cast<std::uintptr_t>(shader) : 0;
+            if (shader) shader->Release();
+            const std::uintptr_t previous =
+                CurrentVertexShaderIdentity.exchange(
+                    identity, std::memory_order_acq_rel);
+            if (previous != identity)
+            {
+                std::uint64_t serial =
+                    VertexShaderSerial.fetch_add(1, std::memory_order_acq_rel) + 1;
+                if (serial == 0)
+                    VertexShaderSerial.fetch_add(1, std::memory_order_acq_rel);
+            }
+        }
+
+        void R22InvalidateAfterStateBlockApply(
+            IDirect3DDevice9* device) noexcept
+        {
+            R22ShadowState = {};
+            InvalidateTrackedRenderStates();
+            R22ResynchronizeShaderEpoch(device);
+            // Re-prime once at the Apply boundary instead of paying
+            // GetViewport/GetScissorRect/GetRenderState on subsequent draws.
+            if (!R22PrimeShadowState(device))
+                R22StateBlockTrackingReliable.store(
+                    false, std::memory_order_release);
+        }
+
+        HRESULT __stdcall R22StateBlockApplyDest(IDirect3DStateBlock9* block)
+        {
+            const HRESULT hr =
+                R22StateBlockApplyHook.stdcall<HRESULT>(block);
+            IDirect3DDevice9* device = nullptr;
+            if (block && SUCCEEDED(block->GetDevice(&device)) && device)
+            {
+                if (IsGameDevice(device) && SUCCEEDED(hr))
+                    R22InvalidateAfterStateBlockApply(device);
+                device->Release();
+            }
+            else
+            {
+                R22StateBlockTrackingReliable.store(
+                    false, std::memory_order_release);
+            }
+            return hr;
+        }
+
+        bool R22EnsureStateBlockApplyHook(
+            IDirect3DStateBlock9* block) noexcept
+        {
+            if (!block)
+                return false;
+            void** vtable = *reinterpret_cast<void***>(block);
+            if (!vtable)
+                return false;
+            void* target = vtable[R22StateBlockApplyVtableIndex];
+            if (R22StateBlockApplyHook)
+            {
+                const bool same = R22StateBlockApplyTarget == target;
+                if (!same)
+                    R22StateBlockTrackingReliable.store(
+                        false, std::memory_order_release);
+                return same;
+            }
+            R22StateBlockApplyHook = safetyhook::create_inline(
+                target, R22StateBlockApplyDest,
+                safetyhook::InlineHook::StartDisabled);
+            if (!R22StateBlockApplyHook ||
+                !R22StateBlockApplyHook.enable().has_value())
+            {
+                R22StateBlockApplyHook = {};
+                R22StateBlockApplyTarget = nullptr;
+                R22StateBlockTrackingReliable.store(
+                    false, std::memory_order_release);
+                return false;
+            }
+            R22StateBlockApplyTarget = target;
+            R22StateBlockTrackingReliable.store(
+                true, std::memory_order_release);
+            spdlog::info(
+                "VR R46 STATE: StateBlock::Apply interception proven; viewport/scissor/render-state caches invalidate at Apply boundary");
+            return true;
+        }
+
+        HRESULT __stdcall CreateStateBlockDestR22(IDirect3DDevice9* device,
+            D3DSTATEBLOCKTYPE type, IDirect3DStateBlock9** block)
+        {
+            const HRESULT hr = R22CreateStateBlockHook.stdcall<HRESULT>(
+                device, type, block);
+            if (SUCCEEDED(hr) && IsGameDevice(device) && block && *block)
+                R22EnsureStateBlockApplyHook(*block);
+            return hr;
+        }
+
+        HRESULT __stdcall BeginStateBlockDestR22(IDirect3DDevice9* device)
+        {
+            const HRESULT hr =
+                R22BeginStateBlockHook.stdcall<HRESULT>(device);
+            if (SUCCEEDED(hr) && IsGameDevice(device) && !InternalStereoPass)
+            {
+                R22ShadowState = {};
+                InvalidateTrackedRenderStates();
+            }
+            return hr;
+        }
+
+        HRESULT __stdcall EndStateBlockDestR22(IDirect3DDevice9* device,
+            IDirect3DStateBlock9** block)
+        {
+            const HRESULT hr =
+                R22EndStateBlockHook.stdcall<HRESULT>(device, block);
+            if (IsGameDevice(device) && !InternalStereoPass)
+            {
+                R22ShadowState = {};
+                InvalidateTrackedRenderStates();
+                if (SUCCEEDED(hr) && block && *block)
+                    R22EnsureStateBlockApplyHook(*block);
+            }
+            return hr;
         }
 
         bool R22SnapshotShadowedGameState(IDirect3DDevice9* device,
@@ -549,6 +685,12 @@ namespace OutRunVRStereo
             R22SetViewportHook = {};
             R22SetRenderStateHook = {};
             R22SetScissorRectHook = {};
+            R22CreateStateBlockHook = {};
+            R22BeginStateBlockHook = {};
+            R22EndStateBlockHook = {};
+            R22StateBlockApplyHook = {};
+            R22StateBlockApplyTarget = nullptr;
+            R22StateBlockTrackingReliable.store(false, std::memory_order_release);
             R22ResetR13Hook = {};
             R22ClearR20Hook = {};
             R22DrawPrimitiveR9Hook = {};
@@ -650,6 +792,37 @@ namespace OutRunVRStereo
                     }
 
                     R22PrimeShadowState(device);
+
+                    // StateBlock coverage is a performance/correctness
+                    // optimization, not a prerequisite for stereo. If these
+                    // optional hooks cannot be armed, R23 keeps its periodic
+                    // live-state validation fallback.
+                    R22CreateStateBlockHook = safetyhook::create_inline(
+                        vtable[R22CreateStateBlockVtableIndex],
+                        CreateStateBlockDestR22, disabled);
+                    R22BeginStateBlockHook = safetyhook::create_inline(
+                        vtable[R22BeginStateBlockVtableIndex],
+                        BeginStateBlockDestR22, disabled);
+                    R22EndStateBlockHook = safetyhook::create_inline(
+                        vtable[R22EndStateBlockVtableIndex],
+                        EndStateBlockDestR22, disabled);
+                    const bool stateBlockHooks =
+                        R22CreateStateBlockHook && R22BeginStateBlockHook &&
+                        R22EndStateBlockHook &&
+                        R22EndStateBlockHook.enable().has_value() &&
+                        R22BeginStateBlockHook.enable().has_value() &&
+                        R22CreateStateBlockHook.enable().has_value();
+                    if (!stateBlockHooks)
+                    {
+                        R22CreateStateBlockHook = {};
+                        R22BeginStateBlockHook = {};
+                        R22EndStateBlockHook = {};
+                        R22StateBlockTrackingReliable.store(
+                            false, std::memory_order_release);
+                        spdlog::warn(
+                            "VR R46 STATE: StateBlock creation hooks unavailable; periodic live raster validation retained");
+                    }
+
                     R22InstallState.store(State::Ready, std::memory_order_release);
                     spdlog::info(
                         "VR R22 GAME: shadow-tracked viewport/scissor replay + common initial depth baseline + R21 eligibility gate ACTIVE");
