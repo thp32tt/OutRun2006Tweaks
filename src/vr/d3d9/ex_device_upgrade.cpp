@@ -537,12 +537,10 @@ namespace OutRunVRD3D9ExUpgrade
             ClearClassicBaseline();
         }
 
-        bool InstallManagedResourceCompat(IDirect3DDevice9Ex* deviceEx)
+        bool InstallManagedResourceCompat(IDirect3DDevice9* baseDevice)
         {
-            if (!deviceEx)
+            if (!baseDevice)
                 return false;
-
-            auto* baseDevice = static_cast<IDirect3DDevice9*>(deviceEx);
             IDirect3DDevice9* const existing =
                 CompatDevice.load(std::memory_order_acquire);
             if (existing && existing != baseDevice)
@@ -747,29 +745,71 @@ namespace OutRunVRD3D9ExUpgrade
                     fullscreenPtr = &fullscreen;
                 }
 
-                IDirect3DDevice9Ex* deviceEx = nullptr;
-                const HRESULT hr = ex_ ? ex_->CreateDeviceEx(
+                const D3DPRESENT_PARAMETERS originalParams = *params;
+                D3DPRESENT_PARAMETERS attemptedParams = originalParams;
+                IDirect3DDevice9* baseDevice = nullptr;
+                HRESULT hr = ex_ ? ex_->CreateDevice(
                     adapter, type, focusWindow, behaviorFlags,
-                    params, fullscreenPtr, &deviceEx) : E_POINTER;
+                    &attemptedParams, &baseDevice) : E_POINTER;
 
                 spdlog::info(
-                    "VR DX12 STRICT: CreateDeviceEx returned hr=0x{:08X} device={:p}",
-                    static_cast<unsigned>(hr), fmt::ptr(deviceEx));
+                    "VR DX12 STRICT: D3D9On12 base CreateDevice returned hr=0x{:08X} device={:p} count={} interval={} window={:p}",
+                    static_cast<unsigned>(hr), fmt::ptr(baseDevice),
+                    attemptedParams.BackBufferCount,
+                    attemptedParams.PresentationInterval,
+                    fmt::ptr(attemptedParams.hDeviceWindow));
 
-                if (FAILED(hr) || !deviceEx)
+                // D3D9On12 must preserve the legacy CreateDevice contract. If
+                // the runtime rejects OutRun's double-buffer/window parameters,
+                // retry once with the smallest compatibility normalization while
+                // staying on the same D3D9On12 provider (never native D3D9).
+                if (FAILED(hr) || !baseDevice)
+                {
+                    if (baseDevice)
+                    {
+                        baseDevice->Release();
+                        baseDevice = nullptr;
+                    }
+                    D3DPRESENT_PARAMETERS safe = originalParams;
+                    if (safe.Windowed)
+                    {
+                        safe.FullScreen_RefreshRateInHz = 0;
+                        if (!safe.hDeviceWindow)
+                            safe.hDeviceWindow = focusWindow;
+                    }
+                    if (safe.BackBufferCount > 1)
+                        safe.BackBufferCount = 1;
+                    safe.PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;
+
+                    spdlog::warn(
+                        "VR DX12 STRICT: retrying D3D9On12 CreateDevice with compatibility presentation count={} interval={} window={:p}",
+                        safe.BackBufferCount,
+                        safe.PresentationInterval,
+                        fmt::ptr(safe.hDeviceWindow));
+
+                    hr = ex_ ? ex_->CreateDevice(
+                        adapter, type, focusWindow, behaviorFlags,
+                        &safe, &baseDevice) : E_POINTER;
+                    attemptedParams = safe;
+                    spdlog::info(
+                        "VR DX12 STRICT: compatibility CreateDevice returned hr=0x{:08X} device={:p}",
+                        static_cast<unsigned>(hr), fmt::ptr(baseDevice));
+                }
+
+                if (FAILED(hr) || !baseDevice)
                 {
                     if (!FirstDeviceFailureLogged.exchange(true))
                         spdlog::error(
-                            "VR DX12 STRICT FAIL stage=CreateDeviceEx hr=0x{:08X} adapter={} type={} flags=0x{:08X}; D3D9Ex/classic fallback REMOVED",
+                            "VR DX12 STRICT FAIL stage=CreateDeviceOn12 hr=0x{:08X} adapter={} type={} flags=0x{:08X}; native D3D9 fallback remains disabled",
                             static_cast<unsigned>(hr), adapter,
                             static_cast<unsigned>(type),
                             static_cast<unsigned>(behaviorFlags));
-                    if (deviceEx) deviceEx->Release();
+                    if (baseDevice) baseDevice->Release();
                     return FAILED(hr) ? hr : E_FAIL;
                 }
 
                 IDirect3DDevice9On12* on12 = nullptr;
-                const HRESULT on12Qi = deviceEx->QueryInterface(
+                const HRESULT on12Qi = baseDevice->QueryInterface(
                     __uuidof(IDirect3DDevice9On12),
                     reinterpret_cast<void**>(&on12));
                 if (FAILED(on12Qi) || !on12)
@@ -778,7 +818,7 @@ namespace OutRunVRD3D9ExUpgrade
                         "VR DX12 STRICT FAIL stage=VerifyOn12 reason=IDirect3DDevice9On12-QI hr=0x{:08X}; refusing non-D3D9On12 device",
                         static_cast<unsigned>(on12Qi));
                     if (on12) on12->Release();
-                    deviceEx->Release();
+                    baseDevice->Release();
                     return FAILED(on12Qi) ? on12Qi : E_NOINTERFACE;
                 }
 
@@ -793,7 +833,7 @@ namespace OutRunVRD3D9ExUpgrade
                         static_cast<unsigned>(d12Hr));
                     if (underlying12) underlying12->Release();
                     on12->Release();
-                    deviceEx->Release();
+                    baseDevice->Release();
                     return FAILED(d12Hr) ? d12Hr : E_NOINTERFACE;
                 }
 
@@ -807,15 +847,19 @@ namespace OutRunVRD3D9ExUpgrade
                 underlying12->Release();
                 on12->Release();
 
-                if (!InstallManagedResourceCompat(deviceEx))
+                if (!InstallManagedResourceCompat(baseDevice))
                 {
                     spdlog::error(
-                        "VR DX12 STRICT FAIL stage=CompatInstall reason=managed-resource-compat-install-failed; D3D9Ex/classic fallback REMOVED");
-                    deviceEx->Release();
+                        "VR DX12 STRICT FAIL stage=CompatInstall reason=managed-resource-compat-install-failed; native D3D9 fallback remains disabled");
+                    baseDevice->Release();
                     return E_FAIL;
                 }
 
-                *device = static_cast<IDirect3DDevice9*>(deviceEx);
+                // CreateDevice is in/out. Publish the actual presentation values
+                // accepted by D3D9On12 so the game's Reset path sees the same
+                // swap-chain contract that was really created.
+                *params = attemptedParams;
+                *device = baseDevice;
                 UpdateCompatPresentationState(*device, params);
                 if (!OutRunVRD3D12Bridge::Attach(*device))
                 {
@@ -825,9 +869,9 @@ namespace OutRunVRD3D9ExUpgrade
                 if (!FirstUpgradeLogged.exchange(true))
                 {
                     spdlog::info(
-                        "VR DX12 STRICT PASS: OutRun game device is D3D9On12-backed D3D12; no native D3D9Ex/classic fallback path exists");
+                        "VR DX12 STRICT PASS: OutRun game device is D3D9On12-backed D3D12 through legacy CreateDevice semantics; no native D3D9 fallback path exists");
                 }
-                return D3D_OK;
+                return hr;
             }
 
         private:
