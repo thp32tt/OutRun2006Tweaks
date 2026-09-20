@@ -55,3 +55,15 @@ The :00 automation is the only production writer on vr-d3d9ex-focus. It implemen
 The :30 automation works independently on vr-d3d9ex-review. It performs adversarial review and may add documentation or verifier prototypes, but it must not change production runtime behavior or replace the frozen candidate.
 
 The main job consumes only verified evidence from the review branch.
+
+
+## Temporary compile-time comparison caveat
+
+Some current renderer-chain comparisons (historical P1/P2/P3/P4) are selected by CMake source composition and cannot yet be toggled safely inside one DLL. They are retained only as regression-isolation tools. The default development policy no longer requires the user to test them sequentially. Runtime/profile differences that are already safe to isolate use CONTROL/CORRECTNESS/PERFORMANCE with one binary set; renderer-chain compile variants should be retired or feature-flagged only after the DX9Ex reference path is established.
+
+## Scheduled support split
+
+- :00 — production writer on `vr-d3d9ex-focus`.
+- :30 — adversarial reviewer on `vr-d3d9ex-review`, no production runtime writes.
+- 01:15 — once-per-day nightly gate: consolidate evidence, validate hashes/profile/session state, remove redundant test requests, and tell the 02:00 run which unchanged work can be skipped.
+- 08:15 / 11:15 / 14:15 / 17:15 — support work on `vr-d3d9ex-support` when a commit is needed: reusable verifiers, profile/session/log/package validators, CI efficiency, capture-schema/ring-buffer test harnesses and TEST_LEVEL demotion work. This slot does not become a third production runtime writer.
