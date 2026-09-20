@@ -194,7 +194,9 @@ namespace OutRunVRStereo
 		std::uint64_t LastBeginSceneCountAtPresent = 0;
 		std::uint64_t FixedFunctionNonWorldDraws = 0;
 		std::uint64_t FixedFunctionWorldStereoDraws = 0;
+		std::uint64_t FixedFunctionSkyRotationOnlyDraws = 0;
 		bool FirstFixedFunctionWorldLogged = false;
+		bool FirstFixedFunctionSkyRotationLogged = false;
 		std::uint64_t OcclusionQueriesCreated = 0;
 		std::uint64_t OcclusionQueryBegins = 0;
 		std::uint64_t OcclusionQueryEnds = 0;
@@ -578,6 +580,9 @@ namespace OutRunVRStereo
 			}
 		}
 
+		bool ReadTrackedRenderState(IDirect3DDevice9* device,
+			D3DRENDERSTATETYPE state, DWORD& out) noexcept;
+
 		enum class EyeBuildResult { NonWorld, WorldStereo, FatalError };
 		struct DrawStereoState
 		{
@@ -589,6 +594,7 @@ namespace OutRunVRStereo
 			D3DMATRIX fixedEyeProjection[2]{};
 			bool worldStereo = false;
 			bool fixedFunctionWorld = false;
+			bool fixedFunctionRotationOnly = false;
 			std::uint32_t poseSequence = 0;
 			OutRunVRRenderer::LatchedStereoFrame stereoFrame{};
 		};
@@ -662,11 +668,25 @@ namespace OutRunVRStereo
 				// Car-select and other theater/menu previews also use
 				// fixed-function perspective XYZ. They are not VR world geometry
 				// and must not receive the headset inverse/eye transforms.
-				if (!GameplayActive())
+				DWORD zEnable = D3DZB_TRUE;
+				if (!ReadTrackedRenderState(device, D3DRS_ZENABLE, zEnable))
 				{
 					++FixedFunctionNonWorldDraws;
 					return EyeBuildResult::NonWorld;
 				}
+				const auto fixedPolicy =
+					OutRunVR::PassPolicy::ClassifyFixedFunctionStereo(
+						projectionClass, GameplayActive(),
+						zEnable != D3DZB_FALSE);
+				if (fixedPolicy ==
+					OutRunVR::PassPolicy::FixedFunctionStereoPolicy::NonWorld)
+				{
+					++FixedFunctionNonWorldDraws;
+					return EyeBuildResult::NonWorld;
+				}
+				const bool rotationOnly =
+					fixedPolicy ==
+					OutRunVR::PassPolicy::FixedFunctionStereoPolicy::SkyRotationOnly;
 
 				if (stereo.poseSequence == 0 ||
 					!MatrixFinite(state.fixedOriginalView) ||
@@ -685,17 +705,28 @@ namespace OutRunVRStereo
 				if (!MatrixFinite(headInverse))
 					return EyeBuildResult::FatalError;
 
+				D3DMATRIX appliedHeadInverse = headInverse;
+				if (rotationOnly)
+				{
+					appliedHeadInverse._41 = 0.0f;
+					appliedHeadInverse._42 = 0.0f;
+					appliedHeadInverse._43 = 0.0f;
+				}
+
 				for (int eye = 0; eye < 2; ++eye)
 				{
+					XrVector3f eyeOffset = stereo.eyeOffset[eye];
+					if (rotationOnly)
+						eyeOffset = { 0.0f, 0.0f, 0.0f };
 					const D3DMATRIX eyePose =
 						MatrixFromQuaternionTranslation(
-							stereo.eyeOrientation[eye], stereo.eyeOffset[eye],
+							stereo.eyeOrientation[eye], eyeOffset,
 							Settings::VRWorldScale * Settings::VRStereoDepth);
 					const D3DMATRIX eyeInverse = InverseRigid(eyePose);
 					state.fixedEyeView[eye] =
 						MultiplyMatrix(
 							MultiplyMatrix(
-								state.fixedOriginalView, headInverse),
+								state.fixedOriginalView, appliedHeadInverse),
 							eyeInverse);
 					state.fixedEyeProjection[eye] =
 						ProjectionFromFov(
@@ -707,14 +738,28 @@ namespace OutRunVRStereo
 				}
 
 				state.fixedFunctionWorld = true;
+				state.fixedFunctionRotationOnly = rotationOnly;
 				state.worldStereo = true;
 				state.poseSequence = stereo.poseSequence;
-				++FixedFunctionWorldStereoDraws;
-				if (!FirstFixedFunctionWorldLogged)
+				if (rotationOnly)
 				{
-					FirstFixedFunctionWorldLogged = true;
-					spdlog::info(
-						"VR C1.2 FIXEDFN HEAD: perspective fixed-function XYZ world receives the same latched head inverse + eye-local IPD/FOV as shader world; sky/cloud fixed-function passes no longer stay head-locked");
+					++FixedFunctionSkyRotationOnlyDraws;
+					if (!FirstFixedFunctionSkyRotationLogged)
+					{
+						FirstFixedFunctionSkyRotationLogged = true;
+						spdlog::info(
+							"VR SKY ROTATION: depth-off fixed-function perspective draw keeps headset rotation/FOV but removes head/IPD translation");
+					}
+				}
+				else
+				{
+					++FixedFunctionWorldStereoDraws;
+					if (!FirstFixedFunctionWorldLogged)
+					{
+						FirstFixedFunctionWorldLogged = true;
+						spdlog::info(
+							"VR FIXEDFN WORLD: depth-tested perspective XYZ receives latched head inverse + eye-local IPD/FOV");
+					}
 				}
 				return EyeBuildResult::WorldStereo;
 			}
@@ -796,6 +841,7 @@ namespace OutRunVRStereo
 			constexpr D3DRENDERSTATETYPE states[] = {
 				D3DRS_ZENABLE, D3DRS_ZWRITEENABLE,
 				D3DRS_ALPHABLENDENABLE, D3DRS_ALPHATESTENABLE,
+				D3DRS_CULLMODE, D3DRS_COLORWRITEENABLE,
 				D3DRS_STENCILENABLE, D3DRS_STENCILWRITEMASK,
 				D3DRS_STENCILFAIL, D3DRS_STENCILZFAIL,
 				D3DRS_STENCILPASS, D3DRS_TWOSIDEDSTENCILMODE,
