@@ -18,6 +18,7 @@
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "vr/core/render_backend.hpp"
+#include "vr/d3d9/dxvk_probe.hpp"
 
 namespace Settings
 {
@@ -31,7 +32,12 @@ namespace OutRunVRD3D9ExUpgrade
     {
         const auto backend = OutRunVR::RenderBackendFromSetting(
             Settings::VRRenderBackend.get());
-        return backend != OutRunVR::RenderBackend::Dxvk;
+        if (backend == OutRunVR::RenderBackend::Dxvk)
+            return false;
+        if (backend == OutRunVR::RenderBackend::Auto &&
+            OutRunVRDxvkProbe::PreflightNonSystemD3D9Provider())
+            return false;
+        return true;
     }
 
     namespace
