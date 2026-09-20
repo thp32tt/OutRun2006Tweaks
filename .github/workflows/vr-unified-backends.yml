@@ -8,6 +8,7 @@ on:
       - 'tools/Select-OutRunVRBackend.*'
       - 'tools/OutRunVR-Backend-Selector.*'
       - 'tools/Collect-OutRunVRLogs.*'
+      - 'tools/Run-OutRunVRTest.*'
       - 'docs/VR_UNIFIED_TEST_SCENARIO.md'
       - '.github/workflows/vr-unified-backends.yml'
 
@@ -258,6 +259,8 @@ jobs:
           Copy-Item tools/OutRunVR-Backend-Selector.cmd package/OutRunVR-Backend-Selector.cmd
           Copy-Item tools/Collect-OutRunVRLogs.ps1 package/Collect-OutRunVRLogs.ps1
           Copy-Item tools/Collect-OutRunVRLogs.cmd package/Collect-OutRunVRLogs.cmd
+          Copy-Item tools/Run-OutRunVRTest.ps1 package/Run-OutRunVRTest.ps1
+          Copy-Item tools/Run-OutRunVRTest.cmd package/Run-OutRunVRTest.cmd
           Copy-Item docs/VR_UNIFIED_TEST_SCENARIO.md package/VR_UNIFIED_TEST_SCENARIO.md
 
           $ini = Get-Content package/OutRun2006Tweaks.ini -Raw
@@ -282,7 +285,7 @@ jobs:
           } | ConvertTo-Json | Set-Content package/BUILD_INPUTS.json -Encoding UTF8
           Set-Content package/ACTIVE_VR_BACKEND.txt ("backend=d3d9`nvariant=A_CONTROL`nmatrix=$matrix") -Encoding ascii
 
-          $required = @('dinput8.dll','outrun-vr-host.exe','Select-OutRunVRBackend.ps1','OutRunVR-Backend-Selector.cmd','Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt')
+          $required = @('dinput8.dll','outrun-vr-host.exe','Select-OutRunVRBackend.ps1','OutRunVR-Backend-Selector.cmd','Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','Run-OutRunVRTest.ps1','Run-OutRunVRTest.cmd','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt')
           foreach ($file in $required) { if (-not (Test-Path (Join-Path package $file))) { throw "Required package file missing: $file" } }
           if (Test-Path package/d3d9.dll) { throw 'D3D9 control package root unexpectedly contains d3d9.dll' }
           if (Test-Path package/multiviewpatcher.dll) { throw 'D3D9 control package root unexpectedly contains multiviewpatcher.dll' }
@@ -311,16 +314,20 @@ jobs:
               'dx12' { if ((Test-Path package-smoke/d3d9.dll) -or (Test-Path package-smoke/multiviewpatcher.dll)) { throw 'DX12 STRICT retained DXVK files' } }
             }
             if (-not (Test-Path package-smoke/CURRENT_VR_SESSION.json)) { throw "Session identity missing for $mode" }
+            $sessionStateBefore = Get-Content package-smoke/CURRENT_VR_SESSION.json -Raw | ConvertFrom-Json
             Add-Content package-smoke/OutRun2006Tweaks-session.log "new-$mode"
             & package-smoke/Collect-OutRunVRLogs.ps1
-            $sessionState = Get-Content package-smoke/CURRENT_VR_SESSION.json -Raw | ConvertFrom-Json
-            $collectedLog = Join-Path package-smoke ("logs/{0}/{1}/{2}/OutRun2006Tweaks-session.log" -f $sessionState.BuildMatrixId,$sessionState.VariantId,$sessionState.SessionId)
+            $collectedLog = Join-Path package-smoke ("logs/{0}/{1}/{2}/OutRun2006Tweaks-session.log" -f $sessionStateBefore.BuildMatrixId,$sessionStateBefore.VariantId,$sessionStateBefore.SessionId)
+            if (-not (Test-Path $collectedLog)) { throw "Collected session log missing for $mode" }
             $sessionText = Get-Content $collectedLog -Raw
             if ($sessionText -notmatch "new-$mode" -or $sessionText -match 'old-before-session') { throw "Session log isolation failed for $mode" }
+            if (Test-Path package-smoke/OutRun2006Tweaks-session.log) { throw "Root session log was not sealed for $mode" }
+            $sessionStateAfter = Get-Content package-smoke/CURRENT_VR_SESSION.json -Raw | ConvertFrom-Json
+            if ($sessionStateAfter.SessionId -eq $sessionStateBefore.SessionId) { throw "Next session was not prepared for $mode" }
           }
           $zip = Get-ChildItem OutRun2_VR_UNIFIED_*.zip | Select-Object -First 1
           Expand-Archive $zip.FullName zip-verify
-          foreach ($file in @('Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','SHA256SUMS.txt')) {
+          foreach ($file in @('Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','Run-OutRunVRTest.ps1','Run-OutRunVRTest.cmd','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','SHA256SUMS.txt')) {
             if (-not (Test-Path (Join-Path zip-verify $file))) { throw "ZIP content missing: $file" }
           }
       - uses: actions/upload-artifact@v4
