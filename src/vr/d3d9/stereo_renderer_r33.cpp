@@ -284,7 +284,8 @@ namespace OutRunVRStereo
 
         template <typename ActualDraw>
         R31OwnedResult R33TryFastWorld(IDirect3DDevice9* device,
-            ActualDraw&& actualDraw, const char* site)
+            ActualDraw&& actualDraw, const char* site,
+            std::uint32_t dxvkEligibilityFlags)
         {
             if (R31StateBlockRecording || !R29StableStereoBase(device))
             {
@@ -373,7 +374,8 @@ namespace OutRunVRStereo
                     draw.eyeConstants[0],
                     draw.eyeConstants[1],
                     draw.poseSequence,
-                    dxvkDrawToken))
+                    dxvkDrawToken,
+                    dxvkEligibilityFlags))
             {
                 ++R9DrawCalls;
                 R9MonoBackupGap = true;
@@ -694,7 +696,7 @@ namespace OutRunVRStereo
         template <typename ActualDraw, typename LowerR29Draw>
         HRESULT R33Dispatch(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, LowerR29Draw&& lowerR29Draw,
-            const char* site) noexcept
+            const char* site, std::uint32_t dxvkEligibilityFlags) noexcept
         {
             if (!R31StateBlockRecording)
                 R31FlushPendingStateBlockResync(device);
@@ -719,7 +721,8 @@ namespace OutRunVRStereo
             else
             {
                 const auto fast = R33TryFastWorld(device,
-                    std::forward<ActualDraw>(actualDraw), site);
+                    std::forward<ActualDraw>(actualDraw), site,
+                    dxvkEligibilityFlags);
                 if (fast.handled)
                     return fast.hr;
             }
@@ -745,7 +748,8 @@ namespace OutRunVRStereo
                 return R30DrawPrimitiveR29Hook.stdcall<HRESULT>(
                     device, type, startVertex, primitiveCount);
             };
-            return R33Dispatch(device, actual, lower, "R33/DrawPrimitive");
+            return R33Dispatch(device, actual, lower, "R33/DrawPrimitive",
+                OutRunVR::DxvkInterop::DrawPrimitive);
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveDestR33(
@@ -764,7 +768,8 @@ namespace OutRunVRStereo
                     startIndex, primitiveCount);
             };
             return R33Dispatch(device, actual, lower,
-                "R33/DrawIndexedPrimitive");
+                "R33/DrawIndexedPrimitive",
+                OutRunVR::DxvkInterop::DrawIndexedPrimitive);
         }
 
         HRESULT __stdcall DrawPrimitiveUPDestR33(IDirect3DDevice9* device,
@@ -779,7 +784,8 @@ namespace OutRunVRStereo
                 return R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>(
                     device, type, primitiveCount, data, stride);
             };
-            return R33Dispatch(device, actual, lower, "R33/DrawPrimitiveUP");
+            return R33Dispatch(device, actual, lower, "R33/DrawPrimitiveUP",
+                OutRunVR::DxvkInterop::DrawPrimitiveUP);
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveUPDestR33(
@@ -799,7 +805,8 @@ namespace OutRunVRStereo
                     indexData, indexFormat, vertexData, stride);
             };
             return R33Dispatch(device, actual, lower,
-                "R33/DrawIndexedPrimitiveUP");
+                "R33/DrawIndexedPrimitiveUP",
+                OutRunVR::DxvkInterop::DrawIndexedPrimitiveUP);
         }
 
         HRESULT __stdcall ResetDestR33(IDirect3DDevice9* device,
