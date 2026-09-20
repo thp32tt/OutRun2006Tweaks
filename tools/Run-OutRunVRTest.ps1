@@ -61,6 +61,36 @@ $state=Get-Content $current -Raw|ConvertFrom-Json
 Write-Host "Starting test session: $($state.SessionId)"
 Write-Host "Backend: $backend"
 
+# Recovery retest policy: first prove that the game can leave the white startup
+# screen before re-enabling high-refresh interpolation / XR phase-lock. These
+# command-line values are session-scoped and override both base and user INIs.
+$recoveryBootArgs=@(
+    '-FramerateLimit=60',
+    '-FramerateFastLoad=0',
+    '-FramerateInterpolation=false',
+    '-FramerateUnlockExperimental=false',
+    '-FrameCadenceMode=0',
+    '-DisableDesktopVsync=false',
+    '-SkyGlowFactor=1'
+)
+$gameArgs=@($recoveryBootArgs)
+if($backend -eq 'd3d9' -or $backend -eq 'dxvk-safe'){
+    $gameArgs += @(
+        '-PreferD3D9Ex=false',
+        '-DirectGpuOnly=false',
+        '-DisableDesktopDuplication=false'
+    )
+}
+
+$sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}" -f $state.BuildMatrixId,$state.VariantId,$state.SessionId)
+New-Item -ItemType Directory -Force $sessionRoot|Out-Null
+@(
+    "backend=$backend"
+    "forceVrDisabled=$($backend -eq '2d')"
+    "arguments=$($gameArgs -join ' ')"
+)|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
+Write-Host "Recovery boot overrides: $($gameArgs -join ' ')"
+
 # DXVK/Vulkan safety: third-party implicit capture/overlay layers can crash
 # vkCreateInstance before DXVK gets control. The observed Bandicam path was
 # bdcamvk32.dll -> NVIDIA vkCreateInstance. Run the DXVK comparison with
@@ -69,6 +99,13 @@ $dxvkMode = $backend -eq 'dxvk-safe' -or $backend -eq 'dxvk'
 $oldVkDisable = $env:VK_LOADER_LAYERS_DISABLE
 $oldVkInstanceLayers = $env:VK_INSTANCE_LAYERS
 $oldVkDebug = $env:VK_LOADER_DEBUG
+$oldVrForceDisabled = $env:OUTRUN_VR_FORCE_DISABLED
+if($backend -eq '2d'){
+    $env:OUTRUN_VR_FORCE_DISABLED='1'
+    Write-Host '2D control isolation: all OpenXR/VR hook installers are disabled for this process.'
+}else{
+    $env:OUTRUN_VR_FORCE_DISABLED=$null
+}
 if($dxvkMode){
     $env:VK_LOADER_LAYERS_DISABLE='~implicit~'
     $env:VK_INSTANCE_LAYERS=$null
@@ -83,8 +120,9 @@ if($dxvkMode){
 }
 
 try{
-    $p=Start-Process -FilePath $game -WorkingDirectory $root -PassThru
+    $p=Start-Process -FilePath $game -ArgumentList $gameArgs -WorkingDirectory $root -PassThru
 } finally {
+    $env:OUTRUN_VR_FORCE_DISABLED=$oldVrForceDisabled
     if($dxvkMode){
         $env:VK_LOADER_LAYERS_DISABLE=$oldVkDisable
         $env:VK_INSTANCE_LAYERS=$oldVkInstanceLayers
