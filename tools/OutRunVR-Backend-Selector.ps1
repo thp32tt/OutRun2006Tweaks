@@ -17,6 +17,7 @@ function Refresh-Status {
     $status.Text = switch ($current) {
         "2d"   { "현재 선택: 2D ORIGINAL (Classic D3D9)" }
         "d3d9" { "현재 선택: D3D9 VR SAFE" }
+        "dxvk-safe" { "현재 선택: DXVK SAFE (2-pass)" }
         "dxvk" { "현재 선택: DXVK MULTIVIEW" }
         "dx12" { "현재 선택: DX12 STRICT" }
         default { "현재 선택: 확인되지 않음" }
@@ -50,6 +51,7 @@ function Select-Backend([string]$backend) {
     $label = switch ($backend) {
         "2d"   { "2D ORIGINAL" }
         "d3d9" { "D3D9 VR SAFE" }
+        "dxvk-safe" { "DXVK SAFE" }
         "dxvk" { "DXVK MULTIVIEW" }
         "dx12" { "DX12 STRICT" }
     }
@@ -59,7 +61,7 @@ function Select-Backend([string]$backend) {
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "OutRun 2006 Renderer / VR Selector"
 $form.StartPosition = "CenterScreen"
-$form.ClientSize = New-Object System.Drawing.Size(500,405)
+$form.ClientSize = New-Object System.Drawing.Size(500,467)
 $form.FormBorderStyle = "FixedDialog"
 $form.MaximizeBox = $false
 
@@ -87,8 +89,9 @@ Refresh-Status
 $buttons = @(
     @{ Text="2D ORIGINAL  (Classic D3D9 / VR OFF)"; Backend="2d"; Y=125 },
     @{ Text="D3D9 VR SAFE"; Backend="d3d9"; Y=187 },
-    @{ Text="DXVK MULTIVIEW"; Backend="dxvk"; Y=249 },
-    @{ Text="DX12 STRICT"; Backend="dx12"; Y=311 }
+    @{ Text="DXVK SAFE  (2-pass / compatibility)"; Backend="dxvk-safe"; Y=249 },
+    @{ Text="DXVK MULTIVIEW  (experimental)"; Backend="dxvk"; Y=311 },
+    @{ Text="DX12 STRICT"; Backend="dx12"; Y=373 }
 )
 
 foreach ($b in $buttons) {
