@@ -1,129 +1,153 @@
 # Experimental DXVK VR architecture
 
-Status: PoC only. Production VR remains on `vr-openxr`.
+Status: active PoC. Production VR remains on `vr-openxr`.
 
 Baseline: `vr-dxvk-poc` was created from the current `vr-openxr` branch on 2026-09-20.
 
 ## Goal
 
-Develop DXVK as an independent renderer backend while keeping the DX12 PoC separate.
-The eventual merged project should expose a renderer choice instead of mixing backend-specific
-code into one path.
+Develop DXVK as an independent renderer backend while preserving the proven OutRun-specific
+camera, WVP, draw-classification, state-restore, pose-latching and fail-closed logic.
 
-Target user-facing choices:
+User-facing renderer policy remains:
 
 ```text
 VRRenderBackend = Auto | D3D9TwoPass | DXVK | DX12
 ```
 
-Renderer selection and frame transport must remain separate decisions.
+Renderer selection and frame transport remain separate decisions.
 
-## Why the DXVK path is separate
+## Current multiview architecture
 
-The current D3D9/OpenXR implementation contains a large amount of reverse-engineered game
-knowledge: verified WVP constants, draw classification, pose latching, state restoration,
-HUD/effect handling, reset generation tracking, and fail-closed fallback. That knowledge is
-valuable, but the implementation details of DXVK multiview are different from the DX12 path.
+The branch no longer uses the earlier capability-zero placeholder provider. It now builds
+`Detegr/dxvk-openRBRVR`, which already contains a working D3D9-to-Vulkan multiview
+implementation and the public `IDirect3DVR9` extension used by openRBRVR.
 
-This branch therefore starts from the latest `vr-openxr` code and does not merge the old
-`dxvk-multiview-poc` history, which is far behind the current VR branch.
-
-## Verified upstream DXVK integration points
-
-Current upstream DXVK still exposes `ID3D9VkInteropDevice` from the D3D9 device
-`QueryInterface` path. It provides access to the Vulkan instance/device/queue and texture
-interop helpers.
-
-Current D3D9 draw submission also still funnels through `PrepareDraw` before DXVK emits
-Vulkan work. This makes the DXVK D3D9 draw/shader layer the intended insertion point for a
-future true multiview implementation.
-
-The OutRun hook should not try to reproduce DXVK's internal pipeline externally.
-
-## Development stages
-
-### Stage 0 - stock DXVK compatibility
-
-Use unmodified 32-bit DXVK and prove:
-
-1. OR2006C2C starts and reaches gameplay.
-2. menus, water, sky, shadows, smoke, skid marks and post effects are correct.
-3. input, wheel support and FFB behave exactly as the normal branch.
-4. Reset/Alt-Tab/game restart are stable.
-5. the DXVK interop probe detects `ID3D9VkInteropDevice`.
-6. the existing VR code fails closed when a D3D9Ex shared-eye feature is unavailable.
-
-No multiview code is enabled in this stage.
-
-### Stage 1 - backend dispatcher
-
-Introduce a backend policy layer with the shared enum in
-`src/vr/core/render_backend.hpp`.
-
-The DXVK branch must initially route all actual stereo rendering to the existing safe path.
-The dispatcher only detects capabilities and records telemetry.
-
-### Stage 2 - custom DXVK fork
-
-Create a separate fork of upstream DXVK and add a minimal OutRun-specific stereo control
-interface at the D3D9 layer.
-
-State passed from OutRun to the DXVK fork should be limited to renderer state:
-
-- enabled/disabled;
-- pose sequence;
-- verified shader/draw generation token;
-- left WVP;
-- right WVP;
-- eligibility token.
-
-Simulation, input and FFB state must never cross this boundary.
-
-### Stage 3 - one multiview route
-
-Enable Vulkan multiview only for the simplest verified opaque world draws.
-
-Required invariants:
-
-- one D3D9 game draw enters DXVK;
-- one Vulkan multiview draw is emitted;
-- view 0 uses the left WVP;
-- view 1 uses the right WVP;
-- both views use the same latched pose;
-- depth/stencil are view-isolated;
-- query/game semantics are unchanged.
-
-Everything else falls back to the proven two-pass route.
-
-### Stage 4 - expand eligibility
-
-Promote draw classes individually after visual/state equivalence is proven:
-
-- stable opaque world;
-- alpha-tested world;
-- selected transparent effects;
-- selected billboards/effects.
-
-HUD, menus, offscreen passes, MRT, occlusion-query-active work and unknown routes stay on
-fallback until explicitly classified.
-
-### Stage 5 - Vulkan/OpenXR direct transport
-
-Only after multiview is correct should DXVK transport bypass the current D3D9Ex/D3D11 host
-bridge. The long-term target is:
+Gameplay is rendered into one persistent two-layer D3D9/DXVK color target and, when present,
+one persistent two-layer depth/stencil target:
 
 ```text
-OutRun D3D9 semantics
-  -> custom DXVK D3D9
-  -> Vulkan multiview eye images
-  -> OpenXR Vulkan
+verified OutRun D3D9 draw stream
+        |
+        +-- programmable verified world draw
+        |      |
+        |      +-- clone original vertex shader
+        |      +-- fetch DXVK-generated SPIR-V
+        |      +-- patch only c64-c67 accesses
+        |      |     view 0 -> left WVP
+        |      |     view 1 -> right WVP
+        |      +-- Vulkan BuiltIn ViewIndex
+        |      +-- ONE game/D3D9 draw -> Vulkan multiview layers 0 + 1
+        |
+        +-- HUD / fixed-function / unsafe / unsupported draw
+               |
+               +-- layer 0 validated left-eye draw
+               +-- layer 1 validated right-eye draw
+                       |
+                       v
+          persistent 2-layer color/depth
+                       |
+                Present boundary
+                       |
+          CopySurfaceLayers once
+             |                 |
+       conventional L     conventional R
+             \_________________/
+                     |
+              existing VR host/transport
 ```
 
-This removes the need to treat SBS or desktop capture as the normal VR transport.
+This arrangement is intentional. Mixing a separate right-eye surface with multiview world
+draws would break ordering and depth continuity whenever a HUD/effect/fixed-function fallback
+appears between world draws. Keeping all stereo work in the same layered color/depth images
+preserves the original game draw order.
 
-## Shared merge contract with DX12
+## Sources incorporated
 
-The later merged branch should keep these common pieces backend-neutral:
+### Detegr/dxvk-openRBRVR
+
+License: zlib/libpng.
+
+Used directly as the x86 D3D9 provider. Relevant existing functionality:
+
+- `Direct3DCreateVR` / `IDirect3DVR9`;
+- two-layer render-target/depth creation;
+- `CopySurfaceLayers`;
+- DXVK SPIR-V access and replacement;
+- shader constant-count control;
+- Vulkan multiview pipeline/view-mask handling;
+- fixed-function multiview support.
+
+OutRun adds a small source patch because upstream exposes
+`SetMultiviewSurfaceLayer` but leaves the corresponding
+`D3D9Subresource::SetMultiviewSurfaceLayer` implementation as a TODO. The OutRun patch lets
+one persistent array surface switch between layer 0, layer 1 and all layers, and invalidates
+cached image views when the selection changes.
+
+### Detegr/RBR-spirvpatcher
+
+License: Mozilla Public License 2.0.
+
+Built and shipped as `multiviewpatcher.dll`. OutRun uses
+`ChangeSPIRVMultiViewDataAccessLocation` to patch only the verified OutRun WVP registers
+c64-c67. Unlike RBR-specific use, OutRun dynamically allocates two four-vector constant blocks
+in unused D3D9 vertex-shader constant space and rejects shaders that cannot fit safely below
+the c255 limit.
+
+### Other references
+
+OpenXR Toolkit (MIT), vrframework (MIT), OpenComposite (GPL), Wine/vkd3d-proton (LGPL) and
+other VR/wrapper implementations are architecture/failure-mode references. Code is imported
+only when it materially improves this branch and its license/source is recorded. UEVR is
+architecture reference only because its repository is not published under a reusable
+open-source license.
+
+## Fail-closed rules
+
+True one-draw multiview is only attempted when all existing OutRun safety checks pass:
+
+- gameplay stereo is active;
+- main render target is the verified logical backbuffer;
+- no unsafe auxiliary MRT path;
+- no active/unknown occlusion-query ownership;
+- pose is valid and latched for the frame;
+- draw is a positively identified programmable world draw;
+- c64-c67 match the verified OutRun WorldView*Projection upload boundary;
+- persistent layered color/depth resources are valid;
+- the vertex shader can be cloned and patched safely;
+- sufficient D3D9 float constant space exists.
+
+If any condition fails, the original shader remains untouched and that draw uses the validated
+two-pass route. Fixed-function, HUD/effects, offscreen passes and unknown draws are not forced
+through the programmable multiview patcher.
+
+## Frame and state ownership
+
+A deterministic full main clear initializes both layers. Subsequent game attempts to bind the
+logical backbuffer/main depth are redirected to layer 0 only while gameplay stereo is active.
+Offscreen targets and MRTs retain normal D3D9 semantics.
+
+Provider-authored D3D9 state changes are wrapped in an internal scope so OutRun's own D3D9
+hooks do not mistake them for game-authored state changes.
+
+At Present, the layered color image is copied once into the conventional left/right eye
+surfaces. Depth remains internal because no display transport needs it. Reset, main-depth
+replacement and leaving gameplay invalidate layered resources and shader/provider state.
+
+## Remaining transport work
+
+True geometry multiview removes most duplicated eligible world draws, but the current PoC
+still resolves the two Vulkan layers to the conventional OutRun eye surfaces before the
+existing host transport consumes them.
+
+The next independent performance stage is direct Vulkan/OpenXR transport. Raw Vulkan handles
+from `IDirect3DVR9` are process-local, so a separate x64 host cannot safely consume them
+without explicit external-memory/semaphore export or an in-process compatible OpenXR design.
+That transport change must not be conflated with geometry multiview correctness.
+
+## Merge contract with DX12
+
+A later merged branch should keep these backend-neutral:
 
 - pose sampling/latching;
 - game camera extraction;
@@ -132,13 +156,9 @@ The later merged branch should keep these common pieces backend-neutral:
 - HUD/effect policy;
 - telemetry;
 - refresh/cadence policy;
-- FFB/input;
+- input/FFB;
 - configuration UI.
 
-Only renderer/transport implementation lives behind backend interfaces.
-
-## Immediate branch policy
-
-`vr-dxvk-poc` is experimental and must not change `vr-openxr` production behavior.
-DX12 work remains in `vr-dx12-poc`.
-No cross-merge should happen until each backend reaches a stable compatibility baseline.
+DXVK owns Vulkan multiview/shader translation. DX12 owns D3D9On12/native D3D12 transport and
+OpenXR D3D12 submission. Production `vr-openxr` remains unchanged until the experimental
+backend passes visual and reset/transition validation.
