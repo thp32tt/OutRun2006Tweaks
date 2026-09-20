@@ -19,7 +19,7 @@ on:
       - '.github/workflows/vr-unified-backends.yml'
 
 concurrency:
-  group: vr-d3d9ex-focus
+  group: vr-d3d9ex-focus-v2
   cancel-in-progress: true
 
 jobs:
