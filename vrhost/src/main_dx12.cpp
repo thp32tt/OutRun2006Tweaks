@@ -98,6 +98,8 @@ namespace
         D3D12_VIEW_INSTANCING_TIER viewInstancingTier{
             D3D12_VIEW_INSTANCING_TIER_NOT_SUPPORTED};
         bool vsRtArrayIndexWithoutGs{};
+        D3D_SHADER_MODEL highestShaderModel{D3D_SHADER_MODEL_5_1};
+        bool nativeViewInstancingCandidate{};
 
         D3D12Objects()=default;
         D3D12Objects(const D3D12Objects&)=delete;
@@ -106,7 +108,9 @@ namespace
             : device(std::exchange(other.device,nullptr)),
               queue(std::exchange(other.queue,nullptr)),
               viewInstancingTier(other.viewInstancingTier),
-              vsRtArrayIndexWithoutGs(other.vsRtArrayIndexWithoutGs) {}
+              vsRtArrayIndexWithoutGs(other.vsRtArrayIndexWithoutGs),
+              highestShaderModel(other.highestShaderModel),
+              nativeViewInstancingCandidate(other.nativeViewInstancingCandidate) {}
         D3D12Objects& operator=(D3D12Objects&& other) noexcept
         {
             if(this!=&other)
@@ -116,6 +120,8 @@ namespace
                 queue=std::exchange(other.queue,nullptr);
                 viewInstancingTier=other.viewInstancingTier;
                 vsRtArrayIndexWithoutGs=other.vsRtArrayIndexWithoutGs;
+                highestShaderModel=other.highestShaderModel;
+                nativeViewInstancingCandidate=other.nativeViewInstancingCandidate;
             }
             return *this;
         }
@@ -158,7 +164,17 @@ namespace
             D3D12_FEATURE_D3D12_OPTIONS,
             &opt,sizeof(opt))))
             out.vsRtArrayIndexWithoutGs=
-                opt.VPAndRTArrayIndexFromAnyShaderFeedingRasterizerWithoutGSEmulation!=FALSE;
+                opt.VPAndRTArrayIndexFromAnyShaderFeedingRasterizerSupportedWithoutGSEmulation!=FALSE;
+
+        D3D12_FEATURE_DATA_SHADER_MODEL shaderModel{
+            D3D_SHADER_MODEL_6_1};
+        if(SUCCEEDED(out.device->CheckFeatureSupport(
+                D3D12_FEATURE_SHADER_MODEL,
+                &shaderModel,sizeof(shaderModel))))
+            out.highestShaderModel=shaderModel.HighestShaderModel;
+        out.nativeViewInstancingCandidate=
+            out.viewInstancingTier!=D3D12_VIEW_INSTANCING_TIER_NOT_SUPPORTED&&
+            out.highestShaderModel>=D3D_SHADER_MODEL_6_1;
 
         const LUID luid=out.device->GetAdapterLuid();
         std::cout<<"D3D12 device ready adapterLuid="
@@ -169,7 +185,11 @@ namespace
             <<" viewInstancingTier="
             <<static_cast<unsigned>(out.viewInstancingTier)
             <<" VS-RT-array-index="
-            <<(out.vsRtArrayIndexWithoutGs?"yes":"no")<<"\n";
+            <<(out.vsRtArrayIndexWithoutGs?"yes":"no")
+            <<" shaderModel=0x"<<std::hex
+            <<static_cast<unsigned>(out.highestShaderModel)<<std::dec
+            <<" geometryViewInstancingCandidate="
+            <<(out.nativeViewInstancingCandidate?"yes":"no")<<"\n";
         return out;
     }
 
@@ -851,7 +871,11 @@ float4 PSMain(GSOut input) : SV_Target
                 <<"(2 hardware instances -> OpenXR array slices). "
                 <<"Native View Instancing capability tier="
                 <<static_cast<unsigned>(d3d_.viewInstancingTier)
-                <<"; true game-geometry view-instancing remains gated on "
+                <<"; shaderModel=0x"<<std::hex
+                <<static_cast<unsigned>(d3d_.highestShaderModel)<<std::dec
+                <<"; geometryCandidate="
+                <<(d3d_.nativeViewInstancingCandidate?"yes":"no")
+                <<". True game-geometry view-instancing remains gated on "
                 <<"translated shader/PSO ownership.\n";
         }
 
