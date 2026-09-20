@@ -3,7 +3,9 @@ name: DX9Ex Active Validation
 on:
   workflow_dispatch:
   push:
-    branches: [ vr-d3d9ex-focus ]
+    branches:
+      - vr-d3d9ex-focus
+      - 'vr-d3d9ex-candidate/**'
     paths:
       - 'src/vr/**'
       - 'src/hooks_framerate.cpp'
@@ -16,7 +18,7 @@ on:
       - '.github/workflows/vr-dx9ex-active.yml'
 
 concurrency:
-  group: vr-dx9ex-active
+  group: vr-dx9ex-active-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
