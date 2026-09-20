@@ -12,6 +12,8 @@ on:
       - 'THIRD_PARTY_GPL_NOTICES.txt'
       - 'LICENSE-3DMIGOTO-GPL-3.0.txt'
       - 'src/vr/**'
+      - 'src/hooks_framerate.cpp'
+      - 'src/hooks_graphics.cpp'
       - 'vrhost/**'
       - 'CMakeLists.txt'
       - 'docs/VR_UNIFIED_TEST_SCENARIO.md'
