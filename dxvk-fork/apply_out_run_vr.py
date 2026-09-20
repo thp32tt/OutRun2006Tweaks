@@ -85,6 +85,9 @@ ID3D9OutRunVRInterop : public IUnknown {
   virtual HRESULT STDMETHODCALLTYPE GetProtocolVersion(
           uint32_t* version) = 0;
 
+  virtual HRESULT STDMETHODCALLTYPE GetCapabilities(
+          uint32_t* flags) = 0;
+
   virtual HRESULT STDMETHODCALLTYPE SetFrameState(
     const D3D9OutRunVRFrameStateV1* state) = 0;
 
@@ -131,6 +134,9 @@ __CRT_UUID_DECL(ID3D9OutRunVRInterop,       0xb16d40b8,0x1a79,0x4e11,0x9d,0x47,0
 
     HRESULT STDMETHODCALLTYPE GetProtocolVersion(
             uint32_t*             version);
+
+    HRESULT STDMETHODCALLTYPE GetCapabilities(
+            uint32_t*             flags);
 
     HRESULT STDMETHODCALLTYPE SetFrameState(
       const D3D9OutRunVRFrameStateV1* state);
@@ -187,6 +193,17 @@ __CRT_UUID_DECL(ID3D9OutRunVRInterop,       0xb16d40b8,0x1a79,0x4e11,0x9d,0x47,0
       return E_POINTER;
 
     *version = ProtocolVersion;
+    return S_OK;
+  }
+
+  HRESULT STDMETHODCALLTYPE D3D9OutRunVRInterop::GetCapabilities(
+          uint32_t* flags) {
+    if (flags == nullptr)
+      return E_POINTER;
+
+    // Milestone 1 advertises no draw-ownership capabilities. This prevents
+    // the client from entering the per-draw custom path at all.
+    *flags = 0u;
     return S_OK;
   }
 
