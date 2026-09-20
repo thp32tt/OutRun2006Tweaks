@@ -579,24 +579,33 @@ namespace OutRunVRRenderer
 
 		ClientPresentationMode CurrentPresentationMode()
 		{
-			// Keep the VR projection alive across OutRun's short gameplay-state
-			// transitions (GOAL/TIMEUP/TRYAGAIN/OUTRUNMILES/pause and brief state
-			// hand-offs). The previous STATE_GAME-only test could drop Frame.v2 to
-			// frame=0 while the desktop continued rendering normally.
-			static ULONGLONG lastGameplayMs = 0;
-			constexpr ULONGLONG GameplayPresentationHoldMs = 1500;
+			// R45: presentation ownership follows the actual OutRun state instead
+			// of Game::is_in_game() plus a 1.5 s sticky hold. The broad helper
+			// includes selector/menu-adjacent 3D scenes on this executable, which
+			// caused the vehicle-select preview car to receive gameplay stereo.
+			// Keep only states that are genuinely rendered on the race camera in
+			// stereo. Result/continue/try-again/ranking/selector states are mono
+			// theater UI and must switch immediately, with no stale stereo hold.
 			if (!Game::current_mode)
 				return PresentationUnknown;
 
-			const ULONGLONG now = GetTickCount64();
-			if (Game::is_in_game())
+			const GameState state =
+				static_cast<GameState>(*Game::current_mode);
+			switch (state)
 			{
-				lastGameplayMs = now;
+			case STATE_START:
+			case STATE_WARP:
+			case STATE_RESTART:
+			case STATE_GAME:
+			case STATE_GIVEUP:
+			case STATE_SMPAUSEMENU:
+			case STATE_GOAL:
+			case STATE_TIMEUP:
+			case STATE_LINK_TIMEUP:
 				return PresentationGameplay;
+			default:
+				return PresentationTheater;
 			}
-			if (lastGameplayMs != 0 && now - lastGameplayMs <= GameplayPresentationHoldMs)
-				return PresentationGameplay;
-			return PresentationTheater;
 		}
 
 		void PublishClientTelemetry(std::uint32_t flags, float relativeAngleDeg)

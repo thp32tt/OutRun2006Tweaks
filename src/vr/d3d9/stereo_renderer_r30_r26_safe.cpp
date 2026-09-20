@@ -1299,12 +1299,20 @@ namespace OutRunVRStereo
                     writeShader, writeShaderSerial) ||
                 !GetCurrentShaderEpoch(currentShader, currentShaderSerial) ||
                 writeShader != currentShader ||
-                writeShaderSerial != currentShaderSerial ||
-                R23GameDrawSerial <= writeDrawSerial)
+                writeShaderSerial != currentShaderSerial)
                 return false;
 
+            // R45: R30 is the outer draw hook and R23 increments its top-level
+            // serial only after this classifier calls down into R26/R23. R44
+            // compared against R23GameDrawSerial directly, so the immediate
+            // draw after a c64 upload had age=0 and every owner test failed.
+            // At this boundary the draw being classified is serial + 1.
+            const std::uint64_t currentOuterDrawSerial =
+                R23GameDrawSerial + 1u;
+            if (currentOuterDrawSerial <= writeDrawSerial)
+                return false;
             const std::uint64_t age =
-                R23GameDrawSerial - writeDrawSerial;
+                currentOuterDrawSerial - writeDrawSerial;
             if (age == 0 || age > R44OverlayWvpDrawWindow)
                 return false;
 
@@ -3372,14 +3380,14 @@ namespace OutRunVRStereo
             {
                 R30FirstFlatPerspectiveLogged = true;
                 spdlog::info(
-                    "VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay is world-locked on a finite virtual plane; R41 spatial vehicle/rank/lens billboards rebuild stock WorldView with head+eye transform; R44 c64 batch ownership keeps multi-draw vehicle ranks spatial");
+                    "VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay is world-locked on a finite virtual plane; R45 spatial vehicle/rank billboards use corrected outer-hook c64 ownership and rebuild stock WorldView with head+eye transform");
             }
             if (screenKind == R30ScreenSpaceKind::PerspectiveHud &&
                 !R30FirstPerspectiveHudLogged)
             {
                 R30FirstPerspectiveHudLogged = true;
                 spdlog::info(
-                    "VR R43 PERSPECTIVE HUD: near-plane alpha UI including 6th/6 uses the raw game c64 before stereo head correction, then uniform HudScale on the world-locked finite HUD plane; R44 result/time-record multi-draw overlays bypass R13 zero-disparity");
+                    "VR R45 PERSPECTIVE HUD: outer-hook draw serial fixed; 6th/6 and flat white overlays use the raw game c64 before stereo head correction, then uniform HudScale on the world-locked finite HUD plane");
             }
 
             if (FAILED(rightHr))

@@ -31,7 +31,7 @@
 namespace OutRunVrR32DirectSubmit
 {
     inline constexpr const char* BuildId =
-        "R42-direct-single-projection-ack-reuse-20260920";
+        "R45-direct-recenter-live-projection-20260920";
 
     enum class FastRejectReason : std::uint8_t
     {
@@ -315,9 +315,13 @@ namespace OutRunVrR32DirectSubmit
         if (!endInfo) { reject = FastRejectReason::NoEndInfo; return false; }
         if (OutRunVrR26RecenterHardening::PendingFocusRecenter)
         { reject = FastRejectReason::PendingRecenter; return false; }
-        if (OutRunVrR26RecenterHardening::PendingGameRequestId.load(
-                std::memory_order_acquire) != 0)
-        { reject = FastRejectReason::PendingGameRequest; return false; }
+        // R45: a game recenter request must not disable the only fresh
+        // DirectGPU presentation path. R44/R42 fell through to R24 cached-image
+        // fallback here; R26 then refused to mark a cached fallback as applied,
+        // leaving PendingGameRequestId set forever and permanently disabling
+        // fast submit. The synthetic LOCAL-change event is consumed before this
+        // frame is rendered, so a successful fresh projection is a valid
+        // post-recenter visible submission and completes the request below.
         if (OutRunVrReviewHardening::HasIncomingNonProjectionLayer(endInfo))
         { reject = FastRejectReason::NonProjectionLayer; return false; }
         if (!OutRunVrR23VerifiedBundle::ReadFresh(verified))
@@ -449,6 +453,9 @@ namespace OutRunVrR32DirectSubmit
             OutRunVrR23RuntimeHardening::RecordFinalSubmission(
                 verified.frameId, verified.kind, submitted);
             ++FastDirectSubmits;
+            if (submitted)
+                OutRunVrR26RecenterHardening::
+                    CompletePendingGameRequestAfterVisibleProjection();
             if (!FirstFastSubmitLogged)
             {
                 FirstFastSubmitLogged = true;

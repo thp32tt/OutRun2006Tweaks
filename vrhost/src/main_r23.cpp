@@ -1173,6 +1173,7 @@ namespace
 
     bool R23RenderWorldLockedMenuProjection(
         StereoCompositor& c, const std::array<XrView, 2>& views,
+        const XrPosef& menuAnchor,
         std::array<XrCompositionLayerProjectionView, 2>& pv)
     {
         R23Pixels.TryConsume(c.context_);
@@ -1245,15 +1246,14 @@ namespace
         c.Release(c.projection_);
         if (!ok) return false;
 
-        // Zero virtual IPD keeps mono menus aligned in both eyes. The caller
-        // submits these identity projection poses in LOCAL space, so the menu
-        // stays fixed at the recentered world orientation instead of following
-        // the headset as it did in VIEW space.
+        // R45: both eyes share the same LOCAL-space camera anchor (zero virtual
+        // IPD), captured from the HMD center when entering a mono menu or when
+        // a recenter/reference-space request is applied. R43 used identity LOCAL
+        // pose, which was world-fixed but had nothing for F12 to update.
         for (int eye = 0; eye < 2; ++eye)
         {
             pv[eye] = { XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW };
-            pv[eye].pose.orientation = { 0.f, 0.f, 0.f, 1.f };
-            pv[eye].pose.position = { 0.f, 0.f, 0.f };
+            pv[eye].pose = menuAnchor;
             pv[eye].fov = commonFov;
             pv[eye].subImage.swapchain = c.projection_.handle;
             pv[eye].subImage.imageRect.offset = { 0, 0 };
@@ -2007,6 +2007,10 @@ int main(int argc, char** argv)
         std::array<XrCompositionLayerProjectionView, 2>
             cachedMenuProjectionViews{};
         bool cachedMenuProjectionValid = false;
+        XrPosef menuProjectionAnchor{};
+        menuProjectionAnchor.orientation.w = 1.0f;
+        bool menuProjectionAnchorValid = false;
+        bool refreshMenuAnchorAfterLocate = true;
         bool pendingReferenceSpaceChange = false;
         XrTime pendingReferenceSpaceChangeTime = 0;
 
@@ -2062,6 +2066,8 @@ int main(int argc, char** argv)
                         lastStereoMatchMs = 0; cachedProjectionValid = false;
                         cachedProjectionRenderedMs = 0;
                         cachedMenuProjectionValid = false;
+                        menuProjectionAnchorValid = false;
+                        refreshMenuAnchorAfterLocate = true;
                         compositor.ReferenceSpaceChanged();
                         OutRunVrR23VerifiedBundle::Invalidate();
                         OutRunVR::SharedRenderFrameState rf{};
@@ -2105,6 +2111,8 @@ int main(int argc, char** argv)
                 matchedStereoValid = false; cachedProjectionValid = false;
                 cachedProjectionRenderedMs = 0;
                 cachedMenuProjectionValid = false;
+                menuProjectionAnchorValid = false;
+                refreshMenuAnchorAfterLocate = true;
                 OutRunVrR23VerifiedBundle::Invalidate();
                 OutRunVR::SharedRenderFrameState rf{};
                 lastProcessedStereoFrame = renderFrames.Read(rf) ? rf.frameId : shared.ReadStereoMeta().frame;
@@ -2122,6 +2130,21 @@ int main(int argc, char** argv)
             vl.displayTime = fs.predictedDisplayTime; vl.space = localSpace;
             std::uint32_t vc = 0;
             CheckXr(xrLocateViews(session, &vl, &vs, 2, &vc, views.data()), "xrLocateViews");
+
+            constexpr XrSpaceLocationFlags R45MenuAnchorFlags =
+                XR_SPACE_LOCATION_ORIENTATION_VALID_BIT |
+                XR_SPACE_LOCATION_POSITION_VALID_BIT;
+            if (refreshMenuAnchorAfterLocate &&
+                (head.locationFlags & R45MenuAnchorFlags) ==
+                    R45MenuAnchorFlags)
+            {
+                menuProjectionAnchor = head.pose;
+                menuProjectionAnchorValid = true;
+                refreshMenuAnchorAfterLocate = false;
+                cachedMenuProjectionValid = false;
+                std::cout
+                    << "[R45 menu] LOCAL projection anchor captured from current HMD center\n";
+            }
 
             const std::uint32_t hostSequence = shared.Write(head, views, vc, configs,
                 state, vs.viewStateFlags, fs.shouldRender == XR_TRUE, directTransportEnabled,
@@ -2148,23 +2171,10 @@ int main(int argc, char** argv)
 
             const auto requestedPresentation = shared.Presentation();
             auto presentation = requestedPresentation;
-            const ULONGLONG presentationNow = GetTickCount64();
-
-            // Race-adjacent game states can briefly publish Theater between
-            // valid gameplay stereo Presents. Do not tear down a healthy
-            // projection immediately: a short debounce prevents the headset
-            // from flashing the raw SBS/theater image during stage/state
-            // transitions. A real menu still switches normally after 750 ms.
-            if (requestedPresentation == OutRunVR::PresentationTheater &&
-                lastPresentation == OutRunVR::PresentationGameplay &&
-                cachedProjectionValid &&
-                presentationNow >= cachedProjectionRenderedMs &&
-                presentationNow - cachedProjectionRenderedMs <=
-                    R23PresentationDebounceMs)
-            {
-                presentation = OutRunVR::PresentationGameplay;
-                ++R23PresentationGraceFrames;
-            }
+            // R45: the game now publishes presentation from an explicit
+            // GameState whitelist. Do not retain a stale stereo projection for
+            // 750 ms after it says Theater; that hold was enough to transform
+            // selector/result frames as gameplay and corrupt the preview car.
 
             if (presentation != lastPresentation)
             {
@@ -2177,13 +2187,25 @@ int main(int argc, char** argv)
                     cachedProjectionValid = false;
                     cachedProjectionRenderedMs = 0;
                     cachedMenuProjectionValid = false;
+                    if ((head.locationFlags & R45MenuAnchorFlags) ==
+                        R45MenuAnchorFlags)
+                    {
+                        menuProjectionAnchor = head.pose;
+                        menuProjectionAnchorValid = true;
+                        refreshMenuAnchorAfterLocate = false;
+                    }
+                    else
+                    {
+                        menuProjectionAnchorValid = false;
+                        refreshMenuAnchorAfterLocate = true;
+                    }
                 }
                 else
                 {
                     cachedMenuProjectionValid = false;
                 }
                 lastPresentation = presentation;
-                std::cout << "VR presentation: "
+                std::cout << "VR presentation R45: "
                     << (presentation == OutRunVR::PresentationGameplay ? "true stereo projection" : "LOCAL-fixed mono 2D projection menu")
                     << ".\n";
             }
@@ -2731,12 +2753,14 @@ int main(int argc, char** argv)
                     // only the reference space changes so the menu remains at
                     // the recentered world orientation while the head moves.
                     if (capture.available &&
+                        menuProjectionAnchorValid &&
                         (!cachedMenuProjectionValid || capture.fresh))
                     {
                         std::array<XrCompositionLayerProjectionView, 2>
                             refreshed{};
                         if (R23RenderWorldLockedMenuProjection(
-                                compositor, views, refreshed))
+                                compositor, views, menuProjectionAnchor,
+                                refreshed))
                         {
                             cachedMenuProjectionViews = refreshed;
                             cachedMenuProjectionValid = true;

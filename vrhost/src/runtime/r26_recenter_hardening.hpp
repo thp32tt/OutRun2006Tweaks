@@ -239,6 +239,30 @@ namespace OutRunVrR26RecenterHardening
         return "other-layer";
     }
 
+    inline bool CompletePendingGameRequestAfterVisibleProjection() noexcept
+    {
+        const LONG pending =
+            PendingGameRequestId.load(std::memory_order_acquire);
+        if (pending == 0)
+            return false;
+
+        auto& channel = OutRunVR::RecenterIpc::SharedChannel();
+        channel.MarkApplied(pending);
+        LONG expected = pending;
+        const bool cleared = PendingGameRequestId.compare_exchange_strong(
+            expected, 0, std::memory_order_acq_rel,
+            std::memory_order_acquire);
+        if (cleared)
+        {
+            ++GameRequestsApplied;
+            InvalidateFallbackAnchor();
+            std::cerr
+                << "[R45 recenter] requestId=" << pending
+                << " completed by fresh visible DirectGPU projection; fast path remained live\n";
+        }
+        return cleared;
+    }
+
     inline XrResult XRAPI_CALL EndFrame(XrSession session,
         const XrFrameEndInfo* endInfo) noexcept
     {
