@@ -278,7 +278,10 @@ namespace
         ci.applicationInfo.applicationVersion=1;
         strcpy_s(ci.applicationInfo.engineName,"OutRun2006Tweaks");
         ci.applicationInfo.engineVersion=1;
-        ci.applicationInfo.apiVersion=XR_CURRENT_API_VERSION;
+        // VDXR and some PC runtimes still expose a 1.0 instance contract even when
+        // the app is built with newer 1.1 headers. Request the stable 1.0 core;
+        // XR_KHR_D3D12_enable is negotiated independently via extensions.
+        ci.applicationInfo.apiVersion=XR_MAKE_VERSION(1,0,0);
         ci.enabledExtensionCount=1;
         ci.enabledExtensionNames=extensions;
         CheckXr(xrCreateInstance(&ci,&xr.instance),"xrCreateInstance");
