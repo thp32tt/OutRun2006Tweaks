@@ -313,8 +313,10 @@ namespace OutRunVRStereo
                     return dxvkResult;
                 }
 
-                // The custom provider guarantees both views were emitted by the
-                // one consumed D3D9 draw. Do not count it as a duplicated draw.
+                // Historical name: Present uses this as "both eyes are ready",
+                // not strictly "the game issued two draw calls". Keep the flag
+                // true for one-draw multiview, but do not increment DuplicatedDraws.
+                FrameHadDuplicatedDraw = true;
                 FrameHadWorldStereo = true;
                 ++WorldStereoDraws;
                 ++R29StableTwoEyeDraws;
