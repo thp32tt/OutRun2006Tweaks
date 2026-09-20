@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-20T18:47:00Z",
+  "updatedUtc": "2026-09-20T18:52:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -60,14 +60,14 @@
     "Recovery runtime forcing 60 FPS with interpolation/cadence disabled contributes independent judder on a 90 Hz OpenXR session.",
     "Restore fast R29 world rendering and classification in bounded variants before deciding which later R30-R34 overlays are required."
   ],
-  "nextAction": "Validate DX9Ex Active Validation at current head. If host/game/package pass, mark rolling capture BUILD VERIFIED and use the single active workflow for routine source changes. Keep the four-way comparison matrix manual-only.",
+  "nextAction": "First consume the DX9Ex Active Validation result and latest lightweight policy/AST parser result. If green, routine source CI is one active game DLL + one host and four-way P1-P4 remains manual-only. Continue independent DX9Ex correctness work without requesting extra HMD tests; next default human test is one CORRECTNESS run.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
     "lastEntryStartKst": "2026-09-21T02:59:17+09:00",
     "historyCommitSha": "035e061e9331867d993d983e1c4bdb514b12e2f3",
     "result": "NO MATERIAL CHANGE / NO BUILD NEEDED",
-    "nextAction": "Validate DX9Ex Active Validation at current head. If host/game/package pass, mark rolling capture BUILD VERIFIED and use the single active workflow for routine source changes. Keep the four-way comparison matrix manual-only."
+    "nextAction": "First consume the DX9Ex Active Validation result and latest lightweight policy/AST parser result. If green, routine source CI is one active game DLL + one host and four-way P1-P4 remains manual-only. Continue independent DX9Ex correctness work without requesting extra HMD tests; next default human test is one CORRECTNESS run."
   },
   "legacyCandidateMatrix": {
     "matrixId": "DX9EX-20260920-ee94dc8051b6",
@@ -193,7 +193,7 @@
     "reason": "Freeze at 19:00 only when material validated changes exist; preserve during user testing."
   },
   "diagnosticCapture": {
-    "status": "phase1-implemented-build-validation-pending",
+    "status": "phase1-build-verified-user-runtime-pending",
     "triggerPolicy": "Ctrl+F9 selected to avoid F11 Tweaks overlay and F12 recenter.",
     "rollingTelemetrySeconds": 10,
     "heavyContinuousImageDumping": false,
@@ -227,11 +227,33 @@
       "per-stage wait/acquire/render-left/render-right/copy/end timings",
       "left/right eye image snapshots",
       "draw-class counters not already exposed by IPC"
-    ]
+    ],
+    "buildEvidence": {
+      "workflow": "DX9Ex Focus Test Matrix",
+      "runId": 35529948535,
+      "result": "success",
+      "meaning": "x64 host and all existing Win32 comparison variants compiled and packaged with phase-1 rolling capture source present"
+    },
+    "runtimeEvidence": "USER_RUNTIME_REQUIRED: capture trigger/usability and headset performance impact have not yet been validated on Quest 3/VDXR."
   },
   "scheduledAutomationModel": {
     "main00": "Production review/implement/validate/commit on vr-d3d9ex-focus at :00.",
     "parallel30": "Independent adversarial review on vr-d3d9ex-review at :30; no production runtime writes.",
     "support15": "01:15 nightly gate; 08:15/11:15/14:15/17:15 reusable verifier/CI/log/package support on vr-d3d9ex-support."
+  },
+  "policyVerification": {
+    "lightweightWorkflow": "VR Test Policy",
+    "lastKnownSuccessRunId": 35530274341,
+    "lastKnownSuccessSha": "e67b00dd3d673b80f73115b7e26392ee6c1a67a1",
+    "note": "Single-active/manual-matrix policy verifier repaired and passed. Additional AST parse coverage was added afterward and should be the next lightweight check."
+  },
+  "activeValidation": {
+    "workflow": "DX9Ex Active Validation",
+    "sourceSha": "78328262a2925d94da4e995a44cc67710da1333d",
+    "status": "in-progress-at-state-write",
+    "host": "success",
+    "game": "in-progress",
+    "package": "pending",
+    "note": "This source includes the phase-1 rolling capture implementation. Later tool/docs commits do not change game/host runtime source."
   }
 }
