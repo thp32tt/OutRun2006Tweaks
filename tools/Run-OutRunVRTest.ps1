@@ -29,7 +29,20 @@ if(!$backend){throw 'Active backend identity is missing.'}
 
 # If stale root logs exist, re-selecting the same backend seals them into the
 # previous session and creates a clean session before launch.
-$patterns=@('OutRun2006Tweaks*.log','outrun-vr-host*.log','outrun-vr-host-pipeline*.log','outrun-vr-watchdog*.log','backend*.log','*.dmp')
+$patterns=@(
+    'OutRun2006Tweaks*.log',
+    'outrun-vr-host*.log',
+    'outrun-vr-host-pipeline*.log',
+    'outrun-vr-watchdog*.log',
+    'backend*.log',
+    'OR2006C2C_d3d9.log',
+    'OR2006C2C_dxgi.log',
+    'OR2006C2C_d3d11.log',
+    'OR2006C2C_vkd3d*.log',
+    'dxvk*.log',
+    'vkd3d*.log',
+    '*.dmp'
+)
 $stale=$false
 foreach($pattern in $patterns){
     if(Get-ChildItem $root -Filter $pattern -File -ErrorAction SilentlyContinue|Select-Object -First 1){
