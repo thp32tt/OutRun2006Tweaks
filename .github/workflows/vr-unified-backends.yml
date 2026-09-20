@@ -243,6 +243,8 @@ jobs:
           Copy-Item tools/Select-OutRunVRBackend.cmd package/Select-OutRunVRBackend.cmd
           Copy-Item tools/OutRunVR-Backend-Selector.ps1 package/OutRunVR-Backend-Selector.ps1
           Copy-Item tools/OutRunVR-Backend-Selector.cmd package/OutRunVR-Backend-Selector.cmd
+          Copy-Item tools/Collect-OutRunVRLogs.ps1 package/Collect-OutRunVRLogs.ps1
+          Copy-Item tools/Collect-OutRunVRLogs.cmd package/Collect-OutRunVRLogs.cmd
           Copy-Item docs/VR_UNIFIED_TEST_SCENARIO.md package/VR_UNIFIED_TEST_SCENARIO.md
 
           $ini = Get-Content package/OutRun2006Tweaks.ini -Raw
