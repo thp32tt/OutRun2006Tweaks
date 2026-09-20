@@ -9,6 +9,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include "../d3d12/d3d12_game_bridge.hpp"
 #include <mutex>
 
 #include <spdlog/spdlog.h>
@@ -309,7 +310,7 @@ namespace OutRunVRStereo
 			return SharedState && (SharedState->flags & OutRunVR::HostDirectGpuTransport) != 0;
 		}
 
-		bool HostDirectTransportReady()
+		bool OutRunVRD3D12Bridge::HostReady()
 		{
 			return SharedState && (SharedState->flags & OutRunVR::HostDirectGpuReady) != 0;
 		}
@@ -981,104 +982,41 @@ namespace OutRunVRStereo
 		}
 		bool ResolveDirectTransport(IDirect3DDevice9* device,std::uint32_t frameId)
 		{
-			if(!frameId||!EnsureDirectTransportResources(device)||!BackBuffer||!RightEyeSurface)return false;
-			const std::uint32_t consumed=SharedState?SharedState->hostDirectConsumedFrameId:0;
-			const std::uint32_t preferred=(frameId-1u)%OutRunVR::RenderFrameRingSize;
-			std::uint32_t selected=OutRunVR::RenderFrameRingSize;
-
-			// Search every ring slot. A slow query must not stall the game thread
-			// or block an otherwise free slot.
-			for(std::uint32_t offset=0;offset<OutRunVR::RenderFrameRingSize;++offset)
-			{
-				const std::uint32_t index=(preferred+offset)%OutRunVR::RenderFrameRingSize;
-				auto&slot=DirectTransportSlots[index];
-
-				if(slot.producerPending)
-				{
-					const HRESULT ready=slot.fence?slot.fence->GetData(nullptr,0,0):E_FAIL;
-					if(ready==S_OK)
-					{
-						slot.producerPending=false;
-						slot.pendingFrameId=0;
-						// A frame whose fence missed its publication window was
-						// never visible to the host, so reclaim it without ACK.
-						if(!slot.published)slot.frameId=0;
-					}
-					else if(ready==S_FALSE)
-					{
-						continue;
-					}
-					else
-					{
-						slot.producerPending=false;
-						slot.pendingFrameId=0;
-						slot.frameId=0;
-						slot.published=false;
-					}
-				}
-
-				// Published images are immutable until the host ACKs their frame.
-				if(slot.published&&slot.frameId&&!FrameIdAtOrAfter(consumed,slot.frameId))
-					continue;
-				if(slot.published&&slot.frameId&&FrameIdAtOrAfter(consumed,slot.frameId))
-				{
-					slot.frameId=0;
-					slot.published=false;
-				}
-				selected=index;
-				break;
-			}
-
-			if(selected>=OutRunVR::RenderFrameRingSize)
-			{
-				++DirectTransportRingBackpressure;
+			// DX12 branch: the old D3D9Ex -> D3D11 shared-handle ring is retired.
+			// Resolve the already-rendered left/right eyes into single-sample D3D9On12
+			// resources, then let the native bridge unwrap/copy them on D3D12 and
+			// publish named shared D3D12 resources guarded by a shared fence.
+			if(!device||!frameId||!BackBuffer||!RightEyeSurface||
+				!LeftResolveSurface||!RightResolveSurface||
+				!OutRunVRD3D12Bridge::HostReady())
 				return false;
-			}
 
-			auto&slot=DirectTransportSlots[selected];
+			HRESULT leftHr=E_FAIL,rightHr=E_FAIL;
 			{
 				InternalPassScope guard;
-				if(FAILED(StretchDirectEye(device,BackBuffer,slot.leftSurface))||
-					FAILED(StretchDirectEye(device,RightEyeSurface,slot.rightSurface))||
-					FAILED(slot.fence->Issue(D3DISSUE_END)))return false;
+				leftHr=device->StretchRect(
+					BackBuffer,nullptr,LeftResolveSurface,nullptr,D3DTEXF_NONE);
+				rightHr=device->StretchRect(
+					RightEyeSurface,nullptr,RightResolveSurface,nullptr,D3DTEXF_NONE);
 			}
-			slot.producerPending=true;
-			slot.pendingFrameId=frameId;
-			slot.frameId=frameId;
-			slot.published=false;
-			ActiveDirectTransportSlot=selected;
-			return true;
+			if(FAILED(leftHr)||FAILED(rightHr))
+			{
+				spdlog::warn(
+					"VR DX12 transport: eye resolve failed left=0x{:08X} right=0x{:08X}",
+					static_cast<unsigned>(leftHr),static_cast<unsigned>(rightHr));
+				return false;
+			}
+			return OutRunVRD3D12Bridge::PublishStereo(
+				LeftResolveSurface,RightResolveSurface,frameId,
+				FrameStereoPoseSequence);
 		}
 
 		bool DirectTransportFrameReadyAfterPresent(std::uint32_t frameId)
 		{
-			if(!frameId||ActiveDirectTransportSlot>=DirectTransportSlots.size())return false;
-			auto&slot=DirectTransportSlots[ActiveDirectTransportSlot];
-			if(slot.frameId!=frameId||slot.pendingFrameId!=frameId||!slot.fence)return false;
-
-			// Present has already flushed the frame. Allow at most 1 ms of bounded
-			// completion grace here; the old 4 ms pre-Present wait consumed a large
-			// part of a 90/120 Hz frame budget and was visible as VD hitching.
-			if(WaitForEventQuery(slot.fence,1))
-			{
-				slot.producerPending=false;
-				slot.pendingFrameId=0;
-				slot.published=true;
-				return true;
-			}
-
-			++DirectTransportFenceTimeouts;
-			const HRESULT status=slot.fence->GetData(nullptr,0,0);
-			if(status!=S_FALSE)
-			{
-				slot.producerPending=false;
-				slot.pendingFrameId=0;
-				slot.frameId=0;
-				slot.published=false;
-			}
-			// S_FALSE stays quarantined. A later slot scan reclaims it as soon as
-			// the query completes; it is never published and therefore needs no ACK.
-			return false;
+			// Native D3D12 publication is asynchronous. The consumer waits on the
+			// producer's shared D3D12 fence, so the game thread never CPU-waits here.
+			return frameId!=0&&
+				OutRunVRD3D12Bridge::LastPublishedFrame()==frameId;
 		}
 
 		bool EnsureStereoResources(IDirect3DDevice9* device)
@@ -1281,7 +1219,7 @@ namespace OutRunVRStereo
 
 			if(stereoFrameEligible)
 			{
-				if(HostDirectTransportReady())
+				if(OutRunVRD3D12Bridge::HostReady())
 					directTransport=ResolveDirectTransport(device,pendingFrameId);
 
 				if(directTransport)
@@ -1349,7 +1287,7 @@ namespace OutRunVRStereo
 				if(!FirstStereoActiveLogged)
 				{
 					FirstStereoActiveLogged=true;
-					spdlog::info("VR stereo: TRUE STEREO active; transport={} sourceEye={}x{} PC={}",directTransport?"verified D3D9Ex->D3D11 ring":"SBS Desktop Duplication",BackBufferDesc.Width,BackBufferDesc.Height,(directTransport&&HostDirectTransportReady())?"left-eye mirror":"SBS fallback");
+					spdlog::info("VR stereo: TRUE STEREO active; transport={} sourceEye={}x{} PC={}",directTransport?"native D3D12 shared ring":"SBS disabled",BackBufferDesc.Width,BackBufferDesc.Height,(directTransport&&OutRunVRD3D12Bridge::HostReady())?"left-eye mirror":"SBS fallback");
 				}
 			}
 			else if(!(directOnlyHold&&stereoFrameEligible&&SUCCEEDED(hr)))
