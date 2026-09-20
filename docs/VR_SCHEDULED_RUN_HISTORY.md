@@ -30,3 +30,14 @@ Durable coordination files:
 - `docs/autodev/VALIDATION_HANDOFF.json`
 
 Source-write ownership is restricted to FIX. Runtime correctness remains Quest 3/VDXR gated.
+
+
+## Environment hardening — 2026-09-21 03:36 KST
+
+Added lightweight coordination validation:
+- `tools/Validate-VRAutodevState.ps1`
+- `.github/workflows/vr-autodev-state.yml`
+
+The validator checks JSON parseability, authority invariants, unique queue IDs, allowed state transitions, dependency references, two-attempt limits and handoff identities. The existing heavy unified backend workflow is path-filtered, so coordination-only document changes do not intentionally trigger the full D3D9/DXVK/DX12 package build.
+
+Static connector-side validation of the six coordination JSON files passed with 7 queue items and zero detected invariant errors.
