@@ -32,7 +32,7 @@ Lack of new runtime evidence is not a reason to stop work on independent LEVEL0/
 
 ## Diagnostic capture target
 
-F11 remains the existing Tweaks overlay key. The VR diagnostic trigger is Ctrl+F11 (or another explicitly non-conflicting bind).
+F11 remains the existing Tweaks overlay key. The VR diagnostic trigger is Ctrl+F9. F11 remains the Tweaks overlay and F12 remains recenter, so the capture key avoids both.
 
 The target capture bundle is low overhead and on-demand:
 
