@@ -11,6 +11,57 @@ $payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "dxvk-safe") { "d3d9" }
 $src = Join-Path $backendRoot $payloadBackend
 if (-not (Test-Path $src)) { throw "Backend payload not found: $src" }
 
+$logPatterns=@('OutRun2006Tweaks*.log','outrun-vr-host*.log','outrun-vr-host-pipeline*.log','outrun-vr-watchdog*.log','backend*.log','*.dmp')
+
+function Get-SessionFiles {
+    $seen=@{}
+    $files=@()
+    foreach($pattern in $logPatterns){
+        foreach($file in Get-ChildItem $root -Filter $pattern -File -ErrorAction SilentlyContinue){
+            if($seen.ContainsKey($file.FullName)){continue}
+            $seen[$file.FullName]=$true
+            $files+=$file
+        }
+    }
+    return $files
+}
+
+function Seal-PendingSessionLogs {
+    $files=Get-SessionFiles
+    if(-not $files -or $files.Count -eq 0){return}
+
+    $current=Join-Path $root 'CURRENT_VR_SESSION.json'
+    $dest=$null
+    $oldState=$null
+    if(Test-Path $current){
+        try{$oldState=Get-Content $current -Raw|ConvertFrom-Json}catch{$oldState=$null}
+    }
+
+    if($oldState -and $oldState.SessionId -and $oldState.BuildMatrixId -and $oldState.VariantId){
+        $dest=Join-Path $root ("logs/{0}/{1}/{2}" -f $oldState.BuildMatrixId,$oldState.VariantId,$oldState.SessionId)
+    }else{
+        $stamp=(Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssfffZ')
+        $dest=Join-Path $root ("logs/_orphaned/{0}" -f $stamp)
+    }
+    New-Item -ItemType Directory -Force $dest|Out-Null
+
+    $moved=@()
+    foreach($file in $files){
+        $target=Join-Path $dest $file.Name
+        if(Test-Path $target){
+            $prefix=(Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssfffZ')
+            $target=Join-Path $dest ($prefix+'_'+$file.Name)
+        }
+        Move-Item $file.FullName $target -Force
+        $moved+=[IO.Path]::GetFileName($target)
+    }
+    @(
+        "AUTO_ARCHIVED_UTC=$((Get-Date).ToUniversalTime().ToString('o'))"
+        "REASON=backend-selection-started-new-session"
+        "FILES=$($moved -join ',')"
+    )|Set-Content (Join-Path $dest 'AUTO_ARCHIVED_ON_NEXT_SESSION.txt') -Encoding UTF8
+}
+
 function Copy-Required([string]$name) {
     $p = Join-Path $src $name
     if (-not (Test-Path $p)) { throw "Required backend file missing: $p" }
@@ -57,6 +108,10 @@ $running = Get-Process -ErrorAction SilentlyContinue | Where-Object {
     $_.ProcessName -ieq "OR2006C2C" -or $_.ProcessName -ieq "outrun-vr-host"
 }
 if ($running) { throw "OutRun or outrun-vr-host.exe is still running. Close it before switching." }
+
+# Preserve any uncollected logs before touching the backend or starting a new
+# session. This makes game-side truncate/overwrite behavior harmless.
+Seal-PendingSessionLogs
 
 Copy-Required "dinput8.dll"
 
@@ -147,19 +202,8 @@ Set-Content (Join-Path $root "ACTIVE_VR_BACKEND.txt") $activeText -Encoding asci
 
 $configHash = "missing"
 if (Test-Path $ini) { $configHash = (Get-FileHash $ini -Algorithm SHA256).Hash.ToLowerInvariant() }
-$preexistingLogs = @()
-foreach ($pattern in @('OutRun2006Tweaks*.log','outrun-vr-host*.log','outrun-vr-host-pipeline*.log','outrun-vr-watchdog*.log','backend*.log')) {
-    foreach ($file in Get-ChildItem $root -Filter $pattern -File -ErrorAction SilentlyContinue) {
-        if ($preexistingLogs.Name -contains $file.Name) { continue }
-        $preexistingLogs += [ordered]@{
-            Name = $file.Name
-            Length = $file.Length
-            LastWriteUtc = $file.LastWriteTimeUtc.ToString("o")
-        }
-    }
-}
 $sessionManifest = [ordered]@{
-    SchemaVersion = 1
+    SchemaVersion = 2
     BuildMatrixId = $matrix
     VariantId = $variant
     Backend = $Backend
@@ -167,7 +211,7 @@ $sessionManifest = [ordered]@{
     StartedUtc = $startedUtc.ToString("o")
     ConfigSha256 = $configHash
     CollectionStatus = "started-before-game-launch"
-    PreexistingLogs = $preexistingLogs
+    PreexistingLogs = @()
 }
 $sessionManifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $root "CURRENT_VR_SESSION.json") -Encoding UTF8
 $sessionManifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $sessionRoot "session_manifest.json") -Encoding UTF8
@@ -184,6 +228,7 @@ if (Test-Path (Join-Path $root "BUILD_INPUTS.json")) {
 
 Write-Host "OutRun renderer mode activated: $Backend"
 Write-Host "Diagnostic session prepared before launch: $session"
+Write-Host "Any previous root logs were archived before this session was created."
 switch ($Backend) {
     "2d"   { Write-Host "2D ORIGINAL: classic D3D9, VR disabled, D3D9Ex promotion disabled, no VR host." }
     "d3d9" { Write-Host "D3D9 VR SAFE: guarded D3D9Ex/DirectGPU VR path." }
