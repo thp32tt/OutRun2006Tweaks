@@ -82,3 +82,20 @@ The T0-debug branch and unified branch are heavily diverged, so wholesale merge/
 
 ### Next action
 Continue from unified source commit `ad14ed6c6757634233ec79b71f42be53c563edb7`. Use T0-debug `365b294...` as the DX9Ex reference input. Next hourly run should port bounded fingerprint telemetry and the narrow S6/S7 lens-flare candidate into the D3D9Ex path only, with fail-closed matching and without broad WVP/WorldBillboard promotion. Prepare no more than six runtime candidates. Do not mark Position HUD, white overlays, or the fast path fixed until runtime evidence confirms them.
+
+
+## Four-worker autonomous development environment — 2026-09-21 03:36 KST
+
+The repository-side environment is now separated from external Work scheduling.
+
+- Durable protocol: `docs/VR_AUTODEV_PROTOCOL.md`
+- Central work queue: `docs/VR_WORK_QUEUE.json`
+- Normalized hardware/runtime inbox: `docs/VR_RUNTIME_FEEDBACK.json`
+- REVIEW handoff: `docs/autodev/REVIEW_HANDOFF.json`
+- FIX handoff: `docs/autodev/FIX_HANDOFF.json`
+- VALIDATION handoff: `docs/autodev/VALIDATION_HANDOFF.json`
+- Coordination state is linked from `docs/VR_AUTODEV_STATE.json`.
+
+Concurrency rule: FIX is the sole autonomous production-source writer. REVIEW and VALIDATION are source-read-only; INTEGRATION/PLANNER owns the central queue/state. This avoids four scheduled workers editing the same source/state concurrently while still allowing staggered hourly execution.
+
+The queue is pre-seeded from the current durable findings. Highest-value automatic work remains bounded DX9Ex fingerprint telemetry, followed by the isolated S6/S7 lens-flare candidate. Position HUD, white overlays and DX12 startup remain runtime-evidence gated. T5/R29 performance work stays blocked behind correctness.
