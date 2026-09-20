@@ -41,10 +41,15 @@ $requiredFiles = @(
     'OutRunVR-Backend-Selector.ps1'
 )
 $text = @{}
-foreach($name in $requiredFiles) {
+$parseTargets = @('OutRunVR-TestProfiles.ps1') + $requiredFiles
+foreach($name in $parseTargets) {
     $p = Join-Path $root $name
     Assert-True (Test-Path $p) "missing test tool: $name"
-    $text[$name] = Get-Content $p -Raw
+    $tokens = $null
+    $errors = $null
+    [void][System.Management.Automation.Language.Parser]::ParseFile($p,[ref]$tokens,[ref]$errors)
+    Assert-True ($errors.Count -eq 0) ("PowerShell parse failure in {0}: {1}" -f $name, (($errors | ForEach-Object {$_.Message}) -join '; '))
+    if($name -in $requiredFiles){ $text[$name] = Get-Content $p -Raw }
 }
 
 Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'TestProfile') 'selector must persist TestProfile'
