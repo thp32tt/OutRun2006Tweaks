@@ -1011,6 +1011,26 @@ namespace OutRunVRStereo
 				FrameStereoPoseSequence);
 		}
 
+		bool ResolveMonoDirectTransport(IDirect3DDevice9* device,std::uint32_t frameId)
+		{
+			if(!device||!frameId||!BackBuffer||
+				!LeftResolveSurface||!RightResolveSurface||
+				!OutRunVRD3D12Bridge::HostReady())
+				return false;
+			HRESULT leftHr=E_FAIL,rightHr=E_FAIL;
+			{
+				InternalPassScope guard;
+				leftHr=device->StretchRect(
+					BackBuffer,nullptr,LeftResolveSurface,nullptr,D3DTEXF_NONE);
+				rightHr=device->StretchRect(
+					BackBuffer,nullptr,RightResolveSurface,nullptr,D3DTEXF_NONE);
+			}
+			if(FAILED(leftHr)||FAILED(rightHr))
+				return false;
+			return OutRunVRD3D12Bridge::PublishStereo(
+				LeftResolveSurface,RightResolveSurface,frameId,0);
+		}
+
 		bool DirectTransportFrameReadyAfterPresent(std::uint32_t frameId)
 		{
 			// Native D3D12 publication is asynchronous. The consumer waits on the
@@ -1193,7 +1213,11 @@ namespace OutRunVRStereo
 			const std::uint64_t beginNow=OutRunVRRenderer::GetBeginSceneCallCount(),beginDelta=beginNow>=LastBeginSceneCountAtPresent?beginNow-LastBeginSceneCountAtPresent:0;LastBeginSceneCountAtPresent=beginNow;if(GameplayActive()){if(beginDelta>1)++MultiBeginScenePresents;MaxBeginScenesPerPresent=std::max(MaxBeginScenesPerPresent,beginDelta);}
 
 			const bool stereoRequested=StereoWanted();
-			const std::uint32_t pendingFrameId=stereoRequested?NextStereoFrameId():0;
+			const bool menuDirectCandidate=
+				!stereoRequested&&!GameplayActive()&&
+				OutRunVRD3D12Bridge::HostReady();
+			const std::uint32_t pendingFrameId=
+				(stereoRequested||menuDirectCandidate)?NextStereoFrameId():0;
 			const bool stereoFrameEligible=
 				stereoRequested&&FrameHadWorldStereo&&FrameHadDuplicatedDraw&&
 				!FrameRightDrawFailed&&!FrameStereoIncomplete&&
@@ -1202,6 +1226,7 @@ namespace OutRunVRStereo
 
 			bool composedStereo=false;
 			bool directTransport=false;
+			bool menuDirectTransport=false;
 			bool directOnlyHold=false;
 			std::uint32_t pendingPoseSequence=0;
 
@@ -1216,6 +1241,18 @@ namespace OutRunVRStereo
 					spdlog::warn("VR DIRECT-ONLY: shared-eye frame deferred without blocking; incomplete handles are never published and OpenXR reuses the last safe projection");
 				}
 			};
+
+			if(menuDirectCandidate&&pendingFrameId&&EnsureStereoResources(device))
+			{
+				menuDirectTransport=
+					ResolveMonoDirectTransport(device,pendingFrameId);
+				if(menuDirectTransport&&!FirstDirectTransportLogged)
+				{
+					FirstDirectTransportLogged=true;
+					spdlog::info(
+						"VR DX12 menu transport: mono backbuffer exported through native D3D12 ring; OpenXR host owns LOCAL-space theater placement");
+				}
+			}
 
 			if(stereoFrameEligible)
 			{
@@ -1265,6 +1302,10 @@ namespace OutRunVRStereo
 				PublishRenderFrame(OutRunVR::StereoSbsFallbackMono,pendingFrameId,pendingPoseSequence,presentStart.QuadPart,FrameFailureReason,nullptr,true,false);
 
 			const HRESULT hr=PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);
+
+			if(menuDirectTransport&&
+				(!SUCCEEDED(hr)||!DirectTransportFrameReadyAfterPresent(pendingFrameId)))
+				menuDirectTransport=false;
 
 			if(directTransport)
 			{
