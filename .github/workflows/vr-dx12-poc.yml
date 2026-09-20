@@ -5,6 +5,12 @@ on:
     branches: [ vr-dx12-poc ]
     paths:
       - 'dx12poc/**'
+      - 'src/vr/d3d12/**'
+      - 'src/vr/ipc/d3d12_transport.hpp'
+      - 'src/vr/d3d9/**'
+      - 'vrhost/CMakeLists.txt'
+      - 'vrhost/src/main_dx12.cpp'
+      - 'vrhost/src/dx12_*.hpp'
       - 'docs/VR_DX12_ARCHITECTURE.md'
       - '.github/workflows/vr-dx12-poc.yml'
   workflow_dispatch:
@@ -51,4 +57,63 @@ jobs:
         with:
           name: outrun-d3d9on12-win32-probe
           path: build-dx12-poc/Release/outrun-d3d9on12-probe.exe
+          if-no-files-found: error
+
+
+  x64-openxr-d3d12-host:
+    runs-on: windows-2022
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure x64 native D3D12 host
+        shell: cmd
+        run: >
+          cmake -S vrhost -B build-vrhost-dx12
+          -G "Visual Studio 17 2022" -A x64
+
+      - name: Build x64 native D3D12 host
+        run: cmake --build build-vrhost-dx12 --config Release --target outrun-vr-host-dx12
+
+      - name: Verify x64 D3D12 host and single-draw marker
+        shell: pwsh
+        run: |
+          $exe = 'build-vrhost-dx12/bin/outrun-vr-host-dx12.exe'
+          if (-not (Test-Path $exe)) {
+            throw 'native DX12 host executable was not produced'
+          }
+
+          $bytes = [System.IO.File]::ReadAllBytes($exe)
+          $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+          $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
+          if ($machine -ne 0x8664) {
+            throw ('expected x64 host, machine=0x{0:X4}' -f $machine)
+          }
+
+          $ascii = [Text.Encoding]::ASCII.GetString($bytes)
+          foreach ($marker in @(
+            'OutRun2 native OpenXR D3D12 host',
+            'DX12 compositor: single DrawInstanced call renders both eyes',
+            'XR_KHR_D3D12_enable'
+          )) {
+            if (-not $ascii.Contains($marker)) {
+              throw "missing DX12 host marker: $marker"
+            }
+          }
+
+          Copy-Item $exe 'build-vrhost-dx12/bin/outrun-vr-host.exe' -Force
+          if (Test-Path 'build-vrhost-dx12/bin/outrun-vr-host-dx12.pdb') {
+            Copy-Item 'build-vrhost-dx12/bin/outrun-vr-host-dx12.pdb' 'build-vrhost-dx12/bin/outrun-vr-host.pdb' -Force
+          }
+          Get-FileHash $exe -Algorithm SHA256
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: outrun-openxr-dx12-host
+          path: |
+            build-vrhost-dx12/bin/outrun-vr-host.exe
+            build-vrhost-dx12/bin/outrun-vr-host-dx12.exe
+            build-vrhost-dx12/bin/outrun-vr-host.pdb
           if-no-files-found: error
