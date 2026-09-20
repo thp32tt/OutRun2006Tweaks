@@ -172,128 +172,48 @@ namespace OutRunVRStereo
             return hr;
         }
 
-        bool R28CanRebindVerifiedWorld(IDirect3DDevice9* device,
-            std::uintptr_t& verifiedShaderIdentity,
-            std::uint64_t& verifiedShaderSerial) noexcept
+        template <typename R9Draw>
+        HRESULT R28RunWithVerifiedWorldEpoch(IDirect3DDevice9* device,
+            R9Draw&&)
         {
-            verifiedShaderIdentity = 0;
-            verifiedShaderSerial = 0;
             if (!IsGameDevice(device) || InternalStereoPass ||
                 !TargetIsBackBuffer() || !StereoWanted() || !R9StereoSeeded)
-                return false;
-            if (AnyAuxRenderTargetActive() || R13ForceMonoShadow ||
-                OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire) ||
-                ActiveOcclusionQueries.load(std::memory_order_acquire) > 0)
-                return false;
-            if (CurrentVertexShaderIdentity.load(std::memory_order_acquire) == 0)
-                return false;
-            if (!OutRunVRRenderer::R28PerspectiveWorldSemantic())
-            {
-                ++R28RebindSemanticReject;
-                return false;
-            }
+                return E_NOTIMPL;
 
             float verified[16]{};
             std::uint32_t generation = 0;
             std::uint32_t poseSequence = 0;
-            std::uintptr_t storedShader = 0;
-            std::uint64_t storedSerial = 0;
-            if (!OutRunVRRenderer::GetLastVerifiedWvp(verified, generation,
-                    poseSequence, storedShader, storedSerial))
+            std::uintptr_t verifiedShader = 0;
+            std::uint64_t verifiedSerial = 0;
+            if (!OutRunVRRenderer::GetLastVerifiedWvp(
+                    verified, generation, poseSequence,
+                    verifiedShader, verifiedSerial))
             {
                 ++R28RebindNoVerified;
-                return false;
+                return E_NOTIMPL;
             }
 
             std::uintptr_t currentShader = 0;
             std::uint64_t currentSerial = 0;
             if (!GetCurrentShaderEpoch(currentShader, currentSerial))
-                return false;
-            if (currentShader == storedShader && currentSerial == storedSerial)
-                return false; // R9 already has the exact verified epoch.
-
-            OutRunVRRenderer::LatchedStereoFrame stereo{};
-            if (!OutRunVRRenderer::GetLatchedStereoFrame(stereo) ||
-                generation == 0 || poseSequence == 0 ||
-                poseSequence != stereo.poseSequence)
-            {
-                ++R28RebindPoseReject;
-                return false;
-            }
-
-            float current[16]{};
-            if (FAILED(device->GetVertexShaderConstantF(
-                    OutRunWvpRegister, current, OutRunWvpRegisterCount)) ||
-                !FloatArrayNear(current, verified, 16, VerifiedWvpEpsilon))
-            {
-                ++R28RebindConstantMismatch;
-                return false;
-            }
-
-            float verifiedProjection[16]{};
-            std::uint32_t projectionGeneration = 0;
-            std::uint32_t projectionPoseSequence = 0;
-            if (!OutRunVRRenderer::GetR28VerifiedProjection(verifiedProjection,
-                    projectionGeneration, projectionPoseSequence) ||
-                projectionGeneration != generation ||
-                projectionPoseSequence != poseSequence)
-            {
-                ++R28RebindProjectionMismatch;
-                return false;
-            }
-
-            D3DMATRIX currentProjection{};
-            if (!ReadProjection(currentProjection) ||
-                !FloatArrayNear(reinterpret_cast<const float*>(&currentProjection),
-                    verifiedProjection, 16, VerifiedWvpEpsilon))
-            {
-                ++R28RebindProjectionMismatch;
-                return false;
-            }
-
-            verifiedShaderIdentity = storedShader;
-            verifiedShaderSerial = storedSerial;
-            return true;
-        }
-
-        template <typename R9Draw>
-        HRESULT R28RunWithVerifiedWorldEpoch(IDirect3DDevice9* device,
-            R9Draw&& r9Draw)
-        {
-            std::uintptr_t verifiedShaderIdentity = 0;
-            std::uint64_t verifiedShaderSerial = 0;
-            if (!R28CanRebindVerifiedWorld(device,
-                    verifiedShaderIdentity, verifiedShaderSerial))
                 return E_NOTIMPL;
 
-            const std::uintptr_t savedIdentity =
-                CurrentVertexShaderIdentity.exchange(
-                    verifiedShaderIdentity, std::memory_order_acq_rel);
-            const std::uint64_t savedSerial =
-                VertexShaderSerial.exchange(
-                    verifiedShaderSerial, std::memory_order_acq_rel);
-
-            const HRESULT hr = r9Draw();
-
-            // A D3D draw should not change the bound vertex shader. Restore only
-            // if no unexpected nested setter changed the synthetic epoch.
-            std::uintptr_t expectedIdentity = verifiedShaderIdentity;
-            CurrentVertexShaderIdentity.compare_exchange_strong(
-                expectedIdentity, savedIdentity,
-                std::memory_order_acq_rel, std::memory_order_acquire);
-            std::uint64_t expectedSerial = verifiedShaderSerial;
-            VertexShaderSerial.compare_exchange_strong(
-                expectedSerial, savedSerial,
-                std::memory_order_acq_rel, std::memory_order_acquire);
-
-            ++R28ShaderEpochWorldRebinds;
-            if (!R28FirstShaderEpochWorldLogged)
+            // Never impersonate the previous verified shader. A changed shader
+            // must upload/verify its own WVP before it can become world stereo.
+            // This closes the HUD/effect epoch leak and also removes the live
+            // c64..c67 readback that used to run on shader transitions.
+            if (currentShader != verifiedShader ||
+                currentSerial != verifiedSerial)
             {
-                R28FirstShaderEpochWorldLogged = true;
-                spdlog::info(
-                    "VR R28 WORLD: perspective draw kept verified per-eye WVP across a vertex-shader epoch change because c64..c67, projection, and pose generation still match");
+                ++R28RebindSemanticReject;
+                if (!R28FirstShaderEpochWorldLogged)
+                {
+                    R28FirstShaderEpochWorldLogged = true;
+                    spdlog::info(
+                        "VR R46 WORLD GUARD: changed vertex shader cannot inherit a prior verified world epoch; draw fails closed until its own WVP is verified");
+                }
             }
-            return hr;
+            return E_NOTIMPL;
         }
 
         bool R27ShouldBypassLegacyZeroDisparity(
