@@ -166,10 +166,19 @@ namespace OutRunVRDxvkProbe
                 }
                 else if (!customCompatible)
                 {
-                    spdlog::error(
-                        "VR DXVK PROBE: custom interface protocol mismatch (game={} provider={}); multiview must remain disabled",
-                        OutRunVR::DxvkInterop::ProtocolVersion,
-                        protocol);
+                    if (protocol != OutRunVR::DxvkInterop::ProtocolVersion)
+                    {
+                        spdlog::error(
+                            "VR DXVK PROBE: custom interface protocol mismatch (game={} provider={}); custom stereo disabled",
+                            OutRunVR::DxvkInterop::ProtocolVersion,
+                            protocol);
+                    }
+                    else
+                    {
+                        spdlog::info(
+                            "VR DXVK PROBE: custom protocol v{} detected but required multiview capability bits are not advertised (flags=0x{:08X}); validated two-pass fallback remains active",
+                            protocol, capabilities);
+                    }
                 }
             }
             else
