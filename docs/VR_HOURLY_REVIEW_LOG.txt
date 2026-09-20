@@ -444,3 +444,64 @@ Integration state:
 - DX12/DXVK runtime selection is not implemented yet
 - clean pre-integration baseline preserved
 
+======================================================================
+RUN 0003 - EVENING FREEZE / TRACEABLE SESSION PACKAGE
+======================================================================
+Date: 2026-09-20
+Phase window: 18:58:52-19:25 Asia/Seoul (09:58:52-10:25 UTC; end rounded to log publication)
+Start remote HEAD: f4133384c2c12871d3f97fb8cc73384aa27975fa
+Concurrent remote commit preserved: 6ba697c8d469495e0433deb045a5007ffca5fa75
+Frozen build commit: cbec700a30c44a85292f396d37d6e24a77ed0b47
+
+Review accounting:
+- This late-day freeze run did not claim a fresh 50-pass global cycle or missed daytime work.
+- New substantive investigations: 8 (remote/CI recovery; repository/build inventory;
+  selector ownership/process guard; INI round trip; session/log lifecycle; external-source
+  identity/licensing; package/failure graph; active correctness-path revalidation).
+- Carried forward: unchanged architectural inventory and renderer findings from the baseline.
+- Active reasoning time is unavailable. Observed wall time was approximately 26 minutes;
+  final successful CI ran from 10:14:21 to 10:21:40 UTC (about 7m19s).
+
+Exact changed paths reviewed:
+- .github/workflows/vr-unified-backends.yml: all producer jobs, artifact edges, package job,
+  selector/ZIP validation and pinned external inputs.
+- tools/Select-OutRunVRBackend.ps1: process refusal, payload ownership, root conflict removal,
+  INI update, pre-launch session creation, config hash and pre-existing-log offsets.
+- tools/Collect-OutRunVRLogs.ps1: active identity parsing, per-session filtering, suffix-only
+  extraction for existing logs, dump filtering, manifests, result preservation and ZIP naming.
+- tools/OutRunVR-Backend-Selector.ps1 and docs/VR_UNIFIED_TEST_SCENARIO.md: five selectable
+  modes and tonight's non-Cartesian test order.
+- src/vr/game/outrun_renderer.cpp, vrhost/src/main_r23.cpp,
+  src/vr/d3d9/vr_pass_policy.hpp, src/vr/d3d9/stereo_renderer_r26.cpp,
+  vrhost/src/runtime/sbs_capture_override.hpp and r24_black_screen_guard.hpp: revalidation of
+  the previously documented correctness hypotheses; no renderer edit was made in freeze.
+
+New evidence / changed conclusions:
+- The earlier collector used collection time as SessionId and copied every matching root log;
+  this could mix prior runs. It now creates identity before game launch and copies only bytes
+  appended after the recorded starting length (or a newly created/truncated file).
+- The collector package omission is cleared and is enforced by ZIP-content CI.
+- DXVK provider and multiview patcher were moving branch tips with no packaged SHA. They are
+  pinned to 5bb301ab... and 0ef3253d... and recorded in BUILD_INPUTS.json.
+- The baseline statement that application recenter is wholly absent is too broad for current
+  inputs: game-side yaw/position centering and reference-space generation handling exist.
+  Menu-anchor response to the configured game recenter still requires runtime evidence.
+- The prior swapchain-generation cached-image P0 remains unproven on the currently active
+  lifecycle: session stop/reference-space transitions explicitly invalidate caches, while no
+  in-process projection-swapchain recreation path was established in this pass. Do not auto-fix
+  it without a reproduced recreate path.
+- Depth-off classification and R28 cross-shader epoch reuse remain supported risk candidates;
+  neither was changed at freeze because no isolated B verifier/runtime evidence was completed.
+
+Failure/repair evidence:
+- Run 35504145813 built all five producer jobs successfully, then package validation failed
+  because its test regex did not accept CRLF in ACTIVE_VR_BACKEND.txt. This was a verifier defect,
+  not a selector-output defect.
+- The verifier was repaired without weakening the assertion. Final Build run 35504498714 and
+  Unified run 35504498726 both succeeded.
+
+Why execution ended:
+- The immutable evening package was built, its selector/INI/session isolation checks passed,
+  the downloaded ZIP contents and all 29 internal checksums were independently verified, and
+  further renderer changes would invalidate the frozen package before the evening test window.
+- Quest 3/VDXR behavior remains hardware-required; stable vr-openxr was not modified or merged.

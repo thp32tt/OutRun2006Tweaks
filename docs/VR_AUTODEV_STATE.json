@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "updatedUtc": "2026-09-20T10:25:00Z",
+  "branch": "vr-unified-backends",
+  "publicationMode": "github-fast-forward-cas",
+  "frozen": true,
+  "freezeReason": "evening-package-delivered-no-post-freeze-binary-changes",
+  "frozenCommit": "cbec700a30c44a85292f396d37d6e24a77ed0b47",
+  "buildMatrixId": "VRM-20260920-cbec700a30c4",
+  "components": {
+    "d3d9": "cbec700a30c44a85292f396d37d6e24a77ed0b47",
+    "dxvkGameHost": "88e891f9cb4533700d64c25f544561c1cda3f7ff",
+    "dxvkProvider": "5bb301ab22f7b41d68a879bf84c1e3d10ae0c473",
+    "multiviewPatcher": "0ef3253da1738b07e67358a027311c7bcedaa001",
+    "dx12": "4eb469238e6caa2f2c6aa8825db7502f42c522db"
+  },
+  "ci": {
+    "buildRunId": 35504498714,
+    "unifiedRunId": 35504498726,
+    "artifactId": 10603562638,
+    "artifactSha256": "1ab18b99ebb5be4cd4dd4e0457407314040b7be89e906132835b9348bf244fd6",
+    "innerZipSha256": "2e6c7fba2fcc5a775bac1c6130f6e1d6b6c7555cc80115fe581df6d6c13a8661"
+  },
+  "availableVariants": ["CONTROL_2D", "A_CONTROL", "E_DXVK_SAFE", "E_DXVK_MULTIVIEW", "F_DX12_STRICT"],
+  "excludedVariants": {
+    "B_CORRECTNESS": "no isolated verified renderer patch frozen",
+    "C_PERFORMANCE": "no isolated performance patch frozen",
+    "D_DIRECTGPU_OPENXR": "no isolated transport/timing patch frozen"
+  },
+  "runtimeEvidence": {
+    "latestLogIds": [],
+    "latestLogHashes": [],
+    "quest3VdxrRequired": true
+  },
+  "nextAction": "After new matrix logs arrive, correlate by BuildMatrixId/VariantId/SessionId and revalidate depth-off and R28 risks before creating B; do not modify the frozen package during evening testing."
+}

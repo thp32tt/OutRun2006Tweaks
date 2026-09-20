@@ -135,3 +135,55 @@ RUN 0002 RESULT:
 - Persistent P0 set: unchanged.
 - Stable vr-openxr: untouched.
 - Next action: package the collector scripts, validate them in CI, then implement isolated P0 correctness changes for B before moving to C/D performance/DirectGPU variants.
+
+======================================================================
+RUN 0003 - IMMUTABLE EVENING MATRIX FREEZE
+======================================================================
+Date: 2026-09-20
+BuildMatrixId: VRM-20260920-cbec700a30c4
+Frozen integration/D3D9 SHA: cbec700a30c44a85292f396d37d6e24a77ed0b47
+DXVK game/host SHA: 88e891f9cb4533700d64c25f544561c1cda3f7ff
+DXVK provider SHA: 5bb301ab22f7b41d68a879bf84c1e3d10ae0c473
+Multiview patcher SHA: 0ef3253da1738b07e67358a027311c7bcedaa001
+DX12 game/host SHA: 4eb469238e6caa2f2c6aa8825db7502f42c522db
+
+Implemented and verified:
+- collector scripts are included in the actual unified ZIP;
+- selector prepares unique SessionId/VariantId/BuildMatrixId and allowed config snapshot before launch;
+- collection filters by session start and extracts only appended bytes from pre-existing logs;
+- TEST_RESULT.txt is preserved on repeat/matrix collection;
+- every external/provider component SHA is pinned and packaged;
+- selector CI covers 2d, d3d9, dxvk-safe, dxvk, dx12, exact root DLL presence/absence,
+  ACTIVE_VR_BACKEND, [VR] header round trips, session identity and old-log exclusion;
+- downloaded ZIP inventory contains the GUI/command selectors, collectors, build inputs,
+  checksums, test scenario, all three backend payloads and both DXVK extras.
+
+Final CI:
+- Build run 35504498714: SUCCESS.
+- Unified run 35504498726: SUCCESS.
+- Unified artifact id 10603562638; artifact digest
+  sha256:1ab18b99ebb5be4cd4dd4e0457407314040b7be89e906132835b9348bf244fd6.
+- Inner evening ZIP sha256:2e6c7fba2fcc5a775bac1c6130f6e1d6b6c7555cc80115fe581df6d6c13a8661.
+- SHA256SUMS.txt entries independently recalculated: 29; failures: 0.
+
+Frozen candidates:
+- CONTROL_2D: available (smoke-only, VR disabled).
+- A_CONTROL / D3D9 SAFE: available; comparison control, not newly user-validated.
+- B_CORRECTNESS: excluded; no isolated renderer patch with adequate verifier was frozen.
+- C_PERFORMANCE: excluded; no isolated performance patch was frozen.
+- D_DIRECTGPU_OPENXR: excluded; no isolated transport/timing patch was frozen.
+- E_DXVK_SAFE: available; D3D9-safe game DLL + pinned local DXVK provider, patcher absent.
+- E_DXVK_MULTIVIEW: available; same DXVK game/host plus pinned provider and patcher; experimental.
+- F_DX12_STRICT: available; DXVK d3d9.dll and multiviewpatcher absent by selector contract.
+
+Evening test order:
+1. 2D ORIGINAL quick launch/exit smoke only.
+2. A_CONTROL D3D9 SAFE short startup screen, then menu car/recenter and identical short race scene.
+3. E_DXVK_SAFE with identical VDXR refresh/render scale and scene.
+4. If clean, choose E_DXVK_MULTIVIEW or F_DX12_STRICT as the one most informative alternative.
+5. Run Collect-OutRunVRLogs.cmd after each tested mode and `Collect-OutRunVRLogs.cmd -All`
+   once at the end; upload the one matrix ZIP.
+
+Runtime limitation:
+Quest 3/VDXR stereo correctness, HMD pacing, recenter, white rank/score, sky/effects,
+menu car and exit Yes/No remain user-runtime-required. CI success is not runtime proof.
