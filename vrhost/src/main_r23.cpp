@@ -2608,10 +2608,12 @@ int main(int argc, char** argv)
                          compositor.HasStereoSource() &&
                          projectionNow >= lastStereoMatchMs &&
                          projectionNow - lastStereoMatchMs <= StereoGraceMs);
-                    const bool cachedHold = cachedProjectionValid &&
-                        projectionNow >= cachedProjectionRenderedMs &&
-                        projectionNow - cachedProjectionRenderedMs <=
-                            R23CachedProjectionHoldMs;
+                    // R47: while gameplay remains active, never age out the
+                    // last successfully released stereo projection. A transient
+                    // producer stall must freeze the last good image, not fall
+                    // through to an empty/solid compositor frame. The projection
+                    // cache is still invalidated on presentation/reset changes.
+                    const bool cachedHold = cachedProjectionValid;
 
                     LARGE_INTEGER rs{}, re{}; QueryPerformanceCounter(&rs);
 
