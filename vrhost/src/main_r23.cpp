@@ -2831,7 +2831,7 @@ int main(int argc, char** argv)
 
             const ULONGLONG pipelineNowMs = GetTickCount64();
             if (lastPipelineTelemetryMs == 0 ||
-                pipelineNowMs - lastPipelineTelemetryMs >= 2000)
+                pipelineNowMs - lastPipelineTelemetryMs >= 5000)
             {
                 lastPipelineTelemetryMs = pipelineNowMs;
                 OutRunVrR23VerifiedBundle::Snapshot bundle{};
@@ -2888,8 +2888,9 @@ int main(int argc, char** argv)
                 std::cout << line;
                 if (pipelineLog.is_open())
                 {
+                    // Let the stream buffer coalesce periodic telemetry writes.
+                    // Per-frame forced flushes can serialize the XR loop on disk.
                     pipelineLog << line;
-                    pipelineLog.flush();
                 }
             }
             timings.MaybeLog();
