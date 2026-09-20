@@ -641,7 +641,7 @@ namespace OutRunVRD3D12Bridge
         if (!G.attached || !G.on12 || !G.device || !G.queue || !G.shared)
             return false;
 
-        if (!HostReady())
+        if (!Detail::HostReady())
         {
             if (!G.firstNoHostLogged)
             {
