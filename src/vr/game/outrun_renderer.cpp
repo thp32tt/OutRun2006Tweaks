@@ -1195,6 +1195,14 @@ namespace OutRunVRRenderer
 			ResetFrameState();
 			RestoreCullingCamera();
 
+			// Poll the configured action even in menu/theater states. Gameplay
+			// consumes the edge below for yaw recenter; the native DX12 host also
+			// receives a one-frame IPC edge so it can re-anchor its LOCAL-space
+			// theater without requiring a separate hard-coded keyboard shortcut.
+			const bool recenter = RendererRecenterPressed();
+			if (recenter)
+				FrameTelemetryFlags |= OutRunVR::ClientRecenterRequested;
+
 			if (!GameRendererIsActive())
 				return;
 
@@ -1225,7 +1233,6 @@ namespace OutRunVRRenderer
 			if (!enabled)
 				return;
 
-			const bool recenter = RendererRecenterPressed();
 			const bool hostChanged = !CenterValid || CenterHostPid != sample.hostPid;
 			const bool referenceSpaceChanged = CenterValid &&
 				CenterReferenceSpaceGeneration != sample.referenceSpaceGeneration;
