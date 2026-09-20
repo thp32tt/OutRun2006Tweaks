@@ -1,0 +1,147 @@
+name: DX9Ex T0 Debug Base
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ vr-d3d9ex-t0-debug ]
+    paths:
+      - 'src/vr/d3d9/**'
+      - 'src/vr/game/**'
+      - 'vrhost/**'
+      - 'cmake.toml'
+      - 'tools/Run-DX9Ex-T0DebugBase.ps1'
+      - 'tools/RUN_DX9EX_T0DBG_BASE.cmd'
+      - '.github/workflows/dx9ex-t0-debug-base.yml'
+
+concurrency:
+  group: dx9ex-t0-debug-base
+  cancel-in-progress: true
+
+jobs:
+  host:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Build OpenXR host
+        shell: pwsh
+        run: |
+          cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
+          cmake --build build-host --config Release --target outrun-vr-host
+          if (-not (Test-Path build-host/bin/outrun-vr-host.exe)) { throw "host missing" }
+          New-Item -ItemType Directory -Force stage-host | Out-Null
+          Copy-Item build-host/bin/outrun-vr-host.exe stage-host/outrun-vr-host.exe
+          Set-Content stage-host/HOST_SHA.txt $env:GITHUB_SHA -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: t0dbg-host
+          path: stage-host/
+          if-no-files-found: error
+
+  game:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Configure T0+S6+fingerprint base
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 `
+            -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF `
+            -DOUTRUN_VR_R26_HUD_COMPARE=ON `
+            -DOUTRUN_VR_C1_COMPARE=OFF `
+            -DOUTRUN_VR_C2_COMPARE=OFF `
+            -DOUTRUN_VR_OVERLAY_OWNER_FIRST=OFF `
+            -DOUTRUN_VR_OVERLAY_LIVE_FIRST=OFF `
+            -DOUTRUN_VR_OVERLAY_WINDOW_32=OFF `
+            -DOUTRUN_VR_OVERLAY_SPATIAL_DEPTH_4=OFF `
+            -DOUTRUN_VR_OVERLAY_SPATIAL_DEPTH_8=OFF `
+            -DOUTRUN_VR_R13_FLAT_PREEMPT=OFF `
+            -DOUTRUN_VR_R13_FLAT_PREEMPT_BROAD=OFF `
+            -DOUTRUN_VR_R13_FLAT_COMMON=OFF `
+            -DOUTRUN_VR_SMALL_ALPHA_LIMIT_2=OFF `
+            -DOUTRUN_VR_SMALL_ALPHA_LIMIT_4=ON `
+            -DOUTRUN_VR_SMALL_ALPHA_LIMIT_8=OFF `
+            -DOUTRUN_VR_SMALL_ALPHA_LIMIT_16=OFF `
+            -DOUTRUN_VR_SMALL_ALPHA_LIMIT_32=OFF `
+            -DOUTRUN_VR_SMALL_ALPHA_HUD=OFF `
+            -DOUTRUN_VR_SMALL_ALPHA_COMMON=OFF `
+            -DOUTRUN_VR_SMALL_ALPHA_ANYZ_MATRIX=ON `
+            -DOUTRUN_VR_ALPHA_RANGE_33_128=OFF `
+            -DOUTRUN_VR_ALPHA_RANGE_129_512=OFF `
+            -DOUTRUN_VR_ALPHA_RANGE_33_512=OFF `
+            -DOUTRUN_VR_ALPHA_RANGE_33_64=OFF `
+            -DOUTRUN_VR_ALPHA_RANGE_65_128=OFF `
+            -DOUTRUN_VR_ALPHA_RANGE_129_256=OFF `
+            -DOUTRUN_VR_ALPHA_RANGE_257_512=OFF `
+            -DOUTRUN_VR_ALPHA_RANGE_513_1024=OFF `
+            -DOUTRUN_VR_FINGERPRINT_TELEMETRY=ON
+      - name: Apply VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+      - name: Build game DLL
+        run: cmake --build build-game --config Release --target outrun2006tweaks
+      - name: Stage game
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force stage-game | Out-Null
+          $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if (-not $dll) { throw "dinput8.dll missing" }
+          Copy-Item $dll.FullName stage-game/dinput8.dll
+          @(
+            "variant=T0DBG_BASE_S6_FINGERPRINT"
+            "sourceSha=$env:GITHUB_SHA"
+            "worldBase=T0/R26+R30 HUD"
+            "lensFlareCandidate=S6: alpha <=4 plus live-WVP flat"
+            "fingerprintTelemetry=ON"
+            "broadWvpPromotion=OFF"
+            "fastR29MonoRemoval=OFF"
+          ) | Set-Content stage-game/T0DBG_BASE.txt -Encoding UTF8
+      - uses: actions/upload-artifact@v4
+        with:
+          name: t0dbg-game
+          path: stage-game/
+          if-no-files-found: error
+
+  package:
+    runs-on: windows-2022
+    needs: [host, game]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: t0dbg-host
+          path: payload/host
+      - uses: actions/download-artifact@v4
+        with:
+          name: t0dbg-game
+          path: payload/game
+      - name: Assemble base package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force package | Out-Null
+          Copy-Item payload/game/dinput8.dll package/dinput8.dll
+          Copy-Item payload/game/T0DBG_BASE.txt package/T0DBG_BASE.txt
+          Copy-Item payload/host/outrun-vr-host.exe package/outrun-vr-host.exe
+          Copy-Item tools/Run-DX9Ex-T0DebugBase.ps1 package/Run-DX9Ex-T0DebugBase.ps1
+          Copy-Item tools/RUN_DX9EX_T0DBG_BASE.cmd package/RUN_DX9EX_T0DBG_BASE.cmd
+          foreach($f in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe')){
+            if(Test-Path (Join-Path package $f)){ throw "Forbidden non-DX9Ex file $f" }
+          }
+          Get-ChildItem package -File | Get-FileHash -Algorithm SHA256 | ForEach-Object {
+            "$($_.Hash)  $($_.Path | Split-Path -Leaf)"
+          } | Set-Content package/SHA256SUMS.txt -Encoding ascii
+          Compress-Archive -Path package/* -DestinationPath OutRun2_VR_DX9EX_T0DBG_BASE.zip -Force
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-DX9EX-T0DBG-BASE-${{ github.sha }}
+          path: OutRun2_VR_DX9EX_T0DBG_BASE.zip
+          if-no-files-found: error
