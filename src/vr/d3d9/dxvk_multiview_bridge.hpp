@@ -16,6 +16,7 @@ namespace OutRunVRDxvkMultiview
         std::uint64_t cancels{};
         std::uint64_t interfaceMisses{};
         std::uint64_t protocolMismatches{};
+        std::uint64_t capabilityMisses{};
     };
 
     bool TryArmWorldDraw(
