@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "role": "C",
+  "runId": "C-20260921T0830KST-compliance",
+  "completedKst": "2026-09-21T08:35:00+09:00",
+  "findingIds": ["DX9EX-COMPLIANCE-001"],
+  "baseSha": "e5e35f483cf7f8d36f99a87807ba6cb9d4b7eccd",
+  "candidateBranch": "vr-d3d9ex-candidate/DX9EX-COMPLIANCE-001-B-20260921T0818KST",
+  "candidateSha": "d8d8982cd18da6d7e0f3fb33ad6a9d56ff8887c7",
+  "testLevel": "LEVEL0",
+  "evidenceLevel": "VALIDATED",
+  "validation": {
+    "workflowRunId": 35544276456,
+    "workflowJobs": {
+      "policy": "success",
+      "compliance": "success",
+      "host": "success",
+      "game": "success",
+      "package": "success"
+    },
+    "complianceArtifact": {
+      "id": 10616085736,
+      "name": "OutRun2-VR-DX9EX-COMPLIANCE-d8d8982cd18da6d7e0f3fb33ad6a9d56ff8887c7",
+      "digest": "sha256:b8a469d5b4da64622b6533d9d6b99453e021250fe42e55d4ea6665f347fad2dd",
+      "sourceShaVerified": true,
+      "requiredFilesVerified": ["COPYING.GPL3", "LICENSE.md", "LICENSE-3DMIGOTO-GPL-3.0.txt", "THIRD_PARTY_GPL_NOTICES.txt", "SOURCE_SHA.txt", "COMPLIANCE_MANIFEST.json", "corresponding-source/src/vr/d3d9/shader_fingerprint_gpl.hpp"]
+    },
+    "runtimeArtifact": {
+      "id": 10616026826,
+      "name": "OutRun2-VR-DX9EX-ACTIVE-d8d8982cd18da6d7e0f3fb33ad6a9d56ff8887c7",
+      "digest": "sha256:8297470ef71846d6020a031cc44ca3549023e5806cb5cdbc2b536a23e527ac26",
+      "forbiddenPayloadCheck": "PASS: no d3d9.dll, multiviewpatcher.dll, DXVK, D3D9On12 or DX12 payload",
+      "sourceShaFilePresent": true
+    }
+  },
+  "runtimeCandidate": false,
+  "runtimeTestQueueEffect": "none; workflow/compliance-only change requires no HMD test",
+  "blockers": [],
+  "retryCount": 0,
+  "nextAction": "D may integrate candidate d8d8982cd18da6d7e0f3fb33ad6a9d56ff8887c7 after refreshing vr-d3d9ex-focus and confirming the workflow diff/base remains applicable.",
+  "slotUtilization": {
+    "subBatches": ["Recovered immutable B handoff", "Validated all five CI jobs", "Inspected artifact identities/digests", "Downloaded and inspected nested compliance payload", "Verified exact SourceSha and required license/corresponding-source files", "Downloaded and inspected runtime package forbidden-file policy", "Persisted C VALIDATED handoff"],
+    "fallbackStagesAttempted": ["candidate awaiting validation", "package/compliance integrity"],
+    "earlyFinishReason": "Primary candidate validation completed with decisive LEVEL0 evidence; no failed/ambiguous CI remained for this candidate. Remaining production integration belongs exclusively to D."
+  }
+}
