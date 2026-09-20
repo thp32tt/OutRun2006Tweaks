@@ -284,7 +284,8 @@ namespace OutRunVRStereo
 
         template <typename ActualDraw>
         R31OwnedResult R33TryFastWorld(IDirect3DDevice9* device,
-            ActualDraw&& actualDraw, const char* site)
+            ActualDraw&& actualDraw, const char* site,
+            std::uint32_t dxvkEligibilityFlags)
         {
             if (R31StateBlockRecording || !R29StableStereoBase(device))
             {
@@ -363,6 +364,84 @@ namespace OutRunVRStereo
                     return { true, E_FAIL };
                 }
                 return {};
+            }
+
+            const std::uint64_t dxvkDrawToken = R9DrawCalls + 1;
+            if (OutRunVRDxvkMultiview::TryArmWorldDraw(
+                    device,
+                    RightEyeSurface,
+                    TrackedDepthStencil ? RightEyeDepth : nullptr,
+                    draw.eyeConstants[0],
+                    draw.eyeConstants[1],
+                    draw.poseSequence,
+                    dxvkDrawToken,
+                    dxvkEligibilityFlags))
+            {
+                ++R9DrawCalls;
+                R9MonoBackupGap = true;
+                if (mayWriteDepth || mayWriteStencil)
+                    ++R9MainDepthContentSerial;
+
+                R31OwnedResult dxvkResult{ true, actualDraw() };
+                OutRunVRDxvkMultiview::FinishArmedDraw(
+                    SUCCEEDED(dxvkResult.hr));
+
+                bool dxvkRestoreOk = false;
+                {
+                    InternalPassScope guard;
+                    dxvkRestoreOk =
+                        R32SetWvpBatch(device, draw.originalConstants);
+                }
+
+                if (FAILED(dxvkResult.hr))
+                {
+                    R33InvalidateRightForLeftWrite(
+                        mayWriteDepth, mayWriteStencil);
+                    R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
+                        site, dxvkResult.hr);
+                    if (!dxvkRestoreOk)
+                        NoteRestoreFailure(
+                            "R33 DXVK multiview failed draw c64");
+                    R29ArmMonoSafety();
+                    return dxvkResult;
+                }
+
+                if (!dxvkRestoreOk)
+                {
+                    R33InvalidateRightForLeftWrite(
+                        mayWriteDepth, mayWriteStencil);
+                    R9Poison(OutRunVR::StereoFailureRestoreFailed,
+                        "R33/DXVK-multiview-WVP-restore");
+                    NoteRestoreFailure(
+                        "R33 DXVK multiview c64 restore");
+                    R29ArmMonoSafety();
+                    return dxvkResult;
+                }
+
+                // Present/SkyGlow use this historical flag as an "L+R ready"
+                // signal. Multiview satisfies that invariant with one D3D9
+                // draw, so set the flag but do not increment DuplicatedDraws.
+                FrameHadDuplicatedDraw = true;
+                FrameHadWorldStereo = true;
+                ++WorldStereoDraws;
+                ++R29StableTwoEyeDraws;
+                if (R33TelemetryEnabled())
+                {
+                    ++R31FastWorldDraws;
+                    ++R31Frame.fastWorld;
+                }
+
+                if (TrackedDepthStencil && mayWriteDepth)
+                    RightDepthSynchronized = true;
+                if (TrackedDepthStencil && mayWriteStencil)
+                    RightStencilSynchronized = true;
+
+                if (FrameStereoPoseSequence == 0)
+                {
+                    FrameStereoPoseSequence = draw.poseSequence;
+                    FrameStereoMetadata = draw.stereoFrame;
+                }
+                return dxvkResult;
             }
 
             ++R9DrawCalls;
@@ -617,7 +696,7 @@ namespace OutRunVRStereo
         template <typename ActualDraw, typename LowerR29Draw>
         HRESULT R33Dispatch(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, LowerR29Draw&& lowerR29Draw,
-            const char* site) noexcept
+            const char* site, std::uint32_t dxvkEligibilityFlags) noexcept
         {
             if (!R31StateBlockRecording)
                 R31FlushPendingStateBlockResync(device);
@@ -642,7 +721,8 @@ namespace OutRunVRStereo
             else
             {
                 const auto fast = R33TryFastWorld(device,
-                    std::forward<ActualDraw>(actualDraw), site);
+                    std::forward<ActualDraw>(actualDraw), site,
+                    dxvkEligibilityFlags);
                 if (fast.handled)
                     return fast.hr;
             }
@@ -668,7 +748,8 @@ namespace OutRunVRStereo
                 return R30DrawPrimitiveR29Hook.stdcall<HRESULT>(
                     device, type, startVertex, primitiveCount);
             };
-            return R33Dispatch(device, actual, lower, "R33/DrawPrimitive");
+            return R33Dispatch(device, actual, lower, "R33/DrawPrimitive",
+                OutRunVR::DxvkInterop::DrawPrimitive);
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveDestR33(
@@ -687,7 +768,8 @@ namespace OutRunVRStereo
                     startIndex, primitiveCount);
             };
             return R33Dispatch(device, actual, lower,
-                "R33/DrawIndexedPrimitive");
+                "R33/DrawIndexedPrimitive",
+                OutRunVR::DxvkInterop::DrawIndexedPrimitive);
         }
 
         HRESULT __stdcall DrawPrimitiveUPDestR33(IDirect3DDevice9* device,
@@ -702,7 +784,8 @@ namespace OutRunVRStereo
                 return R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>(
                     device, type, primitiveCount, data, stride);
             };
-            return R33Dispatch(device, actual, lower, "R33/DrawPrimitiveUP");
+            return R33Dispatch(device, actual, lower, "R33/DrawPrimitiveUP",
+                OutRunVR::DxvkInterop::DrawPrimitiveUP);
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveUPDestR33(
@@ -722,7 +805,8 @@ namespace OutRunVRStereo
                     indexData, indexFormat, vertexData, stride);
             };
             return R33Dispatch(device, actual, lower,
-                "R33/DrawIndexedPrimitiveUP");
+                "R33/DrawIndexedPrimitiveUP",
+                OutRunVR::DxvkInterop::DrawIndexedPrimitiveUP);
         }
 
         HRESULT __stdcall ResetDestR33(IDirect3DDevice9* device,

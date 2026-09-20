@@ -17,14 +17,29 @@
 
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
+#include "vr/core/render_backend.hpp"
+#include "vr/d3d9/dxvk_probe.hpp"
 
 namespace Settings
 {
     extern Setting<bool> VRPreferD3D9Ex;
+    extern Setting<int> VRRenderBackend;
 }
 
 namespace OutRunVRD3D9ExUpgrade
 {
+    bool D3D9ExBackendAllowed() noexcept
+    {
+        const auto backend = OutRunVR::RenderBackendFromSetting(
+            Settings::VRRenderBackend.get());
+        if (backend == OutRunVR::RenderBackend::Dxvk)
+            return false;
+        if (backend == OutRunVR::RenderBackend::Auto &&
+            OutRunVRDxvkProbe::PreflightNonSystemD3D9Provider())
+            return false;
+        return true;
+    }
+
     namespace
     {
         using Direct3DCreate9Fn = IDirect3D9* (WINAPI*)(UINT);
@@ -790,6 +805,13 @@ namespace OutRunVRD3D9ExUpgrade
             IDirect3D9* fallback = OriginalDirect3DCreate9(sdkVersion);
             if (!fallback || !Settings::VRPreferD3D9Ex)
                 return fallback;
+            if (!D3D9ExBackendAllowed())
+            {
+                if (!ThirdPartyLogged.exchange(true))
+                    spdlog::info(
+                        "VR D3D9Ex upgrade: DXVK backend explicitly selected; D3D9Ex promotion skipped before provider negotiation");
+                return fallback;
+            }
             if (!FinalCompatOverlayReady.load(std::memory_order_acquire))
             {
                 if (!FirstOverlayUnavailableLogged.exchange(true))
@@ -877,7 +899,11 @@ namespace OutRunVRD3D9ExUpgrade
     public:
         std::string_view description() override { return "OpenXRVRD3D9ExUpgrade"; }
         void declare_settings() override { Settings::VRPreferD3D9Ex.needs_restart(); }
-        bool validate() override { return Settings::VRPreferD3D9Ex; }
+        bool validate() override
+        {
+            return Settings::VRPreferD3D9Ex &&
+                OutRunVRD3D9ExUpgrade::D3D9ExBackendAllowed();
+        }
         bool apply() override
         {
             if (!PatchDirect3DCreate9Import())

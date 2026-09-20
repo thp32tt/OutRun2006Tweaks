@@ -28,6 +28,7 @@
 #include <intrin.h>
 #include <cstdlib>
 #include <cstring>
+#include "dxvk_multiview_bridge.hpp"
 #include "stereo_renderer_r7.inc"
 
 namespace OutRunVRStereo
@@ -56,8 +57,13 @@ namespace OutRunVRStereo
 
 		bool R9DirectOnlyTransport() noexcept
 		{
-			return R9ReadBoolEnvironment("OUTRUN_VR_DIRECT_TRANSPORT", true) &&
-				R9ReadBoolEnvironment("OUTRUN_VR_DIRECT_ONLY", true);
+			// Game-side policy must follow the parsed setting directly. The host
+			// inherits OUTRUN_VR_DIRECT_ONLY through CreateProcess, but the MSVC
+			// CRT getenv cache does not reliably observe SetEnvironmentVariableA
+			// changes made after process startup. Reading getenv here therefore
+			// left SAFE modes stuck in the default direct-only path even when the
+			// log showed DirectGpuOnly=false.
+			return Settings::VRDirectGpuOnly.get();
 		}
 
 		bool R9FirstDirectOnlyWaitLogged = false;

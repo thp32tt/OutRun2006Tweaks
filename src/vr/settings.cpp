@@ -10,6 +10,8 @@
 
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
+#include "vr/core/render_backend.hpp"
+#include "vr/d3d9/dxvk_probe.hpp"
 
 // VR settings live here, but the final camera transform does not.
 // Head tracking is applied only at the verified D3D9 c64 WorldViewProjection
@@ -40,6 +42,9 @@ namespace Settings
 		"Applies the OpenXR HMD orientation at OutRun's verified D3D9 WorldViewProjection upload." };
 	Setting<bool> VRStereo{ "VR", "Stereo", true,
 		"Renders true left/right geometry stereo into verified shared-eye transport. Menus use a LOCAL-space world-fixed mono quad so head rotation and translation remain 6DoF." };
+	Setting<int> VRRenderBackend{ "VR", "RenderBackend", 0,
+		"Renderer backend policy. Auto detects a local DXVK provider; D3D9TwoPass keeps the validated renderer; DXVK selects compatibility/custom-DXVK work; DX12 is reserved for the separate DX12 branch.",
+		{ "Auto", "D3D9TwoPass", "DXVK", "DX12" } };
 	Setting<bool> VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", true,
 		"Prefers guarded D3D9Ex shared-eye transport so gameplay can bypass Desktop Duplication. Disable to return to classic D3D9/SBS capture." };
 	Setting<bool> VRDirectGpuOnly{ "VR", "DirectGpuOnly", true,
@@ -117,11 +122,32 @@ namespace OutRunVR
 				// The host inherits these test-mode switches. Keeping transport
 				// policy in the same [VR] config as D3D9Ex avoids mismatched
 				// game/host modes during cadence testing.
+				const auto requestedBackend = OutRunVR::RenderBackendFromSetting(
+					Settings::VRRenderBackend.get());
+				const bool preflightDxvk =
+					OutRunVRDxvkProbe::PreflightNonSystemD3D9Provider();
+				const bool dxvkCompatibilityTransport =
+					requestedBackend == OutRunVR::RenderBackend::Dxvk ||
+					(requestedBackend == OutRunVR::RenderBackend::Auto && preflightDxvk);
+				const bool directOnly =
+					Settings::VRDirectGpuOnly && !dxvkCompatibilityTransport;
+				const bool disableDesktopDuplication =
+					Settings::VRDisableDesktopDuplication && !dxvkCompatibilityTransport;
+
 				SetEnvironmentVariableA("OUTRUN_VR_DIRECT_TRANSPORT", "1");
 				SetEnvironmentVariableA("OUTRUN_VR_DIRECT_ONLY",
-					Settings::VRDirectGpuOnly ? "1" : "0");
+					directOnly ? "1" : "0");
 				SetEnvironmentVariableA("OUTRUN_VR_DISABLE_DESKTOP_DUPLICATION",
-					Settings::VRDisableDesktopDuplication ? "1" : "0");
+					disableDesktopDuplication ? "1" : "0");
+				SetEnvironmentVariableA("OUTRUN_VR_RENDER_BACKEND",
+					OutRunVR::RenderBackendName(requestedBackend));
+				if (dxvkCompatibilityTransport)
+				{
+					spdlog::info(
+						"VR DXVK transport policy: requestedBackend={} preflightNonSystemD3D9={} -> Desktop Duplication fallback forced available until custom Vulkan/OpenXR transport is negotiated",
+						OutRunVR::RenderBackendName(requestedBackend),
+						preflightDxvk ? 1 : 0);
+				}
 				const std::string refreshHz =
 					std::to_string(Settings::VRTargetRefreshRateHz.get());
 				SetEnvironmentVariableA("OUTRUN_VR_TARGET_REFRESH_HZ",
@@ -193,6 +219,7 @@ namespace OutRunVR
 			Settings::VRAutoLaunchHost.needs_restart();
 			Settings::VRMirrorFitDesktop.needs_restart();
 			Settings::VRDisableDesktopVsync.needs_restart();
+			Settings::VRRenderBackend.needs_restart();
 			Settings::VRPreferD3D9Ex.needs_restart();
 			Settings::VRDirectGpuOnly.needs_restart();
 			Settings::VRDisableDesktopDuplication.needs_restart();
@@ -205,14 +232,25 @@ namespace OutRunVR
 
 		bool apply() override
 		{
+			const auto requestedBackend = OutRunVR::RenderBackendFromSetting(
+				Settings::VRRenderBackend.get());
+			const bool preflightDxvk =
+				OutRunVRDxvkProbe::PreflightNonSystemD3D9Provider();
 			spdlog::info(
-				"VR: D3D9Ex DirectGPU preference={} directOnly={} refreshOverrideHz={:.1f} cadenceMode={} cadenceTargetHz={:.1f} cadenceMaxHz={:.1f}; target 0 means XR-native render cadence, simulation remains 60 Hz",
+				"VR: backend={} preflightNonSystemD3D9={} D3D9ExPreference={} directOnly={} refreshOverrideHz={:.1f} cadenceMode={} cadenceTargetHz={:.1f} cadenceMaxHz={:.1f}; target 0 means XR-native render cadence, simulation remains 60 Hz",
+				OutRunVR::RenderBackendName(requestedBackend),
+				preflightDxvk ? 1 : 0,
 				Settings::VRPreferD3D9Ex.get(),
 				Settings::VRDirectGpuOnly.get(),
 				Settings::VRTargetRefreshRateHz.get(),
 				Settings::VRFrameCadenceMode.get(),
 				Settings::VRFrameCadenceTargetHz.get(),
 				Settings::VRFrameCadenceMaxHz.get());
+			if (requestedBackend == OutRunVR::RenderBackend::Dx12)
+			{
+				spdlog::warn(
+					"VR: DX12 backend was requested on the DXVK development branch; this branch will stay on the safe D3D9 path. Use vr-dx12-poc for DX12 testing.");
+			}
 			if (Settings::VREnabled && Settings::VRAutoLaunchHost)
 			{
 				HANDLE thread = CreateThread(nullptr, 0, VRAutoLaunchHostThread, nullptr, 0, nullptr);

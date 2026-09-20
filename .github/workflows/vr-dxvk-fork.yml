@@ -1,0 +1,84 @@
+name: OutRun openRBRVR DXVK provider
+
+on:
+  push:
+    branches: [ vr-dxvk-poc ]
+    paths:
+      - 'dxvk-fork/**'
+      - '.github/workflows/vr-dxvk-fork.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: \${{ github.workflow }}-\${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dxvk-openrbrvr-x86:
+    runs-on: ubuntu-latest
+    container: archlinux/archlinux:base-devel
+
+    steps:
+      - name: Install build dependencies
+        run: pacman -Syu --needed --noconfirm git meson ninja mingw-w64-gcc glslang python
+
+      - uses: actions/checkout@v4
+
+      - name: Clone multiview DXVK provider
+        run: |
+          git clone --branch latest --depth 1 --recurse-submodules --shallow-submodules \
+            https://github.com/Detegr/dxvk-openRBRVR.git dxvk-src
+
+      - name: Enable layer-selectable multiview surfaces
+        run: |
+          cd dxvk-src
+          python3 ../dxvk-fork/apply_openrbrvr_layer_switch.py
+          git diff --check
+          grep -R "Direct3DCreateVR" src/d3d9/d3d9.def src/d3d9/d3d9_main.cpp
+          grep -R "m_multiviewSurfaceLayer" src/d3d9/d3d9_subresource.h
+          grep -R "CapabilityMultiView" src/dxvk src/d3d9 | head
+
+      - name: Configure x86 provider
+        run: |
+          cd dxvk-src
+          meson setup --cross-file build-win32.txt \
+            --buildtype release \
+            --prefix "$GITHUB_WORKSPACE/dxvk-install" \
+            build.w32
+
+      - name: Build and install x86 provider
+        run: |
+          ninja -C dxvk-src/build.w32 install
+          find dxvk-install -type f -iname 'd3d9.dll' -print
+
+      - name: Verify and stage PE32 provider
+        run: |
+          python3 - <<'PY'
+          import pathlib, struct
+          matches = list(pathlib.Path("dxvk-install").rglob("d3d9.dll"))
+          if not matches:
+              raise SystemExit("dxvk-openRBRVR x86 d3d9.dll was not produced")
+          p = matches[0]
+          data = p.read_bytes()
+          pe = struct.unpack_from("<I", data, 0x3C)[0]
+          machine = struct.unpack_from("<H", data, pe + 4)[0]
+          if machine != 0x014C:
+              raise SystemExit(f"expected PE32 i386, machine=0x{machine:04X}")
+          if b"Direct3DCreateVR" not in data:
+              raise SystemExit("Direct3DCreateVR export marker missing")
+          out = pathlib.Path("artifact")
+          out.mkdir(exist_ok=True)
+          (out / "d3d9.dll").write_bytes(data)
+          (out / "DXVK_OPENRBRVR_NOTICE.txt").write_text(
+              "Provider: Detegr/dxvk-openRBRVR (zlib/libpng license)\n"
+              "OutRun patch: layer-selectable multiview surface views\n"
+              "Source: https://github.com/Detegr/dxvk-openRBRVR\n",
+              encoding="utf-8")
+          print(f"verified {p}: PE32 i386")
+          PY
+          cp dxvk-src/LICENSE artifact/LICENSE-DXVK-openRBRVR.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: outrun-dxvk-openrbrvr-provider-x86
+          path: artifact/
+          if-no-files-found: error

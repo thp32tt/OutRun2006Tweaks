@@ -540,7 +540,8 @@ namespace OutRunVRD3D9ExUpgradeR13
             }
             bool validate() override
             {
-                return Settings::VRPreferD3D9Ex;
+                return Settings::VRPreferD3D9Ex &&
+                    OutRunVRD3D9ExUpgrade::D3D9ExBackendAllowed();
             }
             bool apply() override
             {

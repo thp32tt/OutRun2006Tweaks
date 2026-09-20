@@ -5,6 +5,7 @@
 // DirectGPU producer slot while a timed-out D3D9 EVENT query is still pending.
 
 #include "r32_policy.hpp"
+#include "dxvk_multiview_bridge.hpp"
 #include "stereo_renderer_r31.cpp"
 
 namespace OutRunVRStereo
@@ -70,6 +71,14 @@ namespace OutRunVRStereo
             std::uint64_t pendingError = 0;
             std::uint64_t resetRearm = 0;
             std::uint64_t resetFail = 0;
+            std::uint64_t dxvkArm = 0;
+            std::uint64_t dxvkAccepted = 0;
+            std::uint64_t dxvkRejected = 0;
+            std::uint64_t dxvkDrawOk = 0;
+            std::uint64_t dxvkDrawFail = 0;
+            std::uint64_t dxvkInterfaceMiss = 0;
+            std::uint64_t dxvkProtocolMismatch = 0;
+            std::uint64_t dxvkCapabilityMiss = 0;
         };
         R32CounterSnapshot R32Counters{};
 
@@ -179,7 +188,8 @@ namespace OutRunVRStereo
 
         template <typename ActualDraw>
         R31OwnedResult R32TryFastWorld(IDirect3DDevice9* device,
-            ActualDraw&& actualDraw, const char* site)
+            ActualDraw&& actualDraw, const char* site,
+            std::uint32_t dxvkEligibilityFlags)
         {
             if (R31StateBlockRecording || !R29StableStereoBase(device))
             {
@@ -253,9 +263,84 @@ namespace OutRunVRStereo
                 return {};
             }
 
+            const bool dxvkWritesDepth = LeftDrawMayWriteDepth(device);
+            const bool dxvkWritesStencil = LeftDrawMayWriteStencil(device);
+            const std::uint64_t dxvkDrawToken = R9DrawCalls + 1;
+            if (OutRunVRDxvkMultiview::TryArmWorldDraw(
+                    device,
+                    RightEyeSurface,
+                    TrackedDepthStencil ? RightEyeDepth : nullptr,
+                    draw.eyeConstants[0],
+                    draw.eyeConstants[1],
+                    draw.poseSequence,
+                    dxvkDrawToken,
+                    dxvkEligibilityFlags))
+            {
+                ++R9DrawCalls;
+                R9MonoBackupGap = true;
+                if (dxvkWritesDepth || dxvkWritesStencil)
+                    ++R9MainDepthContentSerial;
+
+                R31OwnedResult dxvkResult{ true, actualDraw() };
+                OutRunVRDxvkMultiview::FinishArmedDraw(
+                    SUCCEEDED(dxvkResult.hr));
+
+                bool dxvkRestoreOk = false;
+                {
+                    InternalPassScope guard;
+                    dxvkRestoreOk =
+                        R32SetWvpBatch(device, draw.originalConstants);
+                }
+
+                if (FAILED(dxvkResult.hr))
+                {
+                    InvalidateRightDepthStencilIfLeftMayWrite(device);
+                    R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
+                        site, dxvkResult.hr);
+                    if (!dxvkRestoreOk)
+                        NoteRestoreFailure(
+                            "R32 DXVK multiview failed draw c64");
+                    R29ArmMonoSafety();
+                    return dxvkResult;
+                }
+
+                if (!dxvkRestoreOk)
+                {
+                    InvalidateRightDepthStencilIfLeftMayWrite(device);
+                    R9Poison(OutRunVR::StereoFailureRestoreFailed,
+                        "R32/DXVK-multiview-WVP-restore");
+                    NoteRestoreFailure(
+                        "R32 DXVK multiview c64 restore");
+                    R29ArmMonoSafety();
+                    return dxvkResult;
+                }
+
+                // Historical name: Present uses this as "both eyes are ready",
+                // not strictly "the game issued two draw calls". Keep the flag
+                // true for one-draw multiview, but do not increment DuplicatedDraws.
+                FrameHadDuplicatedDraw = true;
+                FrameHadWorldStereo = true;
+                ++WorldStereoDraws;
+                ++R29StableTwoEyeDraws;
+                ++R31FastWorldDraws;
+                ++R31Frame.fastWorld;
+
+                if (TrackedDepthStencil && dxvkWritesDepth)
+                    RightDepthSynchronized = true;
+                if (TrackedDepthStencil && dxvkWritesStencil)
+                    RightStencilSynchronized = true;
+
+                if (FrameStereoPoseSequence == 0)
+                {
+                    FrameStereoPoseSequence = draw.poseSequence;
+                    FrameStereoMetadata = draw.stereoFrame;
+                }
+                return dxvkResult;
+            }
+
             ++R9DrawCalls;
             R9MonoBackupGap = true;
-            if (LeftDrawMayWriteDepth(device) || LeftDrawMayWriteStencil(device))
+            if (dxvkWritesDepth || dxvkWritesStencil)
                 ++R9MainDepthContentSerial;
 
             R31OwnedResult result{ true, D3D_OK };
@@ -506,7 +591,7 @@ namespace OutRunVRStereo
         template <typename ActualDraw, typename LowerDraw>
         HRESULT R32Dispatch(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, LowerDraw&& lowerDraw,
-            const char* site) noexcept
+            const char* site, std::uint32_t dxvkEligibilityFlags) noexcept
         {
             R31ObserveDraw(device);
 
@@ -515,7 +600,8 @@ namespace OutRunVRStereo
                 if (R30CurrentPassIsScreenSpace2D())
                 {
                     const auto hud = R32TryHud(device,
-                        std::forward<ActualDraw>(actualDraw), site);
+                        std::forward<ActualDraw>(actualDraw), site,
+                        dxvkEligibilityFlags);
                     if (hud.handled)
                         return hud.hr;
                 }
@@ -544,7 +630,8 @@ namespace OutRunVRStereo
                 return R32DrawPrimitiveR31Hook.stdcall<HRESULT>(
                     device, type, startVertex, primitiveCount);
             };
-            return R32Dispatch(device, actual, lower, "R32/DrawPrimitive");
+            return R32Dispatch(device, actual, lower, "R32/DrawPrimitive",
+                OutRunVR::DxvkInterop::DrawPrimitive);
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveDestR32(
@@ -563,7 +650,8 @@ namespace OutRunVRStereo
                     startIndex, primitiveCount);
             };
             return R32Dispatch(device, actual, lower,
-                "R32/DrawIndexedPrimitive");
+                "R32/DrawIndexedPrimitive",
+                OutRunVR::DxvkInterop::DrawIndexedPrimitive);
         }
 
         HRESULT __stdcall DrawPrimitiveUPDestR32(IDirect3DDevice9* device,
@@ -578,7 +666,8 @@ namespace OutRunVRStereo
                 return R32DrawPrimitiveUPR31Hook.stdcall<HRESULT>(
                     device, type, primitiveCount, data, stride);
             };
-            return R32Dispatch(device, actual, lower, "R32/DrawPrimitiveUP");
+            return R32Dispatch(device, actual, lower, "R32/DrawPrimitiveUP",
+                OutRunVR::DxvkInterop::DrawPrimitiveUP);
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveUPDestR32(
@@ -598,7 +687,8 @@ namespace OutRunVRStereo
                     indexData, indexFormat, vertexData, stride);
             };
             return R32Dispatch(device, actual, lower,
-                "R32/DrawIndexedPrimitiveUP");
+                "R32/DrawIndexedPrimitiveUP",
+                OutRunVR::DxvkInterop::DrawIndexedPrimitiveUP);
         }
 
         void R32ForgetDirectIdentity() noexcept
@@ -868,6 +958,7 @@ namespace OutRunVRStereo
 
         void R32InvalidateResetCaches() noexcept
         {
+            OutRunVRDxvkMultiview::InvalidateDevice();
             R29Effect = {};
             R31BlockedVerifiedGeneration = 0;
             R31FastWorldCandidates = 0;
@@ -943,13 +1034,23 @@ namespace OutRunVRStereo
                 R32Counters.pendingError = R32PendingFenceErrors;
                 R32Counters.resetRearm = R32ResetEpochRearms;
                 R32Counters.resetFail = R32ResetFailures;
+                const auto dxvk = OutRunVRDxvkMultiview::GetTelemetry();
+                R32Counters.dxvkArm = dxvk.armAttempts;
+                R32Counters.dxvkAccepted = dxvk.armSuccess;
+                R32Counters.dxvkRejected = dxvk.armRejected;
+                R32Counters.dxvkDrawOk = dxvk.drawSuccess;
+                R32Counters.dxvkDrawFail = dxvk.drawFailure;
+                R32Counters.dxvkInterfaceMiss = dxvk.interfaceMisses;
+                R32Counters.dxvkProtocolMismatch = dxvk.protocolMismatches;
+                R32Counters.dxvkCapabilityMiss = dxvk.capabilityMisses;
                 return;
             }
             if (now - R32Counters.lastLogMs < 5000)
                 return;
 
+            const auto dxvkNow = OutRunVRDxvkMultiview::GetTelemetry();
             spdlog::info(
-                "VR R32 PERF 5s: liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},producerFenceOk={},producerBudgetFallback={},backpressure={},pendingDrain={},pendingBlock={},pendingError={}] reset[rearm={},fail={}]",
+                "VR R32 PERF 5s: liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},producerFenceOk={},producerBudgetFallback={},backpressure={},pendingDrain={},pendingBlock={},pendingError={}] reset[rearm={},fail={}] dxvk[arm={},accepted={},rejected={},drawOk={},drawFail={},interfaceMiss={},protocolMismatch={},capabilityMiss={}]",
                 R31FastWorldLiveValidations - R32Counters.liveWvp,
                 R31FastWorldValidationRejects - R32Counters.liveReject,
                 R31StateBlockRecordings - R32Counters.stateRecord,
@@ -966,7 +1067,15 @@ namespace OutRunVRStereo
                 R32PendingFenceBlocks - R32Counters.pendingBlock,
                 R32PendingFenceErrors - R32Counters.pendingError,
                 R32ResetEpochRearms - R32Counters.resetRearm,
-                R32ResetFailures - R32Counters.resetFail);
+                R32ResetFailures - R32Counters.resetFail,
+                dxvkNow.armAttempts - R32Counters.dxvkArm,
+                dxvkNow.armSuccess - R32Counters.dxvkAccepted,
+                dxvkNow.armRejected - R32Counters.dxvkRejected,
+                dxvkNow.drawSuccess - R32Counters.dxvkDrawOk,
+                dxvkNow.drawFailure - R32Counters.dxvkDrawFail,
+                dxvkNow.interfaceMisses - R32Counters.dxvkInterfaceMiss,
+                dxvkNow.protocolMismatches - R32Counters.dxvkProtocolMismatch,
+                dxvkNow.capabilityMisses - R32Counters.dxvkCapabilityMiss);
 
             R32Counters.lastLogMs = now;
             R32Counters.liveWvp = R31FastWorldLiveValidations;
@@ -986,6 +1095,14 @@ namespace OutRunVRStereo
             R32Counters.pendingError = R32PendingFenceErrors;
             R32Counters.resetRearm = R32ResetEpochRearms;
             R32Counters.resetFail = R32ResetFailures;
+            R32Counters.dxvkArm = dxvkNow.armAttempts;
+            R32Counters.dxvkAccepted = dxvkNow.armSuccess;
+            R32Counters.dxvkRejected = dxvkNow.armRejected;
+            R32Counters.dxvkDrawOk = dxvkNow.drawSuccess;
+            R32Counters.dxvkDrawFail = dxvkNow.drawFailure;
+            R32Counters.dxvkInterfaceMiss = dxvkNow.interfaceMisses;
+            R32Counters.dxvkProtocolMismatch = dxvkNow.protocolMismatches;
+            R32Counters.dxvkCapabilityMiss = dxvkNow.capabilityMisses;
         }
 
         HRESULT __stdcall PresentDestR32(IDirect3DDevice9* device,

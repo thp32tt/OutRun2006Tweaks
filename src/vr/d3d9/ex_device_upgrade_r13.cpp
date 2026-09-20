@@ -172,7 +172,8 @@ namespace OutRunVRD3D9ExUpgradeR13
             {
                 return "OpenXRVRD3D9ExR13Hardening";
             }
-            bool validate() override { return Settings::VRPreferD3D9Ex; }
+            bool validate() override { return Settings::VRPreferD3D9Ex &&
+                    OutRunVRD3D9ExUpgrade::D3D9ExBackendAllowed(); }
             bool apply() override
             {
                 R13InstallCompatHook = safetyhook::create_inline(
