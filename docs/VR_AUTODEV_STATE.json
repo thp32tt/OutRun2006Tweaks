@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-20T18:58:00Z",
+  "updatedUtc": "2026-09-20T19:02:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -255,12 +255,14 @@
   },
   "activeValidation": {
     "workflow": "DX9Ex Active Validation",
-    "sourceSha": "78328262a2925d94da4e995a44cc67710da1333d",
+    "runId": 35530793478,
+    "sourceSha": "10df8cbe9b3f32d8844a2c4283bd5bed3c8950c3",
     "status": "in-progress-at-state-write",
+    "policy": "success",
     "host": "success",
     "game": "in-progress",
     "package": "pending",
-    "note": "This source includes the phase-1 rolling capture implementation. Later tool/docs commits do not change game/host runtime source."
+    "reason": "One-time validation triggered by candidate-branch CI/concurrency workflow change; runtime renderer source was not changed by this setup commit."
   },
   "coordination": {
     "protocol": "docs/VR_AUTODEV_PROTOCOL.md",
@@ -279,6 +281,13 @@
     "candidateWorkflow": ".github/workflows/vr-dx9ex-active.yml",
     "candidateWorkflowBranchPattern": "vr-d3d9ex-candidate/**",
     "candidateConcurrency": "branch-scoped",
-    "aBCDoNotRewriteIntegrationQueue": true
+    "aBCDoNotRewriteIntegrationQueue": true,
+    "validation": {
+      "workflow": ".github/workflows/vr-autodev-coordination.yml",
+      "script": "tools/Test-VRAutodevCoordination.ps1",
+      "latestRunId": 35530891316,
+      "latestResult": "success",
+      "validatedHead": "074029e71fd8005d8c5f3a57e3da4a813eac2212"
+    }
   }
 }
