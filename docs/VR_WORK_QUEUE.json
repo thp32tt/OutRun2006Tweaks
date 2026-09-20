@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 2,
+  "integrationBranch": "vr-d3d9ex-focus",
+  "owner": "D_INTEGRATION_PLANNER",
+  "updatedKst": "2026-09-21T03:36:00+09:00",
+  "policy": {
+    "maxIndependentUnvalidatedRuntimeCandidates": 3,
+    "maxMateriallyDifferentFixAttempts": 2,
+    "productionWriter": "D_INTEGRATION_PLANNER",
+    "candidateWriter": "B_FIX",
+    "queueWriter": "D_INTEGRATION_PLANNER",
+    "runtimeTruthRequiresQuest3Vdxr": true,
+    "skipUnchangedCompletedInputs": true,
+    "primaryBackend": "DX9Ex"
+  },
+  "candidateWip": {
+    "activeUnvalidatedCount": 0,
+    "candidateBranches": []
+  },
+  "items": [
+    {
+      "id": "DX9EX-FINGERPRINT-001",
+      "priority": 10,
+      "status": "READY",
+      "preferredRole": "A_REVIEW",
+      "summary": "Establish bounded exact draw fingerprints for unresolved HUD/white-overlay/effect classes without broad WVP ownership.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false
+    },
+    {
+      "id": "L0-CAPTURE-001",
+      "priority": 9,
+      "status": "NEED_HMD_TEST",
+      "preferredRole": "D_INTEGRATION_PLANNER",
+      "summary": "Phase-1 rolling diagnostic capture is build verified; runtime trigger/usability and HMD overhead remain unverified.",
+      "testLevel": "LEVEL1",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false
+    },
+    {
+      "id": "L1-VIS-001",
+      "priority": 9,
+      "status": "READY",
+      "preferredRole": "A_REVIEW",
+      "summary": "World/HUD/effect stereo correctness: white rank-score, 6th/6, menu and YES/NO. Produce exact evidence before behavior change.",
+      "testLevel": "LEVEL1",
+      "dependencies": ["DX9EX-FINGERPRINT-001"],
+      "attempts": 0,
+      "runtimeCandidate": true
+    },
+    {
+      "id": "L1-VIS-002",
+      "priority": 8,
+      "status": "READY",
+      "preferredRole": "A_REVIEW",
+      "summary": "Sky/cloud/SkyGlow/lens flare/smoke/skid placement and head-lock semantics.",
+      "testLevel": "LEVEL1",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": true
+    },
+    {
+      "id": "L1-RECENTER-001",
+      "priority": 7,
+      "status": "READY",
+      "preferredRole": "A_REVIEW",
+      "summary": "Gameplay/menu recenter application-space behavior and visual transition correctness.",
+      "testLevel": "LEVEL1",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": true
+    },
+    {
+      "id": "L2-PERF-001",
+      "priority": 6,
+      "status": "READY",
+      "preferredRole": "A_REVIEW",
+      "summary": "R29+ fast stereo draw amplification and frame-pacing optimization behind correctness gates.",
+      "testLevel": "LEVEL2",
+      "dependencies": ["L1-VIS-001", "L1-VIS-002"],
+      "attempts": 0,
+      "runtimeCandidate": true
+    },
+    {
+      "id": "L3-DX9EX-001",
+      "priority": 5,
+      "status": "READY",
+      "preferredRole": "A_REVIEW",
+      "summary": "D3D9Ex device promotion/reset/shared-resource/direct transport robustness.",
+      "testLevel": "LEVEL3",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": true
+    },
+    {
+      "id": "L4-RELEASE-001",
+      "priority": 1,
+      "status": "BLOCKED",
+      "preferredRole": "D_INTEGRATION_PLANNER",
+      "summary": "DXVK/multiview/DX12 release matrix remains paused until DX9Ex reference is user accepted.",
+      "testLevel": "LEVEL4",
+      "dependencies": ["L1-VIS-001", "L1-VIS-002", "L2-PERF-001", "L3-DX9EX-001"],
+      "attempts": 0,
+      "runtimeCandidate": false
+    }
+  ]
+}
