@@ -1,49 +1,29 @@
 # VR Run State
 
-Updated: 2026-09-20 22:52 KST
+Updated: 2026-09-20 23:10 KST
 
 ## Current checkpoint
-- C0 RECOVER: complete — 2D and D3D9 SAFE startup regression cleared on the previous recovery build
-- C1 REVIEW: complete — runtime logs isolated the flat half-screen symptom to transport/fallback policy rather than common game startup
-- C2 IMPLEMENT: complete — SAFE transport policy, host fallback crop guard, and DX12 D3D9On12 device-creation semantics updated
-- C3 VALIDATE: complete — all unified backend jobs and package validation succeeded
-- C4 COMMIT: complete
-- C5 PACKAGE: complete — frozen tester ZIP produced
-- C6 STATE: complete
+- C0 RECOVER: complete — analyzed user logs from matrix `VRM-20260920-803144005c0e`
+- C1 REVIEW: complete — delivered D3D9 SAFE path was an R26/R23 regression-isolation build, not the intended completed DX9Ex renderer
+- C2 IMPLEMENT: complete — created `vr-d3d9ex-focus`, removed DXVK/DX12 from its dedicated workflow, added four DX9Ex-only comparison candidates and automatic per-variant log collection
+- C3 VALIDATE: in progress — DX9Ex-only workflow run `35515548121`
+- C4 COMMIT: complete for workflow/test-harness changes
+- C5 PACKAGE: pending successful P1-P4 builds
+- C6 STATE: current document
 
-## Frozen recovery candidate
-- Integration commit: `803144005c0e45352602917a2f51804ec6b18ae6`
-- Matrix: `VRM-20260920-803144005c0e`
-- Unified workflow: `35514339728` — success
-- Build workflow: `35514339665` — success
-- Unified artifact: `10606816032`
-- Artifact ZIP SHA256: `1517890fd2efe90f9c5fe8f345d7fd695b534b33de5ad1937441836f386e6cca`
-- Tester inner ZIP SHA256: `e48b1648ce80f7027e3cdea3bbb13192cc56c5bd99628ee886759e6d8916e065`
+## Strategy change
+DX9Ex is now the only active renderer target. DXVK, multiview and DX12 are frozen until the user accepts a correct and smooth DX9Ex reference. The generic Build workflow is disabled on `vr-d3d9ex-focus`; only the dedicated DX9Ex four-variant matrix should compile runtime candidates.
 
-## Backend source identity
-- D3D9 SAFE: `803144005c0e45352602917a2f51804ec6b18ae6`
-- DXVK game + host: `5e58ee35e14636dbfad3ad3744d350aa09859992`
-- DXVK provider: `5bb301ab22f7b41d68a879bf84c1e3d10ae0c473`
-- Multiview patcher: `0ef3253da1738b07e67358a027311c7bcedaa001`
-- DX12 strict: `ab8e00ab4a21e4ebb23fbc4046abda51e885bcb6`
+## Why the previous package regressed
+The last D3D9 SAFE build explicitly compiled the R26/R23/R22/R13/R9 chain and excluded R29-R34 plus renderer R29. Runtime did reach TRUE STEREO SBS compose, so the new corruption was not a simple stereo-transport failure. In heavy gameplay samples the log rose to roughly 1,800-2,000 draws per Present and more than 568k semantic rejects, matching the expensive conservative replay path. The recovery launcher also forced 60 FPS, interpolation OFF and cadence OFF while the OpenXR host reported 90 Hz, adding a separate source of visible judder.
 
-## Runtime evidence that led to this candidate
-The previous recovery package reached normal startup in 2D and D3D9 SAFE. D3D9 SAFE and DXVK SAFE then showed the same enlarged/cropped left-half flat image in gameplay, while DX12 STRICT failed device creation.
+## DX9Ex four-build set
+1. `P1_C1_FAST_WORLD`: R29 fast L+R + restored R27/R28 perspective-world classifier.
+2. `P2_C2_FAST_HUD`: P1 + R30 HUD/XYZRHW/SkyGlow.
+3. `P3_FULL_R34`: full R29-R34 chain.
+4. `P4_R26_HUD_SAFE`: R26 world + R30 HUD/effect overlay, conservative comparison.
 
-The logs and source review showed:
-1. SAFE configuration had `DirectGpuOnly=false`, but the game R9 transport gate read stale CRT environment values and stayed in direct-only mode. That suppressed SBS/Desktop Duplication fallback even though no shared-eye transport was ready.
-2. The host recovery theater always cropped the left half, even when the desktop source was a normal full-width mono frame. That exactly produced the observed half-screen zoom.
-3. DX12 reached `Direct3DCreate9On12Ex`, then failed device creation with `D3DERR_INVALIDCALL`. The strict branch now uses legacy D3D9On12 `CreateDevice` semantics and a bounded compatibility retry without permitting native D3D9 fallback.
-
-## Fixes frozen into this matrix
-- D3D9 SAFE: `R9DirectOnlyTransport()` follows parsed `Settings::VRDirectGpuOnly` directly.
-- DXVK SAFE/MULTIVIEW: same game-side transport fix synchronized to the DXVK branch.
-- D3D11 OpenXR hosts: left-half crop is used only for a frame explicitly marked completed SBS; otherwise recovery shows full-width mono.
-- DX12 STRICT: legacy `CreateDevice` contract first, then one bounded presentation normalization retry while staying on D3D9On12.
-- `SkyGlowFactor = 1` remains packaged.
-
-## Non-blocking branch CI notes
-Two generic branch workflows still have stale checks unrelated to the unified tester result: the DXVK generic R34/OFF build exercises an older incompatible renderer combination, and its host verification script uses PowerShell's reserved `$Host` variable; the DX12 generic verifier searches for the old strict-pass marker string. The unified workflow builds and stages the intended SAFE/DX12 payloads successfully and is the acceptance path for this tester.
+All use `PreferD3D9Ex=true`, allow fallback when DirectGPU sharing is not ready, enable dynamic OpenXR PhaseLock, remove the forced 60-FPS test cap after XR cadence becomes active, enable interpolation, and keep `SkyGlowFactor=1`.
 
 ## Next runtime test
-Use only the frozen `VRM-20260920-803144005c0e` tester. Test D3D9 SAFE first and look for actual geometry stereo rather than a flat recovery theater. If D3D9 is good, test DXVK SAFE. Then test DX12 STRICT only far enough to see whether device creation/startup now passes; deeper DX12 rendering work comes after that boundary is cleared.
+Test P1 -> P2 -> P3 in that order. Use P4 only if the fast-path candidates remain badly corrupted or as a conservative comparison. Use the same short gameplay segment each time and upload the automatically generated `DX9EX_LOG_<variant>_<time>.zip`.
