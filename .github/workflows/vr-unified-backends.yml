@@ -1,25 +1,10 @@
-name: DX9Ex Focus Test Matrix
+name: DX9Ex Comparison Matrix (Manual)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ vr-d3d9ex-focus ]
-    paths:
-      - 'src/vr/**'
-      - 'src/hooks_framerate.cpp'
-      - 'src/hooks_graphics.cpp'
-      - 'vrhost/**'
-      - 'CMakeLists.txt'
-      - 'cmake.toml'
-      - 'OutRun2006Tweaks.ini'
-      - 'OutRun2006Tweaks.lods.ini'
-      - 'tools/Run-DX9ExFocusTest.ps1'
-      - 'tools/RUN_DX9EX_TEST.cmd'
-      - 'docs/VR_DX9EX_TEST_SCENARIO.md'
-      - '.github/workflows/vr-unified-backends.yml'
 
 concurrency:
-  group: vr-d3d9ex-focus-v2
+  group: vr-dx9ex-comparison-manual
   cancel-in-progress: true
 
 jobs:
