@@ -26,7 +26,8 @@ namespace OutRunVRDxvkMultiview
         const float* leftWvp,
         const float* rightWvp,
         std::uint64_t poseSequence,
-        std::uint64_t drawToken) noexcept;
+        std::uint64_t drawToken,
+        std::uint32_t eligibilityFlags) noexcept;
 
     void FinishArmedDraw(bool drawSucceeded) noexcept;
     void InvalidateDevice() noexcept;
