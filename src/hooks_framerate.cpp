@@ -318,13 +318,32 @@ class ReplaceGameUpdateLoop : public Hook
 		// legacy Tweaks limiter on top of the XR clock.
 		const bool xrCadencePacing =
 			OutRunVRRenderer::IsCadencePacingActive();
+		const bool vrCadenceFallback =
+			Settings::VREnabled && Settings::VRFrameCadenceMode > 0 &&
+			!xrCadencePacing;
 		const bool renderUnlock =
 			Settings::FramerateUnlockExperimental || xrCadencePacing;
+		const int effectiveFramerateLimit =
+			vrCadenceFallback ? 60 : Settings::FramerateLimit.get();
 
-		// Skip framelimiter during load screens to help reduce load times
+		// VR must fail safe before the host publishes a valid cadence token.
+		// With FramerateLimit=0 + immediate Present the menu/load loop can run
+		// thousands of Presents per second and never advance out of the white
+		// startup screen. Hold 60 Hz until XR pacing is actually active.
+		static bool vrCadenceFallbackLogged = false;
+		if (vrCadenceFallback && !vrCadenceFallbackLogged)
+		{
+			vrCadenceFallbackLogged = true;
+			spdlog::info(
+				"VR CADENCE FALLBACK: host cadence inactive; software render limiter held at 60 Hz until a valid XR request token is accepted");
+		}
+
+		// Fast-load uncapping is unsafe while VR is waiting for its first valid
+		// host cadence token, so keep the fallback limiter authoritative.
 		bool skipFrameLimiter =
-			Settings::FramerateLimit == 0 || xrCadencePacing;
-		if (Settings::FramerateFastLoad > 0 && !skipFrameLimiter)
+			effectiveFramerateLimit == 0 || xrCadencePacing;
+		if (Settings::FramerateFastLoad > 0 && !skipFrameLimiter &&
+			!vrCadenceFallback)
 		{
 			if (Settings::FramerateFastLoad != 3)
 			{
@@ -375,12 +394,14 @@ class ReplaceGameUpdateLoop : public Hook
 			double timeCurrent = 0;
 			LARGE_INTEGER counter;
 
-			const double FramelimiterTargetFrametime = 1000.0 / double(Settings::FramerateLimit);
+			const double FramelimiterTargetFrametime =
+				1000.0 / double(effectiveFramerateLimit);
 			const double deadline = FramelimiterPrevCounter + FramelimiterTargetFrametime;
 
 			for (;;)
 			{
-				if (Settings::FramerateFastLoad == 3)
+				if (Settings::FramerateFastLoad == 3 &&
+					!vrCadenceFallback)
 					PumpFileLoader(deadline);
 
 				QueryPerformanceCounter(&counter);
@@ -396,7 +417,8 @@ class ReplaceGameUpdateLoop : public Hook
 					continue;
 				}
 
-				if (Settings::FramerateFastLoad == 3)
+				if (Settings::FramerateFastLoad == 3 &&
+					!vrCadenceFallback)
 					remaining = min(remaining, FramelimiterFastLoadSleepMs);
 
 				// PreciseSleep returns right on the deadline, having spun out
