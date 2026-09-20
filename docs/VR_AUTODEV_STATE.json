@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedUtc": "2026-09-20T17:06:00Z",
+  "updatedUtc": "2026-09-20T17:11:30Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -38,16 +38,16 @@
     "Restore fast R29 world rendering and classification in bounded variants before deciding which later R30-R34 overlays are required."
   ],
   "candidateMatrix": {
-    "matrixId": "DX9EX-20260920-f46024f7005c",
+    "matrixId": "DX9EX-20260920-ee94dc8051b6",
     "binarySourceSha": "f46024f7005c5c530479c61673055be324381f2a",
     "packagerSourceSha": "2827f20d456d5fb266cfbefbd4435df0f9952569",
     "configFixSha": "ee94dc8051b6de8c0b6ce67d9bdd8b613b98363c",
     "sourceBuildRunId": 35516112968,
     "sourceBuildStatus": "all four Win32 game variants and x64 D3D11 host succeeded; package job alone failed before assembly on PowerShell variable delimiter",
     "followupRunId": 35524755335,
-    "followupRunStatus": "in_progress",
-    "packageSha256": "ba1757865c445e5f63d37041a1f10dbed8a3137ae049960ec752fc5c9b0fb44b",
-    "packageValidation": "four inner ZIPs; 11 files each; all SHA256SUMS passed; PE32 x86 game DLL + PE32+ x64 host; no d3d9.dll, multiviewpatcher.dll, DX12 host or backends directory",
+    "followupRunStatus": "success: host, all four game variants, package and package validation",
+    "packageSha256": "a21825389f0731ffc62dc23314a1415261bf05fcdf07f4accd4d92a0aa46e630",
+    "packageValidation": "GitHub artifact downloaded and opened; four inner ZIPs; each inner SHA256SUMS passed; exact runtime keys verified; four distinct PE32 x86 game DLLs + common PE32+ x64 host; no d3d9.dll, multiviewpatcher.dll, DX12 host or backends directory",
     "variants": {
       "P1_C1_FAST_WORLD": "R29 fast L+R + restored R27/R28 perspective-world classification; R30-R34 excluded",
       "P2_C2_FAST_HUD": "P1 + R30 HUD/XYZRHW/SkyGlow; R31-R34 excluded",
@@ -65,7 +65,9 @@
       "FrameCadenceTargetHz": 0,
       "DisableDesktopVsync": true,
       "SkyGlowFactor": 1
-    }
+    },
+    "artifactId": 10609329194,
+    "artifactDigest": "sha256:a21825389f0731ffc62dc23314a1415261bf05fcdf07f4accd4d92a0aa46e630"
   },
   "nextAction": "Runtime test P1 first on Quest 3/VDXR, then P2 and P3; use P4 only as conservative fallback. Upload each auto-collected DX9EX_LOG ZIP. Select the reference only from identical-scene runtime evidence."
 }
