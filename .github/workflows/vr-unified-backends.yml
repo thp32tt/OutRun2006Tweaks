@@ -15,7 +15,15 @@ on:
       - 'OutRun2006Tweaks.lods.ini'
       - 'tools/Run-DX9ExFocusTest.ps1'
       - 'tools/RUN_DX9EX_TEST.cmd'
+      - 'tools/OutRunVR-TestProfiles.ps1'
+      - 'tools/Select-OutRunVRBackend.ps1'
+      - 'tools/Run-OutRunVRTest.ps1'
+      - 'tools/Collect-OutRunVRLogs.ps1'
+      - 'tools/OutRunVR-Backend-Selector.ps1'
+      - 'tools/Test-OutRunVRTestPolicy.ps1'
       - 'docs/VR_DX9EX_TEST_SCENARIO.md'
+      - 'docs/VR_TEST_STRATEGY.md'
+      - 'docs/VR_AUTODEV_STATE.json'
       - '.github/workflows/vr-unified-backends.yml'
 
 concurrency:
@@ -23,7 +31,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  policy:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify DX9Ex runtime-test minimization policy
+        shell: pwsh
+        run: ./tools/Test-OutRunVRTestPolicy.ps1
+
   host:
+    needs: policy
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
@@ -45,6 +62,7 @@ jobs:
           if-no-files-found: error
 
   game:
+    needs: policy
     runs-on: windows-2022
     strategy:
       fail-fast: false
