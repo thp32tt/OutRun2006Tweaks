@@ -51,6 +51,7 @@ struct D3D9VkExtOutputMetadata {
  * implementation returns S_FALSE from ArmStereoDraw so the client must keep
  * using its proven D3D9 two-pass fallback until true multiview is implemented.
  */
+#pragma pack(push, 8)
 struct D3D9OutRunVRFrameStateV1 {
   uint32_t size;
   uint32_t version;
@@ -79,6 +80,11 @@ struct D3D9OutRunVRCountersV1 {
   uint64_t rejectedDraws;
   uint64_t fallbackDraws;
 };
+#pragma pack(pop)
+
+static_assert(sizeof(D3D9OutRunVRFrameStateV1) == 32);
+static_assert(sizeof(D3D9OutRunVRDrawStateV1) == 160);
+static_assert(sizeof(D3D9OutRunVRCountersV1) == 40);
 
 MIDL_INTERFACE("b16d40b8-1a79-4e11-9d47-7a50c1f56e62")
 ID3D9OutRunVRInterop : public IUnknown {
