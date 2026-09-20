@@ -1,0 +1,80 @@
+name: OutRun custom DXVK
+
+on:
+  push:
+    branches: [ vr-dxvk-poc ]
+    paths:
+      - 'dxvk-fork/**'
+      - '.github/workflows/vr-dxvk-fork.yml'
+  pull_request:
+    branches: [ vr-openxr ]
+    paths:
+      - 'dxvk-fork/**'
+      - '.github/workflows/vr-dxvk-fork.yml'
+  workflow_dispatch:
+
+jobs:
+  dxvk-x86:
+    runs-on: ubuntu-latest
+    container: archlinux/archlinux:base-devel
+
+    steps:
+      - name: Install DXVK build dependencies
+        run: pacman -Syu --needed --noconfirm git meson ninja mingw-w64-gcc glslang python
+
+      - name: Checkout OutRun VR branch
+        uses: actions/checkout@v4
+
+      - name: Clone official DXVK v3.1.1
+        run: |
+          git clone --branch v3.1.1 --depth 1 --recurse-submodules --shallow-submodules             https://github.com/doitsujin/dxvk.git dxvk-src
+
+      - name: Apply OutRun VR provider overlay
+        run: |
+          python3 dxvk-fork/apply_out_run_vr.py dxvk-src
+          git -C dxvk-src diff --check
+          grep -R "b16d40b8-1a79-4e11-9d47-7a50c1f56e62" dxvk-src/src/d3d9
+          grep -R "return S_FALSE;" dxvk-src/src/d3d9/d3d9_interop.cpp
+
+      - name: Configure x86 DXVK
+        run: |
+          meson setup             --cross-file dxvk-src/build-win32.txt             --buildtype release             --prefix "$GITHUB_WORKSPACE/dxvk-install"             dxvk-src/build.w32 dxvk-src
+
+      - name: Build and install x86 DXVK
+        run: |
+          ninja -C dxvk-src/build.w32 install
+          find dxvk-install -type f -iname 'd3d9.dll' -print
+
+      - name: Verify PE32 d3d9.dll
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import pathlib, struct
+          matches = list(pathlib.Path("dxvk-install").rglob("d3d9.dll"))
+          if not matches:
+              raise SystemExit("custom DXVK x86 d3d9.dll was not produced")
+          p = matches[0]
+          data = p.read_bytes()
+          pe = struct.unpack_from("<I", data, 0x3C)[0]
+          machine = struct.unpack_from("<H", data, pe + 4)[0]
+          if machine != 0x014C:
+              raise SystemExit(f"expected PE32 i386, machine=0x{machine:04X}")
+          print(f"verified {p}: PE32 i386")
+          PY
+
+      - name: Stage x86 provider artifact
+        shell: bash
+        run: |
+          mkdir -p artifact
+          cp "$(find dxvk-install -type f -iname d3d9.dll | head -n1)" artifact/d3d9.dll
+          cat > artifact/README.txt <<'EOF'
+          OutRun VR custom DXVK provider, protocol-v1 compatibility milestone.
+          This build deliberately returns S_FALSE from ArmStereoDraw, so the
+          game keeps its validated two-pass renderer until true multiview lands.
+          EOF
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: outrun-custom-dxvk-v3.1.1-x86
+          path: artifact/
+          if-no-files-found: error
