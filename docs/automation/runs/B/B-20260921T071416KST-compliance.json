@@ -3,7 +3,7 @@
   "role": "B",
   "runId": "B-20260921T071416KST-compliance",
   "startedKst": "2026-09-21T07:14:16+09:00",
-  "completedKst": "2026-09-21T07:23:47+09:00",
+  "completedKst": "2026-09-21T07:24:21+09:00",
   "baseSha": "e5e35f483cf7f8d36f99a87807ba6cb9d4b7eccd",
   "findingIds": [
     "DX9EX-COMPLIANCE-001"
@@ -51,28 +51,33 @@
   "ci": {
     "workflow": "DX9Ex Active Validation",
     "runId": 35541256724,
-    "status": "in_progress",
+    "status": "success",
     "jobs": {
       "policy": "success",
       "compliance": "success",
       "host": "success",
-      "game": "in_progress",
-      "package": "pending"
+      "game": "success",
+      "package": "success"
     },
     "artifacts": [
       {
         "id": 10614663672,
         "name": "OutRun2-VR-DX9EX-COMPLIANCE-734d04f359d29ebce8951d93ed4f534a580b77b0",
         "sha256": "6e9b4d910d3d951fbdbeaa07fccd53a54f597b8dc5a8f6da6dd5adec4ebdcc05"
+      },
+      {
+        "id": 10615335705,
+        "name": "OutRun2-VR-DX9EX-ACTIVE-734d04f359d29ebce8951d93ed4f534a580b77b0",
+        "sha256": "f5639d8a53779c4a6886807ce81c4e6b9380d095bf18aab37a4f07c99bea13df"
       }
     ]
   },
-  "evidenceLevel": "BUILD_VERIFIED_COMPLIANCE_JOB",
+  "evidenceLevel": "BUILD_VERIFIED",
   "queueProposal": [
     {
       "id": "DX9EX-COMPLIANCE-001",
       "proposedStatus": "NEEDS_VALIDATION",
-      "reason": "Same-SHA companion was assembled, validated, downloaded and inspected; C should seal the immutable candidate and D should integrate only after the complete workflow passes."
+      "reason": "Same-SHA companion was assembled, validated, downloaded and inspected; policy, compliance, x64 host, Win32 game and gated package jobs all passed. C should seal the immutable candidate before D integration."
     }
   ],
   "fallbackReview": {
@@ -88,5 +93,5 @@
   },
   "blockers": [],
   "retryCount": 0,
-  "nextAction": "C validates immutable candidate 734d04f3 and artifact 10614663672 after run 35541256724 completes. D may then integrate the two compliance-only paths. B should implement DX9EX-FINGERPRINT-001 separately only after its bounded game-side trigger and draw-metadata contract are fixed."
+  "nextAction": "C validates immutable candidate 734d04f3, compliance artifact 10614663672 and runtime artifact 10615335705 from successful run 35541256724. D may then integrate the two compliance-only paths. B should implement DX9EX-FINGERPRINT-001 separately only after its bounded game-side trigger and draw-metadata contract are fixed."
 }
