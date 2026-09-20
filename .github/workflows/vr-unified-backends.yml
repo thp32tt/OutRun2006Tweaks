@@ -7,6 +7,7 @@ on:
     paths:
       - 'tools/Select-OutRunVRBackend.*'
       - 'tools/OutRunVR-Backend-Selector.*'
+      - 'tools/Collect-OutRunVRLogs.*'
       - 'docs/VR_UNIFIED_TEST_SCENARIO.md'
       - '.github/workflows/vr-unified-backends.yml'
 
@@ -149,8 +150,12 @@ jobs:
           ref: vr-dxvk-poc
       - name: Build OutRun DXVK provider
         run: |
-          git clone --branch latest --depth 1 --recurse-submodules --shallow-submodules https://github.com/Detegr/dxvk-openRBRVR.git dxvk-src
+          git init dxvk-src
+          git -C dxvk-src remote add origin https://github.com/Detegr/dxvk-openRBRVR.git
+          git -C dxvk-src fetch --depth 1 origin 5bb301ab22f7b41d68a879bf84c1e3d10ae0c473
+          git -C dxvk-src checkout --detach FETCH_HEAD
           cd dxvk-src
+          git submodule update --init --recursive --depth 1
           python3 ../dxvk-fork/apply_openrbrvr_layer_switch.py
           meson setup --cross-file build-win32.txt --buildtype release --prefix "$GITHUB_WORKSPACE/dxvk-install" build.w32
           cd ..
@@ -160,6 +165,7 @@ jobs:
           test -n "$p"
           cp "$p" stage/d3d9.dll
           cp dxvk-src/LICENSE stage/LICENSE-DXVK-openRBRVR.txt
+          git -C dxvk-src rev-parse HEAD > stage/SOURCE_SHA.txt
       - uses: actions/upload-artifact@v4
         with:
           name: unified-dxvk-provider
@@ -172,7 +178,11 @@ jobs:
       - name: Build multiview patcher
         shell: pwsh
         run: |
-          git clone --depth 1 --recurse-submodules https://github.com/Detegr/RBR-spirvpatcher.git patcher-src
+          git init patcher-src
+          git -C patcher-src remote add origin https://github.com/Detegr/RBR-spirvpatcher.git
+          git -C patcher-src fetch --depth 1 origin 0ef3253da1738b07e67358a027311c7bcedaa001
+          git -C patcher-src checkout --detach FETCH_HEAD
+          git -C patcher-src submodule update --init --recursive --depth 1
           Push-Location patcher-src/spirv-tools
           python utils/git-sync-deps
           Pop-Location
@@ -181,6 +191,7 @@ jobs:
           New-Item -ItemType Directory -Force stage | Out-Null
           Copy-Item patcher-build/src/Release/multiviewpatcher.dll stage/multiviewpatcher.dll
           Copy-Item patcher-src/LICENSE stage/LICENSE-RBR-spirvpatcher-MPL-2.0.txt
+          git -C patcher-src rev-parse HEAD | Set-Content stage/SOURCE_SHA.txt
       - uses: actions/upload-artifact@v4
         with:
           name: unified-multiview-patcher
@@ -230,8 +241,10 @@ jobs:
           Copy-Item payload/dxvk/SOURCE_SHA.txt package/backends/dxvk/SOURCE_SHA.txt
           Copy-Item payload/dxvk-extra/d3d9.dll package/backends/dxvk/d3d9.dll
           Copy-Item payload/dxvk-extra/LICENSE-DXVK-openRBRVR.txt package/backends/dxvk/LICENSE-DXVK-openRBRVR.txt
+          Copy-Item payload/dxvk-extra/SOURCE_SHA.txt package/backends/dxvk/DXVK_PROVIDER_SOURCE_SHA.txt
           Copy-Item payload/dxvk-patcher/multiviewpatcher.dll package/backends/dxvk/multiviewpatcher.dll
           Copy-Item payload/dxvk-patcher/LICENSE-RBR-spirvpatcher-MPL-2.0.txt package/backends/dxvk/LICENSE-RBR-spirvpatcher-MPL-2.0.txt
+          Copy-Item payload/dxvk-patcher/SOURCE_SHA.txt package/backends/dxvk/MULTIVIEW_PATCHER_SOURCE_SHA.txt
 
           Copy-Item payload/dx12/dinput8.dll package/backends/dx12/dinput8.dll
           Copy-Item payload/dx12/outrun-vr-host.exe package/backends/dx12/outrun-vr-host.exe
@@ -253,14 +266,56 @@ jobs:
 
           Copy-Item package/backends/d3d9/dinput8.dll package/dinput8.dll
           Copy-Item package/backends/d3d9/outrun-vr-host.exe package/outrun-vr-host.exe
-          Set-Content package/ACTIVE_VR_BACKEND.txt "backend=d3d9"
+          $short = $env:GITHUB_SHA.Substring(0,12)
+          $matrix = "VRM-$((Get-Date).ToUniversalTime().ToString('yyyyMMdd'))-$short"
+          Set-Content package/BUILD_MATRIX_ID.txt $matrix -Encoding ascii
+          [ordered]@{
+            SchemaVersion = 1
+            BuildMatrixId = $matrix
+            IntegrationSha = $env:GITHUB_SHA
+            D3D9Sha = (Get-Content payload/d3d9/SOURCE_SHA.txt -Raw).Trim()
+            DXVKGameHostSha = (Get-Content payload/dxvk/SOURCE_SHA.txt -Raw).Trim()
+            DXVKProviderSha = (Get-Content payload/dxvk-extra/SOURCE_SHA.txt -Raw).Trim()
+            MultiviewPatcherSha = (Get-Content payload/dxvk-patcher/SOURCE_SHA.txt -Raw).Trim()
+            DX12Sha = (Get-Content payload/dx12/SOURCE_SHA.txt -Raw).Trim()
+            WorkflowRunId = $env:GITHUB_RUN_ID
+          } | ConvertTo-Json | Set-Content package/BUILD_INPUTS.json -Encoding UTF8
+          Set-Content package/ACTIVE_VR_BACKEND.txt ("backend=d3d9`nvariant=A_CONTROL`nmatrix=$matrix") -Encoding ascii
+
+          $required = @('dinput8.dll','outrun-vr-host.exe','Select-OutRunVRBackend.ps1','OutRunVR-Backend-Selector.cmd','Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt')
+          foreach ($file in $required) { if (-not (Test-Path (Join-Path package $file))) { throw "Required package file missing: $file" } }
+          if (Test-Path package/d3d9.dll) { throw 'D3D9 control package root unexpectedly contains d3d9.dll' }
+          if (Test-Path package/multiviewpatcher.dll) { throw 'D3D9 control package root unexpectedly contains multiviewpatcher.dll' }
 
           Get-ChildItem package -Recurse -File | Get-FileHash -Algorithm SHA256 | ForEach-Object {
             "$($_.Hash)  $([IO.Path]::GetRelativePath((Resolve-Path package), $_.Path))"
           } | Set-Content package/SHA256SUMS.txt
 
-          $short = $env:GITHUB_SHA.Substring(0,12)
           Compress-Archive -Path package/* -DestinationPath "OutRun2_VR_UNIFIED_$short.zip"
+      - name: Validate packaged selectors, INI round trips, and ZIP contents
+        shell: pwsh
+        run: |
+          Copy-Item package package-smoke -Recurse
+          foreach ($mode in @('2d','d3d9','dxvk-safe','dxvk','dx12')) {
+            & package-smoke/Select-OutRunVRBackend.ps1 -Backend $mode
+            $active = Get-Content package-smoke/ACTIVE_VR_BACKEND.txt -Raw
+            if ($active -notmatch "(?m)^backend=$mode$") { throw "ACTIVE_VR_BACKEND mismatch for $mode" }
+            $iniText = Get-Content package-smoke/OutRun2006Tweaks.ini -Raw
+            if ($iniText -notmatch '(?m)^\[VR\]\s*$' -or $iniText -match '(?m)^\[VR\]\\') { throw "VR INI section corrupted for $mode" }
+            switch ($mode) {
+              '2d' { if (Test-Path package-smoke/outrun-vr-host.exe) { throw '2D mode retained VR host' } }
+              'd3d9' { if ((Test-Path package-smoke/d3d9.dll) -or (Test-Path package-smoke/multiviewpatcher.dll)) { throw 'D3D9 mode retained DXVK files' } }
+              'dxvk-safe' { if (-not (Test-Path package-smoke/d3d9.dll) -or (Test-Path package-smoke/multiviewpatcher.dll)) { throw 'DXVK SAFE file contract failed' } }
+              'dxvk' { if (-not (Test-Path package-smoke/d3d9.dll) -or -not (Test-Path package-smoke/multiviewpatcher.dll)) { throw 'DXVK MULTIVIEW file contract failed' } }
+              'dx12' { if ((Test-Path package-smoke/d3d9.dll) -or (Test-Path package-smoke/multiviewpatcher.dll)) { throw 'DX12 STRICT retained DXVK files' } }
+            }
+            if (-not (Test-Path package-smoke/CURRENT_VR_SESSION.json)) { throw "Session identity missing for $mode" }
+          }
+          $zip = Get-ChildItem OutRun2_VR_UNIFIED_*.zip | Select-Object -First 1
+          Expand-Archive $zip.FullName zip-verify
+          foreach ($file in @('Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','SHA256SUMS.txt')) {
+            if (-not (Test-Path (Join-Path zip-verify $file))) { throw "ZIP content missing: $file" }
+          }
       - uses: actions/upload-artifact@v4
         with:
           name: OutRun2-VR-UNIFIED-${{ github.sha }}

@@ -121,9 +121,57 @@ if (Test-Path $ini) {
 }
 
 $nl = [Environment]::NewLine
-Set-Content (Join-Path $root "ACTIVE_VR_BACKEND.txt") ("backend=" + $Backend + $nl + "selected=" + (Get-Date -Format o)) -Encoding ascii
+$variant = switch ($Backend) {
+    "2d"        { "CONTROL_2D" }
+    "d3d9"      { "A_CONTROL" }
+    "dxvk-safe" { "E_DXVK_SAFE" }
+    "dxvk"      { "E_DXVK_MULTIVIEW" }
+    "dx12"      { "F_DX12_STRICT" }
+}
+$matrixFile = Join-Path $root "BUILD_MATRIX_ID.txt"
+$matrix = if (Test-Path $matrixFile) { (Get-Content $matrixFile -Raw).Trim() } else { "UNIFIED_LOCAL" }
+$startedUtc = (Get-Date).ToUniversalTime()
+$session = $startedUtc.ToString("yyyyMMddTHHmmssfffZ") + "-" + [guid]::NewGuid().ToString("N").Substring(0,8)
+$sessionRoot = Join-Path $root ("logs/{0}/{1}/{2}" -f $matrix,$variant,$session)
+New-Item -ItemType Directory -Force $sessionRoot | Out-Null
+
+$activeText = @(
+    "backend=$Backend"
+    "variant=$variant"
+    "matrix=$matrix"
+    "session=$session"
+    "startedUtc=$($startedUtc.ToString('o'))"
+    "selected=$((Get-Date).ToString('o'))"
+) -join $nl
+Set-Content (Join-Path $root "ACTIVE_VR_BACKEND.txt") $activeText -Encoding ascii
+
+$configHash = "missing"
+if (Test-Path $ini) { $configHash = (Get-FileHash $ini -Algorithm SHA256).Hash.ToLowerInvariant() }
+$sessionManifest = [ordered]@{
+    SchemaVersion = 1
+    BuildMatrixId = $matrix
+    VariantId = $variant
+    Backend = $Backend
+    SessionId = $session
+    StartedUtc = $startedUtc.ToString("o")
+    ConfigSha256 = $configHash
+    CollectionStatus = "started-before-game-launch"
+}
+$sessionManifest | ConvertTo-Json | Set-Content (Join-Path $root "CURRENT_VR_SESSION.json") -Encoding UTF8
+$sessionManifest | ConvertTo-Json | Set-Content (Join-Path $sessionRoot "session_manifest.json") -Encoding UTF8
+
+if (Test-Path $ini) {
+    $allowed = '^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor)\s*='
+    Get-Content $ini | Where-Object { $_ -match $allowed } |
+        Set-Content (Join-Path $sessionRoot "VR_CONFIG_SNAPSHOT.txt") -Encoding UTF8
+}
+Copy-Item (Join-Path $root "ACTIVE_VR_BACKEND.txt") $sessionRoot -Force
+if (Test-Path (Join-Path $root "BUILD_INPUTS.json")) {
+    Copy-Item (Join-Path $root "BUILD_INPUTS.json") $sessionRoot -Force
+}
 
 Write-Host "OutRun renderer mode activated: $Backend"
+Write-Host "Diagnostic session prepared before launch: $session"
 switch ($Backend) {
     "2d"   { Write-Host "2D ORIGINAL: classic D3D9, VR disabled, D3D9Ex promotion disabled, no VR host." }
     "d3d9" { Write-Host "D3D9 VR SAFE: guarded D3D9Ex/DirectGPU VR path." }

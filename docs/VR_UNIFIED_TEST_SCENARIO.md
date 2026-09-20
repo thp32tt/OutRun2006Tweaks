@@ -16,7 +16,11 @@ Select-OutRunVRBackend.cmd dx12
 
 Always exit the game and `outrun-vr-host.exe` before switching.
 
-## Test order
+Selecting a mode now creates a unique session identity and a config snapshot **before game launch**. After each test, run `Collect-OutRunVRLogs.cmd`; only logs modified during that session are collected. Run `Collect-OutRunVRLogs.cmd -All` once at the end to create the matrix ZIP.
+
+## Recommended short evening test order
+
+Use 2D ORIGINAL only as a quick no-VR overhead smoke check. Then compare D3D9 control first, followed by DXVK SAFE. Test DXVK MULTIVIEW or DX12 STRICT only if the earlier modes start cleanly. A full A-F sequence is not required; this package contains no fabricated B/C/D variants.
 
 ### A. D3D9 safe baseline
 1. Run `Select-OutRunVRBackend.cmd d3d9`.
@@ -28,7 +32,13 @@ Always exit the game and `outrun-vr-host.exe` before switching.
 7. Record HMD refresh rate and FPS.
 8. Save `OutRun2006Tweaks.log`, `outrun-vr-host-v3*.log`, `outrun-vr-host-pipeline*.log`, and watchdog log.
 
-### B. DXVK multiview
+### E1. DXVK safe
+1. Exit all OutRun/host processes.
+2. Run `Select-OutRunVRBackend.cmd dxvk-safe`.
+3. Confirm root contains `d3d9.dll` but not `multiviewpatcher.dll`.
+4. Repeat the exact A scenario and collect the session ZIP.
+
+### E2. DXVK multiview
 1. Exit all OutRun/host processes.
 2. Run `Select-OutRunVRBackend.cmd dxvk`.
 3. Confirm root contains `d3d9.dll` and `multiviewpatcher.dll`.
@@ -36,7 +46,7 @@ Always exit the game and `outrun-vr-host.exe` before switching.
 5. Confirm log contains `VR DXVK PROBE:`, `VR DXVK MULTIVIEW:`, and when eligible `TRUE MULTIVIEW world rendering active`.
 6. Compare HMD smoothness and frame time against A. Do not judge only by monitor output.
 
-### C. DX12 strict D3D9On12
+### F. DX12 strict D3D9On12
 1. Exit all OutRun/host processes.
 2. Run `Select-OutRunVRBackend.cmd dx12`.
 3. Confirm root `d3d9.dll` is absent.
