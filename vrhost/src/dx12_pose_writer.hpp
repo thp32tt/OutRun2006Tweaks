@@ -256,6 +256,18 @@ namespace OutRunVRHostDX12
             return End();
         }
 
+        OutRunVR::ClientPresentationMode Presentation() const noexcept
+        {
+            if(!state_||state_->magic!=OutRunVR::SharedMagic||
+                state_->protocolVersion!=OutRunVR::SharedProtocolVersion||
+                state_->structSize!=sizeof(*state_))
+                return OutRunVR::PresentationTheater;
+            return state_->reserved[OutRunVR::ClientPresentationModeIndex]==
+                OutRunVR::PresentationGameplay
+                ? OutRunVR::PresentationGameplay
+                : OutRunVR::PresentationTheater;
+        }
+
         void ReferenceSpaceChanged() noexcept
         {
             if(++referenceGeneration_==0)referenceGeneration_=1;
