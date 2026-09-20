@@ -172,9 +172,18 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
+    } elseif ($Backend -eq "d3d9") {
+        # D3D9 SAFE is the correctness/control path. Do not require D3D9Ex or
+        # DirectGPU; plain D3D9 + SBS/Desktop Duplication must remain usable.
+        $text = Set-IniSectionValue $text "VR" "RenderBackend" "1"
+        $text = Set-IniSectionValue $text "VR" "Enabled" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
+        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
     } else {
         $value = switch ($Backend) {
-            "d3d9" { "1" }
             "dxvk" { "2" }
             "dx12" { "3" }
         }
