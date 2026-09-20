@@ -34,6 +34,7 @@ namespace OutRunVRDxvkProbe
         std::atomic<bool> NonSystemProvider{false};
         std::atomic<bool> D3D9ExExposed{false};
         std::atomic<std::uint32_t> CustomProtocolVersion{0};
+        std::atomic<std::uint32_t> CustomCapabilityFlags{0};
         std::atomic<long> DxvkInteropHr{E_PENDING};
         std::atomic<long> CustomInteropHr{E_PENDING};
 
@@ -124,16 +125,26 @@ namespace OutRunVRDxvkProbe
             bool customDetected = SUCCEEDED(customHr) && custom != nullptr;
             bool customCompatible = false;
             std::uint32_t protocol = 0;
+            std::uint32_t capabilities = 0;
             if (customDetected)
             {
                 const HRESULT versionHr = custom->GetProtocolVersion(&protocol);
-                customCompatible = SUCCEEDED(versionHr) &&
+                const bool protocolOk = SUCCEEDED(versionHr) &&
                     protocol == OutRunVR::DxvkInterop::ProtocolVersion;
+                const HRESULT capsHr = protocolOk
+                    ? custom->GetCapabilities(&capabilities)
+                    : E_NOINTERFACE;
+                constexpr std::uint32_t requiredCaps =
+                    OutRunVR::DxvkInterop::CapabilityWorldMultiview |
+                    OutRunVR::DxvkInterop::CapabilityExternalRightTargets;
+                customCompatible = protocolOk && SUCCEEDED(capsHr) &&
+                    (capabilities & requiredCaps) == requiredCaps;
                 custom->Release();
             }
 
             CustomInteropHr.store(customHr, std::memory_order_release);
             CustomProtocolVersion.store(protocol, std::memory_order_release);
+            CustomCapabilityFlags.store(capabilities, std::memory_order_release);
             CustomInteropDetected.store(customDetected, std::memory_order_release);
             CustomInteropCompatible.store(customCompatible, std::memory_order_release);
             ProbeCompleted.store(true, std::memory_order_release);
@@ -141,10 +152,11 @@ namespace OutRunVRDxvkProbe
             if (dxvk)
             {
                 spdlog::info(
-                    "VR DXVK PROBE: stock ID3D9VkInteropDevice detected; D3D9Ex={} customStereo={} protocol={} compatible={}",
+                    "VR DXVK PROBE: stock ID3D9VkInteropDevice detected; D3D9Ex={} customStereo={} protocol={} capabilities=0x{:08X} compatible={}",
                     ex ? 1 : 0,
                     customDetected ? 1 : 0,
                     protocol,
+                    capabilities,
                     customCompatible ? 1 : 0);
 
                 if (!customDetected)
@@ -280,6 +292,8 @@ namespace OutRunVRDxvkProbe
         snapshot.d3d9ExExposed = D3D9ExExposed.load(std::memory_order_acquire);
         snapshot.customProtocolVersion =
             CustomProtocolVersion.load(std::memory_order_acquire);
+        snapshot.customCapabilityFlags =
+            CustomCapabilityFlags.load(std::memory_order_acquire);
         snapshot.dxvkInteropHr = DxvkInteropHr.load(std::memory_order_acquire);
         snapshot.customInteropHr = CustomInteropHr.load(std::memory_order_acquire);
         return snapshot;
