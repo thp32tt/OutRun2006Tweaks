@@ -349,7 +349,10 @@ namespace OutRunVRDxvkMultiview
             if (!device || !FrameTargetsReady)
                 return false;
             if (!LayeredDepth)
+            {
+                InternalProviderScope scope;
                 return SUCCEEDED(device->SetDepthStencilSurface(nullptr));
+            }
             if (!SetSurfaceLayerUnlocked(LayeredDepth, layer))
                 return false;
 
