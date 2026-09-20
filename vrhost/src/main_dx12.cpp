@@ -1075,6 +1075,11 @@ int main()
                 xr.runtimeName.c_str());
 
             const auto presentation=poseWriter.Presentation();
+            if(poseWriter.ConsumeClientRecenter())
+            {
+                theaterAnchorValid=false;
+                std::cout<<"DX12 host: game VR Recenter edge received; fixed theater anchor will be rebuilt from the current HMD pose.\n";
+            }
             const XrSpaceLocationFlags headRequired=
                 XR_SPACE_LOCATION_ORIENTATION_VALID_BIT|
                 XR_SPACE_LOCATION_POSITION_VALID_BIT;
