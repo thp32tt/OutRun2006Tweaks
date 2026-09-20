@@ -297,7 +297,7 @@ jobs:
           } | ConvertTo-Json | Set-Content package/BUILD_INPUTS.json -Encoding UTF8
           Set-Content package/ACTIVE_VR_BACKEND.txt ("backend=d3d9`nvariant=A_CONTROL`nmatrix=$matrix") -Encoding ascii
 
-          $required = @('dinput8.dll','outrun-vr-host.exe','Select-OutRunVRBackend.ps1','OutRunVR-Backend-Selector.cmd','Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','Run-OutRunVRTest.ps1','Run-OutRunVRTest.cmd','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt')
+          $required = @('dinput8.dll','outrun-vr-host.exe','Select-OutRunVRBackend.ps1','OutRunVR-Backend-Selector.cmd','Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','Run-OutRunVRTest.ps1','Run-OutRunVRTest.cmd','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','THIRD_PARTY_GPL_NOTICES.txt','LICENSE-3DMIGOTO-GPL-3.0.txt','SOURCE_GPL/3dmigoto-adapted/shader_fingerprint_gpl.hpp')
           foreach ($file in $required) { if (-not (Test-Path (Join-Path package $file))) { throw "Required package file missing: $file" } }
           if (Test-Path package/d3d9.dll) { throw 'D3D9 control package root unexpectedly contains d3d9.dll' }
           if (Test-Path package/multiviewpatcher.dll) { throw 'D3D9 control package root unexpectedly contains multiviewpatcher.dll' }
@@ -328,18 +328,25 @@ jobs:
             if (-not (Test-Path package-smoke/CURRENT_VR_SESSION.json)) { throw "Session identity missing for $mode" }
             $sessionStateBefore = Get-Content package-smoke/CURRENT_VR_SESSION.json -Raw | ConvertFrom-Json
             Add-Content package-smoke/OutRun2006Tweaks-session.log "new-$mode"
+            Set-Content package-smoke/OR2006C2C_d3d9.log "dxvk-$mode"
             & package-smoke/Collect-OutRunVRLogs.ps1
-            $collectedLog = Join-Path package-smoke ("logs/{0}/{1}/{2}/OutRun2006Tweaks-session.log" -f $sessionStateBefore.BuildMatrixId,$sessionStateBefore.VariantId,$sessionStateBefore.SessionId)
+            $sessionDir = Join-Path package-smoke ("logs/{0}/{1}/{2}" -f $sessionStateBefore.BuildMatrixId,$sessionStateBefore.VariantId,$sessionStateBefore.SessionId)
+            $collectedLog = Join-Path $sessionDir 'OutRun2006Tweaks-session.log'
+            $collectedDxvk = Join-Path $sessionDir 'OR2006C2C_d3d9.log'
             if (-not (Test-Path $collectedLog)) { throw "Collected session log missing for $mode" }
+            if (-not (Test-Path $collectedDxvk)) { throw "Collected DXVK log missing for $mode" }
             $sessionText = Get-Content $collectedLog -Raw
+            $dxvkText = Get-Content $collectedDxvk -Raw
             if ($sessionText -notmatch "new-$mode" -or $sessionText -match 'old-before-session') { throw "Session log isolation failed for $mode" }
+            if ($dxvkText -notmatch "dxvk-$mode") { throw "DXVK log content mismatch for $mode" }
             if (Test-Path package-smoke/OutRun2006Tweaks-session.log) { throw "Root session log was not sealed for $mode" }
+            if (Test-Path package-smoke/OR2006C2C_d3d9.log) { throw "Root DXVK log was not sealed for $mode" }
             $sessionStateAfter = Get-Content package-smoke/CURRENT_VR_SESSION.json -Raw | ConvertFrom-Json
             if ($sessionStateAfter.SessionId -eq $sessionStateBefore.SessionId) { throw "Next session was not prepared for $mode" }
           }
           $zip = Get-ChildItem OutRun2_VR_UNIFIED_*.zip | Select-Object -First 1
           Expand-Archive $zip.FullName zip-verify
-          foreach ($file in @('Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','Run-OutRunVRTest.ps1','Run-OutRunVRTest.cmd','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','SHA256SUMS.txt')) {
+          foreach ($file in @('Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','Run-OutRunVRTest.ps1','Run-OutRunVRTest.cmd','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','SHA256SUMS.txt','THIRD_PARTY_GPL_NOTICES.txt','LICENSE-3DMIGOTO-GPL-3.0.txt','SOURCE_GPL/3dmigoto-adapted/shader_fingerprint_gpl.hpp')) {
             if (-not (Test-Path (Join-Path zip-verify $file))) { throw "ZIP content missing: $file" }
           }
       - uses: actions/upload-artifact@v4
