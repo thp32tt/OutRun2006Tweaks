@@ -78,6 +78,7 @@ namespace OutRunVRStereo
             std::uint64_t dxvkDrawFail = 0;
             std::uint64_t dxvkInterfaceMiss = 0;
             std::uint64_t dxvkProtocolMismatch = 0;
+            std::uint64_t dxvkCapabilityMiss = 0;
         };
         R32CounterSnapshot R32Counters{};
 
@@ -1032,6 +1033,7 @@ namespace OutRunVRStereo
                 R32Counters.dxvkDrawFail = dxvk.drawFailure;
                 R32Counters.dxvkInterfaceMiss = dxvk.interfaceMisses;
                 R32Counters.dxvkProtocolMismatch = dxvk.protocolMismatches;
+                R32Counters.dxvkCapabilityMiss = dxvk.capabilityMisses;
                 return;
             }
             if (now - R32Counters.lastLogMs < 5000)
@@ -1039,7 +1041,7 @@ namespace OutRunVRStereo
 
             const auto dxvkNow = OutRunVRDxvkMultiview::GetTelemetry();
             spdlog::info(
-                "VR R32 PERF 5s: liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},producerFenceOk={},producerBudgetFallback={},backpressure={},pendingDrain={},pendingBlock={},pendingError={}] reset[rearm={},fail={}] dxvk[arm={},accepted={},rejected={},drawOk={},drawFail={},interfaceMiss={},protocolMismatch={}]",
+                "VR R32 PERF 5s: liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},producerFenceOk={},producerBudgetFallback={},backpressure={},pendingDrain={},pendingBlock={},pendingError={}] reset[rearm={},fail={}] dxvk[arm={},accepted={},rejected={},drawOk={},drawFail={},interfaceMiss={},protocolMismatch={},capabilityMiss={}]",
                 R31FastWorldLiveValidations - R32Counters.liveWvp,
                 R31FastWorldValidationRejects - R32Counters.liveReject,
                 R31StateBlockRecordings - R32Counters.stateRecord,
@@ -1063,7 +1065,8 @@ namespace OutRunVRStereo
                 dxvkNow.drawSuccess - R32Counters.dxvkDrawOk,
                 dxvkNow.drawFailure - R32Counters.dxvkDrawFail,
                 dxvkNow.interfaceMisses - R32Counters.dxvkInterfaceMiss,
-                dxvkNow.protocolMismatches - R32Counters.dxvkProtocolMismatch);
+                dxvkNow.protocolMismatches - R32Counters.dxvkProtocolMismatch,
+                dxvkNow.capabilityMisses - R32Counters.dxvkCapabilityMiss);
 
             R32Counters.lastLogMs = now;
             R32Counters.liveWvp = R31FastWorldLiveValidations;
@@ -1090,6 +1093,7 @@ namespace OutRunVRStereo
             R32Counters.dxvkDrawFail = dxvkNow.drawFailure;
             R32Counters.dxvkInterfaceMiss = dxvkNow.interfaceMisses;
             R32Counters.dxvkProtocolMismatch = dxvkNow.protocolMismatches;
+            R32Counters.dxvkCapabilityMiss = dxvkNow.capabilityMisses;
         }
 
         HRESULT __stdcall PresentDestR32(IDirect3DDevice9* device,
