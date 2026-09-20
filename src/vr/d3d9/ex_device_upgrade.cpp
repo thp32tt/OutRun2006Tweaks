@@ -17,9 +17,11 @@
 
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
+#include "../d3d12/d3d9on12_compat.hpp"
 
 namespace Settings
 {
+    extern Setting<bool> VRPreferD3D9On12;
     extern Setting<bool> VRPreferD3D9Ex;
 }
 
@@ -41,6 +43,8 @@ namespace OutRunVRD3D9ExUpgrade
 
         Direct3DCreate9Fn OriginalDirect3DCreate9 = nullptr;
         std::atomic<bool> FirstUpgradeLogged{false};
+        std::atomic<bool> FirstOn12Logged{false};
+        std::atomic<bool> FirstOn12FallbackLogged{false};
         std::atomic<bool> FirstFallbackLogged{false};
         std::atomic<bool> ThirdPartyLogged{false};
         std::atomic<bool> FirstCreateFlagsLogged{false};
@@ -788,41 +792,97 @@ namespace OutRunVRD3D9ExUpgrade
                 return nullptr;
 
             IDirect3D9* fallback = OriginalDirect3DCreate9(sdkVersion);
-            if (!fallback || !Settings::VRPreferD3D9Ex)
+            if (!fallback ||
+                (!Settings::VRPreferD3D9On12 && !Settings::VRPreferD3D9Ex))
                 return fallback;
+
             if (!FinalCompatOverlayReady.load(std::memory_order_acquire))
             {
                 if (!FirstOverlayUnavailableLogged.exchange(true))
                     spdlog::error(
-                        "VR D3D9Ex startup: final R15 compatibility overlay is not ready; Ex promotion skipped to preserve classic startup");
+                        "VR D3D9 backend startup: final R15 compatibility overlay is not ready; promotion skipped to preserve classic startup");
                 return fallback;
             }
 
             HMODULE provider = nullptr;
-            if (!IsSystemModuleForAddress(reinterpret_cast<const void*>(OriginalDirect3DCreate9), provider))
+            if (!IsSystemModuleForAddress(
+                    reinterpret_cast<const void*>(OriginalDirect3DCreate9),
+                    provider))
             {
                 if (!ThirdPartyLogged.exchange(true))
-                    spdlog::warn("VR D3D9Ex upgrade: third-party d3d9 provider detected; device upgrade skipped to preserve wrapper compatibility");
+                    spdlog::warn(
+                        "VR D3D9 backend: third-party d3d9 provider detected; D3D9On12/D3D9Ex promotion skipped to preserve wrapper compatibility");
                 return fallback;
             }
+
+            auto wrapEx = [&](IDirect3D9Ex* exDevice) -> IDirect3D9*
+            {
+                if (!exDevice)
+                    return fallback;
+                auto* wrapper =
+                    new (std::nothrow) Direct3D9ExCompat(exDevice, fallback);
+                if (!wrapper)
+                {
+                    exDevice->Release();
+                    return fallback;
+                }
+                return wrapper;
+            };
+
+            if (Settings::VRPreferD3D9On12)
+            {
+                const auto createOn12Ex =
+                    reinterpret_cast<PFN_Direct3DCreate9On12Ex>(
+                        GetProcAddress(provider, "Direct3DCreate9On12Ex"));
+                if (createOn12Ex)
+                {
+                    D3D9ON12_ARGS args{};
+                    args.Enable9On12 = TRUE;
+                    // Let the Windows translation layer select/create the D3D12
+                    // device for the adapter requested later by CreateDeviceEx.
+                    // Milestone 2 will query IDirect3DDevice9On12 and use the
+                    // underlying device for explicit VR resource interop.
+                    args.pD3D12Device = nullptr;
+                    args.NumQueues = 0;
+                    args.NodeMask = 0;
+
+                    IDirect3D9Ex* on12 = nullptr;
+                    const HRESULT on12Hr = createOn12Ex(
+                        sdkVersion, &args, 1, &on12);
+                    if (SUCCEEDED(on12Hr) && on12)
+                    {
+                        if (!FirstOn12Logged.exchange(true))
+                            spdlog::info(
+                                "VR DX12 POC: Direct3DCreate9On12Ex selected; OutRun D3D9 commands will execute through the Windows D3D12 translation layer");
+                        return wrapEx(on12);
+                    }
+
+                    if (!FirstOn12FallbackLogged.exchange(true))
+                        spdlog::warn(
+                            "VR DX12 POC: Direct3DCreate9On12Ex failed HRESULT=0x{:08X}; falling back to guarded D3D9Ex/classic D3D9",
+                            static_cast<unsigned>(on12Hr));
+                }
+                else if (!FirstOn12FallbackLogged.exchange(true))
+                {
+                    spdlog::warn(
+                        "VR DX12 POC: system d3d9.dll does not export Direct3DCreate9On12Ex; falling back to guarded D3D9Ex/classic D3D9");
+                }
+            }
+
+            if (!Settings::VRPreferD3D9Ex)
+                return fallback;
 
             const auto createEx = reinterpret_cast<Direct3DCreate9ExFn>(
                 GetProcAddress(provider, "Direct3DCreate9Ex"));
             if (!createEx)
                 return fallback;
 
-            IDirect3D9Ex* ex = nullptr;
-            const HRESULT hr = createEx(sdkVersion, &ex);
-            if (FAILED(hr) || !ex)
+            IDirect3D9Ex* exDevice = nullptr;
+            const HRESULT hr = createEx(sdkVersion, &exDevice);
+            if (FAILED(hr) || !exDevice)
                 return fallback;
 
-            auto* wrapper = new (std::nothrow) Direct3D9ExCompat(ex, fallback);
-            if (!wrapper)
-            {
-                ex->Release();
-                return fallback;
-            }
-            return wrapper;
+            return wrapEx(exDevice);
         }
 
         bool PatchDirect3DCreate9Import() noexcept
@@ -876,8 +936,15 @@ namespace OutRunVRD3D9ExUpgrade
     {
     public:
         std::string_view description() override { return "OpenXRVRD3D9ExUpgrade"; }
-        void declare_settings() override { Settings::VRPreferD3D9Ex.needs_restart(); }
-        bool validate() override { return Settings::VRPreferD3D9Ex; }
+        void declare_settings() override
+        {
+            Settings::VRPreferD3D9On12.needs_restart();
+            Settings::VRPreferD3D9Ex.needs_restart();
+        }
+        bool validate() override
+        {
+            return Settings::VRPreferD3D9On12 || Settings::VRPreferD3D9Ex;
+        }
         bool apply() override
         {
             if (!PatchDirect3DCreate9Import())
@@ -885,7 +952,7 @@ namespace OutRunVRD3D9ExUpgrade
                 spdlog::warn("VR D3D9Ex upgrade: Direct3DCreate9 IAT entry was not found/patched; original D3D9 path remains active");
                 return true;
             }
-            spdlog::info("VR D3D9Ex upgrade: Direct3DCreate9 IAT hook armed before game device creation");
+            spdlog::info("VR DX12 POC: Direct3DCreate9 IAT hook armed; backend order is D3D9On12 -> guarded D3D9Ex -> classic D3D9");
             return true;
         }
 

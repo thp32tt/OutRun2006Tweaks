@@ -9,6 +9,7 @@
 
 #include "hook_mgr.hpp"
 #include "game_addrs.hpp"
+#include "d3d12/d3d9on12_compat.hpp"
 
 namespace OutRunVRDeviceProbe
 {
@@ -54,6 +55,24 @@ namespace OutRunVRDeviceProbe
                     __uuidof(IDirect3DDevice9Ex), reinterpret_cast<void**>(&deviceEx));
                 const bool isEx = SUCCEEDED(exHr) && deviceEx;
 
+                IDirect3DDevice9On12* deviceOn12 = nullptr;
+                const HRESULT on12Hr = device->QueryInterface(
+                    __uuidof(IDirect3DDevice9On12),
+                    reinterpret_cast<void**>(&deviceOn12));
+                const bool isOn12 = SUCCEEDED(on12Hr) && deviceOn12;
+                ID3D12Device* underlying12 = nullptr;
+                LUID on12Luid{};
+                bool on12LuidValid = false;
+                if (isOn12 &&
+                    SUCCEEDED(deviceOn12->GetD3D12Device(
+                        __uuidof(ID3D12Device),
+                        reinterpret_cast<void**>(&underlying12))) &&
+                    underlying12)
+                {
+                    on12Luid = underlying12->GetAdapterLuid();
+                    on12LuidValid = true;
+                }
+
                 LUID adapterLuid{};
                 bool luidValid = false;
                 IDirect3D9* d3d = nullptr;
@@ -90,10 +109,21 @@ namespace OutRunVRDeviceProbe
                 else
                     spdlog::info("VR D3D9 probe: adapter LUID unavailable from game device (expected on plain D3D9)");
 
+                if (isOn12 && on12LuidValid)
+                    spdlog::info(
+                        "VR DX12 POC: D3D9On12 ACTIVE underlyingD3D12Luid={:08X}:{:08X}",
+                        static_cast<std::uint32_t>(on12Luid.HighPart),
+                        on12Luid.LowPart);
+                else
+                    spdlog::info(
+                        "VR DX12 POC: D3D9On12 interface unavailable; current device is not running through the D3D12 translation layer");
+
                 if (!isEx)
                     spdlog::warn(
                         "VR D3D9 probe: plain IDirect3DDevice9 detected; zero-copy cross-process sharing is impossible. Exact-eye SBS/DesktopDup remains available; helper D3D9Ex bridge is the optimization path.");
 
+                if (underlying12) underlying12->Release();
+                if (deviceOn12) deviceOn12->Release();
                 if (d3dEx) d3dEx->Release();
                 if (d3d) d3d->Release();
                 if (deviceEx) deviceEx->Release();
