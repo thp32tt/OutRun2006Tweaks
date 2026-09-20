@@ -46,3 +46,27 @@ Quest 3/VDXR runtime evidence is now the gate: test P1 first, then P2 and P3 in 
 - Workflow `35524755335` completed successfully at source `ee94dc8051b6de8c0b6ce67d9bdd8b613b98363c`: host, P1-P4 games, package assembly and package validation all passed.
 - Final artifact ID: `10609329194`; artifact/SHA256: `a21825389f0731ffc62dc23314a1415261bf05fcdf07f4accd4d92a0aa46e630`.
 - Frozen test matrix: `DX9EX-20260920-ee94dc8051b6`. Runtime validation is the only remaining acceptance gate.
+
+
+## Four-role Work pipeline reconciliation — 2026-09-21 03:58 KST
+
+The repository-side automation environment is now aligned with the active four hourly Work roles.
+
+- Integration/source of truth: `vr-d3d9ex-focus`
+- A REVIEW store: `vr-d3d9ex-review`
+- B FIX store: `vr-d3d9ex-candidate/<finding-id>-<run-id>`
+- C VALIDATION/SUPPORT store: `vr-d3d9ex-support`
+- D INTEGRATION/PLANNER: sole autonomous production writer and central state/queue/history owner.
+
+Durable coordination:
+- `docs/VR_AUTODEV_PROTOCOL.md`
+- `docs/VR_WORK_QUEUE.json`
+- `docs/VR_RUNTIME_FEEDBACK.json`
+- `docs/automation/README.md`
+- `docs/automation/RUN_RECORD_TEMPLATE.json`
+
+The active DX9Ex validation workflow now accepts isolated B candidate branches and uses branch-scoped concurrency, so one candidate cannot cancel another candidate or the integration validation run.
+
+Central runtime-candidate WIP limit is 3. Two materially different failed fixes for the same unchanged failure become BLOCKED. A/B/C publish evidence/proposals on their own branches; D imports them idempotently and updates the central queue.
+
+DXVK/multiview/DX12 remain blocked by policy until the DX9Ex reference is user accepted. The next normal human validation remains one CORRECTNESS test unless concrete evidence requires CONTROL/PERFORMANCE comparison.
