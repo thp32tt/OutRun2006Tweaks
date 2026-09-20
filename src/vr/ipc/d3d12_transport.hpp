@@ -30,7 +30,7 @@ namespace OutRunVR::D3D12Transport
     {
         std::uint32_t magic = Magic;
         std::uint32_t version = Version;
-        std::uint32_t structSize = sizeof(SharedState);
+        std::uint32_t structSize = 0;
         std::uint32_t ringSize = RingSize;
 
         volatile LONG producerSequence = 0;
