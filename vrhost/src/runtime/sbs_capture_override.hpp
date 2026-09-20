@@ -179,9 +179,13 @@ float4 PSMain(VSOut input) : SV_Target
 }
 )HLSL";
 
+    inline std::uint64_t NextSwapchainGeneration = 0;
+
     struct Swapchain
     {
         XrSwapchain handle = XR_NULL_HANDLE;
+        std::uint64_t generation = 0;
+        std::uint64_t committedGeneration = 0;
         std::uint32_t width = 0;
         std::uint32_t height = 0;
         std::uint32_t arraySize = 1;
@@ -206,6 +210,8 @@ float4 PSMain(VSOut input) : SV_Target
                 ::xrDestroySwapchain(handle);
                 handle = XR_NULL_HANDLE;
             }
+            generation = 0;
+            committedGeneration = 0;
             width = height = 0;
             arraySize = 1;
             format = DXGI_FORMAT_UNKNOWN;
@@ -578,6 +584,11 @@ float4 PSMain(VSOut input) : SV_Target
             }
         }
 
+        std::uint64_t generation = ++NextSwapchainGeneration;
+        if (generation == 0)
+            generation = ++NextSwapchainGeneration;
+        swapchain.generation = generation;
+        swapchain.committedGeneration = 0;
         swapchain.width = width;
         swapchain.height = height;
         swapchain.arraySize = arraySize;
@@ -670,6 +681,9 @@ float4 PSMain(VSOut input) : SV_Target
             swapchain.acquired = false;
             swapchain.waited = false;
             swapchain.acquiredImage = 0;
+            // A released image is valid only for the exact swapchain creation
+            // that produced it. Recreated handles never inherit this evidence.
+            swapchain.committedGeneration = swapchain.generation;
             return true;
         }
         return false;
