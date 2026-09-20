@@ -195,7 +195,7 @@ jobs:
               'DX9EX_TEST_SCENARIO.md','BUILD_MATRIX_ID.txt'
             )
             foreach ($file in $required) {
-              if (-not (Test-Path (Join-Path $dir $file))) { throw "Required file missing for $variant: $file" }
+              if (-not (Test-Path (Join-Path $dir $file))) { throw "Required file missing for ${variant}: $file" }
             }
 
             Get-ChildItem $dir -File | Get-FileHash -Algorithm SHA256 | ForEach-Object {
