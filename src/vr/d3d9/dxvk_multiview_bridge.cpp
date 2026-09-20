@@ -36,6 +36,7 @@ namespace OutRunVRDxvkMultiview
         std::atomic<std::uint64_t> Cancels{0};
         std::atomic<std::uint64_t> InterfaceMisses{0};
         std::atomic<std::uint64_t> ProtocolMismatches{0};
+        std::atomic<std::uint64_t> CapabilityMisses{0};
 
         bool FirstEnabledLogged = false;
         bool FirstRejectLogged = false;
@@ -115,13 +116,33 @@ namespace OutRunVRDxvkMultiview
                 return nullptr;
             }
 
+            std::uint32_t capabilities = 0;
+            const HRESULT capsHr = interop->GetCapabilities(&capabilities);
+            constexpr std::uint32_t requiredCaps =
+                OutRunVR::DxvkInterop::CapabilityWorldMultiview |
+                OutRunVR::DxvkInterop::CapabilityExternalRightTargets;
+            if (FAILED(capsHr) ||
+                (capabilities & requiredCaps) != requiredCaps)
+            {
+                ++CapabilityMisses;
+                if (!FirstMissingLogged)
+                {
+                    FirstMissingLogged = true;
+                    spdlog::info(
+                        "VR DXVK MULTIVIEW: provider protocol is present but capability flags=0x{:08X} do not include required=0x{:08X}; per-draw custom calls disabled and two-pass fallback stays active",
+                        capabilities, requiredCaps);
+                }
+                interop->Release();
+                return nullptr;
+            }
+
             CachedInterop = interop;
             if (!FirstEnabledLogged)
             {
                 FirstEnabledLogged = true;
                 spdlog::info(
-                    "VR DXVK MULTIVIEW: protocol v{} negotiated; verified stable world draws may use one-D3D9-draw multiview",
-                    version);
+                    "VR DXVK MULTIVIEW: protocol v{} capabilities=0x{:08X} negotiated; verified stable world draws may use one-D3D9-draw multiview",
+                    version, capabilities);
             }
             return CachedInterop;
         }
@@ -230,6 +251,8 @@ namespace OutRunVRDxvkMultiview
         out.interfaceMisses = InterfaceMisses.load(std::memory_order_acquire);
         out.protocolMismatches =
             ProtocolMismatches.load(std::memory_order_acquire);
+        out.capabilityMisses =
+            CapabilityMisses.load(std::memory_order_acquire);
         return out;
     }
 }
