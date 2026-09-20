@@ -909,7 +909,8 @@ int main()
             XrView{XR_TYPE_VIEW},
             XrView{XR_TYPE_VIEW}};
         std::deque<PendingAck> pendingAcks;
-        std::uint32_t lastRenderedFrame=0;
+        OutRunVRHostDX12::TransportConsumer::Frame heldFrame{};
+        std::uint64_t heldLastUseFence=0;
 
         std::cout<<"Runtime: "<<xr.runtimeName<<"\n";
         std::cout<<"Waiting for OpenXR session and DX12 game transport. "
@@ -918,12 +919,12 @@ int main()
         while(!xr.exitRequested)
         {
             PollEvents(xr);
-            consumer.Touch();
             if(!xr.sessionRunning)
             {
                 Sleep(20);
                 continue;
             }
+            consumer.Touch();
 
             const std::uint64_t completed=renderer.CompletedFence();
             while(!pendingAcks.empty()&&
@@ -975,14 +976,28 @@ int main()
             std::array<const XrCompositionLayerBaseHeader*,1> layers{};
             std::uint32_t layerCount=0;
 
-            OutRunVRHostDX12::TransportConsumer::Frame frame{};
-            const bool newFrame=
-                fs.shouldRender!=XR_FALSE&&
-                consumer.AcquireLatest(d3d.device,d3d.queue,frame)&&
-                frame.frameId!=0&&
-                frame.frameId!=lastRenderedFrame;
+            // Keep one producer slot leased until a newer game frame replaces it.
+            // This decouples a 60 Hz game from a 72/80/90/120 Hz XR loop without
+            // re-reading a slot after ACK (the producer may immediately reuse it).
+            OutRunVRHostDX12::TransportConsumer::Frame candidate{};
+            if(fs.shouldRender!=XR_FALSE&&
+                consumer.AcquireLatest(d3d.device,d3d.queue,candidate)&&
+                candidate.frameId&&
+                candidate.frameId!=heldFrame.frameId)
+            {
+                if(heldFrame.frameId)
+                {
+                    if(heldLastUseFence)
+                        pendingAcks.push_back(
+                            {heldLastUseFence,heldFrame.frameId});
+                    else
+                        consumer.Ack(heldFrame.frameId);
+                }
+                heldFrame=std::move(candidate);
+                heldLastUseFence=0;
+            }
 
-            if(fs.shouldRender!=XR_FALSE&&viewCount>=2&&newFrame)
+            if(fs.shouldRender!=XR_FALSE&&viewCount>=2&&heldFrame.frameId)
             {
                 XrSwapchainImageAcquireInfo ai{
                     XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO};
@@ -999,7 +1014,7 @@ int main()
 
                 std::uint64_t gpuFence=0;
                 const bool rendered=renderer.Render(
-                    imageIndex,frame,gpuFence);
+                    imageIndex,heldFrame,gpuFence);
 
                 XrSwapchainImageReleaseInfo sri{
                     XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO};
@@ -1009,10 +1024,7 @@ int main()
 
                 if(rendered)
                 {
-                    pendingAcks.push_back(
-                        {gpuFence,frame.frameId});
-                    lastRenderedFrame=frame.frameId;
-
+                    heldLastUseFence=gpuFence;
                     for(std::uint32_t eye=0;eye<2;++eye)
                     {
                         projectionViews[eye].pose=views[eye].pose;
@@ -1053,6 +1065,9 @@ int main()
             consumer.Ack(pendingAcks.front().frameId);
             pendingAcks.pop_front();
         }
+        if(heldFrame.frameId&&
+            (!heldLastUseFence||heldLastUseFence<=completed))
+            consumer.Ack(heldFrame.frameId);
         return 0;
     }
     catch(const std::exception& e)
