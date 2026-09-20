@@ -87,6 +87,9 @@ protocol_v2 = require(
     "HostAdapterLuidValid",
     "hostDirectConsumedFrameId",
     "SharedRenderFrameRing",
+    "RenderFrameRunGenerationIndex = 11",
+    "RenderFrameRunIdentityMatches",
+    "ring.reserved0 != 0",
 )
 protocol_v3 = require(
     "src/vr/ipc/protocol_v3.hpp",
@@ -317,6 +320,8 @@ require(
 # completion, and bind actual texture format/size to committed Frame.v2 metadata.
 require(
     "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp",
+    "RenderFrameRunIdentityMatches(*FrameRing, candidate)",
+    "const std::uint32_t ringBefore = FrameRing->publishSequence",
     "CopyFenceTimeoutMs = 8",
     "ExpectedDeclaredFormat",
     "case D3DFMT_A8R8G8B8",
@@ -347,6 +352,11 @@ require(
 require(
     "vrhost/src/main_r23.cpp",
     "#include \"main.cpp\"",
+    "R23UsableGameplayBootstrapFrame",
+    "bootstrapFrame",
+    "frame.presentationMode != OutRunVR::PresentationGameplay",
+    "RenderFrameStereoComplete",
+    "RenderFrameEffectivePoseValid",
     "R23FrameUnchanged",
     "R23CommitDirectAfterValidation",
     "R23CommitClassicAfterValidation",
@@ -368,11 +378,22 @@ require(
 
 require(
     "vrhost/src/main.cpp",
+    "RenderFrameRunIdentityMatches(*state_, out)",
+    "const std::uint32_t ringBefore = state_->publishSequence",
     "directTransportOnly_",
     "desktopDuplication=",
     "disabled-direct-only",
     "DXGI_FORMAT_B8G8R8A8_UNORM",
 )
+require(
+    "src/vr/d3d9/stereo_renderer_r7.inc",
+    "MakeRenderFrameRunGeneration",
+    "ClaimRenderFrameRingForCurrentRun",
+    "RenderFrameRing->reserved0 = RenderFrameRunGeneration",
+    "RenderFrameRunGenerationIndex",
+    "DirectTransportGeneration=RenderFrameRunGeneration",
+)
+
 require(
     "src/vr/d3d9/stereo_renderer.cpp",
     "R9ReadBoolEnvironment",
