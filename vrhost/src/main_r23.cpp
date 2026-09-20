@@ -2713,14 +2713,23 @@ int main(int argc, char** argv)
                         QueryPerformanceCounter(&ce); timings.capture.Add(timings.Ms(cs, ce));
 
                         LARGE_INTEGER frs{}, fre{}; QueryPerformanceCounter(&frs);
+                        // Only crop the left half when the shared frame state says
+                        // the desktop source is a completed SBS frame. If stereo
+                        // never became active, the desktop is a normal full-width
+                        // mono frame and cropping it produces a half-screen zoom.
+                        const bool fallbackSourceIsSbs = have &&
+                            before.state == OutRunVR::StereoSbsActive &&
+                            (before.flags & OutRunVR::RenderFrameStereoComplete) != 0;
                         if (fallbackCapture.available &&
                             R23RenderTheater(compositor, viewSpace, localSpace,
-                                fs.predictedDisplayTime, quad, true))
+                                fs.predictedDisplayTime, quad, fallbackSourceIsSbs))
                         {
                             layers[0] =
                                 reinterpret_cast<const XrCompositionLayerBaseHeader*>(&quad);
                             layerReady = true;
-                            finalLayerKind = "recovery-left-eye-theater";
+                            finalLayerKind = fallbackSourceIsSbs
+                                ? "recovery-left-eye-theater"
+                                : "recovery-full-mono-theater";
                             ++R23GameplayTheaterFallbacks;
                             const ULONGLONG now = GetTickCount64();
                             if (R23LastGameplayFallbackLogMs == 0 ||
@@ -2728,7 +2737,9 @@ int main(int argc, char** argv)
                             {
                                 R23LastGameplayFallbackLogMs = now;
                                 std::cout
-                                    << "[R23 fallback] no reusable stereo projection remained; using left-eye-only LOCAL-fixed theater until fresh stereo returns"
+                                    << "[R23 fallback] no reusable stereo projection remained; using "
+                                    << (fallbackSourceIsSbs ? "left-eye SBS crop" : "full-width mono")
+                                    << " LOCAL-fixed theater until fresh stereo returns"
                                     << " count=" << R23GameplayTheaterFallbacks
                                     << " productionAttempted=" << (productionCaptureAttempted ? 1 : 0)
                                     << "\n";
