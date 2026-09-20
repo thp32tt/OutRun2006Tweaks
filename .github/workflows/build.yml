@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches-ignore: [ vr-d3d9ex-r13-flat-test, vr-d3d9ex-overlay-matrix8 ]
+    branches-ignore: [ vr-d3d9ex-r13-flat-test, vr-d3d9ex-overlay-matrix8, vr-d3d9ex-small-alpha-matrix12 ]
   pull_request:
 
 jobs:
