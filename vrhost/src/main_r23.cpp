@@ -2121,6 +2121,11 @@ int main(int argc, char** argv)
 
             XrFrameBeginInfo bi{ XR_TYPE_FRAME_BEGIN_INFO };
             CheckXr(xrBeginFrame(session, &bi), "xrBeginFrame");
+            // F10/focus recenter is an application-space operation, not merely
+            // cache invalidation. Apply it before every pose/view locate so the
+            // current frame and all submitted layer spaces share one origin.
+            OutRunVrR26RecenterHardening::ApplyPendingApplicationRecenter(
+                session, viewSpace, localSpace, fs.predictedDisplayTime);
             XrSpaceLocation head{ XR_TYPE_SPACE_LOCATION };
             CheckXr(xrLocateSpace(viewSpace, localSpace, fs.predictedDisplayTime, &head), "xrLocateSpace");
             std::array<XrView, 2> views{}; for (auto& v : views) v = { XR_TYPE_VIEW };
