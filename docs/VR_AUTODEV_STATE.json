@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedUtc": "2026-09-20T17:55:25Z",
+  "updatedUtc": "2026-09-20T18:36:00Z",
   "branch": "vr-unified-backends",
   "publicationMode": "github-fast-forward-cas",
   "frozen": true,
@@ -108,5 +108,37 @@
     "artifactSha256": "a5e21693ae74d51ea0ba7b2483ef133fbfde9517068993a5e8796f6b5bc37243",
     "innerZipSha256": "12088212f8ec4af2f92cdc6280e785f51112b9e50945c10b8fe9fb4f1dd08780",
     "validation": "Build success; D3D9 SAFE, DXVK game/host, DXVK provider, multiview patcher, DX12 and package all success; runtime validation pending."
+  },
+  "coordination": {
+    "initializedKst": "2026-09-21T03:36:00+09:00",
+    "baselineSourceCommit": "ad14ed6c6757634233ec79b71f42be53c563edb7",
+    "protocol": "docs/VR_AUTODEV_PROTOCOL.md",
+    "queue": "docs/VR_WORK_QUEUE.json",
+    "runtimeFeedback": "docs/VR_RUNTIME_FEEDBACK.json",
+    "handoffs": {
+      "review": "docs/autodev/REVIEW_HANDOFF.json",
+      "fix": "docs/autodev/FIX_HANDOFF.json",
+      "validation": "docs/autodev/VALIDATION_HANDOFF.json"
+    },
+    "authorities": {
+      "productionSourceWriter": "FIX",
+      "centralQueueWriter": "INTEGRATION_PLANNER",
+      "reviewSourceMode": "read-only",
+      "validationSourceMode": "read-only"
+    },
+    "invariants": [
+      "Do not repeat completed work for unchanged input hashes without a new review lens or runtime evidence.",
+      "Two materially different failed fixes move a finding to BLOCKED.",
+      "Runtime/HMD correctness requires Quest 3 + VDXR evidence.",
+      "No more than six meaningful runtime candidates; never fabricate identical variants."
+    ],
+    "setupCommits": [
+      "73c58c45082a8c3b7b62299f4b3ef1242f1f9795",
+      "24822d28d371f39c2a3d261590f93ebf24746a19",
+      "5f0a3dcca342542ccbaf2e2c72ed322719f20ce0",
+      "27380e8ba4b8d168e81a9ed1fc44582779f2a0f4",
+      "c8daa9ac86d922a73469a9b10705d0dff16a7640",
+      "ce6bb0de5755179d4cf104aa00efe81c5b8de0a3"
+    ]
   }
 }
