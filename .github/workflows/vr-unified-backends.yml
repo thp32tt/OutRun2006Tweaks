@@ -249,10 +249,8 @@ jobs:
           Copy-Item payload/dxvk/outrun-vr-host.exe package/backends/dxvk/outrun-vr-host.exe
           Copy-Item payload/dxvk/SOURCE_SHA.txt package/backends/dxvk/SOURCE_SHA.txt
           Copy-Item payload/dxvk-extra/d3d9.dll package/backends/dxvk/d3d9.dll
-          Copy-Item payload/dxvk-extra/LICENSE-DXVK-openRBRVR.txt package/backends/dxvk/LICENSE-DXVK-openRBRVR.txt
           Copy-Item payload/dxvk-extra/SOURCE_SHA.txt package/backends/dxvk/DXVK_PROVIDER_SOURCE_SHA.txt
           Copy-Item payload/dxvk-patcher/multiviewpatcher.dll package/backends/dxvk/multiviewpatcher.dll
-          Copy-Item payload/dxvk-patcher/LICENSE-RBR-spirvpatcher-MPL-2.0.txt package/backends/dxvk/LICENSE-RBR-spirvpatcher-MPL-2.0.txt
           Copy-Item payload/dxvk-patcher/SOURCE_SHA.txt package/backends/dxvk/MULTIVIEW_PATCHER_SOURCE_SHA.txt
 
           Copy-Item payload/dx12/dinput8.dll package/backends/dx12/dinput8.dll
@@ -262,7 +260,6 @@ jobs:
           Copy-Item OutRun2006Tweaks.ini package/OutRun2006Tweaks.ini
           Copy-Item OutRun2006Tweaks.lods.ini package/OutRun2006Tweaks.lods.ini
           Copy-Item tools/Select-OutRunVRBackend.ps1 package/Select-OutRunVRBackend.ps1
-          Copy-Item tools/Select-OutRunVRBackend.cmd package/Select-OutRunVRBackend.cmd
           Copy-Item tools/OutRunVR-Backend-Selector.ps1 package/OutRunVR-Backend-Selector.ps1
           Copy-Item tools/OutRunVR-Backend-Selector.cmd package/OutRunVR-Backend-Selector.cmd
           Copy-Item tools/Collect-OutRunVRLogs.ps1 package/Collect-OutRunVRLogs.ps1
@@ -271,12 +268,9 @@ jobs:
           Copy-Item tools/Run-OutRunVRTest.cmd package/Run-OutRunVRTest.cmd
           Copy-Item docs/VR_UNIFIED_TEST_SCENARIO.md package/VR_UNIFIED_TEST_SCENARIO.md
 
-          # Keep GPL attribution and corresponding adapted source with the
-          # distributable test package.
-          Copy-Item THIRD_PARTY_GPL_NOTICES.txt package/THIRD_PARTY_GPL_NOTICES.txt
-          Copy-Item LICENSE-3DMIGOTO-GPL-3.0.txt package/LICENSE-3DMIGOTO-GPL-3.0.txt
-          New-Item -ItemType Directory -Force package/SOURCE_GPL/3dmigoto-adapted | Out-Null
-          Copy-Item src/vr/d3d9/shader_fingerprint_gpl.hpp package/SOURCE_GPL/3dmigoto-adapted/shader_fingerprint_gpl.hpp
+          # The tester ZIP is intentionally runtime-only. License notices and
+          # corresponding source are assembled into a separate compliance ZIP
+          # so the test folder stays uncluttered.
 
           $ini = Get-Content package/OutRun2006Tweaks.ini -Raw
           $ini = [regex]::Replace($ini, '(?m)^SkyGlowFactor\s*=.*$', 'SkyGlowFactor = 1')
@@ -300,8 +294,54 @@ jobs:
           } | ConvertTo-Json | Set-Content package/BUILD_INPUTS.json -Encoding UTF8
           Set-Content package/ACTIVE_VR_BACKEND.txt ("backend=d3d9`nvariant=A_CONTROL`nmatrix=$matrix") -Encoding ascii
 
-          $required = @('dinput8.dll','outrun-vr-host.exe','Select-OutRunVRBackend.ps1','OutRunVR-Backend-Selector.cmd','Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','Run-OutRunVRTest.ps1','Run-OutRunVRTest.cmd','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','THIRD_PARTY_GPL_NOTICES.txt','LICENSE-3DMIGOTO-GPL-3.0.txt','SOURCE_GPL/3dmigoto-adapted/shader_fingerprint_gpl.hpp')
+          # Keep compliance material outside the tester ZIP.
+          New-Item -ItemType Directory -Force compliance/SOURCE_GPL/3dmigoto-adapted | Out-Null
+          Copy-Item THIRD_PARTY_GPL_NOTICES.txt compliance/THIRD_PARTY_GPL_NOTICES.txt
+          Copy-Item LICENSE-3DMIGOTO-GPL-3.0.txt compliance/LICENSE-3DMIGOTO-GPL-3.0.txt
+          Copy-Item src/vr/d3d9/shader_fingerprint_gpl.hpp compliance/SOURCE_GPL/3dmigoto-adapted/shader_fingerprint_gpl.hpp
+          Copy-Item payload/dxvk-extra/LICENSE-DXVK-openRBRVR.txt compliance/LICENSE-DXVK-openRBRVR.txt
+          Copy-Item payload/dxvk-patcher/LICENSE-RBR-spirvpatcher-MPL-2.0.txt compliance/LICENSE-RBR-spirvpatcher-MPL-2.0.txt
+          Copy-Item package/BUILD_INPUTS.json compliance/BUILD_INPUTS.json
+          Copy-Item package/BUILD_MATRIX_ID.txt compliance/BUILD_MATRIX_ID.txt
+          Compress-Archive -Path compliance/* -DestinationPath "OutRun2_VR_COMPLIANCE_$short.zip"
+
+          # Keep only files directly needed to select, launch, test, collect,
+          # identify, and compare the five runtime modes.
+          $required = @(
+            'dinput8.dll',
+            'outrun-vr-host.exe',
+            'OutRun2006Tweaks.ini',
+            'OutRun2006Tweaks.lods.ini',
+            'Select-OutRunVRBackend.ps1',
+            'OutRunVR-Backend-Selector.ps1',
+            'OutRunVR-Backend-Selector.cmd',
+            'Collect-OutRunVRLogs.ps1',
+            'Collect-OutRunVRLogs.cmd',
+            'Run-OutRunVRTest.ps1',
+            'Run-OutRunVRTest.cmd',
+            'VR_UNIFIED_TEST_SCENARIO.md',
+            'BUILD_INPUTS.json',
+            'BUILD_MATRIX_ID.txt'
+          )
           foreach ($file in $required) { if (-not (Test-Path (Join-Path package $file))) { throw "Required package file missing: $file" } }
+
+          # Do not put release/compliance clutter or the obsolete duplicate CLI
+          # selector wrapper into the tester ZIP.
+          $forbiddenPaths = @(
+            'Select-OutRunVRBackend.cmd',
+            'THIRD_PARTY_GPL_NOTICES.txt',
+            'LICENSE-3DMIGOTO-GPL-3.0.txt',
+            'SOURCE_GPL'
+          )
+          foreach ($file in $forbiddenPaths) {
+            if (Test-Path (Join-Path package $file)) { throw "Tester package contains forbidden release-only file: $file" }
+          }
+          $releaseOnlyFiles = Get-ChildItem package -Recurse -File | Where-Object {
+            $_.Name -match '^(LICENSE|COPYING|NOTICE|THIRD_PARTY)'
+          }
+          if ($releaseOnlyFiles) {
+            throw "Tester package contains release-only license/notice files: $($releaseOnlyFiles.FullName -join ', ')"
+          }
           if (Test-Path package/d3d9.dll) { throw 'D3D9 control package root unexpectedly contains d3d9.dll' }
           if (Test-Path package/multiviewpatcher.dll) { throw 'D3D9 control package root unexpectedly contains multiviewpatcher.dll' }
 
@@ -349,11 +389,23 @@ jobs:
           }
           $zip = Get-ChildItem OutRun2_VR_UNIFIED_*.zip | Select-Object -First 1
           Expand-Archive $zip.FullName zip-verify
-          foreach ($file in @('Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','Run-OutRunVRTest.ps1','Run-OutRunVRTest.cmd','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','SHA256SUMS.txt','THIRD_PARTY_GPL_NOTICES.txt','LICENSE-3DMIGOTO-GPL-3.0.txt','SOURCE_GPL/3dmigoto-adapted/shader_fingerprint_gpl.hpp')) {
+          foreach ($file in @('OutRunVR-Backend-Selector.cmd','OutRunVR-Backend-Selector.ps1','Select-OutRunVRBackend.ps1','Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','Run-OutRunVRTest.ps1','Run-OutRunVRTest.cmd','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','SHA256SUMS.txt','VR_UNIFIED_TEST_SCENARIO.md')) {
             if (-not (Test-Path (Join-Path zip-verify $file))) { throw "ZIP content missing: $file" }
           }
+          foreach ($file in @('Select-OutRunVRBackend.cmd','THIRD_PARTY_GPL_NOTICES.txt','LICENSE-3DMIGOTO-GPL-3.0.txt','SOURCE_GPL')) {
+            if (Test-Path (Join-Path zip-verify $file)) { throw "Lean tester ZIP contains release-only/duplicate file: $file" }
+          }
+          $zipReleaseOnly = Get-ChildItem zip-verify -Recurse -File | Where-Object {
+            $_.Name -match '^(LICENSE|COPYING|NOTICE|THIRD_PARTY)'
+          }
+          if ($zipReleaseOnly) { throw "Lean tester ZIP contains license/notice files." }
       - uses: actions/upload-artifact@v4
         with:
           name: OutRun2-VR-UNIFIED-${{ github.sha }}
           path: OutRun2_VR_UNIFIED_*.zip
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-COMPLIANCE-${{ github.sha }}
+          path: OutRun2_VR_COMPLIANCE_*.zip
           if-no-files-found: error
