@@ -310,9 +310,9 @@ namespace OutRunVRStereo
 			return SharedState && (SharedState->flags & OutRunVR::HostDirectGpuTransport) != 0;
 		}
 
-		bool OutRunVRD3D12Bridge::HostReady()
+		bool HostDirectTransportReady()
 		{
-			return SharedState && (SharedState->flags & OutRunVR::HostDirectGpuReady) != 0;
+			return OutRunVRD3D12Bridge::HostReady();
 		}
 
 		bool StereoWanted()
