@@ -12,6 +12,7 @@
 // unknown WVPs, and constant mismatches remain fail-closed through R13/R23/R9.
 
 #include "stereo_renderer_r23.cpp"
+#include "shader_fingerprint_gpl.hpp"
 
 namespace OutRunVRRenderer
 {
@@ -64,6 +65,32 @@ namespace OutRunVRStereo
         std::uint64_t R27PresentSamples = 0;
         std::uint64_t R27PerfLastDrawSerial = 0;
         std::uint64_t R27PerfLastPresentSamples = 0;
+        std::uint64_t R46ShaderFingerprintPairs = 0;
+
+        void R46TraceShaderFingerprint(IDirect3DDevice9* device,
+            const R13EffectSnapshot& effect) noexcept
+        {
+            if (!OutRunVR::GplShaderFingerprint::TraceEnabled())
+                return;
+
+            const auto pair =
+                OutRunVR::GplShaderFingerprint::CaptureCurrent(device);
+            if (!OutRunVR::GplShaderFingerprint::RememberPair(pair))
+                return;
+
+            ++R46ShaderFingerprintPairs;
+            spdlog::info(
+                "VR GPL SHADER: pair={} vsHash={:016x} vsBytes={} vsPtr=0x{:x} psHash={:016x} psBytes={} psPtr=0x{:x} effect={} zKnown={} zEnabled={}",
+                R46ShaderFingerprintPairs,
+                pair.vertex.value, pair.vertex.bytecodeBytes,
+                pair.vertexIdentity,
+                pair.pixel.value, pair.pixel.bytecodeBytes,
+                pair.pixelIdentity,
+                static_cast<unsigned>(effect.classification),
+                effect.zKnown ? 1 : 0,
+                effect.zEnabled ? 1 : 0);
+        }
+
 
         bool R26TrackedOcclusionNeedsSingleExecution(
             IDirect3DDevice9* device) noexcept
@@ -329,6 +356,7 @@ namespace OutRunVRStereo
             R9Draw&& r9Draw, LegacyR13Draw&& legacyR13Draw)
         {
             const R13EffectSnapshot effect = R13CaptureDrawTimeEffect(device);
+            R46TraceShaderFingerprint(device, effect);
             auto legacyWithSnapshot = [&]() {
                 R13EffectOverrideScope reuse(effect);
                 return legacyR13Draw();
