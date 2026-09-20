@@ -4,6 +4,8 @@
 
 #include <cstdint>
 
+#include "dxvk_interop.hpp"
+
 namespace OutRunVRDxvkMultiview
 {
     struct Telemetry
