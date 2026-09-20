@@ -4,75 +4,172 @@
 #include <d3d9.h>
 
 #include <atomic>
+#include <cwchar>
+#include <string>
 
 #include <spdlog/spdlog.h>
 
 #include "game_addrs.hpp"
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
+#include "vr/d3d9/dxvk_interop.hpp"
+#include "vr/d3d9/dxvk_probe.hpp"
 
-// DXVK compatibility probe for the isolated multiview experiment branch.
-//
-// This file is intentionally non-invasive: it does not replace any D3D9 method,
-// does not submit Vulkan work and does not change R31 stereo routing.  It only
-// asks the live game device for DXVK's public ID3D9VkInteropDevice interface.
-// Stock Microsoft/NVIDIA D3D9 returns E_NOINTERFACE; upstream DXVK exposes the
-// interface from D3D9DeviceEx::QueryInterface.
-//
-// Upstream DXVK IID (src/d3d9/d3d9_interfaces.h):
-//   ID3D9VkInteropDevice = 2eaa4b89-0107-4bdb-87f7-0f541c493ce0
-//
-// Keeping the probe at IUnknown level means the normal Tweaks build does not
-// need Vulkan SDK headers or a source-level dependency on DXVK.
 namespace OutRunVRDxvkProbe
 {
     namespace
     {
+        // Public stock-DXVK D3D9 Vulkan interop IID.
         constexpr GUID DxvkVkInteropDeviceIid{
             0x2eaa4b89u, 0x0107u, 0x4bdbu,
             { 0x87u, 0xf7u, 0x0fu, 0x54u, 0x1cu, 0x49u, 0x3cu, 0xe0u }
         };
 
-        std::atomic<bool> ProbeCompleted{ false };
-        std::atomic<bool> DxvkDetected{ false };
+        std::atomic<bool> ProbeCompleted{false};
+        std::atomic<bool> DxvkDetected{false};
+        std::atomic<bool> CustomInteropDetected{false};
+        std::atomic<bool> CustomInteropCompatible{false};
+        std::atomic<bool> NonSystemProvider{false};
+        std::atomic<bool> D3D9ExExposed{false};
+        std::atomic<std::uint32_t> CustomProtocolVersion{0};
+        std::atomic<long> DxvkInteropHr{E_PENDING};
+        std::atomic<long> CustomInteropHr{E_PENDING};
+
+        bool ModulePath(HMODULE module, std::wstring& out) noexcept
+        {
+            if (!module)
+                return false;
+            wchar_t buffer[32768]{};
+            const DWORD count = GetModuleFileNameW(
+                module, buffer, static_cast<DWORD>(std::size(buffer)));
+            if (count == 0 || count >= std::size(buffer))
+                return false;
+            out.assign(buffer, count);
+            return true;
+        }
+
+        bool IsSystemD3D9Provider(HMODULE module) noexcept
+        {
+            std::wstring modulePath;
+            if (!ModulePath(module, modulePath))
+                return true;
+
+            wchar_t systemDir[32768]{};
+            const UINT systemLen = GetSystemDirectoryW(
+                systemDir, static_cast<UINT>(std::size(systemDir)));
+            if (systemLen == 0 || systemLen >= std::size(systemDir))
+                return true;
+
+            std::wstring prefix(systemDir, systemLen);
+            if (!prefix.empty() && prefix.back() != L'\\')
+                prefix.push_back(L'\\');
+
+            return modulePath.size() >= prefix.size() &&
+                _wcsnicmp(modulePath.c_str(), prefix.c_str(), prefix.size()) == 0;
+        }
+
+        void LogProvider() noexcept
+        {
+            HMODULE provider = GetModuleHandleW(L"d3d9.dll");
+            std::wstring path;
+            ModulePath(provider, path);
+            const bool nonSystem = provider && !IsSystemD3D9Provider(provider);
+            NonSystemProvider.store(nonSystem, std::memory_order_release);
+
+            if (!path.empty())
+            {
+                spdlog::info(
+                    "VR DXVK PROBE: d3d9 provider={} nonSystem={}",
+                    std::string(path.begin(), path.end()), nonSystem ? 1 : 0);
+            }
+            else
+            {
+                spdlog::warn("VR DXVK PROBE: d3d9.dll provider path unavailable");
+            }
+        }
 
         bool ProbeDevice(IDirect3DDevice9* device) noexcept
         {
             if (!device)
                 return false;
 
-            IUnknown* interop = nullptr;
-            const HRESULT hr = device->QueryInterface(
+            LogProvider();
+
+            IUnknown* stockInterop = nullptr;
+            const HRESULT dxvkHr = device->QueryInterface(
                 DxvkVkInteropDeviceIid,
-                reinterpret_cast<void**>(&interop));
+                reinterpret_cast<void**>(&stockInterop));
+            const bool dxvk = SUCCEEDED(dxvkHr) && stockInterop != nullptr;
+            if (stockInterop)
+                stockInterop->Release();
 
-            const bool detected = SUCCEEDED(hr) && interop != nullptr;
-            if (interop)
-                interop->Release();
+            DxvkInteropHr.store(dxvkHr, std::memory_order_release);
+            DxvkDetected.store(dxvk, std::memory_order_release);
 
-            DxvkDetected.store(detected, std::memory_order_release);
+            IDirect3DDevice9Ex* deviceEx = nullptr;
+            const HRESULT exHr = device->QueryInterface(
+                __uuidof(IDirect3DDevice9Ex),
+                reinterpret_cast<void**>(&deviceEx));
+            const bool ex = SUCCEEDED(exHr) && deviceEx != nullptr;
+            if (deviceEx)
+                deviceEx->Release();
+            D3D9ExExposed.store(ex, std::memory_order_release);
+
+            ID3D9OutRunVRInterop* custom = nullptr;
+            const HRESULT customHr = device->QueryInterface(
+                __uuidof(ID3D9OutRunVRInterop),
+                reinterpret_cast<void**>(&custom));
+            bool customDetected = SUCCEEDED(customHr) && custom != nullptr;
+            bool customCompatible = false;
+            std::uint32_t protocol = 0;
+            if (customDetected)
+            {
+                const HRESULT versionHr = custom->GetProtocolVersion(&protocol);
+                customCompatible = SUCCEEDED(versionHr) &&
+                    protocol == OutRunVR::DxvkInterop::ProtocolVersion;
+                custom->Release();
+            }
+
+            CustomInteropHr.store(customHr, std::memory_order_release);
+            CustomProtocolVersion.store(protocol, std::memory_order_release);
+            CustomInteropDetected.store(customDetected, std::memory_order_release);
+            CustomInteropCompatible.store(customCompatible, std::memory_order_release);
             ProbeCompleted.store(true, std::memory_order_release);
 
-            if (detected)
+            if (dxvk)
             {
                 spdlog::info(
-                    "VR DXVK POC: DXVK ID3D9VkInteropDevice detected; stock DXVK interop is available. Rendering remains on the unchanged R31 two-pass path.");
+                    "VR DXVK PROBE: stock ID3D9VkInteropDevice detected; D3D9Ex={} customStereo={} protocol={} compatible={}",
+                    ex ? 1 : 0,
+                    customDetected ? 1 : 0,
+                    protocol,
+                    customCompatible ? 1 : 0);
+
+                if (!customDetected)
+                {
+                    spdlog::info(
+                        "VR DXVK PROBE: compatibility mode active; custom multiview interface absent, existing fail-closed stereo/fallback path remains authoritative");
+                }
+                else if (!customCompatible)
+                {
+                    spdlog::error(
+                        "VR DXVK PROBE: custom interface protocol mismatch (game={} provider={}); multiview must remain disabled",
+                        OutRunVR::DxvkInterop::ProtocolVersion,
+                        protocol);
+                }
             }
             else
             {
                 spdlog::info(
-                    "VR DXVK POC: DXVK ID3D9VkInteropDevice not present (QueryInterface hr=0x{:08X}); classic D3D9 path remains unchanged.",
-                    static_cast<unsigned>(hr));
+                    "VR DXVK PROBE: stock DXVK interop absent (hr=0x{:08X}); normal D3D9 path remains active",
+                    static_cast<unsigned>(dxvkHr));
             }
 
-            return detected;
+            return dxvk;
         }
 
         DWORD WINAPI DxvkProbeThread(void*)
         {
-            // Follow the renderer's device-publication model rather than
-            // intercepting Direct3DCreate9. This keeps the probe completely
-            // independent from D3D9Ex promotion and the R31 hook transaction.
             for (int attempt = 0; attempt < 1200; ++attempt)
             {
                 if (Game::D3DDevice_ptr && *Game::D3DDevice_ptr)
@@ -85,7 +182,7 @@ namespace OutRunVRDxvkProbe
 
             ProbeCompleted.store(true, std::memory_order_release);
             spdlog::warn(
-                "VR DXVK POC: game D3D9 device was not published; DXVK probe could not run.");
+                "VR DXVK PROBE: game D3D9 device was not published within 120 seconds");
             return 0;
         }
 
@@ -101,12 +198,13 @@ namespace OutRunVRDxvkProbe
 
             bool apply() override
             {
+                LogProvider();
                 HANDLE thread = CreateThread(
                     nullptr, 0, DxvkProbeThread, nullptr, 0, nullptr);
                 if (!thread)
                 {
                     spdlog::error(
-                        "VR DXVK POC: failed to start compatibility probe thread: {}",
+                        "VR DXVK PROBE: failed to start capability thread error={}",
                         GetLastError());
                     return false;
                 }
@@ -128,5 +226,39 @@ namespace OutRunVRDxvkProbe
     bool IsDxvkDetected() noexcept
     {
         return DxvkDetected.load(std::memory_order_acquire);
+    }
+
+    bool IsCustomInteropAvailable() noexcept
+    {
+        return CustomInteropCompatible.load(std::memory_order_acquire);
+    }
+
+    bool PreflightNonSystemD3D9Provider() noexcept
+    {
+        HMODULE provider = GetModuleHandleW(L"d3d9.dll");
+        if (!provider)
+            return false;
+        const bool nonSystem = !IsSystemD3D9Provider(provider);
+        NonSystemProvider.store(nonSystem, std::memory_order_release);
+        return nonSystem;
+    }
+
+    Snapshot GetSnapshot() noexcept
+    {
+        Snapshot snapshot{};
+        snapshot.probeComplete = ProbeCompleted.load(std::memory_order_acquire);
+        snapshot.dxvkDetected = DxvkDetected.load(std::memory_order_acquire);
+        snapshot.customInteropDetected =
+            CustomInteropDetected.load(std::memory_order_acquire);
+        snapshot.customInteropCompatible =
+            CustomInteropCompatible.load(std::memory_order_acquire);
+        snapshot.nonSystemD3D9Provider =
+            NonSystemProvider.load(std::memory_order_acquire);
+        snapshot.d3d9ExExposed = D3D9ExExposed.load(std::memory_order_acquire);
+        snapshot.customProtocolVersion =
+            CustomProtocolVersion.load(std::memory_order_acquire);
+        snapshot.dxvkInteropHr = DxvkInteropHr.load(std::memory_order_acquire);
+        snapshot.customInteropHr = CustomInteropHr.load(std::memory_order_acquire);
+        return snapshot;
     }
 }
