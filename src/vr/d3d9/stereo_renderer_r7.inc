@@ -715,9 +715,13 @@ namespace OutRunVRStereo
 
 				for (int eye = 0; eye < 2; ++eye)
 				{
-					XrVector3f eyeOffset = stereo.eyeOffset[eye];
+					float eyeOffset[3]{
+						stereo.eyeOffset[eye][0],
+						stereo.eyeOffset[eye][1],
+						stereo.eyeOffset[eye][2]
+					};
 					if (rotationOnly)
-						eyeOffset = { 0.0f, 0.0f, 0.0f };
+						eyeOffset[0] = eyeOffset[1] = eyeOffset[2] = 0.0f;
 					const D3DMATRIX eyePose =
 						MatrixFromQuaternionTranslation(
 							stereo.eyeOrientation[eye], eyeOffset,
