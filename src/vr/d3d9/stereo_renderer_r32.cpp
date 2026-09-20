@@ -188,7 +188,8 @@ namespace OutRunVRStereo
 
         template <typename ActualDraw>
         R31OwnedResult R32TryFastWorld(IDirect3DDevice9* device,
-            ActualDraw&& actualDraw, const char* site)
+            ActualDraw&& actualDraw, const char* site,
+            std::uint32_t dxvkEligibilityFlags)
         {
             if (R31StateBlockRecording || !R29StableStereoBase(device))
             {
@@ -272,7 +273,8 @@ namespace OutRunVRStereo
                     draw.eyeConstants[0],
                     draw.eyeConstants[1],
                     draw.poseSequence,
-                    dxvkDrawToken))
+                    dxvkDrawToken,
+                    dxvkEligibilityFlags))
             {
                 ++R9DrawCalls;
                 R9MonoBackupGap = true;
@@ -589,7 +591,7 @@ namespace OutRunVRStereo
         template <typename ActualDraw, typename LowerDraw>
         HRESULT R32Dispatch(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, LowerDraw&& lowerDraw,
-            const char* site) noexcept
+            const char* site, std::uint32_t dxvkEligibilityFlags) noexcept
         {
             R31ObserveDraw(device);
 
@@ -598,7 +600,8 @@ namespace OutRunVRStereo
                 if (R30CurrentPassIsScreenSpace2D())
                 {
                     const auto hud = R32TryHud(device,
-                        std::forward<ActualDraw>(actualDraw), site);
+                        std::forward<ActualDraw>(actualDraw), site,
+                        dxvkEligibilityFlags);
                     if (hud.handled)
                         return hud.hr;
                 }
@@ -627,7 +630,8 @@ namespace OutRunVRStereo
                 return R32DrawPrimitiveR31Hook.stdcall<HRESULT>(
                     device, type, startVertex, primitiveCount);
             };
-            return R32Dispatch(device, actual, lower, "R32/DrawPrimitive");
+            return R32Dispatch(device, actual, lower, "R32/DrawPrimitive",
+                OutRunVR::DxvkInterop::DrawPrimitive);
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveDestR32(
@@ -646,7 +650,8 @@ namespace OutRunVRStereo
                     startIndex, primitiveCount);
             };
             return R32Dispatch(device, actual, lower,
-                "R32/DrawIndexedPrimitive");
+                "R32/DrawIndexedPrimitive",
+                OutRunVR::DxvkInterop::DrawIndexedPrimitive);
         }
 
         HRESULT __stdcall DrawPrimitiveUPDestR32(IDirect3DDevice9* device,
@@ -661,7 +666,8 @@ namespace OutRunVRStereo
                 return R32DrawPrimitiveUPR31Hook.stdcall<HRESULT>(
                     device, type, primitiveCount, data, stride);
             };
-            return R32Dispatch(device, actual, lower, "R32/DrawPrimitiveUP");
+            return R32Dispatch(device, actual, lower, "R32/DrawPrimitiveUP",
+                OutRunVR::DxvkInterop::DrawPrimitiveUP);
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveUPDestR32(
@@ -681,7 +687,8 @@ namespace OutRunVRStereo
                     indexData, indexFormat, vertexData, stride);
             };
             return R32Dispatch(device, actual, lower,
-                "R32/DrawIndexedPrimitiveUP");
+                "R32/DrawIndexedPrimitiveUP",
+                OutRunVR::DxvkInterop::DrawIndexedPrimitiveUP);
         }
 
         void R32ForgetDirectIdentity() noexcept
