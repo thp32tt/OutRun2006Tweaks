@@ -236,7 +236,7 @@ namespace OutRunVrR24BlackScreenGuard
         if (!ok || !released)
             return false;
 
-        ProjectionCommittedGeneration = Projection.generation;
+        ProjectionCommittedGeneration = OutRunVrSbsCaptureOverride::Projection.generation;
         projection = *incoming;
         for (int eye = 0; eye < 2; ++eye)
         {
@@ -353,7 +353,7 @@ namespace OutRunVrR24BlackScreenGuard
         if (!ok || !released)
             return false;
 
-        TheaterCommittedGeneration = Theater.generation;
+        TheaterCommittedGeneration = OutRunVrSbsCaptureOverride::Theater.generation;
         BuildViewQuad(Theater.handle, Theater.width, Theater.height, 0, quad);
         const float aspect = SafeEyeHeight
             ? static_cast<float>(SafeEyeWidth) / static_cast<float>(SafeEyeHeight)
@@ -415,7 +415,7 @@ namespace OutRunVrR24BlackScreenGuard
         if (!Release(Theater))
             return false;
 
-        TheaterCommittedGeneration = Theater.generation;
+        TheaterCommittedGeneration = OutRunVrSbsCaptureOverride::Theater.generation;
         BuildViewQuad(Theater.handle, Theater.width, Theater.height, 0, quad);
         return true;
     }
@@ -438,7 +438,7 @@ namespace OutRunVrR24BlackScreenGuard
         const bool live = !cached && !directFlat &&
             OutRunVrSbsCaptureOverride::RenderTheaterOverride(session, quad);
         if (live)
-            TheaterCommittedGeneration = Theater.generation;
+            TheaterCommittedGeneration = OutRunVrSbsCaptureOverride::Theater.generation;
 
         const bool emergency = !cached && !directFlat && !live &&
             BuildEmergencyVisibleQuad(session, quad);
