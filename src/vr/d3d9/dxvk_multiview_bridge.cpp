@@ -146,6 +146,8 @@ namespace OutRunVRDxvkMultiview
             return false;
 
         OutRunVR::DxvkInterop::FrameStateV1 frame{};
+        frame.size = sizeof(frame);
+        frame.version = OutRunVR::DxvkInterop::ProtocolVersion;
         frame.poseSequence = poseSequence;
         frame.frameId = drawToken;
         frame.flags = OutRunVR::DxvkInterop::StereoEnabled |
@@ -158,6 +160,8 @@ namespace OutRunVRDxvkMultiview
         }
 
         OutRunVR::DxvkInterop::DrawStateV1 draw{};
+        draw.size = sizeof(draw);
+        draw.version = OutRunVR::DxvkInterop::ProtocolVersion;
         draw.poseSequence = poseSequence;
         draw.drawToken = drawToken;
         std::memcpy(draw.leftWvp, leftWvp, sizeof(draw.leftWvp));
