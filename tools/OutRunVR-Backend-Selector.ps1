@@ -210,6 +210,16 @@ foreach ($b in $legacyButtons) {
     $btn.Size = New-Object System.Drawing.Size(138,42)
     $btn.Location = New-Object System.Drawing.Point($b.X,350)
     $btn.Tag = $b.Backend
+    $payloadName = switch ($b.Backend) {
+        'dxvk-safe' { 'd3d9' }
+        'dxvk' { 'dxvk' }
+        'dx12' { 'dx12' }
+    }
+    $payloadPath = Join-Path (Join-Path $root 'backends') $payloadName
+    if (-not (Test-Path $payloadPath)) {
+        $btn.Enabled = $false
+        $btn.Text += ' (미포함)'
+    }
     $btn.Add_Click({ Select-Backend $this.Tag })
     $form.Controls.Add($btn)
 }
