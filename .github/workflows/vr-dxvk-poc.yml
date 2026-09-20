@@ -26,6 +26,10 @@ on:
       - '.github/workflows/vr-dxvk-poc.yml'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   game-x86:
     runs-on: windows-2022
@@ -80,7 +84,7 @@ jobs:
           $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
           if ($machine -ne 0x014C) { throw ('expected Win32/x86 DLL, machine=0x{0:X4}' -f $machine) }
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
-          foreach ($marker in @('VR DXVK PROBE:', 'VR DXVK MULTIVIEW:', 'production-safe R7 world path accepted custom one-D3D9-draw stereo ownership')) {
+          foreach ($marker in @('VR DXVK PROBE:', 'VR DXVK MULTIVIEW:', 'TRUE MULTIVIEW world rendering active')) {
             if (-not $ascii.Contains($marker)) { throw "DXVK marker missing: $marker" }
           }
           if ('${{ matrix.id }}' -eq 'safe') {
@@ -144,6 +148,7 @@ jobs:
           path: stage-host/outrun-vr-host.exe
           if-no-files-found: error
 
+
   dxvk-x86:
     runs-on: ubuntu-latest
     container: archlinux/archlinux:base-devel
@@ -153,22 +158,24 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Clone official DXVK v3.1.1
-        run: git clone --branch v3.1.1 --depth 1 --recurse-submodules --shallow-submodules https://github.com/doitsujin/dxvk.git dxvk-src
-
-      - name: Apply and validate OutRun VR provider overlay
+      - name: Clone dxvk-openRBRVR
         run: |
-          python3 -m py_compile dxvk-fork/apply_out_run_vr.py
-          python3 dxvk-fork/apply_out_run_vr.py dxvk-src
-          git -C dxvk-src diff --check
-          grep -R "b16d40b8-1a79-4e11-9d47-7a50c1f56e62" dxvk-src/src/d3d9
-          grep -R "GetCapabilities" dxvk-src/src/d3d9
-          grep -R "return S_FALSE;" dxvk-src/src/d3d9/d3d9_interop.cpp
+          git clone --branch latest --depth 1 --recurse-submodules --shallow-submodules \
+            https://github.com/Detegr/dxvk-openRBRVR.git dxvk-src
 
-      - name: Configure and build x86 DXVK
+      - name: Apply OutRun layer-selection completion
         run: |
           cd dxvk-src
-          meson setup --cross-file build-win32.txt --buildtype release --prefix "$GITHUB_WORKSPACE/dxvk-install" build.w32
+          python3 ../dxvk-fork/apply_openrbrvr_layer_switch.py
+          git diff --check
+          grep -R "Direct3DCreateVR" src/d3d9/d3d9.def src/d3d9/d3d9_main.cpp
+          grep -R "m_multiviewSurfaceLayer" src/d3d9/d3d9_subresource.h
+
+      - name: Configure and build x86 multiview DXVK
+        run: |
+          cd dxvk-src
+          meson setup --cross-file build-win32.txt --buildtype release \
+            --prefix "$GITHUB_WORKSPACE/dxvk-install" build.w32
           cd ..
           ninja -C dxvk-src/build.w32 install
           find dxvk-install -type f -iname 'd3d9.dll' -print
@@ -179,27 +186,82 @@ jobs:
           import pathlib, struct
           matches = list(pathlib.Path("dxvk-install").rglob("d3d9.dll"))
           if not matches:
-              raise SystemExit("custom DXVK x86 d3d9.dll was not produced")
+              raise SystemExit("dxvk-openRBRVR x86 d3d9.dll was not produced")
           p = matches[0]
           data = p.read_bytes()
           pe = struct.unpack_from("<I", data, 0x3C)[0]
           machine = struct.unpack_from("<H", data, pe + 4)[0]
           if machine != 0x014C:
               raise SystemExit(f"expected PE32 i386, machine=0x{machine:04X}")
-          pathlib.Path("stage-dxvk").mkdir(exist_ok=True)
-          pathlib.Path("stage-dxvk/d3d9.dll").write_bytes(data)
+          if b"Direct3DCreateVR" not in data:
+              raise SystemExit("Direct3DCreateVR export marker missing")
+          out = pathlib.Path("stage-dxvk")
+          out.mkdir(exist_ok=True)
+          (out / "d3d9.dll").write_bytes(data)
+          (out / "DXVK_OPENRBRVR_NOTICE.txt").write_text(
+              "Detegr/dxvk-openRBRVR (zlib/libpng) + OutRun layer-selection patch\n"
+              "https://github.com/Detegr/dxvk-openRBRVR\n", encoding="utf-8")
           print(f"verified {p}: PE32 i386")
           PY
+          cp dxvk-src/LICENSE stage-dxvk/LICENSE-DXVK-openRBRVR.txt
 
       - uses: actions/upload-artifact@v4
         with:
           name: outrun-vr-dxvk-provider-x86
-          path: stage-dxvk/d3d9.dll
+          path: stage-dxvk/
+          if-no-files-found: error
+
+  multiview-patcher-x86:
+    runs-on: windows-2022
+    steps:
+      - name: Clone MPL SPIR-V multiview patcher
+        shell: pwsh
+        run: |
+          git clone --depth 1 --recurse-submodules https://github.com/Detegr/RBR-spirvpatcher.git patcher-src
+
+      - name: Sync SPIRV-Tools dependencies
+        shell: pwsh
+        working-directory: patcher-src/spirv-tools
+        run: python utils/git-sync-deps
+
+      - name: Configure and build Win32 patcher
+        shell: pwsh
+        run: |
+          cmake -S patcher-src -B patcher-build -A Win32 -DCMAKE_BUILD_TYPE=Release
+          cmake --build patcher-build --config Release
+
+      - name: Verify and stage PE32 patcher
+        shell: pwsh
+        run: |
+          $dll = 'patcher-build/src/Release/multiviewpatcher.dll'
+          if (-not (Test-Path $dll)) { throw 'multiviewpatcher.dll was not produced' }
+          $bytes = [System.IO.File]::ReadAllBytes($dll)
+          $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+          $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
+          if ($machine -ne 0x014C) { throw ('expected PE32 patcher, machine=0x{0:X4}' -f $machine) }
+          $ascii = [Text.Encoding]::ASCII.GetString($bytes)
+          if (-not $ascii.Contains('ChangeSPIRVMultiViewDataAccessLocation')) {
+            throw 'multiview patcher export marker missing'
+          }
+          New-Item -ItemType Directory -Force stage-patcher | Out-Null
+          Copy-Item $dll stage-patcher/multiviewpatcher.dll
+          Copy-Item patcher-src/LICENSE stage-patcher/LICENSE-RBR-spirvpatcher-MPL-2.0.txt
+          @(
+            'Component: Detegr/RBR-spirvpatcher'
+            'License: Mozilla Public License 2.0'
+            'Source: https://github.com/Detegr/RBR-spirvpatcher'
+            'OutRun uses it to redirect verified c64-c67 SPIR-V accesses by BuiltIn ViewIndex.'
+          ) | Set-Content stage-patcher/MULTIVIEWPATCHER_NOTICE.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: outrun-vr-multiview-patcher-x86
+          path: stage-patcher/
           if-no-files-found: error
 
   package-safe:
     runs-on: windows-2022
-    needs: [ game-x86, host-x64, dxvk-x86 ]
+    needs: [ game-x86, host-x64, dxvk-x86, multiview-patcher-x86 ]
     steps:
       - uses: actions/checkout@v4
 
@@ -218,6 +280,11 @@ jobs:
           name: outrun-vr-dxvk-provider-x86
           path: payload/dxvk
 
+      - uses: actions/download-artifact@v4
+        with:
+          name: outrun-vr-multiview-patcher-x86
+          path: payload/patcher
+
       - name: Assemble root-level test package
         shell: pwsh
         run: |
@@ -225,9 +292,27 @@ jobs:
           Copy-Item payload/game/dinput8.dll package/dinput8.dll
           Copy-Item payload/host/outrun-vr-host.exe package/outrun-vr-host.exe
           Copy-Item payload/dxvk/d3d9.dll package/d3d9.dll
+          Copy-Item payload/dxvk/LICENSE-DXVK-openRBRVR.txt package/LICENSE-DXVK-openRBRVR.txt
+          Copy-Item payload/dxvk/DXVK_OPENRBRVR_NOTICE.txt package/DXVK_OPENRBRVR_NOTICE.txt
+          Copy-Item payload/patcher/multiviewpatcher.dll package/multiviewpatcher.dll
+          Copy-Item payload/patcher/LICENSE-RBR-spirvpatcher-MPL-2.0.txt package/LICENSE-RBR-spirvpatcher-MPL-2.0.txt
+          Copy-Item payload/patcher/MULTIVIEWPATCHER_NOTICE.txt package/MULTIVIEWPATCHER_NOTICE.txt
           Copy-Item OutRun2006Tweaks.ini package/OutRun2006Tweaks.ini
           Copy-Item OutRun2006Tweaks.lods.ini package/OutRun2006Tweaks.lods.ini
-          $readme = @("OutRun 2006 VR - DXVK PoC SAFE package","Branch: vr-dxvk-poc","Game renderer: production-safe R26/R23/R22/R13/R9","DXVK provider: official v3.1.1 + OutRun protocol-v1 overlay","Config: RenderBackend=Auto","","Current provider milestone is fail-closed. It advertises protocol v1 but no multiview capability bits, so the validated stereo fallback remains active while DXVK diagnostics are collected.","","Replace the files in the game directory as one set. Keep logs tagged VR DXVK PROBE and VR DXVK MULTIVIEW.")
+          $readme = @(
+            "OutRun 2006 VR - DXVK TRUE MULTIVIEW SAFE package",
+            "Branch: vr-dxvk-poc",
+            "Game renderer: validated OutRun stereo classifier + persistent 2-layer DXVK frame targets",
+            "Provider: Detegr/dxvk-openRBRVR + OutRun layer-selection completion",
+            "Shader patcher: Detegr/RBR-spirvpatcher (MPL-2.0)",
+            "Config: RenderBackend=Auto",
+            "",
+            "Verified programmable world shaders using c64-c67 are cloned and patched to select left/right WVP through Vulkan BuiltIn ViewIndex. Consecutive eligible world draws submit once. HUD/effects/fixed-function/unsupported shaders remain validated two-pass inside the same layered target.",
+            "",
+            "The two layers are copied to the existing OutRun left/right eye surfaces once at Present, preserving the existing OpenXR host and fallback path.",
+            "",
+            "Replace the files in the game directory as one set. Keep OutRun2006Tweaks.log and host logs. Important tags: VR DXVK PROBE, VR DXVK MULTIVIEW, TRUE MULTIVIEW."
+          )
           $readme | Set-Content package/DXVK_TEST_README.txt
           Get-ChildItem package -File | Get-FileHash -Algorithm SHA256 | ForEach-Object { "$($_.Hash)  $([IO.Path]::GetFileName($_.Path))" } | Set-Content package/SHA256SUMS.txt
           $short = $env:GITHUB_SHA.Substring(0,12)
