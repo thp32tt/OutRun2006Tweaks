@@ -78,6 +78,11 @@ $comparisonWorkflow = Get-Content $comparisonWorkflowPath -Raw
 Assert-True ($activeWorkflow -match 'name:\s*DX9Ex Active Validation') 'active workflow identity mismatch'
 Assert-True ($activeWorkflow -notmatch '(?m)^\s*matrix:\s*$') 'routine active workflow must not build a variant matrix'
 Assert-True ($activeWorkflow -notmatch 'P1_C1_FAST_WORLD|P2_C2_FAST_HUD|P4_R26_HUD_SAFE') 'routine active workflow leaked comparison variants'
+Assert-True ($activeWorkflow -match 'OutRun2-VR-DX9EX-COMPLIANCE-\$\{\{ github\.sha \}\}') 'active workflow must publish a same-SHA compliance companion'
+foreach($requiredComplianceInput in @('COPYING.GPL3','LICENSE-3DMIGOTO-GPL-3.0.txt','THIRD_PARTY_GPL_NOTICES.txt','src/vr/d3d9/shader_fingerprint_gpl.hpp','CORRESPONDING_SOURCE.zip','COMPLIANCE_MANIFEST.json')) {
+    Assert-True ($activeWorkflow.Contains($requiredComplianceInput)) "active workflow compliance companion missing $requiredComplianceInput"
+}
+Assert-True ($activeWorkflow -match 'needs:\s*\[host, game, compliance\]') 'runtime package publication must wait for compliance validation'
 Assert-True ($comparisonWorkflow -match 'name:\s*DX9Ex Comparison Matrix \(Manual\)') 'comparison workflow identity mismatch'
 Assert-True ($comparisonWorkflow -notmatch '(?m)^\s*push:\s*$') 'four-way comparison workflow must remain manual-only'
 

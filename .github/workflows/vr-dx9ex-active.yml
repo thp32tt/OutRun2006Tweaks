@@ -15,6 +15,11 @@ on:
       - 'cmake.toml'
       - 'OutRun2006Tweaks.ini'
       - 'OutRun2006Tweaks.lods.ini'
+      - 'COPYING.GPL3'
+      - 'LICENSE.md'
+      - 'LICENSE-3DMIGOTO-GPL-3.0.txt'
+      - 'THIRD_PARTY_GPL_NOTICES.txt'
+      - 'THIRD_PARTY_NOTICES.md'
       - '.github/workflows/vr-dx9ex-active.yml'
 
 concurrency:
@@ -90,8 +95,72 @@ jobs:
           path: stage-game/
           if-no-files-found: error
 
+  compliance:
+    needs: policy
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Assemble same-SHA GPL compliance companion
+        shell: pwsh
+        run: |
+          $short = $env:GITHUB_SHA.Substring(0,12)
+          $dir = 'compliance'
+          $adapted = Join-Path $dir 'SOURCE_GPL/3dmigoto-adapted'
+          New-Item -ItemType Directory -Force $adapted | Out-Null
+          foreach ($file in @('COPYING.GPL3','LICENSE.md','LICENSE-3DMIGOTO-GPL-3.0.txt','THIRD_PARTY_GPL_NOTICES.txt','THIRD_PARTY_NOTICES.md')) {
+            if (-not (Test-Path $file)) { throw "compliance input missing: $file" }
+            Copy-Item $file (Join-Path $dir $file)
+          }
+          Copy-Item 'src/vr/d3d9/shader_fingerprint_gpl.hpp' (Join-Path $adapted 'shader_fingerprint_gpl.hpp')
+          Set-Content (Join-Path $dir 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
+          git submodule status --recursive | Set-Content (Join-Path $dir 'SUBMODULES.txt') -Encoding ascii
+          git archive --format=zip --output (Join-Path $dir 'CORRESPONDING_SOURCE.zip') $env:GITHUB_SHA
+          if ($LASTEXITCODE -ne 0) { throw 'git archive failed' }
+          $manifest = [ordered]@{
+            SchemaVersion = 1
+            Repository = 'https://github.com/thp32tt/OutRun2006Tweaks'
+            SourceSha = $env:GITHUB_SHA
+            RuntimeArtifact = "OutRun2-VR-DX9EX-ACTIVE-$env:GITHUB_SHA"
+            License = 'GPL-3.0-only'
+            AdaptedSource = 'SOURCE_GPL/3dmigoto-adapted/shader_fingerprint_gpl.hpp'
+            CorrespondingSource = 'CORRESPONDING_SOURCE.zip'
+            Upstream = 'https://github.com/bo3b/3Dmigoto'
+          }
+          $manifest | ConvertTo-Json -Depth 3 | Set-Content (Join-Path $dir 'COMPLIANCE_MANIFEST.json') -Encoding UTF8
+          Get-ChildItem $dir -Recurse -File | Get-FileHash -Algorithm SHA256 | ForEach-Object {
+            "$($_.Hash)  $($_.Path.Substring((Resolve-Path $dir).Path.Length + 1))"
+          } | Set-Content (Join-Path $dir 'SHA256SUMS.txt') -Encoding ascii
+          $zip = "OutRun2_VR_DX9EX_COMPLIANCE_${short}.zip"
+          Compress-Archive -Path (Join-Path $dir '*') -DestinationPath $zip -Force
+      - name: Validate compliance identity and corresponding source
+        shell: pwsh
+        run: |
+          $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_COMPLIANCE_*.zip' | Select-Object -First 1
+          if (-not $zip) { throw 'DX9Ex compliance ZIP missing' }
+          Expand-Archive $zip.FullName verify-compliance
+          foreach ($file in @('COPYING.GPL3','LICENSE.md','LICENSE-3DMIGOTO-GPL-3.0.txt','THIRD_PARTY_GPL_NOTICES.txt','COMPLIANCE_MANIFEST.json','SOURCE_SHA.txt','SUBMODULES.txt','CORRESPONDING_SOURCE.zip','SHA256SUMS.txt','SOURCE_GPL/3dmigoto-adapted/shader_fingerprint_gpl.hpp')) {
+            if (-not (Test-Path (Join-Path 'verify-compliance' $file))) { throw "compliance ZIP missing $file" }
+          }
+          $manifest = Get-Content 'verify-compliance/COMPLIANCE_MANIFEST.json' -Raw | ConvertFrom-Json
+          if ($manifest.SourceSha -ne $env:GITHUB_SHA) { throw 'compliance source SHA does not match workflow SHA' }
+          if ((Get-Content 'verify-compliance/SOURCE_SHA.txt' -Raw).Trim() -ne $env:GITHUB_SHA) { throw 'SOURCE_SHA.txt mismatch' }
+          Expand-Archive 'verify-compliance/CORRESPONDING_SOURCE.zip' verify-source
+          $sourcePath = 'verify-source/src/vr/d3d9/shader_fingerprint_gpl.hpp'
+          if (-not (Test-Path $sourcePath)) { throw 'corresponding source archive omitted adapted source' }
+          $packagedHash = (Get-FileHash 'verify-compliance/SOURCE_GPL/3dmigoto-adapted/shader_fingerprint_gpl.hpp' -Algorithm SHA256).Hash
+          $sourceHash = (Get-FileHash $sourcePath -Algorithm SHA256).Hash
+          if ($packagedHash -ne $sourceHash) { throw 'adapted source copies differ' }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-DX9EX-COMPLIANCE-${{ github.sha }}
+          path: OutRun2_VR_DX9EX_COMPLIANCE_*.zip
+          if-no-files-found: error
+
   package:
-    needs: [host, game]
+    needs: [host, game, compliance]
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
