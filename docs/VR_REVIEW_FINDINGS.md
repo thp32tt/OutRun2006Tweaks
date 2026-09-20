@@ -35,3 +35,29 @@ The failing DX12 log reached `Direct3DCreate9On12Ex` successfully, then device c
 Status: NON-BLOCKING FOR UNIFIED TESTER
 
 The DXVK generic R34/OFF configuration still compiles an older incompatible renderer combination and its host verification script assigns PowerShell's reserved `$Host` variable. The DX12 generic verifier also searches for a pre-change strict-pass marker. These failures do not affect the accepted unified workflow `35514339728`, whose intended D3D9 SAFE, DXVK SAFE host/game, DX12 strict, provider, multiview, and package jobs all passed.
+
+
+## VR-BASE-002 — T0-debug is a reference input, not a merge source
+Status: ACTIVE / REVIEWED IN RB01
+
+`vr-d3d9ex-t0-debug` and `vr-unified-backends` have materially diverged source histories. Replacing unified Host/renderer files wholesale with T0-debug files would discard newer R42/R23 transport, cache, and integration work. The adopted build-validated DX9Ex reference input is T0-debug commit `365b294b6a96c98ada434b439a982725e1ba542c`; future work must port only bounded behaviors into unified and keep exact source evidence.
+
+## VR-HOST-002 — Gameplay loading and stall projection guards
+Status: BUILD/MATRIX VALIDATED AT `ad14ed6c6757634233ec79b71f42be53c563edb7`; RUNTIME RETEST PENDING
+
+T0-family runtime tests showed two useful Host behaviors: stage loading no longer entered a black direct-only interval, and a gameplay frame stall no longer degraded into a full-screen solid/empty color. The current unified Host now defers the Gameplay projection transition until a render frame exists, keeps the last menu/loading projection available during bootstrap, and reuses the last successfully released stereo projection for the duration of a Gameplay stall. Existing presentation/session/reference-space transitions still invalidate the cache. Build run `35527017219` and unified run `35527017201` passed.
+
+## VR-FINGERPRINT-001 — Position HUD needs exact draw fingerprinting
+Status: READY FOR NEXT BOUNDED PORT
+
+Primitive-count experiments through 1..1024 and broad WVP ownership experiments did not resize or correctly place the Position `6th/6` HUD. Broad ownership caused severe world/sky/driver corruption and draw amplification. T0-debug commit `365b294...` contains bounded shader/pixel-shader/vertex-declaration/stride/texture/render-state fingerprint telemetry and passed CI, but that telemetry has not yet been ported into unified. The next diagnostic must remain passive/rate-limited until an exact fingerprint is established.
+
+## VR-LENS-002 — Narrow S6/S7 flare behavior is useful but not final
+Status: RUNTIME OBSERVED / CORRECTNESS UNCONFIRMED
+
+Small12 S6/S7-family tests collapsed the duplicated lens flare to one while avoiding the broad world corruption seen in ownership experiments. The useful discriminator was a small alpha candidate with a live WVP that classified as flat. The flare still appeared to react to head/camera direction, which may be physically correct for a camera-facing flare but has not been confirmed. Preserve this as an isolated fail-closed candidate; do not generalize it to sky, HUD, smoke, skid, or world geometry.
+
+## VR-PERF-002 — T5 mono-backup removal is performance evidence only
+Status: PERFORMANCE SIGNAL / CORRECTNESS BLOCKED
+
+The T5/R29 LEFT+RIGHT-only comparison removed the large steady-state mono safety replay burden and subjectively improved frame rate, but it also made sky/world rendering incorrect. Do not adopt the T5 classifier or fast path wholesale. Reuse only the mono-removal concept behind a strict correctness gate after the stable T0/unified world classification is preserved.
