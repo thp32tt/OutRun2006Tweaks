@@ -18,6 +18,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
 #include <mutex>
 #include <utility>
@@ -189,8 +190,6 @@ namespace OutRunVR::GplShaderFingerprint
         {
             std::uint64_t vs = 0;
             std::uint64_t ps = 0;
-            std::uintptr_t vsIdentity = 0;
-            std::uintptr_t psIdentity = 0;
         };
 
         static std::mutex seenMutex;
@@ -199,19 +198,16 @@ namespace OutRunVR::GplShaderFingerprint
         static std::size_t nextSeen = 0;
         std::lock_guard<std::mutex> lock(seenMutex);
 
+        // Bytecode fingerprints are deliberately the identity here. COM object
+        // addresses can change after Reset/recreation or between launches.
         for (std::size_t i = 0; i < seenCount; ++i)
         {
             if (seen[i].vs == pair.vertex.value &&
-                seen[i].ps == pair.pixel.value &&
-                seen[i].vsIdentity == pair.vertexIdentity &&
-                seen[i].psIdentity == pair.pixelIdentity)
+                seen[i].ps == pair.pixel.value)
                 return false;
         }
 
-        const Seen item{
-            pair.vertex.value, pair.pixel.value,
-            pair.vertexIdentity, pair.pixelIdentity
-        };
+        const Seen item{ pair.vertex.value, pair.pixel.value };
         seen[nextSeen] = item;
         nextSeen = (nextSeen + 1) % seen.size();
         if (seenCount < seen.size())
