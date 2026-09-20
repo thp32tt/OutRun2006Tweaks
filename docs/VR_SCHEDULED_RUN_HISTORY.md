@@ -26,3 +26,18 @@ This cumulative history records resumable scheduled development runs for the `vr
 - Blockers/retry count: hardware runtime evidence pending; retry count 0.
 - Result: **NO MATERIAL CHANGE / NO BUILD NEEDED**.
 - Exact nextAction: test identical menu/car/race scenes in P1 -> P2 -> P3 order, use P4 only if needed, and upload each auto-collected `DX9EX_LOG_<variant>_<time>.zip`.
+
+
+## Automation environment reconciliation — 2026-09-21 03:58 KST
+
+- Scope: repository-side setup for the active A(:00) / B(:15) / C(:30) / D(:45) Work schedules.
+- Integration source of truth remains `vr-d3d9ex-focus`.
+- Added durable protocol, central queue, normalized runtime-feedback inbox and common role-run record schema.
+- Initialized A store on `vr-d3d9ex-review` and C store on `vr-d3d9ex-support`.
+- B is restricted to isolated `vr-d3d9ex-candidate/<finding-id>-<run-id>` branches.
+- D alone owns production integration plus central queue/state/history.
+- `.github/workflows/vr-dx9ex-active.yml` now triggers for both integration and candidate branches; concurrency is branch-scoped.
+- Runtime candidate WIP cap: 3. Fix-attempt cap per unchanged failure: 2.
+- Added lightweight coordination validator `tools/Test-VRAutodevCoordination.ps1` and workflow `.github/workflows/vr-autodev-coordination.yml`.
+- No DXVK/multiview/DX12 development was enabled.
+- This setup changes automation/CI coordination; it does not claim new Quest 3/VDXR runtime correctness.
