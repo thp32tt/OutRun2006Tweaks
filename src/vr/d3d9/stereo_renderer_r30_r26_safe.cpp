@@ -14,6 +14,7 @@
 #include "stereo_renderer_r26.cpp"
 #include <d3dcompiler.h>
 #include <algorithm>
+#include <array>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
@@ -113,6 +114,254 @@ namespace OutRunVRStereo
         std::uint64_t R30XyzrhwBilateralFallbacks = 0;
         bool R30FirstXyzrhwBilateralFallbackLogged = false;
 
+#if defined(OUTRUN_VR_FINGERPRINT_TELEMETRY)
+        struct R49FingerprintEntry
+        {
+            std::uint64_t key = 0;
+            std::uint64_t count = 0;
+            std::uint64_t vsHash = 0;
+            std::uint64_t psHash = 0;
+            std::uint64_t declHash = 0;
+            UINT primitiveType = 0;
+            UINT primitiveCount = 0;
+            UINT stride = 0;
+            DWORD fvf = 0;
+            DWORD zEnable = 0;
+            DWORD zWrite = 0;
+            DWORD alphaBlend = 0;
+            DWORD alphaTest = 0;
+            DWORD cullMode = 0;
+            DWORD textureFormat = 0;
+            UINT textureWidth = 0;
+            UINT textureHeight = 0;
+        };
+
+        constexpr std::size_t R49MaxFingerprints = 96;
+        constexpr std::size_t R49TopFingerprints = 12;
+        std::unordered_map<std::uint64_t, R49FingerprintEntry> R49Fingerprints;
+        std::unordered_map<std::uintptr_t, std::uint64_t> R49VsHashCache;
+        std::unordered_map<std::uintptr_t, std::uint64_t> R49PsHashCache;
+        std::unordered_map<std::uintptr_t, std::uint64_t> R49DeclHashCache;
+        std::uint64_t R49FingerprintDrops = 0;
+
+        std::uint64_t R49Fnv1a(
+            const void* data, std::size_t size,
+            std::uint64_t seed = 1469598103934665603ull) noexcept
+        {
+            const auto* bytes =
+                static_cast<const std::uint8_t*>(data);
+            std::uint64_t hash = seed;
+            for (std::size_t i = 0; i < size; ++i)
+            {
+                hash ^= bytes[i];
+                hash *= 1099511628211ull;
+            }
+            return hash;
+        }
+
+        template <typename T>
+        void R49HashValue(std::uint64_t& hash, const T& value) noexcept
+        {
+            hash = R49Fnv1a(&value, sizeof(value), hash);
+        }
+
+        template <typename TShader>
+        std::uint64_t R49ShaderBytecodeHash(
+            TShader* shader,
+            std::unordered_map<std::uintptr_t, std::uint64_t>& cache)
+        {
+            if (!shader)
+                return 0;
+            const auto identity =
+                reinterpret_cast<std::uintptr_t>(shader);
+            if (const auto it = cache.find(identity); it != cache.end())
+                return it->second;
+
+            UINT bytes = 0;
+            std::uint64_t hash = 0;
+            if (SUCCEEDED(shader->GetFunction(nullptr, &bytes)) &&
+                bytes > 0 && bytes <= (1024u * 1024u))
+            {
+                try
+                {
+                    std::vector<std::uint8_t> code(bytes);
+                    if (SUCCEEDED(shader->GetFunction(code.data(), &bytes)))
+                        hash = R49Fnv1a(code.data(), bytes);
+                }
+                catch (...)
+                {
+                    hash = 0;
+                }
+            }
+            if (cache.size() < 128)
+                cache.emplace(identity, hash);
+            return hash;
+        }
+
+        std::uint64_t R49VertexDeclHash(IDirect3DDevice9* device)
+        {
+            IDirect3DVertexDeclaration9* decl = nullptr;
+            if (!device || FAILED(device->GetVertexDeclaration(&decl)) || !decl)
+                return 0;
+            const auto identity =
+                reinterpret_cast<std::uintptr_t>(decl);
+            if (const auto it = R49DeclHashCache.find(identity);
+                it != R49DeclHashCache.end())
+            {
+                decl->Release();
+                return it->second;
+            }
+
+            UINT count = 0;
+            std::uint64_t hash = 0;
+            if (SUCCEEDED(decl->GetDeclaration(nullptr, &count)) &&
+                count > 0 && count <= 65)
+            {
+                std::array<D3DVERTEXELEMENT9, 65> elements{};
+                if (SUCCEEDED(decl->GetDeclaration(elements.data(), &count)))
+                    hash = R49Fnv1a(elements.data(),
+                        count * sizeof(D3DVERTEXELEMENT9));
+            }
+            if (R49DeclHashCache.size() < 128)
+                R49DeclHashCache.emplace(identity, hash);
+            decl->Release();
+            return hash;
+        }
+
+        void R49RecordFingerprint(IDirect3DDevice9* device,
+            D3DPRIMITIVETYPE primitiveType, UINT primitiveCount,
+            DWORD zEnable, DWORD zWrite, DWORD alphaBlend,
+            DWORD alphaTest, DWORD cullMode)
+        {
+            if (!device || primitiveCount == 0 || primitiveCount > 4096)
+                return;
+
+            IDirect3DVertexShader9* vs = nullptr;
+            IDirect3DPixelShader9* ps = nullptr;
+            device->GetVertexShader(&vs);
+            device->GetPixelShader(&ps);
+            const std::uint64_t vsHash =
+                R49ShaderBytecodeHash(vs, R49VsHashCache);
+            const std::uint64_t psHash =
+                R49ShaderBytecodeHash(ps, R49PsHashCache);
+            if (vs) vs->Release();
+            if (ps) ps->Release();
+
+            DWORD fvf = 0;
+            device->GetFVF(&fvf);
+            const std::uint64_t declHash = R49VertexDeclHash(device);
+
+            UINT stride = 0;
+            UINT offset = 0;
+            IDirect3DVertexBuffer9* stream = nullptr;
+            if (SUCCEEDED(device->GetStreamSource(
+                    0, &stream, &offset, &stride)) && stream)
+                stream->Release();
+
+            DWORD textureFormat = 0;
+            UINT textureWidth = 0;
+            UINT textureHeight = 0;
+            IDirect3DBaseTexture9* baseTexture = nullptr;
+            if (SUCCEEDED(device->GetTexture(0, &baseTexture)) &&
+                baseTexture)
+            {
+                if (baseTexture->GetType() == D3DRTYPE_TEXTURE)
+                {
+                    auto* texture =
+                        static_cast<IDirect3DTexture9*>(baseTexture);
+                    D3DSURFACE_DESC desc{};
+                    if (SUCCEEDED(texture->GetLevelDesc(0, &desc)))
+                    {
+                        textureFormat = static_cast<DWORD>(desc.Format);
+                        textureWidth = desc.Width;
+                        textureHeight = desc.Height;
+                    }
+                }
+                baseTexture->Release();
+            }
+
+            std::uint64_t key = 1469598103934665603ull;
+            R49HashValue(key, vsHash);
+            R49HashValue(key, psHash);
+            R49HashValue(key, declHash);
+            R49HashValue(key, primitiveType);
+            R49HashValue(key, primitiveCount);
+            R49HashValue(key, stride);
+            R49HashValue(key, fvf);
+            R49HashValue(key, zEnable);
+            R49HashValue(key, zWrite);
+            R49HashValue(key, alphaBlend);
+            R49HashValue(key, alphaTest);
+            R49HashValue(key, cullMode);
+            R49HashValue(key, textureFormat);
+            R49HashValue(key, textureWidth);
+            R49HashValue(key, textureHeight);
+
+            if (auto it = R49Fingerprints.find(key);
+                it != R49Fingerprints.end())
+            {
+                ++it->second.count;
+                return;
+            }
+            if (R49Fingerprints.size() >= R49MaxFingerprints)
+            {
+                ++R49FingerprintDrops;
+                return;
+            }
+
+            R49FingerprintEntry entry{};
+            entry.key = key;
+            entry.count = 1;
+            entry.vsHash = vsHash;
+            entry.psHash = psHash;
+            entry.declHash = declHash;
+            entry.primitiveType = static_cast<UINT>(primitiveType);
+            entry.primitiveCount = primitiveCount;
+            entry.stride = stride;
+            entry.fvf = fvf;
+            entry.zEnable = zEnable;
+            entry.zWrite = zWrite;
+            entry.alphaBlend = alphaBlend;
+            entry.alphaTest = alphaTest;
+            entry.cullMode = cullMode;
+            entry.textureFormat = textureFormat;
+            entry.textureWidth = textureWidth;
+            entry.textureHeight = textureHeight;
+            R49Fingerprints.emplace(key, entry);
+        }
+
+        void R49LogTopFingerprints()
+        {
+            if (R49Fingerprints.empty())
+                return;
+            std::vector<R49FingerprintEntry> entries;
+            entries.reserve(R49Fingerprints.size());
+            for (const auto& [_, entry] : R49Fingerprints)
+                entries.push_back(entry);
+            std::sort(entries.begin(), entries.end(),
+                [](const auto& a, const auto& b) {
+                    return a.count > b.count;
+                });
+            const std::size_t limit =
+                std::min(entries.size(), R49TopFingerprints);
+            spdlog::info(
+                "VR R49 FINGERPRINT: signatures={} dropped={} top={}",
+                entries.size(), R49FingerprintDrops, limit);
+            for (std::size_t i = 0; i < limit; ++i)
+            {
+                const auto& e = entries[i];
+                spdlog::info(
+                    "VR R49 SIG #{} key={:016x} n={} vs={:016x} ps={:016x} decl={:016x} prim={}/{} stride={} fvf={:08x} z={}/{} alpha={}/{} cull={} texFmt={} tex={}x{}",
+                    i, e.key, e.count, e.vsHash, e.psHash, e.declHash,
+                    e.primitiveType, e.primitiveCount, e.stride, e.fvf,
+                    e.zEnable, e.zWrite, e.alphaBlend, e.alphaTest,
+                    e.cullMode, e.textureFormat,
+                    e.textureWidth, e.textureHeight);
+            }
+            R49Fingerprints.clear();
+            R49FingerprintDrops = 0;
+        }
+#endif
 
         // R30.6 CPU shadows for XYZRHW vertex/index buffers.
         //
@@ -1117,6 +1366,9 @@ namespace OutRunVRStereo
             if (now - R30LastTelemetryMs < 5000)
                 return;
             R30LastTelemetryMs = now;
+#if defined(OUTRUN_VR_FINGERPRINT_TELEMETRY)
+            R49LogTopFingerprints();
+#endif
             spdlog::info(
                 "VR R41: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] r47small[candidates={},hud={},common={},matrixReject={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
@@ -1480,6 +1732,11 @@ namespace OutRunVRStereo
                 alphaBlend != FALSE || alphaTest != FALSE;
             if (!alphaLike)
                 return R30ScreenSpaceKind::None;
+
+#if defined(OUTRUN_VR_FINGERPRINT_TELEMETRY)
+            R49RecordFingerprint(device, primitiveType, primitiveCount,
+                zEnable, zWrite, alphaBlend, alphaTest, cullMode);
+#endif
 
             const auto alphaRange = R48AlphaPrimitiveRange();
             const bool triangleLike =
