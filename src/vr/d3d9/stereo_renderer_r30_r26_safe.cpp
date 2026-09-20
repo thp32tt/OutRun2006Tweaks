@@ -1281,7 +1281,19 @@ namespace OutRunVRStereo
             WorldBillboard
         };
 
+#if defined(OUTRUN_VR_OVERLAY_WINDOW_32)
+        constexpr std::uint64_t R44OverlayWvpDrawWindow = 32u;
+#else
         constexpr std::uint64_t R44OverlayWvpDrawWindow = 12u;
+#endif
+
+#if defined(OUTRUN_VR_OVERLAY_SPATIAL_DEPTH_8)
+        constexpr float R46SpatialBillboardDepthMin = 8.0f;
+#elif defined(OUTRUN_VR_OVERLAY_SPATIAL_DEPTH_4)
+        constexpr float R46SpatialBillboardDepthMin = 4.0f;
+#else
+        constexpr float R46SpatialBillboardDepthMin = 1.25f;
+#endif
 
         bool R44GetOwnedRawOverlayWvp(
             float outConstants[16], std::uint64_t* drawAge = nullptr) noexcept
@@ -1374,9 +1386,11 @@ namespace OutRunVRStereo
             // a near/screen overlay and must converge on the HUD plane instead
             // of falling through to R13 zero-disparity replay.
             if (affineError <= 0.02f &&
-                viewDepth >= 1.25f && viewDepth < 1000000.0f)
+                viewDepth >= R46SpatialBillboardDepthMin &&
+                viewDepth < 1000000.0f)
                 return R44OverlayMatrixKind::SpatialBillboard;
-            if (viewDepth < 1.25f || affineError > 0.02f)
+            if (viewDepth < R46SpatialBillboardDepthMin ||
+                affineError > 0.02f)
                 return R44OverlayMatrixKind::FlatHud;
             return R44OverlayMatrixKind::Unknown;
         }
@@ -1438,6 +1452,57 @@ namespace OutRunVRStereo
 #if defined(OUTRUN_VR_R13_FLAT_PREEMPT_BROAD)
             if (zEnable == D3DZB_FALSE && alphaLike)
                 return R30ScreenSpaceKind::FlatEffectHud;
+#endif
+
+#if defined(OUTRUN_VR_OVERLAY_OWNER_FIRST)
+            // R46 diagnostic: evaluate the raw game c64 owner before the
+            // verified-world/rebindable early-out. The old order allowed
+            // perspective HUD such as 6th/6 to be swallowed by the world path,
+            // so HudScale/position correction never ran.
+            {
+                float ownerFirstWvp[16]{};
+                if (R44GetOwnedRawOverlayWvp(ownerFirstWvp))
+                {
+                    const auto ownerKind =
+                        R44ClassifyOwnedOverlayMatrix(ownerFirstWvp);
+                    if (ownerKind == R44OverlayMatrixKind::SpatialBillboard)
+                    {
+                        ++R44SpatialBillboardClassifications;
+                        return R30ScreenSpaceKind::WorldBillboard;
+                    }
+                    if (ownerKind == R44OverlayMatrixKind::FlatHud)
+                    {
+                        ++R44FlatOverlayClassifications;
+                        return R30ScreenSpaceKind::PerspectiveHud;
+                    }
+                }
+            }
+#endif
+
+#if defined(OUTRUN_VR_OVERLAY_LIVE_FIRST)
+            // Recreate the earlier 18b classifier as an A/B diagnostic. This
+            // uses the currently bound c64 block before the verified-world
+            // early-out and therefore does not depend on raw-owner lifetime.
+            {
+                float liveWvp[16]{};
+                if (SUCCEEDED(device->GetVertexShaderConstantF(
+                        OutRunWvpRegister, liveWvp,
+                        OutRunWvpRegisterCount)))
+                {
+                    const auto liveKind =
+                        R44ClassifyOwnedOverlayMatrix(liveWvp);
+                    if (liveKind == R44OverlayMatrixKind::SpatialBillboard)
+                    {
+                        ++R44SpatialBillboardClassifications;
+                        return R30ScreenSpaceKind::WorldBillboard;
+                    }
+                    if (liveKind == R44OverlayMatrixKind::FlatHud)
+                    {
+                        ++R44FlatOverlayClassifications;
+                        return R30ScreenSpaceKind::PerspectiveHud;
+                    }
+                }
+            }
 #endif
 
             // Verified/rebindable perspective WVP is already owned by the true
