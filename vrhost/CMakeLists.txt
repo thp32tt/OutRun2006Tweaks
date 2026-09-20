@@ -81,6 +81,41 @@ if(MSVC)
 endif()
 target_link_libraries(outrun-vr-host PRIVATE openxr_loader d3d11 dxgi d3dcompiler user32 dbghelp)
 
+# Native DX12 host for the vr-dx12-poc branch. It intentionally lives beside
+# the validated D3D11 host so normal vr-openxr builds are unchanged. The DX12
+# test-package workflow renames this binary to outrun-vr-host.exe.
+add_executable(outrun-vr-host-dx12
+    src/main_dx12.cpp
+)
+target_include_directories(outrun-vr-host-dx12 PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src"
+    "${CMAKE_CURRENT_LIST_DIR}/src"
+)
+target_compile_definitions(outrun-vr-host-dx12 PRIVATE
+    WIN32_LEAN_AND_MEAN NOMINMAX
+    XR_USE_PLATFORM_WIN32
+    XR_USE_GRAPHICS_API_D3D12
+    OUTRUN_VR_BUILD_SHA="${OUTRUN_VR_GIT_SHA}"
+)
+if(MSVC)
+    target_compile_options(outrun-vr-host-dx12 PRIVATE
+        "/EHsc"
+        "/utf-8"
+        "$<$<CONFIG:Release>:/Zi>"
+    )
+    target_link_options(outrun-vr-host-dx12 PRIVATE
+        "$<$<CONFIG:Release>:/DEBUG:FULL>"
+        "$<$<CONFIG:RelWithDebInfo>:/DEBUG:FULL>"
+    )
+endif()
+target_link_libraries(outrun-vr-host-dx12 PRIVATE
+    openxr_loader
+    d3d12
+    dxgi
+    d3dcompiler
+    user32
+)
+
 add_executable(outrun-vr-diagnostic
     src/diagnostic_pattern.cpp
 )
@@ -155,6 +190,7 @@ target_compile_definitions(outrun-vr-r32-policy-smoke PRIVATE WIN32_LEAN_AND_MEA
 
 foreach(target
     outrun-vr-host
+    outrun-vr-host-dx12
     outrun-vr-diagnostic
     outrun-vr-shader-smoke
     outrun-vr-protocol-v3-smoke
