@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-20T18:52:00Z",
+  "updatedUtc": "2026-09-20T18:58:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -15,7 +15,7 @@
     ],
     "blockedBackendAction": "Do not develop, compile, smoke-build or package until DX9Ex reference milestone is user-accepted.",
     "genericBuildDisabled": true,
-    "dedicatedWorkflow": ".github/workflows/vr-unified-backends.yml",
+    "dedicatedWorkflow": ".github/workflows/vr-dx9ex-active.yml",
     "runtimeTesting": "Quest 3/VDXR hardware testing is a scarce validation gate; default to one evening CORRECTNESS run.",
     "profileModel": {
       "default": "CORRECTNESS",
@@ -60,7 +60,7 @@
     "Recovery runtime forcing 60 FPS with interpolation/cadence disabled contributes independent judder on a 90 Hz OpenXR session.",
     "Restore fast R29 world rendering and classification in bounded variants before deciding which later R30-R34 overlays are required."
   ],
-  "nextAction": "First consume the DX9Ex Active Validation result and latest lightweight policy/AST parser result. If green, routine source CI is one active game DLL + one host and four-way P1-P4 remains manual-only. Continue independent DX9Ex correctness work without requesting extra HMD tests; next default human test is one CORRECTNESS run.",
+  "nextAction": "Use the four-role scheduled pipeline: A reviews on vr-d3d9ex-review, B creates isolated vr-d3d9ex-candidate/<finding-id>-<run-id> branches and triggers candidate-capable DX9Ex Active Validation immediately, C validates immutable candidate evidence on vr-d3d9ex-support, and D alone integrates validated changes/state on vr-d3d9ex-focus. Keep next user runtime target to one CORRECTNESS test unless a concrete hypothesis requires CONTROL/PERFORMANCE.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
@@ -237,9 +237,15 @@
     "runtimeEvidence": "USER_RUNTIME_REQUIRED: capture trigger/usability and headset performance impact have not yet been validated on Quest 3/VDXR."
   },
   "scheduledAutomationModel": {
-    "main00": "Production review/implement/validate/commit on vr-d3d9ex-focus at :00.",
-    "parallel30": "Independent adversarial review on vr-d3d9ex-review at :30; no production runtime writes.",
-    "support15": "01:15 nightly gate; 08:15/11:15/14:15/17:15 reusable verifier/CI/log/package support on vr-d3d9ex-support."
+    "A_00": "Hourly :00 deep review. Source-read-only for production; durable run records on vr-d3d9ex-review.",
+    "B_15": "Hourly :15 isolated fix worker. Candidate branches only; never direct integration writes. Candidate CI starts immediately.",
+    "C_30": "Hourly :30 validation/support. Validates immutable candidate SHAs and may add non-production verifier support on vr-d3d9ex-support.",
+    "D_45": "Hourly :45 integration/planner. Sole production/integration writer and central queue/state/history owner.",
+    "specialD": {
+      "01:45": "nightly consolidation and architecture/regression/cache integrity review",
+      "06:45": "overnight summary and daytime backlog reorder",
+      "19:45": "freeze newest already-validated useful CORRECTNESS artifact; max 3 user choices only when evidence requires comparison"
+    }
   },
   "policyVerification": {
     "lightweightWorkflow": "VR Test Policy",
@@ -255,5 +261,24 @@
     "game": "in-progress",
     "package": "pending",
     "note": "This source includes the phase-1 rolling capture implementation. Later tool/docs commits do not change game/host runtime source."
+  },
+  "coordination": {
+    "protocol": "docs/VR_AUTODEV_PROTOCOL.md",
+    "queue": "docs/VR_WORK_QUEUE.json",
+    "runtimeFeedback": "docs/VR_RUNTIME_FEEDBACK.json",
+    "runRecordGuide": "docs/automation/README.md",
+    "runRecordTemplate": "docs/automation/RUN_RECORD_TEMPLATE.json",
+    "integrationBranch": "vr-d3d9ex-focus",
+    "reviewBranch": "vr-d3d9ex-review",
+    "supportBranch": "vr-d3d9ex-support",
+    "candidatePattern": "vr-d3d9ex-candidate/<finding-id>-<run-id>",
+    "productionWriter": "D_INTEGRATION_PLANNER",
+    "candidateWriter": "B_FIX",
+    "maxIndependentUnvalidatedRuntimeCandidates": 3,
+    "maxMateriallyDifferentFixAttempts": 2,
+    "candidateWorkflow": ".github/workflows/vr-dx9ex-active.yml",
+    "candidateWorkflowBranchPattern": "vr-d3d9ex-candidate/**",
+    "candidateConcurrency": "branch-scoped",
+    "aBCDoNotRewriteIntegrationQueue": true
   }
 }
