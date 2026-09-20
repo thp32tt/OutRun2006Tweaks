@@ -90,8 +90,49 @@ jobs:
           path: stage-game/
           if-no-files-found: error
 
+  compliance:
+    needs: policy
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble same-SHA GPL compliance companion
+        shell: pwsh
+        run: |
+          $short = $env:GITHUB_SHA.Substring(0,12)
+          $dir = 'compliance'
+          New-Item -ItemType Directory -Force (Join-Path $dir 'corresponding-source/src/vr/d3d9') | Out-Null
+          foreach ($file in @('COPYING.GPL3','LICENSE.md','LICENSE-3DMIGOTO-GPL-3.0.txt','THIRD_PARTY_GPL_NOTICES.txt')) {
+            if (-not (Test-Path $file)) { throw "compliance input missing: $file" }
+            Copy-Item $file (Join-Path $dir $file)
+          }
+          $adapted = 'src/vr/d3d9/shader_fingerprint_gpl.hpp'
+          if (-not (Test-Path $adapted)) { throw "adapted source missing: $adapted" }
+          Copy-Item $adapted (Join-Path $dir 'corresponding-source/src/vr/d3d9/shader_fingerprint_gpl.hpp')
+          Set-Content (Join-Path $dir 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
+          $manifest = [ordered]@{
+            SchemaVersion = 1
+            SourceSha = $env:GITHUB_SHA
+            RuntimeArtifact = "OutRun2-VR-DX9EX-ACTIVE-$env:GITHUB_SHA"
+            LicenseScope = 'GPL-3.0-only combined branch; 3Dmigoto-derived helper covered by GPL-3.0'
+            CorrespondingSource = @('src/vr/d3d9/shader_fingerprint_gpl.hpp')
+          }
+          $manifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'COMPLIANCE_MANIFEST.json') -Encoding UTF8
+          foreach ($required in @('COPYING.GPL3','LICENSE.md','LICENSE-3DMIGOTO-GPL-3.0.txt','THIRD_PARTY_GPL_NOTICES.txt','SOURCE_SHA.txt','COMPLIANCE_MANIFEST.json','corresponding-source/src/vr/d3d9/shader_fingerprint_gpl.hpp')) {
+            if (-not (Test-Path (Join-Path $dir $required))) { throw "compliance payload missing: $required" }
+          }
+          $recorded = (Get-Content (Join-Path $dir 'SOURCE_SHA.txt') -Raw).Trim()
+          if ($recorded -ne $env:GITHUB_SHA) { throw "compliance source SHA mismatch: $recorded != $env:GITHUB_SHA" }
+          $zip = "OutRun2_VR_DX9EX_COMPLIANCE_${short}.zip"
+          Compress-Archive -Path (Join-Path $dir '*') -DestinationPath $zip -Force
+          Get-FileHash $zip -Algorithm SHA256 | Format-List
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-DX9EX-COMPLIANCE-${{ github.sha }}
+          path: OutRun2_VR_DX9EX_COMPLIANCE_*.zip
+          if-no-files-found: error
+
   package:
-    needs: [host, game]
+    needs: [host, game, compliance]
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
