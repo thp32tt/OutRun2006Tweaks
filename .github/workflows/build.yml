@@ -121,8 +121,7 @@ jobs:
           if ($ini -notmatch '(?m)^WheelAccelerationInvert\s*=\s*false\s*$') { throw "shipped accelerator invert is not false" }
           if ($ini -notmatch '(?m)^WheelBrakeInvert\s*=\s*false\s*$') { throw "shipped brake invert is not false" }
           if ($ini -notmatch '(?m)^UseNewInput\s*=\s*true\s*$') { throw "multi-device input is not the shipped default" }
-          if ($ini -notmatch '(?m)^TrailResponseLead\s*=\s*0\.25\s*
-          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, current wheel FFB + OpenXR VR markers present" -f $bytes.Length)
+          if ($ini -notmatch '(?m)^TrailResponseLead\s*=\s*0\.25\s* ("Verified dinput8.dll: {0} bytes, PE32 x86, current wheel FFB + OpenXR VR markers present" -f $bytes.Length)
           Get-FileHash $dllPath -Algorithm SHA256
 
       - name: Download upstream replacement EXE
