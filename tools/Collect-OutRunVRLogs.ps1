@@ -32,11 +32,12 @@ function Get-SessionFiles {
     return $files
 }
 
-function Write-ActiveSession([string]$backend,[string]$variant,[string]$matrix,[string]$session,[datetime]$startedUtc){
+function Write-ActiveSession([string]$backend,[string]$variant,[string]$profile,[string]$matrix,[string]$session,[datetime]$startedUtc){
     $active=Join-Path $root 'ACTIVE_VR_BACKEND.txt'
     @(
         "backend=$backend"
         "variant=$variant"
+        "profile=$profile"
         "matrix=$matrix"
         "session=$session"
         "startedUtc=$($startedUtc.ToString('o'))"
@@ -44,19 +45,20 @@ function Write-ActiveSession([string]$backend,[string]$variant,[string]$matrix,[
     ) | Set-Content $active -Encoding ascii
 }
 
-function Prepare-NextSession([string]$backend,[string]$variant,[string]$matrix){
+function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,[string]$matrix){
     $startedUtc=(Get-Date).ToUniversalTime()
     $session=$startedUtc.ToString('yyyyMMddTHHmmssfffZ')+'-'+[guid]::NewGuid().ToString('N').Substring(0,8)
-    $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}" -f $matrix,$variant,$session)
+    $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $matrix,$variant,$profile,$session)
     New-Item -ItemType Directory -Force $sessionRoot|Out-Null
 
     $ini=Join-Path $root 'OutRun2006Tweaks.ini'
     $configHash=if(Test-Path $ini){(Get-FileHash $ini -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
     $state=[ordered]@{
-        SchemaVersion=2
+        SchemaVersion=3
         BuildMatrixId=$matrix
         VariantId=$variant
         Backend=$backend
+        TestProfile=$profile
         SessionId=$session
         StartedUtc=$startedUtc.ToString('o')
         ConfigSha256=$configHash
@@ -65,7 +67,7 @@ function Prepare-NextSession([string]$backend,[string]$variant,[string]$matrix){
     }
     $state|ConvertTo-Json -Depth 4|Set-Content (Join-Path $root 'CURRENT_VR_SESSION.json') -Encoding UTF8
     $state|ConvertTo-Json -Depth 4|Set-Content (Join-Path $sessionRoot 'session_manifest.json') -Encoding UTF8
-    Write-ActiveSession $backend $variant $matrix $session $startedUtc
+    Write-ActiveSession $backend $variant $profile $matrix $session $startedUtc
 
     if(Test-Path $ini){
         $allowed='^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor)\s*='
@@ -89,17 +91,18 @@ Get-Content $active|ForEach-Object{if($_ -match '^([^=]+)=(.*)$'){$kv[$matches[1
 $backend=$kv.backend
 if(!$backend){throw 'backend identity missing'}
 $variant=if($kv.variant){$kv.variant}else{switch($backend){'d3d9'{'A_CONTROL'};'dxvk-safe'{'E_DXVK_SAFE'};'dxvk'{'E_DXVK_MULTIVIEW'};'dx12'{'F_DX12_STRICT'};'2d'{'CONTROL_2D'};default{'UNKNOWN'}}}
+$profile=if($kv.profile){$kv.profile}else{'CORRECTNESS'}
 $matrix=if($kv.matrix){$kv.matrix}else{'UNIFIED'}
 
 $sessionState=Join-Path $root 'CURRENT_VR_SESSION.json'
 if(!(Test-Path $sessionState)){throw 'CURRENT_VR_SESSION.json not found; select the backend again before launching the game.'}
 $state=Get-Content $sessionState -Raw|ConvertFrom-Json
 $session=$state.SessionId
-if(!$session -or $state.Backend -ne $backend -or $state.BuildMatrixId -ne $matrix){throw 'Current session identity does not match the active backend/matrix.'}
+if(!$session -or $state.Backend -ne $backend -or $state.BuildMatrixId -ne $matrix -or ($state.TestProfile -and $state.TestProfile -ne $profile)){throw 'Current session identity does not match the active backend/profile/matrix.'}
 $startedUtc=[datetime]::Parse($state.StartedUtc).ToUniversalTime()
 
 $base=Join-Path $root "logs/$matrix"
-$dest=Join-Path $base "$variant/$session"
+$dest=Join-Path $base "$variant/$profile/$session"
 New-Item -ItemType Directory -Force $dest|Out-Null
 
 $copied=@()
@@ -113,6 +116,14 @@ foreach($file in $sourceFiles){
 
 Copy-Item $active $dest -Force
 Copy-Item $sessionState $dest -Force
+$captureRoot=Join-Path $root 'captures'
+if(Test-Path $captureRoot){
+    $captureDest=Join-Path $dest 'captures'
+    New-Item -ItemType Directory -Force $captureDest|Out-Null
+    Get-ChildItem $captureRoot -Directory -ErrorAction SilentlyContinue |
+        Where-Object {$_.LastWriteTimeUtc -ge $startedUtc} |
+        ForEach-Object { Copy-Item $_.FullName $captureDest -Recurse -Force }
+}
 $inputs=Join-Path $root 'BUILD_INPUTS.json'
 if(Test-Path $inputs){Copy-Item $inputs $dest -Force}
 $payloadBackend=if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}
@@ -123,6 +134,7 @@ $configHash=if(Test-Path (Join-Path $root 'OutRun2006Tweaks.ini')){(Get-FileHash
 @(
     "VARIANT=$variant"
     "BACKEND=$backend"
+    "TEST_PROFILE=$profile"
     "SESSION=$session"
     "SESSION_STARTED_UTC=$($startedUtc.ToString('o'))"
     "BUILD_MATRIX=$matrix"
@@ -133,9 +145,10 @@ $configHash=if(Test-Path (Join-Path $root 'OutRun2006Tweaks.ini')){(Get-FileHash
 )|Set-Content (Join-Path $dest 'MANIFEST.txt') -Encoding UTF8
 
 @{
-    SchemaVersion=2
+    SchemaVersion=3
     VariantId=$variant
     Backend=$backend
+    TestProfile=$profile
     SessionId=$session
     SessionStartedUtc=$startedUtc.ToString('o')
     BuildMatrixId=$matrix
@@ -157,7 +170,7 @@ if($All){
     if(Test-Path $zip){Remove-Item $zip -Force}
     Compress-Archive -Path "$base/*" -DestinationPath $zip
 }else{
-    $zipName='OutRun2_VR_LOGS_'+$matrix+'_'+$variant+'_'+$session+'.zip'
+    $zipName='OutRun2_VR_LOGS_'+$matrix+'_'+$variant+'_'+$profile+'_'+$session+'.zip'
     $zip=Join-Path $root $zipName
     if(Test-Path $zip){Remove-Item $zip -Force}
     Compress-Archive -Path "$dest/*" -DestinationPath $zip
@@ -169,7 +182,7 @@ foreach($file in $sourceFiles){
     }
 }
 
-$nextSession=Prepare-NextSession $backend $variant $matrix
+$nextSession=Prepare-NextSession $backend $variant $profile $matrix
 Write-Host "Diagnostic archive: $zip"
 Write-Host "Next test session prepared automatically: $nextSession"
 Write-Host 'You do NOT need to run the collector before the next test.'
