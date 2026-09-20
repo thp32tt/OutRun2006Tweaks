@@ -38,7 +38,8 @@ jobs:
 
       - name: Configure x86 DXVK
         run: |
-          meson setup             --cross-file dxvk-src/build-win32.txt             --buildtype release             --prefix "$GITHUB_WORKSPACE/dxvk-install"             dxvk-src/build.w32 dxvk-src
+          cd dxvk-src
+          meson setup --cross-file build-win32.txt --buildtype release --prefix "$GITHUB_WORKSPACE/dxvk-install" build.w32
 
       - name: Build and install x86 DXVK
         run: |
