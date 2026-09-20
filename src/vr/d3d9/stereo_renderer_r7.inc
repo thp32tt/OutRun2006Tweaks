@@ -1728,7 +1728,7 @@ namespace OutRunVRStereo
 			// logical main target is the real backbuffer. Redirect only that exact
 			// logical bind to layer 0; offscreen/MRT targets stay untouched.
 			if(!InternalStereoPass&&!providerInternal&&
-				IsGameDevice(device)&&index==0&&
+				IsGameDevice(device)&&index==0&&StereoWanted()&&
 				OutRunVRDxvkMultiview::IsLogicalLeftColor(surface))
 			{
 				hr=OutRunVRDxvkMultiview::BindColorLayer(device,0)
@@ -1760,7 +1760,7 @@ namespace OutRunVRStereo
 			HRESULT hr=E_FAIL;
 
 			if(!InternalStereoPass&&!providerInternal&&
-				IsGameDevice(device)&&
+				IsGameDevice(device)&&StereoWanted()&&
 				OutRunVRDxvkMultiview::IsLogicalLeftDepth(surface))
 			{
 				hr=OutRunVRDxvkMultiview::BindDepthLayer(device,0)
@@ -1842,7 +1842,29 @@ namespace OutRunVRStereo
 			const std::uint64_t beginNow=OutRunVRRenderer::GetBeginSceneCallCount(),beginDelta=beginNow>=LastBeginSceneCountAtPresent?beginNow-LastBeginSceneCountAtPresent:0;LastBeginSceneCountAtPresent=beginNow;if(GameplayActive()){if(beginDelta>1)++MultiBeginScenePresents;MaxBeginScenesPerPresent=std::max(MaxBeginScenesPerPresent,beginDelta);}
 
 			const bool stereoRequested=StereoWanted();
-			const std::uint32_t pendingFrameId=stereoRequested?NextStereoFrameId():0;
+
+			if(!stereoRequested&&
+				OutRunVRDxvkMultiview::HasFrameTargets())
+			{
+				OutRunVRDxvkMultiview::InvalidateFrameTargets();
+			}
+			else if(stereoRequested&&
+				OutRunVRDxvkMultiview::HasFrameTargets())
+			{
+				// EndScene has completed at this point. Copy the persistent
+				// two-layer image once into the conventional left/right eye
+				// surfaces consumed by the existing host/transport.
+				if(!OutRunVRDxvkMultiview::FlushFrameTargets(
+						device,false))
+				{
+					FrameRightDrawFailed=true;
+					PoisonFrame(
+						OutRunVR::StereoFailureComposeFailed);
+				}
+			}
+
+			const std::uint32_t pendingFrameId=
+				stereoRequested?NextStereoFrameId():0;
 			const bool stereoFrameEligible=
 				stereoRequested&&FrameHadWorldStereo&&FrameHadDuplicatedDraw&&
 				!FrameRightDrawFailed&&!FrameStereoIncomplete&&
@@ -1954,7 +1976,7 @@ namespace OutRunVRStereo
 			FrameHadDuplicatedDraw=false;FrameHadWorldStereo=false;FrameRightDrawFailed=false;FrameStereoIncomplete=false;FramePoseMismatchLogged=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoPoseSequence=0;FrameStereoMetadata={};if(++PresentEpoch==0)PresentEpoch=1;return hr;
 		}
 
-		HRESULT __stdcall ResetDest(IDirect3DDevice9*device,D3DPRESENT_PARAMETERS*params){if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))return ResetHook.stdcall<HRESULT>(device,params);InvalidateTrackedRenderStates();OutRunVRRenderer::NotifyGameReset();ReleaseStereoResources();AuxRenderTargetActive={};ActiveOcclusionQueries.store(0,std::memory_order_release);CurrentVertexShaderIdentity.store(0,std::memory_order_release);VertexShaderSerial.store(0,std::memory_order_release);LastStereoWanted=false;RightStencilSynchronized=true;FramePoseMismatchLogged=false;FirstMainDepthReuseLogged=false;FirstMainClearLogged=false;FirstDepthBootstrapLogged=false;PresentEpoch=1;LastMainDepthClearEpoch=0;LastMainDepthClearFlags=0;LastMainDepthClearZ=1.0f;LastMainDepthClearStencil=0;LastMainDepthClearDesc={};LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoMetadata={};PublishStereoState(OutRunVR::StereoDisabled,false,0,0);PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,OutRunVR::StereoFailureNone,nullptr);HRESULT hr=D3DERR_INVALIDCALL;if(OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device)){if(!OutRunVRD3D9ExUpgradeR13::ResetCompatDevice(device,params,hr)){spdlog::error("VR stereo: promoted D3D9Ex device lost ResetEx fallback ownership");return D3DERR_INVALIDCALL;}}else hr=ResetHook.stdcall<HRESULT>(device,params);if(SUCCEEDED(hr)){PrimeTrackedRenderStates(device);EnsureStereoResources(device);}return hr;}
+		HRESULT __stdcall ResetDest(IDirect3DDevice9*device,D3DPRESENT_PARAMETERS*params){if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))return ResetHook.stdcall<HRESULT>(device,params);InvalidateTrackedRenderStates();OutRunVRRenderer::NotifyGameReset();OutRunVRDxvkMultiview::InvalidateDevice();ReleaseStereoResources();AuxRenderTargetActive={};ActiveOcclusionQueries.store(0,std::memory_order_release);CurrentVertexShaderIdentity.store(0,std::memory_order_release);VertexShaderSerial.store(0,std::memory_order_release);LastStereoWanted=false;RightStencilSynchronized=true;FramePoseMismatchLogged=false;FirstMainDepthReuseLogged=false;FirstMainClearLogged=false;FirstDepthBootstrapLogged=false;PresentEpoch=1;LastMainDepthClearEpoch=0;LastMainDepthClearFlags=0;LastMainDepthClearZ=1.0f;LastMainDepthClearStencil=0;LastMainDepthClearDesc={};LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();FrameStereoIncomplete=false;FrameFailureReason=OutRunVR::StereoFailureNone;FrameStereoMetadata={};PublishStereoState(OutRunVR::StereoDisabled,false,0,0);PublishRenderFrame(OutRunVR::StereoDisabled,0,0,0,OutRunVR::StereoFailureNone,nullptr);HRESULT hr=D3DERR_INVALIDCALL;if(OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device)){if(!OutRunVRD3D9ExUpgradeR13::ResetCompatDevice(device,params,hr)){spdlog::error("VR stereo: promoted D3D9Ex device lost ResetEx fallback ownership");return D3DERR_INVALIDCALL;}}else hr=ResetHook.stdcall<HRESULT>(device,params);if(SUCCEEDED(hr)){PrimeTrackedRenderStates(device);EnsureStereoResources(device);}return hr;}
 
 		constexpr std::uint32_t StereoInstallPending = 0;
 		constexpr std::uint32_t StereoInstallReady = 1;
