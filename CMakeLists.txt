@@ -565,6 +565,7 @@ set(outrun2006tweaks_SOURCES
 	"src/vr/d3d9/helper_ex_probe.cpp"
 	"src/vr/d3d9/r13_bridge.hpp"
 	"src/vr/d3d9/r32_policy.hpp"
+	"src/vr/d3d9/shader_fingerprint_gpl.hpp"
 	"src/vr/d3d9/stereo_backend.hpp"
 	"src/vr/d3d9/stereo_renderer.cpp"
 	"src/vr/d3d9/stereo_renderer_r13.cpp"
