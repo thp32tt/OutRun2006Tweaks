@@ -1,7 +1,9 @@
 param(
     [Parameter(Mandatory=$true)]
     [ValidateSet("2d","d3d9","dxvk-safe","dxvk","dx12")]
-    [string]$Backend
+    [string]$Backend,
+    [ValidateSet("CONTROL","CORRECTNESS","PERFORMANCE")]
+    [string]$TestProfile = "CORRECTNESS"
 )
 
 $ErrorActionPreference = "Stop"
@@ -163,7 +165,7 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "Enabled" "false"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "false"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "false"
-        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
     } elseif ($Backend -eq "dxvk-safe") {
@@ -176,8 +178,8 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
         $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
     } elseif ($Backend -eq "d3d9") {
-        # D3D9 SAFE is the correctness/control path. Do not require D3D9Ex or
-        # DirectGPU; plain D3D9 + SBS/Desktop Duplication must remain usable.
+        # DX9Ex focus branch: D3D9 is the reference backend. DirectGPU remains optional
+        # so SBS/Desktop Duplication can still fail open while Ex promotion is tested.
         $text = Set-IniSectionValue $text "VR" "RenderBackend" "1"
         $text = Set-IniSectionValue $text "VR" "Enabled" "true"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
@@ -215,12 +217,13 @@ $matrixFile = Join-Path $root "BUILD_MATRIX_ID.txt"
 $matrix = if (Test-Path $matrixFile) { (Get-Content $matrixFile -Raw).Trim() } else { "UNIFIED_LOCAL" }
 $startedUtc = (Get-Date).ToUniversalTime()
 $session = $startedUtc.ToString("yyyyMMddTHHmmssfffZ") + "-" + [guid]::NewGuid().ToString("N").Substring(0,8)
-$sessionRoot = Join-Path $root ("logs/{0}/{1}/{2}" -f $matrix,$variant,$session)
+$sessionRoot = Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $matrix,$variant,$TestProfile,$session)
 New-Item -ItemType Directory -Force $sessionRoot | Out-Null
 
 $activeText = @(
     "backend=$Backend"
     "variant=$variant"
+    "profile=$TestProfile"
     "matrix=$matrix"
     "session=$session"
     "startedUtc=$($startedUtc.ToString('o'))"
@@ -231,10 +234,11 @@ Set-Content (Join-Path $root "ACTIVE_VR_BACKEND.txt") $activeText -Encoding asci
 $configHash = "missing"
 if (Test-Path $ini) { $configHash = (Get-FileHash $ini -Algorithm SHA256).Hash.ToLowerInvariant() }
 $sessionManifest = [ordered]@{
-    SchemaVersion = 2
+    SchemaVersion = 3
     BuildMatrixId = $matrix
     VariantId = $variant
     Backend = $Backend
+    TestProfile = $TestProfile
     SessionId = $session
     StartedUtc = $startedUtc.ToString("o")
     ConfigSha256 = $configHash
@@ -255,11 +259,12 @@ if (Test-Path (Join-Path $root "BUILD_INPUTS.json")) {
 }
 
 Write-Host "OutRun renderer mode activated: $Backend"
+Write-Host "Test profile: $TestProfile"
 Write-Host "Diagnostic session prepared before launch: $session"
 Write-Host "Any previous root logs were archived before this session was created."
 switch ($Backend) {
     "2d"   { Write-Host "2D ORIGINAL: classic D3D9, VR disabled, D3D9Ex promotion disabled, no VR host." }
-    "d3d9" { Write-Host "D3D9 VR SAFE: guarded D3D9Ex/DirectGPU VR path." }
+    "d3d9" { Write-Host "D3D9Ex REFERENCE: PreferD3D9Ex enabled; DirectGPU optional; profile=$TestProfile." }
     "dxvk-safe" { Write-Host "DXVK SAFE: classic D3D9 calls translated by DXVK; validated two-pass VR, multiview patcher disabled." }
     "dxvk" { Write-Host "DXVK MULTIVIEW: local d3d9.dll + multiviewpatcher.dll active." }
     "dx12" { Write-Host "DX12 STRICT: local d3d9.dll verified absent; Windows D3D9On12 required." }
