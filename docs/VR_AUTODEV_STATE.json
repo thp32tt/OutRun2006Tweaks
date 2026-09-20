@@ -1,60 +1,64 @@
 {
   "schemaVersion": 1,
-  "updatedUtc": "2026-09-20T13:52:00Z",
-  "branch": "vr-unified-backends",
+  "updatedUtc": "2026-09-20T14:10:00Z",
+  "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
-  "frozen": true,
-  "freezeReason": "runtime-recovery-candidate-built-after-safe-transport-policy-sync-and-dx12-device-create-fix",
-  "frozenCommit": "803144005c0e45352602917a2f51804ec6b18ae6",
-  "buildMatrixId": "VRM-20260920-803144005c0e",
-  "components": {
-    "d3d9": "803144005c0e45352602917a2f51804ec6b18ae6",
-    "dxvkGameHost": "5e58ee35e14636dbfad3ad3744d350aa09859992",
-    "dxvkProvider": "5bb301ab22f7b41d68a879bf84c1e3d10ae0c473",
-    "multiviewPatcher": "0ef3253da1738b07e67358a027311c7bcedaa001",
-    "dx12": "ab8e00ab4a21e4ebb23fbc4046abda51e885bcb6"
-  },
-  "ci": {
-    "buildRunId": 35514339665,
-    "unifiedRunId": 35514339728,
-    "artifactId": 10606816032,
-    "artifactSha256": "1517890fd2efe90f9c5fe8f345d7fd695b534b33de5ad1937441836f386e6cca",
-    "innerZipSha256": "e48b1648ce80f7027e3cdea3bbb13192cc56c5bd99628ee886759e6d8916e065"
-  },
-  "availableVariants": [
-    "CONTROL_2D",
-    "A_CONTROL",
-    "E_DXVK_SAFE",
-    "E_DXVK_MULTIVIEW",
-    "F_DX12_STRICT"
-  ],
-  "runtimeEvidence": {
-    "previousCandidate": "5f9028deb7ee93aa5733cfdf4acf5c872f15298e",
-    "observed": {
-      "control2D": "normal startup",
-      "d3d9Safe": "normal startup; gameplay showed enlarged/cropped left half with no stereo",
-      "dxvkSafe": "same enlarged/cropped flat image",
-      "dx12Strict": "device creation failed"
-    },
-    "diagnosis": [
-      "SAFE settings had DirectGpuOnly=false but game-side R9 transport policy read stale CRT environment values and remained direct-only, suppressing SBS fallback and publishing zero completed stereo frames",
-      "host recovery theater cropped the left half even when the desktop source was full-width mono",
-      "DX12 Direct3DCreate9On12Ex succeeded but CreateDeviceEx returned D3DERR_INVALIDCALL; strict branch now preserves legacy CreateDevice semantics with one bounded presentation-parameter retry"
+  "frozen": false,
+  "phase": "DX9Ex-reference-first",
+  "checkpoint": "C3_VALIDATE",
+  "policy": {
+    "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host",
+    "blockedBackends": [
+      "DXVK",
+      "DXVK multiview",
+      "DX12/D3D9On12"
     ],
-    "quest3VdxrRequired": true
+    "blockedBackendAction": "Do not develop, compile, smoke-build or package until DX9Ex reference milestone is user-accepted.",
+    "genericBuildDisabled": true,
+    "dedicatedWorkflow": ".github/workflows/vr-unified-backends.yml"
   },
-  "fixes": {
-    "d3d9Safe": "R9DirectOnlyTransport reads Settings::VRDirectGpuOnly directly; host crops only completed SBS frames",
-    "dxvkSafe": "same transport-policy fix and host crop guard synchronized to vr-dxvk-poc",
-    "dx12Strict": "legacy D3D9On12 CreateDevice semantics plus bounded compatibility retry; host crop guard synchronized"
+  "runtimeEvidence": {
+    "sourceMatrix": "VRM-20260920-803144005c0e",
+    "d3d9Safe": {
+      "startup": "pass",
+      "runtime": "regressed",
+      "visual": "driver and shadow acceptable; most other content corrupted",
+      "transport": "SBS compose succeeded; direct shared-eye not ready",
+      "compilePath": "R26/R23 safe path; R29-R34 excluded",
+      "performance": "~1800-2000 draws/present in heavy gameplay samples; semanticReject exceeded 568k; user reports HMD stutter",
+      "forcedRuntime": "PreferD3D9Ex=false, FramerateLimit=60, FramerateInterpolation=false, FrameCadenceMode=0 while OpenXR reported 90 Hz"
+    },
+    "dxvkSafe": "same visual regression, subjectively worse HMD stutter; development paused",
+    "dx12Strict": "Direct3DCreate9On12Ex succeeds but both original and normalized CreateDevice return 0x8876086C; development paused"
   },
-  "validation": {
-    "unifiedWorkflow": "success",
-    "zipIntegrity": "passed",
-    "requiredFiles": "passed",
-    "branchShaSync": "passed",
-    "skyGlowFactor": 1
+  "currentHypotheses": [
+    "The latest delivered D3D9 SAFE package was not the intended final DX9Ex path: SAFE-DRAW deliberately removed R29-R34 and renderer R29, discarding later world/effect/HUD corrections.",
+    "R26 steady-state safety replay plus classification rejection causes large draw amplification and contributes to headset stutter.",
+    "Recovery runtime forcing 60 FPS with interpolation/cadence disabled contributes independent judder on a 90 Hz OpenXR session.",
+    "Restore fast R29 world rendering and classification in bounded variants before deciding which later R30-R34 overlays are required."
+  ],
+  "candidateMatrix": {
+    "runId": 35515548121,
+    "sourceSha": "505e47bcc520727fe64010ea2af490be3e1e6ac8",
+    "status": "in_progress",
+    "variants": {
+      "P1_C1_FAST_WORLD": "R29 fast L+R + restored R27/R28 perspective-world classification; R30-R34 excluded",
+      "P2_C2_FAST_HUD": "P1 + R30 HUD/XYZRHW/SkyGlow; R31-R34 excluded",
+      "P3_FULL_R34": "complete current R29-R34 chain",
+      "P4_R26_HUD_SAFE": "conservative R26 world + R30 HUD/XYZRHW/SkyGlow"
+    },
+    "commonRuntime": {
+      "PreferD3D9Ex": true,
+      "DirectGpuOnly": false,
+      "DisableDesktopDuplication": false,
+      "FramerateLimit": 0,
+      "FramerateInterpolation": true,
+      "FramerateUnlockExperimental": true,
+      "FrameCadenceMode": 1,
+      "FrameCadenceTargetHz": 0,
+      "DisableDesktopVsync": true,
+      "SkyGlowFactor": 1
+    }
   },
-  "nextAction": "Retest frozen matrix VRM-20260920-803144005c0e. Check D3D9 SAFE first for a completed stereo frame and real depth, then DXVK SAFE for the same, then DX12 STRICT only for device-creation/startup progress before deeper renderer judgement.",
-  "integrationHead": "803144005c0e45352602917a2f51804ec6b18ae6"
+  "nextAction": "Complete DX9Ex-only P1-P4 build/package. User should test P1 first, then P2, then P3, and P4 only as conservative fallback/reference. Compare identical short gameplay and upload each auto-collected DX9EX_LOG ZIP."
 }
