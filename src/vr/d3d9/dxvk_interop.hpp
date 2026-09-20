@@ -14,6 +14,13 @@ namespace OutRunVR::DxvkInterop
 {
     inline constexpr std::uint32_t ProtocolVersion = 1;
 
+    enum CapabilityFlags : std::uint32_t
+    {
+        CapabilityNone = 0,
+        CapabilityWorldMultiview = 1u << 0,
+        CapabilityExternalRightTargets = 1u << 1,
+    };
+
     enum StereoFlags : std::uint32_t
     {
         StereoEnabled = 1u << 0,
@@ -61,6 +68,9 @@ ID3D9OutRunVRInterop : public IUnknown
 public:
     virtual HRESULT STDMETHODCALLTYPE GetProtocolVersion(
         std::uint32_t* version) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE GetCapabilities(
+        std::uint32_t* flags) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE SetFrameState(
         const OutRunVR::DxvkInterop::FrameStateV1* state) = 0;
