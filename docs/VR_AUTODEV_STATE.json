@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "updatedUtc": "2026-09-20T14:10:00Z",
+  "updatedUtc": "2026-09-20T17:06:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
   "phase": "DX9Ex-reference-first",
-  "checkpoint": "C3_VALIDATE",
+  "checkpoint": "C6_STATE",
   "policy": {
     "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host",
     "blockedBackends": [
@@ -38,9 +38,16 @@
     "Restore fast R29 world rendering and classification in bounded variants before deciding which later R30-R34 overlays are required."
   ],
   "candidateMatrix": {
-    "runId": 35515548121,
-    "sourceSha": "505e47bcc520727fe64010ea2af490be3e1e6ac8",
-    "status": "in_progress",
+    "matrixId": "DX9EX-20260920-f46024f7005c",
+    "binarySourceSha": "f46024f7005c5c530479c61673055be324381f2a",
+    "packagerSourceSha": "2827f20d456d5fb266cfbefbd4435df0f9952569",
+    "configFixSha": "ee94dc8051b6de8c0b6ce67d9bdd8b613b98363c",
+    "sourceBuildRunId": 35516112968,
+    "sourceBuildStatus": "all four Win32 game variants and x64 D3D11 host succeeded; package job alone failed before assembly on PowerShell variable delimiter",
+    "followupRunId": 35524755335,
+    "followupRunStatus": "in_progress",
+    "packageSha256": "ba1757865c445e5f63d37041a1f10dbed8a3137ae049960ec752fc5c9b0fb44b",
+    "packageValidation": "four inner ZIPs; 11 files each; all SHA256SUMS passed; PE32 x86 game DLL + PE32+ x64 host; no d3d9.dll, multiviewpatcher.dll, DX12 host or backends directory",
     "variants": {
       "P1_C1_FAST_WORLD": "R29 fast L+R + restored R27/R28 perspective-world classification; R30-R34 excluded",
       "P2_C2_FAST_HUD": "P1 + R30 HUD/XYZRHW/SkyGlow; R31-R34 excluded",
@@ -60,5 +67,5 @@
       "SkyGlowFactor": 1
     }
   },
-  "nextAction": "Complete DX9Ex-only P1-P4 build/package. User should test P1 first, then P2, then P3, and P4 only as conservative fallback/reference. Compare identical short gameplay and upload each auto-collected DX9EX_LOG ZIP."
+  "nextAction": "Runtime test P1 first on Quest 3/VDXR, then P2 and P3; use P4 only as conservative fallback. Upload each auto-collected DX9EX_LOG ZIP. Select the reference only from identical-scene runtime evidence."
 }
