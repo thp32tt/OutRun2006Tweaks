@@ -2,6 +2,7 @@ name: Build
 
 on:
   push:
+    branches-ignore: [ vr-d3d9ex-r13-flat-test ]
   pull_request:
 
 jobs:
