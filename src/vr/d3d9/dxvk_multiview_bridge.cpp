@@ -155,7 +155,8 @@ namespace OutRunVRDxvkMultiview
         const float* leftWvp,
         const float* rightWvp,
         std::uint64_t poseSequence,
-        std::uint64_t drawToken) noexcept
+        std::uint64_t drawToken,
+        std::uint32_t eligibilityFlags) noexcept
     {
         if (!BackendAllowsCustomDxvk() || !device || !rightColorTarget ||
             !leftWvp || !rightWvp || poseSequence == 0)
@@ -188,6 +189,7 @@ namespace OutRunVRDxvkMultiview
         draw.version = OutRunVR::DxvkInterop::ProtocolVersion;
         draw.poseSequence = poseSequence;
         draw.drawToken = drawToken;
+        draw.eligibilityFlags = eligibilityFlags;
         std::memcpy(draw.leftWvp, leftWvp, sizeof(draw.leftWvp));
         std::memcpy(draw.rightWvp, rightWvp, sizeof(draw.rightWvp));
 
