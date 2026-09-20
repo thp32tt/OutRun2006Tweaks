@@ -5,6 +5,7 @@
 #include <Windows.h>
 #include <Unknwn.h>
 
+#include <cstddef>
 #include <cstdint>
 
 // OutRun-specific extension implemented only by the custom DXVK fork.
@@ -28,6 +29,7 @@ namespace OutRunVR::DxvkInterop
         AllowInternalArrayTarget = 1u << 2,
     };
 
+#pragma pack(push, 8)
     struct FrameStateV1
     {
         std::uint32_t size = sizeof(FrameStateV1);
@@ -59,6 +61,14 @@ namespace OutRunVR::DxvkInterop
         std::uint64_t rejectedDraws{};
         std::uint64_t fallbackDraws{};
     };
+#pragma pack(pop)
+
+    static_assert(sizeof(FrameStateV1) == 32);
+    static_assert(sizeof(DrawStateV1) == 160);
+    static_assert(sizeof(CountersV1) == 40);
+    static_assert(offsetof(FrameStateV1, poseSequence) == 8);
+    static_assert(offsetof(DrawStateV1, leftWvp) == 24);
+    static_assert(offsetof(DrawStateV1, rightWvp) == 88);
 }
 
 // {B16D40B8-1A79-4E11-9D47-7A50C1F56E62}
