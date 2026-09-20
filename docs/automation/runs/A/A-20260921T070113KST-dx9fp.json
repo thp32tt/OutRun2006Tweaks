@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "role": "A",
+  "runId": "A-20260921T070113KST-dx9fp",
+  "startedKst": "2026-09-21T07:01:13+09:00",
+  "completedKst": "2026-09-21T07:09:00+09:00",
+  "baseSha": "e5e35f483cf7f8d36f99a87807ba6cb9d4b7eccd",
+  "findingIds": [
+    "DX9EX-FINGERPRINT-001",
+    "DX9EX-COMPLIANCE-001"
+  ],
+  "inputHashes": {
+    "srcVrD3d9Tree": "0ccf527c2f78f18fcd6e9890c32c228ab5018620",
+    "vrhostSrcTree": "01b173993ba2a12c41833f69cc540d15c170fbcb",
+    "activeWorkflowBlob": "b945f834a211ed5baaf99fbd7d3da1259ecebd49",
+    "shaderFingerprintBlob": "35d59f7af9884c02ab0b05e13384639306387459",
+    "stereoRendererR26Blob": "7d5c0b1d730ad60e8c6b5f80400a4b543a4b17e0",
+    "stereoRendererR33Blob": "c7bf2dc8ebe6152ad2d71bd718877f17ac651796"
+  },
+  "reviewBatch": {
+    "id": "RB10-A01",
+    "subsystem": "active R34/R33 draw dispatch, shader fingerprint diagnostics, active DX9Ex packaging compliance",
+    "lenses": [
+      "architecture/control-flow",
+      "resource-lifetime/reset-generation",
+      "stereo/visual-correctness",
+      "hot-path/frame-pacing",
+      "adversarial-falsification/testability"
+    ],
+    "cacheKey": "e5e35f48:0ccf527c:b945f834:final-dispatch-fingerprint+compliance:five-lens"
+  },
+  "findings": [
+    {
+      "id": "DX9EX-FINGERPRINT-001",
+      "status": "READY",
+      "confidence": "high",
+      "severity": "high-diagnostic-blocker",
+      "testLevel": "LEVEL0 implementation verifier; LEVEL1 for object-to-visible-symptom association",
+      "evidence": [
+        "src/vr/d3d9/stereo_renderer_r33.cpp:R33Dispatch returns handled HUD/fast-world draws before lower fallback",
+        "src/vr/d3d9/stereo_renderer_r26.cpp:R27GuardWorldEffect is the only caller of R46TraceShaderFingerprint",
+        "src/vr/d3d9/shader_fingerprint_gpl.hpp:CaptureCurrent treats null/null fixed-function as one valid pair",
+        "src/vr/d3d9/shader_fingerprint_gpl.hpp:RememberPair deduplicates only VS/PS bytecode hashes",
+        "src/vr/d3d9/shader_fingerprint_gpl.hpp:HashBytecodeCached keys the process-static cache only by COM address"
+      ],
+      "risk": "Normal-package evidence cannot isolate white rank/score/6th-of-6/YES-NO or prove which final R33 route produced a visible duplicate. Enabling the current fallback trace can also perturb frame pacing.",
+      "expectedFix": "Add a bounded, reset-generation-aware signature recorder at R33Dispatch with route outcome and fixed-function discriminators; serialize only the Ctrl+F9 capture window; avoid per-draw COM hashing/mutex.",
+      "verifier": "tools/review/verify_dx9ex_fingerprint_coverage.py plus deterministic synthetic signature/reset tests"
+    },
+    {
+      "id": "DX9EX-COMPLIANCE-001",
+      "status": "READY",
+      "confidence": "high",
+      "severity": "high-release-compliance",
+      "testLevel": "LEVEL0",
+      "evidence": [
+        ".github/workflows/vr-dx9ex-active.yml packages the GPL-derived helper in dinput8.dll but has no compliance payload/companion artifact",
+        "docs/VR_REVIEW_FINDINGS.md:PKG-002 claims CI creates a separate compliance ZIP",
+        "THIRD_PARTY_GPL_NOTICES.txt says adapted source is copied into test packages",
+        "LICENSE.md declares the combined branch GPL-3.0-only"
+      ],
+      "risk": "The current active user artifact is not accompanied by the repository-declared license/corresponding-source material from the identical source SHA.",
+      "expectedFix": "Emit and validate a same-SHA companion compliance artifact containing GPL text, notices, license scope, adapted source and manifest; keep the runtime ZIP lean.",
+      "verifier": "Active-workflow package policy test must require the companion artifact and exact source identity."
+    }
+  ],
+  "contraryEvidence": [
+    "Final shader-pair identity uses bytecode hashes, not COM pointers.",
+    "Fingerprint tracing is opt-in, reducing default runtime overhead.",
+    "R31/R33 expose coarse route counters, but not exact draw identities.",
+    "Repository GPL notices and source are present, but the active artifact workflow does not publish them or a companion compliance bundle."
+  ],
+  "upstream": [
+    {
+      "name": "bo3b/3Dmigoto",
+      "url": "https://github.com/bo3b/3Dmigoto",
+      "files": [
+        "util.h",
+        "DirectX9/Direct3DDevice9Functions.h"
+      ],
+      "license": "GPL-3.0",
+      "obligation": "Preserve attribution, GPL text and corresponding adapted source for distributed combined binaries."
+    }
+  ],
+  "changedPaths": [
+    "docs/automation/runs/A/A-20260921T070113KST-dx9fp.json",
+    "docs/automation/runs/A/A-20260921T070113KST-dx9fp.md",
+    "tools/review/verify_dx9ex_fingerprint_coverage.py"
+  ],
+  "candidateBranch": null,
+  "candidateSha": null,
+  "ci": {
+    "workflow": null,
+    "runId": null,
+    "status": "not-run; review-only and no production inputs changed",
+    "artifactIds": []
+  },
+  "evidenceLevel": "STATICALLY_VERIFIED",
+  "queueProposal": [
+    {
+      "id": "DX9EX-FINGERPRINT-001",
+      "from": "READY",
+      "to": "READY",
+      "preferredRole": "B_FIX",
+      "note": "Implementation contract and fail-before verifier are now concrete; do not alter visual policy in the same candidate."
+    },
+    {
+      "id": "DX9EX-COMPLIANCE-001",
+      "from": null,
+      "to": "READY",
+      "preferredRole": "B_FIX",
+      "note": "Independent LEVEL0 workflow-only candidate; no HMD test and no runtime binary rebuild required."
+    }
+  ],
+  "blockers": [
+    "Exact object labels still require one matching normal CORRECTNESS capture after the recorder exists; this does not block the LEVEL0 implementation."
+  ],
+  "retryCount": 0,
+  "nextAction": "B should implement DX9EX-FINGERPRINT-001 as an isolated diagnostics-only candidate at the final R33 dispatch boundary, or take the independent workflow-only DX9EX-COMPLIANCE-001 item. C should run the prototype in --require-fixed mode against the immutable candidate SHA."
+}
