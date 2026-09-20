@@ -54,6 +54,17 @@ Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'CORRECTNESS') 'GUI m
 Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'CONTROL') 'GUI must expose CONTROL'
 Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'PERFORMANCE') 'GUI must expose PERFORMANCE'
 
+
+$repoRoot = Split-Path -Parent $root
+$watchdogPath = Join-Path $repoRoot 'vrhost/src/diagnostics/runtime_watchdog.cpp'
+Assert-True (Test-Path $watchdogPath) 'runtime watchdog source missing'
+$watchdog = Get-Content $watchdogPath -Raw
+Assert-True ($watchdog -match 'VK_F9') 'diagnostic capture must use the non-conflicting F9 trigger'
+Assert-True ($watchdog -match 'VK_CONTROL') 'diagnostic capture must require Ctrl modifier'
+Assert-True ($watchdog -match 'RollingSampleCount\s*=\s*100') 'rolling capture must remain bounded near 10 seconds at 100 ms sampling'
+Assert-True ($watchdog -match 'std::ios::app') 'watchdog log must preserve same-session host restarts'
+Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'captureRoot') 'collector must include capture bundles'
+
 $statePath = Join-Path (Split-Path -Parent $root) 'docs/VR_AUTODEV_STATE.json'
 Assert-True (Test-Path $statePath) 'VR_AUTODEV_STATE.json missing'
 $state = Get-Content $statePath -Raw | ConvertFrom-Json
@@ -64,4 +75,4 @@ Assert-True ($state.testProfiles.CORRECTNESS.defaultUserTest -eq $true) 'CORRECT
 Assert-True ($state.testProfiles.CONTROL.defaultUserTest -eq $false) 'CONTROL must be optional'
 Assert-True ($state.testProfiles.PERFORMANCE.defaultUserTest -eq $false) 'PERFORMANCE must be optional'
 
-Write-Host 'VR test policy verification passed: profile identity, runtime defaults, session/log separation, GUI exposure and TEST_LEVEL state are consistent.'
+Write-Host 'VR test policy verification passed: profile identity, runtime defaults, session/log separation, GUI exposure, bounded Ctrl+F9 capture and TEST_LEVEL state are consistent.'
