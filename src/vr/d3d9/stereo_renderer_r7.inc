@@ -17,6 +17,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr_shared.hpp"
+#include "vr/d3d9/dxvk_interop.hpp"
 
 // True-stereo D3D9 renderer.
 //
