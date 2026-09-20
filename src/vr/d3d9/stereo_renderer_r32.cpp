@@ -71,6 +71,13 @@ namespace OutRunVRStereo
             std::uint64_t pendingError = 0;
             std::uint64_t resetRearm = 0;
             std::uint64_t resetFail = 0;
+            std::uint64_t dxvkArm = 0;
+            std::uint64_t dxvkAccepted = 0;
+            std::uint64_t dxvkRejected = 0;
+            std::uint64_t dxvkDrawOk = 0;
+            std::uint64_t dxvkDrawFail = 0;
+            std::uint64_t dxvkInterfaceMiss = 0;
+            std::uint64_t dxvkProtocolMismatch = 0;
         };
         R32CounterSnapshot R32Counters{};
 
@@ -1017,13 +1024,22 @@ namespace OutRunVRStereo
                 R32Counters.pendingError = R32PendingFenceErrors;
                 R32Counters.resetRearm = R32ResetEpochRearms;
                 R32Counters.resetFail = R32ResetFailures;
+                const auto dxvk = OutRunVRDxvkMultiview::GetTelemetry();
+                R32Counters.dxvkArm = dxvk.armAttempts;
+                R32Counters.dxvkAccepted = dxvk.armSuccess;
+                R32Counters.dxvkRejected = dxvk.armRejected;
+                R32Counters.dxvkDrawOk = dxvk.drawSuccess;
+                R32Counters.dxvkDrawFail = dxvk.drawFailure;
+                R32Counters.dxvkInterfaceMiss = dxvk.interfaceMisses;
+                R32Counters.dxvkProtocolMismatch = dxvk.protocolMismatches;
                 return;
             }
             if (now - R32Counters.lastLogMs < 5000)
                 return;
 
+            const auto dxvkNow = OutRunVRDxvkMultiview::GetTelemetry();
             spdlog::info(
-                "VR R32 PERF 5s: liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},producerFenceOk={},producerBudgetFallback={},backpressure={},pendingDrain={},pendingBlock={},pendingError={}] reset[rearm={},fail={}]",
+                "VR R32 PERF 5s: liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},producerFenceOk={},producerBudgetFallback={},backpressure={},pendingDrain={},pendingBlock={},pendingError={}] reset[rearm={},fail={}] dxvk[arm={},accepted={},rejected={},drawOk={},drawFail={},interfaceMiss={},protocolMismatch={}]",
                 R31FastWorldLiveValidations - R32Counters.liveWvp,
                 R31FastWorldValidationRejects - R32Counters.liveReject,
                 R31StateBlockRecordings - R32Counters.stateRecord,
@@ -1040,7 +1056,14 @@ namespace OutRunVRStereo
                 R32PendingFenceBlocks - R32Counters.pendingBlock,
                 R32PendingFenceErrors - R32Counters.pendingError,
                 R32ResetEpochRearms - R32Counters.resetRearm,
-                R32ResetFailures - R32Counters.resetFail);
+                R32ResetFailures - R32Counters.resetFail,
+                dxvkNow.armAttempts - R32Counters.dxvkArm,
+                dxvkNow.armSuccess - R32Counters.dxvkAccepted,
+                dxvkNow.armRejected - R32Counters.dxvkRejected,
+                dxvkNow.drawSuccess - R32Counters.dxvkDrawOk,
+                dxvkNow.drawFailure - R32Counters.dxvkDrawFail,
+                dxvkNow.interfaceMisses - R32Counters.dxvkInterfaceMiss,
+                dxvkNow.protocolMismatches - R32Counters.dxvkProtocolMismatch);
 
             R32Counters.lastLogMs = now;
             R32Counters.liveWvp = R31FastWorldLiveValidations;
@@ -1060,6 +1083,13 @@ namespace OutRunVRStereo
             R32Counters.pendingError = R32PendingFenceErrors;
             R32Counters.resetRearm = R32ResetEpochRearms;
             R32Counters.resetFail = R32ResetFailures;
+            R32Counters.dxvkArm = dxvkNow.armAttempts;
+            R32Counters.dxvkAccepted = dxvkNow.armSuccess;
+            R32Counters.dxvkRejected = dxvkNow.armRejected;
+            R32Counters.dxvkDrawOk = dxvkNow.drawSuccess;
+            R32Counters.dxvkDrawFail = dxvkNow.drawFailure;
+            R32Counters.dxvkInterfaceMiss = dxvkNow.interfaceMisses;
+            R32Counters.dxvkProtocolMismatch = dxvkNow.protocolMismatches;
         }
 
         HRESULT __stdcall PresentDestR32(IDirect3DDevice9* device,
