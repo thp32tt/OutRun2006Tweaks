@@ -20,8 +20,10 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "dx12_pose_writer.hpp"
+#include "dx12_frame_meta_reader.hpp"
 #include "dx12_transport_consumer.hpp"
 
 namespace
@@ -903,6 +905,7 @@ int main()
             requirements.adapterLuid);
         OutRunVRHostDX12::TransportConsumer consumer(
             requirements.adapterLuid);
+        OutRunVRHostDX12::RenderFrameMetaReader frameMeta;
         StereoRenderer renderer(d3d,swapchain);
 
         std::array<XrView,2> views{
@@ -910,6 +913,9 @@ int main()
             XrView{XR_TYPE_VIEW}};
         std::deque<PendingAck> pendingAcks;
         OutRunVRHostDX12::TransportConsumer::Frame heldFrame{};
+        std::array<XrView,2> heldRenderViews{
+            XrView{XR_TYPE_VIEW},XrView{XR_TYPE_VIEW}};
+        bool heldRenderViewsValid=false;
         std::uint64_t heldLastUseFence=0;
 
         std::cout<<"Runtime: "<<xr.runtimeName<<"\n";
@@ -995,6 +1001,21 @@ int main()
                 }
                 heldFrame=std::move(candidate);
                 heldLastUseFence=0;
+                OutRunVR::SharedRenderFrameState meta{};
+                heldRenderViewsValid=
+                    frameMeta.ReadFrame(
+                        heldFrame.frameId,
+                        heldFrame.poseSequence,
+                        meta)&&
+                    OutRunVRHostDX12::RenderFrameMetaReader::ToXrViews(
+                        meta,heldRenderViews);
+                if(!heldRenderViewsValid)
+                {
+                    std::cerr
+                        <<"DX12 host: exact rendered-eye metadata unavailable for frame "
+                        <<heldFrame.frameId
+                        <<"; current XR views will be used for this frame.\n";
+                }
             }
 
             if(fs.shouldRender!=XR_FALSE&&viewCount>=2&&heldFrame.frameId)
@@ -1025,10 +1046,12 @@ int main()
                 if(rendered)
                 {
                     heldLastUseFence=gpuFence;
+                    const auto& submitViews=
+                        heldRenderViewsValid?heldRenderViews:views;
                     for(std::uint32_t eye=0;eye<2;++eye)
                     {
-                        projectionViews[eye].pose=views[eye].pose;
-                        projectionViews[eye].fov=views[eye].fov;
+                        projectionViews[eye].pose=submitViews[eye].pose;
+                        projectionViews[eye].fov=submitViews[eye].fov;
                         projectionViews[eye].subImage.swapchain=
                             swapchain.handle;
                         projectionViews[eye].subImage.imageRect.offset={0,0};
