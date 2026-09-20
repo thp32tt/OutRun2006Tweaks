@@ -82,6 +82,7 @@ namespace Settings
 	extern Setting<int> FramerateLimit;                    // hooks_framerate.cpp
 	extern Setting<int> FramerateFastLoad;                 // hooks_framerate.cpp
 	extern Setting<bool> FramerateInterpolation;           // hooks_framerate.cpp
+	extern Setting<bool> VREnabled;                        // vr/settings.cpp
 
 	extern Setting<float> FramerateInterpolationDebugAlpha; // interpolation.cpp
 	extern Setting<bool> FramerateInterpolationDebugLog;    // interpolation.cpp
