@@ -23,6 +23,8 @@ $logPatterns=@(
     'OR2006C2C_vkd3d*.log',
     'dxvk*.log',
     'vkd3d*.log',
+    'crash.log',
+    'OR2006C2C.EXE.*.zip',
     '*.dmp'
 )
 
