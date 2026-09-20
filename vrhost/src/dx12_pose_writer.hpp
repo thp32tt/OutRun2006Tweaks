@@ -268,6 +268,20 @@ namespace OutRunVRHostDX12
                 : OutRunVR::PresentationTheater;
         }
 
+        bool ConsumeClientRecenter() noexcept
+        {
+            if(!state_||state_->magic!=OutRunVR::SharedMagic||
+                state_->protocolVersion!=OutRunVR::SharedProtocolVersion||
+                state_->structSize!=sizeof(*state_))
+                return false;
+            const bool down=
+                (state_->reserved[OutRunVR::ClientFlagsIndex]&
+                    OutRunVR::ClientRecenterRequested)!=0;
+            const bool pressed=down&&!clientRecenterWasDown_;
+            clientRecenterWasDown_=down;
+            return pressed;
+        }
+
         void ReferenceSpaceChanged() noexcept
         {
             if(++referenceGeneration_==0)referenceGeneration_=1;
@@ -299,5 +313,6 @@ namespace OutRunVRHostDX12
         OutRunVR::SharedPoseState* state_{};
         LUID adapterLuid_{};
         std::uint32_t referenceGeneration_{1};
+        bool clientRecenterWasDown_{};
     };
 }
