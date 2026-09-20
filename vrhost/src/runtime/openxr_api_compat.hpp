@@ -62,6 +62,9 @@ namespace OutRunVrFinalTest
     inline constexpr const char* BuildId = "R20-production-host-20260916";
 
     inline XrSession Session = XR_NULL_HANDLE;
+    // BaseLocalSpace is the runtime's original LOCAL origin. LocalSpace is the
+    // application-visible origin and may be replaced by user recenter.
+    inline XrSpace BaseLocalSpace = XR_NULL_HANDLE;
     inline XrSpace LocalSpace = XR_NULL_HANDLE;
     inline ID3D11Device* Device = nullptr;
     inline ID3D11DeviceContext* Context = nullptr;
@@ -217,13 +220,24 @@ namespace OutRunVrFinalTest
         const XrResult result = ::xrCreateReferenceSpace(session, info, space);
         if (XR_SUCCEEDED(result) && info && space &&
             info->referenceSpaceType == XR_REFERENCE_SPACE_TYPE_LOCAL)
+        {
+            if (BaseLocalSpace == XR_NULL_HANDLE)
+                BaseLocalSpace = *space;
             LocalSpace = *space;
+        }
         return result;
     }
 
     inline XrResult XRAPI_CALL DestroySession(XrSession session)
     {
         CloseFrameMapping();
+        // main.cpp destroys the active LocalSpace before the session. If a user
+        // recenter replaced it, the immutable base LOCAL is a second handle and
+        // remains ours to release here.
+        if (BaseLocalSpace != XR_NULL_HANDLE &&
+            BaseLocalSpace != LocalSpace)
+            ::xrDestroySpace(BaseLocalSpace);
+        BaseLocalSpace = XR_NULL_HANDLE;
         LocalSpace = XR_NULL_HANDLE;
         Session = XR_NULL_HANDLE;
         ReleaseGraphicsBinding();
