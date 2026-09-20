@@ -74,6 +74,50 @@ namespace
     constexpr ULONGLONG R23CachedProjectionHoldMs = 1000;
     constexpr ULONGLONG R23PresentationDebounceMs = 750;
     constexpr ULONGLONG R23CachedProjectionLogIntervalMs = 5000;
+
+    bool R23UsableGameplayBootstrapFrame(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        constexpr std::uint32_t required =
+            OutRunVR::RenderFrameStereoComplete |
+            OutRunVR::RenderFrameWorldStereo |
+            OutRunVR::RenderFrameDrawDuplicated |
+            OutRunVR::RenderFrameEffectivePoseValid;
+
+        if (!frame.frameId || !frame.sourcePoseSequence ||
+            frame.presentationMode != OutRunVR::PresentationGameplay ||
+            frame.state != OutRunVR::StereoSbsActive ||
+            frame.failureReason != OutRunVR::StereoFailureNone ||
+            frame.presentQpc <= 0 ||
+            !frame.backbufferWidth || !frame.backbufferHeight ||
+            (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
+            (frame.flags & required) != required)
+            return false;
+
+        if ((frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0)
+            return true;
+
+        const std::uint32_t slot =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        const std::uint32_t width =
+            frame.reserved[OutRunVR::RenderFrameDirectWidthIndex];
+        const std::uint32_t height =
+            frame.reserved[OutRunVR::RenderFrameDirectHeightIndex];
+        const std::uint32_t leftHandle =
+            frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex];
+        const std::uint32_t rightHandle =
+            frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex];
+
+        return slot < OutRunVR::RenderFrameRingSize &&
+            generation != 0 &&
+            leftHandle != 0 && rightHandle != 0 &&
+            width != 0 && height != 0 &&
+            width == frame.backbufferWidth &&
+            height == frame.backbufferHeight;
+    }
+
     std::uint64_t R23CachedProjectionSubmits = 0;
     std::uint64_t R42SameFrameProjectionReuses = 0;
     std::uint64_t R42ProjectionRefreshes = 0;
@@ -2180,17 +2224,18 @@ int main(int argc, char** argv)
             const auto requestedPresentation = shared.Presentation();
             auto presentation = requestedPresentation;
 
-            // T0/R46: the game may publish Gameplay several seconds before a
-            // usable stereo render packet exists. Keep the live Theater/menu
-            // projection until at least one render frame has appeared instead
-            // of entering a zero-layer direct-only gameplay interval.
+            // T0/R46+P0: Gameplay can be announced before a releasable
+            // stereo packet exists, and Frame.v2 may survive a fast game restart.
+            // RenderFrameReader already rejects stale run identities; require the
+            // same completed world/pose invariants used by production selection
+            // before leaving the visible menu/loading projection.
             if (requestedPresentation == OutRunVR::PresentationGameplay &&
                 lastPresentation != OutRunVR::PresentationGameplay)
             {
                 OutRunVR::SharedRenderFrameState bootstrapFrame{};
                 const bool haveBootstrapFrame =
                     renderFrames.Read(bootstrapFrame) &&
-                    bootstrapFrame.frameId != 0;
+                    R23UsableGameplayBootstrapFrame(bootstrapFrame);
                 if (!haveBootstrapFrame)
                     presentation = OutRunVR::PresentationTheater;
             }

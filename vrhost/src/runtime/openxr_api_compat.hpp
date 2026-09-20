@@ -152,7 +152,8 @@ namespace OutRunVrFinalTest
                 publishSequence = after;
                 return out.magic == OutRunVR::RenderFrameMagic &&
                     out.protocolVersion == OutRunVR::RenderFrameProtocolVersion &&
-                    out.structSize == sizeof(out);
+                    out.structSize == sizeof(out) &&
+                    OutRunVR::RenderFrameRunIdentityMatches(*FrameRing, out);
             }
         }
         return false;

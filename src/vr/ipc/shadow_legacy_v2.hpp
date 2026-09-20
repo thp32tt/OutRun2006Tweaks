@@ -138,7 +138,9 @@ namespace OutRunVR::IpcV3::ShadowV2
         return out.magic == RenderFrameMagic &&
             out.protocolVersion == RenderFrameProtocolVersion &&
             out.structSize == sizeof(SharedRenderFrameState) &&
-            !(out.sequence & 1u) && out.frameId != 0;
+            !(out.sequence & 1u) &&
+            RenderFrameRunIdentityMatches(ring, out) &&
+            out.frameId != 0;
     }
 
     inline std::uint32_t HostFlagsFromV2(std::uint32_t flags) noexcept
