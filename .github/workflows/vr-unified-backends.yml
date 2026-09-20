@@ -66,11 +66,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Configure Win32 \${{ matrix.variant }}
+      - name: Configure Win32 ${{ matrix.variant }}
         shell: pwsh
         run: |
           Remove-Item Env:CI -ErrorAction SilentlyContinue
-          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 \${{ matrix.flags }}
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 ${{ matrix.flags }}
       - name: Apply VC2022 dependency workarounds
         shell: pwsh
         run: |
@@ -79,22 +79,22 @@ jobs:
           (Get-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj
           Set-Content -Path build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
           (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
-      - name: Build Win32 game DLL \${{ matrix.variant }}
+      - name: Build Win32 game DLL ${{ matrix.variant }}
         run: cmake --build build-game --config Release --target outrun2006tweaks
       - name: Stage game DLL
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force stage-game | Out-Null
           $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
-          if (-not $dll) { throw "dinput8.dll missing for \${{ matrix.variant }}" }
+          if (-not $dll) { throw "dinput8.dll missing for ${{ matrix.variant }}" }
           Copy-Item $dll.FullName stage-game/dinput8.dll
           Set-Content stage-game/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
-          Set-Content stage-game/VARIANT_ID.txt '\${{ matrix.variant }}' -Encoding ascii
-          Set-Content stage-game/CMAKE_FLAGS.txt '\${{ matrix.flags }}' -Encoding ascii
-          Set-Content stage-game/PURPOSE.txt '\${{ matrix.purpose }}' -Encoding UTF8
+          Set-Content stage-game/VARIANT_ID.txt '${{ matrix.variant }}' -Encoding ascii
+          Set-Content stage-game/CMAKE_FLAGS.txt '${{ matrix.flags }}' -Encoding ascii
+          Set-Content stage-game/PURPOSE.txt '${{ matrix.purpose }}' -Encoding UTF8
       - uses: actions/upload-artifact@v4
         with:
-          name: dx9ex-game-\${{ matrix.variant }}
+          name: dx9ex-game-${{ matrix.variant }}
           path: stage-game/
           if-no-files-found: error
 
@@ -228,6 +228,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun2-VR-DX9EX-4PACK-\${{ github.sha }}
+          name: OutRun2-VR-DX9EX-4PACK-${{ github.sha }}
           path: output/*.zip
           if-no-files-found: error
