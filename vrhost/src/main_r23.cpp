@@ -2172,6 +2172,24 @@ int main(int argc, char** argv)
 
             const auto requestedPresentation = shared.Presentation();
             auto presentation = requestedPresentation;
+
+            // R46 bootstrap: the game can publish PresentationGameplay several
+            // seconds before the first complete stereo frame exists. Do not
+            // enter the gameplay projection path yet; keep rendering the live
+            // Theater/loading surface until a real render-frame packet is
+            // available. Once gameplay stereo has started, transient frame gaps
+            // do not force a mode switch back to Theater.
+            if (requestedPresentation == OutRunVR::PresentationGameplay &&
+                lastPresentation != OutRunVR::PresentationGameplay)
+            {
+                OutRunVR::SharedRenderFrameState bootstrapFrame{};
+                const bool haveBootstrapFrame =
+                    renderFrames.Read(bootstrapFrame) &&
+                    bootstrapFrame.frameId != 0;
+                if (!haveBootstrapFrame)
+                    presentation = OutRunVR::PresentationTheater;
+            }
+
             // R45: the game now publishes presentation from an explicit
             // GameState whitelist. Do not retain a stale stereo projection for
             // 750 ms after it says Theater; that hold was enough to transform
