@@ -1,0 +1,327 @@
+name: DX9Ex Alpha Range Matrix16
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ vr-d3d9ex-alpha-range-matrix16 ]
+    paths:
+      - 'src/vr/d3d9/**'
+      - 'src/vr/game/**'
+      - 'vrhost/**'
+      - 'cmake.toml'
+      - 'tools/Run-DX9Ex-Range16-Test.ps1'
+      - 'tools/RUN_DX9EX_RANGE16_TEST.cmd'
+      - '.github/workflows/dx9ex-alpha-range-matrix16.yml'
+
+concurrency:
+  group: dx9ex-alpha-range-matrix16
+  cancel-in-progress: true
+
+jobs:
+  host:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Build OpenXR host
+        shell: pwsh
+        run: |
+          cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
+          cmake --build build-host --config Release --target outrun-vr-host
+          if (-not (Test-Path build-host/bin/outrun-vr-host.exe)) { throw "host missing" }
+          New-Item -ItemType Directory -Force stage | Out-Null
+          Copy-Item build-host/bin/outrun-vr-host.exe stage/outrun-vr-host.exe
+          Set-Content stage/HOST_SHA.txt $env:GITHUB_SHA -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dx9ex-r16-host
+          path: stage/
+          if-no-files-found: error
+
+  game:
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: R0_BASE_STABLE
+            r26hud: ON
+            c1: OFF
+            c2: OFF
+            range: NONE
+            hud: OFF
+            common: OFF
+            anyz: OFF
+            commonEye: OFF
+            purpose: "S0 renderer baseline with persistent last-good Host"
+          - variant: R1_HUD_33_64
+            r26hud: ON
+            c1: OFF
+            c2: OFF
+            range: R33_64
+            hud: ON
+            common: OFF
+            anyz: OFF
+            commonEye: OFF
+            purpose: "Depth-off alpha 33..64 primitives -> PerspectiveHud"
+          - variant: R2_HUD_65_128
+            r26hud: ON
+            c1: OFF
+            c2: OFF
+            range: R65_128
+            hud: ON
+            common: OFF
+            anyz: OFF
+            commonEye: OFF
+            purpose: "Depth-off alpha 65..128 primitives -> PerspectiveHud"
+          - variant: R3_HUD_129_256
+            r26hud: ON
+            c1: OFF
+            c2: OFF
+            range: R129_256
+            hud: ON
+            common: OFF
+            anyz: OFF
+            commonEye: OFF
+            purpose: "Depth-off alpha 129..256 primitives -> PerspectiveHud"
+          - variant: R4_HUD_257_512
+            r26hud: ON
+            c1: OFF
+            c2: OFF
+            range: R257_512
+            hud: ON
+            common: OFF
+            anyz: OFF
+            commonEye: OFF
+            purpose: "Depth-off alpha 257..512 primitives -> PerspectiveHud"
+          - variant: R5_HUD_513_1024
+            r26hud: ON
+            c1: OFF
+            c2: OFF
+            range: R513_1024
+            hud: ON
+            common: OFF
+            anyz: OFF
+            commonEye: OFF
+            purpose: "Depth-off alpha 513..1024 primitives -> PerspectiveHud"
+          - variant: R6_COMMON_33_64
+            r26hud: ON
+            c1: OFF
+            c2: OFF
+            range: R33_64
+            hud: OFF
+            common: ON
+            anyz: OFF
+            commonEye: ON
+            purpose: "Depth-off alpha 33..64 primitives -> common-eye FlatEffectHud"
+          - variant: R7_COMMON_65_128
+            r26hud: ON
+            c1: OFF
+            c2: OFF
+            range: R65_128
+            hud: OFF
+            common: ON
+            anyz: OFF
+            commonEye: ON
+            purpose: "Depth-off alpha 65..128 primitives -> common-eye FlatEffectHud"
+          - variant: R8_COMMON_129_256
+            r26hud: ON
+            c1: OFF
+            c2: OFF
+            range: R129_256
+            hud: OFF
+            common: ON
+            anyz: OFF
+            commonEye: ON
+            purpose: "Depth-off alpha 129..256 primitives -> common-eye FlatEffectHud"
+          - variant: R9_COMMON_257_512
+            r26hud: ON
+            c1: OFF
+            c2: OFF
+            range: R257_512
+            hud: OFF
+            common: ON
+            anyz: OFF
+            commonEye: ON
+            purpose: "Depth-off alpha 257..512 primitives -> common-eye FlatEffectHud"
+          - variant: R10_MATRIX_33_64
+            r26hud: ON
+            c1: OFF
+            c2: OFF
+            range: R33_64
+            hud: OFF
+            common: OFF
+            anyz: ON
+            commonEye: OFF
+            purpose: "Alpha 33..64 primitives -> HUD only when live WVP is flat"
+          - variant: R11_MATRIX_65_128
+            r26hud: ON
+            c1: OFF
+            c2: OFF
+            range: R65_128
+            hud: OFF
+            common: OFF
+            anyz: ON
+            commonEye: OFF
+            purpose: "Alpha 65..128 primitives -> HUD only when live WVP is flat"
+          - variant: R12_MATRIX_129_256
+            r26hud: ON
+            c1: OFF
+            c2: OFF
+            range: R129_256
+            hud: OFF
+            common: OFF
+            anyz: ON
+            commonEye: OFF
+            purpose: "Alpha 129..256 primitives -> HUD only when live WVP is flat"
+          - variant: R13_MATRIX_257_512
+            r26hud: ON
+            c1: OFF
+            c2: OFF
+            range: R257_512
+            hud: OFF
+            common: OFF
+            anyz: ON
+            commonEye: OFF
+            purpose: "Alpha 257..512 primitives -> HUD only when live WVP is flat"
+          - variant: R14_FAST_C1
+            r26hud: OFF
+            c1: ON
+            c2: OFF
+            range: NONE
+            hud: OFF
+            common: OFF
+            anyz: OFF
+            commonEye: OFF
+            purpose: "R29 LEFT+RIGHT-only fast path with R27/R28 world classification; performance comparison"
+          - variant: R15_FAST_C2_HUD
+            r26hud: OFF
+            c1: OFF
+            c2: ON
+            range: NONE
+            hud: OFF
+            common: OFF
+            anyz: OFF
+            commonEye: OFF
+            purpose: "R29 fast path plus R30 HUD correction; performance and HUD comparison"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Configure ${{ matrix.variant }}
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          $r33 = if ('${{ matrix.range }}' -eq 'R33_64') {'ON'} else {'OFF'}
+          $r65 = if ('${{ matrix.range }}' -eq 'R65_128') {'ON'} else {'OFF'}
+          $r129 = if ('${{ matrix.range }}' -eq 'R129_256') {'ON'} else {'OFF'}
+          $r257 = if ('${{ matrix.range }}' -eq 'R257_512') {'ON'} else {'OFF'}
+          $r513 = if ('${{ matrix.range }}' -eq 'R513_1024') {'ON'} else {'OFF'}
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 `
+            -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF `
+            -DOUTRUN_VR_R26_HUD_COMPARE=${{ matrix.r26hud }} `
+            -DOUTRUN_VR_C1_COMPARE=${{ matrix.c1 }} `
+            -DOUTRUN_VR_C2_COMPARE=${{ matrix.c2 }} `
+            -DOUTRUN_VR_OVERLAY_OWNER_FIRST=OFF `
+            -DOUTRUN_VR_OVERLAY_LIVE_FIRST=OFF `
+            -DOUTRUN_VR_OVERLAY_WINDOW_32=OFF `
+            -DOUTRUN_VR_OVERLAY_SPATIAL_DEPTH_4=OFF `
+            -DOUTRUN_VR_OVERLAY_SPATIAL_DEPTH_8=OFF `
+            -DOUTRUN_VR_R13_FLAT_PREEMPT=OFF `
+            -DOUTRUN_VR_R13_FLAT_PREEMPT_BROAD=OFF `
+            -DOUTRUN_VR_R13_FLAT_COMMON=${{ matrix.commonEye }} `
+            -DOUTRUN_VR_SMALL_ALPHA_LIMIT_2=OFF `
+            -DOUTRUN_VR_SMALL_ALPHA_LIMIT_4=OFF `
+            -DOUTRUN_VR_SMALL_ALPHA_LIMIT_8=OFF `
+            -DOUTRUN_VR_SMALL_ALPHA_LIMIT_16=OFF `
+            -DOUTRUN_VR_SMALL_ALPHA_LIMIT_32=OFF `
+            -DOUTRUN_VR_ALPHA_RANGE_33_64=$r33 `
+            -DOUTRUN_VR_ALPHA_RANGE_65_128=$r65 `
+            -DOUTRUN_VR_ALPHA_RANGE_129_256=$r129 `
+            -DOUTRUN_VR_ALPHA_RANGE_257_512=$r257 `
+            -DOUTRUN_VR_ALPHA_RANGE_513_1024=$r513 `
+            -DOUTRUN_VR_SMALL_ALPHA_HUD=${{ matrix.hud }} `
+            -DOUTRUN_VR_SMALL_ALPHA_COMMON=${{ matrix.common }} `
+            -DOUTRUN_VR_SMALL_ALPHA_ANYZ_MATRIX=${{ matrix.anyz }}
+      - name: Apply VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+      - name: Build game DLL
+        run: cmake --build build-game --config Release --target outrun2006tweaks
+      - name: Stage game DLL
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force stage | Out-Null
+          $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if (-not $dll) { throw "dinput8.dll missing" }
+          Copy-Item $dll.FullName stage/dinput8.dll
+          @(
+            "variant=${{ matrix.variant }}"
+            "sourceSha=$env:GITHUB_SHA"
+            "r26Hud=${{ matrix.r26hud }}"
+            "c1=${{ matrix.c1 }}"
+            "c2=${{ matrix.c2 }}"
+            "range=${{ matrix.range }}"
+            "hud=${{ matrix.hud }}"
+            "common=${{ matrix.common }}"
+            "anyz=${{ matrix.anyz }}"
+            "purpose=${{ matrix.purpose }}"
+          ) | Set-Content stage/RANGE16_VARIANT.txt -Encoding UTF8
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dx9ex-r16-${{ matrix.variant }}
+          path: stage/
+          if-no-files-found: error
+
+  package:
+    runs-on: windows-2022
+    needs: [host, game]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dx9ex-r16-host
+          path: payload/host
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: dx9ex-r16-R*
+          path: payload/games
+          merge-multiple: false
+      - name: Assemble sixteen tester ZIPs
+        shell: pwsh
+        run: |
+          $variants = @(
+            'R0_BASE_STABLE','R1_HUD_33_64','R2_HUD_65_128','R3_HUD_129_256',
+            'R4_HUD_257_512','R5_HUD_513_1024','R6_COMMON_33_64','R7_COMMON_65_128',
+            'R8_COMMON_129_256','R9_COMMON_257_512','R10_MATRIX_33_64','R11_MATRIX_65_128',
+            'R12_MATRIX_129_256','R13_MATRIX_257_512','R14_FAST_C1','R15_FAST_C2_HUD'
+          )
+          New-Item -ItemType Directory -Force output | Out-Null
+          foreach ($variant in $variants) {
+            $dir = Join-Path package $variant
+            New-Item -ItemType Directory -Force $dir | Out-Null
+            Copy-Item "payload/games/dx9ex-r16-$variant/dinput8.dll" (Join-Path $dir 'dinput8.dll')
+            Copy-Item "payload/games/dx9ex-r16-$variant/RANGE16_VARIANT.txt" (Join-Path $dir 'RANGE16_VARIANT.txt')
+            Copy-Item payload/host/outrun-vr-host.exe (Join-Path $dir 'outrun-vr-host.exe')
+            Copy-Item tools/Run-DX9Ex-Range16-Test.ps1 (Join-Path $dir 'Run-DX9Ex-Range16-Test.ps1')
+            Copy-Item tools/RUN_DX9EX_RANGE16_TEST.cmd (Join-Path $dir 'RUN_DX9EX_RANGE16_TEST.cmd')
+            foreach($f in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe')){
+              if(Test-Path (Join-Path $dir $f)){ throw "Forbidden non-DX9Ex file $f" }
+            }
+            Get-ChildItem $dir -File | Get-FileHash -Algorithm SHA256 | ForEach-Object {
+              "$($_.Hash)  $($_.Path | Split-Path -Leaf)"
+            } | Set-Content (Join-Path $dir 'SHA256SUMS.txt') -Encoding ascii
+            Compress-Archive -Path (Join-Path $dir '*') -DestinationPath (Join-Path output ("OutRun2_VR_DX9EX_R16_{0}.zip" -f $variant)) -Force
+          }
+          if((Get-ChildItem output -Filter '*.zip').Count -ne 16){ throw "Expected 16 zips" }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-DX9EX-RANGE16-${{ github.sha }}
+          path: output/*.zip
+          if-no-files-found: error
