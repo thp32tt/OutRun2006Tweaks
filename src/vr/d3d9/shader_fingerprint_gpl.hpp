@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <mutex>
+#include <utility>
 #include <vector>
 
 namespace OutRunVR::GplShaderFingerprint
@@ -194,10 +195,11 @@ namespace OutRunVR::GplShaderFingerprint
 
         static std::mutex seenMutex;
         static std::array<Seen, 256> seen{};
-        static std::size_t count = 0;
+        static std::size_t seenCount = 0;
+        static std::size_t nextSeen = 0;
         std::lock_guard<std::mutex> lock(seenMutex);
 
-        for (std::size_t i = 0; i < count; ++i)
+        for (std::size_t i = 0; i < seenCount; ++i)
         {
             if (seen[i].vs == pair.vertex.value &&
                 seen[i].ps == pair.pixel.value &&
@@ -210,10 +212,10 @@ namespace OutRunVR::GplShaderFingerprint
             pair.vertex.value, pair.pixel.value,
             pair.vertexIdentity, pair.pixelIdentity
         };
-        if (count < seen.size())
-            seen[count++] = item;
-        else
-            seen[count++ % seen.size()] = item;
+        seen[nextSeen] = item;
+        nextSeen = (nextSeen + 1) % seen.size();
+        if (seenCount < seen.size())
+            ++seenCount;
         return true;
     }
 }
