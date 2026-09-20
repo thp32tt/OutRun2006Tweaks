@@ -108,7 +108,8 @@ jobs:
             "VR stereo: D3D9 full-eye renderer installed",
             "VR R13: stereo hardening ACTIVE",
             "VR R13: auxiliary/offscreen c64 WVP kept stock",
-            "VR v3 shadow: live dual-protocol diagnostics active"
+            "VR v3 shadow: live dual-protocol diagnostics active",
+            "VR GPL SHADER: pair="
           )
           foreach ($marker in $markers) {
             if (-not $ascii.Contains($marker)) { throw "missing compiled marker: $marker" }
@@ -168,6 +169,8 @@ jobs:
           if (-not (Test-Path build/bin/LICENSES.txt)) { throw 'LICENSES.txt was not generated' }
           if (Test-Path COPYING.GPL3) { Copy-Item COPYING.GPL3 build/bin/COPYING.GPL3 }
           if (Test-Path THIRD_PARTY_NOTICES.md) { Copy-Item THIRD_PARTY_NOTICES.md build/bin/THIRD_PARTY_NOTICES.md }
+          if (-not (Test-Path build/bin/COPYING.GPL3)) { throw 'GPLv3 text is missing from binary distribution' }
+          if (-not (Test-Path build/bin/THIRD_PARTY_NOTICES.md)) { throw 'third-party notices are missing from binary distribution' }
           Write-Host ("Collected {0} unique license/notice texts" -f $seen.Count)
 
       - name: Upload binary
