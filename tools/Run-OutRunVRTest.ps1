@@ -58,7 +58,37 @@ if($stale){
 $state=Get-Content $current -Raw|ConvertFrom-Json
 Write-Host "Starting test session: $($state.SessionId)"
 Write-Host "Backend: $backend"
-$p=Start-Process -FilePath $game -WorkingDirectory $root -PassThru
+
+# DXVK/Vulkan safety: third-party implicit capture/overlay layers can crash
+# vkCreateInstance before DXVK gets control. The observed Bandicam path was
+# bdcamvk32.dll -> NVIDIA vkCreateInstance. Run the DXVK comparison with
+# implicit layers disabled and clear legacy forced instance layers.
+$dxvkMode = $backend -eq 'dxvk-safe' -or $backend -eq 'dxvk'
+$oldVkDisable = $env:VK_LOADER_LAYERS_DISABLE
+$oldVkInstanceLayers = $env:VK_INSTANCE_LAYERS
+$oldVkDebug = $env:VK_LOADER_DEBUG
+if($dxvkMode){
+    $env:VK_LOADER_LAYERS_DISABLE='~implicit~'
+    $env:VK_INSTANCE_LAYERS=$null
+    $env:VK_LOADER_DEBUG='error,warn,layer'
+    $bandicam=Get-Process -ErrorAction SilentlyContinue|Where-Object{
+        $_.ProcessName -match '^bdcam' -or $_.ProcessName -match 'bandicam'
+    }
+    if($bandicam){
+        Write-Warning 'Bandicam process detected. Vulkan implicit layers are disabled for this launch; close Bandicam too if DXVK still crashes.'
+    }
+    Write-Host 'DXVK Vulkan safety: implicit layers disabled for this test process.'
+}
+
+try{
+    $p=Start-Process -FilePath $game -WorkingDirectory $root -PassThru
+} finally {
+    if($dxvkMode){
+        $env:VK_LOADER_LAYERS_DISABLE=$oldVkDisable
+        $env:VK_INSTANCE_LAYERS=$oldVkInstanceLayers
+        $env:VK_LOADER_DEBUG=$oldVkDebug
+    }
+}
 $p.WaitForExit()
 
 # Give the auto-launched host a short chance to flush and exit normally.
