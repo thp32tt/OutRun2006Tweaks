@@ -1,4 +1,31 @@
 #include "hook_mgr.hpp"
+#include "plugin.hpp"
+
+#include <cstdlib>
+#include <cstring>
+
+
+namespace
+{
+    bool IsVrHookDescription(std::string_view description) noexcept
+    {
+        return description.starts_with("OpenXRVR") ||
+            description.starts_with("OpenXVRR");
+    }
+
+    bool VrHooksEnabledForProcess() noexcept
+    {
+        const char* forceDisabled = std::getenv("OUTRUN_VR_FORCE_DISABLED");
+        if (forceDisabled && *forceDisabled &&
+            (std::strcmp(forceDisabled, "1") == 0 ||
+             _stricmp(forceDisabled, "true") == 0 ||
+             _stricmp(forceDisabled, "on") == 0))
+        {
+            return false;
+        }
+        return Settings::VREnabled.get();
+    }
+}
 
 Hook::Hook()
 {
@@ -13,6 +40,15 @@ void HookManager::ApplyHooks()
 
         hook->is_active_.store(false, std::memory_order_release);
         hook->has_error_.store(false, std::memory_order_release);
+
+        const auto desc = hook->description();
+        if (IsVrHookDescription(desc) && !VrHooksEnabledForProcess())
+        {
+            if (!desc.empty())
+                spdlog::info("{}: skipped because VR is disabled for this process", desc);
+            continue;
+        }
+
         if (hook->validate())
         {
             const bool active = hook->apply();
