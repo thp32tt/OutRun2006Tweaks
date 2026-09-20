@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <cstring>
 #include <cwchar>
+#include <filesystem>
 #include <new>
 #include <mutex>
 #include <utility>
@@ -21,8 +22,7 @@
 
 namespace Settings
 {
-    extern Setting<bool> VRPreferD3D9On12;
-    extern Setting<bool> VRPreferD3D9Ex;
+    extern Setting<bool> VREnabled;
 }
 
 namespace OutRunVRD3D9ExUpgrade
@@ -30,7 +30,6 @@ namespace OutRunVRD3D9ExUpgrade
     namespace
     {
         using Direct3DCreate9Fn = IDirect3D9* (WINAPI*)(UINT);
-        using Direct3DCreate9ExFn = HRESULT (WINAPI*)(UINT, IDirect3D9Ex**);
 
         constexpr std::size_t TestCooperativeLevelVtableIndex = 3;
         constexpr std::size_t EvictManagedResourcesVtableIndex = 5;
@@ -44,8 +43,8 @@ namespace OutRunVRD3D9ExUpgrade
         Direct3DCreate9Fn OriginalDirect3DCreate9 = nullptr;
         std::atomic<bool> FirstUpgradeLogged{false};
         std::atomic<bool> FirstOn12Logged{false};
-        std::atomic<bool> FirstOn12FallbackLogged{false};
-        std::atomic<bool> FirstFallbackLogged{false};
+        std::atomic<bool> FirstOn12FailureLogged{false};
+        std::atomic<bool> FirstDeviceFailureLogged{false};
         std::atomic<bool> ThirdPartyLogged{false};
         std::atomic<bool> FirstCreateFlagsLogged{false};
         std::atomic<bool> FirstPureDeviceFallbackLogged{false};
@@ -602,8 +601,8 @@ namespace OutRunVRD3D9ExUpgrade
         class Direct3D9ExCompat final : public IDirect3D9
         {
         public:
-            Direct3D9ExCompat(IDirect3D9Ex* ex, IDirect3D9* fallback) noexcept
-                : ex_(ex), fallback_(fallback)
+            explicit Direct3D9ExCompat(IDirect3D9Ex* ex) noexcept
+                : ex_(ex)
             {
             }
 
@@ -619,7 +618,7 @@ namespace OutRunVRD3D9ExUpgrade
                 }
                 if (riid == __uuidof(IDirect3D9Ex) && ex_)
                     return ex_->QueryInterface(riid, object);
-                return fallback_ ? fallback_->QueryInterface(riid, object) : E_NOINTERFACE;
+                return ex_ ? ex_->QueryInterface(riid, object) : E_NOINTERFACE;
             }
 
             ULONG STDMETHODCALLTYPE AddRef() override
@@ -632,7 +631,6 @@ namespace OutRunVRD3D9ExUpgrade
                 const LONG refs = InterlockedDecrement(&refs_);
                 if (refs == 0)
                 {
-                    if (fallback_) fallback_->Release();
                     if (ex_) ex_->Release();
                     delete this;
                     return 0;
@@ -642,77 +640,71 @@ namespace OutRunVRD3D9ExUpgrade
 
             HRESULT STDMETHODCALLTYPE RegisterSoftwareDevice(void* initializeFunction) override
             {
-                return fallback_->RegisterSoftwareDevice(initializeFunction);
+                return ex_->RegisterSoftwareDevice(initializeFunction);
             }
-            UINT STDMETHODCALLTYPE GetAdapterCount() override { return fallback_->GetAdapterCount(); }
+            UINT STDMETHODCALLTYPE GetAdapterCount() override { return ex_->GetAdapterCount(); }
             HRESULT STDMETHODCALLTYPE GetAdapterIdentifier(UINT a, DWORD f, D3DADAPTER_IDENTIFIER9* i) override
-            { return fallback_->GetAdapterIdentifier(a, f, i); }
+            { return ex_->GetAdapterIdentifier(a, f, i); }
             UINT STDMETHODCALLTYPE GetAdapterModeCount(UINT a, D3DFORMAT f) override
-            { return fallback_->GetAdapterModeCount(a, f); }
+            { return ex_->GetAdapterModeCount(a, f); }
             HRESULT STDMETHODCALLTYPE EnumAdapterModes(UINT a, D3DFORMAT f, UINT m, D3DDISPLAYMODE* mode) override
-            { return fallback_->EnumAdapterModes(a, f, m, mode); }
+            { return ex_->EnumAdapterModes(a, f, m, mode); }
             HRESULT STDMETHODCALLTYPE GetAdapterDisplayMode(UINT a, D3DDISPLAYMODE* mode) override
-            { return fallback_->GetAdapterDisplayMode(a, mode); }
+            { return ex_->GetAdapterDisplayMode(a, mode); }
             HRESULT STDMETHODCALLTYPE CheckDeviceType(UINT a, D3DDEVTYPE t, D3DFORMAT af, D3DFORMAT bf, BOOL w) override
-            { return fallback_->CheckDeviceType(a, t, af, bf, w); }
+            { return ex_->CheckDeviceType(a, t, af, bf, w); }
             HRESULT STDMETHODCALLTYPE CheckDeviceFormat(UINT a, D3DDEVTYPE t, D3DFORMAT af, DWORD u, D3DRESOURCETYPE r, D3DFORMAT cf) override
-            { return fallback_->CheckDeviceFormat(a, t, af, u, r, cf); }
+            { return ex_->CheckDeviceFormat(a, t, af, u, r, cf); }
             HRESULT STDMETHODCALLTYPE CheckDeviceMultiSampleType(UINT a, D3DDEVTYPE t, D3DFORMAT sf, BOOL w,
                 D3DMULTISAMPLE_TYPE mt, DWORD* q) override
-            { return fallback_->CheckDeviceMultiSampleType(a, t, sf, w, mt, q); }
+            { return ex_->CheckDeviceMultiSampleType(a, t, sf, w, mt, q); }
             HRESULT STDMETHODCALLTYPE CheckDepthStencilMatch(UINT a, D3DDEVTYPE t, D3DFORMAT af,
                 D3DFORMAT rf, D3DFORMAT df) override
-            { return fallback_->CheckDepthStencilMatch(a, t, af, rf, df); }
+            { return ex_->CheckDepthStencilMatch(a, t, af, rf, df); }
             HRESULT STDMETHODCALLTYPE CheckDeviceFormatConversion(UINT a, D3DDEVTYPE t, D3DFORMAT s, D3DFORMAT d) override
-            { return fallback_->CheckDeviceFormatConversion(a, t, s, d); }
+            { return ex_->CheckDeviceFormatConversion(a, t, s, d); }
             HRESULT STDMETHODCALLTYPE GetDeviceCaps(UINT a, D3DDEVTYPE t, D3DCAPS9* caps) override
-            { return fallback_->GetDeviceCaps(a, t, caps); }
+            { return ex_->GetDeviceCaps(a, t, caps); }
             HMONITOR STDMETHODCALLTYPE GetAdapterMonitor(UINT a) override
-            { return fallback_->GetAdapterMonitor(a); }
+            { return ex_->GetAdapterMonitor(a); }
 
             HRESULT STDMETHODCALLTYPE CreateDevice(UINT adapter, D3DDEVTYPE type, HWND focusWindow,
                 DWORD behaviorFlags, D3DPRESENT_PARAMETERS* params, IDirect3DDevice9** device) override
             {
-                if (!device || !params) return D3DERR_INVALIDCALL;
+                if (!device || !params)
+                    return D3DERR_INVALIDCALL;
                 *device = nullptr;
 
-                // D3DPRESENT_PARAMETERS is an in/out contract. Preserve the
-                // game's original request so a failed Ex attempt cannot poison
-                // the classic fallback with mutated presentation values.
-                const D3DPRESENT_PARAMETERS originalParams = *params;
-                auto classicFallback = [&]() -> HRESULT
-                {
-                    *params = originalParams;
-                    return fallback_->CreateDevice(adapter, type, focusWindow,
-                        behaviorFlags, params, device);
-                };
+                spdlog::info(
+                    "VR DX12 STRICT: CreateDevice request adapter={} type={} flags=0x{:08X} windowed={} backbuffer={}x{} fmt={} count={} swap={} interval={} autoDepth={} depthFmt={}",
+                    adapter,
+                    static_cast<unsigned>(type),
+                    static_cast<unsigned>(behaviorFlags),
+                    params->Windowed ? 1 : 0,
+                    params->BackBufferWidth,
+                    params->BackBufferHeight,
+                    static_cast<int>(params->BackBufferFormat),
+                    params->BackBufferCount,
+                    static_cast<int>(params->SwapEffect),
+                    params->PresentationInterval,
+                    params->EnableAutoDepthStencil ? 1 : 0,
+                    static_cast<int>(params->AutoDepthStencilFormat));
 
-                // A wrapper may outlive a failed first Ex promotion attempt.
-                // Re-check the final overlay for every CreateDevice call so a
-                // later retry cannot re-enter a compatibility stack that R15
-                // deliberately disarmed after a transactional failure.
                 if (!FinalCompatOverlayReady.load(std::memory_order_acquire))
                 {
-                    if (!FirstOverlayUnavailableLogged.exchange(true))
-                        spdlog::warn(
-                            "VR D3D9Ex startup: final R15 compatibility overlay became unavailable after wrapper creation; subsequent CreateDevice stays on classic D3D9");
-                    return classicFallback();
+                    spdlog::error(
+                        "VR DX12 STRICT FAIL stage=CreateDevice reason=compat-overlay-not-ready hr=0x{:08X}; no D3D9Ex/classic fallback will be attempted",
+                        static_cast<unsigned>(D3DERR_NOTAVAILABLE));
+                    return D3DERR_NOTAVAILABLE;
                 }
 
-                if (!FirstCreateFlagsLogged.exchange(true))
-                {
-                    spdlog::info(
-                        "VR D3D9Ex startup: CreateDevice flags=0x{:08X} multithreaded={} pureDevice={}",
-                        static_cast<unsigned>(behaviorFlags),
-                        (behaviorFlags & D3DCREATE_MULTITHREADED) != 0,
-                        (behaviorFlags & D3DCREATE_PUREDEVICE) != 0);
-                }
                 if ((behaviorFlags & D3DCREATE_PUREDEVICE) != 0)
                 {
-                    if (!FirstPureDeviceFallbackLogged.exchange(true))
-                        spdlog::warn(
-                            "VR D3D9Ex startup: D3DCREATE_PUREDEVICE detected; Ex promotion skipped and classic D3D9 retained");
-                    return classicFallback();
+                    spdlog::error(
+                        "VR DX12 STRICT FAIL stage=CreateDevice reason=pure-device-request flags=0x{:08X} hr=0x{:08X}; request is left unmodified for diagnosis",
+                        static_cast<unsigned>(behaviorFlags),
+                        static_cast<unsigned>(D3DERR_NOTAVAILABLE));
+                    return D3DERR_NOTAVAILABLE;
                 }
 
                 D3DDISPLAYMODEEX fullscreen{};
@@ -730,7 +722,17 @@ namespace OutRunVRD3D9ExUpgrade
                         D3DDISPLAYROTATION rotation = D3DDISPLAYROTATION_IDENTITY;
                         D3DDISPLAYMODEEX current{};
                         current.Size = sizeof(current);
-                        if (SUCCEEDED(ex_->GetAdapterDisplayModeEx(adapter, &current, &rotation)))
+                        const HRESULT modeHr =
+                            ex_->GetAdapterDisplayModeEx(adapter, &current, &rotation);
+                        spdlog::info(
+                            "VR DX12 STRICT: GetAdapterDisplayModeEx hr=0x{:08X} current={}x{} fmt={} refresh={} scan={}",
+                            static_cast<unsigned>(modeHr),
+                            current.Width,
+                            current.Height,
+                            static_cast<int>(current.Format),
+                            current.RefreshRate,
+                            static_cast<int>(current.ScanLineOrdering));
+                        if (SUCCEEDED(modeHr))
                         {
                             if (!fullscreen.Width) fullscreen.Width = current.Width;
                             if (!fullscreen.Height) fullscreen.Height = current.Height;
@@ -745,63 +747,95 @@ namespace OutRunVRD3D9ExUpgrade
                 }
 
                 IDirect3DDevice9Ex* deviceEx = nullptr;
-                HRESULT hr = ex_ ? ex_->CreateDeviceEx(adapter, type, focusWindow, behaviorFlags,
-                    params, fullscreenPtr, &deviceEx) : E_FAIL;
-                if (SUCCEEDED(hr) && deviceEx)
-                {
-                    if (!InstallManagedResourceCompat(deviceEx))
-                    {
-                        deviceEx->Release();
-                        deviceEx = nullptr;
-                        if (!FirstFallbackLogged.exchange(true))
-                        {
-                            spdlog::warn(
-                                "VR D3D9Ex upgrade: Ex device created but managed-resource compatibility layer could not be installed; falling back to original D3D9 device");
-                        }
-                        return classicFallback();
-                    }
+                const HRESULT hr = ex_ ? ex_->CreateDeviceEx(
+                    adapter, type, focusWindow, behaviorFlags,
+                    params, fullscreenPtr, &deviceEx) : E_POINTER;
 
-                    *device = static_cast<IDirect3DDevice9*>(deviceEx);
-                    UpdateCompatPresentationState(*device, params);
-                    if (!FirstUpgradeLogged.exchange(true))
-                    {
-                        spdlog::info(
-                            "VR D3D9Ex upgrade: game CreateDevice promoted to CreateDeviceEx with managed-resource compatibility; existing 4-slot zero-copy eye transport is eligible");
-                    }
-                    return hr;
+                spdlog::info(
+                    "VR DX12 STRICT: CreateDeviceEx returned hr=0x{:08X} device={:p}",
+                    static_cast<unsigned>(hr), fmt::ptr(deviceEx));
+
+                if (FAILED(hr) || !deviceEx)
+                {
+                    if (!FirstDeviceFailureLogged.exchange(true))
+                        spdlog::error(
+                            "VR DX12 STRICT FAIL stage=CreateDeviceEx hr=0x{:08X} adapter={} type={} flags=0x{:08X}; D3D9Ex/classic fallback REMOVED",
+                            static_cast<unsigned>(hr), adapter,
+                            static_cast<unsigned>(type),
+                            static_cast<unsigned>(behaviorFlags));
+                    if (deviceEx) deviceEx->Release();
+                    return FAILED(hr) ? hr : E_FAIL;
                 }
 
-                if (!FirstFallbackLogged.exchange(true))
+                IDirect3DDevice9On12* on12 = nullptr;
+                const HRESULT on12Qi = deviceEx->QueryInterface(
+                    __uuidof(IDirect3DDevice9On12),
+                    reinterpret_cast<void**>(&on12));
+                if (FAILED(on12Qi) || !on12)
                 {
-                    spdlog::warn(
-                        "VR D3D9Ex upgrade: CreateDeviceEx failed HRESULT=0x{:08X}; falling back to original IDirect3D9::CreateDevice",
-                        static_cast<unsigned>(hr));
+                    spdlog::error(
+                        "VR DX12 STRICT FAIL stage=VerifyOn12 reason=IDirect3DDevice9On12-QI hr=0x{:08X}; refusing non-D3D9On12 device",
+                        static_cast<unsigned>(on12Qi));
+                    if (on12) on12->Release();
+                    deviceEx->Release();
+                    return FAILED(on12Qi) ? on12Qi : E_NOINTERFACE;
                 }
-                return classicFallback();
+
+                ID3D12Device* underlying12 = nullptr;
+                const HRESULT d12Hr = on12->GetD3D12Device(
+                    __uuidof(ID3D12Device),
+                    reinterpret_cast<void**>(&underlying12));
+                if (FAILED(d12Hr) || !underlying12)
+                {
+                    spdlog::error(
+                        "VR DX12 STRICT FAIL stage=VerifyOn12 reason=GetD3D12Device hr=0x{:08X}; refusing device without an underlying D3D12 device",
+                        static_cast<unsigned>(d12Hr));
+                    if (underlying12) underlying12->Release();
+                    on12->Release();
+                    deviceEx->Release();
+                    return FAILED(d12Hr) ? d12Hr : E_NOINTERFACE;
+                }
+
+                const LUID luid = underlying12->GetAdapterLuid();
+                spdlog::info(
+                    "VR DX12 STRICT: verified IDirect3DDevice9On12 + ID3D12Device adapterLuid={:08X}:{:08X} nodeCount={}",
+                    static_cast<std::uint32_t>(luid.HighPart),
+                    luid.LowPart,
+                    underlying12->GetNodeCount());
+
+                underlying12->Release();
+                on12->Release();
+
+                if (!InstallManagedResourceCompat(deviceEx))
+                {
+                    spdlog::error(
+                        "VR DX12 STRICT FAIL stage=CompatInstall reason=managed-resource-compat-install-failed; D3D9Ex/classic fallback REMOVED");
+                    deviceEx->Release();
+                    return E_FAIL;
+                }
+
+                *device = static_cast<IDirect3DDevice9*>(deviceEx);
+                UpdateCompatPresentationState(*device, params);
+                if (!FirstUpgradeLogged.exchange(true))
+                {
+                    spdlog::info(
+                        "VR DX12 STRICT PASS: OutRun game device is D3D9On12-backed D3D12; no native D3D9Ex/classic fallback path exists");
+                }
+                return D3D_OK;
             }
 
         private:
             volatile LONG refs_ = 1;
             IDirect3D9Ex* ex_ = nullptr;
-            IDirect3D9* fallback_ = nullptr;
         };
 
         IDirect3D9* WINAPI HookedDirect3DCreate9(UINT sdkVersion)
         {
             if (!OriginalDirect3DCreate9)
-                return nullptr;
-
-            IDirect3D9* fallback = OriginalDirect3DCreate9(sdkVersion);
-            if (!fallback ||
-                (!Settings::VRPreferD3D9On12 && !Settings::VRPreferD3D9Ex))
-                return fallback;
-
-            if (!FinalCompatOverlayReady.load(std::memory_order_acquire))
             {
-                if (!FirstOverlayUnavailableLogged.exchange(true))
-                    spdlog::error(
-                        "VR D3D9 backend startup: final R15 compatibility overlay is not ready; promotion skipped to preserve classic startup");
-                return fallback;
+                spdlog::error(
+                    "VR DX12 STRICT FAIL stage=Direct3DCreate9 reason=original-import-null");
+                return nullptr;
             }
 
             HMODULE provider = nullptr;
@@ -809,80 +843,82 @@ namespace OutRunVRD3D9ExUpgrade
                     reinterpret_cast<const void*>(OriginalDirect3DCreate9),
                     provider))
             {
-                if (!ThirdPartyLogged.exchange(true))
-                    spdlog::warn(
-                        "VR D3D9 backend: third-party d3d9 provider detected; D3D9On12/D3D9Ex promotion skipped to preserve wrapper compatibility");
-                return fallback;
+                HMODULE discovered = nullptr;
+                GetModuleHandleExW(
+                    GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                    GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                    reinterpret_cast<LPCWSTR>(OriginalDirect3DCreate9),
+                    &discovered);
+                wchar_t modulePath[MAX_PATH]{};
+                if (discovered)
+                    GetModuleFileNameW(discovered, modulePath, MAX_PATH);
+                spdlog::error(
+                    "VR DX12 STRICT FAIL stage=Provider reason=non-system-d3d9 provider={} sdkVersion={}; third-party/native fallback is disabled",
+                    modulePath[0] ? std::filesystem::path(modulePath).string() : std::string("<unknown>"),
+                    sdkVersion);
+                return nullptr;
             }
 
-            auto wrapEx = [&](IDirect3D9Ex* exDevice) -> IDirect3D9*
+            wchar_t providerPath[MAX_PATH]{};
+            GetModuleFileNameW(provider, providerPath, MAX_PATH);
+            spdlog::info(
+                "VR DX12 STRICT: Direct3DCreate9 intercepted sdkVersion={} provider={}",
+                sdkVersion,
+                providerPath[0] ? std::filesystem::path(providerPath).string() : std::string("<unknown>"));
+
+            const auto createOn12Ex =
+                reinterpret_cast<PFN_Direct3DCreate9On12Ex>(
+                    GetProcAddress(provider, "Direct3DCreate9On12Ex"));
+            if (!createOn12Ex)
             {
-                if (!exDevice)
-                    return fallback;
-                auto* wrapper =
-                    new (std::nothrow) Direct3D9ExCompat(exDevice, fallback);
-                if (!wrapper)
-                {
-                    exDevice->Release();
-                    return fallback;
-                }
-                return wrapper;
-            };
-
-            if (Settings::VRPreferD3D9On12)
-            {
-                const auto createOn12Ex =
-                    reinterpret_cast<PFN_Direct3DCreate9On12Ex>(
-                        GetProcAddress(provider, "Direct3DCreate9On12Ex"));
-                if (createOn12Ex)
-                {
-                    D3D9ON12_ARGS args{};
-                    args.Enable9On12 = TRUE;
-                    // Let the Windows translation layer select/create the D3D12
-                    // device for the adapter requested later by CreateDeviceEx.
-                    // Milestone 2 will query IDirect3DDevice9On12 and use the
-                    // underlying device for explicit VR resource interop.
-                    args.pD3D12Device = nullptr;
-                    args.NumQueues = 0;
-                    args.NodeMask = 0;
-
-                    IDirect3D9Ex* on12 = nullptr;
-                    const HRESULT on12Hr = createOn12Ex(
-                        sdkVersion, &args, 1, &on12);
-                    if (SUCCEEDED(on12Hr) && on12)
-                    {
-                        if (!FirstOn12Logged.exchange(true))
-                            spdlog::info(
-                                "VR DX12 POC: Direct3DCreate9On12Ex selected; OutRun D3D9 commands will execute through the Windows D3D12 translation layer");
-                        return wrapEx(on12);
-                    }
-
-                    if (!FirstOn12FallbackLogged.exchange(true))
-                        spdlog::warn(
-                            "VR DX12 POC: Direct3DCreate9On12Ex failed HRESULT=0x{:08X}; falling back to guarded D3D9Ex/classic D3D9",
-                            static_cast<unsigned>(on12Hr));
-                }
-                else if (!FirstOn12FallbackLogged.exchange(true))
-                {
-                    spdlog::warn(
-                        "VR DX12 POC: system d3d9.dll does not export Direct3DCreate9On12Ex; falling back to guarded D3D9Ex/classic D3D9");
-                }
+                const DWORD error = GetLastError();
+                if (!FirstOn12FailureLogged.exchange(true))
+                    spdlog::error(
+                        "VR DX12 STRICT FAIL stage=GetProcAddress reason=Direct3DCreate9On12Ex-missing win32Error={}; no D3D9Ex/classic fallback",
+                        error);
+                return nullptr;
             }
 
-            if (!Settings::VRPreferD3D9Ex)
-                return fallback;
+            D3D9ON12_ARGS args{};
+            args.Enable9On12 = TRUE;
+            args.pD3D12Device = nullptr;
+            args.NumQueues = 0;
+            args.NodeMask = 0;
 
-            const auto createEx = reinterpret_cast<Direct3DCreate9ExFn>(
-                GetProcAddress(provider, "Direct3DCreate9Ex"));
-            if (!createEx)
-                return fallback;
+            IDirect3D9Ex* on12 = nullptr;
+            const HRESULT on12Hr = createOn12Ex(
+                sdkVersion, &args, 1, &on12);
+            spdlog::info(
+                "VR DX12 STRICT: Direct3DCreate9On12Ex returned hr=0x{:08X} interface={:p} enable9on12={} queues={} nodeMask={}",
+                static_cast<unsigned>(on12Hr),
+                fmt::ptr(on12),
+                args.Enable9On12 ? 1 : 0,
+                args.NumQueues,
+                args.NodeMask);
 
-            IDirect3D9Ex* exDevice = nullptr;
-            const HRESULT hr = createEx(sdkVersion, &exDevice);
-            if (FAILED(hr) || !exDevice)
-                return fallback;
+            if (FAILED(on12Hr) || !on12)
+            {
+                if (!FirstOn12FailureLogged.exchange(true))
+                    spdlog::error(
+                        "VR DX12 STRICT FAIL stage=Direct3DCreate9On12Ex hr=0x{:08X} interface={:p}; D3D9Ex/classic fallback REMOVED",
+                        static_cast<unsigned>(on12Hr), fmt::ptr(on12));
+                if (on12) on12->Release();
+                return nullptr;
+            }
 
-            return wrapEx(exDevice);
+            auto* wrapper = new (std::nothrow) Direct3D9ExCompat(on12);
+            if (!wrapper)
+            {
+                spdlog::error(
+                    "VR DX12 STRICT FAIL stage=WrapperAlloc reason=out-of-memory; releasing D3D9On12 interface");
+                on12->Release();
+                return nullptr;
+            }
+
+            if (!FirstOn12Logged.exchange(true))
+                spdlog::info(
+                    "VR DX12 STRICT PASS stage=Direct3DCreate9On12Ex; only D3D9On12 -> D3D12 is allowed on this branch");
+            return wrapper;
         }
 
         bool PatchDirect3DCreate9Import() noexcept
@@ -936,23 +972,16 @@ namespace OutRunVRD3D9ExUpgrade
     {
     public:
         std::string_view description() override { return "OpenXRVRD3D9ExUpgrade"; }
-        void declare_settings() override
-        {
-            Settings::VRPreferD3D9On12.needs_restart();
-            Settings::VRPreferD3D9Ex.needs_restart();
-        }
-        bool validate() override
-        {
-            return Settings::VRPreferD3D9On12 || Settings::VRPreferD3D9Ex;
-        }
+        void declare_settings() override {}
+        bool validate() override { return true; }
         bool apply() override
         {
             if (!PatchDirect3DCreate9Import())
             {
-                spdlog::warn("VR D3D9Ex upgrade: Direct3DCreate9 IAT entry was not found/patched; original D3D9 path remains active");
-                return true;
+                spdlog::error("VR DX12 STRICT FAIL stage=IATPatch reason=Direct3DCreate9-import-not-found; DX12 branch cannot start");
+                return false;
             }
-            spdlog::info("VR DX12 POC: Direct3DCreate9 IAT hook armed; backend order is D3D9On12 -> guarded D3D9Ex -> classic D3D9");
+            spdlog::info("VR DX12 STRICT: Direct3DCreate9 IAT hook armed; only D3D9On12 -> D3D12 is permitted, all D3D9Ex/classic fallbacks removed");
             return true;
         }
 

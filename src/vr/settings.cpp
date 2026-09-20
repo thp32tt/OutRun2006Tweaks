@@ -40,10 +40,6 @@ namespace Settings
 		"Applies the OpenXR HMD orientation at OutRun's verified D3D9 WorldViewProjection upload." };
 	Setting<bool> VRStereo{ "VR", "Stereo", true,
 		"Renders true left/right geometry stereo into verified shared-eye transport. Menus use a LOCAL-space world-fixed mono quad so head rotation and translation remain 6DoF." };
-	Setting<bool> VRPreferD3D9On12{ "VR", "PreferD3D9On12", true,
-		"DX12 PoC: asks the Windows D3D9 runtime to create the game device through D3D9On12. Falls back to the guarded D3D9Ex path if unavailable." };
-	Setting<bool> VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", true,
-		"Fallback/backend compatibility path: prefers guarded D3D9Ex shared-eye transport when D3D9On12 is disabled or unavailable." };
 	Setting<bool> VRDirectGpuOnly{ "VR", "DirectGpuOnly", true,
 		"During gameplay, rejects classic Desktop-Duplication stereo candidates and keeps DirectGPU/cached OpenXR projection paths only. Menus remain mono on a world-fixed LOCAL-space quad." };
 	Setting<bool> VRDisableDesktopDuplication{ "VR", "DisableDesktopDuplication", false,
@@ -195,8 +191,6 @@ namespace OutRunVR
 			Settings::VRAutoLaunchHost.needs_restart();
 			Settings::VRMirrorFitDesktop.needs_restart();
 			Settings::VRDisableDesktopVsync.needs_restart();
-			Settings::VRPreferD3D9On12.needs_restart();
-			Settings::VRPreferD3D9Ex.needs_restart();
 			Settings::VRDirectGpuOnly.needs_restart();
 			Settings::VRDisableDesktopDuplication.needs_restart();
 			Settings::VRTargetRefreshRateHz.needs_restart();
@@ -209,9 +203,7 @@ namespace OutRunVR
 		bool apply() override
 		{
 			spdlog::info(
-				"VR DX12 POC: D3D9On12 preference={} D3D9Ex fallback={} directOnly={} refreshOverrideHz={:.1f} cadenceMode={} cadenceTargetHz={:.1f} cadenceMaxHz={:.1f}; simulation remains 60 Hz",
-				Settings::VRPreferD3D9On12.get(),
-				Settings::VRPreferD3D9Ex.get(),
+				"VR DX12 STRICT: backend=D3D9On12-only fallback=NONE directOnly={} refreshOverrideHz={:.1f} cadenceMode={} cadenceTargetHz={:.1f} cadenceMaxHz={:.1f}; simulation remains 60 Hz",
 				Settings::VRDirectGpuOnly.get(),
 				Settings::VRTargetRefreshRateHz.get(),
 				Settings::VRFrameCadenceMode.get(),
