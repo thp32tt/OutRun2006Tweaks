@@ -352,8 +352,10 @@ require(
 effect_policy = require(
     "src/vr/d3d9/vr_pass_policy.hpp",
     "Depth testing is the decisive",
-    "depthTestEnabled",
-    "depthDisabledFlatEffect",
+    "if (!depthTestEnabled)",
+    "return EffectStereoPolicy::ZeroDisparity;",
+    "ClassifyEffectStereo(true, false, false, false, true)",
+    "EffectStereoPolicy::ZeroDisparity",
 )
 if "cullNone && alphaBlendEnabled && !depthWriteEnabled;" in effect_policy:
     raise SystemExit(
