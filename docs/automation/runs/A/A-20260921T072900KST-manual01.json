@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "role": "A",
+  "runId": "A-20260921T072900KST-manual01",
+  "startedKst": "2026-09-21T07:29:00+09:00",
+  "completedKst": "2026-09-21T07:34:55+09:00",
+  "baseSha": "e5e35f483cf7f8d36f99a87807ba6cb9d4b7eccd",
+  "findingIds": [
+    "DX9EX-FINGERPRINT-001",
+    "DX9EX-DISPATCH-XYZRHW-001",
+    "DX9EX-SKYGLOW-001"
+  ],
+  "inputHashes": {
+    "src/vr/d3d9/stereo_renderer_r30.cpp": "bc7eb2c152d82b3a42df13d8361d31cffe7d31b9",
+    "src/vr/d3d9/stereo_renderer_r31.cpp": "94678c9d21449f750e9268ba229e0084d0470aed",
+    "src/vr/d3d9/stereo_renderer_r32.cpp": "301f300075f0cb27c7b6daa6f3c205cdc74318a4",
+    "src/vr/d3d9/stereo_renderer_r33.cpp": "c7bf2dc8ebe6152ad2d71bd718877f17ac651796",
+    "src/vr/d3d9/stereo_renderer_r34.cpp": "2d5b4557d62521d9f1a26cf1c78d1c3b96c09a2b",
+    "src/vr/game/outrun_renderer_r29.cpp": "2e1748f1f882d362c878d39a11e62896c67dc751"
+  },
+  "changedPaths": [
+    "docs/automation/runs/A/A-20260921T072900KST-manual01.json",
+    "docs/automation/runs/A/A-20260921T072900KST-manual01.md"
+  ],
+  "candidateBranch": null,
+  "candidateSha": null,
+  "ci": {
+    "workflow": null,
+    "runId": null,
+    "status": null,
+    "artifactIds": []
+  },
+  "evidenceLevel": "STATICALLY_VERIFIED",
+  "queueProposal": [
+    {
+      "id": "DX9EX-FINGERPRINT-001",
+      "status": "READY",
+      "preferredRole": "A_REVIEW",
+      "testLevel": "LEVEL0",
+      "proposal": "Refine the fingerprint around the already-bounded R30 XYZRHW envelope: no vertex shader + D3DFVF_XYZRHW, then projection-consistent Z/RHW relation separates CPU-projected smoke/skid/decal world effects from white HUD/rank/score glyphs. Do not broaden WVP ownership."
+    },
+    {
+      "id": "DX9EX-DISPATCH-XYZRHW-001",
+      "status": "READY",
+      "priority": 10,
+      "preferredRole": "B_FIX",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "runtimeCandidate": true,
+      "summary": "The active R34/R33 draw owner bypasses R30TryXyzrhw* and falls directly to the R29 trampoline. Restore the bounded XYZRHW pre-dispatch at the final owner before generic HUD/world dispatch, with handled-result semantics that cannot double draw."
+    },
+    {
+      "id": "DX9EX-SKYGLOW-001",
+      "status": "READY",
+      "priority": 8,
+      "preferredRole": "B_FIX",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "runtimeCandidate": false,
+      "summary": "R30ApplyStereoSkyGlow selects the intermediate texture opposite to the pass that actually contains the final blur output. One-step currently composites pre-blur bright extraction; two-step composites horizontal-only output instead of vertical-final output."
+    }
+  ],
+  "blockers": [
+    "Quest 3/VDXR runtime evidence remains required before claiming the visual symptoms fixed."
+  ],
+  "retryCount": 0,
+  "nextAction": "B should first make a minimal isolated candidate that restores R30TryXyzrhw* at the final R33/R34 draw dispatch without broad WVP changes and add a deterministic source-flow verifier. Separately fix the SkyGlow composite-source inversion. C can validate compile/dispatch invariants; visual acceptance stays LEVEL1 HMD.",
+  "review": {
+    "lenses": [
+      "architecture/control-flow",
+      "resource-lifetime/state/reset",
+      "stereo/visual-correctness",
+      "hot-path/frame-pacing",
+      "adversarial-falsification/testability"
+    ],
+    "coverage": [
+      "R29 effect policy",
+      "R30 screen-space and XYZRHW paths",
+      "R30 SkyGlow pipeline",
+      "R31/R32/R33 dispatch layering",
+      "R34 final raster/reset guard",
+      "R29 renderer WVP classification",
+      "active DX9Ex build graph"
+    ],
+    "keyEvidence": {
+      "DX9EX-DISPATCH-XYZRHW-001": [
+        "R30 Draw*Dest wrappers call matching R30TryXyzrhw* before R30GuardScreenSpace.",
+        "R31, R32 and R33 contain no R30TryXyzrhw* dispatch.",
+        "R33 final fallback explicitly invokes R30Draw*R29Hook, the R29 trampoline, rather than the R30 Draw*Dest wrapper.",
+        "R30 XYZRHW code explicitly distinguishes white HUD glyphs from CPU-projected smoke/skid/decal using a bounded Z/RHW projection signature."
+      ],
+      "DX9EX-SKYGLOW-001": [
+        "Bright pass writes temp; horizontal blur writes reduced.",
+        "When effectiveTwoStep is false, compositeSource is temp, so horizontal blur output is skipped.",
+        "When effectiveTwoStep is true, vertical blur writes temp but compositeSource is changed to reduced, so vertical-final output is skipped.",
+        "The adjacent code comment says the vertical pass should be the composite source, contradicting the implementation."
+      ]
+    },
+    "slotUtilization": {
+      "subBatches": 5,
+      "fallbackStagesAttempted": [
+        "primary READY A queue",
+        "dependent visual-correctness review",
+        "regression-boundary/final-dispatch review",
+        "deterministic verifier design",
+        "falsification against final active build graph"
+      ],
+      "earlyFinishReason": "Manual invocation produced actionable STATICALLY_VERIFIED findings; no production edits/builds are permitted for role A."
+    }
+  }
+}
