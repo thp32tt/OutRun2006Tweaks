@@ -161,6 +161,9 @@ namespace OutRunVRDxvkMultiview
             !leftWvp || !rightWvp || poseSequence == 0)
             return false;
 
+        if (CachedDevice == device && InterfaceAttempted && !CachedInterop)
+            return false;
+
         ++ArmAttempts;
         ID3D9OutRunVRInterop* interop = ResolveInterop(device);
         if (!interop)
