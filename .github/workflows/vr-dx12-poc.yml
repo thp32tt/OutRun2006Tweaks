@@ -15,6 +15,10 @@ on:
       - '.github/workflows/vr-dx12-poc.yml'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   win32-d3d9on12-probe:
     runs-on: windows-2022
