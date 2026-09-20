@@ -139,6 +139,12 @@
       "27380e8ba4b8d168e81a9ed1fc44582779f2a0f4",
       "c8daa9ac86d922a73469a9b10705d0dff16a7640",
       "ce6bb0de5755179d4cf104aa00efe81c5b8de0a3"
-    ]
+    ],
+    "validation": {
+      "script": "tools/Validate-VRAutodevState.ps1",
+      "workflow": ".github/workflows/vr-autodev-state.yml",
+      "scope": "coordination-state-only",
+      "fullBackendBuildOnStateOnlyChanges": false
+    }
   }
 }
