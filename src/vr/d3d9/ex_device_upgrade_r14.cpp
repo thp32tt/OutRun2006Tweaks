@@ -1180,7 +1180,7 @@ namespace OutRunVRD3D9ExUpgradeR13
             }
             bool validate() override
             {
-                return Settings::VRPreferD3D9Ex;
+                return true;
             }
             bool apply() override
             {
