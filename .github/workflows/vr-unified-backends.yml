@@ -300,7 +300,7 @@ jobs:
           foreach ($mode in @('2d','d3d9','dxvk-safe','dxvk','dx12')) {
             & package-smoke/Select-OutRunVRBackend.ps1 -Backend $mode
             $active = Get-Content package-smoke/ACTIVE_VR_BACKEND.txt -Raw
-            if ($active -notmatch "(?m)^backend=$mode$") { throw "ACTIVE_VR_BACKEND mismatch for $mode" }
+            if ($active -notmatch "(?m)^backend=$([regex]::Escape($mode))\r?$") { throw "ACTIVE_VR_BACKEND mismatch for $mode" }
             $iniText = Get-Content package-smoke/OutRun2006Tweaks.ini -Raw
             if ($iniText -notmatch '(?m)^\[VR\]\s*$' -or $iniText -match '(?m)^\[VR\]\\') { throw "VR INI section corrupted for $mode" }
             switch ($mode) {
