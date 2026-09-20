@@ -1853,6 +1853,20 @@ namespace OutRunVRStereo
                 const float identityOrientation[4]{
                     0.0f, 0.0f, 0.0f, 1.0f
                 };
+#if defined(OUTRUN_VR_WHITE_XYZRHW_COMMON)
+                {
+                    // Fixed-function/XYZRHW white-overlay experiment. Keep the
+                    // HUD plane world-locked by headInverse, but feed both eyes
+                    // the same projection transform so there is zero binocular
+                    // separation from this path.
+                    const D3DMATRIX commonHudViewProjection =
+                        MultiplyMatrix(headInverse, baseProjection);
+                    if (!MatrixFinite(commonHudViewProjection))
+                        return false;
+                    state.hudViewProjection[0] = commonHudViewProjection;
+                    state.hudViewProjection[1] = commonHudViewProjection;
+                }
+#else
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     const float relativeEye[3]{
@@ -1877,6 +1891,7 @@ namespace OutRunVRStereo
                     if (!MatrixFinite(state.hudViewProjection[eye]))
                         return false;
                 }
+#endif
                 if (!R30BuildHudPlaneCoefficients(state))
                     return false;
                 state.hudWorldLockValid = true;
@@ -3184,6 +3199,25 @@ namespace OutRunVRStereo
                     inverseBaseProjection);
             if (!MatrixFinite(commonViewPlane))
                 return false;
+
+#if defined(OUTRUN_VR_WHITE_PERSPECTIVE_COMMON)
+            if (screenKind == R30ScreenSpaceKind::PerspectiveHud)
+            {
+                // White-overlay experiment: keep the finite HUD plane world-locked
+                // by headInverse, but remove per-eye IPD/FOV divergence entirely.
+                // Both eye render targets receive the exact same clip transform.
+                const D3DMATRIX corrected =
+                    MultiplyMatrix(
+                        MultiplyMatrix(commonViewPlane, headInverse),
+                        baseProjection);
+                if (!MatrixFinite(corrected))
+                    return false;
+                const D3DMATRIX correctedT = TransposeMatrix(corrected);
+                std::memcpy(eyeConstants[0], &correctedT, sizeof(correctedT));
+                std::memcpy(eyeConstants[1], &correctedT, sizeof(correctedT));
+                return true;
+            }
+#endif
 
             for (int eye = 0; eye < 2; ++eye)
             {
