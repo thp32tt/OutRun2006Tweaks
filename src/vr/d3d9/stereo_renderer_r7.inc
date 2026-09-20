@@ -1177,6 +1177,67 @@ namespace OutRunVRStereo
 			}
 			D3DVIEWPORT9 savedViewport{};if(FAILED(device->GetViewport(&savedViewport))){InvalidateRightDepthStencilIfLeftMayWrite(device);PoisonFrame(OutRunVR::StereoFailureViewportUnavailable);return drawCall();}
 			if(draw.worldStereo){bool leftEyeOk=false;{InternalPassScope guard;leftEyeOk=draw.fixedFunctionWorld?SetFixedFunctionEyeTransforms(device,draw,0):SetWvpOneRegisterAtATime(device,draw.eyeConstants[0]);}if(!leftEyeOk){bool rolledBack=false;{InternalPassScope guard;rolledBack=draw.fixedFunctionWorld?RestoreFixedFunctionTransforms(device,draw):SetWvpOneRegisterAtATime(device,draw.originalConstants);}InvalidateRightDepthStencilIfLeftMayWrite(device);PoisonFrame(OutRunVR::StereoFailureLeftWvpUploadFailed);if(!rolledBack)NoteRestoreFailure(draw.fixedFunctionWorld?"left-eye fixed-function rollback":"left-eye c64 rollback");return drawCall();}}
+
+			// The production-safe R26 chain terminates here in R7.  Hand ownership
+			// to custom DXVK only for positively classified programmable world draws.
+			// Fixed-function, HUD/effects, queries, MRT and unsafe depth routes retain
+			// the validated two-pass implementation below.
+			if(draw.worldStereo&&!draw.fixedFunctionWorld)
+			{
+				const std::uint64_t dxvkDrawToken=(PresentEpoch<<32)^(WorldStereoDraws+DuplicatedDraws+1);
+				if(OutRunVRDxvkMultiview::TryArmWorldDraw(
+						device,RightEyeSurface,TrackedDepthStencil?RightEyeDepth:nullptr,
+						draw.eyeConstants[0],draw.eyeConstants[1],
+						draw.poseSequence,dxvkDrawToken))
+				{
+					const bool mayWriteDepth=LeftDrawMayWriteDepth(device);
+					const bool mayWriteStencil=LeftDrawMayWriteStencil(device);
+					const HRESULT dxvkHr=drawCall();
+					OutRunVRDxvkMultiview::FinishArmedDraw(SUCCEEDED(dxvkHr));
+					bool restored=false;
+					{InternalPassScope guard;restored=SetWvpOneRegisterAtATime(device,draw.originalConstants);}
+					if(FAILED(dxvkHr))
+					{
+						InvalidateRightDepthStencilIfLeftMayWrite(device);
+						PoisonFrame(OutRunVR::StereoFailureLeftDrawFailed);
+						if(!restored)NoteRestoreFailure("DXVK safe-path failed draw c64");
+						return dxvkHr;
+					}
+					if(!restored)
+					{
+						InvalidateRightDepthStencilIfLeftMayWrite(device);
+						PoisonFrame(OutRunVR::StereoFailureRestoreFailed);
+						NoteRestoreFailure("DXVK safe-path c64 restore");
+						return dxvkHr;
+					}
+
+					// Historical flag name: Present/SkyGlow interpret this as
+					// "both eyes complete".  Do not increment DuplicatedDraws,
+					// because the game submitted only one stereo-owned D3D9 draw.
+					FrameHadDuplicatedDraw=true;
+					FrameHadWorldStereo=true;
+					++WorldStereoDraws;
+					if(mayWriteDepth)RightDepthSynchronized=true;
+					if(mayWriteStencil)RightStencilSynchronized=true;
+					if(FrameStereoPoseSequence==0)
+					{
+						FrameStereoPoseSequence=draw.poseSequence;
+						FrameStereoMetadata=draw.stereoFrame;
+					}
+					else if(FrameStereoPoseSequence!=draw.poseSequence)
+					{
+						FrameRightDrawFailed=true;
+						PoisonFrame(OutRunVR::StereoFailurePoseSequenceMismatch);
+					}
+					if(!FirstWorldStereoLogged)
+					{
+						FirstWorldStereoLogged=true;
+						spdlog::info("VR DXVK: production-safe R7 world path accepted custom one-D3D9-draw stereo ownership");
+					}
+					return dxvkHr;
+				}
+			}
+
 			const HRESULT leftHr=drawCall();if(FAILED(leftHr)){InvalidateRightDepthStencilIfLeftMayWrite(device);PoisonFrame(OutRunVR::StereoFailureLeftDrawFailed);if(draw.worldStereo){bool restored=false;{InternalPassScope guard;restored=draw.fixedFunctionWorld?RestoreFixedFunctionTransforms(device,draw):SetWvpOneRegisterAtATime(device,draw.originalConstants);}if(!restored)NoteRestoreFailure(draw.fixedFunctionWorld?"left draw fixed-function transforms":"left draw c64");}return leftHr;}
 			IDirect3DSurface9*savedRt=TrackedRenderTarget,*savedDepth=TrackedDepthStencil;HRESULT rightHr=D3D_OK;OutRunVR::StereoFailureReason rightFailure=OutRunVR::StereoFailureRightStateFailed;bool restoreOk=true;{InternalPassScope guard;rightHr=SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface);if(SUCCEEDED(rightHr))rightHr=SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth);if(SUCCEEDED(rightHr))rightHr=device->SetViewport(&savedViewport);if(SUCCEEDED(rightHr)&&draw.worldStereo){const bool eyeOk=draw.fixedFunctionWorld?SetFixedFunctionEyeTransforms(device,draw,1):SetWvpOneRegisterAtATime(device,draw.eyeConstants[1]);if(!eyeOk){rightFailure=OutRunVR::StereoFailureRightWvpUploadFailed;rightHr=E_FAIL;}}if(SUCCEEDED(rightHr)){rightFailure=OutRunVR::StereoFailureRightDrawFailed;rightHr=drawCall();}restoreOk=RestoreRightPassState(device,savedRt,savedDepth,savedViewport,draw.originalConstants,draw.worldStereo&&!draw.fixedFunctionWorld);if(draw.fixedFunctionWorld&&!RestoreFixedFunctionTransforms(device,draw))restoreOk=false;}
 			FrameHadDuplicatedDraw=true;++DuplicatedDraws;if(draw.worldStereo){if(FrameStereoPoseSequence==0){FrameStereoPoseSequence=draw.poseSequence;FrameStereoMetadata=draw.stereoFrame;}else if(FrameStereoPoseSequence!=draw.poseSequence){FrameRightDrawFailed=true;PoisonFrame(OutRunVR::StereoFailurePoseSequenceMismatch);if(!FramePoseMismatchLogged){FramePoseMismatchLogged=true;++PoseSequenceMismatchFrames;spdlog::warn("VR stereo: multiple host pose sequences reached one Present; frame forced to mono fallback");}}FrameHadWorldStereo=true;++WorldStereoDraws;if(!FirstWorldStereoLogged){FirstWorldStereoLogged=true;spdlog::info("VR stereo: TRUE GEOMETRY STEREO active; per-eye c64 + OpenXR asymmetric FOV confirmed");}}else ++NonWorldDuplicatedDraws;if(FAILED(rightHr)){FrameRightDrawFailed=true;InvalidateRightDepthStencilIfLeftMayWrite(device);PoisonFrame(rightFailure);}if(!restoreOk){InvalidateRightDepthStencilIfLeftMayWrite(device);NoteRestoreFailure("right-eye draw");}return leftHr;
