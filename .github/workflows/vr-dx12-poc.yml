@@ -1,0 +1,54 @@
+name: D3D9On12 DX12 VR PoC
+
+on:
+  push:
+    branches: [ vr-dx12-poc ]
+    paths:
+      - 'dx12poc/**'
+      - 'docs/VR_DX12_ARCHITECTURE.md'
+      - '.github/workflows/vr-dx12-poc.yml'
+  workflow_dispatch:
+
+jobs:
+  win32-d3d9on12-probe:
+    runs-on: windows-2022
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure Win32 probe
+        shell: cmd
+        run: >
+          cmake -S dx12poc -B build-dx12-poc
+          -G "Visual Studio 17 2022" -A Win32
+
+      - name: Build Win32 probe
+        run: cmake --build build-dx12-poc --config Release
+
+      - name: Verify x86 executable and build marker
+        shell: pwsh
+        run: |
+          $exe = 'build-dx12-poc/Release/outrun-d3d9on12-probe.exe'
+          if (-not (Test-Path $exe)) {
+            throw 'D3D9On12 probe executable was not produced'
+          }
+
+          $bytes = [System.IO.File]::ReadAllBytes($exe)
+          $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+          $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
+          if ($machine -ne 0x014C) {
+            throw ('expected Win32/x86 executable, machine=0x{0:X4}' -f $machine)
+          }
+
+          $ascii = [Text.Encoding]::ASCII.GetString($bytes)
+          if (-not $ascii.Contains('OUTRUN_DX12_POC_BUILD_1')) {
+            throw 'DX12 PoC build marker missing'
+          }
+
+          Write-Host 'Win32 D3D9On12 probe build verified.'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: outrun-d3d9on12-win32-probe
+          path: build-dx12-poc/Release/outrun-d3d9on12-probe.exe
+          if-no-files-found: error
