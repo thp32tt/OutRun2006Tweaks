@@ -492,8 +492,10 @@ namespace OutRunVRStereo
         R31OwnedResult R31TryHud(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
+            const R30ScreenSpaceKind screenKind =
+                R30ClassifyScreenSpacePass(device);
             if (R31StateBlockRecording || !R29StableStereoBase(device) ||
-                !R30CurrentPassIsScreenSpace2D())
+                screenKind == R30ScreenSpaceKind::None)
                 return {};
             if (!R31StateBlockTrackingReliable.load(std::memory_order_acquire))
             {
@@ -526,8 +528,8 @@ namespace OutRunVRStereo
             float eyeConstants[2][16]{};
             float eyeScale[2]{};
             float eyeOffset[2]{};
-            if (!R30BuildScreenSpaceEyeConstants(device, stereo, original,
-                    eyeConstants, eyeScale, eyeOffset))
+            if (!R30BuildScreenSpaceEyeConstants(device, stereo, screenKind,
+                    original, eyeConstants, eyeScale, eyeOffset))
                 return {};
 
             D3DVIEWPORT9 savedViewport{};
@@ -650,7 +652,7 @@ namespace OutRunVRStereo
                 return actualDraw();
             }
 
-            if (R30CurrentPassIsScreenSpace2D())
+            if (R30ClassifyScreenSpacePass(device) != R30ScreenSpaceKind::None)
             {
                 const auto hud = R31TryHud(device,
                     std::forward<ActualDraw>(actualDraw), site);
