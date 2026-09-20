@@ -80,6 +80,9 @@ namespace OutRunVR
         ClientStereoActive = 1u << 10,
         ClientStereoWorldDraw = 1u << 11,
         ClientStereoDrawDuplicated = 1u << 12,
+        // One-frame edge flag set when the configured VR Recenter action is
+        // pressed. Native hosts use it to re-anchor fixed theater layers.
+        ClientRecenterRequested = 1u << 13,
     };
 
     enum RenderFrameFlags : std::uint32_t
