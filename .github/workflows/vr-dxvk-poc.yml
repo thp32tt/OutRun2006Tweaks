@@ -1,0 +1,53 @@
+name: DXVK VR PoC
+
+on:
+  push:
+    branches: [ vr-dxvk-poc ]
+    paths:
+      - 'src/vr/**'
+      - 'CMakeLists.txt'
+      - 'cmake.toml'
+      - 'docs/VR_DXVK_ARCHITECTURE.md'
+      - '.github/workflows/vr-dxvk-poc.yml'
+  workflow_dispatch:
+
+jobs:
+  game-x86:
+    runs-on: windows-2022
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure Win32 game DLL
+        shell: cmd
+        run: >
+          cmake -S . -B build-dxvk-poc
+          -G "Visual Studio 17 2022" -A Win32
+
+      - name: Build Win32 game DLL
+        run: cmake --build build-dxvk-poc --config Release --target outrun2006tweaks
+
+      - name: Verify x86 dinput8.dll
+        shell: pwsh
+        run: |
+          $dll = Get-ChildItem -Path build-dxvk-poc -Recurse -Filter dinput8.dll |
+            Where-Object { $_.FullName -match '\\bin\\' } |
+            Select-Object -First 1
+          if (-not $dll) {
+            throw 'DXVK PoC dinput8.dll was not produced'
+          }
+
+          $bytes = [System.IO.File]::ReadAllBytes($dll.FullName)
+          $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+          $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
+          if ($machine -ne 0x014C) {
+            throw ('expected Win32/x86 DLL, machine=0x{0:X4}' -f $machine)
+          }
+
+          Write-Host ('Verified: ' + $dll.FullName)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: outrun-vr-dxvk-poc-game-x86
+          path: build-dxvk-poc/bin/**/dinput8.dll
+          if-no-files-found: error
