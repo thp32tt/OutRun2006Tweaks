@@ -35,6 +35,17 @@ Do not launch the game twice manually without either collecting between runs or 
 
 The collector does not need to remain running in the background.
 
+## Recovery checkpoint: 2026-09-20 stereo transport / DX12 device creation
+
+This package must include the transport fixes from all backend source branches before it is considered testable:
+
+- D3D9 SAFE: game-side R9 transport policy follows the parsed `DirectGpuOnly` setting directly. With SAFE defaults (`DirectGpuOnly=false`), classic SBS/Desktop Duplication fallback must not be suppressed by a stale process environment value.
+- DXVK SAFE/MULTIVIEW: the DXVK game branch carries the same R9 transport-policy fix; do not accept a package whose DXVK source SHA predates that branch fix.
+- All D3D11 OpenXR hosts: when no completed SBS frame is published, recovery theater uses the full-width mono source. Left-half cropping is permitted only for a frame explicitly marked `StereoSbsActive` + `RenderFrameStereoComplete`.
+- DX12 STRICT: use D3D9On12 legacy `CreateDevice` semantics first. If the runtime rejects OutRun's original presentation values, retry with the bounded compatibility normalization (window handle/refresh, one back buffer, default interval) while remaining on D3D9On12; native D3D9 fallback stays disabled.
+
+For the next retest, success criteria are intentionally narrow: D3D9 SAFE must publish a completed stereo frame instead of remaining at `composeOk=0`; DXVK SAFE must do the same; DX12 STRICT must at least pass device creation before any later renderer/VR judgement.
+
 ## Recommended short evening test order
 
 Use 2D ORIGINAL only as a quick no-VR overhead smoke check. Then compare D3D9 control first, followed by DXVK SAFE. Test DXVK MULTIVIEW or DX12 STRICT only if the earlier modes start cleanly. A full A-F sequence is not required; this package contains no fabricated B/C/D variants.
