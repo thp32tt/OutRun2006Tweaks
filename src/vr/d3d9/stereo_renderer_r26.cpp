@@ -119,10 +119,10 @@ namespace OutRunVRStereo
             DWORD zWrite = TRUE;
             DWORD stencilEnable = FALSE;
             DWORD stencilWriteMask = 0xFFFFFFFFu;
-            if (FAILED(device->GetRenderState(D3DRS_COLORWRITEENABLE, &colorWrite)) ||
-                FAILED(device->GetRenderState(D3DRS_ZWRITEENABLE, &zWrite)) ||
-                FAILED(device->GetRenderState(D3DRS_STENCILENABLE, &stencilEnable)) ||
-                FAILED(device->GetRenderState(D3DRS_STENCILWRITEMASK, &stencilWriteMask)))
+            if (!ReadTrackedRenderState(device, D3DRS_COLORWRITEENABLE, colorWrite) ||
+                !ReadTrackedRenderState(device, D3DRS_ZWRITEENABLE, zWrite) ||
+                !ReadTrackedRenderState(device, D3DRS_STENCILENABLE, stencilEnable) ||
+                !ReadTrackedRenderState(device, D3DRS_STENCILWRITEMASK, stencilWriteMask))
                 return false;
 
             return colorWrite == 0 && zWrite == FALSE &&
