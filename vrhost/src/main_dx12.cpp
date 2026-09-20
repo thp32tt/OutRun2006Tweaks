@@ -99,6 +99,26 @@ namespace
             D3D12_VIEW_INSTANCING_TIER_NOT_SUPPORTED};
         bool vsRtArrayIndexWithoutGs{};
 
+        D3D12Objects()=default;
+        D3D12Objects(const D3D12Objects&)=delete;
+        D3D12Objects& operator=(const D3D12Objects&)=delete;
+        D3D12Objects(D3D12Objects&& other) noexcept
+            : device(std::exchange(other.device,nullptr)),
+              queue(std::exchange(other.queue,nullptr)),
+              viewInstancingTier(other.viewInstancingTier),
+              vsRtArrayIndexWithoutGs(other.vsRtArrayIndexWithoutGs) {}
+        D3D12Objects& operator=(D3D12Objects&& other) noexcept
+        {
+            if(this!=&other)
+            {
+                Release(queue);Release(device);
+                device=std::exchange(other.device,nullptr);
+                queue=std::exchange(other.queue,nullptr);
+                viewInstancingTier=other.viewInstancingTier;
+                vsRtArrayIndexWithoutGs=other.vsRtArrayIndexWithoutGs;
+            }
+            return *this;
+        }
         ~D3D12Objects()
         {
             Release(queue);
@@ -173,7 +193,7 @@ namespace
     struct XrObjects
     {
         XrInstance instance{XR_NULL_HANDLE};
-        XrSystemId system{XR_NULL_SYSTEM_ID};
+        XrSystemId system{0};
         XrSession session{XR_NULL_HANDLE};
         XrSpace localSpace{XR_NULL_HANDLE};
         XrSpace viewSpace{XR_NULL_HANDLE};
@@ -182,12 +202,45 @@ namespace
         bool exitRequested{};
         std::string runtimeName{"OpenXR-D3D12"};
 
-        ~XrObjects()
+        XrObjects()=default;
+        XrObjects(const XrObjects&)=delete;
+        XrObjects& operator=(const XrObjects&)=delete;
+        XrObjects(XrObjects&& other) noexcept
+            : instance(std::exchange(other.instance,XR_NULL_HANDLE)),
+              system(std::exchange(other.system,0)),
+              session(std::exchange(other.session,XR_NULL_HANDLE)),
+              localSpace(std::exchange(other.localSpace,XR_NULL_HANDLE)),
+              viewSpace(std::exchange(other.viewSpace,XR_NULL_HANDLE)),
+              sessionState(other.sessionState),
+              sessionRunning(other.sessionRunning),
+              exitRequested(other.exitRequested),
+              runtimeName(std::move(other.runtimeName)) {}
+        XrObjects& operator=(XrObjects&& other) noexcept
         {
-            if(viewSpace!=XR_NULL_HANDLE)xrDestroySpace(viewSpace);
-            if(localSpace!=XR_NULL_HANDLE)xrDestroySpace(localSpace);
-            if(session!=XR_NULL_HANDLE)xrDestroySession(session);
-            if(instance!=XR_NULL_HANDLE)xrDestroyInstance(instance);
+            if(this!=&other)
+            {
+                Destroy();
+                instance=std::exchange(other.instance,XR_NULL_HANDLE);
+                system=std::exchange(other.system,0);
+                session=std::exchange(other.session,XR_NULL_HANDLE);
+                localSpace=std::exchange(other.localSpace,XR_NULL_HANDLE);
+                viewSpace=std::exchange(other.viewSpace,XR_NULL_HANDLE);
+                sessionState=other.sessionState;
+                sessionRunning=other.sessionRunning;
+                exitRequested=other.exitRequested;
+                runtimeName=std::move(other.runtimeName);
+            }
+            return *this;
+        }
+        ~XrObjects(){Destroy();}
+
+    private:
+        void Destroy() noexcept
+        {
+            if(viewSpace!=XR_NULL_HANDLE){xrDestroySpace(viewSpace);viewSpace=XR_NULL_HANDLE;}
+            if(localSpace!=XR_NULL_HANDLE){xrDestroySpace(localSpace);localSpace=XR_NULL_HANDLE;}
+            if(session!=XR_NULL_HANDLE){xrDestroySession(session);session=XR_NULL_HANDLE;}
+            if(instance!=XR_NULL_HANDLE){xrDestroyInstance(instance);instance=XR_NULL_HANDLE;}
         }
     };
 
@@ -318,6 +371,24 @@ namespace
         DXGI_FORMAT format{DXGI_FORMAT_UNKNOWN};
         std::vector<XrSwapchainImageD3D12KHR> images;
 
+        Swapchain()=default;
+        Swapchain(const Swapchain&)=delete;
+        Swapchain& operator=(const Swapchain&)=delete;
+        Swapchain(Swapchain&& other) noexcept
+            : handle(std::exchange(other.handle,XR_NULL_HANDLE)),
+              width(other.width),height(other.height),format(other.format),
+              images(std::move(other.images)) {}
+        Swapchain& operator=(Swapchain&& other) noexcept
+        {
+            if(this!=&other)
+            {
+                if(handle!=XR_NULL_HANDLE)xrDestroySwapchain(handle);
+                handle=std::exchange(other.handle,XR_NULL_HANDLE);
+                width=other.width;height=other.height;format=other.format;
+                images=std::move(other.images);
+            }
+            return *this;
+        }
         ~Swapchain()
         {
             if(handle!=XR_NULL_HANDLE)xrDestroySwapchain(handle);
