@@ -24,6 +24,15 @@ function Refresh-Status {
     }
 }
 
+function Start-VRTest {
+    $runner = Join-Path $root "Run-OutRunVRTest.cmd"
+    if (-not (Test-Path $runner)) {
+        [System.Windows.Forms.MessageBox]::Show("Run-OutRunVRTest.cmd 파일이 없습니다.","OutRun VR Test Launcher",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+        return
+    }
+    Start-Process -FilePath $runner -WorkingDirectory $root
+}
+
 function Select-Backend([string]$backend) {
     if (-not (Test-Path $selector)) {
         [System.Windows.Forms.MessageBox]::Show("Select-OutRunVRBackend.ps1 파일이 없습니다.","OutRun VR Backend Selector",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
@@ -61,7 +70,7 @@ function Select-Backend([string]$backend) {
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "OutRun 2006 Renderer / VR Selector"
 $form.StartPosition = "CenterScreen"
-$form.ClientSize = New-Object System.Drawing.Size(500,467)
+$form.ClientSize = New-Object System.Drawing.Size(500,535)
 $form.FormBorderStyle = "FixedDialog"
 $form.MaximizeBox = $false
 
@@ -104,5 +113,13 @@ foreach ($b in $buttons) {
     $btn.Add_Click({ Select-Backend $this.Tag })
     $form.Controls.Add($btn)
 }
+
+$runBtn = New-Object System.Windows.Forms.Button
+$runBtn.Text = "현재 모드 테스트 실행  (종료 후 로그 자동수집)"
+$runBtn.Size = New-Object System.Drawing.Size(370,55)
+$runBtn.Location = New-Object System.Drawing.Point(64,438)
+$runBtn.Font = New-Object System.Drawing.Font("Segoe UI",10,[System.Drawing.FontStyle]::Bold)
+$runBtn.Add_Click({ Start-VRTest })
+$form.Controls.Add($runBtn)
 
 [void]$form.ShowDialog()
