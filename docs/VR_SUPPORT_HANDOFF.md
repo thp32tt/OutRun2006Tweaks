@@ -1,20 +1,24 @@
 # VR Support / Night Gate Handoff
 
 This file belongs to the `vr-d3d9ex-support` branch. It is a durable handoff from
-the :15 support automation to the :00 production developer. It must not contain
+Role C validation/support to the integration planner. It must not contain
 production runtime source edits.
 
 ## OPEN FOR MAIN
 
-- None yet. The first DAY SUPPORT / NIGHT GATE run should replace this line with
-  stable support IDs only when there is actionable evidence.
-- Current production authority remains `vr-d3d9ex-focus`; always inspect its
-  latest SHA instead of assuming this support branch is source-current.
+- `C-20260921T072745KST-VR-HOST-002`: candidate runtime SHA `a2b2e4d0168c311e8998df4dc6c012c47e855558` is **STATICALLY VERIFIED + BUILD VERIFIED**. DX9Ex Active Validation run `35531382160` passed policy, Win32 game, x64 host and package jobs. Artifact `10611079559` was independently opened: all 17 checksums passed, game/host architecture and exact source/profile identity matched, and forbidden backend payloads were absent.
+- Queue proposal: `VR-HOST-002` `NEEDS_VALIDATION -> VALIDATED` for the exact candidate SHA. This does not claim Quest 3/VDXR visual correctness or pacing; those remain `USER_RUNTIME_REQUIRED` in the next normal CORRECTNESS test.
+- Integration safety: candidate and integration diverged after `16e50077`. Do not replace or fast-forward `vr-d3d9ex-focus` to the candidate branch. Replay only the validated runtime + matching verifier delta onto latest integration state, preserve D-owned queue/state/history, then run DX9Ex Active Validation for the new integration SHA/source identity.
+
+## Evidence
+
+- Run record: `docs/automation/runs/C/C-20260921T072745KST-VR-HOST-002.json`
+- Reusable verifier: `tools/support/verify_vr_host_002_candidate.py`
+- Immutable CI: `https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/35531382160`
+- Immutable package inner ZIP SHA256: `29a6f84b242bff0e09be16d571d5952fd43e15577e462754d770433f71398f25`
 
 ## Operating contract
 
-- 08:15 / 11:15 / 14:15 / 17:15 Asia/Seoul: DAY SUPPORT.
-- 01:15 Asia/Seoul: NIGHT GATE before the 02:00 main cycle.
 - Prefer deterministic verifiers, CI/package/log/session checks, TEST_LEVEL
   demotion, and duplicate-work elimination.
 - Do not make production game/host runtime changes here.
@@ -27,6 +31,4 @@ production runtime source edits.
 
 ## History
 
-Append-only. Each run should record local start/end, main/review/support SHAs,
-mode, actual checks or artifacts, stable finding IDs, TEST_LEVEL effects,
-checks/builds the next main run can skip, and exact next action.
+- 2026-09-21 07:27-07:36 KST — validated `VR-HOST-002` against exact candidate/source/package identities; added failure-path and artifact verifier. No production source or integration state was changed.

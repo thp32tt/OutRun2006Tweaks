@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "role": "C",
+  "runId": "C-20260921T072745KST-VR-HOST-002",
+  "startedKst": "2026-09-21T07:27:45+09:00",
+  "completedKst": "2026-09-21T07:36:30+09:00",
+  "integrationBranch": "vr-d3d9ex-focus",
+  "integrationSha": "e5e35f483cf7f8d36f99a87807ba6cb9d4b7eccd",
+  "supportBaseSha": "38be7c14f02585c38a62c5b3ce06e7f65bb0071d",
+  "findingIds": [
+    "VR-HOST-002"
+  ],
+  "candidate": {
+    "branch": "vr-d3d9ex-candidate/VR-HOST-002-reconcile",
+    "validatedRuntimeSha": "a2b2e4d0168c311e8998df4dc6c012c47e855558",
+    "currentBranchHead": "9e9988acfbdc28ed5d1ed9297a5a6008d04847fe",
+    "mergeBaseWithIntegration": "16e50077fcf3e30b516abf48d8088060e30084cf",
+    "postValidationHeadDelta": [
+      ".github/workflows/build.yml",
+      "docs/automation/runs/B/B-VR-HOST-002-reconcile.json"
+    ],
+    "runtimeTreesUnchangedAfterValidatedSha": true,
+    "integrationRuntimeInputsEqualMergeBase": true
+  },
+  "inputHashes": {
+    "integrationSrcVrTree": "f06e5a728e7371e6c1dd2aad7025f92c961e59cb",
+    "integrationVrhostTree": "794871aeb5c8c8c4581a476c58d41f0c705289",
+    "candidateSrcVrTree": "e22375ff3ad5428f7020ab4ad6dcf2ed6ac07001",
+    "candidateVrhostTree": "2795fe664f86d66a3e82587e1f3fa4991c0feff9",
+    "activeWorkflowBlob": "b945f834a211ed5baaf99fbd7d3da1259ecebd49",
+    "runtimeConfigBlob": "efca29d9a2d5ef5dd9025da63c1f1f2d1457eb18",
+    "verifierSha256": "49251ed3a036d79b9750b67c2b323ec8e3452b44968aaaf7eb4f03f41298af81"
+  },
+  "validation": {
+    "sourceContract": "pass",
+    "staleRunIdentityTruthTable": "pass: same run accepted; stale PID, stale generation, zero PID and zero generation rejected",
+    "gameplayBootstrapTruthTable": "pass: classic and DirectGPU valid frames accepted; incomplete, in-flight, failed, dimension-mismatched and invalid-handle frames rejected",
+    "existingArchitectureVerifier": "pass: tools/verify_vr_architecture.py",
+    "existingR32Verifier": "pass: tools/verify_vr_r32_review.py",
+    "diffCheck": "pass: no whitespace errors",
+    "profileMapping": "pass: CORRECTNESS preserves PreferD3D9Ex=true, DirectGpuOnly=false, TargetRefreshRateHz=0, FrameCadenceTargetHz=0 and SkyGlowFactor=1",
+    "sessionLogCaptureContract": "pass: matrix/variant/profile/session identity, runtime overrides, config hash and collected capture identity present",
+    "packageForbiddenPayloads": "pass: no d3d9.dll, multiviewpatcher.dll, DXVK, D3D9On12 or DX12 host payload",
+    "runtime": "not executed; Quest 3/VDXR visual correctness and pacing remain USER_RUNTIME_REQUIRED"
+  },
+  "ci": {
+    "workflow": "DX9Ex Active Validation",
+    "runId": 35531382160,
+    "headSha": "a2b2e4d0168c311e8998df4dc6c012c47e855558",
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": {
+      "policy": 106132674184,
+      "gameWin32": 106132704060,
+      "hostX64": 106132704090,
+      "package": 106133428638
+    }
+  },
+  "artifact": {
+    "artifactId": 10611079559,
+    "artifactName": "OutRun2-VR-DX9EX-ACTIVE-a2b2e4d0168c311e8998df4dc6c012c47e855558",
+    "artifactDigest": "sha256:fe7d4323dc0734d5f5a7187523c67fba9acb67880696154019bc4c6e70b7c68b",
+    "innerZip": "OutRun2_VR_DX9EX_ACTIVE_a2b2e4d0168c.zip",
+    "innerZipSha256": "29a6f84b242bff0e09be16d571d5952fd43e15577e462754d770433f71398f25",
+    "fileCount": 17,
+    "checksums": "pass",
+    "gameBinary": "PE32 x86 dinput8.dll",
+    "hostBinary": "PE32+ x64 outrun-vr-host.exe",
+    "sourceIdentity": "pass: BUILD_INPUTS.json and SOURCE_SHA.txt both pin a2b2e4d0168c311e8998df4dc6c012c47e855558",
+    "userRuntimeVerified": false
+  },
+  "changedPaths": [
+    "tools/support/verify_vr_host_002_candidate.py",
+    "docs/automation/runs/C/C-20260921T072745KST-VR-HOST-002.json",
+    "docs/VR_SUPPORT_HANDOFF.md"
+  ],
+  "evidenceLevel": [
+    "STATICALLY_VERIFIED",
+    "BUILD_VERIFIED"
+  ],
+  "queueProposal": [
+    {
+      "id": "VR-HOST-002",
+      "from": "NEEDS_VALIDATION",
+      "to": "VALIDATED",
+      "candidateSha": "a2b2e4d0168c311e8998df4dc6c012c47e855558",
+      "note": "Validated for deterministic source/build/package gates. This does not claim HMD visual or pacing correctness."
+    }
+  ],
+  "integrationWarning": "The candidate and integration branches diverged after 16e50077. Do not replace or fast-forward vr-d3d9ex-focus to the candidate branch. Replay only the validated runtime delta onto the latest integration head, preserve D-owned queue/state/history, and produce a new source-identity build/package if integrated.",
+  "blockers": [],
+  "retryCount": 0,
+  "nextAction": "D may import VR-HOST-002 as VALIDATED at candidate SHA a2b2e4d0, replay only its runtime and matching verifier delta onto the latest vr-d3d9ex-focus, preserve central state, and run DX9Ex Active Validation for the resulting integration SHA. Keep visual/pacing acceptance in the next single CORRECTNESS HMD test."
+}
