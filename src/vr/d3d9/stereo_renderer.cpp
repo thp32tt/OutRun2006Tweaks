@@ -703,7 +703,7 @@ namespace OutRunVRStereo
 					++DirectTransportFrames;
 					composedStereo = true;
 					pendingPoseSequence = FrameStereoPoseSequence;
-					if (!HostDirectTransportReady() && !directOnly)
+					if (!OutRunVRD3D12Bridge::HostReady() && !directOnly)
 					{
 						const bool composeOk = ComposeSbs(device);
 						if (composeOk) ++StereoComposeSuccess;
@@ -779,7 +779,7 @@ namespace OutRunVRStereo
 				{
 					FirstStereoActiveLogged = true;
 					spdlog::info("VR R9 FINAL TEST: TRUE STEREO PRESENT COMPLETE transport={} sourceEye={}x{} desktop={}x{}",
-						directTransport ? "D3D9Ex ring" : "SBS Desktop Duplication",
+						directTransport ? "native D3D12 shared ring" : "SBS disabled",
 						directTransport && DirectTransportWidth ? DirectTransportWidth : BackBufferDesc.Width,
 						directTransport && DirectTransportHeight ? DirectTransportHeight : BackBufferDesc.Height,
 						BackBufferDesc.Width, BackBufferDesc.Height);
