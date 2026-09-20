@@ -5,6 +5,7 @@
 
 #include <atomic>
 #include <cwchar>
+#include <filesystem>
 #include <iterator>
 #include <string>
 
@@ -237,11 +238,32 @@ namespace OutRunVRDxvkProbe
     bool PreflightNonSystemD3D9Provider() noexcept
     {
         HMODULE provider = GetModuleHandleW(L"d3d9.dll");
-        if (!provider)
+        if (provider)
+        {
+            const bool nonSystem = !IsSystemD3D9Provider(provider);
+            NonSystemProvider.store(nonSystem, std::memory_order_release);
+            return nonSystem;
+        }
+
+        // Host auto-launch may run before the game's D3D9 import has been
+        // resolved. A local d3d9.dll beside OR2006C2C.EXE is therefore a
+        // conservative wrapper/DXVK preflight signal. Treating another local
+        // wrapper the same way is safe: it merely keeps Desktop Duplication
+        // available and avoids forcing the D3D9Ex-only transport too early.
+        try
+        {
+            const auto localProvider =
+                Module::ExePath.parent_path() / L"d3d9.dll";
+            const bool localExists =
+                !Module::ExePath.empty() && std::filesystem::exists(localProvider);
+            if (localExists)
+                NonSystemProvider.store(true, std::memory_order_release);
+            return localExists;
+        }
+        catch (...)
+        {
             return false;
-        const bool nonSystem = !IsSystemD3D9Provider(provider);
-        NonSystemProvider.store(nonSystem, std::memory_order_release);
-        return nonSystem;
+        }
     }
 
     Snapshot GetSnapshot() noexcept
