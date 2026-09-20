@@ -28,6 +28,7 @@
 #include <intrin.h>
 #include <cstdlib>
 #include <cstring>
+#include "dxvk_multiview_bridge.hpp"
 #include "stereo_renderer_r7.inc"
 
 namespace OutRunVRStereo
