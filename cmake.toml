@@ -213,6 +213,20 @@ endif()
 unset(_vr_source)
 unset(_vr_header_only)
 
+# Focused R13 flat-overlay experiments for white rank/score/YES-NO.
+option(OUTRUN_VR_R13_FLAT_PREEMPT "Intercept exact R13 flat signature in R30 HUD plane" OFF)
+option(OUTRUN_VR_R13_FLAT_COMMON "Use identical eye transform for R13 flat HUD class" OFF)
+option(OUTRUN_VR_R13_FLAT_PREEMPT_BROAD "Intercept all depth-off alpha perspective draws in R30 HUD plane" OFF)
+if(OUTRUN_VR_R13_FLAT_PREEMPT)
+    add_compile_definitions(OUTRUN_VR_R13_FLAT_PREEMPT=1)
+endif()
+if(OUTRUN_VR_R13_FLAT_COMMON)
+    add_compile_definitions(OUTRUN_VR_R13_FLAT_COMMON=1)
+endif()
+if(OUTRUN_VR_R13_FLAT_PREEMPT_BROAD)
+    add_compile_definitions(OUTRUN_VR_R13_FLAT_PREEMPT_BROAD=1)
+endif()
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 
