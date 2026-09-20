@@ -5,6 +5,7 @@
 
 #include <atomic>
 #include <cwchar>
+#include <iterator>
 #include <string>
 
 #include <spdlog/spdlog.h>
