@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "role": "B",
+  "runId": "B-20260921T071416KST-compliance",
+  "startedKst": "2026-09-21T07:14:16+09:00",
+  "completedKst": "2026-09-21T07:23:47+09:00",
+  "baseSha": "e5e35f483cf7f8d36f99a87807ba6cb9d4b7eccd",
+  "findingIds": [
+    "DX9EX-COMPLIANCE-001"
+  ],
+  "inputHashes": {
+    "activeWorkflowBlob": "b945f834a211ed5baaf99fbd7d3da1259ecebd49",
+    "roleARecordBlob": "1d3510746ad915425b13b12b8dd5d9112ab82dab",
+    "shaderFingerprintBlob": "35d59f7af9884c02ab0b05e13384639306387459"
+  },
+  "changedPaths": [
+    ".github/workflows/vr-dx9ex-active.yml",
+    "tools/Test-OutRunVRTestPolicy.ps1"
+  ],
+  "candidateBranch": "vr-d3d9ex-candidate/DX9EX-COMPLIANCE-001-B-20260921T071416KST",
+  "candidateSha": "734d04f359d29ebce8951d93ed4f534a580b77b0",
+  "implementation": {
+    "scope": "workflow/package compliance only; no runtime source or runtime configuration changed",
+    "runtimePackageGate": "package now depends on successful same-SHA compliance validation",
+    "companionContents": [
+      "COPYING.GPL3",
+      "LICENSE.md",
+      "LICENSE-3DMIGOTO-GPL-3.0.txt",
+      "THIRD_PARTY_GPL_NOTICES.txt",
+      "THIRD_PARTY_NOTICES.md",
+      "SOURCE_GPL/3dmigoto-adapted/shader_fingerprint_gpl.hpp",
+      "CORRESPONDING_SOURCE.zip",
+      "COMPLIANCE_MANIFEST.json",
+      "SOURCE_SHA.txt",
+      "SUBMODULES.txt",
+      "SHA256SUMS.txt"
+    ]
+  },
+  "validation": {
+    "local": [
+      "workflow YAML parsed and contains policy, host, game, compliance and package jobs",
+      "git diff --check passed",
+      "downloaded actual compliance artifact and opened both outer and inner ZIPs",
+      "manifest/source SHA matched 734d04f359d29ebce8951d93ed4f534a580b77b0",
+      "corresponding-source archive contains CMake inputs and src/vr/d3d9/shader_fingerprint_gpl.hpp"
+      ,"all 10 internal SHA256SUMS entries matched the downloaded files"
+      ,"corresponding-source archive file set matched all 289 regular blobs in the candidate Git tree; submodule gitlinks are recorded separately in SUBMODULES.txt"
+    ],
+    "runtimeClaims": "none; no HMD or visual behavior conclusion"
+  },
+  "ci": {
+    "workflow": "DX9Ex Active Validation",
+    "runId": 35541256724,
+    "status": "in_progress",
+    "jobs": {
+      "policy": "success",
+      "compliance": "success",
+      "host": "success",
+      "game": "in_progress",
+      "package": "pending"
+    },
+    "artifacts": [
+      {
+        "id": 10614663672,
+        "name": "OutRun2-VR-DX9EX-COMPLIANCE-734d04f359d29ebce8951d93ed4f534a580b77b0",
+        "sha256": "6e9b4d910d3d951fbdbeaa07fccd53a54f597b8dc5a8f6da6dd5adec4ebdcc05"
+      }
+    ]
+  },
+  "evidenceLevel": "BUILD_VERIFIED_COMPLIANCE_JOB",
+  "queueProposal": [
+    {
+      "id": "DX9EX-COMPLIANCE-001",
+      "proposedStatus": "NEEDS_VALIDATION",
+      "reason": "Same-SHA companion was assembled, validated, downloaded and inspected; C should seal the immutable candidate and D should integrate only after the complete workflow passes."
+    }
+  ],
+  "fallbackReview": {
+    "findingId": "DX9EX-FINGERPRINT-001",
+    "newEvidence": [
+      "R33Dispatch returns handled HUD and fast-world draws before the only existing R46TraceShaderFingerprint call in R27GuardWorldEffect.",
+      "The Ctrl+F9 capture implementation is host-watchdog-local and has no current game-process control channel for a bounded R33 signature window.",
+      "R33Dispatch receives only draw lambdas and a site string; primitive topology/count/FVF discriminators require explicit metadata plumbing from all four draw hooks."
+      ,"R33 Present is a once-per-frame boundary suitable for edge-detecting Ctrl+F9 in the game process without adding a new ABI or polling the keyboard per draw."
+      ,"The Role-A --require-fixed prototype currently couples fingerprint and compliance assertions; C must evaluate the compliance subset independently for this one-finding candidate."
+    ],
+    "conclusion": "Do not fold fingerprint instrumentation into the compliance candidate. A separate candidate can use the existing R33 Present hook as a bounded game-side Ctrl+F9 gate, carry explicit metadata from all four draw hooks, clear shader caches on successful Reset, and buffer/flush outside draw dispatch."
+  },
+  "blockers": [],
+  "retryCount": 0,
+  "nextAction": "C validates immutable candidate 734d04f3 and artifact 10614663672 after run 35541256724 completes. D may then integrate the two compliance-only paths. B should implement DX9EX-FINGERPRINT-001 separately only after its bounded game-side trigger and draw-metadata contract are fixed."
+}
