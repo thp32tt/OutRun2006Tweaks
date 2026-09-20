@@ -1,6 +1,6 @@
 # VR Run State
 
-Updated: 2026-09-20 22:52 KST
+Updated: 2026-09-21 02:55 KST
 
 ## Current checkpoint
 - C0 RECOVER: complete — 2D and D3D9 SAFE startup regression cleared on the previous recovery build
@@ -47,3 +47,38 @@ Two generic branch workflows still have stale checks unrelated to the unified te
 
 ## Next runtime test
 Use only the frozen `VRM-20260920-803144005c0e` tester. Test D3D9 SAFE first and look for actual geometry stereo rather than a flat recovery theater. If D3D9 is good, test DXVK SAFE. Then test DX12 STRICT only far enough to see whether device creation/startup now passes; deeper DX12 rendering work comes after that boundary is cleared.
+
+
+## Manual hourly-equivalent run — 2026-09-21 02:55 KST
+
+### Checkpoint result
+- C0 RECOVER: complete — recovered `vr-unified-backends` HEAD `fc71a50a10ddcccb6e38e6a41fba8e3f7fc3d74f`, T0-debug build SHA `365b294b6a96c98ada434b439a982725e1ba542c`, and T0-debug branch HEAD `7298d1f2426da9134aca17b83f23076a495fd788`.
+- C1 REVIEW: complete — RB01 bounded 5-lens review covered architecture/build boundaries, resource/state lifetime, stereo/HUD/effects correctness, performance, and adversarial regression risk.
+- C2 IMPLEMENT: complete — ported only the T0 loading/bootstrap and gameplay stall projection guards into the current unified Host. HUD/effect/WVP classification was intentionally unchanged.
+- C3 VALIDATE: complete — Build run `35527017219` succeeded. Unified run `35527017201` succeeded for D3D9 SAFE, DXVK game+host, DXVK provider, multiview patcher, DX12 strict, and final package.
+- C4 COMMIT: complete — source commit `ad14ed6c6757634233ec79b71f42be53c563edb7`.
+- C5 PACKAGE: complete — unified artifact `10609683851`; outer SHA256 `a5e21693ae74d51ea0ba7b2483ef133fbfde9517068993a5e8796f6b5bc37243`; tester ZIP SHA256 `12088212f8ec4af2f92cdc6280e785f51112b9e50945c10b8fe9fb4f1dd08780`; ZIP integrity passed.
+- C6 STATE: complete — durable state updated with the T0-derived working base and next action.
+
+### Adopted DX9Ex working reference input
+- Branch: `vr-d3d9ex-t0-debug`
+- Build-validated source commit: `365b294b6a96c98ada434b439a982725e1ba542c`
+- Branch HEAD: `7298d1f2426da9134aca17b83f23076a495fd788` (later CI/generic-build policy only; runtime payload source remains `365b294...`)
+- T0-debug CI: `35526213136` — host/game/package success
+- Artifact: `10609747550`
+- Artifact SHA256: `7cf2cc7a8ed762a07bcc3bb474e9d37bb0980ac0320b944a1999d61f23612a4f`
+- Inner tester ZIP SHA256: `b034553ac0b919a9d7944ee11168a6e5dd3f868221a047585b3a8da7cfe8ed0d`
+
+### Behavior contract carried forward
+- Preserve T0-style stable world geometry and normal sky classification.
+- Preserve normal stage-loading transition into gameplay.
+- Preserve last-good stereo projection across gameplay frame stalls so HMD output does not become a solid/empty color.
+- T0's duplicated lens flare is not accepted as final. The S6/S7 narrow alpha + flat-WVP observation remains a candidate because it collapsed the flare to one in runtime tests without the broad world corruption seen in ownership experiments.
+- Position HUD `6th/6`, white rank/score, and exit `YES/NO` remain unresolved.
+- T5/R29 LEFT+RIGHT-only behavior is performance evidence only: frame rate improved somewhat, but sky/world graphics regressed.
+
+### RB01 review result
+The T0-debug branch and unified branch are heavily diverged, so wholesale merge/file replacement is rejected. The current unified Host already contains newer R42/R23 transport and projection-cache work. Only validated T0 behavior should be ported in bounded changes. The first bounded port in this run was the loading/bootstrap and persistent projection-hold behavior.
+
+### Next action
+Continue from unified source commit `ad14ed6c6757634233ec79b71f42be53c563edb7`. Use T0-debug `365b294...` as the DX9Ex reference input. Next hourly run should port bounded fingerprint telemetry and the narrow S6/S7 lens-flare candidate into the D3D9Ex path only, with fail-closed matching and without broad WVP/WorldBillboard promotion. Prepare no more than six runtime candidates. Do not mark Position HUD, white overlays, or the fast path fixed until runtime evidence confirms them.
