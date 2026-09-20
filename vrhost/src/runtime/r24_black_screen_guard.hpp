@@ -66,8 +66,8 @@ namespace OutRunVrR24BlackScreenGuard
 
     // A swapchain handle alone does not prove that any image was ever rendered
     // and successfully released. Track only images R24 itself has committed.
-    inline bool ProjectionImageCommitted = false;
-    inline bool TheaterImageCommitted = false;
+    inline std::uint64_t ProjectionCommittedGeneration = 0;
+    inline std::uint64_t TheaterCommittedGeneration = 0;
 
     struct ProjectionSelection
     {
@@ -236,7 +236,7 @@ namespace OutRunVrR24BlackScreenGuard
         if (!ok || !released)
             return false;
 
-        ProjectionImageCommitted = true;
+        ProjectionCommittedGeneration = Projection.generation;
         projection = *incoming;
         for (int eye = 0; eye < 2; ++eye)
         {
@@ -353,7 +353,7 @@ namespace OutRunVrR24BlackScreenGuard
         if (!ok || !released)
             return false;
 
-        TheaterImageCommitted = true;
+        TheaterCommittedGeneration = Theater.generation;
         BuildViewQuad(Theater.handle, Theater.width, Theater.height, 0, quad);
         const float aspect = SafeEyeHeight
             ? static_cast<float>(SafeEyeWidth) / static_cast<float>(SafeEyeHeight)
@@ -373,13 +373,17 @@ namespace OutRunVrR24BlackScreenGuard
         // released projection image. The theater source may be a desktop SBS
         // capture, while Projection is already separated per eye.
         if (Projection.handle != XR_NULL_HANDLE && Projection.width &&
-            Projection.height && (ProjectionImageCommitted || ProjectionSuccess > 0))
+            Projection.height && Projection.generation != 0 &&
+            Projection.committedGeneration == Projection.generation &&
+            ProjectionCommittedGeneration == Projection.generation)
         {
             BuildViewQuad(Projection.handle, Projection.width, Projection.height, 0, quad);
             return true;
         }
         if (Theater.handle != XR_NULL_HANDLE && Theater.width && Theater.height &&
-            (TheaterImageCommitted || TheaterSuccess > 0))
+            Theater.generation != 0 &&
+            Theater.committedGeneration == Theater.generation &&
+            TheaterCommittedGeneration == Theater.generation)
         {
             BuildViewQuad(Theater.handle, Theater.width, Theater.height, 0, quad);
             return true;
@@ -411,7 +415,7 @@ namespace OutRunVrR24BlackScreenGuard
         if (!Release(Theater))
             return false;
 
-        TheaterImageCommitted = true;
+        TheaterCommittedGeneration = Theater.generation;
         BuildViewQuad(Theater.handle, Theater.width, Theater.height, 0, quad);
         return true;
     }
@@ -434,7 +438,7 @@ namespace OutRunVrR24BlackScreenGuard
         const bool live = !cached && !directFlat &&
             OutRunVrSbsCaptureOverride::RenderTheaterOverride(session, quad);
         if (live)
-            TheaterImageCommitted = true;
+            TheaterCommittedGeneration = Theater.generation;
 
         const bool emergency = !cached && !directFlat && !live &&
             BuildEmergencyVisibleQuad(session, quad);
@@ -648,8 +652,8 @@ namespace OutRunVrR24BlackScreenGuard
         EmergencyLayerFallbacks = 0;
         EmptyFrameFallbacks = 0;
         MixedValidatedSubmits = 0;
-        ProjectionImageCommitted = false;
-        TheaterImageCommitted = false;
+        ProjectionCommittedGeneration = 0;
+        TheaterCommittedGeneration = 0;
         return OutRunVrR23RuntimeHardening::DestroySession(session);
     }
 }
