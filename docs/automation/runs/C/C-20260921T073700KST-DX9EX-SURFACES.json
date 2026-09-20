@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "role": "C",
+  "runId": "C-20260921T073700KST-DX9EX-SURFACES",
+  "startedKst": "2026-09-21T07:37:00+09:00",
+  "completedKst": "2026-09-21T07:41:00+09:00",
+  "baseSha": "e5e35f483cf7f8d36f99a87807ba6cb9d4b7eccd",
+  "upstreamReviewRun": "A-20260921T072900KST-manual01",
+  "upstreamReviewHead": "54d1d2923df95bd43075b33c2551e731fa2828a4",
+  "findingIds": [
+    "DX9EX-DISPATCH-XYZRHW-001",
+    "DX9EX-SKYGLOW-001"
+  ],
+  "inputHashes": {
+    "stereoRendererR30Blob": "bc7eb2c152d82b3a42df13d8361d31cffe7d31b9",
+    "stereoRendererR33Blob": "c7bf2dc8ebe6152ad2d71bd718877f17ac651796"
+  },
+  "validation": {
+    "failBefore": "pass: all four final R33 draw wrappers bypass their matching R30TryXyzrhw helper",
+    "handledResultRisk": "confirmed: current final wrappers have no bounded E_NOTIMPL/handled pre-dispatch boundary",
+    "skyGlowOneStep": "fail-before confirmed: composites temp (pre-horizontal-blur) instead of reduced",
+    "skyGlowTwoStep": "fail-before confirmed: composites reduced (horizontal result) instead of temp (vertical-final result)",
+    "requireFixedMode": "expected failure on unchanged integration; ready for isolated B candidates",
+    "runtime": "not executed; final visual association remains USER_RUNTIME_REQUIRED"
+  },
+  "changedPaths": [
+    "tools/support/verify_dx9ex_dispatch_skyglow.py",
+    "docs/automation/runs/C/C-20260921T073700KST-DX9EX-SURFACES.json",
+    "docs/VR_SUPPORT_HANDOFF.md"
+  ],
+  "evidenceLevel": "STATICALLY_VERIFIED",
+  "queueProposal": [
+    {
+      "id": "DX9EX-DISPATCH-XYZRHW-001",
+      "status": "READY",
+      "preferredRole": "B_FIX",
+      "testLevel": "LEVEL0 implementation/build; LEVEL1 visual acceptance",
+      "verifier": "python tools/support/verify_dx9ex_dispatch_skyglow.py --repo . --ref <candidate-sha> --require-fixed"
+    },
+    {
+      "id": "DX9EX-SKYGLOW-001",
+      "status": "READY",
+      "preferredRole": "B_FIX",
+      "testLevel": "LEVEL0 implementation/build; LEVEL1 visual acceptance",
+      "verifier": "python tools/support/verify_dx9ex_dispatch_skyglow.py --repo . --ref <candidate-sha> --require-fixed"
+    }
+  ],
+  "blockers": [
+    "No immutable B candidate exists yet for either finding."
+  ],
+  "retryCount": 0,
+  "nextAction": "B should create separate candidates for R33 XYZRHW pre-dispatch and SkyGlow source inversion. C should run this verifier in --require-fixed mode plus the impact-based DX9Ex Active Validation for each exact candidate SHA."
+}
