@@ -5,6 +5,7 @@
 // DirectGPU producer slot while a timed-out D3D9 EVENT query is still pending.
 
 #include "r32_policy.hpp"
+#include "dxvk_multiview_bridge.hpp"
 #include "stereo_renderer_r31.cpp"
 
 namespace OutRunVRStereo
@@ -253,9 +254,81 @@ namespace OutRunVRStereo
                 return {};
             }
 
+            const bool dxvkWritesDepth = LeftDrawMayWriteDepth(device);
+            const bool dxvkWritesStencil = LeftDrawMayWriteStencil(device);
+            const std::uint64_t dxvkDrawToken = R9DrawCalls + 1;
+            if (OutRunVRDxvkMultiview::TryArmWorldDraw(
+                    device,
+                    RightEyeSurface,
+                    TrackedDepthStencil ? RightEyeDepth : nullptr,
+                    draw.eyeConstants[0],
+                    draw.eyeConstants[1],
+                    draw.poseSequence,
+                    dxvkDrawToken))
+            {
+                ++R9DrawCalls;
+                R9MonoBackupGap = true;
+                if (dxvkWritesDepth || dxvkWritesStencil)
+                    ++R9MainDepthContentSerial;
+
+                R31OwnedResult dxvkResult{ true, actualDraw() };
+                OutRunVRDxvkMultiview::FinishArmedDraw(
+                    SUCCEEDED(dxvkResult.hr));
+
+                bool dxvkRestoreOk = false;
+                {
+                    InternalPassScope guard;
+                    dxvkRestoreOk =
+                        R32SetWvpBatch(device, draw.originalConstants);
+                }
+
+                if (FAILED(dxvkResult.hr))
+                {
+                    InvalidateRightDepthStencilIfLeftMayWrite(device);
+                    R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
+                        site, dxvkResult.hr);
+                    if (!dxvkRestoreOk)
+                        NoteRestoreFailure(
+                            "R32 DXVK multiview failed draw c64");
+                    R29ArmMonoSafety();
+                    return dxvkResult;
+                }
+
+                if (!dxvkRestoreOk)
+                {
+                    InvalidateRightDepthStencilIfLeftMayWrite(device);
+                    R9Poison(OutRunVR::StereoFailureRestoreFailed,
+                        "R32/DXVK-multiview-WVP-restore");
+                    NoteRestoreFailure(
+                        "R32 DXVK multiview c64 restore");
+                    R29ArmMonoSafety();
+                    return dxvkResult;
+                }
+
+                // The custom provider guarantees both views were emitted by the
+                // one consumed D3D9 draw. Do not count it as a duplicated draw.
+                FrameHadWorldStereo = true;
+                ++WorldStereoDraws;
+                ++R29StableTwoEyeDraws;
+                ++R31FastWorldDraws;
+                ++R31Frame.fastWorld;
+
+                if (TrackedDepthStencil && dxvkWritesDepth)
+                    RightDepthSynchronized = true;
+                if (TrackedDepthStencil && dxvkWritesStencil)
+                    RightStencilSynchronized = true;
+
+                if (FrameStereoPoseSequence == 0)
+                {
+                    FrameStereoPoseSequence = draw.poseSequence;
+                    FrameStereoMetadata = draw.stereoFrame;
+                }
+                return dxvkResult;
+            }
+
             ++R9DrawCalls;
             R9MonoBackupGap = true;
-            if (LeftDrawMayWriteDepth(device) || LeftDrawMayWriteStencil(device))
+            if (dxvkWritesDepth || dxvkWritesStencil)
                 ++R9MainDepthContentSerial;
 
             R31OwnedResult result{ true, D3D_OK };
@@ -868,6 +941,7 @@ namespace OutRunVRStereo
 
         void R32InvalidateResetCaches() noexcept
         {
+            OutRunVRDxvkMultiview::InvalidateDevice();
             R29Effect = {};
             R31BlockedVerifiedGeneration = 0;
             R31FastWorldCandidates = 0;
