@@ -9,6 +9,8 @@ on:
       - 'tools/OutRunVR-Backend-Selector.*'
       - 'tools/Collect-OutRunVRLogs.*'
       - 'tools/Run-OutRunVRTest.*'
+      - 'THIRD_PARTY_GPL_NOTICES.txt'
+      - 'LICENSE-3DMIGOTO-GPL-3.0.txt'
       - 'src/vr/**'
       - 'vrhost/**'
       - 'CMakeLists.txt'
@@ -265,6 +267,13 @@ jobs:
           Copy-Item tools/Run-OutRunVRTest.ps1 package/Run-OutRunVRTest.ps1
           Copy-Item tools/Run-OutRunVRTest.cmd package/Run-OutRunVRTest.cmd
           Copy-Item docs/VR_UNIFIED_TEST_SCENARIO.md package/VR_UNIFIED_TEST_SCENARIO.md
+
+          # Keep GPL attribution and corresponding adapted source with the
+          # distributable test package.
+          Copy-Item THIRD_PARTY_GPL_NOTICES.txt package/THIRD_PARTY_GPL_NOTICES.txt
+          Copy-Item LICENSE-3DMIGOTO-GPL-3.0.txt package/LICENSE-3DMIGOTO-GPL-3.0.txt
+          New-Item -ItemType Directory -Force package/SOURCE_GPL/3dmigoto-adapted | Out-Null
+          Copy-Item src/vr/d3d9/shader_fingerprint_gpl.hpp package/SOURCE_GPL/3dmigoto-adapted/shader_fingerprint_gpl.hpp
 
           $ini = Get-Content package/OutRun2006Tweaks.ini -Raw
           $ini = [regex]::Replace($ini, '(?m)^SkyGlowFactor\s*=.*$', 'SkyGlowFactor = 1')
