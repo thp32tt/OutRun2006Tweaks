@@ -1,5 +1,7 @@
 param(
-    [string]$GameExe = 'OR2006C2C.EXE'
+    [string]$GameExe = 'OR2006C2C.EXE',
+    [ValidateSet('CONTROL','CORRECTNESS','PERFORMANCE')]
+    [string]$TestProfile = 'CORRECTNESS'
 )
 
 $ErrorActionPreference='Stop'
@@ -8,6 +10,7 @@ $active=Join-Path $root 'ACTIVE_VR_BACKEND.txt'
 $current=Join-Path $root 'CURRENT_VR_SESSION.json'
 $collector=Join-Path $root 'Collect-OutRunVRLogs.ps1'
 $selector=Join-Path $root 'Select-OutRunVRBackend.ps1'
+$profileLib=Join-Path $root 'OutRunVR-TestProfiles.ps1'
 $game=Join-Path $root $GameExe
 
 if(!(Test-Path $active) -or !(Test-Path $current)){
@@ -15,7 +18,9 @@ if(!(Test-Path $active) -or !(Test-Path $current)){
 }
 if(!(Test-Path $collector)){throw 'Collect-OutRunVRLogs.ps1 not found.'}
 if(!(Test-Path $selector)){throw 'Select-OutRunVRBackend.ps1 not found.'}
+if(!(Test-Path $profileLib)){throw 'OutRunVR-TestProfiles.ps1 not found.'}
 if(!(Test-Path $game)){throw "Game executable not found: $game"}
+. $profileLib
 
 $running=Get-Process -ErrorAction SilentlyContinue|Where-Object{
     $_.ProcessName -ieq 'OR2006C2C' -or $_.ProcessName -ieq 'outrun-vr-host'
@@ -27,8 +32,6 @@ Get-Content $active|ForEach-Object{if($_ -match '^([^=]+)=(.*)$'){$kv[$matches[1
 $backend=$kv.backend
 if(!$backend){throw 'Active backend identity is missing.'}
 
-# If stale root logs exist, re-selecting the same backend seals them into the
-# previous session and creates a clean session before launch.
 $patterns=@(
     'OutRun2006Tweaks*.log',
     'outrun-vr-host*.log',
@@ -53,59 +56,77 @@ foreach($pattern in $patterns){
     }
 }
 if($stale){
-    & $selector -Backend $backend
+    & $selector -Backend $backend -TestProfile $TestProfile
     if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'Failed to seal stale logs before launch.'}
 }
 
 $state=Get-Content $current -Raw|ConvertFrom-Json
-Write-Host "Starting test session: $($state.SessionId)"
-Write-Host "Backend: $backend"
-
-# Recovery retest policy: first prove that the game can leave the white startup
-# screen before re-enabling high-refresh interpolation / XR phase-lock. These
-# command-line values are session-scoped and override both base and user INIs.
-$recoveryBootArgs=@(
-    '-FramerateLimit=60',
-    '-FramerateFastLoad=0',
-    '-FramerateInterpolation=false',
-    '-FramerateUnlockExperimental=false',
-    '-FrameCadenceMode=0',
-    '-DisableDesktopVsync=false',
-    '-SkyGlowFactor=1'
-)
-$gameArgs=@($recoveryBootArgs)
-if($backend -eq 'd3d9' -or $backend -eq 'dxvk-safe'){
-    $gameArgs += @(
-        '-PreferD3D9Ex=false',
-        '-DirectGpuOnly=false',
-        '-DisableDesktopDuplication=false'
-    )
+if($state.TestProfile -and $state.TestProfile -ne $TestProfile){
+    & $selector -Backend $backend -TestProfile $TestProfile
+    if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'Failed to prepare requested test profile.'}
+    $state=Get-Content $current -Raw|ConvertFrom-Json
 }
 
-$sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}" -f $state.BuildMatrixId,$state.VariantId,$state.SessionId)
+Write-Host "Starting test session: $($state.SessionId)"
+Write-Host "Backend: $backend"
+Write-Host "Profile: $TestProfile"
+
+if($backend -eq 'd3d9'){
+    $profile=Get-OutRunVRTestProfile -Name $TestProfile
+    $gameArgs=@($profile.Arguments)
+}else{
+    # Non-DX9Ex backends are retained only for explicit legacy comparison.
+    # Keep them on the conservative startup policy until the DX9Ex reference is accepted.
+    $gameArgs=@(
+        '-FramerateLimit=60',
+        '-FramerateFastLoad=0',
+        '-FramerateInterpolation=false',
+        '-FramerateUnlockExperimental=false',
+        '-FrameCadenceMode=0',
+        '-FrameCadenceTargetHz=0',
+        '-DisableDesktopVsync=false',
+        '-TargetRefreshRateHz=0',
+        '-SkyGlowFactor=1'
+    )
+    $profile=[ordered]@{
+        Name=$TestProfile
+        Description='Legacy/non-reference backend conservative launch'
+        Environment=[ordered]@{
+            OUTRUN_VR_TEST_PROFILE=$TestProfile
+            OUTRUN_VR_PERFORMANCE_PROFILE='0'
+        }
+    }
+}
+
+$sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)
 New-Item -ItemType Directory -Force $sessionRoot|Out-Null
 @(
     "backend=$backend"
+    "profile=$TestProfile"
     "forceVrDisabled=$($backend -eq '2d')"
     "arguments=$($gameArgs -join ' ')"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
-Write-Host "Recovery boot overrides: $($gameArgs -join ' ')"
+Write-Host "Runtime overrides: $($gameArgs -join ' ')"
 
-# DXVK/Vulkan safety: third-party implicit capture/overlay layers can crash
-# vkCreateInstance before DXVK gets control. The observed Bandicam path was
-# bdcamvk32.dll -> NVIDIA vkCreateInstance. Run the DXVK comparison with
-# implicit layers disabled and clear legacy forced instance layers.
 $dxvkMode = $backend -eq 'dxvk-safe' -or $backend -eq 'dxvk'
 $oldVkDisable = $env:VK_LOADER_LAYERS_DISABLE
 $oldVkInstanceLayers = $env:VK_INSTANCE_LAYERS
 $oldVkDebug = $env:VK_LOADER_DEBUG
 $oldVrForceDisabled = $env:OUTRUN_VR_FORCE_DISABLED
+$oldTestProfile = $env:OUTRUN_VR_TEST_PROFILE
+$oldPerformanceProfile = $env:OUTRUN_VR_PERFORMANCE_PROFILE
+
 if($backend -eq '2d'){
     $env:OUTRUN_VR_FORCE_DISABLED='1'
     Write-Host '2D control isolation: all OpenXR/VR hook installers are disabled for this process.'
 }else{
     $env:OUTRUN_VR_FORCE_DISABLED=$null
 }
+
+foreach($entry in $profile.Environment.GetEnumerator()){
+    Set-Item -Path ("Env:" + $entry.Key) -Value ([string]$entry.Value)
+}
+
 if($dxvkMode){
     $env:VK_LOADER_LAYERS_DISABLE='~implicit~'
     $env:VK_INSTANCE_LAYERS=$null
@@ -116,22 +137,22 @@ if($dxvkMode){
     if($bandicam){
         Write-Warning 'Bandicam process detected. Vulkan implicit layers are disabled for this launch; close Bandicam too if DXVK still crashes.'
     }
-    Write-Host 'DXVK Vulkan safety: implicit layers disabled for this test process.'
 }
 
 try{
     $p=Start-Process -FilePath $game -ArgumentList $gameArgs -WorkingDirectory $root -PassThru
+    $p.WaitForExit()
 } finally {
     $env:OUTRUN_VR_FORCE_DISABLED=$oldVrForceDisabled
+    $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
+    $env:OUTRUN_VR_PERFORMANCE_PROFILE=$oldPerformanceProfile
     if($dxvkMode){
         $env:VK_LOADER_LAYERS_DISABLE=$oldVkDisable
         $env:VK_INSTANCE_LAYERS=$oldVkInstanceLayers
         $env:VK_LOADER_DEBUG=$oldVkDebug
     }
 }
-$p.WaitForExit()
 
-# Give the auto-launched host a short chance to flush and exit normally.
 $deadline=(Get-Date).AddSeconds(15)
 do{
     $hostProc=Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue
