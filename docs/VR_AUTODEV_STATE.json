@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-20T18:42:00Z",
+  "updatedUtc": "2026-09-20T18:47:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -31,6 +31,13 @@
       "reviewImplementWindow": "02:00-18:59 Asia/Seoul",
       "freezeAt": "19:00 Asia/Seoul when material validated changes exist",
       "at20": "Do not rebuild a successful frozen candidate unless build failure, new P0, or materially safer correction."
+    },
+    "ciModel": {
+      "lightweightPolicyWorkflow": ".github/workflows/vr-test-policy.yml",
+      "activeValidationWorkflow": ".github/workflows/vr-dx9ex-active.yml",
+      "manualComparisonWorkflow": ".github/workflows/vr-unified-backends.yml",
+      "defaultSourceBuilds": "one active Win32 DX9Ex DLL + one x64 D3D11 OpenXR host",
+      "comparisonMatrix": "manual only; P1-P4 retained for hypothesis isolation when profile switching cannot answer the question"
     }
   },
   "runtimeEvidence": {
@@ -53,14 +60,14 @@
     "Recovery runtime forcing 60 FPS with interpolation/cadence disabled contributes independent judder on a 90 Hz OpenXR session.",
     "Restore fast R29 world rendering and classification in bounded variants before deciding which later R30-R34 overlays are required."
   ],
-  "nextAction": "Wait for host/game CI on rolling capture. If build passes, continue exporting low-overhead timing/draw-class evidence without adding continuous image capture; accumulate LEVEL1 correctness fixes for the next single CORRECTNESS evening candidate.",
+  "nextAction": "Validate DX9Ex Active Validation at current head. If host/game/package pass, mark rolling capture BUILD VERIFIED and use the single active workflow for routine source changes. Keep the four-way comparison matrix manual-only.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
     "lastEntryStartKst": "2026-09-21T02:59:17+09:00",
     "historyCommitSha": "035e061e9331867d993d983e1c4bdb514b12e2f3",
     "result": "NO MATERIAL CHANGE / NO BUILD NEEDED",
-    "nextAction": "Wait for host/game CI on rolling capture. If build passes, continue exporting low-overhead timing/draw-class evidence without adding continuous image capture; accumulate LEVEL1 correctness fixes for the next single CORRECTNESS evening candidate."
+    "nextAction": "Validate DX9Ex Active Validation at current head. If host/game/package pass, mark rolling capture BUILD VERIFIED and use the single active workflow for routine source changes. Keep the four-way comparison matrix manual-only."
   },
   "legacyCandidateMatrix": {
     "matrixId": "DX9EX-20260920-ee94dc8051b6",
