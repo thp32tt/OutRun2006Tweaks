@@ -79,11 +79,22 @@ namespace OutRunVRStereo
         bool R23CaptureActualGameState(IDirect3DDevice9* device,
             R22ScissorSnapshot& out, const char* site, bool force) noexcept
         {
-            // StateBlock::Apply can change viewport/scissor state without
-            // traversing the tracked D3D setters. Never trust an enabled
-            // scissor shadow across a top-level draw: the observed failure was
-            // cache=enabled while the live device was already disabled. For
-            // the common disabled state, bound the stale window to 16 draws.
+            // Once StateBlock::Apply interception is actually proven,
+            // setter + Apply boundaries own the shadow and effect draws no
+            // longer need periodic GetViewport/GetScissorRect queries. Keep
+            // forced live reads for SetRenderTarget implicit viewport changes.
+            const bool effectForce =
+                force && site && std::strcmp(site, "R28EffectDraw") == 0;
+            if (R22ShadowState.Valid() &&
+                R22StateBlockTrackingReliable.load(std::memory_order_acquire) &&
+                (!force || effectForce))
+            {
+                out = R22ShadowState;
+                return true;
+            }
+
+            // If Apply tracking is unavailable, retain the conservative
+            // historical live-validation window.
             if (!force && R23LastStateSampleEpoch == PresentEpoch &&
                 R22ShadowState.Valid() && !R22ShadowState.enabled &&
                 R23GameDrawSerial - R23LastStateSampleDrawSerial < 16)
