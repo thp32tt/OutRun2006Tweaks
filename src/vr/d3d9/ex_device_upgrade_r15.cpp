@@ -540,7 +540,7 @@ namespace OutRunVRD3D9ExUpgradeR13
             }
             bool validate() override
             {
-                return Settings::VRPreferD3D9Ex;
+                return true;
             }
             bool apply() override
             {
@@ -549,7 +549,7 @@ namespace OutRunVRD3D9ExUpgradeR13
                     !R14TextureLockR13Hook || !R14TextureUnlockR13Hook)
                 {
                     spdlog::error(
-                        "VR R15 EX: lower R14 compatibility overlay is unavailable; Ex promotion remains disabled");
+                        "VR R15 EX: lower R14 compatibility overlay is unavailable; strict D3D9On12 path remains unavailable");
                     return false;
                 }
                 const auto disabled = safetyhook::InlineHook::StartDisabled;
