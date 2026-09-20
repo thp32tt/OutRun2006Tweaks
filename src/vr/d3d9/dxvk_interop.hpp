@@ -68,7 +68,9 @@ public:
     // Arms exactly one following D3D9 draw. The DXVK fork must consume or
     // reject the state atomically and clear it after that draw.
     virtual HRESULT STDMETHODCALLTYPE ArmStereoDraw(
-        const OutRunVR::DxvkInterop::DrawStateV1* state) = 0;
+        const OutRunVR::DxvkInterop::DrawStateV1* state,
+        IUnknown* rightColorTarget,
+        IUnknown* rightDepthTarget) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE CancelStereoDraw() = 0;
 
