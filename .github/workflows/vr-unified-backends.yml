@@ -9,6 +9,9 @@ on:
       - 'tools/OutRunVR-Backend-Selector.*'
       - 'tools/Collect-OutRunVRLogs.*'
       - 'tools/Run-OutRunVRTest.*'
+      - 'src/vr/**'
+      - 'vrhost/**'
+      - 'CMakeLists.txt'
       - 'docs/VR_UNIFIED_TEST_SCENARIO.md'
       - '.github/workflows/vr-unified-backends.yml'
 
