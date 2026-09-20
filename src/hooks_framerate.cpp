@@ -23,6 +23,11 @@ typedef struct timecaps_tag {
 
 namespace Settings
 {
+	// Defined by src/vr/settings.cpp. The legacy limiter uses these only to
+	// provide a safe 60 Hz startup/menu fallback until XR cadence is live.
+	extern Setting<bool> VREnabled;
+	extern Setting<int> VRFrameCadenceMode;
+
 	Setting<int> FramerateLimit{ "Performance", "FramerateLimit", 0,
 		"Valid values are 0 (unlimited/vsync), 60 (vanilla), or values above 60. "
 		"Framerates above 60 will duplicate frames, unless FramerateInterpolation is also enabled." };
