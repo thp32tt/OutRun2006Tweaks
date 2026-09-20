@@ -393,11 +393,11 @@ namespace OutRunVRStereo
             DWORD zWrite = TRUE;
             DWORD zEnable = D3DZB_TRUE;
             DWORD cullMode = D3DCULL_CCW;
-            if (FAILED(device->GetRenderState(D3DRS_ALPHABLENDENABLE, &alphaBlend)) ||
-                FAILED(device->GetRenderState(D3DRS_ALPHATESTENABLE, &alphaTest)) ||
-                FAILED(device->GetRenderState(D3DRS_ZWRITEENABLE, &zWrite)) ||
-                FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable)) ||
-                FAILED(device->GetRenderState(D3DRS_CULLMODE, &cullMode)))
+            if (!ReadTrackedRenderState(device, D3DRS_ALPHABLENDENABLE, alphaBlend) ||
+                !ReadTrackedRenderState(device, D3DRS_ALPHATESTENABLE, alphaTest) ||
+                !ReadTrackedRenderState(device, D3DRS_ZWRITEENABLE, zWrite) ||
+                !ReadTrackedRenderState(device, D3DRS_ZENABLE, zEnable) ||
+                !ReadTrackedRenderState(device, D3DRS_CULLMODE, cullMode))
             {
                 if (!R13FirstDrawTimeStateReadFailureLogged)
                 {
