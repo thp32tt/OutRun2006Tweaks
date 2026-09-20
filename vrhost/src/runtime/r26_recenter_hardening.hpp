@@ -31,6 +31,9 @@ namespace OutRunVrR26RecenterHardening
     inline bool PendingFocusRecenter = false;
     inline XrSession PendingFocusSession = XR_NULL_HANDLE;
     inline std::atomic<LONG> PendingGameRequestId{ 0 };
+    inline std::atomic<bool> PendingApplicationRecenter{ false };
+    inline std::atomic<std::uint64_t> ApplicationSpaceGeneration{ 0 };
+    inline std::atomic<std::uint64_t> PendingGameTargetGeneration{ 0 };
     inline bool FallbackAnchorValid = false;
     inline XrPosef FallbackAnchor{};
     inline std::uint64_t ReferenceChangesNormalized = 0;
@@ -62,6 +65,75 @@ namespace OutRunVrR26RecenterHardening
     {
         FallbackAnchorValid = false;
         FallbackAnchor = {};
+    }
+
+    inline void QueueApplicationRecenter() noexcept
+    {
+        PendingApplicationRecenter.store(true, std::memory_order_release);
+        InvalidateFallbackAnchor();
+    }
+
+    inline bool ApplicationRecenterAppliedForPendingGameRequest() noexcept
+    {
+        const std::uint64_t target =
+            PendingGameTargetGeneration.load(std::memory_order_acquire);
+        return target == 0 ||
+            ApplicationSpaceGeneration.load(std::memory_order_acquire) >= target;
+    }
+
+    // Apply a real application-space recenter. The new LOCAL space is created
+    // relative to the immutable runtime LOCAL origin at the current HMD pose,
+    // making the current headset pose the application's new origin. Keeping the
+    // original base LOCAL alive also makes repeated recenter requests stable.
+    inline bool ApplyPendingApplicationRecenter(XrSession session,
+        XrSpace viewSpace, XrSpace& localSpace, XrTime displayTime) noexcept
+    {
+        if (!PendingApplicationRecenter.load(std::memory_order_acquire))
+            return true;
+        const XrSpace base = OutRunVrFinalTest::BaseLocalSpace != XR_NULL_HANDLE
+            ? OutRunVrFinalTest::BaseLocalSpace : localSpace;
+        if (session == XR_NULL_HANDLE || viewSpace == XR_NULL_HANDLE ||
+            base == XR_NULL_HANDLE || displayTime == 0)
+            return false;
+
+        XrSpaceLocation location{ XR_TYPE_SPACE_LOCATION };
+        if (XR_FAILED(::xrLocateSpace(viewSpace, base, displayTime, &location)))
+            return false;
+        constexpr XrSpaceLocationFlags need =
+            XR_SPACE_LOCATION_ORIENTATION_VALID_BIT |
+            XR_SPACE_LOCATION_POSITION_VALID_BIT;
+        if ((location.locationFlags & need) != need)
+            return false;
+
+        XrReferenceSpaceCreateInfo create{ XR_TYPE_REFERENCE_SPACE_CREATE_INFO };
+        create.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_LOCAL;
+        create.poseInReferenceSpace = location.pose;
+        XrSpace recentered = XR_NULL_HANDLE;
+        if (XR_FAILED(::xrCreateReferenceSpace(session, &create, &recentered)) ||
+            recentered == XR_NULL_HANDLE)
+            return false;
+
+        const XrSpace previous = localSpace;
+        localSpace = recentered;
+        OutRunVrFinalTest::LocalSpace = recentered;
+        std::uint64_t generation =
+            ApplicationSpaceGeneration.fetch_add(1, std::memory_order_acq_rel) + 1;
+        if (generation == 0)
+            generation =
+                ApplicationSpaceGeneration.fetch_add(1, std::memory_order_acq_rel) + 1;
+        PendingApplicationRecenter.store(false, std::memory_order_release);
+        InvalidateFallbackAnchor();
+
+        // Never destroy the immutable runtime LOCAL. Old application-created
+        // recenter spaces can be retired immediately after all future locates
+        // are redirected to the new handle.
+        if (previous != XR_NULL_HANDLE && previous != base)
+            ::xrDestroySpace(previous);
+
+        std::cerr
+            << "[R46 recenter] application LOCAL origin recreated generation="
+            << generation << " current headset pose is now application center\n";
+        return true;
     }
 
     inline bool EnsureFallbackAnchor(XrSession session,
@@ -159,10 +231,14 @@ namespace OutRunVrR26RecenterHardening
                 // Received means only that the host accepted ownership. Applied
                 // is deliberately deferred until EndFrame succeeds after the
                 // LOCAL anchor invalidation/rebuild cycle.
+                const std::uint64_t targetGeneration =
+                    ApplicationSpaceGeneration.load(std::memory_order_acquire) + 1;
+                PendingGameTargetGeneration.store(
+                    targetGeneration, std::memory_order_release);
+                QueueApplicationRecenter();
                 WriteSyntheticLocalChange(eventData, XR_NULL_HANDLE);
                 channel.MarkReceived(requestId);
                 PendingGameRequestId.store(requestId, std::memory_order_release);
-                InvalidateFallbackAnchor();
                 ++GameRequestsReceived;
                 std::cerr
                     << "[R28 recenter] F10 request received requestId="
@@ -174,10 +250,10 @@ namespace OutRunVrR26RecenterHardening
 
         if (PendingFocusRecenter && eventData)
         {
+            QueueApplicationRecenter();
             WriteSyntheticLocalChange(eventData, PendingFocusSession);
             PendingFocusRecenter = false;
             PendingFocusSession = XR_NULL_HANDLE;
-            InvalidateFallbackAnchor();
             return XR_SUCCESS;
         }
 
@@ -243,7 +319,8 @@ namespace OutRunVrR26RecenterHardening
     {
         const LONG pending =
             PendingGameRequestId.load(std::memory_order_acquire);
-        if (pending == 0)
+        if (pending == 0 ||
+            !ApplicationRecenterAppliedForPendingGameRequest())
             return false;
 
         auto& channel = OutRunVR::RecenterIpc::SharedChannel();
@@ -255,6 +332,7 @@ namespace OutRunVrR26RecenterHardening
         if (cleared)
         {
             ++GameRequestsApplied;
+            PendingGameTargetGeneration.store(0, std::memory_order_release);
             InvalidateFallbackAnchor();
             std::cerr
                 << "[R45 recenter] requestId=" << pending
@@ -292,7 +370,8 @@ namespace OutRunVrR26RecenterHardening
              OutRunVrR24BlackScreenGuard::CachedLayerFallbacks != cachedBefore ||
              OutRunVrR24BlackScreenGuard::EmergencyLayerFallbacks != emergencyBefore);
 
-        if (pending != 0 && XR_SUCCEEDED(result) && !r24ViewFallback &&
+        if (pending != 0 && ApplicationRecenterAppliedForPendingGameRequest() &&
+            XR_SUCCEEDED(result) && !r24ViewFallback &&
             (anchoredStartup || (endInfo && endInfo->layerCount > 0)))
         {
             auto& channel = OutRunVR::RecenterIpc::SharedChannel();
@@ -302,6 +381,7 @@ namespace OutRunVrR26RecenterHardening
                 expected, 0, std::memory_order_acq_rel,
                 std::memory_order_acquire);
             ++GameRequestsApplied;
+            PendingGameTargetGeneration.store(0, std::memory_order_release);
             std::cerr
                 << "[R28 recenter] requestId=" << pending
                 << " path=" << (anchoredStartup ?
