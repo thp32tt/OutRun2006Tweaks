@@ -15,8 +15,10 @@ No game/host runtime source, profile, renderer behavior, refresh policy or backe
 - Workflow YAML parse and `git diff --check`: pass.
 - Policy job: pass.
 - Compliance assembly and validation job: pass.
+- Win32 DX9Ex game, x64 D3D11 OpenXR host and compliance-gated runtime package jobs: pass.
 - Actual artifact `10614663672` downloaded and opened.
 - Outer artifact digest: `sha256:6e9b4d910d3d951fbdbeaa07fccd53a54f597b8dc5a8f6da6dd5adec4ebdcc05`.
+- Runtime artifact `10615335705`: `sha256:f5639d8a53779c4a6886807ce81c4e6b9380d095bf18aab37a4f07c99bea13df`.
 - Manifest and `SOURCE_SHA.txt`: exact candidate SHA `734d04f359d29ebce8951d93ed4f534a580b77b0`.
 - `CORRESPONDING_SOURCE.zip` contains the root/host CMake inputs and exact `src/vr/d3d9/shader_fingerprint_gpl.hpp`.
 - All 10 internal checksum entries matched; the source archive covered all 289 regular blobs from the candidate tree, with submodule gitlinks recorded separately.
