@@ -7,7 +7,19 @@ on:
       - 'src/vr/**'
       - 'CMakeLists.txt'
       - 'cmake.toml'
+      - 'OutRun2006Tweaks.ini'
       - 'docs/VR_DXVK_ARCHITECTURE.md'
+      - 'dxvk-fork/**'
+      - '.github/workflows/vr-dxvk-poc.yml'
+  pull_request:
+    branches: [ vr-openxr ]
+    paths:
+      - 'src/vr/**'
+      - 'CMakeLists.txt'
+      - 'cmake.toml'
+      - 'OutRun2006Tweaks.ini'
+      - 'docs/VR_DXVK_ARCHITECTURE.md'
+      - 'dxvk-fork/**'
       - '.github/workflows/vr-dxvk-poc.yml'
   workflow_dispatch:
 
