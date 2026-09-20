@@ -140,3 +140,37 @@ Only after this extraction and a Quest/VDXR smoke run should the wire protocol m
 ## License boundary
 
 GPL or otherwise incompatible reference implementations are used only for observable behavior, algorithms, failure cases and architecture comparison. Their code is not copied into this fork. Permissively licensed code may be imported only after its exact license and attribution requirements are recorded with the import.
+
+
+## DX12 branch reference ledger (2026-09-20)
+
+The strict `vr-dx12-poc` branch uses the following projects as API/design references.
+No large third-party renderer source has been transplanted into the game DLL.
+
+| Project | License | DX12-branch use |
+| --- | --- | --- |
+| Khronos OpenXR-SDK-Source / hello_xr | Apache-2.0 | authoritative OpenXR D3D12 graphics-binding, runtime-required adapter LUID/feature-level, swapchain/session patterns |
+| Microsoft DirectX-Headers | MIT | D3D12 capability/feature structure names and modern API contract reference |
+| Microsoft DirectXTK12 | MIT | D3D12 resource/descriptor/command-list lifetime patterns; reference only at present |
+| megai2/d912pxy | MIT | D3D9-to-D3D12 translation/cache architecture reference; no source copied because its full translator ownership model does not match this x86 D3D9On12 branch |
+| doitsujin/dxvk | zlib | draw/state/pipeline translation and legacy-D3D failure-mode reference; no Vulkan/DXVK runtime is embedded in the strict DX12 path |
+| OpenComposite | GPLv3 | OpenXR/OpenVR architecture comparison only; no GPL source copied |
+
+### What is actually reused vs. only studied
+
+The branch directly links the existing OpenXR loader dependency already used by
+the project and calls Windows' system D3D9On12/D3D12 implementations. The new
+cross-process D3D12 transport, shared-fence ownership, frame leasing,
+single-draw stereo compositor, render-pose matching and menu theater code are
+implemented in this repository.
+
+Bringing in a complete second translation runtime such as DXVK or d912pxy on
+top of D3D9On12 would create two competing D3D9 translation owners and would
+make failures harder to isolate. Their useful algorithms and failure patterns
+are therefore harvested selectively rather than vendoring an entire runtime.
+
+D3D12 Memory Allocator is also intentionally not added for the current four-slot
+eye ring: only a small fixed number of shareable committed textures is created,
+and named shared-resource semantics are clearer with explicit committed
+resources. It should be reconsidered only if the native path grows a large
+dynamic resource allocator.
