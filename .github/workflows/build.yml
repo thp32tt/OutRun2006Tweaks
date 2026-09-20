@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches-ignore: [ vr-d3d9ex-focus ]
+    branches-ignore: [ vr-d3d9ex-focus, 'vr-d3d9ex-candidate/**' ]
   pull_request:
 
 jobs:
