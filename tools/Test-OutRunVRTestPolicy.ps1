@@ -2,6 +2,7 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
+$repoRoot = Split-Path -Parent $root
 . (Join-Path $root 'OutRunVR-TestProfiles.ps1')
 
 function Assert-True([bool]$condition,[string]$message) {
@@ -17,7 +18,7 @@ $correctness = Get-OutRunVRTestProfile -Name CORRECTNESS
 $performance = Get-OutRunVRTestProfile -Name PERFORMANCE
 
 foreach($profile in @($control,$correctness,$performance)) {
-    Assert-True ($profile.Name -in @('CONTROL','CORRECTNESS','PERFORMANCE')) "invalid profile identity"
+    Assert-True ($profile.Name -in @('CONTROL','CORRECTNESS','PERFORMANCE')) 'invalid profile identity'
     Assert-True (Has-Argument $profile '-PreferD3D9Ex=true') "$($profile.Name): D3D9Ex reference must be preferred"
     Assert-True (Has-Argument $profile '-DirectGpuOnly=false') "$($profile.Name): DirectGPU must remain optional by default"
     Assert-True (Has-Argument $profile '-DisableDesktopDuplication=false') "$($profile.Name): fallback must remain available by default"
@@ -50,12 +51,11 @@ Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'TestProfile') 'selector
 Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'Get-OutRunVRTestProfile') 'runner must consume profile definitions'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'TEST_PROFILE') 'collector manifest must record profile'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match '\$variant/\$profile/\$session') 'collector path must separate Variant/Profile/Session'
+Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'captureRoot') 'collector must include capture bundles'
 Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'CORRECTNESS') 'GUI must expose CORRECTNESS'
 Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'CONTROL') 'GUI must expose CONTROL'
 Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'PERFORMANCE') 'GUI must expose PERFORMANCE'
 
-
-$repoRoot = Split-Path -Parent $root
 $watchdogPath = Join-Path $repoRoot 'vrhost/src/diagnostics/runtime_watchdog.cpp'
 Assert-True (Test-Path $watchdogPath) 'runtime watchdog source missing'
 $watchdog = Get-Content $watchdogPath -Raw
@@ -63,8 +63,6 @@ Assert-True ($watchdog -match 'VK_F9') 'diagnostic capture must use the non-conf
 Assert-True ($watchdog -match 'VK_CONTROL') 'diagnostic capture must require Ctrl modifier'
 Assert-True ($watchdog -match 'RollingSampleCount\s*=\s*100') 'rolling capture must remain bounded near 10 seconds at 100 ms sampling'
 Assert-True ($watchdog -match 'std::ios::app') 'watchdog log must preserve same-session host restarts'
-Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'captureRoot') 'collector must include capture bundles'
-
 
 $activeWorkflowPath = Join-Path $repoRoot '.github/workflows/vr-dx9ex-active.yml'
 $comparisonWorkflowPath = Join-Path $repoRoot '.github/workflows/vr-unified-backends.yml'
@@ -73,7 +71,12 @@ Assert-True (Test-Path $comparisonWorkflowPath) 'manual comparison workflow miss
 $activeWorkflow = Get-Content $activeWorkflowPath -Raw
 $comparisonWorkflow = Get-Content $comparisonWorkflowPath -Raw
 Assert-True ($activeWorkflow -match 'name:\s*DX9Ex Active Validation') 'active workflow identity mismatch'
-Assert-True ($activeWorkflow -notmatch '(?m)^\s*matrix:\s*
+Assert-True ($activeWorkflow -notmatch '(?m)^\s*matrix:\s*$') 'routine active workflow must not build a variant matrix'
+Assert-True ($activeWorkflow -notmatch 'P1_C1_FAST_WORLD|P2_C2_FAST_HUD|P4_R26_HUD_SAFE') 'routine active workflow leaked comparison variants'
+Assert-True ($comparisonWorkflow -match 'name:\s*DX9Ex Comparison Matrix \(Manual\)') 'comparison workflow identity mismatch'
+Assert-True ($comparisonWorkflow -notmatch '(?m)^\s*push:\s*$') 'four-way comparison workflow must remain manual-only'
+
+$statePath = Join-Path $repoRoot 'docs/VR_AUTODEV_STATE.json'
 Assert-True (Test-Path $statePath) 'VR_AUTODEV_STATE.json missing'
 $state = Get-Content $statePath -Raw | ConvertFrom-Json
 Assert-True ($state.schemaVersion -ge 2) 'autodev state schema must include runtime-test policy'
@@ -84,30 +87,3 @@ Assert-True ($state.testProfiles.CONTROL.defaultUserTest -eq $false) 'CONTROL mu
 Assert-True ($state.testProfiles.PERFORMANCE.defaultUserTest -eq $false) 'PERFORMANCE must be optional'
 
 Write-Host 'VR test policy verification passed: profile identity, runtime defaults, session/log separation, GUI exposure, bounded Ctrl+F9 capture, single-active CI and TEST_LEVEL state are consistent.'
-) 'routine active workflow must not build a variant matrix'
-Assert-True ($activeWorkflow -notmatch 'P1_C1_FAST_WORLD|P2_C2_FAST_HUD|P4_R26_HUD_SAFE') 'routine active workflow leaked comparison variants'
-Assert-True ($comparisonWorkflow -match 'name:\s*DX9Ex Comparison Matrix \(Manual\)') 'comparison workflow identity mismatch'
-Assert-True ($comparisonWorkflow -notmatch '(?m)^\s*push:\s*
-Assert-True (Test-Path $statePath) 'VR_AUTODEV_STATE.json missing'
-$state = Get-Content $statePath -Raw | ConvertFrom-Json
-Assert-True ($state.schemaVersion -ge 2) 'autodev state schema must include runtime-test policy'
-Assert-True ($null -ne $state.runtimeTestQueue) 'runtimeTestQueue missing'
-Assert-True ($null -ne $state.eveningCandidate) 'eveningCandidate state missing'
-Assert-True ($state.testProfiles.CORRECTNESS.defaultUserTest -eq $true) 'CORRECTNESS must be the default user runtime test'
-Assert-True ($state.testProfiles.CONTROL.defaultUserTest -eq $false) 'CONTROL must be optional'
-Assert-True ($state.testProfiles.PERFORMANCE.defaultUserTest -eq $false) 'PERFORMANCE must be optional'
-
-Write-Host 'VR test policy verification passed: profile identity, runtime defaults, session/log separation, GUI exposure, bounded Ctrl+F9 capture and TEST_LEVEL state are consistent.'
-) 'four-way comparison workflow must remain manual-only'
-
-$statePath = Join-Path (Split-Path -Parent $root) 'docs/VR_AUTODEV_STATE.json'
-Assert-True (Test-Path $statePath) 'VR_AUTODEV_STATE.json missing'
-$state = Get-Content $statePath -Raw | ConvertFrom-Json
-Assert-True ($state.schemaVersion -ge 2) 'autodev state schema must include runtime-test policy'
-Assert-True ($null -ne $state.runtimeTestQueue) 'runtimeTestQueue missing'
-Assert-True ($null -ne $state.eveningCandidate) 'eveningCandidate state missing'
-Assert-True ($state.testProfiles.CORRECTNESS.defaultUserTest -eq $true) 'CORRECTNESS must be the default user runtime test'
-Assert-True ($state.testProfiles.CONTROL.defaultUserTest -eq $false) 'CONTROL must be optional'
-Assert-True ($state.testProfiles.PERFORMANCE.defaultUserTest -eq $false) 'PERFORMANCE must be optional'
-
-Write-Host 'VR test policy verification passed: profile identity, runtime defaults, session/log separation, GUI exposure, bounded Ctrl+F9 capture and TEST_LEVEL state are consistent.'
