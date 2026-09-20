@@ -1402,20 +1402,36 @@ namespace OutRunVRStereo
             return R44OverlayMatrixKind::Unknown;
         }
 
-        constexpr UINT R47SmallAlphaPrimitiveLimit() noexcept
+        struct R48PrimitiveRange
         {
-#if defined(OUTRUN_VR_SMALL_ALPHA_LIMIT_2)
-            return 2u;
+            UINT min = 0u;
+            UINT max = 0u;
+        };
+
+        constexpr R48PrimitiveRange R48AlphaPrimitiveRange() noexcept
+        {
+#if defined(OUTRUN_VR_ALPHA_RANGE_33_64)
+            return {33u, 64u};
+#elif defined(OUTRUN_VR_ALPHA_RANGE_65_128)
+            return {65u, 128u};
+#elif defined(OUTRUN_VR_ALPHA_RANGE_129_256)
+            return {129u, 256u};
+#elif defined(OUTRUN_VR_ALPHA_RANGE_257_512)
+            return {257u, 512u};
+#elif defined(OUTRUN_VR_ALPHA_RANGE_513_1024)
+            return {513u, 1024u};
+#elif defined(OUTRUN_VR_SMALL_ALPHA_LIMIT_2)
+            return {1u, 2u};
 #elif defined(OUTRUN_VR_SMALL_ALPHA_LIMIT_4)
-            return 4u;
+            return {1u, 4u};
 #elif defined(OUTRUN_VR_SMALL_ALPHA_LIMIT_8)
-            return 8u;
+            return {1u, 8u};
 #elif defined(OUTRUN_VR_SMALL_ALPHA_LIMIT_16)
-            return 16u;
+            return {1u, 16u};
 #elif defined(OUTRUN_VR_SMALL_ALPHA_LIMIT_32)
-            return 32u;
+            return {1u, 32u};
 #else
-            return 0u;
+            return {};
 #endif
         }
 
@@ -1459,14 +1475,15 @@ namespace OutRunVRStereo
             if (!alphaLike)
                 return R30ScreenSpaceKind::None;
 
-            const UINT smallLimit = R47SmallAlphaPrimitiveLimit();
+            const auto alphaRange = R48AlphaPrimitiveRange();
             const bool triangleLike =
                 primitiveType == D3DPT_TRIANGLELIST ||
                 primitiveType == D3DPT_TRIANGLESTRIP ||
                 primitiveType == D3DPT_TRIANGLEFAN;
             const bool smallAlphaCandidate =
-                smallLimit != 0u && triangleLike &&
-                primitiveCount > 0u && primitiveCount <= smallLimit;
+                alphaRange.min != 0u && alphaRange.max >= alphaRange.min &&
+                triangleLike && primitiveCount >= alphaRange.min &&
+                primitiveCount <= alphaRange.max;
             if (smallAlphaCandidate)
             {
                 ++R47SmallAlphaCandidates;
