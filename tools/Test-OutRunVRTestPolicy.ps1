@@ -65,6 +65,41 @@ Assert-True ($watchdog -match 'RollingSampleCount\s*=\s*100') 'rolling capture m
 Assert-True ($watchdog -match 'std::ios::app') 'watchdog log must preserve same-session host restarts'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'captureRoot') 'collector must include capture bundles'
 
+
+$activeWorkflowPath = Join-Path $repoRoot '.github/workflows/vr-dx9ex-active.yml'
+$comparisonWorkflowPath = Join-Path $repoRoot '.github/workflows/vr-unified-backends.yml'
+Assert-True (Test-Path $activeWorkflowPath) 'single active DX9Ex workflow missing'
+Assert-True (Test-Path $comparisonWorkflowPath) 'manual comparison workflow missing'
+$activeWorkflow = Get-Content $activeWorkflowPath -Raw
+$comparisonWorkflow = Get-Content $comparisonWorkflowPath -Raw
+Assert-True ($activeWorkflow -match 'name:\s*DX9Ex Active Validation') 'active workflow identity mismatch'
+Assert-True ($activeWorkflow -notmatch '(?m)^\s*matrix:\s*
+Assert-True (Test-Path $statePath) 'VR_AUTODEV_STATE.json missing'
+$state = Get-Content $statePath -Raw | ConvertFrom-Json
+Assert-True ($state.schemaVersion -ge 2) 'autodev state schema must include runtime-test policy'
+Assert-True ($null -ne $state.runtimeTestQueue) 'runtimeTestQueue missing'
+Assert-True ($null -ne $state.eveningCandidate) 'eveningCandidate state missing'
+Assert-True ($state.testProfiles.CORRECTNESS.defaultUserTest -eq $true) 'CORRECTNESS must be the default user runtime test'
+Assert-True ($state.testProfiles.CONTROL.defaultUserTest -eq $false) 'CONTROL must be optional'
+Assert-True ($state.testProfiles.PERFORMANCE.defaultUserTest -eq $false) 'PERFORMANCE must be optional'
+
+Write-Host 'VR test policy verification passed: profile identity, runtime defaults, session/log separation, GUI exposure, bounded Ctrl+F9 capture, single-active CI and TEST_LEVEL state are consistent.'
+) 'routine active workflow must not build a variant matrix'
+Assert-True ($activeWorkflow -notmatch 'P1_C1_FAST_WORLD|P2_C2_FAST_HUD|P4_R26_HUD_SAFE') 'routine active workflow leaked comparison variants'
+Assert-True ($comparisonWorkflow -match 'name:\s*DX9Ex Comparison Matrix \(Manual\)') 'comparison workflow identity mismatch'
+Assert-True ($comparisonWorkflow -notmatch '(?m)^\s*push:\s*
+Assert-True (Test-Path $statePath) 'VR_AUTODEV_STATE.json missing'
+$state = Get-Content $statePath -Raw | ConvertFrom-Json
+Assert-True ($state.schemaVersion -ge 2) 'autodev state schema must include runtime-test policy'
+Assert-True ($null -ne $state.runtimeTestQueue) 'runtimeTestQueue missing'
+Assert-True ($null -ne $state.eveningCandidate) 'eveningCandidate state missing'
+Assert-True ($state.testProfiles.CORRECTNESS.defaultUserTest -eq $true) 'CORRECTNESS must be the default user runtime test'
+Assert-True ($state.testProfiles.CONTROL.defaultUserTest -eq $false) 'CONTROL must be optional'
+Assert-True ($state.testProfiles.PERFORMANCE.defaultUserTest -eq $false) 'PERFORMANCE must be optional'
+
+Write-Host 'VR test policy verification passed: profile identity, runtime defaults, session/log separation, GUI exposure, bounded Ctrl+F9 capture and TEST_LEVEL state are consistent.'
+) 'four-way comparison workflow must remain manual-only'
+
 $statePath = Join-Path (Split-Path -Parent $root) 'docs/VR_AUTODEV_STATE.json'
 Assert-True (Test-Path $statePath) 'VR_AUTODEV_STATE.json missing'
 $state = Get-Content $statePath -Raw | ConvertFrom-Json
