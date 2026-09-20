@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedUtc": "2026-09-20T13:52:00Z",
+  "updatedUtc": "2026-09-20T17:55:25Z",
   "branch": "vr-unified-backends",
   "publicationMode": "github-fast-forward-cas",
   "frozen": true,
@@ -55,6 +55,58 @@
     "branchShaSync": "passed",
     "skyGlowFactor": 1
   },
-  "nextAction": "Retest frozen matrix VRM-20260920-803144005c0e. Check D3D9 SAFE first for a completed stereo frame and real depth, then DXVK SAFE for the same, then DX12 STRICT only for device-creation/startup progress before deeper renderer judgement.",
-  "integrationHead": "803144005c0e45352602917a2f51804ec6b18ae6"
+  "nextAction": "Continue from unified commit ad14ed6c6757634233ec79b71f42be53c563edb7 with T0-debug commit 365b294b6a96c98ada434b439a982725e1ba542c as the build-validated DX9Ex reference input. Next hourly work should port bounded fingerprint telemetry and the narrow S6/S7 lens-flare candidate into the D3D9Ex path only, fail closed, without broad WVP/WorldBillboard promotion; then prepare no more than six runtime candidates. Do not mark Position HUD, white overlays, or T5 fast-path correctness fixed without runtime evidence.",
+  "integrationHead": "ad14ed6c6757634233ec79b71f42be53c563edb7",
+  "activeDevelopment": true,
+  "dx9exWorkingBase": {
+    "branch": "vr-d3d9ex-t0-debug",
+    "buildValidatedCommit": "365b294b6a96c98ada434b439a982725e1ba542c",
+    "branchHead": "7298d1f2426da9134aca17b83f23076a495fd788",
+    "ciRunId": 35526213136,
+    "artifactId": 10609747550,
+    "artifactSha256": "7cf2cc7a8ed762a07bcc3bb474e9d37bb0980ac0320b944a1999d61f23612a4f",
+    "innerZipSha256": "b034553ac0b919a9d7944ee11168a6e5dd3f868221a047585b3a8da7cfe8ed0d",
+    "buildValidation": "host/game/package success",
+    "runtimeEvidence": [
+      "T0-derived world/sky/loading behavior is the stability reference",
+      "stage loading reached gameplay normally in the latest T0-family runtime tests",
+      "persistent last-good stereo projection removed the full-screen solid/empty-color stall symptom",
+      "S6/S7-family narrow alpha+flat-WVP behavior collapsed duplicated lens flare to one in runtime tests, but camera-relative correctness remains unconfirmed"
+    ],
+    "unresolved": [
+      "Position HUD 6th/6 remains duplicated/oversized and is not confirmed fixed",
+      "white rank/score and exit YES/NO remain split",
+      "T5/R29 fast path improves frame rate somewhat but corrupts sky/world and is performance evidence only"
+    ]
+  },
+  "reviewBatches": {
+    "RB01": {
+      "status": "complete",
+      "completedUtc": "2026-09-20T17:55:25Z",
+      "inputs": {
+        "unifiedHeadBefore": "fc71a50a10ddcccb6e38e6a41fba8e3f7fc3d74f",
+        "t0DebugBuild": "365b294b6a96c98ada434b439a982725e1ba542c",
+        "t0DebugBranchHead": "7298d1f2426da9134aca17b83f23076a495fd788"
+      },
+      "lenses": [
+        "architecture/build/backend boundary",
+        "resource/state/lifetime/synchronization",
+        "stereo HUD/sky/effects/recenter/menu correctness",
+        "performance draw amplification/copies/XR pacing",
+        "adversarial regression/fail-closed review"
+      ],
+      "result": "Do not wholesale-merge diverged T0 branch. Port only validated behaviors in bounded changes."
+    }
+  },
+  "currentRun": {
+    "type": "manual-hourly-equivalent",
+    "sourceCommit": "ad14ed6c6757634233ec79b71f42be53c563edb7",
+    "change": "Port T0 loading bootstrap and persistent last-good gameplay projection guards into the current unified host without changing HUD/effect classifiers.",
+    "buildRunId": 35527017219,
+    "unifiedRunId": 35527017201,
+    "unifiedArtifactId": 10609683851,
+    "artifactSha256": "a5e21693ae74d51ea0ba7b2483ef133fbfde9517068993a5e8796f6b5bc37243",
+    "innerZipSha256": "12088212f8ec4af2f92cdc6280e785f51112b9e50945c10b8fe9fb4f1dd08780",
+    "validation": "Build success; D3D9 SAFE, DXVK game/host, DXVK provider, multiview patcher, DX12 and package all success; runtime validation pending."
+  }
 }
