@@ -1,0 +1,153 @@
+name: DX9Ex White Overlay Matrix
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ vr-d3d9ex-white-overlay-test ]
+    paths:
+      - 'src/vr/d3d9/**'
+      - 'src/vr/game/**'
+      - 'cmake.toml'
+      - 'vrhost/**'
+      - 'tools/Run-DX9Ex-White-Test.ps1'
+      - 'tools/RUN_DX9EX_WHITE_TEST.cmd'
+      - '.github/workflows/dx9ex-white-overlay-test.yml'
+
+concurrency:
+  group: dx9ex-white-overlay-test
+  cancel-in-progress: true
+
+jobs:
+  host:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Build OpenXR host
+        shell: pwsh
+        run: |
+          cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
+          cmake --build build-host --config Release --target outrun-vr-host
+          if (-not (Test-Path build-host/bin/outrun-vr-host.exe)) { throw "host missing" }
+          New-Item -ItemType Directory -Force stage | Out-Null
+          Copy-Item build-host/bin/outrun-vr-host.exe stage/outrun-vr-host.exe
+          Set-Content stage/HOST_SHA.txt $env:GITHUB_SHA -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dx9ex-white-host
+          path: stage/
+          if-no-files-found: error
+
+  game:
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: W0_H4_R26HUD_BASE
+            pcommon: OFF
+            xcommon: OFF
+            purpose: "H4 source with R26+R30 HUD actually compiled; baseline"
+          - variant: W1_PERSPECTIVE_COMMON
+            pcommon: ON
+            xcommon: OFF
+            purpose: "PerspectiveHud gets identical world-locked clip transform in both eyes"
+          - variant: W2_XYZRHW_COMMON
+            pcommon: OFF
+            xcommon: ON
+            purpose: "Non-world XYZRHW HUD gets identical world-locked projection in both eyes"
+          - variant: W3_BOTH_COMMON
+            pcommon: ON
+            xcommon: ON
+            purpose: "Both PerspectiveHud and non-world XYZRHW HUD use identical eye transforms"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Configure ${{ matrix.variant }}
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 `
+            -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF `
+            -DOUTRUN_VR_R26_HUD_COMPARE=ON `
+            -DOUTRUN_VR_WHITE_PERSPECTIVE_COMMON=${{ matrix.pcommon }} `
+            -DOUTRUN_VR_WHITE_XYZRHW_COMMON=${{ matrix.xcommon }}
+      - name: Apply VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+      - name: Build game DLL
+        run: cmake --build build-game --config Release --target outrun2006tweaks
+      - name: Stage game DLL
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force stage | Out-Null
+          $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if (-not $dll) { throw "dinput8.dll missing" }
+          Copy-Item $dll.FullName stage/dinput8.dll
+          @(
+            "variant=${{ matrix.variant }}"
+            "sourceSha=$env:GITHUB_SHA"
+            "baseHistoricalSha=110b5c6c5732f3bde569d42352126502262dcc2a"
+            "perspectiveCommon=${{ matrix.pcommon }}"
+            "xyzrhwCommon=${{ matrix.xcommon }}"
+            "purpose=${{ matrix.purpose }}"
+          ) | Set-Content stage/WHITE_VARIANT.txt -Encoding UTF8
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dx9ex-white-${{ matrix.variant }}
+          path: stage/
+          if-no-files-found: error
+
+  package:
+    runs-on: windows-2022
+    needs: [host, game]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dx9ex-white-host
+          path: payload/host
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: dx9ex-white-W*
+          path: payload/games
+          merge-multiple: false
+      - name: Assemble four tester ZIPs
+        shell: pwsh
+        run: |
+          $variants = @(
+            'W0_H4_R26HUD_BASE',
+            'W1_PERSPECTIVE_COMMON',
+            'W2_XYZRHW_COMMON',
+            'W3_BOTH_COMMON'
+          )
+          New-Item -ItemType Directory -Force output | Out-Null
+          foreach ($variant in $variants) {
+            $dir = Join-Path package $variant
+            New-Item -ItemType Directory -Force $dir | Out-Null
+            Copy-Item "payload/games/dx9ex-white-$variant/dinput8.dll" (Join-Path $dir 'dinput8.dll')
+            Copy-Item "payload/games/dx9ex-white-$variant/WHITE_VARIANT.txt" (Join-Path $dir 'WHITE_VARIANT.txt')
+            Copy-Item payload/host/outrun-vr-host.exe (Join-Path $dir 'outrun-vr-host.exe')
+            Copy-Item tools/Run-DX9Ex-White-Test.ps1 (Join-Path $dir 'Run-DX9Ex-White-Test.ps1')
+            Copy-Item tools/RUN_DX9EX_WHITE_TEST.cmd (Join-Path $dir 'RUN_DX9EX_WHITE_TEST.cmd')
+            $forbidden = @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe')
+            foreach($f in $forbidden){ if(Test-Path (Join-Path $dir $f)){ throw "Forbidden file $f" } }
+            Get-ChildItem $dir -File | Get-FileHash -Algorithm SHA256 | ForEach-Object {
+              "$($_.Hash)  $($_.Path | Split-Path -Leaf)"
+            } | Set-Content (Join-Path $dir 'SHA256SUMS.txt') -Encoding ascii
+            Compress-Archive -Path (Join-Path $dir '*') -DestinationPath (Join-Path output ("OutRun2_VR_DX9EX_WHITE_{0}.zip" -f $variant)) -Force
+          }
+          $z = Get-ChildItem output -Filter '*.zip'
+          if($z.Count -ne 4){ throw "Expected 4 zips, found $($z.Count)" }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-DX9EX-WHITE-4PACK-${{ github.sha }}
+          path: output/*.zip
+          if-no-files-found: error
