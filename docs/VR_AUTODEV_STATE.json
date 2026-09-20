@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-20T18:38:00Z",
+  "updatedUtc": "2026-09-20T18:42:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -53,14 +53,14 @@
     "Recovery runtime forcing 60 FPS with interpolation/cadence disabled contributes independent judder on a 90 Hz OpenXR session.",
     "Restore fast R29 world rendering and classification in bounded variants before deciding which later R30-R34 overlays are required."
   ],
-  "nextAction": "Finish LEVEL0 deterministic profile/log/session verifier and CI integration; then continue DX9Ex static correctness work. Accumulate compatible LEVEL1 fixes for one CORRECTNESS evening candidate. Do not require legacy P1-P4 sequential runtime tests unless profile isolation cannot distinguish a specific hypothesis.",
+  "nextAction": "Wait for host/game CI on rolling capture. If build passes, continue exporting low-overhead timing/draw-class evidence without adding continuous image capture; accumulate LEVEL1 correctness fixes for the next single CORRECTNESS evening candidate.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
     "lastEntryStartKst": "2026-09-21T02:59:17+09:00",
     "historyCommitSha": "035e061e9331867d993d983e1c4bdb514b12e2f3",
     "result": "NO MATERIAL CHANGE / NO BUILD NEEDED",
-    "nextAction": "Finish LEVEL0 deterministic profile/log/session verifier and CI integration; then continue DX9Ex static correctness work. Accumulate compatible LEVEL1 fixes for one CORRECTNESS evening candidate. Do not require legacy P1-P4 sequential runtime tests unless profile isolation cannot distinguish a specific hypothesis."
+    "nextAction": "Wait for host/game CI on rolling capture. If build passes, continue exporting low-overhead timing/draw-class evidence without adding continuous image capture; accumulate LEVEL1 correctness fixes for the next single CORRECTNESS evening candidate."
   },
   "legacyCandidateMatrix": {
     "matrixId": "DX9EX-20260920-ee94dc8051b6",
@@ -129,8 +129,13 @@
       },
       {
         "id": "L0-VERIFY-001",
-        "status": "pending",
+        "status": "implemented-ci-gated",
         "item": "Deterministic profile/session/log policy verifier and CI hook."
+      },
+      {
+        "id": "L0-CAPTURE-001",
+        "status": "implemented-build-validation-pending",
+        "item": "Background watchdog rolling capture with Ctrl+F9; no render-hot-path file I/O."
       }
     ],
     "level1": [
@@ -181,8 +186,8 @@
     "reason": "Freeze at 19:00 only when material validated changes exist; preserve during user testing."
   },
   "diagnosticCapture": {
-    "status": "planned-progressive",
-    "triggerPolicy": "F11 remains Tweaks overlay; use a non-conflicting modified key such as Ctrl+F11 only after verifying overlay interaction, otherwise select another explicit bind.",
+    "status": "phase1-implemented-build-validation-pending",
+    "triggerPolicy": "Ctrl+F9 selected to avoid F11 Tweaks overlay and F12 recenter.",
     "rollingTelemetrySeconds": 10,
     "heavyContinuousImageDumping": false,
     "requiredIdentity": [
@@ -202,7 +207,20 @@
       "frameTimings",
       "recentLogs"
     ],
-    "eyeImages": "optional only when safe and low-overhead"
+    "eyeImages": "optional only when safe and low-overhead",
+    "postWindowSeconds": 2,
+    "phase1": [
+      "v2/v3 pose/frame/client/ack rolling samples",
+      "runtime recommended eye size",
+      "host/rendered eye pose/FOV snapshot",
+      "session/backend/profile/source/config identity",
+      "collector ZIP inclusion"
+    ],
+    "deferred": [
+      "per-stage wait/acquire/render-left/render-right/copy/end timings",
+      "left/right eye image snapshots",
+      "draw-class counters not already exposed by IPC"
+    ]
   },
   "scheduledAutomationModel": {
     "main00": "Production review/implement/validate/commit on vr-d3d9ex-focus at :00.",
