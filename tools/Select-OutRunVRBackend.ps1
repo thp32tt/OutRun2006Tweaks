@@ -55,7 +55,8 @@ function Seal-PendingSessionLogs {
     }
 
     if($oldState -and $oldState.SessionId -and $oldState.BuildMatrixId -and $oldState.VariantId){
-        $dest=Join-Path $root ("logs/{0}/{1}/{2}" -f $oldState.BuildMatrixId,$oldState.VariantId,$oldState.SessionId)
+        $oldProfile=if($oldState.TestProfile){[string]$oldState.TestProfile}else{'CORRECTNESS'}
+        $dest=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $oldState.BuildMatrixId,$oldState.VariantId,$oldProfile,$oldState.SessionId)
     }else{
         $stamp=(Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssfffZ')
         $dest=Join-Path $root ("logs/_orphaned/{0}" -f $stamp)
@@ -165,7 +166,7 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "Enabled" "false"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "false"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "false"
-        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
     } elseif ($Backend -eq "dxvk-safe") {
@@ -184,7 +185,7 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "Enabled" "true"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
-        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
     } else {
