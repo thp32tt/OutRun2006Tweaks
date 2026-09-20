@@ -2007,6 +2007,7 @@ int main(int argc, char** argv)
         std::array<XrCompositionLayerProjectionView, 2>
             cachedMenuProjectionViews{};
         bool cachedMenuProjectionValid = false;
+        bool awaitingFirstGameplayStereo = false;
         XrPosef menuProjectionAnchor{};
         menuProjectionAnchor.orientation.w = 1.0f;
         bool menuProjectionAnchorValid = false;
@@ -2187,6 +2188,7 @@ int main(int argc, char** argv)
                     cachedProjectionValid = false;
                     cachedProjectionRenderedMs = 0;
                     cachedMenuProjectionValid = false;
+                    awaitingFirstGameplayStereo = false;
                     if ((head.locationFlags & R45MenuAnchorFlags) ==
                         R45MenuAnchorFlags)
                     {
@@ -2202,7 +2204,11 @@ int main(int argc, char** argv)
                 }
                 else
                 {
-                    cachedMenuProjectionValid = false;
+                    // Keep the last visible menu/loading projection alive only
+                    // until the first real gameplay stereo frame arrives.
+                    // Direct-only previously discarded it immediately, leaving
+                    // VDXR with no valid source during stage-loading.
+                    awaitingFirstGameplayStereo = true;
                 }
                 lastPresentation = presentation;
                 std::cout << "VR presentation R45: "
@@ -2696,6 +2702,33 @@ int main(int argc, char** argv)
                     QueryPerformanceCounter(&re);
                     frameRenderMs += timings.Ms(rs, re);
                     timings.render.Add(timings.Ms(rs, re));
+
+                    if (frameFreshProjection)
+                    {
+                        awaitingFirstGameplayStereo = false;
+                        cachedMenuProjectionValid = false;
+                    }
+
+                    // Stage-select -> gameplay can publish PresentationGameplay
+                    // several seconds before the first complete stereo frame.
+                    // In direct-only mode keep the last menu/loading projection
+                    // visible during only that bootstrap window instead of
+                    // submitting an empty/black compositor frame.
+                    if (!layerReady && directTransportOnly &&
+                        awaitingFirstGameplayStereo &&
+                        cachedMenuProjectionValid)
+                    {
+                        pv = cachedMenuProjectionViews;
+                        projection.space = localSpace;
+                        projection.viewCount = 2;
+                        projection.views = pv.data();
+                        layers[0] =
+                            reinterpret_cast<const XrCompositionLayerBaseHeader*>(
+                                &projection);
+                        layerReady = true;
+                        intentionalMonoProjection = true;
+                        finalLayerKind = "gameplay-bootstrap-menu-hold";
+                    }
 
                     // Never submit a zero-layer frame just because Desktop
                     // Duplication missed the stereo grace window. VDXR can show a
