@@ -90,6 +90,7 @@ namespace OutRunVRStereo
         std::uint64_t R30Hud2DDraws = 0;
         std::uint64_t R30PerspectiveHudDraws = 0;
         std::uint64_t R30WorldBillboardDraws = 0;
+        std::uint64_t R30FlatEffectHudDraws = 0;
         std::uint64_t R44OverlayOwnedWvpHits = 0;
         std::uint64_t R44OverlayOwnedWvpGroupHits = 0;
         std::uint64_t R44SpatialBillboardClassifications = 0;
@@ -1276,6 +1277,7 @@ namespace OutRunVRStereo
             None,
             Hud2D,
             PerspectiveHud,
+            FlatEffectHud,
             WorldBillboard
         };
 
@@ -1399,16 +1401,6 @@ namespace OutRunVRStereo
                 OutRunVR::PassPolicy::ProjectionClass::Perspective3D)
                 return R30ScreenSpaceKind::None;
 
-            // Verified/rebindable perspective WVP is already owned by the true
-            // world path and must never be intercepted as UI.
-            if (CurrentDrawMatchesVerifiedWorld(device))
-                return R30ScreenSpaceKind::None;
-            std::uintptr_t reboundShader = 0;
-            std::uint64_t reboundSerial = 0;
-            if (R28CanRebindVerifiedWorld(
-                    device, reboundShader, reboundSerial))
-                return R30ScreenSpaceKind::None;
-
             DWORD zEnable = D3DZB_TRUE;
             DWORD zWrite = TRUE;
             DWORD alphaBlend = FALSE;
@@ -1426,6 +1418,37 @@ namespace OutRunVRStereo
             const bool alphaLike =
                 alphaBlend != FALSE || alphaTest != FALSE;
             if (!alphaLike)
+                return R30ScreenSpaceKind::None;
+
+            // Focused R13-flat experiment. R13 runs below R30 and masks the
+            // vertex-shader identity for depth-off/two-sided alpha draws, then
+            // replays them with stock WVP. That creates visible L/R separation
+            // for white rank/result/YES-NO overlays. Intercept the exact R13
+            // signature before the verified-world early-out so R30 owns it as
+            // a finite HUD-plane draw instead.
+            const bool r13FlatEffectShape =
+                cullMode == D3DCULL_NONE &&
+                zEnable == D3DZB_FALSE &&
+                ((alphaBlend != FALSE && zWrite == FALSE) ||
+                 alphaTest != FALSE);
+#if defined(OUTRUN_VR_R13_FLAT_PREEMPT)
+            if (r13FlatEffectShape)
+                return R30ScreenSpaceKind::FlatEffectHud;
+#endif
+#if defined(OUTRUN_VR_R13_FLAT_PREEMPT_BROAD)
+            if (zEnable == D3DZB_FALSE && alphaLike)
+                return R30ScreenSpaceKind::FlatEffectHud;
+#endif
+
+            // Verified/rebindable perspective WVP is already owned by the true
+            // world path and must never be intercepted as UI, except for the
+            // explicit R13-flat experiments above.
+            if (CurrentDrawMatchesVerifiedWorld(device))
+                return R30ScreenSpaceKind::None;
+            std::uintptr_t reboundShader = 0;
+            std::uint64_t reboundSerial = 0;
+            if (R28CanRebindVerifiedWorld(
+                    device, reboundShader, reboundSerial))
                 return R30ScreenSpaceKind::None;
 
             float rawOwnedWvp[16]{};
@@ -1452,11 +1475,6 @@ namespace OutRunVRStereo
             // is still a flat overlay. Routing it through the finite HUD plane
             // prevents two visible zero-disparity copies for result text while
             // preserving depth-tested unknown effects fail-closed.
-            const bool r13FlatEffectShape =
-                cullMode == D3DCULL_NONE &&
-                zEnable == D3DZB_FALSE &&
-                ((alphaBlend != FALSE && zWrite == FALSE) ||
-                 alphaTest != FALSE);
             if (r13FlatEffectShape)
             {
                 ++R44FlatOverlayClassifications;
@@ -3030,6 +3048,7 @@ namespace OutRunVRStereo
                 return false;
 
             if (screenKind == R30ScreenSpaceKind::PerspectiveHud ||
+                screenKind == R30ScreenSpaceKind::FlatEffectHud ||
                 screenKind == R30ScreenSpaceKind::WorldBillboard)
             {
                 // R44: glyph/billboard batches commonly reuse one game c64 for
@@ -3133,7 +3152,8 @@ namespace OutRunVRStereo
             }
 
             if (screenKind != R30ScreenSpaceKind::Hud2D &&
-                screenKind != R30ScreenSpaceKind::PerspectiveHud)
+                screenKind != R30ScreenSpaceKind::PerspectiveHud &&
+                screenKind != R30ScreenSpaceKind::FlatEffectHud)
                 return false;
 
             // R40: turn all screen HUD into one finite, recentered view plane.
@@ -3184,6 +3204,26 @@ namespace OutRunVRStereo
                     inverseBaseProjection);
             if (!MatrixFinite(commonViewPlane))
                 return false;
+
+#if defined(OUTRUN_VR_R13_FLAT_COMMON)
+            if (screenKind == R30ScreenSpaceKind::FlatEffectHud)
+            {
+                // True zero-disparity diagnostic for only the R13-flat class.
+                // Keep the plane world-locked by headInverse, but use the same
+                // base projection for both eye textures so white UI cannot
+                // acquire binocular separation from asymmetric FOV/IPD.
+                const D3DMATRIX corrected =
+                    MultiplyMatrix(
+                        MultiplyMatrix(commonViewPlane, headInverse),
+                        baseProjection);
+                if (!MatrixFinite(corrected))
+                    return false;
+                const D3DMATRIX correctedT = TransposeMatrix(corrected);
+                std::memcpy(eyeConstants[0], &correctedT, sizeof(correctedT));
+                std::memcpy(eyeConstants[1], &correctedT, sizeof(correctedT));
+                return true;
+            }
+#endif
 
             for (int eye = 0; eye < 2; ++eye)
             {
@@ -3364,6 +3404,8 @@ namespace OutRunVRStereo
                 ++R30Hud2DDraws;
             else if (screenKind == R30ScreenSpaceKind::PerspectiveHud)
                 ++R30PerspectiveHudDraws;
+            else if (screenKind == R30ScreenSpaceKind::FlatEffectHud)
+                ++R30FlatEffectHudDraws;
             else if (screenKind == R30ScreenSpaceKind::WorldBillboard)
                 ++R30WorldBillboardDraws;
 
