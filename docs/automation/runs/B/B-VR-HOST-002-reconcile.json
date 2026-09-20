@@ -3,7 +3,7 @@
   "role": "B",
   "runId": "B-VR-HOST-002-reconcile",
   "startedKst": "2026-09-21T04:05:00+09:00",
-  "completedKst": "2026-09-21T04:06:00+09:00",
+  "completedKst": "2026-09-21T04:10:00+09:00",
   "baseSha": "16e50077fcf3e30b516abf48d8088060e30084cf",
   "findingIds": [
     "VR-HOST-002"
@@ -11,17 +11,30 @@
   "inputHashes": {
     "currentMainR23Blob": "39935464e4965b2d72f9fede0c7950599582c68a",
     "testedFixSourceCommit": "ad14ed6c6757634233ec79b71f42be53c563edb7",
-    "testedFixBlob": "81042ca91b9e98d16f79f1c637f6a2a1db4ec86d"
+    "testedFixBlob": "81042ca91b9e98d16f79f1c637f6a2a1db4ec86d",
+    "restoredUnifiedRuntimeTip": "6585f9c7770de4e1c68bd16ffeb6ddeb9b3b8a4d",
+    "validationUpdates": [
+      "d0f8a6a9f1be3bb7b8b5f72a93f77d499ffb716c",
+      "383ee4ddeb52896accd56066ff382b4927583281"
+    ]
   },
   "changedPaths": [
-    "vrhost/src/main_r23.cpp"
+    "src/vr/ipc/protocol.hpp",
+    "src/vr/d3d9/stereo_renderer_r7.inc",
+    "vrhost/src/main.cpp",
+    "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp",
+    "src/vr/ipc/shadow_legacy_v2.hpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/src/runtime/openxr_api_compat.hpp",
+    "tools/verify_vr_architecture.py",
+    "tools/verify_vr_r32_review.py"
   ],
   "candidateBranch": "vr-d3d9ex-candidate/VR-HOST-002-reconcile",
-  "candidateSha": "7ff7f052eb3fdc0eba145762505579bf791814d1",
+  "candidateSha": "a2b2e4d0168c311e8998df4dc6c012c47e855558",
   "ci": {
     "workflow": "DX9Ex Active Validation",
-    "runId": 35531179095,
-    "status": "queued",
+    "runId": 35531382160,
+    "status": "pending",
     "artifactIds": []
   },
   "evidenceLevel": "STATICALLY_VERIFIED",
@@ -29,10 +42,10 @@
     {
       "id": "VR-HOST-002",
       "proposedStatus": "NEEDS_VALIDATION",
-      "reason": "Current focus main_r23 matched the pre-fix fc71 blob exactly; restored the previously build-validated T0 loading/stall projection guard patch without touching other DX9Ex renderer files."
+      "reason": "Reconciled all runtime-safety fixes unique to the post-test unified line: loading/stall projection hold, Frame.v2 run-generation identity, stale-slot invalidation/rejection, DirectGPU run binding, v3 shadow run binding, validated gameplay handoff, fallback-reader stale-run rejection, plus matching architecture/depth-policy verifier updates."
     }
   ],
   "blockers": [],
   "retryCount": 0,
-  "nextAction": "C validates candidate 7ff7f052 and D integrates only after exact candidate CI passes; Quest 3 runtime remains required for final visual acceptance."
+  "nextAction": "C validates exact runtime source SHA a2b2e4d0 in run 35531382160. D integrates the runtime patch set only after build/regression gates pass; Quest 3 runtime still required for final visual/pacing acceptance."
 }
