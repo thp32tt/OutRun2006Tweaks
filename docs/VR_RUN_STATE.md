@@ -1,39 +1,49 @@
 # VR Run State
 
-Updated: 2026-09-20 22:51 KST
+Updated: 2026-09-20 22:52 KST
 
 ## Current checkpoint
-- C0 RECOVER: complete
-- C1 REVIEW: uploaded 5f9028de retest logs reviewed
-- C2 IMPLEMENT: complete
-- C3 VALIDATE: all backend builds, hosts, selector smoke tests, package checks, and general Win32 build passed
+- C0 RECOVER: complete — 2D and D3D9 SAFE startup regression cleared on the previous recovery build
+- C1 REVIEW: complete — runtime logs isolated the flat half-screen symptom to transport/fallback policy rather than common game startup
+- C2 IMPLEMENT: complete — SAFE transport policy, host fallback crop guard, and DX12 D3D9On12 device-creation semantics updated
+- C3 VALIDATE: complete — all unified backend jobs and package validation succeeded
 - C4 COMMIT: complete
-- C5 PACKAGE: complete
+- C5 PACKAGE: complete — frozen tester ZIP produced
 - C6 STATE: complete
 
-## Frozen retest candidate
-- Integration: `803144005c0e45352602917a2f51804ec6b18ae6`
+## Frozen recovery candidate
+- Integration commit: `803144005c0e45352602917a2f51804ec6b18ae6`
 - Matrix: `VRM-20260920-803144005c0e`
-- D3D9: `803144005c0e45352602917a2f51804ec6b18ae6`
-- DXVK game/host: `5e58ee35e14636dbfad3ad3744d350aa09859992`
+- Unified workflow: `35514339728` — success
+- Build workflow: `35514339665` — success
+- Unified artifact: `10606816032`
+- Artifact ZIP SHA256: `1517890fd2efe90f9c5fe8f345d7fd695b534b33de5ad1937441836f386e6cca`
+- Tester inner ZIP SHA256: `e48b1648ce80f7027e3cdea3bbb13192cc56c5bd99628ee886759e6d8916e065`
+
+## Backend source identity
+- D3D9 SAFE: `803144005c0e45352602917a2f51804ec6b18ae6`
+- DXVK game + host: `5e58ee35e14636dbfad3ad3744d350aa09859992`
 - DXVK provider: `5bb301ab22f7b41d68a879bf84c1e3d10ae0c473`
 - Multiview patcher: `0ef3253da1738b07e67358a027311c7bcedaa001`
-- DX12: `ab8e00ab4a21e4ebb23fbc4046abda51e885bcb6`
-- Unified workflow: `35514339728` success
-- General Build workflow: `35514339665` success
-- Runtime ZIP SHA256: `e48b1648ce80f7027e3cdea3bbb13192cc56c5bd99628ee886759e6d8916e065`
+- DX12 strict: `ab8e00ab4a21e4ebb23fbc4046abda51e885bcb6`
 
-## Findings addressed
-The previous 5f9028de retest proved the boot regression was fixed: 2D and D3D9 SAFE start normally. Gameplay then exposed a separate transport problem. SAFE configuration said `DirectGpuOnly=false`, but R9 still consulted a stale process environment value and suppressed SBS fallback, leaving the Host with no completed stereo frame. The Host then treated the full-width mono desktop as SBS and cropped its left half, producing the observed enlarged half-screen mono image.
+## Runtime evidence that led to this candidate
+The previous recovery package reached normal startup in 2D and D3D9 SAFE. D3D9 SAFE and DXVK SAFE then showed the same enlarged/cropped left-half flat image in gameplay, while DX12 STRICT failed device creation.
 
-The frozen candidate makes game-side R9 follow the parsed setting directly, and the Host only left-half-crops a source explicitly marked completed SBS. The same fixes are synchronized to the DXVK branch.
+The logs and source review showed:
+1. SAFE configuration had `DirectGpuOnly=false`, but the game R9 transport gate read stale CRT environment values and stayed in direct-only mode. That suppressed SBS/Desktop Duplication fallback even though no shared-eye transport was ready.
+2. The host recovery theater always cropped the left half, even when the desktop source was a normal full-width mono frame. That exactly produced the observed half-screen zoom.
+3. DX12 reached `Direct3DCreate9On12Ex`, then failed device creation with `D3DERR_INVALIDCALL`. The strict branch now uses legacy D3D9On12 `CreateDevice` semantics and a bounded compatibility retry without permitting native D3D9 fallback.
 
-DX12 previously reached D3D9On12 but failed device creation with invalid-call presentation parameters. The DX12 branch now preserves legacy `CreateDevice` semantics and performs one bounded compatibility retry without falling back to native D3D9. Its Host also carries the corrected fallback crop policy.
+## Fixes frozen into this matrix
+- D3D9 SAFE: `R9DirectOnlyTransport()` follows parsed `Settings::VRDirectGpuOnly` directly.
+- DXVK SAFE/MULTIVIEW: same game-side transport fix synchronized to the DXVK branch.
+- D3D11 OpenXR hosts: left-half crop is used only for a frame explicitly marked completed SBS; otherwise recovery shows full-width mono.
+- DX12 STRICT: legacy `CreateDevice` contract first, then one bounded presentation normalization retry while staying on D3D9On12.
+- `SkyGlowFactor = 1` remains packaged.
 
-## Resume cursor
-Retest only three short gates:
-1. A_CONTROL: enter gameplay and verify true stereo appears instead of half-width zoom.
-2. E_DXVK_SAFE: repeat the same gate.
-3. F_DX12_STRICT: verify device creation/menu first; only continue into gameplay if startup succeeds.
+## Non-blocking branch CI notes
+Two generic branch workflows still have stale checks unrelated to the unified tester result: the DXVK generic R34/OFF build exercises an older incompatible renderer combination, and its host verification script uses PowerShell's reserved `$Host` variable; the DX12 generic verifier searches for the old strict-pass marker string. The unified workflow builds and stages the intended SAFE/DX12 payloads successfully and is the acceptance path for this tester.
 
-If A_CONTROL still has no completed stereo frame, analyze the new session ZIP before changing any additional renderer code.
+## Next runtime test
+Use only the frozen `VRM-20260920-803144005c0e` tester. Test D3D9 SAFE first and look for actual geometry stereo rather than a flat recovery theater. If D3D9 is good, test DXVK SAFE. Then test DX12 STRICT only far enough to see whether device creation/startup now passes; deeper DX12 rendering work comes after that boundary is cleared.
