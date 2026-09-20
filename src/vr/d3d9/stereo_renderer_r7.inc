@@ -96,6 +96,8 @@ namespace OutRunVRStereo
 		OutRunVR::SharedPoseState* SharedState = nullptr;
 		HANDLE RenderFrameMapping = nullptr;
 		OutRunVR::SharedRenderFrameRing* RenderFrameRing = nullptr;
+		std::uint32_t RenderFrameRunGeneration = 0;
+		bool RenderFrameRingClaimed = false;
 
 		IDirect3DSurface9* BackBuffer = nullptr;
 		IDirect3DSurface9* TrackedRenderTarget = nullptr;
@@ -548,10 +550,85 @@ namespace OutRunVRStereo
 			return true;
 		}
 
+		std::uint32_t MakeRenderFrameRunGeneration() noexcept
+		{
+			LARGE_INTEGER qpc{};
+			QueryPerformanceCounter(&qpc);
+			std::uint32_t generation =
+				static_cast<std::uint32_t>(qpc.LowPart) ^
+				static_cast<std::uint32_t>(qpc.HighPart) ^
+				GetCurrentProcessId() ^
+				GetTickCount() ^
+				0x52554E47u; // 'RUNG'
+			if (!generation)
+				generation = 1;
+			return generation;
+		}
+
+		bool ClaimRenderFrameRingForCurrentRun() noexcept
+		{
+			if (!RenderFrameRing)
+				return false;
+			const bool headerValid =
+				RenderFrameRing->magic == OutRunVR::RenderFrameMagic &&
+				RenderFrameRing->protocolVersion == OutRunVR::RenderFrameProtocolVersion &&
+				RenderFrameRing->structSize == sizeof(OutRunVR::SharedRenderFrameRing) &&
+				RenderFrameRing->slotCount == OutRunVR::RenderFrameRingSize;
+			if (!headerValid)
+				return false;
+
+			const std::uint32_t self = GetCurrentProcessId();
+			if (!RenderFrameRunGeneration)
+				RenderFrameRunGeneration = MakeRenderFrameRunGeneration();
+
+			if (RenderFrameRingClaimed)
+				return RenderFrameRing->clientPid == self &&
+					RenderFrameRing->reserved0 == RenderFrameRunGeneration;
+
+			// The host may keep Frame.v2 mapped across a fast game restart.
+			// Claim a new run generation under the ring seqlock and invalidate
+			// every old slot before publishing any frame from this process.
+			LONG ringSeq = InterlockedIncrement(
+				reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
+			if ((ringSeq & 1) == 0)
+				ringSeq = InterlockedIncrement(
+					reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
+			MemoryBarrier();
+
+			RenderFrameRing->clientPid = self;
+			RenderFrameRing->reserved0 = RenderFrameRunGeneration;
+			RenderFrameRing->latestSlot = 0;
+			for (auto& slot : RenderFrameRing->slots)
+			{
+				std::memset(&slot, 0, sizeof(slot));
+				slot.protocolVersion = OutRunVR::RenderFrameProtocolVersion;
+				slot.structSize = sizeof(slot);
+				slot.clientPid = self;
+				slot.reserved[OutRunVR::RenderFrameRunGenerationIndex] =
+					RenderFrameRunGeneration;
+				MemoryBarrier();
+				slot.magic = OutRunVR::RenderFrameMagic;
+			}
+
+			MemoryBarrier();
+			ringSeq = InterlockedIncrement(
+				reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
+			if (ringSeq & 1)
+				InterlockedIncrement(
+					reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
+
+			RenderFrameRingClaimed = true;
+			spdlog::info(
+				"VR Frame.v2: claimed run identity pid={} generation=0x{:08x}; stale slots from previous game runs invalidated",
+				self, RenderFrameRunGeneration);
+			return true;
+		}
+
 		bool EnsureRenderFrameState()
 		{
 			if (RenderFrameRing)
-				return RenderFrameRing->magic == OutRunVR::RenderFrameMagic && RenderFrameRing->protocolVersion == OutRunVR::RenderFrameProtocolVersion && RenderFrameRing->structSize == sizeof(OutRunVR::SharedRenderFrameRing) && RenderFrameRing->slotCount == OutRunVR::RenderFrameRingSize;
+				return ClaimRenderFrameRingForCurrentRun();
+
 			RenderFrameMapping = CreateFileMappingW(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, static_cast<DWORD>(sizeof(OutRunVR::SharedRenderFrameRing)), OutRunVR::RenderFrameMemoryName);
 			if (!RenderFrameMapping) return false;
 			const bool existed = GetLastError() == ERROR_ALREADY_EXISTS;
@@ -563,10 +640,16 @@ namespace OutRunVRStereo
 				RenderFrameRing->protocolVersion = OutRunVR::RenderFrameProtocolVersion;
 				RenderFrameRing->structSize = sizeof(*RenderFrameRing);
 				RenderFrameRing->slotCount = OutRunVR::RenderFrameRingSize;
-				for (auto& slot : RenderFrameRing->slots) { slot.protocolVersion = OutRunVR::RenderFrameProtocolVersion; slot.structSize = sizeof(slot); slot.magic = OutRunVR::RenderFrameMagic; }
-				MemoryBarrier(); RenderFrameRing->magic = OutRunVR::RenderFrameMagic;
+				for (auto& slot : RenderFrameRing->slots)
+				{
+					slot.protocolVersion = OutRunVR::RenderFrameProtocolVersion;
+					slot.structSize = sizeof(slot);
+					slot.magic = OutRunVR::RenderFrameMagic;
+				}
+				MemoryBarrier();
+				RenderFrameRing->magic = OutRunVR::RenderFrameMagic;
 			}
-			return RenderFrameRing->magic == OutRunVR::RenderFrameMagic && RenderFrameRing->protocolVersion == OutRunVR::RenderFrameProtocolVersion && RenderFrameRing->structSize == sizeof(OutRunVR::SharedRenderFrameRing) && RenderFrameRing->slotCount == OutRunVR::RenderFrameRingSize;
+			return ClaimRenderFrameRingForCurrentRun();
 		}
 
 		void PoisonFrame(OutRunVR::StereoFailureReason reason)
@@ -1168,7 +1251,7 @@ namespace OutRunVRStereo
 
 		void PublishRenderFrame(std::uint32_t state,std::uint32_t frameId,std::uint32_t sourcePoseSequence,std::int64_t presentQpc,OutRunVR::StereoFailureReason failureReason,const OutRunVRRenderer::LatchedStereoFrame* stereo,bool presentInFlight=false,bool directTransport=false)
 		{
-			if(!EnsureRenderFrameState())return;const std::uint32_t slotIndex=frameId?(frameId-1u)%OutRunVR::RenderFrameRingSize:(RenderFrameRing->latestSlot+1u)%OutRunVR::RenderFrameRingSize;auto&frame=RenderFrameRing->slots[slotIndex];LONG seq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));if((seq&1)==0)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));MemoryBarrier();frame.magic=OutRunVR::RenderFrameMagic;frame.protocolVersion=OutRunVR::RenderFrameProtocolVersion;frame.structSize=sizeof(frame);frame.clientPid=GetCurrentProcessId();frame.state=state;frame.frameId=frameId;frame.sourcePoseSequence=sourcePoseSequence;frame.presentationMode=GameplayActive()?OutRunVR::PresentationGameplay:OutRunVR::PresentationTheater;frame.flags=presentInFlight?OutRunVR::RenderFramePresentInFlight:0;frame.failureReason=static_cast<std::uint32_t>(failureReason);const bool directSizedFrame=directTransport&&DirectTransportResourcesReady&&DirectTransportWidth&&DirectTransportHeight;frame.backbufferWidth=directSizedFrame?DirectTransportWidth:BackBufferDesc.Width;frame.backbufferHeight=directSizedFrame?DirectTransportHeight:BackBufferDesc.Height;frame.presentQpc=presentQpc;std::memset(frame.eye,0,sizeof(frame.eye));std::memset(frame.reserved,0,sizeof(frame.reserved));WriteGameBuildTag(frame);frame.reserved[OutRunVR::RenderFrameCadenceRequestIndex]=OutRunVRRenderer::GetActiveCadenceRequestId();if(directTransport&&DirectTransportResourcesReady&&ActiveDirectTransportSlot<DirectTransportSlots.size()){const auto&transport=DirectTransportSlots[ActiveDirectTransportSlot];if(transport.leftHandle&&transport.rightHandle&&transport.frameId==frameId){frame.flags|=OutRunVR::RenderFrameDirectGpuTransport;frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex]=static_cast<std::uint32_t>(reinterpret_cast<std::uintptr_t>(transport.leftHandle));frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex]=static_cast<std::uint32_t>(reinterpret_cast<std::uintptr_t>(transport.rightHandle));frame.reserved[OutRunVR::RenderFrameDirectWidthIndex]=DirectTransportWidth;frame.reserved[OutRunVR::RenderFrameDirectHeightIndex]=DirectTransportHeight;frame.reserved[OutRunVR::RenderFrameDirectFormatIndex]=static_cast<std::uint32_t>(DirectTransportFormat);frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex]=DirectTransportGeneration;frame.reserved[OutRunVR::RenderFrameDirectSlotIndex]=ActiveDirectTransportSlot;}}if(!presentInFlight&&state==OutRunVR::StereoSbsActive&&stereo&&stereo->valid&&frameId){const std::uint32_t transportFlag=frame.flags&OutRunVR::RenderFrameDirectGpuTransport;frame.flags=transportFlag|OutRunVR::RenderFrameStereoComplete|OutRunVR::RenderFrameWorldStereo|OutRunVR::RenderFrameDrawDuplicated|OutRunVR::RenderFrameEffectivePoseValid;for(int eye=0;eye<2;++eye){std::memcpy(frame.eye[eye].orientation,stereo->effectiveEyeOrientation[eye],sizeof(frame.eye[eye].orientation));std::memcpy(frame.eye[eye].position,stereo->effectiveEyePosition[eye],sizeof(frame.eye[eye].position));frame.eye[eye].fov=stereo->eyeFov[eye];}}MemoryBarrier();seq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));if(seq&1)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));LONG ringSeq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));if((ringSeq&1)==0)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));MemoryBarrier();RenderFrameRing->clientPid=GetCurrentProcessId();RenderFrameRing->latestSlot=slotIndex;MemoryBarrier();ringSeq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));if(ringSeq&1)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
+			if(!EnsureRenderFrameState())return;const std::uint32_t slotIndex=frameId?(frameId-1u)%OutRunVR::RenderFrameRingSize:(RenderFrameRing->latestSlot+1u)%OutRunVR::RenderFrameRingSize;auto&frame=RenderFrameRing->slots[slotIndex];LONG seq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));if((seq&1)==0)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));MemoryBarrier();frame.magic=OutRunVR::RenderFrameMagic;frame.protocolVersion=OutRunVR::RenderFrameProtocolVersion;frame.structSize=sizeof(frame);frame.clientPid=GetCurrentProcessId();frame.state=state;frame.frameId=frameId;frame.sourcePoseSequence=sourcePoseSequence;frame.presentationMode=GameplayActive()?OutRunVR::PresentationGameplay:OutRunVR::PresentationTheater;frame.flags=presentInFlight?OutRunVR::RenderFramePresentInFlight:0;frame.failureReason=static_cast<std::uint32_t>(failureReason);const bool directSizedFrame=directTransport&&DirectTransportResourcesReady&&DirectTransportWidth&&DirectTransportHeight;frame.backbufferWidth=directSizedFrame?DirectTransportWidth:BackBufferDesc.Width;frame.backbufferHeight=directSizedFrame?DirectTransportHeight:BackBufferDesc.Height;frame.presentQpc=presentQpc;std::memset(frame.eye,0,sizeof(frame.eye));std::memset(frame.reserved,0,sizeof(frame.reserved));frame.reserved[OutRunVR::RenderFrameRunGenerationIndex]=RenderFrameRunGeneration;WriteGameBuildTag(frame);frame.reserved[OutRunVR::RenderFrameCadenceRequestIndex]=OutRunVRRenderer::GetActiveCadenceRequestId();if(directTransport&&DirectTransportResourcesReady&&ActiveDirectTransportSlot<DirectTransportSlots.size()){const auto&transport=DirectTransportSlots[ActiveDirectTransportSlot];if(transport.leftHandle&&transport.rightHandle&&transport.frameId==frameId){frame.flags|=OutRunVR::RenderFrameDirectGpuTransport;frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex]=static_cast<std::uint32_t>(reinterpret_cast<std::uintptr_t>(transport.leftHandle));frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex]=static_cast<std::uint32_t>(reinterpret_cast<std::uintptr_t>(transport.rightHandle));frame.reserved[OutRunVR::RenderFrameDirectWidthIndex]=DirectTransportWidth;frame.reserved[OutRunVR::RenderFrameDirectHeightIndex]=DirectTransportHeight;frame.reserved[OutRunVR::RenderFrameDirectFormatIndex]=static_cast<std::uint32_t>(DirectTransportFormat);frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex]=DirectTransportGeneration;frame.reserved[OutRunVR::RenderFrameDirectSlotIndex]=ActiveDirectTransportSlot;}}if(!presentInFlight&&state==OutRunVR::StereoSbsActive&&stereo&&stereo->valid&&frameId){const std::uint32_t transportFlag=frame.flags&OutRunVR::RenderFrameDirectGpuTransport;frame.flags=transportFlag|OutRunVR::RenderFrameStereoComplete|OutRunVR::RenderFrameWorldStereo|OutRunVR::RenderFrameDrawDuplicated|OutRunVR::RenderFrameEffectivePoseValid;for(int eye=0;eye<2;++eye){std::memcpy(frame.eye[eye].orientation,stereo->effectiveEyeOrientation[eye],sizeof(frame.eye[eye].orientation));std::memcpy(frame.eye[eye].position,stereo->effectiveEyePosition[eye],sizeof(frame.eye[eye].position));frame.eye[eye].fov=stereo->eyeFov[eye];}}MemoryBarrier();seq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));if(seq&1)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&frame.sequence));LONG ringSeq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));if((ringSeq&1)==0)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));MemoryBarrier();RenderFrameRing->clientPid=GetCurrentProcessId();RenderFrameRing->latestSlot=slotIndex;MemoryBarrier();ringSeq=InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));if(ringSeq&1)InterlockedIncrement(reinterpret_cast<volatile LONG*>(&RenderFrameRing->publishSequence));
 		}
 
 		struct ScreenVertex{float x,y,z,rhw;float u,v;};
