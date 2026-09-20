@@ -3,12 +3,13 @@
   "role": "A",
   "runId": "A-20260921T072900KST-manual01",
   "startedKst": "2026-09-21T07:29:00+09:00",
-  "completedKst": "2026-09-21T07:34:55+09:00",
+  "completedKst": null,
   "baseSha": "e5e35f483cf7f8d36f99a87807ba6cb9d4b7eccd",
   "findingIds": [
     "DX9EX-FINGERPRINT-001",
     "DX9EX-DISPATCH-XYZRHW-001",
-    "DX9EX-SKYGLOW-001"
+    "DX9EX-SKYGLOW-001",
+    "DX9EX-PERF-DISPATCH-001"
   ],
   "inputHashes": {
     "src/vr/d3d9/stereo_renderer_r30.cpp": "bc7eb2c152d82b3a42df13d8361d31cffe7d31b9",
@@ -58,13 +59,23 @@
       "dependencies": [],
       "runtimeCandidate": false,
       "summary": "R30ApplyStereoSkyGlow selects the intermediate texture opposite to the pass that actually contains the final blur output. One-step currently composites pre-blur bright extraction; two-step composites horizontal-only output instead of vertical-final output."
+    },
+    {
+      "id": "DX9EX-PERF-DISPATCH-001",
+      "status": "READY",
+      "priority": 5,
+      "preferredRole": "B_FIX",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "runtimeCandidate": false,
+      "summary": "R33Dispatch classifies a screen-space pass, then R33TryHud immediately classifies the same draw again. For perspective flat effects this duplicates projection lookup and three GetRenderState calls. Thread the already-computed R30ScreenSpaceKind into R33TryHud."
     }
   ],
   "blockers": [
     "Quest 3/VDXR runtime evidence remains required before claiming the visual symptoms fixed."
   ],
   "retryCount": 0,
-  "nextAction": "B should first make a minimal isolated candidate that restores R30TryXyzrhw* at the final R33/R34 draw dispatch without broad WVP changes and add a deterministic source-flow verifier. Separately fix the SkyGlow composite-source inversion. C can validate compile/dispatch invariants; visual acceptance stays LEVEL1 HMD.",
+  "nextAction": "Continue A coverage: D3D9Ex startup/device promotion/reset lifecycle, cars/shadows/rank-billboard visual classes, config/logging/CI testability. B should not consume this run as complete until status becomes COMPLETE.",
   "review": {
     "lenses": [
       "architecture/control-flow",
@@ -74,12 +85,16 @@
       "adversarial-falsification/testability"
     ],
     "coverage": [
-      "R29 effect policy",
-      "R30 screen-space and XYZRHW paths",
-      "R30 SkyGlow pipeline",
-      "R31/R32/R33 dispatch layering",
+      "R29 effect policy and steady-state safety fallback",
+      "R30 screen-space, XYZRHW and SkyGlow paths",
+      "R31 StateBlock invalidation/resync and hot-path caching",
+      "R32/R33 dispatch layering and final lower fail-closed route",
       "R34 final raster/reset guard",
-      "R29 renderer WVP classification",
+      "renderer R29 WVP classification/state-block behavior",
+      "OpenXR recenter/reference-space flow",
+      "cadence mode 1 game/host handshake",
+      "DirectGPU ring/per-slot ACK/latest-frame-wins",
+      "OpenXR swapchain wait guard",
       "active DX9Ex build graph"
     ],
     "keyEvidence": {
@@ -97,15 +112,26 @@
       ]
     },
     "slotUtilization": {
-      "subBatches": 5,
+      "subBatches": 9,
       "fallbackStagesAttempted": [
         "primary READY A queue",
         "dependent visual-correctness review",
         "regression-boundary/final-dispatch review",
         "deterministic verifier design",
-        "falsification against final active build graph"
+        "adversarial falsification against ACTIVE_FULL_R34 build graph",
+        "recenter/reference-space review",
+        "cadence/DirectGPU/swapchain performance review",
+        "StateBlock/reset cache review",
+        "hot-path redundant-classification review"
       ],
-      "earlyFinishReason": "Manual invocation produced actionable STATICALLY_VERIFIED findings; no production edits/builds are permitted for role A."
-    }
-  }
+      "earlyFinishReason": null
+    },
+    "disprovedHypotheses": [
+      "Active R34 does not replay an independent mono shadow for every steady-state draw: R29DirectTwoEye intentionally bypasses R9 mono replay when R29StableStereoBase is true. Existing DX9EX-PERF-001 already owns safety-fallback draw amplification.",
+      "R31FlushPendingStateBlockResync is not dead in the active final chain: R33Dispatch and R34GuardStereoRasterState both invoke it before live draw-state ownership, so StateBlock Apply resynchronization is present in ACTIVE_FULL_R34.",
+      "Cadence mode 1 does not create a host<->game circular wait: host WaitForPresented is mode-2-only; game NotifyGamePresent waits for the next host cadence token once per Present.",
+      "DirectGPU does not use the old global consumed-frame ACK in the active R13 overlay; published slots are protected by per-slot host GPU-completion ACK and R32 asynchronous EVENT tracking."
+    ]
+  },
+  "status": "IN_PROGRESS"
 }
