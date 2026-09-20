@@ -13,6 +13,7 @@ namespace OutRunVRDxvkProbe
         bool nonSystemD3D9Provider{};
         bool d3d9ExExposed{};
         std::uint32_t customProtocolVersion{};
+        std::uint32_t customCapabilityFlags{};
         long dxvkInteropHr{};
         long customInteropHr{};
     };
