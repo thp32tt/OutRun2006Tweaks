@@ -1410,7 +1410,13 @@ namespace OutRunVRStereo
 
         constexpr R48PrimitiveRange R48AlphaPrimitiveRange() noexcept
         {
-#if defined(OUTRUN_VR_ALPHA_RANGE_33_64)
+#if defined(OUTRUN_VR_ALPHA_RANGE_33_128)
+            return {33u, 128u};
+#elif defined(OUTRUN_VR_ALPHA_RANGE_129_512)
+            return {129u, 512u};
+#elif defined(OUTRUN_VR_ALPHA_RANGE_33_512)
+            return {33u, 512u};
+#elif defined(OUTRUN_VR_ALPHA_RANGE_33_64)
             return {33u, 64u};
 #elif defined(OUTRUN_VR_ALPHA_RANGE_65_128)
             return {65u, 128u};
