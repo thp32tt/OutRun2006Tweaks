@@ -133,6 +133,8 @@ jobs:
         run: |
           $candidates = New-Object System.Collections.Generic.List[System.IO.FileInfo]
           $candidates.Add((Get-Item LICENSE.md))
+          if (Test-Path COPYING.GPL3) { $candidates.Add((Get-Item COPYING.GPL3)) }
+          if (Test-Path THIRD_PARTY_NOTICES.md) { $candidates.Add((Get-Item THIRD_PARTY_NOTICES.md)) }
           foreach ($root in @('external', 'build/_deps')) {
             if (Test-Path $root) {
               Get-ChildItem $root -Recurse -File | Where-Object {
@@ -164,6 +166,8 @@ jobs:
 
           $builder.ToString() | Set-Content build/bin/LICENSES.txt -Encoding utf8
           if (-not (Test-Path build/bin/LICENSES.txt)) { throw 'LICENSES.txt was not generated' }
+          if (Test-Path COPYING.GPL3) { Copy-Item COPYING.GPL3 build/bin/COPYING.GPL3 }
+          if (Test-Path THIRD_PARTY_NOTICES.md) { Copy-Item THIRD_PARTY_NOTICES.md build/bin/THIRD_PARTY_NOTICES.md }
           Write-Host ("Collected {0} unique license/notice texts" -f $seen.Count)
 
       - name: Upload binary
@@ -206,7 +210,9 @@ jobs:
             WHEEL_FFB.md
             RELEASE_NOTES_v0.1.md
             LICENSE.md
+            COPYING.GPL3
             THIRD_PARTY_NOTICES.md
+            src/vr/d3d9/shader_fingerprint_gpl.hpp
             tools/verify_wheel_ffb_current.py
             .github/workflows/build.yml
           include-hidden-files: true
