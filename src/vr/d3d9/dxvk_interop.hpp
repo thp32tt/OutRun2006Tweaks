@@ -22,6 +22,14 @@ namespace OutRunVR::DxvkInterop
         CapabilityExternalRightTargets = 1u << 1,
     };
 
+    enum DrawEligibilityFlags : std::uint32_t
+    {
+        DrawPrimitive = 1u << 0,
+        DrawIndexedPrimitive = 1u << 1,
+        DrawPrimitiveUP = 1u << 2,
+        DrawIndexedPrimitiveUP = 1u << 3,
+    };
+
     enum StereoFlags : std::uint32_t
     {
         StereoEnabled = 1u << 0,
