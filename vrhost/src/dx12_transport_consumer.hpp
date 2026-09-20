@@ -30,6 +30,48 @@ namespace OutRunVRHostDX12
             ID3D12Resource* left{};
             ID3D12Resource* right{};
             ID3D12Fence* producerFence{};
+
+            Frame()=default;
+            Frame(const Frame&)=delete;
+            Frame& operator=(const Frame&)=delete;
+            Frame(Frame&& other) noexcept { MoveFrom(other); }
+            Frame& operator=(Frame&& other) noexcept
+            {
+                if(this!=&other){Reset();MoveFrom(other);}
+                return *this;
+            }
+            ~Frame(){Reset();}
+
+            void Reset() noexcept
+            {
+                if(left)left->Release();
+                if(right)right->Release();
+                if(producerFence)producerFence->Release();
+                left=nullptr;right=nullptr;producerFence=nullptr;
+                frameId=poseSequence=generation=slot=width=height=0;
+                format=DXGI_FORMAT_UNKNOWN;
+                producerFenceValue=0;
+            }
+
+        private:
+            void MoveFrom(Frame& other) noexcept
+            {
+                frameId=other.frameId;
+                poseSequence=other.poseSequence;
+                generation=other.generation;
+                slot=other.slot;
+                width=other.width;
+                height=other.height;
+                format=other.format;
+                producerFenceValue=other.producerFenceValue;
+                left=other.left;
+                right=other.right;
+                producerFence=other.producerFence;
+                other.left=nullptr;
+                other.right=nullptr;
+                other.producerFence=nullptr;
+                other.frameId=0;
+            }
         };
 
         explicit TransportConsumer(const LUID& hostLuid)
@@ -114,7 +156,7 @@ namespace OutRunVRHostDX12
             ID3D12Device* device,ID3D12CommandQueue* queue,Frame& out)
         {
             using namespace OutRunVR::D3D12Transport;
-            out={};
+            out.Reset();
             Touch();
             if(!device||!queue||!ProducerReady())return false;
 
@@ -221,6 +263,9 @@ namespace OutRunVRHostDX12
             out.left=cache.left;
             out.right=cache.right;
             out.producerFence=producerFence_;
+            out.left->AddRef();
+            out.right->AddRef();
+            out.producerFence->AddRef();
             return true;
         }
 
