@@ -1,25 +1,25 @@
 {
   "schemaVersion": 1,
-  "updatedUtc": "2026-09-20T12:56:00Z",
+  "updatedUtc": "2026-09-20T13:51:00Z",
   "branch": "vr-unified-backends",
   "publicationMode": "github-fast-forward-cas",
   "frozen": true,
-  "freezeReason": "evening-package-delivered-no-post-freeze-binary-changes",
-  "frozenCommit": "cbec700a30c44a85292f396d37d6e24a77ed0b47",
-  "buildMatrixId": "VRM-20260920-cbec700a30c4",
+  "freezeReason": "retest-package-built-and-ci-validated-after-stereo-transport-and-dx12-device-fixes",
+  "frozenCommit": "803144005c0e45352602917a2f51804ec6b18ae6",
+  "buildMatrixId": "VRM-20260920-803144005c0e",
   "components": {
-    "d3d9": "cbec700a30c44a85292f396d37d6e24a77ed0b47",
-    "dxvkGameHost": "88e891f9cb4533700d64c25f544561c1cda3f7ff",
+    "d3d9": "803144005c0e45352602917a2f51804ec6b18ae6",
+    "dxvkGameHost": "5e58ee35e14636dbfad3ad3744d350aa09859992",
     "dxvkProvider": "5bb301ab22f7b41d68a879bf84c1e3d10ae0c473",
     "multiviewPatcher": "0ef3253da1738b07e67358a027311c7bcedaa001",
-    "dx12": "4eb469238e6caa2f2c6aa8825db7502f42c522db"
+    "dx12": "ab8e00ab4a21e4ebb23fbc4046abda51e885bcb6"
   },
   "ci": {
-    "buildRunId": 35504498714,
-    "unifiedRunId": 35504498726,
-    "artifactId": 10603562638,
-    "artifactSha256": "1ab18b99ebb5be4cd4dd4e0457407314040b7be89e906132835b9348bf244fd6",
-    "innerZipSha256": "2e6c7fba2fcc5a775bac1c6130f6e1d6b6c7555cc80115fe581df6d6c13a8661"
+    "buildRunId": 35514339665,
+    "unifiedRunId": 35514339728,
+    "artifactId": 10606816032,
+    "artifactSha256": "1517890fd2efe90f9c5fe8f345d7fd695b534b33de5ad1937441836f386e6cca",
+    "innerZipSha256": "e48b1648ce80f7027e3cdea3bbb13192cc56c5bd99628ee886759e6d8916e065"
   },
   "availableVariants": [
     "CONTROL_2D",
@@ -28,26 +28,24 @@
     "E_DXVK_MULTIVIEW",
     "F_DX12_STRICT"
   ],
-  "excludedVariants": {
-    "B_CORRECTNESS": "no isolated verified renderer patch frozen",
-    "C_PERFORMANCE": "no isolated performance patch frozen",
-    "D_DIRECTGPU_OPENXR": "no isolated transport/timing patch frozen"
-  },
   "runtimeEvidence": {
-    "latestLogIds": [],
-    "latestLogHashes": [],
+    "latestObservedMatrix": "VRM-20260920-5f9028deb7ee",
+    "control2d": "startup/menu/gameplay launch confirmed by user",
+    "d3d9Safe": "startup confirmed; gameplay showed left-half mono fallback before transport fix",
+    "dxvkSafe": "same left-half mono fallback before branch-sync fix",
+    "dx12Strict": "device creation failed before legacy CreateDevice semantics fix",
     "quest3VdxrRequired": true
   },
-  "nextAction": "Observe/validate the push-triggered unified workflow for commit 840f52a9166d8a4921c4068f8c7ed3468d33e9e9. Accept a new frozen package only after the lean tester ZIP passes selector/mode/log smoke tests and ZIP-content checks. Keep the existing cbec700a30c4 frozen candidate immutable meanwhile.",
-  "integrationHead": "840f52a9166d8a4921c4068f8c7ed3468d33e9e9",
-  "pendingPackaging": {
-    "checkpoint": "C3_VALIDATE",
-    "commit": "840f52a9166d8a4921c4068f8c7ed3468d33e9e9",
-    "change": "lean tester ZIP: remove duplicate Select-OutRunVRBackend.cmd and release/compliance files; emit compliance ZIP separately",
-    "staticValidation": "passed",
-    "ciObservation": "pending",
-    "preservedFrozenCandidate": "cbec700a30c44a85292f396d37d6e24a77ed0b47",
-    "locallyRepackedTestZip": "OutRun2_VR_TEST_ONLY_cbec700a30c4.zip",
-    "locallyRepackedTestZipSha256": "5a920801db281bbdb7ac95bcd49b57166e92ecc725e0fa3b727f928b7f08022c"
-  }
+  "fixesInFrozenCandidate": [
+    "2D process-level VR hook isolation",
+    "deterministic 60Hz recovery launch overrides",
+    "R9 DirectGpuOnly transport policy reads parsed Settings value",
+    "host fallback crops left half only for completed SBS frames",
+    "DXVK branch synchronized with transport and host fallback fixes",
+    "DX12 D3D9On12 legacy CreateDevice semantics with bounded compatibility retry",
+    "DX12 host synchronized with fallback crop fix"
+  ],
+  "nextAction": "Retest A_CONTROL first and verify completed stereo/SBS rather than full-width mono fallback. Then retest E_DXVK_SAFE. If both publish stereo, test F_DX12_STRICT only through device creation/menu before longer gameplay.",
+  "integrationHead": "803144005c0e45352602917a2f51804ec6b18ae6",
+  "pendingPackaging": null
 }
