@@ -1440,16 +1440,75 @@ namespace OutRunVRStereo
 			return leftHr;
 		}
 
-		HRESULT __stdcall SetRenderTargetDest(IDirect3DDevice9*device,DWORD index,IDirect3DSurface9*surface){const HRESULT hr=SetRenderTargetHook.stdcall<HRESULT>(device,index,surface);if(!InternalStereoPass&&IsGameDevice(device)&&SUCCEEDED(hr)){if(index==0)ReplaceSurfaceRef(TrackedRenderTarget,surface);else if(index>=1&&index<=3)AuxRenderTargetActive[index-1]=surface!=nullptr;}return hr;}
-		HRESULT __stdcall SetDepthStencilSurfaceDest(IDirect3DDevice9*device,IDirect3DSurface9*surface)
+		HRESULT __stdcall SetRenderTargetDest(
+			IDirect3DDevice9* device,
+			DWORD index,
+			IDirect3DSurface9* surface)
 		{
-			const HRESULT hr=SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,surface);
-			if(!InternalStereoPass&&IsGameDevice(device)&&SUCCEEDED(hr))
+			const bool providerInternal=
+				OutRunVRDxvkMultiview::IsInternalProviderCall();
+			HRESULT hr=E_FAIL;
+
+			// While DXVK layered targets are active, the game still believes its
+			// logical main target is the real backbuffer. Redirect only that exact
+			// logical bind to layer 0; offscreen/MRT targets stay untouched.
+			if(!InternalStereoPass&&!providerInternal&&
+				IsGameDevice(device)&&index==0&&
+				OutRunVRDxvkMultiview::IsLogicalLeftColor(surface))
+			{
+				hr=OutRunVRDxvkMultiview::BindColorLayer(device,0)
+					?D3D_OK:D3DERR_INVALIDCALL;
+			}
+			else
+			{
+				hr=SetRenderTargetHook.stdcall<HRESULT>(
+					device,index,surface);
+			}
+
+			if(!InternalStereoPass&&!providerInternal&&
+				IsGameDevice(device)&&SUCCEEDED(hr))
+			{
+				if(index==0)
+					ReplaceSurfaceRef(TrackedRenderTarget,surface);
+				else if(index>=1&&index<=3)
+					AuxRenderTargetActive[index-1]=surface!=nullptr;
+			}
+			return hr;
+		}
+
+		HRESULT __stdcall SetDepthStencilSurfaceDest(
+			IDirect3DDevice9* device,
+			IDirect3DSurface9* surface)
+		{
+			const bool providerInternal=
+				OutRunVRDxvkMultiview::IsInternalProviderCall();
+			HRESULT hr=E_FAIL;
+
+			if(!InternalStereoPass&&!providerInternal&&
+				IsGameDevice(device)&&
+				OutRunVRDxvkMultiview::IsLogicalLeftDepth(surface))
+			{
+				hr=OutRunVRDxvkMultiview::BindDepthLayer(device,0)
+					?D3D_OK:D3DERR_INVALIDCALL;
+			}
+			else
+			{
+				hr=SetDepthStencilSurfaceHook.stdcall<HRESULT>(
+					device,surface);
+			}
+
+			if(!InternalStereoPass&&!providerInternal&&
+				IsGameDevice(device)&&SUCCEEDED(hr))
 			{
 				const bool changed=TrackedDepthStencil!=surface;
 				ReplaceSurfaceRef(TrackedDepthStencil,surface);
 				if(changed&&StereoResourcesReady&&TargetIsBackBuffer())
 				{
+					// The layered depth image was created from the old logical
+					// depth surface. Recreate it only after the normal right-eye
+					// depth follows the new game surface.
+					OutRunVRDxvkMultiview::InvalidateFrameTargets();
+
 					if(!surface)
 					{
 						ReleaseCom(RightEyeDepth);
@@ -1462,23 +1521,28 @@ namespace OutRunVRStereo
 						const bool compatible=RightEyeDepth&&
 							SUCCEEDED(surface->GetDesc(&leftDesc))&&
 							SUCCEEDED(RightEyeDepth->GetDesc(&rightDesc))&&
-							leftDesc.Width==BackBufferDesc.Width&&leftDesc.Height==BackBufferDesc.Height&&
-							rightDesc.Width==BackBufferDesc.Width&&rightDesc.Height==BackBufferDesc.Height&&
+							leftDesc.Width==BackBufferDesc.Width&&
+							leftDesc.Height==BackBufferDesc.Height&&
+							rightDesc.Width==BackBufferDesc.Width&&
+							rightDesc.Height==BackBufferDesc.Height&&
 							leftDesc.Format==rightDesc.Format&&
 							leftDesc.MultiSampleType==rightDesc.MultiSampleType&&
-							leftDesc.MultiSampleQuality==rightDesc.MultiSampleQuality;
+							leftDesc.MultiSampleQuality==
+								rightDesc.MultiSampleQuality;
 						if(compatible)
 						{
 							if(!FirstMainDepthReuseLogged)
 							{
 								FirstMainDepthReuseLogged=true;
-								spdlog::info("VR stereo: compatible main depth restored after auxiliary pass; reusing right-eye depth without desynchronizing");
+								spdlog::info(
+									"VR stereo: compatible main depth restored after auxiliary pass; reusing right-eye depth without desynchronizing");
 							}
 						}
 						else
 						{
 							if(FrameHadDuplicatedDraw||FrameHadWorldStereo)
-								PoisonFrame(OutRunVR::StereoFailureDepthStateChanged);
+								PoisonFrame(
+									OutRunVR::StereoFailureDepthStateChanged);
 							if(!CreateRightDepthForTracked(device))
 								StereoResourcesReady=false;
 						}
