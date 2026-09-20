@@ -365,6 +365,83 @@ namespace OutRunVRStereo
                 return {};
             }
 
+            const std::uint64_t dxvkDrawToken = R9DrawCalls + 1;
+            if (OutRunVRDxvkMultiview::TryArmWorldDraw(
+                    device,
+                    RightEyeSurface,
+                    TrackedDepthStencil ? RightEyeDepth : nullptr,
+                    draw.eyeConstants[0],
+                    draw.eyeConstants[1],
+                    draw.poseSequence,
+                    dxvkDrawToken))
+            {
+                ++R9DrawCalls;
+                R9MonoBackupGap = true;
+                if (mayWriteDepth || mayWriteStencil)
+                    ++R9MainDepthContentSerial;
+
+                R31OwnedResult dxvkResult{ true, actualDraw() };
+                OutRunVRDxvkMultiview::FinishArmedDraw(
+                    SUCCEEDED(dxvkResult.hr));
+
+                bool dxvkRestoreOk = false;
+                {
+                    InternalPassScope guard;
+                    dxvkRestoreOk =
+                        R32SetWvpBatch(device, draw.originalConstants);
+                }
+
+                if (FAILED(dxvkResult.hr))
+                {
+                    R33InvalidateRightForLeftWrite(
+                        mayWriteDepth, mayWriteStencil);
+                    R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
+                        site, dxvkResult.hr);
+                    if (!dxvkRestoreOk)
+                        NoteRestoreFailure(
+                            "R33 DXVK multiview failed draw c64");
+                    R29ArmMonoSafety();
+                    return dxvkResult;
+                }
+
+                if (!dxvkRestoreOk)
+                {
+                    R33InvalidateRightForLeftWrite(
+                        mayWriteDepth, mayWriteStencil);
+                    R9Poison(OutRunVR::StereoFailureRestoreFailed,
+                        "R33/DXVK-multiview-WVP-restore");
+                    NoteRestoreFailure(
+                        "R33 DXVK multiview c64 restore");
+                    R29ArmMonoSafety();
+                    return dxvkResult;
+                }
+
+                // Present/SkyGlow use this historical flag as an "L+R ready"
+                // signal. Multiview satisfies that invariant with one D3D9
+                // draw, so set the flag but do not increment DuplicatedDraws.
+                FrameHadDuplicatedDraw = true;
+                FrameHadWorldStereo = true;
+                ++WorldStereoDraws;
+                ++R29StableTwoEyeDraws;
+                if (R33TelemetryEnabled())
+                {
+                    ++R31FastWorldDraws;
+                    ++R31Frame.fastWorld;
+                }
+
+                if (TrackedDepthStencil && mayWriteDepth)
+                    RightDepthSynchronized = true;
+                if (TrackedDepthStencil && mayWriteStencil)
+                    RightStencilSynchronized = true;
+
+                if (FrameStereoPoseSequence == 0)
+                {
+                    FrameStereoPoseSequence = draw.poseSequence;
+                    FrameStereoMetadata = draw.stereoFrame;
+                }
+                return dxvkResult;
+            }
+
             ++R9DrawCalls;
             R9MonoBackupGap = true;
             if (mayWriteDepth || mayWriteStencil)
