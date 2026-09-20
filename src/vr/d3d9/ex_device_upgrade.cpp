@@ -19,6 +19,7 @@
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "../d3d12/d3d9on12_compat.hpp"
+#include "../d3d12/d3d12_game_bridge.hpp"
 
 namespace Settings
 {
@@ -816,6 +817,11 @@ namespace OutRunVRD3D9ExUpgrade
 
                 *device = static_cast<IDirect3DDevice9*>(deviceEx);
                 UpdateCompatPresentationState(*device, params);
+                if (!OutRunVRD3D12Bridge::Attach(*device))
+                {
+                    spdlog::warn(
+                        "VR DX12 STRICT: core D3D9On12 device is valid but native D3D12 VR transport bridge initialization failed; 2D rendering remains usable and bridge diagnostics will stay disabled");
+                }
                 if (!FirstUpgradeLogged.exchange(true))
                 {
                     spdlog::info(
