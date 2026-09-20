@@ -115,6 +115,26 @@ $oldVkDebug = $env:VK_LOADER_DEBUG
 $oldVrForceDisabled = $env:OUTRUN_VR_FORCE_DISABLED
 $oldTestProfile = $env:OUTRUN_VR_TEST_PROFILE
 $oldPerformanceProfile = $env:OUTRUN_VR_PERFORMANCE_PROFILE
+$identityKeys = @(
+    'OUTRUN_VR_SESSION_ID',
+    'OUTRUN_VR_VARIANT_ID',
+    'OUTRUN_VR_MATRIX_ID',
+    'OUTRUN_VR_BACKEND',
+    'OUTRUN_VR_CONFIG_SHA256',
+    'OUTRUN_VR_SOURCE_SHA'
+)
+$oldIdentity = @{}
+foreach($key in $identityKeys){ $oldIdentity[$key] = [Environment]::GetEnvironmentVariable($key,'Process') }
+
+$sourceSha='unknown'
+$sourceFile=Join-Path $root ("backends/{0}/SOURCE_SHA.txt" -f $(if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}))
+if(Test-Path $sourceFile){ $sourceSha=(Get-Content $sourceFile -Raw).Trim() }
+$env:OUTRUN_VR_SESSION_ID=[string]$state.SessionId
+$env:OUTRUN_VR_VARIANT_ID=[string]$state.VariantId
+$env:OUTRUN_VR_MATRIX_ID=[string]$state.BuildMatrixId
+$env:OUTRUN_VR_BACKEND=[string]$backend
+$env:OUTRUN_VR_CONFIG_SHA256=[string]$state.ConfigSha256
+$env:OUTRUN_VR_SOURCE_SHA=$sourceSha
 
 if($backend -eq '2d'){
     $env:OUTRUN_VR_FORCE_DISABLED='1'
@@ -146,6 +166,9 @@ try{
     $env:OUTRUN_VR_FORCE_DISABLED=$oldVrForceDisabled
     $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
     $env:OUTRUN_VR_PERFORMANCE_PROFILE=$oldPerformanceProfile
+    foreach($key in $identityKeys){
+        [Environment]::SetEnvironmentVariable($key,$oldIdentity[$key],'Process')
+    }
     if($dxvkMode){
         $env:VK_LOADER_LAYERS_DISABLE=$oldVkDisable
         $env:VK_INSTANCE_LAYERS=$oldVkInstanceLayers
