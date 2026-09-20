@@ -11,7 +11,20 @@ $payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "dxvk-safe") { "d3d9" }
 $src = Join-Path $backendRoot $payloadBackend
 if (-not (Test-Path $src)) { throw "Backend payload not found: $src" }
 
-$logPatterns=@('OutRun2006Tweaks*.log','outrun-vr-host*.log','outrun-vr-host-pipeline*.log','outrun-vr-watchdog*.log','backend*.log','*.dmp')
+$logPatterns=@(
+    'OutRun2006Tweaks*.log',
+    'outrun-vr-host*.log',
+    'outrun-vr-host-pipeline*.log',
+    'outrun-vr-watchdog*.log',
+    'backend*.log',
+    'OR2006C2C_d3d9.log',
+    'OR2006C2C_dxgi.log',
+    'OR2006C2C_d3d11.log',
+    'OR2006C2C_vkd3d*.log',
+    'dxvk*.log',
+    'vkd3d*.log',
+    '*.dmp'
+)
 
 function Get-SessionFiles {
     $seen=@{}
