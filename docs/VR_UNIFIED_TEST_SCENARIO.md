@@ -16,7 +16,24 @@ Select-OutRunVRBackend.cmd dx12
 
 Always exit the game and `outrun-vr-host.exe` before switching.
 
-Selecting a mode now creates a unique session identity and a config snapshot **before game launch**. After each test, run `Collect-OutRunVRLogs.cmd`; only logs modified during that session are collected. Run `Collect-OutRunVRLogs.cmd -All` once at the end to create the matrix ZIP.
+Selecting a mode creates a unique session identity and a config snapshot **before game launch**. Existing root logs are sealed into the previous session before the new session starts, so game-side log truncate/overwrite behavior cannot destroy an already sealed test.
+
+**You do not run the collector before a test.** The easiest path is the GUI selector: choose a backend once, then click **현재 모드 테스트 실행 (종료 후 로그 자동수집)**. This launches `Run-OutRunVRTest.cmd`, starts the game with a clean session, waits for the game to exit, collects the finished logs, removes the sealed root copies, and immediately prepares the next session for another run of the same backend.
+
+For manual launches, run `Collect-OutRunVRLogs.cmd` **after** each game/host test has ended. The collector now prepares the next session automatically. If you switch backends without collecting first, the selector preserves pending root logs in the previous session before switching. Run `Collect-OutRunVRLogs.cmd -All` at the end to create the matrix ZIP.
+
+Do not launch the game twice manually without either collecting between runs or using `Run-OutRunVRTest.cmd`; a game that truncates the same filename can overwrite an unsealed run before any tool has a chance to preserve it.
+
+## Recommended launch flow
+
+1. Start `OutRunVR-Backend-Selector.cmd`.
+2. Pick the backend you want to test.
+3. Click **현재 모드 테스트 실행 (종료 후 로그 자동수집)**.
+4. Test normally and exit the game.
+5. If `outrun-vr-host.exe` also exits within 15 seconds, the launcher automatically creates the session ZIP and prepares the next session.
+6. If the host remains open, close it and run `Collect-OutRunVRLogs.cmd` once; the launcher deliberately leaves the root logs untouched in that case.
+
+The collector does not need to remain running in the background.
 
 ## Recommended short evening test order
 
