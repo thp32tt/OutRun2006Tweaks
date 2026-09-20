@@ -1,13 +1,13 @@
 param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet("2d","d3d9","dxvk","dx12")]
+    [ValidateSet("2d","d3d9","dxvk-safe","dxvk","dx12")]
     [string]$Backend
 )
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $backendRoot = Join-Path $root "backends"
-$payloadBackend = if ($Backend -eq "2d") { "d3d9" } else { $Backend }
+$payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "dxvk-safe") { "d3d9" } else { $Backend }
 $src = Join-Path $backendRoot $payloadBackend
 if (-not (Test-Path $src)) { throw "Backend payload not found: $src" }
 
@@ -69,6 +69,11 @@ if ($Backend -eq "2d") {
     if ($Backend -eq "dxvk") {
         Copy-Required "d3d9.dll"
         Copy-Required "multiviewpatcher.dll"
+    } elseif ($Backend -eq "dxvk-safe") {
+        $dxvkProvider = Join-Path (Join-Path $backendRoot "dxvk") "d3d9.dll"
+        if (-not (Test-Path $dxvkProvider)) { throw "DXVK provider missing: $dxvkProvider" }
+        Copy-Item $dxvkProvider (Join-Path $root "d3d9.dll") -Force
+        Remove-RootVerified "multiviewpatcher.dll"
     } else {
         Remove-RootVerified "d3d9.dll"
         Remove-RootVerified "multiviewpatcher.dll"
@@ -88,6 +93,14 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "Enabled" "false"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "false"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "false"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
+        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
+    } elseif ($Backend -eq "dxvk-safe") {
+        $text = Set-IniSectionValue $text "VR" "RenderBackend" "1"
+        $text = Set-IniSectionValue $text "VR" "Enabled" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
@@ -114,6 +127,7 @@ Write-Host "OutRun renderer mode activated: $Backend"
 switch ($Backend) {
     "2d"   { Write-Host "2D ORIGINAL: classic D3D9, VR disabled, D3D9Ex promotion disabled, no VR host." }
     "d3d9" { Write-Host "D3D9 VR SAFE: guarded D3D9Ex/DirectGPU VR path." }
-    "dxvk" { Write-Host "DXVK VR: local d3d9.dll + multiviewpatcher.dll active." }
+    "dxvk-safe" { Write-Host "DXVK SAFE: classic D3D9 calls translated by DXVK; validated two-pass VR, multiview patcher disabled." }
+    "dxvk" { Write-Host "DXVK MULTIVIEW: local d3d9.dll + multiviewpatcher.dll active." }
     "dx12" { Write-Host "DX12 STRICT: local d3d9.dll verified absent; Windows D3D9On12 required." }
 }
