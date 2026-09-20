@@ -16,6 +16,7 @@ on:
       - 'src/hooks_graphics.cpp'
       - 'vrhost/**'
       - 'CMakeLists.txt'
+      - 'OutRun2006Tweaks.ini'
       - 'docs/VR_UNIFIED_TEST_SCENARIO.md'
       - '.github/workflows/vr-unified-backends.yml'
 
