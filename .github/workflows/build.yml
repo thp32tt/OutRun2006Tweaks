@@ -2,6 +2,7 @@ name: Build
 
 on:
   push:
+    branches-ignore: [ vr-d3d9ex-white-overlay-test ]
   pull_request:
 
 jobs:
