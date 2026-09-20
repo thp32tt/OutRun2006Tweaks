@@ -56,3 +56,19 @@ The previous recovery launcher forced `FramerateLimit=60`, interpolation OFF and
 Status: POLICY
 
 DXVK SAFE reproduced the graphics regression with worse subjective HMD stutter. DX12 still fails at the same device-creation boundary after `Direct3DCreate9On12Ex`. Neither backend is to be compiled or packaged during the DX9Ex reference phase.
+
+
+## DX9EX-PKG-001 — Four candidate binaries built; assembly parser failed
+Status: FIXED / OFFLINE PACKAGE VALIDATED
+
+Workflow run `35516112968` successfully built four distinct Win32 game DLLs and the shared x64 D3D11 OpenXR host. The package job failed before copying files because PowerShell parsed `$variant:` as an invalid scoped variable. Commit `2827f20` changed it to `${variant}:`. Successful binaries were reused rather than rebuilt solely for this packaging error.
+
+## DX9EX-CONFIG-001 — Required cadence/fallback keys absent from shipped INI
+Status: FIXED IN `ee94dc8051b6de8c0b6ce67d9bdd8b613b98363c`
+
+The DX9Ex packager requires `FramerateUnlockExperimental`, `DisableDesktopDuplication`, `FrameCadenceMode` and `FrameCadenceTargetHz`, but the branch INI did not declare those keys. That would have caused the next package attempt to fail after the parser fix and made runtime defaults less auditable. The keys now exist in their owning Performance/VR sections. The package pins the requested values and verifies exact lines before archiving.
+
+## DX9EX-PKG-002 — Candidate package integrity
+Status: VALIDATED OFFLINE / HARDWARE RUNTIME PENDING
+
+Matrix `DX9EX-20260920-f46024f7005c` contains P1-P4 as four independent ZIPs. Every ZIP has a distinct game DLL, the same verified host, variant/matrix/source identity, automatic log launcher, scenario, Korean quick guide and internal SHA256SUMS. All checksums passed. Forbidden `d3d9.dll`, `multiviewpatcher.dll`, DX12 host and backend directories are absent. Quest 3/VDXR correctness and pacing remain user-runtime-required.
