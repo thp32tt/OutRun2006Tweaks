@@ -246,23 +246,7 @@ jobs:
           Copy-Item docs/VR_UNIFIED_TEST_SCENARIO.md package/VR_UNIFIED_TEST_SCENARIO.md
 
           $ini = Get-Content package/OutRun2006Tweaks.ini -Raw
-          $ini = [regex]::Replace($ini, '(?m)^SkyGlowFactor\s*=.*
-          Copy-Item package/backends/d3d9/dinput8.dll package/dinput8.dll
-          Copy-Item package/backends/d3d9/outrun-vr-host.exe package/outrun-vr-host.exe
-          Set-Content package/ACTIVE_VR_BACKEND.txt "backend=d3d9"
-
-          Get-ChildItem package -Recurse -File | Get-FileHash -Algorithm SHA256 | ForEach-Object {
-            "$($_.Hash)  $([IO.Path]::GetRelativePath((Resolve-Path package), $_.Path))"
-          } | Set-Content package/SHA256SUMS.txt
-
-          $short = $env:GITHUB_SHA.Substring(0,12)
-          Compress-Archive -Path package/* -DestinationPath "OutRun2_VR_UNIFIED_$short.zip"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: OutRun2-VR-UNIFIED-${{ github.sha }}
-          path: OutRun2_VR_UNIFIED_*.zip
-          if-no-files-found: error
-, 'SkyGlowFactor = 1')
+          $ini = [regex]::Replace($ini, '(?m)^SkyGlowFactor\s*=.*$', 'SkyGlowFactor = 1')
           Set-Content package/OutRun2006Tweaks.ini $ini -Encoding UTF8
 
           Copy-Item package/backends/d3d9/dinput8.dll package/dinput8.dll
