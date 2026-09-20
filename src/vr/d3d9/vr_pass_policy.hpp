@@ -157,17 +157,41 @@ namespace OutRunVR::PassPolicy
         bool depthTestEnabled,
         bool cullNone) noexcept
     {
-        const bool depthDisabledFlatEffect =
-            cullNone && !depthTestEnabled &&
-            ((alphaBlendEnabled && !depthWriteEnabled) || alphaTestEnabled);
-        if (depthDisabledFlatEffect)
+        // Screen overlays, white rank/score text and exit Yes/No can
+        // use perspective-looking geometry while Z testing is disabled. Without
+        // a positive spatial semantic, depth-off must never inherit world stereo.
+        if (!depthTestEnabled)
             return EffectStereoPolicy::ZeroDisparity;
+        (void)alphaBlendEnabled;
+        (void)alphaTestEnabled;
+        (void)depthWriteEnabled;
+        (void)cullNone;
         return EffectStereoPolicy::WorldStereo;
     }
 
     constexpr bool AllowsEffectWorldStereo(EffectStereoPolicy policy) noexcept
     {
         return policy == EffectStereoPolicy::WorldStereo;
+    }
+
+    enum class FixedFunctionStereoPolicy : std::uint8_t
+    {
+        NonWorld,
+        WorldStereo,
+        SkyRotationOnly
+    };
+
+    constexpr FixedFunctionStereoPolicy ClassifyFixedFunctionStereo(
+        ProjectionClass projection, bool gameplay, bool depthTestEnabled) noexcept
+    {
+        if (!gameplay || projection != ProjectionClass::Perspective3D)
+            return FixedFunctionStereoPolicy::NonWorld;
+        // A gameplay fixed-function perspective draw with Z disabled is the
+        // only positively isolated sky/cloud signature available in this path.
+        // Keep headset rotation/FOV, but remove head/IPD translation.
+        if (!depthTestEnabled)
+            return FixedFunctionStereoPolicy::SkyRotationOnly;
+        return FixedFunctionStereoPolicy::WorldStereo;
     }
 
     enum class DrawReplayPolicy : std::uint8_t
@@ -240,6 +264,8 @@ namespace OutRunVR::PassPolicy
         EffectStereoPolicy::WorldStereo);
     static_assert(ClassifyEffectStereo(true, false, false, true, true) ==
         EffectStereoPolicy::WorldStereo);
+    static_assert(ClassifyEffectStereo(true, false, false, false, false) ==
+        EffectStereoPolicy::ZeroDisparity);
     static_assert(ClassifyEffectStereo(true, false, false, false, true) ==
         EffectStereoPolicy::ZeroDisparity);
     static_assert(ClassifyEffectStereo(false, true, true, true, true) ==
@@ -248,6 +274,16 @@ namespace OutRunVR::PassPolicy
         EffectStereoPolicy::ZeroDisparity);
     static_assert(AllowsEffectWorldStereo(
         ClassifyEffectStereo(false, false, true, true, false)));
+
+    static_assert(ClassifyFixedFunctionStereo(
+        ProjectionClass::Perspective3D, true, true) ==
+        FixedFunctionStereoPolicy::WorldStereo);
+    static_assert(ClassifyFixedFunctionStereo(
+        ProjectionClass::Perspective3D, true, false) ==
+        FixedFunctionStereoPolicy::SkyRotationOnly);
+    static_assert(ClassifyFixedFunctionStereo(
+        ProjectionClass::Orthographic2D, true, false) ==
+        FixedFunctionStereoPolicy::NonWorld);
 
     static_assert(ClassifyDrawReplay(true, false, true, false, true, true, true, false) ==
         DrawReplayPolicy::UnsafeSingleExecution);
