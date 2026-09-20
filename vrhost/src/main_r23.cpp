@@ -2007,6 +2007,7 @@ int main(int argc, char** argv)
         std::array<XrCompositionLayerProjectionView, 2>
             cachedMenuProjectionViews{};
         bool cachedMenuProjectionValid = false;
+        bool awaitingFirstGameplayStereo = false;
         XrPosef menuProjectionAnchor{};
         menuProjectionAnchor.orientation.w = 1.0f;
         bool menuProjectionAnchorValid = false;
@@ -2066,6 +2067,7 @@ int main(int argc, char** argv)
                         lastStereoMatchMs = 0; cachedProjectionValid = false;
                         cachedProjectionRenderedMs = 0;
                         cachedMenuProjectionValid = false;
+                        awaitingFirstGameplayStereo = false;
                         menuProjectionAnchorValid = false;
                         refreshMenuAnchorAfterLocate = true;
                         compositor.ReferenceSpaceChanged();
@@ -2111,6 +2113,7 @@ int main(int argc, char** argv)
                 matchedStereoValid = false; cachedProjectionValid = false;
                 cachedProjectionRenderedMs = 0;
                 cachedMenuProjectionValid = false;
+                awaitingFirstGameplayStereo = false;
                 menuProjectionAnchorValid = false;
                 refreshMenuAnchorAfterLocate = true;
                 OutRunVrR23VerifiedBundle::Invalidate();
@@ -2176,6 +2179,22 @@ int main(int argc, char** argv)
 
             const auto requestedPresentation = shared.Presentation();
             auto presentation = requestedPresentation;
+
+            // T0/R46: the game may publish Gameplay several seconds before a
+            // usable stereo render packet exists. Keep the live Theater/menu
+            // projection until at least one render frame has appeared instead
+            // of entering a zero-layer direct-only gameplay interval.
+            if (requestedPresentation == OutRunVR::PresentationGameplay &&
+                lastPresentation != OutRunVR::PresentationGameplay)
+            {
+                OutRunVR::SharedRenderFrameState bootstrapFrame{};
+                const bool haveBootstrapFrame =
+                    renderFrames.Read(bootstrapFrame) &&
+                    bootstrapFrame.frameId != 0;
+                if (!haveBootstrapFrame)
+                    presentation = OutRunVR::PresentationTheater;
+            }
+
             // R45: the game now publishes presentation from an explicit
             // GameState whitelist. Do not retain a stale stereo projection for
             // 750 ms after it says Theater; that hold was enough to transform
@@ -2192,6 +2211,7 @@ int main(int argc, char** argv)
                     cachedProjectionValid = false;
                     cachedProjectionRenderedMs = 0;
                     cachedMenuProjectionValid = false;
+                    awaitingFirstGameplayStereo = false;
                     if ((head.locationFlags & R45MenuAnchorFlags) ==
                         R45MenuAnchorFlags)
                     {
@@ -2207,7 +2227,9 @@ int main(int argc, char** argv)
                 }
                 else
                 {
-                    cachedMenuProjectionValid = false;
+                    // Keep the last visible menu/loading projection only until
+                    // the first actual gameplay stereo projection is released.
+                    awaitingFirstGameplayStereo = true;
                 }
                 lastPresentation = presentation;
                 std::cout << "VR presentation R45: "
@@ -2589,10 +2611,13 @@ int main(int argc, char** argv)
                          compositor.HasStereoSource() &&
                          projectionNow >= lastStereoMatchMs &&
                          projectionNow - lastStereoMatchMs <= StereoGraceMs);
-                    const bool cachedHold = cachedProjectionValid &&
-                        projectionNow >= cachedProjectionRenderedMs &&
-                        projectionNow - cachedProjectionRenderedMs <=
-                            R23CachedProjectionHoldMs;
+                    // T0/R47: while Gameplay remains active, never age
+                    // out the last successfully released stereo projection.
+                    // Presentation/session/reference-space transitions already
+                    // invalidate this cache, so a producer stall freezes the
+                    // last good stereo image instead of submitting a solid or
+                    // empty compositor frame.
+                    const bool cachedHold = cachedProjectionValid;
 
                     LARGE_INTEGER rs{}, re{}; QueryPerformanceCounter(&rs);
 
@@ -2701,6 +2726,32 @@ int main(int argc, char** argv)
                     QueryPerformanceCounter(&re);
                     frameRenderMs += timings.Ms(rs, re);
                     timings.render.Add(timings.Ms(rs, re));
+
+                    if (frameFreshProjection)
+                    {
+                        awaitingFirstGameplayStereo = false;
+                        cachedMenuProjectionValid = false;
+                    }
+
+                    // If Gameplay was announced before a releasable stereo
+                    // projection, keep the last LOCAL-fixed menu/loading image
+                    // visible in direct-only mode. This is strictly a bootstrap
+                    // bridge; the first fresh gameplay projection disables it.
+                    if (!layerReady && directTransportOnly &&
+                        awaitingFirstGameplayStereo &&
+                        cachedMenuProjectionValid)
+                    {
+                        pv = cachedMenuProjectionViews;
+                        projection.space = localSpace;
+                        projection.viewCount = 2;
+                        projection.views = pv.data();
+                        layers[0] =
+                            reinterpret_cast<const XrCompositionLayerBaseHeader*>(
+                                &projection);
+                        layerReady = true;
+                        intentionalMonoProjection = true;
+                        finalLayerKind = "gameplay-bootstrap-menu-hold";
+                    }
 
                     // Never submit a zero-layer frame just because Desktop
                     // Duplication missed the stereo grace window. VDXR can show a
