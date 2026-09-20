@@ -117,12 +117,16 @@ foreach($file in $sourceFiles){
 Copy-Item $active $dest -Force
 Copy-Item $sessionState $dest -Force
 $captureRoot=Join-Path $root 'captures'
+$capturedDirs=@()
 if(Test-Path $captureRoot){
     $captureDest=Join-Path $dest 'captures'
     New-Item -ItemType Directory -Force $captureDest|Out-Null
     Get-ChildItem $captureRoot -Directory -ErrorAction SilentlyContinue |
         Where-Object {$_.LastWriteTimeUtc -ge $startedUtc} |
-        ForEach-Object { Copy-Item $_.FullName $captureDest -Recurse -Force }
+        ForEach-Object {
+            Copy-Item $_.FullName $captureDest -Recurse -Force
+            $capturedDirs+=$_.FullName
+        }
 }
 $inputs=Join-Path $root 'BUILD_INPUTS.json'
 if(Test-Path $inputs){Copy-Item $inputs $dest -Force}
@@ -141,6 +145,7 @@ $configHash=if(Test-Path (Join-Path $root 'OutRun2006Tweaks.ini')){(Get-FileHash
     "SOURCE_SHA=$sha"
     "CONFIG_SHA256=$configHash"
     "FILES=$($copied -join ',')"
+    "CAPTURES=$((@($capturedDirs | ForEach-Object {[IO.Path]::GetFileName($_)})) -join ',')"
     'LOG_BOUNDARY=clean-session-root'
 )|Set-Content (Join-Path $dest 'MANIFEST.txt') -Encoding UTF8
 
@@ -156,6 +161,7 @@ $configHash=if(Test-Path (Join-Path $root 'OutRun2006Tweaks.ini')){(Get-FileHash
     ConfigSha256=$configHash
     CollectedAtUtc=(Get-Date).ToUniversalTime().ToString('o')
     CollectedFiles=$copied
+    CollectedCaptures=@($capturedDirs | ForEach-Object {[IO.Path]::GetFileName($_)})
     LogBoundary='clean-session-root'
 }|ConvertTo-Json -Depth 4|Set-Content (Join-Path $dest 'variant_manifest.json') -Encoding UTF8
 
@@ -180,6 +186,9 @@ foreach($file in $sourceFiles){
     if($copied -contains $file.Name -and (Test-Path $file.FullName)){
         Remove-Item $file.FullName -Force
     }
+}
+foreach($captureDir in $capturedDirs){
+    if(Test-Path $captureDir){Remove-Item $captureDir -Recurse -Force}
 }
 
 $nextSession=Prepare-NextSession $backend $variant $profile $matrix
