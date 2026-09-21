@@ -2715,7 +2715,7 @@ namespace OutRunVRStereo
                 R30HudContainScale(stereo, hudScaleX, hudScaleY);
                 // Keep the already-verified ordinary HUD mapping unchanged.
                 // Only FlatPerspectiveEffect uses the finite 3D plane above.
-                clipCorrection._11 = hudScaleX * eyeScale[eye];
+                clipCorrection._11 = hudScaleX;
                 clipCorrection._22 = hudScaleY;
                 clipCorrection._33 = 1.0f;
                 clipCorrection._44 = 1.0f;
@@ -2795,20 +2795,11 @@ namespace OutRunVRStereo
                 haveScissorState && scissorEnabled != FALSE &&
                 SUCCEEDED(device->GetScissorRect(&savedScissor));
             RECT eyeScissor[2]{};
-            bool transformScissor = false;
-            if (screenKind == R30ScreenSpaceKind::Hud2D && haveScissor)
-            {
-                float hudScaleX = 1.0f;
-                float hudScaleY = 1.0f;
-                R30HudContainScale(stereo, hudScaleX, hudScaleY);
-                transformScissor =
-                    R30TransformHudScissor(savedScissor, savedViewport,
-                        hudScaleX * eyeScale[0], hudScaleY,
-                        eyeOffset[0], eyeScissor[0]) &&
-                    R30TransformHudScissor(savedScissor, savedViewport,
-                        hudScaleX * eyeScale[1], hudScaleY,
-                        eyeOffset[1], eyeScissor[1]);
-            }
+            // Runtime evidence on 7081b389 showed the per-eye scissor remap
+            // corrupts otherwise stable HUD placement. Keep the pre-regression
+            // common-centre HUD mapping until sprite-specific semantics are
+            // proven; never remap the game's scissor rectangles per eye here.
+            const bool transformScissor = false;
 
             // Capture the completed world eyes before the first recognized HUD
             // draw. Present then extracts glow from this snapshot, so bright HUD
