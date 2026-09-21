@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-21T18:24:00Z",
+  "updatedUtc": "2026-09-21T18:25:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -338,7 +338,7 @@
     "onWriteFailure": "PUSH_PENDING_OR_CAPABILITY_BLOCKED"
   },
   "binaryContractGate": {
-    "status": "BUILD_VERIFIED",
+    "status": "INTEGRATED",
     "canonicalSource": "emoose/OutRun2006Tweaks release v0.1 OR2006C2C.EXE",
     "manifest": "docs/VR_BINARY_CONTRACT.json",
     "verifier": "tools/verify_vr_binary_contract.py",
@@ -358,6 +358,9 @@
       "gameWin32Build": "success",
       "package": "success"
     },
-    "runtimeCrashSidecar": "compile/package verified; observe on next real crash, no synthetic crash required"
+    "runtimeCrashSidecar": "compile/package verified; observe on next real crash, no synthetic crash required",
+    "integrationSha": "3e7c09db725880eef5650d41a96a8d1691998bdd",
+    "integrationPr": 15,
+    "nextAction": "Mandatory strict EXE contract + matching durable crash-signature revalidation for all future executable-RVA hook changes."
   }
 }
