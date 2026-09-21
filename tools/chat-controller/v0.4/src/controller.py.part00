@@ -31,6 +31,15 @@ WATCHDOG_BUSY_STALL_MINUTES = int(os.getenv("WATCHDOG_BUSY_STALL_MINUTES", "20")
 WATCHDOG_CHECK_SECONDS = int(os.getenv("WATCHDOG_CHECK_SECONDS", "60"))
 WATCHDOG_MAX_RESUMES_PER_RUN = int(os.getenv("WATCHDOG_MAX_RESUMES_PER_RUN", "1"))
 WATCHDOG_FORCE_STOP_STALLED = os.getenv("WATCHDOG_FORCE_STOP_STALLED", "false").lower() == "true"
+RATE_LIMIT_BACKOFF_MINUTES = [
+    max(1, int(x.strip()))
+    for x in os.getenv("RATE_LIMIT_BACKOFF_MINUTES", "1,2,4,8").split(",")
+    if x.strip()
+]
+if not RATE_LIMIT_BACKOFF_MINUTES:
+    RATE_LIMIT_BACKOFF_MINUTES = [1, 2, 4, 8]
+MIN_SEND_GAP_SECONDS = max(0, int(os.getenv("MIN_SEND_GAP_SECONDS", "90")))
+SLOT_DEDUP_SECONDS = max(0, int(os.getenv("SLOT_DEDUP_SECONDS", "300")))
 PREFERRED_THINKING_LEVEL = os.getenv("PREFERRED_THINKING_LEVEL", "High").strip()
 STRICT_THINKING_LEVEL = os.getenv("STRICT_THINKING_LEVEL", "true").lower() == "true"
 PROFILE_DIR = Path("/data/browser-profile")
@@ -47,6 +56,16 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(), logging.FileHandler(LOG_FILE)],
 )
 log = logging.getLogger("outrun-controller")
+
+RATE_LIMIT_PATTERNS = [
+    r"too many requests",
+    r"http\s*429",
+    r"\b429\b.{0,80}(request|rate|limit)",
+    r"rate limit(?:ed|ing)?",
+    r"request(?:s)?.{0,30}(too many|limit|throttl)",
+    r"요청.{0,12}(너무 많|한도|제한)",
+    r"너무 많은 요청",
+]
 
 LIMIT_PATTERNS = [
     r"you.?ve reached.*limit",
@@ -109,6 +128,9 @@ class Registry:
     logical_date: str
     next_slot: int
     slots: list[Slot]
+    rate_limit_attempts: int = 0
+    rate_limit_until: Optional[str] = None
+    last_global_send_at: Optional[str] = None
 
 runtime = {
     "started_at": datetime.now(TZ).isoformat(),
@@ -125,6 +147,11 @@ runtime = {
     "preferred_thinking_level": PREFERRED_THINKING_LEVEL,
     "strict_thinking_level": STRICT_THINKING_LEVEL,
     "last_thinking_level_result": None,
+    "rate_limit_backoff_minutes": RATE_LIMIT_BACKOFF_MINUTES,
+    "min_send_gap_seconds": MIN_SEND_GAP_SECONDS,
+    "slot_dedup_seconds": SLOT_DEDUP_SECONDS,
+    "rate_limit_attempts": 0,
+    "rate_limit_until": None,
 }
 
 def write_runtime(**updates):
@@ -143,6 +170,9 @@ def new_registry(now: datetime) -> Registry:
         logical_date=logical_date(now),
         next_slot=0,
         slots=[Slot(name=chr(ord('A') + i)) for i in range(CHAT_SLOTS)],
+        rate_limit_attempts=0,
+        rate_limit_until=None,
+        last_global_send_at=None,
     )
 
 
@@ -158,6 +188,9 @@ def load_registry(now: datetime) -> Registry:
             logical_date=raw["logical_date"],
             next_slot=int(raw.get("next_slot", 0)),
             slots=[Slot(**s) for s in raw["slots"]],
+            rate_limit_attempts=int(raw.get("rate_limit_attempts", 0)),
+            rate_limit_until=raw.get("rate_limit_until"),
+            last_global_send_at=raw.get("last_global_send_at"),
         )
     except Exception:
         log.exception("registry read failed; recreating")
@@ -180,6 +213,9 @@ def save_registry(reg: Registry):
         "logical_date": reg.logical_date,
         "next_slot": reg.next_slot,
         "slots": [asdict(s) for s in reg.slots],
+        "rate_limit_attempts": reg.rate_limit_attempts,
+        "rate_limit_until": reg.rate_limit_until,
+        "last_global_send_at": reg.last_global_send_at,
     }
     tmp = REGISTRY_FILE.with_suffix(".tmp")
     tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -209,9 +245,85 @@ async def page_text(page: Page) -> str:
         return ""
 
 
+async def detect_rate_limit(page: Page) -> bool:
+    text = await page_text(page)
+    return any(re.search(p, text, flags=re.I | re.S) for p in RATE_LIMIT_PATTERNS)
+
+
 async def detect_limit(page: Page) -> bool:
     text = await page_text(page)
     return any(re.search(p, text, flags=re.I | re.S) for p in LIMIT_PATTERNS)
+
+
+def _parse_iso(value: Optional[str]) -> Optional[datetime]:
+    if not value:
+        return None
+    try:
+        dt = datetime.fromisoformat(value)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=TZ)
+        return dt.astimezone(TZ)
+    except Exception:
+        return None
+
+
+def rate_limit_active(reg: Registry, now: datetime) -> bool:
+    until = _parse_iso(reg.rate_limit_until)
+    return bool(until and now < until)
+
+
+def rate_limit_seconds_remaining(reg: Registry, now: datetime) -> int:
+    until = _parse_iso(reg.rate_limit_until)
+    if not until:
+        return 0
+    return max(0, int((until - now).total_seconds()))
+
+
+def mark_rate_limit(reg: Registry, now: datetime, source: str):
+    reg.rate_limit_attempts = max(0, reg.rate_limit_attempts) + 1
+    idx = min(reg.rate_limit_attempts - 1, len(RATE_LIMIT_BACKOFF_MINUTES) - 1)
+    delay_min = RATE_LIMIT_BACKOFF_MINUTES[idx]
+    reg.rate_limit_until = (now + timedelta(minutes=delay_min)).isoformat()
+    save_registry(reg)
+    write_runtime(
+        status="rate_limited_backoff",
+        last_action=f"Too many requests detected ({source}); backing off {delay_min}m",
+        rate_limit_attempts=reg.rate_limit_attempts,
+        rate_limit_until=reg.rate_limit_until,
+    )
+    log.warning(
+        "rate limit detected source=%s attempt=%s backoff=%sm until=%s",
+        source, reg.rate_limit_attempts, delay_min, reg.rate_limit_until,
+    )
+
+
+def note_successful_request(reg: Registry, now: datetime):
+    reg.last_global_send_at = now.isoformat()
+    reg.rate_limit_attempts = 0
+    reg.rate_limit_until = None
+    write_runtime(
+        rate_limit_attempts=0,
+        rate_limit_until=None,
+    )
+
+
+def send_guard_reason(reg: Registry, slot: Optional[Slot], now: datetime) -> Optional[str]:
+    if rate_limit_active(reg, now):
+        return f"rate_limit_backoff:{rate_limit_seconds_remaining(reg, now)}s"
+
+    last_global = _parse_iso(reg.last_global_send_at)
+    if last_global and MIN_SEND_GAP_SECONDS > 0:
+        age = (now - last_global).total_seconds()
+        if age < MIN_SEND_GAP_SECONDS:
+            return f"global_send_gap:{int(MIN_SEND_GAP_SECONDS - age)}s"
+
+    if slot and slot.last_sent_at and SLOT_DEDUP_SECONDS > 0:
+        last_slot = _parse_iso(slot.last_sent_at)
+        if last_slot:
+            age = (now - last_slot).total_seconds()
+            if age < SLOT_DEDUP_SECONDS:
+                return f"slot_dedup:{int(SLOT_DEDUP_SECONDS - age)}s"
+    return None
 
 
 async def detect_busy(page: Page) -> bool:
