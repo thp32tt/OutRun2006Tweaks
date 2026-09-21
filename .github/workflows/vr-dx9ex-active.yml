@@ -41,8 +41,28 @@ jobs:
         shell: pwsh
         run: |
           cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
-          cmake --build build-host --config Release --target outrun-vr-host
+          cmake --build build-host --config Release --target outrun-vr-host outrun-vr-shader-smoke outrun-vr-protocol-v3-smoke outrun-vr-core-math-smoke outrun-vr-host-state-v3-channel-smoke outrun-vr-v2-v3-shadow-conversion-smoke outrun-vr-host-pose-v3-validation-smoke outrun-vr-runtime-eligibility-smoke outrun-vr-r23-verified-bundle-smoke outrun-vr-r32-policy-smoke
           if (-not (Test-Path build-host/bin/outrun-vr-host.exe)) { throw 'DX9Ex OpenXR host missing' }
+      - name: Run no-HMD VR host smoke suite
+        shell: pwsh
+        run: |
+          $tests = @(
+            'outrun-vr-shader-smoke.exe',
+            'outrun-vr-protocol-v3-smoke.exe',
+            'outrun-vr-core-math-smoke.exe',
+            'outrun-vr-host-state-v3-channel-smoke.exe',
+            'outrun-vr-v2-v3-shadow-conversion-smoke.exe',
+            'outrun-vr-host-pose-v3-validation-smoke.exe',
+            'outrun-vr-runtime-eligibility-smoke.exe',
+            'outrun-vr-r23-verified-bundle-smoke.exe',
+            'outrun-vr-r32-policy-smoke.exe'
+          )
+          foreach ($test in $tests) {
+            $exe = Join-Path 'build-host/bin' $test
+            if (-not (Test-Path $exe)) { throw "Smoke executable missing: $test" }
+            & $exe
+            if ($LASTEXITCODE -ne 0) { throw "Smoke failed: $test exit=$LASTEXITCODE" }
+          }
           New-Item -ItemType Directory -Force stage-host | Out-Null
           Copy-Item build-host/bin/outrun-vr-host.exe stage-host/outrun-vr-host.exe
           Set-Content stage-host/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
