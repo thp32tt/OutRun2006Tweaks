@@ -1161,26 +1161,52 @@ void AfterTick()
 	InterpCollecting = false;
 }
 
+static void RollbackHooks() noexcept
+{
+	// SafetyHook::reset restores the original target bytes and releases the
+	// trampoline/stub. Unwind in reverse install order so a failed transaction
+	// never leaves an earlier interpolation subset live.
+	SumoHeartMarkerPos_hook.reset();
+	SumoHeartBumpPos_hook.reset();
+	HeartDispBumpPos_hook.reset();
+	HeartPulse_hook.reset();
+	OsoCommonPost_hook.reset();
+	OsoCommonDisp_hook.reset();
+	OsoDynDisp_hook.reset();
+	OsoDynCtrl_hook.reset();
+	CalcCharMatrix_hook.reset();
+	CalcDispMatrix_hook.reset();
+}
+
 bool Apply()
 {
+	// A prior failed attempt must not contribute stale handles to this install.
+	RollbackHooks();
+
+	auto fail = []() noexcept
+	{
+		RollbackHooks();
+		return false;
+	};
+
 	// Track which cars are live each tick so we can replay CalcDispMatrix over
 	// them on non-tick frames.
 	CalcDispMatrix_hook = safetyhook::create_inline(Module::exe_ptr(GameAddr::CalcDispMatrix), CalcDispMatrix_dest);
 	if (!CalcDispMatrix_hook)
-		return false;
+		return fail();
 
 	// In-car characters, whose baked base matrix must be rebuilt once the car
 	// matrices move.
 	CalcCharMatrix_hook = safetyhook::create_mid(Module::exe_ptr(GameAddr::CalcCharMatrix), CalcCharMatrix_dest);
 	if (!CalcCharMatrix_hook)
-		return false;
+		return fail();
 
 	// Oso objects: supply a per-tick prev-state to OsoDynamics_Disp, whose own
 	// writeback advances once per rendered frame.
 	OsoDynCtrl_hook = safetyhook::create_mid(Module::exe_ptr(GameAddr::OsoDynamics_Ctrl), OsoDynCtrl_dest);
 	OsoDynDisp_hook = safetyhook::create_mid(Module::exe_ptr(GameAddr::OsoDynamics_Disp), OsoDynDisp_dest);
 	if (!OsoDynCtrl_hook || !OsoDynDisp_hook)
-		return false;
+		return fail();
 
 	// OsoCommonFunc_Disp has no interpolation of its own: substitute an
 	// interpolated matrix across the mxPushLoadMatrix call, then put the real
@@ -1188,12 +1214,12 @@ bool Apply()
 	OsoCommonDisp_hook = safetyhook::create_mid(Module::exe_ptr(GameAddr::OsoCommon_PushMatrix), OsoCommonDisp_dest);
 	OsoCommonPost_hook = safetyhook::create_mid(Module::exe_ptr(GameAddr::OsoCommon_AfterPush), OsoCommonPost_dest);
 	if (!OsoCommonDisp_hook || !OsoCommonPost_hook)
-		return false;
+		return fail();
 
 	// Attached-heart pulse: rewrite the computed animation angle in-register.
 	HeartPulse_hook = safetyhook::create_mid(Module::exe_ptr(GameAddr::HeartDisp_PulseAngle), HeartPulse_dest);
 	if (!HeartPulse_hook)
-		return false;
+		return fail();
 
 	// Heart Attack mission markers: hand the sprite the car's drawn position
 	// rather than its tick position.
@@ -1201,7 +1227,7 @@ bool Apply()
 	SumoHeartBumpPos_hook = safetyhook::create_mid(Module::exe_ptr(0x110B36), SumoHeartBumpPos_dest);
 	SumoHeartMarkerPos_hook = safetyhook::create_mid(Module::exe_ptr(0x10FC25), SumoHeartMarkerPos_dest);
 	if (!HeartDispBumpPos_hook || !SumoHeartBumpPos_hook || !SumoHeartMarkerPos_hook)
-		return false;
+		return fail();
 
 	InterpCars.reserve(32);
 	InterpChars.reserve(8);
