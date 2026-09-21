@@ -19,7 +19,7 @@ function Get-OutRunVRTestProfile {
         'CONTROL' {
             return [ordered]@{
                 Name='CONTROL'
-                Description='Conservative DX9Ex reference. Use only when CORRECTNESS needs an A/B baseline.'
+                Description='FSR1 POC control: full OpenXR output and full-size DirectGPU transport; FSR1 disabled.'
                 Arguments=@(
                     '-FramerateLimit=60',
                     '-FramerateFastLoad=0',
@@ -27,7 +27,10 @@ function Get-OutRunVRTestProfile {
                     '-FramerateUnlockExperimental=false',
                     '-FrameCadenceMode=0',
                     '-FrameCadenceTargetHz=0',
-                    '-DisableDesktopVsync=false'
+                    '-DisableDesktopVsync=false',
+                    '-HostRenderScale=1.0',
+                    '-DirectTransportScale=1.0',
+                    '-FSR1Sharpness=0.0'
                 ) + $commonVr
                 Environment=[ordered]@{
                     OUTRUN_VR_TEST_PROFILE='CONTROL'
@@ -38,7 +41,7 @@ function Get-OutRunVRTestProfile {
         'PERFORMANCE' {
             return [ordered]@{
                 Name='PERFORMANCE'
-                Description='CORRECTNESS runtime baseline plus opt-in performance feature flags when the binary supports them.'
+                Description='FSR1 POC A/B profile: full OpenXR output, 0.77 DirectGPU transport, EASU+RCAS sharpness 0.55.'
                 Arguments=@(
                     '-FramerateLimit=0',
                     '-FramerateFastLoad=3',
@@ -46,7 +49,10 @@ function Get-OutRunVRTestProfile {
                     '-FramerateUnlockExperimental=true',
                     '-FrameCadenceMode=1',
                     '-FrameCadenceTargetHz=0',
-                    '-DisableDesktopVsync=true'
+                    '-DisableDesktopVsync=true',
+                    '-HostRenderScale=1.0',
+                    '-DirectTransportScale=0.77',
+                    '-FSR1Sharpness=0.55'
                 ) + $commonVr
                 Environment=[ordered]@{
                     OUTRUN_VR_TEST_PROFILE='PERFORMANCE'
@@ -57,7 +63,7 @@ function Get-OutRunVRTestProfile {
         default {
             return [ordered]@{
                 Name='CORRECTNESS'
-                Description='Default daily Quest/VDXR test. Correctness fixes enabled; risky performance experiments remain opt-in.'
+                Description='FSR1 POC correctness baseline: full OpenXR output and full-size DirectGPU transport; FSR1 disabled.'
                 Arguments=@(
                     '-FramerateLimit=0',
                     '-FramerateFastLoad=3',
@@ -65,7 +71,10 @@ function Get-OutRunVRTestProfile {
                     '-FramerateUnlockExperimental=true',
                     '-FrameCadenceMode=1',
                     '-FrameCadenceTargetHz=0',
-                    '-DisableDesktopVsync=true'
+                    '-DisableDesktopVsync=true',
+                    '-HostRenderScale=1.0',
+                    '-DirectTransportScale=1.0',
+                    '-FSR1Sharpness=0.0'
                 ) + $commonVr
                 Environment=[ordered]@{
                     OUTRUN_VR_TEST_PROFILE='CORRECTNESS'
