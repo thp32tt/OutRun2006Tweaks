@@ -192,3 +192,42 @@ Issue #13 is append-only. Each occurrence, reopen, fix and validation event shou
 `event`, `regressionKey`, `observedAtKst`, `sourceSha`, build/profile/session identity when available, symptom fingerprint, evidence, root cause, fix SHA, affected paths, verifier, validation result, status and exact nextAction.
 
 This gate is enforced structurally by `tools/Test-VRRegressionKnowledge.ps1` in coordination and active DX9Ex CI. It cannot prove HMD correctness, but it prevents solved regressions from disappearing from project memory.
+
+
+## Unified production write logging
+
+The production-write contract is origin-independent. Scheduled D, direct Chat edits, and deliberate manual production edits all use the same durable logging path.
+
+### Ledgers
+
+- Issue #14: `[VR] Production Change Ledger` — append-only record of every coherent production change.
+- Issue #13: `[VR] Runtime Problem / Regression Ledger` — append-only problem/reopen/fix/validation events.
+- `docs/VR_REGRESSION_KNOWLEDGE.json` — machine-readable regression source of truth.
+
+### Source modes
+
+Every production event declares one source mode:
+- `SCHEDULED_D`
+- `CHAT_DIRECT`
+- `MANUAL`
+
+A direct Chat edit is therefore not an informal exception. For the duration of that transaction it follows the same D ownership, checkpoint, validation and regression rules.
+
+### C4.5 LOG — mandatory after production commit
+
+After C4 COMMIT and before C6 STATE, append an Issue #14 event containing:
+- sourceMode
+- changedAtKst
+- baseSha
+- resultSha
+- changeSummary
+- changedPaths
+- reason
+- relatedFindingOrRegressionKeys
+- validation
+- runtimeTestRequired
+- exact nextAction
+
+When runtime behavior is implicated, also append/update Issue #13 and the regression registry. A known symptom must reuse its existing stable key.
+
+If ledger persistence fails, the run is not fully persisted. Record `PUSH_PENDING` or `CAPABILITY_BLOCKED` and carry that exact action into C6.
