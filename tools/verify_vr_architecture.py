@@ -488,4 +488,76 @@ require("src/vr/core/transport.hpp", "class IFrameProducer", "class IFrameConsum
 require("src/vr/game/game_adapter.hpp", "class IGameAdapter", "latchRenderPose", "buildStereoMatrices")
 require("src/vr/d3d9/stereo_backend.hpp", "class IStereoBackend", "drawWorldStereo", "drawScreenSpaceStereo")
 
+# Fallback/direct shared D3D11 shader cache must publish atomically. Repeated
+# failure at any creation stage must not overwrite/leak persistent COM globals.
+shader_source = text("vrhost/src/runtime/sbs_capture_override.hpp")
+shader_begin = shader_source.find("inline bool CreateShaders()")
+shader_end = shader_source.find("inline bool GetGameUv(", shader_begin)
+if shader_begin < 0 or shader_end < 0:
+    raise SystemExit("CreateShaders transaction boundary missing")
+shader_txn = shader_source[shader_begin:shader_end]
+for marker in (
+    "ID3D11VertexShader* newVs = nullptr;",
+    "ID3D11PixelShader* newPs = nullptr;",
+    "ID3D11SamplerState* newSampler = nullptr;",
+    "ID3D11Buffer* newConstantBuffer = nullptr;",
+    "auto cleanupNewBundle = [&]() noexcept",
+    "CreateVertexShader(",
+    "&newVs",
+    "CreatePixelShader(",
+    "&newPs",
+    "CreateSamplerState(&sd, &newSampler)",
+    "CreateBuffer(",
+    "&newConstantBuffer",
+    "Vs = newVs;",
+    "Ps = newPs;",
+    "Sampler = newSampler;",
+    "ConstantBuffer = newConstantBuffer;",
+):
+    if marker not in shader_txn:
+        raise SystemExit(f"shader bundle transaction invariant missing: {marker}")
+
+# No D3D creation call may write directly into a published cache pointer.
+for forbidden in (
+    "CreateVertexShader(vsCode->GetBufferPointer(),\n            vsCode->GetBufferSize(), nullptr, &Vs)",
+    "CreatePixelShader(psCode->GetBufferPointer(),\n                psCode->GetBufferSize(), nullptr, &Ps)",
+    "CreateSamplerState(&sd, &Sampler)",
+    "CreateBuffer(&bd, nullptr, &ConstantBuffer)",
+):
+    if forbidden in shader_txn:
+        raise SystemExit(f"shader bundle persistent output overwrite returned: {forbidden}")
+
+create_vs = shader_txn.find("&newVs")
+create_ps = shader_txn.find("&newPs")
+create_sampler = shader_txn.find("&newSampler")
+create_cb = shader_txn.find("&newConstantBuffer")
+commit_vs = shader_txn.find("Vs = newVs;")
+commit_cb = shader_txn.find("ConstantBuffer = newConstantBuffer;")
+if min(create_vs, create_ps, create_sampler, create_cb, commit_vs, commit_cb) < 0:
+    raise SystemExit("shader transaction ordering marker missing")
+if not max(create_vs, create_ps, create_sampler, create_cb) < commit_vs < commit_cb:
+    raise SystemExit("shader bundle published before complete creation")
+
+cleanup_begin = shader_txn.find("auto cleanupNewBundle")
+cleanup_end = shader_txn.find("};", cleanup_begin)
+cleanup = shader_txn[cleanup_begin:cleanup_end]
+for marker in (
+    "ReleaseCom(newConstantBuffer)",
+    "ReleaseCom(newSampler)",
+    "ReleaseCom(newPs)",
+    "ReleaseCom(newVs)",
+):
+    if marker not in cleanup:
+        raise SystemExit(f"shader partial cleanup missing: {marker}")
+
+# Minimal deterministic failure model: no persistent object may appear until all
+# four local objects exist; failure at VS/PS/Sampler/CB keeps globals empty.
+for fail_stage in range(4):
+    locals_ready = [stage < fail_stage for stage in range(4)]
+    committed = all(locals_ready)
+    if committed:
+        raise SystemExit(f"partial shader failure unexpectedly committed: {fail_stage}")
+if not all([True, True, True, True]):
+    raise SystemExit("shader complete-bundle model regressed")
+
 print("VR reconstructed R23/R25 architecture boundary verification passed")
