@@ -47,6 +47,7 @@ namespace Settings
 	extern Setting<bool> VRAutoEnableWhenHostPresent;
 	extern Setting<bool> VRStereo;
 	extern Setting<bool> VRDirectGpuOnly;
+	bool VRDirectGpuOnlyEffective() noexcept;
 	extern Setting<float> VRWorldScale;
 	extern Setting<float> VRStereoDepth;
 	extern Setting<bool> VRTelemetry;
@@ -1427,7 +1428,7 @@ namespace OutRunVRStereo
 						spdlog::info("VR stereo: 4-slot direct GPU transport uses bounded post-Present completion; source eye={}x{}",BackBufferDesc.Width,BackBufferDesc.Height);
 					}
 				}
-				else if(Settings::VRDirectGpuOnly)
+				else if(Settings::VRDirectGpuOnlyEffective())
 				{
 					markDirectOnlyHold();
 				}
