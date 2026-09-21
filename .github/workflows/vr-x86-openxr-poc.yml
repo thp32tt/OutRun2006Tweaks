@@ -33,9 +33,8 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force stage | Out-Null
           Copy-Item build-vrx86/bin/outrun-vr-x86-openxr-probe.exe stage/
-          $loader = Get-ChildItem build-vrx86 -Recurse -Filter openxr_loader.dll | Where-Object { $_.FullName -match '\\Release\\' } | Select-Object -First 1
-          if (-not $loader) { throw 'Win32 openxr_loader.dll missing' }
-          Copy-Item $loader.FullName stage/openxr_loader.dll
+          # OpenXR-SDK's loader target is linked into this POC; no adjacent
+          # openxr_loader.dll is required for the staged executable.
           Set-Content stage/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
       - uses: actions/upload-artifact@v4
         with:
