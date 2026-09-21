@@ -1,0 +1,27 @@
+{
+  "role":"A",
+  "candidate_sha":"f26188501e1da3dd9139c7a32407bd6353da9780",
+  "finding_id":"VR-HOST-002",
+  "lens":"architecture/state/lifetime/run-generation ownership",
+  "verdict":"PASS",
+  "evidence":[
+    {"path":"src/vr/d3d9/stereo_renderer_r7.inc","observation":"Frame.v2 ring is claimed per game run under publishSequence seqlock; prior slots are invalidated and each slot mirrors the nonzero run generation."},
+    {"path":"src/vr/ipc/protocol.hpp","observation":"RenderFrameRunIdentityMatches requires nonzero ring identity and exact PID+generation match between ring and slot."},
+    {"path":"vrhost/src/main.cpp","observation":"RenderFrameReader::ReadSlot enforces RenderFrameRunIdentityMatches after slot/ring stability checks, so stale-run slots cannot become host frame authority."},
+    {"path":"vrhost/src/runtime/d3d9ex_direct_passthrough.hpp","observation":"ReadFrameById independently enforces run identity before accepting DirectGPU transport and ACK publication follows host-owned copy completion."},
+    {"path":"src/vr/ipc/shadow_legacy_v2.hpp","observation":"Legacy v2->v3 LatestFrame conversion now rejects stale run identity before conversion."},
+    {"path":"vrhost/src/runtime/openxr_api_compat.hpp","observation":"compat latest-frame reader also requires run identity after stable ring/slot snapshot."},
+    {"path":"vrhost/src/main_r23.cpp","observation":"production R23 selection uses RenderFrameReader for latest/history/exact reads and rechecks exact selected frame stability before committing display authority."}
+  ],
+  "contrary_evidence_checked":[
+    "Ring mapping may outlive a fast game restart; ClaimRenderFrameRingForCurrentRun explicitly reclaims and clears slots.",
+    "Frame IDs may repeat across process restarts; PID+run-generation identity prevents frameId-only stale acceptance.",
+    "DirectGPU skipped-frame ACK path receives frames from identity-filtered ReadHistory.",
+    "Session/reference-space transitions invalidate cached authority independently of run identity."
+  ],
+  "risk_note":"Run generation is a 32-bit mixed value rather than a cryptographic nonce, but stale acceptance additionally requires current client PID and a matching stable ring identity; no architecture/lifetime blocker found for this candidate.",
+  "static_verification":"PASS",
+  "build_verification":"D reported BUILD_VERIFIED; A did not independently rerun CI",
+  "user_runtime_verification":"NOT_VERIFIED",
+  "integration_gate":"A_POST_REVIEW_PASS"
+}
