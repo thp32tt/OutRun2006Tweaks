@@ -21,7 +21,7 @@ function Require-TriggerPath([string]$Path) {
 # All tool files copied by the active package loop must also select this workflow
 # when they change. Parse the literal package inventory so the verifier fails if
 # a new packaged tool is added without a matching push-path trigger.
-$copyLoopPattern = "(?s)foreach \(\$file in @\((?<items>.*?)\)\) \{\s*Copy-Item \(Join-Path 'tools' \$file\)"
+$copyLoopPattern = '(?s)foreach \(\$file in @\((?<items>.*?)\)\) \{\s*Copy-Item \(Join-Path ''tools'' \$file\)'
 $copyLoop = [regex]::Match($workflow, $copyLoopPattern)
 Require $copyLoop.Success "Could not locate active package tool-copy inventory"
 
