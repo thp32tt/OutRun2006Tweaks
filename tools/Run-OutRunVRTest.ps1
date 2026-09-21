@@ -1,6 +1,6 @@
 param(
     [string]$GameExe = 'OR2006C2C.EXE',
-    [ValidateSet('CONTROL','CORRECTNESS','PERFORMANCE')]
+    [ValidateSet('CONTROL','CORRECTNESS','PERFORMANCE','STAGE_DIAGNOSTIC')]
     [string]$TestProfile = 'CORRECTNESS'
 )
 
@@ -35,6 +35,7 @@ if(!$backend){throw 'Active backend identity is missing.'}
 $patterns=@(
     'OutRun2006Tweaks*.log',
     'OutRun2006Tweaks-hudtrace*.csv',
+    'OutRun2006Tweaks-xstmap*.csv',
     'outrun-vr-host*.log',
     'outrun-vr-host-pipeline*.log',
     'outrun-vr-watchdog*.log',
@@ -105,6 +106,22 @@ if($backend -ne '2d'){
 
 $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)
 New-Item -ItemType Directory -Force $sessionRoot|Out-Null
+
+$assetAnalyzer=Join-Path $root 'tools/analyze_outrun_assets.py'
+if(!(Test-Path $assetAnalyzer)){
+    $assetAnalyzer=Join-Path $root 'analyze_outrun_assets.py'
+}
+$pythonCmd=Get-Command python -ErrorAction SilentlyContinue
+if($pythonCmd -and (Test-Path $assetAnalyzer)){
+    $assetOut=Join-Path $sessionRoot 'VR_ASSET_SEMANTICS.json'
+    try {
+        & $pythonCmd.Source $assetAnalyzer --root $root --output $assetOut --max-files 5000 --quiet
+        if($LASTEXITCODE -ne 0){ Write-Warning "Asset semantic analyzer exited with code $LASTEXITCODE" }
+    } catch {
+        Write-Warning "Asset semantic analyzer failed: $($_.Exception.Message)"
+    }
+}
+
 @(
     "backend=$backend"
     "profile=$TestProfile"
