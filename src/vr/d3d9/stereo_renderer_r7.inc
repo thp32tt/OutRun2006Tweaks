@@ -230,6 +230,7 @@ namespace OutRunVRStereo
 		bool FirstMainDepthReuseLogged = false;
 		bool FirstMainClearLogged = false;
 		bool FirstDepthBootstrapLogged = false;
+		bool FirstDeferredResourceInitLogged = false;
 
 		template <typename T>
 		void ReleaseCom(T*& value)
@@ -1591,7 +1592,10 @@ namespace OutRunVRStereo
 			LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();
 			EnsureSharedState();
 			EnsureRenderFrameState();
-			EnsureStereoResources(device);
+			// Resource creation is intentionally deferred beyond CreateDevice exposure.
+			// D3D9Ex still installs Reset/Present ownership synchronously, but private
+			// eye/backbuffer resources are first created only by the final R23 Present
+			// owner after a successful real game Present.
 			StereoInstalledDevice.store(device,std::memory_order_release);
 			StereoBaseCallbacksArmed.store(true,std::memory_order_release);
 			StereoInstallState.store(StereoInstallReady,std::memory_order_release);
