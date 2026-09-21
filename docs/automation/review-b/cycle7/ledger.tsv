@@ -1,0 +1,32 @@
+unit_id	source_unit	target_sha	path	code_path	lens	evidence	regression_case	disposition
+B7-001..B7-120	B3-001..B3-120	a50ee775636e5572f7976f2d1374089741b510b0	prior-ledger-exact-row	identity-carry-forward	rendering/performance	compare 265504f6..a50ee775 shows no src/vr/** or vrhost/** runtime file changes; exact prior evidence rows retained by reference	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B7-121	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	commonVr/PreferD3D9Ex	test-identity	PreferD3D9Ex=true retained	VR-STARTUP-WHITE-001	TRIGGER_PROTECTED
+B7-122	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	commonVr/TargetRefreshRateHz	frame-pacing	TargetRefreshRateHz=0 preserves runtime-selected refresh	VR-STARTUP-WHITE-001	TRIGGER_PROTECTED
+B7-123	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	commonVr/SkyGlowFactor	visual-policy	SkyGlowFactor=1 retained	VR-STARTUP-WHITE-001	TRIGGER_PROTECTED
+B7-124	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	CONTROL/FrameCadenceTargetHz	frame-pacing	CONTROL target remains 0	VR-STARTUP-WHITE-001	TRIGGER_PROTECTED
+B7-125	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	CORRECTNESS/FrameCadenceTargetHz	frame-pacing	CORRECTNESS target remains 0	VR-STARTUP-WHITE-001	TRIGGER_PROTECTED
+B7-126	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	PERFORMANCE/FrameCadenceTargetHz	frame-pacing	PERFORMANCE target remains 0	VR-STARTUP-WHITE-001	TRIGGER_PROTECTED
+B7-127	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	HUD_SCREEN/profile	visual-testability	HUD screen session isolates screen HUD correctness	VR-STARTUP-WHITE-001	NEW_COVERAGE
+B7-128	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	HUD_MENU/profile	visual-testability	menu profile avoids fast-load while retaining VR activation args	VR-STARTUP-WHITE-001	NEW_COVERAGE
+B7-129	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	HUD_WORLD/profile	visual-testability	world profile adds asset diagnostics and stage shortcuts	VR-STARTUP-WHITE-001	NEW_COVERAGE
+B7-130	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	STAGE_DIAGNOSTIC/profile	performance-testability	stage diagnostics remain opt-in and identity-tagged	VR-STARTUP-WHITE-001	NEW_COVERAGE
+B7-131	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	A_BASELINE/culling	performance-comparison	stage culling disabled baseline explicit	VR-STARTUP-WHITE-001	NEW_COVERAGE
+B7-132	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	B_CULLING/culling	performance-comparison	only stage culling dimension changes vs A	VR-STARTUP-WHITE-001	NEW_COVERAGE
+B7-133	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	C_CULLING_NO_SSAA/SSAA	performance-comparison	SSAA dimension isolated after culling	VR-STARTUP-WHITE-001	NEW_COVERAGE
+B7-134	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	D_CULLING_NO_SSAA_R512/reflection	performance-comparison	reflection resolution dimension isolated	VR-STARTUP-WHITE-001	NEW_COVERAGE
+B7-135	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	commonVr/DirectGpuOnly	fallback	DirectGpuOnly=false preserves fallback surface	VR-STARTUP-WHITE-001	FALSIFICATION
+B7-136	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	commonVr/DisableDesktopDuplication	fallback	Desktop Duplication remains available	VR-STARTUP-WHITE-001	FALSIFICATION
+B7-137	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	commonVr/CullingUnionFov	stereo-culling	union FOV remains enabled	VR-STARTUP-WHITE-001	NEW_COVERAGE
+B7-138	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	commonVr/CullingUnionMarginDegrees	stereo-culling	margin explicitly 4 degrees	VR-STARTUP-WHITE-001	NEW_COVERAGE
+B7-139	new	a50ee775	tools/OutRunVR-TestProfiles.ps1	commonVr/NearPlane	projection	NearPlane remains 0.10 across profiles	VR-STARTUP-WHITE-001	NEW_COVERAGE
+B7-140	new	a50ee775	.github/workflows/vr-dx9ex-active.yml	workflow-change	regression-trigger	workflow changed since prior runtime ledger, therefore startup regression remains triggered	VR-STARTUP-WHITE-001	NEEDS_RUNTIME_GATE
+B7-141	new	a50ee775	docs/VR_REGRESSION_KNOWLEDGE.json	riskPaths	regression-gate	src/vr/** and vrhost/** explicitly risk paths	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B7-142	new	a50ee775	docs/VR_REGRESSION_KNOWLEDGE.json	revalidationTriggers/startup	regression-gate	startup/device/reset/present changes require revalidation	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B7-143	new	a50ee775	docs/VR_REGRESSION_KNOWLEDGE.json	revalidationTriggers/transport	regression-gate	stereo transport/shared-frame eligibility changes require revalidation	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B7-144	new	a50ee775	docs/VR_REGRESSION_KNOWLEDGE.json	revalidationTriggers/fallback	regression-gate	host fallback/first-frame changes require revalidation	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B7-145	new	a50ee775	docs/VR_REGRESSION_KNOWLEDGE.json	revalidationTriggers/config	regression-gate	launch/profile/config VR activation changes require revalidation	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B7-146	new	a50ee775	docs/VR_REGRESSION_KNOWLEDGE.json	verifier/static	no-HMD-testability	active DX9Ex DLL+x64 host build and host smoke required	VR-STARTUP-WHITE-001	PROTECTION_REQUIRED
+B7-147	new	a50ee775	docs/VR_REGRESSION_KNOWLEDGE.json	verifier/runtime	runtime-validation	CORRECTNESS launch must pass logo->menu/game without persistent white frame	VR-STARTUP-WHITE-001	NEED_HMD_TEST
+B7-148	new	a50ee775	docs/VR_PROBLEM_HISTORY.md	recovery-sequence	regression-history	known-good/bad and prior fix must be reconstructed before new root cause	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B7-149	new	a50ee775	Issue#13	REOPENED event	regression-history	same fingerprint recorded append-only with unknown source SHA	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B7-150	new	a50ee775	src/vr/hud_semantics.hpp candidate 200f0618	TimeAttack boundary	post-review	candidate changes HUD semantic range only; no startup/transport/fallback/config trigger; B exact-SHA PASS remains valid	NONE	PASS
