@@ -1,0 +1,151 @@
+unit	kind	source	target	evidence	result	case
+A13-001	POST_REVIEW	NEW	5cd00a69	exact base 206c6c1e; hooks_graphics only +4/-1	PASS_DOMAIN_REVIEW	VR-STARTUP-WHITE-001
+A13-002	CHANGESET	NEW	hooks_graphics.cpp	single runtime file; no unrelated diff	PASS	VR-STARTUP-WHITE-001
+A13-003	STATE	NEW	MayInjectStereo	common stereo authority gates VR near plane	PASS	VR-STARTUP-WHITE-001
+A13-004	STATE	NEW	VRStereo	explicit stereo setting required	PASS	VR-STARTUP-WHITE-001
+A13-005	STATE	NEW	VRPositionalTracking	6DoF intent remains required	PASS	VR-STARTUP-WHITE-001
+A13-006	FALSIFY	NEW	RecoveryPending	pending recovery closes gate	PASS	VR-STARTUP-WHITE-001
+A13-007	FALSIFY	NEW	ExternalSafetyBlock	reset safety block closes gate	PASS	VR-STARTUP-WHITE-001
+A13-008	FALSIFY	NEW	SafetyOverlayReady	final overlay required	PASS	VR-STARTUP-WHITE-001
+A13-009	FALSIFY	NEW	HostFresh	stale host closes gate	PASS	VR-STARTUP-WHITE-001
+A13-010	FALSIFY	NEW	HostRenderable	non-renderable host closes gate	PASS	VR-STARTUP-WHITE-001
+A13-011	FALSIFY	NEW	StereoAllowed	verified baseline required	PASS	VR-STARTUP-WHITE-001
+A13-012	TRACE	NEW	FailClosed->MayInjectStereo	stall/reset restores non-VR path	PASS	VR-STARTUP-WHITE-001
+A13-013	TRACE	NEW	BaselineVerified->MayInjectStereo	fresh baseline reopens gate	PASS	VR-STARTUP-WHITE-001
+A13-014	TRACE	NEW	ExternalSafetyBlock->camera	ResetEx safety reaches near-plane choice	PASS	VR-STARTUP-WHITE-001
+A13-015	FALSIFY	NEW	STATE_GAME/GOAL	VR near plane limited to gameplay/goal	PASS	VR-STARTUP-WHITE-001
+A13-016	FALSIFY	NEW	non-VR gameplay	legacy precision policy retained	PASS	VR-STARTUP-WHITE-001
+A13-017	FALSIFY	NEW	camera switch	0.1 cutscene path retained	PASS	VR-STARTUP-WHITE-001
+A13-018	FALSIFY	NEW	in-car fallback	0.25/0.2 paths unchanged	PASS	VR-STARTUP-WHITE-001
+A13-019	LIFETIME	NEW	Clr_SceneEffect	allow_znear_override false suppresses gate	PASS	VR-STARTUP-WHITE-001
+A13-020	FALSIFY	NEW	SceneEffect restore	previous znear restored and matrix recomputed	PASS	VR-STARTUP-WHITE-001
+A13-021	REGRESSION	NEW	riskPaths	hooks_graphics intersects stable case	EVIDENCE_AUGMENT	VR-STARTUP-WHITE-001
+A13-022	REGRESSION	NEW	trigger assessment	eligibility consumer changed; startup producers unchanged	NEED_BUILD_HMD_GATE	VR-STARTUP-WHITE-001
+A13-023	REGRESSION	NEW	knownGood/Bad	a9abb857/1f2dcb98 retained as anchors	PASS	VR-STARTUP-WHITE-001
+A13-024	REGRESSION	NEW	deferred-init guard	must remain protected through validation	REQUIRED	VR-STARTUP-WHITE-001
+A13-025	VALIDATE	NEW	no-HMD	closed gate must preserve legacy znear	REQUIRED	VR-STARTUP-WHITE-001
+A13-026	VALIDATE	NEW	active stereo	eligible gameplay must select VRNearPlane	REQUIRED	VR-STARTUP-WHITE-001
+A13-027	VALIDATE	NEW	recovery	gate stays closed until baseline verified	REQUIRED	VR-STARTUP-WHITE-001
+A13-028	VALIDATE	NEW	DX9Ex build	active game DLL build required	REQUIRED	VR-STARTUP-WHITE-001
+A13-029	VALIDATE	NEW	Quest3/VDXR	logo->menu/game plus stereo-open required	NEED_HMD_TEST	VR-STARTUP-WHITE-001
+A13-030	POST_REVIEW	NEW	A routing	A PASS; C sanity+B visual+build remain	PASS_DOMAIN_REVIEW	VR-STARTUP-WHITE-001
+A13-031	CARRY	A12-001	206c6c1e	identity unchanged	PASS	
+A13-032	CARRY	A12-002	206c6c1e	identity unchanged	PASS	
+A13-033	CARRY	A12-003	206c6c1e	identity unchanged	PASS	
+A13-034	CARRY	A12-004	206c6c1e	identity unchanged	PASS	
+A13-035	CARRY	A12-005	206c6c1e	identity unchanged	PASS	
+A13-036	CARRY	A12-006	206c6c1e	identity unchanged	PASS	
+A13-037	CARRY	A12-007	206c6c1e	identity unchanged	PASS	
+A13-038	CARRY	A12-008	206c6c1e	identity unchanged	PASS	
+A13-039	CARRY	A12-009	206c6c1e	identity unchanged	PASS	
+A13-040	CARRY	A12-010	206c6c1e	identity unchanged	PASS	
+A13-041	CARRY	A12-011	206c6c1e	identity unchanged	PASS	
+A13-042	CARRY	A12-012	206c6c1e	identity unchanged	PASS	
+A13-043	CARRY	A12-013	206c6c1e	identity unchanged	PASS	
+A13-044	CARRY	A12-014	206c6c1e	identity unchanged	PASS	
+A13-045	CARRY	A12-015	206c6c1e	identity unchanged	PASS	
+A13-046	CARRY	A12-016	206c6c1e	identity unchanged	PASS	
+A13-047	CARRY	A12-017	206c6c1e	identity unchanged	PASS	
+A13-048	CARRY	A12-018	206c6c1e	identity unchanged	PASS	
+A13-049	CARRY	A12-019	206c6c1e	identity unchanged	PASS	
+A13-050	CARRY	A12-020	206c6c1e	identity unchanged	PASS	
+A13-051	CARRY	A12-021	206c6c1e	identity unchanged	PASS	
+A13-052	CARRY	A12-022	206c6c1e	identity unchanged	PASS	
+A13-053	CARRY	A12-023	206c6c1e	identity unchanged	PASS	
+A13-054	CARRY	A12-024	206c6c1e	identity unchanged	PASS	
+A13-055	CARRY	A12-025	206c6c1e	identity unchanged	PASS	
+A13-056	CARRY	A12-026	206c6c1e	identity unchanged	PASS	
+A13-057	CARRY	A12-027	206c6c1e	identity unchanged	PASS	
+A13-058	CARRY	A12-028	206c6c1e	identity unchanged	PASS	
+A13-059	CARRY	A12-029	206c6c1e	identity unchanged	PASS	
+A13-060	CARRY	A12-030	206c6c1e	identity unchanged	PASS	
+A13-061	CARRY	A12-031	206c6c1e	identity unchanged	PASS	
+A13-062	CARRY	A12-032	206c6c1e	identity unchanged	PASS	
+A13-063	CARRY	A12-033	206c6c1e	identity unchanged	PASS	
+A13-064	CARRY	A12-034	206c6c1e	identity unchanged	PASS	
+A13-065	CARRY	A12-035	206c6c1e	identity unchanged	PASS	
+A13-066	CARRY	A12-036	206c6c1e	identity unchanged	PASS	
+A13-067	CARRY	A12-037	206c6c1e	identity unchanged	PASS	
+A13-068	CARRY	A12-038	206c6c1e	identity unchanged	PASS	
+A13-069	CARRY	A12-039	206c6c1e	identity unchanged	PASS	
+A13-070	CARRY	A12-040	206c6c1e	identity unchanged	PASS	
+A13-071	CARRY	A12-041	206c6c1e	identity unchanged	PASS	
+A13-072	CARRY	A12-042	206c6c1e	identity unchanged	PASS	
+A13-073	CARRY	A12-043	206c6c1e	identity unchanged	PASS	
+A13-074	CARRY	A12-044	206c6c1e	identity unchanged	PASS	
+A13-075	CARRY	A12-045	206c6c1e	identity unchanged	PASS	
+A13-076	CARRY	A12-046	206c6c1e	identity unchanged	PASS	
+A13-077	CARRY	A12-047	206c6c1e	identity unchanged	PASS	
+A13-078	CARRY	A12-048	206c6c1e	identity unchanged	PASS	
+A13-079	CARRY	A12-049	206c6c1e	identity unchanged	PASS	
+A13-080	CARRY	A12-050	206c6c1e	identity unchanged	PASS	
+A13-081	CARRY	A12-051	206c6c1e	identity unchanged	PASS	
+A13-082	CARRY	A12-052	206c6c1e	identity unchanged	PASS	
+A13-083	CARRY	A12-053	206c6c1e	identity unchanged	PASS	
+A13-084	CARRY	A12-054	206c6c1e	identity unchanged	PASS	
+A13-085	CARRY	A12-055	206c6c1e	identity unchanged	PASS	
+A13-086	CARRY	A12-056	206c6c1e	identity unchanged	PASS	
+A13-087	CARRY	A12-057	206c6c1e	identity unchanged	PASS	
+A13-088	CARRY	A12-058	206c6c1e	identity unchanged	PASS	
+A13-089	CARRY	A12-059	206c6c1e	identity unchanged	PASS	
+A13-090	CARRY	A12-060	206c6c1e	identity unchanged	PASS	
+A13-091	CARRY	A12-061	206c6c1e	identity unchanged	PASS	
+A13-092	CARRY	A12-062	206c6c1e	identity unchanged	PASS	
+A13-093	CARRY	A12-063	206c6c1e	identity unchanged	PASS	
+A13-094	CARRY	A12-064	206c6c1e	identity unchanged	PASS	
+A13-095	CARRY	A12-065	206c6c1e	identity unchanged	PASS	
+A13-096	CARRY	A12-066	206c6c1e	identity unchanged	PASS	
+A13-097	CARRY	A12-067	206c6c1e	identity unchanged	PASS	
+A13-098	CARRY	A12-068	206c6c1e	identity unchanged	PASS	
+A13-099	CARRY	A12-069	206c6c1e	identity unchanged	PASS	
+A13-100	CARRY	A12-070	206c6c1e	identity unchanged	PASS	
+A13-101	CARRY	A12-071	206c6c1e	identity unchanged	PASS	
+A13-102	CARRY	A12-072	206c6c1e	identity unchanged	PASS	
+A13-103	CARRY	A12-073	206c6c1e	identity unchanged	PASS	
+A13-104	CARRY	A12-074	206c6c1e	identity unchanged	PASS	
+A13-105	CARRY	A12-075	206c6c1e	identity unchanged	PASS	
+A13-106	CARRY	A12-076	206c6c1e	identity unchanged	PASS	
+A13-107	CARRY	A12-077	206c6c1e	identity unchanged	PASS	
+A13-108	CARRY	A12-078	206c6c1e	identity unchanged	PASS	
+A13-109	CARRY	A12-079	206c6c1e	identity unchanged	PASS	
+A13-110	CARRY	A12-080	206c6c1e	identity unchanged	PASS	
+A13-111	CARRY	A12-081	206c6c1e	identity unchanged	PASS	
+A13-112	CARRY	A12-082	206c6c1e	identity unchanged	PASS	
+A13-113	CARRY	A12-083	206c6c1e	identity unchanged	PASS	
+A13-114	CARRY	A12-084	206c6c1e	identity unchanged	PASS	
+A13-115	CARRY	A12-085	206c6c1e	identity unchanged	PASS	
+A13-116	CARRY	A12-086	206c6c1e	identity unchanged	PASS	
+A13-117	CARRY	A12-087	206c6c1e	identity unchanged	PASS	
+A13-118	CARRY	A12-088	206c6c1e	identity unchanged	PASS	
+A13-119	CARRY	A12-089	206c6c1e	identity unchanged	PASS	
+A13-120	CARRY	A12-090	206c6c1e	identity unchanged	PASS	
+A13-121	CARRY	A12-091	206c6c1e	identity unchanged	PASS	
+A13-122	CARRY	A12-092	206c6c1e	identity unchanged	PASS	
+A13-123	CARRY	A12-093	206c6c1e	identity unchanged	PASS	
+A13-124	CARRY	A12-094	206c6c1e	identity unchanged	PASS	
+A13-125	CARRY	A12-095	206c6c1e	identity unchanged	PASS	
+A13-126	CARRY	A12-096	206c6c1e	identity unchanged	PASS	
+A13-127	CARRY	A12-097	206c6c1e	identity unchanged	PASS	
+A13-128	CARRY	A12-098	206c6c1e	identity unchanged	PASS	
+A13-129	CARRY	A12-099	206c6c1e	identity unchanged	PASS	
+A13-130	CARRY	A12-100	206c6c1e	identity unchanged	PASS	
+A13-131	CARRY	A12-101	206c6c1e	identity unchanged	PASS	
+A13-132	CARRY	A12-102	206c6c1e	identity unchanged	PASS	
+A13-133	CARRY	A12-103	206c6c1e	identity unchanged	PASS	
+A13-134	CARRY	A12-104	206c6c1e	identity unchanged	PASS	
+A13-135	CARRY	A12-105	206c6c1e	identity unchanged	PASS	
+A13-136	CARRY	A12-106	206c6c1e	identity unchanged	PASS	
+A13-137	CARRY	A12-107	206c6c1e	identity unchanged	PASS	
+A13-138	CARRY	A12-108	206c6c1e	identity unchanged	PASS	
+A13-139	CARRY	A12-109	206c6c1e	identity unchanged	PASS	
+A13-140	CARRY	A12-110	206c6c1e	identity unchanged	PASS	
+A13-141	CARRY	A12-111	206c6c1e	identity unchanged	PASS	
+A13-142	CARRY	A12-112	206c6c1e	identity unchanged	PASS	
+A13-143	CARRY	A12-113	206c6c1e	identity unchanged	PASS	
+A13-144	CARRY	A12-114	206c6c1e	identity unchanged	PASS	
+A13-145	CARRY	A12-115	206c6c1e	identity unchanged	PASS	
+A13-146	CARRY	A12-116	206c6c1e	identity unchanged	PASS	
+A13-147	CARRY	A12-117	206c6c1e	identity unchanged	PASS	
+A13-148	CARRY	A12-118	206c6c1e	identity unchanged	PASS	
+A13-149	CARRY	A12-119	206c6c1e	identity unchanged	PASS	
+A13-150	CARRY	A12-120	206c6c1e	identity unchanged	PASS	
