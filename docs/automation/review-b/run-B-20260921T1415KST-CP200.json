@@ -1,0 +1,21 @@
+{
+  "role":"B",
+  "target_sha":"73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0",
+  "status":"COMPLETE",
+  "review_units_completed":200,
+  "checkpoint":"CP200",
+  "carried_forward_units":100,
+  "invalidated_units":0,
+  "new_units":100,
+  "outside_latest_delta":179,
+  "cross_traces":58,
+  "falsifications":84,
+  "distinct_function_or_paths":150,
+  "revalidations":6,
+  "base_ledger":"docs/automation/review-b/ledger-20260921-cycle1-complete.tsv",
+  "extension_ledger":"docs/automation/review-b/ledger-20260921-cycle1-extension-b101-b200.tsv",
+  "finding_changes":[{"id":"DX9EX-SKYGLOW-001","status":"READY","evidence":"factor=1 composites temp although horizontal blur writes reduced; two-step vertical writes temp but selects reduced","test_level":"deterministic+HMD"}],
+  "post_review_candidates":[],
+  "blockers":[],
+  "nextAction":"D should patch R30ApplyStereoSkyGlow so post-horizontal compositeSource=reduced and post-vertical compositeSource=temp, validate deterministically/build, then route exact candidate SHA back to B for post-review. Next B cycle must be non-duplicate and dependency-aware."
+}
