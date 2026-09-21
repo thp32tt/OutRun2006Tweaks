@@ -155,13 +155,14 @@ $identityKeys = @(
     'OUTRUN_VR_MATRIX_ID',
     'OUTRUN_VR_BACKEND',
     'OUTRUN_VR_CONFIG_SHA256',
-    'OUTRUN_VR_SOURCE_SHA'
+    'OUTRUN_VR_SOURCE_SHA',
+    'OUTRUN_VR_EXE_SEMANTICS_VERIFIED'
 )
 $oldIdentity = @{}
 foreach($key in $identityKeys){ $oldIdentity[$key] = [Environment]::GetEnvironmentVariable($key,'Process') }
 
 $sourceSha='unknown'
-$sourceFile=Join-Path $root ("backends/{0}/SOURCE_SHA.txt" -f $(if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}))
+$sourceFile=Join-Path $root ("backends/{0}/SOURCE_SHA.txt" -f $(if($backend -in @('2d','d3d9-classic','dxvk-safe')){'d3d9'}else{$backend}))
 if(Test-Path $sourceFile){ $sourceSha=(Get-Content $sourceFile -Raw).Trim() }
 $env:OUTRUN_VR_SESSION_ID=[string]$state.SessionId
 $env:OUTRUN_VR_VARIANT_ID=[string]$state.VariantId
@@ -169,6 +170,13 @@ $env:OUTRUN_VR_MATRIX_ID=[string]$state.BuildMatrixId
 $env:OUTRUN_VR_BACKEND=[string]$backend
 $env:OUTRUN_VR_CONFIG_SHA256=[string]$state.ConfigSha256
 $env:OUTRUN_VR_SOURCE_SHA=$sourceSha
+
+$referenceExeSha='68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3'
+$runtimeExeSha=(Get-FileHash $game -Algorithm SHA256).Hash.ToLowerInvariant()
+$env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED=if($runtimeExeSha -eq $referenceExeSha){'1'}else{'0'}
+if($env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED -ne '1'){
+    Write-Warning ("HUD semantic promotion disabled: EXE SHA256 {0} does not match reference {1}" -f $runtimeExeSha,$referenceExeSha)
+}
 
 if($backend -eq '2d'){
     $env:OUTRUN_VR_FORCE_DISABLED='1'
