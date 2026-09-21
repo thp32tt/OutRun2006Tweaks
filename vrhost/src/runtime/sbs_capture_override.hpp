@@ -404,16 +404,43 @@ float4 PSMain(VSOut input) : SV_Target
         if (!OutRunVrFinalTest::Device)
             return false;
 
+        // A partial persistent bundle is never a usable cache. Normalize any
+        // legacy/partial state before building a new bundle transactionally.
+        ReleaseCom(ConstantBuffer);
+        ReleaseCom(Sampler);
+        ReleaseCom(Ps);
+        ReleaseCom(Vs);
+
         ID3DBlob* vsCode = nullptr;
         ID3DBlob* psCode = nullptr;
         ID3DBlob* errors = nullptr;
+        ID3D11VertexShader* newVs = nullptr;
+        ID3D11PixelShader* newPs = nullptr;
+        ID3D11SamplerState* newSampler = nullptr;
+        ID3D11Buffer* newConstantBuffer = nullptr;
+
+        auto cleanupNewBundle = [&]() noexcept
+        {
+            ReleaseCom(newConstantBuffer);
+            ReleaseCom(newSampler);
+            ReleaseCom(newPs);
+            ReleaseCom(newVs);
+            ReleaseCom(psCode);
+            ReleaseCom(vsCode);
+            ReleaseCom(errors);
+        };
+
         HRESULT hr = D3DCompile(BlitShader, std::strlen(BlitShader), "OutRunR19Blit",
             nullptr, nullptr, "VSMain", "vs_5_0",
             D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
             0, &vsCode, &errors);
         ReleaseCom(errors);
         if (FAILED(hr) || !vsCode)
+        {
+            cleanupNewBundle();
             return false;
+        }
+
         hr = D3DCompile(BlitShader, std::strlen(BlitShader), "OutRunR19Blit",
             nullptr, nullptr, "PSMain", "ps_5_0",
             D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
@@ -421,33 +448,59 @@ float4 PSMain(VSOut input) : SV_Target
         ReleaseCom(errors);
         if (FAILED(hr) || !psCode)
         {
-            ReleaseCom(vsCode);
+            cleanupNewBundle();
             return false;
         }
 
-        hr = OutRunVrFinalTest::Device->CreateVertexShader(vsCode->GetBufferPointer(),
-            vsCode->GetBufferSize(), nullptr, &Vs);
+        hr = OutRunVrFinalTest::Device->CreateVertexShader(
+            vsCode->GetBufferPointer(), vsCode->GetBufferSize(), nullptr, &newVs);
         if (SUCCEEDED(hr))
-            hr = OutRunVrFinalTest::Device->CreatePixelShader(psCode->GetBufferPointer(),
-                psCode->GetBufferSize(), nullptr, &Ps);
+        {
+            hr = OutRunVrFinalTest::Device->CreatePixelShader(
+                psCode->GetBufferPointer(), psCode->GetBufferSize(), nullptr, &newPs);
+        }
         ReleaseCom(vsCode);
         ReleaseCom(psCode);
-        if (FAILED(hr) || !Vs || !Ps)
+        if (FAILED(hr) || !newVs || !newPs)
+        {
+            cleanupNewBundle();
             return false;
+        }
 
         D3D11_SAMPLER_DESC sd{};
         sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
         sd.AddressU = sd.AddressV = sd.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-        if (FAILED(OutRunVrFinalTest::Device->CreateSamplerState(&sd, &Sampler)))
+        hr = OutRunVrFinalTest::Device->CreateSamplerState(&sd, &newSampler);
+        if (FAILED(hr) || !newSampler)
+        {
+            cleanupNewBundle();
             return false;
+        }
 
         D3D11_BUFFER_DESC bd{};
         bd.ByteWidth = sizeof(BlitParams);
         bd.Usage = D3D11_USAGE_DYNAMIC;
         bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
         bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-        return SUCCEEDED(OutRunVrFinalTest::Device->CreateBuffer(&bd, nullptr, &ConstantBuffer)) &&
-            ConstantBuffer;
+        hr = OutRunVrFinalTest::Device->CreateBuffer(
+            &bd, nullptr, &newConstantBuffer);
+        if (FAILED(hr) || !newConstantBuffer)
+        {
+            cleanupNewBundle();
+            return false;
+        }
+
+        // Commit only the complete four-object bundle. From this point ResetAll
+        // owns exactly these published references.
+        Vs = newVs;
+        newVs = nullptr;
+        Ps = newPs;
+        newPs = nullptr;
+        Sampler = newSampler;
+        newSampler = nullptr;
+        ConstantBuffer = newConstantBuffer;
+        newConstantBuffer = nullptr;
+        return true;
     }
 
     inline bool GetGameUv(UvRect& uv)
