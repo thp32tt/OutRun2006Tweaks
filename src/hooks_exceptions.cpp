@@ -97,18 +97,25 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
     {
         auto Log = [ExceptionInfo, hFile](char* buffer, size_t size, bool reg, bool stack, bool trace) noexcept
         {
-            if (!LogException(buffer, size, (LPEXCEPTION_POINTERS)ExceptionInfo, reg, stack, trace))
-                return false;
+            try
+            {
+                if (!LogException(buffer, size, (LPEXCEPTION_POINTERS)ExceptionInfo, reg, stack, trace))
+                    return false;
 
-            const size_t requested = strlen(buffer);
-            if (requested == 0 ||
-                requested > static_cast<size_t>((std::numeric_limits<DWORD>::max)()))
-                return false;
+                const size_t requested = strlen(buffer);
+                if (requested == 0 ||
+                    requested > static_cast<size_t>((std::numeric_limits<DWORD>::max)()))
+                    return false;
 
-            DWORD NumberOfBytesWritten = 0;
-            return WriteFile(hFile, buffer, static_cast<DWORD>(requested),
-                &NumberOfBytesWritten, NULL) != FALSE &&
-                NumberOfBytesWritten == requested;
+                DWORD NumberOfBytesWritten = 0;
+                return WriteFile(hFile, buffer, static_cast<DWORD>(requested),
+                    &NumberOfBytesWritten, NULL) != FALSE &&
+                    NumberOfBytesWritten == requested;
+            }
+            catch (...)
+            {
+                return false;
+            }
         };
 
         bool logContentWritten = false;
@@ -131,8 +138,9 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
                 Log(static_buf, sizeof(static_buf), true, true, false);
         }
 
+        const bool crashLogClosed = CloseHandle(hFile) != FALSE;
         crashLogWriteSuccess =
-            logContentWritten && CloseHandle(hFile) != FALSE;
+            logContentWritten && crashLogClosed;
     }
 
     // Snapshot the tweaks log without allowing filesystem/path-construction
