@@ -3,135 +3,46 @@
   "role": "A",
   "runId": "A-20260921T072900KST-manual01",
   "startedKst": "2026-09-21T07:29:00+09:00",
-  "completedKst": null,
+  "completedKst": "2026-09-21T09:00:00+09:00",
   "baseSha": "e5e35f483cf7f8d36f99a87807ba6cb9d4b7eccd",
-  "findingIds": [
-    "DX9EX-FINGERPRINT-001",
-    "DX9EX-DISPATCH-XYZRHW-001",
-    "DX9EX-SKYGLOW-001",
-    "DX9EX-PERF-DISPATCH-001"
-  ],
+  "findingIds": ["DX9EX-FINGERPRINT-001","DX9EX-DISPATCH-XYZRHW-001","DX9EX-SKYGLOW-001","DX9EX-PERF-DISPATCH-001","DX9EX-RESET-STATEBLOCK-001"],
   "inputHashes": {
     "src/vr/d3d9/stereo_renderer_r30.cpp": "bc7eb2c152d82b3a42df13d8361d31cffe7d31b9",
     "src/vr/d3d9/stereo_renderer_r31.cpp": "94678c9d21449f750e9268ba229e0084d0470aed",
     "src/vr/d3d9/stereo_renderer_r32.cpp": "301f300075f0cb27c7b6daa6f3c205cdc74318a4",
     "src/vr/d3d9/stereo_renderer_r33.cpp": "c7bf2dc8ebe6152ad2d71bd718877f17ac651796",
     "src/vr/d3d9/stereo_renderer_r34.cpp": "2d5b4557d62521d9f1a26cf1c78d1c3b96c09a2b",
-    "src/vr/game/outrun_renderer_r29.cpp": "2e1748f1f882d362c878d39a11e62896c67dc751"
+    "src/vr/d3d9/stereo_renderer_r22.cpp": "cece65acc579e4ff4f045f7dec128b2b955afe48",
+    "src/vr/d3d9/ex_device_upgrade.cpp": "05ad9eb798c89bdea42e9e41cbd438369d9e7eec",
+    "src/vr/d3d9/ex_device_upgrade_r13.cpp": "80ce04900a7699aaefb7e040e25cab4a01618dbe",
+    "src/vr/d3d9/ex_device_upgrade_r14.cpp": "57ba4400a28582f18672a6c429be45fcd39cb534",
+    "src/vr/d3d9/ex_device_upgrade_r15.cpp": "5dc13cf1a84ef9ff9a5081a5dd3351e92ab6c890"
   },
-  "changedPaths": [
-    "docs/automation/runs/A/A-20260921T072900KST-manual01.json",
-    "docs/automation/runs/A/A-20260921T072900KST-manual01.md"
-  ],
+  "changedPaths": ["docs/automation/runs/A/A-20260921T072900KST-manual01.json","docs/automation/runs/A/A-20260921T072900KST-manual01.md"],
   "candidateBranch": null,
   "candidateSha": null,
-  "ci": {
-    "workflow": null,
-    "runId": null,
-    "status": null,
-    "artifactIds": []
-  },
+  "ci": {"workflow": null,"runId": null,"status": null,"artifactIds": []},
   "evidenceLevel": "STATICALLY_VERIFIED",
   "queueProposal": [
-    {
-      "id": "DX9EX-FINGERPRINT-001",
-      "status": "READY",
-      "preferredRole": "A_REVIEW",
-      "testLevel": "LEVEL0",
-      "proposal": "Refine the fingerprint around the already-bounded R30 XYZRHW envelope: no vertex shader + D3DFVF_XYZRHW, then projection-consistent Z/RHW relation separates CPU-projected smoke/skid/decal world effects from white HUD/rank/score glyphs. Do not broaden WVP ownership."
-    },
-    {
-      "id": "DX9EX-DISPATCH-XYZRHW-001",
-      "status": "READY",
-      "priority": 10,
-      "preferredRole": "B_FIX",
-      "testLevel": "LEVEL0",
-      "dependencies": [],
-      "runtimeCandidate": true,
-      "summary": "The active R34/R33 draw owner bypasses R30TryXyzrhw* and falls directly to the R29 trampoline. Restore the bounded XYZRHW pre-dispatch at the final owner before generic HUD/world dispatch, with handled-result semantics that cannot double draw."
-    },
-    {
-      "id": "DX9EX-SKYGLOW-001",
-      "status": "READY",
-      "priority": 8,
-      "preferredRole": "B_FIX",
-      "testLevel": "LEVEL0",
-      "dependencies": [],
-      "runtimeCandidate": false,
-      "summary": "R30ApplyStereoSkyGlow selects the intermediate texture opposite to the pass that actually contains the final blur output. One-step currently composites pre-blur bright extraction; two-step composites horizontal-only output instead of vertical-final output."
-    },
-    {
-      "id": "DX9EX-PERF-DISPATCH-001",
-      "status": "READY",
-      "priority": 5,
-      "preferredRole": "B_FIX",
-      "testLevel": "LEVEL0",
-      "dependencies": [],
-      "runtimeCandidate": false,
-      "summary": "R33Dispatch classifies a screen-space pass, then R33TryHud immediately classifies the same draw again. For perspective flat effects this duplicates projection lookup and three GetRenderState calls. Thread the already-computed R30ScreenSpaceKind into R33TryHud."
-    }
+    {"id":"DX9EX-FINGERPRINT-001","status":"READY","priority":10,"preferredRole":"A_REVIEW","testLevel":"LEVEL0","runtimeCandidate":false,"proposal":"Keep the bounded R30 XYZRHW envelope: null vertex shader + D3DFVF_XYZRHW, then projection-consistent Z/RHW evidence for CPU-projected smoke/skid/decal versus white HUD/rank/score glyphs. Do not broaden WVP ownership."},
+    {"id":"DX9EX-DISPATCH-XYZRHW-001","status":"READY","priority":10,"preferredRole":"B_FIX","testLevel":"LEVEL0","dependencies":[],"runtimeCandidate":true,"summary":"The active R34/R33 draw owner bypasses R30TryXyzrhw* and falls directly to the R29 trampoline. Restore bounded XYZRHW pre-dispatch at the final owner with handled-result semantics that cannot double draw."},
+    {"id":"DX9EX-SKYGLOW-001","status":"READY","priority":8,"preferredRole":"B_FIX","testLevel":"LEVEL0","dependencies":[],"runtimeCandidate":false,"summary":"R30ApplyStereoSkyGlow selects the opposite intermediate texture: one-step must composite reduced after horizontal blur; two-step must composite temp after vertical blur."},
+    {"id":"DX9EX-PERF-DISPATCH-001","status":"READY","priority":5,"preferredRole":"B_FIX","testLevel":"LEVEL0","dependencies":[],"runtimeCandidate":false,"summary":"R33Dispatch classifies a screen-space pass and R33TryHud immediately classifies it again. Thread the already-computed R30ScreenSpaceKind into R33TryHud."},
+    {"id":"DX9EX-RESET-STATEBLOCK-001","status":"READY","priority":9,"preferredRole":"B_FIX","testLevel":"LEVEL0","dependencies":[],"runtimeCandidate":true,"summary":"R15 captures a live D3DSBT_ALL object at fresh-device creation and later applies that same object after ResetEx. State-block objects are device resources and are not a safe post-Reset snapshot contract. Replace this with explicit fresh-device baseline values or recreate/capture an equivalent state block after ResetEx before use; never Apply a pre-Reset state-block object after ResetEx."}
   ],
-  "blockers": [
-    "Quest 3/VDXR runtime evidence remains required before claiming the visual symptoms fixed."
-  ],
+  "blockers": ["Quest 3/VDXR runtime evidence remains required before claiming visual symptoms fixed."],
   "retryCount": 0,
-  "nextAction": "Continue A coverage: D3D9Ex startup/device promotion/reset lifecycle, cars/shadows/rank-billboard visual classes, config/logging/CI testability. B should not consume this run as complete until status becomes COMPLETE.",
+  "nextAction": "B may consume this COMPLETE handoff. Highest value: isolated DX9EX-DISPATCH-XYZRHW-001; then DX9EX-RESET-STATEBLOCK-001 and DX9EX-SKYGLOW-001. C validates immutable SHAs. Visual/runtime conclusions remain NEED_HMD_TEST.",
   "review": {
-    "lenses": [
-      "architecture/control-flow",
-      "resource-lifetime/state/reset",
-      "stereo/visual-correctness",
-      "hot-path/frame-pacing",
-      "adversarial-falsification/testability"
-    ],
-    "coverage": [
-      "R29 effect policy and steady-state safety fallback",
-      "R30 screen-space, XYZRHW and SkyGlow paths",
-      "R31 StateBlock invalidation/resync and hot-path caching",
-      "R32/R33 dispatch layering and final lower fail-closed route",
-      "R34 final raster/reset guard",
-      "renderer R29 WVP classification/state-block behavior",
-      "OpenXR recenter/reference-space flow",
-      "cadence mode 1 game/host handshake",
-      "DirectGPU ring/per-slot ACK/latest-frame-wins",
-      "OpenXR swapchain wait guard",
-      "active DX9Ex build graph"
-    ],
+    "lenses": ["architecture/control-flow","resource-lifetime/state/reset","stereo/visual-correctness","hot-path/frame-pacing","adversarial-falsification/testability"],
+    "coverage": ["R29 effect policy and steady-state safety fallback","R30 screen-space, XYZRHW and SkyGlow paths","R31 StateBlock invalidation/resync and hot-path caching","R32/R33 dispatch layering and final lower fail-closed route","R34 final raster/reset guard","D3D9Ex CreateDeviceEx promotion and transactional R13/R14/R15 handoff","D3D9Ex ResetEx/classic-state replay lifecycle","managed 2D CPU-shadow lifetime/coherency","OpenXR recenter/reference-space flow","cadence mode 1 game/host handshake","DirectGPU ring/per-slot ACK/latest-frame-wins","OpenXR swapchain wait guard","active DX9Ex build graph"],
     "keyEvidence": {
-      "DX9EX-DISPATCH-XYZRHW-001": [
-        "R30 Draw*Dest wrappers call matching R30TryXyzrhw* before R30GuardScreenSpace.",
-        "R31, R32 and R33 contain no R30TryXyzrhw* dispatch.",
-        "R33 final fallback explicitly invokes R30Draw*R29Hook, the R29 trampoline, rather than the R30 Draw*Dest wrapper.",
-        "R30 XYZRHW code explicitly distinguishes white HUD glyphs from CPU-projected smoke/skid/decal using a bounded Z/RHW projection signature."
-      ],
-      "DX9EX-SKYGLOW-001": [
-        "Bright pass writes temp; horizontal blur writes reduced.",
-        "When effectiveTwoStep is false, compositeSource is temp, so horizontal blur output is skipped.",
-        "When effectiveTwoStep is true, vertical blur writes temp but compositeSource is changed to reduced, so vertical-final output is skipped.",
-        "The adjacent code comment says the vertical pass should be the composite source, contradicting the implementation."
-      ]
+      "DX9EX-DISPATCH-XYZRHW-001": ["R30 Draw*Dest wrappers call matching R30TryXyzrhw* before generic screen-space dispatch.","R31/R32/R33 contain no R30TryXyzrhw* dispatch.","R33 final fallback invokes the R29 trampoline rather than R30 Draw*Dest wrappers."],
+      "DX9EX-SKYGLOW-001": ["Bright pass writes temp; horizontal blur writes reduced.","One-step currently composites temp and therefore skips horizontal blur output.","Two-step vertical blur writes temp but current code switches composite source to reduced."],
+      "DX9EX-RESET-STATEBLOCK-001": ["R15CaptureClassicExtraBaseline creates and stores IDirect3DStateBlock9 via CreateStateBlock(D3DSBT_ALL) before the device is exposed.","ResetCompatDeviceR15 runs ResetEx through R13 and then calls R15RestoreClassicAllState, which invokes Apply on that same stored state-block object.","The surrounding reset design already has explicit baseline replay and a fail-closed health bit, so replacing the persistent state-block object does not require weakening reset safety."]
     },
-    "slotUtilization": {
-      "subBatches": 9,
-      "fallbackStagesAttempted": [
-        "primary READY A queue",
-        "dependent visual-correctness review",
-        "regression-boundary/final-dispatch review",
-        "deterministic verifier design",
-        "adversarial falsification against ACTIVE_FULL_R34 build graph",
-        "recenter/reference-space review",
-        "cadence/DirectGPU/swapchain performance review",
-        "StateBlock/reset cache review",
-        "hot-path redundant-classification review"
-      ],
-      "earlyFinishReason": null
-    },
-    "disprovedHypotheses": [
-      "Active R34 does not replay an independent mono shadow for every steady-state draw: R29DirectTwoEye intentionally bypasses R9 mono replay when R29StableStereoBase is true. Existing DX9EX-PERF-001 already owns safety-fallback draw amplification.",
-      "R31FlushPendingStateBlockResync is not dead in the active final chain: R33Dispatch and R34GuardStereoRasterState both invoke it before live draw-state ownership, so StateBlock Apply resynchronization is present in ACTIVE_FULL_R34.",
-      "Cadence mode 1 does not create a host<->game circular wait: host WaitForPresented is mode-2-only; game NotifyGamePresent waits for the next host cadence token once per Present.",
-      "DirectGPU does not use the old global consumed-frame ACK in the active R13 overlay; published slots are protected by per-slot host GPU-completion ACK and R32 asynchronous EVENT tracking."
-    ]
+    "slotUtilization": {"subBatches":12,"fallbackStagesAttempted":["primary READY A queue","dependent visual-correctness review","regression-boundary/final-dispatch review","deterministic verifier design","adversarial falsification against ACTIVE_FULL_R34 build graph","recenter/reference-space review","cadence/DirectGPU/swapchain performance review","StateBlock/reset cache review","hot-path redundant-classification review","D3D9Ex CreateDeviceEx transaction review","D3D9Ex ResetEx replay/lifetime review","managed-resource shadow lifetime review"],"earlyFinishReason":null},
+    "disprovedHypotheses": ["Active R34 does not replay an independent mono shadow for every steady-state draw; R29 stable two-eye path already avoids the old third draw.","R31FlushPendingStateBlockResync is live in the active final chain.","Cadence mode 1 does not form a host/game circular wait.","DirectGPU active R13/R32 uses per-slot GPU completion/fence protection rather than the old global ACK.","R14 managed 2D shadow registry is not fixed-capacity and does retain entries through matching Unlock; no new overwrite-ring lifetime defect was found in this pass."]
   },
-  "status": "IN_PROGRESS"
+  "status": "COMPLETE"
 }
