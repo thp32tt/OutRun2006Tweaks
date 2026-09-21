@@ -14,7 +14,7 @@
 // a third mono replay.
 
 #include "stereo_renderer_r26.cpp"
-
+#include "vr/game/render_semantics.hpp"\n
 namespace OutRunVRRenderer
 {
     void R29InvalidateRawWvpGeneration() noexcept;
@@ -312,6 +312,23 @@ namespace OutRunVRStereo
             {
                 ++R29SafetyFallbackDraws;
                 return legacyR13Draw();
+            }
+
+            const auto semanticScope = OutRunVR::GameSemantic::CurrentScope;
+            if (OutRunVR::GameSemantic::ForceZeroDisparity(semanticScope))
+            {
+                // Exact original-game post-process ownership beats a generic
+                // perspective-looking signature, but only after all stable
+                // main-backbuffer/depth safety gates above have passed.
+                fragile = true;
+            }
+            else if (OutRunVR::GameSemantic::CorroboratesWorld(semanticScope) &&
+                R27ShouldBypassLegacyZeroDisparity(device))
+            {
+                // Particle/attached-world semantics are corroborating evidence,
+                // never sole authority: the proven R27 WVP gate must agree.
+                fragile = false;
+                ++R29FragileWorldRetries;
             }
 
             // R29 originally forced every depth-disabled two-sided alpha draw
