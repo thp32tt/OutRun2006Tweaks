@@ -1,5 +1,6 @@
 name: DX9Ex Active Validation
 
+# Canonical EXE gate: strict pinned identity/signatures; DISCOVER is never an integration pass.
 permissions:
   contents: read
 
