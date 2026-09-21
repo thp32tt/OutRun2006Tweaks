@@ -279,6 +279,47 @@ require(
     "MarkSafetyOverlayInstalled",
 )
 
+# Reconstructed VR-STARTUP-WHITE-001 protection: the D3D9Ex CreateDevice
+# handoff may install Reset/Present ownership synchronously, but it must not
+# allocate/swap/clear private stereo resources before the promoted device is
+# returned to OutRun. The final R23 Present owner performs first initialization
+# only after the lower game Present succeeds.
+r7_startup = require(
+    "src/vr/d3d9/stereo_renderer_r7.inc",
+    "Resource creation is intentionally deferred beyond CreateDevice exposure.",
+    "FirstDeferredResourceInitLogged",
+    "StereoInstalledDevice.store(device,std::memory_order_release)",
+)
+install_start = r7_startup.find("bool InstallStereoHooks(IDirect3DDevice9*device)")
+install_end = r7_startup.find("DWORD WINAPI StereoInstallThread", install_start)
+if install_start < 0 or install_end < 0:
+    raise SystemExit("could not isolate R7 InstallStereoHooks for startup-white guard")
+install_body = r7_startup[install_start:install_end]
+if "EnsureStereoResources(device)" in install_body:
+    raise SystemExit(
+        "VR-STARTUP-WHITE-001 regressed: pre-exposure InstallStereoHooks initializes stereo resources"
+    )
+
+r23_startup = require(
+    "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "R23 is the final effective Present owner in the layered hook chain.",
+    "if (SUCCEEDED(hr) && !StereoResourcesReady)",
+    "EnsureStereoResources(device)",
+    "VR R23 INIT: private eye/backbuffer resources initialized after final game Present",
+    "recovery baseline can now identify the main backbuffer",
+)
+present_start = r23_startup.find("HRESULT __stdcall PresentDestR23")
+present_end = r23_startup.find("void R23RollbackHooks", present_start)
+if present_start < 0 or present_end < 0:
+    raise SystemExit("could not isolate R23 Present owner for startup-white guard")
+present_body = r23_startup[present_start:present_end]
+lower_present = present_body.find("R23PresentR21Hook.stdcall<HRESULT>")
+deferred_init = present_body.find("if (SUCCEEDED(hr) && !StereoResourcesReady)")
+if lower_present < 0 or deferred_init < 0 or deferred_init <= lower_present:
+    raise SystemExit(
+        "VR-STARTUP-WHITE-001 regressed: deferred init is not after the lower Present"
+    )
+
 # Async installer status must be publishable back to the hook overlay/UI.
 require(
     "src/hook_mgr.hpp",
