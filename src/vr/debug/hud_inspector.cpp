@@ -4,6 +4,7 @@
 #include <intrin.h>
 
 #include <cstdint>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -32,11 +33,33 @@ namespace OutRunVRHudInspector
             PutSprite = 1,
             SpriteAnim = 2,
             ClipSprite = 3,
-            PutSprite2 = 4
+            PutSprite2 = 4,
+            SprPrintf = 5,
+            SumoPrintf = 6
         };
 
         SafetyHookInline SpriteAnimHook{};
         SafetyHookInline ClipSpriteHook{};
+        SafetyHookMid FontHook{};
+        SafetyHookMid PriorityHook{};
+        SafetyHookMid ColorHook{};
+        SafetyHookMid ScaleHook{};
+        SafetyHookMid LocateHook{};
+        SafetyHookMid SprPrintfHook{};
+        SafetyHookMid SumoPrintfHook{};
+
+        struct FontState
+        {
+            std::uint32_t font = 0;
+            std::uint32_t priority = 0;
+            std::uint32_t color = 0;
+            float scaleX = 0.0f;
+            float scaleY = 0.0f;
+            std::int32_t x = 0;
+            std::int32_t y = 0;
+        };
+
+        thread_local FontState CurrentFont{};
 
         std::mutex TraceMutex;
         std::ofstream TraceFile;
@@ -130,12 +153,85 @@ namespace OutRunVRHudInspector
             return Game::stg_stage_num ? static_cast<int>(*Game::stg_stage_num) : -1;
         }
 
+        template <typename T>
+        T ReadStackValue(std::uintptr_t address) noexcept
+        {
+            T value{};
+            std::memcpy(&value, reinterpret_cast<const void*>(address), sizeof(value));
+            return value;
+        }
+
+        bool CopyTextPreview(const char* source, char* output,
+            std::size_t capacity) noexcept
+        {
+            if (!source || !output || capacity == 0)
+                return false;
+            output[0] = '\0';
+#if defined(_MSC_VER)
+            __try
+            {
+                std::size_t i = 0;
+                for (; i + 1 < capacity; ++i)
+                {
+                    const char ch = source[i];
+                    if (!ch)
+                        break;
+                    output[i] = (ch == '\r' || ch == '\n') ? ' ' : ch;
+                }
+                output[i] = '\0';
+                return true;
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+                output[0] = '\0';
+                return false;
+            }
+#else
+            std::size_t i = 0;
+            for (; i + 1 < capacity && source[i]; ++i)
+                output[i] = (source[i] == '\r' || source[i] == '\n') ? ' ' : source[i];
+            output[i] = '\0';
+            return true;
+#endif
+        }
+
+        std::uint32_t HashText(const char* text) noexcept
+        {
+            std::uint32_t hash = 2166136261u;
+            if (!text)
+                return 0;
+            for (const unsigned char* p =
+                    reinterpret_cast<const unsigned char*>(text); *p; ++p)
+            {
+                hash ^= *p;
+                hash *= 16777619u;
+            }
+            return hash;
+        }
+
+        void WriteCsvText(const char* text)
+        {
+            TraceFile << '"';
+            if (text)
+            {
+                for (const char* p = text; *p; ++p)
+                {
+                    if (*p == '"')
+                        TraceFile << """";
+                    else
+                        TraceFile << *p;
+                }
+            }
+            TraceFile << '"';
+        }
+
         void WriteEvent(EventKind kind, const char* eventName,
             const void* returnAddress,
             std::uint32_t arg0, std::uint32_t arg1,
             double arg2 = 0.0, double arg3 = 0.0,
             double arg4 = 0.0, double arg5 = 0.0,
-            double arg6 = 0.0, double arg7 = 0.0)
+            double arg6 = 0.0, double arg7 = 0.0,
+            std::uint32_t textHash = 0, const char* text = nullptr)
         {
             if (!TraceFile)
                 return;
@@ -166,7 +262,9 @@ namespace OutRunVRHudInspector
                 << arg5 << ','
                 << arg6 << ','
                 << arg7 << ','
-                << count << '\n';
+                << textHash << ',';
+            WriteCsvText(text);
+            TraceFile << ',' << count << '\n';
 
             if ((++TraceLines & 63ull) == 0)
                 TraceFile.flush();
@@ -195,6 +293,63 @@ namespace OutRunVRHudInspector
                 xstnum, x, y, flags, priority, color);
         }
 
+        void FontDest(safetyhook::Context& ctx)
+        {
+            CurrentFont.font = ReadStackValue<std::uint32_t>(ctx.esp + 4);
+        }
+
+        void PriorityDest(safetyhook::Context& ctx)
+        {
+            CurrentFont.priority = ReadStackValue<std::uint32_t>(ctx.esp + 4);
+        }
+
+        void ColorDest(safetyhook::Context& ctx)
+        {
+            CurrentFont.color = ReadStackValue<std::uint32_t>(ctx.esp + 4);
+        }
+
+        void ScaleDest(safetyhook::Context& ctx)
+        {
+            CurrentFont.scaleX = ReadStackValue<float>(ctx.esp + 4);
+            CurrentFont.scaleY = ReadStackValue<float>(ctx.esp + 8);
+        }
+
+        void LocateDest(safetyhook::Context& ctx)
+        {
+            CurrentFont.x = ReadStackValue<std::int32_t>(ctx.esp + 4);
+            CurrentFont.y = ReadStackValue<std::int32_t>(ctx.esp + 8);
+        }
+
+        void TracePrintfEntry(EventKind kind, const char* eventName,
+            safetyhook::Context& ctx)
+        {
+            const auto returnAddress = reinterpret_cast<const void*>(
+                ReadStackValue<std::uintptr_t>(ctx.esp));
+            const char* format = ReadStackValue<const char*>(ctx.esp + 4);
+            char preview[192]{};
+            CopyTextPreview(format, preview, sizeof(preview));
+            const std::uint32_t textHash = HashText(preview);
+
+            WriteEvent(kind, eventName, returnAddress,
+                textHash, CurrentFont.font,
+                static_cast<double>(CurrentFont.priority),
+                static_cast<double>(CurrentFont.x),
+                static_cast<double>(CurrentFont.y),
+                CurrentFont.scaleX, CurrentFont.scaleY,
+                static_cast<double>(CurrentFont.color),
+                textHash, preview);
+        }
+
+        void SprPrintfDest(safetyhook::Context& ctx)
+        {
+            TracePrintfEntry(EventKind::SprPrintf, "sprPrintf", ctx);
+        }
+
+        void SumoPrintfDest(safetyhook::Context& ctx)
+        {
+            TracePrintfEntry(EventKind::SumoPrintf, "Sumo_Printf", ctx);
+        }
+
         bool OpenTrace()
         {
             try
@@ -214,13 +369,13 @@ namespace OutRunVRHudInspector
                 if (empty)
                 {
                     TraceFile
-                        << "# schema=outrun-hudtrace-v1\n"
+                        << "# schema=outrun-hudtrace-v2\n"
                         << "# exe_timestamp="
                         << Util::GetModuleTimestamp(Module::ExeHandle) << "\n"
                         << "# exe_size_of_image=" << ExeSizeOfImage() << "\n"
                         << "# module_base=runtime-only; all addresses below are ASLR-safe RVAs\n"
                         << "elapsed_ms,event,return_rva,call_rva,known_area,mode,stage,"
-                           "arg0,arg1,arg2,arg3,arg4,arg5,arg6,arg7,count\n";
+                           "arg0,arg1,arg2,arg3,arg4,arg5,arg6,arg7,text_hash,text,count\n";
                     TraceFile.flush();
                 }
                 return true;
@@ -234,6 +389,13 @@ namespace OutRunVRHudInspector
 
         void ResetHooks() noexcept
         {
+            SumoPrintfHook = {};
+            SprPrintfHook = {};
+            LocateHook = {};
+            ScaleHook = {};
+            ColorHook = {};
+            PriorityHook = {};
+            FontHook = {};
             ClipSpriteHook = {};
             SpriteAnimHook = {};
         }
@@ -298,8 +460,25 @@ namespace OutRunVRHudInspector
                     Game::sprani_play_ae_auth_alpha, SpriteAnimDest);
                 ClipSpriteHook = safetyhook::create_inline(
                     Game::put_clip_sprite, ClipSpriteDest);
+                FontHook = safetyhook::create_mid(
+                    Game::sprSetPrintFont, FontDest);
+                PriorityHook = safetyhook::create_mid(
+                    Game::sprSetFontPriority, PriorityDest);
+                ColorHook = safetyhook::create_mid(
+                    Game::sprSetFontColor, ColorDest);
+                ScaleHook = safetyhook::create_mid(
+                    Game::sprSetFontScale, ScaleDest);
+                LocateHook = safetyhook::create_mid(
+                    Game::sprLocateP, LocateDest);
+                SprPrintfHook = safetyhook::create_mid(
+                    Game::sprPrintf, SprPrintfDest);
+                SumoPrintfHook = safetyhook::create_mid(
+                    Game::Sumo_Printf, SumoPrintfDest);
 
-                if (!SpriteAnimHook || !ClipSpriteHook)
+                if (!SpriteAnimHook || !ClipSpriteHook ||
+                    !FontHook || !PriorityHook || !ColorHook ||
+                    !ScaleHook || !LocateHook ||
+                    !SprPrintfHook || !SumoPrintfHook)
                 {
                     spdlog::error(
                         "VR HUD INSPECTOR: one or more sprite hooks failed; disabling inspector");
@@ -308,7 +487,7 @@ namespace OutRunVRHudInspector
                 }
 
                 spdlog::info(
-                    "VR HUD INSPECTOR: passive sprite/caller RVA tracing active; existing texture hooks feed put_sprite_ex/put_sprite_ex2, direct hooks feed sprani/clip; output=OutRun2006Tweaks-hudtrace.csv");
+                    "VR HUD INSPECTOR: passive sprite/text caller RVA tracing active; texture hooks feed sprite geometry, direct hooks feed sprani/clip, mid-hooks feed sprPrintf/Sumo_Printf plus font state; output=OutRun2006Tweaks-hudtrace.csv");
                 return true;
             }
 
