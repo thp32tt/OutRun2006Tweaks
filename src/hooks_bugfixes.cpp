@@ -77,14 +77,9 @@ class FixParticleRendering : public Hook
 	// (Possibly other particles too which seem to use similar scaling code - but only the code for grass particles is hooked here)
 	// Fortunately the fix is simple, just divide the values calculated by the function by 2
 	inline static SafetyHookMid midhook{};
+	inline static SafetyHookMid semantic_midhook{};
 	static void destination(SafetyHookContext& ctx)
 	{
-		// This hook sits inside the original particle renderer immediately before
-		// the particle geometry path. Mark the next top-level D3D draw as a world
-		// particle; stereo code still requires the verified world-WVP gate.
-		OutRunVR::GameSemantic::ArmNextDraw(
-			OutRunVR::GameSemantic::RenderScope::WorldParticle);
-
 		float ptcl_size;
 		__asm
 		{
@@ -104,6 +99,14 @@ class FixParticleRendering : public Hook
 		{
 			fld [ptcl_size]
 		}
+	}
+
+	static void semantic_destination(SafetyHookContext&)
+	{
+		// Reference EXE 0x19178 is the DrawPrimitiveUP dispatch. Arm only
+		// immediately before the actual draw, after geometry/conditional work.
+		OutRunVR::GameSemantic::ArmNextDraw(
+			OutRunVR::GameSemantic::RenderScope::WorldParticle);
 	}
 
 	// Fix metropolis firework texture issue (https://github.com/emoose/OutRun2006Tweaks/issues/52)
@@ -143,10 +146,14 @@ public:
 		constexpr int particle_draw_rect2_HookAddr = 0x19009;
 		midhook = safetyhook::create_mid(Module::exe_ptr(particle_draw_rect2_HookAddr), destination);
 
+		constexpr int particle_draw_dispatch_HookAddr = 0x19178;
+		semantic_midhook = safetyhook::create_mid(
+			Module::exe_ptr(particle_draw_dispatch_HookAddr), semantic_destination);
+
 		constexpr int DispStage_HookAddr = 0x4E179;
 		midhook_fireworks = safetyhook::create_mid(Module::exe_ptr(DispStage_HookAddr), destination_fireworks);
 
-		return !!midhook;
+		return !!midhook && !!semantic_midhook;
 	}
 
 	static FixParticleRendering instance;
