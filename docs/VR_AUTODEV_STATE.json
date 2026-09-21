@@ -297,5 +297,14 @@
       "B_RENDER_REVIEW",
       "C_PERF_REVIEW"
     ]
+  },
+  "regressionKnowledge": {
+    "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
+    "history": "docs/VR_PROBLEM_HISTORY.md",
+    "ledgerIssue": 13,
+    "mandatoryAtRecover": true,
+    "reuseStableKeyOnRecurrence": true,
+    "requireTriggeredCaseRevalidationBeforeIntegration": true,
+    "startupBaselineKey": "VR-STARTUP-WHITE-001"
   }
 }
