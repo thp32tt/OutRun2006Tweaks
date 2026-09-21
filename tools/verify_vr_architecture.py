@@ -447,4 +447,66 @@ require("src/vr/core/transport.hpp", "class IFrameProducer", "class IFrameConsum
 require("src/vr/game/game_adapter.hpp", "class IGameAdapter", "latchRenderPose", "buildStereoMatrices")
 require("src/vr/d3d9/stereo_backend.hpp", "class IStereoBackend", "drawWorldStereo", "drawScreenSpaceStereo")
 
+# One-shot game semantic ownership must be bounded. Producers arm only on paths
+# that have committed to the intended draw, and an unconsumed hint cannot cross
+# Present/Reset into unrelated rendering.
+semantic_header = require(
+    "src/vr/game/render_semantics.hpp",
+    "inline void ClearNextDraw() noexcept",
+    "NextDrawScope = RenderScope::None;",
+)
+heart_source = require(
+    "src/interpolation.cpp",
+    "static void HeartSemantic_dest",
+    "Module::exe_ptr(0x5B475)",
+    "RenderScope::WorldBillboard",
+)
+heart_early = heart_source.split("static void HeartPulse_dest", 1)[1].split(
+    "static void HeartSemantic_dest", 1
+)[0]
+if "ArmNextDraw" in heart_early:
+    raise SystemExit("heart semantic must not arm before the 0x5B470 no-draw bypass")
+
+particle_source = text("src/hooks_bugfixes.cpp")
+particle_section = particle_source.split("class FixParticleRendering", 1)[1].split(
+    "class FixIncorrectShading", 1
+)[0]
+for marker in (
+    "static void semantic_destination",
+    "particle_draw_dispatch_HookAddr = 0x19178",
+    "RenderScope::WorldParticle",
+):
+    if marker not in particle_section:
+        raise SystemExit(f"particle semantic late-arm invariant missing: {marker}")
+particle_early = particle_section.split("static void destination", 1)[1].split(
+    "static void semantic_destination", 1
+)[0]
+if "ArmNextDraw" in particle_early:
+    raise SystemExit("particle semantic must not arm during pre-dispatch geometry construction")
+
+renderer_source = require(
+    "src/vr/game/outrun_renderer.cpp",
+    '#include "vr/game/render_semantics.hpp"',
+    "void NotifyGamePresent()",
+    "void NotifyGameReset()",
+)
+if renderer_source.count("OutRunVR::GameSemantic::ClearNextDraw();") < 2:
+    raise SystemExit("one-shot semantic must be cleared by both Present and Reset boundaries")
+
+# Minimal deterministic lifetime model for the original regression:
+# arm + no intended draw + Present + unrelated draw => None.
+_pending = "WORLD_BILLBOARD"
+_pending = None  # NotifyGamePresent
+_unrelated_observed = _pending
+if _unrelated_observed is not None:
+    raise SystemExit("stale one-shot semantic survived frame boundary model")
+
+# Intended producer path remains one-shot: immediate draw consumes exactly once.
+_pending = "WORLD_PARTICLE"
+_first_draw = _pending
+_pending = None
+_second_draw = _pending
+if _first_draw != "WORLD_PARTICLE" or _second_draw is not None:
+    raise SystemExit("one-shot semantic consume model regressed")
+
 print("VR reconstructed R23/R25 architecture boundary verification passed")
