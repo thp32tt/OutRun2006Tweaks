@@ -10,6 +10,7 @@
 
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
+#include "vr/core/x86_openxr_probe.hpp"
 
 // VR settings live here, but the final camera transform does not.
 // Head tracking is applied only at the verified D3D9 c64 WorldViewProjection
@@ -48,6 +49,12 @@ namespace Settings
 		"Diagnostic isolation switch. Disables Desktop Duplication for gameplay and menus. Leave false for normal DirectGPU-only gameplay with visible menus." };
 	Setting<float> VRTargetRefreshRateHz{ "VR", "TargetRefreshRateHz", 0.0f,
 		"Optional OpenXR refresh-rate override through XR_FB_display_refresh_rate. Leave at 0 to respect the refresh rate selected by Virtual Desktop/runtime (for example 72 or 90 Hz).", Range<float>{ 0.0f, 144.0f } };
+	Setting<float> VRHostRenderScale{ "VR", "HostRenderScale", 1.0f,
+		"Scales the OpenXR projection swapchain relative to the runtime-recommended eye size. 1.0 follows Virtual Desktop/OpenXR exactly; lower values reduce host fill cost.", Range<float>{ 0.50f, 1.50f } };
+	Setting<float> VRHostSharpening{ "VR", "HostSharpening", 0.20f,
+		"Applies a lightweight contrast-adaptive sharpening pass in the x64 OpenXR host after source scaling. 0 disables it.", Range<float>{ 0.0f, 1.0f } };
+	Setting<bool> VRDirectX86OpenXRProbe{ "VR", "DirectX86OpenXRProbe", true,
+		"Logs whether the 32-bit game process can see a registered OpenXR runtime and 32-bit openxr_loader.dll. This is a capability probe only; the x64 host remains authoritative." };
 	Setting<int> VRFrameCadenceMode{ "VR", "FrameCadenceMode", 1,
 		"Synchronizes rendering to the OpenXR clock. PhaseLock gates each game Present on the next host xrWaitFrame token without making the host wait for the game; SerializedProbe additionally enables bounded host-side diagnostics. Off restores the pre-R35 cadence.",
 		{ "Off", "PhaseLock", "SerializedProbe" } };
@@ -126,6 +133,14 @@ namespace OutRunVR
 					std::to_string(Settings::VRTargetRefreshRateHz.get());
 				SetEnvironmentVariableA("OUTRUN_VR_TARGET_REFRESH_HZ",
 					refreshHz.c_str());
+				const std::string renderScale =
+					std::to_string(Settings::VRHostRenderScale.get());
+				const std::string sharpening =
+					std::to_string(Settings::VRHostSharpening.get());
+				SetEnvironmentVariableA("OUTRUN_VR_RENDER_SCALE",
+					renderScale.c_str());
+				SetEnvironmentVariableA("OUTRUN_VR_SHARPENING",
+					sharpening.c_str());
 				const std::string cadenceMode =
 					std::to_string(Settings::VRFrameCadenceMode.get());
 				const std::string cadenceTargetHz =
@@ -197,6 +212,9 @@ namespace OutRunVR
 			Settings::VRDirectGpuOnly.needs_restart();
 			Settings::VRDisableDesktopDuplication.needs_restart();
 			Settings::VRTargetRefreshRateHz.needs_restart();
+			Settings::VRHostRenderScale.needs_restart();
+			Settings::VRHostSharpening.needs_restart();
+			Settings::VRDirectX86OpenXRProbe.needs_restart();
 			Settings::VRFrameCadenceMode.needs_restart();
 			Settings::VRFrameCadenceTargetHz.needs_restart();
 			Settings::VRFrameCadenceMaxHz.needs_restart();
@@ -205,11 +223,15 @@ namespace OutRunVR
 
 		bool apply() override
 		{
+			if (Settings::VRDirectX86OpenXRProbe)
+				OutRunVR::X86OpenXRProbe::Run();
 			spdlog::info(
-				"VR: D3D9Ex DirectGPU preference={} directOnly={} refreshOverrideHz={:.1f} cadenceMode={} cadenceTargetHz={:.1f} cadenceMaxHz={:.1f}; target 0 means XR-native render cadence, simulation remains 60 Hz",
+				"VR: D3D9Ex DirectGPU preference={} directOnly={} refreshOverrideHz={:.1f} hostRenderScale={:.2f} hostSharpening={:.2f} cadenceMode={} cadenceTargetHz={:.1f} cadenceMaxHz={:.1f}; target 0 means XR-native render cadence, simulation remains 60 Hz",
 				Settings::VRPreferD3D9Ex.get(),
 				Settings::VRDirectGpuOnly.get(),
 				Settings::VRTargetRefreshRateHz.get(),
+				Settings::VRHostRenderScale.get(),
+				Settings::VRHostSharpening.get(),
 				Settings::VRFrameCadenceMode.get(),
 				Settings::VRFrameCadenceTargetHz.get(),
 				Settings::VRFrameCadenceMaxHz.get());
