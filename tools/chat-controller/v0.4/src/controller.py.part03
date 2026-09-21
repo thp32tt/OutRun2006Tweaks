@@ -1,76 +1,3 @@
-            write_runtime(status="slot_busy", last_action=f"Slot {slot.name} still generating; skipped only this slot and advanced")
-            log.info("slot=%s still busy; advance to next slot", slot.name)
-            return
-        prompt = read_prompt("continue_review.md")
-
-    if await detect_rate_limit(page):
-        slot.last_result = "rate_limited_pre_send"
-        save_registry(reg)
-        mark_rate_limit(reg, datetime.now(TZ), f"scheduled-slot-precheck:{slot.name}")
-        return
-
-    if await detect_limit(page):
-        slot.last_result = "limit_detected"
-        save_registry(reg)
-        write_runtime(status="limit_detected", last_action=f"Slot {slot.name} not sent")
-        return
-
-    guard = send_guard_reason(reg, slot, datetime.now(TZ))
-    if guard:
-        slot.last_result = f"send_guard:{guard}"
-        save_registry(reg)
-        write_runtime(status="send_throttled", last_action=f"Slot {slot.name} not sent because {guard}")
-        return
-
-    thinking_ok = await ensure_thinking_level(page)
-    if not thinking_ok and STRICT_THINKING_LEVEL:
-        slot.last_result = "thinking_level_unverified"
-        save_registry(reg)
-        write_runtime(
-            status="thinking_level_blocked",
-            last_action=f"Slot {slot.name} not sent: {PREFERRED_THINKING_LEVEL} could not be positively verified",
-        )
-        log.warning("slot=%s send blocked because thinking level %s could not be verified", slot.name, PREFERRED_THINKING_LEVEL)
-        return
-
-    sent = await send_message(page, prompt)
-    if not sent:
-        slot.last_result = "input_not_found"
-        save_registry(reg)
-        write_runtime(status="ui_changed", last_action="Prompt input not found; inspect via noVNC")
-        return
-
-    request_now = datetime.now(TZ)
-    if await detect_rate_limit(page):
-        slot.last_result = "rate_limited_after_send"
-        slot.last_sent_at = request_now.isoformat()
-        save_registry(reg)
-        mark_rate_limit(reg, request_now, f"scheduled-send:{slot.name}")
-        return
-
-    if is_new:
-        new_url = await wait_for_chat_url(page)
-        if new_url:
-            slot.url = new_url
-
-    note_successful_request(reg, request_now)
-    slot.runs += 1
-    slot.watchdog_resumes_since_schedule = 0
-    slot.last_assistant_hash = None
-    slot.last_assistant_change_at = request_now.isoformat()
-    slot.last_sent_at = request_now.isoformat()
-    slot.last_result = "sent"
-    reg.next_slot = (reg.next_slot + 1) % len(reg.slots)
-    save_registry(reg)
-    write_runtime(
-        status="sent",
-        last_action=f"Sent review cycle to slot {slot.name}",
-        active_slot=slot.name,
-        active_url=slot.url,
-    )
-    log.info("sent slot=%s runs=%s url=%s", slot.name, slot.runs, slot.url)
-
-
 class StatusHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         return
@@ -109,13 +36,13 @@ def start_status_server():
     log.info("status server listening on :%s", STATUS_PORT)
 
 
-async def scheduler_loop(page: Page, once: bool):
+async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: bool):
     if once:
-        await run_cycle(page)
+        await run_cycle(context, pages)
         return
     last_tick = None
     last_watchdog_check = 0.0
-    write_runtime(status="idle")
+    write_runtime(status="idle", tab_mode="dedicated_per_slot", tab_count=len(pages))
     while True:
         now = datetime.now(TZ)
         tick = now.strftime("%Y-%m-%dT%H:%M")
@@ -125,12 +52,11 @@ async def scheduler_loop(page: Page, once: bool):
             did_scheduled = True
             write_runtime(last_tick=tick, status="running")
             try:
-                await run_cycle(page)
+                await run_cycle(context, pages)
             except Exception as e:
                 log.exception("scheduled cycle failed")
                 write_runtime(status="error", last_error=repr(e))
         elif not AUTO_SEND:
-            # 로그인 화면은 계속 유지하되 자동 전송은 하지 않는다.
             if runtime.get("status") not in ("login_required", "manual_mode"):
                 write_runtime(status="manual_mode", last_action="AUTO_SEND=false; waiting for manual login/setup")
 
@@ -138,7 +64,7 @@ async def scheduler_loop(page: Page, once: bool):
         if AUTO_SEND and WATCHDOG_ENABLED and not did_scheduled and mono - last_watchdog_check >= WATCHDOG_CHECK_SECONDS:
             last_watchdog_check = mono
             try:
-                await watchdog_cycle(page)
+                await watchdog_cycle(context, pages)
             except Exception as e:
                 log.exception("watchdog cycle failed")
                 write_runtime(status="watchdog_error", last_error=repr(e))
@@ -148,8 +74,6 @@ async def scheduler_loop(page: Page, once: bool):
 async def main_async(once: bool):
     start_status_server()
     async with async_playwright() as p:
-        # Attach to a normal Google Chrome process started by entrypoint.sh.
-        # This keeps manual Google/ChatGPT login in a standard browser session.
         browser = None
         for _ in range(60):
             try:
@@ -159,14 +83,16 @@ async def main_async(once: bool):
                 await asyncio.sleep(1)
         if browser is None:
             raise RuntimeError("Could not attach to Google Chrome on CDP port 9222")
+
         context = browser.contexts[0] if browser.contexts else await browser.new_context()
-        page = context.pages[0] if context.pages else await context.new_page()
-        try:
-            if not page.url or page.url == "about:blank":
-                await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
-        except Exception:
-            log.exception("initial navigation failed")
-        await scheduler_loop(page, once=once)
+        reg = load_registry(datetime.now(TZ))
+        pages = await prepare_slot_pages(context, reg)
+
+        # Login check on slot A tab; session is shared by all tabs.
+        first_page = pages[reg.slots[0].name]
+        if not await ensure_logged_in(first_page):
+            write_runtime(status="login_required", last_action="Open noVNC and log in to ChatGPT")
+        await scheduler_loop(context, pages, once=once)
 
 
 def main():
