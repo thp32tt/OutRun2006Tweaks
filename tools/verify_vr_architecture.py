@@ -440,6 +440,31 @@ require(
     "state.rhwDepthEvidence",
 )
 
+# Stereo-intent epoch is a Frame.v2 ABI-preserving source barrier. Producer,
+# transport and host selection must stay bound together so disable/re-enable
+# cannot revive producer-ahead frames from an older intent epoch.
+require(
+    "src/vr/ipc/protocol.hpp",
+    "RenderFrameStereoIntentEpochIndex = 12",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r7.inc",
+    "std::uint32_t StereoIntentEpoch = 1",
+    "AdvanceStereoIntentEpoch()",
+    "RenderFrameStereoIntentEpochIndex]=StereoIntentEpoch",
+)
+require(
+    "src/vr/ipc/direct_history_policy.hpp",
+    "LatestPublicationDefinesHistoryEpoch",
+    "SameStereoIntentEpoch",
+)
+require(
+    "vrhost/src/main_r23.cpp",
+    "StereoIntentEpoch(latestPublication)",
+    "SameStereoIntentEpoch(",
+    "stereo-disabled-source-barrier",
+)
+
 # R41 DirectGPU latency invariant: the newest complete slot is the only frame
 # selected for sampling. Older occupied slots are never rendered later; they are
 # ACKed immediately because no D3D11 work references them.
