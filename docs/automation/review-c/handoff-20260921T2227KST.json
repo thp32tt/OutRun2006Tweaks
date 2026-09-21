@@ -1,0 +1,41 @@
+{
+  "role": "C",
+  "timestamp_kst": "2026-09-21T22:27:00+09:00",
+  "integration_branch": "vr-d3d9ex-focus",
+  "integration_sha": "265504f6ea28c5e97908e450a460661ed5ad37f1",
+  "candidates_reviewed": [
+    {
+      "candidate_branch": "vr-d3d9ex-candidate/HUD-SEMANTIC-TIMEATTACK-RANGE-GAP-001-D-20260921T2145KST",
+      "candidate_sha": "265504f6ea28c5e97908e450a460661ed5ad37f1",
+      "base_sha": "265504f6ea28c5e97908e450a460661ed5ad37f1",
+      "finding_ids": ["HUD-SEMANTIC-TIMEATTACK-RANGE-GAP-001"],
+      "changed_files_functions": [],
+      "intended_hunks": "Expected hud_semantics Time Attack range/source change, but no candidate delta exists.",
+      "unintended_diff_result": "No unintended diff because compare is identical; also no intended production diff.",
+      "active_call_path_evidence": "Not reviewable as a fix because candidate SHA equals base SHA.",
+      "dependency_regression_risks": "None introduced; candidate is an empty placeholder and cannot resolve the finding.",
+      "deterministic_checks_required": ["0x0BE2D9 classifies HUD_TIME_ATTACK", "0x0BE261 remains outside Time Attack range", "candidate compare contains intended source hunk only"],
+      "ci_evidence": "Not applicable until a changed production SHA exists.",
+      "verdict": "BLOCKED",
+      "required_domain_review": ["B"],
+      "exact_correction": "D must create a real current-base source delta in src/vr/hud_semantics.hpp, then resubmit the exact changed SHA to B and C."
+    }
+  ],
+  "findings_organized": [
+    {"id":"HUD-SEMANTIC-TIMEATTACK-RANGE-GAP-001","classification":"READY","note":"2145 candidate remains empty; keep actionable for D."},
+    {"id":"B-R30-PRIMITIVE-COUNT-OVERFLOW-001","classification":"NEEDS_REVIEW","note":"B CP150 requires caller-bound proof before D queue promotion."},
+    {"id":"B-R32-FENCE-ORDER-CROSSTRACE-001","classification":"NEEDS_REVIEW","note":"B CP150 requires producer->projection->EVENT ordering proof before D queue promotion."}
+  ],
+  "validation_gaps": [
+    "No changed SHA exists for HUD Time Attack candidate, so deterministic boundary verifier and CI cannot yet validate a fix.",
+    "B-R30 and B-R32 remain reviewer investigations, not implementation-ready findings."
+  ],
+  "D_IMPLEMENT_NEXT": [
+    {"priority":1,"finding_id":"VR-SKYGLOW-ACTIVE-GATE-001","status":"READY","target":"src/hooks_graphics.cpp / RestoreSkyGlow::SkyGlowAllowed active-runtime gate","fix_intent":"Gate stock SkyGlow suppression on actual stereo/runtime-active eligibility and restore stock ownership during host-loss/menu/fallback.","verifier":"Deterministic active/inactive gate cases plus existing SkyGlow checks","dependency_blocker":"Large-file safe source patch path required","review_requirement":"B + C"},
+    {"priority":2,"finding_id":"VR-NEARPLANE-ACTIVE-GATE-001","status":"READY","target":"near-plane override active-runtime gate","fix_intent":"Apply near-plane VR override only while actual stereo/runtime eligibility is active; fail open to stock state otherwise.","verifier":"Deterministic active/inactive eligibility cases","dependency_blocker":"Large-file safe source patch path required","review_requirement":"A + B + C"},
+    {"priority":3,"finding_id":"VR-SEMANTIC-NEXTDRAW-STALE-HEART-001","status":"READY","target":"semantic next-draw HEART marker consume/clear lifetime","fix_intent":"Ensure skipped/ineligible draws cannot leak HEART semantic state into a later draw.","verifier":"Deterministic skipped-draw then next-draw semantic lifetime test","dependency_blocker":"Safe source patch path required","review_requirement":"A + B + C"},
+    {"priority":4,"finding_id":"HUD-SEMANTIC-TIMEATTACK-RANGE-GAP-001","status":"READY","target":"src/vr/hud_semantics.hpp Time Attack address range","fix_intent":"Extend Time Attack range to include 0x0BE2D9 while preserving 0x0BE261 outside classification.","verifier":"Compile-time/deterministic boundary assertions","dependency_blocker":"None beyond creating an actual changed SHA","review_requirement":"B + C"}
+  ],
+  "blockers": ["Latest D HUD candidate branch is identical to integration base and contains no source fix."],
+  "exact_nextAction": "D should create the first real changed current-base candidate. Prefer VR-SKYGLOW-ACTIVE-GATE-001 when safe large-file patching is available; otherwise complete HUD-SEMANTIC-TIMEATTACK-RANGE-GAP-001 as the small-file unblocker. Route the exact changed SHA to required B/A domain review and C changeset sanity before integration."
+}
