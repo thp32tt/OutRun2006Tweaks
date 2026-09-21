@@ -245,14 +245,64 @@ async def page_text(page: Page) -> str:
         return ""
 
 
+ERROR_SURFACE_SELECTORS = [
+    "[role='alert']",
+    "[role='status']",
+    "[data-sonner-toast]",
+    "[data-testid*='toast']",
+    "[data-testid*='error']",
+    "[class*='toast']",
+    "[class*='error']",
+    "dialog",
+    "[role='dialog']",
+    "form",
+]
+
+
+async def visible_error_surface_text(page: Page) -> str:
+    """Collect only visible transient/error UI, excluding sidebar/chat-history text."""
+    chunks = []
+    for sel in ERROR_SURFACE_SELECTORS:
+        try:
+            loc = page.locator(sel)
+            count = await loc.count()
+            for i in range(min(count, 20)):
+                item = loc.nth(i)
+                try:
+                    if not await item.is_visible(timeout=120):
+                        continue
+                    text = (await item.inner_text(timeout=500)).strip()
+                    if text:
+                        chunks.append(text)
+                except Exception:
+                    continue
+        except Exception:
+            continue
+    return "\n".join(chunks).lower()
+
+
 async def detect_rate_limit(page: Page) -> bool:
-    text = await page_text(page)
-    return any(re.search(p, text, flags=re.I | re.S) for p in RATE_LIMIT_PATTERNS)
+    text = await visible_error_surface_text(page)
+    matched = [p for p in RATE_LIMIT_PATTERNS if re.search(p, text, flags=re.I | re.S)]
+    if matched:
+        write_runtime(
+            last_rate_limit_match=matched[0],
+            last_rate_limit_surface=text[:500],
+        )
+        return True
+    return False
 
 
 async def detect_limit(page: Page) -> bool:
-    text = await page_text(page)
-    return any(re.search(p, text, flags=re.I | re.S) for p in LIMIT_PATTERNS)
+    text = await visible_error_surface_text(page)
+    matched = [p for p in LIMIT_PATTERNS if re.search(p, text, flags=re.I | re.S)]
+    if matched:
+        write_runtime(
+            last_usage_limit_match=matched[0],
+            last_usage_limit_surface=text[:500],
+        )
+        return True
+    return False
 
 
 def _parse_iso(value: Optional[str]) -> Optional[datetime]:
