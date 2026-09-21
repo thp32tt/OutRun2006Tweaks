@@ -1,6 +1,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <filesystem>
+#include <system_error>
 #include <ini.h>
 #include <exception.hpp>
 #include <miniz.h>
@@ -154,14 +155,22 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
           // files is still open, so an optional add failure must never suppress
           // the primary dump/log archive.
           auto add_optional_vr_file = [&zip_archive](const char* archive_name,
-              const std::filesystem::path& source)
+              const std::filesystem::path& source) noexcept
           {
-            if (!std::filesystem::exists(source) ||
-                !std::filesystem::is_regular_file(source))
-              return;
-            const std::wstring wide = source.wstring();
-            mz_zip_writer_add_file(&zip_archive, archive_name, wide.c_str(),
-              nullptr, 0, 3);
+            try
+            {
+              std::error_code metadata_ec;
+              if (!std::filesystem::is_regular_file(source, metadata_ec) ||
+                  metadata_ec)
+                return;
+              const std::wstring wide = source.wstring();
+              mz_zip_writer_add_file(&zip_archive, archive_name, wide.c_str(),
+                nullptr, 0, 3);
+            }
+            catch (...)
+            {
+              // Optional VR evidence must never abort the primary crash archive.
+            }
           };
 
           const std::filesystem::path game_dir = Module::ExePath.parent_path();
