@@ -7,70 +7,43 @@
     "eventHistory": "append-only",
     "recurrence": "reuse-stable-key-and-reopen",
     "integrationGate": "all triggered regression cases must be revalidated or explicitly NEED_HMD_TEST before integration",
-    "fixedRequirements": [
-      "durable fix reference",
-      "affected path set",
-      "deterministic verifier or evidence recipe",
-      "validation evidence level"
-    ],
+    "fixedRequirements": ["durable fix reference", "affected path set", "deterministic verifier or evidence recipe", "validation evidence level"],
     "runtimeFixedRequirement": "runtime-visible regressions require matching USER RUNTIME VERIFIED evidence before final DONE"
   },
   "cases": [
     {
       "key": "VR-STARTUP-WHITE-001",
       "title": "Logo completes then game remains on white screen",
-      "status": "REOPENED_NEEDS_RECONSTRUCTION",
+      "status": "REOPENED_PROTECTION_MISSING_ON_CURRENT_FOCUS",
       "severity": "runtime-blocking",
       "firstKnownWindowKst": "2026-09-20",
       "lastObservedKst": "2026-09-21",
       "recurrenceCount": 1,
       "symptomFingerprint": {
         "primary": "startup reaches/passes logo then white screen and does not progress into normal game flow",
-        "secondary": [
-          "recenter/input path may still respond while presentation/game progression is stuck"
-        ],
-        "logSignals": [
-          "correlate game/host/watchdog session timeline around first post-logo Present and stereo transport activation"
-        ]
+        "secondary": ["recenter/input path may still respond while presentation/game progression is stuck"],
+        "logSignals": ["correlate game/host/watchdog session timeline around first post-logo Present and stereo transport activation"]
       },
-      "knownGood": [],
-      "knownBad": [],
+      "knownGood": ["a9abb85702925aaa09ca85581423eb9766c2adb3 — logo/menu/car/course/race rendered; later theater-only VR defect remained"],
+      "knownBad": ["1f2dcb9848a7142c295f371f0dc91663f174c442 — persistent startup white runtime"],
       "rootCause": {
-        "status": "UNKNOWN_NEEDS_RECONSTRUCTION",
-        "summary": "A prior similar symptom was reported as fixed, but the exact root-cause/fix SHA is not durably identified in the current repository records. Reconstruct from 2026-09-20 candidate/runtime history before declaring a new root cause."
+        "status": "BOUNDED_RECONSTRUCTED",
+        "summary": "D3D9Ex synchronous CreateDevice-thread stereo installation called EnsureStereoResources before the promoted device was returned to OutRun, allocating/mutating private RT/depth resources before fresh-device initialization completed. Current vr-d3d9ex-focus structurally contains this pre-fix behavior again."
       },
-      "fixReferences": [],
-      "riskPaths": [
-        "src/vr/**",
-        "vrhost/**",
-        "src/hooks_graphics.cpp",
-        "src/hooks_framerate.cpp",
-        "src/hooks_exceptions.cpp",
-        "OutRun2006Tweaks.ini",
-        "tools/*OutRunVR*.ps1",
-        ".github/workflows/vr-dx9ex-active.yml"
+      "fixReferences": [
+        "986f0d5794476056ef4bea08c6ac3c0d1f5f01d2 — defer stereo resources until first successful game Present",
+        "ba402e98351fcf8d215bd7719b6ea56044566ead — deterministic deferred-init guard",
+        "fc636acc9e639a7e280ff66f2d1c86700b4caa91 -> 16c47176868dc600afcd8ca0e05990280aaa21d9 -> 7081b38917aa1b7ec319bea137a88b6f6f07733b — owner-corrected preservation chain"
       ],
-      "revalidationTriggers": [
-        "changes to startup/device creation/reset/present flow",
-        "changes to stereo transport/shared-frame eligibility",
-        "changes to host fallback/recovery or first-frame state",
-        "changes to launch/profile/config values affecting VR activation"
-      ],
+      "riskPaths": ["src/vr/**", "vrhost/**", "src/hooks_graphics.cpp", "src/hooks_framerate.cpp", "src/hooks_exceptions.cpp", "OutRun2006Tweaks.ini", "tools/*OutRunVR*.ps1", ".github/workflows/vr-dx9ex-active.yml"],
+      "revalidationTriggers": ["changes to startup/device creation/reset/present flow", "changes to stereo transport/shared-frame eligibility", "changes to host fallback/recovery or first-frame state", "changes to launch/profile/config values affecting VR activation"],
       "verifier": {
-        "static": [
-          "build active DX9Ex game DLL and x64 OpenXR host",
-          "run deterministic host smoke tests",
-          "verify autodev/regression registry contract"
-        ],
-        "runtime": [
-          "launch CORRECTNESS package",
-          "confirm logo transitions into menu/game instead of persistent white frame",
-          "collect standardized OutRun2_VR_ANALYZE_*.zip if failure recurs"
-        ]
+        "static": ["build active DX9Ex game DLL and x64 OpenXR host", "run deterministic host smoke tests", "verify deferred stereo resource initialization is absent from CreateDevice pre-exposure path and occurs only after successful game Present", "verify autodev/regression registry contract"],
+        "runtime": ["launch CORRECTNESS package", "confirm logo transitions into menu/game instead of persistent white frame", "confirm gameplay stereo opens after deferred initialization", "collect standardized OutRun2_VR_ANALYZE_*.zip if failure recurs"]
       },
       "testLevel": 3,
-      "evidenceLevel": "USER_REPORTED_RECURRENCE",
-      "nextAction": "Reconstruct the previous 2026-09-20 fix/root cause and attach exact fix SHA/evidence; then add a deterministic no-HMD guard where feasible and retain HMD startup transition as a mandatory regression check."
+      "evidenceLevel": "ROOT_CAUSE_RECONSTRUCTED_STATIC_PLUS_PRIOR_RUNTIME",
+      "nextAction": "Reconstruct 986f0d57 protection minimally on latest vr-d3d9ex-focus while preserving final-R23 post-successful-Present ownership; add structural guard; require build plus HMD logo->menu/game and gameplay stereo-open validation before DONE."
     }
   ]
 }
