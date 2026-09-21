@@ -10,11 +10,14 @@ on:
       - 'src/vr/**'
       - 'src/hooks_framerate.cpp'
       - 'src/hooks_graphics.cpp'
+      - 'src/hooks_textures.cpp'
       - 'vrhost/**'
       - 'CMakeLists.txt'
       - 'cmake.toml'
       - 'OutRun2006Tweaks.ini'
       - 'OutRun2006Tweaks.lods.ini'
+      - 'tools/verify_vr_architecture.py'
+      - 'tools/verify_vr_r32_review.py'
       - '.github/workflows/vr-dx9ex-active.yml'
 
 concurrency:
@@ -29,6 +32,11 @@ jobs:
       - name: Verify runtime-test minimization policy
         shell: pwsh
         run: ./tools/Test-OutRunVRTestPolicy.ps1
+      - name: Verify reconstructed VR architecture boundaries
+        shell: pwsh
+        run: |
+          python tools/verify_vr_architecture.py
+          python tools/verify_vr_r32_review.py
 
   host:
     needs: policy
@@ -37,12 +45,34 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Build x64 D3D11 OpenXR host
+      - name: Build x64 D3D11 OpenXR host and deterministic smoke tests
         shell: pwsh
         run: |
           cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
-          cmake --build build-host --config Release --target outrun-vr-host
+          cmake --build build-host --config Release --target outrun-vr-host outrun-vr-runtime-eligibility-smoke outrun-vr-r23-verified-bundle-smoke outrun-vr-r32-policy-smoke outrun-vr-protocol-v3-smoke outrun-vr-core-math-smoke outrun-vr-host-state-v3-channel-smoke outrun-vr-v2-v3-shadow-conversion-smoke outrun-vr-host-pose-v3-validation-smoke
           if (-not (Test-Path build-host/bin/outrun-vr-host.exe)) { throw 'DX9Ex OpenXR host missing' }
+      - name: Run deterministic no-HMD host smoke tests
+        shell: pwsh
+        run: |
+          $tests = @(
+            'outrun-vr-runtime-eligibility-smoke.exe',
+            'outrun-vr-r23-verified-bundle-smoke.exe',
+            'outrun-vr-r32-policy-smoke.exe',
+            'outrun-vr-protocol-v3-smoke.exe',
+            'outrun-vr-core-math-smoke.exe',
+            'outrun-vr-host-state-v3-channel-smoke.exe',
+            'outrun-vr-v2-v3-shadow-conversion-smoke.exe',
+            'outrun-vr-host-pose-v3-validation-smoke.exe'
+          )
+          foreach ($test in $tests) {
+            $testPath = Join-Path 'build-host/bin' $test
+            if (-not (Test-Path $testPath)) { throw "host smoke missing: $test" }
+            & $testPath
+            if ($LASTEXITCODE -ne 0) { throw "host smoke failed ($LASTEXITCODE): $test" }
+          }
+      - name: Stage host
+        shell: pwsh
+        run: |
           New-Item -ItemType Directory -Force stage-host | Out-Null
           Copy-Item build-host/bin/outrun-vr-host.exe stage-host/outrun-vr-host.exe
           Set-Content stage-host/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
