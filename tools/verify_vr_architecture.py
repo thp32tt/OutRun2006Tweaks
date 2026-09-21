@@ -494,8 +494,9 @@ direct_release = require(
     "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp",
     "DirectProjectionReleaseFailures",
     "DirectProjectionReleaseQuarantined",
-    "const bool released = Release(Projection);",
-    "if (!released)",
+    "inline bool ReleaseDirectProjection() noexcept",
+    "if (Release(Projection))",
+    "if (!ReleaseDirectProjection())",
     "return false;",
     "!DirectProjectionReleaseQuarantined &&",
     "!OutRunVrSbsCaptureOverride::Projection.acquired",
@@ -506,12 +507,14 @@ render_end = direct_release.find("inline void ObserveCaptureFreshness", render_b
 if render_begin < 0 or render_end < 0:
     raise SystemExit("DirectGPU RenderSafeProjection boundary missing")
 render_release = direct_release[render_begin:render_end]
-release_pos = render_release.find("const bool released = Release(Projection);")
+release_pos = render_release.find("if (!ReleaseDirectProjection())")
 projection_patch_pos = render_release.find("projection = *incoming;")
 if release_pos < 0 or projection_patch_pos < 0 or release_pos >= projection_patch_pos:
     raise SystemExit("DirectGPU projection is promoted before successful release")
-if "Release(Projection);\n        if (!ok)" in render_release:
-    raise SystemExit("DirectGPU release result is ignored again")
+if "Release(Projection);" in render_release:
+    raise SystemExit("DirectGPU RenderSafeProjection bypasses common release quarantine")
+if "image >= Projection.rtvs.size()" not in render_release or         "ReleaseDirectProjection();" not in render_release:
+    raise SystemExit("DirectGPU invalid-image release path is not quarantined")
 
 end_begin = direct_release.find("inline XrResult XRAPI_CALL EndFrame(")
 end_end = direct_release.find("inline XrResult XRAPI_CALL DestroySession", end_begin)
