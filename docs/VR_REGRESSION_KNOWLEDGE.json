@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "integrationBranch": "vr-d3d9ex-focus",
+  "ledgerIssue": 13,
+  "owner": "D_INTEGRATION_PLANNER",
+  "policy": {
+    "eventHistory": "append-only",
+    "recurrence": "reuse-stable-key-and-reopen",
+    "integrationGate": "all triggered regression cases must be revalidated or explicitly NEED_HMD_TEST before integration",
+    "fixedRequirements": [
+      "durable fix reference",
+      "affected path set",
+      "deterministic verifier or evidence recipe",
+      "validation evidence level"
+    ],
+    "runtimeFixedRequirement": "runtime-visible regressions require matching USER RUNTIME VERIFIED evidence before final DONE"
+  },
+  "cases": [
+    {
+      "key": "VR-STARTUP-WHITE-001",
+      "title": "Logo completes then game remains on white screen",
+      "status": "REOPENED_NEEDS_RECONSTRUCTION",
+      "severity": "runtime-blocking",
+      "firstKnownWindowKst": "2026-09-20",
+      "lastObservedKst": "2026-09-21",
+      "recurrenceCount": 1,
+      "symptomFingerprint": {
+        "primary": "startup reaches/passes logo then white screen and does not progress into normal game flow",
+        "secondary": [
+          "recenter/input path may still respond while presentation/game progression is stuck"
+        ],
+        "logSignals": [
+          "correlate game/host/watchdog session timeline around first post-logo Present and stereo transport activation"
+        ]
+      },
+      "knownGood": [],
+      "knownBad": [],
+      "rootCause": {
+        "status": "UNKNOWN_NEEDS_RECONSTRUCTION",
+        "summary": "A prior similar symptom was reported as fixed, but the exact root-cause/fix SHA is not durably identified in the current repository records. Reconstruct from 2026-09-20 candidate/runtime history before declaring a new root cause."
+      },
+      "fixReferences": [],
+      "riskPaths": [
+        "src/vr/**",
+        "vrhost/**",
+        "src/hooks_graphics.cpp",
+        "src/hooks_framerate.cpp",
+        "src/hooks_exceptions.cpp",
+        "OutRun2006Tweaks.ini",
+        "tools/*OutRunVR*.ps1",
+        ".github/workflows/vr-dx9ex-active.yml"
+      ],
+      "revalidationTriggers": [
+        "changes to startup/device creation/reset/present flow",
+        "changes to stereo transport/shared-frame eligibility",
+        "changes to host fallback/recovery or first-frame state",
+        "changes to launch/profile/config values affecting VR activation"
+      ],
+      "verifier": {
+        "static": [
+          "build active DX9Ex game DLL and x64 OpenXR host",
+          "run deterministic host smoke tests",
+          "verify autodev/regression registry contract"
+        ],
+        "runtime": [
+          "launch CORRECTNESS package",
+          "confirm logo transitions into menu/game instead of persistent white frame",
+          "collect standardized OutRun2_VR_ANALYZE_*.zip if failure recurs"
+        ]
+      },
+      "testLevel": 3,
+      "evidenceLevel": "USER_REPORTED_RECURRENCE",
+      "nextAction": "Reconstruct the previous 2026-09-20 fix/root cause and attach exact fix SHA/evidence; then add a deterministic no-HMD guard where feasible and retain HMD startup transition as a mandatory regression check."
+    }
+  ]
+}
