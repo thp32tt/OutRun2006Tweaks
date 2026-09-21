@@ -300,10 +300,19 @@ RestoreXboxBrightness RestoreXboxBrightness::instance;
 // more for quality:
 class RestoreSkyGlow : public Hook
 {
+	static bool StockSkyGlowResourcesOwnedByGame() noexcept
+	{
+		// GlowInit_dest deliberately skips the game's mono glow textures for the
+		// entire configured true-stereo VR lifetime. RuntimeStereoActive is too
+		// narrow here: menus/loading are mono, but the stock resources are still
+		// absent. The execution gate must match the allocation/ownership gate.
+		return !(Settings::VREnabled && Settings::VRStereo);
+	}
+
 	static bool SkyGlowAllowed() noexcept
 	{
 		return Settings::SkyGlowFactor > 0 &&
-			!OutRunVRStereo::IsRuntimeStereoActive();
+			StockSkyGlowResourcesOwnedByGame();
 	}
 
 	// (1) The exposure reaches pixel shader constant c7 alpha, but nothing reads
@@ -541,6 +550,7 @@ class RestoreSkyGlow : public Hook
 	static constexpr int GlowAmount_Addr = 0x4A8C40; // glow_param.amount_28
 
 	inline static IDirect3DTexture9* ReduceHalf = nullptr;
+	inline static bool FirstMissingStep1Logged = false;
 
 	inline static SafetyHookInline MakeReduceBuff_hook = {};
 	static void __stdcall MakeReduceBuff_dest()
@@ -552,8 +562,25 @@ class RestoreSkyGlow : public Hook
 		if (!SkyGlowAllowed())
 			return;
 
+		// The original MakeReduceBuff unconditionally dereferences Step1Tex.
+		// Keep this guard in front of every path that may call the trampoline.
+		// It protects both transition states and unexpected stock allocation
+		// failures from becoming an EXE+0x14E87 null dereference.
+		IDirect3DTexture9* step1 =
+			*Module::exe_ptr<IDirect3DTexture9*>(Step1Tex_Addr);
+		if (!step1)
+		{
+			if (!FirstMissingStep1Logged)
+			{
+				FirstMissingStep1Logged = true;
+				spdlog::warn(
+					"RestoreSkyGlow: MakeReduceBuff suppressed because Step1Tex is null; stock glow resource lifetime is not active");
+			}
+			return;
+		}
+
 		// Checked here rather than in apply so the setting can be changed while the
-		// game runs.
+		// game runs. Calling the original is safe only after Step1Tex is proven live.
 		if (!Settings::SkyGlowTwoStep || !ReduceHalf)
 		{
 			MakeReduceBuff_hook.stdcall();
@@ -567,8 +594,7 @@ class RestoreSkyGlow : public Hook
 			return;
 
 		IDirect3DDevice9* device = Game::D3DDevice();
-		IDirect3DTexture9* step1 = *Module::exe_ptr<IDirect3DTexture9*>(Step1Tex_Addr);
-		if (!device || !step1)
+		if (!device)
 			return;
 
 		IDirect3DSurface9* back = nullptr;
