@@ -276,6 +276,27 @@ async def ensure_thinking_level(page: Page, requested: str = PREFERRED_THINKING_
                     return True
         except Exception:
             continue
+    # Wait for ChatGPT client hydration/model picker on newly opened slot tabs.
+    ready_deadline = time.time() + 15
+    while time.time() < ready_deadline:
+        ready = False
+        for sel in (
+            "button[aria-label='ChatGPT 모델 선택']",
+            "button[aria-label='Select ChatGPT model']",
+            "button[aria-label*='모델 선택']",
+            "button.__composer-pill[aria-haspopup]",
+        ):
+            try:
+                loc = page.locator(sel).first
+                if await loc.count() and await loc.is_visible(timeout=120):
+                    ready = True
+                    break
+            except Exception:
+                continue
+        if ready:
+            break
+        await page.wait_for_timeout(250)
+
     target_offset = {
         "Instant": 0,
         "Medium": 1,
