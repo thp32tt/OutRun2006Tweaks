@@ -11,7 +11,14 @@
     "queueWriter": "D_INTEGRATION_PLANNER",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
-    "primaryBackend": "DX9Ex"
+    "primaryBackend": "DX9Ex",
+    "regressionKnowledge": {
+      "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
+      "ledgerIssue": 13,
+      "loadAtC0Recover": true,
+      "gateIntegrationOnTriggeredCases": true,
+      "recurrenceAction": "REOPEN_EXISTING_STABLE_KEY"
+    }
   },
   "candidateWip": {
     "activeUnvalidatedCount": 0,
