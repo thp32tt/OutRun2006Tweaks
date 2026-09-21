@@ -2,7 +2,6 @@ name: DX9Ex Active Validation
 
 permissions:
   contents: read
-  issues: write
 
 on:
   workflow_dispatch:
@@ -50,26 +49,14 @@ jobs:
       - name: Verify durable regression knowledge
         shell: pwsh
         run: ./tools/Test-VRRegressionKnowledge.ps1
-      - name: Discover canonical original-mod EXE binary contract
+      - name: Verify canonical original-mod EXE binary contract
         shell: pwsh
         run: |
           $contract = Get-Content docs/VR_BINARY_CONTRACT.json -Raw | ConvertFrom-Json
           $exe = Join-Path $env:RUNNER_TEMP 'OR2006C2C.EXE'
           Invoke-WebRequest -Uri $contract.canonicalExe.sourceUrl -OutFile $exe
           python -m pip install --disable-pip-version-check --quiet capstone
-          $discovery = python tools/verify_vr_binary_contract.py --exe $exe --manifest docs/VR_BINARY_CONTRACT.json --source-root . --discover 2>&1
-          $discovery | ForEach-Object { Write-Host $_ }
-          @(
-            '### VR-BINARY-CONTRACT-DISCOVERY'
-            ''
-            ('- candidateSha: ' + $env:GITHUB_SHA)
-            ('- workflow: ' + $env:GITHUB_WORKFLOW)
-            ''
-            '~~~text'
-            ($discovery -join [Environment]::NewLine)
-            '~~~'
-          ) | Set-Content binary-contract-discovery.md -Encoding UTF8
-          gh issue comment 6 --repo $env:GITHUB_REPOSITORY --body-file binary-contract-discovery.md
+          python tools/verify_vr_binary_contract.py --exe $exe --manifest docs/VR_BINARY_CONTRACT.json --source-root .
       - name: Verify reconstructed VR architecture boundaries
         shell: pwsh
         run: |
