@@ -1,4 +1,5 @@
 #include "vr/d3d9/r32_policy.hpp"
+#include "vr/ipc/direct_history_policy.hpp"
 
 #include <cassert>
 #include <cstdint>
@@ -36,6 +37,28 @@ int main()
         PendingFenceDecision::QueryError);
     assert(ClassifyPendingFence(true, true, false, false) ==
         PendingFenceDecision::QueryError);
+
+    // R41: a current-run explicit StereoDisabled publication is a monotonic
+    // source barrier. Older producer-ahead DirectGPU frames must not be selected
+    // after it. Transient transport misses do not emit this packet.
+    OutRunVR::SharedRenderFrameState latest{};
+    latest.state = OutRunVR::StereoDisabled;
+    latest.frameId = 0;
+    latest.flags = 0;
+    assert(OutRunVR::DirectHistoryPolicy::
+        LatestPublicationBlocksHistory(latest));
+
+    latest.state = OutRunVR::StereoSbsActive;
+    latest.frameId = 43;
+    latest.flags = OutRunVR::RenderFrameDirectGpuTransport;
+    assert(!OutRunVR::DirectHistoryPolicy::
+        LatestPublicationBlocksHistory(latest));
+
+    latest.state = OutRunVR::StereoDisabled;
+    latest.frameId = 0;
+    latest.flags = OutRunVR::RenderFramePresentInFlight;
+    assert(!OutRunVR::DirectHistoryPolicy::
+        LatestPublicationBlocksHistory(latest));
 
     return 0;
 }
