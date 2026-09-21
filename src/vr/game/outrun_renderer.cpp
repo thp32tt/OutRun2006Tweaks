@@ -1183,52 +1183,11 @@ namespace OutRunVRRenderer
 				cameraWorld._43 + forward.z * lookDistance
 			};
 			CullingCameraOverridden = true;
-			if (Settings::VRCullingUnionFov && LatchedStereo.valid &&
-				RendererProjection &&
-				IsWritableRange(const_cast<D3DMATRIX*>(RendererProjection), sizeof(D3DMATRIX)))
+			if (Settings::VRCullingUnionFov && !CullingUnionFovDeferredLogged)
 			{
-				SharedFov unionFov{};
-				unionFov.angleLeft = std::min(
-					LatchedStereo.eyeFov[0].angleLeft,
-					LatchedStereo.eyeFov[1].angleLeft);
-				unionFov.angleRight = std::max(
-					LatchedStereo.eyeFov[0].angleRight,
-					LatchedStereo.eyeFov[1].angleRight);
-				unionFov.angleDown = std::min(
-					LatchedStereo.eyeFov[0].angleDown,
-					LatchedStereo.eyeFov[1].angleDown);
-				unionFov.angleUp = std::max(
-					LatchedStereo.eyeFov[0].angleUp,
-					LatchedStereo.eyeFov[1].angleUp);
-
-				const float margin = std::clamp(
-					Settings::VRCullingUnionMarginDegrees.get(), 0.0f, 15.0f) *
-					(Pi / 180.0f);
-				unionFov.angleLeft = std::max(-1.55f, unionFov.angleLeft - margin);
-				unionFov.angleRight = std::min(1.55f, unionFov.angleRight + margin);
-				unionFov.angleDown = std::max(-1.55f, unionFov.angleDown - margin);
-				unionFov.angleUp = std::min(1.55f, unionFov.angleUp + margin);
-
-				if (FovValid(unionFov))
-				{
-					std::memcpy(&CullingProjectionSaved, RendererProjection,
-						sizeof(CullingProjectionSaved));
-					const D3DMATRIX widened =
-						ProjectionFromFov(CullingProjectionSaved, unionFov);
-					if (MatrixFinite(widened))
-					{
-						std::memcpy(const_cast<D3DMATRIX*>(RendererProjection),
-							&widened, sizeof(widened));
-						CullingProjectionOverridden = true;
-						if (!CullingUnionFovDeferredLogged)
-						{
-							CullingUnionFovDeferredLogged = true;
-							spdlog::info(
-								"VR renderer: two-eye union culling FOV ACTIVE margin={:.1f}deg; stock projection remains authoritative for actual eye rendering",
-								Settings::VRCullingUnionMarginDegrees.get());
-						}
-					}
-				}
+				CullingUnionFovDeferredLogged = true;
+				spdlog::warn(
+					"VR renderer: CullingUnionFov disabled in active rendering after visual-regression evidence; live projection remains untouched until a culling-only frustum boundary is proven");
 			}
 			FrameTelemetryFlags |= ClientCullingCameraSynced;
 		}
