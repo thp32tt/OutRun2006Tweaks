@@ -1,0 +1,49 @@
+{
+  "runId": "C-20260921T0930KST-xyzrhw-dispatch",
+  "role": "C",
+  "findingId": "DX9EX-DISPATCH-XYZRHW-001",
+  "status": "VALIDATED",
+  "runtimeStatus": "NEED_HMD_TEST",
+  "testLevel": "LEVEL0",
+  "baseSha": "e5e35f483cf7f8d36f99a87807ba6cb9d4b7eccd",
+  "candidateSha": "8cca78df85fef21a38e66f20fcf9ae867c4779cb",
+  "workflowRunId": 35547178134,
+  "workflowUrl": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/35547178134",
+  "evidence": {
+    "compare": "candidate is exactly one commit ahead of base; only src/vr/d3d9/stereo_renderer_r34.cpp changed (+18/-0)",
+    "jobs": {
+      "policy": "success",
+      "host": "success",
+      "game": "success",
+      "package": "success"
+    },
+    "artifacts": [
+      "OutRun2-VR-DX9EX-ACTIVE-8cca78df85fef21a38e66f20fcf9ae867c4779cb",
+      "dx9ex-active-host",
+      "dx9ex-active-game"
+    ],
+    "artifactHeadSha": "8cca78df85fef21a38e66f20fcf9ae867c4779cb",
+    "staticSemantics": "All four R34 final draw hooks invoke the matching R30TryXyzrhw* handler first. E_NOTIMPL alone falls through to the existing R33 hook; any other HRESULT returns immediately, preventing a second R33 draw. The call remains inside R34GuardStereoRasterState, preserving the final viewport/scissor replay guard."
+  },
+  "verificationClass": ["STATICALLY VERIFIED", "BUILD VERIFIED"],
+  "notVerified": [
+    "Quest 3/VDXR visual correctness",
+    "white HUD/rank/score convergence",
+    "smoke/skid/decal placement",
+    "runtime performance/frame pacing"
+  ],
+  "nextAction": "D may integrate this exact candidate SHA if integration inputs/base remain compatible. Keep the visual finding NEED_HMD_TEST and include it in the next CORRECTNESS HMD candidate rather than claiming runtime-fixed.",
+  "slotUtilization": {
+    "subBatches": [
+      "immutable SHA and one-commit diff identity check",
+      "GitHub Actions policy/host/game/package validation",
+      "artifact identity check",
+      "four final-draw dispatch semantic review"
+    ],
+    "fallbackStagesChecked": [
+      "no failed/ambiguous CI remained after candidate validation",
+      "no additional clean build was warranted because the candidate workflow already built the exact SHA"
+    ],
+    "earlyFinishReason": "Primary candidate reached deterministic LEVEL0 validation; remaining correctness/performance questions require HMD runtime evidence and must not be fabricated by further static repetition."
+  }
+}
