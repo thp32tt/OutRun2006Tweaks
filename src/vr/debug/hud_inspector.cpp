@@ -130,8 +130,48 @@ namespace OutRunVRHudInspector
                 return;
 
             const std::uint32_t returnRva = ToExeRva(returnAddress);
-            const std::uint32_t callRva =
+            const std::uint32_t leafCallRva =
                 returnRva >= 5 ? returnRva - 5 : returnRva;
+            std::uint32_t callRva = leafCallRva;
+            auto semantic = SemanticIdentityVerified
+                ? OutRunVRHudSemantics::ClassifyCaller(callRva)
+                : OutRunVRHudSemantics::UnknownInfo();
+
+            // The inline put_sprite hooks are reached through common EXE sprite
+            // wrappers, so _ReturnAddress() alone often resolves only to
+            // 0x02xxxx helper code instead of DispRank/REV/TimeAttack/etc.
+            // Walk the current stack and promote the first verified EXE caller
+            // that lands inside the UIScaling-derived semantic ranges. This
+            // turns the original mod's reverse-engineered HUD addresses into
+            // runtime evidence instead of leaving every row UNKNOWN.
+            if (SemanticIdentityVerified &&
+                semantic.space == OutRunVRHudSemantics::SpacePolicy::Unknown)
+            {
+                void* frames[24]{};
+                const USHORT frameCount = RtlCaptureStackBackTrace(
+                    0, static_cast<DWORD>(std::size(frames)),
+                    frames, nullptr);
+                for (USHORT depth = 0; depth < frameCount; ++depth)
+                {
+                    const std::uint32_t frameReturnRva =
+                        ToExeRva(frames[depth]);
+                    if (!frameReturnRva)
+                        continue;
+                    const std::uint32_t candidateRva =
+                        frameReturnRva >= 5
+                        ? frameReturnRva - 5
+                        : frameReturnRva;
+                    const auto candidate =
+                        OutRunVRHudSemantics::ClassifyCaller(candidateRva);
+                    if (candidate.space ==
+                        OutRunVRHudSemantics::SpacePolicy::Unknown)
+                        continue;
+                    callRva = candidateRva;
+                    semantic = candidate;
+                    break;
+                }
+            }
+
             const int mode = CurrentMode();
             const int stage = CurrentStage();
             const std::uint64_t key =
@@ -141,10 +181,6 @@ namespace OutRunVRHudInspector
             std::uint32_t count = 0;
             if (!ShouldWrite(key, count))
                 return;
-
-            const auto semantic = SemanticIdentityVerified
-                ? OutRunVRHudSemantics::ClassifyCaller(callRva)
-                : OutRunVRHudSemantics::UnknownInfo();
 
             TraceFile
                 << (GetTickCount64() - StartMs) << ','
@@ -383,7 +419,7 @@ namespace OutRunVRHudInspector
 
                 InspectorActive.store(true, std::memory_order_release);
                 spdlog::info(
-                    "VR HUD INSPECTOR: semantic HUD tracing active; semantic labels are gated by verified reference-EXE identity; context-aware rate limiting and durable row flush enabled; output=OutRun2006Tweaks-hudtrace.csv + OutRun2006Tweaks-xstmap.csv");
+                    "VR HUD INSPECTOR: semantic HUD tracing active; verified EXE callers are stack-resolved through UIScaling-derived ranges before UNKNOWN fallback; context-aware rate limiting and durable row flush enabled; output=OutRun2006Tweaks-hudtrace.csv + OutRun2006Tweaks-xstmap.csv");
                 return true;
             }
 
