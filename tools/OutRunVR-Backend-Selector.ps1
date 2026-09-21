@@ -134,7 +134,7 @@ $title.Location = New-Object System.Drawing.Point(66,18)
 $form.Controls.Add($title)
 
 $hint = New-Object System.Windows.Forms.Label
-$hint.Text = "일반 확인은 CORRECTNESS. 성능 비교는 A_BASELINE -> B_CULLING -> C_CULLING_NO_SSAA -> D_CULLING_NO_SSAA_R512 순서."
+$hint.Text = "현재 우선순위: HUD_SCREEN -> HUD_MENU -> HUD_WORLD. 성능 A~D 비교는 표시 오류 정리 후 사용."
 $hint.Font = New-Object System.Drawing.Font("Segoe UI",9)
 $hint.AutoSize = $false
 $hint.Size = New-Object System.Drawing.Size(440,40)
@@ -152,6 +152,9 @@ $profileBox = New-Object System.Windows.Forms.ComboBox
 $profileBox.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
 $profileBox.Size = New-Object System.Drawing.Size(320,32)
 $profileBox.Location = New-Object System.Drawing.Point(145,96)
+[void]$profileBox.Items.Add("HUD_SCREEN")
+[void]$profileBox.Items.Add("HUD_MENU")
+[void]$profileBox.Items.Add("HUD_WORLD")
 [void]$profileBox.Items.Add("CORRECTNESS")
 [void]$profileBox.Items.Add("A_BASELINE")
 [void]$profileBox.Items.Add("B_CULLING")
@@ -167,7 +170,7 @@ $profileBox.SelectedIndex = $idx
 $form.Controls.Add($profileBox)
 
 $profileHelp = New-Object System.Windows.Forms.Label
-$profileHelp.Text = "A=현 설정  |  B=stage culling ON  |  C=B+SSAA OFF  |  D=C+reflection 512"
+$profileHelp.Text = "HUD_SCREEN=게임 HUD | HUD_MENU=메뉴/YES-NO/리센터 | HUD_WORLD=차량위 마커/효과/파티클"
 $profileHelp.Font = New-Object System.Drawing.Font("Segoe UI",8.5)
 $profileHelp.AutoSize = $true
 $profileHelp.Location = New-Object System.Drawing.Point(42,132)
@@ -230,7 +233,7 @@ foreach ($b in $legacyButtons) {
 }
 
 $runBtn = New-Object System.Windows.Forms.Button
-$runBtn.Text = "선택한 Profile로 테스트 실행"
+$runBtn.Text = "선택한 HUD/테스트 Profile 실행"
 $runBtn.Size = New-Object System.Drawing.Size(430,66)
 $runBtn.Location = New-Object System.Drawing.Point(44,420)
 $runBtn.Font = New-Object System.Drawing.Font("Segoe UI",11,[System.Drawing.FontStyle]::Bold)
