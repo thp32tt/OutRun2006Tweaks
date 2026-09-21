@@ -25,6 +25,7 @@
 
 #include "vr_shared.hpp"
 #include "stereo_shader.hpp"
+#include "fsr1_shader.hpp"
 
 namespace
 {
@@ -382,7 +383,9 @@ namespace
     class SharedWriter
     {
     public:
-        explicit SharedWriter(const LUID& adapterLuid) : adapterLuid_(adapterLuid)
+        explicit SharedWriter(const LUID& adapterLuid, float transportScale = 1.0f)
+            : adapterLuid_(adapterLuid),
+              transportScale_(std::clamp(transportScale, 0.5f, 1.0f))
         {
             mapping_ = CreateFileMappingW(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0,
                 static_cast<DWORD>(sizeof(OutRunVR::SharedPoseState)), OutRunVR::SharedMemoryName);
@@ -567,8 +570,12 @@ namespace
             state_->reserved[OutRunVR::HostReferenceSpaceGenerationIndex] = referenceGeneration_;
             for (std::uint32_t eye = 0; eye < 2; ++eye)
             {
-                state_->recommendedWidth[eye] = configs[eye].recommendedImageRectWidth;
-                state_->recommendedHeight[eye] = configs[eye].recommendedImageRectHeight;
+                state_->recommendedWidth[eye] =
+                    (std::max)(1u, static_cast<std::uint32_t>(std::lround(
+                        configs[eye].recommendedImageRectWidth * transportScale_)));
+                state_->recommendedHeight[eye] =
+                    (std::max)(1u, static_cast<std::uint32_t>(std::lround(
+                        configs[eye].recommendedImageRectHeight * transportScale_)));
                 if (eye < viewCount)
                 {
                     state_->eyeFov[eye] = {
@@ -651,6 +658,7 @@ namespace
         bool owns_ = false;
         std::uint32_t referenceGeneration_ = 1;
         LUID adapterLuid_{};
+        float transportScale_ = 1.0f;
         std::uint32_t interopVerifiedToken_ = 0;
         bool interopVerifiedLogged_ = false;
     };
@@ -1001,12 +1009,13 @@ namespace
             HWND hwnd, const std::array<XrViewConfigurationView, 2>& configs,
             bool directTransportEnabled, bool directTransportOnly,
             bool disableDesktopDuplication, float renderScale,
-            float sharpening)
+            float sharpening, float fsrSharpness)
             : session_(session), device_(device), context_(context), hwnd_(hwnd), configs_(configs),
               directTransportEnabled_(directTransportEnabled),
               directTransportOnly_(directTransportOnly),
               disableDesktopDuplication_(disableDesktopDuplication), renderScale_(renderScale),
-              sharpening_(sharpening)
+              sharpening_(sharpening),
+              fsrSharpness_(std::clamp(fsrSharpness, 0.0f, 1.0f))
         {
             device_->AddRef();
             context_->AddRef();
@@ -2159,6 +2168,7 @@ namespace
         bool directCopyFenceFailureLogged_ = false;
         float renderScale_ = 1.0f;
         float sharpening_ = 0.0f;
+        float fsrSharpness_ = 0.0f;
 
         ID3D11VertexShader* vs_ = nullptr;
         ID3D11VertexShader* menuVs_ = nullptr;
@@ -2210,6 +2220,34 @@ namespace
                 if (std::isfinite(v)) scale = v;
             }
         return std::clamp(scale, 0.5f, 2.0f);
+    }
+
+    float ReadTransportScale()
+    {
+        char env[64]{};
+        const DWORD n = GetEnvironmentVariableA(
+            "OUTRUN_VR_DIRECT_TRANSPORT_SCALE", env, sizeof(env));
+        if (n == 0 || n >= sizeof(env))
+            return 1.0f;
+        char* end = nullptr;
+        const float value = std::strtof(env, &end);
+        if (end == env || !std::isfinite(value))
+            return 1.0f;
+        return std::clamp(value, 0.5f, 1.0f);
+    }
+
+    float ReadFsr1Sharpness()
+    {
+        char env[64]{};
+        const DWORD n = GetEnvironmentVariableA(
+            "OUTRUN_VR_FSR1_SHARPNESS", env, sizeof(env));
+        if (n == 0 || n >= sizeof(env))
+            return 0.0f;
+        char* end = nullptr;
+        const float value = std::strtof(env, &end);
+        if (end == env || !std::isfinite(value))
+            return 0.0f;
+        return std::clamp(value, 0.0f, 1.0f);
     }
 
     float ReadSharpening()
@@ -2374,6 +2412,8 @@ int main(int argc, char** argv)
         ParseRuntimeOverride(argc, argv);
         const float renderScale = ReadRenderScale(argc, argv);
         const float sharpening = ReadSharpening();
+        const float transportScale = ReadTransportScale();
+        const float fsrSharpness = ReadFsr1Sharpness();
         const bool directTransportEnabled = DirectTransportEnabled();
         const bool directTransportOnly =
             directTransportEnabled && DirectTransportOnly();
@@ -2452,7 +2492,7 @@ int main(int argc, char** argv)
             "xrEnumerateViewConfigurationViews list");
         std::array<XrViewConfigurationView, 2> configs{ cv[0], cv[1] };
 
-        SharedWriter shared(req.adapterLuid);RenderFrameReader renderFrames;StereoCompositor compositor(session,d3d.device,d3d.context,gameWindow,configs,directTransportEnabled,directTransportOnly,disableDesktopDuplication,renderScale,sharpening);compositor.Initialize();ViewHistory viewHistory;HostTimings timings;
+        SharedWriter shared(req.adapterLuid, transportScale);RenderFrameReader renderFrames;StereoCompositor compositor(session,d3d.device,d3d.context,gameWindow,configs,directTransportEnabled,directTransportOnly,disableDesktopDuplication,renderScale,sharpening,fsrSharpness);compositor.Initialize();ViewHistory viewHistory;HostTimings timings;
         const XrEnvironmentBlendMode blend = ChooseBlendMode(instance, system);
 
         bool running = false, quit = false, exitRequested = false;
