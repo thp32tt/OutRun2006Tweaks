@@ -5,6 +5,7 @@ on:
   push:
     branches: [ vr-d3d9ex-focus ]
     paths:
+      - 'AGENTS.md'
       - 'docs/VR_AUTODEV_PROTOCOL.md'
       - 'docs/VR_AUTODEV_STATE.json'
       - 'docs/VR_WORK_QUEUE.json'
@@ -14,6 +15,7 @@ on:
       - 'docs/automation/**'
       - 'tools/Test-VRAutodevCoordination.ps1'
       - 'tools/Test-VRRegressionKnowledge.ps1'
+      - 'tools/Test-VRProductionLedger.ps1'
       - '.github/workflows/vr-autodev-coordination.yml'
       - '.github/workflows/vr-dx9ex-active.yml'
 
