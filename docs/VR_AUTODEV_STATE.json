@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-21T18:15:00Z",
+  "updatedUtc": "2026-09-21T18:24:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -338,7 +338,7 @@
     "onWriteFailure": "PUSH_PENDING_OR_CAPABILITY_BLOCKED"
   },
   "binaryContractGate": {
-    "status": "CANDIDATE_STRICT_VALIDATION_PENDING",
+    "status": "BUILD_VERIFIED",
     "canonicalSource": "emoose/OutRun2006Tweaks release v0.1 OR2006C2C.EXE",
     "manifest": "docs/VR_BINARY_CONTRACT.json",
     "verifier": "tools/verify_vr_binary_contract.py",
@@ -347,6 +347,17 @@
     "exeCommittedToRepo": false,
     "canonicalSha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
     "imageBase": "0x00400000",
-    "discoveryRunId": 35636970665
+    "discoveryRunId": 35636970665,
+    "validationRunId": 35637181469,
+    "validationSha": "c1cb4def3ecfefb23084401d7961b6d658620388",
+    "validation": {
+      "policy": "success",
+      "strictCanonicalExeContract": "success",
+      "hostBuild": "success",
+      "noHmdHostSmokes": "8/8 success",
+      "gameWin32Build": "success",
+      "package": "success"
+    },
+    "runtimeCrashSidecar": "compile/package verified; observe on next real crash, no synthetic crash required"
   }
 }
