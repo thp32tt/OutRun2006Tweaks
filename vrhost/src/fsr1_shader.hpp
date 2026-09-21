@@ -2,7 +2,8 @@
 
 // FSR 1 EASU/RCAS adaptation for the OutRun D3D11 OpenXR host.
 // Based on AMD FidelityFX Super Resolution 1 reference concepts and the
-// NFSHeatVR adaptation. AMD FidelityFX FSR is MIT licensed.
+// NFSHeatVR adaptation. See ../FSR1_THIRD_PARTY_NOTICES.txt for preserved
+// MIT copyright and permission notices.
 //
 // This POC deliberately applies FSR only to the DirectGPU eye transport.
 // OpenXR projection swapchains remain at the runtime-recommended size.
