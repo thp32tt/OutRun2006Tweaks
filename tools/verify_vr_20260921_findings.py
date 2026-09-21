@@ -113,6 +113,14 @@ def main() -> int:
     ])
     require("tools/analyze_outrun_exe.py", [
         '0x02D0C0: "put_sprite_ex2"',
+        '0x060900, 0x061100, "ctrl_icon_work", "HUD_CTRL_ICON"',
+        '0x0BBA00, 0x0BBC00, "DispTempHeartNum", "HUD_TEMP_HEART"',
+    ])
+    require("src/vr/hud_semantics.hpp", [
+        '"HUD_CTRL_ICON"',
+        '"HUD_TEMP_HEART"',
+        "0x060D40",
+        "0x0BBA89",
     ])
     require("tools/Run-OutRunVRTest.ps1", [
         "LaunchConfigSha256",
