@@ -462,7 +462,7 @@ require(
     "vrhost/src/main_r23.cpp",
     "StereoIntentEpoch(latestPublication)",
     "SameStereoIntentEpoch(",
-    "stereo-disabled-source-barrier",
+    "missing-stereo-intent-epoch",
 )
 
 # R41 DirectGPU latency invariant: the newest complete slot is the only frame
