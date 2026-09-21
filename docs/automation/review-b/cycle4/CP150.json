@@ -1,0 +1,22 @@
+{
+  "cycle": "B4-carried-plus-postreview",
+  "target_sha": "265504f6ea28c5e97908e450a460661ed5ad37f1",
+  "checkpoint": "CP150",
+  "valid_units": 150,
+  "carried_forward_units": 150,
+  "new_general_units": 0,
+  "invalidated_units": 0,
+  "outside_latest_delta_units": 150,
+  "cross_subsystem_units": 46,
+  "adversarial_falsification_units": 94,
+  "distinct_function_or_paths": 79,
+  "existing_finding_revalidation_units": 30,
+  "ledger": "docs/automation/review-b/ledger-20260921-cycle4-carried.tsv",
+  "carry_source": "docs/automation/review-b/ledger-20260921-cycle3-expanded.tsv",
+  "carry_reason": "integration target SHA unchanged; dependency/content identities unchanged; exact evidence blob reused byte-for-byte",
+  "post_review_candidate": "a6c688ab6ef2f41f1b0f0c64ded12c81d95619a9",
+  "post_review_base": "265504f6ea28c5e97908e450a460661ed5ad37f1",
+  "post_review_verdict": "PASS",
+  "post_review_record": "docs/automation/review-b/post-review-a6c688ab-20260921.md",
+  "status": "COMPLETE"
+}
