@@ -488,4 +488,64 @@ require("src/vr/core/transport.hpp", "class IFrameProducer", "class IFrameConsum
 require("src/vr/game/game_adapter.hpp", "class IGameAdapter", "latchRenderPose", "buildStereoMatrices")
 require("src/vr/d3d9/stereo_backend.hpp", "class IStereoBackend", "drawWorldStereo", "drawScreenSpaceStereo")
 
+# DirectGPU final projection ownership includes xrReleaseSwapchainImage. A
+# successfully rendered but unreleased image is not a committed final layer.
+direct_release = require(
+    "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp",
+    "DirectProjectionReleaseFailures",
+    "DirectProjectionReleaseQuarantined",
+    "const bool released = Release(Projection);",
+    "if (!released)",
+    "return false;",
+    "!DirectProjectionReleaseQuarantined &&",
+    "!OutRunVrSbsCaptureOverride::Projection.acquired",
+    "!OutRunVrSbsCaptureOverride::Projection.waited",
+)
+render_begin = direct_release.find("inline bool RenderSafeProjection(")
+render_end = direct_release.find("inline void ObserveCaptureFreshness", render_begin)
+if render_begin < 0 or render_end < 0:
+    raise SystemExit("DirectGPU RenderSafeProjection boundary missing")
+render_release = direct_release[render_begin:render_end]
+release_pos = render_release.find("const bool released = Release(Projection);")
+projection_patch_pos = render_release.find("projection = *incoming;")
+if release_pos < 0 or projection_patch_pos < 0 or release_pos >= projection_patch_pos:
+    raise SystemExit("DirectGPU projection is promoted before successful release")
+if "Release(Projection);\n        if (!ok)" in render_release:
+    raise SystemExit("DirectGPU release result is ignored again")
+
+end_begin = direct_release.find("inline XrResult XRAPI_CALL EndFrame(")
+end_end = direct_release.find("inline XrResult XRAPI_CALL DestroySession", end_begin)
+if end_begin < 0 or end_end < 0:
+    raise SystemExit("DirectGPU EndFrame boundary missing")
+end_release = direct_release[end_begin:end_end]
+if "const bool directCandidate = !DirectProjectionReleaseQuarantined &&" not in end_release:
+    raise SystemExit("DirectGPU release-failure quarantine is not gating final owner")
+if end_release.find("OutRunVrSbsCaptureOverride::EndFrame(session, endInfo)") < 0:
+    raise SystemExit("DirectGPU quarantine has no fallback recovery owner")
+
+# Deterministic owner-state model:
+# failed direct release => no final DirectGPU commit and next frame cannot enter
+# DirectGPU until fallback successfully releases the retained image.
+_quarantined = False
+_projection_acquired = True
+_projection_waited = True
+_release_ok = False
+_direct_committed = _release_ok
+if not _release_ok:
+    _quarantined = True
+if _direct_committed or not _quarantined:
+    raise SystemExit("DirectGPU failed-release model incorrectly committed")
+
+_next_direct_candidate = not _quarantined
+if _next_direct_candidate:
+    raise SystemExit("DirectGPU rerendered a still-acquired release-failed image")
+
+# Fallback owns recovery. Only real released ownership clears quarantine.
+_projection_acquired = False
+_projection_waited = False
+if _quarantined and not _projection_acquired and not _projection_waited:
+    _quarantined = False
+if _quarantined:
+    raise SystemExit("DirectGPU quarantine did not clear after fallback ownership recovery")
+
 print("VR reconstructed R23/R25 architecture boundary verification passed")
