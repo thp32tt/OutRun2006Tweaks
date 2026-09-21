@@ -2527,7 +2527,7 @@ int main(int argc, char** argv)
                     }
                     if (directHistoryBlocked)
                         candidateRejectReason =
-                            "stereo-disabled-source-barrier";
+                            "missing-stereo-intent-epoch";
                     else if (!have)
                         candidateRejectReason = "no-frame-state";
                     else if ((before.flags & OutRunVR::RenderFramePresentInFlight) != 0)
