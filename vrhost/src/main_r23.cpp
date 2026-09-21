@@ -2338,7 +2338,7 @@ int main(int argc, char** argv)
                                     StereoIntentEpoch(latestPublication);
                             directHistoryBlocked =
                                 !OutRunVR::DirectHistoryPolicy::
-                                    LatestPublicationAllowsHistory(
+                                    LatestPublicationDefinesHistoryEpoch(
                                         latestPublication);
 
                             // A newer stereo-intent epoch makes unprocessed
