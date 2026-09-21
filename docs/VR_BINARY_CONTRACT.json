@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "canonicalExe": {
+    "name": "OR2006C2C.EXE",
+    "provenance": "emoose/OutRun2006Tweaks release v0.1; same replacement EXE URL used by upstream .github/workflows/build.yml",
+    "sourceUrl": "https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.1/OR2006C2C.EXE",
+    "sha256": "DISCOVER",
+    "machine": "x86",
+    "imageBase": "DISCOVER",
+    "repositoryPolicy": "Do not commit the EXE. Download it transiently in CI and verify the pinned identity before using disassembly evidence."
+  },
+  "contracts": [
+    {
+      "id": "VR-EXE-HUD-SPRITENODE-QUEUE-ENTER",
+      "rva": "0x0002D734",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "DISCOVER",
+      "purpose": "Canonical SpriteNode render-queue entry recovered from original executable analysis.",
+      "sourceBindings": []
+    },
+    {
+      "id": "VR-EXE-HUD-SPRITENODE-NODE-RENDER",
+      "rva": "0x0002D762",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "DISCOVER",
+      "purpose": "Canonical SpriteNode node-render point used to distinguish screen HUD from broad draw heuristics.",
+      "sourceBindings": []
+    },
+    {
+      "id": "VR-EXE-HUD-SPRITENODE-QUEUE-EXIT",
+      "rva": "0x0002DCB4",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "DISCOVER",
+      "purpose": "Canonical SpriteNode render-queue exit.",
+      "sourceBindings": []
+    },
+    {
+      "id": "VR-EXE-UI-D3DX-MATRIX-TRANSFORM2D",
+      "rva": "0x00039400",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "DISCOVER",
+      "purpose": "Original-mod UI scaling inline-hook target.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "D3DXMatrixTransformation2D_Addr = 0x39400"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-UI-DRAW-SPRITE-MATRIX-MID",
+      "rva": "0x0002A556",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "DISCOVER",
+      "purpose": "Original-mod sprite vertex stream mid-hook target.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "draw_sprite_custom_matrix_mid_Addr = 0x2A556"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-UI-CALC3D2D",
+      "rva": "0x00049940",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "DISCOVER",
+      "purpose": "Original-mod 3D-to-2D projection hook used by world-attached marker handling.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "Calc3D2D_Addr = 0x49940"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-RIVAL-RANK-TRUNCATE",
+      "rva": "0x000BB046",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "DISCOVER",
+      "purpose": "Rival rank marker truncation anchor in sub_4BAD20.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "RankMarker_Truncate = 0xBB046"
+        }
+      ]
+    }
+  ]
+}
