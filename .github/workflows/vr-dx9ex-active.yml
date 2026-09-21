@@ -6,6 +6,9 @@ permissions:
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - vr-d3d9ex-focus
   push:
     branches:
       - vr-d3d9ex-focus
