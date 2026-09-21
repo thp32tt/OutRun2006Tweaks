@@ -1,0 +1,1 @@
+{"cycle":"20260921-A1","checkpoint":"CP60","valid_units":60,"target_sha":"b159cc66ca1ed6f25f7a2c7640a246ee1d0b489a","coverage":"Classic capture correlation, Frame.v2 history selection, QPC skew bounds, exact-frame mutation checks, desktop fallback authority"}
