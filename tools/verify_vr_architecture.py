@@ -279,6 +279,29 @@ require(
     "MarkSafetyOverlayInstalled",
 )
 
+# CORRECTNESS is the conservative runtime-isolation baseline used to
+# distinguish renderer/startup regressions from cadence/performance changes.
+# Keep the executable profile and its dedicated policy verifier mutually bound.
+correctness_profiles = require(
+    "tools/OutRunVR-TestProfiles.ps1",
+    "Name='CORRECTNESS'",
+    "'-FramerateLimit=60'",
+    "'-FramerateFastLoad=0'",
+    "'-FramerateInterpolation=false'",
+    "'-FramerateUnlockExperimental=false'",
+    "'-FrameCadenceMode=0'",
+    "'-DisableDesktopVsync=false'",
+)
+correctness_policy = require(
+    "tools/Test-OutRunVRTestPolicy.ps1",
+    "CORRECTNESS must remain a conservative 60 Hz isolation baseline",
+    "CORRECTNESS must disable FastLoad",
+    "CORRECTNESS must disable interpolation",
+    "CORRECTNESS must disable experimental framerate unlock",
+    "CORRECTNESS must disable phase-lock cadence",
+    "CORRECTNESS must preserve desktop VSync",
+)
+
 # Async installer status must be publishable back to the hook overlay/UI.
 require(
     "src/hook_mgr.hpp",
