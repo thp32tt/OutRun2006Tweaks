@@ -7,6 +7,7 @@
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "game_addrs.hpp"
+#include "vr/game/render_semantics.hpp"
 
 namespace Settings
 {
@@ -78,6 +79,12 @@ class FixParticleRendering : public Hook
 	inline static SafetyHookMid midhook{};
 	static void destination(SafetyHookContext& ctx)
 	{
+		// This hook sits inside the original particle renderer immediately before
+		// the particle geometry path. Mark the next top-level D3D draw as a world
+		// particle; stereo code still requires the verified world-WVP gate.
+		OutRunVR::GameSemantic::ArmNextDraw(
+			OutRunVR::GameSemantic::RenderScope::WorldParticle);
+
 		float ptcl_size;
 		__asm
 		{
