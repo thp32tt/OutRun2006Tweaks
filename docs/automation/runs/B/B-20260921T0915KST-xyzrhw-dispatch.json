@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "role": "B",
+  "runId": "B-20260921T0915KST-xyzrhw-dispatch",
+  "startedKst": "2026-09-21T09:15:12+09:00",
+  "baseSha": "e5e35f483cf7f8d36f99a87807ba6cb9d4b7eccd",
+  "findingIds": ["DX9EX-DISPATCH-XYZRHW-001"],
+  "candidateBranch": "vr-d3d9ex-candidate/DX9EX-DISPATCH-XYZRHW-001-B-20260921T0915KST",
+  "candidateSha": "8cca78df85fef21a38e66f20fcf9ae867c4779cb",
+  "changedPaths": ["src/vr/d3d9/stereo_renderer_r34.cpp"],
+  "implementation": "Restore the bounded R30 XYZRHW handlers at the final R34 draw boundary. Each of the four final draw wrappers tries its matching R30TryXyzrhw* handler first and treats every result other than E_NOTIMPL as handled; only an explicit E_NOTIMPL falls through to the unchanged R33 owner. The attempt remains inside R34GuardStereoRasterState so viewport/scissor replay protection still encloses the XYZRHW stereo path. This preserves exact single-draw ownership and prevents R33 from drawing a second time after an R30 handled result.",
+  "evidenceLevel": "IMPLEMENTED_NEEDS_VALIDATION",
+  "ci": {
+    "workflow": "DX9Ex Active Validation",
+    "runId": 35547178134,
+    "status": "in_progress",
+    "headSha": "8cca78df85fef21a38e66f20fcf9ae867c4779cb",
+    "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/35547178134"
+  },
+  "testLevel": "LEVEL0",
+  "runtimeCandidate": true,
+  "status": "NEEDS_VALIDATION",
+  "retryCount": 0,
+  "blockers": ["C must validate the immutable source SHA and CI result before D integration.", "Quest 3/VDXR runtime evidence remains required before claiming white HUD/rank/score or smoke/skid/decal visual symptoms fixed."],
+  "nextAction": "C: validate candidate SHA 8cca78df85fef21a38e66f20fcf9ae867c4779cb, including Windows compile, policy/package gates, exact E_NOTIMPL handled/fallback semantics, and confirmation that all four final R34 draw forms reach their matching R30 XYZRHW path without double draw. If successful, mark VALIDATED but retain NEED_HMD_TEST for visual conclusions.",
+  "slotUtilization": {
+    "subBatches": ["recovered COMPLETE A handoff", "verified integration base SHA unchanged", "traced R33 final fallback bypass", "implemented isolated R34 final-boundary dispatch restoration", "confirmed candidate CI auto-trigger"],
+    "fallbackStagesAttempted": ["primary READY B queue"],
+    "earlyFinishReason": "Stopped after publishing the highest-priority runtime candidate because CI validation belongs to C and the next READY runtime fix would increase concurrent unvalidated runtime WIP before this high-risk dispatch change is compiled."
+  }
+}
