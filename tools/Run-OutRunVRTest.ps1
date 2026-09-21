@@ -34,6 +34,7 @@ if(!$backend){throw 'Active backend identity is missing.'}
 
 $patterns=@(
     'OutRun2006Tweaks*.log',
+    'OutRun2006Tweaks-hudtrace*.csv',
     'outrun-vr-host*.log',
     'outrun-vr-host-pipeline*.log',
     'outrun-vr-watchdog*.log',
@@ -98,6 +99,10 @@ if($backend -eq 'd3d9'){
     }
 }
 
+if($backend -ne '2d'){
+    $gameArgs += '-HudInspector=true'
+}
+
 $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)
 New-Item -ItemType Directory -Force $sessionRoot|Out-Null
 @(
@@ -115,6 +120,7 @@ $oldVkDebug = $env:VK_LOADER_DEBUG
 $oldVrForceDisabled = $env:OUTRUN_VR_FORCE_DISABLED
 $oldTestProfile = $env:OUTRUN_VR_TEST_PROFILE
 $oldPerformanceProfile = $env:OUTRUN_VR_PERFORMANCE_PROFILE
+$oldShaderFingerprint = $env:OUTRUN_VR_SHADER_FINGERPRINT
 $identityKeys = @(
     'OUTRUN_VR_SESSION_ID',
     'OUTRUN_VR_VARIANT_ID',
@@ -143,6 +149,12 @@ if($backend -eq '2d'){
     $env:OUTRUN_VR_FORCE_DISABLED=$null
 }
 
+if($backend -ne '2d'){
+    $env:OUTRUN_VR_SHADER_FINGERPRINT='1'
+}else{
+    $env:OUTRUN_VR_SHADER_FINGERPRINT=$null
+}
+
 foreach($entry in $profile.Environment.GetEnumerator()){
     Set-Item -Path ("Env:" + $entry.Key) -Value ([string]$entry.Value)
 }
@@ -166,6 +178,7 @@ try{
     $env:OUTRUN_VR_FORCE_DISABLED=$oldVrForceDisabled
     $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
     $env:OUTRUN_VR_PERFORMANCE_PROFILE=$oldPerformanceProfile
+    $env:OUTRUN_VR_SHADER_FINGERPRINT=$oldShaderFingerprint
     foreach($key in $identityKeys){
         [Environment]::SetEnvironmentVariable($key,$oldIdentity[$key],'Process')
     }
