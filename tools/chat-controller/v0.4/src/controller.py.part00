@@ -195,7 +195,7 @@ def load_registry(now: datetime) -> Registry:
     except Exception:
         log.exception("registry read failed; recreating")
         reg = new_registry(now)
-    if reg.logical_date != logical_date(now) or len(reg.slots) != CHAT_SLOTS:
+    if reg.logical_date != logical_date(now):
         archive = STATE_DIR / f"chat_registry_{reg.logical_date}.json"
         try:
             if REGISTRY_FILE.exists():
@@ -205,6 +205,17 @@ def load_registry(now: datetime) -> Registry:
         reg = new_registry(now)
         save_registry(reg)
         log.info("daily chat generation rolled over: %s", reg.logical_date)
+    elif len(reg.slots) != CHAT_SLOTS:
+        # Resize without discarding progress: preserve A..N existing slot state.
+        old_len = len(reg.slots)
+        if CHAT_SLOTS < old_len:
+            reg.slots = reg.slots[:CHAT_SLOTS]
+        else:
+            for i in range(old_len, CHAT_SLOTS):
+                reg.slots.append(Slot(name=chr(ord('A') + i)))
+        reg.next_slot = reg.next_slot % CHAT_SLOTS
+        save_registry(reg)
+        log.info("resized chat slots from %s to %s while preserving state", old_len, CHAT_SLOTS)
     return reg
 
 
