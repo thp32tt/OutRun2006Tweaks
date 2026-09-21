@@ -1,0 +1,12 @@
+{
+  "cycle":"B3-expanded",
+  "target_sha":"265504f6ea28c5e97908e450a460661ed5ad37f1",
+  "checkpoint":"CP30",
+  "valid_units":30,
+  "carried_forward_units":20,
+  "new_units_this_run":10,
+  "invalidated_units":0,
+  "ledger":"docs/automation/review-b/ledger-20260921-cycle3-expanded.tsv",
+  "notable":"B-XR-WAIT-ROUTING-001 falsified: vrhost/CMakeLists.txt forces bounded_swapchain_wait.hpp before sbs_capture_override.hpp; SBS undefines xrEndFrame/xrDestroySession only, so xrWaitSwapchainImage remains macro-routed to bounded wrapper.",
+  "status":"PARTIAL_CONTINUE"
+}
