@@ -488,4 +488,28 @@ require("src/vr/core/transport.hpp", "class IFrameProducer", "class IFrameConsum
 require("src/vr/game/game_adapter.hpp", "class IGameAdapter", "latchRenderPose", "buildStereoMatrices")
 require("src/vr/d3d9/stereo_backend.hpp", "class IStereoBackend", "drawWorldStereo", "drawScreenSpaceStereo")
 
+# FixBinkLargeMovies is a two-part executable transaction: the raw NOP+RET
+# body is invalid without its replacement mid-hook. A failed hook install must
+# restore the exact bytes captured by TogglePatch before apply() reports false.
+bugfix_source = text("src/hooks_bugfixes.cpp")
+if "class FixBinkLargeMovies" not in bugfix_source:
+    raise SystemExit("FixBinkLargeMovies missing")
+bink_section = bugfix_source.split("class FixBinkLargeMovies", 1)[1].split(
+    "class FixPegasusClopping", 1
+)[0]
+for marker in (
+    "static TogglePatch bodyPatch",
+    "bodyPatch.set(true);",
+    "auto replacementHook = safetyhook::create_mid(target, destination);",
+    "if (!replacementHook)",
+    "bodyPatch.set(false);",
+    "Sumo_BinkGetPow2 = std::move(replacementHook);",
+):
+    if marker not in bink_section:
+        raise SystemExit(f"Bink hook transaction invariant missing: {marker}")
+if bink_section.find("bodyPatch.set(false);") > bink_section.find("Sumo_BinkGetPow2 = std::move(replacementHook);"):
+    raise SystemExit("Bink rollback must precede replacement-hook publication")
+if "Memory::VP::Patch(Module::exe_ptr(Sumo_BinkGetPow2_Addr)" in bink_section:
+    raise SystemExit("Bink destructive patch bypasses reversible TogglePatch transaction")
+
 print("VR reconstructed R23/R25 architecture boundary verification passed")
