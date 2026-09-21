@@ -96,20 +96,62 @@ async def _thinking_menu_state(page: Page, aliases: list[str]):
     return {"slider": None, "option": None}
 
 
+async def collect_thinking_diagnostics(page: Page):
+    """Capture visible interactive controls so UI changes can be diagnosed from /status."""
+    rows = []
+    try:
+        loc = page.locator("button, [role='button'], [aria-haspopup]")
+        count = await loc.count()
+        for i in range(min(count, 120)):
+            item = loc.nth(i)
+            try:
+                if not await item.is_visible(timeout=80):
+                    continue
+                row = await item.evaluate("""el => ({
+                    tag: el.tagName,
+                    text: (el.innerText || '').trim().slice(0,120),
+                    aria: (el.getAttribute('aria-label') || '').slice(0,120),
+                    title: (el.getAttribute('title') || '').slice(0,120),
+                    testid: (el.getAttribute('data-testid') || '').slice(0,120),
+                    haspopup: (el.getAttribute('aria-haspopup') || '').slice(0,40),
+                    cls: (typeof el.className === 'string' ? el.className : '').slice(0,180)
+                })""")
+                hay = " ".join([
+                    row.get("text", ""), row.get("aria", ""), row.get("title", ""),
+                    row.get("testid", ""), row.get("haspopup", ""), row.get("cls", "")
+                ]).lower()
+                if any(k in hay for k in (
+                    "gpt", "model", "모델", "thinking", "reasoning", "생각",
+                    "instant", "medium", "high", "composer", "prompt"
+                )):
+                    rows.append(row)
+            except Exception:
+                continue
+    except Exception:
+        pass
+    return rows[:40]
+
+
 async def _candidate_thinking_controls(page: Page):
     selectors = [
         "form button.__composer-pill[aria-haspopup]",
         "form button[aria-haspopup='menu']",
         "form button[aria-haspopup='listbox']",
         "button[data-testid='model-switcher-dropdown-button']",
-        "button[data-testid*='model'][aria-haspopup]",
+        "button[data-testid*='model']",
         "button[aria-label*='thinking' i]",
         "button[aria-label*='reasoning' i]",
         "button[aria-label*='model' i]",
         "button[title*='thinking' i]",
         "button[title*='reasoning' i]",
         "button[title*='model' i]",
+        "button:has-text('GPT')",
+        "button:has-text('Thinking')",
+        "button:has-text('Reasoning')",
+        "button:has-text('High')",
+        "button:has-text('Medium')",
         "header button[aria-haspopup='menu']",
+        "header button",
     ]
 
     seen = set()
@@ -118,7 +160,6 @@ async def _candidate_thinking_controls(page: Page):
         try:
             loc = page.locator(sel)
             count = await loc.count()
-            # Prefer controls nearest the composer / later in DOM.
             for i in range(count - 1, -1, -1):
                 item = loc.nth(i)
                 try:
@@ -221,7 +262,12 @@ async def ensure_thinking_level(page: Page, requested: str = PREFERRED_THINKING_
 
     control, state = await open_thinking_control(page, aliases)
     if not control:
-        write_runtime(last_thinking_level_result=f"picker_not_found:{requested}")
+        diag = await collect_thinking_diagnostics(page)
+        write_runtime(
+            last_thinking_level_result=f"picker_not_found:{requested}",
+            thinking_diagnostics=diag,
+            current_url=page.url,
+        )
         return False
 
     slider = state.get("slider")
