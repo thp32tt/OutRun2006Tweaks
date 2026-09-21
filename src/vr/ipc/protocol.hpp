@@ -116,6 +116,12 @@ namespace OutRunVR
     // slots left behind when the host mapping survives a fast game restart.
     inline constexpr std::uint32_t RenderFrameRunGenerationIndex = 11;
 
+    // Runtime stereo-intent epoch. Incremented whenever the producer observes
+    // StereoWanted() change between enabled/disabled. Word 12 was unused; the
+    // Frame.v2 struct size/ABI remains unchanged. The host uses this epoch to
+    // reject producer-ahead descriptors from before an explicit disable/re-enable.
+    inline constexpr std::uint32_t RenderFrameStereoIntentEpochIndex = 12;
+
     enum StereoFailureReason : std::uint32_t
     {
         StereoFailureNone = 0,
