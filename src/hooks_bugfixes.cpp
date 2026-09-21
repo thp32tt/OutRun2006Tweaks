@@ -261,6 +261,9 @@ public:
 		auto replacementHook = safetyhook::create_mid(target, destination);
 		if (!replacementHook)
 		{
+			// Destroy any partially-owned SafetyHook state before restoring the
+			// executable bytes it may have touched.
+			replacementHook = {};
 			bodyPatch.set(false);
 			return false;
 		}
