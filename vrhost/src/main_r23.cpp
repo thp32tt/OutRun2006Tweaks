@@ -1148,10 +1148,26 @@ namespace
 
         std::uint32_t image = 0;
         c.Acquire(c.projection_, image);
-        bool ok = c.RenderTo(c.projection_.rtvs[image][0], c.projection_.width,
-            c.projection_.height, eyes[0], srv[0], fmt[0]);
-        ok = c.RenderTo(c.projection_.rtvs[image][1], c.projection_.width,
-            c.projection_.height, eyes[1], srv[1], fmt[1]) && ok;
+        const bool directFsrCandidate =
+            c.directFrameValid_ && R23DirectHold.valid &&
+            R23DirectHold.width > 0 && R23DirectHold.height > 0 &&
+            (R23DirectHold.width < c.projection_.width ||
+             R23DirectHold.height < c.projection_.height);
+
+        auto renderEye = [&](int eye) {
+            if (directFsrCandidate &&
+                c.RenderFsr1To(c.projection_.rtvs[image][eye],
+                    c.projection_.width, c.projection_.height,
+                    srv[eye], R23DirectHold.width, R23DirectHold.height,
+                    fmt[eye]))
+                return true;
+            return c.RenderTo(c.projection_.rtvs[image][eye],
+                c.projection_.width, c.projection_.height,
+                eyes[eye], srv[eye], fmt[eye]);
+        };
+
+        bool ok = renderEye(0);
+        ok = renderEye(1) && ok;
         if (ok) R23Pixels.ScheduleProjection(c, image);
         c.Release(c.projection_);
         if (!ok) return false;
@@ -1849,6 +1865,8 @@ int main(int argc, char** argv)
         ParseRuntimeOverride(argc, argv);
         const float renderScale = ReadRenderScale(argc, argv);
         const float sharpening = ReadSharpening();
+        const float transportScale = ReadTransportScale();
+        const float fsrSharpness = ReadFsr1Sharpness();
         const bool directTransportEnabled = DirectTransportEnabled();
         const bool directTransportOnly =
             directTransportEnabled && DirectTransportOnly();
@@ -1934,6 +1952,8 @@ int main(int argc, char** argv)
             << (directTransportEnabled ? 1 : 0)
             << " directOnly=" << (directTransportOnly ? 1 : 0)
             << " renderScale=" << renderScale
+            << " transportScale=" << transportScale
+            << " fsr1Sharpness=" << fsrSharpness
             << " sharpening=" << sharpening
             << " refreshOverrideHz=" << targetRefreshRateHz
             << " refreshPolicy="
@@ -1976,13 +1996,14 @@ int main(int argc, char** argv)
             "xrEnumerateViewConfigurationViews list");
         std::array<XrViewConfigurationView, 2> configs{ cv[0], cv[1] };
 
-        SharedWriter shared(req.adapterLuid);
+        SharedWriter shared(req.adapterLuid, transportScale);
         R35CadenceHost cadence(cadenceMode, cadenceTargetHz,
             cadenceMaxHz, cadenceTimeoutMs, targetRefreshRateHz);
         RenderFrameReader renderFrames;
         StereoCompositor compositor(session, d3d.device, d3d.context, gameWindow,
             configs, directTransportEnabled, directTransportOnly,
-            disableDesktopDuplication, renderScale, sharpening);
+            disableDesktopDuplication, renderScale, sharpening,
+            fsrSharpness);
         compositor.Initialize();
         ViewHistory viewHistory;
         HostTimings timings;
