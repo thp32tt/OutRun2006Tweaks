@@ -56,6 +56,7 @@ namespace OutRunVrR32DirectSubmit
         ID3D11Query* fence = nullptr;
         bool armed = false;
         bool flushIssued = false;
+        LARGE_INTEGER armedQpc{};
         OutRunVR::SharedRenderFrameState frame{};
     };
 
@@ -71,6 +72,10 @@ namespace OutRunVrR32DirectSubmit
     inline std::uint64_t AckFlushEscalations = 0;
     inline std::uint64_t AckQueryErrors = 0;
     inline std::uint64_t AckSameFramePendingReuse = 0;
+    inline std::uint64_t AckFenceLatencySamples = 0;
+    inline std::uint64_t AckFenceLatencyTotalUs = 0;
+    inline std::uint64_t AckFenceLatencyMaxUs = 0;
+    inline LARGE_INTEGER AckFenceFrequency{};
     inline std::array<std::uint64_t,
         static_cast<std::size_t>(FastRejectReason::Count)> RejectReasons{};
     inline std::uint32_t AckFaultGeneration = 0;
@@ -91,6 +96,9 @@ namespace OutRunVrR32DirectSubmit
         std::uint64_t flushEscalations = 0;
         std::uint64_t ackQueryError = 0;
         std::uint64_t sameFramePendingReuse = 0;
+        std::uint64_t ackFenceSamples = 0;
+        std::uint64_t ackFenceTotalUs = 0;
+        std::uint64_t ackFenceMaxUs = 0;
         std::array<std::uint64_t,
             static_cast<std::size_t>(FastRejectReason::Count)> rejectReasons{};
         std::uint64_t safeCacheHit = 0;
@@ -111,6 +119,7 @@ namespace OutRunVrR32DirectSubmit
             }
             pending.armed = false;
             pending.flushIssued = false;
+            pending.armedQpc = {};
             pending.frame = {};
         }
         AckedFrame.fill(0);
@@ -143,6 +152,25 @@ namespace OutRunVrR32DirectSubmit
             &desc, &pending.fence)) && pending.fence;
     }
 
+    inline void ObserveFenceLatency(PendingAck& pending) noexcept
+    {
+        if (pending.armedQpc.QuadPart == 0)
+            return;
+        if (AckFenceFrequency.QuadPart == 0)
+            QueryPerformanceFrequency(&AckFenceFrequency);
+        LARGE_INTEGER done{};
+        QueryPerformanceCounter(&done);
+        if (AckFenceFrequency.QuadPart <= 0 ||
+            done.QuadPart < pending.armedQpc.QuadPart)
+            return;
+        const std::uint64_t us = static_cast<std::uint64_t>(
+            (done.QuadPart - pending.armedQpc.QuadPart) * 1000000LL /
+            AckFenceFrequency.QuadPart);
+        ++AckFenceLatencySamples;
+        AckFenceLatencyTotalUs += us;
+        AckFenceLatencyMaxUs = (std::max)(AckFenceLatencyMaxUs, us);
+    }
+
     inline void PollCompletedAcks() noexcept
     {
         if (!OutRunVrFinalTest::Context)
@@ -173,6 +201,7 @@ namespace OutRunVrR32DirectSubmit
                 pending.fence = nullptr;
                 continue;
             }
+            ObserveFenceLatency(pending);
             const std::uint32_t completedGeneration =
                 pending.frame.reserved[
                     OutRunVR::RenderFrameDirectGenerationIndex];
@@ -279,6 +308,7 @@ namespace OutRunVrR32DirectSubmit
             return true;
 
         OutRunVrFinalTest::Context->End(pending.fence);
+        QueryPerformanceCounter(&pending.armedQpc);
         pending.frame = frame;
         pending.armed = true;
         pending.flushIssued = false;
@@ -360,6 +390,9 @@ namespace OutRunVrR32DirectSubmit
         Perf.flushEscalations = AckFlushEscalations;
         Perf.ackQueryError = AckQueryErrors;
         Perf.sameFramePendingReuse = AckSameFramePendingReuse;
+        Perf.ackFenceSamples = AckFenceLatencySamples;
+        Perf.ackFenceTotalUs = AckFenceLatencyTotalUs;
+        Perf.ackFenceMaxUs = AckFenceLatencyMaxUs;
         Perf.rejectReasons = RejectReasons;
         Perf.safeCacheHit = OutRunVrD3D9ExDirectPassthrough::R32SharedCacheHits;
         Perf.safeCacheMiss = OutRunVrD3D9ExDirectPassthrough::R32SharedCacheMisses;
@@ -390,6 +423,11 @@ namespace OutRunVrR32DirectSubmit
             << " ackQueryError=" << AckQueryErrors - Perf.ackQueryError
             << " sameFrameAckReuse="
             << AckSameFramePendingReuse - Perf.sameFramePendingReuse
+            << " ackFenceAvgMs="
+            << ((AckFenceLatencySamples - Perf.ackFenceSamples) ?
+                (double(AckFenceLatencyTotalUs - Perf.ackFenceTotalUs) /
+                 double(AckFenceLatencySamples - Perf.ackFenceSamples) / 1000.0) : 0.0)
+            << " ackFenceMaxMs=" << (double(AckFenceLatencyMaxUs) / 1000.0)
             << " rejectReason[projection="
             << RejectReasons[static_cast<std::size_t>(
                 FastRejectReason::ProjectionMismatch)] -
