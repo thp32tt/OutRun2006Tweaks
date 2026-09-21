@@ -1848,6 +1848,7 @@ int main(int argc, char** argv)
         SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
         ParseRuntimeOverride(argc, argv);
         const float renderScale = ReadRenderScale(argc, argv);
+        const float sharpening = ReadSharpening();
         const bool directTransportEnabled = DirectTransportEnabled();
         const bool directTransportOnly =
             directTransportEnabled && DirectTransportOnly();
@@ -1932,6 +1933,8 @@ int main(int argc, char** argv)
             << "VR transport: directEnabled="
             << (directTransportEnabled ? 1 : 0)
             << " directOnly=" << (directTransportOnly ? 1 : 0)
+            << " renderScale=" << renderScale
+            << " sharpening=" << sharpening
             << " refreshOverrideHz=" << targetRefreshRateHz
             << " refreshPolicy="
             << (targetRefreshRateHz > 0.0f ? "explicit-request" : "runtime-owned")
@@ -1979,7 +1982,7 @@ int main(int argc, char** argv)
         RenderFrameReader renderFrames;
         StereoCompositor compositor(session, d3d.device, d3d.context, gameWindow,
             configs, directTransportEnabled, directTransportOnly,
-            disableDesktopDuplication, renderScale);
+            disableDesktopDuplication, renderScale, sharpening);
         compositor.Initialize();
         ViewHistory viewHistory;
         HostTimings timings;
