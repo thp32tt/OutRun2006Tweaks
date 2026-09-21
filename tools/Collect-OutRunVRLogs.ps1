@@ -194,6 +194,42 @@ if(Test-Path $hudCsv){
         }
         $summary|Set-Content (Join-Path $dest 'HUD_TRACE_SUMMARY.txt') -Encoding UTF8
         $copied+='HUD_TRACE_SUMMARY.txt'
+
+        $candidates=@($groups | ForEach-Object {
+            $candidateClass=if($_.KnownArea -match 'RankMarker'){'RankMarker'}
+                elseif($_.Event -match 'Printf' -and $_.Text -match '(?i)score'){'ScoreText'}
+                elseif($_.Event -match 'Printf' -and $_.Text -match '(?i)(yes|no|quit|exit|retry)'){'DialogText'}
+                elseif($_.Event -match 'Printf' -and $_.Text -match '(?i)(rank|position|pos|%.*(st|nd|rd|th)|st|nd|rd|th)'){'PositionText'}
+                elseif($_.Event -match 'Printf'){'TextHud'}
+                elseif($_.KnownArea){'KnownSpriteArea'}
+                else{'SpriteCandidate'}
+            [pscustomobject]@{
+                CandidateClass=$candidateClass
+                Event=$_.Event
+                CallRva=$_.CallRva
+                KnownArea=$_.KnownArea
+                Mode=$_.Mode
+                Stage=$_.Stage
+                Arg0=$_.Arg0
+                Arg1=$_.Arg1
+                Arg2=$_.Arg2
+                Arg3=$_.Arg3
+                Arg4=$_.Arg4
+                Arg5=$_.Arg5
+                Arg6=$_.Arg6
+                Arg7=$_.Arg7
+                TextHash=$_.TextHash
+                Text=$_.Text
+                ObservedCount=$_.MaxCount
+            }
+        })
+        if($candidates.Count -gt 0){
+            $candidates |
+                Sort-Object @{Expression={switch($_.CandidateClass){'RankMarker'{0};'PositionText'{1};'ScoreText'{2};'DialogText'{3};'KnownSpriteArea'{4};'TextHud'{5};default{6}}}}, @{Expression='ObservedCount';Descending=$true} |
+                ConvertTo-Json -Depth 4 |
+                Set-Content (Join-Path $dest 'HUD_CANDIDATES.json') -Encoding UTF8
+            $copied+='HUD_CANDIDATES.json'
+        }
     }
 }
 
