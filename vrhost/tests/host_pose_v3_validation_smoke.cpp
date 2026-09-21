@@ -74,6 +74,29 @@ int main()
     state.flags &= ~StereoViewsValid;
     ok &= Expect(HostStateUsable(state, now, frequency), "mono-valid pose remains usable");
 
+    OutRunVR::SharedPoseState legacy{};
+    legacy.magic = OutRunVR::SharedMagic;
+    legacy.protocolVersion = OutRunVR::SharedProtocolVersion;
+    legacy.structSize = sizeof(legacy);
+    legacy.hostPid = 42;
+    legacy.sequence = static_cast<std::uint32_t>(state.poseId);
+    ok &= Expect(
+        HostOwnershipMatchesLegacy(state, legacy),
+        "same-host v2/v3 ownership accepted");
+    ok &= Expect(
+        PoseSequenceMatchesLegacy(state.poseId, legacy.sequence),
+        "same-host v2/v3 sequence accepted");
+
+    legacy.hostPid = 43;
+    ok &= Expect(
+        !HostOwnershipMatchesLegacy(state, legacy),
+        "cross-host v2/v3 ownership rejected");
+
+    legacy.hostPid = 0;
+    ok &= Expect(
+        !HostOwnershipMatchesLegacy(state, legacy),
+        "unowned legacy channel rejects stale v3 owner");
+
     if (!ok)
         return 1;
     std::cout << "HostState.v3 pose validation rules passed.\n";
