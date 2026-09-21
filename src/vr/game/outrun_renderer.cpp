@@ -1841,3 +1841,46 @@ namespace OutRunVRRenderer
 		shaderSerial = LastGameWvpShaderSerial;
 		return true;
 	}
+
+	bool GetLastRawGameWvpWrite(float outConstants[16],
+		std::uint64_t& writeSerial, std::uint64_t& topLevelDrawSerial,
+		std::uintptr_t& shaderIdentity, std::uint64_t& shaderSerial) noexcept
+	{
+		if (!outConstants || !LastGameWvpWriteValid ||
+			LastGameWvpWriteSerial == 0 || LastGameWvpShaderIdentity == 0 ||
+			LastGameWvpShaderSerial == 0)
+			return false;
+		std::memcpy(outConstants, LastRawGameWvpWrite,
+			sizeof(LastRawGameWvpWrite));
+		writeSerial = LastGameWvpWriteSerial;
+		topLevelDrawSerial = LastGameWvpTopLevelDrawSerial;
+		shaderIdentity = LastGameWvpShaderIdentity;
+		shaderSerial = LastGameWvpShaderSerial;
+		return true;
+	}
+
+	class VRRendererHook : public Hook
+	{
+	public:
+		std::string_view description() override { return "OpenXRVRRenderer"; }
+		bool validate() override { return true; }
+
+		bool apply() override
+		{
+			HANDLE thread = CreateThread(nullptr, 0, RendererInstallThread, nullptr, 0, nullptr);
+			if (!thread)
+			{
+				RendererInjectionAllowed.store(false, std::memory_order_release);
+				RendererInstallState.store(RendererInstallFailed, std::memory_order_release);
+				spdlog::error("VR renderer: failed to create installer thread: {}", GetLastError());
+				return false;
+			}
+			CloseHandle(thread);
+			return true;
+		}
+
+		static VRRendererHook instance;
+	};
+
+	VRRendererHook VRRendererHook::instance;
+}
