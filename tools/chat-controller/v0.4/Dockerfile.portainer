@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /opt/outrun
 
 COPY requirements.direct.txt ./requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+RUN python -m pip install --upgrade pip --index-url https://pypi.org/simple \\
+    && python -m pip install --no-cache-dir --prefer-binary --index-url https://pypi.org/simple playwright==1.63.0
 
 RUN mkdir -p /opt/outrun/app /opt/outrun/prompts /tmp/controller-parts \
     && touch /opt/outrun/app/__init__.py
