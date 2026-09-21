@@ -499,6 +499,9 @@ texture_source = require(
     "layout.totalBytes > dataSize - validatedEnd",
     "lockedRect.Pitch > 0",
     "destinationPitch < layout.rowBytes",
+    "const DWORD lockFlags =",
+    "(Usage & D3DUSAGE_DYNAMIC) ? D3DLOCK_DISCARD : 0",
+    "texture->LockRect(mipLevel, &lockedRect, nullptr, lockFlags)",
     "const HRESULT unlockHr = texture->UnlockRect(mipLevel)",
     "*ppTexture = texture;",
     "*pSrcDataSize < sizeof(DDS_FILE)",
@@ -537,6 +540,19 @@ if not output_null < header_cast < payload_validation < create_texture < publish
 size_guard = allocator.find("if (dataSize < sizeof(DDS_FILE))")
 if size_guard < 0 or size_guard > header_cast:
     raise SystemExit("DDS header length guard must precede header dereference")
+
+# DISCARD is legal only for dynamic resources. Ordinary managed/custom
+# wrapper textures use Usage=0 and must lock without DISCARD.
+if "LockRect(mipLevel, &lockedRect, nullptr, D3DLOCK_DISCARD)" in allocator:
+    raise SystemExit("custom DDS allocator unconditionally uses D3DLOCK_DISCARD")
+_usage_cases = (
+    (0, 0),
+    (0x00000200, 0x00002000),  # D3DUSAGE_DYNAMIC -> D3DLOCK_DISCARD
+)
+for usage, expected_flags in _usage_cases:
+    flags = 0x00002000 if usage & 0x00000200 else 0
+    if flags != expected_flags:
+        raise SystemExit("DDS LockRect usage/flag model regressed")
 
 # Destination copy must be row-based through D3DLOCKED_RECT::Pitch for both
 # converted and direct-copy paths.
