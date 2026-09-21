@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-22T03:06:00+09:00",
+  "updatedKst": "2026-09-22T03:24:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -28,7 +28,7 @@
     {
       "id": "VR-BINARY-CONTRACT-001",
       "priority": 10,
-      "status": "NEEDS_VALIDATION",
+      "status": "VALIDATED",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "Pin the upstream replacement OR2006C2C.EXE as the canonical reverse-engineering baseline; gate executable-RVA hooks on SHA/PE identity, byte signatures, source bindings, and durable crash-RVA revalidation.",
       "testLevel": "LEVEL0",
@@ -36,7 +36,18 @@
       "attempts": 1,
       "runtimeCandidate": false,
       "candidateBranch": "vr-d3d9ex-candidate/VR-BINARY-CONTRACT-001-CHAT-20260922",
-      "expectedFix": "Strict canonical EXE binary contract must pass in DX9Ex Active Validation; crash ZIP must include ASLR-stable exeRva sidecar."
+      "expectedFix": "Strict canonical EXE binary contract must pass in DX9Ex Active Validation; crash ZIP must include ASLR-stable exeRva sidecar.",
+      "validationRunId": 35637181469,
+      "validationSha": "c1cb4def3ecfefb23084401d7961b6d658620388",
+      "validationResult": "BUILD_VERIFIED",
+      "validationEvidence": [
+        "strict canonical EXE SHA/PE/image-base/RVA opcode/source-binding contract PASS",
+        "x64 D3D11 OpenXR host build PASS",
+        "8 deterministic no-HMD host smoke tests PASS",
+        "Win32 active DX9Ex game DLL build PASS",
+        "active DX9Ex package assembly/validation PASS"
+      ],
+      "runtimeCrashSidecarEndToEnd": "NOT_FORCED: compile/package verified; next naturally occurring crash bundle will validate sidecar observation without deliberately crashing the game"
     },
     {
       "id": "DX9EX-RESET-STATEBLOCK-001",
