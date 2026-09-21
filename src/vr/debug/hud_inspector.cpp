@@ -31,10 +31,10 @@ namespace OutRunVRHudInspector
         {
             PutSprite = 1,
             SpriteAnim = 2,
-            ClipSprite = 3
+            ClipSprite = 3,
+            PutSprite2 = 4
         };
 
-        SafetyHookInline PutSpriteHook{};
         SafetyHookInline SpriteAnimHook{};
         SafetyHookInline ClipSpriteHook{};
 
@@ -169,16 +169,6 @@ namespace OutRunVRHudInspector
                 TraceFile.flush();
         }
 
-        void __cdecl PutSpriteDest(SPRARGS* sprargs, float priority)
-        {
-            WriteEvent(EventKind::PutSprite, "put_sprite_ex", _ReturnAddress(),
-                0u, 0u,
-                static_cast<double>(
-                    reinterpret_cast<std::uintptr_t>(sprargs)),
-                priority);
-            PutSpriteHook.unsafe_ccall<void>(sprargs, priority);
-        }
-
         int __cdecl SpriteAnimDest(std::uint32_t spriteId, float x, float y,
             int a4, int a5, float alpha)
         {
@@ -243,9 +233,35 @@ namespace OutRunVRHudInspector
         {
             ClipSpriteHook = {};
             SpriteAnimHook = {};
-            PutSpriteHook = {};
         }
 
+    }
+
+    // Feed points used by the existing texture hooks. Keeping put_sprite_ex on
+    // its already-established hook avoids stacking two inline detours on the
+    // same game function and preserves the real game caller return address.
+    void TracePutSprite(SPRARGS* sprargs, float priority,
+        const void* returnAddress)
+    {
+        WriteEvent(EventKind::PutSprite, "put_sprite_ex", returnAddress,
+            0u, 0u,
+            static_cast<double>(
+                reinterpret_cast<std::uintptr_t>(sprargs)),
+            priority);
+    }
+
+    void TracePutSprite2(const void* sprargs, float priority,
+        const void* returnAddress)
+    {
+        WriteEvent(EventKind::PutSprite2, "put_sprite_ex2", returnAddress,
+            0u, 0u,
+            static_cast<double>(
+                reinterpret_cast<std::uintptr_t>(sprargs)),
+            priority);
+    }
+
+    namespace
+    {
         class VRHudInspectorHook : public Hook
         {
         public:
@@ -270,14 +286,12 @@ namespace OutRunVRHudInspector
                 if (!OpenTrace())
                     return false;
 
-                PutSpriteHook = safetyhook::create_inline(
-                    Game::put_sprite_ex, PutSpriteDest);
                 SpriteAnimHook = safetyhook::create_inline(
                     Game::sprani_play_ae_auth_alpha, SpriteAnimDest);
                 ClipSpriteHook = safetyhook::create_inline(
                     Game::put_clip_sprite, ClipSpriteDest);
 
-                if (!PutSpriteHook || !SpriteAnimHook || !ClipSpriteHook)
+                if (!SpriteAnimHook || !ClipSpriteHook)
                 {
                     spdlog::error(
                         "VR HUD INSPECTOR: one or more sprite hooks failed; disabling inspector");
@@ -286,7 +300,7 @@ namespace OutRunVRHudInspector
                 }
 
                 spdlog::info(
-                    "VR HUD INSPECTOR: passive sprite/caller RVA tracing active; output=OutRun2006Tweaks-hudtrace.csv");
+                    "VR HUD INSPECTOR: passive sprite/caller RVA tracing active; existing texture hooks feed put_sprite_ex/put_sprite_ex2, direct hooks feed sprani/clip; output=OutRun2006Tweaks-hudtrace.csv");
                 return true;
             }
 
