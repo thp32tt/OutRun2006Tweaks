@@ -50,7 +50,7 @@ def main() -> int:
         "R44OverlayOwnedWvpHits",
         "R30ScreenSpaceKind::PerspectiveHud",
         "GetLastRawGameWvpWrite",
-        "finite HUD world-lock",
+        "R30BuildHudPlaneCoefficients",
         "R30XyzrhwWorldLockedHudDraws",
         "R47SemanticHudAccepted",
         "R47SemanticUnknownRejected",
