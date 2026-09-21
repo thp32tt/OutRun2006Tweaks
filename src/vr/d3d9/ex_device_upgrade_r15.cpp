@@ -57,7 +57,6 @@ namespace OutRunVRD3D9ExUpgradeR13
         };
 
         R15ClassicExtraBaseline R15ClassicExtra{};
-        IDirect3DStateBlock9* R15ClassicAllState = nullptr;
         std::mutex R15ClassicExtraMutex;
 
         bool R15CaptureClassicExtraBaseline(IDirect3DDevice9* device) noexcept
@@ -66,9 +65,6 @@ namespace OutRunVRD3D9ExUpgradeR13
                 return false;
 
             R15ClassicExtraBaseline next{};
-            IDirect3DStateBlock9* allState = nullptr;
-            if (FAILED(device->CreateStateBlock(D3DSBT_ALL, &allState)) || !allState)
-                return false;
 
             if (FAILED(device->GetTransform(D3DTS_WORLD, &next.world)) ||
                 FAILED(device->GetTransform(D3DTS_VIEW, &next.view)) ||
@@ -76,7 +72,6 @@ namespace OutRunVRD3D9ExUpgradeR13
                     &next.projection)) ||
                 FAILED(device->GetMaterial(&next.material)))
             {
-                allState->Release();
                 return false;
             }
 
@@ -87,7 +82,6 @@ namespace OutRunVRD3D9ExUpgradeR13
                             D3DTS_TEXTURE0 + stage),
                         &next.texture[stage])))
                 {
-                    allState->Release();
                     return false;
                 }
             }
@@ -101,9 +95,6 @@ namespace OutRunVRD3D9ExUpgradeR13
             next.ready = true;
 
             std::lock_guard<std::mutex> lock(R15ClassicExtraMutex);
-            if (R15ClassicAllState)
-                R15ClassicAllState->Release();
-            R15ClassicAllState = allState;
             R15ClassicExtra = next;
             R15ResetStateHealthy.store(true, std::memory_order_release);
             OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(false);
@@ -175,23 +166,6 @@ namespace OutRunVRD3D9ExUpgradeR13
             return ok;
         }
 
-        bool R15RestoreClassicAllState(IDirect3DDevice9* device) noexcept
-        {
-            if (!device)
-                return false;
-            IDirect3DStateBlock9* state = nullptr;
-            {
-                std::lock_guard<std::mutex> lock(R15ClassicExtraMutex);
-                state = R15ClassicAllState;
-                if (state) state->AddRef();
-            }
-            if (!state)
-                return false;
-            const HRESULT hr = state->Apply();
-            state->Release();
-            return SUCCEEDED(hr);
-        }
-
         bool R15RestoreClassicExtraBaseline(IDirect3DDevice9* device) noexcept
         {
             if (!device)
@@ -254,15 +228,10 @@ namespace OutRunVRD3D9ExUpgradeR13
                 OutRunVRD3D9ExUpgrade::ClearCompatHooks();
                 {
                     std::lock_guard<std::mutex> lock(R15ClassicExtraMutex);
-                    if (R15ClassicAllState)
-                    {
-                        R15ClassicAllState->Release();
-                        R15ClassicAllState = nullptr;
-                    }
                     R15ClassicExtra = {};
                 }
                 spdlog::error(
-                    "VR R15 EX: could not capture fresh-device full classic-state baseline; Ex promotion rolled back transactionally");
+                    "VR R15 EX: could not capture fresh-device explicit classic-state baseline; Ex promotion rolled back transactionally");
                 return false;
             }
 
@@ -279,11 +248,6 @@ namespace OutRunVRD3D9ExUpgradeR13
                 OutRunVRD3D9ExUpgrade::ClearCompatHooks();
                 {
                     std::lock_guard<std::mutex> lock(R15ClassicExtraMutex);
-                    if (R15ClassicAllState)
-                    {
-                        R15ClassicAllState->Release();
-                        R15ClassicAllState = nullptr;
-                    }
                     R15ClassicExtra = {};
                 }
                 spdlog::error(
@@ -292,7 +256,7 @@ namespace OutRunVRD3D9ExUpgradeR13
             }
 
             spdlog::info(
-                "VR R15 EX: full D3DSBT_ALL baseline + synchronous Reset/stereo handoff ACTIVE; partial-RECT and generated-mip correctness overlay ACTIVE");
+                "VR R15 EX: explicit fresh-device state baselines + synchronous Reset/stereo handoff ACTIVE; no pre-Reset state-block replay; partial-RECT and generated-mip correctness overlay ACTIVE");
             return true;
         }
 
@@ -499,10 +463,13 @@ namespace OutRunVRD3D9ExUpgradeR13
             // restore state families that R13 did not cover.
             const bool coreHealthy =
                 OutRunVRD3D9ExUpgrade::RestoreClassicResetState(device);
-            const bool allStateHealthy = R15RestoreClassicAllState(device);
             const bool extraHealthy =
                 R15RestoreClassicExtraBaseline(device);
-            const bool healthy = coreHealthy && allStateHealthy && extraHealthy;
+            // D3D9 state blocks are device-reset-sensitive COM objects. Never
+            // retain/apply a pre-Reset D3DSBT_ALL state block after ResetEx.
+            // R13 restores render/stage/sampler/binding defaults explicitly;
+            // R15 restores the remaining fresh-device state families explicitly.
+            const bool healthy = coreHealthy && extraHealthy;
             R15ResetStateHealthy.store(healthy, std::memory_order_release);
             OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(!healthy);
 
