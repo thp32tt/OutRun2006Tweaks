@@ -2333,10 +2333,59 @@ int main(int argc, char** argv)
                         if (renderFrames.ReadHistory(
                                 history, historyCount, &latestPublication))
                         {
-                            directHistoryBlocked =
+                            const std::uint32_t latestIntentEpoch =
                                 OutRunVR::DirectHistoryPolicy::
-                                    LatestPublicationBlocksHistory(
+                                    StereoIntentEpoch(latestPublication);
+                            directHistoryBlocked =
+                                !OutRunVR::DirectHistoryPolicy::
+                                    LatestPublicationAllowsHistory(
                                         latestPublication);
+
+                            // A newer stereo-intent epoch makes unprocessed
+                            // producer-ahead descriptors from older epochs
+                            // permanently ineligible. They were never sampled by
+                            // D3D11, so ACK them immediately to avoid re-enable
+                            // ring backpressure. Same-epoch frames keep normal R32
+                            // EVENT completion ownership.
+                            if (latestIntentEpoch != 0)
+                            {
+                                for (std::size_t i = 0;
+                                     i < historyCount; ++i)
+                                {
+                                    const auto& stale = history[i];
+                                    const std::uint32_t staleSlot =
+                                        stale.reserved[
+                                            OutRunVR::RenderFrameDirectSlotIndex];
+                                    const std::uint32_t staleGeneration =
+                                        stale.reserved[
+                                            OutRunVR::RenderFrameDirectGenerationIndex];
+                                    if (!stale.frameId ||
+                                        (lastProcessedStereoFrame != 0 &&
+                                         !R37FrameIdBefore(
+                                             lastProcessedStereoFrame,
+                                             stale.frameId)) ||
+                                        (stale.flags &
+                                         OutRunVR::RenderFramePresentInFlight) != 0 ||
+                                        (stale.flags &
+                                         OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
+                                        staleSlot >= OutRunVR::RenderFrameRingSize ||
+                                        staleGeneration == 0 ||
+                                        OutRunVR::DirectHistoryPolicy::
+                                            SameStereoIntentEpoch(
+                                                stale, latestPublication))
+                                        continue;
+
+                                    if (OutRunVrD3D9ExDirectPassthrough::
+                                            PublishCompletedFrame(stale))
+                                    {
+                                        R37BootstrapSubmittedFrame[staleSlot] =
+                                            stale.frameId;
+                                        R37BootstrapSubmittedGeneration[staleSlot] =
+                                            staleGeneration;
+                                    }
+                                }
+                            }
+
                             if (directHistoryBlocked)
                                 historyCount = 0;
 
@@ -2351,7 +2400,10 @@ int main(int argc, char** argv)
                                 if (!frame.frameId || !generation ||
                                     frame.state != OutRunVR::StereoSbsActive ||
                                     (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
-                                    (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0)
+                                    (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
+                                    !OutRunVR::DirectHistoryPolicy::
+                                        SameStereoIntentEpoch(
+                                            frame, latestPublication))
                                     continue;
                                 if (!haveCurrentGeneration ||
                                     R37FrameIdBefore(
@@ -2381,7 +2433,10 @@ int main(int argc, char** argv)
                                     slot >= OutRunVR::RenderFrameRingSize ||
                                     generation == 0 ||
                                     !haveCurrentGeneration ||
-                                    generation != currentGeneration)
+                                    generation != currentGeneration ||
+                                    !OutRunVR::DirectHistoryPolicy::
+                                        SameStereoIntentEpoch(
+                                            frame, latestPublication))
                                     continue;
 
                                 if (!foundDirect ||
@@ -2412,7 +2467,10 @@ int main(int argc, char** argv)
                                         (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
                                         (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
                                         slot >= OutRunVR::RenderFrameRingSize ||
-                                        generation != currentGeneration)
+                                        generation != currentGeneration ||
+                                        !OutRunVR::DirectHistoryPolicy::
+                                            SameStereoIntentEpoch(
+                                                frame, latestPublication))
                                         continue;
 
                                     // No D3D11 draw/copy references this skipped
