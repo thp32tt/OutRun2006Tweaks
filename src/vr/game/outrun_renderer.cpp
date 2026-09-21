@@ -18,6 +18,7 @@
 #include "vr_shared.hpp"
 #include "vr/ipc/host_pose_v3.hpp"
 #include "vr/ipc/cadence_v1.hpp"
+#include "vr/game/render_semantics.hpp"
 
 // Authoritative renderer-side OpenXR head-pose injector for OutRun 2006.
 //
@@ -1774,6 +1775,9 @@ namespace OutRunVRRenderer
 
 	void NotifyGamePresent()
 	{
+		// One-shot semantic hints are frame-local. Never carry an unconsumed
+		// producer hint across Present into unrelated rendering.
+		OutRunVR::GameSemantic::ClearNextDraw();
 		MarkCadencePresented();
 		PresentPoseLocked = false;
 		InvalidateVerifiedWvp();
@@ -1784,6 +1788,7 @@ namespace OutRunVRRenderer
 
 	void NotifyGameReset()
 	{
+		OutRunVR::GameSemantic::ClearNextDraw();
 		ActiveCadenceRequestId.store(0, std::memory_order_release);
 		CadencePacingActive.store(false, std::memory_order_release);
 		CadenceAcceptedRequestId = 0;
