@@ -83,3 +83,15 @@ Contract:
 - Findings should be correlated with repository source, existing reverse-engineering/static-analysis artifacts and prior runtime evidence before proposing production changes.
 
 The user-facing default loop is therefore: run the packaged test, reproduce naturally, exit the game, upload the generated `OutRun2_VR_ANALYZE_*.zip`.
+
+
+## Mandatory regression baseline
+
+Every frozen CORRECTNESS package must retain a short regression baseline before feature-specific checks:
+
+1. **Startup transition:** logo -> menu/game must complete; a persistent white frame is a failure mapped to `VR-STARTUP-WHITE-001`.
+2. Confirm the session/build/config identity is captured before interpreting the symptom.
+3. If a known symptom fingerprint recurs, reopen the existing regression key and consult `docs/VR_REGRESSION_KNOWLEDGE.json` before creating a new finding.
+4. Upload the standardized log ZIP; D correlates it against the stored known-good/known-bad/fix/verifier history.
+
+This baseline remains even after the original bug is fixed so later renderer, transport, reset, fallback or configuration changes cannot silently erase the regression knowledge.
