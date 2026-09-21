@@ -23,5 +23,9 @@ RUN cat part*.b64 | tr -d '\r\n\t ' | base64 -d > /tmp/controller.zip \
     && chmod +x /opt/outrun/entrypoint.sh \
     && rm -rf /tmp/controller.zip /tmp/unpack /tmp/controller-payload
 
+COPY bootstrap_review.override.md /opt/outrun/prompts/bootstrap_review.md
+COPY continue_review.override.md /opt/outrun/prompts/continue_review.md
+COPY watchdog_resume.override.md /opt/outrun/prompts/watchdog_resume.md
+
 WORKDIR /opt/outrun
 ENTRYPOINT ["/usr/bin/tini","--","/opt/outrun/entrypoint.sh"]
