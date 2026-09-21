@@ -156,9 +156,13 @@ jobs:
           $buildInputs | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'BUILD_INPUTS.json') -Encoding UTF8
           $bad = Get-ChildItem $dir -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe') }
           if ($bad) { throw "Forbidden backend payload: $($bad.FullName -join ', ')" }
-          Get-ChildItem $dir -Recurse -File | Get-FileHash -Algorithm SHA256 | ForEach-Object {
-            "$($_.Hash)  $($_.Path.Substring((Resolve-Path $dir).Path.Length + 1))"
-          } | Set-Content (Join-Path $dir 'SHA256SUMS.txt') -Encoding ascii
+          $packageRoot = (Resolve-Path $dir).Path
+          Get-ChildItem $dir -Recurse -File |
+            Where-Object { $_.Name -ne 'SHA256SUMS.txt' } |
+            Get-FileHash -Algorithm SHA256 | ForEach-Object {
+              $relative = $_.Path.Substring($packageRoot.Length + 1).Replace('\\','/')
+              "$($_.Hash.ToLowerInvariant())  $relative"
+            } | Set-Content (Join-Path $dir 'SHA256SUMS.txt') -Encoding ascii
           $zip = "OutRun2_VR_FSR1_POC_${short}.zip"
           Compress-Archive -Path (Join-Path $dir '*') -DestinationPath $zip -Force
           Get-FileHash $zip -Algorithm SHA256 | Format-List
@@ -173,6 +177,25 @@ jobs:
           }
           foreach ($file in @('dinput8.dll','outrun-vr-host.exe','SOURCE_SHA.txt')) {
             if (-not (Test-Path (Join-Path 'verify/backends/d3d9' $file))) { throw "backend payload missing $file" }
+          }
+          $sumFile = Join-Path verify 'SHA256SUMS.txt'
+          if (-not (Test-Path $sumFile)) { throw 'package missing SHA256SUMS.txt' }
+          foreach ($line in Get-Content $sumFile) {
+            if ($line -notmatch '^([0-9a-fA-F]{64})  (.+)
+          if ($bad) { throw 'active package contains forbidden backend payload' }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-FSR1-POC-${{ github.sha }}
+          path: OutRun2_VR_FSR1_POC_*.zip
+          if-no-files-found: error
+) { throw "Malformed SHA256SUMS line: $line" }
+            $expected = $matches[1].ToLowerInvariant()
+            $relative = $matches[2]
+            if ($relative.Contains('\\')) { throw "SHA256SUMS must use portable forward slashes: $relative" }
+            $target = Join-Path verify ($relative.Replace('/',[IO.Path]::DirectorySeparatorChar))
+            if (-not (Test-Path $target)) { throw "SHA256SUMS target missing: $relative" }
+            $actual = (Get-FileHash $target -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($actual -ne $expected) { throw "SHA256SUMS mismatch: $relative" }
           }
           $bad = Get-ChildItem verify -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe') }
           if ($bad) { throw 'active package contains forbidden backend payload' }
