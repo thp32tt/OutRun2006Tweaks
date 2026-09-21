@@ -1,0 +1,1 @@
+{"cycle":"20260921-A1","checkpoint":"CP20","valid_units":20,"target_sha":"b159cc66ca1ed6f25f7a2c7640a246ee1d0b489a","coverage":"RenderFrameReader latest/exact/history stability, run identity, v2->v3 shadow conversion, stale-frame falsification"}
