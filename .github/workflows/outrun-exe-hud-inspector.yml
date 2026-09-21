@@ -27,6 +27,7 @@ on:
       - 'tools/Run-OutRunVRTest.ps1'
       - 'docs/VR_EXE_HUD_INSPECTOR.md'
       - 'docs/VR_HUD_SEMANTIC_BASELINE.md'
+      - 'docs/VR_RUNTIME_VISUAL_CONTRACT.json'
       - '.github/workflows/outrun-exe-hud-inspector.yml'
   pull_request:
     paths:
@@ -53,6 +54,7 @@ on:
       - 'tools/Run-OutRunVRTest.ps1'
       - 'docs/VR_EXE_HUD_INSPECTOR.md'
       - 'docs/VR_HUD_SEMANTIC_BASELINE.md'
+      - 'docs/VR_RUNTIME_VISUAL_CONTRACT.json'
       - '.github/workflows/outrun-exe-hud-inspector.yml'
 
 permissions:
@@ -124,7 +126,7 @@ jobs:
         shell: pwsh
         run: |
           Remove-Item Env:CI -ErrorAction SilentlyContinue
-          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=ON
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
 
       - name: Apply VC2022 dependency workarounds
         shell: pwsh
