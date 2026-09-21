@@ -1082,13 +1082,11 @@ void AfterTicks(double qpcFreqMs)
 // simply (counter - 1 + alpha); no per-entry prev-state is needed.
 //
 static SafetyHookMid HeartPulse_hook = {};
+static SafetyHookMid HeartSemantic_hook = {};
+static SafetyHookMid HeartSemanticCancel_hook = {};
+
 static void HeartPulse_dest(SafetyHookContext& ctx)
 {
-	// HeartDisp_car_heart is a true car/world-attached billboard. Preserve that
-	// ownership through the next D3D draw instead of letting depth-off alpha
-	// heuristics flatten it into the HUD plane.
-	OutRunVR::GameSemantic::ArmNextDraw(
-		OutRunVR::GameSemantic::RenderScope::WorldBillboard);
 	if (!Settings::FramerateInterpolation)
 		return;
 
@@ -1101,6 +1099,23 @@ static void HeartPulse_dest(SafetyHookContext& ctx)
 	const float angle = (float(counter) - (1.0f - alpha)) * AngleStep;
 
 	ctx.ebp = *reinterpret_cast<const uint32_t*>(&angle);
+}
+
+static void HeartSemantic_dest(SafetyHookContext&)
+{
+	// Arm only after the original [ebx] == 0 no-draw bypass. This hook sits at
+	// the first instruction of the render-helper path.
+	OutRunVR::GameSemantic::ArmNextDraw(
+		OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+}
+
+static void HeartSemanticCancel_dest(SafetyHookContext&)
+{
+	// 0x5B4C0 is the common loop-advance target for both the explicit no-draw
+	// branch and the completed render-helper path. If no top-level D3D draw
+	// consumed this heart's hint, cancel only that hint before the next entry.
+	OutRunVR::GameSemantic::CancelNextDraw(
+		OutRunVR::GameSemantic::RenderScope::WorldBillboard);
 }
 
 //
@@ -1161,26 +1176,55 @@ void AfterTick()
 	InterpCollecting = false;
 }
 
+static void RollbackHooks() noexcept
+{
+	// Reverse the complete interpolation hook transaction. The architecture
+	// verifier derives every create_mid/create_inline target in Apply() and
+	// requires a matching reset here, so future required hooks cannot silently
+	// escape rollback coverage.
+	SumoHeartMarkerPos_hook.reset();
+	SumoHeartBumpPos_hook.reset();
+	HeartDispBumpPos_hook.reset();
+	HeartSemanticCancel_hook.reset();
+	HeartSemantic_hook.reset();
+	HeartPulse_hook.reset();
+	OsoCommonPost_hook.reset();
+	OsoCommonDisp_hook.reset();
+	OsoDynDisp_hook.reset();
+	OsoDynCtrl_hook.reset();
+	CalcCharMatrix_hook.reset();
+	CalcDispMatrix_hook.reset();
+}
+
 bool Apply()
 {
+	// A prior failed attempt must not contribute stale handles to this install.
+	RollbackHooks();
+
+	auto fail = []() noexcept
+	{
+		RollbackHooks();
+		return false;
+	};
+
 	// Track which cars are live each tick so we can replay CalcDispMatrix over
 	// them on non-tick frames.
 	CalcDispMatrix_hook = safetyhook::create_inline(Module::exe_ptr(GameAddr::CalcDispMatrix), CalcDispMatrix_dest);
 	if (!CalcDispMatrix_hook)
-		return false;
+		return fail();
 
 	// In-car characters, whose baked base matrix must be rebuilt once the car
 	// matrices move.
 	CalcCharMatrix_hook = safetyhook::create_mid(Module::exe_ptr(GameAddr::CalcCharMatrix), CalcCharMatrix_dest);
 	if (!CalcCharMatrix_hook)
-		return false;
+		return fail();
 
 	// Oso objects: supply a per-tick prev-state to OsoDynamics_Disp, whose own
 	// writeback advances once per rendered frame.
 	OsoDynCtrl_hook = safetyhook::create_mid(Module::exe_ptr(GameAddr::OsoDynamics_Ctrl), OsoDynCtrl_dest);
 	OsoDynDisp_hook = safetyhook::create_mid(Module::exe_ptr(GameAddr::OsoDynamics_Disp), OsoDynDisp_dest);
 	if (!OsoDynCtrl_hook || !OsoDynDisp_hook)
-		return false;
+		return fail();
 
 	// OsoCommonFunc_Disp has no interpolation of its own: substitute an
 	// interpolated matrix across the mxPushLoadMatrix call, then put the real
@@ -1188,12 +1232,17 @@ bool Apply()
 	OsoCommonDisp_hook = safetyhook::create_mid(Module::exe_ptr(GameAddr::OsoCommon_PushMatrix), OsoCommonDisp_dest);
 	OsoCommonPost_hook = safetyhook::create_mid(Module::exe_ptr(GameAddr::OsoCommon_AfterPush), OsoCommonPost_dest);
 	if (!OsoCommonDisp_hook || !OsoCommonPost_hook)
-		return false;
+		return fail();
 
 	// Attached-heart pulse: rewrite the computed animation angle in-register.
 	HeartPulse_hook = safetyhook::create_mid(Module::exe_ptr(GameAddr::HeartDisp_PulseAngle), HeartPulse_dest);
-	if (!HeartPulse_hook)
-		return false;
+	// Reference EXE: 0x5B470 may branch directly to 0x5B4C0 and skip rendering.
+	// Arm the semantic only on the taken render-helper path at 0x5B475.
+	HeartSemantic_hook = safetyhook::create_mid(Module::exe_ptr(0x5B475), HeartSemantic_dest);
+	HeartSemanticCancel_hook = safetyhook::create_mid(
+		Module::exe_ptr(0x5B4C0), HeartSemanticCancel_dest);
+	if (!HeartPulse_hook || !HeartSemantic_hook || !HeartSemanticCancel_hook)
+		return fail();
 
 	// Heart Attack mission markers: hand the sprite the car's drawn position
 	// rather than its tick position.
@@ -1201,11 +1250,10 @@ bool Apply()
 	SumoHeartBumpPos_hook = safetyhook::create_mid(Module::exe_ptr(0x110B36), SumoHeartBumpPos_dest);
 	SumoHeartMarkerPos_hook = safetyhook::create_mid(Module::exe_ptr(0x10FC25), SumoHeartMarkerPos_dest);
 	if (!HeartDispBumpPos_hook || !SumoHeartBumpPos_hook || !SumoHeartMarkerPos_hook)
-		return false;
+		return fail();
 
 	InterpCars.reserve(32);
 	InterpChars.reserve(8);
 	return true;
 }
-
 }
