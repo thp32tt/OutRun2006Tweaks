@@ -1,0 +1,32 @@
+unit_id	source	target	evidence	regression	disposition
+B11-001..B11-120	B10-001..B10-120	5cd00a69	PARTIAL_INVALIDATION: exact candidate diff touches only src/hooks_graphics.cpp FixZBufferPrecision; 120 B10 units outside that dependency retain validated content identity against unchanged integration 206c6c1e; expansion pending physical rows	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B11-121	candidate-diff	FixZBufferPrecision::CalcCameraMatrix_dest	exact diff adds RuntimeEligibility include and replaces VREnabled gate with VRPositionalTracking+VRStereo+MayInjectStereo	VR-STARTUP-WHITE-001	PASS_INTENT
+B11-122	candidate-diff	src/hooks_graphics.cpp	ahead 1 behind 0; only file changed +4/-1; no unrelated rendering hunks	VR-STARTUP-WHITE-001	PASS_DIFF_SANITY
+B11-123	falsification	mono-mode	VRStereo=false prevents VRNearPlane override, preserving ordinary precision path	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
+B11-124	falsification	3DoF-mode	VRPositionalTracking=false prevents VRNearPlane override even if stereo is enabled	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
+B11-125	falsification	stale-host	MayInjectStereo=false suppresses near-plane mutation when host freshness/renderability gate fails	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
+B11-126	falsification	recovery-pending	MayInjectStereo=false prevents VRNearPlane during recovery/reset eligibility loss	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
+B11-127	falsification	external-safety-block	MayInjectStereo=false prevents near-plane override while external safety block is active	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
+B11-128	cross-trace	STATE_GAME	active 6DoF stereo remains eligible for VRNearPlane in gameplay	VR-STARTUP-WHITE-001	PASS_TRACE
+B11-129	cross-trace	STATE_GOAL	active 6DoF stereo remains eligible for VRNearPlane in goal rendering	VR-STARTUP-WHITE-001	PASS_TRACE
+B11-130	falsification	non-game-mode	mode predicate remains unchanged; menus do not receive VRNearPlane	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
+B11-131	cross-trace	RuntimeEligibility::MayInjectStereo	near-plane consumer now shares active-stereo eligibility boundary rather than config-only VREnabled	VR-STARTUP-WHITE-001	PASS_TRACE
+B11-132	visual-risk	depth-precision	2D precision fix remains default outside eligible VR; no global znear widening introduced	VR-STARTUP-WHITE-001	PASS_VISUAL_BOUNDARY
+B11-133	performance	per-camera-gate	additional eligibility predicate is state-query only; no copy/draw/wait added by diff	VR-STARTUP-WHITE-001	PASS_PERF_SANITY
+B11-134	falsification	SkyGlow	candidate does not touch SkyGlowFactor/composite/copy paths	VR-STARTUP-WHITE-001	UNAFFECTED
+B11-135	falsification	HUD	candidate does not touch HUD/XYZRHW/stereo-offset paths	VR-STARTUP-WHITE-001	UNAFFECTED
+B11-136	falsification	frame-pacing	candidate adds no Present/acquire/wait/release/frame-timing operations	VR-STARTUP-WHITE-001	UNAFFECTED
+B11-137	falsification	eye-sizing	candidate changes no eye-resolution/runtime-sizing state	VR-STARTUP-WHITE-001	UNAFFECTED
+B11-138	falsification	SBS-monitor	candidate changes no SBS/mirror/desktop presentation path	VR-STARTUP-WHITE-001	UNAFFECTED
+B11-139	falsification	direct-GPU-fallback	candidate changes no transport/copy/fallback path	VR-STARTUP-WHITE-001	UNAFFECTED
+B11-140	regression-protection	startup-white	hooks_graphics.cpp is registered riskPath; startup regression key reused as EVIDENCE_AUGMENT, not new finding	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B11-141	regression-protection	CreateDevice	candidate does not modify CreateDevice pre-exposure/deferred-resource protection	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
+B11-142	regression-protection	Present	candidate does not modify post-successful-Present deferred stereo initialization	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
+B11-143	regression-protection	stereo-transport	eligibility consumer changes but transport/shared-frame implementation unchanged; requires deterministic/build gate	VR-STARTUP-WHITE-001	NEED_BUILD_CHECK
+B11-144	validation	static	build active DX9Ex game DLL + host and deterministic near-plane eligibility check required before integration	VR-STARTUP-WHITE-001	REQUIRED
+B11-145	validation	runtime	Quest3/VDXR logo->menu/game plus gameplay stereo-open remains required for startup-white final DONE	VR-STARTUP-WHITE-001	NEED_HMD_TEST
+B11-146	visual-falsification	near-clip-active	eligible 6DoF path must still use configured VRNearPlane; HMD visual check required	VR-STARTUP-WHITE-001	NEED_HMD_TEST
+B11-147	visual-falsification	near-clip-inactive	ineligible stereo/mono/menu must retain non-VR znear behavior; deterministic testable	VR-STARTUP-WHITE-001	PASS_STATIC
+B11-148	cross-trace	config-to-runtime	removal of VREnabled from local predicate is bounded by VRStereo+MayInjectStereo runtime gate; no config-only activation remains	VR-STARTUP-WHITE-001	PASS_TRACE
+B11-149	post-review	candidate-identity	verdict PASS_DOMAIN_REVIEW_NEED_BUILD_HMD_GATE for exact 5cd00a69 on base 206c6c1e	VR-STARTUP-WHITE-001	PASS_WITH_GATES
+B11-150	next-action	integration-gate	require C exact-SHA sanity, deterministic near-plane verifier, active DX9Ex build, and preserve startup-white NEED_HMD_TEST	VR-STARTUP-WHITE-001	HANDOFF
