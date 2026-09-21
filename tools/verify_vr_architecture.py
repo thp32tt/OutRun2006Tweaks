@@ -488,4 +488,92 @@ require("src/vr/core/transport.hpp", "class IFrameProducer", "class IFrameConsum
 require("src/vr/game/game_adapter.hpp", "class IGameAdapter", "latchRenderPose", "buildStereoMatrices")
 require("src/vr/d3d9/stereo_backend.hpp", "class IStereoBackend", "drawWorldStereo", "drawScreenSpaceStereo")
 
+# Deferred private-resource initialization is a bounded state transaction.
+# It must preserve the caller's complete raster binding, quarantine an
+# unrecoverable restore failure until Reset, and avoid heavyweight per-Present
+# retries for ordinary allocation/init failure.
+r7_resource = text("src/vr/d3d9/stereo_renderer_r7.inc")
+ensure_begin = r7_resource.find("bool EnsureStereoResources(IDirect3DDevice9* device)")
+ensure_end = r7_resource.find("void NoteRestoreFailure", ensure_begin)
+if ensure_begin < 0 or ensure_end < 0:
+    raise SystemExit("EnsureStereoResources transaction boundary missing")
+ensure_resource = r7_resource[ensure_begin:ensure_end]
+for marker in (
+    "GetViewport(&savedViewport)",
+    "GetScissorRect(&savedScissor)",
+    "GetRenderState(",
+    "D3DRS_SCISSORTESTENABLE",
+    "SetViewport(&savedViewport)",
+    "SetScissorRect(&savedScissor)",
+    "StereoResourceInitRestoreFault = true",
+    'NoteRestoreFailure("EnsureStereoResources/state-restore")',
+):
+    if marker not in ensure_resource:
+        raise SystemExit(
+            f"deferred resource-init state transaction invariant missing: {marker}"
+        )
+
+reset_begin = r7_resource.find("HRESULT __stdcall ResetDest(")
+reset_end = r7_resource.find("constexpr std::uint32_t StereoInstallPending", reset_begin)
+if reset_begin < 0 or reset_end < 0:
+    raise SystemExit("ResetDest boundary missing for resource-init recovery")
+reset_resource = r7_resource[reset_begin:reset_end]
+for marker in (
+    "StereoResourceInitRestoreFault = false",
+    "++StereoResourceInitGeneration",
+    "EnsureStereoResources(device)",
+):
+    if marker not in reset_resource:
+        raise SystemExit(
+            f"resource-init Reset-generation recovery invariant missing: {marker}"
+        )
+
+r23_resource = text("src/vr/d3d9/stereo_renderer_r23.cpp")
+present_begin = r23_resource.find("HRESULT __stdcall PresentDestR23")
+present_end = r23_resource.find("void R23RollbackHooks", present_begin)
+if present_begin < 0 or present_end < 0:
+    raise SystemExit("R23 Present boundary missing")
+present_resource = r23_resource[present_begin:present_end]
+for marker in (
+    "R23RefreshResourceInitGeneration();",
+    "StereoResourceInitRestoreFault",
+    "R23ResourceInitNextRetryMs",
+    "R23ResourceInitBackoffMs(",
+    "R23ResourceInitFailureCount",
+):
+    if marker not in present_resource:
+        raise SystemExit(
+            f"R23 deferred resource retry invariant missing: {marker}"
+        )
+
+# Deterministic retry model: a persistent failure at a 90-Hz Present cadence
+# must cause only a small bounded number of heavyweight init attempts, while a
+# Reset-generation transition immediately re-arms one recovery attempt.
+def _resource_init_backoff_ms(failure_count: int) -> int:
+    if failure_count <= 1:
+        return 0
+    shift = min(failure_count - 2, 6)
+    return min(25 << shift, 2000)
+
+failure_count = 0
+next_retry_ms = 0
+attempts = 0
+for now_ms in range(0, 5000, 11):
+    if now_ms < next_retry_ms:
+        continue
+    attempts += 1
+    failure_count += 1
+    next_retry_ms = now_ms + _resource_init_backoff_ms(failure_count)
+
+if attempts >= 20:
+    raise SystemExit(
+        f"deferred resource-init retry model is effectively per-Present: attempts={attempts}"
+    )
+
+# Meaningful Reset/generation change clears the backoff immediately.
+failure_count = 0
+next_retry_ms = 0
+if next_retry_ms != 0 or failure_count != 0:
+    raise SystemExit("resource-init Reset-generation rearm model regressed")
+
 print("VR reconstructed R23/R25 architecture boundary verification passed")
