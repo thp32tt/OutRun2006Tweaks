@@ -35,6 +35,7 @@
 #include "stereo_shader.hpp"
 #include "runtime/r23_verified_bundle.hpp"
 #include "vr/ipc/cadence_v1.hpp"
+#include "vr/ipc/direct_history_policy.hpp"
 
 #ifndef OUTRUN_VR_BUILD_SHA
 #define OUTRUN_VR_BUILD_SHA "unknown"
@@ -2320,7 +2321,12 @@ int main(int argc, char** argv)
                     // being sampled by D3D11 are immediately per-slot ACKed so
                     // the producer can recycle them; the selected frame keeps
                     // R32's GPU EVENT completion ACK.
-                    if (directTransportOnly)
+                    const bool directHistoryBlocked =
+                        directTransportOnly && have &&
+                        OutRunVR::DirectHistoryPolicy::
+                            LatestPublicationBlocksHistory(before);
+
+                    if (directTransportOnly && !directHistoryBlocked)
                     {
                         std::array<OutRunVR::SharedRenderFrameState,
                             OutRunVR::RenderFrameRingSize> history{};
@@ -2443,6 +2449,17 @@ int main(int argc, char** argv)
                         {
                             have = false;
                         }
+                    }
+                    else if (directHistoryBlocked)
+                    {
+                        // The newest current-run publication is an explicit
+                        // stereo-intent-off barrier. Do not resurrect any older
+                        // producer-ahead DirectGPU descriptor from ring history.
+                        // A transient direct-only miss does not publish this
+                        // barrier, so the deliberate last-safe hold is unchanged.
+                        have = false;
+                        candidateRejectReason =
+                            "stereo-disabled-source-barrier";
                     }
 
                     constexpr std::uint32_t need = OutRunVR::RenderFrameStereoComplete |
