@@ -8,6 +8,7 @@
 #include <unordered_set>
 #include <array>
 #include <new>
+#include <limits>
 #include <intrin.h>
 
 namespace OutRunVRHudInspector
@@ -106,48 +107,61 @@ inline D3DFORMAT GetD3DFormatFromPixelFormat(const DDPIXELFORMAT& format)
 	return D3DFMT_UNKNOWN;
 }
 
-size_t D3DXGetFormatSize(D3DFORMAT fmt, size_t width = 1, size_t height = 1)
+struct TextureCopyLayout
 {
-	switch (fmt) {
-	case D3DFMT_R8G8B8: return 3 * width * height;
+	size_t rowBytes = 0;
+	size_t rowCount = 0;
+	size_t totalBytes = 0;
+};
+
+bool TryGetTextureCopyLayout(
+	D3DFORMAT fmt, size_t width, size_t height, TextureCopyLayout& out)
+{
+	out = {};
+	if (width == 0 || height == 0)
+		return false;
+
+	size_t unitsWide = width;
+	size_t unitsHigh = height;
+	size_t bytesPerUnit = 0;
+
+	switch (fmt)
+	{
+	case D3DFMT_R8G8B8:
+		bytesPerUnit = 3;
+		break;
 	case D3DFMT_A8R8G8B8:
 	case D3DFMT_A8B8G8R8:
-	case D3DFMT_X8R8G8B8:
-	case D3DFMT_X8B8G8R8: return 4 * width * height;
+		bytesPerUnit = 4;
+		break;
 	case D3DFMT_R5G6B5:
-	case D3DFMT_X1R5G5B5:
-	case D3DFMT_A1R5G5B5:
-	case D3DFMT_A4R4G4B4: return 2 * width * height;
-	case D3DFMT_A8:
-	case D3DFMT_P8:
-	case D3DFMT_L8: return width * height;
-	case D3DFMT_A8P8:
-	case D3DFMT_A8L8:
-	case D3DFMT_V8U8:
-	case D3DFMT_L6V5U5: return 2 * width * height;
-	case D3DFMT_X8L8V8U8:
-	case D3DFMT_Q8W8V8U8:
-	case D3DFMT_V16U16:
-	case D3DFMT_D32:
-	case D3DFMT_D24S8:
-	case D3DFMT_D24X8:
-	case D3DFMT_D24X4S4:
-	case D3DFMT_D32F_LOCKABLE:
-	case D3DFMT_R32F:
-	case D3DFMT_G32R32F: return 4 * width * height;
-	case D3DFMT_A32B32G32R32F: return 16 * width * height;
-	case D3DFMT_A16B16G16R16F: return 8 * width * height;
-	case D3DFMT_R16F:
-	case D3DFMT_D16_LOCKABLE:
-	case D3DFMT_D16: return 2 * width * height;
-	case D3DFMT_D15S1: return 2 * width * height;
-	case D3DFMT_DXT1: return ((width + 3) / 4) * ((height + 3) / 4) * 8;
+	case D3DFMT_A4R4G4B4:
+		bytesPerUnit = 2;
+		break;
+	case D3DFMT_DXT1:
+		unitsWide = width / 4 + (width % 4 ? 1 : 0);
+		unitsHigh = height / 4 + (height % 4 ? 1 : 0);
+		bytesPerUnit = 8;
+		break;
 	case D3DFMT_DXT3:
-	case D3DFMT_DXT5: return ((width + 3) / 4) * ((height + 3) / 4) * 16;
+	case D3DFMT_DXT5:
+		unitsWide = width / 4 + (width % 4 ? 1 : 0);
+		unitsHigh = height / 4 + (height % 4 ? 1 : 0);
+		bytesPerUnit = 16;
+		break;
 	default:
-		assert(false && "Unsupported format");
-		return 0;
+		return false;
 	}
+
+	if (unitsWide > (std::numeric_limits<size_t>::max)() / bytesPerUnit)
+		return false;
+	out.rowBytes = unitsWide * bytesPerUnit;
+	out.rowCount = unitsHigh;
+
+	if (out.rowCount > (std::numeric_limits<size_t>::max)() / out.rowBytes)
+		return false;
+	out.totalBytes = out.rowBytes * out.rowCount;
+	return out.totalBytes != 0;
 }
 
 #define D3DX_FILTER_NONE                 0x00000001
@@ -183,10 +197,14 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 	if (!pDevice || !pData || !ppTexture)
 		return E_POINTER;
 
+	*ppTexture = nullptr;
+	if (dataSize < sizeof(DDS_FILE))
+		return E_FAIL;
+
 	const uint8_t* data = static_cast<const uint8_t*>(pData);
 	const DDS_FILE* header = reinterpret_cast<const DDS_FILE*>(data);
 
-	// Validate DDS header
+	// Validate DDS header before reading any fields beyond the caller's buffer.
 	if (header->magic != DDS_MAGIC)
 		return E_FAIL;
 
@@ -203,10 +221,19 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 	if (MipLevels > header->data.dwMipMapCount)
 		MipLevels = header->data.dwMipMapCount;
 
-	// MipLevels = 0 means caller is asking us to gen mips, the only caller that sets MipLevels = 0 is UI related though, which doesn't really need any
-	// (though mip gen is still needed when caller asks for more mips than the texture file contains...)
+	// MipLevels = 0 means caller is asking us to gen mips, the only caller that
+	// sets MipLevels = 0 is UI related though, which doesn't really need any.
 	if (MipLevels == 0)
-		MipLevels = 1; 
+		MipLevels = 1;
+
+	if (Width == 0 || Height == 0)
+		return E_FAIL;
+
+	UINT maxMipLevels = 1;
+	for (UINT maxDim = (std::max)(Width, Height); maxDim > 1; maxDim >>= 1)
+		++maxMipLevels;
+	if (MipLevels > maxMipLevels)
+		return E_FAIL;
 
 	D3DFORMAT format_orig = GetD3DFormatFromPixelFormat(header->data.ddpfPixelFormat);
 	if (format_orig == D3DFMT_UNKNOWN)
@@ -220,7 +247,24 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 	spdlog::info("Texture {}x{} mips {} fmt {}", Width, Height, MipLevels, (int)format_orig);
 #endif
 
-	// Create the texture
+	// Validate the complete requested mip payload before allocating or locking a
+	// D3D resource. Every offset advance is checked against the explicit input size.
+	size_t validatedEnd = sizeof(DDS_FILE);
+	for (UINT mipLevel = 0; mipLevel < MipLevels; ++mipLevel)
+	{
+		const UINT mipWidth = (std::max)(1U, Width >> mipLevel);
+		const UINT mipHeight = (std::max)(1U, Height >> mipLevel);
+		TextureCopyLayout layout{};
+		if (!TryGetTextureCopyLayout(format_orig, mipWidth, mipHeight, layout) ||
+			validatedEnd > dataSize ||
+			layout.totalBytes > dataSize - validatedEnd)
+		{
+			return E_FAIL;
+		}
+		validatedEnd += layout.totalBytes;
+	}
+
+	LPDIRECT3DTEXTURE9 texture = nullptr;
 	HRESULT hr = pDevice->CreateTexture(
 		Width,
 		Height,
@@ -228,62 +272,97 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 		Usage,
 		format_present,
 		Pool,
-		ppTexture,
+		&texture,
 		nullptr
 	);
 
-	if (FAILED(hr))
-		return hr;
+	if (FAILED(hr) || !texture)
+		return FAILED(hr) ? hr : E_FAIL;
 
-	// Lock the texture and copy data
-	D3DLOCKED_RECT lockedRect;
-	uint8_t* srcData = const_cast<uint8_t*>(data) + sizeof(DDS_FILE);
+	auto failTexture = [&](HRESULT failure) -> HRESULT
+	{
+		if (texture)
+		{
+			texture->Release();
+			texture = nullptr;
+		}
+		*ppTexture = nullptr;
+		return failure;
+	};
+
+	size_t sourceOffset = sizeof(DDS_FILE);
 	for (UINT mipLevel = 0; mipLevel < MipLevels; ++mipLevel)
 	{
-		hr = (*ppTexture)->LockRect(mipLevel, &lockedRect, nullptr, D3DLOCK_DISCARD);
-		if (FAILED(hr))
+		const UINT mipWidth = (std::max)(1U, Width >> mipLevel);
+		const UINT mipHeight = (std::max)(1U, Height >> mipLevel);
+		TextureCopyLayout layout{};
+		if (!TryGetTextureCopyLayout(format_orig, mipWidth, mipHeight, layout) ||
+			sourceOffset > dataSize ||
+			layout.totalBytes > dataSize - sourceOffset)
 		{
-			(*ppTexture)->Release();
-			return hr;
+			return failTexture(E_FAIL);
 		}
 
-		// Calculate mip size
-		UINT mipWidth = max(1U, Width >> mipLevel);
-		UINT mipHeight = max(1U, Height >> mipLevel);
-		size_t mipSize = D3DXGetFormatSize(format_present, mipWidth, mipHeight);
+		D3DLOCKED_RECT lockedRect{};
+		hr = texture->LockRect(mipLevel, &lockedRect, nullptr, D3DLOCK_DISCARD);
+		if (FAILED(hr))
+			return failTexture(hr);
+
+		const size_t destinationPitch =
+			lockedRect.Pitch > 0 ? static_cast<size_t>(lockedRect.Pitch) : 0;
+		if (!lockedRect.pBits || destinationPitch < layout.rowBytes)
+		{
+			const HRESULT unlockHr = texture->UnlockRect(mipLevel);
+			return failTexture(FAILED(unlockHr) ? unlockHr : D3DERR_INVALIDCALL);
+		}
+
+		const uint8_t* srcData = data + sourceOffset;
+		uint8_t* destData = static_cast<uint8_t*>(lockedRect.pBits);
 
 		if (format_orig == D3DFMT_A8B8G8R8)
 		{
-			// Convert A8B8G8R8 to A8R8G8B8
-			uint8_t* destData = static_cast<uint8_t*>(lockedRect.pBits);
-			for (UINT y = 0; y < mipHeight; ++y) {
-				for (UINT x = 0; x < mipWidth; ++x) {
-					uint8_t b = srcData[4 * (y * mipWidth + x)];
-					uint8_t g = srcData[4 * (y * mipWidth + x) + 1];
-					uint8_t r = srcData[4 * (y * mipWidth + x) + 2];
-					uint8_t a = srcData[4 * (y * mipWidth + x) + 3];
-					destData[4 * (y * mipWidth + x)] = r;
-					destData[4 * (y * mipWidth + x) + 1] = g;
-					destData[4 * (y * mipWidth + x) + 2] = b;
-					destData[4 * (y * mipWidth + x) + 3] = a;
+			// Convert A8B8G8R8 to A8R8G8B8 while honoring destination pitch.
+			for (UINT y = 0; y < mipHeight; ++y)
+			{
+				const uint8_t* srcRow = srcData + static_cast<size_t>(y) * layout.rowBytes;
+				uint8_t* destRow = destData + static_cast<size_t>(y) * destinationPitch;
+				for (UINT x = 0; x < mipWidth; ++x)
+				{
+					const size_t pixel = static_cast<size_t>(x) * 4;
+					const uint8_t b = srcRow[pixel];
+					const uint8_t g = srcRow[pixel + 1];
+					const uint8_t r = srcRow[pixel + 2];
+					const uint8_t a = srcRow[pixel + 3];
+					destRow[pixel] = r;
+					destRow[pixel + 1] = g;
+					destRow[pixel + 2] = b;
+					destRow[pixel + 3] = a;
 				}
 			}
 		}
-		else {
-			// Copy image data to the texture directly
-			memcpy(lockedRect.pBits, srcData, mipSize);
+		else
+		{
+			// D3DLOCKED_RECT::Pitch is the destination row stride for both
+			// uncompressed pixel rows and compressed block rows.
+			for (size_t row = 0; row < layout.rowCount; ++row)
+			{
+				const uint8_t* srcRow = srcData + row * layout.rowBytes;
+				uint8_t* destRow = destData + row * destinationPitch;
+				memcpy(destRow, srcRow, layout.rowBytes);
+			}
 		}
 
-		(*ppTexture)->UnlockRect(mipLevel);
+		const HRESULT unlockHr = texture->UnlockRect(mipLevel);
+		if (FAILED(unlockHr))
+			return failTexture(unlockHr);
 
-		// Move to the next mip level
-		srcData += mipSize;
+		sourceOffset += layout.totalBytes;
 	}
 
 	// Apply filtering modes (just the ones used by C2C)
 	// TODO: this likely isn't applying filtering properly, we probably need to gen mipmaps & use D3DXFilterTexture...
-
-	if (Filter != 0) {
+	if (Filter != 0)
+	{
 		if (Filter == D3DX_FILTER_NONE)
 			Filter = D3DTEXF_NONE;
 		else if (Filter == D3DX_FILTER_LINEAR)
@@ -291,7 +370,8 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 		pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, Filter);
 		pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, Filter);
 	}
-	if (MipFilter != 0) {
+	if (MipFilter != 0)
+	{
 		if (MipFilter == D3DX_FILTER_NONE)
 			MipFilter = D3DTEXF_NONE;
 		else if (MipFilter == D3DX_FILTER_LINEAR)
@@ -299,6 +379,7 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 		pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, MipFilter);
 	}
 
+	*ppTexture = texture;
 	return S_OK;
 }
 
@@ -686,7 +767,8 @@ class TextureReplacement : public Hook
 
 	static void HandleTexture(void** ppSrcData, UINT* pSrcDataSize, std::filesystem::path texturePackName, bool isUITexture)
 	{
-		if (!*ppSrcData || !*pSrcDataSize) [[unlikely]]
+		if (!ppSrcData || !pSrcDataSize || !*ppSrcData ||
+			*pSrcDataSize < sizeof(DDS_FILE)) [[unlikely]]
 			return;
 
 		bool allowReplacement = isUITexture ? Settings::UITextureReplacement : Settings::SceneTextureReplacement;
@@ -758,7 +840,8 @@ class TextureReplacement : public Hook
 			{
 				size_t size = 0;
 				const uint8_t* file = FileData.getFileData(path_load, &size);
-				if (file)
+				if (file && size >= sizeof(DDS_FILE) &&
+					size <= (std::numeric_limits<UINT>::max)())
 				{
 					const DDS_FILE* newhead = (const DDS_FILE*)file;
 					if (newhead->magic == DDS_MAGIC)
@@ -778,7 +861,7 @@ class TextureReplacement : public Hook
 
 						// Update pointers to our new texture
 						*ppSrcData = (void*)file;
-						*pSrcDataSize = size;
+						*pSrcDataSize = static_cast<UINT>(size);
 
 						// Don't dump texture if we've loaded in new one
 						allowExtract = false;
