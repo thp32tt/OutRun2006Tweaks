@@ -4,23 +4,17 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
     DISPLAY=:99
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      xvfb x11vnc openbox novnc websockify tini curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends xvfb x11vnc openbox novnc websockify tini curl && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/outrun
 
 COPY requirements.direct.txt ./requirements.txt
-RUN python -m pip install --upgrade pip --index-url https://pypi.org/simple \\
-    && python -m pip install --no-cache-dir --prefer-binary --index-url https://pypi.org/simple playwright==1.63.0
+RUN python -m pip install --upgrade pip --index-url https://pypi.org/simple && python -m pip install --no-cache-dir --prefer-binary --index-url https://pypi.org/simple playwright==1.63.0
 
-RUN mkdir -p /opt/outrun/app /opt/outrun/prompts /tmp/controller-parts \
-    && touch /opt/outrun/app/__init__.py
+RUN mkdir -p /opt/outrun/app /opt/outrun/prompts /tmp/controller-parts && touch /opt/outrun/app/__init__.py
 
 COPY src/controller.py.part* /tmp/controller-parts/
-RUN cat /tmp/controller-parts/controller.py.part* > /opt/outrun/app/controller.py \
-    && python -m py_compile /opt/outrun/app/controller.py \
-    && rm -rf /tmp/controller-parts
+RUN cat /tmp/controller-parts/controller.py.part* > /opt/outrun/app/controller.py && python -m py_compile /opt/outrun/app/controller.py && rm -rf /tmp/controller-parts
 
 COPY entrypoint.direct.sh /opt/outrun/entrypoint.sh
 COPY bootstrap_review.override.md /opt/outrun/prompts/bootstrap_review.md
