@@ -28,143 +28,178 @@ async def visible_exact_text(page: Page, text: str):
     return None
 
 
-async def current_thinking_level(page: Page) -> Optional[str]:
-    """Best-effort detection of the level shown in the web composer picker."""
-    # Prefer visible buttons with an exact known level label. Menu choices are normally
-    # hidden until the picker opens, so an exact visible button is a good current-state signal.
-    for canonical, aliases in THINKING_LABEL_ALIASES.items():
-        for label in aliases:
-            try:
-                loc = page.get_by_role("button", name=label, exact=True)
-                count = await loc.count()
-                for i in range(min(count, 6)):
-                    if await loc.nth(i).is_visible(timeout=200):
-                        return canonical
-            except Exception:
-                continue
-    return None
-
-
-async def find_thinking_picker(page: Page):
-    # 1) Exact current-level button, which is the normal 2026 web UI shape.
-    for label in ALL_THINKING_LABELS:
-        try:
-            loc = page.get_by_role("button", name=label, exact=True)
-            count = await loc.count()
-            for i in range(min(count, 6)):
-                item = loc.nth(i)
-                if await item.is_visible(timeout=200):
-                    return item
-        except Exception:
-            continue
-
-    # 2) accessibility/title fallbacks for gradual UI variants.
+async def find_thinking_control(page: Page):
+    """Locate the current ChatGPT composer reasoning/model pill."""
     selectors = [
+        "form button.__composer-pill[aria-haspopup='menu']",
+        "button.__composer-pill[aria-haspopup='menu']",
+        "form button[aria-haspopup='menu'][data-tone='neutral']",
+        "button[data-testid='model-switcher-dropdown-button'][aria-haspopup='menu']",
         "button[aria-label*='thinking' i]",
         "button[aria-label*='reasoning' i]",
         "button[aria-label*='model' i]",
-        "button[title*='thinking' i]",
-        "button[title*='reasoning' i]",
-        "button[title*='model' i]",
     ]
     for sel in selectors:
         try:
             loc = page.locator(sel)
             count = await loc.count()
-            for i in range(min(count, 10)):
+            for i in range(count - 1, -1, -1):
                 item = loc.nth(i)
-                if await item.is_visible(timeout=200):
+                if await item.is_visible(timeout=250):
                     return item
         except Exception:
             continue
     return None
 
 
-async def ensure_thinking_level(page: Page, requested: str = PREFERRED_THINKING_LEVEL) -> bool:
-    """Select and verify the requested ChatGPT thinking level before a send.
-
-    In strict mode the caller must not send if this cannot be positively verified.
-    """
-    requested = requested.strip() or "High"
-    aliases = THINKING_LABEL_ALIASES.get(requested, [requested])
-
-    current = await current_thinking_level(page)
-    if current == requested:
-        write_runtime(last_thinking_level_result=f"verified:{requested}")
-        return True
-
-    picker = await find_thinking_picker(page)
-    if not picker:
-        write_runtime(last_thinking_level_result=f"picker_not_found:{requested}")
-        return False
+async def open_thinking_slider(page: Page):
+    control = await find_thinking_control(page)
+    if not control:
+        return None, None
 
     try:
-        await picker.click()
-        await page.wait_for_timeout(500)
+        expanded = await control.get_attribute("aria-expanded")
+        state = await control.get_attribute("data-state")
+        if expanded != "true" and state != "open":
+            await control.click(force=True, timeout=3000)
     except Exception:
-        log.exception("thinking picker click failed")
-        write_runtime(last_thinking_level_result=f"picker_click_failed:{requested}")
-        return False
+        try:
+            await control.press("Enter")
+        except Exception:
+            return control, None
 
-    option = None
-    # Prefer semantic menu/option/button matches before generic text.
-    for label in aliases:
-        for role in ("menuitem", "option", "button"):
-            try:
-                loc = page.get_by_role(role, name=label, exact=True)
-                count = await loc.count()
-                for i in range(min(count, 8)):
-                    item = loc.nth(i)
-                    if await item.is_visible(timeout=300):
-                        # Avoid just re-clicking the current picker button when possible.
-                        option = item
-                        break
-                if option:
-                    break
-            except Exception:
-                continue
-        if option:
-            break
+    deadline = time.time() + 5
+    while time.time() < deadline:
+        try:
+            container = page.locator("[data-model-reasoning-effort-slider]").last
+            if await container.count() and await container.is_visible(timeout=250):
+                slider = container.locator("[role='slider']").first
+                if await slider.count():
+                    return control, slider
+        except Exception:
+            pass
+        await page.wait_for_timeout(100)
 
-    if option is None:
-        for label in aliases:
-            option = await visible_exact_text(page, label)
-            if option:
-                break
+    return control, None
 
-    if option is None:
+
+async def read_slider_state(slider):
+    try:
+        raw_min = await slider.get_attribute("aria-valuemin")
+        raw_max = await slider.get_attribute("aria-valuemax")
+        raw_now = await slider.get_attribute("aria-valuenow")
+        if raw_min is None or raw_max is None or raw_now is None:
+            return None
+        vmin, vmax, now = int(raw_min), int(raw_max), int(raw_now)
+        if vmax < vmin or now < vmin or now > vmax:
+            return None
+        return vmin, vmax, now
+    except Exception:
+        return None
+
+
+async def current_thinking_level(page: Page) -> Optional[str]:
+    control, slider = await open_thinking_slider(page)
+    if not slider:
+        return None
+    try:
+        state = await read_slider_state(slider)
+        if not state:
+            return None
+        vmin, vmax, now = state
+        offset = now - vmin
+        mapping = {0: "Instant", 1: "Medium", 2: "High", 3: "Extra High"}
+        return mapping.get(offset)
+    finally:
         try:
             await page.keyboard.press("Escape")
         except Exception:
             pass
-        write_runtime(last_thinking_level_result=f"option_not_found:{requested}")
+
+
+async def ensure_thinking_level(page: Page, requested: str = PREFERRED_THINKING_LEVEL) -> bool:
+    """Select and positively verify the current ChatGPT reasoning slider."""
+    requested = requested.strip() or "High"
+    target_offset = {
+        "Instant": 0,
+        "Medium": 1,
+        "High": 2,
+        "Extra High": 3,
+    }.get(requested)
+    if target_offset is None:
+        write_runtime(last_thinking_level_result=f"unsupported_level:{requested}")
         return False
+
+    control, slider = await open_thinking_slider(page)
+    if not control:
+        write_runtime(last_thinking_level_result=f"picker_not_found:{requested}")
+        return False
+    if not slider:
+        try:
+            await page.keyboard.press("Escape")
+        except Exception:
+            pass
+        write_runtime(last_thinking_level_result=f"slider_not_found:{requested}")
+        return False
+
+    state = await read_slider_state(slider)
+    if not state:
+        try:
+            await page.keyboard.press("Escape")
+        except Exception:
+            pass
+        write_runtime(last_thinking_level_result=f"slider_state_invalid:{requested}")
+        return False
+
+    vmin, vmax, now = state
+    target = vmin + target_offset
+    if target > vmax:
+        try:
+            await page.keyboard.press("Escape")
+        except Exception:
+            pass
+        write_runtime(last_thinking_level_result=f"level_unavailable:{requested}:{vmin}-{vmax}")
+        return False
+
+    if now != target:
+        try:
+            # The semantic slider can be zero-width/aria-hidden, but it still receives
+            # keyboard events when focused programmatically.
+            await slider.evaluate("(el) => el.focus()")
+            # Move deterministically to the minimum, then to the requested offset.
+            for _ in range(max(1, vmax - vmin + 1)):
+                await page.keyboard.press("ArrowLeft")
+                await page.wait_for_timeout(40)
+            for _ in range(target_offset):
+                await page.keyboard.press("ArrowRight")
+                await page.wait_for_timeout(80)
+        except Exception:
+            log.exception("reasoning slider keyboard selection failed")
+            try:
+                await page.keyboard.press("Escape")
+            except Exception:
+                pass
+            write_runtime(last_thinking_level_result=f"selection_failed:{requested}")
+            return False
+
+    # Positive verification from the slider's actual ARIA value.
+    verified_state = await read_slider_state(slider)
+    verified = bool(verified_state and verified_state[2] == target)
+    observed = verified_state[2] if verified_state else None
 
     try:
-        await option.click()
-        await page.wait_for_timeout(700)
+        await page.keyboard.press("Escape")
     except Exception:
-        log.exception("thinking level selection failed")
-        write_runtime(last_thinking_level_result=f"selection_failed:{requested}")
-        return False
+        pass
 
-    # Positive verification after selection. Try the canonical detector first, then
-    # exact visible button labels in case localization is involved.
-    current = await current_thinking_level(page)
-    verified = current == requested
-    if not verified:
-        for label in aliases:
-            try:
-                loc = page.get_by_role("button", name=label, exact=True)
-                count = await loc.count()
-                if any([await loc.nth(i).is_visible(timeout=150) for i in range(min(count, 6))]):
-                    verified = True
-                    break
-            except Exception:
-                continue
-
-    write_runtime(last_thinking_level_result=(f"selected:{requested}" if verified else f"verify_failed:{requested}"))
+    write_runtime(
+        last_thinking_level_result=(
+            f"verified:{requested}:{target}" if verified
+            else f"verify_failed:{requested}:target={target}:observed={observed}"
+        )
+    )
     return verified
+
 
 async def send_message(page: Page, message: str) -> bool:
     box = await first_visible(page, INPUT_SELECTORS)
