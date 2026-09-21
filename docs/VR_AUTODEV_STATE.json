@@ -51,7 +51,9 @@
         "HUD world-fixed, not head-locked",
         "R43/R44 raw-game-WVP finite HUD plane retained",
         "menu LOCAL-fixed mono presentation",
-        "live RendererProjection not mutated for union culling"
+        "live RendererProjection not mutated for union culling",
+        "Unknown draw classes fail closed to R26/R23; never widen renderer scope just to discover HUD",
+        "HUD discovery must use canonical EXE/original-mod semantics or exact runtime evidence before code promotion"
       ],
       "promotionRule": "Changes to visual ownership, HUD space, presentation space or gameplay transport remain experiment/default-off until user HMD evidence explicitly promotes the exact SHA.",
       "regressionAction": "CI must fail; do not package or integrate a candidate that violates the visual contract."
@@ -77,7 +79,7 @@
     "Recovery runtime forcing 60 FPS with interpolation/cadence disabled contributes independent judder on a 90 Hz OpenXR session.",
     "Restore fast R29 world rendering and classification in bounded variants before deciding which later R30-R34 overlays are required."
   ],
-  "nextAction": "Validate the DirectGPU-only ACTIVE_R26_R43_R44 candidate; use stack-resolved HUD semantics to map original UIScaling/EXE callers, then promote only exact runtime-verified visual changes.",
+  "nextAction": "Validate R46 narrowed XYZRHW scope first. Preserve HUD world-lock only where positive planar/semantic evidence exists; use EXE/original-mod reverse-analysis to target remaining HUD without broad draw interception.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
