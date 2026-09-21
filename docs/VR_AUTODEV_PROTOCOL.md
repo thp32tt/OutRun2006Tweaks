@@ -148,3 +148,47 @@ Ingestion order:
 6. Treat any accompanying user description as optional extra evidence. Do not require the user to restate symptoms already inferable from the standardized bundle.
 
 An incomplete bundle is analyzed to the maximum supported extent and marked with explicit evidence gaps rather than being discarded.
+
+
+## Durable regression knowledge gate
+
+Runtime regressions are durable project knowledge, not chat-only context.
+
+Sources of truth:
+- machine-readable registry: `docs/VR_REGRESSION_KNOWLEDGE.json`
+- human runbook/history: `docs/VR_PROBLEM_HISTORY.md`
+- append-only event ledger: GitHub Issue #13, `[VR] Runtime Problem / Regression Ledger`
+
+### Mandatory C0 recovery behavior
+
+Every A/B/C/D run that can affect diagnosis or integration must load the regression registry before new hypotheses are created. D must additionally:
+1. compare the current candidate changed paths and behavior hypothesis with every case's `riskPaths`, `revalidationTriggers`, and `symptomFingerprint`;
+2. reuse the existing regression key when the same symptom recurs;
+3. recover known-good/known-bad identities, prior root cause, prior fix references and verifier recipe before attempting a new fix;
+4. record missing historical data as `NEEDS_RECONSTRUCTION` rather than inventing it.
+
+### Integration gate
+
+A D candidate may not be integrated merely because it compiles or its new finding is fixed. Before integration:
+- every triggered historical regression case must have a current revalidation result;
+- deterministic/static/build-verifiable checks must pass;
+- hardware-visible regressions may remain `NEED_HMD_TEST`, but that state must be explicit and carried into the next frozen CORRECTNESS package;
+- a recurrence must increment the existing case recurrence counter and append a `REOPENED` event to Issue #13.
+
+### Fixed/DONE requirements
+
+A regression is not durably FIXED/DONE until the registry contains:
+- stable regression key and symptom fingerprint;
+- bounded root cause;
+- exact fix reference(s);
+- affected/risk paths and revalidation triggers;
+- deterministic verifier or evidence recipe;
+- validation evidence level;
+- for runtime-visible behavior, matching USER RUNTIME VERIFIED evidence before final DONE.
+
+### Event persistence
+
+Issue #13 is append-only. Each occurrence, reopen, fix and validation event should record:
+`event`, `regressionKey`, `observedAtKst`, `sourceSha`, build/profile/session identity when available, symptom fingerprint, evidence, root cause, fix SHA, affected paths, verifier, validation result, status and exact nextAction.
+
+This gate is enforced structurally by `tools/Test-VRRegressionKnowledge.ps1` in coordination and active DX9Ex CI. It cannot prove HMD correctness, but it prevents solved regressions from disappearing from project memory.
