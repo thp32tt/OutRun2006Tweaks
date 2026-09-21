@@ -73,6 +73,36 @@ def main() -> int:
         "OUTRUN_VR_EXE_SEMANTICS_VERIFIED",
         "Configuration identity is still inconsistent after session rotation.",
     ])
+    profiles = read("tools/OutRunVR-TestProfiles.ps1")
+    correctness = profiles.split("Name='CORRECTNESS'", 1)[1]
+    for marker in [
+        "'-FramerateLimit=60'",
+        "'-FramerateFastLoad=0'",
+        "'-FramerateInterpolation=false'",
+        "'-FramerateUnlockExperimental=false'",
+        "'-FrameCadenceMode=0'",
+        "'-DisableDesktopVsync=false'",
+    ]:
+        if marker not in correctness:
+            raise AssertionError(
+                f"CORRECTNESS profile missing conservative marker: {marker}")
+    require("tools/Select-OutRunVRBackend.ps1", [
+        '"d3d9-classic"',
+        '"B_CLASSIC_D3D9_VR"',
+        '"PreferD3D9Ex" "false"',
+        "CLASSIC D3D9 VR",
+    ])
+    require("tools/OutRunVR-Backend-Selector.ps1", [
+        "CLASSIC D3D9 + VR",
+        '"d3d9-classic"',
+    ])
+    require("vrhost/src/main_r23.cpp", [
+        '"outrun-vr-host-startup.log"',
+        'startup("wait-game-window-begin")',
+        'startup("shared-writer-ready")',
+        'startup("compositor-ready")',
+        'startup("fatal", e.what())',
+    ])
     require("tools/Collect-OutRunVRLogs.ps1", [
         "CONFIG_DRIFT_STATUS",
         "CollectionConfigSha256",
