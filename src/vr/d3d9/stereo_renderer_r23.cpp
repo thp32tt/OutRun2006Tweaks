@@ -661,6 +661,30 @@ namespace OutRunVRStereo
             if (!gameDevice)
                 return hr;
 
+            // R23 is the final effective Present owner in the layered hook chain.
+            // Initialize private eye/backbuffer tracking here, after the game has
+            // completed a real Present, rather than in the early R7 owner that can
+            // be bypassed by later Present wrappers. This keeps CreateDeviceEx
+            // pre-exposure state untouched while guaranteeing TargetIsBackBuffer()
+            // becomes meaningful before the next recovery-baseline Clear.
+            if (SUCCEEDED(hr) && !StereoResourcesReady)
+            {
+                if (EnsureStereoResources(device))
+                {
+                    if (!FirstDeferredResourceInitLogged)
+                    {
+                        FirstDeferredResourceInitLogged = true;
+                        spdlog::info(
+                            "VR R23 INIT: private eye/backbuffer resources initialized after final game Present; recovery baseline can now identify the main backbuffer");
+                    }
+                }
+                else
+                {
+                    spdlog::warn(
+                        "VR R23 INIT: deferred private eye/backbuffer initialization failed after successful Present; stereo remains theater/fail-closed");
+                }
+            }
+
             std::int64_t ageMs = -1;
             const char* reason = R23DiagnoseHostFreshness(ageMs);
             if (std::strcmp(reason, R23LastHostReason) != 0)
