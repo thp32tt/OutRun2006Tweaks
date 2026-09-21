@@ -84,7 +84,7 @@ namespace OutRunVRHudSemantics
             return { "C2CDontLoseGF", "HUD_GF_WARNING", SpacePolicy::ScreenHud };
         if (InRange(callRva, 0x0BD900, 0x0BE100))
             return { "GhostGap", "HUD_GHOST", SpacePolicy::ScreenHud };
-        if (InRange(callRva, 0x0BE300, 0x0BEA40))
+        if (InRange(callRva, 0x0BE270, 0x0BEA40))
             return { "DispTimeAttack2D", "HUD_TIME_ATTACK", SpacePolicy::ScreenHud };
         if (InRange(callRva, 0x0BEA40, 0x0BEB20))
             return { "NaviPub_DispTimeAttackGoal", "HUD_GOAL_TIME", SpacePolicy::ScreenHud };
