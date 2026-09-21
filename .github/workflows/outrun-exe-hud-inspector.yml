@@ -5,6 +5,19 @@ on:
   push:
     paths:
       - 'src/vr/debug/hud_inspector.cpp'
+      - 'OutRun2006Tweaks.ini'
+      - 'tools/Select-OutRunVRBackend.ps1'
+      - 'tools/OutRunVR-TestProfiles.ps1'
+      - 'tools/analyze_outrun_assets.py'
+      - 'src/interpolation.cpp'
+      - 'src/hooks_exceptions.cpp'
+      - 'src/hooks_bugfixes.cpp'
+      - 'src/hooks_graphics.cpp'
+      - 'src/vr/d3d9/stereo_renderer_r34.cpp'
+      - 'src/vr/d3d9/stereo_renderer_r29.cpp'
+      - 'src/vr/game/outrun_renderer.cpp'
+      - 'src/vr/settings.cpp'
+      - 'src/vr/game/render_semantics.hpp'
       - 'src/vr/hud_semantics.hpp'
       - 'src/hooks_textures.cpp'
       - 'CMakeLists.txt'
@@ -18,6 +31,19 @@ on:
   pull_request:
     paths:
       - 'src/vr/debug/hud_inspector.cpp'
+      - 'OutRun2006Tweaks.ini'
+      - 'tools/Select-OutRunVRBackend.ps1'
+      - 'tools/OutRunVR-TestProfiles.ps1'
+      - 'tools/analyze_outrun_assets.py'
+      - 'src/interpolation.cpp'
+      - 'src/hooks_exceptions.cpp'
+      - 'src/hooks_bugfixes.cpp'
+      - 'src/hooks_graphics.cpp'
+      - 'src/vr/d3d9/stereo_renderer_r34.cpp'
+      - 'src/vr/d3d9/stereo_renderer_r29.cpp'
+      - 'src/vr/game/outrun_renderer.cpp'
+      - 'src/vr/settings.cpp'
+      - 'src/vr/game/render_semantics.hpp'
       - 'src/vr/hud_semantics.hpp'
       - 'src/hooks_textures.cpp'
       - 'CMakeLists.txt'
@@ -42,7 +68,12 @@ jobs:
         shell: pwsh
         run: |
           $failed=$false
-          foreach($script in @('tools/Collect-OutRunVRLogs.ps1','tools/Run-OutRunVRTest.ps1')){
+          foreach($script in @(
+            'tools/Collect-OutRunVRLogs.ps1',
+            'tools/Run-OutRunVRTest.ps1',
+            'tools/OutRunVR-TestProfiles.ps1',
+            'tools/Select-OutRunVRBackend.ps1'
+          )){
             $tokens=$null
             $errors=$null
             [void][System.Management.Automation.Language.Parser]::ParseFile(
@@ -53,6 +84,10 @@ jobs:
             }
           }
           if($failed){ throw 'PowerShell syntax validation failed' }
+
+      - name: Asset semantic parser self-test
+        shell: pwsh
+        run: python tools/analyze_outrun_assets.py --self-test
 
       - name: Download upstream replacement EXE
         shell: pwsh
@@ -114,6 +149,9 @@ jobs:
           Copy-Item $dll.FullName stage/dinput8.dll
           Copy-Item tools/Collect-OutRunVRLogs.ps1 stage/
           Copy-Item tools/Run-OutRunVRTest.ps1 stage/
+          Copy-Item tools/OutRunVR-TestProfiles.ps1 stage/
+          Copy-Item tools/Select-OutRunVRBackend.ps1 stage/
+          Copy-Item tools/analyze_outrun_assets.py stage/
           git rev-parse HEAD | Set-Content stage/SOURCE_SHA.txt
 
       - uses: actions/upload-artifact@v4
