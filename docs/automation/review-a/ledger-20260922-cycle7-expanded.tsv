@@ -1,0 +1,151 @@
+unit	sha	identity	file	path	lens	hypothesis	evidence	result	type
+A6-001	265504f6	r26:InvalidateFallbackAnchor:ordering	r26	InvalidateFallbackAnchor	anchor-state	ordering	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	falsification
+A6-002	265504f6	r26:QueueApplicationRecenter:ordering	r26	QueueApplicationRecenter	recenter-state	ordering	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	architecture
+A6-003	265504f6	r26:ApplicationRecenterAppliedForPendingGameRequest:ordering	r26	ApplicationRecenterAppliedForPendingGameRequest	generation-gate	ordering	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	cross-trace
+A6-004	265504f6	r26:ApplyPendingApplicationRecenter:ordering	r26	ApplyPendingApplicationRecenter	space-lifetime	ordering	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	falsification
+A6-005	265504f6	r26:EnsureFallbackAnchor:ordering	r26	EnsureFallbackAnchor	fallback-lifetime	ordering	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	architecture
+A6-006	265504f6	r26:TrySubmitAnchoredStartupFallback:ordering	r26	TrySubmitAnchoredStartupFallback	fallback-ownership	ordering	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	cross-trace
+A6-007	265504f6	r26:WriteSyntheticLocalChange:ordering	r26	WriteSyntheticLocalChange	event-state	ordering	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	falsification
+A6-008	265504f6	r26:PollEvent:ordering	r26	PollEvent	event-lifecycle	ordering	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	architecture
+A6-009	265504f6	r26:IncomingPath:ordering	r26	IncomingPath	submission-classification	ordering	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	cross-trace
+A6-010	265504f6	r26:CompletePendingGameRequestAfterVisibleProjection:ordering	r26	CompletePendingGameRequestAfterVisibleProjection	request-completion	ordering	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	falsification
+A6-011	265504f6	r26:EndFrame:ordering	r26	EndFrame	submission-lifecycle	ordering	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	architecture
+A6-012	265504f6	r32:ReleasePending:ordering	r32	ReleasePending	query-lifetime	ordering	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	cross-trace
+A6-013	265504f6	r32:ObserveGeneration:ordering	r32	ObserveGeneration	generation-state	ordering	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	falsification
+A6-014	265504f6	r32:EnsureFence:ordering	r32	EnsureFence	query-creation	ordering	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	architecture
+A6-015	265504f6	r32:PollCompletedAcks:ordering	r32	PollCompletedAcks	ack-lifetime	ordering	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	cross-trace
+A6-016	265504f6	r32:ArmConsumptionFence:ordering	r32	ArmConsumptionFence	sync-ownership	ordering	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	falsification
+A6-017	265504f6	r32:MetadataValid:ordering	r32	MetadataValid	metadata-gate	ordering	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	architecture
+A6-018	265504f6	r32:CanFastSubmit:ordering	r32	CanFastSubmit	fallback-gate	ordering	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	cross-trace
+A6-019	265504f6	r32:CapturePerfSnapshot:ordering	r32	CapturePerfSnapshot	telemetry-state	ordering	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	falsification
+A6-020	265504f6	r32:MaybeLogPerf:ordering	r32	MaybeLogPerf	telemetry-lifetime	ordering	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	architecture
+A6-021	265504f6	r32:EndFrame:ordering	r32	EndFrame	submission-sync	ordering	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	cross-trace
+A6-022	265504f6	r32:DestroySession:ordering	r32	DestroySession	session-teardown	ordering	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	falsification
+A6-023	265504f6	main:R23UsableGameplayBootstrapFrame:ordering	main	R23UsableGameplayBootstrapFrame	bootstrap-gate	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-024	265504f6	main:R23ReadFinalCounters:ordering	main	R23ReadFinalCounters	fallback-observation	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-025	265504f6	main:R23ActualFinalKind:ordering	main	R23ActualFinalKind	submission-observation	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-026	265504f6	main:R23MetricWindow::Add:ordering	main	R23MetricWindow::Add	telemetry-state	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-027	265504f6	main:R23MetricWindow::Reset:ordering	main	R23MetricWindow::Reset	telemetry-reset	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-028	265504f6	main:R23PipelineWindow::Note:ordering	main	R23PipelineWindow::Note	telemetry-ownership	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-029	265504f6	main:R23ReleaseDirectHoldResources:ordering	main	R23ReleaseDirectHoldResources	resource-lifetime	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-030	265504f6	main:R23InvalidateDirectHold:ordering	main	R23InvalidateDirectHold	identity-invalidation	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-031	265504f6	main:R37FrameIdBefore:ordering	main	R37FrameIdBefore	wraparound-order	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-032	265504f6	main:R23FrameUnchanged:ordering	main	R23FrameUnchanged	frame-atomicity	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-033	265504f6	main:R23ValidateDirectResourceSize:ordering	main	R23ValidateDirectResourceSize	resource-identity	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-034	265504f6	main:R23InvalidateDirect:ordering	main	R23InvalidateDirect	failure-atomicity	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-035	265504f6	main:R23CommitDirectAfterValidation:ordering	main	R23CommitDirectAfterValidation	commit-atomicity	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-036	265504f6	main:R23CommitClassicAfterValidation:ordering	main	R23CommitClassicAfterValidation	fallback-ownership	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-037	265504f6	main:R23RenderProjection:ordering	main	R23RenderProjection	projection-lifetime	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-038	265504f6	main:R35CadenceHost::~R35CadenceHost:ordering	main	R35CadenceHost::~R35CadenceHost	ipc-teardown	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-039	265504f6	main:R35CadenceHost::SetRunning:ordering	main	R35CadenceHost::SetRunning	state-transition	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-040	265504f6	main:R35CadenceHost::UpdateActiveRenderHz:ordering	main	R35CadenceHost::UpdateActiveRenderHz	config-transition	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-041	265504f6	main:R35CadenceHost::IssueIfDue:ordering	main	R35CadenceHost::IssueIfDue	request-lifecycle	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-042	265504f6	main:R35CadenceHost::WaitForPresented:ordering	main	R35CadenceHost::WaitForPresented	bounded-wait	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-043	265504f6	main:R35CadenceHost::Publish:ordering	main	R35CadenceHost::Publish	ipc-atomicity	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-044	265504f6	main:SESSION_STATE_STOPPING:ordering	main	SESSION_STATE_STOPPING	session-lifecycle	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-045	265504f6	main:pendingReferenceSpaceChange:ordering	main	pendingReferenceSpaceChange	space-transition	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-046	265504f6	main:frame-loop-locate:ordering	main	frame-loop-locate	space-consistency	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-047	265504f6	main:client-PID-handoff:ordering	main	client-PID-handoff	process-ownership	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-048	265504f6	main:shutdown:ordering	main	shutdown	teardown-order	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-049	265504f6	main:catch-cleanup:ordering	main	catch-cleanup	failure-teardown	ordering	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-050	265504f6	r26:InvalidateFallbackAnchor:failure	r26	InvalidateFallbackAnchor	anchor-state	failure	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	architecture
+A6-051	265504f6	r26:QueueApplicationRecenter:failure	r26	QueueApplicationRecenter	recenter-state	failure	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	cross-trace
+A6-052	265504f6	r26:ApplicationRecenterAppliedForPendingGameRequest:failure	r26	ApplicationRecenterAppliedForPendingGameRequest	generation-gate	failure	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	falsification
+A6-053	265504f6	r26:ApplyPendingApplicationRecenter:failure	r26	ApplyPendingApplicationRecenter	space-lifetime	failure	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	architecture
+A6-054	265504f6	r26:EnsureFallbackAnchor:failure	r26	EnsureFallbackAnchor	fallback-lifetime	failure	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	cross-trace
+A6-055	265504f6	r26:TrySubmitAnchoredStartupFallback:failure	r26	TrySubmitAnchoredStartupFallback	fallback-ownership	failure	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	falsification
+A6-056	265504f6	r26:WriteSyntheticLocalChange:failure	r26	WriteSyntheticLocalChange	event-state	failure	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	architecture
+A6-057	265504f6	r26:PollEvent:failure	r26	PollEvent	event-lifecycle	failure	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	cross-trace
+A6-058	265504f6	r26:IncomingPath:failure	r26	IncomingPath	submission-classification	failure	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	falsification
+A6-059	265504f6	r26:CompletePendingGameRequestAfterVisibleProjection:failure	r26	CompletePendingGameRequestAfterVisibleProjection	request-completion	failure	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	architecture
+A6-060	265504f6	r26:EndFrame:failure	r26	EndFrame	submission-lifecycle	failure	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	cross-trace
+A6-061	265504f6	r32:ReleasePending:failure	r32	ReleasePending	query-lifetime	failure	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	falsification
+A6-062	265504f6	r32:ObserveGeneration:failure	r32	ObserveGeneration	generation-state	failure	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	architecture
+A6-063	265504f6	r32:EnsureFence:failure	r32	EnsureFence	query-creation	failure	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	cross-trace
+A6-064	265504f6	r32:PollCompletedAcks:failure	r32	PollCompletedAcks	ack-lifetime	failure	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	falsification
+A6-065	265504f6	r32:ArmConsumptionFence:failure	r32	ArmConsumptionFence	sync-ownership	failure	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	architecture
+A6-066	265504f6	r32:MetadataValid:failure	r32	MetadataValid	metadata-gate	failure	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	cross-trace
+A6-067	265504f6	r32:CanFastSubmit:failure	r32	CanFastSubmit	fallback-gate	failure	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	falsification
+A6-068	265504f6	r32:CapturePerfSnapshot:failure	r32	CapturePerfSnapshot	telemetry-state	failure	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	architecture
+A6-069	265504f6	r32:MaybeLogPerf:failure	r32	MaybeLogPerf	telemetry-lifetime	failure	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	cross-trace
+A6-070	265504f6	r32:EndFrame:failure	r32	EndFrame	submission-sync	failure	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	falsification
+A6-071	265504f6	r32:DestroySession:failure	r32	DestroySession	session-teardown	failure	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	architecture
+A6-072	265504f6	main:R23UsableGameplayBootstrapFrame:failure	main	R23UsableGameplayBootstrapFrame	bootstrap-gate	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-073	265504f6	main:R23ReadFinalCounters:failure	main	R23ReadFinalCounters	fallback-observation	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-074	265504f6	main:R23ActualFinalKind:failure	main	R23ActualFinalKind	submission-observation	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-075	265504f6	main:R23MetricWindow::Add:failure	main	R23MetricWindow::Add	telemetry-state	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-076	265504f6	main:R23MetricWindow::Reset:failure	main	R23MetricWindow::Reset	telemetry-reset	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-077	265504f6	main:R23PipelineWindow::Note:failure	main	R23PipelineWindow::Note	telemetry-ownership	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-078	265504f6	main:R23ReleaseDirectHoldResources:failure	main	R23ReleaseDirectHoldResources	resource-lifetime	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-079	265504f6	main:R23InvalidateDirectHold:failure	main	R23InvalidateDirectHold	identity-invalidation	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-080	265504f6	main:R37FrameIdBefore:failure	main	R37FrameIdBefore	wraparound-order	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-081	265504f6	main:R23FrameUnchanged:failure	main	R23FrameUnchanged	frame-atomicity	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-082	265504f6	main:R23ValidateDirectResourceSize:failure	main	R23ValidateDirectResourceSize	resource-identity	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-083	265504f6	main:R23InvalidateDirect:failure	main	R23InvalidateDirect	failure-atomicity	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-084	265504f6	main:R23CommitDirectAfterValidation:failure	main	R23CommitDirectAfterValidation	commit-atomicity	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-085	265504f6	main:R23CommitClassicAfterValidation:failure	main	R23CommitClassicAfterValidation	fallback-ownership	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-086	265504f6	main:R23RenderProjection:failure	main	R23RenderProjection	projection-lifetime	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-087	265504f6	main:R35CadenceHost::~R35CadenceHost:failure	main	R35CadenceHost::~R35CadenceHost	ipc-teardown	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-088	265504f6	main:R35CadenceHost::SetRunning:failure	main	R35CadenceHost::SetRunning	state-transition	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-089	265504f6	main:R35CadenceHost::UpdateActiveRenderHz:failure	main	R35CadenceHost::UpdateActiveRenderHz	config-transition	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-090	265504f6	main:R35CadenceHost::IssueIfDue:failure	main	R35CadenceHost::IssueIfDue	request-lifecycle	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-091	265504f6	main:R35CadenceHost::WaitForPresented:failure	main	R35CadenceHost::WaitForPresented	bounded-wait	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-092	265504f6	main:R35CadenceHost::Publish:failure	main	R35CadenceHost::Publish	ipc-atomicity	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-093	265504f6	main:SESSION_STATE_STOPPING:failure	main	SESSION_STATE_STOPPING	session-lifecycle	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-094	265504f6	main:pendingReferenceSpaceChange:failure	main	pendingReferenceSpaceChange	space-transition	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-095	265504f6	main:frame-loop-locate:failure	main	frame-loop-locate	space-consistency	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-096	265504f6	main:client-PID-handoff:failure	main	client-PID-handoff	process-ownership	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-097	265504f6	main:shutdown:failure	main	shutdown	teardown-order	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-098	265504f6	main:catch-cleanup:failure	main	catch-cleanup	failure-teardown	failure	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-099	265504f6	r26:InvalidateFallbackAnchor:identity	r26	InvalidateFallbackAnchor	anchor-state	identity	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	cross-trace
+A6-100	265504f6	r26:QueueApplicationRecenter:identity	r26	QueueApplicationRecenter	recenter-state	identity	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	falsification
+A6-101	265504f6	r26:ApplicationRecenterAppliedForPendingGameRequest:identity	r26	ApplicationRecenterAppliedForPendingGameRequest	generation-gate	identity	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	architecture
+A6-102	265504f6	r26:ApplyPendingApplicationRecenter:identity	r26	ApplyPendingApplicationRecenter	space-lifetime	identity	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	cross-trace
+A6-103	265504f6	r26:EnsureFallbackAnchor:identity	r26	EnsureFallbackAnchor	fallback-lifetime	identity	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	falsification
+A6-104	265504f6	r26:TrySubmitAnchoredStartupFallback:identity	r26	TrySubmitAnchoredStartupFallback	fallback-ownership	identity	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	architecture
+A6-105	265504f6	r26:WriteSyntheticLocalChange:identity	r26	WriteSyntheticLocalChange	event-state	identity	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	cross-trace
+A6-106	265504f6	r26:PollEvent:identity	r26	PollEvent	event-lifecycle	identity	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	falsification
+A6-107	265504f6	r26:IncomingPath:identity	r26	IncomingPath	submission-classification	identity	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	architecture
+A6-108	265504f6	r26:CompletePendingGameRequestAfterVisibleProjection:identity	r26	CompletePendingGameRequestAfterVisibleProjection	request-completion	identity	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	cross-trace
+A6-109	265504f6	r26:EndFrame:identity	r26	EndFrame	submission-lifecycle	identity	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	falsification
+A6-110	265504f6	r32:ReleasePending:identity	r32	ReleasePending	query-lifetime	identity	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	architecture
+A6-111	265504f6	r32:ObserveGeneration:identity	r32	ObserveGeneration	generation-state	identity	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	cross-trace
+A6-112	265504f6	r32:EnsureFence:identity	r32	EnsureFence	query-creation	identity	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	falsification
+A6-113	265504f6	r32:PollCompletedAcks:identity	r32	PollCompletedAcks	ack-lifetime	identity	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	architecture
+A6-114	265504f6	r32:ArmConsumptionFence:identity	r32	ArmConsumptionFence	sync-ownership	identity	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	cross-trace
+A6-115	265504f6	r32:MetadataValid:identity	r32	MetadataValid	metadata-gate	identity	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	falsification
+A6-116	265504f6	r32:CanFastSubmit:identity	r32	CanFastSubmit	fallback-gate	identity	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	architecture
+A6-117	265504f6	r32:CapturePerfSnapshot:identity	r32	CapturePerfSnapshot	telemetry-state	identity	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	cross-trace
+A6-118	265504f6	r32:MaybeLogPerf:identity	r32	MaybeLogPerf	telemetry-lifetime	identity	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	falsification
+A6-119	265504f6	r32:EndFrame:identity	r32	EndFrame	submission-sync	identity	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	architecture
+A6-120	265504f6	r32:DestroySession:identity	r32	DestroySession	session-teardown	identity	reviewed generation-aware EVENT ACK state, safe fallback and teardown	PASS	cross-trace
+A6-121	265504f6	main:R23UsableGameplayBootstrapFrame:identity	main	R23UsableGameplayBootstrapFrame	bootstrap-gate	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-122	265504f6	main:R23ReadFinalCounters:identity	main	R23ReadFinalCounters	fallback-observation	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-123	265504f6	main:R23ActualFinalKind:identity	main	R23ActualFinalKind	submission-observation	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-124	265504f6	main:R23MetricWindow::Add:identity	main	R23MetricWindow::Add	telemetry-state	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-125	265504f6	main:R23MetricWindow::Reset:identity	main	R23MetricWindow::Reset	telemetry-reset	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-126	265504f6	main:R23PipelineWindow::Note:identity	main	R23PipelineWindow::Note	telemetry-ownership	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-127	265504f6	main:R23ReleaseDirectHoldResources:identity	main	R23ReleaseDirectHoldResources	resource-lifetime	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-128	265504f6	main:R23InvalidateDirectHold:identity	main	R23InvalidateDirectHold	identity-invalidation	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-129	265504f6	main:R37FrameIdBefore:identity	main	R37FrameIdBefore	wraparound-order	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-130	265504f6	main:R23FrameUnchanged:identity	main	R23FrameUnchanged	frame-atomicity	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-131	265504f6	main:R23ValidateDirectResourceSize:identity	main	R23ValidateDirectResourceSize	resource-identity	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-132	265504f6	main:R23InvalidateDirect:identity	main	R23InvalidateDirect	failure-atomicity	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-133	265504f6	main:R23CommitDirectAfterValidation:identity	main	R23CommitDirectAfterValidation	commit-atomicity	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-134	265504f6	main:R23CommitClassicAfterValidation:identity	main	R23CommitClassicAfterValidation	fallback-ownership	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-135	265504f6	main:R23RenderProjection:identity	main	R23RenderProjection	projection-lifetime	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-136	265504f6	main:R35CadenceHost::~R35CadenceHost:identity	main	R35CadenceHost::~R35CadenceHost	ipc-teardown	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-137	265504f6	main:R35CadenceHost::SetRunning:identity	main	R35CadenceHost::SetRunning	state-transition	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-138	265504f6	main:R35CadenceHost::UpdateActiveRenderHz:identity	main	R35CadenceHost::UpdateActiveRenderHz	config-transition	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-139	265504f6	main:R35CadenceHost::IssueIfDue:identity	main	R35CadenceHost::IssueIfDue	request-lifecycle	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-140	265504f6	main:R35CadenceHost::WaitForPresented:identity	main	R35CadenceHost::WaitForPresented	bounded-wait	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-141	265504f6	main:R35CadenceHost::Publish:identity	main	R35CadenceHost::Publish	ipc-atomicity	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-142	265504f6	main:SESSION_STATE_STOPPING:identity	main	SESSION_STATE_STOPPING	session-lifecycle	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-143	265504f6	main:pendingReferenceSpaceChange:identity	main	pendingReferenceSpaceChange	space-transition	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-144	265504f6	main:frame-loop-locate:identity	main	frame-loop-locate	space-consistency	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-145	265504f6	main:client-PID-handoff:identity	main	client-PID-handoff	process-ownership	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	falsification
+A6-146	265504f6	main:shutdown:identity	main	shutdown	teardown-order	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	architecture
+A6-147	265504f6	main:catch-cleanup:identity	main	catch-cleanup	failure-teardown	identity	reviewed host loop state transition, identity validation and cleanup ordering	PASS	cross-trace
+A6-148	265504f6	r26:InvalidateFallbackAnchor:teardown	r26	InvalidateFallbackAnchor	anchor-state	teardown	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	falsification
+A6-149	265504f6	r26:QueueApplicationRecenter:teardown	r26	QueueApplicationRecenter	recenter-state	teardown	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	architecture
+A6-150	265504f6	r26:ApplicationRecenterAppliedForPendingGameRequest:teardown	r26	ApplicationRecenterAppliedForPendingGameRequest	generation-gate	teardown	reviewed recenter wrapper ordering/state guards and fail-closed returns	PASS	cross-trace
