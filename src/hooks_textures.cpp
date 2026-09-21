@@ -22,6 +22,7 @@ namespace OutRunVRHudInspector
 namespace Settings
 {
 	extern Setting<bool> VREnabled;
+	extern Setting<bool> VRHudInspector;
 	Setting<std::string> TextureBaseFolder{ "Graphics", "TextureBaseFolder", "textures",
 		"The base folder for texture replacements. Replacements are loaded from [TextureBaseFolder]/load/, and vanilla "
 		"textures are extracted to [TextureBaseFolder]/dump/." };
@@ -942,7 +943,9 @@ public:
 
 	bool validate() override
 	{
-		return (Settings::SceneTextureReplacement || Settings::SceneTextureExtract) || (Settings::UITextureReplacement || Settings::UITextureExtract);
+		return (Settings::SceneTextureReplacement || Settings::SceneTextureExtract) ||
+			(Settings::UITextureReplacement || Settings::UITextureExtract) ||
+			(Settings::VREnabled && Settings::VRHudInspector);
 	}
 
 	void declare_settings() override
@@ -1004,6 +1007,8 @@ public:
 
 		bool ApplyUIHooks = Settings::UITextureReplacement || Settings::UITextureExtract;
 		bool ApplySceneHooks = Settings::SceneTextureReplacement || Settings::SceneTextureExtract;
+		const bool ApplyHudInspectorFeeds =
+			Settings::VREnabled && Settings::VRHudInspector;
 
 		// Scene hooks are applied through D3DXCreateTextureFromFileInMemoryEx
 		// But our UI code also calls D3DXCreateTextureFromFileInMemoryEx to allow loading textures slightly faster
@@ -1022,15 +1027,21 @@ public:
 				D3DXCreateTextureFromFileInMemory = safetyhook::create_inline(Module::exe_ptr(D3DXCreateTextureFromFileInMemory_Addr), D3DXCreateTextureFromFileInMemory_Custom_dest);
 			else
 				D3DXCreateTextureFromFileInMemory = safetyhook::create_inline(Module::exe_ptr(D3DXCreateTextureFromFileInMemory_Addr), D3DXCreateTextureFromFileInMemory_Orig_dest);
+		}
 
+		// HUD inspection owns its diagnostic feeds independently from texture
+		// replacement policy. Keep one detour owner for each sprite target so
+		// enabling the inspector never stacks a second inline hook.
+		if (ApplyUIHooks || ApplyHudInspectorFeeds)
 			LoadXstsetSprite_hook = safetyhook::create_mid(Module::exe_ptr(LoadXstsetSprite_Addr), LoadXstsetSprite_dest);
 
-			if (Settings::UITextureReplacement)
-			{
-				get_texture = safetyhook::create_inline(Module::exe_ptr(get_texture_Addr), get_texture_dest);
-				put_sprite_ex = safetyhook::create_inline(Module::exe_ptr(put_sprite_ex_Addr), put_sprite_ex_dest);
-				put_sprite_ex2 = safetyhook::create_inline(Module::exe_ptr(put_sprite_ex2_Addr), put_sprite_ex2_dest);
-			}
+		if (Settings::UITextureReplacement)
+			get_texture = safetyhook::create_inline(Module::exe_ptr(get_texture_Addr), get_texture_dest);
+
+		if (Settings::UITextureReplacement || ApplyHudInspectorFeeds)
+		{
+			put_sprite_ex = safetyhook::create_inline(Module::exe_ptr(put_sprite_ex_Addr), put_sprite_ex_dest);
+			put_sprite_ex2 = safetyhook::create_inline(Module::exe_ptr(put_sprite_ex2_Addr), put_sprite_ex2_dest);
 		}
 
 		if (ApplySceneHooks)
