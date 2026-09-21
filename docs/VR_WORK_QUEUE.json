@@ -7,7 +7,7 @@
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
     "productionWriter": "D_INTEGRATION_PLANNER",
-    "candidateWriter": "B_FIX",
+    "candidateWriter": "D_INTEGRATION_PLANNER",
     "queueWriter": "D_INTEGRATION_PLANNER",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
@@ -36,7 +36,7 @@
       "id": "VR-HOST-002",
       "priority": 10,
       "status": "NEEDS_POST_REVIEW",
-      "preferredRole": "C_VALIDATION",
+      "preferredRole": "C_PERF_REVIEW",
       "summary": "Restore omitted post-test runtime safety fixes: loading/stall projection hold, Frame.v2 run-generation identity, stale slot/run rejection, DirectGPU run binding, validated gameplay handoff, fallback stale-run rejection, and matching verifiers.",
       "testLevel": "LEVEL0",
       "dependencies": [],
@@ -46,7 +46,11 @@
       "candidateSha": "a2b2e4d0168c311e8998df4dc6c012c47e855558",
       "validationRunId": 35531382160,
       "validationResult": "BUILD_VERIFIED",
-      "postReviewRequired": ["A", "B", "C"],
+      "postReviewRequired": [
+        "A",
+        "B",
+        "C"
+      ],
       "provenance": [
         "ad14ed6c6757634233ec79b71f42be53c563edb7",
         "edee6b911198f4ab1fd9bd0e36ca3a5cf54a6162",
@@ -63,7 +67,7 @@
       "id": "DX9EX-FINGERPRINT-001",
       "priority": 10,
       "status": "READY",
-      "preferredRole": "A_REVIEW",
+      "preferredRole": "B_RENDER_REVIEW",
       "summary": "Establish bounded exact draw fingerprints for unresolved HUD/white-overlay/effect classes without broad WVP ownership.",
       "testLevel": "LEVEL0",
       "dependencies": [],
@@ -113,10 +117,12 @@
       "id": "L1-VIS-001",
       "priority": 9,
       "status": "READY",
-      "preferredRole": "A_REVIEW",
+      "preferredRole": "B_RENDER_REVIEW",
       "summary": "World/HUD/effect stereo correctness: white rank-score, 6th/6, menu and YES/NO. Produce exact evidence before behavior change.",
       "testLevel": "LEVEL1",
-      "dependencies": ["DX9EX-FINGERPRINT-001"],
+      "dependencies": [
+        "DX9EX-FINGERPRINT-001"
+      ],
       "attempts": 0,
       "runtimeCandidate": true
     },
@@ -124,7 +130,7 @@
       "id": "L1-VIS-002",
       "priority": 8,
       "status": "READY",
-      "preferredRole": "A_REVIEW",
+      "preferredRole": "B_RENDER_REVIEW",
       "summary": "Sky/cloud/SkyGlow/lens flare/smoke/skid placement and head-lock semantics.",
       "testLevel": "LEVEL1",
       "dependencies": [],
@@ -135,7 +141,7 @@
       "id": "DX9EX-PERF-PRODUCER-FENCE-001",
       "priority": 8,
       "status": "READY",
-      "preferredRole": "C_VALIDATION",
+      "preferredRole": "C_PERF_REVIEW",
       "summary": "DirectGPU producer path issues D3D9 EVENT GetData(D3DGETDATA_FLUSH) then polls GetData with SwitchToThread up to ProducerFenceBudgetMs=2 on the game thread; quantify wait cost before changing synchronization semantics.",
       "testLevel": "LEVEL2",
       "dependencies": [],
@@ -148,7 +154,7 @@
       "id": "L1-RECENTER-001",
       "priority": 7,
       "status": "READY",
-      "preferredRole": "A_REVIEW",
+      "preferredRole": "B_RENDER_REVIEW",
       "summary": "Gameplay/menu recenter application-space behavior and visual transition correctness.",
       "testLevel": "LEVEL1",
       "dependencies": [],
@@ -159,10 +165,13 @@
       "id": "L2-PERF-001",
       "priority": 6,
       "status": "READY",
-      "preferredRole": "A_REVIEW",
+      "preferredRole": "C_PERF_REVIEW",
       "summary": "R29+ fast stereo draw amplification and frame-pacing optimization behind correctness gates.",
       "testLevel": "LEVEL2",
-      "dependencies": ["L1-VIS-001", "L1-VIS-002"],
+      "dependencies": [
+        "L1-VIS-001",
+        "L1-VIS-002"
+      ],
       "attempts": 0,
       "runtimeCandidate": true
     },
@@ -170,7 +179,7 @@
       "id": "L3-DX9EX-001",
       "priority": 5,
       "status": "READY",
-      "preferredRole": "A_REVIEW",
+      "preferredRole": "A_ARCH_REVIEW",
       "summary": "D3D9Ex device promotion/reset/shared-resource/direct transport robustness.",
       "testLevel": "LEVEL3",
       "dependencies": [],
@@ -184,7 +193,12 @@
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "DXVK/multiview/DX12 release matrix remains paused until DX9Ex reference is user accepted.",
       "testLevel": "LEVEL4",
-      "dependencies": ["L1-VIS-001", "L1-VIS-002", "L2-PERF-001", "L3-DX9EX-001"],
+      "dependencies": [
+        "L1-VIS-001",
+        "L1-VIS-002",
+        "L2-PERF-001",
+        "L3-DX9EX-001"
+      ],
       "attempts": 0,
       "runtimeCandidate": false
     }
