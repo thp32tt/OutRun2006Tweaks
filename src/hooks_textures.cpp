@@ -16,6 +16,7 @@ namespace OutRunVRHudInspector
         const void* returnAddress);
     void TracePutSprite2(SPRARGS2* sprargs, float priority,
         const void* returnAddress);
+    void TraceXstSet(int xstsetIndex, const char* filename);
 }
 
 namespace Settings
@@ -676,6 +677,8 @@ class TextureReplacement : public Hook
 			CurrentXstsetFilename = xstsetFilename; // sprite xstset filename
 			CurrentXstsetIndex = (int)(ctx.eax); // index into xstset array
 			CurrentTextureIdx = 0;
+			OutRunVRHudInspector::TraceXstSet(
+				CurrentXstsetIndex, CurrentXstsetFilename.string().c_str());
 		}
 	};
 
