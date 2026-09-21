@@ -32,6 +32,9 @@ jobs:
       - name: Configure
         shell: pwsh
         run: |
+          # cmkr intentionally skips regeneration when CI is set. vr-openxr uses
+          # cmake.toml as the canonical source graph, so remove CI here just as
+          # the dedicated VR workflow does before configuring.
           Remove-Item Env:CI -ErrorAction SilentlyContinue
           mkdir build
           cd build
