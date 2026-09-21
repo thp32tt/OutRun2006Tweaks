@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - 'src/vr/debug/hud_inspector.cpp'
+      - 'src/hooks_textures.cpp'
       - 'tools/analyze_outrun_exe.py'
       - 'tools/Collect-OutRunVRLogs.ps1'
       - 'tools/Run-OutRunVRTest.ps1'
