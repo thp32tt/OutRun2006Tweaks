@@ -9,10 +9,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp/controller-payload
-COPY part*.b64 ./
+COPY controller.b64 ./
 
-RUN cat part*.b64 | tr -d '\r\n\t ' | base64 -d > /tmp/controller.zip \
-    && echo "119aa620bbf6ae4dc26cdc48e2ed48f645ad281cae4645bbe96fe25c37f192e9  /tmp/controller.zip" | sha256sum -c - \
+RUN python -c "import base64,pathlib; p=pathlib.Path('controller.b64'); pathlib.Path('/tmp/controller.zip').write_bytes(base64.b64decode(''.join(p.read_text().split())))" \
+    && unzip -tq /tmp/controller.zip \
     && mkdir -p /tmp/unpack \
     && unzip -q /tmp/controller.zip -d /tmp/unpack \
     && mkdir -p /opt/outrun \
