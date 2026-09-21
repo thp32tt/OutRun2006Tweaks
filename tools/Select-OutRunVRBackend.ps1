@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet("2d","d3d9","dxvk-safe","dxvk","dx12")]
+    [ValidateSet("2d","d3d9","d3d9-classic","dxvk-safe","dxvk","dx12")]
     [string]$Backend,
     [ValidateSet("CONTROL","CORRECTNESS","PERFORMANCE","STAGE_DIAGNOSTIC")]
     [string]$TestProfile = "CORRECTNESS"
@@ -9,7 +9,7 @@ param(
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $backendRoot = Join-Path $root "backends"
-$payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "dxvk-safe") { "d3d9" } else { $Backend }
+$payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "d3d9-classic" -or $Backend -eq "dxvk-safe") { "d3d9" } else { $Backend }
 $src = Join-Path $backendRoot $payloadBackend
 if (-not (Test-Path $src)) { throw "Backend payload not found: $src" }
 
@@ -180,6 +180,18 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
         $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
+    } elseif ($Backend -eq "d3d9-classic") {
+        # Diagnostic isolation: keep the complete VR renderer/host active while
+        # disabling only D3D9Ex promotion. This distinguishes Ex compatibility
+        # failures from generic VR hook/host/cadence failures without falling
+        # all the way back to the VR-disabled 2D control.
+        $text = Set-IniSectionValue $text "VR" "RenderBackend" "1"
+        $text = Set-IniSectionValue $text "VR" "Enabled" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
+        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
     } elseif ($Backend -eq "d3d9") {
         # DX9Ex focus branch: D3D9 is the reference backend. DirectGPU remains optional
         # so SBS/Desktop Duplication can still fail open while Ex promotion is tested.
@@ -212,6 +224,7 @@ $nl = [Environment]::NewLine
 $variant = switch ($Backend) {
     "2d"        { "CONTROL_2D" }
     "d3d9"      { "A_CONTROL" }
+    "d3d9-classic" { "B_CLASSIC_D3D9_VR" }
     "dxvk-safe" { "E_DXVK_SAFE" }
     "dxvk"      { "E_DXVK_MULTIVIEW" }
     "dx12"      { "F_DX12_STRICT" }
@@ -268,6 +281,7 @@ Write-Host "Any previous root logs were archived before this session was created
 switch ($Backend) {
     "2d"   { Write-Host "2D ORIGINAL: classic D3D9, VR disabled, D3D9Ex promotion disabled, no VR host." }
     "d3d9" { Write-Host "D3D9Ex REFERENCE: PreferD3D9Ex enabled; DirectGPU optional; profile=$TestProfile." }
+    "d3d9-classic" { Write-Host "CLASSIC D3D9 VR: VR host/stereo hooks enabled, D3D9Ex promotion disabled; diagnostic isolation mode." }
     "dxvk-safe" { Write-Host "DXVK SAFE: classic D3D9 calls translated by DXVK; validated two-pass VR, multiview patcher disabled." }
     "dxvk" { Write-Host "DXVK MULTIVIEW: local d3d9.dll + multiviewpatcher.dll active." }
     "dx12" { Write-Host "DX12 STRICT: local d3d9.dll verified absent; Windows D3D9On12 required." }

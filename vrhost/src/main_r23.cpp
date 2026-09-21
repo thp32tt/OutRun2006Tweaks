@@ -1887,6 +1887,25 @@ int main(int argc, char** argv)
     XrSpace localSpace = XR_NULL_HANDLE;
     XrSpace viewSpace = XR_NULL_HANDLE;
 
+    std::ofstream startupLog("outrun-vr-host-startup.log",
+        std::ios::out | std::ios::trunc);
+    auto startup = [&](const char* stage, const std::string& detail = {}) {
+        if (!startupLog.is_open())
+            return;
+        SYSTEMTIME now{};
+        GetSystemTime(&now);
+        startupLog << now.wYear << '-'
+            << now.wMonth << '-' << now.wDay << 'T'
+            << now.wHour << ':' << now.wMinute << ':' << now.wSecond << '.'
+            << now.wMilliseconds << "Z stage=" << stage;
+        if (!detail.empty())
+            startupLog << " detail=" << detail;
+        startupLog << '\n';
+        startupLog.flush();
+    };
+    startup("entry", std::string("pid=") +
+        std::to_string(GetCurrentProcessId()));
+
     try
     {
         SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
@@ -1909,9 +1928,13 @@ int main(int argc, char** argv)
             static_cast<std::uint32_t>(std::clamp(
                 R35ReadEnvFloat("OUTRUN_VR_CADENCE_TIMEOUT_MS", 35.0f),
                 5.0f, 100.0f));
+        startup("wait-game-window-begin");
         HWND gameWindow = WaitForGameWindow();
         DWORD gamePid = 0; GetWindowThreadProcessId(gameWindow, &gamePid);
+        startup("game-window-ready", std::string("gamePid=") +
+            std::to_string(gamePid));
 
+        startup("openxr-extension-query-begin");
         if (!HasExtension(XR_KHR_D3D11_ENABLE_EXTENSION_NAME))
             throw std::runtime_error("runtime lacks XR_KHR_D3D11_enable");
 
@@ -1941,6 +1964,7 @@ int main(int argc, char** argv)
             static_cast<std::uint32_t>(extensions.size());
         ii.enabledExtensionNames = extensions.data();
         CheckXr(xrCreateInstance(&ii, &instance), "xrCreateInstance");
+        startup("xr-instance-created");
 
         XrInstanceProperties ip{ XR_TYPE_INSTANCE_PROPERTIES };
         CheckXr(xrGetInstanceProperties(instance, &ip), "xrGetInstanceProperties");
@@ -1958,6 +1982,7 @@ int main(int argc, char** argv)
             if (r == XR_ERROR_FORM_FACTOR_UNAVAILABLE) { Sleep(1000); continue; }
             CheckXr(r, "xrGetSystem"); break;
         }
+        startup("xr-system-ready");
 
         PFN_xrGetD3D11GraphicsRequirementsKHR getReq = nullptr;
         CheckXr(xrGetInstanceProcAddr(instance, "xrGetD3D11GraphicsRequirementsKHR",
@@ -1965,12 +1990,14 @@ int main(int argc, char** argv)
         XrGraphicsRequirementsD3D11KHR req{ XR_TYPE_GRAPHICS_REQUIREMENTS_D3D11_KHR };
         CheckXr(getReq(instance, system, &req), "xrGetD3D11GraphicsRequirementsKHR");
         D3DObjects d3d = CreateD3D11Device(req);
+        startup("d3d11-device-ready");
 
         XrGraphicsBindingD3D11KHR binding{ XR_TYPE_GRAPHICS_BINDING_D3D11_KHR };
         binding.device = d3d.device;
         XrSessionCreateInfo si{ XR_TYPE_SESSION_CREATE_INFO };
         si.next = &binding; si.systemId = system;
         CheckXr(xrCreateSession(instance, &si, &session), "xrCreateSession");
+        startup("xr-session-created");
 
         std::cout
             << "VR transport: directEnabled="
@@ -2018,6 +2045,7 @@ int main(int argc, char** argv)
         std::array<XrViewConfigurationView, 2> configs{ cv[0], cv[1] };
 
         SharedWriter shared(req.adapterLuid);
+        startup("shared-writer-ready");
         R35CadenceHost cadence(cadenceMode, cadenceTargetHz,
             cadenceMaxHz, cadenceTimeoutMs, targetRefreshRateHz);
         RenderFrameReader renderFrames;
@@ -2025,6 +2053,7 @@ int main(int argc, char** argv)
             configs, directTransportEnabled, directTransportOnly,
             disableDesktopDuplication, renderScale);
         compositor.Initialize();
+        startup("compositor-ready");
         ViewHistory viewHistory;
         HostTimings timings;
         std::ofstream pipelineLog("outrun-vr-host-pipeline.log",
@@ -3014,6 +3043,7 @@ int main(int argc, char** argv)
     }
     catch (const std::exception& e)
     {
+        startup("fatal", e.what());
         std::cerr << "OutRun VR host error: " << e.what() << "\n";
         OutRunVrR23VerifiedBundle::Invalidate();
         if (viewSpace != XR_NULL_HANDLE) xrDestroySpace(viewSpace);

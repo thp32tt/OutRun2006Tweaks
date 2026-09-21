@@ -252,6 +252,12 @@ $payloadBackend=if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$
 $source=Join-Path $root "backends/$payloadBackend/SOURCE_SHA.txt"
 $sha=if(Test-Path $source){(Get-Content $source -Raw).Trim()}else{'unknown'}
 $configHash=if(Test-Path (Join-Path $root 'OutRun2006Tweaks.ini')){(Get-FileHash (Join-Path $root 'OutRun2006Tweaks.ini') -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
+$launchConfigHash=if($state.LaunchConfigSha256){[string]$state.LaunchConfigSha256}else{[string]$state.ConfigSha256}
+$configDrift=($launchConfigHash -ne $configHash)
+$configDriftStatus=if($configDrift){'CONFIG_DRIFT'}else{'STABLE'}
+if($configDrift){
+    Write-Warning ("Configuration changed after game launch: launch={0} collection={1}" -f $launchConfigHash,$configHash)
+}
 
 $analysisRequest=[ordered]@{
     SchemaVersion=1
@@ -267,7 +273,9 @@ $analysisRequest=[ordered]@{
     SessionId=$session
     SessionStartedUtc=$startedUtc.ToString('o')
     SourceSha=$sha
-    ConfigSha256=$configHash
+    ConfigSha256=$launchConfigHash
+    CollectionConfigSha256=$configHash
+    ConfigDriftStatus=$configDriftStatus
     ExeIdentityFile='EXE_IDENTITY.txt'
     PrimaryManifest='variant_manifest.json'
     AnalysisContract='Treat upload of this ZIP as an immediate analysis request. Do not require the user to restate symptoms. Validate identity first, then analyze all available runtime evidence, correlate with static/reverse-engineering evidence, and report actionable findings. Missing optional evidence should reduce confidence, not block analysis.'
@@ -317,7 +325,9 @@ if($assetSemanticsPresent){
     "SESSION_STARTED_UTC=$($startedUtc.ToString('o'))"
     "BUILD_MATRIX=$matrix"
     "SOURCE_SHA=$sha"
-    "CONFIG_SHA256=$configHash"
+    "CONFIG_SHA256=$launchConfigHash"
+    "COLLECTION_CONFIG_SHA256=$configHash"
+    "CONFIG_DRIFT_STATUS=$configDriftStatus"
     "EXE_SEMANTIC_IDENTITY=$exeSemanticIdentity"
     "EXE_SEMANTIC_BASELINE_VALID=$matchesUpstream"
     "ASSET_SEMANTICS_PRESENT=$assetSemanticsPresent"
@@ -340,7 +350,9 @@ if($assetSemanticsPresent){
     SessionStartedUtc=$startedUtc.ToString('o')
     BuildMatrixId=$matrix
     GitSha=$sha
-    ConfigSha256=$configHash
+    ConfigSha256=$launchConfigHash
+    CollectionConfigSha256=$configHash
+    ConfigDriftStatus=$configDriftStatus
     ExeSemanticIdentity=$exeSemanticIdentity
     ExeSemanticBaselineValid=$matchesUpstream
     AssetSemantics=@{

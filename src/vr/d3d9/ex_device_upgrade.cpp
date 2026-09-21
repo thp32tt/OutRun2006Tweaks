@@ -389,15 +389,34 @@ namespace OutRunVRD3D9ExUpgrade
                 return CreateVertexBufferCompatHook.stdcall<HRESULT>(
                     device, length, usage, fvf, pool, buffer, sharedHandle);
 
-            const HRESULT hr = CreateVertexBufferCompatHook.stdcall<HRESULT>(
-                device, length, usage, fvf, D3DPOOL_DEFAULT, buffer, sharedHandle);
+            // D3DPOOL_MANAGED buffers are CPU-updatable regardless of whether
+            // the original caller requested D3DUSAGE_DYNAMIC. On D3D9Ex the
+            // replacement must live in DEFAULT, where DISCARD/NOOVERWRITE
+            // semantics require DYNAMIC. Prefer a lock-compatible dynamic
+            // replacement so startup/menu quads written immediately after
+            // CreateDevice cannot silently lose their first upload.
+            const DWORD dynamicUsage = usage | D3DUSAGE_DYNAMIC;
+            HRESULT hr = CreateVertexBufferCompatHook.stdcall<HRESULT>(
+                device, length, dynamicUsage, fvf, D3DPOOL_DEFAULT,
+                buffer, sharedHandle);
+            bool dynamic = SUCCEEDED(hr);
+            if (FAILED(hr))
+            {
+                hr = CreateVertexBufferCompatHook.stdcall<HRESULT>(
+                    device, length, usage, fvf, D3DPOOL_DEFAULT,
+                    buffer, sharedHandle);
+            }
+
             ++ManagedVertexBufferCreates;
             if (FAILED(hr)) ++ManagedCreateFailures;
             if (ManagedVertexBufferCreates.load() == 1)
             {
                 spdlog::info(
-                    "VR D3D9Ex compat: MANAGED vertex buffer translated to DEFAULT (length={} usage=0x{:08X} hr=0x{:08X})",
-                    length, static_cast<unsigned>(usage), static_cast<unsigned>(hr));
+                    "VR D3D9Ex compat: MANAGED vertex buffer translated to {} (length={} usage=0x{:08X}->0x{:08X} hr=0x{:08X})",
+                    dynamic ? "DEFAULT|DYNAMIC" : "DEFAULT fallback",
+                    length, static_cast<unsigned>(usage),
+                    static_cast<unsigned>(dynamic ? dynamicUsage : usage),
+                    static_cast<unsigned>(hr));
             }
             return hr;
         }
@@ -410,15 +429,28 @@ namespace OutRunVRD3D9ExUpgrade
                 return CreateIndexBufferCompatHook.stdcall<HRESULT>(
                     device, length, usage, format, pool, buffer, sharedHandle);
 
-            const HRESULT hr = CreateIndexBufferCompatHook.stdcall<HRESULT>(
-                device, length, usage, format, D3DPOOL_DEFAULT, buffer, sharedHandle);
+            const DWORD dynamicUsage = usage | D3DUSAGE_DYNAMIC;
+            HRESULT hr = CreateIndexBufferCompatHook.stdcall<HRESULT>(
+                device, length, dynamicUsage, format, D3DPOOL_DEFAULT,
+                buffer, sharedHandle);
+            bool dynamic = SUCCEEDED(hr);
+            if (FAILED(hr))
+            {
+                hr = CreateIndexBufferCompatHook.stdcall<HRESULT>(
+                    device, length, usage, format, D3DPOOL_DEFAULT,
+                    buffer, sharedHandle);
+            }
+
             ++ManagedIndexBufferCreates;
             if (FAILED(hr)) ++ManagedCreateFailures;
             if (ManagedIndexBufferCreates.load() == 1)
             {
                 spdlog::info(
-                    "VR D3D9Ex compat: MANAGED index buffer translated to DEFAULT (length={} usage=0x{:08X} fmt={} hr=0x{:08X})",
-                    length, static_cast<unsigned>(usage), static_cast<int>(format), static_cast<unsigned>(hr));
+                    "VR D3D9Ex compat: MANAGED index buffer translated to {} (length={} usage=0x{:08X}->0x{:08X} fmt={} hr=0x{:08X})",
+                    dynamic ? "DEFAULT|DYNAMIC" : "DEFAULT fallback",
+                    length, static_cast<unsigned>(usage),
+                    static_cast<unsigned>(dynamic ? dynamicUsage : usage),
+                    static_cast<int>(format), static_cast<unsigned>(hr));
             }
             return hr;
         }

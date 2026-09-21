@@ -6,6 +6,11 @@
 #include <iostream>
 #include <array>
 
+namespace OutRunVRStereo
+{
+	bool IsRuntimeStereoActive() noexcept;
+}
+
 namespace Settings
 {
 	Setting<int> SkyGlowFactor{ "Graphics", "SkyGlowFactor", 4,
@@ -298,7 +303,7 @@ class RestoreSkyGlow : public Hook
 	static bool SkyGlowAllowed() noexcept
 	{
 		return Settings::SkyGlowFactor > 0 &&
-			!(Settings::VREnabled && Settings::VRStereo);
+			!OutRunVRStereo::IsRuntimeStereoActive();
 	}
 
 	// (1) The exposure reaches pixel shader constant c7 alpha, but nothing reads

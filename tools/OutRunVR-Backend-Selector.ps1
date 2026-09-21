@@ -28,6 +28,7 @@ function Refresh-Status {
     $backendText = switch ($current.backend) {
         "2d"        { "2D ORIGINAL" }
         "d3d9"      { "D3D9Ex REFERENCE" }
+        "d3d9-classic" { "CLASSIC D3D9 VR" }
         "dxvk-safe" { "DXVK SAFE" }
         "dxvk"      { "DXVK MULTIVIEW" }
         "dx12"      { "DX12 STRICT" }
@@ -67,6 +68,7 @@ function Select-Backend([string]$backend) {
         $label = switch ($backend) {
             "2d"        { "2D ORIGINAL" }
             "d3d9"      { "D3D9Ex REFERENCE" }
+            "d3d9-classic" { "CLASSIC D3D9 VR" }
             "dxvk-safe" { "DXVK SAFE" }
             "dxvk"      { "DXVK MULTIVIEW" }
             "dx12"      { "DX12 STRICT" }
@@ -122,7 +124,7 @@ function Start-VRTest {
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "OutRun 2006 VR Test Launcher"
 $form.StartPosition = "CenterScreen"
-$form.ClientSize = New-Object System.Drawing.Size(520,650)
+$form.ClientSize = New-Object System.Drawing.Size(520,710)
 $form.FormBorderStyle = "FixedDialog"
 $form.MaximizeBox = $false
 
@@ -184,10 +186,19 @@ $primary.Tag = "d3d9"
 $primary.Add_Click({ Select-Backend $this.Tag })
 $form.Controls.Add($primary)
 
+$classic = New-Object System.Windows.Forms.Button
+$classic.Text = "CLASSIC D3D9 + VR  (진단: D3D9Ex만 OFF)"
+$classic.Size = New-Object System.Drawing.Size(430,48)
+$classic.Location = New-Object System.Drawing.Point(44,263)
+$classic.Font = New-Object System.Drawing.Font("Segoe UI",10,[System.Drawing.FontStyle]::Bold)
+$classic.Tag = "d3d9-classic"
+$classic.Add_Click({ Select-Backend $this.Tag })
+$form.Controls.Add($classic)
+
 $control2d = New-Object System.Windows.Forms.Button
 $control2d.Text = "2D ORIGINAL  (VR OFF)"
 $control2d.Size = New-Object System.Drawing.Size(430,44)
-$control2d.Location = New-Object System.Drawing.Point(44,265)
+$control2d.Location = New-Object System.Drawing.Point(44,320)
 $control2d.Tag = "2d"
 $control2d.Add_Click({ Select-Backend $this.Tag })
 $form.Controls.Add($control2d)
@@ -196,7 +207,7 @@ $legacyLabel = New-Object System.Windows.Forms.Label
 $legacyLabel.Text = "Legacy backend comparison — DX9Ex 기준 확립 전에는 일반 테스트에 사용하지 않음"
 $legacyLabel.Font = New-Object System.Drawing.Font("Segoe UI",8.5)
 $legacyLabel.AutoSize = $true
-$legacyLabel.Location = New-Object System.Drawing.Point(44,322)
+$legacyLabel.Location = New-Object System.Drawing.Point(44,377)
 $form.Controls.Add($legacyLabel)
 
 $legacyButtons = @(
@@ -208,7 +219,7 @@ foreach ($b in $legacyButtons) {
     $btn = New-Object System.Windows.Forms.Button
     $btn.Text = $b.Text
     $btn.Size = New-Object System.Drawing.Size(138,42)
-    $btn.Location = New-Object System.Drawing.Point($b.X,350)
+    $btn.Location = New-Object System.Drawing.Point($b.X,405)
     $btn.Tag = $b.Backend
     $payloadName = switch ($b.Backend) {
         'dxvk-safe' { 'd3d9' }
@@ -227,7 +238,7 @@ foreach ($b in $legacyButtons) {
 $runBtn = New-Object System.Windows.Forms.Button
 $runBtn.Text = "선택한 Profile로 테스트 실행"
 $runBtn.Size = New-Object System.Drawing.Size(430,66)
-$runBtn.Location = New-Object System.Drawing.Point(44,420)
+$runBtn.Location = New-Object System.Drawing.Point(44,475)
 $runBtn.Font = New-Object System.Drawing.Font("Segoe UI",11,[System.Drawing.FontStyle]::Bold)
 $runBtn.Add_Click({ Start-VRTest })
 $form.Controls.Add($runBtn)
@@ -237,7 +248,7 @@ $logInfo.Text = "게임 종료 후 로그는 Matrix / Variant / Profile / Sessio
 $logInfo.Font = New-Object System.Drawing.Font("Segoe UI",9)
 $logInfo.AutoSize = $false
 $logInfo.Size = New-Object System.Drawing.Size(430,42)
-$logInfo.Location = New-Object System.Drawing.Point(44,505)
+$logInfo.Location = New-Object System.Drawing.Point(44,560)
 $form.Controls.Add($logInfo)
 
 $captureInfo = New-Object System.Windows.Forms.Label
@@ -245,7 +256,7 @@ $captureInfo.Text = "VR 진단 캡처: 게임 중 Ctrl+F9. 약 10초 전 + 2초 
 $captureInfo.Font = New-Object System.Drawing.Font("Segoe UI",9)
 $captureInfo.AutoSize = $false
 $captureInfo.Size = New-Object System.Drawing.Size(430,42)
-$captureInfo.Location = New-Object System.Drawing.Point(44,550)
+$captureInfo.Location = New-Object System.Drawing.Point(44,605)
 $form.Controls.Add($captureInfo)
 
 [void]$form.ShowDialog()

@@ -123,9 +123,14 @@ namespace OutRunVR
 				// The host inherits these test-mode switches. Keeping transport
 				// policy in the same [VR] config as D3D9Ex avoids mismatched
 				// game/host modes during cadence testing.
-				SetEnvironmentVariableA("OUTRUN_VR_DIRECT_TRANSPORT", "1");
+				const bool directTransport =
+					Settings::VRPreferD3D9Ex.get();
+				const bool directOnly =
+					directTransport && Settings::VRDirectGpuOnly.get();
+				SetEnvironmentVariableA("OUTRUN_VR_DIRECT_TRANSPORT",
+					directTransport ? "1" : "0");
 				SetEnvironmentVariableA("OUTRUN_VR_DIRECT_ONLY",
-					Settings::VRDirectGpuOnly ? "1" : "0");
+					directOnly ? "1" : "0");
 				SetEnvironmentVariableA("OUTRUN_VR_DISABLE_DESKTOP_DUPLICATION",
 					Settings::VRDisableDesktopDuplication ? "1" : "0");
 				const std::string refreshHz =
@@ -211,10 +216,19 @@ namespace OutRunVR
 
 		bool apply() override
 		{
+			const bool effectiveDirectOnly =
+				Settings::VRPreferD3D9Ex.get() &&
+				Settings::VRDirectGpuOnly.get();
+			if (!Settings::VRPreferD3D9Ex.get() &&
+				Settings::VRDirectGpuOnly.get())
+			{
+				spdlog::warn(
+					"VR transport policy: DirectGpuOnly requires PreferD3D9Ex; effective DirectGpuOnly=false and SBS/Desktop Duplication fallback remains eligible");
+			}
 			spdlog::info(
 				"VR: D3D9Ex DirectGPU preference={} directOnly={} refreshOverrideHz={:.1f} cadenceMode={} cadenceTargetHz={:.1f} cadenceMaxHz={:.1f}; target 0 means XR-native render cadence, simulation remains 60 Hz",
 				Settings::VRPreferD3D9Ex.get(),
-				Settings::VRDirectGpuOnly.get(),
+				effectiveDirectOnly,
 				Settings::VRTargetRefreshRateHz.get(),
 				Settings::VRFrameCadenceMode.get(),
 				Settings::VRFrameCadenceTargetHz.get(),

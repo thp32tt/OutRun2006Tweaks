@@ -69,6 +69,29 @@ if($state.TestProfile -and $state.TestProfile -ne $TestProfile){
     $state=Get-Content $current -Raw|ConvertFrom-Json
 }
 
+# Bind the runtime session to the configuration that actually exists at launch.
+# If the INI changed after backend selection, rotate the session rather than
+# exporting a stale ConfigSha256 identity.
+$iniPath=Join-Path $root 'OutRun2006Tweaks.ini'
+$launchConfigHash=if(Test-Path $iniPath){
+    (Get-FileHash $iniPath -Algorithm SHA256).Hash.ToLowerInvariant()
+}else{'missing'}
+if([string]$state.ConfigSha256 -ne $launchConfigHash){
+    Write-Warning 'OutRun2006Tweaks.ini changed after session preparation; rotating runtime session identity before launch.'
+    & $selector -Backend $backend -TestProfile $TestProfile
+    if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'Failed to rotate session after configuration drift.'}
+    $state=Get-Content $current -Raw|ConvertFrom-Json
+    $launchConfigHash=if(Test-Path $iniPath){
+        (Get-FileHash $iniPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    }else{'missing'}
+    if([string]$state.ConfigSha256 -ne $launchConfigHash){
+        throw 'Configuration identity is still inconsistent after session rotation.'
+    }
+}
+$state | Add-Member -NotePropertyName LaunchConfigSha256 -NotePropertyValue $launchConfigHash -Force
+$state | Add-Member -NotePropertyName LaunchConfigCheckedUtc -NotePropertyValue ((Get-Date).ToUniversalTime().ToString('o')) -Force
+$state|ConvertTo-Json -Depth 6|Set-Content $current -Encoding UTF8
+
 Write-Host "Starting test session: $($state.SessionId)"
 Write-Host "Backend: $backend"
 Write-Host "Profile: $TestProfile"
@@ -106,6 +129,7 @@ if($backend -ne '2d'){
 
 $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)
 New-Item -ItemType Directory -Force $sessionRoot|Out-Null
+$state|ConvertTo-Json -Depth 6|Set-Content (Join-Path $sessionRoot 'session_manifest.json') -Encoding UTF8
 
 $assetAnalyzer=Join-Path $root 'tools/analyze_outrun_assets.py'
 if(!(Test-Path $assetAnalyzer)){
@@ -155,20 +179,30 @@ $identityKeys = @(
     'OUTRUN_VR_MATRIX_ID',
     'OUTRUN_VR_BACKEND',
     'OUTRUN_VR_CONFIG_SHA256',
-    'OUTRUN_VR_SOURCE_SHA'
+    'OUTRUN_VR_SOURCE_SHA',
+    'OUTRUN_VR_EXE_SEMANTICS_VERIFIED',
+    'OUTRUN_VR_EXE_SHA256'
 )
 $oldIdentity = @{}
 foreach($key in $identityKeys){ $oldIdentity[$key] = [Environment]::GetEnvironmentVariable($key,'Process') }
 
 $sourceSha='unknown'
-$sourceFile=Join-Path $root ("backends/{0}/SOURCE_SHA.txt" -f $(if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}))
+$sourceFile=Join-Path $root ("backends/{0}/SOURCE_SHA.txt" -f $(if($backend -eq '2d' -or $backend -eq 'd3d9-classic' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}))
 if(Test-Path $sourceFile){ $sourceSha=(Get-Content $sourceFile -Raw).Trim() }
 $env:OUTRUN_VR_SESSION_ID=[string]$state.SessionId
 $env:OUTRUN_VR_VARIANT_ID=[string]$state.VariantId
 $env:OUTRUN_VR_MATRIX_ID=[string]$state.BuildMatrixId
 $env:OUTRUN_VR_BACKEND=[string]$backend
-$env:OUTRUN_VR_CONFIG_SHA256=[string]$state.ConfigSha256
+$env:OUTRUN_VR_CONFIG_SHA256=$launchConfigHash
 $env:OUTRUN_VR_SOURCE_SHA=$sourceSha
+
+$upstreamReferenceSha='68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3'
+$runtimeExeSha=(Get-FileHash $game -Algorithm SHA256).Hash.ToLowerInvariant()
+$env:OUTRUN_VR_EXE_SHA256=$runtimeExeSha
+$env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED=if($runtimeExeSha -eq $upstreamReferenceSha){'1'}else{'0'}
+if($env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED -ne '1'){
+    Write-Warning 'OR2006C2C.EXE does not match the verified semantic baseline; HUD caller RVAs will remain UNKNOWN/UNVERIFIED.'
+}
 
 if($backend -eq '2d'){
     $env:OUTRUN_VR_FORCE_DISABLED='1'

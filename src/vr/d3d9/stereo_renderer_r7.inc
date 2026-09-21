@@ -46,6 +46,7 @@ namespace Settings
 	extern Setting<bool> VREnabled;
 	extern Setting<bool> VRAutoEnableWhenHostPresent;
 	extern Setting<bool> VRStereo;
+	extern Setting<bool> VRPreferD3D9Ex;
 	extern Setting<bool> VRDirectGpuOnly;
 	extern Setting<float> VRWorldScale;
 	extern Setting<float> VRStereoDepth;
@@ -230,6 +231,7 @@ namespace OutRunVRStereo
 		bool FirstMainDepthReuseLogged = false;
 		bool FirstMainClearLogged = false;
 		bool FirstDepthBootstrapLogged = false;
+		bool FirstDeferredResourceInitLogged = false;
 
 		template <typename T>
 		void ReleaseCom(T*& value)
@@ -318,11 +320,16 @@ namespace OutRunVRStereo
 			return SharedState && (SharedState->flags & OutRunVR::HostDirectGpuReady) != 0;
 		}
 
+		bool RuntimeStereoEligible()
+		{
+			return Settings::VRStereo && GameplayActive() &&
+				HostRenderEligible() &&
+				(Settings::VREnabled || Settings::VRAutoEnableWhenHostPresent);
+		}
+
 		bool StereoWanted()
 		{
-			const bool hostEligible = HostRenderEligible();
-			const bool wanted = Settings::VRStereo && GameplayActive() && hostEligible &&
-				(Settings::VREnabled || Settings::VRAutoEnableWhenHostPresent);
+			const bool wanted = RuntimeStereoEligible();
 			if (wanted && !LastStereoWanted && TrackedDepthStencil)
 			{
 				RightDepthSynchronized = false;
@@ -1427,7 +1434,7 @@ namespace OutRunVRStereo
 						spdlog::info("VR stereo: 4-slot direct GPU transport uses bounded post-Present completion; source eye={}x{}",BackBufferDesc.Width,BackBufferDesc.Height);
 					}
 				}
-				else if(Settings::VRDirectGpuOnly)
+				else if(Settings::VRDirectGpuOnly && Settings::VRPreferD3D9Ex)
 				{
 					markDirectOnlyHold();
 				}
@@ -1460,6 +1467,18 @@ namespace OutRunVRStereo
 				PublishRenderFrame(OutRunVR::StereoSbsFallbackMono,pendingFrameId,pendingPoseSequence,presentStart.QuadPart,FrameFailureReason,nullptr,true,false);
 
 			const HRESULT hr=PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);
+
+			// D3D9Ex installs the Reset/Present ownership hooks synchronously before
+			// CreateDeviceEx returns to the game. Do not allocate/clear/swap private
+			// stereo RT/depth resources at that pre-exposure boundary: OutRun has not
+			// finished its own fresh-device initialization yet. The first successful
+			// real game Present is the earliest safe boundary to initialize them.
+			if(SUCCEEDED(hr)&&!StereoResourcesReady&&EnsureStereoResources(device)&&
+				!FirstDeferredResourceInitLogged)
+			{
+				FirstDeferredResourceInitLogged=true;
+				spdlog::info("VR stereo: private eye resources initialized only after first successful game Present; CreateDevice pre-exposure RT/depth mutation removed");
+			}
 
 			if(directTransport)
 			{
@@ -1591,7 +1610,9 @@ namespace OutRunVRStereo
 			LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();
 			EnsureSharedState();
 			EnsureRenderFrameState();
-			EnsureStereoResources(device);
+			// Resource creation is intentionally deferred until the first successful
+			// game Present. Hook ownership must be synchronous for D3D9Ex Reset safety,
+			// but fresh-device render targets must remain untouched before exposure.
 			StereoInstalledDevice.store(device,std::memory_order_release);
 			StereoBaseCallbacksArmed.store(true,std::memory_order_release);
 			StereoInstallState.store(StereoInstallReady,std::memory_order_release);
@@ -1621,6 +1642,14 @@ namespace OutRunVRStereo
 			return 0;
 		}
 
+	}
+
+	bool IsRuntimeStereoActive() noexcept
+	{
+		// Pure view of the same eligibility predicate used by StereoWanted().
+		// Consumers such as stock mono SkyGlow must not duplicate config-only
+		// approximations of whether true stereo is actually active.
+		return RuntimeStereoEligible();
 	}
 
 	bool InstallStereoHooksSynchronously(IDirect3DDevice9* device) noexcept

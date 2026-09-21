@@ -2,6 +2,9 @@ name: DX9Ex Active Validation
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - vr-d3d9ex-focus
   push:
     branches:
       - vr-d3d9ex-focus
@@ -20,6 +23,11 @@ on:
       - 'OutRun2006Tweaks.lods.ini'
       - 'tools/verify_vr_architecture.py'
       - 'tools/verify_vr_r32_review.py'
+      - 'tools/verify_vr_20260921_findings.py'
+      - 'tools/Run-OutRunVRTest.ps1'
+      - 'tools/Collect-OutRunVRLogs.ps1'
+      - 'tools/analyze_outrun_exe.py'
+      - 'docs/VR_TEST_SCENARIO_20260921.md'
       - '.github/workflows/vr-dx9ex-active.yml'
 
 concurrency:
@@ -39,6 +47,26 @@ jobs:
         run: |
           python tools/verify_vr_architecture.py
           python tools/verify_vr_r32_review.py
+          python tools/verify_vr_20260921_findings.py
+      - name: Parse runtime test harness PowerShell
+        shell: pwsh
+        run: |
+          $files = @(
+            'tools/Run-OutRunVRTest.ps1',
+            'tools/Collect-OutRunVRLogs.ps1',
+            'tools/Select-OutRunVRBackend.ps1',
+            'tools/OutRunVR-Backend-Selector.ps1'
+          )
+          foreach ($file in $files) {
+            $tokens = $null
+            $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              (Resolve-Path $file), [ref]$tokens, [ref]$errors)
+            if ($errors.Count -ne 0) {
+              $errors | Format-List | Out-String | Write-Error
+              throw "PowerShell parse failed: $file"
+            }
+          }
 
   host:
     needs: policy
@@ -152,6 +180,7 @@ jobs:
             Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
           }
           Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
+          Copy-Item docs/VR_TEST_SCENARIO_20260921.md (Join-Path $dir 'VR_TEST_SCENARIO_20260921.md')
           @(
             'OUTRUN VR TEST / LOG UPLOAD'
             ''
@@ -187,7 +216,7 @@ jobs:
           $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_ACTIVE_*.zip' | Select-Object -First 1
           if (-not $zip) { throw 'active DX9Ex ZIP missing' }
           Expand-Archive $zip.FullName verify
-          foreach ($file in @('OutRunVR-Backend-Selector.cmd','OutRunVR-Backend-Selector.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt')) {
+          foreach ($file in @('OutRunVR-Backend-Selector.cmd','OutRunVR-Backend-Selector.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt','VR_TEST_SCENARIO_20260921.md')) {
             if (-not (Test-Path (Join-Path verify $file))) { throw "package missing $file" }
           }
           $collectorText = Get-Content (Join-Path verify 'Collect-OutRunVRLogs.ps1') -Raw
