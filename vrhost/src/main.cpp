@@ -928,25 +928,34 @@ namespace
         return 1.f;
     }
 
-    ID3DBlob* CompileShader(const char* entry, const char* target)
+    ID3DBlob* CompileShaderSource(const char* source, const char* label,
+        const char* entry, const char* target)
     {
         ID3DBlob* code = nullptr;
         ID3DBlob* errors = nullptr;
-        const HRESULT hr = D3DCompile(OutRunStereoBlitShader, std::strlen(OutRunStereoBlitShader),
-            "OutRunStereoBlit", nullptr, nullptr, entry, target,
+        const HRESULT hr = D3DCompile(source, std::strlen(source),
+            label, nullptr, nullptr, entry, target,
             D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
             0, &code, &errors);
         if (FAILED(hr))
         {
-            std::string m = "D3DCompile failed";
+            std::string m = std::string(label) + " " + entry + "/" + target +
+                " D3DCompile failed";
             if (errors && errors->GetBufferPointer())
-                m += std::string(": ") + static_cast<const char*>(errors->GetBufferPointer());
+                m += std::string(": ") +
+                    static_cast<const char*>(errors->GetBufferPointer());
             ReleaseCom(errors);
             ReleaseCom(code);
             throw std::runtime_error(m);
         }
         ReleaseCom(errors);
         return code;
+    }
+
+    ID3DBlob* CompileShader(const char* entry, const char* target)
+    {
+        return CompileShaderSource(OutRunStereoBlitShader,
+            "OutRunStereoBlit", entry, target);
     }
 
     struct UvRect { float x = 0, y = 0, w = 1, h = 1; };
@@ -962,6 +971,25 @@ namespace
     struct MenuPlaneParams
     {
         float clip[4][4]{};
+    };
+
+    struct FsrEasuParams
+    {
+        float con0[4]{};
+        float con1[4]{};
+        float con2[4]{};
+        float con3[4]{};
+        float sdrWhiteScale = 1.0f;
+        float sourceIsScRgb = 0.0f;
+        float padding[2]{};
+    };
+
+    struct FsrRcasParams
+    {
+        float attenuation = 2.0f;
+        float outputWidth = 1.0f;
+        float outputHeight = 1.0f;
+        float padding = 0.0f;
     };
 
     struct SwapchainSet
@@ -1777,9 +1805,17 @@ namespace
             directFrameValid_ = false; directTransportReady_ = false;
             ReleaseCom(sourceSrv_);
             ReleaseCom(source_);
+            ReleaseCom(fsrIntermediateSrv_);
+            ReleaseCom(fsrIntermediateRtv_);
+            ReleaseCom(fsrIntermediate_);
+            fsrIntermediateWidth_ = fsrIntermediateHeight_ = 0;
+            ReleaseCom(fsrRcasBuffer_);
+            ReleaseCom(fsrEasuBuffer_);
             ReleaseCom(menuConstantBuffer_);
             ReleaseCom(constantBuffer_);
             ReleaseCom(sampler_);
+            ReleaseCom(fsrRcasPs_);
+            ReleaseCom(fsrEasuPs_);
             ReleaseCom(ps_);
             ReleaseCom(menuVs_);
             ReleaseCom(vs_);
@@ -1906,15 +1942,29 @@ namespace
             ID3DBlob* v = CompileShader("VSMain", "vs_5_0");
             ID3DBlob* mv = CompileShader("VSMenu", "vs_5_0");
             ID3DBlob* p = CompileShader("PSMain", "ps_5_0");
+            ID3DBlob* fsrEasu = CompileShaderSource(
+                OutRunFsr1EasuShader, "OutRunFSR1-EASU",
+                "PSFsrEasu", "ps_5_0");
+            ID3DBlob* fsrRcas = CompileShaderSource(
+                OutRunFsr1RcasShader, "OutRunFSR1-RCAS",
+                "PSFsrRcas", "ps_5_0");
             CheckHr(device_->CreateVertexShader(v->GetBufferPointer(), v->GetBufferSize(), nullptr, &vs_),
                 "CreateVertexShader");
             CheckHr(device_->CreateVertexShader(mv->GetBufferPointer(), mv->GetBufferSize(), nullptr, &menuVs_),
                 "CreateVertexShader(VSMenu)");
             CheckHr(device_->CreatePixelShader(p->GetBufferPointer(), p->GetBufferSize(), nullptr, &ps_),
                 "CreatePixelShader");
+            CheckHr(device_->CreatePixelShader(
+                fsrEasu->GetBufferPointer(), fsrEasu->GetBufferSize(),
+                nullptr, &fsrEasuPs_), "CreatePixelShader(FSR1-EASU)");
+            CheckHr(device_->CreatePixelShader(
+                fsrRcas->GetBufferPointer(), fsrRcas->GetBufferSize(),
+                nullptr, &fsrRcasPs_), "CreatePixelShader(FSR1-RCAS)");
             v->Release();
             mv->Release();
             p->Release();
+            fsrEasu->Release();
+            fsrRcas->Release();
 
             D3D11_SAMPLER_DESC sd{};
             sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -1932,6 +1982,18 @@ namespace
             menuBd.ByteWidth = sizeof(MenuPlaneParams);
             CheckHr(device_->CreateBuffer(&menuBd, nullptr, &menuConstantBuffer_),
                 "CreateBuffer(MenuPlaneParams)");
+
+            D3D11_BUFFER_DESC fsrEasuBd = bd;
+            fsrEasuBd.ByteWidth = sizeof(FsrEasuParams);
+            CheckHr(device_->CreateBuffer(
+                &fsrEasuBd, nullptr, &fsrEasuBuffer_),
+                "CreateBuffer(FSR1-EASU)");
+
+            D3D11_BUFFER_DESC fsrRcasBd = bd;
+            fsrRcasBd.ByteWidth = sizeof(FsrRcasParams);
+            CheckHr(device_->CreateBuffer(
+                &fsrRcasBd, nullptr, &fsrRcasBuffer_),
+                "CreateBuffer(FSR1-RCAS)");
         }
 
         bool BindCaptureOutput(bool initial)
@@ -2079,7 +2141,8 @@ namespace
             p->uvOffset[1] = uv.y;
             p->sdrWhiteScale = sdrWhiteScale_;
             p->sourceIsScRgb = sourceFormat == DXGI_FORMAT_R16G16B16A16_FLOAT ? 1.f : 0.f;
-            p->padding[0] = p->padding[1] = 0;
+            p->padding[0] = sharpening_;
+            p->padding[1] = 0;
             context_->Unmap(constantBuffer_, 0);
 
             D3D11_VIEWPORT vp{};
@@ -2099,6 +2162,157 @@ namespace
             context_->PSSetShaderResources(0, 1, &nullSrv);
             ID3D11RenderTargetView* nullRtv = nullptr;
             context_->OMSetRenderTargets(1, &nullRtv, nullptr);
+            return true;
+        }
+
+        bool EnsureFsrIntermediate(
+            std::uint32_t width, std::uint32_t height)
+        {
+            if (!width || !height)
+                return false;
+            if (fsrIntermediate_ && fsrIntermediateRtv_ &&
+                fsrIntermediateSrv_ &&
+                fsrIntermediateWidth_ == width &&
+                fsrIntermediateHeight_ == height)
+                return true;
+
+            ReleaseCom(fsrIntermediateSrv_);
+            ReleaseCom(fsrIntermediateRtv_);
+            ReleaseCom(fsrIntermediate_);
+            fsrIntermediateWidth_ = fsrIntermediateHeight_ = 0;
+
+            D3D11_TEXTURE2D_DESC desc{};
+            desc.Width = width;
+            desc.Height = height;
+            desc.MipLevels = 1;
+            desc.ArraySize = 1;
+            desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+            desc.SampleDesc.Count = 1;
+            desc.Usage = D3D11_USAGE_DEFAULT;
+            desc.BindFlags =
+                D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+            if (FAILED(device_->CreateTexture2D(
+                    &desc, nullptr, &fsrIntermediate_)) ||
+                !fsrIntermediate_ ||
+                FAILED(device_->CreateRenderTargetView(
+                    fsrIntermediate_, nullptr, &fsrIntermediateRtv_)) ||
+                !fsrIntermediateRtv_ ||
+                FAILED(device_->CreateShaderResourceView(
+                    fsrIntermediate_, nullptr, &fsrIntermediateSrv_)) ||
+                !fsrIntermediateSrv_)
+            {
+                ReleaseCom(fsrIntermediateSrv_);
+                ReleaseCom(fsrIntermediateRtv_);
+                ReleaseCom(fsrIntermediate_);
+                return false;
+            }
+            fsrIntermediateWidth_ = width;
+            fsrIntermediateHeight_ = height;
+            return true;
+        }
+
+        bool RenderFsr1To(ID3D11RenderTargetView* finalRtv,
+            std::uint32_t outputWidth, std::uint32_t outputHeight,
+            ID3D11ShaderResourceView* sourceSrv,
+            std::uint32_t sourceWidth, std::uint32_t sourceHeight,
+            DXGI_FORMAT sourceFormat)
+        {
+            if (!finalRtv || !sourceSrv || !sourceWidth || !sourceHeight ||
+                !outputWidth || !outputHeight ||
+                !fsrEasuPs_ || !fsrRcasPs_ ||
+                !fsrEasuBuffer_ || !fsrRcasBuffer_ ||
+                !sampler_)
+                return false;
+
+            // EASU is an upscaler. Equal/larger sources keep the existing
+            // blit path instead of spending an extra two passes.
+            if (sourceWidth >= outputWidth &&
+                sourceHeight >= outputHeight)
+                return false;
+            if (!EnsureFsrIntermediate(outputWidth, outputHeight))
+                return false;
+
+            D3D11_MAPPED_SUBRESOURCE map{};
+            if (FAILED(context_->Map(
+                    fsrEasuBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &map)))
+                return false;
+            auto* easu = static_cast<FsrEasuParams*>(map.pData);
+            const float inW = static_cast<float>(sourceWidth);
+            const float inH = static_cast<float>(sourceHeight);
+            const float outW = static_cast<float>(outputWidth);
+            const float outH = static_cast<float>(outputHeight);
+            easu->con0[0] = inW / outW;
+            easu->con0[1] = inH / outH;
+            easu->con0[2] = 0.5f * inW / outW - 0.5f;
+            easu->con0[3] = 0.5f * inH / outH - 0.5f;
+            easu->con1[0] = 1.0f / inW;
+            easu->con1[1] = 1.0f / inH;
+            easu->con1[2] = 1.0f / inW;
+            easu->con1[3] = -1.0f / inH;
+            easu->con2[0] = -1.0f / inW;
+            easu->con2[1] = 2.0f / inH;
+            easu->con2[2] = 1.0f / inW;
+            easu->con2[3] = 2.0f / inH;
+            easu->con3[0] = 0.0f;
+            easu->con3[1] = 4.0f / inH;
+            easu->con3[2] = 0.0f;
+            easu->con3[3] = 0.0f;
+            easu->sdrWhiteScale = sdrWhiteScale_;
+            easu->sourceIsScRgb =
+                sourceFormat == DXGI_FORMAT_R16G16B16A16_FLOAT ? 1.0f : 0.0f;
+            easu->padding[0] = easu->padding[1] = 0.0f;
+            context_->Unmap(fsrEasuBuffer_, 0);
+
+            D3D11_VIEWPORT vp{};
+            vp.Width = outW;
+            vp.Height = outH;
+            vp.MaxDepth = 1.0f;
+            context_->RSSetViewports(1, &vp);
+            context_->OMSetRenderTargets(1, &fsrIntermediateRtv_, nullptr);
+            context_->IASetPrimitiveTopology(
+                D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+            context_->VSSetShader(vs_, nullptr, 0);
+            context_->PSSetShader(fsrEasuPs_, nullptr, 0);
+            context_->PSSetShaderResources(0, 1, &sourceSrv);
+            context_->PSSetSamplers(0, 1, &sampler_);
+            context_->PSSetConstantBuffers(0, 1, &fsrEasuBuffer_);
+            context_->Draw(3, 0);
+            ID3D11ShaderResourceView* nullSrv = nullptr;
+            context_->PSSetShaderResources(0, 1, &nullSrv);
+
+            if (FAILED(context_->Map(
+                    fsrRcasBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &map)))
+                return false;
+            auto* rcas = static_cast<FsrRcasParams*>(map.pData);
+            rcas->attenuation =
+                2.0f * (1.0f - std::clamp(fsrSharpness_, 0.0f, 1.0f));
+            rcas->outputWidth = outW;
+            rcas->outputHeight = outH;
+            rcas->padding = 0.0f;
+            context_->Unmap(fsrRcasBuffer_, 0);
+
+            context_->OMSetRenderTargets(1, &finalRtv, nullptr);
+            context_->PSSetShader(fsrRcasPs_, nullptr, 0);
+            context_->PSSetShaderResources(0, 1, &fsrIntermediateSrv_);
+            context_->PSSetConstantBuffers(0, 1, &fsrRcasBuffer_);
+            context_->Draw(3, 0);
+            context_->PSSetShaderResources(0, 1, &nullSrv);
+            ID3D11Buffer* nullBuffer = nullptr;
+            context_->PSSetConstantBuffers(0, 1, &nullBuffer);
+            ID3D11RenderTargetView* nullRtv = nullptr;
+            context_->OMSetRenderTargets(1, &nullRtv, nullptr);
+
+            ++fsr1Frames_;
+            if (!fsr1FirstLogged_)
+            {
+                fsr1FirstLogged_ = true;
+                std::cout
+                    << "FSR1 DirectGPU POC active: transport "
+                    << sourceWidth << "x" << sourceHeight
+                    << " -> OpenXR " << outputWidth << "x" << outputHeight
+                    << " RCAS=" << fsrSharpness_
+                    << "; projection swapchain remains runtime-sized.\n";
+            }
             return true;
         }
 
@@ -2173,9 +2387,20 @@ namespace
         ID3D11VertexShader* vs_ = nullptr;
         ID3D11VertexShader* menuVs_ = nullptr;
         ID3D11PixelShader* ps_ = nullptr;
+        ID3D11PixelShader* fsrEasuPs_ = nullptr;
+        ID3D11PixelShader* fsrRcasPs_ = nullptr;
         ID3D11SamplerState* sampler_ = nullptr;
         ID3D11Buffer* constantBuffer_ = nullptr;
         ID3D11Buffer* menuConstantBuffer_ = nullptr;
+        ID3D11Buffer* fsrEasuBuffer_ = nullptr;
+        ID3D11Buffer* fsrRcasBuffer_ = nullptr;
+        ID3D11Texture2D* fsrIntermediate_ = nullptr;
+        ID3D11RenderTargetView* fsrIntermediateRtv_ = nullptr;
+        ID3D11ShaderResourceView* fsrIntermediateSrv_ = nullptr;
+        std::uint32_t fsrIntermediateWidth_ = 0;
+        std::uint32_t fsrIntermediateHeight_ = 0;
+        std::uint64_t fsr1Frames_ = 0;
+        bool fsr1FirstLogged_ = false;
         DXGI_FORMAT swapFormat_ = DXGI_FORMAT_UNKNOWN;
         SwapchainSet projection_{}, theater_{};
         float sdrWhiteScale_ = 1.f;
