@@ -21,6 +21,10 @@ on:
       - 'tools/verify_vr_architecture.py'
       - 'tools/verify_vr_r32_review.py'
       - 'tools/verify_vr_20260921_findings.py'
+      - 'tools/Run-OutRunVRTest.ps1'
+      - 'tools/Collect-OutRunVRLogs.ps1'
+      - 'tools/analyze_outrun_exe.py'
+      - 'docs/VR_TEST_SCENARIO_20260921.md'
       - '.github/workflows/vr-dx9ex-active.yml'
 
 concurrency:
@@ -41,6 +45,25 @@ jobs:
           python tools/verify_vr_architecture.py
           python tools/verify_vr_r32_review.py
           python tools/verify_vr_20260921_findings.py
+      - name: Parse runtime test harness PowerShell
+        shell: pwsh
+        run: |
+          $files = @(
+            'tools/Run-OutRunVRTest.ps1',
+            'tools/Collect-OutRunVRLogs.ps1',
+            'tools/Select-OutRunVRBackend.ps1',
+            'tools/OutRunVR-Backend-Selector.ps1'
+          )
+          foreach ($file in $files) {
+            $tokens = $null
+            $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              (Resolve-Path $file), [ref]$tokens, [ref]$errors)
+            if ($errors.Count -ne 0) {
+              $errors | Format-List | Out-String | Write-Error
+              throw "PowerShell parse failed: $file"
+            }
+          }
 
   host:
     needs: policy
