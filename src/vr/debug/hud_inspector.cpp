@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <intrin.h>
 
+#include <atomic>
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
@@ -42,6 +43,7 @@ namespace OutRunVRHudInspector
         std::mutex TraceMutex;
         std::ofstream TraceFile;
         std::ofstream XstMapFile;
+        std::atomic<bool> TraceActive{false};
         std::unordered_map<std::uint64_t, std::uint32_t> Seen;
         std::uint64_t TraceLines = 0;
         ULONGLONG StartMs = 0;
@@ -83,7 +85,8 @@ namespace OutRunVRHudInspector
         }
 
         std::uint64_t MakeKey(EventKind kind, std::uint32_t callRva,
-            std::uint32_t arg0, std::uint32_t arg1) noexcept
+            std::uint32_t arg0, std::uint32_t arg1,
+            int mode, int stage) noexcept
         {
             std::uint64_t h = 1469598103934665603ull;
             auto mix = [&h](std::uint32_t v) {
@@ -94,6 +97,8 @@ namespace OutRunVRHudInspector
             mix(callRva);
             mix(arg0);
             mix(arg1);
+            mix(static_cast<std::uint32_t>(mode));
+            mix(static_cast<std::uint32_t>(stage));
             return h;
         }
 
@@ -120,15 +125,20 @@ namespace OutRunVRHudInspector
             double arg4 = 0.0, double arg5 = 0.0,
             double arg6 = 0.0, double arg7 = 0.0)
         {
-            if (!TraceFile)
+            if (!TraceActive.load(std::memory_order_acquire))
                 return;
 
             const std::uint32_t returnRva = ToExeRva(returnAddress);
             const std::uint32_t callRva =
                 returnRva >= 5 ? returnRva - 5 : returnRva;
-            const std::uint64_t key = MakeKey(kind, callRva, arg0, arg1);
+            const int mode = CurrentMode();
+            const int stage = CurrentStage();
+            const std::uint64_t key =
+                MakeKey(kind, callRva, arg0, arg1, mode, stage);
 
             std::lock_guard lock(TraceMutex);
+            if (!TraceActive.load(std::memory_order_relaxed) || !TraceFile)
+                return;
             std::uint32_t count = 0;
             if (!ShouldWrite(key, count))
                 return;
@@ -144,8 +154,8 @@ namespace OutRunVRHudInspector
                 << semantic.area << ','
                 << semantic.semantic << ','
                 << OutRunVRHudSemantics::SpacePolicyName(semantic.space) << ','
-                << CurrentMode() << ','
-                << CurrentStage() << ','
+                << mode << ','
+                << stage << ','
                 << arg0 << ','
                 << arg1 << ','
                 << arg2 << ','
@@ -156,8 +166,11 @@ namespace OutRunVRHudInspector
                 << arg7 << ','
                 << count << '\n';
 
-            if ((++TraceLines & 63ull) == 0)
-                TraceFile.flush();
+            ++TraceLines;
+            // HudInspector is diagnostic-only and already rate-limited. Make
+            // every acknowledged row durable so an unhandled-crash ZIP cannot
+            // lose the most recent semantic evidence from the stream buffer.
+            TraceFile.flush();
         }
 
         int __cdecl SpriteAnimDest(std::uint32_t spriteId, float x, float y,
@@ -239,8 +252,24 @@ namespace OutRunVRHudInspector
 
         void ResetHooks() noexcept
         {
+            TraceActive.store(false, std::memory_order_release);
             ClipSpriteHook = {};
             SpriteAnimHook = {};
+
+            std::lock_guard lock(TraceMutex);
+            if (TraceFile.is_open())
+            {
+                TraceFile.flush();
+                TraceFile.close();
+            }
+            if (XstMapFile.is_open())
+            {
+                XstMapFile.flush();
+                XstMapFile.close();
+            }
+            Seen.clear();
+            TraceLines = 0;
+            StartMs = 0;
         }
 
     }
@@ -275,9 +304,12 @@ namespace OutRunVRHudInspector
 
     void TraceXstSet(int xstsetIndex, const char* filename)
     {
-        if (!filename || !*filename || !XstMapFile)
+        if (!filename || !*filename ||
+            !TraceActive.load(std::memory_order_acquire))
             return;
         std::lock_guard lock(TraceMutex);
+        if (!TraceActive.load(std::memory_order_relaxed) || !XstMapFile)
+            return;
         XstMapFile
             << (GetTickCount64() - StartMs) << ','
             << xstsetIndex << ','
@@ -324,8 +356,9 @@ namespace OutRunVRHudInspector
                     return false;
                 }
 
+                TraceActive.store(true, std::memory_order_release);
                 spdlog::info(
-                    "VR HUD INSPECTOR: semantic HUD tracing active; UIScaling-derived caller taxonomy separates screen HUD from world billboards; output=OutRun2006Tweaks-hudtrace.csv + OutRun2006Tweaks-xstmap.csv");
+                    "VR HUD INSPECTOR: semantic HUD tracing active; startup is transactional, mode/stage transitions have independent rate-limit keys, and emitted rows are crash-durable; output=OutRun2006Tweaks-hudtrace.csv + OutRun2006Tweaks-xstmap.csv");
                 return true;
             }
 
