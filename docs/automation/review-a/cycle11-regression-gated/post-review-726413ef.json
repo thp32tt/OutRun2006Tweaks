@@ -1,0 +1,26 @@
+{
+  "role": "A",
+  "candidate_sha": "726413efdb396ce1eb81c76b32cea927afd37040",
+  "base_sha": "3de2e34c8f77b39a6a5f1f2a521e21ac2a82ef39",
+  "finding": "CRASH-EVIDENCE-TRANSACTION-REOPEN",
+  "changed_files": ["src/hooks_exceptions.cpp", "tools/verify_vr_architecture.py"],
+  "architecture_review": {
+    "verdict": "PASS_DOMAIN_REVIEW",
+    "production_change_sha": "263960b1de0c4fb418c0b9db2582768e208572b6",
+    "checks": [
+      "required evidence success is initialized fail-closed",
+      "MiniDumpWriteDump and handle close success both gate dump validity",
+      "crash-log write verifies exact byte count and close success",
+      "tweaks-log snapshot uses unique per-crash destination and error-code/catch containment",
+      "ZIP publication requires dump/log/snapshot plus finalize/end/fclose success",
+      "optional VR diagnostics remain non-fatal to primary evidence transaction",
+      "candidate is exactly ahead 2/behind 0 from base; no stale-base contamination"
+    ]
+  },
+  "regression_case_keys": ["VR-STARTUP-WHITE-001"],
+  "regression_classification": "EVIDENCE_AUGMENT",
+  "regression_reason": "src/hooks_exceptions.cpp is a registered riskPath, but candidate does not change startup/device creation/reset/present, stereo transport/shared-frame eligibility, host first-frame/fallback, or VR activation config triggers.",
+  "runtime_fixed_claim": false,
+  "integration_gate": "A domain review passes; integration still requires C exact-SHA sanity, applicable CI/build evidence, and D prospective-merge regression gate. VR-STARTUP-WHITE-001 remains REOPENED/NEED_HMD_TEST independently.",
+  "nextAction": "D/C obtain build/CI evidence for 726413ef; do not use this candidate to close VR-STARTUP-WHITE-001. A next priority remains exact D candidate restoring 986f0d57 deferred-init protection."
+}
