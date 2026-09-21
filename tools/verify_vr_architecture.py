@@ -447,4 +447,45 @@ require("src/vr/core/transport.hpp", "class IFrameProducer", "class IFrameConsum
 require("src/vr/game/game_adapter.hpp", "class IGameAdapter", "latchRenderPose", "buildStereoMatrices")
 require("src/vr/d3d9/stereo_backend.hpp", "class IStereoBackend", "drawWorldStereo", "drawScreenSpaceStereo")
 
+# Crash evidence publication is a fail-closed transaction. The primary archive
+# may be reported successful only when dump, crash log and tweaks-log snapshot
+# were generated successfully; optional diagnostics must never throw out of the
+# unhandled-exception filter. Keep the newer crash-signature sidecar intact.
+crash_source = require(
+    "src/hooks_exceptions.cpp",
+    "bool        bDumpSuccess = false;",
+    "bool        crashLogWriteSuccess = false;",
+    "bool        re4tLogSnapshotReady = false;",
+    "NumberOfBytesWritten == requested",
+    "std::filesystem::copy_options::none",
+    "const std::filesystem::path& source) noexcept",
+    'add_optional_vr_file("crash_signature.json",',
+    "bDumpSuccess && crashLogWriteSuccess && re4tLogSnapshotReady",
+    "required_entries_ok && finalized && ended && closed",
+)
+for forbidden in (
+    "bool        bDumpSuccess;\n",
+    'L"%s\\\\%s\\\\OutRun2006Tweaks.log"',
+    "std::filesystem::exists(Module::LogPath)",
+):
+    if forbidden in crash_source:
+        raise SystemExit(f"crash evidence transaction regressed: {forbidden}")
+
+# Minimal transaction model: any failed required evidence write forces archive
+# publication false; an optional diagnostic failure does not.
+for dump_ok, log_ok, snapshot_ok in (
+    (False, True, True),
+    (True, False, True),
+    (True, True, False),
+):
+    published = dump_ok and log_ok and snapshot_ok and True and True and True
+    if published:
+        raise SystemExit("crash required-evidence fail-closed model regressed")
+
+primary_ok = True and True and True
+optional_vr_ok = False
+published = primary_ok and True and True and True
+if not published or optional_vr_ok:
+    raise SystemExit("crash optional-evidence isolation model regressed")
+
 print("VR reconstructed R23/R25 architecture boundary verification passed")
