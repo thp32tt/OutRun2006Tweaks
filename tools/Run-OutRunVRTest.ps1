@@ -116,7 +116,18 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     $assetOut=Join-Path $sessionRoot 'VR_ASSET_SEMANTICS.json'
     try {
         & $pythonCmd.Source $assetAnalyzer --root $root --output $assetOut --max-files 5000 --quiet
-        if($LASTEXITCODE -ne 0){ Write-Warning "Asset semantic analyzer exited with code $LASTEXITCODE" }
+        $assetExitCode=$LASTEXITCODE
+        if(Test-Path $assetOut){
+            try {
+                $assetReport=Get-Content $assetOut -Raw|ConvertFrom-Json
+                if($assetReport.status -ne 'COMPLETE'){
+                    Write-Warning ("Asset semantic inventory is {0}: scanned {1}/{2}, parseErrors={3}" -f $assetReport.status,$assetReport.files_scanned,$assetReport.discovered_candidates,$assetReport.parse_error_count)
+                }
+            } catch {
+                Write-Warning "Asset semantic inventory status could not be parsed: $($_.Exception.Message)"
+            }
+        }
+        if($assetExitCode -ne 0){ Write-Warning "Asset semantic analyzer exited with code $assetExitCode" }
     } catch {
         Write-Warning "Asset semantic analyzer failed: $($_.Exception.Message)"
     }
