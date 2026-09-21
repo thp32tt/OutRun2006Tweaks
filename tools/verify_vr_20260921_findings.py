@@ -52,6 +52,13 @@ def main() -> int:
         "GetLastRawGameWvpWrite",
         "finite HUD world-lock",
         "R30XyzrhwWorldLockedHudDraws",
+        "R46XyzrhwHudPlaneAccepted",
+        "R46XyzrhwUnknownRejected",
+        "if (!state.worldEffect && !hudPlaneEvidence)",
+        "unknown depth-disabled draws fail closed to R26/R23",
+    ])
+    forbid("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
+        "if (state.depthTestEnabled && !state.worldEffect &&",
     ])
     require("src/vr/d3d9/stereo_renderer_r30.cpp", [
         "clipCorrection._11 = hudScaleX;",
@@ -160,6 +167,13 @@ def main() -> int:
     require("tools/OutRunVR-Backend-Selector.ps1", [
         "CLASSIC D3D9 + VR",
         '"d3d9-classic"',
+    ])
+    require("vrhost/src/diagnostics/runtime_watchdog.cpp", [
+        "VR_CAPTURE_LAST.txt",
+        "status=CAPTURING",
+        "status=READY",
+        "MessageBeep(MB_OK)",
+        "MessageBeep(MB_ICONASTERISK)",
     ])
     require("vrhost/src/main_r23.cpp", [
         '"outrun-vr-host-startup.log"',
