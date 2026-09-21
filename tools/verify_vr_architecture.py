@@ -502,11 +502,14 @@ for marker in (
     "bodyPatch.set(true);",
     "auto replacementHook = safetyhook::create_mid(target, destination);",
     "if (!replacementHook)",
+    "replacementHook = {};",
     "bodyPatch.set(false);",
     "Sumo_BinkGetPow2 = std::move(replacementHook);",
 ):
     if marker not in bink_section:
         raise SystemExit(f"Bink hook transaction invariant missing: {marker}")
+if bink_section.find("replacementHook = {};") > bink_section.find("bodyPatch.set(false);"):
+    raise SystemExit("Bink failed hook ownership must be released before byte rollback")
 if bink_section.find("bodyPatch.set(false);") > bink_section.find("Sumo_BinkGetPow2 = std::move(replacementHook);"):
     raise SystemExit("Bink rollback must precede replacement-hook publication")
 if "Memory::VP::Patch(Module::exe_ptr(Sumo_BinkGetPow2_Addr)" in bink_section:
