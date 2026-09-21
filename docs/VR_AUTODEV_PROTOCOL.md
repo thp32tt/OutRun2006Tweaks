@@ -231,3 +231,38 @@ After C4 COMMIT and before C6 STATE, append an Issue #14 event containing:
 When runtime behavior is implicated, also append/update Issue #13 and the regression registry. A known symptom must reuse its existing stable key.
 
 If ledger persistence fails, the run is not fully persisted. Record `PUSH_PENDING` or `CAPABILITY_BLOCKED` and carry that exact action into C6.
+
+
+## Canonical original-EXE reverse-engineering gate
+
+Executable-RVA reasoning uses one canonical binary baseline:
+
+- upstream: `emoose/OutRun2006Tweaks`;
+- asset: release `v0.1/OR2006C2C.EXE`, the same replacement EXE URI used by upstream's own build workflow;
+- manifest: `docs/VR_BINARY_CONTRACT.json`;
+- verifier: `tools/verify_vr_binary_contract.py`;
+- crash signature registry: `docs/VR_CRASH_SIGNATURES.json`.
+
+The EXE itself is not committed. CI downloads it transiently and strict-verifies
+its pinned SHA-256, PE32/x86 identity, image base, reviewed RVA byte signatures,
+and source bindings.
+
+A/B/C must consult this contract/disassembly whenever a finding depends on game
+control flow, HUD/render ownership, call timing, calling convention, register/
+stack assumptions, or an executable RVA. Source-only reasoning is insufficient
+for a new executable hook.
+
+D integration rules:
+1. any new/changed executable-RVA hook must add or update a stable binary
+   contract entry;
+2. strict canonical-EXE verification must pass before build validation is
+   considered sufficient;
+3. a candidate touching an RVA/risk path that matches a known crash signature
+   must revalidate that stable crash key;
+4. discovery mode may be used only to collect evidence for a deliberately
+   changed canonical baseline and never counts as an integration pass.
+
+Crash bundles preserve a machine-readable `crash_signature.json` containing
+exception code, absolute address, main-module base, thread ID and ASLR-stable
+`exeRva` when the fault belongs to the main EXE. This allows direct joining to
+the binary contract and durable crash registry.
