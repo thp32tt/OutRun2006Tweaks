@@ -110,6 +110,12 @@ namespace OutRunVR
     // this game frame. Word 10 was previously unused; Frame.v2 ABI stays fixed.
     inline constexpr std::uint32_t RenderFrameCadenceRequestIndex = 10;
 
+    // P0 runtime identity. Word 11 carries a per-game-process generation that
+    // is mirrored by SharedRenderFrameRing::reserved0. Reusing reserved storage
+    // keeps the Frame.v2 ABI unchanged while letting every reader reject stale
+    // slots left behind when the host mapping survives a fast game restart.
+    inline constexpr std::uint32_t RenderFrameRunGenerationIndex = 11;
+
     enum StereoFailureReason : std::uint32_t
     {
         StereoFailureNone = 0,
@@ -210,10 +216,22 @@ namespace OutRunVR
         volatile std::uint32_t publishSequence;
         volatile std::uint32_t latestSlot;
         volatile std::uint32_t clientPid;
+        // P0: per-game-process run generation. Each valid slot mirrors this in
+        // reserved[RenderFrameRunGenerationIndex].
         std::uint32_t reserved0;
         SharedRenderFrameState slots[RenderFrameRingSize];
     };
 #pragma pack(pop)
+
+    inline bool RenderFrameRunIdentityMatches(
+        const SharedRenderFrameRing& ring,
+        const SharedRenderFrameState& frame) noexcept
+    {
+        return ring.clientPid != 0 &&
+            ring.reserved0 != 0 &&
+            frame.clientPid == ring.clientPid &&
+            frame.reserved[RenderFrameRunGenerationIndex] == ring.reserved0;
+    }
 
     static_assert(sizeof(SharedFov) == 16);
     static_assert(sizeof(SharedPoseState) == 280);

@@ -74,6 +74,50 @@ namespace
     constexpr ULONGLONG R23CachedProjectionHoldMs = 1000;
     constexpr ULONGLONG R23PresentationDebounceMs = 750;
     constexpr ULONGLONG R23CachedProjectionLogIntervalMs = 5000;
+
+    bool R23UsableGameplayBootstrapFrame(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        constexpr std::uint32_t required =
+            OutRunVR::RenderFrameStereoComplete |
+            OutRunVR::RenderFrameWorldStereo |
+            OutRunVR::RenderFrameDrawDuplicated |
+            OutRunVR::RenderFrameEffectivePoseValid;
+
+        if (!frame.frameId || !frame.sourcePoseSequence ||
+            frame.presentationMode != OutRunVR::PresentationGameplay ||
+            frame.state != OutRunVR::StereoSbsActive ||
+            frame.failureReason != OutRunVR::StereoFailureNone ||
+            frame.presentQpc <= 0 ||
+            !frame.backbufferWidth || !frame.backbufferHeight ||
+            (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
+            (frame.flags & required) != required)
+            return false;
+
+        if ((frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0)
+            return true;
+
+        const std::uint32_t slot =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        const std::uint32_t width =
+            frame.reserved[OutRunVR::RenderFrameDirectWidthIndex];
+        const std::uint32_t height =
+            frame.reserved[OutRunVR::RenderFrameDirectHeightIndex];
+        const std::uint32_t leftHandle =
+            frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex];
+        const std::uint32_t rightHandle =
+            frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex];
+
+        return slot < OutRunVR::RenderFrameRingSize &&
+            generation != 0 &&
+            leftHandle != 0 && rightHandle != 0 &&
+            width != 0 && height != 0 &&
+            width == frame.backbufferWidth &&
+            height == frame.backbufferHeight;
+    }
+
     std::uint64_t R23CachedProjectionSubmits = 0;
     std::uint64_t R42SameFrameProjectionReuses = 0;
     std::uint64_t R42ProjectionRefreshes = 0;
@@ -2007,6 +2051,7 @@ int main(int argc, char** argv)
         std::array<XrCompositionLayerProjectionView, 2>
             cachedMenuProjectionViews{};
         bool cachedMenuProjectionValid = false;
+        bool awaitingFirstGameplayStereo = false;
         XrPosef menuProjectionAnchor{};
         menuProjectionAnchor.orientation.w = 1.0f;
         bool menuProjectionAnchorValid = false;
@@ -2066,6 +2111,7 @@ int main(int argc, char** argv)
                         lastStereoMatchMs = 0; cachedProjectionValid = false;
                         cachedProjectionRenderedMs = 0;
                         cachedMenuProjectionValid = false;
+                        awaitingFirstGameplayStereo = false;
                         menuProjectionAnchorValid = false;
                         refreshMenuAnchorAfterLocate = true;
                         compositor.ReferenceSpaceChanged();
@@ -2111,6 +2157,7 @@ int main(int argc, char** argv)
                 matchedStereoValid = false; cachedProjectionValid = false;
                 cachedProjectionRenderedMs = 0;
                 cachedMenuProjectionValid = false;
+                awaitingFirstGameplayStereo = false;
                 menuProjectionAnchorValid = false;
                 refreshMenuAnchorAfterLocate = true;
                 OutRunVrR23VerifiedBundle::Invalidate();
@@ -2176,6 +2223,23 @@ int main(int argc, char** argv)
 
             const auto requestedPresentation = shared.Presentation();
             auto presentation = requestedPresentation;
+
+            // T0/R46+P0: Gameplay can be announced before a releasable
+            // stereo packet exists, and Frame.v2 may survive a fast game restart.
+            // RenderFrameReader already rejects stale run identities; require the
+            // same completed world/pose invariants used by production selection
+            // before leaving the visible menu/loading projection.
+            if (requestedPresentation == OutRunVR::PresentationGameplay &&
+                lastPresentation != OutRunVR::PresentationGameplay)
+            {
+                OutRunVR::SharedRenderFrameState bootstrapFrame{};
+                const bool haveBootstrapFrame =
+                    renderFrames.Read(bootstrapFrame) &&
+                    R23UsableGameplayBootstrapFrame(bootstrapFrame);
+                if (!haveBootstrapFrame)
+                    presentation = OutRunVR::PresentationTheater;
+            }
+
             // R45: the game now publishes presentation from an explicit
             // GameState whitelist. Do not retain a stale stereo projection for
             // 750 ms after it says Theater; that hold was enough to transform
@@ -2192,6 +2256,7 @@ int main(int argc, char** argv)
                     cachedProjectionValid = false;
                     cachedProjectionRenderedMs = 0;
                     cachedMenuProjectionValid = false;
+                    awaitingFirstGameplayStereo = false;
                     if ((head.locationFlags & R45MenuAnchorFlags) ==
                         R45MenuAnchorFlags)
                     {
@@ -2207,7 +2272,9 @@ int main(int argc, char** argv)
                 }
                 else
                 {
-                    cachedMenuProjectionValid = false;
+                    // Keep the last visible menu/loading projection only until
+                    // the first actual gameplay stereo projection is released.
+                    awaitingFirstGameplayStereo = true;
                 }
                 lastPresentation = presentation;
                 std::cout << "VR presentation R45: "
@@ -2589,10 +2656,13 @@ int main(int argc, char** argv)
                          compositor.HasStereoSource() &&
                          projectionNow >= lastStereoMatchMs &&
                          projectionNow - lastStereoMatchMs <= StereoGraceMs);
-                    const bool cachedHold = cachedProjectionValid &&
-                        projectionNow >= cachedProjectionRenderedMs &&
-                        projectionNow - cachedProjectionRenderedMs <=
-                            R23CachedProjectionHoldMs;
+                    // T0/R47: while Gameplay remains active, never age
+                    // out the last successfully released stereo projection.
+                    // Presentation/session/reference-space transitions already
+                    // invalidate this cache, so a producer stall freezes the
+                    // last good stereo image instead of submitting a solid or
+                    // empty compositor frame.
+                    const bool cachedHold = cachedProjectionValid;
 
                     LARGE_INTEGER rs{}, re{}; QueryPerformanceCounter(&rs);
 
@@ -2701,6 +2771,32 @@ int main(int argc, char** argv)
                     QueryPerformanceCounter(&re);
                     frameRenderMs += timings.Ms(rs, re);
                     timings.render.Add(timings.Ms(rs, re));
+
+                    if (frameFreshProjection)
+                    {
+                        awaitingFirstGameplayStereo = false;
+                        cachedMenuProjectionValid = false;
+                    }
+
+                    // If Gameplay was announced before a releasable stereo
+                    // projection, keep the last LOCAL-fixed menu/loading image
+                    // visible in direct-only mode. This is strictly a bootstrap
+                    // bridge; the first fresh gameplay projection disables it.
+                    if (!layerReady && directTransportOnly &&
+                        awaitingFirstGameplayStereo &&
+                        cachedMenuProjectionValid)
+                    {
+                        pv = cachedMenuProjectionViews;
+                        projection.space = localSpace;
+                        projection.viewCount = 2;
+                        projection.views = pv.data();
+                        layers[0] =
+                            reinterpret_cast<const XrCompositionLayerBaseHeader*>(
+                                &projection);
+                        layerReady = true;
+                        intentionalMonoProjection = true;
+                        finalLayerKind = "gameplay-bootstrap-menu-hold";
+                    }
 
                     // Never submit a zero-layer frame just because Desktop
                     // Duplication missed the stereo grace window. VDXR can show a

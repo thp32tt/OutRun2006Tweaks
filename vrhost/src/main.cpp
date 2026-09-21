@@ -733,14 +733,33 @@ namespace
         {
             if (!frameId || !ValidateRing())
                 return false;
-            for (std::uint32_t i = 0;
-                 i < OutRunVR::RenderFrameRingSize; ++i)
+            for (int attempt = 0; attempt < 6; ++attempt)
             {
-                OutRunVR::SharedRenderFrameState candidate{};
-                if (ReadSlot(i, candidate) &&
-                    candidate.frameId == frameId)
+                const std::uint32_t ringBefore = state_->publishSequence;
+                if (ringBefore & 1u)
+                    continue;
+
+                bool found = false;
+                OutRunVR::SharedRenderFrameState selected{};
+                for (std::uint32_t i = 0;
+                     i < OutRunVR::RenderFrameRingSize; ++i)
                 {
-                    out = candidate;
+                    OutRunVR::SharedRenderFrameState candidate{};
+                    if (ReadSlot(i, candidate) &&
+                        candidate.frameId == frameId)
+                    {
+                        selected = candidate;
+                        found = true;
+                        break;
+                    }
+                }
+
+                MemoryBarrier();
+                const std::uint32_t ringAfter = state_->publishSequence;
+                if (found && ringBefore == ringAfter &&
+                    !(ringAfter & 1u))
+                {
+                    out = selected;
                     return true;
                 }
             }
@@ -825,7 +844,8 @@ namespace
                     out.magic == OutRunVR::RenderFrameMagic &&
                     out.protocolVersion ==
                         OutRunVR::RenderFrameProtocolVersion &&
-                    out.structSize == sizeof(out))
+                    out.structSize == sizeof(out) &&
+                    OutRunVR::RenderFrameRunIdentityMatches(*state_, out))
                     return true;
             }
             return false;
