@@ -125,28 +125,30 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
             std::filesystem::copy_file(Module::LogPath, re4t_log_filename);
     }
 
+    bool zip_created = false;
+
     // ZIP up the dump/log/save
     {
       swprintf_s(zip_filename, L"%s\\%s\\%s.%s.zip", modulename, L"CrashDumps", modulenameptr, timestamp);
 
-      bool zip_created = false;
-
-      FILE* zip_file;
+      FILE* zip_file = nullptr;
       if (_wfopen_s(&zip_file, zip_filename, L"wb") == 0 && zip_file)
       {
         mz_zip_archive zip_archive;
         mz_zip_zero_struct(&zip_archive);
         if (mz_zip_writer_init_cfile(&zip_archive, zip_file, 3))
         {
-          // Even if one of these fails we want all to attempt being added, so don't think we can do any assignment trick here...
-          zip_created = true;
+          // Required crash evidence must all be present, but success is not
+          // published until archive finalization, writer teardown, and the
+          // underlying FILE flush/close have also succeeded.
+          bool required_entries_ok = true;
 
           if (!mz_zip_writer_add_file(&zip_archive, "dump.dmp", dump_filename, nullptr, 0, 3))
-            zip_created = false;
+            required_entries_ok = false;
           if (!mz_zip_writer_add_file(&zip_archive, "crash.log", crash_log_filename, nullptr, 0, 3))
-            zip_created = false;
+            required_entries_ok = false;
           if (!mz_zip_writer_add_file(&zip_archive, "OutRun2006Tweaks.log", re4t_log_filename, nullptr, 0, 3))
-            zip_created = false;
+            required_entries_ok = false;
 
           // VR diagnostics are optional. A crash can happen while one of these
           // files is still open, so an optional add failure must never suppress
@@ -192,10 +194,16 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
           }
           catch (...) {}
 
-          mz_zip_writer_finalize_archive(&zip_archive);
-          mz_zip_writer_end(&zip_archive);
+          const bool finalized =
+            mz_zip_writer_finalize_archive(&zip_archive) != 0;
+          const bool ended = mz_zip_writer_end(&zip_archive) != 0;
+          const bool closed = fclose(zip_file) == 0;
+          zip_file = nullptr;
+          zip_created =
+            required_entries_ok && finalized && ended && closed;
         }
-        fclose(zip_file);
+        if (zip_file)
+          fclose(zip_file);
       }
 
       if (zip_created)
@@ -208,7 +216,10 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
 
     // Exit the application
     wchar_t	error[1024];
-    swprintf_s(error, L"Fatal error (0x%08X) at 0x%08X.\n\nA crash log has been saved to \"%s\".", (int)ExceptionInfo->ExceptionRecord->ExceptionCode, (int)ExceptionInfo->ExceptionRecord->ExceptionAddress, zip_filename);
+    if (zip_created)
+      swprintf_s(error, L"Fatal error (0x%08X) at 0x%08X.\n\nA crash log has been saved to \"%s\".", (int)ExceptionInfo->ExceptionRecord->ExceptionCode, (int)ExceptionInfo->ExceptionRecord->ExceptionAddress, zip_filename);
+    else
+      swprintf_s(error, L"Fatal error (0x%08X) at 0x%08X.\n\nThe crash ZIP could not be finalized. Loose dump/log files were kept in the CrashDumps folder.", (int)ExceptionInfo->ExceptionRecord->ExceptionCode, (int)ExceptionInfo->ExceptionRecord->ExceptionAddress);
     MessageBoxW(NULL, error, L"OutRun2006Tweaks", MB_ICONERROR | MB_OK);
 
     ShowCursor(TRUE);
