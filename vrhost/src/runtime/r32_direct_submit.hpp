@@ -84,6 +84,10 @@ namespace OutRunVrR32DirectSubmit
     inline bool FirstFastSubmitLogged = false;
     inline bool FirstAsyncAckLogged = false;
     inline bool FirstDeferredFlushLogged = false;
+    inline std::uint32_t LastLineageFrameId = 0;
+    inline std::uint32_t LastLineagePoseSequence = 0;
+    inline std::uint32_t LastLineageGeneration = 0;
+    inline std::uint32_t LastLineageSlot = 0;
 
     struct PerfSnapshot
     {
@@ -457,6 +461,10 @@ namespace OutRunVrR32DirectSubmit
             << OutRunVrD3D9ExDirectPassthrough::R32SafeSwaps - Perf.safeSwap
             << " timeoutPreserve="
             << OutRunVrD3D9ExDirectPassthrough::R32SafeTimeoutPreserves - Perf.timeoutPreserve
+            << " lineage[frame=" << LastLineageFrameId
+            << ",pose=" << LastLineagePoseSequence
+            << ",gen=" << LastLineageGeneration
+            << ",slot=" << LastLineageSlot << "]"
             << "\n";
         CapturePerfSnapshot();
     }
@@ -491,6 +499,12 @@ namespace OutRunVrR32DirectSubmit
             OutRunVrR23RuntimeHardening::RecordFinalSubmission(
                 verified.frameId, verified.kind, submitted);
             ++FastDirectSubmits;
+            LastLineageFrameId = verified.frame.frameId;
+            LastLineagePoseSequence = verified.frame.sourcePoseSequence;
+            LastLineageGeneration = verified.frame.reserved[
+                OutRunVR::RenderFrameDirectGenerationIndex];
+            LastLineageSlot = verified.frame.reserved[
+                OutRunVR::RenderFrameDirectSlotIndex];
             if (submitted)
                 OutRunVrR26RecenterHardening::
                     CompletePendingGameRequestAfterVisibleProjection();
