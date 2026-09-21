@@ -3,10 +3,23 @@
             return
         prompt = read_prompt("continue_review.md")
 
+    if await detect_rate_limit(page):
+        slot.last_result = "rate_limited_pre_send"
+        save_registry(reg)
+        mark_rate_limit(reg, datetime.now(TZ), f"scheduled-slot-precheck:{slot.name}")
+        return
+
     if await detect_limit(page):
         slot.last_result = "limit_detected"
         save_registry(reg)
         write_runtime(status="limit_detected", last_action=f"Slot {slot.name} not sent")
+        return
+
+    guard = send_guard_reason(reg, slot, datetime.now(TZ))
+    if guard:
+        slot.last_result = f"send_guard:{guard}"
+        save_registry(reg)
+        write_runtime(status="send_throttled", last_action=f"Slot {slot.name} not sent because {guard}")
         return
 
     thinking_ok = await ensure_thinking_level(page)
@@ -27,16 +40,25 @@
         write_runtime(status="ui_changed", last_action="Prompt input not found; inspect via noVNC")
         return
 
+    request_now = datetime.now(TZ)
+    if await detect_rate_limit(page):
+        slot.last_result = "rate_limited_after_send"
+        slot.last_sent_at = request_now.isoformat()
+        save_registry(reg)
+        mark_rate_limit(reg, request_now, f"scheduled-send:{slot.name}")
+        return
+
     if is_new:
         new_url = await wait_for_chat_url(page)
         if new_url:
             slot.url = new_url
 
+    note_successful_request(reg, request_now)
     slot.runs += 1
     slot.watchdog_resumes_since_schedule = 0
     slot.last_assistant_hash = None
-    slot.last_assistant_change_at = now.isoformat()
-    slot.last_sent_at = now.isoformat()
+    slot.last_assistant_change_at = request_now.isoformat()
+    slot.last_sent_at = request_now.isoformat()
     slot.last_result = "sent"
     reg.next_slot = (reg.next_slot + 1) % len(reg.slots)
     save_registry(reg)
@@ -66,10 +88,11 @@ class StatusHandler(BaseHTTPRequestHandler):
 <p><b>Last action:</b> {html.escape(str(runtime.get('last_action')))}</p>
 <p><b>Schedule:</b> minute {html.escape(str(SCHEDULE_MINUTES))} / KST</p>
 <p><b>Watchdog:</b> {html.escape(str(WATCHDOG_ENABLED))} / idle {WATCHDOG_STALL_MINUTES}m / busy-stall {WATCHDOG_BUSY_STALL_MINUTES}m / force-stop {html.escape(str(WATCHDOG_FORCE_STOP_STALLED))}</p>
+<p><b>Rate limit:</b> attempts {reg.rate_limit_attempts} / until {html.escape(str(reg.rate_limit_until))} / backoff {html.escape(str(RATE_LIMIT_BACKOFF_MINUTES))}m / global-gap {MIN_SEND_GAP_SECONDS}s / slot-dedup {SLOT_DEDUP_SECONDS}s</p>
 <p><b>Thinking:</b> required {html.escape(PREFERRED_THINKING_LEVEL)} / strict {html.escape(str(STRICT_THINKING_LEVEL))} / last {html.escape(str(runtime.get('last_thinking_level_result')))}</p>
 <p><b>Logical date:</b> {html.escape(reg.logical_date)}</p>
 <p><b>Next slot:</b> {html.escape(reg.slots[reg.next_slot].name)}</p>
-<h2>Registry</h2><pre>{html.escape(json.dumps({"next_slot": reg.next_slot, "slots": [asdict(s) for s in reg.slots]}, ensure_ascii=False, indent=2))}</pre>
+<h2>Registry</h2><pre>{html.escape(json.dumps({"next_slot": reg.next_slot, "rate_limit_attempts": reg.rate_limit_attempts, "rate_limit_until": reg.rate_limit_until, "last_global_send_at": reg.last_global_send_at, "slots": [asdict(s) for s in reg.slots]}, ensure_ascii=False, indent=2))}</pre>
 <h2>Runtime</h2><pre>{html.escape(json.dumps(runtime, ensure_ascii=False, indent=2))}</pre>
 <p>noVNC: <a href='http://192.168.0.48:6080/vnc.html'>192.168.0.48:6080/vnc.html</a></p>
 </body></html>""".encode("utf-8")
