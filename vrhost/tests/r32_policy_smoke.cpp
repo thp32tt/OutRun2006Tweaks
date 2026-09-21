@@ -38,9 +38,10 @@ int main()
     assert(ClassifyPendingFence(true, true, false, false) ==
         PendingFenceDecision::QueryError);
 
-    // R41 stereo-intent epoch: explicit disable and re-enable fallback
-    // remain a source barrier until a complete DirectGPU frame from the new
-    // intent epoch becomes the authoritative latest publication.
+    // R41 stereo-intent epoch: the latest stable ring snapshot defines
+    // which producer epoch may contribute DirectGPU history. Packet state does
+    // not shorten the barrier; old epochs remain ineligible across disable and
+    // re-enable fallback until a fresh same-epoch active source exists.
     constexpr std::uint32_t completeDirect =
         OutRunVR::RenderFrameDirectGpuTransport |
         OutRunVR::RenderFrameStereoComplete |
@@ -57,50 +58,47 @@ int main()
     OutRunVR::SharedRenderFrameState latest{};
     latest.state = OutRunVR::StereoDisabled;
     latest.frameId = 0;
-    latest.flags = 0;
     latest.reserved[OutRunVR::RenderFrameStereoIntentEpochIndex] = 11;
-    assert(!OutRunVR::DirectHistoryPolicy::
-        LatestPublicationAllowsHistory(latest));
-    assert(!OutRunVR::DirectHistoryPolicy::
-        SameStereoIntentEpoch(oldActive, latest));
-
-    // Re-enable before a fresh color/baseline is ready. FallbackMono belongs to
-    // the new epoch and must keep all pre-disable DirectGPU history blocked.
-    latest.state = OutRunVR::StereoSbsFallbackMono;
-    latest.frameId = 0;
-    latest.flags = 0;
-    latest.reserved[OutRunVR::RenderFrameStereoIntentEpochIndex] = 12;
-    assert(!OutRunVR::DirectHistoryPolicy::
-        LatestPublicationAllowsHistory(latest));
-    assert(!OutRunVR::DirectHistoryPolicy::
-        SameStereoIntentEpoch(oldActive, latest));
-
-    // Only a complete, stable DirectGPU publication from the post-enable epoch
-    // opens history again; old epoch descriptors remain ineligible.
-    latest.state = OutRunVR::StereoSbsActive;
-    latest.frameId = 44;
-    latest.flags = completeDirect;
     assert(OutRunVR::DirectHistoryPolicy::
-        LatestPublicationAllowsHistory(latest));
+        LatestPublicationDefinesHistoryEpoch(latest));
     assert(!OutRunVR::DirectHistoryPolicy::
         SameStereoIntentEpoch(oldActive, latest));
 
-    OutRunVR::SharedRenderFrameState freshActive = latest;
+    // Re-enable with no fresh baseline: fallback is a newer epoch, so old
+    // pre-disable frames remain rejected even though the latest state changed.
+    latest.state = OutRunVR::StereoSbsFallbackMono;
+    latest.reserved[OutRunVR::RenderFrameStereoIntentEpochIndex] = 12;
+    assert(OutRunVR::DirectHistoryPolicy::
+        LatestPublicationDefinesHistoryEpoch(latest));
+    assert(!OutRunVR::DirectHistoryPolicy::
+        SameStereoIntentEpoch(oldActive, latest));
+
+    // Fresh post-enable DirectGPU source carries the new epoch and is eligible.
+    OutRunVR::SharedRenderFrameState freshActive{};
+    freshActive.state = OutRunVR::StereoSbsActive;
     freshActive.frameId = 43;
+    freshActive.flags = completeDirect;
+    freshActive.reserved[OutRunVR::RenderFrameStereoIntentEpochIndex] = 12;
+    assert(OutRunVR::DirectHistoryPolicy::
+        SameStereoIntentEpoch(freshActive, latest));
+    assert(!OutRunVR::DirectHistoryPolicy::
+        SameStereoIntentEpoch(oldActive, latest));
+
+    // A transient direct-only miss does not change stereo intent. Its in-flight
+    // marker stays in the same epoch, so the last safe same-epoch source remains
+    // eligible for the existing projection-hold policy.
+    latest = freshActive;
+    latest.frameId = 44;
+    latest.flags = OutRunVR::RenderFramePresentInFlight;
+    assert(OutRunVR::DirectHistoryPolicy::
+        LatestPublicationDefinesHistoryEpoch(latest));
     assert(OutRunVR::DirectHistoryPolicy::
         SameStereoIntentEpoch(freshActive, latest));
 
-    // An in-flight latest packet is not yet an authority boundary.
-    latest.flags = completeDirect | OutRunVR::RenderFramePresentInFlight;
+    // Missing epoch metadata fails closed instead of reviving arbitrary history.
+    latest.reserved[OutRunVR::RenderFrameStereoIntentEpochIndex] = 0;
     assert(!OutRunVR::DirectHistoryPolicy::
-        LatestPublicationAllowsHistory(latest));
-
-    // Direct-only transient hold emits no new packet. The existing complete
-    // active latest publication therefore remains valid and does not create a
-    // false disable/re-enable barrier.
-    latest.flags = completeDirect;
-    assert(OutRunVR::DirectHistoryPolicy::
-        LatestPublicationAllowsHistory(latest));
+        LatestPublicationDefinesHistoryEpoch(latest));
 
     return 0;
 }
