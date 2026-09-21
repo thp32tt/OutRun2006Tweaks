@@ -692,6 +692,14 @@ namespace
                         "another or unverified outrun-vr-host revived during takeover");
                 }
 
+                // Invalidate the dead/empty owner's host payload before
+                // publishing the replacement PID. Even readers that only peek
+                // at hostPid can therefore observe at worst oldPid+empty or
+                // newPid+empty, never newPid+oldHostPayload.
+                ClearHostOwnedPayloadLocked();
+                state_->hostAdapterLuidLow = 0;
+                state_->hostAdapterLuidHigh = 0;
+
                 if (InterlockedCompareExchange(
                         reinterpret_cast<volatile LONG*>(&state_->hostPid),
                         self, observed) != observed)
@@ -701,7 +709,6 @@ namespace
                     continue;
                 }
 
-                ClearHostOwnedPayloadLocked();
                 state_->hostAdapterLuidLow = adapterLuid_.LowPart;
                 state_->hostAdapterLuidHigh =
                     static_cast<std::uint32_t>(adapterLuid_.HighPart);
