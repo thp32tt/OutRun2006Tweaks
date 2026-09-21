@@ -61,3 +61,15 @@ Small12 S6/S7-family tests collapsed the duplicated lens flare to one while avoi
 Status: PERFORMANCE SIGNAL / CORRECTNESS BLOCKED
 
 The T5/R29 LEFT+RIGHT-only comparison removed the large steady-state mono safety replay burden and subjectively improved frame rate, but it also made sky/world rendering incorrect. Do not adopt the T5 classifier or fast path wholesale. Reuse only the mono-removal concept behind a strict correctness gate after the stable T0/unified world classification is preserved.
+
+## VR-HUD-SEMANTICS-001 — UIScaling-derived HUD semantic baseline
+Status: BASELINE / SOURCE-INTEGRATED
+
+The existing 4:3/16:9 UI reverse engineering is now the VR semantic
+source-of-truth. Time Attack, Rank, REV/gear, Ghost/You/Diff, goal time,
+Heart totals, Rival HUD, girlfriend speech, ranking emoji/text and related C2C
+HUD are explicitly classified as SCREEN_HUD. Rival-car rank markers
+(`sub_4BAD20`) and attached car/world hearts are explicitly protected as
+WORLD_BILLBOARD. HUD trace schema v2, static EXE analysis and automatic log
+coverage all use the same semantic names. See `docs/VR_HUD_SEMANTIC_BASELINE.md`.
+

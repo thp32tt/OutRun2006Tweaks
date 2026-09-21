@@ -163,13 +163,15 @@ if(Test-Path $hudCsv){
         $summary+="rows=$($hudRows.Count)"
         $summary+=''
         $groups=$hudRows |
-            Group-Object event,call_rva,known_area,mode,stage,arg0,arg1 |
+            Group-Object event,call_rva,known_area,semantic,space_policy,mode,stage,arg0,arg1 |
             ForEach-Object {
                 $maxCount=($_.Group | ForEach-Object {[int]$_.count} | Measure-Object -Maximum).Maximum
                 [pscustomobject]@{
                     Event=$_.Group[0].event
                     CallRva=$_.Group[0].call_rva
                     KnownArea=$_.Group[0].known_area
+                    Semantic=$_.Group[0].semantic
+                    SpacePolicy=$_.Group[0].space_policy
                     Mode=$_.Group[0].mode
                     Stage=$_.Group[0].stage
                     Arg0=$_.Group[0].arg0
@@ -183,14 +185,41 @@ if(Test-Path $hudCsv){
                     MaxCount=[int]$maxCount
                 }
             } |
-            Sort-Object @{Expression={if($_.KnownArea){0}else{1}}}, @{Expression='MaxCount';Descending=$true}, CallRva
-        $summary+='event | call_rva | known_area | mode | stage | arg0 | arg1 | arg2 | arg3 | arg4 | arg5 | arg6 | arg7 | observed_count'
-        $summary+='------|----------|------------|------|-------|------|------|------|------|------|------|------|------|---------------'
-        foreach($g in ($groups | Select-Object -First 200)){
-            $summary+=("$($g.Event) | $($g.CallRva) | $($g.KnownArea) | $($g.Mode) | $($g.Stage) | $($g.Arg0) | $($g.Arg1) | $($g.Arg2) | $($g.Arg3) | $($g.Arg4) | $($g.Arg5) | $($g.Arg6) | $($g.Arg7) | $($g.MaxCount)")
+            Sort-Object @{Expression={if($_.Semantic -and $_.Semantic -ne 'UNKNOWN'){0}else{1}}}, @{Expression='MaxCount';Descending=$true}, CallRva
+        $summary+='event | call_rva | known_area | semantic | space_policy | mode | stage | arg0 | arg1 | arg2 | arg3 | arg4 | arg5 | arg6 | arg7 | observed_count'
+        $summary+='------|----------|------------|----------|--------------|------|-------|------|------|------|------|------|------|------|------|---------------'
+        foreach($g in ($groups | Select-Object -First 250)){
+            $summary+=("$($g.Event) | $($g.CallRva) | $($g.KnownArea) | $($g.Semantic) | $($g.SpacePolicy) | $($g.Mode) | $($g.Stage) | $($g.Arg0) | $($g.Arg1) | $($g.Arg2) | $($g.Arg3) | $($g.Arg4) | $($g.Arg5) | $($g.Arg6) | $($g.Arg7) | $($g.MaxCount)")
         }
         $summary|Set-Content (Join-Path $dest 'HUD_TRACE_SUMMARY.txt') -Encoding UTF8
         $copied+='HUD_TRACE_SUMMARY.txt'
+
+        $expectedSemantics=@(
+            'HUD_TIME_ATTACK','HUD_RANK','HUD_GEAR_REV','HUD_GHOST',
+            'HUD_GOAL_TIME','HUD_HEART_TOTAL','HUD_RIVAL','HUD_GF_SPEECH',
+            'HUD_RANK_EMOJI','HUD_RANK_TEXT','HUD_GF_WARNING','HUD_SLIPSTREAM',
+            'HUD_FRUIT','WORLD_RIVAL_MARKER','WORLD_HEART'
+        )
+        $observedSemantics=@($hudRows |
+            Where-Object {$_.semantic -and $_.semantic -ne 'UNKNOWN'} |
+            Select-Object -ExpandProperty semantic -Unique)
+        $coverage=@(
+            'HUD SEMANTIC COVERAGE',
+            "session=$session",
+            'status means observed in this session, not pass/fail; unobserved modes may simply not have appeared.',
+            '',
+            'semantic | status',
+            '---------|-------'
+        )
+        foreach($semanticName in $expectedSemantics){
+            $status=if($observedSemantics -contains $semanticName){'OBSERVED'}else{'NOT_OBSERVED_THIS_SESSION'}
+            $coverage+=("$semanticName | $status")
+        }
+        $unknownCount=@($hudRows | Where-Object {!$_.semantic -or $_.semantic -eq 'UNKNOWN'}).Count
+        $coverage+=''
+        $coverage+=("unknown_rows=$unknownCount")
+        $coverage|Set-Content (Join-Path $dest 'HUD_SEMANTIC_COVERAGE.txt') -Encoding UTF8
+        $copied+='HUD_SEMANTIC_COVERAGE.txt'
     }
 }
 

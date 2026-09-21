@@ -43,6 +43,43 @@ KNOWN_CALL_SITES = {
     0x0BB2D0: "RankMarker clip #5",
 }
 
+# Mirrors src/vr/hud_semantics.hpp. These ranges come from the shipped
+# hooks_uiscaling.cpp reverse engineering and are intentionally semantic,
+# rather than D3D primitive-count heuristics.
+SEMANTIC_RANGES = (
+    (0x05B300, 0x05B700, "HeartDisp_car_heart", "WORLD_HEART", "WORLD_BILLBOARD"),
+    (0x081A00, 0x081B00, "C2C_Fruit", "HUD_FRUIT", "SCREEN_HUD"),
+    (0x081B00, 0x081C00, "C2C_Heart", "HUD_HEART_TOTAL", "SCREEN_HUD"),
+    (0x096A80, 0x096D00, "C2CSpeechBubble", "HUD_GF_SPEECH", "SCREEN_HUD"),
+    (0x0B9000, 0x0B9200, "DispGearPosition", "HUD_GEAR_REV", "SCREEN_HUD"),
+    (0x0B9E00, 0x0BA100, "DispRank", "HUD_RANK", "SCREEN_HUD"),
+    (0x0BAD20, 0x0BB320, "RankMarker/sub_4BAD20", "WORLD_RIVAL_MARKER", "WORLD_BILLBOARD"),
+    (0x0BD2E0, 0x0BD360, "C2CTestSlipstream", "HUD_SLIPSTREAM", "SCREEN_HUD"),
+    (0x0BD360, 0x0BD500, "C2CDontLoseGF", "HUD_GF_WARNING", "SCREEN_HUD"),
+    (0x0BD900, 0x0BE100, "GhostGap", "HUD_GHOST", "SCREEN_HUD"),
+    (0x0BE300, 0x0BEA40, "DispTimeAttack2D", "HUD_TIME_ATTACK", "SCREEN_HUD"),
+    (0x0BEA40, 0x0BEB20, "NaviPub_DispTimeAttackGoal", "HUD_GOAL_TIME", "SCREEN_HUD"),
+    (0x0BEB60, 0x0BEBC0, "NaviPub_Disp_Rival", "HUD_RIVAL", "SCREEN_HUD"),
+    (0x0BEBC0, 0x0BEC50, "NaviPub_Disp_Heart", "HUD_HEART_TOTAL", "SCREEN_HUD"),
+    (0x0BEC50, 0x0BECA0, "NaviPub_Disp_Rival", "HUD_RIVAL", "SCREEN_HUD"),
+    (0x0BECA0, 0x0BED20, "NaviPub_Disp_Heart", "HUD_HEART_TOTAL", "SCREEN_HUD"),
+    (0x0BED20, 0x0BEE80, "NaviPub_Disp", "HUD_NAV_GENERIC", "SCREEN_HUD"),
+    (0x0FC800, 0x0FC8A0, "C2CSpeechBubbleGF_RankEmoji", "HUD_RANK_EMOJI", "SCREEN_HUD"),
+    (0x0FC8A0, 0x0FC900, "C2CSpeechBubbleGF_RankText", "HUD_RANK_TEXT", "SCREEN_HUD"),
+    (0x0FC900, 0x0FCC00, "C2CSpeechBubbleGF", "HUD_GF_SPEECH", "SCREEN_HUD"),
+    (0x0FCD80, 0x0FD080, "C2CSpeechBubbleGF", "HUD_GF_SPEECH", "SCREEN_HUD"),
+    (0x0FD560, 0x0FD680, "C2CSpeechBubbleGF", "HUD_GF_SPEECH", "SCREEN_HUD"),
+    (0x0FE860, 0x0FE900, "C2CSpeechBubbleGF", "HUD_GF_SPEECH", "SCREEN_HUD"),
+)
+
+
+def classify_semantic(call_rva: int) -> tuple[str, str, str]:
+    for begin, end, area, semantic, space_policy in SEMANTIC_RANGES:
+        if begin <= call_rva < end:
+            return area, semantic, space_policy
+    return "", "UNKNOWN", "UNKNOWN"
+
+
 HUD_WORDS = re.compile(
     rb"(rank|rival|score|position|goal|time|yes|no|retry|stage|ghost|lap|"
     rb"checkpoint|game.?over|outrun)",
@@ -171,6 +208,7 @@ def find_calls(pe: PE) -> list[dict]:
         name = KNOWN_TARGETS.get(target_rva)
         if not name:
             continue
+        area, semantic, space_policy = classify_semantic(call_rva)
         found.append(
             {
                 "call_rva": call_rva,
@@ -180,6 +218,9 @@ def find_calls(pe: PE) -> list[dict]:
                     text, text_section.virtual_address, i
                 ),
                 "known_call_site": KNOWN_CALL_SITES.get(call_rva, ""),
+                "known_area": area,
+                "semantic": semantic,
+                "space_policy": space_policy,
             }
         )
     return found
@@ -250,14 +291,15 @@ def render_markdown(report: dict) -> str:
         "",
         "## Direct CALL references into HUD/sprite anchors",
         "",
-        "| Call RVA | Function start guess | Target | Known site |",
-        "|---:|---:|---|---|",
+        "| Call RVA | Function start guess | Target | Known site | Semantic | Space |",
+        "|---:|---:|---|---|---|---|",
     ]
     for call in report["calls"]:
         lines.append(
             f"| {hexrva(call['call_rva'])} | "
             f"{hexrva(call['function_start_guess_rva'])} | "
-            f"{call['target']} | {call['known_call_site']} |"
+            f"{call['target']} | {call['known_call_site']} | "
+            f"{call['semantic']} | {call['space_policy']} |"
         )
 
     lines += [
@@ -278,9 +320,12 @@ def render_markdown(report: dict) -> str:
         "## Runtime correlation",
         "",
         "The VR HUD inspector writes OutRun2006Tweaks-hudtrace.csv. "
-        "Match its call_rva column against this report. Known RankMarker call sites "
-        "are labeled automatically, and previously unknown callers become concrete "
-        "reverse-engineering targets without requiring an interactive debugger.",
+        "Match its call_rva column against this report. UIScaling-derived semantic "
+        "classification labels Time Attack, Rank, REV/gear, Ghost, goal time, "
+        "Heart, Rival, girlfriend speech/rank UI, and protects world-attached "
+        "Rival/Heart billboards from screen-HUD treatment. Previously unknown "
+        "callers remain concrete reverse-engineering targets without requiring "
+        "an interactive debugger.",
         "",
     ]
     return "\n".join(lines)

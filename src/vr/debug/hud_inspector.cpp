@@ -14,6 +14,7 @@
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "game_addrs.hpp"
+#include "../hud_semantics.hpp"
 
 namespace Settings
 {
@@ -68,37 +69,6 @@ namespace OutRunVRHudInspector
             return static_cast<std::uint32_t>(value - base);
         }
 
-        const char* KnownCaller(std::uint32_t callRva) noexcept
-        {
-            switch (callRva)
-            {
-                case 0x0BB0FB:
-                case 0x0BB133:
-                case 0x0BB16C:
-                case 0x0BB1A5:
-                case 0x0BB21F:
-                case 0x0BB241:
-                case 0x0BB271:
-                case 0x0BB2BC:
-                case 0x0BB2D0:
-                    return "RankMarker/sub_4BAD20";
-                default:
-                    break;
-            }
-
-            if (callRva >= 0x0BAD20 && callRva < 0x0BB320)
-                return "RankMarker/sub_4BAD20";
-            if (callRva >= 0x0B9E00 && callRva < 0x0BA100)
-                return "DispRank";
-            if (callRva >= 0x0BE300 && callRva < 0x0BEA80)
-                return "DispTimeAttack2D";
-            if (callRva >= 0x0BD900 && callRva < 0x0BE100)
-                return "GhostGap";
-            if (callRva >= 0x0BEA80 && callRva < 0x0BEE80)
-                return "NaviPub_Disp";
-            return "";
-        }
-
         std::uint64_t MakeKey(EventKind kind, std::uint32_t callRva,
             std::uint32_t arg0, std::uint32_t arg1) noexcept
         {
@@ -150,12 +120,17 @@ namespace OutRunVRHudInspector
             if (!ShouldWrite(key, count))
                 return;
 
+            const auto semantic =
+                OutRunVRHudSemantics::ClassifyCaller(callRva);
+
             TraceFile
                 << (GetTickCount64() - StartMs) << ','
                 << eventName << ','
                 << "0x" << std::hex << std::setw(8) << std::setfill('0') << returnRva << ','
                 << "0x" << std::setw(8) << callRva << std::dec << ','
-                << KnownCaller(callRva) << ','
+                << semantic.area << ','
+                << semantic.semantic << ','
+                << OutRunVRHudSemantics::SpacePolicyName(semantic.space) << ','
                 << CurrentMode() << ','
                 << CurrentStage() << ','
                 << arg0 << ','
@@ -214,12 +189,12 @@ namespace OutRunVRHudInspector
                 if (empty)
                 {
                     TraceFile
-                        << "# schema=outrun-hudtrace-v1\n"
+                        << "# schema=outrun-hudtrace-v2\n"
                         << "# exe_timestamp="
                         << Util::GetModuleTimestamp(Module::ExeHandle) << "\n"
                         << "# exe_size_of_image=" << ExeSizeOfImage() << "\n"
                         << "# module_base=runtime-only; all addresses below are ASLR-safe RVAs\n"
-                        << "elapsed_ms,event,return_rva,call_rva,known_area,mode,stage,"
+                        << "elapsed_ms,event,return_rva,call_rva,known_area,semantic,space_policy,mode,stage,"
                            "arg0,arg1,arg2,arg3,arg4,arg5,arg6,arg7,count\n";
                     TraceFile.flush();
                 }
@@ -308,7 +283,7 @@ namespace OutRunVRHudInspector
                 }
 
                 spdlog::info(
-                    "VR HUD INSPECTOR: passive sprite/caller RVA tracing active; existing texture hooks feed put_sprite_ex/put_sprite_ex2, direct hooks feed sprani/clip; output=OutRun2006Tweaks-hudtrace.csv");
+                    "VR HUD INSPECTOR: semantic HUD tracing active; UIScaling-derived caller taxonomy separates screen HUD from world billboards; output=OutRun2006Tweaks-hudtrace.csv");
                 return true;
             }
 
