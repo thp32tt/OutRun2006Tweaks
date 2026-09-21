@@ -56,6 +56,15 @@ namespace OutRunVR::IpcV3
             static_cast<std::uint32_t>(poseId & 0xFFFFFFFFull) == legacySequence;
     }
 
+    inline bool HostOwnershipMatchesLegacy(
+        const HostState& state,
+        const OutRunVR::SharedPoseState& legacy) noexcept
+    {
+        return state.hostPid != 0 &&
+            legacy.hostPid != 0 &&
+            state.hostPid == legacy.hostPid;
+    }
+
     inline bool HostStateUsable(
         const HostState& state,
         std::int64_t nowQpc,
@@ -119,10 +128,16 @@ namespace OutRunVR::IpcV3
                 if (OutRunVR::Ipc::StableRead(legacy_.Get(), legacy) &&
                     legacy.magic == OutRunVR::SharedMagic &&
                     legacy.protocolVersion == OutRunVR::SharedProtocolVersion &&
-                    legacy.structSize == sizeof(legacy) &&
-                    legacy.hostPid == state.hostPid &&
-                    !PoseSequenceMatchesLegacy(state.poseId, legacy.sequence))
-                    return false;
+                    legacy.structSize == sizeof(legacy))
+                {
+                    // A v2/v3 PID mismatch is a host-run boundary, not a reason
+                    // to skip parity checking. Fail closed until both channels
+                    // are owned by the same replacement host.
+                    if (!HostOwnershipMatchesLegacy(state, legacy) ||
+                        !PoseSequenceMatchesLegacy(
+                            state.poseId, legacy.sequence))
+                        return false;
+                }
             }
 
             out = {};
