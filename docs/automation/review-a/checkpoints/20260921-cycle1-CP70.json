@@ -1,0 +1,1 @@
+{"cycle":"20260921-A1","checkpoint":"CP70","valid_units":70,"target_sha":"b159cc66ca1ed6f25f7a2c7640a246ee1d0b489a","coverage":"Direct latest-frame selection, generation isolation, skipped-frame ACK safety, direct-only fail-closed behavior"}
