@@ -1,0 +1,1 @@
+{"cycle":"20260921-A1","checkpoint":"CP30","valid_units":30,"target_sha":"b159cc66ca1ed6f25f7a2c7640a246ee1d0b489a","coverage":"DirectGPU mapping ownership, per-slot ACK state, transport generation, shared-resource lifetime, host-owned safe-copy authority"}
