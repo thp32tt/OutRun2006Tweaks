@@ -1270,8 +1270,9 @@ namespace OutRunVRStereo
 				return false;
 			}
 			// D3DERR_NOTFOUND is the one explicit, valid no-depth snapshot.
+			// Defensively release any unexpected pointer the failed query left behind.
 			if (depthStateHr == D3DERR_NOTFOUND)
-				currentDepth = nullptr;
+				ReleaseCom(currentDepth);
 
 			D3DVIEWPORT9 savedViewport{};
 			RECT savedScissor{};
