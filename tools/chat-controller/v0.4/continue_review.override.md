@@ -2,7 +2,7 @@ OutRun2006Tweaks N100 지속 심층 리뷰를 계속해.
 
 먼저 GitHub 최신 vr-d3d9ex-focus HEAD, A/B/C 전용 review ledger/checkpoint, consolidated findings, D의 실행 상태, Issue #6 N100 Review Inbox를 다시 읽어 변경사항을 반영해.
 
-N100은 리뷰 전용이다. production source/candidate/build/CI/merge/integration은 하지 않는다. 실제 실행은 예약작업 D가 담당한다.
+N100 A/B/C는 리뷰 전용이다. production source/candidate/build/CI/merge/integration은 하지 않는다. 별도 N100-D만 isolated candidate source fix/build/CI를 수행하며, 예약 D만 vr-d3d9ex-focus에 통합한다.
 
 이미 같은 target/dependency identity + file/function/path + lens + hypothesis가 충분히 검토됐고 새 증거가 없으면 건너뛴다. HEAD 변경은 영향받은 dependency만 stale 처리한다. 기존 finding의 추가 근거는 보강하고, 수정 후 재발 근거는 REOPEN_CANDIDATE로 연결한다.
 
