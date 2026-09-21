@@ -341,7 +341,10 @@ namespace OutRunVRHudInspector
             bool apply() override
             {
                 if (!OpenTrace())
+                {
+                    ResetHooks();
                     return false;
+                }
 
                 SpriteAnimHook = safetyhook::create_inline(
                     Game::sprani_play_ae_auth_alpha, SpriteAnimDest);
