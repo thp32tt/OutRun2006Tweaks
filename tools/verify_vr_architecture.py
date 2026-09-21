@@ -452,13 +452,17 @@ require("src/vr/d3d9/stereo_backend.hpp", "class IStereoBackend", "drawWorldSter
 # Present/Reset into unrelated rendering.
 semantic_header = require(
     "src/vr/game/render_semantics.hpp",
+    "inline void CancelNextDraw(RenderScope expected) noexcept",
     "inline void ClearNextDraw() noexcept",
     "NextDrawScope = RenderScope::None;",
 )
 heart_source = require(
     "src/interpolation.cpp",
     "static void HeartSemantic_dest",
+    "static void HeartSemanticCancel_dest",
     "Module::exe_ptr(0x5B475)",
+    "Module::exe_ptr(0x5B4C0)",
+    "CancelNextDraw(",
     "RenderScope::WorldBillboard",
 )
 heart_early = heart_source.split("static void HeartPulse_dest", 1)[1].split(
@@ -496,7 +500,7 @@ if renderer_source.count("OutRunVR::GameSemantic::ClearNextDraw();") < 2:
 # Minimal deterministic lifetime model for the original regression:
 # arm + no intended draw + Present + unrelated draw => None.
 _pending = "WORLD_BILLBOARD"
-_pending = None  # NotifyGamePresent
+_pending = None  # 0x5B4C0 per-heart cancellation / Present fallback
 _unrelated_observed = _pending
 if _unrelated_observed is not None:
     raise SystemExit("stale one-shot semantic survived frame boundary model")
