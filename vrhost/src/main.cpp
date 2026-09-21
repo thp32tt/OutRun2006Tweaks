@@ -769,7 +769,8 @@ namespace
         bool ReadHistory(
             std::array<OutRunVR::SharedRenderFrameState,
                 OutRunVR::RenderFrameRingSize>& out,
-            std::size_t& count) const
+            std::size_t& count,
+            OutRunVR::SharedRenderFrameState* latestPublication = nullptr) const
         {
             count = 0;
             if (!ValidateRing())
@@ -780,6 +781,10 @@ namespace
                 const std::uint32_t ringBefore =
                     state_->publishSequence;
                 if (ringBefore & 1u)
+                    continue;
+
+                const std::uint32_t latestIndex = state_->latestSlot;
+                if (latestIndex >= OutRunVR::RenderFrameRingSize)
                     continue;
 
                 std::array<OutRunVR::SharedRenderFrameState,
@@ -806,6 +811,8 @@ namespace
                 {
                     out = snapshot;
                     count = snapshotCount;
+                    if (latestPublication)
+                        *latestPublication = snapshot[latestIndex];
                     return true;
                 }
             }
