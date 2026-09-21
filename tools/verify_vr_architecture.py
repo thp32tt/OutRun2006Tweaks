@@ -513,6 +513,72 @@ for marker in (
             f"deferred resource-init state transaction invariant missing: {marker}"
         )
 
+# Caller RT/depth/raster state must be fully known before the resource graph is
+# released or any private eye target is bound. Query failure is not a plausible
+# backbuffer/null-depth snapshot; only D3DERR_NOTFOUND means known no-depth.
+for marker in (
+    "const HRESULT renderTargetStateHr =",
+    "device->GetRenderTarget(0, &currentRt)",
+    "if (FAILED(renderTargetStateHr) || !currentRt)",
+    "const HRESULT depthStateHr =",
+    "device->GetDepthStencilSurface(&currentDepth)",
+    "if (FAILED(depthStateHr) && depthStateHr != D3DERR_NOTFOUND)",
+    "if (SUCCEEDED(depthStateHr) && !currentDepth)",
+    "if (depthStateHr == D3DERR_NOTFOUND)",
+    "TrackedRenderTarget = currentRt;",
+    "TrackedDepthStencil = currentDepth;",
+):
+    if marker not in ensure_resource:
+        raise SystemExit(
+            f"resource-init capture fail-close invariant missing: {marker}"
+        )
+
+if "ReplaceSurfaceRef(TrackedRenderTarget, BackBuffer)" in ensure_resource:
+    raise SystemExit(
+        "failed RT capture must not fabricate the backbuffer as caller state"
+    )
+
+capture_markers = (
+    "device->GetRenderTarget(0, &currentRt)",
+    "device->GetDepthStencilSurface(&currentDepth)",
+    "device->GetViewport(&savedViewport)",
+    "device->GetScissorRect(&savedScissor)",
+    "D3DRS_SCISSORTESTENABLE, &savedScissorEnabled",
+)
+capture_positions = [ensure_resource.find(marker) for marker in capture_markers]
+first_release = ensure_resource.find("ReleaseStereoResources();")
+first_private_create = ensure_resource.find("device->CreateRenderTarget(")
+first_private_bind = ensure_resource.find("SetRenderTargetHook.stdcall<HRESULT>(")
+if any(pos < 0 for pos in capture_positions):
+    raise SystemExit("resource-init complete capture sequence missing")
+if first_release < 0 or first_private_create < 0 or first_private_bind < 0:
+    raise SystemExit("resource-init mutation boundary missing")
+if not all(pos < first_release for pos in capture_positions):
+    raise SystemExit(
+        "caller state must be captured before ReleaseStereoResources mutates ownership"
+    )
+if not first_release < first_private_create < first_private_bind:
+    raise SystemExit(
+        "private resource create/bind ordering regressed after caller-state capture"
+    )
+
+# Deterministic failure matrix for the capture contract.
+_capture_cases = (
+    ("rt-query-failure", False, False),
+    ("depth-invalidcall", False, False),
+    ("depth-notfound", True, True),
+    ("full-capture", True, True),
+)
+for name, capture_known, may_mutate in _capture_cases:
+    if (name in ("rt-query-failure", "depth-invalidcall")) and (
+        capture_known or may_mutate
+    ):
+        raise SystemExit(f"resource-init failure model regressed: {name}")
+    if name in ("depth-notfound", "full-capture") and not (
+        capture_known and may_mutate
+    ):
+        raise SystemExit(f"resource-init valid capture model regressed: {name}")
+
 reset_begin = r7_resource.find("HRESULT __stdcall ResetDest(")
 reset_end = r7_resource.find("constexpr std::uint32_t StereoInstallPending", reset_begin)
 if reset_begin < 0 or reset_end < 0:
