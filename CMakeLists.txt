@@ -557,6 +557,8 @@ set(outrun2006tweaks_SOURCES
 	"src/vr/core/frame_types.hpp"
 	"src/vr/core/matrix.hpp"
 	"src/vr/core/transport.hpp"
+	"src/vr/debug/hud_inspector.cpp"
+	"src/vr/hud_semantics.hpp"
 	"src/vr/d3d9/device_probe.cpp"
 	"src/vr/d3d9/ex_device_upgrade.cpp"
 	"src/vr/d3d9/ex_device_upgrade_r13.cpp"
