@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-21T11:51:00+09:00",
+  "updatedKst": "2026-09-22T03:06:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -25,6 +25,19 @@
     "candidateBranches": []
   },
   "items": [
+    {
+      "id": "VR-BINARY-CONTRACT-001",
+      "priority": 10,
+      "status": "NEEDS_VALIDATION",
+      "preferredRole": "D_INTEGRATION_PLANNER",
+      "summary": "Pin the upstream replacement OR2006C2C.EXE as the canonical reverse-engineering baseline; gate executable-RVA hooks on SHA/PE identity, byte signatures, source bindings, and durable crash-RVA revalidation.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 1,
+      "runtimeCandidate": false,
+      "candidateBranch": "vr-d3d9ex-candidate/VR-BINARY-CONTRACT-001-CHAT-20260922",
+      "expectedFix": "Strict canonical EXE binary contract must pass in DX9Ex Active Validation; crash ZIP must include ASLR-stable exeRva sidecar."
+    },
     {
       "id": "DX9EX-RESET-STATEBLOCK-001",
       "priority": 10,
