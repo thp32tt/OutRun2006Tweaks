@@ -105,6 +105,13 @@ def main() -> int:
     require("src/vr/game/outrun_renderer.cpp", [
         "CullingUnionFov disabled in active rendering after visual-regression evidence",
         "live projection remains untouched until a culling-only frustum boundary is proven",
+        '#include "vr/game/render_semantics.hpp"',
+        "R49 final ownership split",
+        "const bool semanticOverlay =",
+        "RecordGameWvpWrite(",
+        "SemanticOverlayBypassCalls",
+        "VR R49 HUD OWNER: semantic overlay c64 kept raw",
+        "R30 owns exactly one HUD/world-billboard transform",
     ])
     forbid("src/vr/game/outrun_renderer.cpp", [
         "two-eye union culling FOV ACTIVE",
