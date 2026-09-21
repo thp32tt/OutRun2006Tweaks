@@ -23,6 +23,18 @@ on:
       - 'tools/verify_vr_architecture.py'
       - 'tools/verify_vr_r32_review.py'
       - 'tools/Test-VRRegressionKnowledge.ps1'
+      - 'tools/Test-OutRunVRTestPolicy.ps1'
+      - 'tools/Test-DX9ExPackageTriggerCoverage.ps1'
+      - 'tools/Collect-OutRunVRLogs.ps1'
+      - 'tools/Collect-OutRunVRLogs.cmd'
+      - 'tools/Run-OutRunVRTest.ps1'
+      - 'tools/Run-OutRunVRTest.cmd'
+      - 'tools/Select-OutRunVRBackend.ps1'
+      - 'tools/OutRunVR-TestProfiles.ps1'
+      - 'tools/OutRunVR-Backend-Selector.ps1'
+      - 'tools/OutRunVR-Backend-Selector.cmd'
+      - 'tools/analyze_outrun_assets.py'
+      - 'docs/VR_TEST_STRATEGY.md'
       - '.github/workflows/vr-dx9ex-active.yml'
 
 concurrency:
@@ -40,6 +52,9 @@ jobs:
       - name: Verify durable regression knowledge
         shell: pwsh
         run: ./tools/Test-VRRegressionKnowledge.ps1
+      - name: Verify active package dependency closure
+        shell: pwsh
+        run: ./tools/Test-DX9ExPackageTriggerCoverage.ps1
       - name: Verify reconstructed VR architecture boundaries
         shell: pwsh
         run: |
@@ -158,6 +173,7 @@ jobs:
             Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
           }
           Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
+          Copy-Item tools/analyze_outrun_assets.py (Join-Path $dir 'analyze_outrun_assets.py')
           @(
             'OUTRUN VR TEST / LOG UPLOAD'
             ''
@@ -193,7 +209,7 @@ jobs:
           $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_ACTIVE_*.zip' | Select-Object -First 1
           if (-not $zip) { throw 'active DX9Ex ZIP missing' }
           Expand-Archive $zip.FullName verify
-          foreach ($file in @('OutRunVR-Backend-Selector.cmd','OutRunVR-Backend-Selector.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt')) {
+          foreach ($file in @('OutRunVR-Backend-Selector.cmd','OutRunVR-Backend-Selector.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','OutRunVR-TestProfiles.ps1','analyze_outrun_assets.py','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt')) {
             if (-not (Test-Path (Join-Path verify $file))) { throw "package missing $file" }
           }
           $collectorText = Get-Content (Join-Path verify 'Collect-OutRunVRLogs.ps1') -Raw
