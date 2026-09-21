@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "project": "OutRun2006Tweaks OpenXR VR",
+  "behavioralBaseline": {
+    "branch": "vr-openxr",
+    "commit": "91b9c639bea60c114600aedd2f4f3fe97ec420e9",
+    "observedWindowKst": "2026-09-20 08:47",
+    "note": "Behavioral visual baseline only. Newer D3D9Ex lifetime, crash, reset and transport fixes remain required."
+  },
+  "lockedInvariants": {
+    "d3d9exGameplayTransport": "DIRECT_GPU_ONLY",
+    "desktopGameplayMirror": "MONO_OR_LEFT_EYE_NEVER_SBS",
+    "desktopDuplicationGameplayFallback": false,
+    "menuPresentation": "OPENXR_LOCAL_FIXED_MONO",
+    "worldRendering": "TRUE_PER_EYE_STEREO",
+    "hudPresentation": "WORLD_FIXED_NOT_HEAD_LOCKED",
+    "hudPerspectiveOwnership": "R43_R44_RAW_GAME_WVP_FINITE_PLANE",
+    "skyGlow": "VR_OWNED_PER_EYE",
+    "cullingUnionLiveProjectionMutation": false
+  },
+  "requiredActiveBuild": {
+    "safeDrawCompare": false,
+    "r26HudCompare": true,
+    "c1Compare": false,
+    "c2Compare": false,
+    "variantId": "ACTIVE_R26_R43_R44"
+  },
+  "runtimePromotionPolicy": {
+    "visualPathChangesRequireHmdEvidence": true,
+    "transportFallbackChangesRequireHmdEvidence": true,
+    "unverifiedVisualExperimentsDefaultOff": true,
+    "doNotReplaceGoldenVisualOwnerWithFullR34WithoutRuntimeApproval": true
+  }
+}
