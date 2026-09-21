@@ -9,8 +9,11 @@ on:
       - 'docs/VR_AUTODEV_STATE.json'
       - 'docs/VR_WORK_QUEUE.json'
       - 'docs/VR_RUNTIME_FEEDBACK.json'
+      - 'docs/VR_REGRESSION_KNOWLEDGE.json'
+      - 'docs/VR_PROBLEM_HISTORY.md'
       - 'docs/automation/**'
       - 'tools/Test-VRAutodevCoordination.ps1'
+      - 'tools/Test-VRRegressionKnowledge.ps1'
       - '.github/workflows/vr-autodev-coordination.yml'
       - '.github/workflows/vr-dx9ex-active.yml'
 
@@ -26,3 +29,6 @@ jobs:
       - name: Validate four-role coordination contract
         shell: pwsh
         run: ./tools/Test-VRAutodevCoordination.ps1
+      - name: Validate durable regression knowledge
+        shell: pwsh
+        run: ./tools/Test-VRRegressionKnowledge.ps1
