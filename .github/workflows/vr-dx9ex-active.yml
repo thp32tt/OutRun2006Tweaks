@@ -1,0 +1,160 @@
+name: DX9Ex Active Validation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - vr-d3d9ex-focus
+      - 'vr-d3d9ex-candidate/**'
+    paths:
+      - 'src/vr/**'
+      - 'src/hooks_framerate.cpp'
+      - 'src/hooks_graphics.cpp'
+      - 'vrhost/**'
+      - 'CMakeLists.txt'
+      - 'cmake.toml'
+      - 'OutRun2006Tweaks.ini'
+      - 'OutRun2006Tweaks.lods.ini'
+      - '.github/workflows/vr-dx9ex-active.yml'
+
+concurrency:
+  group: vr-dx9ex-active-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  policy:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify runtime-test minimization policy
+        shell: pwsh
+        run: ./tools/Test-OutRunVRTestPolicy.ps1
+
+  host:
+    needs: policy
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Build x64 D3D11 OpenXR host
+        shell: pwsh
+        run: |
+          cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
+          cmake --build build-host --config Release --target outrun-vr-host
+          if (-not (Test-Path build-host/bin/outrun-vr-host.exe)) { throw 'DX9Ex OpenXR host missing' }
+          New-Item -ItemType Directory -Force stage-host | Out-Null
+          Copy-Item build-host/bin/outrun-vr-host.exe stage-host/outrun-vr-host.exe
+          Set-Content stage-host/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dx9ex-active-host
+          path: stage-host/
+          if-no-files-found: error
+
+  game:
+    needs: policy
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Configure Win32 active DX9Ex path
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+      - name: Apply VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ''
+          (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+      - name: Build Win32 active game DLL
+        run: cmake --build build-game --config Release --target outrun2006tweaks
+      - name: Stage active game DLL
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force stage-game | Out-Null
+          $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if (-not $dll) { throw 'dinput8.dll missing' }
+          Copy-Item $dll.FullName stage-game/dinput8.dll
+          Set-Content stage-game/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
+          Set-Content stage-game/VARIANT_ID.txt 'ACTIVE_FULL_R34' -Encoding ascii
+          Set-Content stage-game/CMAKE_FLAGS.txt '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF' -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dx9ex-active-game
+          path: stage-game/
+          if-no-files-found: error
+
+  package:
+    needs: [host, game]
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dx9ex-active-host
+          path: payload/host
+      - uses: actions/download-artifact@v4
+        with:
+          name: dx9ex-active-game
+          path: payload/game
+      - name: Assemble one profile-aware DX9Ex package
+        shell: pwsh
+        run: |
+          $short = $env:GITHUB_SHA.Substring(0,12)
+          $matrixId = "DX9EX-ACTIVE-$((Get-Date).ToUniversalTime().ToString('yyyyMMdd'))-$short"
+          $dir = 'package'
+          $backend = Join-Path $dir 'backends/d3d9'
+          New-Item -ItemType Directory -Force $backend | Out-Null
+          Copy-Item payload/game/dinput8.dll (Join-Path $backend 'dinput8.dll')
+          Copy-Item payload/host/outrun-vr-host.exe (Join-Path $backend 'outrun-vr-host.exe')
+          Set-Content (Join-Path $backend 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
+          Copy-Item OutRun2006Tweaks.ini (Join-Path $dir 'OutRun2006Tweaks.ini')
+          Copy-Item OutRun2006Tweaks.lods.ini (Join-Path $dir 'OutRun2006Tweaks.lods.ini')
+          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Run-OutRunVRTest.cmd','Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','OutRunVR-Backend-Selector.ps1','OutRunVR-Backend-Selector.cmd')) {
+            Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
+          }
+          Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
+          Set-Content (Join-Path $dir 'BUILD_MATRIX_ID.txt') $matrixId -Encoding ascii
+          $buildInputs = [ordered]@{
+            SchemaVersion = 1
+            BuildMatrixId = $matrixId
+            IntegrationSha = $env:GITHUB_SHA
+            VariantId = 'ACTIVE_FULL_R34'
+            DefaultTestProfile = 'CORRECTNESS'
+            Profiles = @('CONTROL','CORRECTNESS','PERFORMANCE')
+            UserRuntimeVerified = $false
+          }
+          $buildInputs | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'BUILD_INPUTS.json') -Encoding UTF8
+          $bad = Get-ChildItem $dir -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe') }
+          if ($bad) { throw "Forbidden backend payload: $($bad.FullName -join ', ')" }
+          Get-ChildItem $dir -Recurse -File | Get-FileHash -Algorithm SHA256 | ForEach-Object {
+            "$($_.Hash)  $($_.Path.Substring((Resolve-Path $dir).Path.Length + 1))"
+          } | Set-Content (Join-Path $dir 'SHA256SUMS.txt') -Encoding ascii
+          $zip = "OutRun2_VR_DX9EX_ACTIVE_${short}.zip"
+          Compress-Archive -Path (Join-Path $dir '*') -DestinationPath $zip -Force
+          Get-FileHash $zip -Algorithm SHA256 | Format-List
+      - name: Validate active package
+        shell: pwsh
+        run: |
+          $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_ACTIVE_*.zip' | Select-Object -First 1
+          if (-not $zip) { throw 'active DX9Ex ZIP missing' }
+          Expand-Archive $zip.FullName verify
+          foreach ($file in @('OutRunVR-Backend-Selector.cmd','OutRunVR-Backend-Selector.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt')) {
+            if (-not (Test-Path (Join-Path verify $file))) { throw "package missing $file" }
+          }
+          foreach ($file in @('dinput8.dll','outrun-vr-host.exe','SOURCE_SHA.txt')) {
+            if (-not (Test-Path (Join-Path 'verify/backends/d3d9' $file))) { throw "backend payload missing $file" }
+          }
+          $bad = Get-ChildItem verify -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe') }
+          if ($bad) { throw 'active package contains forbidden backend payload' }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-DX9EX-ACTIVE-${{ github.sha }}
+          path: OutRun2_VR_DX9EX_ACTIVE_*.zip
+          if-no-files-found: error

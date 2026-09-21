@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 2,
+  "updatedUtc": "2026-09-20T19:02:00Z",
+  "branch": "vr-d3d9ex-focus",
+  "publicationMode": "github-fast-forward-cas",
+  "frozen": false,
+  "phase": "DX9Ex-reference-first / runtime-test-minimized",
+  "checkpoint": "C6_STATE",
+  "policy": {
+    "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host",
+    "blockedBackends": [
+      "DXVK",
+      "DXVK multiview",
+      "DX12/D3D9On12"
+    ],
+    "blockedBackendAction": "Do not develop, compile, smoke-build or package until DX9Ex reference milestone is user-accepted.",
+    "genericBuildDisabled": true,
+    "dedicatedWorkflow": ".github/workflows/vr-dx9ex-active.yml",
+    "runtimeTesting": "Quest 3/VDXR hardware testing is a scarce validation gate; default to one evening CORRECTNESS run.",
+    "profileModel": {
+      "default": "CORRECTNESS",
+      "profiles": [
+        "CONTROL",
+        "CORRECTNESS",
+        "PERFORMANCE"
+      ],
+      "sameBinaryPreferred": true,
+      "note": "Runtime/config differences use profiles where practical. Existing renderer-chain comparison builds remain temporary compile-time historical tools until safely feature-flagged."
+    },
+    "eveningFreeze": {
+      "reviewImplementWindow": "02:00-18:59 Asia/Seoul",
+      "freezeAt": "19:00 Asia/Seoul when material validated changes exist",
+      "at20": "Do not rebuild a successful frozen candidate unless build failure, new P0, or materially safer correction."
+    },
+    "ciModel": {
+      "lightweightPolicyWorkflow": ".github/workflows/vr-test-policy.yml",
+      "activeValidationWorkflow": ".github/workflows/vr-dx9ex-active.yml",
+      "manualComparisonWorkflow": ".github/workflows/vr-unified-backends.yml",
+      "defaultSourceBuilds": "one active Win32 DX9Ex DLL + one x64 D3D11 OpenXR host",
+      "comparisonMatrix": "manual only; P1-P4 retained for hypothesis isolation when profile switching cannot answer the question"
+    }
+  },
+  "runtimeEvidence": {
+    "sourceMatrix": "VRM-20260920-803144005c0e",
+    "d3d9Safe": {
+      "startup": "pass",
+      "runtime": "regressed",
+      "visual": "driver and shadow acceptable; most other content corrupted",
+      "transport": "SBS compose succeeded; direct shared-eye not ready",
+      "compilePath": "R26/R23 safe path; R29-R34 excluded",
+      "performance": "~1800-2000 draws/present in heavy gameplay samples; semanticReject exceeded 568k; user reports HMD stutter",
+      "forcedRuntime": "PreferD3D9Ex=false, FramerateLimit=60, FramerateInterpolation=false, FrameCadenceMode=0 while OpenXR reported 90 Hz"
+    },
+    "dxvkSafe": "same visual regression, subjectively worse HMD stutter; development paused",
+    "dx12Strict": "Direct3DCreate9On12Ex succeeds but both original and normalized CreateDevice return 0x8876086C; development paused"
+  },
+  "currentHypotheses": [
+    "The latest delivered D3D9 SAFE package was not the intended final DX9Ex path: SAFE-DRAW deliberately removed R29-R34 and renderer R29, discarding later world/effect/HUD corrections.",
+    "R26 steady-state safety replay plus classification rejection causes large draw amplification and contributes to headset stutter.",
+    "Recovery runtime forcing 60 FPS with interpolation/cadence disabled contributes independent judder on a 90 Hz OpenXR session.",
+    "Restore fast R29 world rendering and classification in bounded variants before deciding which later R30-R34 overlays are required."
+  ],
+  "nextAction": "Use the four-role scheduled pipeline: A reviews on vr-d3d9ex-review, B creates isolated vr-d3d9ex-candidate/<finding-id>-<run-id> branches and triggers candidate-capable DX9Ex Active Validation immediately, C validates immutable candidate evidence on vr-d3d9ex-support, and D alone integrates validated changes/state on vr-d3d9ex-focus. Keep next user runtime target to one CORRECTNESS test unless a concrete hypothesis requires CONTROL/PERFORMANCE.",
+  "scheduledRunHistory": {
+    "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
+    "lastRunId": "RUN-0001",
+    "lastEntryStartKst": "2026-09-21T02:59:17+09:00",
+    "historyCommitSha": "035e061e9331867d993d983e1c4bdb514b12e2f3",
+    "result": "NO MATERIAL CHANGE / NO BUILD NEEDED",
+    "nextAction": "First consume the DX9Ex Active Validation result and latest lightweight policy/AST parser result. If green, routine source CI is one active game DLL + one host and four-way P1-P4 remains manual-only. Continue independent DX9Ex correctness work without requesting extra HMD tests; next default human test is one CORRECTNESS run."
+  },
+  "legacyCandidateMatrix": {
+    "matrixId": "DX9EX-20260920-ee94dc8051b6",
+    "binarySourceSha": "f46024f7005c5c530479c61673055be324381f2a",
+    "packagerSourceSha": "2827f20d456d5fb266cfbefbd4435df0f9952569",
+    "configFixSha": "ee94dc8051b6de8c0b6ce67d9bdd8b613b98363c",
+    "sourceBuildRunId": 35516112968,
+    "sourceBuildStatus": "all four Win32 game variants and x64 D3D11 host succeeded; package job alone failed before assembly on PowerShell variable delimiter",
+    "followupRunId": 35524755335,
+    "followupRunStatus": "success: host, all four game variants, package and package validation",
+    "packageSha256": "a21825389f0731ffc62dc23314a1415261bf05fcdf07f4accd4d92a0aa46e630",
+    "packageValidation": "GitHub artifact downloaded and opened; four inner ZIPs; each inner SHA256SUMS passed; exact runtime keys verified; four distinct PE32 x86 game DLLs + common PE32+ x64 host; no d3d9.dll, multiviewpatcher.dll, DX12 host or backends directory",
+    "variants": {
+      "P1_C1_FAST_WORLD": "R29 fast L+R + restored R27/R28 perspective-world classification; R30-R34 excluded",
+      "P2_C2_FAST_HUD": "P1 + R30 HUD/XYZRHW/SkyGlow; R31-R34 excluded",
+      "P3_FULL_R34": "complete current R29-R34 chain",
+      "P4_R26_HUD_SAFE": "conservative R26 world + R30 HUD/XYZRHW/SkyGlow"
+    },
+    "commonRuntime": {
+      "PreferD3D9Ex": true,
+      "DirectGpuOnly": false,
+      "DisableDesktopDuplication": false,
+      "FramerateLimit": 0,
+      "FramerateInterpolation": true,
+      "FramerateUnlockExperimental": true,
+      "FrameCadenceMode": 1,
+      "FrameCadenceTargetHz": 0,
+      "DisableDesktopVsync": true,
+      "SkyGlowFactor": 1
+    },
+    "artifactId": 10609329194,
+    "artifactDigest": "sha256:a21825389f0731ffc62dc23314a1415261bf05fcdf07f4accd4d92a0aa46e630",
+    "status": "retired-as-default-runtime-test-policy",
+    "note": "Preserved as historical compile-time isolation evidence. Do not require P1-P4 sequential user testing by default."
+  },
+  "testProfiles": {
+    "CONTROL": {
+      "purpose": "Conservative DX9Ex baseline only when A/B evidence is required",
+      "defaultUserTest": false
+    },
+    "CORRECTNESS": {
+      "purpose": "Default daily Quest/VDXR validation candidate",
+      "defaultUserTest": true
+    },
+    "PERFORMANCE": {
+      "purpose": "CORRECTNESS plus isolated performance experiments when comparison is required",
+      "defaultUserTest": false
+    }
+  },
+  "runtimeTestQueue": {
+    "level0": [
+      {
+        "id": "L0-PROFILE-001",
+        "status": "implemented",
+        "item": "Backend/TestProfile identity separated in selector/runner/session manifests."
+      },
+      {
+        "id": "L0-LOG-001",
+        "status": "implemented",
+        "item": "Profile-aware Matrix/Variant/Profile/Session log directory and ZIP naming."
+      },
+      {
+        "id": "L0-GUI-001",
+        "status": "implemented",
+        "item": "GUI exposes CORRECTNESS/CONTROL/PERFORMANCE with CORRECTNESS recommended."
+      },
+      {
+        "id": "L0-VERIFY-001",
+        "status": "implemented-ci-gated",
+        "item": "Deterministic profile/session/log policy verifier and CI hook."
+      },
+      {
+        "id": "L0-CAPTURE-001",
+        "status": "implemented-build-validation-pending",
+        "item": "Background watchdog rolling capture with Ctrl+F9; no render-hot-path file I/O."
+      }
+    ],
+    "level1": [
+      {
+        "id": "L1-VIS-001",
+        "status": "queued",
+        "item": "World/HUD/effect stereo correctness including white rank-score, 6th/6, menu and YES/NO."
+      },
+      {
+        "id": "L1-VIS-002",
+        "status": "queued",
+        "item": "Sky/cloud/SkyGlow/lens flare/smoke/skid placement and head-lock behavior."
+      },
+      {
+        "id": "L1-RECENTER-001",
+        "status": "queued",
+        "item": "Gameplay/menu recenter visual behavior."
+      }
+    ],
+    "level2": [
+      {
+        "id": "L2-PERF-001",
+        "status": "queued",
+        "item": "Fast stereo/R29+ draw amplification and frame-pacing optimizations; compare PERFORMANCE only when needed."
+      }
+    ],
+    "level3": [
+      {
+        "id": "L3-DX9EX-001",
+        "status": "queued",
+        "item": "D3D9Ex device promotion/reset/shared-resource/direct transport behavior requiring backend-specific runtime evidence."
+      }
+    ],
+    "level4": [
+      {
+        "id": "L4-RELEASE-001",
+        "status": "deferred",
+        "item": "DXVK/multiview/DX12 release matrix after DX9Ex reference is accepted."
+      }
+    ]
+  },
+  "eveningCandidate": {
+    "profile": "CORRECTNESS",
+    "frozen": false,
+    "sourceSha": null,
+    "configHash": null,
+    "packageSha256": null,
+    "reason": "Freeze at 19:00 only when material validated changes exist; preserve during user testing."
+  },
+  "diagnosticCapture": {
+    "status": "phase1-build-verified-user-runtime-pending",
+    "triggerPolicy": "Ctrl+F9 selected to avoid F11 Tweaks overlay and F12 recenter.",
+    "rollingTelemetrySeconds": 10,
+    "heavyContinuousImageDumping": false,
+    "requiredIdentity": [
+      "backend",
+      "profile",
+      "session",
+      "sourceSha",
+      "configHash"
+    ],
+    "targetEvidence": [
+      "framePoseIds",
+      "presentationStereoFallback",
+      "runtimeRefresh",
+      "recommendedEyeSize",
+      "leftRightMatrices",
+      "drawClassCounters",
+      "frameTimings",
+      "recentLogs"
+    ],
+    "eyeImages": "optional only when safe and low-overhead",
+    "postWindowSeconds": 2,
+    "phase1": [
+      "v2/v3 pose/frame/client/ack rolling samples",
+      "runtime recommended eye size",
+      "host/rendered eye pose/FOV snapshot",
+      "session/backend/profile/source/config identity",
+      "collector ZIP inclusion"
+    ],
+    "deferred": [
+      "per-stage wait/acquire/render-left/render-right/copy/end timings",
+      "left/right eye image snapshots",
+      "draw-class counters not already exposed by IPC"
+    ],
+    "buildEvidence": {
+      "workflow": "DX9Ex Focus Test Matrix",
+      "runId": 35529948535,
+      "result": "success",
+      "meaning": "x64 host and all existing Win32 comparison variants compiled and packaged with phase-1 rolling capture source present"
+    },
+    "runtimeEvidence": "USER_RUNTIME_REQUIRED: capture trigger/usability and headset performance impact have not yet been validated on Quest 3/VDXR."
+  },
+  "scheduledAutomationModel": {
+    "A_00": "Hourly :00 deep review. Source-read-only for production; durable run records on vr-d3d9ex-review.",
+    "B_15": "Hourly :15 isolated fix worker. Candidate branches only; never direct integration writes. Candidate CI starts immediately.",
+    "C_30": "Hourly :30 validation/support. Validates immutable candidate SHAs and may add non-production verifier support on vr-d3d9ex-support.",
+    "D_45": "Hourly :45 integration/planner. Sole production/integration writer and central queue/state/history owner.",
+    "specialD": {
+      "01:45": "nightly consolidation and architecture/regression/cache integrity review",
+      "06:45": "overnight summary and daytime backlog reorder",
+      "19:45": "freeze newest already-validated useful CORRECTNESS artifact; max 3 user choices only when evidence requires comparison"
+    }
+  },
+  "policyVerification": {
+    "lightweightWorkflow": "VR Test Policy",
+    "lastKnownSuccessRunId": 35530274341,
+    "lastKnownSuccessSha": "e67b00dd3d673b80f73115b7e26392ee6c1a67a1",
+    "note": "Single-active/manual-matrix policy verifier repaired and passed. Additional AST parse coverage was added afterward and should be the next lightweight check."
+  },
+  "activeValidation": {
+    "workflow": "DX9Ex Active Validation",
+    "runId": 35530793478,
+    "sourceSha": "10df8cbe9b3f32d8844a2c4283bd5bed3c8950c3",
+    "status": "in-progress-at-state-write",
+    "policy": "success",
+    "host": "success",
+    "game": "in-progress",
+    "package": "pending",
+    "reason": "One-time validation triggered by candidate-branch CI/concurrency workflow change; runtime renderer source was not changed by this setup commit."
+  },
+  "coordination": {
+    "protocol": "docs/VR_AUTODEV_PROTOCOL.md",
+    "queue": "docs/VR_WORK_QUEUE.json",
+    "runtimeFeedback": "docs/VR_RUNTIME_FEEDBACK.json",
+    "runRecordGuide": "docs/automation/README.md",
+    "runRecordTemplate": "docs/automation/RUN_RECORD_TEMPLATE.json",
+    "integrationBranch": "vr-d3d9ex-focus",
+    "reviewBranch": "vr-d3d9ex-review",
+    "supportBranch": "vr-d3d9ex-support",
+    "candidatePattern": "vr-d3d9ex-candidate/<finding-id>-<run-id>",
+    "productionWriter": "D_INTEGRATION_PLANNER",
+    "candidateWriter": "B_FIX",
+    "maxIndependentUnvalidatedRuntimeCandidates": 3,
+    "maxMateriallyDifferentFixAttempts": 2,
+    "candidateWorkflow": ".github/workflows/vr-dx9ex-active.yml",
+    "candidateWorkflowBranchPattern": "vr-d3d9ex-candidate/**",
+    "candidateConcurrency": "branch-scoped",
+    "aBCDoNotRewriteIntegrationQueue": true,
+    "validation": {
+      "workflow": ".github/workflows/vr-autodev-coordination.yml",
+      "script": "tools/Test-VRAutodevCoordination.ps1",
+      "latestRunId": 35530891316,
+      "latestResult": "success",
+      "validatedHead": "074029e71fd8005d8c5f3a57e3da4a813eac2212"
+    }
+  }
+}

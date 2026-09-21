@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 2,
+  "integrationBranch": "vr-d3d9ex-focus",
+  "updatedKst": "2026-09-21T03:36:00+09:00",
+  "owner": "D_INTEGRATION_PLANNER",
+  "lastConsumedEvidenceId": null,
+  "sessions": [],
+  "knownRuntimeBaseline": {
+    "matrixId": "VRM-20260920-803144005c0e",
+    "summary": "Prior D3D9 SAFE reached startup/stereo transport but regressed visuals and pacing; DXVK/DX12 paused. This baseline is context only and is not evidence for current active candidate correctness."
+  },
+  "notes": [
+    "Only add runtime sessions that can be tied to an exact package/profile/session/source identity.",
+    "Quest 3/VDXR observations override build-only assumptions for hardware-visible behavior.",
+    "Logs uploaded in another chat are not assumed accessible to a scheduled run unless durable identity/evidence is recorded here."
+  ]
+}

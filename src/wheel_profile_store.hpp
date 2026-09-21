@@ -170,15 +170,39 @@ namespace WheelProfileStore
         backup += ".bak";
         std::error_code ec;
 
-        bool finalExists = std::filesystem::is_regular_file(finalPath, ec);
-        if (ec)
+        // MSVC's std::filesystem::is_regular_file(path, ec) can report
+        // ERROR_FILE_NOT_FOUND through ec for a path that simply does not exist.
+        // A missing destination/backup is the normal first-save case, not an error.
+        const auto inspect_regular_file = [&](const std::filesystem::path& path,
+                                              bool& exists,
+                                              const char* label) -> bool
         {
-            if (error) *error = "Could not inspect the existing profile: " + ec.message();
+            ec.clear();
+            exists = std::filesystem::is_regular_file(path, ec);
+            if (ec == std::errc::no_such_file_or_directory)
+            {
+                ec.clear();
+                exists = false;
+                return true;
+            }
+            if (ec)
+            {
+                if (error) *error = std::string("Could not inspect ") + label + ": " + ec.message();
+                return false;
+            }
+            return true;
+        };
+
+        bool finalExists = false;
+        if (!inspect_regular_file(finalPath, finalExists, "the existing profile"))
             return false;
-        }
+
+        bool backupExists = false;
+        if (!inspect_regular_file(backup, backupExists, "the profile backup"))
+            return false;
 
         // Recover a previous interrupted replacement before starting another.
-        if (!finalExists && std::filesystem::is_regular_file(backup, ec) && !ec)
+        if (!finalExists && backupExists)
         {
             std::filesystem::rename(backup, finalPath, ec);
             if (ec)
@@ -187,11 +211,6 @@ namespace WheelProfileStore
                 return false;
             }
             finalExists = true;
-        }
-        else if (ec)
-        {
-            if (error) *error = "Could not inspect the profile backup: " + ec.message();
-            return false;
         }
 
         if (finalExists)
@@ -210,25 +229,61 @@ namespace WheelProfileStore
             }
         }
 
+        bool installedByCopyFallback = false;
         std::filesystem::rename(staged, finalPath, ec);
         if (ec)
         {
-            const std::string replaceError = ec.message();
+            const std::string renameError = ec.message();
+            std::error_code copyEc;
+            std::filesystem::copy_file(
+                staged, finalPath, std::filesystem::copy_options::overwrite_existing, copyEc);
+            if (copyEc)
+            {
+                if (finalExists)
+                {
+                    std::error_code restoreEc;
+                    std::filesystem::rename(backup, finalPath, restoreEc);
+                    if (restoreEc)
+                    {
+                        if (error) *error = "Could not install the new profile (rename: " + renameError +
+                            "; copy fallback: " + copyEc.message() + ") and could not restore the backup (" +
+                            restoreEc.message() + "). Destination: " + finalPath.string();
+                        return false;
+                    }
+                }
+                if (error) *error = "Could not install the completed profile (rename: " + renameError +
+                    "; copy fallback: " + copyEc.message() + "). Destination: " + finalPath.string();
+                return false;
+            }
+            installedByCopyFallback = true;
+        }
+
+        std::error_code verifyEc;
+        const bool installed = std::filesystem::is_regular_file(finalPath, verifyEc) && !verifyEc;
+        if (!installed)
+        {
+            std::error_code ignored;
+            std::filesystem::remove(finalPath, ignored);
             if (finalExists)
             {
                 std::error_code restoreEc;
                 std::filesystem::rename(backup, finalPath, restoreEc);
                 if (restoreEc)
                 {
-                    if (error) *error = "Could not install the new profile (" + replaceError +
-                        ") and could not restore the backup (" + restoreEc.message() + ").";
+                    if (error) *error = "Profile installation could not be verified and the previous profile could not be restored: " +
+                        restoreEc.message() + ". Destination: " + finalPath.string();
                     return false;
                 }
             }
-            if (error) *error = "Could not install the completed profile: " + replaceError;
+            if (error) *error = "Profile installation could not be verified. Destination: " + finalPath.string();
             return false;
         }
 
+        if (installedByCopyFallback)
+        {
+            std::error_code ignored;
+            std::filesystem::remove(staged, ignored);
+        }
         if (finalExists)
         {
             std::error_code ignored;

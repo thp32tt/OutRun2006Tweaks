@@ -2,6 +2,7 @@ name: Build
 
 on:
   push:
+    branches-ignore: [ vr-d3d9ex-focus, 'vr-d3d9ex-candidate/**' ]
   pull_request:
 
 jobs:
@@ -20,24 +21,7 @@ jobs:
 
       - name: Verify consolidated wheel FFB source
         shell: pwsh
-        run: |
-          if (Test-Path 'DISCORD_SHARE_v0.1.md') {
-            throw 'DISCORD_SHARE_v0.1.md must not be tracked in the release branch.'
-          }
-          # The consolidated verifier still contains two historical checks for
-          # the old Discord handoff document. Keep the repository clean by
-          # satisfying those checks only inside the CI workspace, then remove
-          # the temporary compatibility file immediately after verification.
-          @'
-          Dynamic Damping 0.28
-          '@ | Set-Content DISCORD_SHARE_v0.1.md -Encoding utf8
-          try {
-            python tools/verify_wheel_ffb_current.py
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          }
-          finally {
-            Remove-Item DISCORD_SHARE_v0.1.md -Force -ErrorAction SilentlyContinue
-          }
+        run: python tools/verify_wheel_ffb_current.py
 
       - name: Test production wheel FFB math
         shell: cmd
@@ -46,7 +30,12 @@ jobs:
           python tools/verify_wheel_ffb_math.py
 
       - name: Configure
+        shell: pwsh
         run: |
+          # cmkr intentionally skips regeneration when CI is set. vr-openxr uses
+          # cmake.toml as the canonical source graph, so remove CI here just as
+          # the dedicated VR workflow does before configuring.
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
           mkdir build
           cd build
           cmake -G "Visual Studio 17 2022" -A ${{matrix.arch}} ..
@@ -73,7 +62,7 @@ jobs:
           cp OutRun2006Tweaks.ini build/bin/OutRun2006Tweaks.ini
           cp OutRun2006Tweaks.lods.ini build/bin/OutRun2006Tweaks.lods.ini
 
-      - name: Verify built wheel payload
+      - name: Verify built wheel and VR payload
         shell: pwsh
         run: |
           $dllPath = "build/bin/dinput8.dll"
@@ -97,7 +86,12 @@ jobs:
             "Reverse Spring",
             "multi-device SDL raw input enabled",
             "Multi-device input architecture adapted from hyp36rmax (MIT)",
-            "2-axis POLAR actuator encoding",
+            "zero-force live SetParameters",
+            "temporarily excluding it from automatic selection",
+            "ConstantForce is using detected actuator offset",
+            "next compatible interface will be probed on the next update tick",
+            "transient ConstantForce update failure",
+            "preferred FFB driver/vendor",
             "MOZA R3 Physics SAT",
             "MOZA R3 Natural SAT",
             "Single-owner wheel FFB: DirectInput COM only",
@@ -111,7 +105,12 @@ jobs:
             "load={:.2f} slide={:.2f} scrub={:.2f}",
             "basis=M70r{}",
             "steerSrc={}",
-            "Test Left (20%)"
+            "Test Left (20%)",
+            "VR stereo: D3D9 full-eye renderer installed",
+            "VR R13: stereo hardening ACTIVE",
+            "VR R13: auxiliary/offscreen c64 WVP kept stock",
+            "VR v3 shadow: live dual-protocol diagnostics active",
+            "VR GPL SHADER: pair="
           )
           foreach ($marker in $markers) {
             if (-not $ascii.Contains($marker)) { throw "missing compiled marker: $marker" }
@@ -124,7 +123,7 @@ jobs:
           if ($ini -notmatch '(?m)^UseNewInput\s*=\s*true\s*$') { throw "multi-device input is not the shipped default" }
           if ($ini -notmatch '(?m)^TrailResponseLead\s*=\s*0\.25\s*$') { throw "shipped pneumatic trail response lead is not 0.25" }
 
-          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, externally reviewed Physics SAT wheel FFB markers present" -f $bytes.Length)
+          Write-Host ("Verified dinput8.dll: {0} bytes, PE32 x86, current wheel FFB + OpenXR VR markers present" -f $bytes.Length)
           Get-FileHash $dllPath -Algorithm SHA256
 
       - name: Download upstream replacement EXE
@@ -136,6 +135,8 @@ jobs:
         run: |
           $candidates = New-Object System.Collections.Generic.List[System.IO.FileInfo]
           $candidates.Add((Get-Item LICENSE.md))
+          if (Test-Path COPYING.GPL3) { $candidates.Add((Get-Item COPYING.GPL3)) }
+          if (Test-Path THIRD_PARTY_NOTICES.md) { $candidates.Add((Get-Item THIRD_PARTY_NOTICES.md)) }
           foreach ($root in @('external', 'build/_deps')) {
             if (Test-Path $root) {
               Get-ChildItem $root -Recurse -File | Where-Object {
@@ -167,6 +168,10 @@ jobs:
 
           $builder.ToString() | Set-Content build/bin/LICENSES.txt -Encoding utf8
           if (-not (Test-Path build/bin/LICENSES.txt)) { throw 'LICENSES.txt was not generated' }
+          if (Test-Path COPYING.GPL3) { Copy-Item COPYING.GPL3 build/bin/COPYING.GPL3 }
+          if (Test-Path THIRD_PARTY_NOTICES.md) { Copy-Item THIRD_PARTY_NOTICES.md build/bin/THIRD_PARTY_NOTICES.md }
+          if (-not (Test-Path build/bin/COPYING.GPL3)) { throw 'GPLv3 text is missing from binary distribution' }
+          if (-not (Test-Path build/bin/THIRD_PARTY_NOTICES.md)) { throw 'third-party notices are missing from binary distribution' }
           Write-Host ("Collected {0} unique license/notice texts" -f $seen.Count)
 
       - name: Upload binary
@@ -188,6 +193,7 @@ jobs:
             tools/test_wheel_ffb_current.cpp
             tools/verify_wheel_ffb_math.py
             src/hooks_forcefeedback.cpp
+            src/hooks_framerate.cpp
             src/hooks_wheel_input_compat_v2.hpp
             src/hooks_wheel_r3_menu_dpad.hpp
             src/hooks_wheel_r3_menu_ab.hpp
@@ -196,8 +202,21 @@ jobs:
             src/input_manager.cpp
             src/overlay/input_bindings_ui.cpp
             src/overlay/wheel_setup_ui.cpp
+            src/wheel_profile_store.hpp
+            src/hooks_input.cpp
+            src/overlay/settings_ui.cpp
+            src/overlay/overlay.cpp
             src/dllmain.cpp
             OutRun2006Tweaks.ini
+            CMakeLists.txt
+            cmake.toml
+            README.md
+            WHEEL_FFB.md
+            RELEASE_NOTES_v0.1.md
             LICENSE.md
+            COPYING.GPL3
             THIRD_PARTY_NOTICES.md
+            src/vr/d3d9/shader_fingerprint_gpl.hpp
             tools/verify_wheel_ffb_current.py
+            .github/workflows/build.yml
+          include-hidden-files: true

@@ -1,0 +1,229 @@
+name: DX9Ex Comparison Matrix (Manual)
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: vr-dx9ex-comparison-manual
+  cancel-in-progress: true
+
+jobs:
+  policy:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify DX9Ex runtime-test minimization policy
+        shell: pwsh
+        run: ./tools/Test-OutRunVRTestPolicy.ps1
+
+  host:
+    needs: policy
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Build x64 D3D11 OpenXR host only
+        shell: pwsh
+        run: |
+          cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
+          cmake --build build-host --config Release --target outrun-vr-host
+          if (-not (Test-Path build-host/bin/outrun-vr-host.exe)) { throw "DX9Ex OpenXR host missing" }
+          New-Item -ItemType Directory -Force stage-host | Out-Null
+          Copy-Item build-host/bin/outrun-vr-host.exe stage-host/outrun-vr-host.exe
+          Set-Content stage-host/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dx9ex-host
+          path: stage-host/
+          if-no-files-found: error
+
+  game:
+    needs: policy
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: P1_C1_FAST_WORLD
+            flags: "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=ON"
+            purpose: "R29 fast L+R plus restored R27/R28 world classifier"
+          - variant: P2_C2_FAST_HUD
+            flags: "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=ON"
+            purpose: "P1 plus R30 HUD/XYZRHW/SkyGlow correction"
+          - variant: P3_FULL_R34
+            flags: "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF"
+            purpose: "Full R29-R34 current correction chain"
+          - variant: P4_R26_HUD_SAFE
+            flags: "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON"
+            purpose: "Conservative R26 world plus R30 HUD/effect overlay"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Configure Win32 ${{ matrix.variant }}
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 ${{ matrix.flags }}
+      - name: Apply VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+      - name: Build Win32 game DLL ${{ matrix.variant }}
+        run: cmake --build build-game --config Release --target outrun2006tweaks
+      - name: Stage game DLL
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force stage-game | Out-Null
+          $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if (-not $dll) { throw "dinput8.dll missing for ${{ matrix.variant }}" }
+          Copy-Item $dll.FullName stage-game/dinput8.dll
+          Set-Content stage-game/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
+          Set-Content stage-game/VARIANT_ID.txt '${{ matrix.variant }}' -Encoding ascii
+          Set-Content stage-game/CMAKE_FLAGS.txt '${{ matrix.flags }}' -Encoding ascii
+          Set-Content stage-game/PURPOSE.txt '${{ matrix.purpose }}' -Encoding UTF8
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dx9ex-game-${{ matrix.variant }}
+          path: stage-game/
+          if-no-files-found: error
+
+  package:
+    runs-on: windows-2022
+    needs: [host, game]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dx9ex-host
+          path: payload/host
+      - uses: actions/download-artifact@v4
+        with:
+          name: dx9ex-game-P1_C1_FAST_WORLD
+          path: payload/P1_C1_FAST_WORLD
+      - uses: actions/download-artifact@v4
+        with:
+          name: dx9ex-game-P2_C2_FAST_HUD
+          path: payload/P2_C2_FAST_HUD
+      - uses: actions/download-artifact@v4
+        with:
+          name: dx9ex-game-P3_FULL_R34
+          path: payload/P3_FULL_R34
+      - uses: actions/download-artifact@v4
+        with:
+          name: dx9ex-game-P4_R26_HUD_SAFE
+          path: payload/P4_R26_HUD_SAFE
+
+      - name: Assemble four DX9Ex-only tester ZIPs
+        shell: pwsh
+        run: |
+          $variants = @(
+            'P1_C1_FAST_WORLD',
+            'P2_C2_FAST_HUD',
+            'P3_FULL_R34',
+            'P4_R26_HUD_SAFE'
+          )
+          $short = $env:GITHUB_SHA.Substring(0,12)
+          $matrixId = "DX9EX-$((Get-Date).ToUniversalTime().ToString('yyyyMMdd'))-$short"
+          New-Item -ItemType Directory -Force output | Out-Null
+
+          foreach ($variant in $variants) {
+            $dir = Join-Path 'package' $variant
+            New-Item -ItemType Directory -Force $dir | Out-Null
+
+            Copy-Item "payload/$variant/dinput8.dll" (Join-Path $dir 'dinput8.dll')
+            Copy-Item "payload/host/outrun-vr-host.exe" (Join-Path $dir 'outrun-vr-host.exe')
+            Copy-Item OutRun2006Tweaks.ini (Join-Path $dir 'OutRun2006Tweaks.ini')
+            Copy-Item OutRun2006Tweaks.lods.ini (Join-Path $dir 'OutRun2006Tweaks.lods.ini')
+            Copy-Item tools/Run-DX9ExFocusTest.ps1 (Join-Path $dir 'Run-DX9ExFocusTest.ps1')
+            Copy-Item tools/RUN_DX9EX_TEST.cmd (Join-Path $dir 'RUN_DX9EX_TEST.cmd')
+            Copy-Item docs/VR_DX9EX_TEST_SCENARIO.md (Join-Path $dir 'DX9EX_TEST_SCENARIO.md')
+
+            $iniPath = Join-Path $dir 'OutRun2006Tweaks.ini'
+            $ini = Get-Content $iniPath -Raw
+            $settings = [ordered]@{
+              FramerateLimit = '0'
+              FramerateFastLoad = '0'
+              FramerateInterpolation = 'true'
+              FramerateUnlockExperimental = 'true'
+              FrameCadenceMode = '1'
+              FrameCadenceTargetHz = '0'
+              DisableDesktopVsync = 'true'
+              SkyGlowFactor = '1'
+              PreferD3D9Ex = 'true'
+              DirectGpuOnly = 'false'
+              DisableDesktopDuplication = 'false'
+            }
+            foreach ($entry in $settings.GetEnumerator()) {
+              $pattern = '(?m)^' + [regex]::Escape($entry.Key) + '\s*=.*$'
+              if (-not [regex]::IsMatch($ini, $pattern)) { throw "INI key missing: $($entry.Key)" }
+              $ini = [regex]::Replace($ini, $pattern, "$($entry.Key) = $($entry.Value)")
+            }
+            Set-Content $iniPath $ini -Encoding UTF8
+
+            $flags = (Get-Content "payload/$variant/CMAKE_FLAGS.txt" -Raw).Trim()
+            $purpose = (Get-Content "payload/$variant/PURPOSE.txt" -Raw).Trim()
+            @(
+              "variant=$variant"
+              "matrix=$matrixId"
+              "integrationSha=$env:GITHUB_SHA"
+              "cmakeFlags=$flags"
+              "purpose=$purpose"
+              "runtime=PreferD3D9Ex=true; DirectGpuOnly=false; FrameCadenceMode=1; FramerateLimit=0; Interpolation=true; SkyGlowFactor=1"
+            ) | Set-Content (Join-Path $dir 'DX9EX_VARIANT.txt') -Encoding UTF8
+            Set-Content (Join-Path $dir 'BUILD_MATRIX_ID.txt') $matrixId -Encoding ascii
+
+            foreach ($forbidden in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe')) {
+              if (Test-Path (Join-Path $dir $forbidden)) { throw "Forbidden non-DX9Ex file present: $forbidden" }
+            }
+            if (Test-Path (Join-Path $dir 'backends')) { throw 'Backend bundle directory must not exist in DX9Ex focus package.' }
+
+            $required = @(
+              'dinput8.dll','outrun-vr-host.exe','OutRun2006Tweaks.ini',
+              'OutRun2006Tweaks.lods.ini','RUN_DX9EX_TEST.cmd',
+              'Run-DX9ExFocusTest.ps1','DX9EX_VARIANT.txt',
+              'DX9EX_TEST_SCENARIO.md','BUILD_MATRIX_ID.txt'
+            )
+            foreach ($file in $required) {
+              if (-not (Test-Path (Join-Path $dir $file))) { throw "Required file missing for ${variant}: $file" }
+            }
+
+            Get-ChildItem $dir -File | Get-FileHash -Algorithm SHA256 | ForEach-Object {
+              "$($_.Hash)  $($_.Path | Split-Path -Leaf)"
+            } | Set-Content (Join-Path $dir 'SHA256SUMS.txt') -Encoding ascii
+
+            $zip = Join-Path output ("OutRun2_VR_DX9EX_{0}_{1}.zip" -f $variant,$short)
+            Compress-Archive -Path (Join-Path $dir '*') -DestinationPath $zip -Force
+          }
+
+      - name: Validate four independent DX9Ex ZIPs
+        shell: pwsh
+        run: |
+          $zips = Get-ChildItem output -Filter 'OutRun2_VR_DX9EX_*.zip'
+          if ($zips.Count -ne 4) { throw "Expected 4 DX9Ex ZIPs, found $($zips.Count)" }
+          foreach ($zip in $zips) {
+            $dst = Join-Path 'verify' $zip.BaseName
+            Expand-Archive $zip.FullName $dst
+            foreach ($file in @('dinput8.dll','outrun-vr-host.exe','RUN_DX9EX_TEST.cmd','DX9EX_VARIANT.txt','SHA256SUMS.txt')) {
+              if (-not (Test-Path (Join-Path $dst $file))) { throw "$($zip.Name) missing $file" }
+            }
+            $forbidden = Get-ChildItem $dst -Recurse -File | Where-Object {
+              $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe') -or
+              $_.FullName -match '\\backends\\'
+            }
+            if ($forbidden) { throw "$($zip.Name) contains non-DX9Ex payload: $($forbidden.FullName -join ', ')" }
+            $variantText = Get-Content (Join-Path $dst 'DX9EX_VARIANT.txt') -Raw
+            if ($variantText -notmatch 'runtime=PreferD3D9Ex=true') { throw "$($zip.Name) is not pinned to DX9Ex" }
+          }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-DX9EX-4PACK-${{ github.sha }}
+          path: output/*.zip
+          if-no-files-found: error
+
