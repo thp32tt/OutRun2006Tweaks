@@ -1,6 +1,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <filesystem>
+#include <system_error>
 #include <ini.h>
 #include <exception.hpp>
 #include <miniz.h>
@@ -45,6 +46,7 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
     wchar_t     timestamp[128];
     wchar_t*    modulenameptr{};
     bool        bDumpSuccess;
+    bool        re4tLogSnapshotReady = false;
     __time64_t  time;
     struct tm   ltime;
     HWND        hWnd;
@@ -117,12 +119,51 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
         CloseHandle(hFile);
     }
 
-    // Copy re4_tweaks log file to CrashDumps
+    // Snapshot the tweaks log without allowing filesystem exceptions to escape
+    // from the unhandled-exception filter. Use a per-crash destination so a
+    // loose log retained after an earlier ZIP failure cannot poison the next
+    // crash attempt.
     {
-        swprintf_s(re4t_log_filename, L"%s\\%s\\OutRun2006Tweaks.log", modulename, L"CrashDumps");
+        std::error_code source_ec;
+        if (std::filesystem::is_regular_file(Module::LogPath, source_ec) && !source_ec)
+        {
+            for (unsigned suffix = 0; suffix < 100; ++suffix)
+            {
+                if (suffix == 0)
+                    swprintf_s(re4t_log_filename,
+                        L"%s\\%s\\OutRun2006Tweaks.%s.log",
+                        modulename, L"CrashDumps", timestamp);
+                else
+                    swprintf_s(re4t_log_filename,
+                        L"%s\\%s\\OutRun2006Tweaks.%s.%u.log",
+                        modulename, L"CrashDumps", timestamp, suffix);
 
-        if (std::filesystem::exists(Module::LogPath))
-            std::filesystem::copy_file(Module::LogPath, re4t_log_filename);
+                std::error_code exists_ec;
+                if (std::filesystem::exists(re4t_log_filename, exists_ec))
+                {
+                    if (exists_ec)
+                        break;
+                    continue;
+                }
+                if (exists_ec)
+                    break;
+
+                std::error_code copy_ec;
+                re4tLogSnapshotReady = std::filesystem::copy_file(
+                    Module::LogPath,
+                    re4t_log_filename,
+                    std::filesystem::copy_options::none,
+                    copy_ec);
+                if (re4tLogSnapshotReady)
+                    break;
+
+                // Retry only if another writer won the destination-name race.
+                std::error_code collision_ec;
+                if (!std::filesystem::exists(re4t_log_filename, collision_ec) ||
+                    collision_ec)
+                    break;
+            }
+        }
     }
 
     bool zip_created = false;
@@ -141,13 +182,14 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
           // Required crash evidence must all be present, but success is not
           // published until archive finalization, writer teardown, and the
           // underlying FILE flush/close have also succeeded.
-          bool required_entries_ok = true;
+          bool required_entries_ok = re4tLogSnapshotReady;
 
           if (!mz_zip_writer_add_file(&zip_archive, "dump.dmp", dump_filename, nullptr, 0, 3))
             required_entries_ok = false;
           if (!mz_zip_writer_add_file(&zip_archive, "crash.log", crash_log_filename, nullptr, 0, 3))
             required_entries_ok = false;
-          if (!mz_zip_writer_add_file(&zip_archive, "OutRun2006Tweaks.log", re4t_log_filename, nullptr, 0, 3))
+          if (re4tLogSnapshotReady &&
+              !mz_zip_writer_add_file(&zip_archive, "OutRun2006Tweaks.log", re4t_log_filename, nullptr, 0, 3))
             required_entries_ok = false;
 
           // VR diagnostics are optional. A crash can happen while one of these
