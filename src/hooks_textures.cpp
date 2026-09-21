@@ -14,7 +14,7 @@ namespace OutRunVRHudInspector
 {
     void TracePutSprite(SPRARGS* sprargs, float priority,
         const void* returnAddress);
-    void TracePutSprite2(const void* sprargs, float priority,
+    void TracePutSprite2(SPRARGS2* sprargs, float priority,
         const void* returnAddress);
 }
 
