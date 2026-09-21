@@ -24,17 +24,19 @@ $feedback = Read-Json "docs/VR_RUNTIME_FEEDBACK.json"
 
 Require ($state.branch -eq "vr-d3d9ex-focus") "State branch must be vr-d3d9ex-focus"
 Require ($state.coordination.integrationBranch -eq "vr-d3d9ex-focus") "Coordination integration branch mismatch"
-Require ($state.coordination.reviewBranch -eq "vr-d3d9ex-review") "Review branch mismatch"
-Require ($state.coordination.supportBranch -eq "vr-d3d9ex-support") "Support branch mismatch"
+Require ($state.coordination.reviewBranches.A -eq "vr-d3d9ex-review-a") "A review branch mismatch"
+Require ($state.coordination.reviewBranches.B -eq "vr-d3d9ex-review-b") "B review branch mismatch"
+Require ($state.coordination.reviewBranches.C -eq "vr-d3d9ex-review-c") "C review branch mismatch"
+Require (@($state.coordination.reviewOnlyRoles).Count -eq 3) "A/B/C review-only role set mismatch"
 Require ($state.coordination.productionWriter -eq "D_INTEGRATION_PLANNER") "Only D may be production writer"
-Require ($state.coordination.candidateWriter -eq "B_FIX") "Only B may own candidate writes"
+Require ($state.coordination.candidateWriter -eq "D_INTEGRATION_PLANNER") "Only D may own production candidate writes"
 Require ([int]$state.coordination.maxIndependentUnvalidatedRuntimeCandidates -eq 3) "Runtime candidate WIP cap must be 3"
 Require ([int]$state.coordination.maxMateriallyDifferentFixAttempts -eq 2) "Fix attempt cap must be 2"
 
 Require ($queue.integrationBranch -eq "vr-d3d9ex-focus") "Queue integration branch mismatch"
 Require ($queue.owner -eq "D_INTEGRATION_PLANNER") "Queue owner must be D_INTEGRATION_PLANNER"
 Require ($queue.policy.productionWriter -eq "D_INTEGRATION_PLANNER") "Queue production writer mismatch"
-Require ($queue.policy.candidateWriter -eq "B_FIX") "Queue candidate writer mismatch"
+Require ($queue.policy.candidateWriter -eq "D_INTEGRATION_PLANNER") "Queue candidate writer mismatch"
 Require ([int]$queue.policy.maxIndependentUnvalidatedRuntimeCandidates -eq 3) "Queue WIP cap must be 3"
 Require ([int]$queue.policy.maxMateriallyDifferentFixAttempts -eq 2) "Queue fix-attempt cap must be 2"
 
@@ -52,6 +54,11 @@ foreach ($item in @($queue.items)) {
     foreach ($dep in @($item.dependencies)) {
         Require ($ids.ContainsKey([string]$dep)) "Unknown dependency $dep referenced by $($item.id)"
     }
+}
+
+foreach ($item in @($queue.items)) {
+    $role = [string]$item.preferredRole
+    Require ($role -notin @("B_FIX","C_VALIDATION","A_REVIEW")) "Legacy active role remains in queue for $($item.id): $role"
 }
 
 $candidateBranches = @($queue.candidateWip.candidateBranches)
