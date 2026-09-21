@@ -69,7 +69,7 @@ function Prepare-NextSession([string]$backend,[string]$variant,[string]$matrix){
     Write-ActiveSession $backend $variant $matrix $session $startedUtc
 
     if(Test-Path $ini){
-        $allowed='^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor)\s*='
+        $allowed='^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|HudInspector)\s*='
         Get-Content $ini|Where-Object{$_ -match $allowed}|Set-Content (Join-Path $sessionRoot 'VR_CONFIG_SNAPSHOT.txt') -Encoding UTF8
     }
     Copy-Item (Join-Path $root 'ACTIVE_VR_BACKEND.txt') $sessionRoot -Force
@@ -132,6 +132,23 @@ if(Test-Path $gameExe){
         "lastWriteUtc=$($exeItem.LastWriteTimeUtc.ToString('o'))"
     )|Set-Content (Join-Path $dest 'EXE_IDENTITY.txt') -Encoding UTF8
     $copied+='EXE_IDENTITY.txt'
+}
+
+$gameLogs=Get-ChildItem $dest -Filter 'OutRun2006Tweaks*.log' -File -ErrorAction SilentlyContinue
+$shaderLines=@()
+foreach($log in $gameLogs){
+    $shaderLines += Select-String -Path $log.FullName -Pattern 'VR GPL SHADER:' -SimpleMatch |
+        ForEach-Object { $_.Line }
+}
+if($shaderLines.Count -gt 0){
+    @(
+        'SHADER FINGERPRINT SUMMARY'
+        "session=$session"
+        "pairs=$($shaderLines.Count)"
+        ''
+        $shaderLines
+    )|Set-Content (Join-Path $dest 'SHADER_FINGERPRINT_SUMMARY.txt') -Encoding UTF8
+    $copied+='SHADER_FINGERPRINT_SUMMARY.txt'
 }
 
 $hudCsv=Join-Path $dest 'OutRun2006Tweaks-hudtrace.csv'
