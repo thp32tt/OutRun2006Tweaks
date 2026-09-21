@@ -16,7 +16,9 @@
     "hudPresentation": "WORLD_FIXED_NOT_HEAD_LOCKED",
     "hudPerspectiveOwnership": "R43_R44_RAW_GAME_WVP_FINITE_PLANE",
     "skyGlow": "VR_OWNED_PER_EYE",
-    "cullingUnionLiveProjectionMutation": false
+    "cullingUnionLiveProjectionMutation": false,
+    "unknownDrawClassification": "FAIL_CLOSED_TO_PROVEN_R26_R23",
+    "hudDiscoveryPolicy": "EXE_ORIGINAL_MOD_SEMANTICS_FIRST_NEVER_WIDEN_DRAW_SCOPE"
   },
   "requiredActiveBuild": {
     "safeDrawCompare": false,
@@ -29,6 +31,12 @@
     "visualPathChangesRequireHmdEvidence": true,
     "transportFallbackChangesRequireHmdEvidence": true,
     "unverifiedVisualExperimentsDefaultOff": true,
-    "doNotReplaceGoldenVisualOwnerWithFullR34WithoutRuntimeApproval": true
+    "doNotReplaceGoldenVisualOwnerWithFullR34WithoutRuntimeApproval": true,
+    "doNotWidenUnknownDrawsToFindHud": true,
+    "hudPromotionRequires": [
+      "verified EXE/original-mod semantic evidence",
+      "or exact runtime caller/texture evidence",
+      "HMD validation on exact SHA"
+    ]
   }
 }
