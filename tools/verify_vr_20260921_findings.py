@@ -61,7 +61,7 @@ def main() -> int:
         "canonical EXE sprite-queue semantics own HUD transforms",
         "R48 final-test policy: screen/perspective HUD ownership comes only",
         "if (!semanticHud && !semanticWorld)",
-        "The EXE queue semantic is the ownership proof",
+        "if (!semanticHud && !semanticWorld)",
     ])
     forbid("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
         "if (state.depthTestEnabled && !state.worldEffect &&",
