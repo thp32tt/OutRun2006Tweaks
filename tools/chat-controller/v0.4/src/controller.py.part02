@@ -1,0 +1,197 @@
+        log.exception("failed to inspect previous slot")
+        return True
+
+
+def stable_hash(text: str) -> str:
+    import hashlib
+    return hashlib.sha256(text.encode("utf-8", errors="ignore")).hexdigest()
+
+
+async def last_assistant_text(page: Page) -> str:
+    for sel in ASSISTANT_MESSAGE_SELECTORS:
+        try:
+            loc = page.locator(sel)
+            count = await loc.count()
+            if count:
+                return (await loc.nth(count - 1).inner_text(timeout=2000)).strip()
+        except Exception:
+            continue
+    return ""
+
+
+async def click_continue_generating(page: Page) -> bool:
+    loc = await first_visible(page, CONTINUE_GENERATING_SELECTORS)
+    if not loc:
+        return False
+    try:
+        await loc.click()
+        await page.wait_for_timeout(1000)
+        return True
+    except Exception:
+        log.exception("continue-generating click failed")
+        return False
+
+
+async def click_stop_generating(page: Page) -> bool:
+    loc = await first_visible(page, BUSY_SELECTORS)
+    if not loc:
+        return False
+    try:
+        await loc.click()
+        await page.wait_for_timeout(3000)
+        return True
+    except Exception:
+        log.exception("stop-generating click failed")
+        return False
+
+
+def minutes_since(value: Optional[str], now: datetime) -> Optional[float]:
+    if not value:
+        return None
+    try:
+        dt = datetime.fromisoformat(value)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=TZ)
+        return (now - dt.astimezone(TZ)).total_seconds() / 60.0
+    except Exception:
+        return None
+
+
+async def watchdog_cycle(page: Page):
+    if not WATCHDOG_ENABLED or not AUTO_SEND:
+        return
+    now = datetime.now(TZ)
+    reg = load_registry(now)
+    candidates = [(i, s) for i, s in enumerate(reg.slots) if s.url and s.last_sent_at]
+    if not candidates:
+        return
+
+    # A~F 전체를 감시한다. 한 Chat이 멈춰도 다른 Chat의 watchdog/정규 스케줄을 막지 않는다.
+    # 오래된 last_watchdog_at/last_sent_at 순으로 확인해 starvation을 방지한다.
+    def watch_key(item):
+        _, slot = item
+        return slot.last_watchdog_at or slot.last_sent_at or ""
+
+    for idx, slot in sorted(candidates, key=watch_key):
+        if slot.watchdog_resumes_since_schedule >= WATCHDOG_MAX_RESUMES_PER_RUN:
+            continue
+        try:
+            await page.goto(slot.url, wait_until="domcontentloaded", timeout=60000)
+            await page.wait_for_timeout(900)
+        except Exception:
+            log.exception("watchdog navigation failed slot=%s", slot.name)
+            continue
+
+        if await detect_limit(page):
+            write_runtime(status="limit_detected", last_action=f"Watchdog stopped: limit detected while checking slot {slot.name}")
+            return
+
+        # ChatGPT 자체의 'Continue generating'이 보이면 입력보다 먼저 사용한다.
+        if await click_continue_generating(page):
+            slot.last_watchdog_at = now.isoformat()
+            slot.last_result = "watchdog_continue_clicked"
+            save_registry(reg)
+            write_runtime(status="watchdog_continue", last_action=f"Clicked Continue generating on slot {slot.name}")
+            log.info("watchdog clicked continue-generating slot=%s", slot.name)
+            continue
+
+        text = await last_assistant_text(page)
+        h = stable_hash(text) if text else None
+        if h and h != slot.last_assistant_hash:
+            slot.last_assistant_hash = h
+            slot.last_assistant_change_at = now.isoformat()
+            slot.last_watchdog_at = now.isoformat()
+            save_registry(reg)
+            continue
+        if not slot.last_assistant_change_at:
+            slot.last_assistant_change_at = slot.last_sent_at or now.isoformat()
+            slot.last_watchdog_at = now.isoformat()
+            save_registry(reg)
+            continue
+
+        stale_min = minutes_since(slot.last_assistant_change_at, now) or 0
+        busy = await detect_busy(page)
+
+        if busy:
+            if stale_min < WATCHDOG_BUSY_STALL_MINUTES:
+                slot.last_watchdog_at = now.isoformat()
+                save_registry(reg)
+                continue
+            if not WATCHDOG_FORCE_STOP_STALLED:
+                slot.last_result = "watchdog_busy_stalled"
+                slot.last_watchdog_at = now.isoformat()
+                save_registry(reg)
+                write_runtime(
+                    status="watchdog_busy_stalled",
+                    last_action=f"Slot {slot.name} unchanged {stale_min:.1f}m but still generating; other slots continue",
+                )
+                continue
+            if not await click_stop_generating(page):
+                continue
+            if await detect_busy(page):
+                continue
+        elif stale_min < WATCHDOG_STALL_MINUTES:
+            slot.last_watchdog_at = now.isoformat()
+            save_registry(reg)
+            continue
+
+        prompt = read_prompt("watchdog_resume.md")
+        thinking_ok = await ensure_thinking_level(page)
+        if not thinking_ok and STRICT_THINKING_LEVEL:
+            slot.last_result = "thinking_level_unverified"
+            slot.last_watchdog_at = now.isoformat()
+            save_registry(reg)
+            write_runtime(status="thinking_level_blocked", last_action=f"Watchdog did not send slot {slot.name}: {PREFERRED_THINKING_LEVEL} could not be verified")
+            continue
+        sent = await send_message(page, prompt)
+        if not sent:
+            slot.last_result = "watchdog_input_not_found"
+            slot.last_watchdog_at = now.isoformat()
+            save_registry(reg)
+            write_runtime(status="ui_changed", last_action=f"Watchdog could not find input for slot {slot.name}")
+            continue
+        slot.watchdog_resumes_since_schedule += 1
+        slot.last_watchdog_at = now.isoformat()
+        slot.last_sent_at = now.isoformat()
+        slot.last_assistant_change_at = now.isoformat()
+        slot.last_result = "watchdog_resume_sent"
+        save_registry(reg)
+        write_runtime(
+            status="watchdog_resume_sent",
+            last_action=f"Sent continuation prompt to stalled/idle slot {slot.name}",
+            active_slot=slot.name,
+            active_url=slot.url,
+        )
+        log.info("watchdog resumed slot=%s stale_min=%.1f busy=%s", slot.name, stale_min, busy)
+
+
+async def run_cycle(page: Page):
+    now = datetime.now(TZ)
+    reg = load_registry(now)
+
+    if not await ensure_logged_in(page):
+        write_runtime(status="login_required", last_action="Open noVNC and log in to ChatGPT")
+        log.warning("ChatGPT login required; open noVNC on port 6080")
+        return
+
+    if await detect_limit(page):
+        write_runtime(status="limit_detected", last_action="Skipped automatic send")
+        log.warning("usage/limit signal detected; skipping")
+        return
+
+    # 다른 슬롯이 생성 중이어도 막지 않는다. 10분마다 A~F를 독립적으로 순환한다.
+    slot = reg.slots[reg.next_slot]
+    is_new = not slot.url
+
+    if is_new:
+        await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
+        await page.wait_for_timeout(1000)
+        prompt = read_prompt("bootstrap_review.md")
+    else:
+        await page.goto(slot.url, wait_until="domcontentloaded", timeout=60000)
+        await page.wait_for_timeout(1000)
+        if await detect_busy(page):
+            # 이 Chat은 그대로 계속 일하게 두고 다음 tick에는 다음 슬롯으로 진행한다.
+            slot.last_result = "busy_skipped"
+            reg.next_slot = (reg.next_slot + 1) % len(reg.slots)
+            save_registry(reg)
