@@ -98,6 +98,48 @@
           "needle": "RankMarker_Truncate = 0xBB046"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-HEART-SEMANTIC-RENDER-PATH",
+      "rva": "0x0005B475",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "discover",
+      "purpose": "Attached-heart render-helper path entered only after the 0x5B470 no-draw bypass.",
+      "sourceBindings": [
+        {
+          "path": "src/interpolation.cpp",
+          "needle": "Module::exe_ptr(0x5B475)"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-HEART-SEMANTIC-LOOP-ADVANCE",
+      "rva": "0x0005B4C0",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "discover",
+      "purpose": "Common attached-heart loop-advance boundary used to cancel an unconsumed one-shot semantic.",
+      "sourceBindings": [
+        {
+          "path": "src/interpolation.cpp",
+          "needle": "Module::exe_ptr(0x5B4C0)"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-PARTICLE-DRAWPRIMITIVEUP-DISPATCH",
+      "rva": "0x00019178",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "discover",
+      "purpose": "Particle DrawPrimitiveUP dispatch; semantic arm is delayed until this committed draw boundary.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_bugfixes.cpp",
+          "needle": "particle_draw_dispatch_HookAddr = 0x19178"
+        }
+      ]
     }
   ]
 }
