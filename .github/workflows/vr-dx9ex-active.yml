@@ -17,6 +17,7 @@ on:
       - 'OutRun2006Tweaks.ini'
       - 'OutRun2006Tweaks.lods.ini'
       - 'tools/OutRunVR-TestProfiles.ps1'
+      - 'docs/VR_TEST_STRATEGY.md'
       - '.github/workflows/vr-dx9ex-active.yml'
 
 concurrency:
