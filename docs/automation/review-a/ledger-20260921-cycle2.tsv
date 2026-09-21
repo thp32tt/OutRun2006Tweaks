@@ -1,0 +1,101 @@
+unit_id	target_sha	dependency_identity	file/path	function-or-code-path	review_lens	hypothesis/category	concrete_evidence	disposition	type
+A2-001	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	TrackManagedTexture/null	lifetime	null texture enters tracking	null returns before cursor mutation	FALSIFIED	falsification
+A2-002	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	TrackManagedTexture/ring-slot	ownership	tracking index escapes capacity	cursor modulo 256	PASS	new coverage
+A2-003	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	TrackManagedTexture/release-store	synchronization	reader misses publication	store uses release	PASS	cross-trace
+A2-004	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	IsTrackedManagedTexture/null	lifetime	null tracked	null returns false	FALSIFIED	falsification
+A2-005	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	IsTrackedManagedTexture/acquire	synchronization	unordered read	loads use acquire	PASS	new coverage
+A2-006	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	TextureLockRectR13/original-first	control-flow	diagnostics alter lock	original executes first	FALSIFIED	falsification
+A2-007	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	TextureLockRectR13/untracked	control-flow	untracked policy changes	original HRESULT returned	PASS	new coverage
+A2-008	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	TextureLockRectR13/failure	error-recovery	failure hidden	counter+error log	PASS	cross-trace
+A2-009	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	TextureUnlockRectR13/original	control-flow	unlock rewritten	original HRESULT returned	FALSIFIED	falsification
+A2-010	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	EnsureTextureLockInstrumentation/idempotence	lifetime	hooks reinstall	returns when both armed	PASS	new coverage
+A2-011	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	EnsureTextureLockInstrumentation/vtable	ownership	null vtable deref	null returns	FALSIFIED	falsification
+A2-012	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	EnsureTextureLockInstrumentation/lock-hook	creation	LockRect hook absent	creates vtable[19] hook	PASS	new coverage
+A2-013	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	EnsureTextureLockInstrumentation/unlock-hook	creation	UnlockRect hook absent	creates vtable[20] hook	PASS	new coverage
+A2-014	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	CreateTextureCompatDestR13/delegate	control-flow	bypasses compat allocator	delegates first	PASS	cross-trace
+A2-015	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	CreateTextureCompatDestR13/managed-gate	ownership	default texture tracked	requires MANAGED+success+compat	FALSIFIED	falsification
+A2-016	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	InstallManagedResourceCompatR13/base-install	creation	continues on base failure	false immediately	PASS	new coverage
+A2-017	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	InstallManagedResourceCompatR13/reset-handoff	ownership	disarms Reset early	retains shim through R14/R15	PASS	cross-trace
+A2-018	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	InstallManagedResourceCompatR13/create-hook	creation	hook assumed present	creation checked+warn	PASS	new coverage
+A2-019	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	D3D9ExR13HardeningHook/validate	config	active when Ex disabled	VRPreferD3D9Ex gate	FALSIFIED	falsification
+A2-020	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	D3D9ExR13HardeningHook/apply	error-recovery	failed hook leaves enabled	logs+false	PASS	new coverage
+A2-021	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	DisarmLegacyResetHook/presence	ownership	clears absent hook	only if hook exists	PASS	new coverage
+A2-022	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	DisarmLegacyResetHook/synchronous	ownership	two Reset owners remain	hook cleared synchronously	PASS	cross-trace
+A2-023	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	NormalizeLegacyPresentResult/noncompat	fallback	noncompat altered	unchanged result	FALSIFIED	falsification
+A2-024	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	NormalizeLegacyPresentResult/modechanged	fallback	mode change leaks	maps DEVICELOST	PASS	new coverage
+A2-025	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	NormalizeLegacyPresentResult/occluded-windowed	fallback	window occlusion loses device	maps D3D_OK	PASS	new coverage
+A2-026	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	NormalizeLegacyPresentResult/occluded-fullscreen	fallback	fullscreen occlusion ignored	maps DEVICELOST	PASS	cross-trace
+A2-027	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	ResetCompatDevice/param-gate	reset	null params reach ResetEx	false+INVALIDCALL	FALSIFIED	falsification
+A2-028	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	ResetCompatDevice/QI	reset	non-Ex invoked as Ex	QI required	PASS	new coverage
+A2-029	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	ResetCompatDevice/fullscreen	reset	misses fullscreen conversion	BuildFullscreenMode feeds ResetEx	PASS	cross-trace
+A2-030	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r13	src/vr/d3d9/ex_device_upgrade_r13.cpp	ResetCompatDevice/classic-replay	state	ResetEx omits baseline	UpdateCompatPresentationState+RestoreClassicResetState	PASS	cross-trace
+A2-031	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	GameplayActive/is_in_game	control-flow	goal/timeup drop stereo	is_in_game accepted	PASS	new coverage
+A2-032	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	GameplayActive/warp	fallback	warp forces theater	WARP treated gameplay	FALSIFIED	falsification
+A2-033	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	GameplayActive/restart	fallback	restart forces theater	RESTART treated gameplay	FALSIFIED	falsification
+A2-034	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	HostRenderEligible/header	ownership	invalid header enables stereo	magic/version/size required	PASS	new coverage
+A2-035	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	HostRenderEligible/liveness	lifetime	shouldRender tears source	uses Alive+Visible only	PASS	cross-trace
+A2-036	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	StereoWanted/gates	control-flow	stereo outside gameplay	requires stereo+gameplay+host	FALSIFIED	falsification
+A2-037	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	ReadProjection/probe-first	state	raw RVA overrides probe	probe preferred	PASS	new coverage
+A2-038	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	ReadProjection/rva-range	memory-safety	invalid range read	range+readability gated	FALSIFIED	falsification
+A2-039	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	ReadProjection/signature	state	nonperspective accepted	finite and perspective signature	PASS	new coverage
+A2-040	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	GetInverseProjection/cache-key	state	stale inverse reused	memcmp invalidates	FALSIFIED	falsification
+A2-041	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	EnsureSharedState/existing	ownership	incompatible mapping accepted	validates header	PASS	new coverage
+A2-042	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	EnsureSharedState/new-publish	synchronization	magic published early	barrier before magic	PASS	cross-trace
+A2-043	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	MakeRenderFrameRunGeneration/nonzero	lifetime	zero generation	zero forced to 1	FALSIFIED	falsification
+A2-044	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	ClaimRenderFrameRing/header	ownership	bad ring claimed	full header required	PASS	new coverage
+A2-045	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	ClaimRenderFrameRing/fast-path	ownership	cached claim ignores PID	PID+generation match	FALSIFIED	falsification
+A2-046	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	ClaimRenderFrameRing/seqlock-open	synchronization	writes while even	normalizes odd	PASS	cross-trace
+A2-047	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	ClaimRenderFrameRing/slot-reset	lifetime	old slots survive	all memset/rebuilt	FALSIFIED	falsification
+A2-048	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	ClaimRenderFrameRing/slot-identity	ownership	slot lacks run identity	PID+generation stored	PASS	cross-trace
+A2-049	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	ClaimRenderFrameRing/magic-order	synchronization	partial slot visible	barrier before magic	PASS	new coverage
+A2-050	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	ClaimRenderFrameRing/seqlock-close	synchronization	ring left odd	normalizes even	FALSIFIED	falsification
+A2-051	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	EnsureRenderFrameState/existing	control-flow	existing bypasses claim	calls Claim current run	PASS	cross-trace
+A2-052	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	EnsureRenderFrameState/map-fail	resource-lifetime	failed map used	returns false	PASS	new coverage
+A2-053	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	EnsureRenderFrameState/new-header	creation	magic before slots	slots then barrier then magic	PASS	cross-trace
+A2-054	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	PoisonFrame/first-reason	error-recovery	root cause overwritten	first reason retained	PASS	new coverage
+A2-055	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	BuildEyeConstants/tracked-zero	classification	masked shader fixed-function	checks real bound shader	FALSIFIED	falsification
+A2-056	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	BuildEyeConstants/fvf	classification	XYZRHW world stereo	only XYZ/B accepted	FALSIFIED	falsification
+A2-057	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	BuildEyeConstants/transform-read	state	failed transforms proceed	returns NonWorld	PASS	new coverage
+A2-058	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	BuildEyeConstants/projection-class	classification	orthographic becomes world	requires Perspective3D	FALSIFIED	falsification
+A2-059	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	BuildEyeConstants/menu-depth-gate	classification	car-select becomes world	gameplay+Z feed policy	PASS	cross-trace
+A2-060	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r7	src/vr/d3d9/stereo_renderer_r7.inc	BuildEyeConstants/pose-match	state	stale head mixes frame	pose sequence must match	PASS	cross-trace
+A2-061	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	EnumGameWindows/visibility	startup	hidden helper selected	requires visible	PASS	new coverage
+A2-062	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	EnumGameWindows/area	startup	tiny window selected	>=320x200 largest area	FALSIFIED	falsification
+A2-063	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	ProcessAliveForSelection/open	lifetime	unopenable PID alive	failure false	PASS	new coverage
+A2-064	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	ProcessAliveForSelection/wait	lifetime	terminated PID alive	only WAIT_TIMEOUT alive	FALSIFIED	falsification
+A2-065	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	SharedClientPid/header	ownership	stale mapping PID trusted	header gates PID	PASS	cross-trace
+A2-066	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	ProcessCreationKey/failure	startup	unknown creation outranks valid	failure zero	PASS	new coverage
+A2-067	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	FindGameProcess/shared-first	ownership	Toolhelp preferred	live shared PID preferred	PASS	cross-trace
+A2-068	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	FindGameProcess/newest-fallback	startup	first process wins	greatest creation key	FALSIFIED	falsification
+A2-069	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	WaitForGameWindow/rebind	startup	locks stale PID	re-runs selection	PASS	cross-trace
+A2-070	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	FindAdapter/luid	ownership	wrong GPU adapter	exact LUID match	FALSIFIED	falsification
+A2-071	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	FindAdapter/no-match	error-recovery	silent fallback	throws no match	PASS	new coverage
+A2-072	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	D3DObjects/move-ctor	resource-lifetime	duplicate COM ownership	exchange nulls source	PASS	new coverage
+A2-073	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	D3DObjects/move-assign	resource-lifetime	leaks prior resources	releases before exchange	FALSIFIED	falsification
+A2-074	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	D3DObjects/destructor	resource-lifetime	device/context leak	releases both	PASS	new coverage
+A2-075	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	CreateD3D11Device/feature-filter	creation	below runtime minimum	filters >= min	FALSIFIED	falsification
+A2-076	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	CreateD3D11Device/adapter-release	resource-lifetime	adapter leak	released before CheckHr	PASS	new coverage
+A2-077	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	NormalizeQuaternion/nonfinite	state	NaN propagates	identity fallback	FALSIFIED	falsification
+A2-078	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	ToHeadLocal	state	eye remains world-space	subtract+inverse rotate	PASS	cross-trace
+A2-079	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	QueryProcessLiveness/unknown	lifetime	access denial treated dead	maps Unknown	FALSIFIED	falsification
+A2-080	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:main	vrhost/src/main.cpp	SharedWriter/creation-contract	ownership	mapping lacks ownership contract	constructor enters ownership class path	PASS	new coverage
+A2-081	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23UsableGameplayBootstrapFrame/required-flags	state	partial frame bootstraps	requires complete+world+duplicated+pose	FALSIFIED	falsification
+A2-082	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23UsableGameplayBootstrapFrame/inflight	synchronization	inflight accepted	rejects PresentInFlight	FALSIFIED	falsification
+A2-083	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23UsableGameplayBootstrapFrame/direct-slot	bounds	OOB direct slot	ring bound required	PASS	new coverage
+A2-084	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23UsableGameplayBootstrapFrame/direct-generation	ownership	zero generation accepted	nonzero required	FALSIFIED	falsification
+A2-085	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23UsableGameplayBootstrapFrame/direct-handles	resource-lifetime	missing handle accepted	both handles required	PASS	new coverage
+A2-086	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23UsableGameplayBootstrapFrame/dimensions	state	eye size differs	must equal backbuffer	PASS	cross-trace
+A2-087	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23MetricWindow/Add	diagnostics	invalid timings poison	nonfinite/negative ignored	FALSIFIED	falsification
+A2-088	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23MetricWindow/P95	diagnostics	P95 OOB	index clamped	PASS	new coverage
+A2-089	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23PipelineWindow/Note	diagnostics	normal states reject	known normal excluded	FALSIFIED	falsification
+A2-090	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23DirectHoldState/destructor	resource-lifetime	cache resources leak	releases eyes+SRVs	PASS	new coverage
+A2-091	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23FrameIdBefore/wrap	state	naive unsigned order	signed delta handles wrap	PASS	cross-trace
+A2-092	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23ReleaseDirectHoldResources	resource-lifetime	stale validity remains	metadata reset+valid false	PASS	new coverage
+A2-093	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23InvalidateDirectHold	lifetime	invalidation releases cache	only authority metadata invalidated	PASS	cross-trace
+A2-094	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23StageDirectHold/input-gates	ownership	missing inputs accepted	context/device/slot/frame/gen/textures required	FALSIFIED	falsification
+A2-095	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23StageDirectHold/desc-match	state	mismatched eyes copied	desc fields compared	FALSIFIED	falsification
+A2-096	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23StageDirectHold/frame-size	state	texture size diverges	must match backbuffer	PASS	cross-trace
+A2-097	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23StageDirectHold/recreate	resource-lifetime	cache reused after format change	recreate covers size/mips/array/format	PASS	new coverage
+A2-098	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23StageDirectHold/release-before-recreate	resource-lifetime	recreate leaks old hold	release called first	PASS	new coverage
+A2-099	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23FinalCounters/actual-kind	diagnostics	requested label hides fallback	counter deltas determine actual	FALSIFIED	falsification
+A2-100	73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0	73f3b59b:r23	vrhost/src/main_r23.cpp	R23CachedProjectionHold/policy	fallback	short gap exposes theater	1000ms cached projection hold	PASS	cross-trace
