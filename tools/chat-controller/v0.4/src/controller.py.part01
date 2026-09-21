@@ -1,0 +1,214 @@
+    # UI가 변경된 경우 false로 보수적으로 처리
+    return False
+
+
+
+
+THINKING_LABEL_ALIASES = {
+    "Instant": ["Instant", "즉시"],
+    "Medium": ["Medium", "중간"],
+    "High": ["High", "높음"],
+    "Extra High": ["Extra High", "매우 높음", "최고"],
+}
+ALL_THINKING_LABELS = [x for values in THINKING_LABEL_ALIASES.values() for x in values]
+
+
+async def visible_exact_text(page: Page, text: str):
+    """Return a visible element whose rendered text exactly matches text."""
+    candidates = [
+        page.get_by_role("button", name=text, exact=True),
+        page.get_by_role("menuitem", name=text, exact=True),
+        page.get_by_role("option", name=text, exact=True),
+        page.get_by_text(text, exact=True),
+    ]
+    for loc in candidates:
+        try:
+            count = await loc.count()
+            for i in range(min(count, 8)):
+                item = loc.nth(i)
+                if await item.is_visible(timeout=250):
+                    return item
+        except Exception:
+            continue
+    return None
+
+
+async def current_thinking_level(page: Page) -> Optional[str]:
+    """Best-effort detection of the level shown in the web composer picker."""
+    # Prefer visible buttons with an exact known level label. Menu choices are normally
+    # hidden until the picker opens, so an exact visible button is a good current-state signal.
+    for canonical, aliases in THINKING_LABEL_ALIASES.items():
+        for label in aliases:
+            try:
+                loc = page.get_by_role("button", name=label, exact=True)
+                count = await loc.count()
+                for i in range(min(count, 6)):
+                    if await loc.nth(i).is_visible(timeout=200):
+                        return canonical
+            except Exception:
+                continue
+    return None
+
+
+async def find_thinking_picker(page: Page):
+    # 1) Exact current-level button, which is the normal 2026 web UI shape.
+    for label in ALL_THINKING_LABELS:
+        try:
+            loc = page.get_by_role("button", name=label, exact=True)
+            count = await loc.count()
+            for i in range(min(count, 6)):
+                item = loc.nth(i)
+                if await item.is_visible(timeout=200):
+                    return item
+        except Exception:
+            continue
+
+    # 2) accessibility/title fallbacks for gradual UI variants.
+    selectors = [
+        "button[aria-label*='thinking' i]",
+        "button[aria-label*='reasoning' i]",
+        "button[aria-label*='model' i]",
+        "button[title*='thinking' i]",
+        "button[title*='reasoning' i]",
+        "button[title*='model' i]",
+    ]
+    for sel in selectors:
+        try:
+            loc = page.locator(sel)
+            count = await loc.count()
+            for i in range(min(count, 10)):
+                item = loc.nth(i)
+                if await item.is_visible(timeout=200):
+                    return item
+        except Exception:
+            continue
+    return None
+
+
+async def ensure_thinking_level(page: Page, requested: str = PREFERRED_THINKING_LEVEL) -> bool:
+    """Select and verify the requested ChatGPT thinking level before a send.
+
+    In strict mode the caller must not send if this cannot be positively verified.
+    """
+    requested = requested.strip() or "High"
+    aliases = THINKING_LABEL_ALIASES.get(requested, [requested])
+
+    current = await current_thinking_level(page)
+    if current == requested:
+        write_runtime(last_thinking_level_result=f"verified:{requested}")
+        return True
+
+    picker = await find_thinking_picker(page)
+    if not picker:
+        write_runtime(last_thinking_level_result=f"picker_not_found:{requested}")
+        return False
+
+    try:
+        await picker.click()
+        await page.wait_for_timeout(500)
+    except Exception:
+        log.exception("thinking picker click failed")
+        write_runtime(last_thinking_level_result=f"picker_click_failed:{requested}")
+        return False
+
+    option = None
+    # Prefer semantic menu/option/button matches before generic text.
+    for label in aliases:
+        for role in ("menuitem", "option", "button"):
+            try:
+                loc = page.get_by_role(role, name=label, exact=True)
+                count = await loc.count()
+                for i in range(min(count, 8)):
+                    item = loc.nth(i)
+                    if await item.is_visible(timeout=300):
+                        # Avoid just re-clicking the current picker button when possible.
+                        option = item
+                        break
+                if option:
+                    break
+            except Exception:
+                continue
+        if option:
+            break
+
+    if option is None:
+        for label in aliases:
+            option = await visible_exact_text(page, label)
+            if option:
+                break
+
+    if option is None:
+        try:
+            await page.keyboard.press("Escape")
+        except Exception:
+            pass
+        write_runtime(last_thinking_level_result=f"option_not_found:{requested}")
+        return False
+
+    try:
+        await option.click()
+        await page.wait_for_timeout(700)
+    except Exception:
+        log.exception("thinking level selection failed")
+        write_runtime(last_thinking_level_result=f"selection_failed:{requested}")
+        return False
+
+    # Positive verification after selection. Try the canonical detector first, then
+    # exact visible button labels in case localization is involved.
+    current = await current_thinking_level(page)
+    verified = current == requested
+    if not verified:
+        for label in aliases:
+            try:
+                loc = page.get_by_role("button", name=label, exact=True)
+                count = await loc.count()
+                if any([await loc.nth(i).is_visible(timeout=150) for i in range(min(count, 6))]):
+                    verified = True
+                    break
+            except Exception:
+                continue
+
+    write_runtime(last_thinking_level_result=(f"selected:{requested}" if verified else f"verify_failed:{requested}"))
+    return verified
+
+async def send_message(page: Page, message: str) -> bool:
+    box = await first_visible(page, INPUT_SELECTORS)
+    if not box:
+        return False
+    try:
+        tag = await box.evaluate("el => el.tagName")
+        if tag.lower() == "textarea":
+            await box.fill(message)
+        else:
+            await box.click()
+            await page.keyboard.press("Control+A")
+            await page.keyboard.type(message, delay=1)
+        await page.keyboard.press("Enter")
+        await page.wait_for_timeout(1500)
+        return True
+    except Exception:
+        log.exception("message send failed")
+        return False
+
+
+async def wait_for_chat_url(page: Page, timeout_sec: int = 30) -> Optional[str]:
+    deadline = time.time() + timeout_sec
+    while time.time() < deadline:
+        if "/c/" in page.url:
+            return page.url
+        await page.wait_for_timeout(500)
+    return page.url if "/c/" in page.url else None
+
+
+async def previous_run_still_busy(page: Page, reg: Registry) -> bool:
+    if not any(s.last_sent_at for s in reg.slots):
+        return False
+    prev_idx = (reg.next_slot - 1) % len(reg.slots)
+    prev = reg.slots[prev_idx]
+    if not prev.url:
+        return False
+    try:
+        await page.goto(prev.url, wait_until="domcontentloaded", timeout=60000)
+        await page.wait_for_timeout(1200)
+        return await detect_busy(page)
+    except Exception:
