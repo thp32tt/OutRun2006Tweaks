@@ -1,6 +1,8 @@
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "game_addrs.hpp"
+#include "vr/game/render_semantics.hpp"
+#include <algorithm>
 #include <iostream>
 #include <array>
 
@@ -632,7 +634,11 @@ class RestoreSkyGlow : public Hook
 		*offset = prevOffset * scale;
 		*step = prevStep * scale;
 
-		BlurGlowImage_hook.stdcall();
+		{
+			OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
+				OutRunVR::GameSemantic::RenderScope::SkyGlow);
+			BlurGlowImage_hook.stdcall();
+		}
 
 		*offset = prevOffset;
 		*step = prevStep;
@@ -882,14 +888,39 @@ class ReflectionUpdateRate : public Hook
 	static void FaceCount_dest(SafetyHookContext& ctx)
 	{
 		// Carried between frames so a share that doesn't come to a whole number of
-		// faces still averages out, 0.25 alternating one face and two. A cubemap
-		// left part drawn continues next frame, as the game holds the face cursor.
+		// faces still averages out. In VR, render cadence can be 72/80/90/120 Hz;
+		// normalize the work to elapsed time so 0.5 keeps the original 60 Hz
+		// budget (3 faces/frame * 60) instead of scaling GPU cost with HMD Hz.
 		static float pendingFaces = 0.0f;
+		static LARGE_INTEGER lastCounter{};
+		static LARGE_INTEGER frequency{};
 
-		pendingFaces += FacesPerCubemap * Settings::ReflectionUpdateRate.get();
+		float frameScale60 = 1.0f;
+		if (Settings::VREnabled && Settings::VRNormalizeReflectionRate)
+		{
+			if (frequency.QuadPart <= 0)
+				QueryPerformanceFrequency(&frequency);
+			LARGE_INTEGER now{};
+			QueryPerformanceCounter(&now);
+			if (lastCounter.QuadPart > 0 && frequency.QuadPart > 0 &&
+				now.QuadPart >= lastCounter.QuadPart)
+			{
+				const double dt = static_cast<double>(now.QuadPart - lastCounter.QuadPart) /
+					static_cast<double>(frequency.QuadPart);
+				// Avoid a long pause/load screen producing a one-frame cubemap spike.
+				frameScale60 = static_cast<float>(std::clamp(dt * 60.0, 0.0, 2.0));
+			}
+			lastCounter = now;
+		}
+		else
+		{
+			lastCounter = {};
+		}
 
-		const int faces = int(pendingFaces);
+		pendingFaces += FacesPerCubemap * Settings::ReflectionUpdateRate.get() * frameScale60;
+		const int faces = std::min(FacesPerCubemap, int(pendingFaces));
 		pendingFaces -= float(faces);
+		pendingFaces = std::min(pendingFaces, float(FacesPerCubemap));
 
 		ctx.eax = faces;
 	}
@@ -1048,7 +1079,16 @@ class FixZBufferPrecision : public Hook
 
 		if (allow_znear_override)
 		{
+			// In 6DoF VR the player can move their head through the normal third-
+			// person near plane. Keep the 2D precision fix intact outside VR, but
+			// use the dedicated VR near plane during gameplay/goal rendering.
+			if (Settings::VREnabled && Settings::VRPositionalTracking &&
+				(*Game::current_mode == STATE_GAME || *Game::current_mode == STATE_GOAL))
+			{
+				camera->perspective_znear_BC = Settings::VRNearPlane.get();
+			}
 			// only set znear to 1 if...
+			else
 			if ((camera->cam_mode_34A == 2 || camera->cam_mode_34A == 0) // ... in third-person or FPV
 				&& camera->cam_mode_timer_364 == 0 // ... not switching cameras
 				&& (*Game::current_mode == STATE_GAME || *Game::current_mode == STATE_GOAL)) // ... we're in main game state (not in STATE_START cutscene etc)
@@ -1090,7 +1130,11 @@ class FixZBufferPrecision : public Hook
 		camera->perspective_znear_BC = 0.05f; // game default = 0.1, but that causes lens flare to slightly clip, 0.05 allows it to fade properly
 		CalcCameraMatrix_dest(camera);
 
-		Clr_SceneEffect.call(a1);
+		{
+			OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
+				OutRunVR::GameSemantic::RenderScope::SceneEffect);
+			Clr_SceneEffect.call(a1);
+		}
 
 		// restore orig znear
 		camera->perspective_znear_BC = prev;
@@ -1398,32 +1442,3 @@ class VSyncOverride : public Hook
 
 		// TODO: add MultiSampleType / MultiSampleQuality overrides here?
 		//  (doesn't seem any of them are improvement over vanilla "DX/ANTIALIASING = 2" though...)
-	}
-
-public:
-	std::string_view description() override
-	{
-		return "VSync";
-	}
-
-	bool validate() override
-	{
-		return Settings::VSync != 1 ||
-			(Settings::VREnabled && Settings::VRDisableDesktopVsync);
-	}
-
-	void declare_settings() override
-	{
-		Settings::VSync.needs_restart();
-	}
-
-	bool apply() override
-	{
-		dest_hook = safetyhook::create_mid(Module::exe_ptr(D3DInit_HookAddr), destination);
-
-		return true;
-	}
-
-	static VSyncOverride instance;
-};
-VSyncOverride VSyncOverride::instance;
