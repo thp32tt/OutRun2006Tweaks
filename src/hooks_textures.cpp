@@ -277,7 +277,11 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 	);
 
 	if (FAILED(hr) || !texture)
+	{
+		if (texture)
+			texture->Release();
 		return FAILED(hr) ? hr : E_FAIL;
+	}
 
 	auto failTexture = [&](HRESULT failure) -> HRESULT
 	{
