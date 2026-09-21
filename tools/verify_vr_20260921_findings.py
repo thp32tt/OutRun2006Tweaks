@@ -125,6 +125,10 @@ def main() -> int:
     forbid("src/hooks_graphics.cpp", [
         "return Settings::SkyGlowFactor > 0 &&\n\t\t\t!OutRunVRStereo::IsRuntimeStereoActive();",
     ])
+    graphics = read("src/hooks_graphics.cpp")
+    if graphics.count("StockSkyGlowResourcesOwnedByGame()") < 3:
+        raise AssertionError(
+            "stock SkyGlow allocation and execution must share one ownership predicate")
     require("src/vr/settings.cpp", [
         "DirectGpuOnly requires PreferD3D9Ex",
         "const bool effectiveDirectOnly",
