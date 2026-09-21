@@ -1,6 +1,8 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <filesystem>
+#include <limits>
+#include <system_error>
 #include <ini.h>
 #include <exception.hpp>
 #include <miniz.h>
@@ -44,7 +46,9 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
     wchar_t     zip_filename[MAX_PATH];
     wchar_t     timestamp[128];
     wchar_t*    modulenameptr{};
-    bool        bDumpSuccess;
+    bool        bDumpSuccess = false;
+    bool        crashLogWriteSuccess = false;
+    bool        re4tLogSnapshotReady = false;
     __time64_t  time;
     struct tm   ltime;
     HWND        hWnd;
@@ -77,10 +81,12 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
         ex.ExceptionPointers = ExceptionInfo;
         ex.ClientPointers = TRUE;
 
-        if (!(MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpWithDataSegs, &ex, NULL, NULL)))
-            bDumpSuccess = false;
+        bDumpSuccess =
+            MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile,
+                MiniDumpWithDataSegs, &ex, NULL, NULL) != FALSE;
 
-        CloseHandle(hFile);
+        if (!CloseHandle(hFile))
+            bDumpSuccess = false;
     }
 
     // Logs exception into buffer and writes to file
@@ -89,20 +95,29 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
 
     if (hFile != INVALID_HANDLE_VALUE)
     {
-        auto Log = [ExceptionInfo, hFile](char* buffer, size_t size, bool reg, bool stack, bool trace)
+        auto Log = [ExceptionInfo, hFile](char* buffer, size_t size, bool reg, bool stack, bool trace) noexcept
         {
-            if (LogException(buffer, size, (LPEXCEPTION_POINTERS)ExceptionInfo, reg, stack, trace))
-            {
-                // Write log file
-                DWORD NumberOfBytesWritten = 0;
-                WriteFile(hFile, buffer, strlen(buffer), &NumberOfBytesWritten, NULL);
-            }
+            if (!LogException(buffer, size, (LPEXCEPTION_POINTERS)ExceptionInfo, reg, stack, trace))
+                return false;
+
+            const size_t requested = strlen(buffer);
+            if (requested == 0 ||
+                requested > static_cast<size_t>((std::numeric_limits<DWORD>::max)()))
+                return false;
+
+            DWORD NumberOfBytesWritten = 0;
+            return WriteFile(hFile, buffer, static_cast<DWORD>(requested),
+                &NumberOfBytesWritten, NULL) != FALSE &&
+                NumberOfBytesWritten == requested;
         };
+
+        bool logContentWritten = false;
 
         // Try to make a very descriptive exception, for that we need to malloc a huge buffer...
         if (auto buffer = (char*)malloc(max_logsize_ever))
         {
-            Log(buffer, max_logsize_ever, true, true, true);
+            logContentWritten =
+                Log(buffer, max_logsize_ever, true, true, true);
             free(buffer);
         }
         else
@@ -112,17 +127,66 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
             static char static_buf[size];
             static_assert(size <= max_static_buffer, "Static buffer is too big");
 
-            Log(buffer = static_buf, sizeof(static_buf), true, true, false);
+            logContentWritten =
+                Log(static_buf, sizeof(static_buf), true, true, false);
         }
-        CloseHandle(hFile);
+
+        crashLogWriteSuccess =
+            logContentWritten && CloseHandle(hFile) != FALSE;
     }
 
-    // Copy re4_tweaks log file to CrashDumps
+    // Snapshot the tweaks log without allowing filesystem/path-construction
+    // failures to escape from the unhandled-exception filter. Use a per-crash
+    // destination so evidence retained after an earlier failed ZIP is preserved.
+    try
     {
-        swprintf_s(re4t_log_filename, L"%s\\%s\\OutRun2006Tweaks.log", modulename, L"CrashDumps");
+        std::error_code source_ec;
+        if (std::filesystem::is_regular_file(Module::LogPath, source_ec) &&
+            !source_ec)
+        {
+            for (unsigned suffix = 0; suffix < 100; ++suffix)
+            {
+                if (suffix == 0)
+                    swprintf_s(re4t_log_filename,
+                        L"%s\\%s\\OutRun2006Tweaks.%s.log",
+                        modulename, L"CrashDumps", timestamp);
+                else
+                    swprintf_s(re4t_log_filename,
+                        L"%s\\%s\\OutRun2006Tweaks.%s.%u.log",
+                        modulename, L"CrashDumps", timestamp, suffix);
 
-        if (std::filesystem::exists(Module::LogPath))
-            std::filesystem::copy_file(Module::LogPath, re4t_log_filename);
+                const std::filesystem::path snapshotPath(re4t_log_filename);
+
+                std::error_code exists_ec;
+                if (std::filesystem::exists(snapshotPath, exists_ec))
+                {
+                    if (exists_ec)
+                        break;
+                    continue;
+                }
+                if (exists_ec)
+                    break;
+
+                std::error_code copy_ec;
+                re4tLogSnapshotReady = std::filesystem::copy_file(
+                    Module::LogPath,
+                    snapshotPath,
+                    std::filesystem::copy_options::none,
+                    copy_ec);
+                if (re4tLogSnapshotReady)
+                    break;
+
+                // Retry only if another writer won the destination-name race.
+                std::error_code collision_ec;
+                if (!std::filesystem::exists(snapshotPath, collision_ec) ||
+                    collision_ec)
+                    break;
+            }
+        }
+    }
+    catch (...)
+    {
+        re4tLogSnapshotReady = false;
     }
 
     bool zip_created = false;
@@ -141,43 +205,52 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
           // Required crash evidence must all be present, but success is not
           // published until archive finalization, writer teardown, and the
           // underlying FILE flush/close have also succeeded.
-          bool required_entries_ok = true;
+          bool required_entries_ok =
+            bDumpSuccess && crashLogWriteSuccess && re4tLogSnapshotReady;
 
-          if (!mz_zip_writer_add_file(&zip_archive, "dump.dmp", dump_filename, nullptr, 0, 3))
+          if (bDumpSuccess &&
+              !mz_zip_writer_add_file(&zip_archive, "dump.dmp", dump_filename, nullptr, 0, 3))
             required_entries_ok = false;
-          if (!mz_zip_writer_add_file(&zip_archive, "crash.log", crash_log_filename, nullptr, 0, 3))
+          if (crashLogWriteSuccess &&
+              !mz_zip_writer_add_file(&zip_archive, "crash.log", crash_log_filename, nullptr, 0, 3))
             required_entries_ok = false;
-          if (!mz_zip_writer_add_file(&zip_archive, "OutRun2006Tweaks.log", re4t_log_filename, nullptr, 0, 3))
+          if (re4tLogSnapshotReady &&
+              !mz_zip_writer_add_file(&zip_archive, "OutRun2006Tweaks.log", re4t_log_filename, nullptr, 0, 3))
             required_entries_ok = false;
 
-          // VR diagnostics are optional. A crash can happen while one of these
-          // files is still open, so an optional add failure must never suppress
-          // the primary dump/log archive.
-          auto add_optional_vr_file = [&zip_archive](const char* archive_name,
-              const std::filesystem::path& source)
-          {
-            if (!std::filesystem::exists(source) ||
-                !std::filesystem::is_regular_file(source))
-              return;
-            const std::wstring wide = source.wstring();
-            mz_zip_writer_add_file(&zip_archive, archive_name, wide.c_str(),
-              nullptr, 0, 3);
-          };
-
-          const std::filesystem::path game_dir = Module::ExePath.parent_path();
-          add_optional_vr_file("vr/OutRun2006Tweaks-hudtrace.csv",
-            game_dir / "OutRun2006Tweaks-hudtrace.csv");
-          add_optional_vr_file("vr/OutRun2006Tweaks-xstmap.csv",
-            game_dir / "OutRun2006Tweaks-xstmap.csv");
-          add_optional_vr_file("vr/CURRENT_VR_SESSION.json",
-            game_dir / "CURRENT_VR_SESSION.json");
-          add_optional_vr_file("vr/ACTIVE_VR_BACKEND.txt",
-            game_dir / "ACTIVE_VR_BACKEND.txt");
-          add_optional_vr_file("vr/BUILD_INPUTS.json",
-            game_dir / "BUILD_INPUTS.json");
-
+          // VR diagnostics are optional. Keep every path construction,
+          // metadata lookup and directory traversal behind a no-throw boundary
+          // so optional evidence can never abort the primary crash archive.
           try
           {
+            auto add_optional_vr_file = [&zip_archive](const char* archive_name,
+                const std::filesystem::path& source) noexcept
+            {
+              try
+              {
+                std::error_code metadata_ec;
+                if (!std::filesystem::is_regular_file(source, metadata_ec) ||
+                    metadata_ec)
+                  return;
+                const std::wstring wide = source.wstring();
+                mz_zip_writer_add_file(&zip_archive, archive_name, wide.c_str(),
+                  nullptr, 0, 3);
+              }
+              catch (...) {}
+            };
+
+            const std::filesystem::path game_dir = Module::ExePath.parent_path();
+            add_optional_vr_file("vr/OutRun2006Tweaks-hudtrace.csv",
+              game_dir / "OutRun2006Tweaks-hudtrace.csv");
+            add_optional_vr_file("vr/OutRun2006Tweaks-xstmap.csv",
+              game_dir / "OutRun2006Tweaks-xstmap.csv");
+            add_optional_vr_file("vr/CURRENT_VR_SESSION.json",
+              game_dir / "CURRENT_VR_SESSION.json");
+            add_optional_vr_file("vr/ACTIVE_VR_BACKEND.txt",
+              game_dir / "ACTIVE_VR_BACKEND.txt");
+            add_optional_vr_file("vr/BUILD_INPUTS.json",
+              game_dir / "BUILD_INPUTS.json");
+
             for (const auto& entry :
                 std::filesystem::directory_iterator(game_dir))
             {
