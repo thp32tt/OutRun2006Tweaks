@@ -12,7 +12,7 @@ services:
       TZ: Asia/Seoul
       AUTO_SEND: "${AUTO_SEND:-false}"
       SCHEDULE_MINUTES: "7,17,27,37,47,57"
-      CHAT_SLOTS: "6"
+      CHAT_SLOTS: "3"
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"
       PREFERRED_THINKING_LEVEL: "High"
