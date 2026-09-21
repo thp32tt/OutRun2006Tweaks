@@ -46,6 +46,7 @@ namespace Settings
 	extern Setting<bool> VREnabled;
 	extern Setting<bool> VRAutoEnableWhenHostPresent;
 	extern Setting<bool> VRStereo;
+	extern Setting<bool> VRPreferD3D9Ex;
 	extern Setting<bool> VRDirectGpuOnly;
 	extern Setting<float> VRWorldScale;
 	extern Setting<float> VRStereoDepth;
@@ -318,11 +319,16 @@ namespace OutRunVRStereo
 			return SharedState && (SharedState->flags & OutRunVR::HostDirectGpuReady) != 0;
 		}
 
+		bool RuntimeStereoEligible()
+		{
+			return Settings::VRStereo && GameplayActive() &&
+				HostRenderEligible() &&
+				(Settings::VREnabled || Settings::VRAutoEnableWhenHostPresent);
+		}
+
 		bool StereoWanted()
 		{
-			const bool hostEligible = HostRenderEligible();
-			const bool wanted = Settings::VRStereo && GameplayActive() && hostEligible &&
-				(Settings::VREnabled || Settings::VRAutoEnableWhenHostPresent);
+			const bool wanted = RuntimeStereoEligible();
 			if (wanted && !LastStereoWanted && TrackedDepthStencil)
 			{
 				RightDepthSynchronized = false;
@@ -1427,7 +1433,7 @@ namespace OutRunVRStereo
 						spdlog::info("VR stereo: 4-slot direct GPU transport uses bounded post-Present completion; source eye={}x{}",BackBufferDesc.Width,BackBufferDesc.Height);
 					}
 				}
-				else if(Settings::VRDirectGpuOnly)
+				else if(Settings::VRDirectGpuOnly && Settings::VRPreferD3D9Ex)
 				{
 					markDirectOnlyHold();
 				}
@@ -1621,6 +1627,14 @@ namespace OutRunVRStereo
 			return 0;
 		}
 
+	}
+
+	bool IsRuntimeStereoActive() noexcept
+	{
+		// Pure view of the same eligibility predicate used by StereoWanted().
+		// Consumers such as stock mono SkyGlow must not duplicate config-only
+		// approximations of whether true stereo is actually active.
+		return RuntimeStereoEligible();
 	}
 
 	bool InstallStereoHooksSynchronously(IDirect3DDevice9* device) noexcept
