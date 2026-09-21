@@ -163,13 +163,15 @@ if(Test-Path $hudCsv){
         $summary+="rows=$($hudRows.Count)"
         $summary+=''
         $groups=$hudRows |
-            Group-Object event,call_rva,known_area,arg0,arg1 |
+            Group-Object event,call_rva,known_area,mode,stage,arg0,arg1 |
             ForEach-Object {
                 $maxCount=($_.Group | ForEach-Object {[int]$_.count} | Measure-Object -Maximum).Maximum
                 [pscustomobject]@{
                     Event=$_.Group[0].event
                     CallRva=$_.Group[0].call_rva
                     KnownArea=$_.Group[0].known_area
+                    Mode=$_.Group[0].mode
+                    Stage=$_.Group[0].stage
                     Arg0=$_.Group[0].arg0
                     Arg1=$_.Group[0].arg1
                     Arg2=$_.Group[0].arg2
@@ -182,10 +184,10 @@ if(Test-Path $hudCsv){
                 }
             } |
             Sort-Object @{Expression={if($_.KnownArea){0}else{1}}}, @{Expression='MaxCount';Descending=$true}, CallRva
-        $summary+='event | call_rva | known_area | arg0 | arg1 | arg2 | arg3 | arg4 | arg5 | arg6 | arg7 | observed_count'
-        $summary+='------|----------|------------|------|------|------|------|------|------|------|------|---------------'
+        $summary+='event | call_rva | known_area | mode | stage | arg0 | arg1 | arg2 | arg3 | arg4 | arg5 | arg6 | arg7 | observed_count'
+        $summary+='------|----------|------------|------|-------|------|------|------|------|------|------|------|------|---------------'
         foreach($g in ($groups | Select-Object -First 200)){
-            $summary+=("$($g.Event) | $($g.CallRva) | $($g.KnownArea) | $($g.Arg0) | $($g.Arg1) | $($g.Arg2) | $($g.Arg3) | $($g.Arg4) | $($g.Arg5) | $($g.Arg6) | $($g.Arg7) | $($g.MaxCount)")
+            $summary+=("$($g.Event) | $($g.CallRva) | $($g.KnownArea) | $($g.Mode) | $($g.Stage) | $($g.Arg0) | $($g.Arg1) | $($g.Arg2) | $($g.Arg3) | $($g.Arg4) | $($g.Arg5) | $($g.Arg6) | $($g.Arg7) | $($g.MaxCount)")
         }
         $summary|Set-Content (Join-Path $dest 'HUD_TRACE_SUMMARY.txt') -Encoding UTF8
         $copied+='HUD_TRACE_SUMMARY.txt'
