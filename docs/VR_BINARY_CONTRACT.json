@@ -104,7 +104,7 @@
       "rva": "0x0005B475",
       "signatureLength": 16,
       "disassemblyWindow": 48,
-      "expectedBytes": "discover",
+      "expectedBytes": "e8a6ebfaff8b4604f30f1006f30f5844",
       "purpose": "Attached-heart render-helper path entered only after the 0x5B470 no-draw bypass.",
       "sourceBindings": [
         {
@@ -118,7 +118,7 @@
       "rva": "0x0005B4C0",
       "signatureLength": 16,
       "disassemblyWindow": 48,
-      "expectedBytes": "discover",
+      "expectedBytes": "8b44241483c30483c60c488944241475",
       "purpose": "Common attached-heart loop-advance boundary used to cancel an unconsumed one-shot semantic.",
       "sourceBindings": [
         {
@@ -132,7 +132,7 @@
       "rva": "0x00019178",
       "signatureLength": 16,
       "disassemblyWindow": 48,
-      "expectedBytes": "discover",
+      "expectedBytes": "ff924c010000bf01000000ff0d68b589",
       "purpose": "Particle DrawPrimitiveUP dispatch; semantic arm is delayed until this committed draw boundary.",
       "sourceBindings": [
         {
