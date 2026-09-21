@@ -50,6 +50,7 @@ namespace Settings
 	extern Setting<bool> VRPositionalTracking;
 	extern Setting<bool> VRCullingCameraSync;
 	extern Setting<bool> VRCullingUnionFov;
+	extern Setting<float> VRCullingUnionMarginDegrees;
 	extern Setting<float> VRWorldScale;
 	extern Setting<float> VRRotationScale;
 	extern Setting<int> VRMatrixOrder;
@@ -1182,10 +1183,52 @@ namespace OutRunVRRenderer
 				cameraWorld._43 + forward.z * lookDistance
 			};
 			CullingCameraOverridden = true;
-			if (Settings::VRCullingUnionFov && !CullingUnionFovDeferredLogged)
+			if (Settings::VRCullingUnionFov && LatchedStereo.valid &&
+				RendererProjection &&
+				IsWritableRange(const_cast<D3DMATRIX*>(RendererProjection), sizeof(D3DMATRIX)))
 			{
-				CullingUnionFovDeferredLogged = true;
-				spdlog::warn("VR renderer: CullingUnionFov is deferred until a culling-only frustum boundary is verified; live projection remains untouched");
+				SharedFov unionFov{};
+				unionFov.angleLeft = std::min(
+					LatchedStereo.eyeFov[0].angleLeft,
+					LatchedStereo.eyeFov[1].angleLeft);
+				unionFov.angleRight = std::max(
+					LatchedStereo.eyeFov[0].angleRight,
+					LatchedStereo.eyeFov[1].angleRight);
+				unionFov.angleDown = std::min(
+					LatchedStereo.eyeFov[0].angleDown,
+					LatchedStereo.eyeFov[1].angleDown);
+				unionFov.angleUp = std::max(
+					LatchedStereo.eyeFov[0].angleUp,
+					LatchedStereo.eyeFov[1].angleUp);
+
+				const float margin = std::clamp(
+					Settings::VRCullingUnionMarginDegrees.get(), 0.0f, 15.0f) *
+					(Pi / 180.0f);
+				unionFov.angleLeft = std::max(-1.55f, unionFov.angleLeft - margin);
+				unionFov.angleRight = std::min(1.55f, unionFov.angleRight + margin);
+				unionFov.angleDown = std::max(-1.55f, unionFov.angleDown - margin);
+				unionFov.angleUp = std::min(1.55f, unionFov.angleUp + margin);
+
+				if (FovValid(unionFov))
+				{
+					std::memcpy(&CullingProjectionSaved, RendererProjection,
+						sizeof(CullingProjectionSaved));
+					const D3DMATRIX widened =
+						ProjectionFromFov(CullingProjectionSaved, unionFov);
+					if (MatrixFinite(widened))
+					{
+						std::memcpy(const_cast<D3DMATRIX*>(RendererProjection),
+							&widened, sizeof(widened));
+						CullingProjectionOverridden = true;
+						if (!CullingUnionFovDeferredLogged)
+						{
+							CullingUnionFovDeferredLogged = true;
+							spdlog::info(
+								"VR renderer: two-eye union culling FOV ACTIVE margin={:.1f}deg; stock projection remains authoritative for actual eye rendering",
+								Settings::VRCullingUnionMarginDegrees.get());
+						}
+					}
+				}
 			}
 			FrameTelemetryFlags |= ClientCullingCameraSynced;
 		}
@@ -1798,46 +1841,3 @@ namespace OutRunVRRenderer
 		shaderSerial = LastGameWvpShaderSerial;
 		return true;
 	}
-
-	bool GetLastRawGameWvpWrite(float outConstants[16],
-		std::uint64_t& writeSerial, std::uint64_t& topLevelDrawSerial,
-		std::uintptr_t& shaderIdentity, std::uint64_t& shaderSerial) noexcept
-	{
-		if (!outConstants || !LastGameWvpWriteValid ||
-			LastGameWvpWriteSerial == 0 || LastGameWvpShaderIdentity == 0 ||
-			LastGameWvpShaderSerial == 0)
-			return false;
-		std::memcpy(outConstants, LastRawGameWvpWrite,
-			sizeof(LastRawGameWvpWrite));
-		writeSerial = LastGameWvpWriteSerial;
-		topLevelDrawSerial = LastGameWvpTopLevelDrawSerial;
-		shaderIdentity = LastGameWvpShaderIdentity;
-		shaderSerial = LastGameWvpShaderSerial;
-		return true;
-	}
-
-	class VRRendererHook : public Hook
-	{
-	public:
-		std::string_view description() override { return "OpenXRVRRenderer"; }
-		bool validate() override { return true; }
-
-		bool apply() override
-		{
-			HANDLE thread = CreateThread(nullptr, 0, RendererInstallThread, nullptr, 0, nullptr);
-			if (!thread)
-			{
-				RendererInjectionAllowed.store(false, std::memory_order_release);
-				RendererInstallState.store(RendererInstallFailed, std::memory_order_release);
-				spdlog::error("VR renderer: failed to create installer thread: {}", GetLastError());
-				return false;
-			}
-			CloseHandle(thread);
-			return true;
-		}
-
-		static VRRendererHook instance;
-	};
-
-	VRRendererHook VRRendererHook::instance;
-}
