@@ -38,7 +38,7 @@ Require ($queue.policy.candidateWriter -eq "B_FIX") "Queue candidate writer mism
 Require ([int]$queue.policy.maxIndependentUnvalidatedRuntimeCandidates -eq 3) "Queue WIP cap must be 3"
 Require ([int]$queue.policy.maxMateriallyDifferentFixAttempts -eq 2) "Queue fix-attempt cap must be 2"
 
-$allowed = @("READY","IN_PROGRESS","NEEDS_VALIDATION","VALIDATED","NEED_HMD_TEST","BLOCKED","DONE")
+$allowed = @("READY","IN_PROGRESS","NEEDS_VALIDATION","VALIDATED","NEEDS_POST_REVIEW","NEED_HMD_TEST","BLOCKED","DONE")
 $ids = @{}
 foreach ($item in @($queue.items)) {
     $id = [string]$item.id
