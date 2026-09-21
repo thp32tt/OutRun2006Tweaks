@@ -14,7 +14,7 @@
     {
       "key": "VR-STARTUP-WHITE-001",
       "title": "Logo completes then game remains on white screen",
-      "status": "REOPENED_PROTECTION_MISSING_ON_CURRENT_FOCUS",
+      "status": "INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
       "severity": "runtime-blocking",
       "firstKnownWindowKst": "2026-09-20",
       "lastObservedKst": "2026-09-21",
@@ -28,11 +28,12 @@
       "knownBad": ["1f2dcb9848a7142c295f371f0dc91663f174c442 — persistent startup white runtime"],
       "rootCause": {
         "status": "BOUNDED_RECONSTRUCTED",
-        "summary": "D3D9Ex synchronous CreateDevice-thread stereo installation called EnsureStereoResources before the promoted device was returned to OutRun, allocating/mutating private RT/depth resources before fresh-device initialization completed. Current vr-d3d9ex-focus structurally contains this pre-fix behavior again."
+        "summary": "D3D9Ex synchronous CreateDevice-thread stereo installation called EnsureStereoResources before the promoted device was returned to OutRun, allocating/mutating private RT/depth resources before fresh-device initialization completed."
       },
       "fixReferences": [
-        "986f0d5794476056ef4bea08c6ac3c0d1f5f01d2 — defer stereo resources until first successful game Present",
-        "ba402e98351fcf8d215bd7719b6ea56044566ead — deterministic deferred-init guard",
+        "986f0d5794476056ef4bea08c6ac3c0d1f5f01d2 — historical protection: defer stereo resources until first successful game Present",
+        "ba402e98351fcf8d215bd7719b6ea56044566ead — historical deterministic deferred-init guard",
+        "341bd8027b9595f43c89e31ae1f9cf8783751faa — integrated current-focus reconstruction plus deterministic guard",
         "fc636acc9e639a7e280ff66f2d1c86700b4caa91 -> 16c47176868dc600afcd8ca0e05990280aaa21d9 -> 7081b38917aa1b7ec319bea137a88b6f6f07733b — owner-corrected preservation chain"
       ],
       "riskPaths": ["src/vr/**", "vrhost/**", "src/hooks_graphics.cpp", "src/hooks_framerate.cpp", "src/hooks_exceptions.cpp", "OutRun2006Tweaks.ini", "tools/*OutRunVR*.ps1", ".github/workflows/vr-dx9ex-active.yml"],
@@ -42,8 +43,10 @@
         "runtime": ["launch CORRECTNESS package", "confirm logo transitions into menu/game instead of persistent white frame", "confirm gameplay stereo opens after deferred initialization", "collect standardized OutRun2_VR_ANALYZE_*.zip if failure recurs"]
       },
       "testLevel": 3,
-      "evidenceLevel": "ROOT_CAUSE_RECONSTRUCTED_STATIC_PLUS_PRIOR_RUNTIME",
-      "nextAction": "Reconstruct 986f0d57 protection minimally on latest vr-d3d9ex-focus while preserving final-R23 post-successful-Present ownership; add structural guard; require build plus HMD logo->menu/game and gameplay stereo-open validation before DONE."
+      "evidenceLevel": "BUILD_VERIFIED_NEED_HMD_TEST",
+      "integrationSha": "341bd8027b9595f43c89e31ae1f9cf8783751faa",
+      "validationRun": "35647825229 SUCCESS",
+      "nextAction": "Run Quest3/VDXR CORRECTNESS validation: logo->menu/game without persistent white frame, then verify gameplay stereo opens. Keep case open until USER RUNTIME VERIFIED; if symptom recurs append REOPENED using this same key."
     }
   ]
 }
