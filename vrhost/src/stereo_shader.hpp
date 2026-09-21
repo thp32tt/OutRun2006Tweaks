@@ -60,6 +60,25 @@ float4 PSMain(VSOut input) : SV_Target
 {
     const float2 sampleUv = input.uv * UvScale + UvOffset;
     float4 src = SourceTexture.Sample(SourceSampler, sampleUv);
+
+    // Reference-mod integration: keep the OpenXR swapchain/runtime resolution
+    // independent from the game image and apply a bounded spatial sharpen only
+    // at the final host copy. This is deliberately simpler than a temporal
+    // upscaler: it cannot affect game depth, HUD classification, or eye poses.
+    const float sharpen = saturate(Padding.x);
+    if (sharpen > 0.0001)
+    {
+        uint sourceWidth = 1, sourceHeight = 1;
+        SourceTexture.GetDimensions(sourceWidth, sourceHeight);
+        const float2 texel = 1.0 / max(float2(sourceWidth, sourceHeight), 1.0);
+        const float3 n = SourceTexture.Sample(SourceSampler, sampleUv + float2(0.0, -texel.y)).rgb;
+        const float3 s = SourceTexture.Sample(SourceSampler, sampleUv + float2(0.0,  texel.y)).rgb;
+        const float3 w = SourceTexture.Sample(SourceSampler, sampleUv + float2(-texel.x, 0.0)).rgb;
+        const float3 e = SourceTexture.Sample(SourceSampler, sampleUv + float2( texel.x, 0.0)).rgb;
+        const float amount = 0.18 * sharpen;
+        src.rgb = saturate(src.rgb * (1.0 + 4.0 * amount) - amount * (n + s + w + e));
+    }
+
     float3 linearColor;
     if (SourceIsScRgb > 0.5)
         linearColor = max(src.rgb, 0.0) / max(SdrWhiteScale, 0.001);
