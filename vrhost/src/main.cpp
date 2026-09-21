@@ -405,10 +405,6 @@ namespace
                 if (!HeaderValid()) throw std::runtime_error("existing VR shared mapping is not ready");
             }
             AcquireOwnership();
-            Begin();
-            state_->hostAdapterLuidLow = adapterLuid_.LowPart;
-            state_->hostAdapterLuidHigh = static_cast<std::uint32_t>(adapterLuid_.HighPart);
-            End();
         }
 
         ~SharedWriter()
@@ -418,7 +414,9 @@ namespace
                 if (owns_ && state_->hostPid == GetCurrentProcessId())
                 {
                     Begin();
-                    state_->flags = 0;
+                    ClearHostOwnedPayloadLocked();
+                    state_->hostAdapterLuidLow = 0;
+                    state_->hostAdapterLuidHigh = 0;
                     state_->hostPid = 0;
                     End();
                 }
@@ -608,23 +606,111 @@ namespace
                 state_->structSize == sizeof(*state_);
         }
 
+        void ClearHostOwnedPayloadLocked() noexcept
+        {
+            // Client-owned telemetry in reserved[] is intentionally preserved.
+            // Everything below is published by the host and must never survive
+            // an ownership/run transition as apparently fresh state.
+            state_->flags = 0;
+            state_->heartbeat = 0;
+            state_->sampleQpc = 0;
+            std::memset(state_->orientation, 0, sizeof(state_->orientation));
+            std::memset(state_->position, 0, sizeof(state_->position));
+            std::memset(state_->eyeFov, 0, sizeof(state_->eyeFov));
+            std::memset(state_->recommendedWidth, 0,
+                sizeof(state_->recommendedWidth));
+            std::memset(state_->recommendedHeight, 0,
+                sizeof(state_->recommendedHeight));
+            state_->hostInteropProbeAckToken = 0;
+            state_->hostDirectConsumedFrameId = 0;
+            std::memset(state_->runtimeName, 0, sizeof(state_->runtimeName));
+            state_->reserved[OutRunVR::HostReferenceSpaceGenerationIndex] = 0;
+            state_->reserved[OutRunVR::HostEyeOffsetLeftXIndex] = 0;
+            state_->reserved[OutRunVR::HostEyeOffsetLeftYIndex] = 0;
+            state_->reserved[OutRunVR::HostEyeOffsetLeftZIndex] = 0;
+            state_->reserved[OutRunVR::HostEyeOffsetRightXIndex] = 0;
+            state_->reserved[OutRunVR::HostEyeOffsetRightYIndex] = 0;
+            state_->reserved[OutRunVR::HostEyeOffsetRightZIndex] = 0;
+        }
+
+        bool TryBeginOwnershipWrite(std::uint32_t observedHostPid) noexcept
+        {
+            const LONG sequence =
+                static_cast<LONG>(state_->sequence);
+            if (sequence & 1)
+                return false;
+            if (InterlockedCompareExchange(
+                    reinterpret_cast<volatile LONG*>(&state_->sequence),
+                    sequence + 1, sequence) != sequence)
+                return false;
+            MemoryBarrier();
+
+            // The owner may have changed between the outer observation and
+            // acquiring the sequence write lock. Give up without touching
+            // payload in that case.
+            if (state_->hostPid != observedHostPid)
+            {
+                End();
+                return false;
+            }
+            return true;
+        }
+
         void AcquireOwnership()
         {
             const LONG self = static_cast<LONG>(GetCurrentProcessId());
             for (int i = 0; i < 100; ++i)
             {
                 const LONG observed = static_cast<LONG>(state_->hostPid);
-                if (observed == self) { owns_ = true; return; }
-                if (observed != 0 &&
-                    QueryProcessLiveness(static_cast<DWORD>(observed)) != ProcessLiveness::Dead)
-                    throw std::runtime_error("another or unverified outrun-vr-host already owns the bridge");
-                if (InterlockedCompareExchange(reinterpret_cast<volatile LONG*>(&state_->hostPid),
-                    self, observed) == observed)
+                if (observed == self)
                 {
                     owns_ = true;
                     return;
                 }
-                Sleep(1);
+                if (observed != 0 &&
+                    QueryProcessLiveness(static_cast<DWORD>(observed)) !=
+                        ProcessLiveness::Dead)
+                    throw std::runtime_error(
+                        "another or unverified outrun-vr-host already owns the bridge");
+
+                if (!TryBeginOwnershipWrite(
+                        static_cast<std::uint32_t>(observed)))
+                {
+                    Sleep(1);
+                    continue;
+                }
+
+                // Re-check process liveness while the shared seqlock remains
+                // odd. A replacement PID is not exposed until stale host-owned
+                // payload has been invalidated in this same transaction.
+                if (observed != 0 &&
+                    QueryProcessLiveness(static_cast<DWORD>(observed)) !=
+                        ProcessLiveness::Dead)
+                {
+                    End();
+                    throw std::runtime_error(
+                        "another or unverified outrun-vr-host revived during takeover");
+                }
+
+                if (InterlockedCompareExchange(
+                        reinterpret_cast<volatile LONG*>(&state_->hostPid),
+                        self, observed) != observed)
+                {
+                    End();
+                    Sleep(1);
+                    continue;
+                }
+
+                ClearHostOwnedPayloadLocked();
+                state_->hostAdapterLuidLow = adapterLuid_.LowPart;
+                state_->hostAdapterLuidHigh =
+                    static_cast<std::uint32_t>(adapterLuid_.HighPart);
+                End();
+
+                interopVerifiedToken_ = 0;
+                interopVerifiedLogged_ = false;
+                owns_ = true;
+                return;
             }
             throw std::runtime_error("failed to acquire host ownership");
         }
