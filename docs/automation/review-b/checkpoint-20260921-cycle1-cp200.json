@@ -1,0 +1,1 @@
+{"role":"B","cycle":"20260921-cycle1","checkpoint":"CP200","valid_units":200,"target_sha":"73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0","carried_forward_units":100,"invalidated_units":0,"extension_units":100,"status":"COMPLETE","base_ledger":"ledger-20260921-cycle1-complete.tsv","extension_ledger":"ledger-20260921-cycle1-extension-b101-b200.tsv"}
