@@ -500,7 +500,7 @@ texture_source = require(
     "lockedRect.Pitch > 0",
     "destinationPitch < layout.rowBytes",
     "const DWORD lockFlags =",
-    "(Usage & D3DUSAGE_DYNAMIC) ? D3DLOCK_DISCARD : 0",
+    "((Usage & D3DUSAGE_DYNAMIC) && Pool == D3DPOOL_DEFAULT)",
     "texture->LockRect(mipLevel, &lockedRect, nullptr, lockFlags)",
     "const HRESULT unlockHr = texture->UnlockRect(mipLevel)",
     "*ppTexture = texture;",
@@ -546,13 +546,14 @@ if size_guard < 0 or size_guard > header_cast:
 if "LockRect(mipLevel, &lockedRect, nullptr, D3DLOCK_DISCARD)" in allocator:
     raise SystemExit("custom DDS allocator unconditionally uses D3DLOCK_DISCARD")
 _usage_cases = (
-    (0, 0),
-    (0x00000200, 0x00002000),  # D3DUSAGE_DYNAMIC -> D3DLOCK_DISCARD
+    (0, "MANAGED", 0),
+    (0x00000200, "DEFAULT", 0x00002000),
+    (0x00000200, "MANAGED", 0),
 )
-for usage, expected_flags in _usage_cases:
-    flags = 0x00002000 if usage & 0x00000200 else 0
+for usage, pool, expected_flags in _usage_cases:
+    flags = 0x00002000 if (usage & 0x00000200) and pool == "DEFAULT" else 0
     if flags != expected_flags:
-        raise SystemExit("DDS LockRect usage/flag model regressed")
+        raise SystemExit("DDS LockRect usage/pool/flag model regressed")
 
 # Destination copy must be row-based through D3DLOCKED_RECT::Pitch for both
 # converted and direct-copy paths.
