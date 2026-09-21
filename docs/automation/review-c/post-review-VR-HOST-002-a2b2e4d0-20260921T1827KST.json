@@ -1,0 +1,33 @@
+{
+  "role": "C",
+  "run": "20260921T1827KST",
+  "candidate": "VR-HOST-002",
+  "candidate_sha": "a2b2e4d0168c311e8998df4dc6c012c47e855558",
+  "integration_sha": "955da662766a0951175d002977378787138dced0",
+  "verdict": "CHANGES_REQUIRED",
+  "findings": [
+    {
+      "id": "C-VR-HOST-002-DIVERGED-BASE-001",
+      "severity": "P0-integration-gate",
+      "evidence": "GitHub compare vr-d3d9ex-focus...a2b2e4d0 reports status=diverged, ahead_by=3, behind_by=59, merge_base=16e50077. Exact candidate therefore cannot establish prospective merged-tree synchronization/testability correctness against current integration HEAD.",
+      "required_action": "Rebase/reconcile VR-HOST-002 onto current vr-d3d9ex-focus and rerun deterministic LEVEL0/build validation plus exact-SHA A/B/C post-review."
+    },
+    {
+      "id": "C-VR-HOST-002-COPY-FENCE-ACK-001",
+      "severity": "resolved-on-exact-candidate-safe-path",
+      "evidence": "CopySharedFrameToSafeEyes issues both D3D11 CopyResource calls, then WaitForCopyFence performs End(EVENT), Flush and bounded GetData polling; PublishCompletedFrame ACK is called only after that wait succeeds. This exact path preserves copy-completion-before-ACK.",
+      "required_action": "Preserve this ordering during reconciliation and add/retain a deterministic verifier that rejects ACK publication before successful copy fence completion."
+    },
+    {
+      "id": "C-VR-HOST-002-FENCE-BUDGET-TELEMETRY-001",
+      "severity": "P1-performance-evidence",
+      "evidence": "WaitForCopyFence may occupy the host thread for up to CopyFenceTimeoutMs=8 with SwitchToThread polling after Context Flush; 90 Hz frame budget is about 11.1 ms. Static safety is bounded but Quest3/VDXR cost remains runtime-unverified.",
+      "required_action": "Add bounded QPC wait-duration/count telemetry before changing fence semantics; validate with PERFORMANCE only after correctness gate."
+    }
+  ],
+  "cycle_state": "PARTIAL",
+  "review_units_completed": 3,
+  "strict_150_gate": "NOT_MET",
+  "blocker": "No hard repository-access blocker. CP150 is intentionally not claimed because 150 distinct evidence-bearing units were not completed in this invocation.",
+  "nextAction": "D must not consume a C PASS for a2b2e4d0. Reconcile onto current integration HEAD first; then C reviews the exact reconciled SHA, verifies copy-fence-before-ACK and stale-run rejection, and continues a fresh strict 150-unit cycle through CP150."
+}
