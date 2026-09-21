@@ -309,7 +309,8 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 
 		D3DLOCKED_RECT lockedRect{};
 		const DWORD lockFlags =
-			(Usage & D3DUSAGE_DYNAMIC) ? D3DLOCK_DISCARD : 0;
+			((Usage & D3DUSAGE_DYNAMIC) && Pool == D3DPOOL_DEFAULT)
+			? D3DLOCK_DISCARD : 0;
 		hr = texture->LockRect(mipLevel, &lockedRect, nullptr, lockFlags);
 		if (FAILED(hr))
 			return failTexture(hr);
