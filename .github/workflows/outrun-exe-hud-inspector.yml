@@ -25,6 +25,8 @@ on:
       - 'tools/analyze_outrun_exe.py'
       - 'tools/Collect-OutRunVRLogs.ps1'
       - 'tools/Run-OutRunVRTest.ps1'
+      - 'tools/Test-VRAssetDiagnosticsProfileGate.ps1'
+      - 'tools/Test-VRAssetDiagnosticsProfileGate.ps1'
       - 'docs/VR_EXE_HUD_INSPECTOR.md'
       - 'docs/VR_HUD_SEMANTIC_BASELINE.md'
       - '.github/workflows/outrun-exe-hud-inspector.yml'
@@ -88,6 +90,10 @@ jobs:
       - name: Asset semantic parser self-test
         shell: pwsh
         run: python tools/analyze_outrun_assets.py --self-test
+
+      - name: Verify asset diagnostics profile gate
+        shell: pwsh
+        run: ./tools/Test-VRAssetDiagnosticsProfileGate.ps1
 
       - name: Download upstream replacement EXE
         shell: pwsh
