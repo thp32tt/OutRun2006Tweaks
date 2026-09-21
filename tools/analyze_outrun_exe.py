@@ -44,6 +44,10 @@ KNOWN_CALL_SITES = {
     0x0BB2D0: "RankMarker clip #5",
 }
 
+KNOWN_DATA_RVAS = {
+    0x556C00: "sprite_prio_root",
+}
+
 # Mirrors src/vr/hud_semantics.hpp. These ranges come from the shipped
 # hooks_uiscaling.cpp reverse engineering and are intentionally semantic,
 # rather than D3D primitive-count heuristics.
@@ -229,6 +233,38 @@ def find_calls(pe: PE) -> list[dict]:
     return found
 
 
+def find_data_xrefs(pe: PE) -> list[dict]:
+    text_section = pe.section(".text")
+    if not text_section:
+        raise ValueError(".text section not found")
+    text = pe.data[
+        text_section.raw_pointer :
+        text_section.raw_pointer + text_section.raw_size
+    ]
+    found: list[dict] = []
+    for target_rva, name in KNOWN_DATA_RVAS.items():
+        target_va = (pe.image_base + target_rva) & 0xFFFFFFFF
+        needle = struct.pack("<I", target_va)
+        start = 0
+        while True:
+            i = text.find(needle, start)
+            if i < 0:
+                break
+            xref_rva = text_section.virtual_address + i
+            found.append({
+                "xref_rva": xref_rva,
+                "target_rva": target_rva,
+                "target": name,
+                "function_start_guess_rva": guess_function_start(
+                    text, text_section.virtual_address, i
+                ),
+                "prefix8": text[max(0, i - 8):i].hex(" "),
+                "suffix8": text[i + 4:i + 12].hex(" "),
+            })
+            start = i + 1
+    return found
+
+
 def extract_hud_strings(pe: PE) -> list[dict]:
     results: list[dict] = []
     for section in pe.sections:
@@ -307,6 +343,20 @@ def render_markdown(report: dict) -> str:
 
     lines += [
         "",
+        "## Data references relevant to the 2D sprite queue",
+        "",
+        "| Xref RVA | Function start guess | Target | Prefix | Suffix |",
+        "|---:|---:|---|---|---|",
+    ]
+    for item in report["data_xrefs"]:
+        lines.append(
+            f"| {hexrva(item['xref_rva'])} | "
+            f"{hexrva(item['function_start_guess_rva'])} | "
+            f"{item['target']} | {item['prefix8']} | {item['suffix8']} |"
+        )
+
+    lines += [
+        "",
         "## HUD-related ASCII strings",
         "",
         "| RVA | Section | Text |",
@@ -363,6 +413,7 @@ def main() -> int:
         },
         "symbols": symbol_fingerprints(pe),
         "calls": calls,
+        "data_xrefs": find_data_xrefs(pe),
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
