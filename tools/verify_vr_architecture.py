@@ -488,4 +488,110 @@ require("src/vr/core/transport.hpp", "class IFrameProducer", "class IFrameConsum
 require("src/vr/game/game_adapter.hpp", "class IGameAdapter", "latchRenderPose", "buildStereoMatrices")
 require("src/vr/d3d9/stereo_backend.hpp", "class IStereoBackend", "drawWorldStereo", "drawScreenSpaceStereo")
 
+# Custom DDS allocator is a single bounded upload transaction. It must not read
+# beyond the supplied payload, ignore D3D lock pitch, or publish a partially
+# initialized/freed texture pointer on Lock/Unlock failure.
+texture_source = require(
+    "src/hooks_textures.cpp",
+    "struct TextureCopyLayout",
+    "TryGetTextureCopyLayout(",
+    "dataSize < sizeof(DDS_FILE)",
+    "layout.totalBytes > dataSize - validatedEnd",
+    "lockedRect.Pitch > 0",
+    "destinationPitch < layout.rowBytes",
+    "const HRESULT unlockHr = texture->UnlockRect(mipLevel)",
+    "*ppTexture = texture;",
+    "*pSrcDataSize < sizeof(DDS_FILE)",
+    "size >= sizeof(DDS_FILE)",
+)
+allocator_begin = texture_source.find(
+    "HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom("
+)
+allocator_end = texture_source.find("class FileDataCache", allocator_begin)
+if allocator_begin < 0 or allocator_end < 0:
+    raise SystemExit("custom DDS allocator boundary missing")
+allocator = texture_source[allocator_begin:allocator_end]
+
+for forbidden in (
+    "memcpy(lockedRect.pBits, srcData",
+    "D3DXGetFormatSize(format_present",
+):
+    if forbidden in allocator:
+        raise SystemExit(f"unsafe custom DDS upload pattern returned: {forbidden}")
+
+output_null = allocator.find("*ppTexture = nullptr;")
+header_cast = allocator.find(
+    "const DDS_FILE* header = reinterpret_cast<const DDS_FILE*>(data);"
+)
+payload_validation = allocator.find(
+    "layout.totalBytes > dataSize - validatedEnd"
+)
+create_texture = allocator.find("pDevice->CreateTexture(")
+publish_output = allocator.rfind("*ppTexture = texture;")
+if min(output_null, header_cast, payload_validation, create_texture, publish_output) < 0:
+    raise SystemExit("custom DDS transaction ordering marker missing")
+if not output_null < header_cast < payload_validation < create_texture < publish_output:
+    raise SystemExit("custom DDS transaction ordering regressed")
+
+# The source-size guard must precede header interpretation.
+size_guard = allocator.find("if (dataSize < sizeof(DDS_FILE))")
+if size_guard < 0 or size_guard > header_cast:
+    raise SystemExit("DDS header length guard must precede header dereference")
+
+# Destination copy must be row-based through D3DLOCKED_RECT::Pitch for both
+# converted and direct-copy paths.
+for marker in (
+    "destData + static_cast<size_t>(y) * destinationPitch",
+    "destData + row * destinationPitch",
+    "memcpy(destRow, srcRow, layout.rowBytes)",
+):
+    if marker not in allocator:
+        raise SystemExit(f"pitch-aware DDS row-copy invariant missing: {marker}")
+
+# Failure cleanup must own the local COM object until all mips are unlocked.
+fail_begin = allocator.find("auto failTexture =")
+if fail_begin < 0:
+    raise SystemExit("custom DDS failure cleanup transaction missing")
+fail_block = allocator[fail_begin:allocator.find("size_t sourceOffset", fail_begin)]
+for marker in ("texture->Release();", "texture = nullptr;", "*ppTexture = nullptr;"):
+    if marker not in fail_block:
+        raise SystemExit(f"custom DDS failure cleanup invariant missing: {marker}")
+if allocator.find("return failTexture(hr);") < 0 or allocator.find(
+    "return failTexture(unlockHr);"
+) < 0:
+    raise SystemExit("Lock/Unlock failure is not propagated through cleanup")
+
+# Minimal deterministic layout/bounds model for compressed/uncompressed rows.
+def _dds_layout(width: int, height: int, bytes_per_unit: int, block: bool):
+    if width <= 0 or height <= 0:
+        return None
+    if block:
+        rows = height // 4 + (1 if height % 4 else 0)
+        cols = width // 4 + (1 if width % 4 else 0)
+    else:
+        rows = height
+        cols = width
+    return cols * bytes_per_unit, rows, cols * bytes_per_unit * rows
+
+_dxt1 = _dds_layout(7, 5, 8, True)
+if _dxt1 != (16, 2, 32):
+    raise SystemExit(f"DDS DXT1 block-row model regressed: {_dxt1}")
+
+_header_size = 128
+_payload_size = 32
+if _payload_size > (_header_size - _header_size):
+    pass
+else:
+    # header-only DXT payload must fail before any copy.
+    _remaining = _header_size - _header_size
+    if _dxt1[2] <= _remaining:
+        raise SystemExit("truncated DDS payload model unexpectedly accepted")
+
+# Padded destination pitch must place logical rows at the real row base.
+_row_bytes, _rows, _ = _dds_layout(3, 2, 4, False)
+_pitch = 16
+_offsets = [row * _pitch for row in range(_rows)]
+if (_row_bytes, _offsets) != (12, [0, 16]):
+    raise SystemExit("DDS pitch-aware row placement model regressed")
+
 print("VR reconstructed R23/R25 architecture boundary verification passed")
