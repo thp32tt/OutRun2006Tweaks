@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-22T03:24:00+09:00",
+  "updatedKst": "2026-09-22T03:25:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -28,7 +28,7 @@
     {
       "id": "VR-BINARY-CONTRACT-001",
       "priority": 10,
-      "status": "VALIDATED",
+      "status": "DONE",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "Pin the upstream replacement OR2006C2C.EXE as the canonical reverse-engineering baseline; gate executable-RVA hooks on SHA/PE identity, byte signatures, source bindings, and durable crash-RVA revalidation.",
       "testLevel": "LEVEL0",
@@ -47,7 +47,10 @@
         "Win32 active DX9Ex game DLL build PASS",
         "active DX9Ex package assembly/validation PASS"
       ],
-      "runtimeCrashSidecarEndToEnd": "NOT_FORCED: compile/package verified; next naturally occurring crash bundle will validate sidecar observation without deliberately crashing the game"
+      "runtimeCrashSidecarEndToEnd": "NOT_FORCED: compile/package verified; next naturally occurring crash bundle will validate sidecar observation without deliberately crashing the game",
+      "integrationSha": "3e7c09db725880eef5650d41a96a8d1691998bdd",
+      "integratedViaPr": 15,
+      "nextAction": "Apply strict binary-contract and crash-signature revalidation to every future new/changed executable-RVA hook; ingest crash_signature.json on the next natural crash."
     },
     {
       "id": "DX9EX-RESET-STATEBLOCK-001",
