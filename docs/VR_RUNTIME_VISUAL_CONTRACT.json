@@ -21,7 +21,8 @@
     "hudDiscoveryPolicy": "EXE_ORIGINAL_MOD_SEMANTICS_FIRST_NEVER_WIDEN_DRAW_SCOPE",
     "hudOwnership": "CANONICAL_EXE_SPRITE_QUEUE_OR_EXACT_ORIGINAL_MOD_TAG_ONLY",
     "perspectiveHudPromotion": "SEMANTIC_ONLY_NO_ALPHA_Z_CULL_MATRIX_HEURISTICS",
-    "exitMenuText": "ALL_CANONICAL_QUEUE_GLYPHS_WORLD_FIXED_REGARDLESS_OF_COLOR"
+    "exitMenuText": "ALL_CANONICAL_QUEUE_GLYPHS_WORLD_FIXED_REGARDLESS_OF_COLOR",
+    "overlayC64Ownership": "SEMANTIC_OVERLAY_RAW_AT_RENDERER_R30_SINGLE_TRANSFORM_OWNER"
   },
   "requiredActiveBuild": {
     "safeDrawCompare": false,
@@ -42,6 +43,8 @@
       "HMD validation on exact SHA"
     ],
     "doNotInferHudFromD3DState": true,
-    "remainingHudDiscovery": "Use canonical EXE queue ownership, original-mod exact addresses, runtime caller/XST/texture evidence; never widen draw-state heuristics."
+    "remainingHudDiscovery": "Use canonical EXE queue ownership, original-mod exact addresses, runtime caller/XST/texture evidence; never widen draw-state heuristics.",
+    "preventDoubleHudTransform": true,
+    "overlayC64Rule": "SCREEN_HUD/WORLD_BILLBOARD c64 stays raw in outrun_renderer; R30 alone applies HUD/world-billboard stereo transform."
   }
 }
