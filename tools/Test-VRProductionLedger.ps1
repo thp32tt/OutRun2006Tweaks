@@ -61,7 +61,7 @@ $requiredFields=@(
     'runtimeTestRequired','nextAction'
 )
 foreach($field in $requiredFields){
-    Require ($body -match "(?mi)^\s*$field:\s*\S.+$") "Issue #$LedgerIssue event for $ResultSha missing/non-empty field: $field"
+    Require ($body -match "(?mi)^\s*${field}:\s*\S.+$") "Issue #$LedgerIssue event for $ResultSha missing/non-empty field: $field"
 }
 
 $sourceMode=([regex]::Match($body,'(?mi)^\s*sourceMode:\s*([^\r\n]+)$')).Groups[1].Value.Trim()
