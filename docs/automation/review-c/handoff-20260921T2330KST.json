@@ -1,0 +1,33 @@
+{
+  "role": "C",
+  "timestamp_kst": "2026-09-21T23:30:00+09:00",
+  "integration_head": "117b3110c7de21121ea3bc025b8ce67da6f2607b",
+  "candidates_reviewed": 1,
+  "candidate_reviews": [
+    {
+      "candidate_sha": "a6c688ab6ef2f41f1b0f0c64ded12c81d95619a9",
+      "base_sha": "265504f6ea28c5e97908e450a460661ed5ad37f1",
+      "finding_ids": ["HUD-SEMANTIC-TIMEATTACK-RANGE-GAP-001"],
+      "changed_files": ["src/vr/hud_semantics.hpp"],
+      "intended_hunks": "ClassifyCaller Time Attack begin 0x0BE300 -> 0x0BE270 plus boundary static_asserts",
+      "unintended_diff_result": "PASS against exact original base; candidate was previously B-domain PASS",
+      "active_call_path_evidence": "hud_semantics ClassifyCaller remains current semantic classifier surface",
+      "dependency_regression_risks": "Integration HEAD advanced and current hud_semantics.hpp reverted/does not contain candidate range change; candidate is now stale/diverged relative to current integration.",
+      "deterministic_checks_required": ["0x0BE2D9 => ScreenHud/HUD_TIME_ATTACK", "0x0BE261 => Unknown", "0x0BEA40 remains HUD_GOAL_TIME boundary"],
+      "ci_evidence": "No new candidate CI evidence reviewed in this run",
+      "verdict": "NEEDS_CHANGES",
+      "required_domain_review": "B re-review required only for recreated current-base SHA; A not required unless dependencies broaden",
+      "exact_correction": "D must recreate the same minimal source fix from current integration HEAD 117b3110c7de21121ea3bc025b8ce67da6f2607b; do not merge stale a6c688ab directly. Then run deterministic checks and route exact new SHA to B and C."
+    }
+  ],
+  "findings_organized": 1,
+  "ready_for_d": 4,
+  "D_IMPLEMENT_NEXT": [
+    {"finding_id":"HUD-SEMANTIC-TIMEATTACK-RANGE-GAP-001","status":"READY_RECREATE_CURRENT_BASE","target":"src/vr/hud_semantics.hpp::ClassifyCaller","fix_intent":"Reapply minimal 0x0BE270 Time Attack lower bound and boundary assertions on current HEAD","verifier":"compile-time boundary static_asserts","dependency_blocker":"current integration moved past old candidate","review":"B+C","priority":1},
+    {"finding_id":"VR-SKYGLOW-ACTIVE-GATE-001","status":"READY","target":"SkyGlow suppression/runtime-active ownership path","fix_intent":"Gate stock SkyGlow suppression on actual stereo/runtime-active eligibility and restore stock ownership on host-loss/menu/fallback","verifier":"deterministic active/inactive ownership cases","dependency_blocker":"none known","review":"B+C","priority":2},
+    {"finding_id":"VR-NEARPLANE-ACTIVE-GATE-001","status":"READY","target":"near-plane override eligibility path","fix_intent":"Bind near-plane override to actual runtime eligibility","verifier":"active/inactive eligibility boundary cases","dependency_blocker":"none known","review":"A+B+C","priority":3},
+    {"finding_id":"VR-SEMANTIC-NEXTDRAW-STALE-HEART-001","status":"READY","target":"semantic next-draw consume/clear lifetime","fix_intent":"Prevent HEART semantic marker leaking across skipped/ineligible draw","verifier":"skipped/ineligible draw consume-clear sequence","dependency_blocker":"none known","review":"A+B+C","priority":4}
+  ],
+  "validation_gaps": ["Recreated current-base Time Attack candidate needs exact-SHA B review, C sanity, and build/CI evidence before integration"],
+  "exact_nextAction": "D recreate HUD-SEMANTIC-TIMEATTACK-RANGE-GAP-001 from current HEAD 117b3110..., obtain a new changed SHA, run deterministic/build checks, then route that exact SHA to B and C."
+}
