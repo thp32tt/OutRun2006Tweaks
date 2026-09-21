@@ -14,9 +14,12 @@ This branch treats Quest 3 / VDXR runtime testing as a scarce validation gate ra
 
 ## Profiles
 
+- HUD_SCREEN: current first-priority gameplay HUD session for rank/score/time/gear/ghost/goal/heart/rival/speech/emoji stereo correctness.
+- HUD_MENU: current second-priority menu session for menu car rendering, exit YES/NO, menu recenter and non-game overlays.
+- HUD_WORLD: current third-priority world-attached display session for rival/car markers, Heart Attack markers, world hearts/lines, lens flare, sky, smoke and skid.
 - CONTROL: conservative DX9Ex reference used only when a baseline comparison is needed.
-- CORRECTNESS: default daily runtime profile and the only profile the user should normally need.
-- PERFORMANCE: same binary set where possible, with isolated performance feature flags enabled only when supported.
+- CORRECTNESS: general daily correctness profile after the focused HUD sessions.
+- PERFORMANCE: performance work is deferred until HUD/display correctness is stable.
 - A_BASELINE: reproducible A/B baseline: DisableStageCulling=true, TransparencySupersampling=true, ReflectionResolution=1024.
 - B_CULLING: A with DisableStageCulling=false so VR union-FOV culling can be measured.
 - C_CULLING_NO_SSAA: B with TransparencySupersampling=false.
