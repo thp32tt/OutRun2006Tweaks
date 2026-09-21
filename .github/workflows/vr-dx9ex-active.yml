@@ -6,6 +6,7 @@ on:
     branches:
       - vr-d3d9ex-focus
       - 'vr-d3d9ex-candidate/**'
+      - vr-fsr1-upscale-poc
     paths:
       - 'src/vr/**'
       - 'src/hooks_framerate.cpp'
@@ -102,7 +103,7 @@ jobs:
           if (-not $dll) { throw 'dinput8.dll missing' }
           Copy-Item $dll.FullName stage-game/dinput8.dll
           Set-Content stage-game/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
-          Set-Content stage-game/VARIANT_ID.txt 'ACTIVE_FULL_R34' -Encoding ascii
+          Set-Content stage-game/VARIANT_ID.txt 'FSR1_POC_R35' -Encoding ascii
           Set-Content stage-game/CMAKE_FLAGS.txt '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF' -Encoding ascii
       - uses: actions/upload-artifact@v4
         with:
@@ -145,7 +146,7 @@ jobs:
             SchemaVersion = 1
             BuildMatrixId = $matrixId
             IntegrationSha = $env:GITHUB_SHA
-            VariantId = 'ACTIVE_FULL_R34'
+            VariantId = 'FSR1_POC_R35'
             DefaultTestProfile = 'CORRECTNESS'
             Profiles = @('CONTROL','CORRECTNESS','PERFORMANCE')
             UserRuntimeVerified = $false
@@ -156,13 +157,13 @@ jobs:
           Get-ChildItem $dir -Recurse -File | Get-FileHash -Algorithm SHA256 | ForEach-Object {
             "$($_.Hash)  $($_.Path.Substring((Resolve-Path $dir).Path.Length + 1))"
           } | Set-Content (Join-Path $dir 'SHA256SUMS.txt') -Encoding ascii
-          $zip = "OutRun2_VR_DX9EX_ACTIVE_${short}.zip"
+          $zip = "OutRun2_VR_FSR1_POC_${short}.zip"
           Compress-Archive -Path (Join-Path $dir '*') -DestinationPath $zip -Force
           Get-FileHash $zip -Algorithm SHA256 | Format-List
       - name: Validate active package
         shell: pwsh
         run: |
-          $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_ACTIVE_*.zip' | Select-Object -First 1
+          $zip = Get-ChildItem -Filter 'OutRun2_VR_FSR1_POC_*.zip' | Select-Object -First 1
           if (-not $zip) { throw 'active DX9Ex ZIP missing' }
           Expand-Archive $zip.FullName verify
           foreach ($file in @('OutRunVR-Backend-Selector.cmd','OutRunVR-Backend-Selector.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt')) {
@@ -175,6 +176,6 @@ jobs:
           if ($bad) { throw 'active package contains forbidden backend payload' }
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun2-VR-DX9EX-ACTIVE-${{ github.sha }}
-          path: OutRun2_VR_DX9EX_ACTIVE_*.zip
+          name: OutRun2-VR-FSR1-POC-${{ github.sha }}
+          path: OutRun2_VR_FSR1_POC_*.zip
           if-no-files-found: error
