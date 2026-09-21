@@ -1,0 +1,151 @@
+unit_id	source_unit	target_sha	evidence	regression_case	disposition
+B8-001	B3-001	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-002	B3-002	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-003	B3-003	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-004	B3-004	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-005	B3-005	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-006	B3-006	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-007	B3-007	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-008	B3-008	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-009	B3-009	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-010	B3-010	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-011	B3-011	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-012	B3-012	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-013	B3-013	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-014	B3-014	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-015	B3-015	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-016	B3-016	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-017	B3-017	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-018	B3-018	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-019	B3-019	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-020	B3-020	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-021	B3-021	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-022	B3-022	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-023	B3-023	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-024	B3-024	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-025	B3-025	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-026	B3-026	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-027	B3-027	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-028	B3-028	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-029	B3-029	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-030	B3-030	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-031	B3-031	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-032	B3-032	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-033	B3-033	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-034	B3-034	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-035	B3-035	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-036	B3-036	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-037	B3-037	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-038	B3-038	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-039	B3-039	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-040	B3-040	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-041	B3-041	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-042	B3-042	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-043	B3-043	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-044	B3-044	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-045	B3-045	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-046	B3-046	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-047	B3-047	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-048	B3-048	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-049	B3-049	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-050	B3-050	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-051	B3-051	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-052	B3-052	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-053	B3-053	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-054	B3-054	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-055	B3-055	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-056	B3-056	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-057	B3-057	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-058	B3-058	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-059	B3-059	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-060	B3-060	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-061	B3-061	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-062	B3-062	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-063	B3-063	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-064	B3-064	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-065	B3-065	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-066	B3-066	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-067	B3-067	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-068	B3-068	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-069	B3-069	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-070	B3-070	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-071	B3-071	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-072	B3-072	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-073	B3-073	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-074	B3-074	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-075	B3-075	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-076	B3-076	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-077	B3-077	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-078	B3-078	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-079	B3-079	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-080	B3-080	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-081	B3-081	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-082	B3-082	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-083	B3-083	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-084	B3-084	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-085	B3-085	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-086	B3-086	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-087	B3-087	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-088	B3-088	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-089	B3-089	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-090	B3-090	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-091	B3-091	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-092	B3-092	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-093	B3-093	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-094	B3-094	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-095	B3-095	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-096	B3-096	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-097	B3-097	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-098	B3-098	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-099	B3-099	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-100	B3-100	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-101	B3-101	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-102	B3-102	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-103	B3-103	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-104	B3-104	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-105	B3-105	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-106	B3-106	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-107	B3-107	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-108	B3-108	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-109	B3-109	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-110	B3-110	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-111	B3-111	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-112	B3-112	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-113	B3-113	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-114	B3-114	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-115	B3-115	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-116	B3-116	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-117	B3-117	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-118	B3-118	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-119	B3-119	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-120	B3-120	4934e790	identity validated; exact prior evidence carried 1:1	VR-STARTUP-WHITE-001	CARRIED
+B8-121	B7-121	4934e790	profile PreferD3D9Ex=true unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-122	B7-122	4934e790	TargetRefreshRateHz=0 unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-123	B7-123	4934e790	SkyGlowFactor=1 unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-124	B7-124	4934e790	CONTROL cadence target 0 unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-125	B7-125	4934e790	CORRECTNESS cadence target 0 unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-126	B7-126	4934e790	PERFORMANCE cadence target 0 unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-127	B7-127	4934e790	HUD_SCREEN identity unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-128	B7-128	4934e790	HUD_MENU identity unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-129	B7-129	4934e790	HUD_WORLD identity unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-130	B7-130	4934e790	STAGE_DIAGNOSTIC identity unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-131	B7-131	4934e790	A_BASELINE culling identity unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-132	B7-132	4934e790	B_CULLING identity unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-133	B7-133	4934e790	C_CULLING_NO_SSAA identity unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-134	B7-134	4934e790	D_CULLING_NO_SSAA_R512 identity unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-135	B7-135	4934e790	DirectGpuOnly=false fallback surface unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-136	B7-136	4934e790	Desktop Duplication fallback remains available	VR-STARTUP-WHITE-001	CARRIED
+B8-137	B7-137	4934e790	CullingUnionFov enabled unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-138	B7-138	4934e790	union margin 4 degrees unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-139	B7-139	4934e790	NearPlane 0.10 unchanged	VR-STARTUP-WHITE-001	CARRIED
+B8-140	B7-140	4934e790	workflow trigger remains runtime-gated	VR-STARTUP-WHITE-001	NEED_HMD_TEST
+B8-141	B7-141	4934e790	registry riskPaths reloaded before promotion	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B8-142	B7-142	4934e790	startup/device/reset/present trigger retained	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B8-143	B7-143	4934e790	transport/shared-frame trigger retained	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B8-144	B7-144	4934e790	fallback/first-frame trigger retained	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B8-145	B7-145	4934e790	launch/profile/config trigger retained	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B8-146	B7-146	4934e790	static verifier now includes reconstructed deferred-init invariant	VR-STARTUP-WHITE-001	PROTECTION_REQUIRED
+B8-147	B7-147	4934e790	runtime verifier requires logo-to-menu/game plus stereo-open	VR-STARTUP-WHITE-001	NEED_HMD_TEST
+B8-148	B7-148	4934e790	root cause/fix references now reconstructed in durable history	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B8-149	B7-149	4934e790	Issue13 append-only RECONSTRUCTED_REOPEN_EVIDENCE consulted	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B8-150	B7-150	4934e790	HUD candidate prior PASS remains unrelated to startup trigger	NONE	PASS
