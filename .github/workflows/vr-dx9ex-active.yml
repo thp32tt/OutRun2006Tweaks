@@ -23,6 +23,17 @@ on:
       - 'tools/verify_vr_architecture.py'
       - 'tools/verify_vr_r32_review.py'
       - 'tools/Test-VRRegressionKnowledge.ps1'
+      - 'tools/Test-DX9ExPackageTriggerCoverage.ps1'
+      - 'tools/Collect-OutRunVRLogs.ps1'
+      - 'tools/Collect-OutRunVRLogs.cmd'
+      - 'tools/Run-OutRunVRTest.ps1'
+      - 'tools/Run-OutRunVRTest.cmd'
+      - 'tools/Select-OutRunVRBackend.ps1'
+      - 'tools/OutRunVR-TestProfiles.ps1'
+      - 'tools/OutRunVR-Backend-Selector.ps1'
+      - 'tools/OutRunVR-Backend-Selector.cmd'
+      - 'tools/analyze_outrun_assets.py'
+      - 'docs/VR_TEST_STRATEGY.md'
       - '.github/workflows/vr-dx9ex-active.yml'
 
 concurrency:
@@ -40,6 +51,9 @@ jobs:
       - name: Verify durable regression knowledge
         shell: pwsh
         run: ./tools/Test-VRRegressionKnowledge.ps1
+      - name: Verify active package trigger coverage
+        shell: pwsh
+        run: ./tools/Test-DX9ExPackageTriggerCoverage.ps1
       - name: Verify reconstructed VR architecture boundaries
         shell: pwsh
         run: |
