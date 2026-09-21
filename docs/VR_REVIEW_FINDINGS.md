@@ -72,3 +72,14 @@ The DX9Ex packager requires `FramerateUnlockExperimental`, `DisableDesktopDuplic
 Status: VALIDATED OFFLINE / HARDWARE RUNTIME PENDING
 
 Matrix `DX9EX-20260920-f46024f7005c` contains P1-P4 as four independent ZIPs. Every ZIP has a distinct game DLL, the same verified host, variant/matrix/source identity, automatic log launcher, scenario, Korean quick guide and internal SHA256SUMS. All checksums passed. Forbidden `d3d9.dll`, `multiviewpatcher.dll`, DX12 host and backend directories are absent. Quest 3/VDXR correctness and pacing remain user-runtime-required.
+
+## VR-HUD-SEMANTICS-001 — UIScaling-derived HUD semantic baseline
+Status: BASELINE / SOURCE-INTEGRATED / CI-PENDING
+
+The shipped 4:3/16:9 UI reverse engineering is now the VR semantic
+source-of-truth. Time Attack, Rank, REV/gear, Ghost/You/Diff, goal time,
+Heart totals, Rival HUD, girlfriend speech, ranking emoji/text and related C2C
+HUD are explicitly SCREEN_HUD. Rival-car rank markers (`sub_4BAD20`) and
+attached car/world hearts are explicitly WORLD_BILLBOARD. Runtime trace schema
+v2, static EXE analysis and automatic coverage use the same semantic names.
+See `docs/VR_HUD_SEMANTIC_BASELINE.md`.
