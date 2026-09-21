@@ -447,4 +447,41 @@ require("src/vr/core/transport.hpp", "class IFrameProducer", "class IFrameConsum
 require("src/vr/game/game_adapter.hpp", "class IGameAdapter", "latchRenderPose", "buildStereoMatrices")
 require("src/vr/d3d9/stereo_backend.hpp", "class IStereoBackend", "drawWorldStereo", "drawScreenSpaceStereo")
 
+# Experimental interpolation hook installation is one transaction. A failed
+# child install must roll back every prior interpolation hook, and the outer
+# framerate hook must consume that failure before installing later experimental
+# patches.
+interp_source = require(
+    "src/interpolation.cpp",
+    "static void RollbackHooks() noexcept",
+    "CalcDispMatrix_hook.reset();",
+    "CalcCharMatrix_hook.reset();",
+    "OsoDynCtrl_hook.reset();",
+    "OsoDynDisp_hook.reset();",
+    "OsoCommonDisp_hook.reset();",
+    "OsoCommonPost_hook.reset();",
+    "HeartPulse_hook.reset();",
+    "HeartDispBumpPos_hook.reset();",
+    "SumoHeartBumpPos_hook.reset();",
+    "SumoHeartMarkerPos_hook.reset();",
+    "auto fail = []() noexcept",
+    "return fail();",
+)
+interp_apply = interp_source.split("bool Apply()", 1)[1]
+if "return false;" in interp_apply:
+    raise SystemExit("Interp::Apply must route hook-install failures through rollback")
+
+framerate_source = require(
+    "src/hooks_framerate.cpp",
+    "if (!Interp::Apply())",
+    "interpolation hook transaction failed; later experimental patches were not installed",
+    "constexpr int SetTweeningTable_Addr = 0xED60;",
+)
+if "Interp::Apply();" in framerate_source:
+    raise SystemExit("ReplaceGameUpdateLoop must not ignore Interp::Apply result")
+checked = framerate_source.index("if (!Interp::Apply())")
+later_patch = framerate_source.index("constexpr int SetTweeningTable_Addr = 0xED60;")
+if checked > later_patch:
+    raise SystemExit("Interp transaction result must be checked before later experimental patches")
+
 print("VR reconstructed R23/R25 architecture boundary verification passed")
