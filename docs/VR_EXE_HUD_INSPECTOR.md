@@ -6,8 +6,8 @@ This pipeline removes most manual reverse-engineering work from HUD identificati
 
 1. GitHub Actions downloads the same public replacement OR2006C2C.EXE used by the upstream OutRun2006Tweaks build.
 2. tools/analyze_outrun_exe.py parses the PE32 image, calculates SHA-256, fingerprints known renderer/HUD entry points, and finds direct x86 CALL references into them.
-3. The VR game DLL installs a passive HUD inspector when VR is enabled. It traces put_sprite_ex, sprani_play_ae_auth_alpha, and put_clip_sprite without altering their arguments or rendering.
-4. The runtime trace records ASLR-safe caller RVAs, sprite IDs, coordinates, priorities, game mode/stage and known reverse-engineered regions.
+3. The VR game DLL installs a passive HUD inspector when VR is enabled. It traces put_sprite_ex, put_sprite_ex2, sprani_play_ae_auth_alpha, put_clip_sprite, sprPrintf and Sumo_Printf without altering their arguments or rendering.
+4. The runtime trace records ASLR-safe caller RVAs, sprite IDs, coordinates, priorities, game mode/stage and known reverse-engineered regions. Font-output events also retain the format-string fingerprint/preview plus the active font, priority, color, scale and screen location.
 5. The normal test launcher automatically enables the existing shader-bytecode fingerprint telemetry for the test process; normal non-test launches keep the HUD inspector disabled.
 6. Run-OutRunVRTest.ps1 waits for the game to exit and invokes Collect-OutRunVRLogs.ps1 automatically. The collector includes the HUD CSV, a HUD summary, a shader-fingerprint summary, and the exact local OR2006C2C.EXE SHA-256/match verdict.
 
@@ -22,7 +22,8 @@ Important columns:
 - return_rva: return address inside OR2006C2C.EXE.
 - call_rva: return_rva minus five, matching the normal x86 CALL rel32 instruction address.
 - known_area: labels existing reverse-engineered regions when known.
-- arg0..arg5: API-specific sprite IDs, coordinates, flags, priority, color, or pointers.
+- arg0..arg7: API-specific sprite geometry/state. For text events these encode format hash, font, priority, position, scale and color.
+- text_hash / text: stable format-string fingerprint and a bounded escaped preview for sprPrintf/Sumo_Printf calls.
 - mode / stage: game context at the time of the draw request.
 
 ## Existing anchor
@@ -45,3 +46,8 @@ The OutRun EXE HUD Inspector CI workflow uploads:
 The static analyzer also verifies the nine previously reverse-engineered RankMarker call sites in the reference EXE. A mismatch fails CI rather than silently producing addresses for the wrong binary.
 
 The JSON is machine-readable so later automation can convert confirmed runtime fingerprints into precise VR pass rules instead of broad primitive-count or render-state heuristics.
+
+
+## Text HUD coverage
+
+The inspector tracks the font state setters (sprSetPrintFont, sprSetFontPriority, sprSetFontColor, sprSetFontScale and sprLocateP) with non-mutating mid-hooks. When sprPrintf or Sumo_Printf is entered, the caller RVA, format string and current font state are recorded. This specifically covers position/score text such as the problematic 6th/6 and white score path when those elements are emitted through the game's font renderer instead of the sprite queue.
