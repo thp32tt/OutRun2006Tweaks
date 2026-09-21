@@ -18,6 +18,7 @@
 #include "vr_shared.hpp"
 #include "vr/ipc/host_pose_v3.hpp"
 #include "vr/ipc/cadence_v1.hpp"
+#include "vr/game/render_semantics.hpp"
 
 // Authoritative renderer-side OpenXR head-pose injector for OutRun 2006.
 //
@@ -185,6 +186,7 @@ namespace OutRunVRRenderer
 		std::uint64_t WvpUploadSucceededCalls = 0;
 		std::uint64_t WvpUploadFailedCalls = 0;
 		std::uint64_t WvpRejectedCalls = 0;
+		std::uint64_t SemanticOverlayBypassCalls = 0;
 		std::uint64_t UnsafeAddressRejects = 0;
 		std::uint64_t ReusedPoseSceneCalls = 0;
 		std::uint64_t V3PoseReads = 0;
@@ -194,6 +196,7 @@ namespace OutRunVRRenderer
 		bool FirstRejectedLogged = false;
 		bool FirstUnsafeAddressLogged = false;
 		bool FirstUploadFailedLogged = false;
+		bool FirstSemanticOverlayBypassLogged = false;
 		bool CullingUnionFovDeferredLogged = false;
 		bool FirstV3PoseLogged = false;
 		bool FirstV2FallbackLogged = false;
@@ -1513,9 +1516,10 @@ namespace OutRunVRRenderer
 				return;
 			LastSummaryMs = now;
 			spdlog::info(
-				"VR renderer: beginScene={} poseReuse={} c64Candidate={} verified={} prepared={} uploadOk={} uploadFail={} rejected={} unsafe={} latchedSeq={} poseSource={} v3Reads={} v2Fallbacks={} wvpGen={} presentPoseLocked={}",
+				"VR renderer: beginScene={} poseReuse={} c64Candidate={} verified={} prepared={} uploadOk={} uploadFail={} rejected={} semanticOverlayBypass={} unsafe={} latchedSeq={} poseSource={} v3Reads={} v2Fallbacks={} wvpGen={} presentPoseLocked={}",
 				BeginSceneCalls, ReusedPoseSceneCalls, WvpCandidateCalls, WvpVerifiedCalls, WvpPreparedCalls,
 				WvpUploadSucceededCalls, WvpUploadFailedCalls, WvpRejectedCalls,
+				SemanticOverlayBypassCalls,
 				UnsafeAddressRejects, LatchedPoseSequence, LastPoseSourceV3 ? "v3" : "v2",
 				V3PoseReads, V2PoseFallbacks, LastVerifiedWvpGeneration, PresentPoseLocked ? 1 : 0);
 		}
@@ -1595,6 +1599,41 @@ namespace OutRunVRRenderer
 			{
 				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
 					device, startRegister, constantData, vector4fCount);
+			}
+
+			// R49 final ownership split: the canonical EXE sprite queue and exact
+			// original-mod world-marker tags identify overlays before this c64
+			// upload. Leave their game WVP completely raw here. R30 is then the
+			// single owner that converts SCREEN_HUD to a finite world-fixed plane
+			// or WORLD_BILLBOARD to per-eye world placement. Without this split,
+			// renderer head injection can happen first and R30 applies a second
+			// transform, which is visible as duplicated/misplaced 6th/6 and menus.
+			const auto semanticScope =
+				OutRunVR::GameSemantic::CurrentScope;
+			const bool semanticOverlay =
+				OutRunVR::GameSemantic::CorroboratesHud(semanticScope) ||
+				OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
+			if (semanticOverlay)
+			{
+				const HRESULT result =
+					SetVertexShaderConstantFHook.stdcall<HRESULT>(
+						device, startRegister, constantData, vector4fCount);
+				if (SUCCEEDED(result))
+				{
+					const UINT wvpOffsetRegisters =
+						OutRunWvpRegister - startRegister;
+					RecordGameWvpWrite(
+						constantData + wvpOffsetRegisters * 4,
+						constantData + wvpOffsetRegisters * 4);
+					++SemanticOverlayBypassCalls;
+					if (!FirstSemanticOverlayBypassLogged)
+					{
+						FirstSemanticOverlayBypassLogged = true;
+						spdlog::info(
+							"VR R49 HUD OWNER: semantic overlay c64 kept raw; renderer head injection bypassed so R30 owns exactly one HUD/world-billboard transform");
+					}
+				}
+				return result;
 			}
 
 			float patchedData[256 * 4];
