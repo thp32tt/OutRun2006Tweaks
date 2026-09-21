@@ -763,7 +763,12 @@ public:
 
 		if (Settings::FramerateUnlockExperimental)
 		{
-			Interp::Apply();
+			if (!Interp::Apply())
+			{
+				spdlog::error(
+					"ReplaceGameUpdateLoop: interpolation hook transaction failed; later experimental patches were not installed");
+				return false;
+			}
 
 			constexpr int SetTweeningTable_Addr = 0xED60;
 			SetTweeningTable = safetyhook::create_inline(Module::exe_ptr(SetTweeningTable_Addr), SetTweeningTable_dest);
