@@ -3,7 +3,7 @@ Set-StrictMode -Version Latest
 function Get-OutRunVRTestProfile {
     param(
         [Parameter(Mandatory=$true)]
-        [ValidateSet('CONTROL','CORRECTNESS','PERFORMANCE','STAGE_DIAGNOSTIC','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
+        [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
         [string]$Name
     )
 
@@ -58,6 +58,70 @@ function Get-OutRunVRTestProfile {
                 Environment=[ordered]@{
                     OUTRUN_VR_TEST_PROFILE='STAGE_DIAGNOSTIC'
                     OUTRUN_VR_PERFORMANCE_PROFILE='0'
+                    OUTRUN_VR_ASSET_DIAGNOSTICS='1'
+                }
+            }
+        }
+        'HUD_SCREEN' {
+            return [ordered]@{
+                Name='HUD_SCREEN'
+                Description='Primary HUD correctness session: rank/score/time/gear/ghost/goal/heart/rival/speech/emoji and zero-disparity alignment.'
+                Arguments=@(
+                    '-FramerateLimit=0',
+                    '-FramerateFastLoad=3',
+                    '-FramerateInterpolation=true',
+                    '-FramerateUnlockExperimental=true',
+                    '-FrameCadenceMode=1',
+                    '-FrameCadenceTargetHz=0',
+                    '-DisableDesktopVsync=true'
+                ) + $commonVr
+                Environment=[ordered]@{
+                    OUTRUN_VR_TEST_PROFILE='HUD_SCREEN'
+                    OUTRUN_VR_PERFORMANCE_PROFILE='0'
+                    OUTRUN_VR_HUD_FOCUS='SCREEN'
+                }
+            }
+        }
+        'HUD_MENU' {
+            return [ordered]@{
+                Name='HUD_MENU'
+                Description='Menu/UI correctness session: menu car rendering, exit YES/NO, menu recenter and non-game HUD alignment.'
+                Arguments=@(
+                    '-FramerateLimit=0',
+                    '-FramerateFastLoad=0',
+                    '-FramerateInterpolation=true',
+                    '-FramerateUnlockExperimental=true',
+                    '-FrameCadenceMode=1',
+                    '-FrameCadenceTargetHz=0',
+                    '-DisableDesktopVsync=true'
+                ) + $commonVr
+                Environment=[ordered]@{
+                    OUTRUN_VR_TEST_PROFILE='HUD_MENU'
+                    OUTRUN_VR_PERFORMANCE_PROFILE='0'
+                    OUTRUN_VR_HUD_FOCUS='MENU'
+                }
+            }
+        }
+        'HUD_WORLD' {
+            return [ordered]@{
+                Name='HUD_WORLD'
+                Description='World-attached display session: rival rank markers, Heart Attack markers, world hearts/lines, lens flare, smoke/skid and sky anchoring.'
+                Arguments=@(
+                    '-FramerateLimit=0',
+                    '-FramerateFastLoad=3',
+                    '-FramerateInterpolation=true',
+                    '-FramerateUnlockExperimental=true',
+                    '-FrameCadenceMode=1',
+                    '-FrameCadenceTargetHz=0',
+                    '-DisableDesktopVsync=true',
+                    '-SkipIntros',
+                    '-OuttaTime',
+                    '-LevelSelect'
+                ) + $commonVr
+                Environment=[ordered]@{
+                    OUTRUN_VR_TEST_PROFILE='HUD_WORLD'
+                    OUTRUN_VR_PERFORMANCE_PROFILE='0'
+                    OUTRUN_VR_HUD_FOCUS='WORLD'
                     OUTRUN_VR_ASSET_DIAGNOSTICS='1'
                 }
             }
