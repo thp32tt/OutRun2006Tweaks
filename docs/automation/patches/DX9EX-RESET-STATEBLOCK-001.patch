@@ -1,0 +1,74 @@
+diff --git a/src/vr/d3d9/ex_device_upgrade_r15.cpp b/src/vr/d3d9/ex_device_upgrade_r15.cpp
+--- a/src/vr/d3d9/ex_device_upgrade_r15.cpp
++++ b/src/vr/d3d9/ex_device_upgrade_r15.cpp
+@@
+-        IDirect3DStateBlock9* R15ClassicAllState = nullptr;
+         std::mutex R15ClassicExtraMutex;
+@@
+-            IDirect3DStateBlock9* allState = nullptr;
+-            if (FAILED(device->CreateStateBlock(D3DSBT_ALL, &allState)) || !allState)
+-                return false;
+-
+             if (FAILED(device->GetTransform(D3DTS_WORLD, &next.world)) ||
+@@
+-                allState->Release();
+                 return false;
+@@
+-                    allState->Release();
+                     return false;
+@@
+-            if (R15ClassicAllState)
+-                R15ClassicAllState->Release();
+-            R15ClassicAllState = allState;
+             R15ClassicExtra = next;
+@@
+-        bool R15RestoreClassicAllState(IDirect3DDevice9* device) noexcept
+-        {
+-            if (!device)
+-                return false;
+-            IDirect3DStateBlock9* state = nullptr;
+-            {
+-                std::lock_guard<std::mutex> lock(R15ClassicExtraMutex);
+-                state = R15ClassicAllState;
+-                if (state) state->AddRef();
+-            }
+-            if (!state)
+-                return false;
+-            const HRESULT hr = state->Apply();
+-            state->Release();
+-            return SUCCEEDED(hr);
+-        }
+-
+@@
+-                    if (R15ClassicAllState)
+-                    {
+-                        R15ClassicAllState->Release();
+-                        R15ClassicAllState = nullptr;
+-                    }
+                     R15ClassicExtra = {};
+@@
+-                    if (R15ClassicAllState)
+-                    {
+-                        R15ClassicAllState->Release();
+-                        R15ClassicAllState = nullptr;
+-                    }
+                     R15ClassicExtra = {};
+@@
+-                "VR R15 EX: full D3DSBT_ALL baseline + synchronous Reset/stereo handoff ACTIVE; partial-RECT and generated-mip correctness overlay ACTIVE");
++                "VR R15 EX: explicit fresh-device baseline + synchronous Reset/stereo handoff ACTIVE; partial-RECT and generated-mip correctness overlay ACTIVE");
+@@
+-            // R13 already performed ResetEx and its classic render/stage/sampler
+-            // replay. Re-run that replay so its bool is authoritative, then
+-            // restore state families that R13 did not cover.
++            // ResetEx restores device state to its documented defaults. R13
++            // then replays the classic render/stage/sampler baseline. Re-run
++            // that replay so its bool is authoritative and restore only the
++            // explicitly captured fresh-device families. Never retain/apply a
++            // D3D9 state-block object across ResetEx.
+             const bool coreHealthy =
+                 OutRunVRD3D9ExUpgrade::RestoreClassicResetState(device);
+-            const bool allStateHealthy = R15RestoreClassicAllState(device);
+             const bool extraHealthy =
+                 R15RestoreClassicExtraBaseline(device);
+-            const bool healthy = coreHealthy && allStateHealthy && extraHealthy;
++            const bool healthy = coreHealthy && extraHealthy;
