@@ -22,6 +22,7 @@
 namespace Settings
 {
     extern Setting<float> VRHudScale;
+    extern Setting<float> VRProjectedEffectDistanceMeters;
     extern Setting<float> VRStereoDepth;
     extern Setting<int> SkyGlowFactor;
     extern Setting<bool> SkyGlowTwoStep;
@@ -2646,7 +2647,11 @@ namespace OutRunVRStereo
                 // geometry. Keeping x/w and y/w while replacing z/w with a
                 // constant preserves the game's original 2D placement at
                 // recenter, but adds real IPD convergence and world locking.
-                constexpr float OverlayPlaneViewZ = -2.50f;
+                const float OverlayPlaneViewZ =
+                    -std::clamp(
+                        Settings::VRProjectedEffectDistanceMeters.get(),
+                        2.0f, 200.0f) *
+                    std::max(Settings::VRWorldScale.get(), 0.1f);
                 const float planeClipW =
                     OverlayPlaneViewZ * baseProjection._34 +
                     baseProjection._44;
@@ -2948,7 +2953,8 @@ namespace OutRunVRStereo
             {
                 R30FirstFlatPerspectiveLogged = true;
                 spdlog::info(
-                    "VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay is world-locked on a finite virtual plane with real head/IPD/FOV transform (no HudScale)");
+                    "VR R35 DISTANT EFFECT: depth-disabled alpha perspective overlay uses a configurable distant plane ({:.1f}m) with real head rotation/FOV and reduced near-field parallax",
+                    Settings::VRProjectedEffectDistanceMeters.get());
             }
 
             if (FAILED(rightHr))
