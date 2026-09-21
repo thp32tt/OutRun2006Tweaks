@@ -137,3 +137,28 @@ For long tasks:
 - do not restart completed unchanged work.
 
 User-provided runtime logs and Quest/VDXR tests remain the authority for hardware-only behavior; offline evidence must be labeled accordingly.
+
+
+## Mandatory logging for direct chat/manual writes
+
+The durability rules apply to **every production write path**, not only scheduled automation.
+
+When ChatGPT/Codex or a human-driven chat directly edits, commits, builds, packages, or integrates production VR code/config/workflows:
+
+1. Treat the writer as a D-equivalent production writer for that transaction and follow C0 -> C6.
+2. At C0 read:
+   - `docs/VR_REGRESSION_KNOWLEDGE.json`
+   - `docs/VR_PROBLEM_HISTORY.md`
+   - GitHub Issue #13 (runtime problem/regression ledger) when diagnosing or fixing a runtime symptom
+   - GitHub Issue #14 (production change ledger) for the append-only change record
+3. Before implementation, compare the intended changed paths/hypothesis against historical regression `riskPaths`, triggers and symptom fingerprints.
+4. After each coherent production commit, append an Issue #14 event with:
+   `sourceMode=CHAT_DIRECT`, KST timestamp, base SHA, result SHA, summary, changed paths, reason, related finding/regression keys, validation, runtime-test requirement and exact next action.
+5. If the change reopens, fixes, mitigates or validates a runtime problem, also:
+   - update the matching case in `docs/VR_REGRESSION_KNOWLEDGE.json`;
+   - update `docs/VR_PROBLEM_HISTORY.md` when durable knowledge changed;
+   - append the corresponding event to Issue #13 using the existing stable regression key.
+6. Do not create a new regression key for a familiar symptom until the existing history has been checked.
+7. A direct-chat fix is not exempt from regression revalidation, state persistence, build evidence or HMD-evidence labeling.
+
+If GitHub issue write capability is unavailable, mark the transaction `PUSH_PENDING/CAPABILITY_BLOCKED` in durable repository state; never claim the ledger was written when it was not.
