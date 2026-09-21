@@ -249,13 +249,24 @@ public:
 	bool apply() override
 	{
 		constexpr int Sumo_BinkGetPow2_Addr = 0x14730;
+		auto* const target = Module::exe_ptr(Sumo_BinkGetPow2_Addr);
 
-		// patch start of func to 5 nops + ret
-		Memory::VP::Patch(Module::exe_ptr(Sumo_BinkGetPow2_Addr), { 0x90, 0x90, 0x90, 0x90, 0x90, 0xC3 });
+		// The replacement requires both the raw NOP+RET body and the mid-hook.
+		// TogglePatch snapshots the exact original bytes so a hook-install failure
+		// can restore the vanilla helper instead of leaving a truncated function.
+		static TogglePatch bodyPatch(target,
+			std::vector<uint8_t>{ 0x90, 0x90, 0x90, 0x90, 0x90, 0xC3 });
+		bodyPatch.set(true);
 
-		// midhook func
-		Sumo_BinkGetPow2 = safetyhook::create_mid(Module::exe_ptr(Sumo_BinkGetPow2_Addr), destination);
-		return !!Sumo_BinkGetPow2;
+		auto replacementHook = safetyhook::create_mid(target, destination);
+		if (!replacementHook)
+		{
+			bodyPatch.set(false);
+			return false;
+		}
+
+		Sumo_BinkGetPow2 = std::move(replacementHook);
+		return true;
 	}
 
 	static FixBinkLargeMovies instance;
