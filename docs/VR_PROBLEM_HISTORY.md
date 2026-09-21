@@ -15,27 +15,31 @@ This document is the human-readable companion to `docs/VR_REGRESSION_KNOWLEDGE.j
 
 ## VR-STARTUP-WHITE-001 — logo -> persistent white screen
 
-**Status:** REOPENED / PROTECTION_MISSING_ON_CURRENT_FOCUS  
+**Status:** INTEGRATED / BUILD_VERIFIED / NEED_HMD_TEST  
 **Observed again:** 2026-09-21 KST  
+**Integrated protection:** 2026-09-22 KST  
 **Severity:** runtime-blocking
 
 ### Symptom fingerprint
 
 The game reaches or passes the logo, then remains on a white screen instead of progressing into normal menu/game flow. Input/recenter may still react, so this is treated as a presentation/progression regression rather than a simple process crash until logs prove otherwise.
 
-### Reconstructed durable knowledge (2026-09-22)
+### Reconstructed durable knowledge
 
 The prior failure was correlated to known-bad `1f2dcb9848a7142c295f371f0dc91663f174c442`. The bounded root cause was D3D9Ex synchronous CreateDevice-thread stereo installation calling `EnsureStereoResources` before the promoted device was returned to OutRun, allocating/mutating private render-target/depth resources before fresh-device initialization completed.
 
-Primary protection was `986f0d5794476056ef4bea08c6ac3c0d1f5f01d2`, which kept synchronous hook ownership but deferred private stereo-resource creation until the first successful real game `Present`. Structural guard `ba402e98351fcf8d215bd7719b6ea56044566ead` protected that invariant. Known-good startup transition was observed on `a9abb85702925aaa09ca85581423eb9766c2adb3`; that build still had a separate theater-only VR follow-up defect.
+Historical protection was `986f0d5794476056ef4bea08c6ac3c0d1f5f01d2`, with structural guard `ba402e98351fcf8d215bd7719b6ea56044566ead`. Known-good startup transition was observed on `a9abb85702925aaa09ca85581423eb9766c2adb3`; that build still had a separate theater-only VR follow-up defect.
 
-Current `vr-d3d9ex-focus` diverged from that historical fix line and again contains the pre-fix resource initialization in `InstallStereoHooks`, while `PresentDest` lacks the deferred-init protection. This is a recurrence caused by missing protection, not a new bug key.
+### Current-focus integration — 2026-09-22
 
-### Required recovery sequence
+Candidate `341bd8027b9595f43c89e31ae1f9cf8783751faa` reconstructed the protection on base `3de2e34c8f77b39a6a5f1f2a521e21ac2a82ef39`: synchronous `InstallStereoHooks` no longer initializes private stereo resources before CreateDeviceEx exposure, and final R23 `Present` initializes them only after a successful lower game Present. The deterministic architecture guard is included. DX9Ex Active Validation run `35647825229` succeeded. A domain review, B rendering-domain review, and C exact-SHA changeset sanity all passed with runtime validation explicitly remaining `NEED_HMD_TEST`.
 
-1. Reconstruct the `986f0d57` protection minimally on the latest focus branch while preserving current post-successful-Present ownership.
-2. Restore a deterministic structural guard equivalent to `ba402e98`.
-3. Build the active DX9Ex game DLL and x64 OpenXR host and run deterministic host/regression checks.
-4. Keep one mandatory HMD startup transition check: **logo -> menu/game, no persistent white frame**.
-5. Also confirm gameplay stereo opens after the deferred initialization.
-6. Append candidate/integration/validation events to Issue #13; final DONE requires matching USER RUNTIME VERIFIED evidence.
+The candidate was fast-forward integrated into `vr-d3d9ex-focus`. This is **not final DONE** because the failure is runtime-visible.
+
+### Required remaining validation
+
+1. Launch the CORRECTNESS package on Quest 3 / VDXR.
+2. Confirm **logo -> menu/game** with no persistent white frame.
+3. Confirm first gameplay stereo opens after deferred initialization.
+4. If it passes, append USER_RUNTIME_VERIFIED/VALIDATED to Issue #13 and update the registry to DONE.
+5. If it recurs, append REOPENED using `VR-STARTUP-WHITE-001`, increment recurrence, and preserve the full earlier history.
