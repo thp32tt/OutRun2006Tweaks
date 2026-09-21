@@ -31,6 +31,7 @@ if(!$backend){throw 'Active backend identity is missing.'}
 # previous session and creates a clean session before launch.
 $patterns=@(
     'OutRun2006Tweaks*.log',
+    'OutRun2006Tweaks-hudtrace*.csv',
     'outrun-vr-host*.log',
     'outrun-vr-host-pipeline*.log',
     'outrun-vr-watchdog*.log',
@@ -71,7 +72,8 @@ $recoveryBootArgs=@(
     '-FramerateUnlockExperimental=false',
     '-FrameCadenceMode=0',
     '-DisableDesktopVsync=false',
-    '-SkyGlowFactor=1'
+    '-SkyGlowFactor=1',
+    '-HudInspector=true'
 )
 $gameArgs=@($recoveryBootArgs)
 if($backend -eq 'd3d9' -or $backend -eq 'dxvk-safe'){
@@ -100,6 +102,8 @@ $oldVkDisable = $env:VK_LOADER_LAYERS_DISABLE
 $oldVkInstanceLayers = $env:VK_INSTANCE_LAYERS
 $oldVkDebug = $env:VK_LOADER_DEBUG
 $oldVrForceDisabled = $env:OUTRUN_VR_FORCE_DISABLED
+$oldShaderFingerprint = $env:OUTRUN_VR_SHADER_FINGERPRINT
+$env:OUTRUN_VR_SHADER_FINGERPRINT='1'
 if($backend -eq '2d'){
     $env:OUTRUN_VR_FORCE_DISABLED='1'
     Write-Host '2D control isolation: all OpenXR/VR hook installers are disabled for this process.'
@@ -123,6 +127,7 @@ try{
     $p=Start-Process -FilePath $game -ArgumentList $gameArgs -WorkingDirectory $root -PassThru
 } finally {
     $env:OUTRUN_VR_FORCE_DISABLED=$oldVrForceDisabled
+    $env:OUTRUN_VR_SHADER_FINGERPRINT=$oldShaderFingerprint
     if($dxvkMode){
         $env:VK_LOADER_LAYERS_DISABLE=$oldVkDisable
         $env:VK_INSTANCE_LAYERS=$oldVkInstanceLayers

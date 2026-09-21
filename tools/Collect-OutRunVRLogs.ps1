@@ -4,6 +4,7 @@ $root=Split-Path -Parent $MyInvocation.MyCommand.Path
 
 $patterns=@(
     'OutRun2006Tweaks*.log',
+    'OutRun2006Tweaks-hudtrace*.csv',
     'outrun-vr-host*.log',
     'outrun-vr-host-pipeline*.log',
     'outrun-vr-watchdog*.log',
@@ -68,7 +69,7 @@ function Prepare-NextSession([string]$backend,[string]$variant,[string]$matrix){
     Write-ActiveSession $backend $variant $matrix $session $startedUtc
 
     if(Test-Path $ini){
-        $allowed='^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor)\s*='
+        $allowed='^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|HudInspector)\s*='
         Get-Content $ini|Where-Object{$_ -match $allowed}|Set-Content (Join-Path $sessionRoot 'VR_CONFIG_SNAPSHOT.txt') -Encoding UTF8
     }
     Copy-Item (Join-Path $root 'ACTIVE_VR_BACKEND.txt') $sessionRoot -Force
@@ -115,6 +116,84 @@ Copy-Item $active $dest -Force
 Copy-Item $sessionState $dest -Force
 $inputs=Join-Path $root 'BUILD_INPUTS.json'
 if(Test-Path $inputs){Copy-Item $inputs $dest -Force}
+
+$gameExe=Join-Path $root 'OR2006C2C.EXE'
+if(Test-Path $gameExe){
+    $exeItem=Get-Item $gameExe
+    $exeSha=(Get-FileHash $gameExe -Algorithm SHA256).Hash.ToLowerInvariant()
+    $upstreamReferenceSha='68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3'
+    $matchesUpstream=($exeSha -eq $upstreamReferenceSha)
+    @(
+        "filename=$($exeItem.Name)"
+        "size=$($exeItem.Length)"
+        "sha256=$exeSha"
+        "upstreamReferenceSha256=$upstreamReferenceSha"
+        "matchesUpstreamReplacementExe=$matchesUpstream"
+        "lastWriteUtc=$($exeItem.LastWriteTimeUtc.ToString('o'))"
+    )|Set-Content (Join-Path $dest 'EXE_IDENTITY.txt') -Encoding UTF8
+    $copied+='EXE_IDENTITY.txt'
+}
+
+$gameLogs=Get-ChildItem $dest -Filter 'OutRun2006Tweaks*.log' -File -ErrorAction SilentlyContinue
+$shaderLines=@()
+foreach($log in $gameLogs){
+    $shaderLines += Select-String -Path $log.FullName -Pattern 'VR GPL SHADER:' -SimpleMatch |
+        ForEach-Object { $_.Line }
+}
+if($shaderLines.Count -gt 0){
+    @(
+        'SHADER FINGERPRINT SUMMARY'
+        "session=$session"
+        "pairs=$($shaderLines.Count)"
+        ''
+        $shaderLines
+    )|Set-Content (Join-Path $dest 'SHADER_FINGERPRINT_SUMMARY.txt') -Encoding UTF8
+    $copied+='SHADER_FINGERPRINT_SUMMARY.txt'
+}
+
+$hudCsv=Join-Path $dest 'OutRun2006Tweaks-hudtrace.csv'
+if(Test-Path $hudCsv){
+    $hudRows=Get-Content $hudCsv |
+        Where-Object { $_ -and -not $_.StartsWith('#') } |
+        ConvertFrom-Csv
+    if($hudRows){
+        $summary=@()
+        $summary+='HUD TRACE SUMMARY'
+        $summary+="session=$session"
+        $summary+="rows=$($hudRows.Count)"
+        $summary+=''
+        $groups=$hudRows |
+            Group-Object event,call_rva,known_area,mode,stage,arg0,arg1 |
+            ForEach-Object {
+                $maxCount=($_.Group | ForEach-Object {[int]$_.count} | Measure-Object -Maximum).Maximum
+                [pscustomobject]@{
+                    Event=$_.Group[0].event
+                    CallRva=$_.Group[0].call_rva
+                    KnownArea=$_.Group[0].known_area
+                    Mode=$_.Group[0].mode
+                    Stage=$_.Group[0].stage
+                    Arg0=$_.Group[0].arg0
+                    Arg1=$_.Group[0].arg1
+                    Arg2=$_.Group[0].arg2
+                    Arg3=$_.Group[0].arg3
+                    Arg4=$_.Group[0].arg4
+                    Arg5=$_.Group[0].arg5
+                    Arg6=$_.Group[0].arg6
+                    Arg7=$_.Group[0].arg7
+                    MaxCount=[int]$maxCount
+                }
+            } |
+            Sort-Object @{Expression={if($_.KnownArea){0}else{1}}}, @{Expression='MaxCount';Descending=$true}, CallRva
+        $summary+='event | call_rva | known_area | mode | stage | arg0 | arg1 | arg2 | arg3 | arg4 | arg5 | arg6 | arg7 | observed_count'
+        $summary+='------|----------|------------|------|-------|------|------|------|------|------|------|------|------|---------------'
+        foreach($g in ($groups | Select-Object -First 200)){
+            $summary+=("$($g.Event) | $($g.CallRva) | $($g.KnownArea) | $($g.Mode) | $($g.Stage) | $($g.Arg0) | $($g.Arg1) | $($g.Arg2) | $($g.Arg3) | $($g.Arg4) | $($g.Arg5) | $($g.Arg6) | $($g.Arg7) | $($g.MaxCount)")
+        }
+        $summary|Set-Content (Join-Path $dest 'HUD_TRACE_SUMMARY.txt') -Encoding UTF8
+        $copied+='HUD_TRACE_SUMMARY.txt'
+    }
+}
+
 $payloadBackend=if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}
 $source=Join-Path $root "backends/$payloadBackend/SOURCE_SHA.txt"
 $sha=if(Test-Path $source){(Get-Content $source -Raw).Trim()}else{'unknown'}
