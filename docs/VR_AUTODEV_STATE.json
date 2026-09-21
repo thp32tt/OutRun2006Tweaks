@@ -306,5 +306,35 @@
     "reuseStableKeyOnRecurrence": true,
     "requireTriggeredCaseRevalidationBeforeIntegration": true,
     "startupBaselineKey": "VR-STARTUP-WHITE-001"
+  },
+  "productionChangeLogging": {
+    "ledgerIssue": 14,
+    "appliesTo": [
+      "SCHEDULED_D",
+      "CHAT_DIRECT",
+      "MANUAL"
+    ],
+    "directChatUsesDTransactionContract": true,
+    "mandatoryAfterProductionCommit": true,
+    "logCheckpoint": "C4.5_LOG",
+    "fields": [
+      "sourceMode",
+      "changedAtKst",
+      "baseSha",
+      "resultSha",
+      "changeSummary",
+      "changedPaths",
+      "reason",
+      "relatedFindingOrRegressionKeys",
+      "validation",
+      "runtimeTestRequired",
+      "nextAction"
+    ],
+    "runtimeProblemAlsoUpdates": {
+      "regressionLedgerIssue": 13,
+      "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
+      "history": "docs/VR_PROBLEM_HISTORY.md"
+    },
+    "onWriteFailure": "PUSH_PENDING_OR_CAPABILITY_BLOCKED"
   }
 }
