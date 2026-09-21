@@ -52,13 +52,36 @@ def main() -> int:
         "GetLastRawGameWvpWrite",
         "finite HUD world-lock",
         "R30XyzrhwWorldLockedHudDraws",
-        "R46XyzrhwHudPlaneAccepted",
-        "R46XyzrhwUnknownRejected",
-        "if (!state.worldEffect && !hudPlaneEvidence)",
-        "R46: never classify an unknown XYZRHW draw as HUD merely because",
+        "R47SemanticHudAccepted",
+        "R47SemanticUnknownRejected",
+        "GameSemantic::CorroboratesHud",
+        "GameSemantic::CorroboratesWorld",
+        "GameSemantic::ConsumeForDraw",
+        "Never promote an unknown XYZRHW draw from D3D",
+        "canonical EXE sprite-queue semantics own HUD transforms",
     ])
     forbid("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
         "if (state.depthTestEnabled && !state.worldEffect &&",
+        "if (!state.worldEffect && !hudPlaneEvidence)",
+    ])
+    require("src/vr/game/render_semantics.hpp", [
+        "RenderScope::ScreenHud",
+        "RegisterSpriteNodeScope(",
+        "ConsumeSpriteNodeScope(",
+        "BeginSpriteQueueRender()",
+        "SelectSpriteQueueNode(",
+        "EndSpriteQueueRender()",
+        "0x42D734",
+        "0x42DCB4",
+    ])
+    require("src/hooks_uiscaling.cpp", [
+        "VRHudQueueSemanticBridge",
+        "Module::exe_ptr(0x2D734)",
+        "Module::exe_ptr(0x2D762)",
+        "Module::exe_ptr(0x2DCB4)",
+        "RegisterSpriteNodeScope(",
+        "RenderScope::WorldBillboard",
+        "canonical sprite queue 0x2D734..0x2DCB4 owns SCREEN_HUD",
     ])
     require("src/vr/d3d9/stereo_renderer_r30.cpp", [
         "clipCorrection._11 = hudScaleX;",
@@ -122,6 +145,8 @@ def main() -> int:
         '0x02D0C0: "put_sprite_ex2"',
         '0x060900, 0x061100, "ctrl_icon_work", "HUD_CTRL_ICON"',
         '0x0BBA00, 0x0BBC00, "DispTempHeartNum", "HUD_TEMP_HEART"',
+        '0x556C00: "sprite_prio_root"',
+        "find_data_xrefs(pe)",
     ])
     require("src/vr/hud_semantics.hpp", [
         '"HUD_CTRL_ICON"',
