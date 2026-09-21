@@ -88,5 +88,16 @@ Require ($workflow.Contains('group: vr-dx9ex-active-${{ github.ref_name }}')) "C
 $protocolPath = Join-Path $RepoRoot "docs/VR_AUTODEV_PROTOCOL.md"
 Require (Test-Path $protocolPath) "Missing four-role protocol"
 
+$agentsPath = Join-Path $RepoRoot "AGENTS.md"
+Require (Test-Path $agentsPath) "Missing AGENTS.md production-write contract"
+$agents = Get-Content -Raw $agentsPath
+foreach($marker in @("Issue #14","C4.5_LOG","CHAT_DIRECT","SCHEDULED_D","MANUAL")){
+    Require ($agents.Contains($marker)) "AGENTS.md missing production-ledger marker: $marker"
+}
+
+$ledgerVerifierPath = Join-Path $RepoRoot "tools/Test-VRProductionLedger.ps1"
+Require (Test-Path $ledgerVerifierPath) "Missing exact-SHA production ledger verifier"
+Require ($workflow.Contains("Test-VRProductionLedger.ps1")) "Active validation does not execute exact-SHA production ledger verifier"
+
 Write-Host "VR four-role coordination validation passed."
 Write-Host ("Queue items={0}; active candidate WIP={1}; runtime sessions={2}" -f @($queue.items).Count, $candidateBranches.Count, @($feedback.sessions).Count)
