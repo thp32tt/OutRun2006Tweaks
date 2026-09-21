@@ -2,6 +2,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/runtime_eligibility.hpp"
 #include <algorithm>
 #include <iostream>
 #include <array>
@@ -896,7 +897,12 @@ class ReflectionUpdateRate : public Hook
 		static LARGE_INTEGER frequency{};
 
 		float frameScale60 = 1.0f;
-		if (Settings::VREnabled && Settings::VRNormalizeReflectionRate)
+		const bool normalizeForActiveVr =
+			Settings::VREnabled &&
+			Settings::VRStereo &&
+			Settings::VRNormalizeReflectionRate &&
+			OutRunVR::RuntimeEligibility::MayInjectStereo();
+		if (normalizeForActiveVr)
 		{
 			if (frequency.QuadPart <= 0)
 				QueryPerformanceFrequency(&frequency);
