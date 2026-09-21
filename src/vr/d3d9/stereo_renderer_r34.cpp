@@ -8,6 +8,7 @@
 // stale ResetEx state. A later clean Reset clears the block.
 
 #include "stereo_renderer_r33.cpp"
+#include "vr/game/render_semantics.hpp"
 
 namespace OutRunVRD3D9ExUpgradeR13
 {
@@ -60,6 +61,13 @@ namespace OutRunVRStereo
         HRESULT R34GuardStereoRasterState(IDirect3DDevice9* device,
             DrawCall&& drawCall, const char* site) noexcept
         {
+            const auto drawSemanticValue =
+                (device && IsGameDevice(device) && !InternalStereoPass)
+                ? OutRunVR::GameSemantic::ConsumeForDraw()
+                : OutRunVR::GameSemantic::CurrentScope;
+            OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
+                drawSemanticValue);
+
             if (!device || !IsGameDevice(device) || InternalStereoPass ||
                 R31StateBlockRecording || !StereoWanted() ||
                 !TargetIsBackBuffer())
