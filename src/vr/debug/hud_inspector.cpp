@@ -172,9 +172,10 @@ namespace OutRunVRHudInspector
         void __cdecl PutSpriteDest(SPRARGS* sprargs, float priority)
         {
             WriteEvent(EventKind::PutSprite, "put_sprite_ex", _ReturnAddress(),
-                static_cast<std::uint32_t>(
+                0u, 0u,
+                static_cast<double>(
                     reinterpret_cast<std::uintptr_t>(sprargs)),
-                0u, priority);
+                priority);
             PutSpriteHook.unsafe_ccall<void>(sprargs, priority);
         }
 
