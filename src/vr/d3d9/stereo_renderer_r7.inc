@@ -1468,18 +1468,6 @@ namespace OutRunVRStereo
 
 			const HRESULT hr=PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);
 
-			// D3D9Ex installs the Reset/Present ownership hooks synchronously before
-			// CreateDeviceEx returns to the game. Do not allocate/clear/swap private
-			// stereo RT/depth resources at that pre-exposure boundary: OutRun has not
-			// finished its own fresh-device initialization yet. The first successful
-			// real game Present is the earliest safe boundary to initialize them.
-			if(SUCCEEDED(hr)&&!StereoResourcesReady&&EnsureStereoResources(device)&&
-				!FirstDeferredResourceInitLogged)
-			{
-				FirstDeferredResourceInitLogged=true;
-				spdlog::info("VR stereo: private eye resources initialized only after first successful game Present; CreateDevice pre-exposure RT/depth mutation removed");
-			}
-
 			if(directTransport)
 			{
 				if(SUCCEEDED(hr)&&DirectTransportFrameReadyAfterPresent(pendingFrameId))
@@ -1610,9 +1598,9 @@ namespace OutRunVRStereo
 			LastBeginSceneCountAtPresent=OutRunVRRenderer::GetBeginSceneCallCount();
 			EnsureSharedState();
 			EnsureRenderFrameState();
-			// Resource creation is intentionally deferred until the first successful
-			// game Present. Hook ownership must be synchronous for D3D9Ex Reset safety,
-			// but fresh-device render targets must remain untouched before exposure.
+			// Resource creation is intentionally deferred beyond CreateDevice exposure.
+			// The final R23 Present owner initializes private eye resources only after
+			// a successful real game Present, so early Ex device setup remains untouched.
 			StereoInstalledDevice.store(device,std::memory_order_release);
 			StereoBaseCallbacksArmed.store(true,std::memory_order_release);
 			StereoInstallState.store(StereoInstallReady,std::memory_order_release);
