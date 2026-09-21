@@ -134,7 +134,8 @@ namespace OutRunVRHudInspector
             const void* returnAddress,
             std::uint32_t arg0, std::uint32_t arg1,
             double arg2 = 0.0, double arg3 = 0.0,
-            double arg4 = 0.0, double arg5 = 0.0)
+            double arg4 = 0.0, double arg5 = 0.0,
+            double arg6 = 0.0, double arg7 = 0.0)
         {
             if (!TraceFile)
                 return;
@@ -163,6 +164,8 @@ namespace OutRunVRHudInspector
                 << arg3 << ','
                 << arg4 << ','
                 << arg5 << ','
+                << arg6 << ','
+                << arg7 << ','
                 << count << '\n';
 
             if ((++TraceLines & 63ull) == 0)
@@ -217,7 +220,7 @@ namespace OutRunVRHudInspector
                         << "# exe_size_of_image=" << ExeSizeOfImage() << "\n"
                         << "# module_base=runtime-only; all addresses below are ASLR-safe RVAs\n"
                         << "elapsed_ms,event,return_rva,call_rva,known_area,mode,stage,"
-                           "arg0,arg1,arg2,arg3,arg4,arg5,count\n";
+                           "arg0,arg1,arg2,arg3,arg4,arg5,arg6,arg7,count\n";
                     TraceFile.flush();
                 }
                 return true;
@@ -243,20 +246,25 @@ namespace OutRunVRHudInspector
     void TracePutSprite(SPRARGS* sprargs, float priority,
         const void* returnAddress)
     {
+        if (!sprargs)
+            return;
         WriteEvent(EventKind::PutSprite, "put_sprite_ex", returnAddress,
-            0u, 0u,
-            static_cast<double>(
-                reinterpret_cast<std::uintptr_t>(sprargs)),
-            priority);
+            sprargs->xstnum_0, sprargs->top_4,
+            sprargs->left_8, sprargs->bottom_C,
+            sprargs->right_10, sprargs->scaleX,
+            sprargs->scaleY, priority);
     }
 
-    void TracePutSprite2(const void* sprargs, float priority,
+    void TracePutSprite2(SPRARGS2* sprargs, float priority,
         const void* returnAddress)
     {
+        if (!sprargs)
+            return;
         WriteEvent(EventKind::PutSprite2, "put_sprite_ex2", returnAddress,
-            0u, 0u,
-            static_cast<double>(
-                reinterpret_cast<std::uintptr_t>(sprargs)),
+            sprargs->xstnum_0, sprargs->child_B4 ? 1u : 0u,
+            sprargs->color_4,
+            sprargs->TopLeft_54.x, sprargs->TopLeft_54.y,
+            sprargs->BottomRight_78.x, sprargs->BottomRight_78.y,
             priority);
     }
 
