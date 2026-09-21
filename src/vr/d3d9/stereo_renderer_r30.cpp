@@ -1209,6 +1209,55 @@ namespace OutRunVRStereo
             }
         }
 
+        bool R30TransformHudScissor(
+            const RECT& source, const D3DVIEWPORT9& viewport,
+            float scaleX, float scaleY, float offsetX,
+            RECT& transformed) noexcept
+        {
+            if (!std::isfinite(scaleX) || !std::isfinite(scaleY) ||
+                !std::isfinite(offsetX) ||
+                scaleX <= 0.0f || scaleY <= 0.0f ||
+                viewport.Width == 0 || viewport.Height == 0)
+                return false;
+
+            const float leftBound = static_cast<float>(viewport.X);
+            const float topBound = static_cast<float>(viewport.Y);
+            const float rightBound =
+                leftBound + static_cast<float>(viewport.Width);
+            const float bottomBound =
+                topBound + static_cast<float>(viewport.Height);
+            const float centerX = 0.5f * (leftBound + rightBound);
+            const float centerY = 0.5f * (topBound + bottomBound);
+            const float pixelOffsetX =
+                offsetX * static_cast<float>(viewport.Width) * 0.5f;
+
+            auto mapX = [&](LONG x) {
+                return centerX +
+                    (static_cast<float>(x) - centerX) * scaleX +
+                    pixelOffsetX;
+            };
+            auto mapY = [&](LONG y) {
+                return centerY +
+                    (static_cast<float>(y) - centerY) * scaleY;
+            };
+
+            const float l = std::clamp(mapX(source.left),
+                leftBound, rightBound);
+            const float r = std::clamp(mapX(source.right),
+                leftBound, rightBound);
+            const float t = std::clamp(mapY(source.top),
+                topBound, bottomBound);
+            const float b = std::clamp(mapY(source.bottom),
+                topBound, bottomBound);
+
+            transformed.left = static_cast<LONG>(std::floor((std::min)(l, r)));
+            transformed.right = static_cast<LONG>(std::ceil((std::max)(l, r)));
+            transformed.top = static_cast<LONG>(std::floor((std::min)(t, b)));
+            transformed.bottom = static_cast<LONG>(std::ceil((std::max)(t, b)));
+            return transformed.right > transformed.left &&
+                transformed.bottom > transformed.top;
+        }
+
         enum class R30ScreenSpaceKind : std::uint8_t
         {
             None,
@@ -2663,7 +2712,12 @@ namespace OutRunVRStereo
                 R30HudContainScale(stereo, hudScaleX, hudScaleY);
                 // Keep the already-verified ordinary HUD mapping unchanged.
                 // Only FlatPerspectiveEffect uses the finite 3D plane above.
-                clipCorrection._11 = hudScaleX;
+                // R35 reference-stack correction: R30BuildEyeAffine returns
+                // both scale and offset for the asymmetric per-eye FOV. The
+                // previous HUD path consumed only the offset, so horizontally
+                // asymmetric runtimes could converge the centre while leaving
+                // the canvas width wrong. Apply both terms.
+                clipCorrection._11 = hudScaleX * eyeScale[eye];
                 clipCorrection._22 = hudScaleY;
                 clipCorrection._33 = 1.0f;
                 clipCorrection._44 = 1.0f;
@@ -2734,6 +2788,30 @@ namespace OutRunVRStereo
             if (FAILED(device->GetViewport(&savedViewport)))
                 return E_NOTIMPL;
 
+            DWORD scissorEnabled = FALSE;
+            RECT savedScissor{};
+            const bool haveScissorState =
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_SCISSORTESTENABLE, &scissorEnabled));
+            const bool haveScissor =
+                haveScissorState && scissorEnabled != FALSE &&
+                SUCCEEDED(device->GetScissorRect(&savedScissor));
+            RECT eyeScissor[2]{};
+            bool transformScissor = false;
+            if (screenKind == R30ScreenSpaceKind::Hud2D && haveScissor)
+            {
+                float hudScaleX = 1.0f;
+                float hudScaleY = 1.0f;
+                R30HudContainScale(stereo, hudScaleX, hudScaleY);
+                transformScissor =
+                    R30TransformHudScissor(savedScissor, savedViewport,
+                        hudScaleX * eyeScale[0], hudScaleY,
+                        eyeOffset[0], eyeScissor[0]) &&
+                    R30TransformHudScissor(savedScissor, savedViewport,
+                        hudScaleX * eyeScale[1], hudScaleY,
+                        eyeOffset[1], eyeScissor[1]);
+            }
+
             // Capture the completed world eyes before the first recognized HUD
             // draw. Present then extracts glow from this snapshot, so bright HUD
             // text/icons are never themselves bloom sources.
@@ -2771,7 +2849,29 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             }
 
+            if (transformScissor)
+            {
+                InternalPassScope guard;
+                if (FAILED(device->SetScissorRect(&eyeScissor[0])))
+                {
+                    SetWvpOneRegisterAtATime(device, original);
+                    ++R30ScreenSpaceFallbacks;
+                    return E_NOTIMPL;
+                }
+            }
+
             const HRESULT leftHr = actualDraw();
+
+            if (transformScissor)
+            {
+                InternalPassScope guard;
+                if (FAILED(device->SetScissorRect(&savedScissor)))
+                {
+                    R9Poison(OutRunVR::StereoFailureRestoreFailed,
+                        "R30/HUD-left-scissor");
+                    R29ArmMonoSafety();
+                }
+            }
             if (FAILED(leftHr))
             {
                 bool restored = false;
@@ -2804,6 +2904,8 @@ namespace OutRunVRStereo
                 }
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&savedViewport);
+                if (SUCCEEDED(rightHr) && transformScissor)
+                    rightHr = device->SetScissorRect(&eyeScissor[1]);
                 if (SUCCEEDED(rightHr) &&
                     !SetWvpOneRegisterAtATime(device, eyeConstants[1]))
                 {
@@ -2818,6 +2920,12 @@ namespace OutRunVRStereo
                 }
                 restoreOk = RestoreRightPassState(device, savedRt, savedDepth,
                     savedViewport, original, true);
+                if (transformScissor &&
+                    FAILED(device->SetScissorRect(&savedScissor)))
+                {
+                    restoreOk = false;
+                    NoteRestoreFailure("R30/HUD-right-scissor-restore");
+                }
             }
 
             FrameHadDuplicatedDraw = true;
@@ -2830,7 +2938,8 @@ namespace OutRunVRStereo
             {
                 R30FirstScreenSpaceLogged = true;
                 spdlog::info(
-                    "VR R30 HUD: asymmetric-FOV convergence correction ACTIVE; common-centre offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} sourceOverTarget={:.3f}",
+                    "VR R35 HUD: asymmetric-FOV scale+offset and per-eye scissor correction ACTIVE; scale[L/R]={:.4f}/{:.4f} offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} sourceOverTarget={:.3f}",
+                    eyeScale[0], eyeScale[1],
                     eyeOffset[0], eyeOffset[1], R30HudScaleValue(),
                     R30HudAspectCompensation(stereo));
             }
