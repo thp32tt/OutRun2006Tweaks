@@ -66,6 +66,12 @@ namespace OutRunVR::GameSemantic
         return CurrentScope;
     }
 
+    inline void CancelNextDraw(RenderScope expected) noexcept
+    {
+        if (NextDrawScope == expected)
+            NextDrawScope = RenderScope::None;
+    }
+
     inline void ClearNextDraw() noexcept
     {
         NextDrawScope = RenderScope::None;
