@@ -1,4 +1,5 @@
 #pragma once
+// Scheduled-review baseline marker: UIScaling-derived VR HUD semantics.
 
 #include <array>
 #include <cstdint>
