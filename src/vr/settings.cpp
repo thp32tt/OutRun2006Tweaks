@@ -55,6 +55,10 @@ namespace Settings
 		"Scales the OpenXR projection swapchain relative to the runtime-recommended eye size. 1.0 follows Virtual Desktop/OpenXR exactly; lower values reduce host fill cost.", Range<float>{ 0.50f, 1.50f } };
 	Setting<float> VRHostSharpening{ "VR", "HostSharpening", 0.20f,
 		"Applies a lightweight contrast-adaptive sharpening pass in the x64 OpenXR host after source scaling. 0 disables it.", Range<float>{ 0.0f, 1.0f } };
+	Setting<float> VRDirectTransportScale{ "VR", "DirectTransportScale", 0.77f,
+		"FSR1 POC only: scales the D3D9Ex shared-eye transport relative to the runtime-recommended eye size while keeping the OpenXR projection at full size.", Range<float>{ 0.50f, 1.0f } };
+	Setting<float> VRFsr1Sharpness{ "VR", "FSR1Sharpness", 0.55f,
+		"FSR1 POC RCAS strength for DirectGPU eye upscaling. 0 is softest and 1 is strongest.", Range<float>{ 0.0f, 1.0f } };
 	Setting<bool> VRDirectX86OpenXRProbe{ "VR", "DirectX86OpenXRProbe", true,
 		"Logs whether the 32-bit game process can see a registered OpenXR runtime and 32-bit openxr_loader.dll. This is a capability probe only; the x64 host remains authoritative." };
 	Setting<int> VRFrameCadenceMode{ "VR", "FrameCadenceMode", 1,
@@ -143,6 +147,14 @@ namespace OutRunVR
 					renderScale.c_str());
 				SetEnvironmentVariableA("OUTRUN_VR_SHARPENING",
 					sharpening.c_str());
+				const std::string transportScale =
+					std::to_string(Settings::VRDirectTransportScale.get());
+				const std::string fsrSharpness =
+					std::to_string(Settings::VRFsr1Sharpness.get());
+				SetEnvironmentVariableA("OUTRUN_VR_DIRECT_TRANSPORT_SCALE",
+					transportScale.c_str());
+				SetEnvironmentVariableA("OUTRUN_VR_FSR1_SHARPNESS",
+					fsrSharpness.c_str());
 				const std::string cadenceMode =
 					std::to_string(Settings::VRFrameCadenceMode.get());
 				const std::string cadenceTargetHz =
@@ -216,6 +228,8 @@ namespace OutRunVR
 			Settings::VRTargetRefreshRateHz.needs_restart();
 			Settings::VRHostRenderScale.needs_restart();
 			Settings::VRHostSharpening.needs_restart();
+			Settings::VRDirectTransportScale.needs_restart();
+			Settings::VRFsr1Sharpness.needs_restart();
 			Settings::VRDirectX86OpenXRProbe.needs_restart();
 			Settings::VRFrameCadenceMode.needs_restart();
 			Settings::VRFrameCadenceTargetHz.needs_restart();
@@ -228,12 +242,14 @@ namespace OutRunVR
 			if (Settings::VRDirectX86OpenXRProbe)
 				OutRunVR::X86OpenXRProbe::Run();
 			spdlog::info(
-				"VR: D3D9Ex DirectGPU preference={} directOnly={} refreshOverrideHz={:.1f} hostRenderScale={:.2f} hostSharpening={:.2f} cadenceMode={} cadenceTargetHz={:.1f} cadenceMaxHz={:.1f}; target 0 means XR-native render cadence, simulation remains 60 Hz",
+				"VR: D3D9Ex DirectGPU preference={} directOnly={} refreshOverrideHz={:.1f} hostRenderScale={:.2f} hostSharpening={:.2f} transportScale={:.2f} fsr1Sharpness={:.2f} cadenceMode={} cadenceTargetHz={:.1f} cadenceMaxHz={:.1f}; target 0 means XR-native render cadence, simulation remains 60 Hz",
 				Settings::VRPreferD3D9Ex.get(),
 				Settings::VRDirectGpuOnly.get(),
 				Settings::VRTargetRefreshRateHz.get(),
 				Settings::VRHostRenderScale.get(),
 				Settings::VRHostSharpening.get(),
+				Settings::VRDirectTransportScale.get(),
+				Settings::VRFsr1Sharpness.get(),
 				Settings::VRFrameCadenceMode.get(),
 				Settings::VRFrameCadenceTargetHz.get(),
 				Settings::VRFrameCadenceMaxHz.get());
