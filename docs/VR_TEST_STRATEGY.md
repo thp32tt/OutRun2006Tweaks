@@ -67,3 +67,18 @@ Some current renderer-chain comparisons (historical P1/P2/P3/P4) are selected by
 - :30 — adversarial reviewer on `vr-d3d9ex-review`, no production runtime writes.
 - 01:15 — once-per-day nightly gate: consolidate evidence, validate hashes/profile/session state, remove redundant test requests, and tell the 02:00 run which unchanged work can be skipped.
 - 08:15 / 11:15 / 14:15 / 17:15 — support work on `vr-d3d9ex-support` when a commit is needed: reusable verifiers, profile/session/log/package validators, CI efficiency, capture-schema/ring-buffer test harnesses and TEST_LEVEL demotion work. This slot does not become a third production runtime writer.
+
+
+## 2026-09-21 reference-stack POC validation
+
+The active experimental package is built from `vr-fsr1-upscale-poc`. It keeps the OpenXR projection swapchain at the runtime-recommended size when `HostRenderScale=1.0`, but can reduce only the D3D9Ex shared-eye transport and reconstruct it in the x64 host using a two-pass FSR1-style EASU + RCAS path.
+
+Use one binary package for the comparison:
+
+- `CORRECTNESS`: `HostRenderScale=1.0`, `DirectTransportScale=1.0`, `FSR1Sharpness=0.0`. This is the full-resolution reference and the first test.
+- `PERFORMANCE`: `HostRenderScale=1.0`, `DirectTransportScale=0.77`, `FSR1Sharpness=0.55`. This keeps VDXR/OpenXR output resolution unchanged while reducing only the shared-eye transport size.
+- `CONTROL`: conservative cadence/render baseline with full-resolution transport; use only if CORRECTNESS and PERFORMANCE produce ambiguous timing evidence.
+
+For the next Quest 3 / VDXR session, run the same short gameplay segment first with CORRECTNESS and then PERFORMANCE. Compare HMD smoothness, image clarity, HUD/white rank-score alignment, sky/glow/flare behavior, smoke/skid placement and the host timing/fence telemetry. Do not test the x86 direct OpenXR POC in the same run; it is an independent architecture probe.
+
+The x86 direct OpenXR POC lives on `vr-x86-openxr-direct-poc`. It is not the production renderer. Its standalone Win32 executable verifies that a 32-bit process can create an OpenXR instance, obtain the HMD system, query `XR_KHR_D3D11_enable` requirements, create a D3D11 device on the required adapter and create an OpenXR session. Use it only after the FSR1 A/B test or when investigating whether the x64 host/IPC layer is the main remaining bottleneck.
