@@ -87,6 +87,8 @@ namespace OutRunVRStereo
         std::uint64_t R30XyzrhwHudDraws = 0;
         std::uint64_t R30XyzrhwWorldLockedHudDraws = 0;
         std::uint64_t R30XyzrhwWorldEffectDraws = 0;
+        std::uint64_t R46XyzrhwHudPlaneAccepted = 0;
+        std::uint64_t R46XyzrhwUnknownRejected = 0;
         std::uint64_t R30Hud2DDraws = 0;
         std::uint64_t R30PerspectiveHudDraws = 0;
         std::uint64_t R30WorldBillboardDraws = 0;
@@ -1113,12 +1115,14 @@ namespace OutRunVRStereo
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(
-                "VR R41: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R46: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},hudPlaneAccepted={},unknownRejected={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
                 R30XyzrhwWorldEffectDraws, R30XyzrhwHudDraws,
                 R30XyzrhwWorldLockedHudDraws,
+                R46XyzrhwHudPlaneAccepted,
+                R46XyzrhwUnknownRejected,
                 R30XyzrhwRhwWorldPromotions,
                 R30XyzrhwRhwOnlyDepthEvidence,
                 R30XyzrhwZOnlyDepthEvidence,
@@ -1811,17 +1815,29 @@ namespace OutRunVRStereo
                     source, vertexCount, stride, state,
                     baseProjection, usedMask);
 
-            // R42: depth signature is authoritative world evidence. ZENABLE by
-            // itself is not: several HUD passes leave Z enabled. When depth
-            // evidence is absent, admit only a strongly pre-transformed screen
-            // plane (RHW~=1 with near-constant Z) to the HUD world-lock.
+            // R46: never classify an unknown XYZRHW draw as HUD merely because
+            // Z is disabled. Runtime evidence on a218c684 showed 103,320
+            // XYZRHW draws routed through the HUD plane while only 31 carried
+            // positive world-depth evidence, reproducing the old widened-draw
+            // corruption (stretched bridge/road geometry and black quads).
+            //
+            // Keep world effects on positive projected-depth evidence. Keep HUD
+            // head-lock removal only for a positive pre-transformed planar HUD
+            // signature (RHW ~= 1 and near-constant screen Z). Everything else
+            // fails closed to the proven R26/R23 owner.
             state.worldEffect = state.rhwDepthEvidence;
-            if (state.depthTestEnabled && !state.worldEffect &&
-                !R30XyzrhwLooksLikeHudPlane(
-                    source, vertexCount, stride, state, usedMask))
+            const bool hudPlaneEvidence =
+                !state.worldEffect &&
+                R30XyzrhwLooksLikeHudPlane(
+                    source, vertexCount, stride, state, usedMask);
+            if (!state.worldEffect && !hudPlaneEvidence)
+            {
+                ++R46XyzrhwUnknownRejected;
                 return false;
+            }
             if (!state.worldEffect)
             {
+                ++R46XyzrhwHudPlaneAccepted;
                 // R41: most of OutRun's HUD is fixed-function XYZRHW, not the
                 // shader/c64 path. Build a synthetic finite HUD plane in the
                 // recentered gameplay space, then transform that plane by the
