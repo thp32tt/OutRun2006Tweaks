@@ -1,5 +1,124 @@
 unit_id	source	target	evidence	regression	disposition
-B10-001..B10-120	B9-001..B9-120	206c6c1e	partial-invalidation carry: integration delta touches only r7/r23 startup-deferred-init + verifier/docs; B9 outside-delta rendering/host/performance identities remain unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-001	B9-001	206c6c1e	identity validated: carried rendering/stereo dependency unchanged by r7/r23 deferred-init delta	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-002	B9-002	206c6c1e	identity validated: carried visual path unchanged by startup deferred-init delta	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-003	B9-003	206c6c1e	identity validated: carried frame-delivery path unchanged by docs/verifier delta	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-004	B9-004	206c6c1e	identity validated: carried stereo classification path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-005	B9-005	206c6c1e	identity validated: carried HUD path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-006	B9-006	206c6c1e	identity validated: carried rank/score path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-007	B9-007	206c6c1e	identity validated: carried menu rendering path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-008	B9-008	206c6c1e	identity validated: carried sky/cloud path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-009	B9-009	206c6c1e	identity validated: carried SkyGlow path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-010	B9-010	206c6c1e	identity validated: carried lens-flare path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-011	B9-011	206c6c1e	identity validated: carried smoke path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-012	B9-012	206c6c1e	identity validated: carried skid path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-013	B9-013	206c6c1e	identity validated: carried shadow path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-014	B9-014	206c6c1e	identity validated: carried billboard path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-015	B9-015	206c6c1e	identity validated: carried HUD scale path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-016	B9-016	206c6c1e	identity validated: carried stereo offset path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-017	B9-017	206c6c1e	identity validated: carried SBS monitor path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-018	B9-018	206c6c1e	identity validated: carried fallback path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-019	B9-019	206c6c1e	identity validated: carried eye-selection path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-020	B9-020	206c6c1e	identity validated: carried XYZRHW path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-021	B9-021	206c6c1e	identity validated: carried projection path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-022	B9-022	206c6c1e	identity validated: carried view-transform path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-023	B9-023	206c6c1e	identity validated: carried render-target restoration path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-024	B9-024	206c6c1e	identity validated: carried render-state restoration path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-025	B9-025	206c6c1e	identity validated: carried draw-amplification path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-026	B9-026	206c6c1e	identity validated: carried copy-count path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-027	B9-027	206c6c1e	identity validated: carried producer-wait path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-028	B9-028	206c6c1e	identity validated: carried consumer-wait path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-029	B9-029	206c6c1e	identity validated: carried OpenXR frame-timing path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-030	B9-030	206c6c1e	identity validated: carried eye-sizing path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-031	B9-031	206c6c1e	identity validated: carried refresh-selection path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-032	B9-032	206c6c1e	identity validated: carried swapchain-acquire path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-033	B9-033	206c6c1e	identity validated: carried swapchain-wait path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-034	B9-034	206c6c1e	identity validated: carried swapchain-release path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-035	B9-035	206c6c1e	identity validated: carried direct-GPU path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-036	B9-036	206c6c1e	identity validated: carried fallback-presentation cost path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-037	B9-037	206c6c1e	identity validated: carried diagnostic-capture path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-038	B9-038	206c6c1e	identity validated: carried rolling-telemetry path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-039	B9-039	206c6c1e	identity validated: carried profile identity path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-040	B9-040	206c6c1e	identity validated: carried session identity path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-041	B9-041	206c6c1e	identity validated: carried white-HUD path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-042	B9-042	206c6c1e	identity validated: carried 6th-of-6 path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-043	B9-043	206c6c1e	identity validated: carried YES-NO path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-044	B9-044	206c6c1e	identity validated: carried menu-vehicle path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-045	B9-045	206c6c1e	identity validated: carried head-lock path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-046	B9-046	206c6c1e	identity validated: carried ping-pong path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-047	B9-047	206c6c1e	identity validated: carried composite path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-048	B9-048	206c6c1e	identity validated: carried duplication classifier path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-049	B9-049	206c6c1e	identity validated: carried particle projection path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-050	B9-050	206c6c1e	identity validated: carried car-rank path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-051	B9-051	206c6c1e	identity validated: carried HUD offset falsification unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-052	B9-052	206c6c1e	identity validated: carried monitor fallback falsification unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-053	B9-053	206c6c1e	identity validated: carried eye classifier falsification unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-054	B9-054	206c6c1e	identity validated: carried transform falsification unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-055	B9-055	206c6c1e	identity validated: carried state-restore falsification unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-056	B9-056	206c6c1e	identity validated: carried copy amplification falsification unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-057	B9-057	206c6c1e	identity validated: carried wait-path falsification unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-058	B9-058	206c6c1e	identity validated: carried frame-pacing falsification unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-059	B9-059	206c6c1e	identity validated: carried runtime-sizing falsification unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-060	B9-060	206c6c1e	identity validated: carried telemetry-overhead falsification unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-061	B9-061	206c6c1e	identity validated: carried HUD-to-eye cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-062	B9-062	206c6c1e	identity validated: carried rank-to-billboard cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-063	B9-063	206c6c1e	identity validated: carried sky-to-view cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-064	B9-064	206c6c1e	identity validated: carried glow-to-composite cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-065	B9-065	206c6c1e	identity validated: carried flare-to-eye cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-066	B9-066	206c6c1e	identity validated: carried smoke-to-projection cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-067	B9-067	206c6c1e	identity validated: carried skid-to-world cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-068	B9-068	206c6c1e	identity validated: carried RT-to-state cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-069	B9-069	206c6c1e	identity validated: carried game-to-host copy cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-070	B9-070	206c6c1e	identity validated: carried host-to-XR delivery cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-071	B9-071	206c6c1e	identity validated: carried refresh-to-frame cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-072	B9-072	206c6c1e	identity validated: carried sizing-to-swapchain cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-073	B9-073	206c6c1e	identity validated: carried SBS-to-fallback cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-074	B9-074	206c6c1e	identity validated: carried diagnostic-to-frame cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-075	B9-075	206c6c1e	identity validated: carried profile-to-visual cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-076	B9-076	206c6c1e	identity validated: carried session-to-telemetry cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-077	B9-077	206c6c1e	identity validated: carried fallback-to-cost cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-078	B9-078	206c6c1e	identity validated: carried direct-GPU-to-copy cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-079	B9-079	206c6c1e	identity validated: carried projection-to-XYZRHW cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-080	B9-080	206c6c1e	identity validated: carried HUD-to-monitor cross-trace unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-081	B9-081	206c6c1e	identity validated: carried adversarial HUD split test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-082	B9-082	206c6c1e	identity validated: carried adversarial rank duplication test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-083	B9-083	206c6c1e	identity validated: carried adversarial menu YES-NO test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-084	B9-084	206c6c1e	identity validated: carried adversarial menu vehicle test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-085	B9-085	206c6c1e	identity validated: carried adversarial sky head-lock test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-086	B9-086	206c6c1e	identity validated: carried adversarial glow composite test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-087	B9-087	206c6c1e	identity validated: carried adversarial flare duplication test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-088	B9-088	206c6c1e	identity validated: carried adversarial smoke placement test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-089	B9-089	206c6c1e	identity validated: carried adversarial skid placement test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-090	B9-090	206c6c1e	identity validated: carried adversarial billboard test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-091	B9-091	206c6c1e	identity validated: carried adversarial state leakage test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-092	B9-092	206c6c1e	identity validated: carried adversarial fallback test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-093	B9-093	206c6c1e	identity validated: carried adversarial copy-count test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-094	B9-094	206c6c1e	identity validated: carried adversarial wait-stall test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-095	B9-095	206c6c1e	identity validated: carried adversarial frame-pacing test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-096	B9-096	206c6c1e	identity validated: carried adversarial runtime-refresh test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-097	B9-097	206c6c1e	identity validated: carried adversarial eye-size test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-098	B9-098	206c6c1e	identity validated: carried adversarial capture-overhead test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-099	B9-099	206c6c1e	identity validated: carried adversarial telemetry test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-100	B9-100	206c6c1e	identity validated: carried adversarial identity-skew test unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-101	B9-101	206c6c1e	identity validated: carried outside-delta rendering path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-102	B9-102	206c6c1e	identity validated: carried outside-delta stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-103	B9-103	206c6c1e	identity validated: carried outside-delta visual path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-104	B9-104	206c6c1e	identity validated: carried outside-delta performance path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-105	B9-105	206c6c1e	identity validated: carried outside-delta frame-pacing path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-106	B9-106	206c6c1e	identity validated: carried outside-delta host-delivery path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-107	B9-107	206c6c1e	identity validated: carried outside-delta fallback path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-108	B9-108	206c6c1e	identity validated: carried outside-delta diagnostic path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-109	B9-109	206c6c1e	identity validated: carried outside-delta config path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-110	B9-110	206c6c1e	identity validated: carried outside-delta session path unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-111	B9-111	206c6c1e	identity validated: carried independent falsification evidence unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-112	B9-112	206c6c1e	identity validated: carried independent cross-trace evidence unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-113	B9-113	206c6c1e	identity validated: carried eye classification evidence unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-114	B9-114	206c6c1e	identity validated: carried state restoration evidence unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-115	B9-115	206c6c1e	identity validated: carried frame-delivery evidence unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-116	B9-116	206c6c1e	identity validated: carried copy/wait evidence unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-117	B9-117	206c6c1e	identity validated: carried runtime-sizing evidence unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-118	B9-118	206c6c1e	identity validated: carried telemetry evidence unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-119	B9-119	206c6c1e	identity validated: carried profile/session evidence unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-120	B9-120	206c6c1e	identity validated: carried regression-boundary evidence unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
 B10-121	DELTA	PresentDestR23	lower Present executes before EnsureStereoResources	VR-STARTUP-WHITE-001	PASS_PROTECTION
 B10-122	DELTA	PresentDestR23	failed lower Present cannot initialize private stereo resources	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
 B10-123	DELTA	PresentDestR23	non-game-device returns before deferred init	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
