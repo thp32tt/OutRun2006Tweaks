@@ -2,6 +2,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/runtime_eligibility.hpp"
 #include <algorithm>
 #include <iostream>
 #include <array>
@@ -62,6 +63,20 @@ namespace Settings
 		"Only applied if WindowedBorderless is set to true." };
 	Setting<bool> DisableDPIScaling{ "Window", "DisableDPIScaling", true,
 		"Disables DPI scaling on game window, can help fix issues when screen DPI is set above 100%." };
+}
+
+namespace
+{
+	bool RuntimeGameplayStereoPolicyActive() noexcept
+	{
+		if (!Game::current_mode ||
+			(*Game::current_mode != STATE_GAME && *Game::current_mode != STATE_GOAL))
+			return false;
+
+		return Settings::VRStereo &&
+			(Settings::VREnabled || Settings::VRAutoEnableWhenHostPresent) &&
+			OutRunVR::RuntimeEligibility::MayInjectStereo();
+	}
 }
 
 class UseHiDefCharacters : public Hook
@@ -896,7 +911,8 @@ class ReflectionUpdateRate : public Hook
 		static LARGE_INTEGER frequency{};
 
 		float frameScale60 = 1.0f;
-		if (Settings::VREnabled && Settings::VRNormalizeReflectionRate)
+		if (Settings::VRNormalizeReflectionRate &&
+			RuntimeGameplayStereoPolicyActive())
 		{
 			if (frequency.QuadPart <= 0)
 				QueryPerformanceFrequency(&frequency);
@@ -1082,8 +1098,8 @@ class FixZBufferPrecision : public Hook
 			// In 6DoF VR the player can move their head through the normal third-
 			// person near plane. Keep the 2D precision fix intact outside VR, but
 			// use the dedicated VR near plane during gameplay/goal rendering.
-			if (Settings::VREnabled && Settings::VRPositionalTracking &&
-				(*Game::current_mode == STATE_GAME || *Game::current_mode == STATE_GOAL))
+			if (Settings::VRPositionalTracking &&
+				RuntimeGameplayStereoPolicyActive())
 			{
 				camera->perspective_znear_BC = Settings::VRNearPlane.get();
 			}
