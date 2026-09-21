@@ -1,0 +1,14 @@
+{
+  "schemaVersion":1,
+  "role":"B_RENDERING_STEREO_VISUAL",
+  "findingId":"VR-HOST-002",
+  "candidateSha":"f26188501e1da3dd9139c7a32407bd6353da9780",
+  "baseSha":"844c197fa808bcd6a2708184c34907809476c439",
+  "verdict":"PASS_STATIC",
+  "userRuntimeVerified":false,
+  "lens":"rendering/fallback visual handoff and stale-frame rejection",
+  "evidenceUnits":["B021","B022","B023","B024","B025","B026","B027"],
+  "evidenceSummary":"Frame.v2 ABI size is preserved while run generation occupies reserved storage. Direct reader requires stable ring/slot seqlocks plus exact run identity. Gameplay bootstrap requires complete stereo/world/duplicated/effective-pose metadata and direct transport descriptors. Direct hold uses host-owned D3D11 resources, so no rendering/fallback lifetime blocker was found in this lens.",
+  "limitations":"Static independent post-review only; no claim of HMD visual correctness or runtime performance.",
+  "nextAction":"D may consume B PASS for this exact SHA after verifying this record; A/C gates remain independent."
+}
