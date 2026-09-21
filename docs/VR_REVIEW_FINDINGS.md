@@ -83,3 +83,20 @@ HUD are explicitly SCREEN_HUD. Rival-car rank markers (`sub_4BAD20`) and
 attached car/world hearts are explicitly WORLD_BILLBOARD. Runtime trace schema
 v2, static EXE analysis and automatic coverage use the same semantic names.
 See `docs/VR_HUD_SEMANTIC_BASELINE.md`.
+
+## VR-UPSTREAM-HARVEST-001 — Original-mod semantic and asset harvest
+Status: SOURCE-INTEGRATED / BUILD-PENDING
+
+Reviewed upstream baseline:
+`emoose/OutRun2006Tweaks@08e5efb4deea4066c440307ec009c868a30562d3`.
+
+The focus branch already contains upstream in its ancestry, so this change
+promotes existing reverse-engineering into VR architecture rather than merging
+missing upstream code. Added two-eye union culling FOV, a 6DoF-safe VR near
+plane, 60-Hz-normalized reflection work, exact SceneEffect/SkyGlow scopes,
+particle/attached-heart world semantic hints, XST runtime provenance, an
+XST/PMT/XMT semantic analyzer, a STAGE_DIAGNOSTIC launch profile and richer
+crash/session diagnostics.
+
+Semantic hints remain subordinate to verified WVP/depth/target safety gates.
+See `docs/VR_UPSTREAM_SEMANTIC_HARVEST.md`.
