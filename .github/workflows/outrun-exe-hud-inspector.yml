@@ -21,6 +21,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Validate PowerShell helper syntax
+        shell: pwsh
+        run: |
+          $failed=$false
+          foreach($script in @('tools/Collect-OutRunVRLogs.ps1','tools/Run-OutRunVRTest.ps1')){
+            $tokens=$null
+            $errors=$null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              (Resolve-Path $script), [ref]$tokens, [ref]$errors)
+            if($errors.Count -gt 0){
+              $failed=$true
+              $errors | ForEach-Object { Write-Error "$script: $($_.Message)" }
+            }
+          }
+          if($failed){ throw 'PowerShell syntax validation failed' }
+
       - name: Download upstream replacement EXE
         shell: pwsh
         run: |
