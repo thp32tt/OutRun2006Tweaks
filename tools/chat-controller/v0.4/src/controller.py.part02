@@ -87,6 +87,15 @@ async def prepare_slot_pages(context: BrowserContext, reg: Registry) -> dict[str
         pages[slot.name] = page
         used.add(page)
 
+    # Close surplus controller tabs after a slot-count reduction so they do not keep
+    # consuming Chrome/N100 resources.
+    surplus = [p for p in available if p not in used]
+    for page in surplus:
+        try:
+            await page.close()
+        except Exception:
+            log.exception("failed to close surplus controller tab")
+
     # Put each tab on its own persisted chat URL or a clean ChatGPT home page.
     for slot in reg.slots:
         page = pages[slot.name]
