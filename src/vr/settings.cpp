@@ -61,8 +61,14 @@ namespace Settings
 		"Applies 6DoF HMD X/Y/Z movement in addition to orientation. Disable this option if a title-specific camera/culling issue is observed; stereo eye separation is independent." };
 	Setting<bool> VRCullingCameraSync{ "VR", "CullingCameraSync", true,
 		"Temporarily mirrors the render-time VR camera into OutRun's live camera position/look so render-phase culling and camera-facing effects can follow head motion. Restored before game logic resumes." };
-	Setting<bool> VRCullingUnionFov{ "VR", "CullingUnionFov", false,
-		"Reserved diagnostic option. Union-FOV culling is intentionally deferred until a culling-only frustum boundary is verified; the live game projection is not modified." };
+	Setting<bool> VRCullingUnionFov{ "VR", "CullingUnionFov", true,
+		"Widens the temporary render-phase culling projection to the union of both OpenXR eye FOVs plus a small safety margin. The stock game projection is restored before gameplay logic resumes and the actual eye projections remain unchanged." };
+	Setting<float> VRCullingUnionMarginDegrees{ "VR", "CullingUnionMarginDegrees", 4.0f,
+		"Extra angular safety margin added around the two-eye culling union.", Range<float>{ 0.0f, 15.0f } };
+	Setting<bool> VRNormalizeReflectionRate{ "VR", "NormalizeReflectionRate", true,
+		"Keeps car cubemap reflection work at the original 60 Hz time budget when rendering the HMD at 72/80/90/120 Hz." };
+	Setting<float> VRNearPlane{ "VR", "NearPlane", 0.10f,
+		"VR gameplay camera near plane in game units. Overrides the 2D Z-precision fix while positional tracking is active so dashboard/driver geometry is not clipped by the normal 1.0 near plane.", Range<float>{ 0.03f, 0.50f } };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,
 		"Game-world units per metre of OpenXR head movement.", Range<float>{ 0.1f, 10.0f } };
 	Setting<float> VRStereoDepth{ "VR", "StereoDepth", 1.0f,
