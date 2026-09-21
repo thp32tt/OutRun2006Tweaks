@@ -1,0 +1,1 @@
+{"cycle":"20260921-A2","target_sha":"73f3b59ba21f4ecd2b18fb99bbed937b90fa32f0","checkpoint":"CP100","valid_units":100,"last_unit":"A2-100","status":"COMPLETE","cross_traces":25,"falsifications":37,"outside_latest_changed_delta":30,"distinct_code_paths":100,"upstream_reference_units":0}
