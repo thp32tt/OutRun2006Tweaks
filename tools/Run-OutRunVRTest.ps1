@@ -31,6 +31,7 @@ if(!$backend){throw 'Active backend identity is missing.'}
 # previous session and creates a clean session before launch.
 $patterns=@(
     'OutRun2006Tweaks*.log',
+    'OutRun2006Tweaks-hudtrace*.csv',
     'outrun-vr-host*.log',
     'outrun-vr-host-pipeline*.log',
     'outrun-vr-watchdog*.log',
