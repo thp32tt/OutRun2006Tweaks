@@ -37,7 +37,24 @@
       "activeValidationWorkflow": ".github/workflows/vr-dx9ex-active.yml",
       "manualComparisonWorkflow": ".github/workflows/vr-unified-backends.yml",
       "defaultSourceBuilds": "one active Win32 DX9Ex DLL + one x64 D3D11 OpenXR host",
-      "comparisonMatrix": "manual only; P1-P4 retained for hypothesis isolation when profile switching cannot answer the question"
+      "comparisonMatrix": "manual only; P1-P4 retained for hypothesis isolation when profile switching cannot answer the question",
+      "activeVisualOwner": "OUTRUN_VR_R26_HUD_COMPARE=ON",
+      "forbiddenRoutineOwner": "ACTIVE_FULL_R34 until separately HMD-validated"
+    },
+    "runtimeVisualContract": {
+      "path": "docs/VR_RUNTIME_VISUAL_CONTRACT.json",
+      "behavioralBaselineSha": "91b9c639bea60c114600aedd2f4f3fe97ec420e9",
+      "activeVisualOwner": "ACTIVE_R26_R43_R44",
+      "lockedInvariants": [
+        "D3D9Ex gameplay DirectGPU-only; never ComposeSbs/Desktop-Duplication fallback",
+        "PC gameplay mirror mono/left-eye; never SBS",
+        "HUD world-fixed, not head-locked",
+        "R43/R44 raw-game-WVP finite HUD plane retained",
+        "menu LOCAL-fixed mono presentation",
+        "live RendererProjection not mutated for union culling"
+      ],
+      "promotionRule": "Changes to visual ownership, HUD space, presentation space or gameplay transport remain experiment/default-off until user HMD evidence explicitly promotes the exact SHA.",
+      "regressionAction": "CI must fail; do not package or integrate a candidate that violates the visual contract."
     }
   },
   "runtimeEvidence": {
@@ -60,7 +77,7 @@
     "Recovery runtime forcing 60 FPS with interpolation/cadence disabled contributes independent judder on a 90 Hz OpenXR session.",
     "Restore fast R29 world rendering and classification in bounded variants before deciding which later R30-R34 overlays are required."
   ],
-  "nextAction": "Use the four-role scheduled pipeline with A/B/C as review-only roles on dedicated branches: A=architecture/state/lifetime on vr-d3d9ex-review-a, B=rendering/stereo/visual correctness on vr-d3d9ex-review-b, C=performance/OpenXR/synchronization/testability on vr-d3d9ex-review-c. D alone creates production candidates, fixes, builds, validates, integrates, and owns consolidated queue/state/history on vr-d3d9ex-focus. Keep the next user runtime target to one CORRECTNESS test unless a concrete hypothesis requires CONTROL/PERFORMANCE.",
+  "nextAction": "Validate the DirectGPU-only ACTIVE_R26_R43_R44 candidate; use stack-resolved HUD semantics to map original UIScaling/EXE callers, then promote only exact runtime-verified visual changes.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
