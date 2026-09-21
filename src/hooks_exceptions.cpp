@@ -44,7 +44,7 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
     wchar_t     zip_filename[MAX_PATH];
     wchar_t     timestamp[128];
     wchar_t*    modulenameptr{};
-    bool        bDumpSuccess;
+    bool        bDumpSuccess = false;
     __time64_t  time;
     struct tm   ltime;
     HWND        hWnd;
@@ -77,8 +77,9 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
         ex.ExceptionPointers = ExceptionInfo;
         ex.ClientPointers = TRUE;
 
-        if (!(MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpWithDataSegs, &ex, NULL, NULL)))
-            bDumpSuccess = false;
+        bDumpSuccess =
+            MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile,
+                MiniDumpWithDataSegs, &ex, NULL, NULL) != FALSE;
 
         CloseHandle(hFile);
     }
@@ -141,9 +142,13 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
           // Required crash evidence must all be present, but success is not
           // published until archive finalization, writer teardown, and the
           // underlying FILE flush/close have also succeeded.
-          bool required_entries_ok = true;
+          bool required_entries_ok = bDumpSuccess;
 
-          if (!mz_zip_writer_add_file(&zip_archive, "dump.dmp", dump_filename, nullptr, 0, 3))
+          // A created file is not proof that MiniDumpWriteDump completed.
+          // Never publish a crash ZIP as valid when the required minidump
+          // failed and left an empty or partial file behind.
+          if (bDumpSuccess &&
+              !mz_zip_writer_add_file(&zip_archive, "dump.dmp", dump_filename, nullptr, 0, 3))
             required_entries_ok = false;
           if (!mz_zip_writer_add_file(&zip_archive, "crash.log", crash_log_filename, nullptr, 0, 3))
             required_entries_ok = false;
