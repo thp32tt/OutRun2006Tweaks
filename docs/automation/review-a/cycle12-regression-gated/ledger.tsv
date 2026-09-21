@@ -1,0 +1,151 @@
+unit	kind	source_unit	target	identity_validation	evidence	result	regression_case
+A12-001	CARRY_FORWARD	A11-001..A11-115	206c6c1e	115 individually numbered carry-forward units expanded conceptually from A11 after compare showed only r7/r23, regression docs, and architecture verifier changed; no r7/r23-specific hypothesis promoted by carry set	A11 evidence retained under partial-invalidation rule; see A11 physical ledger for source rows	PASS	
+A12-002	POST_REVIEW	NEW	234f0421	hooks_exceptions::CustomUnhandledExceptionFilter	candidate exact base 206c6c1e ahead1; only hooks_exceptions.cpp +129/-48	PASS_DOMAIN_REVIEW	VR-STARTUP-WHITE-001
+A12-003	CHANGESET	NEW	234f0421	src/hooks_exceptions.cpp	single production file; no unrelated runtime/config/workflow hunks	PASS	VR-STARTUP-WHITE-001
+A12-004	FAILURE_ATOMICITY	NEW	234f0421	MiniDumpWriteDump/CloseHandle	dump success requires write + handle close	PASS	VR-STARTUP-WHITE-001
+A12-005	FAILURE_ATOMICITY	NEW	234f0421	Log lambda	noexcept + exact byte-count WriteFile check prevents false success	PASS	VR-STARTUP-WHITE-001
+A12-006	FAILURE_ATOMICITY	NEW	234f0421	crashLogWriteSuccess	content write and CloseHandle both required	PASS	VR-STARTUP-WHITE-001
+A12-007	FAILURE_ATOMICITY	NEW	234f0421	re4t snapshot	per-crash timestamp/suffix prevents prior loose evidence overwrite	PASS	VR-STARTUP-WHITE-001
+A12-008	FALSIFICATION	NEW	234f0421	filesystem snapshot	error_code + catch boundary prevents filesystem exception escaping filter	PASS	VR-STARTUP-WHITE-001
+A12-009	FALSIFICATION	NEW	234f0421	optional VR evidence	optional metadata/path/directory traversal isolated from primary archive	PASS	VR-STARTUP-WHITE-001
+A12-010	FAILURE_ATOMICITY	NEW	234f0421	required_entries_ok	dump+crash log+tweaks snapshot required before publish	PASS	VR-STARTUP-WHITE-001
+A12-011	FAILURE_ATOMICITY	NEW	234f0421	zip finalize	zip_created requires add/finalize/end/fclose success	PASS	VR-STARTUP-WHITE-001
+A12-012	FALSIFICATION	NEW	234f0421	loose evidence retention	required evidence deleted only after zip_created true	PASS	VR-STARTUP-WHITE-001
+A12-013	FALSIFICATION	NEW	234f0421	failed zip path	failure message preserves loose dump/log instead of claiming archive success	PASS	VR-STARTUP-WHITE-001
+A12-014	REGRESSION	NEW	206c6c1e	VR-STARTUP-WHITE-001 riskPaths	hooks_exceptions.cpp intersects riskPaths but not startup/present/stereo revalidation triggers	EVIDENCE_AUGMENT	VR-STARTUP-WHITE-001
+A12-015	REGRESSION	NEW	206c6c1e	startup runtime gate	runtime-visible case remains NEED_HMD_TEST; no static DONE claim	PASS	VR-STARTUP-WHITE-001
+A12-016	DELTA	NEW	206c6c1e	stereo_renderer_r7::InstallStereoHooks	pre-exposure EnsureStereoResources removed by integrated protection	PASS	VR-STARTUP-WHITE-001
+A12-017	DELTA	NEW	206c6c1e	stereo_renderer_r23::Present	deferred resource init occurs after successful lower Present	PASS	VR-STARTUP-WHITE-001
+A12-018	FALSIFICATION	NEW	206c6c1e	Present failure path	deferred init must not execute after failed lower Present	PASS	VR-STARTUP-WHITE-001
+A12-019	STATE_LIFETIME	NEW	206c6c1e	StereoResourcesReady	resource-ready state begins false and is not forced during install	PASS	VR-STARTUP-WHITE-001
+A12-020	STATE_LIFETIME	NEW	206c6c1e	FirstDeferredResourceInitLogged	diagnostic state independent from resource ownership	PASS	VR-STARTUP-WHITE-001
+A12-021	STATE_LIFETIME	NEW	206c6c1e	HostRenderEligible	host shouldRender transient advice not used to tear down producer source	PASS	
+A12-022	STATE_LIFETIME	NEW	206c6c1e	GameplayActive	WARP/RESTART retain gameplay presentation ownership	PASS	
+A12-023	SYNC	NEW	206c6c1e	DirectTransportSlot::published	ACK required only for actually advertised slots	PASS	
+A12-024	SYNC	NEW	206c6c1e	producerPending/pendingFrameId	producer fence pending identity kept separate from published ACK state	PASS	
+A12-025	STATE_LIFETIME	NEW	206c6c1e	RenderFrameRunGeneration	generation state explicit for shared-frame ring ownership	PASS	
+A12-026	STATE_LIFETIME	NEW	206c6c1e	DirectTransportGeneration	direct transport resources carry independent generation identity	PASS	
+A12-027	FALSIFICATION	NEW	206c6c1e	InternalPassScope	thread-local internal stereo pass restored RAII-style after nested work	PASS	
+A12-028	FALSIFICATION	NEW	206c6c1e	ReplaceSurfaceRef	AddRef new surface precedes Release old surface, safe for same-object replacement	PASS	
+A12-029	STATE_LIFETIME	NEW	206c6c1e	TrackedDepthStencil	stereo transition invalidates right-depth synchronization when depth exists	PASS	
+A12-030	SYNC	NEW	206c6c1e	StereoBaseCallbacksArmed	atomic callback-arming state avoids plain-bool cross-thread visibility	PASS	
+A12-031	SYNC	NEW	206c6c1e	ActiveOcclusionQueries	atomic query count avoids unsynchronized counter ownership	PASS	
+A12-032	FALSIFICATION	NEW	206c6c1e	CurrentVertexShaderIdentity	atomic shader identity separates classification observation from draw state	PASS	
+A12-033	FALSIFICATION	NEW	206c6c1e	VertexShaderSerial	atomic serial supplies epoch identity for WVP classification	PASS	
+A12-034	REGRESSION	NEW	206c6c1e	knownGood/knownBad	a9abb857 startup-good and 1f2dcb98 startup-white retained as falsification anchors	PASS	VR-STARTUP-WHITE-001
+A12-035	REGRESSION	NEW	206c6c1e	verifier recipe	static deferred-init guard + build/smoke and runtime logo/menu/game+stereo-open retained	PASS	VR-STARTUP-WHITE-001
+A12-036	POST_REVIEW	NEW	234f0421	A routing	failure-atomicity architecture review passes; integration still requires C sanity/build verifier	PASS_DOMAIN_REVIEW	VR-STARTUP-WHITE-001
+A12-037	CARRY_FORWARD	A11-002	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-038	CARRY_FORWARD	A11-003	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-039	CARRY_FORWARD	A11-004	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-040	CARRY_FORWARD	A11-005	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-041	CARRY_FORWARD	A11-006	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-042	CARRY_FORWARD	A11-007	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-043	CARRY_FORWARD	A11-008	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-044	CARRY_FORWARD	A11-009	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-045	CARRY_FORWARD	A11-010	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-046	CARRY_FORWARD	A11-011	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-047	CARRY_FORWARD	A11-012	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-048	CARRY_FORWARD	A11-013	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-049	CARRY_FORWARD	A11-014	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-050	CARRY_FORWARD	A11-015	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-051	CARRY_FORWARD	A11-016	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-052	CARRY_FORWARD	A11-017	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-053	CARRY_FORWARD	A11-018	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-054	CARRY_FORWARD	A11-019	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-055	CARRY_FORWARD	A11-020	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-056	CARRY_FORWARD	A11-021	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-057	CARRY_FORWARD	A11-022	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-058	CARRY_FORWARD	A11-023	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-059	CARRY_FORWARD	A11-024	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-060	CARRY_FORWARD	A11-025	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-061	CARRY_FORWARD	A11-026	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-062	CARRY_FORWARD	A11-027	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-063	CARRY_FORWARD	A11-028	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-064	CARRY_FORWARD	A11-029	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-065	CARRY_FORWARD	A11-030	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-066	CARRY_FORWARD	A11-031	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-067	CARRY_FORWARD	A11-032	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-068	CARRY_FORWARD	A11-033	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-069	CARRY_FORWARD	A11-034	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-070	CARRY_FORWARD	A11-035	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-071	CARRY_FORWARD	A11-036	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-072	CARRY_FORWARD	A11-037	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-073	CARRY_FORWARD	A11-038	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-074	CARRY_FORWARD	A11-039	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-075	CARRY_FORWARD	A11-040	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-076	CARRY_FORWARD	A11-041	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-077	CARRY_FORWARD	A11-042	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-078	CARRY_FORWARD	A11-043	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-079	CARRY_FORWARD	A11-044	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-080	CARRY_FORWARD	A11-045	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-081	CARRY_FORWARD	A11-046	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-082	CARRY_FORWARD	A11-047	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-083	CARRY_FORWARD	A11-048	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-084	CARRY_FORWARD	A11-049	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-085	CARRY_FORWARD	A11-050	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-086	CARRY_FORWARD	A11-051	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-087	CARRY_FORWARD	A11-052	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-088	CARRY_FORWARD	A11-053	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-089	CARRY_FORWARD	A11-054	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-090	CARRY_FORWARD	A11-055	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-091	CARRY_FORWARD	A11-056	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-092	CARRY_FORWARD	A11-057	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-093	CARRY_FORWARD	A11-058	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-094	CARRY_FORWARD	A11-059	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-095	CARRY_FORWARD	A11-060	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-096	CARRY_FORWARD	A11-061	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-097	CARRY_FORWARD	A11-062	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-098	CARRY_FORWARD	A11-063	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-099	CARRY_FORWARD	A11-064	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-100	CARRY_FORWARD	A11-065	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-101	CARRY_FORWARD	A11-066	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-102	CARRY_FORWARD	A11-067	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-103	CARRY_FORWARD	A11-068	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-104	CARRY_FORWARD	A11-069	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-105	CARRY_FORWARD	A11-070	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-106	CARRY_FORWARD	A11-071	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-107	CARRY_FORWARD	A11-072	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-108	CARRY_FORWARD	A11-073	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-109	CARRY_FORWARD	A11-074	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-110	CARRY_FORWARD	A11-075	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-111	CARRY_FORWARD	A11-076	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-112	CARRY_FORWARD	A11-077	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-113	CARRY_FORWARD	A11-078	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-114	CARRY_FORWARD	A11-079	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-115	CARRY_FORWARD	A11-080	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-116	CARRY_FORWARD	A11-081	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-117	CARRY_FORWARD	A11-082	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-118	CARRY_FORWARD	A11-083	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-119	CARRY_FORWARD	A11-084	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-120	CARRY_FORWARD	A11-085	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-121	CARRY_FORWARD	A11-086	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-122	CARRY_FORWARD	A11-087	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-123	CARRY_FORWARD	A11-088	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-124	CARRY_FORWARD	A11-089	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-125	CARRY_FORWARD	A11-090	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-126	CARRY_FORWARD	A11-091	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-127	CARRY_FORWARD	A11-092	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-128	CARRY_FORWARD	A11-093	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-129	CARRY_FORWARD	A11-094	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-130	CARRY_FORWARD	A11-095	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-131	CARRY_FORWARD	A11-096	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-132	CARRY_FORWARD	A11-097	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-133	CARRY_FORWARD	A11-098	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-134	CARRY_FORWARD	A11-099	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-135	CARRY_FORWARD	A11-100	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-136	CARRY_FORWARD	A11-101	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-137	CARRY_FORWARD	A11-102	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-138	CARRY_FORWARD	A11-103	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-139	CARRY_FORWARD	A11-104	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-140	CARRY_FORWARD	A11-105	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-141	CARRY_FORWARD	A11-106	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-142	CARRY_FORWARD	A11-107	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-143	CARRY_FORWARD	A11-108	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-144	CARRY_FORWARD	A11-109	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-145	CARRY_FORWARD	A11-110	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-146	CARRY_FORWARD	A11-111	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-147	CARRY_FORWARD	A11-112	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-148	CARRY_FORWARD	A11-113	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-149	CARRY_FORWARD	A11-114	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
+A12-150	CARRY_FORWARD	A11-115	206c6c1e	unchanged dependency identity	A11 evidence retained	PASS	
