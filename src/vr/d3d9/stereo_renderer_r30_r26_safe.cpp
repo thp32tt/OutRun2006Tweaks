@@ -1390,6 +1390,20 @@ namespace OutRunVRStereo
             if (!device || !TargetIsBackBuffer())
                 return R30ScreenSpaceKind::None;
 
+            const auto semanticScope =
+                OutRunVR::GameSemantic::CurrentScope;
+            const bool semanticHud =
+                OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
+            const bool semanticWorld =
+                OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
+
+            // R48 final-test policy: screen/perspective HUD ownership comes only
+            // from the canonical EXE sprite queue or exact original-mod semantic
+            // tags. Do not infer HUD from alpha, ZENABLE, cull mode, shader
+            // shape, primitive count or a recently uploaded matrix.
+            if (!semanticHud && !semanticWorld)
+                return R30ScreenSpaceKind::None;
+
             float projection[16]{};
             if (!OutRunVRRenderer::GetRendererBaseProjection(projection))
                 return R30ScreenSpaceKind::None;
@@ -1397,6 +1411,21 @@ namespace OutRunVRStereo
             const auto projectionClass =
                 OutRunVR::PassPolicy::ClassifyProjectionSignature(
                     projection[11], projection[15]);
+
+            if (semanticWorld)
+            {
+                // Original-mod RankMarker call sites explicitly tag queued
+                // rival-car markers WORLD_BILLBOARD. They must stay attached to
+                // the car/world and never be flattened into the fixed HUD.
+                if (projectionClass ==
+                    OutRunVR::PassPolicy::ProjectionClass::Perspective3D)
+                {
+                    ++R44SpatialBillboardClassifications;
+                    return R30ScreenSpaceKind::WorldBillboard;
+                }
+                return R30ScreenSpaceKind::None;
+            }
+
             if (projectionClass ==
                 OutRunVR::PassPolicy::ProjectionClass::Orthographic2D)
                 return R30ScreenSpaceKind::Hud2D;
@@ -1404,8 +1433,10 @@ namespace OutRunVRStereo
                 OutRunVR::PassPolicy::ProjectionClass::Perspective3D)
                 return R30ScreenSpaceKind::None;
 
-            // Verified/rebindable perspective WVP is already owned by the true
-            // world path and must never be intercepted as UI.
+            // A SCREEN_HUD node may still use the game's perspective sprite
+            // shader (6th/6, Position/results and menu glyph variants). The EXE
+            // queue semantic is the ownership proof; use raw game WVP only as
+            // placement data, never as a classifier.
             if (CurrentDrawMatchesVerifiedWorld(device))
                 return R30ScreenSpaceKind::None;
             std::uintptr_t reboundShader = 0;
@@ -1414,65 +1445,9 @@ namespace OutRunVRStereo
                     device, reboundShader, reboundSerial))
                 return R30ScreenSpaceKind::None;
 
-            DWORD zEnable = D3DZB_TRUE;
-            DWORD zWrite = TRUE;
-            DWORD alphaBlend = FALSE;
-            DWORD alphaTest = FALSE;
-            DWORD cullMode = D3DCULL_CCW;
-            if (!ReadTrackedRenderState(device, D3DRS_ZENABLE, zEnable) ||
-                !ReadTrackedRenderState(device, D3DRS_ZWRITEENABLE, zWrite) ||
-                !ReadTrackedRenderState(
-                    device, D3DRS_ALPHABLENDENABLE, alphaBlend) ||
-                !ReadTrackedRenderState(
-                    device, D3DRS_ALPHATESTENABLE, alphaTest) ||
-                !ReadTrackedRenderState(device, D3DRS_CULLMODE, cullMode))
-                return R30ScreenSpaceKind::None;
-
-            const bool alphaLike =
-                alphaBlend != FALSE || alphaTest != FALSE;
-            if (!alphaLike)
-                return R30ScreenSpaceKind::None;
-
-            float rawOwnedWvp[16]{};
-            const bool haveOwnedWvp =
-                R44GetOwnedRawOverlayWvp(rawOwnedWvp);
-            if (haveOwnedWvp)
-            {
-                const auto matrixKind =
-                    R44ClassifyOwnedOverlayMatrix(rawOwnedWvp);
-                if (matrixKind == R44OverlayMatrixKind::SpatialBillboard)
-                {
-                    ++R44SpatialBillboardClassifications;
-                    return R30ScreenSpaceKind::WorldBillboard;
-                }
-                if (matrixKind == R44OverlayMatrixKind::FlatHud)
-                {
-                    ++R44FlatOverlayClassifications;
-                    return R30ScreenSpaceKind::PerspectiveHud;
-                }
-            }
-
-            // Keep R13's fragile-effect shape as an explicit fallback signal.
-            // If the matrix owner is unavailable, depth-disabled/two-sided alpha
-            // is still a flat overlay. Routing it through the finite HUD plane
-            // prevents two visible zero-disparity copies for result text while
-            // preserving depth-tested unknown effects fail-closed.
-            const bool r13FlatEffectShape =
-                cullMode == D3DCULL_NONE &&
-                zEnable == D3DZB_FALSE &&
-                ((alphaBlend != FALSE && zWrite == FALSE) ||
-                 alphaTest != FALSE);
-            if (r13FlatEffectShape)
-            {
-                ++R44FlatOverlayClassifications;
-                return R30ScreenSpaceKind::PerspectiveHud;
-            }
-
-            if (zEnable != D3DZB_FALSE)
-                return R30ScreenSpaceKind::None;
+            ++R44FlatOverlayClassifications;
             return R30ScreenSpaceKind::PerspectiveHud;
         }
-
 
         bool R30BuildEyeAffine(
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
