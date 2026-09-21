@@ -1,0 +1,33 @@
+{
+  "role":"C",
+  "mode":"POST_FIX_TRIAGE_ORGANIZATION",
+  "run_kst":"2026-09-21T21:32:46+09:00",
+  "integration_sha":"265504f6ea28c5e97908e450a460661ed5ad37f1",
+  "candidates_reviewed":[
+    {"candidate_ref":"vr-d3d9ex-candidate/VR-SKYGLOW-ACTIVE-GATE-001-D-20260921T2043KST","candidate_sha":"265504f6ea28c5e97908e450a460661ed5ad37f1","base_sha":"265504f6ea28c5e97908e450a460661ed5ad37f1","finding_ids":["VR-SKYGLOW-ACTIVE-GATE-001"],"changed_files":[],"changed_functions":[],"intended_hunks":"runtime-active SkyGlow gate","unintended_diff":"none because no diff exists","active_call_path_evidence":"not reviewable: candidate is byte-identical to base","dependency_regression_risks":"no implementation exists","deterministic_checks_required":"active/inactive host-loss/menu fallback gate assertions after real source change","ci_evidence":"not applicable to unchanged candidate","verdict":"BLOCKED","required_review":"B after real candidate","nextAction":"D must create a real current-base runtime source delta; this ref is only an empty placeholder"},
+    {"candidate_ref":"vr-d3d9ex-candidate/HUD-SEMANTIC-TIMEATTACK-RANGE-GAP-001-D-20260921T2043KST","candidate_sha":"265504f6ea28c5e97908e450a460661ed5ad37f1","base_sha":"265504f6ea28c5e97908e450a460661ed5ad37f1","finding_ids":["HUD-SEMANTIC-TIMEATTACK-RANGE-GAP-001"],"changed_files":[],"changed_functions":[],"intended_hunks":"extend Time Attack semantic address range and deterministic assertions","unintended_diff":"none because no diff exists","active_call_path_evidence":"not reviewable: candidate is byte-identical to base","dependency_regression_risks":"no implementation exists","deterministic_checks_required":"range includes 0x0BE2D9 while preserving adjacent-boundary exclusion","ci_evidence":"not applicable to unchanged candidate","verdict":"BLOCKED","required_review":"B after real candidate","nextAction":"D must write the small complete hud_semantics.hpp change and verifier on a fresh current-base candidate"}
+  ],
+  "summary":{"candidates_reviewed":2,"PASS":0,"NEEDS_CHANGES":0,"BLOCKED":2},
+  "findings_organized":[
+    {"id":"DX9EX-RESET-STATEBLOCK-001","status":"ALREADY_INTEGRATED_REMOVE_FROM_D_QUEUE"},
+    {"id":"DX9EX-SKYGLOW-001","status":"ALREADY_INTEGRATED_REMOVE_FROM_D_QUEUE"},
+    {"id":"CRASH-ZIP-FINALIZE-DURABILITY-001","status":"ALREADY_INTEGRATED_REMOVE_FROM_D_QUEUE"},
+    {"id":"B-XR-WAIT-ROUTING-001","status":"REJECTED_FALSIFIED","evidence":"B CP30 proves forced-include routing keeps xrWaitSwapchainImage bounded"},
+    {"id":"A-V3-ACK-IDENTITY-001","status":"NEEDS_REVIEW","owner":"A"},
+    {"id":"A-RUNTIME-LIFECYCLE-ORDER-001","status":"NEEDS_REVIEW","owner":"A"},
+    {"id":"A-REFERENCE-SPACE-GENERATION-001","status":"NEEDS_REVIEW","owner":"A"},
+    {"id":"VR-SKYGLOW-ACTIVE-GATE-001","status":"READY"},
+    {"id":"HUD-SEMANTIC-TIMEATTACK-RANGE-GAP-001","status":"READY"}
+  ],
+  "READY_for_D":4,
+  "D_IMPLEMENT_NEXT":[
+    {"finding_id":"VR-SKYGLOW-ACTIVE-GATE-001","status":"READY","priority":1,"target_file_function":"src/hooks_graphics.cpp / RestoreSkyGlow::SkyGlowAllowed active-runtime gate","fix_intent":"gate stock SkyGlow suppression on actual stereo/runtime-active eligibility rather than config-only VREnabled&&VRStereo, preserving fallback/menu/host-loss ownership","verifier":"deterministic active-vs-inactive gate assertions plus current prospective build","dependency_blocker":"large-file safe write path required; existing 2043 candidate is empty","review_requirement":"B + C exact-SHA sanity"},
+    {"finding_id":"VR-NEARPLANE-ACTIVE-GATE-001","status":"READY","priority":2,"target_file_function":"near-plane VR override active-runtime eligibility call path","fix_intent":"apply VR near-plane override only while runtime stereo path is actually eligible; fail open to stock behavior during fallback/menu/host loss","verifier":"deterministic active/inactive gate matrix plus build","dependency_blocker":"confirm current exact target function before edit","review_requirement":"A+B + C exact-SHA sanity"},
+    {"finding_id":"VR-SEMANTIC-NEXTDRAW-STALE-HEART-001","status":"READY","priority":3,"target_file_function":"semantic next-draw state lifetime/consumption path","fix_intent":"prevent stale HEART semantic marker surviving beyond intended next draw across skipped/ineligible paths","verifier":"deterministic consume/clear tests across eligible, skipped, and fallback draws","dependency_blocker":"exact current-base source path must be fetched complete","review_requirement":"A+B + C exact-SHA sanity"},
+    {"finding_id":"HUD-SEMANTIC-TIMEATTACK-RANGE-GAP-001","status":"READY","priority":4,"target_file_function":"src/vr/hud_semantics.hpp / Time Attack semantic range","fix_intent":"extend range to cover first put_clip_sprite at 0x0BE2D9 without capturing adjacent non-Time-Attack call sites","verifier":"assert inclusion 0x0BE2D9 and intended boundary exclusions","dependency_blocker":"none; small complete file is preferred unblocker if higher-priority large-file writes remain blocked","review_requirement":"B + C exact-SHA sanity"}
+  ],
+  "validation_gaps":["Both new D candidate refs created at 20:43 are unchanged placeholders with zero changed files","No exact-SHA A/B/C post-review can pass until D creates a real source-change SHA","A CP20 architecture findings remain deep-review owned and must not be imported as D READY until A resolves them","B-XR-WAIT-ROUTING-001 must not consume D time because B falsified it at CP30"],
+  "blockers":["No new real D production source candidate exists after 20:43 placeholders"],
+  "exact_nextAction":"D create real current-base VR-SKYGLOW-ACTIVE-GATE-001 candidate first. If large-file safe write remains blocked, immediately complete HUD-SEMANTIC-TIMEATTACK-RANGE-GAP-001 using the small complete file rather than ending with another empty candidate. Route every real candidate to C exact-SHA sanity and B; add A for state/lifetime dependencies.",
+  "production_write":false
+}
