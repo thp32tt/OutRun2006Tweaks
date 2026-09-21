@@ -66,6 +66,11 @@ namespace OutRunVR::GameSemantic
         return CurrentScope;
     }
 
+    inline void ClearNextDraw() noexcept
+    {
+        NextDrawScope = RenderScope::None;
+    }
+
     inline bool ForceZeroDisparity(RenderScope scope) noexcept
     {
         return scope == RenderScope::SkyGlow;
