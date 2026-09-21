@@ -112,6 +112,9 @@ def main() -> int:
         "RuntimeStereoEligible()",
         "IsRuntimeStereoActive() noexcept",
         "Settings::VRDirectGpuOnly && Settings::VRPreferD3D9Ex",
+        "FirstDeferredResourceInitLogged",
+        "private eye resources initialized only after first successful game Present",
+        "CreateDevice pre-exposure RT/depth mutation removed",
     ])
     require("src/hooks_graphics.cpp", [
         "!OutRunVRStereo::IsRuntimeStereoActive()",
