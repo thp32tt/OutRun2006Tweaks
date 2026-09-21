@@ -1,0 +1,153 @@
+            write_runtime(status="slot_busy", last_action=f"Slot {slot.name} still generating; skipped only this slot and advanced")
+            log.info("slot=%s still busy; advance to next slot", slot.name)
+            return
+        prompt = read_prompt("continue_review.md")
+
+    if await detect_limit(page):
+        slot.last_result = "limit_detected"
+        save_registry(reg)
+        write_runtime(status="limit_detected", last_action=f"Slot {slot.name} not sent")
+        return
+
+    thinking_ok = await ensure_thinking_level(page)
+    if not thinking_ok and STRICT_THINKING_LEVEL:
+        slot.last_result = "thinking_level_unverified"
+        save_registry(reg)
+        write_runtime(
+            status="thinking_level_blocked",
+            last_action=f"Slot {slot.name} not sent: {PREFERRED_THINKING_LEVEL} could not be positively verified",
+        )
+        log.warning("slot=%s send blocked because thinking level %s could not be verified", slot.name, PREFERRED_THINKING_LEVEL)
+        return
+
+    sent = await send_message(page, prompt)
+    if not sent:
+        slot.last_result = "input_not_found"
+        save_registry(reg)
+        write_runtime(status="ui_changed", last_action="Prompt input not found; inspect via noVNC")
+        return
+
+    if is_new:
+        new_url = await wait_for_chat_url(page)
+        if new_url:
+            slot.url = new_url
+
+    slot.runs += 1
+    slot.watchdog_resumes_since_schedule = 0
+    slot.last_assistant_hash = None
+    slot.last_assistant_change_at = now.isoformat()
+    slot.last_sent_at = now.isoformat()
+    slot.last_result = "sent"
+    reg.next_slot = (reg.next_slot + 1) % len(reg.slots)
+    save_registry(reg)
+    write_runtime(
+        status="sent",
+        last_action=f"Sent review cycle to slot {slot.name}",
+        active_slot=slot.name,
+        active_url=slot.url,
+    )
+    log.info("sent slot=%s runs=%s url=%s", slot.name, slot.runs, slot.url)
+
+
+class StatusHandler(BaseHTTPRequestHandler):
+    def log_message(self, format, *args):
+        return
+
+    def do_GET(self):
+        if self.path not in ("/", "/status"):
+            self.send_response(404); self.end_headers(); return
+        now = datetime.now(TZ)
+        reg = load_registry(now)
+        body = f"""<!doctype html><html><head><meta charset='utf-8'><title>OutRun Chat Controller</title>
+<style>body{{font-family:sans-serif;max-width:1000px;margin:40px auto;padding:0 20px}}pre{{background:#f5f5f5;padding:16px;overflow:auto}}</style></head><body>
+<h1>OutRun Chat Controller</h1>
+<p><b>AUTO_SEND:</b> {html.escape(str(AUTO_SEND))}</p>
+<p><b>Status:</b> {html.escape(str(runtime.get('status')))}</p>
+<p><b>Last action:</b> {html.escape(str(runtime.get('last_action')))}</p>
+<p><b>Schedule:</b> minute {html.escape(str(SCHEDULE_MINUTES))} / KST</p>
+<p><b>Watchdog:</b> {html.escape(str(WATCHDOG_ENABLED))} / idle {WATCHDOG_STALL_MINUTES}m / busy-stall {WATCHDOG_BUSY_STALL_MINUTES}m / force-stop {html.escape(str(WATCHDOG_FORCE_STOP_STALLED))}</p>
+<p><b>Thinking:</b> required {html.escape(PREFERRED_THINKING_LEVEL)} / strict {html.escape(str(STRICT_THINKING_LEVEL))} / last {html.escape(str(runtime.get('last_thinking_level_result')))}</p>
+<p><b>Logical date:</b> {html.escape(reg.logical_date)}</p>
+<p><b>Next slot:</b> {html.escape(reg.slots[reg.next_slot].name)}</p>
+<h2>Registry</h2><pre>{html.escape(json.dumps({"next_slot": reg.next_slot, "slots": [asdict(s) for s in reg.slots]}, ensure_ascii=False, indent=2))}</pre>
+<h2>Runtime</h2><pre>{html.escape(json.dumps(runtime, ensure_ascii=False, indent=2))}</pre>
+<p>noVNC: <a href='http://192.168.0.48:6080/vnc.html'>192.168.0.48:6080/vnc.html</a></p>
+</body></html>""".encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers(); self.wfile.write(body)
+
+
+def start_status_server():
+    server = ThreadingHTTPServer(("0.0.0.0", STATUS_PORT), StatusHandler)
+    t = threading.Thread(target=server.serve_forever, daemon=True)
+    t.start()
+    log.info("status server listening on :%s", STATUS_PORT)
+
+
+async def scheduler_loop(page: Page, once: bool):
+    if once:
+        await run_cycle(page)
+        return
+    last_tick = None
+    last_watchdog_check = 0.0
+    write_runtime(status="idle")
+    while True:
+        now = datetime.now(TZ)
+        tick = now.strftime("%Y-%m-%dT%H:%M")
+        did_scheduled = False
+        if AUTO_SEND and now.minute in SCHEDULE_MINUTES and tick != last_tick:
+            last_tick = tick
+            did_scheduled = True
+            write_runtime(last_tick=tick, status="running")
+            try:
+                await run_cycle(page)
+            except Exception as e:
+                log.exception("scheduled cycle failed")
+                write_runtime(status="error", last_error=repr(e))
+        elif not AUTO_SEND:
+            # 로그인 화면은 계속 유지하되 자동 전송은 하지 않는다.
+            if runtime.get("status") not in ("login_required", "manual_mode"):
+                write_runtime(status="manual_mode", last_action="AUTO_SEND=false; waiting for manual login/setup")
+
+        mono = time.monotonic()
+        if AUTO_SEND and WATCHDOG_ENABLED and not did_scheduled and mono - last_watchdog_check >= WATCHDOG_CHECK_SECONDS:
+            last_watchdog_check = mono
+            try:
+                await watchdog_cycle(page)
+            except Exception as e:
+                log.exception("watchdog cycle failed")
+                write_runtime(status="watchdog_error", last_error=repr(e))
+        await asyncio.sleep(10)
+
+
+async def main_async(once: bool):
+    start_status_server()
+    PROFILE_DIR.mkdir(parents=True, exist_ok=True)
+    async with async_playwright() as p:
+        context: BrowserContext = await p.chromium.launch_persistent_context(
+            user_data_dir=str(PROFILE_DIR),
+            headless=False,
+            viewport={"width": 1365, "height": 768},
+            args=["--disable-dev-shm-usage", "--no-first-run", "--no-default-browser-check"],
+        )
+        page = context.pages[0] if context.pages else await context.new_page()
+        try:
+            await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
+        except Exception:
+            log.exception("initial navigation failed")
+        await scheduler_loop(page, once=once)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--once", action="store_true", help="run one review cycle immediately")
+    args = parser.parse_args()
+    try:
+        asyncio.run(main_async(args.once))
+    except KeyboardInterrupt:
+        pass
+
+if __name__ == "__main__":
+    main()
