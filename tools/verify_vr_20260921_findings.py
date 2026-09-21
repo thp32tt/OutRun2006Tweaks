@@ -42,6 +42,12 @@ def main() -> int:
         "no pre-Reset state-block replay",
         "RestoreClassicResetState(device)",
     ])
+    require("src/vr/d3d9/ex_device_upgrade.cpp", [
+        "const DWORD dynamicUsage = usage | D3DUSAGE_DYNAMIC;",
+        'dynamic ? "DEFAULT|DYNAMIC" : "DEFAULT fallback"',
+        "CreateVertexBufferCompatHook.stdcall<HRESULT>(",
+        "CreateIndexBufferCompatHook.stdcall<HRESULT>(",
+    ])
     forbid("src/vr/d3d9/ex_device_upgrade_r15.cpp", [
         "R15ClassicStateBlock",
         "R15ResetStateBlock",
