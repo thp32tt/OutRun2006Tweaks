@@ -121,13 +121,52 @@ $gameExe=Join-Path $root 'OR2006C2C.EXE'
 if(Test-Path $gameExe){
     $exeItem=Get-Item $gameExe
     $exeSha=(Get-FileHash $gameExe -Algorithm SHA256).Hash.ToLowerInvariant()
+    $upstreamReferenceSha='68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3'
+    $matchesUpstream=($exeSha -eq $upstreamReferenceSha)
     @(
         "filename=$($exeItem.Name)"
         "size=$($exeItem.Length)"
         "sha256=$exeSha"
+        "upstreamReferenceSha256=$upstreamReferenceSha"
+        "matchesUpstreamReplacementExe=$matchesUpstream"
         "lastWriteUtc=$($exeItem.LastWriteTimeUtc.ToString('o'))"
     )|Set-Content (Join-Path $dest 'EXE_IDENTITY.txt') -Encoding UTF8
     $copied+='EXE_IDENTITY.txt'
+}
+
+$hudCsv=Join-Path $dest 'OutRun2006Tweaks-hudtrace.csv'
+if(Test-Path $hudCsv){
+    $hudRows=Get-Content $hudCsv |
+        Where-Object { $_ -and -not $_.StartsWith('#') } |
+        ConvertFrom-Csv
+    if($hudRows){
+        $summary=@()
+        $summary+='HUD TRACE SUMMARY'
+        $summary+="session=$session"
+        $summary+="rows=$($hudRows.Count)"
+        $summary+=''
+        $groups=$hudRows |
+            Group-Object event,call_rva,known_area,arg0,arg1 |
+            ForEach-Object {
+                $maxCount=($_.Group | ForEach-Object {[int]$_.count} | Measure-Object -Maximum).Maximum
+                [pscustomobject]@{
+                    Event=$_.Group[0].event
+                    CallRva=$_.Group[0].call_rva
+                    KnownArea=$_.Group[0].known_area
+                    Arg0=$_.Group[0].arg0
+                    Arg1=$_.Group[0].arg1
+                    MaxCount=[int]$maxCount
+                }
+            } |
+            Sort-Object @{Expression={if($_.KnownArea){0}else{1}}}, @{Expression='MaxCount';Descending=$true}, CallRva
+        $summary+='event | call_rva | known_area | arg0 | arg1 | observed_count'
+        $summary+='------|----------|------------|------|------|---------------'
+        foreach($g in ($groups | Select-Object -First 200)){
+            $summary+=("$($g.Event) | $($g.CallRva) | $($g.KnownArea) | $($g.Arg0) | $($g.Arg1) | $($g.MaxCount)")
+        }
+        $summary|Set-Content (Join-Path $dest 'HUD_TRACE_SUMMARY.txt') -Encoding UTF8
+        $copied+='HUD_TRACE_SUMMARY.txt'
+    }
 }
 
 $payloadBackend=if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}
