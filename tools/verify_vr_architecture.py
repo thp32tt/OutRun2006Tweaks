@@ -577,15 +577,14 @@ _dxt1 = _dds_layout(7, 5, 8, True)
 if _dxt1 != (16, 2, 32):
     raise SystemExit(f"DDS DXT1 block-row model regressed: {_dxt1}")
 
-_header_size = 128
-_payload_size = 32
-if _payload_size > (_header_size - _header_size):
-    pass
-else:
-    # header-only DXT payload must fail before any copy.
-    _remaining = _header_size - _header_size
-    if _dxt1[2] <= _remaining:
-        raise SystemExit("truncated DDS payload model unexpectedly accepted")
+# A header-only buffer has zero payload and must reject a 32-byte DXT mip;
+# an exact 32-byte payload must accept it.
+_header_only_remaining = 0
+_exact_payload_remaining = 32
+if _dxt1[2] <= _header_only_remaining:
+    raise SystemExit("truncated DDS payload model unexpectedly accepted")
+if _dxt1[2] > _exact_payload_remaining:
+    raise SystemExit("exact DDS payload model unexpectedly rejected")
 
 # Padded destination pitch must place logical rows at the real row base.
 _row_bytes, _rows, _ = _dds_layout(3, 2, 4, False)
