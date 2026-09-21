@@ -1000,11 +1000,13 @@ namespace
         StereoCompositor(XrSession session, ID3D11Device* device, ID3D11DeviceContext* context,
             HWND hwnd, const std::array<XrViewConfigurationView, 2>& configs,
             bool directTransportEnabled, bool directTransportOnly,
-            bool disableDesktopDuplication, float renderScale)
+            bool disableDesktopDuplication, float renderScale,
+            float sharpening)
             : session_(session), device_(device), context_(context), hwnd_(hwnd), configs_(configs),
               directTransportEnabled_(directTransportEnabled),
               directTransportOnly_(directTransportOnly),
-              disableDesktopDuplication_(disableDesktopDuplication), renderScale_(renderScale)
+              disableDesktopDuplication_(disableDesktopDuplication), renderScale_(renderScale),
+              sharpening_(sharpening)
         {
             device_->AddRef();
             context_->AddRef();
@@ -1413,7 +1415,8 @@ namespace
             p->sdrWhiteScale = sdrWhiteScale_;
             p->sourceIsScRgb =
                 sourceFormat == DXGI_FORMAT_R16G16B16A16_FLOAT ? 1.f : 0.f;
-            p->padding[0] = p->padding[1] = 0;
+            p->padding[0] = sharpening_;
+            p->padding[1] = 0;
             context_->Unmap(constantBuffer_, 0);
 
             if (FAILED(context_->Map(
@@ -2155,6 +2158,7 @@ namespace
         bool directOpenFailureLogged_ = false;
         bool directCopyFenceFailureLogged_ = false;
         float renderScale_ = 1.0f;
+        float sharpening_ = 0.0f;
 
         ID3D11VertexShader* vs_ = nullptr;
         ID3D11VertexShader* menuVs_ = nullptr;
@@ -2206,6 +2210,20 @@ namespace
                 if (std::isfinite(v)) scale = v;
             }
         return std::clamp(scale, 0.5f, 2.0f);
+    }
+
+    float ReadSharpening()
+    {
+        char env[64]{};
+        const DWORD n = GetEnvironmentVariableA(
+            "OUTRUN_VR_SHARPENING", env, sizeof(env));
+        if (n == 0 || n >= sizeof(env))
+            return 0.0f;
+        char* end = nullptr;
+        const float value = std::strtof(env, &end);
+        if (end == env || !std::isfinite(value))
+            return 0.0f;
+        return std::clamp(value, 0.0f, 1.0f);
     }
 
     bool ReadBoolEnvironment(const char* name, bool defaultValue)
@@ -2355,6 +2373,7 @@ int main(int argc, char** argv)
         SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
         ParseRuntimeOverride(argc, argv);
         const float renderScale = ReadRenderScale(argc, argv);
+        const float sharpening = ReadSharpening();
         const bool directTransportEnabled = DirectTransportEnabled();
         const bool directTransportOnly =
             directTransportEnabled && DirectTransportOnly();
@@ -2433,7 +2452,7 @@ int main(int argc, char** argv)
             "xrEnumerateViewConfigurationViews list");
         std::array<XrViewConfigurationView, 2> configs{ cv[0], cv[1] };
 
-        SharedWriter shared(req.adapterLuid);RenderFrameReader renderFrames;StereoCompositor compositor(session,d3d.device,d3d.context,gameWindow,configs,directTransportEnabled,directTransportOnly,disableDesktopDuplication,renderScale);compositor.Initialize();ViewHistory viewHistory;HostTimings timings;
+        SharedWriter shared(req.adapterLuid);RenderFrameReader renderFrames;StereoCompositor compositor(session,d3d.device,d3d.context,gameWindow,configs,directTransportEnabled,directTransportOnly,disableDesktopDuplication,renderScale,sharpening);compositor.Initialize();ViewHistory viewHistory;HostTimings timings;
         const XrEnvironmentBlendMode blend = ChooseBlendMode(instance, system);
 
         bool running = false, quit = false, exitRequested = false;
