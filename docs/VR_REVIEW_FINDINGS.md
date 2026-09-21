@@ -72,3 +72,29 @@ The DX9Ex packager requires `FramerateUnlockExperimental`, `DisableDesktopDuplic
 Status: VALIDATED OFFLINE / HARDWARE RUNTIME PENDING
 
 Matrix `DX9EX-20260920-f46024f7005c` contains P1-P4 as four independent ZIPs. Every ZIP has a distinct game DLL, the same verified host, variant/matrix/source identity, automatic log launcher, scenario, Korean quick guide and internal SHA256SUMS. All checksums passed. Forbidden `d3d9.dll`, `multiviewpatcher.dll`, DX12 host and backend directories are absent. Quest 3/VDXR correctness and pacing remain user-runtime-required.
+
+
+## REFSTACK-HUD-001 — asymmetric HUD affine dropped eye scale and left scissor untransformed
+Status: FIXED / HARDWARE RUNTIME PENDING
+
+R30 already computed per-eye affine scale and offset, but the HUD correction consumed the offset while leaving the asymmetric eye scale out of the final clip correction. HUD geometry was also transformed independently from the active scissor rectangle. The reference-stack candidate applies eye scale + offset and transforms/restores the scissor per eye. This specifically targets white rank/score, 6th/6, menu and YES/NO misalignment/cropping.
+
+## REFSTACK-EFFECT-001 — flat depth-disabled effects used an artificially near stereo plane
+Status: FIXED / HARDWARE RUNTIME PENDING
+
+Depth-disabled alpha perspective overlays were reconstructed on a near fixed virtual plane. The candidate moves this class to a configurable distant plane so flare/glow-like effects retain head rotation/FOV while reducing artificial near-field parallax.
+
+## REFSTACK-PERF-001 — transport size and OpenXR output size were coupled
+Status: FSR1 POC BUILT / HARDWARE A-B PENDING
+
+The host can now keep the OpenXR projection at runtime/VDXR recommended size while requesting a smaller D3D9Ex shared-eye transport. The FSR1 POC reconstructs DirectGPU eyes with EASU+RCAS. CORRECTNESS uses scale 1.00 with FSR off; PERFORMANCE uses scale 0.77 with FSR1 on.
+
+## REFSTACK-LINEAGE-001 — direct-submit synchronization cost lacked explicit provenance
+Status: FIXED / RUNTIME TELEMETRY PENDING
+
+DirectGPU telemetry now records frame, pose sequence, generation and slot lineage and measures producer-fence latency. This separates x86->x64 synchronization cost from game-side stereo rendering cost.
+
+## REFSTACK-X86-001 — 32-bit direct OpenXR feasibility
+Status: POC BUILT / HARDWARE RUNTIME PENDING
+
+A standalone Win32 POC successfully compiles and packages code that creates an OpenXR instance/system, obtains D3D11 graphics requirements, creates the required D3D11 device and creates an OpenXR session. It remains isolated from the production game renderer until runtime evidence shows a reason to replace or reduce the x64 host/IPC architecture.
