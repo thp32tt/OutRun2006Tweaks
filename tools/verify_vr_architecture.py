@@ -531,7 +531,8 @@ if "state_->hostAdapterLuidLow = adapterLuid_.LowPart;" not in acquire:
 host_pose_v3 = require(
     "src/vr/ipc/host_pose_v3.hpp",
     "HostOwnershipMatchesLegacy",
-    "if (!HostOwnershipMatchesLegacy(state, legacy) ||",
+    "if (!OutRunVR::Ipc::StableRead(legacy_.Get(), legacy) ||",
+    "!HostOwnershipMatchesLegacy(state, legacy) ||",
     "!PoseSequenceMatchesLegacy(",
 )
 if "legacy.hostPid == state.hostPid &&" in host_pose_v3:
