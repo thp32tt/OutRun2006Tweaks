@@ -57,7 +57,66 @@ def minutes_since(value: Optional[str], now: datetime) -> Optional[float]:
         return None
 
 
-async def watchdog_cycle(page: Page):
+async def prepare_slot_pages(context: BrowserContext, reg: Registry) -> dict[str, Page]:
+    """Create and keep one persistent Chrome tab per A~F review slot."""
+    pages: dict[str, Page] = {}
+    available = [p for p in context.pages if not p.is_closed()]
+
+    # First reuse tabs that already match persisted chat URLs.
+    used = set()
+    for slot in reg.slots:
+        if not slot.url:
+            continue
+        for page in available:
+            if page in used:
+                continue
+            try:
+                if page.url == slot.url or ("/c/" in page.url and page.url.rstrip("/") == slot.url.rstrip("/")):
+                    pages[slot.name] = page
+                    used.add(page)
+                    break
+            except Exception:
+                continue
+
+    # Reuse remaining existing tabs, then create new tabs until every slot has one.
+    leftovers = [p for p in available if p not in used]
+    for slot in reg.slots:
+        if slot.name in pages:
+            continue
+        page = leftovers.pop(0) if leftovers else await context.new_page()
+        pages[slot.name] = page
+        used.add(page)
+
+    # Put each tab on its own persisted chat URL or a clean ChatGPT home page.
+    for slot in reg.slots:
+        page = pages[slot.name]
+        target = slot.url or BASE_URL
+        try:
+            if not page.url or page.url == "about:blank" or page.url.rstrip("/") != target.rstrip("/"):
+                await page.goto(target, wait_until="domcontentloaded", timeout=60000)
+                await page.wait_for_timeout(500)
+        except Exception:
+            log.exception("slot tab initialization failed slot=%s target=%s", slot.name, target)
+
+    write_runtime(
+        tab_mode="dedicated_per_slot",
+        tab_count=len(pages),
+        slot_tabs={name: page.url for name, page in pages.items()},
+    )
+    log.info("prepared %s dedicated tabs: %s", len(pages), ",".join(sorted(pages)))
+    return pages
+
+
+async def slot_page(context: BrowserContext, pages: dict[str, Page], slot: Slot) -> Page:
+    page = pages.get(slot.name)
+    if page is None or page.is_closed():
+        page = await context.new_page()
+        pages[slot.name] = page
+        await page.goto(slot.url or BASE_URL, wait_until="domcontentloaded", timeout=60000)
+    return page
+
+
+async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
     if not WATCHDOG_ENABLED or not AUTO_SEND:
         return
     now = datetime.now(TZ)
@@ -75,8 +134,6 @@ async def watchdog_cycle(page: Page):
     if not candidates:
         return
 
-    # A~F 전체를 감시한다. 한 Chat이 멈춰도 다른 Chat의 watchdog/정규 스케줄을 막지 않는다.
-    # 오래된 last_watchdog_at/last_sent_at 순으로 확인해 starvation을 방지한다.
     def watch_key(item):
         _, slot = item
         return slot.last_watchdog_at or slot.last_sent_at or ""
@@ -84,11 +141,14 @@ async def watchdog_cycle(page: Page):
     for idx, slot in sorted(candidates, key=watch_key):
         if slot.watchdog_resumes_since_schedule >= WATCHDOG_MAX_RESUMES_PER_RUN:
             continue
+
+        page = await slot_page(context, pages, slot)
         try:
-            await page.goto(slot.url, wait_until="domcontentloaded", timeout=60000)
-            await page.wait_for_timeout(900)
+            if page.url.rstrip("/") != slot.url.rstrip("/"):
+                await page.goto(slot.url, wait_until="domcontentloaded", timeout=60000)
+                await page.wait_for_timeout(700)
         except Exception:
-            log.exception("watchdog navigation failed slot=%s", slot.name)
+            log.exception("watchdog slot-tab navigation failed slot=%s", slot.name)
             continue
 
         if await detect_rate_limit(page):
@@ -98,7 +158,6 @@ async def watchdog_cycle(page: Page):
             write_runtime(status="limit_detected", last_action=f"Watchdog stopped: limit detected while checking slot {slot.name}")
             return
 
-        # ChatGPT 자체의 'Continue generating'이 보이면 입력보다 먼저 사용한다.
         guard = send_guard_reason(reg, slot, datetime.now(TZ))
         if not guard and await click_continue_generating(page):
             request_now = datetime.now(TZ)
@@ -106,11 +165,10 @@ async def watchdog_cycle(page: Page):
                 mark_rate_limit(reg, request_now, f"watchdog-continue:{slot.name}")
                 return
             note_successful_request(reg, request_now)
-            slot.last_watchdog_at = now.isoformat()
+            slot.last_watchdog_at = request_now.isoformat()
             slot.last_result = "watchdog_continue_clicked"
             save_registry(reg)
             write_runtime(status="watchdog_continue", last_action=f"Clicked Continue generating on slot {slot.name}")
-            log.info("watchdog clicked continue-generating slot=%s", slot.name)
             continue
 
         text = await last_assistant_text(page)
@@ -141,7 +199,7 @@ async def watchdog_cycle(page: Page):
                 save_registry(reg)
                 write_runtime(
                     status="watchdog_busy_stalled",
-                    last_action=f"Slot {slot.name} unchanged {stale_min:.1f}m but still generating; other slots continue",
+                    last_action=f"Slot {slot.name} unchanged {stale_min:.1f}m but still generating; other tabs continue",
                 )
                 continue
             if not await click_stop_generating(page):
@@ -169,6 +227,7 @@ async def watchdog_cycle(page: Page):
             save_registry(reg)
             write_runtime(status="thinking_level_blocked", last_action=f"Watchdog did not send slot {slot.name}: {PREFERRED_THINKING_LEVEL} could not be verified")
             continue
+
         sent = await send_message(page, prompt)
         if not sent:
             slot.last_result = "watchdog_input_not_found"
@@ -188,9 +247,9 @@ async def watchdog_cycle(page: Page):
 
         note_successful_request(reg, request_now)
         slot.watchdog_resumes_since_schedule += 1
-        slot.last_watchdog_at = now.isoformat()
-        slot.last_sent_at = now.isoformat()
-        slot.last_assistant_change_at = now.isoformat()
+        slot.last_watchdog_at = request_now.isoformat()
+        slot.last_sent_at = request_now.isoformat()
+        slot.last_assistant_change_at = request_now.isoformat()
         slot.last_result = "watchdog_resume_sent"
         save_registry(reg)
         write_runtime(
@@ -198,11 +257,12 @@ async def watchdog_cycle(page: Page):
             last_action=f"Sent continuation prompt to stalled/idle slot {slot.name}",
             active_slot=slot.name,
             active_url=slot.url,
+            slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
         )
         log.info("watchdog resumed slot=%s stale_min=%.1f busy=%s", slot.name, stale_min, busy)
 
 
-async def run_cycle(page: Page):
+async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
     now = datetime.now(TZ)
     reg = load_registry(now)
 
@@ -216,33 +276,107 @@ async def run_cycle(page: Page):
         )
         return
 
-    if not await ensure_logged_in(page):
-        write_runtime(status="login_required", last_action="Open noVNC and log in to ChatGPT")
-        log.warning("ChatGPT login required; open noVNC on port 6080")
-        return
-
-    if await detect_rate_limit(page):
-        mark_rate_limit(reg, datetime.now(TZ), "scheduled-precheck")
-        return
-
-    if await detect_limit(page):
-        write_runtime(status="limit_detected", last_action="Skipped automatic send")
-        log.warning("usage/limit signal detected; skipping")
-        return
-
-    # 다른 슬롯이 생성 중이어도 막지 않는다. 10분마다 A~F를 독립적으로 순환한다.
     slot = reg.slots[reg.next_slot]
+    page = await slot_page(context, pages, slot)
     is_new = not slot.url
 
     if is_new:
-        await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
-        await page.wait_for_timeout(1000)
+        if not await ensure_logged_in(page):
+            write_runtime(status="login_required", last_action=f"Slot {slot.name}: open noVNC and log in to ChatGPT")
+            return
         prompt = read_prompt("bootstrap_review.md")
     else:
-        await page.goto(slot.url, wait_until="domcontentloaded", timeout=60000)
-        await page.wait_for_timeout(1000)
+        try:
+            if page.url.rstrip("/") != slot.url.rstrip("/"):
+                await page.goto(slot.url, wait_until="domcontentloaded", timeout=60000)
+                await page.wait_for_timeout(600)
+        except Exception:
+            log.exception("slot-tab navigation failed slot=%s", slot.name)
+            return
+
         if await detect_busy(page):
-            # 이 Chat은 그대로 계속 일하게 두고 다음 tick에는 다음 슬롯으로 진행한다.
             slot.last_result = "busy_skipped"
             reg.next_slot = (reg.next_slot + 1) % len(reg.slots)
             save_registry(reg)
+            write_runtime(
+                status="slot_busy",
+                last_action=f"Slot {slot.name} still generating in its own tab; advanced to next slot",
+                slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
+            )
+            return
+        prompt = read_prompt("continue_review.md")
+
+    if await detect_rate_limit(page):
+        slot.last_result = "rate_limited_pre_send"
+        save_registry(reg)
+        mark_rate_limit(reg, datetime.now(TZ), f"scheduled-slot-precheck:{slot.name}")
+        return
+
+    if await detect_limit(page):
+        slot.last_result = "limit_detected"
+        save_registry(reg)
+        write_runtime(status="limit_detected", last_action=f"Slot {slot.name} not sent")
+        return
+
+    guard = send_guard_reason(reg, slot, datetime.now(TZ))
+    if guard:
+        slot.last_result = f"send_guard:{guard}"
+        save_registry(reg)
+        write_runtime(status="send_throttled", last_action=f"Slot {slot.name} not sent because {guard}")
+        return
+
+    thinking_ok = await ensure_thinking_level(page)
+    if not thinking_ok and STRICT_THINKING_LEVEL:
+        slot.last_result = "thinking_level_unverified"
+        save_registry(reg)
+        write_runtime(
+            status="thinking_level_blocked",
+            last_action=f"Slot {slot.name} not sent: {PREFERRED_THINKING_LEVEL} could not be positively verified",
+            active_slot=slot.name,
+            active_url=page.url,
+            slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
+        )
+        return
+
+    sent = await send_message(page, prompt)
+    if not sent:
+        slot.last_result = "input_not_found"
+        save_registry(reg)
+        write_runtime(status="ui_changed", last_action=f"Slot {slot.name}: prompt input not found")
+        return
+
+    request_now = datetime.now(TZ)
+    if await detect_rate_limit(page):
+        slot.last_result = "rate_limited_after_send"
+        slot.last_sent_at = request_now.isoformat()
+        save_registry(reg)
+        mark_rate_limit(reg, request_now, f"scheduled-send:{slot.name}")
+        return
+
+    if is_new:
+        new_url = await wait_for_chat_url(page)
+        if new_url:
+            slot.url = new_url
+
+    note_successful_request(reg, request_now)
+    slot.runs += 1
+    slot.watchdog_resumes_since_schedule = 0
+    slot.last_assistant_hash = None
+    slot.last_assistant_change_at = request_now.isoformat()
+    slot.last_sent_at = request_now.isoformat()
+    slot.last_result = "sent"
+    reg.next_slot = (reg.next_slot + 1) % len(reg.slots)
+    save_registry(reg)
+
+    write_runtime(
+        status="sent",
+        last_action=f"Sent review cycle to dedicated tab {slot.name}",
+        active_slot=slot.name,
+        active_url=slot.url,
+        tab_mode="dedicated_per_slot",
+        tab_count=len(pages),
+        slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
+    )
+    log.info("sent dedicated-tab slot=%s runs=%s url=%s", slot.name, slot.runs, slot.url)
+
+
