@@ -51,3 +51,4 @@ direct-CALL inventory, so CI artifacts and runtime logs use the same names.
 Preserve semantic separation first. A source change may refine an exact
 call-site or split a category, but broad promotion of screen HUD to world 3D or
 world billboards to zero-disparity HUD requires specific runtime evidence.
+Validation PR marker: build-only verification of the canonical focus source.
