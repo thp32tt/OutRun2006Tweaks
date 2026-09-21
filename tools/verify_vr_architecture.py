@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -446,5 +447,118 @@ if "#include <d3d9.h>" in math_core or "#include <openxr/" in math_core:
 require("src/vr/core/transport.hpp", "class IFrameProducer", "class IFrameConsumer", "D3D9ExShared", "DesktopDuplication")
 require("src/vr/game/game_adapter.hpp", "class IGameAdapter", "latchRenderPose", "buildStereoMatrices")
 require("src/vr/d3d9/stereo_backend.hpp", "class IStereoBackend", "drawWorldStereo", "drawScreenSpaceStereo")
+
+# One-shot game semantic ownership must be bounded. Producers arm only on paths
+# that have committed to the intended draw, and an unconsumed hint cannot cross
+# Present/Reset into unrelated rendering.
+semantic_header = require(
+    "src/vr/game/render_semantics.hpp",
+    "inline void CancelNextDraw(RenderScope expected) noexcept",
+    "inline void ClearNextDraw() noexcept",
+    "NextDrawScope = RenderScope::None;",
+)
+heart_source = require(
+    "src/interpolation.cpp",
+    "static void HeartSemantic_dest",
+    "static void HeartSemanticCancel_dest",
+    "Module::exe_ptr(0x5B475)",
+    "Module::exe_ptr(0x5B4C0)",
+    "CancelNextDraw(",
+    "RenderScope::WorldBillboard",
+)
+heart_early = heart_source.split("static void HeartPulse_dest", 1)[1].split(
+    "static void HeartSemantic_dest", 1
+)[0]
+if "ArmNextDraw" in heart_early:
+    raise SystemExit("heart semantic must not arm before the 0x5B470 no-draw bypass")
+
+particle_source = text("src/hooks_bugfixes.cpp")
+particle_section = particle_source.split("class FixParticleRendering", 1)[1].split(
+    "class FixIncorrectShading", 1
+)[0]
+for marker in (
+    "static void semantic_destination",
+    "particle_draw_dispatch_HookAddr = 0x19178",
+    "RenderScope::WorldParticle",
+):
+    if marker not in particle_section:
+        raise SystemExit(f"particle semantic late-arm invariant missing: {marker}")
+particle_early = particle_section.split("static void destination", 1)[1].split(
+    "static void semantic_destination", 1
+)[0]
+if "ArmNextDraw" in particle_early:
+    raise SystemExit("particle semantic must not arm during pre-dispatch geometry construction")
+
+renderer_source = require(
+    "src/vr/game/outrun_renderer.cpp",
+    '#include "vr/game/render_semantics.hpp"',
+    "void NotifyGamePresent()",
+    "void NotifyGameReset()",
+)
+if renderer_source.count("OutRunVR::GameSemantic::ClearNextDraw();") < 2:
+    raise SystemExit("one-shot semantic must be cleared by both Present and Reset boundaries")
+
+# Minimal deterministic lifetime model for the original regression:
+# arm + no intended draw + Present + unrelated draw => None.
+_pending = "WORLD_BILLBOARD"
+_pending = None  # 0x5B4C0 per-heart cancellation / Present fallback
+_unrelated_observed = _pending
+if _unrelated_observed is not None:
+    raise SystemExit("stale one-shot semantic survived frame boundary model")
+
+# Intended producer path remains one-shot: immediate draw consumes exactly once.
+_pending = "WORLD_PARTICLE"
+_first_draw = _pending
+_pending = None
+_second_draw = _pending
+if _first_draw != "WORLD_PARTICLE" or _second_draw is not None:
+    raise SystemExit("one-shot semantic consume model regressed")
+
+# Interpolation hook installation must remain an atomic transaction even as
+# new required hooks are added. Derive the installed hook symbols from Apply()
+# and require exactly the same set in RollbackHooks(), rather than maintaining
+# a stale hard-coded count.
+interp_source = require(
+    "src/interpolation.cpp",
+    "static void RollbackHooks() noexcept",
+    "auto fail = []() noexcept",
+    "return fail();",
+)
+rollback_section = interp_source.split("static void RollbackHooks() noexcept", 1)[1].split(
+    "bool Apply()", 1
+)[0]
+apply_section = interp_source.split("bool Apply()", 1)[1]
+created_hooks = set(
+    re.findall(
+        r"\b([A-Za-z_]\w*)\s*=\s*safetyhook::create_(?:mid|inline)\s*\(",
+        apply_section,
+    )
+)
+rollback_hooks = set(
+    re.findall(r"\b([A-Za-z_]\w*)\.reset\(\);", rollback_section)
+)
+if not created_hooks:
+    raise SystemExit("Interp::Apply hook transaction verifier found no required hooks")
+if created_hooks != rollback_hooks:
+    raise SystemExit(
+        "Interp hook rollback coverage mismatch: "
+        f"missing={sorted(created_hooks - rollback_hooks)} "
+        f"extra={sorted(rollback_hooks - created_hooks)}"
+    )
+if "return false;" in apply_section:
+    raise SystemExit("Interp::Apply must route required-hook failures through rollback")
+
+framerate_source = require(
+    "src/hooks_framerate.cpp",
+    "if (!Interp::Apply())",
+    "interpolation hook transaction failed; later experimental patches were not installed",
+    "constexpr int SetTweeningTable_Addr = 0xED60;",
+)
+if "Interp::Apply();" in framerate_source:
+    raise SystemExit("ReplaceGameUpdateLoop must not ignore Interp::Apply result")
+checked = framerate_source.index("if (!Interp::Apply())")
+later_patch = framerate_source.index("constexpr int SetTweeningTable_Addr = 0xED60;")
+if checked > later_patch:
+    raise SystemExit("Interp transaction result must be checked before later experimental patches")
 
 print("VR reconstructed R23/R25 architecture boundary verification passed")
