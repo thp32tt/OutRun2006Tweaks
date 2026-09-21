@@ -148,6 +148,50 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
           if (!mz_zip_writer_add_file(&zip_archive, "OutRun2006Tweaks.log", re4t_log_filename, nullptr, 0, 3))
             zip_created = false;
 
+          // VR diagnostics are optional. A crash can happen while one of these
+          // files is still open, so an optional add failure must never suppress
+          // the primary dump/log archive.
+          auto add_optional_vr_file = [&zip_archive](const char* archive_name,
+              const std::filesystem::path& source)
+          {
+            if (!std::filesystem::exists(source) ||
+                !std::filesystem::is_regular_file(source))
+              return;
+            const std::wstring wide = source.wstring();
+            mz_zip_writer_add_file(&zip_archive, archive_name, wide.c_str(),
+              nullptr, 0, 3);
+          };
+
+          const std::filesystem::path game_dir = Module::ExePath.parent_path();
+          add_optional_vr_file("vr/OutRun2006Tweaks-hudtrace.csv",
+            game_dir / "OutRun2006Tweaks-hudtrace.csv");
+          add_optional_vr_file("vr/OutRun2006Tweaks-xstmap.csv",
+            game_dir / "OutRun2006Tweaks-xstmap.csv");
+          add_optional_vr_file("vr/CURRENT_VR_SESSION.json",
+            game_dir / "CURRENT_VR_SESSION.json");
+          add_optional_vr_file("vr/ACTIVE_VR_BACKEND.txt",
+            game_dir / "ACTIVE_VR_BACKEND.txt");
+          add_optional_vr_file("vr/BUILD_INPUTS.json",
+            game_dir / "BUILD_INPUTS.json");
+
+          try
+          {
+            for (const auto& entry :
+                std::filesystem::directory_iterator(game_dir))
+            {
+              if (!entry.is_regular_file())
+                continue;
+              const std::string name = entry.path().filename().string();
+              if (name.starts_with("outrun-vr-host") &&
+                  entry.path().extension() == ".log")
+                add_optional_vr_file(("vr/" + name).c_str(), entry.path());
+              else if (name.starts_with("outrun-vr-watchdog") &&
+                       entry.path().extension() == ".log")
+                add_optional_vr_file(("vr/" + name).c_str(), entry.path());
+            }
+          }
+          catch (...) {}
+
           mz_zip_writer_finalize_archive(&zip_archive);
           mz_zip_writer_end(&zip_archive);
         }

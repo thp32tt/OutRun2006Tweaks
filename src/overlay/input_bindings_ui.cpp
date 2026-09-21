@@ -81,6 +81,7 @@ private:
 		{ "Tweaks",  Mod, int(ModAction::OpenChat)        },
 		{ "Tweaks",  Mod, int(ModAction::MusicNext)       },
 		{ "Tweaks",  Mod, int(ModAction::MusicPrevious)   },
+		{ "VR",      Mod, int(ModAction::VRRecenter)      },
 	};
 
 	struct QuickSetupEntry

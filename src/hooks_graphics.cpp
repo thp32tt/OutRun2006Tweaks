@@ -1,6 +1,8 @@
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "game_addrs.hpp"
+#include "vr/game/render_semantics.hpp"
+#include <algorithm>
 #include <iostream>
 #include <array>
 
@@ -12,6 +14,13 @@ namespace Settings
 	Setting<bool> SkyGlowTwoStep{ "Graphics", "SkyGlowTwoStep", true,
 		"Reduces aliasing in the sky glow effect by handling the SkyGlowFactor in two steps. "
 		"Likely not console-accurate, but can help reduce the aliasing with Factor = 4 or higher." };
+	// Defined by src/vr/settings.cpp. Sky glow samples the mono game backbuffer,
+	// so it must be suppressed while true stereo is active or the left-eye bloom
+	// gets composited into the right eye as a translucent ghost.
+	extern Setting<bool> VREnabled;
+	extern Setting<bool> VRStereo;
+	extern Setting<bool> VRMirrorFitDesktop;
+	extern Setting<bool> VRDisableDesktopVsync;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
 
@@ -286,6 +295,12 @@ RestoreXboxBrightness RestoreXboxBrightness::instance;
 // more for quality:
 class RestoreSkyGlow : public Hook
 {
+	static bool SkyGlowAllowed() noexcept
+	{
+		return Settings::SkyGlowFactor > 0 &&
+			!(Settings::VREnabled && Settings::VRStereo);
+	}
+
 	// (1) The exposure reaches pixel shader constant c7 alpha, but nothing reads
 	// it. Games pixel shaders are assembled by concatenating ps_1_1 snippets looked
 	// up by combiner encoding, and entry for the HDR alpha op holds an empty snippet 
@@ -525,6 +540,13 @@ class RestoreSkyGlow : public Hook
 	inline static SafetyHookInline MakeReduceBuff_hook = {};
 	static void __stdcall MakeReduceBuff_dest()
 	{
+		// True stereo owns two independent eye images. The stock glow reducer
+		// samples D3DBACKBUFFER_TYPE_MONO, which is the left/game backbuffer in
+		// the VR renderer; letting this run would bake left-eye scenery into a
+		// texture that is later composited into both eyes.
+		if (!SkyGlowAllowed())
+			return;
+
 		// Checked here rather than in apply so the setting can be changed while the
 		// game runs.
 		if (!Settings::SkyGlowTwoStep || !ReduceHalf)
@@ -596,6 +618,12 @@ class RestoreSkyGlow : public Hook
 	inline static SafetyHookInline BlurGlowImage_hook = {};
 	static void __stdcall BlurGlowImage_dest()
 	{
+		// Keep the whole post-process chain inert while true stereo is active.
+		// This is a second fail-safe behind g_GlowEnabled for paths that can be
+		// entered from cached game state during a mode transition.
+		if (!SkyGlowAllowed())
+			return;
+
 		float* offset = Module::exe_ptr<float>(BlurOffset_Addr);
 		float* step = Module::exe_ptr<float>(BlurOffsetStep_Addr);
 
@@ -606,7 +634,11 @@ class RestoreSkyGlow : public Hook
 		*offset = prevOffset * scale;
 		*step = prevStep * scale;
 
-		BlurGlowImage_hook.stdcall();
+		{
+			OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
+				OutRunVR::GameSemantic::RenderScope::SkyGlow);
+			BlurGlowImage_hook.stdcall();
+		}
 
 		*offset = prevOffset;
 		*step = prevStep;
@@ -646,6 +678,23 @@ class RestoreSkyGlow : public Hook
 
 		spdlog::info("RestoreSkyGlow: glow buffers sized {}x{}", w, h);
 
+		// True-stereo VR owns its own per-eye R30 glow chain. Do not allocate
+		// the game's mono glow render targets here: besides wasting a large
+		// buffer at 4K, that chain can only sample D3DBACKBUFFER_TYPE_MONO and
+		// would later leak left-eye content into the right eye.
+		if (Settings::VREnabled && Settings::VRStereo)
+		{
+			if (ReduceHalf)
+			{
+				ReduceHalf->Release();
+				ReduceHalf = nullptr;
+			}
+			spdlog::info(
+				"RestoreSkyGlow: stock mono buffers skipped in true-stereo VR; R30 owns independent eye buffers factor={}",
+				Settings::SkyGlowFactor.get());
+			return;
+		}
+
 		GlowInit_hook.stdcall();
 
 		// Halfway stage for the reduce, so neither StretchRect does more than a 2x.
@@ -656,7 +705,7 @@ class RestoreSkyGlow : public Hook
 			ReduceHalf = nullptr;
 		}
 
-		if (Settings::SkyGlowFactor > 2)
+		if (SkyGlowAllowed() && Settings::SkyGlowFactor > 2)
 		{
 			if (IDirect3DDevice9* device = Game::D3DDevice())
 			{
@@ -676,6 +725,12 @@ class RestoreSkyGlow : public Hook
 	inline static SafetyHookInline ClearBuffer_hook = {};
 	static int __cdecl ClearBuffer_dest(int a1)
 	{
+		// When glow is disabled (including true-stereo VR), preserve the game's
+		// original clear alpha exactly. The exposure seed only exists to feed the
+		// mono sky-glow extraction pass.
+		if (!SkyGlowAllowed())
+			return ClearBuffer_hook.ccall<int>(a1);
+
 		uint32_t* backColor = Module::exe_ptr<uint32_t>(BackColor_Addr);
 		const uint32_t prevColor = *backColor;
 
@@ -713,12 +768,16 @@ public:
 		// SkyGlowTwoStep is read inside MakeReduceBuff on every call, so nothing
 		// needs declaring for it at all.
 		Settings::SkyGlowFactor.watch([] { RebuildGlowBuffers(); });
+		Settings::VREnabled.watch([] { RebuildGlowBuffers(); });
+		Settings::VRStereo.watch([] { RebuildGlowBuffers(); });
 	}
 
 	bool apply() override
 	{
 		// Note: hooks/patches are always applied regardless of INI settings, so they can be changed at runtime
-		Memory::VP::Patch(Module::exe_ptr<uint8_t>(GlowEnabled_Addr), uint8_t(Settings::SkyGlowFactor > 0 ? 1 : 0));
+		Memory::VP::Patch(Module::exe_ptr<uint8_t>(GlowEnabled_Addr), uint8_t(SkyGlowAllowed() ? 1 : 0));
+		if (Settings::SkyGlowFactor > 0 && !SkyGlowAllowed())
+			spdlog::info("VR SKY GLOW: stock mono-backbuffer chain disabled; stereo renderer owns independent left/right glow extraction and blur");
 
 		Memory::VP::Patch(Module::exe_ptr(AlphaOpTable_ps11_Entry0Snippet), uintptr_t(Snippet_ps11));
 		Memory::VP::Patch(Module::exe_ptr(AlphaOpTable_ps14_Entry0Snippet), uintptr_t(Snippet_ps14));
@@ -763,7 +822,7 @@ public:
 
 		// Release before patching the enabled byte, so it frees resources if needed
 		GlowRelease_dest();
-		Memory::VP::Patch(Module::exe_ptr<uint8_t>(GlowEnabled_Addr), uint8_t(Settings::SkyGlowFactor > 0 ? 1 : 0));
+		Memory::VP::Patch(Module::exe_ptr<uint8_t>(GlowEnabled_Addr), uint8_t(SkyGlowAllowed() ? 1 : 0));
 		GlowInit_dest();
 	}
 
@@ -829,14 +888,39 @@ class ReflectionUpdateRate : public Hook
 	static void FaceCount_dest(SafetyHookContext& ctx)
 	{
 		// Carried between frames so a share that doesn't come to a whole number of
-		// faces still averages out, 0.25 alternating one face and two. A cubemap
-		// left part drawn continues next frame, as the game holds the face cursor.
+		// faces still averages out. In VR, render cadence can be 72/80/90/120 Hz;
+		// normalize the work to elapsed time so 0.5 keeps the original 60 Hz
+		// budget (3 faces/frame * 60) instead of scaling GPU cost with HMD Hz.
 		static float pendingFaces = 0.0f;
+		static LARGE_INTEGER lastCounter{};
+		static LARGE_INTEGER frequency{};
 
-		pendingFaces += FacesPerCubemap * Settings::ReflectionUpdateRate.get();
+		float frameScale60 = 1.0f;
+		if (Settings::VREnabled && Settings::VRNormalizeReflectionRate)
+		{
+			if (frequency.QuadPart <= 0)
+				QueryPerformanceFrequency(&frequency);
+			LARGE_INTEGER now{};
+			QueryPerformanceCounter(&now);
+			if (lastCounter.QuadPart > 0 && frequency.QuadPart > 0 &&
+				now.QuadPart >= lastCounter.QuadPart)
+			{
+				const double dt = static_cast<double>(now.QuadPart - lastCounter.QuadPart) /
+					static_cast<double>(frequency.QuadPart);
+				// Avoid a long pause/load screen producing a one-frame cubemap spike.
+				frameScale60 = static_cast<float>(std::clamp(dt * 60.0, 0.0, 2.0));
+			}
+			lastCounter = now;
+		}
+		else
+		{
+			lastCounter = {};
+		}
 
-		const int faces = int(pendingFaces);
+		pendingFaces += FacesPerCubemap * Settings::ReflectionUpdateRate.get() * frameScale60;
+		const int faces = std::min(FacesPerCubemap, int(pendingFaces));
 		pendingFaces -= float(faces);
+		pendingFaces = std::min(pendingFaces, float(FacesPerCubemap));
 
 		ctx.eax = faces;
 	}
@@ -995,7 +1079,16 @@ class FixZBufferPrecision : public Hook
 
 		if (allow_znear_override)
 		{
+			// In 6DoF VR the player can move their head through the normal third-
+			// person near plane. Keep the 2D precision fix intact outside VR, but
+			// use the dedicated VR near plane during gameplay/goal rendering.
+			if (Settings::VREnabled && Settings::VRPositionalTracking &&
+				(*Game::current_mode == STATE_GAME || *Game::current_mode == STATE_GOAL))
+			{
+				camera->perspective_znear_BC = Settings::VRNearPlane.get();
+			}
 			// only set znear to 1 if...
+			else
 			if ((camera->cam_mode_34A == 2 || camera->cam_mode_34A == 0) // ... in third-person or FPV
 				&& camera->cam_mode_timer_364 == 0 // ... not switching cameras
 				&& (*Game::current_mode == STATE_GAME || *Game::current_mode == STATE_GOAL)) // ... we're in main game state (not in STATE_START cutscene etc)
@@ -1037,7 +1130,11 @@ class FixZBufferPrecision : public Hook
 		camera->perspective_znear_BC = 0.05f; // game default = 0.1, but that causes lens flare to slightly clip, 0.05 allows it to fade properly
 		CalcCameraMatrix_dest(camera);
 
-		Clr_SceneEffect.call(a1);
+		{
+			OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
+				OutRunVR::GameSemantic::RenderScope::SceneEffect);
+			Clr_SceneEffect.call(a1);
+		}
 
 		// restore orig znear
 		camera->perspective_znear_BC = prev;
@@ -1174,10 +1271,35 @@ class WindowedBorderless : public Hook
 	static void destination(safetyhook::Context& ctx)
 	{
 		HWND window = HWND(ctx.ebp);
-		SetWindowPos(window, 0,
-			Settings::WindowPositionX, Settings::WindowPositionY, 
-			Game::screen_resolution->x, Game::screen_resolution->y,
-			0x40);
+		int x = Settings::WindowPositionX;
+		int y = Settings::WindowPositionY;
+		int width = Game::screen_resolution->x;
+		int height = Game::screen_resolution->y;
+
+		// VR may intentionally render a larger internal backbuffer than the PC
+		// desktop. Keep that render resolution for the HMD/SBS source, but fit the
+		// borderless mirror window to the current monitor so a 3840x2160 render on
+		// a 3440x1440 display is scaled instead of extending off-screen.
+		if (Settings::VREnabled && Settings::VRMirrorFitDesktop)
+		{
+			MONITORINFO monitorInfo{};
+			monitorInfo.cbSize = sizeof(monitorInfo);
+			const HMONITOR monitor = MonitorFromWindow(
+				window, MONITOR_DEFAULTTOPRIMARY);
+			if (monitor && GetMonitorInfoW(monitor, &monitorInfo))
+			{
+				x = monitorInfo.rcMonitor.left;
+				y = monitorInfo.rcMonitor.top;
+				width = monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
+				height = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
+				spdlog::info(
+					"VR PC MIRROR: fitting borderless window to monitor {}x{} while internal backbuffer remains {}x{}",
+					width, height,
+					Game::screen_resolution->x, Game::screen_resolution->y);
+			}
+		}
+
+		SetWindowPos(window, 0, x, y, width, height, 0x40);
 	}
 
 public:
@@ -1304,37 +1426,19 @@ class VSyncOverride : public Hook
 	inline static SafetyHookMid dest_hook = {};
 	static void destination(safetyhook::Context& ctx)
 	{
-		Game::D3DPresentParams->PresentationInterval = Settings::VSync;
-		if (!Settings::VSync)
-			Game::D3DPresentParams->PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+		if (Settings::VREnabled && Settings::VRDisableDesktopVsync)
+		{
+			Game::D3DPresentParams->PresentationInterval =
+				D3DPRESENT_INTERVAL_IMMEDIATE;
+			spdlog::info("VR PRESENT: desktop D3D9 VSync bypass active; OpenXR cadence is owned by the host/runtime");
+		}
+		else
+		{
+			Game::D3DPresentParams->PresentationInterval = Settings::VSync;
+			if (!Settings::VSync)
+				Game::D3DPresentParams->PresentationInterval =
+					D3DPRESENT_INTERVAL_IMMEDIATE;
+		}
 
 		// TODO: add MultiSampleType / MultiSampleQuality overrides here?
 		//  (doesn't seem any of them are improvement over vanilla "DX/ANTIALIASING = 2" though...)
-	}
-
-public:
-	std::string_view description() override
-	{
-		return "VSync";
-	}
-
-	bool validate() override
-	{
-		return Settings::VSync != 1;
-	}
-
-	void declare_settings() override
-	{
-		Settings::VSync.needs_restart();
-	}
-
-	bool apply() override
-	{
-		dest_hook = safetyhook::create_mid(Module::exe_ptr(D3DInit_HookAddr), destination);
-
-		return true;
-	}
-
-	static VSyncOverride instance;
-};
-VSyncOverride VSyncOverride::instance;

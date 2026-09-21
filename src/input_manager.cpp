@@ -144,6 +144,7 @@ std::string InputManager_ModActionDisplayName(ModAction action)
 		case ModAction::OpenChat:      return "Y";
 		case ModAction::MusicNext:     return "X";
 		case ModAction::MusicPrevious: return "Z";
+		case ModAction::VRRecenter:    return "F12";
 		default:                       return "(unbound)";
 	}
 }

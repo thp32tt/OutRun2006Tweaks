@@ -3,6 +3,7 @@
 #include "game_addrs.hpp"
 #include "overlay/overlay.hpp"
 #include "interpolation.hpp"
+#include "vr/game/render_semantics.hpp"
 
 #include <vector>
 #include <algorithm>
@@ -1083,6 +1084,11 @@ void AfterTicks(double qpcFreqMs)
 static SafetyHookMid HeartPulse_hook = {};
 static void HeartPulse_dest(SafetyHookContext& ctx)
 {
+	// HeartDisp_car_heart is a true car/world-attached billboard. Preserve that
+	// ownership through the next D3D draw instead of letting depth-off alpha
+	// heuristics flatten it into the HUD plane.
+	OutRunVR::GameSemantic::ArmNextDraw(
+		OutRunVR::GameSemantic::RenderScope::WorldBillboard);
 	if (!Settings::FramerateInterpolation)
 		return;
 

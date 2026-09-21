@@ -48,6 +48,7 @@ enum class ModAction
 	OpenChat,
 	MusicNext,
 	MusicPrevious,
+	VRRecenter,
 	Count
 };
 
@@ -500,7 +501,8 @@ private:
 		"HUD Toggle",
 		"Open Chat",
 		"Music Next",
-		"Music Previous"
+		"Music Previous",
+		"VR Recenter"
 	};
 	static_assert(std::size(modNames) == size_t(ModAction::Count));
 
@@ -764,18 +766,24 @@ public:
 
 	void init(HWND hwnd);
 
-	// An ini written before an action existed has no lines for it, so it loads
-	// unbound. That is recoverable for every action except the overlay toggle:
-	// without it there is no way to reach the UI that would rebind it, so it
-	// always gets its default back.
+	// Actions introduced after a bindings INI was written load with no entry.
+	// Keep the overlay reachable and give VR recenter an F12 default that does not collide with legacy HUD F10
+	// until the user chooses a custom keyboard/wheel/gamepad binding.
 	void ensureOverlayBindable()
 	{
 		InputAction& overlay = modBindings[size_t(ModAction::OverlayToggle)];
-		if (!overlay.bindings().empty())
-			return;
+		if (overlay.bindings().empty())
+		{
+			spdlog::warn(__FUNCTION__ ": overlay toggle had no bindings, restoring F11");
+			addModBinding(ModAction::OverlayToggle, SDL_SCANCODE_F11);
+		}
 
-		spdlog::warn(__FUNCTION__ ": overlay toggle had no bindings, restoring F11");
-		addModBinding(ModAction::OverlayToggle, SDL_SCANCODE_F11);
+		InputAction& recenter = modBindings[size_t(ModAction::VRRecenter)];
+		if (recenter.bindings().empty())
+		{
+			spdlog::info(__FUNCTION__ ": VR recenter had no binding, restoring F12");
+			addModBinding(ModAction::VRRecenter, SDL_SCANCODE_F12);
+		}
 	}
 
 	void setupDefaultBindings()
@@ -854,6 +862,7 @@ public:
 
 		// Mod actions.
 		addModBinding(ModAction::OverlayToggle, SDL_SCANCODE_F11);
+		addModBinding(ModAction::VRRecenter, SDL_SCANCODE_F12);
 		addModBinding(ModAction::OpenChat, SDL_SCANCODE_Y);
 		addModBinding(ModAction::MusicNext, SDL_SCANCODE_X);
 		addModBinding(ModAction::MusicNext, SDL_GAMEPAD_BUTTON_BACK);

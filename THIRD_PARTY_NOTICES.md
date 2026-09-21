@@ -35,6 +35,24 @@ Role: important public reference for DirectInput wheel-FFB architecture and forc
 
 The repository retains the upstream MIT license notice. This fork does not redistribute the separate `WheelFfb.dll` toolkit from that project; the v0.1 FFB backend is implemented directly with Windows DirectInput COM.
 
+### VR GPL source reuse
+
+#### bo3b / 3Dmigoto
+
+Repository: https://github.com/bo3b/3Dmigoto
+
+License: GNU GPL version 3.
+
+Role: the `vr-openxr-gpl-reuse` branch adapts 3Dmigoto's DirectX 9 shader
+fingerprinting approach and its FNV-1 64-bit byte-buffer hash routine. The
+adapted implementation is isolated in
+`src/vr/d3d9/shader_fingerprint_gpl.hpp` and is used by the R26 safe-draw
+diagnostic path to identify vertex/pixel shaders by stable bytecode fingerprint
+instead of process-local COM pointer values.
+
+The GPLv3 license text is included as `COPYING.GPL3`. Original MIT notices for
+OutRun2006Tweaks remain preserved.
+
 ### Build dependencies
 
 The produced DLL also incorporates open-source dependencies from the upstream build, including projects fetched or linked through CMake/submodules such as SDL, SafetyHook/Zydis, spdlog, Dear ImGui, xxHash, IXWebSocket, zlib, jsoncpp, Ogg/FLAC, miniz and related support libraries.
@@ -57,7 +75,7 @@ Community discussions and user hardware logs were used as practical testing/desi
 
 ### License summary
 
-The forked source remains under the repository's MIT license while preserving the upstream notice. Binary-release dependency notices are generated from the actual source/dependency trees and shipped as `LICENSES.txt`.
+The upstream/base MIT-covered source remains under MIT with its notices preserved. The `vr-openxr-gpl-reuse` branch contains GPLv3-derived source and the combined branch distribution is GPL-3.0-only. Binary-release dependency notices are generated from the actual source/dependency trees and shipped as `LICENSES.txt`.
 
 This file is a project attribution/packaging record, not legal advice.
 
@@ -96,6 +114,23 @@ This file is a project attribution/packaging record, not legal advice.
 
 해당 저장소는 원본 MIT 라이선스 고지를 유지합니다. 이 포크는 그 프로젝트의 별도 `WheelFfb.dll` 툴킷을 재배포하지 않으며, v0.1 FFB 백엔드는 Windows DirectInput COM을 직접 사용해 구현했습니다.
 
+### VR GPL 소스 재사용
+
+#### bo3b / 3Dmigoto
+
+저장소: https://github.com/bo3b/3Dmigoto
+
+라이선스: GNU GPL version 3.
+
+역할: `vr-openxr-gpl-reuse` 브랜치는 3Dmigoto의 DirectX 9 셰이더
+fingerprint 방식과 FNV-1 64-bit 바이트 버퍼 해시 루틴을 적용했습니다.
+적용 코드는 `src/vr/d3d9/shader_fingerprint_gpl.hpp`에 분리되어 있으며,
+R26 safe-draw 진단 경로에서 실행마다 달라질 수 있는 COM 포인터 대신
+셰이더 바이트코드 기반의 안정적인 식별값을 기록하는 데 사용합니다.
+
+GPLv3 전문은 `COPYING.GPL3`에 포함되어 있으며, 기존 OutRun2006Tweaks의
+MIT 저작권/허가 고지는 그대로 유지합니다.
+
 ### 빌드 의존성
 
 생성되는 DLL에는 원본 빌드에서 사용하는 여러 오픈소스 의존성도 포함됩니다. CMake 또는 서브모듈로 가져오거나 링크되는 SDL, SafetyHook/Zydis, spdlog, Dear ImGui, xxHash, IXWebSocket, zlib, jsoncpp, Ogg/FLAC, miniz 및 관련 지원 라이브러리 등이 이에 해당합니다.
@@ -118,6 +153,6 @@ This file is a project attribution/packaging record, not legal advice.
 
 ### 라이선스 요약
 
-포크된 소스는 원본 고지를 유지한 상태로 이 저장소의 MIT 라이선스를 따릅니다. 바이너리 배포에 필요한 의존성 고지는 실제 소스/의존성 트리에서 생성해 `LICENSES.txt`로 함께 배포합니다.
+원본 및 기존 MIT 코드의 MIT 권리와 고지는 그대로 유지합니다. 다만 `vr-openxr-gpl-reuse` 브랜치는 GPLv3 유래 소스를 포함하므로 결합된 브랜치 배포물은 GPL-3.0-only 조건으로 배포합니다. 바이너리 배포에 필요한 의존성 고지는 실제 소스/의존성 트리에서 생성해 `LICENSES.txt`로 함께 배포합니다.
 
 이 문서는 프로젝트의 출처 표시 및 배포 패키징 기록이며 법률 자문이 아닙니다.
