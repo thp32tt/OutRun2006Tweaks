@@ -87,6 +87,8 @@ def main() -> int:
         "Configuration identity is still inconsistent after session rotation.",
     ])
     profiles = read("tools/OutRunVR-TestProfiles.ps1")
+    if "'-CullingUnionFov=false'" not in profiles:
+        raise AssertionError("VR test profiles must keep union culling disabled until visually proven")
     correctness = profiles.split("Name='CORRECTNESS'", 1)[1]
     for marker in [
         "'-FramerateLimit=60'",
@@ -95,7 +97,6 @@ def main() -> int:
         "'-FramerateUnlockExperimental=false'",
         "'-FrameCadenceMode=0'",
         "'-DisableDesktopVsync=false'",
-        "'-CullingUnionFov=false'",
     ]:
         if marker not in correctness:
             raise AssertionError(
