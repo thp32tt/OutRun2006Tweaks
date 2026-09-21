@@ -36,6 +36,10 @@ namespace Settings
 		"Uses immediate D3D9 presentation while VR is enabled so the game source is not hard-capped by the desktop VSync setting before the OpenXR host captures it." };
 	Setting<float> VRHudScale{ "VR", "HudScale", 0.55f,
 		"Projection-space HUD size after the headset-specific asymmetric-FOV correction. Lower values make speed/time/position and menus smaller in the HMD.", Range<float>{ 0.30f, 1.20f } };
+	Setting<float> VRHostRenderScale{ "VR", "HostRenderScale", 1.0f,
+		"OpenXR projection swapchain scale relative to the runtime-recommended per-eye size. Keep 1.0 for the exact VDXR/SteamVR recommendation; lower values are performance experiments.", Range<float>{ 0.50f, 1.00f } };
+	Setting<float> VRHostSharpening{ "VR", "HostSharpening", 0.30f,
+		"Host-side spatial sharpening after the D3D9/D3D9Ex eye image is sampled into the OpenXR projection swapchain. 0 disables it.", Range<float>{ 0.0f, 1.0f } };
 	Setting<bool> VRHeadTracking{ "VR", "HeadTracking", true,
 		"Applies the OpenXR HMD orientation at OutRun's verified D3D9 WorldViewProjection upload." };
 	Setting<bool> VRStereo{ "VR", "Stereo", true,
@@ -122,6 +126,14 @@ namespace OutRunVR
 					Settings::VRDirectGpuOnly ? "1" : "0");
 				SetEnvironmentVariableA("OUTRUN_VR_DISABLE_DESKTOP_DUPLICATION",
 					Settings::VRDisableDesktopDuplication ? "1" : "0");
+				const std::string renderScale =
+					std::to_string(Settings::VRHostRenderScale.get());
+				const std::string sharpening =
+					std::to_string(Settings::VRHostSharpening.get());
+				SetEnvironmentVariableA("OUTRUN_VR_RENDER_SCALE",
+					renderScale.c_str());
+				SetEnvironmentVariableA("OUTRUN_VR_SHARPENING",
+					sharpening.c_str());
 				const std::string refreshHz =
 					std::to_string(Settings::VRTargetRefreshRateHz.get());
 				SetEnvironmentVariableA("OUTRUN_VR_TARGET_REFRESH_HZ",
@@ -193,6 +205,8 @@ namespace OutRunVR
 			Settings::VRAutoLaunchHost.needs_restart();
 			Settings::VRMirrorFitDesktop.needs_restart();
 			Settings::VRDisableDesktopVsync.needs_restart();
+			Settings::VRHostRenderScale.needs_restart();
+			Settings::VRHostSharpening.needs_restart();
 			Settings::VRPreferD3D9Ex.needs_restart();
 			Settings::VRDirectGpuOnly.needs_restart();
 			Settings::VRDisableDesktopDuplication.needs_restart();
@@ -206,9 +220,11 @@ namespace OutRunVR
 		bool apply() override
 		{
 			spdlog::info(
-				"VR: D3D9Ex DirectGPU preference={} directOnly={} refreshOverrideHz={:.1f} cadenceMode={} cadenceTargetHz={:.1f} cadenceMaxHz={:.1f}; target 0 means XR-native render cadence, simulation remains 60 Hz",
+				"VR: D3D9Ex DirectGPU preference={} directOnly={} hostScale={:.2f} hostSharpen={:.2f} refreshOverrideHz={:.1f} cadenceMode={} cadenceTargetHz={:.1f} cadenceMaxHz={:.1f}; target 0 means XR-native render cadence, simulation remains 60 Hz",
 				Settings::VRPreferD3D9Ex.get(),
 				Settings::VRDirectGpuOnly.get(),
+				Settings::VRHostRenderScale.get(),
+				Settings::VRHostSharpening.get(),
 				Settings::VRTargetRefreshRateHz.get(),
 				Settings::VRFrameCadenceMode.get(),
 				Settings::VRFrameCadenceTargetHz.get(),
