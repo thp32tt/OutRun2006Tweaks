@@ -251,12 +251,17 @@ def find_data_xrefs(pe: PE) -> list[dict]:
             if i < 0:
                 break
             xref_rva = text_section.virtual_address + i
+            function_start = guess_function_start(
+                text, text_section.virtual_address, i
+            )
             found.append({
                 "xref_rva": xref_rva,
                 "target_rva": target_rva,
                 "target": name,
-                "function_start_guess_rva": guess_function_start(
-                    text, text_section.virtual_address, i
+                "function_start_guess_rva": function_start,
+                "function_bytes96": (
+                    pe.bytes_at_rva(function_start, 96).hex(" ")
+                    if function_start is not None else ""
                 ),
                 "prefix8": text[max(0, i - 8):i].hex(" "),
                 "suffix8": text[i + 4:i + 12].hex(" "),
