@@ -17,6 +17,12 @@ This branch treats Quest 3 / VDXR runtime testing as a scarce validation gate ra
 - CONTROL: conservative DX9Ex reference used only when a baseline comparison is needed.
 - CORRECTNESS: default daily runtime profile and the only profile the user should normally need.
 - PERFORMANCE: same binary set where possible, with isolated performance feature flags enabled only when supported.
+- A_BASELINE: reproducible A/B baseline: DisableStageCulling=true, TransparencySupersampling=true, ReflectionResolution=1024.
+- B_CULLING: A with DisableStageCulling=false so VR union-FOV culling can be measured.
+- C_CULLING_NO_SSAA: B with TransparencySupersampling=false.
+- D_CULLING_NO_SSAA_R512: C with ReflectionResolution=512.
+
+For the A/B sequence, run A -> B -> C -> D on the same stage/path when possible. Each profile is written into the session manifest, log directory and ZIP name, so uploads can be compared without a separate user description.
 
 Backend and TestProfile are separate identities. Session manifests and log archives must record both.
 
