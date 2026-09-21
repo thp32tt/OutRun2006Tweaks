@@ -83,6 +83,11 @@ namespace Settings
 	extern Setting<int> FramerateFastLoad;                 // hooks_framerate.cpp
 	extern Setting<bool> FramerateInterpolation;           // hooks_framerate.cpp
 	extern Setting<bool> VREnabled;                        // vr/settings.cpp
+	extern Setting<bool> VRPositionalTracking;              // vr/settings.cpp
+	extern Setting<bool> VRCullingUnionFov;                 // vr/settings.cpp
+	extern Setting<float> VRCullingUnionMarginDegrees;      // vr/settings.cpp
+	extern Setting<bool> VRNormalizeReflectionRate;         // vr/settings.cpp
+	extern Setting<float> VRNearPlane;                      // vr/settings.cpp
 
 	extern Setting<float> FramerateInterpolationDebugAlpha; // interpolation.cpp
 	extern Setting<bool> FramerateInterpolationDebugLog;    // interpolation.cpp
