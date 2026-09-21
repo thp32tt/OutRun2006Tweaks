@@ -1,0 +1,226 @@
+from __future__ import annotations
+
+import argparse
+import asyncio
+import html
+import json
+import logging
+import os
+import re
+import threading
+import time
+from dataclasses import dataclass, asdict
+from datetime import datetime, timedelta
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+from typing import Optional
+from zoneinfo import ZoneInfo
+
+from playwright.async_api import async_playwright, BrowserContext, Page, TimeoutError as PlaywrightTimeoutError
+
+TZ = ZoneInfo(os.getenv("TZ", "Asia/Seoul"))
+BASE_URL = os.getenv("CHATGPT_BASE_URL", "https://chatgpt.com/")
+AUTO_SEND = os.getenv("AUTO_SEND", "false").lower() == "true"
+SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("SCHEDULE_MINUTES", "7,17,27,37,47,57").split(",") if x.strip()})
+CHAT_SLOTS = max(1, int(os.getenv("CHAT_SLOTS", "6")))
+ROLLOVER_HOUR = int(os.getenv("CHAT_DAY_ROLLOVER_HOUR", "2"))
+STATUS_PORT = int(os.getenv("STATUS_PORT", "8787"))
+WATCHDOG_ENABLED = os.getenv("WATCHDOG_ENABLED", "true").lower() == "true"
+WATCHDOG_STALL_MINUTES = int(os.getenv("WATCHDOG_STALL_MINUTES", "12"))
+WATCHDOG_BUSY_STALL_MINUTES = int(os.getenv("WATCHDOG_BUSY_STALL_MINUTES", "20"))
+WATCHDOG_CHECK_SECONDS = int(os.getenv("WATCHDOG_CHECK_SECONDS", "60"))
+WATCHDOG_MAX_RESUMES_PER_RUN = int(os.getenv("WATCHDOG_MAX_RESUMES_PER_RUN", "1"))
+WATCHDOG_FORCE_STOP_STALLED = os.getenv("WATCHDOG_FORCE_STOP_STALLED", "false").lower() == "true"
+PREFERRED_THINKING_LEVEL = os.getenv("PREFERRED_THINKING_LEVEL", "High").strip()
+STRICT_THINKING_LEVEL = os.getenv("STRICT_THINKING_LEVEL", "true").lower() == "true"
+PROFILE_DIR = Path("/data/browser-profile")
+STATE_DIR = Path("/data/state")
+REGISTRY_FILE = STATE_DIR / "chat_registry.json"
+RUNTIME_FILE = STATE_DIR / "runtime_status.json"
+PROMPTS_DIR = Path("/opt/outrun/prompts")
+LOG_FILE = Path("/logs/controller.log")
+
+LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+    handlers=[logging.StreamHandler(), logging.FileHandler(LOG_FILE)],
+)
+log = logging.getLogger("outrun-controller")
+
+LIMIT_PATTERNS = [
+    r"you.?ve reached.*limit",
+    r"usage limit",
+    r"limit reached",
+    r"try again later",
+    r"사용량.{0,8}한도",
+    r"한도에.{0,8}도달",
+    r"사용 한도",
+    r"나중에 다시",
+]
+BUSY_SELECTORS = [
+    "button[data-testid='stop-button']",
+    "button:has-text('Stop generating')",
+    "button:has-text('Stop streaming')",
+    "button:has-text('생성 중지')",
+    "button:has-text('응답 중지')",
+]
+CONTINUE_GENERATING_SELECTORS = [
+    "button:has-text('Continue generating')",
+    "button:has-text('계속 생성')",
+    "button:has-text('계속해서 생성')",
+]
+ASSISTANT_MESSAGE_SELECTORS = [
+    "[data-message-author-role='assistant']",
+]
+
+INPUT_SELECTORS = [
+    "#prompt-textarea",
+    "textarea[placeholder*='Message']",
+    "textarea[placeholder*='메시지']",
+    "[contenteditable='true'][data-lexical-editor='true']",
+    "[contenteditable='true']",
+]
+
+@dataclass
+class Slot:
+    name: str
+    url: Optional[str] = None
+    runs: int = 0
+    last_sent_at: Optional[str] = None
+    last_result: Optional[str] = None
+    last_assistant_hash: Optional[str] = None
+    last_assistant_change_at: Optional[str] = None
+    watchdog_resumes_since_schedule: int = 0
+    last_watchdog_at: Optional[str] = None
+
+@dataclass
+class Registry:
+    logical_date: str
+    next_slot: int
+    slots: list[Slot]
+
+runtime = {
+    "started_at": datetime.now(TZ).isoformat(),
+    "auto_send": AUTO_SEND,
+    "schedule_minutes": SCHEDULE_MINUTES,
+    "status": "starting",
+    "last_tick": None,
+    "last_action": None,
+    "last_error": None,
+    "watchdog_enabled": WATCHDOG_ENABLED,
+    "watchdog_stall_minutes": WATCHDOG_STALL_MINUTES,
+    "watchdog_busy_stall_minutes": WATCHDOG_BUSY_STALL_MINUTES,
+    "watchdog_force_stop_stalled": WATCHDOG_FORCE_STOP_STALLED,
+    "preferred_thinking_level": PREFERRED_THINKING_LEVEL,
+    "strict_thinking_level": STRICT_THINKING_LEVEL,
+    "last_thinking_level_result": None,
+}
+
+def write_runtime(**updates):
+    runtime.update(updates)
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    RUNTIME_FILE.write_text(json.dumps(runtime, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def logical_date(now: datetime) -> str:
+    shifted = now - timedelta(days=1) if now.hour < ROLLOVER_HOUR else now
+    return shifted.date().isoformat()
+
+
+def new_registry(now: datetime) -> Registry:
+    return Registry(
+        logical_date=logical_date(now),
+        next_slot=0,
+        slots=[Slot(name=chr(ord('A') + i)) for i in range(CHAT_SLOTS)],
+    )
+
+
+def load_registry(now: datetime) -> Registry:
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    if not REGISTRY_FILE.exists():
+        reg = new_registry(now)
+        save_registry(reg)
+        return reg
+    try:
+        raw = json.loads(REGISTRY_FILE.read_text(encoding="utf-8"))
+        reg = Registry(
+            logical_date=raw["logical_date"],
+            next_slot=int(raw.get("next_slot", 0)),
+            slots=[Slot(**s) for s in raw["slots"]],
+        )
+    except Exception:
+        log.exception("registry read failed; recreating")
+        reg = new_registry(now)
+    if reg.logical_date != logical_date(now) or len(reg.slots) != CHAT_SLOTS:
+        archive = STATE_DIR / f"chat_registry_{reg.logical_date}.json"
+        try:
+            if REGISTRY_FILE.exists():
+                archive.write_text(REGISTRY_FILE.read_text(encoding="utf-8"), encoding="utf-8")
+        except Exception:
+            log.exception("registry archive failed")
+        reg = new_registry(now)
+        save_registry(reg)
+        log.info("daily chat generation rolled over: %s", reg.logical_date)
+    return reg
+
+
+def save_registry(reg: Registry):
+    payload = {
+        "logical_date": reg.logical_date,
+        "next_slot": reg.next_slot,
+        "slots": [asdict(s) for s in reg.slots],
+    }
+    tmp = REGISTRY_FILE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp.replace(REGISTRY_FILE)
+
+
+def read_prompt(filename: str) -> str:
+    path = PROMPTS_DIR / filename
+    return path.read_text(encoding="utf-8").strip()
+
+
+async def first_visible(page: Page, selectors: list[str]):
+    for sel in selectors:
+        try:
+            loc = page.locator(sel).first
+            if await loc.count() and await loc.is_visible(timeout=500):
+                return loc
+        except Exception:
+            continue
+    return None
+
+
+async def page_text(page: Page) -> str:
+    try:
+        return (await page.locator("body").inner_text(timeout=3000)).lower()
+    except Exception:
+        return ""
+
+
+async def detect_limit(page: Page) -> bool:
+    text = await page_text(page)
+    return any(re.search(p, text, flags=re.I | re.S) for p in LIMIT_PATTERNS)
+
+
+async def detect_busy(page: Page) -> bool:
+    for sel in BUSY_SELECTORS:
+        try:
+            loc = page.locator(sel).first
+            if await loc.count() and await loc.is_visible(timeout=300):
+                return True
+        except Exception:
+            continue
+    return False
+
+
+async def ensure_logged_in(page: Page) -> bool:
+    await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
+    await page.wait_for_timeout(1500)
+    box = await first_visible(page, INPUT_SELECTORS)
+    if box:
+        return True
+    txt = await page_text(page)
+    if "log in" in txt or "sign up" in txt or "로그인" in txt or "가입" in txt:
+        return False
