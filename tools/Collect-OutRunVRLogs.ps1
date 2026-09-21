@@ -5,6 +5,7 @@ $root=Split-Path -Parent $MyInvocation.MyCommand.Path
 $patterns=@(
     'OutRun2006Tweaks*.log',
     'OutRun2006Tweaks-hudtrace*.csv',
+    'OutRun2006Tweaks-xstmap*.csv',
     'outrun-vr-host*.log',
     'outrun-vr-host-pipeline*.log',
     'outrun-vr-watchdog*.log',
@@ -255,6 +256,7 @@ $configHash=if(Test-Path (Join-Path $root 'OutRun2006Tweaks.ini')){(Get-FileHash
     "BUILD_MATRIX=$matrix"
     "SOURCE_SHA=$sha"
     "CONFIG_SHA256=$configHash"
+    "ASSET_SEMANTICS_PRESENT=$(Test-Path (Join-Path $dest 'VR_ASSET_SEMANTICS.json'))"
     "FILES=$($copied -join ',')"
     "CAPTURES=$((@($capturedDirs | ForEach-Object {[IO.Path]::GetFileName($_)})) -join ',')"
     'LOG_BOUNDARY=clean-session-root'
