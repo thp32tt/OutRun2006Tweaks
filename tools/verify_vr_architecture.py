@@ -488,4 +488,62 @@ require("src/vr/core/transport.hpp", "class IFrameProducer", "class IFrameConsum
 require("src/vr/game/game_adapter.hpp", "class IGameAdapter", "latchRenderPose", "buildStereoMatrices")
 require("src/vr/d3d9/stereo_backend.hpp", "class IStereoBackend", "drawWorldStereo", "drawScreenSpaceStereo")
 
+# Host takeover must publish a fail-closed owner epoch. The replacement PID
+# cannot relabel a previous host's pose/flags/direct-transport state, and stale
+# v3 pose authority may not survive a v2/v3 host identity mismatch.
+main_source = text("vrhost/src/main.cpp")
+shared_writer_begin = main_source.find("class SharedWriter")
+shared_writer_end = main_source.find("class RenderFrameReader", shared_writer_begin)
+if shared_writer_begin < 0 or shared_writer_end < 0:
+    raise SystemExit("SharedWriter boundary missing")
+shared_writer = main_source[shared_writer_begin:shared_writer_end]
+for marker in (
+    "ClearHostOwnedPayloadLocked",
+    "TryBeginOwnershipWrite",
+    "state_->flags = 0;",
+    "state_->heartbeat = 0;",
+    "state_->sampleQpc = 0;",
+    "state_->hostInteropProbeAckToken = 0;",
+    "state_->hostDirectConsumedFrameId = 0;",
+    "HostReferenceSpaceGenerationIndex",
+    "HostEyeOffsetLeftXIndex",
+    "HostEyeOffsetRightZIndex",
+):
+    if marker not in shared_writer:
+        raise SystemExit(f"v2 host takeover fail-close invariant missing: {marker}")
+
+acquire_begin = shared_writer.find("void AcquireOwnership()")
+acquire_end = shared_writer.find("void Begin()", acquire_begin)
+if acquire_begin < 0 or acquire_end < 0:
+    raise SystemExit("SharedWriter AcquireOwnership boundary missing")
+acquire = shared_writer[acquire_begin:acquire_end]
+clear_index = acquire.find("ClearHostOwnedPayloadLocked();")
+publish_index = acquire.find(
+    "reinterpret_cast<volatile LONG*>(&state_->hostPid)"
+)
+if clear_index < 0 or publish_index < 0 or clear_index > publish_index:
+    raise SystemExit(
+        "replacement host PID must not publish before stale host payload is fail-closed"
+    )
+if "state_->hostAdapterLuidLow = adapterLuid_.LowPart;" not in acquire:
+    raise SystemExit("replacement host adapter identity not committed in takeover transaction")
+
+host_pose_v3 = require(
+    "src/vr/ipc/host_pose_v3.hpp",
+    "HostOwnershipMatchesLegacy",
+    "if (!HostOwnershipMatchesLegacy(state, legacy) ||",
+    "!PoseSequenceMatchesLegacy(",
+)
+if "legacy.hostPid == state.hostPid &&" in host_pose_v3:
+    raise SystemExit(
+        "v3 reader still skips parity rejection across a host PID mismatch"
+    )
+
+host_pose_smoke = require(
+    "vrhost/tests/host_pose_v3_validation_smoke.cpp",
+    "same-host v2/v3 ownership accepted",
+    "cross-host v2/v3 ownership rejected",
+    "unowned legacy channel rejects stale v3 owner",
+)
+
 print("VR reconstructed R23/R25 architecture boundary verification passed")
