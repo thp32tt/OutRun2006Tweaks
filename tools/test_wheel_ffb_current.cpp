@@ -18,6 +18,16 @@ void step(WheelVehicleDynamics& d, EVWORK_CAR& c, float a=0, float beta=0, float
 }
 int main() {
  using namespace WheelFFBMath;
+ auto engineIdle=estimate_engine_haptics(0.0f,0,0.0f);
+ require(engineIdle.rpmNorm>=.08f&&engineIdle.rpmNorm<.20f,"engine idle RPM estimate");
+ require(engineIdle.frequencyHz>=13.0f&&engineIdle.frequencyHz<16.0f,"engine idle haptic frequency");
+ auto engineFree=estimate_engine_haptics(0.0f,0,1.0f);
+ require(engineFree.rpmNorm>engineIdle.rpmNorm&&engineFree.frequencyHz>engineIdle.frequencyHz,"free-rev haptic rises with throttle");
+ auto engineGear1=estimate_engine_haptics(.15f,1,.5f);
+ auto engineGear2=estimate_engine_haptics(.15f,2,.5f);
+ require(engineGear1.rpmNorm>engineGear2.rpmNorm,"upshift lowers estimated RPM at equal road speed");
+ require(engineGear1.frequencyHz<=24.0001f&&engineGear1.amplitudeScale<=1.0001f,"engine haptic bounded");
+ require(estimate_engine_haptics(std::numeric_limits<float>::quiet_NaN(),99,std::numeric_limits<float>::quiet_NaN()).frequencyHz>=13.0f,"engine haptic rejects non-finite inputs");
  require(pneumatic_sat_shape(0)==0,"SAT zero");
  require(pneumatic_sat_shape(std::numeric_limits<float>::quiet_NaN())==0,"SAT NaN");
  require(lateral_force_shape(.32f)>.999f,"Fy proxy saturates in deep slip");
@@ -63,6 +73,18 @@ int main() {
  WheelVehicleDynamics low; EVWORK_CAR lowCar; low.reset(); for(int i=0;i<80;++i)step(low,lowCar,0,0,0,.15f); step(low,lowCar,.01f,0,.2f,.15f);
  WheelVehicleDynamics high; EVWORK_CAR highCar; high.reset(); for(int i=0;i<80;++i)step(high,highCar,0,0,0,.90f); step(high,highCar,.01f,0,.2f,.90f);
  require(high.frontSlipBlend()>low.frontSlipBlend(),"front-slip transient speeds up with vehicle speed");
+
+ // v0.2: a rapid steering reversal must change the Physics SAT tyre proxy on
+ // the first valid tick instead of carrying stale opposite torque for several
+ // frames. The steering-rate predictor should point in the new direction too.
+ WheelVehicleDynamics reversal; EVWORK_CAR reversalCar; reversal.reset();
+ for(int i=0;i<80;++i)step(reversal,reversalCar);
+ for(int i=0;i<8;++i)step(reversal,reversalCar,0,0,.50f,.55f);
+ require(reversal.frontSlip()>.08f,"front-slip positive corner established");
+ step(reversal,reversalCar,0,0,-.50f,.55f);
+ require(reversal.rawFrontSlip()<0&&reversal.frontSlip()<0,"front-slip reversal crosses in one tick");
+ require(reversal.steerRate()<0,"steering transient lead follows counter-steer direction");
+
  float beta=d.bodySlip();d.update(nullptr,0,.5,0);require(d.bodySlip()<beta&&!d.sampleValid(),"invalid decay");
  for(int i=0;i<4;++i)d.update(nullptr,0,.5,0);
  require(d.bodySlip()==0&&d.yawRate()==0&&d.frontSlip()==0&&d.activationBlend()==0,"five-invalid clear");

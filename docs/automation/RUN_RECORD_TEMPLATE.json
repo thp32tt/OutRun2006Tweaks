@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "role": "A|B|C|D",
+  "runId": "role-YYYYMMDDTHHMMSSKST-shortid",
+  "startedKst": null,
+  "completedKst": null,
+  "baseSha": null,
+  "findingIds": [],
+  "inputHashes": {},
+  "changedPaths": [],
+  "candidateBranch": null,
+  "candidateSha": null,
+  "ci": {
+    "workflow": null,
+    "runId": null,
+    "status": null,
+    "artifactIds": []
+  },
+  "evidenceLevel": "STATICALLY_VERIFIED|BUILD_VERIFIED|USER_RUNTIME_VERIFIED|NONE",
+  "queueProposal": [],
+  "blockers": [],
+  "retryCount": 0,
+  "nextAction": null
+}
