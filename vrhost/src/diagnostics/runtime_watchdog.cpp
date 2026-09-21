@@ -273,8 +273,24 @@ namespace OutRunVR::Host::Diagnostics
                     }
                 }
 
+                {
+                    std::ofstream last(
+                        "VR_CAPTURE_LAST.txt",
+                        std::ios::out | std::ios::trunc);
+                    if (last)
+                    {
+                        last << "status=READY\n"
+                             << "captureId=" << captureId << '\n'
+                             << "path=" << (std::filesystem::path("captures") /
+                                  captureId).string() << '\n'
+                             << "completedUtc=" << Timestamp() << '\n';
+                    }
+                }
                 log.Write("INFO", "diagnostic_capture_written id=" + captureId +
                     " samples=" + std::to_string(samples.size()));
+                // Ctrl+F9 previously had no visible/audible acknowledgement,
+                // making a successful capture look like a missing feature.
+                MessageBeep(MB_ICONASTERISK);
                 return true;
             }
             catch (const std::exception& e)
@@ -438,6 +454,19 @@ namespace OutRunVR::Host::Diagnostics
                             "diagnostic_capture_triggered id=" + captureId +
                             " key=Ctrl+F9 preSamples=" +
                             std::to_string(captureSamples.size()));
+                        {
+                            std::ofstream last(
+                                "VR_CAPTURE_LAST.txt",
+                                std::ios::out | std::ios::trunc);
+                            if (last)
+                            {
+                                last << "status=CAPTURING\n"
+                                     << "captureId=" << captureId << '\n'
+                                     << "trigger=Ctrl+F9\n"
+                                     << "startedUtc=" << Timestamp() << '\n';
+                            }
+                        }
+                        MessageBeep(MB_OK);
                     }
                     else if (capturePending)
                     {
