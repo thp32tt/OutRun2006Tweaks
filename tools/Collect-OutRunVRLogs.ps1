@@ -163,7 +163,7 @@ if(Test-Path $hudCsv){
         $summary+="rows=$($hudRows.Count)"
         $summary+=''
         $groups=$hudRows |
-            Group-Object event,call_rva,known_area,mode,stage,arg0,arg1 |
+            Group-Object event,call_rva,known_area,mode,stage,arg0,arg1,text_hash,text |
             ForEach-Object {
                 $maxCount=($_.Group | ForEach-Object {[int]$_.count} | Measure-Object -Maximum).Maximum
                 [pscustomobject]@{
@@ -180,14 +180,17 @@ if(Test-Path $hudCsv){
                     Arg5=$_.Group[0].arg5
                     Arg6=$_.Group[0].arg6
                     Arg7=$_.Group[0].arg7
+                    TextHash=$_.Group[0].text_hash
+                    Text=$_.Group[0].text
                     MaxCount=[int]$maxCount
                 }
             } |
             Sort-Object @{Expression={if($_.KnownArea){0}else{1}}}, @{Expression='MaxCount';Descending=$true}, CallRva
-        $summary+='event | call_rva | known_area | mode | stage | arg0 | arg1 | arg2 | arg3 | arg4 | arg5 | arg6 | arg7 | observed_count'
-        $summary+='------|----------|------------|------|-------|------|------|------|------|------|------|------|------|---------------'
+        $summary+='event | call_rva | known_area | mode | stage | arg0 | arg1 | arg2 | arg3 | arg4 | arg5 | arg6 | arg7 | text_hash | text | observed_count'
+        $summary+='------|----------|------------|------|-------|------|------|------|------|------|------|------|------|-----------|------|---------------'
         foreach($g in ($groups | Select-Object -First 200)){
-            $summary+=("$($g.Event) | $($g.CallRva) | $($g.KnownArea) | $($g.Mode) | $($g.Stage) | $($g.Arg0) | $($g.Arg1) | $($g.Arg2) | $($g.Arg3) | $($g.Arg4) | $($g.Arg5) | $($g.Arg6) | $($g.Arg7) | $($g.MaxCount)")
+            $safeText=if($g.Text){$g.Text.Replace('|','\|')}else{''}
+            $summary+=("$($g.Event) | $($g.CallRva) | $($g.KnownArea) | $($g.Mode) | $($g.Stage) | $($g.Arg0) | $($g.Arg1) | $($g.Arg2) | $($g.Arg3) | $($g.Arg4) | $($g.Arg5) | $($g.Arg6) | $($g.Arg7) | $($g.TextHash) | $safeText | $($g.MaxCount)")
         }
         $summary|Set-Content (Join-Path $dest 'HUD_TRACE_SUMMARY.txt') -Encoding UTF8
         $copied+='HUD_TRACE_SUMMARY.txt'
