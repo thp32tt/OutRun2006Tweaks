@@ -2,6 +2,7 @@
 """Deterministic source-policy checks for the 2026-09-21 OutRun VR finding bundle."""
 
 from pathlib import Path
+import json
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,6 +23,36 @@ def forbid(path: str, markers: list[str]) -> None:
         raise AssertionError(f"{path}: forbidden regression markers present: {present}")
 
 def main() -> int:
+    contract = json.loads(read("docs/VR_RUNTIME_VISUAL_CONTRACT.json"))
+    baseline = contract["behavioralBaseline"]
+    if baseline["commit"] != "91b9c639bea60c114600aedd2f4f3fe97ec420e9":
+        raise AssertionError("runtime visual behavioral baseline changed without explicit review")
+    locked = contract["lockedInvariants"]
+    if locked["d3d9exGameplayTransport"] != "DIRECT_GPU_ONLY":
+        raise AssertionError("D3D9Ex gameplay transport contract must remain DirectGPU-only")
+    if locked["desktopGameplayMirror"] != "MONO_OR_LEFT_EYE_NEVER_SBS":
+        raise AssertionError("desktop gameplay mirror contract must forbid SBS")
+    if locked["hudPresentation"] != "WORLD_FIXED_NOT_HEAD_LOCKED":
+        raise AssertionError("HUD contract must remain world-fixed / not head-locked")
+    required_build = contract["requiredActiveBuild"]
+    if not required_build["r26HudCompare"] or required_build["variantId"] != "ACTIVE_R26_R43_R44":
+        raise AssertionError("active build contract must keep the R26 + R43/R44 visual owner")
+
+    require(".github/workflows/vr-dx9ex-active.yml", [
+        "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON",
+        "ACTIVE_R26_R43_R44",
+    ])
+    forbid(".github/workflows/vr-dx9ex-active.yml", [
+        "ACTIVE_FULL_R34",
+        "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF",
+    ])
+    require("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
+        "R44OverlayOwnedWvpHits",
+        "R30ScreenSpaceKind::PerspectiveHud",
+        "GetLastRawGameWvpWrite",
+        "finite HUD world-lock",
+        "R30XyzrhwWorldLockedHudDraws",
+    ])
     require("src/vr/d3d9/stereo_renderer_r30.cpp", [
         "clipCorrection._11 = hudScaleX;",
         "const bool transformScissor = false;",
@@ -72,6 +103,8 @@ def main() -> int:
         "MakeKey(kind, callRva, arg0, arg1, mode, stage)",
         "TraceFile.flush();",
         "ResetTraceState()",
+        "RtlCaptureStackBackTrace(",
+        "UIScaling-derived semantic ranges",
     ])
     require("src/hooks_textures.cpp", [
         "ApplyHudInspectorFeeds",
