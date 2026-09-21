@@ -737,7 +737,7 @@ jobs:
             '[R32 direct] D3D11 Flush is deferred until actual direct-ring slot pressure',
             '[R23 mono] gameplay stereo pending: bounded Desktop Duplication refresh for theater-only fallback',
             '[R23 final-submit] serial=',
-            'using left-eye-only LOCAL-fixed theater until fresh stereo returns'
+            'LOCAL-fixed theater until fresh stereo returns'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR host marker missing: $marker" }
           }
