@@ -247,6 +247,42 @@ $source=Join-Path $root "backends/$payloadBackend/SOURCE_SHA.txt"
 $sha=if(Test-Path $source){(Get-Content $source -Raw).Trim()}else{'unknown'}
 $configHash=if(Test-Path (Join-Path $root 'OutRun2006Tweaks.ini')){(Get-FileHash (Join-Path $root 'OutRun2006Tweaks.ini') -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
 
+$analysisRequest=[ordered]@{
+    SchemaVersion=1
+    RequestType='OUTRUN_VR_RUNTIME_LOG_ANALYSIS'
+    AutoAnalyzeOnUpload=$true
+    RequiresUserDescription=$false
+    Project='OutRun2006Tweaks VR'
+    IntegrationBranch='vr-d3d9ex-focus'
+    BuildMatrixId=$matrix
+    VariantId=$variant
+    Backend=$backend
+    TestProfile=$profile
+    SessionId=$session
+    SessionStartedUtc=$startedUtc.ToString('o')
+    SourceSha=$sha
+    ConfigSha256=$configHash
+    ExeIdentityFile='EXE_IDENTITY.txt'
+    PrimaryManifest='variant_manifest.json'
+    AnalysisContract='Treat upload of this ZIP as an immediate analysis request. Do not require the user to restate symptoms. Validate identity first, then analyze all available runtime evidence, correlate with static/reverse-engineering evidence, and report actionable findings. Missing optional evidence should reduce confidence, not block analysis.'
+}
+$analysisRequest|ConvertTo-Json -Depth 5|Set-Content (Join-Path $dest 'ANALYSIS_REQUEST.json') -Encoding UTF8
+@(
+    'OUTRUN VR AUTOMATIC ANALYSIS BUNDLE'
+    ''
+    'Upload the generated ZIP to the OutRun VR project chat.'
+    'The ZIP itself is the analysis request; no additional description is required.'
+    'If you add a short symptom note it is treated as extra evidence, not a prerequisite.'
+    ''
+    "session=$session"
+    "variant=$variant"
+    "backend=$backend"
+    "profile=$profile"
+    "sourceSha=$sha"
+)|Set-Content (Join-Path $dest 'UPLOAD_THIS_ZIP.txt') -Encoding UTF8
+$copied+='ANALYSIS_REQUEST.json'
+$copied+='UPLOAD_THIS_ZIP.txt'
+
 @(
     "VARIANT=$variant"
     "BACKEND=$backend"
@@ -284,12 +320,12 @@ if(!(Test-Path $resultFile)){
 }
 
 if($All){
-    $zipName='OutRun2_VR_MATRIX_LOGS_'+$matrix+'_'+$session+'.zip'
+    $zipName='OutRun2_VR_ANALYZE_MATRIX_'+$matrix+'_'+$session+'.zip'
     $zip=Join-Path $root $zipName
     if(Test-Path $zip){Remove-Item $zip -Force}
     Compress-Archive -Path "$base/*" -DestinationPath $zip
 }else{
-    $zipName='OutRun2_VR_LOGS_'+$matrix+'_'+$variant+'_'+$profile+'_'+$session+'.zip'
+    $zipName='OutRun2_VR_ANALYZE_'+$matrix+'_'+$variant+'_'+$profile+'_'+$session+'.zip'
     $zip=Join-Path $root $zipName
     if(Test-Path $zip){Remove-Item $zip -Force}
     Compress-Archive -Path "$dest/*" -DestinationPath $zip
@@ -308,3 +344,4 @@ $nextSession=Prepare-NextSession $backend $variant $profile $matrix
 Write-Host "Diagnostic archive: $zip"
 Write-Host "Next test session prepared automatically: $nextSession"
 Write-Host 'You do NOT need to run the collector before the next test.'
+Write-Host 'Upload this ZIP to the OutRun VR project chat. The ZIP itself is the analysis request; no description is required.'
