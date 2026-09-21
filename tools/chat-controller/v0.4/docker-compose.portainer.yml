@@ -11,7 +11,7 @@ services:
     environment:
       TZ: Asia/Seoul
       AUTO_SEND: "${AUTO_SEND:-false}"
-      SCHEDULE_MINUTES: "7"
+      SCHEDULE_MINUTES: "7,27,47"
       CHAT_SLOTS: "3"
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"
