@@ -1,0 +1,151 @@
+unit_id	source	target	evidence	regression	disposition
+B9-001	B8-001	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-002	B8-002	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-003	B8-003	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-004	B8-004	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-005	B8-005	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-006	B8-006	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-007	B8-007	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-008	B8-008	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-009	B8-009	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-010	B8-010	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-011	B8-011	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-012	B8-012	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-013	B8-013	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-014	B8-014	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-015	B8-015	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-016	B8-016	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-017	B8-017	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-018	B8-018	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-019	B8-019	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-020	B8-020	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-021	B8-021	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-022	B8-022	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-023	B8-023	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-024	B8-024	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-025	B8-025	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-026	B8-026	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-027	B8-027	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-028	B8-028	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-029	B8-029	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-030	B8-030	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-031	B8-031	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-032	B8-032	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-033	B8-033	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-034	B8-034	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-035	B8-035	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-036	B8-036	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-037	B8-037	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-038	B8-038	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-039	B8-039	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-040	B8-040	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-041	B8-041	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-042	B8-042	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-043	B8-043	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-044	B8-044	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-045	B8-045	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-046	B8-046	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-047	B8-047	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-048	B8-048	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-049	B8-049	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-050	B8-050	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-051	B8-051	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-052	B8-052	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-053	B8-053	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-054	B8-054	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-055	B8-055	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-056	B8-056	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-057	B8-057	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-058	B8-058	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-059	B8-059	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-060	B8-060	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-061	B8-061	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-062	B8-062	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-063	B8-063	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-064	B8-064	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-065	B8-065	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-066	B8-066	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-067	B8-067	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-068	B8-068	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-069	B8-069	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-070	B8-070	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-071	B8-071	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-072	B8-072	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-073	B8-073	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-074	B8-074	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-075	B8-075	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-076	B8-076	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-077	B8-077	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-078	B8-078	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-079	B8-079	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-080	B8-080	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-081	B8-081	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-082	B8-082	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-083	B8-083	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-084	B8-084	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-085	B8-085	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-086	B8-086	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-087	B8-087	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-088	B8-088	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-089	B8-089	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-090	B8-090	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-091	B8-091	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-092	B8-092	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-093	B8-093	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-094	B8-094	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-095	B8-095	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-096	B8-096	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-097	B8-097	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-098	B8-098	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-099	B8-099	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-100	B8-100	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-101	B8-101	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-102	B8-102	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-103	B8-103	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-104	B8-104	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-105	B8-105	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-106	B8-106	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-107	B8-107	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-108	B8-108	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-109	B8-109	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-110	B8-110	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-111	B8-111	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-112	B8-112	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-113	B8-113	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-114	B8-114	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-115	B8-115	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-116	B8-116	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-117	B8-117	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-118	B8-118	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-119	B8-119	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-120	B8-120	3de2e34c	identity-valid rendering/stereo path unchanged	VR-STARTUP-WHITE-001	CARRIED
+B9-121	NEW	3de2e34c	delta only workflow/docs/hooks_exceptions/binary-contract; stereo/host frame path unchanged	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-122	NEW	3de2e34c	crash-signature write is post-crash diagnostic, not normal-frame hot path	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-123	NEW	3de2e34c	optional VR file enumeration occurs only in exception filter	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-124	NEW	3de2e34c	ZIP required-entry adds are crash-only; no draw amplification	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-125	NEW	3de2e34c	ZIP finalize/end/fclose crash-only; no pre-crash frame pacing impact	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-126	NEW	3de2e34c	FlushFileBuffers crash-only; no rolling telemetry overhead	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-127	NEW	3de2e34c	host/watchdog log scan crash-only; no OpenXR frame-loop wait	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-128	NEW	3de2e34c	binary-contract verifier tooling-only; no eye sizing/refresh mutation	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-129	NEW	3de2e34c	workflow delta CI-only; no runtime TargetRefreshRateHz override	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-130	NEW	3de2e34c	workflow adds no production runtime config value change	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-131	NEW	3de2e34c	hooks_exceptions riskPath hit; trigger not activated	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-132	NEW	3de2e34c	workflow riskPath hit; VR activation trigger not activated	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-133	NEW	3de2e34c	falsify startup-white: no CreateDevice/Reset/Present mutation	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-134	NEW	3de2e34c	falsify transport: no shared-frame eligibility/producer mutation	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-135	NEW	3de2e34c	falsify fallback: vrhost tree unchanged	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-136	NEW	3de2e34c	falsify eye resolution: no swapchain sizing path changed	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-137	NEW	3de2e34c	falsify refresh: no TargetRefreshRateHz code/config change	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-138	NEW	3de2e34c	falsify SBS: no mirror/SBS presentation code changed	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-139	NEW	3de2e34c	falsify draw amplification: no draw dispatch/classifier changed	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-140	NEW	3de2e34c	falsify copy amplification: no texture copy/shared-handle path changed	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-141	NEW	3de2e34c	cross-trace session identity capture is crash evidence only	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-142	NEW	3de2e34c	cross-trace backend identity capture is crash evidence only	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-143	NEW	3de2e34c	cross-trace build identity capture is crash evidence only	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-144	NEW	3de2e34c	exeRva binary-contract correlation has no render mutation	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-145	NEW	3de2e34c	workflow binary verifier does not ship runtime behavior	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-146	NEW	3de2e34c	optional VR ZIP failure cannot suppress required archive evidence	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-147	NEW	3de2e34c	adversarial directory_iterator exception swallowed in crash path	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-148	NEW	3de2e34c	adversarial fclose gates zip_created; diagnostic correctness only	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-149	NEW	3de2e34c	adversarial broad fault-address classification affects diagnostics only	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B9-150	NEW	3de2e34c	HMD logo-to-menu/game plus gameplay stereo-open gate retained	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
