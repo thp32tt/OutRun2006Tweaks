@@ -713,7 +713,7 @@ class RestoreSkyGlow : public Hook
 		// the game's mono glow render targets here: besides wasting a large
 		// buffer at 4K, that chain can only sample D3DBACKBUFFER_TYPE_MONO and
 		// would later leak left-eye content into the right eye.
-		if (Settings::VREnabled && Settings::VRStereo)
+		if (!StockSkyGlowResourcesOwnedByGame())
 		{
 			if (ReduceHalf)
 			{
