@@ -171,8 +171,13 @@ if($shaderLines.Count -gt 0){
     $copied+='SHADER_FINGERPRINT_SUMMARY.txt'
 }
 
+$traceSemanticsVerified=$false
+$semanticEvidenceVerified=$false
 $hudCsv=Join-Path $dest 'OutRun2006Tweaks-hudtrace.csv'
 if(Test-Path $hudCsv){
+    $traceHeader=Get-Content $hudCsv -TotalCount 12
+    $traceSemanticsVerified=(@($traceHeader | Where-Object {$_ -eq '# exe_semantics_verified=1'}).Count -gt 0)
+    $semanticEvidenceVerified=($matchesUpstream -and $traceSemanticsVerified)
     $hudRows=Get-Content $hudCsv |
         Where-Object { $_ -and -not $_.StartsWith('#') } |
         ConvertFrom-Csv
@@ -183,8 +188,9 @@ if(Test-Path $hudCsv){
         $summary+="profile=$profile"
         $summary+="rows=$($hudRows.Count)"
         $summary+="semanticIdentity=$exeSemanticIdentity"
-        $summary+="semanticBaselineValid=$matchesUpstream"
-        if(!$matchesUpstream){$summary+='semanticPromotion=REJECTED_EXE_IDENTITY_MISMATCH'}
+        $summary+="producerSemanticIdentityVerified=$traceSemanticsVerified"
+        $summary+="semanticBaselineValid=$semanticEvidenceVerified"
+        if(!$semanticEvidenceVerified){$summary+='semanticPromotion=REJECTED_EXE_IDENTITY_MISMATCH_OR_UNVERIFIED_TRACE'}
         $summary+=''
         $groups=$hudRows |
             Group-Object event,call_rva,known_area,semantic,space_policy,mode,stage,arg0,arg1 |
@@ -193,9 +199,9 @@ if(Test-Path $hudCsv){
                 [pscustomobject]@{
                     Event=$_.Group[0].event
                     CallRva=$_.Group[0].call_rva
-                    KnownArea=if($matchesUpstream){$_.Group[0].known_area}else{''}
-                    Semantic=if($matchesUpstream){$_.Group[0].semantic}else{'UNVERIFIED'}
-                    SpacePolicy=if($matchesUpstream){$_.Group[0].space_policy}else{'UNVERIFIED'}
+                    KnownArea=if($semanticEvidenceVerified){$_.Group[0].known_area}else{''}
+                    Semantic=if($semanticEvidenceVerified){$_.Group[0].semantic}else{'UNVERIFIED'}
+                    SpacePolicy=if($semanticEvidenceVerified){$_.Group[0].space_policy}else{'UNVERIFIED'}
                     Mode=$_.Group[0].mode
                     Stage=$_.Group[0].stage
                     Arg0=$_.Group[0].arg0
@@ -225,7 +231,7 @@ if(Test-Path $hudCsv){
             'HUD_FRUIT','WORLD_RIVAL_MARKER','WORLD_HEART'
         )
         $observedSemantics=@()
-        if($matchesUpstream){
+        if($semanticEvidenceVerified){
             $observedSemantics=@($hudRows |
                 Where-Object {$_.semantic -and $_.semantic -ne 'UNKNOWN'} |
                 Select-Object -ExpandProperty semantic -Unique)
@@ -235,8 +241,9 @@ if(Test-Path $hudCsv){
             "session=$session",
             "profile=$profile",
             "semanticIdentity=$exeSemanticIdentity",
-            "semanticBaselineValid=$matchesUpstream",
-            $(if($matchesUpstream){'semanticPromotion=VERIFIED'}else{'semanticPromotion=REJECTED_EXE_IDENTITY_MISMATCH'}),
+            "producerSemanticIdentityVerified=$traceSemanticsVerified",
+            "semanticBaselineValid=$semanticEvidenceVerified",
+            $(if($semanticEvidenceVerified){'semanticPromotion=VERIFIED'}else{'semanticPromotion=REJECTED_EXE_IDENTITY_MISMATCH_OR_UNVERIFIED_TRACE'}),
             'status means observed in this session, not pass/fail; unobserved modes may simply not have appeared.',
             '',
             'semantic | status',
@@ -246,7 +253,7 @@ if(Test-Path $hudCsv){
             $status=if($observedSemantics -contains $semanticName){'OBSERVED'}else{'NOT_OBSERVED_THIS_SESSION'}
             $coverage+=("$semanticName | $status")
         }
-        $unknownCount=if($matchesUpstream){
+        $unknownCount=if($semanticEvidenceVerified){
             @($hudRows | Where-Object {!$_.semantic -or $_.semantic -eq 'UNKNOWN'}).Count
         }else{
             @($hudRows).Count
@@ -279,6 +286,8 @@ $analysisRequest=[ordered]@{
     SourceSha=$sha
     ConfigSha256=$configHash
     ExeIdentityFile='EXE_IDENTITY.txt'
+    HudTraceProducerSemanticVerified=$traceSemanticsVerified
+    HudSemanticBaselineValid=$semanticEvidenceVerified
     PrimaryManifest='variant_manifest.json'
     AnalysisContract='Treat upload of this ZIP as an immediate analysis request. Do not require the user to restate symptoms. Validate identity first, then analyze all available runtime evidence, correlate with static/reverse-engineering evidence, and report actionable findings. Missing optional evidence should reduce confidence, not block analysis.'
 }
@@ -329,7 +338,8 @@ if($assetSemanticsPresent){
     "SOURCE_SHA=$sha"
     "CONFIG_SHA256=$configHash"
     "EXE_SEMANTIC_IDENTITY=$exeSemanticIdentity"
-    "EXE_SEMANTIC_BASELINE_VALID=$matchesUpstream"
+    "HUD_TRACE_PRODUCER_SEMANTIC_VERIFIED=$traceSemanticsVerified"
+    "EXE_SEMANTIC_BASELINE_VALID=$semanticEvidenceVerified"
     "ASSET_SEMANTICS_PRESENT=$assetSemanticsPresent"
     "ASSET_SEMANTICS_STATUS=$assetSemanticsStatus"
     "ASSET_SEMANTICS_SCANNED=$assetSemanticsScanned"
@@ -352,7 +362,8 @@ if($assetSemanticsPresent){
     GitSha=$sha
     ConfigSha256=$configHash
     ExeSemanticIdentity=$exeSemanticIdentity
-    ExeSemanticBaselineValid=$matchesUpstream
+    HudTraceProducerSemanticVerified=$traceSemanticsVerified
+    ExeSemanticBaselineValid=$semanticEvidenceVerified
     AssetSemantics=@{
         Present=$assetSemanticsPresent
         Status=$assetSemanticsStatus
