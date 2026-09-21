@@ -39,6 +39,7 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
     wchar_t     modulename[MAX_PATH];
     wchar_t     dump_filename[MAX_PATH];
     wchar_t     crash_log_filename[MAX_PATH];
+    wchar_t     crash_signature_filename[MAX_PATH];
     wchar_t     re4t_log_filename[MAX_PATH];
     wchar_t     save_filename[MAX_PATH];
     wchar_t     zip_filename[MAX_PATH];
@@ -117,6 +118,54 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
         CloseHandle(hFile);
     }
 
+    // Write a compact machine-readable crash signature. The absolute address
+    // alone is unstable across ASLR, so preserve the OR2006C2C.exe-relative
+    // RVA when the fault belongs to the main executable. Offline analysis can
+    // then join this directly to docs/VR_BINARY_CONTRACT.json.
+    swprintf_s(crash_signature_filename, L"%s\\%s\\%s.%s.signature.json",
+        modulename, L"CrashDumps", modulenameptr, timestamp);
+    {
+        HANDLE signatureFile = CreateFileW(crash_signature_filename,
+            GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS,
+            FILE_ATTRIBUTE_NORMAL, NULL);
+        if (signatureFile != INVALID_HANDLE_VALUE)
+        {
+            const uintptr_t moduleBase =
+                reinterpret_cast<uintptr_t>(GetModuleHandleW(NULL));
+            const uintptr_t faultAddress = reinterpret_cast<uintptr_t>(
+                ExceptionInfo->ExceptionRecord->ExceptionAddress);
+            const bool inMainExe = faultAddress >= moduleBase;
+            const uintptr_t exeRva = inMainExe ?
+                (faultAddress - moduleBase) : 0;
+
+            char signatureJson[768]{};
+            sprintf_s(signatureJson,
+                "{\n"
+                "  \"schemaVersion\": 1,\n"
+                "  \"exceptionCode\": \"0x%08X\",\n"
+                "  \"absoluteAddress\": \"0x%p\",\n"
+                "  \"moduleBase\": \"0x%p\",\n"
+                "  \"module\": \"OR2006C2C.EXE\",\n"
+                "  \"faultInMainExe\": %s,\n"
+                "  \"exeRva\": \"0x%08llX\",\n"
+                "  \"threadId\": %lu\n"
+                "}\n",
+                static_cast<unsigned>(
+                    ExceptionInfo->ExceptionRecord->ExceptionCode),
+                ExceptionInfo->ExceptionRecord->ExceptionAddress,
+                reinterpret_cast<void*>(moduleBase),
+                inMainExe ? "true" : "false",
+                static_cast<unsigned long long>(exeRva),
+                static_cast<unsigned long>(GetCurrentThreadId()));
+
+            DWORD written = 0;
+            WriteFile(signatureFile, signatureJson,
+                static_cast<DWORD>(strlen(signatureJson)), &written, NULL);
+            FlushFileBuffers(signatureFile);
+            CloseHandle(signatureFile);
+        }
+    }
+
     // Copy re4_tweaks log file to CrashDumps
     {
         swprintf_s(re4t_log_filename, L"%s\\%s\\OutRun2006Tweaks.log", modulename, L"CrashDumps");
@@ -175,6 +224,8 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
             game_dir / "ACTIVE_VR_BACKEND.txt");
           add_optional_vr_file("vr/BUILD_INPUTS.json",
             game_dir / "BUILD_INPUTS.json");
+          add_optional_vr_file("crash_signature.json",
+            crash_signature_filename);
 
           try
           {
@@ -210,6 +261,7 @@ LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
       {
         DeleteFileW(dump_filename);
         DeleteFileW(crash_log_filename);
+        DeleteFileW(crash_signature_filename);
         DeleteFileW(re4t_log_filename);
       }
     }
