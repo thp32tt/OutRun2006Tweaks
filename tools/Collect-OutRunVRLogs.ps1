@@ -283,6 +283,26 @@ $analysisRequest|ConvertTo-Json -Depth 5|Set-Content (Join-Path $dest 'ANALYSIS_
 $copied+='ANALYSIS_REQUEST.json'
 $copied+='UPLOAD_THIS_ZIP.txt'
 
+$assetSemanticsPath=Join-Path $dest 'VR_ASSET_SEMANTICS.json'
+$assetSemanticsPresent=Test-Path $assetSemanticsPath
+$assetSemanticsStatus=if($assetSemanticsPresent){'UNKNOWN'}else{'MISSING'}
+$assetSemanticsDiscovered=0
+$assetSemanticsScanned=0
+$assetSemanticsErrors=0
+$assetSemanticsTruncated=$false
+if($assetSemanticsPresent){
+    try {
+        $assetSemantics=Get-Content $assetSemanticsPath -Raw|ConvertFrom-Json
+        if($assetSemantics.status){$assetSemanticsStatus=[string]$assetSemantics.status}
+        $assetSemanticsDiscovered=[int]$assetSemantics.discovered_candidates
+        $assetSemanticsScanned=[int]$assetSemantics.files_scanned
+        $assetSemanticsErrors=[int]$assetSemantics.parse_error_count
+        $assetSemanticsTruncated=[bool]$assetSemantics.truncated
+    } catch {
+        $assetSemanticsStatus='INVALID'
+    }
+}
+
 @(
     "VARIANT=$variant"
     "BACKEND=$backend"
@@ -292,7 +312,12 @@ $copied+='UPLOAD_THIS_ZIP.txt'
     "BUILD_MATRIX=$matrix"
     "SOURCE_SHA=$sha"
     "CONFIG_SHA256=$configHash"
-    "ASSET_SEMANTICS_PRESENT=$(Test-Path (Join-Path $dest 'VR_ASSET_SEMANTICS.json'))"
+    "ASSET_SEMANTICS_PRESENT=$assetSemanticsPresent"
+    "ASSET_SEMANTICS_STATUS=$assetSemanticsStatus"
+    "ASSET_SEMANTICS_SCANNED=$assetSemanticsScanned"
+    "ASSET_SEMANTICS_DISCOVERED=$assetSemanticsDiscovered"
+    "ASSET_SEMANTICS_PARSE_ERRORS=$assetSemanticsErrors"
+    "ASSET_SEMANTICS_TRUNCATED=$assetSemanticsTruncated"
     "FILES=$($copied -join ',')"
     "CAPTURES=$((@($capturedDirs | ForEach-Object {[IO.Path]::GetFileName($_)})) -join ',')"
     'LOG_BOUNDARY=clean-session-root'
@@ -308,6 +333,14 @@ $copied+='UPLOAD_THIS_ZIP.txt'
     BuildMatrixId=$matrix
     GitSha=$sha
     ConfigSha256=$configHash
+    AssetSemantics=@{
+        Present=$assetSemanticsPresent
+        Status=$assetSemanticsStatus
+        FilesScanned=$assetSemanticsScanned
+        DiscoveredCandidates=$assetSemanticsDiscovered
+        ParseErrors=$assetSemanticsErrors
+        Truncated=$assetSemanticsTruncated
+    }
     CollectedAtUtc=(Get-Date).ToUniversalTime().ToString('o')
     CollectedFiles=$copied
     CollectedCaptures=@($capturedDirs | ForEach-Object {[IO.Path]::GetFileName($_)})
