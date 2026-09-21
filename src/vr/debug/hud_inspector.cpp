@@ -5,6 +5,7 @@
 
 #include <atomic>
 #include <cstdint>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -47,6 +48,7 @@ namespace OutRunVRHudInspector
         std::unordered_map<std::uint64_t, std::uint32_t> Seen;
         std::uint64_t TraceLines = 0;
         ULONGLONG StartMs = 0;
+        bool SemanticIdentityVerified = false;
 
         std::uint32_t ExeSizeOfImage() noexcept
         {
@@ -60,6 +62,49 @@ namespace OutRunVRHudInspector
             if (nt->Signature != IMAGE_NT_SIGNATURE)
                 return 0;
             return nt->OptionalHeader.SizeOfImage;
+        }
+
+        bool ReferenceSemanticAnchorsMatch() noexcept
+        {
+            const auto* base =
+                reinterpret_cast<const std::uint8_t*>(Module::ExeHandle);
+            const std::uint32_t size = ExeSizeOfImage();
+            if (!base || !size)
+                return false;
+
+            struct Anchor
+            {
+                std::uint32_t callRva;
+                std::uint32_t targetRva;
+            };
+            constexpr Anchor anchors[] = {
+                {0x0BB0FB, 0x029580},
+                {0x0BB133, 0x029580},
+                {0x0BB16C, 0x029580},
+                {0x0BB1A5, 0x029580},
+                {0x0BB21F, 0x02D280},
+                {0x0BB241, 0x02D280},
+                {0x0BB271, 0x02D280},
+                {0x0BB2BC, 0x02D280},
+                {0x0BB2D0, 0x02D280},
+            };
+
+            for (const auto& anchor : anchors)
+            {
+                if (anchor.callRva > size - 5 ||
+                    base[anchor.callRva] != 0xE8)
+                    return false;
+                std::int32_t relative = 0;
+                std::memcpy(&relative, base + anchor.callRva + 1,
+                    sizeof(relative));
+                const std::int64_t resolved =
+                    static_cast<std::int64_t>(anchor.callRva) + 5 +
+                    static_cast<std::int64_t>(relative);
+                if (resolved !=
+                    static_cast<std::int64_t>(anchor.targetRva))
+                    return false;
+            }
+            return true;
         }
 
         std::uint32_t ToExeRva(const void* address) noexcept
@@ -143,17 +188,20 @@ namespace OutRunVRHudInspector
             if (!ShouldWrite(key, count))
                 return;
 
-            const auto semantic =
-                OutRunVRHudSemantics::ClassifyCaller(callRva);
+            const auto semantic = SemanticIdentityVerified
+                ? OutRunVRHudSemantics::ClassifyCaller(callRva)
+                : OutRunVRHudSemantics::UnknownInfo();
 
             TraceFile
                 << (GetTickCount64() - StartMs) << ','
                 << eventName << ','
                 << "0x" << std::hex << std::setw(8) << std::setfill('0') << returnRva << ','
                 << "0x" << std::setw(8) << callRva << std::dec << ','
-                << semantic.area << ','
-                << semantic.semantic << ','
-                << OutRunVRHudSemantics::SpacePolicyName(semantic.space) << ','
+                << (SemanticIdentityVerified ? semantic.area : "") << ','
+                << (SemanticIdentityVerified ? semantic.semantic : "UNVERIFIED") << ','
+                << (SemanticIdentityVerified
+                    ? OutRunVRHudSemantics::SpacePolicyName(semantic.space)
+                    : "UNVERIFIED") << ','
                 << mode << ','
                 << stage << ','
                 << arg0 << ','
@@ -222,10 +270,21 @@ namespace OutRunVRHudInspector
                     return false;
 
                 StartMs = GetTickCount64();
+                SemanticIdentityVerified =
+                    ReferenceSemanticAnchorsMatch();
+                if (!SemanticIdentityVerified)
+                {
+                    spdlog::warn(
+                        "VR HUD INSPECTOR: reference EXE semantic anchors do not match; fixed-RVA HUD/world labels are gated to UNVERIFIED");
+                }
                 if (empty)
                 {
                     TraceFile
-                        << "# schema=outrun-hudtrace-v2\n"
+                        << "# schema=outrun-hudtrace-v3\n"
+                        << "# semantic_identity="
+                        << (SemanticIdentityVerified
+                            ? "VERIFIED_REFERENCE_ANCHORS"
+                            : "UNVERIFIED") << "\n"
                         << "# exe_timestamp="
                         << Util::GetModuleTimestamp(Module::ExeHandle) << "\n"
                         << "# exe_size_of_image=" << ExeSizeOfImage() << "\n"
@@ -270,6 +329,7 @@ namespace OutRunVRHudInspector
             Seen.clear();
             TraceLines = 0;
             StartMs = 0;
+            SemanticIdentityVerified = false;
         }
 
     }
