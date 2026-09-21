@@ -136,3 +136,17 @@ Every role-run JSON should include:
 - exact nextAction
 
 D appends one consolidated history entry per consumed run and records the run ID to prevent duplicate import.
+
+## Uploaded runtime bundle ingestion
+
+A standardized runtime ZIP with `ANALYSIS_REQUEST.json` and `AutoAnalyzeOnUpload=true` is sufficient to start runtime analysis without an additional user prompt.
+
+Ingestion order:
+1. Validate `BuildMatrixId`, `VariantId`, `TestProfile`, `SessionId`, source SHA, config hash and EXE identity.
+2. Correlate the bundle with the frozen/user-tested candidate and current integration history.
+3. Analyze available game/host/watchdog/backend logs, HUD trace/semantic coverage, shader fingerprints, captures, dumps and test metadata.
+4. Convert concrete evidence into existing finding IDs when possible; new evidence for an existing issue strengthens or reopens that finding instead of creating duplicates.
+5. Update runtime-feedback/state only when the evidence identity is unambiguous.
+6. Treat any accompanying user description as optional extra evidence. Do not require the user to restate symptoms already inferable from the standardized bundle.
+
+An incomplete bundle is analyzed to the maximum supported extent and marked with explicit evidence gaps rather than being discarded.
