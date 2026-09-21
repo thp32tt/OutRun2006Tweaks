@@ -10,8 +10,11 @@
 
 #include <array>
 #include <cstdint>
+#include <cstring>
 #include <iostream>
+#include <iterator>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 template <typename T> void ReleaseCom(T*& p) { if (p) { p->Release(); p = nullptr; } }
