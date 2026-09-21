@@ -12,6 +12,7 @@
 // perspective effects remain entirely owned by R29/R13.
 
 #include "stereo_renderer_r26.cpp"
+#include "vr/game/render_semantics.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
@@ -87,8 +88,8 @@ namespace OutRunVRStereo
         std::uint64_t R30XyzrhwHudDraws = 0;
         std::uint64_t R30XyzrhwWorldLockedHudDraws = 0;
         std::uint64_t R30XyzrhwWorldEffectDraws = 0;
-        std::uint64_t R46XyzrhwHudPlaneAccepted = 0;
-        std::uint64_t R46XyzrhwUnknownRejected = 0;
+        std::uint64_t R47SemanticHudAccepted = 0;
+        std::uint64_t R47SemanticUnknownRejected = 0;
         std::uint64_t R30Hud2DDraws = 0;
         std::uint64_t R30PerspectiveHudDraws = 0;
         std::uint64_t R30WorldBillboardDraws = 0;
@@ -1115,7 +1116,7 @@ namespace OutRunVRStereo
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(
-                "VR R46: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},hudPlaneAccepted={},unknownRejected={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R47: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAccepted={},semanticUnknownRejected={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
@@ -1815,29 +1816,29 @@ namespace OutRunVRStereo
                     source, vertexCount, stride, state,
                     baseProjection, usedMask);
 
-            // R46: never classify an unknown XYZRHW draw as HUD merely because
-            // Z is disabled. Runtime evidence on a218c684 showed 103,320
-            // XYZRHW draws routed through the HUD plane while only 31 carried
-            // positive world-depth evidence, reproducing the old widened-draw
-            // corruption (stretched bridge/road geometry and black quads).
+            // R47: semantic ownership is authoritative. The canonical EXE
+            // sprite-queue renderer marks ordinary queued 2D nodes SCREEN_HUD;
+            // exact original-mod call sites can tag individual nodes as
+            // WORLD_BILLBOARD. Never promote an unknown XYZRHW draw from D3D
+            // state, RHW shape, ZENABLE, blend mode, or primitive count.
             //
-            // Keep world effects on positive projected-depth evidence. Keep HUD
-            // head-lock removal only for a positive pre-transformed planar HUD
-            // signature (RHW ~= 1 and near-constant screen Z). Everything else
-            // fails closed to the proven R26/R23 owner.
-            state.worldEffect = state.rhwDepthEvidence;
-            const bool hudPlaneEvidence =
-                !state.worldEffect &&
-                R30XyzrhwLooksLikeHudPlane(
-                    source, vertexCount, stride, state, usedMask);
-            if (!state.worldEffect && !hudPlaneEvidence)
+            // Positive projected-depth evidence remains sufficient for known
+            // world effects. Everything else fails closed to the R26/R23 owner.
+            const auto semanticScope =
+                OutRunVR::GameSemantic::CurrentScope;
+            const bool semanticHud =
+                OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
+            const bool semanticWorld =
+                OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
+            state.worldEffect = semanticWorld || state.rhwDepthEvidence;
+            if (!state.worldEffect && !semanticHud)
             {
-                ++R46XyzrhwUnknownRejected;
+                ++R47SemanticUnknownRejected;
                 return false;
             }
             if (!state.worldEffect)
             {
-                ++R46XyzrhwHudPlaneAccepted;
+                ++R47SemanticHudAccepted;
                 // R41: most of OutRun's HUD is fixed-function XYZRHW, not the
                 // shader/c64 path. Build a synthetic finite HUD plane in the
                 // recentered gameplay space, then transform that plane by the
@@ -3245,6 +3246,22 @@ namespace OutRunVRStereo
             if (screenKind == R30ScreenSpaceKind::None)
                 return E_NOTIMPL;
 
+            // D3D state can describe a candidate shape, but it never owns it.
+            // Promotion requires the canonical EXE/original-mod semantic scope.
+            const auto semanticScope =
+                OutRunVR::GameSemantic::CurrentScope;
+            if (screenKind == R30ScreenSpaceKind::WorldBillboard)
+            {
+                if (!OutRunVR::GameSemantic::CorroboratesWorld(
+                        semanticScope))
+                    return E_NOTIMPL;
+            }
+            else if (!OutRunVR::GameSemantic::CorroboratesHud(
+                         semanticScope))
+            {
+                return E_NOTIMPL;
+            }
+
             if (!EnsureStereoResources(device))
                 return E_NOTIMPL;
 
@@ -3438,6 +3455,12 @@ namespace OutRunVRStereo
         HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
+            const auto drawSemanticValue =
+                (device && IsGameDevice(device) && !InternalStereoPass)
+                ? OutRunVR::GameSemantic::ConsumeForDraw()
+                : OutRunVR::GameSemantic::CurrentScope;
+            OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
+                drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
                 device, type, startVertex, primitiveCount);
             if (xyzrhw != E_NOTIMPL)
@@ -3460,6 +3483,12 @@ namespace OutRunVRStereo
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
+            const auto drawSemanticValue =
+                (device && IsGameDevice(device) && !InternalStereoPass)
+                ? OutRunVR::GameSemantic::ConsumeForDraw()
+                : OutRunVR::GameSemantic::CurrentScope;
+            OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
+                drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
                 device, type, baseVertexIndex, minVertexIndex, numVertices,
                 startIndex, primitiveCount);
@@ -3484,6 +3513,12 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT primitiveCount, const void* data, UINT stride)
         {
+            const auto drawSemanticValue =
+                (device && IsGameDevice(device) && !InternalStereoPass)
+                ? OutRunVR::GameSemantic::ConsumeForDraw()
+                : OutRunVR::GameSemantic::CurrentScope;
+            OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
+                drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                 device, type, primitiveCount, data, stride);
             if (xyzrhw != E_NOTIMPL)
@@ -3507,6 +3542,12 @@ namespace OutRunVRStereo
             const void* indexData, D3DFORMAT indexFormat,
             const void* vertexData, UINT stride)
         {
+            const auto drawSemanticValue =
+                (device && IsGameDevice(device) && !InternalStereoPass)
+                ? OutRunVR::GameSemantic::ConsumeForDraw()
+                : OutRunVR::GameSemantic::CurrentScope;
+            OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
+                drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
                 device, type, minVertexIndex, numVertices, primitiveCount,
                 indexData, indexFormat, vertexData, stride);
@@ -3618,7 +3659,7 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current={:.2f}; R41 shader+XYZRHW finite HUD world-lock + spatial billboard rebuild active",
+                        "VR R47 HUD: canonical EXE sprite-queue semantics own HUD transforms; unknown draw heuristics are disabled; HudScale={:.2f}; exact original-mod world-billboard tags override queue HUD ownership",
                         R30HudScaleValue());
                     return 0;
                 }
