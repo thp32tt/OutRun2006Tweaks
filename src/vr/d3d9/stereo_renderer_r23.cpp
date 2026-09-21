@@ -60,6 +60,39 @@ namespace OutRunVRStereo
         bool R23FirstColorBaselineLogged = false;
         bool R23FirstImplicitViewportResyncLogged = false;
 
+        std::uint32_t R23ResourceInitSeenGeneration = 0;
+        std::uint32_t R23ResourceInitFailureCount = 0;
+        ULONGLONG R23ResourceInitNextRetryMs = 0;
+        bool R23ResourceInitQuarantineLogged = false;
+
+        void R23RefreshResourceInitGeneration() noexcept
+        {
+            if (R23ResourceInitSeenGeneration == StereoResourceInitGeneration)
+                return;
+            R23ResourceInitSeenGeneration = StereoResourceInitGeneration;
+            R23ResourceInitFailureCount = 0;
+            R23ResourceInitNextRetryMs = 0;
+            R23ResourceInitQuarantineLogged = false;
+        }
+
+        ULONGLONG R23ResourceInitBackoffMs(
+            std::uint32_t failureCount) noexcept
+        {
+            if (failureCount <= 1)
+                return 0;
+            const std::uint32_t shift =
+                (std::min)(failureCount - 2u, 6u);
+            const ULONGLONG delay = 25ull << shift;
+            return (std::min)(delay, 2000ull);
+        }
+
+        bool R23ShouldLogResourceInitFailure(
+            std::uint32_t failureCount) noexcept
+        {
+            return failureCount <= 2 ||
+                (failureCount & (failureCount - 1u)) == 0;
+        }
+
         bool R23SnapshotSame(const R22ScissorSnapshot& a,
             const R22ScissorSnapshot& b) noexcept
         {
@@ -638,11 +671,13 @@ namespace OutRunVRStereo
                 return;
             R23LastSummaryMs = now;
             spdlog::info(
-                "VR R23/R25 summary: epoch={} gameDrawSerial={} passiveClear={} authoritativeSeed={} recoveryVrWrites={} stateMismatch={} stateCaptureFail={} baselineReject={} lastReject={} warmup={} stereoAllowed={} recoveryPending={} hostReason={}",
+                "VR R23/R25 summary: epoch={} gameDrawSerial={} passiveClear={} authoritativeSeed={} recoveryVrWrites={} stateMismatch={} stateCaptureFail={} baselineReject={} lastReject={} initFailures={} initQuarantine={} warmup={} stereoAllowed={} recoveryPending={} hostReason={}",
                 PresentEpoch, R23GameDrawSerial, R23PassiveClears,
                 R23AuthoritativeSeeds, R23RecoveryVrSurfaceWrites,
                 R23StateMismatches, R23StateCaptureFailures,
                 R23BaselineRejects, R23LastRejectReason,
+                R23ResourceInitFailureCount,
+                StereoResourceInitRestoreFault ? 1 : 0,
                 OutRunVR::RuntimeEligibility::PoseWarmupAllowed() ? 1 : 0,
                 OutRunVR::RuntimeEligibility::StereoAllowed.load(
                     std::memory_order_acquire) ? 1 : 0,
@@ -664,21 +699,46 @@ namespace OutRunVRStereo
             // R23 is the final effective Present owner in the layered hook chain.
             // Keep CreateDeviceEx pre-exposure state untouched: initialize private
             // stereo/backbuffer resources only after a real game Present succeeds.
+            R23RefreshResourceInitGeneration();
             if (SUCCEEDED(hr) && !StereoResourcesReady)
             {
-                if (EnsureStereoResources(device))
+                const ULONGLONG now = GetTickCount64();
+                if (StereoResourceInitRestoreFault)
                 {
-                    if (!FirstDeferredResourceInitLogged)
+                    if (!R23ResourceInitQuarantineLogged)
                     {
-                        FirstDeferredResourceInitLogged = true;
-                        spdlog::info(
-                            "VR R23 INIT: private eye/backbuffer resources initialized after final game Present; recovery baseline can now identify the main backbuffer");
+                        R23ResourceInitQuarantineLogged = true;
+                        spdlog::error(
+                            "VR R23 INIT: deferred resource state restoration failed; retry quarantined until a successful Reset advances generation");
                     }
                 }
-                else
+                else if (now >= R23ResourceInitNextRetryMs)
                 {
-                    spdlog::warn(
-                        "VR R23 INIT: deferred private eye/backbuffer initialization failed after successful Present; stereo remains theater/fail-closed");
+                    if (EnsureStereoResources(device))
+                    {
+                        R23ResourceInitFailureCount = 0;
+                        R23ResourceInitNextRetryMs = 0;
+                        if (!FirstDeferredResourceInitLogged)
+                        {
+                            FirstDeferredResourceInitLogged = true;
+                            spdlog::info(
+                                "VR R23 INIT: private eye/backbuffer resources initialized after final game Present; recovery baseline can now identify the main backbuffer");
+                        }
+                    }
+                    else if (!StereoResourceInitRestoreFault)
+                    {
+                        ++R23ResourceInitFailureCount;
+                        const ULONGLONG delay = R23ResourceInitBackoffMs(
+                            R23ResourceInitFailureCount);
+                        R23ResourceInitNextRetryMs = now + delay;
+                        if (R23ShouldLogResourceInitFailure(
+                                R23ResourceInitFailureCount))
+                        {
+                            spdlog::warn(
+                                "VR R23 INIT: deferred private eye/backbuffer initialization failed attempt={} retryDelayMs={}; stereo remains theater/fail-closed",
+                                R23ResourceInitFailureCount, delay);
+                        }
+                    }
                 }
             }
 
