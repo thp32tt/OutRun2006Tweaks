@@ -1,0 +1,18 @@
+{
+  "cycle":"B3-expanded",
+  "target_sha":"265504f6ea28c5e97908e450a460661ed5ad37f1",
+  "checkpoint":"CP150",
+  "valid_units":150,
+  "carried_forward_units":30,
+  "new_units_this_invocation":120,
+  "invalidated_units":0,
+  "outside_latest_delta_units":150,
+  "cross_subsystem_units":46,
+  "adversarial_falsification_units":94,
+  "distinct_function_or_paths":79,
+  "existing_finding_revalidation_units":30,
+  "ledger":"docs/automation/review-b/ledger-20260921-cycle3-expanded.tsv",
+  "findings":["B-R30-PRIMITIVE-COUNT-OVERFLOW-001","B-R32-FENCE-ORDER-CROSSTRACE-001"],
+  "notable":"150-unit completion. R30 primitive element-count UINT overflow lacks explicit guard and needs call-site bound review. R32 async EVENT ordering remains a targeted cross-trace item. DirectGPU fast path avoids SafeEye copies; fallback retains two-copy + two-blit + Flush cost. Runtime projection extents drive fallback eye sizing when incoming projection exists.",
+  "status":"COMPLETE"
+}
