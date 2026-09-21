@@ -18,8 +18,11 @@ on:
       - 'cmake.toml'
       - 'OutRun2006Tweaks.ini'
       - 'OutRun2006Tweaks.lods.ini'
+      - 'docs/VR_REGRESSION_KNOWLEDGE.json'
+      - 'docs/VR_PROBLEM_HISTORY.md'
       - 'tools/verify_vr_architecture.py'
       - 'tools/verify_vr_r32_review.py'
+      - 'tools/Test-VRRegressionKnowledge.ps1'
       - '.github/workflows/vr-dx9ex-active.yml'
 
 concurrency:
@@ -34,6 +37,9 @@ jobs:
       - name: Verify runtime-test minimization policy
         shell: pwsh
         run: ./tools/Test-OutRunVRTestPolicy.ps1
+      - name: Verify durable regression knowledge
+        shell: pwsh
+        run: ./tools/Test-VRRegressionKnowledge.ps1
       - name: Verify reconstructed VR architecture boundaries
         shell: pwsh
         run: |
