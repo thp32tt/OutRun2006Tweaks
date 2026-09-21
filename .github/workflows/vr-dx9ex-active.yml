@@ -160,7 +160,7 @@ jobs:
           Get-ChildItem $dir -Recurse -File |
             Where-Object { $_.Name -ne 'SHA256SUMS.txt' } |
             Get-FileHash -Algorithm SHA256 | ForEach-Object {
-              $relative = $_.Path.Substring($packageRoot.Length + 1).Replace('\\','/')
+              $relative = $_.Path.Substring($packageRoot.Length + 1).Replace('\','/')
               "$($_.Hash.ToLowerInvariant())  $relative"
             } | Set-Content (Join-Path $dir 'SHA256SUMS.txt') -Encoding ascii
           $zip = "OutRun2_VR_FSR1_POC_${short}.zip"
@@ -181,17 +181,10 @@ jobs:
           $sumFile = Join-Path verify 'SHA256SUMS.txt'
           if (-not (Test-Path $sumFile)) { throw 'package missing SHA256SUMS.txt' }
           foreach ($line in Get-Content $sumFile) {
-            if ($line -notmatch '^([0-9a-fA-F]{64})  (.+)
-          if ($bad) { throw 'active package contains forbidden backend payload' }
-      - uses: actions/upload-artifact@v4
-        with:
-          name: OutRun2-VR-FSR1-POC-${{ github.sha }}
-          path: OutRun2_VR_FSR1_POC_*.zip
-          if-no-files-found: error
-) { throw "Malformed SHA256SUMS line: $line" }
+            if ($line -notmatch '^([0-9a-fA-F]{64})  (.+)$') { throw "Malformed SHA256SUMS line: $line" }
             $expected = $matches[1].ToLowerInvariant()
             $relative = $matches[2]
-            if ($relative.Contains('\\')) { throw "SHA256SUMS must use portable forward slashes: $relative" }
+            if ($relative.Contains('\')) { throw "SHA256SUMS must use portable forward slashes: $relative" }
             $target = Join-Path verify ($relative.Replace('/',[IO.Path]::DirectorySeparatorChar))
             if (-not (Test-Path $target)) { throw "SHA256SUMS target missing: $relative" }
             $actual = (Get-FileHash $target -Algorithm SHA256).Hash.ToLowerInvariant()
