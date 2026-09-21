@@ -117,7 +117,13 @@ def main() -> int:
         "CreateDevice pre-exposure RT/depth mutation removed",
     ])
     require("src/hooks_graphics.cpp", [
-        "!OutRunVRStereo::IsRuntimeStereoActive()",
+        "StockSkyGlowResourcesOwnedByGame()",
+        "return !(Settings::VREnabled && Settings::VRStereo);",
+        "MakeReduceBuff suppressed because Step1Tex is null",
+        "EXE+0x14E87 null dereference",
+    ])
+    forbid("src/hooks_graphics.cpp", [
+        "return Settings::SkyGlowFactor > 0 &&\n\t\t\t!OutRunVRStereo::IsRuntimeStereoActive();",
     ])
     require("src/vr/settings.cpp", [
         "DirectGpuOnly requires PreferD3D9Ex",
