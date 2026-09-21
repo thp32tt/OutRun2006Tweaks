@@ -23,12 +23,25 @@ def forbid(path: str, markers: list[str]) -> None:
 
 def main() -> int:
     require("src/vr/d3d9/stereo_renderer_r30.cpp", [
-        "clipCorrection._11 = hudScaleX * eyeScale[eye];",
-        "R30TransformHudScissor(",
-        "device->SetScissorRect(&eyeScissor[0])",
-        "device->SetScissorRect(&eyeScissor[1])",
+        "clipCorrection._11 = hudScaleX;",
+        "const bool transformScissor = false;",
         "IDirect3DTexture9* compositeSource =",
         "compositeSource = R30SkyGlow.temp[eye];",
+    ])
+    forbid("src/vr/d3d9/stereo_renderer_r30.cpp", [
+        "clipCorrection._11 = hudScaleX * eyeScale[eye];",
+        "R30TransformHudScissor(savedScissor, savedViewport,",
+    ])
+    require("src/vr/d3d9/stereo_renderer_r31.cpp", [
+        "screenKind != R30ScreenSpaceKind::Hud2D",
+        "R30ClassifyScreenSpacePass(device) == R30ScreenSpaceKind::Hud2D",
+    ])
+    require("src/vr/game/outrun_renderer.cpp", [
+        "CullingUnionFov disabled in active rendering after visual-regression evidence",
+        "live projection remains untouched until a culling-only frustum boundary is proven",
+    ])
+    forbid("src/vr/game/outrun_renderer.cpp", [
+        "two-eye union culling FOV ACTIVE",
     ])
     require("src/vr/d3d9/stereo_renderer_r34.cpp", [
         "device->TestCooperativeLevel()",
@@ -82,6 +95,7 @@ def main() -> int:
         "'-FramerateUnlockExperimental=false'",
         "'-FrameCadenceMode=0'",
         "'-DisableDesktopVsync=false'",
+        "'-CullingUnionFov=false'",
     ]:
         if marker not in correctness:
             raise AssertionError(
