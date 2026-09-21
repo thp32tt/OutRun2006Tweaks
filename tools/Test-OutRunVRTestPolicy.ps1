@@ -20,8 +20,9 @@ $performance = Get-OutRunVRTestProfile -Name PERFORMANCE
 foreach($profile in @($control,$correctness,$performance)) {
     Assert-True ($profile.Name -in @('CONTROL','CORRECTNESS','PERFORMANCE')) 'invalid profile identity'
     Assert-True (Has-Argument $profile '-PreferD3D9Ex=true') "$($profile.Name): D3D9Ex reference must be preferred"
-    Assert-True (Has-Argument $profile '-DirectGpuOnly=false') "$($profile.Name): DirectGPU must remain optional by default"
-    Assert-True (Has-Argument $profile '-DisableDesktopDuplication=false') "$($profile.Name): fallback must remain available by default"
+    Assert-True (Has-Argument $profile '-DirectGpuOnly=true') "$($profile.Name): gameplay must remain DirectGPU-only; SBS fallback is a locked regression"
+    Assert-True (-not (Has-Argument $profile '-DirectGpuOnly=false')) "$($profile.Name): DirectGPU optional mode must not return to the reference profiles"
+    Assert-True (Has-Argument $profile '-DisableDesktopDuplication=false') "$($profile.Name): desktop capture may remain available for LOCAL-fixed menu presentation only"
     Assert-True (Has-Argument $profile '-TargetRefreshRateHz=0') "$($profile.Name): refresh must follow OpenXR/VDXR"
     Assert-True (Has-Argument $profile '-SkyGlowFactor=1') "$($profile.Name): test policy requires SkyGlowFactor=1"
     Assert-True ($profile.Environment.OUTRUN_VR_TEST_PROFILE -eq $profile.Name) "$($profile.Name): environment identity mismatch"
@@ -78,6 +79,9 @@ $comparisonWorkflow = Get-Content $comparisonWorkflowPath -Raw
 Assert-True ($activeWorkflow -match 'name:\s*DX9Ex Active Validation') 'active workflow identity mismatch'
 Assert-True ($activeWorkflow -notmatch '(?m)^\s*matrix:\s*$') 'routine active workflow must not build a variant matrix'
 Assert-True ($activeWorkflow -notmatch 'P1_C1_FAST_WORLD|P2_C2_FAST_HUD|P4_R26_HUD_SAFE') 'routine active workflow leaked comparison variants'
+Assert-True ($activeWorkflow -match 'OUTRUN_VR_R26_HUD_COMPARE=ON') 'active workflow must build the runtime-proven R26 + R43/R44 visual owner'
+Assert-True ($activeWorkflow -match 'ACTIVE_R26_R43_R44') 'active workflow variant identity must preserve the golden visual owner'
+Assert-True ($activeWorkflow -notmatch 'ACTIVE_FULL_R34') 'unvalidated full R34 visual owner must not replace the golden active build'
 Assert-True ($comparisonWorkflow -match 'name:\s*DX9Ex Comparison Matrix \(Manual\)') 'comparison workflow identity mismatch'
 Assert-True ($comparisonWorkflow -notmatch '(?m)^\s*push:\s*$') 'four-way comparison workflow must remain manual-only'
 
@@ -91,4 +95,4 @@ Assert-True ($state.testProfiles.CORRECTNESS.defaultUserTest -eq $true) 'CORRECT
 Assert-True ($state.testProfiles.CONTROL.defaultUserTest -eq $false) 'CONTROL must be optional'
 Assert-True ($state.testProfiles.PERFORMANCE.defaultUserTest -eq $false) 'PERFORMANCE must be optional'
 
-Write-Host 'VR test policy verification passed: profile identity, runtime defaults, session/log separation, GUI exposure, bounded Ctrl+F9 capture, single-active CI and TEST_LEVEL state are consistent.'
+Write-Host 'VR test policy verification passed: DirectGPU-only gameplay, golden R26+R43/R44 visual ownership, profile identity, session/log separation and TEST_LEVEL state are consistent.'
