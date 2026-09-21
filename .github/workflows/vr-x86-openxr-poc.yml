@@ -33,9 +33,19 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force stage | Out-Null
           Copy-Item build-vrx86/bin/outrun-vr-x86-openxr-probe.exe stage/
+          Copy-Item vrx86/Run-x86-openxr-probe.cmd stage/
+          Copy-Item vrx86/README_TEST_KO.md stage/
           # OpenXR-SDK's loader target is linked into this POC; no adjacent
           # openxr_loader.dll is required for the staged executable.
           Set-Content stage/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
+          foreach ($required in @(
+            'stage/outrun-vr-x86-openxr-probe.exe',
+            'stage/Run-x86-openxr-probe.cmd',
+            'stage/README_TEST_KO.md',
+            'stage/SOURCE_SHA.txt'
+          )) {
+            if (-not (Test-Path $required)) { throw "Missing staged x86 POC file: $required" }
+          }
       - uses: actions/upload-artifact@v4
         with:
           name: OutRun2-VR-x86-OpenXR-POC-${{ github.sha }}
