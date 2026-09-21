@@ -38,6 +38,9 @@ namespace OutRunVrD3D9ExDirectPassthrough
     inline std::uint64_t SafeCopyFailure = 0;
     inline std::uint64_t CopyFenceTimeout = 0;
     inline std::uint64_t StaleFallbackInvalidations = 0;
+    inline std::uint64_t DirectProjectionReleaseFailures = 0;
+    inline bool DirectProjectionReleaseQuarantined = false;
+    inline bool FirstDirectReleaseFailureLogged = false;
     inline bool FirstDirectPassLogged = false;
     inline bool FirstDirectRejectLogged = false;
     inline bool FirstGpuSafeAckLogged = false;
@@ -673,7 +676,25 @@ namespace OutRunVrD3D9ExDirectPassthrough
         SourceFormat = savedFormat;
         if (OutRunVrFinalTest::Context)
             OutRunVrFinalTest::Context->Flush();
-        Release(Projection);
+
+        // Rendering is not a committed DirectGPU projection until OpenXR owns
+        // the image again. A failed release leaves Projection acquired/waited;
+        // quarantine only the DirectGPU owner and let the established fallback
+        // path retry/recover that exact ownership state.
+        const bool released = Release(Projection);
+        if (!released)
+        {
+            ++DirectProjectionReleaseFailures;
+            DirectProjectionReleaseQuarantined = true;
+            if (!FirstDirectReleaseFailureLogged)
+            {
+                FirstDirectReleaseFailureLogged = true;
+                std::cerr
+                    << "[D3D9Ex R23] DirectGPU projection release failed; "
+                    << "quarantining direct owner until fallback releases the image\n";
+            }
+            return false;
+        }
         if (!ok)
             return false;
 
@@ -726,13 +747,15 @@ namespace OutRunVrD3D9ExDirectPassthrough
         CloseReadMappings();
         LastObservedCaptureFresh = 0;
         LastCaptureFreshMs = 0;
+        DirectProjectionReleaseQuarantined = false;
     }
 
     inline XrResult XRAPI_CALL EndFrame(XrSession session,
         const XrFrameEndInfo* endInfo)
     {
         const DirectHostState state = ReadDirectHostState();
-        const bool directCandidate = IncomingProjectionValid(endInfo) &&
+        const bool directCandidate = !DirectProjectionReleaseQuarantined &&
+            IncomingProjectionValid(endInfo) &&
             state.valid && state.openedFrame != 0;
 
         if (directCandidate && EnsureSafeFrame(state.openedFrame))
@@ -775,6 +798,12 @@ namespace OutRunVrD3D9ExDirectPassthrough
         InvalidateStaleFallbackSource();
         const XrResult result =
             OutRunVrSbsCaptureOverride::EndFrame(session, endInfo);
+        if (DirectProjectionReleaseQuarantined &&
+            !OutRunVrSbsCaptureOverride::Projection.acquired &&
+            !OutRunVrSbsCaptureOverride::Projection.waited)
+        {
+            DirectProjectionReleaseQuarantined = false;
+        }
         ObserveCaptureFreshness();
         return result;
     }
