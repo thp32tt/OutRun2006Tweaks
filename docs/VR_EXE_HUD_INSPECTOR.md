@@ -45,3 +45,9 @@ The OutRun EXE HUD Inspector CI workflow uploads:
 The static analyzer also verifies the nine previously reverse-engineered RankMarker call sites in the reference EXE. A mismatch fails CI rather than silently producing addresses for the wrong binary.
 
 The JSON is machine-readable so later automation can convert confirmed runtime fingerprints into precise VR pass rules instead of broad primitive-count or render-state heuristics.
+
+## Runtime ZIP ingestion rule
+
+The normal collector now emits `ANALYSIS_REQUEST.json` and `UPLOAD_THIS_ZIP.txt` into each session bundle and names the archive `OutRun2_VR_ANALYZE_...`.
+
+When such a ZIP is uploaded to the OutRun VR project chat, the upload itself means: analyze this runtime session now. A separate symptom description is optional. The analysis should correlate HUD/runtime fingerprints with the static EXE analysis and known semantic anchors before recommending a render-classification or coordinate-space change.
