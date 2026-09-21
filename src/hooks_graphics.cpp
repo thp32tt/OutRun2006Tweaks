@@ -918,9 +918,9 @@ class ReflectionUpdateRate : public Hook
 		}
 
 		pendingFaces += FacesPerCubemap * Settings::ReflectionUpdateRate.get() * frameScale60;
-		const int faces = std::min(FacesPerCubemap, int(pendingFaces));
+		const int faces = (std::min)(FacesPerCubemap, int(pendingFaces));
 		pendingFaces -= float(faces);
-		pendingFaces = std::min(pendingFaces, float(FacesPerCubemap));
+		pendingFaces = (std::min)(pendingFaces, float(FacesPerCubemap));
 
 		ctx.eax = faces;
 	}
@@ -1442,3 +1442,32 @@ class VSyncOverride : public Hook
 
 		// TODO: add MultiSampleType / MultiSampleQuality overrides here?
 		//  (doesn't seem any of them are improvement over vanilla "DX/ANTIALIASING = 2" though...)
+	}
+
+public:
+	std::string_view description() override
+	{
+		return "VSync";
+	}
+
+	bool validate() override
+	{
+		return Settings::VSync != 1 ||
+			(Settings::VREnabled && Settings::VRDisableDesktopVsync);
+	}
+
+	void declare_settings() override
+	{
+		Settings::VSync.needs_restart();
+	}
+
+	bool apply() override
+	{
+		dest_hook = safetyhook::create_mid(Module::exe_ptr(D3DInit_HookAddr), destination);
+
+		return true;
+	}
+
+	static VSyncOverride instance;
+};
+VSyncOverride VSyncOverride::instance;
