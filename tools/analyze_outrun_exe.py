@@ -335,9 +335,28 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--exe", required=True, type=Path)
     parser.add_argument("--out-dir", required=True, type=Path)
+    parser.add_argument(
+        "--expected-sha-file",
+        type=Path,
+        help="Optional file containing the exact accepted OR2006C2C.EXE SHA-256.",
+    )
     args = parser.parse_args()
 
     data = args.exe.read_bytes()
+    observed_sha256 = hashlib.sha256(data).hexdigest()
+    expected_sha256 = None
+    if args.expected_sha_file is not None:
+        expected_sha256 = args.expected_sha_file.read_text(encoding="utf-8").strip().lower()
+        if not re.fullmatch(r"[0-9a-f]{64}", expected_sha256):
+            raise SystemExit(
+                f"invalid expected SHA-256 in {args.expected_sha_file}: {expected_sha256!r}"
+            )
+        if observed_sha256 != expected_sha256:
+            raise SystemExit(
+                "reference EXE SHA-256 mismatch: "
+                f"expected={expected_sha256} observed={observed_sha256}"
+            )
+
     pe = parse_pe(data)
     calls = find_calls(pe)
     found_call_rvas = {item["call_rva"] for item in calls}
@@ -349,7 +368,11 @@ def main() -> int:
 
     report = {
         "source": str(args.exe),
-        "sha256": hashlib.sha256(data).hexdigest(),
+        "sha256": observed_sha256,
+        "expected_sha256": expected_sha256,
+        "reference_identity_verified": (
+            expected_sha256 is not None and observed_sha256 == expected_sha256
+        ),
         "file_size": len(data),
         "pe": {
             "image_base": pe.image_base,
