@@ -41,6 +41,7 @@ namespace OutRunVRHudInspector
 
         std::mutex TraceMutex;
         std::ofstream TraceFile;
+        std::ofstream XstMapFile;
         std::unordered_map<std::uint64_t, std::uint32_t> Seen;
         std::uint64_t TraceLines = 0;
         ULONGLONG StartMs = 0;
@@ -67,6 +68,18 @@ namespace OutRunVRHudInspector
             if (!base || !value || value < base || !size || value >= base + size)
                 return 0;
             return static_cast<std::uint32_t>(value - base);
+        }
+
+        std::string CsvEscape(const char* value)
+        {
+            std::string out = value ? value : "";
+            std::size_t pos = 0;
+            while ((pos = out.find('"', pos)) != std::string::npos)
+            {
+                out.insert(pos, 1, '"');
+                pos += 2;
+            }
+            return """ + out + """;
         }
 
         std::uint64_t MakeKey(EventKind kind, std::uint32_t callRva,
@@ -185,6 +198,16 @@ namespace OutRunVRHudInspector
                 if (!TraceFile)
                     return false;
 
+                const auto xstPath =
+                    Module::DllPath.parent_path() /
+                    "OutRun2006Tweaks-xstmap.csv";
+                const bool xstEmpty =
+                    !std::filesystem::exists(xstPath) ||
+                    std::filesystem::file_size(xstPath) == 0;
+                XstMapFile.open(xstPath, std::ios::out | std::ios::app);
+                if (!XstMapFile)
+                    return false;
+
                 StartMs = GetTickCount64();
                 if (empty)
                 {
@@ -197,6 +220,13 @@ namespace OutRunVRHudInspector
                         << "elapsed_ms,event,return_rva,call_rva,known_area,semantic,space_policy,mode,stage,"
                            "arg0,arg1,arg2,arg3,arg4,arg5,arg6,arg7,count\n";
                     TraceFile.flush();
+                }
+                if (xstEmpty)
+                {
+                    XstMapFile
+                        << "# schema=outrun-xstmap-v1\n"
+                        << "elapsed_ms,xstset_index,filename\n";
+                    XstMapFile.flush();
                 }
                 return true;
             }
@@ -243,6 +273,18 @@ namespace OutRunVRHudInspector
             priority);
     }
 
+    void TraceXstSet(int xstsetIndex, const char* filename)
+    {
+        if (!filename || !*filename || !XstMapFile)
+            return;
+        std::lock_guard lock(TraceMutex);
+        XstMapFile
+            << (GetTickCount64() - StartMs) << ','
+            << xstsetIndex << ','
+            << CsvEscape(filename) << '\n';
+        XstMapFile.flush();
+    }
+
     namespace
     {
         class VRHudInspectorHook : public Hook
@@ -283,7 +325,7 @@ namespace OutRunVRHudInspector
                 }
 
                 spdlog::info(
-                    "VR HUD INSPECTOR: semantic HUD tracing active; UIScaling-derived caller taxonomy separates screen HUD from world billboards; output=OutRun2006Tweaks-hudtrace.csv");
+                    "VR HUD INSPECTOR: semantic HUD tracing active; UIScaling-derived caller taxonomy separates screen HUD from world billboards; output=OutRun2006Tweaks-hudtrace.csv + OutRun2006Tweaks-xstmap.csv");
                 return true;
             }
 
