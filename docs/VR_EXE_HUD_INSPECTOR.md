@@ -42,7 +42,9 @@ The OutRun EXE HUD Inspector CI workflow uploads:
 - OR2006C2C_EXE_ANALYSIS.md
 - a build-validated dinput8.dll containing the passive inspector
 
-The static analyzer also verifies the nine previously reverse-engineered RankMarker call sites in the reference EXE. A mismatch fails CI rather than silently producing addresses for the wrong binary.
+The static analyzer first verifies the downloaded EXE against the immutable SHA-256 stored in `tools/OR2006C2C_REFERENCE_SHA256.txt`, then verifies the nine previously reverse-engineered RankMarker call sites. The same SHA file is packaged beside `Collect-OutRunVRLogs.ps1`, so static CI and runtime semantic promotion consume one identity source. A byte-level SHA mismatch fails before PE/HUD analysis; the call-site check remains a second structural guard.
+
+The workflow also mutates one byte in a temporary copy and asserts that the SHA gate rejects it, preventing a green run from silently accepting a replaced release asset.
 
 The JSON is machine-readable so later automation can convert confirmed runtime fingerprints into precise VR pass rules instead of broad primitive-count or render-state heuristics.
 
