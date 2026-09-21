@@ -18,6 +18,7 @@ from pathlib import Path
 
 KNOWN_TARGETS = {
     0x02CFE0: "put_sprite_ex",
+    0x02D0C0: "put_sprite_ex2",
     0x029580: "sprani_play_ae_auth_alpha",
     0x02D280: "put_clip_sprite",
     0x02CCB0: "sprSetFontPriority",
