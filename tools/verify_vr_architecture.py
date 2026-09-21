@@ -376,8 +376,10 @@ require(
 require(
     "src/vr/d3d9/stereo_renderer.cpp",
     "R9ReadBoolEnvironment",
-    "OUTRUN_VR_DIRECT_TRANSPORT",
-    "OUTRUN_VR_DIRECT_ONLY",
+    "R9DirectOnlyTransport",
+    "Settings::VRDirectGpuOnly.get()",
+    "inherits OUTRUN_VR_DIRECT_ONLY through CreateProcess",
+    "SAFE modes stuck in the default direct-only path",
 )
 require(
     "src/vr/d3d9/stereo_renderer_r26.cpp",

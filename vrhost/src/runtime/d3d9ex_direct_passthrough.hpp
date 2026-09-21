@@ -362,26 +362,51 @@ namespace OutRunVrD3D9ExDirectPassthrough
     {
         if (!frameId || !EnsureFrameRing())
             return false;
-        for (std::uint32_t i = 0; i < OutRunVR::RenderFrameRingSize; ++i)
+
+        for (int ringAttempt = 0; ringAttempt < 6; ++ringAttempt)
         {
-            const auto& slot = FrameRing->slots[i];
-            for (int attempt = 0; attempt < 4; ++attempt)
+            const std::uint32_t ringBefore = FrameRing->publishSequence;
+            if (ringBefore & 1u)
+                continue;
+
+            bool found = false;
+            OutRunVR::SharedRenderFrameState selected{};
+            for (std::uint32_t i = 0; i < OutRunVR::RenderFrameRingSize && !found; ++i)
             {
-                const std::uint32_t before = slot.sequence;
-                if (before & 1u)
-                    continue;
-                MemoryBarrier();
-                std::memcpy(&out, &slot, sizeof(out));
-                MemoryBarrier();
-                const std::uint32_t after = slot.sequence;
-                if (before == after && !(after & 1u) &&
-                    out.magic == OutRunVR::RenderFrameMagic &&
-                    out.protocolVersion == OutRunVR::RenderFrameProtocolVersion &&
-                    out.structSize == sizeof(out) && out.frameId == frameId &&
-                    out.state == OutRunVR::StereoSbsActive &&
-                    (out.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0 &&
-                    (out.flags & OutRunVR::RenderFramePresentInFlight) == 0)
-                    return true;
+                const auto& slot = FrameRing->slots[i];
+                for (int attempt = 0; attempt < 4; ++attempt)
+                {
+                    const std::uint32_t before = slot.sequence;
+                    if (before & 1u)
+                        continue;
+                    MemoryBarrier();
+                    OutRunVR::SharedRenderFrameState candidate{};
+                    std::memcpy(&candidate, &slot, sizeof(candidate));
+                    MemoryBarrier();
+                    const std::uint32_t after = slot.sequence;
+                    if (before == after && !(after & 1u) &&
+                        candidate.magic == OutRunVR::RenderFrameMagic &&
+                        candidate.protocolVersion == OutRunVR::RenderFrameProtocolVersion &&
+                        candidate.structSize == sizeof(candidate) &&
+                        OutRunVR::RenderFrameRunIdentityMatches(*FrameRing, candidate) &&
+                        candidate.frameId == frameId &&
+                        candidate.state == OutRunVR::StereoSbsActive &&
+                        (candidate.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0 &&
+                        (candidate.flags & OutRunVR::RenderFramePresentInFlight) == 0)
+                    {
+                        selected = candidate;
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            MemoryBarrier();
+            const std::uint32_t ringAfter = FrameRing->publishSequence;
+            if (found && ringBefore == ringAfter && !(ringAfter & 1u))
+            {
+                out = selected;
+                return true;
             }
         }
         return false;
