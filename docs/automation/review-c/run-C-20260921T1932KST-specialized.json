@@ -1,0 +1,26 @@
+{
+  "role":"C",
+  "mode":"POST_FIX_TRIAGE_ORGANIZATION",
+  "run_kst":"2026-09-21T19:32:54+09:00",
+  "integration_sha":"265504f6ea28c5e97908e450a460661ed5ad37f1",
+  "candidates_reviewed":[
+    {"candidate_sha":"a053902bf33e2b192074ff1c316de62a1b8bc832","base_sha":"955da662766a0951175d002977378787138dced0","finding_ids":["DX9EX-SKYGLOW-001"],"changed_files":["src/vr/d3d9/stereo_renderer_r30.cpp"],"verdict":"BLOCKED_STALE_BASE","sanity":"single intended runtime file; 5 additions/2 deletions; candidate now 14 commits behind integration","nextAction":"D recreate/cherry-pick minimal 7-line SkyGlow source-selection fix onto current integration SHA, rerun verifier/build, route B post-review"},
+    {"candidate_sha":"2e086adfb5974bf38a78b1ad61f79e7cc76317c2","base_sha":"955da662766a0951175d002977378787138dced0","finding_ids":["DX9EX-RESET-STATEBLOCK-001"],"changed_files":["src/vr/d3d9/ex_device_upgrade_r15.cpp"],"verdict":"BLOCKED_STALE_BASE","sanity":"single intended runtime file; removes pre-Reset D3DSBT_ALL replay; candidate now 14 commits behind integration","nextAction":"D recreate minimal state-block removal on current integration SHA, verify explicit R13/R15 baseline coverage, build, route A post-review"},
+    {"candidate_ref":"vr-d3d9ex-candidate/VR-HOST-002-rebase-D-20260921T1151KST","finding_ids":["VR-HOST-002"],"verdict":"NEEDS_CHANGES","sanity":"67 commits behind integration and 9-file delta; not safe as exact current candidate","nextAction":"D discard stale branch as integration candidate and regenerate VR-HOST-002 from current integration SHA with only required host/IPC/verifier dependencies"},
+    {"candidate_ref":"vr-d3d9ex-candidate/HUD-INSPECTOR-CORRECTNESS-D-20260921T1905KST","finding_ids":["HUD-INSPECTOR-CORRECTNESS"],"verdict":"BLOCKED_STALE_BASE","sanity":"6 commits ahead of old 955da662 base, 14 commits behind integration, four-file runtime/tool delta","nextAction":"D rebase/reconstruct only if still READY; require B review because hooks_textures/hud semantics can affect visual classification"}
+  ],
+  "findings_organized":[
+    {"id":"DX9EX-SKYGLOW-001","status":"READY_REBASE"},
+    {"id":"DX9EX-RESET-STATEBLOCK-001","status":"READY_REBASE"},
+    {"id":"VR-HOST-002","status":"REOPEN_CANDIDATE"},
+    {"id":"HUD-INSPECTOR-CORRECTNESS","status":"NEEDS_REVIEW_AFTER_REBASE"}
+  ],
+  "READY_for_D":2,
+  "D_IMPLEMENT_NEXT":[
+    {"finding_id":"DX9EX-RESET-STATEBLOCK-001","status":"READY_REBASE","priority":1,"target":"src/vr/d3d9/ex_device_upgrade_r15.cpp / R15CaptureClassicExtraBaseline + post-Reset restore","fix_intent":"remove retained pre-Reset D3DSBT_ALL state block and rely on explicit fresh-device R13/R15 baseline families","verifier":"prove no cross-Reset StateBlock Apply path remains and explicit baseline restore families cover required state; build current prospective tree","dependency":"recreate on 265504f6...","review":"A required"},
+    {"finding_id":"DX9EX-SKYGLOW-001","status":"READY_REBASE","priority":2,"target":"src/vr/d3d9/stereo_renderer_r30.cpp / SkyGlow blur composite","fix_intent":"one-step composite reduced output; successful two-step composite temp output","verifier":"static ping-pong source assertion + build; SkyGlowFactor=1 profile identity preserved","dependency":"recreate on 265504f6...","review":"B required"},
+    {"finding_id":"VR-HOST-002","status":"REOPEN_CANDIDATE","priority":3,"target":"vrhost DirectGPU hold/copy/ACK path + IPC dependencies","fix_intent":"regenerate minimal current-base candidate preserving copy-completion-before-ACK ownership ordering","verifier":"LEVEL0 ordering verifier + host build + prospective-tree diff sanity","dependency":"old branch 67 commits behind; reconstruct on 265504f6...","review":"A+B required; C exact-SHA sanity afterward"}
+  ],
+  "validation_gaps":["No current-base runtime candidate among reviewed items","CI evidence must be regenerated after current-base reconstruction","Exact post-review records must target regenerated candidate SHA"],
+  "production_write":false
+}
