@@ -1,0 +1,1 @@
+{"cycle":"20260921-A1","checkpoint":"CP40","valid_units":40,"target_sha":"b159cc66ca1ed6f25f7a2c7640a246ee1d0b489a","coverage":"OpenXR session/reference-space lifecycle, host ownership, game PID rebinding, presentation transition invalidation"}
