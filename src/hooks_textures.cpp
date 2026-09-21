@@ -8,6 +8,15 @@
 #include <unordered_set>
 #include <array>
 #include <new>
+#include <intrin.h>
+
+namespace OutRunVRHudInspector
+{
+    void TracePutSprite(SPRARGS* sprargs, float priority,
+        const void* returnAddress);
+    void TracePutSprite2(const void* sprargs, float priority,
+        const void* returnAddress);
+}
 
 namespace Settings
 {
@@ -608,6 +617,7 @@ class TextureReplacement : public Hook
 	inline static SafetyHookInline put_sprite_ex2 = {};
 	static int __cdecl put_sprite_ex2_dest(SPRARGS2* a1, float a2)
 	{
+		OutRunVRHudInspector::TracePutSprite2(a1, a2, _ReturnAddress());
 		int xstnum = a1->xstnum_0;
 
 		if (a1->d3dtexture_ptr_C == prevTexture && sprite_scales.contains(prevTextureId))
@@ -641,6 +651,7 @@ class TextureReplacement : public Hook
 	inline static SafetyHookInline put_sprite_ex = {};
 	static int __cdecl put_sprite_ex_dest(SPRARGS* a1, float a2)
 	{
+		OutRunVRHudInspector::TracePutSprite(a1, a2, _ReturnAddress());
 		int xstnum = a1->xstnum_0;
 		if (sprite_scales.contains(xstnum))
 		{
