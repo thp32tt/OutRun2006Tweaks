@@ -5,27 +5,27 @@ ENV DEBIAN_FRONTEND=noninteractive \
     DISPLAY=:99
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      xvfb x11vnc openbox novnc websockify tini curl unzip \
+      xvfb x11vnc openbox novnc websockify tini curl \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /tmp/controller-payload
-COPY controller.b64 ./
+WORKDIR /opt/outrun
 
-RUN python -c "import base64,pathlib; p=pathlib.Path('controller.b64'); pathlib.Path('/tmp/controller.zip').write_bytes(base64.b64decode(''.join(p.read_text().split())))" \
-    && unzip -tq /tmp/controller.zip \
-    && mkdir -p /tmp/unpack \
-    && unzip -q /tmp/controller.zip -d /tmp/unpack \
-    && mkdir -p /opt/outrun \
-    && cp -a /tmp/unpack/outrun-chat-controller/app /opt/outrun/ \
-    && cp -a /tmp/unpack/outrun-chat-controller/prompts /opt/outrun/ \
-    && cp /tmp/unpack/outrun-chat-controller/entrypoint.sh /opt/outrun/entrypoint.sh \
-    && pip install --no-cache-dir -r /tmp/unpack/outrun-chat-controller/requirements.txt \
-    && chmod +x /opt/outrun/entrypoint.sh \
-    && rm -rf /tmp/controller.zip /tmp/unpack /tmp/controller-payload
+COPY requirements.direct.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
+RUN mkdir -p /opt/outrun/app /opt/outrun/prompts /tmp/controller-parts \
+    && touch /opt/outrun/app/__init__.py
+
+COPY src/controller.py.part* /tmp/controller-parts/
+RUN cat /tmp/controller-parts/controller.py.part* > /opt/outrun/app/controller.py \
+    && python -m py_compile /opt/outrun/app/controller.py \
+    && rm -rf /tmp/controller-parts
+
+COPY entrypoint.direct.sh /opt/outrun/entrypoint.sh
 COPY bootstrap_review.override.md /opt/outrun/prompts/bootstrap_review.md
 COPY continue_review.override.md /opt/outrun/prompts/continue_review.md
 COPY watchdog_resume.override.md /opt/outrun/prompts/watchdog_resume.md
 
-WORKDIR /opt/outrun
+RUN chmod +x /opt/outrun/entrypoint.sh
+
 ENTRYPOINT ["/usr/bin/tini","--","/opt/outrun/entrypoint.sh"]
