@@ -70,3 +70,14 @@ The active DX9Ex validation workflow now accepts isolated B candidate branches a
 Central runtime-candidate WIP limit is 3. Two materially different failed fixes for the same unchanged failure become BLOCKED. A/B/C publish evidence/proposals on their own branches; D imports them idempotently and updates the central queue.
 
 DXVK/multiview/DX12 remain blocked by policy until the DX9Ex reference is user accepted. The next normal human validation remains one CORRECTNESS test unless concrete evidence requires CONTROL/PERFORMANCE comparison.
+
+
+## Reference-stack POC checkpoint — 2026-09-21
+
+- Base reference-stack candidate: `vr-d3d9ex-candidate/VR-REFSTACK-20260921T1120KST` at `0134fb7b3feb91e58da2adf4f1a60b2b6b6f3cd0`.
+- Base candidate validation run `35554393634`: policy, x64 host, nine no-HMD smoke tests, Win32 game DLL, package assembly and package validation all passed.
+- Base package artifact: `OutRun2-VR-DX9EX-ACTIVE-0134fb7b...`, artifact id `10619623339`, digest `sha256:c8cb67b46acb9c849fad46411664126538db76e759923a666cdc168ff54e82aa`.
+- x86 Direct OpenXR POC: branch `vr-x86-openxr-direct-poc`, SHA `81bab0b123264216310e9f082793b763e0569247`; Win32 OpenXR+D3D11 POC CI passed. Artifact id `10619103867`, digest `sha256:8493bd54234f00f9dc69fd4f4a22cfeaa8623a48800f1d783b20e5505796d3f4`.
+- FSR1 POC: branch `vr-fsr1-upscale-poc`. Run `35560047554` at SHA `0de83a1d1873b3a0176a90c97c663b69b7093c57` passed policy, x64 host + FSR1 shader/no-HMD smoke, Win32 game DLL and package validation.
+- Validated FSR1 package artifact at that seal: id `10621428307`, digest `sha256:aa6ee0625107e31d64ee4250451d068afc206b52a0204ff3fd5ca6427c9ea212`.
+- Runtime gate: use one package. CORRECTNESS = full transport / FSR off. PERFORMANCE = full OpenXR output + 0.77 DirectGPU transport + EASU/RCAS. Run the same scene and compare visual correctness, headset smoothness and host/fence telemetry.
