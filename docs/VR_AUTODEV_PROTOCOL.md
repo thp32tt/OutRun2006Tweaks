@@ -11,35 +11,32 @@ This repository-side protocol matches the four Work scheduled roles. The schedul
 
 ## Four-role ownership
 
-### A — REVIEW
-- Primary role branch: `vr-d3d9ex-review`.
-- Production runtime source is read-only.
-- Produces evidence, findings, coverage and optional non-production verifier prototypes.
-- Persists each run as `docs/automation/runs/A/<run-id>.json` on the review branch.
-- Does not rewrite integration state/queue/history.
+### A — ARCHITECTURE REVIEW
+- Primary role branch: `vr-d3d9ex-review-a`.
+- Reviews architecture, control flow, state/lifetime/reset and cross-subsystem ownership.
+- Production runtime source, candidates, build/CI and integration are read-only.
+- Persists evidence/checkpoints only; does not rewrite integration state/queue/history.
 
-### B — FIX
-- Works only on isolated candidate branches named `vr-d3d9ex-candidate/<finding-id>-<run-id>`.
-- Never commits production changes directly to `vr-d3d9ex-focus`.
-- One coherent hypothesis per candidate SHA; use runtime/profile flags for hardware-dependent experiments when practical.
-- Starts the existing candidate-capable CI immediately after publishing the candidate.
-- Persists `docs/automation/runs/B/<run-id>.json` on the candidate branch.
-- Two materially different failed fixes for the same unchanged failure => BLOCKED evidence, then move on.
+### B — RENDERING REVIEW
+- Primary role branch: `vr-d3d9ex-review-b`.
+- Reviews rendering, stereo, HUD, XYZRHW, world/effect semantics and visual fallback.
+- Production runtime source, candidates, build/CI and integration are read-only.
+- Persists evidence/checkpoints only; does not implement fixes.
 
-### C — VALIDATION
-- Primary role branch: `vr-d3d9ex-support`.
-- Does not change production runtime source or merge integration.
-- Validates immutable candidate SHA/config/toolchain/profile identity and actual GitHub Actions evidence.
-- May add non-production verifier/support tooling on the support branch.
-- Persists `docs/automation/runs/C/<run-id>.json`.
-- Build success is not HMD correctness; hardware-visible conclusions stay NEED_HMD_TEST.
+### C — PERFORMANCE / OPENXR REVIEW
+- Primary role branch: `vr-d3d9ex-review-c`.
+- Reviews performance, frame pacing, copies/waits, OpenXR synchronization, shared-texture protocol and testability.
+- Production runtime source, candidates, build/CI and integration are read-only.
+- Persists evidence/checkpoints only; does not validate or merge production candidates as an owner.
 
-### D — INTEGRATION / PLANNER
+### D — FIX / BUILD / VALIDATE / INTEGRATE
 - Sole autonomous writer of production runtime code and consolidated state on `vr-d3d9ex-focus`.
-- Consumes A/B/C run records idempotently.
-- Revalidates changed base/dependencies before integrating a candidate.
+- D alone creates `vr-d3d9ex-candidate/<finding-id>-<run-id>` branches, implements one coherent hypothesis per candidate, runs candidate CI, validates evidence, and integrates accepted candidates.
+- Consumes A/B/C review records idempotently and requests/reuses independent post-review evidence when required.
+- Two materially different failed fixes for the same unchanged failure => BLOCKED evidence, then move on.
 - Owns `docs/VR_WORK_QUEUE.json`, `docs/VR_AUTODEV_STATE.json`, `docs/VR_RUNTIME_FEEDBACK.json`, and `docs/VR_SCHEDULED_RUN_HISTORY.md`.
 - Only D freezes/finalizes user test packages.
+- Build success is not HMD correctness; hardware-visible conclusions stay NEED_HMD_TEST.
 
 ## Resumable checkpoint model
 
@@ -129,7 +126,7 @@ Every role-run JSON should include:
 - findingId(s)
 - dependency/input hashes
 - changed paths (if any)
-- candidateSha (B, when created)
+- candidateSha (D, when created)
 - actual CI run/artifact identifiers
 - evidence level
 - queue proposal
