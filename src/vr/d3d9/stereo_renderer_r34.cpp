@@ -29,7 +29,9 @@ namespace OutRunVRStereo
         std::atomic<bool> R34ResetReplayBlocked{false};
         std::uint64_t R34ReplayBlocks = 0;
         std::uint64_t R34RasterGuardDraws = 0;
+        std::uint64_t R34LostDeviceBypasses = 0;
         bool R34FirstReplayBlockLogged = false;
+        bool R34FirstLostDeviceBypassLogged = false;
         bool R34FirstRasterGuardLogged = false;
 
         void R34ForceResetReplayFailClosed(IDirect3DDevice9* device,
@@ -192,6 +194,30 @@ namespace OutRunVRStereo
             const RECT* sourceRect, const RECT* destRect,
             HWND destWindowOverride, const RGNDATA* dirtyRegion)
         {
+            if (device && IsGameDevice(device))
+            {
+                const HRESULT cooperative = device->TestCooperativeLevel();
+                if (cooperative == D3DERR_DEVICELOST ||
+                    cooperative == D3DERR_DEVICENOTRESET)
+                {
+                    ++R34LostDeviceBypasses;
+                    R34ResetReplayBlocked.store(
+                        true, std::memory_order_release);
+                    OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
+                    R29ArmMonoSafety();
+                    if (!R34FirstLostDeviceBypassLogged)
+                    {
+                        R34FirstLostDeviceBypassLogged = true;
+                        spdlog::warn(
+                            "VR R35 DEVICE LOST: TestCooperativeLevel=0x{:08x}; skipping every VR D3D operation and forwarding raw Present until Reset restores the device",
+                            static_cast<unsigned>(cooperative));
+                    }
+                    return PresentHook.stdcall<HRESULT>(
+                        device, sourceRect, destRect,
+                        destWindowOverride, dirtyRegion);
+                }
+            }
+
             const bool blocked = IsGameDevice(device) &&
                 R34ResetReplayBlocked.load(std::memory_order_acquire);
             if (blocked)
