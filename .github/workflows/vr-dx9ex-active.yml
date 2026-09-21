@@ -10,6 +10,7 @@ on:
       - 'src/vr/**'
       - 'src/hooks_framerate.cpp'
       - 'src/hooks_graphics.cpp'
+      - 'src/hooks_exceptions.cpp'
       - 'vrhost/**'
       - 'CMakeLists.txt'
       - 'cmake.toml'
