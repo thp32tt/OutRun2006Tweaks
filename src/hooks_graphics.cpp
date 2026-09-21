@@ -898,7 +898,6 @@ class ReflectionUpdateRate : public Hook
 
 		float frameScale60 = 1.0f;
 		const bool normalizeForActiveVr =
-			Settings::VREnabled &&
 			Settings::VRStereo &&
 			Settings::VRNormalizeReflectionRate &&
 			OutRunVR::RuntimeEligibility::MayInjectStereo();
