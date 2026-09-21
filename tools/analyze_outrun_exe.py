@@ -18,6 +18,7 @@ from pathlib import Path
 
 KNOWN_TARGETS = {
     0x02CFE0: "put_sprite_ex",
+    0x02D0C0: "put_sprite_ex2",
     0x029580: "sprani_play_ae_auth_alpha",
     0x02D280: "put_clip_sprite",
     0x02CCB0: "sprSetFontPriority",
@@ -57,7 +58,7 @@ SEMANTIC_RANGES = (
     (0x0BD2E0, 0x0BD360, "C2CTestSlipstream", "HUD_SLIPSTREAM", "SCREEN_HUD"),
     (0x0BD360, 0x0BD500, "C2CDontLoseGF", "HUD_GF_WARNING", "SCREEN_HUD"),
     (0x0BD900, 0x0BE100, "GhostGap", "HUD_GHOST", "SCREEN_HUD"),
-    (0x0BE300, 0x0BEA40, "DispTimeAttack2D", "HUD_TIME_ATTACK", "SCREEN_HUD"),
+    (0x0BE270, 0x0BEA40, "DispTimeAttack2D", "HUD_TIME_ATTACK", "SCREEN_HUD"),
     (0x0BEA40, 0x0BEB20, "NaviPub_DispTimeAttackGoal", "HUD_GOAL_TIME", "SCREEN_HUD"),
     (0x0BEB60, 0x0BEBC0, "NaviPub_Disp_Rival", "HUD_RIVAL", "SCREEN_HUD"),
     (0x0BEBC0, 0x0BEC50, "NaviPub_Disp_Heart", "HUD_HEART_TOTAL", "SCREEN_HUD"),
