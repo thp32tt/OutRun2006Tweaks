@@ -1,0 +1,27 @@
+FROM mcr.microsoft.com/playwright/python:v1.63.0-noble
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    DISPLAY=:99
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      xvfb x11vnc openbox novnc websockify tini curl unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /tmp/controller-payload
+COPY part*.b64 ./
+
+RUN cat part*.b64 | tr -d '\\r\\n\\t ' | base64 -d > /tmp/controller.zip \
+    && echo "119aa620bbf6ae4dc26cdc48e2ed48f645ad281cae4645bbe96fe25c37f192e9  /tmp/controller.zip" | sha256sum -c - \
+    && mkdir -p /tmp/unpack \
+    && unzip -q /tmp/controller.zip -d /tmp/unpack \
+    && mkdir -p /opt/outrun \
+    && cp -a /tmp/unpack/outrun-chat-controller/app /opt/outrun/ \
+    && cp -a /tmp/unpack/outrun-chat-controller/prompts /opt/outrun/ \
+    && cp /tmp/unpack/outrun-chat-controller/entrypoint.sh /opt/outrun/entrypoint.sh \
+    && pip install --no-cache-dir -r /tmp/unpack/outrun-chat-controller/requirements.txt \
+    && chmod +x /opt/outrun/entrypoint.sh \
+    && rm -rf /tmp/controller.zip /tmp/unpack /tmp/controller-payload
+
+WORKDIR /opt/outrun
+ENTRYPOINT ["/usr/bin/tini","--","/opt/outrun/entrypoint.sh"]
