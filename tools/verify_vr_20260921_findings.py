@@ -113,8 +113,16 @@ def main() -> int:
         "IsRuntimeStereoActive() noexcept",
         "Settings::VRDirectGpuOnly && Settings::VRPreferD3D9Ex",
         "FirstDeferredResourceInitLogged",
+        "Resource creation is intentionally deferred beyond CreateDevice exposure.",
+    ])
+    forbid("src/vr/d3d9/stereo_renderer_r7.inc", [
         "private eye resources initialized only after first successful game Present",
-        "CreateDevice pre-exposure RT/depth mutation removed",
+    ])
+    require("src/vr/d3d9/stereo_renderer_r23.cpp", [
+        "R23 is the final effective Present owner in the layered hook chain.",
+        "EnsureStereoResources(device)",
+        "VR R23 INIT: private eye/backbuffer resources initialized after final game Present",
+        "recovery baseline can now identify the main backbuffer",
     ])
     require("src/hooks_graphics.cpp", [
         "StockSkyGlowResourcesOwnedByGame()",
