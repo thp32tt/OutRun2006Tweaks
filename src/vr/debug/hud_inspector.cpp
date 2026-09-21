@@ -18,7 +18,7 @@
 namespace Settings
 {
     Setting<bool> VRHudInspector{
-        "VR", "HudInspector", true,
+        "VR", "HudInspector", false,
         "Passive HUD/sprite reverse-engineering trace. Records unique sprite call sites, IDs and coordinates with EXE RVAs so static EXE analysis can map them back to game functions."
     };
 }
