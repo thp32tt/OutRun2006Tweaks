@@ -338,32 +338,45 @@ async def detect_busy(page: Page) -> bool:
 
 
 async def ensure_logged_in(page: Page) -> bool:
-    await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
+    # Never navigate here: each A~F tab must keep its own chat URL.
+    # Only initialize a truly blank tab.
+    if not page.url or page.url == "about:blank":
+        await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
 
-    # ChatGPT composer/login UI can appear several seconds after DOMContentLoaded.
-    deadline = time.time() + 15
+    # Require the actual composer (or current model picker), not merely sidebar/nav UI.
+    deadline = time.time() + 30
     while time.time() < deadline:
         box = await first_visible(page, INPUT_SELECTORS)
         if box:
             return True
 
+        model_selectors = [
+            "button[aria-label='ChatGPT 모델 선택']",
+            "button[aria-label='Select ChatGPT model']",
+            "button[aria-label*='모델 선택']",
+        ]
+        for sel in model_selectors:
+            try:
+                loc = page.locator(sel).first
+                if await loc.count() and await loc.is_visible(timeout=200):
+                    return True
+            except Exception:
+                continue
+
         txt = await page_text(page)
-        explicit_login = any(x in txt for x in ("log in", "sign up", "로그인", "가입"))
+        if any(x in txt for x in ("log in", "sign up", "로그인", "가입")):
+            # Give redirects/client hydration a few seconds before declaring logged out.
+            if time.time() + 3 < deadline:
+                await page.wait_for_timeout(1000)
+                continue
+            return False
 
-        if not explicit_login:
-            for sel in LOGGED_IN_SELECTORS:
-                try:
-                    loc = page.locator(sel).first
-                    if await loc.count() and await loc.is_visible(timeout=200):
-                        return True
-                except Exception:
-                    continue
-
-        await page.wait_for_timeout(1000)
+        await page.wait_for_timeout(500)
 
     write_runtime(
         status="login_detection_failed",
-        last_action=f"ChatGPT login/composer could not be verified at {page.url}",
+        last_action=f"ChatGPT composer/model picker could not be verified at {page.url}",
+        current_url=page.url,
     )
     return False
 
