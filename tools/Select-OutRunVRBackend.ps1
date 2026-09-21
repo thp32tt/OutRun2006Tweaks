@@ -2,7 +2,7 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateSet("2d","d3d9","dxvk-safe","dxvk","dx12")]
     [string]$Backend,
-    [ValidateSet("CONTROL","CORRECTNESS","PERFORMANCE","STAGE_DIAGNOSTIC","A_BASELINE","B_CULLING","C_CULLING_NO_SSAA","D_CULLING_NO_SSAA_R512")]
+    [ValidateSet("CONTROL","CORRECTNESS","HUD_SCREEN","HUD_MENU","HUD_WORLD","PERFORMANCE","STAGE_DIAGNOSTIC","A_BASELINE","B_CULLING","C_CULLING_NO_SSAA","D_CULLING_NO_SSAA_R512")]
     [string]$TestProfile = "CORRECTNESS"
 )
 
