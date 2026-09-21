@@ -55,7 +55,7 @@ def main() -> int:
         "R46XyzrhwHudPlaneAccepted",
         "R46XyzrhwUnknownRejected",
         "if (!state.worldEffect && !hudPlaneEvidence)",
-        "unknown depth-disabled draws fail closed to R26/R23",
+        "R46: never classify an unknown XYZRHW draw as HUD merely because",
     ])
     forbid("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
         "if (state.depthTestEnabled && !state.worldEffect &&",
