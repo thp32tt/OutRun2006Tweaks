@@ -1083,6 +1083,7 @@ void AfterTicks(double qpcFreqMs)
 //
 static SafetyHookMid HeartPulse_hook = {};
 static SafetyHookMid HeartSemantic_hook = {};
+static SafetyHookMid HeartSemanticCancel_hook = {};
 
 static void HeartPulse_dest(SafetyHookContext& ctx)
 {
@@ -1103,9 +1104,17 @@ static void HeartPulse_dest(SafetyHookContext& ctx)
 static void HeartSemantic_dest(SafetyHookContext&)
 {
 	// Arm only after the original [ebx] == 0 no-draw bypass. This hook sits at
-	// the first instruction of the render-helper path, so skipped heart entries
-	// cannot leak a WorldBillboard hint into an unrelated draw.
+	// the first instruction of the render-helper path.
 	OutRunVR::GameSemantic::ArmNextDraw(
+		OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+}
+
+static void HeartSemanticCancel_dest(SafetyHookContext&)
+{
+	// 0x5B4C0 is the common loop-advance target for both the explicit no-draw
+	// branch and the completed render-helper path. If no top-level D3D draw
+	// consumed this heart's hint, cancel only that hint before the next entry.
+	OutRunVR::GameSemantic::CancelNextDraw(
 		OutRunVR::GameSemantic::RenderScope::WorldBillboard);
 }
 
@@ -1201,7 +1210,9 @@ bool Apply()
 	// Reference EXE: 0x5B470 may branch directly to 0x5B4C0 and skip rendering.
 	// Arm the semantic only on the taken render-helper path at 0x5B475.
 	HeartSemantic_hook = safetyhook::create_mid(Module::exe_ptr(0x5B475), HeartSemantic_dest);
-	if (!HeartPulse_hook || !HeartSemantic_hook)
+	HeartSemanticCancel_hook = safetyhook::create_mid(
+		Module::exe_ptr(0x5B4C0), HeartSemanticCancel_dest);
+	if (!HeartPulse_hook || !HeartSemantic_hook || !HeartSemanticCancel_hook)
 		return false;
 
 	// Heart Attack mission markers: hand the sprite the car's drawn position
