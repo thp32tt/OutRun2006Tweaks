@@ -133,12 +133,15 @@ if(Test-Path $captureRoot){
 $inputs=Join-Path $root 'BUILD_INPUTS.json'
 if(Test-Path $inputs){Copy-Item $inputs $dest -Force}
 
+$matchesUpstream=$false
+$exeSemanticIdentity='MISSING'
 $gameExe=Join-Path $root 'OR2006C2C.EXE'
 if(Test-Path $gameExe){
     $exeItem=Get-Item $gameExe
     $exeSha=(Get-FileHash $gameExe -Algorithm SHA256).Hash.ToLowerInvariant()
     $upstreamReferenceSha='68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3'
     $matchesUpstream=($exeSha -eq $upstreamReferenceSha)
+    $exeSemanticIdentity=if($matchesUpstream){'VERIFIED_REFERENCE_SHA256'}else{'MISMATCH'}
     @(
         "filename=$($exeItem.Name)"
         "size=$($exeItem.Length)"
@@ -179,6 +182,9 @@ if(Test-Path $hudCsv){
         $summary+="session=$session"
         $summary+="profile=$profile"
         $summary+="rows=$($hudRows.Count)"
+        $summary+="semanticIdentity=$exeSemanticIdentity"
+        $summary+="semanticBaselineValid=$matchesUpstream"
+        if(!$matchesUpstream){$summary+='semanticPromotion=REJECTED_EXE_IDENTITY_MISMATCH'}
         $summary+=''
         $groups=$hudRows |
             Group-Object event,call_rva,known_area,semantic,space_policy,mode,stage,arg0,arg1 |
@@ -187,9 +193,9 @@ if(Test-Path $hudCsv){
                 [pscustomobject]@{
                     Event=$_.Group[0].event
                     CallRva=$_.Group[0].call_rva
-                    KnownArea=$_.Group[0].known_area
-                    Semantic=$_.Group[0].semantic
-                    SpacePolicy=$_.Group[0].space_policy
+                    KnownArea=if($matchesUpstream){$_.Group[0].known_area}else{''}
+                    Semantic=if($matchesUpstream){$_.Group[0].semantic}else{'UNVERIFIED'}
+                    SpacePolicy=if($matchesUpstream){$_.Group[0].space_policy}else{'UNVERIFIED'}
                     Mode=$_.Group[0].mode
                     Stage=$_.Group[0].stage
                     Arg0=$_.Group[0].arg0
@@ -312,6 +318,8 @@ if($assetSemanticsPresent){
     "BUILD_MATRIX=$matrix"
     "SOURCE_SHA=$sha"
     "CONFIG_SHA256=$configHash"
+    "EXE_SEMANTIC_IDENTITY=$exeSemanticIdentity"
+    "EXE_SEMANTIC_BASELINE_VALID=$matchesUpstream"
     "ASSET_SEMANTICS_PRESENT=$assetSemanticsPresent"
     "ASSET_SEMANTICS_STATUS=$assetSemanticsStatus"
     "ASSET_SEMANTICS_SCANNED=$assetSemanticsScanned"
@@ -333,6 +341,8 @@ if($assetSemanticsPresent){
     BuildMatrixId=$matrix
     GitSha=$sha
     ConfigSha256=$configHash
+    ExeSemanticIdentity=$exeSemanticIdentity
+    ExeSemanticBaselineValid=$matchesUpstream
     AssetSemantics=@{
         Present=$assetSemanticsPresent
         Status=$assetSemanticsStatus
