@@ -113,6 +113,15 @@ namespace OutRunVRHudInspector
             return Game::stg_stage_num ? static_cast<int>(*Game::stg_stage_num) : -1;
         }
 
+        bool SemanticIdentityVerified() noexcept
+        {
+            char verified[2]{};
+            return GetEnvironmentVariableA(
+                "OUTRUN_VR_EXE_SEMANTICS_VERIFIED",
+                verified, static_cast<DWORD>(sizeof(verified))) == 1 &&
+                verified[0] == '1';
+        }
+
         void WriteEvent(EventKind kind, const char* eventName,
             const void* returnAddress,
             std::uint32_t arg0, std::uint32_t arg1,
@@ -134,7 +143,9 @@ namespace OutRunVRHudInspector
                 return;
 
             const auto semantic =
-                OutRunVRHudSemantics::ClassifyCaller(callRva);
+                SemanticIdentityVerified()
+                ? OutRunVRHudSemantics::ClassifyCaller(callRva)
+                : OutRunVRHudSemantics::UnknownInfo();
 
             TraceFile
                 << (GetTickCount64() - StartMs) << ','
@@ -216,6 +227,7 @@ namespace OutRunVRHudInspector
                         << "# exe_timestamp="
                         << Util::GetModuleTimestamp(Module::ExeHandle) << "\n"
                         << "# exe_size_of_image=" << ExeSizeOfImage() << "\n"
+                        << "# exe_semantics_verified=" << (SemanticIdentityVerified() ? 1 : 0) << "\n"
                         << "# module_base=runtime-only; all addresses below are ASLR-safe RVAs\n"
                         << "elapsed_ms,event,return_rva,call_rva,known_area,semantic,space_policy,mode,stage,"
                            "arg0,arg1,arg2,arg3,arg4,arg5,arg6,arg7,count\n";
