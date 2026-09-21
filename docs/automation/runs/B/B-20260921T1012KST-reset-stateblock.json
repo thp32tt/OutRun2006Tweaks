@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "role": "B",
+  "runId": "B-20260921T1012KST-reset-stateblock",
+  "startedKst": "2026-09-21T10:12:05+09:00",
+  "baseSha": "8cca78df85fef21a38e66f20fcf9ae867c4779cb",
+  "findingId": "DX9EX-RESET-STATEBLOCK-001",
+  "status": "CAPABILITY_BLOCKED",
+  "evidenceLevel": "PATCH_PREPARED_NOT_APPLIED",
+  "candidateBranch": "vr-d3d9ex-candidate/DX9EX-RESET-STATEBLOCK-001-B-20260921T1012KST",
+  "patchPath": "docs/automation/patches/DX9EX-RESET-STATEBLOCK-001.patch",
+  "analysis": [
+    "R15 captures IDirect3DStateBlock9 D3DSBT_ALL on the fresh promoted device and retains it across ResetEx.",
+    "ResetCompatDeviceR15 applies that same pre-Reset object after the lower ResetEx path returns.",
+    "The safe candidate removes the persistent state-block dependency and relies on documented Reset defaults plus the existing R13 explicit render/stage/sampler replay and R15 explicit transform/material/clip/palette/NPatch/shader-constant replay.",
+    "The current Chat GitHub connector exposes whole-file replacement and Git-data primitives but no apply-patch/edit-range operation. Replacing the 23KB production source from a truncated transport representation would risk accidental source loss, so production source was intentionally not rewritten in this run."
+  ],
+  "requiredValidation": [
+    "Apply the staged patch exactly to src/vr/d3d9/ex_device_upgrade_r15.cpp on this branch using an edit-capable run/tool.",
+    "Verify no R15ClassicAllState, CreateStateBlock(D3DSBT_ALL), or pre-Reset StateBlock Apply remains in R15 reset lifecycle.",
+    "Run DX9Ex Active Validation on the resulting immutable source SHA.",
+    "Keep actual ResetEx/device-loss runtime behavior at NEED_HMD_TEST/LEVEL3 until hardware evidence exists."
+  ],
+  "nextAction": "Next B run should first check whether an edit-capable path or another worker applied this staged patch. If not, apply it without touching integration directly; then trigger candidate CI. Do not mark implemented from this patch artifact alone.",
+  "slotUtilization": {
+    "subBatches": 4,
+    "fallbackStagesAttempted": [
+      "recover latest integration and COMPLETE A handoff",
+      "re-read exact R15 capture/restore/reset call path",
+      "derive minimal removal of cross-Reset state-block lifetime",
+      "persist exact patch and blocker instead of unsafe whole-file rewrite"
+    ],
+    "earlyFinishReason": "Production edit was blocked by the available connector's lack of safe range/patch application; continuing with speculative whole-file reconstruction would create source-corruption risk."
+  }
+}
