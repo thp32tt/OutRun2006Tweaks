@@ -586,6 +586,7 @@ set(outrun2006tweaks_SOURCES
 	"src/vr/d3d9/stereo_renderer_r7.inc"
 	"src/vr/d3d9/vr_pass_policy.hpp"
 	"src/vr/game/game_adapter.hpp"
+	"src/vr/game/render_semantics.hpp"
 	"src/vr/game/outrun_renderer.cpp"
 	"src/vr/game/outrun_renderer_r13.cpp"
 	"src/vr/game/outrun_renderer_r23.cpp"
