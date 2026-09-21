@@ -37,6 +37,8 @@ namespace Settings
 		"Uses immediate D3D9 presentation while VR is enabled so the game source is not hard-capped by the desktop VSync setting before the OpenXR host captures it." };
 	Setting<float> VRHudScale{ "VR", "HudScale", 0.55f,
 		"Projection-space HUD size after the headset-specific asymmetric-FOV correction. Lower values make speed/time/position and menus smaller in the HMD.", Range<float>{ 0.30f, 1.20f } };
+	Setting<float> VRProjectedEffectDistanceMeters{ "VR", "ProjectedEffectDistanceMeters", 30.0f,
+		"Virtual distance for depth-disabled perspective overlays such as distant glow/flare effects. Larger values reduce artificial near-field stereo separation while preserving head rotation/FOV.", Range<float>{ 2.0f, 200.0f } };
 	Setting<bool> VRHeadTracking{ "VR", "HeadTracking", true,
 		"Applies the OpenXR HMD orientation at OutRun's verified D3D9 WorldViewProjection upload." };
 	Setting<bool> VRStereo{ "VR", "Stereo", true,
