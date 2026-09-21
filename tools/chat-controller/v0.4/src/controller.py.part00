@@ -76,10 +76,20 @@ ASSISTANT_MESSAGE_SELECTORS = [
 
 INPUT_SELECTORS = [
     "#prompt-textarea",
+    "div#prompt-textarea[contenteditable='true']",
     "textarea[placeholder*='Message']",
     "textarea[placeholder*='메시지']",
+    "[data-testid='composer'] [contenteditable='true']",
     "[contenteditable='true'][data-lexical-editor='true']",
+    "form [contenteditable='true']",
     "[contenteditable='true']",
+]
+
+LOGGED_IN_SELECTORS = [
+    "button[data-testid*='profile']",
+    "button[aria-label*='profile' i]",
+    "button[aria-label*='account' i]",
+    "nav a[href='/']",
 ]
 
 @dataclass
@@ -217,10 +227,31 @@ async def detect_busy(page: Page) -> bool:
 
 async def ensure_logged_in(page: Page) -> bool:
     await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
-    await page.wait_for_timeout(1500)
-    box = await first_visible(page, INPUT_SELECTORS)
-    if box:
-        return True
-    txt = await page_text(page)
-    if "log in" in txt or "sign up" in txt or "로그인" in txt or "가입" in txt:
-        return False
+
+    # ChatGPT composer/login UI can appear several seconds after DOMContentLoaded.
+    deadline = time.time() + 15
+    while time.time() < deadline:
+        box = await first_visible(page, INPUT_SELECTORS)
+        if box:
+            return True
+
+        txt = await page_text(page)
+        explicit_login = any(x in txt for x in ("log in", "sign up", "로그인", "가입"))
+
+        if not explicit_login:
+            for sel in LOGGED_IN_SELECTORS:
+                try:
+                    loc = page.locator(sel).first
+                    if await loc.count() and await loc.is_visible(timeout=200):
+                        return True
+                except Exception:
+                    continue
+
+        await page.wait_for_timeout(1000)
+
+    write_runtime(
+        status="login_detection_failed",
+        last_action=f"ChatGPT login/composer could not be verified at {page.url}",
+    )
+    return False
+
