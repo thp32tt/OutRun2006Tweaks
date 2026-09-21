@@ -260,7 +260,7 @@ def find_data_xrefs(pe: PE) -> list[dict]:
                 "target": name,
                 "function_start_guess_rva": function_start,
                 "function_bytes96": (
-                    pe.bytes_at_rva(function_start, 96).hex(" ")
+                    pe.bytes_at_rva(function_start, 1536).hex(" ")
                     if function_start is not None else ""
                 ),
                 "prefix8": text[max(0, i - 8):i].hex(" "),
