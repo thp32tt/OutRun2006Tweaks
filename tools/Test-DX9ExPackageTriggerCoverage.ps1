@@ -51,6 +51,6 @@ foreach ($path in @(
 }
 
 Require ($workflow.Contains('Copy-Item tools/analyze_outrun_assets.py (Join-Path $dir ''analyze_outrun_assets.py'')')) "Asset analyzer is not copied into the active tester package"
-Require ($workflow.Contains('''analyze_outrun_assets.py''')) "Asset analyzer is not required by active package validation"
+Require ($workflow.Contains('''OutRunVR-TestProfiles.ps1'',''analyze_outrun_assets.py'',''BUILD_INPUTS.json''')) "Asset analyzer is not required by active package validation"
 
 Write-Host ("DX9Ex dependency closure passed. packagedTools={0}" -f $toolNames.Count)
