@@ -94,6 +94,10 @@ namespace OutRunVRStereo
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
             auto call = [&]() {
+                const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
+                    device, type, startVertex, primitiveCount);
+                if (xyzrhw != E_NOTIMPL)
+                    return xyzrhw;
                 return R34DrawPrimitiveR33Hook.stdcall<HRESULT>(
                     device, type, startVertex, primitiveCount);
             };
@@ -107,6 +111,11 @@ namespace OutRunVRStereo
             UINT startIndex, UINT primitiveCount)
         {
             auto call = [&]() {
+                const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
+                    device, type, baseVertexIndex, minVertexIndex,
+                    numVertices, startIndex, primitiveCount);
+                if (xyzrhw != E_NOTIMPL)
+                    return xyzrhw;
                 return R34DrawIndexedPrimitiveR33Hook.stdcall<HRESULT>(
                     device, type, baseVertexIndex, minVertexIndex,
                     numVertices, startIndex, primitiveCount);
@@ -120,6 +129,10 @@ namespace OutRunVRStereo
             UINT stride)
         {
             auto call = [&]() {
+                const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
+                    device, type, primitiveCount, data, stride);
+                if (xyzrhw != E_NOTIMPL)
+                    return xyzrhw;
                 return R34DrawPrimitiveUPR33Hook.stdcall<HRESULT>(
                     device, type, primitiveCount, data, stride);
             };
@@ -134,6 +147,11 @@ namespace OutRunVRStereo
             const void* vertexData, UINT stride)
         {
             auto call = [&]() {
+                const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
+                    device, type, minVertexIndex, numVertices, primitiveCount,
+                    indexData, indexFormat, vertexData, stride);
+                if (xyzrhw != E_NOTIMPL)
+                    return xyzrhw;
                 return R34DrawIndexedPrimitiveUPR33Hook.stdcall<HRESULT>(
                     device, type, minVertexIndex, numVertices, primitiveCount,
                     indexData, indexFormat, vertexData, stride);
