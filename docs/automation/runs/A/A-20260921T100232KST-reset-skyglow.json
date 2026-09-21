@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "role": "A",
+  "runId": "A-20260921T100232KST-reset-skyglow",
+  "startedKst": "2026-09-21T10:02:32+09:00",
+  "baseSha": "8cca78df85fef21a38e66f20fcf9ae867c4779cb",
+  "findingIds": ["DX9EX-RESET-STATEBLOCK-001", "DX9EX-SKYGLOW-001", "DX9EX-PERF-DISPATCH-001"],
+  "evidenceLevel": "STATICALLY_VERIFIED",
+  "status": "COMPLETE",
+  "queueProposal": [
+    {
+      "id": "DX9EX-RESET-STATEBLOCK-001",
+      "status": "READY",
+      "priority": 10,
+      "preferredRole": "B_FIX",
+      "testLevel": "LEVEL0",
+      "runtimeCandidate": true,
+      "summary": "R15 retains a D3DSBT_ALL state block across ResetEx and applies it afterward. Microsoft Direct3D 9 Reset guidance explicitly requires state blocks associated with the device to be released before Reset. Remove the persistent state-block dependency from the reset boundary; preserve/replay the baseline through explicit value snapshots or a post-Reset state object only after Reset succeeds."
+    },
+    {
+      "id": "DX9EX-SKYGLOW-001",
+      "status": "READY",
+      "priority": 9,
+      "preferredRole": "B_FIX",
+      "testLevel": "LEVEL0",
+      "runtimeCandidate": false,
+      "summary": "SkyGlow ping-pong source selection is reversed: bright writes temp, horizontal blur writes reduced, so one-step must composite reduced; optional vertical blur writes temp, so two-step must composite temp. Current code does the opposite in both cases. SkyGlowFactor=1 therefore composites the pre-horizontal-blur temp texture."
+    },
+    {
+      "id": "DX9EX-PERF-DISPATCH-001",
+      "status": "READY",
+      "priority": 5,
+      "preferredRole": "B_FIX",
+      "testLevel": "LEVEL0",
+      "runtimeCandidate": false,
+      "summary": "Retain as lower priority after reset/SkyGlow: R33 screen-space classification can be threaded into HUD handling to avoid duplicate classification work."
+    }
+  ],
+  "keyEvidence": {
+    "integrationHead": "vr-d3d9ex-focus is 8cca78df85fef21a38e66f20fcf9ae867c4779cb, including the integrated XYZRHW final-owner dispatch fix.",
+    "reset": [
+      "R15CaptureClassicExtraBaseline creates and stores R15ClassicAllState via CreateStateBlock(D3DSBT_ALL).",
+      "ResetCompatDeviceR15 calls the lower ResetEx path while R15ClassicAllState is still retained, then R15RestoreClassicAllState calls Apply on that same object.",
+      "Microsoft IDirect3DDevice9::Reset documentation says applications should release state blocks associated with the device before Reset; Reset also loses all state information.",
+      "CreateStateBlock documentation confirms D3D9 captures requested state values at object creation, so this object is a pre-reset snapshot rather than a post-reset reconstruction."
+    ],
+    "skyGlow": [
+      "Bright pass: source reduced -> destination temp.",
+      "Horizontal blur: source temp -> destination reduced.",
+      "effectiveTwoStep=false initializes compositeSource=temp, skipping horizontal blur output.",
+      "effectiveTwoStep=true performs vertical blur source reduced -> destination temp but then sets compositeSource=reduced, skipping vertical blur output."
+    ]
+  },
+  "disprovedOrDeferred": [
+    "No new defect was promoted in the already-integrated R34 XYZRHW dispatch change during this delta review; its runtime visual result remains NEED_HMD_TEST.",
+    "No production code was changed by role A."
+  ],
+  "blockers": ["Quest 3/VDXR runtime evidence remains required for user-visible visual conclusions."],
+  "nextAction": "B should consume DX9EX-RESET-STATEBLOCK-001 first because it crosses the Reset contract, then DX9EX-SKYGLOW-001. Keep DX9EX-PERF-DISPATCH-001 lower priority. C validates immutable candidate SHAs; visual claims remain NEED_HMD_TEST.",
+  "slotUtilization": {
+    "subBatches": 5,
+    "fallbackStagesAttempted": [
+      "recover durable integration/review state",
+      "delta review after integrated XYZRHW dispatch",
+      "ResetEx/state-block lifetime falsification against Microsoft D3D9 contract",
+      "SkyGlow ping-pong dataflow verification",
+      "remaining READY backlog reprioritization"
+    ],
+    "earlyFinishReason": "High-confidence actionable findings were already isolated; additional rereads of unchanged subsystems would duplicate the prior COMPLETE 12-batch review."
+  }
+}
