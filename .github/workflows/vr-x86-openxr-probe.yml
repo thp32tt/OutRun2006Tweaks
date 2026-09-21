@@ -2,6 +2,12 @@ name: x86 OpenXR Capability Probe
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 'vr-d3d9ex-candidate/**'
+    paths:
+      - 'vrprobe32/**'
+      - '.github/workflows/vr-x86-openxr-probe.yml'
 
 jobs:
   build-win32-probe:
