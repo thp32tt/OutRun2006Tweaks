@@ -2,7 +2,7 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateSet("2d","d3d9","dxvk-safe","dxvk","dx12")]
     [string]$Backend,
-    [ValidateSet("CONTROL","CORRECTNESS","PERFORMANCE")]
+    [ValidateSet("CONTROL","CORRECTNESS","PERFORMANCE","STAGE_DIAGNOSTIC")]
     [string]$TestProfile = "CORRECTNESS"
 )
 
@@ -15,6 +15,8 @@ if (-not (Test-Path $src)) { throw "Backend payload not found: $src" }
 
 $logPatterns=@(
     'OutRun2006Tweaks*.log',
+    'OutRun2006Tweaks-hudtrace*.csv',
+    'OutRun2006Tweaks-xstmap*.csv',
     'outrun-vr-host*.log',
     'outrun-vr-host-pipeline*.log',
     'outrun-vr-watchdog*.log',
