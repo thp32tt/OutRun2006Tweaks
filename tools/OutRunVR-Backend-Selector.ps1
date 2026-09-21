@@ -134,7 +134,7 @@ $title.Location = New-Object System.Drawing.Point(66,18)
 $form.Controls.Add($title)
 
 $hint = New-Object System.Windows.Forms.Label
-$hint.Text = "권장: D3D9Ex REFERENCE + CORRECTNESS 1회. 비교가 필요할 때만 CONTROL/PERFORMANCE."
+$hint.Text = "일반 확인은 CORRECTNESS. 성능 비교는 A_BASELINE -> B_CULLING -> C_CULLING_NO_SSAA -> D_CULLING_NO_SSAA_R512 순서."
 $hint.Font = New-Object System.Drawing.Font("Segoe UI",9)
 $hint.AutoSize = $false
 $hint.Size = New-Object System.Drawing.Size(440,40)
@@ -150,9 +150,14 @@ $form.Controls.Add($profileLabel)
 
 $profileBox = New-Object System.Windows.Forms.ComboBox
 $profileBox.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
-$profileBox.Size = New-Object System.Drawing.Size(255,32)
+$profileBox.Size = New-Object System.Drawing.Size(320,32)
 $profileBox.Location = New-Object System.Drawing.Point(145,96)
 [void]$profileBox.Items.Add("CORRECTNESS")
+[void]$profileBox.Items.Add("A_BASELINE")
+[void]$profileBox.Items.Add("B_CULLING")
+[void]$profileBox.Items.Add("C_CULLING_NO_SSAA")
+[void]$profileBox.Items.Add("D_CULLING_NO_SSAA_R512")
+[void]$profileBox.Items.Add("STAGE_DIAGNOSTIC")
 [void]$profileBox.Items.Add("CONTROL")
 [void]$profileBox.Items.Add("PERFORMANCE")
 $activeInitial = Get-ActiveValues
@@ -162,7 +167,7 @@ $profileBox.SelectedIndex = $idx
 $form.Controls.Add($profileBox)
 
 $profileHelp = New-Object System.Windows.Forms.Label
-$profileHelp.Text = "CORRECTNESS=기본  |  CONTROL=보수적 비교  |  PERFORMANCE=성능 비교"
+$profileHelp.Text = "A=현 설정  |  B=stage culling ON  |  C=B+SSAA OFF  |  D=C+reflection 512"
 $profileHelp.Font = New-Object System.Drawing.Font("Segoe UI",8.5)
 $profileHelp.AutoSize = $true
 $profileHelp.Location = New-Object System.Drawing.Point(42,132)
