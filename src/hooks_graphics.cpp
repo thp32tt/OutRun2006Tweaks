@@ -19,6 +19,7 @@ namespace Settings
 	// so it must be suppressed while true stereo is active or the left-eye bloom
 	// gets composited into the right eye as a translucent ghost.
 	extern Setting<bool> VREnabled;
+	extern Setting<bool> VRAutoEnableWhenHostPresent;
 	extern Setting<bool> VRStereo;
 	extern Setting<bool> VRMirrorFitDesktop;
 	extern Setting<bool> VRDisableDesktopVsync;
