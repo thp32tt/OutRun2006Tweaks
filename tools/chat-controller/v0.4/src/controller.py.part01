@@ -246,9 +246,36 @@ async def _selected_option_matches(page: Page, aliases: list[str]) -> bool:
 
 
 async def ensure_thinking_level(page: Page, requested: str = PREFERRED_THINKING_LEVEL) -> bool:
-    """Set High using either the current slider UI or menu/radio UI, then verify."""
+    """Set High using either the visible model button, slider UI, or menu/radio UI, then verify."""
     requested = requested.strip() or "High"
     aliases = THINKING_LABEL_ALIASES.get(requested, [requested])
+
+    # Current ChatGPT UI exposes the selected reasoning level directly on the
+    # model picker button, e.g. text='High', aria-label='ChatGPT 모델 선택'.
+    direct_selectors = [
+        "button[aria-label='ChatGPT 모델 선택']",
+        "button[aria-label='Select ChatGPT model']",
+        "button[aria-label*='모델 선택']",
+        "button[aria-label*='model' i]",
+    ]
+    for sel in direct_selectors:
+        try:
+            loc = page.locator(sel)
+            count = await loc.count()
+            for i in range(count):
+                item = loc.nth(i)
+                if not await item.is_visible(timeout=150):
+                    continue
+                text = ((await item.inner_text(timeout=400)) or "").strip()
+                if any(text.lower() == label.lower() for label in aliases):
+                    write_runtime(
+                        last_thinking_level_result=f"verified:{requested}:model_button",
+                        thinking_diagnostics=None,
+                        current_url=page.url,
+                    )
+                    return True
+        except Exception:
+            continue
     target_offset = {
         "Instant": 0,
         "Medium": 1,
