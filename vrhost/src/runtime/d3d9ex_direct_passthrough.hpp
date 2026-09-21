@@ -632,6 +632,24 @@ namespace OutRunVrD3D9ExDirectPassthrough
         return CopySharedFrameToSafeEyes(frame);
     }
 
+    inline bool ReleaseDirectProjection() noexcept
+    {
+        using namespace OutRunVrSbsCaptureOverride;
+        if (Release(Projection))
+            return true;
+
+        ++DirectProjectionReleaseFailures;
+        DirectProjectionReleaseQuarantined = true;
+        if (!FirstDirectReleaseFailureLogged)
+        {
+            FirstDirectReleaseFailureLogged = true;
+            std::cerr
+                << "[D3D9Ex R23] DirectGPU projection release failed; "
+                << "quarantining direct owner until fallback releases the image\n";
+        }
+        return false;
+    }
+
     inline bool RenderSafeProjection(XrSession session,
         const XrFrameEndInfo* endInfo,
         XrCompositionLayerProjection& projection,
@@ -658,7 +676,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
             return false;
         if (image >= Projection.rtvs.size())
         {
-            Release(Projection);
+            ReleaseDirectProjection();
             return false;
         }
 
@@ -681,20 +699,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
         // the image again. A failed release leaves Projection acquired/waited;
         // quarantine only the DirectGPU owner and let the established fallback
         // path retry/recover that exact ownership state.
-        const bool released = Release(Projection);
-        if (!released)
-        {
-            ++DirectProjectionReleaseFailures;
-            DirectProjectionReleaseQuarantined = true;
-            if (!FirstDirectReleaseFailureLogged)
-            {
-                FirstDirectReleaseFailureLogged = true;
-                std::cerr
-                    << "[D3D9Ex R23] DirectGPU projection release failed; "
-                    << "quarantining direct owner until fallback releases the image\n";
-            }
+        if (!ReleaseDirectProjection())
             return false;
-        }
         if (!ok)
             return false;
 
