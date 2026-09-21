@@ -107,29 +107,45 @@ if($backend -ne '2d'){
 $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)
 New-Item -ItemType Directory -Force $sessionRoot|Out-Null
 
-$assetAnalyzer=Join-Path $root 'tools/analyze_outrun_assets.py'
-if(!(Test-Path $assetAnalyzer)){
-    $assetAnalyzer=Join-Path $root 'analyze_outrun_assets.py'
-}
-$pythonCmd=Get-Command python -ErrorAction SilentlyContinue
-if($pythonCmd -and (Test-Path $assetAnalyzer)){
-    $assetOut=Join-Path $sessionRoot 'VR_ASSET_SEMANTICS.json'
-    try {
-        & $pythonCmd.Source $assetAnalyzer --root $root --output $assetOut --max-files 5000 --quiet
-        $assetExitCode=$LASTEXITCODE
-        if(Test-Path $assetOut){
-            try {
-                $assetReport=Get-Content $assetOut -Raw|ConvertFrom-Json
-                if($assetReport.status -ne 'COMPLETE'){
-                    Write-Warning ("Asset semantic inventory is {0}: scanned {1}/{2}, parseErrors={3}" -f $assetReport.status,$assetReport.files_scanned,$assetReport.discovered_candidates,$assetReport.parse_error_count)
+$assetDiagnosticsRequested=([string]$profile.Environment['OUTRUN_VR_ASSET_DIAGNOSTICS'] -eq '1')
+$assetDiagnosticsState=if($assetDiagnosticsRequested){'REQUESTED'}else{'SKIPPED_PROFILE'}
+if($assetDiagnosticsRequested){
+    $assetAnalyzer=Join-Path $root 'tools/analyze_outrun_assets.py'
+    if(!(Test-Path $assetAnalyzer)){
+        $assetAnalyzer=Join-Path $root 'analyze_outrun_assets.py'
+    }
+    $pythonCmd=Get-Command python -ErrorAction SilentlyContinue
+    if(!$pythonCmd){
+        $assetDiagnosticsState='UNAVAILABLE_PYTHON'
+        Write-Warning 'Asset semantic diagnostics requested but python is unavailable.'
+    }elseif(!(Test-Path $assetAnalyzer)){
+        $assetDiagnosticsState='UNAVAILABLE_ANALYZER'
+        Write-Warning 'Asset semantic diagnostics requested but analyze_outrun_assets.py is unavailable.'
+    }else{
+        $assetOut=Join-Path $sessionRoot 'VR_ASSET_SEMANTICS.json'
+        try {
+            & $pythonCmd.Source $assetAnalyzer --root $root --output $assetOut --max-files 5000 --quiet
+            $assetExitCode=$LASTEXITCODE
+            $assetDiagnosticsState=if($assetExitCode -eq 0){'COMPLETED'}else{"EXIT_$assetExitCode"}
+            if(Test-Path $assetOut){
+                try {
+                    $assetReport=Get-Content $assetOut -Raw|ConvertFrom-Json
+                    if($assetReport.status){
+                        $assetDiagnosticsState=[string]$assetReport.status
+                    }
+                    if($assetReport.status -ne 'COMPLETE'){
+                        Write-Warning ("Asset semantic inventory is {0}: scanned {1}/{2}, parseErrors={3}" -f $assetReport.status,$assetReport.files_scanned,$assetReport.discovered_candidates,$assetReport.parse_error_count)
+                    }
+                } catch {
+                    $assetDiagnosticsState='REPORT_PARSE_ERROR'
+                    Write-Warning "Asset semantic inventory status could not be parsed: $($_.Exception.Message)"
                 }
-            } catch {
-                Write-Warning "Asset semantic inventory status could not be parsed: $($_.Exception.Message)"
             }
+            if($assetExitCode -ne 0){ Write-Warning "Asset semantic analyzer exited with code $assetExitCode" }
+        } catch {
+            $assetDiagnosticsState='ANALYZER_EXCEPTION'
+            Write-Warning "Asset semantic analyzer failed: $($_.Exception.Message)"
         }
-        if($assetExitCode -ne 0){ Write-Warning "Asset semantic analyzer exited with code $assetExitCode" }
-    } catch {
-        Write-Warning "Asset semantic analyzer failed: $($_.Exception.Message)"
     }
 }
 
@@ -137,6 +153,8 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "backend=$backend"
     "profile=$TestProfile"
     "forceVrDisabled=$($backend -eq '2d')"
+    "assetDiagnosticsRequested=$assetDiagnosticsRequested"
+    "assetDiagnosticsState=$assetDiagnosticsState"
     "arguments=$($gameArgs -join ' ')"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
 Write-Host "Runtime overrides: $($gameArgs -join ' ')"
