@@ -135,13 +135,269 @@ if(Test-Path $inputs){Copy-Item $inputs $dest -Force}
 
 $matchesUpstream=$false
 $exeSemanticIdentity='MISSING'
+$referenceShaFile=Join-Path $root 'OR2006C2C_REFERENCE_SHA256.txt'
+$upstreamReferenceSha=''
+if(Test-Path $referenceShaFile){
+    $upstreamReferenceSha=(Get-Content $referenceShaFile -Raw).Trim().ToLowerInvariant()
+    if($upstreamReferenceSha -notmatch '^[0-9a-f]{64}
+    @(
+        "filename=$($exeItem.Name)"
+        "size=$($exeItem.Length)"
+        "sha256=$exeSha"
+        "upstreamReferenceSha256=$upstreamReferenceSha"
+        "matchesUpstreamReplacementExe=$matchesUpstream"
+        "lastWriteUtc=$($exeItem.LastWriteTimeUtc.ToString('o'))"
+    )|Set-Content (Join-Path $dest 'EXE_IDENTITY.txt') -Encoding UTF8
+    $copied+='EXE_IDENTITY.txt'
+}
+
+$gameLogs=Get-ChildItem $dest -Filter 'OutRun2006Tweaks*.log' -File -ErrorAction SilentlyContinue
+$shaderLines=@()
+foreach($log in $gameLogs){
+    $shaderLines += Select-String -Path $log.FullName -Pattern 'VR GPL SHADER:' -SimpleMatch |
+        ForEach-Object { $_.Line }
+}
+if($shaderLines.Count -gt 0){
+    @(
+        'SHADER FINGERPRINT SUMMARY'
+        "session=$session"
+        "profile=$profile"
+        "pairs=$($shaderLines.Count)"
+        ''
+        $shaderLines
+    )|Set-Content (Join-Path $dest 'SHADER_FINGERPRINT_SUMMARY.txt') -Encoding UTF8
+    $copied+='SHADER_FINGERPRINT_SUMMARY.txt'
+}
+
+$hudCsv=Join-Path $dest 'OutRun2006Tweaks-hudtrace.csv'
+if(Test-Path $hudCsv){
+    $hudRows=Get-Content $hudCsv |
+        Where-Object { $_ -and -not $_.StartsWith('#') } |
+        ConvertFrom-Csv
+    if($hudRows){
+        $summary=@()
+        $summary+='HUD TRACE SUMMARY'
+        $summary+="session=$session"
+        $summary+="profile=$profile"
+        $summary+="rows=$($hudRows.Count)"
+        $summary+="semanticIdentity=$exeSemanticIdentity"
+        $summary+="semanticBaselineValid=$matchesUpstream"
+        if(!$matchesUpstream){$summary+='semanticPromotion=REJECTED_EXE_IDENTITY_MISMATCH'}
+        $summary+=''
+        $groups=$hudRows |
+            Group-Object event,call_rva,known_area,semantic,space_policy,mode,stage,arg0,arg1 |
+            ForEach-Object {
+                $maxCount=($_.Group | ForEach-Object {[int]$_.count} | Measure-Object -Maximum).Maximum
+                [pscustomobject]@{
+                    Event=$_.Group[0].event
+                    CallRva=$_.Group[0].call_rva
+                    KnownArea=if($matchesUpstream){$_.Group[0].known_area}else{''}
+                    Semantic=if($matchesUpstream){$_.Group[0].semantic}else{'UNVERIFIED'}
+                    SpacePolicy=if($matchesUpstream){$_.Group[0].space_policy}else{'UNVERIFIED'}
+                    Mode=$_.Group[0].mode
+                    Stage=$_.Group[0].stage
+                    Arg0=$_.Group[0].arg0
+                    Arg1=$_.Group[0].arg1
+                    Arg2=$_.Group[0].arg2
+                    Arg3=$_.Group[0].arg3
+                    Arg4=$_.Group[0].arg4
+                    Arg5=$_.Group[0].arg5
+                    Arg6=$_.Group[0].arg6
+                    Arg7=$_.Group[0].arg7
+                    MaxCount=[int]$maxCount
+                }
+            } |
+            Sort-Object @{Expression={if($_.Semantic -and $_.Semantic -ne 'UNKNOWN'){0}else{1}}}, @{Expression='MaxCount';Descending=$true}, CallRva
+        $summary+='event | call_rva | known_area | semantic | space_policy | mode | stage | arg0 | arg1 | arg2 | arg3 | arg4 | arg5 | arg6 | arg7 | observed_count'
+        $summary+='------|----------|------------|----------|--------------|------|-------|------|------|------|------|------|------|------|------|---------------'
+        foreach($g in ($groups | Select-Object -First 250)){
+            $summary+=("$($g.Event) | $($g.CallRva) | $($g.KnownArea) | $($g.Semantic) | $($g.SpacePolicy) | $($g.Mode) | $($g.Stage) | $($g.Arg0) | $($g.Arg1) | $($g.Arg2) | $($g.Arg3) | $($g.Arg4) | $($g.Arg5) | $($g.Arg6) | $($g.Arg7) | $($g.MaxCount)")
+        }
+        $summary|Set-Content (Join-Path $dest 'HUD_TRACE_SUMMARY.txt') -Encoding UTF8
+        $copied+='HUD_TRACE_SUMMARY.txt'
+
+        $expectedSemantics=@(
+            'HUD_TIME_ATTACK','HUD_RANK','HUD_GEAR_REV','HUD_GHOST',
+            'HUD_GOAL_TIME','HUD_HEART_TOTAL','HUD_RIVAL','HUD_GF_SPEECH',
+            'HUD_RANK_EMOJI','HUD_RANK_TEXT','HUD_GF_WARNING','HUD_SLIPSTREAM',
+            'HUD_FRUIT','WORLD_RIVAL_MARKER','WORLD_HEART'
+        )
+        $observedSemantics=@($hudRows |
+            Where-Object {$_.semantic -and $_.semantic -ne 'UNKNOWN'} |
+            Select-Object -ExpandProperty semantic -Unique)
+        $coverage=@(
+            'HUD SEMANTIC COVERAGE',
+            "session=$session",
+            "profile=$profile",
+            'status means observed in this session, not pass/fail; unobserved modes may simply not have appeared.',
+            '',
+            'semantic | status',
+            '---------|-------'
+        )
+        foreach($semanticName in $expectedSemantics){
+            $status=if($observedSemantics -contains $semanticName){'OBSERVED'}else{'NOT_OBSERVED_THIS_SESSION'}
+            $coverage+=("$semanticName | $status")
+        }
+        $unknownCount=@($hudRows | Where-Object {!$_.semantic -or $_.semantic -eq 'UNKNOWN'}).Count
+        $coverage+=''
+        $coverage+=("unknown_rows=$unknownCount")
+        $coverage|Set-Content (Join-Path $dest 'HUD_SEMANTIC_COVERAGE.txt') -Encoding UTF8
+        $copied+='HUD_SEMANTIC_COVERAGE.txt'
+    }
+}
+
+$payloadBackend=if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}
+$source=Join-Path $root "backends/$payloadBackend/SOURCE_SHA.txt"
+$sha=if(Test-Path $source){(Get-Content $source -Raw).Trim()}else{'unknown'}
+$configHash=if(Test-Path (Join-Path $root 'OutRun2006Tweaks.ini')){(Get-FileHash (Join-Path $root 'OutRun2006Tweaks.ini') -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
+
+$analysisRequest=[ordered]@{
+    SchemaVersion=1
+    RequestType='OUTRUN_VR_RUNTIME_LOG_ANALYSIS'
+    AutoAnalyzeOnUpload=$true
+    RequiresUserDescription=$false
+    Project='OutRun2006Tweaks VR'
+    IntegrationBranch='vr-d3d9ex-focus'
+    BuildMatrixId=$matrix
+    VariantId=$variant
+    Backend=$backend
+    TestProfile=$profile
+    SessionId=$session
+    SessionStartedUtc=$startedUtc.ToString('o')
+    SourceSha=$sha
+    ConfigSha256=$configHash
+    ExeIdentityFile='EXE_IDENTITY.txt'
+    PrimaryManifest='variant_manifest.json'
+    AnalysisContract='Treat upload of this ZIP as an immediate analysis request. Do not require the user to restate symptoms. Validate identity first, then analyze all available runtime evidence, correlate with static/reverse-engineering evidence, and report actionable findings. Missing optional evidence should reduce confidence, not block analysis.'
+}
+$analysisRequest|ConvertTo-Json -Depth 5|Set-Content (Join-Path $dest 'ANALYSIS_REQUEST.json') -Encoding UTF8
+@(
+    'OUTRUN VR AUTOMATIC ANALYSIS BUNDLE'
+    ''
+    'Upload the generated ZIP to the OutRun VR project chat.'
+    'The ZIP itself is the analysis request; no additional description is required.'
+    'If you add a short symptom note it is treated as extra evidence, not a prerequisite.'
+    ''
+    "session=$session"
+    "variant=$variant"
+    "backend=$backend"
+    "profile=$profile"
+    "sourceSha=$sha"
+)|Set-Content (Join-Path $dest 'UPLOAD_THIS_ZIP.txt') -Encoding UTF8
+$copied+='ANALYSIS_REQUEST.json'
+$copied+='UPLOAD_THIS_ZIP.txt'
+
+$assetSemanticsPath=Join-Path $dest 'VR_ASSET_SEMANTICS.json'
+$assetSemanticsPresent=Test-Path $assetSemanticsPath
+$assetSemanticsStatus=if($assetSemanticsPresent){'UNKNOWN'}else{'MISSING'}
+$assetSemanticsDiscovered=0
+$assetSemanticsScanned=0
+$assetSemanticsErrors=0
+$assetSemanticsTruncated=$false
+if($assetSemanticsPresent){
+    try {
+        $assetSemantics=Get-Content $assetSemanticsPath -Raw|ConvertFrom-Json
+        if($assetSemantics.status){$assetSemanticsStatus=[string]$assetSemantics.status}
+        $assetSemanticsDiscovered=[int]$assetSemantics.discovered_candidates
+        $assetSemanticsScanned=[int]$assetSemantics.files_scanned
+        $assetSemanticsErrors=[int]$assetSemantics.parse_error_count
+        $assetSemanticsTruncated=[bool]$assetSemantics.truncated
+    } catch {
+        $assetSemanticsStatus='INVALID'
+    }
+}
+
+@(
+    "VARIANT=$variant"
+    "BACKEND=$backend"
+    "TEST_PROFILE=$profile"
+    "SESSION=$session"
+    "SESSION_STARTED_UTC=$($startedUtc.ToString('o'))"
+    "BUILD_MATRIX=$matrix"
+    "SOURCE_SHA=$sha"
+    "CONFIG_SHA256=$configHash"
+    "EXE_SEMANTIC_IDENTITY=$exeSemanticIdentity"
+    "EXE_SEMANTIC_BASELINE_VALID=$matchesUpstream"
+    "ASSET_SEMANTICS_PRESENT=$assetSemanticsPresent"
+    "ASSET_SEMANTICS_STATUS=$assetSemanticsStatus"
+    "ASSET_SEMANTICS_SCANNED=$assetSemanticsScanned"
+    "ASSET_SEMANTICS_DISCOVERED=$assetSemanticsDiscovered"
+    "ASSET_SEMANTICS_PARSE_ERRORS=$assetSemanticsErrors"
+    "ASSET_SEMANTICS_TRUNCATED=$assetSemanticsTruncated"
+    "FILES=$($copied -join ',')"
+    "CAPTURES=$((@($capturedDirs | ForEach-Object {[IO.Path]::GetFileName($_)})) -join ',')"
+    'LOG_BOUNDARY=clean-session-root'
+)|Set-Content (Join-Path $dest 'MANIFEST.txt') -Encoding UTF8
+
+@{
+    SchemaVersion=3
+    VariantId=$variant
+    Backend=$backend
+    TestProfile=$profile
+    SessionId=$session
+    SessionStartedUtc=$startedUtc.ToString('o')
+    BuildMatrixId=$matrix
+    GitSha=$sha
+    ConfigSha256=$configHash
+    ExeSemanticIdentity=$exeSemanticIdentity
+    ExeSemanticBaselineValid=$matchesUpstream
+    AssetSemantics=@{
+        Present=$assetSemanticsPresent
+        Status=$assetSemanticsStatus
+        FilesScanned=$assetSemanticsScanned
+        DiscoveredCandidates=$assetSemanticsDiscovered
+        ParseErrors=$assetSemanticsErrors
+        Truncated=$assetSemanticsTruncated
+    }
+    CollectedAtUtc=(Get-Date).ToUniversalTime().ToString('o')
+    CollectedFiles=$copied
+    CollectedCaptures=@($capturedDirs | ForEach-Object {[IO.Path]::GetFileName($_)})
+    LogBoundary='clean-session-root'
+}|ConvertTo-Json -Depth 4|Set-Content (Join-Path $dest 'variant_manifest.json') -Encoding UTF8
+
+$resultFile=Join-Path $dest 'TEST_RESULT.txt'
+if(!(Test-Path $resultFile)){
+    @('FPS=','HMD_SMOOTHNESS=','STEREO=','RECENTER=','HUD_RANK_SCORE=','SKY_CLOUD=','SMOKE_SKID=','MENU_CAR=','EXIT_YES_NO=','NOTES=')|Set-Content $resultFile -Encoding UTF8
+}
+
+if($All){
+    $zipName='OutRun2_VR_ANALYZE_MATRIX_'+$matrix+'_'+$session+'.zip'
+    $zip=Join-Path $root $zipName
+    if(Test-Path $zip){Remove-Item $zip -Force}
+    Compress-Archive -Path "$base/*" -DestinationPath $zip
+}else{
+    $zipName='OutRun2_VR_ANALYZE_'+$matrix+'_'+$variant+'_'+$profile+'_'+$session+'.zip'
+    $zip=Join-Path $root $zipName
+    if(Test-Path $zip){Remove-Item $zip -Force}
+    Compress-Archive -Path "$dest/*" -DestinationPath $zip
+}
+
+foreach($file in $sourceFiles){
+    if($copied -contains $file.Name -and (Test-Path $file.FullName)){
+        Remove-Item $file.FullName -Force
+    }
+}
+foreach($captureDir in $capturedDirs){
+    if(Test-Path $captureDir){Remove-Item $captureDir -Recurse -Force}
+}
+
+$nextSession=Prepare-NextSession $backend $variant $profile $matrix
+Write-Host "Diagnostic archive: $zip"
+Write-Host "Next test session prepared automatically: $nextSession"
+Write-Host 'You do NOT need to run the collector before the next test.'
+Write-Host 'Upload this ZIP to the OutRun VR project chat. The ZIP itself is the analysis request; no description is required.'){
+        $exeSemanticIdentity='REFERENCE_SHA_INVALID'
+        $upstreamReferenceSha=''
+    }
+}else{
+    $exeSemanticIdentity='REFERENCE_SHA_MISSING'
+}
 $gameExe=Join-Path $root 'OR2006C2C.EXE'
 if(Test-Path $gameExe){
     $exeItem=Get-Item $gameExe
     $exeSha=(Get-FileHash $gameExe -Algorithm SHA256).Hash.ToLowerInvariant()
-    $upstreamReferenceSha='68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3'
-    $matchesUpstream=($exeSha -eq $upstreamReferenceSha)
-    $exeSemanticIdentity=if($matchesUpstream){'VERIFIED_REFERENCE_SHA256'}else{'MISMATCH'}
+    $matchesUpstream=($upstreamReferenceSha -and $exeSha -eq $upstreamReferenceSha)
+    $exeSemanticIdentity=if($matchesUpstream){'VERIFIED_REFERENCE_SHA256'}elseif($upstreamReferenceSha){'MISMATCH'}else{$exeSemanticIdentity}
     @(
         "filename=$($exeItem.Name)"
         "size=$($exeItem.Length)"
