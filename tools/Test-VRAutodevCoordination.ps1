@@ -68,6 +68,17 @@ Require ($candidateBranches.Count -le 3) "More than 3 unvalidated runtime candid
 Require ($feedback.integrationBranch -eq "vr-d3d9ex-focus") "Runtime feedback integration branch mismatch"
 Require ($feedback.owner -eq "D_INTEGRATION_PLANNER") "Runtime feedback owner must be D"
 
+Require ($null -ne $state.productionChangeLogging) "Missing productionChangeLogging state contract"
+Require ([int]$state.productionChangeLogging.ledgerIssue -eq 14) "Production change ledger must be Issue #14"
+Require ([bool]$state.productionChangeLogging.directChatUsesDTransactionContract) "Direct chat writes must use the D transaction contract"
+Require ([bool]$state.productionChangeLogging.mandatoryAfterProductionCommit) "Production change logging must be mandatory after commit"
+Require ($state.productionChangeLogging.logCheckpoint -eq "C4.5_LOG") "Production change logging checkpoint must be C4.5_LOG"
+$sourceModes = @($state.productionChangeLogging.appliesTo)
+Require ($sourceModes -contains "SCHEDULED_D") "SCHEDULED_D logging mode missing"
+Require ($sourceModes -contains "CHAT_DIRECT") "CHAT_DIRECT logging mode missing"
+Require ($sourceModes -contains "MANUAL") "MANUAL logging mode missing"
+Require ([int]$state.productionChangeLogging.runtimeProblemAlsoUpdates.regressionLedgerIssue -eq 13) "Runtime regression ledger must remain Issue #13"
+
 $workflowPath = Join-Path $RepoRoot ".github/workflows/vr-dx9ex-active.yml"
 Require (Test-Path $workflowPath) "Missing candidate validation workflow"
 $workflow = Get-Content -Raw $workflowPath
