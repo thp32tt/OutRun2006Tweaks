@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "canonicalExe": {
+    "name": "OR2006C2C.EXE",
+    "provenance": "emoose/OutRun2006Tweaks release v0.1; same replacement EXE URL used by upstream .github/workflows/build.yml",
+    "sourceUrl": "https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.1/OR2006C2C.EXE",
+    "sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "machine": "x86",
+    "imageBase": "0x00400000",
+    "repositoryPolicy": "Do not commit the EXE. Download it transiently in CI and verify the pinned identity before using disassembly evidence.",
+    "size": 3674112,
+    "discoveryEvidence": {
+      "workflowRunId": 35636970665,
+      "policyJobId": 106456657873,
+      "discoveredAtUtc": "2026-09-21T18:13:26Z"
+    }
+  },
+  "contracts": [
+    {
+      "id": "VR-EXE-HUD-SPRITENODE-QUEUE-ENTER",
+      "rva": "0x0002D734",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "535657e824c5ffff8b04ad006c950085",
+      "purpose": "Canonical SpriteNode render-queue entry recovered from original executable analysis.",
+      "sourceBindings": []
+    },
+    {
+      "id": "VR-EXE-HUD-SPRITENODE-NODE-RENDER",
+      "rva": "0x0002D762",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "8b0d20b295008b470c4985c0890d20b2",
+      "purpose": "Canonical SpriteNode node-render point used to distinguish screen HUD from broad draw heuristics.",
+      "sourceBindings": []
+    },
+    {
+      "id": "VR-EXE-HUD-SPRITENODE-QUEUE-EXIT",
+      "rva": "0x0002DCB4",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "5d83c444c3cccccccccccccc576a00c7",
+      "purpose": "Canonical SpriteNode render-queue exit.",
+      "sourceBindings": []
+    },
+    {
+      "id": "VR-EXE-UI-D3DX-MATRIX-TRANSFORM2D",
+      "rva": "0x00039400",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "ff2594625900ff2590625900ff258c62",
+      "purpose": "Original-mod UI scaling inline-hook target.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "D3DXMatrixTransformation2D_Addr = 0x39400"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-UI-DRAW-SPRITE-MATRIX-MID",
+      "rva": "0x0002A556",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "8b53548b43588d7314b9100000008d7c",
+      "purpose": "Original-mod sprite vertex stream mid-hook target.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "draw_sprite_custom_matrix_mid_Addr = 0x2A556"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-UI-CALC3D2D",
+      "rva": "0x00049940",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "8b44240c83ec10508d4c240851e87e0e",
+      "purpose": "Original-mod 3D-to-2D projection hook used by world-attached marker handling.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "Calc3D2D_Addr = 0x49940"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-RIVAL-RANK-TRUNCATE",
+      "rva": "0x000BB046",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "c744242818000000c744242c00000000",
+      "purpose": "Rival rank marker truncation anchor in sub_4BAD20.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "RankMarker_Truncate = 0xBB046"
+        }
+      ]
+    }
+  ]
+}
