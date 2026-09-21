@@ -234,6 +234,7 @@ def render_markdown(report: dict) -> str:
         f"- Image base: {hexrva(report['pe']['image_base'])}",
         f"- Entry RVA: {hexrva(report['pe']['entry_rva'])}",
         f"- SizeOfImage: {report['pe']['size_of_image']} bytes",
+        f"- Known HUD call-site validation: {report['known_call_sites_found']}/{report['known_call_sites_expected']}",
         "",
         "## Known HUD/render anchors",
         "",
@@ -293,6 +294,14 @@ def main() -> int:
 
     data = args.exe.read_bytes()
     pe = parse_pe(data)
+    calls = find_calls(pe)
+    found_call_rvas = {item["call_rva"] for item in calls}
+    missing_known_call_sites = [
+        {"rva": rva, "label": label}
+        for rva, label in KNOWN_CALL_SITES.items()
+        if rva not in found_call_rvas
+    ]
+
     report = {
         "source": str(args.exe),
         "sha256": hashlib.sha256(data).hexdigest(),
@@ -305,7 +314,10 @@ def main() -> int:
             "sections": [s.__dict__ for s in pe.sections],
         },
         "symbols": symbol_fingerprints(pe),
-        "calls": find_calls(pe),
+        "calls": calls,
+        "known_call_sites_expected": len(KNOWN_CALL_SITES),
+        "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
+        "missing_known_call_sites": missing_known_call_sites,
         "hud_strings": extract_hud_strings(pe),
     }
 
@@ -319,7 +331,18 @@ def main() -> int:
 
     print(f"sha256={report['sha256']}")
     print(f"calls={len(report['calls'])}")
+    print(
+        f"known_call_sites={report['known_call_sites_found']}/"
+        f"{report['known_call_sites_expected']}"
+    )
     print(f"hud_strings={len(report['hud_strings'])}")
+    if missing_known_call_sites:
+        for item in missing_known_call_sites:
+            print(
+                f"missing_known_call_site=0x{item['rva']:08X} "
+                f"{item['label']}"
+            )
+        return 2
     return 0
 
 
