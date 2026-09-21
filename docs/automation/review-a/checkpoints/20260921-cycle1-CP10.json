@@ -1,0 +1,1 @@
+{"cycle":"20260921-A1","checkpoint":"CP10","valid_units":10,"target_sha":"b159cc66ca1ed6f25f7a2c7640a246ee1d0b489a","candidate_post_review_sha":"f26188501e1da3dd9139c7a32407bd6353da9780","carried_forward_units":0,"invalidated_units":0,"coverage":"Frame.v2 ownership/run-generation claim, ring seqlock, slot invalidation, publication identity, exact reader stability"}
