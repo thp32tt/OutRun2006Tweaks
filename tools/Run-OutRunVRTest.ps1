@@ -187,7 +187,7 @@ $oldIdentity = @{}
 foreach($key in $identityKeys){ $oldIdentity[$key] = [Environment]::GetEnvironmentVariable($key,'Process') }
 
 $sourceSha='unknown'
-$sourceFile=Join-Path $root ("backends/{0}/SOURCE_SHA.txt" -f $(if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}))
+$sourceFile=Join-Path $root ("backends/{0}/SOURCE_SHA.txt" -f $(if($backend -eq '2d' -or $backend -eq 'd3d9-classic' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}))
 if(Test-Path $sourceFile){ $sourceSha=(Get-Content $sourceFile -Raw).Trim() }
 $env:OUTRUN_VR_SESSION_ID=[string]$state.SessionId
 $env:OUTRUN_VR_VARIANT_ID=[string]$state.VariantId
