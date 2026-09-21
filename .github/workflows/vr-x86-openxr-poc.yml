@@ -1,0 +1,44 @@
+name: x86 OpenXR Direct POC
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - vr-x86-openxr-direct-poc
+    paths:
+      - 'vrx86/**'
+      - '.github/workflows/vr-x86-openxr-poc.yml'
+
+concurrency:
+  group: vr-x86-openxr-poc-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build-win32:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Win32 OpenXR POC
+        shell: pwsh
+        run: cmake -S vrx86 -B build-vrx86 -G "Visual Studio 17 2022" -A Win32
+      - name: Build Win32 OpenXR POC
+        shell: pwsh
+        run: |
+          cmake --build build-vrx86 --config Release --target outrun-vr-x86-openxr-probe
+          if (-not (Test-Path build-vrx86/bin/outrun-vr-x86-openxr-probe.exe)) {
+            throw 'x86 OpenXR POC executable missing'
+          }
+      - name: Stage x86 POC
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force stage | Out-Null
+          Copy-Item build-vrx86/bin/outrun-vr-x86-openxr-probe.exe stage/
+          $loader = Get-ChildItem build-vrx86 -Recurse -Filter openxr_loader.dll | Where-Object { $_.FullName -match '\\Release\\' } | Select-Object -First 1
+          if (-not $loader) { throw 'Win32 openxr_loader.dll missing' }
+          Copy-Item $loader.FullName stage/openxr_loader.dll
+          Set-Content stage/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-x86-OpenXR-POC-${{ github.sha }}
+          path: stage/
+          if-no-files-found: error
