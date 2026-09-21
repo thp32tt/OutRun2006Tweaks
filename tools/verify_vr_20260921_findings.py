@@ -89,6 +89,10 @@ def main() -> int:
     profiles = read("tools/OutRunVR-TestProfiles.ps1")
     if "'-CullingUnionFov=false'" not in profiles:
         raise AssertionError("VR test profiles must keep union culling disabled until visually proven")
+    if "'-DirectGpuOnly=true'" not in profiles:
+        raise AssertionError("D3D9Ex VR test profiles must keep gameplay DirectGPU-only")
+    if "'-DirectGpuOnly=false'" in profiles:
+        raise AssertionError("SBS/Desktop-Duplication gameplay fallback must not be re-enabled by test profiles")
     correctness = profiles.split("Name='CORRECTNESS'", 1)[1]
     for marker in [
         "'-FramerateLimit=60'",
@@ -106,6 +110,11 @@ def main() -> int:
         '"B_CLASSIC_D3D9_VR"',
         '"PreferD3D9Ex" "false"',
         "CLASSIC D3D9 VR",
+    ])
+    require("tools/Select-OutRunVRBackend.ps1", [
+        'Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"',
+        "Never re-open ComposeSbs/Desktop-Duplication",
+        "PC mirror remains mono/left-eye",
     ])
     require("tools/OutRunVR-Backend-Selector.ps1", [
         "CLASSIC D3D9 + VR",
