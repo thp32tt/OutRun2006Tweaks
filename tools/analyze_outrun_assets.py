@@ -327,16 +327,19 @@ def _parse_path(path: Path) -> dict:
 
 
 def scan(root: Path, max_files: int = 5000) -> dict:
+    max_files = max(0, max_files)
     candidates = []
+    discovered_candidates = 0
     for path in root.rglob("*"):
         if not path.is_file():
             continue
         name = path.name.lower()
         if path.suffix.lower() in {".xst", ".pmt", ".xmt"} or name == "mdl.bin":
-            candidates.append(path)
-            if len(candidates) >= max_files:
-                break
+            discovered_candidates += 1
+            if len(candidates) < max_files:
+                candidates.append(path)
 
+    truncated = discovered_candidates > len(candidates)
     results, errors = [], []
     for path in candidates:
         try:
@@ -351,10 +354,24 @@ def scan(root: Path, max_files: int = 5000) -> dict:
                 "path": str(path.relative_to(root)), "error": str(exc),
             })
 
+    if errors:
+        status = "PARTIAL" if results else "FAILED"
+    elif truncated:
+        status = "PARTIAL"
+    else:
+        status = "COMPLETE"
+
     return {
-        "schema": "outrun-vr-asset-semantics-v1",
-        "root": str(root), "files_scanned": len(candidates),
-        "results": results, "errors": errors,
+        "schema": "outrun-vr-asset-semantics-v2",
+        "root": str(root),
+        "status": status,
+        "discovered_candidates": discovered_candidates,
+        "files_scanned": len(candidates),
+        "truncated": truncated,
+        "parse_error_count": len(errors),
+        "max_files": max_files,
+        "results": results,
+        "errors": errors,
     }
 
 
@@ -444,9 +461,14 @@ def main(argv=None) -> int:
         json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
     if not args.quiet:
         print(
-            f"wrote {args.output}: "
-            f"{len(report['results'])} parsed, {len(report['errors'])} errors")
-    return 0
+            f"wrote {args.output}: status={report['status']}, "
+            f"{len(report['results'])} parsed, {report['parse_error_count']} errors, "
+            f"{report['files_scanned']}/{report['discovered_candidates']} scanned")
+    if report["status"] == "COMPLETE":
+        return 0
+    if report["status"] == "PARTIAL":
+        return 2
+    return 1
 
 
 if __name__ == "__main__":
