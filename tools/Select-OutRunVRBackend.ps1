@@ -9,7 +9,7 @@ param(
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $backendRoot = Join-Path $root "backends"
-$payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "dxvk-safe") { "d3d9" } else { $Backend }
+$payloadBackend = if ($Backend -in @("2d", "d3d9-classic", "dxvk-safe")) { "d3d9" } else { $Backend }
 $src = Join-Path $backendRoot $payloadBackend
 if (-not (Test-Path $src)) { throw "Backend payload not found: $src" }
 
