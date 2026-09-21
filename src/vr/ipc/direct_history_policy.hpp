@@ -10,21 +10,10 @@ namespace OutRunVR::DirectHistoryPolicy
         return frame.reserved[RenderFrameStereoIntentEpochIndex];
     }
 
-    inline bool LatestPublicationAllowsHistory(
+    inline bool LatestPublicationDefinesHistoryEpoch(
         const SharedRenderFrameState& latest) noexcept
     {
-        constexpr std::uint32_t required =
-            RenderFrameDirectGpuTransport |
-            RenderFrameStereoComplete |
-            RenderFrameWorldStereo |
-            RenderFrameDrawDuplicated |
-            RenderFrameEffectivePoseValid;
-
-        return StereoIntentEpoch(latest) != 0 &&
-            latest.frameId != 0 &&
-            latest.state == StereoSbsActive &&
-            (latest.flags & RenderFramePresentInFlight) == 0 &&
-            (latest.flags & required) == required;
+        return StereoIntentEpoch(latest) != 0;
     }
 
     inline bool SameStereoIntentEpoch(
