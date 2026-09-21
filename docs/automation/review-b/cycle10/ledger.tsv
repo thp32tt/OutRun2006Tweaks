@@ -1,0 +1,32 @@
+unit_id	source	target	evidence	regression	disposition
+B10-001..B10-120	B9-001..B9-120	206c6c1e	partial-invalidation carry: integration delta touches only r7/r23 startup-deferred-init + verifier/docs; B9 outside-delta rendering/host/performance identities remain unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED
+B10-121	DELTA	PresentDestR23	lower Present executes before EnsureStereoResources	VR-STARTUP-WHITE-001	PASS_PROTECTION
+B10-122	DELTA	PresentDestR23	failed lower Present cannot initialize private stereo resources	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
+B10-123	DELTA	PresentDestR23	non-game-device returns before deferred init	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
+B10-124	DELTA	PresentDestR23	InternalStereoPass excluded by gameDevice classification	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
+B10-125	DELTA	PresentDestR23	StereoResourcesReady prevents redundant per-Present creation	VR-STARTUP-WHITE-001	PASS_PERF
+B10-126	DELTA	PresentDestR23	EnsureStereoResources failure leaves normal lower Present result intact	VR-STARTUP-WHITE-001	PASS_FALLBACK
+B10-127	DELTA	PresentDestR23	deferred-init log executes only on successful resource init	VR-STARTUP-WHITE-001	PASS_DIAGNOSTIC
+B10-128	DELTA	PresentDestR23	resource-init warning does not force false stereo readiness	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
+B10-129	DELTA	PresentDestR23	HostFresh gate remains downstream of deferred initialization	VR-STARTUP-WHITE-001	PASS_CROSS_TRACE
+B10-130	DELTA	PresentDestR23	warmup arm still requires successful Present + HostFresh + RecoveryPending	VR-STARTUP-WHITE-001	PASS_CROSS_TRACE
+B10-131	DELTA	PresentDestR23	R23LastPresentBeginScene update retained after new init block	VR-STARTUP-WHITE-001	PASS_FRAME_BOUNDARY
+B10-132	DELTA	PresentDestR23	HostFresh false still closes R20StereoEligibilityGate	VR-STARTUP-WHITE-001	PASS_CROSS_TRACE
+B10-133	DELTA	InstallStereoHooks	pre-exposure EnsureStereoResources absent	VR-STARTUP-WHITE-001	PASS_PROTECTION
+B10-134	DELTA	InstallStereoHooks	hook transaction remains disabled-first then all-or-rollback	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
+B10-135	DELTA	InstallStereoHooks	failed hook creation rolls back before callbacks arm	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
+B10-136	DELTA	InstallStereoHooks	failed enable rolls back complete base-hook set	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
+B10-137	DELTA	InstallStereoHooks	vertex-shader identity priming preserved without resource allocation	VR-STARTUP-WHITE-001	PASS_STATE
+B10-138	DELTA	InstallStereoHooks	PrimeTrackedRenderStates preserved before device exposure	VR-STARTUP-WHITE-001	PASS_STATE
+B10-139	DELTA	InstallStereoHooks	CreateQuery probe preserved and released	VR-STARTUP-WHITE-001	PASS_STATE
+B10-140	DELTA	InstallStereoHooks	InitializeAuxRenderTargetState remains but private stereo creation is deferred	VR-STARTUP-WHITE-001	PASS_BOUNDARY
+B10-141	DELTA	InstallStereoHooks	EnsureSharedState remains independent of private eye/backbuffer creation	VR-STARTUP-WHITE-001	PASS_CROSS_TRACE
+B10-142	DELTA	InstallStereoHooks	EnsureRenderFrameState remains independent of private eye/backbuffer creation	VR-STARTUP-WHITE-001	PASS_CROSS_TRACE
+B10-143	DELTA	R23Present hook chain	final effective Present owner is explicit location of deferred init	VR-STARTUP-WHITE-001	PASS_OWNER
+B10-144	DELTA	R23Present hook chain	deferred init cannot precede R23PresentR21Hook call	VR-STARTUP-WHITE-001	PASS_FALSIFICATION
+B10-145	DELTA	startup->Present	stored rootCause and current call ordering agree; no new hypothesis minted	VR-STARTUP-WHITE-001	EVIDENCE_AUGMENT
+B10-146	DELTA	startup->Present	knownBad pre-exposure pattern structurally absent from reviewed install path	VR-STARTUP-WHITE-001	STATICALLY_VERIFIED
+B10-147	DELTA	startup->Present	knownGood protection shape reconstructed but runtime claim withheld	VR-STARTUP-WHITE-001	NEED_HMD_TEST
+B10-148	DELTA	frame pacing	new deferred initialization is one-time guarded, not recurring copy/draw amplification	VR-STARTUP-WHITE-001	PASS_PERF
+B10-149	DELTA	fallback	resource init failure explicitly keeps stereo theater/fail-closed	VR-STARTUP-WHITE-001	PASS_FALLBACK
+B10-150	DELTA	regression gate	BUILD_VERIFIED_NEED_HMD_TEST retained; final DONE requires logo->menu/game + gameplay stereo-open	VR-STARTUP-WHITE-001	PASS_GATE
