@@ -217,7 +217,7 @@ namespace OutRunVRHudInspector
                 for (const char* p = text; *p; ++p)
                 {
                     if (*p == '"')
-                        TraceFile << """";
+                        TraceFile << '"' << '"';
                     else
                         TraceFile << *p;
                 }
