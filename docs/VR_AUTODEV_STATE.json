@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-21T18:06:00Z",
+  "updatedUtc": "2026-09-21T18:15:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -338,12 +338,15 @@
     "onWriteFailure": "PUSH_PENDING_OR_CAPABILITY_BLOCKED"
   },
   "binaryContractGate": {
-    "status": "CANDIDATE_DISCOVERY_PENDING",
+    "status": "CANDIDATE_STRICT_VALIDATION_PENDING",
     "canonicalSource": "emoose/OutRun2006Tweaks release v0.1 OR2006C2C.EXE",
     "manifest": "docs/VR_BINARY_CONTRACT.json",
     "verifier": "tools/verify_vr_binary_contract.py",
     "crashRegistry": "docs/VR_CRASH_SIGNATURES.json",
     "requiredFor": "new-or-changed executable-RVA hooks and matching crash-signature revalidation",
-    "exeCommittedToRepo": false
+    "exeCommittedToRepo": false,
+    "canonicalSha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "imageBase": "0x00400000",
+    "discoveryRunId": 35636970665
   }
 }
