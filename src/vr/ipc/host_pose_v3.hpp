@@ -125,19 +125,18 @@ namespace OutRunVR::IpcV3
             if (legacy_.EnsureOpen(OutRunVR::SharedMemoryName))
             {
                 OutRunVR::SharedPoseState legacy{};
-                if (OutRunVR::Ipc::StableRead(legacy_.Get(), legacy) &&
-                    legacy.magic == OutRunVR::SharedMagic &&
-                    legacy.protocolVersion == OutRunVR::SharedProtocolVersion &&
-                    legacy.structSize == sizeof(legacy))
-                {
-                    // A v2/v3 PID mismatch is a host-run boundary, not a reason
-                    // to skip parity checking. Fail closed until both channels
-                    // are owned by the same replacement host.
-                    if (!HostOwnershipMatchesLegacy(state, legacy) ||
-                        !PoseSequenceMatchesLegacy(
-                            state.poseId, legacy.sequence))
-                        return false;
-                }
+                // If the production v2 channel exists, it is the ownership
+                // authority for this shadow phase. An odd takeover sequence,
+                // invalid header or cross-host PID must all fail closed rather
+                // than letting a still-fresh old v3 sample bypass parity.
+                if (!OutRunVR::Ipc::StableRead(legacy_.Get(), legacy) ||
+                    legacy.magic != OutRunVR::SharedMagic ||
+                    legacy.protocolVersion != OutRunVR::SharedProtocolVersion ||
+                    legacy.structSize != sizeof(legacy) ||
+                    !HostOwnershipMatchesLegacy(state, legacy) ||
+                    !PoseSequenceMatchesLegacy(
+                        state.poseId, legacy.sequence))
+                    return false;
             }
 
             out = {};
