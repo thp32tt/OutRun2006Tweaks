@@ -224,13 +224,19 @@ if(Test-Path $hudCsv){
             'HUD_RANK_EMOJI','HUD_RANK_TEXT','HUD_GF_WARNING','HUD_SLIPSTREAM',
             'HUD_FRUIT','WORLD_RIVAL_MARKER','WORLD_HEART'
         )
-        $observedSemantics=@($hudRows |
-            Where-Object {$_.semantic -and $_.semantic -ne 'UNKNOWN'} |
-            Select-Object -ExpandProperty semantic -Unique)
+        $observedSemantics=@()
+        if($matchesUpstream){
+            $observedSemantics=@($hudRows |
+                Where-Object {$_.semantic -and $_.semantic -ne 'UNKNOWN'} |
+                Select-Object -ExpandProperty semantic -Unique)
+        }
         $coverage=@(
             'HUD SEMANTIC COVERAGE',
             "session=$session",
             "profile=$profile",
+            "semanticIdentity=$exeSemanticIdentity",
+            "semanticBaselineValid=$matchesUpstream",
+            $(if($matchesUpstream){'semanticPromotion=VERIFIED'}else{'semanticPromotion=REJECTED_EXE_IDENTITY_MISMATCH'}),
             'status means observed in this session, not pass/fail; unobserved modes may simply not have appeared.',
             '',
             'semantic | status',
@@ -240,7 +246,11 @@ if(Test-Path $hudCsv){
             $status=if($observedSemantics -contains $semanticName){'OBSERVED'}else{'NOT_OBSERVED_THIS_SESSION'}
             $coverage+=("$semanticName | $status")
         }
-        $unknownCount=@($hudRows | Where-Object {!$_.semantic -or $_.semantic -eq 'UNKNOWN'}).Count
+        $unknownCount=if($matchesUpstream){
+            @($hudRows | Where-Object {!$_.semantic -or $_.semantic -eq 'UNKNOWN'}).Count
+        }else{
+            @($hudRows).Count
+        }
         $coverage+=''
         $coverage+=("unknown_rows=$unknownCount")
         $coverage|Set-Content (Join-Path $dest 'HUD_SEMANTIC_COVERAGE.txt') -Encoding UTF8
@@ -248,7 +258,7 @@ if(Test-Path $hudCsv){
     }
 }
 
-$payloadBackend=if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}
+$payloadBackend=if($backend -in @('2d','d3d9-classic','dxvk-safe')){'d3d9'}else{$backend}
 $source=Join-Path $root "backends/$payloadBackend/SOURCE_SHA.txt"
 $sha=if(Test-Path $source){(Get-Content $source -Raw).Trim()}else{'unknown'}
 $configHash=if(Test-Path (Join-Path $root 'OutRun2006Tweaks.ini')){(Get-FileHash (Join-Path $root 'OutRun2006Tweaks.ini') -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
