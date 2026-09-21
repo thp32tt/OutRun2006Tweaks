@@ -1,0 +1,27 @@
+name: x86 OpenXR Capability Probe
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-win32-probe:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Win32 OpenXR probe
+        shell: pwsh
+        run: cmake -S vrprobe32 -B build-vrprobe32 -G "Visual Studio 17 2022" -A Win32
+      - name: Build Win32 OpenXR probe
+        shell: pwsh
+        run: cmake --build build-vrprobe32 --config Release --target outrun-vr-x86-openxr-probe
+      - name: Stage
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force stage | Out-Null
+          Copy-Item build-vrprobe32/bin/Release/outrun-vr-x86-openxr-probe.exe stage/
+          Set-Content stage/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun-x86-OpenXR-Probe-${{ github.sha }}
+          path: stage/
+          if-no-files-found: error
