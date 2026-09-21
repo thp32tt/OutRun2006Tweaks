@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches-ignore: [ vr-d3d9ex-focus, 'vr-d3d9ex-candidate/**' ]
+    branches-ignore: [ vr-d3d9ex-focus, 'vr-d3d9ex-candidate/**', 'vr-d3d9ex-review-*' ]
   pull_request:
 
 jobs:
@@ -202,8 +202,6 @@ jobs:
             src/input_manager.cpp
             src/overlay/input_bindings_ui.cpp
             src/overlay/wheel_setup_ui.cpp
-            src/wheel_profile_store.hpp
-            src/hooks_input.cpp
             src/overlay/settings_ui.cpp
             src/overlay/overlay.cpp
             src/dllmain.cpp
