@@ -43,7 +43,12 @@ namespace Settings
 	Setting<bool> VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", true,
 		"Prefers guarded D3D9Ex shared-eye transport so gameplay can bypass Desktop Duplication. Disable to return to classic D3D9/SBS capture." };
 	Setting<bool> VRDirectGpuOnly{ "VR", "DirectGpuOnly", true,
-		"During gameplay, rejects classic Desktop-Duplication stereo candidates and keeps DirectGPU/cached OpenXR projection paths only. Menus remain mono on a world-fixed LOCAL-space quad." };
+		"During gameplay with PreferD3D9Ex enabled, rejects classic Desktop-Duplication stereo candidates and keeps DirectGPU/cached OpenXR projection paths only. When PreferD3D9Ex is disabled, classic SBS fallback remains eligible." };
+
+	bool VRDirectGpuOnlyEffective() noexcept
+	{
+		return VRPreferD3D9Ex.get() && VRDirectGpuOnly.get();
+	}
 	Setting<bool> VRDisableDesktopDuplication{ "VR", "DisableDesktopDuplication", false,
 		"Diagnostic isolation switch. Disables Desktop Duplication for gameplay and menus. Leave false for normal DirectGPU-only gameplay with visible menus." };
 	Setting<float> VRTargetRefreshRateHz{ "VR", "TargetRefreshRateHz", 0.0f,
@@ -123,9 +128,19 @@ namespace OutRunVR
 				// The host inherits these test-mode switches. Keeping transport
 				// policy in the same [VR] config as D3D9Ex avoids mismatched
 				// game/host modes during cadence testing.
-				SetEnvironmentVariableA("OUTRUN_VR_DIRECT_TRANSPORT", "1");
+				const bool directTransport =
+					Settings::VRPreferD3D9Ex.get();
+				const bool directOnly =
+					Settings::VRDirectGpuOnlyEffective();
+				SetEnvironmentVariableA("OUTRUN_VR_DIRECT_TRANSPORT",
+					directTransport ? "1" : "0");
 				SetEnvironmentVariableA("OUTRUN_VR_DIRECT_ONLY",
-					Settings::VRDirectGpuOnly ? "1" : "0");
+					directOnly ? "1" : "0");
+				if (Settings::VRDirectGpuOnly.get() && !directTransport)
+				{
+					spdlog::warn(
+						"VR transport: DirectGpuOnly ignored because PreferD3D9Ex=false; classic SBS/Desktop Duplication fallback is eligible");
+				}
 				SetEnvironmentVariableA("OUTRUN_VR_DISABLE_DESKTOP_DUPLICATION",
 					Settings::VRDisableDesktopDuplication ? "1" : "0");
 				const std::string refreshHz =
@@ -214,7 +229,7 @@ namespace OutRunVR
 			spdlog::info(
 				"VR: D3D9Ex DirectGPU preference={} directOnly={} refreshOverrideHz={:.1f} cadenceMode={} cadenceTargetHz={:.1f} cadenceMaxHz={:.1f}; target 0 means XR-native render cadence, simulation remains 60 Hz",
 				Settings::VRPreferD3D9Ex.get(),
-				Settings::VRDirectGpuOnly.get(),
+				Settings::VRDirectGpuOnlyEffective(),
 				Settings::VRTargetRefreshRateHz.get(),
 				Settings::VRFrameCadenceMode.get(),
 				Settings::VRFrameCadenceTargetHz.get(),
