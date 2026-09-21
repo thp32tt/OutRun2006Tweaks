@@ -4,6 +4,7 @@ $root=Split-Path -Parent $MyInvocation.MyCommand.Path
 
 $patterns=@(
     'OutRun2006Tweaks*.log',
+    'OutRun2006Tweaks-hudtrace*.csv',
     'outrun-vr-host*.log',
     'outrun-vr-host-pipeline*.log',
     'outrun-vr-watchdog*.log',
@@ -115,6 +116,20 @@ Copy-Item $active $dest -Force
 Copy-Item $sessionState $dest -Force
 $inputs=Join-Path $root 'BUILD_INPUTS.json'
 if(Test-Path $inputs){Copy-Item $inputs $dest -Force}
+
+$gameExe=Join-Path $root 'OR2006C2C.EXE'
+if(Test-Path $gameExe){
+    $exeItem=Get-Item $gameExe
+    $exeSha=(Get-FileHash $gameExe -Algorithm SHA256).Hash.ToLowerInvariant()
+    @(
+        "filename=$($exeItem.Name)"
+        "size=$($exeItem.Length)"
+        "sha256=$exeSha"
+        "lastWriteUtc=$($exeItem.LastWriteTimeUtc.ToString('o'))"
+    )|Set-Content (Join-Path $dest 'EXE_IDENTITY.txt') -Encoding UTF8
+    $copied+='EXE_IDENTITY.txt'
+}
+
 $payloadBackend=if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}
 $source=Join-Path $root "backends/$payloadBackend/SOURCE_SHA.txt"
 $sha=if(Test-Path $source){(Get-Content $source -Raw).Trim()}else{'unknown'}
