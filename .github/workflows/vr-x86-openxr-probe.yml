@@ -24,7 +24,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force stage | Out-Null
-          Copy-Item build-vrprobe32/bin/Release/outrun-vr-x86-openxr-probe.exe stage/
+          Copy-Item build-vrprobe32/bin/outrun-vr-x86-openxr-probe.exe stage/
           Set-Content stage/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
       - uses: actions/upload-artifact@v4
         with:
