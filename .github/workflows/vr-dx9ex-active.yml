@@ -16,6 +16,7 @@ on:
       - 'src/hooks_graphics.cpp'
       - 'src/hooks_exceptions.cpp'
       - 'src/hooks_textures.cpp'
+      - 'src/hooks_uiscaling.cpp'
       - 'vrhost/**'
       - 'CMakeLists.txt'
       - 'cmake.toml'
