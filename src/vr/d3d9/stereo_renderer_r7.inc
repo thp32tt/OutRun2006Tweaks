@@ -1240,23 +1240,61 @@ namespace OutRunVRStereo
 				return false;
 			}
 
-			ReleaseStereoResources();
-			BackBuffer = newBackBuffer;
-			BackBufferDesc = desc;
-
+			// Snapshot every caller-owned state value before releasing or replacing
+			// any existing stereo resource. Unknown state is not equivalent to a
+			// plausible default: fail closed without mutating the live device.
 			IDirect3DSurface9* currentRt = nullptr;
-			if (SUCCEEDED(device->GetRenderTarget(0, &currentRt)) && currentRt)
-				TrackedRenderTarget = currentRt;
-			else
-				ReplaceSurfaceRef(TrackedRenderTarget, BackBuffer);
+			const HRESULT renderTargetStateHr =
+				device->GetRenderTarget(0, &currentRt);
+			if (FAILED(renderTargetStateHr) || !currentRt)
+			{
+				ReleaseCom(currentRt);
+				newBackBuffer->Release();
+				return false;
+			}
 
 			IDirect3DSurface9* currentDepth = nullptr;
 			const HRESULT depthStateHr =
 				device->GetDepthStencilSurface(&currentDepth);
-			if (SUCCEEDED(depthStateHr) && currentDepth)
-				TrackedDepthStencil = currentDepth;
-			else if (depthStateHr == D3DERR_NOTFOUND)
-				TrackedDepthStencil = nullptr;
+			if (FAILED(depthStateHr) && depthStateHr != D3DERR_NOTFOUND)
+			{
+				ReleaseCom(currentDepth);
+				currentRt->Release();
+				newBackBuffer->Release();
+				return false;
+			}
+			if (SUCCEEDED(depthStateHr) && !currentDepth)
+			{
+				currentRt->Release();
+				newBackBuffer->Release();
+				return false;
+			}
+			// D3DERR_NOTFOUND is the one explicit, valid no-depth snapshot.
+			if (depthStateHr == D3DERR_NOTFOUND)
+				currentDepth = nullptr;
+
+			D3DVIEWPORT9 savedViewport{};
+			RECT savedScissor{};
+			DWORD savedScissorEnabled = FALSE;
+			if (FAILED(device->GetViewport(&savedViewport)) ||
+				FAILED(device->GetScissorRect(&savedScissor)) ||
+				FAILED(device->GetRenderState(
+					D3DRS_SCISSORTESTENABLE, &savedScissorEnabled)))
+			{
+				ReleaseCom(currentDepth);
+				currentRt->Release();
+				newBackBuffer->Release();
+				return false;
+			}
+
+			// Only after the full caller snapshot is known may the resource graph be
+			// replaced. The acquired RT/depth references become the tracked restore
+			// state and are owned by ReleaseStereoResources from this point onward.
+			ReleaseStereoResources();
+			BackBuffer = newBackBuffer;
+			TrackedRenderTarget = currentRt;
+			TrackedDepthStencil = currentDepth;
+			BackBufferDesc = desc;
 
 			InitializeAuxRenderTargetState(device);
 
@@ -1278,18 +1316,6 @@ namespace OutRunVRStereo
 					desc.Format, D3DPOOL_DEFAULT, &RightResolveTexture, nullptr)) ||
 				FAILED(RightResolveTexture->GetSurfaceLevel(
 					0, &RightResolveSurface)))
-			{
-				ReleaseStereoResources();
-				return false;
-			}
-
-			D3DVIEWPORT9 savedViewport{};
-			RECT savedScissor{};
-			DWORD savedScissorEnabled = FALSE;
-			if (FAILED(device->GetViewport(&savedViewport)) ||
-				FAILED(device->GetScissorRect(&savedScissor)) ||
-				FAILED(device->GetRenderState(
-					D3DRS_SCISSORTESTENABLE, &savedScissorEnabled)))
 			{
 				ReleaseStereoResources();
 				return false;
