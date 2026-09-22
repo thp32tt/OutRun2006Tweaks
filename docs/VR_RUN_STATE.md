@@ -54,3 +54,21 @@ BLOCKED: 0
 findings_organized: 4
 regression_cases_triggered: 1 (`VR-STARTUP-WHITE-001`)
 exact nextAction: D should consume `c4dd697e...` as the first integration-gate item, verify prospective merged-tree identity/regression evidence, then integrate only if unchanged/fresh gates pass. Next independent source implementation is `VR-SKYGLOW-ACTIVE-GATE-001` with RED -> GREEN oracle first.
+
+
+## Role-C capability/write-discovery rule — 2026-09-22 15:56 KST
+
+- Before declaring CAPABILITY_BLOCKED for review-state persistence, C MUST discover the connected GitHub actions for `fetch_file`, `update_file`, `create_file`, `create_commit`, and `update_ref` as applicable.
+- Existing review/support files MUST be read first to obtain the current blob SHA, then updated sequentially with `update_file`; never run concurrent writes to the same path.
+- After each write, C MUST fetch the exact file from `vr-d3d9ex-review-c` and verify the resulting content/identity before claiming persistence success.
+- CAPABILITY_BLOCKED is valid only after action discovery or an actual permission/API failure. A tool not being initially visible is not sufficient evidence.
+- C persistence is restricted to review/support state on `vr-d3d9ex-review-c`. C MUST NOT write production runtime source, create production candidates, package production builds, or update/integrate `vr-d3d9ex-focus`.
+- If `docs/VR_SUPERPOWERS_POLICY.md` is unavailable on the review branch, C records that policy-read limitation but continues only with already-canonical review/support constraints; it must not infer production authority.
+
+## Role-C stale handoff correction — 2026-09-22 15:56 KST
+
+- Previous handoff entry that treated `c4dd697e2b1f33d3b8af6ab254f378a1cc421248` as awaiting D integration is stale once integration branch HEAD equals that SHA.
+- `VR-NEARPLANE-ACTIVE-GATE-001`: classify as INTEGRATED / BUILD_VERIFIED / NEED_HMD_TEST; remove from READY_FOR_D integration work. Runtime-visible DONE remains gated by Quest3/VDXR evidence.
+- `VR-STARTUP-WHITE-001`: retain stable regression key and USER_RUNTIME_REQUIRED gate.
+- D_IMPLEMENT_NEXT after stale-item removal: P1 `VR-SKYGLOW-ACTIVE-GATE-001`; P2 `CRASH-ZIP-FINALIZE-DURABILITY-001` unless newer evidence changes ordering.
+- This correction is review/support state only and makes no production write.
