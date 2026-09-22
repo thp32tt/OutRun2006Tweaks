@@ -11,7 +11,7 @@
   "adversarial_falsification_units": 13,
   "distinct_function_paths": 14,
   "outside_latest_delta_units": 40,
-  "existing_finding_revalidation_units": 4,
+  "existing_finding_revalidation_units": 6,
   "ledger_path": "docs/automation/review-a/cycle-20260922T1501-rerun/ledger.tsv",
   "status": "IN_PROGRESS"
 }
