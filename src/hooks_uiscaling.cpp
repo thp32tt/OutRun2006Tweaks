@@ -780,9 +780,9 @@ UIScaling UIScaling::instance;
 // Runtime crash signatures at EXE+0x2D738 and EXE+0x2D73E proved that a
 // SafetyHookMid at 0x2D734 can resume inside the relocated prologue.
 // Queue scope therefore starts lazily at the first real node (0x2D762).
-// This is deliberately semantic, not a draw-state heuristic: ordinary nodes are
-// SCREEN_HUD, while exact original-mod world-marker call sites register their
-// nodes as WORLD_BILLBOARD before the queue is rendered.
+// This is deliberately semantic, not a draw-state heuristic. The queue hook
+// only selects an already-tagged node. Untagged nodes remain NONE; exact
+// producer/call-site evidence must register SCREEN_HUD or WORLD_BILLBOARD.
 class VRHudQueueSemanticBridge : public Hook
 {
 	inline static SafetyHookMid QueueNode_hk{};
@@ -828,7 +828,7 @@ public:
 		if (ok)
 		{
 			spdlog::info(
-				"VR HUD SEMANTIC: canonical sprite queue node 0x2D762 + epilogue 0x2DCB4 own SCREEN_HUD; unsafe 0x2D734 entry hook is forbidden; original-mod tagged rival nodes remain WORLD_BILLBOARD");
+				"VR HUD SEMANTIC: sprite queue node 0x2D762 selects explicit tags only; untagged nodes fail closed to NONE; unsafe 0x2D734 entry hook is forbidden; original-mod tagged rival nodes remain WORLD_BILLBOARD");
 		}
 		else
 		{
