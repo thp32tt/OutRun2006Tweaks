@@ -32,6 +32,7 @@ on:
       - 'tools/verify_vr_binary_contract.py'
       - 'tools/verify_vr_architecture.py'
       - 'tools/verify_vr_r32_review.py'
+      - 'tools/verify_vr_nearplane_active_gate.py'
       - 'tools/Test-VRRegressionKnowledge.ps1'
       - '.github/workflows/vr-dx9ex-active.yml'
 
@@ -63,6 +64,9 @@ jobs:
         run: |
           python tools/verify_vr_architecture.py
           python tools/verify_vr_r32_review.py
+      - name: Verify near-plane active stereo eligibility
+        shell: pwsh
+        run: python tools/verify_vr_nearplane_active_gate.py
 
   host:
     needs: policy
