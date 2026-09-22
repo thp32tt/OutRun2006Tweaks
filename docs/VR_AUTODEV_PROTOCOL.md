@@ -23,17 +23,18 @@ This repository-side protocol matches the four Work scheduled roles. The schedul
 - Production runtime source, candidates, build/CI and integration are read-only.
 - Persists evidence/checkpoints only; does not implement fixes.
 
-### C — PERFORMANCE / OPENXR REVIEW
-- Primary role branch: `vr-d3d9ex-review-c`.
-- Reviews performance, frame pacing, copies/waits, OpenXR synchronization, shared-texture protocol and testability.
-- Production runtime source, candidates, build/CI and integration are read-only.
-- Persists evidence/checkpoints only; does not validate or merge production candidates as an owner.
+### C — IMPLEMENT / CANDIDATE / SELF-RECOVERY
+- Creates production changes only on isolated `vr-d3d9ex-candidate/<finding-id>-<run-id>` branches from the exact current integration SHA.
+- Establishes bounded root cause and RED -> GREEN deterministic evidence where possible.
+- May repair the same candidate through bounded corrective revisions after classifying CI/review failures.
+- Never writes directly to `vr-d3d9ex-focus`, never packages/releases, and never marks runtime-visible behavior DONE.
+- Hands exact base SHA, candidate SHA, diff intent, regression keys, verifier/CI evidence and required post-review to D.
 
-### D — FIX / BUILD / VALIDATE / INTEGRATE
-- Sole autonomous writer of production runtime code and consolidated state on `vr-d3d9ex-focus`.
-- D alone creates `vr-d3d9ex-candidate/<finding-id>-<run-id>` branches, implements one coherent hypothesis per candidate, runs candidate CI, validates evidence, and integrates accepted candidates.
-- Consumes A/B/C review records idempotently and requests/reuses independent post-review evidence when required.
-- Two materially different failed fixes for the same unchanged failure => BLOCKED evidence, then move on.
+### D — INDEPENDENT REVIEW / VALIDATE / INTEGRATE / PACKAGE
+- Sole autonomous writer of the integration branch and consolidated project state on `vr-d3d9ex-focus`.
+- Does not normally author product fixes; independently reviews exact C base..candidate changes and returns defects to C.
+- Integrates only after impact-relevant compile/static/regression gates and required A/B review pass.
+- If integration HEAD moved, recreates/rebases safely and reruns affected validation; never treats stale candidate evidence as proof for a changed merged tree.
 - Owns `docs/VR_WORK_QUEUE.json`, `docs/VR_AUTODEV_STATE.json`, `docs/VR_RUNTIME_FEEDBACK.json`, and `docs/VR_SCHEDULED_RUN_HISTORY.md`.
 - Only D freezes/finalizes user test packages.
 - Build success is not HMD correctness; hardware-visible conclusions stay NEED_HMD_TEST.
@@ -281,3 +282,48 @@ Key project adaptations:
 - Hardware-visible final DONE still requires matching Quest 3/VDXR runtime evidence.
 - The existing two-failed-fix BLOCKED rule is stricter than generic Superpowers retry guidance and remains authoritative.
 - Superpowers does not add review quotas or duplicate the central queue; it is concentrated at finding promotion, diagnosis, D implementation, post-fix review, and completion verification.
+
+
+## USER_RUNTIME_VERIFIED baseline and anti-regression lock
+
+The project maintains a protected runtime baseline independently from the moving integration HEAD.
+
+### Baseline identity
+- A baseline is established or advanced only by matching Quest 3 / VDXR USER_RUNTIME_VERIFIED evidence.
+- The baseline identity must include source SHA, package hash, profile, config hash, session/log bundle identity and the set of runtime invariants actually observed as passing.
+- A BUILD_VERIFIED or STATICALLY_VERIFIED candidate can never replace the USER_RUNTIME_VERIFIED baseline.
+- Until a complete current baseline exists, previously USER_RUNTIME_VERIFIED regression cases remain individually protected by their stable regression keys and evidence.
+
+### Protected runtime invariants
+Every runtime behavior positively verified by the user becomes a protected invariant tied to its stable regression key. Examples include startup/logo->menu progression, recenter behavior, sky/cloud world lock, HUD/rank/score stereo behavior, 6th/6 and YES/NO overlays, menu vehicle rendering, smoke/skid/effect placement and accepted frame-pacing behavior.
+
+A later candidate may deliberately change a protected invariant only when the change is explicitly required by a new finding and the old invariant is revalidated or deliberately superseded with matching evidence.
+
+### C candidate gate
+Before C publishes READY_FOR_D_REVIEW it must:
+1. load the current USER_RUNTIME_VERIFIED baseline identity and all protected regression cases;
+2. compute candidate changed paths and intersect them with each case's riskPaths/revalidationTriggers;
+3. run every deterministic/static/build-verifiable regression oracle triggered by that intersection;
+4. record a BASELINE_DELTA stating which protected invariants are unchanged, revalidated, intentionally changed, or still NEED_HMD_TEST;
+5. never silently drop a prior fix while reconstructing/rebasing a candidate.
+
+If a known fixed behavior disappears from candidate source/config/profile, C must treat this as a regression and repair the candidate before handoff.
+
+### D integration gate
+D must reject integration when any of the following is true:
+- a USER_RUNTIME_VERIFIED protected invariant is removed or contradicted without explicit superseding evidence;
+- a triggered deterministic regression oracle fails;
+- candidate/config/profile drift reintroduces a known-bad value or code path;
+- the candidate was validated against a different base and the prospective merged tree has not been revalidated;
+- BASELINE_DELTA is missing for runtime-risking changes.
+
+D must compare both `baseline -> prospective integration tree` and `current integration HEAD -> prospective tree`. New feature correctness alone is insufficient.
+
+### Baseline advancement
+After a Quest 3 / VDXR test passes:
+1. append USER_RUNTIME_VERIFIED evidence to the matching regression cases;
+2. update the protected invariant set;
+3. update the baseline source/package/profile/config/session identity;
+4. only then may the prior baseline be superseded.
+
+A failed HMD test never advances the baseline. It reopens the matching regression key and preserves the last known-good baseline.
