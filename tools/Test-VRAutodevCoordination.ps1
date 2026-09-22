@@ -28,15 +28,19 @@ Require ($state.coordination.reviewBranches.A -eq "vr-d3d9ex-review-a") "A revie
 Require ($state.coordination.reviewBranches.B -eq "vr-d3d9ex-review-b") "B review branch mismatch"
 Require ($state.coordination.reviewBranches.C -eq "vr-d3d9ex-review-c") "C review branch mismatch"
 Require (@($state.coordination.reviewOnlyRoles).Count -eq 3) "A/B/C review-only role set mismatch"
-Require ($state.coordination.productionWriter -eq "D_INTEGRATION_PLANNER") "Only D may be production writer"
-Require ($state.coordination.candidateWriter -eq "D_INTEGRATION_PLANNER") "Only D may own production candidate writes"
+
+$canonicalDWriter = [string]$state.coordination.productionWriter
+Require (-not [string]::IsNullOrWhiteSpace($canonicalDWriter)) "Canonical D production writer is missing"
+Require ($canonicalDWriter -eq "D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE") "Canonical D production writer must be D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE"
+Require ($state.coordination.candidateWriter -eq $canonicalDWriter) "State candidate writer must match canonical D writer"
 Require ([int]$state.coordination.maxIndependentUnvalidatedRuntimeCandidates -eq 3) "Runtime candidate WIP cap must be 3"
 Require ([int]$state.coordination.maxMateriallyDifferentFixAttempts -eq 2) "Fix attempt cap must be 2"
 
 Require ($queue.integrationBranch -eq "vr-d3d9ex-focus") "Queue integration branch mismatch"
-Require ($queue.owner -eq "D_INTEGRATION_PLANNER") "Queue owner must be D_INTEGRATION_PLANNER"
-Require ($queue.policy.productionWriter -eq "D_INTEGRATION_PLANNER") "Queue production writer mismatch"
-Require ($queue.policy.candidateWriter -eq "D_INTEGRATION_PLANNER") "Queue candidate writer mismatch"
+Require ($queue.owner -eq $canonicalDWriter) "Queue owner must match canonical D writer"
+Require ($queue.policy.productionWriter -eq $canonicalDWriter) "Queue production writer mismatch"
+Require ($queue.policy.candidateWriter -eq $canonicalDWriter) "Queue candidate writer mismatch"
+Require ($queue.policy.queueWriter -eq $canonicalDWriter) "Queue writer mismatch"
 Require ([int]$queue.policy.maxIndependentUnvalidatedRuntimeCandidates -eq 3) "Queue WIP cap must be 3"
 Require ([int]$queue.policy.maxMateriallyDifferentFixAttempts -eq 2) "Queue fix-attempt cap must be 2"
 
@@ -56,9 +60,10 @@ foreach ($item in @($queue.items)) {
     }
 }
 
+$legacyRoles = @("D_INTEGRATION_PLANNER","B_FIX","C_VALIDATION","A_REVIEW","C_PERF_REVIEW","B_RENDER_REVIEW","A_ARCH_REVIEW")
 foreach ($item in @($queue.items)) {
     $role = [string]$item.preferredRole
-    Require ($role -notin @("B_FIX","C_VALIDATION","A_REVIEW")) "Legacy active role remains in queue for $($item.id): $role"
+    Require ($role -notin $legacyRoles) "Legacy active role remains in queue for $($item.id): $role"
 }
 
 $candidateBranches = @($queue.candidateWip.candidateBranches)
@@ -66,7 +71,7 @@ Require ([int]$queue.candidateWip.activeUnvalidatedCount -eq $candidateBranches.
 Require ($candidateBranches.Count -le 3) "More than 3 unvalidated runtime candidates"
 
 Require ($feedback.integrationBranch -eq "vr-d3d9ex-focus") "Runtime feedback integration branch mismatch"
-Require ($feedback.owner -eq "D_INTEGRATION_PLANNER") "Runtime feedback owner must be D"
+Require ($feedback.owner -eq $canonicalDWriter) "Runtime feedback owner must match canonical D writer"
 
 Require ($null -ne $state.productionChangeLogging) "Missing productionChangeLogging state contract"
 Require ([int]$state.productionChangeLogging.ledgerIssue -eq 14) "Production change ledger must be Issue #14"
