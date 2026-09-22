@@ -1,0 +1,19 @@
+{
+  "run": "20260923T0500-A",
+  "target": "4ff3a3f98a000e0e19f4ba065066d5f81e9d5417",
+  "review_units_completed": 150,
+  "evidence_rows": 150,
+  "fresh_units": 75,
+  "carried_forward_units": 75,
+  "fresh_cross_subsystem": 25,
+  "fresh_adversarial": 25,
+  "fresh_distinct_paths": 25,
+  "fresh_outside_latest_delta": 67,
+  "existing_finding_revalidation": 1,
+  "post_review": "R32 post-Present publication contract PASS_A",
+  "regression_keys": ["VR-STARTUP-WHITE-001"],
+  "new_findings": [],
+  "runtime_truth": "NEED_HMD_TEST",
+  "status": "COMPLETE",
+  "nextAction": "Review ResetEx/device-lost overlap with R32 direct-ring generation/ACK and host OpenXR recovery; exact C candidate first if A-domain post-review appears."
+}
