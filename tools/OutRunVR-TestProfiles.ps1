@@ -242,13 +242,13 @@ function Get-OutRunVRTestProfile {
                 Name='CORRECTNESS'
                 Description='Default daily Quest/VDXR test. Correctness fixes enabled; risky performance experiments remain opt-in.'
                 Arguments=@(
-                    '-FramerateLimit=0',
-                    '-FramerateFastLoad=3',
-                    '-FramerateInterpolation=true',
-                    '-FramerateUnlockExperimental=true',
-                    '-FrameCadenceMode=1',
+                    '-FramerateLimit=60',
+                    '-FramerateFastLoad=0',
+                    '-FramerateInterpolation=false',
+                    '-FramerateUnlockExperimental=false',
+                    '-FrameCadenceMode=0',
                     '-FrameCadenceTargetHz=0',
-                    '-DisableDesktopVsync=true'
+                    '-DisableDesktopVsync=false'
                 ) + $commonVr
                 Environment=[ordered]@{
                     OUTRUN_VR_TEST_PROFILE='CORRECTNESS'
