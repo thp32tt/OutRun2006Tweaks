@@ -31,15 +31,17 @@ WATCHDOG_BUSY_STALL_MINUTES = int(os.getenv("WATCHDOG_BUSY_STALL_MINUTES", "20")
 WATCHDOG_CHECK_SECONDS = int(os.getenv("WATCHDOG_CHECK_SECONDS", "60"))
 WATCHDOG_MAX_RESUMES_PER_RUN = int(os.getenv("WATCHDOG_MAX_RESUMES_PER_RUN", "1"))
 WATCHDOG_FORCE_STOP_STALLED = os.getenv("WATCHDOG_FORCE_STOP_STALLED", "false").lower() == "true"
-RATE_LIMIT_BACKOFF_MINUTES = [
-    max(1, int(x.strip()))
-    for x in os.getenv("RATE_LIMIT_BACKOFF_MINUTES", "1,2,4,8").split(",")
+RATE_LIMIT_BACKOFF_SECONDS = [
+    max(10, int(x.strip()))
+    for x in os.getenv("RATE_LIMIT_BACKOFF_SECONDS", "30,60,120").split(",")
     if x.strip()
 ]
-if not RATE_LIMIT_BACKOFF_MINUTES:
-    RATE_LIMIT_BACKOFF_MINUTES = [1, 2, 4, 8]
-MIN_SEND_GAP_SECONDS = max(0, int(os.getenv("MIN_SEND_GAP_SECONDS", "90")))
-SLOT_DEDUP_SECONDS = max(0, int(os.getenv("SLOT_DEDUP_SECONDS", "300")))
+if not RATE_LIMIT_BACKOFF_SECONDS:
+    RATE_LIMIT_BACKOFF_SECONDS = [30, 60, 120]
+MIN_SEND_GAP_SECONDS = max(0, int(os.getenv("MIN_SEND_GAP_SECONDS", "45")))
+SLOT_DEDUP_SECONDS = max(0, int(os.getenv("SLOT_DEDUP_SECONDS", "120")))
+FRESH_CHAT_EACH_RUN = os.getenv("FRESH_CHAT_EACH_RUN", "true").lower() == "true"
+RETRY_BUTTON_COOLDOWN_SECONDS = max(10, int(os.getenv("RETRY_BUTTON_COOLDOWN_SECONDS", "45")))
 PREFERRED_THINKING_LEVEL = os.getenv("PREFERRED_THINKING_LEVEL", "High").strip()
 STRICT_THINKING_LEVEL = os.getenv("STRICT_THINKING_LEVEL", "true").lower() == "true"
 PROFILE_DIR = Path("/data/browser-profile")
@@ -147,9 +149,11 @@ runtime = {
     "preferred_thinking_level": PREFERRED_THINKING_LEVEL,
     "strict_thinking_level": STRICT_THINKING_LEVEL,
     "last_thinking_level_result": None,
-    "rate_limit_backoff_minutes": RATE_LIMIT_BACKOFF_MINUTES,
+    "rate_limit_backoff_seconds": RATE_LIMIT_BACKOFF_SECONDS,
     "min_send_gap_seconds": MIN_SEND_GAP_SECONDS,
     "slot_dedup_seconds": SLOT_DEDUP_SECONDS,
+    "fresh_chat_each_run": FRESH_CHAT_EACH_RUN,
+    "retry_button_cooldown_seconds": RETRY_BUTTON_COOLDOWN_SECONDS,
     "rate_limit_attempts": 0,
     "rate_limit_until": None,
 }
@@ -342,19 +346,19 @@ def rate_limit_seconds_remaining(reg: Registry, now: datetime) -> int:
 
 def mark_rate_limit(reg: Registry, now: datetime, source: str):
     reg.rate_limit_attempts = max(0, reg.rate_limit_attempts) + 1
-    idx = min(reg.rate_limit_attempts - 1, len(RATE_LIMIT_BACKOFF_MINUTES) - 1)
-    delay_min = RATE_LIMIT_BACKOFF_MINUTES[idx]
-    reg.rate_limit_until = (now + timedelta(minutes=delay_min)).isoformat()
+    idx = min(reg.rate_limit_attempts - 1, len(RATE_LIMIT_BACKOFF_SECONDS) - 1)
+    delay_sec = RATE_LIMIT_BACKOFF_SECONDS[idx]
+    reg.rate_limit_until = (now + timedelta(seconds=delay_sec)).isoformat()
     save_registry(reg)
     write_runtime(
         status="rate_limited_backoff",
-        last_action=f"Too many requests detected ({source}); backing off {delay_min}m",
+        last_action=f"Too many requests detected ({source}); backing off {delay_sec}s",
         rate_limit_attempts=reg.rate_limit_attempts,
         rate_limit_until=reg.rate_limit_until,
     )
     log.warning(
-        "rate limit detected source=%s attempt=%s backoff=%sm until=%s",
-        source, reg.rate_limit_attempts, delay_min, reg.rate_limit_until,
+        "rate limit detected source=%s attempt=%s backoff=%ss until=%s",
+        source, reg.rate_limit_attempts, delay_sec, reg.rate_limit_until,
     )
 
 
