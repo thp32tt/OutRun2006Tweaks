@@ -6,12 +6,12 @@ N100 리뷰 인박스: GitHub Issue #6 [N100] Continuous Review Inbox
 
 중요: 이 프롬프트는 설정 확인용 턴이 아니다. 아래 규칙은 내부 작업 규칙으로 즉시 적용하고, 규칙을 되풀이하거나 "설정 완료", "이해했다", "다음부터 시작하겠다" 같은 응답으로 턴을 소비하지 않는다. 반드시 이 첫 응답 안에서 실제 GitHub 상태 복구와 심층 리뷰를 바로 시작하고, 가능한 범위까지 실제 finding/evidence 영속화까지 수행한다.
 
-현재 예약작업 역할을 반드시 따른다.
-- A: architecture / state / lifetime 심층리뷰
-- B: rendering / stereo / visual correctness 심층리뷰
-- C: performance / OpenXR / synchronization / testability 심층리뷰
-- 예약 D: 유일한 production INTEGRATE 작업자
-- N100 A: 단일 보조 심층리뷰 전용. production source/candidate/build/CI/merge/integration을 수행하지 않는다.
+현재 예약작업 역할/시간표를 canonical contract로 따른다. 저장소의 과거 문서에 예전 :15/:30 또는 B=FIX/C=Validation/C=Performance 역할이 남아 있어도 현재 contract가 우선이다.
+- A (:00): architecture / state / lifetime / OpenXR lifecycle / synchronization 심층리뷰
+- N100 (:10): 단일 보조 심층리뷰. production source/candidate/build/CI/merge/integration 금지
+- B (:20): rendering / stereo / visual correctness / performance / frame-pacing 심층리뷰
+- C (:35): D candidate exact-SHA post-fix review, changeset sanity, finding dedup/organization, validation preparation, D_IMPLEMENT_NEXT 정리
+- D (:45): 유일한 production IMPLEMENT + BUILD + VALIDATE + INTEGRATE 작업자
 
 
 첫 응답의 실행 순서는 다음과 같다. 이 순서를 설명만 하지 말고 실제로 수행한다.
@@ -23,12 +23,13 @@ N100 리뷰 인박스: GitHub Issue #6 [N100] Continuous Review Inbox
    - docs/VR_SCHEDULED_RUN_HISTORY.md
    - vr-d3d9ex-review-a / -b / -c 최신 ledger/checkpoint
    - D의 candidate / NEEDS_POST_REVIEW / validation 상태
-   - Issue #6의 기존 N100 finding/evidence 댓글
+   - Issue #6의 최신 N100_CHECKPOINT 댓글과 그 이후의 신규 finding/evidence 댓글. 최신 checkpoint가 완전하면 그 이전 댓글 전체를 다시 요약하지 않는다.
 2. 복구한 상태를 이용해 이미 충분히 검토된 key와 DONE/VALIDATED/BLOCKED 항목을 즉시 제외한다.
 3. 아직 덜 검토된 subsystem/cross-subsystem 경계 하나를 선택해 실제 소스/히스토리/상태를 깊게 읽는다.
 4. 근거가 생기면 같은 응답에서 추가 영역으로 계속 이동해 리뷰한다. 한 finding이나 한 subsystem에서 멈추지 않는다.
 5. 새로운 finding 또는 기존 finding을 강화하는 새 evidence가 있으면 같은 실행 중 Issue #6에 append-only 댓글로 저장한다.
-6. 마지막에 실제 저장 성공 여부와 exact nextReview만 간결하게 남긴다.
+6. 마지막에 Issue #6에 append-only `N100_CHECKPOINT` 댓글을 남긴다. 최소 필드: target_sha, processed_through(comment id 또는 timestamp), A/B/C ledger identity, stable_keys_seen 요약, new_or_augmented keys, exact nextReview. 다음 실행은 이 checkpoint 이후 delta만 우선 복구한다.
+7. 실제 저장 성공 여부와 exact nextReview만 간결하게 남긴다.
 
 목표는 예약 A/B/C가 이미 다룬 내용을 반복하는 것이 아니라 아직 충분히 검토되지 않은 영역, cross-subsystem 경계, historical regression, contrary evidence, adversarial falsification에서 실제 수정 가치가 있는 새로운 finding을 지속적으로 발굴하는 것이다.
 
