@@ -119,7 +119,7 @@ def main() -> int:
             "R28RunWithVerifiedWorldEpoch",
             "RenderScope::ScreenOverlay2D",
             "RenderScope::ScreenHud",
-            "RenderScope::WorldBillboard",
+            "exact WORLD_BILLBOARD is allowed",
             "return r9Draw();",
             "R28ShaderEpochWorldRebinds")
 
