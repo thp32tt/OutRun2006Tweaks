@@ -223,11 +223,14 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
                 save_registry(reg)
                 write_runtime(status="retry_wait", last_action=f"Retry visible on slot {slot.name}; cooldown {wait_sec}s")
                 continue
-            if guard:
-                slot.last_result = f"retry_wait:{guard}"
+            retry_guard = send_guard_reason(reg, slot, datetime.now(TZ))
+            if retry_guard and retry_guard.startswith("slot_dedup:"):
+                retry_guard = None
+            if retry_guard:
+                slot.last_result = f"retry_wait:{retry_guard}"
                 slot.last_watchdog_at = now.isoformat()
                 save_registry(reg)
-                write_runtime(status="retry_wait", last_action=f"Retry visible on slot {slot.name}; waiting only for {guard}")
+                write_runtime(status="retry_wait", last_action=f"Retry visible on slot {slot.name}; waiting only for {retry_guard}")
                 continue
             if await click_retry_generation(page):
                 request_now = datetime.now(TZ)
@@ -368,6 +371,24 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
 
     slot = reg.slots[reg.next_slot]
     if FRESH_CHAT_EACH_RUN:
+        previous_page = pages.get(slot.name)
+        if previous_page is not None and not previous_page.is_closed():
+            try:
+                if await detect_busy(previous_page):
+                    slot.last_result = "fresh_chat_deferred_previous_busy"
+                    save_registry(reg)
+                    write_runtime(
+                        status="previous_run_busy",
+                        last_action=f"Slot {slot.name} is still generating; skipped this hourly fresh-chat launch instead of closing active work",
+                        active_slot=slot.name,
+                        active_url=slot.url or previous_page.url,
+                    )
+                    return
+            except Exception:
+                log.exception("failed to check previous slot before fresh-chat rotation slot=%s", slot.name)
+                slot.last_result = "fresh_chat_deferred_busy_check_failed"
+                save_registry(reg)
+                return
         page = await replace_with_fresh_slot_page(context, pages, slot)
         is_new = True
         save_registry(reg)
