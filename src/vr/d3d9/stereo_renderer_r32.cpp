@@ -863,7 +863,15 @@ namespace OutRunVRStereo
 
             R32ProducerFencePending[slotIndex] = false;
             R32ProducerPendingFrame[slotIndex] = 0;
+
+            // Bridge the R32-private producer fence into the base R7/R13
+            // post-Present publication contract. DirectTransportFrameReadyAfterPresent()
+            // is still the sole owner that marks the slot published after Present;
+            // it requires this exact frame identity plus producerPending.
+            slot.producerPending = true;
+            slot.pendingFrameId = frameId;
             slot.frameId = frameId;
+            slot.published = false;
             ActiveDirectTransportSlot = slotIndex;
             return true;
         }
