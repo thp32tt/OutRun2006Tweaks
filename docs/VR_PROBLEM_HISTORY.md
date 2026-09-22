@@ -73,3 +73,28 @@ The visual-contract verifier forbids reintroducing `Module::exe_ptr(0x2D734)` in
 3. Confirm startup passes the prior `0x2D738/0x2D73E` crash boundary.
 4. Confirm HUD semantic rendering becomes active without falling back to broad draw heuristics.
 5. Only after matching user runtime evidence may this case move to DONE.
+
+
+## VR-R47-SPRITEQUEUE-BLANKET-HUD-001 — blanket SpriteNode queue HUD promotion
+
+**Status:** FIX_CANDIDATE / NEED_HMD_TEST  
+**Observed:** 2026-09-22 KST  
+**Severity:** major visual regression
+
+### Runtime proof
+
+On exact runtime SHA `ea7c322d8a21f41e2055214abd28b68c28fbeb19`, true stereo and DirectGPU transport remain live with no right-eye/restore/present failure, but the user still reports broad screen corruption. R47 telemetry reaches `semanticHudAccepted=31681`, `hudWorldLock=31681`, and `semanticUnknownRejected=0`.
+
+The independent HUD trace from the same run contains 1,334 rows yet resolves all expected semantic families as UNKNOWN/NOT_OBSERVED. Production therefore promoted far more strongly than the evidence system could prove.
+
+### Root cause
+
+`ConsumeSpriteNodeScope(... fallback=ScreenHud)` made membership in the canonical SpriteNode renderer sufficient HUD evidence. Every untagged node inherited `SCREEN_HUD`, and R47 applied the finite recentered HUD plane. This violates the already-established rule that unknown draws fail closed and must not be widened merely to find HUD.
+
+### Fix candidate
+
+`vr-d3d9ex-candidate/VR-R47-QUEUE-FAILCLOSED-ea7c322d` changes the fallback to `RenderScope::None`. Only explicitly tagged nodes may become `SCREEN_HUD` or `WORLD_BILLBOARD`. Remaining HUD elements must be discovered by exact producer/caller/XST evidence, not queue-wide promotion.
+
+### Validation requirement
+
+One Quest 3 / VDXR CORRECTNESS race-entry pass must confirm broad world/stage geometry is coherent. It is acceptable for unresolved HUD elements to remain uncorrected in this isolation build; they must not be fixed by widening ownership again.
