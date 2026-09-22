@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "cycle_id": "cycle-20260922T1501-rerun",
+  "role": "A",
+  "target_sha": "c4dd697e2b1f33d3b8af6ab254f378a1cc421248",
+  "checkpoint": "CP30",
+  "review_units_persisted": 30,
+  "fresh_units": 30,
+  "carried_forward_units": 0,
+  "cross_subsystem_units": 10,
+  "adversarial_falsification_units": 10,
+  "distinct_function_paths": 10,
+  "outside_latest_delta_units": 30,
+  "existing_finding_revalidation_units": 4,
+  "ledger_path": "docs/automation/review-a/cycle-20260922T1501-rerun/ledger.tsv",
+  "status": "IN_PROGRESS"
+}
