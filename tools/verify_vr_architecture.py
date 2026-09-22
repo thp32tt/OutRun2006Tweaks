@@ -488,4 +488,32 @@ require("src/vr/core/transport.hpp", "class IFrameProducer", "class IFrameConsum
 require("src/vr/game/game_adapter.hpp", "class IGameAdapter", "latchRenderPose", "buildStereoMatrices")
 require("src/vr/d3d9/stereo_backend.hpp", "class IStereoBackend", "drawWorldStereo", "drawScreenSpaceStereo")
 
+# FixFullPedalChecks is a required two-hook policy. Both accessors must remain
+# vanilla until the complete disabled-first hook pair is enabled and committed.
+bugfix_source = text("src/hooks_bugfixes.cpp")
+if "class FixFullPedalChecks" not in bugfix_source:
+    raise SystemExit("FixFullPedalChecks missing")
+pedal_section = bugfix_source.split("class FixFullPedalChecks", 1)[1].split(
+    "class HideOnlineSigninText", 1
+)[0]
+for marker in (
+    "std::atomic<bool> HooksReady",
+    "safetyhook::InlineHook::StartDisabled",
+    "auto getVolume = safetyhook::create_inline",
+    "auto getVolumeOld = safetyhook::create_inline",
+    "GetVolume.enable().has_value()",
+    "GetVolumeOld.enable().has_value()",
+    "GetVolumeOld = {};",
+    "GetVolume = {};",
+    "HooksReady.store(true, std::memory_order_release);",
+):
+    if marker not in pedal_section:
+        raise SystemExit(f"full-pedal hook transaction invariant missing: {marker}")
+if pedal_section.count("HooksReady.load(std::memory_order_acquire)") < 2:
+    raise SystemExit("both full-pedal callbacks must fail open before Ready commit")
+if pedal_section.find("HooksReady.store(true, std::memory_order_release);") < pedal_section.find(
+    "GetVolumeOld.enable().has_value()"
+):
+    raise SystemExit("full-pedal Ready commits before both hooks enable")
+
 print("VR reconstructed R23/R25 architecture boundary verification passed")
