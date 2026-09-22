@@ -1,0 +1,8 @@
+unit	fresh	lens	evidence
+1-25	1	baseline ancestry	R51 baseline 17ad376 is not ancestor of focus 539fecf; merge-base 4ff3a3f; current focus is divergent from runtime baseline.
+26-50	1	world ownership	Current focus R28RunWithVerifiedWorldEpoch fails closed on every changed shader epoch; R51 runtime baseline restores strictly verified world continuation with HUD veto and exact billboard allowance.
+51-75	1	baseline invariant	Protected R51 world/background/vehicle stereo and frame-stability evidence cannot be inferred for current focus; baseline delta is unresolved and requires preservation/recomposition, not BUILD_VERIFIED substitution.
+76-100	0	carry identity	Startup white-screen deferred-resource invariant retained as protected USER_RUNTIME_VERIFIED baseline; current registry key VR-STARTUP-WHITE-001 remains protected.
+101-125	0	carry identity	DirectGPU ownership/order findings remain separate from R51 world-render lineage; prior exact evidence retained only where blobs/dependencies are unchanged.
+126-150	0	carry identity	Reset/session/reference-space/shared-texture architecture coverage retained after identity validation; no runtime truth promoted from static evidence.
+SUMMARY	-	diversity	fresh=75 carry=75 cross-subsystem=25 adversarial=25 distinct-path/objective=25; baseline-regression-risk=1; new duplicate key=0
