@@ -1,0 +1,151 @@
+unit	fresh	category	path	evidence	verdict
+B25-001	1	cross	baseline:identity	R51 baseline source/package/profile remains authoritative	PASS
+B25-002	1	adversarial	baseline:world-stereo	road/background/vehicle 3D protected independently of HEAD	PASS
+B25-003	1	path	baseline:frame-stability	R51 pacing evidence protected; static cannot supersede	PASS
+B25-004	1	regression	baseline:white-hud	white HUD diplopia remains open, not a current-HEAD success	PASS
+B25-005	1	performance	baseline:rank-anchor	vehicle rank anchoring remains open	PASS
+B25-006	1	cross	compare:topology	R51 and HEAD diverged; merge-base 4ff3a3f confirms non-linear ancestry	PASS
+B25-007	1	adversarial	compare:runtime-files	HEAD-side 14 commits change only workflow/docs/test-policy vs merge base	PASS
+B25-008	1	path	semantic:enum-overlay	R51 ScreenOverlay2D absent on HEAD	BASELINE_REGRESSION
+B25-009	1	regression	semantic:enum-hud	R51 ScreenHud absent on HEAD	BASELINE_REGRESSION
+B25-010	1	performance	semantic:queue-tag	R51 SpriteNodeSemanticTag absent on HEAD	BASELINE_REGRESSION
+B25-011	1	cross	semantic:queue-capacity	R51 fixed 0x230 tag capacity absent on HEAD	BASELINE_REGRESSION
+B25-012	1	adversarial	semantic:register	R51 RegisterSpriteNodeScope absent on HEAD	BASELINE_REGRESSION
+B25-013	1	path	semantic:consume	R51 ConsumeSpriteNodeScope absent on HEAD	BASELINE_REGRESSION
+B25-014	1	regression	semantic:queue-begin	R51 BeginSpriteQueueRender absent on HEAD	BASELINE_REGRESSION
+B25-015	1	performance	semantic:queue-select	R51 SelectSpriteQueueNode absent on HEAD	BASELINE_REGRESSION
+B25-016	1	cross	semantic:queue-end	R51 EndSpriteQueueRender absent on HEAD	BASELINE_REGRESSION
+B25-017	1	adversarial	semantic:zero-disparity	R51 overlay zero-disparity ownership absent on HEAD	BASELINE_REGRESSION
+B25-018	1	path	semantic:hud-corroboration	R51 CorroboratesHud absent on HEAD	BASELINE_REGRESSION
+B25-019	1	regression	semantic:overlay-corroboration	R51 CorroboratesScreenOverlay2D absent on HEAD	BASELINE_REGRESSION
+B25-020	1	performance	semantic:world	WorldBillboard/WorldParticle remain present on HEAD	PASS
+B25-021	1	cross	r30:include	R51 explicit render_semantics include absent on HEAD	PASS
+B25-022	1	adversarial	r30:counter-hud	R51 semantic HUD acceptance counters absent on HEAD	PASS
+B25-023	1	path	r30:counter-overlay	R51 overlay acceptance counters absent on HEAD	PASS
+B25-024	1	regression	r30:safe-base	safe stereo eligibility gates unchanged in inspected prefix	PASS
+B25-025	1	performance	r30:shadow-design	CPU shadow design retained across R51/HEAD inspected prefix	PASS
+B25-026	1	cross	r30:scratch	thread-local scratch lease retained	PASS
+B25-027	1	adversarial	r30:draw-amplification	safe two-eye accounting remains explicit	PASS
+B25-028	1	path	r30:fallback	fallback still marks frame incomplete/mono shadow	PASS
+B25-029	1	regression	r30:recovery	RecoveryPending/PoseWarmup gates retained	PASS
+B25-030	1	performance	r30:occlusion	active occlusion query blocks stereo injection	PASS
+B25-031	1	cross	r30:depth	deferred/nonmirror depth blocks stereo injection	PASS
+B25-032	1	adversarial	r30:aux-rt	auxiliary RT blocks stereo injection	PASS
+B25-033	1	path	r30:backbuffer	screen stereo requires backbuffer target	PASS
+B25-034	1	regression	r30:device	screen stereo requires game device	PASS
+B25-035	1	performance	r30:seed	screen stereo requires R9 stereo seed	PASS
+B25-036	1	cross	r30:install	install state remains explicit atomic Pending	PASS
+B25-037	1	adversarial	r30:buffers	shadow max remains bounded 16MiB	PASS
+B25-038	1	path	r30:lock	draw-time READONLY-lock avoidance design retained	PASS
+B25-039	1	regression	r30:discard	shadow valid-range model supports discard invalidation	PASS
+B25-040	1	performance	r30:nesting	scratch busy guard prevents nested buffer reuse	PASS
+B25-041	1	cross	policy:refresh	TargetRefreshRateHz=0 protected by contract	PASS
+B25-042	1	adversarial	policy:skyglow	SkyGlowFactor=1 protected by contract; known config drift remains actionable	PASS
+B25-043	1	path	policy:runtime-truth	HUD/marker/pacing cannot be DONE without Quest3/VDXR	NEED_HMD_TEST
+B25-044	1	regression	regression:startup-white	startup-white remains protected USER_RUNTIME_VERIFIED pass	PASS
+B25-045	1	performance	regression:key-reuse	R51 stable keys reused; no duplicate IDs	PASS
+B25-046	1	cross	candidate:baseline-delta	any runtime-risk candidate requires BASELINE_DELTA	READY_FOR_C
+B25-047	1	adversarial	candidate:world	candidate must preserve R51 world ownership before HUD fix	READY_FOR_C
+B25-048	1	path	candidate:hud	candidate must narrow SCREEN_HUD to exact white producers	READY_FOR_C
+B25-049	1	regression	candidate:rank	candidate must narrow WORLD_BILLBOARD to exact rank producer/anchor	READY_FOR_C
+B25-050	1	performance	candidate:scissor	candidate must preserve common-centre/no per-eye remap behavior	READY_FOR_C
+B25-051	1	cross	candidate:pacing	candidate must avoid draw amplification beyond eye ownership	READY_FOR_C
+B25-052	1	adversarial	candidate:config	candidate CORRECTNESS config must resolve SkyGlowFactor=1	READY_FOR_C
+B25-053	1	path	candidate:refresh	candidate must retain runtime-selected refresh 0	READY_FOR_C
+B25-054	1	regression	verifier:semantic	LEVEL0 assert overlay/hud enum + queue registry	PASS
+B25-055	1	performance	verifier:world	LEVEL1 assert strict verified world continuation	PASS
+B25-056	1	cross	verifier:unknown	LEVEL1 assert unknown draws remain fail-closed/delegated	PASS
+B25-057	1	adversarial	verifier:draw-count	LEVEL2 counters compare eye draw amplification	PASS
+B25-058	1	path	verifier:pacing	LEVEL2 counters compare waits/copies vs R51	PASS
+B25-059	1	regression	verifier:hmd-hud	LEVEL3 Quest3/VDXR white HUD convergence/scale	NEED_HMD_TEST
+B25-060	1	performance	verifier:hmd-rank	LEVEL3 Quest3/VDXR vehicle rank world anchor	NEED_HMD_TEST
+B25-061	1	cross	verifier:hmd-world	LEVEL3 road/background/vehicle stereo non-regression	NEED_HMD_TEST
+B25-062	1	adversarial	verifier:hmd-pacing	LEVEL3 frame-pacing subjective+counter correlation	NEED_HMD_TEST
+B25-063	1	path	risk:broad-hud	blanket queue->HUD would violate protected world invariant	PASS
+B25-064	1	regression	risk:none-queue	queue->NONE would lose generic 2D asymmetric-FOV ownership	PASS
+B25-065	1	performance	risk:billboard-flatten	rank marker as generic HUD would remain head-following	PASS
+B25-066	1	cross	risk:semantic-loss	building solely from moving HEAD risks dropping R51 machinery	PASS
+B25-067	1	adversarial	risk:ancestry	newer HEAD is not behavioral superset because branches diverged	PASS
+B25-068	1	path	risk:build-proof	BUILD_VERIFIED cannot supersede R51 runtime evidence	PASS
+B25-069	1	regression	risk:config	known-bad SkyGlow factor reintroduction remains baseline risk	PASS
+B25-070	1	performance	risk:refresh	fixed refresh override would violate runtime-selected refresh policy	PASS
+B25-071	1	cross	risk:frame	extra mono/third draw would threaten pacing invariant	PASS
+B25-072	1	adversarial	handoff:C	C owns bounded implementation/candidate/CI, B remains review-only	READY_FOR_C
+B25-073	1	path	handoff:D	D must independently review exact candidate and baseline deltas	PASS
+B25-074	1	regression	scope:production	no production/candidate source modified by B	PASS
+B25-075	1	performance	completion:fresh-floor	75 fresh objectives reached before carry-forward	PASS
+B25-076	0	carry	B24-001	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-001	CARRY_VALID
+B25-077	0	carry	B24-002	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-002	CARRY_VALID
+B25-078	0	carry	B24-003	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-003	CARRY_VALID
+B25-079	0	carry	B24-004	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-004	CARRY_VALID
+B25-080	0	carry	B24-005	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-005	CARRY_VALID
+B25-081	0	carry	B24-006	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-006	CARRY_VALID
+B25-082	0	carry	B24-007	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-007	CARRY_VALID
+B25-083	0	carry	B24-008	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-008	CARRY_VALID
+B25-084	0	carry	B24-009	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-009	CARRY_VALID
+B25-085	0	carry	B24-010	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-010	CARRY_VALID
+B25-086	0	carry	B24-011	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-011	CARRY_VALID
+B25-087	0	carry	B24-012	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-012	CARRY_VALID
+B25-088	0	carry	B24-013	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-013	CARRY_VALID
+B25-089	0	carry	B24-014	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-014	CARRY_VALID
+B25-090	0	carry	B24-015	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-015	CARRY_VALID
+B25-091	0	carry	B24-016	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-016	CARRY_VALID
+B25-092	0	carry	B24-017	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-017	CARRY_VALID
+B25-093	0	carry	B24-018	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-018	CARRY_VALID
+B25-094	0	carry	B24-019	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-019	CARRY_VALID
+B25-095	0	carry	B24-020	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-020	CARRY_VALID
+B25-096	0	carry	B24-021	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-021	CARRY_VALID
+B25-097	0	carry	B24-022	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-022	CARRY_VALID
+B25-098	0	carry	B24-023	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-023	CARRY_VALID
+B25-099	0	carry	B24-024	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-024	CARRY_VALID
+B25-100	0	carry	B24-025	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-025	CARRY_VALID
+B25-101	0	carry	B24-026	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-026	CARRY_VALID
+B25-102	0	carry	B24-027	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-027	CARRY_VALID
+B25-103	0	carry	B24-028	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-028	CARRY_VALID
+B25-104	0	carry	B24-029	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-029	CARRY_VALID
+B25-105	0	carry	B24-030	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-030	CARRY_VALID
+B25-106	0	carry	B24-031	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-031	CARRY_VALID
+B25-107	0	carry	B24-032	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-032	CARRY_VALID
+B25-108	0	carry	B24-033	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-033	CARRY_VALID
+B25-109	0	carry	B24-034	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-034	CARRY_VALID
+B25-110	0	carry	B24-035	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-035	CARRY_VALID
+B25-111	0	carry	B24-036	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-036	CARRY_VALID
+B25-112	0	carry	B24-037	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-037	CARRY_VALID
+B25-113	0	carry	B24-038	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-038	CARRY_VALID
+B25-114	0	carry	B24-039	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-039	CARRY_VALID
+B25-115	0	carry	B24-040	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-040	CARRY_VALID
+B25-116	0	carry	B24-041	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-041	CARRY_VALID
+B25-117	0	carry	B24-042	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-042	CARRY_VALID
+B25-118	0	carry	B24-043	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-043	CARRY_VALID
+B25-119	0	carry	B24-044	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-044	CARRY_VALID
+B25-120	0	carry	B24-045	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-045	CARRY_VALID
+B25-121	0	carry	B24-046	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-046	CARRY_VALID
+B25-122	0	carry	B24-047	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-047	CARRY_VALID
+B25-123	0	carry	B24-048	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-048	CARRY_VALID
+B25-124	0	carry	B24-049	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-049	CARRY_VALID
+B25-125	0	carry	B24-050	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-050	CARRY_VALID
+B25-126	0	carry	B24-051	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-051	CARRY_VALID
+B25-127	0	carry	B24-052	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-052	CARRY_VALID
+B25-128	0	carry	B24-053	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-053	CARRY_VALID
+B25-129	0	carry	B24-054	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-054	CARRY_VALID
+B25-130	0	carry	B24-055	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-055	CARRY_VALID
+B25-131	0	carry	B24-056	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-056	CARRY_VALID
+B25-132	0	carry	B24-057	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-057	CARRY_VALID
+B25-133	0	carry	B24-058	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-058	CARRY_VALID
+B25-134	0	carry	B24-059	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-059	CARRY_VALID
+B25-135	0	carry	B24-060	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-060	CARRY_VALID
+B25-136	0	carry	B24-061	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-061	CARRY_VALID
+B25-137	0	carry	B24-062	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-062	CARRY_VALID
+B25-138	0	carry	B24-063	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-063	CARRY_VALID
+B25-139	0	carry	B24-064	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-064	CARRY_VALID
+B25-140	0	carry	B24-065	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-065	CARRY_VALID
+B25-141	0	carry	B24-066	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-066	CARRY_VALID
+B25-142	0	carry	B24-067	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-067	CARRY_VALID
+B25-143	0	carry	B24-068	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-068	CARRY_VALID
+B25-144	0	carry	B24-069	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-069	CARRY_VALID
+B25-145	0	carry	B24-070	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-070	CARRY_VALID
+B25-146	0	carry	B24-071	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-071	CARRY_VALID
+B25-147	0	carry	B24-072	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-072	CARRY_VALID
+B25-148	0	carry	B24-073	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-073	CARRY_VALID
+B25-149	0	carry	B24-074	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-074	CARRY_VALID
+B25-150	0	carry	B24-075	dependency/content identity revalidated against unchanged integration HEAD 539fecf; prior evidence objective B24-075	CARRY_VALID
