@@ -266,19 +266,17 @@ namespace OutRunVRStereo
             R9Draw&& r9Draw)
         {
             // R51: restore the runtime-proven R28 shader-epoch world continuation,
-            // but never let it steal any queue-owned overlay. Generic 2D HUD,
-            // exact finite HUD and rival-car billboards stay exclusively owned
-            // by R30. Only an otherwise unowned perspective world draw can
-            // inherit a verified epoch, and R28CanRebindVerifiedWorld still
-            // requires exact c64..c67, projection and pose-generation matches.
+            // but never let it steal queue HUD. SCREEN_OVERLAY_2D and SCREEN_HUD
+            // stay exclusively owned by R30. An exact WORLD_BILLBOARD is allowed
+            // through this gate only when the strict c64..c67 + projection +
+            // pose-generation proof succeeds; in that case normal per-eye world
+            // stereo is exactly the desired ownership for a car-attached marker.
             const auto semanticScope =
                 OutRunVR::GameSemantic::CurrentScope;
             if (semanticScope ==
                     OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D ||
                 semanticScope ==
-                    OutRunVR::GameSemantic::RenderScope::ScreenHud ||
-                semanticScope ==
-                    OutRunVR::GameSemantic::RenderScope::WorldBillboard)
+                    OutRunVR::GameSemantic::RenderScope::ScreenHud)
             {
                 ++R28RebindSemanticReject;
                 return E_NOTIMPL;
