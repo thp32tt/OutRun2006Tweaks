@@ -1,0 +1,151 @@
+unit	fresh	category	path	evidence	verdict
+B26-001	1	cross	baseline:identity	registry/protocol: R51 17ad376b USER_RUNTIME baseline remains protected; open HUD/rank defects stay runtime-visible	PASS
+B26-002	1	adversarial	baseline:world-stereo	registry/protocol: R51 17ad376b USER_RUNTIME baseline remains protected; open HUD/rank defects stay runtime-visible	PASS
+B26-003	1	path	baseline:frame-stability	registry/protocol: R51 17ad376b USER_RUNTIME baseline remains protected; open HUD/rank defects stay runtime-visible	PASS
+B26-004	1	regression	baseline:white-hud	registry/protocol: R51 17ad376b USER_RUNTIME baseline remains protected; open HUD/rank defects stay runtime-visible	PASS
+B26-005	1	performance	baseline:rank-anchor	registry/protocol: R51 17ad376b USER_RUNTIME baseline remains protected; open HUD/rank defects stay runtime-visible	PASS
+B26-006	1	cross	semantic:ScreenOverlay2D	R51 render_semantics has explicit screen/queue semantic machinery; current 539fecf header lacks it while retaining world scopes	BASELINE_REGRESSION_RISK
+B26-007	1	adversarial	semantic:ScreenHud	R51 render_semantics has explicit screen/queue semantic machinery; current 539fecf header lacks it while retaining world scopes	BASELINE_REGRESSION_RISK
+B26-008	1	path	semantic:ForceZeroDisparity	R51 render_semantics has explicit screen/queue semantic machinery; current 539fecf header lacks it while retaining world scopes	BASELINE_REGRESSION_RISK
+B26-009	1	regression	semantic:CorroboratesHud	R51 render_semantics has explicit screen/queue semantic machinery; current 539fecf header lacks it while retaining world scopes	BASELINE_REGRESSION_RISK
+B26-010	1	performance	semantic:CorroboratesScreenOverlay2D	R51 render_semantics has explicit screen/queue semantic machinery; current 539fecf header lacks it while retaining world scopes	BASELINE_REGRESSION_RISK
+B26-011	1	cross	semantic:SpriteNodeSemanticTag	R51 render_semantics has explicit screen/queue semantic machinery; current 539fecf header lacks it while retaining world scopes	BASELINE_REGRESSION_RISK
+B26-012	1	adversarial	semantic:RegisterSpriteNodeScope	R51 render_semantics has explicit screen/queue semantic machinery; current 539fecf header lacks it while retaining world scopes	BASELINE_REGRESSION_RISK
+B26-013	1	path	semantic:ConsumeSpriteNodeScope	R51 render_semantics has explicit screen/queue semantic machinery; current 539fecf header lacks it while retaining world scopes	BASELINE_REGRESSION_RISK
+B26-014	1	regression	semantic:BeginSpriteQueueRender	R51 render_semantics has explicit screen/queue semantic machinery; current 539fecf header lacks it while retaining world scopes	BASELINE_REGRESSION_RISK
+B26-015	1	performance	semantic:SelectSpriteQueueNode	R51 render_semantics has explicit screen/queue semantic machinery; current 539fecf header lacks it while retaining world scopes	BASELINE_REGRESSION_RISK
+B26-016	1	cross	semantic:EndSpriteQueueRender	R51 render_semantics has explicit screen/queue semantic machinery; current 539fecf header lacks it while retaining world scopes	BASELINE_REGRESSION_RISK
+B26-017	1	adversarial	semantic:queue-fallback	R51 render_semantics has explicit screen/queue semantic machinery; current 539fecf header lacks it while retaining world scopes	BASELINE_REGRESSION_RISK
+B26-018	1	path	semantic:queue-depth	R51 render_semantics has explicit screen/queue semantic machinery; current 539fecf header lacks it while retaining world scopes	BASELINE_REGRESSION_RISK
+B26-019	1	regression	semantic:tag-capacity	R51 render_semantics has explicit screen/queue semantic machinery; current 539fecf header lacks it while retaining world scopes	BASELINE_REGRESSION_RISK
+B26-020	1	performance	semantic:world-billboard	R51 render_semantics has explicit screen/queue semantic machinery; current 539fecf header lacks it while retaining world scopes	BASELINE_REGRESSION_RISK
+B26-021	1	cross	ui:RankMarker_sprani	R51 hooks_uiscaling adds exact rank-node WORLD_BILLBOARD tagging around known rank producer calls; current HEAD lacks semantic tagging	BASELINE_REGRESSION_RISK
+B26-022	1	adversarial	ui:RankMarker_putClipSprite	R51 hooks_uiscaling adds exact rank-node WORLD_BILLBOARD tagging around known rank producer calls; current HEAD lacks semantic tagging	BASELINE_REGRESSION_RISK
+B26-023	1	path	ui:RankMarker_Truncate	R51 hooks_uiscaling adds exact rank-node WORLD_BILLBOARD tagging around known rank producer calls; current HEAD lacks semantic tagging	BASELINE_REGRESSION_RISK
+B26-024	1	regression	ui:Calc3D2D	R51 hooks_uiscaling adds exact rank-node WORLD_BILLBOARD tagging around known rank producer calls; current HEAD lacks semantic tagging	BASELINE_REGRESSION_RISK
+B26-025	1	performance	ui:rank-call-sites	R51 hooks_uiscaling adds exact rank-node WORLD_BILLBOARD tagging around known rank producer calls; current HEAD lacks semantic tagging	BASELINE_REGRESSION_RISK
+B26-026	1	cross	r30:shadow-lock	R30 source inspected for CPU shadow/scratch or stereo SkyGlow capture/apply/state restoration; fail-open/state restore boundaries traced	PASS
+B26-027	1	adversarial	r30:shadow-unlock	R30 source inspected for CPU shadow/scratch or stereo SkyGlow capture/apply/state restoration; fail-open/state restore boundaries traced	PASS
+B26-028	1	path	r30:shadow-discard	R30 source inspected for CPU shadow/scratch or stereo SkyGlow capture/apply/state restoration; fail-open/state restore boundaries traced	PASS
+B26-029	1	regression	r30:shadow-read	R30 source inspected for CPU shadow/scratch or stereo SkyGlow capture/apply/state restoration; fail-open/state restore boundaries traced	PASS
+B26-030	1	performance	r30:scratch-lease	R30 source inspected for CPU shadow/scratch or stereo SkyGlow capture/apply/state restoration; fail-open/state restore boundaries traced	PASS
+B26-031	1	cross	r30:skyglow-capture	R30 source inspected for CPU shadow/scratch or stereo SkyGlow capture/apply/state restoration; fail-open/state restore boundaries traced	PASS
+B26-032	1	adversarial	r30:skyglow-apply	R30 source inspected for CPU shadow/scratch or stereo SkyGlow capture/apply/state restoration; fail-open/state restore boundaries traced	PASS
+B26-033	1	path	r30:skyglow-stateblock	R30 source inspected for CPU shadow/scratch or stereo SkyGlow capture/apply/state restoration; fail-open/state restore boundaries traced	PASS
+B26-034	1	regression	r30:skyglow-rt-restore	R30 source inspected for CPU shadow/scratch or stereo SkyGlow capture/apply/state restoration; fail-open/state restore boundaries traced	PASS
+B26-035	1	performance	r30:skyglow-depth-restore	R30 source inspected for CPU shadow/scratch or stereo SkyGlow capture/apply/state restoration; fail-open/state restore boundaries traced	PASS
+B26-036	1	cross	r30:skyglow-viewport-restore	R30 source inspected for CPU shadow/scratch or stereo SkyGlow capture/apply/state restoration; fail-open/state restore boundaries traced	PASS
+B26-037	1	adversarial	r30:skyglow-two-step	R30 source inspected for CPU shadow/scratch or stereo SkyGlow capture/apply/state restoration; fail-open/state restore boundaries traced	PASS
+B26-038	1	path	r30:skyglow-factor1	R30 source inspected for CPU shadow/scratch or stereo SkyGlow capture/apply/state restoration; fail-open/state restore boundaries traced	PASS
+B26-039	1	regression	r30:skyglow-stereo-gate	R30 source inspected for CPU shadow/scratch or stereo SkyGlow capture/apply/state restoration; fail-open/state restore boundaries traced	PASS
+B26-040	1	performance	r30:skyglow-failure	R30 source inspected for CPU shadow/scratch or stereo SkyGlow capture/apply/state restoration; fail-open/state restore boundaries traced	PASS
+B26-041	1	cross	topology:merge-base	HEAD 539fecf vs R51 candidate diverged at merge-base 4ff3a3f; compare shows runtime rendering paths differ	PASS
+B26-042	1	adversarial	topology:diverged	HEAD 539fecf vs R51 candidate diverged at merge-base 4ff3a3f; compare shows runtime rendering paths differ	PASS
+B26-043	1	path	candidate:runtime-paths	HEAD 539fecf vs R51 candidate diverged at merge-base 4ff3a3f; compare shows runtime rendering paths differ	PASS
+B26-044	1	regression	candidate:visual-contract	HEAD 539fecf vs R51 candidate diverged at merge-base 4ff3a3f; compare shows runtime rendering paths differ	PASS
+B26-045	1	performance	candidate:uiscaling-delta	HEAD 539fecf vs R51 candidate diverged at merge-base 4ff3a3f; compare shows runtime rendering paths differ	PASS
+B26-046	1	cross	candidate:r30-delta	HEAD 539fecf vs R51 candidate diverged at merge-base 4ff3a3f; compare shows runtime rendering paths differ	PASS
+B26-047	1	adversarial	candidate:safe-delta	HEAD 539fecf vs R51 candidate diverged at merge-base 4ff3a3f; compare shows runtime rendering paths differ	PASS
+B26-048	1	path	candidate:semantics-delta	HEAD 539fecf vs R51 candidate diverged at merge-base 4ff3a3f; compare shows runtime rendering paths differ	PASS
+B26-049	1	regression	candidate:hud-semantics-delta	HEAD 539fecf vs R51 candidate diverged at merge-base 4ff3a3f; compare shows runtime rendering paths differ	PASS
+B26-050	1	performance	candidate:graphics-delta	HEAD 539fecf vs R51 candidate diverged at merge-base 4ff3a3f; compare shows runtime rendering paths differ	PASS
+B26-051	1	cross	reg:startup-white	registry/protocol: R51 17ad376b USER_RUNTIME baseline remains protected; open HUD/rank defects stay runtime-visible	PASS
+B26-052	1	adversarial	reg:r51-world	registry/protocol: R51 17ad376b USER_RUNTIME baseline remains protected; open HUD/rank defects stay runtime-visible	PASS
+B26-053	1	path	reg:r51-pacing	registry/protocol: R51 17ad376b USER_RUNTIME baseline remains protected; open HUD/rank defects stay runtime-visible	PASS
+B26-054	1	regression	reg:r51-white-hud	registry/protocol: R51 17ad376b USER_RUNTIME baseline remains protected; open HUD/rank defects stay runtime-visible	PASS
+B26-055	1	performance	reg:r51-rank	registry/protocol: R51 17ad376b USER_RUNTIME baseline remains protected; open HUD/rank defects stay runtime-visible	PASS
+B26-056	1	cross	config:TargetRefreshRateHz	protocol protected config invariant checked: preserve runtime-selected refresh and SkyGlowFactor=1 in next candidate	PASS
+B26-057	1	adversarial	config:SkyGlowFactor	protocol protected config invariant checked: preserve runtime-selected refresh and SkyGlowFactor=1 in next candidate	PASS
+B26-058	1	path	policy:build-vs-runtime	registry/protocol: R51 17ad376b USER_RUNTIME baseline remains protected; open HUD/rank defects stay runtime-visible	PASS
+B26-059	1	regression	policy:baseline-delta	registry/protocol: R51 17ad376b USER_RUNTIME baseline remains protected; open HUD/rank defects stay runtime-visible	PASS
+B26-060	1	performance	policy:need-hmd-test	registry/protocol: R51 17ad376b USER_RUNTIME baseline remains protected; open HUD/rank defects stay runtime-visible	PASS
+B26-061	1	cross	boundary:world-to-hud	contrary-evidence trace: exact semantic ownership is required; broad queue/HUD inference would contradict protected R51 world stereo	BASELINE_REGRESSION_RISK
+B26-062	1	adversarial	boundary:hud-to-world	contrary-evidence trace: exact semantic ownership is required; broad queue/HUD inference would contradict protected R51 world stereo	BASELINE_REGRESSION_RISK
+B26-063	1	path	boundary:marker-anchor	contrary-evidence trace: exact semantic ownership is required; broad queue/HUD inference would contradict protected R51 world stereo	BASELINE_REGRESSION_RISK
+B26-064	1	regression	boundary:queue-ownership	contrary-evidence trace: exact semantic ownership is required; broad queue/HUD inference would contradict protected R51 world stereo	BASELINE_REGRESSION_RISK
+B26-065	1	performance	boundary:screen-affine	contrary-evidence trace: exact semantic ownership is required; broad queue/HUD inference would contradict protected R51 world stereo	BASELINE_REGRESSION_RISK
+B26-066	1	cross	perf:draw-amplification	performance trace checks draw/copy/lock/post-process cost against protected R51 frame-stability invariant	PASS
+B26-067	1	adversarial	perf:gpu-lock-removal	performance trace checks draw/copy/lock/post-process cost against protected R51 frame-stability invariant	PASS
+B26-068	1	path	perf:cpu-shadow	performance trace checks draw/copy/lock/post-process cost against protected R51 frame-stability invariant	PASS
+B26-069	1	regression	perf:skyglow-bandwidth	performance trace checks draw/copy/lock/post-process cost against protected R51 frame-stability invariant	PASS
+B26-070	1	performance	perf:stateblock	performance trace checks draw/copy/lock/post-process cost against protected R51 frame-stability invariant	PASS
+B26-071	1	cross	falsify:blanket-hud	contrary-evidence trace: exact semantic ownership is required; broad queue/HUD inference would contradict protected R51 world stereo	BASELINE_REGRESSION_RISK
+B26-072	1	adversarial	falsify:generic-overlay	contrary-evidence trace: exact semantic ownership is required; broad queue/HUD inference would contradict protected R51 world stereo	BASELINE_REGRESSION_RISK
+B26-073	1	path	falsify:rank-screen	contrary-evidence trace: exact semantic ownership is required; broad queue/HUD inference would contradict protected R51 world stereo	BASELINE_REGRESSION_RISK
+B26-074	1	regression	falsify:build-supersedes-runtime	contrary-evidence trace: exact semantic ownership is required; broad queue/HUD inference would contradict protected R51 world stereo	PASS
+B26-075	1	performance	falsify:head-recency	contrary-evidence trace: exact semantic ownership is required; broad queue/HUD inference would contradict protected R51 world stereo	PASS
+B26-076	0	carry	B25-001	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-077	0	carry	B25-002	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-078	0	carry	B25-003	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-079	0	carry	B25-004	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-080	0	carry	B25-005	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-081	0	carry	B25-006	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-082	0	carry	B25-007	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-083	0	carry	B25-008	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-084	0	carry	B25-009	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-085	0	carry	B25-010	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-086	0	carry	B25-011	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-087	0	carry	B25-012	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-088	0	carry	B25-013	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-089	0	carry	B25-014	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-090	0	carry	B25-015	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-091	0	carry	B25-016	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-092	0	carry	B25-017	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-093	0	carry	B25-018	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-094	0	carry	B25-019	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-095	0	carry	B25-020	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-096	0	carry	B25-021	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-097	0	carry	B25-022	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-098	0	carry	B25-023	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-099	0	carry	B25-024	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-100	0	carry	B25-025	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-101	0	carry	B25-026	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-102	0	carry	B25-027	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-103	0	carry	B25-028	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-104	0	carry	B25-029	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-105	0	carry	B25-030	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-106	0	carry	B25-031	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-107	0	carry	B25-032	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-108	0	carry	B25-033	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-109	0	carry	B25-034	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-110	0	carry	B25-035	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-111	0	carry	B25-036	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-112	0	carry	B25-037	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-113	0	carry	B25-038	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-114	0	carry	B25-039	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-115	0	carry	B25-040	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-116	0	carry	B25-041	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-117	0	carry	B25-042	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-118	0	carry	B25-043	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-119	0	carry	B25-044	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-120	0	carry	B25-045	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-121	0	carry	B25-046	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-122	0	carry	B25-047	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-123	0	carry	B25-048	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-124	0	carry	B25-049	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-125	0	carry	B25-050	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-126	0	carry	B25-051	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-127	0	carry	B25-052	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-128	0	carry	B25-053	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-129	0	carry	B25-054	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-130	0	carry	B25-055	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-131	0	carry	B25-056	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-132	0	carry	B25-057	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-133	0	carry	B25-058	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-134	0	carry	B25-059	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-135	0	carry	B25-060	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-136	0	carry	B25-061	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-137	0	carry	B25-062	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-138	0	carry	B25-063	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-139	0	carry	B25-064	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-140	0	carry	B25-065	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-141	0	carry	B25-066	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-142	0	carry	B25-067	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-143	0	carry	B25-068	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-144	0	carry	B25-069	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-145	0	carry	B25-070	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-146	0	carry	B25-071	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-147	0	carry	B25-072	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-148	0	carry	B25-073	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-149	0	carry	B25-074	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
+B26-150	0	carry	B25-075	carry-forward only after exact integration HEAD 539fecf and B25 ledger identity revalidation	CARRY_VALIDATED
