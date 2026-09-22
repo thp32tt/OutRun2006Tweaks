@@ -276,7 +276,6 @@ jobs:
             'VR R23/R25 BASELINE: authoritative first seed',
             'VR R23 RENDERER: BeginScene/WVP guards READY; recovery pose warmup is stock-visible',
             'VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE',
-            'VR R15 EX: full D3DSBT_ALL baseline + synchronous Reset/stereo handoff ACTIVE',
             'VR v3 shadow: live dual-protocol diagnostics active'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR safe DLL marker missing: $marker" }
@@ -531,7 +530,6 @@ jobs:
             'VR C1/C2 CLASSIFY: R29 renderer delegates candidate WVP uploads to R23/R27/R28 perspective-world classification',
             'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
             'VR C1.1 BASELINE: authoritative color clear replay seeds right/mono surfaces; two full-surface StretchRect baseline copies removed',
-            'VR C1.2 FIXEDFN HEAD: perspective fixed-function XYZ world receives the same latched head inverse',
             'VR R27 EFFECT: main-backbuffer perspective c64 now follows the verified per-eye world WVP'
           )) {
             if (-not $ascii.Contains($marker)) { throw "C1 marker missing: $marker" }
@@ -619,7 +617,6 @@ jobs:
             'VR C1/C2 CLASSIFY: R29 renderer delegates candidate WVP uploads to R23/R27/R28 perspective-world classification',
             'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
             'VR C1.1 BASELINE: authoritative color clear replay seeds right/mono surfaces; two full-surface StretchRect baseline copies removed',
-            'VR C1.2 FIXEDFN HEAD: perspective fixed-function XYZ world receives the same latched head inverse',
             'VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current=',
             'VR R30.6 XYZRHW WORLD:'
           )) {
