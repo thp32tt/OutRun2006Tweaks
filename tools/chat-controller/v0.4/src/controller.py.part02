@@ -439,17 +439,21 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
         return
 
     request_now = datetime.now(TZ)
+
+    # Persist the newly created chat URL before inspecting transient errors so the
+    # watchdog can retry the exact failed turn instead of losing the new chat.
+    if is_new:
+        new_url = await wait_for_chat_url(page, timeout_sec=8)
+        if new_url:
+            slot.url = new_url
+            save_registry(reg)
+
     if await detect_rate_limit(page):
         slot.last_result = "rate_limited_after_send"
         slot.last_sent_at = request_now.isoformat()
         save_registry(reg)
         mark_rate_limit(reg, request_now, f"scheduled-send:{slot.name}")
         return
-
-    if is_new:
-        new_url = await wait_for_chat_url(page)
-        if new_url:
-            slot.url = new_url
 
     note_successful_request(reg, request_now)
     slot.runs += 1
