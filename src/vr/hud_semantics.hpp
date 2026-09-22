@@ -60,6 +60,10 @@ namespace OutRunVRHudSemantics
         if (InRange(callRva, 0x05B300, 0x05B700))
             return { "HeartDisp_car_heart", "WORLD_HEART", SpacePolicy::WorldBillboard };
 
+        // Original UIScaling girlfriend/control-icon helpers.
+        if (InRange(callRva, 0x060900, 0x061100))
+            return { "ctrl_icon_work", "HUD_CTRL_ICON", SpacePolicy::ScreenHud };
+
         // C2C mission HUD anchors present in the original UI-scaling fixes.
         if (InRange(callRva, 0x081A00, 0x081B00))
             return { "C2C_Fruit", "HUD_FRUIT", SpacePolicy::ScreenHud };
@@ -77,6 +81,9 @@ namespace OutRunVRHudSemantics
         // sub_4BAD20: position markers projected from rival-car world position.
         if (InRange(callRva, 0x0BAD20, 0x0BB320))
             return { "RankMarker/sub_4BAD20", "WORLD_RIVAL_MARKER", SpacePolicy::WorldBillboard };
+
+        if (InRange(callRva, 0x0BBA00, 0x0BBC00))
+            return { "DispTempHeartNum", "HUD_TEMP_HEART", SpacePolicy::ScreenHud };
 
         if (InRange(callRva, 0x0BD2E0, 0x0BD360))
             return { "C2CTestSlipstream", "HUD_SLIPSTREAM", SpacePolicy::ScreenHud };
@@ -116,8 +123,11 @@ namespace OutRunVRHudSemantics
     // Exact reverse-engineered anchor inventory from hooks_uiscaling.cpp.
     // This is a review/test source-of-truth, even where the anchor itself is
     // not a direct sprite call and therefore may not appear in hudtrace.csv.
-    inline constexpr std::array<SemanticAnchor, 50> Anchors{{
+    inline constexpr std::array<SemanticAnchor, 55> Anchors{{
         {0x05B43A, "WORLD_HEART", SpacePolicy::WorldBillboard, "HeartDisp_car_heart pulse angle"},
+        {0x060A21, "HUD_CTRL_ICON", SpacePolicy::ScreenHud, "set_icon_work girlfriend/control icon"},
+        {0x060D40, "HUD_CTRL_ICON", SpacePolicy::ScreenHud, "ctrl_icon_work adjustment #1"},
+        {0x060FBC, "HUD_CTRL_ICON", SpacePolicy::ScreenHud, "ctrl_icon_work adjustment #2"},
         {0x081A86, "HUD_FRUIT", SpacePolicy::ScreenHud, "C2C fruit scaling disable"},
         {0x081A8B, "HUD_FRUIT", SpacePolicy::ScreenHud, "C2C fruit scaling enable"},
         {0x081B76, "HUD_HEART_TOTAL", SpacePolicy::ScreenHud, "C2C heart scaling disable"},
@@ -135,6 +145,8 @@ namespace OutRunVRHudSemantics
         {0x0BA035, "HUD_RANK", SpacePolicy::ScreenHud, "DispRank adjustment #7"},
         {0x0BA052, "HUD_RANK", SpacePolicy::ScreenHud, "DispRank adjustment #8"},
 
+        {0x0BA0E0, "HUD_RANK", SpacePolicy::ScreenHud, "dispMarkerCheck scaling gate shared by rival marker functions"},
+
         {0x0BB0FB, "WORLD_RIVAL_MARKER", SpacePolicy::WorldBillboard, "rank marker sprani #1"},
         {0x0BB133, "WORLD_RIVAL_MARKER", SpacePolicy::WorldBillboard, "rank marker sprani #2"},
         {0x0BB16C, "WORLD_RIVAL_MARKER", SpacePolicy::WorldBillboard, "rank marker sprani #3"},
@@ -145,6 +157,7 @@ namespace OutRunVRHudSemantics
         {0x0BB2BC, "WORLD_RIVAL_MARKER", SpacePolicy::WorldBillboard, "rank marker clip #4"},
         {0x0BB2D0, "WORLD_RIVAL_MARKER", SpacePolicy::WorldBillboard, "rank marker clip #5"},
 
+        {0x0BBA89, "HUD_TEMP_HEART", SpacePolicy::ScreenHud, "negative temporary heart score '-' text"},
         {0x0BD32E, "HUD_SLIPSTREAM", SpacePolicy::ScreenHud, "test your slipstream"},
         {0x0BD397, "HUD_GF_WARNING", SpacePolicy::ScreenHud, "don't lose girlfriend #1"},
         {0x0BD414, "HUD_GF_WARNING", SpacePolicy::ScreenHud, "don't lose girlfriend #2"},
@@ -175,6 +188,8 @@ namespace OutRunVRHudSemantics
         {0x0FCB20, "HUD_GF_SPEECH", SpacePolicy::ScreenHud, "speech initial position #4"},
     }};
 
+    static_assert(ClassifyCaller(0x060D40).space == SpacePolicy::ScreenHud);
+    static_assert(ClassifyCaller(0x0BBA89).space == SpacePolicy::ScreenHud);
     static_assert(ClassifyCaller(0x0B9F3A).space == SpacePolicy::ScreenHud);
     static_assert(ClassifyCaller(0x0BB0FB).space == SpacePolicy::WorldBillboard);
     static_assert(ClassifyCaller(0x0BE5CD).space == SpacePolicy::ScreenHud);
