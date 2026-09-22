@@ -367,6 +367,28 @@ def main() -> int:
     }
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
+
+    # Analysis-only extraction for reverse engineering in CI. The upstream
+    # replacement EXE is public but cannot be fetched by every local analysis
+    # environment. Preserve its .text bytes as a workflow artifact so exact
+    # vehicle/camera call paths can be disassembled without modifying the game.
+    text_section = pe.section(".text")
+    if text_section:
+        text_blob = pe.data[
+            text_section.raw_pointer :
+            text_section.raw_pointer + text_section.raw_size
+        ]
+        (args.out_dir / "OR2006C2C_TEXT.bin").write_bytes(text_blob)
+        (args.out_dir / "OR2006C2C_TEXT_META.json").write_text(
+            json.dumps({
+                "virtual_address": text_section.virtual_address,
+                "virtual_size": text_section.virtual_size,
+                "raw_size": text_section.raw_size,
+                "image_base": pe.image_base,
+            }, indent=2),
+            encoding="utf-8",
+        )
+
     (args.out_dir / "OR2006C2C_EXE_ANALYSIS.json").write_text(
         json.dumps(report, indent=2), encoding="utf-8"
     )
