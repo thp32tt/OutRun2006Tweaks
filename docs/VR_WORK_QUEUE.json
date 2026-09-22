@@ -1,14 +1,14 @@
 {
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
-  "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-22T03:25:00+09:00",
+  "owner": "D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE",
+  "updatedKst": "2026-09-22T19:45:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
-    "productionWriter": "D_INTEGRATION_PLANNER",
-    "candidateWriter": "D_INTEGRATION_PLANNER",
-    "queueWriter": "D_INTEGRATION_PLANNER",
+    "productionWriter": "D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE",
+    "candidateWriter": "D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE",
+    "queueWriter": "D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
     "primaryBackend": "DX9Ex",
@@ -20,221 +20,21 @@
       "recurrenceAction": "REOPEN_EXISTING_STABLE_KEY"
     }
   },
-  "candidateWip": {
-    "activeUnvalidatedCount": 0,
-    "candidateBranches": []
-  },
+  "candidateWip": {"activeUnvalidatedCount": 0, "candidateBranches": []},
   "items": [
-    {
-      "id": "VR-BINARY-CONTRACT-001",
-      "priority": 10,
-      "status": "DONE",
-      "preferredRole": "D_INTEGRATION_PLANNER",
-      "summary": "Pin the upstream replacement OR2006C2C.EXE as the canonical reverse-engineering baseline; gate executable-RVA hooks on SHA/PE identity, byte signatures, source bindings, and durable crash-RVA revalidation.",
-      "testLevel": "LEVEL0",
-      "dependencies": [],
-      "attempts": 1,
-      "runtimeCandidate": false,
-      "candidateBranch": "vr-d3d9ex-candidate/VR-BINARY-CONTRACT-001-CHAT-20260922",
-      "expectedFix": "Strict canonical EXE binary contract must pass in DX9Ex Active Validation; crash ZIP must include ASLR-stable exeRva sidecar.",
-      "validationRunId": 35637181469,
-      "validationSha": "c1cb4def3ecfefb23084401d7961b6d658620388",
-      "validationResult": "BUILD_VERIFIED",
-      "validationEvidence": [
-        "strict canonical EXE SHA/PE/image-base/RVA opcode/source-binding contract PASS",
-        "x64 D3D11 OpenXR host build PASS",
-        "8 deterministic no-HMD host smoke tests PASS",
-        "Win32 active DX9Ex game DLL build PASS",
-        "active DX9Ex package assembly/validation PASS"
-      ],
-      "runtimeCrashSidecarEndToEnd": "NOT_FORCED: compile/package verified; next naturally occurring crash bundle will validate sidecar observation without deliberately crashing the game",
-      "integrationSha": "3e7c09db725880eef5650d41a96a8d1691998bdd",
-      "integratedViaPr": 15,
-      "nextAction": "Apply strict binary-contract and crash-signature revalidation to every future new/changed executable-RVA hook; ingest crash_signature.json on the next natural crash."
-    },
-    {
-      "id": "DX9EX-RESET-STATEBLOCK-001",
-      "priority": 10,
-      "status": "READY",
-      "preferredRole": "D_INTEGRATION_PLANNER",
-      "summary": "R15 retains and reapplies a D3DSBT_ALL state-block object across ResetEx; replace cross-reset COM state-block replay with R13 baseline plus explicit fresh-device state-family replay.",
-      "testLevel": "LEVEL0",
-      "dependencies": [],
-      "attempts": 0,
-      "runtimeCandidate": true,
-      "sourceIdentity": "src/vr/d3d9/ex_device_upgrade_r15.cpp@5dc13cf1a84ef9ff9a5081a5dd3351e92ab6c890",
-      "preparedPatchBranch": "vr-d3d9ex-candidate/DX9EX-RESET-STATEBLOCK-001-B-20260921T1012KST",
-      "implementationBlocker": "Safe full replacement blob cannot yet be materialized from the Chat connector without reconstructing truncated source excerpts; do not write partial source."
-    },
-    {
-      "id": "VR-HOST-002",
-      "priority": 10,
-      "status": "NEEDS_POST_REVIEW",
-      "preferredRole": "C_PERF_REVIEW",
-      "summary": "Restore omitted post-test runtime safety fixes: loading/stall projection hold, Frame.v2 run-generation identity, stale slot/run rejection, DirectGPU run binding, validated gameplay handoff, fallback stale-run rejection, and matching verifiers.",
-      "testLevel": "LEVEL0",
-      "dependencies": [],
-      "attempts": 0,
-      "runtimeCandidate": false,
-      "candidateBranch": "vr-d3d9ex-candidate/VR-HOST-002-reconcile",
-      "candidateSha": "a2b2e4d0168c311e8998df4dc6c012c47e855558",
-      "validationRunId": 35531382160,
-      "validationResult": "BUILD_VERIFIED",
-      "postReviewRequired": [
-        "A",
-        "B",
-        "C"
-      ],
-      "provenance": [
-        "ad14ed6c6757634233ec79b71f42be53c563edb7",
-        "edee6b911198f4ab1fd9bd0e36ca3a5cf54a6162",
-        "6ff14350d00a29d581adf963afb6f09e7c6059d0",
-        "db730290ea2f5c7920ba78a8236cbb2ac636ab7d",
-        "c65403e79d39a101a53244fb689e852d89ce6d15",
-        "f3d5f3f9b970fd4d3bcd760f140138794c7fc2e4",
-        "94be96fb8bbdc20ac53349707d53111d8d5ae885",
-        "256fd8c5867042d73458a2f58f125c01352c76b3",
-        "6585f9c7770de4e1c68bd16ffeb6ddeb9b3b8a4d"
-      ]
-    },
-    {
-      "id": "DX9EX-FINGERPRINT-001",
-      "priority": 10,
-      "status": "READY",
-      "preferredRole": "B_RENDER_REVIEW",
-      "summary": "Establish bounded exact draw fingerprints for unresolved HUD/white-overlay/effect classes without broad WVP ownership.",
-      "testLevel": "LEVEL0",
-      "dependencies": [],
-      "attempts": 0,
-      "runtimeCandidate": false
-    },
-    {
-      "id": "DX9EX-SKYGLOW-001",
-      "priority": 9,
-      "status": "READY",
-      "preferredRole": "D_INTEGRATION_PLANNER",
-      "summary": "R30 SkyGlow ping-pong composites the texture opposite the last produced blur result: factor=1 selects temp after horizontal temp->reduced, while two-step selects reduced after vertical reduced->temp.",
-      "testLevel": "LEVEL0",
-      "dependencies": [],
-      "attempts": 0,
-      "runtimeCandidate": true,
-      "sourceIdentity": "src/vr/d3d9/stereo_renderer_r30.cpp@bc7eb2c152d82b3a42df13d8361d31cffe7d31b9",
-      "expectedFix": "After horizontal pass composite reduced; after optional vertical pass composite temp. Add deterministic source/policy verifier before integration."
-    },
-    {
-      "id": "DX9EX-TEST-HOST-SMOKES-CI-001",
-      "priority": 9,
-      "status": "NEEDS_VALIDATION",
-      "preferredRole": "D_INTEGRATION_PLANNER",
-      "summary": "Run existing deterministic no-HMD host smoke executables in DX9Ex Active Validation instead of merely building outrun-vr-host.",
-      "testLevel": "LEVEL0",
-      "dependencies": [],
-      "attempts": 1,
-      "runtimeCandidate": false,
-      "candidateBranch": "vr-d3d9ex-candidate/DX9EX-TEST-HOST-SMOKES-CI-001-D-20260921T1147KST",
-      "candidateSha": "bad74c80d37e5b57b9f7ae761cc7e7a2af180c29",
-      "validationRunId": 35555390587,
-      "validationState": "host build + eight smoke tests PASS; game/package still running at queue write"
-    },
-    {
-      "id": "L0-CAPTURE-001",
-      "priority": 9,
-      "status": "NEED_HMD_TEST",
-      "preferredRole": "D_INTEGRATION_PLANNER",
-      "summary": "Phase-1 rolling diagnostic capture is build verified; runtime trigger/usability and HMD overhead remain unverified.",
-      "testLevel": "LEVEL1",
-      "dependencies": [],
-      "attempts": 0,
-      "runtimeCandidate": false
-    },
-    {
-      "id": "L1-VIS-001",
-      "priority": 9,
-      "status": "READY",
-      "preferredRole": "B_RENDER_REVIEW",
-      "summary": "World/HUD/effect stereo correctness: white rank-score, 6th/6, menu and YES/NO. Produce exact evidence before behavior change.",
-      "testLevel": "LEVEL1",
-      "dependencies": [
-        "DX9EX-FINGERPRINT-001"
-      ],
-      "attempts": 0,
-      "runtimeCandidate": true
-    },
-    {
-      "id": "L1-VIS-002",
-      "priority": 8,
-      "status": "READY",
-      "preferredRole": "B_RENDER_REVIEW",
-      "summary": "Sky/cloud/SkyGlow/lens flare/smoke/skid placement and head-lock semantics.",
-      "testLevel": "LEVEL1",
-      "dependencies": [],
-      "attempts": 0,
-      "runtimeCandidate": true
-    },
-    {
-      "id": "DX9EX-PERF-PRODUCER-FENCE-001",
-      "priority": 8,
-      "status": "READY",
-      "preferredRole": "C_PERF_REVIEW",
-      "summary": "DirectGPU producer path issues D3D9 EVENT GetData(D3DGETDATA_FLUSH) then polls GetData with SwitchToThread up to ProducerFenceBudgetMs=2 on the game thread; quantify wait cost before changing synchronization semantics.",
-      "testLevel": "LEVEL2",
-      "dependencies": [],
-      "attempts": 0,
-      "runtimeCandidate": true,
-      "sourceIdentity": "src/vr/d3d9/stereo_renderer_r32.cpp@301f300075f0cb27c7b6daa6f3c205cdc74318a4 + src/vr/d3d9/r32_policy.hpp@bcaae26253033a8d7fdf8ad1188e8086bc4e2344",
-      "expectedFix": "First add bounded wait-count/QPC telemetry or deterministic policy verifier; do not remove producer safety fence without evidence."
-    },
-    {
-      "id": "L1-RECENTER-001",
-      "priority": 7,
-      "status": "READY",
-      "preferredRole": "B_RENDER_REVIEW",
-      "summary": "Gameplay/menu recenter application-space behavior and visual transition correctness.",
-      "testLevel": "LEVEL1",
-      "dependencies": [],
-      "attempts": 0,
-      "runtimeCandidate": true
-    },
-    {
-      "id": "L2-PERF-001",
-      "priority": 6,
-      "status": "READY",
-      "preferredRole": "C_PERF_REVIEW",
-      "summary": "R29+ fast stereo draw amplification and frame-pacing optimization behind correctness gates.",
-      "testLevel": "LEVEL2",
-      "dependencies": [
-        "L1-VIS-001",
-        "L1-VIS-002"
-      ],
-      "attempts": 0,
-      "runtimeCandidate": true
-    },
-    {
-      "id": "L3-DX9EX-001",
-      "priority": 5,
-      "status": "READY",
-      "preferredRole": "A_ARCH_REVIEW",
-      "summary": "D3D9Ex device promotion/reset/shared-resource/direct transport robustness.",
-      "testLevel": "LEVEL3",
-      "dependencies": [],
-      "attempts": 0,
-      "runtimeCandidate": true
-    },
-    {
-      "id": "L4-RELEASE-001",
-      "priority": 1,
-      "status": "BLOCKED",
-      "preferredRole": "D_INTEGRATION_PLANNER",
-      "summary": "DXVK/multiview/DX12 release matrix remains paused until DX9Ex reference is user accepted.",
-      "testLevel": "LEVEL4",
-      "dependencies": [
-        "L1-VIS-001",
-        "L1-VIS-002",
-        "L2-PERF-001",
-        "L3-DX9EX-001"
-      ],
-      "attempts": 0,
-      "runtimeCandidate": false
-    }
+    {"id":"VR-BINARY-CONTRACT-001","priority":10,"status":"DONE","preferredRole":"D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE","summary":"Pin the upstream replacement OR2006C2C.EXE as the canonical reverse-engineering baseline; gate executable-RVA hooks on SHA/PE identity, byte signatures, source bindings, and durable crash-RVA revalidation.","testLevel":"LEVEL0","dependencies":[],"attempts":1,"runtimeCandidate":false,"candidateBranch":"vr-d3d9ex-candidate/VR-BINARY-CONTRACT-001-CHAT-20260922","expectedFix":"Strict canonical EXE binary contract must pass in DX9Ex Active Validation; crash ZIP must include ASLR-stable exeRva sidecar.","validationRunId":35637181469,"validationSha":"c1cb4def3ecfefb23084401d7961b6d658620388","validationResult":"BUILD_VERIFIED","validationEvidence":["strict canonical EXE SHA/PE/image-base/RVA opcode/source-binding contract PASS","x64 D3D11 OpenXR host build PASS","8 deterministic no-HMD host smoke tests PASS","Win32 active DX9Ex game DLL build PASS","active DX9Ex package assembly/validation PASS"],"runtimeCrashSidecarEndToEnd":"NOT_FORCED: compile/package verified; next naturally occurring crash bundle will validate sidecar observation without deliberately crashing the game","integrationSha":"3e7c09db725880eef5650d41a96a8d1691998bdd","integratedViaPr":15,"nextAction":"Apply strict binary-contract and crash-signature revalidation to every future new/changed executable-RVA hook; ingest crash_signature.json on the next natural crash."},
+    {"id":"DX9EX-RESET-STATEBLOCK-001","priority":10,"status":"READY","preferredRole":"D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE","summary":"R15 retains and reapplies a D3DSBT_ALL state-block object across ResetEx; replace cross-reset COM state-block replay with R13 baseline plus explicit fresh-device state-family replay.","testLevel":"LEVEL0","dependencies":[],"attempts":0,"runtimeCandidate":true,"sourceIdentity":"src/vr/d3d9/ex_device_upgrade_r15.cpp@5dc13cf1a84ef9ff9a5081a5dd3351e92ab6c890","preparedPatchBranch":"vr-d3d9ex-candidate/DX9EX-RESET-STATEBLOCK-001-B-20260921T1012KST","implementationBlocker":"Safe full replacement blob cannot yet be materialized from the Chat connector without reconstructing truncated source excerpts; do not write partial source."},
+    {"id":"VR-HOST-002","priority":10,"status":"NEEDS_POST_REVIEW","preferredRole":"C_CHANGE_SANITY_VALIDATION_PREP","summary":"Restore omitted post-test runtime safety fixes: loading/stall projection hold, Frame.v2 run-generation identity, stale slot/run rejection, DirectGPU run binding, validated gameplay handoff, fallback stale-run rejection, and matching verifiers.","testLevel":"LEVEL0","dependencies":[],"attempts":0,"runtimeCandidate":false,"candidateBranch":"vr-d3d9ex-candidate/VR-HOST-002-reconcile","candidateSha":"a2b2e4d0168c311e8998df4dc6c012c47e855558","validationRunId":35531382160,"validationResult":"BUILD_VERIFIED","postReviewRequired":["A","B","C"],"provenance":["ad14ed6c6757634233ec79b71f42be53c563edb7","edee6b911198f4ab1fd9bd0e36ca3a5cf54a6162","6ff14350d00a29d581adf963afb6f09e7c6059d0","db730290ea2f5c7920ba78a8236cbb2ac636ab7d","c65403e79d39a101a53244fb689e852d89ce6d15","f3d5f3f9b970fd4d3bcd760f140138794c7fc2e4","94be96fb8bbdc20ac53349707d53111d8d5ae885","256fd8c5867042d73458a2f58f125c01352c76b3","6585f9c7770de4e1c68bd16ffeb6ddeb9b3b8a4d"]},
+    {"id":"DX9EX-FINGERPRINT-001","priority":10,"status":"READY","preferredRole":"B_RENDER_STEREO_VISUAL_PERF_REVIEW","summary":"Establish bounded exact draw fingerprints for unresolved HUD/white-overlay/effect classes without broad WVP ownership.","testLevel":"LEVEL0","dependencies":[],"attempts":0,"runtimeCandidate":false},
+    {"id":"DX9EX-SKYGLOW-001","priority":9,"status":"READY","preferredRole":"D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE","summary":"R30 SkyGlow ping-pong composites the texture opposite the last produced blur result: factor=1 selects temp after horizontal temp->reduced, while two-step selects reduced after vertical reduced->temp.","testLevel":"LEVEL0","dependencies":[],"attempts":0,"runtimeCandidate":true,"sourceIdentity":"src/vr/d3d9/stereo_renderer_r30.cpp@bc7eb2c152d82b3a42df13d8361d31cffe7d31b9","expectedFix":"After horizontal pass composite reduced; after optional vertical pass composite temp. Add deterministic source/policy verifier before integration."},
+    {"id":"DX9EX-TEST-HOST-SMOKES-CI-001","priority":9,"status":"NEEDS_VALIDATION","preferredRole":"D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE","summary":"Run existing deterministic no-HMD host smoke executables in DX9Ex Active Validation instead of merely building outrun-vr-host.","testLevel":"LEVEL0","dependencies":[],"attempts":1,"runtimeCandidate":false,"candidateBranch":"vr-d3d9ex-candidate/DX9EX-TEST-HOST-SMOKES-CI-001-D-20260921T1147KST","candidateSha":"bad74c80d37e5b57b9f7ae761cc7e7a2af180c29","validationRunId":35555390587,"validationState":"host build + eight smoke tests PASS; game/package still running at queue write"},
+    {"id":"L0-CAPTURE-001","priority":9,"status":"NEED_HMD_TEST","preferredRole":"D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE","summary":"Phase-1 rolling diagnostic capture is build verified; runtime trigger/usability and HMD overhead remain unverified.","testLevel":"LEVEL1","dependencies":[],"attempts":0,"runtimeCandidate":false},
+    {"id":"L1-VIS-001","priority":9,"status":"READY","preferredRole":"B_RENDER_STEREO_VISUAL_PERF_REVIEW","summary":"World/HUD/effect stereo correctness: white rank-score, 6th/6, menu and YES/NO. Produce exact evidence before behavior change.","testLevel":"LEVEL1","dependencies":["DX9EX-FINGERPRINT-001"],"attempts":0,"runtimeCandidate":true},
+    {"id":"L1-VIS-002","priority":8,"status":"READY","preferredRole":"B_RENDER_STEREO_VISUAL_PERF_REVIEW","summary":"Sky/cloud/SkyGlow/lens flare/smoke/skid placement and head-lock semantics.","testLevel":"LEVEL1","dependencies":[],"attempts":0,"runtimeCandidate":true},
+    {"id":"DX9EX-PERF-PRODUCER-FENCE-001","priority":8,"status":"READY","preferredRole":"B_RENDER_STEREO_VISUAL_PERF_REVIEW","summary":"DirectGPU producer path issues D3D9 EVENT GetData(D3DGETDATA_FLUSH) then polls GetData with SwitchToThread up to ProducerFenceBudgetMs=2 on the game thread; quantify wait cost before changing synchronization semantics.","testLevel":"LEVEL2","dependencies":[],"attempts":0,"runtimeCandidate":true,"sourceIdentity":"src/vr/d3d9/stereo_renderer_r32.cpp@301f300075f0cb27c7b6daa6f3c205cdc74318a4 + src/vr/d3d9/r32_policy.hpp@bcaae26253033a8d7fdf8ad1188e8086bc4e2344","expectedFix":"First add bounded wait-count/QPC telemetry or deterministic policy verifier; do not remove producer safety fence without evidence."},
+    {"id":"L1-RECENTER-001","priority":7,"status":"READY","preferredRole":"A_ARCH_STATE_LIFETIME_OPENXR_SYNC_REVIEW","summary":"Gameplay/menu recenter application-space behavior and visual transition correctness.","testLevel":"LEVEL1","dependencies":[],"attempts":0,"runtimeCandidate":true},
+    {"id":"L2-PERF-001","priority":6,"status":"READY","preferredRole":"B_RENDER_STEREO_VISUAL_PERF_REVIEW","summary":"R29+ fast stereo draw amplification and frame-pacing optimization behind correctness gates.","testLevel":"LEVEL2","dependencies":["L1-VIS-001","L1-VIS-002"],"attempts":0,"runtimeCandidate":true},
+    {"id":"L3-DX9EX-001","priority":5,"status":"READY","preferredRole":"A_ARCH_STATE_LIFETIME_OPENXR_SYNC_REVIEW","summary":"D3D9Ex device promotion/reset/shared-resource/direct transport robustness.","testLevel":"LEVEL3","dependencies":[],"attempts":0,"runtimeCandidate":true},
+    {"id":"L4-RELEASE-001","priority":1,"status":"BLOCKED","preferredRole":"D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE","summary":"DXVK/multiview/DX12 release matrix remains paused until DX9Ex reference is user accepted.","testLevel":"LEVEL4","dependencies":["L1-VIS-001","L1-VIS-002","L2-PERF-001","L3-DX9EX-001"],"attempts":0,"runtimeCandidate":false}
   ]
 }
