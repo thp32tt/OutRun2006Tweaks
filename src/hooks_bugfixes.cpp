@@ -860,6 +860,7 @@ class MenuSelectionWrap : public Hook
 		{ 0xD91E8, 2 }, // sub_4D90A0, left
 		{ 0xD91FE, 2 }, // sub_4D90A0, right
 	};
+	static constexpr size_t GuardCount = sizeof(Guards) / sizeof(Guards[0]);
 
 	static int& field(void* thisptr, int offset)
 	{
@@ -951,7 +952,7 @@ public:
 		static std::vector<TogglePatch> guardPatches;
 		if (guardPatches.empty())
 		{
-			guardPatches.reserve(std::size(Guards));
+			guardPatches.reserve(GuardCount);
 			for (const Guard& guard : Guards)
 				guardPatches.emplace_back(
 					TogglePatch::nop(Module::exe_ptr<uint8_t>(guard.addr), guard.size));
@@ -978,7 +979,7 @@ public:
 			return false;
 		}
 
-		for (size_t guardIndex = 0; guardIndex < std::size(Guards); ++guardIndex)
+		for (size_t guardIndex = 0; guardIndex < GuardCount; ++guardIndex)
 		{
 			guardPatches[guardIndex].set(true);
 			const Guard& guard = Guards[guardIndex];
