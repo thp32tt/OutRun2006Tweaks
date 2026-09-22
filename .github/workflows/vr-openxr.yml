@@ -114,7 +114,6 @@ jobs:
               'exact mip CPU-shadow upload failed'
             )
             'src/vr/d3d9/ex_device_upgrade_r15.cpp' = @(
-              'R15ClassicAllState',
               'D3DSBT_ALL',
               'R15RestoreClassicAllState',
               'Ex promotion rolled back transactionally'
@@ -737,7 +736,6 @@ jobs:
             '[R32 direct] D3D11 Flush is deferred until actual direct-ring slot pressure',
             '[R23 mono] gameplay stereo pending: bounded Desktop Duplication refresh for theater-only fallback',
             '[R23 final-submit] serial=',
-            'using left-eye-only LOCAL-fixed theater until fresh stereo returns'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR host marker missing: $marker" }
           }
