@@ -1601,17 +1601,20 @@ namespace OutRunVRRenderer
 					device, startRegister, constantData, vector4fCount);
 			}
 
-			// R49 final ownership split: the canonical EXE sprite queue and exact
+			// R51 ownership split: the canonical EXE sprite queue and exact
 			// original-mod world-marker tags identify overlays before this c64
-			// upload. Leave their game WVP completely raw here. R30 is then the
-			// single owner that converts SCREEN_HUD to a finite world-fixed plane
-			// or WORLD_BILLBOARD to per-eye world placement. Without this split,
+			// upload. Leave SCREEN_OVERLAY_2D / SCREEN_HUD / WORLD_BILLBOARD
+			// game WVP completely raw here. R30 is then the single owner that
+			// places queue HUD on the finite world-fixed plane or keeps rival
+			// markers in world space. Without this split,
 			// renderer head injection can happen first and R30 applies a second
 			// transform, which is visible as duplicated/misplaced 6th/6 and menus.
 			const auto semanticScope =
 				OutRunVR::GameSemantic::CurrentScope;
 			const bool semanticOverlay =
 				OutRunVR::GameSemantic::CorroboratesHud(semanticScope) ||
+				OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
+					semanticScope) ||
 				OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
 			if (semanticOverlay)
 			{
@@ -1630,7 +1633,7 @@ namespace OutRunVRRenderer
 					{
 						FirstSemanticOverlayBypassLogged = true;
 						spdlog::info(
-							"VR R49 HUD OWNER: semantic overlay c64 kept raw; renderer head injection bypassed so R30 owns exactly one HUD/world-billboard transform");
+							"VR R51 HUD OWNER: queue overlay c64 kept raw; renderer head injection bypassed so R30 owns exactly one HUD/world-billboard transform");
 					}
 				}
 				return result;
