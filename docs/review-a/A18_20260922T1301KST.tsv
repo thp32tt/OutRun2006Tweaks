@@ -1,0 +1,151 @@
+unit	path/objective	lens	result
+1	hooks_graphics near-plane candidate boundary	control	PASS carry-forward identity unchanged
+2	runtime_eligibility single authority	state	PASS identity+source reviewed
+3	ex_device_upgrade device discovery	lifetime	PASS carry-forward
+4	ex_device_upgrade CreateDevice upgrade	lifetime	PASS source reviewed
+5	ex_device_upgrade R13 fallback	fallback	PASS carry-forward
+6	ex_device_upgrade R14 reset ownership	reset	PASS carry-forward
+7	ex_device_upgrade R15 install boundary	startup	PASS carry-forward
+8	helper Ex probe	fallback	PASS carry-forward
+9	r13 bridge ownership	lifetime	PASS carry-forward
+10	r32 policy transition	state	PASS CP10
+11	IPC cadence ownership	sync	PASS carry-forward
+12	direct ACK ABI	sync	PASS source reviewed
+13	host pose freshness	state	PASS carry-forward
+14	host state reader consistency	sync	PASS carry-forward
+15	protocol generation contract	IPC	PASS source reviewed
+16	protocol v3 compatibility	IPC	PASS carry-forward
+17	protocol smoke surface	testability	PASS carry-forward
+18	recenter request ownership	IPC	PASS source reviewed
+19	legacy shadow compatibility	IPC	PASS carry-forward
+20	frame source ownership	lifetime	PASS CP20
+21	host legacy/current comparison	lifecycle	PASS carry-forward
+22	main_r23 session/swapchain owner	OpenXR	PASS source reviewed
+23	host shader lifetime	lifetime	PASS carry-forward
+24	diagnostic fallback ownership	fallback	PASS carry-forward
+25	host build architecture	testability	PASS carry-forward
+26	settings transition ownership	config	PASS carry-forward
+27	HUD semantic A/B boundary	ownership	PASS carry-forward
+28	shader fingerprint stability	state	PASS carry-forward
+29	VR-STARTUP-WHITE-001 stable key	regression	PASS reused
+30	Superpowers verification gate	policy	PASS CP30
+31	RuntimeEligibility HostStaleMs shared freshness constant	state	PASS one authority
+32	InstallState Pending default semantics	state	PASS fail-closed
+33	InstallState Ready acquire read	sync	PASS
+34	InstallState Failed acquire read	sync	PASS
+35	HostFresh default false	state	PASS fail-closed
+36	HostRenderable default false	state	PASS fail-closed
+37	StereoAllowed default false	state	PASS fail-closed
+38	RecoveryPending default true	state	PASS fail-closed
+39	RecoveryPoseWarmup default false	state	PASS
+40	ExternalSafetyBlock default false	state	PASS CP40
+41	SetExternalSafetyBlock blocks stereo	state	PASS
+42	SetExternalSafetyBlock arms recovery	state	PASS
+43	SetExternalSafetyBlock clears warmup	state	PASS
+44	SafetyOverlayReady default false	startup	PASS
+45	FailClosed clears HostFresh	failure	PASS
+46	FailClosed clears HostRenderable	failure	PASS
+47	FailClosed clears StereoAllowed	failure	PASS
+48	FailClosed sets RecoveryPending	failure	PASS
+49	FailClosed clears warmup	failure	PASS
+50	MarkSafetyOverlayUnavailable ordering	failure	PASS CP50
+51	MarkSafetyOverlayInstalled calls FailClosed first	startup	PASS
+52	MarkSafetyOverlayInstalled publishes ready after close	sync	PASS release ordering
+53	ObserveFreshHost does not reopen stereo	state	PASS
+54	ObserveSoftHostSuspend preserves source eligibility intent	state	PASS host remains submit authority
+55	ArmRecovery requires overlay ready	adversarial	PASS reject otherwise
+56	ArmRecovery requires fresh host	adversarial	PASS reject stale
+57	ArmRecovery requires renderable host	adversarial	PASS reject nonrenderable
+58	ArmRecovery rejects external safety block	adversarial	PASS
+59	ArmRecovery requires pending recovery	adversarial	PASS
+60	PoseWarmup requires warmup bit	adversarial	PASS CP60
+61	PoseWarmup rejects already StereoAllowed	adversarial	PASS
+62	BaselineVerified rejects overlay-not-ready	adversarial	PASS
+63	BaselineVerified rejects stale host	adversarial	PASS
+64	BaselineVerified rejects nonrenderable host	adversarial	PASS
+65	BaselineVerified rejects safety block	adversarial	PASS
+66	BaselineVerified clears warmup before open	state	PASS
+67	BaselineVerified clears RecoveryPending	state	PASS
+68	BaselineVerified opens StereoAllowed last	state	PASS
+69	MayInject requires overlay ready	adversarial	PASS
+70	MayInject requires HostFresh	adversarial	PASS CP70
+71	MayInject requires HostRenderable	adversarial	PASS
+72	MayInject rejects ExternalSafetyBlock	adversarial	PASS
+73	MayInject requires StereoAllowed	adversarial	PASS
+74	MayInject rejects RecoveryPending	adversarial	PASS
+75	Reset compat identifies promoted device only	reset	PASS
+76	Reset compat QI failure falls through classic hook	fallback	PASS
+77	Reset compat BuildFullscreenMode only fullscreen	reset	PASS
+78	ResetEx success updates presentation state	reset	PASS
+79	ResetEx success restores classic state	reset	PASS
+80	ResetEx failure skips state replay	adversarial	PASS CP80
+81	Classic baseline mutex protects capture/replay	sync	PASS
+82	Capture baseline exception fails closed	failure	PASS
+83	Clear baseline mutex serialized	reset	PASS
+84	Restore baseline absent returns false	adversarial	PASS
+85	Restore clears texture bindings after reset	reset	PASS
+86	Restore clears stream sources	reset	PASS
+87	Restore resets stream frequencies	reset	PASS
+88	Restore clears index buffer	reset	PASS
+89	Restore clears vertex shader	reset	PASS
+90	Restore clears pixel shader	reset	PASS CP90
+91	Restore vertex declaration best-effort boundary	fallback	PASS
+92	Restore viewport derives current backbuffer	reset	PASS
+93	Restore scissor derives current backbuffer	reset	PASS
+94	Restore failures counted not hidden	testability	PASS
+95	CheckDeviceState mode-changed maps DEVICENOTRESET	state	PASS
+96	Occluded windowed maps OK	state	PASS
+97	Occluded fullscreen maps DEVICELOST	state	PASS
+98	DEVICEHUNG maps DRIVERINTERNALERROR	failure	PASS
+99	DEVICEREMOVED maps DRIVERINTERNALERROR	failure	PASS
+100	unknown failed CheckDeviceState maps internal error	failure	PASS CP100
+101	Protocol run generation occupies reserved word without ABI growth	IPC	PASS
+102	Ring/client PID nonzero required for run identity	adversarial	PASS
+103	Frame PID must match ring PID	adversarial	PASS
+104	Frame generation must match ring generation	adversarial	PASS
+105	Frame.v2 ring fixed size asserted	IPC	PASS
+106	Frame state fixed 256-byte ABI asserted	IPC	PASS
+107	pose state fixed ABI asserted	IPC	PASS
+108	direct generation explicit in frame metadata	IPC	PASS
+109	direct slot bounded by ring size in host bootstrap	adversarial	PASS
+110	direct handles both nonzero before bootstrap	adversarial	PASS CP110
+111	direct dimensions nonzero before bootstrap	adversarial	PASS
+112	direct dimensions equal backbuffer before bootstrap	adversarial	PASS
+113	bootstrap rejects present-in-flight	adversarial	PASS
+114	bootstrap requires gameplay mode	adversarial	PASS
+115	bootstrap requires StereoSbsActive	adversarial	PASS
+116	bootstrap requires failureReason none	adversarial	PASS
+117	bootstrap requires frameId and pose sequence	adversarial	PASS
+118	bootstrap requires valid presentQpc	adversarial	PASS
+119	bootstrap requires complete stereo/world/duplicate/pose flags	adversarial	PASS
+120	nondirect complete frame may bootstrap	fallback	PASS CP120
+121	Direct hold destructor releases SRV and textures	lifetime	PASS
+122	Direct hold explicit release zeros dimensions/format	lifetime	PASS
+123	Direct hold invalidation clears frame/generation validity	state	PASS
+124	StageDirectHold requires context/device	adversarial	PASS
+125	StageDirectHold rejects out-of-range slot	adversarial	PASS
+126	StageDirectHold requires generation	adversarial	PASS
+127	StageDirectHold requires both eye textures	adversarial	PASS
+128	StageDirectHold compares eye width/height	adversarial	PASS
+129	StageDirectHold compares mip/array/format	adversarial	PASS
+130	StageDirectHold rejects multisample source	adversarial	PASS CP130
+131	StageDirectHold dimensions must match frame metadata	cross-subsystem	PASS
+132	Recenter mapping ABI separate from pose ABI	cross-subsystem	PASS
+133	Recenter Ensure validates magic/version/size	adversarial	PASS
+134	Recenter new mapping zeroes before header publish	sync	PASS
+135	Recenter existing invalid mapping fails without reuse	adversarial	PASS
+136	Recenter Publish stores requester PID before increment	sync	PASS
+137	Recenter Pending atomically reads request/received IDs	sync	PASS
+138	Recenter Pending rejects zero request	adversarial	PASS
+139	Recenter Pending rejects already received request	adversarial	PASS
+140	Recenter MarkReceived ignores zero	adversarial	PASS CP140
+141	Recenter MarkApplied ignores zero	adversarial	PASS
+142	Recenter AppliedId atomic read	sync	PASS
+143	ACK state carries hostPid	cross-subsystem	PASS
+144	ACK state carries transportGeneration	cross-subsystem	PASS
+145	ACK completion is per ring slot	cross-subsystem	PASS
+146	ACK ABI standard-layout asserted	testability	PASS
+147	ACK ABI trivially-copyable asserted	testability	PASS
+148	startup-white risk intersects hooks_graphics candidate	regression	PASS NEED_HMD_TEST retained
+149	c4dd697e changes workflow only vs b8bd82c3	post-review	PASS A production hunk unchanged
+150	A18 completion evidence self-check	verification	PASS CP150; 150 physical rows persisted
