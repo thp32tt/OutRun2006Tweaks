@@ -30,8 +30,10 @@ def main() -> int:
         raise AssertionError("visual contract forbids SBS desktop gameplay fallback")
     if locked["hudPresentation"] != "WORLD_FIXED_NOT_HEAD_LOCKED":
         raise AssertionError("HUD visual contract changed")
-    if locked.get("untaggedSpriteNodeOwnership") != "NONE_FAIL_CLOSED_NEVER_SCREEN_HUD":
-        raise AssertionError("untagged SpriteNode ownership must fail closed")
+    if locked.get("untaggedSpriteNodeOwnership") != "SCREEN_OVERLAY_2D_FOV_ONLY_NEVER_FINITE_HUD":
+        raise AssertionError("untagged SpriteNode ownership must be FOV-only 2D")
+    if locked.get("generic2DQueuePlacement") != "ASYMMETRIC_FOV_COMMON_RAY_ONLY_NO_HEAD_IPD_DEPTH_RESET":
+        raise AssertionError("generic 2D queue must not use finite HUD/world placement")
     if not required["r26HudCompare"] or required["variantId"] != "ACTIVE_R26_R43_R44":
         raise AssertionError("active build no longer selects runtime-proven R26/R43/R44 owner")
 
@@ -59,13 +61,14 @@ def main() -> int:
         raise AssertionError("CORRECTNESS no longer binds the R49 visual-safe runtime set")
 
     require("src/vr/game/render_semantics.hpp",
+            "RenderScope::ScreenOverlay2D",
             "RenderScope::ScreenHud",
             "RegisterSpriteNodeScope(",
             "ConsumeSpriteNodeScope(",
-            "RenderScope fallback = RenderScope::None",
+            "RenderScope fallback = RenderScope::ScreenOverlay2D",
             "SelectSpriteQueueNode(",
-            "ConsumeSpriteNodeScope(node, RenderScope::None)",
-            "Queue membership alone is not HUD evidence",
+            "node, RenderScope::ScreenOverlay2D",
+            "asymmetric-FOV",
             "if (!SpriteQueueDepth)",
             "EXE+0x2D738",
             "EXE+0x2D73E",
@@ -74,7 +77,8 @@ def main() -> int:
             "0x42DCB4")
     forbid("src/vr/game/render_semantics.hpp",
            "RenderScope fallback = RenderScope::ScreenHud",
-           "CurrentScope = RenderScope::ScreenHud;")
+           "CurrentScope = RenderScope::ScreenHud;",
+           "RenderScope fallback = RenderScope::None")
 
     require("src/hooks_uiscaling.cpp",
             "VRHudQueueSemanticBridge",
@@ -91,11 +95,17 @@ def main() -> int:
     require("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
             "R47SemanticHudAccepted",
             "R47SemanticUnknownRejected",
+            "R50SemanticOverlay2DAccepted",
+            "R50ScreenOverlay2DDraws",
             "GameSemantic::CorroboratesHud",
             "GameSemantic::CorroboratesWorld",
-            "GameSemantic::ConsumeForDraw",
-            "canonical EXE sprite-queue semantics own HUD transforms",
-            "if (!semanticHud && !semanticWorld)")
+            "GameSemantic::CorroboratesScreenOverlay2D",
+            "R30ScreenSpaceKind::ScreenOverlay2D",
+            "state.eyeScale[eye] * ndcX + state.eyeOffset[eye]",
+            "fovAffine._11 = eyeScale[eye]",
+            "fovAffine._41 = eyeOffset[eye]",
+            "Do not apply head inverse",
+            "GameSemantic::ConsumeForDraw")
     forbid("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
            "if (state.depthTestEnabled && !state.worldEffect &&",
            "if (!state.worldEffect && !hudPlaneEvidence)",
