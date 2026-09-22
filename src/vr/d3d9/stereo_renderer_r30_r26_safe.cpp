@@ -90,6 +90,8 @@ namespace OutRunVRStereo
         std::uint64_t R30XyzrhwWorldEffectDraws = 0;
         std::uint64_t R47SemanticHudAccepted = 0;
         std::uint64_t R47SemanticUnknownRejected = 0;
+        std::uint64_t R50SemanticOverlay2DAccepted = 0;
+        std::uint64_t R50ScreenOverlay2DDraws = 0;
         std::uint64_t R30Hud2DDraws = 0;
         std::uint64_t R30PerspectiveHudDraws = 0;
         std::uint64_t R30WorldBillboardDraws = 0;
@@ -1116,7 +1118,7 @@ namespace OutRunVRStereo
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(
-                "VR R47: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAccepted={},semanticUnknownRejected={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R50: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAccepted={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
@@ -1124,6 +1126,8 @@ namespace OutRunVRStereo
                 R30XyzrhwWorldLockedHudDraws,
                 R47SemanticHudAccepted,
                 R47SemanticUnknownRejected,
+                R50SemanticOverlay2DAccepted,
+                R50ScreenOverlay2DDraws,
                 R30XyzrhwRhwWorldPromotions,
                 R30XyzrhwRhwOnlyDepthEvidence,
                 R30XyzrhwZOnlyDepthEvidence,
@@ -1281,6 +1285,7 @@ namespace OutRunVRStereo
             None,
             Hud2D,
             PerspectiveHud,
+            ScreenOverlay2D,
             WorldBillboard
         };
 
@@ -1396,6 +1401,15 @@ namespace OutRunVRStereo
                 OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
             const bool semanticWorld =
                 OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
+            const bool semanticOverlay2D =
+                OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
+                    semanticScope);
+
+            // R50: canonical queue membership proves generic 2D ownership but
+            // not finite/world-locked HUD ownership. This class receives only
+            // the per-eye asymmetric-FOV affine.
+            if (semanticOverlay2D)
+                return R30ScreenSpaceKind::ScreenOverlay2D;
 
             // R48 final-test policy: screen/perspective HUD ownership comes only
             // from the canonical EXE sprite queue or exact original-mod semantic
@@ -1510,6 +1524,7 @@ namespace OutRunVRStereo
             float hudClipY[2][3]{};
             float hudClipW[2][3]{};
             bool hudWorldLockValid = false;
+            bool screenOverlay2D = false;
             bool fullWorldReprojection = false;
             bool depthTestEnabled = false;
             bool rhwDepthEvidence = false;
@@ -1805,6 +1820,22 @@ namespace OutRunVRStereo
                 OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
             const bool semanticWorld =
                 OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
+            const bool semanticOverlay2D =
+                OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
+                    semanticScope);
+
+            // R50: generic SpriteNode queue content is known 2D but is not
+            // allowed onto the finite recentered HUD plane. Correct only the
+            // eye-FOV mapping in screen space. Exact WorldBillboard/ScreenHud
+            // tags retain their stronger specialized paths.
+            if (semanticOverlay2D)
+            {
+                state.screenOverlay2D = true;
+                state.worldEffect = false;
+                ++R50SemanticOverlay2DAccepted;
+                return true;
+            }
+
             state.worldEffect = semanticWorld || state.rhwDepthEvidence;
             if (!state.worldEffect && !semanticHud)
             {
@@ -2315,12 +2346,19 @@ namespace OutRunVRStereo
                     }
                     // Fallback keeps the game's original Z/RHW pair intact.
                 }
+                else if (state.screenOverlay2D)
+                {
+                    // R50: identical D3D pixel coordinates do not represent the
+                    // same visual ray under asymmetric OpenXR eye FOV. Apply the
+                    // proven common-ray X affine only. Do not apply head inverse,
+                    // eye translation, depth reset, HudScale, or a world plane.
+                    correctedX =
+                        state.eyeScale[eye] * ndcX + state.eyeOffset[eye];
+                    correctedY = ndcY;
+                }
                 else
                 {
-                    // R41: the real OutRun HUD is overwhelmingly XYZRHW. Put
-                    // those pre-transformed vertices on the same finite,
-                    // recentered plane used by the shader HUD instead of
-                    // copying screen coordinates into both eyes (head-lock).
+                    // Exact SCREEN_HUD only: finite recentered world-locked plane.
                     if (!state.hudWorldLockValid)
                         return false;
 
@@ -2475,11 +2513,13 @@ namespace OutRunVRStereo
                 ++R30XyzrhwHudDraws;
                 if (state.hudWorldLockValid)
                     ++R30XyzrhwWorldLockedHudDraws;
+                if (state.screenOverlay2D)
+                    ++R50ScreenOverlay2DDraws;
                 if (!R30FirstXyzrhwHudLogged)
                 {
                     R30FirstXyzrhwHudLogged = true;
                     spdlog::info(
-                        "VR R41 XYZRHW HUD: fixed-function HUD uses HudScale on a finite recentered world-locked plane; R42 Z-enabled screen-plane HUD is safely admitted and uses cached planar coefficients instead of per-vertex 4x4 transforms");
+                        "VR R50 XYZRHW 2D: generic SpriteNode content uses asymmetric-FOV common-ray affine only; exact SCREEN_HUD may still use the finite recentered world-locked plane");
                 }
             }
 
@@ -3064,6 +3104,29 @@ namespace OutRunVRStereo
                 !InvertMatrix(baseProjection, inverseBaseProjection))
                 return false;
 
+            // R50 generic queue path: post-multiply the stock clip transform by
+            // the same common-ray affine used for XYZRHW. This compensates only
+            // asymmetric per-eye FOV; it deliberately keeps the stock depth,
+            // head relation and WVP ownership untouched.
+            if (screenKind == R30ScreenSpaceKind::ScreenOverlay2D)
+            {
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    D3DMATRIX fovAffine = IdentityMatrix();
+                    fovAffine._11 = eyeScale[eye];
+                    fovAffine._41 = eyeOffset[eye];
+                    const D3DMATRIX corrected =
+                        MultiplyMatrix(stockWvp, fovAffine);
+                    if (!MatrixFinite(corrected))
+                        return false;
+                    const D3DMATRIX correctedT =
+                        TransposeMatrix(corrected);
+                    std::memcpy(eyeConstants[eye], &correctedT,
+                        sizeof(correctedT));
+                }
+                return true;
+            }
+
             const float centerEye[3]{
                 0.5f * (stereo.eyeOffset[0][0] + stereo.eyeOffset[1][0]),
                 0.5f * (stereo.eyeOffset[0][1] + stereo.eyeOffset[1][1]),
@@ -3228,6 +3291,12 @@ namespace OutRunVRStereo
             if (screenKind == R30ScreenSpaceKind::WorldBillboard)
             {
                 if (!OutRunVR::GameSemantic::CorroboratesWorld(
+                        semanticScope))
+                    return E_NOTIMPL;
+            }
+            else if (screenKind == R30ScreenSpaceKind::ScreenOverlay2D)
+            {
+                if (!OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
                         semanticScope))
                     return E_NOTIMPL;
             }
