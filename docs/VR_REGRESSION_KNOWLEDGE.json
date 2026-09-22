@@ -150,6 +150,69 @@
       "integrationSha": null,
       "validationRun": null,
       "nextAction": "Complete exact candidate CI/package, then run one short Quest3/VDXR CORRECTNESS startup/HUD test. Do not integrate any candidate containing a production 0x2D734 hook."
+    },
+    {
+      "key": "VR-R47-SPRITEQUEUE-BLANKET-HUD-001",
+      "title": "Untagged SpriteNode queue draws are blanket-promoted to world-locked HUD and corrupt the scene",
+      "status": "FIX_CANDIDATE_NEED_HMD_TEST",
+      "severity": "runtime-major-visual",
+      "firstKnownWindowKst": "2026-09-22",
+      "lastObservedKst": "2026-09-22",
+      "recurrenceCount": 1,
+      "symptomFingerprint": {
+        "primary": "True stereo remains stable but the broad 3D scene is visibly corrupted.",
+        "secondary": [
+          "R47 telemetry shows semanticHudAccepted equals hudWorldLock for every admitted XYZRHW HUD draw",
+          "independent HUD inspector resolves zero verified HUD semantics in the same session"
+        ],
+        "logSignals": [
+          "ea7c322d runtime: semanticHudAccepted=31681, hudWorldLock=31681, semanticUnknownRejected=0",
+          "HUD_TRACE_SUMMARY rows=1334 with all expected semantics NOT_OBSERVED/UNKNOWN"
+        ]
+      },
+      "knownBad": [
+        "ea7c322d8a21f41e2055214abd28b68c28fbeb19 — stable stereo, user reports whole-screen visual corruption; blanket queue fallback active"
+      ],
+      "rootCause": {
+        "status": "BOUNDED_RUNTIME_CONFIRMED",
+        "summary": "ConsumeSpriteNodeScope defaulted every untagged canonical queue node to ScreenHud. Production R47 therefore treated queue membership itself as semantic HUD proof and applied the finite world-locked HUD plane to all such XYZRHW draws, contradicting the project's fail-closed unknown-draw policy and the independent HUD evidence stream."
+      },
+      "fixReferences": [
+        "vr-d3d9ex-candidate/VR-R47-QUEUE-FAILCLOSED-ea7c322d — default untagged nodes to None; retain only explicit ScreenHud/WorldBillboard tags"
+      ],
+      "riskPaths": [
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "src/hooks_uiscaling.cpp",
+        "docs/VR_RUNTIME_VISUAL_CONTRACT.json",
+        "tools/verify_vr_visual_contract.py"
+      ],
+      "revalidationTriggers": [
+        "changes to SpriteNode semantic fallback",
+        "changes that treat queue membership alone as ScreenHud",
+        "changes to XYZRHW HUD promotion/finite-plane ownership",
+        "restoring R47/R48/R49 wholesale"
+      ],
+      "verifier": {
+        "static": [
+          "forbid fallback=ScreenHud for untagged nodes",
+          "require explicit None fallback",
+          "retain 0x2D734 crash prohibition",
+          "build active R26/R43/R44 package"
+        ],
+        "runtime": [
+          "CORRECTNESS on Quest3/VDXR",
+          "world geometry must become coherent",
+          "semanticUnknownRejected must become nonzero for untagged draws",
+          "no broad finite-plane promotion without explicit tag",
+          "remaining HUD defects are tracked separately rather than widening scope"
+        ]
+      },
+      "testLevel": 1,
+      "evidenceLevel": "SOURCE_FIX_PENDING_CI_NEED_HMD_TEST",
+      "integrationSha": null,
+      "validationRun": null,
+      "nextAction": "Validate exact candidate, then one short race visual pass. Do not add new HUD promotion until exact producer/caller evidence exists."
     }
   ]
 }
