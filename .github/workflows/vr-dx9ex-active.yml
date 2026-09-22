@@ -68,8 +68,11 @@ jobs:
         shell: pwsh
         run: |
           python tools/verify_vr_architecture.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tools/verify_vr_visual_contract.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tools/verify_vr_r32_review.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Verify near-plane active stereo eligibility
         shell: pwsh
         run: python tools/verify_vr_nearplane_active_gate.py
