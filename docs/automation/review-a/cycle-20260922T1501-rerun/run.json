@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "cycle_id": "cycle-20260922T1501-rerun",
   "role": "A",
-  "status": "COMPLETE_PENDING_FINAL_REVERIFY",
+  "status": "COMPLETE",
   "target_sha": "c4dd697e2b1f33d3b8af6ab254f378a1cc421248",
   "integration_identity_verified": "identical",
   "review_units_completed": 150,
@@ -49,8 +49,16 @@
     "R29-R34 stereo overlays and renderer R29 are comparison/inactive under the default SafeDraw owner and must not be treated as the active production draw path.",
     "Startup-white protection remains structurally present: private stereo resources initialize only after successful real game Present."
   ],
-  "blockers": [
-    "CP30/CP40 prefix revalidation-count accounting correction pending due transient GitHub safety block; core ledger rows and CP review_units counts unaffected."
-  ],
-  "nextAction": "Correct CP30/CP40 prefix accounting, then re-read ledger+all CP10..CP150+run record. Future healthy A invocations require >=75 fresh distinct units even on unchanged HEAD, carry-forward <=75."
+  "blockers": [],
+  "nextAction": "Next healthy A invocation must independently produce >=75 fresh distinct units even when HEAD is unchanged; carry-forward <=75. Prior COMPLETE is cache only, never permission to early-finish. On A-risk delta, partially invalidate affected identities. Keep VR-STARTUP-WHITE-001 open until Quest3/VDXR USER RUNTIME VERIFIED.",
+  "completion_verification": {
+    "ledger_rows": 150,
+    "unique_unit_ids": 150,
+    "fresh_units": 150,
+    "carried_forward_units": 0,
+    "checkpoints_verified": "CP10..CP150",
+    "checkpoint_mismatches": 0,
+    "ledger_blob": "8d776bbd9ed335707bc8027bb734ae0be64897df",
+    "cp150_blob": "2a49becf26f86d0a821d4f2e1deb0fc1d2412ff0"
+  }
 }
