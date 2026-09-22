@@ -774,22 +774,19 @@ UIScaling UIScaling::instance;
 // Canonical replacement EXE SHA256:
 // 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3
 // Static reverse analysis proves:
-//   RVA 0x2D734 = one-time entry into the priority/SpriteNode renderer,
+//   RVA 0x2D734 = queue-entry context only; DO NOT hook this address,
 //   RVA 0x2D762 = per-node iteration with EDI = SpriteNode*,
 //   RVA 0x2DCB4 = common epilogue.
+// Runtime crash signatures at EXE+0x2D738 and EXE+0x2D73E proved that a
+// SafetyHookMid at 0x2D734 can resume inside the relocated prologue.
+// Queue scope therefore starts lazily at the first real node (0x2D762).
 // This is deliberately semantic, not a draw-state heuristic: ordinary nodes are
 // SCREEN_HUD, while exact original-mod world-marker call sites register their
 // nodes as WORLD_BILLBOARD before the queue is rendered.
 class VRHudQueueSemanticBridge : public Hook
 {
-	inline static SafetyHookMid QueueBegin_hk{};
 	inline static SafetyHookMid QueueNode_hk{};
 	inline static SafetyHookMid QueueEnd_hk{};
-
-	static void QueueBegin(SafetyHookContext&)
-	{
-		OutRunVR::GameSemantic::BeginSpriteQueueRender();
-	}
 
 	static void QueueNode(SafetyHookContext& ctx)
 	{
@@ -815,18 +812,23 @@ public:
 
 	bool apply() override
 	{
-		QueueBegin_hk = safetyhook::create_mid(
-			Module::exe_ptr(0x2D734), QueueBegin);
 		QueueNode_hk = safetyhook::create_mid(
 			Module::exe_ptr(0x2D762), QueueNode);
 		QueueEnd_hk = safetyhook::create_mid(
 			Module::exe_ptr(0x2DCB4), QueueEnd);
 
-		const bool ok = QueueBegin_hk && QueueNode_hk && QueueEnd_hk;
+		const bool ok = QueueNode_hk && QueueEnd_hk;
+		if (!ok)
+		{
+			// The semantic bridge is all-or-nothing. Never leave a partial
+			// queue hook alive after a failed install.
+			QueueNode_hk = {};
+			QueueEnd_hk = {};
+		}
 		if (ok)
 		{
 			spdlog::info(
-				"VR HUD SEMANTIC: canonical sprite queue 0x2D734..0x2DCB4 owns SCREEN_HUD; original-mod tagged rival nodes remain WORLD_BILLBOARD");
+				"VR HUD SEMANTIC: canonical sprite queue node 0x2D762 + epilogue 0x2DCB4 own SCREEN_HUD; unsafe 0x2D734 entry hook is forbidden; original-mod tagged rival nodes remain WORLD_BILLBOARD");
 		}
 		else
 		{
