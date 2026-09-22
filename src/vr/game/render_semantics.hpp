@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+#include <cstddef>
 #include <cstdint>
 
 namespace OutRunVR::GameSemantic
@@ -15,6 +17,7 @@ namespace OutRunVR::GameSemantic
         WorldParticle,
         WorldBillboard,
         ReflectionCube,
+        ScreenHud,
     };
 
     inline thread_local RenderScope CurrentScope = RenderScope::None;
@@ -29,6 +32,7 @@ namespace OutRunVR::GameSemantic
         case RenderScope::WorldParticle: return "WORLD_PARTICLE";
         case RenderScope::WorldBillboard: return "WORLD_BILLBOARD";
         case RenderScope::ReflectionCube: return "REFLECTION_CUBE";
+        case RenderScope::ScreenHud: return "SCREEN_HUD";
         default: return "NONE";
         }
     }
@@ -75,5 +79,96 @@ namespace OutRunVR::GameSemantic
     {
         return scope == RenderScope::WorldParticle ||
             scope == RenderScope::WorldBillboard;
+    }
+
+    inline bool CorroboratesHud(RenderScope scope) noexcept
+    {
+        return scope == RenderScope::ScreenHud;
+    }
+
+    // Canonical OR2006C2C.EXE queue renderer recovered by static reverse analysis:
+    //   0x42D734 enters the per-priority SpriteNode walk,
+    //   0x42D762 begins one node, and
+    //   0x42DCB4 is the common epilogue.
+    // The queue is the authoritative ownership boundary for ordinary 2D HUD/menu
+    // sprites. Individual original-mod call sites may tag a node as a world
+    // billboard before it reaches this renderer.
+    struct SpriteNodeSemanticTag
+    {
+        const void* node = nullptr;
+        RenderScope scope = RenderScope::None;
+    };
+
+    inline constexpr std::size_t SpriteNodeSemanticCapacity = 0x230;
+    inline thread_local std::array<SpriteNodeSemanticTag,
+        SpriteNodeSemanticCapacity> SpriteNodeSemanticTags{};
+    inline thread_local std::size_t SpriteNodeSemanticCount = 0;
+    inline thread_local RenderScope SpriteQueuePreviousScope = RenderScope::None;
+    inline thread_local unsigned SpriteQueueDepth = 0;
+
+    inline void RegisterSpriteNodeScope(
+        const void* node, RenderScope scope) noexcept
+    {
+        if (!node || scope == RenderScope::None)
+            return;
+        for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
+        {
+            if (SpriteNodeSemanticTags[i].node == node)
+            {
+                SpriteNodeSemanticTags[i].scope = scope;
+                return;
+            }
+        }
+        if (SpriteNodeSemanticCount < SpriteNodeSemanticTags.size())
+        {
+            SpriteNodeSemanticTags[SpriteNodeSemanticCount++] =
+                { node, scope };
+        }
+    }
+
+    inline RenderScope ConsumeSpriteNodeScope(
+        const void* node, RenderScope fallback = RenderScope::ScreenHud) noexcept
+    {
+        if (node)
+        {
+            for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
+            {
+                if (SpriteNodeSemanticTags[i].node != node)
+                    continue;
+                const RenderScope scope = SpriteNodeSemanticTags[i].scope;
+                SpriteNodeSemanticTags[i] =
+                    SpriteNodeSemanticTags[--SpriteNodeSemanticCount];
+                SpriteNodeSemanticTags[SpriteNodeSemanticCount] = {};
+                return scope;
+            }
+        }
+        return fallback;
+    }
+
+    inline void BeginSpriteQueueRender() noexcept
+    {
+        if (SpriteQueueDepth++ == 0)
+        {
+            SpriteQueuePreviousScope = CurrentScope;
+            CurrentScope = RenderScope::ScreenHud;
+        }
+    }
+
+    inline void SelectSpriteQueueNode(const void* node) noexcept
+    {
+        if (SpriteQueueDepth)
+            CurrentScope = ConsumeSpriteNodeScope(node);
+    }
+
+    inline void EndSpriteQueueRender() noexcept
+    {
+        if (!SpriteQueueDepth)
+            return;
+        if (--SpriteQueueDepth == 0)
+        {
+            CurrentScope = SpriteQueuePreviousScope;
+            SpriteQueuePreviousScope = RenderScope::None;
+            SpriteNodeSemanticCount = 0;
+        }
     }
 }
