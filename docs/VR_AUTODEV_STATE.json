@@ -237,15 +237,18 @@
     "runtimeEvidence": "USER_RUNTIME_REQUIRED: capture trigger/usability and headset performance impact have not yet been validated on Quest 3/VDXR."
   },
   "scheduledAutomationModel": {
-    "A_00": "Hourly :00 architecture/state/lifetime deep review. Production source read-only; durable review records on vr-d3d9ex-review-a.",
-    "B_15": "Hourly :15 rendering/stereo/visual-correctness deep review. Production source read-only; durable review records on vr-d3d9ex-review-b.",
-    "C_30": "Hourly :30 performance/OpenXR/synchronization/testability deep review. Production source read-only; durable review records on vr-d3d9ex-review-c.",
-    "D_45": "Hourly :45 sole production FIX+BUILD+VALIDATE+INTEGRATE worker and consolidated queue/state/history owner.",
+    "A_00": "Hourly :00 architecture/state/lifetime/OpenXR-lifecycle/synchronization deep review. Review-only; persists to vr-d3d9ex-review-a.",
+    "N100_10": "Hourly :10 auxiliary fresh-chat deep review. Review-only; publishes delta findings/checkpoints to Issue #6.",
+    "B_20": "Hourly :20 rendering/stereo/visual/performance/frame-pacing deep review. Review-only; persists to vr-d3d9ex-review-b.",
+    "C_35": "Hourly :35 post-fix exact-SHA review, changeset sanity, finding dedup/organization, validation preparation, and D_IMPLEMENT_NEXT curation. Review/support only; persists to vr-d3d9ex-review-c.",
+    "D_45": "Hourly :45 sole production IMPLEMENT + BUILD + VALIDATE + INTEGRATE worker and durable regression/history owner.",
     "specialD": {
       "01:45": "nightly consolidation and architecture/regression/cache integrity review",
       "06:45": "overnight summary and daytime backlog reorder",
       "19:45": "freeze newest already-validated useful CORRECTNESS artifact; max 3 user choices only when evidence requires comparison"
-    }
+    },
+    "canonicalRoleContract": true,
+    "staleHistoricalRoleDocsDoNotOverride": true
   },
   "policyVerification": {
     "lightweightWorkflow": "VR Test Policy",
@@ -272,8 +275,8 @@
     "runRecordTemplate": "docs/automation/RUN_RECORD_TEMPLATE.json",
     "integrationBranch": "vr-d3d9ex-focus",
     "candidatePattern": "vr-d3d9ex-candidate/<finding-id>-<run-id>",
-    "productionWriter": "D_INTEGRATION_PLANNER",
-    "candidateWriter": "D_INTEGRATION_PLANNER",
+    "productionWriter": "D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE",
+    "candidateWriter": "D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE",
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
     "candidateWorkflow": ".github/workflows/vr-dx9ex-active.yml",
@@ -293,10 +296,17 @@
       "C": "vr-d3d9ex-review-c"
     },
     "reviewOnlyRoles": [
-      "A_ARCH_REVIEW",
-      "B_RENDER_REVIEW",
-      "C_PERF_REVIEW"
-    ]
+      "A_ARCH_STATE_LIFETIME_OPENXR_SYNC_REVIEW",
+      "B_RENDER_STEREO_VISUAL_PERF_FRAMEPACing_REVIEW",
+      "C_POSTFIX_CHANGE_SANITY_DEDUP_VALIDATION_PREP"
+    ],
+    "n100": {
+      "scheduleMinute": 10,
+      "role": "AUXILIARY_REVIEW_ONLY",
+      "persistence": "GitHub Issue #6 append-only findings + N100_CHECKPOINT",
+      "freshChatEachRun": true,
+      "previousBusyPolicy": "skip fresh launch; never close an actively generating prior run"
+    }
   },
   "regressionKnowledge": {
     "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
