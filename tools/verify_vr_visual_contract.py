@@ -43,6 +43,7 @@ def main() -> int:
 
     profiles = read("tools/OutRunVR-TestProfiles.ps1")
     require("tools/OutRunVR-TestProfiles.ps1",
+            "$visualSafeVr",
             "'-DirectGpuOnly=true'",
             "'-CullingUnionFov=false'",
             "'-FramerateLimit=60'",
@@ -51,9 +52,9 @@ def main() -> int:
             "'-FramerateUnlockExperimental=false'",
             "'-FrameCadenceMode=0'",
             "'-DisableDesktopVsync=false'")
-    forbid("tools/OutRunVR-TestProfiles.ps1",
-           "'-DirectGpuOnly=false'",
-           "'-CullingUnionFov=true'")
+    correctness = profiles.split("Name='CORRECTNESS'", 1)[1]
+    if ") + $visualSafeVr" not in correctness:
+        raise AssertionError("CORRECTNESS no longer binds the R49 visual-safe runtime set")
 
     require("src/vr/game/render_semantics.hpp",
             "RenderScope::ScreenHud",
