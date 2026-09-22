@@ -1,32 +1,151 @@
 unit_id	source	target	evidence	regression	disposition
-B12-001..B12-120	B11-001..B11-120	d961afe38d6417961d65d7e23d3a65f33bcec39c	Carry-forward after integration HEAD and production-runtime content identity revalidation; HEAD unchanged since prior B12 partial and candidate production hunk unchanged	VR-STARTUP-WHITE-001	CARRIED_IDENTITY_VALIDATED_120_DISTINCT_ROWS
-B12-121	candidate-base	c4dd697e	base exact d961afe; ahead3 behind0	VR-STARTUP-WHITE-001	POST_REVIEW
-B12-122	hooks_graphics/FixZBufferPrecision	c4dd697e	near-plane gate requires VRStereo	VR-STARTUP-WHITE-001	FALSIFICATION_PASS
-B12-123	hooks_graphics/FixZBufferPrecision	c4dd697e	near-plane gate requires RuntimeEligibility::MayInjectStereo	VR-STARTUP-WHITE-001	FALSIFICATION_PASS
-B12-124	nearplane-verifier	c4dd697e	deterministic oracle present and workflow-connected	VR-STARTUP-WHITE-001	POST_REVIEW
-B12-125	active-validation	c4dd697e	run 35684438108 exact head success	VR-STARTUP-WHITE-001	BUILD_EVIDENCE
-B12-126	active-validation/policy	c4dd697e	near-plane eligibility verifier executed successfully	VR-STARTUP-WHITE-001	BUILD_EVIDENCE
-B12-127	active-validation/game	c4dd697e	Win32 active game DLL job success	VR-STARTUP-WHITE-001	BUILD_EVIDENCE
-B12-128	active-validation/host	c4dd697e	x64 D3D11 OpenXR host/no-HMD smoke success	VR-STARTUP-WHITE-001	BUILD_EVIDENCE
-B12-129	active-validation/package	c4dd697e	package validation success	VR-STARTUP-WHITE-001	BUILD_EVIDENCE
-B12-130	SkyGlow boundary	c4dd697e	candidate does not modify stereo_renderer_r30 SkyGlow path	-	OUTSIDE_DELTA
-B12-131	HUD/XYZRHW boundary	c4dd697e	candidate does not modify HUD classifier path	-	OUTSIDE_DELTA
-B12-132	RT restoration boundary	c4dd697e	candidate does not modify render-target restoration path	-	OUTSIDE_DELTA
-B12-133	SBS/mirror boundary	c4dd697e	candidate does not modify desktop SBS/mirror path	-	OUTSIDE_DELTA
-B12-134	eye-sizing boundary	c4dd697e	candidate does not modify eye-size selection	-	OUTSIDE_DELTA
-B12-135	refresh boundary	c4dd697e	TargetRefreshRateHz runtime-selected policy unaffected	-	OUTSIDE_DELTA
-B12-136	draw amplification boundary	c4dd697e	no replay/draw-loop hunk	-	OUTSIDE_DELTA
-B12-137	copy hot-path boundary	c4dd697e	no copy path hunk	-	OUTSIDE_DELTA
-B12-138	wait hot-path boundary	c4dd697e	no producer/consumer wait hunk	-	OUTSIDE_DELTA
-B12-139	OpenXR frame delivery	c4dd697e	no acquire/wait/release hunk	-	OUTSIDE_DELTA
-B12-140	lens flare boundary	c4dd697e	no flare classification/render hunk	-	OUTSIDE_DELTA
-B12-141	smoke boundary	c4dd697e	no smoke render hunk	-	OUTSIDE_DELTA
-B12-142	skids boundary	c4dd697e	no skid render hunk	-	OUTSIDE_DELTA
-B12-143	world billboard boundary	c4dd697e	no billboard hunk	-	OUTSIDE_DELTA
-B12-144	monitor fallback	c4dd697e	no monitor fallback hunk	-	OUTSIDE_DELTA
-B12-145	diagnostic overhead	c4dd697e	no per-draw diagnostic hunk	-	OUTSIDE_DELTA
-B12-146	config/profile	c4dd697e	no runtime profile/config semantic change	-	FALSIFICATION_PASS
-B12-147	workflow trigger	c4dd697e	verifier path added to active workflow trigger	VR-STARTUP-WHITE-001	REGRESSION_PROTECTION
-B12-148	A-review identity	c4dd697e	A identity-only PASS; production hunk unchanged	VR-STARTUP-WHITE-001	CROSS_REVIEW
-B12-149	C-review exact SHA	c4dd697e	C PASS_EXACT_SHA_BUILD_VERIFIED_NEED_HMD_TEST	VR-STARTUP-WHITE-001	CROSS_REVIEW
-B12-150	runtime acceptance	c4dd697e	Quest3/VDXR evidence still required; build success not runtime truth	VR-STARTUP-WHITE-001	NEED_HMD_TEST
+B12-001	B11-001	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-002	B11-002	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-003	B11-003	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-004	B11-004	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-005	B11-005	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-006	B11-006	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-007	B11-007	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-008	B11-008	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-009	B11-009	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-010	B11-010	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-011	B11-011	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-012	B11-012	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-013	B11-013	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-014	B11-014	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-015	B11-015	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-016	B11-016	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-017	B11-017	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-018	B11-018	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-019	B11-019	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-020	B11-020	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-021	B11-021	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-022	B11-022	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-023	B11-023	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-024	B11-024	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-025	B11-025	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-026	B11-026	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-027	B11-027	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-028	B11-028	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-029	B11-029	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-030	B11-030	d961afe	identity revalidated	VR-STARTUP-WHITE-001	CARRY
+B12-031	B11-031	d961afe	identity revalidated	-	CARRY
+B12-032	B11-032	d961afe	identity revalidated	-	CARRY
+B12-033	B11-033	d961afe	identity revalidated	-	CARRY
+B12-034	B11-034	d961afe	identity revalidated	-	CARRY
+B12-035	B11-035	d961afe	identity revalidated	-	CARRY
+B12-036	B11-036	d961afe	identity revalidated	-	CARRY
+B12-037	B11-037	d961afe	identity revalidated	-	CARRY
+B12-038	B11-038	d961afe	identity revalidated	-	CARRY
+B12-039	B11-039	d961afe	identity revalidated	-	CARRY
+B12-040	B11-040	d961afe	identity revalidated	-	CARRY
+B12-041	B11-041	d961afe	identity revalidated	-	CARRY
+B12-042	B11-042	d961afe	identity revalidated	-	CARRY
+B12-043	B11-043	d961afe	identity revalidated	-	CARRY
+B12-044	B11-044	d961afe	identity revalidated	-	CARRY
+B12-045	B11-045	d961afe	identity revalidated	-	CARRY
+B12-046	B11-046	d961afe	identity revalidated	-	CARRY
+B12-047	B11-047	d961afe	identity revalidated	-	CARRY
+B12-048	B11-048	d961afe	identity revalidated	-	CARRY
+B12-049	B11-049	d961afe	identity revalidated	-	CARRY
+B12-050	B11-050	d961afe	identity revalidated	-	CARRY
+B12-051	B11-051	d961afe	identity revalidated	-	CARRY
+B12-052	B11-052	d961afe	identity revalidated	-	CARRY
+B12-053	B11-053	d961afe	identity revalidated	-	CARRY
+B12-054	B11-054	d961afe	identity revalidated	-	CARRY
+B12-055	B11-055	d961afe	identity revalidated	-	CARRY
+B12-056	B11-056	d961afe	identity revalidated	-	CARRY
+B12-057	B11-057	d961afe	identity revalidated	-	CARRY
+B12-058	B11-058	d961afe	identity revalidated	-	CARRY
+B12-059	B11-059	d961afe	identity revalidated	-	CARRY
+B12-060	B11-060	d961afe	identity revalidated	-	CARRY
+B12-061	B11-061	d961afe	identity revalidated	-	CARRY
+B12-062	B11-062	d961afe	identity revalidated	-	CARRY
+B12-063	B11-063	d961afe	identity revalidated	-	CARRY
+B12-064	B11-064	d961afe	identity revalidated	-	CARRY
+B12-065	B11-065	d961afe	identity revalidated	-	CARRY
+B12-066	B11-066	d961afe	identity revalidated	-	CARRY
+B12-067	B11-067	d961afe	identity revalidated	-	CARRY
+B12-068	B11-068	d961afe	identity revalidated	-	CARRY
+B12-069	B11-069	d961afe	identity revalidated	-	CARRY
+B12-070	B11-070	d961afe	identity revalidated	-	CARRY
+B12-071	B11-071	d961afe	identity revalidated	-	CARRY
+B12-072	B11-072	d961afe	identity revalidated	-	CARRY
+B12-073	B11-073	d961afe	identity revalidated	-	CARRY
+B12-074	B11-074	d961afe	identity revalidated	-	CARRY
+B12-075	B11-075	d961afe	identity revalidated	-	CARRY
+B12-076	B11-076	d961afe	identity revalidated	-	CARRY
+B12-077	B11-077	d961afe	identity revalidated	-	CARRY
+B12-078	B11-078	d961afe	identity revalidated	-	CARRY
+B12-079	B11-079	d961afe	identity revalidated	-	CARRY
+B12-080	B11-080	d961afe	identity revalidated	-	CARRY
+B12-081	B11-081	d961afe	identity revalidated	-	CARRY
+B12-082	B11-082	d961afe	identity revalidated	-	CARRY
+B12-083	B11-083	d961afe	identity revalidated	-	CARRY
+B12-084	B11-084	d961afe	identity revalidated	-	CARRY
+B12-085	B11-085	d961afe	identity revalidated	-	CARRY
+B12-086	B11-086	d961afe	identity revalidated	-	CARRY
+B12-087	B11-087	d961afe	identity revalidated	-	CARRY
+B12-088	B11-088	d961afe	identity revalidated	-	CARRY
+B12-089	B11-089	d961afe	identity revalidated	-	CARRY
+B12-090	B11-090	d961afe	identity revalidated	-	CARRY
+B12-091	B11-091	d961afe	identity revalidated	-	CARRY
+B12-092	B11-092	d961afe	identity revalidated	-	CARRY
+B12-093	B11-093	d961afe	identity revalidated	-	CARRY
+B12-094	B11-094	d961afe	identity revalidated	-	CARRY
+B12-095	B11-095	d961afe	identity revalidated	-	CARRY
+B12-096	B11-096	d961afe	identity revalidated	-	CARRY
+B12-097	B11-097	d961afe	identity revalidated	-	CARRY
+B12-098	B11-098	d961afe	identity revalidated	-	CARRY
+B12-099	B11-099	d961afe	identity revalidated	-	CARRY
+B12-100	B11-100	d961afe	identity revalidated	-	CARRY
+B12-101	B11-101	d961afe	identity revalidated	-	CARRY
+B12-102	B11-102	d961afe	identity revalidated	-	CARRY
+B12-103	B11-103	d961afe	identity revalidated	-	CARRY
+B12-104	B11-104	d961afe	identity revalidated	-	CARRY
+B12-105	B11-105	d961afe	identity revalidated	-	CARRY
+B12-106	B11-106	d961afe	identity revalidated	-	CARRY
+B12-107	B11-107	d961afe	identity revalidated	-	CARRY
+B12-108	B11-108	d961afe	identity revalidated	-	CARRY
+B12-109	B11-109	d961afe	identity revalidated	-	CARRY
+B12-110	B11-110	d961afe	identity revalidated	-	CARRY
+B12-111	B11-111	d961afe	identity revalidated	-	CARRY
+B12-112	B11-112	d961afe	identity revalidated	-	CARRY
+B12-113	B11-113	d961afe	identity revalidated	-	CARRY
+B12-114	B11-114	d961afe	identity revalidated	-	CARRY
+B12-115	B11-115	d961afe	identity revalidated	-	CARRY
+B12-116	B11-116	d961afe	identity revalidated	-	CARRY
+B12-117	B11-117	d961afe	identity revalidated	-	CARRY
+B12-118	B11-118	d961afe	identity revalidated	-	CARRY
+B12-119	B11-119	d961afe	identity revalidated	-	CARRY
+B12-120	B11-120	d961afe	identity revalidated	-	CARRY
+B12-121	candidate-base	c4dd697e	base exact d961afe ahead3 behind0	VR-STARTUP-WHITE-001	POST_REVIEW
+B12-122	FixZBufferPrecision	c4dd697e	VRStereo required	VR-STARTUP-WHITE-001	FALSIFY_PASS
+B12-123	FixZBufferPrecision	c4dd697e	MayInjectStereo required	VR-STARTUP-WHITE-001	FALSIFY_PASS
+B12-124	nearplane-verifier	c4dd697e	oracle workflow-connected	VR-STARTUP-WHITE-001	POST_REVIEW
+B12-125	CI	c4dd697e	run35684438108 exact-head success	VR-STARTUP-WHITE-001	BUILD
+B12-126	CI-policy	c4dd697e	near-plane verifier executed GREEN	VR-STARTUP-WHITE-001	BUILD
+B12-127	CI-game	c4dd697e	Win32 game success	VR-STARTUP-WHITE-001	BUILD
+B12-128	CI-host	c4dd697e	x64 host/no-HMD success	VR-STARTUP-WHITE-001	BUILD
+B12-129	CI-package	c4dd697e	package validation success	VR-STARTUP-WHITE-001	BUILD
+B12-130	SkyGlow	c4dd697e	no SkyGlow hunk	-	OUTSIDE_DELTA
+B12-131	HUD-XYZRHW	c4dd697e	no classifier hunk	-	OUTSIDE_DELTA
+B12-132	RT-restore	c4dd697e	no RT restoration hunk	-	OUTSIDE_DELTA
+B12-133	SBS-mirror	c4dd697e	no SBS/mirror hunk	-	OUTSIDE_DELTA
+B12-134	eye-sizing	c4dd697e	no eye-size hunk	-	OUTSIDE_DELTA
+B12-135	refresh	c4dd697e	TargetRefreshRateHz=0 unaffected	-	OUTSIDE_DELTA
+B12-136	draw-amplification	c4dd697e	no replay-loop hunk	-	OUTSIDE_DELTA
+B12-137	copy-hotpath	c4dd697e	no copy hunk	-	OUTSIDE_DELTA
+B12-138	wait-hotpath	c4dd697e	no wait hunk	-	OUTSIDE_DELTA
+B12-139	XR-frame	c4dd697e	no acquire/wait/release hunk	-	OUTSIDE_DELTA
+B12-140	lensflare	c4dd697e	no flare hunk	-	OUTSIDE_DELTA
+B12-141	smoke	c4dd697e	no smoke hunk	-	OUTSIDE_DELTA
+B12-142	skids	c4dd697e	no skid hunk	-	OUTSIDE_DELTA
+B12-143	billboard	c4dd697e	no billboard hunk	-	OUTSIDE_DELTA
+B12-144	monitor-fallback	c4dd697e	no fallback hunk	-	OUTSIDE_DELTA
+B12-145	diagnostics	c4dd697e	no per-draw diagnostic hunk	-	OUTSIDE_DELTA
+B12-146	config-profile	c4dd697e	no runtime profile semantic change	-	FALSIFY_PASS
+B12-147	workflow-trigger	c4dd697e	verifier path trigger present	VR-STARTUP-WHITE-001	PROTECTION
+B12-148	A-review	c4dd697e	identity-only PASS	VR-STARTUP-WHITE-001	CROSS_REVIEW
+B12-149	C-review	c4dd697e	exact-SHA PASS build-verified	VR-STARTUP-WHITE-001	CROSS_REVIEW
+B12-150	runtime-gate	c4dd697e	Quest3/VDXR still required	VR-STARTUP-WHITE-001	NEED_HMD_TEST
