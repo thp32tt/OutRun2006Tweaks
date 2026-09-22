@@ -1462,6 +1462,18 @@ namespace OutRunVRStereo
 
 			const HRESULT hr=PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);
 
+			// VR-STARTUP-WHITE-001 runtime recurrence: keep private-resource creation
+			// out of CreateDevice exposure, but restore the exact runtime-known-good
+			// ownership boundary from a9abb857/986f0d57. Initializing only after the
+			// raw/lower game Present succeeds prevents the later R23 wrapper chain from
+			// becoming the first owner of fresh-device RT/depth mutation.
+			if(SUCCEEDED(hr)&&!StereoResourcesReady&&EnsureStereoResources(device)&&
+				!FirstDeferredResourceInitLogged)
+			{
+				FirstDeferredResourceInitLogged=true;
+				spdlog::info("VR R23 INIT: private eye resources initialized at known-good R7 post-Present boundary; CreateDevice pre-exposure mutation remains prohibited");
+			}
+
 			if(directTransport)
 			{
 				if(SUCCEEDED(hr)&&DirectTransportFrameReadyAfterPresent(pendingFrameId))
