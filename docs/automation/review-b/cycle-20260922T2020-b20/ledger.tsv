@@ -1,1 +1,151 @@
 unit	fresh	path	lens	evidence
+B20-001	1	main_r23::CreateSwapchain	authority	verify single-owner presentation preconditions
+B20-002	1	main_r23::AcquireSwapchainImage	authority	verify single-owner presentation preconditions
+B20-003	1	main_r23::WaitSwapchainImage	authority	verify single-owner presentation preconditions
+B20-004	1	main_r23::ReleaseSwapchainImage	authority	verify single-owner presentation preconditions
+B20-005	1	main_r23::xrWaitFrame	authority	verify single-owner presentation preconditions
+B20-006	1	main_r23::xrBeginFrame	authority	verify single-owner presentation preconditions
+B20-007	1	main_r23::xrEndFrame	authority	verify single-owner presentation preconditions
+B20-008	1	main_r23::LocateViews	authority	verify single-owner presentation preconditions
+B20-009	1	R23::EndFrame	authority	verify single-owner presentation preconditions
+B20-010	1	R23::RenderCommittedDirect	authority	verify single-owner presentation preconditions
+B20-011	1	R23::IncomingPoseMatchesCommittedFrame	authority	verify single-owner presentation preconditions
+B20-012	1	R23::DirectSafeEyeMatchesCommittedFrame	authority	verify single-owner presentation preconditions
+B20-013	1	R23::SubmitNoLayer	authority	verify single-owner presentation preconditions
+B20-014	1	R23::SubmitNonProjectionOnly	authority	verify single-owner presentation preconditions
+B20-015	1	R23::DestroySession	authority	verify single-owner presentation preconditions
+B20-016	1	R23Bundle::ReadFresh	authority	verify single-owner presentation preconditions
+B20-017	1	R23Bundle::Commit	authority	verify single-owner presentation preconditions
+B20-018	1	R23Bundle::Invalidate	authority	verify single-owner presentation preconditions
+B20-019	1	Sbs::FrameComplete	authority	verify single-owner presentation preconditions
+B20-020	1	Sbs::EndFrame	authority	verify single-owner presentation preconditions
+B20-021	1	Sbs::LastProductionPresentQpc	authority	verify single-owner presentation preconditions
+B20-022	1	Review::IncomingProjectionValid	authority	verify single-owner presentation preconditions
+B20-023	1	Review::FreshClassicFallbackAvailable	authority	verify single-owner presentation preconditions
+B20-024	1	Review::HasIncomingNonProjectionLayer	authority	verify single-owner presentation preconditions
+B20-025	1	R21::HostShouldRenderReadonly	authority	verify single-owner presentation preconditions
+B20-026	1	R21::DirectTransportRequested	authority	verify single-owner presentation preconditions
+B20-027	1	R21::ReadDirectHostStateReadonly	authority	verify single-owner presentation preconditions
+B20-028	1	R21::BindLegacyBlitConstantBufferToVs	authority	verify single-owner presentation preconditions
+B20-029	1	R22::DirectOpenMatchesLatest	authority	verify single-owner presentation preconditions
+B20-030	1	Direct::EnsureSafeFrame	authority	verify single-owner presentation preconditions
+B20-031	1	main_r23::CreateSwapchain	cross-trace	trace frame/source/pose identity to submission
+B20-032	1	main_r23::AcquireSwapchainImage	cross-trace	trace frame/source/pose identity to submission
+B20-033	1	main_r23::WaitSwapchainImage	cross-trace	trace frame/source/pose identity to submission
+B20-034	1	main_r23::ReleaseSwapchainImage	cross-trace	trace frame/source/pose identity to submission
+B20-035	1	main_r23::xrWaitFrame	cross-trace	trace frame/source/pose identity to submission
+B20-036	1	main_r23::xrBeginFrame	cross-trace	trace frame/source/pose identity to submission
+B20-037	1	main_r23::xrEndFrame	cross-trace	trace frame/source/pose identity to submission
+B20-038	1	main_r23::LocateViews	cross-trace	trace frame/source/pose identity to submission
+B20-039	1	R23::EndFrame	cross-trace	trace frame/source/pose identity to submission
+B20-040	1	R23::RenderCommittedDirect	cross-trace	trace frame/source/pose identity to submission
+B20-041	1	R23::IncomingPoseMatchesCommittedFrame	cross-trace	trace frame/source/pose identity to submission
+B20-042	1	R23::DirectSafeEyeMatchesCommittedFrame	cross-trace	trace frame/source/pose identity to submission
+B20-043	1	R23::SubmitNoLayer	cross-trace	trace frame/source/pose identity to submission
+B20-044	1	R23::SubmitNonProjectionOnly	cross-trace	trace frame/source/pose identity to submission
+B20-045	1	R23::DestroySession	cross-trace	trace frame/source/pose identity to submission
+B20-046	1	R23Bundle::ReadFresh	cross-trace	trace frame/source/pose identity to submission
+B20-047	1	R23Bundle::Commit	cross-trace	trace frame/source/pose identity to submission
+B20-048	1	R23Bundle::Invalidate	cross-trace	trace frame/source/pose identity to submission
+B20-049	1	Sbs::FrameComplete	cross-trace	trace frame/source/pose identity to submission
+B20-050	1	Sbs::EndFrame	cross-trace	trace frame/source/pose identity to submission
+B20-051	1	Sbs::LastProductionPresentQpc	cross-trace	trace frame/source/pose identity to submission
+B20-052	1	Review::IncomingProjectionValid	cross-trace	trace frame/source/pose identity to submission
+B20-053	1	Review::FreshClassicFallbackAvailable	cross-trace	trace frame/source/pose identity to submission
+B20-054	1	Review::HasIncomingNonProjectionLayer	cross-trace	trace frame/source/pose identity to submission
+B20-055	1	R21::HostShouldRenderReadonly	cross-trace	trace frame/source/pose identity to submission
+B20-056	1	R21::DirectTransportRequested	cross-trace	trace frame/source/pose identity to submission
+B20-057	1	R21::ReadDirectHostStateReadonly	cross-trace	trace frame/source/pose identity to submission
+B20-058	1	R21::BindLegacyBlitConstantBufferToVs	cross-trace	trace frame/source/pose identity to submission
+B20-059	1	R22::DirectOpenMatchesLatest	cross-trace	trace frame/source/pose identity to submission
+B20-060	1	Direct::EnsureSafeFrame	cross-trace	trace frame/source/pose identity to submission
+B20-061	1	main_r23::CreateSwapchain	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-062	1	main_r23::AcquireSwapchainImage	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-063	1	main_r23::WaitSwapchainImage	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-064	1	main_r23::ReleaseSwapchainImage	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-065	1	main_r23::xrWaitFrame	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-066	1	main_r23::xrBeginFrame	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-067	1	main_r23::xrEndFrame	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-068	1	main_r23::LocateViews	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-069	1	R23::EndFrame	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-070	1	R23::RenderCommittedDirect	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-071	1	R23::IncomingPoseMatchesCommittedFrame	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-072	1	R23::DirectSafeEyeMatchesCommittedFrame	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-073	1	R23::SubmitNoLayer	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-074	1	R23::SubmitNonProjectionOnly	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-075	1	R23::DestroySession	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-076	1	R23Bundle::ReadFresh	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-077	1	R23Bundle::Commit	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-078	1	R23Bundle::Invalidate	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-079	1	Sbs::FrameComplete	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-080	1	Sbs::EndFrame	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-081	1	Sbs::LastProductionPresentQpc	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-082	1	Review::IncomingProjectionValid	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-083	1	Review::FreshClassicFallbackAvailable	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-084	1	Review::HasIncomingNonProjectionLayer	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-085	1	R21::HostShouldRenderReadonly	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-086	1	R21::DirectTransportRequested	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-087	1	R21::ReadDirectHostStateReadonly	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-088	1	R21::BindLegacyBlitConstantBufferToVs	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-089	1	R22::DirectOpenMatchesLatest	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-090	1	Direct::EnsureSafeFrame	falsify	challenge stale/mixed/mismatched state fail-closed
+B20-091	1	main_r23::CreateSwapchain	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-092	1	main_r23::AcquireSwapchainImage	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-093	1	main_r23::WaitSwapchainImage	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-094	1	main_r23::ReleaseSwapchainImage	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-095	1	main_r23::xrWaitFrame	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-096	1	main_r23::xrBeginFrame	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-097	1	main_r23::xrEndFrame	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-098	1	main_r23::LocateViews	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-099	1	R23::EndFrame	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-100	1	R23::RenderCommittedDirect	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-101	1	R23::IncomingPoseMatchesCommittedFrame	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-102	1	R23::DirectSafeEyeMatchesCommittedFrame	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-103	1	R23::SubmitNoLayer	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-104	1	R23::SubmitNonProjectionOnly	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-105	1	R23::DestroySession	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-106	1	R23Bundle::ReadFresh	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-107	1	R23Bundle::Commit	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-108	1	R23Bundle::Invalidate	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-109	1	Sbs::FrameComplete	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-110	1	Sbs::EndFrame	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-111	1	Sbs::LastProductionPresentQpc	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-112	1	Review::IncomingProjectionValid	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-113	1	Review::FreshClassicFallbackAvailable	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-114	1	Review::HasIncomingNonProjectionLayer	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-115	1	R21::HostShouldRenderReadonly	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-116	1	R21::DirectTransportRequested	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-117	1	R21::ReadDirectHostStateReadonly	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-118	1	R21::BindLegacyBlitConstantBufferToVs	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-119	1	R22::DirectOpenMatchesLatest	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-120	1	Direct::EnsureSafeFrame	timing	inspect wait/freshness/frame-pacing cost boundary
+B20-121	1	main_r23::CreateSwapchain	fallback	verify fallback preserves identity and projection authority
+B20-122	1	main_r23::AcquireSwapchainImage	fallback	verify fallback preserves identity and projection authority
+B20-123	1	main_r23::WaitSwapchainImage	fallback	verify fallback preserves identity and projection authority
+B20-124	1	main_r23::ReleaseSwapchainImage	fallback	verify fallback preserves identity and projection authority
+B20-125	1	main_r23::xrWaitFrame	fallback	verify fallback preserves identity and projection authority
+B20-126	1	main_r23::xrBeginFrame	fallback	verify fallback preserves identity and projection authority
+B20-127	1	main_r23::xrEndFrame	fallback	verify fallback preserves identity and projection authority
+B20-128	1	main_r23::LocateViews	fallback	verify fallback preserves identity and projection authority
+B20-129	1	R23::EndFrame	fallback	verify fallback preserves identity and projection authority
+B20-130	1	R23::RenderCommittedDirect	fallback	verify fallback preserves identity and projection authority
+B20-131	1	R23::IncomingPoseMatchesCommittedFrame	fallback	verify fallback preserves identity and projection authority
+B20-132	1	R23::DirectSafeEyeMatchesCommittedFrame	fallback	verify fallback preserves identity and projection authority
+B20-133	1	R23::SubmitNoLayer	fallback	verify fallback preserves identity and projection authority
+B20-134	1	R23::SubmitNonProjectionOnly	fallback	verify fallback preserves identity and projection authority
+B20-135	1	R23::DestroySession	fallback	verify fallback preserves identity and projection authority
+B20-136	1	R23Bundle::ReadFresh	fallback	verify fallback preserves identity and projection authority
+B20-137	1	R23Bundle::Commit	fallback	verify fallback preserves identity and projection authority
+B20-138	1	R23Bundle::Invalidate	fallback	verify fallback preserves identity and projection authority
+B20-139	1	Sbs::FrameComplete	fallback	verify fallback preserves identity and projection authority
+B20-140	1	Sbs::EndFrame	fallback	verify fallback preserves identity and projection authority
+B20-141	1	Sbs::LastProductionPresentQpc	fallback	verify fallback preserves identity and projection authority
+B20-142	1	Review::IncomingProjectionValid	fallback	verify fallback preserves identity and projection authority
+B20-143	1	Review::FreshClassicFallbackAvailable	fallback	verify fallback preserves identity and projection authority
+B20-144	1	Review::HasIncomingNonProjectionLayer	fallback	verify fallback preserves identity and projection authority
+B20-145	1	R21::HostShouldRenderReadonly	fallback	verify fallback preserves identity and projection authority
+B20-146	1	R21::DirectTransportRequested	fallback	verify fallback preserves identity and projection authority
+B20-147	1	R21::ReadDirectHostStateReadonly	fallback	verify fallback preserves identity and projection authority
+B20-148	1	R21::BindLegacyBlitConstantBufferToVs	fallback	verify fallback preserves identity and projection authority
+B20-149	1	R22::DirectOpenMatchesLatest	fallback	verify fallback preserves identity and projection authority
+B20-150	1	Direct::EnsureSafeFrame	fallback	verify fallback preserves identity and projection authority
