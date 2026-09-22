@@ -1428,12 +1428,21 @@ namespace OutRunVRStereo
 
             if (semanticWorld)
             {
-                // Original-mod RankMarker call sites explicitly tag queued
-                // rival-car markers WORLD_BILLBOARD. They must stay attached to
-                // the car/world and never be flattened into the fixed HUD.
+                // Exact rival-car WORLD_BILLBOARD tags never become HUD.
+                // If the live draw already has a verified/rebindable world WVP,
+                // let the lower R9/R28 world owner handle it directly. R30 only
+                // reconstructs a billboard when those stricter world owners
+                // cannot prove the current draw.
                 if (projectionClass ==
                     OutRunVR::PassPolicy::ProjectionClass::Perspective3D)
                 {
+                    if (CurrentDrawMatchesVerifiedWorld(device))
+                        return R30ScreenSpaceKind::None;
+                    std::uintptr_t reboundShader = 0;
+                    std::uint64_t reboundSerial = 0;
+                    if (R28CanRebindVerifiedWorld(
+                            device, reboundShader, reboundSerial))
+                        return R30ScreenSpaceKind::None;
                     ++R44SpatialBillboardClassifications;
                     return R30ScreenSpaceKind::WorldBillboard;
                 }
@@ -1824,27 +1833,32 @@ namespace OutRunVRStereo
                 OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
                     semanticScope);
 
-            // R50: generic SpriteNode queue content is known 2D but is not
-            // allowed onto the finite recentered HUD plane. Correct only the
-            // eye-FOV mapping in screen space. Exact WorldBillboard/ScreenHud
-            // tags retain their stronger specialized paths.
+            // R51 ownership precedence is explicit:
+            // exact WORLD_BILLBOARD > queue-owned 2D/HUD > geometric evidence.
+            // Runtime 750453f2 proved FOV-only queue placement converges the
+            // image but remains head-locked. Queue-owned 2D now uses the same
+            // finite recentered HUD plane as SCREEN_HUD, while keeping its
+            // distinct semantic class so it can never be mistaken for 3D.
+            state.screenOverlay2D = semanticOverlay2D;
             if (semanticOverlay2D)
-            {
-                state.screenOverlay2D = true;
-                state.worldEffect = false;
                 ++R50SemanticOverlay2DAccepted;
-                return true;
-            }
 
-            state.worldEffect = semanticWorld || state.rhwDepthEvidence;
-            if (!state.worldEffect && !semanticHud)
+            if (semanticWorld)
+                state.worldEffect = true;
+            else if (semanticHud || semanticOverlay2D)
+                state.worldEffect = false;
+            else
+                state.worldEffect = state.rhwDepthEvidence;
+
+            if (!state.worldEffect && !semanticHud && !semanticOverlay2D)
             {
                 ++R47SemanticUnknownRejected;
                 return false;
             }
             if (!state.worldEffect)
             {
-                ++R47SemanticHudAccepted;
+                if (semanticHud)
+                    ++R47SemanticHudAccepted;
                 // R41: most of OutRun's HUD is fixed-function XYZRHW, not the
                 // shader/c64 path. Build a synthetic finite HUD plane in the
                 // recentered gameplay space, then transform that plane by the
@@ -2346,19 +2360,12 @@ namespace OutRunVRStereo
                     }
                     // Fallback keeps the game's original Z/RHW pair intact.
                 }
-                else if (state.screenOverlay2D)
-                {
-                    // R50: identical D3D pixel coordinates do not represent the
-                    // same visual ray under asymmetric OpenXR eye FOV. Apply the
-                    // proven common-ray X affine only. Do not apply head inverse,
-                    // eye translation, depth reset, HudScale, or a world plane.
-                    correctedX =
-                        state.eyeScale[eye] * ndcX + state.eyeOffset[eye];
-                    correctedY = ndcY;
-                }
                 else
                 {
-                    // Exact SCREEN_HUD only: finite recentered world-locked plane.
+                    // R51: both exact SCREEN_HUD and generic canonical
+                    // SCREEN_OVERLAY_2D are queue-owned 2D. Put them on the
+                    // finite recentered world-fixed plane so they no longer
+                    // rotate with the HMD. WORLD_BILLBOARD never enters here.
                     if (!state.hudWorldLockValid)
                         return false;
 
@@ -3069,12 +3076,14 @@ namespace OutRunVRStereo
                 // a live register that may already contain our head correction.
                 if (!R44GetOwnedRawOverlayWvp(original))
                 {
-                    // Some flat result overlays never refresh c64 in the short
-                    // ownership window. They are safe only as PerspectiveHud;
-                    // preserve the old live fallback for those, but never for a
-                    // spatial billboard.
-                    if (screenKind == R30ScreenSpaceKind::WorldBillboard ||
-                        FAILED(device->GetVertexShaderConstantF(
+                    // R51: an exact WORLD_BILLBOARD semantic is already stronger
+                    // than the old 12-draw R44 age heuristic. The classifier has
+                    // just excluded both current-verified and strict R28-rebind
+                    // world ownership, so the live c64 is the remaining placement
+                    // source. This fixes rank-marker groups whose raw upload was
+                    // older than R44OverlayWvpDrawWindow without widening any
+                    // untagged draw.
+                    if (FAILED(device->GetVertexShaderConstantF(
                             OutRunWvpRegister, original,
                             OutRunWvpRegisterCount)))
                         return false;
@@ -3104,28 +3113,9 @@ namespace OutRunVRStereo
                 !InvertMatrix(baseProjection, inverseBaseProjection))
                 return false;
 
-            // R50 generic queue path: post-multiply the stock clip transform by
-            // the same common-ray affine used for XYZRHW. This compensates only
-            // asymmetric per-eye FOV; it deliberately keeps the stock depth,
-            // head relation and WVP ownership untouched.
-            if (screenKind == R30ScreenSpaceKind::ScreenOverlay2D)
-            {
-                for (int eye = 0; eye < 2; ++eye)
-                {
-                    D3DMATRIX fovAffine = IdentityMatrix();
-                    fovAffine._11 = eyeScale[eye];
-                    fovAffine._41 = eyeOffset[eye];
-                    const D3DMATRIX corrected =
-                        MultiplyMatrix(stockWvp, fovAffine);
-                    if (!MatrixFinite(corrected))
-                        return false;
-                    const D3DMATRIX correctedT =
-                        TransposeMatrix(corrected);
-                    std::memcpy(eyeConstants[eye], &correctedT,
-                        sizeof(correctedT));
-                }
-                return true;
-            }
+            // R51: SCREEN_OVERLAY_2D continues below into the same finite,
+            // recentered world-fixed plane transform as SCREEN_HUD. R49/R51
+            // keeps its c64 raw so R30 remains the sole transform owner.
 
             const float centerEye[3]{
                 0.5f * (stereo.eyeOffset[0][0] + stereo.eyeOffset[1][0]),
@@ -3188,7 +3178,8 @@ namespace OutRunVRStereo
             }
 
             if (screenKind != R30ScreenSpaceKind::Hud2D &&
-                screenKind != R30ScreenSpaceKind::PerspectiveHud)
+                screenKind != R30ScreenSpaceKind::PerspectiveHud &&
+                screenKind != R30ScreenSpaceKind::ScreenOverlay2D)
                 return false;
 
             // R40: turn all screen HUD into one finite, recentered view plane.
