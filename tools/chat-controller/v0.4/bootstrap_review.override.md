@@ -11,8 +11,8 @@ N100 리뷰 인박스: GitHub Issue #6 [N100] Continuous Review Inbox
 - B: rendering / stereo / visual correctness 심층리뷰
 - C: performance / OpenXR / synchronization / testability 심층리뷰
 - 예약 D: 유일한 production INTEGRATE 작업자
-- N100 A/B/C: 추가 리뷰 전용. production source, candidate, build/CI, merge/integration을 수행하지 않는다.
-- N100 D: 별도 candidate worker. 실제 source fix/verifier/build/CI까지 가능하지만 vr-d3d9ex-focus merge/integration은 절대 하지 않는다.
+- N100 A: 단일 보조 심층리뷰 전용. production source/candidate/build/CI/merge/integration을 수행하지 않는다.
+
 
 첫 응답의 실행 순서는 다음과 같다. 이 순서를 설명만 하지 말고 실제로 수행한다.
 1. GitHub에서 최신 상태를 즉시 복구한다.
