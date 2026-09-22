@@ -20,13 +20,16 @@ $performance = Get-OutRunVRTestProfile -Name PERFORMANCE
 foreach($profile in @($control,$correctness,$performance)) {
     Assert-True ($profile.Name -in @('CONTROL','CORRECTNESS','PERFORMANCE')) 'invalid profile identity'
     Assert-True (Has-Argument $profile '-PreferD3D9Ex=true') "$($profile.Name): D3D9Ex reference must be preferred"
-    Assert-True (Has-Argument $profile '-DirectGpuOnly=false') "$($profile.Name): DirectGPU must remain optional by default"
     Assert-True (Has-Argument $profile '-DisableDesktopDuplication=false') "$($profile.Name): fallback must remain available by default"
     Assert-True (Has-Argument $profile '-TargetRefreshRateHz=0') "$($profile.Name): refresh must follow OpenXR/VDXR"
     Assert-True (Has-Argument $profile '-SkyGlowFactor=1') "$($profile.Name): test policy requires SkyGlowFactor=1"
     Assert-True ($profile.Environment.OUTRUN_VR_TEST_PROFILE -eq $profile.Name) "$($profile.Name): environment identity mismatch"
 }
 
+Assert-True (Has-Argument $control '-DirectGpuOnly=false') 'CONTROL must keep DirectGPU optional for A/B isolation'
+Assert-True (Has-Argument $performance '-DirectGpuOnly=false') 'PERFORMANCE must keep fallback transport available for explicit performance comparison'
+Assert-True (Has-Argument $correctness '-DirectGpuOnly=true') 'CORRECTNESS must use the runtime-proven DirectGPU visual owner'
+Assert-True (Has-Argument $correctness '-CullingUnionFov=false') 'CORRECTNESS must keep union-FOV projection mutation disabled'
 Assert-True (Has-Argument $control '-FramerateLimit=60') 'CONTROL must remain conservative 60 Hz comparison'
 Assert-True ($control.Environment.OUTRUN_VR_PERFORMANCE_PROFILE -eq '0') 'CONTROL must not enable performance experiments'
 Assert-True ($correctness.Environment.OUTRUN_VR_PERFORMANCE_PROFILE -eq '0') 'CORRECTNESS must keep performance experiments isolated'
