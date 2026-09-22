@@ -15,7 +15,8 @@ class StatusHandler(BaseHTTPRequestHandler):
 <p><b>Last action:</b> {html.escape(str(runtime.get('last_action')))}</p>
 <p><b>Schedule:</b> minute {html.escape(str(SCHEDULE_MINUTES))} / KST</p>
 <p><b>Watchdog:</b> {html.escape(str(WATCHDOG_ENABLED))} / idle {WATCHDOG_STALL_MINUTES}m / busy-stall {WATCHDOG_BUSY_STALL_MINUTES}m / force-stop {html.escape(str(WATCHDOG_FORCE_STOP_STALLED))}</p>
-<p><b>Rate limit:</b> attempts {reg.rate_limit_attempts} / until {html.escape(str(reg.rate_limit_until))} / backoff {html.escape(str(RATE_LIMIT_BACKOFF_MINUTES))}m / global-gap {MIN_SEND_GAP_SECONDS}s / slot-dedup {SLOT_DEDUP_SECONDS}s</p>
+<p><b>Rate limit:</b> attempts {reg.rate_limit_attempts} / until {html.escape(str(reg.rate_limit_until))} / backoff {html.escape(str(RATE_LIMIT_BACKOFF_SECONDS))}s / global-gap {MIN_SEND_GAP_SECONDS}s / slot-dedup {SLOT_DEDUP_SECONDS}s</p>
+<p><b>Chat mode:</b> fresh_each_run {html.escape(str(FRESH_CHAT_EACH_RUN))} / retry cooldown {RETRY_BUTTON_COOLDOWN_SECONDS}s</p>
 <p><b>Thinking:</b> required {html.escape(PREFERRED_THINKING_LEVEL)} / strict {html.escape(str(STRICT_THINKING_LEVEL))} / last {html.escape(str(runtime.get('last_thinking_level_result')))}</p>
 <p><b>Logical date:</b> {html.escape(reg.logical_date)}</p>
 <p><b>Next slot:</b> {html.escape(reg.slots[reg.next_slot].name)}</p>
@@ -42,7 +43,7 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
         return
     last_tick = None
     last_watchdog_check = 0.0
-    write_runtime(status="idle", tab_mode="dedicated_per_slot", tab_count=len(pages))
+    write_runtime(status="idle", tab_mode="fresh_per_run" if FRESH_CHAT_EACH_RUN else "dedicated_per_slot", tab_count=len(pages))
     while True:
         now = datetime.now(TZ)
         tick = now.strftime("%Y-%m-%dT%H:%M")
