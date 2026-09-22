@@ -18,7 +18,28 @@
     ],
     "integrationRule": "A candidate touching a matching hook/RVA or riskPath must revalidate the known crash signature before D integration."
   },
-  "signatures": [],
+  "signatures": [
+    {
+      "key": "VR-CRASH-HUDQUEUE-001",
+      "exceptionCode": "0xC0000005",
+      "module": "OR2006C2C.EXE",
+      "moduleRva": "0x0002D738/0x0002D73E",
+      "observedRvas": [
+        "0x0002D738",
+        "0x0002D73E"
+      ],
+      "firstSeenSourceSha": "1296ef2bd2b7432ecbb74214180a3960128d7e7c",
+      "symptom": "Immediate startup access violation inside the canonical SpriteNode queue-entry prologue after installing VRHudQueueSemanticBridge.",
+      "rootCause": "SafetyHookMid at RVA 0x2D734 relocates/returns through the short queue-entry prologue; real crashes resumed at offsets 0x2D738 and 0x2D73E inside original instructions.",
+      "fixReference": "VR-HUDQUEUE-ENTRY-CRASH-559eb670: remove the 0x2D734 mid-hook and lazily begin semantic queue ownership at the first per-node hook RVA 0x2D762.",
+      "validation": "LEVEL0 CI must forbid any production Module::exe_ptr(0x2D734) hook; Win32 build/package plus LEVEL1 HMD startup required.",
+      "status": "FIX_CANDIDATE",
+      "riskPath": [
+        "src/hooks_uiscaling.cpp::VRHudQueueSemanticBridge",
+        "src/vr/game/render_semantics.hpp::SelectSpriteQueueNode"
+      ]
+    }
+  ],
   "notes": [
     "Crash ZIPs should contain crash_signature.json with exceptionCode, absoluteAddress, moduleBase and exeRva when the fault address belongs to OR2006C2C.EXE.",
     "Exact EXE identity is verified separately by docs/VR_BINARY_CONTRACT.json.",
