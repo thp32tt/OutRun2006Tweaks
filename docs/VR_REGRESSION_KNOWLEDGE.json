@@ -7,8 +7,21 @@
     "eventHistory": "append-only",
     "recurrence": "reuse-stable-key-and-reopen",
     "integrationGate": "all triggered regression cases must be revalidated or explicitly NEED_HMD_TEST before integration",
-    "fixedRequirements": ["durable fix reference", "affected path set", "deterministic verifier or evidence recipe", "validation evidence level"],
-    "runtimeFixedRequirement": "runtime-visible regressions require matching USER RUNTIME VERIFIED evidence before final DONE"
+    "fixedRequirements": [
+      "durable fix reference",
+      "affected path set",
+      "deterministic verifier or evidence recipe",
+      "validation evidence level"
+    ],
+    "runtimeFixedRequirement": "runtime-visible regressions require matching USER RUNTIME VERIFIED evidence before final DONE",
+    "userRuntimeBaseline": {
+      "mode": "protected-moving-baseline",
+      "advancement": "only matching Quest3/VDXR USER_RUNTIME_VERIFIED evidence may establish or advance the baseline",
+      "buildEvidenceCannotAdvance": true,
+      "failedRuntimeTestPreservesLastKnownGood": true,
+      "candidateRequirement": "BASELINE_DELTA required for runtime-risking candidates",
+      "integrationRequirement": "all triggered protected invariants must pass deterministic revalidation or remain explicitly NEED_HMD_TEST without contradicting a known USER_RUNTIME_VERIFIED invariant"
+    }
   },
   "cases": [
     {
@@ -21,11 +34,19 @@
       "recurrenceCount": 1,
       "symptomFingerprint": {
         "primary": "startup reaches/passes logo then white screen and does not progress into normal game flow",
-        "secondary": ["recenter/input path may still respond while presentation/game progression is stuck"],
-        "logSignals": ["correlate game/host/watchdog session timeline around first post-logo Present and stereo transport activation"]
+        "secondary": [
+          "recenter/input path may still respond while presentation/game progression is stuck"
+        ],
+        "logSignals": [
+          "correlate game/host/watchdog session timeline around first post-logo Present and stereo transport activation"
+        ]
       },
-      "knownGood": ["a9abb85702925aaa09ca85581423eb9766c2adb3 — logo/menu/car/course/race rendered; later theater-only VR defect remained"],
-      "knownBad": ["1f2dcb9848a7142c295f371f0dc91663f174c442 — persistent startup white runtime"],
+      "knownGood": [
+        "a9abb85702925aaa09ca85581423eb9766c2adb3 — logo/menu/car/course/race rendered; later theater-only VR defect remained"
+      ],
+      "knownBad": [
+        "1f2dcb9848a7142c295f371f0dc91663f174c442 — persistent startup white runtime"
+      ],
       "rootCause": {
         "status": "BOUNDED_RECONSTRUCTED",
         "summary": "D3D9Ex synchronous CreateDevice-thread stereo installation called EnsureStereoResources before the promoted device was returned to OutRun, allocating/mutating private RT/depth resources before fresh-device initialization completed."
@@ -36,11 +57,35 @@
         "341bd8027b9595f43c89e31ae1f9cf8783751faa — integrated current-focus reconstruction plus deterministic guard",
         "fc636acc9e639a7e280ff66f2d1c86700b4caa91 -> 16c47176868dc600afcd8ca0e05990280aaa21d9 -> 7081b38917aa1b7ec319bea137a88b6f6f07733b — owner-corrected preservation chain"
       ],
-      "riskPaths": ["src/vr/**", "vrhost/**", "src/hooks_graphics.cpp", "src/hooks_framerate.cpp", "src/hooks_exceptions.cpp", "OutRun2006Tweaks.ini", "tools/*OutRunVR*.ps1", ".github/workflows/vr-dx9ex-active.yml"],
-      "revalidationTriggers": ["changes to startup/device creation/reset/present flow", "changes to stereo transport/shared-frame eligibility", "changes to host fallback/recovery or first-frame state", "changes to launch/profile/config values affecting VR activation"],
+      "riskPaths": [
+        "src/vr/**",
+        "vrhost/**",
+        "src/hooks_graphics.cpp",
+        "src/hooks_framerate.cpp",
+        "src/hooks_exceptions.cpp",
+        "OutRun2006Tweaks.ini",
+        "tools/*OutRunVR*.ps1",
+        ".github/workflows/vr-dx9ex-active.yml"
+      ],
+      "revalidationTriggers": [
+        "changes to startup/device creation/reset/present flow",
+        "changes to stereo transport/shared-frame eligibility",
+        "changes to host fallback/recovery or first-frame state",
+        "changes to launch/profile/config values affecting VR activation"
+      ],
       "verifier": {
-        "static": ["build active DX9Ex game DLL and x64 OpenXR host", "run deterministic host smoke tests", "verify deferred stereo resource initialization is absent from CreateDevice pre-exposure path and occurs only after successful game Present", "verify autodev/regression registry contract"],
-        "runtime": ["launch CORRECTNESS package", "confirm logo transitions into menu/game instead of persistent white frame", "confirm gameplay stereo opens after deferred initialization", "collect standardized OutRun2_VR_ANALYZE_*.zip if failure recurs"]
+        "static": [
+          "build active DX9Ex game DLL and x64 OpenXR host",
+          "run deterministic host smoke tests",
+          "verify deferred stereo resource initialization is absent from CreateDevice pre-exposure path and occurs only after successful game Present",
+          "verify autodev/regression registry contract"
+        ],
+        "runtime": [
+          "launch CORRECTNESS package",
+          "confirm logo transitions into menu/game instead of persistent white frame",
+          "confirm gameplay stereo opens after deferred initialization",
+          "collect standardized OutRun2_VR_ANALYZE_*.zip if failure recurs"
+        ]
       },
       "testLevel": 3,
       "evidenceLevel": "BUILD_VERIFIED_NEED_HMD_TEST",
@@ -48,5 +93,15 @@
       "validationRun": "35647825229 SUCCESS",
       "nextAction": "Run Quest3/VDXR CORRECTNESS validation: logo->menu/game without persistent white frame, then verify gameplay stereo opens. Keep case open until USER RUNTIME VERIFIED; if symptom recurs append REOPENED using this same key."
     }
-  ]
+  ],
+  "userRuntimeVerifiedBaseline": {
+    "status": "PENDING_CURRENT_ACCEPTED_BASELINE",
+    "sourceSha": null,
+    "packageSha256": null,
+    "profile": null,
+    "configHash": null,
+    "sessionId": null,
+    "protectedRegressionKeys": [],
+    "note": "Do not infer a full baseline from BUILD_VERIFIED state. Populate only after matching Quest3/VDXR user runtime evidence. Existing per-regression known-good evidence remains usable for scoped revalidation."
+  }
 }
