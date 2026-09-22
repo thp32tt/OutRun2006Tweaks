@@ -1,9 +1,13 @@
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "game_addrs.hpp"
+#include "vr/game/render_semantics.hpp"
+
+#include <array>
 
 namespace Settings
 {
+	extern Setting<bool> VREnabled;
 	Setting<int> UIScalingMode{ "Graphics", "UIScalingMode", 1,
 		"Adjusts the UI scaling applied by the game.",
 		{ "Vanilla, stretches to screen ratio", "Scaled UI, no stretching (Outrun Online Arcade)",
@@ -232,7 +236,28 @@ class UIScaling : public Hook
 	// position as floats, so the discarded fraction goes straight back on.
 	static int __cdecl RankMarker_sprani(uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
 	{
-		return Game::sprani_play_ae_auth_alpha(spriteId, x + RankMarkerFracX, y + RankMarkerFracY, a4, a5, alpha);
+		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			tailsBefore[prio] = root ? root->tail_4 : nullptr;
+		}
+
+		const int result = Game::sprani_play_ae_auth_alpha(
+			spriteId, x + RankMarkerFracX, y + RankMarkerFracY, a4, a5, alpha);
+
+		// These four call sites are explicitly identified by the original mod as
+		// rival-car rank markers. Preserve that ownership on the queued node so
+		// the VR sprite renderer does not flatten the marker into the fixed HUD.
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			SpriteNode* node = root ? root->tail_4 : nullptr;
+			if (node && node != tailsBefore[prio])
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+		}
+		return result;
 	}
 
 	// 4th place onward is spelled out from digit sprites drawn by
@@ -257,6 +282,8 @@ class UIScaling : public Hook
 		{
 			node->args_10.float24 += RankMarkerFracX;
 			node->args_10.float28 += RankMarkerFracY;
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
 		}
 
 		return result;
@@ -740,4 +767,75 @@ public:
 	}
 	static UIScaling instance;
 };
+
 UIScaling UIScaling::instance;
+
+// VR semantic bridge for the game's canonical queued 2D renderer.
+// Canonical replacement EXE SHA256:
+// 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3
+// Static reverse analysis proves:
+//   RVA 0x2D734 = one-time entry into the priority/SpriteNode renderer,
+//   RVA 0x2D762 = per-node iteration with EDI = SpriteNode*,
+//   RVA 0x2DCB4 = common epilogue.
+// This is deliberately semantic, not a draw-state heuristic: ordinary nodes are
+// SCREEN_HUD, while exact original-mod world-marker call sites register their
+// nodes as WORLD_BILLBOARD before the queue is rendered.
+class VRHudQueueSemanticBridge : public Hook
+{
+	inline static SafetyHookMid QueueBegin_hk{};
+	inline static SafetyHookMid QueueNode_hk{};
+	inline static SafetyHookMid QueueEnd_hk{};
+
+	static void QueueBegin(SafetyHookContext&)
+	{
+		OutRunVR::GameSemantic::BeginSpriteQueueRender();
+	}
+
+	static void QueueNode(SafetyHookContext& ctx)
+	{
+		OutRunVR::GameSemantic::SelectSpriteQueueNode(
+			reinterpret_cast<const void*>(ctx.edi));
+	}
+
+	static void QueueEnd(SafetyHookContext&)
+	{
+		OutRunVR::GameSemantic::EndSpriteQueueRender();
+	}
+
+public:
+	std::string_view description() override
+	{
+		return "VRHudQueueSemanticBridge";
+	}
+
+	bool validate() override
+	{
+		return Settings::VREnabled.get();
+	}
+
+	bool apply() override
+	{
+		QueueBegin_hk = safetyhook::create_mid(
+			Module::exe_ptr(0x2D734), QueueBegin);
+		QueueNode_hk = safetyhook::create_mid(
+			Module::exe_ptr(0x2D762), QueueNode);
+		QueueEnd_hk = safetyhook::create_mid(
+			Module::exe_ptr(0x2DCB4), QueueEnd);
+
+		const bool ok = QueueBegin_hk && QueueNode_hk && QueueEnd_hk;
+		if (ok)
+		{
+			spdlog::info(
+				"VR HUD SEMANTIC: canonical sprite queue 0x2D734..0x2DCB4 owns SCREEN_HUD; original-mod tagged rival nodes remain WORLD_BILLBOARD");
+		}
+		else
+		{
+			spdlog::error(
+				"VR HUD SEMANTIC: failed to install canonical sprite-queue ownership hooks; semantic HUD promotion disabled");
+		}
+		return ok;
+	}
+
+	static VRHudQueueSemanticBridge instance;
+};
+VRHudQueueSemanticBridge VRHudQueueSemanticBridge::instance;
