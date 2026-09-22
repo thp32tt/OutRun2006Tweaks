@@ -91,6 +91,12 @@ CONTINUE_GENERATING_SELECTORS = [
     "button:has-text('계속 생성')",
     "button:has-text('계속해서 생성')",
 ]
+RETRY_SELECTORS = [
+    "button:has-text('Retry')",
+    "button:has-text('Try again')",
+    "button:has-text('다시 시도')",
+    "button:has-text('재시도')",
+]
 ASSISTANT_MESSAGE_SELECTORS = [
     "[data-message-author-role='assistant']",
 ]
