@@ -70,3 +70,16 @@ The active DX9Ex validation workflow now accepts isolated B candidate branches a
 Central runtime-candidate WIP limit is 3. Two materially different failed fixes for the same unchanged failure become BLOCKED. A/B/C publish evidence/proposals on their own branches; D imports them idempotently and updates the central queue.
 
 DXVK/multiview/DX12 remain blocked by policy until the DX9Ex reference is user accepted. The next normal human validation remains one CORRECTNESS test unless concrete evidence requires CONTROL/PERFORMANCE comparison.
+
+
+## Canonical automation role/schedule update — 2026-09-22 KST
+
+Current autonomous pipeline contract supersedes older historical :15/:30 role descriptions:
+
+- A :00 — architecture/state/lifetime/OpenXR-lifecycle/synchronization deep review.
+- N100 :10 — auxiliary review-only fresh Chat; findings and delta checkpoint go to Issue #6.
+- B :20 — rendering/stereo/visual/performance/frame-pacing deep review.
+- C :35 — exact-SHA post-fix review, changeset sanity, finding dedup/organization, validation preparation, and `D_IMPLEMENT_NEXT` curation.
+- D :45 — sole production IMPLEMENT + BUILD + VALIDATE + INTEGRATE worker.
+- Older text describing B as a fix worker, C as general validation/performance review, or :15/:30 launch times is historical context only and must not override this contract.
+- N100 opens a fresh Chat each scheduled run only when the previous N100 run is no longer generating; an active prior run is preserved and that hour's fresh launch is skipped.
