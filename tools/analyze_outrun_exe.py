@@ -364,6 +364,8 @@ def main() -> int:
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
         "hud_strings": extract_hud_strings(pe),
+        "driver_chrsets_bytes": pe.bytes_at_rva(0x2549B0, 24).hex(" "),
+        "heroine_chrsets_bytes": pe.bytes_at_rva(0x2549C8, 24).hex(" "),
     }
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
