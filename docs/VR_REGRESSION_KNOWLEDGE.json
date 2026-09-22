@@ -154,7 +154,7 @@
     {
       "key": "VR-R47-SPRITEQUEUE-BLANKET-HUD-001",
       "title": "Untagged SpriteNode queue draws are blanket-promoted to world-locked HUD and corrupt the scene",
-      "status": "FIX_CANDIDATE_NEED_HMD_TEST",
+      "status": "FIX_REFINED_NEED_HMD_TEST",
       "severity": "runtime-major-visual",
       "firstKnownWindowKst": "2026-09-22",
       "lastObservedKst": "2026-09-22",
@@ -171,14 +171,16 @@
         ]
       },
       "knownBad": [
-        "ea7c322d8a21f41e2055214abd28b68c28fbeb19 — stable stereo, user reports whole-screen visual corruption; blanket queue fallback active"
+        "ea7c322d8a21f41e2055214abd28b68c28fbeb19 — stable stereo, user reports whole-screen visual corruption; blanket queue fallback active",
+        "9554272a7142b1533dfbf85d294111f3d6634fe1 — blanket finite-HUD promotion removed, but generic 2D queue fell to stock zero-disparity duplication and became binocularly split under asymmetric OpenXR FOV"
       ],
       "rootCause": {
         "status": "BOUNDED_RUNTIME_CONFIRMED",
         "summary": "ConsumeSpriteNodeScope defaulted every untagged canonical queue node to ScreenHud. Production R47 therefore treated queue membership itself as semantic HUD proof and applied the finite world-locked HUD plane to all such XYZRHW draws, contradicting the project's fail-closed unknown-draw policy and the independent HUD evidence stream."
       },
       "fixReferences": [
-        "vr-d3d9ex-candidate/VR-R47-QUEUE-FAILCLOSED-ea7c322d — default untagged nodes to None; retain only explicit ScreenHud/WorldBillboard tags"
+        "9554272a7142b1533dfbf85d294111f3d6634fe1 — removed blanket ScreenHud finite-plane ownership; runtime proved NONE fallback is too weak for asymmetric-FOV 2D convergence",
+        "vr-d3d9ex-candidate/VR-R50-QUEUE-FOV2D-9554272a — refined generic queue ownership to FOV-only ScreenOverlay2D; exact ScreenHud/WorldBillboard remain explicit"
       ],
       "riskPaths": [
         "src/vr/game/render_semantics.hpp",
@@ -196,7 +198,8 @@
       "verifier": {
         "static": [
           "forbid fallback=ScreenHud for untagged nodes",
-          "require explicit None fallback",
+          "require generic ScreenOverlay2D FOV-only fallback",
+          "forbid head inverse/IPD/depth reset for generic queue content",
           "retain 0x2D734 crash prohibition",
           "build active R26/R43/R44 package"
         ],
@@ -212,7 +215,74 @@
       "evidenceLevel": "SOURCE_FIX_PENDING_CI_NEED_HMD_TEST",
       "integrationSha": null,
       "validationRun": null,
-      "nextAction": "Validate exact candidate, then one short race visual pass. Do not add new HUD promotion until exact producer/caller evidence exists."
+      "nextAction": "Validate R50 exact candidate. Broad scene must stay free of finite-HUD distortion while generic 2D/HUD converges to one image.",
+      "knownGood": []
+    },
+    {
+      "key": "VR-R50-ASYMMETRIC-FOV-2D-DIPLOPIA-001",
+      "title": "Generic 2D/HUD becomes double when untagged SpriteNode queue falls through to identical-pixel two-eye duplication",
+      "status": "FIX_CANDIDATE_NEED_HMD_TEST",
+      "severity": "runtime-major-visual",
+      "firstKnownWindowKst": "2026-09-23",
+      "lastObservedKst": "2026-09-23",
+      "recurrenceCount": 1,
+      "symptomFingerprint": {
+        "primary": "User reports everything split into two, including HUD, on exact 9554272a fail-closed candidate.",
+        "secondary": [
+          "R30 HUD/2D ownership is completely zero while stereo transport remains healthy",
+          "generic SpriteNode draws fall through to R7/R9 non-world duplication with unchanged D3D screen coordinates"
+        ],
+        "logSignals": [
+          "9554272a runtime: semanticHudAccepted=0, hud=0, screen[all=0], semanticUnknownRejected=45614",
+          "R7 design duplicates non-world draws at stock WVP/screen coordinates",
+          "Quest/VDXR publishes asymmetric left/right FOV, so identical per-eye NDC/pixel positions do not represent the same visual ray",
+          "rightDraw/restore/present failures remain zero and DirectGPU true stereo is active"
+        ]
+      },
+      "knownBad": [
+        "9554272a7142b1533dfbf85d294111f3d6634fe1 — user runtime confirms whole visible image/HUD diplopia after generic queue fallback=None"
+      ],
+      "rootCause": {
+        "status": "BOUNDED_RUNTIME_AND_SOURCE_CONFIRMED",
+        "summary": "The 9554272a isolation correctly stopped finite-plane over-promotion, but untagged canonical 2D queue content then bypassed R30 completely. R7/R9 duplicates non-world draws with identical stock screen coordinates. Because the OpenXR left/right projection FOVs are asymmetric, identical D3D coordinates map to different visual rays and appear separated in the HMD."
+      },
+      "fixReferences": [
+        "vr-d3d9ex-candidate/VR-R50-QUEUE-FOV2D-9554272a — introduce ScreenOverlay2D and apply only the proven common-ray asymmetric-FOV affine to generic SpriteNode content; no head inverse, IPD translation, depth reset, HudScale or finite world plane"
+      ],
+      "riskPaths": [
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "src/hooks_uiscaling.cpp",
+        "docs/VR_RUNTIME_VISUAL_CONTRACT.json",
+        "tools/verify_vr_visual_contract.py"
+      ],
+      "revalidationTriggers": [
+        "changes to untagged SpriteNode fallback",
+        "changes to R30BuildEyeAffine or generic screen-space mapping",
+        "changes that apply finite HUD plane to ScreenOverlay2D",
+        "changes that send ScreenOverlay2D back to stock R7/R9 duplication"
+      ],
+      "verifier": {
+        "static": [
+          "generic queue fallback must be ScreenOverlay2D, never ScreenHud or None",
+          "XYZRHW ScreenOverlay2D uses eyeScale*ndcX+eyeOffset and preserves Y/Z/RHW",
+          "shader ScreenOverlay2D post-multiplies only a clip-space X FOV affine",
+          "no head inverse/IPD/depth reset/HudScale in generic overlay branch",
+          "0x2D734 hook remains forbidden"
+        ],
+        "runtime": [
+          "Quest3/VDXR CORRECTNESS short race",
+          "generic HUD/2D must converge to one image",
+          "broad stage geometry must remain free of the ea7c finite-HUD corruption",
+          "telemetry overlay2DAccepted/overlay2DDraws must become nonzero",
+          "semanticHudAccepted may remain zero until exact HUD producer tagging is available"
+        ]
+      },
+      "testLevel": 1,
+      "evidenceLevel": "SOURCE_FIX_PENDING_CI_NEED_HMD_TEST",
+      "integrationSha": null,
+      "validationRun": null,
+      "nextAction": "Build/package exact R50 candidate and perform one short HMD race pass before any focus integration."
     }
   ]
 }
