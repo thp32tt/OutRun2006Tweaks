@@ -1,0 +1,151 @@
+unit	fresh	path	lens	evidence
+B19-001	1	hooks_graphics:SkyGlowAllowed	visual	true-stereo gate prevents mono glow ownership
+B19-002	1	hooks_graphics:SkyGlowAllowed	stereo	VREnabled+VRStereo boundary is explicit
+B19-003	1	hooks_graphics:SkyGlowAllowed	perf	disabled mono chain avoids redundant VR work
+B19-004	1	hooks_graphics:SkyGlowAllowed	regression	config transition is visual-risk boundary
+B19-005	1	hooks_graphics:SkyGlowAllowed	falsify	cached entry is re-gated at worker paths
+B19-006	1	hooks_graphics:ShaderWritesExposure	visual	emitted combiner list bounds alpha exposure ownership
+B19-007	1	hooks_graphics:ShaderWritesExposure	stereo	material alpha classification is eye-independent
+B19-008	1	hooks_graphics:ShaderWritesExposure	perf	bounded <=9-entry scan is constant cost
+B19-009	1	hooks_graphics:ShaderWritesExposure	regression	preset/no-op/overflow paths remain distinguishable
+B19-010	1	hooks_graphics:ShaderWritesExposure	falsify	missing exposure op returns false rather than guessing
+B19-011	1	hooks_graphics:Exposure_dest	visual	exposure is clamped 1..255 before material reference
+B19-012	1	hooks_graphics:Exposure_dest	stereo	shared scalar cannot introduce per-eye divergence itself
+B19-013	1	hooks_graphics:Exposure_dest	perf	constant-time scalar update only
+B19-014	1	hooks_graphics:Exposure_dest	regression	negative conversion is explicitly bounded
+B19-015	1	hooks_graphics:Exposure_dest	falsify	0 and >255 values collapse to safe bounds
+B19-016	1	hooks_graphics:PsSetPixelShader_dest	visual	ALPHAREF changes only when emitted shader writes exposure
+B19-017	1	hooks_graphics:PsSetPixelShader_dest	stereo	preset shaders bypass override consistently
+B19-018	1	hooks_graphics:PsSetPixelShader_dest	perf	one short combiner scan per eligible shader bind
+B19-019	1	hooks_graphics:PsSetPixelShader_dest	regression	HdrState zero preserves game reference
+B19-020	1	hooks_graphics:PsSetPixelShader_dest	falsify	device-null path skips state write
+B19-021	1	hooks_graphics:MakeReduceBuff_dest	visual	mono backbuffer reduction blocked in true stereo
+B19-022	1	hooks_graphics:MakeReduceBuff_dest	stereo	left-eye leakage into both eyes is explicitly prevented
+B19-023	1	hooks_graphics:MakeReduceBuff_dest	perf	two StretchRect calls occur only two-step eligible path
+B19-024	1	hooks_graphics:MakeReduceBuff_dest	regression	RenderCfgGlow and GlowAmount preserve stock conditions
+B19-025	1	hooks_graphics:MakeReduceBuff_dest	falsify	missing device/step1/surface acquisition fails closed
+B19-026	1	hooks_graphics:GlowRelease_dest	visual	intermediate glow texture is released before reset
+B19-027	1	hooks_graphics:GlowRelease_dest	stereo	shared mono intermediate cannot survive lifecycle release
+B19-028	1	hooks_graphics:GlowRelease_dest	perf	release is O(1) and avoids stale allocation
+B19-029	1	hooks_graphics:GlowRelease_dest	regression	pointer nulled before stock release continuation
+B19-030	1	hooks_graphics:GlowRelease_dest	falsify	null ReduceHalf is safe no-op
+B19-031	1	hooks_graphics:BlurGlowImage_dest	visual	blur offsets scale with render width then restore
+B19-032	1	hooks_graphics:BlurGlowImage_dest	stereo	true-stereo path returns before mono blur
+B19-033	1	hooks_graphics:BlurGlowImage_dest	perf	no mono blur work when stereo owns per-eye chain
+B19-034	1	hooks_graphics:BlurGlowImage_dest	regression	original offset/step restored after hook
+B19-035	1	hooks_graphics:BlurGlowImage_dest	falsify	scope cannot leak scaled values after normal return
+B19-036	1	hooks_graphics:GlowInit_dest	visual	buffer dimensions derive from live resolution/factor
+B19-037	1	hooks_graphics:GlowInit_dest	stereo	stock mono targets skipped when VR stereo active
+B19-038	1	hooks_graphics:GlowInit_dest	perf	stereo skip avoids large redundant mono allocation
+B19-039	1	hooks_graphics:GlowInit_dest	regression	factor floored at 1 and minimum size 160x120
+B19-040	1	hooks_graphics:GlowInit_dest	falsify	stale ReduceHalf released on stereo transition
+B19-041	1	hooks_graphics:ReflectionUpdateRate::FaceCount_dest	visual	cubemap face budget remains fractional over frames
+B19-042	1	hooks_graphics:ReflectionUpdateRate::FaceCount_dest	stereo	VR normalization is gated by VREnabled setting
+B19-043	1	hooks_graphics:ReflectionUpdateRate::FaceCount_dest	perf	dt normalization caps one-frame scale at 2x
+B19-044	1	hooks_graphics:ReflectionUpdateRate::FaceCount_dest	regression	long pause cannot create unbounded cubemap spike
+B19-045	1	hooks_graphics:ReflectionUpdateRate::FaceCount_dest	falsify	pendingFaces is capped at one cubemap
+B19-046	1	hooks_graphics:ScreenEdgeCullFix::destination	visual	wide-screen cull coordinates remap to 4:3 expectation
+B19-047	1	hooks_graphics:ScreenEdgeCullFix::destination	stereo	uses shared render resolution not per-eye transform
+B19-048	1	hooks_graphics:ScreenEdgeCullFix::destination	perf	constant arithmetic only per cull query
+B19-049	1	hooks_graphics:ScreenEdgeCullFix::destination	regression	setting-off path returns original result
+B19-050	1	hooks_graphics:ScreenEdgeCullFix::destination	falsify	both x/y ratio directions were checked for reciprocal mapping
+B19-051	1	hooks_graphics:FixZBufferPrecision::CalcCameraMatrix_dest	visual	VR near plane applies only GAME/GOAL eligible stereo
+B19-052	1	hooks_graphics:FixZBufferPrecision::CalcCameraMatrix_dest	stereo	MayInjectStereo bounds VR projection override
+B19-053	1	hooks_graphics:FixZBufferPrecision::CalcCameraMatrix_dest	perf	no additional draw/copy amplification
+B19-054	1	hooks_graphics:FixZBufferPrecision::CalcCameraMatrix_dest	regression	cutscene/camera-switch returns to 0.1 near plane
+B19-055	1	hooks_graphics:FixZBufferPrecision::CalcCameraMatrix_dest	falsify	non-VR third-person retains precision fix
+B19-056	1	hooks_graphics:Clr_SceneEffect_dest	visual	scene effects temporarily use 0.05 near plane
+B19-057	1	hooks_graphics:Clr_SceneEffect_dest	stereo	SceneEffect semantic brackets effect draw
+B19-058	1	hooks_graphics:Clr_SceneEffect_dest	perf	two camera matrix recalculations are bounded per invocation
+B19-059	1	hooks_graphics:Clr_SceneEffect_dest	regression	previous near plane is restored after effect
+B19-060	1	hooks_graphics:Clr_SceneEffect_dest	falsify	allow_znear_override false prevents recursive VR override
+B19-061	1	hooks_graphics:TransparencySupersampling::destination	visual	NVIDIA state bundle explicitly enables SSAA/blend
+B19-062	1	hooks_graphics:TransparencySupersampling::destination	stereo	device-global state is reapplied at init/reset
+B19-063	1	hooks_graphics:TransparencySupersampling::destination	perf	SSAA is explicit performance-sensitive setting
+B19-064	1	hooks_graphics:TransparencySupersampling::destination	regression	adapter identification is cached after first query
+B19-065	1	hooks_graphics:TransparencySupersampling::destination	falsify	non-NVIDIA path does not force unsupported ATOC
+B19-066	1	ex_device_upgrade:CaptureClassicBaseline	visual	captures render/stage/sampler state baseline
+B19-067	1	ex_device_upgrade:CaptureClassicBaseline	stereo	baseline is device-global rather than eye-specific
+B19-068	1	ex_device_upgrade:CaptureClassicBaseline	perf	capture loops are bounded 255/8x32/16x16
+B19-069	1	ex_device_upgrade:CaptureClassicBaseline	regression	ready requires at least one render-state read
+B19-070	1	ex_device_upgrade:CaptureClassicBaseline	falsify	unsupported enum reads are skipped on HRESULT failure
+B19-071	1	ex_device_upgrade:ClearClassicBaseline	visual	clears replay snapshot on lifecycle invalidation
+B19-072	1	ex_device_upgrade:ClearClassicBaseline	stereo	prevents cross-device visual state carryover
+B19-073	1	ex_device_upgrade:ClearClassicBaseline	perf	mutex-protected constant reset only
+B19-074	1	ex_device_upgrade:ClearClassicBaseline	regression	ready flag disappears with aggregate reset
+B19-075	1	ex_device_upgrade:ClearClassicBaseline	falsify	concurrent baseline readers are serialized
+B19-076	1	ex_device_upgrade:UpdateCompatPresentationState	visual	tracks Windowed and effective focus window
+B19-077	1	ex_device_upgrade:UpdateCompatPresentationState	stereo	presentation identity remains tied to same device
+B19-078	1	ex_device_upgrade:UpdateCompatPresentationState	perf	one creation-parameter query only if window absent
+B19-079	1	ex_device_upgrade:UpdateCompatPresentationState	regression	fallback focus window is derived from creation params
+B19-080	1	ex_device_upgrade:UpdateCompatPresentationState	falsify	null device/params is explicit no-op
+B19-081	1	ex_device_upgrade:RestoreClassicResetState	visual	replays captured render/stage/sampler state after ResetEx
+B19-082	1	ex_device_upgrade:RestoreClassicResetState	stereo	textures/streams/shaders are reset to neutral bindings
+B19-083	1	ex_device_upgrade:RestoreClassicResetState	perf	replay is reset-time only, not per-frame
+B19-084	1	ex_device_upgrade:RestoreClassicResetState	regression	viewport/scissor rebuilt from new backbuffer dimensions
+B19-085	1	ex_device_upgrade:RestoreClassicResetState	falsify	partial rejected writes are counted and reported, not hidden
+B19-086	1	ex_device_upgrade:IsCompatDevice	visual	only promoted compat device receives overlay semantics
+B19-087	1	ex_device_upgrade:IsCompatDevice	stereo	identity gate prevents unrelated device mutation
+B19-088	1	ex_device_upgrade:IsCompatDevice	perf	atomic pointer compare only
+B19-089	1	ex_device_upgrade:IsCompatDevice	regression	null device cannot match
+B19-090	1	ex_device_upgrade:IsCompatDevice	falsify	foreign device routes to original methods
+B19-091	1	ex_device_upgrade:BuildFullscreenMode	visual	fullscreen dimensions/format/refresh derive from params/current mode
+B19-092	1	ex_device_upgrade:BuildFullscreenMode	stereo	presentation mode is independent from per-eye sizing
+B19-093	1	ex_device_upgrade:BuildFullscreenMode	perf	display-mode query occurs only fullscreen reset path
+B19-094	1	ex_device_upgrade:BuildFullscreenMode	regression	unknown scanline falls back progressive
+B19-095	1	ex_device_upgrade:BuildFullscreenMode	falsify	windowed path returns null fullscreen descriptor
+B19-096	1	ex_device_upgrade:TestCooperativeLevelCompatDest	visual	legacy lost-device state is translated from CheckDeviceState
+B19-097	1	ex_device_upgrade:TestCooperativeLevelCompatDest	stereo	compat translation is scoped to promoted device
+B19-098	1	ex_device_upgrade:TestCooperativeLevelCompatDest	perf	one QueryInterface+CheckDeviceState per legacy poll
+B19-099	1	ex_device_upgrade:TestCooperativeLevelCompatDest	regression	occluded windowed maps OK while fullscreen maps DEVICELOST
+B19-100	1	ex_device_upgrade:TestCooperativeLevelCompatDest	falsify	unknown failure maps DRIVERINTERNALERROR rather than success
+B19-101	1	ex_device_upgrade:EvictManagedResourcesCompatDest	visual	compat MANAGED emulation avoids destructive eviction
+B19-102	1	ex_device_upgrade:EvictManagedResourcesCompatDest	stereo	only compat device bypasses eviction
+B19-103	1	ex_device_upgrade:EvictManagedResourcesCompatDest	perf	compat path returns D3D_OK without GPU work
+B19-104	1	ex_device_upgrade:EvictManagedResourcesCompatDest	regression	foreign device still calls original
+B19-105	1	ex_device_upgrade:EvictManagedResourcesCompatDest	falsify	identity mismatch cannot silently suppress eviction
+B19-106	1	ex_device_upgrade:ResetCompatDest	visual	legacy Reset is redirected to ResetEx then state replay
+B19-107	1	ex_device_upgrade:ResetCompatDest	stereo	replay happens only after successful ResetEx
+B19-108	1	ex_device_upgrade:ResetCompatDest	perf	no replay work on failed ResetEx
+B19-109	1	ex_device_upgrade:ResetCompatDest	regression	presentation state refresh follows successful reset
+B19-110	1	ex_device_upgrade:ResetCompatDest	falsify	QI failure falls back to original Reset
+B19-111	1	ex_device_upgrade_r14:R14AdoptCompatDevice	visual	old-device texture shadows retire on replacement
+B19-112	1	ex_device_upgrade_r14:R14AdoptCompatDevice	stereo	registry identity prevents mixed device generations
+B19-113	1	ex_device_upgrade_r14:R14AdoptCompatDevice	perf	replacement snapshot cost scales with tracked shadows only
+B19-114	1	ex_device_upgrade_r14:R14AdoptCompatDevice	regression	locked shadows defer retirement until matching Unlock
+B19-115	1	ex_device_upgrade_r14:R14AdoptCompatDevice	falsify	allocation failure keeps old identity authoritative
+B19-116	1	ex_device_upgrade_r14:R14AbandonCompatDevice	visual	device identity clears only when shadow registry empty
+B19-117	1	ex_device_upgrade_r14:R14AbandonCompatDevice	stereo	prevents premature generation abandonment
+B19-118	1	ex_device_upgrade_r14:R14AbandonCompatDevice	perf	mutex plus empty check only
+B19-119	1	ex_device_upgrade_r14:R14AbandonCompatDevice	regression	nonmatching device cannot clear registry identity
+B19-120	1	ex_device_upgrade_r14:R14AbandonCompatDevice	falsify	null input is explicit no-op
+B19-121	1	ex_device_upgrade_r14:R14Find	visual	texture shadow lookup is exact identity keyed
+B19-122	1	ex_device_upgrade_r14:R14Find	stereo	no heuristic cross-texture aliasing
+B19-123	1	ex_device_upgrade_r14:R14Find	perf	unordered-map lookup under bounded mutex
+B19-124	1	ex_device_upgrade_r14:R14Find	regression	missing key returns empty shared_ptr
+B19-125	1	ex_device_upgrade_r14:R14Find	falsify	null texture never enters registry lookup
+B19-126	1	ex_device_upgrade_r14:R14Erase	visual	erase transfers entry before registry removal
+B19-127	1	ex_device_upgrade_r14:R14Erase	stereo	shared_ptr keeps in-flight entry lifetime stable
+B19-128	1	ex_device_upgrade_r14:R14Erase	perf	release destruction occurs after map mutation scope
+B19-129	1	ex_device_upgrade_r14:R14Erase	regression	missing key exits without counter mutation
+B19-130	1	ex_device_upgrade_r14:R14Erase	falsify	registry lock bounds concurrent erase/find race
+B19-131	1	ex_device_upgrade_r14:R14DetachShadowLocked	visual	retired shadow becomes DirectOnly and masks clear
+B19-132	1	ex_device_upgrade_r14:R14DetachShadowLocked	stereo	stale CPU copy cannot remain authoritative after detach
+B19-133	1	ex_device_upgrade_r14:R14DetachShadowLocked	perf	shadow byte accounting decremented exactly once
+B19-134	1	ex_device_upgrade_r14:R14DetachShadowLocked	regression	all per-level lockRectValid flags are cleared
+B19-135	1	ex_device_upgrade_r14:R14DetachShadowLocked	falsify	zero shadowBytes does not underflow global counter
+B19-136	1	ex_device_upgrade_r14:R14RetireShadow	visual	retirement refuses while CPU shadow lock is active
+B19-137	1	ex_device_upgrade_r14:R14RetireShadow	stereo	DirectOnly mode is idempotent
+B19-138	1	ex_device_upgrade_r14:R14RetireShadow	perf	CPU texture release occurs outside entry mutex
+B19-139	1	ex_device_upgrade_r14:R14RetireShadow	regression	retire reason is logged after actual detach
+B19-140	1	ex_device_upgrade_r14:R14RetireShadow	falsify	empty entry is treated already retired
+B19-141	1	ex_device_upgrade_r14:R14MarkExternalGpuWrite	visual	external GPU write invalidates CPU shadow validity
+B19-142	1	ex_device_upgrade_r14:R14MarkExternalGpuWrite	stereo	concurrent lock suppresses unsafe immediate detach
+B19-143	1	ex_device_upgrade_r14:R14MarkExternalGpuWrite	perf	nonconcurrent write retires shadow to one direct path
+B19-144	1	ex_device_upgrade_r14:R14MarkExternalGpuWrite	regression	externalWriteDuringLock records overlap explicitly
+B19-145	1	ex_device_upgrade_r14:R14MarkExternalGpuWrite	falsify	DirectOnly path ignores redundant invalidation
+B19-146	1	ex_device_upgrade_r14:R14EstimateShadowBytes	visual	mip dimensions/formats bound CPU shadow allocation
+B19-147	1	ex_device_upgrade_r14:R14EstimateShadowBytes	stereo	allocation accounting is texture-local
+B19-148	1	ex_device_upgrade_r14:R14EstimateShadowBytes	perf	384MiB budget prevents unbounded shadow growth
+B19-149	1	ex_device_upgrade_r14:R14EstimateShadowBytes	regression	DXT block sizes and high-precision formats are separately handled
+B19-150	1	ex_device_upgrade_r14:R14EstimateShadowBytes	falsify	overflow/budget excess returns sentinel above budget
