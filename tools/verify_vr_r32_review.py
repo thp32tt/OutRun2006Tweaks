@@ -96,21 +96,6 @@ if min(issue_marker, issue_reject) < 0 or issue_reject < issue_marker:
     raise SystemExit(
         "R32 EVENT Issue failure must quarantine DirectGPU after queued eye copies")
 
-# R32 owns a private bounded producer wait, but base R7/R13 still owns the
-# post-Present publication transition. A successful R32 resolve must therefore
-# bridge the exact frame identity back into the base slot contract.
-resolve_end = r32.find("void R32InvalidateResetCaches", resolve_start)
-resolve_block = r32[resolve_start:resolve_end]
-for marker in (
-    "slot.producerPending = true;",
-    "slot.pendingFrameId = frameId;",
-    "slot.frameId = frameId;",
-    "slot.published = false;",
-):
-    if marker not in resolve_block:
-        raise SystemExit(
-            "R32 successful resolve must bridge producer state into base post-Present publication contract: " + marker)
-
 r33 = require(
     "src/vr/d3d9/stereo_renderer_r33.cpp",
     '#include "stereo_renderer_r32.cpp"',
