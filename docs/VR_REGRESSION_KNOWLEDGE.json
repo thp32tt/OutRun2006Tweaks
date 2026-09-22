@@ -7,7 +7,12 @@
     "eventHistory": "append-only",
     "recurrence": "reuse-stable-key-and-reopen",
     "integrationGate": "all triggered regression cases must be revalidated or explicitly NEED_HMD_TEST before integration",
-    "fixedRequirements": ["durable fix reference", "affected path set", "deterministic verifier or evidence recipe", "validation evidence level"],
+    "fixedRequirements": [
+      "durable fix reference",
+      "affected path set",
+      "deterministic verifier or evidence recipe",
+      "validation evidence level"
+    ],
     "runtimeFixedRequirement": "runtime-visible regressions require matching USER RUNTIME VERIFIED evidence before final DONE"
   },
   "cases": [
@@ -21,11 +26,19 @@
       "recurrenceCount": 1,
       "symptomFingerprint": {
         "primary": "startup reaches/passes logo then white screen and does not progress into normal game flow",
-        "secondary": ["recenter/input path may still respond while presentation/game progression is stuck"],
-        "logSignals": ["correlate game/host/watchdog session timeline around first post-logo Present and stereo transport activation"]
+        "secondary": [
+          "recenter/input path may still respond while presentation/game progression is stuck"
+        ],
+        "logSignals": [
+          "correlate game/host/watchdog session timeline around first post-logo Present and stereo transport activation"
+        ]
       },
-      "knownGood": ["a9abb85702925aaa09ca85581423eb9766c2adb3 — logo/menu/car/course/race rendered; later theater-only VR defect remained"],
-      "knownBad": ["1f2dcb9848a7142c295f371f0dc91663f174c442 — persistent startup white runtime"],
+      "knownGood": [
+        "a9abb85702925aaa09ca85581423eb9766c2adb3 — logo/menu/car/course/race rendered; later theater-only VR defect remained"
+      ],
+      "knownBad": [
+        "1f2dcb9848a7142c295f371f0dc91663f174c442 — persistent startup white runtime"
+      ],
       "rootCause": {
         "status": "BOUNDED_RECONSTRUCTED",
         "summary": "D3D9Ex synchronous CreateDevice-thread stereo installation called EnsureStereoResources before the promoted device was returned to OutRun, allocating/mutating private RT/depth resources before fresh-device initialization completed."
@@ -36,17 +49,107 @@
         "341bd8027b9595f43c89e31ae1f9cf8783751faa — integrated current-focus reconstruction plus deterministic guard",
         "fc636acc9e639a7e280ff66f2d1c86700b4caa91 -> 16c47176868dc600afcd8ca0e05990280aaa21d9 -> 7081b38917aa1b7ec319bea137a88b6f6f07733b — owner-corrected preservation chain"
       ],
-      "riskPaths": ["src/vr/**", "vrhost/**", "src/hooks_graphics.cpp", "src/hooks_framerate.cpp", "src/hooks_exceptions.cpp", "OutRun2006Tweaks.ini", "tools/*OutRunVR*.ps1", ".github/workflows/vr-dx9ex-active.yml"],
-      "revalidationTriggers": ["changes to startup/device creation/reset/present flow", "changes to stereo transport/shared-frame eligibility", "changes to host fallback/recovery or first-frame state", "changes to launch/profile/config values affecting VR activation"],
+      "riskPaths": [
+        "src/vr/**",
+        "vrhost/**",
+        "src/hooks_graphics.cpp",
+        "src/hooks_framerate.cpp",
+        "src/hooks_exceptions.cpp",
+        "OutRun2006Tweaks.ini",
+        "tools/*OutRunVR*.ps1",
+        ".github/workflows/vr-dx9ex-active.yml"
+      ],
+      "revalidationTriggers": [
+        "changes to startup/device creation/reset/present flow",
+        "changes to stereo transport/shared-frame eligibility",
+        "changes to host fallback/recovery or first-frame state",
+        "changes to launch/profile/config values affecting VR activation"
+      ],
       "verifier": {
-        "static": ["build active DX9Ex game DLL and x64 OpenXR host", "run deterministic host smoke tests", "verify deferred stereo resource initialization is absent from CreateDevice pre-exposure path and occurs only after successful game Present", "verify autodev/regression registry contract"],
-        "runtime": ["launch CORRECTNESS package", "confirm logo transitions into menu/game instead of persistent white frame", "confirm gameplay stereo opens after deferred initialization", "collect standardized OutRun2_VR_ANALYZE_*.zip if failure recurs"]
+        "static": [
+          "build active DX9Ex game DLL and x64 OpenXR host",
+          "run deterministic host smoke tests",
+          "verify deferred stereo resource initialization is absent from CreateDevice pre-exposure path and occurs only after successful game Present",
+          "verify autodev/regression registry contract"
+        ],
+        "runtime": [
+          "launch CORRECTNESS package",
+          "confirm logo transitions into menu/game instead of persistent white frame",
+          "confirm gameplay stereo opens after deferred initialization",
+          "collect standardized OutRun2_VR_ANALYZE_*.zip if failure recurs"
+        ]
       },
       "testLevel": 3,
       "evidenceLevel": "BUILD_VERIFIED_NEED_HMD_TEST",
       "integrationSha": "341bd8027b9595f43c89e31ae1f9cf8783751faa",
       "validationRun": "35647825229 SUCCESS",
       "nextAction": "Run Quest3/VDXR CORRECTNESS validation: logo->menu/game without persistent white frame, then verify gameplay stereo opens. Keep case open until USER RUNTIME VERIFIED; if symptom recurs append REOPENED using this same key."
+    },
+    {
+      "key": "VR-CRASH-HUDQUEUE-001",
+      "title": "Startup crash inside canonical SpriteNode queue entry after VR HUD semantic hook install",
+      "status": "FIX_CANDIDATE_NEED_HMD_TEST",
+      "severity": "runtime-blocking",
+      "firstKnownWindowKst": "2026-09-21",
+      "lastObservedKst": "2026-09-22",
+      "recurrenceCount": 2,
+      "symptomFingerprint": {
+        "primary": "Immediate 0xC0000005 access violation inside OR2006C2C.EXE SpriteNode queue-entry instruction block after VRHudQueueSemanticBridge installs.",
+        "secondary": [
+          "observed EIP RVAs 0x0002D738 and 0x0002D73E",
+          "crash occurs before meaningful stereo runtime progression"
+        ],
+        "logSignals": [
+          "VRHudQueueSemanticBridge applied",
+          "fault module OR2006C2C.EXE",
+          "fault RVA within 0x2D734 entry/prologue block"
+        ]
+      },
+      "knownGood": [
+        "Any candidate where production code does not install a mid-hook at RVA 0x2D734; runtime verification still required for current fix."
+      ],
+      "knownBad": [
+        "1296ef2bd2b7432ecbb74214180a3960128d7e7c lineage — crash observed at EXE+0x2D738",
+        "559eb67055d9896bd057f511d52dbb08215782e0 — crash observed at EXE+0x2D73E"
+      ],
+      "rootCause": {
+        "status": "BOUNDED_RUNTIME_CONFIRMED",
+        "summary": "Production SafetyHookMid installed at canonical queue-entry RVA 0x2D734. Two independent real crashes resumed inside that relocated entry instruction sequence (0x2D738 and 0x2D73E), proving this entry hook boundary unsafe."
+      },
+      "fixReferences": [
+        "vr-d3d9ex-candidate/VR-HUDQUEUE-ENTRY-CRASH-559eb670 — remove 0x2D734 mid-hook; lazily begin queue semantic ownership at first per-node hook RVA 0x2D762; keep epilogue 0x2DCB4"
+      ],
+      "riskPaths": [
+        "src/hooks_uiscaling.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "tools/verify_vr_visual_contract.py",
+        "docs/VR_BINARY_CONTRACT.json"
+      ],
+      "revalidationTriggers": [
+        "any change to VRHudQueueSemanticBridge",
+        "any production hook added within the canonical SpriteNode queue entry/prologue 0x2D734..0x2D74A",
+        "any change to SpriteNode semantic queue lifetime/ownership",
+        "restoring/cherry-picking R47/R48/R49 visual commits"
+      ],
+      "verifier": {
+        "static": [
+          "forbid production Module::exe_ptr(0x2D734) mid-hook",
+          "require semantic queue scope to start lazily at first per-node hook 0x2D762",
+          "build Win32 active game DLL and package",
+          "strict canonical EXE byte contract remains valid for static reverse-analysis anchors"
+        ],
+        "runtime": [
+          "launch CORRECTNESS package on Quest3/VDXR",
+          "confirm startup passes the prior crash point without OR2006C2C.EXE+0x2D738/0x2D73E exception",
+          "confirm HUD semantic path becomes active and collect standardized OutRun2_VR_ANALYZE_*.zip"
+        ]
+      },
+      "testLevel": 3,
+      "evidenceLevel": "BUILD_PENDING_NEED_HMD_TEST",
+      "integrationSha": null,
+      "validationRun": null,
+      "nextAction": "Complete exact candidate CI/package, then run one short Quest3/VDXR CORRECTNESS startup/HUD test. Do not integrate any candidate containing a production 0x2D734 hook."
     }
   ]
 }
