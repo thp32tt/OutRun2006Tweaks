@@ -274,7 +274,7 @@ the binary contract and durable crash registry.
 The installed Superpowers methodology is integrated through `docs/VR_SUPERPOWERS_POLICY.md`.
 
 Key project adaptations:
-- A/B/C/N100 remain review/support-only; D remains the sole production writer.
+- A/B/N100 remain review-only; C owns isolated production candidate implementation; D owns independent review/integration/package. Direct Chat/manual transactions must emulate the same C→D gates rather than bypassing them.
 - Suspected bugs/regressions require bounded root-cause investigation before a fix.
 - D behavior changes use RED -> GREEN -> REFACTOR with deterministic tests/verifiers whenever possible.
 - A/B/C exact-SHA review is the project code-review surface; feedback is verified, not blindly applied.
@@ -327,3 +327,41 @@ After a Quest 3 / VDXR test passes:
 4. only then may the prior baseline be superseded.
 
 A failed HMD test never advances the baseline. It reopens the matching regression key and preserves the last known-good baseline.
+
+
+## Direct Chat / manual build and package gate
+
+A user request such as "파일 말아줘", "테스트 ZIP 만들어줘", "최종 빌드 줘", "지금 수동으로 빌드해줘", or an equivalent direct/manual packaging request is NOT an exception to the autonomous safety model.
+
+### Required interpretation
+- "latest" means the newest tree that is eligible under the regression/baseline gates, not blindly the newest commit.
+- A direct/manual request must never package an arbitrary moving `vr-d3d9ex-focus` HEAD solely because scheduled workers are idle.
+- Existing frozen/BUILD_VERIFIED artifacts may be reused only when their exact source/config/profile inputs still match the requested test and no newer runtime evidence invalidated them.
+- Runtime-visible USER_RUNTIME_VERIFIED knowledge always outranks recency.
+
+### Manual transaction model
+If source/config changes are required, a direct Chat/manual transaction must synchronously emulate the normal pipeline:
+1. **RECOVER** exact integration HEAD, regression registry, USER_RUNTIME_VERIFIED baseline/protected invariants, Issue #13/#14 history, active candidates and latest runtime evidence.
+2. **IMPLEMENT** only on an isolated candidate/ref or otherwise preserve an exact pre-change base; never silently overwrite a known-good fix.
+3. **BASELINE_DELTA** compare protected baseline -> candidate/prospective package tree and current HEAD -> candidate/prospective tree.
+4. **VALIDATE** every triggered deterministic/static/build regression oracle and exact package/profile policy.
+5. **INDEPENDENT RELEASE CHECK** re-read the final exact tree/diff as D would; if HEAD changed, validate the prospective final tree rather than reusing stale green evidence.
+6. **PACKAGE** only that exact validated SHA/tree and embed source SHA, profile/config identity, manifest and hashes.
+7. **PERSIST** CHAT_DIRECT or MANUAL production/package event to Issue #14; runtime recurrence/fix evidence also updates Issue #13 and the regression registry.
+
+The same assistant/chat may perform these steps sequentially when the user explicitly asks for immediate manual work, but it must preserve separation of evidence: implementation evidence is not release approval, and build success is not HMD correctness.
+
+### Hard stops for manual packaging
+Do not present a package as the current recommended test artifact when:
+- a protected USER_RUNTIME_VERIFIED invariant is contradicted or silently absent;
+- a known-bad code/config/profile value has reappeared;
+- a triggered regression oracle is failing or was skipped without a documented hardware-only reason;
+- the candidate/build SHA differs from the packaged tree;
+- the source moved after validation and the prospective package tree was not revalidated;
+- the package identity cannot state exact source SHA/config/profile;
+- a newer user runtime failure invalidates the artifact's assumption.
+
+In those cases, repair/revalidate first or clearly label an intentionally requested diagnostic artifact as **DIAGNOSTIC / NOT BASELINE-SAFE / NEED_HMD_TEST**. Never silently substitute it for the normal CORRECTNESS test artifact.
+
+### Package-only requests
+When no source change is needed, still run RECOVER + BASELINE_DELTA + release eligibility checks before selecting an artifact. Prefer reusing an already validated exact artifact over rebuilding unchanged inputs. Manual packaging therefore cannot bypass regression knowledge simply because no code is being edited.
