@@ -30,6 +30,8 @@ def main() -> int:
         raise AssertionError("visual contract forbids SBS desktop gameplay fallback")
     if locked["hudPresentation"] != "WORLD_FIXED_NOT_HEAD_LOCKED":
         raise AssertionError("HUD visual contract changed")
+    if locked.get("untaggedSpriteNodeOwnership") != "NONE_FAIL_CLOSED_NEVER_SCREEN_HUD":
+        raise AssertionError("untagged SpriteNode ownership must fail closed")
     if not required["r26HudCompare"] or required["variantId"] != "ACTIVE_R26_R43_R44":
         raise AssertionError("active build no longer selects runtime-proven R26/R43/R44 owner")
 
@@ -60,13 +62,19 @@ def main() -> int:
             "RenderScope::ScreenHud",
             "RegisterSpriteNodeScope(",
             "ConsumeSpriteNodeScope(",
+            "RenderScope fallback = RenderScope::None",
             "SelectSpriteQueueNode(",
+            "ConsumeSpriteNodeScope(node, RenderScope::None)",
+            "Queue membership alone is not HUD evidence",
             "if (!SpriteQueueDepth)",
             "EXE+0x2D738",
             "EXE+0x2D73E",
             "EndSpriteQueueRender()",
             "0x42D734",
             "0x42DCB4")
+    forbid("src/vr/game/render_semantics.hpp",
+           "RenderScope fallback = RenderScope::ScreenHud",
+           "CurrentScope = RenderScope::ScreenHud;")
 
     require("src/hooks_uiscaling.cpp",
             "VRHudQueueSemanticBridge",
