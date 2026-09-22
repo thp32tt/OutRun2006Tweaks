@@ -623,22 +623,31 @@ class FixFileLoadRace : public Hook
 	// the read itself, which suspends its own thread and would otherwise strand
 	// anyone waiting.
 	inline static CRITICAL_SECTION ListLock{};
+	inline static std::atomic<bool> HooksReady{ false };
+	inline static bool ListLockInitialized = false;
 
 	inline static SafetyHookMid ServiceRequest_hook = {};
 	static void ServiceRequest_dest(SafetyHookContext& ctx)
 	{
+		if (!HooksReady.load(std::memory_order_acquire))
+			return;
 		EnterCriticalSection(&ListLock);
 	}
 
 	inline static SafetyHookMid ServiceRequestMoveDone_hook = {};
 	static void ServiceRequestMoveDone_dest(SafetyHookContext& ctx)
 	{
+		if (!HooksReady.load(std::memory_order_acquire))
+			return;
 		LeaveCriticalSection(&ListLock);
 	}
 
 	inline static SafetyHookInline sumo_fread_hook = {};
 	static uint32_t __cdecl sumo_fread_dest(void* buf, int numBytes, int a3, void* file, int* outSize)
 	{
+		if (!HooksReady.load(std::memory_order_acquire))
+			return sumo_fread_hook.ccall<uint32_t>(buf, numBytes, a3, file, outSize);
+
 		EnterCriticalSection(&ListLock);
 		uint32_t result = sumo_fread_hook.ccall<uint32_t>(buf, numBytes, a3, file, outSize);
 		LeaveCriticalSection(&ListLock);
@@ -656,7 +665,7 @@ class FixFileLoadRace : public Hook
 	inline static SafetyHookInline sumo_fread_finished_hook = {};
 	static int __cdecl sumo_fread_finished_dest(int file, int requestId)
 	{
-		if (requestId == NoRequest)
+		if (!HooksReady.load(std::memory_order_acquire) || requestId == NoRequest)
 			return sumo_fread_finished_hook.ccall<int>(file, requestId);
 
 		EnterCriticalSection(&ListLock);
@@ -680,6 +689,9 @@ class FixFileLoadRace : public Hook
 	inline static SafetyHookMid LoadTextures_hook = {};
 	static void LoadTextures_dest(SafetyHookContext& ctx)
 	{
+		if (!HooksReady.load(std::memory_order_acquire))
+			return;
+
 		uint8_t* xmt = reinterpret_cast<uint8_t*>(ctx.edi);
 		uint8_t* head = *reinterpret_cast<uint8_t**>(xmt);                    // XMTSET::head
 		uint8_t** objectHandle = *reinterpret_cast<uint8_t***>(xmt + 0x28);   // XMTSET::ObjectHandle
@@ -716,19 +728,76 @@ public:
 		return true;
 	}
 
+	static void RollbackHooks() noexcept
+	{
+		HooksReady.store(false, std::memory_order_release);
+		LoadTextures_hook = {};
+		sumo_fread_finished_hook = {};
+		sumo_fread_hook = {};
+		ServiceRequestMoveDone_hook = {};
+		ServiceRequest_hook = {};
+		if (ListLockInitialized)
+		{
+			DeleteCriticalSection(&ListLock);
+			ListLockInitialized = false;
+		}
+	}
+
 	bool apply() override
 	{
+		HooksReady.store(false, std::memory_order_release);
+
+		const auto midDisabled = safetyhook::MidHook::StartDisabled;
+		const auto inlineDisabled = safetyhook::InlineHook::StartDisabled;
+
+		auto serviceRequest = safetyhook::create_mid(
+			Module::exe_ptr(ServiceRequest_Addr), ServiceRequest_dest, midDisabled);
+		auto serviceRequestDone = safetyhook::create_mid(
+			Module::exe_ptr(ServiceRequestMoveDone_Addr), ServiceRequestMoveDone_dest, midDisabled);
+		auto freadHook = safetyhook::create_inline(
+			Module::exe_ptr(sumo_fread_Addr), sumo_fread_dest, inlineDisabled);
+		auto freadFinishedHook = safetyhook::create_inline(
+			Module::exe_ptr(sumo_fread_finished_Addr), sumo_fread_finished_dest, inlineDisabled);
+		auto loadTexturesHook = safetyhook::create_mid(
+			Module::exe_ptr(LoadTextures_Addr), LoadTextures_dest, midDisabled);
+
+		if (!serviceRequest || !serviceRequestDone || !freadHook ||
+			!freadFinishedHook || !loadTexturesHook)
+			return false;
+
+		// Publish complete-but-disabled handles first so inline fail-open callbacks
+		// always have a valid trampoline during the enable transaction.
+		ServiceRequest_hook = std::move(serviceRequest);
+		ServiceRequestMoveDone_hook = std::move(serviceRequestDone);
+		sumo_fread_hook = std::move(freadHook);
+		sumo_fread_finished_hook = std::move(freadFinishedHook);
+		LoadTextures_hook = std::move(loadTexturesHook);
+
 		// Held only across a list pop and push, so a waiter is better off spinning
 		// than paying for the trip into the kernel.
-		InitializeCriticalSectionAndSpinCount(&ListLock, 4000);
+		if (!InitializeCriticalSectionAndSpinCount(&ListLock, 4000))
+		{
+			RollbackHooks();
+			return false;
+		}
+		ListLockInitialized = true;
 
-		ServiceRequest_hook = safetyhook::create_mid(Module::exe_ptr(ServiceRequest_Addr), ServiceRequest_dest);
-		ServiceRequestMoveDone_hook = safetyhook::create_mid(Module::exe_ptr(ServiceRequestMoveDone_Addr), ServiceRequestMoveDone_dest);
-		sumo_fread_hook = safetyhook::create_inline(Module::exe_ptr(sumo_fread_Addr), sumo_fread_dest);
-		sumo_fread_finished_hook = safetyhook::create_inline(Module::exe_ptr(sumo_fread_finished_Addr), sumo_fread_finished_dest);
-		LoadTextures_hook = safetyhook::create_mid(Module::exe_ptr(LoadTextures_Addr), LoadTextures_dest);
+		const bool enabled =
+			ServiceRequest_hook.enable().has_value() &&
+			ServiceRequestMoveDone_hook.enable().has_value() &&
+			sumo_fread_hook.enable().has_value() &&
+			sumo_fread_finished_hook.enable().has_value() &&
+			LoadTextures_hook.enable().has_value();
+		if (!enabled)
+		{
+			RollbackHooks();
+			return false;
+		}
 
-		return ServiceRequest_hook && ServiceRequestMoveDone_hook && sumo_fread_hook && sumo_fread_finished_hook && LoadTextures_hook;
+		// This is the single behavioral commit point. Until it publishes true,
+		// any callback exposed by sequential SafetyHook enable is fail-open.
+		HooksReady.store(true, std::memory_order_release);
+		return true;
 	}
 
 	static FixFileLoadRace instance;
