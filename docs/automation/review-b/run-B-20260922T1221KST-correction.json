@@ -1,0 +1,27 @@
+{
+  "role": "B",
+  "integration_head": "d961afe38d6417961d65d7e23d3a65f33bcec39c",
+  "review_branch_base": "bb4c1d9434d367b36af2619a5eaff43929b4fb15",
+  "status": "CORRECTION_PERSISTED_NOT_NEW_150_CYCLE",
+  "verification_before_completion": {
+    "cycle11_ledger_path": "docs/automation/review-b/cycle11/ledger.tsv",
+    "cycle11_ledger_blob": "518469ca0b3c71b4b501f473d24dec5200abd10f",
+    "cycle11_cp150_path": "docs/automation/review-b/cycle11/CP150.json",
+    "cycle11_cp150_blob": "ac322ff6fe5cb470967fc522df194aa82be74178",
+    "correction": "The previous B report incorrectly stated that cycle11 had checkpoints but no physical ledger. Recursive tree verification proves ledger.tsv and CP10..CP150 are physically present. Do not repeat that claim."
+  },
+  "post_review": {
+    "candidate_sha": "b8bd82c3bdb5dfadb8e528752a9dba2a742cad51",
+    "base_sha": "d961afe38d6417961d65d7e23d3a65f33bcec39c",
+    "finding": "VR-NEARPLANE-ACTIVE-GATE-001",
+    "regression_key": "VR-STARTUP-WHITE-001",
+    "verdict": "PASS_DOMAIN_REVIEW_NEED_HMD_GATE",
+    "evidence": "FixZBufferPrecision VR near plane is gated by VRPositionalTracking + VRStereo + RuntimeEligibility::MayInjectStereo; scene-effect near-plane save/restore remains intact.",
+    "runtime_final_done": false
+  },
+  "review_units_completed_this_run": 0,
+  "new_ledger_rows": 0,
+  "cp10_cp150_new_cycle": "NOT_ASSERTED",
+  "reason": "This run corrected the physical-ledger verification error. It does not manufacture a new 150-unit cycle from duplicate rows.",
+  "nextAction": "On the next B cycle, use the physically present cycle11 ledger as the carry-forward source, validate dependency/content identities against current integration HEAD/candidate, add genuinely new independent B-lens falsification units as needed, and persist a new 150-row ledger plus CP10..CP150 before COMPLETE."
+}
