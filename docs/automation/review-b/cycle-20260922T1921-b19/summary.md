@@ -1,6 +1,6 @@
 # B19 summary
 
-Status: COMPLETE subject to persisted ledger/checkpoint reread.
+Status: COMPLETE after persisted ledger/checkpoint reread.
 Target integration SHA: `c4dd697e2b1f33d3b8af6ab254f378a1cc421248`.
 Review branch only; no production runtime source or integration changes.
 
@@ -14,7 +14,7 @@ Review branch only; no production runtime source or integration changes.
 - adversarial_falsification: 30
 - distinct_functions_or_paths: 30
 - existing_finding_revalidation: 5
-- CP10..CP150: accounted for
+- CP10..CP150: accounted for and CP150 re-read
 
 ## Result
 B19 rotated away from B18 DirectGPU/ACK and reviewed graphics post-process/state restoration plus D3D9Ex compatibility reset/resource-shadow boundaries.
@@ -28,5 +28,7 @@ Reset compatibility was traced from fresh-device `CaptureClassicBaseline` throug
 R14 shadow ownership remains fail-closed under device replacement and external GPU writes: locked shadows defer retirement, external writes invalidate/retire CPU authority, and the 384 MiB budget bounds shadow allocation. No new bounded P0/P1 rendering/performance defect was promoted from that cluster.
 
 Regression registry `VR-STARTUP-WHITE-001` remains `INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST`; B19 produced no matching runtime recurrence evidence and does not mark it DONE.
+
+Verification-before-completion reread confirmed ledger terminates at `B19-150`, checkpoint file reports CP10..CP150 with rows=150/fresh=150/carry=0, and diversity minima are satisfied.
 
 Exact nextAction: C should consume the revalidation of `VR-REFLECTION-RATE-ACTIVE-GATE-001` as EVIDENCE_AUGMENT, avoid a duplicate finding, and keep the existing deterministic verifier/fix intent. Next B should rotate away from this reset/R14 cluster unless a candidate or runtime evidence invalidates it.
