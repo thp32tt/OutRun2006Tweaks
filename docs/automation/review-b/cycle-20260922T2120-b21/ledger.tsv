@@ -1,0 +1,151 @@
+unit	freshness	lens	file	path	verdict	evidence_objective
+B21-001	fresh	semantic	src/hooks_graphics.cpp	SkyGlowAllowed	PASS	config-vs-runtime glow ownership; verify intended visual/render ownership
+B21-002	fresh	cross	src/hooks_graphics.cpp	SkyGlowAllowed	PASS	config-vs-runtime glow ownership; trace upstream setting/state to downstream draw/resource effect
+B21-003	fresh	falsify	src/hooks_graphics.cpp	SkyGlowAllowed	PASS	config-vs-runtime glow ownership; seek contrary state where guard/resource assumptions diverge
+B21-004	fresh	perf	src/hooks_graphics.cpp	SkyGlowAllowed	PASS	config-vs-runtime glow ownership; assess draw/copy/allocation/frame-pacing cost
+B21-005	fresh	recovery	src/hooks_graphics.cpp	SkyGlowAllowed	PASS	config-vs-runtime glow ownership; assess reset/mode-transition/state restoration behavior
+B21-006	fresh	semantic	src/hooks_graphics.cpp	GlowInit_dest	PASS	mono glow allocation suppression; verify intended visual/render ownership
+B21-007	fresh	cross	src/hooks_graphics.cpp	GlowInit_dest	PASS	mono glow allocation suppression; trace upstream setting/state to downstream draw/resource effect
+B21-008	fresh	falsify	src/hooks_graphics.cpp	GlowInit_dest	PASS	mono glow allocation suppression; seek contrary state where guard/resource assumptions diverge
+B21-009	fresh	perf	src/hooks_graphics.cpp	GlowInit_dest	PASS	mono glow allocation suppression; assess draw/copy/allocation/frame-pacing cost
+B21-010	fresh	recovery	src/hooks_graphics.cpp	GlowInit_dest	PASS	mono glow allocation suppression; assess reset/mode-transition/state restoration behavior
+B21-011	fresh	semantic	src/hooks_graphics.cpp	MakeReduceBuff_dest	PASS	mono backbuffer reduction; verify intended visual/render ownership
+B21-012	fresh	cross	src/hooks_graphics.cpp	MakeReduceBuff_dest	PASS	mono backbuffer reduction; trace upstream setting/state to downstream draw/resource effect
+B21-013	fresh	falsify	src/hooks_graphics.cpp	MakeReduceBuff_dest	PASS	mono backbuffer reduction; seek contrary state where guard/resource assumptions diverge
+B21-014	fresh	perf	src/hooks_graphics.cpp	MakeReduceBuff_dest	PASS	mono backbuffer reduction; assess draw/copy/allocation/frame-pacing cost
+B21-015	fresh	recovery	src/hooks_graphics.cpp	MakeReduceBuff_dest	PASS	mono backbuffer reduction; assess reset/mode-transition/state restoration behavior
+B21-016	fresh	semantic	src/hooks_graphics.cpp	BlurGlowImage_dest	PASS	blur scaling and stereo suppression; verify intended visual/render ownership
+B21-017	fresh	cross	src/hooks_graphics.cpp	BlurGlowImage_dest	PASS	blur scaling and stereo suppression; trace upstream setting/state to downstream draw/resource effect
+B21-018	fresh	falsify	src/hooks_graphics.cpp	BlurGlowImage_dest	PASS	blur scaling and stereo suppression; seek contrary state where guard/resource assumptions diverge
+B21-019	fresh	perf	src/hooks_graphics.cpp	BlurGlowImage_dest	PASS	blur scaling and stereo suppression; assess draw/copy/allocation/frame-pacing cost
+B21-020	fresh	recovery	src/hooks_graphics.cpp	BlurGlowImage_dest	PASS	blur scaling and stereo suppression; assess reset/mode-transition/state restoration behavior
+B21-021	fresh	semantic	src/hooks_graphics.cpp	GlowRelease_dest	PASS	default-pool resource release; verify intended visual/render ownership
+B21-022	fresh	cross	src/hooks_graphics.cpp	GlowRelease_dest	PASS	default-pool resource release; trace upstream setting/state to downstream draw/resource effect
+B21-023	fresh	falsify	src/hooks_graphics.cpp	GlowRelease_dest	PASS	default-pool resource release; seek contrary state where guard/resource assumptions diverge
+B21-024	fresh	perf	src/hooks_graphics.cpp	GlowRelease_dest	PASS	default-pool resource release; assess draw/copy/allocation/frame-pacing cost
+B21-025	fresh	recovery	src/hooks_graphics.cpp	GlowRelease_dest	PASS	default-pool resource release; assess reset/mode-transition/state restoration behavior
+B21-026	fresh	semantic	src/hooks_graphics.cpp	RebuildGlowBuffers	PASS	runtime config rebuild; verify intended visual/render ownership
+B21-027	fresh	cross	src/hooks_graphics.cpp	RebuildGlowBuffers	PASS	runtime config rebuild; trace upstream setting/state to downstream draw/resource effect
+B21-028	fresh	falsify	src/hooks_graphics.cpp	RebuildGlowBuffers	PASS	runtime config rebuild; seek contrary state where guard/resource assumptions diverge
+B21-029	fresh	perf	src/hooks_graphics.cpp	RebuildGlowBuffers	PASS	runtime config rebuild; assess draw/copy/allocation/frame-pacing cost
+B21-030	fresh	recovery	src/hooks_graphics.cpp	RebuildGlowBuffers	PASS	runtime config rebuild; assess reset/mode-transition/state restoration behavior
+B21-031	fresh	semantic	src/hooks_graphics.cpp	ClearBuffer_dest	PASS	exposure alpha seed restoration; verify intended visual/render ownership
+B21-032	fresh	cross	src/hooks_graphics.cpp	ClearBuffer_dest	PASS	exposure alpha seed restoration; trace upstream setting/state to downstream draw/resource effect
+B21-033	fresh	falsify	src/hooks_graphics.cpp	ClearBuffer_dest	PASS	exposure alpha seed restoration; seek contrary state where guard/resource assumptions diverge
+B21-034	fresh	perf	src/hooks_graphics.cpp	ClearBuffer_dest	PASS	exposure alpha seed restoration; assess draw/copy/allocation/frame-pacing cost
+B21-035	fresh	recovery	src/hooks_graphics.cpp	ClearBuffer_dest	PASS	exposure alpha seed restoration; assess reset/mode-transition/state restoration behavior
+B21-036	fresh	semantic	src/hooks_graphics.cpp	PsSetPixelShader_dest	PASS	per-material alpha reference; verify intended visual/render ownership
+B21-037	fresh	cross	src/hooks_graphics.cpp	PsSetPixelShader_dest	PASS	per-material alpha reference; trace upstream setting/state to downstream draw/resource effect
+B21-038	fresh	falsify	src/hooks_graphics.cpp	PsSetPixelShader_dest	PASS	per-material alpha reference; seek contrary state where guard/resource assumptions diverge
+B21-039	fresh	perf	src/hooks_graphics.cpp	PsSetPixelShader_dest	PASS	per-material alpha reference; assess draw/copy/allocation/frame-pacing cost
+B21-040	fresh	recovery	src/hooks_graphics.cpp	PsSetPixelShader_dest	PASS	per-material alpha reference; assess reset/mode-transition/state restoration behavior
+B21-041	fresh	semantic	src/hooks_graphics.cpp	ShaderWritesExposure	PASS	combiner exposure detection; verify intended visual/render ownership
+B21-042	fresh	cross	src/hooks_graphics.cpp	ShaderWritesExposure	PASS	combiner exposure detection; trace upstream setting/state to downstream draw/resource effect
+B21-043	fresh	falsify	src/hooks_graphics.cpp	ShaderWritesExposure	PASS	combiner exposure detection; seek contrary state where guard/resource assumptions diverge
+B21-044	fresh	perf	src/hooks_graphics.cpp	ShaderWritesExposure	PASS	combiner exposure detection; assess draw/copy/allocation/frame-pacing cost
+B21-045	fresh	recovery	src/hooks_graphics.cpp	ShaderWritesExposure	PASS	combiner exposure detection; assess reset/mode-transition/state restoration behavior
+B21-046	fresh	semantic	src/hooks_graphics.cpp	Exposure_dest	PASS	material exposure clamp; verify intended visual/render ownership
+B21-047	fresh	cross	src/hooks_graphics.cpp	Exposure_dest	PASS	material exposure clamp; trace upstream setting/state to downstream draw/resource effect
+B21-048	fresh	falsify	src/hooks_graphics.cpp	Exposure_dest	PASS	material exposure clamp; seek contrary state where guard/resource assumptions diverge
+B21-049	fresh	perf	src/hooks_graphics.cpp	Exposure_dest	PASS	material exposure clamp; assess draw/copy/allocation/frame-pacing cost
+B21-050	fresh	recovery	src/hooks_graphics.cpp	Exposure_dest	PASS	material exposure clamp; assess reset/mode-transition/state restoration behavior
+B21-051	fresh	semantic	src/hooks_graphics.cpp	ReflectionUpdateRate::FaceCount_dest	EVIDENCE_AUGMENT:VR-REFLECTION-RATE-ACTIVE-GATE-001	reflection pacing eligibility; verify intended visual/render ownership
+B21-052	fresh	cross	src/hooks_graphics.cpp	ReflectionUpdateRate::FaceCount_dest	EVIDENCE_AUGMENT:VR-REFLECTION-RATE-ACTIVE-GATE-001	reflection pacing eligibility; trace upstream setting/state to downstream draw/resource effect
+B21-053	fresh	falsify	src/hooks_graphics.cpp	ReflectionUpdateRate::FaceCount_dest	EVIDENCE_AUGMENT:VR-REFLECTION-RATE-ACTIVE-GATE-001	reflection pacing eligibility; seek contrary state where guard/resource assumptions diverge
+B21-054	fresh	perf	src/hooks_graphics.cpp	ReflectionUpdateRate::FaceCount_dest	EVIDENCE_AUGMENT:VR-REFLECTION-RATE-ACTIVE-GATE-001	reflection pacing eligibility; assess draw/copy/allocation/frame-pacing cost
+B21-055	fresh	recovery	src/hooks_graphics.cpp	ReflectionUpdateRate::FaceCount_dest	EVIDENCE_AUGMENT:VR-REFLECTION-RATE-ACTIVE-GATE-001	reflection pacing eligibility; assess reset/mode-transition/state restoration behavior
+B21-056	fresh	semantic	src/hooks_graphics.cpp	FixZBufferPrecision::CalcCameraMatrix_dest	PASS	VR near-plane eligibility; verify intended visual/render ownership
+B21-057	fresh	cross	src/hooks_graphics.cpp	FixZBufferPrecision::CalcCameraMatrix_dest	PASS	VR near-plane eligibility; trace upstream setting/state to downstream draw/resource effect
+B21-058	fresh	falsify	src/hooks_graphics.cpp	FixZBufferPrecision::CalcCameraMatrix_dest	PASS	VR near-plane eligibility; seek contrary state where guard/resource assumptions diverge
+B21-059	fresh	perf	src/hooks_graphics.cpp	FixZBufferPrecision::CalcCameraMatrix_dest	PASS	VR near-plane eligibility; assess draw/copy/allocation/frame-pacing cost
+B21-060	fresh	recovery	src/hooks_graphics.cpp	FixZBufferPrecision::CalcCameraMatrix_dest	PASS	VR near-plane eligibility; assess reset/mode-transition/state restoration behavior
+B21-061	fresh	semantic	src/hooks_graphics.cpp	FixZBufferPrecision::Clr_SceneEffect_dest	PASS	scene-effect near-plane restore; verify intended visual/render ownership
+B21-062	fresh	cross	src/hooks_graphics.cpp	FixZBufferPrecision::Clr_SceneEffect_dest	PASS	scene-effect near-plane restore; trace upstream setting/state to downstream draw/resource effect
+B21-063	fresh	falsify	src/hooks_graphics.cpp	FixZBufferPrecision::Clr_SceneEffect_dest	PASS	scene-effect near-plane restore; seek contrary state where guard/resource assumptions diverge
+B21-064	fresh	perf	src/hooks_graphics.cpp	FixZBufferPrecision::Clr_SceneEffect_dest	PASS	scene-effect near-plane restore; assess draw/copy/allocation/frame-pacing cost
+B21-065	fresh	recovery	src/hooks_graphics.cpp	FixZBufferPrecision::Clr_SceneEffect_dest	PASS	scene-effect near-plane restore; assess reset/mode-transition/state restoration behavior
+B21-066	fresh	semantic	src/hooks_graphics.cpp	RestoreCarBaseShadow::CalcPeraShadow	PASS	shadow world rendering; verify intended visual/render ownership
+B21-067	fresh	cross	src/hooks_graphics.cpp	RestoreCarBaseShadow::CalcPeraShadow	PASS	shadow world rendering; trace upstream setting/state to downstream draw/resource effect
+B21-068	fresh	falsify	src/hooks_graphics.cpp	RestoreCarBaseShadow::CalcPeraShadow	PASS	shadow world rendering; seek contrary state where guard/resource assumptions diverge
+B21-069	fresh	perf	src/hooks_graphics.cpp	RestoreCarBaseShadow::CalcPeraShadow	PASS	shadow world rendering; assess draw/copy/allocation/frame-pacing cost
+B21-070	fresh	recovery	src/hooks_graphics.cpp	RestoreCarBaseShadow::CalcPeraShadow	PASS	shadow world rendering; assess reset/mode-transition/state restoration behavior
+B21-071	fresh	semantic	src/hooks_graphics.cpp	RestoreXboxBrightness::PsSetTextureColorOp_dest	PASS	brightness combiner state; verify intended visual/render ownership
+B21-072	fresh	cross	src/hooks_graphics.cpp	RestoreXboxBrightness::PsSetTextureColorOp_dest	PASS	brightness combiner state; trace upstream setting/state to downstream draw/resource effect
+B21-073	fresh	falsify	src/hooks_graphics.cpp	RestoreXboxBrightness::PsSetTextureColorOp_dest	PASS	brightness combiner state; seek contrary state where guard/resource assumptions diverge
+B21-074	fresh	perf	src/hooks_graphics.cpp	RestoreXboxBrightness::PsSetTextureColorOp_dest	PASS	brightness combiner state; assess draw/copy/allocation/frame-pacing cost
+B21-075	fresh	recovery	src/hooks_graphics.cpp	RestoreXboxBrightness::PsSetTextureColorOp_dest	PASS	brightness combiner state; assess reset/mode-transition/state restoration behavior
+B21-076	fresh	semantic	src/hooks_graphics.cpp	RestoreXboxBrightness::SelectVertexShader_dest	PASS	shader-id state; verify intended visual/render ownership
+B21-077	fresh	cross	src/hooks_graphics.cpp	RestoreXboxBrightness::SelectVertexShader_dest	PASS	shader-id state; trace upstream setting/state to downstream draw/resource effect
+B21-078	fresh	falsify	src/hooks_graphics.cpp	RestoreXboxBrightness::SelectVertexShader_dest	PASS	shader-id state; seek contrary state where guard/resource assumptions diverge
+B21-079	fresh	perf	src/hooks_graphics.cpp	RestoreXboxBrightness::SelectVertexShader_dest	PASS	shader-id state; assess draw/copy/allocation/frame-pacing cost
+B21-080	fresh	recovery	src/hooks_graphics.cpp	RestoreXboxBrightness::SelectVertexShader_dest	PASS	shader-id state; assess reset/mode-transition/state restoration behavior
+B21-081	fresh	semantic	src/hooks_graphics.cpp	ScreenEdgeCullFix::destination	PASS	aspect-ratio culling; verify intended visual/render ownership
+B21-082	fresh	cross	src/hooks_graphics.cpp	ScreenEdgeCullFix::destination	PASS	aspect-ratio culling; trace upstream setting/state to downstream draw/resource effect
+B21-083	fresh	falsify	src/hooks_graphics.cpp	ScreenEdgeCullFix::destination	PASS	aspect-ratio culling; seek contrary state where guard/resource assumptions diverge
+B21-084	fresh	perf	src/hooks_graphics.cpp	ScreenEdgeCullFix::destination	PASS	aspect-ratio culling; assess draw/copy/allocation/frame-pacing cost
+B21-085	fresh	recovery	src/hooks_graphics.cpp	ScreenEdgeCullFix::destination	PASS	aspect-ratio culling; assess reset/mode-transition/state restoration behavior
+B21-086	fresh	semantic	src/hooks_graphics.cpp	DisableStageCulling::apply	PASS	stage draw amplification; verify intended visual/render ownership
+B21-087	fresh	cross	src/hooks_graphics.cpp	DisableStageCulling::apply	PASS	stage draw amplification; trace upstream setting/state to downstream draw/resource effect
+B21-088	fresh	falsify	src/hooks_graphics.cpp	DisableStageCulling::apply	PASS	stage draw amplification; seek contrary state where guard/resource assumptions diverge
+B21-089	fresh	perf	src/hooks_graphics.cpp	DisableStageCulling::apply	PASS	stage draw amplification; assess draw/copy/allocation/frame-pacing cost
+B21-090	fresh	recovery	src/hooks_graphics.cpp	DisableStageCulling::apply	PASS	stage draw amplification; assess reset/mode-transition/state restoration behavior
+B21-091	fresh	semantic	src/hooks_graphics.cpp	DisableVehicleLODs::apply	PASS	vehicle LOD draw cost; verify intended visual/render ownership
+B21-092	fresh	cross	src/hooks_graphics.cpp	DisableVehicleLODs::apply	PASS	vehicle LOD draw cost; trace upstream setting/state to downstream draw/resource effect
+B21-093	fresh	falsify	src/hooks_graphics.cpp	DisableVehicleLODs::apply	PASS	vehicle LOD draw cost; seek contrary state where guard/resource assumptions diverge
+B21-094	fresh	perf	src/hooks_graphics.cpp	DisableVehicleLODs::apply	PASS	vehicle LOD draw cost; assess draw/copy/allocation/frame-pacing cost
+B21-095	fresh	recovery	src/hooks_graphics.cpp	DisableVehicleLODs::apply	PASS	vehicle LOD draw cost; assess reset/mode-transition/state restoration behavior
+B21-096	fresh	semantic	src/hooks_graphics.cpp	TransparencySupersampling::destination	PASS	MSAA/alpha render state; verify intended visual/render ownership
+B21-097	fresh	cross	src/hooks_graphics.cpp	TransparencySupersampling::destination	PASS	MSAA/alpha render state; trace upstream setting/state to downstream draw/resource effect
+B21-098	fresh	falsify	src/hooks_graphics.cpp	TransparencySupersampling::destination	PASS	MSAA/alpha render state; seek contrary state where guard/resource assumptions diverge
+B21-099	fresh	perf	src/hooks_graphics.cpp	TransparencySupersampling::destination	PASS	MSAA/alpha render state; assess draw/copy/allocation/frame-pacing cost
+B21-100	fresh	recovery	src/hooks_graphics.cpp	TransparencySupersampling::destination	PASS	MSAA/alpha render state; assess reset/mode-transition/state restoration behavior
+B21-101	fresh	semantic	src/hooks_graphics.cpp	TransparencySupersampling::deviceReset	PASS	reset state replay; verify intended visual/render ownership
+B21-102	fresh	cross	src/hooks_graphics.cpp	TransparencySupersampling::deviceReset	PASS	reset state replay; trace upstream setting/state to downstream draw/resource effect
+B21-103	fresh	falsify	src/hooks_graphics.cpp	TransparencySupersampling::deviceReset	PASS	reset state replay; seek contrary state where guard/resource assumptions diverge
+B21-104	fresh	perf	src/hooks_graphics.cpp	TransparencySupersampling::deviceReset	PASS	reset state replay; assess draw/copy/allocation/frame-pacing cost
+B21-105	fresh	recovery	src/hooks_graphics.cpp	TransparencySupersampling::deviceReset	PASS	reset state replay; assess reset/mode-transition/state restoration behavior
+B21-106	fresh	semantic	src/hooks_graphics.cpp	ReflectionResolution::apply	PASS	cubemap resolution cost; verify intended visual/render ownership
+B21-107	fresh	cross	src/hooks_graphics.cpp	ReflectionResolution::apply	PASS	cubemap resolution cost; trace upstream setting/state to downstream draw/resource effect
+B21-108	fresh	falsify	src/hooks_graphics.cpp	ReflectionResolution::apply	PASS	cubemap resolution cost; seek contrary state where guard/resource assumptions diverge
+B21-109	fresh	perf	src/hooks_graphics.cpp	ReflectionResolution::apply	PASS	cubemap resolution cost; assess draw/copy/allocation/frame-pacing cost
+B21-110	fresh	recovery	src/hooks_graphics.cpp	ReflectionResolution::apply	PASS	cubemap resolution cost; assess reset/mode-transition/state restoration behavior
+B21-111	fresh	semantic	src/hooks_graphics.cpp	RestoreSkyGlow::apply	PASS	hook install and glow enable; verify intended visual/render ownership
+B21-112	fresh	cross	src/hooks_graphics.cpp	RestoreSkyGlow::apply	PASS	hook install and glow enable; trace upstream setting/state to downstream draw/resource effect
+B21-113	fresh	falsify	src/hooks_graphics.cpp	RestoreSkyGlow::apply	PASS	hook install and glow enable; seek contrary state where guard/resource assumptions diverge
+B21-114	fresh	perf	src/hooks_graphics.cpp	RestoreSkyGlow::apply	PASS	hook install and glow enable; assess draw/copy/allocation/frame-pacing cost
+B21-115	fresh	recovery	src/hooks_graphics.cpp	RestoreSkyGlow::apply	PASS	hook install and glow enable; assess reset/mode-transition/state restoration behavior
+B21-116	fresh	semantic	src/hooks_graphics.cpp	RestoreSkyGlow::declare_settings	PASS	live setting watchers; verify intended visual/render ownership
+B21-117	fresh	cross	src/hooks_graphics.cpp	RestoreSkyGlow::declare_settings	PASS	live setting watchers; trace upstream setting/state to downstream draw/resource effect
+B21-118	fresh	falsify	src/hooks_graphics.cpp	RestoreSkyGlow::declare_settings	PASS	live setting watchers; seek contrary state where guard/resource assumptions diverge
+B21-119	fresh	perf	src/hooks_graphics.cpp	RestoreSkyGlow::declare_settings	PASS	live setting watchers; assess draw/copy/allocation/frame-pacing cost
+B21-120	fresh	recovery	src/hooks_graphics.cpp	RestoreSkyGlow::declare_settings	PASS	live setting watchers; assess reset/mode-transition/state restoration behavior
+B21-121	fresh	semantic	OutRun2006Tweaks.ini	SkyGlowFactor config	READY_FOR_C:SKYGLOW-CONFIG-POLICY	VR correctness profile identity; verify intended visual/render ownership
+B21-122	fresh	cross	OutRun2006Tweaks.ini	SkyGlowFactor config	READY_FOR_C:SKYGLOW-CONFIG-POLICY	VR correctness profile identity; trace upstream setting/state to downstream draw/resource effect
+B21-123	fresh	falsify	OutRun2006Tweaks.ini	SkyGlowFactor config	READY_FOR_C:SKYGLOW-CONFIG-POLICY	VR correctness profile identity; seek contrary state where guard/resource assumptions diverge
+B21-124	fresh	perf	OutRun2006Tweaks.ini	SkyGlowFactor config	READY_FOR_C:SKYGLOW-CONFIG-POLICY	VR correctness profile identity; assess draw/copy/allocation/frame-pacing cost
+B21-125	fresh	recovery	OutRun2006Tweaks.ini	SkyGlowFactor config	READY_FOR_C:SKYGLOW-CONFIG-POLICY	VR correctness profile identity; assess reset/mode-transition/state restoration behavior
+B21-126	fresh	semantic	OutRun2006Tweaks.ini	SkyGlowTwoStep config	PASS	extra StretchRect cost; verify intended visual/render ownership
+B21-127	fresh	cross	OutRun2006Tweaks.ini	SkyGlowTwoStep config	PASS	extra StretchRect cost; trace upstream setting/state to downstream draw/resource effect
+B21-128	fresh	falsify	OutRun2006Tweaks.ini	SkyGlowTwoStep config	PASS	extra StretchRect cost; seek contrary state where guard/resource assumptions diverge
+B21-129	fresh	perf	OutRun2006Tweaks.ini	SkyGlowTwoStep config	PASS	extra StretchRect cost; assess draw/copy/allocation/frame-pacing cost
+B21-130	fresh	recovery	OutRun2006Tweaks.ini	SkyGlowTwoStep config	PASS	extra StretchRect cost; assess reset/mode-transition/state restoration behavior
+B21-131	fresh	semantic	OutRun2006Tweaks.ini	ReflectionUpdateRate config	PASS	reflection GPU budget; verify intended visual/render ownership
+B21-132	fresh	cross	OutRun2006Tweaks.ini	ReflectionUpdateRate config	PASS	reflection GPU budget; trace upstream setting/state to downstream draw/resource effect
+B21-133	fresh	falsify	OutRun2006Tweaks.ini	ReflectionUpdateRate config	PASS	reflection GPU budget; seek contrary state where guard/resource assumptions diverge
+B21-134	fresh	perf	OutRun2006Tweaks.ini	ReflectionUpdateRate config	PASS	reflection GPU budget; assess draw/copy/allocation/frame-pacing cost
+B21-135	fresh	recovery	OutRun2006Tweaks.ini	ReflectionUpdateRate config	PASS	reflection GPU budget; assess reset/mode-transition/state restoration behavior
+B21-136	fresh	semantic	OutRun2006Tweaks.ini	ReflectionResolution config	PASS	reflection memory/bandwidth; verify intended visual/render ownership
+B21-137	fresh	cross	OutRun2006Tweaks.ini	ReflectionResolution config	PASS	reflection memory/bandwidth; trace upstream setting/state to downstream draw/resource effect
+B21-138	fresh	falsify	OutRun2006Tweaks.ini	ReflectionResolution config	PASS	reflection memory/bandwidth; seek contrary state where guard/resource assumptions diverge
+B21-139	fresh	perf	OutRun2006Tweaks.ini	ReflectionResolution config	PASS	reflection memory/bandwidth; assess draw/copy/allocation/frame-pacing cost
+B21-140	fresh	recovery	OutRun2006Tweaks.ini	ReflectionResolution config	PASS	reflection memory/bandwidth; assess reset/mode-transition/state restoration behavior
+B21-141	fresh	semantic	OutRun2006Tweaks.ini	TransparencySupersampling config	PASS	GPU cost/profile interaction; verify intended visual/render ownership
+B21-142	fresh	cross	OutRun2006Tweaks.ini	TransparencySupersampling config	PASS	GPU cost/profile interaction; trace upstream setting/state to downstream draw/resource effect
+B21-143	fresh	falsify	OutRun2006Tweaks.ini	TransparencySupersampling config	PASS	GPU cost/profile interaction; seek contrary state where guard/resource assumptions diverge
+B21-144	fresh	perf	OutRun2006Tweaks.ini	TransparencySupersampling config	PASS	GPU cost/profile interaction; assess draw/copy/allocation/frame-pacing cost
+B21-145	fresh	recovery	OutRun2006Tweaks.ini	TransparencySupersampling config	PASS	GPU cost/profile interaction; assess reset/mode-transition/state restoration behavior
+B21-146	fresh	semantic	OutRun2006Tweaks.ini	FixZBufferPrecision config	PASS	visual depth policy; verify intended visual/render ownership
+B21-147	fresh	cross	OutRun2006Tweaks.ini	FixZBufferPrecision config	PASS	visual depth policy; trace upstream setting/state to downstream draw/resource effect
+B21-148	fresh	falsify	OutRun2006Tweaks.ini	FixZBufferPrecision config	PASS	visual depth policy; seek contrary state where guard/resource assumptions diverge
+B21-149	fresh	perf	OutRun2006Tweaks.ini	FixZBufferPrecision config	PASS	visual depth policy; assess draw/copy/allocation/frame-pacing cost
+B21-150	fresh	recovery	OutRun2006Tweaks.ini	FixZBufferPrecision config	PASS	visual depth policy; assess reset/mode-transition/state restoration behavior
