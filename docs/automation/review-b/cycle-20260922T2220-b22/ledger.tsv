@@ -1,0 +1,151 @@
+unit	fresh	category	path	objective	evidence	verdict
+B22-001	1	cross	r32:ResolveDirectTransportR32	R32 overlay-disabled delegation	stereo_renderer_r32.cpp: ResolveDirectTransportR32 delegates to R13 when overlay not ready	PASS
+B22-002	1	adversarial	r32:ResolveDirectTransportR32	zero frame rejection	!frameId returns false before publication state	PASS
+B22-003	1	path	r32:ResolveDirectTransportR32	resource prerequisite	R32EnsureDirectResources and eye surfaces required	PASS
+B22-004	1	cross	r32:ResolveDirectTransportR32	identity regeneration ordering	Ensure resources precedes cached rejection so generation change can clear rejection	PASS
+B22-005	1	adversarial	r32:ResolveDirectTransportR32	cached rejection fail-closed	R32DirectCopyPathRejected returns false	PASS
+B22-006	1	path	r32:slot-selection	frame-to-slot mapping	(frameId-1)%RenderFrameRingSize bounds slot	PASS
+B22-007	1	cross	r32:producer-fence	pending fence drain before reuse	R32DrainPendingProducerFence gates slot reuse	PASS
+B22-008	1	adversarial	r32:producer-fence	S_FALSE quarantine	pending EVENT S_FALSE blocks reuse and increments backpressure	PASS
+B22-009	1	adversarial	r32:producer-fence	query error semantics	query error quarantines DirectGPU; does not infer completion	PASS
+B22-010	1	path	r32:consumer-ack	prior frame occupancy	slot.frameId triggers exact per-slot ACK check	PASS
+B22-011	1	cross	r32:consumer-ack	ACK mapping identity	R13ReadGpuCompletedFrame validates hostPid and transportGeneration	PASS
+B22-012	1	adversarial	r32:consumer-ack	missing ACK	invalid ACK blocks reuse and increments R13SafeAckBackpressure	PASS
+B22-013	1	adversarial	r32:consumer-ack	stale ACK	FrameIdAtOrAfter required before overwrite	PASS
+B22-014	1	path	r32:left-copy	left StretchRect ordering	left eye copy executes before right copy	PASS
+B22-015	1	path	r32:right-copy	right copy dependency	right copy only attempted after successful left copy	PASS
+B22-016	1	adversarial	r32:copy-failure	left failure quarantine	failed left copy sets R32DirectCopyPathRejected	PASS
+B22-017	1	adversarial	r32:copy-failure	right failure quarantine	failed right copy sets rejection with exact HRESULT	PASS
+B22-018	1	path	r32:event-issue	EVENT after copies	fence Issue(D3DISSUE_END) follows both StretchRect commands	PASS
+B22-019	1	adversarial	r32:event-issue	Issue failure quarantine	EVENT issue failure rejects DirectGPU because completion cannot be proven	PASS
+B22-020	1	cross	r32:event-issue	producer pending identity	R32ProducerFencePending and R32ProducerPendingFrame set before wait	PASS
+B22-021	1	path	r32:wait	bounded producer wait	R32WaitProducerFence decides whether resolve can proceed	PASS
+B22-022	1	adversarial	r32:wait	timeout path	failed wait returns false before base publication bridge	PASS
+B22-023	1	path	r32:wait-success	private pending clear	success clears R32 private pending markers	PASS
+B22-024	1	cross	r32:bridge	base producerPending bridge	slot.producerPending=true restores base post-Present contract	PASS
+B22-025	1	cross	r32:bridge	base pendingFrameId bridge	slot.pendingFrameId=frameId matches base publication identity	PASS
+B22-026	1	path	r32:bridge	frame identity assignment	slot.frameId=frameId before ActiveDirectTransportSlot	PASS
+B22-027	1	adversarial	r32:bridge	pre-Present visibility guard	slot.published=false prevents host-visible publication before Present	PASS
+B22-028	1	cross	r32:bridge	active slot handoff	ActiveDirectTransportSlot set only after bridge state complete	PASS
+B22-029	1	path	r7:FrameReadyAfterPresent	active slot bounds	invalid ActiveDirectTransportSlot rejects publication	PASS
+B22-030	1	adversarial	r7:FrameReadyAfterPresent	zero frame	frameId zero rejects publication	PASS
+B22-031	1	cross	r7:FrameReadyAfterPresent	frame identity equality	slot.frameId must equal pending frame	PASS
+B22-032	1	cross	r7:FrameReadyAfterPresent	pending identity equality	slot.pendingFrameId must equal pending frame	PASS
+B22-033	1	adversarial	r7:FrameReadyAfterPresent	missing fence	missing slot fence rejects publication	PASS
+B22-034	1	performance	r7:FrameReadyAfterPresent	post-Present wait budget	WaitForEventQuery grace is 1 ms after Present	PASS
+B22-035	1	cross	r7:FrameReadyAfterPresent	Present flush ordering	publication wait occurs only after real Present returns	PASS
+B22-036	1	path	r7:FrameReadyAfterPresent	success clears producer pending	producerPending false after fence completion	PASS
+B22-037	1	path	r7:FrameReadyAfterPresent	success clears pending id	pendingFrameId zeroed after completion	PASS
+B22-038	1	cross	r7:FrameReadyAfterPresent	publication ownership	published becomes true only in post-Present success path	PASS
+B22-039	1	adversarial	r7:FrameReadyAfterPresent	timeout counter	failed bounded wait increments DirectTransportFenceTimeouts	PASS
+B22-040	1	adversarial	r7:FrameReadyAfterPresent	S_FALSE quarantine	S_FALSE retains pending/frame identity and remains unpublished	PASS
+B22-041	1	adversarial	r7:FrameReadyAfterPresent	query error cleanup	non-S_FALSE clears producer/pending/frame/published	PASS
+B22-042	1	cross	r7:PresentDest	direct resolve precondition	ResolveDirectTransport only attempted for stereoFrameEligible and host-ready	PASS
+B22-043	1	path	r7:PresentDest	pending frame allocation	NextStereoFrameId only when stereo requested	PASS
+B22-044	1	cross	r7:PresentDest	world draw eligibility	FrameHadWorldStereo and duplicated draw required	PASS
+B22-045	1	adversarial	r7:PresentDest	right-eye failure gate	FrameRightDrawFailed excludes stereo frame	PASS
+B22-046	1	adversarial	r7:PresentDest	incomplete frame gate	FrameStereoIncomplete excludes transport	PASS
+B22-047	1	cross	r7:PresentDest	pose metadata gate	pose sequence and valid stereo metadata required	PASS
+B22-048	1	path	r7:PresentDest	resource gate	EnsureStereoResources is final frame eligibility prerequisite	PASS
+B22-049	1	performance	r7:PresentDest	direct-only miss behavior	miss uses hold instead of blocking/fallback compose	PASS
+B22-050	1	cross	r7:PresentDest	SBS fallback separation	SBS compose only when direct-only is disabled	PASS
+B22-051	1	path	r7:PresentDest	pre-Present metadata rule	direct transport does not PublishRenderFrame before Present	PASS
+B22-052	1	cross	r7:PresentDest	classic correlation marker	non-direct stereo publishes in-flight marker pre-Present	PASS
+B22-053	1	path	r7:PresentDest	real Present boundary	PresentHook is executed before DirectTransportFrameReadyAfterPresent	PASS
+B22-054	1	adversarial	r7:PresentDest	failed Present	failed Present prevents direct publication	PASS
+B22-055	1	cross	r7:PresentDest	post-Present direct validation	DirectTransportFrameReadyAfterPresent exact frame gates success	PASS
+B22-056	1	performance	r7:PresentDest	direct success accounting	DirectTransportFrames increments only after post-Present readiness	PASS
+B22-057	1	adversarial	r7:PresentDest	direct readiness miss	miss clears directTransport/composedStereo and enters hold	PASS
+B22-058	1	cross	r7:PresentDest	final stereo state gate	composedStereo+Present success+complete frame required	PASS
+B22-059	1	cross	r7:PresentDest	final render-frame direct flag	PublishRenderFrame receives directTransport only after readiness success	PASS
+B22-060	1	adversarial	r7:PresentDest	failure fallback state	failed composed path publishes fallback/disabled unless valid direct-only hold	PASS
+B22-061	1	performance	r7:PresentDest	last-safe projection reuse	direct-only transient miss preserves prior valid metadata	PASS
+B22-062	1	path	r7:PresentDest	frame state reset	per-Present stereo flags reset after NotifyGamePresent	PASS
+B22-063	1	path	r7:NextStereoFrameId	zero avoidance	frame counter skips zero on wrap	PASS
+B22-064	1	cross	r7:PublishStereoState	active state identity	active state requires nonzero pose and frame IDs	PASS
+B22-065	1	adversarial	r7:PublishStereoState	invalid identity fallback	zero pose/frame clears active state instead of advertising stereo	PASS
+B22-066	1	cross	r7:PublishStereoState	publication ordering	client frame index written last after MemoryBarrier	PASS
+B22-067	1	path	r7:PublishRenderFrame	ring slot identity	frameId maps to render frame ring slot deterministically	PASS
+B22-068	1	cross	r7:PublishRenderFrame	direct handle gate	direct handles copied only if active transport slot frameId matches frameId	PASS
+B22-069	1	adversarial	r7:PublishRenderFrame	mismatched transport frame	mismatch omits DirectGpuTransport flag/handles	PASS
+B22-070	1	cross	r7:PublishRenderFrame	direct size identity	direct transport width/height used only when direct resources are valid	PASS
+B22-071	1	path	r7:PublishRenderFrame	complete stereo gate	complete eye metadata requires !presentInFlight, active state, valid stereo, nonzero frame	PASS
+B22-072	1	adversarial	r7:PublishRenderFrame	in-flight metadata exclusion	pre-Present marker cannot carry complete eye metadata	PASS
+B22-073	1	cross	r7:PublishRenderFrame	build identity	game build tag is embedded in frame metadata	PASS
+B22-074	1	cross	r7:PublishRenderFrame	cadence identity	active cadence request ID persisted in frame reserved field	PASS
+B22-075	1	path	r7:PublishRenderFrame	seqlock write	frame sequence enters odd state before mutation and even after	PASS
+B22-076	1	path	r7:PublishRenderFrame	ring publication seqlock	ring publish sequence protects latest slot update	PASS
+B22-077	1	cross	r13:R13ReadGpuCompletedFrame	ACK slot bounds	out-of-range slot fails closed	PASS
+B22-078	1	cross	r13:R13EnsureAckState	mapping schema validation	magic/version/structSize checked before use	PASS
+B22-079	1	adversarial	r13:R13EnsureAckState	bad mapping schema	bad mapping is unmapped/closed and rejected	PASS
+B22-080	1	cross	r13:R13ReadGpuCompletedFrame	ACK seqlock	before/after sequence must match and be even	PASS
+B22-081	1	adversarial	r13:R13ReadGpuCompletedFrame	torn ACK snapshot	odd/changing sequence retries then fails closed	PASS
+B22-082	1	cross	r13:R13ReadGpuCompletedFrame	host PID identity	ACK hostPid must match SharedState hostPid	PASS
+B22-083	1	cross	r13:R13ReadGpuCompletedFrame	generation identity	ACK transportGeneration must equal DirectTransportGeneration	PASS
+B22-084	1	path	r13:R13ReadGpuCompletedFrame	per-slot completion	completedFrameId indexed by exact slot	PASS
+B22-085	1	cross	r13:ResolveDirectTransportR13	free-slot scan	R13 scans all ring slots rather than assuming frame modulo slot	PASS
+B22-086	1	performance	r13:ResolveDirectTransportR13	ring pressure	busy slots are skipped instead of blocking game thread	PASS
+B22-087	1	adversarial	r13:ResolveDirectTransportR13	pending fence error	query error clears unusable pending state	PASS
+B22-088	1	cross	r13:ResolveDirectTransportR13	unpublished completion reclaim	completed unpublished producer frame can be reclaimed without host ACK	PASS
+B22-089	1	adversarial	r13:ResolveDirectTransportR13	published frame immutability	published frame remains blocked without exact GPU completion ACK	PASS
+B22-090	1	path	r13:ResolveDirectTransportR13	ACK release	valid ACK clears frameId and published before reuse	PASS
+B22-091	1	performance	r13:ResolveDirectTransportR13	full ring backpressure	no free slot returns false and increments backpressure	PASS
+B22-092	1	path	r13:ResolveDirectTransportR13	copy sequence	left/right copies and EVENT issue happen under InternalPassScope	PASS
+B22-093	1	cross	r13:ResolveDirectTransportR13	base contract producer pending	producerPending set after successful copies/event	PASS
+B22-094	1	cross	r13:ResolveDirectTransportR13	base contract pending identity	pendingFrameId assigned exact frame	PASS
+B22-095	1	adversarial	r13:ResolveDirectTransportR13	pre-publication state	published=false before Present	PASS
+B22-096	1	path	r13:ResolveDirectTransportR13	actual selected slot handoff	ActiveDirectTransportSlot uses scanned selected slot	PASS
+B22-097	1	cross	r32:R32ResetAfterGameReset	reset mono-safety epoch	mono safety rearmed after R22 reset lifecycle	PASS
+B22-098	1	path	r32:R32InvalidateResetCaches	direct identity reset	R32ForgetDirectIdentity invalidates transport identity	PASS
+B22-099	1	path	r32:R32InvalidateResetCaches	pending fence reset	R32ClearPendingProducerFences called during reset invalidation	PASS
+B22-100	1	path	r32:R32InvalidateResetCaches	copy rejection reset	R32DirectCopyPathRejected cleared on reset/revalidation	PASS
+B22-101	1	cross	r32:ResetDestR32	pre-reset fence clear	game device clears pending producer fences before R22 reset	PASS
+B22-102	1	adversarial	r32:ResetDestR32	reset failure	failed reset invalidates caches and increments reset failure counter	PASS
+B22-103	1	cross	r32:ResetDestR32	reset success	success calls R32ResetAfterGameReset only after underlying R22 reset	PASS
+B22-104	1	cross	r13:R13ResetCommonPre	published state reset	ReleaseStereoResources clears direct transport slots	PASS
+B22-105	1	path	r13:R13ResetCommonPre	stereo metadata reset	PublishStereoState disabled and PublishRenderFrame disabled on reset	PASS
+B22-106	1	cross	r7:ReleaseStereoResources	slot COM lifetime	all fences/surfaces/textures released and slot zeroed	PASS
+B22-107	1	path	r7:ReleaseStereoResources	interop probe lifetime	probe query/surface/texture released and handles/tokens cleared	PASS
+B22-108	1	cross	r7:ReleaseStereoResources	shared probe identity	shared client interop handle/token zeroed when schema valid	PASS
+B22-109	1	path	r7:ReleaseStereoResources	transport format reset	DirectTransportFormat reset to unknown	PASS
+B22-110	1	path	r7:ReleaseStereoResources	projection cache reset	ProjectionInverseValid cleared with resource release	PASS
+B22-111	1	performance	r7:DirectTransportTargetSize	stable eye-size fallback	unstable seqlock read retains active direct size rather than desktop size	PASS
+B22-112	1	cross	r7:DirectTransportTargetSize	recommended eye seqlock	width/height read only from stable SharedState sequence	PASS
+B22-113	1	adversarial	r7:DirectTransportTargetSize	zero recommendation	zero recommended size does not replace stable fallback	PASS
+B22-114	1	cross	r7:EnsureDirectInteropProbe	adapter identity	game D3D9Ex adapter LUID must match host D3D11/OpenXR LUID	PASS
+B22-115	1	adversarial	r7:EnsureDirectInteropProbe	adapter mismatch	mismatch forces SBS fallback instead of direct transport	PASS
+B22-116	1	cross	r7:EnsureDirectInteropProbe	probe ACK identity	DirectInteropVerified only after host ack token matches client probe token	PASS
+B22-117	1	performance	r7:EnsureDirectInteropProbe	probe fence budget	interop probe EVENT wait bounded to 50 ms during setup	PASS
+B22-118	1	adversarial	r7:EnsureDirectInteropProbe	probe failure cleanup	failed probe releases query/surface/texture and rejects direct path	PASS
+B22-119	1	cross	r7:HostRenderEligible	visibility gate	game stereo source gated by host alive+session visible, not transient shouldRender	PASS
+B22-120	1	performance	r7:HostRenderEligible	shouldRender decoupling	transient compositor advice cannot tear down source metadata	PASS
+B22-121	1	cross	r7:GameplayActive	in-game state reuse	game established is_in_game state controls gameplay presentation	PASS
+B22-122	1	cross	r7:GameplayActive	warp/restart continuity	WARP/RESTART preserve gameplay presentation	PASS
+B22-123	1	adversarial	r7:GameplayActive	menu fallback	other non-game states remain theater/fallback	PASS
+B22-124	1	cross	r7:PresentDest	BeginScene pacing	multiple BeginScene per Present tracked only during gameplay	PASS
+B22-125	1	performance	r7:MaybeLogSummary	telemetry gate	5-second summary disabled unless VRTelemetry enabled	PASS
+B22-126	1	performance	r7:MaybeLogSummary	identity diagnostics	game/host/run identity logged for comparison without per-frame spam	PASS
+B22-127	1	cross	r7:PresentDest	presentation QPC	presentStart QPC captured immediately before Present boundary	PASS
+B22-128	1	cross	r7:PublishRenderFrame	present QPC propagation	post-Present frame publication carries pre-Present timestamp identity	PASS
+B22-129	1	adversarial	r7:PresentDest	compose failure	SBS compose failure poisons frame and prevents active stereo publish	PASS
+B22-130	1	cross	r7:PresentDest	direct-only hold eligibility	previous metadata preserved only when stereo frame eligible and Present succeeds	PASS
+B22-131	1	adversarial	r7:PresentDest	hold on Present failure	failed Present bypasses preservation and publishes failure fallback	PASS
+B22-132	1	cross	r32:bridge	R32 to R7 publication contract	new bridge makes R32-produced slot satisfy exact base post-Present identity checks	PASS
+B22-133	1	adversarial	r32:bridge	partial bridge hypothesis	without pendingFrameId base readiness would fail; integrated code sets it	PASS
+B22-134	1	adversarial	r32:bridge	premature published hypothesis	integrated code explicitly sets published=false before Present	PASS
+B22-135	1	adversarial	r32:bridge	stale active slot hypothesis	ActiveDirectTransportSlot assigned after slot identity fields	PASS
+B22-136	1	cross	r32:bridge	consumer ACK continuity	slot.frameId remains exact producer frame for later per-slot ACK	PASS
+B22-137	1	performance	r32:bridge	wait layering	R32 producer wait plus base 1ms post-Present wait is bounded but warrants runtime pacing observation	NEED_HMD_TEST
+B22-138	1	performance	r32:bridge	no extra CPU copy	bridge changes metadata only; eye copies remain StretchRect GPU path	PASS
+B22-139	1	cross	r32:bridge	no handle publication before Present	PublishRenderFrame direct handles only after base readiness returns true	PASS
+B22-140	1	adversarial	r32:bridge	Present failure after resolved copy	failed Present prevents slot published transition; slot remains unpublished/pending for later reclaim	PASS
+B22-141	1	cross	regression:VR-STARTUP-WHITE-001	startup risk path match	stereo_renderer_r32/r7 changes touch stereo transport/present risk paths; registry case remains open	NEED_HMD_TEST
+B22-142	1	adversarial	regression:VR-STARTUP-WHITE-001	static evidence limit	build/static review cannot close runtime white-screen case	NEED_HMD_TEST
+B22-143	1	cross	regression:VR-STARTUP-WHITE-001	deferred resource invariant	InstallStereoHooks still defers private resource creation beyond CreateDevice exposure	PASS
+B22-144	1	adversarial	regression:VR-STARTUP-WHITE-001	pre-exposure allocation recurrence	no new R32 bridge code is on CreateDevice pre-exposure path	PASS
+B22-145	1	cross	policy:TargetRefreshRateHz	refresh policy	R32 bridge introduces no hardcoded refresh rate and does not alter runtime-selected policy	PASS
+B22-146	1	cross	policy:SkyGlowFactor	visual config policy	R32 publication bridge does not alter SkyGlow config; existing config finding remains separate	PASS
+B22-147	1	path	candidate/integration identity	merged tree review	integration 4ff3a3f contains R32 bridge commit merged after c4dd697	PASS
+B22-148	1	adversarial	candidate/integration identity	base mismatch check	review evidence tied to exact integrated SHA 4ff3a3f, not prior c4dd697 tree	PASS
+B22-149	1	cross	C-handoff	new actionable defect search	no new bounded rendering/performance defect found in R32 publication bridge; no duplicate READY_FOR_C created	PASS
+B22-150	1	verification	CP150	completion assertion	150 physical rows; fresh=150; carry=0; cross/adversarial/performance/path diversity present	COMPLETE
