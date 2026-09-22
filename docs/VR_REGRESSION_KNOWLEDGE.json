@@ -103,5 +103,16 @@
     "sessionId": null,
     "protectedRegressionKeys": [],
     "note": "Do not infer a full baseline from BUILD_VERIFIED state. Populate only after matching Quest3/VDXR user runtime evidence. Existing per-regression known-good evidence remains usable for scoped revalidation."
+  },
+  "workingDevelopmentBaseline": {
+    "status": "USER_SELECTED_WORKING_BASELINE",
+    "establishedAtKst": "2026-09-23T02:11:00+09:00",
+    "sourceSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
+    "branch": "vr-d3d9ex-working-baseline",
+    "originCandidateBranch": "vr-d3d9ex-candidate/VR-R50-QUEUE-FOV2D-9554272a",
+    "packageSha256": "30a6ed205c517b146564d94bf7fc5eaadbcc36de1154a0f2966e9ef31787e3eb",
+    "profile": "CORRECTNESS",
+    "evidenceLevel": "BUILD_VERIFIED_USER_SELECTED",
+    "note": "User explicitly selected the latest R50 modification as the development continuation baseline. This does not claim Quest3/VDXR USER_RUNTIME_VERIFIED acceptance. Preserve this tree for future renderer work and compose it with newer integration governance commits instead of reverting to an older renderer lineage."
   }
 }
