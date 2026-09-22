@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-22T14:26:00Z",
+  "updatedUtc": "2026-09-22T14:40:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -46,6 +46,27 @@
       "candidateBaselineDeltaRequired": true,
       "rejectKnownBadReintroduction": true,
       "revalidateProspectiveMergedTreeWhenHeadMoves": true
+    },
+    "manualPackageGate": {
+      "enabled": true,
+      "appliesTo": [
+        "CHAT_DIRECT",
+        "MANUAL",
+        "ad-hoc build",
+        "ad-hoc package",
+        "package-only request"
+      ],
+      "latestMeans": "newest baseline-eligible exact tree, not blindly newest commit",
+      "recoverRegressionKnowledge": true,
+      "baselineDeltaRequired": true,
+      "exactShaConfigProfileRequired": true,
+      "revalidateIfHeadMoved": true,
+      "buildVerifiedCannotOverrideUserRuntimeBaseline": true,
+      "knownBadReintroductionBlocksRecommendedPackage": true,
+      "packageOnlyRequestsCannotBypassGate": true,
+      "diagnosticExceptionLabel": "DIAGNOSTIC / NOT BASELINE-SAFE / NEED_HMD_TEST",
+      "productionLedgerIssue": 14,
+      "runtimeRegressionLedgerIssue": 13
     }
   },
   "runtimeEvidence": {
