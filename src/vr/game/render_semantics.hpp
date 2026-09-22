@@ -156,8 +156,18 @@ namespace OutRunVR::GameSemantic
 
     inline void SelectSpriteQueueNode(const void* node) noexcept
     {
-        if (SpriteQueueDepth)
-            CurrentScope = ConsumeSpriteNodeScope(node);
+        // Do not hook the canonical queue entry at RVA 0x2D734. Two real
+        // crashes (EXE+0x2D738 and EXE+0x2D73E) proved that relocating the
+        // tiny entry/prologue block with a mid-hook is not runtime-safe.
+        //
+        // The first node at RVA 0x2D762 is the earliest point where semantic
+        // ownership is actually needed, so lazily open the queue scope here.
+        if (!SpriteQueueDepth)
+        {
+            SpriteQueueDepth = 1;
+            SpriteQueuePreviousScope = CurrentScope;
+        }
+        CurrentScope = ConsumeSpriteNodeScope(node);
     }
 
     inline void EndSpriteQueueRender() noexcept
