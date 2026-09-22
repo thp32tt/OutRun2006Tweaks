@@ -306,7 +306,8 @@
       "persistence": "GitHub Issue #6 append-only findings + N100_CHECKPOINT",
       "freshChatEachRun": true,
       "previousBusyPolicy": "skip fresh launch; never close an actively generating prior run"
-    }
+    },
+    "superpowersPolicy": "docs/VR_SUPERPOWERS_POLICY.md"
   },
   "regressionKnowledge": {
     "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
@@ -372,5 +373,28 @@
     "integrationSha": "3e7c09db725880eef5650d41a96a8d1691998bdd",
     "integrationPr": 15,
     "nextAction": "Mandatory strict EXE contract + matching durable crash-signature revalidation for all future executable-RVA hook changes."
+  },
+  "superpowersPolicy": {
+    "status": "ENABLED",
+    "policy": "docs/VR_SUPERPOWERS_POLICY.md",
+    "roleOwnershipUnchanged": true,
+    "productionWriter": "D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE",
+    "requiredGates": [
+      "systematic-debugging-before-production-fix",
+      "red-green-refactor-when-deterministic-oracle-possible",
+      "exact-sha-domain-code-review",
+      "verify-review-feedback-before-acting",
+      "fresh-verification-before-completion",
+      "prospective-merged-tree-verification-before-integration"
+    ],
+    "reviewRoles": [
+      "A",
+      "B",
+      "C",
+      "N100"
+    ],
+    "reviewQuotaUnchanged": true,
+    "maxMateriallyDifferentFixAttempts": 2,
+    "hardwareVisibleFinalDone": "USER_RUNTIME_VERIFIED_REQUIRED"
   }
 }
