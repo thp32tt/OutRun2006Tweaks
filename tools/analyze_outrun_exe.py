@@ -43,6 +43,17 @@ KNOWN_CALL_SITES = {
     0x0BB2D0: "RankMarker clip #5",
 }
 
+# Targeted reverse-analysis windows used by the VR HUD/rank regression work.
+# These are emitted as hex only; the canonical EXE itself is never uploaded.
+BYTE_RANGES = {
+    "sprite_font_core_02CA00_02DE00": (0x02CA00, 0x1400),
+    "calc3d2d_049900_049B80": (0x049900, 0x280),
+    "rank_marker_0BAD20_0BB340": (0x0BAD20, 0x620),
+    "disp_rank_0B9E00_0BA180": (0x0B9E00, 0x380),
+    "time_attack_0BE300_0BEB40": (0x0BE300, 0x840),
+    "navipub_0BEB40_0BEEA0": (0x0BEB40, 0x360),
+}
+
 # Mirrors src/vr/hud_semantics.hpp. These ranges come from the shipped
 # hooks_uiscaling.cpp reverse engineering and are intentionally semantic,
 # rather than D3D primitive-count heuristics.
@@ -289,6 +300,16 @@ def render_markdown(report: dict) -> str:
 
     lines += [
         "",
+        "## Targeted reverse-analysis byte windows",
+        "",
+    ]
+    for name, item in report.get("byte_ranges", {}).items():
+        lines.append(
+            f"- {name}: {hexrva(item['rva'])} size=0x{item['size']:X}"
+        )
+
+    lines += [
+        "",
         "## Direct CALL references into HUD/sprite anchors",
         "",
         "| Call RVA | Function start guess | Target | Known site | Semantic | Space |",
@@ -359,6 +380,14 @@ def main() -> int:
             "sections": [s.__dict__ for s in pe.sections],
         },
         "symbols": symbol_fingerprints(pe),
+        "byte_ranges": {
+            name: {
+                "rva": rva,
+                "size": size,
+                "hex": pe.bytes_at_rva(rva, size).hex(),
+            }
+            for name, (rva, size) in BYTE_RANGES.items()
+        },
         "calls": calls,
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
