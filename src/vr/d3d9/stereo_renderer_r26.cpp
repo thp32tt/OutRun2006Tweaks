@@ -13,6 +13,7 @@
 
 #include "stereo_renderer_r23.cpp"
 #include "shader_fingerprint_gpl.hpp"
+#include "../game/render_semantics.hpp"
 
 namespace OutRunVRRenderer
 {
