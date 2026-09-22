@@ -160,19 +160,12 @@ async def replace_with_fresh_slot_page(context: BrowserContext, pages: dict[str,
 
 
 def prompt_for_slot(slot: Slot, phase: str) -> str:
-    """Use fix-worker prompts only for dedicated N100 slot D."""
-    if slot.name == "D":
-        mapping = {
-            "bootstrap": "bootstrap_fix.md",
-            "continue": "continue_fix.md",
-            "watchdog": "watchdog_fix.md",
-        }
-    else:
-        mapping = {
-            "bootstrap": "bootstrap_review.md",
-            "continue": "continue_review.md",
-            "watchdog": "watchdog_resume.md",
-        }
+    """N100 is review-only; every slot uses the review prompt family."""
+    mapping = {
+        "bootstrap": "bootstrap_review.md",
+        "continue": "continue_review.md",
+        "watchdog": "watchdog_resume.md",
+    }
     return read_prompt(mapping[phase])
 
 
