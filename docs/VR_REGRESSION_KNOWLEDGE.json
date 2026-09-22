@@ -114,7 +114,25 @@
         "src/vr/game/render_semantics.hpp",
         "src/hooks_uiscaling.cpp"
       ],
-      "nextAction": "Any HUD/marker fix must prove it does not broaden HUD ownership into perspective world draws or regress correct world stereo."
+      "nextAction": "Any HUD/marker fix must prove it does not broaden HUD ownership into perspective world draws or regress correct world stereo.",
+      "recurrenceCount": 0,
+      "testLevel": 3,
+      "revalidationTriggers": [
+        "changes to R26/R28/R29/R30 world draw ownership, c64..c67 WVP handling or stereo replay",
+        "changes that add or widen SCREEN_HUD/SCREEN_OVERLAY_2D ownership",
+        "changes to world-billboard classification or per-eye projection"
+      ],
+      "verifier": {
+        "static": [
+          "verify perspective/world semantics remain excluded from generic HUD ownership and unknown 3D fails closed",
+          "verify R28 verified-world continuation remains scoped to matching WVP/projection/pose generation and world semantics",
+          "build the active Win32 DX9Ex game DLL and x64 OpenXR host with regression/policy checks"
+        ],
+        "runtime": [
+          "Quest3/VDXR CORRECTNESS: road, background and vehicles remain true stereo without new doubling or head-lock",
+          "compare world/classification/right-eye/restore/pose-mismatch telemetry with the protected runtime baseline"
+        ]
+      }
     },
     {
       "key": "VR-R50-FRAME-STABILITY-PRESERVE-001",
@@ -128,7 +146,32 @@
       "runtimeEvidence": [
         "user reports frame rate/frame pacing is more stable than prior tested builds"
       ],
-      "nextAction": "HUD semantic fixes must avoid large draw amplification/replay regressions; compare counters and frame pacing against R50 baseline."
+      "nextAction": "HUD semantic fixes must avoid large draw amplification/replay regressions; compare counters and frame pacing against R50 baseline.",
+      "recurrenceCount": 0,
+      "testLevel": 3,
+      "riskPaths": [
+        "src/vr/d3d9/**",
+        "src/vr/ipc/**",
+        "vrhost/src/**",
+        "src/hooks_framerate.cpp",
+        "OutRun2006Tweaks.ini"
+      ],
+      "revalidationTriggers": [
+        "changes to draw replay count or world/HUD ownership that can amplify work",
+        "changes to producer/consumer fences, copies, waits or shared-frame lifetime",
+        "changes to frame cadence, interpolation, present interval or OpenXR submission timing"
+      ],
+      "verifier": {
+        "static": [
+          "collect bounded draw, producer-fence, host-copy/fence, render and xrEndFrame timing telemetry before optimization",
+          "verify no render-hot-path forced log flush or unbounded wait was introduced",
+          "build active DX9Ex game and host and run deterministic timing/policy smoke checks"
+        ],
+        "runtime": [
+          "Quest3/VDXR CORRECTNESS or PERFORMANCE comparison on the same scene/profile must not visibly regress pacing from the protected baseline",
+          "capture standardized timing telemetry when a pacing regression is suspected"
+        ]
+      }
     },
     {
       "key": "VR-R50-WHITE-HUD-DIPLOPIA-001",
@@ -152,7 +195,32 @@
       },
       "hypothesis": "R50 generic SCREEN_OVERLAY_2D common-ray correction is insufficient for exact white HUD producers; exact SCREEN_HUD ownership/scale/world-lock semantics are still missing or not reached.",
       "evidenceLevel": "USER_RUNTIME_VERIFIED_FAILURE",
-      "nextAction": "Identify exact white HUD producer/caller families without widening generic queue ownership; assign explicit SCREEN_HUD semantics and preserve R50 world-stereo invariant."
+      "nextAction": "Identify exact white HUD producer/caller families without widening generic queue ownership; assign explicit SCREEN_HUD semantics and preserve R50 world-stereo invariant.",
+      "recurrenceCount": 0,
+      "testLevel": 1,
+      "riskPaths": [
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "src/vr/game/outrun_renderer_r29.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/hud_semantics.hpp",
+        "src/hooks_uiscaling.cpp"
+      ],
+      "revalidationTriggers": [
+        "changes to fixed-function/no-vertex-shader screen ownership",
+        "changes to SCREEN_HUD/SCREEN_OVERLAY_2D semantics, HUD scale or world-lock placement",
+        "changes to white glyph, menu or sprite queue producer tagging"
+      ],
+      "verifier": {
+        "static": [
+          "require exact semantic provenance for any fixed-function screen owner; do not accept unknown 3D by heuristic",
+          "instrument screen fallback reasons including no-VS, missing constants and safety-gate rejection",
+          "verify HUD fixes preserve the protected world-stereo regression case"
+        ],
+        "runtime": [
+          "Quest3/VDXR: 6th/6, exit YES/NO and end-of-run white text render binocularly single and no longer follow head rotation",
+          "confirm intended HUD resize is applied and road/background/vehicles remain unchanged"
+        ]
+      }
     },
     {
       "key": "VR-R50-VEHICLE-RANK-ANCHOR-001",
@@ -171,7 +239,31 @@
       },
       "hypothesis": "Marker producer is being treated as screen overlay/HUD instead of WORLD_BILLBOARD with vehicle/world anchor transform.",
       "evidenceLevel": "USER_RUNTIME_VERIFIED_FAILURE",
-      "nextAction": "Recover exact marker producer/vehicle anchor transform; classify spatial rank marker as WORLD_BILLBOARD while leaving generic HUD/overlay path unchanged."
+      "nextAction": "Recover exact marker producer/vehicle anchor transform; classify spatial rank marker as WORLD_BILLBOARD while leaving generic HUD/overlay path unchanged.",
+      "recurrenceCount": 0,
+      "testLevel": 1,
+      "riskPaths": [
+        "src/vr/game/outrun_renderer_r29.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "src/hooks_uiscaling.cpp"
+      ],
+      "revalidationTriggers": [
+        "changes to Calc3D2D/rank-marker producer hooks or SpriteNode semantic metadata",
+        "changes to WORLD_BILLBOARD projection or screen-space marker fallback",
+        "changes to put_clip_sprite node tagging for 4th+ markers"
+      ],
+      "verifier": {
+        "static": [
+          "verify rank-marker metadata preserves the original vehicle/world anchor before screen projection",
+          "verify every newly appended 4th+ digit node is boundedly tagged rather than only the final tail node",
+          "verify WORLD_BILLBOARD handling is exact-tag only and cannot widen generic HUD/world ownership"
+        ],
+        "runtime": [
+          "Quest3/VDXR: 1st/2nd/3rd and 4th+ markers remain attached above their corresponding vehicles while the head moves",
+          "confirm marker text is binocularly single without changing ordinary HUD or world stereo"
+        ]
+      }
     },
     {
       "key": "VR-R51-WHITE-HUD-DIPLOPIA-001",
@@ -191,7 +283,32 @@
         "preserve improved frame stability",
         "do not restore blanket queue-to-HUD ownership"
       ],
-      "nextAction": "Identify exact white HUD producers and give only those SCREEN_HUD ownership/scale/world-lock semantics."
+      "nextAction": "Identify exact white HUD producers and give only those SCREEN_HUD ownership/scale/world-lock semantics.",
+      "recurrenceCount": 0,
+      "testLevel": 1,
+      "riskPaths": [
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "src/vr/game/outrun_renderer_r29.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/hud_semantics.hpp",
+        "src/hooks_uiscaling.cpp"
+      ],
+      "revalidationTriggers": [
+        "changes to fixed-function/no-vertex-shader screen ownership",
+        "changes to queue HUD/world-lock/scale semantics",
+        "changes to white glyph, YES/NO, result/time or rank-marker producer tagging"
+      ],
+      "verifier": {
+        "static": [
+          "permit no-vertex-shader screen correction only for exact queue-owned SCREEN_HUD or exact marker semantics",
+          "record fallback rejection reason counters so zero screen-owner acceptance is diagnosable",
+          "assert no blanket queue-to-HUD ownership and preserve R51 world-epoch continuation"
+        ],
+        "runtime": [
+          "Quest3/VDXR CORRECTNESS: 6th/6, exit YES/NO, result/time/countdown and white rank glyphs are binocularly single and world/recenter locked as intended",
+          "confirm 6th/6 scale change works and R51 road/background/vehicle stereo and frame stability remain intact"
+        ]
+      }
     },
     {
       "key": "VR-R51-VEHICLE-RANK-ANCHOR-001",
@@ -211,7 +328,31 @@
         "do not flatten rank markers into generic SCREEN_HUD",
         "preserve verified-good R51 world stereo and frame stability"
       ],
-      "nextAction": "Recover exact vehicle/world anchor and WORLD_BILLBOARD ownership for rank-marker producer paths; keep white-marker diplopia as a separately tracked producer issue."
+      "nextAction": "Recover exact vehicle/world anchor and WORLD_BILLBOARD ownership for rank-marker producer paths; keep white-marker diplopia as a separately tracked producer issue.",
+      "recurrenceCount": 0,
+      "testLevel": 1,
+      "riskPaths": [
+        "src/vr/game/outrun_renderer_r29.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "src/hooks_uiscaling.cpp"
+      ],
+      "revalidationTriggers": [
+        "changes to Calc3D2D rank-marker anchor capture or SpriteNode metadata",
+        "changes to WORLD_BILLBOARD per-eye projection",
+        "changes to sprani_play_ae_auth_alpha or put_clip_sprite rank-marker tagging"
+      ],
+      "verifier": {
+        "static": [
+          "preserve exact vehicle/world anchor metadata from Calc3D2D through queued rank-marker semantics",
+          "tag all newly appended digit nodes with a bounded queue walk",
+          "project the preserved anchor per eye only for exact WORLD_BILLBOARD markers and fail closed otherwise"
+        ],
+        "runtime": [
+          "Quest3/VDXR CORRECTNESS: non-white and white rank markers stay spatially attached to the correct vehicle during head motion",
+          "confirm marker convergence does not regress generic HUD or protected R51 world stereo"
+        ]
+      }
     }
   ],
   "userRuntimeVerifiedBaseline": {
