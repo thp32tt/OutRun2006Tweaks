@@ -30,10 +30,12 @@ def main() -> int:
         raise AssertionError("visual contract forbids SBS desktop gameplay fallback")
     if locked["hudPresentation"] != "WORLD_FIXED_NOT_HEAD_LOCKED":
         raise AssertionError("HUD visual contract changed")
-    if locked.get("untaggedSpriteNodeOwnership") != "SCREEN_OVERLAY_2D_FOV_ONLY_NEVER_FINITE_HUD":
-        raise AssertionError("untagged SpriteNode ownership must be FOV-only 2D")
-    if locked.get("generic2DQueuePlacement") != "ASYMMETRIC_FOV_COMMON_RAY_ONLY_NO_HEAD_IPD_DEPTH_RESET":
-        raise AssertionError("generic 2D queue must not use finite HUD/world placement")
+    if locked.get("untaggedSpriteNodeOwnership") != "SCREEN_OVERLAY_2D_WORLD_FIXED_FINITE_PLANE_NEVER_WORLD":
+        raise AssertionError("untagged SpriteNode ownership must stay world-fixed 2D, never 3D")
+    if locked.get("generic2DQueuePlacement") != "FINITE_RECENTERED_WORLD_FIXED_QUEUE_PLANE":
+        raise AssertionError("generic 2D queue must use the world-fixed HUD plane")
+    if locked.get("worldShaderEpochContinuation") != "STRICT_C64_PROJECTION_POSE_MATCH_OVERLAY_VETO":
+        raise AssertionError("world shader-epoch continuation must remain strict and overlay-vetoed")
     if not required["r26HudCompare"] or required["variantId"] != "ACTIVE_R26_R43_R44":
         raise AssertionError("active build no longer selects runtime-proven R26/R43/R44 owner")
 
@@ -101,16 +103,25 @@ def main() -> int:
             "GameSemantic::CorroboratesWorld",
             "GameSemantic::CorroboratesScreenOverlay2D",
             "R30ScreenSpaceKind::ScreenOverlay2D",
-            "state.eyeScale[eye] * ndcX + state.eyeOffset[eye]",
-            "fovAffine._11 = eyeScale[eye]",
-            "fovAffine._41 = eyeOffset[eye]",
-            "Do not apply head inverse",
+            "state.screenOverlay2D = semanticOverlay2D",
+            "state.hudWorldLockValid = true",
+            "finite recentered world-fixed plane",
+            "R28CanRebindVerifiedWorld(",
             "GameSemantic::ConsumeForDraw")
     forbid("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
            "if (state.depthTestEnabled && !state.worldEffect &&",
            "if (!state.worldEffect && !hudPlaneEvidence)",
            "r13FlatEffectShape",
            "if (zEnable != D3DZB_FALSE)")
+
+    require("src/vr/d3d9/stereo_renderer_r26.cpp",
+            "R28CanRebindVerifiedWorld(",
+            "R28RunWithVerifiedWorldEpoch",
+            "RenderScope::ScreenOverlay2D",
+            "RenderScope::ScreenHud",
+            "RenderScope::WorldBillboard",
+            "return r9Draw();",
+            "R28ShaderEpochWorldRebinds")
 
     require("src/vr/d3d9/stereo_renderer_r30.cpp",
             "clipCorrection._11 = hudScaleX;",
@@ -128,9 +139,10 @@ def main() -> int:
     require("src/vr/game/outrun_renderer.cpp",
             "CullingUnionFov disabled in active rendering after visual-regression evidence",
             "live projection remains untouched until a culling-only frustum boundary is proven",
-            "R49 final ownership split",
+            "R51 ownership split",
             "SemanticOverlayBypassCalls",
-            "VR R49 HUD OWNER: semantic overlay c64 kept raw")
+            "CorroboratesScreenOverlay2D",
+            "VR R51 HUD OWNER: queue overlay c64 kept raw")
     forbid("src/vr/game/outrun_renderer.cpp",
            "two-eye union culling FOV ACTIVE")
 
