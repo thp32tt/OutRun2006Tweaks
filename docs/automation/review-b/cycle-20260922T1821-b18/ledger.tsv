@@ -1,0 +1,151 @@
+unit	fresh	path	objective	kind	evidence	result
+B18-001	1	vrhost/src/runtime/r32_direct_submit.hpp::EndFrame	Observe newest generation before ACK polling	cross	ReadFresh+MetadataValid precede PollCompletedAcks	PASS
+B18-002	1	vrhost/src/runtime/r32_direct_submit.hpp::EndFrame	Fast path submits incoming projection once	cross	CanFastSubmit+ArmConsumptionFence then FinalTest::EndFrame	PASS
+B18-003	1	vrhost/src/runtime/r32_direct_submit.hpp::EndFrame	Reject path preserves fallback	falsify	failed eligibility routes R26RecenterHardening::EndFrame	PASS
+B18-004	1	vrhost/src/runtime/r32_direct_submit.hpp::EndFrame	Perf logging bounded cadence	perf	MaybeLogPerf called once per end-frame path	PASS
+B18-005	1	vrhost/src/runtime/r32_direct_submit.hpp::EndFrame	Recenter completion requires visible submit	falsify	CompletePendingGameRequestAfterVisibleProjection only if submitted	PASS
+B18-006	1	vrhost/src/runtime/r32_direct_submit.hpp::PollCompletedAcks	Nonblocking query polling	perf	GetData uses D3D11_ASYNC_GETDATA_DONOTFLUSH	PASS
+B18-007	1	vrhost/src/runtime/r32_direct_submit.hpp::PollCompletedAcks	Query failure cannot early-ACK producer	falsify	FAILED sets AckFaultGeneration and drops pending without publish	PASS
+B18-008	1	vrhost/src/runtime/r32_direct_submit.hpp::PollCompletedAcks	Old generation completion cannot rollback ACK	cross	completedGeneration mismatch clears pending without PublishCompletedFrame	PASS
+B18-009	1	vrhost/src/runtime/r32_direct_submit.hpp::PollCompletedAcks	Publish failure retains retry state	falsify	PublishCompletedFrame false increments retry and continues armed	PASS
+B18-010	1	vrhost/src/runtime/r32_direct_submit.hpp::PollCompletedAcks	Completed ACK records slot identity	cross	AckedFrame/AckedGeneration updated after publish	PASS
+B18-011	1	vrhost/src/runtime/r32_direct_submit.hpp::ArmConsumptionFence	Already ACKed frame avoids duplicate EVENT	perf	matching AckedGeneration+AckedFrame returns true	PASS
+B18-012	1	vrhost/src/runtime/r32_direct_submit.hpp::ArmConsumptionFence	Same pending frame reuse avoids fallback	perf	matching pending frame/generation returns true	PASS
+B18-013	1	vrhost/src/runtime/r32_direct_submit.hpp::ArmConsumptionFence	Flush only under slot pressure	falsify	Flush occurs only pending.armed after PollCompletedAcks	PASS
+B18-014	1	vrhost/src/runtime/r32_direct_submit.hpp::ArmConsumptionFence	Busy slot fails closed	falsify	still armed after deferred flush returns false	PASS
+B18-015	1	vrhost/src/runtime/r32_direct_submit.hpp::ArmConsumptionFence	EVENT placed after sampling commands	cross	Context->End arms fence immediately before submission path returns	PASS
+B18-016	1	vrhost/src/runtime/r32_direct_submit.hpp::CanFastSubmit	Null end info rejected	falsify	NoEndInfo explicit reason	PASS
+B18-017	1	vrhost/src/runtime/r32_direct_submit.hpp::CanFastSubmit	Pending focus recenter rejected	cross	PendingFocusRecenter gate precedes bundle use	PASS
+B18-018	1	vrhost/src/runtime/r32_direct_submit.hpp::CanFastSubmit	Nonprojection layer rejected	visual	HasIncomingNonProjectionLayer gate	PASS
+B18-019	1	vrhost/src/runtime/r32_direct_submit.hpp::CanFastSubmit	Stale verified bundle rejected	falsify	ReadFresh required	PASS
+B18-020	1	vrhost/src/runtime/r32_direct_submit.hpp::CanFastSubmit	Only DirectGPU source accepted	cross	SourceKind::DirectGpu required	PASS
+B18-021	1	vrhost/src/runtime/r32_direct_submit.hpp::CanFastSubmit	Incomplete stereo frame rejected	visual	FrameComplete required	PASS
+B18-022	1	vrhost/src/runtime/r32_direct_submit.hpp::CanFastSubmit	Malformed metadata rejected	falsify	MetadataValid required	PASS
+B18-023	1	vrhost/src/runtime/r32_direct_submit.hpp::CanFastSubmit	Projection identity mismatch rejected	visual	ProjectionMatchesSnapshot required	PASS
+B18-024	1	vrhost/src/runtime/r32_direct_submit.hpp::CanFastSubmit	Disabled transport rejected	falsify	DirectTransportRequested required	PASS
+B18-025	1	vrhost/src/runtime/r32_direct_submit.hpp::CanFastSubmit	Faulted generation rejected	cross	AckFaultGeneration match rejects	PASS
+B18-026	1	vrhost/src/runtime/r32_direct_submit.hpp::MetadataValid	Ring slot bounds validated	falsify	slot < Pending.size required	PASS
+B18-027	1	vrhost/src/runtime/r32_direct_submit.hpp::MetadataValid	Generation zero rejected	falsify	generation != 0 required	PASS
+B18-028	1	vrhost/src/runtime/r32_direct_submit.hpp::MetadataValid	Zero eye dimensions rejected	visual	width/height nonzero required	PASS
+B18-029	1	vrhost/src/runtime/r32_direct_submit.hpp::MetadataValid	Declared dimensions bind backbuffer identity	cross	width/height equal frame.backbufferWidth/Height	PASS
+B18-030	1	vrhost/src/runtime/r32_direct_submit.hpp::MetadataValid	Unknown format rejected	visual	ExpectedDeclaredFormat != UNKNOWN	PASS
+B18-031	1	vrhost/src/runtime/r32_direct_submit.hpp::ObserveGeneration	Zero generation ignored	falsify	!generation early return	PASS
+B18-032	1	vrhost/src/runtime/r32_direct_submit.hpp::ObserveGeneration	Same generation avoids churn	perf	ActiveAckGeneration equality early return	PASS
+B18-033	1	vrhost/src/runtime/r32_direct_submit.hpp::ObserveGeneration	Generation change clears cached ACKs	cross	AckedFrame/AckedGeneration fill zero	PASS
+B18-034	1	vrhost/src/runtime/r32_direct_submit.hpp::EnsureFence	Invalid slot rejected	falsify	slot >= Pending.size returns false	PASS
+B18-035	1	vrhost/src/runtime/r32_direct_submit.hpp::EnsureFence	Fence allocation cached	perf	existing pending.fence returns true	PASS
+B18-036	1	vrhost/src/runtime/r32_direct_submit.hpp::ReleasePending	Queries released on session teardown	cross	Release each fence and clear pending	PASS
+B18-037	1	vrhost/src/runtime/r32_direct_submit.hpp::ReleasePending	ACK identity cleared on teardown	falsify	Acked arrays and generations reset	PASS
+B18-038	1	vrhost/src/runtime/r32_direct_submit.hpp::DestroySession	Direct caches reset with session	cross	ReleasePending+R32ResetDirectCaches before downstream destroy	PASS
+B18-039	1	vrhost/src/runtime/r32_direct_submit.hpp::MaybeLogPerf	Five-second telemetry cadence	perf	now-LastPerfLogMs <5000 returns	PASS
+B18-040	1	vrhost/src/runtime/r32_direct_submit.hpp::CapturePerfSnapshot	Telemetry snapshots deltas not per-frame heavy work	perf	copies counters/arrays only	PASS
+B18-041	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32OpenSharedSlot	Cache hit avoids OpenSharedResource	perf	identity match returns cached slot	PASS
+B18-042	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32OpenSharedSlot	Slot bounds validated	falsify	slotIndex >= cache size rejected	PASS
+B18-043	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32OpenSharedSlot	Generation/handles/dimensions required	falsify	zero metadata rejected	PASS
+B18-044	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32OpenSharedSlot	Unknown format rejected	visual	declared UNKNOWN rejected	PASS
+B18-045	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32OpenSharedSlot	Texture descriptors validated against metadata	cross	both eyes width/height/format/sample count checked	PASS
+B18-046	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32EnsureInactiveEyes	Inactive eyes reused when compatible	perf	dimensions+format+SRV identity return true	PASS
+B18-047	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32EnsureInactiveEyes	Fallback texture is single-sample SRV	visual	Mip1 Array1 Sample1 BindShaderResource	PASS
+B18-048	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32EnsureInactiveEyes	Partial allocation fails atomically	falsify	failure calls R32ReleaseInactiveEyes	PASS
+B18-049	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::CopySharedFrameToSafeEyesR32	Copy fence required before staging	cross	Context+EnsureCopyFence gate	PASS
+B18-050	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::CopySharedFrameToSafeEyesR32	Source slot must validate before copy	falsify	R32OpenSharedSlot failure returns	PASS
+B18-051	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::CopySharedFrameToSafeEyesR32	Both eyes copied once to inactive pair	perf	two CopyResource calls	PASS
+B18-052	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::CopySharedFrameToSafeEyesR32	Fence timeout preserves active visible pair	visual	timeout returns before swaps/SafeFrameId mutation	PASS
+B18-053	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::CopySharedFrameToSafeEyesR32	ACK publish precedes active swap	cross	PublishCompletedFrame before std::swap	PASS
+B18-054	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::CopySharedFrameToSafeEyesR32	Safe identity updates only after successful swap	falsify	SafeFrameId/generation assigned after swaps	PASS
+B18-055	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::EnsureSafeFrameR32	Exact frame+generation cache hit avoids copy	perf	SafeFrameId+generation+SRVs return true	PASS
+B18-056	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::EnsureSafeFrameR32	Frame lookup failure fails closed	falsify	ReadFrameById false returns	PASS
+B18-057	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32ResetDirectCaches	Shared slots released	cross	loop R32ReleaseSharedSlot	PASS
+B18-058	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32ResetDirectCaches	Inactive eyes released	cross	R32ReleaseInactiveEyes called	PASS
+B18-059	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32ResetDirectCaches	Perf counters reset with caches	perf	cache/swap/timeout counters zeroed	PASS
+B18-060	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32ReleaseSharedSlot	COM eyes released before slot clear	falsify	ReleaseCom both eyes then slot={}	PASS
+B18-061	1	vrhost/src/runtime/sbs_capture_override.hpp::FrameComplete	Stereo completeness gate	visual	frame completeness used by fast submit	PASS
+B18-062	1	vrhost/src/runtime/sbs_capture_override.hpp::latest-frame path	Latest-frame-wins transport	perf	fast submit consumes ReadFresh verified bundle rather than queue drain	PASS
+B18-063	1	vrhost/src/runtime/sbs_capture_override.hpp::direct metadata	Direct slot metadata crosses game-host boundary	cross	frame reserved fields feed host slot/generation/handles	PASS
+B18-064	1	vrhost/src/runtime/sbs_capture_override.hpp::generation	Generation participates in visible identity	cross	host caches and ACK logic compare generation	PASS
+B18-065	1	vrhost/src/runtime/sbs_capture_override.hpp::fallback	Fallback remains available on fast rejection	falsify	R32 EndFrame routes to R26/R24 chain	PASS
+B18-066	1	vrhost/src/runtime/bounded_swapchain_wait.hpp::AcquireWait	Bounded swapchain wait avoids infinite block	perf	bounded wait helper isolates runtime stalls	PASS
+B18-067	1	vrhost/src/runtime/bounded_swapchain_wait.hpp::AcquireWait	Wait failure cannot masquerade as acquired image	falsify	bounded helper returns failure status	PASS
+B18-068	1	vrhost/src/runtime/bounded_swapchain_wait.hpp::AcquireWait	Frame pacing boundary separated from producer ACK	cross	OpenXR swapchain wait distinct from D3D11 EVENT ACK	PASS
+B18-069	1	vrhost/src/runtime/r32_direct_submit.hpp::FastRejectReason	Reject reasons are bounded enum	perf	fixed Count-sized counter array	PASS
+B18-070	1	vrhost/src/runtime/r32_direct_submit.hpp::RejectReasons	Reject telemetry has no dynamic allocation	perf	std::array counters	PASS
+B18-071	1	vrhost/src/runtime/r32_direct_submit.hpp::AckFaultGeneration	Query failure disables only affected generation	cross	generation-specific fault gate	PASS
+B18-072	1	vrhost/src/runtime/r32_direct_submit.hpp::ActiveAckGeneration	Newest generation owns ACK epoch	cross	ObserveGeneration updates epoch before polling	PASS
+B18-073	1	vrhost/src/runtime/r32_direct_submit.hpp::PendingAck	One pending EVENT per ring slot	perf	array sized RenderFrameRingSize	PASS
+B18-074	1	vrhost/src/runtime/r32_direct_submit.hpp::PendingAck	Pending stores immutable frame identity	cross	SharedRenderFrameState copied into pending.frame	PASS
+B18-075	1	vrhost/src/runtime/r32_direct_submit.hpp::PendingAck	flushIssued prevents repeated flush escalation	perf	guard !pending.flushIssued	PASS
+B18-076	1	vrhost/src/runtime/r32_direct_submit.hpp::EndFrame	AckBusy is explicit fallback reason	falsify	fastEligible&&!ackReady maps AckBusy	PASS
+B18-077	1	vrhost/src/runtime/r32_direct_submit.hpp::EndFrame	Reject counter increments once per rejected end-frame	perf	one increment after eligibility/ack decision	PASS
+B18-078	1	vrhost/src/runtime/r32_direct_submit.hpp::EndFrame	Successful fast submit records source kind	cross	RecordFinalSubmission(frameId,kind,submitted)	PASS
+B18-079	1	vrhost/src/runtime/r32_direct_submit.hpp::EndFrame	Failed xrEndFrame does not complete recenter	falsify	submitted requires XR_SUCCEEDED and layerCount>0	PASS
+B18-080	1	vrhost/src/runtime/r32_direct_submit.hpp::EndFrame	Zero-layer success not treated visible	visual	layerCount > 0 required	PASS
+B18-081	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32OpenSharedSlot	Cache identity includes both handles	falsify	leftHandle and rightHandle compared	PASS
+B18-082	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32OpenSharedSlot	Cache identity includes dimensions	falsify	width/height compared	PASS
+B18-083	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32OpenSharedSlot	Cache identity includes format	visual	format compared	PASS
+B18-084	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32OpenSharedSlot	Cache miss releases stale resources	cross	R32ReleaseSharedSlot before reopen	PASS
+B18-085	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32OpenSharedSlot	Partial eye open cannot leak first eye	falsify	failure releases entire cache slot	PASS
+B18-086	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32EnsureInactiveEyes	Source misc flags stripped for safe eyes	visual	MiscFlags=0	PASS
+B18-087	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32EnsureInactiveEyes	CPU access disabled on GPU staging	perf	CPUAccessFlags=0	PASS
+B18-088	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32EnsureInactiveEyes	DEFAULT usage keeps GPU path	perf	Usage=D3D11_USAGE_DEFAULT	PASS
+B18-089	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::CopySharedFrameToSafeEyesR32	No active-pair mutation before fence completion	falsify	all swaps occur after WaitForCopyFence true	PASS
+B18-090	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::CopySharedFrameToSafeEyesR32	Publish failure preserves previous active pair	visual	return false before swaps	PASS
+B18-091	1	vrhost/src/runtime/r32_direct_submit.hpp::PollCompletedAcks	S_FALSE is pure nonblocking continue	perf	no Flush/no publish on S_FALSE	PASS
+B18-092	1	vrhost/src/runtime/r32_direct_submit.hpp::PollCompletedAcks	FAILED query releases poisoned query	falsify	fence Release+nullptr	PASS
+B18-093	1	vrhost/src/runtime/r32_direct_submit.hpp::PollCompletedAcks	Late old-generation completion counts but does not publish	cross	AckCompleted++ after clearing superseded pending	PASS
+B18-094	1	vrhost/src/runtime/r32_direct_submit.hpp::PollCompletedAcks	Publish retry keeps EVENT completion knowledge	perf	pending remains armed for later publish retry	PASS
+B18-095	1	vrhost/src/runtime/r32_direct_submit.hpp::ArmConsumptionFence	Generation mismatch clears stale ACK cache	cross	AckedGeneration reset when different	PASS
+B18-096	1	vrhost/src/runtime/r32_direct_submit.hpp::ArmConsumptionFence	Poll-before-flush reduces forced submission	perf	PollCompletedAcks precedes Context->Flush	PASS
+B18-097	1	vrhost/src/runtime/r32_direct_submit.hpp::ArmConsumptionFence	Second poll after flush can recover slot	perf	PollCompletedAcks called after Flush	PASS
+B18-098	1	vrhost/src/runtime/r32_direct_submit.hpp::ArmConsumptionFence	No third synchronous wait loop	falsify	still armed returns false immediately	PASS
+B18-099	1	vrhost/src/runtime/r32_direct_submit.hpp::ArmConsumptionFence	New EVENT state written coherently	cross	End then frame copy then armed=true	PASS
+B18-100	1	vrhost/src/runtime/r32_direct_submit.hpp::CanFastSubmit	Eligibility ordering rejects semantic layers before transport work	perf	nonprojection gate precedes ReadFresh/metadata	PASS
+B18-101	1	vrhost/src/runtime/r32_direct_submit.hpp::CanFastSubmit	Freshness checked before source kind	falsify	ReadFresh precedes kind comparison	PASS
+B18-102	1	vrhost/src/runtime/r32_direct_submit.hpp::CanFastSubmit	Completeness checked before metadata	falsify	FrameComplete precedes MetadataValid	PASS
+B18-103	1	vrhost/src/runtime/r32_direct_submit.hpp::CanFastSubmit	Projection match checked before transport enabled	visual	ProjectionMatchesSnapshot precedes DirectTransportRequested	PASS
+B18-104	1	vrhost/src/runtime/r32_direct_submit.hpp::CanFastSubmit	Generation fault is last safety gate	cross	AckFaultGeneration check after transport request	PASS
+B18-105	1	vrhost/src/runtime/r32_direct_submit.hpp::MetadataValid	Backbuffer identity prevents wrong-size projection reuse	visual	direct dimensions equal backbuffer dimensions	PASS
+B18-106	1	vrhost/src/runtime/r32_direct_submit.hpp::MaybeLogPerf	First call only seeds snapshot	perf	LastPerfLogMs==0 captures and returns	PASS
+B18-107	1	vrhost/src/runtime/r32_direct_submit.hpp::MaybeLogPerf	Logs deltas rather than lifetime totals	perf	counters subtract Perf snapshot	PASS
+B18-108	1	vrhost/src/runtime/r32_direct_submit.hpp::MaybeLogPerf	SafeEye fallback counters included	cross	cache hit/miss/swap/timeout deltas logged	PASS
+B18-109	1	vrhost/src/runtime/r32_direct_submit.hpp::DestroySession	Pending ACK cannot survive session destruction	falsify	ReleasePending before downstream destroy	PASS
+B18-110	1	vrhost/src/runtime/r32_direct_submit.hpp::DestroySession	SafeEye shared cache cannot survive session destruction	falsify	R32ResetDirectCaches before downstream destroy	PASS
+B18-111	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::macro redirect	Fallback EnsureSafeFrame routes to R32 staging	cross	#define EnsureSafeFrame EnsureSafeFrameR32	PASS
+B18-112	1	vrhost/src/runtime/r32_direct_submit.hpp::macro redirect	Final xrEndFrame routes to R32 EndFrame	cross	#define xrEndFrame R32DirectSubmit::EndFrame	PASS
+B18-113	1	vrhost/src/runtime/r32_direct_submit.hpp::macro redirect	Final xrDestroySession routes teardown wrapper	cross	#define xrDestroySession R32DirectSubmit::DestroySession	PASS
+B18-114	1	vrhost/src/runtime/r32_direct_submit.hpp::BuildId	Runtime identity exposes R45 direct-recenter build	perf	BuildId string logged on first fast submit	PASS
+B18-115	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32SafeEyeBuildId	Fallback identity exposes R32 safe-eye build	perf	build id logged on first safe swap	PASS
+B18-116	1	vrhost/src/runtime/r32_direct_submit.hpp::FirstFastSubmitLogged	One-time activation log avoids per-frame spam	perf	bool guard	PASS
+B18-117	1	vrhost/src/runtime/r32_direct_submit.hpp::FirstAsyncAckLogged	One-time ACK log avoids per-frame spam	perf	bool guard	PASS
+B18-118	1	vrhost/src/runtime/r32_direct_submit.hpp::FirstDeferredFlushLogged	One-time flush escalation log avoids spam	perf	bool guard	PASS
+B18-119	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32FirstTimeoutPreserveLogged	Timeout diagnostic bounded	perf	one-time guard	PASS
+B18-120	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32FirstSafeSwapLogged	Safe swap diagnostic bounded	perf	one-time guard	PASS
+B18-121	1	vrhost/src/runtime/r32_direct_submit.hpp::PerfSnapshot	Fixed-size reject snapshot	perf	std::array no allocation	PASS
+B18-122	1	vrhost/src/runtime/r32_direct_submit.hpp::PerfSnapshot	Safe cache metrics cross fallback boundary	cross	R32 counters sampled from fallback namespace	PASS
+B18-123	1	vrhost/src/runtime/r32_direct_submit.hpp::AckSameFramePendingReuse	Repeated XR tick observable	perf	counter increment on same-frame pending reuse	PASS
+B18-124	1	vrhost/src/runtime/r32_direct_submit.hpp::AckFlushEscalations	Slot-pressure flush observable	perf	counter increment only at actual Flush	PASS
+B18-125	1	vrhost/src/runtime/r32_direct_submit.hpp::AckSlotBusy	Fallback pressure observable	perf	counter increments on still-busy slot	PASS
+B18-126	1	vrhost/src/runtime/r32_direct_submit.hpp::AckPublishRetry	IPC publish backpressure observable	cross	counter increments on publish failure	PASS
+B18-127	1	vrhost/src/runtime/r32_direct_submit.hpp::AckQueryErrors	GPU query failure observable	perf	counter increments on FAILED GetData	PASS
+B18-128	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32SafeTimeoutPreserves	Synchronous fallback timeout observable	perf	counter increments on fence timeout	PASS
+B18-129	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32SharedCacheHits	Shared-resource cache effectiveness observable	perf	counter increments on identity hit	PASS
+B18-130	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32SharedCacheMisses	Shared-resource reopen cost observable	perf	counter increments before reopen	PASS
+B18-131	1	vrhost/src/runtime/r32_direct_submit.hpp::EndFrame	Direct path removes redundant SafeEye copy	perf	fast branch calls FinalTest::EndFrame directly	PASS
+B18-132	1	vrhost/src/runtime/r32_direct_submit.hpp::EndFrame	Direct path removes second projection blit	perf	no fallback renderer call in fast branch	PASS
+B18-133	1	vrhost/src/runtime/r32_direct_submit.hpp::ArmConsumptionFence	Direct path has no CPU fence wait	perf	End EVENT only; completion polled future frames	PASS
+B18-134	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::CopySharedFrameToSafeEyesR32	Fallback intentionally retains synchronous copy fence	perf	WaitForCopyFence remains fallback cost	PASS
+B18-135	1	vrhost/src/runtime/r32_direct_submit.hpp::EndFrame	Fast-path uncertainty degrades to safe fallback	falsify	all rejection/ack busy cases route R26	PASS
+B18-136	1	vrhost/src/runtime/r32_direct_submit.hpp::ObserveGeneration	Generation observation uses only valid DirectGPU snapshot	falsify	kind+MetadataValid required before ObserveGeneration	PASS
+B18-137	1	vrhost/src/runtime/r32_direct_submit.hpp::PollCompletedAcks	No ACK rollback across generation change	cross	ActiveAckGeneration mismatch discards late completion	PASS
+B18-138	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::CopySharedFrameToSafeEyesR32	No stale visible image mutation on timeout	visual	inactive A/B pair absorbs late GPU copy	PASS
+B18-139	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::CopySharedFrameToSafeEyesR32	Frame identity and image swap remain coupled	cross	SafeFrameId assigned after pair swap	PASS
+B18-140	1	vrhost/src/runtime/r32_direct_submit.hpp::CanFastSubmit	No symptom-first visual override discovered	falsify	all fast gates are identity/lifecycle/transport checks	PASS
+B18-141	1	vrhost/src/runtime/r32_direct_submit.hpp::EndFrame	No hardcoded refresh rate in reviewed fast path	perf	no refresh constant in R32 submit path	PASS
+B18-142	1	vrhost/src/runtime/r32_direct_submit.hpp::MaybeLogPerf	No monitor-size eye sizing in reviewed path	visual	telemetry only, no eye-size derivation	PASS
+B18-143	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32EnsureInactiveEyes	Fallback eye size derives source texture	visual	Width/Height copied from source desc	PASS
+B18-144	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32EnsureInactiveEyes	Fallback format derives source texture	visual	Format copied from source desc	PASS
+B18-145	1	vrhost/src/runtime/r32_direct_submit.hpp::CanFastSubmit	Nonprojection composition never fast-submitted	visual	explicit HasIncomingNonProjectionLayer reject	PASS
+B18-146	1	vrhost/src/runtime/r32_direct_submit.hpp::EndFrame	Projection authority remains incoming verified layer	visual	fast branch submits unchanged endInfo once	PASS
+B18-147	1	vrhost/src/runtime/r32_direct_submit.hpp::ArmConsumptionFence	Producer reuse safety tied to GPU consumption	cross	EVENT ACK published only after GetData completion	PASS
+B18-148	1	vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp::R32OpenSharedSlot	Producer resource identity tied to generation	cross	cache key includes generation and handles	PASS
+B18-149	1	vrhost/src/runtime/r32_direct_submit.hpp::EndFrame	Fallback and fast metrics coexist for runtime comparison	perf	MaybeLogPerf includes direct and SafeEye counters	PASS
+B18-150	1	vrhost/src/runtime/r32_direct_submit.hpp::EndFrame	B18 completion falsification: no new P0/P1 frame-pacing defect bounded	falsify	150 distinct objectives across direct/fallback/ACK/projection paths; runtime claims remain HMD-gated	PASS
