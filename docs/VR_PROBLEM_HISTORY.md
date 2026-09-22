@@ -98,3 +98,26 @@ The independent HUD trace from the same run contains 1,334 rows yet resolves all
 ### Validation requirement
 
 One Quest 3 / VDXR CORRECTNESS race-entry pass must confirm broad world/stage geometry is coherent. It is acceptable for unresolved HUD elements to remain uncorrected in this isolation build; they must not be fixed by widening ownership again.
+
+
+## VR-R50-ASYMMETRIC-FOV-2D-DIPLOPIA-001 — generic 2D/HUD two-eye split
+
+**Status:** FIX_CANDIDATE / NEED_HMD_TEST  
+**Observed:** 2026-09-23 KST  
+**Bad runtime:** `9554272a7142b1533dfbf85d294111f3d6634fe1`
+
+### Runtime proof
+
+The fail-closed R47 isolation removed blanket finite-HUD ownership exactly as intended, but the user then observed the visible image split into two, including HUD. The same session shows `semanticHudAccepted=0`, `hud=0`, `screen[all=0]`, and `semanticUnknownRejected=45614`, while DirectGPU true stereo stays active with zero right-draw/restore/Present failures.
+
+R7/R9 deliberately duplicates non-world draws with the stock screen transform. That is not binocularly neutral for an OpenXR projection layer with asymmetric left/right FOV: identical D3D NDC/pixel coordinates correspond to different visual rays.
+
+### R50 fix
+
+Generic canonical SpriteNode content is now `SCREEN_OVERLAY_2D`, a distinct ownership class. It receives only the common-ray asymmetric-FOV X affine already derived from the latched OpenXR eye FOV. It does **not** receive head inverse, IPD eye translation, depth reset, HudScale, or finite world-plane placement.
+
+Exact `SCREEN_HUD` and `WORLD_BILLBOARD` tags remain stronger explicit semantics. This separates binocular convergence from final world-fixed HUD placement and avoids repeating the ea7c blanket finite-plane scene corruption.
+
+### HMD gate
+
+The next test must prove both simultaneously: ordinary HUD/2D converges to one image, and broad road/stage geometry no longer exhibits the ea7c finite-HUD distortion. Do not integrate before both are true.
