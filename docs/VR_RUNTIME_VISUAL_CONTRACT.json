@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "project": "OutRun2006Tweaks OpenXR VR",
+  "behavioralBaseline": {
+    "branch": "vr-openxr",
+    "commit": "91b9c639bea60c114600aedd2f4f3fe97ec420e9",
+    "observedWindowKst": "2026-09-20 08:47",
+    "note": "Behavioral visual baseline only. Newer D3D9Ex lifetime, crash, reset and transport fixes remain required."
+  },
+  "lockedInvariants": {
+    "d3d9exGameplayTransport": "DIRECT_GPU_ONLY",
+    "desktopGameplayMirror": "MONO_OR_LEFT_EYE_NEVER_SBS",
+    "desktopDuplicationGameplayFallback": false,
+    "menuPresentation": "OPENXR_LOCAL_FIXED_MONO",
+    "worldRendering": "TRUE_PER_EYE_STEREO",
+    "hudPresentation": "WORLD_FIXED_NOT_HEAD_LOCKED",
+    "hudPerspectiveOwnership": "R43_R44_RAW_GAME_WVP_FINITE_PLANE",
+    "skyGlow": "VR_OWNED_PER_EYE",
+    "cullingUnionLiveProjectionMutation": false,
+    "unknownDrawClassification": "FAIL_CLOSED_TO_PROVEN_R26_R23",
+    "hudDiscoveryPolicy": "EXE_ORIGINAL_MOD_SEMANTICS_FIRST_NEVER_WIDEN_DRAW_SCOPE",
+    "hudOwnership": "CANONICAL_EXE_SPRITE_QUEUE_OR_EXACT_ORIGINAL_MOD_TAG_ONLY",
+    "perspectiveHudPromotion": "SEMANTIC_ONLY_NO_ALPHA_Z_CULL_MATRIX_HEURISTICS",
+    "exitMenuText": "ALL_CANONICAL_QUEUE_GLYPHS_WORLD_FIXED_REGARDLESS_OF_COLOR",
+    "overlayC64Ownership": "SEMANTIC_OVERLAY_RAW_AT_RENDERER_R30_SINGLE_TRANSFORM_OWNER"
+  },
+  "requiredActiveBuild": {
+    "safeDrawCompare": false,
+    "r26HudCompare": true,
+    "c1Compare": false,
+    "c2Compare": false,
+    "variantId": "ACTIVE_R26_R43_R44"
+  },
+  "runtimePromotionPolicy": {
+    "visualPathChangesRequireHmdEvidence": true,
+    "transportFallbackChangesRequireHmdEvidence": true,
+    "unverifiedVisualExperimentsDefaultOff": true,
+    "doNotReplaceGoldenVisualOwnerWithFullR34WithoutRuntimeApproval": true,
+    "doNotWidenUnknownDrawsToFindHud": true,
+    "hudPromotionRequires": [
+      "verified EXE/original-mod semantic evidence",
+      "or exact runtime caller/texture evidence",
+      "HMD validation on exact SHA"
+    ],
+    "doNotInferHudFromD3DState": true,
+    "remainingHudDiscovery": "Use canonical EXE queue ownership, original-mod exact addresses, runtime caller/XST/texture evidence; never widen draw-state heuristics.",
+    "preventDoubleHudTransform": true,
+    "overlayC64Rule": "SCREEN_HUD/WORLD_BILLBOARD c64 stays raw in outrun_renderer; R30 alone applies HUD/world-billboard stereo transform."
+  }
+}
