@@ -1,0 +1,151 @@
+unit	fresh	lens	path	objective	evidence
+1	1	post-review	stereo_renderer_r32.cpp:ResolveDirectTransportR32	R32 fence completion bridges base publication	sets producerPending/pendingFrameId/frameId and published=false
+2	1	post-review	stereo_renderer_r7.inc:DirectTransportFrameReadyAfterPresent	sole post-Present publisher	published=true only after bounded event completion
+3	1	cross	R32->R7 publication	frame identity continuity	pendingFrameId must equal Present frameId
+4	1	adversarial	R32 producer fence timeout	no premature publication	Resolve returns false before bridge
+5	1	adversarial	Present failure	no publish	PresentDest requires SUCCEEDED(hr)
+6	1	cross	PresentDest->PublishRenderFrame	direct handles advertised after readiness	directTransport cleared on readiness failure
+7	1	lifetime	DirectTransportSlot	published ownership	published images retained until host ACK
+8	1	sync	DirectTransportSlot	producer ownership	producerPending separates GPU completion from host publication
+9	1	reset	R32InvalidateResetCaches	interop rejection reset	clears direct rejection and pending fences
+10	1	reset	R32ResetAfterGameReset	reset ordering	R22 lifecycle completes before R32 cache rearm
+11	1	cross	R32->RenderFrameRing	direct generation identity	PublishRenderFrame carries DirectTransportGeneration
+12	1	adversarial	stale ACK	prevent overwrite	R32 checks gpuCompleted against slot.frameId
+13	1	adversarial	invalid ACK	backpressure	invalid ACK returns false
+14	1	sync	R32DrainPendingProducerFence	pending fence ownership	must drain before slot reuse
+15	1	failure	R32 query error	quarantine	query error rejects DirectGPU until identity regeneration
+16	1	failure	StretchRect failure	fail closed	copy rejection disables path until reset/revalidation
+17	1	failure	Issue failure	unproven producer completion	quarantines path
+18	1	cross	R32EnsureDirectResources->rejection	identity regeneration	ensure runs before cached rejection check
+19	1	architecture	ActiveDirectTransportSlot	publication selector	updated only after exact slot preparation
+20	1	adversarial	frameId zero	invalid publication identity	Resolve rejects zero
+21	1	startup	InstallStereoHooks	deferred resource creation	no EnsureStereoResources before CreateDevice exposure
+22	1	regression	VR-STARTUP-WHITE-001	known root cause guard	private eye resources deferred beyond CreateDevice
+23	1	startup	InstallStereoHooksSynchronously	Reset/Present ownership transfer	hooks installed synchronously without private resources
+24	1	failure	RollbackStereoHooks	partial transaction	all hooks disarmed on partial creation failure
+25	1	failure	base hook enable transaction	partial enable	rollback on any enable failure
+26	1	state	StereoBaseCallbacksArmed	behavior boundary	armed only after initialization
+27	1	lifetime	StereoInstalledDevice	device identity	published after hook setup
+28	1	reset	ResetDest	state invalidation	tracked render states invalidated before reset
+29	1	reset	ResetDest	pose reset	NotifyGameReset precedes resource release
+30	1	reset	ResetDest	resource lifetime	ReleaseStereoResources before Reset/ResetEx
+31	1	cross	ResetDest->ResetCompatDevice	D3D9Ex ownership	compat path owns ResetEx fallback
+32	1	failure	ResetCompatDevice failure	fail closed	returns INVALIDCALL instead of split ownership
+33	1	reset	ResetDest success	state replay	PrimeTrackedRenderStates after successful reset
+34	1	reset	ResetDest success	resource re-create	EnsureStereoResources only after reset success
+35	1	adversarial	Reset failure	no resource recreation	post-reset initialization gated by SUCCEEDED
+36	1	state	PresentEpoch	reset generation	reset to 1 on Reset
+37	1	state	LastMainDepthClearEpoch	depth generation	cleared on Reset
+38	1	state	CurrentVertexShaderIdentity	shader lifetime	cleared on Reset
+39	1	state	VertexShaderSerial	shader epoch	cleared on Reset
+40	1	state	ActiveOcclusionQueries	query lifetime	cleared on Reset
+41	1	cross	PresentDest->ResolveDirectTransport	producer selection	direct path resolved only when host ready
+42	1	failure	DirectGPU miss/direct-only	metadata hold	previous valid projection retained
+43	1	adversarial	direct readiness timeout	no corrupt mode flip	directTransport/composedStereo cleared
+44	1	cross	PresentDest->PublishStereoState	metadata commit	commit only composed+Present success+complete frame
+45	1	cross	PresentDest->PublishRenderFrame	frame commit	final render frame follows successful Present
+46	1	adversarial	Present failure	failure classification	PresentFailed poison when no prior reason
+47	1	state	FrameStereoMetadata	per-Present lifetime	cleared after NotifyGamePresent
+48	1	state	FrameStereoPoseSequence	per-Present lifetime	cleared after Present
+49	1	state	FrameFailureReason	per-Present lifetime	cleared after Present
+50	1	state	PresentEpoch	monotonic generation	increment with zero skip
+51	1	IPC	PublishRenderFrame	seqlock write	odd sequence then MemoryBarrier then even
+52	1	IPC	RenderFrameRing publish	latestSlot ordering	ring publish sequence guards latest slot
+53	1	IPC	RenderFrameRunGeneration	run identity	stored in every frame
+54	1	IPC	WriteGameBuildTag	binary identity	build tag copied into frame
+55	1	IPC	PublishRenderFrame direct handles	handle identity	published only matching transport.frameId
+56	1	adversarial	mismatched transport.frameId	no handle publish	direct handles gated by equality
+57	1	IPC	DirectTransportGeneration	interop identity	included with handles
+58	1	IPC	ActiveDirectTransportSlot	slot identity	included in frame metadata
+59	1	cross	HostRenderEligible	game-host liveness	requires HostAlive+SessionVisible
+60	1	adversarial	shouldRender transient	no game-side teardown	not part of HostRenderEligible
+61	1	cross	StereoWanted	config+gameplay+host	all eligibility boundaries combined
+62	1	config	VRDirectGpuOnly	runtime config ownership	reads parsed setting directly
+63	1	failure	EnsureStereoResources	partial allocation	ReleaseStereoResources on failure
+64	1	state	EnsureStereoResources	RT/depth restoration	restores tracked RT/depth/viewport
+65	1	adversarial	viewport read failure	no half-init	releases resources
+66	1	lifetime	R9ReleaseMonoResources	generation ownership	resets mono generation and seeds
+67	1	lifetime	R9CaptureMainDepth	depth identity generation	increments nonzero generation
+68	1	cross	R9CaptureMainDepth->mono	depth change invalidates mono resources
+69	1	adversarial	undersized depth	identity rejection	does not capture smaller depth
+70	1	state	ReadTrackedRenderState	cache validation	bounded cache reads with live validation
+71	1	cross	BuildEyeConstants	shader epoch ownership	verified upload identity+serial must match
+72	1	adversarial	shader mismatch	zero-disparity fallback	returns NonWorld
+73	1	adversarial	pose mismatch	fatal frame	verified pose must equal stereo pose
+74	1	cross	fixed-function world	pose lifetime	latched head inverse sequence must match
+75	1	adversarial	XYZRHW	no world transform	screen-space format remains NonWorld
+76	0	carry	VR-STARTUP-WHITE-001	regression identity	registry status BUILD_VERIFIED_NEED_HMD_TEST
+77	0	carry	startup deferred init	content identity	stereo_renderer_r7.inc blob e0241001 unchanged at target
+78	0	carry	ResetDest	content identity	reset owner in same immutable blob
+79	0	carry	InstallStereoHooks	content identity	transaction owner same blob
+80	0	carry	PublishRenderFrame	content identity	IPC publisher same blob
+81	0	carry	DirectTransportFrameReadyAfterPresent	content identity	base publisher same blob
+82	0	carry	HostRenderEligible	content identity	host gate same blob
+83	0	carry	StereoWanted	content identity	eligibility same blob
+84	0	carry	EnsureStereoResources	content identity	resource owner same blob
+85	0	carry	R9CaptureMainDepth	content identity	depth owner same renderer TU
+86	0	carry	BuildEyeConstants	content identity	stereo classification same blob
+87	0	carry	R32ResolveDirectTransport	content identity	R32 blob b7b9cc26 target
+88	0	carry	R32ResetAfterGameReset	content identity	R32 blob b7b9cc26 target
+89	0	carry	R32InvalidateResetCaches	content identity	R32 blob b7b9cc26 target
+90	0	carry	R32 producer fence	content identity	R32 blob b7b9cc26 target
+91	0	carry	RenderFrameRing	protocol identity	current target uses same shared protocol boundary
+92	0	carry	ACK ownership	validated dependency	published slot waits host ACK
+93	0	carry	generation ownership	validated dependency	direct generation accompanies handles
+94	0	carry	reset generation	validated dependency	resource generations invalidated on reset
+95	0	carry	pose ownership	validated dependency	one latched packet per scene
+96	0	carry	recenter boundary	validated dependency	pose sequence remains commit identity
+97	0	carry	OpenXR runtime truth	validation level	HMD-visible truth not statically DONE
+98	0	carry	CreateDevice exposure	regression guard	private resources deferred
+99	0	carry	hook rollback	failure atomicity	disabled-first transaction
+100	0	carry	query lifetime	reset boundary	active query state cleared
+101	0	carry	shader epoch	reset boundary	identity+serial reset
+102	0	carry	depth epoch	reset boundary	clear history reset
+103	0	carry	Present epoch	generation boundary	nonzero epoch
+104	0	carry	frame metadata	publication boundary	post-Present only
+105	0	carry	direct handles	publication boundary	post-fence only
+106	0	carry	DirectGPU hold	fallback ownership	last safe projection retained
+107	0	carry	SBS fallback	fallback ownership	allowed when not direct-only
+108	0	carry	interop probe	adapter ownership	LUID match required
+109	0	carry	interop token	ACK ownership	host ACK token verifies probe
+110	0	carry	direct target size	seqlock boundary	stable read required
+111	0	carry	direct ring	resource ownership	four slots
+112	0	carry	ring backpressure	ownership boundary	no overwrite unacked slot
+113	0	carry	producerPending	GPU ownership	pending fence protects slot
+114	0	carry	published	consumer ownership	ACK protects published slot
+115	0	carry	pendingFrameId	frame identity	exact producer frame
+116	0	carry	frameId	consumer identity	exact advertised frame
+117	0	carry	Present success	commit boundary	publication gated by success
+118	0	carry	frame completeness	commit boundary	metadata gated by !incomplete
+119	0	carry	stereo pose	commit boundary	nonzero pose required
+120	0	carry	frame id	commit boundary	nonzero frame required
+121	0	carry	SharedState flags	liveness boundary	HostAlive+Visible
+122	0	carry	gameplay state	mode boundary	is_in_game plus warp/restart
+123	0	carry	config activation	state transition	VREnabled/auto-enable
+124	0	carry	ResetEx ownership	compat device boundary	R13 owns promoted reset
+125	0	carry	classic Reset ownership	device boundary	base hook owns classic reset
+126	0	carry	resource creation	post-reset boundary	success only
+127	0	carry	resource release	pre-reset boundary	always before reset call
+128	0	carry	stereo disable publish	reset boundary	published before reset
+129	0	carry	render-frame disable	reset boundary	published before reset
+130	0	carry	main depth generation	resource boundary	nonzero increment
+131	0	carry	mono generation	resource boundary	follows main depth
+132	0	carry	right depth sync	state boundary	reset true then recaptured
+133	0	carry	stencil sync	state boundary	reset true
+134	0	carry	tracked RT	state boundary	restored after internal pass
+135	0	carry	tracked depth	state boundary	restored after internal pass
+136	0	carry	viewport	state boundary	restored after internal pass
+137	0	carry	InternalPassScope	reentrancy boundary	thread-local guard restores prior value
+138	0	carry	StereoInstallState	install lifetime	pending/ready/failed
+139	0	carry	StereoInstalledDevice	install identity	atomic device pointer
+140	0	carry	StereoBaseCallbacksArmed	callback ownership	atomic behavior gate
+141	0	carry	RenderFrame sequence	IPC atomicity	odd/even seqlock
+142	0	carry	Ring publishSequence	IPC atomicity	latestSlot protected
+143	0	carry	MemoryBarrier	IPC ordering	payload before commit sequence
+144	0	carry	build tag	traceability	frame carries source identity
+145	0	carry	cadence request	cross-subsystem identity	frame carries active cadence request
+146	0	carry	DirectGPU format	resource identity	metadata carries format
+147	0	carry	DirectGPU size	resource identity	metadata carries dimensions
+148	0	carry	DirectGPU generation	resource identity	metadata carries generation
+149	0	carry	DirectGPU slot	resource identity	metadata carries slot
+150	0	carry	runtime closure	regression policy	Quest3/VDXR required before DONE
