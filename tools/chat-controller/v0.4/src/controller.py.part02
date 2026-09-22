@@ -32,6 +32,19 @@ async def click_continue_generating(page: Page) -> bool:
         return False
 
 
+async def click_retry_generation(page: Page) -> bool:
+    loc = await first_visible(page, RETRY_SELECTORS)
+    if not loc:
+        return False
+    try:
+        await loc.click()
+        await page.wait_for_timeout(1000)
+        return True
+    except Exception:
+        log.exception("retry click failed")
+        return False
+
+
 async def click_stop_generating(page: Page) -> bool:
     loc = await first_visible(page, BUSY_SELECTORS)
     if not loc:
@@ -108,7 +121,7 @@ async def prepare_slot_pages(context: BrowserContext, reg: Registry) -> dict[str
             log.exception("slot tab initialization failed slot=%s target=%s", slot.name, target)
 
     write_runtime(
-        tab_mode="dedicated_per_slot",
+        tab_mode="fresh_per_run" if FRESH_CHAT_EACH_RUN else "dedicated_per_slot",
         tab_count=len(pages),
         slot_tabs={name: page.url for name, page in pages.items()},
     )
@@ -122,6 +135,27 @@ async def slot_page(context: BrowserContext, pages: dict[str, Page], slot: Slot)
         page = await context.new_page()
         pages[slot.name] = page
         await page.goto(slot.url or BASE_URL, wait_until="domcontentloaded", timeout=60000)
+    return page
+
+
+async def replace_with_fresh_slot_page(context: BrowserContext, pages: dict[str, Page], slot: Slot) -> Page:
+    """Start each scheduled N100 run in a brand-new tab/chat and close the previous one."""
+    old = pages.get(slot.name)
+    if old is not None and not old.is_closed():
+        try:
+            await old.close()
+        except Exception:
+            log.exception("failed to close previous slot tab slot=%s", slot.name)
+
+    page = await context.new_page()
+    pages[slot.name] = page
+    slot.url = None
+    slot.last_assistant_hash = None
+    slot.last_assistant_change_at = None
+    slot.last_watchdog_at = None
+    slot.watchdog_resumes_since_schedule = 0
+    await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
+    await page.wait_for_timeout(700)
     return page
 
 
@@ -176,6 +210,27 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
         except Exception:
             log.exception("watchdog slot-tab navigation failed slot=%s", slot.name)
             continue
+
+        guard = send_guard_reason(reg, slot, datetime.now(TZ))
+        retry_visible = await first_visible(page, RETRY_SELECTORS)
+        if retry_visible:
+            if guard:
+                slot.last_result = f"retry_wait:{guard}"
+                slot.last_watchdog_at = now.isoformat()
+                save_registry(reg)
+                write_runtime(status="retry_wait", last_action=f"Retry visible on slot {slot.name}; waiting only for {guard}")
+                continue
+            if await click_retry_generation(page):
+                request_now = datetime.now(TZ)
+                note_successful_request(reg, request_now)
+                slot.watchdog_resumes_since_schedule += 1
+                slot.last_watchdog_at = request_now.isoformat()
+                slot.last_sent_at = request_now.isoformat()
+                slot.last_assistant_change_at = request_now.isoformat()
+                slot.last_result = "watchdog_retry_clicked"
+                save_registry(reg)
+                write_runtime(status="watchdog_retry", last_action=f"Clicked Retry on slot {slot.name}")
+                continue
 
         if await detect_rate_limit(page):
             mark_rate_limit(reg, datetime.now(TZ), f"watchdog-precheck:{slot.name}")
@@ -303,8 +358,20 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
         return
 
     slot = reg.slots[reg.next_slot]
-    page = await slot_page(context, pages, slot)
-    is_new = not slot.url
+    if FRESH_CHAT_EACH_RUN:
+        page = await replace_with_fresh_slot_page(context, pages, slot)
+        is_new = True
+        save_registry(reg)
+        write_runtime(
+            status="fresh_chat_started",
+            last_action=f"Opened a fresh ChatGPT tab for slot {slot.name}",
+            tab_mode="fresh_per_run",
+            tab_count=len([p for p in pages.values() if not p.is_closed()]),
+            slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
+        )
+    else:
+        page = await slot_page(context, pages, slot)
+        is_new = not slot.url
 
     if is_new:
         if not await ensure_logged_in(page):
@@ -403,6 +470,6 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
         tab_count=len(pages),
         slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
     )
-    log.info("sent dedicated-tab slot=%s runs=%s url=%s", slot.name, slot.runs, slot.url)
+    log.info("sent slot=%s fresh=%s runs=%s url=%s", slot.name, FRESH_CHAT_EACH_RUN, slot.runs, slot.url)
 
 
