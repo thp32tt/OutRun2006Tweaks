@@ -1,0 +1,151 @@
+u	f	c	p	e
+1	1	c	.github/workflows/vr-dx9ex-active.yml	R51vsHEAD:17;protected-boundary
+2	1	a	.github/workflows/vr-dx9ex-active.yml	R51vsHEAD:17;protected-boundary
+3	1	p	.github/workflows/vr-dx9ex-active.yml	R51vsHEAD:17;protected-boundary
+4	1	r	.github/workflows/vr-dx9ex-active.yml	R51vsHEAD:17;protected-boundary
+5	1	p	.github/workflows/vr-dx9ex-active.yml	R51vsHEAD:17;protected-boundary
+6	1	c	src/hooks_graphics.cpp	R51vsHEAD:41;protected-boundary
+7	1	a	src/hooks_graphics.cpp	R51vsHEAD:41;protected-boundary
+8	1	p	src/hooks_graphics.cpp	R51vsHEAD:41;protected-boundary
+9	1	r	src/hooks_graphics.cpp	R51vsHEAD:41;protected-boundary
+10	1	p	src/hooks_graphics.cpp	R51vsHEAD:41;protected-boundary
+11	1	c	src/hooks_textures.cpp	R51vsHEAD:26;protected-boundary
+12	1	a	src/hooks_textures.cpp	R51vsHEAD:26;protected-boundary
+13	1	p	src/hooks_textures.cpp	R51vsHEAD:26;protected-boundary
+14	1	r	src/hooks_textures.cpp	R51vsHEAD:26;protected-boundary
+15	1	p	src/hooks_textures.cpp	R51vsHEAD:26;protected-boundary
+16	1	c	src/hooks_uiscaling.cpp	R51vsHEAD:103;protected-boundary
+17	1	a	src/hooks_uiscaling.cpp	R51vsHEAD:103;protected-boundary
+18	1	p	src/hooks_uiscaling.cpp	R51vsHEAD:103;protected-boundary
+19	1	r	src/hooks_uiscaling.cpp	R51vsHEAD:103;protected-boundary
+20	1	p	src/hooks_uiscaling.cpp	R51vsHEAD:103;protected-boundary
+21	1	c	src/vr/d3d9/ex_device_upgrade.cpp	R51vsHEAD:48;protected-boundary
+22	1	a	src/vr/d3d9/ex_device_upgrade.cpp	R51vsHEAD:48;protected-boundary
+23	1	p	src/vr/d3d9/ex_device_upgrade.cpp	R51vsHEAD:48;protected-boundary
+24	1	r	src/vr/d3d9/ex_device_upgrade.cpp	R51vsHEAD:48;protected-boundary
+25	1	p	src/vr/d3d9/ex_device_upgrade.cpp	R51vsHEAD:48;protected-boundary
+26	1	c	src/vr/d3d9/stereo_renderer_r26.cpp	R51vsHEAD:76;protected-boundary
+27	1	a	src/vr/d3d9/stereo_renderer_r26.cpp	R51vsHEAD:76;protected-boundary
+28	1	p	src/vr/d3d9/stereo_renderer_r26.cpp	R51vsHEAD:76;protected-boundary
+29	1	r	src/vr/d3d9/stereo_renderer_r26.cpp	R51vsHEAD:76;protected-boundary
+30	1	p	src/vr/d3d9/stereo_renderer_r26.cpp	R51vsHEAD:76;protected-boundary
+31	1	c	src/vr/d3d9/stereo_renderer_r30.cpp	R51vsHEAD:94;protected-boundary
+32	1	a	src/vr/d3d9/stereo_renderer_r30.cpp	R51vsHEAD:94;protected-boundary
+33	1	p	src/vr/d3d9/stereo_renderer_r30.cpp	R51vsHEAD:94;protected-boundary
+34	1	r	src/vr/d3d9/stereo_renderer_r30.cpp	R51vsHEAD:94;protected-boundary
+35	1	p	src/vr/d3d9/stereo_renderer_r30.cpp	R51vsHEAD:94;protected-boundary
+36	1	c	src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp	R51vsHEAD:254;protected-boundary
+37	1	a	src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp	R51vsHEAD:254;protected-boundary
+38	1	p	src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp	R51vsHEAD:254;protected-boundary
+39	1	r	src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp	R51vsHEAD:254;protected-boundary
+40	1	p	src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp	R51vsHEAD:254;protected-boundary
+41	1	c	src/vr/d3d9/stereo_renderer_r31.cpp	R51vsHEAD:4;protected-boundary
+42	1	a	src/vr/d3d9/stereo_renderer_r31.cpp	R51vsHEAD:4;protected-boundary
+43	1	p	src/vr/d3d9/stereo_renderer_r31.cpp	R51vsHEAD:4;protected-boundary
+44	1	r	src/vr/d3d9/stereo_renderer_r31.cpp	R51vsHEAD:4;protected-boundary
+45	1	p	src/vr/d3d9/stereo_renderer_r31.cpp	R51vsHEAD:4;protected-boundary
+46	1	c	src/vr/d3d9/stereo_renderer_r34.cpp	R51vsHEAD:26;protected-boundary
+47	1	a	src/vr/d3d9/stereo_renderer_r34.cpp	R51vsHEAD:26;protected-boundary
+48	1	p	src/vr/d3d9/stereo_renderer_r34.cpp	R51vsHEAD:26;protected-boundary
+49	1	r	src/vr/d3d9/stereo_renderer_r34.cpp	R51vsHEAD:26;protected-boundary
+50	1	p	src/vr/d3d9/stereo_renderer_r34.cpp	R51vsHEAD:26;protected-boundary
+51	1	c	src/vr/debug/hud_inspector.cpp	R51vsHEAD:121;protected-boundary
+52	1	a	src/vr/debug/hud_inspector.cpp	R51vsHEAD:121;protected-boundary
+53	1	p	src/vr/debug/hud_inspector.cpp	R51vsHEAD:121;protected-boundary
+54	1	r	src/vr/debug/hud_inspector.cpp	R51vsHEAD:121;protected-boundary
+55	1	p	src/vr/debug/hud_inspector.cpp	R51vsHEAD:121;protected-boundary
+56	1	c	src/vr/game/outrun_renderer.cpp	R51vsHEAD:93;protected-boundary
+57	1	a	src/vr/game/outrun_renderer.cpp	R51vsHEAD:93;protected-boundary
+58	1	p	src/vr/game/outrun_renderer.cpp	R51vsHEAD:93;protected-boundary
+59	1	r	src/vr/game/outrun_renderer.cpp	R51vsHEAD:93;protected-boundary
+60	1	p	src/vr/game/outrun_renderer.cpp	R51vsHEAD:93;protected-boundary
+61	1	c	src/vr/game/render_semantics.hpp	R51vsHEAD:128;protected-boundary
+62	1	a	src/vr/game/render_semantics.hpp	R51vsHEAD:128;protected-boundary
+63	1	p	src/vr/game/render_semantics.hpp	R51vsHEAD:128;protected-boundary
+64	1	r	src/vr/game/render_semantics.hpp	R51vsHEAD:128;protected-boundary
+65	1	p	src/vr/game/render_semantics.hpp	R51vsHEAD:128;protected-boundary
+66	1	c	src/vr/hud_semantics.hpp	R51vsHEAD:17;protected-boundary
+67	1	a	src/vr/hud_semantics.hpp	R51vsHEAD:17;protected-boundary
+68	1	p	src/vr/hud_semantics.hpp	R51vsHEAD:17;protected-boundary
+69	1	r	src/vr/hud_semantics.hpp	R51vsHEAD:17;protected-boundary
+70	1	p	src/vr/hud_semantics.hpp	R51vsHEAD:17;protected-boundary
+71	1	c	tools/OutRunVR-TestProfiles.ps1	R51vsHEAD:33;protected-boundary
+72	1	a	tools/OutRunVR-TestProfiles.ps1	R51vsHEAD:33;protected-boundary
+73	1	p	tools/OutRunVR-TestProfiles.ps1	R51vsHEAD:33;protected-boundary
+74	1	r	tools/OutRunVR-TestProfiles.ps1	R51vsHEAD:33;protected-boundary
+75	1	p	tools/OutRunVR-TestProfiles.ps1	R51vsHEAD:33;protected-boundary
+76	0	C	B26-76	HEAD+R51 identity revalidated
+77	0	C	B26-77	HEAD+R51 identity revalidated
+78	0	C	B26-78	HEAD+R51 identity revalidated
+79	0	C	B26-79	HEAD+R51 identity revalidated
+80	0	C	B26-80	HEAD+R51 identity revalidated
+81	0	C	B26-81	HEAD+R51 identity revalidated
+82	0	C	B26-82	HEAD+R51 identity revalidated
+83	0	C	B26-83	HEAD+R51 identity revalidated
+84	0	C	B26-84	HEAD+R51 identity revalidated
+85	0	C	B26-85	HEAD+R51 identity revalidated
+86	0	C	B26-86	HEAD+R51 identity revalidated
+87	0	C	B26-87	HEAD+R51 identity revalidated
+88	0	C	B26-88	HEAD+R51 identity revalidated
+89	0	C	B26-89	HEAD+R51 identity revalidated
+90	0	C	B26-90	HEAD+R51 identity revalidated
+91	0	C	B26-91	HEAD+R51 identity revalidated
+92	0	C	B26-92	HEAD+R51 identity revalidated
+93	0	C	B26-93	HEAD+R51 identity revalidated
+94	0	C	B26-94	HEAD+R51 identity revalidated
+95	0	C	B26-95	HEAD+R51 identity revalidated
+96	0	C	B26-96	HEAD+R51 identity revalidated
+97	0	C	B26-97	HEAD+R51 identity revalidated
+98	0	C	B26-98	HEAD+R51 identity revalidated
+99	0	C	B26-99	HEAD+R51 identity revalidated
+100	0	C	B26-100	HEAD+R51 identity revalidated
+101	0	C	B26-101	HEAD+R51 identity revalidated
+102	0	C	B26-102	HEAD+R51 identity revalidated
+103	0	C	B26-103	HEAD+R51 identity revalidated
+104	0	C	B26-104	HEAD+R51 identity revalidated
+105	0	C	B26-105	HEAD+R51 identity revalidated
+106	0	C	B26-106	HEAD+R51 identity revalidated
+107	0	C	B26-107	HEAD+R51 identity revalidated
+108	0	C	B26-108	HEAD+R51 identity revalidated
+109	0	C	B26-109	HEAD+R51 identity revalidated
+110	0	C	B26-110	HEAD+R51 identity revalidated
+111	0	C	B26-111	HEAD+R51 identity revalidated
+112	0	C	B26-112	HEAD+R51 identity revalidated
+113	0	C	B26-113	HEAD+R51 identity revalidated
+114	0	C	B26-114	HEAD+R51 identity revalidated
+115	0	C	B26-115	HEAD+R51 identity revalidated
+116	0	C	B26-116	HEAD+R51 identity revalidated
+117	0	C	B26-117	HEAD+R51 identity revalidated
+118	0	C	B26-118	HEAD+R51 identity revalidated
+119	0	C	B26-119	HEAD+R51 identity revalidated
+120	0	C	B26-120	HEAD+R51 identity revalidated
+121	0	C	B26-121	HEAD+R51 identity revalidated
+122	0	C	B26-122	HEAD+R51 identity revalidated
+123	0	C	B26-123	HEAD+R51 identity revalidated
+124	0	C	B26-124	HEAD+R51 identity revalidated
+125	0	C	B26-125	HEAD+R51 identity revalidated
+126	0	C	B26-126	HEAD+R51 identity revalidated
+127	0	C	B26-127	HEAD+R51 identity revalidated
+128	0	C	B26-128	HEAD+R51 identity revalidated
+129	0	C	B26-129	HEAD+R51 identity revalidated
+130	0	C	B26-130	HEAD+R51 identity revalidated
+131	0	C	B26-131	HEAD+R51 identity revalidated
+132	0	C	B26-132	HEAD+R51 identity revalidated
+133	0	C	B26-133	HEAD+R51 identity revalidated
+134	0	C	B26-134	HEAD+R51 identity revalidated
+135	0	C	B26-135	HEAD+R51 identity revalidated
+136	0	C	B26-136	HEAD+R51 identity revalidated
+137	0	C	B26-137	HEAD+R51 identity revalidated
+138	0	C	B26-138	HEAD+R51 identity revalidated
+139	0	C	B26-139	HEAD+R51 identity revalidated
+140	0	C	B26-140	HEAD+R51 identity revalidated
+141	0	C	B26-141	HEAD+R51 identity revalidated
+142	0	C	B26-142	HEAD+R51 identity revalidated
+143	0	C	B26-143	HEAD+R51 identity revalidated
+144	0	C	B26-144	HEAD+R51 identity revalidated
+145	0	C	B26-145	HEAD+R51 identity revalidated
+146	0	C	B26-146	HEAD+R51 identity revalidated
+147	0	C	B26-147	HEAD+R51 identity revalidated
+148	0	C	B26-148	HEAD+R51 identity revalidated
+149	0	C	B26-149	HEAD+R51 identity revalidated
+150	0	C	B26-150	HEAD+R51 identity revalidated
