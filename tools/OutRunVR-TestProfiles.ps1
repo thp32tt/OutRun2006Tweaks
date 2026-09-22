@@ -9,11 +9,11 @@ function Get-OutRunVRTestProfile {
 
     $commonVr = @(
         '-PreferD3D9Ex=true',
-        '-DirectGpuOnly=false',
+        '-DirectGpuOnly=true',
         '-DisableDesktopDuplication=false',
         '-TargetRefreshRateHz=0',
         '-SkyGlowFactor=1',
-        '-CullingUnionFov=true',
+        '-CullingUnionFov=false',
         '-CullingUnionMarginDegrees=4.0',
         '-NormalizeReflectionRate=true',
         '-NearPlane=0.10'
