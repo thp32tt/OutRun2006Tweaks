@@ -488,4 +488,49 @@ require("src/vr/core/transport.hpp", "class IFrameProducer", "class IFrameConsum
 require("src/vr/game/game_adapter.hpp", "class IGameAdapter", "latchRenderPose", "buildStereoMatrices")
 require("src/vr/d3d9/stereo_backend.hpp", "class IStereoBackend", "drawWorldStereo", "drawScreenSpaceStereo")
 
+# MenuSelectionWrap commits two replacement hooks plus seven guard removals as
+# one feature. During installation HooksReady=false forces both hook callbacks
+# to vanilla behavior, while every guard patch remains reversible and verified.
+bugfix_source = text("src/hooks_bugfixes.cpp")
+if "class MenuSelectionWrap" not in bugfix_source:
+    raise SystemExit("MenuSelectionWrap missing")
+menu_section = bugfix_source.split("class MenuSelectionWrap", 1)[1].split(
+    "MenuSelectionWrap MenuSelectionWrap::instance", 1
+)[0]
+for marker in (
+    "std::atomic<bool> HooksReady",
+    "safetyhook::InlineHook::StartDisabled",
+    "auto incrementHook = safetyhook::create_inline",
+    "auto decrementHook = safetyhook::create_inline",
+    "static std::vector<TogglePatch> guardPatches",
+    "TogglePatch::nop",
+    "Increment_hook.enable().has_value()",
+    "Decrement_hook.enable().has_value()",
+    "HooksReady.store(true, std::memory_order_release);",
+):
+    if marker not in menu_section:
+        raise SystemExit(f"menu-wrap transaction invariant missing: {marker}")
+
+if menu_section.count("HooksReady.load(std::memory_order_acquire)") < 2:
+    raise SystemExit("both menu-wrap callbacks must fail open before Ready commit")
+if "Memory::VP::Nop(Module::exe_ptr<uint8_t>(guard.addr), guard.size)" in menu_section:
+    raise SystemExit("menu-wrap guards bypass reversible transaction")
+
+ready_pos = menu_section.find("HooksReady.store(true, std::memory_order_release);")
+verify_pos = menu_section.find("if (bytes[i] != 0x90)")
+if ready_pos < verify_pos:
+    raise SystemExit("menu-wrap Ready commits before guard-byte verification")
+
+rollback = menu_section.split("auto rollback = [&]() noexcept", 1)[1].split(
+    "// Hooks can become visible", 1
+)[0]
+for marker in (
+    "HooksReady.store(false, std::memory_order_release);",
+    "it->set(false);",
+    "Decrement_hook = {};",
+    "Increment_hook = {};",
+):
+    if marker not in rollback:
+        raise SystemExit(f"menu-wrap rollback invariant missing: {marker}")
+
 print("VR reconstructed R23/R25 architecture boundary verification passed")
