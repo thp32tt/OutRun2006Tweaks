@@ -19,12 +19,13 @@
     "cullingUnionLiveProjectionMutation": false,
     "unknownDrawClassification": "FAIL_CLOSED_TO_PROVEN_R26_R23",
     "hudDiscoveryPolicy": "EXE_ORIGINAL_MOD_SEMANTICS_FIRST_NEVER_WIDEN_DRAW_SCOPE",
-    "hudOwnership": "EXPLICIT_TAGGED_SPRITENODE_OR_EXACT_ORIGINAL_MOD_SEMANTIC_ONLY",
+    "hudOwnership": "CANONICAL_SPRITENODE_QUEUE_WORLD_FIXED_2D_EXACT_WORLDBILLBOARD_OVERRIDE",
     "perspectiveHudPromotion": "SEMANTIC_ONLY_NO_ALPHA_Z_CULL_MATRIX_HEURISTICS",
     "exitMenuText": "ALL_CANONICAL_QUEUE_GLYPHS_WORLD_FIXED_REGARDLESS_OF_COLOR",
     "overlayC64Ownership": "SEMANTIC_OVERLAY_RAW_AT_RENDERER_R30_SINGLE_TRANSFORM_OWNER",
-    "untaggedSpriteNodeOwnership": "SCREEN_OVERLAY_2D_FOV_ONLY_NEVER_FINITE_HUD",
-    "generic2DQueuePlacement": "ASYMMETRIC_FOV_COMMON_RAY_ONLY_NO_HEAD_IPD_DEPTH_RESET"
+    "untaggedSpriteNodeOwnership": "SCREEN_OVERLAY_2D_WORLD_FIXED_FINITE_PLANE_NEVER_WORLD",
+    "generic2DQueuePlacement": "FINITE_RECENTERED_WORLD_FIXED_QUEUE_PLANE",
+    "worldShaderEpochContinuation": "STRICT_C64_PROJECTION_POSE_MATCH_OVERLAY_VETO"
   },
   "requiredActiveBuild": {
     "safeDrawCompare": false,
@@ -45,8 +46,8 @@
       "HMD validation on exact SHA"
     ],
     "doNotInferHudFromD3DState": true,
-    "remainingHudDiscovery": "Generic SpriteNode queue content gets FOV-only common-ray alignment. Promote to finite ScreenHud or WorldBillboard only from exact producer/caller evidence; never widen generic queue content to the finite HUD plane.",
+    "remainingHudDiscovery": "Canonical SpriteNode queue content is world-fixed 2D. Promote only exact world-attached exceptions to WORLD_BILLBOARD; never use D3D-state heuristics to move untagged content into 3D.",
     "preventDoubleHudTransform": true,
-    "overlayC64Rule": "SCREEN_HUD/WORLD_BILLBOARD c64 stays raw in outrun_renderer; R30 alone applies HUD/world-billboard stereo transform."
+    "overlayC64Rule": "SCREEN_OVERLAY_2D/SCREEN_HUD/WORLD_BILLBOARD c64 stays raw in outrun_renderer; R30 alone applies queue-HUD/world-billboard stereo placement."
   }
 }
