@@ -214,6 +214,15 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
         guard = send_guard_reason(reg, slot, datetime.now(TZ))
         retry_visible = await first_visible(page, RETRY_SELECTORS)
         if retry_visible:
+            last_request = _parse_iso(slot.last_sent_at)
+            retry_age = (datetime.now(TZ) - last_request).total_seconds() if last_request else RETRY_BUTTON_COOLDOWN_SECONDS
+            if retry_age < RETRY_BUTTON_COOLDOWN_SECONDS:
+                wait_sec = max(1, int(RETRY_BUTTON_COOLDOWN_SECONDS - retry_age))
+                slot.last_result = f"retry_wait:cooldown:{wait_sec}s"
+                slot.last_watchdog_at = now.isoformat()
+                save_registry(reg)
+                write_runtime(status="retry_wait", last_action=f"Retry visible on slot {slot.name}; cooldown {wait_sec}s")
+                continue
             if guard:
                 slot.last_result = f"retry_wait:{guard}"
                 slot.last_watchdog_at = now.isoformat()
