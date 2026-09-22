@@ -46,8 +46,8 @@ KNOWN_CALL_SITES = {
 # Targeted reverse-analysis windows used by the VR HUD/rank regression work.
 # These are emitted as hex only; the canonical EXE itself is never uploaded.
 BYTE_RANGES = {
-    "sprite_custom_renderer_02A000_02B000": (0x02A000, 0x1000),
-    "sprite_helpers_02C000_02CA00": (0x02C000, 0x0A00),
+    "sprite_custom_renderer_02A000_02BF00": (0x02A000, 0x1F00),
+    "sprite_helpers_02BF00_02CA00": (0x02BF00, 0x0B00),
     "sprite_font_core_02CA00_02DE00": (0x02CA00, 0x1400),
     "calc3d2d_049900_049B80": (0x049900, 0x280),
     "rank_marker_0BAD20_0BB340": (0x0BAD20, 0x620),
