@@ -19,6 +19,6 @@ Ledger: `docs/automation/review-b/cycle-20260922T1921-b19/ledger.tsv`
 - CP140: rows=140 fresh=140 carry=0
 - CP150: rows=150 fresh=150 carry=0 COMPLETE
 
-Final diversity: outside_latest_delta=145; cross_subsystem=60; adversarial_falsification=30; distinct_functions_or_paths=30; existing_finding_revalidation=0.
+Final diversity: outside_latest_delta=145; cross_subsystem=60; adversarial_falsification=30; distinct_functions_or_paths=30; existing_finding_revalidation=5.
 
-Cross-subsystem accounting uses the stereo and reset/regression-boundary units that explicitly trace game render state into VR/device-overlay behavior; adversarial accounting is the 30 `falsify` rows, one per distinct function/path. Latest integration delta touched the near-plane active-gate area; only the five `CalcCameraMatrix_dest` units are treated as inside-delta.
+Cross-subsystem accounting uses the stereo and reset/regression-boundary units that explicitly trace game render state into VR/device-overlay behavior; adversarial accounting is the 30 `falsify` rows, one per distinct function/path. Latest integration delta touched the near-plane active-gate area; only the five `CalcCameraMatrix_dest` units are treated as inside-delta. B19-041..045 revalidate existing Issue #6 finding `VR-REFLECTION-RATE-ACTIVE-GATE-001` rather than creating a duplicate: current `FaceCount_dest` still keys elapsed-time normalization on `VREnabled && VRNormalizeReflectionRate`, not runtime eligibility.
