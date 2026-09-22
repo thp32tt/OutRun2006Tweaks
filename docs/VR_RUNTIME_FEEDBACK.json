@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
-  "updatedKst": "2026-09-21T03:36:00+09:00",
-  "owner": "D_INTEGRATION_PLANNER",
+  "updatedKst": "2026-09-22T18:45:00+09:00",
+  "owner": "D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE",
   "lastConsumedEvidenceId": null,
   "sessions": [],
   "knownRuntimeBaseline": {
