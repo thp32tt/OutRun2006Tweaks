@@ -266,3 +266,18 @@ Crash bundles preserve a machine-readable `crash_signature.json` containing
 exception code, absolute address, main-module base, thread ID and ASLR-stable
 `exeRva` when the fault belongs to the main EXE. This allows direct joining to
 the binary contract and durable crash registry.
+
+
+## Superpowers development discipline
+
+The installed Superpowers methodology is integrated through `docs/VR_SUPERPOWERS_POLICY.md`.
+
+Key project adaptations:
+- A/B/C/N100 remain review/support-only; D remains the sole production writer.
+- Suspected bugs/regressions require bounded root-cause investigation before a fix.
+- D behavior changes use RED -> GREEN -> REFACTOR with deterministic tests/verifiers whenever possible.
+- A/B/C exact-SHA review is the project code-review surface; feedback is verified, not blindly applied.
+- PASS/FIXED/VALIDATED/DONE claims require fresh evidence for the exact SHA/tree being claimed.
+- Hardware-visible final DONE still requires matching Quest 3/VDXR runtime evidence.
+- The existing two-failed-fix BLOCKED rule is stricter than generic Superpowers retry guidance and remains authoritative.
+- Superpowers does not add review quotas or duplicate the central queue; it is concentrated at finding promotion, diagnosis, D implementation, post-fix review, and completion verification.
