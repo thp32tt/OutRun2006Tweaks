@@ -1,0 +1,151 @@
+unit	kind	source	target	evidence	result	case
+A14-001	STATE	NEW	RuntimeEligibility::HostFresh	atomic acquire/release authority; no independent freshness clock	PASS	VR-STARTUP-WHITE-001
+A14-002	STATE	NEW	RuntimeEligibility::HostRenderable	separate renderability latch participates in all reopen paths	PASS	VR-STARTUP-WHITE-001
+A14-003	STATE	NEW	RuntimeEligibility::StereoAllowed	baseline proof remains independent from host freshness	PASS	VR-STARTUP-WHITE-001
+A14-004	STATE	NEW	RuntimeEligibility::RecoveryPending	initial true makes startup fail-closed	PASS	VR-STARTUP-WHITE-001
+A14-005	STATE	NEW	RuntimeEligibility::RecoveryPoseWarmup	warmup cannot itself authorize stereo	PASS	VR-STARTUP-WHITE-001
+A14-006	STATE	NEW	RuntimeEligibility::ExternalSafetyBlock	compat/reset safety has independent close authority	PASS	VR-STARTUP-WHITE-001
+A14-007	STATE	NEW	RuntimeEligibility::SafetyOverlayReady	final overlay readiness is explicit gate	PASS	VR-STARTUP-WHITE-001
+A14-008	FALSIFY	NEW	SetExternalSafetyBlock(true)	forces StereoAllowed false + RecoveryPending true + warmup false	PASS	VR-STARTUP-WHITE-001
+A14-009	FALSIFY	NEW	SetExternalSafetyBlock(false)	unblocking alone cannot reopen StereoAllowed	PASS	VR-STARTUP-WHITE-001
+A14-010	FALSIFY	NEW	FailClosed	clears freshness/renderability/stereo and rearms recovery	PASS	VR-STARTUP-WHITE-001
+A14-011	FALSIFY	NEW	MarkSafetyOverlayUnavailable	clears overlay then fail-closes all dependent state	PASS	VR-STARTUP-WHITE-001
+A14-012	FALSIFY	NEW	MarkSafetyOverlayInstalled	fail-closes before publishing overlay ready; no stale baseline inheritance	PASS	VR-STARTUP-WHITE-001
+A14-013	TRACE	NEW	ObserveFreshHost->BaselineVerified	fresh host alone cannot reopen; baseline proof still required	PASS	VR-STARTUP-WHITE-001
+A14-014	TRACE	NEW	ObserveSoftHostSuspend->MayInjectStereo	soft suspend preserves verified source but host owns layer submission	PASS	VR-STARTUP-WHITE-001
+A14-015	FALSIFY	NEW	ArmRecoveryPoseWarmup/no-overlay	returns without arming when overlay unavailable	PASS	VR-STARTUP-WHITE-001
+A14-016	FALSIFY	NEW	ArmRecoveryPoseWarmup/stale-host	returns without arming when freshness false	PASS	VR-STARTUP-WHITE-001
+A14-017	FALSIFY	NEW	ArmRecoveryPoseWarmup/safety-block	returns without arming under external safety block	PASS	VR-STARTUP-WHITE-001
+A14-018	FALSIFY	NEW	ArmRecoveryPoseWarmup/no-recovery	cannot arm outside pending recovery	PASS	VR-STARTUP-WHITE-001
+A14-019	TRACE	NEW	PoseWarmupAllowed	requires pending recovery and explicitly requires StereoAllowed false	PASS	VR-STARTUP-WHITE-001
+A14-020	FALSIFY	NEW	BaselineVerified/no-overlay	cannot publish StereoAllowed before final overlay	PASS	VR-STARTUP-WHITE-001
+A14-021	FALSIFY	NEW	BaselineVerified/stale-host	cannot publish StereoAllowed from stale host state	PASS	VR-STARTUP-WHITE-001
+A14-022	FALSIFY	NEW	BaselineVerified/nonrenderable	cannot publish StereoAllowed when host nonrenderable	PASS	VR-STARTUP-WHITE-001
+A14-023	FALSIFY	NEW	BaselineVerified/safety-block	cannot override compatibility/reset safety closure	PASS	VR-STARTUP-WHITE-001
+A14-024	TRACE	NEW	BaselineVerified/order	warmup false then recovery false then stereo true via release stores	PASS	VR-STARTUP-WHITE-001
+A14-025	TRACE	NEW	MayInjectStereo	all six authorities are acquire-loaded and fail closed on any negative	PASS	VR-STARTUP-WHITE-001
+A14-026	REGRESSION	NEW	runtime_eligibility.hpp	startup/stereo eligibility is regression-sensitive even though registry wildcard is src/vr/**	EVIDENCE_AUGMENT	VR-STARTUP-WHITE-001
+A14-027	REGRESSION	NEW	knownGood/knownBad	a9abb857/1f2dcb98 remain anchors; no newer runtime evidence observed	PASS	VR-STARTUP-WHITE-001
+A14-028	REGRESSION	NEW	fixReferences	deferred-init protection 341bd802 remains integration reference; no contradiction found	PASS	VR-STARTUP-WHITE-001
+A14-029	VALIDATE	NEW	static verifier	active DX9Ex build + host smoke + deferred-init guard remain mandatory	REQUIRED	VR-STARTUP-WHITE-001
+A14-030	VALIDATE	NEW	runtime verifier	Quest3/VDXR logo->menu/game then gameplay stereo-open remains mandatory	NEED_HMD_TEST	VR-STARTUP-WHITE-001
+A14-031	CARRY	A13-031	206c6c1e	integration identity unchanged	PASS	
+A14-032	CARRY	A13-032	206c6c1e	integration identity unchanged	PASS	
+A14-033	CARRY	A13-033	206c6c1e	integration identity unchanged	PASS	
+A14-034	CARRY	A13-034	206c6c1e	integration identity unchanged	PASS	
+A14-035	CARRY	A13-035	206c6c1e	integration identity unchanged	PASS	
+A14-036	CARRY	A13-036	206c6c1e	integration identity unchanged	PASS	
+A14-037	CARRY	A13-037	206c6c1e	integration identity unchanged	PASS	
+A14-038	CARRY	A13-038	206c6c1e	integration identity unchanged	PASS	
+A14-039	CARRY	A13-039	206c6c1e	integration identity unchanged	PASS	
+A14-040	CARRY	A13-040	206c6c1e	integration identity unchanged	PASS	
+A14-041	CARRY	A13-041	206c6c1e	integration identity unchanged	PASS	
+A14-042	CARRY	A13-042	206c6c1e	integration identity unchanged	PASS	
+A14-043	CARRY	A13-043	206c6c1e	integration identity unchanged	PASS	
+A14-044	CARRY	A13-044	206c6c1e	integration identity unchanged	PASS	
+A14-045	CARRY	A13-045	206c6c1e	integration identity unchanged	PASS	
+A14-046	CARRY	A13-046	206c6c1e	integration identity unchanged	PASS	
+A14-047	CARRY	A13-047	206c6c1e	integration identity unchanged	PASS	
+A14-048	CARRY	A13-048	206c6c1e	integration identity unchanged	PASS	
+A14-049	CARRY	A13-049	206c6c1e	integration identity unchanged	PASS	
+A14-050	CARRY	A13-050	206c6c1e	integration identity unchanged	PASS	
+A14-051	CARRY	A13-051	206c6c1e	integration identity unchanged	PASS	
+A14-052	CARRY	A13-052	206c6c1e	integration identity unchanged	PASS	
+A14-053	CARRY	A13-053	206c6c1e	integration identity unchanged	PASS	
+A14-054	CARRY	A13-054	206c6c1e	integration identity unchanged	PASS	
+A14-055	CARRY	A13-055	206c6c1e	integration identity unchanged	PASS	
+A14-056	CARRY	A13-056	206c6c1e	integration identity unchanged	PASS	
+A14-057	CARRY	A13-057	206c6c1e	integration identity unchanged	PASS	
+A14-058	CARRY	A13-058	206c6c1e	integration identity unchanged	PASS	
+A14-059	CARRY	A13-059	206c6c1e	integration identity unchanged	PASS	
+A14-060	CARRY	A13-060	206c6c1e	integration identity unchanged	PASS	
+A14-061	CARRY	A13-061	206c6c1e	integration identity unchanged	PASS	
+A14-062	CARRY	A13-062	206c6c1e	integration identity unchanged	PASS	
+A14-063	CARRY	A13-063	206c6c1e	integration identity unchanged	PASS	
+A14-064	CARRY	A13-064	206c6c1e	integration identity unchanged	PASS	
+A14-065	CARRY	A13-065	206c6c1e	integration identity unchanged	PASS	
+A14-066	CARRY	A13-066	206c6c1e	integration identity unchanged	PASS	
+A14-067	CARRY	A13-067	206c6c1e	integration identity unchanged	PASS	
+A14-068	CARRY	A13-068	206c6c1e	integration identity unchanged	PASS	
+A14-069	CARRY	A13-069	206c6c1e	integration identity unchanged	PASS	
+A14-070	CARRY	A13-070	206c6c1e	integration identity unchanged	PASS	
+A14-071	CARRY	A13-071	206c6c1e	integration identity unchanged	PASS	
+A14-072	CARRY	A13-072	206c6c1e	integration identity unchanged	PASS	
+A14-073	CARRY	A13-073	206c6c1e	integration identity unchanged	PASS	
+A14-074	CARRY	A13-074	206c6c1e	integration identity unchanged	PASS	
+A14-075	CARRY	A13-075	206c6c1e	integration identity unchanged	PASS	
+A14-076	CARRY	A13-076	206c6c1e	integration identity unchanged	PASS	
+A14-077	CARRY	A13-077	206c6c1e	integration identity unchanged	PASS	
+A14-078	CARRY	A13-078	206c6c1e	integration identity unchanged	PASS	
+A14-079	CARRY	A13-079	206c6c1e	integration identity unchanged	PASS	
+A14-080	CARRY	A13-080	206c6c1e	integration identity unchanged	PASS	
+A14-081	CARRY	A13-081	206c6c1e	integration identity unchanged	PASS	
+A14-082	CARRY	A13-082	206c6c1e	integration identity unchanged	PASS	
+A14-083	CARRY	A13-083	206c6c1e	integration identity unchanged	PASS	
+A14-084	CARRY	A13-084	206c6c1e	integration identity unchanged	PASS	
+A14-085	CARRY	A13-085	206c6c1e	integration identity unchanged	PASS	
+A14-086	CARRY	A13-086	206c6c1e	integration identity unchanged	PASS	
+A14-087	CARRY	A13-087	206c6c1e	integration identity unchanged	PASS	
+A14-088	CARRY	A13-088	206c6c1e	integration identity unchanged	PASS	
+A14-089	CARRY	A13-089	206c6c1e	integration identity unchanged	PASS	
+A14-090	CARRY	A13-090	206c6c1e	integration identity unchanged	PASS	
+A14-091	CARRY	A13-091	206c6c1e	integration identity unchanged	PASS	
+A14-092	CARRY	A13-092	206c6c1e	integration identity unchanged	PASS	
+A14-093	CARRY	A13-093	206c6c1e	integration identity unchanged	PASS	
+A14-094	CARRY	A13-094	206c6c1e	integration identity unchanged	PASS	
+A14-095	CARRY	A13-095	206c6c1e	integration identity unchanged	PASS	
+A14-096	CARRY	A13-096	206c6c1e	integration identity unchanged	PASS	
+A14-097	CARRY	A13-097	206c6c1e	integration identity unchanged	PASS	
+A14-098	CARRY	A13-098	206c6c1e	integration identity unchanged	PASS	
+A14-099	CARRY	A13-099	206c6c1e	integration identity unchanged	PASS	
+A14-100	CARRY	A13-100	206c6c1e	integration identity unchanged	PASS	
+A14-101	CARRY	A13-101	206c6c1e	integration identity unchanged	PASS	
+A14-102	CARRY	A13-102	206c6c1e	integration identity unchanged	PASS	
+A14-103	CARRY	A13-103	206c6c1e	integration identity unchanged	PASS	
+A14-104	CARRY	A13-104	206c6c1e	integration identity unchanged	PASS	
+A14-105	CARRY	A13-105	206c6c1e	integration identity unchanged	PASS	
+A14-106	CARRY	A13-106	206c6c1e	integration identity unchanged	PASS	
+A14-107	CARRY	A13-107	206c6c1e	integration identity unchanged	PASS	
+A14-108	CARRY	A13-108	206c6c1e	integration identity unchanged	PASS	
+A14-109	CARRY	A13-109	206c6c1e	integration identity unchanged	PASS	
+A14-110	CARRY	A13-110	206c6c1e	integration identity unchanged	PASS	
+A14-111	CARRY	A13-111	206c6c1e	integration identity unchanged	PASS	
+A14-112	CARRY	A13-112	206c6c1e	integration identity unchanged	PASS	
+A14-113	CARRY	A13-113	206c6c1e	integration identity unchanged	PASS	
+A14-114	CARRY	A13-114	206c6c1e	integration identity unchanged	PASS	
+A14-115	CARRY	A13-115	206c6c1e	integration identity unchanged	PASS	
+A14-116	CARRY	A13-116	206c6c1e	integration identity unchanged	PASS	
+A14-117	CARRY	A13-117	206c6c1e	integration identity unchanged	PASS	
+A14-118	CARRY	A13-118	206c6c1e	integration identity unchanged	PASS	
+A14-119	CARRY	A13-119	206c6c1e	integration identity unchanged	PASS	
+A14-120	CARRY	A13-120	206c6c1e	integration identity unchanged	PASS	
+A14-121	CARRY	A13-121	206c6c1e	integration identity unchanged	PASS	
+A14-122	CARRY	A13-122	206c6c1e	integration identity unchanged	PASS	
+A14-123	CARRY	A13-123	206c6c1e	integration identity unchanged	PASS	
+A14-124	CARRY	A13-124	206c6c1e	integration identity unchanged	PASS	
+A14-125	CARRY	A13-125	206c6c1e	integration identity unchanged	PASS	
+A14-126	CARRY	A13-126	206c6c1e	integration identity unchanged	PASS	
+A14-127	CARRY	A13-127	206c6c1e	integration identity unchanged	PASS	
+A14-128	CARRY	A13-128	206c6c1e	integration identity unchanged	PASS	
+A14-129	CARRY	A13-129	206c6c1e	integration identity unchanged	PASS	
+A14-130	CARRY	A13-130	206c6c1e	integration identity unchanged	PASS	
+A14-131	CARRY	A13-131	206c6c1e	integration identity unchanged	PASS	
+A14-132	CARRY	A13-132	206c6c1e	integration identity unchanged	PASS	
+A14-133	CARRY	A13-133	206c6c1e	integration identity unchanged	PASS	
+A14-134	CARRY	A13-134	206c6c1e	integration identity unchanged	PASS	
+A14-135	CARRY	A13-135	206c6c1e	integration identity unchanged	PASS	
+A14-136	CARRY	A13-136	206c6c1e	integration identity unchanged	PASS	
+A14-137	CARRY	A13-137	206c6c1e	integration identity unchanged	PASS	
+A14-138	CARRY	A13-138	206c6c1e	integration identity unchanged	PASS	
+A14-139	CARRY	A13-139	206c6c1e	integration identity unchanged	PASS	
+A14-140	CARRY	A13-140	206c6c1e	integration identity unchanged	PASS	
+A14-141	CARRY	A13-141	206c6c1e	integration identity unchanged	PASS	
+A14-142	CARRY	A13-142	206c6c1e	integration identity unchanged	PASS	
+A14-143	CARRY	A13-143	206c6c1e	integration identity unchanged	PASS	
+A14-144	CARRY	A13-144	206c6c1e	integration identity unchanged	PASS	
+A14-145	CARRY	A13-145	206c6c1e	integration identity unchanged	PASS	
+A14-146	CARRY	A13-146	206c6c1e	integration identity unchanged	PASS	
+A14-147	CARRY	A13-147	206c6c1e	integration identity unchanged	PASS	
+A14-148	CARRY	A13-148	206c6c1e	integration identity unchanged	PASS	
+A14-149	CARRY	A13-149	206c6c1e	integration identity unchanged	PASS	
+A14-150	CARRY	A13-150	206c6c1e	integration identity unchanged	PASS	
