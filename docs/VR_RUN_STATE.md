@@ -74,12 +74,23 @@ DXVK/multiview/DX12 remain blocked by policy until the DX9Ex reference is user a
 
 ## Canonical automation role/schedule update — 2026-09-22 KST
 
-Current autonomous pipeline contract supersedes older historical :15/:30 role descriptions:
+Current autonomous pipeline contract supersedes all older role descriptions:
 
-- A :00 — architecture/state/lifetime/OpenXR-lifecycle/synchronization deep review.
+- A :00 — architecture/state/lifetime/OpenXR-lifecycle/synchronization deep review; review-only.
 - N100 :10 — auxiliary review-only fresh Chat; findings and delta checkpoint go to Issue #6.
-- B :20 — rendering/stereo/visual/performance/frame-pacing deep review.
-- C :35 — exact-SHA post-fix review, changeset sanity, finding dedup/organization, validation preparation, and `D_IMPLEMENT_NEXT` curation.
-- D :45 — sole production IMPLEMENT + BUILD + VALIDATE + INTEGRATE worker.
-- Older text describing B as a fix worker, C as general validation/performance review, or :15/:30 launch times is historical context only and must not override this contract.
-- N100 opens a fresh Chat each scheduled run only when the previous N100 run is no longer generating; an active prior run is preserved and that hour's fresh launch is skipped.
+- B :20 — rendering/stereo/visual/performance/frame-pacing deep review; review-only.
+- C :35 — IMPLEMENT on isolated candidate branches + deterministic verification/CI + bounded self-recovery. C never writes the integration branch.
+- D :45 — independent exact-SHA review + regression/baseline release gate + CI validation + sole integration/final package writer.
+- Older text describing B as a fix worker, C as review-only/general validation, or D as the normal product-fix author is historical context only and must not override this contract.
+- N100 follows the durable repository baseline/regression policy even when launched outside these Chat automations.
+
+### USER_RUNTIME_VERIFIED baseline lock
+
+- The moving `vr-d3d9ex-focus` HEAD is not the runtime baseline.
+- Only matching Quest 3 / VDXR USER_RUNTIME_VERIFIED evidence may establish or advance the protected baseline.
+- STATICALLY_VERIFIED or BUILD_VERIFIED results never replace runtime baseline evidence.
+- Every runtime-visible behavior confirmed as fixed becomes a protected invariant under its stable regression key.
+- C must emit `BASELINE_DELTA` and revalidate every triggered protected regression before handoff.
+- D must compare both protected-baseline -> prospective merged tree and current-HEAD -> prospective merged tree; silent loss of a prior fix or reintroduction of a known-bad value/path blocks integration.
+- If integration HEAD moves after candidate validation, the prospective merged tree must be revalidated.
+- A failed HMD test reopens the existing regression key and preserves the last known-good baseline.
