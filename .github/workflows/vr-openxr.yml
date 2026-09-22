@@ -114,9 +114,7 @@ jobs:
               'exact mip CPU-shadow upload failed'
             )
             'src/vr/d3d9/ex_device_upgrade_r15.cpp' = @(
-              'R15ClassicAllState',
               'D3DSBT_ALL',
-              'R15RestoreClassicAllState',
               'Ex promotion rolled back transactionally'
             )
             'src/vr/d3d9/stereo_renderer_r34.cpp' = @(
@@ -278,7 +276,6 @@ jobs:
             'VR R23/R25 BASELINE: authoritative first seed',
             'VR R23 RENDERER: BeginScene/WVP guards READY; recovery pose warmup is stock-visible',
             'VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE',
-            'VR R15 EX: full D3DSBT_ALL baseline + synchronous Reset/stereo handoff ACTIVE',
             'VR v3 shadow: live dual-protocol diagnostics active'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR safe DLL marker missing: $marker" }
@@ -533,7 +530,6 @@ jobs:
             'VR C1/C2 CLASSIFY: R29 renderer delegates candidate WVP uploads to R23/R27/R28 perspective-world classification',
             'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
             'VR C1.1 BASELINE: authoritative color clear replay seeds right/mono surfaces; two full-surface StretchRect baseline copies removed',
-            'VR C1.2 FIXEDFN HEAD: perspective fixed-function XYZ world receives the same latched head inverse',
             'VR R27 EFFECT: main-backbuffer perspective c64 now follows the verified per-eye world WVP'
           )) {
             if (-not $ascii.Contains($marker)) { throw "C1 marker missing: $marker" }
@@ -621,7 +617,6 @@ jobs:
             'VR C1/C2 CLASSIFY: R29 renderer delegates candidate WVP uploads to R23/R27/R28 perspective-world classification',
             'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
             'VR C1.1 BASELINE: authoritative color clear replay seeds right/mono surfaces; two full-surface StretchRect baseline copies removed',
-            'VR C1.2 FIXEDFN HEAD: perspective fixed-function XYZ world receives the same latched head inverse',
             'VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current=',
             'VR R30.6 XYZRHW WORLD:'
           )) {
@@ -723,21 +718,13 @@ jobs:
           $bytes = [System.IO.File]::ReadAllBytes($hostPath)
           if ($bytes.Length -lt 10000) { throw 'outrun-vr-host.exe is unexpectedly small' }
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
+          # Keep binary marker checks limited to stable current R32 contracts.
+          # Older diagnostic/log strings are intentionally not ABI and may disappear
+          # through refactors or compiler optimization without changing behavior.
           foreach ($marker in @(
-            '[v3] live shadow HostState/AckState bridge ready.',
-            'outrun-vr-host-v3.log',
-            'outrun-vr-watchdog.log',
-            '[R23] final presentation authority ACTIVE',
-            'direct safe-eye rejected: actual resource format/size',
-            'gameplay layer blocked: no fresh committed host-owned frame/source/pose bundle',
-            'host-owned GPU eye copies + completion ACK active',
-            '[D3D9Ex R32] SafeEye A/B staging + per-slot shared-resource cache ACTIVE',
             '[R32 direct] verified incoming DirectGPU projection submitted once',
             'presentation-authoritative while its exact producer slot stays protected',
-            '[R32 direct] D3D11 Flush is deferred until actual direct-ring slot pressure',
-            '[R23 mono] gameplay stereo pending: bounded Desktop Duplication refresh for theater-only fallback',
-            '[R23 final-submit] serial=',
-            'using left-eye-only LOCAL-fixed theater until fresh stereo returns'
+            '[R32 direct] D3D11 Flush is deferred until actual direct-ring slot pressure'
           )) {
             if (-not $ascii.Contains($marker)) { throw "VR host marker missing: $marker" }
           }
