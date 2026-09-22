@@ -172,54 +172,94 @@
       "hypothesis": "Marker producer is being treated as screen overlay/HUD instead of WORLD_BILLBOARD with vehicle/world anchor transform.",
       "evidenceLevel": "USER_RUNTIME_VERIFIED_FAILURE",
       "nextAction": "Recover exact marker producer/vehicle anchor transform; classify spatial rank marker as WORLD_BILLBOARD while leaving generic HUD/overlay path unchanged."
+    },
+    {
+      "key": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+      "title": "White HUD/text remains doubled and head-following on R51",
+      "status": "USER_RUNTIME_VERIFIED_OPEN",
+      "severity": "visual-correctness",
+      "lastObservedKst": "2026-09-23",
+      "sourceSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+      "symptoms": [
+        "6th/6 not resized, doubled, follows head movement",
+        "exit YES/NO doubled and follows head movement",
+        "end-of-run time/countdown/record and other white HUD/text doubled and follows head movement",
+        "white vehicle marker doubled"
+      ],
+      "constraints": [
+        "preserve verified-good R51 road/background/vehicle 3D stereo",
+        "preserve improved frame stability",
+        "do not restore blanket queue-to-HUD ownership"
+      ],
+      "nextAction": "Identify exact white HUD producers and give only those SCREEN_HUD ownership/scale/world-lock semantics."
+    },
+    {
+      "key": "VR-R51-VEHICLE-RANK-ANCHOR-001",
+      "title": "Vehicle rank markers are not world-anchored on R51",
+      "status": "USER_RUNTIME_VERIFIED_OPEN",
+      "severity": "visual-correctness",
+      "lastObservedKst": "2026-09-23",
+      "sourceSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+      "symptoms": [
+        "non-white 1st/2nd/3rd marker appears single",
+        "marker follows head movement",
+        "marker is not fixed above its vehicle and appears to live in HUD space",
+        "white vehicle marker remains doubled"
+      ],
+      "constraints": [
+        "rank marker must use exact WORLD_BILLBOARD/world anchor semantics",
+        "do not flatten rank markers into generic SCREEN_HUD",
+        "preserve verified-good R51 world stereo and frame stability"
+      ],
+      "nextAction": "Recover exact vehicle/world anchor and WORLD_BILLBOARD ownership for rank-marker producer paths; keep white-marker diplopia as a separately tracked producer issue."
     }
   ],
   "userRuntimeVerifiedBaseline": {
     "status": "PARTIAL_ACCEPTED_WITH_OPEN_VISUAL_DEFECTS",
-    "sourceSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
-    "packageSha256": "30a6ed205c517b146564d94bf7fc5eaadbcc36de1154a0f2966e9ef31787e3eb",
+    "sourceSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+    "packageSha256": "bf9f5b7c04520f1bf018764f54c1a915e019f4a21b18bf5fab061ce29790fbe7",
     "profile": "CORRECTNESS",
     "configHash": null,
     "sessionId": null,
-    "observedAtKst": "2026-09-23T02:13:00+09:00",
+    "observedAtKst": "2026-09-23T02:16:53+09:00",
     "protectedRegressionKeys": [
       "VR-STARTUP-WHITE-001",
-      "VR-R50-WORLD-STEREO-PRESERVE-001",
-      "VR-R50-FRAME-STABILITY-PRESERVE-001"
+      "VR-R51-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-FRAME-STABILITY-PRESERVE-001"
     ],
     "protectedInvariants": [
-      "Playable road scene must remain reachable; do not reintroduce persistent startup white screen.",
-      "Road/background/vehicle world geometry must remain correct 3D stereo and must not collapse to HUD/finite-plane/head-locked behavior.",
-      "Do not regress the improved frame stability while fixing HUD semantics."
+      "Road/background/vehicle world geometry must remain correct 3D stereo.",
+      "Do not regress the improved frame stability while fixing HUD semantics.",
+      "Do not reintroduce broad world-to-HUD/finite-plane ownership."
     ],
     "openDefects": [
-      "VR-R50-WHITE-HUD-DIPLOPIA-001",
-      "VR-R50-VEHICLE-RANK-ANCHOR-001"
+      "VR-R51-WHITE-HUD-DIPLOPIA-001",
+      "VR-R51-VEHICLE-RANK-ANCHOR-001"
     ],
-    "note": "Partial runtime baseline: protects what the user explicitly verified as good while keeping HUD/marker failures open. Future candidates may advance only if these protected invariants remain intact."
+    "note": "Partial runtime baseline: protects behavior explicitly verified by the user on R51 while keeping white HUD and vehicle-rank marker failures open."
   },
   "workingDevelopmentBaseline": {
     "status": "USER_RUNTIME_PARTIAL_VERIFIED_WORKING_BASELINE",
-    "establishedAtKst": "2026-09-23T02:11:00+09:00",
-    "sourceSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
+    "establishedAtKst": "2026-09-23T02:16:53+09:00",
+    "sourceSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
     "branch": "vr-d3d9ex-working-baseline",
-    "originCandidateBranch": "vr-d3d9ex-candidate/VR-R50-QUEUE-FOV2D-9554272a",
-    "packageSha256": "30a6ed205c517b146564d94bf7fc5eaadbcc36de1154a0f2966e9ef31787e3eb",
+    "originCandidateBranch": "vr-d3d9ex-candidate/VR-R51-WORLD-HUD-OWNERSHIP-750453f2",
+    "packageSha256": "bf9f5b7c04520f1bf018764f54c1a915e019f4a21b18bf5fab061ce29790fbe7",
     "profile": "CORRECTNESS",
     "evidenceLevel": "USER_RUNTIME_PARTIAL_VERIFIED",
-    "note": "User tested this exact R50 package on Quest3/VDXR and selected it as the working baseline. Preserve the verified-good world/vehicle stereo and improved frame stability. HUD/marker defects remain explicitly open; baseline acceptance does not mean visual completion.",
-    "runtimeObservedAtKst": "2026-09-23T02:13:00+09:00",
+    "validationRun": 35753905582,
+    "supersedesMistakenBaselineSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
     "protectedGoodBehaviors": [
       "Road/world/background geometry renders as correct 3D stereo.",
-      "Player/traffic vehicle 3D renders correctly.",
-      "Frame pacing/stability is improved versus prior tested builds.",
-      "Game reaches playable road scene; persistent startup white-screen blocker was not present in this run."
+      "Vehicles render correctly in 3D stereo.",
+      "Frame pacing/stability is improved versus earlier tested builds."
     ],
     "knownOpenRuntimeDefects": [
       "6th/6 HUD is not resized, appears doubled, and follows head movement.",
-      "Exit YES/NO, end-of-run countdown/time-record and other white HUD/text elements appear doubled and follow head movement.",
+      "Exit YES/NO, end-of-run time/countdown/record and other white HUD/text elements appear doubled and follow head movement.",
       "White marker above vehicles appears doubled.",
-      "Non-white 1st/2nd/3rd vehicle rank marker appears single but follows head movement and is not anchored to the vehicle; it behaves like HUD-space content."
-    ]
+      "Non-white 1st/2nd/3rd vehicle rank marker appears single but follows head movement and is not anchored to the vehicle."
+    ],
+    "note": "Corrected baseline identity: the user's described runtime result belongs to R51 exact SHA 17ad376b, not R50 750453f2. Preserve verified-good world stereo/frame stability while fixing only remaining HUD/marker semantics."
   }
 }
