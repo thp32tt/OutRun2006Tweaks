@@ -9,14 +9,27 @@ function Get-OutRunVRTestProfile {
 
     $commonVr = @(
         '-PreferD3D9Ex=true',
-        '-DirectGpuOnly=true',
+        '-DirectGpuOnly=false',
         '-DisableDesktopDuplication=false',
         '-TargetRefreshRateHz=0',
         '-SkyGlowFactor=1',
-        '-CullingUnionFov=false',
+        '-CullingUnionFov=true',
         '-CullingUnionMarginDegrees=4.0',
         '-NormalizeReflectionRate=true',
         '-NearPlane=0.10'
+    )
+
+    # Runtime-proven visual path. Keep CONTROL/PERFORMANCE able to exercise
+    # fallback transport, but correctness/HUD sessions must use the R49
+    # DirectGPU owner and keep union-FOV mutation disabled.
+    $visualSafeVr = @(
+        $commonVr | Where-Object {
+            $_ -notmatch '^-DirectGpuOnly=' -and
+            $_ -notmatch '^-CullingUnionFov='
+        }
+    ) + @(
+        '-DirectGpuOnly=true',
+        '-CullingUnionFov=false'
     )
 
     switch ($Name) {
@@ -74,7 +87,7 @@ function Get-OutRunVRTestProfile {
                     '-FrameCadenceMode=1',
                     '-FrameCadenceTargetHz=0',
                     '-DisableDesktopVsync=true'
-                ) + $commonVr
+                ) + $visualSafeVr
                 Environment=[ordered]@{
                     OUTRUN_VR_TEST_PROFILE='HUD_SCREEN'
                     OUTRUN_VR_PERFORMANCE_PROFILE='0'
@@ -94,7 +107,7 @@ function Get-OutRunVRTestProfile {
                     '-FrameCadenceMode=1',
                     '-FrameCadenceTargetHz=0',
                     '-DisableDesktopVsync=true'
-                ) + $commonVr
+                ) + $visualSafeVr
                 Environment=[ordered]@{
                     OUTRUN_VR_TEST_PROFILE='HUD_MENU'
                     OUTRUN_VR_PERFORMANCE_PROFILE='0'
@@ -117,7 +130,7 @@ function Get-OutRunVRTestProfile {
                     '-SkipIntros',
                     '-OuttaTime',
                     '-LevelSelect'
-                ) + $commonVr
+                ) + $visualSafeVr
                 Environment=[ordered]@{
                     OUTRUN_VR_TEST_PROFILE='HUD_WORLD'
                     OUTRUN_VR_PERFORMANCE_PROFILE='0'
@@ -249,7 +262,7 @@ function Get-OutRunVRTestProfile {
                     '-FrameCadenceMode=0',
                     '-FrameCadenceTargetHz=0',
                     '-DisableDesktopVsync=false'
-                ) + $commonVr
+                ) + $visualSafeVr
                 Environment=[ordered]@{
                     OUTRUN_VR_TEST_PROFILE='CORRECTNESS'
                     OUTRUN_VR_PERFORMANCE_PROFILE='0'
