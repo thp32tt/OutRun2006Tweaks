@@ -466,16 +466,23 @@ class FixFullPedalChecks : public Hook
 		return result;
 	}
 
+	inline static std::atomic<bool> HooksReady{ false };
 	inline static SafetyHookInline GetVolume = {};
 	static int GetVolume_dest(int channel)
 	{
-		return correctPedalValue(channel, GetVolume.call<int>(channel));
+		const int result = GetVolume.call<int>(channel);
+		return HooksReady.load(std::memory_order_acquire)
+			? correctPedalValue(channel, result)
+			: result;
 	}
 
 	inline static SafetyHookInline GetVolumeOld = {};
 	static int GetVolumeOld_dest(int channel)
 	{
-		return correctPedalValue(channel, GetVolumeOld.call<int>(channel));
+		const int result = GetVolumeOld.call<int>(channel);
+		return HooksReady.load(std::memory_order_acquire)
+			? correctPedalValue(channel, result)
+			: result;
 	}
 
 public:
@@ -486,8 +493,29 @@ public:
 
 	bool apply() override
 	{
-		GetVolume = safetyhook::create_inline(Module::exe_ptr(GetVolume_Addr), GetVolume_dest);
-		GetVolumeOld = safetyhook::create_inline(Module::exe_ptr(GetVolumeOld_Addr), GetVolumeOld_dest);
+		HooksReady.store(false, std::memory_order_release);
+		const auto disabled = safetyhook::InlineHook::StartDisabled;
+
+		auto getVolume = safetyhook::create_inline(
+			Module::exe_ptr(GetVolume_Addr), GetVolume_dest, disabled);
+		auto getVolumeOld = safetyhook::create_inline(
+			Module::exe_ptr(GetVolumeOld_Addr), GetVolumeOld_dest, disabled);
+		if (!getVolume || !getVolumeOld)
+			return false;
+
+		GetVolume = std::move(getVolume);
+		GetVolumeOld = std::move(getVolumeOld);
+
+		if (!GetVolume.enable().has_value() ||
+			!GetVolumeOld.enable().has_value())
+		{
+			HooksReady.store(false, std::memory_order_release);
+			GetVolumeOld = {};
+			GetVolume = {};
+			return false;
+		}
+
+		HooksReady.store(true, std::memory_order_release);
 		if (Settings::WheelInputCompatibility)
 		{
 			spdlog::info(
@@ -495,7 +523,7 @@ public:
 				Settings::WheelAccelerationInvert ? "inverted" : "normal",
 				Settings::WheelBrakeInvert ? "inverted" : "normal");
 		}
-		return !!GetVolume && !!GetVolumeOld;
+		return true;
 	}
 
 	static FixFullPedalChecks instance;
