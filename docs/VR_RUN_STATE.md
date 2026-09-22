@@ -1,40 +1,50 @@
 # VR Run State
 
-## Role-C specialized handoff — 2026-09-22 01:30 KST
+## Role-C exact-SHA handoff — 2026-09-22 13:41 KST
 
 REGRESSION_KNOWLEDGE:
-- integration_sha: `a50ee775636e5572f7976f2d1374089741b510b0`
-- loaded: `docs/VR_REGRESSION_KNOWLEDGE.json`, `docs/VR_PROBLEM_HISTORY.md`, Issue #13 and comments.
-- active case: `VR-STARTUP-WHITE-001` / `REOPENED_NEEDS_RECONSTRUCTION`.
-- rootCause/fixReferences/knownGood/knownBad remain unresolved; do not invent replacements.
-- runtime-visible final DONE still requires USER RUNTIME VERIFIED logo -> menu/game with no persistent white frame.
+- integration_sha: `d961afe38d6417961d65d7e23d3a65f33bcec39c`
+- loaded: `docs/VR_REGRESSION_KNOWLEDGE.json`, `docs/VR_PROBLEM_HISTORY.md`, Issue #13, `docs/VR_SUPERPOWERS_POLICY.md`.
+- active case: `VR-STARTUP-WHITE-001` / `INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST`.
+- stored root cause: synchronous CreateDevice-thread stereo installation previously allocated/mutated private RT/depth before fresh-device initialization completed.
+- current candidate intersects explicit riskPaths `src/hooks_graphics.cpp` and `.github/workflows/vr-dx9ex-active.yml`; preserve stable key as EVIDENCE_AUGMENT.
+- runtime-visible final DONE still requires USER RUNTIME VERIFIED Quest3/VDXR logo -> menu/game and gameplay stereo-open evidence.
 
 POST_FIX_REVIEW:
-- candidate_sha: `200f0618a5fb018df2bf7b7fe5af31bdbe394bdc`
-- base_sha: `a50ee775636e5572f7976f2d1374089741b510b0`
-- finding_ids: `HUD-SEMANTIC-TIMEATTACK-RANGE-GAP-001`
-- regression_case_keys: `VR-STARTUP-WHITE-001` riskPath intersection only; revalidation trigger NOT activated by this semantic-boundary-only change.
-- changed files/functions: `src/vr/hud_semantics.hpp` / caller HUD semantic classification.
-- intended hunks: extend `DispTimeAttack2D` lower boundary `0x0BE300 -> 0x0BE270`; add `0x0BE2D9 -> ScreenHud` and `0x0BE261 -> Unknown` compile-time assertions.
-- unintended_diff: PASS; exact base comparison is 1 commit ahead / 0 behind, one source file, +3/-1.
-- active_call_path: real semantic classifier source change, not verifier-only.
-- dependency/regression risks: file matches `VR-STARTUP-WHITE-001` `src/vr/**` riskPath, but does not change startup/device/reset/Present, stereo transport/shared-frame eligibility, host first-frame/fallback, or launch/profile/config activation. Therefore no startup-white trigger is activated by this candidate itself.
-- deterministic checks required: compile-time positive/negative boundary assertions; preserve adjacent HUD_GOAL_TIME boundary; compile/build.
-- CI evidence: no commit statuses and no workflow runs associated with candidate SHA at review time.
-- domain review: B exact-SHA PASS recorded externally for this SHA; A not required for semantic-boundary-only change.
-- verdict: PASS for C exact-SHA changeset sanity and regression-gate classification. BUILD VERIFIED remains pending and integration must still obey D's build/prospective-tree gates.
-- nextAction: D may advance this exact candidate after applicable build/CI evidence and prospective merged-tree identity; do not mark runtime HUD behavior USER RUNTIME VERIFIED from static/build evidence.
+- candidate_sha: `c4dd697e2b1f33d3b8af6ab254f378a1cc421248`
+- base_sha: `d961afe38d6417961d65d7e23d3a65f33bcec39c`
+- finding_ids: `VR-NEARPLANE-ACTIVE-GATE-001`
+- regression_case_keys: `VR-STARTUP-WHITE-001` / EVIDENCE_AUGMENT.
+- topology: exact merge-base is base SHA; candidate ahead 3 / behind 0.
+- changed production file/function: `src/hooks_graphics.cpp` / `FixZBufferPrecision` near-plane eligibility; support changes add `tools/verify_vr_nearplane_active_gate.py` and wire it into `.github/workflows/vr-dx9ex-active.yml`.
+- intended source hunk: replace broad `VREnabled && VRPositionalTracking` near-plane activation with `VRPositionalTracking && VRStereo && RuntimeEligibility::MayInjectStereo()` while retaining configured `VRNearPlane` behavior for eligible stereo.
+- unintended_diff: PASS; no evidence of stale-base/diverged carryover or unrelated production-runtime hunks.
+- active_call_path evidence: production near-plane decision is in `FixZBufferPrecision`; deterministic oracle checks the active-stereo eligibility contract and legacy broad gate removal.
+- config/profile impact: no requested change to `SkyGlowFactor=1`, `TargetRefreshRateHz=0`, profile selection or package defaults.
+- dependency/regression risk: `src/hooks_graphics.cpp` is a `VR-STARTUP-WHITE-001` riskPath. Candidate narrows render-time eligibility rather than changing the stored deferred CreateDevice/first-Present root-cause protection. Keep startup-white runtime gate open.
+- deterministic checks: exact candidate DX9Ex Active Validation run `35684438108` completed SUCCESS. Policy job explicitly ran `Verify near-plane active stereo eligibility` SUCCESS; canonical binary contract and reconstructed architecture checks also succeeded.
+- build/CI evidence: run `35684438108`, exact head SHA `c4dd697e...`, all 4 jobs SUCCESS: policy, Win32 active DX9Ex game DLL, x64 D3D11 OpenXR host + deterministic no-HMD smoke, profile-aware package + package validation.
+- A review: exact-candidate identity-only A PASS recorded; production source unchanged from previously A-reviewed `b8bd82c3...`.
+- B review: exact `c4dd697e...` PASS_DOMAIN_REVIEW_NEED_HMD_GATE with fresh oracle/build evidence.
+- C verdict: PASS_EXACT_SHA_BUILD_VERIFIED_NEED_HMD_TEST.
+- required final validation: D must perform fresh prospective-merged-tree identity/regression validation if integration HEAD moves; runtime final DONE remains gated on Quest3/VDXR evidence.
+- exact nextAction: D may integrate this exact candidate only after confirming integration HEAD still equals `d961afe...` (or recreating/revalidating on moved HEAD), preserving triggered `VR-STARTUP-WHITE-001` evidence recipe and production-change history requirements.
 
 FINDING_ORGANIZATION:
-- `HUD-SEMANTIC-TIMEATTACK-RANGE-GAP-001`: candidate reviewed PASS by C; awaiting D build/integration gates.
-- `VR-STARTUP-WHITE-001`: EVIDENCE_AUGMENT only; remains REOPENED_NEEDS_RECONSTRUCTION. Candidate intersects riskPath but not trigger.
-- `B-R30-PRIMITIVE-COUNT-OVERFLOW-001`: NEEDS_REVIEW; caller bounds still required.
-- `B-R32-FENCE-ORDER-CROSSTRACE-001`: NEEDS_REVIEW; GPU ordering evidence still required.
+- `VR-NEARPLANE-ACTIVE-GATE-001`: PASS exact SHA / BUILD VERIFIED / NEED_HMD_TEST; READY_FOR_D_INTEGRATION_GATE.
+- `VR-STARTUP-WHITE-001`: EVIDENCE_AUGMENT; do not create a new regression key; remains BUILD_VERIFIED_NEED_HMD_TEST.
+- `VR-SKYGLOW-ACTIVE-GATE-001`: READY; independent next production source item after near-plane integration gate.
+- `CRASH-ZIP-FINALIZE-DURABILITY-001`: READY/VALIDATION_PREP; retain behind SkyGlow unless new failure evidence raises severity.
 
 D_IMPLEMENT_NEXT:
-1. `VR-SKYGLOW-ACTIVE-GATE-001` | regression cases: `VR-STARTUP-WHITE-001` if implementation touches `src/vr/**` and stereo/shared-frame eligibility | READY | target: SkyGlow ownership/active gate in current stereo renderer path | fix: gate ownership on actual runtime/stereo-active eligibility while preserving `SkyGlowFactor=1` | verifier: deterministic active/inactive cases + build; if shared-frame eligibility changes, also apply startup-white static verifier and retain HMD logo->menu/game check | dependency: current renderer path | review: B+C, A additionally if ownership/lifetime changes | priority P1.
-2. `VR-NEARPLANE-ACTIVE-GATE-001` | regression cases: `VR-STARTUP-WHITE-001` riskPath; trigger only if VR activation/config or startup eligibility is changed | READY | target: near-plane override eligibility path | fix: apply override only under actual runtime VR eligibility | verifier: deterministic eligible/ineligible states + build | dependency: state/render boundary | review: A+B+C | priority P1.
-3. `VR-SEMANTIC-NEXTDRAW-STALE-HEART-001` | regression cases: `VR-STARTUP-WHITE-001` riskPath; no trigger unless transport/startup eligibility is changed | READY | target: semantic next-draw consume/clear lifetime | fix: prevent HEART semantic leakage across skipped/ineligible draw | verifier: skipped-draw lifetime regression + build | dependency: semantic state lifetime | review: A+B+C | priority P1.
+1. `VR-NEARPLANE-ACTIVE-GATE-001` | regression key `VR-STARTUP-WHITE-001` | READY_FOR_INTEGRATION_GATE | target `src/hooks_graphics.cpp::FixZBufferPrecision` | bounded hypothesis: broad near-plane activation can apply VR projection depth behavior when stereo injection is not currently eligible | GREEN fix already present in exact candidate `c4dd697e...` | RED/GREEN oracle `tools/verify_vr_nearplane_active_gate.py`, GREEN in run `35684438108` | dependency/blocker: prospective merged-tree identity and durable production/regression history; final runtime HMD evidence remains open | reviews A+B+C satisfied for exact identity/source risk | priority P0.
+2. `VR-SKYGLOW-ACTIVE-GATE-001` | regression key `VR-STARTUP-WHITE-001` if implementation intersects stereo/shared-frame eligibility | READY | target current stereo renderer SkyGlow ownership/active gate | bounded hypothesis: SkyGlow path can remain active from requested stereo state after runtime injection becomes ineligible, causing visual ownership/state work outside active stereo | intended RED oracle: active/inactive eligibility cases preserving `SkyGlowFactor=1` | minimal fix: gate SkyGlow ownership/composite on actual runtime stereo eligibility without changing factor semantics | dependency: current renderer path | review B+C, A if lifetime/ownership changes | priority P1.
+3. `CRASH-ZIP-FINALIZE-DURABILITY-001` | no new regression key unless runtime path evidence intersects registry | READY_VALIDATION_PREP | target crash ZIP finalization durability path | bounded hypothesis: interrupted/partial finalization can leave diagnostic artifact identity incomplete or non-atomic | RED oracle: deterministic interrupted/finalize durability check on exact current base | dependency: confirm current-base identity before implementation | review C plus A only if lifecycle ownership changes | priority P2.
+
+VALIDATION_PREP:
+- Near-plane candidate: use exact candidate SHA, CI run 35684438108, policy oracle, Win32 game/x64 host/no-HMD/package evidence; re-run/confirm prospective merged tree if integration HEAD moved.
+- Triggered regression recipe: build active DX9Ex game DLL + x64 host; deterministic host smoke; preserve deferred stereo resource initialization outside CreateDevice pre-exposure path; runtime CORRECTNESS logo -> menu/game -> gameplay stereo-open before final DONE.
+- Package/profile/session identity must remain attributable to exact source SHA/config/profile for human runtime evidence.
 
 READY_for_D: 3
 candidates_reviewed: 1
@@ -42,5 +52,5 @@ PASS: 1
 NEEDS_CHANGES: 0
 BLOCKED: 0
 findings_organized: 4
-regression_cases_triggered: 0 (one riskPath intersection: `VR-STARTUP-WHITE-001`)
-exact nextAction: D should obtain build/CI evidence for `200f0618...`, verify prospective merged tree against current integration, then integrate only if all gates remain valid. In parallel implement `VR-SKYGLOW-ACTIVE-GATE-001`; route B+C and add A if ownership/lifetime changes. Any change to stereo transport/shared-frame eligibility activates `VR-STARTUP-WHITE-001` revalidation and mandatory HMD startup transition evidence before final DONE.
+regression_cases_triggered: 1 (`VR-STARTUP-WHITE-001`)
+exact nextAction: D should consume `c4dd697e...` as the first integration-gate item, verify prospective merged-tree identity/regression evidence, then integrate only if unchanged/fresh gates pass. Next independent source implementation is `VR-SKYGLOW-ACTIVE-GATE-001` with RED -> GREEN oracle first.
