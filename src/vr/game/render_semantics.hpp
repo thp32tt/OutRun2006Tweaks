@@ -90,9 +90,10 @@ namespace OutRunVR::GameSemantic
     //   0x42D734 enters the per-priority SpriteNode walk,
     //   0x42D762 begins one node, and
     //   0x42DCB4 is the common epilogue.
-    // The queue is the authoritative ownership boundary for ordinary 2D HUD/menu
-    // sprites. Individual original-mod call sites may tag a node as a world
-    // billboard before it reaches this renderer.
+    // The queue provides a stable per-node execution boundary, but queue
+    // membership alone is NOT semantic HUD evidence. Only explicitly tagged
+    // nodes may become ScreenHud/WorldBillboard; every untagged node fails
+    // closed to None and stays on the proven lower renderer path.
     struct SpriteNodeSemanticTag
     {
         const void* node = nullptr;
