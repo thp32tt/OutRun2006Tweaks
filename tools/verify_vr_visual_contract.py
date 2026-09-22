@@ -60,20 +60,25 @@ def main() -> int:
             "RenderScope::ScreenHud",
             "RegisterSpriteNodeScope(",
             "ConsumeSpriteNodeScope(",
-            "BeginSpriteQueueRender()",
             "SelectSpriteQueueNode(",
+            "if (!SpriteQueueDepth)",
+            "EXE+0x2D738",
+            "EXE+0x2D73E",
             "EndSpriteQueueRender()",
             "0x42D734",
             "0x42DCB4")
 
     require("src/hooks_uiscaling.cpp",
             "VRHudQueueSemanticBridge",
-            "Module::exe_ptr(0x2D734)",
             "Module::exe_ptr(0x2D762)",
             "Module::exe_ptr(0x2DCB4)",
             "RegisterSpriteNodeScope(",
             "RenderScope::WorldBillboard",
-            "canonical sprite queue 0x2D734..0x2DCB4 owns SCREEN_HUD")
+            "unsafe 0x2D734 entry hook is forbidden")
+    forbid("src/hooks_uiscaling.cpp",
+           "Module::exe_ptr(0x2D734)",
+           "QueueBegin_hk",
+           "create_mid(\n\t\t\tModule::exe_ptr(0x2D734)")
 
     require("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
             "R47SemanticHudAccepted",
