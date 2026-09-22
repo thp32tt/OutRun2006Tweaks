@@ -30,17 +30,17 @@ This repository-side protocol matches the four Work scheduled roles. The schedul
 - Production runtime source, candidates, build/CI and integration are read-only.
 - Persists evidence/checkpoints only; does not implement fixes.
 
-### C — IMPLEMENT / CANDIDATE / SELF-RECOVERY
-- Creates production changes only on isolated `vr-d3d9ex-candidate/<finding-id>-<run-id>` branches from the exact current integration SHA.
-- Establishes bounded root cause and RED -> GREEN deterministic evidence where possible.
-- May repair the same candidate through bounded corrective revisions after classifying CI/review failures.
-- Never writes directly to `vr-d3d9ex-focus`, never packages/releases, and never marks runtime-visible behavior DONE.
-- Hands exact base SHA, candidate SHA, diff intent, regression keys, verifier/CI evidence and required post-review to D.
+### C — POST-FIX / CHANGE-SANITY / DEDUP / VALIDATION-PREP REVIEW
+- Primary role branch: `vr-d3d9ex-review-c`.
+- Review-only. Rechecks proposed/available changes, deduplicates findings, prepares deterministic validation requirements and emits exact `D_IMPLEMENT_NEXT` handoff evidence.
+- Production runtime source, candidate branches, build/package and integration are read-only.
+- May review HUD, DXVK/DX12 and performance lanes in parallel, but never implements or rewrites the production queue directly.
 
-### D — INDEPENDENT REVIEW / VALIDATE / INTEGRATE / PACKAGE
-- Sole autonomous writer of the integration branch and consolidated project state on `vr-d3d9ex-focus`.
-- Does not normally author product fixes; independently reviews exact C base..candidate changes and returns defects to C.
-- Integrates only after impact-relevant compile/static/regression gates and required A/B review pass.
+### D — IMPLEMENT / BUILD / VALIDATE / INTEGRATE / PACKAGE
+- Sole autonomous production and candidate writer.
+- Creates bounded `vr-d3d9ex-candidate/<finding-id>-<run-id>` branches from the exact current integration SHA.
+- Implements one coherent risky change-set per candidate, self-recovers bounded CI/build failures, and records `BASELINE_DELTA`.
+- Independently applies A/B/C evidence and regression gates before integration.
 - If integration HEAD moved, recreates/rebases safely and reruns affected validation; never treats stale candidate evidence as proof for a changed merged tree.
 - Owns `docs/VR_WORK_QUEUE.json`, `docs/VR_AUTODEV_STATE.json`, `docs/VR_RUNTIME_FEEDBACK.json`, and `docs/VR_SCHEDULED_RUN_HISTORY.md`.
 - Only D freezes/finalizes user test packages.
@@ -341,7 +341,7 @@ A failed HMD test never advances the baseline. It reopens the matching regressio
 A user request such as "파일 말아줘", "테스트 ZIP 만들어줘", "최종 빌드 줘", "지금 수동으로 빌드해줘", or an equivalent direct/manual packaging request is NOT an exception to the autonomous safety model.
 
 ### Required interpretation
-- "latest" means the newest tree that is eligible under the regression/baseline gates, not blindly the newest commit.
+- "latest" means the newest baseline-eligible exact tree under the regression/baseline gates, not blindly the newest commit.
 - A direct/manual request must never package an arbitrary moving `vr-d3d9ex-focus` HEAD solely because scheduled workers are idle.
 - Existing frozen/BUILD_VERIFIED artifacts may be reused only when their exact source/config/profile inputs still match the requested test and no newer runtime evidence invalidated them.
 - Runtime-visible USER_RUNTIME_VERIFIED knowledge always outranks recency.

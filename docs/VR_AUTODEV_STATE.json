@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-22T23:30:00Z",
+  "updatedUtc": "2026-09-22T23:40:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -283,8 +283,8 @@
     "A_00": "Hourly :00 architecture/state/lifetime/OpenXR/synchronization deep review, with DXVK/DX12 backend architecture and parity-boundary review now active.",
     "N100_10": "Hourly :10 auxiliary fresh-chat deep review. Review-only; publishes delta findings/checkpoints to Issue #6 and follows durable baseline policy.",
     "B_20": "Hourly :20 rendering/stereo/visual/performance/frame-pacing deep review, prioritizing HUD/white-overlay/rank-marker correctness while protecting the R51 world owner.",
-    "C_35": "Hourly :35 isolated candidate implementation/repair across ready HUD, backend and performance lanes. Keep risky lanes in separate candidate branches and emit BASELINE_DELTA.",
-    "D_45": "Hourly :45 independent exact-SHA review + R51 baseline/regression gate + CI validation + sole integration/final package. Backend promotion additionally requires Quest3/VDXR parity evidence.",
+    "C_35": "Hourly :35 post-fix/change-sanity/dedup/validation-prep review only. Review ready HUD, DXVK/DX12 and performance findings/candidates, publish exact evidence and D_IMPLEMENT_NEXT; never write production source or candidates.",
+    "D_45": "Hourly :45 sole production IMPLEMENT + BUILD + VALIDATE + INTEGRATE worker. May select one bounded ready item from HUD, backend or performance lanes; keep unrelated risky changes in separate candidate branches; backend promotion requires Quest3/VDXR parity evidence.",
     "specialD": {
       "01:45": "nightly consolidation and architecture/regression/cache integrity review",
       "06:45": "overnight summary and daytime backlog reorder",
@@ -319,8 +319,8 @@
     "runRecordTemplate": "docs/automation/RUN_RECORD_TEMPLATE.json",
     "integrationBranch": "vr-d3d9ex-focus",
     "candidatePattern": "vr-d3d9ex-candidate/<finding-id>-<run-id>",
-    "productionWriter": "D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE",
-    "candidateWriter": "D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE",
+    "productionWriter": "D_INTEGRATION_PLANNER",
+    "candidateWriter": "D_INTEGRATION_PLANNER",
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
     "candidateWorkflow": ".github/workflows/vr-dx9ex-active.yml",
@@ -476,13 +476,13 @@
   "parallelWorkstreams": {
     "hud": {
       "ownerLens": "B_RENDER_STEREO_VISUAL_PERF_FRAMEPACING_REVIEW",
-      "implementer": "C candidate",
+      "implementer": "D isolated candidate",
       "priority": "P0",
       "guard": "Do not alter R51 world ownership while fixing fixed-function white HUD and rank-marker anchors."
     },
     "backends": {
       "ownerLens": "A_ARCH_STATE_LIFETIME_OPENXR_SYNC_REVIEW",
-      "implementer": "C candidate",
+      "implementer": "D isolated candidate",
       "priority": "P1",
       "scope": [
         "DXVK",
@@ -492,12 +492,12 @@
     },
     "performance": {
       "ownerLens": "B/C",
-      "implementer": "C candidate",
+      "implementer": "D isolated candidate",
       "priority": "P1",
       "guard": "Telemetry first; optimize waits/copies/draw amplification only after correctness invariants are asserted."
     },
     "integration": {
-      "owner": "D",
+      "owner": "D_INTEGRATION_PLANNER",
       "rule": "Independent exact-SHA review, affected CI/regression validation, then integration; never combine unrelated risky lanes into one runtime candidate."
     }
   }

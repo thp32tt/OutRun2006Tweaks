@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-23T08:30:00+09:00",
+  "updatedKst": "2026-09-23T08:40:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -23,9 +23,9 @@
     "parallelBackendDevelopment": true,
     "backendReplacementGate": "Quest3/VDXR parity with protected R51 world stereo and frame stability",
     "parallelTracks": {
-      "HUD": "B evidence -> C isolated candidate -> D integrate",
-      "DXVK_DX12": "A architecture/parity review -> C isolated backend candidate -> D integrate only build/static-safe changes; runtime promotion needs HMD parity",
-      "PERFORMANCE": "B/C telemetry and deterministic verifier -> C bounded optimization -> D regression gate"
+      "HUD": "B evidence + C post-fix sanity -> D isolated implementation/integration",
+      "DXVK_DX12": "A architecture/parity review + C sanity/dedup -> D isolated backend implementation/integration; runtime promotion needs HMD parity",
+      "PERFORMANCE": "B performance evidence + C validation-prep -> D bounded optimization/integration"
     }
   },
   "candidateWip": {
@@ -172,7 +172,7 @@
       "id": "DXVK-REACTIVATE-001",
       "priority": 9,
       "status": "READY",
-      "preferredRole": "C_IMPLEMENT_CANDIDATE",
+      "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "Re-enable the isolated x86 DXVK path and turn the existing PoC into a repeatable build/smoke/backend-identity path while preserving the R51 semantic/frame contract.",
       "testLevel": "LEVEL2",
       "dependencies": [],
@@ -184,7 +184,7 @@
       "id": "DX12-D3D9ON12-REACTIVATE-001",
       "priority": 9,
       "status": "READY",
-      "preferredRole": "C_IMPLEMENT_CANDIDATE",
+      "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "Resume DX12/D3D9On12 from the known Direct3DCreate9On12Ex/CreateDevice 0x8876086C boundary; isolate device parameters and translated MANAGED/LockRect compatibility before any renderer promotion.",
       "testLevel": "LEVEL2",
       "dependencies": [],
@@ -196,7 +196,7 @@
       "id": "VR-PERF-COMMON-001",
       "priority": 9,
       "status": "READY",
-      "preferredRole": "C_IMPLEMENT_CANDIDATE",
+      "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "Create a common frame-budget telemetry and optimization lane covering game-thread producer fence wait, host copy/fence wait, draw amplification, capture/commit copy, render and xrEndFrame timing across backends.",
       "testLevel": "LEVEL0",
       "dependencies": [],
@@ -264,7 +264,7 @@
     {
       "id": "L4-RELEASE-001",
       "priority": 1,
-      "status": "BLOCKED_ON_PARITY_NOT_DEVELOPMENT",
+      "status": "BLOCKED",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "DXVK/multiview/DX12 implementation/build/smoke is re-enabled. Release/promotion matrix remains gated until backend parity with protected R51 is demonstrated.",
       "testLevel": "LEVEL4",
@@ -274,7 +274,8 @@
         "VR-PERF-COMMON-001"
       ],
       "attempts": 0,
-      "runtimeCandidate": false
+      "runtimeCandidate": false,
+      "blockReason": "Development/build/smoke is allowed; only release/promotion is blocked pending Quest3/VDXR parity with the protected R51 baseline."
     }
   ]
 }
