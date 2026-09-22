@@ -891,9 +891,13 @@ class MenuSelectionWrap : public Hook
 		return result;
 	}
 
+	inline static std::atomic<bool> HooksReady{ false };
 	inline static SafetyHookInline Increment_hook = {};
 	static int __fastcall Increment_dest(void* thisptr, int unused)
 	{
+		if (!HooksReady.load(std::memory_order_acquire))
+			return Increment_hook.thiscall<int>(thisptr);
+
 		int& current = field(thisptr, CurIndex_Offset);
 		const int maxIndex = field(thisptr, MaxIndex_Offset);
 
@@ -906,6 +910,9 @@ class MenuSelectionWrap : public Hook
 	inline static SafetyHookInline Decrement_hook = {};
 	static int __fastcall Decrement_dest(void* thisptr, int unused)
 	{
+		if (!HooksReady.load(std::memory_order_acquire))
+			return Decrement_hook.thiscall<int>(thisptr);
+
 		int& current = field(thisptr, CurIndex_Offset);
 		const int maxIndex = field(thisptr, MaxIndex_Offset);
 
@@ -929,13 +936,67 @@ public:
 
 	bool apply() override
 	{
-		Increment_hook = safetyhook::create_inline(Module::exe_ptr(Increment_Addr), Increment_dest);
-		Decrement_hook = safetyhook::create_inline(Module::exe_ptr(Decrement_Addr), Decrement_dest);
+		HooksReady.store(false, std::memory_order_release);
 
-		for (const Guard& guard : Guards)
-			Memory::VP::Nop(Module::exe_ptr<uint8_t>(guard.addr), guard.size);
+		const auto disabled = safetyhook::InlineHook::StartDisabled;
+		auto incrementHook = safetyhook::create_inline(
+			Module::exe_ptr(Increment_Addr), Increment_dest, disabled);
+		auto decrementHook = safetyhook::create_inline(
+			Module::exe_ptr(Decrement_Addr), Decrement_dest, disabled);
+		if (!incrementHook || !decrementHook)
+			return false;
 
-		return !!Increment_hook && !!Decrement_hook;
+		// Retain the exact original guard bytes so any failed transaction can
+		// return the executable to its vanilla menu-control flow.
+		static std::vector<TogglePatch> guardPatches;
+		if (guardPatches.empty())
+		{
+			guardPatches.reserve(std::size(Guards));
+			for (const Guard& guard : Guards)
+				guardPatches.emplace_back(
+					TogglePatch::nop(Module::exe_ptr<uint8_t>(guard.addr), guard.size));
+		}
+
+		Increment_hook = std::move(incrementHook);
+		Decrement_hook = std::move(decrementHook);
+
+		auto rollback = [&]() noexcept
+		{
+			HooksReady.store(false, std::memory_order_release);
+			for (auto it = guardPatches.rbegin(); it != guardPatches.rend(); ++it)
+				it->set(false);
+			Decrement_hook = {};
+			Increment_hook = {};
+		};
+
+		// Hooks can become visible one at a time, but until HooksReady commits
+		// they call straight through to vanilla behavior.
+		if (!Increment_hook.enable().has_value() ||
+			!Decrement_hook.enable().has_value())
+		{
+			rollback();
+			return false;
+		}
+
+		for (size_t guardIndex = 0; guardIndex < std::size(Guards); ++guardIndex)
+		{
+			guardPatches[guardIndex].set(true);
+			const Guard& guard = Guards[guardIndex];
+			const uint8_t* bytes = Module::exe_ptr<uint8_t>(guard.addr);
+			for (int i = 0; i < guard.size; ++i)
+			{
+				if (bytes[i] != 0x90)
+				{
+					rollback();
+					return false;
+				}
+			}
+		}
+
+		// Both replacement directions and all seven reversible guard patches are
+		// now committed. This is the single point where wrap behavior becomes live.
+		HooksReady.store(true, std::memory_order_release);
+		return true;
 	}
 
 	static MenuSelectionWrap instance;
