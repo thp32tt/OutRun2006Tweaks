@@ -488,4 +488,51 @@ require("src/vr/core/transport.hpp", "class IFrameProducer", "class IFrameConsum
 require("src/vr/game/game_adapter.hpp", "class IGameAdapter", "latchRenderPose", "buildStereoMatrices")
 require("src/vr/d3d9/stereo_backend.hpp", "class IStereoBackend", "drawWorldStereo", "drawScreenSpaceStereo")
 
+# FixFileLoadRace owns a five-hook synchronization protocol. Hook creation is
+# prepared disabled; callbacks must fail open until the complete set is enabled
+# and HooksReady publishes the single behavioral commit point.
+bugfix_source = text("src/hooks_bugfixes.cpp")
+if "class FixFileLoadRace" not in bugfix_source:
+    raise SystemExit("FixFileLoadRace missing")
+fileload_section = bugfix_source.split("class FixFileLoadRace", 1)[1].split(
+    "class FileLoadSliceEndsEarly", 1
+)[0]
+for marker in (
+    "std::atomic<bool> HooksReady",
+    "static void RollbackHooks() noexcept",
+    "safetyhook::MidHook::StartDisabled",
+    "safetyhook::InlineHook::StartDisabled",
+    "ServiceRequest_hook.enable().has_value()",
+    "ServiceRequestMoveDone_hook.enable().has_value()",
+    "sumo_fread_hook.enable().has_value()",
+    "sumo_fread_finished_hook.enable().has_value()",
+    "LoadTextures_hook.enable().has_value()",
+    "HooksReady.store(true, std::memory_order_release);",
+):
+    if marker not in fileload_section:
+        raise SystemExit(f"file-load hook transaction invariant missing: {marker}")
+
+if fileload_section.count("HooksReady.load(std::memory_order_acquire)") < 5:
+    raise SystemExit("all file-load callbacks must fail open before atomic Ready commit")
+
+ready_pos = fileload_section.find("HooksReady.store(true, std::memory_order_release);")
+last_enable_pos = fileload_section.find("LoadTextures_hook.enable().has_value()")
+if ready_pos < last_enable_pos:
+    raise SystemExit("file-load HooksReady commit precedes complete enable transaction")
+
+rollback = fileload_section.split("static void RollbackHooks() noexcept", 1)[1].split(
+    "bool apply() override", 1
+)[0]
+for marker in (
+    "HooksReady.store(false, std::memory_order_release);",
+    "LoadTextures_hook = {};",
+    "sumo_fread_finished_hook = {};",
+    "sumo_fread_hook = {};",
+    "ServiceRequestMoveDone_hook = {};",
+    "ServiceRequest_hook = {};",
+    "DeleteCriticalSection(&ListLock);",
+):
+    if marker not in rollback:
+        raise SystemExit(f"file-load rollback invariant missing: {marker}")
+
 print("VR reconstructed R23/R25 architecture boundary verification passed")
