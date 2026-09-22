@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-21T18:25:00Z",
+  "updatedUtc": "2026-09-22T14:26:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -38,6 +38,14 @@
       "manualComparisonWorkflow": ".github/workflows/vr-unified-backends.yml",
       "defaultSourceBuilds": "one active Win32 DX9Ex DLL + one x64 D3D11 OpenXR host",
       "comparisonMatrix": "manual only; P1-P4 retained for hypothesis isolation when profile switching cannot answer the question"
+    },
+    "userRuntimeBaseline": {
+      "sourceOfTruth": "docs/VR_REGRESSION_KNOWLEDGE.json::userRuntimeVerifiedBaseline",
+      "movingHeadIsNotBaseline": true,
+      "advanceOnlyBy": "matching Quest3/VDXR USER_RUNTIME_VERIFIED evidence",
+      "candidateBaselineDeltaRequired": true,
+      "rejectKnownBadReintroduction": true,
+      "revalidateProspectiveMergedTreeWhenHeadMoves": true
     }
   },
   "runtimeEvidence": {
@@ -60,7 +68,7 @@
     "Recovery runtime forcing 60 FPS with interpolation/cadence disabled contributes independent judder on a 90 Hz OpenXR session.",
     "Restore fast R29 world rendering and classification in bounded variants before deciding which later R30-R34 overlays are required."
   ],
-  "nextAction": "Use the four-role scheduled pipeline with A/B/C as review-only roles on dedicated branches: A=architecture/state/lifetime on vr-d3d9ex-review-a, B=rendering/stereo/visual correctness on vr-d3d9ex-review-b, C=performance/OpenXR/synchronization/testability on vr-d3d9ex-review-c. D alone creates production candidates, fixes, builds, validates, integrates, and owns consolidated queue/state/history on vr-d3d9ex-focus. Keep the next user runtime target to one CORRECTNESS test unless a concrete hypothesis requires CONTROL/PERFORMANCE.",
+  "nextAction": "Use canonical v2 pipeline: A/B/N100 review-only, C implements isolated candidates with BASELINE_DELTA and triggered regression checks, D independently reviews prospective merged tree and is sole integration/package writer. Protect USER_RUNTIME_VERIFIED invariants independently of moving vr-d3d9ex-focus HEAD; build success never advances runtime baseline.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
@@ -237,18 +245,19 @@
     "runtimeEvidence": "USER_RUNTIME_REQUIRED: capture trigger/usability and headset performance impact have not yet been validated on Quest 3/VDXR."
   },
   "scheduledAutomationModel": {
-    "A_00": "Hourly :00 architecture/state/lifetime/OpenXR-lifecycle/synchronization deep review. Review-only; persists to vr-d3d9ex-review-a.",
-    "N100_10": "Hourly :10 auxiliary fresh-chat deep review. Review-only; publishes delta findings/checkpoints to Issue #6.",
-    "B_20": "Hourly :20 rendering/stereo/visual/performance/frame-pacing deep review. Review-only; persists to vr-d3d9ex-review-b.",
-    "C_35": "Hourly :35 post-fix exact-SHA review, changeset sanity, finding dedup/organization, validation preparation, and D_IMPLEMENT_NEXT curation. Review/support only; persists to vr-d3d9ex-review-c.",
-    "D_45": "Hourly :45 sole production IMPLEMENT + BUILD + VALIDATE + INTEGRATE worker and durable regression/history owner.",
+    "A_00": "Hourly :00 architecture/state/lifetime/OpenXR-lifecycle/synchronization deep review. Review-only; baseline-regression risk detection.",
+    "N100_10": "Hourly :10 auxiliary fresh-chat deep review. Review-only; publishes delta findings/checkpoints to Issue #6 and follows durable baseline policy.",
+    "B_20": "Hourly :20 rendering/stereo/visual/performance/frame-pacing deep review. Review-only; baseline-regression risk detection.",
+    "C_35": "Hourly :35 IMPLEMENT + isolated candidate + deterministic verification/CI + self-recovery. Must emit BASELINE_DELTA; never writes integration branch.",
+    "D_45": "Hourly :45 independent exact-SHA review + baseline/regression release gate + CI validation + sole integration/final package.",
     "specialD": {
       "01:45": "nightly consolidation and architecture/regression/cache integrity review",
       "06:45": "overnight summary and daytime backlog reorder",
       "19:45": "freeze newest already-validated useful CORRECTNESS artifact; max 3 user choices only when evidence requires comparison"
     },
     "canonicalRoleContract": true,
-    "staleHistoricalRoleDocsDoNotOverride": true
+    "staleHistoricalRoleDocsDoNotOverride": true,
+    "baselineLock": true
   },
   "policyVerification": {
     "lightweightWorkflow": "VR Test Policy",
