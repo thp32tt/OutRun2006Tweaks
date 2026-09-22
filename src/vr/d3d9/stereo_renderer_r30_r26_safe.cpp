@@ -93,6 +93,19 @@ namespace OutRunVRStereo
         std::uint64_t R50SemanticOverlay2DAccepted = 0;
         std::uint64_t R50ScreenOverlay2DDraws = 0;
         std::uint64_t R52WorldBillboardDepthDraws = 0;
+        std::uint64_t R52CanonicalSpriteShaderCacheRecoveries = 0;
+        std::uint64_t R52CanonicalSpriteSeen1C = 0;
+        std::uint64_t R52CanonicalSpriteSeen24 = 0;
+        std::uint64_t R52CanonicalSpriteSeen2C = 0;
+        std::uint64_t R52CanonicalSpriteSeen34 = 0;
+        std::uint64_t R52CanonicalSpriteHandled1C = 0;
+        std::uint64_t R52CanonicalSpriteHandled24 = 0;
+        std::uint64_t R52CanonicalSpriteHandled2C = 0;
+        std::uint64_t R52CanonicalSpriteHandled34 = 0;
+        std::uint64_t R52CanonicalSpriteFallback1C = 0;
+        std::uint64_t R52CanonicalSpriteFallback24 = 0;
+        std::uint64_t R52CanonicalSpriteFallback2C = 0;
+        std::uint64_t R52CanonicalSpriteFallback34 = 0;
         std::uint64_t R30Hud2DDraws = 0;
         std::uint64_t R30PerspectiveHudDraws = 0;
         std::uint64_t R30WorldBillboardDraws = 0;
@@ -1119,7 +1132,7 @@ namespace OutRunVRStereo
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(
-                "VR R52: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAccepted={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},billboardDepth={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R52: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAccepted={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},billboardDepth={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] canonicalSprite[cacheRecover={},seen1c={},handled1c={},fallback1c={},seen24={},handled24={},fallback24={},seen2c={},handled2c={},fallback2c={},seen34={},handled34={},fallback34={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
@@ -1136,6 +1149,19 @@ namespace OutRunVRStereo
                 R30XyzrhwAtomicFallbacks,
                 R30XyzrhwDepthPreserveFallbacks,
                 R30XyzrhwBilateralFallbacks,
+                R52CanonicalSpriteShaderCacheRecoveries,
+                R52CanonicalSpriteSeen1C,
+                R52CanonicalSpriteHandled1C,
+                R52CanonicalSpriteFallback1C,
+                R52CanonicalSpriteSeen24,
+                R52CanonicalSpriteHandled24,
+                R52CanonicalSpriteFallback24,
+                R52CanonicalSpriteSeen2C,
+                R52CanonicalSpriteHandled2C,
+                R52CanonicalSpriteFallback2C,
+                R52CanonicalSpriteSeen34,
+                R52CanonicalSpriteHandled34,
+                R52CanonicalSpriteFallback34,
                 R30ScreenSpaceFovDraws, R30Hud2DDraws,
                 R30PerspectiveHudDraws, R30WorldBillboardDraws,
                 R44OverlayOwnedWvpHits, R44OverlayOwnedWvpGroupHits,
@@ -1547,10 +1573,26 @@ namespace OutRunVRStereo
         bool R30PrepareXyzrhwState(
             IDirect3DDevice9* device, R30XyzrhwState& state) noexcept
         {
-            if (!R30SafeStereoBase(device) ||
-                CurrentVertexShaderIdentity.load(std::memory_order_acquire) != 0)
+            if (!R30SafeStereoBase(device))
                 return false;
 
+            const auto semanticScope =
+                OutRunVR::GameSemantic::CurrentScope;
+            const bool canonicalSprite =
+                OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
+                    semanticScope) ||
+                OutRunVR::GameSemantic::CorroboratesHud(semanticScope) ||
+                OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
+            const std::uintptr_t cachedShader =
+                CurrentVertexShaderIdentity.load(std::memory_order_acquire);
+            if (cachedShader != 0 && !canonicalSprite)
+                return false;
+
+            // R52: the canonical sprite renderers at 0x42A3A0/0x42A800
+            // explicitly call SetVertexShader(NULL) before DrawPrimitiveUP.
+            // StateBlock/apply tracking can leave the cached identity one draw
+            // behind, so exact queue semantic is allowed to trust the actual
+            // D3D device state instead of failing before querying it.
             IDirect3DVertexShader9* shader = nullptr;
             if (FAILED(device->GetVertexShader(&shader)))
                 return false;
@@ -1559,6 +1601,8 @@ namespace OutRunVRStereo
                 shader->Release();
                 return false;
             }
+            if (cachedShader != 0 && canonicalSprite)
+                ++R52CanonicalSpriteShaderCacheRecoveries;
 
             DWORD fvf = 0;
             if (FAILED(device->GetFVF(&fvf)) ||
@@ -2629,7 +2673,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstXyzrhwHudLogged = true;
                     spdlog::info(
-                        "VR R50 XYZRHW 2D: generic SpriteNode content uses asymmetric-FOV common-ray affine only; exact SCREEN_HUD may still use the finite recentered world-locked plane");
+                        "VR R52 XYZRHW 2D: canonical SpriteNode content uses the finite recentered world-locked plane; exact WORLD_BILLBOARD remains depth/world owned");
                 }
             }
 
@@ -3657,10 +3701,60 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::CurrentScope;
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+
+            // R52 diagnostic/contract: canonical EXE sprite renderers use
+            // POSITIONT layouts 0x1C, 0x24, 0x2C and 0x34. Count only draws
+            // that already carry exact queue semantic; these counters neither
+            // classify nor promote unrelated D3D traffic.
+            const bool canonicalSprite =
+                OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
+                    drawSemanticValue) ||
+                OutRunVR::GameSemantic::CorroboratesHud(drawSemanticValue) ||
+                OutRunVR::GameSemantic::CorroboratesWorld(drawSemanticValue);
+            auto noteCanonical = [&](bool handled) noexcept {
+                if (!canonicalSprite)
+                    return;
+                std::uint64_t* seen = nullptr;
+                std::uint64_t* done = nullptr;
+                std::uint64_t* fallback = nullptr;
+                switch (stride)
+                {
+                case 0x1C:
+                    seen = &R52CanonicalSpriteSeen1C;
+                    done = &R52CanonicalSpriteHandled1C;
+                    fallback = &R52CanonicalSpriteFallback1C;
+                    break;
+                case 0x24:
+                    seen = &R52CanonicalSpriteSeen24;
+                    done = &R52CanonicalSpriteHandled24;
+                    fallback = &R52CanonicalSpriteFallback24;
+                    break;
+                case 0x2C:
+                    seen = &R52CanonicalSpriteSeen2C;
+                    done = &R52CanonicalSpriteHandled2C;
+                    fallback = &R52CanonicalSpriteFallback2C;
+                    break;
+                case 0x34:
+                    seen = &R52CanonicalSpriteSeen34;
+                    done = &R52CanonicalSpriteHandled34;
+                    fallback = &R52CanonicalSpriteFallback34;
+                    break;
+                default:
+                    return;
+                }
+                ++*seen;
+                if (handled) ++*done;
+                else ++*fallback;
+            };
+
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                 device, type, primitiveCount, data, stride);
             if (xyzrhw != E_NOTIMPL)
+            {
+                noteCanonical(true);
                 return xyzrhw;
+            }
+            noteCanonical(false);
 
             auto actual = [&]() {
                 return DrawPrimitiveUPHook.stdcall<HRESULT>(
