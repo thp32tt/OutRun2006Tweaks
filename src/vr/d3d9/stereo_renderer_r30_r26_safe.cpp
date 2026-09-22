@@ -92,6 +92,7 @@ namespace OutRunVRStereo
         std::uint64_t R47SemanticUnknownRejected = 0;
         std::uint64_t R50SemanticOverlay2DAccepted = 0;
         std::uint64_t R50ScreenOverlay2DDraws = 0;
+        std::uint64_t R52WorldBillboardDepthDraws = 0;
         std::uint64_t R30Hud2DDraws = 0;
         std::uint64_t R30PerspectiveHudDraws = 0;
         std::uint64_t R30WorldBillboardDraws = 0;
@@ -1118,7 +1119,7 @@ namespace OutRunVRStereo
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(
-                "VR R50: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAccepted={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R52: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAccepted={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},billboardDepth={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
@@ -1128,6 +1129,7 @@ namespace OutRunVRStereo
                 R47SemanticUnknownRejected,
                 R50SemanticOverlay2DAccepted,
                 R50ScreenOverlay2DDraws,
+                R52WorldBillboardDepthDraws,
                 R30XyzrhwRhwWorldPromotions,
                 R30XyzrhwRhwOnlyDepthEvidence,
                 R30XyzrhwZOnlyDepthEvidence,
@@ -1532,6 +1534,8 @@ namespace OutRunVRStereo
             float hudClipX[2][3]{};
             float hudClipY[2][3]{};
             float hudClipW[2][3]{};
+            float worldBillboardViewZ = 0.0f;
+            bool worldBillboardViewZValid = false;
             bool hudWorldLockValid = false;
             bool screenOverlay2D = false;
             bool fullWorldReprojection = false;
@@ -1832,6 +1836,12 @@ namespace OutRunVRStereo
             const bool semanticOverlay2D =
                 OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
                     semanticScope);
+            state.worldBillboardViewZValid =
+                semanticWorld &&
+                OutRunVR::GameSemantic::TryGetCurrentWorldBillboardViewZ(
+                    state.worldBillboardViewZ);
+            if (state.worldBillboardViewZValid)
+                ++R52WorldBillboardDepthDraws;
 
             // R51 ownership precedence is explicit:
             // exact WORLD_BILLBOARD > queue-owned 2D/HUD > geometric evidence.
@@ -2113,6 +2123,99 @@ namespace OutRunVRStereo
                 return reinterpret_cast<float*>(
                     out.data() + static_cast<std::size_t>(i) * stride);
             };
+
+            // R52 rival markers are already projected to XYZRHW by
+            // Calc3D2D before the sprite queue. Their stock RHW is therefore not
+            // the car depth. Reconstruct every vertex on one constant-depth
+            // camera plane using the exact Calc3D2D view-Z retained on the
+            // SpriteNode, then apply only the head-relative eye pose/FOV. This
+            // preserves the stock sprite footprint while attaching its parallax
+            // to the actual rival depth.
+            if (state.worldEffect && state.worldBillboardViewZValid &&
+                state.fullWorldReprojection && allowFullReprojection)
+            {
+                const D3DMATRIX& bp = state.baseProjection;
+                const float viewZ = state.worldBillboardViewZ;
+                const float clipW = viewZ * bp._34 + bp._44;
+                const float det =
+                    bp._11 * bp._22 - bp._21 * bp._12;
+                if (!std::isfinite(viewZ) || !std::isfinite(clipW) ||
+                    !std::isfinite(det) || clipW <= 1.0e-6f ||
+                    std::fabs(det) <= 1.0e-6f)
+                    return false;
+
+                UINT selectedVertices = 0;
+                for (UINT i = 0; i < vertexCount; ++i)
+                {
+                    if (!selected(i))
+                        continue;
+                    ++selectedVertices;
+
+                    const float* src = sourceVertex(i);
+                    float* dst = outputVertex(i);
+                    const float x = src[0];
+                    const float y = src[1];
+                    if (!std::isfinite(x) || !std::isfinite(y))
+                        return false;
+
+                    const float ndcX =
+                        ((x - x0) / width) * 2.0f - 1.0f;
+                    const float ndcY =
+                        1.0f - ((y - y0) / height) * 2.0f;
+                    const float clipX = ndcX * clipW;
+                    const float clipY = ndcY * clipW;
+                    const float rhsX =
+                        clipX - viewZ * bp._31 - bp._41;
+                    const float rhsY =
+                        clipY - viewZ * bp._32 - bp._42;
+                    const float viewX =
+                        (rhsX * bp._22 - bp._21 * rhsY) / det;
+                    const float viewY =
+                        (bp._11 * rhsY - rhsX * bp._12) / det;
+                    if (!std::isfinite(viewX) || !std::isfinite(viewY))
+                        return false;
+
+                    const float restoredView[4]{
+                        viewX, viewY, viewZ, 1.0f
+                    };
+                    float eyeView[4]{};
+                    for (int col = 0; col < 4; ++col)
+                        for (int row = 0; row < 4; ++row)
+                            eyeView[col] += restoredView[row] *
+                                state.eyeInverse[eye].m[row][col];
+
+                    float clipEye[4]{};
+                    for (int col = 0; col < 4; ++col)
+                        for (int row = 0; row < 4; ++row)
+                            clipEye[col] += eyeView[row] *
+                                state.eyeProjection[eye].m[row][col];
+
+                    if (!std::isfinite(clipEye[0]) ||
+                        !std::isfinite(clipEye[1]) ||
+                        !std::isfinite(clipEye[3]) ||
+                        clipEye[3] <= 1.0e-6f)
+                        return false;
+
+                    const float invW = 1.0f / clipEye[3];
+                    const float eyeNdcX = clipEye[0] * invW;
+                    const float eyeNdcY = clipEye[1] * invW;
+                    if (!std::isfinite(eyeNdcX) ||
+                        !std::isfinite(eyeNdcY))
+                        return false;
+
+                    dst[0] =
+                        x0 + (eyeNdcX + 1.0f) * 0.5f * width;
+                    dst[1] =
+                        y0 + (1.0f - eyeNdcY) * 0.5f * height;
+                    // Keep the game's screen-Z/RHW/color/UV untouched. The
+                    // rank marker is an overlay at a world-derived anchor; only
+                    // its per-eye screen position needs to change.
+                }
+                if (selectedVertices == 0)
+                    return false;
+                usedFullReprojection = true;
+                return true;
+            }
 
             if (state.worldEffect && state.fullWorldReprojection &&
                 allowFullReprojection)
