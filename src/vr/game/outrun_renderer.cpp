@@ -53,6 +53,11 @@ namespace Settings
 	extern Setting<bool> VRCullingUnionFov;
 	extern Setting<float> VRCullingUnionMarginDegrees;
 	extern Setting<float> VRWorldScale;
+	extern Setting<bool> VRDriverSeatView;
+	extern Setting<int> VRDriverSeatNativeMode;
+	extern Setting<float> VRDriverSeatForward;
+	extern Setting<float> VRDriverSeatRight;
+	extern Setting<float> VRDriverSeatUp;
 	extern Setting<float> VRRotationScale;
 	extern Setting<int> VRMatrixOrder;
 	extern Setting<bool> VRTelemetry;
@@ -801,6 +806,43 @@ namespace OutRunVRRenderer
 			return CurrentPresentationMode() == PresentationGameplay;
 		}
 
+		bool DriverSeatViewActive()
+		{
+			if (!Settings::VRDriverSeatView || !GameRendererIsActive())
+				return false;
+			EvWorkCamera* cam = Game::camera();
+			return cam && cam->cam_mode_timer_364 == 0.0f &&
+				static_cast<int>(cam->cam_mode_34A) == Settings::VRDriverSeatNativeMode.get();
+		}
+
+		D3DMATRIX ApplyDriverSeatBaseView(const D3DMATRIX& view)
+		{
+			if (!DriverSeatViewActive())
+				return view;
+
+			D3DMATRIX cameraWorld = InverseRigid(view);
+			const Vec3 right{ cameraWorld._11, cameraWorld._12, cameraWorld._13 };
+			const Vec3 up{ cameraWorld._21, cameraWorld._22, cameraWorld._23 };
+			const Vec3 forward{ -cameraWorld._31, -cameraWorld._32, -cameraWorld._33 };
+			const float rightOffset = Settings::VRDriverSeatRight.get();
+			const float upOffset = Settings::VRDriverSeatUp.get();
+			const float forwardOffset = Settings::VRDriverSeatForward.get();
+
+			cameraWorld._41 += right.x * rightOffset + up.x * upOffset + forward.x * forwardOffset;
+			cameraWorld._42 += right.y * rightOffset + up.y * upOffset + forward.y * forwardOffset;
+			cameraWorld._43 += right.z * rightOffset + up.z * upOffset + forward.z * forwardOffset;
+
+			static bool firstLogged = false;
+			if (!firstLogged)
+			{
+				firstLogged = true;
+				spdlog::info(
+					"VR DRIVER SEAT TEST: nativeMode={} forward={:.2f} right={:.2f} up={:.2f}; bumper timing/smoothing retained",
+					Settings::VRDriverSeatNativeMode.get(), forwardOffset, rightOffset, upOffset);
+			}
+			return InverseRigid(cameraWorld);
+		}
+
 
         bool CadenceHostHeaderValid(const OutRunVR::CadenceV1::HostState& state) noexcept
         {
@@ -1153,6 +1195,7 @@ namespace OutRunVRRenderer
 			std::memcpy(&baseView, RendererView, sizeof(baseView));
 			if (!MatrixFinite(baseView))
 				return;
+			baseView = ApplyDriverSeatBaseView(baseView);
 
 			const D3DMATRIX correctedView = MultiplyMatrix(baseView, LatchedHeadInverse);
 			if (!MatrixFinite(correctedView))
@@ -1424,16 +1467,20 @@ namespace OutRunVRRenderer
 			}
 
 			D3DMATRIX correctedWvp{};
+			const D3DMATRIX baseView = ApplyDriverSeatBaseView(view);
+			// WorldView = World * View. Recover World from the unmodified native
+			// view, then rebuild it with the bumper-synchronized driver-seat base.
+			const D3DMATRIX world = MultiplyMatrix(worldView, InverseRigid(view));
+			const D3DMATRIX driverWorldView = MultiplyMatrix(world, baseView);
 			if (Settings::VRMatrixOrder == 0)
 			{
-				correctedWvp = MultiplyMatrix(MultiplyMatrix(worldView, LatchedHeadInverse), projection);
+				correctedWvp = MultiplyMatrix(
+					MultiplyMatrix(driverWorldView, LatchedHeadInverse), projection);
 			}
 			else
 			{
-				// WorldView = World * View -> World = WorldView * inverse(View).
-				const D3DMATRIX world = MultiplyMatrix(worldView, InverseRigid(view));
 				correctedWvp = MultiplyMatrix(
-					MultiplyMatrix(MultiplyMatrix(world, LatchedHeadInverse), view), projection);
+					MultiplyMatrix(MultiplyMatrix(world, LatchedHeadInverse), baseView), projection);
 			}
 			if (!MatrixFinite(correctedWvp))
 				return false;
