@@ -21,9 +21,6 @@ COPY entrypoint.direct.sh /opt/outrun/entrypoint.sh
 COPY bootstrap_review.override.md /opt/outrun/prompts/bootstrap_review.md
 COPY continue_review.override.md /opt/outrun/prompts/continue_review.md
 COPY watchdog_resume.override.md /opt/outrun/prompts/watchdog_resume.md
-COPY bootstrap_fix.override.md /opt/outrun/prompts/bootstrap_fix.md
-COPY continue_fix.override.md /opt/outrun/prompts/continue_fix.md
-COPY watchdog_fix.override.md /opt/outrun/prompts/watchdog_fix.md
 
 RUN chmod +x /opt/outrun/entrypoint.sh
 
