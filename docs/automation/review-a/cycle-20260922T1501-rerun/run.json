@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "cycle_id": "cycle-20260922T1501-rerun",
+  "role": "A",
+  "status": "COMPLETE_PENDING_FINAL_REVERIFY",
+  "target_sha": "c4dd697e2b1f33d3b8af6ab254f378a1cc421248",
+  "integration_identity_verified": "identical",
+  "review_units_completed": 150,
+  "fresh_units": 150,
+  "carried_forward_units": 0,
+  "evidence_bearing_ledger_rows": 150,
+  "diversity": {
+    "outside_latest_delta": 150,
+    "cross_subsystem_upstream_downstream_traces": 50,
+    "adversarial_falsification_attempts": 50,
+    "distinct_functions_code_paths": 50,
+    "existing_finding_revalidation": 15,
+    "upstream_reference_units": 0
+  },
+  "checkpoints": [
+    "CP10",
+    "CP20",
+    "CP30",
+    "CP40",
+    "CP50",
+    "CP60",
+    "CP70",
+    "CP80",
+    "CP90",
+    "CP100",
+    "CP110",
+    "CP120",
+    "CP130",
+    "CP140",
+    "CP150"
+  ],
+  "regression_case_keys": [
+    "VR-STARTUP-WHITE-001"
+  ],
+  "findings_changed": [
+    {
+      "key": "VR-STARTUP-WHITE-001",
+      "disposition": "EVIDENCE_AUGMENT",
+      "note": "CreateDevice/Reset/Present/eligibility protection structurally revalidated; runtime closure remains NEED_HMD_TEST."
+    }
+  ],
+  "architecture_observations": [
+    "Default CMake enables OUTRUN_VR_SAFE_DRAW_COMPARE; active default stereo draw chain is R26/R23/R22/R13/R9 with renderer R23.",
+    "R29-R34 stereo overlays and renderer R29 are comparison/inactive under the default SafeDraw owner and must not be treated as the active production draw path.",
+    "Startup-white protection remains structurally present: private stereo resources initialize only after successful real game Present."
+  ],
+  "blockers": [
+    "CP30/CP40 prefix revalidation-count accounting correction pending due transient GitHub safety block; core ledger rows and CP review_units counts unaffected."
+  ],
+  "nextAction": "Correct CP30/CP40 prefix accounting, then re-read ledger+all CP10..CP150+run record. Future healthy A invocations require >=75 fresh distinct units even on unchanged HEAD, carry-forward <=75."
+}
