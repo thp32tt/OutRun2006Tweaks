@@ -120,8 +120,8 @@ def main() -> int:
             "MakeKey(kind, callRva, arg0, arg1, mode, stage)")
 
     require("src/vr/hud_semantics.hpp",
-            ""HUD_CTRL_ICON"",
-            ""HUD_TEMP_HEART"",
+            '"HUD_CTRL_ICON"',
+            '"HUD_TEMP_HEART"',
             "0x060D40",
             "0x0BBA89")
 
