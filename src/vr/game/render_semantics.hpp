@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 
@@ -111,6 +112,12 @@ namespace OutRunVR::GameSemantic
     {
         const void* node = nullptr;
         RenderScope scope = RenderScope::None;
+        // R52: Calc3D2D still owns the real camera/view-space depth before
+        // rival-rank sprites are flattened into screen XY. Preserve that Z on
+        // the exact node so R30 can reconstruct a constant-depth billboard for
+        // each eye instead of treating the marker like HUD.
+        float worldBillboardViewZ = 0.0f;
+        bool hasWorldBillboardViewZ = false;
     };
 
     inline constexpr std::size_t SpriteNodeSemanticCapacity = 0x230;
@@ -119,6 +126,8 @@ namespace OutRunVR::GameSemantic
     inline thread_local std::size_t SpriteNodeSemanticCount = 0;
     inline thread_local RenderScope SpriteQueuePreviousScope = RenderScope::None;
     inline thread_local unsigned SpriteQueueDepth = 0;
+    inline thread_local float CurrentWorldBillboardViewZ = 0.0f;
+    inline thread_local bool CurrentWorldBillboardViewZValid = false;
 
     inline void RegisterSpriteNodeScope(
         const void* node, RenderScope scope) noexcept
@@ -138,6 +147,42 @@ namespace OutRunVR::GameSemantic
             SpriteNodeSemanticTags[SpriteNodeSemanticCount++] =
                 { node, scope };
         }
+    }
+
+    inline void RegisterSpriteNodeWorldBillboard(
+        const void* node, float viewZ) noexcept
+    {
+        if (!node || !std::isfinite(viewZ) ||
+            std::fabs(viewZ) <= 1.0e-4f ||
+            std::fabs(viewZ) >= 1000000.0f)
+        {
+            RegisterSpriteNodeScope(node, RenderScope::WorldBillboard);
+            return;
+        }
+
+        for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
+        {
+            if (SpriteNodeSemanticTags[i].node != node)
+                continue;
+            SpriteNodeSemanticTags[i].scope = RenderScope::WorldBillboard;
+            SpriteNodeSemanticTags[i].worldBillboardViewZ = viewZ;
+            SpriteNodeSemanticTags[i].hasWorldBillboardViewZ = true;
+            return;
+        }
+        if (SpriteNodeSemanticCount < SpriteNodeSemanticTags.size())
+        {
+            SpriteNodeSemanticTags[SpriteNodeSemanticCount++] =
+                { node, RenderScope::WorldBillboard, viewZ, true };
+        }
+    }
+
+    inline bool TryGetCurrentWorldBillboardViewZ(float& outViewZ) noexcept
+    {
+        if (!CurrentWorldBillboardViewZValid ||
+            !std::isfinite(CurrentWorldBillboardViewZ))
+            return false;
+        outViewZ = CurrentWorldBillboardViewZ;
+        return true;
     }
 
     inline RenderScope ConsumeSpriteNodeScope(
@@ -187,8 +232,29 @@ namespace OutRunVR::GameSemantic
             SpriteQueueDepth = 1;
             SpriteQueuePreviousScope = CurrentScope;
         }
-        CurrentScope = ConsumeSpriteNodeScope(
-            node, RenderScope::ScreenOverlay2D);
+        CurrentWorldBillboardViewZ = 0.0f;
+        CurrentWorldBillboardViewZValid = false;
+        if (node)
+        {
+            for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
+            {
+                if (SpriteNodeSemanticTags[i].node != node)
+                    continue;
+                const auto tag = SpriteNodeSemanticTags[i];
+                SpriteNodeSemanticTags[i] =
+                    SpriteNodeSemanticTags[--SpriteNodeSemanticCount];
+                SpriteNodeSemanticTags[SpriteNodeSemanticCount] = {};
+                CurrentScope = tag.scope;
+                if (tag.scope == RenderScope::WorldBillboard &&
+                    tag.hasWorldBillboardViewZ)
+                {
+                    CurrentWorldBillboardViewZ = tag.worldBillboardViewZ;
+                    CurrentWorldBillboardViewZValid = true;
+                }
+                return;
+            }
+        }
+        CurrentScope = RenderScope::ScreenOverlay2D;
     }
 
     inline void EndSpriteQueueRender() noexcept
@@ -200,6 +266,8 @@ namespace OutRunVR::GameSemantic
             CurrentScope = SpriteQueuePreviousScope;
             SpriteQueuePreviousScope = RenderScope::None;
             SpriteNodeSemanticCount = 0;
+            CurrentWorldBillboardViewZ = 0.0f;
+            CurrentWorldBillboardViewZValid = false;
         }
     }
 }
