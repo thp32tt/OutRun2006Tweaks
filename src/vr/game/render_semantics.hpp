@@ -127,7 +127,7 @@ namespace OutRunVR::GameSemantic
     }
 
     inline RenderScope ConsumeSpriteNodeScope(
-        const void* node, RenderScope fallback = RenderScope::ScreenHud) noexcept
+        const void* node, RenderScope fallback = RenderScope::None) noexcept
     {
         if (node)
         {
@@ -150,7 +150,11 @@ namespace OutRunVR::GameSemantic
         if (SpriteQueueDepth++ == 0)
         {
             SpriteQueuePreviousScope = CurrentScope;
-            CurrentScope = RenderScope::ScreenHud;
+            // Queue membership alone is not HUD evidence. Runtime ea7c322d
+            // proved blanket queue->SCREEN_HUD promotion can world-lock tens of
+            // thousands of XYZRHW draws while the independent HUD inspector
+            // resolves zero verified HUD semantics. Untagged nodes fail closed.
+            CurrentScope = RenderScope::None;
         }
     }
 
@@ -167,7 +171,7 @@ namespace OutRunVR::GameSemantic
             SpriteQueueDepth = 1;
             SpriteQueuePreviousScope = CurrentScope;
         }
-        CurrentScope = ConsumeSpriteNodeScope(node);
+        CurrentScope = ConsumeSpriteNodeScope(node, RenderScope::None);
     }
 
     inline void EndSpriteQueueRender() noexcept
