@@ -17,6 +17,9 @@ namespace OutRunVR::GameSemantic
         WorldParticle,
         WorldBillboard,
         ReflectionCube,
+        // Generic canonical 2D queue content. It needs only per-eye
+        // asymmetric-FOV alignment, never head/IPD/world-plane placement.
+        ScreenOverlay2D,
         ScreenHud,
     };
 
@@ -32,6 +35,7 @@ namespace OutRunVR::GameSemantic
         case RenderScope::WorldParticle: return "WORLD_PARTICLE";
         case RenderScope::WorldBillboard: return "WORLD_BILLBOARD";
         case RenderScope::ReflectionCube: return "REFLECTION_CUBE";
+        case RenderScope::ScreenOverlay2D: return "SCREEN_OVERLAY_2D";
         case RenderScope::ScreenHud: return "SCREEN_HUD";
         default: return "NONE";
         }
@@ -72,7 +76,8 @@ namespace OutRunVR::GameSemantic
 
     inline bool ForceZeroDisparity(RenderScope scope) noexcept
     {
-        return scope == RenderScope::SkyGlow;
+        return scope == RenderScope::SkyGlow ||
+            scope == RenderScope::ScreenOverlay2D;
     }
 
     inline bool CorroboratesWorld(RenderScope scope) noexcept
@@ -81,8 +86,15 @@ namespace OutRunVR::GameSemantic
             scope == RenderScope::WorldBillboard;
     }
 
+    inline bool CorroboratesScreenOverlay2D(RenderScope scope) noexcept
+    {
+        return scope == RenderScope::ScreenOverlay2D;
+    }
+
     inline bool CorroboratesHud(RenderScope scope) noexcept
     {
+        // ScreenOverlay2D is intentionally NOT a finite/world-locked HUD.
+        // Only exact producer evidence may enter ScreenHud.
         return scope == RenderScope::ScreenHud;
     }
 
@@ -91,9 +103,10 @@ namespace OutRunVR::GameSemantic
     //   0x42D762 begins one node, and
     //   0x42DCB4 is the common epilogue.
     // The queue provides a stable per-node execution boundary, but queue
-    // membership alone is NOT semantic HUD evidence. Only explicitly tagged
-    // nodes may become ScreenHud/WorldBillboard; every untagged node fails
-    // closed to None and stays on the proven lower renderer path.
+    // membership alone is NOT semantic finite-HUD evidence. Untagged nodes are
+    // generic ScreenOverlay2D: correct only the OpenXR asymmetric-FOV mapping,
+    // without head inverse, eye translation, depth reset, or world-plane
+    // placement. Exact producer evidence may still tag ScreenHud/WorldBillboard.
     struct SpriteNodeSemanticTag
     {
         const void* node = nullptr;
@@ -128,7 +141,8 @@ namespace OutRunVR::GameSemantic
     }
 
     inline RenderScope ConsumeSpriteNodeScope(
-        const void* node, RenderScope fallback = RenderScope::None) noexcept
+        const void* node,
+        RenderScope fallback = RenderScope::ScreenOverlay2D) noexcept
     {
         if (node)
         {
@@ -151,11 +165,12 @@ namespace OutRunVR::GameSemantic
         if (SpriteQueueDepth++ == 0)
         {
             SpriteQueuePreviousScope = CurrentScope;
-            // Queue membership alone is not HUD evidence. Runtime ea7c322d
-            // proved blanket queue->SCREEN_HUD promotion can world-lock tens of
-            // thousands of XYZRHW draws while the independent HUD inspector
-            // resolves zero verified HUD semantics. Untagged nodes fail closed.
-            CurrentScope = RenderScope::None;
+            // Runtime ea7c322d proved queue->SCREEN_HUD is too strong, while
+            // runtime 9554272a proved queue->NONE leaves 2D content duplicated
+            // at identical D3D screen coordinates, which does not converge under
+            // asymmetric OpenXR eye FOV. Generic queue content therefore owns
+            // only the per-eye FOV affine, not the finite world-locked HUD plane.
+            CurrentScope = RenderScope::ScreenOverlay2D;
         }
     }
 
@@ -172,7 +187,8 @@ namespace OutRunVR::GameSemantic
             SpriteQueueDepth = 1;
             SpriteQueuePreviousScope = CurrentScope;
         }
-        CurrentScope = ConsumeSpriteNodeScope(node, RenderScope::None);
+        CurrentScope = ConsumeSpriteNodeScope(
+            node, RenderScope::ScreenOverlay2D);
     }
 
     inline void EndSpriteQueueRender() noexcept
