@@ -7,7 +7,14 @@ This repository-side protocol matches the four Work scheduled roles. The schedul
 - Integration/production branch: `vr-d3d9ex-focus`.
 - Stable `master`, `vr-openxr`, and `wheel-ffb` are never autonomous write targets.
 - Reference renderer: native Win32 D3D9/D3D9Ex game + x64 D3D11 OpenXR host.
-- DXVK, multiview and DX12/D3D9On12 remain paused until the DX9Ex reference milestone is user-accepted or explicit backend-specific evidence requires work.
+- The user accepted the R51 basic 3D/world-stereo result as the protected reference on 2026-09-23. DXVK, multiview and DX12/D3D9On12 development/build/smoke work may now proceed in isolated candidates in parallel with HUD and performance work. They must preserve the R51 semantic/frame contract and cannot replace the DX9Ex runtime baseline without Quest3/VDXR parity evidence.
+
+## Parallel workstreams after R51 acceptance
+
+- **HUD correctness (P0):** white/fixed-function overlays, `6th/6`, YES/NO and vehicle rank markers. Keep the verified R51 world owner unchanged; carry explicit world anchors for world billboards.
+- **DXVK + DX12/D3D9On12 (P1):** architecture/build/smoke/diagnostics may proceed now, but each backend stays isolated from the protected runtime baseline until parity is demonstrated.
+- **Performance (P1):** instrument game producer waits, host copy/fence waits, draw amplification, capture/copy/render and OpenXR submission timing. Optimize only after correctness assertions exist.
+- **Integration:** keep unrelated risky lanes in separate candidate branches. D may merge independently validated low-risk infrastructure, but runtime-visible backend promotion always remains an HMD gate.
 
 ## Four-role ownership
 

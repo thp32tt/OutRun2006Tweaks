@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-22T03:25:00+09:00",
+  "updatedKst": "2026-09-23T08:30:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -11,13 +11,21 @@
     "queueWriter": "D_INTEGRATION_PLANNER",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
-    "primaryBackend": "DX9Ex",
+    "primaryBackend": "DX9Ex protected reference; DXVK and DX12/D3D9On12 are parallel development backends",
     "regressionKnowledge": {
       "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
       "ledgerIssue": 13,
       "loadAtC0Recover": true,
       "gateIntegrationOnTriggeredCases": true,
       "recurrenceAction": "REOPEN_EXISTING_STABLE_KEY"
+    },
+    "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+    "parallelBackendDevelopment": true,
+    "backendReplacementGate": "Quest3/VDXR parity with protected R51 world stereo and frame stability",
+    "parallelTracks": {
+      "HUD": "B evidence -> C isolated candidate -> D integrate",
+      "DXVK_DX12": "A architecture/parity review -> C isolated backend candidate -> D integrate only build/static-safe changes; runtime promotion needs HMD parity",
+      "PERFORMANCE": "B/C telemetry and deterministic verifier -> C bounded optimization -> D regression gate"
     }
   },
   "candidateWip": {
@@ -25,6 +33,30 @@
     "candidateBranches": []
   },
   "items": [
+    {
+      "id": "DX9EX-FINGERPRINT-001",
+      "priority": 11,
+      "status": "READY",
+      "preferredRole": "B_RENDER_REVIEW",
+      "summary": "Establish bounded exact draw fingerprints for unresolved HUD/white-overlay/effect classes without broad WVP ownership.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false
+    },
+    {
+      "id": "L1-VIS-001",
+      "priority": 11,
+      "status": "READY",
+      "preferredRole": "B_RENDER_REVIEW",
+      "summary": "World/HUD/effect stereo correctness: white rank-score, 6th/6, menu and YES/NO. Produce exact evidence before behavior change.",
+      "testLevel": "LEVEL1",
+      "dependencies": [
+        "DX9EX-FINGERPRINT-001"
+      ],
+      "attempts": 0,
+      "runtimeCandidate": true
+    },
     {
       "id": "VR-BINARY-CONTRACT-001",
       "priority": 10,
@@ -98,17 +130,6 @@
       ]
     },
     {
-      "id": "DX9EX-FINGERPRINT-001",
-      "priority": 10,
-      "status": "READY",
-      "preferredRole": "B_RENDER_REVIEW",
-      "summary": "Establish bounded exact draw fingerprints for unresolved HUD/white-overlay/effect classes without broad WVP ownership.",
-      "testLevel": "LEVEL0",
-      "dependencies": [],
-      "attempts": 0,
-      "runtimeCandidate": false
-    },
-    {
       "id": "DX9EX-SKYGLOW-001",
       "priority": 9,
       "status": "READY",
@@ -148,17 +169,40 @@
       "runtimeCandidate": false
     },
     {
-      "id": "L1-VIS-001",
+      "id": "DXVK-REACTIVATE-001",
       "priority": 9,
       "status": "READY",
-      "preferredRole": "B_RENDER_REVIEW",
-      "summary": "World/HUD/effect stereo correctness: white rank-score, 6th/6, menu and YES/NO. Produce exact evidence before behavior change.",
-      "testLevel": "LEVEL1",
-      "dependencies": [
-        "DX9EX-FINGERPRINT-001"
-      ],
+      "preferredRole": "C_IMPLEMENT_CANDIDATE",
+      "summary": "Re-enable the isolated x86 DXVK path and turn the existing PoC into a repeatable build/smoke/backend-identity path while preserving the R51 semantic/frame contract.",
+      "testLevel": "LEVEL2",
+      "dependencies": [],
       "attempts": 0,
-      "runtimeCandidate": true
+      "runtimeCandidate": false,
+      "expectedFix": "Backend selector/log manifest must identify DXVK explicitly; verify D3D9 initialization/reset and transport behavior without modifying the protected DX9Ex world renderer."
+    },
+    {
+      "id": "DX12-D3D9ON12-REACTIVATE-001",
+      "priority": 9,
+      "status": "READY",
+      "preferredRole": "C_IMPLEMENT_CANDIDATE",
+      "summary": "Resume DX12/D3D9On12 from the known Direct3DCreate9On12Ex/CreateDevice 0x8876086C boundary; isolate device parameters and translated MANAGED/LockRect compatibility before any renderer promotion.",
+      "testLevel": "LEVEL2",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "expectedFix": "First obtain deterministic device-creation/resource-compatibility diagnostics and a no-HMD smoke build; do not change R51 world/HUD ownership to make DX12 pass."
+    },
+    {
+      "id": "VR-PERF-COMMON-001",
+      "priority": 9,
+      "status": "READY",
+      "preferredRole": "C_IMPLEMENT_CANDIDATE",
+      "summary": "Create a common frame-budget telemetry and optimization lane covering game-thread producer fence wait, host copy/fence wait, draw amplification, capture/commit copy, render and xrEndFrame timing across backends.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "expectedFix": "Instrumentation first with bounded counters/QPC windows; only then remove redundant waits/copies or reduce draw work where deterministic correctness gates prove equivalence."
     },
     {
       "id": "L1-VIS-002",
@@ -185,6 +229,17 @@
       "expectedFix": "First add bounded wait-count/QPC telemetry or deterministic policy verifier; do not remove producer safety fence without evidence."
     },
     {
+      "id": "L2-PERF-001",
+      "priority": 8,
+      "status": "READY",
+      "preferredRole": "C_PERF_REVIEW",
+      "summary": "Cross-backend frame-pacing optimization: quantify R29+ draw amplification, producer/consumer waits, copies and XR pacing without waiting for all visual cleanup. Correctness invariants remain hard gates.",
+      "testLevel": "LEVEL2",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": true
+    },
+    {
       "id": "L1-RECENTER-001",
       "priority": 7,
       "status": "READY",
@@ -192,20 +247,6 @@
       "summary": "Gameplay/menu recenter application-space behavior and visual transition correctness.",
       "testLevel": "LEVEL1",
       "dependencies": [],
-      "attempts": 0,
-      "runtimeCandidate": true
-    },
-    {
-      "id": "L2-PERF-001",
-      "priority": 6,
-      "status": "READY",
-      "preferredRole": "C_PERF_REVIEW",
-      "summary": "R29+ fast stereo draw amplification and frame-pacing optimization behind correctness gates.",
-      "testLevel": "LEVEL2",
-      "dependencies": [
-        "L1-VIS-001",
-        "L1-VIS-002"
-      ],
       "attempts": 0,
       "runtimeCandidate": true
     },
@@ -223,15 +264,14 @@
     {
       "id": "L4-RELEASE-001",
       "priority": 1,
-      "status": "BLOCKED",
+      "status": "BLOCKED_ON_PARITY_NOT_DEVELOPMENT",
       "preferredRole": "D_INTEGRATION_PLANNER",
-      "summary": "DXVK/multiview/DX12 release matrix remains paused until DX9Ex reference is user accepted.",
+      "summary": "DXVK/multiview/DX12 implementation/build/smoke is re-enabled. Release/promotion matrix remains gated until backend parity with protected R51 is demonstrated.",
       "testLevel": "LEVEL4",
       "dependencies": [
-        "L1-VIS-001",
-        "L1-VIS-002",
-        "L2-PERF-001",
-        "L3-DX9EX-001"
+        "DXVK-REACTIVATE-001",
+        "DX12-D3D9ON12-REACTIVATE-001",
+        "VR-PERF-COMMON-001"
       ],
       "attempts": 0,
       "runtimeCandidate": false

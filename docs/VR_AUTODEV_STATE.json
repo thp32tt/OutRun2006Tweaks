@@ -1,19 +1,15 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-22T17:16:53Z",
+  "updatedUtc": "2026-09-22T23:30:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
-  "phase": "DX9Ex-reference-first / runtime-test-minimized",
+  "phase": "R51-baseline-protected / HUD-backend-perf-parallel",
   "checkpoint": "C6_STATE",
   "policy": {
     "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host",
-    "blockedBackends": [
-      "DXVK",
-      "DXVK multiview",
-      "DX12/D3D9On12"
-    ],
-    "blockedBackendAction": "Do not develop, compile, smoke-build or package until DX9Ex reference milestone is user-accepted.",
+    "blockedBackends": [],
+    "blockedBackendAction": "DXVK and DX12/D3D9On12 development, compile and smoke validation are re-enabled in isolated candidates after user acceptance of the R51 basic 3D reference. They may not replace the protected DX9Ex runtime baseline until backend-parity evidence is recorded.",
     "genericBuildDisabled": true,
     "dedicatedWorkflow": ".github/workflows/vr-dx9ex-active.yml",
     "runtimeTesting": "Quest 3/VDXR hardware testing is a scarce validation gate; default to one evening CORRECTNESS run.",
@@ -67,6 +63,24 @@
       "diagnosticExceptionLabel": "DIAGNOSTIC / NOT BASELINE-SAFE / NEED_HMD_TEST",
       "productionLedgerIssue": 14,
       "runtimeRegressionLedgerIssue": 13
+    },
+    "parallelBackendDevelopment": {
+      "enabled": true,
+      "userAcceptedAtKst": "2026-09-23T08:30:00+09:00",
+      "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+      "protectedInvariants": [
+        "road/background/vehicle true stereo",
+        "R28 verified world-epoch continuation",
+        "frame stability at least R51 level",
+        "world ownership must not be broadened into HUD ownership"
+      ],
+      "tracks": [
+        "HUD/semantic ownership and world-anchored rank markers",
+        "DXVK compatibility/transport",
+        "DX12/D3D9On12 compatibility/transport",
+        "shared performance/frame-pacing optimization"
+      ],
+      "backendPromotionGate": "Quest3/VDXR parity evidence against the protected R51 baseline"
     }
   },
   "runtimeEvidence": {
@@ -89,7 +103,7 @@
     "Recovery runtime forcing 60 FPS with interpolation/cadence disabled contributes independent judder on a 90 Hz OpenXR session.",
     "Restore fast R29 world rendering and classification in bounded variants before deciding which later R30-R34 overlays are required."
   ],
-  "nextAction": "Recover vr-d3d9ex-working-baseline@17ad376bfdf7939f0851c0c629e4fa094a84f28a as the user-tested R51 continuation baseline. Preserve correct road/background/vehicle 3D stereo and improved frame stability. Next fixes are restricted to white HUD diplopia/head-lock/resize and vehicle rank marker world anchoring; do not regress world ownership.",
+  "nextAction": "Run four parallel lanes without modifying the protected R51 world owner: (1) HUD/white-overlay/fixed-function ownership and vehicle-rank world anchors, (2) DXVK build/smoke compatibility, (3) DX12/D3D9On12 CreateDevice/translated-resource compatibility, and (4) instrumentation-first frame-pacing/draw/wait/copy optimization. Integrate only bounded candidates that preserve VR-R51-WORLD-STEREO-PRESERVE-001 and VR-R51-FRAME-STABILITY-PRESERVE-001.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
@@ -208,8 +222,8 @@
     "level4": [
       {
         "id": "L4-RELEASE-001",
-        "status": "deferred",
-        "item": "DXVK/multiview/DX12 release matrix after DX9Ex reference is accepted."
+        "status": "development-reenabled-release-gated",
+        "item": "DXVK/multiview/DX12 development/build/smoke may proceed in parallel; release/promotion remains gated on Quest3/VDXR parity with R51."
       }
     ]
   },
@@ -266,11 +280,11 @@
     "runtimeEvidence": "USER_RUNTIME_REQUIRED: capture trigger/usability and headset performance impact have not yet been validated on Quest 3/VDXR."
   },
   "scheduledAutomationModel": {
-    "A_00": "Hourly :00 architecture/state/lifetime/OpenXR-lifecycle/synchronization deep review. Review-only; baseline-regression risk detection.",
+    "A_00": "Hourly :00 architecture/state/lifetime/OpenXR/synchronization deep review, with DXVK/DX12 backend architecture and parity-boundary review now active.",
     "N100_10": "Hourly :10 auxiliary fresh-chat deep review. Review-only; publishes delta findings/checkpoints to Issue #6 and follows durable baseline policy.",
-    "B_20": "Hourly :20 rendering/stereo/visual/performance/frame-pacing deep review. Review-only; baseline-regression risk detection.",
-    "C_35": "Hourly :35 IMPLEMENT + isolated candidate + deterministic verification/CI + self-recovery. Must emit BASELINE_DELTA; never writes integration branch.",
-    "D_45": "Hourly :45 independent exact-SHA review + baseline/regression release gate + CI validation + sole integration/final package.",
+    "B_20": "Hourly :20 rendering/stereo/visual/performance/frame-pacing deep review, prioritizing HUD/white-overlay/rank-marker correctness while protecting the R51 world owner.",
+    "C_35": "Hourly :35 isolated candidate implementation/repair across ready HUD, backend and performance lanes. Keep risky lanes in separate candidate branches and emit BASELINE_DELTA.",
+    "D_45": "Hourly :45 independent exact-SHA review + R51 baseline/regression gate + CI validation + sole integration/final package. Backend promotion additionally requires Quest3/VDXR parity evidence.",
     "specialD": {
       "01:45": "nightly consolidation and architecture/regression/cache integrity review",
       "06:45": "overnight summary and daytime backlog reorder",
@@ -458,5 +472,33 @@
       "When composing with vr-d3d9ex-focus, retain newer governance/regression-policy commits rather than force-moving or discarding them.",
       "Do not silently fall back to R50 or an older renderer lineage."
     ]
+  },
+  "parallelWorkstreams": {
+    "hud": {
+      "ownerLens": "B_RENDER_STEREO_VISUAL_PERF_FRAMEPACING_REVIEW",
+      "implementer": "C candidate",
+      "priority": "P0",
+      "guard": "Do not alter R51 world ownership while fixing fixed-function white HUD and rank-marker anchors."
+    },
+    "backends": {
+      "ownerLens": "A_ARCH_STATE_LIFETIME_OPENXR_SYNC_REVIEW",
+      "implementer": "C candidate",
+      "priority": "P1",
+      "scope": [
+        "DXVK",
+        "DX12/D3D9On12"
+      ],
+      "guard": "Isolated backend candidates only until parity gate passes."
+    },
+    "performance": {
+      "ownerLens": "B/C",
+      "implementer": "C candidate",
+      "priority": "P1",
+      "guard": "Telemetry first; optimize waits/copies/draw amplification only after correctness invariants are asserted."
+    },
+    "integration": {
+      "owner": "D",
+      "rule": "Independent exact-SHA review, affected CI/regression validation, then integration; never combine unrelated risky lanes into one runtime candidate."
+    }
   }
 }
