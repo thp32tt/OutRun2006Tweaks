@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-22T17:13:00Z",
+  "updatedUtc": "2026-09-22T17:16:53Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -89,7 +89,7 @@
     "Recovery runtime forcing 60 FPS with interpolation/cadence disabled contributes independent judder on a 90 Hz OpenXR session.",
     "Restore fast R29 world rendering and classification in bounded variants before deciding which later R30-R34 overlays are required."
   ],
-  "nextAction": "Continue from R50 working baseline 750453f2. Fix only the open HUD/marker defects: exact white HUD/text stereo+world-lock+scale semantics and vehicle-rank WORLD_BILLBOARD anchoring. Hard gate: preserve user-verified correct road/background/vehicle 3D stereo, playable startup, and improved frame stability; never widen generic SpriteNode ownership back into world draws.",
+  "nextAction": "Recover vr-d3d9ex-working-baseline@17ad376bfdf7939f0851c0c629e4fa094a84f28a as the user-tested R51 continuation baseline. Preserve correct road/background/vehicle 3D stereo and improved frame stability. Next fixes are restricted to white HUD diplopia/head-lock/resize and vehicle rank marker world anchoring; do not regress world ownership.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
@@ -429,31 +429,34 @@
   },
   "workingBaseline": {
     "status": "USER_RUNTIME_PARTIAL_VERIFIED_LOCKED",
-    "establishedAtKst": "2026-09-23T02:11:00+09:00",
-    "sourceSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
+    "establishedAtKst": "2026-09-23T02:16:53+09:00",
+    "sourceSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
     "branch": "vr-d3d9ex-working-baseline",
-    "originCandidateBranch": "vr-d3d9ex-candidate/VR-R50-QUEUE-FOV2D-9554272a",
+    "originCandidateBranch": "vr-d3d9ex-candidate/VR-R51-WORLD-HUD-OWNERSHIP-750453f2",
     "profile": "CORRECTNESS",
-    "packageSha256": "30a6ed205c517b146564d94bf7fc5eaadbcc36de1154a0f2966e9ef31787e3eb",
+    "package": "OutRun2_VR_DX9EX_ACTIVE_17ad376bfdf7.zip",
+    "packageSha256": "bf9f5b7c04520f1bf018764f54c1a915e019f4a21b18bf5fab061ce29790fbe7",
+    "validationRun": 35753905582,
     "semantic": "development continuation baseline",
     "userRuntimeVerified": true,
-    "rules": [
-      "Future runtime-visible development must preserve or explicitly supersede this exact tree; do not silently fall back to an older integration renderer lineage.",
-      "When composing with vr-d3d9ex-focus, retain newer governance/regression-policy commits from the integration branch rather than force-moving or discarding them.",
-      "USER_RUNTIME_VERIFIED baseline remains separate and must not be fabricated from build-only evidence."
-    ],
-    "runtimeObservedAtKst": "2026-09-23T02:13:00+09:00",
+    "supersedesMistakenBaselineSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
     "protectedGoodBehaviors": [
-      "Road/world/background geometry renders as correct 3D stereo.",
-      "Player/traffic vehicle 3D renders correctly.",
-      "Frame pacing/stability is improved versus prior tested builds.",
-      "Game reaches playable road scene; persistent startup white-screen blocker was not present in this run."
+      "Road/world geometry renders correctly in 3D stereo.",
+      "Background renders correctly in 3D stereo.",
+      "Vehicles render correctly in 3D stereo.",
+      "Frame rate/frame pacing is more stable than earlier tested builds."
     ],
     "knownOpenRuntimeDefects": [
-      "6th/6 HUD is not resized, appears doubled, and follows head movement.",
-      "Exit YES/NO, end-of-run countdown/time-record and other white HUD/text elements appear doubled and follow head movement.",
+      "6th/6 is not resized, appears doubled, and follows head movement.",
+      "Exit YES/NO, end-of-run time/countdown/record text and other white HUD/text elements appear doubled and follow head movement.",
       "White marker above vehicles appears doubled.",
-      "Non-white 1st/2nd/3rd vehicle rank marker appears single but follows head movement and is not anchored to the vehicle; it behaves like HUD-space content."
+      "Non-white 1st/2nd/3rd vehicle rank marker appears as one image but follows head movement and is not anchored above the vehicle; it behaves like HUD-space content."
+    ],
+    "rules": [
+      "Future runtime-visible development must preserve the verified-good R51 world/background/vehicle 3D stereo and improved frame stability.",
+      "Fix only the remaining HUD/marker ownership and anchoring paths; do not broadly reclassify world geometry as HUD.",
+      "When composing with vr-d3d9ex-focus, retain newer governance/regression-policy commits rather than force-moving or discarding them.",
+      "Do not silently fall back to R50 or an older renderer lineage."
     ]
   }
 }
