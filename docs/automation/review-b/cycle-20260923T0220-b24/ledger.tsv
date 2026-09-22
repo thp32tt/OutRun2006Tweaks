@@ -1,0 +1,151 @@
+unit	fresh	category	path	evidence	verdict
+B24-001	1	baseline	regression:userRuntimeVerifiedBaseline	source=17ad376b USER_RUNTIME_PARTIAL_VERIFIED	PASS
+B24-002	1	baseline	regression:world-stereo	road/background/vehicle 3D protected	PASS
+B24-003	1	baseline	regression:frame-stability	improved pacing protected	PASS
+B24-004	1	baseline	regression:white-hud	R51 white HUD diplopia remains open	READY_FOR_C
+B24-005	1	baseline	regression:rank-anchor	R51 rank anchor remains open	READY_FOR_C
+B24-006	1	cross	baseline->current	current HEAD=539fecf differs from runtime source	BASELINE_RISK
+B24-007	1	adversarial	baseline->current	BUILD/static cannot supersede runtime baseline	PASS
+B24-008	1	path	protocol:baseline-gate	candidate BASELINE_DELTA required	PASS
+B24-009	1	regression	startup-white	USER_RUNTIME_VERIFIED_PASS baseline retained	PASS
+B24-010	1	path	settings:TargetRefreshRateHz	default remains 0	PASS
+B24-011	1	path	settings:FrameCadenceTargetHz	default remains 0	PASS
+B24-012	1	performance	settings:FrameCadenceMode	PhaseLock default unchanged	PASS
+B24-013	1	cross	settings:DirectGpuOnly	game/host transport policy retained	PASS
+B24-014	1	adversarial	settings:refresh	no fixed refresh override found	PASS
+B24-015	1	regression	settings:pacing	R51 pacing still NEED_HMD_TEST on moving HEAD	NEED_HMD_TEST
+B24-016	1	path	render_semantics:enum	current HEAD lacks ScreenOverlay2D	BASELINE_REGRESSION
+B24-017	1	path	render_semantics:enum	current HEAD lacks ScreenHud	BASELINE_REGRESSION
+B24-018	1	path	render_semantics:queue	current HEAD lacks SpriteNodeSemanticTag	BASELINE_REGRESSION
+B24-019	1	path	render_semantics:queue	current HEAD lacks queue-node semantic registry	BASELINE_REGRESSION
+B24-020	1	path	render_semantics:queue	current HEAD lacks ScreenOverlay2D fallback	BASELINE_REGRESSION
+B24-021	1	cross	render_semantics->R30	R51 queue ownership cannot exist on current header	BASELINE_REGRESSION
+B24-022	1	adversarial	render_semantics:world	WorldBillboard enum still exists	PASS
+B24-023	1	regression	render_semantics:scope	broad world->HUD protection absent from current semantic header	BASELINE_REGRESSION
+B24-024	1	path	render_semantics:ForceZeroDisparity	current only SkyGlow zero-disparity	BASELINE_RISK
+B24-025	1	path	render_semantics:CorroboratesHud	function absent on current HEAD	BASELINE_REGRESSION
+B24-026	1	path	render_semantics:CorroboratesScreenOverlay2D	function absent on current HEAD	BASELINE_REGRESSION
+B24-027	1	cross	render_semantics:queue-RVA	R51 queue boundary logic absent current HEAD	BASELINE_REGRESSION
+B24-028	1	adversarial	render_semantics:capacity	R51 0x230 node capacity absent current HEAD	BASELINE_REGRESSION
+B24-029	1	regression	VR-R51-WHITE-HUD-DIPLOPIA-001	current tree lacks required semantic vocabulary	READY_FOR_C
+B24-030	1	regression	VR-R51-VEHICLE-RANK-ANCHOR-001	WorldBillboard exists but exact queue tagging absent	READY_FOR_C
+B24-031	1	path	r26:include	current HEAD lacks render_semantics include	BASELINE_REGRESSION
+B24-032	1	path	r26:R28RunWithVerifiedWorldEpoch	current function always returns E_NOTIMPL	BASELINE_REGRESSION
+B24-033	1	cross	r26:shader-epoch	R51 verified world continuation missing	BASELINE_REGRESSION
+B24-034	1	adversarial	r26:changed-shader	current rejects all changed shader epochs	BASELINE_REGRESSION
+B24-035	1	regression	world-stereo-preserve	current path contradicts R51 proven continuation	READY_FOR_C
+B24-036	1	path	r26:R28CanRebindVerifiedWorld	strict WVP/projection proof still present	PASS
+B24-037	1	cross	r26:pose-proof	generation/pose equality retained	PASS
+B24-038	1	adversarial	r26:constant-proof	c64..c67 mismatch still fail-closed	PASS
+B24-039	1	adversarial	r26:projection-proof	projection mismatch still fail-closed	PASS
+B24-040	1	performance	r26:shader-epoch	current removed live rebind execution but regressed world coverage	BASELINE_REGRESSION
+B24-041	1	path	r26:semantic-guard	R51 ScreenOverlay2D exclusion missing	BASELINE_REGRESSION
+B24-042	1	path	r26:semantic-guard	R51 ScreenHud exclusion missing	BASELINE_REGRESSION
+B24-043	1	cross	r26:WorldBillboard	R51 allowed exact billboard through strict proof	BASELINE_REGRESSION
+B24-044	1	adversarial	r26:unknown-world	current remains fail-closed for unknown WVP	PASS
+B24-045	1	regression	world-ownership	C must preserve R51 world continuation without blanket HUD	READY_FOR_C
+B24-046	1	path	r30:HudScale	0.55 remains configured	PASS
+B24-047	1	path	r30:HudContainScale	contain mapping present current tree	PASS
+B24-048	1	cross	r30:eye-aspect	recommended eye size drives aspect when available	PASS
+B24-049	1	adversarial	r30:aspect-fallback	angular FOV fallback bounded	PASS
+B24-050	1	performance	r30:HudContainScale	constant-time per draw	PASS
+B24-051	1	path	r30:ClassifyScreenSpacePass	orthographic HUD path present	PASS
+B24-052	1	path	r30:FlatPerspectiveEffect	depth-disabled alpha classification present	PASS
+B24-053	1	cross	r30:BuildEyeAffine	common-ray asymmetric FOV mapping retained	PASS
+B24-054	1	adversarial	r30:eye-affine	invalid FOV fails closed	PASS
+B24-055	1	regression	white-hud	generic projection correction alone known insufficient	READY_FOR_C
+B24-056	1	path	r30:BuildScreenSpaceEyeConstants	Hud2D uses scale+eyeOffset	PASS
+B24-057	1	cross	r30:Hud2D	no exact ScreenHud producer ownership on current HEAD	BASELINE_REGRESSION
+B24-058	1	adversarial	r30:Hud2D	generic Hud2D cannot prove 6th/6 ownership	READY_FOR_C
+B24-059	1	regression	white-hud-scale	R51 runtime says 6th/6 resize not applied	READY_FOR_C
+B24-060	1	path	r30:TryScreenSpaceFovDraw	stable stereo/pose gate retained	PASS
+B24-061	1	cross	r30:pose-sequence	HUD correction matches established frame pose	PASS
+B24-062	1	adversarial	r30:depth-sync	right depth/stencil mismatch fails closed	PASS
+B24-063	1	path	r30:world-before-HUD	SkyGlow scene capture before HUD retained	PASS
+B24-064	1	performance	r30:screen-space	duplicates owned HUD draw exactly two eyes	PASS
+B24-065	1	regression	world-stereo	generic R30 still delegates unowned draws to R29	PASS
+B24-066	1	path	r30:scissor	R51 disables per-eye scissor remap	BASELINE_REGRESSION
+B24-067	1	adversarial	r30:scissor	current HEAD lacks R51 explicit no-remap protection	BASELINE_RISK
+B24-068	1	regression	HUD-placement	known stable common-centre scissor rule must be preserved	READY_FOR_C
+B24-069	1	cross	r30:restore	WVP/RT/depth/viewport restoration retained	PASS
+B24-070	1	adversarial	r30:restore-failure	failure arms mono safety	PASS
+B24-071	1	path	r30:XYZRHW-prepare	fixed-function XYZRHW gate retained	PASS
+B24-072	1	path	r30:RHW-depth-signature	projected-depth discriminator retained	PASS
+B24-073	1	cross	r30:RHW-world	white HUD glyphs intended to fail world relation	PASS
+B24-074	1	adversarial	r30:RHW-world	Z-disabled world requires coherent RHW/depth evidence	PASS
+B24-075	1	regression	white-marker	white vehicle marker remains separate open producer issue	READY_FOR_C
+B24-076	1	path	r30:world-reprojection	base projection inverse guarded	PASS
+B24-077	1	cross	r30:eye-relative	world particles use head-centre relative eye translation	PASS
+B24-078	1	adversarial	r30:matrix-bounds	nonfinite/extreme scale rejected	PASS
+B24-079	1	performance	r30:world-reprojection	CPU transforms selected XYZRHW vertices	PASS
+B24-080	1	regression	smoke-skid	R51 protected world ownership must not be broadened to HUD	PASS
+B24-081	1	path	r30:buffer-shadow	VB/IB CPU shadows avoid draw-time GPU Lock	PASS
+B24-082	1	performance	r30:buffer-shadow	no draw-time READONLY lock	PASS
+B24-083	1	adversarial	r30:shadow-miss	unobserved range fails open	PASS
+B24-084	1	cross	r30:discard	DISCARD invalidates old CPU range	PASS
+B24-085	1	regression	frame-stability	shadow design supports protected pacing invariant	PASS
+B24-086	1	path	r30:scratch	thread-local scratch lease prevents nested reuse	PASS
+B24-087	1	adversarial	r30:scratch-busy	nested conversion fails open	PASS
+B24-088	1	performance	r30:scratch	buffers reused across draws	PASS
+B24-089	1	cross	r30:indexed	used-mask bounds conversion work	PASS
+B24-090	1	regression	frame-stability	no new amplification evidence on baseline tree	PASS
+B24-091	1	path	r30:SkyGlow-resources	per-eye reduced/temp resources retained	PASS
+B24-092	1	path	r30:SkyGlow-factor	factor derived from Settings	PASS
+B24-093	1	regression	SkyGlowFactor	current code default=4 violates canonical VR policy=1	READY_FOR_C
+B24-094	1	regression	SkyGlowFactor-INI	checked-in INI=4 violates canonical VR policy=1	READY_FOR_C
+B24-095	1	performance	SkyGlow-factor1	factor1 avoids second full-res blur	PASS
+B24-096	1	cross	SkyGlow:pre-HUD	world eye capture excludes bright HUD bloom	PASS
+B24-097	1	adversarial	SkyGlow:stereo	requires complete duplicated world frame	PASS
+B24-098	1	path	SkyGlow:stateblock	captures and reapplies game state	PASS
+B24-099	1	path	SkyGlow:restore	RT/depth/viewport explicitly restored after Apply	PASS
+B24-100	1	regression	SkyGlow-visual	actual HMD glow quality remains NEED_HMD_TEST	NEED_HMD_TEST
+B24-101	1	path	SkyGlow:BrightPs	alpha world mask suppresses opaque UI contamination	PASS
+B24-102	1	adversarial	SkyGlow:compile	shader compile failure disables glow for frame	PASS
+B24-103	1	performance	SkyGlow:two-step	vertical blur conditional on factor>1	PASS
+B24-104	1	cross	SkyGlow:present	applied immediately before lower Present	PASS
+B24-105	1	regression	SkyGlow-policy	C must resolve CORRECTNESS config to factor1	READY_FOR_C
+B24-106	1	path	settings:VRWorldScale	1.0 retained	PASS
+B24-107	1	path	settings:VRStereoDepth	1.0 retained	PASS
+B24-108	1	cross	world-scale->R30	eye transform uses both scales	PASS
+B24-109	1	adversarial	world-scale	bounds constrain invalid user values	PASS
+B24-110	1	regression	world-stereo	R51 user evidence outranks moving-head static assumptions	PASS
+B24-111	1	path	settings:VRPositionalTracking	true retained	PASS
+B24-112	1	cross	settings:culling-sync	camera/culling settings remain enabled	PASS
+B24-113	1	adversarial	settings:near-plane	near-plane remains bounded 0.03..0.50	PASS
+B24-114	1	regression	recenter	no current evidence to supersede protected runtime cases	NEED_HMD_TEST
+B24-115	1	performance	settings:telemetry	5s R30 telemetry cadence bounded	PASS
+B24-116	1	path	r30:Present	telemetry + conditional stereo glow	PASS
+B24-117	1	path	r30:Reset	releases glow resources and capture epoch	PASS
+B24-118	1	cross	r30:Reset->resource	stale per-eye glow resources cannot survive reset	PASS
+B24-119	1	adversarial	r30:install	R29 failure leaves lower owner active	PASS
+B24-120	1	regression	startup-white	no new pre-device stereo allocation evidence in reviewed B paths	PASS
+B24-121	1	path	r30:DrawPrimitive	XYZRHW first then screen-space then R29	PASS
+B24-122	1	path	r30:DrawIndexedPrimitive	XYZRHW first then screen-space then R29	PASS
+B24-123	1	path	r30:DrawPrimitiveUP	XYZRHW first then screen-space then R29	PASS
+B24-124	1	path	r30:DrawIndexedPrimitiveUP	XYZRHW first then screen-space then R29	PASS
+B24-125	1	cross	r30:ownership-order	world/HUD paths remain mutually gated	PASS
+B24-126	1	adversarial	r30:unknown-draw	unclassified draw delegates rather than forced HUD	PASS
+B24-127	1	regression	world-stereo	fail-open delegation helps protect world geometry	PASS
+B24-128	1	performance	r30:draw-order	no third mono draw in reviewed R30 path	PASS
+B24-129	1	baseline	R51:world-stereo	current HEAD missing exact R51 world semantic preservation	READY_FOR_C
+B24-130	1	baseline	R51:frame-stability	current HEAD performance must remain runtime-unverified	NEED_HMD_TEST
+B24-131	1	baseline	R51:white-HUD	current HEAD cannot claim fix; semantic machinery missing	READY_FOR_C
+B24-132	1	baseline	R51:rank-anchor	current HEAD cannot claim fix; exact anchor absent	READY_FOR_C
+B24-133	1	baseline	R51:startup	startup pass remains protected independent of HEAD	PASS
+B24-134	1	baseline	R51:config	SkyGlow known-bad factor4 still present	READY_FOR_C
+B24-135	1	baseline	R51:refresh	TargetRefreshRateHz=0 preserved	PASS
+B24-136	1	cross	baseline->candidate-gate	C must compare baseline and current HEAD to prospective tree	READY_FOR_C
+B24-137	1	adversarial	baseline->candidate-gate	candidate must not silently reconstruct from current degraded header	READY_FOR_C
+B24-138	1	regression	baseline-delta	mark ScreenOverlay2D/ScreenHud disappearance as baseline-regression risk	READY_FOR_C
+B24-139	1	regression	baseline-delta	mark R28 verified world continuation disappearance as baseline-regression risk	READY_FOR_C
+B24-140	1	regression	baseline-delta	mark scissor no-remap disappearance as baseline-regression risk	READY_FOR_C
+B24-141	1	verifier	C:semantic-header	LEVEL0 assert ScreenOverlay2D+ScreenHud+queue registry retained	READY_FOR_C
+B24-142	1	verifier	C:r28-world	LEVEL0 assert R28 strict verified rebind + HUD exclusions retained	READY_FOR_C
+B24-143	1	verifier	C:scissor	LEVEL0 assert generic HUD scissor remains common-centre/no per-eye remap	READY_FOR_C
+B24-144	1	verifier	C:SkyGlow	LEVEL0 assert CORRECTNESS resolved SkyGlowFactor=1	READY_FOR_C
+B24-145	1	verifier	C:refresh	LEVEL0 assert TargetRefreshRateHz=0	READY_FOR_C
+B24-146	1	verifier	C:world-ownership	LEVEL1 static compare R51 risk paths before candidate handoff	READY_FOR_C
+B24-147	1	verifier	C:frame-pacing	LEVEL2 deterministic counters: no draw amplification beyond two-eye owner	READY_FOR_C
+B24-148	1	verifier	C:runtime	LEVEL3 Quest3/VDXR required for HUD/marker/pacing truth	NEED_HMD_TEST
+B24-149	1	regression	C-handoff	preserve stable R51 regression keys; no duplicate IDs	READY_FOR_C
+B24-150	1	completion	B24	150 fresh evidence rows; production/candidate source untouched	COMPLETE
