@@ -217,7 +217,7 @@ class UIScaling : public Hook
 		if (out && std::isfinite(out->z))
 		{
 			const auto base =
-				reinterpret_cast<std::uintptr_t>(Module::ExeHandle);
+				reinterpret_cast<std::uintptr_t>(GetModuleHandleW(nullptr));
 			const auto ret =
 				reinterpret_cast<std::uintptr_t>(_ReturnAddress());
 			const auto rva = (base && ret >= base) ? ret - base : 0;
