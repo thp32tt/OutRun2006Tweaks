@@ -202,9 +202,33 @@ class UIScaling : public Hook
 
 	// Adjust positions of sprites in 3d space (eg 1st/2nd/etc markers)
 	static inline SafetyHookInline Calc3D2D_hk = {};
+	static inline float RankMarkerViewZ = 0.0f;
+	static inline bool RankMarkerViewZValid = false;
+
 	static void Calc3D2D_dest(float a1, float a2, D3DVECTOR* in, D3DVECTOR* out)
 	{
 		Calc3D2D_hk.call(a1, a2, in, out);
+
+		// R52: canonical sub_4BAD20 calls Calc3D2D at RVA 0xBAEE2
+		// after transforming each rival's world position. The returned Z is the
+		// camera/view-space depth; the stock code keeps X/Y for the sprite but
+		// discards Z. Retain it only for this exact rival-marker caller family.
+		RankMarkerViewZValid = false;
+		if (out && std::isfinite(out->z))
+		{
+			const auto base =
+				reinterpret_cast<std::uintptr_t>(Module::ExeHandle);
+			const auto ret =
+				reinterpret_cast<std::uintptr_t>(_ReturnAddress());
+			const auto rva = (base && ret >= base) ? ret - base : 0;
+			if (rva >= 0x0BAD20 && rva < 0x0BB320 &&
+				std::fabs(out->z) > 1.0e-4f &&
+				std::fabs(out->z) < 1000000.0f)
+			{
+				RankMarkerViewZ = out->z;
+				RankMarkerViewZValid = true;
+			}
+		}
 
 		// TODO: OnlineArcade mode needs to add position here
 
@@ -254,8 +278,12 @@ class UIScaling : public Hook
 			SpriteNode* root = Game::sprite_prio_root[prio];
 			SpriteNode* node = root ? root->tail_4 : nullptr;
 			if (node && node != tailsBefore[prio])
-				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-					node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+				if (RankMarkerViewZValid)
+					OutRunVR::GameSemantic::RegisterSpriteNodeWorldBillboard(
+						node, RankMarkerViewZ);
+				else
+					OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+						node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
 		}
 		return result;
 	}
@@ -282,8 +310,12 @@ class UIScaling : public Hook
 		{
 			node->args_10.float24 += RankMarkerFracX;
 			node->args_10.float28 += RankMarkerFracY;
-			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-				node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+			if (RankMarkerViewZValid)
+				OutRunVR::GameSemantic::RegisterSpriteNodeWorldBillboard(
+					node, RankMarkerViewZ);
+			else
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
 		}
 
 		return result;
