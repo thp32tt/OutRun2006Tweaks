@@ -27,10 +27,10 @@
     {
       "key": "VR-STARTUP-WHITE-001",
       "title": "Logo completes then game remains on white screen",
-      "status": "INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
+      "status": "USER_RUNTIME_VERIFIED_PASS_ON_R50_BASELINE",
       "severity": "runtime-blocking",
       "firstKnownWindowKst": "2026-09-20",
-      "lastObservedKst": "2026-09-21",
+      "lastObservedKst": "2026-09-23",
       "recurrenceCount": 1,
       "symptomFingerprint": {
         "primary": "startup reaches/passes logo then white screen and does not progress into normal game flow",
@@ -42,7 +42,8 @@
         ]
       },
       "knownGood": [
-        "a9abb85702925aaa09ca85581423eb9766c2adb3 — logo/menu/car/course/race rendered; later theater-only VR defect remained"
+        "a9abb85702925aaa09ca85581423eb9766c2adb3 — logo/menu/car/course/race rendered; later theater-only VR defect remained",
+        "750453f2d2ee357f7ca705e9982907a1578f8fbf — user reached playable road scene; persistent startup white-screen blocker absent in this runtime test"
       ],
       "knownBad": [
         "1f2dcb9848a7142c295f371f0dc91663f174c442 — persistent startup white runtime"
@@ -88,31 +89,137 @@
         ]
       },
       "testLevel": 3,
-      "evidenceLevel": "BUILD_VERIFIED_NEED_HMD_TEST",
+      "evidenceLevel": "USER_RUNTIME_VERIFIED",
       "integrationSha": "341bd8027b9595f43c89e31ae1f9cf8783751faa",
       "validationRun": "35647825229 SUCCESS",
-      "nextAction": "Run Quest3/VDXR CORRECTNESS validation: logo->menu/game without persistent white frame, then verify gameplay stereo opens. Keep case open until USER RUNTIME VERIFIED; if symptom recurs append REOPENED using this same key."
+      "nextAction": "Protect as baseline invariant. Reopen only if a later candidate again fails to reach gameplay or reproduces persistent white screen."
+    },
+    {
+      "key": "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "title": "Preserve R50 correct road/background/vehicle 3D stereo",
+      "status": "USER_RUNTIME_VERIFIED_PROTECTED_INVARIANT",
+      "severity": "regression-protection",
+      "firstKnownWindowKst": "2026-09-23",
+      "lastObservedKst": "2026-09-23",
+      "sourceSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
+      "evidenceLevel": "USER_RUNTIME_VERIFIED",
+      "runtimeEvidence": [
+        "road renders correctly in 3D",
+        "background/world renders correctly in 3D",
+        "vehicles render correctly in 3D"
+      ],
+      "riskPaths": [
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/hooks_uiscaling.cpp"
+      ],
+      "nextAction": "Any HUD/marker fix must prove it does not broaden HUD ownership into perspective world draws or regress correct world stereo."
+    },
+    {
+      "key": "VR-R50-FRAME-STABILITY-PRESERVE-001",
+      "title": "Preserve R50 improved frame stability",
+      "status": "USER_RUNTIME_VERIFIED_PROTECTED_INVARIANT",
+      "severity": "performance-regression-protection",
+      "firstKnownWindowKst": "2026-09-23",
+      "lastObservedKst": "2026-09-23",
+      "sourceSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
+      "evidenceLevel": "USER_RUNTIME_VERIFIED_SUBJECTIVE",
+      "runtimeEvidence": [
+        "user reports frame rate/frame pacing is more stable than prior tested builds"
+      ],
+      "nextAction": "HUD semantic fixes must avoid large draw amplification/replay regressions; compare counters and frame pacing against R50 baseline."
+    },
+    {
+      "key": "VR-R50-WHITE-HUD-DIPLOPIA-001",
+      "title": "White HUD/text elements remain doubled and head-locked on R50",
+      "status": "OPEN_USER_RUNTIME_VERIFIED_FAILURE",
+      "severity": "visual-major",
+      "firstKnownWindowKst": "2026-09-23",
+      "lastObservedKst": "2026-09-23",
+      "sourceSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
+      "symptomFingerprint": {
+        "primary": "white HUD/text appears as two images and follows head movement",
+        "examples": [
+          "6th/6",
+          "exit YES/NO",
+          "end countdown/time record",
+          "white vehicle marker"
+        ],
+        "secondary": [
+          "6th/6 resize is not applied"
+        ]
+      },
+      "hypothesis": "R50 generic SCREEN_OVERLAY_2D common-ray correction is insufficient for exact white HUD producers; exact SCREEN_HUD ownership/scale/world-lock semantics are still missing or not reached.",
+      "evidenceLevel": "USER_RUNTIME_VERIFIED_FAILURE",
+      "nextAction": "Identify exact white HUD producer/caller families without widening generic queue ownership; assign explicit SCREEN_HUD semantics and preserve R50 world-stereo invariant."
+    },
+    {
+      "key": "VR-R50-VEHICLE-RANK-ANCHOR-001",
+      "title": "Vehicle rank markers are not world-anchored to their vehicles",
+      "status": "OPEN_USER_RUNTIME_VERIFIED_FAILURE",
+      "severity": "visual-major",
+      "firstKnownWindowKst": "2026-09-23",
+      "lastObservedKst": "2026-09-23",
+      "sourceSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
+      "symptomFingerprint": {
+        "primary": "non-white 1st/2nd/3rd rank marker renders as one image but follows head movement and is not fixed above the corresponding vehicle",
+        "secondary": [
+          "marker appears to live in HUD space and moves independently from vehicle",
+          "white vehicle marker still appears doubled"
+        ]
+      },
+      "hypothesis": "Marker producer is being treated as screen overlay/HUD instead of WORLD_BILLBOARD with vehicle/world anchor transform.",
+      "evidenceLevel": "USER_RUNTIME_VERIFIED_FAILURE",
+      "nextAction": "Recover exact marker producer/vehicle anchor transform; classify spatial rank marker as WORLD_BILLBOARD while leaving generic HUD/overlay path unchanged."
     }
   ],
   "userRuntimeVerifiedBaseline": {
-    "status": "PENDING_CURRENT_ACCEPTED_BASELINE",
-    "sourceSha": null,
-    "packageSha256": null,
-    "profile": null,
+    "status": "PARTIAL_ACCEPTED_WITH_OPEN_VISUAL_DEFECTS",
+    "sourceSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
+    "packageSha256": "30a6ed205c517b146564d94bf7fc5eaadbcc36de1154a0f2966e9ef31787e3eb",
+    "profile": "CORRECTNESS",
     "configHash": null,
     "sessionId": null,
-    "protectedRegressionKeys": [],
-    "note": "Do not infer a full baseline from BUILD_VERIFIED state. Populate only after matching Quest3/VDXR user runtime evidence. Existing per-regression known-good evidence remains usable for scoped revalidation."
+    "observedAtKst": "2026-09-23T02:13:00+09:00",
+    "protectedRegressionKeys": [
+      "VR-STARTUP-WHITE-001",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R50-FRAME-STABILITY-PRESERVE-001"
+    ],
+    "protectedInvariants": [
+      "Playable road scene must remain reachable; do not reintroduce persistent startup white screen.",
+      "Road/background/vehicle world geometry must remain correct 3D stereo and must not collapse to HUD/finite-plane/head-locked behavior.",
+      "Do not regress the improved frame stability while fixing HUD semantics."
+    ],
+    "openDefects": [
+      "VR-R50-WHITE-HUD-DIPLOPIA-001",
+      "VR-R50-VEHICLE-RANK-ANCHOR-001"
+    ],
+    "note": "Partial runtime baseline: protects what the user explicitly verified as good while keeping HUD/marker failures open. Future candidates may advance only if these protected invariants remain intact."
   },
   "workingDevelopmentBaseline": {
-    "status": "USER_SELECTED_WORKING_BASELINE",
+    "status": "USER_RUNTIME_PARTIAL_VERIFIED_WORKING_BASELINE",
     "establishedAtKst": "2026-09-23T02:11:00+09:00",
     "sourceSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
     "branch": "vr-d3d9ex-working-baseline",
     "originCandidateBranch": "vr-d3d9ex-candidate/VR-R50-QUEUE-FOV2D-9554272a",
     "packageSha256": "30a6ed205c517b146564d94bf7fc5eaadbcc36de1154a0f2966e9ef31787e3eb",
     "profile": "CORRECTNESS",
-    "evidenceLevel": "BUILD_VERIFIED_USER_SELECTED",
-    "note": "User explicitly selected the latest R50 modification as the development continuation baseline. This does not claim Quest3/VDXR USER_RUNTIME_VERIFIED acceptance. Preserve this tree for future renderer work and compose it with newer integration governance commits instead of reverting to an older renderer lineage."
+    "evidenceLevel": "USER_RUNTIME_PARTIAL_VERIFIED",
+    "note": "User tested this exact R50 package on Quest3/VDXR and selected it as the working baseline. Preserve the verified-good world/vehicle stereo and improved frame stability. HUD/marker defects remain explicitly open; baseline acceptance does not mean visual completion.",
+    "runtimeObservedAtKst": "2026-09-23T02:13:00+09:00",
+    "protectedGoodBehaviors": [
+      "Road/world/background geometry renders as correct 3D stereo.",
+      "Player/traffic vehicle 3D renders correctly.",
+      "Frame pacing/stability is improved versus prior tested builds.",
+      "Game reaches playable road scene; persistent startup white-screen blocker was not present in this run."
+    ],
+    "knownOpenRuntimeDefects": [
+      "6th/6 HUD is not resized, appears doubled, and follows head movement.",
+      "Exit YES/NO, end-of-run countdown/time-record and other white HUD/text elements appear doubled and follow head movement.",
+      "White marker above vehicles appears doubled.",
+      "Non-white 1st/2nd/3rd vehicle rank marker appears single but follows head movement and is not anchored to the vehicle; it behaves like HUD-space content."
+    ]
   }
 }
