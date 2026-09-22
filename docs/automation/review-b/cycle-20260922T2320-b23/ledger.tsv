@@ -1,0 +1,151 @@
+unit	fresh	category	path	evidence	verdict
+B23-001	1	path	settings:VRTargetRefreshRateHz	default=0; runtime-selected refresh	PASS
+B23-002	1	cross	settings:VRTargetRefreshRateHz	env propagation preserves 0	PASS
+B23-003	1	adversarial	settings:VRTargetRefreshRateHz	no hardcoded refresh override	PASS
+B23-004	1	performance	settings:VRTargetRefreshRateHz	XR-native cadence retained	PASS
+B23-005	1	regression	settings:VRTargetRefreshRateHz	policy TargetRefreshRateHz=0	PASS
+B23-006	1	path	settings:VRFrameCadenceTargetHz	default=0 XR-native	PASS
+B23-007	1	cross	settings:VRFrameCadenceTargetHz	env cadence target propagates 0	PASS
+B23-008	1	adversarial	settings:VRFrameCadenceTargetHz	no fixed diagnostic cadence by default	PASS
+B23-009	1	performance	settings:VRFrameCadenceTargetHz	native xrWaitFrame rate retained	PASS
+B23-010	1	regression	settings:VRFrameCadenceTargetHz	auto cadence invariant	PASS
+B23-011	1	path	settings:VRFrameCadenceTimeoutMs	default35 range5..100	PASS
+B23-012	1	cross	settings:VRFrameCadenceTimeoutMs	env timeout propagation	PASS
+B23-013	1	adversarial	settings:VRFrameCadenceTimeoutMs	bounded fail-open timeout	PASS
+B23-014	1	performance	settings:VRFrameCadenceTimeoutMs	wait cannot exceed configured cap	PASS
+B23-015	1	regression	settings:VRFrameCadenceTimeoutMs	stall boundary explicit	PASS
+B23-016	1	path	settings:VRDirectGpuOnly	default=true	PASS
+B23-017	1	cross	settings:VRDirectGpuOnly	host env DIRECT_ONLY propagated	PASS
+B23-018	1	adversarial	settings:VRDirectGpuOnly	classic gameplay candidate rejected	PASS
+B23-019	1	performance	settings:VRDirectGpuOnly	avoids duplication gameplay path	PASS
+B23-020	1	regression	settings:VRDirectGpuOnly	menu fallback remains allowed	PASS
+B23-021	1	path	settings:VRTelemetry	configurable bool	PASS
+B23-022	1	cross	settings:VRTelemetry	render diagnostics policy visible	PASS
+B23-023	1	adversarial	settings:VRTelemetry	can disable summary diagnostics	PASS
+B23-024	1	performance	settings:VRTelemetry	no mandatory per-frame file IO	PASS
+B23-025	1	regression	settings:VRTelemetry	diagnostic overhead boundary	PASS
+B23-026	1	path	graphics:SkyGlowFactor	code default=4 vs VR policy=1	READY_FOR_C
+B23-027	1	cross	graphics:SkyGlowFactor	setting feeds glow resolution	READY_FOR_C
+B23-028	1	adversarial	graphics:SkyGlowFactor	VR stereo suppresses mono glow but config still 4	PASS
+B23-029	1	performance	graphics:SkyGlowFactor	factor4 lowers glow resolution	PASS
+B23-030	1	regression	graphics:SkyGlowFactor	SkyGlowFactor=1 invariant violated	READY_FOR_C
+B23-031	1	path	config:SkyGlowFactor	checked-in INI=4	READY_FOR_C
+B23-032	1	cross	config:SkyGlowFactor	package config can override code path	READY_FOR_C
+B23-033	1	adversarial	config:SkyGlowFactor	CORRECTNESS historical profile says1	PASS
+B23-034	1	performance	config:SkyGlowFactor	config changes glow render resolution	PASS
+B23-035	1	regression	config:SkyGlowFactor	policy/config identity mismatch	READY_FOR_C
+B23-036	1	path	watchdog:RollingSampleCount	100 samples	PASS
+B23-037	1	cross	watchdog:RollingSampleCount	100ms loop ~=10s history	PASS
+B23-038	1	adversarial	watchdog:RollingSampleCount	deque capped at100	PASS
+B23-039	1	performance	watchdog:RollingSampleCount	bounded memory growth	PASS
+B23-040	1	regression	watchdog:RollingSampleCount	10s pre-window retained	PASS
+B23-041	1	path	watchdog:Run-loop	background thread	PASS
+B23-042	1	cross	watchdog:Run-loop	reads v2+v3 mappings	PASS
+B23-043	1	adversarial	watchdog:Run-loop	stop atomic exits loop	PASS
+B23-044	1	performance	watchdog:Run-loop	Sleep(100) caps polling	PASS
+B23-045	1	regression	watchdog:Run-loop	not render-thread owned	PASS
+B23-046	1	path	watchdog:Log.Write	append log	PASS
+B23-047	1	cross	watchdog:Log.Write	event+summary callers	PASS
+B23-048	1	adversarial	watchdog:Log.Write	closed stream returns	PASS
+B23-049	1	performance	watchdog:Log.Write	flush only event/5s summary	PASS
+B23-050	1	regression	watchdog:Log.Write	no render-hot-path file IO	PASS
+B23-051	1	path	watchdog:StableReadFrameRing	publishSequence guarded	PASS
+B23-052	1	cross	watchdog:StableReadFrameRing	copies whole ring between barriers	PASS
+B23-053	1	adversarial	watchdog:StableReadFrameRing	odd/changing sequence rejected	PASS
+B23-054	1	performance	watchdog:StableReadFrameRing	max6 attempts	PASS
+B23-055	1	regression	watchdog:StableReadFrameRing	torn diagnostic frame prevented	PASS
+B23-056	1	path	watchdog:HeaderValid	magic/version/size checked	PASS
+B23-057	1	cross	watchdog:HeaderValid	host/client/ack/frame variants	PASS
+B23-058	1	adversarial	watchdog:HeaderValid	bad header ignored	PASS
+B23-059	1	performance	watchdog:HeaderValid	constant-time checks	PASS
+B23-060	1	regression	watchdog:HeaderValid	protocol mismatch fail-closed	PASS
+B23-061	1	path	watchdog:LatestFrame	latestSlot bounds check	PASS
+B23-062	1	cross	watchdog:LatestFrame	uses stable copied ring	PASS
+B23-063	1	adversarial	watchdog:LatestFrame	out-of-range returns null	PASS
+B23-064	1	performance	watchdog:LatestFrame	no scan/copy	PASS
+B23-065	1	regression	watchdog:LatestFrame	invalid slot cannot dereference	PASS
+B23-066	1	path	watchdog:Capture-trigger	Ctrl+F9 edge trigger	PASS
+B23-067	1	cross	watchdog:Capture-trigger	copies rolling pre-window	PASS
+B23-068	1	adversarial	watchdog:Capture-trigger	held key not retriggered	PASS
+B23-069	1	performance	watchdog:Capture-trigger	no continuous bundle writes	PASS
+B23-070	1	regression	watchdog:Capture-trigger	manual evidence isolation	PASS
+B23-071	1	path	watchdog:Capture-postwindow	2s post window	PASS
+B23-072	1	cross	watchdog:Capture-postwindow	updates host/frame snapshot	PASS
+B23-073	1	adversarial	watchdog:Capture-postwindow	pending state cleared after write	PASS
+B23-074	1	performance	watchdog:Capture-postwindow	write deferred until trigger window ends	PASS
+B23-075	1	regression	watchdog:Capture-postwindow	phase1 no eye image dumping	PASS
+B23-076	1	path	wait:BoundedSwapchainWait	infinite waits sliced20ms	PASS
+B23-077	1	cross	wait:BoundedSwapchainWait	wraps xrWaitSwapchainImage	PASS
+B23-078	1	adversarial	wait:BoundedSwapchainWait	250ms budget -> runtime failure	PASS
+B23-079	1	performance	wait:BoundedSwapchainWait	bounded compositor stall	PASS
+B23-080	1	regression	wait:BoundedSwapchainWait	black-frame hang guard	PASS
+B23-081	1	path	wait:FiniteSwapchainWait	finite timeout passed through	PASS
+B23-082	1	cross	wait:FiniteSwapchainWait	wrapper preserves caller contract	PASS
+B23-083	1	adversarial	wait:FiniteSwapchainWait	null info passed through	PASS
+B23-084	1	performance	wait:FiniteSwapchainWait	no added slicing for finite waits	PASS
+B23-085	1	regression	wait:FiniteSwapchainWait	diagnostic finite budgets unchanged	PASS
+B23-086	1	path	wait:CaptureWaitGuard	AcquireNextFrame max2ms	PASS
+B23-087	1	cross	wait:CaptureWaitGuard	macro rewrites call timeout only	PASS
+B23-088	1	adversarial	wait:CaptureWaitGuard	long legacy1000ms cannot survive	PASS
+B23-089	1	performance	wait:CaptureWaitGuard	duplication cannot starve XR for1s	PASS
+B23-090	1	regression	wait:CaptureWaitGuard	black-screen recovery boundary	PASS
+B23-091	1	path	bundle:Invalidate	odd/even seqlock publication	PASS
+B23-092	1	cross	bundle:Invalidate	frame+kind+ids zeroed	PASS
+B23-093	1	adversarial	bundle:Invalidate	stale identity removed	PASS
+B23-094	1	performance	bundle:Invalidate	no heap/copy path	PASS
+B23-095	1	regression	bundle:Invalidate	stale bundle cannot remain fresh	PASS
+B23-096	1	path	bundle:Publish	frame copied under seqlock	PASS
+B23-097	1	cross	bundle:Publish	frameId pose present captureQpc coupled	PASS
+B23-098	1	adversarial	bundle:Publish	classic missing captureQpc snapshots production QPC	PASS
+B23-099	1	performance	bundle:Publish	one struct memcpy + atomics	PASS
+B23-100	1	regression	bundle:Publish	texture/pose identity committed together	PASS
+B23-101	1	path	bundle:Read	stable before/after sequence	PASS
+B23-102	1	cross	bundle:Read	reads all identity fields together	PASS
+B23-103	1	adversarial	bundle:Read	odd/changing sequence rejected	PASS
+B23-104	1	performance	bundle:Read	max4 attempts	PASS
+B23-105	1	regression	bundle:Read	torn projection identity prevented	PASS
+B23-106	1	path	bundle:IsFresh	kind+frameId required	PASS
+B23-107	1	cross	bundle:IsFresh	internal frame/pose/present identities match	PASS
+B23-108	1	adversarial	bundle:IsFresh	future/zero timestamp rejected	PASS
+B23-109	1	performance	bundle:IsFresh	1000ms age bound constant-time	PASS
+B23-110	1	regression	bundle:IsFresh	stale source cannot submit	PASS
+B23-111	1	path	bundle:Matches	required source kind checked	PASS
+B23-112	1	cross	bundle:Matches	frame+pose+present compared	PASS
+B23-113	1	adversarial	bundle:Matches	fresh wrong-kind rejected	PASS
+B23-114	1	performance	bundle:Matches	no texture copy	PASS
+B23-115	1	regression	bundle:Matches	mixed-frame projection rejected	PASS
+B23-116	1	path	r32:PollCompletedAcks	GetData DONOTFLUSH	PASS
+B23-117	1	cross	r32:PollCompletedAcks	completed EVENT publishes producer ACK	PASS
+B23-118	1	adversarial	r32:PollCompletedAcks	S_FALSE remains pending	PASS
+B23-119	1	performance	r32:PollCompletedAcks	steady polling nonblocking	PASS
+B23-120	1	regression	r32:PollCompletedAcks	no unconditional Flush	PASS
+B23-121	1	path	r32:AckQueryError	FAILED query faults generation	PASS
+B23-122	1	cross	r32:AckQueryError	fault forces SafeEye fallback path	PASS
+B23-123	1	adversarial	r32:AckQueryError	uncertain completion never ACKed	PASS
+B23-124	1	performance	r32:AckQueryError	query released on error	PASS
+B23-125	1	regression	r32:AckQueryError	producer reuse safety preserved	PASS
+B23-126	1	path	r32:GenerationRollover	ObserveGeneration resets ACK arrays	PASS
+B23-127	1	cross	r32:GenerationRollover	old completion compared to active generation	PASS
+B23-128	1	adversarial	r32:GenerationRollover	late old generation discarded	PASS
+B23-129	1	performance	r32:GenerationRollover	no wait on superseded generation	PASS
+B23-130	1	regression	r32:GenerationRollover	ACK rollback window closed	PASS
+B23-131	1	path	r32:ArmConsumptionFence	per-slot EVENT fence	PASS
+B23-132	1	cross	r32:ArmConsumptionFence	exact frame+generation identity	PASS
+B23-133	1	adversarial	r32:ArmConsumptionFence	same-frame pending reuse allowed	PASS
+B23-134	1	performance	r32:ArmConsumptionFence	avoids redundant SafeEye fallback	PASS
+B23-135	1	regression	r32:ArmConsumptionFence	cached XR tick remains direct	PASS
+B23-136	1	path	r32:DeferredFlush	Flush only after pending slot persists	PASS
+B23-137	1	cross	r32:DeferredFlush	poll->flush->poll escalation	PASS
+B23-138	1	adversarial	r32:DeferredFlush	busy after escalation rejects fast path	PASS
+B23-139	1	performance	r32:DeferredFlush	runtime frequency unknown	NEED_HMD_TEST
+B23-140	1	regression	r32:DeferredFlush	frame pacing requires Quest evidence	PASS
+B23-141	1	path	r32:CanFastSubmit	fresh DirectGPU bundle required	PASS
+B23-142	1	cross	r32:CanFastSubmit	complete metadata+projection+transport gates	PASS
+B23-143	1	adversarial	r32:CanFastSubmit	stale/mismatch/fault rejected	PASS
+B23-144	1	performance	r32:CanFastSubmit	no copy in eligibility check	PASS
+B23-145	1	regression	r32:CanFastSubmit	fail-closed to R26/R24	PASS
+B23-146	1	path	r32:EndFrame	fast submits incoming projection once	PASS
+B23-147	1	cross	r32:EndFrame	visible submit completes recenter request	PASS
+B23-148	1	adversarial	r32:EndFrame	ineligible/ACK busy delegates R26	PASS
+B23-149	1	performance	r32:EndFrame	removes redundant SafeEye copy+second blit	PASS
+B23-150	1	regression	r32:EndFrame	DirectGPU presentation authority preserved	PASS
