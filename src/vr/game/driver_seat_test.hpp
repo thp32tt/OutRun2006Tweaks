@@ -7,9 +7,9 @@
 #define NOMINMAX
 #endif
 #include <Windows.h>
-#include <string>
+#include <d3d9types.h>
 
-#include "game.hpp"
+typedef struct tgaEvWorkCamera EvWorkCamera;
 
 namespace OutRunVR::DriverSeatTest
 {
