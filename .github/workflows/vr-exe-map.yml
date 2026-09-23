@@ -93,6 +93,103 @@ jobs:
           print(json.dumps(c, sort_keys=True))
           PY
 
+      - name: Write and verify map provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import datetime, hashlib, json, os, pathlib, sqlite3, subprocess
+
+          repo = pathlib.Path(os.environ["GITHUB_WORKSPACE"])
+          root = pathlib.Path(os.environ["RUNNER_TEMP"]) / "OR2006C2C-map"
+          db = root / "exe_map.sqlite"
+
+          def sha256(path):
+              h = hashlib.sha256()
+              with pathlib.Path(path).open("rb") as f:
+                  for chunk in iter(lambda: f.read(1024 * 1024), b""):
+                      h.update(chunk)
+              return h.hexdigest()
+
+          source_sha = os.environ["GITHUB_SHA"]
+          source_tree = subprocess.check_output(
+              ["git", "rev-parse", f"{source_sha}^{{tree}}"], cwd=repo, text=True
+          ).strip()
+          exe_sha = sha256(repo / "OR2006C2C.EXE")
+          tracked = [
+              "tools/reverse/ghidra/ExportOutRunMap.java",
+              "tools/reverse/build_exe_map.py",
+              "tools/reverse/exequery.py",
+              "reverse/semantics.json",
+              "docs/VR_BINARY_CONTRACT.json",
+          ]
+          tracked_hashes = {p: sha256(repo / p) for p in tracked}
+          raw_hashes = {
+              p.name: sha256(p)
+              for p in sorted(root.glob("*.jsonl"))
+          }
+
+          con = sqlite3.connect(db)
+          schema_row = con.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()
+          schema_version = int(schema_row[0]) if schema_row else 0
+          meta_values = {
+              "map_source_sha": source_sha,
+              "map_source_tree": source_tree,
+              "map_workflow_run_id": os.environ["GITHUB_RUN_ID"],
+              "map_workflow_run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "map_ghidra_tag": os.environ["GHIDRA_TAG"],
+              "map_ghidra_archive_sha256": os.environ["GHIDRA_SHA256"],
+              "map_canonical_exe_sha256": exe_sha,
+              "map_generator_sha256": tracked_hashes["tools/reverse/ghidra/ExportOutRunMap.java"],
+              "map_builder_sha256": tracked_hashes["tools/reverse/build_exe_map.py"],
+              "map_query_sha256": tracked_hashes["tools/reverse/exequery.py"],
+              "map_semantics_sha256": tracked_hashes["reverse/semantics.json"],
+              "map_binary_contract_sha256": tracked_hashes["docs/VR_BINARY_CONTRACT.json"],
+          }
+          for key, value in meta_values.items():
+              con.execute(
+                  "INSERT OR REPLACE INTO meta(key,value) VALUES(?,?)",
+                  (key, json.dumps(value)),
+              )
+          con.commit()
+          con.close()
+
+          manifest = {
+              "schemaVersion": 1,
+              "generatedUtc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+              "sourceSha": source_sha,
+              "sourceTree": source_tree,
+              "workflowRunId": os.environ["GITHUB_RUN_ID"],
+              "workflowRunAttempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "ghidraTag": os.environ["GHIDRA_TAG"],
+              "ghidraArchiveSha256": os.environ["GHIDRA_SHA256"],
+              "canonicalExeSha256": exe_sha,
+              "mapSchemaVersion": schema_version,
+              "trackedInputSha256": tracked_hashes,
+              "rawExportSha256": raw_hashes,
+              "exeMapSqliteSha256": sha256(db),
+          }
+          (root / "MAP_PROVENANCE.json").write_text(
+              json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+
+          check = json.loads((root / "MAP_PROVENANCE.json").read_text(encoding="utf-8"))
+          assert check["sourceSha"] == source_sha
+          assert check["sourceTree"] == source_tree
+          assert check["canonicalExeSha256"] == sha256(repo / "OR2006C2C.EXE")
+          assert check["exeMapSqliteSha256"] == sha256(db)
+          for rel, digest in check["trackedInputSha256"].items():
+              assert digest == sha256(repo / rel), rel
+          for name, digest in check["rawExportSha256"].items():
+              assert digest == sha256(root / name), name
+          print(json.dumps({
+              "sourceSha": source_sha,
+              "sourceTree": source_tree,
+              "mapSchemaVersion": schema_version,
+              "exeMapSqliteSha256": check["exeMapSqliteSha256"],
+          }, sort_keys=True))
+          PY
+
       - name: Pack map artifact
         shell: bash
         run: |
