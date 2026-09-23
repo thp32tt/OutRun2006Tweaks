@@ -35,6 +35,8 @@ on:
       - 'tools/verify_vr_binary_contract.py'
       - 'tools/verify_vr_architecture.py'
       - 'tools/verify_vr_r51_runtime_contract.py'
+      - 'tools/verify_vr_dependency_lock.py'
+      - 'docs/VR_DEPENDENCY_LOCK.json'
       - 'tools/reverse/**'
       - 'docs/reverse/**'
       - 'tools/verify_vr_r32_review.py'
@@ -70,6 +72,7 @@ jobs:
         run: |
           python tools/verify_vr_architecture.py
           python tools/verify_vr_r51_runtime_contract.py
+          python tools/verify_vr_dependency_lock.py
           python tools/verify_vr_r32_review.py
           python -m py_compile tools/reverse/exequery.py tools/reverse/build_exe_map.py
       - name: Verify near-plane active stereo eligibility
