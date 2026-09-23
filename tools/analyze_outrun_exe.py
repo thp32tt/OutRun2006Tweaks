@@ -415,6 +415,11 @@ def main() -> int:
                 f"func=0x{(item['function_start_guess_rva'] or 0):08X} "
                 f"target={item['target']}"
             )
+            start = max(0, item["call_rva"] - 96)
+            print(
+                f"driver_char_context=call=0x{item['call_rva']:08X} "
+                f"start=0x{start:08X} bytes={pe.bytes_at_rva(start, 224).hex(' ')}"
+            )
     for rva, name in ((0x088AF0, "CalcCharMatrix"), (0x114C10, "RobotDisplayWrapper"), (0x113AC0, "RobotRenderer")):
         print(f"driver_char_bytes={name} rva=0x{rva:08X} bytes={pe.bytes_at_rva(rva, 96).hex(' ')}")
     if missing_known_call_sites:
