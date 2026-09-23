@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-22T23:40:00Z",
+  "updatedUtc": "2026-09-23T16:50:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
-  "phase": "R51-baseline-protected / HUD-backend-perf-parallel",
+  "phase": "R51-baseline-protected / HUD-semantic-lifetime-analysis / no-PC-runner",
   "checkpoint": "C6_STATE",
   "policy": {
     "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host",
@@ -98,12 +98,13 @@
     "dx12Strict": "Direct3DCreate9On12Ex succeeds but both original and normalized CreateDevice return 0x8876086C; development paused"
   },
   "currentHypotheses": [
-    "The latest delivered D3D9 SAFE package was not the intended final DX9Ex path: SAFE-DRAW deliberately removed R29-R34 and renderer R29, discarding later world/effect/HUD corrections.",
-    "R26 steady-state safety replay plus classification rejection causes large draw amplification and contributes to headset stutter.",
-    "Recovery runtime forcing 60 FPS with interpolation/cadence disabled contributes independent judder on a 90 Hz OpenXR session.",
-    "Restore fast R29 world rendering and classification in bounded variants before deciding which later R30-R34 overlays are required."
+    "R51 remains the protected partial runtime baseline: road/background/vehicles render correct 3D; white HUD diplopia, rank HUD head-lock/doubling, vehicle-rank anchoring and dense-scene performance remain open.",
+    "Candidate 8d21824f proved EXE-map producer tagging can reach R30 draw ownership (semanticHudAccepted=93681), but renderer semanticOverlayBypass remained 0 for the entire session. Semantic ownership is becoming visible too late for the renderer c64/WVP injection boundary.",
+    "Vehicle rank-marker exact callsite tags are insufficient by themselves: the pre-screen-projection vehicle/world anchor must be preserved/reconstructed through SpriteNode data into per-eye WORLD_BILLBOARD projection.",
+    "DirectGPU transport is not the current HUD root cause: direct frames=13187, fallbacks=4, fenceTimeout=0, stereo/right-draw failures=0 in the failed HUD candidate session.",
+    "Dense-scene performance remains separate; observed peak drawsPerPresent≈3929.3 and lower-Present max≈16.639 ms in this session."
   ],
-  "nextAction": "Run four parallel lanes without modifying the protected R51 world owner: (1) HUD/white-overlay/fixed-function ownership and vehicle-rank world anchors, (2) DXVK build/smoke compatibility, (3) DX12/D3D9On12 CreateDevice/translated-resource compatibility, and (4) instrumentation-first frame-pacing/draw/wait/copy optimization. Integrate only bounded candidates that preserve VR-R51-WORLD-STEREO-PRESERVE-001 and VR-R51-FRAME-STABILITY-PRESERVE-001.",
+  "nextAction": "Overnight scheduled work: analysis/review only on HUD semantic lifetime and rival-marker anchor propagation. Trace exact producer -> node tag -> queue select -> c64 SetVertexShaderConstantF -> draw ordering and EXE-map Calc3D2D/marker anchor flow. Do not create another HMD candidate until this contradiction is explained. Preserve R51 world owner. Normal cloud CI may be used when needed; self-hosted PC runner is disabled until the user explicitly authorizes a new evening PC-build session.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
@@ -229,11 +230,11 @@
   },
   "eveningCandidate": {
     "profile": "CORRECTNESS",
-    "frozen": false,
-    "sourceSha": null,
+    "frozen": true,
+    "sourceSha": "8d21824f9502b3354fae679972a90868a0cce562",
     "configHash": null,
-    "packageSha256": null,
-    "reason": "Freeze at 19:00 only when material validated changes exist; preserve during user testing."
+    "packageSha256": "701a57ca5e4a1ba413bcdd75ad6fc6ecc320f6fc3dbb0dbd5a0597cb6ba81d89",
+    "reason": "HMD_FAILED HUD/rank fix; do not promote/integrate. Preserve only as failed evidence candidate. No further PC build tonight."
   },
   "diagnosticCapture": {
     "status": "phase1-build-verified-user-runtime-pending",
@@ -499,6 +500,45 @@
     "integration": {
       "owner": "D_INTEGRATION_PLANNER",
       "rule": "Independent exact-SHA review, affected CI/regression validation, then integration; never combine unrelated risky lanes into one runtime candidate."
+    }
+  },
+  "pcRunnerAuthorization": {
+    "status": "DISABLED_UNTIL_EXPLICIT_USER_REAUTHORIZATION",
+    "endedAtKst": "2026-09-24T01:49:00+09:00",
+    "reason": "User ended today's PC-build/test session and is going to sleep.",
+    "allowedOvernight": "review, static analysis, EXE-map queries, documentation, normal cloud CI when necessary",
+    "forbiddenOvernight": "self-hosted PC build dispatch, PC fast build, PC clean build"
+  },
+  "overnightHandoff": {
+    "recordedAtKst": "2026-09-24T01:50:00+09:00",
+    "protectedBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+    "failedCandidateSha": "8d21824f9502b3354fae679972a90868a0cce562",
+    "failedCandidateBranch": "vr-d3d9ex-candidate/VR-R51-HUD-PRODUCER-MAP-20260924",
+    "failedCandidatePackageSha256": "701a57ca5e4a1ba413bcdd75ad6fc6ecc320f6fc3dbb0dbd5a0597cb6ba81d89",
+    "buildRunId": 35888306771,
+    "runtimeEvidenceId": "RUNTIME-20260924-R51-HUD-MAP-001",
+    "runtimeSessionId": "20260923T164207853Z-2202b186",
+    "logZipSha256": "25be7a39d7daad4073e0b1765e9c6312a13f0b077898a84e4b1a17bf1dfe6731",
+    "observedFailure": [
+      "white HUD/text remains doubled/head-following",
+      "position/rank HUD remains doubled/head-following",
+      "vehicle rank markers remain detached from vehicles/head-following"
+    ],
+    "observedPass": [
+      "R51 world/road/vehicle 3D preserved",
+      "DirectGPU transport stable"
+    ],
+    "keyTelemetry": {
+      "semanticHudAccepted": 93681,
+      "semanticOverlayBypass": 0,
+      "overlay2DAccepted": 371082,
+      "r30World": 4832,
+      "r44Spatial": 5154,
+      "directFrames": 13187,
+      "directFallbacks": 4,
+      "fenceTimeout": 0,
+      "maxDrawsPerPresent": 3929.3,
+      "lowerPresentMaxMs": 16.639
     }
   }
 }
