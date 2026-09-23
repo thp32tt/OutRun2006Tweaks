@@ -1,11 +1,32 @@
 Set-StrictMode -Version Latest
 
+$script:OutRunVRTestProfileNames = @(
+    'CONTROL',
+    'CORRECTNESS',
+    'HUD_SCREEN',
+    'HUD_MENU',
+    'HUD_WORLD',
+    'PERFORMANCE',
+    'STAGE_DIAGNOSTIC',
+    'A_BASELINE',
+    'B_CULLING',
+    'C_CULLING_NO_SSAA',
+    'D_CULLING_NO_SSAA_R512'
+)
+
+function Get-OutRunVRTestProfileNames {
+    return @($script:OutRunVRTestProfileNames)
+}
+
 function Get-OutRunVRTestProfile {
     param(
         [Parameter(Mandatory=$true)]
-        [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
         [string]$Name
     )
+
+    if ($script:OutRunVRTestProfileNames -notcontains $Name) {
+        throw "Unknown OutRun VR test profile: $Name"
+    }
 
     $commonVr = @(
         '-PreferD3D9Ex=true',
