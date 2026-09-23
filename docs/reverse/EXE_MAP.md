@@ -28,7 +28,7 @@ Prerequisites: a 64-bit JDK supported by the selected Ghidra release, Ghidra, Py
 
 ```bash
 export GHIDRA_HOME=/opt/ghidra
-./tools/reverse/run_ghidra_map.sh /path/to/OR2006C2C.EXE
+bash tools/reverse/run_ghidra_map.sh /path/to/OR2006C2C.EXE
 ```
 
 Query by RVA or VA:
