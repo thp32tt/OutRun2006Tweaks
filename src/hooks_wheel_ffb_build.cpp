@@ -270,6 +270,13 @@ namespace
         Settings::WheelFFBXForceMix = 0.50f;
         Settings::WheelFFBXForceInvert = false;
         Settings::WheelFFBXForceGain = 1.00f;
+        Settings::WheelFFBNativeTireSat = false;
+        Settings::WheelFFBNativeTireSatGain = 1.00f;
+        Settings::WheelFFBNativeTireSatInvert = false;
+        Settings::WheelFFBNativeOversteerCue = false;
+        Settings::WheelFFBNativeOversteerStrength = 0.18f;
+        Settings::WheelFFBNativeOversteerSlipThreshold = 0.12f;
+        Settings::WheelFFBNativeOversteerInvert = false;
         Settings::WheelFFBGlobalStrength = 0.70f;
         Settings::WheelFFBSpringStrength = 0.22f;
         Settings::WheelFFBSpringSaturation = 0.55f;
@@ -304,6 +311,13 @@ namespace
         Settings::WheelFFBXForceMix = 0.50f;
         Settings::WheelFFBXForceInvert = false;
         Settings::WheelFFBXForceGain = 1.00f;
+        Settings::WheelFFBNativeTireSat = false;
+        Settings::WheelFFBNativeTireSatGain = 1.00f;
+        Settings::WheelFFBNativeTireSatInvert = false;
+        Settings::WheelFFBNativeOversteerCue = false;
+        Settings::WheelFFBNativeOversteerStrength = 0.18f;
+        Settings::WheelFFBNativeOversteerSlipThreshold = 0.12f;
+        Settings::WheelFFBNativeOversteerInvert = false;
         Settings::WheelFFBGlobalStrength = 0.70f;
         Settings::WheelFFBSpringStrength = 0.22f;
         Settings::WheelFFBSpringSaturation = 0.55f;
