@@ -133,7 +133,12 @@ jobs:
           (Get-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj
           (Get-Content build-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/Zydis.vcxproj
           (Get-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj
-          Set-Content -Path build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ''
+          $sdlSource = @(
+            'build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.cpp',
+            'build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c'
+          ) | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if (-not $sdlSource) { throw 'SDL GameInput workaround source missing' }
+          Set-Content -Path $sdlSource -Value ''
           (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
       - name: Build Win32 active game DLL
         run: cmake --build build-game --config Release --target outrun2006tweaks
@@ -147,7 +152,8 @@ jobs:
           Set-Content stage-game/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
           Set-Content stage-game/VARIANT_ID.txt 'ACTIVE_FULL_R34' -Encoding ascii
           Set-Content stage-game/CMAKE_FLAGS.txt '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF' -Encoding ascii
-          Set-Content stage-game/GENERATED_CMAKELISTS_SHA256.txt (Get-FileHash CMakeLists.txt -Algorithm SHA256).Hash.ToLowerInvariant() -Encoding ascii
+          $generatedCMakeHash = (Get-FileHash CMakeLists.txt -Algorithm SHA256).Hash.ToLowerInvariant()
+          Set-Content stage-game/GENERATED_CMAKELISTS_SHA256.txt $generatedCMakeHash -Encoding ascii
       - uses: actions/upload-artifact@v4
         with:
           name: dx9ex-active-game
