@@ -263,12 +263,12 @@ compile-definitions = ["SPDLOG_COMPILED_LIB", "_DISABLE_CONSTEXPR_MUTEX_CONSTRUC
 compile-options = ["/utf-8"]
 
 [fetch-content]
-ogg = { git = "https://github.com/xiph/ogg", tag = "v1.3.6" }
-flac = { git = "https://github.com/xiph/flac", tag = "1.5.0" }
-miniupnpc = { git = "https://github.com/miniupnp/miniupnp", tag = "miniupnpd_2_3_10", subdir = "miniupnpc" }
-jsoncpp = { git = "https://github.com/open-source-parsers/jsoncpp.git", tag = "1.9.8" }
-zlib = { git = "https://github.com/madler/zlib", tag = "v1.3.2" }
-sdl = { git = "https://github.com/libsdl-org/SDL", tag = "release-3.4.12" }
+ogg = { git = "https://github.com/xiph/ogg", tag = "be05b13e98b048f0b5a0f5fa8ce514d56db5f822" } # v1.3.6
+flac = { git = "https://github.com/xiph/flac", tag = "1507800de4b70e21be71f38caa0d9079d0bc6e45" } # 1.5.0
+miniupnpc = { git = "https://github.com/miniupnp/miniupnp", tag = "b5e5d2eb069822b7f00d56c8e61033b9d500e60c", subdir = "miniupnpc" } # miniupnpd_2_3_10
+jsoncpp = { git = "https://github.com/open-source-parsers/jsoncpp.git", tag = "8519b8381f3c741ad1421f88237b1deda0b11412" } # 1.9.8
+zlib = { git = "https://github.com/madler/zlib", tag = "da607da739fa6047df13e66a2af6b8bec7c2a498" } # v1.3.2
+sdl = { git = "https://github.com/libsdl-org/SDL", tag = "f87239e71e42da91ca317a12eefb82cfbf3393eb" } # release-3.4.12
 
 [fetch-content.safetyhook]
 git = "https://github.com/cursey/safetyhook"
