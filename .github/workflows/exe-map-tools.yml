@@ -65,7 +65,7 @@ jobs:
       - name: Run Ghidra whole-EXE structural map
         shell: bash
         run: |
-          mkdir -p "$RUNNER_TEMP/out"
+          mkdir -p "$RUNNER_TEMP/out" "$RUNNER_TEMP/project"
           "$GHIDRA_HOME/support/analyzeHeadless" \
             "$RUNNER_TEMP/project" OutRunMap \
             -import /tmp/OR2006C2C.EXE \
