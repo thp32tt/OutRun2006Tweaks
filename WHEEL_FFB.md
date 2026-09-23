@@ -1,5 +1,13 @@
 # Wheel / FFB architecture — v0.1
 
+> **Current v0.4 research branch note:** the v0.1 roughness/snow compatibility
+> section below is historical. Wheel road FFB now uses four raw per-wheel
+> material masks plus native suspension/load motion. Continuous road texture is
+> averaged and capped; curb/bump feedback is a separate short physical impulse.
+> The old max-roughness path, snow-stage attenuation, snow curb latch, temporary
+> roughness floor and road-triggered SAT/damper overrides have been removed.
+> See `docs/FFB_NATIVE_PHYSICS_MAP.md` section 10 for the current model.
+
 [English](#english) | [한국어](#한국어)
 
 <a id="english"></a>
