@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-23T08:40:00+09:00",
+  "updatedKst": "2026-09-24T01:50:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -26,6 +26,11 @@
       "HUD": "B evidence + C post-fix sanity -> D isolated implementation/integration",
       "DXVK_DX12": "A architecture/parity review + C sanity/dedup -> D isolated backend implementation/integration; runtime promotion needs HMD parity",
       "PERFORMANCE": "B performance evidence + C validation-prep -> D bounded optimization/integration"
+    },
+    "pcRunnerAuthorization": {
+      "status": "DISABLED_UNTIL_EXPLICIT_USER_REAUTHORIZATION",
+      "endedAtKst": "2026-09-24T01:49:00+09:00",
+      "rule": "Scheduled overnight work may review/analyze/use normal cloud CI, but must not dispatch or trigger self-hosted PC builds until the user explicitly opens a new PC-build session."
     }
   },
   "candidateWip": {
@@ -33,6 +38,41 @@
     "candidateBranches": []
   },
   "items": [
+    {
+      "id": "VR-R51-RANK-ANCHOR-PROPAGATION-001",
+      "priority": 13,
+      "status": "READY_ANALYSIS_ONLY",
+      "preferredRole": "B_RENDER_REVIEW",
+      "summary": "Reconstruct rival rank-marker anchor propagation from Calc3D2D/vehicle source through sprani/put_clip SpriteNode and per-eye WORLD_BILLBOARD projection; current exact-callsite tags still leave markers head-locked/detached.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "sourceEvidence": {
+        "candidateSha": "8d21824f9502b3354fae679972a90868a0cce562",
+        "sessionId": "20260923T164207853Z-2202b186",
+        "userResult": "vehicle rank markers remain detached and head-locked"
+      },
+      "guard": "Preserve R51 road/background/vehicle stereo and keep ordinary HUD separate."
+    },
+    {
+      "id": "VR-R51-HUD-SEMANTIC-LIFETIME-001",
+      "priority": 13,
+      "status": "READY_ANALYSIS_ONLY",
+      "preferredRole": "B_RENDER_REVIEW",
+      "summary": "Explain why exact producer tags yield semanticHudAccepted>0 while renderer semanticOverlayBypass stays 0; trace producer/node/queue/c64/draw ordering and design exact lifetime propagation.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "sourceEvidence": {
+        "candidateSha": "8d21824f9502b3354fae679972a90868a0cce562",
+        "sessionId": "20260923T164207853Z-2202b186",
+        "semanticHudAccepted": 93681,
+        "semanticOverlayBypass": 0
+      },
+      "guard": "Do not modify protected R51 world owner; do not create another HMD candidate until ordering evidence explains the contradiction."
+    },
     {
       "id": "DX9EX-FINGERPRINT-001",
       "priority": 11,
@@ -46,16 +86,26 @@
     },
     {
       "id": "L1-VIS-001",
-      "priority": 11,
-      "status": "READY",
+      "priority": 12,
+      "status": "REOPENED_AFTER_HMD_FAILURE",
       "preferredRole": "B_RENDER_REVIEW",
       "summary": "World/HUD/effect stereo correctness: white rank-score, 6th/6, menu and YES/NO. Produce exact evidence before behavior change.",
       "testLevel": "LEVEL1",
       "dependencies": [
         "DX9EX-FINGERPRINT-001"
       ],
-      "attempts": 0,
-      "runtimeCandidate": true
+      "attempts": 1,
+      "runtimeCandidate": false,
+      "lastCandidateSha": "8d21824f9502b3354fae679972a90868a0cce562",
+      "lastCandidateBranch": "vr-d3d9ex-candidate/VR-R51-HUD-PRODUCER-MAP-20260924",
+      "lastRuntimeEvidenceId": "RUNTIME-20260924-R51-HUD-MAP-001",
+      "lastResult": "EXE-map producer tagging reached R30 semantic HUD ownership, but white/rank HUD remained doubled/head-locked and rival markers remained detached from vehicles.",
+      "newEvidence": [
+        "semanticHudAccepted reached 93681",
+        "semanticOverlayBypass remained 0 for the full session",
+        "world baseline remained visually correct"
+      ],
+      "nextAction": "Trace exact semantic lifetime/order through c64/WVP upload before any new candidate; create a token/ownership mechanism visible at c64 time without widening generic queue HUD ownership."
     },
     {
       "id": "VR-BINARY-CONTRACT-001",
