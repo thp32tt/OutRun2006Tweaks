@@ -119,6 +119,26 @@ namespace OutRunVR::GameSemantic
     inline thread_local std::size_t SpriteNodeSemanticCount = 0;
     inline thread_local RenderScope SpriteQueuePreviousScope = RenderScope::None;
     inline thread_local unsigned SpriteQueueDepth = 0;
+    // Monotonic per-thread identity for the canonical queue node currently
+    // being rendered. This is diagnostic/provenance state only; it does not
+    // change semantic classification or draw ownership.
+    inline thread_local const void* CurrentSpriteQueueNode = nullptr;
+    inline thread_local std::uint64_t SpriteQueueNodeEpoch = 0;
+
+    inline const void* CurrentQueueNode() noexcept
+    {
+        return CurrentSpriteQueueNode;
+    }
+
+    inline std::uint64_t CurrentQueueNodeEpoch() noexcept
+    {
+        return SpriteQueueNodeEpoch;
+    }
+
+    inline bool QueueRenderActive() noexcept
+    {
+        return SpriteQueueDepth != 0;
+    }
 
     inline void RegisterSpriteNodeScope(
         const void* node, RenderScope scope) noexcept
@@ -187,6 +207,9 @@ namespace OutRunVR::GameSemantic
             SpriteQueueDepth = 1;
             SpriteQueuePreviousScope = CurrentScope;
         }
+        CurrentSpriteQueueNode = node;
+        if (++SpriteQueueNodeEpoch == 0)
+            ++SpriteQueueNodeEpoch;
         CurrentScope = ConsumeSpriteNodeScope(
             node, RenderScope::ScreenOverlay2D);
     }
@@ -199,6 +222,7 @@ namespace OutRunVR::GameSemantic
         {
             CurrentScope = SpriteQueuePreviousScope;
             SpriteQueuePreviousScope = RenderScope::None;
+            CurrentSpriteQueueNode = nullptr;
             SpriteNodeSemanticCount = 0;
         }
     }

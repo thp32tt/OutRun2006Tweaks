@@ -170,6 +170,10 @@ namespace OutRunVRRenderer
 		std::uint64_t LastGameWvpTopLevelDrawSerial = 0;
 		std::uintptr_t LastGameWvpShaderIdentity = 0;
 		std::uint64_t LastGameWvpShaderSerial = 0;
+		OutRunVR::GameSemantic::RenderScope LastGameWvpSemanticScope =
+			OutRunVR::GameSemantic::RenderScope::None;
+		std::uint64_t LastGameWvpQueueNodeEpoch = 0;
+		const void* LastGameWvpQueueNode = nullptr;
 
 		D3DVECTOR CullingCameraSavedPos{};
 		D3DVECTOR CullingCameraSavedLook{};
@@ -1461,6 +1465,9 @@ namespace OutRunVRRenderer
 			LastGameWvpTopLevelDrawSerial = 0;
 			LastGameWvpShaderIdentity = 0;
 			LastGameWvpShaderSerial = 0;
+			LastGameWvpSemanticScope = OutRunVR::GameSemantic::RenderScope::None;
+			LastGameWvpQueueNodeEpoch = 0;
+			LastGameWvpQueueNode = nullptr;
 		}
 
 		void RecordGameWvpWrite(const float* constants,
@@ -1487,6 +1494,11 @@ namespace OutRunVRRenderer
 			LastGameWvpTopLevelDrawSerial = OutRunVRStereo::GetTopLevelDrawSerial();
 			LastGameWvpShaderIdentity = shaderIdentity;
 			LastGameWvpShaderSerial = shaderSerial;
+			LastGameWvpSemanticScope = OutRunVR::GameSemantic::CurrentScope;
+			LastGameWvpQueueNodeEpoch =
+				OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
+			LastGameWvpQueueNode =
+				OutRunVR::GameSemantic::CurrentQueueNode();
 			LastGameWvpWriteValid = true;
 		}
 
@@ -1840,6 +1852,19 @@ namespace OutRunVRRenderer
 		topLevelDrawSerial = LastGameWvpTopLevelDrawSerial;
 		shaderIdentity = LastGameWvpShaderIdentity;
 		shaderSerial = LastGameWvpShaderSerial;
+		return true;
+	}
+
+	bool GetLastGameWvpSemanticProvenance(
+		OutRunVR::GameSemantic::RenderScope& semanticScope,
+		std::uint64_t& queueNodeEpoch,
+		const void*& queueNode) noexcept
+	{
+		if (!LastGameWvpWriteValid || LastGameWvpWriteSerial == 0)
+			return false;
+		semanticScope = LastGameWvpSemanticScope;
+		queueNodeEpoch = LastGameWvpQueueNodeEpoch;
+		queueNode = LastGameWvpQueueNode;
 		return true;
 	}
 

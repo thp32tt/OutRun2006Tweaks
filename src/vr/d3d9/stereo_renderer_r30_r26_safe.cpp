@@ -88,7 +88,11 @@ namespace OutRunVRStereo
         std::uint64_t R30XyzrhwHudDraws = 0;
         std::uint64_t R30XyzrhwWorldLockedHudDraws = 0;
         std::uint64_t R30XyzrhwWorldEffectDraws = 0;
-        std::uint64_t R47SemanticHudAccepted = 0;
+        std::uint64_t R47SemanticHudAccepted = 0; // fixed-function XYZRHW
+        std::uint64_t R51VsSemanticHudAccepted = 0;
+        std::uint64_t R51VsSemanticHudC64SameNode = 0;
+        std::uint64_t R51VsSemanticHudC64OtherNode = 0;
+        std::uint64_t R51VsSemanticHudC64NoNode = 0;
         std::uint64_t R47SemanticUnknownRejected = 0;
         std::uint64_t R50SemanticOverlay2DAccepted = 0;
         std::uint64_t R50ScreenOverlay2DDraws = 0;
@@ -1118,7 +1122,7 @@ namespace OutRunVRStereo
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(
-                "VR R50: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAccepted={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R51: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAcceptedXyzrhw={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={},semanticHudAcceptedVs={},c64SameNode={},c64OtherNode={},c64NoNode={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
@@ -1136,6 +1140,10 @@ namespace OutRunVRStereo
                 R30XyzrhwBilateralFallbacks,
                 R30ScreenSpaceFovDraws, R30Hud2DDraws,
                 R30PerspectiveHudDraws, R30WorldBillboardDraws,
+                R51VsSemanticHudAccepted,
+                R51VsSemanticHudC64SameNode,
+                R51VsSemanticHudC64OtherNode,
+                R51VsSemanticHudC64NoNode,
                 R44OverlayOwnedWvpHits, R44OverlayOwnedWvpGroupHits,
                 R44SpatialBillboardClassifications,
                 R44FlatOverlayClassifications,
@@ -1447,6 +1455,33 @@ namespace OutRunVRStereo
                     return R30ScreenSpaceKind::WorldBillboard;
                 }
                 return R30ScreenSpaceKind::None;
+            }
+
+            if (semanticHud)
+            {
+                ++R51VsSemanticHudAccepted;
+                OutRunVR::GameSemantic::RenderScope c64Scope =
+                    OutRunVR::GameSemantic::RenderScope::None;
+                std::uint64_t c64NodeEpoch = 0;
+                const void* c64Node = nullptr;
+                if (OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
+                        c64Scope, c64NodeEpoch, c64Node))
+                {
+                    const auto drawNode = OutRunVR::GameSemantic::CurrentQueueNode();
+                    const auto drawEpoch =
+                        OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
+                    if (drawNode && c64Node == drawNode &&
+                        c64NodeEpoch == drawEpoch)
+                        ++R51VsSemanticHudC64SameNode;
+                    else if (c64Node)
+                        ++R51VsSemanticHudC64OtherNode;
+                    else
+                        ++R51VsSemanticHudC64NoNode;
+                }
+                else
+                {
+                    ++R51VsSemanticHudC64NoNode;
+                }
             }
 
             if (projectionClass ==
