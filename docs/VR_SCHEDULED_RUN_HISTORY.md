@@ -41,3 +41,14 @@ This cumulative history records resumable scheduled development runs for the `vr
 - Added lightweight coordination validator `tools/Test-VRAutodevCoordination.ps1` and workflow `.github/workflows/vr-autodev-coordination.yml`.
 - No DXVK/multiview/DX12 development was enabled.
 - This setup changes automation/CI coordination; it does not claim new Quest 3/VDXR runtime correctness.
+
+## Runtime handoff — 2026-09-24 01:50 KST
+
+- Source tested: `8d21824f9502b3354fae679972a90868a0cce562`, R51 EXE-map HUD producer candidate.
+- PC clean build run: `35888306771` SUCCESS; package SHA256 `701a57ca5e4a1ba413bcdd75ad6fc6ecc320f6fc3dbb0dbd5a0597cb6ba81d89`.
+- HMD session: `PC-R51-HUD-MAP / A_CONTROL / CORRECTNESS / 20260923T164207853Z-2202b186`.
+- Result: world 3D preserved, intended HUD/rank corrections failed.
+- Key evidence: `semanticHudAccepted=93681` while renderer `semanticOverlayBypass=0`; white/rank HUD still doubles and follows head; vehicle rank markers remain detached/head-locked.
+- Next scheduled-run priority: static ordering analysis for HUD semantic lifetime at c64 and EXE-map anchor-flow analysis for rival rank markers. No new runtime candidate until the ordering gap is explained.
+- User ended the PC-runner session. Self-hosted PC builds are forbidden until explicit re-authorization; overnight scheduled tasks may continue review/static analysis and normal cloud CI.
+
