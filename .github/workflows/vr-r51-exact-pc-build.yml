@@ -1,0 +1,166 @@
+name: VR R51 Exact PC Clean Build
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - vr-r51-recovery-pc-20260923
+  workflow_dispatch:
+
+concurrency:
+  group: outrun-pc-r51-exact
+  cancel-in-progress: false
+
+jobs:
+  exact-clean-build:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[pc-build]') }}
+    runs-on: [self-hosted, Windows, X64, outrun-pc]
+    timeout-minutes: 30
+
+    steps:
+      - name: Keep temporary writes on runner SSD
+        shell: powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          New-Item -ItemType Directory -Force $env:RUNNER_TEMP | Out-Null
+          "TEMP=$env:RUNNER_TEMP" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "TMP=$env:RUNNER_TEMP" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Checkout exact verified R51 source
+        uses: actions/checkout@v4
+        with:
+          ref: 17ad376bfdf7939f0851c0c629e4fa094a84f28a
+          submodules: recursive
+          fetch-depth: 1
+          clean: true
+
+      - name: Clean exact PC build directories
+        shell: powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          $root = 'out/pc-r51-exact'
+          if (Test-Path $root) { Remove-Item $root -Recurse -Force }
+          New-Item -ItemType Directory -Force $root | Out-Null
+
+      - name: Build exact R51 x64 OpenXR host
+        shell: powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          cmake -S vrhost -B out/pc-r51-exact/host -G "Visual Studio 17 2022" -A x64
+          if ($LASTEXITCODE -ne 0) { throw "host configure failed" }
+          cmake --build out/pc-r51-exact/host --config Release --target outrun-vr-host outrun-vr-runtime-eligibility-smoke outrun-vr-r23-verified-bundle-smoke outrun-vr-r32-policy-smoke outrun-vr-protocol-v3-smoke outrun-vr-core-math-smoke outrun-vr-host-state-v3-channel-smoke outrun-vr-v2-v3-shadow-conversion-smoke outrun-vr-host-pose-v3-validation-smoke
+          if ($LASTEXITCODE -ne 0) { throw "host build failed" }
+          foreach ($name in @(
+            'outrun-vr-runtime-eligibility-smoke.exe',
+            'outrun-vr-r23-verified-bundle-smoke.exe',
+            'outrun-vr-r32-policy-smoke.exe',
+            'outrun-vr-protocol-v3-smoke.exe',
+            'outrun-vr-core-math-smoke.exe',
+            'outrun-vr-host-state-v3-channel-smoke.exe',
+            'outrun-vr-v2-v3-shadow-conversion-smoke.exe',
+            'outrun-vr-host-pose-v3-validation-smoke.exe'
+          )) {
+            $test = Join-Path 'out/pc-r51-exact/host/bin' $name
+            if (-not (Test-Path $test)) { throw "host smoke missing: $name" }
+            & $test
+            if ($LASTEXITCODE -ne 0) { throw "host smoke failed: $name" }
+          }
+
+      - name: Configure exact R51 Win32 game
+        shell: powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          cmake -S . -B out/pc-r51-exact/game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+          if ($LASTEXITCODE -ne 0) { throw "game configure failed" }
+
+      - name: Apply the same R51 dependency workarounds
+        shell: powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $b='out/pc-r51-exact/game'
+          foreach ($p in @(
+            "$b/_deps/safetyhook-build/src/safetyhook.vcxproj",
+            "$b/_deps/zydis-build/Zydis.vcxproj",
+            "$b/_deps/zydis-build/zycore/Zycore.vcxproj"
+          )) {
+            (Get-Content $p) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content $p
+          }
+          $sdlCandidates=@(
+            "$b/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c",
+            "$b/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.cpp"
+          )
+          $sdl=$sdlCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if (-not $sdl) { throw "SDL GameInput source missing" }
+          Set-Content -Path $sdl -Value ''
+          $cfg="$b/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h"
+          (Get-Content $cfg) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content $cfg
+
+      - name: Build exact R51 Win32 game DLL
+        shell: powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          cmake --build out/pc-r51-exact/game --config Release --target outrun2006tweaks
+          if ($LASTEXITCODE -ne 0) { throw "game build failed" }
+
+      - name: Assemble exact R51 PC package
+        shell: powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $root='out/pc-r51-exact'
+          $dir="$root/package"
+          $backend=Join-Path $dir 'backends/d3d9'
+          New-Item -ItemType Directory -Force $backend | Out-Null
+          $dll=Get-ChildItem "$root/game" -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if (-not $dll) { throw 'dinput8.dll missing' }
+          $host="$root/host/bin/outrun-vr-host.exe"
+          if (-not (Test-Path $host)) { throw 'outrun-vr-host.exe missing' }
+          Copy-Item $dll.FullName (Join-Path $backend 'dinput8.dll')
+          Copy-Item $host (Join-Path $backend 'outrun-vr-host.exe')
+          Set-Content (Join-Path $backend 'SOURCE_SHA.txt') '17ad376bfdf7939f0851c0c629e4fa094a84f28a' -Encoding ascii
+          Set-Content (Join-Path $backend 'VARIANT_ID.txt') 'ACTIVE_R26_R43_R44' -Encoding ascii
+          Set-Content (Join-Path $backend 'CMAKE_FLAGS.txt') '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF' -Encoding ascii
+          Copy-Item OutRun2006Tweaks.ini (Join-Path $dir 'OutRun2006Tweaks.ini')
+          Copy-Item OutRun2006Tweaks.lods.ini (Join-Path $dir 'OutRun2006Tweaks.lods.ini')
+          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Run-OutRunVRTest.cmd','Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','OutRunVR-Backend-Selector.ps1','OutRunVR-Backend-Selector.cmd')) {
+            Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
+          }
+          Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
+          @(
+            'OUTRUN VR R51 EXACT PC CLEAN TEST'
+            'Built from exact R51 source and original R51 CMake feature flags.'
+            'Upload generated OutRun2_VR_ANALYZE_*.zip after testing.'
+          ) | Set-Content (Join-Path $dir 'UPLOAD_LOG_ZIP_ONLY.txt') -Encoding UTF8
+          $matrixId='PC-R51-EXACT-CLEAN-17ad376bfdf7'
+          Set-Content (Join-Path $dir 'BUILD_MATRIX_ID.txt') $matrixId -Encoding ascii
+          $buildInputs=[ordered]@{
+            SchemaVersion=1
+            BuildMatrixId=$matrixId
+            IntegrationSha='17ad376bfdf7939f0851c0c629e4fa094a84f28a'
+            VariantId='ACTIVE_R26_R43_R44'
+            DefaultTestProfile='CORRECTNESS'
+            Profiles=@('CONTROL','CORRECTNESS','PERFORMANCE')
+            UserRuntimeVerified=$false
+            ValidationClass='PC_R51_EXACT_CLEAN'
+          }
+          $buildInputs | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'BUILD_INPUTS.json') -Encoding UTF8
+          $packageRoot=(Resolve-Path $dir).Path
+          Get-ChildItem $dir -Recurse -File | Get-FileHash -Algorithm SHA256 | ForEach-Object {
+            "$($_.Hash)  $($_.Path.Substring($packageRoot.Length + 1))"
+          } | Set-Content (Join-Path $dir 'SHA256SUMS.txt') -Encoding ascii
+          $zip="$root/OutRun2_VR_R51_PC_EXACT_CLEAN_17ad376bfdf7.zip"
+          Compress-Archive -Path (Join-Path $dir '*') -DestinationPath $zip -Force
+          $drop='L:\OutRunTestBuilds\R51_EXACT_CLEAN'
+          if (Test-Path $drop) { Remove-Item $drop -Recurse -Force }
+          Copy-Item $dir $drop -Recurse
+          Copy-Item $zip 'L:\OutRunTestBuilds\' -Force
+          $dllHash=(Get-FileHash (Join-Path $backend 'dinput8.dll') -Algorithm SHA256).Hash
+          $hostHash=(Get-FileHash (Join-Path $backend 'outrun-vr-host.exe') -Algorithm SHA256).Hash
+          $zipHash=(Get-FileHash $zip -Algorithm SHA256).Hash
+          "R51 exact PC clean dinput8: $dllHash" | Out-File "$root/BUILD_RESULT.txt" -Encoding utf8
+          "R51 exact PC clean host: $hostHash" | Out-File "$root/BUILD_RESULT.txt" -Append -Encoding utf8
+          "R51 exact PC clean zip: $zipHash" | Out-File "$root/BUILD_RESULT.txt" -Append -Encoding utf8
+          Get-Content "$root/BUILD_RESULT.txt" | Write-Host
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-R51-PC-EXACT-CLEAN
+          path: |
+            out/pc-r51-exact/OutRun2_VR_R51_PC_EXACT_CLEAN_17ad376bfdf7.zip
+            out/pc-r51-exact/BUILD_RESULT.txt
+          if-no-files-found: error
