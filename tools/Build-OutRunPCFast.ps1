@@ -149,7 +149,7 @@ if (-not (Test-Path $hostExe)) { throw 'outrun-vr-host.exe missing after increme
 Copy-Item $dll.FullName (Join-Path $backendDir 'dinput8.dll')
 Copy-Item $hostExe (Join-Path $backendDir 'outrun-vr-host.exe')
 Set-Content (Join-Path $backendDir 'SOURCE_SHA.txt') $sourceSha -Encoding ascii
-Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_FULL_R34' -Encoding ascii
+Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_R43_R44' -Encoding ascii
 Assert-R51PCBuildContract -BuildDir $gameBuild
 Set-Content (Join-Path $backendDir 'CMAKE_FLAGS.txt') $canonicalGameFlagString -Encoding ascii
 Set-Content (Join-Path $backendDir 'BUILD_CONTRACT.txt') $buildContractVersion -Encoding ascii
@@ -192,14 +192,16 @@ Set-Content (Join-Path $packageDir 'BUILD_MATRIX_ID.txt') $matrixId -Encoding as
 Set-Content (Join-Path $packageDir 'PC_FAST_BUILD.txt') "PC_FAST_${buildMode}_NOT_FINAL_CI" -Encoding ascii
 
 $buildInputs = [ordered]@{
-    SchemaVersion = 1
+    SchemaVersion = 2
     BuildMatrixId = $matrixId
     IntegrationSha = $sourceSha
-    VariantId = 'ACTIVE_FULL_R34'
+    VariantId = 'ACTIVE_R26_R43_R44'
+    CompiledVariantId = 'ACTIVE_R26_R43_R44'
     DefaultTestProfile = 'CORRECTNESS'
     Profiles = @('CONTROL', 'CORRECTNESS', 'PERFORMANCE')
     UserRuntimeVerified = $false
     ValidationClass = 'PC_FAST_INCREMENTAL_NOT_FINAL_CI'
+    EvidenceClass = 'BUILD_VERIFIED_NONFINAL'
     BuildMode = $buildMode
     BuildContract = $buildContractVersion
     CMakeFlags = $canonicalGameFlagString
