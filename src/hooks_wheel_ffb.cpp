@@ -179,6 +179,28 @@ namespace Settings
         "Reverse only the experimental native tyre-force SAT direction. Use only during low-strength validation."
     };
 
+    Setting<bool> WheelFFBNativeOversteerCue{
+        "WheelFFB", "NativeOversteerCue", false,
+        "Experimental rear-tyre peak-slip counter-steer cue inspired by AMS2 rFuktor and AC post-process FFB. Default off until rear slip direction is hardware-validated."
+    };
+
+    Setting<float> WheelFFBNativeOversteerStrength{
+        "WheelFFB", "NativeOversteerStrength", 0.18f,
+        "Maximum additive rear-slip counter-steer cue before the existing global output cap/slew path.",
+        Range<float>{ 0.0f, 0.35f }
+    };
+
+    Setting<float> WheelFFBNativeOversteerSlipThreshold{
+        "WheelFFB", "NativeOversteerSlipThreshold", 0.12f,
+        "Rear native slip angle in radians treated as the approximate peak-slip reference for the bounded oversteer cue.",
+        Range<float>{ 0.04f, 0.30f }
+    };
+
+    Setting<bool> WheelFFBNativeOversteerInvert{
+        "WheelFFB", "NativeOversteerInvert", false,
+        "Reverse only the native rear-slip counter-steer cue during low-strength direction validation."
+    };
+
     Setting<float> WheelFFBGripLoss{
         "WheelFFB", "GripLoss", 0.65f,
         "How strongly real chassis/front-slip signals release damping and unload SAT. Lateral G is load only, never a drift detector.", Range<float>{ 0.0f, 1.0f }
@@ -1010,12 +1032,14 @@ namespace
                 : naturalSatTorque;
 
             // Canonical EXE tyre path (research-gated):
-            // wheel0/1 are the front axle; +EE is signed slip-angle state,
-            // +AC is the native lateral-force component and +C0 its load-sensitive
-            // combined-slip capacity. This path is OFF by default and can only
-            // crossfade in when the native front contact/capacity is valid.
+            // wheel0/1 are the front axle and wheel2/3 are the rear axle.
+            // +EE is native signed slip-angle state, +AC is the lateral tyre
+            // force component and +C0 is the load-sensitive combined-slip
+            // capacity. All new native ownership is opt-in and fail-closed.
             const WheelNativePhysicsResearch::FrontTireState nativeFront =
                 WheelNativePhysicsResearch::front_tire_state();
+            const WheelNativePhysicsResearch::RearTireState nativeRear =
+                WheelNativePhysicsResearch::rear_tire_state();
             const bool nativeTireRequested =
                 Settings::WheelFFBPhysicsSat &&
                 Settings::WheelFFBNativeTireSat &&
@@ -1074,9 +1098,81 @@ namespace
                     nativeTireSatTorque = syntheticModernSat;
             }
 
-            const float modernSelfAligningTorque =
+            const float baseModernSelfAligningTorque =
                 syntheticModernSat +
                 (nativeTireSatTorque - syntheticModernSat) * nativeTireSatBlend_;
+
+            // AMS2 rFuktor + AC Toolbox-inspired oversteer cue. It is deliberately
+            // a bounded rear peak-slip cue, not a generic "drift force": it rises
+            // near the configured rear peak-slip reference and fades again in a
+            // very large slide. Both axles need trustworthy native tyre capacity,
+            // and collision/reset/airborne-like states release ownership quickly.
+            const float configuredRearSlipThreshold =
+                static_cast<float>(Settings::WheelFFBNativeOversteerSlipThreshold);
+            const float rearSlipThreshold =
+                std::isfinite(configuredRearSlipThreshold)
+                    ? std::clamp(configuredRearSlipThreshold, 0.04f, 0.30f)
+                    : 0.12f;
+            const float rearSlipNormalized = nativeRear.valid
+                ? std::abs(nativeRear.slipRad) / rearSlipThreshold
+                : 0.0f;
+            const float rearOversteerBand =
+                WheelFFBMath::native_oversteer_band(rearSlipNormalized);
+
+            const bool nativeOversteerRequested =
+                Settings::WheelFFBPhysicsSat &&
+                Settings::WheelFFBNativeOversteerCue &&
+                speedNorm > 0.08f;
+            const bool oversteerProtectionClear =
+                crashImpulseTimer_ <= 0 &&
+                nativeFront.valid &&
+                nativeRear.valid &&
+                vehicleDynamics_.sampleValid();
+            const bool nativeOversteerValid =
+                nativeOversteerRequested && oversteerProtectionClear;
+
+            constexpr float OversteerProtectBlendInPerTick = 1.0f / 12.0f; // ~200 ms
+            constexpr float OversteerProtectBlendOutPerTick = 1.0f / 3.0f; // ~50 ms
+            if (nativeOversteerValid)
+                nativeOversteerProtectionBlend_ = std::min(
+                    1.0f,
+                    nativeOversteerProtectionBlend_ + OversteerProtectBlendInPerTick);
+            else
+                nativeOversteerProtectionBlend_ = std::max(
+                    0.0f,
+                    nativeOversteerProtectionBlend_ - OversteerProtectBlendOutPerTick);
+
+            float nativeOversteerCueTorque = 0.0f;
+            if (nativeRear.valid && rearOversteerBand > 0.0f)
+            {
+                const float configuredCueStrength =
+                    static_cast<float>(Settings::WheelFFBNativeOversteerStrength);
+                const float cueStrength = std::isfinite(configuredCueStrength)
+                    ? std::clamp(configuredCueStrength, 0.0f, 0.35f)
+                    : 0.18f;
+
+                // Rear slip sign supplies the catch direction. This remains a
+                // separately invertible research channel until MOZA R3 hardware
+                // capture confirms the canonical EXE's sign convention.
+                float rearCueDirection =
+                    nativeRear.slipRad > 0.0f ? -1.0f :
+                    (nativeRear.slipRad < 0.0f ? 1.0f : 0.0f);
+                if (Settings::WheelFFBNativeOversteerInvert)
+                    rearCueDirection = -rearCueDirection;
+
+                nativeOversteerCueTorque =
+                    rearCueDirection *
+                    rearOversteerBand *
+                    cueStrength *
+                    satSpeed *
+                    satStrength *
+                    nativeOversteerProtectionBlend_;
+                if (!std::isfinite(nativeOversteerCueTorque))
+                    nativeOversteerCueTorque = 0.0f;
+            }
+
+            const float modernSelfAligningTorque =
+                baseModernSelfAligningTorque + nativeOversteerCueTorque;
 
             // Legacy v0.3 DBC instrumentation is retained for comparison with
             // old captures, but whole-EXE XREF analysis proved actionforce_DBC is
@@ -3683,6 +3779,7 @@ namespace
             smoothedXForceMix_ = -1.0f;
             smoothedXForceGain_ = -1.0f;
             nativeTireSatBlend_ = 0.0f;
+            nativeOversteerProtectionBlend_ = 0.0f;
             prevStructuralLevel_ = 0;
             prevSpringCoefficient_ = 0;
             prevDamperCoefficient_ = 0;
@@ -4069,6 +4166,7 @@ namespace
         float smoothedXForceMix_ = -1.0f;
         float smoothedXForceGain_ = -1.0f;
         float nativeTireSatBlend_ = 0.0f;
+        float nativeOversteerProtectionBlend_ = 0.0f;
         float prevSteer_ = 0.0f;
         float smoothedSteerRate_ = 0.0f;
         bool steerSampleValid_ = false;
