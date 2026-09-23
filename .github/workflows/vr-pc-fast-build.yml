@@ -29,12 +29,16 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[pc-build]') }}
     runs-on: [self-hosted, Windows, X64, outrun-pc]
     timeout-minutes: 30
-    env:
-      # Keep build/tool temporary writes on the runner SSD instead of C:\Users\...\AppData\Local\Temp.
-      TEMP: ${{ runner.temp }}
-      TMP: ${{ runner.temp }}
 
     steps:
+      - name: Keep temporary writes on the runner SSD
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force $env:RUNNER_TEMP | Out-Null
+          "TEMP=$env:RUNNER_TEMP" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "TMP=$env:RUNNER_TEMP" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "TEMP/TMP -> $env:RUNNER_TEMP"
+
       - name: Checkout current VR integration branch without deleting build cache
         uses: actions/checkout@v4
         with:
