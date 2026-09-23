@@ -760,6 +760,30 @@ namespace WheelFFBMath
         return std::clamp(rise * fall, 0.0f, 1.0f);
     }
 
+    inline float native_oversteer_direction(float rearSlipRad, bool invert)
+    {
+        // MOZA R3 hardware validation established that the canonical rear EE
+        // sign must be preserved here. The old implementation negated it and
+        // therefore required the UI "Reverse" switch for correct counter-steer.
+        if (!std::isfinite(rearSlipRad))
+            return 0.0f;
+        float direction =
+            rearSlipRad > 0.0f ? 1.0f :
+            (rearSlipRad < 0.0f ? -1.0f : 0.0f);
+        return invert ? -direction : direction;
+    }
+
+    inline float native_oversteer_headroom(float baseTorque)
+    {
+        // The rear cue is supplemental steering information. Reduce its share
+        // as front/base SAT approaches full scale so a drift transition does
+        // not pile a large additive kick on top of an already heavy wheel.
+        if (!std::isfinite(baseTorque))
+            return 0.0f;
+        const float occupied = std::clamp(std::abs(baseTorque), 0.0f, 1.0f);
+        return std::clamp(1.0f - 0.65f * occupied, 0.35f, 1.0f);
+    }
+
     using ResponseLUT = std::array<float, 11>;
 
     inline ResponseLUT linear_response_lut()
