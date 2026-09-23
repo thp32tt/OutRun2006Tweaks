@@ -69,6 +69,18 @@ namespace Settings
 		"Keeps car cubemap reflection work at the original 60 Hz time budget when rendering the HMD at 72/80/90/120 Hz." };
 	Setting<float> VRNearPlane{ "VR", "NearPlane", 0.10f,
 		"VR gameplay camera near plane in game units. Overrides the 2D Z-precision fix while positional tracking is active so dashboard/driver geometry is not clipped by the normal 1.0 near plane.", Range<float>{ 0.03f, 0.50f } };
+	Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", true,
+		"Native-view-2 cockpit experiment. Keeps the games own synchronized first-person camera and only adds the full player-car render path." };
+	Setting<float> VRDriverSeatForward{ "VR", "DriverSeatForward", -0.451f,
+		"Camera offset along native view 2 forward. Default is the final value reached in the 2026-09-24 runtime tuning log.", Range<float>{ -3.0f, 3.0f } };
+	Setting<float> VRDriverSeatRight{ "VR", "DriverSeatRight", -0.037f,
+		"Camera offset along native view 2 right axis.", Range<float>{ -2.0f, 2.0f } };
+	Setting<float> VRDriverSeatUp{ "VR", "DriverSeatUp", 0.015f,
+		"Camera offset along native view 2 up axis.", Range<float>{ -2.0f, 2.0f } };
+	Setting<bool> VRDriverSeatFullCar{ "VR", "DriverSeatFullCar", true,
+		"Forces only the player-car body to the full render state while native view 2 remains active." };
+	Setting<float> VRDriverSeatCarScale{ "VR", "DriverSeatCarScale", 1.12f,
+		"Visual scale applied only to the player-car body draw in native view 2. 1.0 is stock size.", Range<float>{ 0.80f, 1.50f } };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,
 		"Game-world units per metre of OpenXR head movement.", Range<float>{ 0.1f, 10.0f } };
 	Setting<float> VRStereoDepth{ "VR", "StereoDepth", 1.0f,

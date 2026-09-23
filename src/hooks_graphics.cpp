@@ -2,6 +2,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/game/driver_seat_view2.hpp"
 #include "vr/runtime_eligibility.hpp"
 #include <algorithm>
 #include <iostream>
@@ -1111,6 +1112,11 @@ class FixZBufferPrecision : public Hook
 
 		if (allow_znear_override)
 		{
+			if (OutRunVR::DriverSeatView2::Active(camera))
+			{
+				camera->perspective_znear_BC = Settings::VRNearPlane.get();
+			}
+			else
 			// In 6DoF VR the player can move their head through the normal third-
 			// person near plane. Keep the 2D precision fix intact outside VR, but
 			// use the dedicated VR near plane during gameplay/goal rendering.
@@ -1147,7 +1153,9 @@ class FixZBufferPrecision : public Hook
 				} 
 			}
 		}
+		auto seatBackup = OutRunVR::DriverSeatView2::BeforeCalcCameraMatrix(camera);
 		CalcCameraMatrix.call(camera);
+		OutRunVR::DriverSeatView2::AfterCalcCameraMatrix(camera, seatBackup);
 	}
 
 	// hook Clr_SceneEffect so we can reset camera z-near before screen effects are draw
