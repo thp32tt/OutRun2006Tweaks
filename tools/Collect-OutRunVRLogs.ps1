@@ -55,12 +55,27 @@ function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,
 
     $ini=Join-Path $root 'OutRun2006Tweaks.ini'
     $configHash=if(Test-Path $ini){(Get-FileHash $ini -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
+    $inputsPath=Join-Path $root 'BUILD_INPUTS.json'
+    $inputsObj=$null
+    if(Test-Path $inputsPath){try{$inputsObj=Get-Content $inputsPath -Raw|ConvertFrom-Json}catch{$inputsObj=$null}}
+    $payloadBackend=if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}
+    $compiledVariantFile=Join-Path $root ("backends/{0}/VARIANT_ID.txt" -f $payloadBackend)
+    $compiledVariant=if(Test-Path $compiledVariantFile){(Get-Content $compiledVariantFile -Raw).Trim()}elseif($inputsObj -and $inputsObj.CompiledVariantId){[string]$inputsObj.CompiledVariantId}elseif($inputsObj -and $inputsObj.VariantId){[string]$inputsObj.VariantId}else{'UNKNOWN_COMPILED_VARIANT'}
+    $validationClass=if($inputsObj -and $inputsObj.ValidationClass){[string]$inputsObj.ValidationClass}else{'UNKNOWN'}
+    $evidenceClass=if($inputsObj -and $inputsObj.EvidenceClass){[string]$inputsObj.EvidenceClass}else{'NONE'}
+    $userRuntimeVerified=if($inputsObj -and $null -ne $inputsObj.UserRuntimeVerified){[bool]$inputsObj.UserRuntimeVerified}else{$false}
     $state=[ordered]@{
-        SchemaVersion=3
+        SchemaVersion=4
         BuildMatrixId=$matrix
         VariantId=$variant
+        CompiledVariantId=$compiledVariant
+        SessionVariantId=$variant
+        ProfileId=$profile
         Backend=$backend
         TestProfile=$profile
+        ValidationClass=$validationClass
+        EvidenceClass=$evidenceClass
+        UserRuntimeVerified=$userRuntimeVerified
         SessionId=$session
         StartedUtc=$startedUtc.ToString('o')
         ConfigSha256=$configHash
@@ -101,6 +116,12 @@ if(!(Test-Path $sessionState)){throw 'CURRENT_VR_SESSION.json not found; select 
 $state=Get-Content $sessionState -Raw|ConvertFrom-Json
 $session=$state.SessionId
 if(!$session -or $state.Backend -ne $backend -or $state.BuildMatrixId -ne $matrix -or ($state.TestProfile -and $state.TestProfile -ne $profile)){throw 'Current session identity does not match the active backend/profile/matrix.'}
+$compiledVariant=if($state.CompiledVariantId){[string]$state.CompiledVariantId}else{'UNKNOWN_COMPILED_VARIANT'}
+$sessionVariant=if($state.SessionVariantId){[string]$state.SessionVariantId}else{$variant}
+$profileId=if($state.ProfileId){[string]$state.ProfileId}else{$profile}
+$validationClass=if($state.ValidationClass){[string]$state.ValidationClass}else{'UNKNOWN'}
+$evidenceClass=if($state.EvidenceClass){[string]$state.EvidenceClass}else{'NONE'}
+$userRuntimeVerified=if($null -ne $state.UserRuntimeVerified){[bool]$state.UserRuntimeVerified}else{$false}
 $startedUtc=[datetime]::Parse($state.StartedUtc).ToUniversalTime()
 
 $base=Join-Path $root "logs/$matrix"
@@ -262,8 +283,14 @@ $analysisRequest=[ordered]@{
     IntegrationBranch='vr-d3d9ex-focus'
     BuildMatrixId=$matrix
     VariantId=$variant
+    CompiledVariantId=$compiledVariant
+    SessionVariantId=$sessionVariant
+    ProfileId=$profileId
     Backend=$backend
     TestProfile=$profile
+    ValidationClass=$validationClass
+    EvidenceClass=$evidenceClass
+    UserRuntimeVerified=$userRuntimeVerified
     SessionId=$session
     SessionStartedUtc=$startedUtc.ToString('o')
     SourceSha=$sha
@@ -311,8 +338,14 @@ if($assetSemanticsPresent){
 
 @(
     "VARIANT=$variant"
+    "SESSION_VARIANT=$sessionVariant"
+    "COMPILED_VARIANT=$compiledVariant"
     "BACKEND=$backend"
     "TEST_PROFILE=$profile"
+    "PROFILE_ID=$profileId"
+    "VALIDATION_CLASS=$validationClass"
+    "EVIDENCE_CLASS=$evidenceClass"
+    "USER_RUNTIME_VERIFIED=$userRuntimeVerified"
     "SESSION=$session"
     "SESSION_STARTED_UTC=$($startedUtc.ToString('o'))"
     "BUILD_MATRIX=$matrix"
@@ -332,10 +365,16 @@ if($assetSemanticsPresent){
 )|Set-Content (Join-Path $dest 'MANIFEST.txt') -Encoding UTF8
 
 @{
-    SchemaVersion=3
+    SchemaVersion=4
     VariantId=$variant
+    CompiledVariantId=$compiledVariant
+    SessionVariantId=$sessionVariant
+    ProfileId=$profileId
     Backend=$backend
     TestProfile=$profile
+    ValidationClass=$validationClass
+    EvidenceClass=$evidenceClass
+    UserRuntimeVerified=$userRuntimeVerified
     SessionId=$session
     SessionStartedUtc=$startedUtc.ToString('o')
     BuildMatrixId=$matrix
