@@ -80,11 +80,11 @@ namespace Settings
 	Setting<float> VRDriverSeatUp{ "VR", "DriverSeatUp", 0.65f,
 		"Driver-seat camera vertical offset from the native bumper camera.", Range<float>{ -2.0f, 2.0f } };
 	Setting<bool> VRDriverSeatFullCar{ "VR", "DriverSeatFullCar", true,
-		"While DriverSeatView is active, makes DispCarModel_Common use the native full-car render state without changing the games persistent camera/car flags." };
+		"While DriverSeatView is active, forces DispCarModel_Common render state 1, the full exterior/body path. The games persistent camera/car flags are not changed." };
 	Setting<bool> VRDriverSeatHideDriver{ "VR", "DriverSeatHideDriver", true,
 		"Hides only the selected driver robot while DriverSeatView is active. Passenger/girlfriend rendering remains untouched." };
 	Setting<int> VRDriverSeatDriverWorkId{ "VR", "DriverSeatDriverWorkId", 0,
-		"Robot workId suppressed as the player driver in DriverSeatView. Default 0 matches the first gameplay robot slot; adjustable for runtime validation.", Range<int>{ 0, 20 } };
+		"Robot workId suppressed as the player driver in DriverSeatView. Candidate workId/chrset pairs are logged so this can be corrected live from F11 without rebuilding.", Range<int>{ 0, 20 } };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,
 		"Game-world units per metre of OpenXR head movement.", Range<float>{ 0.1f, 10.0f } };
 	Setting<float> VRStereoDepth{ "VR", "StereoDepth", 1.0f,
