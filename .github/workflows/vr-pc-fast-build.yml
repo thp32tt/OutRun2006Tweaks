@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       clean:
-        description: 'Discard persistent PC build cache before compiling'
+        description: 'Full clean rebuild. Use only for build-system/dependency/toolchain/major branch-contract changes or unexplained runtime mismatch.'
         required: false
         default: false
         type: boolean
@@ -78,7 +78,7 @@ jobs:
           "- Source: $(git rev-parse HEAD)" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           "- Local test folder: $drop" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           "- ZIP: $zip" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
-          "- Final hosted CI: not run by this fast path" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- Build policy: incremental by default; canonical R51 CMake contract is enforced by Build-OutRunPCFast.ps1`n          - Final hosted CI: not run by this fast path" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
 
       - name: Optional GitHub artifact upload
         if: ${{ env.OUTRUN_PC_STALE != 'true' && github.event_name == 'workflow_dispatch' && inputs.upload_artifact }}
