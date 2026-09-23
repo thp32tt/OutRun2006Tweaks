@@ -142,6 +142,9 @@ public class ExportOutRunMap extends GhidraScript {
             FunctionIterator it = currentProgram.getFunctionManager().getFunctions(true);
             while (it.hasNext() && !monitor.isCancelled()) {
                 Function f = it.next();
+                if (f.isExternal()) {
+                    continue;
+                }
                 Address entry = f.getEntryPoint();
                 Address min = f.getBody().getMinAddress();
                 Address max = f.getBody().getMaxAddress();
