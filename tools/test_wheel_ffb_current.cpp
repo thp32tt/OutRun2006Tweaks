@@ -196,6 +196,87 @@ int main() {
  require(reversal.rawFrontSlip()<0&&reversal.frontSlip()<0,"front-slip reversal crosses in one tick");
  require(reversal.steerRate()<0,"steering transient lead follows counter-steer direction");
 
+ // Rear native oversteer cue is intentionally band-limited: no artificial
+ // assist in normal cornering, strong near peak-slip/catch range, and no
+ // runaway DD torque once the rear is far beyond the useful catch window.
+ require(native_oversteer_band(0.50f)==0.0f,"rear-slip cue stays off below activation band");
+ require(native_oversteer_band(1.15f)>.99f,"rear-slip cue reaches full strength near peak slip");
+ require(native_oversteer_band(1.45f)>.99f,"rear-slip cue holds through catch window");
+ require(native_oversteer_band(1.85f)>0.0f&&native_oversteer_band(1.85f)<1.0f,"rear-slip cue fades in large slide");
+ require(native_oversteer_band(2.25f)==0.0f,"rear-slip cue fully releases beyond large-slide band");
+ require(native_oversteer_band(-1.15f)>.99f,"rear-slip cue magnitude is symmetric");
+ require(native_oversteer_band(std::numeric_limits<float>::quiet_NaN())==0.0f,"rear-slip cue NaN fails closed");
+
+ require(native_oversteer_direction(0.12f,false)>0.99f,"hardware-validated positive rear slip keeps positive cue direction");
+ require(native_oversteer_direction(-0.12f,false)<-0.99f,"hardware-validated negative rear slip keeps negative cue direction");
+ require(native_oversteer_direction(0.12f,true)<-0.99f,"rear cue reverse switch remains an explicit fallback");
+ require(native_oversteer_direction(std::numeric_limits<float>::quiet_NaN(),false)==0.0f,"rear cue direction NaN fails closed");
+ require(native_oversteer_headroom(0.0f)>.99f,"rear cue keeps full headroom when base SAT is light");
+ require(native_oversteer_headroom(1.0f)>.34f&&native_oversteer_headroom(1.0f)<.36f,"rear cue is strongly tapered near full base SAT");
+ require(native_oversteer_headroom(-2.0f)>.34f&&native_oversteer_headroom(-2.0f)<.36f,"rear cue headroom is symmetric and bounded");
+ require(native_oversteer_headroom(std::numeric_limits<float>::quiet_NaN())==0.0f,"rear cue headroom NaN fails closed");
+
+ // Drift re-grip guard must leave sustained drift free, then briefly soften
+ // SAT rebuild and add damping only after rear grip returns.
+ DriftRegripGuard regrip;
+ require(regrip.update(0.20f,1.0f/60.0f)==0.0f,"ordinary corner does not arm regrip stabilization");
+ require(regrip.update(0.80f,1.0f/60.0f)==0.0f&&regrip.drift_armed(),"deep slide arms regrip guard without damping the drift");
+ require(regrip.update(0.40f,1.0f/60.0f)==0.0f&&regrip.drift_armed(),"mid-slide hysteresis preserves drift ownership");
+ float recovery=regrip.update(0.20f,1.0f/60.0f);
+ require(recovery>.99f&&!regrip.drift_armed(),"grip return triggers full regrip envelope");
+ require(drift_regrip_sat_scale(recovery)>.54f&&drift_regrip_sat_scale(recovery)<.56f,"regrip initially softens SAT to 55 percent");
+ require(drift_regrip_damper_boost(recovery)>.119f&&drift_regrip_damper_boost(recovery)<.121f,"regrip initially adds 12 percent damping");
+ require(drift_regrip_build_scale(recovery)>.64f&&drift_regrip_build_scale(recovery)<.66f,"regrip slows new-direction torque build without slowing release");
+ for(int i=0;i<28;++i) recovery=regrip.update(0.10f,1.0f/60.0f);
+ require(recovery==0.0f,"regrip stabilization fully releases after about 450 ms");
+ require(drift_regrip_sat_scale(0.0f)==1.0f&&drift_regrip_build_scale(0.0f)==1.0f&&drift_regrip_damper_boost(0.0f)==0.0f,"settled grip restores normal SAT and damping");
+ regrip.update(0.90f,1.0f/60.0f);
+ regrip.update(0.10f,1.0f/60.0f);
+ require(regrip.recovery()>.99f,"second drift can retrigger regrip guard");
+ require(regrip.update(0.90f,1.0f/60.0f)==0.0f&&regrip.drift_armed(),"new drift immediately cancels an old recovery envelope");
+ require(regrip.update(0.0f,std::numeric_limits<float>::quiet_NaN())==0.0f&&!regrip.drift_armed(),"invalid regrip timing fails closed");
+
+ DriftRegripGuard regrip60,regrip120;
+ regrip60.update(0.9f,1.0f/60.0f); regrip60.update(0.1f,1.0f/60.0f);
+ regrip120.update(0.9f,1.0f/120.0f); regrip120.update(0.1f,1.0f/120.0f);
+ float r60=0.0f,r120=0.0f;
+ for(int i=0;i<12;++i) r60=regrip60.update(0.1f,1.0f/60.0f);
+ for(int i=0;i<24;++i) r120=regrip120.update(0.1f,1.0f/120.0f);
+ require(std::abs(r60-r120)<.001f,"regrip envelope duration is cadence independent");
+
+ // Per-wheel road model: material identity alone cannot generate a curb hit;
+ // continuous rough motion stays capped, while a real load/suspension impulse
+ // produces a short event envelope.
+ SurfaceHapticsModel surface;
+ std::array<SurfaceWheelSignal,4> sw{};
+ for(auto& w:sw){w.materialMask=1;w.compressionRate=.01f;w.normalLoad=1.0f;w.referenceLoad=1.0f;w.valid=true;}
+ auto surf=surface.update(sw,1.0f/60.0f);
+ require(surf.valid&&surf.impact==0.0f&&surf.texture==0.0f,"surface first frame initializes without false curb hit");
+ surf=surface.update(sw,1.0f/60.0f);
+ require(surf.valid&&surf.impact==0.0f&&surf.texture>0.0f&&surf.texture<=.12f,"steady road motion becomes subtle capped texture");
+ for(auto& w:sw)w.materialMask=2;
+ surf=surface.update(sw,1.0f/60.0f);
+ require(surf.materialChanges==4&&surf.impact==0.0f,"material transition alone never creates curb impact");
+ for(auto& w:sw){w.materialMask=4;w.compressionRate=.05f;w.normalLoad=1.5f;}
+ surf=surface.update(sw,1.0f/60.0f);
+ require(surf.impact>.95f&&surf.maxLoadDelta>.49f&&surf.materialChanges==4,"material plus physical suspension/load spike creates curb hit");
+ for(auto& w:sw){w.compressionRate=.01f;w.normalLoad=1.5f;}
+ for(int i=0;i<10;++i)surf=surface.update(sw,1.0f/60.0f);
+ require(surf.impact==0.0f,"curb impact envelope releases instead of becoming continuous roughness");
+
+ SurfaceHapticsModel brick;
+ for(auto& w:sw){w.materialMask=8;w.compressionRate=.04f;w.normalLoad=1.0f;w.referenceLoad=1.0f;w.valid=true;}
+ brick.update(sw,1.0f/60.0f);
+ for(int i=0;i<30;++i){
+   const float n=(i&1)?1.02f:.98f;
+   for(auto& w:sw){w.compressionRate=.04f;w.normalLoad=n;}
+   surf=brick.update(sw,1.0f/60.0f);
+ }
+ require(surf.valid&&surf.texture<=.12f&&surf.impact==0.0f,"continuous brick-like motion remains low texture without permanent curb pulse");
+ for(auto& w:sw)w.valid=false;
+ surf=brick.update(sw,1.0f/60.0f);
+ require(!surf.valid&&surf.texture==0.0f&&surf.impact==0.0f,"invalid native wheel frame fails closed");
+
  float beta=d.bodySlip();d.update(nullptr,0,.5,0);require(d.bodySlip()<beta&&!d.sampleValid(),"invalid decay");
  for(int i=0;i<4;++i)d.update(nullptr,0,.5,0);
  require(d.bodySlip()==0&&d.yawRate()==0&&d.frontSlip()==0&&d.activationBlend()==0,"five-invalid clear");

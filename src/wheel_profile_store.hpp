@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <optional>
@@ -23,6 +24,17 @@ namespace Settings
     extern Setting<float> WheelFFBXForceMix;
     extern Setting<bool> WheelFFBXForceInvert;
     extern Setting<float> WheelFFBXForceGain;
+    extern Setting<bool> WheelFFBNativeTireSat;
+    extern Setting<float> WheelFFBNativeTireSatGain;
+    extern Setting<bool> WheelFFBNativeTireSatInvert;
+    extern Setting<bool> WheelFFBNativeOversteerCue;
+    extern Setting<float> WheelFFBNativeOversteerStrength;
+    extern Setting<float> WheelFFBNativeOversteerSlipThreshold;
+    extern Setting<bool> WheelFFBNativeOversteerInvert;
+    extern Setting<bool> WheelFFBInvertForce;
+    extern Setting<float> WheelFFBRoadTexture;
+    extern Setting<float> WheelFFBCurbImpact;
+    extern Setting<int> WheelFFBFeelRevision;
 }
 
 // Named wheel/input and force-feedback profiles live beside the DLL instead of
@@ -416,6 +428,7 @@ namespace WheelProfileStore
         return key != "DeviceName" && key != "DeviceGuid" &&
             key != "Telemetry" && key != "DebugLog" &&
             key != "XForceCapture60Hz" &&
+            key != "NativePhysicsCapture60Hz" &&
             key != "ResponseCorrection" && key != "ResponseLUT" &&
             key != "MaxTorqueNm";
     }
@@ -559,6 +572,99 @@ namespace WheelProfileStore
             Settings::WheelFFBXForceGain.set_from_string("1.00");
             if (Settings::WheelFFBXForceGain.to_string() != oldValue)
                 changed.push_back(&Settings::WheelFFBXForceGain);
+        }
+
+        // Native tyre-force SAT did not exist in earlier profiles and is a
+        // research-only mode. Loading an old profile must never inherit a live
+        // experimental native state from the current session.
+        const auto migrate_native = [&](Settings::SettingBase& setting, const char* value)
+        {
+            const std::string oldValue = setting.to_string();
+            setting.set_from_string(value);
+            if (setting.to_string() != oldValue)
+                changed.push_back(&setting);
+        };
+        if (values.find("nativetiresat") == values.end())
+            migrate_native(Settings::WheelFFBNativeTireSat, "false");
+        if (values.find("nativetiresatgain") == values.end())
+            migrate_native(Settings::WheelFFBNativeTireSatGain, "1.00");
+        if (values.find("nativetiresatinvert") == values.end())
+            migrate_native(Settings::WheelFFBNativeTireSatInvert, "false");
+
+        // The rear-slip counter-steer cue is intentionally fail-closed for every
+        // profile saved before this feature existed. Missing strength/threshold
+        // values also receive neutral research defaults rather than inheriting
+        // a live session value.
+        if (values.find("nativeoversteercue") == values.end())
+            migrate_native(Settings::WheelFFBNativeOversteerCue, "false");
+        if (values.find("nativeoversteerstrength") == values.end())
+            migrate_native(Settings::WheelFFBNativeOversteerStrength, "0.10");
+        if (values.find("nativeoversteerslipthreshold") == values.end())
+            migrate_native(Settings::WheelFFBNativeOversteerSlipThreshold, "0.12");
+        if (values.find("nativeoversteerinvert") == values.end())
+            migrate_native(Settings::WheelFFBNativeOversteerInvert, "false");
+
+        // Profiles from the first v0.4 candidate used the opposite rear-cue
+        // sign. The corrected runtime preserves the hardware-validated direction
+        // with Reverse OFF. Migrate those profiles once, and soften only the
+        // original 0.18 default rather than overwriting deliberate custom gain.
+        const bool preRearCueDirectionFix =
+            values.find("feelrevision") == values.end() ||
+            int(Settings::WheelFFBFeelRevision) < 6;
+        if (preRearCueDirectionFix)
+        {
+            const float rearStrength =
+                static_cast<float>(Settings::WheelFFBNativeOversteerStrength);
+            if (std::isfinite(rearStrength) &&
+                std::abs(rearStrength - 0.18f) <= 0.0005f)
+                migrate_native(Settings::WheelFFBNativeOversteerStrength, "0.10");
+            migrate_native(Settings::WheelFFBNativeOversteerInvert, "false");
+            migrate_native(Settings::WheelFFBFeelRevision, "6");
+        }
+
+        // The first v0.4 R3 test profile could store both the global output
+        // reverse and an experimental native SAT reverse. Enabling both hides
+        // the direction error by double inversion. The hardware-validated R3
+        // path uses both OFF. Apply that migration only to the known R3 device
+        // family; unknown wheels keep their deliberate direction settings.
+        const std::string deviceName =
+            lower_ascii(Settings::WheelFFBDeviceName.get());
+        const bool validatedR3 =
+            deviceName.find("r3 racing wheel") != std::string::npos ||
+            deviceName.find("moza r3") != std::string::npos;
+        const bool preR3DirectionFix =
+            values.find("feelrevision") == values.end() ||
+            int(Settings::WheelFFBFeelRevision) < 7;
+        if (validatedR3 && preR3DirectionFix)
+        {
+            migrate_native(Settings::WheelFFBInvertForce, "false");
+            migrate_native(Settings::WheelFFBNativeTireSatInvert, "false");
+            migrate_native(Settings::WheelFFBNativeOversteerInvert, "false");
+        }
+        if (preR3DirectionFix)
+            migrate_native(Settings::WheelFFBFeelRevision, "7");
+
+        // Profiles saved before the per-wheel surface rewrite used a road
+        // strength tuned around the old max-roughness model and had no separate
+        // curb/bump control. Soften only the untouched 0.60 legacy road default;
+        // preserve deliberate custom RoadTexture values.
+        const bool preSurfaceRewrite =
+            values.find("feelrevision") == values.end() ||
+            int(Settings::WheelFFBFeelRevision) < 8;
+        if (preSurfaceRewrite)
+        {
+            const float road =
+                static_cast<float>(Settings::WheelFFBRoadTexture);
+            if (std::isfinite(road) &&
+                std::abs(road - 0.60f) <= 0.0005f)
+                migrate_native(Settings::WheelFFBRoadTexture, "0.30");
+            if (values.find("curbimpact") == values.end())
+                migrate_native(Settings::WheelFFBCurbImpact, "0.40");
+            migrate_native(Settings::WheelFFBFeelRevision, "8");
+        }
+        else if (values.find("curbimpact") == values.end())
+        {
+            migrate_native(Settings::WheelFFBCurbImpact, "0.40");
         }
 
         for (Settings::SettingBase* setting : changed)

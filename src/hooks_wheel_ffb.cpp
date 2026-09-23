@@ -23,6 +23,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "hooks_wheel_vehicle_dynamics.hpp"
+#include "hooks_wheel_native_physics_research.hpp"
 #include "wheel_ffb_math.hpp"
 #include "wheel_ffb_runtime.hpp"
 #include "overlay/overlay.hpp"
@@ -32,11 +33,10 @@ extern "C"
     void __cdecl CalcVibrationValues(EVWORK_CAR* car);
 }
 
-extern double __cdecl sub_1149C0(unsigned int surfaceMask, int loadColiType, DWORD* waterFlag);
 extern float InputManager_SteeringValue();
 
 static_assert(offsetof(EVWORK_CAR, actionforce_DBC) == 0xDBC,
-    "EVWORK_CAR::actionforce_DBC offset drifted; native X-Force candidate would read the wrong memory");
+    "EVWORK_CAR::actionforce_DBC offset drifted; legacy DBC diagnostic would read the wrong memory");
 
 namespace Settings
 {
@@ -125,36 +125,79 @@ namespace Settings
         "Experimental body-slip/yaw SAT instead of steering-centre direction alone."
     };
 
-    // v0.3 steering-character experiment. Modern preserves the v0.2 model exactly;
-    // Arcade/Hybrid can consume the game's actionforce_DBC field only after
-    // conservative plausibility checks. Until that field is proven to be Howard
-    // Castro's X-Force, it is deliberately treated as a candidate signal.
+    // v0.3 compatibility settings are retained so existing user.ini/profile
+    // files continue to parse, but the whole-EXE map invalidated actionforce_DBC
+    // as a steering-force source: its writer belongs to the race handicap /
+    // catch-up path. Production output is therefore forced to Modern DD.
     Setting<int> WheelFFBFeedbackCharacter{
         "WheelFFB", "FeedbackCharacter", 0,
-        "Steering-force character: 0=Modern DD, 1=Arcade X-Force candidate, 2=Hybrid.",
+        "Deprecated compatibility value. EXE XREF analysis proved actionforce_DBC belongs to handicap/catch-up logic; runtime always uses Modern DD.",
         Range<int>{ 0, 2 }
     };
 
     Setting<float> WheelFFBXForceMix{
         "WheelFFB", "XForceMix", 0.50f,
-        "Hybrid share of the guarded native X-Force candidate. 0=Modern SAT, 1=native candidate.",
+        "Deprecated compatibility value. DBC native-force mixing is disabled by executable-map evidence.",
         Range<float>{ 0.0f, 1.0f }
     };
 
     Setting<bool> WheelFFBXForceInvert{
         "WheelFFB", "XForceInvert", false,
-        "Reverse only the native X-Force candidate before it is mixed with Modern SAT."
+        "Deprecated compatibility value. DBC is diagnostic-only and is never routed to wheel torque."
     };
 
     Setting<float> WheelFFBXForceGain{
         "WheelFFB", "XForceGain", 1.00f,
-        "Native X-Force candidate gain after normalization. Default 1.0; keep conservative until actionforce_DBC is proven.",
+        "Deprecated compatibility value. DBC is diagnostic-only and is never routed to wheel torque.",
         Range<float>{ 0.0f, 2.0f }
     };
 
     Setting<bool> WheelFFBXForceCapture60Hz{
         "WheelFFB", "XForceCapture60Hz", false,
-        "Very verbose 60 Hz X-Force validation capture in OutRun2006Tweaks.log. Diagnostic only; does not alter force selection."
+        "Legacy 60 Hz DBC/DC0/DC4 diagnostic capture. DBC is now known to be handicap/catch-up data and never alters FFB output."
+    };
+
+    Setting<bool> WheelFFBNativePhysicsCapture60Hz{
+        "WheelFFB", "NativePhysicsCapture60Hz", false,
+        "Very verbose research capture of the canonical 4-wheel physics workspace after each 60 Hz player-car physics tick. Diagnostic only; never alters wheel output."
+    };
+
+    Setting<bool> WheelFFBNativeTireSat{
+        "WheelFFB", "NativeTireSAT", false,
+        "Experimental SAT from the game's native front-tyre slip/lateral-force channels (AC/C0). Default off until driving captures validate sign/scale."
+    };
+
+    Setting<float> WheelFFBNativeTireSatGain{
+        "WheelFFB", "NativeTireSATGain", 1.00f,
+        "Gain applied to the normalized native front lateral-force candidate before trail shaping.",
+        Range<float>{ 0.0f, 2.0f }
+    };
+
+    Setting<bool> WheelFFBNativeTireSatInvert{
+        "WheelFFB", "NativeTireSATInvert", false,
+        "Reverse only the experimental native tyre-force SAT direction. Use only during low-strength validation."
+    };
+
+    Setting<bool> WheelFFBNativeOversteerCue{
+        "WheelFFB", "NativeOversteerCue", false,
+        "Experimental rear-tyre peak-slip counter-steer cue inspired by AMS2 rFuktor and AC post-process FFB. Default off until rear slip direction is hardware-validated."
+    };
+
+    Setting<float> WheelFFBNativeOversteerStrength{
+        "WheelFFB", "NativeOversteerStrength", 0.10f,
+        "Maximum additive rear-slip counter-steer cue before base-SAT headroom taper and the existing global output cap/slew path.",
+        Range<float>{ 0.0f, 0.25f }
+    };
+
+    Setting<float> WheelFFBNativeOversteerSlipThreshold{
+        "WheelFFB", "NativeOversteerSlipThreshold", 0.12f,
+        "Rear native slip angle in radians treated as the approximate peak-slip reference for the bounded oversteer cue.",
+        Range<float>{ 0.04f, 0.30f }
+    };
+
+    Setting<bool> WheelFFBNativeOversteerInvert{
+        "WheelFFB", "NativeOversteerInvert", false,
+        "Reverse only the native rear-slip counter-steer cue during low-strength direction validation."
     };
 
     Setting<float> WheelFFBGripLoss{
@@ -184,7 +227,14 @@ namespace Settings
 
     Setting<float> WheelFFBRoadTexture{
         "WheelFFB", "RoadTexture", 0.30f,
-        "Hardware sine vibration driven by the game's own surface roughness table.", Range<float>{ 0.0f, 1.0f }
+        "Low-amplitude continuous road texture derived from per-wheel suspension/load motion. No max(roughness) material lookup.",
+        Range<float>{ 0.0f, 1.0f }
+    };
+
+    Setting<float> WheelFFBCurbImpact{
+        "WheelFFB", "CurbImpact", 0.40f,
+        "Short curb/bump pulse from per-wheel material transitions plus suspension/load impulse.",
+        Range<float>{ 0.0f, 1.0f }
     };
 
     Setting<float> WheelFFBTireSlip{
@@ -222,8 +272,8 @@ namespace Settings
     };
 
     Setting<bool> WheelFFBInvertForce{
-        "WheelFFB", "InvertForce", true,
-        "Reverse ConstantForce steering/event direction without changing the centering spring."
+        "WheelFFB", "InvertForce", false,
+        "Reverse ConstantForce steering/event direction without changing the centering spring. Leave off for the validated MOZA R3 path."
     };
 
     Setting<bool> WheelFFBInvertSpring{
@@ -509,8 +559,6 @@ namespace
                 crashImpulseTimer_ = 0;
                 crashImpulseForce_ = 0.0f;
                 gearShiftTimer_ = 0;
-                splashTimer_ = 0;
-                splashAmp_ = 0.0f;
 
                 LONG testLevel = manualTestDirection_ * 2000L;
                 if (Settings::WheelFFBInvertForce)
@@ -677,62 +725,85 @@ namespace
             update_crash_detection(speed, stateFlags);
             update_gear_event(curGear);
 
-            float roughness = 0.0f;
-            DWORD waterFlag = 0;
-            for (int i = 0; i < 4; ++i)
+            float regripRecovery = 0.0f;
+            if (vehicleDynamics_.sampleValid() &&
+                speedNorm > 0.08f &&
+                crashImpulseTimer_ <= 0)
             {
-                const float surfaceRoughness = static_cast<float>(sub_1149C0(
-                    car->water_flag_24C[i],
-                    static_cast<int>(car->OnRoadPlace_5C.loadColiType_0),
-                    &waterFlag));
-                if (std::isfinite(surfaceRoughness))
-                    roughness = std::max(roughness, surfaceRoughness);
+                regripRecovery = driftRegripGuard_.update(
+                    bodySlide, 1.0f / 60.0f);
+            }
+            else
+            {
+                driftRegripGuard_.reset();
+            }
+            const float regripSatScale =
+                WheelFFBMath::drift_regrip_sat_scale(regripRecovery);
+            const float regripDamperBoost =
+                WheelFFBMath::drift_regrip_damper_boost(regripRecovery);
+            const float regripBuildScale =
+                WheelFFBMath::drift_regrip_build_scale(regripRecovery);
+
+            // Per-wheel road/curb model. The old path collapsed all four
+            // material queries through one maximum roughness scalar, which made a
+            // continuously rough brick/stone road feel like a permanent curb
+            // and required a stage-specific snow/ice attenuation hack.
+            //
+            // Keep material identity as identity, then let real suspension/load
+            // motion decide how much tactile energy exists. Material transitions
+            // can boost an actual physical hit but never generate a hit alone.
+            const auto nativeWheelFrame =
+                WheelNativePhysicsResearch::wheel_frame_state();
+            std::array<WheelFFBMath::SurfaceWheelSignal, 4> surfaceWheel{};
+            if (nativeWheelFrame.valid)
+            {
+                for (std::size_t i = 0; i < surfaceWheel.size(); ++i)
+                {
+                    const auto& nw = nativeWheelFrame.wheel[i];
+                    auto& sw = surfaceWheel[i];
+                    sw.materialMask = car->water_flag_24C[i];
+                    sw.compressionRate = nw.compressionRate20;
+                    sw.normalLoad = nw.normalLoad34;
+                    sw.referenceLoad = nw.referenceLoad38;
+                    sw.valid = nw.finite;
+                }
             }
 
-            // Road texture and tire-slip envelopes.  sub_1149C0 returns
-            // ~0.25 for ordinary asphalt; that is a material baseline, not a
-            // request to vibrate the wheel.  The Xbox routine only enters its
-            // stronger surface branch above roughly 0.30, so remove that
-            // baseline here and ramp rough surfaces from 0.30 -> 0.85.
-            const float textureRoughness =
-                std::clamp((roughness - 0.30f) / 0.55f, 0.0f, 1.0f);
+            const WheelFFBMath::SurfaceHapticsOutput surfaceHaptics =
+                surfaceHapticsModel_.update(surfaceWheel, 1.0f / 60.0f);
             const float roadSpeedGate =
                 std::clamp((speedNorm - 0.05f) / 0.20f, 0.0f, 1.0f);
+            const float roadTextureStrength = std::clamp(
+                static_cast<float>(Settings::WheelFFBRoadTexture),
+                0.0f, 1.0f);
+            const float curbImpactStrength = std::clamp(
+                static_cast<float>(Settings::WheelFFBCurbImpact),
+                0.0f, 1.0f);
 
-            // Xbox gamepad rumble treats snow/ice as a continuously rough
-            // material. On a DD wheel that becomes an unpleasant constant
-            // high-frequency sine. Stage IDs follow Game::StageNames: 4/19
-            // are Snowy Mountain/Ice Scape and +30 are their reverse variants.
-            const int stageNumber = Game::GetNowStageNum(8);
-            const int uniqueStage = Game::GetStageUniqueNum(stageNumber);
-            const bool snowOrIceStage =
-                uniqueStage == 4 || uniqueStage == 19 ||
-                uniqueStage == 34 || uniqueStage == 49;
-            constexpr float SnowIceRoadTextureScale = 0.04f;
-            const float stageRoadTextureScale =
-                snowOrIceStage ? SnowIceRoadTextureScale : 1.0f;
+            const float roadTextureAmp =
+                surfaceHaptics.valid
+                    ? surfaceHaptics.texture * roadSpeedGate *
+                        roadTextureStrength * outputStrength
+                    : 0.0f;
+            const float roadImpactAmp =
+                surfaceHaptics.valid
+                    ? surfaceHaptics.impact * roadSpeedGate *
+                        curbImpactStrength * 0.18f * outputStrength
+                    : 0.0f;
 
-            float roadAmp =
-                textureRoughness * roadSpeedGate *
-                static_cast<float>(Settings::WheelFFBRoadTexture) * outputStrength *
-                stageRoadTextureScale;
-            const float roadFreq = 25.0f + 12.0f * speedNorm;
-
-            if (waterFlag && roughness > 0.7f && speedNorm > 0.70f && splashTimer_ <= 0)
-            {
-                const float roadTextureScale = std::clamp(
-                    static_cast<float>(Settings::WheelFFBRoadTexture) / 0.20f,
-                    0.0f, 5.0f);
-                splashAmp_ =
-                    (roughness - 0.7f) * speedNorm * 0.75f * roadTextureScale *
-                    outputStrength * stageRoadTextureScale;
-                splashTimer_ = 9;
-            }
-            if (splashTimer_ > 0)
-            {
-                roadAmp = std::max(roadAmp, splashAmp_);
-                --splashTimer_;
-            }
+            // Texture is intentionally averaged/capped by SurfaceHapticsModel.
+            // A short suspension impulse may temporarily dominate the same
+            // tactile channel at a lower, curb-like frequency.
+            const float roadAmp = std::clamp(
+                roadTextureAmp + roadImpactAmp,
+                0.0f,
+                0.24f * std::max(outputStrength, 0.0f));
+            const bool roadImpactDominant =
+                roadImpactAmp > 0.004f &&
+                roadImpactAmp > roadTextureAmp * 0.75f;
+            const float roadFreq = roadImpactDominant
+                ? 12.0f + 6.0f * speedNorm
+                : 22.0f + 10.0f * speedNorm;
 
             float slipAmp = 0.0f;
             float slipFreq = 40.0f;
@@ -844,7 +915,8 @@ namespace
             const float damperRelease = 1.0f - 0.55f * gripLoss * damperSlipRelief;
             const float dynamicDamperStrength = std::clamp(
                 static_cast<float>(Settings::WheelFFBDamperStrength) *
-                    dampingSpeed * damperRelease,
+                    dampingSpeed * damperRelease +
+                    regripDamperBoost,
                 0.0f, 1.0f);
 
             if (!Settings::WheelFFBUseHardwareDamper && damperEffect_)
@@ -983,15 +1055,162 @@ namespace
             // Dropping it on the calibration tick created a short SAT hole while
             // physicsMix was still near zero.
             const float physicsFallback = naturalSatTorque;
-            const float modernSelfAligningTorque = Settings::WheelFFBPhysicsSat
+            const float syntheticModernSat = Settings::WheelFFBPhysicsSat
                 ? physicsFallback + (physicsSatTorque - physicsFallback) * physicsMix
                 : naturalSatTorque;
 
-            // v0.3 native steering-force experiment. actionforce_DBC remains a
-            // candidate until telemetry proves it is Howard Castro's X-Force.
-            // The production guard handles the two important DD-wheel hazards:
-            // stale force at a stop/restart and one-frame fallback at a legitimate
-            // zero crossing. Modern DD never consumes the candidate.
+            // Canonical EXE tyre path (research-gated):
+            // wheel0/1 are the front axle and wheel2/3 are the rear axle.
+            // +EE is native signed slip-angle state, +AC is the lateral tyre
+            // force component and +C0 is the load-sensitive combined-slip
+            // capacity. All new native ownership is opt-in and fail-closed.
+            const WheelNativePhysicsResearch::FrontTireState nativeFront =
+                WheelNativePhysicsResearch::front_tire_state();
+            const WheelNativePhysicsResearch::RearTireState nativeRear =
+                WheelNativePhysicsResearch::rear_tire_state();
+            const bool nativeTireRequested =
+                Settings::WheelFFBPhysicsSat &&
+                Settings::WheelFFBNativeTireSat &&
+                speedNorm > 0.04f;
+            const bool nativeTireValid =
+                nativeTireRequested && nativeFront.valid;
+
+            constexpr float NativeTireBlendInPerTick = 1.0f / 12.0f;  // ~200 ms @60 Hz
+            constexpr float NativeTireBlendOutPerTick = 1.0f / 6.0f; // ~100 ms @60 Hz
+            if (nativeTireValid)
+                nativeTireSatBlend_ = std::min(
+                    1.0f, nativeTireSatBlend_ + NativeTireBlendInPerTick);
+            else
+                nativeTireSatBlend_ = std::max(
+                    0.0f, nativeTireSatBlend_ - NativeTireBlendOutPerTick);
+
+            float nativeTireSatTorque = syntheticModernSat;
+            if (nativeFront.valid)
+            {
+                const float configuredNativeGain =
+                    static_cast<float>(Settings::WheelFFBNativeTireSatGain);
+                const float nativeGain = std::isfinite(configuredNativeGain)
+                    ? std::clamp(configuredNativeGain, 0.0f, 2.0f)
+                    : 1.0f;
+                const float nativeForceMagnitude = std::clamp(
+                    std::abs(nativeFront.normalizedLateral) * nativeGain,
+                    0.0f, 1.0f);
+
+                // AC already contains the game's own load/grip/combined-slip
+                // behavior. Only the aligning lever arm is shaped here; do not
+                // multiply the synthetic lateral-G load proxy on top of it.
+                const float nativePneumaticTrail =
+                    WheelFFBMath::pneumatic_trail_factor(nativeFront.slipRad);
+                const float nativeTrailDenom = 1.0f + mechanicalTrailMix;
+                const float nativeAlignShape = nativeTrailDenom > 0.0f
+                    ? std::clamp(
+                        nativeForceMagnitude *
+                        (nativePneumaticTrail + mechanicalTrailMix) /
+                        nativeTrailDenom,
+                        0.0f, 1.0f)
+                    : 0.0f;
+
+                float nativeDirection =
+                    nativeFront.normalizedLateral > 0.0f ? -1.0f :
+                    (nativeFront.normalizedLateral < 0.0f ? 1.0f : 0.0f);
+                if (Settings::WheelFFBNativeTireSatInvert)
+                    nativeDirection = -nativeDirection;
+
+                const float nativeReturnRelief =
+                    WheelFFBMath::physics_return_relief(
+                        nativeFront.slipRad, steerRate);
+                nativeTireSatTorque =
+                    nativeDirection * nativeAlignShape * satSpeed *
+                    nativeReturnRelief * satStrength;
+                if (!std::isfinite(nativeTireSatTorque))
+                    nativeTireSatTorque = syntheticModernSat;
+            }
+
+            const float baseModernSelfAligningTorque =
+                syntheticModernSat +
+                (nativeTireSatTorque - syntheticModernSat) * nativeTireSatBlend_;
+
+            // AMS2 rFuktor + AC Toolbox-inspired oversteer cue. It is deliberately
+            // a bounded rear peak-slip cue, not a generic "drift force": it rises
+            // near the configured rear peak-slip reference and fades again in a
+            // very large slide. Both axles need trustworthy native tyre capacity,
+            // and collision/reset/airborne-like states release ownership quickly.
+            const float configuredRearSlipThreshold =
+                static_cast<float>(Settings::WheelFFBNativeOversteerSlipThreshold);
+            const float rearSlipThreshold =
+                std::isfinite(configuredRearSlipThreshold)
+                    ? std::clamp(configuredRearSlipThreshold, 0.04f, 0.30f)
+                    : 0.12f;
+            const float rearSlipNormalized = nativeRear.valid
+                ? std::abs(nativeRear.slipRad) / rearSlipThreshold
+                : 0.0f;
+            const float rearOversteerBand =
+                WheelFFBMath::native_oversteer_band(rearSlipNormalized);
+
+            const bool nativeOversteerRequested =
+                Settings::WheelFFBPhysicsSat &&
+                Settings::WheelFFBNativeOversteerCue &&
+                speedNorm > 0.08f;
+            const bool oversteerProtectionClear =
+                crashImpulseTimer_ <= 0 &&
+                nativeFront.valid &&
+                nativeRear.valid &&
+                vehicleDynamics_.sampleValid();
+            const bool nativeOversteerValid =
+                nativeOversteerRequested && oversteerProtectionClear;
+
+            constexpr float OversteerProtectBlendInPerTick = 1.0f / 12.0f; // ~200 ms
+            constexpr float OversteerProtectBlendOutPerTick = 1.0f / 3.0f; // ~50 ms
+            if (nativeOversteerValid)
+                nativeOversteerProtectionBlend_ = std::min(
+                    1.0f,
+                    nativeOversteerProtectionBlend_ + OversteerProtectBlendInPerTick);
+            else
+                nativeOversteerProtectionBlend_ = std::max(
+                    0.0f,
+                    nativeOversteerProtectionBlend_ - OversteerProtectBlendOutPerTick);
+
+            float nativeOversteerCueTorque = 0.0f;
+            if (nativeRear.valid && rearOversteerBand > 0.0f)
+            {
+                const float configuredCueStrength =
+                    static_cast<float>(Settings::WheelFFBNativeOversteerStrength);
+                const float cueStrength = std::isfinite(configuredCueStrength)
+                    ? std::clamp(configuredCueStrength, 0.0f, 0.25f)
+                    : 0.10f;
+
+                // Hardware testing on the R3 established the canonical EE sign:
+                // preserving rear slip sign produces the correct counter-steer
+                // direction. The optional invert remains for device/user fallback.
+                const float rearCueDirection =
+                    WheelFFBMath::native_oversteer_direction(
+                        nativeRear.slipRad,
+                        bool(Settings::WheelFFBNativeOversteerInvert));
+                const float cueHeadroom =
+                    WheelFFBMath::native_oversteer_headroom(
+                        baseModernSelfAligningTorque);
+
+                nativeOversteerCueTorque =
+                    rearCueDirection *
+                    rearOversteerBand *
+                    cueStrength *
+                    cueHeadroom *
+                    satSpeed *
+                    satStrength *
+                    nativeOversteerProtectionBlend_;
+                if (!std::isfinite(nativeOversteerCueTorque))
+                    nativeOversteerCueTorque = 0.0f;
+            }
+
+            const float modernSelfAligningTorque =
+                baseModernSelfAligningTorque + nativeOversteerCueTorque;
+
+            // Legacy v0.3 DBC instrumentation is retained for comparison with
+            // old captures, but whole-EXE XREF analysis proved actionforce_DBC is
+            // written by the race handicap/catch-up path. It must never own
+            // production steering torque. The guarded analyzer below is therefore
+            // diagnostic-only until it is eventually removed/replaced by the
+            // newly discovered four-wheel native-physics channels.
             const DWORD xForceNow = GetTickCount();
             float xForceDeltaSeconds = 1.0f / 60.0f;
             if (lastXForceFrameTick_ != 0)
@@ -1037,14 +1256,31 @@ namespace
                 xForceSample.normalized * xForceSample.motionGate * satStrength *
                 smoothedXForceGain_;
 
-            const int feedbackCharacter = std::clamp(
+            const int requestedFeedbackCharacter = std::clamp(
                 static_cast<int>(Settings::WheelFFBFeedbackCharacter), 0, 2);
+            // Fail closed: DBC/DC0 are handicap/catch-up state, not steering-rack
+            // force. Keep the legacy setting readable for old profiles, but force
+            // production ownership to Modern DD irrespective of its value.
+            constexpr int feedbackCharacter = 0;
+            if (requestedFeedbackCharacter != 0)
+            {
+                static int lastRejectedFeedbackCharacter = -1;
+                if (lastRejectedFeedbackCharacter != requestedFeedbackCharacter)
+                {
+                    lastRejectedFeedbackCharacter = requestedFeedbackCharacter;
+                    spdlog::warn(
+                        "WheelFFB: FeedbackCharacter={} ignored; executable-map XREFs prove actionforce_DBC is handicap/catch-up data, so Modern DD remains authoritative",
+                        requestedFeedbackCharacter);
+                }
+            }
             const float xForceMix = std::clamp(smoothedXForceMix_, 0.0f, 1.0f);
             const WheelFFBMath::XForceMixResult xForceMixResult =
                 WheelFFBMath::mix_xforce_character(
                     modernSelfAligningTorque, nativeXForceTorque,
                     feedbackCharacter, xForceMix, xForceSample.nativeBlend);
-            const float selfAligningTorque = xForceMixResult.torque;
+            const float rawSelfAligningTorque = xForceMixResult.torque;
+            const float selfAligningTorque =
+                rawSelfAligningTorque * regripSatScale;
 
             float loadMod = 1.0f;
             if (speedHistoryIndex_ > 6)
@@ -1123,11 +1359,15 @@ namespace
             const float safeSlew = std::isfinite(configuredSlew)
                 ? std::clamp(configuredSlew, 0.01f, 1.0f)
                 : 0.06f;
-            const LONG maxSlew = static_cast<LONG>(
+            const LONG baseMaxSlew = static_cast<LONG>(
                 safeSlew * static_cast<float>(DI_FFNOMINALMAX));
+            const LONG maxSlew = std::max<LONG>(
+                1,
+                static_cast<LONG>(
+                    static_cast<float>(baseMaxSlew) * regripBuildScale));
 
             const LONG releaseMaxSlew = std::min(
-                static_cast<LONG>(DI_FFNOMINALMAX), maxSlew * 2);
+                static_cast<LONG>(DI_FFNOMINALMAX), baseMaxSlew * 2);
             const float configuredReversalRelease =
                 static_cast<float>(Settings::WheelFFBReversalReleaseRate);
             const float safeReversalRelease = std::isfinite(configuredReversalRelease)
@@ -1221,7 +1461,11 @@ namespace
                 static_cast<float>(structuralLevel) / static_cast<float>(DI_FFNOMINALMAX),
                 static_cast<float>(level) / static_cast<float>(DI_FFNOMINALMAX),
                 xForceSample.normalized, modernSelfAligningTorque,
-                nativeXForceTorque, xForceMixResult.nativeShare);
+                nativeXForceTorque, xForceMixResult.nativeShare,
+                nativeFront.valid ? nativeFront.normalizedLateral : 0.0f,
+                nativeTireSatTorque, nativeTireSatBlend_,
+                rearSlipNormalized, nativeOversteerCueTorque,
+                nativeOversteerProtectionBlend_);
 
             if (Settings::WheelFFBXForceCapture60Hz)
             {
@@ -1278,13 +1522,17 @@ namespace
 
             prevGear_ = curGear;
             prevCollisionFlags_ = stateFlags;
-            maybe_log(speedNorm, steer, steerRate, lateralLoadSmooth, bodySlide, frontScrub, roughness, selfAligningTorque, level);
+            maybe_log(
+                speedNorm, steer, steerRate, lateralLoadSmooth,
+                bodySlide, frontScrub,
+                surfaceHaptics.texture, surfaceHaptics.impact,
+                selfAligningTorque, level);
             const DWORD telemetryNow = GetTickCount();
             if (Settings::WheelFFBTelemetry && telemetryNow - lastTelemetryTick_ >= 100)
             {
                 lastTelemetryTick_ = telemetryNow;
                 spdlog::info(
-                    "WheelFFB SAMPLE t={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperRelease={} damperCoefficient={} roadAmp={} slipAmp={} structural={} event={} structuralPreClip={} structuralPostClip={} eventPostClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
+                    "WheelFFB SAMPLE t={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} regripRecovery={} regripSatScale={} regripDamperBoost={} regripBuildScale={} springRequested={} springCoefficient={} damperRequested={} damperRelease={} damperCoefficient={} surfaceTexture={} surfaceImpact={} surfaceMatChanges={} surfaceMaxLoadDelta={} surfaceMaxRateSpike={} surfaceMasks={:08X}/{:08X}/{:08X}/{:08X} roadTextureAmp={} roadImpactAmp={} roadAmp={} slipAmp={} structural={} event={} structuralPreClip={} structuralPostClip={} eventPostClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
                     telemetryNow, static_cast<const void*>(car), speedRaw, speedNorm, steer, rawSteerRate, steerRate,
                     car->field_264, car->field_268, lateralRaw, smoothedLateral_, lateralLoadSmooth,
                     vehicleDynamics_.bodySlip(), bodySlide, vehicleDynamics_.yawRate(), frontSlip, frontScrub,
@@ -1293,8 +1541,16 @@ namespace
                     vehicleDynamics_.spdLen(), vehicleDynamics_.spdCorrelation(),
                     vehicleDynamics_.forwardAxis(), vehicleDynamics_.calibrationConfidence(),
                     vehicleDynamics_.sampleValid(), physicsMix, physicsSatTorque, selfAligningTorque,
-                    trailShape, physicsLoad, rearSlideRelief, springStrength, prevSpringCoefficient_,
-                    dynamicDamperStrength, damperRelease, prevDamperCoefficient_, roadAmp, slipAmp,
+                    trailShape, physicsLoad, rearSlideRelief,
+                    regripRecovery, regripSatScale, regripDamperBoost, regripBuildScale,
+                    springStrength, prevSpringCoefficient_,
+                    dynamicDamperStrength, damperRelease, prevDamperCoefficient_,
+                    surfaceHaptics.texture, surfaceHaptics.impact,
+                    surfaceHaptics.materialChanges,
+                    surfaceHaptics.maxLoadDelta, surfaceHaptics.maxRateSpike,
+                    car->water_flag_24C[0], car->water_flag_24C[1],
+                    car->water_flag_24C[2], car->water_flag_24C[3],
+                    roadTextureAmp, roadImpactAmp, roadAmp, slipAmp,
                     structural, events, total, compressed, eventCompressed, structuralLevel, level, prevConstantLevel_,
                     constantEffectPolar_, springEffect_ != nullptr, damperEffect_ != nullptr,
                     periodicsActive_, outputStrength, bool(Settings::WheelFFBInvertForce),
@@ -1317,6 +1573,17 @@ namespace
                     xForceAnalysis.p95Abs, xForceAnalysis.p99Abs,
                     xForceAnalysis.maxAbs, smoothedXForceGain_);
                 spdlog::info(
+                    "WheelFFB NATIVE_OVERSTEER t={} requested={} frontValid={} rearValid={} rearSlipRad={} rearSlipNorm={} rearBand={} rearAC={} rearCapacity={} protectionClear={} protectionBlend={} baseSat={} cueHeadroom={} cueTorque={} strength={} peakRef={} invert={}",
+                    telemetryNow, nativeOversteerRequested, nativeFront.valid, nativeRear.valid,
+                    nativeRear.slipRad, rearSlipNormalized, rearOversteerBand,
+                    nativeRear.lateralSum, nativeRear.capacitySum,
+                    oversteerProtectionClear, nativeOversteerProtectionBlend_,
+                    baseModernSelfAligningTorque,
+                    WheelFFBMath::native_oversteer_headroom(baseModernSelfAligningTorque),
+                    nativeOversteerCueTorque,
+                    static_cast<float>(Settings::WheelFFBNativeOversteerStrength),
+                    rearSlipThreshold, bool(Settings::WheelFFBNativeOversteerInvert));
+                spdlog::info(
                     "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} rawFrontSlip={} frontSlip={} frontBlend={} trailResponseSlip={} trailResponseLead={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} diPreResponse={} diCorrected={} responseCorrection={}",
                     telemetryNow,
                     vehicleDynamics_.rawBodySlip(), vehicleDynamics_.bodySlip(), vehicleDynamics_.bodySlipBlend(),
@@ -1327,9 +1594,14 @@ namespace
                     levelBeforeResponse, level, bool(Settings::WheelFFBResponseCorrection));
                 // Raw horizontal bases allow row/column x X/Z candidates to be
                 // compared offline without changing the active steering model.
+                // Stage is telemetry only; it no longer selects road haptics.
+                int telemetryStage = -1;
+                if (Game::GetNowStageNum && Game::GetStageUniqueNum)
+                    telemetryStage = Game::GetStageUniqueNum(
+                        Game::GetNowStageNum(8));
                 spdlog::info(
                     "WheelFFB BASIS t={} tick={} state={} gear={} stage={} basisSign={} posX={} posY={} posZ={} m70_11={} m70_13={} m70_31={} m70_33={} mB0_11={} mB0_13={} mB0_31={} mB0_33={} mF0_11={} mF0_13={} mF0_31={} mF0_33={}",
-                    telemetryNow, updateCounter_, stateFlags, curGear, uniqueStage, vehicleDynamics_.forwardSign(),
+                    telemetryNow, updateCounter_, stateFlags, curGear, telemetryStage, vehicleDynamics_.forwardSign(),
                     car->position_14.x, car->position_14.y, car->position_14.z,
                     car->matrix_70._11, car->matrix_70._13, car->matrix_70._31, car->matrix_70._33,
                     car->matrix_B0._11, car->matrix_B0._13, car->matrix_B0._31, car->matrix_B0._33,
@@ -1454,6 +1726,12 @@ namespace
                 result.modernSat[i] = graphModernSat_[src];
                 result.nativeSat[i] = graphNativeSat_[src];
                 result.nativeShare[i] = graphNativeShare_[src];
+                result.nativeTireNormalized[i] = graphNativeTireNormalized_[src];
+                result.nativeTireSat[i] = graphNativeTireSat_[src];
+                result.nativeTireShare[i] = graphNativeTireShare_[src];
+                result.rearSlipNormalized[i] = graphRearSlipNormalized_[src];
+                result.nativeOversteerCue[i] = graphNativeOversteerCue_[src];
+                result.nativeOversteerProtection[i] = graphNativeOversteerProtection_[src];
             }
             return result;
         }
@@ -3243,7 +3521,10 @@ namespace
 
         void record_graph_sample(
             float rawStructural, float softLimited, float postSlew, float finalOutput,
-            float xForceNormalized, float modernSat, float nativeSat, float nativeShare)
+            float xForceNormalized, float modernSat, float nativeSat, float nativeShare,
+            float nativeTireNormalized, float nativeTireSat, float nativeTireShare,
+            float rearSlipNormalized, float nativeOversteerCue,
+            float nativeOversteerProtection)
         {
             const size_t slot = graphWriteIndex_ % WheelFFBGraphCapacity;
             graphRawStructural_[slot] = std::isfinite(rawStructural) ? rawStructural : 0.0f;
@@ -3255,6 +3536,17 @@ namespace
             graphNativeSat_[slot] = std::isfinite(nativeSat) ? nativeSat : 0.0f;
             graphNativeShare_[slot] = std::isfinite(nativeShare)
                 ? std::clamp(nativeShare, 0.0f, 1.0f) : 0.0f;
+            graphNativeTireNormalized_[slot] = std::isfinite(nativeTireNormalized)
+                ? std::clamp(nativeTireNormalized, -1.0f, 1.0f) : 0.0f;
+            graphNativeTireSat_[slot] = std::isfinite(nativeTireSat) ? nativeTireSat : 0.0f;
+            graphNativeTireShare_[slot] = std::isfinite(nativeTireShare)
+                ? std::clamp(nativeTireShare, 0.0f, 1.0f) : 0.0f;
+            graphRearSlipNormalized_[slot] = std::isfinite(rearSlipNormalized)
+                ? std::clamp(rearSlipNormalized, 0.0f, 3.0f) : 0.0f;
+            graphNativeOversteerCue_[slot] = std::isfinite(nativeOversteerCue)
+                ? nativeOversteerCue : 0.0f;
+            graphNativeOversteerProtection_[slot] = std::isfinite(nativeOversteerProtection)
+                ? std::clamp(nativeOversteerProtection, 0.0f, 1.0f) : 0.0f;
             ++graphWriteIndex_;
             graphCount_ = std::min<std::size_t>(graphCount_ + 1, WheelFFBGraphCapacity);
         }
@@ -3564,6 +3856,10 @@ namespace
             lastXForceFrameTick_ = 0;
             smoothedXForceMix_ = -1.0f;
             smoothedXForceGain_ = -1.0f;
+            nativeTireSatBlend_ = 0.0f;
+            nativeOversteerProtectionBlend_ = 0.0f;
+            driftRegripGuard_.reset();
+            surfaceHapticsModel_.reset();
             prevStructuralLevel_ = 0;
             prevSpringCoefficient_ = 0;
             prevDamperCoefficient_ = 0;
@@ -3577,8 +3873,6 @@ namespace
             smoothedEngineRpm_ = 0.0f;
             smoothedEngineAmp_ = 0.0f;
             smoothedEngineFreq_ = 0.0f;
-            splashTimer_ = 0;
-            splashAmp_ = 0.0f;
             manualTestFrames_ = 0;
             manualTestDirection_ = 1;
 
@@ -3821,7 +4115,8 @@ namespace
             float lateralLoad,
             float bodySlide,
             float frontScrub,
-            float roughness,
+            float surfaceTexture,
+            float surfaceImpact,
             float satTorque,
             LONG level)
         {
@@ -3834,7 +4129,7 @@ namespace
 
             lastLogTick_ = now;
             spdlog::info(
-                "WheelFFB DIAG: spd={:.2f} steer={:.3f} rate={:.4f} lat={:.2f} load={:.2f} slide={:.2f} scrub={:.2f} rough={:.2f} sat={:.3f} phys={} basis=M70r{} cal={:.2f} mix={:.2f} beta={:.3f} yaw={:.3f} fslip={:.3f} vLat={:.5f} vLong={:.5f} step={:.5f} spdLen={:.5f} spdCorr={:.2f} steerSrc={} out={} invCF={} spring={} invSpring={} coeff={} damper={} dcoeff={} periodic={}",
+                "WheelFFB DIAG: spd={:.2f} steer={:.3f} rate={:.4f} lat={:.2f} load={:.2f} slide={:.2f} scrub={:.2f} surfaceTex={:.3f} surfaceHit={:.3f} sat={:.3f} phys={} basis=M70r{} cal={:.2f} mix={:.2f} beta={:.3f} yaw={:.3f} fslip={:.3f} vLat={:.5f} vLong={:.5f} step={:.5f} spdLen={:.5f} spdCorr={:.2f} steerSrc={} out={} invCF={} spring={} invSpring={} coeff={} damper={} dcoeff={} periodic={}",
                 speedNorm,
                 steer,
                 steerRate,
@@ -3842,7 +4137,8 @@ namespace
                 lateralLoad,
                 bodySlide,
                 frontScrub,
-                roughness,
+                surfaceTexture,
+                surfaceImpact,
                 satTorque,
                 Settings::WheelFFBPhysicsSat
                     ? (vehicleDynamics_.calibrated()
@@ -3949,6 +4245,10 @@ namespace
         float smoothedLongAccel_ = 0.0f;
         float smoothedXForceMix_ = -1.0f;
         float smoothedXForceGain_ = -1.0f;
+        float nativeTireSatBlend_ = 0.0f;
+        float nativeOversteerProtectionBlend_ = 0.0f;
+        WheelFFBMath::DriftRegripGuard driftRegripGuard_{};
+        WheelFFBMath::SurfaceHapticsModel surfaceHapticsModel_{};
         float prevSteer_ = 0.0f;
         float smoothedSteerRate_ = 0.0f;
         bool steerSampleValid_ = false;
@@ -3971,6 +4271,12 @@ namespace
         std::array<float, WheelFFBGraphCapacity> graphModernSat_{};
         std::array<float, WheelFFBGraphCapacity> graphNativeSat_{};
         std::array<float, WheelFFBGraphCapacity> graphNativeShare_{};
+        std::array<float, WheelFFBGraphCapacity> graphNativeTireNormalized_{};
+        std::array<float, WheelFFBGraphCapacity> graphNativeTireSat_{};
+        std::array<float, WheelFFBGraphCapacity> graphNativeTireShare_{};
+        std::array<float, WheelFFBGraphCapacity> graphRearSlipNormalized_{};
+        std::array<float, WheelFFBGraphCapacity> graphNativeOversteerCue_{};
+        std::array<float, WheelFFBGraphCapacity> graphNativeOversteerProtection_{};
         std::size_t graphWriteIndex_ = 0;
         std::size_t graphCount_ = 0;
 
@@ -3985,7 +4291,6 @@ namespace
         float smoothedEngineRpm_ = 0.0f;
         float smoothedEngineAmp_ = 0.0f;
         float smoothedEngineFreq_ = 0.0f;
-        float splashAmp_ = 0.0f;
 
         float speedHistory_[SpeedHistoryCount]{};
         int speedHistoryIndex_ = 0;
@@ -4007,7 +4312,6 @@ namespace
         int recreateRampFrames_ = 0;
         int manualTestFrames_ = 0;
         int manualTestDirection_ = 1;
-        int splashTimer_ = 0;
         unsigned updateCounter_ = 0;
 
         SafetyHookInline exitProcessHook_{};

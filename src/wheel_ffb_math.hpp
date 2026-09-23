@@ -735,6 +735,306 @@ namespace WheelFFBMath
         return 1.0f - 0.15f * t*t*(3.0f - 2.0f*t);
     }
 
+    inline float native_oversteer_band(float normalizedRearSlip)
+    {
+        // rFuktor-inspired rear-slip cue: arrive around the tyre's peak-slip
+        // region, stay strong through the useful catch window, then fade again
+        // in a very large slide so a DD wheel does not keep winding itself up.
+        if (!std::isfinite(normalizedRearSlip))
+            return 0.0f;
+
+        const float x = std::abs(normalizedRearSlip);
+        constexpr float RiseStart = 0.85f;
+        constexpr float RiseEnd = 1.15f;
+        constexpr float FallStart = 1.45f;
+        constexpr float FallEnd = 2.25f;
+
+        const auto smooth01 = [](float t)
+        {
+            t = std::clamp(t, 0.0f, 1.0f);
+            return t * t * (3.0f - 2.0f * t);
+        };
+
+        const float rise = smooth01((x - RiseStart) / (RiseEnd - RiseStart));
+        const float fall = 1.0f - smooth01((x - FallStart) / (FallEnd - FallStart));
+        return std::clamp(rise * fall, 0.0f, 1.0f);
+    }
+
+    inline float native_oversteer_direction(float rearSlipRad, bool invert)
+    {
+        // MOZA R3 hardware validation established that the canonical rear EE
+        // sign must be preserved here. The old implementation negated it and
+        // therefore required the UI "Reverse" switch for correct counter-steer.
+        if (!std::isfinite(rearSlipRad))
+            return 0.0f;
+        float direction =
+            rearSlipRad > 0.0f ? 1.0f :
+            (rearSlipRad < 0.0f ? -1.0f : 0.0f);
+        return invert ? -direction : direction;
+    }
+
+    inline float native_oversteer_headroom(float baseTorque)
+    {
+        // The rear cue is supplemental steering information. Reduce its share
+        // as front/base SAT approaches full scale so a drift transition does
+        // not pile a large additive kick on top of an already heavy wheel.
+        if (!std::isfinite(baseTorque))
+            return 0.0f;
+        const float occupied = std::clamp(std::abs(baseTorque), 0.0f, 1.0f);
+        return std::clamp(1.0f - 0.65f * occupied, 0.35f, 1.0f);
+    }
+
+    inline float drift_regrip_shape(float recovery)
+    {
+        if (!std::isfinite(recovery))
+            return 0.0f;
+        const float t = std::clamp(recovery, 0.0f, 1.0f);
+        return t * t * (3.0f - 2.0f * t);
+    }
+
+    inline float drift_regrip_sat_scale(float recovery)
+    {
+        // A recovered rear axle can make the front-slip SAT estimate change sign
+        // several times while the car straightens. Keep the rack informative but
+        // temporarily reduce the new grip torque so a DD base does not ping-pong.
+        return 1.0f - 0.45f * drift_regrip_shape(recovery);
+    }
+
+    inline float drift_regrip_damper_boost(float recovery)
+    {
+        // Brief extra damping controls wheel velocity during the same transition.
+        // It fades completely once the car has settled, so sustained drift stays
+        // free enough for natural counter-steer.
+        return 0.12f * drift_regrip_shape(recovery);
+    }
+
+    inline float drift_regrip_build_scale(float recovery)
+    {
+        // Releasing stale torque remains fast. Only rebuilding the next sign is
+        // slowed during re-grip, preventing repeated full-strength sign swaps.
+        return 1.0f - 0.35f * drift_regrip_shape(recovery);
+    }
+
+    class DriftRegripGuard
+    {
+    public:
+        float update(float bodySlide, float deltaSeconds)
+        {
+            if (!std::isfinite(bodySlide) || !std::isfinite(deltaSeconds) ||
+                deltaSeconds <= 0.0f)
+            {
+                reset();
+                return 0.0f;
+            }
+
+            const float slide = std::clamp(bodySlide, 0.0f, 1.0f);
+
+            // Hysteresis: a real drift must first be established before a
+            // low-slide sample can start the recovery envelope.
+            if (slide >= 0.65f)
+            {
+                driftArmed_ = true;
+                recovery_ = 0.0f;
+            }
+            else if (driftArmed_ && slide <= 0.25f)
+            {
+                driftArmed_ = false;
+                recovery_ = 1.0f;
+            }
+            else if (recovery_ > 0.0f)
+            {
+                constexpr float RecoverySeconds = 0.45f;
+                recovery_ = std::max(
+                    0.0f, recovery_ - deltaSeconds / RecoverySeconds);
+            }
+
+            return recovery_;
+        }
+
+        void reset()
+        {
+            driftArmed_ = false;
+            recovery_ = 0.0f;
+        }
+
+        bool drift_armed() const { return driftArmed_; }
+        float recovery() const { return recovery_; }
+
+    private:
+        bool driftArmed_ = false;
+        float recovery_ = 0.0f;
+    };
+
+    struct SurfaceWheelSignal
+    {
+        std::uint32_t materialMask = 0;
+        float compressionRate = 0.0f;
+        float normalLoad = 0.0f;
+        float referenceLoad = 0.0f;
+        bool valid = false;
+    };
+
+    struct SurfaceHapticsOutput
+    {
+        bool valid = false;
+        float texture = 0.0f;
+        float impact = 0.0f;
+        float maxLoadDelta = 0.0f;
+        float maxRateSpike = 0.0f;
+        unsigned materialChanges = 0;
+        unsigned validWheels = 0;
+    };
+
+    class SurfaceHapticsModel
+    {
+    public:
+        SurfaceHapticsOutput update(
+            const std::array<SurfaceWheelSignal, 4>& wheel,
+            float deltaSeconds)
+        {
+            SurfaceHapticsOutput out{};
+            if (!std::isfinite(deltaSeconds) || deltaSeconds <= 0.0f)
+            {
+                reset();
+                return out;
+            }
+
+            float textureSum = 0.0f;
+            float strongestImpact = 0.0f;
+
+            for (std::size_t i = 0; i < wheel.size(); ++i)
+            {
+                const auto& in = wheel[i];
+                const float refLoad = std::abs(in.referenceLoad);
+                if (!in.valid ||
+                    !std::isfinite(in.compressionRate) ||
+                    !std::isfinite(in.normalLoad) ||
+                    !std::isfinite(refLoad) ||
+                    refLoad <= 1.0e-5f)
+                {
+                    continue;
+                }
+
+                ++out.validWheels;
+                const float loadRatio = in.normalLoad / refLoad;
+                if (!std::isfinite(loadRatio))
+                    continue;
+
+                const float rateAbs = std::abs(in.compressionRate);
+                if (!initialized_[i])
+                {
+                    initialized_[i] = true;
+                    previousMaterial_[i] = in.materialMask;
+                    previousLoadRatio_[i] = loadRatio;
+                    rateBaseline_[i] = std::max(rateAbs, 1.0e-5f);
+                    continue;
+                }
+
+                const float loadDelta =
+                    std::abs(loadRatio - previousLoadRatio_[i]);
+                out.maxLoadDelta = std::max(out.maxLoadDelta, loadDelta);
+
+                const float baseline =
+                    std::max(rateBaseline_[i], 1.0e-5f);
+                const float cappedForBaseline =
+                    std::min(rateAbs, baseline * 2.5f + 0.0010f);
+                rateBaseline_[i] +=
+                    (cappedForBaseline - rateBaseline_[i]) * 0.035f;
+
+                // Continuous road texture follows real suspension activity, not
+                // a material->roughness lookup. Keep it intentionally small:
+                // a full-time brick/stone road should be texture, not a curb.
+                const float normalizedRate =
+                    rateAbs / (rateAbs + baseline * 6.0f + 0.0015f);
+                const float normalizedLoadMotion =
+                    std::clamp(loadDelta / 0.10f, 0.0f, 1.0f);
+                const float wheelTexture = std::clamp(
+                    0.65f * normalizedRate +
+                    0.35f * normalizedLoadMotion,
+                    0.0f, 1.0f);
+                textureSum += wheelTexture;
+
+                // A curb/bump is a physical impulse. A material transition only
+                // boosts a real suspension/load event; it can never create a
+                // hit by itself.
+                const bool materialChanged =
+                    previousMaterial_[i] != 0 &&
+                    in.materialMask != 0 &&
+                    previousMaterial_[i] != in.materialMask;
+                if (materialChanged)
+                    ++out.materialChanges;
+
+                const float excessRate = std::max(
+                    0.0f,
+                    rateAbs - (baseline * 2.5f + 0.0010f));
+                const float rateSpike = std::clamp(
+                    excessRate / (baseline * 6.0f + 0.0020f),
+                    0.0f, 1.0f);
+                out.maxRateSpike = std::max(out.maxRateSpike, rateSpike);
+
+                const float loadImpulse = smoothstep01(
+                    (loadDelta - 0.06f) / 0.34f);
+                float physicalImpact = std::max(
+                    loadImpulse,
+                    rateSpike * 0.80f);
+
+                if (materialChanged && physicalImpact > 0.08f)
+                    physicalImpact = std::min(
+                        1.0f,
+                        physicalImpact * 1.15f + 0.08f);
+
+                strongestImpact =
+                    std::max(strongestImpact, physicalImpact);
+
+                previousMaterial_[i] = in.materialMask;
+                previousLoadRatio_[i] = loadRatio;
+            }
+
+            if (out.validWheels == 0)
+            {
+                reset();
+                return out;
+            }
+
+            // Average all valid wheels instead of max(). The 0.12 ceiling is
+            // deliberate: continuous texture must remain subtle even when all
+            // four tyres are on a rough brick/stone material.
+            const float meanTexture =
+                textureSum / static_cast<float>(out.validWheels);
+            out.texture = std::clamp(meanTexture * 0.12f, 0.0f, 0.12f);
+
+            if (strongestImpact > impactEnvelope_)
+                impactEnvelope_ = strongestImpact;
+            else
+            {
+                constexpr float ImpactReleaseSeconds = 0.14f;
+                impactEnvelope_ = std::max(
+                    0.0f,
+                    impactEnvelope_ - deltaSeconds / ImpactReleaseSeconds);
+            }
+
+            out.impact = std::clamp(impactEnvelope_, 0.0f, 1.0f);
+            out.valid = true;
+            return out;
+        }
+
+        void reset()
+        {
+            initialized_.fill(false);
+            previousMaterial_.fill(0);
+            previousLoadRatio_.fill(0.0f);
+            rateBaseline_.fill(0.0f);
+            impactEnvelope_ = 0.0f;
+        }
+
+    private:
+        std::array<bool, 4> initialized_{};
+        std::array<std::uint32_t, 4> previousMaterial_{};
+        std::array<float, 4> previousLoadRatio_{};
+        std::array<float, 4> rateBaseline_{};
+        float impactEnvelope_ = 0.0f;
+    };
+
     using ResponseLUT = std::array<float, 11>;
 
     inline ResponseLUT linear_response_lut()

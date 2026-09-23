@@ -99,7 +99,7 @@ private:
 		{ "Shift Down",  "Press the downshift paddle or button.",                     Sw,  int(SwitchId::GearDown) },
 		{ "Start",       "Press the button you want to use for Start and Pause.",      Sw,  int(SwitchId::Start) },
 		{ "Confirm",     "Press the button you want to use to confirm menu choices.",  Sw,  int(SwitchId::A) },
-		{ "Back",        "Press the button you want to use to go back.",               Sw,  int(SwitchId::B) },
+		{ "Back",        "Press the button you want to use to go back.",               Sw,  int(SwitchId::Back) },
 		{ "Menu Up",     "Press Up on the wheel D-pad/POV, or another menu button.",    Sw,  int(SwitchId::SelectionUp) },
 		{ "Menu Right",  "Press Right on the wheel D-pad/POV, or another menu button.", Sw,  int(SwitchId::SelectionRight) },
 		{ "Menu Down",   "Press Down on the wheel D-pad/POV, or another menu button.",  Sw,  int(SwitchId::SelectionDown) },
@@ -418,24 +418,6 @@ public:
 		if (quickSetupCandidate || quickSetupTimedOut)
 			return false;
 
-		// Keyboard
-		{
-			int keyCount = 0;
-			const bool* keyState = SDL_GetKeyboardState(&keyCount);
-			for (int i = 0; i < keyCount; i++)
-			{
-				// Reserved above, so they can't be bound to anything.
-				if (i == SDL_SCANCODE_ESCAPE || i == SDL_SCANCODE_DELETE || i == SDL_SCANCODE_BACKSPACE)
-					continue;
-
-				if (keyState[i])
-				{
-					commit(InputBinding(static_cast<SDL_Scancode>(i)));
-					return true;
-				}
-			}
-		}
-
 		// Controller
 		for (const auto& device : InputManager::instance.devices)
 		{
@@ -498,6 +480,28 @@ public:
 					// The direction it was pushed becomes the binding's, which
 					// the invert toggle can flip afterwards.
 					commit(InputBinding(static_cast<SDL_GamepadAxis>(i), value < 0));
+					return true;
+				}
+			}
+		}
+
+		// Keyboard is deliberately checked after raw joystick/gamepad input.
+		// Some wheel drivers expose a physical wheel button and a synthetic
+		// keyboard key in the same frame. Prefer the real device identity so a
+		// menu button cannot accidentally become F1/F2 instead of Button N.
+		// Keyboard
+		{
+			int keyCount = 0;
+			const bool* keyState = SDL_GetKeyboardState(&keyCount);
+			for (int i = 0; i < keyCount; i++)
+			{
+				// Reserved above, so they can't be bound to anything.
+				if (i == SDL_SCANCODE_ESCAPE || i == SDL_SCANCODE_DELETE || i == SDL_SCANCODE_BACKSPACE)
+					continue;
+
+				if (keyState[i])
+				{
+					commit(InputBinding(static_cast<SDL_Scancode>(i)));
 					return true;
 				}
 			}

@@ -53,6 +53,14 @@ namespace Settings
     extern Setting<bool> WheelFFBXForceInvert;
     extern Setting<float> WheelFFBXForceGain;
     extern Setting<bool> WheelFFBXForceCapture60Hz;
+    extern Setting<bool> WheelFFBNativePhysicsCapture60Hz;
+    extern Setting<bool> WheelFFBNativeTireSat;
+    extern Setting<float> WheelFFBNativeTireSatGain;
+    extern Setting<bool> WheelFFBNativeTireSatInvert;
+    extern Setting<bool> WheelFFBNativeOversteerCue;
+    extern Setting<float> WheelFFBNativeOversteerStrength;
+    extern Setting<float> WheelFFBNativeOversteerSlipThreshold;
+    extern Setting<bool> WheelFFBNativeOversteerInvert;
     extern Setting<float> WheelFFBGripLoss;
     extern Setting<float> WheelFFBLateralDeadzone;
     extern Setting<float> WheelFFBWeightTransfer;
@@ -63,6 +71,7 @@ namespace Settings
     extern Setting<float> WheelFFBReversalReleaseRate;
     extern Setting<int> VibrationMode;
     extern Setting<float> WheelFFBRoadTexture;
+    extern Setting<float> WheelFFBCurbImpact;
     extern Setting<float> WheelFFBTireSlip;
     extern Setting<float> WheelFFBWallImpact;
     extern Setting<bool> WheelFFBUseHardwareSpring;
@@ -813,10 +822,18 @@ namespace
             bool xForceInvert = false;
             float xForceGain = 1.00f;
             bool xForceCapture60Hz = false;
+            bool nativePhysicsCapture60Hz = false;
+            bool nativeTireSat = false;
+            float nativeTireSatGain = 1.00f;
+            bool nativeTireSatInvert = false;
+            bool nativeOversteerCue = false;
+            float nativeOversteerStrength = 0.10f;
+            float nativeOversteerSlipThreshold = 0.12f;
+            bool nativeOversteerInvert = false;
             bool hwSpring = true;
             bool hwDamper = true;
             bool periodic = true;
-            bool invertForce = true;
+            bool invertForce = false;
             bool invertSpring = false;
             bool responseCorrection = false;
             bool debugLog = true;
@@ -837,6 +854,7 @@ namespace
             float slew = 0.06f;
             float reversalRelease = 0.12f;
             float road = 0.30f;
+            float curb = 0.40f;
             float tire = 0.20f;
             float collision = 0.38f;
             float maxTorque = 0.0f;
@@ -853,6 +871,14 @@ namespace
             savedFfb_.xForceInvert = Settings::WheelFFBXForceInvert;
             savedFfb_.xForceGain = Settings::WheelFFBXForceGain;
             savedFfb_.xForceCapture60Hz = Settings::WheelFFBXForceCapture60Hz;
+            savedFfb_.nativePhysicsCapture60Hz = Settings::WheelFFBNativePhysicsCapture60Hz;
+            savedFfb_.nativeTireSat = Settings::WheelFFBNativeTireSat;
+            savedFfb_.nativeTireSatGain = Settings::WheelFFBNativeTireSatGain;
+            savedFfb_.nativeTireSatInvert = Settings::WheelFFBNativeTireSatInvert;
+            savedFfb_.nativeOversteerCue = Settings::WheelFFBNativeOversteerCue;
+            savedFfb_.nativeOversteerStrength = Settings::WheelFFBNativeOversteerStrength;
+            savedFfb_.nativeOversteerSlipThreshold = Settings::WheelFFBNativeOversteerSlipThreshold;
+            savedFfb_.nativeOversteerInvert = Settings::WheelFFBNativeOversteerInvert;
             savedFfb_.hwSpring = Settings::WheelFFBUseHardwareSpring;
             savedFfb_.hwDamper = Settings::WheelFFBUseHardwareDamper;
             savedFfb_.periodic = Settings::WheelFFBUsePeriodicEffects;
@@ -877,6 +903,7 @@ namespace
             savedFfb_.slew = Settings::WheelFFBSlewRate;
             savedFfb_.reversalRelease = Settings::WheelFFBReversalReleaseRate;
             savedFfb_.road = Settings::WheelFFBRoadTexture;
+            savedFfb_.curb = Settings::WheelFFBCurbImpact;
             savedFfb_.tire = Settings::WheelFFBTireSlip;
             savedFfb_.collision = Settings::WheelFFBWallImpact;
             savedFfb_.maxTorque = Settings::WheelFFBMaxTorqueNm;
@@ -893,6 +920,14 @@ namespace
             Settings::WheelFFBXForceInvert = savedFfb_.xForceInvert;
             Settings::WheelFFBXForceGain = savedFfb_.xForceGain;
             Settings::WheelFFBXForceCapture60Hz = savedFfb_.xForceCapture60Hz;
+            Settings::WheelFFBNativePhysicsCapture60Hz = savedFfb_.nativePhysicsCapture60Hz;
+            Settings::WheelFFBNativeTireSat = savedFfb_.nativeTireSat;
+            Settings::WheelFFBNativeTireSatGain = savedFfb_.nativeTireSatGain;
+            Settings::WheelFFBNativeTireSatInvert = savedFfb_.nativeTireSatInvert;
+            Settings::WheelFFBNativeOversteerCue = savedFfb_.nativeOversteerCue;
+            Settings::WheelFFBNativeOversteerStrength = savedFfb_.nativeOversteerStrength;
+            Settings::WheelFFBNativeOversteerSlipThreshold = savedFfb_.nativeOversteerSlipThreshold;
+            Settings::WheelFFBNativeOversteerInvert = savedFfb_.nativeOversteerInvert;
             Settings::WheelFFBUseHardwareSpring = savedFfb_.hwSpring;
             Settings::WheelFFBUseHardwareDamper = savedFfb_.hwDamper;
             Settings::WheelFFBUsePeriodicEffects = savedFfb_.periodic;
@@ -917,6 +952,7 @@ namespace
             Settings::WheelFFBSlewRate = savedFfb_.slew;
             Settings::WheelFFBReversalReleaseRate = savedFfb_.reversalRelease;
             Settings::WheelFFBRoadTexture = savedFfb_.road;
+            Settings::WheelFFBCurbImpact = savedFfb_.curb;
             Settings::WheelFFBTireSlip = savedFfb_.tire;
             Settings::WheelFFBWallImpact = savedFfb_.collision;
             Settings::WheelFFBMaxTorqueNm = savedFfb_.maxTorque;
@@ -1651,7 +1687,7 @@ namespace
             track_ffb_change(ImGui::Checkbox("Enable Force Feedback", Settings::WheelFFBEnable.ptr()));
             ImGui::TextDisabled("gameplay FFB follows the exact selected DirectInput GUID.");
             ImGui::TextWrapped(
-                "Single-owner wheel FFB: DirectInput COM only. v0.3 can keep the Modern DD front-slip SAT, test the game's actionforce_DBC as an X-Force candidate, or blend both. Centering Spring remains a low-speed stabilizer and every character shares the same DD safety/output path.");
+                "Single-owner wheel FFB: DirectInput COM only. Executable-map XREF analysis proved actionforce_DBC belongs to race handicap/catch-up logic, so v0.4 fail-closes the old Arcade/Hybrid DBC experiment and keeps Modern DD authoritative. Native four-wheel physics is currently capture-only.");
             ImGui::TextDisabled("Settings > WheelFFB is hidden; changes on this page apply live. Gamepad rumble is suppressed only while DirectInput FFB owns an output device.");
 
             ImGui::SeparatorText("Physics / Structural");
@@ -1664,7 +1700,13 @@ namespace
             static constexpr const char* FeedbackCharacters[] = {
                 "Modern DD", "Arcade / X-Force candidate", "Hybrid"
             };
-            int feedbackCharacter = std::clamp(int(Settings::WheelFFBFeedbackCharacter), 0, 2);
+            const int requestedFeedbackCharacter =
+                std::clamp(int(Settings::WheelFFBFeedbackCharacter), 0, 2);
+            int feedbackCharacter = 0;
+            if (requestedFeedbackCharacter != 0)
+                ImGui::TextColored(ImVec4(1.0f, 0.60f, 0.25f, 1.0f),
+                    "Saved Arcade/Hybrid DBC mode is disabled: DBC is handicap/catch-up data.");
+            ImGui::BeginDisabled();
             if (ImGui::BeginCombo("Feedback Character", FeedbackCharacters[feedbackCharacter]))
             {
                 for (int character = 0; character < 3; ++character)
@@ -1682,6 +1724,7 @@ namespace
                 }
                 ImGui::EndCombo();
             }
+            ImGui::EndDisabled();
 
             if (feedbackCharacter == 0)
                 ImGui::TextDisabled("Modern DD: v0.2 front-slip / pneumatic + mechanical-trail SAT behavior.");
@@ -1728,6 +1771,53 @@ namespace
                 track_ffb_change(ImGui::SliderFloat("Mechanical / Caster Trail", Settings::WheelFFBMechanicalTrail.ptr(), 0.0f, 0.60f, "%.2f"));
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip("Normalized mechanical/caster trail acts with front lateral force throughout a corner. 0 disables it; this is not a centre spring.");
+
+                if (track_ffb_change(ImGui::Checkbox(
+                        "Native tyre-force SAT (EXE physics, experimental)",
+                        Settings::WheelFFBNativeTireSat.ptr())))
+                    WheelFFB_RequestSettingsTransition();
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Default OFF. Uses the game's front wheel slip-angle + native lateral-force/capacity channels (EE/AC/C0). Invalid/airborne data fades back to Modern SAT; all existing soft-cap, slew and watchdog safety remains downstream.");
+                if (Settings::WheelFFBNativeTireSat)
+                {
+                    track_ffb_change(ImGui::SliderFloat(
+                        "Native tyre SAT gain",
+                        Settings::WheelFFBNativeTireSatGain.ptr(),
+                        0.0f, 2.0f, "%.2f"));
+                    if (track_ffb_change(ImGui::Checkbox(
+                            "Reverse native tyre SAT only",
+                            Settings::WheelFFBNativeTireSatInvert.ptr())))
+                        WheelFFB_RequestSettingsTransition();
+                    ImGui::TextDisabled("MOZA R3 validated direction: Global Reverse OFF + Native SAT Reverse OFF.");
+                    ImGui::TextColored(ImVec4(1.0f, 0.72f, 0.25f, 1.0f),
+                        "Research mode: use a reverse switch only if another wheel/device proves it necessary.");
+                }
+
+                if (track_ffb_change(ImGui::Checkbox(
+                        "Native rear-slip countersteer cue (experimental)",
+                        Settings::WheelFFBNativeOversteerCue.ptr())))
+                    WheelFFB_RequestSettingsTransition();
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Default OFF. Uses native rear wheel2/3 slip angle around peak grip. The cue rises near the catch window, fades again in a large slide, and releases quickly during collision or invalid/airborne tyre capacity.");
+                if (Settings::WheelFFBNativeOversteerCue)
+                {
+                    track_ffb_change(ImGui::SliderFloat(
+                        "Rear countersteer cue strength",
+                        Settings::WheelFFBNativeOversteerStrength.ptr(),
+                        0.0f, 0.25f, "%.2f"));
+                    track_ffb_change(ImGui::SliderFloat(
+                        "Rear peak-slip reference (rad)",
+                        Settings::WheelFFBNativeOversteerSlipThreshold.ptr(),
+                        0.04f, 0.30f, "%.3f"));
+                    if (track_ffb_change(ImGui::Checkbox(
+                            "Reverse rear countersteer cue only",
+                            Settings::WheelFFBNativeOversteerInvert.ptr())))
+                        WheelFFB_RequestSettingsTransition();
+                    ImGui::TextDisabled("rFuktor-style band: starts near 0.85x peak, strongest around 1.15-1.45x, releases by 2.25x.");
+                    ImGui::TextDisabled("MOZA R3 live test corrected the default direction. Reverse is retained only as a device-specific fallback.");
+                    ImGui::TextColored(ImVec4(1.0f, 0.72f, 0.25f, 1.0f),
+                        "Cue strength is conservative and tapers automatically when base SAT is already high.");
+                }
             }
             track_ffb_change(ImGui::SliderFloat("Grip-loss Response", Settings::WheelFFBGripLoss.ptr(), 0.0f, 1.0f, "%.2f"));
 
@@ -1740,7 +1830,12 @@ namespace
             ImGui::TextDisabled("Wheelbase/driver-side spring, damping, inertia or friction are additional forces; keep them conservative while tuning game-side feel.");
 
             ImGui::SeparatorText("Effects");
-            track_ffb_change(ImGui::SliderFloat("Road Detail", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 1.0f, "%.2f"));
+            track_ffb_change(ImGui::SliderFloat("Road Texture", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 1.0f, "%.2f"));
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Continuous texture from averaged per-wheel suspension/load motion. Brick/stone roads are intentionally capped and no longer use max(roughness).");
+            track_ffb_change(ImGui::SliderFloat("Curb / Bump Impact", Settings::WheelFFBCurbImpact.ptr(), 0.0f, 1.0f, "%.2f"));
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Short pulse from per-wheel suspension/load impulse; a material change can boost a real hit but cannot create one by itself.");
             track_ffb_change(ImGui::SliderFloat("Tire Slip", Settings::WheelFFBTireSlip.ptr(), 0.0f, 0.50f, "%.2f"));
             track_ffb_change(ImGui::SliderFloat("Collision", Settings::WheelFFBWallImpact.ptr(), 0.0f, 1.0f, "%.2f"));
             track_ffb_change(ImGui::Checkbox("Engine Vibration", Settings::WheelFFBEngineVibration.ptr()));
@@ -1768,7 +1863,7 @@ namespace
                 ImGui::TextDisabled("Approx full-scale ramp: build %.0f ms | stale reversal release %.0f ms at 60 Hz.",
                     (1.0f / buildRate) * (1000.0f / 60.0f),
                     (1.0f / reversalRate) * (1000.0f / 60.0f));
-                const int advancedFeedbackCharacter = std::clamp(int(Settings::WheelFFBFeedbackCharacter), 0, 2);
+                constexpr int advancedFeedbackCharacter = 0;
                 if (advancedFeedbackCharacter != 0)
                 {
                     ImGui::SeparatorText("Native X-Force candidate");
@@ -1831,10 +1926,15 @@ namespace
 
             track_ffb_change(ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr()));
             track_ffb_change(ImGui::Checkbox("Record driving telemetry (10 Hz)", Settings::WheelFFBTelemetry.ptr()));
-            track_ffb_change(ImGui::Checkbox("Capture X-Force validation at 60 Hz (very verbose)", Settings::WheelFFBXForceCapture60Hz.ptr()));
+            track_ffb_change(ImGui::Checkbox("Capture legacy DBC/handicap diagnostics at 60 Hz (very verbose)", Settings::WheelFFBXForceCapture60Hz.ptr()));
             if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Writes one WheelFFB XFORCE60 line every physics update for short validation runs. This is diagnostic only and can grow the log quickly.");
+                ImGui::SetTooltip("Legacy comparison capture only. actionforce_DBC is proven handicap/catch-up state and never alters wheel torque.");
+            track_ffb_change(ImGui::Checkbox("Capture native 4-wheel physics at 60 Hz (very verbose)", Settings::WheelFFBNativePhysicsCapture60Hz.ptr()));
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Writes one WheelFFB NATIVE_PHYSICS record per player-car physics tick with front/rear suspension, normal-load and tire-force candidates. Read-only diagnostic capture.");
             track_ffb_change(ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr()));
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("MOZA R3 live validation: leave this OFF. If experimental Native tyre SAT is enabled, leave its Reverse OFF too. Two reverse switches can double-invert and hide a direction error.");
             ImGui::SameLine();
             track_ffb_change(ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr()));
             if (ImGui::IsItemHovered())
@@ -1897,12 +1997,21 @@ namespace
                 ImGui::PlotLines("Soft limited", graph.softLimited.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 46));
                 ImGui::PlotLines("Post slew", graph.postSlew.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 46));
                 ImGui::PlotLines("Final DirectInput", graph.finalOutput.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 46));
+                if (Settings::WheelFFBNativeTireSat)
+                {
+                    ImGui::PlotLines("Native tyre force / capacity", graph.nativeTireNormalized.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 40));
+                    ImGui::PlotLines("Native tyre SAT torque", graph.nativeTireSat.data(), int(graph.count), 0, nullptr, -2.1f, 2.1f, ImVec2(0, 40));
+                    ImGui::PlotLines("Native tyre SAT blend", graph.nativeTireShare.data(), int(graph.count), 0, nullptr, 0.0f, 1.0f, ImVec2(0, 40));
+                }
+                if (Settings::WheelFFBNativeOversteerCue)
+                {
+                    ImGui::PlotLines("Rear slip / peak reference", graph.rearSlipNormalized.data(), int(graph.count), 0, nullptr, 0.0f, 3.0f, ImVec2(0, 40));
+                    ImGui::PlotLines("Rear countersteer cue torque", graph.nativeOversteerCue.data(), int(graph.count), 0, nullptr, -0.6f, 0.6f, ImVec2(0, 40));
+                    ImGui::PlotLines("Rear cue protection blend", graph.nativeOversteerProtection.data(), int(graph.count), 0, nullptr, 0.0f, 1.0f, ImVec2(0, 40));
+                }
                 if (std::clamp(int(Settings::WheelFFBFeedbackCharacter), 0, 2) != 0)
                 {
-                    ImGui::PlotLines("X-Force normalized", graph.xForceNormalized.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 40));
-                    ImGui::PlotLines("Modern SAT", graph.modernSat.data(), int(graph.count), 0, nullptr, -2.1f, 2.1f, ImVec2(0, 40));
-                    ImGui::PlotLines("Native SAT", graph.nativeSat.data(), int(graph.count), 0, nullptr, -2.1f, 2.1f, ImVec2(0, 40));
-                    ImGui::PlotLines("Native share", graph.nativeShare.data(), int(graph.count), 0, nullptr, 0.0f, 1.0f, ImVec2(0, 40));
+                    ImGui::PlotLines("Legacy DBC normalized", graph.xForceNormalized.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 40));
                 }
             }
             else
@@ -1923,6 +2032,13 @@ namespace
             {
                 Settings::WheelFFBEnable = true;
                 Settings::WheelFFBPhysicsSat = true;
+                Settings::WheelFFBNativeTireSat = false;
+                Settings::WheelFFBNativeTireSatGain = 1.00f;
+                Settings::WheelFFBNativeTireSatInvert = false;
+                Settings::WheelFFBNativeOversteerCue = false;
+                Settings::WheelFFBNativeOversteerStrength = 0.10f;
+                Settings::WheelFFBNativeOversteerSlipThreshold = 0.12f;
+                Settings::WheelFFBNativeOversteerInvert = false;
                 Settings::WheelFFBFeedbackCharacter = 0;
                 Settings::WheelFFBXForceMix = 0.50f;
                 Settings::WheelFFBXForceInvert = false;
@@ -1939,12 +2055,13 @@ namespace
                 Settings::WheelFFBSlewRate = 0.040f;
                 Settings::WheelFFBReversalReleaseRate = 0.12f;
                 Settings::WheelFFBRoadTexture = 0.30f;
+                Settings::WheelFFBCurbImpact = 0.40f;
                 Settings::WheelFFBTireSlip = 0.20f;
                 Settings::WheelFFBWallImpact = 0.38f;
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
                 Settings::WheelFFBUsePeriodicEffects = true;
-                Settings::WheelFFBInvertForce = true;
+                Settings::WheelFFBInvertForce = false;
                 Settings::WheelFFBInvertSpring = false;
                 Settings::WheelFFBDebugLog = true;
                 Settings::VibrationMode = 0;
@@ -1966,6 +2083,13 @@ namespace
             if (ImGui::Button("Load MOZA R3 Natural SAT"))
             {
                 Settings::WheelFFBPhysicsSat = false;
+                Settings::WheelFFBNativeTireSat = false;
+                Settings::WheelFFBNativeTireSatGain = 1.00f;
+                Settings::WheelFFBNativeTireSatInvert = false;
+                Settings::WheelFFBNativeOversteerCue = false;
+                Settings::WheelFFBNativeOversteerStrength = 0.10f;
+                Settings::WheelFFBNativeOversteerSlipThreshold = 0.12f;
+                Settings::WheelFFBNativeOversteerInvert = false;
                 Settings::WheelFFBFeedbackCharacter = 0;
                 Settings::WheelFFBXForceMix = 0.50f;
                 Settings::WheelFFBXForceInvert = false;
@@ -1983,12 +2107,13 @@ namespace
                 Settings::WheelFFBSlewRate = 0.045f;
                 Settings::WheelFFBReversalReleaseRate = 0.12f;
                 Settings::WheelFFBRoadTexture = 0.30f;
+                Settings::WheelFFBCurbImpact = 0.40f;
                 Settings::WheelFFBTireSlip = 0.20f;
                 Settings::WheelFFBWallImpact = 0.38f;
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
                 Settings::WheelFFBUsePeriodicEffects = true;
-                Settings::WheelFFBInvertForce = true;
+                Settings::WheelFFBInvertForce = false;
                 Settings::WheelFFBInvertSpring = false;
                 Settings::VibrationMode = 0;
                 WheelFFB_RequestSettingsTransition();
