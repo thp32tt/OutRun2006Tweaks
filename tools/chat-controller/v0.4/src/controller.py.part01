@@ -417,18 +417,53 @@ async def ensure_thinking_level(page: Page, requested: str = PREFERRED_THINKING_
     return False
 
 
+async def _composer_text(box) -> str:
+    """Read the current composer value without logging the prompt contents."""
+    try:
+        tag = (await box.evaluate("el => el.tagName")).lower()
+        if tag in ("textarea", "input"):
+            return await box.input_value()
+        return await box.evaluate("el => (el.innerText ?? el.textContent ?? '')")
+    except Exception:
+        return ""
+
+
+def _normalize_composer_text(value: str) -> str:
+    return (value or "").replace("\r\n", "\n").replace("\r", "\n")
+
+
 async def send_message(page: Page, message: str) -> bool:
+    """Insert one complete prompt atomically, verify it, then send exactly once."""
     box = await first_visible(page, INPUT_SELECTORS)
     if not box:
         return False
     try:
-        tag = await box.evaluate("el => el.tagName")
-        if tag.lower() == "textarea":
-            await box.fill(message)
-        else:
-            await box.click()
+        # Playwright fill() supports textarea/input/contenteditable and updates the
+        # composer in one operation. Avoid keyboard.type(), which emits thousands
+        # of per-character events and can leave a long N100 prompt partially entered.
+        try:
+            await box.fill(message, timeout=15000)
+        except Exception:
+            # Compatibility fallback is still a single text insertion operation,
+            # not character-by-character typing.
+            await box.click(timeout=3000)
             await page.keyboard.press("Control+A")
-            await page.keyboard.type(message, delay=1)
+            await page.keyboard.insert_text(message)
+
+        expected = _normalize_composer_text(message)
+        actual = _normalize_composer_text(await _composer_text(box))
+        if actual != expected:
+            log.error(
+                "composer verification failed expected_len=%s actual_len=%s",
+                len(expected),
+                len(actual),
+            )
+            try:
+                await box.fill("", timeout=3000)
+            except Exception:
+                pass
+            return False
+
         await page.keyboard.press("Enter")
         await page.wait_for_timeout(1500)
         return True
