@@ -100,3 +100,18 @@ crash/session diagnostics.
 
 Semantic hints remain subordinate to verified WVP/depth/target safety gates.
 See `docs/VR_UPSTREAM_SEMANTIC_HARVEST.md`.
+
+## VR-R51-HUD-SEMANTIC-LIFETIME-001 — producer tag arrives too late for c64 ownership
+Status: **CONFIRMED RUNTIME ORDERING GAP / ANALYSIS REQUIRED**
+
+Candidate `8d21824f9502b3354fae679972a90868a0cce562` proved that exact EXE-map producer tagging works at the R30 draw layer: `semanticHudAccepted` reached 93,681. However, renderer telemetry kept `semanticOverlayBypass=0` for the entire HMD session, while the user still saw white HUD and position/rank HUD doubled and following the headset.
+
+This narrows the defect from “producer not identified” to a semantic-lifetime/order mismatch. R51's renderer c64 bypass reads `GameSemantic::CurrentScope` during `SetVertexShaderConstantF`; the per-node semantic is apparently selected after the relevant c64 upload. Next review must reconstruct the exact producer -> SpriteNode -> queue -> c64 -> draw order and propose an exact ownership token available at c64 time. Blanket queue-to-HUD promotion remains forbidden.
+
+## VR-R51-RANK-ANCHOR-PROPAGATION-001 — exact marker callsite tag does not preserve car anchor
+Status: **CONFIRMED HMD FAILURE / ANALYSIS REQUIRED**
+
+The EXE-map sibling marker callsite tags did not make the rank labels stay above their cars. The user still observes vehicle rank labels detached from the vehicles, following head motion, with affected rank/position elements doubled. Exact WORLD_BILLBOARD scope alone is therefore insufficient.
+
+Next review must trace the original Calc3D2D/vehicle/world anchor through BAD20 and sibling producers `BBC5A/BC2E5/BC346`, determine where the anchor is lost after screen projection/queueing, and preserve enough metadata for per-eye world projection. Do not substitute screen-space coordinates for the original world/vehicle anchor.
+
