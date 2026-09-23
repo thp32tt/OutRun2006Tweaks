@@ -3,10 +3,12 @@
 #include <Windows.h>
 #include <intrin.h>
 
+#include <atomic>
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
+#include <iterator>
 #include <mutex>
 #include <string_view>
 #include <unordered_map>
@@ -43,6 +45,8 @@ namespace OutRunVRHudInspector
         std::ofstream TraceFile;
         std::ofstream XstMapFile;
         std::unordered_map<std::uint64_t, std::uint32_t> Seen;
+        std::atomic<bool> InspectorActive{false};
+        bool SemanticIdentityVerified = false;
         std::uint64_t TraceLines = 0;
         ULONGLONG StartMs = 0;
 
@@ -83,7 +87,8 @@ namespace OutRunVRHudInspector
         }
 
         std::uint64_t MakeKey(EventKind kind, std::uint32_t callRva,
-            std::uint32_t arg0, std::uint32_t arg1) noexcept
+            std::uint32_t arg0, std::uint32_t arg1,
+            int mode, int stage) noexcept
         {
             std::uint64_t h = 1469598103934665603ull;
             auto mix = [&h](std::uint32_t v) {
@@ -94,6 +99,8 @@ namespace OutRunVRHudInspector
             mix(callRva);
             mix(arg0);
             mix(arg1);
+            mix(static_cast<std::uint32_t>(mode));
+            mix(static_cast<std::uint32_t>(stage));
             return h;
         }
 
@@ -120,21 +127,61 @@ namespace OutRunVRHudInspector
             double arg4 = 0.0, double arg5 = 0.0,
             double arg6 = 0.0, double arg7 = 0.0)
         {
-            if (!TraceFile)
+            if (!InspectorActive.load(std::memory_order_acquire) || !TraceFile)
                 return;
 
             const std::uint32_t returnRva = ToExeRva(returnAddress);
-            const std::uint32_t callRva =
+            const std::uint32_t leafCallRva =
                 returnRva >= 5 ? returnRva - 5 : returnRva;
-            const std::uint64_t key = MakeKey(kind, callRva, arg0, arg1);
+            std::uint32_t callRva = leafCallRva;
+            auto semantic = SemanticIdentityVerified
+                ? OutRunVRHudSemantics::ClassifyCaller(callRva)
+                : OutRunVRHudSemantics::UnknownInfo();
+
+            // The inline put_sprite hooks are reached through common EXE sprite
+            // wrappers, so _ReturnAddress() alone often resolves only to
+            // 0x02xxxx helper code instead of DispRank/REV/TimeAttack/etc.
+            // Walk the current stack and promote the first verified EXE caller
+            // that lands inside the UIScaling-derived semantic ranges. This
+            // turns the original mod's reverse-engineered HUD addresses into
+            // runtime evidence instead of leaving every row UNKNOWN.
+            if (SemanticIdentityVerified &&
+                semantic.space == OutRunVRHudSemantics::SpacePolicy::Unknown)
+            {
+                void* frames[24]{};
+                const USHORT frameCount = RtlCaptureStackBackTrace(
+                    0, static_cast<DWORD>(std::size(frames)),
+                    frames, nullptr);
+                for (USHORT depth = 0; depth < frameCount; ++depth)
+                {
+                    const std::uint32_t frameReturnRva =
+                        ToExeRva(frames[depth]);
+                    if (!frameReturnRva)
+                        continue;
+                    const std::uint32_t candidateRva =
+                        frameReturnRva >= 5
+                        ? frameReturnRva - 5
+                        : frameReturnRva;
+                    const auto candidate =
+                        OutRunVRHudSemantics::ClassifyCaller(candidateRva);
+                    if (candidate.space ==
+                        OutRunVRHudSemantics::SpacePolicy::Unknown)
+                        continue;
+                    callRva = candidateRva;
+                    semantic = candidate;
+                    break;
+                }
+            }
+
+            const int mode = CurrentMode();
+            const int stage = CurrentStage();
+            const std::uint64_t key =
+                MakeKey(kind, callRva, arg0, arg1, mode, stage);
 
             std::lock_guard lock(TraceMutex);
             std::uint32_t count = 0;
             if (!ShouldWrite(key, count))
                 return;
-
-            const auto semantic =
-                OutRunVRHudSemantics::ClassifyCaller(callRva);
 
             TraceFile
                 << (GetTickCount64() - StartMs) << ','
@@ -144,8 +191,8 @@ namespace OutRunVRHudInspector
                 << semantic.area << ','
                 << semantic.semantic << ','
                 << OutRunVRHudSemantics::SpacePolicyName(semantic.space) << ','
-                << CurrentMode() << ','
-                << CurrentStage() << ','
+                << mode << ','
+                << stage << ','
                 << arg0 << ','
                 << arg1 << ','
                 << arg2 << ','
@@ -156,8 +203,11 @@ namespace OutRunVRHudInspector
                 << arg7 << ','
                 << count << '\n';
 
-            if ((++TraceLines & 63ull) == 0)
-                TraceFile.flush();
+            ++TraceLines;
+            // HUD inspector is diagnostic-only and rate-limited. Make each
+            // acknowledged row durable so an unhandled-crash ZIP cannot lose
+            // the most recent HUD evidence in an unflushed stream tail.
+            TraceFile.flush();
         }
 
         int __cdecl SpriteAnimDest(std::uint32_t spriteId, float x, float y,
@@ -185,6 +235,7 @@ namespace OutRunVRHudInspector
 
         bool OpenTrace()
         {
+            InspectorActive.store(false, std::memory_order_release);
             try
             {
                 const auto path =
@@ -209,6 +260,13 @@ namespace OutRunVRHudInspector
                     return false;
 
                 StartMs = GetTickCount64();
+                char semanticVerified[8]{};
+                SemanticIdentityVerified =
+                    GetEnvironmentVariableA(
+                        "OUTRUN_VR_EXE_SEMANTICS_VERIFIED",
+                        semanticVerified,
+                        static_cast<DWORD>(sizeof(semanticVerified))) > 0 &&
+                    semanticVerified[0] == '1';
                 if (empty)
                 {
                     TraceFile
@@ -217,10 +275,18 @@ namespace OutRunVRHudInspector
                         << Util::GetModuleTimestamp(Module::ExeHandle) << "\n"
                         << "# exe_size_of_image=" << ExeSizeOfImage() << "\n"
                         << "# module_base=runtime-only; all addresses below are ASLR-safe RVAs\n"
+                        << "# semantic_identity_gate=runtime-verified-reference-sha256\n"
                         << "elapsed_ms,event,return_rva,call_rva,known_area,semantic,space_policy,mode,stage,"
                            "arg0,arg1,arg2,arg3,arg4,arg5,arg6,arg7,count\n";
                     TraceFile.flush();
                 }
+                TraceFile
+                    << "# session_semantic_identity="
+                    << (SemanticIdentityVerified
+                        ? "VERIFIED_REFERENCE_SHA256"
+                        : "UNVERIFIED_UNKNOWN")
+                    << "\n";
+                TraceFile.flush();
                 if (xstEmpty)
                 {
                     XstMapFile
@@ -241,6 +307,29 @@ namespace OutRunVRHudInspector
         {
             ClipSpriteHook = {};
             SpriteAnimHook = {};
+        }
+
+        void ResetTraceState() noexcept
+        {
+            InspectorActive.store(false, std::memory_order_release);
+            try
+            {
+                std::lock_guard lock(TraceMutex);
+                if (TraceFile)
+                {
+                    TraceFile.flush();
+                    TraceFile.close();
+                }
+                if (XstMapFile)
+                {
+                    XstMapFile.flush();
+                    XstMapFile.close();
+                }
+                Seen.clear();
+                TraceLines = 0;
+                SemanticIdentityVerified = false;
+            }
+            catch (...) {}
         }
 
     }
@@ -275,7 +364,8 @@ namespace OutRunVRHudInspector
 
     void TraceXstSet(int xstsetIndex, const char* filename)
     {
-        if (!filename || !*filename || !XstMapFile)
+        if (!InspectorActive.load(std::memory_order_acquire) ||
+            !filename || !*filename || !XstMapFile)
             return;
         std::lock_guard lock(TraceMutex);
         XstMapFile
@@ -309,7 +399,10 @@ namespace OutRunVRHudInspector
             bool apply() override
             {
                 if (!OpenTrace())
+                {
+                    ResetTraceState();
                     return false;
+                }
 
                 SpriteAnimHook = safetyhook::create_inline(
                     Game::sprani_play_ae_auth_alpha, SpriteAnimDest);
@@ -321,11 +414,13 @@ namespace OutRunVRHudInspector
                     spdlog::error(
                         "VR HUD INSPECTOR: one or more sprite hooks failed; disabling inspector");
                     ResetHooks();
+                    ResetTraceState();
                     return false;
                 }
 
+                InspectorActive.store(true, std::memory_order_release);
                 spdlog::info(
-                    "VR HUD INSPECTOR: semantic HUD tracing active; UIScaling-derived caller taxonomy separates screen HUD from world billboards; output=OutRun2006Tweaks-hudtrace.csv + OutRun2006Tweaks-xstmap.csv");
+                    "VR HUD INSPECTOR: semantic HUD tracing active; verified EXE callers are stack-resolved through UIScaling-derived ranges before UNKNOWN fallback; context-aware rate limiting and durable row flush enabled; output=OutRun2006Tweaks-hudtrace.csv + OutRun2006Tweaks-xstmap.csv");
                 return true;
             }
 

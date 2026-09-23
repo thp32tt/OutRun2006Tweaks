@@ -126,7 +126,7 @@ jobs:
         shell: pwsh
         run: |
           Remove-Item Env:CI -ErrorAction SilentlyContinue
-          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
       - name: Apply VC2022 dependency workarounds
         shell: pwsh
         run: |
@@ -145,8 +145,8 @@ jobs:
           if (-not $dll) { throw 'dinput8.dll missing' }
           Copy-Item $dll.FullName stage-game/dinput8.dll
           Set-Content stage-game/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
-          Set-Content stage-game/VARIANT_ID.txt 'ACTIVE_FULL_R34' -Encoding ascii
-          Set-Content stage-game/CMAKE_FLAGS.txt '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF' -Encoding ascii
+          Set-Content stage-game/VARIANT_ID.txt 'ACTIVE_R26_R43_R44' -Encoding ascii
+          Set-Content stage-game/CMAKE_FLAGS.txt '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF' -Encoding ascii
       - uses: actions/upload-artifact@v4
         with:
           name: dx9ex-active-game
@@ -198,7 +198,7 @@ jobs:
             SchemaVersion = 1
             BuildMatrixId = $matrixId
             IntegrationSha = $env:GITHUB_SHA
-            VariantId = 'ACTIVE_FULL_R34'
+            VariantId = 'ACTIVE_R26_R43_R44'
             DefaultTestProfile = 'CORRECTNESS'
             Profiles = @('CONTROL','CORRECTNESS','PERFORMANCE')
             UserRuntimeVerified = $false
