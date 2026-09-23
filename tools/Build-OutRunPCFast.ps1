@@ -66,10 +66,17 @@ Patch-DependencyProject (Join-Path $gameBuild '_deps/safetyhook-build/src/safety
 Patch-DependencyProject (Join-Path $gameBuild '_deps/zydis-build/Zydis.vcxproj')
 Patch-DependencyProject (Join-Path $gameBuild '_deps/zydis-build/zycore/Zycore.vcxproj')
 
-$sdlSource = Join-Path $gameBuild '_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c'
+$sdlSourceCandidates = @(
+    (Join-Path $gameBuild '_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.cpp'),
+    (Join-Path $gameBuild '_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c')
+)
+$sdlSource = $sdlSourceCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
 $sdlConfig = Join-Path $gameBuild '_deps/sdl-build/include-config-release/build_config/SDL_build_config.h'
-if (-not (Test-Path $sdlSource)) { throw "SDL source workaround target missing: $sdlSource" }
+if (-not $sdlSource) {
+    throw "SDL GameInput workaround target missing. Checked: $($sdlSourceCandidates -join ', ')"
+}
 if (-not (Test-Path $sdlConfig)) { throw "SDL config workaround target missing: $sdlConfig" }
+Write-Host "PC fast build: disabling SDL GameInput source $sdlSource"
 Set-Content -Path $sdlSource -Value ''
 $sdlText = Get-Content $sdlConfig -Raw
 if ($sdlText -match '#define SDL_JOYSTICK_GAMEINPUT 1') {
