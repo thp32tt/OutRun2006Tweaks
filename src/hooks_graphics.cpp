@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <iostream>
 #include <array>
+#include <cmath>
 
 namespace Settings
 {
@@ -137,12 +138,16 @@ class VRDriverSeatRenderTest : public Hook
 	inline static SafetyHookInline RobotDisplayHook{};
 	inline static bool FullCarLogged = false;
 	inline static bool DriverHiddenLogged = false;
+	inline static std::array<std::uint64_t, 24> RobotTraceKeys{};
+	inline static std::size_t RobotTraceCount = 0;
 
 	static bool Active()
 	{
-		if (!Settings::VREnabled || !Settings::VRStereo ||
-			!Settings::VRDriverSeatView ||
-			!OutRunVR::RuntimeEligibility::MayInjectStereo())
+		// Driver-seat geometry/camera testing must not depend on the current
+		// stereo recovery gate. Keeping it native-game active makes the test
+		// visible on the PC mirror too and prevents temporary host eligibility
+		// changes from turning the car/driver path on and off.
+		if (!Settings::VREnabled || !Settings::VRDriverSeatView)
 			return false;
 		if (!Game::current_mode ||
 			(*Game::current_mode != STATE_GAME && *Game::current_mode != STATE_GOAL))
@@ -159,26 +164,53 @@ class VRDriverSeatRenderTest : public Hook
 		EVWORK_CAR* player = Game::pl_car();
 		if (!player || reinterpret_cast<EVWORK_CAR*>(ctx.ebx) != player)
 			return;
-		ctx.eax &= ~0x0000C000u;
+
+		const std::uint32_t originalState = (ctx.eax >> 14) & 3u;
+		// Canonical DispCarModel_Common disassembly shows state 1 takes the
+		// full exterior/body path; state 0 skips those blocks and was the reason
+		// the first prototype made the car disappear.
+		ctx.eax = (ctx.eax & ~0x0000C000u) | 0x00004000u;
 		if (!FullCarLogged)
 		{
 			FullCarLogged = true;
-			spdlog::info("VR DRIVER SEAT TEST: forcing player DispCarModel_Common render-state to full-car without changing persistent flags");
+			spdlog::info(
+				"VR DRIVER SEAT TEST: player car render state {} -> 1 (full model); persistent flags unchanged",
+				originalState);
 		}
+	}
+
+	static void TraceRobotCandidate(EvWorkRobot* robot)
+	{
+		if (!robot || RobotTraceCount >= RobotTraceKeys.size())
+			return;
+		const std::uint64_t key =
+			(static_cast<std::uint64_t>(robot->workId_0) << 32) |
+			static_cast<std::uint32_t>(robot->chrset_8);
+		for (std::size_t i = 0; i < RobotTraceCount; ++i)
+			if (RobotTraceKeys[i] == key)
+				return;
+		RobotTraceKeys[RobotTraceCount++] = key;
+		spdlog::info("VR DRIVER SEAT ROBOT: candidate workId={} chrset={}",
+			robot->workId_0, static_cast<int>(robot->chrset_8));
 	}
 
 	static void __cdecl RobotDisplay_dest(EvWorkRobot* robot)
 	{
-		if (Active() && Settings::VRDriverSeatHideDriver && robot &&
-			static_cast<int>(robot->workId_0) == Settings::VRDriverSeatDriverWorkId.get())
+		if (Active() && robot)
 		{
-			if (!DriverHiddenLogged)
+			TraceRobotCandidate(robot);
+			if (Settings::VRDriverSeatHideDriver &&
+				static_cast<int>(robot->workId_0) == Settings::VRDriverSeatDriverWorkId.get())
 			{
-				DriverHiddenLogged = true;
-				spdlog::info("VR DRIVER SEAT TEST: hiding driver robot workId={} chrset={}; passenger robots remain enabled",
-					robot->workId_0, static_cast<int>(robot->chrset_8));
+				if (!DriverHiddenLogged)
+				{
+					DriverHiddenLogged = true;
+					spdlog::info(
+						"VR DRIVER SEAT TEST: hiding configured driver robot workId={} chrset={}; other robots/passenger remain enabled",
+						robot->workId_0, static_cast<int>(robot->chrset_8));
+				}
+				return;
 			}
-			return;
 		}
 		RobotDisplayHook.ccall<void>(robot);
 	}
@@ -1152,6 +1184,79 @@ class FixZBufferPrecision : public Hook
 	inline static SafetyHookInline CalcCameraMatrix = {};
 
 	static inline bool allow_znear_override = true;
+
+	static bool DriverSeatCameraActive(EvWorkCamera* camera)
+	{
+		return camera && Settings::VREnabled && Settings::VRDriverSeatView &&
+			Game::current_mode &&
+			(*Game::current_mode == STATE_GAME || *Game::current_mode == STATE_GOAL) &&
+			camera->cam_mode_timer_364 == 0.0f &&
+			static_cast<int>(camera->cam_mode_34A) == Settings::VRDriverSeatNativeMode.get();
+	}
+
+	static bool ApplyDriverSeatCameraOffset(EvWorkCamera* camera,
+		D3DVECTOR& savedPos, D3DVECTOR& savedLook)
+	{
+		if (!DriverSeatCameraActive(camera))
+			return false;
+
+		savedPos = camera->cam_pos_F8;
+		savedLook = camera->look_pos_104;
+
+		float fx = savedLook.x - savedPos.x;
+		float fy = savedLook.y - savedPos.y;
+		float fz = savedLook.z - savedPos.z;
+		const float forwardLen = std::sqrt(fx * fx + fy * fy + fz * fz);
+		if (!std::isfinite(forwardLen) || forwardLen < 1.0e-5f)
+			return false;
+		fx /= forwardLen; fy /= forwardLen; fz /= forwardLen;
+
+		// Right = forward x world-up. Rebuild a camera-local up from
+		// right x forward so vertical adjustment follows pitch instead of
+		// translating only on the world Y axis.
+		float rx = -fz;
+		float ry = 0.0f;
+		float rz = fx;
+		const float rightLen = std::sqrt(rx * rx + rz * rz);
+		if (!std::isfinite(rightLen) || rightLen < 1.0e-5f)
+			return false;
+		rx /= rightLen; rz /= rightLen;
+
+		const float ux = ry * fz - rz * fy;
+		const float uy = rz * fx - rx * fz;
+		const float uz = rx * fy - ry * fx;
+
+		const float forward = Settings::VRDriverSeatForward.get();
+		const float right = Settings::VRDriverSeatRight.get();
+		const float up = Settings::VRDriverSeatUp.get();
+		const D3DVECTOR delta{
+			fx * forward + rx * right + ux * up,
+			fy * forward + ry * right + uy * up,
+			fz * forward + rz * right + uz * up
+		};
+
+		camera->cam_pos_F8 = {
+			savedPos.x + delta.x, savedPos.y + delta.y, savedPos.z + delta.z };
+		camera->look_pos_104 = {
+			savedLook.x + delta.x, savedLook.y + delta.y, savedLook.z + delta.z };
+
+		static float lastForward = 9999.0f, lastRight = 9999.0f, lastUp = 9999.0f;
+		static int lastMode = -1;
+		const int mode = static_cast<int>(camera->cam_mode_34A);
+		if (mode != lastMode || std::fabs(forward - lastForward) > 0.0001f ||
+			std::fabs(right - lastRight) > 0.0001f || std::fabs(up - lastUp) > 0.0001f)
+		{
+			lastMode = mode;
+			lastForward = forward;
+			lastRight = right;
+			lastUp = up;
+			spdlog::info(
+				"VR DRIVER SEAT CAMERA: native mode={} forward={:.3f} right={:.3f} up={:.3f} applied before CalcCameraMatrix",
+				mode, forward, right, up);
+		}
+		return true;
+	}
+
 	static void CalcCameraMatrix_dest(EvWorkCamera* camera)
 	{
 		// improve z-buffer precision by increasing znear
@@ -1195,7 +1300,17 @@ class FixZBufferPrecision : public Hook
 				} 
 			}
 		}
+		D3DVECTOR savedPos{}, savedLook{};
+		const bool driverSeatOffset = ApplyDriverSeatCameraOffset(camera, savedPos, savedLook);
 		CalcCameraMatrix.call(camera);
+		if (driverSeatOffset)
+		{
+			// Only the generated native View matrix keeps the offset. Restore the
+			// camera work immediately so the game's smoothing/controller never
+			// feeds the synthetic cockpit position back into the next simulation tick.
+			camera->cam_pos_F8 = savedPos;
+			camera->look_pos_104 = savedLook;
+		}
 	}
 
 	// hook Clr_SceneEffect so we can reset camera z-near before screen effects are draw
