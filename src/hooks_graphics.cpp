@@ -25,6 +25,9 @@ namespace Settings
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRDriverSeatView;
 	extern Setting<int> VRDriverSeatNativeMode;
+	extern Setting<float> VRDriverSeatForward;
+	extern Setting<float> VRDriverSeatRight;
+	extern Setting<float> VRDriverSeatUp;
 	extern Setting<bool> VRDriverSeatFullCar;
 	extern Setting<bool> VRDriverSeatHideDriver;
 	extern Setting<int> VRDriverSeatDriverWorkId;
