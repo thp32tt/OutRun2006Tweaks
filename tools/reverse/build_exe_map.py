@@ -8,7 +8,7 @@ import pathlib
 import sqlite3
 from typing import Iterable
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 
 
 def parse_int(v):
@@ -59,11 +59,13 @@ def connect(path: pathlib.Path) -> sqlite3.Connection:
         );
         CREATE TABLE calls(
           id INTEGER PRIMARY KEY, callsite_rva INTEGER, caller_rva INTEGER,
-          callee_va INTEGER, callee_rva INTEGER, callee_function_rva INTEGER, type TEXT
+          callee_va INTEGER, callee_rva INTEGER, callee_space TEXT,
+          callee_function_rva INTEGER, type TEXT
         );
         CREATE TABLE xrefs(
-          id INTEGER PRIMARY KEY, from_rva INTEGER, from_function_rva INTEGER,
-          to_va INTEGER, to_rva INTEGER, to_function_rva INTEGER, type TEXT, primary_ref INTEGER
+          id INTEGER PRIMARY KEY, from_rva INTEGER, from_space TEXT, from_function_rva INTEGER,
+          to_va INTEGER, to_rva INTEGER, to_space TEXT,
+          to_function_rva INTEGER, type TEXT, primary_ref INTEGER
         );
         CREATE TABLE strings(
           rva INTEGER PRIMARY KEY, va INTEGER, function_rva INTEGER,
@@ -114,14 +116,15 @@ def insert_export(con: sqlite3.Connection, export_dir: pathlib.Path) -> dict:
             r.get("mnemonic"), r.get("text"), r.get("bytes")))
 
     for r in read_jsonl(export_dir / "calls.jsonl"):
-        con.execute("INSERT INTO calls(callsite_rva,caller_rva,callee_va,callee_rva,callee_function_rva,type) VALUES(?,?,?,?,?,?)", (
+        con.execute("INSERT INTO calls(callsite_rva,caller_rva,callee_va,callee_rva,callee_space,callee_function_rva,type) VALUES(?,?,?,?,?,?,?)", (
             parse_int(r.get("callsite_rva")), parse_int(r.get("caller_rva")), parse_int(r.get("callee_va")),
-            parse_int(r.get("callee_rva")), parse_int(r.get("callee_function_rva")), r.get("type")))
+            parse_int(r.get("callee_rva")), r.get("callee_space"),
+            parse_int(r.get("callee_function_rva")), r.get("type")))
 
     for r in read_jsonl(export_dir / "xrefs.jsonl"):
-        con.execute("INSERT INTO xrefs(from_rva,from_function_rva,to_va,to_rva,to_function_rva,type,primary_ref) VALUES(?,?,?,?,?,?,?)", (
-            parse_int(r.get("from_rva")), parse_int(r.get("from_function_rva")), parse_int(r.get("to_va")),
-            parse_int(r.get("to_rva")), parse_int(r.get("to_function_rva")), r.get("type"), int(bool(r.get("primary")))))
+        con.execute("INSERT INTO xrefs(from_rva,from_space,from_function_rva,to_va,to_rva,to_space,to_function_rva,type,primary_ref) VALUES(?,?,?,?,?,?,?,?,?)", (
+            parse_int(r.get("from_rva")), r.get("from_space"), parse_int(r.get("from_function_rva")), parse_int(r.get("to_va")),
+            parse_int(r.get("to_rva")), r.get("to_space"), parse_int(r.get("to_function_rva")), r.get("type"), int(bool(r.get("primary")))))
 
     for r in read_jsonl(export_dir / "strings.jsonl"):
         con.execute("INSERT INTO strings VALUES(?,?,?,?,?,?)", (
