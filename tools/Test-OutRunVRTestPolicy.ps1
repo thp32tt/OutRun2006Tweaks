@@ -75,8 +75,17 @@ foreach($name in $parseTargets) {
 }
 
 Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'TestProfile') 'selector must persist TestProfile'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'CompiledVariantId') 'selector must separate compiled variant identity'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'SessionVariantId') 'selector must separate session variant identity'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'ProfileId') 'selector must persist profile identity'
+Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'OUTRUN_VR_COMPILED_VARIANT_ID') 'runner must export compiled variant identity'
+Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'OUTRUN_VR_SESSION_VARIANT_ID') 'runner must export session variant identity'
+Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'OUTRUN_VR_PROFILE_ID') 'runner must export profile identity'
 Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'Get-OutRunVRTestProfile') 'runner must consume profile definitions'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'TEST_PROFILE') 'collector manifest must record profile'
+Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'CompiledVariantId') 'collector must preserve compiled variant identity'
+Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'SessionVariantId') 'collector must preserve session variant identity'
+Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'EvidenceClass') 'collector must preserve evidence class'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match '\$variant/\$profile/\$session') 'collector path must separate Variant/Profile/Session'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'captureRoot') 'collector must include capture bundles'
 Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'CORRECTNESS') 'GUI must expose CORRECTNESS'
