@@ -1,0 +1,89 @@
+name: VR R51 Recovery PC Build
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+    inputs:
+      clean:
+        description: 'Discard persistent PC build cache before compiling'
+        required: false
+        default: false
+        type: boolean
+      upload_artifact:
+        description: 'Also upload the ZIP to GitHub artifacts (slower)'
+        required: false
+        default: false
+        type: boolean
+  push:
+    branches:
+      - vr-r51-recovery-pc-20260923
+
+concurrency:
+  group: outrun-pc-fast-test
+  cancel-in-progress: false
+
+jobs:
+  fast-build:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[pc-build]') }}
+    runs-on: [self-hosted, Windows, X64, outrun-pc]
+    timeout-minutes: 30
+
+    steps:
+      - name: Keep temporary writes on the runner SSD
+        shell: powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          New-Item -ItemType Directory -Force $env:RUNNER_TEMP | Out-Null
+          "TEMP=$env:RUNNER_TEMP" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "TMP=$env:RUNNER_TEMP" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "TEMP/TMP -> $env:RUNNER_TEMP"
+
+      - name: Checkout current VR integration branch without deleting build cache
+        uses: actions/checkout@v4
+        with:
+          ref: vr-r51-recovery-pc-20260923
+          submodules: recursive
+          fetch-depth: 1
+          clean: false
+
+      - name: Skip stale queued push
+        if: ${{ github.event_name == 'push' }}
+        shell: powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $checkedOut = (git rev-parse HEAD).Trim()
+          $triggerSha = '${{ github.sha }}'
+          if ($checkedOut -ne $triggerSha) {
+            Write-Host "Queued trigger $triggerSha is stale; current vr-r51-recovery-pc-20260923 is $checkedOut."
+            "OUTRUN_PC_STALE=true" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          }
+
+      - name: Fast incremental build and local package
+        if: ${{ env.OUTRUN_PC_STALE != 'true' }}
+        shell: powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
+        run: |
+          $cleanRequested = '${{ inputs.clean }}' -eq 'true'
+          if ($cleanRequested) {
+            ./tools/Build-OutRunPCFast.ps1 -Clean
+          } else {
+            ./tools/Build-OutRunPCFast.ps1
+          }
+
+          $zip = (Get-Content out/pc-fast/LAST_ZIP_PATH.txt -Raw).Trim()
+          $drop = (Get-Content out/pc-fast/LAST_DROP_PATH.txt -Raw).Trim()
+          "OUTRUN_PC_ZIP=$zip" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "OUTRUN_PC_DROP=$drop" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+          "### PC fast build ready" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- Source: $(git rev-parse HEAD)" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- Local test folder: $drop" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- ZIP: $zip" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- Final hosted CI: not run by this fast path" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+      - name: Optional GitHub artifact upload
+        if: ${{ env.OUTRUN_PC_STALE != 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-R51-RECOVERY-PC-${{ github.sha }}
+          path: ${{ env.OUTRUN_PC_ZIP }}
+          if-no-files-found: error
