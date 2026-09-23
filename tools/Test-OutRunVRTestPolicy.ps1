@@ -27,7 +27,7 @@ $allRuntimeProfileNames = @(
 )
 foreach($profileName in $allRuntimeProfileNames) {
     $runtimeProfile = Get-OutRunVRTestProfile -Name $profileName
-    Assert-True (Has-Argument $runtimeProfile '-FramerateFastLoad=0') "$profileName: VR runtime profiles must keep FastLoad disabled to prevent startup white-screen recovery deadlock"
+    Assert-True (Has-Argument $runtimeProfile '-FramerateFastLoad=0') "${profileName}: VR runtime profiles must keep FastLoad disabled to prevent startup white-screen recovery deadlock"
 }
 
 foreach($profile in @($control,$correctness,$performance)) {
