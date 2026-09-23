@@ -13,6 +13,25 @@ $payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "dxvk-safe") { "d3d9" }
 $src = Join-Path $backendRoot $payloadBackend
 if (-not (Test-Path $src)) { throw "Backend payload not found: $src" }
 
+$buildInputsPath = Join-Path $root 'BUILD_INPUTS.json'
+$buildInputs = $null
+if (Test-Path $buildInputsPath) {
+    try { $buildInputs = Get-Content $buildInputsPath -Raw | ConvertFrom-Json } catch { $buildInputs = $null }
+}
+$compiledVariantFile = Join-Path $src 'VARIANT_ID.txt'
+$compiledVariant = if (Test-Path $compiledVariantFile) {
+    (Get-Content $compiledVariantFile -Raw).Trim()
+} elseif ($buildInputs -and $buildInputs.CompiledVariantId) {
+    [string]$buildInputs.CompiledVariantId
+} elseif ($buildInputs -and $buildInputs.VariantId) {
+    [string]$buildInputs.VariantId
+} else {
+    'UNKNOWN_COMPILED_VARIANT'
+}
+$validationClass = if ($buildInputs -and $buildInputs.ValidationClass) { [string]$buildInputs.ValidationClass } else { 'UNKNOWN' }
+$evidenceClass = if ($buildInputs -and $buildInputs.EvidenceClass) { [string]$buildInputs.EvidenceClass } else { 'NONE' }
+$userRuntimeVerified = if ($buildInputs -and $null -ne $buildInputs.UserRuntimeVerified) { [bool]$buildInputs.UserRuntimeVerified } else { $false }
+
 $logPatterns=@(
     'OutRun2006Tweaks*.log',
     'OutRun2006Tweaks-hudtrace*.csv',
@@ -226,7 +245,13 @@ New-Item -ItemType Directory -Force $sessionRoot | Out-Null
 $activeText = @(
     "backend=$Backend"
     "variant=$variant"
+    "sessionVariant=$variant"
+    "compiledVariant=$compiledVariant"
     "profile=$TestProfile"
+    "profileId=$TestProfile"
+    "validationClass=$validationClass"
+    "evidenceClass=$evidenceClass"
+    "userRuntimeVerified=$userRuntimeVerified"
     "matrix=$matrix"
     "session=$session"
     "startedUtc=$($startedUtc.ToString('o'))"
@@ -240,8 +265,14 @@ $sessionManifest = [ordered]@{
     SchemaVersion = 3
     BuildMatrixId = $matrix
     VariantId = $variant
+    CompiledVariantId = $compiledVariant
+    SessionVariantId = $variant
+    ProfileId = $TestProfile
     Backend = $Backend
     TestProfile = $TestProfile
+    ValidationClass = $validationClass
+    EvidenceClass = $evidenceClass
+    UserRuntimeVerified = $userRuntimeVerified
     SessionId = $session
     StartedUtc = $startedUtc.ToString("o")
     ConfigSha256 = $configHash
