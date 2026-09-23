@@ -1426,7 +1426,9 @@ namespace
                 xForceSample.normalized, modernSelfAligningTorque,
                 nativeXForceTorque, xForceMixResult.nativeShare,
                 nativeFront.valid ? nativeFront.normalizedLateral : 0.0f,
-                nativeTireSatTorque, nativeTireSatBlend_);
+                nativeTireSatTorque, nativeTireSatBlend_,
+                rearSlipNormalized, nativeOversteerCueTorque,
+                nativeOversteerProtectionBlend_);
 
             if (Settings::WheelFFBXForceCapture60Hz)
             {
@@ -1662,6 +1664,9 @@ namespace
                 result.nativeTireNormalized[i] = graphNativeTireNormalized_[src];
                 result.nativeTireSat[i] = graphNativeTireSat_[src];
                 result.nativeTireShare[i] = graphNativeTireShare_[src];
+                result.rearSlipNormalized[i] = graphRearSlipNormalized_[src];
+                result.nativeOversteerCue[i] = graphNativeOversteerCue_[src];
+                result.nativeOversteerProtection[i] = graphNativeOversteerProtection_[src];
             }
             return result;
         }
@@ -3452,7 +3457,9 @@ namespace
         void record_graph_sample(
             float rawStructural, float softLimited, float postSlew, float finalOutput,
             float xForceNormalized, float modernSat, float nativeSat, float nativeShare,
-            float nativeTireNormalized, float nativeTireSat, float nativeTireShare)
+            float nativeTireNormalized, float nativeTireSat, float nativeTireShare,
+            float rearSlipNormalized, float nativeOversteerCue,
+            float nativeOversteerProtection)
         {
             const size_t slot = graphWriteIndex_ % WheelFFBGraphCapacity;
             graphRawStructural_[slot] = std::isfinite(rawStructural) ? rawStructural : 0.0f;
@@ -3469,6 +3476,12 @@ namespace
             graphNativeTireSat_[slot] = std::isfinite(nativeTireSat) ? nativeTireSat : 0.0f;
             graphNativeTireShare_[slot] = std::isfinite(nativeTireShare)
                 ? std::clamp(nativeTireShare, 0.0f, 1.0f) : 0.0f;
+            graphRearSlipNormalized_[slot] = std::isfinite(rearSlipNormalized)
+                ? std::clamp(rearSlipNormalized, 0.0f, 3.0f) : 0.0f;
+            graphNativeOversteerCue_[slot] = std::isfinite(nativeOversteerCue)
+                ? nativeOversteerCue : 0.0f;
+            graphNativeOversteerProtection_[slot] = std::isfinite(nativeOversteerProtection)
+                ? std::clamp(nativeOversteerProtection, 0.0f, 1.0f) : 0.0f;
             ++graphWriteIndex_;
             graphCount_ = std::min<std::size_t>(graphCount_ + 1, WheelFFBGraphCapacity);
         }
@@ -4192,6 +4205,9 @@ namespace
         std::array<float, WheelFFBGraphCapacity> graphNativeTireNormalized_{};
         std::array<float, WheelFFBGraphCapacity> graphNativeTireSat_{};
         std::array<float, WheelFFBGraphCapacity> graphNativeTireShare_{};
+        std::array<float, WheelFFBGraphCapacity> graphRearSlipNormalized_{};
+        std::array<float, WheelFFBGraphCapacity> graphNativeOversteerCue_{};
+        std::array<float, WheelFFBGraphCapacity> graphNativeOversteerProtection_{};
         std::size_t graphWriteIndex_ = 0;
         std::size_t graphCount_ = 0;
 
