@@ -8,7 +8,7 @@ import pathlib
 import sqlite3
 from typing import Iterable
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 
 def parse_int(v):
@@ -48,6 +48,11 @@ def connect(path: pathlib.Path) -> sqlite3.Connection:
           thunk INTEGER, external INTEGER, calling_convention TEXT,
           parameter_count INTEGER, return_type TEXT
         );
+        CREATE TABLE function_ranges(
+          entry_rva INTEGER NOT NULL, range_index INTEGER NOT NULL,
+          start_rva INTEGER NOT NULL, end_rva INTEGER NOT NULL,
+          PRIMARY KEY(entry_rva, range_index)
+        );
         CREATE TABLE instructions(
           rva INTEGER PRIMARY KEY, va INTEGER, function_rva INTEGER,
           mnemonic TEXT, text TEXT, bytes TEXT
@@ -72,6 +77,7 @@ def connect(path: pathlib.Path) -> sqlite3.Connection:
           id TEXT PRIMARY KEY, rva INTEGER, kind TEXT, name TEXT,
           tags TEXT, confidence TEXT, evidence TEXT, notes TEXT, source TEXT
         );
+        CREATE INDEX idx_function_ranges_lookup ON function_ranges(start_rva, end_rva);
         CREATE INDEX idx_instr_function ON instructions(function_rva, rva);
         CREATE INDEX idx_calls_caller ON calls(caller_rva);
         CREATE INDEX idx_calls_callee ON calls(callee_function_rva, callee_rva);
@@ -96,6 +102,11 @@ def insert_export(con: sqlite3.Connection, export_dir: pathlib.Path) -> dict:
             r.get("size"), parse_int(r.get("body_min_rva")), parse_int(r.get("body_max_rva")),
             int(bool(r.get("thunk"))), int(bool(r.get("external"))), r.get("calling_convention"),
             r.get("parameter_count"), r.get("return_type")))
+
+    for r in read_jsonl(export_dir / "function_ranges.jsonl"):
+        con.execute("INSERT INTO function_ranges VALUES(?,?,?,?)", (
+            parse_int(r.get("entry_rva")), r.get("range_index"),
+            parse_int(r.get("start_rva")), parse_int(r.get("end_rva"))))
 
     for r in read_jsonl(export_dir / "instructions.jsonl"):
         con.execute("INSERT INTO instructions VALUES(?,?,?,?,?,?)", (
