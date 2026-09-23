@@ -214,7 +214,7 @@ class UIScaling : public Hook
 	// This deliberately does not change generic queue ownership: untagged nodes
 	// remain SCREEN_OVERLAY_2D and all world rendering stays on the R51 path.
 	static inline SafetyHookInline HudTextProducer_hk{};
-	static thread_local bool HudTextProducerScreenHud = false;
+	inline static thread_local bool HudTextProducerScreenHud = false;
 	static inline bool HudTextProducerFirstTaggedLogged = false;
 
 	static uint32_t ExeCallRva(const void* returnAddress)
