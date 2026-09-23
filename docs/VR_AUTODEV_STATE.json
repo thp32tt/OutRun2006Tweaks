@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-23T22:37:00Z",
+  "updatedUtc": "2026-09-23T22:38:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -585,7 +585,7 @@
   "manualCd20": {
     "requestedAtKst": "2026-09-24T07:10:28+09:00",
     "totalCycles": 20,
-    "completedCycles": 7,
+    "completedCycles": 8,
     "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
     "selfHostedPcUsed": false,
     "history": [
@@ -618,9 +618,13 @@
       {
         "cycle": 7,
         "summary": "enforce hosted package metadata attestation"
+      },
+      {
+        "cycle": 8,
+        "summary": "align PC-fast compiled variant and evidence class"
       }
     ],
-    "currentCandidateSummary": "enforce hosted package metadata attestation",
+    "currentCandidateSummary": "align PC-fast compiled variant and evidence class",
     "runtimeBaselineAdvanced": false
   }
 }
