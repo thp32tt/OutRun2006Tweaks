@@ -422,6 +422,10 @@ def main() -> int:
             )
     for rva, name in ((0x088AF0, "CalcCharMatrix"), (0x114C10, "RobotDisplayWrapper"), (0x113AC0, "RobotRenderer")):
         print(f"driver_char_bytes={name} rva=0x{rva:08X} bytes={pe.bytes_at_rva(rva, 96).hex(' ')}")
+    print(
+        "player_car_display_context="
+        f"start=0x0006BF20 bytes={pe.bytes_at_rva(0x0006BF20, 256).hex(' ')}"
+    )
     if missing_known_call_sites:
         for item in missing_known_call_sites:
             print(
