@@ -147,6 +147,7 @@ jobs:
           Set-Content stage-game/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
           Set-Content stage-game/VARIANT_ID.txt 'ACTIVE_FULL_R34' -Encoding ascii
           Set-Content stage-game/CMAKE_FLAGS.txt '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF' -Encoding ascii
+          Set-Content stage-game/GENERATED_CMAKELISTS_SHA256.txt (Get-FileHash CMakeLists.txt -Algorithm SHA256).Hash.ToLowerInvariant() -Encoding ascii
       - uses: actions/upload-artifact@v4
         with:
           name: dx9ex-active-game
@@ -183,6 +184,7 @@ jobs:
             Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
           }
           Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
+          Copy-Item docs/VR_DEPENDENCY_LOCK.json (Join-Path $dir 'VR_DEPENDENCY_LOCK.json')
           @(
             'OUTRUN VR TEST / LOG UPLOAD'
             ''
@@ -194,14 +196,21 @@ jobs:
             'Optional: add a short symptom note only when you want to provide extra human-observed evidence.'
           ) | Set-Content (Join-Path $dir 'UPLOAD_LOG_ZIP_ONLY.txt') -Encoding UTF8
           Set-Content (Join-Path $dir 'BUILD_MATRIX_ID.txt') $matrixId -Encoding ascii
+          . ./tools/OutRunVR-TestProfiles.ps1
+          $dependencyLockSha = (Get-FileHash docs/VR_DEPENDENCY_LOCK.json -Algorithm SHA256).Hash.ToLowerInvariant()
+          $generatedCMakeSha = (Get-Content payload/game/GENERATED_CMAKELISTS_SHA256.txt -Raw).Trim()
           $buildInputs = [ordered]@{
-            SchemaVersion = 1
+            SchemaVersion = 2
             BuildMatrixId = $matrixId
             IntegrationSha = $env:GITHUB_SHA
             VariantId = 'ACTIVE_FULL_R34'
             DefaultTestProfile = 'CORRECTNESS'
-            Profiles = @('CONTROL','CORRECTNESS','PERFORMANCE')
+            Profiles = @(Get-OutRunVRTestProfileNames)
             UserRuntimeVerified = $false
+            ValidationClass = 'HOSTED_ACTIVE_CI'
+            DependencyLockFile = 'VR_DEPENDENCY_LOCK.json'
+            DependencyLockSha256 = $dependencyLockSha
+            GeneratedCMakeListsSha256 = $generatedCMakeSha
           }
           $buildInputs | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'BUILD_INPUTS.json') -Encoding UTF8
           $bad = Get-ChildItem $dir -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe') }
@@ -218,7 +227,7 @@ jobs:
           $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_ACTIVE_*.zip' | Select-Object -First 1
           if (-not $zip) { throw 'active DX9Ex ZIP missing' }
           Expand-Archive $zip.FullName verify
-          foreach ($file in @('OutRunVR-Backend-Selector.cmd','OutRunVR-Backend-Selector.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt')) {
+          foreach ($file in @('OutRunVR-Backend-Selector.cmd','OutRunVR-Backend-Selector.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','VR_DEPENDENCY_LOCK.json','UPLOAD_LOG_ZIP_ONLY.txt')) {
             if (-not (Test-Path (Join-Path verify $file))) { throw "package missing $file" }
           }
           $collectorText = Get-Content (Join-Path verify 'Collect-OutRunVRLogs.ps1') -Raw
