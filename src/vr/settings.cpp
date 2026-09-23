@@ -69,22 +69,6 @@ namespace Settings
 		"Keeps car cubemap reflection work at the original 60 Hz time budget when rendering the HMD at 72/80/90/120 Hz." };
 	Setting<float> VRNearPlane{ "VR", "NearPlane", 0.10f,
 		"VR gameplay camera near plane in game units. Overrides the 2D Z-precision fix while positional tracking is active so dashboard/driver geometry is not clipped by the normal 1.0 near plane.", Range<float>{ 0.03f, 0.50f } };
-	Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", true,
-		"Experimental test view: reuses the native bumper camera timing/smoothing, shows the full player car, hides the driver robot and offsets the VR camera into the cockpit." };
-	Setting<int> VRDriverSeatNativeMode{ "VR", "DriverSeatNativeMode", 1,
-		"Native camera mode used as the synchronized base for DriverSeatView. Default 1 is the bumper/in-car camera discovered from the canonical EXE.", Range<int>{ 0, 2 } };
-	Setting<float> VRDriverSeatForward{ "VR", "DriverSeatForward", -1.35f,
-		"Driver-seat camera offset along the native camera forward axis. Positive moves toward the road; negative moves rearward into the cabin.", Range<float>{ -3.0f, 3.0f } };
-	Setting<float> VRDriverSeatRight{ "VR", "DriverSeatRight", -0.32f,
-		"Driver-seat camera offset along the native camera right axis. Negative moves left toward the driver seat.", Range<float>{ -2.0f, 2.0f } };
-	Setting<float> VRDriverSeatUp{ "VR", "DriverSeatUp", 0.65f,
-		"Driver-seat camera vertical offset from the native bumper camera.", Range<float>{ -2.0f, 2.0f } };
-	Setting<bool> VRDriverSeatFullCar{ "VR", "DriverSeatFullCar", true,
-		"While DriverSeatView is active, makes DispCarModel_Common use the native full-car render state without changing the games persistent camera/car flags." };
-	Setting<bool> VRDriverSeatHideDriver{ "VR", "DriverSeatHideDriver", true,
-		"Hides only the selected driver robot while DriverSeatView is active. Passenger/girlfriend rendering remains untouched." };
-	Setting<int> VRDriverSeatDriverWorkId{ "VR", "DriverSeatDriverWorkId", 0,
-		"Robot workId suppressed as the player driver in DriverSeatView. Default 0 matches the first gameplay robot slot; adjustable for runtime validation.", Range<int>{ 0, 20 } };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,
 		"Game-world units per metre of OpenXR head movement.", Range<float>{ 0.1f, 10.0f } };
 	Setting<float> VRStereoDepth{ "VR", "StereoDepth", 1.0f,

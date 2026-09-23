@@ -22,11 +22,6 @@ namespace Settings
 	extern Setting<bool> VRStereo;
 	extern Setting<bool> VRMirrorFitDesktop;
 	extern Setting<bool> VRDisableDesktopVsync;
-	extern Setting<bool> VRDriverSeatView;
-	extern Setting<int> VRDriverSeatNativeMode;
-	extern Setting<bool> VRDriverSeatFullCar;
-	extern Setting<bool> VRDriverSeatHideDriver;
-	extern Setting<int> VRDriverSeatDriverWorkId;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
 
@@ -127,80 +122,6 @@ public:
 	static UseHiDefCharacters instance;
 };
 UseHiDefCharacters UseHiDefCharacters::instance;
-
-class VRDriverSeatRenderTest : public Hook
-{
-	constexpr static int PlayerCarRenderState_HookAddr = 0x69764;
-	constexpr static int RobotDisplay_Addr = 0x114C10;
-
-	inline static SafetyHookMid PlayerCarRenderStateHook{};
-	inline static SafetyHookInline RobotDisplayHook{};
-	inline static bool FullCarLogged = false;
-	inline static bool DriverHiddenLogged = false;
-
-	static bool Active()
-	{
-		if (!Settings::VREnabled || !Settings::VRStereo ||
-			!Settings::VRDriverSeatView ||
-			!OutRunVR::RuntimeEligibility::MayInjectStereo())
-			return false;
-		if (!Game::current_mode ||
-			(*Game::current_mode != STATE_GAME && *Game::current_mode != STATE_GOAL))
-			return false;
-		EvWorkCamera* camera = Game::camera();
-		return camera && camera->cam_mode_timer_364 == 0.0f &&
-			static_cast<int>(camera->cam_mode_34A) == Settings::VRDriverSeatNativeMode.get();
-	}
-
-	static void PlayerCarRenderState_dest(SafetyHookContext& ctx)
-	{
-		if (!Active() || !Settings::VRDriverSeatFullCar)
-			return;
-		EVWORK_CAR* player = Game::pl_car();
-		if (!player || reinterpret_cast<EVWORK_CAR*>(ctx.ebx) != player)
-			return;
-		ctx.eax &= ~0x0000C000u;
-		if (!FullCarLogged)
-		{
-			FullCarLogged = true;
-			spdlog::info("VR DRIVER SEAT TEST: forcing player DispCarModel_Common render-state to full-car without changing persistent flags");
-		}
-	}
-
-	static void __cdecl RobotDisplay_dest(EvWorkRobot* robot)
-	{
-		if (Active() && Settings::VRDriverSeatHideDriver && robot &&
-			static_cast<int>(robot->workId_0) == Settings::VRDriverSeatDriverWorkId.get())
-		{
-			if (!DriverHiddenLogged)
-			{
-				DriverHiddenLogged = true;
-				spdlog::info("VR DRIVER SEAT TEST: hiding driver robot workId={} chrset={}; passenger robots remain enabled",
-					robot->workId_0, static_cast<int>(robot->chrset_8));
-			}
-			return;
-		}
-		RobotDisplayHook.ccall<void>(robot);
-	}
-
-public:
-	std::string_view description() override
-	{
-		return "VRDriverSeatRenderTest";
-	}
-
-	bool apply() override
-	{
-		PlayerCarRenderStateHook = safetyhook::create_mid(
-			Module::exe_ptr(PlayerCarRenderState_HookAddr), PlayerCarRenderState_dest);
-		RobotDisplayHook = safetyhook::create_inline(
-			Module::exe_ptr(RobotDisplay_Addr), RobotDisplay_dest);
-		return !!PlayerCarRenderStateHook && !!RobotDisplayHook;
-	}
-
-	static VRDriverSeatRenderTest instance;
-};
-VRDriverSeatRenderTest VRDriverSeatRenderTest::instance;
 
 class RestoreCarBaseShadow : public Hook
 {
