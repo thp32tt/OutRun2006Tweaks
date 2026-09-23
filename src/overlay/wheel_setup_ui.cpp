@@ -71,6 +71,7 @@ namespace Settings
     extern Setting<float> WheelFFBReversalReleaseRate;
     extern Setting<int> VibrationMode;
     extern Setting<float> WheelFFBRoadTexture;
+    extern Setting<float> WheelFFBCurbImpact;
     extern Setting<float> WheelFFBTireSlip;
     extern Setting<float> WheelFFBWallImpact;
     extern Setting<bool> WheelFFBUseHardwareSpring;
@@ -853,6 +854,7 @@ namespace
             float slew = 0.06f;
             float reversalRelease = 0.12f;
             float road = 0.30f;
+            float curb = 0.40f;
             float tire = 0.20f;
             float collision = 0.38f;
             float maxTorque = 0.0f;
@@ -901,6 +903,7 @@ namespace
             savedFfb_.slew = Settings::WheelFFBSlewRate;
             savedFfb_.reversalRelease = Settings::WheelFFBReversalReleaseRate;
             savedFfb_.road = Settings::WheelFFBRoadTexture;
+            savedFfb_.curb = Settings::WheelFFBCurbImpact;
             savedFfb_.tire = Settings::WheelFFBTireSlip;
             savedFfb_.collision = Settings::WheelFFBWallImpact;
             savedFfb_.maxTorque = Settings::WheelFFBMaxTorqueNm;
@@ -949,6 +952,7 @@ namespace
             Settings::WheelFFBSlewRate = savedFfb_.slew;
             Settings::WheelFFBReversalReleaseRate = savedFfb_.reversalRelease;
             Settings::WheelFFBRoadTexture = savedFfb_.road;
+            Settings::WheelFFBCurbImpact = savedFfb_.curb;
             Settings::WheelFFBTireSlip = savedFfb_.tire;
             Settings::WheelFFBWallImpact = savedFfb_.collision;
             Settings::WheelFFBMaxTorqueNm = savedFfb_.maxTorque;
@@ -1826,7 +1830,12 @@ namespace
             ImGui::TextDisabled("Wheelbase/driver-side spring, damping, inertia or friction are additional forces; keep them conservative while tuning game-side feel.");
 
             ImGui::SeparatorText("Effects");
-            track_ffb_change(ImGui::SliderFloat("Road Detail", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 1.0f, "%.2f"));
+            track_ffb_change(ImGui::SliderFloat("Road Texture", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 1.0f, "%.2f"));
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Continuous texture from averaged per-wheel suspension/load motion. Brick/stone roads are intentionally capped and no longer use max(roughness).");
+            track_ffb_change(ImGui::SliderFloat("Curb / Bump Impact", Settings::WheelFFBCurbImpact.ptr(), 0.0f, 1.0f, "%.2f"));
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Short pulse from per-wheel suspension/load impulse; a material change can boost a real hit but cannot create one by itself.");
             track_ffb_change(ImGui::SliderFloat("Tire Slip", Settings::WheelFFBTireSlip.ptr(), 0.0f, 0.50f, "%.2f"));
             track_ffb_change(ImGui::SliderFloat("Collision", Settings::WheelFFBWallImpact.ptr(), 0.0f, 1.0f, "%.2f"));
             track_ffb_change(ImGui::Checkbox("Engine Vibration", Settings::WheelFFBEngineVibration.ptr()));
@@ -2046,6 +2055,7 @@ namespace
                 Settings::WheelFFBSlewRate = 0.040f;
                 Settings::WheelFFBReversalReleaseRate = 0.12f;
                 Settings::WheelFFBRoadTexture = 0.30f;
+                Settings::WheelFFBCurbImpact = 0.40f;
                 Settings::WheelFFBTireSlip = 0.20f;
                 Settings::WheelFFBWallImpact = 0.38f;
                 Settings::WheelFFBUseHardwareSpring = true;
@@ -2097,6 +2107,7 @@ namespace
                 Settings::WheelFFBSlewRate = 0.045f;
                 Settings::WheelFFBReversalReleaseRate = 0.12f;
                 Settings::WheelFFBRoadTexture = 0.30f;
+                Settings::WheelFFBCurbImpact = 0.40f;
                 Settings::WheelFFBTireSlip = 0.20f;
                 Settings::WheelFFBWallImpact = 0.38f;
                 Settings::WheelFFBUseHardwareSpring = true;
