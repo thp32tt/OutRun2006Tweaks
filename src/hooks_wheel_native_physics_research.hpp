@@ -44,6 +44,9 @@ namespace WheelNativePhysicsResearch
     inline constexpr std::size_t FirstWheelOffset = 0x258;
     inline constexpr std::size_t WheelStride = 0xF4;
     inline constexpr int WheelCount = 4;
+    // Canonical EXE VA 0x00628254 = 2*pi/65536. The tyre model stores angular
+    // state in signed 16-bit game-angle units.
+    inline constexpr float AngleUnitRadians = 6.2831853071795864769f / 65536.0f;
 
     template <typename T>
     inline T read_value(const std::uint8_t* base, std::size_t offset)
@@ -135,6 +138,71 @@ namespace WheelNativePhysicsResearch
                 return false;
         }
         return true;
+    }
+
+    struct FrontTireState
+    {
+        bool valid = false;
+        float slip0Rad = 0.0f;
+        float slip1Rad = 0.0f;
+        float slipRad = 0.0f;
+        float lateral0 = 0.0f;
+        float lateral1 = 0.0f;
+        float lateralSum = 0.0f;
+        float capacity0 = 0.0f;
+        float capacity1 = 0.0f;
+        float capacitySum = 0.0f;
+        float normalizedLateral = 0.0f;
+        float normalLoadSum = 0.0f;
+        float normalLoadDiff = 0.0f;
+    };
+
+    inline FrontTireState front_tire_state()
+    {
+        FrontTireState out{};
+        const auto* workspace = reinterpret_cast<const std::uint8_t*>(
+            Module::exe_ptr(PlayerWorkspaceRva));
+        if (!pointer_table_matches(workspace))
+            return out;
+
+        const WheelSample front0 = sample_wheel(workspace + FirstWheelOffset);
+        const WheelSample front1 = sample_wheel(
+            workspace + FirstWheelOffset + WheelStride);
+        if (!front0.finite || !front1.finite)
+            return out;
+
+        out.slip0Rad = -static_cast<float>(front0.steerAngleEE) * AngleUnitRadians;
+        out.slip1Rad = -static_cast<float>(front1.steerAngleEE) * AngleUnitRadians;
+        out.lateral0 = front0.tireLocalAC;
+        out.lateral1 = front1.tireLocalAC;
+        out.lateralSum = out.lateral0 + out.lateral1;
+        out.capacity0 = std::abs(front0.gripCapacityC0);
+        out.capacity1 = std::abs(front1.gripCapacityC0);
+        out.capacitySum = out.capacity0 + out.capacity1;
+        out.normalLoadSum = front0.normalLoad34 + front1.normalLoad34;
+        out.normalLoadDiff = front0.normalLoad34 - front1.normalLoad34;
+
+        // Capacity is produced by the native load-sensitive tyre limit. A zero
+        // capacity is treated as no trustworthy front contact (airborne/reset/
+        // uninitialized) and therefore cannot arm native steering torque.
+        if (!std::isfinite(out.capacitySum) || out.capacitySum <= 1.0e-6f)
+            return out;
+
+        out.slipRad =
+            (out.slip0Rad * out.capacity0 + out.slip1Rad * out.capacity1) /
+            out.capacitySum;
+        out.normalizedLateral = std::clamp(
+            out.lateralSum / out.capacitySum, -1.0f, 1.0f);
+
+        out.valid =
+            std::isfinite(out.slip0Rad) &&
+            std::isfinite(out.slip1Rad) &&
+            std::isfinite(out.slipRad) &&
+            std::isfinite(out.lateralSum) &&
+            std::isfinite(out.normalizedLateral) &&
+            std::isfinite(out.normalLoadSum) &&
+            std::isfinite(out.normalLoadDiff);
+        return out;
     }
 
     inline void capture_after_physics(EVWORK_CAR* car)
