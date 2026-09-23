@@ -13,8 +13,13 @@ def hx(v): return None if v is None else f"0x{v:08X}"
 
 def parse_addr(text: str):
     t = text.strip()
-    if not re.fullmatch(r"(?:0x)?[0-9a-fA-F]{4,16}", t): return None
-    return int(t, 16)
+    kind = "auto"
+    m = re.fullmatch(r"(?:(rva|va):)?((?:0x)?[0-9a-fA-F]{4,16})", t, re.IGNORECASE)
+    if not m:
+        return None
+    if m.group(1):
+        kind = m.group(1).lower()
+    return kind, int(m.group(2), 16)
 
 
 def image_base(con):
@@ -24,13 +29,19 @@ def image_base(con):
     except Exception: return int(row[0], 0)
 
 
-def normalize_rva(con, value):
+def normalize_rva(con, value, kind="auto"):
     base = image_base(con)
+    if kind == "rva":
+        return value
+    if kind == "va":
+        if value < base:
+            raise ValueError(f"VA 0x{value:X} is below image base 0x{base:X}")
+        return value - base
     return value - base if value >= base else value
 
 
-def show_address(con, raw, context):
-    rva = normalize_rva(con, raw)
+def show_address(con, raw, context, address_kind="auto"):
+    rva = normalize_rva(con, raw, address_kind)
     f = con.execute("SELECT * FROM functions WHERE body_min_rva<=? AND body_max_rva>=? ORDER BY size ASC LIMIT 1", (rva,rva)).fetchone()
     print(f"ADDRESS RVA={hx(rva)} VA={hx(rva+image_base(con))}")
     if f:
@@ -117,8 +128,11 @@ def main():
     con.row_factory=sqlite3.Row
     try:
         addr=parse_addr(args.query)
-        if addr is not None: show_address(con, addr, args.context)
-        else: plain_search(con, args.query, args.limit)
+        if addr is not None:
+            address_kind, address_value = addr
+            show_address(con, address_value, args.context, address_kind)
+        else:
+            plain_search(con, args.query, args.limit)
     finally: con.close()
 
 if __name__ == "__main__": main()
