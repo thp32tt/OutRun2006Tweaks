@@ -33,7 +33,6 @@ extern "C"
     void __cdecl CalcVibrationValues(EVWORK_CAR* car);
 }
 
-extern double __cdecl sub_1149C0(unsigned int surfaceMask, int loadColiType, DWORD* waterFlag);
 extern float InputManager_SteeringValue();
 
 static_assert(offsetof(EVWORK_CAR, actionforce_DBC) == 0xDBC,
@@ -228,7 +227,14 @@ namespace Settings
 
     Setting<float> WheelFFBRoadTexture{
         "WheelFFB", "RoadTexture", 0.30f,
-        "Hardware sine vibration driven by the game's own surface roughness table.", Range<float>{ 0.0f, 1.0f }
+        "Low-amplitude continuous road texture derived from per-wheel suspension/load motion. No max(roughness) material lookup.",
+        Range<float>{ 0.0f, 1.0f }
+    };
+
+    Setting<float> WheelFFBCurbImpact{
+        "WheelFFB", "CurbImpact", 0.40f,
+        "Short curb/bump pulse from per-wheel material transitions plus suspension/load impulse.",
+        Range<float>{ 0.0f, 1.0f }
     };
 
     Setting<float> WheelFFBTireSlip{
@@ -553,8 +559,6 @@ namespace
                 crashImpulseTimer_ = 0;
                 crashImpulseForce_ = 0.0f;
                 gearShiftTimer_ = 0;
-                splashTimer_ = 0;
-                splashAmp_ = 0.0f;
 
                 LONG testLevel = manualTestDirection_ * 2000L;
                 if (Settings::WheelFFBInvertForce)
@@ -740,62 +744,66 @@ namespace
             const float regripBuildScale =
                 WheelFFBMath::drift_regrip_build_scale(regripRecovery);
 
-            float roughness = 0.0f;
-            DWORD waterFlag = 0;
-            for (int i = 0; i < 4; ++i)
+            // Per-wheel road/curb model. The old path collapsed all four
+            // material queries through max(sub_1149C0 roughness), which made a
+            // continuously rough brick/stone road feel like a permanent curb
+            // and required a stage-specific snow/ice attenuation hack.
+            //
+            // Keep material identity as identity, then let real suspension/load
+            // motion decide how much tactile energy exists. Material transitions
+            // can boost an actual physical hit but never generate a hit alone.
+            const auto nativeWheelFrame =
+                WheelNativePhysicsResearch::wheel_frame_state();
+            std::array<WheelFFBMath::SurfaceWheelSignal, 4> surfaceWheel{};
+            if (nativeWheelFrame.valid)
             {
-                const float surfaceRoughness = static_cast<float>(sub_1149C0(
-                    car->water_flag_24C[i],
-                    static_cast<int>(car->OnRoadPlace_5C.loadColiType_0),
-                    &waterFlag));
-                if (std::isfinite(surfaceRoughness))
-                    roughness = std::max(roughness, surfaceRoughness);
+                for (std::size_t i = 0; i < surfaceWheel.size(); ++i)
+                {
+                    const auto& nw = nativeWheelFrame.wheel[i];
+                    auto& sw = surfaceWheel[i];
+                    sw.materialMask = car->water_flag_24C[i];
+                    sw.compressionRate = nw.compressionRate20;
+                    sw.normalLoad = nw.normalLoad34;
+                    sw.referenceLoad = nw.referenceLoad38;
+                    sw.valid = nw.finite;
+                }
             }
 
-            // Road texture and tire-slip envelopes.  sub_1149C0 returns
-            // ~0.25 for ordinary asphalt; that is a material baseline, not a
-            // request to vibrate the wheel.  The Xbox routine only enters its
-            // stronger surface branch above roughly 0.30, so remove that
-            // baseline here and ramp rough surfaces from 0.30 -> 0.85.
-            const float textureRoughness =
-                std::clamp((roughness - 0.30f) / 0.55f, 0.0f, 1.0f);
+            const WheelFFBMath::SurfaceHapticsOutput surfaceHaptics =
+                surfaceHapticsModel_.update(surfaceWheel, 1.0f / 60.0f);
             const float roadSpeedGate =
                 std::clamp((speedNorm - 0.05f) / 0.20f, 0.0f, 1.0f);
+            const float roadTextureStrength = std::clamp(
+                static_cast<float>(Settings::WheelFFBRoadTexture),
+                0.0f, 1.0f);
+            const float curbImpactStrength = std::clamp(
+                static_cast<float>(Settings::WheelFFBCurbImpact),
+                0.0f, 1.0f);
 
-            // Xbox gamepad rumble treats snow/ice as a continuously rough
-            // material. On a DD wheel that becomes an unpleasant constant
-            // high-frequency sine. Stage IDs follow Game::StageNames: 4/19
-            // are Snowy Mountain/Ice Scape and +30 are their reverse variants.
-            const int stageNumber = Game::GetNowStageNum(8);
-            const int uniqueStage = Game::GetStageUniqueNum(stageNumber);
-            const bool snowOrIceStage =
-                uniqueStage == 4 || uniqueStage == 19 ||
-                uniqueStage == 34 || uniqueStage == 49;
-            constexpr float SnowIceRoadTextureScale = 0.04f;
-            const float stageRoadTextureScale =
-                snowOrIceStage ? SnowIceRoadTextureScale : 1.0f;
+            const float roadTextureAmp =
+                surfaceHaptics.valid
+                    ? surfaceHaptics.texture * roadSpeedGate *
+                        roadTextureStrength * outputStrength
+                    : 0.0f;
+            const float roadImpactAmp =
+                surfaceHaptics.valid
+                    ? surfaceHaptics.impact * roadSpeedGate *
+                        curbImpactStrength * 0.18f * outputStrength
+                    : 0.0f;
 
-            float roadAmp =
-                textureRoughness * roadSpeedGate *
-                static_cast<float>(Settings::WheelFFBRoadTexture) * outputStrength *
-                stageRoadTextureScale;
-            const float roadFreq = 25.0f + 12.0f * speedNorm;
-
-            if (waterFlag && roughness > 0.7f && speedNorm > 0.70f && splashTimer_ <= 0)
-            {
-                const float roadTextureScale = std::clamp(
-                    static_cast<float>(Settings::WheelFFBRoadTexture) / 0.20f,
-                    0.0f, 5.0f);
-                splashAmp_ =
-                    (roughness - 0.7f) * speedNorm * 0.75f * roadTextureScale *
-                    outputStrength * stageRoadTextureScale;
-                splashTimer_ = 9;
-            }
-            if (splashTimer_ > 0)
-            {
-                roadAmp = std::max(roadAmp, splashAmp_);
-                --splashTimer_;
-            }
+            // Texture is intentionally averaged/capped by SurfaceHapticsModel.
+            // A short suspension impulse may temporarily dominate the same
+            // tactile channel at a lower, curb-like frequency.
+            const float roadAmp = std::clamp(
+                roadTextureAmp + roadImpactAmp,
+                0.0f,
+                0.24f * std::max(outputStrength, 0.0f));
+            const bool roadImpactDominant =
+                roadImpactAmp > 0.004f &&
+                roadImpactAmp > roadTextureAmp * 0.75f;
+            const float roadFreq = roadImpactDominant
+                ? 12.0f + 6.0f * speedNorm
+                : 22.0f + 10.0f * speedNorm;
 
             float slipAmp = 0.0f;
             float slipFreq = 40.0f;
@@ -3836,6 +3844,7 @@ namespace
             nativeTireSatBlend_ = 0.0f;
             nativeOversteerProtectionBlend_ = 0.0f;
             driftRegripGuard_.reset();
+            surfaceHapticsModel_.reset();
             prevStructuralLevel_ = 0;
             prevSpringCoefficient_ = 0;
             prevDamperCoefficient_ = 0;
@@ -3849,8 +3858,6 @@ namespace
             smoothedEngineRpm_ = 0.0f;
             smoothedEngineAmp_ = 0.0f;
             smoothedEngineFreq_ = 0.0f;
-            splashTimer_ = 0;
-            splashAmp_ = 0.0f;
             manualTestFrames_ = 0;
             manualTestDirection_ = 1;
 
@@ -4224,6 +4231,7 @@ namespace
         float nativeTireSatBlend_ = 0.0f;
         float nativeOversteerProtectionBlend_ = 0.0f;
         WheelFFBMath::DriftRegripGuard driftRegripGuard_{};
+        WheelFFBMath::SurfaceHapticsModel surfaceHapticsModel_{};
         float prevSteer_ = 0.0f;
         float smoothedSteerRate_ = 0.0f;
         bool steerSampleValid_ = false;
@@ -4266,7 +4274,6 @@ namespace
         float smoothedEngineRpm_ = 0.0f;
         float smoothedEngineAmp_ = 0.0f;
         float smoothedEngineFreq_ = 0.0f;
-        float splashAmp_ = 0.0f;
 
         float speedHistory_[SpeedHistoryCount]{};
         int speedHistoryIndex_ = 0;
@@ -4288,7 +4295,6 @@ namespace
         int recreateRampFrames_ = 0;
         int manualTestFrames_ = 0;
         int manualTestDirection_ = 1;
-        int splashTimer_ = 0;
         unsigned updateCounter_ = 0;
 
         SafetyHookInline exitProcessHook_{};
