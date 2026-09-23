@@ -154,7 +154,9 @@ public class ExportOutRunMap extends GhidraScript {
                     ",\"name\":" + q(f.getName()) +
                     ",\"namespace\":" + q(f.getParentNamespace().getName()) +
                     ",\"min\":" + q(hex(min)) +
+                    ",\"minRva\":" + q(rvaHex(min)) +
                     ",\"max\":" + q(hex(max)) +
+                    ",\"maxRva\":" + q(rvaHex(max)) +
                     ",\"bodySize\":" + f.getBody().getNumAddresses() +
                     ",\"thunk\":" + f.isThunk() +
                     ",\"external\":" + f.isExternal() +
