@@ -69,6 +69,16 @@ namespace Settings
 		"Keeps car cubemap reflection work at the original 60 Hz time budget when rendering the HMD at 72/80/90/120 Hz." };
 	Setting<float> VRNearPlane{ "VR", "NearPlane", 0.10f,
 		"VR gameplay camera near plane in game units. Overrides the 2D Z-precision fix while positional tracking is active so dashboard/driver geometry is not clipped by the normal 1.0 near plane.", Range<float>{ 0.03f, 0.50f } };
+	Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", true,
+		"Adds a virtual fourth camera view. It keeps native view 1 vehicle/passenger rendering, learns the synchronized native view 2 camera transform, then reapplies that transform relative to the player car." };
+	Setting<float> VRDriverSeatForward{ "VR", "DriverSeatForward", -0.781f,
+		"Virtual fourth-view offset along the learned view-2 camera forward axis. Tuned from the 2026-09-23 reference screenshot.", Range<float>{ -3.0f, 3.0f } };
+	Setting<float> VRDriverSeatRight{ "VR", "DriverSeatRight", -0.066f,
+		"Virtual fourth-view lateral offset relative to the learned view-2 camera.", Range<float>{ -2.0f, 2.0f } };
+	Setting<float> VRDriverSeatUp{ "VR", "DriverSeatUp", 0.0f,
+		"Virtual fourth-view vertical offset relative to the learned view-2 camera.", Range<float>{ -2.0f, 2.0f } };
+	Setting<bool> VRDriverSeatHideDriver{ "VR", "DriverSeatHideDriver", true,
+		"Hides EVENT_ROB01 (player driver) only while the virtual fourth view is active. EVENT_ROB02/passenger remains untouched." };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,
 		"Game-world units per metre of OpenXR head movement.", Range<float>{ 0.1f, 10.0f } };
 	Setting<float> VRStereoDepth{ "VR", "StereoDepth", 1.0f,

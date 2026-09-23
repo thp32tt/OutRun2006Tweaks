@@ -2,6 +2,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/game/driver_seat_view.hpp"
 #include "vr/runtime_eligibility.hpp"
 #include <algorithm>
 #include <iostream>
@@ -1080,6 +1081,14 @@ class FixZBufferPrecision : public Hook
 
 		if (allow_znear_override)
 		{
+			// The virtual fourth view renders with native view 1 ownership but
+			// places the camera in the cabin. Keep the cockpit near plane even if
+			// the OpenXR eligibility gate is temporarily closed.
+			if (OutRunVR::DriverSeatView::IsVirtualActive(camera))
+			{
+				camera->perspective_znear_BC = Settings::VRNearPlane.get();
+			}
+			else
 			// In 6DoF VR the player can move their head through the normal third-
 			// person near plane. Keep the 2D precision fix intact outside VR, but
 			// use the dedicated VR near plane during gameplay/goal rendering.
@@ -1116,7 +1125,10 @@ class FixZBufferPrecision : public Hook
 				} 
 			}
 		}
+		auto driverSeatBackup =
+			OutRunVR::DriverSeatView::BeforeCalcCameraMatrix(camera);
 		CalcCameraMatrix.call(camera);
+		OutRunVR::DriverSeatView::AfterCalcCameraMatrix(camera, driverSeatBackup);
 	}
 
 	// hook Clr_SceneEffect so we can reset camera z-near before screen effects are draw
