@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-23T16:50:00Z",
+  "updatedUtc": "2026-09-23T21:53:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
-  "phase": "R51-baseline-protected / HUD-semantic-lifetime-analysis / no-PC-runner",
+  "phase": "R51-reconciled-candidate / HUD-semantic-provenance-instrumented / regression-gated / no-PC-runner",
   "checkpoint": "C6_STATE",
   "policy": {
     "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host",
@@ -124,12 +124,12 @@
   },
   "currentHypotheses": [
     "R51 remains the protected partial runtime baseline: road/background/vehicles render correct 3D; white HUD diplopia, rank HUD head-lock/doubling, vehicle-rank anchoring and dense-scene performance remain open.",
-    "Candidate 8d21824f proved EXE-map producer tagging can reach R30 draw ownership (semanticHudAccepted=93681), but renderer semanticOverlayBypass remained 0 for the entire session. Semantic ownership is becoming visible too late for the renderer c64/WVP injection boundary.",
+    "Failed candidate 8d21824f proved EXE-map producer tagging reaches R30 semantic ownership, but its semanticHudAccepted counter is fixed-function XYZRHW while renderer semanticOverlayBypass tracks the separate VS c64 path. Their coexistence alone does not prove semantic ownership arrives too late for c64. The current candidate adds queue-node/c64 semantic provenance and split XYZRHW-vs-VS telemetry so the next runtime log can resolve ordering without widening HUD ownership.",
     "Vehicle rank-marker exact callsite tags are insufficient by themselves: the pre-screen-projection vehicle/world anchor must be preserved/reconstructed through SpriteNode data into per-eye WORLD_BILLBOARD projection.",
     "DirectGPU transport is not the current HUD root cause: direct frames=13187, fallbacks=4, fenceTimeout=0, stereo/right-draw failures=0 in the failed HUD candidate session.",
     "Dense-scene performance remains separate; observed peak drawsPerPresent≈3929.3 and lower-Present max≈16.639 ms in this session."
   ],
-  "nextAction": "Overnight scheduled work: analysis/review only on HUD semantic lifetime and rival-marker anchor propagation. Trace exact producer -> node tag -> queue select -> c64 SetVertexShaderConstantF -> draw ordering and EXE-map Calc3D2D/marker anchor flow. Do not create another HMD candidate until this contradiction is explained. Preserve R51 world owner. Normal cloud CI may be used when needed; self-hosted PC runner is disabled until the user explicitly authorizes a new evening PC-build session.",
+  "nextAction": "Complete branch-scoped normal cloud CI for the five-cycle C/D candidate chain. Obtain exact-SHA A/B review before integrating the runtime-visible reconciliation/diagnostic changes into vr-d3d9ex-focus. Preserve R51 as USER_RUNTIME_VERIFIED baseline; build success alone does not advance it. On the next authorized Quest3/VDXR test, use the split XYZRHW-vs-VS semantic/c64 provenance telemetry before attempting another HUD behavior fix. Self-hosted PC runner remains disabled until explicit user reauthorization.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
@@ -565,5 +565,21 @@
       "maxDrawsPerPresent": 3929.3,
       "lowerPresentMaxMs": 16.639
     }
+  },
+  "manualCdLoop": {
+    "requestedAtKst": "2026-09-24T06:39:00+09:00",
+    "cycles": 5,
+    "status": "C5_REVIEWED_D5_CLOUD_VALIDATION_TRIGGERED",
+    "baseIntegrationSha": "b330332fbf71ec3c565eba29b041e0eada0edfe0",
+    "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+    "chain": [
+      "c1338efa83255d86af1c5886fe7c47139c5ecd86",
+      "c156f43b345ff5a65ec61db27b464be06284e347",
+      "6e72a3d0690050fe54557b884076c2680da873cc",
+      "291fe517aece1ad05f5dac4f0ab72e403ab0fb58"
+    ],
+    "selfHostedPcUsed": false,
+    "integrationDecision": "BLOCKED_PENDING_EXACT_SHA_A_B_REVIEW_AND_CLOUD_CI",
+    "runtimeBaselineAdvanced": false
   }
 }
