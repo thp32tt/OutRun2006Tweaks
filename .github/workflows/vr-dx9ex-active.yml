@@ -235,9 +235,17 @@ jobs:
           foreach ($requiredMarker in @('ANALYSIS_REQUEST.json','AutoAnalyzeOnUpload=$true','RequiresUserDescription=$false','OutRun2_VR_ANALYZE_')) {
             if ($collectorText -notlike "*$requiredMarker*") { throw "collector missing runtime auto-analysis contract marker: $requiredMarker" }
           }
-          foreach ($file in @('dinput8.dll','outrun-vr-host.exe','SOURCE_SHA.txt')) {
+          foreach ($file in @('dinput8.dll','outrun-vr-host.exe','SOURCE_SHA.txt','VARIANT_ID.txt','CMAKE_FLAGS.txt')) {
             if (-not (Test-Path (Join-Path 'verify/backends/d3d9' $file))) { throw "backend payload missing $file" }
           }
+          $inputs = Get-Content (Join-Path verify 'BUILD_INPUTS.json') -Raw | ConvertFrom-Json
+          $payloadSha = (Get-Content (Join-Path 'verify/backends/d3d9/SOURCE_SHA.txt') -Raw).Trim()
+          $payloadVariant = (Get-Content (Join-Path 'verify/backends/d3d9/VARIANT_ID.txt') -Raw).Trim()
+          $payloadFlags = (Get-Content (Join-Path 'verify/backends/d3d9/CMAKE_FLAGS.txt') -Raw).Trim()
+          if ($inputs.IntegrationSha -ne $payloadSha) { throw 'package attestation: source SHA mismatch' }
+          if ($inputs.CompiledVariantId -ne $payloadVariant) { throw 'package attestation: compiled variant mismatch' }
+          if ($inputs.CMakeFlags -ne $payloadFlags) { throw 'package attestation: CMake flags mismatch' }
+          if ($inputs.UserRuntimeVerified -ne $false) { throw 'package attestation: build-only artifact cannot claim runtime verification' }
           $bad = Get-ChildItem verify -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe') }
           if ($bad) { throw 'active package contains forbidden backend payload' }
       - uses: actions/upload-artifact@v4
