@@ -22,7 +22,7 @@ on:
 
 concurrency:
   group: outrun-pc-fast-test
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   fast-build:
