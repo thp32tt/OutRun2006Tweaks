@@ -416,6 +416,7 @@ namespace WheelProfileStore
         return key != "DeviceName" && key != "DeviceGuid" &&
             key != "Telemetry" && key != "DebugLog" &&
             key != "XForceCapture60Hz" &&
+            key != "NativePhysicsCapture60Hz" &&
             key != "ResponseCorrection" && key != "ResponseLUT" &&
             key != "MaxTorqueNm";
     }
