@@ -199,13 +199,21 @@ harder. The cue is additionally protected by:
 - existing global soft clipping, stale-torque reversal release, output slew,
   DirectInput watchdog and focus/device-loss zeroing remain downstream
 
-`NativeOversteerStrength` is capped at 0.35 before global output strength, and
-`NativeOversteerInvert` reverses only this research channel for controlled
-hardware sign validation.
+MOZA R3 live testing of the first v0.4 candidate established that the original
+rear-cue sign was reversed: correct counter-steer required the temporary Reverse
+option. The runtime now preserves the canonical rear EE sign by default, so
+`NativeOversteerInvert=false` is the validated R3 direction and the switch remains
+only as a device-specific fallback.
 
-Old or partial FFB profiles that do not contain the new rear-slip keys explicitly
-restore `NativeOversteerCue=false`, strength 0.18, peak reference 0.12 rad and
-invert false.
+The first 0.18 cue was also stronger than necessary. The corrected default is
+0.10, the exposed maximum is 0.25, and an additional base-SAT headroom factor
+reduces the additive rear cue from 100% when front steering torque is light to
+35% when base SAT is already at/above normalized full scale.
+
+Old user settings and named profiles are migrated once through feel revision 6:
+the old Reverse workaround is cleared, an untouched 0.18 strength is softened to
+0.10, custom strength values remain intact, peak reference remains 0.12 rad, and
+`NativeOversteerCue` itself remains opt-in/default-off.
 
 The capture analyzer now reports rear slip/capacity/AC distributions and
 correlations plus P90/P95 rear-slip reference hints. Those percentile hints are
