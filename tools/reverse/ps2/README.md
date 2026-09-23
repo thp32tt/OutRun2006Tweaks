@@ -4,6 +4,12 @@ The canonical analysis result is documented in `docs/reverse/PS2_FFB_MAP.md` and
 
 The full generated map is intentionally not committed because it contains a large disassembly derived from the retail PS2 executable. A local generated package contains the SQLite database, JSONL indexes, full EE disassembly and IOPRP module disassemblies.
 
+Regenerate the compact core map from the original binaries:
+
+```bash
+python3 tools/reverse/ps2/build_ps2_map.py /path/to/SLPM_666.28 /path/to/IOPRP310.IMG /tmp/outrun2-ps2-map
+```
+
 Use `ps2query.py` against a generated `ps2_knowledge_map.sqlite`:
 
 ```bash
