@@ -568,19 +568,19 @@ namespace WheelProfileStore
         // Native tyre-force SAT did not exist in earlier profiles and is a
         // research-only mode. Loading an old profile must never inherit a live
         // experimental native state from the current session.
-        if (values.find("nativetiresat") == values.end())
+        const auto migrate_native = [&](Settings::SettingBase& setting, const char* value)
         {
-            const auto migrate_native = [&](Settings::SettingBase& setting, const char* value)
-            {
-                const std::string oldValue = setting.to_string();
-                setting.set_from_string(value);
-                if (setting.to_string() != oldValue)
-                    changed.push_back(&setting);
-            };
+            const std::string oldValue = setting.to_string();
+            setting.set_from_string(value);
+            if (setting.to_string() != oldValue)
+                changed.push_back(&setting);
+        };
+        if (values.find("nativetiresat") == values.end())
             migrate_native(Settings::WheelFFBNativeTireSat, "false");
+        if (values.find("nativetiresatgain") == values.end())
             migrate_native(Settings::WheelFFBNativeTireSatGain, "1.00");
+        if (values.find("nativetiresatinvert") == values.end())
             migrate_native(Settings::WheelFFBNativeTireSatInvert, "false");
-        }
 
         for (Settings::SettingBase* setting : changed)
             setting->notify();
