@@ -2,6 +2,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/game/driver_seat_test.hpp"
 #include "vr/runtime_eligibility.hpp"
 #include <algorithm>
 #include <iostream>
@@ -1116,7 +1117,10 @@ class FixZBufferPrecision : public Hook
 				} 
 			}
 		}
+		const auto driverSeatCamera =
+			OutRunVR::DriverSeatTest::ApplyCameraOffset(camera);
 		CalcCameraMatrix.call(camera);
+		OutRunVR::DriverSeatTest::RestoreCamera(camera, driverSeatCamera);
 	}
 
 	// hook Clr_SceneEffect so we can reset camera z-near before screen effects are draw

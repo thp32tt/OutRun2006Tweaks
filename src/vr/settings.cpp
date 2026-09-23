@@ -69,6 +69,20 @@ namespace Settings
 		"Keeps car cubemap reflection work at the original 60 Hz time budget when rendering the HMD at 72/80/90/120 Hz." };
 	Setting<float> VRNearPlane{ "VR", "NearPlane", 0.10f,
 		"VR gameplay camera near plane in game units. Overrides the 2D Z-precision fix while positional tracking is active so dashboard/driver geometry is not clipped by the normal 1.0 near plane.", Range<float>{ 0.03f, 0.50f } };
+	Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", true,
+		"Clean experimental driver-seat test using the native bumper/in-car camera as the synchronization owner." };
+	Setting<int> VRDriverSeatNativeMode{ "VR", "DriverSeatNativeMode", 1,
+		"Native camera mode that activates the driver-seat test. Default 1 is the bumper/in-car path under test.", Range<int>{ 0, 2 } };
+	Setting<float> VRDriverSeatForward{ "VR", "DriverSeatForward", -1.35f,
+		"Camera offset along the native camera forward axis. Negative moves rearward into the cabin.", Range<float>{ -5.0f, 5.0f } };
+	Setting<float> VRDriverSeatRight{ "VR", "DriverSeatRight", -0.32f,
+		"Camera offset along the native camera right axis. Negative moves toward the left-hand driver seat.", Range<float>{ -3.0f, 3.0f } };
+	Setting<float> VRDriverSeatUp{ "VR", "DriverSeatUp", 0.65f,
+		"Camera offset along the native camera-local up axis.", Range<float>{ -3.0f, 3.0f } };
+	Setting<int> VRDriverSeatCarRenderState{ "VR", "DriverSeatCarRenderState", -1,
+		"Player-car render state in driver-seat view. -1 learns/reuses native camera mode 0; 0/1/2 force a state for diagnosis.", Range<int>{ -1, 2 } };
+	Setting<bool> VRDriverSeatHideDriver{ "VR", "DriverSeatHideDriver", true,
+		"Hides chrsets from the game's live driver table while preserving heroine/passenger chrsets." };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,
 		"Game-world units per metre of OpenXR head movement.", Range<float>{ 0.1f, 10.0f } };
 	Setting<float> VRStereoDepth{ "VR", "StereoDepth", 1.0f,
