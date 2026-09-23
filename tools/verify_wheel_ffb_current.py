@@ -22,6 +22,7 @@ def forbid(text, needle, label):
 ffb = read('src/hooks_wheel_ffb.cpp')
 vib = read('src/hooks_forcefeedback.cpp')
 dyn = read('src/hooks_wheel_vehicle_dynamics.hpp')
+native_physics = read('src/hooks_wheel_native_physics_research.hpp')
 math = read('src/wheel_ffb_math.hpp')
 input_cpp = read('src/input_manager.cpp')
 input_hpp = read('src/input_manager.hpp')
@@ -41,6 +42,7 @@ for rel, text in [
     ('src/hooks_wheel_ffb_build.cpp', build),
     ('src/hooks_forcefeedback.cpp', vib),
     ('src/hooks_wheel_vehicle_dynamics.hpp', dyn),
+    ('src/hooks_wheel_native_physics_research.hpp', native_physics),
     ('src/input_manager.cpp', input_cpp),
     ('src/overlay/input_bindings_ui.cpp', bind_ui),
     ('src/overlay/wheel_setup_ui.cpp', wheel_ui),
@@ -55,6 +57,7 @@ for rel, text in [
 req(ini, 'UseNewInput = true', 'shipped SDL multi-device input default')
 for rel in (
     'src/wheel_profile_store.hpp', 'src/hooks_input.cpp',
+    'src/hooks_wheel_native_physics_research.hpp',
     'src/overlay/settings_ui.cpp', 'src/overlay/overlay.cpp',
     'CMakeLists.txt', 'cmake.toml', 'README.md', 'WHEEL_FFB.md',
     'RELEASE_NOTES_v0.1.md', '.github/workflows/build.yml',
@@ -92,6 +95,21 @@ req(ffb, 'WheelFFB XFORCE60', '60 Hz X-Force capture marker')
 req(ffb, 'xForceAnalyzer_.update(', 'runtime updates the X-Force diagnostic analyzer')
 req(ffb, 'smoothedXForceMix_', 'live Hybrid mix changes are smoothed')
 req(ffb, 'smoothedXForceGain_', 'live native gain changes are smoothed')
+req(ffb, 'constexpr int feedbackCharacter = 0;', 'DBC handicap/catch-up field is fail-closed from production FFB ownership')
+req(ffb, 'FeedbackCharacter={} ignored; executable-map XREFs prove actionforce_DBC is handicap/catch-up data', 'nonzero legacy DBC character requests are explicitly rejected')
+req(ffb, 'Setting<bool> WheelFFBNativePhysicsCapture60Hz', 'native four-wheel physics capture is opt-in')
+req(build, '#include "hooks_wheel_native_physics_research.hpp"', 'native physics research reader is compiled into wheel build')
+req(build, 'WheelNativePhysicsResearch::capture_after_physics(car);', 'native capture samples the completed player-car physics tick')
+req(native_physics, 'PlayerWorkspaceRva = 0x0042E7F0u', 'canonical player physics workspace RVA is explicit')
+req(native_physics, 'WheelPointerTableOffset = 0x248', 'four-wheel pointer-table offset is explicit')
+req(native_physics, 'FirstWheelOffset = 0x258', 'inline wheel object base is explicit')
+req(native_physics, 'WheelStride = 0xF4', 'native wheel object stride is explicit')
+req(native_physics, 'float normalLoad34', 'native wheel capture includes normal-load candidate')
+req(native_physics, 'float tireForceB4', 'native wheel capture includes transformed tire-force B4')
+req(native_physics, 'float tireForceB8', 'native wheel capture includes transformed tire-force B8')
+req(native_physics, 'frontNormalDiff', 'native capture records front-axle load differential')
+req(native_physics, 'heading2E', 'native capture records executable-derived heading candidate')
+req(native_physics, 'angularD34', 'native capture records D34 angular candidate without asserting semantics')
 req(ffb, 'structural = (softwareSpring + selfAligningTorque) * loadMod + damper;', 'Modern/fallback arithmetic path remains exactly v0.2')
 req(ffb, 'softwareSpring * loadMod +', 'native steering can avoid synthetic longitudinal load modulation')
 req(ffb, 'WheelFFB XFORCE t={}', 'X-Force candidate is observable in opt-in telemetry')
