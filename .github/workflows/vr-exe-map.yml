@@ -68,13 +68,41 @@ jobs:
           grep -q 'SEM-HUD-SPRITENODE-QUEUE-ENTER' "$RUNNER_TEMP/query-hud.txt"
           grep -q 'SEM-RIVAL-RANK-TRUNCATE' "$RUNNER_TEMP/query-rank.txt"
 
+      - name: Validate map density
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, pathlib, sqlite3
+          root = pathlib.Path("$RUNNER_TEMP/OR2006C2C-map")
+          summary = json.loads((root / "summary.json").read_text())
+          c = summary["counts"]
+          minimums = {
+              "functions": 7000,
+              "instructions": 400000,
+              "calls": 30000,
+              "xrefs": 150000,
+              "strings": 7000,
+              "imports": 150,
+          }
+          for key, minimum in minimums.items():
+              assert c[key] >= minimum, f"{key}: {c[key]} < {minimum}"
+          con = sqlite3.connect(root / "exe_map.sqlite")
+          assert con.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
+          con.close()
+          print(json.dumps(c, sort_keys=True))
+          PY
+
       - name: Pack map artifact
         shell: bash
         run: |
           set -euo pipefail
           rm -rf "$RUNNER_TEMP/OR2006C2C-map/ghidra-project"
           tar -C "$RUNNER_TEMP" -czf "$RUNNER_TEMP/OR2006C2C-exe-map.tar.gz" OR2006C2C-map
-          sha256sum "$RUNNER_TEMP/OR2006C2C-exe-map.tar.gz" > "$RUNNER_TEMP/OR2006C2C-exe-map.tar.gz.sha256"
+          (
+            cd "$RUNNER_TEMP"
+            sha256sum OR2006C2C-exe-map.tar.gz > OR2006C2C-exe-map.tar.gz.sha256
+          )
 
       - name: Upload map
         uses: actions/upload-artifact@v4
