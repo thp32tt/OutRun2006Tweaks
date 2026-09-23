@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-23T22:44:00Z",
+  "updatedUtc": "2026-09-23T22:45:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -585,7 +585,7 @@
   "manualCd20": {
     "requestedAtKst": "2026-09-24T07:10:28+09:00",
     "totalCycles": 20,
-    "completedCycles": 14,
+    "completedCycles": 15,
     "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
     "selfHostedPcUsed": false,
     "history": [
@@ -646,9 +646,13 @@
       {
         "cycle": 14,
         "summary": "emit EXE-map provenance hashes and CI syntax-check reverse tools"
+      },
+      {
+        "cycle": 15,
+        "summary": "record resolved immutable FetchContent dependency lock"
       }
     ],
-    "currentCandidateSummary": "emit EXE-map provenance hashes and CI syntax-check reverse tools",
+    "currentCandidateSummary": "record resolved immutable FetchContent dependency lock",
     "runtimeBaselineAdvanced": false
   }
 }
