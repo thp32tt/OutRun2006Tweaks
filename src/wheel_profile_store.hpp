@@ -32,6 +32,7 @@ namespace Settings
     extern Setting<float> WheelFFBNativeOversteerSlipThreshold;
     extern Setting<bool> WheelFFBNativeOversteerInvert;
     extern Setting<bool> WheelFFBInvertForce;
+    extern Setting<float> WheelFFBCurbImpact;
     extern Setting<int> WheelFFBFeelRevision;
 }
 
@@ -641,6 +642,11 @@ namespace WheelProfileStore
         }
         if (preR3DirectionFix)
             migrate_native(Settings::WheelFFBFeelRevision, "7");
+
+        // Profiles saved before the per-wheel surface rewrite have no separate
+        // curb/bump control. Do not inherit an unrelated live session value.
+        if (values.find("curbimpact") == values.end())
+            migrate_native(Settings::WheelFFBCurbImpact, "0.40");
 
         for (Settings::SettingBase* setting : changed)
             setting->notify();
