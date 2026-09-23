@@ -200,6 +200,8 @@ jobs:
           Set-Content (Join-Path $dir 'BUILD_MATRIX_ID.txt') $matrixId -Encoding ascii
           $compiledVariant = (Get-Content (Join-Path $backend 'VARIANT_ID.txt') -Raw).Trim()
           $cmakeFlags = (Get-Content (Join-Path $backend 'CMAKE_FLAGS.txt') -Raw).Trim()
+          $gameSha256 = (Get-FileHash (Join-Path $backend 'dinput8.dll') -Algorithm SHA256).Hash.ToLowerInvariant()
+          $hostSha256 = (Get-FileHash (Join-Path $backend 'outrun-vr-host.exe') -Algorithm SHA256).Hash.ToLowerInvariant()
           $buildInputs = [ordered]@{
             SchemaVersion = 2
             BuildMatrixId = $matrixId
@@ -212,6 +214,8 @@ jobs:
             ValidationClass = 'HOSTED_CLOUD_CI'
             EvidenceClass = 'BUILD_VERIFIED'
             CMakeFlags = $cmakeFlags
+            GameBinarySha256 = $gameSha256
+            HostBinarySha256 = $hostSha256
           }
           $buildInputs | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'BUILD_INPUTS.json') -Encoding UTF8
           $bad = Get-ChildItem $dir -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe') }
@@ -245,6 +249,10 @@ jobs:
           if ($inputs.IntegrationSha -ne $payloadSha) { throw 'package attestation: source SHA mismatch' }
           if ($inputs.CompiledVariantId -ne $payloadVariant) { throw 'package attestation: compiled variant mismatch' }
           if ($inputs.CMakeFlags -ne $payloadFlags) { throw 'package attestation: CMake flags mismatch' }
+          $gameHash = (Get-FileHash (Join-Path 'verify/backends/d3d9/dinput8.dll') -Algorithm SHA256).Hash.ToLowerInvariant()
+          $hostHash = (Get-FileHash (Join-Path 'verify/backends/d3d9/outrun-vr-host.exe') -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($inputs.GameBinarySha256 -ne $gameHash) { throw 'package attestation: game binary hash mismatch' }
+          if ($inputs.HostBinarySha256 -ne $hostHash) { throw 'package attestation: host binary hash mismatch' }
           if ($inputs.UserRuntimeVerified -ne $false) { throw 'package attestation: build-only artifact cannot claim runtime verification' }
           $bad = Get-ChildItem verify -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe') }
           if ($bad) { throw 'active package contains forbidden backend payload' }
