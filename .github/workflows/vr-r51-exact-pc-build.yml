@@ -109,10 +109,10 @@ jobs:
           New-Item -ItemType Directory -Force $backend | Out-Null
           $dll=Get-ChildItem "$root/game" -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
           if (-not $dll) { throw 'dinput8.dll missing' }
-          $host="$root/host/bin/outrun-vr-host.exe"
-          if (-not (Test-Path $host)) { throw 'outrun-vr-host.exe missing' }
+          $hostExe="$root/host/bin/outrun-vr-host.exe"
+          if (-not (Test-Path $hostExe)) { throw 'outrun-vr-host.exe missing' }
           Copy-Item $dll.FullName (Join-Path $backend 'dinput8.dll')
-          Copy-Item $host (Join-Path $backend 'outrun-vr-host.exe')
+          Copy-Item $hostExe (Join-Path $backend 'outrun-vr-host.exe')
           Set-Content (Join-Path $backend 'SOURCE_SHA.txt') '17ad376bfdf7939f0851c0c629e4fa094a84f28a' -Encoding ascii
           Set-Content (Join-Path $backend 'VARIANT_ID.txt') 'ACTIVE_R26_R43_R44' -Encoding ascii
           Set-Content (Join-Path $backend 'CMAKE_FLAGS.txt') '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF' -Encoding ascii
