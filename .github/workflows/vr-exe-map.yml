@@ -71,6 +71,9 @@ jobs:
           python3 tools/reverse/exequery.py --db "$RUNNER_TEMP/OR2006C2C-map/exe_map.sqlite" rva:0x38020 --context 1 | tee "$RUNNER_TEMP/query-function-owner.txt"
           grep -q 'FUN_00438020' "$RUNNER_TEMP/query-function-owner.txt"
 
+          python3 tools/reverse/exequery.py --db "$RUNNER_TEMP/OR2006C2C-map/exe_map.sqlite" rva:0x37EF0 --context 1 | tee "$RUNNER_TEMP/query-noncontiguous-owner.txt"
+          grep -q 'FUN_00454A70' "$RUNNER_TEMP/query-noncontiguous-owner.txt"
+
           python3 tools/reverse/exequery.py --db "$RUNNER_TEMP/OR2006C2C-map/exe_map.sqlite" rva:0x58A6FC --context 0 | tee "$RUNNER_TEMP/query-high-rva.txt"
           grep -q 'ADDRESS RVA=0x0058A6FC' "$RUNNER_TEMP/query-high-rva.txt"
           python3 tools/reverse/exequery.py --db "$RUNNER_TEMP/OR2006C2C-map/exe_map.sqlite" va:0x98A6FC --context 0 | tee "$RUNNER_TEMP/query-high-va.txt"
@@ -97,7 +100,12 @@ jobs:
               assert c[key] >= minimum, f"{key}: {c[key]} < {minimum}"
           con = sqlite3.connect(root / "exe_map.sqlite")
           assert con.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
-          assert con.execute("SELECT count(*) FROM function_ranges").fetchone()[0] >= c["functions"]
+          missing_ranges = con.execute(
+              """SELECT count(*) FROM functions f
+                 WHERE f.body_min_rva IS NOT NULL
+                   AND NOT EXISTS (SELECT 1 FROM function_ranges fr WHERE fr.entry_rva=f.entry_rva)"""
+          ).fetchone()[0]
+          assert missing_ranges == 0, f"functions with bodies missing exact ranges: {missing_ranges}"
           mismatch = con.execute(
               """SELECT count(*) FROM instructions i
                  WHERE i.function_rva IS NOT NULL
@@ -113,10 +121,11 @@ jobs:
           ).fetchone()
           if synthetic[0]:
               assert (synthetic[1] or 0) == 0, f"synthetic TIB refs leaked into PE RVA: {synthetic}"
-              spaces = con.execute(
-                  "SELECT DISTINCT to_space FROM xrefs WHERE to_va=0xFFDFF000"
+              identities = con.execute(
+                  "SELECT DISTINCT to_space,to_block,to_block_artificial FROM xrefs WHERE to_va=0xFFDFF000"
               ).fetchall()
-              assert all(row[0] for row in spaces), f"synthetic address-space identity missing: {spaces}"
+              assert all(row[0] and row[1] for row in identities), f"synthetic address identity missing: {identities}"
+              assert any(row[2] == 1 for row in identities), f"expected synthetic/artificial block identity: {identities}"
           con.close()
           print(json.dumps(c, sort_keys=True))
           PY
