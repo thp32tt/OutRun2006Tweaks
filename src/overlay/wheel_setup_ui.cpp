@@ -1943,12 +1943,15 @@ namespace
                 ImGui::PlotLines("Soft limited", graph.softLimited.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 46));
                 ImGui::PlotLines("Post slew", graph.postSlew.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 46));
                 ImGui::PlotLines("Final DirectInput", graph.finalOutput.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 46));
+                if (Settings::WheelFFBNativeTireSat)
+                {
+                    ImGui::PlotLines("Native tyre force / capacity", graph.nativeTireNormalized.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 40));
+                    ImGui::PlotLines("Native tyre SAT torque", graph.nativeTireSat.data(), int(graph.count), 0, nullptr, -2.1f, 2.1f, ImVec2(0, 40));
+                    ImGui::PlotLines("Native tyre SAT blend", graph.nativeTireShare.data(), int(graph.count), 0, nullptr, 0.0f, 1.0f, ImVec2(0, 40));
+                }
                 if (std::clamp(int(Settings::WheelFFBFeedbackCharacter), 0, 2) != 0)
                 {
-                    ImGui::PlotLines("X-Force normalized", graph.xForceNormalized.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 40));
-                    ImGui::PlotLines("Modern SAT", graph.modernSat.data(), int(graph.count), 0, nullptr, -2.1f, 2.1f, ImVec2(0, 40));
-                    ImGui::PlotLines("Native SAT", graph.nativeSat.data(), int(graph.count), 0, nullptr, -2.1f, 2.1f, ImVec2(0, 40));
-                    ImGui::PlotLines("Native share", graph.nativeShare.data(), int(graph.count), 0, nullptr, 0.0f, 1.0f, ImVec2(0, 40));
+                    ImGui::PlotLines("Legacy DBC normalized", graph.xForceNormalized.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 40));
                 }
             }
             else
@@ -1969,6 +1972,9 @@ namespace
             {
                 Settings::WheelFFBEnable = true;
                 Settings::WheelFFBPhysicsSat = true;
+                Settings::WheelFFBNativeTireSat = false;
+                Settings::WheelFFBNativeTireSatGain = 1.00f;
+                Settings::WheelFFBNativeTireSatInvert = false;
                 Settings::WheelFFBFeedbackCharacter = 0;
                 Settings::WheelFFBXForceMix = 0.50f;
                 Settings::WheelFFBXForceInvert = false;
@@ -2012,6 +2018,9 @@ namespace
             if (ImGui::Button("Load MOZA R3 Natural SAT"))
             {
                 Settings::WheelFFBPhysicsSat = false;
+                Settings::WheelFFBNativeTireSat = false;
+                Settings::WheelFFBNativeTireSatGain = 1.00f;
+                Settings::WheelFFBNativeTireSatInvert = false;
                 Settings::WheelFFBFeedbackCharacter = 0;
                 Settings::WheelFFBXForceMix = 0.50f;
                 Settings::WheelFFBXForceInvert = false;
