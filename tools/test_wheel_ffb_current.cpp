@@ -216,6 +216,34 @@ int main() {
  require(native_oversteer_headroom(-2.0f)>.34f&&native_oversteer_headroom(-2.0f)<.36f,"rear cue headroom is symmetric and bounded");
  require(native_oversteer_headroom(std::numeric_limits<float>::quiet_NaN())==0.0f,"rear cue headroom NaN fails closed");
 
+ // Drift re-grip guard must leave sustained drift free, then briefly soften
+ // SAT rebuild and add damping only after rear grip returns.
+ DriftRegripGuard regrip;
+ require(regrip.update(0.20f,1.0f/60.0f)==0.0f,"ordinary corner does not arm regrip stabilization");
+ require(regrip.update(0.80f,1.0f/60.0f)==0.0f&&regrip.drift_armed(),"deep slide arms regrip guard without damping the drift");
+ require(regrip.update(0.40f,1.0f/60.0f)==0.0f&&regrip.drift_armed(),"mid-slide hysteresis preserves drift ownership");
+ float recovery=regrip.update(0.20f,1.0f/60.0f);
+ require(recovery>.99f&&!regrip.drift_armed(),"grip return triggers full regrip envelope");
+ require(drift_regrip_sat_scale(recovery)>.54f&&drift_regrip_sat_scale(recovery)<.56f,"regrip initially softens SAT to 55 percent");
+ require(drift_regrip_damper_boost(recovery)>.119f&&drift_regrip_damper_boost(recovery)<.121f,"regrip initially adds 12 percent damping");
+ require(drift_regrip_build_scale(recovery)>.64f&&drift_regrip_build_scale(recovery)<.66f,"regrip slows new-direction torque build without slowing release");
+ for(int i=0;i<28;++i) recovery=regrip.update(0.10f,1.0f/60.0f);
+ require(recovery==0.0f,"regrip stabilization fully releases after about 450 ms");
+ require(drift_regrip_sat_scale(0.0f)==1.0f&&drift_regrip_build_scale(0.0f)==1.0f&&drift_regrip_damper_boost(0.0f)==0.0f,"settled grip restores normal SAT and damping");
+ regrip.update(0.90f,1.0f/60.0f);
+ regrip.update(0.10f,1.0f/60.0f);
+ require(regrip.recovery()>.99f,"second drift can retrigger regrip guard");
+ require(regrip.update(0.90f,1.0f/60.0f)==0.0f&&regrip.drift_armed(),"new drift immediately cancels an old recovery envelope");
+ require(regrip.update(0.0f,std::numeric_limits<float>::quiet_NaN())==0.0f&&!regrip.drift_armed(),"invalid regrip timing fails closed");
+
+ DriftRegripGuard regrip60,regrip120;
+ regrip60.update(0.9f,1.0f/60.0f); regrip60.update(0.1f,1.0f/60.0f);
+ regrip120.update(0.9f,1.0f/120.0f); regrip120.update(0.1f,1.0f/120.0f);
+ float r60=0.0f,r120=0.0f;
+ for(int i=0;i<12;++i) r60=regrip60.update(0.1f,1.0f/60.0f);
+ for(int i=0;i<24;++i) r120=regrip120.update(0.1f,1.0f/120.0f);
+ require(std::abs(r60-r120)<.001f,"regrip envelope duration is cadence independent");
+
  float beta=d.bodySlip();d.update(nullptr,0,.5,0);require(d.bodySlip()<beta&&!d.sampleValid(),"invalid decay");
  for(int i=0;i<4;++i)d.update(nullptr,0,.5,0);
  require(d.bodySlip()==0&&d.yawRate()==0&&d.frontSlip()==0&&d.activationBlend()==0,"five-invalid clear");
