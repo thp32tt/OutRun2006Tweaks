@@ -2,6 +2,14 @@ name: VR EXE Knowledge Map
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 'vr-d3d9ex-candidate/VR-EXE-KNOWLEDGE-MAP-*'
+    paths:
+      - 'tools/reverse/**'
+      - 'reverse/semantics.json'
+      - 'docs/VR_BINARY_CONTRACT.json'
+      - '.github/workflows/vr-exe-map.yml'
 
 permissions:
   contents: read
