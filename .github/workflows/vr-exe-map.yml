@@ -73,8 +73,8 @@ jobs:
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import json, pathlib, sqlite3
-          root = pathlib.Path("$RUNNER_TEMP/OR2006C2C-map")
+          import json, os, pathlib, sqlite3
+          root = pathlib.Path(os.environ["RUNNER_TEMP"]) / "OR2006C2C-map"
           summary = json.loads((root / "summary.json").read_text())
           c = summary["counts"]
           minimums = {
