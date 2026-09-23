@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-23T22:41:00Z",
+  "updatedUtc": "2026-09-23T22:42:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -585,7 +585,7 @@
   "manualCd20": {
     "requestedAtKst": "2026-09-24T07:10:28+09:00",
     "totalCycles": 20,
-    "completedCycles": 11,
+    "completedCycles": 12,
     "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
     "selfHostedPcUsed": false,
     "history": [
@@ -634,9 +634,13 @@
       {
         "cycle": 11,
         "summary": "add explicit rva:/va: EXE-map query syntax"
+      },
+      {
+        "cycle": 12,
+        "summary": "prefer exact instruction function owner over range envelope"
       }
     ],
-    "currentCandidateSummary": "add explicit rva:/va: EXE-map query syntax",
+    "currentCandidateSummary": "prefer exact instruction function owner over range envelope",
     "runtimeBaselineAdvanced": false
   }
 }
