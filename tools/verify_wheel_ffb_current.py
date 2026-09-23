@@ -127,7 +127,7 @@ req(ffb, 'NativeTireBlendInPerTick = 1.0f / 12.0f', 'native tyre SAT blends in o
 req(ffb, 'NativeTireBlendOutPerTick = 1.0f / 6.0f', 'invalid native tyre SAT fades back faster')
 req(ffb, 'nativeTireSatBlend_ = 0.0f;', 'native tyre SAT ownership resets on lifecycle transitions')
 req(wheel_ui, 'Native tyre-force SAT (EXE physics, experimental)', 'F11 exposes native tyre SAT as an explicit research control')
-req(wheel_ui, 'Research mode: validate direction at low Overall Strength', 'F11 warns before native tyre SAT driving validation')
+req(wheel_ui, 'Research mode: use a reverse switch only if another wheel/device proves it necessary.', 'F11 warns before native tyre SAT driving validation')
 req(profiles, 'key != "NativePhysicsCapture60Hz"', 'named feel profiles exclude native verbose capture state')
 req(profiles, 'values.find("nativetiresat") == values.end()', 'legacy profiles fail closed instead of inheriting native tyre SAT')
 req(profiles, 'migrate_native(Settings::WheelFFBNativeTireSat, "false")', 'legacy profiles explicitly disable native tyre SAT')
