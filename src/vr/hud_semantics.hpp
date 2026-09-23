@@ -56,6 +56,14 @@ namespace OutRunVRHudSemantics
     // World-attached rival/heart markers remain true stereo billboards.
     constexpr SemanticInfo ClassifyCaller(std::uint32_t callRva) noexcept
     {
+        // Exact sibling rival-marker sprite producers recovered from the
+        // canonical call graph. Keep these child world identities ahead of
+        // broader parent HUD ranges so stack promotion cannot flatten them.
+        if (callRva == 0x0BBC5Au)
+            return { "RankMarker/FUN_004BBAF0", "WORLD_RIVAL_MARKER", SpacePolicy::WorldBillboard };
+        if (callRva == 0x0BC2E5u || callRva == 0x0BC346u)
+            return { "RankMarker/FUN_004BBC70", "WORLD_RIVAL_MARKER", SpacePolicy::WorldBillboard };
+
         // HAM attached-heart draw; anchored by HeartDisp_PulseAngle=0x05B43A.
         if (InRange(callRva, 0x05B300, 0x05B700))
             return { "HeartDisp_car_heart", "WORLD_HEART", SpacePolicy::WorldBillboard };
@@ -116,7 +124,7 @@ namespace OutRunVRHudSemantics
     // Exact reverse-engineered anchor inventory from hooks_uiscaling.cpp.
     // This is a review/test source-of-truth, even where the anchor itself is
     // not a direct sprite call and therefore may not appear in hudtrace.csv.
-    inline constexpr std::array<SemanticAnchor, 50> Anchors{{
+    inline constexpr std::array<SemanticAnchor, 53> Anchors{{
         {0x05B43A, "WORLD_HEART", SpacePolicy::WorldBillboard, "HeartDisp_car_heart pulse angle"},
         {0x081A86, "HUD_FRUIT", SpacePolicy::ScreenHud, "C2C fruit scaling disable"},
         {0x081A8B, "HUD_FRUIT", SpacePolicy::ScreenHud, "C2C fruit scaling enable"},
@@ -144,6 +152,9 @@ namespace OutRunVRHudSemantics
         {0x0BB271, "WORLD_RIVAL_MARKER", SpacePolicy::WorldBillboard, "rank marker clip #3"},
         {0x0BB2BC, "WORLD_RIVAL_MARKER", SpacePolicy::WorldBillboard, "rank marker clip #4"},
         {0x0BB2D0, "WORLD_RIVAL_MARKER", SpacePolicy::WorldBillboard, "rank marker clip #5"},
+        {0x0BBC5A, "WORLD_RIVAL_MARKER", SpacePolicy::WorldBillboard, "sibling marker FUN_004BBAF0 sprani"},
+        {0x0BC2E5, "WORLD_RIVAL_MARKER", SpacePolicy::WorldBillboard, "sibling marker FUN_004BBC70 sprani #1"},
+        {0x0BC346, "WORLD_RIVAL_MARKER", SpacePolicy::WorldBillboard, "sibling marker FUN_004BBC70 sprani #2"},
 
         {0x0BD32E, "HUD_SLIPSTREAM", SpacePolicy::ScreenHud, "test your slipstream"},
         {0x0BD397, "HUD_GF_WARNING", SpacePolicy::ScreenHud, "don't lose girlfriend #1"},
@@ -177,6 +188,9 @@ namespace OutRunVRHudSemantics
 
     static_assert(ClassifyCaller(0x0B9F3A).space == SpacePolicy::ScreenHud);
     static_assert(ClassifyCaller(0x0BB0FB).space == SpacePolicy::WorldBillboard);
+    static_assert(ClassifyCaller(0x0BBC5A).space == SpacePolicy::WorldBillboard);
+    static_assert(ClassifyCaller(0x0BC2E5).space == SpacePolicy::WorldBillboard);
+    static_assert(ClassifyCaller(0x0BC346).space == SpacePolicy::WorldBillboard);
     static_assert(ClassifyCaller(0x0BE5CD).space == SpacePolicy::ScreenHud);
     static_assert(ClassifyCaller(0x0FC84E).space == SpacePolicy::ScreenHud);
 }
