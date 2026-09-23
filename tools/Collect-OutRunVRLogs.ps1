@@ -21,6 +21,30 @@ $patterns=@(
     '*.dmp'
 )
 
+function Get-BuildEvidence {
+    $result=[ordered]@{
+        ValidationClass='UNKNOWN'
+        UserRuntimeVerified=$false
+        BuildVariantId='UNKNOWN'
+        DependencyLockSha256='UNKNOWN'
+        GeneratedCMakeListsSha256='UNKNOWN'
+    }
+    $inputs=Join-Path $root 'BUILD_INPUTS.json'
+    if(Test-Path $inputs){
+        try {
+            $json=Get-Content $inputs -Raw|ConvertFrom-Json
+            if($json.PSObject.Properties['ValidationClass']){$result.ValidationClass=[string]$json.ValidationClass}
+            if($json.PSObject.Properties['UserRuntimeVerified']){$result.UserRuntimeVerified=[bool]$json.UserRuntimeVerified}
+            if($json.PSObject.Properties['VariantId']){$result.BuildVariantId=[string]$json.VariantId}
+            if($json.PSObject.Properties['DependencyLockSha256']){$result.DependencyLockSha256=[string]$json.DependencyLockSha256}
+            if($json.PSObject.Properties['GeneratedCMakeListsSha256']){$result.GeneratedCMakeListsSha256=[string]$json.GeneratedCMakeListsSha256}
+        } catch {
+            $result.ValidationClass='INVALID_BUILD_INPUTS'
+        }
+    }
+    return [pscustomobject]$result
+}
+
 function Get-SessionFiles {
     $seen=@{}
     $files=@()
@@ -55,15 +79,21 @@ function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,
 
     $ini=Join-Path $root 'OutRun2006Tweaks.ini'
     $configHash=if(Test-Path $ini){(Get-FileHash $ini -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
+    $buildEvidence=Get-BuildEvidence
     $state=[ordered]@{
-        SchemaVersion=3
+        SchemaVersion=4
         BuildMatrixId=$matrix
         VariantId=$variant
+        BuildVariantId=$buildEvidence.BuildVariantId
         Backend=$backend
         TestProfile=$profile
         SessionId=$session
         StartedUtc=$startedUtc.ToString('o')
         ConfigSha256=$configHash
+        ValidationClass=$buildEvidence.ValidationClass
+        UserRuntimeVerified=$buildEvidence.UserRuntimeVerified
+        DependencyLockSha256=$buildEvidence.DependencyLockSha256
+        GeneratedCMakeListsSha256=$buildEvidence.GeneratedCMakeListsSha256
         CollectionStatus='prepared-after-previous-collection'
         PreexistingLogs=@()
     }
@@ -78,6 +108,10 @@ function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,
     Copy-Item (Join-Path $root 'ACTIVE_VR_BACKEND.txt') $sessionRoot -Force
     $inputs=Join-Path $root 'BUILD_INPUTS.json'
     if(Test-Path $inputs){Copy-Item $inputs $sessionRoot -Force}
+    foreach($evidenceFile in @('PC_FAST_BUILD.txt','VR_DEPENDENCY_LOCK.json')){
+        $evidencePath=Join-Path $root $evidenceFile
+        if(Test-Path $evidencePath){Copy-Item $evidencePath $sessionRoot -Force}
+    }
     return $session
 }
 
@@ -131,7 +165,11 @@ if(Test-Path $captureRoot){
         }
 }
 $inputs=Join-Path $root 'BUILD_INPUTS.json'
-if(Test-Path $inputs){Copy-Item $inputs $dest -Force}
+if(Test-Path $inputs){Copy-Item $inputs $dest -Force; $copied+='BUILD_INPUTS.json'}
+foreach($evidenceFile in @('PC_FAST_BUILD.txt','VR_DEPENDENCY_LOCK.json')){
+    $evidencePath=Join-Path $root $evidenceFile
+    if(Test-Path $evidencePath){Copy-Item $evidencePath $dest -Force; $copied+=$evidenceFile}
+}
 
 $matchesUpstream=$false
 $exeSemanticIdentity='MISSING'
@@ -252,9 +290,10 @@ $payloadBackend=if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$
 $source=Join-Path $root "backends/$payloadBackend/SOURCE_SHA.txt"
 $sha=if(Test-Path $source){(Get-Content $source -Raw).Trim()}else{'unknown'}
 $configHash=if(Test-Path (Join-Path $root 'OutRun2006Tweaks.ini')){(Get-FileHash (Join-Path $root 'OutRun2006Tweaks.ini') -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
+$buildEvidence=Get-BuildEvidence
 
 $analysisRequest=[ordered]@{
-    SchemaVersion=1
+    SchemaVersion=2
     RequestType='OUTRUN_VR_RUNTIME_LOG_ANALYSIS'
     AutoAnalyzeOnUpload=$true
     RequiresUserDescription=$false
@@ -262,8 +301,13 @@ $analysisRequest=[ordered]@{
     IntegrationBranch='vr-d3d9ex-focus'
     BuildMatrixId=$matrix
     VariantId=$variant
+    BuildVariantId=$buildEvidence.BuildVariantId
     Backend=$backend
     TestProfile=$profile
+    ValidationClass=$buildEvidence.ValidationClass
+    UserRuntimeVerified=$buildEvidence.UserRuntimeVerified
+    DependencyLockSha256=$buildEvidence.DependencyLockSha256
+    GeneratedCMakeListsSha256=$buildEvidence.GeneratedCMakeListsSha256
     SessionId=$session
     SessionStartedUtc=$startedUtc.ToString('o')
     SourceSha=$sha
@@ -311,8 +355,13 @@ if($assetSemanticsPresent){
 
 @(
     "VARIANT=$variant"
+    "BUILD_VARIANT=$($buildEvidence.BuildVariantId)"
     "BACKEND=$backend"
     "TEST_PROFILE=$profile"
+    "VALIDATION_CLASS=$($buildEvidence.ValidationClass)"
+    "USER_RUNTIME_VERIFIED=$($buildEvidence.UserRuntimeVerified)"
+    "DEPENDENCY_LOCK_SHA256=$($buildEvidence.DependencyLockSha256)"
+    "GENERATED_CMAKELISTS_SHA256=$($buildEvidence.GeneratedCMakeListsSha256)"
     "SESSION=$session"
     "SESSION_STARTED_UTC=$($startedUtc.ToString('o'))"
     "BUILD_MATRIX=$matrix"
@@ -332,10 +381,15 @@ if($assetSemanticsPresent){
 )|Set-Content (Join-Path $dest 'MANIFEST.txt') -Encoding UTF8
 
 @{
-    SchemaVersion=3
+    SchemaVersion=4
     VariantId=$variant
+    BuildVariantId=$buildEvidence.BuildVariantId
     Backend=$backend
     TestProfile=$profile
+    ValidationClass=$buildEvidence.ValidationClass
+    UserRuntimeVerified=$buildEvidence.UserRuntimeVerified
+    DependencyLockSha256=$buildEvidence.DependencyLockSha256
+    GeneratedCMakeListsSha256=$buildEvidence.GeneratedCMakeListsSha256
     SessionId=$session
     SessionStartedUtc=$startedUtc.ToString('o')
     BuildMatrixId=$matrix
