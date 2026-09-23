@@ -3,6 +3,7 @@
 #include "../../hook_mgr.hpp"
 #include "../../plugin.hpp"
 #include "../../game_addrs.hpp"
+#include "render_semantics.hpp"
 
 #include <cmath>
 #include <cstdint>
@@ -104,6 +105,12 @@ namespace OutRunVR::DriverSeatView2
 		inline void DrawPassengerOnly(EVWORK_CAR* car)
 		{
 			if (!Settings::VRDriverSeatPassenger || PassengerDrawInProgress || !car)
+				return;
+			// Only inject into the main world pass. Reflections/effects may reuse
+			// DispCarModel_Common and would otherwise redraw the passenger several
+			// extra times per frame.
+			if (OutRunVR::GameSemantic::CurrentScope !=
+				OutRunVR::GameSemantic::RenderScope::None)
 				return;
 
 			auto* event = Game::event(EVENT_ROB02);
