@@ -4,18 +4,6 @@ permissions:
   contents: read
 
 on:
-  workflow_dispatch:
-    inputs:
-      clean:
-        description: 'Discard persistent PC build cache before compiling'
-        required: false
-        default: false
-        type: boolean
-      upload_artifact:
-        description: 'Also upload the ZIP to GitHub artifacts (slower)'
-        required: false
-        default: false
-        type: boolean
   push:
     branches:
       - vr-d3d9ex-focus
@@ -26,7 +14,7 @@ concurrency:
 
 jobs:
   fast-build:
-    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[pc-build]') }}
+    if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[pc-build]') }}
     runs-on: [self-hosted, Windows, X64, outrun-pc]
     timeout-minutes: 30
 
@@ -62,12 +50,7 @@ jobs:
         if: ${{ env.OUTRUN_PC_STALE != 'true' }}
         shell: powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
-          $cleanRequested = '${{ inputs.clean }}' -eq 'true'
-          if ($cleanRequested) {
-            ./tools/Build-OutRunPCFast.ps1 -Clean
-          } else {
-            ./tools/Build-OutRunPCFast.ps1
-          }
+          ./tools/Build-OutRunPCFast.ps1
 
           $zip = (Get-Content out/pc-fast/LAST_ZIP_PATH.txt -Raw).Trim()
           $drop = (Get-Content out/pc-fast/LAST_DROP_PATH.txt -Raw).Trim()
@@ -80,10 +63,3 @@ jobs:
           "- ZIP: $zip" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           "- Final hosted CI: not run by this fast path" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
 
-      - name: Optional GitHub artifact upload
-        if: ${{ env.OUTRUN_PC_STALE != 'true' && github.event_name == 'workflow_dispatch' && inputs.upload_artifact }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: OutRun2-VR-PC-FAST-${{ github.sha }}
-          path: ${{ env.OUTRUN_PC_ZIP }}
-          if-no-files-found: error
