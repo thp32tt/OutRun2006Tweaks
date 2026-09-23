@@ -1,23 +1,39 @@
-# R51 Native View-2 Driver Seat Experiment
+# R51 Virtual Fourth Driver View
 
 Base SHA: `17ad376bfdf7939f0851c0c629e4fa094a84f28a`
 
-This branch intentionally removes the virtual fourth-view reconstruction.
+## View cycle
 
-- native raw mode 1 remains the camera owner
-- no cam_mode rewriting
-- no view-2 camera capture/reprojection through matrix_B0
-- player car only is forced to full body render state 1
-- ROB01 driver is not forced
-- ROB02 girlfriend/passenger is rebuilt with the game's original CalcCharMatrix(car, ROB02, 1) and drawn once from the main player-car world pass
-- player car body scale is a draw-local visual transform only
+- View 1: native raw mode 2, untouched.
+- View 2: native raw mode 1, untouched.
+- View 3: native raw mode 0, untouched.
+- View 4: virtual flag + raw mode 1. It uses the exact native view-2 camera controller, but enables the driver-seat additions.
+- Next Change View exits V4 to native view 1.
 
-Defaults from the final live tuning values in the prior runtime log:
-Forward=-0.451, Right=-0.037, Up=0.015.
+No raw camera mode 3 is ever written.
 
-CarScale defaults to 1.12 and is live-adjustable in F11.
+## Virtual view 4 only
+
+- camera offset: Forward/Right/Up
+- full player-car render state
+- draw-local player-car scale
+- passenger-only ROB02 draw
+- ROB01 driver is never forced
+
+The passenger path uses the original game `CalcCharMatrix(car, ROB02, 1)`.
+The passenger draw is injected only after the player-car `DispCarModel_Common`
+returns and the caller executes `mxPopMatrix` at RVA `0x6BF91`; the hook is
+at RVA `0x6BF96`. This avoids inheriting the car-body matrix/render state that
+caused the previous passenger mesh corruption.
+
+Passenger injection is skipped for reflection/effect semantic subpasses to
+avoid duplicate character draws.
+
+Defaults:
+- Forward=-0.451
+- Right=-0.037
+- Up=0.015
+- CarScale=1.12
 
 R51 validated render graph is preserved:
-SAFE_DRAW_COMPARE=OFF, R26_HUD_COMPARE=ON.
-
-Passenger injection is skipped for ReflectionCube/SceneEffect/SkyGlow and other semantic subpasses to avoid duplicate character draws and extra VR cost.
+`SAFE_DRAW_COMPARE=OFF`, `R26_HUD_COMPARE=ON`.
