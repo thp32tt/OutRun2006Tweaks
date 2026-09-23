@@ -21,11 +21,11 @@ python3 "$ROOT/tools/verify_vr_binary_contract.py" \
   --manifest "$ROOT/docs/VR_BINARY_CONTRACT.json" \
   --source-root "$ROOT"
 
-rm -rf "$OUT/raw" "$OUT/.ghidra-project"
-mkdir -p "$OUT/raw" "$OUT/.ghidra-project"
+rm -rf "$OUT/raw" "$OUT/ghidra-project"
+mkdir -p "$OUT/raw" "$OUT/ghidra-project"
 
 "$GHIDRA_HOME/support/analyzeHeadless" \
-  "$OUT/.ghidra-project" OutRunExeMap \
+  "$OUT/ghidra-project" OutRunExeMap \
   -import "$EXE" \
   -overwrite \
   -analysisTimeoutPerFile 1800 \
