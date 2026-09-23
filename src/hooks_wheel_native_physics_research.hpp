@@ -206,6 +206,72 @@ namespace WheelNativePhysicsResearch
         return out;
     }
 
+    struct RearTireState
+    {
+        bool valid = false;
+        float slip0Rad = 0.0f;
+        float slip1Rad = 0.0f;
+        float slipRad = 0.0f;
+        float lateral0 = 0.0f;
+        float lateral1 = 0.0f;
+        float lateralSum = 0.0f;
+        float capacity0 = 0.0f;
+        float capacity1 = 0.0f;
+        float capacitySum = 0.0f;
+        float normalizedLateral = 0.0f;
+        float normalLoadSum = 0.0f;
+        float normalLoadDiff = 0.0f;
+    };
+
+    inline RearTireState rear_tire_state()
+    {
+        RearTireState out{};
+        const auto* workspace = reinterpret_cast<const std::uint8_t*>(
+            Module::exe_ptr(PlayerWorkspaceRva));
+        if (!pointer_table_matches(workspace))
+            return out;
+
+        const WheelSample rear0 = sample_wheel(
+            workspace + FirstWheelOffset + 2 * WheelStride);
+        const WheelSample rear1 = sample_wheel(
+            workspace + FirstWheelOffset + 3 * WheelStride);
+        if (!rear0.finite || !rear1.finite)
+            return out;
+
+        out.slip0Rad = -static_cast<float>(rear0.steerAngleEE) * AngleUnitRadians;
+        out.slip1Rad = -static_cast<float>(rear1.steerAngleEE) * AngleUnitRadians;
+        out.lateral0 = rear0.tireLocalAC;
+        out.lateral1 = rear1.tireLocalAC;
+        out.lateralSum = out.lateral0 + out.lateral1;
+        out.capacity0 = std::abs(rear0.gripCapacityC0);
+        out.capacity1 = std::abs(rear1.gripCapacityC0);
+        out.capacitySum = out.capacity0 + out.capacity1;
+        out.normalLoadSum = rear0.normalLoad34 + rear1.normalLoad34;
+        out.normalLoadDiff = rear0.normalLoad34 - rear1.normalLoad34;
+
+        // Rear capacity is also a contact/trust gate. A car that is airborne,
+        // resetting or otherwise has no usable rear tyre capacity must never
+        // create an artificial counter-steer cue.
+        if (!std::isfinite(out.capacitySum) || out.capacitySum <= 1.0e-6f)
+            return out;
+
+        out.slipRad =
+            (out.slip0Rad * out.capacity0 + out.slip1Rad * out.capacity1) /
+            out.capacitySum;
+        out.normalizedLateral = std::clamp(
+            out.lateralSum / out.capacitySum, -1.0f, 1.0f);
+
+        out.valid =
+            std::isfinite(out.slip0Rad) &&
+            std::isfinite(out.slip1Rad) &&
+            std::isfinite(out.slipRad) &&
+            std::isfinite(out.lateralSum) &&
+            std::isfinite(out.normalizedLateral) &&
+            std::isfinite(out.normalLoadSum) &&
+            std::isfinite(out.normalLoadDiff);
+        return out;
+    }
+
     inline void capture_after_physics(EVWORK_CAR* car)
     {
         static std::uint64_t captureTick = 0;
