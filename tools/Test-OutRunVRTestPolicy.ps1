@@ -17,6 +17,19 @@ $control = Get-OutRunVRTestProfile -Name CONTROL
 $correctness = Get-OutRunVRTestProfile -Name CORRECTNESS
 $performance = Get-OutRunVRTestProfile -Name PERFORMANCE
 
+# A FastLoad value above zero is not safe for the current VR recovery-baseline
+# startup path. 2026-09-23 Quest/VDXR evidence showed every FastLoad=3 profile
+# remained in the white loading loop with authoritativeSeed=0/stereoAllowed=0,
+# while HUD_MENU (FastLoad=0) progressed to a verified c64 baseline/gameplay.
+$allRuntimeProfileNames = @(
+    'CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE',
+    'STAGE_DIAGNOSTIC','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512'
+)
+foreach($profileName in $allRuntimeProfileNames) {
+    $runtimeProfile = Get-OutRunVRTestProfile -Name $profileName
+    Assert-True (Has-Argument $runtimeProfile '-FramerateFastLoad=0') "$profileName: VR runtime profiles must keep FastLoad disabled to prevent startup white-screen recovery deadlock"
+}
+
 foreach($profile in @($control,$correctness,$performance)) {
     Assert-True ($profile.Name -in @('CONTROL','CORRECTNESS','PERFORMANCE')) 'invalid profile identity'
     Assert-True (Has-Argument $profile '-PreferD3D9Ex=true') "$($profile.Name): D3D9Ex reference must be preferred"
