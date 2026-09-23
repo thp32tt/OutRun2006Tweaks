@@ -119,7 +119,8 @@ namespace
         Settings::WheelFFBWeightTransfer = 0.15f;
         Settings::WheelFFBSlewRate = 0.12f;
         Settings::WheelFFBReversalReleaseRate = 0.30f;
-        Settings::WheelFFBRoadTexture = 0.60f;
+        Settings::WheelFFBRoadTexture = 0.30f;
+        Settings::WheelFFBCurbImpact = 0.40f;
         Settings::WheelFFBTireSlip = 0.04f;
         Settings::WheelFFBWallImpact = 0.38f;
         Settings::WheelFFBGearShift = 0.60f;
@@ -317,13 +318,13 @@ namespace
             if (revision < 1)
             {
                 // Baseline feel is universal. Preserve SAT/trail gains, reduce
-                // the low-speed centre spring, make real surface roughness easier
-                // to feel, suppress normal-cornering scrub buzz, and retain an
+                // the low-speed centre spring, keep road texture conservative,
+                // suppress normal-cornering scrub buzz, and retain an
                 // unmistakable but short gear-change thunk.
                 Settings::WheelFFBSpringStrength = 0.22f;
                 Settings::WheelFFBSpringSaturation = 0.55f;
                 Settings::WheelFFBRoadTexture = 0.30f;
-        Settings::WheelFFBCurbImpact = 0.40f;
+                Settings::WheelFFBCurbImpact = 0.40f;
                 Settings::WheelFFBTireSlip = 0.04f;
                 Settings::WheelFFBGearShift = 0.60f;
                 Settings::WheelFFBFeelRevision = 1;
@@ -600,7 +601,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_physics_preset();
-                    Settings::WheelFFBFeelRevision = 7;
+                    Settings::WheelFFBFeelRevision = 8;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
@@ -616,7 +617,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_natural_preset();
-                    Settings::WheelFFBFeelRevision = 7;
+                    Settings::WheelFFBFeelRevision = 8;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
