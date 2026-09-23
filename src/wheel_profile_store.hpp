@@ -26,6 +26,10 @@ namespace Settings
     extern Setting<bool> WheelFFBNativeTireSat;
     extern Setting<float> WheelFFBNativeTireSatGain;
     extern Setting<bool> WheelFFBNativeTireSatInvert;
+    extern Setting<bool> WheelFFBNativeOversteerCue;
+    extern Setting<float> WheelFFBNativeOversteerStrength;
+    extern Setting<float> WheelFFBNativeOversteerSlipThreshold;
+    extern Setting<bool> WheelFFBNativeOversteerInvert;
 }
 
 // Named wheel/input and force-feedback profiles live beside the DLL instead of
@@ -581,6 +585,19 @@ namespace WheelProfileStore
             migrate_native(Settings::WheelFFBNativeTireSatGain, "1.00");
         if (values.find("nativetiresatinvert") == values.end())
             migrate_native(Settings::WheelFFBNativeTireSatInvert, "false");
+
+        // The rear-slip counter-steer cue is intentionally fail-closed for every
+        // profile saved before this feature existed. Missing strength/threshold
+        // values also receive neutral research defaults rather than inheriting
+        // a live session value.
+        if (values.find("nativeoversteercue") == values.end())
+            migrate_native(Settings::WheelFFBNativeOversteerCue, "false");
+        if (values.find("nativeoversteerstrength") == values.end())
+            migrate_native(Settings::WheelFFBNativeOversteerStrength, "0.18");
+        if (values.find("nativeoversteerslipthreshold") == values.end())
+            migrate_native(Settings::WheelFFBNativeOversteerSlipThreshold, "0.12");
+        if (values.find("nativeoversteerinvert") == values.end())
+            migrate_native(Settings::WheelFFBNativeOversteerInvert, "false");
 
         for (Settings::SettingBase* setting : changed)
             setting->notify();
