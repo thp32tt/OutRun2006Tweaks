@@ -23,10 +23,10 @@ jobs:
       GHIDRA_SHA256: ddac49f903da9d5bac833e5cc79395098b9c33cfd3279be5f31bd00387d2d4db
       CANONICAL_EXE_URL: https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.1/OR2006C2C.EXE
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Java 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
@@ -57,7 +57,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ./tools/reverse/run_ghidra_map.sh "$GITHUB_WORKSPACE/OR2006C2C.EXE" "$RUNNER_TEMP/OR2006C2C-map"
+          bash tools/reverse/run_ghidra_map.sh "$GITHUB_WORKSPACE/OR2006C2C.EXE" "$RUNNER_TEMP/OR2006C2C-map"
 
       - name: Smoke-query known semantic anchors
         shell: bash
