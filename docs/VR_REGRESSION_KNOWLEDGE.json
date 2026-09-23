@@ -268,9 +268,9 @@
     {
       "key": "VR-R51-WHITE-HUD-DIPLOPIA-001",
       "title": "White HUD/text remains doubled and head-following on R51",
-      "status": "USER_RUNTIME_VERIFIED_OPEN",
+      "status": "OPEN_USER_RUNTIME_VERIFIED_FAILURE",
       "severity": "visual-correctness",
-      "lastObservedKst": "2026-09-23",
+      "lastObservedKst": "2026-09-24",
       "sourceSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
       "symptoms": [
         "6th/6 not resized, doubled, follows head movement",
@@ -283,8 +283,8 @@
         "preserve improved frame stability",
         "do not restore blanket queue-to-HUD ownership"
       ],
-      "nextAction": "Identify exact white HUD producers and give only those SCREEN_HUD ownership/scale/world-lock semantics.",
-      "recurrenceCount": 0,
+      "nextAction": "Trace producer -> node tag -> queue SelectSpriteQueueNode -> renderer SetVertexShaderConstantF(c64) -> R30 draw ordering. Make exact semantic ownership visible at c64 time or move the renderer bypass to an equally exact producer-safe boundary; no blanket queue-to-HUD promotion.",
+      "recurrenceCount": 1,
       "testLevel": 1,
       "riskPaths": [
         "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -308,14 +308,24 @@
           "Quest3/VDXR CORRECTNESS: 6th/6, exit YES/NO, result/time/countdown and white rank glyphs are binocularly single and world/recenter locked as intended",
           "confirm 6th/6 scale change works and R51 road/background/vehicle stereo and frame stability remain intact"
         ]
+      },
+      "hypothesis": "EXE-map producer tagging is now proven to reach R30 draw ownership (semanticHudAccepted=93681), but renderer c64/WVP ownership still reports semanticOverlayBypass=0. SCREEN_HUD ownership becomes visible too late, after renderer head injection can already occur.",
+      "latestFailedCandidate": {
+        "sha": "8d21824f9502b3354fae679972a90868a0cce562",
+        "branch": "vr-d3d9ex-candidate/VR-R51-HUD-PRODUCER-MAP-20260924",
+        "sessionId": "20260923T164207853Z-2202b186",
+        "logZipSha256": "25be7a39d7daad4073e0b1765e9c6312a13f0b077898a84e4b1a17bf1dfe6731",
+        "packageSha256": "701a57ca5e4a1ba413bcdd75ad6fc6ecc320f6fc3dbb0dbd5a0597cb6ba81d89",
+        "result": "white HUD/position rank HUD still doubled and headset-following; R51 world stereo preserved",
+        "telemetry": "semanticHudAccepted=93681; semanticOverlayBypass=0"
       }
     },
     {
       "key": "VR-R51-VEHICLE-RANK-ANCHOR-001",
       "title": "Vehicle rank markers are not world-anchored on R51",
-      "status": "USER_RUNTIME_VERIFIED_OPEN",
+      "status": "OPEN_USER_RUNTIME_VERIFIED_FAILURE",
       "severity": "visual-correctness",
-      "lastObservedKst": "2026-09-23",
+      "lastObservedKst": "2026-09-24",
       "sourceSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
       "symptoms": [
         "non-white 1st/2nd/3rd marker appears single",
@@ -328,8 +338,8 @@
         "do not flatten rank markers into generic SCREEN_HUD",
         "preserve verified-good R51 world stereo and frame stability"
       ],
-      "nextAction": "Recover exact vehicle/world anchor and WORLD_BILLBOARD ownership for rank-marker producer paths; keep white-marker diplopia as a separately tracked producer issue.",
-      "recurrenceCount": 0,
+      "nextAction": "Use EXE map to reconstruct the exact Calc3D2D/vehicle anchor data flow for BAD20 plus BBC5A/BC2E5/BC346 sibling producers. Preserve anchor metadata through every queued node/digit and consume it in per-eye world projection rather than only assigning WORLD_BILLBOARD scope.",
+      "recurrenceCount": 1,
       "testLevel": 1,
       "riskPaths": [
         "src/vr/game/outrun_renderer_r29.cpp",
@@ -352,6 +362,13 @@
           "Quest3/VDXR CORRECTNESS: non-white and white rank markers stay spatially attached to the correct vehicle during head motion",
           "confirm marker convergence does not regress generic HUD or protected R51 world stereo"
         ]
+      },
+      "hypothesis": "Exact sibling callsite tagging alone is insufficient. The vehicle/world anchor produced before screen projection is not being preserved/reconstructed through SpriteNode ownership into the per-eye world-billboard draw; the result still behaves as head-following screen content.",
+      "latestFailedCandidate": {
+        "sha": "8d21824f9502b3354fae679972a90868a0cce562",
+        "sessionId": "20260923T164207853Z-2202b186",
+        "result": "vehicle rank labels remain detached from vehicles, move with headset, and affected rank/position elements are doubled",
+        "telemetry": "R30 screen worldBillboard counter remained 0 while r44 spatial reached 5154"
       }
     }
   ],
@@ -362,7 +379,7 @@
     "profile": "CORRECTNESS",
     "configHash": null,
     "sessionId": null,
-    "observedAtKst": "2026-09-23T02:16:53+09:00",
+    "observedAtKst": "2026-09-24T01:47:00+09:00",
     "protectedRegressionKeys": [
       "VR-STARTUP-WHITE-001",
       "VR-R51-WORLD-STEREO-PRESERVE-001",
@@ -377,7 +394,7 @@
       "VR-R51-WHITE-HUD-DIPLOPIA-001",
       "VR-R51-VEHICLE-RANK-ANCHOR-001"
     ],
-    "note": "Partial runtime baseline: protects behavior explicitly verified by the user on R51 while keeping white HUD and vehicle-rank marker failures open."
+    "note": "R51 protected partial baseline reaffirmed by original and PC clean rebuild runtime: world/road/vehicles good 3D; white HUD diplopia and vehicle-rank anchoring remain open; candidate 8d21824f failed those fixes without regressing world."
   },
   "workingDevelopmentBaseline": {
     "status": "USER_RUNTIME_PARTIAL_VERIFIED_WORKING_BASELINE",
@@ -396,10 +413,9 @@
       "Frame pacing/stability is improved versus earlier tested builds."
     ],
     "knownOpenRuntimeDefects": [
-      "6th/6 HUD is not resized, appears doubled, and follows head movement.",
-      "Exit YES/NO, end-of-run time/countdown/record and other white HUD/text elements appear doubled and follow head movement.",
-      "White marker above vehicles appears doubled.",
-      "Non-white 1st/2nd/3rd vehicle rank marker appears single but follows head movement and is not anchored to the vehicle."
+      "White HUD/text including position/rank HUD remains doubled and headset-following.",
+      "Vehicle rank markers remain detached from vehicles/head-following; affected rank/position elements can appear doubled.",
+      "Dense building scenes still exhibit frame-rate loss and require separate optimization."
     ],
     "note": "Corrected baseline identity: the user's described runtime result belongs to R51 exact SHA 17ad376b, not R50 750453f2. Preserve verified-good world stereo/frame stability while fixing only remaining HUD/marker semantics."
   }
