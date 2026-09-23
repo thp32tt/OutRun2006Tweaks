@@ -15,6 +15,7 @@ import ghidra.program.model.listing.FunctionManager;
 import ghidra.program.model.listing.Instruction;
 import ghidra.program.model.listing.InstructionIterator;
 import ghidra.program.model.listing.Listing;
+import ghidra.program.model.mem.MemoryBlock;
 import ghidra.program.model.symbol.Reference;
 import ghidra.program.model.symbol.RefType;
 
@@ -57,14 +58,38 @@ public class ExportOutRunMap extends GhidraScript {
         return hex(a.getOffset());
     }
 
-    private String rva(Address a) {
+    private MemoryBlock memoryBlock(Address a) {
         if (a == null || !a.isMemoryAddress()) return null;
-        if (!currentProgram.getMemory().contains(a)) return null;
+        return currentProgram.getMemory().getBlock(a);
+    }
+
+    private boolean isImageAddress(Address a) {
+        MemoryBlock block = memoryBlock(a);
+        return block != null &&
+            block.isLoaded() &&
+            !block.isArtificial() &&
+            !block.isExternalBlock() &&
+            !block.isOverlay() &&
+            a.getAddressSpace().equals(currentProgram.getImageBase().getAddressSpace());
+    }
+
+    private String rva(Address a) {
+        if (!isImageAddress(a)) return null;
         return hex(a.getOffset() - imageBase);
     }
 
     private String addressSpace(Address a) {
         return a == null ? null : a.getAddressSpace().getName();
+    }
+
+    private String memoryBlockName(Address a) {
+        MemoryBlock block = memoryBlock(a);
+        return block == null ? null : block.getName();
+    }
+
+    private Boolean memoryBlockArtificial(Address a) {
+        MemoryBlock block = memoryBlock(a);
+        return block == null ? null : block.isArtificial();
     }
 
     private String json(Map<String, Object> m) {
@@ -201,6 +226,8 @@ public class ExportOutRunMap extends GhidraScript {
                     xm.put("to_va", addr(to));
                     xm.put("to_rva", rva(to));
                     xm.put("to_space", addressSpace(to));
+                    xm.put("to_block", memoryBlockName(to));
+                    xm.put("to_block_artificial", memoryBlockArtificial(to));
                     xm.put("to_function_rva", to != null && to.isMemoryAddress() ? functionEntry(to) : null);
                     xm.put("type", rt == null ? "" : rt.getName());
                     xm.put("primary", ref.isPrimary());
@@ -213,6 +240,8 @@ public class ExportOutRunMap extends GhidraScript {
                         cm.put("callee_va", addr(to));
                         cm.put("callee_rva", rva(to));
                         cm.put("callee_space", addressSpace(to));
+                        cm.put("callee_block", memoryBlockName(to));
+                        cm.put("callee_block_artificial", memoryBlockArtificial(to));
                         cm.put("callee_function_rva", to != null && to.isMemoryAddress() ? functionEntry(to) : null);
                         cm.put("type", rt.getName());
                         cw.write(json(cm)); cw.newLine();
