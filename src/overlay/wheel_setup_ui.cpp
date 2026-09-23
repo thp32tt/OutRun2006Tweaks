@@ -826,7 +826,7 @@ namespace
             float nativeTireSatGain = 1.00f;
             bool nativeTireSatInvert = false;
             bool nativeOversteerCue = false;
-            float nativeOversteerStrength = 0.18f;
+            float nativeOversteerStrength = 0.10f;
             float nativeOversteerSlipThreshold = 0.12f;
             bool nativeOversteerInvert = false;
             bool hwSpring = true;
@@ -1799,7 +1799,7 @@ namespace
                     track_ffb_change(ImGui::SliderFloat(
                         "Rear countersteer cue strength",
                         Settings::WheelFFBNativeOversteerStrength.ptr(),
-                        0.0f, 0.35f, "%.2f"));
+                        0.0f, 0.25f, "%.2f"));
                     track_ffb_change(ImGui::SliderFloat(
                         "Rear peak-slip reference (rad)",
                         Settings::WheelFFBNativeOversteerSlipThreshold.ptr(),
@@ -1809,8 +1809,9 @@ namespace
                             Settings::WheelFFBNativeOversteerInvert.ptr())))
                         WheelFFB_RequestSettingsTransition();
                     ImGui::TextDisabled("rFuktor-style band: starts near 0.85x peak, strongest around 1.15-1.45x, releases by 2.25x.");
+                    ImGui::TextDisabled("MOZA R3 live test corrected the default direction. Reverse is retained only as a device-specific fallback.");
                     ImGui::TextColored(ImVec4(1.0f, 0.72f, 0.25f, 1.0f),
-                        "Validate at low Overall Strength first; this cue is additive to front SAT.");
+                        "Cue strength is conservative and tapers automatically when base SAT is already high.");
                 }
             }
             track_ffb_change(ImGui::SliderFloat("Grip-loss Response", Settings::WheelFFBGripLoss.ptr(), 0.0f, 1.0f, "%.2f"));
@@ -2023,7 +2024,7 @@ namespace
                 Settings::WheelFFBNativeTireSatGain = 1.00f;
                 Settings::WheelFFBNativeTireSatInvert = false;
                 Settings::WheelFFBNativeOversteerCue = false;
-                Settings::WheelFFBNativeOversteerStrength = 0.18f;
+                Settings::WheelFFBNativeOversteerStrength = 0.10f;
                 Settings::WheelFFBNativeOversteerSlipThreshold = 0.12f;
                 Settings::WheelFFBNativeOversteerInvert = false;
                 Settings::WheelFFBFeedbackCharacter = 0;
@@ -2073,7 +2074,7 @@ namespace
                 Settings::WheelFFBNativeTireSatGain = 1.00f;
                 Settings::WheelFFBNativeTireSatInvert = false;
                 Settings::WheelFFBNativeOversteerCue = false;
-                Settings::WheelFFBNativeOversteerStrength = 0.18f;
+                Settings::WheelFFBNativeOversteerStrength = 0.10f;
                 Settings::WheelFFBNativeOversteerSlipThreshold = 0.12f;
                 Settings::WheelFFBNativeOversteerInvert = false;
                 Settings::WheelFFBFeedbackCharacter = 0;
