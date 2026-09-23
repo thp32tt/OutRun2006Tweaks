@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "canonicalExeSha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+  "annotations": [
+    {
+      "id": "HUD-SPRITENODE-QUEUE-ENTER",
+      "rva": "0x0002D734",
+      "kind": "render-queue",
+      "name": "SpriteNode queue enter",
+      "tags": ["HUD", "SPRITE", "QUEUE", "SCREEN_HUD"],
+      "confidence": "high",
+      "note": "Canonical SpriteNode render-queue entry. Do not treat every draw inside this interval as HUD without producer evidence.",
+      "evidence": ["docs/VR_BINARY_CONTRACT.json", "VR-R51-WHITE-HUD-DIPLOPIA-001"]
+    },
+    {
+      "id": "HUD-SPRITENODE-NODE-RENDER",
+      "rva": "0x0002D762",
+      "kind": "render-queue",
+      "name": "SpriteNode node render",
+      "tags": ["HUD", "SPRITE", "DRAW"],
+      "confidence": "high",
+      "note": "Per-node SpriteNode render point used as a semantic provenance anchor.",
+      "evidence": ["docs/VR_BINARY_CONTRACT.json"]
+    },
+    {
+      "id": "HUD-SPRITENODE-QUEUE-EXIT",
+      "rva": "0x0002DCB4",
+      "kind": "render-queue",
+      "name": "SpriteNode queue exit",
+      "tags": ["HUD", "SPRITE", "QUEUE"],
+      "confidence": "high",
+      "note": "Canonical SpriteNode render-queue exit.",
+      "evidence": ["docs/VR_BINARY_CONTRACT.json"]
+    },
+    {
+      "id": "UI-D3DX-MATRIX-TRANSFORM2D",
+      "rva": "0x00039400",
+      "kind": "ui-transform",
+      "name": "D3DXMatrixTransformation2D import thunk",
+      "tags": ["UI", "HUD", "TRANSFORM2D", "HOOK"],
+      "confidence": "high",
+      "note": "Original-mod UI scaling hook target.",
+      "evidence": ["docs/VR_BINARY_CONTRACT.json", "src/hooks_uiscaling.cpp"]
+    },
+    {
+      "id": "UI-DRAW-SPRITE-MATRIX-MID",
+      "rva": "0x0002A556",
+      "kind": "ui-render",
+      "name": "draw sprite custom matrix midpoint",
+      "tags": ["UI", "SPRITE", "VERTEX", "HOOK"],
+      "confidence": "high",
+      "note": "Original-mod sprite vertex stream mid-hook.",
+      "evidence": ["docs/VR_BINARY_CONTRACT.json", "src/hooks_uiscaling.cpp"]
+    },
+    {
+      "id": "UI-CALC3D2D",
+      "rva": "0x00049940",
+      "kind": "projection",
+      "name": "Calc3D2D",
+      "tags": ["WORLD_BILLBOARD", "RANK_MARKER", "PROJECTION", "HOOK"],
+      "confidence": "high",
+      "note": "3D-to-2D projection path. Preserve world/vehicle anchor provenance before screen projection.",
+      "evidence": ["docs/VR_BINARY_CONTRACT.json", "VR-R51-VEHICLE-RANK-ANCHOR-001"]
+    },
+    {
+      "id": "RIVAL-RANK-TRUNCATE",
+      "rva": "0x000BB046",
+      "kind": "rank-marker",
+      "name": "rival rank marker truncation anchor",
+      "tags": ["RANK_MARKER", "WORLD_BILLBOARD", "RIVAL", "HOOK"],
+      "confidence": "high",
+      "note": "Rank marker truncation anchor in the recovered rival marker path.",
+      "evidence": ["docs/VR_BINARY_CONTRACT.json", "src/hooks_uiscaling.cpp"]
+    }
+  ]
+}
