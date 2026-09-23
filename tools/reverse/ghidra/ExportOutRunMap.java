@@ -4,6 +4,8 @@
 
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.address.Address;
+import ghidra.program.model.address.AddressRange;
+import ghidra.program.model.address.AddressRangeIterator;
 import ghidra.program.model.address.AddressSetView;
 import ghidra.program.model.listing.Data;
 import ghidra.program.model.listing.DataIterator;
@@ -57,6 +59,7 @@ public class ExportOutRunMap extends GhidraScript {
 
     private String rva(Address a) {
         if (a == null || !a.isMemoryAddress()) return null;
+        if (!currentProgram.getMemory().contains(a)) return null;
         return hex(a.getOffset() - imageBase);
     }
 
@@ -123,14 +126,16 @@ public class ExportOutRunMap extends GhidraScript {
     }
 
     private void exportFunctions(File dir) throws IOException {
-        try (BufferedWriter w = out(dir, "functions.jsonl")) {
+        try (BufferedWriter w = out(dir, "functions.jsonl");
+             BufferedWriter rw = out(dir, "function_ranges.jsonl")) {
             FunctionIterator it = fm.getFunctions(true);
             while (it.hasNext() && !monitor.isCancelled()) {
                 Function f = it.next();
                 AddressSetView body = f.getBody();
+                String entryRva = rva(f.getEntryPoint());
                 Map<String, Object> m = new LinkedHashMap<>();
                 m.put("entry_va", addr(f.getEntryPoint()));
-                m.put("entry_rva", rva(f.getEntryPoint()));
+                m.put("entry_rva", entryRva);
                 m.put("name", f.getName());
                 m.put("namespace", f.getParentNamespace() == null ? "" : f.getParentNamespace().getName(true));
                 m.put("size", body == null ? 0 : body.getNumAddresses());
@@ -142,6 +147,23 @@ public class ExportOutRunMap extends GhidraScript {
                 m.put("parameter_count", f.getParameterCount());
                 m.put("return_type", f.getReturnType() == null ? "" : f.getReturnType().getDisplayName());
                 w.write(json(m)); w.newLine();
+
+                if (body != null && !body.isEmpty() && entryRva != null) {
+                    int rangeIndex = 0;
+                    AddressRangeIterator ranges = body.getAddressRanges();
+                    while (ranges.hasNext()) {
+                        AddressRange range = ranges.next();
+                        String startRva = rva(range.getMinAddress());
+                        String endRva = rva(range.getMaxAddress());
+                        if (startRva == null || endRva == null) continue;
+                        Map<String, Object> rm = new LinkedHashMap<>();
+                        rm.put("entry_rva", entryRva);
+                        rm.put("range_index", rangeIndex++);
+                        rm.put("start_rva", startRva);
+                        rm.put("end_rva", endRva);
+                        rw.write(json(rm)); rw.newLine();
+                    }
+                }
             }
         }
     }
