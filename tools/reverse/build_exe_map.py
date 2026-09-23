@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import pathlib
 import sqlite3
@@ -180,6 +181,59 @@ def write_summary(con: sqlite3.Connection, out: pathlib.Path):
     out.write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
+
+def sha256_path(path: pathlib.Path) -> str | None:
+    if not path or not path.is_file():
+        return None
+    h = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def write_provenance(
+    out: pathlib.Path,
+    db: pathlib.Path,
+    export_dir: pathlib.Path,
+    semantics: pathlib.Path | None,
+    binary_contract: pathlib.Path | None,
+) -> None:
+    export_files = {}
+    for name in (
+        "program.jsonl", "functions.jsonl", "instructions.jsonl", "calls.jsonl",
+        "xrefs.jsonl", "strings.jsonl", "imports.jsonl"
+    ):
+        path = export_dir / name
+        if path.is_file():
+            export_files[name] = sha256_path(path)
+    doc = {
+        "schemaVersion": 1,
+        "generator": {
+            "path": "tools/reverse/build_exe_map.py",
+            "sha256": sha256_path(pathlib.Path(__file__).resolve()),
+        },
+        "database": {
+            "path": str(db),
+            "sha256": sha256_path(db),
+        },
+        "exportDirectory": str(export_dir),
+        "exportFiles": export_files,
+        "semantics": None if not semantics else {
+            "path": str(semantics),
+            "sha256": sha256_path(semantics),
+        },
+        "binaryContract": None if not binary_contract else {
+            "path": str(binary_contract),
+            "sha256": sha256_path(binary_contract),
+        },
+    }
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(
+        json.dumps(doc, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--export-dir", required=True, type=pathlib.Path)
@@ -187,6 +241,8 @@ def main() -> int:
     ap.add_argument("--summary", type=pathlib.Path)
     ap.add_argument("--semantics", type=pathlib.Path)
     ap.add_argument("--binary-contract", type=pathlib.Path)
+    ap.add_argument("--provenance", type=pathlib.Path,
+                    help="MAP_PROVENANCE.json output; defaults beside the database")
     args = ap.parse_args()
     args.db.parent.mkdir(parents=True, exist_ok=True)
     con = connect(args.db)
@@ -202,6 +258,12 @@ def main() -> int:
         print(f"EXE_MAP_DB={args.db}")
     finally:
         con.close()
+    provenance = args.provenance or args.db.with_name("MAP_PROVENANCE.json")
+    write_provenance(
+        provenance, args.db, args.export_dir,
+        args.semantics, args.binary_contract,
+    )
+    print(f"EXE_MAP_PROVENANCE={provenance}")
     return 0
 
 if __name__ == "__main__":
