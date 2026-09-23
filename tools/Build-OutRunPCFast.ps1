@@ -189,7 +189,7 @@ Copy-Item 'docs/VR_TEST_STRATEGY.md' (Join-Path $packageDir 'VR_TEST_STRATEGY.md
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $matrixId = "PC-FAST-$stamp-$shortSha"
 Set-Content (Join-Path $packageDir 'BUILD_MATRIX_ID.txt') $matrixId -Encoding ascii
-Set-Content (Join-Path $packageDir 'PC_FAST_BUILD.txt') "PC_FAST_$buildMode`_NOT_FINAL_CI" -Encoding ascii
+Set-Content (Join-Path $packageDir 'PC_FAST_BUILD.txt') "PC_FAST_${buildMode}_NOT_FINAL_CI" -Encoding ascii
 
 $buildInputs = [ordered]@{
     SchemaVersion = 1
