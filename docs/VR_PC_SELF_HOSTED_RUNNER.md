@@ -25,6 +25,8 @@ Leave this window open. The expected state is Listening for Jobs.
 
 Stop with Ctrl+C when the test session ends. While stopped, the PC does not accept GitHub jobs.
 
+If this repository remains public, stopping run.cmd is only an execution stop; the repository-level runner registration still exists. The safer trust boundary is a private repository/mirror or a purely local invocation of tools/Build-OutRunPCFast.ps1. If a public-repository runner is used temporarily, unregister/remove the runner from GitHub after the interactive session when it is no longer needed, then register it again only for a deliberate test session.
+
 For this PC the runner lives on the fast L: SSD. Create a desktop file named OutRun Runner Start.cmd:
 
     @echo off
