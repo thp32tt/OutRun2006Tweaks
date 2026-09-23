@@ -60,7 +60,7 @@ namespace Settings
     Setting<int> WheelFFBFeelRevision{
         "WheelFFB", "FeelRevision", 0,
         "Internal one-shot migration version for wheel FFB feel defaults.",
-        Range<int>{ 0, 5 }
+        Range<int>{ 0, 6 }
     };
 }
 
@@ -274,7 +274,7 @@ namespace
         Settings::WheelFFBNativeTireSatGain = 1.00f;
         Settings::WheelFFBNativeTireSatInvert = false;
         Settings::WheelFFBNativeOversteerCue = false;
-        Settings::WheelFFBNativeOversteerStrength = 0.18f;
+        Settings::WheelFFBNativeOversteerStrength = 0.10f;
         Settings::WheelFFBNativeOversteerSlipThreshold = 0.12f;
         Settings::WheelFFBNativeOversteerInvert = false;
         Settings::WheelFFBGlobalStrength = 0.70f;
@@ -315,7 +315,7 @@ namespace
         Settings::WheelFFBNativeTireSatGain = 1.00f;
         Settings::WheelFFBNativeTireSatInvert = false;
         Settings::WheelFFBNativeOversteerCue = false;
-        Settings::WheelFFBNativeOversteerStrength = 0.18f;
+        Settings::WheelFFBNativeOversteerStrength = 0.10f;
         Settings::WheelFFBNativeOversteerSlipThreshold = 0.12f;
         Settings::WheelFFBNativeOversteerInvert = false;
         Settings::WheelFFBGlobalStrength = 0.70f;
@@ -682,6 +682,23 @@ namespace
                 changed = true;
             }
 
+            if (revision < 6)
+            {
+                // v0.4 hardware validation found the original experimental rear
+                // cue sign reversed. The production formula is now corrected,
+                // so clear the old compatibility invert and soften only the old
+                // 0.18 default; deliberate custom strength remains untouched.
+                const float rearStrength =
+                    static_cast<float>(Settings::WheelFFBNativeOversteerStrength);
+                if (std::isfinite(rearStrength) &&
+                    std::abs(rearStrength - 0.18f) <= 0.0005f)
+                    Settings::WheelFFBNativeOversteerStrength = 0.10f;
+                Settings::WheelFFBNativeOversteerInvert = false;
+                Settings::WheelFFBFeelRevision = 6;
+                revision = 6;
+                changed = true;
+            }
+
             if (!changed)
                 return true;
 
@@ -693,6 +710,11 @@ namespace
                 spdlog::warn(
                     "WheelFFBFeelRetune: applied revision {} for this session but could not persist user.ini",
                     revision);
+            }
+            else if (revision >= 6)
+            {
+                spdlog::info(
+                    "WheelFFBFeelRetune: applied revision 6 (rear countersteer sign corrected; legacy 0.18 cue default softened to 0.10)");
             }
             else if (revision >= 5)
             {
@@ -818,7 +840,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_physics_preset();
-                    Settings::WheelFFBFeelRevision = 5;
+                    Settings::WheelFFBFeelRevision = 6;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
@@ -834,7 +856,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_natural_preset();
-                    Settings::WheelFFBFeelRevision = 5;
+                    Settings::WheelFFBFeelRevision = 6;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
