@@ -26,3 +26,85 @@ jobs:
         run: python -m py_compile tools/reverse/build_exe_map.py tools/reverse/exequery.py tools/reverse/test_exe_map.py
       - name: Synthetic knowledge-map self-test
         run: python tools/reverse/test_exe_map.py
+
+  ghidra-whole-exe-map:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GHIDRA_URL: https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_12.1.4_build/ghidra_12.1.4_PUBLIC_20260921.zip
+      GHIDRA_SHA256: ddac49f903da9d5bac833e5cc79395098b9c33cfd3279be5f31bd00387d2d4db
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Download pinned Ghidra
+        shell: bash
+        run: |
+          curl -L --fail --retry 3 "$GHIDRA_URL" -o "$RUNNER_TEMP/ghidra.zip"
+          echo "$GHIDRA_SHA256  $RUNNER_TEMP/ghidra.zip" | sha256sum -c -
+          unzip -q "$RUNNER_TEMP/ghidra.zip" -d "$RUNNER_TEMP"
+          echo "GHIDRA_HOME=$RUNNER_TEMP/ghidra_12.1.4_PUBLIC" >> "$GITHUB_ENV"
+      - name: Download and verify canonical OR2006C2C.EXE
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, pathlib, urllib.request
+          manifest = json.loads(pathlib.Path("docs/VR_BINARY_CONTRACT.json").read_text())
+          url = manifest["canonicalExe"]["sourceUrl"]
+          urllib.request.urlretrieve(url, "/tmp/OR2006C2C.EXE")
+          PY
+          python tools/verify_vr_binary_contract.py \
+            --exe /tmp/OR2006C2C.EXE \
+            --manifest docs/VR_BINARY_CONTRACT.json \
+            --source-root .
+      - name: Run Ghidra whole-EXE structural map
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/out"
+          "$GHIDRA_HOME/support/analyzeHeadless" \
+            "$RUNNER_TEMP/project" OutRunMap \
+            -import /tmp/OR2006C2C.EXE \
+            -overwrite \
+            -scriptPath tools/reverse \
+            -postScript ExportOutRunMap.java "$RUNNER_TEMP/out" nodecompile \
+            -analysisTimeoutPerFile 1800 \
+            -max-cpu 2 \
+            -deleteProject
+      - name: Build and query SQLite map
+        shell: bash
+        run: |
+          python tools/reverse/build_exe_map.py \
+            --export-dir "$RUNNER_TEMP/out" \
+            --db "$RUNNER_TEMP/out/outrun_exe_map.sqlite" \
+            --semantics tools/reverse/seed_semantics.json \
+            --contract docs/VR_BINARY_CONTRACT.json
+          python tools/reverse/exequery.py \
+            --db "$RUNNER_TEMP/out/outrun_exe_map.sqlite" 0x2D762 --json > "$RUNNER_TEMP/query.json"
+          python - <<'PY'
+          import json, pathlib
+          q = json.loads(pathlib.Path(__import__("os").environ["RUNNER_TEMP"], "query.json").read_text())
+          assert q["queryRva"] == "0x0002D762"
+          assert q["annotations"], "expected canonical semantic annotation"
+          assert q["instructions"], "expected disassembly around canonical RVA"
+          print("Ghidra whole-EXE map query: PASS")
+          PY
+      - name: Upload structural map artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: outrun-exe-structural-map
+          path: |
+            ${{ runner.temp }}/out/manifest.json
+            ${{ runner.temp }}/out/functions.jsonl
+            ${{ runner.temp }}/out/instructions.jsonl
+            ${{ runner.temp }}/out/calls.jsonl
+            ${{ runner.temp }}/out/xrefs.jsonl
+            ${{ runner.temp }}/out/strings.jsonl
+            ${{ runner.temp }}/out/symbols.jsonl
+            ${{ runner.temp }}/out/outrun_exe_map.sqlite
+          retention-days: 90
+
