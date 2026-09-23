@@ -63,6 +63,9 @@ struct WheelFFBGraphSnapshot
     std::array<float, WheelFFBGraphCapacity> nativeTireNormalized{};
     std::array<float, WheelFFBGraphCapacity> nativeTireSat{};
     std::array<float, WheelFFBGraphCapacity> nativeTireShare{};
+    std::array<float, WheelFFBGraphCapacity> rearSlipNormalized{};
+    std::array<float, WheelFFBGraphCapacity> nativeOversteerCue{};
+    std::array<float, WheelFFBGraphCapacity> nativeOversteerProtection{};
 };
 
 
