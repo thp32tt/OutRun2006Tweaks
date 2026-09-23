@@ -19,6 +19,19 @@ function Get-OutRunVRTestProfile {
         '-NearPlane=0.10'
     )
 
+    # Runtime-proven visual path. Keep CONTROL/PERFORMANCE able to exercise
+    # fallback transport, but correctness/HUD sessions must use the R49
+    # DirectGPU owner and keep union-FOV mutation disabled.
+    $visualSafeVr = @(
+        $commonVr | Where-Object {
+            $_ -notmatch '^-DirectGpuOnly=' -and
+            $_ -notmatch '^-CullingUnionFov='
+        }
+    ) + @(
+        '-DirectGpuOnly=true',
+        '-CullingUnionFov=false'
+    )
+
     switch ($Name) {
         'CONTROL' {
             return [ordered]@{
@@ -45,7 +58,7 @@ function Get-OutRunVRTestProfile {
                 Description='Fast world/effect diagnostic: skip intros, open debug level select and remove race timeout so sky/particle/rival/stage issues can be reproduced without menu traversal.'
                 Arguments=@(
                     '-FramerateLimit=0',
-                    '-FramerateFastLoad=3',
+                    '-FramerateFastLoad=0',
                     '-FramerateInterpolation=true',
                     '-FramerateUnlockExperimental=true',
                     '-FrameCadenceMode=1',
@@ -68,13 +81,13 @@ function Get-OutRunVRTestProfile {
                 Description='Primary HUD correctness session: rank/score/time/gear/ghost/goal/heart/rival/speech/emoji and zero-disparity alignment.'
                 Arguments=@(
                     '-FramerateLimit=0',
-                    '-FramerateFastLoad=3',
+                    '-FramerateFastLoad=0',
                     '-FramerateInterpolation=true',
                     '-FramerateUnlockExperimental=true',
                     '-FrameCadenceMode=1',
                     '-FrameCadenceTargetHz=0',
                     '-DisableDesktopVsync=true'
-                ) + $commonVr
+                ) + $visualSafeVr
                 Environment=[ordered]@{
                     OUTRUN_VR_TEST_PROFILE='HUD_SCREEN'
                     OUTRUN_VR_PERFORMANCE_PROFILE='0'
@@ -94,7 +107,7 @@ function Get-OutRunVRTestProfile {
                     '-FrameCadenceMode=1',
                     '-FrameCadenceTargetHz=0',
                     '-DisableDesktopVsync=true'
-                ) + $commonVr
+                ) + $visualSafeVr
                 Environment=[ordered]@{
                     OUTRUN_VR_TEST_PROFILE='HUD_MENU'
                     OUTRUN_VR_PERFORMANCE_PROFILE='0'
@@ -108,7 +121,7 @@ function Get-OutRunVRTestProfile {
                 Description='World-attached display session: rival rank markers, Heart Attack markers, world hearts/lines, lens flare, smoke/skid and sky anchoring.'
                 Arguments=@(
                     '-FramerateLimit=0',
-                    '-FramerateFastLoad=3',
+                    '-FramerateFastLoad=0',
                     '-FramerateInterpolation=true',
                     '-FramerateUnlockExperimental=true',
                     '-FrameCadenceMode=1',
@@ -117,7 +130,7 @@ function Get-OutRunVRTestProfile {
                     '-SkipIntros',
                     '-OuttaTime',
                     '-LevelSelect'
-                ) + $commonVr
+                ) + $visualSafeVr
                 Environment=[ordered]@{
                     OUTRUN_VR_TEST_PROFILE='HUD_WORLD'
                     OUTRUN_VR_PERFORMANCE_PROFILE='0'
@@ -132,7 +145,7 @@ function Get-OutRunVRTestProfile {
                 Description='A/B baseline: current conservative graphics policy, stage culling disabled, transparency SSAA on, reflections 1024.'
                 Arguments=@(
                     '-FramerateLimit=0',
-                    '-FramerateFastLoad=3',
+                    '-FramerateFastLoad=0',
                     '-FramerateInterpolation=true',
                     '-FramerateUnlockExperimental=true',
                     '-FrameCadenceMode=1',
@@ -155,7 +168,7 @@ function Get-OutRunVRTestProfile {
                 Description='A/B step B: enable stage culling so the VR union-FOV culling path can be evaluated; keep SSAA and 1024 reflections.'
                 Arguments=@(
                     '-FramerateLimit=0',
-                    '-FramerateFastLoad=3',
+                    '-FramerateFastLoad=0',
                     '-FramerateInterpolation=true',
                     '-FramerateUnlockExperimental=true',
                     '-FrameCadenceMode=1',
@@ -178,7 +191,7 @@ function Get-OutRunVRTestProfile {
                 Description='A/B step C: B plus transparency SSAA disabled to isolate its stereo GPU cost.'
                 Arguments=@(
                     '-FramerateLimit=0',
-                    '-FramerateFastLoad=3',
+                    '-FramerateFastLoad=0',
                     '-FramerateInterpolation=true',
                     '-FramerateUnlockExperimental=true',
                     '-FrameCadenceMode=1',
@@ -201,7 +214,7 @@ function Get-OutRunVRTestProfile {
                 Description='A/B step D: C plus 512 reflection cubemap to isolate reflection-resolution cost.'
                 Arguments=@(
                     '-FramerateLimit=0',
-                    '-FramerateFastLoad=3',
+                    '-FramerateFastLoad=0',
                     '-FramerateInterpolation=true',
                     '-FramerateUnlockExperimental=true',
                     '-FrameCadenceMode=1',
@@ -224,7 +237,7 @@ function Get-OutRunVRTestProfile {
                 Description='CORRECTNESS runtime baseline plus opt-in performance feature flags when the binary supports them.'
                 Arguments=@(
                     '-FramerateLimit=0',
-                    '-FramerateFastLoad=3',
+                    '-FramerateFastLoad=0',
                     '-FramerateInterpolation=true',
                     '-FramerateUnlockExperimental=true',
                     '-FrameCadenceMode=1',
@@ -242,14 +255,14 @@ function Get-OutRunVRTestProfile {
                 Name='CORRECTNESS'
                 Description='Default daily Quest/VDXR test. Correctness fixes enabled; risky performance experiments remain opt-in.'
                 Arguments=@(
-                    '-FramerateLimit=0',
-                    '-FramerateFastLoad=3',
-                    '-FramerateInterpolation=true',
-                    '-FramerateUnlockExperimental=true',
-                    '-FrameCadenceMode=1',
+                    '-FramerateLimit=60',
+                    '-FramerateFastLoad=0',
+                    '-FramerateInterpolation=false',
+                    '-FramerateUnlockExperimental=false',
+                    '-FrameCadenceMode=0',
                     '-FrameCadenceTargetHz=0',
-                    '-DisableDesktopVsync=true'
-                ) + $commonVr
+                    '-DisableDesktopVsync=false'
+                ) + $visualSafeVr
                 Environment=[ordered]@{
                     OUTRUN_VR_TEST_PROFILE='CORRECTNESS'
                     OUTRUN_VR_PERFORMANCE_PROFILE='0'
