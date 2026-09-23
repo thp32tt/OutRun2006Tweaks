@@ -107,3 +107,10 @@ Before adding or changing any executable-RVA hook:
 
 The map is evidence and navigation infrastructure. It does not override runtime
 Quest 3 / VDXR evidence or the protected working baseline.
+
+## Validation
+
+`python tools/reverse/test_exe_map.py` builds and queries a synthetic map. The
+`EXE Map Tools` pull-request workflow also runs Python syntax checks plus this
+self-test. Full Ghidra execution remains an environment-level check because the
+exporter requires a Ghidra installation and the canonical executable.
