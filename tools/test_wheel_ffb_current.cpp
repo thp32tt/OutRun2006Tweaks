@@ -207,6 +207,15 @@ int main() {
  require(native_oversteer_band(-1.15f)>.99f,"rear-slip cue magnitude is symmetric");
  require(native_oversteer_band(std::numeric_limits<float>::quiet_NaN())==0.0f,"rear-slip cue NaN fails closed");
 
+ require(native_oversteer_direction(0.12f,false)>0.99f,"hardware-validated positive rear slip keeps positive cue direction");
+ require(native_oversteer_direction(-0.12f,false)<-0.99f,"hardware-validated negative rear slip keeps negative cue direction");
+ require(native_oversteer_direction(0.12f,true)<-0.99f,"rear cue reverse switch remains an explicit fallback");
+ require(native_oversteer_direction(std::numeric_limits<float>::quiet_NaN(),false)==0.0f,"rear cue direction NaN fails closed");
+ require(native_oversteer_headroom(0.0f)>.99f,"rear cue keeps full headroom when base SAT is light");
+ require(native_oversteer_headroom(1.0f)>.34f&&native_oversteer_headroom(1.0f)<.36f,"rear cue is strongly tapered near full base SAT");
+ require(native_oversteer_headroom(-2.0f)>.34f&&native_oversteer_headroom(-2.0f)<.36f,"rear cue headroom is symmetric and bounded");
+ require(native_oversteer_headroom(std::numeric_limits<float>::quiet_NaN())==0.0f,"rear cue headroom NaN fails closed");
+
  float beta=d.bodySlip();d.update(nullptr,0,.5,0);require(d.bodySlip()<beta&&!d.sampleValid(),"invalid decay");
  for(int i=0;i<4;++i)d.update(nullptr,0,.5,0);
  require(d.bodySlip()==0&&d.yawRate()==0&&d.frontSlip()==0&&d.activationBlend()==0,"five-invalid clear");
