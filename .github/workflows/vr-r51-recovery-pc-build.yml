@@ -80,6 +80,6 @@ jobs:
         if: ${{ env.OUTRUN_PC_STALE != 'true' }}
         uses: actions/upload-artifact@v4
         with:
-          name: OutRun2-VR-R51-RECOVERY-PC-${{ github.sha }}
+          name: OutRun2-VR-R51-CLEAN-PC-${{ github.sha }}
           path: ${{ env.OUTRUN_PC_ZIP }}
           if-no-files-found: error
