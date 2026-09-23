@@ -1,0 +1,1 @@
+Issue #6 EXE-map correctness validation trigger. This validation-only branch is based on candidate 9ec7a9601460fe409814542c28ba921e66af50a4.
