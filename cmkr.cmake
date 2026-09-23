@@ -170,6 +170,24 @@ else()
     cmkr_exec("${CMKR_EXECUTABLE}" version)
     message(STATUS "[cmkr] Bootstrapped ${CMKR_EXECUTABLE}")
 endif()
+
+# A persistent cache is only reusable when it was built from the pinned commit.
+if(CMKR_COMMIT_HASH AND CMKR_EXECUTABLE STREQUAL CMKR_CACHED_EXECUTABLE)
+    find_package(Git QUIET REQUIRED)
+    execute_process(
+        COMMAND "${GIT_EXECUTABLE}" rev-parse HEAD
+        RESULT_VARIABLE CMKR_GIT_RESULT
+        OUTPUT_VARIABLE CMKR_CACHED_COMMIT
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        WORKING_DIRECTORY "${CMKR_DIRECTORY}"
+    )
+    if(NOT CMKR_GIT_RESULT EQUAL 0 OR NOT CMKR_CACHED_COMMIT STREQUAL CMKR_COMMIT_HASH)
+        message(FATAL_ERROR
+            "[cmkr] Cached cmkr identity mismatch: expected ${CMKR_COMMIT_HASH}, got '${CMKR_CACHED_COMMIT}'. "
+            "Clear the cmkr cache and configure again.")
+    endif()
+endif()
+
 execute_process(COMMAND "${CMKR_EXECUTABLE}" version
     RESULT_VARIABLE CMKR_EXEC_RESULT
 )
