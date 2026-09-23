@@ -119,21 +119,75 @@ def show_address(con, raw, context, address_kind="auto"):
         for x in outgoing: print(f"  {hx(x['to_rva'])} func={hx(x['to_function_rva'])} {x['type']}")
 
 
+def fts_enabled(con):
+    row = con.execute("SELECT value FROM meta WHERE key='fts5'").fetchone()
+    if not row:
+        return False
+    return str(row[0]).strip().lower() in ("true", "1", '"true"')
+
+
+def display_value(key, value):
+    if value is None:
+        return value
+    if key.endswith("rva"):
+        if isinstance(value, int):
+            return hx(value)
+        return str(value)
+    return value
+
+
 def plain_search(con, q, limit):
     like = f"%{q}%"
-    sections = [
-        ("SEMANTICS", "SELECT id,rva,name,tags,notes FROM semantics WHERE id LIKE ? OR name LIKE ? OR tags LIKE ? OR notes LIKE ? LIMIT ?", (like,like,like,like,limit)),
-        ("FUNCTIONS", "SELECT entry_rva,name,namespace,size FROM functions WHERE name LIKE ? OR namespace LIKE ? LIMIT ?", (like,like,limit)),
-        ("STRINGS", "SELECT rva,value,datatype FROM strings WHERE value LIKE ? LIMIT ?", (like,limit)),
-        ("INSTRUCTIONS", "SELECT rva,function_rva,text FROM instructions WHERE text LIKE ? LIMIT ?", (like,limit)),
-        ("IMPORTS", "SELECT entry_rva,name,namespace FROM imports WHERE name LIKE ? OR namespace LIKE ? LIMIT ?", (like,like,limit)),
-    ]
-    for title, sql, params in sections:
-        rows = con.execute(sql, params).fetchall()
-        if not rows: continue
-        print(title)
+    used_fts = fts_enabled(con)
+    rows_by_section = []
+    if used_fts:
+        phrase = '"' + q.replace('"', '""') + '"'
+        try:
+            rows_by_section.extend([
+                ("SEMANTICS", con.execute(
+                    "SELECT id,rva,name,tags,notes FROM fts_semantics WHERE fts_semantics MATCH ? LIMIT ?",
+                    (phrase, limit)).fetchall()),
+                ("FUNCTIONS", con.execute(
+                    "SELECT entry_rva,name,namespace,NULL AS size FROM fts_functions WHERE fts_functions MATCH ? LIMIT ?",
+                    (phrase, limit)).fetchall()),
+                ("STRINGS", con.execute(
+                    "SELECT rva,value,datatype FROM fts_strings WHERE fts_strings MATCH ? LIMIT ?",
+                    (phrase, limit)).fetchall()),
+                ("INSTRUCTIONS", con.execute(
+                    "SELECT rva,function_rva,text FROM fts_instructions WHERE fts_instructions MATCH ? LIMIT ?",
+                    (phrase, limit)).fetchall()),
+            ])
+        except sqlite3.OperationalError:
+            rows_by_section = []
+            used_fts = False
+
+    if not used_fts:
+        sections = [
+            ("SEMANTICS", "SELECT id,rva,name,tags,notes FROM semantics WHERE id LIKE ? OR name LIKE ? OR tags LIKE ? OR notes LIKE ? LIMIT ?", (like,like,like,like,limit)),
+            ("FUNCTIONS", "SELECT entry_rva,name,namespace,size FROM functions WHERE name LIKE ? OR namespace LIKE ? LIMIT ?", (like,like,limit)),
+            ("STRINGS", "SELECT rva,value,datatype FROM strings WHERE value LIKE ? LIMIT ?", (like,limit)),
+            ("INSTRUCTIONS", "SELECT rva,function_rva,text FROM instructions WHERE text LIKE ? LIMIT ?", (like,limit)),
+        ]
+        rows_by_section.extend(
+            (title, con.execute(sql, params).fetchall())
+            for title, sql, params in sections
+        )
+
+    rows_by_section.append((
+        "IMPORTS",
+        con.execute(
+            "SELECT entry_rva,name,namespace FROM imports WHERE name LIKE ? OR namespace LIKE ? LIMIT ?",
+            (like, like, limit),
+        ).fetchall(),
+    ))
+    for title, rows in rows_by_section:
+        if not rows:
+            continue
+        print(title + (" [FTS5]" if used_fts and title != "IMPORTS" else ""))
         for r in rows:
-            print("  " + " | ".join(f"{k}={hx(r[k]) if k.endswith('rva') and r[k] is not None else r[k]}" for k in r.keys()))
+            print("  " + " | ".join(
+                f"{k}={display_value(k, r[k])}" for k in r.keys()
+            ))
 
 
 def main():
