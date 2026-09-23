@@ -152,6 +152,12 @@ $oldShaderFingerprint = $env:OUTRUN_VR_SHADER_FINGERPRINT
 $identityKeys = @(
     'OUTRUN_VR_SESSION_ID',
     'OUTRUN_VR_VARIANT_ID',
+    'OUTRUN_VR_COMPILED_VARIANT_ID',
+    'OUTRUN_VR_SESSION_VARIANT_ID',
+    'OUTRUN_VR_PROFILE_ID',
+    'OUTRUN_VR_VALIDATION_CLASS',
+    'OUTRUN_VR_EVIDENCE_CLASS',
+    'OUTRUN_VR_USER_RUNTIME_VERIFIED',
     'OUTRUN_VR_MATRIX_ID',
     'OUTRUN_VR_BACKEND',
     'OUTRUN_VR_CONFIG_SHA256',
@@ -165,6 +171,12 @@ $sourceFile=Join-Path $root ("backends/{0}/SOURCE_SHA.txt" -f $(if($backend -eq 
 if(Test-Path $sourceFile){ $sourceSha=(Get-Content $sourceFile -Raw).Trim() }
 $env:OUTRUN_VR_SESSION_ID=[string]$state.SessionId
 $env:OUTRUN_VR_VARIANT_ID=[string]$state.VariantId
+$env:OUTRUN_VR_COMPILED_VARIANT_ID=if($state.CompiledVariantId){[string]$state.CompiledVariantId}else{'UNKNOWN_COMPILED_VARIANT'}
+$env:OUTRUN_VR_SESSION_VARIANT_ID=if($state.SessionVariantId){[string]$state.SessionVariantId}else{[string]$state.VariantId}
+$env:OUTRUN_VR_PROFILE_ID=if($state.ProfileId){[string]$state.ProfileId}else{$TestProfile}
+$env:OUTRUN_VR_VALIDATION_CLASS=if($state.ValidationClass){[string]$state.ValidationClass}else{'UNKNOWN'}
+$env:OUTRUN_VR_EVIDENCE_CLASS=if($state.EvidenceClass){[string]$state.EvidenceClass}else{'NONE'}
+$env:OUTRUN_VR_USER_RUNTIME_VERIFIED=if($state.UserRuntimeVerified){'1'}else{'0'}
 $env:OUTRUN_VR_MATRIX_ID=[string]$state.BuildMatrixId
 $env:OUTRUN_VR_BACKEND=[string]$backend
 $env:OUTRUN_VR_CONFIG_SHA256=[string]$state.ConfigSha256
