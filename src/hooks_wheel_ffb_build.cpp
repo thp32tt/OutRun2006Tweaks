@@ -14,6 +14,7 @@
 
 #include "input_manager.hpp"
 #include "hooks_wheel_input_compat_v2.hpp"
+#include "hooks_wheel_native_physics_research.hpp"
 #include "hooks_wheel_r3_menu_dpad.hpp"
 #include "hooks_wheel_r3_menu_ab.hpp"
 #include "hooks_wheel_r3_device_autoselect.hpp"
@@ -478,6 +479,10 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
     coreSurfaceRoughnessFloor = applyCoreSurfaceFloor
         ? SnowLatchedCoreRoughnessFloor : 0.0f;
     WheelFFB_UpdateAfterPhysics_Core(car);
+    // Research capture runs after the same completed player-car physics tick as
+    // FFB itself. It is read-only and remains fully dormant unless explicitly
+    // enabled, so production force ownership is unchanged.
+    WheelNativePhysicsResearch::capture_after_physics(car);
     coreSurfaceRoughnessFloorActive = false;
     coreSurfaceRoughnessFloor = 0.0f;
 
