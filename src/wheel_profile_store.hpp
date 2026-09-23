@@ -31,6 +31,7 @@ namespace Settings
     extern Setting<float> WheelFFBNativeOversteerStrength;
     extern Setting<float> WheelFFBNativeOversteerSlipThreshold;
     extern Setting<bool> WheelFFBNativeOversteerInvert;
+    extern Setting<bool> WheelFFBInvertForce;
     extern Setting<int> WheelFFBFeelRevision;
 }
 
@@ -618,6 +619,28 @@ namespace WheelProfileStore
             migrate_native(Settings::WheelFFBNativeOversteerInvert, "false");
             migrate_native(Settings::WheelFFBFeelRevision, "6");
         }
+
+        // The first v0.4 R3 test profile could store both the global output
+        // reverse and an experimental native SAT reverse. Enabling both hides
+        // the direction error by double inversion. The hardware-validated R3
+        // path uses both OFF. Apply that migration only to the known R3 device
+        // family; unknown wheels keep their deliberate direction settings.
+        const std::string deviceName =
+            lower_ascii(Settings::WheelFFBDeviceName.get());
+        const bool validatedR3 =
+            deviceName.find("r3 racing wheel") != std::string::npos ||
+            deviceName.find("moza r3") != std::string::npos;
+        const bool preR3DirectionFix =
+            values.find("feelrevision") == values.end() ||
+            int(Settings::WheelFFBFeelRevision) < 7;
+        if (validatedR3 && preR3DirectionFix)
+        {
+            migrate_native(Settings::WheelFFBInvertForce, "false");
+            migrate_native(Settings::WheelFFBNativeTireSatInvert, "false");
+            migrate_native(Settings::WheelFFBNativeOversteerInvert, "false");
+        }
+        if (preR3DirectionFix)
+            migrate_native(Settings::WheelFFBFeelRevision, "7");
 
         for (Settings::SettingBase* setting : changed)
             setting->notify();
