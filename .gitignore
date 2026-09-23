@@ -34,3 +34,6 @@ out/*
 .vs/*
 rel/*
 OutRun2006Tweaks.profiles/
+
+# Generated reverse-engineering knowledge maps
+reverse/OR2006C2C/
