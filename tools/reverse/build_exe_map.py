@@ -27,7 +27,9 @@ CREATE TABLE IF NOT EXISTS functions (
     name TEXT NOT NULL,
     namespace TEXT,
     min_address TEXT,
+    min_rva INTEGER,
     max_address TEXT,
+    max_rva INTEGER,
     body_size INTEGER,
     is_thunk INTEGER,
     is_external INTEGER,
@@ -168,11 +170,12 @@ def import_export(conn: sqlite3.Connection, export_dir: pathlib.Path) -> None:
         rva = parse_rva(row["rva"])
         conn.execute(
             """INSERT OR REPLACE INTO functions
-               (rva,rva_hex,entry,name,namespace,min_address,max_address,body_size,is_thunk,is_external,signature)
-               VALUES(?,?,?,?,?,?,?,?,?,?,?)""",
+               (rva,rva_hex,entry,name,namespace,min_address,min_rva,max_address,max_rva,body_size,is_thunk,is_external,signature)
+               VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (
                 rva, row["rva"], row["entry"], row["name"], row.get("namespace"),
-                row.get("min"), row.get("max"), row.get("bodySize"),
+                row.get("min"), parse_rva(row.get("minRva")),
+                row.get("max"), parse_rva(row.get("maxRva")), row.get("bodySize"),
                 int(bool(row.get("thunk"))), int(bool(row.get("external"))), row.get("signature"),
             ),
         )
