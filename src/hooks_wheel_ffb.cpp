@@ -745,7 +745,7 @@ namespace
                 WheelFFBMath::drift_regrip_build_scale(regripRecovery);
 
             // Per-wheel road/curb model. The old path collapsed all four
-            // material queries through max(sub_1149C0 roughness), which made a
+            // material queries through one maximum roughness scalar, which made a
             // continuously rough brick/stone road feel like a permanent curb
             // and required a stage-specific snow/ice attenuation hack.
             //
