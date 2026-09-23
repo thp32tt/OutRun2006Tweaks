@@ -51,22 +51,19 @@ def normalize_address(conn: sqlite3.Connection, value: int) -> int:
 
 
 def query_rva(conn: sqlite3.Connection, rva: int) -> dict:
-    exact_instruction = rows(
+    owning_instruction = rows(
         conn,
-        "SELECT function_rva FROM instructions WHERE rva=? AND function_rva IS NOT NULL LIMIT 1",
-        (rva,),
+        """SELECT function_rva FROM instructions
+           WHERE rva <= ?
+             AND ? < rva + CASE WHEN bytes IS NULL THEN 1 ELSE MAX(1, length(bytes) / 2) END
+             AND function_rva IS NOT NULL
+           ORDER BY rva DESC LIMIT 1""",
+        (rva, rva),
     )
-    if exact_instruction:
-        fn = rows(conn, "SELECT * FROM functions WHERE rva=?", (exact_instruction[0]["function_rva"],))
+    if owning_instruction:
+        fn = rows(conn, "SELECT * FROM functions WHERE rva=?", (owning_instruction[0]["function_rva"],))
     else:
-        fn = rows(
-            conn,
-            """SELECT * FROM functions
-               WHERE min_rva IS NOT NULL AND max_rva IS NOT NULL
-                 AND min_rva <= ? AND ? <= max_rva
-               ORDER BY (max_rva - min_rva) ASC, rva DESC LIMIT 1""",
-            (rva, rva),
-        )
+        fn = []
     exact_fn = rows(conn, "SELECT * FROM functions WHERE rva=?", (rva,))
     ins = rows(
         conn,
