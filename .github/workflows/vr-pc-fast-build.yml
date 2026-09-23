@@ -1,0 +1,81 @@
+name: VR PC Fast Test Build
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+    inputs:
+      clean:
+        description: 'Discard persistent PC build cache before compiling'
+        required: false
+        default: false
+        type: boolean
+      upload_artifact:
+        description: 'Also upload the ZIP to GitHub artifacts (slower)'
+        required: false
+        default: false
+        type: boolean
+  push:
+    branches:
+      - vr-d3d9ex-focus
+
+concurrency:
+  group: outrun-pc-fast-test
+  cancel-in-progress: false
+
+jobs:
+  fast-build:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[pc-build]') }}
+    runs-on: [self-hosted, Windows, X64, outrun-pc]
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout current VR integration branch without deleting build cache
+        uses: actions/checkout@v4
+        with:
+          ref: vr-d3d9ex-focus
+          submodules: recursive
+          fetch-depth: 1
+          clean: false
+
+      - name: Skip stale queued push
+        if: ${{ github.event_name == 'push' }}
+        shell: pwsh
+        run: |
+          $checkedOut = (git rev-parse HEAD).Trim()
+          $triggerSha = '${{ github.sha }}'
+          if ($checkedOut -ne $triggerSha) {
+            Write-Host "Queued trigger $triggerSha is stale; current vr-d3d9ex-focus is $checkedOut."
+            "OUTRUN_PC_STALE=true" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          }
+
+      - name: Fast incremental build and local package
+        if: ${{ env.OUTRUN_PC_STALE != 'true' }}
+        shell: pwsh
+        run: |
+          $cleanRequested = '${{ inputs.clean }}' -eq 'true'
+          if ($cleanRequested) {
+            ./tools/Build-OutRunPCFast.ps1 -Clean
+          } else {
+            ./tools/Build-OutRunPCFast.ps1
+          }
+
+          $zip = (Get-Content out/pc-fast/LAST_ZIP_PATH.txt -Raw).Trim()
+          $drop = (Get-Content out/pc-fast/LAST_DROP_PATH.txt -Raw).Trim()
+          "OUTRUN_PC_ZIP=$zip" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "OUTRUN_PC_DROP=$drop" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+          "### PC fast build ready" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- Source: $(git rev-parse HEAD)" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- Local test folder: $drop" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- ZIP: $zip" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- Final hosted CI: not run by this fast path" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+      - name: Optional GitHub artifact upload
+        if: ${{ env.OUTRUN_PC_STALE != 'true' && github.event_name == 'workflow_dispatch' && inputs.upload_artifact }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-PC-FAST-${{ github.sha }}
+          path: ${{ env.OUTRUN_PC_ZIP }}
+          if-no-files-found: error

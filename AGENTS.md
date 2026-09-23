@@ -162,3 +162,15 @@ When ChatGPT/Codex or a human-driven chat directly edits, commits, builds, packa
 7. A direct-chat fix is not exempt from regression revalidation, state persistence, build evidence or HMD-evidence labeling.
 
 If GitHub issue write capability is unavailable, mark the transaction `PUSH_PENDING/CAPABILITY_BLOCKED` in durable repository state; never claim the ledger was written when it was not.
+
+## Opt-in PC fast test path
+
+The repository has an interactive Windows self-hosted fast-build path in .github/workflows/vr-pc-fast-build.yml and tools/Build-OutRunPCFast.ps1.
+
+- The runner label is outrun-pc. It is expected to be started manually and remain offline outside a user-requested test/fix/retest session.
+- Never route scheduled A/N100/B/C/D work, ordinary review work, pull requests, or untrusted code to this runner.
+- Only when the user explicitly indicates that the PC runner is active for an interactive runtime test session may a direct test-fix commit to vr-d3d9ex-focus include the marker [pc-build].
+- [pc-build] is a build trigger, not a validation claim. The workflow preserves out/pc-fast incremental build state and writes a local package to Desktop\OutRunTestBuilds\LATEST.
+- PC-fast output is PC_FAST_INCREMENTAL_NOT_FINAL_CI. It never advances the protected runtime baseline and never replaces canonical hosted validation or final packaging.
+- When the interactive session ends, stop using [pc-build] immediately so the user's PC remains uninvolved.
+
