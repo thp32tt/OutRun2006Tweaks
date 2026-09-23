@@ -11,7 +11,7 @@ on:
 
 concurrency:
   group: outrun-pc-r51-exact
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   exact-clean-build:
