@@ -35,6 +35,43 @@ def show_address(con, raw, context):
     print(f"ADDRESS RVA={hx(rva)} VA={hx(rva+image_base(con))}")
     if f:
         print(f"FUNCTION {hx(f['entry_rva'])} {f['namespace']}::{f['name']} size={f['size']}")
+        entry = f["entry_rva"]
+        callers = con.execute(
+            """SELECT c.caller_rva, fn.name, count(*) AS n
+               FROM calls c LEFT JOIN functions fn ON fn.entry_rva=c.caller_rva
+               WHERE c.callee_function_rva=?
+               GROUP BY c.caller_rva, fn.name ORDER BY n DESC, c.caller_rva LIMIT 40""",
+            (entry,),
+        ).fetchall()
+        callees = con.execute(
+            """SELECT c.callee_function_rva, c.callee_rva, fn.name, count(*) AS n
+               FROM calls c LEFT JOIN functions fn ON fn.entry_rva=c.callee_function_rva
+               WHERE c.caller_rva=?
+               GROUP BY c.callee_function_rva, c.callee_rva, fn.name
+               ORDER BY n DESC LIMIT 60""",
+            (entry,),
+        ).fetchall()
+        string_refs = con.execute(
+            """SELECT s.rva, s.value, count(*) AS n
+               FROM xrefs x JOIN strings s ON s.rva=x.to_rva
+               WHERE x.from_function_rva=?
+               GROUP BY s.rva, s.value ORDER BY n DESC, s.rva LIMIT 40""",
+            (entry,),
+        ).fetchall()
+        if callers:
+            print("CALLERS")
+            for x in callers:
+                print(f"  {hx(x['caller_rva'])} {x['name'] or '<unknown>'} refs={x['n']}")
+        if callees:
+            print("CALLEES")
+            for x in callees:
+                target = x["callee_function_rva"] if x["callee_function_rva"] is not None else x["callee_rva"]
+                print(f"  {hx(target)} {x['name'] or '<unknown/external>'} calls={x['n']}")
+        if string_refs:
+            print("STRING_REFS")
+            for x in string_refs:
+                value = str(x["value"]).replace("\\n", "\\\\n")
+                print(f"  {hx(x['rva'])} refs={x['n']} {value[:180]}")
     sem = con.execute("SELECT * FROM semantics WHERE rva BETWEEN ? AND ? ORDER BY rva", (max(0,rva-context*16), rva+context*16)).fetchall()
     for s in sem:
         print(f"SEMANTIC {s['id']} {hx(s['rva'])} [{s['tags']}] confidence={s['confidence']} :: {s['notes']}")
