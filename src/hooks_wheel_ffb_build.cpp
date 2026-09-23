@@ -60,7 +60,7 @@ namespace Settings
     Setting<int> WheelFFBFeelRevision{
         "WheelFFB", "FeelRevision", 0,
         "Internal one-shot migration version for wheel FFB feel defaults.",
-        Range<int>{ 0, 6 }
+        Range<int>{ 0, 7 }
     };
 }
 
@@ -297,7 +297,7 @@ namespace
         Settings::WheelFFBUseHardwareSpring = true;
         Settings::WheelFFBUseHardwareDamper = true;
         Settings::WheelFFBUsePeriodicEffects = false;
-        Settings::WheelFFBInvertForce = true;
+        Settings::WheelFFBInvertForce = false;
         Settings::WheelFFBInvertSpring = false;
         Settings::WheelFFBDebugLog = true;
         Settings::VibrationMode = 0;
@@ -338,7 +338,7 @@ namespace
         Settings::WheelFFBUseHardwareSpring = true;
         Settings::WheelFFBUseHardwareDamper = true;
         Settings::WheelFFBUsePeriodicEffects = false;
-        Settings::WheelFFBInvertForce = true;
+        Settings::WheelFFBInvertForce = false;
         Settings::WheelFFBInvertSpring = false;
         Settings::WheelFFBDebugLog = true;
         Settings::VibrationMode = 0;
@@ -699,6 +699,30 @@ namespace
                 changed = true;
             }
 
+            if (revision < 7)
+            {
+                // Live R3 testing confirmed that the corrected internal Physics
+                // SAT and rear-cue signs need no output inversion. Earlier R3
+                // candidates often had both the global and native SAT Reverse
+                // switches enabled, which double-inverted into an apparently
+                // correct result. Normalize only the validated R3 device family;
+                // preserve inversion choices for unknown wheel hardware.
+                const std::string device =
+                    lower_copy(Settings::WheelFFBDeviceName.get().c_str());
+                const bool validatedR3 =
+                    device.find("r3 racing wheel") != std::string::npos ||
+                    device.find("moza r3") != std::string::npos;
+                if (validatedR3)
+                {
+                    Settings::WheelFFBInvertForce = false;
+                    Settings::WheelFFBNativeTireSatInvert = false;
+                    Settings::WheelFFBNativeOversteerInvert = false;
+                }
+                Settings::WheelFFBFeelRevision = 7;
+                revision = 7;
+                changed = true;
+            }
+
             if (!changed)
                 return true;
 
@@ -710,6 +734,11 @@ namespace
                 spdlog::warn(
                     "WheelFFBFeelRetune: applied revision {} for this session but could not persist user.ini",
                     revision);
+            }
+            else if (revision >= 7)
+            {
+                spdlog::info(
+                    "WheelFFBFeelRetune: applied revision 7 (R3 validated with global/native SAT reverse OFF; drift re-grip stabilization enabled in runtime)");
             }
             else if (revision >= 6)
             {
@@ -840,7 +869,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_physics_preset();
-                    Settings::WheelFFBFeelRevision = 6;
+                    Settings::WheelFFBFeelRevision = 7;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
@@ -856,7 +885,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_natural_preset();
-                    Settings::WheelFFBFeelRevision = 6;
+                    Settings::WheelFFBFeelRevision = 7;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
