@@ -63,6 +63,10 @@ public class ExportOutRunMap extends GhidraScript {
         return hex(a.getOffset() - imageBase);
     }
 
+    private String addressSpace(Address a) {
+        return a == null ? null : a.getAddressSpace().getName();
+    }
+
     private String json(Map<String, Object> m) {
         StringBuilder b = new StringBuilder();
         b.append('{');
@@ -192,9 +196,11 @@ public class ExportOutRunMap extends GhidraScript {
                     RefType rt = ref.getReferenceType();
                     Map<String, Object> xm = new LinkedHashMap<>();
                     xm.put("from_rva", rva(a));
+                    xm.put("from_space", addressSpace(a));
                     xm.put("from_function_rva", functionEntry(a));
                     xm.put("to_va", addr(to));
                     xm.put("to_rva", rva(to));
+                    xm.put("to_space", addressSpace(to));
                     xm.put("to_function_rva", to != null && to.isMemoryAddress() ? functionEntry(to) : null);
                     xm.put("type", rt == null ? "" : rt.getName());
                     xm.put("primary", ref.isPrimary());
@@ -206,6 +212,7 @@ public class ExportOutRunMap extends GhidraScript {
                         cm.put("caller_rva", functionEntry(a));
                         cm.put("callee_va", addr(to));
                         cm.put("callee_rva", rva(to));
+                        cm.put("callee_space", addressSpace(to));
                         cm.put("callee_function_rva", to != null && to.isMemoryAddress() ? functionEntry(to) : null);
                         cm.put("type", rt.getName());
                         cw.write(json(cm)); cw.newLine();
