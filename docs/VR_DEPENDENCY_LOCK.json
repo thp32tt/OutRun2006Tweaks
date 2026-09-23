@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "generatedFor": "OutRun2006Tweaks reproducible build inputs",
+  "dependencies": [
+    {
+      "name": "ogg",
+      "repository": "https://github.com/xiph/ogg",
+      "release": "v1.3.6",
+      "commit": "be05b13e98b048f0b5a0f5fa8ce514d56db5f822"
+    },
+    {
+      "name": "flac",
+      "repository": "https://github.com/xiph/flac",
+      "release": "1.5.0",
+      "commit": "1507800de4b70e21be71f38caa0d9079d0bc6e45"
+    },
+    {
+      "name": "miniupnpc",
+      "repository": "https://github.com/miniupnp/miniupnp",
+      "release": "miniupnpd_2_3_10",
+      "commit": "b5e5d2eb069822b7f00d56c8e61033b9d500e60c"
+    },
+    {
+      "name": "jsoncpp",
+      "repository": "https://github.com/open-source-parsers/jsoncpp.git",
+      "release": "1.9.8",
+      "commit": "8519b8381f3c741ad1421f88237b1deda0b11412"
+    },
+    {
+      "name": "zlib",
+      "repository": "https://github.com/madler/zlib",
+      "release": "v1.3.2",
+      "commit": "da607da739fa6047df13e66a2af6b8bec7c2a498"
+    },
+    {
+      "name": "sdl",
+      "repository": "https://github.com/libsdl-org/SDL",
+      "release": "release-3.4.12",
+      "commit": "f87239e71e42da91ca317a12eefb82cfbf3393eb"
+    },
+    {
+      "name": "safetyhook",
+      "repository": "https://github.com/cursey/safetyhook",
+      "release": "pinned",
+      "commit": "f44cc070a8340f2f26649553c49533475417304d"
+    },
+    {
+      "name": "openxr-sdk",
+      "repository": "https://github.com/KhronosGroup/OpenXR-SDK.git",
+      "release": "release-1.1.63",
+      "commit": "f2448a8797c85814aa892efc1ab8707900fbcc78"
+    }
+  ],
+  "generators": [
+    {
+      "name": "cmkr",
+      "repository": "https://github.com/build-cpp/cmkr",
+      "release": "v0.2.34",
+      "commit": "b0a1d79a42ad938af9e399ac0498a157ac188b57"
+    }
+  ]
+}
