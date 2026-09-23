@@ -7,6 +7,7 @@ $ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $repoRoot
+. (Join-Path $PSScriptRoot 'OutRunVR-TestProfiles.ps1')
 
 function Invoke-Checked {
     param(
@@ -133,6 +134,7 @@ foreach ($file in $runtimeFiles) {
     Copy-Item $src (Join-Path $packageDir $file)
 }
 Copy-Item 'docs/VR_TEST_STRATEGY.md' (Join-Path $packageDir 'VR_TEST_STRATEGY.md')
+Copy-Item 'docs/VR_DEPENDENCY_LOCK.json' (Join-Path $packageDir 'VR_DEPENDENCY_LOCK.json')
 
 @(
     'OUTRUN VR TEST / LOG UPLOAD'
@@ -151,15 +153,20 @@ $matrixId = "PC-FAST-$stamp-$shortSha"
 Set-Content (Join-Path $packageDir 'BUILD_MATRIX_ID.txt') $matrixId -Encoding ascii
 Set-Content (Join-Path $packageDir 'PC_FAST_BUILD.txt') 'PC_FAST_INCREMENTAL_NOT_FINAL_CI' -Encoding ascii
 
+$dependencyLockSha = (Get-FileHash 'docs/VR_DEPENDENCY_LOCK.json' -Algorithm SHA256).Hash.ToLowerInvariant()
+$generatedCMakeSha = (Get-FileHash 'CMakeLists.txt' -Algorithm SHA256).Hash.ToLowerInvariant()
 $buildInputs = [ordered]@{
-    SchemaVersion = 1
+    SchemaVersion = 2
     BuildMatrixId = $matrixId
     IntegrationSha = $sourceSha
     VariantId = 'ACTIVE_FULL_R34'
     DefaultTestProfile = 'CORRECTNESS'
-    Profiles = @('CONTROL', 'CORRECTNESS', 'PERFORMANCE')
+    Profiles = @(Get-OutRunVRTestProfileNames)
     UserRuntimeVerified = $false
     ValidationClass = 'PC_FAST_INCREMENTAL_NOT_FINAL_CI'
+    DependencyLockFile = 'VR_DEPENDENCY_LOCK.json'
+    DependencyLockSha256 = $dependencyLockSha
+    GeneratedCMakeListsSha256 = $generatedCMakeSha
 }
 $buildInputs | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $packageDir 'BUILD_INPUTS.json') -Encoding UTF8
 
