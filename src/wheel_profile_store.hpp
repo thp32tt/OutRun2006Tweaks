@@ -23,6 +23,9 @@ namespace Settings
     extern Setting<float> WheelFFBXForceMix;
     extern Setting<bool> WheelFFBXForceInvert;
     extern Setting<float> WheelFFBXForceGain;
+    extern Setting<bool> WheelFFBNativeTireSat;
+    extern Setting<float> WheelFFBNativeTireSatGain;
+    extern Setting<bool> WheelFFBNativeTireSatInvert;
 }
 
 // Named wheel/input and force-feedback profiles live beside the DLL instead of
@@ -560,6 +563,23 @@ namespace WheelProfileStore
             Settings::WheelFFBXForceGain.set_from_string("1.00");
             if (Settings::WheelFFBXForceGain.to_string() != oldValue)
                 changed.push_back(&Settings::WheelFFBXForceGain);
+        }
+
+        // Native tyre-force SAT did not exist in earlier profiles and is a
+        // research-only mode. Loading an old profile must never inherit a live
+        // experimental native state from the current session.
+        if (values.find("nativetiresat") == values.end())
+        {
+            const auto migrate_native = [&](Settings::SettingBase& setting, const char* value)
+            {
+                const std::string oldValue = setting.to_string();
+                setting.set_from_string(value);
+                if (setting.to_string() != oldValue)
+                    changed.push_back(&setting);
+            };
+            migrate_native(Settings::WheelFFBNativeTireSat, "false");
+            migrate_native(Settings::WheelFFBNativeTireSatGain, "1.00");
+            migrate_native(Settings::WheelFFBNativeTireSatInvert, "false");
         }
 
         for (Settings::SettingBase* setting : changed)
