@@ -16,6 +16,7 @@ namespace Settings
 	extern Setting<float> VRDriverSeatUp;
 	extern Setting<bool> VRDriverSeatFullCar;
 	extern Setting<float> VRDriverSeatCarScale;
+	extern Setting<bool> VRDriverSeatPassenger;
 }
 
 namespace OutRunVR::DriverSeatView2
@@ -27,6 +28,7 @@ namespace OutRunVR::DriverSeatView2
 	constexpr int NativeMode = 1;
 	constexpr int CarRenderStateHookRva = 0x69764;
 	constexpr int CarRenderMatrixHookRva = 0x69891;
+	constexpr int RobotDisplayRva = 0x114C10;
 
 	struct CameraBackup
 	{
@@ -41,6 +43,9 @@ namespace OutRunVR::DriverSeatView2
 		inline SafetyHookMid CarRenderMatrixHook{};
 		inline bool StateLogged = false;
 		inline bool ScaleLogged = false;
+		inline bool PassengerLogged = false;
+		inline bool PassengerMissingLogged = false;
+		inline thread_local bool PassengerDrawInProgress = false;
 
 		inline bool Gameplay()
 		{
@@ -96,6 +101,45 @@ namespace OutRunVR::DriverSeatView2
 			}
 		}
 
+		inline void DrawPassengerOnly(EVWORK_CAR* car)
+		{
+			if (!Settings::VRDriverSeatPassenger || PassengerDrawInProgress || !car)
+				return;
+
+			auto* event = Game::event(EVENT_ROB02);
+			auto* passenger = event ? event->data<EvWorkRobot>() : nullptr;
+			if (!passenger)
+			{
+				if (!PassengerMissingLogged)
+				{
+					PassengerMissingLogged = true;
+					spdlog::warn("VR DRIVER VIEW2: EVENT_ROB02 passenger data unavailable; skipping passenger draw");
+				}
+				return;
+			}
+
+			// Canonical game helper: rebuild the passenger base matrix from the
+			// current player-car transform using the original passenger slot (1).
+			// This keeps the game's authored seat placement and current animation.
+			Game::CalcCharMatrix(car, passenger, 1);
+
+			using RobotDisplayFn = void(__cdecl*)(EvWorkRobot*);
+			auto robotDisplay = reinterpret_cast<RobotDisplayFn>(
+				Module::exe_ptr(RobotDisplayRva));
+
+			PassengerDrawInProgress = true;
+			robotDisplay(passenger);
+			PassengerDrawInProgress = false;
+
+			if (!PassengerLogged)
+			{
+				PassengerLogged = true;
+				spdlog::info(
+					"VR DRIVER VIEW2: ROB02 passenger-only draw active workId={} chrset={}; ROB01 driver remains untouched/not forced",
+					passenger->workId_0, static_cast<int>(passenger->chrset_8));
+			}
+		}
+
 		inline void CarRenderMatrixDest(safetyhook::Context& ctx)
 		{
 			EvWorkCamera* camera = Game::camera();
@@ -109,24 +153,29 @@ namespace OutRunVR::DriverSeatView2
 				return;
 
 			const float s = Settings::VRDriverSeatCarScale.get();
-			if (!std::isfinite(s) || std::fabs(s - 1.0f) < 0.0001f)
-				return;
-
-			// At canonical VA 0x469891, DispCarModel_Common has just copied the
-			// state-1 body matrix to ESP+0x70. Uniformly scale only its 3x3 basis;
-			// translation and the persistent EVWORK_CAR matrices remain untouched.
-			auto* m = reinterpret_cast<D3DMATRIX*>(ctx.esp + 0x70);
-			m->_11 *= s; m->_12 *= s; m->_13 *= s;
-			m->_21 *= s; m->_22 *= s; m->_23 *= s;
-			m->_31 *= s; m->_32 *= s; m->_33 *= s;
-
-			if (!ScaleLogged)
+			if (std::isfinite(s) && std::fabs(s - 1.0f) >= 0.0001f)
 			{
-				ScaleLogged = true;
-				spdlog::info(
-					"VR DRIVER VIEW2: player-car visual scale {:.3f} applied only to DispCarModel_Common body matrix",
-					s);
+				// At canonical VA 0x469891, DispCarModel_Common has just copied the
+				// state-1 body matrix to ESP+0x70. Uniformly scale only its 3x3 basis;
+				// translation and the persistent EVWORK_CAR matrices remain untouched.
+				auto* m = reinterpret_cast<D3DMATRIX*>(ctx.esp + 0x70);
+				m->_11 *= s; m->_12 *= s; m->_13 *= s;
+				m->_21 *= s; m->_22 *= s; m->_23 *= s;
+				m->_31 *= s; m->_32 *= s; m->_33 *= s;
+
+				if (!ScaleLogged)
+				{
+					ScaleLogged = true;
+					spdlog::info(
+						"VR DRIVER VIEW2: player-car visual scale {:.3f} applied only to DispCarModel_Common body matrix",
+						s);
+				}
 			}
+
+			// Native view 2 does not enqueue ROB characters at all. Recreate only
+			// the passenger matrix and draw ROB02 once from the same player-car
+			// display path; never force ROB01.
+			DrawPassengerOnly(car);
 		}
 	}
 
