@@ -1,0 +1,28 @@
+name: EXE Map Tools
+
+on:
+  pull_request:
+    paths:
+      - "tools/reverse/**"
+      - ".github/workflows/exe-map-tools.yml"
+  push:
+    branches:
+      - vr-d3d9ex-focus
+    paths:
+      - "tools/reverse/**"
+      - ".github/workflows/exe-map-tools.yml"
+  workflow_dispatch:
+
+jobs:
+  python-tools:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Syntax check
+        run: python -m py_compile tools/reverse/build_exe_map.py tools/reverse/exequery.py tools/reverse/test_exe_map.py
+      - name: Synthetic knowledge-map self-test
+        run: python tools/reverse/test_exe_map.py
