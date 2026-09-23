@@ -1,0 +1,1 @@
+Issue #6 EXE-map R3 validation trigger. Based on candidate de03a1d97f514438492db88b12676ee06685b14c.
