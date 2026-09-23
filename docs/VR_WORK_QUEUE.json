@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-24T01:50:00+09:00",
+  "updatedKst": "2026-09-24T02:19:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -41,7 +41,7 @@
     {
       "id": "VR-R51-RANK-ANCHOR-PROPAGATION-001",
       "priority": 13,
-      "status": "READY_ANALYSIS_ONLY",
+      "status": "READY",
       "preferredRole": "B_RENDER_REVIEW",
       "summary": "Reconstruct rival rank-marker anchor propagation from Calc3D2D/vehicle source through sprani/put_clip SpriteNode and per-eye WORLD_BILLBOARD projection; current exact-callsite tags still leave markers head-locked/detached.",
       "testLevel": "LEVEL0",
@@ -58,7 +58,7 @@
     {
       "id": "VR-R51-HUD-SEMANTIC-LIFETIME-001",
       "priority": 13,
-      "status": "READY_ANALYSIS_ONLY",
+      "status": "READY",
       "preferredRole": "B_RENDER_REVIEW",
       "summary": "Explain why exact producer tags yield semanticHudAccepted>0 while renderer semanticOverlayBypass stays 0; trace producer/node/queue/c64/draw ordering and design exact lifetime propagation.",
       "testLevel": "LEVEL0",
@@ -87,7 +87,7 @@
     {
       "id": "L1-VIS-001",
       "priority": 12,
-      "status": "REOPENED_AFTER_HMD_FAILURE",
+      "status": "READY",
       "preferredRole": "B_RENDER_REVIEW",
       "summary": "World/HUD/effect stereo correctness: white rank-score, 6th/6, menu and YES/NO. Produce exact evidence before behavior change.",
       "testLevel": "LEVEL1",
