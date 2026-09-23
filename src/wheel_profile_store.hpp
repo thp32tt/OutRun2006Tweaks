@@ -30,6 +30,7 @@ namespace Settings
     extern Setting<float> WheelFFBNativeOversteerStrength;
     extern Setting<float> WheelFFBNativeOversteerSlipThreshold;
     extern Setting<bool> WheelFFBNativeOversteerInvert;
+    extern Setting<int> WheelFFBFeelRevision;
 }
 
 // Named wheel/input and force-feedback profiles live beside the DLL instead of
@@ -593,11 +594,29 @@ namespace WheelProfileStore
         if (values.find("nativeoversteercue") == values.end())
             migrate_native(Settings::WheelFFBNativeOversteerCue, "false");
         if (values.find("nativeoversteerstrength") == values.end())
-            migrate_native(Settings::WheelFFBNativeOversteerStrength, "0.18");
+            migrate_native(Settings::WheelFFBNativeOversteerStrength, "0.10");
         if (values.find("nativeoversteerslipthreshold") == values.end())
             migrate_native(Settings::WheelFFBNativeOversteerSlipThreshold, "0.12");
         if (values.find("nativeoversteerinvert") == values.end())
             migrate_native(Settings::WheelFFBNativeOversteerInvert, "false");
+
+        // Profiles from the first v0.4 candidate used the opposite rear-cue
+        // sign. The corrected runtime preserves the hardware-validated direction
+        // with Reverse OFF. Migrate those profiles once, and soften only the
+        // original 0.18 default rather than overwriting deliberate custom gain.
+        const bool preRearCueDirectionFix =
+            values.find("feelrevision") == values.end() ||
+            int(Settings::WheelFFBFeelRevision) < 6;
+        if (preRearCueDirectionFix)
+        {
+            const float rearStrength =
+                static_cast<float>(Settings::WheelFFBNativeOversteerStrength);
+            if (std::isfinite(rearStrength) &&
+                std::abs(rearStrength - 0.18f) <= 0.0005f)
+                migrate_native(Settings::WheelFFBNativeOversteerStrength, "0.10");
+            migrate_native(Settings::WheelFFBNativeOversteerInvert, "false");
+            migrate_native(Settings::WheelFFBFeelRevision, "6");
+        }
 
         for (Settings::SettingBase* setting : changed)
             setting->notify();
