@@ -72,7 +72,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf "$RUNNER_TEMP/OR2006C2C-map/.ghidra-project"
+          rm -rf "$RUNNER_TEMP/OR2006C2C-map/ghidra-project"
           tar -C "$RUNNER_TEMP" -czf "$RUNNER_TEMP/OR2006C2C-exe-map.tar.gz" OR2006C2C-map
           sha256sum "$RUNNER_TEMP/OR2006C2C-exe-map.tar.gz" > "$RUNNER_TEMP/OR2006C2C-exe-map.tar.gz.sha256"
 
