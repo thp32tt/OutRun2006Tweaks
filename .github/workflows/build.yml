@@ -185,6 +185,8 @@ jobs:
             src/wheel_ffb_runtime.hpp
             tools/test_wheel_ffb_current.cpp
             tools/verify_wheel_ffb_math.py
+            tools/analyze_native_physics_capture.py
+            docs/FFB_NATIVE_PHYSICS_MAP.md
             src/hooks_forcefeedback.cpp
             src/hooks_framerate.cpp
             src/hooks_wheel_input_compat_v2.hpp
