@@ -62,12 +62,8 @@ jobs:
         if: ${{ env.OUTRUN_PC_STALE != 'true' }}
         shell: powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
-          $cleanRequested = '${{ inputs.clean }}' -eq 'true'
-          if ($cleanRequested) {
-            ./tools/Build-OutRunPCFast.ps1 -Clean
-          } else {
-            ./tools/Build-OutRunPCFast.ps1
-          }
+          # R51 reproducibility check: always discard the persistent PC cache.
+          ./tools/Build-OutRunPCFast.ps1 -Clean
 
           $zip = (Get-Content out/pc-fast/LAST_ZIP_PATH.txt -Raw).Trim()
           $drop = (Get-Content out/pc-fast/LAST_DROP_PATH.txt -Raw).Trim()
