@@ -33,6 +33,11 @@ runtime = read('src/wheel_ffb_runtime.hpp')
 build = read('src/hooks_wheel_ffb_build.cpp')
 ini = read('OutRun2006Tweaks.ini')
 workflow = read('.github/workflows/build.yml')
+native_analyzer = read('tools/analyze_native_physics_capture.py')
+native_map_doc = read('docs/FFB_NATIVE_PHYSICS_MAP.md')
+
+compile(native_analyzer, 'tools/analyze_native_physics_capture.py', 'exec')
+print('OK [native physics analyzer syntax]')
 
 if (ROOT / 'src/hooks_wheel_physics_sat.hpp').exists():
     raise SystemExit('CURRENT VERIFY FAILED [obsolete Physics SAT helper still active]')
@@ -60,7 +65,8 @@ for rel in (
     'src/hooks_wheel_native_physics_research.hpp',
     'src/overlay/settings_ui.cpp', 'src/overlay/overlay.cpp',
     'CMakeLists.txt', 'cmake.toml', 'README.md', 'WHEEL_FFB.md',
-    'RELEASE_NOTES_v0.1.md', '.github/workflows/build.yml',
+    'RELEASE_NOTES_v0.1.md', 'tools/analyze_native_physics_capture.py',
+    'docs/FFB_NATIVE_PHYSICS_MAP.md', '.github/workflows/build.yml',
 ):
     req(workflow, rel, f'source snapshot includes verifier dependency {rel}')
 req(input_cpp, 'float InputManager_SteeringValue()', 'InputManager steering bridge exported')
@@ -110,6 +116,12 @@ req(native_physics, 'float tireForceB8', 'native wheel capture includes transfor
 req(native_physics, 'frontNormalDiff', 'native capture records front-axle load differential')
 req(native_physics, 'heading2E', 'native capture records executable-derived heading candidate')
 req(native_physics, 'angularD34', 'native capture records D34 angular candidate without asserting semantics')
+req(native_analyzer, 'ANGLE_UNIT_RAD = 2.0 * math.pi / 65536.0', 'capture analyzer uses the executable 16-bit angular scale')
+req(native_analyzer, 'corr(front slip, AC sum)', 'capture analyzer cross-checks native slip against lateral-force candidate')
+req(native_analyzer, 'moving rows with zero front capacity', 'capture analyzer reports invalid/airborne front-capacity cases')
+req(native_map_doc, 'actionforce_DBC', 'native physics map documents invalidated DBC hypothesis')
+req(native_map_doc, '0x001019C0', 'native physics map records lateral tyre-force writer')
+req(native_map_doc, '0x001026F0', 'native physics map records combined-slip limiter')
 req(ffb, 'structural = (softwareSpring + selfAligningTorque) * loadMod + damper;', 'Modern/fallback arithmetic path remains exactly v0.2')
 req(ffb, 'softwareSpring * loadMod +', 'native steering can avoid synthetic longitudinal load modulation')
 req(ffb, 'WheelFFB XFORCE t={}', 'X-Force candidate is observable in opt-in telemetry')
