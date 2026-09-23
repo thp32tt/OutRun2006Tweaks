@@ -7,6 +7,7 @@
 #define NOMINMAX
 #endif
 #include <Windows.h>
+#include <string>
 
 #include "game.hpp"
 
