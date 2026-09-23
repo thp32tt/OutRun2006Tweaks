@@ -16,9 +16,6 @@ on:
         required: false
         default: false
         type: boolean
-  push:
-    branches:
-      - vr-r51-recovery-pc-20260923
 
 concurrency:
   group: outrun-pc-fast-test
