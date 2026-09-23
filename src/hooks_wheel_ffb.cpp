@@ -185,9 +185,9 @@ namespace Settings
     };
 
     Setting<float> WheelFFBNativeOversteerStrength{
-        "WheelFFB", "NativeOversteerStrength", 0.18f,
-        "Maximum additive rear-slip counter-steer cue before the existing global output cap/slew path.",
-        Range<float>{ 0.0f, 0.35f }
+        "WheelFFB", "NativeOversteerStrength", 0.10f,
+        "Maximum additive rear-slip counter-steer cue before base-SAT headroom taper and the existing global output cap/slew path.",
+        Range<float>{ 0.0f, 0.25f }
     };
 
     Setting<float> WheelFFBNativeOversteerSlipThreshold{
@@ -1148,22 +1148,25 @@ namespace
                 const float configuredCueStrength =
                     static_cast<float>(Settings::WheelFFBNativeOversteerStrength);
                 const float cueStrength = std::isfinite(configuredCueStrength)
-                    ? std::clamp(configuredCueStrength, 0.0f, 0.35f)
-                    : 0.18f;
+                    ? std::clamp(configuredCueStrength, 0.0f, 0.25f)
+                    : 0.10f;
 
-                // Rear slip sign supplies the catch direction. This remains a
-                // separately invertible research channel until MOZA R3 hardware
-                // capture confirms the canonical EXE's sign convention.
-                float rearCueDirection =
-                    nativeRear.slipRad > 0.0f ? -1.0f :
-                    (nativeRear.slipRad < 0.0f ? 1.0f : 0.0f);
-                if (Settings::WheelFFBNativeOversteerInvert)
-                    rearCueDirection = -rearCueDirection;
+                // Hardware testing on the R3 established the canonical EE sign:
+                // preserving rear slip sign produces the correct counter-steer
+                // direction. The optional invert remains for device/user fallback.
+                const float rearCueDirection =
+                    WheelFFBMath::native_oversteer_direction(
+                        nativeRear.slipRad,
+                        bool(Settings::WheelFFBNativeOversteerInvert));
+                const float cueHeadroom =
+                    WheelFFBMath::native_oversteer_headroom(
+                        baseModernSelfAligningTorque);
 
                 nativeOversteerCueTorque =
                     rearCueDirection *
                     rearOversteerBand *
                     cueStrength *
+                    cueHeadroom *
                     satSpeed *
                     satStrength *
                     nativeOversteerProtectionBlend_;
@@ -1524,11 +1527,13 @@ namespace
                     xForceAnalysis.p95Abs, xForceAnalysis.p99Abs,
                     xForceAnalysis.maxAbs, smoothedXForceGain_);
                 spdlog::info(
-                    "WheelFFB NATIVE_OVERSTEER t={} requested={} frontValid={} rearValid={} rearSlipRad={} rearSlipNorm={} rearBand={} rearAC={} rearCapacity={} protectionClear={} protectionBlend={} cueTorque={} strength={} peakRef={} invert={}",
+                    "WheelFFB NATIVE_OVERSTEER t={} requested={} frontValid={} rearValid={} rearSlipRad={} rearSlipNorm={} rearBand={} rearAC={} rearCapacity={} protectionClear={} protectionBlend={} baseSat={} cueHeadroom={} cueTorque={} strength={} peakRef={} invert={}",
                     telemetryNow, nativeOversteerRequested, nativeFront.valid, nativeRear.valid,
                     nativeRear.slipRad, rearSlipNormalized, rearOversteerBand,
                     nativeRear.lateralSum, nativeRear.capacitySum,
                     oversteerProtectionClear, nativeOversteerProtectionBlend_,
+                    baseModernSelfAligningTorque,
+                    WheelFFBMath::native_oversteer_headroom(baseModernSelfAligningTorque),
                     nativeOversteerCueTorque,
                     static_cast<float>(Settings::WheelFFBNativeOversteerStrength),
                     rearSlipThreshold, bool(Settings::WheelFFBNativeOversteerInvert));
