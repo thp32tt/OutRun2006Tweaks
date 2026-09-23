@@ -69,6 +69,7 @@ jobs:
       - name: Configure exact R51 Win32 game
         shell: powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
           cmake -S . -B out/pc-r51-exact/game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
           if ($LASTEXITCODE -ne 0) { throw "game configure failed" }
 
