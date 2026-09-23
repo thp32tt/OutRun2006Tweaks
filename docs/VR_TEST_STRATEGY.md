@@ -104,3 +104,23 @@ Every frozen CORRECTNESS package must retain a short regression baseline before 
 4. Upload the standardized log ZIP; D correlates it against the stored known-good/known-bad/fix/verifier history.
 
 This baseline remains even after the original bug is fixed so later renderer, transport, reset, fallback or configuration changes cannot silently erase the regression knowledge.
+
+## PC fast build policy — R51 lineage
+
+The self-hosted PC path is incremental-first. Routine HUD, camera/view, FFB and bounded performance edits reuse the persistent build directory.
+
+Canonical R51 game-build contract:
+
+- `OUTRUN_VR_SAFE_DRAW_COMPARE=OFF`
+- `OUTRUN_VR_R26_HUD_COMPARE=ON`
+- `OUTRUN_VR_C1_COMPARE=OFF`
+- `OUTRUN_VR_C2_COMPARE=OFF`
+
+`tools/Build-OutRunPCFast.ps1` owns this flag set as one source of truth. It verifies the generated `CMakeCache.txt` immediately after configure, again after compilation, and before packaging. A mismatch is a hard failure; no test ZIP may be emitted from a non-canonical R51 renderer configuration.
+
+A full `-Clean` build is exceptional, not routine. Use it only after build-system/CMake changes, dependency/toolchain changes, a major branch/build-contract transition, or an unexplained runtime mismatch that makes incremental-artifact contamination plausible.
+
+Every PC-fast package records `BuildMode`, `BuildContract` and canonical `CMakeFlags` in `BUILD_INPUTS.json`, and writes `backends/d3d9/CMAKE_FLAGS.txt` plus `BUILD_CONTRACT.txt`. Review these identities before interpreting HMD results.
+
+Historical reason: the earlier broken R51 PC-fast rebuild used `OUTRUN_VR_R26_HUD_COMPARE=OFF`; the verified R51 contract and the later working driver-seat PC-fast path use `ON`. Therefore build-configuration drift, not incremental caching itself, is the primary known cause of that visual mismatch.
+
