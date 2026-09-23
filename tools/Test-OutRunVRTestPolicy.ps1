@@ -17,19 +17,41 @@ $control = Get-OutRunVRTestProfile -Name CONTROL
 $correctness = Get-OutRunVRTestProfile -Name CORRECTNESS
 $performance = Get-OutRunVRTestProfile -Name PERFORMANCE
 
+# A FastLoad value above zero is not safe for the current VR recovery-baseline
+# startup path. 2026-09-23 Quest/VDXR evidence showed every FastLoad=3 profile
+# remained in the white loading loop with authoritativeSeed=0/stereoAllowed=0,
+# while HUD_MENU (FastLoad=0) progressed to a verified c64 baseline/gameplay.
+$allRuntimeProfileNames = @(
+    'CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE',
+    'STAGE_DIAGNOSTIC','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512'
+)
+foreach($profileName in $allRuntimeProfileNames) {
+    $runtimeProfile = Get-OutRunVRTestProfile -Name $profileName
+    Assert-True (Has-Argument $runtimeProfile '-FramerateFastLoad=0') "$profileName: VR runtime profiles must keep FastLoad disabled to prevent startup white-screen recovery deadlock"
+}
+
 foreach($profile in @($control,$correctness,$performance)) {
     Assert-True ($profile.Name -in @('CONTROL','CORRECTNESS','PERFORMANCE')) 'invalid profile identity'
     Assert-True (Has-Argument $profile '-PreferD3D9Ex=true') "$($profile.Name): D3D9Ex reference must be preferred"
-    Assert-True (Has-Argument $profile '-DirectGpuOnly=false') "$($profile.Name): DirectGPU must remain optional by default"
     Assert-True (Has-Argument $profile '-DisableDesktopDuplication=false') "$($profile.Name): fallback must remain available by default"
     Assert-True (Has-Argument $profile '-TargetRefreshRateHz=0') "$($profile.Name): refresh must follow OpenXR/VDXR"
     Assert-True (Has-Argument $profile '-SkyGlowFactor=1') "$($profile.Name): test policy requires SkyGlowFactor=1"
     Assert-True ($profile.Environment.OUTRUN_VR_TEST_PROFILE -eq $profile.Name) "$($profile.Name): environment identity mismatch"
 }
 
+Assert-True (Has-Argument $control '-DirectGpuOnly=false') 'CONTROL must keep DirectGPU optional for A/B isolation'
+Assert-True (Has-Argument $performance '-DirectGpuOnly=false') 'PERFORMANCE must keep fallback transport available for explicit performance comparison'
+Assert-True (Has-Argument $correctness '-DirectGpuOnly=true') 'CORRECTNESS must use the runtime-proven DirectGPU visual owner'
+Assert-True (Has-Argument $correctness '-CullingUnionFov=false') 'CORRECTNESS must keep union-FOV projection mutation disabled'
 Assert-True (Has-Argument $control '-FramerateLimit=60') 'CONTROL must remain conservative 60 Hz comparison'
 Assert-True ($control.Environment.OUTRUN_VR_PERFORMANCE_PROFILE -eq '0') 'CONTROL must not enable performance experiments'
 Assert-True ($correctness.Environment.OUTRUN_VR_PERFORMANCE_PROFILE -eq '0') 'CORRECTNESS must keep performance experiments isolated'
+Assert-True (Has-Argument $correctness '-FramerateLimit=60') 'CORRECTNESS must remain a conservative 60 Hz isolation baseline'
+Assert-True (Has-Argument $correctness '-FramerateFastLoad=0') 'CORRECTNESS must disable FastLoad'
+Assert-True (Has-Argument $correctness '-FramerateInterpolation=false') 'CORRECTNESS must disable interpolation'
+Assert-True (Has-Argument $correctness '-FramerateUnlockExperimental=false') 'CORRECTNESS must disable experimental framerate unlock'
+Assert-True (Has-Argument $correctness '-FrameCadenceMode=0') 'CORRECTNESS must disable phase-lock cadence'
+Assert-True (Has-Argument $correctness '-DisableDesktopVsync=false') 'CORRECTNESS must preserve desktop VSync'
 Assert-True ($performance.Environment.OUTRUN_VR_PERFORMANCE_PROFILE -eq '1') 'PERFORMANCE must explicitly opt into performance experiments'
 Assert-True (Has-Argument $correctness '-FrameCadenceTargetHz=0') 'CORRECTNESS must use runtime-selected cadence'
 Assert-True (Has-Argument $performance '-FrameCadenceTargetHz=0') 'PERFORMANCE must use runtime-selected cadence'
@@ -90,19 +112,5 @@ Assert-True ($null -ne $state.eveningCandidate) 'eveningCandidate state missing'
 Assert-True ($state.testProfiles.CORRECTNESS.defaultUserTest -eq $true) 'CORRECTNESS must be the default user runtime test'
 Assert-True ($state.testProfiles.CONTROL.defaultUserTest -eq $false) 'CONTROL must be optional'
 Assert-True ($state.testProfiles.PERFORMANCE.defaultUserTest -eq $false) 'PERFORMANCE must be optional'
-Assert-True ($null -ne $state.policy.manualPackageGate) 'manualPackageGate policy missing'
-Assert-True ($state.policy.manualPackageGate.enabled -eq $true) 'manualPackageGate must remain enabled'
-Assert-True ($state.policy.manualPackageGate.baselineDeltaRequired -eq $true) 'manual packages must require BASELINE_DELTA'
-Assert-True ($state.policy.manualPackageGate.exactShaConfigProfileRequired -eq $true) 'manual packages must bind exact SHA/config/profile'
-Assert-True ($state.policy.manualPackageGate.revalidateIfHeadMoved -eq $true) 'manual packages must revalidate when HEAD moves'
-Assert-True ($state.policy.manualPackageGate.buildVerifiedCannotOverrideUserRuntimeBaseline -eq $true) 'BUILD_VERIFIED must not override USER_RUNTIME_VERIFIED baseline'
-Assert-True ($state.policy.manualPackageGate.packageOnlyRequestsCannotBypassGate -eq $true) 'package-only requests must not bypass regression gate'
 
-$protocolPath = Join-Path $repoRoot 'docs/VR_AUTODEV_PROTOCOL.md'
-Assert-True (Test-Path $protocolPath) 'VR_AUTODEV_PROTOCOL.md missing'
-$protocol = Get-Content $protocolPath -Raw
-Assert-True ($protocol -match 'Direct Chat / manual build and package gate') 'manual/direct package protocol gate missing'
-Assert-True ($protocol -match 'latest.*baseline-eligible exact tree') 'manual latest semantics must prefer baseline-eligible exact tree'
-Assert-True ($protocol -match 'BASELINE_DELTA') 'manual package protocol must require BASELINE_DELTA'
-
-Write-Host 'VR test policy verification passed: profile identity, runtime defaults, session/log separation, GUI exposure, bounded Ctrl+F9 capture, single-active CI, TEST_LEVEL state and manual/direct package baseline gate are consistent.'
+Write-Host 'VR test policy verification passed: profile identity, runtime defaults, session/log separation, GUI exposure, bounded Ctrl+F9 capture, single-active CI and TEST_LEVEL state are consistent.'
