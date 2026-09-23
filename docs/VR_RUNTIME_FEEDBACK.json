@@ -1,13 +1,54 @@
 {
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
-  "updatedKst": "2026-09-21T03:36:00+09:00",
+  "updatedKst": "2026-09-24T01:49:00+09:00",
   "owner": "D_INTEGRATION_PLANNER",
   "lastConsumedEvidenceId": null,
-  "sessions": [],
+  "sessions": [
+    {
+      "evidenceId": "RUNTIME-20260924-R51-HUD-MAP-001",
+      "observedAtKst": "2026-09-24T01:47:00+09:00",
+      "sourceSha": "8d21824f9502b3354fae679972a90868a0cce562",
+      "baselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+      "candidateBranch": "vr-d3d9ex-candidate/VR-R51-HUD-PRODUCER-MAP-20260924",
+      "buildMatrixId": "PC-R51-HUD-MAP",
+      "variantId": "A_CONTROL",
+      "profile": "CORRECTNESS",
+      "sessionId": "20260923T164207853Z-2202b186",
+      "logZipSha256": "25be7a39d7daad4073e0b1765e9c6312a13f0b077898a84e4b1a17bf1dfe6731",
+      "packageSha256": "701a57ca5e4a1ba413bcdd75ad6fc6ecc320f6fc3dbb0dbd5a0597cb6ba81d89",
+      "hmd": "Quest 3 / VDXR",
+      "result": "HMD_FAILED_INTENDED_HUD_FIX_WORLD_BASELINE_PRESERVED",
+      "userObserved": [
+        "world/road/vehicle 3D remains good",
+        "white HUD/text still doubled/head-following",
+        "position/rank HUD still doubled and follows headset",
+        "vehicle rank labels remain detached from vehicles and follow headset",
+        "dense-scene frame drop remains"
+      ],
+      "telemetry": {
+        "semanticHudAccepted": 93681,
+        "overlay2DAccepted": 371082,
+        "semanticUnknownRejected": 0,
+        "semanticOverlayBypass": 0,
+        "r30World": 4832,
+        "r44Spatial": 5154,
+        "directFrames": 13187,
+        "directFallbacks": 4,
+        "fenceTimeout": 0,
+        "maxDrawsPerPresent": 3929.3,
+        "lowerPresentMaxMs": 16.639
+      },
+      "interpretation": "EXE-map producer tagging reaches R30 draw ownership but not the earlier renderer c64/WVP ownership boundary. The semantic lifetime/order is too late, so head injection can occur before SCREEN_HUD/WORLD_BILLBOARD ownership is visible.",
+      "nextAction": "Analysis first: trace producer->node tag->queue select->c64 upload->draw ordering and design an exact producer/node token visible at c64 upload. Re-trace rival marker anchor propagation. Do not broaden generic HUD ownership.",
+      "pcRunnerAuthorization": "ENDED_BY_USER; no self-hosted PC builds until explicit re-authorization"
+    }
+  ],
   "knownRuntimeBaseline": {
-    "matrixId": "VRM-20260920-803144005c0e",
-    "summary": "Prior D3D9 SAFE reached startup/stereo transport but regressed visuals and pacing; DXVK/DX12 paused. This baseline is context only and is not evidence for current active candidate correctness."
+    "matrixId": "R51-17ad376b",
+    "sourceSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+    "packageSha256": "bf9f5b7c04520f1bf018764f54c1a915e019f4a21b18bf5fab061ce29790fbe7",
+    "summary": "Protected partial user-runtime baseline: world/road/vehicles good 3D; white HUD diplopia and vehicle-rank anchoring remain open; dense scenes can lose frame rate."
   },
   "notes": [
     "Only add runtime sessions that can be tied to an exact package/profile/session/source identity.",
