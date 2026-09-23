@@ -36,12 +36,27 @@ def print_json(obj: object) -> None:
     print(json.dumps(obj, ensure_ascii=False, indent=2))
 
 
+def normalize_address(conn: sqlite3.Connection, value: int) -> int:
+    row = conn.execute(
+        "SELECT value FROM meta WHERE key IN ('contract.imageBase','export.imageBase') "
+        "ORDER BY CASE key WHEN 'contract.imageBase' THEN 0 ELSE 1 END LIMIT 1"
+    ).fetchone()
+    if not row:
+        return value
+    try:
+        base = int(str(row[0]), 0)
+    except (TypeError, ValueError):
+        return value
+    return value - base if value >= base else value
+
+
 def query_rva(conn: sqlite3.Connection, rva: int) -> dict:
     fn = rows(
         conn,
         """SELECT * FROM functions
-           WHERE rva <= ? AND ? <= rva + CASE WHEN body_size > 0 THEN body_size ELSE 0 END
-           ORDER BY rva DESC LIMIT 1""",
+           WHERE min_rva IS NOT NULL AND max_rva IS NOT NULL
+             AND min_rva <= ? AND ? <= max_rva
+           ORDER BY (max_rva - min_rva) ASC, rva DESC LIMIT 1""",
         (rva, rva),
     )
     exact_fn = rows(conn, "SELECT * FROM functions WHERE rva=?", (rva,))
@@ -58,12 +73,13 @@ def query_rva(conn: sqlite3.Connection, rva: int) -> dict:
            FROM calls WHERE target_rva=? ORDER BY site_rva LIMIT 50""",
         (rva,),
     )
+    owner_rva = exact_fn[0]["rva"] if exact_fn else (fn[0]["rva"] if fn else rva)
     outgoing_calls = rows(
         conn,
         """SELECT site_rva,caller_rva,target_rva,target_name
-           FROM calls WHERE caller_rva=COALESCE((SELECT rva FROM functions WHERE rva<=? ORDER BY rva DESC LIMIT 1),?)
+           FROM calls WHERE caller_rva=?
            ORDER BY site_rva LIMIT 100""",
-        (rva, rva),
+        (owner_rva,),
     )
     xrefs_in = rows(
         conn,
@@ -179,6 +195,7 @@ def main() -> int:
     try:
         rva = parse_rva(query)
         if rva is not None:
+            rva = normalize_address(conn, rva)
             result = query_rva(conn, rva)
             if args.json:
                 print_json(result)
