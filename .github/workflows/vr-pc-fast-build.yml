@@ -32,7 +32,7 @@ jobs:
 
     steps:
       - name: Keep temporary writes on the runner SSD
-        shell: pwsh
+        shell: powershell
         run: |
           New-Item -ItemType Directory -Force $env:RUNNER_TEMP | Out-Null
           "TEMP=$env:RUNNER_TEMP" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
@@ -49,7 +49,7 @@ jobs:
 
       - name: Skip stale queued push
         if: ${{ github.event_name == 'push' }}
-        shell: pwsh
+        shell: powershell
         run: |
           $checkedOut = (git rev-parse HEAD).Trim()
           $triggerSha = '${{ github.sha }}'
@@ -60,7 +60,7 @@ jobs:
 
       - name: Fast incremental build and local package
         if: ${{ env.OUTRUN_PC_STALE != 'true' }}
-        shell: pwsh
+        shell: powershell
         run: |
           $cleanRequested = '${{ inputs.clean }}' -eq 'true'
           if ($cleanRequested) {
