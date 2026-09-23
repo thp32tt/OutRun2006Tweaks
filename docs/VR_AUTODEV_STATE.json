@@ -81,6 +81,31 @@
         "shared performance/frame-pacing optimization"
       ],
       "backendPromotionGate": "Quest3/VDXR parity evidence against the protected R51 baseline"
+    },
+    "pcFastBuild": {
+      "defaultMode": "INCREMENTAL",
+      "canonicalContract": "R51-PC-FAST-v2-R26HUD-ON",
+      "canonicalCMakeFlags": [
+        "OUTRUN_VR_SAFE_DRAW_COMPARE=OFF",
+        "OUTRUN_VR_R26_HUD_COMPARE=ON",
+        "OUTRUN_VR_C1_COMPARE=OFF",
+        "OUTRUN_VR_C2_COMPARE=OFF"
+      ],
+      "hardGate": "Build-OutRunPCFast.ps1 must verify CMakeCache before compile, after compile, and before packaging; any mismatch aborts the build/package.",
+      "cleanOnlyWhen": [
+        "build-system/CMake structure changes",
+        "dependency/toolchain changes",
+        "major branch/build-contract transition",
+        "runtime behavior cannot be explained by source/config and an incremental-build artifact is suspected"
+      ],
+      "packageEvidence": [
+        "backends/d3d9/CMAKE_FLAGS.txt",
+        "backends/d3d9/BUILD_CONTRACT.txt",
+        "BUILD_INPUTS.json::BuildMode",
+        "BUILD_INPUTS.json::BuildContract",
+        "BUILD_INPUTS.json::CMakeFlags"
+      ],
+      "rationale": "Earlier broken PC-fast R51 rebuild used OUTRUN_VR_R26_HUD_COMPARE=OFF while verified R51 and later good driver-seat PC-fast builds use ON. Incremental caching is not the primary root cause."
     }
   },
   "runtimeEvidence": {
