@@ -244,6 +244,39 @@ int main() {
  for(int i=0;i<24;++i) r120=regrip120.update(0.1f,1.0f/120.0f);
  require(std::abs(r60-r120)<.001f,"regrip envelope duration is cadence independent");
 
+ // Per-wheel road model: material identity alone cannot generate a curb hit;
+ // continuous rough motion stays capped, while a real load/suspension impulse
+ // produces a short event envelope.
+ SurfaceHapticsModel surface;
+ std::array<SurfaceWheelSignal,4> sw{};
+ for(auto& w:sw){w.materialMask=1;w.compressionRate=.01f;w.normalLoad=1.0f;w.referenceLoad=1.0f;w.valid=true;}
+ auto surf=surface.update(sw,1.0f/60.0f);
+ require(surf.valid&&surf.impact==0.0f&&surf.texture==0.0f,"surface first frame initializes without false curb hit");
+ surf=surface.update(sw,1.0f/60.0f);
+ require(surf.valid&&surf.impact==0.0f&&surf.texture>0.0f&&surf.texture<=.12f,"steady road motion becomes subtle capped texture");
+ for(auto& w:sw)w.materialMask=2;
+ surf=surface.update(sw,1.0f/60.0f);
+ require(surf.materialChanges==4&&surf.impact==0.0f,"material transition alone never creates curb impact");
+ for(auto& w:sw){w.materialMask=4;w.compressionRate=.05f;w.normalLoad=1.5f;}
+ surf=surface.update(sw,1.0f/60.0f);
+ require(surf.impact>.95f&&surf.maxLoadDelta>.49f&&surf.materialChanges==4,"material plus physical suspension/load spike creates curb hit");
+ for(auto& w:sw){w.compressionRate=.01f;w.normalLoad=1.5f;}
+ for(int i=0;i<10;++i)surf=surface.update(sw,1.0f/60.0f);
+ require(surf.impact==0.0f,"curb impact envelope releases instead of becoming continuous roughness");
+
+ SurfaceHapticsModel brick;
+ for(auto& w:sw){w.materialMask=8;w.compressionRate=.04f;w.normalLoad=1.0f;w.referenceLoad=1.0f;w.valid=true;}
+ brick.update(sw,1.0f/60.0f);
+ for(int i=0;i<30;++i){
+   const float n=(i&1)?1.02f:.98f;
+   for(auto& w:sw){w.compressionRate=.04f;w.normalLoad=n;}
+   surf=brick.update(sw,1.0f/60.0f);
+ }
+ require(surf.valid&&surf.texture<=.12f&&surf.impact==0.0f,"continuous brick-like motion remains low texture without permanent curb pulse");
+ for(auto& w:sw)w.valid=false;
+ surf=brick.update(sw,1.0f/60.0f);
+ require(!surf.valid&&surf.texture==0.0f&&surf.impact==0.0f,"invalid native wheel frame fails closed");
+
  float beta=d.bodySlip();d.update(nullptr,0,.5,0);require(d.bodySlip()<beta&&!d.sampleValid(),"invalid decay");
  for(int i=0;i<4;++i)d.update(nullptr,0,.5,0);
  require(d.bodySlip()==0&&d.yawRate()==0&&d.frontSlip()==0&&d.activationBlend()==0,"five-invalid clear");
