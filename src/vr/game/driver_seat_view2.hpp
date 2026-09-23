@@ -29,6 +29,10 @@ namespace OutRunVR::DriverSeatView2
 	constexpr int NativeMode = 1;
 	constexpr int CarRenderStateHookRva = 0x69764;
 	constexpr int CarRenderMatrixHookRva = 0x69891;
+	// Player-car display calls DispCarModel_Common at 0x6BF8C, then restores
+	// the game matrix stack with mxPopMatrix at 0x6BF91. Inject the passenger
+	// only after that pop, never from inside DispCarModel_Common.
+	constexpr int PassengerAfterCarHookRva = 0x6BF96;
 	constexpr int RobotDisplayRva = 0x114C10;
 
 	struct CameraBackup
@@ -42,6 +46,7 @@ namespace OutRunVR::DriverSeatView2
 	{
 		inline SafetyHookMid CarRenderStateHook{};
 		inline SafetyHookMid CarRenderMatrixHook{};
+		inline SafetyHookMid PassengerAfterCarHook{};
 		inline bool StateLogged = false;
 		inline bool ScaleLogged = false;
 		inline bool PassengerLogged = false;
@@ -147,6 +152,19 @@ namespace OutRunVR::DriverSeatView2
 			}
 		}
 
+		inline void PassengerAfterCarDest(safetyhook::Context&)
+		{
+			EvWorkCamera* camera = Game::camera();
+			if (!Settings::VRDriverSeatView || !Gameplay() || !camera ||
+				camera->cam_mode_timer_364 != 0.0f || camera->cam_mode_34A != NativeMode)
+				return;
+
+			// This point is after DispCarModel_Common and its mxPopMatrix, so the
+			// passenger renderer receives the same clean matrix-stack ownership it
+			// expects when invoked by the normal event display path.
+			DrawPassengerOnly(Game::pl_car());
+		}
+
 		inline void CarRenderMatrixDest(safetyhook::Context& ctx)
 		{
 			EvWorkCamera* camera = Game::camera();
@@ -179,10 +197,6 @@ namespace OutRunVR::DriverSeatView2
 				}
 			}
 
-			// Native view 2 does not enqueue ROB characters at all. Recreate only
-			// the passenger matrix and draw ROB02 once from the same player-car
-			// display path; never force ROB01.
-			DrawPassengerOnly(car);
 		}
 	}
 
@@ -258,7 +272,10 @@ namespace OutRunVR::DriverSeatView2
 				Module::exe_ptr(CarRenderStateHookRva), Detail::CarRenderStateDest);
 			Detail::CarRenderMatrixHook = safetyhook::create_mid(
 				Module::exe_ptr(CarRenderMatrixHookRva), Detail::CarRenderMatrixDest);
-			return !!Detail::CarRenderStateHook && !!Detail::CarRenderMatrixHook;
+			Detail::PassengerAfterCarHook = safetyhook::create_mid(
+				Module::exe_ptr(PassengerAfterCarHookRva), Detail::PassengerAfterCarDest);
+			return !!Detail::CarRenderStateHook && !!Detail::CarRenderMatrixHook &&
+				!!Detail::PassengerAfterCarHook;
 		}
 		static HookImpl instance;
 	};
