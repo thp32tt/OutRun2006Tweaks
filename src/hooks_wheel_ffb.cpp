@@ -23,6 +23,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "hooks_wheel_vehicle_dynamics.hpp"
+#include "hooks_wheel_native_physics_research.hpp"
 #include "wheel_ffb_math.hpp"
 #include "wheel_ffb_runtime.hpp"
 #include "overlay/overlay.hpp"
@@ -160,6 +161,22 @@ namespace Settings
     Setting<bool> WheelFFBNativePhysicsCapture60Hz{
         "WheelFFB", "NativePhysicsCapture60Hz", false,
         "Very verbose research capture of the canonical 4-wheel physics workspace after each 60 Hz player-car physics tick. Diagnostic only; never alters wheel output."
+    };
+
+    Setting<bool> WheelFFBNativeTireSat{
+        "WheelFFB", "NativeTireSAT", false,
+        "Experimental SAT from the game's native front-tyre slip/lateral-force channels (AC/C0). Default off until driving captures validate sign/scale."
+    };
+
+    Setting<float> WheelFFBNativeTireSatGain{
+        "WheelFFB", "NativeTireSATGain", 1.00f,
+        "Gain applied to the normalized native front lateral-force candidate before trail shaping.",
+        Range<float>{ 0.0f, 2.0f }
+    };
+
+    Setting<bool> WheelFFBNativeTireSatInvert{
+        "WheelFFB", "NativeTireSATInvert", false,
+        "Reverse only the experimental native tyre-force SAT direction. Use only during low-strength validation."
     };
 
     Setting<float> WheelFFBGripLoss{
@@ -988,9 +1005,78 @@ namespace
             // Dropping it on the calibration tick created a short SAT hole while
             // physicsMix was still near zero.
             const float physicsFallback = naturalSatTorque;
-            const float modernSelfAligningTorque = Settings::WheelFFBPhysicsSat
+            const float syntheticModernSat = Settings::WheelFFBPhysicsSat
                 ? physicsFallback + (physicsSatTorque - physicsFallback) * physicsMix
                 : naturalSatTorque;
+
+            // Canonical EXE tyre path (research-gated):
+            // wheel0/1 are the front axle; +EE is signed slip-angle state,
+            // +AC is the native lateral-force component and +C0 its load-sensitive
+            // combined-slip capacity. This path is OFF by default and can only
+            // crossfade in when the native front contact/capacity is valid.
+            const WheelNativePhysicsResearch::FrontTireState nativeFront =
+                WheelNativePhysicsResearch::front_tire_state();
+            const bool nativeTireRequested =
+                Settings::WheelFFBPhysicsSat &&
+                Settings::WheelFFBNativeTireSat &&
+                speedNorm > 0.04f;
+            const bool nativeTireValid =
+                nativeTireRequested && nativeFront.valid;
+
+            constexpr float NativeTireBlendInPerTick = 1.0f / 12.0f;  // ~200 ms @60 Hz
+            constexpr float NativeTireBlendOutPerTick = 1.0f / 6.0f; // ~100 ms @60 Hz
+            if (nativeTireValid)
+                nativeTireSatBlend_ = std::min(
+                    1.0f, nativeTireSatBlend_ + NativeTireBlendInPerTick);
+            else
+                nativeTireSatBlend_ = std::max(
+                    0.0f, nativeTireSatBlend_ - NativeTireBlendOutPerTick);
+
+            float nativeTireSatTorque = syntheticModernSat;
+            if (nativeFront.valid)
+            {
+                const float configuredNativeGain =
+                    static_cast<float>(Settings::WheelFFBNativeTireSatGain);
+                const float nativeGain = std::isfinite(configuredNativeGain)
+                    ? std::clamp(configuredNativeGain, 0.0f, 2.0f)
+                    : 1.0f;
+                const float nativeForceMagnitude = std::clamp(
+                    std::abs(nativeFront.normalizedLateral) * nativeGain,
+                    0.0f, 1.0f);
+
+                // AC already contains the game's own load/grip/combined-slip
+                // behavior. Only the aligning lever arm is shaped here; do not
+                // multiply the synthetic lateral-G load proxy on top of it.
+                const float nativePneumaticTrail =
+                    WheelFFBMath::pneumatic_trail_factor(nativeFront.slipRad);
+                const float nativeTrailDenom = 1.0f + mechanicalTrailMix;
+                const float nativeAlignShape = nativeTrailDenom > 0.0f
+                    ? std::clamp(
+                        nativeForceMagnitude *
+                        (nativePneumaticTrail + mechanicalTrailMix) /
+                        nativeTrailDenom,
+                        0.0f, 1.0f)
+                    : 0.0f;
+
+                float nativeDirection =
+                    nativeFront.normalizedLateral > 0.0f ? -1.0f :
+                    (nativeFront.normalizedLateral < 0.0f ? 1.0f : 0.0f);
+                if (Settings::WheelFFBNativeTireSatInvert)
+                    nativeDirection = -nativeDirection;
+
+                const float nativeReturnRelief =
+                    WheelFFBMath::physics_return_relief(
+                        nativeFront.slipRad, steerRate);
+                nativeTireSatTorque =
+                    nativeDirection * nativeAlignShape * satSpeed *
+                    nativeReturnRelief * satStrength;
+                if (!std::isfinite(nativeTireSatTorque))
+                    nativeTireSatTorque = syntheticModernSat;
+            }
+
+            const float modernSelfAligningTorque =
+                syntheticModernSat +
+                (nativeTireSatTorque - syntheticModernSat) * nativeTireSatBlend_;
 
             // Legacy v0.3 DBC instrumentation is retained for comparison with
             // old captures, but whole-EXE XREF analysis proved actionforce_DBC is
@@ -3585,6 +3671,7 @@ namespace
             lastXForceFrameTick_ = 0;
             smoothedXForceMix_ = -1.0f;
             smoothedXForceGain_ = -1.0f;
+            nativeTireSatBlend_ = 0.0f;
             prevStructuralLevel_ = 0;
             prevSpringCoefficient_ = 0;
             prevDamperCoefficient_ = 0;
@@ -3970,6 +4057,7 @@ namespace
         float smoothedLongAccel_ = 0.0f;
         float smoothedXForceMix_ = -1.0f;
         float smoothedXForceGain_ = -1.0f;
+        float nativeTireSatBlend_ = 0.0f;
         float prevSteer_ = 0.0f;
         float smoothedSteerRate_ = 0.0f;
         bool steerSampleValid_ = false;
