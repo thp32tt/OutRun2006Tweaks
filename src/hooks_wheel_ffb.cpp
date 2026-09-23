@@ -36,7 +36,7 @@ extern double __cdecl sub_1149C0(unsigned int surfaceMask, int loadColiType, DWO
 extern float InputManager_SteeringValue();
 
 static_assert(offsetof(EVWORK_CAR, actionforce_DBC) == 0xDBC,
-    "EVWORK_CAR::actionforce_DBC offset drifted; native X-Force candidate would read the wrong memory");
+    "EVWORK_CAR::actionforce_DBC offset drifted; legacy DBC diagnostic would read the wrong memory");
 
 namespace Settings
 {
@@ -125,36 +125,41 @@ namespace Settings
         "Experimental body-slip/yaw SAT instead of steering-centre direction alone."
     };
 
-    // v0.3 steering-character experiment. Modern preserves the v0.2 model exactly;
-    // Arcade/Hybrid can consume the game's actionforce_DBC field only after
-    // conservative plausibility checks. Until that field is proven to be Howard
-    // Castro's X-Force, it is deliberately treated as a candidate signal.
+    // v0.3 compatibility settings are retained so existing user.ini/profile
+    // files continue to parse, but the whole-EXE map invalidated actionforce_DBC
+    // as a steering-force source: its writer belongs to the race handicap /
+    // catch-up path. Production output is therefore forced to Modern DD.
     Setting<int> WheelFFBFeedbackCharacter{
         "WheelFFB", "FeedbackCharacter", 0,
-        "Steering-force character: 0=Modern DD, 1=Arcade X-Force candidate, 2=Hybrid.",
+        "Deprecated compatibility value. EXE XREF analysis proved actionforce_DBC belongs to handicap/catch-up logic; runtime always uses Modern DD.",
         Range<int>{ 0, 2 }
     };
 
     Setting<float> WheelFFBXForceMix{
         "WheelFFB", "XForceMix", 0.50f,
-        "Hybrid share of the guarded native X-Force candidate. 0=Modern SAT, 1=native candidate.",
+        "Deprecated compatibility value. DBC native-force mixing is disabled by executable-map evidence.",
         Range<float>{ 0.0f, 1.0f }
     };
 
     Setting<bool> WheelFFBXForceInvert{
         "WheelFFB", "XForceInvert", false,
-        "Reverse only the native X-Force candidate before it is mixed with Modern SAT."
+        "Deprecated compatibility value. DBC is diagnostic-only and is never routed to wheel torque."
     };
 
     Setting<float> WheelFFBXForceGain{
         "WheelFFB", "XForceGain", 1.00f,
-        "Native X-Force candidate gain after normalization. Default 1.0; keep conservative until actionforce_DBC is proven.",
+        "Deprecated compatibility value. DBC is diagnostic-only and is never routed to wheel torque.",
         Range<float>{ 0.0f, 2.0f }
     };
 
     Setting<bool> WheelFFBXForceCapture60Hz{
         "WheelFFB", "XForceCapture60Hz", false,
-        "Very verbose 60 Hz X-Force validation capture in OutRun2006Tweaks.log. Diagnostic only; does not alter force selection."
+        "Legacy 60 Hz DBC/DC0/DC4 diagnostic capture. DBC is now known to be handicap/catch-up data and never alters FFB output."
+    };
+
+    Setting<bool> WheelFFBNativePhysicsCapture60Hz{
+        "WheelFFB", "NativePhysicsCapture60Hz", false,
+        "Very verbose research capture of the canonical 4-wheel physics workspace after each 60 Hz player-car physics tick. Diagnostic only; never alters wheel output."
     };
 
     Setting<float> WheelFFBGripLoss{
@@ -987,11 +992,12 @@ namespace
                 ? physicsFallback + (physicsSatTorque - physicsFallback) * physicsMix
                 : naturalSatTorque;
 
-            // v0.3 native steering-force experiment. actionforce_DBC remains a
-            // candidate until telemetry proves it is Howard Castro's X-Force.
-            // The production guard handles the two important DD-wheel hazards:
-            // stale force at a stop/restart and one-frame fallback at a legitimate
-            // zero crossing. Modern DD never consumes the candidate.
+            // Legacy v0.3 DBC instrumentation is retained for comparison with
+            // old captures, but whole-EXE XREF analysis proved actionforce_DBC is
+            // written by the race handicap/catch-up path. It must never own
+            // production steering torque. The guarded analyzer below is therefore
+            // diagnostic-only until it is eventually removed/replaced by the
+            // newly discovered four-wheel native-physics channels.
             const DWORD xForceNow = GetTickCount();
             float xForceDeltaSeconds = 1.0f / 60.0f;
             if (lastXForceFrameTick_ != 0)
@@ -1037,8 +1043,23 @@ namespace
                 xForceSample.normalized * xForceSample.motionGate * satStrength *
                 smoothedXForceGain_;
 
-            const int feedbackCharacter = std::clamp(
+            const int requestedFeedbackCharacter = std::clamp(
                 static_cast<int>(Settings::WheelFFBFeedbackCharacter), 0, 2);
+            // Fail closed: DBC/DC0 are handicap/catch-up state, not steering-rack
+            // force. Keep the legacy setting readable for old profiles, but force
+            // production ownership to Modern DD irrespective of its value.
+            constexpr int feedbackCharacter = 0;
+            if (requestedFeedbackCharacter != 0)
+            {
+                static int lastRejectedFeedbackCharacter = -1;
+                if (lastRejectedFeedbackCharacter != requestedFeedbackCharacter)
+                {
+                    lastRejectedFeedbackCharacter = requestedFeedbackCharacter;
+                    spdlog::warn(
+                        "WheelFFB: FeedbackCharacter={} ignored; executable-map XREFs prove actionforce_DBC is handicap/catch-up data, so Modern DD remains authoritative",
+                        requestedFeedbackCharacter);
+                }
+            }
             const float xForceMix = std::clamp(smoothedXForceMix_, 0.0f, 1.0f);
             const WheelFFBMath::XForceMixResult xForceMixResult =
                 WheelFFBMath::mix_xforce_character(
