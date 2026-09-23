@@ -577,7 +577,6 @@ namespace
     class WheelQuickSetupRemoval : public Hook
     {
         inline static SafetyHookInline ButtonHook = {};
-        inline static SafetyHookInline SliderFloatHook = {};
 
         static bool __cdecl Button_dest(const char* label, const ImVec2& size)
         {
@@ -632,23 +631,6 @@ namespace
             return ButtonHook.ccall<bool>(label, &size);
         }
 
-        static bool __cdecl SliderFloat_dest(
-            const char* label,
-            float* value,
-            float minimum,
-            float maximum,
-            const char* format,
-            ImGuiSliderFlags flags)
-        {
-            // RoadTexture has a real setting range of 0..1.0 and the universal
-            // default is 0.60. The old F11 slider stopped at 0.50, which could
-            // silently clamp the migrated value simply by touching the control.
-            if (label && std::strcmp(label, "Road Detail") == 0)
-                maximum = std::max(maximum, 1.0f);
-
-            return SliderFloatHook.ccall<bool>(
-                label, value, minimum, maximum, format, flags);
-        }
 
     public:
         std::string_view description() override
@@ -660,9 +642,7 @@ namespace
         {
             ButtonHook = safetyhook::create_inline(
                 reinterpret_cast<void*>(&ImGui::Button), Button_dest);
-            SliderFloatHook = safetyhook::create_inline(
-                reinterpret_cast<void*>(&ImGui::SliderFloat), SliderFloat_dest);
-            return !!ButtonHook && !!SliderFloatHook;
+            return !!ButtonHook;
         }
 
         static WheelQuickSetupRemoval instance;
