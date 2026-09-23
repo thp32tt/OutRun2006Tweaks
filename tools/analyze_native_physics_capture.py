@@ -146,6 +146,23 @@ def main() -> int:
         total = c0 + c1
         slip_mean.append((s0 * c0 + s1 * c1) / total if total > 1e-6 else float("nan"))
 
+    rear_ac_sum = series(rows, lambda r: r["rear0"]["ac"] + r["rear1"]["ac"])
+    rear_capacity = series(
+        rows, lambda r: abs(r["rear0"]["c0"]) + abs(r["rear1"]["c0"]))
+    rear_force_ratio = [
+        (fy / cap if math.isfinite(fy) and math.isfinite(cap) and cap > 1e-6 else float("nan"))
+        for fy, cap in zip(rear_ac_sum, rear_capacity)
+    ]
+    rear_slip0 = series(rows, lambda r: -r["rear0"]["steerEE"] * ANGLE_UNIT_RAD)
+    rear_slip1 = series(rows, lambda r: -r["rear1"]["steerEE"] * ANGLE_UNIT_RAD)
+    rear_slip_mean = []
+    for r, s0, s1 in zip(rows, rear_slip0, rear_slip1):
+        c0 = abs(r["rear0"].get("c0", 0.0))
+        c1 = abs(r["rear1"].get("c0", 0.0))
+        total = c0 + c1
+        rear_slip_mean.append(
+            (s0 * c0 + s1 * c1) / total if total > 1e-6 else float("nan"))
+
     compression_diff = series(
         rows, lambda r: r["front0"]["c18"] - r["front1"]["c18"])
     reaction_diff = series(
@@ -159,6 +176,10 @@ def main() -> int:
         ("front normal load", normal),
         ("|front load diff|", [abs(v) for v in normal_diff]),
         ("|front slip rad|", [abs(v) for v in slip_mean]),
+        ("|rear AC sum|", [abs(v) for v in rear_ac_sum]),
+        ("rear capacity", rear_capacity),
+        ("|rear AC/capacity|", [abs(v) for v in rear_force_ratio]),
+        ("|rear slip rad|", [abs(v) for v in rear_slip_mean]),
         ("|dSpeed|", [abs(v) for v in d_speed]),
     ):
         print(
@@ -178,15 +199,31 @@ def main() -> int:
     print(f"corr(load diff, AC sum)        : {fmt(corr(normal_diff, ac_sum), 3)}")
     print(f"corr(compression diff, AC sum) : {fmt(corr(compression_diff, ac_sum), 3)}")
     print(f"corr(reaction diff, AC sum)    : {fmt(corr(reaction_diff, ac_sum), 3)}")
+    print(f"corr(rear slip, rear AC sum)   : {fmt(corr(rear_slip_mean, rear_ac_sum), 3)}")
+    print(f"corr(front slip, rear slip)    : {fmt(corr(slip_mean, rear_slip_mean), 3)}")
     print(f"corr(dSpeed, prevDSpeed)       : {fmt(corr(d_speed[1:], prev_d_speed[1:]), 3)}")
+
+    rear_abs = [abs(v) for v in rear_slip_mean if math.isfinite(v)]
+    if rear_abs:
+        print(
+            "rear-slip reference hints       : "
+            f"P90={fmt(percentile(rear_abs, .90), 3)} rad  "
+            f"P95={fmt(percentile(rear_abs, .95), 3)} rad  "
+            "(use only as capture evidence, not automatic tuning)"
+        )
 
     moving = [r for r in rows if abs(r["root"].get("speed", 0.0)) > 0.05]
     air_or_zero_cap = sum(
         1 for r in moving
         if abs(r["front0"].get("c0", 0.0)) + abs(r["front1"].get("c0", 0.0)) <= 1e-6
     )
+    rear_zero_cap = sum(
+        1 for r in moving
+        if abs(r["rear0"].get("c0", 0.0)) + abs(r["rear1"].get("c0", 0.0)) <= 1e-6
+    )
     print("\nGuards")
     print(f"moving rows with zero front capacity: {air_or_zero_cap} / {len(moving)}")
+    print(f"moving rows with zero rear capacity : {rear_zero_cap} / {len(moving)}")
     print(
         "Interpretation rule: strong correlations support a candidate relationship, "
         "but field names remain provisional until writer/consumer dataflow and a "
