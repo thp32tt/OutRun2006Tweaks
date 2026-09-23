@@ -54,6 +54,9 @@ namespace Settings
     extern Setting<float> WheelFFBXForceGain;
     extern Setting<bool> WheelFFBXForceCapture60Hz;
     extern Setting<bool> WheelFFBNativePhysicsCapture60Hz;
+    extern Setting<bool> WheelFFBNativeTireSat;
+    extern Setting<float> WheelFFBNativeTireSatGain;
+    extern Setting<bool> WheelFFBNativeTireSatInvert;
     extern Setting<float> WheelFFBGripLoss;
     extern Setting<float> WheelFFBLateralDeadzone;
     extern Setting<float> WheelFFBWeightTransfer;
@@ -814,6 +817,10 @@ namespace
             bool xForceInvert = false;
             float xForceGain = 1.00f;
             bool xForceCapture60Hz = false;
+            bool nativePhysicsCapture60Hz = false;
+            bool nativeTireSat = false;
+            float nativeTireSatGain = 1.00f;
+            bool nativeTireSatInvert = false;
             bool hwSpring = true;
             bool hwDamper = true;
             bool periodic = true;
@@ -854,6 +861,10 @@ namespace
             savedFfb_.xForceInvert = Settings::WheelFFBXForceInvert;
             savedFfb_.xForceGain = Settings::WheelFFBXForceGain;
             savedFfb_.xForceCapture60Hz = Settings::WheelFFBXForceCapture60Hz;
+            savedFfb_.nativePhysicsCapture60Hz = Settings::WheelFFBNativePhysicsCapture60Hz;
+            savedFfb_.nativeTireSat = Settings::WheelFFBNativeTireSat;
+            savedFfb_.nativeTireSatGain = Settings::WheelFFBNativeTireSatGain;
+            savedFfb_.nativeTireSatInvert = Settings::WheelFFBNativeTireSatInvert;
             savedFfb_.hwSpring = Settings::WheelFFBUseHardwareSpring;
             savedFfb_.hwDamper = Settings::WheelFFBUseHardwareDamper;
             savedFfb_.periodic = Settings::WheelFFBUsePeriodicEffects;
@@ -894,6 +905,10 @@ namespace
             Settings::WheelFFBXForceInvert = savedFfb_.xForceInvert;
             Settings::WheelFFBXForceGain = savedFfb_.xForceGain;
             Settings::WheelFFBXForceCapture60Hz = savedFfb_.xForceCapture60Hz;
+            Settings::WheelFFBNativePhysicsCapture60Hz = savedFfb_.nativePhysicsCapture60Hz;
+            Settings::WheelFFBNativeTireSat = savedFfb_.nativeTireSat;
+            Settings::WheelFFBNativeTireSatGain = savedFfb_.nativeTireSatGain;
+            Settings::WheelFFBNativeTireSatInvert = savedFfb_.nativeTireSatInvert;
             Settings::WheelFFBUseHardwareSpring = savedFfb_.hwSpring;
             Settings::WheelFFBUseHardwareDamper = savedFfb_.hwDamper;
             Settings::WheelFFBUsePeriodicEffects = savedFfb_.periodic;
@@ -1736,6 +1751,26 @@ namespace
                 track_ffb_change(ImGui::SliderFloat("Mechanical / Caster Trail", Settings::WheelFFBMechanicalTrail.ptr(), 0.0f, 0.60f, "%.2f"));
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip("Normalized mechanical/caster trail acts with front lateral force throughout a corner. 0 disables it; this is not a centre spring.");
+
+                if (track_ffb_change(ImGui::Checkbox(
+                        "Native tyre-force SAT (EXE physics, experimental)",
+                        Settings::WheelFFBNativeTireSat.ptr())))
+                    WheelFFB_RequestSettingsTransition();
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Default OFF. Uses the game's front wheel slip-angle + native lateral-force/capacity channels (EE/AC/C0). Invalid/airborne data fades back to Modern SAT; all existing soft-cap, slew and watchdog safety remains downstream.");
+                if (Settings::WheelFFBNativeTireSat)
+                {
+                    track_ffb_change(ImGui::SliderFloat(
+                        "Native tyre SAT gain",
+                        Settings::WheelFFBNativeTireSatGain.ptr(),
+                        0.0f, 2.0f, "%.2f"));
+                    if (track_ffb_change(ImGui::Checkbox(
+                            "Reverse native tyre SAT only",
+                            Settings::WheelFFBNativeTireSatInvert.ptr())))
+                        WheelFFB_RequestSettingsTransition();
+                    ImGui::TextColored(ImVec4(1.0f, 0.72f, 0.25f, 1.0f),
+                        "Research mode: validate direction at low Overall Strength before normal driving.");
+                }
             }
             track_ffb_change(ImGui::SliderFloat("Grip-loss Response", Settings::WheelFFBGripLoss.ptr(), 0.0f, 1.0f, "%.2f"));
 
