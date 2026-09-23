@@ -735,6 +735,31 @@ namespace WheelFFBMath
         return 1.0f - 0.15f * t*t*(3.0f - 2.0f*t);
     }
 
+    inline float native_oversteer_band(float normalizedRearSlip)
+    {
+        // rFuktor-inspired rear-slip cue: arrive around the tyre's peak-slip
+        // region, stay strong through the useful catch window, then fade again
+        // in a very large slide so a DD wheel does not keep winding itself up.
+        if (!std::isfinite(normalizedRearSlip))
+            return 0.0f;
+
+        const float x = std::abs(normalizedRearSlip);
+        constexpr float RiseStart = 0.85f;
+        constexpr float RiseEnd = 1.15f;
+        constexpr float FallStart = 1.45f;
+        constexpr float FallEnd = 2.25f;
+
+        const auto smooth01 = [](float t)
+        {
+            t = std::clamp(t, 0.0f, 1.0f);
+            return t * t * (3.0f - 2.0f * t);
+        };
+
+        const float rise = smooth01((x - RiseStart) / (RiseEnd - RiseStart));
+        const float fall = 1.0f - smooth01((x - FallStart) / (FallEnd - FallStart));
+        return std::clamp(rise * fall, 0.0f, 1.0f);
+    }
+
     using ResponseLUT = std::array<float, 11>;
 
     inline ResponseLUT linear_response_lut()
