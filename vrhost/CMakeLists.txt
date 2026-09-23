@@ -23,7 +23,7 @@ set(BUILD_ALL_EXTENSIONS OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     openxr_sdk
     GIT_REPOSITORY https://github.com/KhronosGroup/OpenXR-SDK.git
-    GIT_TAG release-1.1.63
+    GIT_TAG f2448a8797c85814aa892efc1ab8707900fbcc78 # release-1.1.63
     GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(openxr_sdk)
