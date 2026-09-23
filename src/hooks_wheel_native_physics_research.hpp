@@ -141,6 +141,33 @@ namespace WheelNativePhysicsResearch
         return true;
     }
 
+    struct WheelFrameState
+    {
+        bool valid = false;
+        std::array<WheelSample, WheelCount> wheel{};
+    };
+
+    inline WheelFrameState wheel_frame_state()
+    {
+        WheelFrameState out{};
+        const auto* workspace = reinterpret_cast<const std::uint8_t*>(
+            Module::exe_ptr(PlayerWorkspaceRva));
+        if (!pointer_table_matches(workspace))
+            return out;
+
+        for (int i = 0; i < WheelCount; ++i)
+        {
+            const auto* wheel =
+                workspace + FirstWheelOffset + static_cast<std::size_t>(i) * WheelStride;
+            out.wheel[static_cast<std::size_t>(i)] = sample_wheel(wheel);
+            if (!out.wheel[static_cast<std::size_t>(i)].finite)
+                return out;
+        }
+
+        out.valid = true;
+        return out;
+    }
+
     struct FrontTireState
     {
         bool valid = false;
