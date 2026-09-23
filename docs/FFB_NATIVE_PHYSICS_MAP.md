@@ -244,3 +244,61 @@ the wheel remains free to self-countersteer while the rear is actually sliding.
 The capture analyzer now reports rear slip/capacity/AC distributions and
 correlations plus P90/P95 rear-slip reference hints. Those percentile hints are
 evidence for tuning only; they are never applied automatically.
+
+
+## 10. Per-wheel material + suspension road haptics
+
+The old wheel FFB road path converted all four `EVWORK_CAR+0x24C..0x258`
+surface masks through the Xbox vibration roughness lookup and then used the
+maximum roughness value. That made a continuously rough brick/stone road behave
+like a permanent large tactile event and led to stage-specific snow/ice
+attenuation and snow-curb latch workarounds.
+
+That path is now removed from wheel FFB.
+
+The production road model preserves the four raw per-wheel material masks and
+combines them with the canonical native wheel workspace:
+
+- material identity: `EVWORK_CAR+0x24C/+0x250/+0x254/+0x258`
+- suspension/compression rate: wheel `+0x20`
+- actual normal load: wheel `+0x34`
+- reference load: wheel `+0x38`
+
+Two independent tactile concepts are generated:
+
+### Continuous road texture
+
+Continuous texture is derived from the mean physical suspension/load motion of
+all valid wheels. It is deliberately capped at 0.12 normalized before the user
+RoadTexture control, so four wheels continuously running on brick/stone cannot
+become a permanent curb-level vibration.
+
+No stage ID or human-readable material name is required.
+
+### Curb / bump impact
+
+A curb/bump pulse is derived from a real suspension/load impulse. A per-wheel
+material-mask change may boost a real impact, but a material change alone cannot
+create a hit.
+
+The impact envelope releases in approximately 140 ms rather than remaining
+active for the duration of a rough material.
+
+This removes the previous wheel-FFB dependencies on:
+
+- max surface roughness across four wheels
+- Xbox `sub_1149C0` roughness values
+- Snowy Mountain / Ice Scape stage-number checks
+- fixed snow road-texture attenuation
+- snow-curb material latches
+- temporary roughness floors
+- temporary SAT/damper reduction used only to make old road vibration audible
+
+Raw four-wheel material masks, load delta, suspension-rate spike, continuous
+texture and impact envelope are emitted in FFB telemetry so material IDs can be
+named later from controlled asphalt/brick/curb/grass/snow captures without
+hard-coding guesses into the force model.
+
+Left/right wheel ordering is still intentionally unasserted, so the first
+version uses an undirected curb/bump tactile pulse. Directional left/right curb
+kick should only be added after wheel-side ordering is proven.
