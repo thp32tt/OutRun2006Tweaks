@@ -42,9 +42,28 @@ def normalize_rva(con, value, kind="auto"):
 
 def show_address(con, raw, context, address_kind="auto"):
     rva = normalize_rva(con, raw, address_kind)
-    f = con.execute("SELECT * FROM functions WHERE body_min_rva<=? AND body_max_rva>=? ORDER BY size ASC LIMIT 1", (rva,rva)).fetchone()
+    owner_source = None
+    insn = con.execute(
+        "SELECT function_rva FROM instructions WHERE rva=? LIMIT 1", (rva,)
+    ).fetchone()
+    f = None
+    if insn and insn["function_rva"] is not None:
+        f = con.execute(
+            "SELECT * FROM functions WHERE entry_rva=? LIMIT 1",
+            (insn["function_rva"],),
+        ).fetchone()
+        if f:
+            owner_source = "exact-instruction"
+    if not f:
+        f = con.execute(
+            "SELECT * FROM functions WHERE body_min_rva<=? AND body_max_rva>=? ORDER BY size ASC LIMIT 1",
+            (rva, rva),
+        ).fetchone()
+        if f:
+            owner_source = "range-fallback"
     print(f"ADDRESS RVA={hx(rva)} VA={hx(rva+image_base(con))}")
     if f:
+        print(f"FUNCTION_OWNER {owner_source}")
         print(f"FUNCTION {hx(f['entry_rva'])} {f['namespace']}::{f['name']} size={f['size']}")
         entry = f["entry_rva"]
         callers = con.execute(
