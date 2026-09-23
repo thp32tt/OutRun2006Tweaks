@@ -169,17 +169,18 @@ jobs:
       - name: Upload binary
         uses: actions/upload-artifact@v7.0.1
         with:
-          name: outrun2006tweaks-v0.3-xforce-${{ github.sha }}
+          name: outrun2006tweaks-v0.4-native-physics-${{ github.sha }}
           path: build/bin/
 
       - name: Upload wheel source snapshot
         uses: actions/upload-artifact@v7.0.1
         with:
-          name: wheel-source-v0.3-xforce-${{ github.sha }}
+          name: wheel-source-v0.4-native-physics-${{ github.sha }}
           path: |
             src/hooks_wheel_ffb.cpp
             src/hooks_wheel_ffb_build.cpp
             src/hooks_wheel_vehicle_dynamics.hpp
+            src/hooks_wheel_native_physics_research.hpp
             src/wheel_ffb_math.hpp
             src/wheel_ffb_runtime.hpp
             tools/test_wheel_ffb_current.cpp
