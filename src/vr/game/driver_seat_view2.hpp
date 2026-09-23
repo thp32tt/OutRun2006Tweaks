@@ -22,10 +22,10 @@ namespace Settings
 
 namespace OutRunVR::DriverSeatView2
 {
-	// Canonical executable mapping confirmed by runtime testing:
-	// raw mode 1 = native user-visible view 2. Unlike the prior virtual-view
-	// experiment, this module never changes cam_mode and never reconstructs a
-	// camera from the third-person path.
+	// Canonical executable mapping:
+	// raw 2 = native view 1, raw 1 = native view 2, raw 0 = native view 3.
+	// Virtual view 4 aliases raw mode 1, so it uses the exact native view-2
+	// camera controller. A separate flag distinguishes native view 2 from V4.
 	constexpr int NativeMode = 1;
 	constexpr int CarRenderStateHookRva = 0x69764;
 	constexpr int CarRenderMatrixHookRva = 0x69891;
@@ -34,6 +34,8 @@ namespace OutRunVR::DriverSeatView2
 	// only after that pop, never from inside DispCarModel_Common.
 	constexpr int PassengerAfterCarHookRva = 0x6BF96;
 	constexpr int RobotDisplayRva = 0x114C10;
+	constexpr int ChangeViewCycleRva = 0x84B93;
+	constexpr int ChangeViewCycleDoneRva = 0x84BAE;
 
 	struct CameraBackup
 	{
@@ -47,11 +49,87 @@ namespace OutRunVR::DriverSeatView2
 		inline SafetyHookMid CarRenderStateHook{};
 		inline SafetyHookMid CarRenderMatrixHook{};
 		inline SafetyHookMid PassengerAfterCarHook{};
+		inline SafetyHookMid ChangeViewCycleHook{};
+		inline SafetyHookMid ChangeViewCycleDoneHook{};
+		inline bool VirtualActive = false;
+		inline bool PendingEnterVirtual = false;
+		inline bool PendingExitVirtual = false;
 		inline bool StateLogged = false;
 		inline bool ScaleLogged = false;
 		inline bool PassengerLogged = false;
 		inline bool PassengerMissingLogged = false;
 		inline thread_local bool PassengerDrawInProgress = false;
+
+		inline void ResetVirtualState()
+		{
+			VirtualActive = false;
+			PendingEnterVirtual = false;
+			PendingExitVirtual = false;
+		}
+
+		inline void ChangeViewCycleDest(safetyhook::Context& ctx)
+		{
+			auto* camera = reinterpret_cast<EvWorkCamera*>(ctx.esi);
+			if (!camera || !Settings::VRDriverSeatView || !Game::current_mode ||
+				(*Game::current_mode != STATE_GAME && *Game::current_mode != STATE_GOAL))
+			{
+				ResetVirtualState();
+				return;
+			}
+
+			if (camera->cam_mode_timer_364 != 0.0f)
+				return;
+
+			if (VirtualActive)
+			{
+				// V4 is raw mode 1. Before the stock 2->1->0->2 cycle reads
+				// cam_mode, temporarily present raw mode 0 so the stock cycle
+				// wraps to raw mode 2 (native view 1). The post hook finalizes.
+				camera->cam_mode_34A = 0;
+				PendingExitVirtual = true;
+				PendingEnterVirtual = false;
+				return;
+			}
+
+			if (camera->cam_mode_34A == 0)
+			{
+				// Native view 3 normally wraps to raw mode 2. Let the stock code
+				// perform that transition, then post-adjust to raw mode 1 and
+				// mark it as virtual view 4. Native view 2 remains untouched
+				// because its raw mode 1 is never tagged VirtualActive.
+				PendingEnterVirtual = true;
+				PendingExitVirtual = false;
+			}
+		}
+
+		inline void ChangeViewCycleDoneDest(safetyhook::Context& ctx)
+		{
+			auto* camera = reinterpret_cast<EvWorkCamera*>(ctx.esi);
+			if (!camera)
+			{
+				ResetVirtualState();
+				return;
+			}
+
+			if (PendingEnterVirtual)
+			{
+				PendingEnterVirtual = false;
+				camera->cam_mode_34A = NativeMode;
+				VirtualActive = true;
+				spdlog::info(
+					"VR DRIVER V4: entered virtual view 4 using native view-2 camera controller (raw mode 1)");
+				return;
+			}
+
+			if (PendingExitVirtual)
+			{
+				PendingExitVirtual = false;
+				VirtualActive = false;
+				camera->cam_mode_34A = 2;
+				spdlog::info(
+					"VR DRIVER V4: exited virtual view 4 -> native view 1 (raw mode 2)");
+			}
+		}
 
 		inline bool Gameplay()
 		{
@@ -88,8 +166,8 @@ namespace OutRunVR::DriverSeatView2
 		{
 			EvWorkCamera* camera = Game::camera();
 			if (!Settings::VRDriverSeatView || !Settings::VRDriverSeatFullCar ||
-				!Gameplay() || !camera || camera->cam_mode_timer_364 != 0.0f ||
-				camera->cam_mode_34A != NativeMode)
+				!VirtualActive || !Gameplay() || !camera ||
+				camera->cam_mode_timer_364 != 0.0f || camera->cam_mode_34A != NativeMode)
 				return;
 
 			auto* car = Game::pl_car();
@@ -102,7 +180,7 @@ namespace OutRunVR::DriverSeatView2
 			{
 				StateLogged = true;
 				spdlog::info(
-					"VR DRIVER VIEW2: player car render state {} -> 1; native camera mode 1 remains untouched",
+					"VR DRIVER V4: player car render state {} -> 1; native view 2 remains untouched outside V4",
 					originalState);
 			}
 		}
@@ -125,7 +203,7 @@ namespace OutRunVR::DriverSeatView2
 				if (!PassengerMissingLogged)
 				{
 					PassengerMissingLogged = true;
-					spdlog::warn("VR DRIVER VIEW2: EVENT_ROB02 passenger data unavailable; skipping passenger draw");
+					spdlog::warn("VR DRIVER V4: EVENT_ROB02 passenger data unavailable; skipping passenger draw");
 				}
 				return;
 			}
@@ -147,7 +225,7 @@ namespace OutRunVR::DriverSeatView2
 			{
 				PassengerLogged = true;
 				spdlog::info(
-					"VR DRIVER VIEW2: ROB02 passenger-only draw active workId={} chrset={}; ROB01 driver remains untouched/not forced",
+					"VR DRIVER V4: ROB02 passenger-only draw active workId={} chrset={}; ROB01 driver remains untouched/not forced",
 					passenger->workId_0, static_cast<int>(passenger->chrset_8));
 			}
 		}
@@ -155,7 +233,7 @@ namespace OutRunVR::DriverSeatView2
 		inline void PassengerAfterCarDest(safetyhook::Context&)
 		{
 			EvWorkCamera* camera = Game::camera();
-			if (!Settings::VRDriverSeatView || !Gameplay() || !camera ||
+			if (!Settings::VRDriverSeatView || !VirtualActive || !Gameplay() || !camera ||
 				camera->cam_mode_timer_364 != 0.0f || camera->cam_mode_34A != NativeMode)
 				return;
 
@@ -169,8 +247,8 @@ namespace OutRunVR::DriverSeatView2
 		{
 			EvWorkCamera* camera = Game::camera();
 			if (!Settings::VRDriverSeatView || !Settings::VRDriverSeatFullCar ||
-				!Gameplay() || !camera || camera->cam_mode_timer_364 != 0.0f ||
-				camera->cam_mode_34A != NativeMode)
+				!VirtualActive || !Gameplay() || !camera ||
+				camera->cam_mode_timer_364 != 0.0f || camera->cam_mode_34A != NativeMode)
 				return;
 
 			auto* car = Game::pl_car();
@@ -192,7 +270,7 @@ namespace OutRunVR::DriverSeatView2
 				{
 					ScaleLogged = true;
 					spdlog::info(
-						"VR DRIVER VIEW2: player-car visual scale {:.3f} applied only to DispCarModel_Common body matrix",
+						"VR DRIVER V4: player-car visual scale {:.3f} applied only to DispCarModel_Common body matrix",
 						s);
 				}
 			}
@@ -202,12 +280,17 @@ namespace OutRunVR::DriverSeatView2
 
 	inline bool Active(EvWorkCamera* camera = nullptr)
 	{
-		if (!Settings::VREnabled || !Settings::VRDriverSeatView || !Detail::Gameplay())
+		if (!Settings::VREnabled || !Settings::VRDriverSeatView ||
+			!Detail::VirtualActive || !Detail::Gameplay())
 			return false;
 		if (!camera)
 			camera = Game::camera();
-		return camera && camera->cam_mode_timer_364 == 0.0f &&
-			camera->cam_mode_34A == NativeMode;
+		if (!camera || camera->cam_mode_34A != NativeMode)
+		{
+			Detail::ResetVirtualState();
+			return false;
+		}
+		return camera->cam_mode_timer_364 == 0.0f;
 	}
 
 	inline CameraBackup BeforeCalcCameraMatrix(EvWorkCamera* camera)
@@ -249,7 +332,7 @@ namespace OutRunVR::DriverSeatView2
 		if (std::fabs(f-lf)>0.0001f || std::fabs(r-lr)>0.0001f || std::fabs(u-lu)>0.0001f)
 		{
 			lf=f; lr=r; lu=u;
-			spdlog::info("VR DRIVER VIEW2 CAMERA: forward={:.3f} right={:.3f} up={:.3f}", f,r,u);
+			spdlog::info("VR DRIVER V4 CAMERA: forward={:.3f} right={:.3f} up={:.3f}", f,r,u);
 		}
 		return backup;
 	}
@@ -274,8 +357,13 @@ namespace OutRunVR::DriverSeatView2
 				Module::exe_ptr(CarRenderMatrixHookRva), Detail::CarRenderMatrixDest);
 			Detail::PassengerAfterCarHook = safetyhook::create_mid(
 				Module::exe_ptr(PassengerAfterCarHookRva), Detail::PassengerAfterCarDest);
+			Detail::ChangeViewCycleHook = safetyhook::create_mid(
+				Module::exe_ptr(ChangeViewCycleRva), Detail::ChangeViewCycleDest);
+			Detail::ChangeViewCycleDoneHook = safetyhook::create_mid(
+				Module::exe_ptr(ChangeViewCycleDoneRva), Detail::ChangeViewCycleDoneDest);
 			return !!Detail::CarRenderStateHook && !!Detail::CarRenderMatrixHook &&
-				!!Detail::PassengerAfterCarHook;
+				!!Detail::PassengerAfterCarHook && !!Detail::ChangeViewCycleHook &&
+				!!Detail::ChangeViewCycleDoneHook;
 		}
 		static HookImpl instance;
 	};
