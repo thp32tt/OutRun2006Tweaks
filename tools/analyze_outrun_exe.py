@@ -29,6 +29,9 @@ KNOWN_TARGETS = {
     0x02CDD0: "Sumo_Printf",
     0x049940: "Calc3D2D",
     0x0BAD20: "RankMarker_sub_4BAD20",
+    0x088AF0: "CalcCharMatrix",
+    0x114C10: "RobotDisplayWrapper",
+    0x113AC0: "RobotRenderer",
 }
 
 KNOWN_CALL_SITES = {
@@ -405,6 +408,15 @@ def main() -> int:
         f"{report['known_call_sites_expected']}"
     )
     print(f"hud_strings={len(report['hud_strings'])}")
+    for item in report["calls"]:
+        if item["target"] in {"CalcCharMatrix", "RobotDisplayWrapper", "RobotRenderer"}:
+            print(
+                f"driver_char_xref=0x{item['call_rva']:08X} "
+                f"func=0x{(item['function_start_guess_rva'] or 0):08X} "
+                f"target={item['target']}"
+            )
+    for rva, name in ((0x088AF0, "CalcCharMatrix"), (0x114C10, "RobotDisplayWrapper"), (0x113AC0, "RobotRenderer")):
+        print(f"driver_char_bytes={name} rva=0x{rva:08X} bytes={pe.bytes_at_rva(rva, 96).hex(' ')}")
     if missing_known_call_sites:
         for item in missing_known_call_sites:
             print(
