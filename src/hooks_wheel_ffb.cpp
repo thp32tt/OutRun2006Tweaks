@@ -1522,13 +1522,17 @@ namespace
 
             prevGear_ = curGear;
             prevCollisionFlags_ = stateFlags;
-            maybe_log(speedNorm, steer, steerRate, lateralLoadSmooth, bodySlide, frontScrub, roughness, selfAligningTorque, level);
+            maybe_log(
+                speedNorm, steer, steerRate, lateralLoadSmooth,
+                bodySlide, frontScrub,
+                surfaceHaptics.texture, surfaceHaptics.impact,
+                selfAligningTorque, level);
             const DWORD telemetryNow = GetTickCount();
             if (Settings::WheelFFBTelemetry && telemetryNow - lastTelemetryTick_ >= 100)
             {
                 lastTelemetryTick_ = telemetryNow;
                 spdlog::info(
-                    "WheelFFB SAMPLE t={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} regripRecovery={} regripSatScale={} regripDamperBoost={} regripBuildScale={} springRequested={} springCoefficient={} damperRequested={} damperRelease={} damperCoefficient={} roadAmp={} slipAmp={} structural={} event={} structuralPreClip={} structuralPostClip={} eventPostClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
+                    "WheelFFB SAMPLE t={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} regripRecovery={} regripSatScale={} regripDamperBoost={} regripBuildScale={} springRequested={} springCoefficient={} damperRequested={} damperRelease={} damperCoefficient={} surfaceTexture={} surfaceImpact={} surfaceMatChanges={} surfaceMaxLoadDelta={} surfaceMaxRateSpike={} surfaceMasks={:08X}/{:08X}/{:08X}/{:08X} roadTextureAmp={} roadImpactAmp={} roadAmp={} slipAmp={} structural={} event={} structuralPreClip={} structuralPostClip={} eventPostClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
                     telemetryNow, static_cast<const void*>(car), speedRaw, speedNorm, steer, rawSteerRate, steerRate,
                     car->field_264, car->field_268, lateralRaw, smoothedLateral_, lateralLoadSmooth,
                     vehicleDynamics_.bodySlip(), bodySlide, vehicleDynamics_.yawRate(), frontSlip, frontScrub,
@@ -1540,7 +1544,13 @@ namespace
                     trailShape, physicsLoad, rearSlideRelief,
                     regripRecovery, regripSatScale, regripDamperBoost, regripBuildScale,
                     springStrength, prevSpringCoefficient_,
-                    dynamicDamperStrength, damperRelease, prevDamperCoefficient_, roadAmp, slipAmp,
+                    dynamicDamperStrength, damperRelease, prevDamperCoefficient_,
+                    surfaceHaptics.texture, surfaceHaptics.impact,
+                    surfaceHaptics.materialChanges,
+                    surfaceHaptics.maxLoadDelta, surfaceHaptics.maxRateSpike,
+                    car->water_flag_24C[0], car->water_flag_24C[1],
+                    car->water_flag_24C[2], car->water_flag_24C[3],
+                    roadTextureAmp, roadImpactAmp, roadAmp, slipAmp,
                     structural, events, total, compressed, eventCompressed, structuralLevel, level, prevConstantLevel_,
                     constantEffectPolar_, springEffect_ != nullptr, damperEffect_ != nullptr,
                     periodicsActive_, outputStrength, bool(Settings::WheelFFBInvertForce),
@@ -4100,7 +4110,8 @@ namespace
             float lateralLoad,
             float bodySlide,
             float frontScrub,
-            float roughness,
+            float surfaceTexture,
+            float surfaceImpact,
             float satTorque,
             LONG level)
         {
@@ -4113,7 +4124,7 @@ namespace
 
             lastLogTick_ = now;
             spdlog::info(
-                "WheelFFB DIAG: spd={:.2f} steer={:.3f} rate={:.4f} lat={:.2f} load={:.2f} slide={:.2f} scrub={:.2f} rough={:.2f} sat={:.3f} phys={} basis=M70r{} cal={:.2f} mix={:.2f} beta={:.3f} yaw={:.3f} fslip={:.3f} vLat={:.5f} vLong={:.5f} step={:.5f} spdLen={:.5f} spdCorr={:.2f} steerSrc={} out={} invCF={} spring={} invSpring={} coeff={} damper={} dcoeff={} periodic={}",
+                "WheelFFB DIAG: spd={:.2f} steer={:.3f} rate={:.4f} lat={:.2f} load={:.2f} slide={:.2f} scrub={:.2f} surfaceTex={:.3f} surfaceHit={:.3f} sat={:.3f} phys={} basis=M70r{} cal={:.2f} mix={:.2f} beta={:.3f} yaw={:.3f} fslip={:.3f} vLat={:.5f} vLong={:.5f} step={:.5f} spdLen={:.5f} spdCorr={:.2f} steerSrc={} out={} invCF={} spring={} invSpring={} coeff={} damper={} dcoeff={} periodic={}",
                 speedNorm,
                 steer,
                 steerRate,
@@ -4121,7 +4132,8 @@ namespace
                 lateralLoad,
                 bodySlide,
                 frontScrub,
-                roughness,
+                surfaceTexture,
+                surfaceImpact,
                 satTorque,
                 Settings::WheelFFBPhysicsSat
                     ? (vehicleDynamics_.calibrated()
