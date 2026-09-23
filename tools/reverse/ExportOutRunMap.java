@@ -152,7 +152,7 @@ public class ExportOutRunMap extends GhidraScript {
                 fw.write("{\"entry\":" + q(hex(entry)) +
                     ",\"rva\":" + q(rvaHex(entry)) +
                     ",\"name\":" + q(f.getName()) +
-                    ",\"namespace\":" + q(f.getParentNamespace().getName(true)) +
+                    ",\"namespace\":" + q(f.getParentNamespace().getName()) +
                     ",\"min\":" + q(hex(min)) +
                     ",\"max\":" + q(hex(max)) +
                     ",\"bodySize\":" + f.getBody().getNumAddresses() +
@@ -260,7 +260,7 @@ public class ExportOutRunMap extends GhidraScript {
                     ",\"address\":" + q(a == null ? null : hex(a)) +
                     ",\"rva\":" + q(inMem ? rvaHex(a) : null) +
                     ",\"type\":" + q(s.getSymbolType().toString()) +
-                    ",\"namespace\":" + q(s.getParentNamespace().getName(true)) +
+                    ",\"namespace\":" + q(s.getParentNamespace().getName()) +
                     ",\"source\":" + q(s.getSource().toString()) + "}\n");
             }
         }
