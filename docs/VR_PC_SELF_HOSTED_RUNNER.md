@@ -73,3 +73,15 @@ A PC fast build is tagged PC_FAST_INCREMENTAL_NOT_FINAL_CI.
 It is suitable for Quest 3 / VDXR test-fix-retest iteration. It does not replace the repository normal exact-SHA policy, smoke, regression, integration, or final package validation.
 
 After the runtime symptom is fixed, run the normal canonical validation path before treating the result as a final candidate.
+
+
+## Evening-only usage rule
+
+The PC fast path is reserved for the user's interactive evening Quest 3 / VDXR test-fix-retest session.
+
+- Do not use [pc-build] for scheduled A/N100/B/C/D work.
+- Do not use [pc-build] for ordinary daytime/manual code changes, reviews, CI checks, or final validation.
+- The runner being online by itself does not authorize PC builds.
+- Start using [pc-build] only after the user explicitly starts the evening runtime test session.
+- Stop using [pc-build] immediately when that test session ends, even if the runner process is still listening.
+- Final canonical validation remains on the normal GitHub-hosted validation path unless the user explicitly changes this policy.

@@ -169,8 +169,8 @@ The repository has an interactive Windows self-hosted fast-build path in .github
 
 - The runner label is outrun-pc. It is expected to be started manually and remain offline outside a user-requested test/fix/retest session.
 - Never route scheduled A/N100/B/C/D work, ordinary review work, pull requests, or untrusted code to this runner.
-- Only when the user explicitly indicates that the PC runner is active for an interactive runtime test session may a direct test-fix commit to vr-d3d9ex-focus include the marker [pc-build].
+- Only during an explicitly started **evening user runtime test/fix/retest session** may a direct test-fix commit to vr-d3d9ex-focus include the marker [pc-build]. The runner merely being online is not sufficient authorization.
 - [pc-build] is a build trigger, not a validation claim. The workflow preserves out/pc-fast incremental build state and writes a local package to Desktop\OutRunTestBuilds\LATEST.
 - PC-fast output is PC_FAST_INCREMENTAL_NOT_FINAL_CI. It never advances the protected runtime baseline and never replaces canonical hosted validation or final packaging.
-- When the interactive session ends, stop using [pc-build] immediately so the user's PC remains uninvolved.
+- Outside that evening test session, scheduled A/N100/B/C/D work, daytime/manual development, review, CI validation, packaging and ordinary direct-chat edits must not use [pc-build]. When the evening session ends, stop using [pc-build] immediately so the user's PC remains uninvolved.
 
