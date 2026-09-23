@@ -33,6 +33,10 @@ namespace OutRunVRRenderer
     bool GetLastRawGameWvpWrite(float outConstants[16],
         std::uint64_t& writeSerial, std::uint64_t& topLevelDrawSerial,
         std::uintptr_t& shaderIdentity, std::uint64_t& shaderSerial) noexcept;
+    bool GetLastGameWvpSemanticProvenance(
+        OutRunVR::GameSemantic::RenderScope& semanticScope,
+        std::uint64_t& queueNodeEpoch,
+        const void*& queueNode) noexcept;
 }
 
 namespace OutRunVRStereo
