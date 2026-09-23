@@ -81,6 +81,8 @@ namespace Settings
 		"Forces only the player-car body to the full render state while native view 2 remains active." };
 	Setting<float> VRDriverSeatCarScale{ "VR", "DriverSeatCarScale", 1.12f,
 		"Visual scale applied only to the player-car body draw in native view 2. 1.0 is stock size.", Range<float>{ 0.80f, 1.50f } };
+	Setting<bool> VRDriverSeatPassenger{ "VR", "DriverSeatPassenger", true,
+		"Adds only EVENT_ROB02 (girlfriend/passenger) to native view 2 using the games original CalcCharMatrix seat transform and robot display path. ROB01 driver is never forced." };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,
 		"Game-world units per metre of OpenXR head movement.", Range<float>{ 0.1f, 10.0f } };
 	Setting<float> VRStereoDepth{ "VR", "StereoDepth", 1.0f,
