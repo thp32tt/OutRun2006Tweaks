@@ -784,6 +784,87 @@ namespace WheelFFBMath
         return std::clamp(1.0f - 0.65f * occupied, 0.35f, 1.0f);
     }
 
+    inline float drift_regrip_shape(float recovery)
+    {
+        if (!std::isfinite(recovery))
+            return 0.0f;
+        const float t = std::clamp(recovery, 0.0f, 1.0f);
+        return t * t * (3.0f - 2.0f * t);
+    }
+
+    inline float drift_regrip_sat_scale(float recovery)
+    {
+        // A recovered rear axle can make the front-slip SAT estimate change sign
+        // several times while the car straightens. Keep the rack informative but
+        // temporarily reduce the new grip torque so a DD base does not ping-pong.
+        return 1.0f - 0.45f * drift_regrip_shape(recovery);
+    }
+
+    inline float drift_regrip_damper_boost(float recovery)
+    {
+        // Brief extra damping controls wheel velocity during the same transition.
+        // It fades completely once the car has settled, so sustained drift stays
+        // free enough for natural counter-steer.
+        return 0.12f * drift_regrip_shape(recovery);
+    }
+
+    inline float drift_regrip_build_scale(float recovery)
+    {
+        // Releasing stale torque remains fast. Only rebuilding the next sign is
+        // slowed during re-grip, preventing repeated full-strength sign swaps.
+        return 1.0f - 0.35f * drift_regrip_shape(recovery);
+    }
+
+    class DriftRegripGuard
+    {
+    public:
+        float update(float bodySlide, float deltaSeconds)
+        {
+            if (!std::isfinite(bodySlide) || !std::isfinite(deltaSeconds) ||
+                deltaSeconds <= 0.0f)
+            {
+                reset();
+                return 0.0f;
+            }
+
+            const float slide = std::clamp(bodySlide, 0.0f, 1.0f);
+
+            // Hysteresis: a real drift must first be established before a
+            // low-slide sample can start the recovery envelope.
+            if (slide >= 0.65f)
+            {
+                driftArmed_ = true;
+                recovery_ = 0.0f;
+            }
+            else if (driftArmed_ && slide <= 0.25f)
+            {
+                driftArmed_ = false;
+                recovery_ = 1.0f;
+            }
+            else if (recovery_ > 0.0f)
+            {
+                constexpr float RecoverySeconds = 0.45f;
+                recovery_ = std::max(
+                    0.0f, recovery_ - deltaSeconds / RecoverySeconds);
+            }
+
+            return recovery_;
+        }
+
+        void reset()
+        {
+            driftArmed_ = false;
+            recovery_ = 0.0f;
+        }
+
+        bool drift_armed() const { return driftArmed_; }
+        float recovery() const { return recovery_; }
+
+    private:
+        bool driftArmed_ = false;
+        float recovery_ = 0.0f;
+    };
+
     using ResponseLUT = std::array<float, 11>;
 
     inline ResponseLUT linear_response_lut()
