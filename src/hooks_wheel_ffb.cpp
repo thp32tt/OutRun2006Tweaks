@@ -266,8 +266,8 @@ namespace Settings
     };
 
     Setting<bool> WheelFFBInvertForce{
-        "WheelFFB", "InvertForce", true,
-        "Reverse ConstantForce steering/event direction without changing the centering spring."
+        "WheelFFB", "InvertForce", false,
+        "Reverse ConstantForce steering/event direction without changing the centering spring. Leave off for the validated MOZA R3 path."
     };
 
     Setting<bool> WheelFFBInvertSpring{
@@ -721,6 +721,25 @@ namespace
             update_crash_detection(speed, stateFlags);
             update_gear_event(curGear);
 
+            float regripRecovery = 0.0f;
+            if (vehicleDynamics_.sampleValid() &&
+                speedNorm > 0.08f &&
+                crashImpulseTimer_ <= 0)
+            {
+                regripRecovery = driftRegripGuard_.update(
+                    bodySlide, 1.0f / 60.0f);
+            }
+            else
+            {
+                driftRegripGuard_.reset();
+            }
+            const float regripSatScale =
+                WheelFFBMath::drift_regrip_sat_scale(regripRecovery);
+            const float regripDamperBoost =
+                WheelFFBMath::drift_regrip_damper_boost(regripRecovery);
+            const float regripBuildScale =
+                WheelFFBMath::drift_regrip_build_scale(regripRecovery);
+
             float roughness = 0.0f;
             DWORD waterFlag = 0;
             for (int i = 0; i < 4; ++i)
@@ -888,7 +907,8 @@ namespace
             const float damperRelease = 1.0f - 0.55f * gripLoss * damperSlipRelief;
             const float dynamicDamperStrength = std::clamp(
                 static_cast<float>(Settings::WheelFFBDamperStrength) *
-                    dampingSpeed * damperRelease,
+                    dampingSpeed * damperRelease +
+                    regripDamperBoost,
                 0.0f, 1.0f);
 
             if (!Settings::WheelFFBUseHardwareDamper && damperEffect_)
@@ -1250,7 +1270,9 @@ namespace
                 WheelFFBMath::mix_xforce_character(
                     modernSelfAligningTorque, nativeXForceTorque,
                     feedbackCharacter, xForceMix, xForceSample.nativeBlend);
-            const float selfAligningTorque = xForceMixResult.torque;
+            const float rawSelfAligningTorque = xForceMixResult.torque;
+            const float selfAligningTorque =
+                rawSelfAligningTorque * regripSatScale;
 
             float loadMod = 1.0f;
             if (speedHistoryIndex_ > 6)
@@ -1329,11 +1351,15 @@ namespace
             const float safeSlew = std::isfinite(configuredSlew)
                 ? std::clamp(configuredSlew, 0.01f, 1.0f)
                 : 0.06f;
-            const LONG maxSlew = static_cast<LONG>(
+            const LONG baseMaxSlew = static_cast<LONG>(
                 safeSlew * static_cast<float>(DI_FFNOMINALMAX));
+            const LONG maxSlew = std::max<LONG>(
+                1,
+                static_cast<LONG>(
+                    static_cast<float>(baseMaxSlew) * regripBuildScale));
 
             const LONG releaseMaxSlew = std::min(
-                static_cast<LONG>(DI_FFNOMINALMAX), maxSlew * 2);
+                static_cast<LONG>(DI_FFNOMINALMAX), baseMaxSlew * 2);
             const float configuredReversalRelease =
                 static_cast<float>(Settings::WheelFFBReversalReleaseRate);
             const float safeReversalRelease = std::isfinite(configuredReversalRelease)
@@ -1494,7 +1520,7 @@ namespace
             {
                 lastTelemetryTick_ = telemetryNow;
                 spdlog::info(
-                    "WheelFFB SAMPLE t={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperRelease={} damperCoefficient={} roadAmp={} slipAmp={} structural={} event={} structuralPreClip={} structuralPostClip={} eventPostClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
+                    "WheelFFB SAMPLE t={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} regripRecovery={} regripSatScale={} regripDamperBoost={} regripBuildScale={} springRequested={} springCoefficient={} damperRequested={} damperRelease={} damperCoefficient={} roadAmp={} slipAmp={} structural={} event={} structuralPreClip={} structuralPostClip={} eventPostClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
                     telemetryNow, static_cast<const void*>(car), speedRaw, speedNorm, steer, rawSteerRate, steerRate,
                     car->field_264, car->field_268, lateralRaw, smoothedLateral_, lateralLoadSmooth,
                     vehicleDynamics_.bodySlip(), bodySlide, vehicleDynamics_.yawRate(), frontSlip, frontScrub,
@@ -1503,7 +1529,9 @@ namespace
                     vehicleDynamics_.spdLen(), vehicleDynamics_.spdCorrelation(),
                     vehicleDynamics_.forwardAxis(), vehicleDynamics_.calibrationConfidence(),
                     vehicleDynamics_.sampleValid(), physicsMix, physicsSatTorque, selfAligningTorque,
-                    trailShape, physicsLoad, rearSlideRelief, springStrength, prevSpringCoefficient_,
+                    trailShape, physicsLoad, rearSlideRelief,
+                    regripRecovery, regripSatScale, regripDamperBoost, regripBuildScale,
+                    springStrength, prevSpringCoefficient_,
                     dynamicDamperStrength, damperRelease, prevDamperCoefficient_, roadAmp, slipAmp,
                     structural, events, total, compressed, eventCompressed, structuralLevel, level, prevConstantLevel_,
                     constantEffectPolar_, springEffect_ != nullptr, damperEffect_ != nullptr,
@@ -3807,6 +3835,7 @@ namespace
             smoothedXForceGain_ = -1.0f;
             nativeTireSatBlend_ = 0.0f;
             nativeOversteerProtectionBlend_ = 0.0f;
+            driftRegripGuard_.reset();
             prevStructuralLevel_ = 0;
             prevSpringCoefficient_ = 0;
             prevDamperCoefficient_ = 0;
@@ -4194,6 +4223,7 @@ namespace
         float smoothedXForceGain_ = -1.0f;
         float nativeTireSatBlend_ = 0.0f;
         float nativeOversteerProtectionBlend_ = 0.0f;
+        WheelFFBMath::DriftRegripGuard driftRegripGuard_{};
         float prevSteer_ = 0.0f;
         float smoothedSteerRate_ = 0.0f;
         bool steerSampleValid_ = false;
