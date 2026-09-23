@@ -207,6 +207,9 @@ def main() -> int:
         assert va_result["queryRva"] == "0x00001004"
         assert va_result["containingFunction"][0]["name"] == "FUN_demo"
 
+        mid_insn_result = json.loads(run(str(QUERY), "--db", str(db), "0x1006", "--json"))
+        assert mid_insn_result["containingFunction"][0]["name"] == "FUN_demo"
+
         text_result = json.loads(
             run(str(QUERY), "--db", str(db), "demo", "marker", "--json")
         )
