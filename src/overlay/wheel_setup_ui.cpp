@@ -832,7 +832,7 @@ namespace
             bool hwSpring = true;
             bool hwDamper = true;
             bool periodic = true;
-            bool invertForce = true;
+            bool invertForce = false;
             bool invertSpring = false;
             bool responseCorrection = false;
             bool debugLog = true;
@@ -1784,8 +1784,9 @@ namespace
                             "Reverse native tyre SAT only",
                             Settings::WheelFFBNativeTireSatInvert.ptr())))
                         WheelFFB_RequestSettingsTransition();
+                    ImGui::TextDisabled("MOZA R3 validated direction: Global Reverse OFF + Native SAT Reverse OFF.");
                     ImGui::TextColored(ImVec4(1.0f, 0.72f, 0.25f, 1.0f),
-                        "Research mode: validate direction at low Overall Strength before normal driving.");
+                        "Research mode: use a reverse switch only if another wheel/device proves it necessary.");
                 }
 
                 if (track_ffb_change(ImGui::Checkbox(
@@ -1923,6 +1924,8 @@ namespace
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Writes one WheelFFB NATIVE_PHYSICS record per player-car physics tick with front/rear suspension, normal-load and tire-force candidates. Read-only diagnostic capture.");
             track_ffb_change(ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr()));
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("MOZA R3 live validation: leave this OFF. If experimental Native tyre SAT is enabled, leave its Reverse OFF too. Two reverse switches can double-invert and hide a direction error.");
             ImGui::SameLine();
             track_ffb_change(ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr()));
             if (ImGui::IsItemHovered())
@@ -2048,7 +2051,7 @@ namespace
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
                 Settings::WheelFFBUsePeriodicEffects = true;
-                Settings::WheelFFBInvertForce = true;
+                Settings::WheelFFBInvertForce = false;
                 Settings::WheelFFBInvertSpring = false;
                 Settings::WheelFFBDebugLog = true;
                 Settings::VibrationMode = 0;
@@ -2099,7 +2102,7 @@ namespace
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
                 Settings::WheelFFBUsePeriodicEffects = true;
-                Settings::WheelFFBInvertForce = true;
+                Settings::WheelFFBInvertForce = false;
                 Settings::WheelFFBInvertSpring = false;
                 Settings::VibrationMode = 0;
                 WheelFFB_RequestSettingsTransition();
