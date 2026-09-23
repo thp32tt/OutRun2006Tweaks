@@ -1524,6 +1524,15 @@ namespace
                     xForceAnalysis.p95Abs, xForceAnalysis.p99Abs,
                     xForceAnalysis.maxAbs, smoothedXForceGain_);
                 spdlog::info(
+                    "WheelFFB NATIVE_OVERSTEER t={} requested={} frontValid={} rearValid={} rearSlipRad={} rearSlipNorm={} rearBand={} rearAC={} rearCapacity={} protectionClear={} protectionBlend={} cueTorque={} strength={} peakRef={} invert={}",
+                    telemetryNow, nativeOversteerRequested, nativeFront.valid, nativeRear.valid,
+                    nativeRear.slipRad, rearSlipNormalized, rearOversteerBand,
+                    nativeRear.lateralSum, nativeRear.capacitySum,
+                    oversteerProtectionClear, nativeOversteerProtectionBlend_,
+                    nativeOversteerCueTorque,
+                    static_cast<float>(Settings::WheelFFBNativeOversteerStrength),
+                    rearSlipThreshold, bool(Settings::WheelFFBNativeOversteerInvert));
+                spdlog::info(
                     "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} rawFrontSlip={} frontSlip={} frontBlend={} trailResponseSlip={} trailResponseLead={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} diPreResponse={} diCorrected={} responseCorrection={}",
                     telemetryNow,
                     vehicleDynamics_.rawBodySlip(), vehicleDynamics_.bodySlip(), vehicleDynamics_.bodySlipBlend(),
