@@ -1594,9 +1594,14 @@ namespace
                     levelBeforeResponse, level, bool(Settings::WheelFFBResponseCorrection));
                 // Raw horizontal bases allow row/column x X/Z candidates to be
                 // compared offline without changing the active steering model.
+                // Stage is telemetry only; it no longer selects road haptics.
+                int telemetryStage = -1;
+                if (Game::GetNowStageNum && Game::GetStageUniqueNum)
+                    telemetryStage = Game::GetStageUniqueNum(
+                        Game::GetNowStageNum(8));
                 spdlog::info(
                     "WheelFFB BASIS t={} tick={} state={} gear={} stage={} basisSign={} posX={} posY={} posZ={} m70_11={} m70_13={} m70_31={} m70_33={} mB0_11={} mB0_13={} mB0_31={} mB0_33={} mF0_11={} mF0_13={} mF0_31={} mF0_33={}",
-                    telemetryNow, updateCounter_, stateFlags, curGear, uniqueStage, vehicleDynamics_.forwardSign(),
+                    telemetryNow, updateCounter_, stateFlags, curGear, telemetryStage, vehicleDynamics_.forwardSign(),
                     car->position_14.x, car->position_14.y, car->position_14.z,
                     car->matrix_70._11, car->matrix_70._13, car->matrix_70._31, car->matrix_70._33,
                     car->matrix_B0._11, car->matrix_B0._13, car->matrix_B0._31, car->matrix_B0._33,
