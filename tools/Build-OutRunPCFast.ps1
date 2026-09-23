@@ -50,6 +50,42 @@ $gameBuild = Join-Path $root 'game'
 $hostBuild = Join-Path $root 'host'
 $packageDir = Join-Path $root 'package'
 
+# Canonical PC-fast contract for the protected R51 renderer lineage.
+# Keep this single source of truth in sync with the verified R51 build.
+$buildContractVersion = 'R51-PC-FAST-v2-R26HUD-ON'
+$canonicalGameFlags = @(
+    '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF'
+    '-DOUTRUN_VR_R26_HUD_COMPARE=ON'
+    '-DOUTRUN_VR_C1_COMPARE=OFF'
+    '-DOUTRUN_VR_C2_COMPARE=OFF'
+)
+$canonicalGameFlagString = $canonicalGameFlags -join ' '
+$buildMode = if ($Clean) { 'CLEAN' } else { 'INCREMENTAL' }
+
+function Assert-R51PCBuildContract {
+    param([Parameter(Mandatory = $true)][string]$BuildDir)
+
+    $cache = Join-Path $BuildDir 'CMakeCache.txt'
+    if (-not (Test-Path $cache)) {
+        throw "R51 PC build contract: CMakeCache missing after configure: $cache"
+    }
+
+    $required = @(
+        'OUTRUN_VR_SAFE_DRAW_COMPARE:BOOL=OFF'
+        'OUTRUN_VR_R26_HUD_COMPARE:BOOL=ON'
+        'OUTRUN_VR_C1_COMPARE:BOOL=OFF'
+        'OUTRUN_VR_C2_COMPARE:BOOL=OFF'
+    )
+    $cacheText = Get-Content $cache -Raw
+    foreach ($line in $required) {
+        if ($cacheText -notmatch [regex]::Escape($line)) {
+            throw "R51 PC build contract mismatch: expected '$line'. Refusing to compile/package a non-R51 renderer configuration."
+        }
+    }
+
+    Write-Host "PC fast build contract PASS: $buildContractVersion [$canonicalGameFlagString]"
+}
+
 if ($Clean -and (Test-Path $root)) {
     Write-Host 'PC fast build: CLEAN requested; deleting persistent build cache.'
     Remove-Item $root -Recurse -Force
@@ -60,7 +96,8 @@ Remove-Item Env:CI -ErrorAction SilentlyContinue
 $totalWatch = [Diagnostics.Stopwatch]::StartNew()
 
 Write-Host "PC fast build: configure Win32 game (persistent cache: $gameBuild)"
-Invoke-Checked cmake '-S' '.' '-B' $gameBuild '-G' 'Visual Studio 17 2022' '-A' 'Win32' '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF' '-DOUTRUN_VR_R26_HUD_COMPARE=OFF' '-DOUTRUN_VR_C1_COMPARE=OFF' '-DOUTRUN_VR_C2_COMPARE=OFF'
+Invoke-Checked cmake '-S' '.' '-B' $gameBuild '-G' 'Visual Studio 17 2022' '-A' 'Win32' @canonicalGameFlags
+Assert-R51PCBuildContract -BuildDir $gameBuild
 
 Patch-DependencyProject (Join-Path $gameBuild '_deps/safetyhook-build/src/safetyhook.vcxproj')
 Patch-DependencyProject (Join-Path $gameBuild '_deps/zydis-build/Zydis.vcxproj')
@@ -87,6 +124,7 @@ if ($sdlText -match '#define SDL_JOYSTICK_GAMEINPUT 1') {
 $gameWatch = [Diagnostics.Stopwatch]::StartNew()
 Write-Host "PC fast build: compile game DLL with up to $jobs parallel jobs"
 Invoke-Checked cmake '--build' $gameBuild '--config' 'Release' '--target' 'outrun2006tweaks' '--parallel' "$jobs"
+Assert-R51PCBuildContract -BuildDir $gameBuild
 $gameWatch.Stop()
 
 $hostWatch = [Diagnostics.Stopwatch]::StartNew()
@@ -112,7 +150,9 @@ Copy-Item $dll.FullName (Join-Path $backendDir 'dinput8.dll')
 Copy-Item $hostExe (Join-Path $backendDir 'outrun-vr-host.exe')
 Set-Content (Join-Path $backendDir 'SOURCE_SHA.txt') $sourceSha -Encoding ascii
 Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_FULL_R34' -Encoding ascii
-Set-Content (Join-Path $backendDir 'CMAKE_FLAGS.txt') '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF' -Encoding ascii
+Assert-R51PCBuildContract -BuildDir $gameBuild
+Set-Content (Join-Path $backendDir 'CMAKE_FLAGS.txt') $canonicalGameFlagString -Encoding ascii
+Set-Content (Join-Path $backendDir 'BUILD_CONTRACT.txt') $buildContractVersion -Encoding ascii
 
 Copy-Item 'OutRun2006Tweaks.ini' (Join-Path $packageDir 'OutRun2006Tweaks.ini')
 Copy-Item 'OutRun2006Tweaks.lods.ini' (Join-Path $packageDir 'OutRun2006Tweaks.lods.ini')
@@ -149,7 +189,7 @@ Copy-Item 'docs/VR_TEST_STRATEGY.md' (Join-Path $packageDir 'VR_TEST_STRATEGY.md
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $matrixId = "PC-FAST-$stamp-$shortSha"
 Set-Content (Join-Path $packageDir 'BUILD_MATRIX_ID.txt') $matrixId -Encoding ascii
-Set-Content (Join-Path $packageDir 'PC_FAST_BUILD.txt') 'PC_FAST_INCREMENTAL_NOT_FINAL_CI' -Encoding ascii
+Set-Content (Join-Path $packageDir 'PC_FAST_BUILD.txt') "PC_FAST_$buildMode`_NOT_FINAL_CI" -Encoding ascii
 
 $buildInputs = [ordered]@{
     SchemaVersion = 1
@@ -160,6 +200,9 @@ $buildInputs = [ordered]@{
     Profiles = @('CONTROL', 'CORRECTNESS', 'PERFORMANCE')
     UserRuntimeVerified = $false
     ValidationClass = 'PC_FAST_INCREMENTAL_NOT_FINAL_CI'
+    BuildMode = $buildMode
+    BuildContract = $buildContractVersion
+    CMakeFlags = $canonicalGameFlagString
 }
 $buildInputs | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $packageDir 'BUILD_INPUTS.json') -Encoding UTF8
 
@@ -201,6 +244,9 @@ $zipHash = (Get-FileHash $zipPath -Algorithm SHA256).Hash
     "Zip=$zipName"
     "ZipSha256=$zipHash"
     "ValidationClass=PC_FAST_INCREMENTAL_NOT_FINAL_CI"
+    "BuildMode=$buildMode"
+    "BuildContract=$buildContractVersion"
+    "CMakeFlags=$canonicalGameFlagString"
 ) | Set-Content (Join-Path $latestDrop 'PC_BUILD_INFO.txt') -Encoding UTF8
 
 Get-ChildItem $dropRoot -Filter 'OutRun2_VR_PC_FAST_*.zip' -File | Sort-Object LastWriteTime -Descending | Select-Object -Skip 8 | Remove-Item -Force -ErrorAction SilentlyContinue
@@ -215,6 +261,8 @@ $totalWatch.Stop()
 
 Write-Host ''
 Write-Host 'PC FAST BUILD READY'
+Write-Host "  Mode   : $buildMode"
+Write-Host "  Contract: $buildContractVersion"
 Write-Host "  Source : $sourceSha"
 Write-Host "  Game   : $([Math]::Round($gameWatch.Elapsed.TotalSeconds, 1)) s"
 Write-Host "  Host   : $([Math]::Round($hostWatch.Elapsed.TotalSeconds, 1)) s"
