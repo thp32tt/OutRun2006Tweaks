@@ -60,6 +60,9 @@ struct WheelFFBGraphSnapshot
     std::array<float, WheelFFBGraphCapacity> modernSat{};
     std::array<float, WheelFFBGraphCapacity> nativeSat{};
     std::array<float, WheelFFBGraphCapacity> nativeShare{};
+    std::array<float, WheelFFBGraphCapacity> nativeTireNormalized{};
+    std::array<float, WheelFFBGraphCapacity> nativeTireSat{};
+    std::array<float, WheelFFBGraphCapacity> nativeTireShare{};
 };
 
 
