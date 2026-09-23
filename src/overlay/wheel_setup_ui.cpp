@@ -53,6 +53,7 @@ namespace Settings
     extern Setting<bool> WheelFFBXForceInvert;
     extern Setting<float> WheelFFBXForceGain;
     extern Setting<bool> WheelFFBXForceCapture60Hz;
+    extern Setting<bool> WheelFFBNativePhysicsCapture60Hz;
     extern Setting<float> WheelFFBGripLoss;
     extern Setting<float> WheelFFBLateralDeadzone;
     extern Setting<float> WheelFFBWeightTransfer;
@@ -1651,7 +1652,7 @@ namespace
             track_ffb_change(ImGui::Checkbox("Enable Force Feedback", Settings::WheelFFBEnable.ptr()));
             ImGui::TextDisabled("gameplay FFB follows the exact selected DirectInput GUID.");
             ImGui::TextWrapped(
-                "Single-owner wheel FFB: DirectInput COM only. v0.3 can keep the Modern DD front-slip SAT, test the game's actionforce_DBC as an X-Force candidate, or blend both. Centering Spring remains a low-speed stabilizer and every character shares the same DD safety/output path.");
+                "Single-owner wheel FFB: DirectInput COM only. Executable-map XREF analysis proved actionforce_DBC belongs to race handicap/catch-up logic, so v0.4 fail-closes the old Arcade/Hybrid DBC experiment and keeps Modern DD authoritative. Native four-wheel physics is currently capture-only.");
             ImGui::TextDisabled("Settings > WheelFFB is hidden; changes on this page apply live. Gamepad rumble is suppressed only while DirectInput FFB owns an output device.");
 
             ImGui::SeparatorText("Physics / Structural");
@@ -1664,7 +1665,13 @@ namespace
             static constexpr const char* FeedbackCharacters[] = {
                 "Modern DD", "Arcade / X-Force candidate", "Hybrid"
             };
-            int feedbackCharacter = std::clamp(int(Settings::WheelFFBFeedbackCharacter), 0, 2);
+            const int requestedFeedbackCharacter =
+                std::clamp(int(Settings::WheelFFBFeedbackCharacter), 0, 2);
+            int feedbackCharacter = 0;
+            if (requestedFeedbackCharacter != 0)
+                ImGui::TextColored(ImVec4(1.0f, 0.60f, 0.25f, 1.0f),
+                    "Saved Arcade/Hybrid DBC mode is disabled: DBC is handicap/catch-up data.");
+            ImGui::BeginDisabled();
             if (ImGui::BeginCombo("Feedback Character", FeedbackCharacters[feedbackCharacter]))
             {
                 for (int character = 0; character < 3; ++character)
@@ -1682,6 +1689,7 @@ namespace
                 }
                 ImGui::EndCombo();
             }
+            ImGui::EndDisabled();
 
             if (feedbackCharacter == 0)
                 ImGui::TextDisabled("Modern DD: v0.2 front-slip / pneumatic + mechanical-trail SAT behavior.");
@@ -1768,7 +1776,7 @@ namespace
                 ImGui::TextDisabled("Approx full-scale ramp: build %.0f ms | stale reversal release %.0f ms at 60 Hz.",
                     (1.0f / buildRate) * (1000.0f / 60.0f),
                     (1.0f / reversalRate) * (1000.0f / 60.0f));
-                const int advancedFeedbackCharacter = std::clamp(int(Settings::WheelFFBFeedbackCharacter), 0, 2);
+                constexpr int advancedFeedbackCharacter = 0;
                 if (advancedFeedbackCharacter != 0)
                 {
                     ImGui::SeparatorText("Native X-Force candidate");
@@ -1831,9 +1839,12 @@ namespace
 
             track_ffb_change(ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr()));
             track_ffb_change(ImGui::Checkbox("Record driving telemetry (10 Hz)", Settings::WheelFFBTelemetry.ptr()));
-            track_ffb_change(ImGui::Checkbox("Capture X-Force validation at 60 Hz (very verbose)", Settings::WheelFFBXForceCapture60Hz.ptr()));
+            track_ffb_change(ImGui::Checkbox("Capture legacy DBC/handicap diagnostics at 60 Hz (very verbose)", Settings::WheelFFBXForceCapture60Hz.ptr()));
             if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Writes one WheelFFB XFORCE60 line every physics update for short validation runs. This is diagnostic only and can grow the log quickly.");
+                ImGui::SetTooltip("Legacy comparison capture only. actionforce_DBC is proven handicap/catch-up state and never alters wheel torque.");
+            track_ffb_change(ImGui::Checkbox("Capture native 4-wheel physics at 60 Hz (very verbose)", Settings::WheelFFBNativePhysicsCapture60Hz.ptr()));
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Writes one WheelFFB NATIVE_PHYSICS record per player-car physics tick with front/rear suspension, normal-load and tire-force candidates. Read-only diagnostic capture.");
             track_ffb_change(ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr()));
             ImGui::SameLine();
             track_ffb_change(ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr()));
