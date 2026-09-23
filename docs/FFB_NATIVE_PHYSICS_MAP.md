@@ -130,3 +130,34 @@ tick:
 - front normal-load sum/difference and transformed-force sums
 
 No field in this capture path can alter DirectInput output.
+
+
+## 8. Opt-in native tyre SAT candidate
+
+The v0.4 research branch exposes a **default-off** `NativeTireSAT` mode. It
+uses only the front axle (wheel0/1):
+
+- slip angle: `-EE * (2*pi/65536)`
+- native lateral force: `AC0 + AC1`
+- native load-sensitive capacity: `abs(C0_0) + abs(C0_1)`
+- normalized force: lateral-force sum divided by capacity, clamped to [-1,1]
+
+The native force magnitude is shaped only by the existing pneumatic/mechanical
+trail model. The synthetic lateral-G load boost is intentionally not stacked on
+top because AC/C0 already comes from the game's tyre/load/combined-slip path.
+
+Safety/validation rules:
+
+- ships OFF
+- zero/invalid capacity cannot arm native SAT
+- valid native ownership ramps in over ~200 ms at the fixed 60 Hz physics rate
+- invalid native data fades back to Modern SAT over ~100 ms
+- menu/focus/device/settings lifecycle resets native ownership to zero
+- the existing output soft-cap, reversal release, DirectInput lease/watchdog and
+  focus-loss zeroing remain downstream
+- old/partial profiles that do not contain native-tyre keys explicitly restore
+  `NativeTireSAT=false`, gain 1.00 and invert false
+
+The sign/scale still requires a controlled low-strength hardware capture before
+this mode can become a default. The separate invert switch exists only for that
+validation and does not change global ConstantForce direction.
