@@ -2,8 +2,10 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/hud_semantics.hpp"
 
 #include <array>
+#include <intrin.h>
 
 namespace Settings
 {
@@ -199,6 +201,165 @@ class UIScaling : public Hook
 
 		Game::D3DDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2u, g_spriteVertexStream, 0x1Cu);
 	}
+
+	// R51 EXE-map HUD producer bridge.
+	//
+	// The runtime HUD inspector sees the final common sprite helpers, which is
+	// too late to recover the producer reliably on the retail x86 stack.  The
+	// canonical EXE map proves that FUN_004BA9D0 is the shared numeric/text
+	// producer used by DispRank/ghost/time/result HUD paths.  Classify its
+	// *immediate* call site while that provenance is still exact, then tag only
+	// the SpriteNodes created by its internal sprani/put_clip calls.
+	//
+	// This deliberately does not change generic queue ownership: untagged nodes
+	// remain SCREEN_OVERLAY_2D and all world rendering stays on the R51 path.
+	static inline SafetyHookInline HudTextProducer_hk{};
+	static thread_local bool HudTextProducerScreenHud = false;
+	static inline bool HudTextProducerFirstTaggedLogged = false;
+
+	static uint32_t ExeCallRva(const void* returnAddress)
+	{
+		const auto base = reinterpret_cast<uintptr_t>(Module::ExeHandle);
+		const auto value = reinterpret_cast<uintptr_t>(returnAddress);
+		if (!base || value < base + 5)
+			return 0;
+		const auto returnRva = value - base;
+		return returnRva >= 5 && returnRva <= 0xFFFFFFFFu
+			? static_cast<uint32_t>(returnRva - 5)
+			: 0;
+	}
+
+	static void TagChangedPriorityTails(
+		const std::array<SpriteNode*, Game::SpritePriorityCount>& before,
+		OutRunVR::GameSemantic::RenderScope scope)
+	{
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			SpriteNode* node = root ? root->tail_4 : nullptr;
+			if (node && node != before[prio])
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
+		}
+	}
+
+	static int __cdecl HudText_sprani(
+		uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
+	{
+		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+		if (HudTextProducerScreenHud)
+		{
+			for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+			{
+				SpriteNode* root = Game::sprite_prio_root[prio];
+				before[prio] = root ? root->tail_4 : nullptr;
+			}
+		}
+
+		const int result =
+			Game::sprani_play_ae_auth_alpha(spriteId, x, y, a4, a5, alpha);
+		if (HudTextProducerScreenHud)
+			TagChangedPriorityTails(
+				before, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		return result;
+	}
+
+	static int __cdecl HudText_putClipSprite(
+		int xstnum, int x, int y, uint32_t flags, float priority, uint32_t color)
+	{
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* before = root ? root->tail_4 : nullptr;
+
+		const int result =
+			Game::put_clip_sprite(xstnum, x, y, flags, priority, color);
+
+		if (HudTextProducerScreenHud)
+		{
+			root = Game::sprite_prio_root[prio];
+			SpriteNode* node = root ? root->tail_4 : nullptr;
+			if (node && node != before)
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		}
+		return result;
+	}
+
+	static void __cdecl HudTextProducer_dest(
+		int glyphSet, int x, int y, const char* text, int a4, float alpha)
+	{
+		const uint32_t callRva = ExeCallRva(_ReturnAddress());
+		const auto semantic =
+			OutRunVRHudSemantics::ClassifyCaller(callRva);
+		const bool previous = HudTextProducerScreenHud;
+		HudTextProducerScreenHud =
+			previous ||
+			semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud;
+
+		if (HudTextProducerScreenHud && !HudTextProducerFirstTaggedLogged)
+		{
+			HudTextProducerFirstTaggedLogged = true;
+			spdlog::info(
+				"VR HUD EXE MAP: FUN_004BA9D0 producer tagged SCREEN_HUD from exact caller RVA=0x{:X} semantic={}",
+				callRva, semantic.semantic);
+		}
+
+		HudTextProducer_hk.call(glyphSet, x, y, text, a4, alpha);
+		HudTextProducerScreenHud = previous;
+	}
+
+	// Exact DispRank put_clip_sprite call sites from the canonical EXE map.
+	// These are ordinary screen HUD (including the 6th/6 glyph group), not the
+	// vehicle-attached rival marker producer below.
+	static int __cdecl ScreenHud_putClipSprite(
+		int xstnum, int x, int y, uint32_t flags, float priority, uint32_t color)
+	{
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* before = root ? root->tail_4 : nullptr;
+
+		const int result =
+			Game::put_clip_sprite(xstnum, x, y, flags, priority, color);
+
+		root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (node && node != before)
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		return result;
+	}
+
+	static constexpr int ScreenHudRankClipCalls[] = {
+		0xB9F3A, 0xB9F5E, 0xB9F81, 0xB9FD0,
+		0xB9FFC, 0xBA01E, 0xBA035, 0xBA052
+	};
+
+	// EXE-map sibling projected rival-marker producers that were outside the
+	// original sub_4BAD20 hook list.  Do not apply RankMarkerFracX/Y here: these
+	// functions own their own Calc3D2D result and only need spatial ownership.
+	static int __cdecl WorldBillboard_sprani(
+		uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
+	{
+		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			before[prio] = root ? root->tail_4 : nullptr;
+		}
+
+		const int result =
+			Game::sprani_play_ae_auth_alpha(spriteId, x, y, a4, a5, alpha);
+		TagChangedPriorityTails(
+			before, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+		return result;
+	}
+
+	static constexpr int WorldBillboardSiblingSpraniCalls[] = {
+		0xBBC5A, 0xBC2E5, 0xBC346
+	};
 
 	// Adjust positions of sprites in 3d space (eg 1st/2nd/etc markers)
 	static inline SafetyHookInline Calc3D2D_hk = {};
@@ -625,6 +786,27 @@ public:
 		D3DXMatrixTransformation2D = safetyhook::create_inline(Module::exe_ptr(D3DXMatrixTransformation2D_Addr), D3DXMatrixTransformation2D_dest);
 
 		Calc3D2D_hk = safetyhook::create_inline(Module::exe_ptr(Calc3D2D_Addr), Calc3D2D_dest);
+
+		// EXE-map exact HUD ownership.  FUN_004BA9D0 ABI is:
+		// (glyphSet, x, y, text, a4, alpha), recovered from canonical disassembly.
+		HudTextProducer_hk = safetyhook::create_inline(
+			Module::exe_ptr(0xBA9D0), HudTextProducer_dest);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBAAA0), HudText_putClipSprite,
+			Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBAAEA), HudText_sprani,
+			Memory::HookType::Call);
+
+		for (int addr : ScreenHudRankClipCalls)
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr), ScreenHud_putClipSprite,
+				Memory::HookType::Call);
+
+		for (int addr : WorldBillboardSiblingSpraniCalls)
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr), WorldBillboard_sprani,
+				Memory::HookType::Call);
 
 		RankMarker_Truncate_hk = safetyhook::create_mid(Module::exe_ptr(RankMarker_Truncate), RankMarker_Truncate_dest);
 		for (int addr : RankMarker_SpraniCalls)
