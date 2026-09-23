@@ -29,6 +29,10 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[pc-build]') }}
     runs-on: [self-hosted, Windows, X64, outrun-pc]
     timeout-minutes: 30
+    env:
+      # Keep build/tool temporary writes on the runner SSD instead of C:\Users\...\AppData\Local\Temp.
+      TEMP: ${{ runner.temp }}
+      TMP: ${{ runner.temp }}
 
     steps:
       - name: Checkout current VR integration branch without deleting build cache

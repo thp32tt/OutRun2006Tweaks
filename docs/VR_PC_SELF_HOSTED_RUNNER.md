@@ -25,11 +25,17 @@ Leave this window open. The expected state is Listening for Jobs.
 
 Stop with Ctrl+C when the test session ends. While stopped, the PC does not accept GitHub jobs.
 
-For convenience create a desktop file named OutRun Runner Start.cmd:
+For this PC the runner lives on the fast L: SSD. Create a desktop file named OutRun Runner Start.cmd:
 
     @echo off
-    cd /d C:\actions-runner
+    if not exist "L:\actions-runner\temp" mkdir "L:\actions-runner\temp"
+    set "TEMP=L:\actions-runner\temp"
+    set "TMP=L:\actions-runner\temp"
+    set "OUTRUN_TEST_DROP_ROOT=L:\OutRunTestBuilds"
+    cd /d L:\actions-runner
     call run.cmd
+
+This keeps the runner process temp directory and the test-package drop on L:. The workflow also overrides TEMP/TMP with GitHub runner.temp during jobs, which is under the runner work area on L:.
 
 ## Automatic fast-build trigger
 
@@ -53,8 +59,9 @@ The fast path intentionally differs from final CI.
 - Only the active Win32 game DLL and x64 OpenXR host are built.
 - Expensive policy, smoke, and final validation are not rerun on every interactive iteration.
 - GitHub artifact upload is skipped by default.
-- The ready-to-run package is copied directly to Desktop\OutRunTestBuilds\LATEST.
-- The ZIP is kept in Desktop\OutRunTestBuilds.
+- The ready-to-run package is copied directly to L:\OutRunTestBuilds\LATEST on this PC.
+- The ZIP is kept in L:\OutRunTestBuilds.
+- If OUTRUN_TEST_DROP_ROOT is explicitly set, that path takes precedence; if L: is unavailable the script falls back to the Desktop.
 - Only the newest eight PC-fast ZIPs are retained.
 
 The first PC build is a warm-up build and can still take time because dependencies and build trees must be created. Later source-only changes use incremental compilation.

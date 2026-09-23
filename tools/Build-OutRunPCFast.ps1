@@ -168,11 +168,19 @@ $zipName = "OutRun2_VR_PC_FAST_$($stamp)_$($shortSha).zip"
 $zipPath = Join-Path $root $zipName
 Compress-Archive -Path (Join-Path $packageDir '*') -DestinationPath $zipPath -Force
 
-$desktop = [Environment]::GetFolderPath('Desktop')
-if ([string]::IsNullOrWhiteSpace($desktop)) {
-    $desktop = Join-Path $env:USERPROFILE 'Desktop'
+if (-not [string]::IsNullOrWhiteSpace($env:OUTRUN_TEST_DROP_ROOT)) {
+    $dropRoot = $env:OUTRUN_TEST_DROP_ROOT
+} elseif (Test-Path 'L:\') {
+    # The interactive self-hosted PC uses L: as the fast SSD. Keep test payloads
+    # off the small system drive by default.
+    $dropRoot = 'L:\OutRunTestBuilds'
+} else {
+    $desktop = [Environment]::GetFolderPath('Desktop')
+    if ([string]::IsNullOrWhiteSpace($desktop)) {
+        $desktop = Join-Path $env:USERPROFILE 'Desktop'
+    }
+    $dropRoot = Join-Path $desktop 'OutRunTestBuilds'
 }
-$dropRoot = Join-Path $desktop 'OutRunTestBuilds'
 $latestDrop = Join-Path $dropRoot 'LATEST'
 New-Item -ItemType Directory -Force $dropRoot | Out-Null
 if (Test-Path $latestDrop) { Remove-Item $latestDrop -Recurse -Force }
