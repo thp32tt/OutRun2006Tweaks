@@ -1,0 +1,78 @@
+name: VR EXE Knowledge Map
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-map:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GHIDRA_TAG: Ghidra_12.1.4_build
+      GHIDRA_SHA256: ddac49f903da9d5bac833e5cc79395098b9c33cfd3279be5f31bd00387d2d4db
+      CANONICAL_EXE_URL: https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.1/OR2006C2C.EXE
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Download canonical executable
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fL "$CANONICAL_EXE_URL" -o OR2006C2C.EXE
+          python3 tools/verify_vr_binary_contract.py \
+            --exe OR2006C2C.EXE \
+            --manifest docs/VR_BINARY_CONTRACT.json \
+            --source-root .
+
+      - name: Download pinned Ghidra release
+        shell: bash
+        run: |
+          set -euo pipefail
+          api="https://api.github.com/repos/NationalSecurityAgency/ghidra/releases/tags/${GHIDRA_TAG}"
+          url="$(curl -fsSL "$api" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(a["browser_download_url"] for a in d["assets"] if a["name"].endswith(".zip")))')"
+          curl -fL "$url" -o ghidra.zip
+          echo "$GHIDRA_SHA256  ghidra.zip" | sha256sum -c -
+          unzip -q ghidra.zip -d "$RUNNER_TEMP/ghidra"
+          home="$(find "$RUNNER_TEMP/ghidra" -mindepth 1 -maxdepth 1 -type d | head -n1)"
+          echo "GHIDRA_HOME=$home" >> "$GITHUB_ENV"
+
+      - name: Build full executable map
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./tools/reverse/run_ghidra_map.sh "$GITHUB_WORKSPACE/OR2006C2C.EXE" "$RUNNER_TEMP/OR2006C2C-map"
+
+      - name: Smoke-query known semantic anchors
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/reverse/exequery.py --db "$RUNNER_TEMP/OR2006C2C-map/exe_map.sqlite" 0x2D734 --context 4 | tee "$RUNNER_TEMP/query-hud.txt"
+          python3 tools/reverse/exequery.py --db "$RUNNER_TEMP/OR2006C2C-map/exe_map.sqlite" RankMarker | tee "$RUNNER_TEMP/query-rank.txt"
+          grep -q 'SEM-HUD-SPRITENODE-QUEUE-ENTER' "$RUNNER_TEMP/query-hud.txt"
+          grep -q 'SEM-RIVAL-RANK-TRUNCATE' "$RUNNER_TEMP/query-rank.txt"
+
+      - name: Pack map artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/OR2006C2C-map/.ghidra-project"
+          tar -C "$RUNNER_TEMP" -czf "$RUNNER_TEMP/OR2006C2C-exe-map.tar.gz" OR2006C2C-map
+          sha256sum "$RUNNER_TEMP/OR2006C2C-exe-map.tar.gz" > "$RUNNER_TEMP/OR2006C2C-exe-map.tar.gz.sha256"
+
+      - name: Upload map
+        uses: actions/upload-artifact@v4
+        with:
+          name: OR2006C2C-exe-map
+          path: |
+            ${{ runner.temp }}/OR2006C2C-exe-map.tar.gz
+            ${{ runner.temp }}/OR2006C2C-exe-map.tar.gz.sha256
+          retention-days: 30
