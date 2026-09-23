@@ -57,6 +57,10 @@ namespace Settings
     extern Setting<bool> WheelFFBNativeTireSat;
     extern Setting<float> WheelFFBNativeTireSatGain;
     extern Setting<bool> WheelFFBNativeTireSatInvert;
+    extern Setting<bool> WheelFFBNativeOversteerCue;
+    extern Setting<float> WheelFFBNativeOversteerStrength;
+    extern Setting<float> WheelFFBNativeOversteerSlipThreshold;
+    extern Setting<bool> WheelFFBNativeOversteerInvert;
     extern Setting<float> WheelFFBGripLoss;
     extern Setting<float> WheelFFBLateralDeadzone;
     extern Setting<float> WheelFFBWeightTransfer;
@@ -821,6 +825,10 @@ namespace
             bool nativeTireSat = false;
             float nativeTireSatGain = 1.00f;
             bool nativeTireSatInvert = false;
+            bool nativeOversteerCue = false;
+            float nativeOversteerStrength = 0.18f;
+            float nativeOversteerSlipThreshold = 0.12f;
+            bool nativeOversteerInvert = false;
             bool hwSpring = true;
             bool hwDamper = true;
             bool periodic = true;
@@ -865,6 +873,10 @@ namespace
             savedFfb_.nativeTireSat = Settings::WheelFFBNativeTireSat;
             savedFfb_.nativeTireSatGain = Settings::WheelFFBNativeTireSatGain;
             savedFfb_.nativeTireSatInvert = Settings::WheelFFBNativeTireSatInvert;
+            savedFfb_.nativeOversteerCue = Settings::WheelFFBNativeOversteerCue;
+            savedFfb_.nativeOversteerStrength = Settings::WheelFFBNativeOversteerStrength;
+            savedFfb_.nativeOversteerSlipThreshold = Settings::WheelFFBNativeOversteerSlipThreshold;
+            savedFfb_.nativeOversteerInvert = Settings::WheelFFBNativeOversteerInvert;
             savedFfb_.hwSpring = Settings::WheelFFBUseHardwareSpring;
             savedFfb_.hwDamper = Settings::WheelFFBUseHardwareDamper;
             savedFfb_.periodic = Settings::WheelFFBUsePeriodicEffects;
@@ -909,6 +921,10 @@ namespace
             Settings::WheelFFBNativeTireSat = savedFfb_.nativeTireSat;
             Settings::WheelFFBNativeTireSatGain = savedFfb_.nativeTireSatGain;
             Settings::WheelFFBNativeTireSatInvert = savedFfb_.nativeTireSatInvert;
+            Settings::WheelFFBNativeOversteerCue = savedFfb_.nativeOversteerCue;
+            Settings::WheelFFBNativeOversteerStrength = savedFfb_.nativeOversteerStrength;
+            Settings::WheelFFBNativeOversteerSlipThreshold = savedFfb_.nativeOversteerSlipThreshold;
+            Settings::WheelFFBNativeOversteerInvert = savedFfb_.nativeOversteerInvert;
             Settings::WheelFFBUseHardwareSpring = savedFfb_.hwSpring;
             Settings::WheelFFBUseHardwareDamper = savedFfb_.hwDamper;
             Settings::WheelFFBUsePeriodicEffects = savedFfb_.periodic;
@@ -1771,6 +1787,31 @@ namespace
                     ImGui::TextColored(ImVec4(1.0f, 0.72f, 0.25f, 1.0f),
                         "Research mode: validate direction at low Overall Strength before normal driving.");
                 }
+
+                if (track_ffb_change(ImGui::Checkbox(
+                        "Native rear-slip countersteer cue (experimental)",
+                        Settings::WheelFFBNativeOversteerCue.ptr())))
+                    WheelFFB_RequestSettingsTransition();
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Default OFF. Uses native rear wheel2/3 slip angle around peak grip. The cue rises near the catch window, fades again in a large slide, and releases quickly during collision or invalid/airborne tyre capacity.");
+                if (Settings::WheelFFBNativeOversteerCue)
+                {
+                    track_ffb_change(ImGui::SliderFloat(
+                        "Rear countersteer cue strength",
+                        Settings::WheelFFBNativeOversteerStrength.ptr(),
+                        0.0f, 0.35f, "%.2f"));
+                    track_ffb_change(ImGui::SliderFloat(
+                        "Rear peak-slip reference (rad)",
+                        Settings::WheelFFBNativeOversteerSlipThreshold.ptr(),
+                        0.04f, 0.30f, "%.3f"));
+                    if (track_ffb_change(ImGui::Checkbox(
+                            "Reverse rear countersteer cue only",
+                            Settings::WheelFFBNativeOversteerInvert.ptr())))
+                        WheelFFB_RequestSettingsTransition();
+                    ImGui::TextDisabled("rFuktor-style band: starts near 0.85x peak, strongest around 1.15-1.45x, releases by 2.25x.");
+                    ImGui::TextColored(ImVec4(1.0f, 0.72f, 0.25f, 1.0f),
+                        "Validate at low Overall Strength first; this cue is additive to front SAT.");
+                }
             }
             track_ffb_change(ImGui::SliderFloat("Grip-loss Response", Settings::WheelFFBGripLoss.ptr(), 0.0f, 1.0f, "%.2f"));
 
@@ -1949,6 +1990,12 @@ namespace
                     ImGui::PlotLines("Native tyre SAT torque", graph.nativeTireSat.data(), int(graph.count), 0, nullptr, -2.1f, 2.1f, ImVec2(0, 40));
                     ImGui::PlotLines("Native tyre SAT blend", graph.nativeTireShare.data(), int(graph.count), 0, nullptr, 0.0f, 1.0f, ImVec2(0, 40));
                 }
+                if (Settings::WheelFFBNativeOversteerCue)
+                {
+                    ImGui::PlotLines("Rear slip / peak reference", graph.rearSlipNormalized.data(), int(graph.count), 0, nullptr, 0.0f, 3.0f, ImVec2(0, 40));
+                    ImGui::PlotLines("Rear countersteer cue torque", graph.nativeOversteerCue.data(), int(graph.count), 0, nullptr, -0.6f, 0.6f, ImVec2(0, 40));
+                    ImGui::PlotLines("Rear cue protection blend", graph.nativeOversteerProtection.data(), int(graph.count), 0, nullptr, 0.0f, 1.0f, ImVec2(0, 40));
+                }
                 if (std::clamp(int(Settings::WheelFFBFeedbackCharacter), 0, 2) != 0)
                 {
                     ImGui::PlotLines("Legacy DBC normalized", graph.xForceNormalized.data(), int(graph.count), 0, nullptr, -1.1f, 1.1f, ImVec2(0, 40));
@@ -1975,6 +2022,10 @@ namespace
                 Settings::WheelFFBNativeTireSat = false;
                 Settings::WheelFFBNativeTireSatGain = 1.00f;
                 Settings::WheelFFBNativeTireSatInvert = false;
+                Settings::WheelFFBNativeOversteerCue = false;
+                Settings::WheelFFBNativeOversteerStrength = 0.18f;
+                Settings::WheelFFBNativeOversteerSlipThreshold = 0.12f;
+                Settings::WheelFFBNativeOversteerInvert = false;
                 Settings::WheelFFBFeedbackCharacter = 0;
                 Settings::WheelFFBXForceMix = 0.50f;
                 Settings::WheelFFBXForceInvert = false;
@@ -2021,6 +2072,10 @@ namespace
                 Settings::WheelFFBNativeTireSat = false;
                 Settings::WheelFFBNativeTireSatGain = 1.00f;
                 Settings::WheelFFBNativeTireSatInvert = false;
+                Settings::WheelFFBNativeOversteerCue = false;
+                Settings::WheelFFBNativeOversteerStrength = 0.18f;
+                Settings::WheelFFBNativeOversteerSlipThreshold = 0.12f;
+                Settings::WheelFFBNativeOversteerInvert = false;
                 Settings::WheelFFBFeedbackCharacter = 0;
                 Settings::WheelFFBXForceMix = 0.50f;
                 Settings::WheelFFBXForceInvert = false;
