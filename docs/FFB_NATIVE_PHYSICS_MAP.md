@@ -210,10 +210,36 @@ The first 0.18 cue was also stronger than necessary. The corrected default is
 reduces the additive rear cue from 100% when front steering torque is light to
 35% when base SAT is already at/above normalized full scale.
 
-Old user settings and named profiles are migrated once through feel revision 6:
-the old Reverse workaround is cleared, an untouched 0.18 strength is softened to
-0.10, custom strength values remain intact, peak reference remains 0.12 rad, and
-`NativeOversteerCue` itself remains opt-in/default-off.
+Old user settings and named profiles are migrated through feel revision 7.
+Revision 6 clears the first rear-cue Reverse workaround and softens an untouched
+0.18 strength to 0.10. Revision 7 records the later R3 live validation that the
+canonical direction is **Global Reverse OFF + Native SAT Reverse OFF**; existing
+R3 settings/profiles are normalized to that pair while unknown wheel hardware
+keeps its explicit inversion choices. `NativeOversteerCue` remains opt-in.
+
+### 9.1 Drift re-grip stabilization
+
+The 2026-09-23 R3 telemetry showed that the uncomfortable wheel shake on grip
+recovery was not mainly the small rear countersteer cue. During several drift
+exits, the base Physics SAT repeatedly changed sign at high magnitude as body
+slide collapsed and the filtered front-slip estimate crossed zero. That can make
+a DD wheel ping-pong just as rear grip returns.
+
+The runtime therefore keeps sustained-drift countersteer unchanged and adds a
+short recovery envelope only after a real slide has been established:
+
+- arm only after `bodySlide >= 0.65`
+- trigger recovery when slide falls to `<= 0.25`
+- decay the recovery envelope over about 450 ms
+- initially scale new SAT to 55%, smoothly returning to 100%
+- add at most 0.12 normalized dynamic damping during the transition
+- slow new-direction torque build to 65% initially
+- do **not** slow stale-torque release; existing fast reversal unload stays active
+- reset the envelope on invalid dynamics, collision/lifecycle transitions, or a
+  newly established drift
+
+This is deliberately a transition stabilizer rather than a generic drift damper:
+the wheel remains free to self-countersteer while the rear is actually sliding.
 
 The capture analyzer now reports rear slip/capacity/AC distributions and
 correlations plus P90/P95 rear-slip reference hints. Those percentile hints are
