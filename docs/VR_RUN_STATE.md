@@ -94,3 +94,16 @@ Current autonomous pipeline contract supersedes all older role descriptions:
 - D must compare both protected-baseline -> prospective merged tree and current-HEAD -> prospective merged tree; silent loss of a prior fix or reintroduction of a known-bad value/path blocks integration.
 - If integration HEAD moves after candidate validation, the prospective merged tree must be revalidated.
 - A failed HMD test reopens the existing regression key and preserves the last known-good baseline.
+
+## Overnight handoff — 2026-09-24 01:50 KST
+
+- Protected runtime baseline remains R51 `17ad376bfdf7939f0851c0c629e4fa094a84f28a`.
+- PC-clean rebuild of exact R51 was user-tested and reproduced the same functional result as the preserved R51 artifact: world/road/vehicles good 3D; white HUD/rank defects unchanged.
+- EXE-map HUD candidate `8d21824f9502b3354fae679972a90868a0cce562` was built clean on PC runner run `35888306771`; package SHA256 `701a57ca5e4a1ba413bcdd75ad6fc6ecc320f6fc3dbb0dbd5a0597cb6ba81d89`.
+- HMD result: **FAILED intended HUD/rank fix**. White text and position/rank HUD remain doubled/head-following. Vehicle rank labels remain detached from their cars and head-following. R51 world 3D remained correct.
+- New decisive telemetry: `semanticHudAccepted=93681` but renderer `semanticOverlayBypass=0` throughout the session. Producer tagging reaches R30 draw ownership but is not visible at the earlier c64/WVP head-injection boundary.
+- Runtime evidence: matrix `PC-R51-HUD-MAP`, session `20260923T164207853Z-2202b186`, uploaded ZIP SHA256 `25be7a39d7daad4073e0b1765e9c6312a13f0b077898a84e4b1a17bf1dfe6731`.
+- Performance remains a separate lane: peak `drawsPerPresent≈3929.3`, lower-Present `max≈16.639 ms`; DirectGPU transport stayed healthy (`frames=13187`, `fallbacks=4`, `fenceTimeout=0`).
+- Next checkpoint: trace exact producer -> node-tag -> queue-select -> c64 upload -> draw semantic lifetime, plus Calc3D2D/vehicle-anchor propagation for rival rank markers. Do not broaden generic queue-to-HUD ownership.
+- **PC runner is disabled until explicit user re-authorization.** Overnight scheduled work is review/static analysis/EXE-map/documentation and normal cloud CI only.
+
