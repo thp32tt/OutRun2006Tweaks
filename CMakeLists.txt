@@ -280,7 +280,7 @@ FetchContent_Declare(ogg
 	GIT_REPOSITORY
 		"https://github.com/xiph/ogg"
 	GIT_TAG
-		v1.3.6
+		be05b13e98b048f0b5a0f5fa8ce514d56db5f822 # v1.3.6
 )
 FetchContent_MakeAvailable(ogg)
 
@@ -289,7 +289,7 @@ FetchContent_Declare(flac
 	GIT_REPOSITORY
 		"https://github.com/xiph/flac"
 	GIT_TAG
-		1.5.0
+		1507800de4b70e21be71f38caa0d9079d0bc6e45 # 1.5.0
 )
 FetchContent_MakeAvailable(flac)
 
@@ -298,7 +298,7 @@ FetchContent_Declare(miniupnpc
 	GIT_REPOSITORY
 		"https://github.com/miniupnp/miniupnp"
 	GIT_TAG
-		miniupnpd_2_3_10
+		b5e5d2eb069822b7f00d56c8e61033b9d500e60c # miniupnpd_2_3_10
 	SOURCE_SUBDIR
 		miniupnpc
 )
@@ -309,7 +309,7 @@ FetchContent_Declare(jsoncpp
 	GIT_REPOSITORY
 		"https://github.com/open-source-parsers/jsoncpp.git"
 	GIT_TAG
-		1.9.8
+		8519b8381f3c741ad1421f88237b1deda0b11412 # 1.9.8
 )
 FetchContent_MakeAvailable(jsoncpp)
 
@@ -318,7 +318,7 @@ FetchContent_Declare(zlib
 	GIT_REPOSITORY
 		"https://github.com/madler/zlib"
 	GIT_TAG
-		v1.3.2
+		da607da739fa6047df13e66a2af6b8bec7c2a498 # v1.3.2
 )
 FetchContent_MakeAvailable(zlib)
 
@@ -327,7 +327,7 @@ FetchContent_Declare(sdl
 	GIT_REPOSITORY
 		"https://github.com/libsdl-org/SDL"
 	GIT_TAG
-		release-3.4.12
+		f87239e71e42da91ca317a12eefb82cfbf3393eb # release-3.4.12
 )
 FetchContent_MakeAvailable(sdl)
 
