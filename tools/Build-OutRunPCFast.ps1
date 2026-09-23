@@ -191,6 +191,8 @@ $matrixId = "PC-FAST-$stamp-$shortSha"
 Set-Content (Join-Path $packageDir 'BUILD_MATRIX_ID.txt') $matrixId -Encoding ascii
 Set-Content (Join-Path $packageDir 'PC_FAST_BUILD.txt') "PC_FAST_${buildMode}_NOT_FINAL_CI" -Encoding ascii
 
+$gameBinarySha256 = (Get-FileHash (Join-Path $backendDir 'dinput8.dll') -Algorithm SHA256).Hash.ToLowerInvariant()
+$hostBinarySha256 = (Get-FileHash (Join-Path $backendDir 'outrun-vr-host.exe') -Algorithm SHA256).Hash.ToLowerInvariant()
 $buildInputs = [ordered]@{
     SchemaVersion = 2
     BuildMatrixId = $matrixId
@@ -205,8 +207,18 @@ $buildInputs = [ordered]@{
     BuildMode = $buildMode
     BuildContract = $buildContractVersion
     CMakeFlags = $canonicalGameFlagString
+    GameBinarySha256 = $gameBinarySha256
+    HostBinarySha256 = $hostBinarySha256
 }
 $buildInputs | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $packageDir 'BUILD_INPUTS.json') -Encoding UTF8
+$attestedInputs = Get-Content (Join-Path $packageDir 'BUILD_INPUTS.json') -Raw | ConvertFrom-Json
+$attestedVariant = (Get-Content (Join-Path $backendDir 'VARIANT_ID.txt') -Raw).Trim()
+$attestedFlags = (Get-Content (Join-Path $backendDir 'CMAKE_FLAGS.txt') -Raw).Trim()
+if ($attestedInputs.CompiledVariantId -ne $attestedVariant) { throw 'PC-fast attestation: compiled variant mismatch' }
+if ($attestedInputs.CMakeFlags -ne $attestedFlags) { throw 'PC-fast attestation: CMake flags mismatch' }
+if ($attestedInputs.GameBinarySha256 -ne $gameBinarySha256) { throw 'PC-fast attestation: game hash mismatch' }
+if ($attestedInputs.HostBinarySha256 -ne $hostBinarySha256) { throw 'PC-fast attestation: host hash mismatch' }
+if ($attestedInputs.UserRuntimeVerified -ne $false) { throw 'PC-fast attestation: nonfinal build cannot claim USER_RUNTIME_VERIFIED' }
 
 $bad = Get-ChildItem $packageDir -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll', 'multiviewpatcher.dll', 'outrun-vr-host-dx12.exe') }
 if ($bad) { throw "Forbidden backend payload: $($bad.FullName -join ', ')" }
