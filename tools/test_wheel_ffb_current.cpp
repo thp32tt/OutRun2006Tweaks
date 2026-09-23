@@ -196,6 +196,17 @@ int main() {
  require(reversal.rawFrontSlip()<0&&reversal.frontSlip()<0,"front-slip reversal crosses in one tick");
  require(reversal.steerRate()<0,"steering transient lead follows counter-steer direction");
 
+ // Rear native oversteer cue is intentionally band-limited: no artificial
+ // assist in normal cornering, strong near peak-slip/catch range, and no
+ // runaway DD torque once the rear is far beyond the useful catch window.
+ require(native_oversteer_band(0.50f)==0.0f,"rear-slip cue stays off below activation band");
+ require(native_oversteer_band(1.15f)>.99f,"rear-slip cue reaches full strength near peak slip");
+ require(native_oversteer_band(1.45f)>.99f,"rear-slip cue holds through catch window");
+ require(native_oversteer_band(1.85f)>0.0f&&native_oversteer_band(1.85f)<1.0f,"rear-slip cue fades in large slide");
+ require(native_oversteer_band(2.25f)==0.0f,"rear-slip cue fully releases beyond large-slide band");
+ require(native_oversteer_band(-1.15f)>.99f,"rear-slip cue magnitude is symmetric");
+ require(native_oversteer_band(std::numeric_limits<float>::quiet_NaN())==0.0f,"rear-slip cue NaN fails closed");
+
  float beta=d.bodySlip();d.update(nullptr,0,.5,0);require(d.bodySlip()<beta&&!d.sampleValid(),"invalid decay");
  for(int i=0;i<4;++i)d.update(nullptr,0,.5,0);
  require(d.bodySlip()==0&&d.yawRate()==0&&d.frontSlip()==0&&d.activationBlend()==0,"five-invalid clear");
