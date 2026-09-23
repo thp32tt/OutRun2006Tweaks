@@ -178,6 +178,8 @@ jobs:
           New-Item -ItemType Directory -Force $backend | Out-Null
           Copy-Item payload/game/dinput8.dll (Join-Path $backend 'dinput8.dll')
           Copy-Item payload/host/outrun-vr-host.exe (Join-Path $backend 'outrun-vr-host.exe')
+          Copy-Item payload/game/VARIANT_ID.txt (Join-Path $backend 'VARIANT_ID.txt')
+          Copy-Item payload/game/CMAKE_FLAGS.txt (Join-Path $backend 'CMAKE_FLAGS.txt')
           Set-Content (Join-Path $backend 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
           Copy-Item OutRun2006Tweaks.ini (Join-Path $dir 'OutRun2006Tweaks.ini')
           Copy-Item OutRun2006Tweaks.lods.ini (Join-Path $dir 'OutRun2006Tweaks.lods.ini')
@@ -196,14 +198,20 @@ jobs:
             'Optional: add a short symptom note only when you want to provide extra human-observed evidence.'
           ) | Set-Content (Join-Path $dir 'UPLOAD_LOG_ZIP_ONLY.txt') -Encoding UTF8
           Set-Content (Join-Path $dir 'BUILD_MATRIX_ID.txt') $matrixId -Encoding ascii
+          $compiledVariant = (Get-Content (Join-Path $backend 'VARIANT_ID.txt') -Raw).Trim()
+          $cmakeFlags = (Get-Content (Join-Path $backend 'CMAKE_FLAGS.txt') -Raw).Trim()
           $buildInputs = [ordered]@{
-            SchemaVersion = 1
+            SchemaVersion = 2
             BuildMatrixId = $matrixId
             IntegrationSha = $env:GITHUB_SHA
-            VariantId = 'ACTIVE_R26_R43_R44'
+            VariantId = $compiledVariant
+            CompiledVariantId = $compiledVariant
             DefaultTestProfile = 'CORRECTNESS'
             Profiles = @('CONTROL','CORRECTNESS','PERFORMANCE')
             UserRuntimeVerified = $false
+            ValidationClass = 'HOSTED_CLOUD_CI'
+            EvidenceClass = 'BUILD_VERIFIED'
+            CMakeFlags = $cmakeFlags
           }
           $buildInputs | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'BUILD_INPUTS.json') -Encoding UTF8
           $bad = Get-ChildItem $dir -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe') }
