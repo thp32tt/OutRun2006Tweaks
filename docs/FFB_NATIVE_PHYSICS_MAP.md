@@ -161,3 +161,52 @@ Safety/validation rules:
 The sign/scale still requires a controlled low-strength hardware capture before
 this mode can become a default. The separate invert switch exists only for that
 validation and does not change global ConstantForce direction.
+
+
+## 9. Native rear-slip counter-steer cue
+
+The v0.4 research branch also exposes a **default-off**
+`NativeOversteerCue` path inspired by the bounded rear-slip / oversteer ideas
+used in AMS2 rFuktor-family custom FFB and modern Assetto Corsa FFB
+post-processing tools.
+
+It reads the canonical rear axle (wheel2/3):
+
+- rear slip angle: capacity-weighted `-EE * (2*pi/65536)`
+- rear lateral-force evidence: `AC2 + AC3`
+- rear load-sensitive capacity: `abs(C0_2) + abs(C0_3)`
+
+The additive cue is not a generic drift-force switch. Rear slip is normalized
+against the configurable `NativeOversteerSlipThreshold` and passed through a
+bounded catch window:
+
+- below ~0.85x peak reference: zero
+- 0.85x -> 1.15x: smooth rise
+- 1.15x -> 1.45x: strongest catch cue
+- 1.45x -> 2.25x: smooth release
+- beyond ~2.25x: zero again
+
+This prevents an extreme sustained slide from continually winding a DD wheel
+harder. The cue is additionally protected by:
+
+- front and rear native capacity must both be valid
+- current vehicle-dynamics sample must be valid
+- collision impulse handling must be inactive
+- speed must be above the low-speed research gate
+- protection ownership ramps in over ~200 ms but releases in ~50 ms when a
+  collision/contact/telemetry guard fails
+- lifecycle/settings transitions reset protection ownership to zero
+- existing global soft clipping, stale-torque reversal release, output slew,
+  DirectInput watchdog and focus/device-loss zeroing remain downstream
+
+`NativeOversteerStrength` is capped at 0.35 before global output strength, and
+`NativeOversteerInvert` reverses only this research channel for controlled
+hardware sign validation.
+
+Old or partial FFB profiles that do not contain the new rear-slip keys explicitly
+restore `NativeOversteerCue=false`, strength 0.18, peak reference 0.12 rad and
+invert false.
+
+The capture analyzer now reports rear slip/capacity/AC distributions and
+correlations plus P90/P95 rear-slip reference hints. Those percentile hints are
+evidence for tuning only; they are never applied automatically.
