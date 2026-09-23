@@ -3,14 +3,11 @@
 // collide with std::min/std::max/std::clamp in the DirectInput FFB engine.
 #define NOMINMAX
 
-// Compile the core through two narrow compatibility aliases. The surface alias
-// lets this shim provide a temporary roughness floor only while a snow curb is
-// latched; the original game surface LUT remains authoritative everywhere else.
-#define sub_1149C0 WheelFFB_SurfaceRoughnessForCore
+// Compile the core under a private update-entry alias so this shim can retain
+// legacy preset migration/controller-rumble routing around it.
 #define WheelFFB_UpdateAfterPhysics WheelFFB_UpdateAfterPhysics_Core
 #include "hooks_wheel_ffb.cpp"
 #undef WheelFFB_UpdateAfterPhysics
-#undef sub_1149C0
 
 #include "input_manager.hpp"
 #include "hooks_wheel_input_compat_v2.hpp"
@@ -24,27 +21,6 @@
 
 #include <imgui.h>
 #include <cstring>
-
-// The core include above declared the macro-renamed surface function. Define it
-// here as a transparent pass-through with one optional, one-tick compatibility
-// floor. This avoids mutating EVWORK_CAR or weakening the core's normal asphalt
-// threshold just to retain a snow curb whose material scalar is below snow.
-extern double __cdecl sub_1149C0(
-    unsigned int surfaceMask, int loadColiType, DWORD* waterFlag);
-namespace
-{
-    bool coreSurfaceRoughnessFloorActive = false;
-    float coreSurfaceRoughnessFloor = 0.0f;
-}
-
-double __cdecl WheelFFB_SurfaceRoughnessForCore(
-    unsigned int surfaceMask, int loadColiType, DWORD* waterFlag)
-{
-    const double original = sub_1149C0(surfaceMask, loadColiType, waterFlag);
-    if (!coreSurfaceRoughnessFloorActive || !std::isfinite(original))
-        return original;
-    return std::max(original, static_cast<double>(coreSurfaceRoughnessFloor));
-}
 
 // The legacy vibration path lives in hooks_forcefeedback.cpp, but this wheel
 // build owns the modern input/FFB integration. Keep its controller routing safe
@@ -60,7 +36,7 @@ namespace Settings
     Setting<int> WheelFFBFeelRevision{
         "WheelFFB", "FeelRevision", 0,
         "Internal one-shot migration version for wheel FFB feel defaults.",
-        Range<int>{ 0, 7 }
+        Range<int>{ 0, 8 }
     };
 }
 
@@ -71,151 +47,6 @@ void InputManager_Update();
 
 namespace
 {
-    bool is_snow_or_ice_stage_for_ffb()
-    {
-        if (!Game::GetNowStageNum || !Game::GetStageUniqueNum)
-            return false;
-
-        const int stageNumber = Game::GetNowStageNum(8);
-        const int uniqueStage = Game::GetStageUniqueNum(stageNumber);
-        return uniqueStage == 4 || uniqueStage == 19 ||
-               uniqueStage == 34 || uniqueStage == 49;
-    }
-
-    struct RoadSurfaceProfile
-    {
-        float minimum = 1.0f;
-        float maximum = 0.0f;
-        float spread = 0.0f;
-        int validSamples = 0;
-    };
-
-    RoadSurfaceProfile sample_surface_profile(EVWORK_CAR* car)
-    {
-        RoadSurfaceProfile result{};
-        if (!car)
-            return result;
-
-        DWORD waterFlag = 0;
-        for (int i = 0; i < 4; ++i)
-        {
-            const float roughness = static_cast<float>(sub_1149C0(
-                car->water_flag_24C[i],
-                static_cast<int>(car->OnRoadPlace_5C.loadColiType_0),
-                &waterFlag));
-            if (!std::isfinite(roughness))
-                continue;
-
-            result.minimum = std::min(result.minimum, roughness);
-            result.maximum = std::max(result.maximum, roughness);
-            ++result.validSamples;
-        }
-
-        if (result.validSamples == 0)
-        {
-            result.minimum = 0.0f;
-            return result;
-        }
-
-        result.spread = std::max(0.0f, result.maximum - result.minimum);
-        return result;
-    }
-
-    // v0.2 snow-curb state. On snow stages a curb can be rougher OR smoother
-    // than the ~0.50 snow baseline. Mixed contact tells us which material is the
-    // curb; once all four tyres cross onto that same material the old per-frame
-    // mixed test disappears. Retain the material identity until the car returns
-    // to the snow baseline instead of lowering the global roughness threshold.
-    constexpr float SnowSurfaceBaseline = 0.50f;
-    constexpr float SnowLatchedCoreRoughnessFloor = 0.85f;
-    constexpr DWORD SnowCurbHoldMs = 450;
-    bool snowCurbLatched = false;
-    float snowCurbMaterial = 0.0f;
-    DWORD snowCurbHoldUntil = 0;
-
-    void clear_snow_curb_latch()
-    {
-        snowCurbLatched = false;
-        snowCurbMaterial = 0.0f;
-        snowCurbHoldUntil = 0;
-    }
-
-    bool update_snow_curb_latch(
-        const RoadSurfaceProfile& surface,
-        bool snowStage,
-        bool mixedSurface,
-        DWORD now)
-    {
-        if (!snowStage || surface.validSamples < 2)
-        {
-            clear_snow_curb_latch();
-            return false;
-        }
-
-        // A snow-curb latch may only start from a transition that still contains
-        // the real ~0.50 snow baseline. This prevents post-stage asphalt values
-        // such as 0.25/0.35 from being reclassified as a new snow curb.
-        const bool minimumIsSnowBaseline =
-            std::abs(surface.minimum - SnowSurfaceBaseline) <= 0.06f;
-        const bool maximumIsSnowBaseline =
-            std::abs(surface.maximum - SnowSurfaceBaseline) <= 0.06f;
-        const bool mixedTouchesSnowBaseline =
-            mixedSurface && (minimumIsSnowBaseline || maximumIsSnowBaseline);
-
-        if (mixedTouchesSnowBaseline)
-        {
-            float candidate = surface.minimum;
-            if (minimumIsSnowBaseline && !maximumIsSnowBaseline)
-                candidate = surface.maximum;
-            else if (maximumIsSnowBaseline && !minimumIsSnowBaseline)
-                candidate = surface.minimum;
-            else
-            {
-                const float minDistance =
-                    std::abs(surface.minimum - SnowSurfaceBaseline);
-                const float maxDistance =
-                    std::abs(surface.maximum - SnowSurfaceBaseline);
-                candidate = minDistance >= maxDistance
-                    ? surface.minimum
-                    : surface.maximum;
-            }
-
-            // Only a meaningful departure from snow starts/re-arms the one-shot
-            // hold. The hold deadline is never extended by uniform curb contact.
-            if (std::abs(candidate - SnowSurfaceBaseline) >= 0.08f)
-            {
-                snowCurbLatched = true;
-                snowCurbMaterial = candidate;
-                snowCurbHoldUntil = now + SnowCurbHoldMs;
-            }
-        }
-
-        if (!snowCurbLatched)
-            return false;
-
-        const float uniformValue =
-            (surface.minimum + surface.maximum) * 0.5f;
-        const bool nearlyUniform = surface.spread < 0.08f;
-
-        // Returning to the normal ~0.50 snow surface ends the latch immediately.
-        if (nearlyUniform &&
-            std::abs(uniformValue - SnowSurfaceBaseline) <= 0.05f)
-        {
-            clear_snow_curb_latch();
-            return false;
-        }
-
-        // A completed curb crossing is retained only for the fixed 450 ms grace
-        // period that began at the last confirmed snow<->curb mixed contact.
-        // Uniform curb/road contact must never refresh this deadline.
-        if (snowCurbHoldUntil != 0 &&
-            static_cast<LONG>(now - snowCurbHoldUntil) < 0)
-            return true;
-
-        clear_snow_curb_latch();
-        return false;
-    }
-
     bool nearly(float value, float expected)
     {
         return std::isfinite(value) && std::abs(value - expected) <= 0.0005f;
@@ -329,7 +160,8 @@ namespace
         Settings::WheelFFBWeightTransfer = 0.20f;
         Settings::WheelFFBSlewRate = 0.12f;
         Settings::WheelFFBReversalReleaseRate = 0.30f;
-        Settings::WheelFFBRoadTexture = 0.60f;
+        Settings::WheelFFBRoadTexture = 0.30f;
+        Settings::WheelFFBCurbImpact = 0.40f;
         Settings::WheelFFBTireSlip = 0.04f;
         Settings::WheelFFBWallImpact = 0.38f;
         Settings::WheelFFBGearShift = 0.60f;
@@ -366,146 +198,22 @@ namespace
         return true;
     }
 
-    DWORD lastRoadCompatibilityLogTick = 0;
 }
 
-// Road texture and snow/curb tactile handling are deliberately universal.
-// Wheel model names do not select a force model. ConstantForce is the common
-// road/slip transport so a driver claiming GUID_Sine support cannot silently
-// produce a different feel from another wheel. Hardware Spring/Damper remain
-// capability-driven inside the core and retain their software fallbacks.
-//
-// During a real surface transition, temporarily unload SAT/damping and normalize
-// RoadTexture so the tactile signal remains audible under sustained corner load.
-// Snow is special because its four-wheel baseline can itself be around 0.50;
-// min/max spread plus a short material latch preserves a curb after all tyres
-// complete the transition, regardless of whether the curb scalar is higher or
-// lower than the snow scalar.
+// The core now owns road/curb haptics directly from per-wheel material and
+// suspension/load signals. This wrapper only keeps legacy preset migration,
+// standardized ConstantForce tactile transport, and read-only research capture.
 void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
 {
-    // Old named profiles or old F11 presets can still restore the v0.1 values.
-    // Recognize only the exact known signatures so arbitrary user tuning remains
-    // untouched, then immediately bring those presets onto the universal tune.
     normalize_legacy_preset(true);
 
-    // One tactile transport for every wheel. Spring and Damper are still chosen
-    // by DirectInput capability probing; only road/slip sine is standardized.
+    // Keep one tactile transport across wheels. The new road model itself no
+    // longer depends on the old Xbox roughness LUT or snow-stage exceptions.
     if (Settings::WheelFFBUsePeriodicEffects)
         Settings::WheelFFBUsePeriodicEffects = false;
 
-    const float originalRoadTexture =
-        static_cast<float>(Settings::WheelFFBRoadTexture);
-    const float originalSteeringWeight =
-        static_cast<float>(Settings::WheelFFBSteeringWeight);
-    const float originalDamperStrength =
-        static_cast<float>(Settings::WheelFFBDamperStrength);
-
-    bool restoreTactileOverrides = false;
-    bool applyCoreSurfaceFloor = false;
-
-    if (!car)
-        clear_snow_curb_latch();
-
-    if (car)
-    {
-        const RoadSurfaceProfile surface = sample_surface_profile(car);
-        const bool rawMixedSurface =
-            surface.validSamples >= 2 && surface.spread >= 0.08f;
-        const bool genuinelyRough = surface.maximum >= 0.60f;
-        // Ordinary route-fork/asphalt material changes (for example 0.25/0.35)
-        // are not tactile curbs. A non-snow mixed transition must include a
-        // genuinely rough material before the compatibility boost is allowed.
-        const bool mixedSurface = rawMixedSurface && genuinelyRough;
-        const bool fullyRough =
-            surface.validSamples >= 2 && surface.minimum >= 0.60f;
-        const DWORD now = GetTickCount();
-        const bool snowStage = is_snow_or_ice_stage_for_ffb();
-        const bool snowCurbHeld = update_snow_curb_latch(
-            surface, snowStage, rawMixedSurface, now);
-        const bool strongTactile = mixedSurface || fullyRough || snowCurbHeld;
-        const bool tactileSurface = genuinelyRough || snowCurbHeld;
-
-        if (tactileSurface)
-        {
-            const float speedRaw = std::isfinite(car->field_1C4)
-                ? car->field_1C4 : 0.0f;
-            const float speedNorm = std::clamp(speedRaw / 2.0f, 0.0f, 1.0f);
-            const float roadSpeedGate =
-                std::clamp((speedNorm - 0.05f) / 0.20f, 0.0f, 1.0f);
-
-            // A latched snow curb is already a positively identified surface
-            // transition. Treat it as full texture in the compatibility envelope
-            // even when its LUT scalar is <=0.30; the core receives the matching
-            // temporary roughness floor immediately before its update below.
-            const float textureRoughness = snowCurbHeld
-                ? 1.0f
-                : std::clamp((surface.maximum - 0.30f) / 0.55f, 0.0f, 1.0f);
-            const float outputStrength = std::clamp(
-                static_cast<float>(Settings::WheelFFBGlobalStrength), 0.0f, 1.5f);
-            const float coreStageScale = snowStage ? 0.04f : 1.0f;
-
-            const float desiredRoadAmp = strongTactile ? 0.30f : 0.22f;
-            const float envelope =
-                textureRoughness * roadSpeedGate * outputStrength * coreStageScale;
-            if (envelope > 0.0005f)
-            {
-                // This value is temporary for one physics tick and is restored
-                // immediately below. Values above the UI range are intentional:
-                // they compensate the core's snow attenuation and/or a small
-                // material scalar, while the resulting roadAmp stays bounded by
-                // desiredRoadAmp and the DirectInput output remains hard capped.
-                const float normalizedRoadSetting = desiredRoadAmp / envelope;
-                Settings::WheelFFBRoadTexture = std::clamp(
-                    std::max(originalRoadTexture, normalizedRoadSetting),
-                    0.0f, 120.0f);
-            }
-
-            // Only an already-identified snow curb gets the core surface floor.
-            // Normal snow and ordinary asphalt still use the game's exact LUT.
-            applyCoreSurfaceFloor = snowCurbHeld;
-
-            // Keep exactly the same SAT/damper relief when the car completes the
-            // transition onto a fully rough or latched snow curb/shoulder.
-            const float steeringScale = strongTactile ? 0.72f : 0.80f;
-            const float damperScale = strongTactile ? 0.55f : 0.70f;
-            Settings::WheelFFBSteeringWeight =
-                originalSteeringWeight * steeringScale;
-            Settings::WheelFFBDamperStrength =
-                originalDamperStrength * damperScale;
-            restoreTactileOverrides = true;
-
-            if (Settings::WheelFFBDebugLog &&
-                now - lastRoadCompatibilityLogTick >= 750)
-            {
-                lastRoadCompatibilityLogTick = now;
-                spdlog::info(
-                    "WheelFFB ROAD: min={:.2f} max={:.2f} spread={:.2f} mixed={} fullRough={} snow={} snowLatch={} latchMaterial={:.2f} coreFloor={} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
-                    surface.minimum, surface.maximum, surface.spread,
-                    mixedSurface, fullyRough, snowStage, snowCurbHeld,
-                    snowCurbMaterial, applyCoreSurfaceFloor, desiredRoadAmp,
-                    static_cast<float>(Settings::WheelFFBRoadTexture),
-                    steeringScale, damperScale);
-            }
-        }
-    }
-
-    coreSurfaceRoughnessFloorActive = applyCoreSurfaceFloor;
-    coreSurfaceRoughnessFloor = applyCoreSurfaceFloor
-        ? SnowLatchedCoreRoughnessFloor : 0.0f;
     WheelFFB_UpdateAfterPhysics_Core(car);
-    // Research capture runs after the same completed player-car physics tick as
-    // FFB itself. It is read-only and remains fully dormant unless explicitly
-    // enabled, so production force ownership is unchanged.
     WheelNativePhysicsResearch::capture_after_physics(car);
-    coreSurfaceRoughnessFloorActive = false;
-    coreSurfaceRoughnessFloor = 0.0f;
-
-    if (restoreTactileOverrides)
-    {
-        Settings::WheelFFBRoadTexture = originalRoadTexture;
-        Settings::WheelFFBSteeringWeight = originalSteeringWeight;
-        Settings::WheelFFBDamperStrength = originalDamperStrength;
-    }
 }
 
 namespace
@@ -614,7 +322,8 @@ namespace
                 // unmistakable but short gear-change thunk.
                 Settings::WheelFFBSpringStrength = 0.22f;
                 Settings::WheelFFBSpringSaturation = 0.55f;
-                Settings::WheelFFBRoadTexture = 0.60f;
+                Settings::WheelFFBRoadTexture = 0.30f;
+        Settings::WheelFFBCurbImpact = 0.40f;
                 Settings::WheelFFBTireSlip = 0.04f;
                 Settings::WheelFFBGearShift = 0.60f;
                 Settings::WheelFFBFeelRevision = 1;
@@ -723,6 +432,23 @@ namespace
                 changed = true;
             }
 
+            if (revision < 8)
+            {
+                // v0.4 surface rewrite: the old 0.60 RoadTexture default was
+                // tuned around max(Xbox roughness). The new per-wheel physical
+                // model deliberately keeps continuous texture subtle and has a
+                // separate bounded curb/bump pulse.
+                const float road =
+                    static_cast<float>(Settings::WheelFFBRoadTexture);
+                if (std::isfinite(road) &&
+                    std::abs(road - 0.60f) <= 0.0005f)
+                    Settings::WheelFFBRoadTexture = 0.30f;
+                Settings::WheelFFBCurbImpact = 0.40f;
+                Settings::WheelFFBFeelRevision = 8;
+                revision = 8;
+                changed = true;
+            }
+
             if (!changed)
                 return true;
 
@@ -734,6 +460,11 @@ namespace
                 spdlog::warn(
                     "WheelFFBFeelRetune: applied revision {} for this session but could not persist user.ini",
                     revision);
+            }
+            else if (revision >= 8)
+            {
+                spdlog::info(
+                    "WheelFFBFeelRetune: applied revision 8 (per-wheel material+suspension road model; max roughness and snow-stage hacks removed)");
             }
             else if (revision >= 7)
             {
