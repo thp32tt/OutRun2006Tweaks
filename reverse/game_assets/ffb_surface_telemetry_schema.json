@@ -1,0 +1,123 @@
+{
+  "schema": "outrun-ffb-surface-telemetry-v1",
+  "purpose": "Correlate static Stage COLI records with native per-wheel surface masks before changing DD-wheel material behavior.",
+  "runtimeChangeIncluded": false,
+  "samplePolicy": {
+    "recommended": "emit on any surfaceMask/loadColiType/stage/roadSection change; optional <=10Hz heartbeat",
+    "reason": "Preserves transitions without per-frame log volume."
+  },
+  "fields": [
+    {
+      "name": "timeMs",
+      "type": "uint64",
+      "source": "monotonic runtime clock"
+    },
+    {
+      "name": "stageId",
+      "type": "int",
+      "source": "GetStageUniqueNum(GetNowStageNum(8))"
+    },
+    {
+      "name": "stageFolder",
+      "type": "derived-string",
+      "source": "reverse/game_assets/stage_collision_inventory.json"
+    },
+    {
+      "name": "roadSectionNum",
+      "type": "int16",
+      "source": "EVWORK_CAR::OnRoadPlace_5C.roadSectionNum_8"
+    },
+    {
+      "name": "curStageIdx",
+      "type": "uint32",
+      "source": "EVWORK_CAR::OnRoadPlace_5C.curStageIdx_C"
+    },
+    {
+      "name": "loadColiType",
+      "type": "uint32",
+      "source": "EVWORK_CAR::OnRoadPlace_5C.loadColiType_0",
+      "semantic": "branch/junction collision context; not material"
+    },
+    {
+      "name": "surfaceMask",
+      "type": "uint32[4]",
+      "source": "EVWORK_CAR::water_flag_24C[0..3]",
+      "semantic": "per-wheel raw surface identity"
+    },
+    {
+      "name": "roughness",
+      "type": "float[4]",
+      "source": "sub_1149C0(surfaceMask[i], loadColiType, &waterFlag)"
+    },
+    {
+      "name": "waterFlag",
+      "type": "uint32",
+      "source": "aggregate output from sub_1149C0 calls"
+    },
+    {
+      "name": "speedNorm",
+      "type": "float",
+      "source": "existing WheelFFB normalized speed"
+    },
+    {
+      "name": "roadAmp",
+      "type": "float",
+      "source": "existing WheelFFB road-texture output"
+    },
+    {
+      "name": "roadFreq",
+      "type": "float",
+      "source": "existing WheelFFB road-texture frequency"
+    }
+  ],
+  "derived": [
+    {
+      "name": "roughnessMin",
+      "formula": "min(roughness[0..3])"
+    },
+    {
+      "name": "roughnessMax",
+      "formula": "max(roughness[0..3])"
+    },
+    {
+      "name": "roughnessSpread",
+      "formula": "roughnessMax - roughnessMin"
+    },
+    {
+      "name": "uniqueMaskCount",
+      "formula": "count(distinct surfaceMask[0..3])"
+    },
+    {
+      "name": "leftRightSplit",
+      "formula": "compare FL/RL against FR/RR raw masks"
+    },
+    {
+      "name": "frontRearSplit",
+      "formula": "compare FL/FR against RL/RR raw masks"
+    }
+  ],
+  "wheelOrder": [
+    "FL",
+    "FR",
+    "RL",
+    "RR"
+  ],
+  "correlationKey": [
+    "stageId",
+    "roadSectionNum",
+    "curStageIdx",
+    "loadColiType",
+    "surfaceMask"
+  ],
+  "interpretationRules": [
+    "Raw surfaceMask is the primary identity; roughness is derived intensity evidence.",
+    "Never infer an exact raw mask from ambiguous roughness values such as 0.35 or 0.85.",
+    "Do not assign names like curb/grass/snow until runtime masks correlate with a static COLI field or an independently proven game semantic.",
+    "Keep DD-wheel feel parameters separate from original Xbox roughness values."
+  ],
+  "successCriteria": [
+    "Repeated passes over the same physical region reproduce the same raw mask pattern.",
+    "Forward/reverse stages correlate to equivalent static collision attributes where geometry/material is shared.",
+    "A candidate COLI attribute predicts raw surfaceMask transitions across at least two distinct stages before receiving a semantic material name."
+  ]
+}
