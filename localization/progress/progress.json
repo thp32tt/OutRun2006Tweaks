@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T00:09:00+09:00",
+  "updated_at_kst": "2026-09-25T00:13:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -87,10 +87,10 @@
     },
     "graphics_transcription": {
       "status": "in_progress",
-      "percent": 35,
-      "transcribed_assets": 28,
+      "percent": 40,
+      "transcribed_assets": 32,
       "localize_text_targets": 80,
-      "transcribed_segments": 82
+      "transcribed_segments": 153
     },
     "graphics_artwork": {
       "status": "not_started",
@@ -99,7 +99,7 @@
       "total": 80
     }
   },
-  "next_checkpoint": "Wait for clean Win32 build; collect K1 runtime trace; resolve IDs 96/97/279/280; continue graphics transcription then create first Korean DDS proof",
+  "next_checkpoint": "Pass latest clean CI; collect K1 runtime trace; resolve IDs 96/97/279/280; continue pending_transcription queue and prepare first Korean DDS typesetting proof",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -133,8 +133,8 @@
     "work_queue_total": 137,
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
-    "transcribed_assets": 28,
-    "transcribed_segments": 82,
+    "transcribed_assets": 32,
+    "transcribed_segments": 153,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl"
   },
   "data_build": {
