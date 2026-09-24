@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-09-24T23:00:00+09:00",
+  "updatedKst": "2026-09-24T23:02:00+09:00",
   "policy": "IMPLEMENTATION-FIRST + PARALLEL-HMD-MATRIX (HUD/PERF/DXVK/DX12 non-blocking)",
   "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
   "integrationBranch": "vr-d3d9ex-focus",
@@ -83,16 +83,26 @@
     {
       "slotId": "D_PERF",
       "backend": "DX9Ex",
-      "status": "IMPLEMENT_NEXT",
-      "sourceSha": null,
+      "status": "HMD_EXPERIMENT_READY",
+      "sourceSha": "2d96a3117a6057bf66b7415c9cda959d80834fd5",
       "profile": "PERFORMANCE",
       "featureFlags": [
         "DENSE_SCENE_PERF_TELEMETRY",
         "FRAME_BUDGET_TELEMETRY"
       ],
       "hypothesis": "Dense-scene loss must be localized to draw amplification/copies/waits/resource churn/frame cadence and optimized independently of HUD completion.",
-      "expectedObservable": "Per-frame counters identify dominant cost; optimization candidates can be built/tested while HUD remains open.",
-      "blockedByHud": false
+      "expectedObservable": "5-second telemetry reports DirectGPU producer-fence sample count, poll count, average wait us and maximum wait us alongside fallback/backpressure counters; stereo behavior is unchanged.",
+      "blockedByHud": false,
+      "branch": "vr-d3d9ex-candidate/PERF-FENCE-TELEMETRY-D-20260924",
+      "ciRunId": 36008667500,
+      "ciResult": "SUCCESS",
+      "artifactRef": "github-actions:36008667500/artifact:10810754989",
+      "artifactDigest": "sha256:e07a0f25a15bdf04a8fcc7ac02fe8d0b88ed5bf30a84f25a6f9b998c95314957",
+      "binarySha256": "fd3105e551b82d7b3a1415de53d8f898613dfb46cb964274f482880622f560b2",
+      "configSha256": "da1ab4c9f9aa614b8aae8afcd000122ddf77ba2113bdee3ecd8838a563be22b7",
+      "profileLibrarySha256": "872134376d3bfcea22f81d555b4af3444013482fce4afdba67dbb080f09ed843",
+      "configProfileHash": "7c35bc4d1444c8e11581fb07f263845c2a553c6c32dece8ba58e3aca628da3f1",
+      "note": "Exact-SHA DX9Ex Active Validation passed; instrumentation only, no fence/synchronization policy change."
     },
     {
       "slotId": "E_DXVK",
