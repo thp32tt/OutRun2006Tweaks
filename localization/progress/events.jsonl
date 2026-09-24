@@ -14,3 +14,6 @@
 {"ts_kst":"2026-09-25T00:47:00+09:00","event":"graphics_transcription_checkpoint","transcribed_assets":49,"localize_text_targets":79,"percent":62,"transcribed_segments":364,"reclassified_preserve_index":122}
 {"ts_kst":"2026-09-25T00:48:00+09:00","event":"clean_k2_ascii_package_ready","package_sha256":"0d68692be110175bd49d4d84f926f673eb6ca09cc32b9410bac6e847755f1229","includes_game_exe":false,"proof_override":true,"expected_id0":"[KOR-PROOF] Screen Position"}
 {"ts_kst":"2026-09-25T00:50:00+09:00","event":"cp5_state_verifier_repair","cause":"index 122 legal-credit reclassification initially updated progress/queue but not visual_review source-of-truth","fix":"visual_review and asset_queue aligned to preserve_brand_song_credit","localization_state_run_id":36022979146,"localization_state_result":"pass"}
+{"ts_kst":"2026-09-25T01:37:00+09:00","event":"graphics_jsonl_boundary_repaired","affected_indices":[241,46],"data_loss":false}
+{"ts_kst":"2026-09-25T01:38:00+09:00","event":"graphics_jsonl_ci_guard_added","checks":["valid_json","unique_indices","asset_count","segment_count"]}
+{"ts_kst":"2026-09-25T01:39:00+09:00","event":"graphics_transcription_checkpoint","transcribed_assets":78,"total_targets":79,"percent":98.7,"segments":668,"blocked_context_indices":[152]}
