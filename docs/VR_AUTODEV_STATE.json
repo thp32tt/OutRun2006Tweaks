@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-24T13:58:00Z",
+  "updatedUtc": "2026-09-24T14:08:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
-  "phase": "R51-matrix-base-integrated / HUD+PERF+DXVK+DX12 parallel development / no-PC-runner",
+  "phase": "two-full-cycles-per-hour / HUD+PERF+DXVK+DX12 parallel development / no-PC-runner",
   "checkpoint": "C6_STATE",
   "policy": {
     "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host",
@@ -129,7 +129,7 @@
     "DirectGPU transport is not the current HUD root cause: direct frames=13187, fallbacks=4, fenceTimeout=0, stereo/right-draw failures=0 in the failed HUD candidate session.",
     "Dense-scene performance remains separate; observed peak drawsPerPresent≈3929.3 and lower-Present max≈16.639 ms in this session."
   ],
-  "nextAction": "Run independent implementation lanes in parallel: HUD semantic lifetime, lens flare, dense-scene performance, DXVK SAFE->multiview, and DX12/D3D9On12. Preserve R51 as the comparison baseline; only backend promotion is parity-gated. Normal cloud CI is allowed; self-hosted PC remains disabled until explicitly authorized.",
+  "nextAction": "Use the :00 and :30 full cycles. Each cycle may review, implement, cloud-build, validate and integrate in one run. Rotate HUD/flare/perf/DXVK/DX12 and do not reintroduce the old A/B/C/D handoff latency.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
@@ -580,5 +580,38 @@
       "F_DX12: D3D9On12 strict/device-resource compatibility"
     ],
     "nextAction": "Prepare D_PERF/E_DXVK/F_DX12 immediately in parallel with B_HUD/C_FLARE. Do not wait for HUD resolution."
+  },
+  "automationSchedule": {
+    "contract": "TWO-FULL-CYCLES-PER-HOUR",
+    "timezone": "Asia/Seoul",
+    "active": [
+      {
+        "taskId": "6ab45eaa511c8191ab7d5984495d7e93",
+        "title": "OutRun Full Cycle 1 (Chat)",
+        "minute": 0,
+        "scope": "full recover-review-implement-validate-integrate-matrix"
+      },
+      {
+        "taskId": "6ab45ed52f548191b94c90af792116fb",
+        "title": "OutRun Full Cycle 2 (Chat)",
+        "minute": 30,
+        "scope": "consume prior outputs then full recover-review-implement-validate-integrate-matrix"
+      }
+    ],
+    "disabled": [
+      {
+        "taskId": "6ab45ebf6ba08191a59cb6d49c251637",
+        "formerRole": "B review",
+        "minute": 20
+      },
+      {
+        "taskId": "6ab45eec82dc8191b63632bdad258a7d",
+        "formerRole": "D integration",
+        "minute": 45
+      }
+    ],
+    "productionIntegrationWip": 1,
+    "ownership": "remote GitHub claim/CAS; never concurrent source mutation",
+    "waitingPolicy": "If one cycle waits on CI/HMD/review or another live writer, advance another independent lane instead of idling."
   }
 }
