@@ -105,3 +105,18 @@
 - Added stable `hangul_glyph_manifest.json`, manifest builder, two-page atlas renderer, K3 architecture document and EXE signature verifier.
 - Added opt-in `KoreanK3Trace` mid-hooks at string-width and glyph-draw entry points. Trace-only; no rendering behavior changes.
 - Latest Localization State and Domain Isolation checks passed; Win32 build for the K3 trace code is pending at this checkpoint.
+
+## 2026-09-25 01:50 KST - CP7
+
+- Completed graphics transcription/translation data for all 79/79 direct-localization DDS targets (674 text segments).
+- Resolved the final abbreviated music badge atlas (index 152) by cross-referencing the full music labels in index 198.
+- Added `artwork_plan.jsonl` with per-asset translation/layout/render/DDS/in-game states for all 79 targets.
+- Prepared six additional source-header-preserving BGRA DDS candidates: indices 55, 89, 102, 104, 116, 119.
+- Graphics proof candidates are now 7/79 including the earlier Continue -> 계속? candidate. In-game completion remains 0/79 until user validation.
+- Generated a local K3 compact atlas proof for all 505 required Hangul syllables: two 1024x1024 RGBA, 16x16-grid pages plus metrics. The source font file is not stored or distributed.
+- Reverse engineered the upper text draw loop at `0x42CCE0` / `0x42CD30`: it formats into a 256-byte buffer, calls `0x42C720` per byte and advances the global cursor directly.
+- Confirmed `0x42C720` builds a draw-command structure and submits it through `0x42CFE0`, making reuse of the existing text batching path a viable K3 direction.
+- Added opt-in, signature-gated `KoreanK3Trace` mid-hooks for width and glyph tracing; no render behavior changes.
+- Added K3 signature verifier and all six canonical EXE signatures passed against the supplied OR2006C2C.EXE.
+- CI optimization: localization data/docs/tool-only commits no longer enqueue full Win32 builds; C++/INI changes still do.
+- Next: obtain a successful Win32 build containing K3 trace -> package it -> K1/K2/K3 runtime logs -> reuse stock batch queue for first four-glyph Korean render proof -> expand artwork candidates.
