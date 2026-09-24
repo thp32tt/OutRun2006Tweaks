@@ -63,4 +63,21 @@ if required_flag not in workflow:
 if "-DOUTRUN_VR_R26_HUD_COMPARE=OFF" in workflow:
     raise SystemExit("protected R51 build contract regressed: active DX9Ex workflow contains R26_HUD_COMPARE=OFF")
 
+
+
+# Exact SCREEN_HUD draw ownership is discovered after the game's c64 upload.
+# Prevent the pre-draw world WVP verifier from vetoing the later exact HUD tag.
+safe = read("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp")
+hud_marker = "R51 HUD lifetime bridge: c64 is uploaded before the canonical"
+if hud_marker not in safe:
+    raise SystemExit("protected R51 HUD lifetime bridge missing")
+hud_begin = safe.find("R51 HUD lifetime bridge:")
+hud_end = safe.find("return R30ScreenSpaceKind::PerspectiveHud;", hud_begin)
+if hud_begin < 0 or hud_end < 0:
+    raise SystemExit("protected R51 HUD lifetime bridge malformed")
+hud_block = safe[hud_begin:hud_end]
+for forbidden in ("CurrentDrawMatchesVerifiedWorld(device)", "R28CanRebindVerifiedWorld("):
+    if forbidden in hud_block:
+        raise SystemExit(f"HUD lifetime regression: exact SCREEN_HUD is vetoed by pre-draw world gate: {forbidden}")
+
 print("R51 protected runtime contract: PASS")
