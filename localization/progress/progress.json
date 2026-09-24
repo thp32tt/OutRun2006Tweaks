@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T00:22:00+09:00",
+  "updated_at_kst": "2026-09-25T00:36:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -61,8 +61,8 @@
       "total_categories": 10
     },
     "runtime_text_trace": {
-      "status": "clean_branch_code_present_ci_in_progress",
-      "percent": 60,
+      "status": "clean_k1_package_ready",
+      "percent": 75,
       "clean_build_run_id": 36017712385,
       "domain_isolation_run_id": 36017712430,
       "localization_state_run_id": 36017712175
@@ -169,6 +169,16 @@
     "prototype_k1_ci_run_id": 35981045694,
     "prototype_evidence_role": "historical_only",
     "clean_k1_ci": "build_in_progress",
-    "hangul_runtime_render": "blocked_pending_clean_runtime_trace_and_font"
+    "hangul_runtime_render": "blocked_pending_clean_runtime_trace_and_font",
+    "clean_k1_test_package": {
+      "build_head": "079d890c2bdb87590f2f95e55281a7c4627401df",
+      "artifact_id": 10816665179,
+      "package_name": "OutRun2_Korean_Clean_K1_Trace.zip",
+      "package_sha256": "930a510bf8c6ffaa589da51bd805047bbfc1cef9d43076149e1fcef86899b287",
+      "includes_game_exe": false,
+      "korean_trace": true,
+      "proof_text_override": false,
+      "status": "ready_for_runtime_log"
+    }
   }
 }
