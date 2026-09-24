@@ -913,5 +913,57 @@
     "final FL/FR/RL/RR contact labels",
     "physical names for non-primary materials",
     "surface-mask aggregate consumers for particles/sound"
+  ],
+  "nonPrimaryContextEvidence": {
+    "0x19": {
+      "surfaceMask": "0x02000000",
+      "stageScope": [
+        "SNOW",
+        "SNOW_R",
+        "ALAS",
+        "ALAS_R"
+      ],
+      "totalRecords": 4464,
+      "spatialEvidence": "SNOW median nearest-primary center distance 7.93m; ALAS 8.67m; similar elevation and upward normals",
+      "safeLabel": "snow/ice-adjacent non-primary collision family",
+      "physicalName": "OPEN"
+    },
+    "0x0E": {
+      "surfaceMask": "0x00004000",
+      "stageScope": [
+        "PALM",
+        "PALM_R",
+        "PALM_T",
+        "PALM_BT",
+        "PALM_BR",
+        "BEAC",
+        "BEAC_R",
+        "BEAC_T",
+        "BEAC_BT",
+        "BEAC_BR"
+      ],
+      "totalRecords": 2885,
+      "spatialEvidence": "Flat coastal bands; PALM median nearest-primary distance 23.64m, BEAC 29.53m; occurs only in Palm/Sunny Beach variants",
+      "safeLabel": "coastal-only non-primary collision family",
+      "physicalName": "OPEN; do not choose sand versus water without runtime/effect evidence"
+    },
+    "0x08": {
+      "surfaceMask": "0x00000100",
+      "totalRecords": 2556,
+      "stageEvidence": "2540/2556 records are GHOS/GHOS_R; only 16 records occur elsewhere",
+      "safeLabel": "Ghost-Forest-dominant non-primary family",
+      "physicalName": "OPEN"
+    },
+    "0x18": {
+      "surfaceMask": "0x01000000",
+      "totalRecords": 1126,
+      "stageEvidence": "563 INDUSTRIAL + 563 INDUSTRIAL_R only",
+      "safeLabel": "Industrial-only non-primary family",
+      "physicalName": "OPEN"
+    }
+  },
+  "methodGuards": [
+    "Stage exclusivity and spatial adjacency may support contextual family labels, but not physical surface names.",
+    "Do not label 0x0E sand/water or 0x19 snowbank until runtime/effect consumers provide independent evidence."
   ]
 }
