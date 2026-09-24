@@ -1,4 +1,4 @@
-# OutRun VR Automation — IMPLEMENTATION-FIRST + EVENING-HMD-MATRIX
+# OutRun VR Automation — IMPLEMENTATION-FIRST + PARALLEL-HMD-MATRIX
 
 Effective: 2026-09-24 KST
 Repository: thp32tt/OutRun2006Tweaks
@@ -38,8 +38,8 @@ When enough evidence exists, D should prepare up to six high-information tests:
 - B HUD: HUD semantic lifetime candidate
 - C FLARE: lens-flare exact-producer candidate
 - D PERF: dense-scene instrumentation or measured low-risk optimization candidate
-- E HUD+FLARE: interaction candidate
-- F FULL: best currently compatible HUD+FLARE+PERF combination
+- E DXVK: x86 DXVK SAFE compatibility first; then multiview/performance if SAFE is viable
+- F DX12: D3D9On12/DX12 strict compatibility, device/resource diagnostics and VR transport
 
 Slots are examples, not a requirement to fabricate work. If a lane lacks implementation-ready evidence, replace that slot with a meaningful alternate hypothesis for an active problem or omit it.
 
@@ -74,11 +74,11 @@ Never treat lens flare as generic SCREEN_HUD.
 
 ### Dense-scene performance lane
 Instrumentation first, then measured optimization.
-Track draw amplification, copies/waits, resource churn/cache misses and frame cadence.
+Track draw amplification, copies/waits, resource churn/cache misses and frame cadence. Performance work is active even while HUD remains unresolved.
 
 ## Parallel preparation vs integration
 
-HUD, lens-flare and performance experiment candidates may be prepared and built in parallel during the day when each has bounded evidence and can be isolated from the common TEST_MATRIX_BASE.
+HUD, lens-flare, performance, DXVK and DX12 experiment candidates may be prepared and built in parallel during the day when each has bounded evidence and can be isolated from the common TEST_MATRIX_BASE. HUD/flare delays must never block performance or backend work; backend failures must never block HUD/flare.
 
 Actual integration stays conservative:
 1. reconcile/protect R51 contract;
@@ -88,17 +88,26 @@ Actual integration stays conservative:
 
 A failed experiment must never regress or block unrelated experiment slots.
 
+## Active backend lanes
+
+DXVK and DX12 are active first-class development/test lanes alongside HUD/flare/performance.
+
+### DXVK lane
+Start with x86 DXVK SAFE so initialization, Reset, gameplay rendering and VR transport are repeatable and identity-tracked. Once SAFE evidence is viable, continue to DXVK multiview/performance optimization as a separate exact identity. Do not wait for HUD completion.
+
+### DX12 / D3D9On12 lane
+Resume from the known CreateDevice/resource-compatibility boundary, including 0x8876086C evidence. Isolate device parameters, MANAGED/LockRect/resource lifetime behavior and VR transport. Do not change protected R51 world/HUD ownership merely to make DX12 pass. Do not wait for HUD completion.
+
+Only promotion to the protected/default backend is gated on Quest3/VDXR parity with R51.
+
 ## Frozen work
 
-Until the above user-visible lanes are substantially resolved, do not spend primary development time on:
-- DXVK
-- DX12
-- multiview
-- broad EXE-map expansion
-- general dependency/toolchain cleanup
+Do not spend primary development time on unrelated work while active user-visible/backend lanes remain:
+- broad EXE-map expansion unrelated to HUD/flare/backend work
+- general dependency/toolchain cleanup unrelated to active builds
 - PS2/FFB runtime work
 - localization runtime work
-- broad architecture refactors
+- broad architecture refactors unrelated to current backend blockers
 
 Existing infrastructure/reverse knowledge may be reused.
 
