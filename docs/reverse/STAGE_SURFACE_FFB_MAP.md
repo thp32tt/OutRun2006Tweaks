@@ -240,3 +240,12 @@ coli_CS_*_bin.sz -> collision/contact geometry/data used for physics lookup
 ```
 
 Visual texture identity must therefore not be substituted for collision material identity. It can be used only as a spatial cross-check after the runtime collision mask is correlated.
+
+
+### Cross-platform contact-pipeline anchor
+
+The same independent Xbox reverse project later corrected an earlier misidentification of `car+0x5C`: a write watch showed its only writer at Xbox `0x16902E`, described as contact write-back inside the `0x1692A0` per-car pipeline and fed by collision routine `0x168880`.
+
+The PC fork independently places `OnRoadPlace_5C` at **exactly car offset +0x5C**. Function addresses are platform-specific and must not be copied to PC, but the structure/role agreement is valuable.
+
+**PC next anchor:** find every canonical-EXE writer to `EVWORK_CAR + 0x5C`, then walk backward to the collision query and forward to the writes of per-wheel `surfaceMask` at `+0x24C..+0x258`. This is a stronger route to the COLI material field than guessing from static values.
