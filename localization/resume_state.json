@@ -7,8 +7,6 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "wait for/verify one Win32 build containing the K3 trace source",
-    "package K3 trace build with KoreanTrace=true and KoreanK3Trace=true but no game EXE",
     "collect K1/K2/K3 runtime logs",
     "resolve text IDs 96,97,279,280 using actual mode-screen context",
     "reuse stock text batching path for K3-A four-glyph Korean render proof",
@@ -44,6 +42,10 @@
     "k2": {
       "name": "OutRun2_Korean_Clean_K2_ASCII_Proof.zip",
       "sha256": "0d68692be110175bd49d4d84f926f673eb6ca09cc32b9410bac6e847755f1229"
+    },
+    "k3": {
+      "name": "OutRun2_Korean_Clean_K3_Trace.zip",
+      "sha256": "695db84089a79cce47693dbb90183dd34202d120db66230ec5f7e335464a0046"
     }
   },
   "k3_checkpoint": {
@@ -51,10 +53,13 @@
     "atlas_pages": 2,
     "local_atlas_proof_ready": true,
     "trace_code_present": true,
-    "source_build_validation": "pending",
+    "source_build_validation": "pass",
     "upper_draw_loop_va": "0x42CCE0",
     "byte_loop_va": "0x42CD30",
     "glyph_draw_va": "0x42C720",
-    "batch_submit_va": "0x42CFE0"
+    "batch_submit_va": "0x42CFE0",
+    "build_head": "3af9dec1650245272dfd594cad6a8885b11480a6",
+    "build_run_id": 36029358510,
+    "artifact_id": 10820094736
   }
 }
