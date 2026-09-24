@@ -64,7 +64,7 @@ index,path,action,artwork_status,transcription_status,notes
 116,textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 119,textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 121,textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds,localize_text,pending_artwork,transcribed_reviewed,pass6 transcription saved
-122,textures/load/spr_sprani_splash_cvt_xst/549D375_512x256.dds,localize_text,pending_artwork,pending_transcription,
+122,textures/load/spr_sprani_splash_cvt_xst/549D375_512x256.dds,preserve_brand_song_credit,preserve_original,not_required,legal/licensing credits; preserve original
 128,textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds,localize_text,pending_artwork,pending_transcription,
 130,textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds,localize_text,pending_artwork,pending_transcription,
 132,textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds,localize_text,pending_artwork,pending_transcription,
