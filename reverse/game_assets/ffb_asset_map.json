@@ -279,5 +279,16 @@
     "humanGuide": "docs/reverse/STAGE_SURFACE_FFB_MAP.md",
     "sharedAnalyzer": "tools/reverse/analyze_game_data.py",
     "telemetrySchema": "reverse/game_assets/ffb_surface_telemetry_schema.json"
+  },
+  "externalCrossCheck": {
+    "repository": "StupidCoder/RetroReverse",
+    "commit": "e9d892e19825c518407e41144fb8050f9d3e6c50",
+    "platform": "Xbox OutRun 2006 C2C",
+    "findings": [
+      "66 main coli_CS_* files use COLI0200 with size/magic/count/section-offset structure.",
+      "Six COLI0105 old-format leftovers exist in the Xbox corpus.",
+      "COLI section/material semantics remain unopened in that independent project.",
+      "Visible road asphalt/lane/kerb mesh is in cs_CS_*_pmt.sz; do not equate render texture material with collision surface identity."
+    ]
   }
 }
