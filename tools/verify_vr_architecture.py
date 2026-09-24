@@ -279,16 +279,19 @@ require(
     "MarkSafetyOverlayInstalled",
 )
 
-# Reconstructed VR-STARTUP-WHITE-001 protection: the D3D9Ex CreateDevice
-# handoff may install Reset/Present ownership synchronously, but it must not
-# allocate/swap/clear private stereo resources before the promoted device is
-# returned to OutRun. The final R23 Present owner performs first initialization
-# only after the lower game Present succeeds.
+# VR-STARTUP-WHITE-001 runtime recurrence protection.
+# Runtime evidence on 4ff3a3f9 falsified the reconstructed assumption that moving
+# the first post-Present private-resource initialization to the final R23 owner
+# was equivalent to the previously runtime-known-good R7 ownership boundary.
+# Keep the critical pre-CreateDevice prohibition, but require initialization to
+# occur only after the raw/lower game Present succeeds in R7, matching known-good
+# a9abb857. R23 must observe/recover; it must not become a second/late owner.
 r7_startup = require(
     "src/vr/d3d9/stereo_renderer_r7.inc",
     "Resource creation is intentionally deferred beyond CreateDevice exposure.",
     "FirstDeferredResourceInitLogged",
     "StereoInstalledDevice.store(device,std::memory_order_release)",
+    "private eye resources initialized at known-good R7 post-Present boundary",
 )
 install_start = r7_startup.find("bool InstallStereoHooks(IDirect3DDevice9*device)")
 install_end = r7_startup.find("DWORD WINAPI StereoInstallThread", install_start)
@@ -300,24 +303,37 @@ if "EnsureStereoResources(device)" in install_body:
         "VR-STARTUP-WHITE-001 regressed: pre-exposure InstallStereoHooks initializes stereo resources"
     )
 
+present_start = r7_startup.find("HRESULT __stdcall PresentDest(")
+present_end = r7_startup.find("void MaybeLogSummary", present_start)
+if present_start < 0:
+    raise SystemExit("could not isolate R7 Present owner for startup-white guard")
+# The function extends past MaybeLogSummary in some layouts; isolate by the next
+# install/rollback boundary when available.
+rollback = r7_startup.find("void RollbackStereoHooks", present_start)
+if rollback > present_start:
+    present_end = rollback
+if present_end < 0:
+    raise SystemExit("could not isolate end of R7 Present owner")
+present_body = r7_startup[present_start:present_end]
+lower_present = present_body.find("const HRESULT hr=PresentHook.stdcall<HRESULT>")
+deferred_init = present_body.find("if(SUCCEEDED(hr)&&!StereoResourcesReady")
+if lower_present < 0 or deferred_init < 0 or deferred_init <= lower_present:
+    raise SystemExit(
+        "VR-STARTUP-WHITE-001 regressed: known-good R7 post-Present resource owner missing"
+    )
+
 r23_startup = require(
     "src/vr/d3d9/stereo_renderer_r23.cpp",
     "R23 is the final effective Present owner in the layered hook chain.",
-    "if (SUCCEEDED(hr) && !StereoResourcesReady)",
-    "EnsureStereoResources(device)",
-    "VR R23 INIT: private eye/backbuffer resources initialized after final game Present",
-    "recovery baseline can now identify the main backbuffer",
 )
-present_start = r23_startup.find("HRESULT __stdcall PresentDestR23")
-present_end = r23_startup.find("void R23RollbackHooks", present_start)
-if present_start < 0 or present_end < 0:
+r23_present_start = r23_startup.find("HRESULT __stdcall PresentDestR23")
+r23_present_end = r23_startup.find("void R23RollbackHooks", r23_present_start)
+if r23_present_start < 0 or r23_present_end < 0:
     raise SystemExit("could not isolate R23 Present owner for startup-white guard")
-present_body = r23_startup[present_start:present_end]
-lower_present = present_body.find("R23PresentR21Hook.stdcall<HRESULT>")
-deferred_init = present_body.find("if (SUCCEEDED(hr) && !StereoResourcesReady)")
-if lower_present < 0 or deferred_init < 0 or deferred_init <= lower_present:
+r23_present_body = r23_startup[r23_present_start:r23_present_end]
+if "EnsureStereoResources(device)" in r23_present_body:
     raise SystemExit(
-        "VR-STARTUP-WHITE-001 regressed: deferred init is not after the lower Present"
+        "VR-STARTUP-WHITE-001 regressed: R23 still owns first stereo-resource initialization"
     )
 
 # Async installer status must be publishable back to the hook overlay/UI.
