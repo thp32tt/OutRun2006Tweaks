@@ -8,7 +8,11 @@
     "xstFiles": 141,
     "spraniFiles": 51,
     "scriptFiles": 80,
-    "uploadedCollisionFiles": 19
+    "uploadedCollisionFiles": 19,
+    "stageFiles": 847,
+    "stageDirectories": 66,
+    "stageCollisionFiles": 72,
+    "stageCollisionCompressedBytes": 19481268
   },
   "files": [
     "docs/reverse/GAME_ASSET_KNOWLEDGE_BASE.md",
@@ -18,6 +22,14 @@
     "reverse/game_assets/localization_map.json",
     "reverse/game_assets/ffb_asset_map.json",
     "reverse/game_assets/scripts_map.json",
-    "tools/reverse/analyze_game_data.py"
-  ]
+    "tools/reverse/analyze_game_data.py",
+    "docs/reverse/STAGE_SURFACE_FFB_MAP.md",
+    "reverse/game_assets/stage_collision_inventory.json"
+  ],
+  "stageSurfaceEvidence": {
+    "semanticAlias": "EVWORK_CAR::water_flag_24C[4] -> per-wheel surfaceMask[4]",
+    "junctionContext": "OnRoadPlace.loadColiType_0 != 0 -> is_in_bunki()",
+    "staticFieldToRuntimeMask": "OPEN",
+    "inventory": "reverse/game_assets/stage_collision_inventory.json"
+  }
 }
