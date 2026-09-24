@@ -179,6 +179,7 @@ jobs:
             src/hooks_wheel_ffb_build.cpp
             src/hooks_wheel_vehicle_dynamics.hpp
             src/wheel_ffb_math.hpp
+            src/wheel_ffb_ps2.hpp
             src/wheel_ffb_runtime.hpp
             tools/test_wheel_ffb_current.cpp
             tools/verify_wheel_ffb_math.py
