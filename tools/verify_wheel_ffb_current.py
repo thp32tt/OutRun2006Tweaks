@@ -522,6 +522,18 @@ req(build, 'ffbModel == WheelFFBMath::Model::ModernDD', 'Modern DD tactile wrapp
 req(wheel_ui, 'Arcade Original (Lindbergh-derived)', 'F11 exposes Arcade Original model')
 req(wheel_ui, 'Arcade + Modern Hybrid', 'F11 exposes Arcade Hybrid model')
 req(wheel_ui, 'PS2 Original topology (Experimental)', 'F11 exposes PS2 experimental model')
+req(wheel_ui, '// Arcade Original\'s verified rough-surface path is periodic.', 'Arcade shortcut documents hardware periodic ownership')
+req(wheel_ui, '// The retail PS2 binary has explicit periodic download/update', 'PS2 shortcut documents verified periodic ownership')
+original_shortcut = wheel_ui[wheel_ui.find('if (ImGui::Button("Use Arcade Original"))'):wheel_ui.find('if (ImGui::Button("Use Arcade Hybrid"))')]
+hybrid_shortcut = wheel_ui[wheel_ui.find('if (ImGui::Button("Use Arcade Hybrid"))'):wheel_ui.find('if (ImGui::Button("Use PS2 Original (Experimental)"))')]
+ps2_shortcut = wheel_ui[wheel_ui.find('if (ImGui::Button("Use PS2 Original (Experimental)"))':wheel_ui.find('if (!Settings::UseNewInput)', wheel_ui.find('if (ImGui::Button("Use PS2 Original (Experimental)"))')]
+for block, label in (
+    (original_shortcut, 'Arcade Original shortcut'),
+    (hybrid_shortcut, 'Arcade Hybrid shortcut'),
+    (ps2_shortcut, 'PS2 Original shortcut'),
+):
+    req(block, 'Settings::WheelFFBUsePeriodicEffects = true;', label + ' enables hardware periodic path')
+    forbid(block, 'Settings::WheelFFBUsePeriodicEffects = false;', label + ' never disables verified periodic path')
 req(wheel_ui, 'savedFfb_.model = Settings::WheelFFBModel;', 'FFB revert snapshot includes model selection')
 req(wheel_ui, 'Settings::WheelFFBModel = savedFfb_.model;', 'FFB revert restores model selection')
 req(ini, 'Model = 0', 'shipped INI defaults to Modern DD')
