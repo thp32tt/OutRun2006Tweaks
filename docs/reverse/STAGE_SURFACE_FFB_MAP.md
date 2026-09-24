@@ -219,3 +219,24 @@ The shared analyzer already verifies `COLI0200` identity/header bounds and zlib 
 Candidate fields should remain anonymous (for example `record_u32_0C`) until a runtime mask correlation proves their meaning.
 
 The goal is not merely a list of road types; it is a reproducible mapping that can eventually remove stage-name heuristics from FFB.
+
+
+## 9. Independent Xbox cross-check — RetroReverse
+
+An independent public reverse-engineering project, `StupidCoder/RetroReverse` at commit `e9d892e19825c518407e41144fb8050f9d3e6c50`, provides a useful cross-check against the Xbox C2C assets.
+
+Its current OutRun 2006 Xbox notes independently report:
+
+- `coli_CS_*_bin` self-describes as `{size, "COLI0200", counts, section offsets}`;
+- 66 main COLI0200 course files are present;
+- six old-format `COLI0105` leftovers also exist on the Xbox disc;
+- the COLI sections/material meanings remain unopened in that project as well.
+
+The same work later proves that the **visible road mesh** (asphalt, lane markings and kerbs) is ordinary rendered batch geometry inside decompressed `cs_CS_*_pmt.sz`. This is an important boundary for FFB:
+
+```text
+cs_CS_*_pmt.sz   -> visible/render road geometry + textures
+coli_CS_*_bin.sz -> collision/contact geometry/data used for physics lookup
+```
+
+Visual texture identity must therefore not be substituted for collision material identity. It can be used only as a spatial cross-check after the runtime collision mask is correlated.
