@@ -1739,6 +1739,13 @@ namespace
             ImGui::SeparatorText("Steering Feel");
             track_ffb_change(ImGui::SliderFloat("Centering Spring (low speed)", Settings::WheelFFBSpringStrength.ptr(), 0.0f, 1.0f, "%.2f"));
             track_ffb_change(ImGui::SliderFloat("Dynamic Damping", Settings::WheelFFBDamperStrength.ptr(), 0.0f, 1.0f, "%.2f"));
+            if (activeFfbModel == 3)
+            {
+                ImGui::TextDisabled(
+                    "PS2 baseline: Spring 0.65 = 1.00x retail coefficient 200/255; Dynamic Damping 0.30 = 1.00x retail 10*(1-speed)/255 coefficient.");
+                ImGui::TextDisabled(
+                    "Advanced Spring Saturation 0.775 = 1.00x the retail 15..60/255 dynamic saturation.");
+            }
             track_ffb_change(ImGui::Checkbox("Hardware GUID_Spring", Settings::WheelFFBUseHardwareSpring.ptr()));
             ImGui::SameLine();
             track_ffb_change(ImGui::Checkbox("Hardware GUID_Damper", Settings::WheelFFBUseHardwareDamper.ptr()));
@@ -1746,15 +1753,26 @@ namespace
 
             ImGui::SeparatorText("Effects");
             track_ffb_change(ImGui::SliderFloat("Road Detail", Settings::WheelFFBRoadTexture.ptr(), 0.0f, 1.0f, "%.2f"));
+
+            const bool modelUsesModernTireSlip =
+                activeFfbModel == 0 || activeFfbModel == 2;
+            if (!modelUsesModernTireSlip) ImGui::BeginDisabled();
             track_ffb_change(ImGui::SliderFloat("Tire Slip", Settings::WheelFFBTireSlip.ptr(), 0.0f, 0.50f, "%.2f"));
+            if (!modelUsesModernTireSlip) ImGui::EndDisabled();
+
             track_ffb_change(ImGui::SliderFloat("Collision", Settings::WheelFFBWallImpact.ptr(), 0.0f, 1.0f, "%.2f"));
+
+            const bool modelUsesEngineHaptics = activeFfbModel == 0;
+            if (!modelUsesEngineHaptics) ImGui::BeginDisabled();
             track_ffb_change(ImGui::Checkbox("Engine Vibration", Settings::WheelFFBEngineVibration.ptr()));
             if (!Settings::WheelFFBEngineVibration) ImGui::BeginDisabled();
             track_ffb_change(ImGui::SliderFloat("Engine Vibration Strength", Settings::WheelFFBEngineIdle.ptr(), 0.0f, 1.0f, "%.2f"));
             if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Optional estimated-RPM texture. Default OFF. Strength is normalized and internally limited so 0.20 remains subtle.");
+                ImGui::SetTooltip("Optional estimated-RPM texture. Modern DD only. Default OFF.");
             if (!Settings::WheelFFBEngineVibration) ImGui::EndDisabled();
-            track_ffb_change(ImGui::Checkbox("Hardware road/slip sine effects", Settings::WheelFFBUsePeriodicEffects.ptr()));
+            if (!modelUsesEngineHaptics) ImGui::EndDisabled();
+
+            track_ffb_change(ImGui::Checkbox("Hardware road/slip periodic effects", Settings::WheelFFBUsePeriodicEffects.ptr()));
 
             if (ImGui::CollapsingHeader("Advanced FFB tuning"))
             {
@@ -2018,6 +2036,11 @@ namespace
                 Settings::WheelFFBModel = 3;
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
+                // These shipped control values are defined as 1.00x scaling
+                // around the recovered retail PS2 condition parameters.
+                Settings::WheelFFBSpringStrength = 0.65f;
+                Settings::WheelFFBSpringSaturation = 0.775f;
+                Settings::WheelFFBDamperStrength = 0.30f;
                 Settings::WheelFFBEngineVibration = false;
                 // The retail PS2 binary has explicit periodic download/update
                 // paths; never inherit a previous model's disabled state.
