@@ -1,0 +1,284 @@
+{
+  "schema_version": 1,
+  "canonical_exe": "OR2006C2C.EXE",
+  "descriptor_table_va": "0x0076F7B8",
+  "active_globals": {
+    "texture_ptr_va": "0x00956BA0",
+    "kerning_ptr_va": "0x00956BA4",
+    "resource_handle_va": "0x00956BAC",
+    "texture_width_va": "0x00956BB0",
+    "texture_height_va": "0x00956BB2",
+    "cursor_x_va": "0x00956BB8",
+    "cursor_y_va": "0x00956BBA",
+    "cell_width_va": "0x00956BBC",
+    "cell_height_va": "0x00956BBE",
+    "scale_x_va": "0x00956BC4",
+    "scale_y_va": "0x00956BC8",
+    "color_va": "0x00956BCC",
+    "layer_va": "0x00956BD0",
+    "base_code_va": "0x00956BD4",
+    "flags_va": "0x00956BD8",
+    "letter_spacing_va": "0x00956BDC",
+    "line_advance_va": "0x00956BE0"
+  },
+  "descriptors": [
+    {
+      "descriptor_index": 0,
+      "resource_handle": 0,
+      "cell": [
+        12,
+        12
+      ],
+      "base_code": 0,
+      "letter_spacing": 0,
+      "dds_hash": "7B65A191",
+      "dds_size": [
+        256,
+        128
+      ],
+      "dds_format": "DXT3"
+    },
+    {
+      "descriptor_index": 1,
+      "resource_handle": 1,
+      "cell": [
+        16,
+        16
+      ],
+      "base_code": 0,
+      "letter_spacing": 0,
+      "dds_hash": "CE41E71C",
+      "dds_size": [
+        256,
+        128
+      ],
+      "dds_format": "DXT3",
+      "replacement_present": false
+    },
+    {
+      "descriptor_index": 2,
+      "resource_handle": 3,
+      "cell": [
+        30,
+        30
+      ],
+      "base_code": 32,
+      "letter_spacing": 0,
+      "dds_hash": "23DDB6EC",
+      "dds_size": [
+        512,
+        512
+      ],
+      "dds_format": "DXT3"
+    },
+    {
+      "descriptor_index": 3,
+      "resource_handle": 4,
+      "cell": [
+        26,
+        26
+      ],
+      "base_code": 32,
+      "letter_spacing": 0,
+      "dds_hash": "B3ED3652",
+      "dds_size": [
+        512,
+        256
+      ],
+      "dds_format": "DXT3"
+    },
+    {
+      "descriptor_index": 4,
+      "resource_handle": 5,
+      "cell": [
+        20,
+        20
+      ],
+      "base_code": 32,
+      "letter_spacing": 0,
+      "dds_hash": "FDC6BAD7",
+      "dds_size": [
+        512,
+        128
+      ],
+      "dds_format": "DXT3"
+    },
+    {
+      "descriptor_index": 5,
+      "resource_handle": 6,
+      "cell": [
+        15,
+        20
+      ],
+      "base_code": 32,
+      "letter_spacing": 0,
+      "dds_hash": "B7EEB2D9",
+      "dds_size": [
+        256,
+        128
+      ],
+      "dds_format": "DXT3"
+    },
+    {
+      "descriptor_index": 6,
+      "resource_handle": 8,
+      "cell": [
+        16,
+        12
+      ],
+      "base_code": 32,
+      "letter_spacing": 0,
+      "dds_hash": "6B8ED9DA",
+      "dds_size": [
+        256,
+        128
+      ],
+      "dds_format": "DXT3"
+    },
+    {
+      "descriptor_index": 7,
+      "resource_handle": 2,
+      "cell": [
+        22,
+        26
+      ],
+      "base_code": 32,
+      "letter_spacing": 0,
+      "dds_hash": "D7CE8BC3",
+      "dds_size": [
+        512,
+        256
+      ],
+      "dds_format": "DXT3"
+    },
+    {
+      "descriptor_index": 8,
+      "resource_handle": 7,
+      "cell": [
+        16,
+        20
+      ],
+      "base_code": 32,
+      "letter_spacing": 0,
+      "dds_hash": "E86D77E8",
+      "dds_size": [
+        256,
+        128
+      ],
+      "dds_format": "DXT3"
+    },
+    {
+      "descriptor_index": 9,
+      "resource_handle": 9,
+      "cell": [
+        17,
+        17
+      ],
+      "base_code": 32,
+      "letter_spacing": 2,
+      "dds_hash": "20389D70",
+      "dds_size": [
+        512,
+        256
+      ],
+      "dds_format": "DXT5"
+    }
+  ],
+  "resource_hashes": [
+    {
+      "resource_handle": 0,
+      "hash": "7B65A191",
+      "size": [
+        256,
+        128
+      ],
+      "embedded_bytes": 32896
+    },
+    {
+      "resource_handle": 1,
+      "hash": "CE41E71C",
+      "size": [
+        256,
+        128
+      ],
+      "embedded_bytes": 32896
+    },
+    {
+      "resource_handle": 2,
+      "hash": "D7CE8BC3",
+      "size": [
+        512,
+        256
+      ],
+      "embedded_bytes": 131200
+    },
+    {
+      "resource_handle": 3,
+      "hash": "23DDB6EC",
+      "size": [
+        512,
+        512
+      ],
+      "embedded_bytes": 262272
+    },
+    {
+      "resource_handle": 4,
+      "hash": "B3ED3652",
+      "size": [
+        512,
+        256
+      ],
+      "embedded_bytes": 131200
+    },
+    {
+      "resource_handle": 5,
+      "hash": "FDC6BAD7",
+      "size": [
+        512,
+        128
+      ],
+      "embedded_bytes": 65664
+    },
+    {
+      "resource_handle": 6,
+      "hash": "B7EEB2D9",
+      "size": [
+        256,
+        128
+      ],
+      "embedded_bytes": 32896
+    },
+    {
+      "resource_handle": 7,
+      "hash": "E86D77E8",
+      "size": [
+        256,
+        128
+      ],
+      "embedded_bytes": 32896
+    },
+    {
+      "resource_handle": 8,
+      "hash": "6B8ED9DA",
+      "size": [
+        256,
+        128
+      ],
+      "embedded_bytes": 32896
+    },
+    {
+      "resource_handle": 9,
+      "hash": "20389D70",
+      "size": [
+        512,
+        256
+      ],
+      "embedded_bytes": 131200
+    }
+  ],
+  "notes": [
+    "resource_handle 1 / CE41E71C is the only embedded stock font DDS without a matching high-resolution replacement in the analyzed texture pack",
+    "descriptor 1 uses handle 1, 16x16 cells and base_code 0; it is a candidate research slot but must not be repurposed until runtime usage is measured",
+    "do not infer a safe Korean page slot from static data alone; use KoreanK3Trace font_state logs first"
+  ]
+}
