@@ -50,6 +50,28 @@ with (LOC/'text/config_text_ko.tsv').open(encoding='utf-8-sig',newline='') as f:
     config=list(csv.DictReader(f,delimiter='\t'))
 if len(config)!=progress['text']['config_text_rows']: fail('config text row count mismatch')
 
+# Graphics transcription JSONL
+transcriptions=[]
+for n,line in enumerate((LOC/'graphics/transcriptions.jsonl').read_text(encoding='utf-8').splitlines(),1):
+    if not line.strip():
+        continue
+    try:
+        row=json.loads(line)
+    except Exception as e:
+        fail(f'graphics transcription line {n}: invalid JSON: {e}')
+        continue
+    transcriptions.append(row)
+tr_ids=[r.get('index') for r in transcriptions]
+if len(tr_ids)!=len(set(tr_ids)):
+    fail('duplicate graphics transcription indices')
+tr_segments=sum(len(r.get('segments',[])) for r in transcriptions)
+expected_tr_assets=progress['graphics']['transcribed_assets']
+expected_tr_segments=progress['graphics']['transcribed_segments']
+if len(transcriptions)!=expected_tr_assets:
+    fail(f'graphics transcription count {len(transcriptions)} != {expected_tr_assets}')
+if tr_segments!=expected_tr_segments:
+    fail(f'graphics transcription segments {tr_segments} != {expected_tr_segments}')
+
 # Graphics state
 with (LOC/'graphics/visual_review.csv').open(encoding='utf-8-sig',newline='') as f:
     visual=list(csv.DictReader(f))
