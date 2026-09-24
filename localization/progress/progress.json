@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T01:53:00+09:00",
+  "updated_at_kst": "2026-09-25T03:12:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -67,7 +67,9 @@
       "percent": 75,
       "clean_build_run_id": 36017712385,
       "domain_isolation_run_id": 36017712430,
-      "localization_state_run_id": 36017712175
+      "localization_state_run_id": 36017712175,
+      "clean_build_status": "pass",
+      "clean_build_head": "079d890c2bdb87590f2f95e55281a7c4627401df"
     },
     "unicode_runtime": {
       "status": "k3_trace_build_pass_package_ready",
@@ -130,7 +132,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "User K3 trace log; analyze stock font globals/batch queue; implement K3-A four-glyph Hangul render proof; in-game validate 7 graphics DDS candidates",
+  "next_checkpoint": "Collect clean K1/K2/K3 runtime logs; implement K3-A only after trace evidence; continue deterministic graphics artwork candidates in parallel",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -210,7 +212,7 @@
     "k1_trace_hook": "migrated_to_clean_branch",
     "prototype_k1_ci_run_id": 35981045694,
     "prototype_evidence_role": "historical_only",
-    "clean_k1_ci": "build_in_progress",
+    "clean_k1_ci": "pass",
     "hangul_runtime_render": "blocked_pending_clean_runtime_trace_and_font",
     "clean_k1_test_package": {
       "build_head": "079d890c2bdb87590f2f95e55281a7c4627401df",
@@ -269,6 +271,7 @@
       "metrics_sha256": "f4908dcfefd318d629645a97ca74261a6b9053337d77bac5181fac4af3bae91b",
       "package_sha256": "33a4e2b69a1a288582a6b028430ac70338eca66e4e72cdf2655abc5db89b4c0a",
       "status": "development_proof_not_ingame_validated"
-    }
+    },
+    "clean_k1_ci_run_id": 36017712385
   }
 }
