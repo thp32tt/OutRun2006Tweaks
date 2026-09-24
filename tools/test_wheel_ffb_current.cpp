@@ -18,6 +18,16 @@ void step(WheelVehicleDynamics& d, EVWORK_CAR& c, float a=0, float beta=0, float
 }
 int main() {
  using namespace WheelFFBMath;
+ require(sanitize_model(-10)==Model::ModernDD&&sanitize_model(99)==Model::PS2OriginalExperimental,"FFB model setting clamps");
+ require(model_uses_modern_sat(Model::ModernDD)&&model_uses_modern_sat(Model::ArcadeHybrid),"modern SAT models");
+ require(!model_uses_modern_sat(Model::ArcadeOriginal)&&!model_uses_modern_sat(Model::PS2OriginalExperimental),"original modes do not claim modern SAT");
+ require(model_uses_arcade_events(Model::ArcadeOriginal)&&model_uses_arcade_events(Model::ArcadeHybrid),"arcade event models");
+ require(std::abs(arcade_speed_strength(.10f)-.10f)<1e-6f,"arcade first speed step");
+ require(std::abs(arcade_speed_strength(.20f)-.20f)<1e-6f,"arcade second speed step");
+ require(std::abs(arcade_speed_strength(.50f)-.50f)<1e-6f,"arcade mid speed step");
+ require(std::abs(arcade_speed_strength(.90f)-.90f)<1e-6f,"arcade upper speed step");
+ require(std::abs(arcade_speed_strength(1.20f)-1.00f)<1e-6f,"arcade top speed step");
+ require(arcade_speed_strength(std::numeric_limits<float>::quiet_NaN())==0.0f,"arcade speed rejects NaN");
  auto engineIdle=estimate_engine_haptics(0.0f,0,0.0f);
  require(engineIdle.rpmNorm>=.08f&&engineIdle.rpmNorm<.20f,"engine idle RPM estimate");
  require(engineIdle.frequencyHz>=13.0f&&engineIdle.frequencyHz<16.0f,"engine idle haptic frequency");
