@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T01:40:00+09:00",
+  "updated_at_kst": "2026-09-25T01:44:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -55,11 +55,11 @@
       "total": 243
     },
     "graphics_localization": {
-      "status": "in_progress",
-      "transcription_percent": 98.7,
+      "status": "artwork_rendering_pending",
+      "transcription_percent": 100,
       "final_artwork_percent": 0,
-      "transcribed_assets": 78,
-      "blocked_context_assets": 1,
+      "transcribed_assets": 79,
+      "blocked_context_assets": 0,
       "total_artwork_targets": 79
     },
     "runtime_text_trace": {
@@ -100,15 +100,13 @@
       "total": 243
     },
     "graphics_transcription": {
-      "status": "context_blocked_one_remaining",
-      "percent": 98.7,
-      "transcribed_assets": 78,
+      "status": "done",
+      "percent": 100,
+      "transcribed_assets": 79,
       "localize_text_targets": 79,
-      "transcribed_segments": 668,
-      "blocked_context_assets": 1,
-      "blocked_context_indices": [
-        152
-      ]
+      "transcribed_segments": 674,
+      "blocked_context_assets": 0,
+      "blocked_context_indices": []
     },
     "graphics_artwork": {
       "status": "not_started",
@@ -124,7 +122,7 @@
       "total": 80
     }
   },
-  "next_checkpoint": "Pass K3 trace Win32 build; make K3 trace package; K1/K2/K3 runtime logs; resolve text IDs and graphic index 152; begin Korean atlas rendering/metrics and first in-game glyph proof",
+  "next_checkpoint": "Pass latest CI; package K3 trace build; user K1/K2/K3 runtime tests; begin deterministic Korean artwork specs/rendering for 79 translated atlases; resolve text IDs 96/97/279/280",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -158,8 +156,8 @@
     "work_queue_total": 136,
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
-    "transcribed_assets": 78,
-    "transcribed_segments": 668,
+    "transcribed_assets": 79,
+    "transcribed_segments": 674,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 1,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -173,10 +171,8 @@
       "candidate_sha256": "847aa537f1651239a794b531438cb26e8dd7302738df65c5858f6cf6b55c3999",
       "status": "candidate_pending_ingame_validation"
     },
-    "blocked_context_assets": 1,
-    "blocked_context_indices": [
-      152
-    ]
+    "blocked_context_assets": 0,
+    "blocked_context_indices": []
   },
   "data_build": {
     "draft_bin_entries": 1356,
