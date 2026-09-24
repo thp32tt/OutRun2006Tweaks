@@ -50,17 +50,16 @@ The **Advanced FFB tuning** section exposes supported lower-level values such as
 
 The R3 driver can accept creation/update of a DirectInput sine effect while the physical road texture remains effectively inaudible. v0.1 therefore forces road/slip vibration through the **ConstantForce fallback** on the R3 path.
 
-Road contact is sampled across all four wheels. The compatibility layer distinguishes:
+Road contact is sampled across all four wheels using the game's original surface-mask LUT. The compatibility layer now preserves each wheel's raw surface mask, resolved roughness and stage-specific water classification instead of reducing the road to one maximum scalar. It distinguishes:
 
-- **mixed surface** — meaningful roughness spread while only part of the car is on a curb/shoulder;
-- **fully rough surface** — all sampled wheels are on a high-roughness surface;
+- **mixed non-water rough surface** — meaningful spread while part of the car is on a real rough curb/shoulder;
+- **fully rough non-water surface** — the sampled non-water wheels are all on a high-roughness surface;
+- **stage water** — retained for the original core water/splash response, but deliberately excluded from the fixed curb-strength and SAT/damper-unload compatibility boost;
 - **ordinary surface** — no extra tactile override.
 
-Mixed and fully rough curb states use the same strong tactile profile so vibration does not disappear when the remaining wheels cross fully onto the curb. During tactile contact the R3 path temporarily reduces structural SAT/damping enough for the road ripple to remain perceptible under corner load, then immediately restores the user's normal settings.
+This matters on Metropolis, Cape Way and Imperial Avenue (and their reverse variants), where the reconstructed Xbox LUT can map surface mask `0x2` to a high roughness value while also explicitly marking it as water. Treating only the scalar as a curb made those water contacts eligible for the stronger curb envelope. The stage-aware path keeps the water effect while avoiding that false curb classification.
 
-Snow stages have a much lower core road-texture scale. The R3 compatibility wrapper compensates that attenuation only when a real tactile surface is detected, so the normal snow road itself does not become a constant buzz.
-
-Known limitation: on snow stages, curb vibration can still fade when all four wheels are fully on the same rough curb/shoulder surface. Partial curb contact works correctly and steering/SAT is unaffected. See [Issue #1](https://github.com/thp32tt/OutRun2006Tweaks/issues/1).
+Mixed and fully rough curb states still use the same strong tactile profile so vibration does not disappear when the remaining wheels cross fully onto the curb. Snowy Mountain and Ice Scape (including reverse variants) retain the bounded snow-curb material latch; normal snow remains attenuated while a confirmed curb transition gets the existing short compatibility boost. See `docs/reverse/C2C_STAGE_FFB_MAP.md` for the verified stage IDs and surface-mask table.
 
 ### Device selection and safety
 
@@ -94,7 +93,7 @@ The wheel backend also keeps the reconstructed Xbox C2C `CalcVibrationValues()` 
 - selected DirectInput FFB identity;
 - effect creation/fallback status;
 - SAT and final output diagnostics;
-- R3 road-contact diagnostics including min/max roughness, spread, mixed/full-rough state and temporary tactile scaling.
+- stage-aware road diagnostics including stage ID/name, four raw surface masks, per-wheel roughness, water-wheel mask, non-water min/max roughness, mixed/full-rough state and temporary tactile scaling.
 
 For a useful hardware report, include the full launch → race → exit log plus wheel-base model, driver and firmware version.
 
@@ -166,17 +165,16 @@ F11의 **Force Feedback** 화면에서 출력 장치 선택과 게임 내 FFB �
 
 R3 드라이버는 DirectInput sine effect의 생성/갱신 자체는 정상 처리하더라도 테스트한 장비에서 실제 노면 질감이 거의 느껴지지 않았습니다. 그래서 v0.1의 R3 경로에서는 노면/슬립 진동을 **ConstantForce 폴백**으로 강제합니다.
 
-노면 접촉은 네 바퀴 전체를 샘플링합니다. 호환 레이어는 다음 상태를 구분합니다.
+노면 접촉은 게임 원본의 표면 마스크 LUT를 이용해 네 바퀴를 각각 샘플링합니다. 이제 호환 레이어는 노면을 최대 거칠기 하나로 축약하지 않고 각 바퀴의 원시 표면 마스크, 계산된 거칠기, 스테이지별 물 표면 판정을 함께 보존합니다.
 
-- **mixed surface** — 차량 일부만 연석/숄더에 올라가 표면 거칠기 차이가 의미 있게 발생하는 상태
-- **fully rough surface** — 샘플링된 모든 바퀴가 높은 거칠기의 표면에 올라간 상태
+- **mixed non-water rough surface** — 일부 바퀴가 실제 거친 연석/숄더에 올라가 의미 있는 거칠기 차이가 생긴 상태
+- **fully rough non-water surface** — 물이 아닌 샘플들이 모두 높은 거칠기의 표면에 올라간 상태
+- **stage water** — 게임 원본의 물/스플래시 효과에는 그대로 전달하지만, 고정 연석 강도 및 SAT/댐핑 완화 보정에서는 제외
 - **ordinary surface** — 별도 촉각 보정이 필요하지 않은 일반 표면
 
-mixed와 fully rough 연석 상태에는 같은 강한 촉각 프로필을 사용해 남은 바퀴가 모두 연석으로 넘어가는 순간 진동이 끊기지 않도록 설계했습니다. 촉각 접촉 중에는 코너링 하중에 노면 진동이 묻히지 않도록 R3 경로가 구조적인 SAT/댐핑을 일시적으로 줄이고, 표면 접촉이 끝나면 사용자의 일반 설정으로 즉시 복귀합니다.
+이 구분은 Metropolis, Cape Way, Imperial Avenue 및 각 역방향 스테이지에서 중요합니다. 재구성한 Xbox LUT에서는 표면 마스크 `0x2`가 높은 거칠기 값으로 계산되는 동시에 물 표면으로 명시될 수 있습니다. 예전처럼 거칠기 값만 보면 물을 연석으로 오인해 강한 연석 보정을 적용할 수 있었지만, 스테이지 인식 경로에서는 물 효과는 유지하면서 이 오분류를 막습니다.
 
-눈 맵은 기본 노면 텍스처 스케일이 훨씬 낮습니다. R3 호환 래퍼는 실제 촉각 표면이 감지된 경우에만 이 감쇠를 보정해 일반 눈길 자체가 계속 떨리지 않도록 합니다.
-
-현재 알려진 제한 사항으로, 눈 맵에서 네 바퀴가 모두 동일한 거친 연석/숄더 표면에 완전히 올라가면 연석 진동이 약해지거나 사라질 수 있습니다. 부분 연석 접촉은 정상이며 조향력/SAT에는 영향이 없습니다. 자세한 내용은 [Issue #1](https://github.com/thp32tt/OutRun2006Tweaks/issues/1)을 참고하세요.
+mixed/fully rough 연석은 기존과 동일하게 강한 촉각 프로필을 유지합니다. Snowy Mountain과 Ice Scape 및 역방향 스테이지에는 기존의 제한시간형 snow-curb material latch를 그대로 유지해 일반 눈길은 약하게 두고 실제 연석 전환만 짧게 보강합니다. 검증된 스테이지 ID와 표면 마스크 표는 `docs/reverse/C2C_STAGE_FFB_MAP.md`에 정리했습니다.
 
 ### 장치 선택 및 안전 처리
 
@@ -210,7 +208,7 @@ mixed와 fully rough 연석 상태에는 같은 강한 촉각 프로필을 사�
 - 선택된 DirectInput FFB 장치 식별 정보
 - 효과 생성 및 폴백 상태
 - SAT 및 최종 출력 진단
-- 최소/최대 거칠기, spread, mixed/full-rough 상태, 임시 촉각 스케일링을 포함한 R3 노면 접촉 진단
+- 스테이지 ID/이름, 네 바퀴 원시 표면 마스크, 휠별 거칠기, 물 표면 휠 마스크, non-water 최소/최대 거칠기, mixed/full-rough 상태, 임시 촉각 스케일링을 포함한 노면 접촉 진단
 
 하드웨어 문제를 보고할 때는 게임 실행 → 레이스 → 종료까지의 전체 로그와 휠베이스 모델, 드라이버, 펌웨어 버전을 함께 첨부하는 것이 좋습니다.
 
