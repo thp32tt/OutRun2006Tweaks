@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-24T14:08:00Z",
+  "updatedUtc": "2026-09-24T14:24:08Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
@@ -106,6 +106,13 @@
         "BUILD_INPUTS.json::CMakeFlags"
       ],
       "rationale": "Earlier broken PC-fast R51 rebuild used OUTRUN_VR_R26_HUD_COMPARE=OFF while verified R51 and later good driver-seat PC-fast builds use ON. Incremental caching is not the primary root cause."
+    },
+    "implementationFirstEnforcement": {
+      "enabled": true,
+      "sourceOfTruth": "docs/automation/IMPLEMENTATION_FIRST_20260924.md#no-ready-parking-enforcement",
+      "rule": "READY is an instruction to act, not a parking state. Implement/validate/fix blockers in-run whenever HMD is not required.",
+      "noIdleGate": true,
+      "continueIndependentLaneWhileWaiting": true
     }
   },
   "runtimeEvidence": {
@@ -129,7 +136,7 @@
     "DirectGPU transport is not the current HUD root cause: direct frames=13187, fallbacks=4, fenceTimeout=0, stereo/right-draw failures=0 in the failed HUD candidate session.",
     "Dense-scene performance remains separate; observed peak drawsPerPresent≈3929.3 and lower-Present max≈16.639 ms in this session."
   ],
-  "nextAction": "Use the :00 and :30 full cycles. Each cycle may review, implement, cloud-build, validate and integrate in one run. Rotate HUD/flare/perf/DXVK/DX12 and do not reintroduce the old A/B/C/D handoff latency.",
+  "nextAction": "Run :00/:30 full cycles with NO-READY-PARKING: consume completed CI, implement bounded READY work immediately, repair deterministic blockers in-run, and leave only genuine HMD-only or hard-blocked work pending.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
