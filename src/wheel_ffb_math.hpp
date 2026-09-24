@@ -9,6 +9,70 @@
 
 namespace WheelFFBMath
 {
+    enum class Model : int
+    {
+        ModernDD = 0,
+        ArcadeOriginal = 1,
+        ArcadeHybrid = 2,
+        PS2OriginalExperimental = 3,
+    };
+
+    inline Model sanitize_model(int value)
+    {
+        return static_cast<Model>(std::clamp(value, 0, 3));
+    }
+
+    inline const char* model_name(Model model)
+    {
+        switch (model)
+        {
+        case Model::ArcadeOriginal: return "ARCADE_ORIGINAL";
+        case Model::ArcadeHybrid: return "ARCADE_HYBRID";
+        case Model::PS2OriginalExperimental: return "PS2_ORIGINAL_EXPERIMENTAL";
+        default: return "MODERN_DD";
+        }
+    }
+
+    inline bool model_uses_modern_sat(Model model)
+    {
+        return model == Model::ModernDD || model == Model::ArcadeHybrid;
+    }
+
+    inline bool model_uses_arcade_events(Model model)
+    {
+        return model == Model::ArcadeOriginal || model == Model::ArcadeHybrid;
+    }
+
+    inline bool model_uses_original_condition_backbone(Model model)
+    {
+        return model == Model::ArcadeOriginal ||
+               model == Model::PS2OriginalExperimental;
+    }
+
+    // Boomslangnz/FFBArcadePlugin OutRun2Real.cpp derives a 10%-step
+    // SpeedStrength from Lindbergh's speed value: 0.1..80=>10%, 80.1..130=>20%,
+    // 130.1..180=>30%, 180.1..220=>40%, 220.1..270=>50%, 270.1..320=>60%,
+    // 320.1..380=>70%, 380.1..430=>80%, 430.1..500=>90%, >500=>100%.
+    // C2C exposes a different speed scale, so normalize those thresholds to the
+    // established C2C speedNorm (top-speed region ~= 1.0). This preserves the
+    // observed arcade step structure without importing Lindbergh addresses.
+    inline float arcade_speed_strength(float speedNorm)
+    {
+        if (!std::isfinite(speedNorm) || speedNorm <= 0.0f)
+            return 0.0f;
+        speedNorm = std::clamp(speedNorm, 0.0f, 1.25f);
+        if (speedNorm <= 0.16f) return 0.10f;
+        if (speedNorm <= 0.26f) return 0.20f;
+        if (speedNorm <= 0.36f) return 0.30f;
+        if (speedNorm <= 0.44f) return 0.40f;
+        if (speedNorm <= 0.54f) return 0.50f;
+        if (speedNorm <= 0.64f) return 0.60f;
+        if (speedNorm <= 0.76f) return 0.70f;
+        if (speedNorm <= 0.86f) return 0.80f;
+        if (speedNorm <= 1.00f) return 0.90f;
+        return 1.00f;
+    }
+
     inline float smoothstep01(float t)
     {
         t = std::clamp(t, 0.0f, 1.0f);
