@@ -10,6 +10,7 @@ struct D3DMATRIX { float _11=1,_12=0,_13=0,_14=0,_21=0,_22=1,_23=0,_24=0,_31=0,_
 struct EVWORK_CAR { D3DVECTOR position_14, spd_mb_20; D3DMATRIX matrix_70; };
 #include "hooks_wheel_vehicle_dynamics.hpp"
 #include "wheel_ffb_math.hpp"
+#include "wheel_ffb_ps2.hpp"
 static int checks = 0;
 void require(bool b, const char* msg) { ++checks; if (!b) { std::cerr << msg << '\n'; std::exit(1); } }
 void heading(EVWORK_CAR& c, float a) { c.matrix_70._11=std::cos(a);c.matrix_70._13=-std::sin(a);c.matrix_70._31=std::sin(a);c.matrix_70._33=std::cos(a); }
@@ -28,6 +29,22 @@ int main() {
  require(std::abs(arcade_speed_strength(.90f)-.90f)<1e-6f,"arcade upper speed step");
  require(std::abs(arcade_speed_strength(1.20f)-1.00f)<1e-6f,"arcade top speed step");
  require(arcade_speed_strength(std::numeric_limits<float>::quiet_NaN())==0.0f,"arcade speed rejects NaN");
+
+ // Retail PS2 translation invariants recovered from SLPM_666.28.
+ require(std::abs(WheelFFBPS2::drive_factor(.875f)-1.0f)<1e-6f,"PS2 retail drive factor reaches one at field_1C4 0.875");
+ require(std::abs(WheelFFBPS2::drive_factor(.4375f)-.5f)<1e-6f,"PS2 retail drive factor midpoint");
+ require(WheelFFBPS2::drive_factor(std::numeric_limits<float>::quiet_NaN())==0.0f,"PS2 drive factor rejects NaN");
+ require(WheelFFBPS2::spring_saturation_raw(0.0f)==15,"PS2 spring low-speed saturation");
+ require(WheelFFBPS2::spring_saturation_raw(1.0f)==60,"PS2 spring high-speed saturation");
+ require(std::abs(WheelFFBPS2::spring_coefficient_norm()-200.0f/255.0f)<1e-6f,"PS2 spring coefficient 200/255");
+ require(WheelFFBPS2::damper_coefficient_raw(0.0f)==10,"PS2 damper low-speed coefficient");
+ require(WheelFFBPS2::damper_coefficient_raw(1.0f)==0,"PS2 damper fades at retail drive factor one");
+ require(WheelFFBPS2::triangle_period_raw(0.0f)==100,"PS2 Triangle base period field");
+ require(WheelFFBPS2::triangle_period_raw(1.0f)==160,"PS2 Triangle high-speed period field");
+ require(std::abs(WheelFFBPS2::triangle_frequency_hz_for_directinput(0.0f)-10.0f)<1e-6f,"PS2 host Triangle 100ms translation");
+ require(std::abs(WheelFFBPS2::triangle_frequency_hz_for_directinput(1.0f)-6.25f)<1e-6f,"PS2 host Triangle 160ms translation");
+ require(std::abs(WheelFFBPS2::constant_magnitude_cap_norm()-220.0f/255.0f)<1e-6f,"PS2 constant cap 220/255");
+
  auto engineIdle=estimate_engine_haptics(0.0f,0,0.0f);
  require(engineIdle.rpmNorm>=.08f&&engineIdle.rpmNorm<.20f,"engine idle RPM estimate");
  require(engineIdle.frequencyHz>=13.0f&&engineIdle.frequencyHz<16.0f,"engine idle haptic frequency");
