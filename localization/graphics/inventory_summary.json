@@ -1,0 +1,35 @@
+{
+  "source_archive_file_count": 324,
+  "dds_total": 243,
+  "categories": {
+    "front_end": 111,
+    "selector": 31,
+    "common_ui": 19,
+    "ranking": 15,
+    "font": 9,
+    "loading": 9,
+    "game_ui": 7,
+    "route": 4,
+    "name_entry": 1,
+    "other": 37
+  },
+  "visually_reviewed_categories": [
+    "game_ui",
+    "common_ui",
+    "ranking",
+    "font"
+  ],
+  "observations": [
+    "game_ui atlases contain embedded English UI labels and mission/menu text",
+    "common_ui atlases contain embedded labels, counters, controller prompts, and status text",
+    "ranking atlases contain speech-bubble/rank text and character UI elements",
+    "font atlases contain Latin/digit/symbol glyphs only; no Hangul glyph set was observed"
+  ],
+  "status": "IN_PROGRESS",
+  "next": [
+    "review front_end 111 textures",
+    "review selector 31 textures",
+    "review loading/route/name_entry",
+    "mark text-bearing candidates"
+  ]
+}
