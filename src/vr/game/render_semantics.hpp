@@ -111,6 +111,9 @@ namespace OutRunVR::GameSemantic
     {
         const void* node = nullptr;
         RenderScope scope = RenderScope::None;
+        bool hasWorldAnchor = false;
+        float worldAnchor[3]{};
+        float projectedAnchor[3]{};
     };
 
     inline constexpr std::size_t SpriteNodeSemanticCapacity = 0x230;
@@ -124,6 +127,9 @@ namespace OutRunVR::GameSemantic
     // change semantic classification or draw ownership.
     inline thread_local const void* CurrentSpriteQueueNode = nullptr;
     inline thread_local std::uint64_t SpriteQueueNodeEpoch = 0;
+    inline thread_local bool CurrentSpriteQueueHasWorldAnchor = false;
+    inline thread_local float CurrentSpriteQueueWorldAnchor[3]{};
+    inline thread_local float CurrentSpriteQueueProjectedAnchor[3]{};
 
     inline const void* CurrentQueueNode() noexcept
     {
@@ -160,21 +166,82 @@ namespace OutRunVR::GameSemantic
         }
     }
 
+
+    inline void RegisterSpriteNodeWorldAnchor(
+        const void* node, const float world[3],
+        const float projected[3]) noexcept
+    {
+        if (!node || !world || !projected)
+            return;
+        for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
+        {
+            if (SpriteNodeSemanticTags[i].node != node)
+                continue;
+            auto& tag = SpriteNodeSemanticTags[i];
+            tag.hasWorldAnchor = true;
+            for (int axis = 0; axis < 3; ++axis)
+            {
+                tag.worldAnchor[axis] = world[axis];
+                tag.projectedAnchor[axis] = projected[axis];
+            }
+            return;
+        }
+        if (SpriteNodeSemanticCount < SpriteNodeSemanticTags.size())
+        {
+            auto& tag = SpriteNodeSemanticTags[SpriteNodeSemanticCount++];
+            tag.node = node;
+            tag.scope = RenderScope::WorldBillboard;
+            tag.hasWorldAnchor = true;
+            for (int axis = 0; axis < 3; ++axis)
+            {
+                tag.worldAnchor[axis] = world[axis];
+                tag.projectedAnchor[axis] = projected[axis];
+            }
+        }
+    }
+
+    inline bool CurrentWorldBillboardAnchor(
+        float world[3], float projected[3]) noexcept
+    {
+        if (!CurrentSpriteQueueHasWorldAnchor || !world || !projected)
+            return false;
+        for (int axis = 0; axis < 3; ++axis)
+        {
+            world[axis] = CurrentSpriteQueueWorldAnchor[axis];
+            projected[axis] = CurrentSpriteQueueProjectedAnchor[axis];
+        }
+        return true;
+    }
+
     inline RenderScope ConsumeSpriteNodeScope(
         const void* node,
         RenderScope fallback = RenderScope::ScreenOverlay2D) noexcept
     {
+        CurrentSpriteQueueHasWorldAnchor = false;
+        CurrentSpriteQueueWorldAnchor[0] = CurrentSpriteQueueWorldAnchor[1] =
+            CurrentSpriteQueueWorldAnchor[2] = 0.0f;
+        CurrentSpriteQueueProjectedAnchor[0] = CurrentSpriteQueueProjectedAnchor[1] =
+            CurrentSpriteQueueProjectedAnchor[2] = 0.0f;
         if (node)
         {
             for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
             {
                 if (SpriteNodeSemanticTags[i].node != node)
                     continue;
-                const RenderScope scope = SpriteNodeSemanticTags[i].scope;
+                const auto tag = SpriteNodeSemanticTags[i];
+                if (tag.hasWorldAnchor)
+                {
+                    CurrentSpriteQueueHasWorldAnchor = true;
+                    for (int axis = 0; axis < 3; ++axis)
+                    {
+                        CurrentSpriteQueueWorldAnchor[axis] = tag.worldAnchor[axis];
+                        CurrentSpriteQueueProjectedAnchor[axis] = tag.projectedAnchor[axis];
+                    }
+                }
                 SpriteNodeSemanticTags[i] =
                     SpriteNodeSemanticTags[--SpriteNodeSemanticCount];
                 SpriteNodeSemanticTags[SpriteNodeSemanticCount] = {};
-                return scope;
+                return tag.scope;
             }
         }
         return fallback;
