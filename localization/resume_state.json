@@ -1,0 +1,11 @@
+{
+  "branch": "korean-localization-prototype",
+  "next_actions": [
+    "continue translation at text ID 159",
+    "classify DDS visual index 36 onward",
+    "do not overwrite original game assets",
+    "after CI pass package K1 trace build",
+    "collect runtime log before K2 Unicode override"
+  ],
+  "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57"
+}
