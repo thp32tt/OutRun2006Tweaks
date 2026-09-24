@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "updatedKst": "2026-09-24T22:43:00+09:00",
+  "policy": "IMPLEMENTATION-FIRST + EVENING-HMD-MATRIX",
+  "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+  "integrationBranch": "vr-d3d9ex-focus",
+  "productionIntegrationWip": 1,
+  "maxExperimentSlots": 6,
+  "testMatrixBase": {
+    "branch": "vr-d3d9ex-candidate/R51-MATRIX-BASE-MANUAL-20260924",
+    "sourceSha": "27f4ad958cf965f33bc6791395dd77ca1af7fb42",
+    "baseIntegrationSha": "0ca18d79a9e0c9f1f8ed45194c49b679785aceae",
+    "status": "CI_IN_PROGRESS",
+    "ciRuns": [
+      36007124220,
+      36007124238
+    ],
+    "purpose": "Restore protected R51 runtime contract on current focus while retaining provenance diagnostics and binary/source-binding guards."
+  },
+  "slots": [
+    {
+      "slotId": "A_CONTROL",
+      "status": "WAITING_FOR_BASE_CI",
+      "sourceSha": "27f4ad958cf965f33bc6791395dd77ca1af7fb42",
+      "profile": "CONTROL",
+      "featureFlags": [],
+      "hypothesis": "Protected R51-equivalent runtime behavior is preserved on the current project tree.",
+      "expectedObservable": "Road/background/vehicle stereo and startup/gameplay remain at R51 level; existing HUD defects may remain.",
+      "binarySha256": null,
+      "configProfileHash": null,
+      "artifactRef": null
+    },
+    {
+      "slotId": "B_HUD",
+      "status": "IMPLEMENT_NEXT",
+      "sourceSha": null,
+      "profile": "HUD",
+      "featureFlags": [
+        "HUD_SEMANTIC_LIFETIME_EXPERIMENT"
+      ],
+      "hypothesis": "Exact producer/node semantic ownership must be available at the relevant VS/c64 boundary; failed 8d21824f candidate must not be recreated unchanged.",
+      "expectedObservable": "HUD diplopia/head-lock changes without altering protected world stereo."
+    },
+    {
+      "slotId": "C_FLARE",
+      "status": "IMPLEMENT_NEXT",
+      "sourceSha": null,
+      "profile": "FLARE",
+      "featureFlags": [
+        "LENS_FLARE_PRODUCER_TELEMETRY"
+      ],
+      "hypothesis": "Lens flare is a dedicated transformed 3D alpha camera-effect path and must be traced/scoped at its exact producer.",
+      "expectedObservable": "Telemetry identifies exact eye/pass/matrix ownership before any visual policy change."
+    },
+    {
+      "slotId": "D_PERF",
+      "status": "IMPLEMENT_NEXT",
+      "sourceSha": null,
+      "profile": "PERFORMANCE",
+      "featureFlags": [
+        "DENSE_SCENE_PERF_TELEMETRY"
+      ],
+      "hypothesis": "Dense-scene loss must first be localized to draw amplification/copies/waits/resource churn/frame cadence.",
+      "expectedObservable": "Per-frame counters distinguish the dominant measured bottleneck without changing stereo behavior."
+    }
+  ],
+  "loggingContract": {
+    "requiredSessionIdentity": [
+      "SlotID",
+      "SourceSHA",
+      "BinarySHA256",
+      "TEST_MATRIX_BASE",
+      "ConfigProfileHash",
+      "FeatureFlags",
+      "SessionID",
+      "StartTimestamp",
+      "EndTimestamp"
+    ],
+    "manualLogRenameRequired": false,
+    "singleFinalCollectorZip": true
+  }
+}
