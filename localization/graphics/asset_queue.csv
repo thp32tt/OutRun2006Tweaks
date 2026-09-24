@@ -81,7 +81,7 @@ index,path,action,artwork_status,transcription_status,notes
 148,textures/load/spr_sprani_sumo_fe_cvt_Exst/3AE1BB60_256x256.dds,zoom_review,blocked_review,needs_zoom_review,
 150,textures/load/spr_sprani_sumo_fe_cvt_Exst/40A4D914_256x128.dds,zoom_review,blocked_review,needs_zoom_review,
 151,textures/load/spr_sprani_sumo_fe_cvt_Exst/4668C688_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
-152,textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds,localize_text,pending_artwork,blocked_context,ambiguous badges PRO./INS./G.M./E.R.; defer until runtime context
+152,textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds,localize_text,pending_artwork,transcribed_reviewed,pass12 semantics resolved via index198 music-label cross-reference
 153,textures/load/spr_sprani_sumo_fe_cvt_Exst/4C972A19_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
 154,textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 155,textures/load/spr_sprani_sumo_fe_cvt_Exst/4D49CA85_512x256.dds,zoom_review,blocked_review,needs_zoom_review,
