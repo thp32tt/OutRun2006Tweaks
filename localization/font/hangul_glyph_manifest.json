@@ -1,0 +1,4561 @@
+{
+  "schema_version": 1,
+  "generated_from": [
+    "localization/text/korean_all.jsonl",
+    "localization/graphics/transcriptions.jsonl"
+  ],
+  "glyph_count": 505,
+  "page_capacity": 256,
+  "page_count": 2,
+  "grid": {
+    "columns": 16,
+    "rows": 16
+  },
+  "entries": [
+    {
+      "index": 0,
+      "char": "가",
+      "codepoint": "U+AC00",
+      "page": 0,
+      "cell": 0,
+      "row": 0,
+      "col": 0
+    },
+    {
+      "index": 1,
+      "char": "각",
+      "codepoint": "U+AC01",
+      "page": 0,
+      "cell": 1,
+      "row": 0,
+      "col": 1
+    },
+    {
+      "index": 2,
+      "char": "간",
+      "codepoint": "U+AC04",
+      "page": 0,
+      "cell": 2,
+      "row": 0,
+      "col": 2
+    },
+    {
+      "index": 3,
+      "char": "갈",
+      "codepoint": "U+AC08",
+      "page": 0,
+      "cell": 3,
+      "row": 0,
+      "col": 3
+    },
+    {
+      "index": 4,
+      "char": "감",
+      "codepoint": "U+AC10",
+      "page": 0,
+      "cell": 4,
+      "row": 0,
+      "col": 4
+    },
+    {
+      "index": 5,
+      "char": "갑",
+      "codepoint": "U+AC11",
+      "page": 0,
+      "cell": 5,
+      "row": 0,
+      "col": 5
+    },
+    {
+      "index": 6,
+      "char": "값",
+      "codepoint": "U+AC12",
+      "page": 0,
+      "cell": 6,
+      "row": 0,
+      "col": 6
+    },
+    {
+      "index": 7,
+      "char": "갔",
+      "codepoint": "U+AC14",
+      "page": 0,
+      "cell": 7,
+      "row": 0,
+      "col": 7
+    },
+    {
+      "index": 8,
+      "char": "강",
+      "codepoint": "U+AC15",
+      "page": 0,
+      "cell": 8,
+      "row": 0,
+      "col": 8
+    },
+    {
+      "index": 9,
+      "char": "같",
+      "codepoint": "U+AC19",
+      "page": 0,
+      "cell": 9,
+      "row": 0,
+      "col": 9
+    },
+    {
+      "index": 10,
+      "char": "개",
+      "codepoint": "U+AC1C",
+      "page": 0,
+      "cell": 10,
+      "row": 0,
+      "col": 10
+    },
+    {
+      "index": 11,
+      "char": "객",
+      "codepoint": "U+AC1D",
+      "page": 0,
+      "cell": 11,
+      "row": 0,
+      "col": 11
+    },
+    {
+      "index": 12,
+      "char": "거",
+      "codepoint": "U+AC70",
+      "page": 0,
+      "cell": 12,
+      "row": 0,
+      "col": 12
+    },
+    {
+      "index": 13,
+      "char": "건",
+      "codepoint": "U+AC74",
+      "page": 0,
+      "cell": 13,
+      "row": 0,
+      "col": 13
+    },
+    {
+      "index": 14,
+      "char": "검",
+      "codepoint": "U+AC80",
+      "page": 0,
+      "cell": 14,
+      "row": 0,
+      "col": 14
+    },
+    {
+      "index": 15,
+      "char": "게",
+      "codepoint": "U+AC8C",
+      "page": 0,
+      "cell": 15,
+      "row": 0,
+      "col": 15
+    },
+    {
+      "index": 16,
+      "char": "겠",
+      "codepoint": "U+ACA0",
+      "page": 0,
+      "cell": 16,
+      "row": 1,
+      "col": 0
+    },
+    {
+      "index": 17,
+      "char": "겨",
+      "codepoint": "U+ACA8",
+      "page": 0,
+      "cell": 17,
+      "row": 1,
+      "col": 1
+    },
+    {
+      "index": 18,
+      "char": "격",
+      "codepoint": "U+ACA9",
+      "page": 0,
+      "cell": 18,
+      "row": 1,
+      "col": 2
+    },
+    {
+      "index": 19,
+      "char": "결",
+      "codepoint": "U+ACB0",
+      "page": 0,
+      "cell": 19,
+      "row": 1,
+      "col": 3
+    },
+    {
+      "index": 20,
+      "char": "경",
+      "codepoint": "U+ACBD",
+      "page": 0,
+      "cell": 20,
+      "row": 1,
+      "col": 4
+    },
+    {
+      "index": 21,
+      "char": "계",
+      "codepoint": "U+ACC4",
+      "page": 0,
+      "cell": 21,
+      "row": 1,
+      "col": 5
+    },
+    {
+      "index": 22,
+      "char": "고",
+      "codepoint": "U+ACE0",
+      "page": 0,
+      "cell": 22,
+      "row": 1,
+      "col": 6
+    },
+    {
+      "index": 23,
+      "char": "곡",
+      "codepoint": "U+ACE1",
+      "page": 0,
+      "cell": 23,
+      "row": 1,
+      "col": 7
+    },
+    {
+      "index": 24,
+      "char": "골",
+      "codepoint": "U+ACE8",
+      "page": 0,
+      "cell": 24,
+      "row": 1,
+      "col": 8
+    },
+    {
+      "index": 25,
+      "char": "곱",
+      "codepoint": "U+ACF1",
+      "page": 0,
+      "cell": 25,
+      "row": 1,
+      "col": 9
+    },
+    {
+      "index": 26,
+      "char": "공",
+      "codepoint": "U+ACF5",
+      "page": 0,
+      "cell": 26,
+      "row": 1,
+      "col": 10
+    },
+    {
+      "index": 27,
+      "char": "과",
+      "codepoint": "U+ACFC",
+      "page": 0,
+      "cell": 27,
+      "row": 1,
+      "col": 11
+    },
+    {
+      "index": 28,
+      "char": "관",
+      "codepoint": "U+AD00",
+      "page": 0,
+      "cell": 28,
+      "row": 1,
+      "col": 12
+    },
+    {
+      "index": 29,
+      "char": "괄",
+      "codepoint": "U+AD04",
+      "page": 0,
+      "cell": 29,
+      "row": 1,
+      "col": 13
+    },
+    {
+      "index": 30,
+      "char": "교",
+      "codepoint": "U+AD50",
+      "page": 0,
+      "cell": 30,
+      "row": 1,
+      "col": 14
+    },
+    {
+      "index": 31,
+      "char": "구",
+      "codepoint": "U+AD6C",
+      "page": 0,
+      "cell": 31,
+      "row": 1,
+      "col": 15
+    },
+    {
+      "index": 32,
+      "char": "국",
+      "codepoint": "U+AD6D",
+      "page": 0,
+      "cell": 32,
+      "row": 2,
+      "col": 0
+    },
+    {
+      "index": 33,
+      "char": "귀",
+      "codepoint": "U+ADC0",
+      "page": 0,
+      "cell": 33,
+      "row": 2,
+      "col": 1
+    },
+    {
+      "index": 34,
+      "char": "규",
+      "codepoint": "U+ADDC",
+      "page": 0,
+      "cell": 34,
+      "row": 2,
+      "col": 2
+    },
+    {
+      "index": 35,
+      "char": "균",
+      "codepoint": "U+ADE0",
+      "page": 0,
+      "cell": 35,
+      "row": 2,
+      "col": 3
+    },
+    {
+      "index": 36,
+      "char": "그",
+      "codepoint": "U+ADF8",
+      "page": 0,
+      "cell": 36,
+      "row": 2,
+      "col": 4
+    },
+    {
+      "index": 37,
+      "char": "근",
+      "codepoint": "U+ADFC",
+      "page": 0,
+      "cell": 37,
+      "row": 2,
+      "col": 5
+    },
+    {
+      "index": 38,
+      "char": "글",
+      "codepoint": "U+AE00",
+      "page": 0,
+      "cell": 38,
+      "row": 2,
+      "col": 6
+    },
+    {
+      "index": 39,
+      "char": "금",
+      "codepoint": "U+AE08",
+      "page": 0,
+      "cell": 39,
+      "row": 2,
+      "col": 7
+    },
+    {
+      "index": 40,
+      "char": "급",
+      "codepoint": "U+AE09",
+      "page": 0,
+      "cell": 40,
+      "row": 2,
+      "col": 8
+    },
+    {
+      "index": 41,
+      "char": "기",
+      "codepoint": "U+AE30",
+      "page": 0,
+      "cell": 41,
+      "row": 2,
+      "col": 9
+    },
+    {
+      "index": 42,
+      "char": "김",
+      "codepoint": "U+AE40",
+      "page": 0,
+      "cell": 42,
+      "row": 2,
+      "col": 10
+    },
+    {
+      "index": 43,
+      "char": "깁",
+      "codepoint": "U+AE41",
+      "page": 0,
+      "cell": 43,
+      "row": 2,
+      "col": 11
+    },
+    {
+      "index": 44,
+      "char": "까",
+      "codepoint": "U+AE4C",
+      "page": 0,
+      "cell": 44,
+      "row": 2,
+      "col": 12
+    },
+    {
+      "index": 45,
+      "char": "깜",
+      "codepoint": "U+AE5C",
+      "page": 0,
+      "cell": 45,
+      "row": 2,
+      "col": 13
+    },
+    {
+      "index": 46,
+      "char": "깨",
+      "codepoint": "U+AE68",
+      "page": 0,
+      "cell": 46,
+      "row": 2,
+      "col": 14
+    },
+    {
+      "index": 47,
+      "char": "꺼",
+      "codepoint": "U+AEBC",
+      "page": 0,
+      "cell": 47,
+      "row": 2,
+      "col": 15
+    },
+    {
+      "index": 48,
+      "char": "께",
+      "codepoint": "U+AED8",
+      "page": 0,
+      "cell": 48,
+      "row": 3,
+      "col": 0
+    },
+    {
+      "index": 49,
+      "char": "끄",
+      "codepoint": "U+B044",
+      "page": 0,
+      "cell": 49,
+      "row": 3,
+      "col": 1
+    },
+    {
+      "index": 50,
+      "char": "끊",
+      "codepoint": "U+B04A",
+      "page": 0,
+      "cell": 50,
+      "row": 3,
+      "col": 2
+    },
+    {
+      "index": 51,
+      "char": "끝",
+      "codepoint": "U+B05D",
+      "page": 0,
+      "cell": 51,
+      "row": 3,
+      "col": 3
+    },
+    {
+      "index": 52,
+      "char": "나",
+      "codepoint": "U+B098",
+      "page": 0,
+      "cell": 52,
+      "row": 3,
+      "col": 4
+    },
+    {
+      "index": 53,
+      "char": "난",
+      "codepoint": "U+B09C",
+      "page": 0,
+      "cell": 53,
+      "row": 3,
+      "col": 5
+    },
+    {
+      "index": 54,
+      "char": "남",
+      "codepoint": "U+B0A8",
+      "page": 0,
+      "cell": 54,
+      "row": 3,
+      "col": 6
+    },
+    {
+      "index": 55,
+      "char": "납",
+      "codepoint": "U+B0A9",
+      "page": 0,
+      "cell": 55,
+      "row": 3,
+      "col": 7
+    },
+    {
+      "index": 56,
+      "char": "낮",
+      "codepoint": "U+B0AE",
+      "page": 0,
+      "cell": 56,
+      "row": 3,
+      "col": 8
+    },
+    {
+      "index": 57,
+      "char": "내",
+      "codepoint": "U+B0B4",
+      "page": 0,
+      "cell": 57,
+      "row": 3,
+      "col": 9
+    },
+    {
+      "index": 58,
+      "char": "낸",
+      "codepoint": "U+B0B8",
+      "page": 0,
+      "cell": 58,
+      "row": 3,
+      "col": 10
+    },
+    {
+      "index": 59,
+      "char": "낼",
+      "codepoint": "U+B0BC",
+      "page": 0,
+      "cell": 59,
+      "row": 3,
+      "col": 11
+    },
+    {
+      "index": 60,
+      "char": "냈",
+      "codepoint": "U+B0C8",
+      "page": 0,
+      "cell": 60,
+      "row": 3,
+      "col": 12
+    },
+    {
+      "index": 61,
+      "char": "너",
+      "codepoint": "U+B108",
+      "page": 0,
+      "cell": 61,
+      "row": 3,
+      "col": 13
+    },
+    {
+      "index": 62,
+      "char": "널",
+      "codepoint": "U+B110",
+      "page": 0,
+      "cell": 62,
+      "row": 3,
+      "col": 14
+    },
+    {
+      "index": 63,
+      "char": "네",
+      "codepoint": "U+B124",
+      "page": 0,
+      "cell": 63,
+      "row": 3,
+      "col": 15
+    },
+    {
+      "index": 64,
+      "char": "넷",
+      "codepoint": "U+B137",
+      "page": 0,
+      "cell": 64,
+      "row": 4,
+      "col": 0
+    },
+    {
+      "index": 65,
+      "char": "녀",
+      "codepoint": "U+B140",
+      "page": 0,
+      "cell": 65,
+      "row": 4,
+      "col": 1
+    },
+    {
+      "index": 66,
+      "char": "노",
+      "codepoint": "U+B178",
+      "page": 0,
+      "cell": 66,
+      "row": 4,
+      "col": 2
+    },
+    {
+      "index": 67,
+      "char": "녹",
+      "codepoint": "U+B179",
+      "page": 0,
+      "cell": 67,
+      "row": 4,
+      "col": 3
+    },
+    {
+      "index": 68,
+      "char": "높",
+      "codepoint": "U+B192",
+      "page": 0,
+      "cell": 68,
+      "row": 4,
+      "col": 4
+    },
+    {
+      "index": 69,
+      "char": "놓",
+      "codepoint": "U+B193",
+      "page": 0,
+      "cell": 69,
+      "row": 4,
+      "col": 5
+    },
+    {
+      "index": 70,
+      "char": "누",
+      "codepoint": "U+B204",
+      "page": 0,
+      "cell": 70,
+      "row": 4,
+      "col": 6
+    },
+    {
+      "index": 71,
+      "char": "눌",
+      "codepoint": "U+B20C",
+      "page": 0,
+      "cell": 71,
+      "row": 4,
+      "col": 7
+    },
+    {
+      "index": 72,
+      "char": "뉘",
+      "codepoint": "U+B258",
+      "page": 0,
+      "cell": 72,
+      "row": 4,
+      "col": 8
+    },
+    {
+      "index": 73,
+      "char": "뉴",
+      "codepoint": "U+B274",
+      "page": 0,
+      "cell": 73,
+      "row": 4,
+      "col": 9
+    },
+    {
+      "index": 74,
+      "char": "는",
+      "codepoint": "U+B294",
+      "page": 0,
+      "cell": 74,
+      "row": 4,
+      "col": 10
+    },
+    {
+      "index": 75,
+      "char": "늘",
+      "codepoint": "U+B298",
+      "page": 0,
+      "cell": 75,
+      "row": 4,
+      "col": 11
+    },
+    {
+      "index": 76,
+      "char": "능",
+      "codepoint": "U+B2A5",
+      "page": 0,
+      "cell": 76,
+      "row": 4,
+      "col": 12
+    },
+    {
+      "index": 77,
+      "char": "니",
+      "codepoint": "U+B2C8",
+      "page": 0,
+      "cell": 77,
+      "row": 4,
+      "col": 13
+    },
+    {
+      "index": 78,
+      "char": "닉",
+      "codepoint": "U+B2C9",
+      "page": 0,
+      "cell": 78,
+      "row": 4,
+      "col": 14
+    },
+    {
+      "index": 79,
+      "char": "님",
+      "codepoint": "U+B2D8",
+      "page": 0,
+      "cell": 79,
+      "row": 4,
+      "col": 15
+    },
+    {
+      "index": 80,
+      "char": "닙",
+      "codepoint": "U+B2D9",
+      "page": 0,
+      "cell": 80,
+      "row": 5,
+      "col": 0
+    },
+    {
+      "index": 81,
+      "char": "닝",
+      "codepoint": "U+B2DD",
+      "page": 0,
+      "cell": 81,
+      "row": 5,
+      "col": 1
+    },
+    {
+      "index": 82,
+      "char": "다",
+      "codepoint": "U+B2E4",
+      "page": 0,
+      "cell": 82,
+      "row": 5,
+      "col": 2
+    },
+    {
+      "index": 83,
+      "char": "단",
+      "codepoint": "U+B2E8",
+      "page": 0,
+      "cell": 83,
+      "row": 5,
+      "col": 3
+    },
+    {
+      "index": 84,
+      "char": "달",
+      "codepoint": "U+B2EC",
+      "page": 0,
+      "cell": 84,
+      "row": 5,
+      "col": 4
+    },
+    {
+      "index": 85,
+      "char": "답",
+      "codepoint": "U+B2F5",
+      "page": 0,
+      "cell": 85,
+      "row": 5,
+      "col": 5
+    },
+    {
+      "index": 86,
+      "char": "당",
+      "codepoint": "U+B2F9",
+      "page": 0,
+      "cell": 86,
+      "row": 5,
+      "col": 6
+    },
+    {
+      "index": 87,
+      "char": "대",
+      "codepoint": "U+B300",
+      "page": 0,
+      "cell": 87,
+      "row": 5,
+      "col": 7
+    },
+    {
+      "index": 88,
+      "char": "댑",
+      "codepoint": "U+B311",
+      "page": 0,
+      "cell": 88,
+      "row": 5,
+      "col": 8
+    },
+    {
+      "index": 89,
+      "char": "더",
+      "codepoint": "U+B354",
+      "page": 0,
+      "cell": 89,
+      "row": 5,
+      "col": 9
+    },
+    {
+      "index": 90,
+      "char": "덜",
+      "codepoint": "U+B35C",
+      "page": 0,
+      "cell": 90,
+      "row": 5,
+      "col": 10
+    },
+    {
+      "index": 91,
+      "char": "덮",
+      "codepoint": "U+B36E",
+      "page": 0,
+      "cell": 91,
+      "row": 5,
+      "col": 11
+    },
+    {
+      "index": 92,
+      "char": "데",
+      "codepoint": "U+B370",
+      "page": 0,
+      "cell": 92,
+      "row": 5,
+      "col": 12
+    },
+    {
+      "index": 93,
+      "char": "덴",
+      "codepoint": "U+B374",
+      "page": 0,
+      "cell": 93,
+      "row": 5,
+      "col": 13
+    },
+    {
+      "index": 94,
+      "char": "뎀",
+      "codepoint": "U+B380",
+      "page": 0,
+      "cell": 94,
+      "row": 5,
+      "col": 14
+    },
+    {
+      "index": 95,
+      "char": "도",
+      "codepoint": "U+B3C4",
+      "page": 0,
+      "cell": 95,
+      "row": 5,
+      "col": 15
+    },
+    {
+      "index": 96,
+      "char": "독",
+      "codepoint": "U+B3C5",
+      "page": 0,
+      "cell": 96,
+      "row": 6,
+      "col": 0
+    },
+    {
+      "index": 97,
+      "char": "돌",
+      "codepoint": "U+B3CC",
+      "page": 0,
+      "cell": 97,
+      "row": 6,
+      "col": 1
+    },
+    {
+      "index": 98,
+      "char": "동",
+      "codepoint": "U+B3D9",
+      "page": 0,
+      "cell": 98,
+      "row": 6,
+      "col": 2
+    },
+    {
+      "index": 99,
+      "char": "되",
+      "codepoint": "U+B418",
+      "page": 0,
+      "cell": 99,
+      "row": 6,
+      "col": 3
+    },
+    {
+      "index": 100,
+      "char": "된",
+      "codepoint": "U+B41C",
+      "page": 0,
+      "cell": 100,
+      "row": 6,
+      "col": 4
+    },
+    {
+      "index": 101,
+      "char": "됨",
+      "codepoint": "U+B428",
+      "page": 0,
+      "cell": 101,
+      "row": 6,
+      "col": 5
+    },
+    {
+      "index": 102,
+      "char": "됩",
+      "codepoint": "U+B429",
+      "page": 0,
+      "cell": 102,
+      "row": 6,
+      "col": 6
+    },
+    {
+      "index": 103,
+      "char": "두",
+      "codepoint": "U+B450",
+      "page": 0,
+      "cell": 103,
+      "row": 6,
+      "col": 7
+    },
+    {
+      "index": 104,
+      "char": "둥",
+      "codepoint": "U+B465",
+      "page": 0,
+      "cell": 104,
+      "row": 6,
+      "col": 8
+    },
+    {
+      "index": 105,
+      "char": "뒤",
+      "codepoint": "U+B4A4",
+      "page": 0,
+      "cell": 105,
+      "row": 6,
+      "col": 9
+    },
+    {
+      "index": 106,
+      "char": "드",
+      "codepoint": "U+B4DC",
+      "page": 0,
+      "cell": 106,
+      "row": 6,
+      "col": 10
+    },
+    {
+      "index": 107,
+      "char": "득",
+      "codepoint": "U+B4DD",
+      "page": 0,
+      "cell": 107,
+      "row": 6,
+      "col": 11
+    },
+    {
+      "index": 108,
+      "char": "든",
+      "codepoint": "U+B4E0",
+      "page": 0,
+      "cell": 108,
+      "row": 6,
+      "col": 12
+    },
+    {
+      "index": 109,
+      "char": "들",
+      "codepoint": "U+B4E4",
+      "page": 0,
+      "cell": 109,
+      "row": 6,
+      "col": 13
+    },
+    {
+      "index": 110,
+      "char": "등",
+      "codepoint": "U+B4F1",
+      "page": 0,
+      "cell": 110,
+      "row": 6,
+      "col": 14
+    },
+    {
+      "index": 111,
+      "char": "디",
+      "codepoint": "U+B514",
+      "page": 0,
+      "cell": 111,
+      "row": 6,
+      "col": 15
+    },
+    {
+      "index": 112,
+      "char": "딥",
+      "codepoint": "U+B525",
+      "page": 0,
+      "cell": 112,
+      "row": 7,
+      "col": 0
+    },
+    {
+      "index": 113,
+      "char": "딩",
+      "codepoint": "U+B529",
+      "page": 0,
+      "cell": 113,
+      "row": 7,
+      "col": 1
+    },
+    {
+      "index": 114,
+      "char": "따",
+      "codepoint": "U+B530",
+      "page": 0,
+      "cell": 114,
+      "row": 7,
+      "col": 2
+    },
+    {
+      "index": 115,
+      "char": "또",
+      "codepoint": "U+B610",
+      "page": 0,
+      "cell": 115,
+      "row": 7,
+      "col": 3
+    },
+    {
+      "index": 116,
+      "char": "뛰",
+      "codepoint": "U+B6F0",
+      "page": 0,
+      "cell": 116,
+      "row": 7,
+      "col": 4
+    },
+    {
+      "index": 117,
+      "char": "라",
+      "codepoint": "U+B77C",
+      "page": 0,
+      "cell": 117,
+      "row": 7,
+      "col": 5
+    },
+    {
+      "index": 118,
+      "char": "락",
+      "codepoint": "U+B77D",
+      "page": 0,
+      "cell": 118,
+      "row": 7,
+      "col": 6
+    },
+    {
+      "index": 119,
+      "char": "란",
+      "codepoint": "U+B780",
+      "page": 0,
+      "cell": 119,
+      "row": 7,
+      "col": 7
+    },
+    {
+      "index": 120,
+      "char": "람",
+      "codepoint": "U+B78C",
+      "page": 0,
+      "cell": 120,
+      "row": 7,
+      "col": 8
+    },
+    {
+      "index": 121,
+      "char": "랑",
+      "codepoint": "U+B791",
+      "page": 0,
+      "cell": 121,
+      "row": 7,
+      "col": 9
+    },
+    {
+      "index": 122,
+      "char": "래",
+      "codepoint": "U+B798",
+      "page": 0,
+      "cell": 122,
+      "row": 7,
+      "col": 10
+    },
+    {
+      "index": 123,
+      "char": "랙",
+      "codepoint": "U+B799",
+      "page": 0,
+      "cell": 123,
+      "row": 7,
+      "col": 11
+    },
+    {
+      "index": 124,
+      "char": "랜",
+      "codepoint": "U+B79C",
+      "page": 0,
+      "cell": 124,
+      "row": 7,
+      "col": 12
+    },
+    {
+      "index": 125,
+      "char": "랩",
+      "codepoint": "U+B7A9",
+      "page": 0,
+      "cell": 125,
+      "row": 7,
+      "col": 13
+    },
+    {
+      "index": 126,
+      "char": "랭",
+      "codepoint": "U+B7AD",
+      "page": 0,
+      "cell": 126,
+      "row": 7,
+      "col": 14
+    },
+    {
+      "index": 127,
+      "char": "량",
+      "codepoint": "U+B7C9",
+      "page": 0,
+      "cell": 127,
+      "row": 7,
+      "col": 15
+    },
+    {
+      "index": 128,
+      "char": "러",
+      "codepoint": "U+B7EC",
+      "page": 0,
+      "cell": 128,
+      "row": 8,
+      "col": 0
+    },
+    {
+      "index": 129,
+      "char": "런",
+      "codepoint": "U+B7F0",
+      "page": 0,
+      "cell": 129,
+      "row": 8,
+      "col": 1
+    },
+    {
+      "index": 130,
+      "char": "럴",
+      "codepoint": "U+B7F4",
+      "page": 0,
+      "cell": 130,
+      "row": 8,
+      "col": 2
+    },
+    {
+      "index": 131,
+      "char": "럽",
+      "codepoint": "U+B7FD",
+      "page": 0,
+      "cell": 131,
+      "row": 8,
+      "col": 3
+    },
+    {
+      "index": 132,
+      "char": "레",
+      "codepoint": "U+B808",
+      "page": 0,
+      "cell": 132,
+      "row": 8,
+      "col": 4
+    },
+    {
+      "index": 133,
+      "char": "렉",
+      "codepoint": "U+B809",
+      "page": 0,
+      "cell": 133,
+      "row": 8,
+      "col": 5
+    },
+    {
+      "index": 134,
+      "char": "려",
+      "codepoint": "U+B824",
+      "page": 0,
+      "cell": 134,
+      "row": 8,
+      "col": 6
+    },
+    {
+      "index": 135,
+      "char": "력",
+      "codepoint": "U+B825",
+      "page": 0,
+      "cell": 135,
+      "row": 8,
+      "col": 7
+    },
+    {
+      "index": 136,
+      "char": "렬",
+      "codepoint": "U+B82C",
+      "page": 0,
+      "cell": 136,
+      "row": 8,
+      "col": 8
+    },
+    {
+      "index": 137,
+      "char": "로",
+      "codepoint": "U+B85C",
+      "page": 0,
+      "cell": 137,
+      "row": 8,
+      "col": 9
+    },
+    {
+      "index": 138,
+      "char": "록",
+      "codepoint": "U+B85D",
+      "page": 0,
+      "cell": 138,
+      "row": 8,
+      "col": 10
+    },
+    {
+      "index": 139,
+      "char": "롤",
+      "codepoint": "U+B864",
+      "page": 0,
+      "cell": 139,
+      "row": 8,
+      "col": 11
+    },
+    {
+      "index": 140,
+      "char": "롭",
+      "codepoint": "U+B86D",
+      "page": 0,
+      "cell": 140,
+      "row": 8,
+      "col": 12
+    },
+    {
+      "index": 141,
+      "char": "롯",
+      "codepoint": "U+B86F",
+      "page": 0,
+      "cell": 141,
+      "row": 8,
+      "col": 13
+    },
+    {
+      "index": 142,
+      "char": "료",
+      "codepoint": "U+B8CC",
+      "page": 0,
+      "cell": 142,
+      "row": 8,
+      "col": 14
+    },
+    {
+      "index": 143,
+      "char": "루",
+      "codepoint": "U+B8E8",
+      "page": 0,
+      "cell": 143,
+      "row": 8,
+      "col": 15
+    },
+    {
+      "index": 144,
+      "char": "룸",
+      "codepoint": "U+B8F8",
+      "page": 0,
+      "cell": 144,
+      "row": 9,
+      "col": 0
+    },
+    {
+      "index": 145,
+      "char": "류",
+      "codepoint": "U+B958",
+      "page": 0,
+      "cell": 145,
+      "row": 9,
+      "col": 1
+    },
+    {
+      "index": 146,
+      "char": "률",
+      "codepoint": "U+B960",
+      "page": 0,
+      "cell": 146,
+      "row": 9,
+      "col": 2
+    },
+    {
+      "index": 147,
+      "char": "륨",
+      "codepoint": "U+B968",
+      "page": 0,
+      "cell": 147,
+      "row": 9,
+      "col": 3
+    },
+    {
+      "index": 148,
+      "char": "르",
+      "codepoint": "U+B974",
+      "page": 0,
+      "cell": 148,
+      "row": 9,
+      "col": 4
+    },
+    {
+      "index": 149,
+      "char": "른",
+      "codepoint": "U+B978",
+      "page": 0,
+      "cell": 149,
+      "row": 9,
+      "col": 5
+    },
+    {
+      "index": 150,
+      "char": "를",
+      "codepoint": "U+B97C",
+      "page": 0,
+      "cell": 150,
+      "row": 9,
+      "col": 6
+    },
+    {
+      "index": 151,
+      "char": "름",
+      "codepoint": "U+B984",
+      "page": 0,
+      "cell": 151,
+      "row": 9,
+      "col": 7
+    },
+    {
+      "index": 152,
+      "char": "리",
+      "codepoint": "U+B9AC",
+      "page": 0,
+      "cell": 152,
+      "row": 9,
+      "col": 8
+    },
+    {
+      "index": 153,
+      "char": "린",
+      "codepoint": "U+B9B0",
+      "page": 0,
+      "cell": 153,
+      "row": 9,
+      "col": 9
+    },
+    {
+      "index": 154,
+      "char": "림",
+      "codepoint": "U+B9BC",
+      "page": 0,
+      "cell": 154,
+      "row": 9,
+      "col": 10
+    },
+    {
+      "index": 155,
+      "char": "립",
+      "codepoint": "U+B9BD",
+      "page": 0,
+      "cell": 155,
+      "row": 9,
+      "col": 11
+    },
+    {
+      "index": 156,
+      "char": "링",
+      "codepoint": "U+B9C1",
+      "page": 0,
+      "cell": 156,
+      "row": 9,
+      "col": 12
+    },
+    {
+      "index": 157,
+      "char": "마",
+      "codepoint": "U+B9C8",
+      "page": 0,
+      "cell": 157,
+      "row": 9,
+      "col": 13
+    },
+    {
+      "index": 158,
+      "char": "막",
+      "codepoint": "U+B9C9",
+      "page": 0,
+      "cell": 158,
+      "row": 9,
+      "col": 14
+    },
+    {
+      "index": 159,
+      "char": "만",
+      "codepoint": "U+B9CC",
+      "page": 0,
+      "cell": 159,
+      "row": 9,
+      "col": 15
+    },
+    {
+      "index": 160,
+      "char": "많",
+      "codepoint": "U+B9CE",
+      "page": 0,
+      "cell": 160,
+      "row": 10,
+      "col": 0
+    },
+    {
+      "index": 161,
+      "char": "말",
+      "codepoint": "U+B9D0",
+      "page": 0,
+      "cell": 161,
+      "row": 10,
+      "col": 1
+    },
+    {
+      "index": 162,
+      "char": "맞",
+      "codepoint": "U+B9DE",
+      "page": 0,
+      "cell": 162,
+      "row": 10,
+      "col": 2
+    },
+    {
+      "index": 163,
+      "char": "매",
+      "codepoint": "U+B9E4",
+      "page": 0,
+      "cell": 163,
+      "row": 10,
+      "col": 3
+    },
+    {
+      "index": 164,
+      "char": "맨",
+      "codepoint": "U+B9E8",
+      "page": 0,
+      "cell": 164,
+      "row": 10,
+      "col": 4
+    },
+    {
+      "index": 165,
+      "char": "맷",
+      "codepoint": "U+B9F7",
+      "page": 0,
+      "cell": 165,
+      "row": 10,
+      "col": 5
+    },
+    {
+      "index": 166,
+      "char": "머",
+      "codepoint": "U+BA38",
+      "page": 0,
+      "cell": 166,
+      "row": 10,
+      "col": 6
+    },
+    {
+      "index": 167,
+      "char": "먹",
+      "codepoint": "U+BA39",
+      "page": 0,
+      "cell": 167,
+      "row": 10,
+      "col": 7
+    },
+    {
+      "index": 168,
+      "char": "멀",
+      "codepoint": "U+BA40",
+      "page": 0,
+      "cell": 168,
+      "row": 10,
+      "col": 8
+    },
+    {
+      "index": 169,
+      "char": "메",
+      "codepoint": "U+BA54",
+      "page": 0,
+      "cell": 169,
+      "row": 10,
+      "col": 9
+    },
+    {
+      "index": 170,
+      "char": "멕",
+      "codepoint": "U+BA55",
+      "page": 0,
+      "cell": 170,
+      "row": 10,
+      "col": 10
+    },
+    {
+      "index": 171,
+      "char": "며",
+      "codepoint": "U+BA70",
+      "page": 0,
+      "cell": 171,
+      "row": 10,
+      "col": 11
+    },
+    {
+      "index": 172,
+      "char": "면",
+      "codepoint": "U+BA74",
+      "page": 0,
+      "cell": 172,
+      "row": 10,
+      "col": 12
+    },
+    {
+      "index": 173,
+      "char": "명",
+      "codepoint": "U+BA85",
+      "page": 0,
+      "cell": 173,
+      "row": 10,
+      "col": 13
+    },
+    {
+      "index": 174,
+      "char": "모",
+      "codepoint": "U+BAA8",
+      "page": 0,
+      "cell": 174,
+      "row": 10,
+      "col": 14
+    },
+    {
+      "index": 175,
+      "char": "목",
+      "codepoint": "U+BAA9",
+      "page": 0,
+      "cell": 175,
+      "row": 10,
+      "col": 15
+    },
+    {
+      "index": 176,
+      "char": "못",
+      "codepoint": "U+BABB",
+      "page": 0,
+      "cell": 176,
+      "row": 11,
+      "col": 0
+    },
+    {
+      "index": 177,
+      "char": "무",
+      "codepoint": "U+BB34",
+      "page": 0,
+      "cell": 177,
+      "row": 11,
+      "col": 1
+    },
+    {
+      "index": 178,
+      "char": "문",
+      "codepoint": "U+BB38",
+      "page": 0,
+      "cell": 178,
+      "row": 11,
+      "col": 2
+    },
+    {
+      "index": 179,
+      "char": "물",
+      "codepoint": "U+BB3C",
+      "page": 0,
+      "cell": 179,
+      "row": 11,
+      "col": 3
+    },
+    {
+      "index": 180,
+      "char": "미",
+      "codepoint": "U+BBF8",
+      "page": 0,
+      "cell": 180,
+      "row": 11,
+      "col": 4
+    },
+    {
+      "index": 181,
+      "char": "믹",
+      "codepoint": "U+BBF9",
+      "page": 0,
+      "cell": 181,
+      "row": 11,
+      "col": 5
+    },
+    {
+      "index": 182,
+      "char": "민",
+      "codepoint": "U+BBFC",
+      "page": 0,
+      "cell": 182,
+      "row": 11,
+      "col": 6
+    },
+    {
+      "index": 183,
+      "char": "밀",
+      "codepoint": "U+BC00",
+      "page": 0,
+      "cell": 183,
+      "row": 11,
+      "col": 7
+    },
+    {
+      "index": 184,
+      "char": "및",
+      "codepoint": "U+BC0F",
+      "page": 0,
+      "cell": 184,
+      "row": 11,
+      "col": 8
+    },
+    {
+      "index": 185,
+      "char": "밑",
+      "codepoint": "U+BC11",
+      "page": 0,
+      "cell": 185,
+      "row": 11,
+      "col": 9
+    },
+    {
+      "index": 186,
+      "char": "바",
+      "codepoint": "U+BC14",
+      "page": 0,
+      "cell": 186,
+      "row": 11,
+      "col": 10
+    },
+    {
+      "index": 187,
+      "char": "반",
+      "codepoint": "U+BC18",
+      "page": 0,
+      "cell": 187,
+      "row": 11,
+      "col": 11
+    },
+    {
+      "index": 188,
+      "char": "받",
+      "codepoint": "U+BC1B",
+      "page": 0,
+      "cell": 188,
+      "row": 11,
+      "col": 12
+    },
+    {
+      "index": 189,
+      "char": "발",
+      "codepoint": "U+BC1C",
+      "page": 0,
+      "cell": 189,
+      "row": 11,
+      "col": 13
+    },
+    {
+      "index": 190,
+      "char": "밟",
+      "codepoint": "U+BC1F",
+      "page": 0,
+      "cell": 190,
+      "row": 11,
+      "col": 14
+    },
+    {
+      "index": 191,
+      "char": "방",
+      "codepoint": "U+BC29",
+      "page": 0,
+      "cell": 191,
+      "row": 11,
+      "col": 15
+    },
+    {
+      "index": 192,
+      "char": "배",
+      "codepoint": "U+BC30",
+      "page": 0,
+      "cell": 192,
+      "row": 12,
+      "col": 0
+    },
+    {
+      "index": 193,
+      "char": "백",
+      "codepoint": "U+BC31",
+      "page": 0,
+      "cell": 193,
+      "row": 12,
+      "col": 1
+    },
+    {
+      "index": 194,
+      "char": "밸",
+      "codepoint": "U+BC38",
+      "page": 0,
+      "cell": 194,
+      "row": 12,
+      "col": 2
+    },
+    {
+      "index": 195,
+      "char": "버",
+      "codepoint": "U+BC84",
+      "page": 0,
+      "cell": 195,
+      "row": 12,
+      "col": 3
+    },
+    {
+      "index": 196,
+      "char": "번",
+      "codepoint": "U+BC88",
+      "page": 0,
+      "cell": 196,
+      "row": 12,
+      "col": 4
+    },
+    {
+      "index": 197,
+      "char": "벌",
+      "codepoint": "U+BC8C",
+      "page": 0,
+      "cell": 197,
+      "row": 12,
+      "col": 5
+    },
+    {
+      "index": 198,
+      "char": "범",
+      "codepoint": "U+BC94",
+      "page": 0,
+      "cell": 198,
+      "row": 12,
+      "col": 6
+    },
+    {
+      "index": 199,
+      "char": "베",
+      "codepoint": "U+BCA0",
+      "page": 0,
+      "cell": 199,
+      "row": 12,
+      "col": 7
+    },
+    {
+      "index": 200,
+      "char": "벨",
+      "codepoint": "U+BCA8",
+      "page": 0,
+      "cell": 200,
+      "row": 12,
+      "col": 8
+    },
+    {
+      "index": 201,
+      "char": "벽",
+      "codepoint": "U+BCBD",
+      "page": 0,
+      "cell": 201,
+      "row": 12,
+      "col": 9
+    },
+    {
+      "index": 202,
+      "char": "변",
+      "codepoint": "U+BCC0",
+      "page": 0,
+      "cell": 202,
+      "row": 12,
+      "col": 10
+    },
+    {
+      "index": 203,
+      "char": "별",
+      "codepoint": "U+BCC4",
+      "page": 0,
+      "cell": 203,
+      "row": 12,
+      "col": 11
+    },
+    {
+      "index": 204,
+      "char": "병",
+      "codepoint": "U+BCD1",
+      "page": 0,
+      "cell": 204,
+      "row": 12,
+      "col": 12
+    },
+    {
+      "index": 205,
+      "char": "보",
+      "codepoint": "U+BCF4",
+      "page": 0,
+      "cell": 205,
+      "row": 12,
+      "col": 13
+    },
+    {
+      "index": 206,
+      "char": "복",
+      "codepoint": "U+BCF5",
+      "page": 0,
+      "cell": 206,
+      "row": 12,
+      "col": 14
+    },
+    {
+      "index": 207,
+      "char": "본",
+      "codepoint": "U+BCF8",
+      "page": 0,
+      "cell": 207,
+      "row": 12,
+      "col": 15
+    },
+    {
+      "index": 208,
+      "char": "볼",
+      "codepoint": "U+BCFC",
+      "page": 0,
+      "cell": 208,
+      "row": 13,
+      "col": 0
+    },
+    {
+      "index": 209,
+      "char": "봅",
+      "codepoint": "U+BD05",
+      "page": 0,
+      "cell": 209,
+      "row": 13,
+      "col": 1
+    },
+    {
+      "index": 210,
+      "char": "봇",
+      "codepoint": "U+BD07",
+      "page": 0,
+      "cell": 210,
+      "row": 13,
+      "col": 2
+    },
+    {
+      "index": 211,
+      "char": "부",
+      "codepoint": "U+BD80",
+      "page": 0,
+      "cell": 211,
+      "row": 13,
+      "col": 3
+    },
+    {
+      "index": 212,
+      "char": "북",
+      "codepoint": "U+BD81",
+      "page": 0,
+      "cell": 212,
+      "row": 13,
+      "col": 4
+    },
+    {
+      "index": 213,
+      "char": "분",
+      "codepoint": "U+BD84",
+      "page": 0,
+      "cell": 213,
+      "row": 13,
+      "col": 5
+    },
+    {
+      "index": 214,
+      "char": "불",
+      "codepoint": "U+BD88",
+      "page": 0,
+      "cell": 214,
+      "row": 13,
+      "col": 6
+    },
+    {
+      "index": 215,
+      "char": "브",
+      "codepoint": "U+BE0C",
+      "page": 0,
+      "cell": 215,
+      "row": 13,
+      "col": 7
+    },
+    {
+      "index": 216,
+      "char": "블",
+      "codepoint": "U+BE14",
+      "page": 0,
+      "cell": 216,
+      "row": 13,
+      "col": 8
+    },
+    {
+      "index": 217,
+      "char": "비",
+      "codepoint": "U+BE44",
+      "page": 0,
+      "cell": 217,
+      "row": 13,
+      "col": 9
+    },
+    {
+      "index": 218,
+      "char": "빅",
+      "codepoint": "U+BE45",
+      "page": 0,
+      "cell": 218,
+      "row": 13,
+      "col": 10
+    },
+    {
+      "index": 219,
+      "char": "빈",
+      "codepoint": "U+BE48",
+      "page": 0,
+      "cell": 219,
+      "row": 13,
+      "col": 11
+    },
+    {
+      "index": 220,
+      "char": "빌",
+      "codepoint": "U+BE4C",
+      "page": 0,
+      "cell": 220,
+      "row": 13,
+      "col": 12
+    },
+    {
+      "index": 221,
+      "char": "빠",
+      "codepoint": "U+BE60",
+      "page": 0,
+      "cell": 221,
+      "row": 13,
+      "col": 13
+    },
+    {
+      "index": 222,
+      "char": "빡",
+      "codepoint": "U+BE61",
+      "page": 0,
+      "cell": 222,
+      "row": 13,
+      "col": 14
+    },
+    {
+      "index": 223,
+      "char": "빨",
+      "codepoint": "U+BE68",
+      "page": 0,
+      "cell": 223,
+      "row": 13,
+      "col": 15
+    },
+    {
+      "index": 224,
+      "char": "빼",
+      "codepoint": "U+BE7C",
+      "page": 0,
+      "cell": 224,
+      "row": 14,
+      "col": 0
+    },
+    {
+      "index": 225,
+      "char": "뻐",
+      "codepoint": "U+BED0",
+      "page": 0,
+      "cell": 225,
+      "row": 14,
+      "col": 1
+    },
+    {
+      "index": 226,
+      "char": "사",
+      "codepoint": "U+C0AC",
+      "page": 0,
+      "cell": 226,
+      "row": 14,
+      "col": 2
+    },
+    {
+      "index": 227,
+      "char": "삭",
+      "codepoint": "U+C0AD",
+      "page": 0,
+      "cell": 227,
+      "row": 14,
+      "col": 3
+    },
+    {
+      "index": 228,
+      "char": "산",
+      "codepoint": "U+C0B0",
+      "page": 0,
+      "cell": 228,
+      "row": 14,
+      "col": 4
+    },
+    {
+      "index": 229,
+      "char": "삽",
+      "codepoint": "U+C0BD",
+      "page": 0,
+      "cell": 229,
+      "row": 14,
+      "col": 5
+    },
+    {
+      "index": 230,
+      "char": "상",
+      "codepoint": "U+C0C1",
+      "page": 0,
+      "cell": 230,
+      "row": 14,
+      "col": 6
+    },
+    {
+      "index": 231,
+      "char": "새",
+      "codepoint": "U+C0C8",
+      "page": 0,
+      "cell": 231,
+      "row": 14,
+      "col": 7
+    },
+    {
+      "index": 232,
+      "char": "색",
+      "codepoint": "U+C0C9",
+      "page": 0,
+      "cell": 232,
+      "row": 14,
+      "col": 8
+    },
+    {
+      "index": 233,
+      "char": "샌",
+      "codepoint": "U+C0CC",
+      "page": 0,
+      "cell": 233,
+      "row": 14,
+      "col": 9
+    },
+    {
+      "index": 234,
+      "char": "생",
+      "codepoint": "U+C0DD",
+      "page": 0,
+      "cell": 234,
+      "row": 14,
+      "col": 10
+    },
+    {
+      "index": 235,
+      "char": "서",
+      "codepoint": "U+C11C",
+      "page": 0,
+      "cell": 235,
+      "row": 14,
+      "col": 11
+    },
+    {
+      "index": 236,
+      "char": "석",
+      "codepoint": "U+C11D",
+      "page": 0,
+      "cell": 236,
+      "row": 14,
+      "col": 12
+    },
+    {
+      "index": 237,
+      "char": "선",
+      "codepoint": "U+C120",
+      "page": 0,
+      "cell": 237,
+      "row": 14,
+      "col": 13
+    },
+    {
+      "index": 238,
+      "char": "설",
+      "codepoint": "U+C124",
+      "page": 0,
+      "cell": 238,
+      "row": 14,
+      "col": 14
+    },
+    {
+      "index": 239,
+      "char": "섬",
+      "codepoint": "U+C12C",
+      "page": 0,
+      "cell": 239,
+      "row": 14,
+      "col": 15
+    },
+    {
+      "index": 240,
+      "char": "성",
+      "codepoint": "U+C131",
+      "page": 0,
+      "cell": 240,
+      "row": 15,
+      "col": 0
+    },
+    {
+      "index": 241,
+      "char": "세",
+      "codepoint": "U+C138",
+      "page": 0,
+      "cell": 241,
+      "row": 15,
+      "col": 1
+    },
+    {
+      "index": 242,
+      "char": "섹",
+      "codepoint": "U+C139",
+      "page": 0,
+      "cell": 242,
+      "row": 15,
+      "col": 2
+    },
+    {
+      "index": 243,
+      "char": "센",
+      "codepoint": "U+C13C",
+      "page": 0,
+      "cell": 243,
+      "row": 15,
+      "col": 3
+    },
+    {
+      "index": 244,
+      "char": "셋",
+      "codepoint": "U+C14B",
+      "page": 0,
+      "cell": 244,
+      "row": 15,
+      "col": 4
+    },
+    {
+      "index": 245,
+      "char": "셔",
+      "codepoint": "U+C154",
+      "page": 0,
+      "cell": 245,
+      "row": 15,
+      "col": 5
+    },
+    {
+      "index": 246,
+      "char": "션",
+      "codepoint": "U+C158",
+      "page": 0,
+      "cell": 246,
+      "row": 15,
+      "col": 6
+    },
+    {
+      "index": 247,
+      "char": "셜",
+      "codepoint": "U+C15C",
+      "page": 0,
+      "cell": 247,
+      "row": 15,
+      "col": 7
+    },
+    {
+      "index": 248,
+      "char": "소",
+      "codepoint": "U+C18C",
+      "page": 0,
+      "cell": 248,
+      "row": 15,
+      "col": 8
+    },
+    {
+      "index": 249,
+      "char": "속",
+      "codepoint": "U+C18D",
+      "page": 0,
+      "cell": 249,
+      "row": 15,
+      "col": 9
+    },
+    {
+      "index": 250,
+      "char": "손",
+      "codepoint": "U+C190",
+      "page": 0,
+      "cell": 250,
+      "row": 15,
+      "col": 10
+    },
+    {
+      "index": 251,
+      "char": "솔",
+      "codepoint": "U+C194",
+      "page": 0,
+      "cell": 251,
+      "row": 15,
+      "col": 11
+    },
+    {
+      "index": 252,
+      "char": "송",
+      "codepoint": "U+C1A1",
+      "page": 0,
+      "cell": 252,
+      "row": 15,
+      "col": 12
+    },
+    {
+      "index": 253,
+      "char": "쇼",
+      "codepoint": "U+C1FC",
+      "page": 0,
+      "cell": 253,
+      "row": 15,
+      "col": 13
+    },
+    {
+      "index": 254,
+      "char": "수",
+      "codepoint": "U+C218",
+      "page": 0,
+      "cell": 254,
+      "row": 15,
+      "col": 14
+    },
+    {
+      "index": 255,
+      "char": "순",
+      "codepoint": "U+C21C",
+      "page": 0,
+      "cell": 255,
+      "row": 15,
+      "col": 15
+    },
+    {
+      "index": 256,
+      "char": "숫",
+      "codepoint": "U+C22B",
+      "page": 1,
+      "cell": 0,
+      "row": 0,
+      "col": 0
+    },
+    {
+      "index": 257,
+      "char": "쉬",
+      "codepoint": "U+C26C",
+      "page": 1,
+      "cell": 1,
+      "row": 0,
+      "col": 1
+    },
+    {
+      "index": 258,
+      "char": "쉼",
+      "codepoint": "U+C27C",
+      "page": 1,
+      "cell": 2,
+      "row": 0,
+      "col": 2
+    },
+    {
+      "index": 259,
+      "char": "스",
+      "codepoint": "U+C2A4",
+      "page": 1,
+      "cell": 3,
+      "row": 0,
+      "col": 3
+    },
+    {
+      "index": 260,
+      "char": "슬",
+      "codepoint": "U+C2AC",
+      "page": 1,
+      "cell": 4,
+      "row": 0,
+      "col": 4
+    },
+    {
+      "index": 261,
+      "char": "습",
+      "codepoint": "U+C2B5",
+      "page": 1,
+      "cell": 5,
+      "row": 0,
+      "col": 5
+    },
+    {
+      "index": 262,
+      "char": "승",
+      "codepoint": "U+C2B9",
+      "page": 1,
+      "cell": 6,
+      "row": 0,
+      "col": 6
+    },
+    {
+      "index": 263,
+      "char": "시",
+      "codepoint": "U+C2DC",
+      "page": 1,
+      "cell": 7,
+      "row": 0,
+      "col": 7
+    },
+    {
+      "index": 264,
+      "char": "식",
+      "codepoint": "U+C2DD",
+      "page": 1,
+      "cell": 8,
+      "row": 0,
+      "col": 8
+    },
+    {
+      "index": 265,
+      "char": "신",
+      "codepoint": "U+C2E0",
+      "page": 1,
+      "cell": 9,
+      "row": 0,
+      "col": 9
+    },
+    {
+      "index": 266,
+      "char": "실",
+      "codepoint": "U+C2E4",
+      "page": 1,
+      "cell": 10,
+      "row": 0,
+      "col": 10
+    },
+    {
+      "index": 267,
+      "char": "십",
+      "codepoint": "U+C2ED",
+      "page": 1,
+      "cell": 11,
+      "row": 0,
+      "col": 11
+    },
+    {
+      "index": 268,
+      "char": "싱",
+      "codepoint": "U+C2F1",
+      "page": 1,
+      "cell": 12,
+      "row": 0,
+      "col": 12
+    },
+    {
+      "index": 269,
+      "char": "싶",
+      "codepoint": "U+C2F6",
+      "page": 1,
+      "cell": 13,
+      "row": 0,
+      "col": 13
+    },
+    {
+      "index": 270,
+      "char": "쌍",
+      "codepoint": "U+C30D",
+      "page": 1,
+      "cell": 14,
+      "row": 0,
+      "col": 14
+    },
+    {
+      "index": 271,
+      "char": "써",
+      "codepoint": "U+C368",
+      "page": 1,
+      "cell": 15,
+      "row": 0,
+      "col": 15
+    },
+    {
+      "index": 272,
+      "char": "쏘",
+      "codepoint": "U+C3D8",
+      "page": 1,
+      "cell": 16,
+      "row": 1,
+      "col": 0
+    },
+    {
+      "index": 273,
+      "char": "쓰",
+      "codepoint": "U+C4F0",
+      "page": 1,
+      "cell": 17,
+      "row": 1,
+      "col": 1
+    },
+    {
+      "index": 274,
+      "char": "씁",
+      "codepoint": "U+C501",
+      "page": 1,
+      "cell": 18,
+      "row": 1,
+      "col": 2
+    },
+    {
+      "index": 275,
+      "char": "아",
+      "codepoint": "U+C544",
+      "page": 1,
+      "cell": 19,
+      "row": 1,
+      "col": 3
+    },
+    {
+      "index": 276,
+      "char": "악",
+      "codepoint": "U+C545",
+      "page": 1,
+      "cell": 20,
+      "row": 1,
+      "col": 4
+    },
+    {
+      "index": 277,
+      "char": "안",
+      "codepoint": "U+C548",
+      "page": 1,
+      "cell": 21,
+      "row": 1,
+      "col": 5
+    },
+    {
+      "index": 278,
+      "char": "않",
+      "codepoint": "U+C54A",
+      "page": 1,
+      "cell": 22,
+      "row": 1,
+      "col": 6
+    },
+    {
+      "index": 279,
+      "char": "알",
+      "codepoint": "U+C54C",
+      "page": 1,
+      "cell": 23,
+      "row": 1,
+      "col": 7
+    },
+    {
+      "index": 280,
+      "char": "암",
+      "codepoint": "U+C554",
+      "page": 1,
+      "cell": 24,
+      "row": 1,
+      "col": 8
+    },
+    {
+      "index": 281,
+      "char": "았",
+      "codepoint": "U+C558",
+      "page": 1,
+      "cell": 25,
+      "row": 1,
+      "col": 9
+    },
+    {
+      "index": 282,
+      "char": "앙",
+      "codepoint": "U+C559",
+      "page": 1,
+      "cell": 26,
+      "row": 1,
+      "col": 10
+    },
+    {
+      "index": 283,
+      "char": "앞",
+      "codepoint": "U+C55E",
+      "page": 1,
+      "cell": 27,
+      "row": 1,
+      "col": 11
+    },
+    {
+      "index": 284,
+      "char": "애",
+      "codepoint": "U+C560",
+      "page": 1,
+      "cell": 28,
+      "row": 1,
+      "col": 12
+    },
+    {
+      "index": 285,
+      "char": "앱",
+      "codepoint": "U+C571",
+      "page": 1,
+      "cell": 29,
+      "row": 1,
+      "col": 13
+    },
+    {
+      "index": 286,
+      "char": "야",
+      "codepoint": "U+C57C",
+      "page": 1,
+      "cell": 30,
+      "row": 1,
+      "col": 14
+    },
+    {
+      "index": 287,
+      "char": "약",
+      "codepoint": "U+C57D",
+      "page": 1,
+      "cell": 31,
+      "row": 1,
+      "col": 15
+    },
+    {
+      "index": 288,
+      "char": "양",
+      "codepoint": "U+C591",
+      "page": 1,
+      "cell": 32,
+      "row": 2,
+      "col": 0
+    },
+    {
+      "index": 289,
+      "char": "어",
+      "codepoint": "U+C5B4",
+      "page": 1,
+      "cell": 33,
+      "row": 2,
+      "col": 1
+    },
+    {
+      "index": 290,
+      "char": "억",
+      "codepoint": "U+C5B5",
+      "page": 1,
+      "cell": 34,
+      "row": 2,
+      "col": 2
+    },
+    {
+      "index": 291,
+      "char": "언",
+      "codepoint": "U+C5B8",
+      "page": 1,
+      "cell": 35,
+      "row": 2,
+      "col": 3
+    },
+    {
+      "index": 292,
+      "char": "얼",
+      "codepoint": "U+C5BC",
+      "page": 1,
+      "cell": 36,
+      "row": 2,
+      "col": 4
+    },
+    {
+      "index": 293,
+      "char": "업",
+      "codepoint": "U+C5C5",
+      "page": 1,
+      "cell": 37,
+      "row": 2,
+      "col": 5
+    },
+    {
+      "index": 294,
+      "char": "없",
+      "codepoint": "U+C5C6",
+      "page": 1,
+      "cell": 38,
+      "row": 2,
+      "col": 6
+    },
+    {
+      "index": 295,
+      "char": "었",
+      "codepoint": "U+C5C8",
+      "page": 1,
+      "cell": 39,
+      "row": 2,
+      "col": 7
+    },
+    {
+      "index": 296,
+      "char": "에",
+      "codepoint": "U+C5D0",
+      "page": 1,
+      "cell": 40,
+      "row": 2,
+      "col": 8
+    },
+    {
+      "index": 297,
+      "char": "엔",
+      "codepoint": "U+C5D4",
+      "page": 1,
+      "cell": 41,
+      "row": 2,
+      "col": 9
+    },
+    {
+      "index": 298,
+      "char": "여",
+      "codepoint": "U+C5EC",
+      "page": 1,
+      "cell": 42,
+      "row": 2,
+      "col": 10
+    },
+    {
+      "index": 299,
+      "char": "역",
+      "codepoint": "U+C5ED",
+      "page": 1,
+      "cell": 43,
+      "row": 2,
+      "col": 11
+    },
+    {
+      "index": 300,
+      "char": "연",
+      "codepoint": "U+C5F0",
+      "page": 1,
+      "cell": 44,
+      "row": 2,
+      "col": 12
+    },
+    {
+      "index": 301,
+      "char": "열",
+      "codepoint": "U+C5F4",
+      "page": 1,
+      "cell": 45,
+      "row": 2,
+      "col": 13
+    },
+    {
+      "index": 302,
+      "char": "염",
+      "codepoint": "U+C5FC",
+      "page": 1,
+      "cell": 46,
+      "row": 2,
+      "col": 14
+    },
+    {
+      "index": 303,
+      "char": "엽",
+      "codepoint": "U+C5FD",
+      "page": 1,
+      "cell": 47,
+      "row": 2,
+      "col": 15
+    },
+    {
+      "index": 304,
+      "char": "였",
+      "codepoint": "U+C600",
+      "page": 1,
+      "cell": 48,
+      "row": 3,
+      "col": 0
+    },
+    {
+      "index": 305,
+      "char": "영",
+      "codepoint": "U+C601",
+      "page": 1,
+      "cell": 49,
+      "row": 3,
+      "col": 1
+    },
+    {
+      "index": 306,
+      "char": "예",
+      "codepoint": "U+C608",
+      "page": 1,
+      "cell": 50,
+      "row": 3,
+      "col": 2
+    },
+    {
+      "index": 307,
+      "char": "오",
+      "codepoint": "U+C624",
+      "page": 1,
+      "cell": 51,
+      "row": 3,
+      "col": 3
+    },
+    {
+      "index": 308,
+      "char": "온",
+      "codepoint": "U+C628",
+      "page": 1,
+      "cell": 52,
+      "row": 3,
+      "col": 4
+    },
+    {
+      "index": 309,
+      "char": "올",
+      "codepoint": "U+C62C",
+      "page": 1,
+      "cell": 53,
+      "row": 3,
+      "col": 5
+    },
+    {
+      "index": 310,
+      "char": "옴",
+      "codepoint": "U+C634",
+      "page": 1,
+      "cell": 54,
+      "row": 3,
+      "col": 6
+    },
+    {
+      "index": 311,
+      "char": "옵",
+      "codepoint": "U+C635",
+      "page": 1,
+      "cell": 55,
+      "row": 3,
+      "col": 7
+    },
+    {
+      "index": 312,
+      "char": "와",
+      "codepoint": "U+C640",
+      "page": 1,
+      "cell": 56,
+      "row": 3,
+      "col": 8
+    },
+    {
+      "index": 313,
+      "char": "완",
+      "codepoint": "U+C644",
+      "page": 1,
+      "cell": 57,
+      "row": 3,
+      "col": 9
+    },
+    {
+      "index": 314,
+      "char": "왔",
+      "codepoint": "U+C654",
+      "page": 1,
+      "cell": 58,
+      "row": 3,
+      "col": 10
+    },
+    {
+      "index": 315,
+      "char": "외",
+      "codepoint": "U+C678",
+      "page": 1,
+      "cell": 59,
+      "row": 3,
+      "col": 11
+    },
+    {
+      "index": 316,
+      "char": "왼",
+      "codepoint": "U+C67C",
+      "page": 1,
+      "cell": 60,
+      "row": 3,
+      "col": 12
+    },
+    {
+      "index": 317,
+      "char": "요",
+      "codepoint": "U+C694",
+      "page": 1,
+      "cell": 61,
+      "row": 3,
+      "col": 13
+    },
+    {
+      "index": 318,
+      "char": "욕",
+      "codepoint": "U+C695",
+      "page": 1,
+      "cell": 62,
+      "row": 3,
+      "col": 14
+    },
+    {
+      "index": 319,
+      "char": "용",
+      "codepoint": "U+C6A9",
+      "page": 1,
+      "cell": 63,
+      "row": 3,
+      "col": 15
+    },
+    {
+      "index": 320,
+      "char": "우",
+      "codepoint": "U+C6B0",
+      "page": 1,
+      "cell": 64,
+      "row": 4,
+      "col": 0
+    },
+    {
+      "index": 321,
+      "char": "운",
+      "codepoint": "U+C6B4",
+      "page": 1,
+      "cell": 65,
+      "row": 4,
+      "col": 1
+    },
+    {
+      "index": 322,
+      "char": "울",
+      "codepoint": "U+C6B8",
+      "page": 1,
+      "cell": 66,
+      "row": 4,
+      "col": 2
+    },
+    {
+      "index": 323,
+      "char": "움",
+      "codepoint": "U+C6C0",
+      "page": 1,
+      "cell": 67,
+      "row": 4,
+      "col": 3
+    },
+    {
+      "index": 324,
+      "char": "웃",
+      "codepoint": "U+C6C3",
+      "page": 1,
+      "cell": 68,
+      "row": 4,
+      "col": 4
+    },
+    {
+      "index": 325,
+      "char": "워",
+      "codepoint": "U+C6CC",
+      "page": 1,
+      "cell": 69,
+      "row": 4,
+      "col": 5
+    },
+    {
+      "index": 326,
+      "char": "원",
+      "codepoint": "U+C6D0",
+      "page": 1,
+      "cell": 70,
+      "row": 4,
+      "col": 6
+    },
+    {
+      "index": 327,
+      "char": "월",
+      "codepoint": "U+C6D4",
+      "page": 1,
+      "cell": 71,
+      "row": 4,
+      "col": 7
+    },
+    {
+      "index": 328,
+      "char": "웨",
+      "codepoint": "U+C6E8",
+      "page": 1,
+      "cell": 72,
+      "row": 4,
+      "col": 8
+    },
+    {
+      "index": 329,
+      "char": "웹",
+      "codepoint": "U+C6F9",
+      "page": 1,
+      "cell": 73,
+      "row": 4,
+      "col": 9
+    },
+    {
+      "index": 330,
+      "char": "위",
+      "codepoint": "U+C704",
+      "page": 1,
+      "cell": 74,
+      "row": 4,
+      "col": 10
+    },
+    {
+      "index": 331,
+      "char": "유",
+      "codepoint": "U+C720",
+      "page": 1,
+      "cell": 75,
+      "row": 4,
+      "col": 11
+    },
+    {
+      "index": 332,
+      "char": "율",
+      "codepoint": "U+C728",
+      "page": 1,
+      "cell": 76,
+      "row": 4,
+      "col": 12
+    },
+    {
+      "index": 333,
+      "char": "으",
+      "codepoint": "U+C73C",
+      "page": 1,
+      "cell": 77,
+      "row": 4,
+      "col": 13
+    },
+    {
+      "index": 334,
+      "char": "은",
+      "codepoint": "U+C740",
+      "page": 1,
+      "cell": 78,
+      "row": 4,
+      "col": 14
+    },
+    {
+      "index": 335,
+      "char": "을",
+      "codepoint": "U+C744",
+      "page": 1,
+      "cell": 79,
+      "row": 4,
+      "col": 15
+    },
+    {
+      "index": 336,
+      "char": "음",
+      "codepoint": "U+C74C",
+      "page": 1,
+      "cell": 80,
+      "row": 5,
+      "col": 0
+    },
+    {
+      "index": 337,
+      "char": "응",
+      "codepoint": "U+C751",
+      "page": 1,
+      "cell": 81,
+      "row": 5,
+      "col": 1
+    },
+    {
+      "index": 338,
+      "char": "의",
+      "codepoint": "U+C758",
+      "page": 1,
+      "cell": 82,
+      "row": 5,
+      "col": 2
+    },
+    {
+      "index": 339,
+      "char": "이",
+      "codepoint": "U+C774",
+      "page": 1,
+      "cell": 83,
+      "row": 5,
+      "col": 3
+    },
+    {
+      "index": 340,
+      "char": "익",
+      "codepoint": "U+C775",
+      "page": 1,
+      "cell": 84,
+      "row": 5,
+      "col": 4
+    },
+    {
+      "index": 341,
+      "char": "인",
+      "codepoint": "U+C778",
+      "page": 1,
+      "cell": 85,
+      "row": 5,
+      "col": 5
+    },
+    {
+      "index": 342,
+      "char": "일",
+      "codepoint": "U+C77C",
+      "page": 1,
+      "cell": 86,
+      "row": 5,
+      "col": 6
+    },
+    {
+      "index": 343,
+      "char": "임",
+      "codepoint": "U+C784",
+      "page": 1,
+      "cell": 87,
+      "row": 5,
+      "col": 7
+    },
+    {
+      "index": 344,
+      "char": "입",
+      "codepoint": "U+C785",
+      "page": 1,
+      "cell": 88,
+      "row": 5,
+      "col": 8
+    },
+    {
+      "index": 345,
+      "char": "있",
+      "codepoint": "U+C788",
+      "page": 1,
+      "cell": 89,
+      "row": 5,
+      "col": 9
+    },
+    {
+      "index": 346,
+      "char": "자",
+      "codepoint": "U+C790",
+      "page": 1,
+      "cell": 90,
+      "row": 5,
+      "col": 10
+    },
+    {
+      "index": 347,
+      "char": "작",
+      "codepoint": "U+C791",
+      "page": 1,
+      "cell": 91,
+      "row": 5,
+      "col": 11
+    },
+    {
+      "index": 348,
+      "char": "잘",
+      "codepoint": "U+C798",
+      "page": 1,
+      "cell": 92,
+      "row": 5,
+      "col": 12
+    },
+    {
+      "index": 349,
+      "char": "잠",
+      "codepoint": "U+C7A0",
+      "page": 1,
+      "cell": 93,
+      "row": 5,
+      "col": 13
+    },
+    {
+      "index": 350,
+      "char": "잡",
+      "codepoint": "U+C7A1",
+      "page": 1,
+      "cell": 94,
+      "row": 5,
+      "col": 14
+    },
+    {
+      "index": 351,
+      "char": "장",
+      "codepoint": "U+C7A5",
+      "page": 1,
+      "cell": 95,
+      "row": 5,
+      "col": 15
+    },
+    {
+      "index": 352,
+      "char": "재",
+      "codepoint": "U+C7AC",
+      "page": 1,
+      "cell": 96,
+      "row": 6,
+      "col": 0
+    },
+    {
+      "index": 353,
+      "char": "저",
+      "codepoint": "U+C800",
+      "page": 1,
+      "cell": 97,
+      "row": 6,
+      "col": 1
+    },
+    {
+      "index": 354,
+      "char": "적",
+      "codepoint": "U+C801",
+      "page": 1,
+      "cell": 98,
+      "row": 6,
+      "col": 2
+    },
+    {
+      "index": 355,
+      "char": "전",
+      "codepoint": "U+C804",
+      "page": 1,
+      "cell": 99,
+      "row": 6,
+      "col": 3
+    },
+    {
+      "index": 356,
+      "char": "절",
+      "codepoint": "U+C808",
+      "page": 1,
+      "cell": 100,
+      "row": 6,
+      "col": 4
+    },
+    {
+      "index": 357,
+      "char": "점",
+      "codepoint": "U+C810",
+      "page": 1,
+      "cell": 101,
+      "row": 6,
+      "col": 5
+    },
+    {
+      "index": 358,
+      "char": "접",
+      "codepoint": "U+C811",
+      "page": 1,
+      "cell": 102,
+      "row": 6,
+      "col": 6
+    },
+    {
+      "index": 359,
+      "char": "정",
+      "codepoint": "U+C815",
+      "page": 1,
+      "cell": 103,
+      "row": 6,
+      "col": 7
+    },
+    {
+      "index": 360,
+      "char": "제",
+      "codepoint": "U+C81C",
+      "page": 1,
+      "cell": 104,
+      "row": 6,
+      "col": 8
+    },
+    {
+      "index": 361,
+      "char": "젠",
+      "codepoint": "U+C820",
+      "page": 1,
+      "cell": 105,
+      "row": 6,
+      "col": 9
+    },
+    {
+      "index": 362,
+      "char": "져",
+      "codepoint": "U+C838",
+      "page": 1,
+      "cell": 106,
+      "row": 6,
+      "col": 10
+    },
+    {
+      "index": 363,
+      "char": "졌",
+      "codepoint": "U+C84C",
+      "page": 1,
+      "cell": 107,
+      "row": 6,
+      "col": 11
+    },
+    {
+      "index": 364,
+      "char": "조",
+      "codepoint": "U+C870",
+      "page": 1,
+      "cell": 108,
+      "row": 6,
+      "col": 12
+    },
+    {
+      "index": 365,
+      "char": "족",
+      "codepoint": "U+C871",
+      "page": 1,
+      "cell": 109,
+      "row": 6,
+      "col": 13
+    },
+    {
+      "index": 366,
+      "char": "존",
+      "codepoint": "U+C874",
+      "page": 1,
+      "cell": 110,
+      "row": 6,
+      "col": 14
+    },
+    {
+      "index": 367,
+      "char": "종",
+      "codepoint": "U+C885",
+      "page": 1,
+      "cell": 111,
+      "row": 6,
+      "col": 15
+    },
+    {
+      "index": 368,
+      "char": "좋",
+      "codepoint": "U+C88B",
+      "page": 1,
+      "cell": 112,
+      "row": 7,
+      "col": 0
+    },
+    {
+      "index": 369,
+      "char": "죄",
+      "codepoint": "U+C8C4",
+      "page": 1,
+      "cell": 113,
+      "row": 7,
+      "col": 1
+    },
+    {
+      "index": 370,
+      "char": "주",
+      "codepoint": "U+C8FC",
+      "page": 1,
+      "cell": 114,
+      "row": 7,
+      "col": 2
+    },
+    {
+      "index": 371,
+      "char": "줄",
+      "codepoint": "U+C904",
+      "page": 1,
+      "cell": 115,
+      "row": 7,
+      "col": 3
+    },
+    {
+      "index": 372,
+      "char": "중",
+      "codepoint": "U+C911",
+      "page": 1,
+      "cell": 116,
+      "row": 7,
+      "col": 4
+    },
+    {
+      "index": 373,
+      "char": "줘",
+      "codepoint": "U+C918",
+      "page": 1,
+      "cell": 117,
+      "row": 7,
+      "col": 5
+    },
+    {
+      "index": 374,
+      "char": "즐",
+      "codepoint": "U+C990",
+      "page": 1,
+      "cell": 118,
+      "row": 7,
+      "col": 6
+    },
+    {
+      "index": 375,
+      "char": "증",
+      "codepoint": "U+C99D",
+      "page": 1,
+      "cell": 119,
+      "row": 7,
+      "col": 7
+    },
+    {
+      "index": 376,
+      "char": "지",
+      "codepoint": "U+C9C0",
+      "page": 1,
+      "cell": 120,
+      "row": 7,
+      "col": 8
+    },
+    {
+      "index": 377,
+      "char": "직",
+      "codepoint": "U+C9C1",
+      "page": 1,
+      "cell": 121,
+      "row": 7,
+      "col": 9
+    },
+    {
+      "index": 378,
+      "char": "진",
+      "codepoint": "U+C9C4",
+      "page": 1,
+      "cell": 122,
+      "row": 7,
+      "col": 10
+    },
+    {
+      "index": 379,
+      "char": "질",
+      "codepoint": "U+C9C8",
+      "page": 1,
+      "cell": 123,
+      "row": 7,
+      "col": 11
+    },
+    {
+      "index": 380,
+      "char": "집",
+      "codepoint": "U+C9D1",
+      "page": 1,
+      "cell": 124,
+      "row": 7,
+      "col": 12
+    },
+    {
+      "index": 381,
+      "char": "쪽",
+      "codepoint": "U+CABD",
+      "page": 1,
+      "cell": 125,
+      "row": 7,
+      "col": 13
+    },
+    {
+      "index": 382,
+      "char": "차",
+      "codepoint": "U+CC28",
+      "page": 1,
+      "cell": 126,
+      "row": 7,
+      "col": 14
+    },
+    {
+      "index": 383,
+      "char": "착",
+      "codepoint": "U+CC29",
+      "page": 1,
+      "cell": 127,
+      "row": 7,
+      "col": 15
+    },
+    {
+      "index": 384,
+      "char": "참",
+      "codepoint": "U+CC38",
+      "page": 1,
+      "cell": 128,
+      "row": 8,
+      "col": 0
+    },
+    {
+      "index": 385,
+      "char": "찼",
+      "codepoint": "U+CC3C",
+      "page": 1,
+      "cell": 129,
+      "row": 8,
+      "col": 1
+    },
+    {
+      "index": 386,
+      "char": "찾",
+      "codepoint": "U+CC3E",
+      "page": 1,
+      "cell": 130,
+      "row": 8,
+      "col": 2
+    },
+    {
+      "index": 387,
+      "char": "채",
+      "codepoint": "U+CC44",
+      "page": 1,
+      "cell": 131,
+      "row": 8,
+      "col": 3
+    },
+    {
+      "index": 388,
+      "char": "책",
+      "codepoint": "U+CC45",
+      "page": 1,
+      "cell": 132,
+      "row": 8,
+      "col": 4
+    },
+    {
+      "index": 389,
+      "char": "챔",
+      "codepoint": "U+CC54",
+      "page": 1,
+      "cell": 133,
+      "row": 8,
+      "col": 5
+    },
+    {
+      "index": 390,
+      "char": "처",
+      "codepoint": "U+CC98",
+      "page": 1,
+      "cell": 134,
+      "row": 8,
+      "col": 6
+    },
+    {
+      "index": 391,
+      "char": "천",
+      "codepoint": "U+CC9C",
+      "page": 1,
+      "cell": 135,
+      "row": 8,
+      "col": 7
+    },
+    {
+      "index": 392,
+      "char": "청",
+      "codepoint": "U+CCAD",
+      "page": 1,
+      "cell": 136,
+      "row": 8,
+      "col": 8
+    },
+    {
+      "index": 393,
+      "char": "체",
+      "codepoint": "U+CCB4",
+      "page": 1,
+      "cell": 137,
+      "row": 8,
+      "col": 9
+    },
+    {
+      "index": 394,
+      "char": "초",
+      "codepoint": "U+CD08",
+      "page": 1,
+      "cell": 138,
+      "row": 8,
+      "col": 10
+    },
+    {
+      "index": 395,
+      "char": "총",
+      "codepoint": "U+CD1D",
+      "page": 1,
+      "cell": 139,
+      "row": 8,
+      "col": 11
+    },
+    {
+      "index": 396,
+      "char": "촬",
+      "codepoint": "U+CD2C",
+      "page": 1,
+      "cell": 140,
+      "row": 8,
+      "col": 12
+    },
+    {
+      "index": 397,
+      "char": "최",
+      "codepoint": "U+CD5C",
+      "page": 1,
+      "cell": 141,
+      "row": 8,
+      "col": 13
+    },
+    {
+      "index": 398,
+      "char": "추",
+      "codepoint": "U+CD94",
+      "page": 1,
+      "cell": 142,
+      "row": 8,
+      "col": 14
+    },
+    {
+      "index": 399,
+      "char": "축",
+      "codepoint": "U+CD95",
+      "page": 1,
+      "cell": 143,
+      "row": 8,
+      "col": 15
+    },
+    {
+      "index": 400,
+      "char": "출",
+      "codepoint": "U+CD9C",
+      "page": 1,
+      "cell": 144,
+      "row": 9,
+      "col": 0
+    },
+    {
+      "index": 401,
+      "char": "충",
+      "codepoint": "U+CDA9",
+      "page": 1,
+      "cell": 145,
+      "row": 9,
+      "col": 1
+    },
+    {
+      "index": 402,
+      "char": "취",
+      "codepoint": "U+CDE8",
+      "page": 1,
+      "cell": 146,
+      "row": 9,
+      "col": 2
+    },
+    {
+      "index": 403,
+      "char": "치",
+      "codepoint": "U+CE58",
+      "page": 1,
+      "cell": 147,
+      "row": 9,
+      "col": 3
+    },
+    {
+      "index": 404,
+      "char": "칙",
+      "codepoint": "U+CE59",
+      "page": 1,
+      "cell": 148,
+      "row": 9,
+      "col": 4
+    },
+    {
+      "index": 405,
+      "char": "친",
+      "codepoint": "U+CE5C",
+      "page": 1,
+      "cell": 149,
+      "row": 9,
+      "col": 5
+    },
+    {
+      "index": 406,
+      "char": "침",
+      "codepoint": "U+CE68",
+      "page": 1,
+      "cell": 150,
+      "row": 9,
+      "col": 6
+    },
+    {
+      "index": 407,
+      "char": "칭",
+      "codepoint": "U+CE6D",
+      "page": 1,
+      "cell": 151,
+      "row": 9,
+      "col": 7
+    },
+    {
+      "index": 408,
+      "char": "카",
+      "codepoint": "U+CE74",
+      "page": 1,
+      "cell": 152,
+      "row": 9,
+      "col": 8
+    },
+    {
+      "index": 409,
+      "char": "캐",
+      "codepoint": "U+CE90",
+      "page": 1,
+      "cell": 153,
+      "row": 9,
+      "col": 9
+    },
+    {
+      "index": 410,
+      "char": "캡",
+      "codepoint": "U+CEA1",
+      "page": 1,
+      "cell": 154,
+      "row": 9,
+      "col": 10
+    },
+    {
+      "index": 411,
+      "char": "커",
+      "codepoint": "U+CEE4",
+      "page": 1,
+      "cell": 155,
+      "row": 9,
+      "col": 11
+    },
+    {
+      "index": 412,
+      "char": "컨",
+      "codepoint": "U+CEE8",
+      "page": 1,
+      "cell": 156,
+      "row": 9,
+      "col": 12
+    },
+    {
+      "index": 413,
+      "char": "컬",
+      "codepoint": "U+CEEC",
+      "page": 1,
+      "cell": 157,
+      "row": 9,
+      "col": 13
+    },
+    {
+      "index": 414,
+      "char": "컴",
+      "codepoint": "U+CEF4",
+      "page": 1,
+      "cell": 158,
+      "row": 9,
+      "col": 14
+    },
+    {
+      "index": 415,
+      "char": "케",
+      "codepoint": "U+CF00",
+      "page": 1,
+      "cell": 159,
+      "row": 9,
+      "col": 15
+    },
+    {
+      "index": 416,
+      "char": "켜",
+      "codepoint": "U+CF1C",
+      "page": 1,
+      "cell": 160,
+      "row": 10,
+      "col": 0
+    },
+    {
+      "index": 417,
+      "char": "코",
+      "codepoint": "U+CF54",
+      "page": 1,
+      "cell": 161,
+      "row": 10,
+      "col": 1
+    },
+    {
+      "index": 418,
+      "char": "콘",
+      "codepoint": "U+CF58",
+      "page": 1,
+      "cell": 162,
+      "row": 10,
+      "col": 2
+    },
+    {
+      "index": 419,
+      "char": "콩",
+      "codepoint": "U+CF69",
+      "page": 1,
+      "cell": 163,
+      "row": 10,
+      "col": 3
+    },
+    {
+      "index": 420,
+      "char": "쿠",
+      "codepoint": "U+CFE0",
+      "page": 1,
+      "cell": 164,
+      "row": 10,
+      "col": 4
+    },
+    {
+      "index": 421,
+      "char": "쿼",
+      "codepoint": "U+CFFC",
+      "page": 1,
+      "cell": 165,
+      "row": 10,
+      "col": 5
+    },
+    {
+      "index": 422,
+      "char": "크",
+      "codepoint": "U+D06C",
+      "page": 1,
+      "cell": 166,
+      "row": 10,
+      "col": 6
+    },
+    {
+      "index": 423,
+      "char": "클",
+      "codepoint": "U+D074",
+      "page": 1,
+      "cell": 167,
+      "row": 10,
+      "col": 7
+    },
+    {
+      "index": 424,
+      "char": "키",
+      "codepoint": "U+D0A4",
+      "page": 1,
+      "cell": 168,
+      "row": 10,
+      "col": 8
+    },
+    {
+      "index": 425,
+      "char": "킵",
+      "codepoint": "U+D0B5",
+      "page": 1,
+      "cell": 169,
+      "row": 10,
+      "col": 9
+    },
+    {
+      "index": 426,
+      "char": "킹",
+      "codepoint": "U+D0B9",
+      "page": 1,
+      "cell": 170,
+      "row": 10,
+      "col": 10
+    },
+    {
+      "index": 427,
+      "char": "타",
+      "codepoint": "U+D0C0",
+      "page": 1,
+      "cell": 171,
+      "row": 10,
+      "col": 11
+    },
+    {
+      "index": 428,
+      "char": "탄",
+      "codepoint": "U+D0C4",
+      "page": 1,
+      "cell": 172,
+      "row": 10,
+      "col": 12
+    },
+    {
+      "index": 429,
+      "char": "탈",
+      "codepoint": "U+D0C8",
+      "page": 1,
+      "cell": 173,
+      "row": 10,
+      "col": 13
+    },
+    {
+      "index": 430,
+      "char": "태",
+      "codepoint": "U+D0DC",
+      "page": 1,
+      "cell": 174,
+      "row": 10,
+      "col": 14
+    },
+    {
+      "index": 431,
+      "char": "택",
+      "codepoint": "U+D0DD",
+      "page": 1,
+      "cell": 175,
+      "row": 10,
+      "col": 15
+    },
+    {
+      "index": 432,
+      "char": "탭",
+      "codepoint": "U+D0ED",
+      "page": 1,
+      "cell": 176,
+      "row": 11,
+      "col": 0
+    },
+    {
+      "index": 433,
+      "char": "터",
+      "codepoint": "U+D130",
+      "page": 1,
+      "cell": 177,
+      "row": 11,
+      "col": 1
+    },
+    {
+      "index": 434,
+      "char": "텀",
+      "codepoint": "U+D140",
+      "page": 1,
+      "cell": 178,
+      "row": 11,
+      "col": 2
+    },
+    {
+      "index": 435,
+      "char": "테",
+      "codepoint": "U+D14C",
+      "page": 1,
+      "cell": 179,
+      "row": 11,
+      "col": 3
+    },
+    {
+      "index": 436,
+      "char": "텍",
+      "codepoint": "U+D14D",
+      "page": 1,
+      "cell": 180,
+      "row": 11,
+      "col": 4
+    },
+    {
+      "index": 437,
+      "char": "템",
+      "codepoint": "U+D15C",
+      "page": 1,
+      "cell": 181,
+      "row": 11,
+      "col": 5
+    },
+    {
+      "index": 438,
+      "char": "토",
+      "codepoint": "U+D1A0",
+      "page": 1,
+      "cell": 182,
+      "row": 11,
+      "col": 6
+    },
+    {
+      "index": 439,
+      "char": "통",
+      "codepoint": "U+D1B5",
+      "page": 1,
+      "cell": 183,
+      "row": 11,
+      "col": 7
+    },
+    {
+      "index": 440,
+      "char": "퇴",
+      "codepoint": "U+D1F4",
+      "page": 1,
+      "cell": 184,
+      "row": 11,
+      "col": 8
+    },
+    {
+      "index": 441,
+      "char": "투",
+      "codepoint": "U+D22C",
+      "page": 1,
+      "cell": 185,
+      "row": 11,
+      "col": 9
+    },
+    {
+      "index": 442,
+      "char": "툰",
+      "codepoint": "U+D230",
+      "page": 1,
+      "cell": 186,
+      "row": 11,
+      "col": 10
+    },
+    {
+      "index": 443,
+      "char": "튜",
+      "codepoint": "U+D29C",
+      "page": 1,
+      "cell": 187,
+      "row": 11,
+      "col": 11
+    },
+    {
+      "index": 444,
+      "char": "튤",
+      "codepoint": "U+D2A4",
+      "page": 1,
+      "cell": 188,
+      "row": 11,
+      "col": 12
+    },
+    {
+      "index": 445,
+      "char": "트",
+      "codepoint": "U+D2B8",
+      "page": 1,
+      "cell": 189,
+      "row": 11,
+      "col": 13
+    },
+    {
+      "index": 446,
+      "char": "특",
+      "codepoint": "U+D2B9",
+      "page": 1,
+      "cell": 190,
+      "row": 11,
+      "col": 14
+    },
+    {
+      "index": 447,
+      "char": "튼",
+      "codepoint": "U+D2BC",
+      "page": 1,
+      "cell": 191,
+      "row": 11,
+      "col": 15
+    },
+    {
+      "index": 448,
+      "char": "틀",
+      "codepoint": "U+D2C0",
+      "page": 1,
+      "cell": 192,
+      "row": 12,
+      "col": 0
+    },
+    {
+      "index": 449,
+      "char": "티",
+      "codepoint": "U+D2F0",
+      "page": 1,
+      "cell": 193,
+      "row": 12,
+      "col": 1
+    },
+    {
+      "index": 450,
+      "char": "틴",
+      "codepoint": "U+D2F4",
+      "page": 1,
+      "cell": 194,
+      "row": 12,
+      "col": 2
+    },
+    {
+      "index": 451,
+      "char": "팅",
+      "codepoint": "U+D305",
+      "page": 1,
+      "cell": 195,
+      "row": 12,
+      "col": 3
+    },
+    {
+      "index": 452,
+      "char": "파",
+      "codepoint": "U+D30C",
+      "page": 1,
+      "cell": 196,
+      "row": 12,
+      "col": 4
+    },
+    {
+      "index": 453,
+      "char": "판",
+      "codepoint": "U+D310",
+      "page": 1,
+      "cell": 197,
+      "row": 12,
+      "col": 5
+    },
+    {
+      "index": 454,
+      "char": "팜",
+      "codepoint": "U+D31C",
+      "page": 1,
+      "cell": 198,
+      "row": 12,
+      "col": 6
+    },
+    {
+      "index": 455,
+      "char": "패",
+      "codepoint": "U+D328",
+      "page": 1,
+      "cell": 199,
+      "row": 12,
+      "col": 7
+    },
+    {
+      "index": 456,
+      "char": "퍼",
+      "codepoint": "U+D37C",
+      "page": 1,
+      "cell": 200,
+      "row": 12,
+      "col": 8
+    },
+    {
+      "index": 457,
+      "char": "페",
+      "codepoint": "U+D398",
+      "page": 1,
+      "cell": 201,
+      "row": 12,
+      "col": 9
+    },
+    {
+      "index": 458,
+      "char": "편",
+      "codepoint": "U+D3B8",
+      "page": 1,
+      "cell": 202,
+      "row": 12,
+      "col": 10
+    },
+    {
+      "index": 459,
+      "char": "평",
+      "codepoint": "U+D3C9",
+      "page": 1,
+      "cell": 203,
+      "row": 12,
+      "col": 11
+    },
+    {
+      "index": 460,
+      "char": "포",
+      "codepoint": "U+D3EC",
+      "page": 1,
+      "cell": 204,
+      "row": 12,
+      "col": 12
+    },
+    {
+      "index": 461,
+      "char": "폭",
+      "codepoint": "U+D3ED",
+      "page": 1,
+      "cell": 205,
+      "row": 12,
+      "col": 13
+    },
+    {
+      "index": 462,
+      "char": "폴",
+      "codepoint": "U+D3F4",
+      "page": 1,
+      "cell": 206,
+      "row": 12,
+      "col": 14
+    },
+    {
+      "index": 463,
+      "char": "표",
+      "codepoint": "U+D45C",
+      "page": 1,
+      "cell": 207,
+      "row": 12,
+      "col": 15
+    },
+    {
+      "index": 464,
+      "char": "퓨",
+      "codepoint": "U+D4E8",
+      "page": 1,
+      "cell": 208,
+      "row": 13,
+      "col": 0
+    },
+    {
+      "index": 465,
+      "char": "프",
+      "codepoint": "U+D504",
+      "page": 1,
+      "cell": 209,
+      "row": 13,
+      "col": 1
+    },
+    {
+      "index": 466,
+      "char": "플",
+      "codepoint": "U+D50C",
+      "page": 1,
+      "cell": 210,
+      "row": 13,
+      "col": 2
+    },
+    {
+      "index": 467,
+      "char": "피",
+      "codepoint": "U+D53C",
+      "page": 1,
+      "cell": 211,
+      "row": 13,
+      "col": 3
+    },
+    {
+      "index": 468,
+      "char": "픽",
+      "codepoint": "U+D53D",
+      "page": 1,
+      "cell": 212,
+      "row": 13,
+      "col": 4
+    },
+    {
+      "index": 469,
+      "char": "핀",
+      "codepoint": "U+D540",
+      "page": 1,
+      "cell": 213,
+      "row": 13,
+      "col": 5
+    },
+    {
+      "index": 470,
+      "char": "필",
+      "codepoint": "U+D544",
+      "page": 1,
+      "cell": 214,
+      "row": 13,
+      "col": 6
+    },
+    {
+      "index": 471,
+      "char": "하",
+      "codepoint": "U+D558",
+      "page": 1,
+      "cell": 215,
+      "row": 13,
+      "col": 7
+    },
+    {
+      "index": 472,
+      "char": "한",
+      "codepoint": "U+D55C",
+      "page": 1,
+      "cell": 216,
+      "row": 13,
+      "col": 8
+    },
+    {
+      "index": 473,
+      "char": "할",
+      "codepoint": "U+D560",
+      "page": 1,
+      "cell": 217,
+      "row": 13,
+      "col": 9
+    },
+    {
+      "index": 474,
+      "char": "함",
+      "codepoint": "U+D568",
+      "page": 1,
+      "cell": 218,
+      "row": 13,
+      "col": 10
+    },
+    {
+      "index": 475,
+      "char": "합",
+      "codepoint": "U+D569",
+      "page": 1,
+      "cell": 219,
+      "row": 13,
+      "col": 11
+    },
+    {
+      "index": 476,
+      "char": "해",
+      "codepoint": "U+D574",
+      "page": 1,
+      "cell": 220,
+      "row": 13,
+      "col": 12
+    },
+    {
+      "index": 477,
+      "char": "핸",
+      "codepoint": "U+D578",
+      "page": 1,
+      "cell": 221,
+      "row": 13,
+      "col": 13
+    },
+    {
+      "index": 478,
+      "char": "했",
+      "codepoint": "U+D588",
+      "page": 1,
+      "cell": 222,
+      "row": 13,
+      "col": 14
+    },
+    {
+      "index": 479,
+      "char": "행",
+      "codepoint": "U+D589",
+      "page": 1,
+      "cell": 223,
+      "row": 13,
+      "col": 15
+    },
+    {
+      "index": 480,
+      "char": "향",
+      "codepoint": "U+D5A5",
+      "page": 1,
+      "cell": 224,
+      "row": 14,
+      "col": 0
+    },
+    {
+      "index": 481,
+      "char": "허",
+      "codepoint": "U+D5C8",
+      "page": 1,
+      "cell": 225,
+      "row": 14,
+      "col": 1
+    },
+    {
+      "index": 482,
+      "char": "험",
+      "codepoint": "U+D5D8",
+      "page": 1,
+      "cell": 226,
+      "row": 14,
+      "col": 2
+    },
+    {
+      "index": 483,
+      "char": "혀",
+      "codepoint": "U+D600",
+      "page": 1,
+      "cell": 227,
+      "row": 14,
+      "col": 3
+    },
+    {
+      "index": 484,
+      "char": "현",
+      "codepoint": "U+D604",
+      "page": 1,
+      "cell": 228,
+      "row": 14,
+      "col": 4
+    },
+    {
+      "index": 485,
+      "char": "형",
+      "codepoint": "U+D615",
+      "page": 1,
+      "cell": 229,
+      "row": 14,
+      "col": 5
+    },
+    {
+      "index": 486,
+      "char": "호",
+      "codepoint": "U+D638",
+      "page": 1,
+      "cell": 230,
+      "row": 14,
+      "col": 6
+    },
+    {
+      "index": 487,
+      "char": "혼",
+      "codepoint": "U+D63C",
+      "page": 1,
+      "cell": 231,
+      "row": 14,
+      "col": 7
+    },
+    {
+      "index": 488,
+      "char": "홀",
+      "codepoint": "U+D640",
+      "page": 1,
+      "cell": 232,
+      "row": 14,
+      "col": 8
+    },
+    {
+      "index": 489,
+      "char": "홈",
+      "codepoint": "U+D648",
+      "page": 1,
+      "cell": 233,
+      "row": 14,
+      "col": 9
+    },
+    {
+      "index": 490,
+      "char": "홍",
+      "codepoint": "U+D64D",
+      "page": 1,
+      "cell": 234,
+      "row": 14,
+      "col": 10
+    },
+    {
+      "index": 491,
+      "char": "화",
+      "codepoint": "U+D654",
+      "page": 1,
+      "cell": 235,
+      "row": 14,
+      "col": 11
+    },
+    {
+      "index": 492,
+      "char": "확",
+      "codepoint": "U+D655",
+      "page": 1,
+      "cell": 236,
+      "row": 14,
+      "col": 12
+    },
+    {
+      "index": 493,
+      "char": "환",
+      "codepoint": "U+D658",
+      "page": 1,
+      "cell": 237,
+      "row": 14,
+      "col": 13
+    },
+    {
+      "index": 494,
+      "char": "활",
+      "codepoint": "U+D65C",
+      "page": 1,
+      "cell": 238,
+      "row": 14,
+      "col": 14
+    },
+    {
+      "index": 495,
+      "char": "황",
+      "codepoint": "U+D669",
+      "page": 1,
+      "cell": 239,
+      "row": 14,
+      "col": 15
+    },
+    {
+      "index": 496,
+      "char": "회",
+      "codepoint": "U+D68C",
+      "page": 1,
+      "cell": 240,
+      "row": 15,
+      "col": 0
+    },
+    {
+      "index": 497,
+      "char": "획",
+      "codepoint": "U+D68D",
+      "page": 1,
+      "cell": 241,
+      "row": 15,
+      "col": 1
+    },
+    {
+      "index": 498,
+      "char": "효",
+      "codepoint": "U+D6A8",
+      "page": 1,
+      "cell": 242,
+      "row": 15,
+      "col": 2
+    },
+    {
+      "index": 499,
+      "char": "후",
+      "codepoint": "U+D6C4",
+      "page": 1,
+      "cell": 243,
+      "row": 15,
+      "col": 3
+    },
+    {
+      "index": 500,
+      "char": "휠",
+      "codepoint": "U+D720",
+      "page": 1,
+      "cell": 244,
+      "row": 15,
+      "col": 4
+    },
+    {
+      "index": 501,
+      "char": "휴",
+      "codepoint": "U+D734",
+      "page": 1,
+      "cell": 245,
+      "row": 15,
+      "col": 5
+    },
+    {
+      "index": 502,
+      "char": "흔",
+      "codepoint": "U+D754",
+      "page": 1,
+      "cell": 246,
+      "row": 15,
+      "col": 6
+    },
+    {
+      "index": 503,
+      "char": "흰",
+      "codepoint": "U+D770",
+      "page": 1,
+      "cell": 247,
+      "row": 15,
+      "col": 7
+    },
+    {
+      "index": 504,
+      "char": "히",
+      "codepoint": "U+D788",
+      "page": 1,
+      "cell": 248,
+      "row": 15,
+      "col": 8
+    }
+  ]
+}
