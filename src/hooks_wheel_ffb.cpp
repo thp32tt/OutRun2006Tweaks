@@ -1298,10 +1298,20 @@ namespace
             float fallbackVibration = 0.0f;
             if (!periodicsActive_)
             {
+                if (ps2Original)
+                {
+                    fallbackVibration += synth_ps2_triangle_fallback(
+                        roadPhase_, roadAmp * effectRampScale, roadFreq);
+                }
+                else
+                {
+                    fallbackVibration += synth_fallback(
+                        roadPhase_, roadAmp * effectRampScale,
+                        std::min(roadFreq, 15.0f));
+                }
                 fallbackVibration += synth_fallback(
-                    roadPhase_, roadAmp * effectRampScale, std::min(roadFreq, 15.0f));
-                fallbackVibration += synth_fallback(
-                    slipPhase_, slipAmp * effectRampScale, std::min(slipFreq, 15.0f));
+                    slipPhase_, slipAmp * effectRampScale,
+                    std::min(slipFreq, 15.0f));
             }
 
             // Engine haptics always use the normalized ConstantForce tactile
@@ -3740,6 +3750,22 @@ namespace
             constexpr float TwoPi = 6.28318530718f;
             phase = std::fmod(phase + frequency / 60.0f * TwoPi, TwoPi);
             return std::sin(phase) * amplitude;
+        }
+
+        float synth_ps2_triangle_fallback(
+            float& phase, float amplitude, float frequency)
+        {
+            if (!std::isfinite(amplitude) || !std::isfinite(frequency) ||
+                amplitude <= 0.005f)
+            {
+                phase = 0.0f;
+                return 0.0f;
+            }
+
+            constexpr float TwoPi = 6.28318530718f;
+            phase = std::fmod(phase + frequency / 60.0f * TwoPi, TwoPi);
+            const float cycles = phase / TwoPi;
+            return WheelFFBPS2::triangle_wave(cycles) * amplitude;
         }
 
         void zero_all_forces()
