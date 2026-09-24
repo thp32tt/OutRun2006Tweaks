@@ -1,6 +1,6 @@
 # PS2 reverse map tooling
 
-The canonical analysis result is documented in `docs/reverse/PS2_FFB_MAP.md` and `reverse/ps2/semantics.json`.
+The canonical analysis is split across `docs/reverse/PS2_FFB_MAP.md`, `docs/reverse/PS2_HUD_MAP.md`, `docs/reverse/PS2_SYSTEM_MAP.md`, `reverse/ps2/semantics.json`, and `reverse/ps2/hud_semantics.json`.
 
 The full generated map is intentionally not committed because it contains a large disassembly derived from the retail PS2 executable. A local generated package contains the SQLite database, JSONL indexes, full EE disassembly and IOPRP module disassemblies.
 
@@ -22,4 +22,18 @@ Input identity for the current map:
 - `SLPM_666.28`: `bc5dd6d836bf34546ef9f047ad2bcb99c5ef5a713767a161d0c342af33f38c34`
 - `IOPRP310.IMG`: `1cf5475f533f04d161bbb4b08179df156afeb7b400f207c88dcf1e39466679b6`
 
-The next required FFB binary is `LGDEV.IRX`, which is referenced by the EE executable but absent from `IOPRP310.IMG`.
+`LGDEV.IRX` and `USBD.IRX` have now been recovered from `SYSTEM.PS2`. The next FFB task is the IOP RPC/effect payload map. For HUD work, use `extract_ps2_pack.py` to unpack JSPRANI/JSPRITE and `analyze_sprani.py` to inspect verified animation/layout fields.
+
+
+Extract a resource pack:
+
+```bash
+python3 tools/reverse/ps2/extract_ps2_pack.py JSPRANI.PS2 --out /tmp/jsprani
+python3 tools/reverse/ps2/extract_ps2_pack.py JSPRITE.PS2 --out /tmp/jsprite
+```
+
+Analyze a decompressed JSPRANI entry:
+
+```bash
+python3 tools/reverse/ps2/analyze_sprani.py /tmp/jsprani/044_FE1FC030_zlib.bin --resource-id 0x2B
+```
