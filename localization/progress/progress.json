@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T01:47:00+09:00",
+  "updated_at_kst": "2026-09-25T01:53:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -70,8 +70,8 @@
       "localization_state_run_id": 36017712175
     },
     "unicode_runtime": {
-      "status": "k3_trace_implemented_ci_pending",
-      "percent": 35,
+      "status": "k3_trace_build_pass_package_ready",
+      "percent": 45,
       "evidence": {
         "string_width_va": "0x42C480",
         "pair_spacing_va": "0x42C410",
@@ -130,7 +130,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Pass latest CI with artwork-plan integrity and K3 trace compile; create K3 trace package; user K1/K2/K3 tests; begin layout/render specs beyond Continue",
+  "next_checkpoint": "User K3 trace log; analyze stock font globals/batch queue; implement K3-A four-glyph Hangul render proof; in-game validate 7 graphics DDS candidates",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -240,7 +240,21 @@
       "signatures_verified_against_uploaded_exe": true,
       "unique_hangul_syllables": 505,
       "compact_pages_required": 2,
-      "build_status": "ci_in_progress"
+      "build_status": "pass",
+      "build_head": "3af9dec1650245272dfd594cad6a8885b11480a6",
+      "build_run_id": 36029358510,
+      "artifact_id": 10820094736,
+      "test_package": {
+        "name": "OutRun2_Korean_Clean_K3_Trace.zip",
+        "sha256": "695db84089a79cce47693dbb90183dd34202d120db66230ec5f7e335464a0046",
+        "dll_sha256": "887d79188c358edba93dc2b4857b4757c6cfa1194b0c1c3c426f3d62bf5fe7cd",
+        "includes_game_exe": false,
+        "korean_trace": true,
+        "proof_text_override": false,
+        "k3_trace": true,
+        "status": "ready_for_runtime_log"
+      },
+      "ini_newline_bug": "fixed_in_branch_and_package"
     },
     "k3_atlas_proof": {
       "glyphs": 505,
