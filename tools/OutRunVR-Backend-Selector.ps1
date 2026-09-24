@@ -134,7 +134,7 @@ $title.Location = New-Object System.Drawing.Point(66,18)
 $form.Controls.Add($title)
 
 $hint = New-Object System.Windows.Forms.Label
-$hint.Text = "현재 우선순위: HUD_SCREEN -> HUD_MENU -> HUD_WORLD. 성능 A~D 비교는 표시 오류 정리 후 사용."
+$hint.Text = "병렬 테스트: DX9Ex 기준 / HUD / Flare / Performance / DXVK / DX12. HUD 미해결이어도 성능·백엔드 개발 계속."
 $hint.Font = New-Object System.Drawing.Font("Segoe UI",9)
 $hint.AutoSize = $false
 $hint.Size = New-Object System.Drawing.Size(440,40)
@@ -201,7 +201,7 @@ $control2d.Add_Click({ Select-Backend $this.Tag })
 $form.Controls.Add($control2d)
 
 $legacyLabel = New-Object System.Windows.Forms.Label
-$legacyLabel.Text = "Legacy backend comparison — DX9Ex 기준 확립 전에는 일반 테스트에 사용하지 않음"
+$legacyLabel.Text = "병렬 backend test — DXVK SAFE→MULTIVIEW / DX12 STRICT. 기본 backend 승격만 R51 parity gate 적용"
 $legacyLabel.Font = New-Object System.Drawing.Font("Segoe UI",8.5)
 $legacyLabel.AutoSize = $true
 $legacyLabel.Location = New-Object System.Drawing.Point(44,322)
@@ -233,7 +233,7 @@ foreach ($b in $legacyButtons) {
 }
 
 $runBtn = New-Object System.Windows.Forms.Button
-$runBtn.Text = "선택한 HUD/테스트 Profile 실행"
+$runBtn.Text = "선택한 Backend / Test Profile 실행"
 $runBtn.Size = New-Object System.Drawing.Size(430,66)
 $runBtn.Location = New-Object System.Drawing.Point(44,420)
 $runBtn.Font = New-Object System.Drawing.Font("Segoe UI",11,[System.Drawing.FontStyle]::Bold)
