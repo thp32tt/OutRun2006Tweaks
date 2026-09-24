@@ -1,5 +1,5 @@
 {
-  "schema": "outrun-stage-coli-ffb-summary-v2",
+  "schema": "outrun-stage-coli-ffb-summary-v3",
   "source": {
     "file": "Stage.zip",
     "sizeBytes": 290113621,
@@ -48,8 +48,10 @@
     },
     "geometry": {
       "recordStride": 64,
-      "layout": "vec3 corner[4] + vec3 center + u32 flags",
-      "confirmed": true
+      "layout": "vec3 corner[4] + vec3 center + u16 collisionFlags + s16 localHeadingAngle",
+      "confirmed": true,
+      "flagsAccessor": "RVA 0x0003C440 -> EVWORK_CAR+0x25C in body collision path",
+      "headingAccessor": "RVA 0x0003C340; 16-bit binary angle, scale 65536/(2*pi)"
     },
     "cornerNormals": {
       "recordStride": 48,
@@ -58,15 +60,43 @@
     },
     "collisionSubtype": {
       "recordStride": 1,
-      "semanticNames": "OPEN"
+      "semantic": "collision topology/response selector; low nibble indexes table VA 0x005E0DE0",
+      "tableBytes": "00 01 01 C2 00 01 01 C2 01 42 02 03 01 42 02 03",
+      "primaryRoadSubtype": 0
     },
     "roadSectionIndex": {
       "recordStride": 2,
-      "comparison": "OnRoadPlace::roadSectionNum"
+      "confirmedPath": "0x780228[collisionSet][collisionIndex] -> EVWORK_CAR+0x64 = OnRoadPlace.roadSectionNum"
     },
     "primaryRoadCollisionCount": {
       "fileOffset": "0x10",
       "nameIsDescriptive": true
+    },
+    "spatialGrid": {
+      "recordCount": 65536,
+      "recordStride": 2,
+      "dimensions": [
+        256,
+        256
+      ],
+      "keyHelper": "RVA 0x0003BB40 / VA 0x0043CB40",
+      "localCoordinateFormula": "clamp(int((coord + 3072.0) / 6.0),0,255)",
+      "coordinateSpace": "collision-set-local; query transforms contact/world input before lookup"
+    },
+    "candidateLists": {
+      "layout": "u16 count + u16 collisionIndex[count]",
+      "indexUnit": "section0 cell value is an index in u16 units into section1",
+      "validation": "all referenced unique lists in 66/66 COLI0200 files in bounds; no candidate index >= collisionCount",
+      "maxObservedCandidates": 113
+    },
+    "section7": {
+      "semantic": "OPEN; loader relocates nested offsets/pointers"
+    },
+    "section8": {
+      "recordStride": 4,
+      "semantic": "four per-corner lighting/intensity bytes",
+      "accessor": "RVA 0x0003C130 converts bytes to float * (1/255); caller 0x004A45F0 smooths result into EVWORK_CAR::lightRate_58",
+      "ffbMaterial": false
     }
   },
   "runtimeContract": {
@@ -84,7 +114,42 @@
       "EVWORK_CAR+0x254",
       "EVWORK_CAR+0x258"
     ],
-    "contactOrder": "OPEN"
+    "contactOrder": {
+      "status": "PARTIAL_GEOMETRY_CONFIRMED",
+      "localPositions": [
+        {
+          "index": 0,
+          "pattern": "-X,-Z side"
+        },
+        {
+          "index": 1,
+          "pattern": "+X,-Z side"
+        },
+        {
+          "index": 2,
+          "pattern": "-X,+Z side"
+        },
+        {
+          "index": 3,
+          "pattern": "+X,+Z side"
+        }
+      ],
+      "source": "VA 0x0046BBF0 table + VA 0x004A58EC copy to EVWORK_CAR::vector_130[i]",
+      "guard": "Do not assign FL/FR/RL/RR until vehicle forward-axis convention is proven."
+    },
+    "contactCollisionIndex": {
+      "source": "wheelWork[i]+0x10",
+      "writer": "collision query RVA 0x0003DB60",
+      "wheelWorkArray": "VA 0x0082EA38",
+      "note": "exact selected collision polygon per contact; preferred telemetry correlation key"
+    },
+    "bodyCollisionState": {
+      "collisionIndex": "EVWORK_CAR+0x230",
+      "surfaceMask": "EVWORK_CAR+0x248",
+      "collisionFlags": "EVWORK_CAR+0x25C",
+      "loadColiType": "EVWORK_CAR+0x5C",
+      "roadSectionNum": "EVWORK_CAR+0x64"
+    }
   },
   "materialCatalog": [
     {
@@ -788,5 +853,65 @@
     "guard": "Do not label contact indices FL/FR/RL/RR until ordering is proven; do not assign human surface names to non-primary IDs without runtime correlation."
   },
   "reproducer": "tools/reverse/analyze_stage_coli.py",
-  "fullLocalArtifact": "stage_coli_ffb_map_v2.json"
+  "fullLocalArtifact": "stage_coli_ffb_map_v2.json",
+  "specialRoadSectionRanges": {
+    "SNOW": {
+      "stageId": 4,
+      "material17": "0-31,33-84,86-97,99-131,204-248,250-270,272-328,330-373,375-401,403-419,421-502,504-534,536-569,571-572,574-600,602-610,612-645,647-680",
+      "material01": "32,85,98,132-203,249,271,329,374,402,420,503,535,570,573,601,611,646"
+    },
+    "SNOW_R": {
+      "stageId": 34,
+      "material01": "34,69,79,107,110,145,177,260,278,306,351,409,431,477-548,582,595,648",
+      "material17": "all other primary-road sections"
+    },
+    "ALAS": {
+      "stageIds": [
+        19,
+        49
+      ],
+      "material17": "0-620 (all primary-road sections)"
+    },
+    "LAKE": {
+      "stageId": 1,
+      "material14": "419-458"
+    },
+    "LAKE_R": {
+      "stageId": 31,
+      "material14": "218-257"
+    },
+    "TULI": {
+      "stageId": 10,
+      "material14": "54-70"
+    },
+    "TULI_R": {
+      "stageId": 40,
+      "material14": "571-587"
+    },
+    "PRIN": {
+      "stageId": 27,
+      "material14": "510-533"
+    },
+    "PRIN_R": {
+      "stageId": 57,
+      "material14": "136-159"
+    },
+    "LASV": {
+      "stageId": 18,
+      "material16": "7-18,56-86,88-255,257-380,511-656",
+      "material01": "0-6,19-55,87,256,381-510,657-661"
+    },
+    "LASV_R": {
+      "stageId": 48,
+      "material16": "5-150,281-404,406-573,575-605,643-654",
+      "material01": "0-4,151-280,405,574,606-642,655-661"
+    }
+  },
+  "openResearch": [
+    "section7 semantics",
+    "collisionFlags bit names",
+    "final FL/FR/RL/RR contact labels",
+    "physical names for non-primary materials",
+    "surface-mask aggregate consumers for particles/sound"
+  ]
 }
