@@ -33,6 +33,8 @@ extern "C"
 
 extern double __cdecl sub_1149C0(unsigned int surfaceMask, int loadColiType, DWORD* waterFlag);
 extern float InputManager_SteeringValue();
+extern float VibrationLeftMotor;
+extern float VibrationRightMotor;
 
 namespace Settings
 {
@@ -533,6 +535,20 @@ namespace
 
             const uint32_t stateFlags = car->field_8;
             const uint32_t curGear = car->cur_gear_208;
+
+            // The reconstructed Xbox CalcVibrationValues() runs immediately before
+            // GamePlCar_Ctrl each tick. Preserve its two XInput motor envelopes as
+            // read-only witnesses so runtime logs can be correlated with the game's
+            // original vibration intent and the Lindbergh drive-board observations.
+            // These are low/high-frequency rumble channels, NOT left/right steering
+            // torque, and therefore must not be mixed into ConstantForce direction.
+            const float originalXboxLeftRumble = std::isfinite(VibrationLeftMotor)
+                ? std::clamp(VibrationLeftMotor, 0.0f, 1.0f)
+                : 0.0f;
+            const float originalXboxRightRumble = std::isfinite(VibrationRightMotor)
+                ? std::clamp(VibrationRightMotor, 0.0f, 1.0f)
+                : 0.0f;
+
             const float throttleNorm = std::clamp(
                 static_cast<float>(car->pedal_amount_34) / 255.0f, 0.0f, 1.0f);
 
@@ -1145,13 +1161,16 @@ namespace
 
             prevGear_ = curGear;
             prevCollisionFlags_ = stateFlags;
-            maybe_log(speedNorm, steer, steerRate, lateralLoadSmooth, bodySlide, frontScrub, roughness, selfAligningTorque, level);
+            maybe_log(
+                speedNorm, steer, steerRate, lateralLoadSmooth, bodySlide, frontScrub,
+                roughness, originalXboxLeftRumble, originalXboxRightRumble,
+                selfAligningTorque, level);
             const DWORD telemetryNow = GetTickCount();
             if (Settings::WheelFFBTelemetry && telemetryNow - lastTelemetryTick_ >= 100)
             {
                 lastTelemetryTick_ = telemetryNow;
                 spdlog::info(
-                    "WheelFFB SAMPLE t={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperRelease={} damperCoefficient={} roadAmp={} slipAmp={} structural={} event={} structuralPreClip={} structuralPostClip={} eventPostClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
+                    "WheelFFB SAMPLE t={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperRelease={} damperCoefficient={} xboxLeft={} xboxRight={} roadAmp={} slipAmp={} structural={} event={} structuralPreClip={} structuralPostClip={} eventPostClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
                     telemetryNow, static_cast<const void*>(car), speedRaw, speedNorm, steer, rawSteerRate, steerRate,
                     car->field_264, car->field_268, lateralRaw, smoothedLateral_, lateralLoadSmooth,
                     vehicleDynamics_.bodySlip(), bodySlide, vehicleDynamics_.yawRate(), frontSlip, frontScrub,
@@ -1161,7 +1180,8 @@ namespace
                     vehicleDynamics_.forwardAxis(), vehicleDynamics_.calibrationConfidence(),
                     vehicleDynamics_.sampleValid(), physicsMix, physicsSatTorque, selfAligningTorque,
                     trailShape, physicsLoad, rearSlideRelief, springStrength, prevSpringCoefficient_,
-                    dynamicDamperStrength, damperRelease, prevDamperCoefficient_, roadAmp, slipAmp,
+                    dynamicDamperStrength, damperRelease, prevDamperCoefficient_,
+                    originalXboxLeftRumble, originalXboxRightRumble, roadAmp, slipAmp,
                     structural, events, total, compressed, eventCompressed, structuralLevel, level, prevConstantLevel_,
                     constantEffectPolar_, springEffect_ != nullptr, damperEffect_ != nullptr,
                     periodicsActive_, outputStrength, bool(Settings::WheelFFBInvertForce),
@@ -3636,6 +3656,8 @@ namespace
             float bodySlide,
             float frontScrub,
             float roughness,
+            float originalXboxLeftRumble,
+            float originalXboxRightRumble,
             float satTorque,
             LONG level)
         {
@@ -3648,7 +3670,7 @@ namespace
 
             lastLogTick_ = now;
             spdlog::info(
-                "WheelFFB DIAG: spd={:.2f} steer={:.3f} rate={:.4f} lat={:.2f} load={:.2f} slide={:.2f} scrub={:.2f} rough={:.2f} sat={:.3f} phys={} basis=M70r{} cal={:.2f} mix={:.2f} beta={:.3f} yaw={:.3f} fslip={:.3f} vLat={:.5f} vLong={:.5f} step={:.5f} spdLen={:.5f} spdCorr={:.2f} steerSrc={} out={} invCF={} spring={} invSpring={} coeff={} damper={} dcoeff={} periodic={}",
+                "WheelFFB DIAG: spd={:.2f} steer={:.3f} rate={:.4f} lat={:.2f} load={:.2f} slide={:.2f} scrub={:.2f} rough={:.2f} origXboxL={:.3f} origXboxR={:.3f} sat={:.3f} phys={} basis=M70r{} cal={:.2f} mix={:.2f} beta={:.3f} yaw={:.3f} fslip={:.3f} vLat={:.5f} vLong={:.5f} step={:.5f} spdLen={:.5f} spdCorr={:.2f} steerSrc={} out={} invCF={} spring={} invSpring={} coeff={} damper={} dcoeff={} periodic={}",
                 speedNorm,
                 steer,
                 steerRate,
@@ -3657,6 +3679,8 @@ namespace
                 bodySlide,
                 frontScrub,
                 roughness,
+                originalXboxLeftRumble,
+                originalXboxRightRumble,
                 satTorque,
                 Settings::WheelFFBPhysicsSat
                     ? (vehicleDynamics_.calibrated()
