@@ -475,9 +475,17 @@ namespace
                 if (damperEffect_)
                     update_damper(0.0f);
                 if (roadTextureEffect_)
-                    update_periodic(roadTextureEffect_, roadState_, 0.0f, 30.0f);
+                    update_periodic(
+                        roadTextureEffect_, roadState_, 0.0f, 30.0f,
+                        roadPeriodicStrategy_,
+                        roadPeriodicIsTriangle_
+                            ? "GUID_Triangle road periodic"
+                            : "GUID_Sine road periodic");
                 if (tireSlipEffect_)
-                    update_periodic(tireSlipEffect_, slipState_, 0.0f, 35.0f);
+                    update_periodic(
+                        tireSlipEffect_, slipState_, 0.0f, 35.0f,
+                        slipPeriodicStrategy_,
+                        "GUID_Sine tire-slip periodic");
 
                 crashImpulseTimer_ = 0;
                 crashImpulseForce_ = 0.0f;
@@ -3785,9 +3793,17 @@ namespace
             prevStructuralLevel_ = 0;
 
             if (roadTextureEffect_)
-                update_periodic(roadTextureEffect_, roadState_, 0.0f, 30.0f);
+                update_periodic(
+                        roadTextureEffect_, roadState_, 0.0f, 30.0f,
+                        roadPeriodicStrategy_,
+                        roadPeriodicIsTriangle_
+                            ? "GUID_Triangle road periodic"
+                            : "GUID_Sine road periodic");
             if (tireSlipEffect_)
-                update_periodic(tireSlipEffect_, slipState_, 0.0f, 35.0f);
+                update_periodic(
+                        tireSlipEffect_, slipState_, 0.0f, 35.0f,
+                        slipPeriodicStrategy_,
+                        "GUID_Sine tire-slip periodic");
         }
 
         void reset_signal_state()
