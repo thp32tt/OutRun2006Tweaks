@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-23T16:50:00Z",
+  "updatedUtc": "2026-09-24T13:47:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
-  "phase": "R51-baseline-protected / HUD-semantic-lifetime-analysis / no-PC-runner",
+  "phase": "R51-matrix-base-integrated / parallel-HMD-matrix-preparation / no-PC-runner",
   "checkpoint": "C6_STATE",
   "policy": {
     "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host",
@@ -12,21 +12,24 @@
     "blockedBackendAction": "DXVK and DX12/D3D9On12 development, compile and smoke validation are re-enabled in isolated candidates after user acceptance of the R51 basic 3D reference. They may not replace the protected DX9Ex runtime baseline until backend-parity evidence is recorded.",
     "genericBuildDisabled": true,
     "dedicatedWorkflow": ".github/workflows/vr-dx9ex-active.yml",
-    "runtimeTesting": "Quest 3/VDXR hardware testing is a scarce validation gate; default to one evening CORRECTNESS run.",
+    "runtimeTesting": "Quest 3/VDXR testing is an evening gate; prepare one self-contained matrix with up to six hypothesis-distinguishing slots and collect one final ZIP.",
     "profileModel": {
-      "default": "CORRECTNESS",
+      "default": "A_CONTROL",
       "profiles": [
-        "CONTROL",
-        "CORRECTNESS",
-        "PERFORMANCE"
+        "A_CONTROL",
+        "B_HUD",
+        "C_FLARE",
+        "D_PERF",
+        "E_HUD_FLARE",
+        "F_FULL"
       ],
       "sameBinaryPreferred": true,
-      "note": "Runtime/config differences use profiles where practical. Existing renderer-chain comparison builds remain temporary compile-time historical tools until safely feature-flagged."
+      "note": "Production integration remains serial WIP=1; HMD experiments may prepare in parallel. Prefer one binary plus runtime flags where behavior can be isolated safely."
     },
     "eveningFreeze": {
-      "reviewImplementWindow": "02:00-18:59 Asia/Seoul",
-      "freezeAt": "19:00 Asia/Seoul when material validated changes exist",
-      "at20": "Do not rebuild a successful frozen candidate unless build failure, new P0, or materially safer correction."
+      "reviewImplementWindow": "daytime / before evening HMD session",
+      "freezeAt": "19:45 Asia/Seoul when useful HMD experiment slots are ready",
+      "at20": "Keep one frozen EVENING_MATRIX package stable while the user tests; replace only for a blocking packaging defect."
     },
     "ciModel": {
       "lightweightPolicyWorkflow": ".github/workflows/vr-test-policy.yml",
@@ -65,22 +68,16 @@
       "runtimeRegressionLedgerIssue": 13
     },
     "parallelBackendDevelopment": {
-      "enabled": true,
-      "userAcceptedAtKst": "2026-09-23T08:30:00+09:00",
+      "enabled": false,
       "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-      "protectedInvariants": [
-        "road/background/vehicle true stereo",
-        "R28 verified world-epoch continuation",
-        "frame stability at least R51 level",
-        "world ownership must not be broadened into HUD ownership"
+      "reason": "DXVK/DX12/multiview are frozen as primary work while HUD/lens-flare/dense-scene performance HMD matrix work is active.",
+      "activeUserVisibleTracks": [
+        "HUD semantic lifetime",
+        "lens flare exact producer",
+        "dense-scene performance"
       ],
-      "tracks": [
-        "HUD/semantic ownership and world-anchored rank markers",
-        "DXVK compatibility/transport",
-        "DX12/D3D9On12 compatibility/transport",
-        "shared performance/frame-pacing optimization"
-      ],
-      "backendPromotionGate": "Quest3/VDXR parity evidence against the protected R51 baseline"
+      "productionIntegrationWip": 1,
+      "maxParallelHmdExperimentSlots": 6
     },
     "pcFastBuild": {
       "defaultMode": "INCREMENTAL",
@@ -565,5 +562,21 @@
       "maxDrawsPerPresent": 3929.3,
       "lowerPresentMaxMs": 16.639
     }
+  },
+  "hmdTestMatrix": {
+    "manifest": "docs/VR_HMD_TEST_MATRIX.json",
+    "runtimeBaseSha": "27f4ad958cf965f33bc6791395dd77ca1af7fb42",
+    "integrationSha": "060e2ae5ff78503b41d8a38980843dd5003e43bb",
+    "baseStatus": "BUILD_VERIFIED_INTEGRATED_NEEDS_HMD",
+    "candidateCiRuns": [
+      36007124220,
+      36007124238
+    ],
+    "nextSlots": [
+      "A_CONTROL identity completion",
+      "B_HUD semantic lifetime experiment",
+      "C_FLARE producer telemetry",
+      "D_PERF dense-scene telemetry"
+    ]
   }
 }
