@@ -1,5 +1,5 @@
 {
-  "schema": "outrun-stage-collision-ffb-map-v1",
+  "schema": "outrun-stage-collision-ffb-map-v2",
   "evidenceDateKst": "2026-09-24",
   "source": {
     "manifest": "game_file_manifest.txt",
@@ -11,18 +11,25 @@
     "uploadedStageZip": {
       "name": "Stage.zip",
       "sizeBytes": 290113621,
-      "materialized": true,
-      "directByteInspection": "BLOCKED_BY_EXECUTION_BACKEND_THIS_RUN"
+      "sha256": "385a5be540d87139c065bb5d62899767ca57c9a26950f7c2819235aa1448e6f6",
+      "directByteInspection": "PASS",
+      "collisionFiles": 72,
+      "coli0200Files": 66,
+      "legacyColi0105Files": 6
     },
     "sourceCode": {
       "ffbBranch": "ffb-arcade-dd-research",
       "sha": "7b08c30055212334735cc55b71575c6cc57c48b1"
     },
-    "canonicalExeSha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3"
+    "canonicalExeSha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "deepMap": "reverse/game_assets/stage_coli_ffb_map.json",
+    "reproducer": "tools/reverse/analyze_stage_coli.py"
   },
   "semanticCorrections": {
     "EVWORK_CAR::water_flag_24C[4]": "Treat as per-wheel surfaceMask[4] for FFB/reverse-analysis semantics. Legacy field name is misleading; sub_1149C0 branches on many non-water mask bits.",
-    "OnRoadPlace::loadColiType_0": "Not a material ID. Current source's is_in_bunki() returns loadColiType_0 != 0, so model it as branch/junction collision-mode context until stronger evidence exists."
+    "OnRoadPlace::loadColiType_0": "Not a material ID. Current source's is_in_bunki() returns loadColiType_0 != 0, so model it as branch/junction collision-mode context until stronger evidence exists.",
+    "COLI0200::materialId": "CONFIRMED: canonical PC EXE computes surfaceMask = 1u << materialId at VA 0x0043ECB8..0x0043ECC7.",
+    "COLI0200::primaryRoadCollisionCount": "Descriptive name for file+0x10 count: first N records form the main-road region across 66/66 files; original symbol name unknown."
   },
   "stageVariants": [
     {
