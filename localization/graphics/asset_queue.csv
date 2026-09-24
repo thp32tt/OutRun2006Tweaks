@@ -81,7 +81,7 @@ index,path,action,artwork_status,transcription_status,notes
 148,textures/load/spr_sprani_sumo_fe_cvt_Exst/3AE1BB60_256x256.dds,zoom_review,blocked_review,needs_zoom_review,
 150,textures/load/spr_sprani_sumo_fe_cvt_Exst/40A4D914_256x128.dds,zoom_review,blocked_review,needs_zoom_review,
 151,textures/load/spr_sprani_sumo_fe_cvt_Exst/4668C688_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
-152,textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds,localize_text,pending_artwork,pending_transcription,
+152,textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds,localize_text,pending_artwork,blocked_context,ambiguous badges PRO./INS./G.M./E.R.; defer until runtime context
 153,textures/load/spr_sprani_sumo_fe_cvt_Exst/4C972A19_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
 154,textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 155,textures/load/spr_sprani_sumo_fe_cvt_Exst/4D49CA85_512x256.dds,zoom_review,blocked_review,needs_zoom_review,
@@ -102,7 +102,7 @@ index,path,action,artwork_status,transcription_status,notes
 177,textures/load/spr_sprani_sumo_fe_cvt_Exst/7978907D_512x128.dds,zoom_review,blocked_review,needs_zoom_review,
 178,textures/load/spr_sprani_sumo_fe_cvt_Exst/798A1E_1024x256.dds,zoom_review,blocked_review,needs_zoom_review,
 180,textures/load/spr_sprani_sumo_fe_cvt_Exst/7ABD5110_1024x256.dds,zoom_review,blocked_review,needs_zoom_review,
-182,textures/load/spr_sprani_sumo_fe_cvt_Exst/7D747BED_512x128.dds,localize_text,pending_artwork,pending_transcription,
+182,textures/load/spr_sprani_sumo_fe_cvt_Exst/7D747BED_512x128.dds,localize_text,pending_artwork,transcribed_reviewed,pass11 transcription saved
 188,textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass9 transcription saved
 189,textures/load/spr_sprani_sumo_fe_cvt_Exst/8C9E91F8_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
 191,textures/load/spr_sprani_sumo_fe_cvt_Exst/94BB6271_512x256.dds,zoom_review,blocked_review,needs_zoom_review,
@@ -124,12 +124,12 @@ index,path,action,artwork_status,transcription_status,notes
 217,textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
 219,textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
 220,textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds,localize_text,pending_artwork,transcribed_reviewed,pass10 transcription saved
-222,textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds,localize_text,pending_artwork,pending_transcription,
-225,textures/load/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds,localize_text,pending_artwork,pending_transcription,
-226,textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds,localize_text,pending_artwork,pending_transcription,
-227,textures/load/spr_sprani_sumo_fe_cvt_Exst/E596B7AC_512x512.dds,localize_text,pending_artwork,pending_transcription,
-228,textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds,localize_text,pending_artwork,pending_transcription,
-230,textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds,localize_text,pending_artwork,pending_transcription,
+222,textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass11 transcription saved
+225,textures/load/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass11 transcription saved
+226,textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds,localize_text,pending_artwork,transcribed_reviewed,pass11 transcription saved
+227,textures/load/spr_sprani_sumo_fe_cvt_Exst/E596B7AC_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass11 transcription saved
+228,textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass11 transcription saved
+230,textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass11 transcription saved
 231,textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 232,textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 236,textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
