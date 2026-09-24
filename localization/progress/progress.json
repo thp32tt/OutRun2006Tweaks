@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T00:14:00+09:00",
+  "updated_at_kst": "2026-09-25T00:09:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -35,16 +35,24 @@
       "percent": 100
     },
     "text_translation": {
-      "status": "in_progress",
-      "percent": 26.6,
-      "explicit_draft": 180,
-      "exact_match_covered": 361,
-      "total": 1356,
-      "method": "explicit IDs + exact duplicate source propagation"
+      "status": "draft_complete_context_review_remaining",
+      "percent": 99.7,
+      "translation_coverage_percent": 100,
+      "translated_non_null": 1355,
+      "total_non_null": 1355,
+      "reviewed": 1351,
+      "context_drafts": 4,
+      "context_review_ids": [
+        96,
+        97,
+        279,
+        280
+      ]
     },
     "graphics_inventory": {
       "status": "done",
-      "percent": 100
+      "percent": 100,
+      "total": 243
     },
     "graphics_localization": {
       "status": "in_progress",
@@ -53,8 +61,11 @@
       "total_categories": 10
     },
     "runtime_text_trace": {
-      "status": "needs_clean_revalidation",
-      "percent": 20
+      "status": "clean_branch_code_present_ci_in_progress",
+      "percent": 60,
+      "clean_build_run_id": 36017712385,
+      "domain_isolation_run_id": 36017712430,
+      "localization_state_run_id": 36017712175
     },
     "unicode_runtime": {
       "status": "queued",
@@ -67,9 +78,28 @@
     "packaging": {
       "status": "not_started",
       "percent": 0
+    },
+    "graphics_visual_review": {
+      "status": "done",
+      "percent": 100,
+      "reviewed": 243,
+      "total": 243
+    },
+    "graphics_transcription": {
+      "status": "in_progress",
+      "percent": 35,
+      "transcribed_assets": 28,
+      "localize_text_targets": 80,
+      "transcribed_segments": 82
+    },
+    "graphics_artwork": {
+      "status": "not_started",
+      "percent": 0,
+      "completed": 0,
+      "total": 80
     }
   },
-  "next_checkpoint": "Port signature-gated text trace to clean branch; continue graphic visual review and explicit translation after ID 179",
+  "next_checkpoint": "Wait for clean Win32 build; collect K1 runtime trace; resolve IDs 96/97/279/280; continue graphics transcription then create first Korean DDS proof",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -119,7 +149,7 @@
     "k1_trace_hook": "migrated_to_clean_branch",
     "prototype_k1_ci_run_id": 35981045694,
     "prototype_evidence_role": "historical_only",
-    "clean_k1_ci": "pending",
+    "clean_k1_ci": "build_in_progress",
     "hangul_runtime_render": "blocked_pending_clean_runtime_trace_and_font"
   }
 }
