@@ -5,8 +5,8 @@ index,path,text_detected,action,review_status,notes
 3,textures/load/cs_BK_SUMOEND_pmt/B2E612E8_256x64.dds,no,no_localization,visual_reviewed,
 4,textures/load/spr_etc_xst/150E5A1E_128x64.dds,no,no_localization,visual_reviewed,
 5,textures/load/spr_etc_xst/1E674263_128x128.dds,no,no_localization,visual_reviewed,
-6,textures/load/spr_etc_xst/28CC276C_128x64.dds,yes,localize_text,visual_reviewed,
-7,textures/load/spr_etc_xst/3181CDE7_128x64.dds,yes,localize_text,visual_reviewed,
+6,textures/load/spr_etc_xst/28CC276C_128x64.dds,yes,no_localization,visual_reviewed,units km/h and mph; preserve standard abbreviations
+7,textures/load/spr_etc_xst/3181CDE7_128x64.dds,yes,no_localization,visual_reviewed,REV gauge abbreviation; preserve
 8,textures/load/spr_etc_xst/34C6562D_128x256.dds,no,no_localization,visual_reviewed,
 9,textures/load/spr_etc_xst/64F36800_128x128.dds,no,no_localization,visual_reviewed,
 10,textures/load/spr_etc_xst/94EF7373_256x256.dds,no,no_localization,visual_reviewed,
@@ -95,7 +95,7 @@ index,path,text_detected,action,review_status,notes
 93,textures/load/spr_sprani_selector_cvt_Exst/242309DA_128x512.dds,no,no_localization,visual_reviewed,
 94,textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds,yes,localize_text,visual_reviewed,
 95,textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds,yes,localize_text,visual_reviewed,
-96,textures/load/spr_sprani_selector_cvt_Exst/38F794DB_512x64.dds,yes,localize_text,visual_reviewed,
+96,textures/load/spr_sprani_selector_cvt_Exst/38F794DB_512x64.dds,yes,preserve_brand_song_credit,visual_reviewed,Ferrari model name 365 GTS/4 Daytona
 97,textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds,yes,localize_text,visual_reviewed,
 98,textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds,yes,localize_text,visual_reviewed,
 99,textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds,yes,localize_text,visual_reviewed,
@@ -232,7 +232,7 @@ index,path,text_detected,action,review_status,notes
 230,textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds,yes,localize_text,visual_reviewed,
 231,textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds,yes,localize_text,visual_reviewed,
 232,textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds,yes,localize_text,visual_reviewed,
-233,textures/load/spr_sprani_sumo_fe_cvt_Exst/F20926A9_512x512.dds,yes,localize_text,visual_reviewed,
+233,textures/load/spr_sprani_sumo_fe_cvt_Exst/F20926A9_512x512.dds,yes,preserve_brand_song_credit,visual_reviewed,music/song-title selection artwork; preserve titles/credits
 234,textures/load/spr_sprani_sumo_fe_cvt_Exst/F2E7EA57_256x256.dds,no,no_localization,visual_reviewed,
 235,textures/load/spr_sprani_sumo_fe_cvt_Exst/F813D9D3_512x32.dds,no,no_localization,visual_reviewed,
 236,textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds,yes,localize_text,visual_reviewed,
