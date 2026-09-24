@@ -87,3 +87,21 @@
 - Legal/licensing credit texture index 122 was removed from the direct-localization set and reclassified to preserve-original; target count corrected from 80 to 79.
 - Four text IDs remain context-sensitive: PASSENGER at 96/279 and DUMPED at 97/280. The DUMPED gameplay event is drafted as `차였어요!`; mode-title wording remains pending runtime menu context.
 - Next: latest clean CI -> K1 runtime log -> K2 ID0 marker -> continue remaining 30 atlas transcriptions -> first in-game Korean DDS validation -> K3 Hangul glyph/width proof.
+
+## 2026-09-25 01:40 KST - CP6
+
+- Graphics transcription reached 78/79 direct artwork targets (98.7%), 668 text segments.
+- One graphics item remains context-blocked: index 152 (`PRO./INS./G.M./E.R.` badges).
+- Repaired a pre-existing JSONL boundary defect between graphics transcription records 241 and 46; no data loss.
+- Extended Localization State CI to parse `transcriptions.jsonl`, reject invalid JSON/duplicate indices, and verify asset + segment counts.
+- Reverse engineering reconfirmed:
+  - `0x42C480` byte-oriented string width loop.
+  - `0x42C410` pair-spacing helper.
+  - `0x42C610` byte-oriented cursor advance.
+  - `0x42C720` single-glyph draw path with explicit >0x7F/high-bit rejection and 16x16 atlas addressing.
+  - `0x42C2F0` glyph metadata lookup.
+- All six K3 executable signatures matched the supplied canonical OR2006C2C.EXE.
+- Current translation corpus requires only 505 unique precomposed Hangul syllables; two 256-cell pages are sufficient.
+- Added stable `hangul_glyph_manifest.json`, manifest builder, two-page atlas renderer, K3 architecture document and EXE signature verifier.
+- Added opt-in `KoreanK3Trace` mid-hooks at string-width and glyph-draw entry points. Trace-only; no rendering behavior changes.
+- Latest Localization State and Domain Isolation checks passed; Win32 build for the K3 trace code is pending at this checkpoint.
