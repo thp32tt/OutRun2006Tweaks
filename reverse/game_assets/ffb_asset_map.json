@@ -207,5 +207,76 @@
       "Do not use loadColiType as a material ID.",
       "Keep stage-name special cases until native material identity is proven, then remove only with regression evidence."
     ]
+  },
+  "roughnessToMaskCandidates": {
+    "0.00": [
+      "0x000001"
+    ],
+    "0.25": [
+      "0x000002 default/context",
+      "0x400000 when loadColiType!=0",
+      "0x400000 on Casino Town"
+    ],
+    "0.30": [
+      "0x000400"
+    ],
+    "0.31": [
+      "fallback/unrecognized mapped mask"
+    ],
+    "0.35": [
+      "0x000200",
+      "0x000800",
+      "0x001000",
+      "0x002000"
+    ],
+    "0.40": [
+      "0x008000"
+    ],
+    "0.45": [
+      "0x000100"
+    ],
+    "0.50": [
+      "0x800000"
+    ],
+    "0.70": [
+      "0x000004"
+    ],
+    "0.71": [
+      "0x100000"
+    ],
+    "0.73": [
+      "0x000002 on Metropolis"
+    ],
+    "0.76": [
+      "0x000002 on Imperial Avenue"
+    ],
+    "0.79": [
+      "0x000002 on Cape Way"
+    ],
+    "0.80": [
+      "0x200000"
+    ],
+    "0.85": [
+      "0x000008",
+      "0x000080"
+    ],
+    "0.90": [
+      "0x000010",
+      "0x400000 normal non-Casino/non-junction context"
+    ]
+  },
+  "historicalLogInterpretation": {
+    "0.76": "Strongly identifies the stage-specific 0x000002 Imperial Avenue path when stage context agrees.",
+    "0.71": "Maps uniquely to 0x100000 in the current recovered function.",
+    "0.70": "Maps uniquely to 0x000004.",
+    "0.50": "Maps uniquely to 0x800000.",
+    "0.35": "Ambiguous across four masks; raw-mask telemetry required.",
+    "0.85": "Ambiguous between 0x000008 and 0x000080; raw-mask telemetry required.",
+    "0.25": "Contextual/ambiguous; raw mask + loadColiType + stage required."
+  },
+  "dataProducts": {
+    "stageInventory": "reverse/game_assets/stage_collision_inventory.json",
+    "humanGuide": "docs/reverse/STAGE_SURFACE_FFB_MAP.md",
+    "sharedAnalyzer": "tools/reverse/analyze_game_data.py"
   }
 }
