@@ -63,4 +63,14 @@ if required_flag not in workflow:
 if "-DOUTRUN_VR_R26_HUD_COMPARE=OFF" in workflow:
     raise SystemExit("protected R51 build contract regressed: active DX9Ex workflow contains R26_HUD_COMPARE=OFF")
 
+
+
+# Stereo SkyGlow ping-pong ownership: horizontal writes temp->reduced; the
+# optional vertical pass writes reduced->temp. Composite the newest result.
+safe = read("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp")
+if "IDirect3DTexture9* compositeSource =\n                    R30SkyGlow.reduced[eye];" not in safe:
+    raise SystemExit("SkyGlow regression: one-pass composite is not horizontal reduced result")
+if "compositeSource = R30SkyGlow.temp[eye];" not in safe:
+    raise SystemExit("SkyGlow regression: two-step composite is not vertical temp result")
+
 print("R51 protected runtime contract: PASS")
