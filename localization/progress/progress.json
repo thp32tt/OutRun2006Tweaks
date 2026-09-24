@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T03:12:00+09:00",
+  "updated_at_kst": "2026-09-25T04:14:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -119,10 +119,10 @@
     },
     "graphics_artwork_pipeline": {
       "status": "proof_renderer_ready",
-      "percent": 15,
-      "proof_specs": 1,
+      "percent": 8.9,
+      "proof_specs": 7,
       "final_artwork_completed": 0,
-      "total": 80
+      "total": 79
     },
     "graphics_artwork_planning": {
       "status": "done",
@@ -132,7 +132,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Collect clean K1/K2/K3 runtime logs; implement K3-A only after trace evidence; continue deterministic graphics artwork candidates in parallel",
+  "next_checkpoint": "Latest-head state/domain CI PASS; collect clean K1/K2/K3 runtime logs; continue deterministic graphics artwork candidates in parallel",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
