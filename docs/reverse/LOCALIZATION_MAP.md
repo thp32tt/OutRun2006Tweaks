@@ -1,81 +1,86 @@
 # OutRun 2006 localization reverse map
 
-Canonical EXE SHA-256: `68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3`
+Canonical EXE SHA-256: \`68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3\`  
+Verified localization branch: \`korean-localization-prototype@9394b832b93b83303fe029e45182c7b3a64d8d54\`  
+Localization tracking issue: #25
 
-## 1. Dynamic text path — CONFIRMED
+## 1. txet text format — VERIFIED on English_Korean.bin
 
-The canonical text loader begins at RVA `0x00065DF0`.
+The localization project already verified the actual binary format and a byte-identical round trip:
 
-It calls the language getter and indexes the path-pointer table at VA `0x0064B91C`. The six canonical paths in index order are:
+\`\`\`text
+0x00  char[4]  "txet"
+0x04  uint32   total file size
+0x08  uint32[] record offsets
+...            UTF-16LE record payloads
+\`\`\`
+
+For the analyzed \`English_Korean.bin\`:
+
+- size: 94,076 bytes
+- SHA-256: \`d95b2f04d801c4b8c93017c487f122db49441310c1015b068875d8b91ca6d73d\`
+- records: 1,356
+- simple single-string records: 1,351
+- multi/special records: 4
+- null pointer entries: 1
+- extract -> rebuild: **BYTE_IDENTICAL**
+
+Some records contain multiple NUL-separated UTF-16LE strings, so a naive one-string-per-ID exporter is lossy. The dedicated localization tool preserves each raw record slice.
+
+The analyzed regional \`English_Korean.bin\` is **not itself a Korean translation**: 1,340 of 1,356 records matched \`English_US.bin\`; the remaining differences were mainly SCEK/DNAS regional text. No Hangul text was present before the prototype patch.
+
+A resource-only test replaced ID 0 \`Screen Position\` with \`화면 위치\`, rebuilt the file and retained all 1,356 records. This proves the resource editor, not in-game Hangul rendering.
+
+The shared analyzer now understands the same txet layout so VR/FFB/localization research can consume the same ID map without duplicating format guesses.
+
+## 2. Canonical dynamic-text runtime path — CONFIRMED
+
+The canonical text loader starts at RVA \`0x00065DF0\` and indexes the path table at VA \`0x0064B91C\`:
 
 | Language index | Canonical path |
 |---:|---|
-| 0 | `\text\english_us.bin` |
-| 1 | `\text\french.bin` |
-| 2 | `\text\german.bin` |
-| 3 | `\text\italian.bin` |
-| 4 | `\text\spanish.bin` |
-| 5 | `\text\english.bin` |
+| 0 | \`\\text\\english_us.bin\` |
+| 1 | \`\\text\\french.bin\` |
+| 2 | \`\\text\\german.bin\` |
+| 3 | \`\\text\\italian.bin\` |
+| 4 | \`\\text\\spanish.bin\` |
+| 5 | \`\\text\\english.bin\` |
 
-The supplied file manifest additionally lists `Text/English_Korean.bin` (94,076 bytes), but that file's bytes were not included in the current asset bundle. Its internal content is therefore **not yet parsed or validated**.
+The loader stores the blob at \`0x007F8D70\`, stores the pointer table (\`base + 8\`) at \`0x007F8D74\`, relocates each record offset by adding the blob base, then converts each 16-bit string to a byte string **by copying only the low byte of each UTF-16LE code unit**.
 
-Other manifest sizes:
+\`Sumo_GetStringFromId\` at RVA \`0x00065EB0\` returns the resulting runtime pointer.
 
-- `English_US.bin` 94,748
-- `French.bin` 106,188
-- `German.bin` 106,074
-- `Italian.bin` 98,722
-- `Spanish.bin` 99,384
+### Consequence
 
-## 2. Text binary runtime contract — CONFIRMED from EXE
+The txet file can losslessly contain Hangul, but stock runtime loading destroys the Unicode code point before rendering. A translated BIN alone is therefore insufficient.
 
-After loading a text blob, the game:
-
-1. stores the blob base at global VA `0x007F8D70`;
-2. treats `base + 8` as an array of relative DWORD string pointers and stores it at `0x007F8D74`;
-3. walks pointer entries until a zero pointer;
-4. converts every relative pointer to an absolute pointer by adding the blob base;
-5. walks each string as 16-bit code units;
-6. **copies only the low byte of each UTF-16LE code unit back into the same buffer** and NUL-terminates the resulting byte string.
-
-`Sumo_GetStringFromId` is RVA `0x00065EB0` and returns `pointerTable[id]` as the runtime byte string.
-
-### Consequence for Korean
-
-A Korean UTF-16LE syllable cannot survive the stock conversion. Replacing `English_US.bin` with UTF-16 Hangul alone is not sufficient.
-
-The analyzer includes a strict candidate parser for this `+8 relative-pointer table -> UTF-16LE strings` layout. It is intentionally reported as a candidate parser until actual `Text/*.bin` bytes are supplied and pass the guards.
-
-## 3. Font renderer limit — CONFIRMED from EXE
+## 3. Font/glyph path — CONFIRMED
 
 Relevant anchors:
 
-- glyph draw function RVA `0x0002B720` (VA `0x0042C720`)
-- `sprSetPrintFont` RVA `0x0002BA60`
-- `put_sprite_ex` RVA `0x0002CFE0`
+- glyph draw RVA \`0x0002B720\`
+- \`sprSetPrintFont\` RVA \`0x0002BA60\`
+- \`put_sprite_ex\` RVA \`0x0002CFE0\`
+- localization branch also tracks width/layout around \`0x42C480\`, glyph lookup around \`0x42C300\`, and line/layout handling around \`0x48EB60\` as research anchors requiring signature validation before production use
 
-The stock glyph draw path:
+The stock glyph path:
 
-- rejects signed/extended byte characters;
-- rejects values greater than `0x7F`;
-- handles text one byte at a time;
-- maps a glyph index onto a 16x16 atlas by splitting low and high nibbles;
-- `sprSetPrintFont` searches up to 10 font descriptors.
+- processes one byte per glyph;
+- rejects signed/extended byte values;
+- rejects values above \`0x7F\`;
+- splits low/high nibbles into a 16x16 atlas position;
+- searches up to 10 font descriptors.
 
-The supplied `spr_font_xst.sz` contains 10 textures / 10 sprite records and `Media/Font.xpr` is a separate XPR0 font-related asset.
+The supplied \`spr_font_xst.sz\` contains 10 textures / 10 sprite entries. The examined stock font atlases contain Latin letters, digits and symbols but no Hangul glyph set.
 
-### Implication
+Therefore Korean needs both:
 
-There are two localization paths and they should not be conflated:
+1. a Unicode-safe runtime string path; and
+2. a Hangul-capable glyph path/atlas.
 
-1. **Texture/graphic UI translation** — can reuse existing XST/Sprani geometry and replace translated texture payload.
-2. **Dynamic text translation** — needs an encoding + font-renderer extension. Options should be chosen only after the real translated text set is measured (unique Hangul syllables, line lengths and call sites).
+## 4. Five-language texture UI families — CONFIRMED
 
-A one-byte extension could expose at most the remaining byte space and is not a general Korean solution. A robust full translation will likely require a multibyte/Unicode-aware decoder plus glyph-page/atlas selection or an equivalent font backend.
-
-## 4. Five-language sprite families — CONFIRMED
-
-Sixteen supplied XST families contain all `E/F/G/I/S` variants. For **all 16**, the system-memory prefix and parsed XST structure are byte-identical across languages; only the video/texture payload hash changes.
+Sixteen supplied XST families contain complete \`E/F/G/I/S\` variants. In every family, the parsed XST structure and system-memory prefix are identical across languages; only video/texture payload differs.
 
 | Family | Textures | Sprites |
 |---|---:|---:|
@@ -96,32 +101,25 @@ Sixteen supplied XST families contain all `E/F/G/I/S` variants. For **all 16**, 
 | SUMO_LOADING | 4 | 5 |
 | SUMO_VSLOAD | 4 | 278 |
 
-This is strong evidence that translation graphics can preserve the original sprite rectangles/animation layout and swap only language-specific texture data.
+This supports a clean separation: embedded UI graphics can be translated by texture payload while reusing original animation/layout structures.
 
-## 5. Sprani/XST bridge — CONFIRMED structure, semantic names still runtime-gated
+Representative Sprani/XST counts:
 
-Representative top-level Sprani animation counts:
-
-| Sprani | Animation records | Matching XST sprites | XST textures |
+| Sprani | Anim records | XST sprites | Textures |
 |---|---:|---:|---:|
 | GAME_CVT | 108 | 338 | 7 |
 | RANKING_CVT | 41 | 108 | 3 |
 | ROUTE_CVT | 32 | 80 | 12 |
 | SELECTOR_CVT | 96 | 523 | 38 |
 
-Canonical XST loading uses a 75-slot (`0x4B`) language/variant stride. Runtime HUD diagnostics already expose XST-set and sprite identities, so the long-term reusable chain is:
+Canonical XST selection uses a 75-slot (\`0x4B\`) language/variant stride, providing a bridge from runtime \`xstsetIndex\` to language-specific resource package.
 
-`text/UI producer -> Sprani animation -> XST set -> sprite/texture -> runtime caller -> translated asset`.
+## 5. Shared localization pipeline
 
-## 6. Next localization evidence required
+The shared knowledge base and the dedicated localization branch have distinct roles:
 
-Highest value missing input is the actual `Text` directory, especially `English_Korean.bin` and `English_US.bin`. Once available, the shared analyzer should report:
+- \`tools/localization/txet_tool.py\` — authoritative lossless txet editor used by the Korean project.
+- \`tools/reverse/analyze_game_data.py\` — cross-project read-only scanner; reports txet/XST/Sprani/Scripts/COLI structure and hashes.
+- \`src/hooks_localization.cpp\` — localization-only, signature-gated logging hook; must remain isolated until minimal Hangul rendering is proven.
 
-- pointer count / string count;
-- exact structural compatibility between English_US and English_Korean;
-- unique Korean syllable count;
-- longest strings and expansion ratio;
-- strings containing formatting/control tokens;
-- IDs used by high-frequency HUD/menu call sites.
-
-Do not commit the original text blobs; commit only extracted IDs, hashes and translation metadata appropriate for the localization project.
+Do not move experimental localization runtime hooks into \`vr-d3d9ex-focus\` before K3/minimal Hangul render proof. Shared metadata/tools are safe to reuse earlier because they change no runtime behavior.
