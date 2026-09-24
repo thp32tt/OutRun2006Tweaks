@@ -40,9 +40,20 @@ The main steering model contains:
 6. **Grip-loss unloading** — reduces steering load as usable front grip falls away.
 7. **Road / tire / gear / collision effects** — transient tactile effects layered on top of the structural steering signal.
 
+### Selectable force models
+
+The standalone branch now exposes four models through the same DirectInput safety/output layer:
+
+- **Modern DD Physics** — current front-slip/yaw SAT and DD-oriented transient model;
+- **Arcade Original (Lindbergh-derived)** — condition/spring backbone plus directional wall, surface-transition and rough-surface behavior reconstructed from the public Lindbergh drive-board interception;
+- **Arcade + Modern Hybrid** — Modern DD SAT with the arcade event/surface semantics;
+- **PS2 Original topology (Experimental)** — verified PS2 Condition/Constant/Periodic effect topology without claiming still-unknown payload fields as original values.
+
+Xbox controller vibration is not exposed as a wheel model. See `docs/reverse/FFB_MODEL_MODES.md` for evidence boundaries and mapping details.
+
 ### Force Feedback UI
 
-The F11 **Force Feedback** page owns output-device selection and game-side tuning. `Load MOZA R3 Physics SAT` and `Load MOZA R3 Natural SAT` provide starting profiles, while **Save Force Feedback** persists live edits.
+The F11 **Force Feedback** page owns output-device selection, **FFB Model** selection and game-side tuning. `Load MOZA R3 Physics SAT` and `Load MOZA R3 Natural SAT` provide starting profiles, while **Save Force Feedback** persists live edits.
 
 The **Advanced FFB tuning** section exposes supported lower-level values such as Spring Saturation, Weight Transfer, Force Build Slew Rate, Countersteer Release Rate, Pneumatic Trail Response Lead and optional wheel-response correction. These remain live tuning controls; wheel-specific response data is stored with the wheel profile rather than a generic named feel profile.
 
@@ -155,9 +166,20 @@ v0.1은 주로 **MOZA R3**를 기준으로 개발했으며 기본 검증 경로�
 6. **Grip-loss unloading** — 사용 가능한 전륜 그립이 줄어들수록 조향 하중을 줄입니다.
 7. **Road / tire / gear / collision effects** — 기본 조향 신호 위에 일시적인 촉각 효과를 추가합니다.
 
+### 선택 가능한 FFB 모델
+
+독립 FFB 브랜치는 동일한 DirectInput 안전/출력 계층 위에서 네 가지 모델을 선택할 수 있습니다.
+
+- **Modern DD Physics** — 현재의 front-slip/yaw SAT 및 현대 DD용 transient 모델
+- **Arcade Original (Lindbergh-derived)** — 공개 Lindbergh drive-board interception에서 재구성한 condition/spring, 방향성 벽 충돌, 노면 전환, 거친 노면 효과
+- **Arcade + Modern Hybrid** — Modern DD SAT + 아케이드 이벤트/노면 의미
+- **PS2 Original topology (Experimental)** — PS2에서 검증된 Condition/Constant/Periodic 구조를 사용하되 아직 해독되지 않은 payload 수치를 원본값이라고 주장하지 않는 실험 모드
+
+Xbox의 원본 경로는 휠 FFB가 아니라 컨트롤러 진동이므로 선택 가능한 휠 모델에는 넣지 않았습니다. 근거와 매핑 범위는 `docs/reverse/FFB_MODEL_MODES.md`에 정리했습니다.
+
 ### Force Feedback UI
 
-F11의 **Force Feedback** 화면에서 출력 장치 선택과 게임 내 FFB 튜닝을 담당합니다. `Load MOZA R3 Physics SAT`와 `Load MOZA R3 Natural SAT`는 시작용 프로필이며, **Save Force Feedback**으로 실시간 변경 값을 저장합니다.
+F11의 **Force Feedback** 화면에서 출력 장치 선택, **FFB Model** 선택과 게임 내 FFB 튜닝을 담당합니다. `Load MOZA R3 Physics SAT`와 `Load MOZA R3 Natural SAT`는 시작용 프로필이며, **Save Force Feedback**으로 실시간 변경 값을 저장합니다.
 
 **Advanced FFB tuning**에는 Spring Saturation, Weight Transfer, Force Build Slew Rate, Countersteer Release Rate, Pneumatic Trail Response Lead, 선택적 휠 응답 보정 등 하위 수준 조정 값이 노출됩니다. 이 값들은 실시간 튜닝 항목이며, 휠별 응답 데이터는 일반적인 feel 프리셋이 아니라 해당 휠 프로필에 저장됩니다.
 
