@@ -20,3 +20,4 @@
 {"ts_kst":"2026-09-25T01:40:00+09:00","event":"k3_reverse_engineering_checkpoint","width_va":"0x42C480","pair_va":"0x42C410","advance_va":"0x42C610","draw_va":"0x42C720","ascii_limit":"0x7F"}
 {"ts_kst":"2026-09-25T01:40:00+09:00","event":"hangul_corpus_measured","unique_syllables":505,"page_capacity":256,"pages_required":2}
 {"ts_kst":"2026-09-25T01:40:00+09:00","event":"k3_trace_hooks_added","setting":"KoreanK3Trace","behavior_change":false,"ci_status":"in_progress"}
+{"ts_kst":"2026-09-25T01:44:00+09:00","event":"graphics_transcription_complete","transcribed_assets":79,"total_targets":79,"percent":100,"segments":674,"final_item_index":152,"final_item_resolution":"music-version abbreviations resolved via index198 full-label cross-reference"}
