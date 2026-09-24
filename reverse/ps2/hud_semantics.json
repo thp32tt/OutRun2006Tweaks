@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "sources": {
+    "SLPM_666.28": "bc5dd6d836bf34546ef9f047ad2bcb99c5ef5a713767a161d0c342af33f38c34",
+    "SYSTEM.PS2": "a056e2b587530cea1a916a1a04e6ab3f2f7997d8c336e4c16719872e85f7ebc2",
+    "JSPRITE.PS2": "ec54a2cb10ecb4f6e45377f63a1ff83f0da2da411093558c87eebf45bc8a8efc",
+    "JSPRANI.PS2": "be403e11f5bea21b466ade29ba991270e912078611bb8d61641623a38a96d892",
+    "COMMON.PS2": "95074059560248049287803c23b76f548ffe69b7b5ce0927986822a5f2b14f95"
+  },
+  "packHash": {
+    "functionVa": "0x001749F0",
+    "algorithm": "Process suffix bytes right-to-left; uppercase ASCII a-z; h=(h*131+c) mod 2^32; names use leading backslash."
+  },
+  "anchors": {
+    "jspraniPointerTableVa": "0x0032AA58",
+    "jspritePointerTableVa": "0x0035C96C",
+    "spraniLoaderVa": "0x00116C50",
+    "spraniLoadedRelocationVa": "0x00116F90",
+    "spraniSpriteIdPatchVa": "0x00117018",
+    "spraniSpriteResolverVa": "0x00117330",
+    "spraniRootRelocatorVa": "0x001768F0",
+    "spraniUpdateSectionVa": "0x0030DBA0",
+    "spraniUpdateWrapperVa": "0x0030E480",
+    "spraniNodeIteratorVa": "0x0030E5A8"
+  },
+  "spriteIdFormat": {
+    "high16": "resource bank",
+    "low16": "sprite index"
+  },
+  "keyBanks": [
+    {
+      "id": "0x2B",
+      "name": "GAME_CVT",
+      "roots": 107,
+      "tracks": 626,
+      "nodes": 1003,
+      "frames": 602,
+      "x": [
+        14,
+        650
+      ],
+      "y": [
+        6,
+        490
+      ],
+      "sprites": 124
+    },
+    {
+      "id": "0x2C",
+      "name": "ETC_CVT",
+      "roots": 268,
+      "tracks": 923,
+      "nodes": 2221,
+      "frames": 915,
+      "x": [
+        2,
+        640
+      ],
+      "y": [
+        1,
+        510
+      ],
+      "sprites": 145
+    },
+    {
+      "id": "0x34",
+      "name": "ROUTE_CVT",
+      "roots": 32,
+      "tracks": 151,
+      "nodes": 854,
+      "frames": 151,
+      "x": [
+        10,
+        512
+      ],
+      "y": [
+        4,
+        510
+      ],
+      "sprites": 22
+    },
+    {
+      "id": "0x3D",
+      "name": "RANKING_CVT",
+      "roots": 41,
+      "tracks": 176,
+      "nodes": 493,
+      "frames": 176,
+      "x": [
+        14,
+        685
+      ],
+      "y": [
+        3,
+        322
+      ],
+      "sprites": 28
+    },
+    {
+      "id": "0x3E",
+      "name": "FLAG_RANK",
+      "roots": 7,
+      "tracks": 31,
+      "nodes": 83,
+      "frames": 31,
+      "x": [
+        30,
+        512
+      ],
+      "y": [
+        30,
+        398
+      ],
+      "sprites": 13
+    },
+    {
+      "id": "0x3F",
+      "name": "CLAR_RANK",
+      "roots": 7,
+      "tracks": 38,
+      "nodes": 90,
+      "frames": 38,
+      "x": [
+        30,
+        512
+      ],
+      "y": [
+        30,
+        358
+      ],
+      "sprites": 13
+    },
+    {
+      "id": "0x40",
+      "name": "JENN_RANK",
+      "roots": 7,
+      "tracks": 38,
+      "nodes": 90,
+      "frames": 38,
+      "x": [
+        30,
+        512
+      ],
+      "y": [
+        30,
+        398
+      ],
+      "sprites": 12
+    },
+    {
+      "id": "0x41",
+      "name": "HOLL_RANK",
+      "roots": 7,
+      "tracks": 38,
+      "nodes": 90,
+      "frames": 38,
+      "x": [
+        30,
+        512
+      ],
+      "y": [
+        30,
+        398
+      ],
+      "sprites": 12
+    }
+  ],
+  "validation": {
+    "namedJspriteEntriesMatched": "50/50",
+    "namedJspraniEntriesMatched": "43/43",
+    "pairedBankInvariant": "For all 43 paired banks, max animation sprite index + 1 == XST sprite_count."
+  },
+  "pcUse": {
+    "status": "comparative-evidence",
+    "rule": "Verify PC bank numbering independently before production classification; keep explicit world-projected rival marker paths separate from screen-HUD provenance."
+  }
+}
