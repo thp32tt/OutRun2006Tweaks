@@ -20,3 +20,14 @@
 3. Continue from `text.next_id` and `graphics.next_visual_index`.
 4. Never overwrite original game assets in Git. Store only translation/manifest/patch metadata.
 5. Update progress counts and append this worklog at every checkpoint.
+
+## 2026-09-24 19:05 KST - CP1
+
+- Completed Korean text data for all 1,355 non-null IDs.
+- 1,347 normal rows are reviewed; 4 multi-segment rows are reviewed with raw-tail preservation; 4 online-mode labels remain context-sensitive drafts (IDs 96, 97, 279, 280); ID 1355 remains a null pointer.
+- Placeholder QA passed with no `%s`/`%d`-style format-token mismatches.
+- Generated a 1,356-entry Korean draft txet BIN: 58,438 bytes, SHA-256 `20d5c3cc245855d55d9dc9bfe90d0269c0ba8c1242b35779f979b974dec56440`.
+- The draft BIN is data-validation only; stock runtime still truncates UTF-16LE and cannot render Hangul.
+- Visually reviewed all 243 DDS assets: 84 localize-text targets, 30 preserve-brand/song/credit, 9 font atlases, 1 name-entry atlas, 47 zoom-review, 72 no-localization.
+- K1 signature-gated resolver trace Win32 Release CI run `35981045694`: SUCCESS.
+- Next runtime gate is K1 trace collection, then K2 single-string Unicode override and K3 minimal Hangul glyph proof.
