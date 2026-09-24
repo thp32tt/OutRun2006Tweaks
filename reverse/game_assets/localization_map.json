@@ -1,0 +1,357 @@
+{
+  "schema": "outrun-localization-map-v1",
+  "sourceSha": "8a312af992e4319aa5d101bfbfa97f271dd75203",
+  "canonicalExeSha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+  "textLoader": {
+    "rva": "0x00065DF0",
+    "stringGetterRva": "0x00065EB0",
+    "pathTableVa": "0x0064B91C",
+    "pointerTableOffset": 8,
+    "onDiskEncoding": "UTF-16LE",
+    "runtimeConversion": "low-byte collapse to one-byte strings"
+  },
+  "canonicalTextPaths": [
+    {
+      "index": 0,
+      "path": "\\text\\english_us.bin"
+    },
+    {
+      "index": 1,
+      "path": "\\text\\french.bin"
+    },
+    {
+      "index": 2,
+      "path": "\\text\\german.bin"
+    },
+    {
+      "index": 3,
+      "path": "\\text\\italian.bin"
+    },
+    {
+      "index": 4,
+      "path": "\\text\\spanish.bin"
+    },
+    {
+      "index": 5,
+      "path": "\\text\\english.bin"
+    }
+  ],
+  "manifestTextFiles": [
+    {
+      "path": "Text/English_Korean.bin",
+      "size": 94076
+    },
+    {
+      "path": "Text/English_US.bin",
+      "size": 94748
+    },
+    {
+      "path": "Text/French.bin",
+      "size": 106188
+    },
+    {
+      "path": "Text/German.bin",
+      "size": 106074
+    },
+    {
+      "path": "Text/Italian.bin",
+      "size": 98722
+    },
+    {
+      "path": "Text/Spanish.bin",
+      "size": 99384
+    }
+  ],
+  "koreanPayloadPresentInAnalyzedBundle": false,
+  "fontRenderer": {
+    "glyphDrawRva": "0x0002B720",
+    "setPrintFontRva": "0x0002BA60",
+    "acceptedByteRange": "0x00..0x7F",
+    "fontDescriptorSearchCount": 10,
+    "glyphGrid": "16x16",
+    "stockUnicodeHangulSupported": false
+  },
+  "fontAssets": {
+    "spr_font_xst": {
+      "textures": 10,
+      "sprites": 10
+    },
+    "font_xpr": {
+      "path": "Media/Font.xpr",
+      "size": 36864,
+      "magic": "XPR0"
+    }
+  },
+  "languageXstFamilies": [
+    {
+      "base": "spr_sprani_clar_rank",
+      "languages": [
+        "E",
+        "F",
+        "G",
+        "I",
+        "S"
+      ],
+      "textureCount": 5,
+      "spriteCount": 18,
+      "sameStructure": true,
+      "sameSystemPrefix": true,
+      "languageDifference": "video/texture payload"
+    },
+    {
+      "base": "spr_sprani_congrats_cvt",
+      "languages": [
+        "E",
+        "F",
+        "G",
+        "I",
+        "S"
+      ],
+      "textureCount": 2,
+      "spriteCount": 9,
+      "sameStructure": true,
+      "sameSystemPrefix": true,
+      "languageDifference": "video/texture payload"
+    },
+    {
+      "base": "spr_sprani_etc_cvt",
+      "languages": [
+        "E",
+        "F",
+        "G",
+        "I",
+        "S"
+      ],
+      "textureCount": 11,
+      "spriteCount": 698,
+      "sameStructure": true,
+      "sameSystemPrefix": true,
+      "languageDifference": "video/texture payload"
+    },
+    {
+      "base": "spr_sprani_fight",
+      "languages": [
+        "E",
+        "F",
+        "G",
+        "I",
+        "S"
+      ],
+      "textureCount": 1,
+      "spriteCount": 34,
+      "sameStructure": true,
+      "sameSystemPrefix": true,
+      "languageDifference": "video/texture payload"
+    },
+    {
+      "base": "spr_sprani_flag_rank",
+      "languages": [
+        "E",
+        "F",
+        "G",
+        "I",
+        "S"
+      ],
+      "textureCount": 4,
+      "spriteCount": 17,
+      "sameStructure": true,
+      "sameSystemPrefix": true,
+      "languageDifference": "video/texture payload"
+    },
+    {
+      "base": "spr_sprani_fruity_cvt",
+      "languages": [
+        "E",
+        "F",
+        "G",
+        "I",
+        "S"
+      ],
+      "textureCount": 2,
+      "spriteCount": 195,
+      "sameStructure": true,
+      "sameSystemPrefix": true,
+      "languageDifference": "video/texture payload"
+    },
+    {
+      "base": "spr_sprani_game_cvt",
+      "languages": [
+        "E",
+        "F",
+        "G",
+        "I",
+        "S"
+      ],
+      "textureCount": 7,
+      "spriteCount": 338,
+      "sameStructure": true,
+      "sameSystemPrefix": true,
+      "languageDifference": "video/texture payload"
+    },
+    {
+      "base": "spr_sprani_holl_rank",
+      "languages": [
+        "E",
+        "F",
+        "G",
+        "I",
+        "S"
+      ],
+      "textureCount": 2,
+      "spriteCount": 18,
+      "sameStructure": true,
+      "sameSystemPrefix": true,
+      "languageDifference": "video/texture payload"
+    },
+    {
+      "base": "spr_sprani_jenn_rank",
+      "languages": [
+        "E",
+        "F",
+        "G",
+        "I",
+        "S"
+      ],
+      "textureCount": 2,
+      "spriteCount": 18,
+      "sameStructure": true,
+      "sameSystemPrefix": true,
+      "languageDifference": "video/texture payload"
+    },
+    {
+      "base": "spr_sprani_loading_cvt",
+      "languages": [
+        "E",
+        "F",
+        "G",
+        "I",
+        "S"
+      ],
+      "textureCount": 5,
+      "spriteCount": 18,
+      "sameStructure": true,
+      "sameSystemPrefix": true,
+      "languageDifference": "video/texture payload"
+    },
+    {
+      "base": "spr_sprani_ranking_cvt",
+      "languages": [
+        "E",
+        "F",
+        "G",
+        "I",
+        "S"
+      ],
+      "textureCount": 3,
+      "spriteCount": 108,
+      "sameStructure": true,
+      "sameSystemPrefix": true,
+      "languageDifference": "video/texture payload"
+    },
+    {
+      "base": "spr_sprani_route_cvt",
+      "languages": [
+        "E",
+        "F",
+        "G",
+        "I",
+        "S"
+      ],
+      "textureCount": 12,
+      "spriteCount": 80,
+      "sameStructure": true,
+      "sameSystemPrefix": true,
+      "languageDifference": "video/texture payload"
+    },
+    {
+      "base": "spr_sprani_selector_cvt",
+      "languages": [
+        "E",
+        "F",
+        "G",
+        "I",
+        "S"
+      ],
+      "textureCount": 38,
+      "spriteCount": 523,
+      "sameStructure": true,
+      "sameSystemPrefix": true,
+      "languageDifference": "video/texture payload"
+    },
+    {
+      "base": "spr_sprani_sumo_fe_cvt",
+      "languages": [
+        "E",
+        "F",
+        "G",
+        "I",
+        "S"
+      ],
+      "textureCount": 129,
+      "spriteCount": 1564,
+      "sameStructure": true,
+      "sameSystemPrefix": true,
+      "languageDifference": "video/texture payload"
+    },
+    {
+      "base": "spr_sprani_sumo_loading",
+      "languages": [
+        "E",
+        "F",
+        "G",
+        "I",
+        "S"
+      ],
+      "textureCount": 4,
+      "spriteCount": 5,
+      "sameStructure": true,
+      "sameSystemPrefix": true,
+      "languageDifference": "video/texture payload"
+    },
+    {
+      "base": "spr_sprani_sumo_vsload",
+      "languages": [
+        "E",
+        "F",
+        "G",
+        "I",
+        "S"
+      ],
+      "textureCount": 4,
+      "spriteCount": 278,
+      "sameStructure": true,
+      "sameSystemPrefix": true,
+      "languageDifference": "video/texture payload"
+    }
+  ],
+  "representativeSprani": [
+    {
+      "name": "GAME_CVT",
+      "animationRecords": 108,
+      "xstSprites": 338,
+      "xstTextures": 7
+    },
+    {
+      "name": "RANKING_CVT",
+      "animationRecords": 41,
+      "xstSprites": 108,
+      "xstTextures": 3
+    },
+    {
+      "name": "ROUTE_CVT",
+      "animationRecords": 32,
+      "xstSprites": 80,
+      "xstTextures": 12
+    },
+    {
+      "name": "SELECTOR_CVT",
+      "animationRecords": 96,
+      "xstSprites": 523,
+      "xstTextures": 38
+    }
+  ],
+  "evidenceBoundary": [
+    "English_Korean.bin is listed by manifest but its bytes were not present in this analysis bundle.",
+    "Asset family name alone must not decide VR screen/world semantics."
+  ]
+}
