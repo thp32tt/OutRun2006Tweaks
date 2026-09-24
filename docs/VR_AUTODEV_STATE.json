@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-24T13:47:00Z",
+  "updatedUtc": "2026-09-24T13:58:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
-  "phase": "R51-matrix-base-integrated / parallel-HMD-matrix-preparation / no-PC-runner",
+  "phase": "R51-matrix-base-integrated / HUD+PERF+DXVK+DX12 parallel development / no-PC-runner",
   "checkpoint": "C6_STATE",
   "policy": {
     "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host",
@@ -12,7 +12,7 @@
     "blockedBackendAction": "DXVK and DX12/D3D9On12 development, compile and smoke validation are re-enabled in isolated candidates after user acceptance of the R51 basic 3D reference. They may not replace the protected DX9Ex runtime baseline until backend-parity evidence is recorded.",
     "genericBuildDisabled": true,
     "dedicatedWorkflow": ".github/workflows/vr-dx9ex-active.yml",
-    "runtimeTesting": "Quest 3/VDXR testing is an evening gate; prepare one self-contained matrix with up to six hypothesis-distinguishing slots and collect one final ZIP.",
+    "runtimeTesting": "Quest 3/VDXR evening gate uses six independent slots: A DX9Ex control, B HUD, C flare, D performance, E DXVK, F DX12. No slot blocks development of another.",
     "profileModel": {
       "default": "A_CONTROL",
       "profiles": [
@@ -20,11 +20,11 @@
         "B_HUD",
         "C_FLARE",
         "D_PERF",
-        "E_HUD_FLARE",
-        "F_FULL"
+        "E_DXVK",
+        "F_DX12"
       ],
-      "sameBinaryPreferred": true,
-      "note": "Production integration remains serial WIP=1; HMD experiments may prepare in parallel. Prefer one binary plus runtime flags where behavior can be isolated safely."
+      "sameBinaryPreferred": false,
+      "note": "Use one binary within a backend when practical. DXVK/DX12 have distinct backend payload identity. HUD completion is not a prerequisite for performance/backend work."
     },
     "eveningFreeze": {
       "reviewImplementWindow": "daytime / before evening HMD session",
@@ -35,8 +35,8 @@
       "lightweightPolicyWorkflow": ".github/workflows/vr-test-policy.yml",
       "activeValidationWorkflow": ".github/workflows/vr-dx9ex-active.yml",
       "manualComparisonWorkflow": ".github/workflows/vr-unified-backends.yml",
-      "defaultSourceBuilds": "one active Win32 DX9Ex DLL + one x64 D3D11 OpenXR host",
-      "comparisonMatrix": "manual only; P1-P4 retained for hypothesis isolation when profile switching cannot answer the question"
+      "defaultSourceBuilds": "DX9Ex reference plus affected backend-specific build/smoke paths; DXVK/DX12 may run in isolated candidates in parallel.",
+      "comparisonMatrix": "Backend and performance validation is active work, not deferred behind HUD. Keep exact SHA/backend/profile identity."
     },
     "userRuntimeBaseline": {
       "sourceOfTruth": "docs/VR_REGRESSION_KNOWLEDGE.json::userRuntimeVerifiedBaseline",
@@ -68,16 +68,19 @@
       "runtimeRegressionLedgerIssue": 13
     },
     "parallelBackendDevelopment": {
-      "enabled": false,
+      "enabled": true,
       "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-      "reason": "DXVK/DX12/multiview are frozen as primary work while HUD/lens-flare/dense-scene performance HMD matrix work is active.",
+      "reason": "Basic 3D DX9Ex baseline is established. HUD is a separate visual defect track and must not serialize backend/performance development.",
       "activeUserVisibleTracks": [
         "HUD semantic lifetime",
         "lens flare exact producer",
-        "dense-scene performance"
+        "dense-scene performance/frame pacing",
+        "DXVK SAFE compatibility then multiview optimization",
+        "DX12/D3D9On12 compatibility and transport"
       ],
       "productionIntegrationWip": 1,
-      "maxParallelHmdExperimentSlots": 6
+      "maxParallelHmdExperimentSlots": 6,
+      "nonBlockingRule": "HUD/FLARE delays must not block PERF/DXVK/DX12; backend failures must not block HUD/FLARE."
     },
     "pcFastBuild": {
       "defaultMode": "INCREMENTAL",
@@ -126,7 +129,7 @@
     "DirectGPU transport is not the current HUD root cause: direct frames=13187, fallbacks=4, fenceTimeout=0, stereo/right-draw failures=0 in the failed HUD candidate session.",
     "Dense-scene performance remains separate; observed peak drawsPerPresent≈3929.3 and lower-Present max≈16.639 ms in this session."
   ],
-  "nextAction": "Overnight scheduled work: analysis/review only on HUD semantic lifetime and rival-marker anchor propagation. Trace exact producer -> node tag -> queue select -> c64 SetVertexShaderConstantF -> draw ordering and EXE-map Calc3D2D/marker anchor flow. Do not create another HMD candidate until this contradiction is explained. Preserve R51 world owner. Normal cloud CI may be used when needed; self-hosted PC runner is disabled until the user explicitly authorizes a new evening PC-build session.",
+  "nextAction": "Run independent implementation lanes in parallel: HUD semantic lifetime, lens flare, dense-scene performance, DXVK SAFE->multiview, and DX12/D3D9On12. Preserve R51 as the comparison baseline; only backend promotion is parity-gated. Normal cloud CI is allowed; self-hosted PC remains disabled until explicitly authorized.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
@@ -568,15 +571,14 @@
     "runtimeBaseSha": "27f4ad958cf965f33bc6791395dd77ca1af7fb42",
     "integrationSha": "060e2ae5ff78503b41d8a38980843dd5003e43bb",
     "baseStatus": "BUILD_VERIFIED_INTEGRATED_NEEDS_HMD",
-    "candidateCiRuns": [
-      36007124220,
-      36007124238
+    "slots": [
+      "A_CONTROL: DX9Ex R51-protected reference",
+      "B_HUD: HUD semantic lifetime",
+      "C_FLARE: lens flare producer",
+      "D_PERF: dense-scene/frame-budget performance",
+      "E_DXVK: DXVK SAFE first, multiview next",
+      "F_DX12: D3D9On12 strict/device-resource compatibility"
     ],
-    "nextSlots": [
-      "A_CONTROL identity completion",
-      "B_HUD semantic lifetime experiment",
-      "C_FLARE producer telemetry",
-      "D_PERF dense-scene telemetry"
-    ]
+    "nextAction": "Prepare D_PERF/E_DXVK/F_DX12 immediately in parallel with B_HUD/C_FLARE. Do not wait for HUD resolution."
   }
 }
