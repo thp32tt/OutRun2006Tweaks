@@ -29,7 +29,7 @@
     {
       "slotId": "A_CONTROL",
       "backend": "DX9Ex",
-      "status": "BUILD_VERIFIED_IDENTITY_PENDING",
+      "status": "HMD_EXPERIMENT_READY",
       "sourceSha": "27f4ad958cf965f33bc6791395dd77ca1af7fb42",
       "profile": "CONTROL",
       "featureFlags": [],
@@ -37,7 +37,12 @@
       "expectedObservable": "Road/background/vehicle stereo and startup/gameplay remain at R51 level; existing HUD defects may remain.",
       "artifactRef": "github-actions:36007124220/artifact:10811237291",
       "artifactDigest": "sha256:d3b91d61661b78bdcb27a9dc2c9547f21881375a1bc745d866d87a72d260c516",
-      "integrationSha": "060e2ae5ff78503b41d8a38980843dd5003e43bb"
+      "integrationSha": "060e2ae5ff78503b41d8a38980843dd5003e43bb",
+      "binarySha256": "6395a04d126cb2fc6c2c962d2b206574b7e8d4d45aec2dd62092b517178c0fa6",
+      "configSha256": "da1ab4c9f9aa614b8aae8afcd000122ddf77ba2113bdee3ecd8838a563be22b7",
+      "profileLibrarySha256": "872134376d3bfcea22f81d555b4af3444013482fce4afdba67dbb080f09ed843",
+      "configProfileHash": "cb23923cf7f1011ce2bf1d6ac130d51cfcef927c5c0e3552cc1cdef06d56fc47",
+      "note": "Exact candidate package extracted and verified from GitHub Actions artifact 10811237291; dinput8.dll/config/profile-library identities are frozen."
     },
     {
       "slotId": "B_HUD",
@@ -137,5 +142,10 @@
     "B_HUD",
     "C_FLARE"
   ],
-  "testOrderNote": "Order is for efficient user testing only, not a dependency chain. Backend/performance development continues even if HUD/FLARE remains unresolved."
+  "testOrderNote": "Order is for efficient user testing only, not a dependency chain. Backend/performance development continues even if HUD/FLARE remains unresolved.",
+  "identityHashContract": {
+    "algorithm": "SHA256 UTF-8 of configSha256=<ini>\\nprofileLibrarySha256=<OutRunVR-TestProfiles.ps1>\\nprofile=<slot profile>\\n",
+    "configFile": "OutRun2006Tweaks.ini",
+    "profileLibrary": "OutRunVR-TestProfiles.ps1"
+  }
 }
