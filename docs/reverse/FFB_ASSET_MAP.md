@@ -101,3 +101,28 @@ The detailed evidence, stage-specific exceptions and telemetry design are in `do
 6. Replace stage-name FFB special cases only when native material/contact identity is proven and regression-tested.
 
 The FFB layer should preserve four-wheel material identity instead of reducing everything to one max-roughness value when implementing curb/shoulder transitions.
+
+
+## Confirmed Stage COLI0200 material contract
+
+Direct analysis of the user-supplied Stage.zip plus the canonical PC executable closes the previous static-asset gap.
+
+- 72 collision assets: 66 `COLI0200` course files + 6 legacy `COLI0105` background files.
+- `COLI0200` section 2 is the per-collision **materialId byte array**.
+- Canonical PC VA `0x0043ECB8..0x0043ECC7` reads `materialId[collisionIndex]` and returns `surfaceMask = 1u << materialId`.
+- The four contact calls write masks to `EVWORK_CAR+0x24C/+0x250/+0x254/+0x258`.
+- Section 3 is a 64-byte collision geometry record (`vec3 corner[4] + vec3 center + u32 flags`).
+- Section 4 is a 48-byte per-corner-normal record.
+- Section 5 is a one-byte collision subtype/class family; names remain open.
+- Section 6 is a u16 road-section-index family compared against `OnRoadPlace::roadSectionNum`.
+
+Primary-road material IDs are only `0x01, 0x14, 0x16, 0x17` in the supplied 66-stage corpus. In particular:
+- `0x17 -> mask 0x00800000 -> native roughness 0.50` is the snow/ice primary-road family.
+- Snowy Mountain primary road is 88.8% ID 0x17 and 11.2% ordinary ID 0x01.
+- Ice Scape primary road is 100% ID 0x17.
+- `0x16 -> mask 0x00400000` dominates Casino Town and hits the game's explicit Casino roughness exception.
+- `0x14 -> mask 0x00100000 -> roughness 0.71` appears in short primary-road runs at Deep Lake, Tulip Garden and Floral Village.
+
+FFB should therefore prefer the **runtime per-contact raw masks** over stage-name-wide material assumptions. The current snow/ice stage-wide attenuation can be refined to the proven `0x00800000` contact mask after normal FFB branch review/validation.
+
+See `docs/reverse/STAGE_SURFACE_FFB_MAP.md`, `reverse/game_assets/stage_coli_ffb_map.json` and `tools/reverse/analyze_stage_coli.py`.
