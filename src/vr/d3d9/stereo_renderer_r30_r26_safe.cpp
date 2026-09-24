@@ -1033,8 +1033,11 @@ namespace OutRunVRStereo
                 const bool effectiveTwoStep =
                     Settings::SkyGlowTwoStep.get() &&
                     R30SkyGlow.factor > 1;
+                // Horizontal pass writes temp -> reduced, so one-pass glow
+                // must composite reduced. If the optional vertical pass runs it
+                // writes reduced -> temp, making temp the newest result.
                 IDirect3DTexture9* compositeSource =
-                    R30SkyGlow.temp[eye];
+                    R30SkyGlow.reduced[eye];
                 if (effectiveTwoStep)
                 {
                     const float vertical[4]{
@@ -1051,7 +1054,7 @@ namespace OutRunVRStereo
                             R30SkyGlow.reduced[eye],
                             R30SkyGlow.blur, vertical, false);
                     if (ok)
-                        compositeSource = R30SkyGlow.reduced[eye];
+                        compositeSource = R30SkyGlow.temp[eye];
                 }
 
                 const float composite[4]{ 0.38f, 0, 0, 0 };
