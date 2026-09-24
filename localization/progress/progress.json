@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T01:44:00+09:00",
+  "updated_at_kst": "2026-09-25T01:47:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -109,9 +109,10 @@
       "blocked_context_indices": []
     },
     "graphics_artwork": {
-      "status": "not_started",
-      "percent": 0,
+      "status": "proof_candidate_one_ready",
+      "percent": 1.3,
       "completed": 0,
+      "proof_candidate_ready": 1,
       "total": 79
     },
     "graphics_artwork_pipeline": {
@@ -120,9 +121,16 @@
       "proof_specs": 1,
       "final_artwork_completed": 0,
       "total": 80
+    },
+    "graphics_artwork_planning": {
+      "status": "done",
+      "percent": 100,
+      "planned_assets": 79,
+      "translated_segments": 674,
+      "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Pass latest CI; package K3 trace build; user K1/K2/K3 runtime tests; begin deterministic Korean artwork specs/rendering for 79 translated atlases; resolve text IDs 96/97/279/280",
+  "next_checkpoint": "Pass latest CI with artwork-plan integrity and K3 trace compile; create K3 trace package; user K1/K2/K3 tests; begin layout/render specs beyond Continue",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -172,7 +180,10 @@
       "status": "candidate_pending_ingame_validation"
     },
     "blocked_context_assets": 0,
-    "blocked_context_indices": []
+    "blocked_context_indices": [],
+    "artwork_plan_assets": 79,
+    "artwork_plan_segments": 674,
+    "artwork_proof_candidates": 1
   },
   "data_build": {
     "draft_bin_entries": 1356,
