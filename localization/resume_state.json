@@ -1,23 +1,31 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "branch": "korean-localization-prototype",
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "resume_order": [
     "read localization/progress.json",
     "read localization/WORKLOG.md newest checkpoint",
-    "load localization/text/korean_*.jsonl and special_records.json",
-    "load localization/graphics/visual_review.csv",
+    "load localization/text/korean_all.jsonl and localization/text/special_records.json",
+    "load localization/graphics/visual_review.csv and localization/graphics/asset_queue.csv",
+    "run python tools/localization/verify_state.py before editing state",
     "never overwrite original game assets in the repository"
   ],
   "next_actions": [
-    "resolve text IDs 96,97,279,280 using K1 runtime menu context",
-    "package/download K1 trace artifact from CI run 35981045694",
-    "run with [Localization] KoreanTrace=true and collect OutRun2006Tweaks.log",
+    "run OutRun2006Tweaks_KOREAN_K1_TRACE_TEST.zip and collect OutRun2006Tweaks.log",
+    "resolve text IDs 96,97,279,280 from actual runtime menu context",
     "zoom-review the 47 graphics rows marked zoom_review",
-    "create Korean replacement artwork for confirmed localize_text assets",
+    "transcribe and create Korean replacement artwork for 84 confirmed localize_text assets",
     "prototype the 9 font atlases plus Hangul name-entry atlas",
     "after trace confirmation implement K2 single-string Unicode override and K3 minimal Hangul glyph proof"
   ],
+  "k1_trace": {
+    "ci_run_id": 35981045694,
+    "artifact_id": 10800442258,
+    "test_package_sha256": "f54bb11442d3e5d315f0402800f6cadde2eb85ef895f7bc15e9517bb6125814d",
+    "vr_enabled": false,
+    "auto_launch_host": false,
+    "korean_trace": true
+  },
   "data_build": {
     "last_output_sha256": "20d5c3cc245855d55d9dc9bfe90d0269c0ba8c1242b35779f979b974dec56440",
     "last_output_entries": 1356,
