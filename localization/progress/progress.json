@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T00:48:00+09:00",
+  "updated_at_kst": "2026-09-25T01:39:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -56,9 +56,10 @@
     },
     "graphics_localization": {
       "status": "in_progress",
-      "transcription_percent": 62,
+      "transcription_percent": 98.7,
       "final_artwork_percent": 0,
-      "transcribed_assets": 49,
+      "transcribed_assets": 78,
+      "blocked_context_assets": 1,
       "total_artwork_targets": 79
     },
     "runtime_text_trace": {
@@ -87,11 +88,15 @@
       "total": 243
     },
     "graphics_transcription": {
-      "status": "in_progress",
-      "percent": 62,
-      "transcribed_assets": 49,
+      "status": "context_blocked_one_remaining",
+      "percent": 98.7,
+      "transcribed_assets": 78,
       "localize_text_targets": 79,
-      "transcribed_segments": 364
+      "transcribed_segments": 668,
+      "blocked_context_assets": 1,
+      "blocked_context_indices": [
+        152
+      ]
     },
     "graphics_artwork": {
       "status": "not_started",
@@ -107,7 +112,7 @@
       "total": 80
     }
   },
-  "next_checkpoint": "Latest clean CI; user K1 runtime log; then K2 ASCII proof; continue remaining 30/79 graphics transcriptions; validate Continue Korean DDS in-game; design K3 glyph/width hook",
+  "next_checkpoint": "CI with JSONL integrity gate; K1 runtime log and K2 ASCII proof; resolve text IDs 96/97/279/280 and graphics index 152; implement K3 width/glyph trace scaffold; validate first Korean DDS in-game",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -141,8 +146,8 @@
     "work_queue_total": 136,
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
-    "transcribed_assets": 49,
-    "transcribed_segments": 364,
+    "transcribed_assets": 78,
+    "transcribed_segments": 668,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 1,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -155,7 +160,11 @@
       "header_128_byte_identical": true,
       "candidate_sha256": "847aa537f1651239a794b531438cb26e8dd7302738df65c5858f6cf6b55c3999",
       "status": "candidate_pending_ingame_validation"
-    }
+    },
+    "blocked_context_assets": 1,
+    "blocked_context_indices": [
+      152
+    ]
   },
   "data_build": {
     "draft_bin_entries": 1356,
