@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T00:12:00+09:00",
+  "updated_at_kst": "2026-09-25T00:14:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -35,8 +35,12 @@
       "percent": 100
     },
     "text_translation": {
-      "status": "data_complete",
-      "percent": 100
+      "status": "in_progress",
+      "percent": 26.6,
+      "explicit_draft": 180,
+      "exact_match_covered": 361,
+      "total": 1356,
+      "method": "explicit IDs + exact duplicate source propagation"
     },
     "graphics_inventory": {
       "status": "done",
@@ -65,7 +69,7 @@
       "percent": 0
     }
   },
-  "next_checkpoint": "Pass clean build/state/domain CI, then produce clean K1 trace package; continue graphics transcription/artwork in parallel.",
+  "next_checkpoint": "Port signature-gated text trace to clean branch; continue graphic visual review and explicit translation after ID 179",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
