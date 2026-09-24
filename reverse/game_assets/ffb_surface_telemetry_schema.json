@@ -1,6 +1,6 @@
 {
-  "schema": "outrun-ffb-surface-telemetry-v1",
-  "purpose": "Correlate static Stage COLI records with native per-wheel surface masks before changing DD-wheel material behavior.",
+  "schema": "outrun-ffb-surface-telemetry-v2",
+  "purpose": "Correlate confirmed COLI0200 material IDs with the canonical per-contact surfaceMask path and modern DD-wheel output.",
   "runtimeChangeIncluded": false,
   "samplePolicy": {
     "recommended": "emit on any surfaceMask/loadColiType/stage/roadSection change; optional <=10Hz heartbeat",
@@ -42,7 +42,13 @@
       "name": "surfaceMask",
       "type": "uint32[4]",
       "source": "EVWORK_CAR::water_flag_24C[0..3]",
-      "semantic": "per-wheel raw surface identity"
+      "semantic": "four native contact surface masks; canonical EXE proves each mask is 1u << COLI0200 materialId"
+    },
+    {
+      "name": "materialId",
+      "type": "int[4]",
+      "source": "derived from one-hot surfaceMask[i] using countr_zero/bit-scan",
+      "semantic": "exact COLI0200 material byte for nonzero one-hot masks; canonical EXE VA 0x0043ECB8..0x0043ECC7"
     },
     {
       "name": "roughness",
@@ -88,20 +94,20 @@
       "formula": "count(distinct surfaceMask[0..3])"
     },
     {
-      "name": "leftRightSplit",
-      "formula": "compare FL/RL against FR/RR raw masks"
-    },
-    {
-      "name": "frontRearSplit",
-      "formula": "compare FL/FR against RL/RR raw masks"
+      "name": "materialTransition",
+      "formula": "surfaceMask[i] or materialId[i] changed since prior sample"
     }
   ],
-  "wheelOrder": [
-    "FL",
-    "FR",
-    "RL",
-    "RR"
-  ],
+  "wheelOrder": {
+    "status": "OPEN",
+    "indices": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "rule": "Do not label FL/FR/RL/RR until canonical wheel-object ordering is separately proven."
+  },
   "correlationKey": [
     "stageId",
     "roadSectionNum",
@@ -110,14 +116,24 @@
     "surfaceMask"
   ],
   "interpretationRules": [
-    "Raw surfaceMask is the primary identity; roughness is derived intensity evidence.",
-    "Never infer an exact raw mask from ambiguous roughness values such as 0.35 or 0.85.",
-    "Do not assign names like curb/grass/snow until runtime masks correlate with a static COLI field or an independently proven game semantic.",
+    "Canonical EXE proves surfaceMask = 1u << materialId for the selected collision record.",
+    "For a nonzero one-hot surfaceMask, derived materialId is exact and may be used for diagnostics.",
+    "Contact index ordering is not yet proven; keep names contact0..contact3.",
+    "Human labels for non-primary material IDs remain open until driven runtime correlation identifies the physical surface.",
     "Keep DD-wheel feel parameters separate from original Xbox roughness values."
   ],
   "successCriteria": [
     "Repeated passes over the same physical region reproduce the same raw mask pattern.",
     "Forward/reverse stages correlate to equivalent static collision attributes where geometry/material is shared.",
     "A candidate COLI attribute predicts raw surfaceMask transitions across at least two distinct stages before receiving a semantic material name."
-  ]
+  ],
+  "staticCorrelation": {
+    "map": "reverse/game_assets/stage_coli_ffb_map.json",
+    "primaryKnown": {
+      "0x01": "default primary road; mask 0x00000002",
+      "0x14": "special rough primary-road strip; mask 0x00100000; native roughness 0.71",
+      "0x16": "Casino Town primary-road family; mask 0x00400000; Casino exception roughness 0.25",
+      "0x17": "Snow/Ice primary road; mask 0x00800000; native roughness 0.50"
+    }
+  }
 }
