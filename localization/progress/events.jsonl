@@ -17,3 +17,6 @@
 {"ts_kst":"2026-09-25T01:37:00+09:00","event":"graphics_jsonl_boundary_repaired","affected_indices":[241,46],"data_loss":false}
 {"ts_kst":"2026-09-25T01:38:00+09:00","event":"graphics_jsonl_ci_guard_added","checks":["valid_json","unique_indices","asset_count","segment_count"]}
 {"ts_kst":"2026-09-25T01:39:00+09:00","event":"graphics_transcription_checkpoint","transcribed_assets":78,"total_targets":79,"percent":98.7,"segments":668,"blocked_context_indices":[152]}
+{"ts_kst":"2026-09-25T01:40:00+09:00","event":"k3_reverse_engineering_checkpoint","width_va":"0x42C480","pair_va":"0x42C410","advance_va":"0x42C610","draw_va":"0x42C720","ascii_limit":"0x7F"}
+{"ts_kst":"2026-09-25T01:40:00+09:00","event":"hangul_corpus_measured","unique_syllables":505,"page_capacity":256,"pages_required":2}
+{"ts_kst":"2026-09-25T01:40:00+09:00","event":"k3_trace_hooks_added","setting":"KoreanK3Trace","behavior_change":false,"ci_status":"in_progress"}
