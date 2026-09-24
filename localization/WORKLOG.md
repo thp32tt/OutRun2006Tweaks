@@ -63,3 +63,14 @@
 - Clean lineage remains official upstream `08e5efb4deea4066c440307ec009c868a30562d3`.
 - No VR or FFB source/history merged.
 - Prototype K1 evidence retained only as historical evidence; clean K1 revalidation required.
+
+## 2026-09-25 00:13 KST - CP4
+
+- Continued only on `korean-localization-clean`; VR/FFB source remains forbidden by domain policy.
+- Reconciled authoritative progress: Korean draft coverage is 1,355/1,355 non-null IDs; four context-sensitive IDs (96, 97, 279, 280) remain draft pending runtime context.
+- Current-head Domain Isolation Guard and Localization State checks passed before this graphics checkpoint.
+- Visually transcribed four additional common-UI atlases: queue indices 46, 48, 49 and 51.
+- Graphics transcription is now 32/80 direct Korean-artwork targets (40%), 153 text segments.
+- Added stage-name, timer/ghost HUD, stage-rank/bowling and multiplayer mission-HUD Korean text specs.
+- Artwork remains source-preserving metadata only at this checkpoint; no final DDS replacement is marked complete yet.
+- Next: clean CI on latest HEAD, K1 runtime trace, resolve four context-sensitive strings, continue graphics transcription, then first Korean DDS typesetting proof.
