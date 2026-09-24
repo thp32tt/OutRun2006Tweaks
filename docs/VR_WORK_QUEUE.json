@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-24T22:56:00+09:00",
+  "updatedKst": "2026-09-24T23:09:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -95,12 +95,12 @@
     {
       "id": "VR-R51-HUD-SEMANTIC-LIFETIME-001",
       "priority": 13,
-      "status": "READY",
+      "status": "NEED_HMD_TEST",
       "preferredRole": "B_RENDER_REVIEW",
       "summary": "Explain why exact producer tags yield semanticHudAccepted>0 while renderer semanticOverlayBypass stays 0; trace producer/node/queue/c64/draw ordering and design exact lifetime propagation.",
       "testLevel": "LEVEL0",
       "dependencies": [],
-      "attempts": 0,
+      "attempts": 1,
       "runtimeCandidate": false,
       "sourceEvidence": {
         "candidateSha": "8d21824f9502b3354fae679972a90868a0cce562",
@@ -108,7 +108,12 @@
         "semanticHudAccepted": 93681,
         "semanticOverlayBypass": 0
       },
-      "guard": "Do not modify protected R51 world owner; do not create another HMD candidate until ordering evidence explains the contradiction."
+      "guard": "Do not modify protected R51 world owner; do not create another HMD candidate until ordering evidence explains the contradiction.",
+      "candidateBranch": "vr-d3d9ex-candidate/HUD-SEMANTIC-LIFETIME-B-20260924",
+      "candidateSha": "7e2095aa2156f6a9dd301d2899b0e62b4d92f4f1",
+      "validationRunId": 36008480891,
+      "validationResult": "BUILD_VERIFIED",
+      "nextAction": "Run B_HUD/HUD_SCREEN on Quest3; verify semanticOverlayBypass becomes nonzero and HUD diplopia/head-lock improves without R51 world regression."
     },
     {
       "id": "DX9EX-FINGERPRINT-001",
@@ -174,16 +179,21 @@
     {
       "id": "DX9EX-RESET-STATEBLOCK-001",
       "priority": 10,
-      "status": "READY",
+      "status": "DONE",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "R15 retains and reapplies a D3DSBT_ALL state-block object across ResetEx; replace cross-reset COM state-block replay with R13 baseline plus explicit fresh-device state-family replay.",
       "testLevel": "LEVEL0",
       "dependencies": [],
-      "attempts": 0,
-      "runtimeCandidate": true,
+      "attempts": 1,
+      "runtimeCandidate": false,
       "sourceIdentity": "src/vr/d3d9/ex_device_upgrade_r15.cpp@5dc13cf1a84ef9ff9a5081a5dd3351e92ab6c890",
       "preparedPatchBranch": "vr-d3d9ex-candidate/DX9EX-RESET-STATEBLOCK-001-B-20260921T1012KST",
-      "implementationBlocker": "Safe full replacement blob cannot yet be materialized from the Chat connector without reconstructing truncated source excerpts; do not write partial source."
+      "implementationBlocker": "Safe full replacement blob cannot yet be materialized from the Chat connector without reconstructing truncated source excerpts; do not write partial source.",
+      "validationSha": "b536d4022a3afabd7ca00f75ce462c6ed37a3f42",
+      "validationRunId": 36009313286,
+      "validationResult": "BUILD_VERIFIED",
+      "resolution": "Current R15 already uses explicit fresh-device state replay and no pre-Reset D3DSBT_ALL state-block Apply. Durable verifier is persisted on focus.",
+      "nextAction": "Reopen only if verifier fails or Quest3 reset/lost-device runtime evidence regresses."
     },
     {
       "id": "VR-HOST-002",
@@ -219,15 +229,20 @@
     {
       "id": "DX9EX-SKYGLOW-001",
       "priority": 9,
-      "status": "READY",
+      "status": "NEED_HMD_TEST",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "R30 SkyGlow ping-pong composites the texture opposite the last produced blur result: factor=1 selects temp after horizontal temp->reduced, while two-step selects reduced after vertical reduced->temp.",
       "testLevel": "LEVEL0",
       "dependencies": [],
-      "attempts": 0,
+      "attempts": 1,
       "runtimeCandidate": true,
       "sourceIdentity": "src/vr/d3d9/stereo_renderer_r30.cpp@bc7eb2c152d82b3a42df13d8361d31cffe7d31b9",
-      "expectedFix": "After horizontal pass composite reduced; after optional vertical pass composite temp. Add deterministic source/policy verifier before integration."
+      "expectedFix": "Horizontal temp->reduced composites reduced; optional vertical reduced->temp composites temp. Static regression gate added.",
+      "candidateBranch": "vr-d3d9ex-candidate/SKYGLOW-PINGPONG-FIX-20260924",
+      "candidateSha": "c14634f9e1d9f3bf109db900110c129d8aa55d3f",
+      "validationRunId": 36009049710,
+      "validationResult": "BUILD_VERIFIED",
+      "nextAction": "Quest3/VDXR visual check for per-eye SkyGlow; integrate after runtime verification."
     },
     {
       "id": "DX9EX-TEST-HOST-SMOKES-CI-001",
@@ -311,15 +326,20 @@
     {
       "id": "DX9EX-PERF-PRODUCER-FENCE-001",
       "priority": 8,
-      "status": "READY",
+      "status": "NEED_HMD_TEST",
       "preferredRole": "C_PERF_REVIEW",
       "summary": "DirectGPU producer path issues D3D9 EVENT GetData(D3DGETDATA_FLUSH) then polls GetData with SwitchToThread up to ProducerFenceBudgetMs=2 on the game thread; quantify wait cost before changing synchronization semantics.",
       "testLevel": "LEVEL2",
       "dependencies": [],
-      "attempts": 0,
+      "attempts": 1,
       "runtimeCandidate": true,
       "sourceIdentity": "src/vr/d3d9/stereo_renderer_r32.cpp@301f300075f0cb27c7b6daa6f3c205cdc74318a4 + src/vr/d3d9/r32_policy.hpp@bcaae26253033a8d7fdf8ad1188e8086bc4e2344",
-      "expectedFix": "First add bounded wait-count/QPC telemetry or deterministic policy verifier; do not remove producer safety fence without evidence."
+      "expectedFix": "First add bounded wait-count/QPC telemetry or deterministic policy verifier; do not remove producer safety fence without evidence.",
+      "candidateBranch": "vr-d3d9ex-candidate/PERF-FENCE-TELEMETRY-D-20260924",
+      "candidateSha": "2d96a3117a6057bf66b7415c9cda959d80834fd5",
+      "validationRunId": 36008667500,
+      "validationResult": "BUILD_VERIFIED",
+      "nextAction": "Run D_PERF and use fenceSamples/fencePolls/fenceAvgUs/fenceMaxUs to decide whether producer wait is a real frame-time bottleneck."
     },
     {
       "id": "L2-PERF-001",
