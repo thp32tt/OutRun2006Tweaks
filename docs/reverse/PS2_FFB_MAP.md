@@ -4,6 +4,7 @@ Source binaries analyzed:
 
 - `SLPM_666.28` SHA-256 `bc5dd6d836bf34546ef9f047ad2bcb99c5ef5a713767a161d0c342af33f38c34`
 - `IOPRP310.IMG` SHA-256 `1cf5475f533f04d161bbb4b08179df156afeb7b400f207c88dcf1e39466679b6`
+- `SYSTEM.PS2` SHA-256 `a056e2b587530cea1a916a1a04e6ab3f2f7997d8c336e4c16719872e85f7ebc2`
 - ELF entry `0x00100008`
 - GP `0x0043BC70`
 
@@ -36,7 +37,15 @@ Ramp-force diagnostic strings are present, but no direct code XREF is verified y
 
 The ROMDIR image was parsed into the standard runtime modules: SYSMEM, LOADCORE, SIFCMD, SIFMAN, THREADMAN, IOMAN, MODLOAD, FILEIO, CDVDMAN, CDVDFSV, LOADFILE, TIMEMANI, ROMDRV, EESYNC, SYSCLIB and STDIO.
 
-`LGDEV.IRX` is **not** inside this IOPRP image. The EE binary explicitly references that filename, so the disc's `LGDEV.IRX` is the next required binary for the IOP-side Logitech USB/force protocol map. A disc-local `USBD.IRX` is also useful if present.
+`LGDEV.IRX` is not inside IOPRP310 itself, but it has now been recovered from `SYSTEM.PS2` together with `USBD.IRX`. See `docs/reverse/PS2_SYSTEM_MAP.md`.
+
+## SYSTEM.PS2 / IOP-side FFB
+
+`SYSTEM.PS2` hash `0x2BC3970E` maps exactly to `\\IRX\\LGDEV.IRX` and hash `0x5C70405A` maps to `\\IRX\\USBD.IRX` using the recovered executable pack-hash function.
+
+`LGDEV.IRX` SHA-256 is `205e94539293bffe8579b83e09c9e7fb3062fde8216adb7904a4bfac906435e8`. It is an ELF32 little-endian MIPS/R3000 IRX with module/library name `lgdev`, imports `usbd`, and contains the version string `Version 1.12.003 ( Wheel Joystick ), built on Jul  5 2006 at 11:40:35`. Its diagnostics include fixed memory allocations for devices and force effects.
+
+This closes the missing IOP service gap. The next useful reverse pass is to map `lgdev` export/RPC ordinals to effect commands and reconstruct the exact force-effect payload fields/units before transferring any PS2 tuning constants to the PC DirectInput implementation.
 
 ## Map-generation result
 
