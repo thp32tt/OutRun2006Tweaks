@@ -120,3 +120,17 @@
 - Added K3 signature verifier and all six canonical EXE signatures passed against the supplied OR2006C2C.EXE.
 - CI optimization: localization data/docs/tool-only commits no longer enqueue full Win32 builds; C++/INI changes still do.
 - Next: obtain a successful Win32 build containing K3 trace -> package it -> K1/K2/K3 runtime logs -> reuse stock batch queue for first four-glyph Korean render proof -> expand artwork candidates.
+
+## 2026-09-25 01:53 KST - CP8
+
+- K3 trace source compiled successfully on Win32 Release at head `3af9dec1650245272dfd594cad6a8885b11480a6`.
+- Successful workflow run: `36029358510`; artifact: `10820094736`.
+- Found and repaired a configuration serialization defect where literal `\\n` sequences prevented `KoreanK3Trace` from being parsed as a separate INI key. Runtime C++ code was unaffected.
+- Corrected branch INI at commit `d6bfa7c9a15d8448640f5f08402d9b563d0ef534`.
+- Built safe K3 trace package with no game EXE:
+  - `OutRun2_Korean_Clean_K3_Trace.zip`
+  - SHA-256 `695db84089a79cce47693dbb90183dd34202d120db66230ec5f7e335464a0046`
+  - DLL SHA-256 `887d79188c358edba93dc2b4857b4757c6cfa1194b0c1c3c426f3d62bf5fe7cd`
+  - `KoreanTrace=true`, `KoreanProofTextOverride=false`, `KoreanK3Trace=true`.
+- Generated six additional simple-text DDS proof candidates with source header/size preserved; graphics proof candidate count is now 7/79.
+- Next runtime gate: collect K3 log from real game screens, inspect width/glyph/global font state, then implement K3-A `화면 위치` four-glyph rendering through the existing text batch path.
