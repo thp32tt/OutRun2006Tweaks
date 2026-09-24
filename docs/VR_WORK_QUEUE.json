@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-24T23:07:06+09:00",
+  "updatedKst": "2026-09-24T23:08:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -53,6 +53,19 @@
         "F_DX12"
       ],
       "nonBlockingRule": "A failure or delay in HUD/FLARE must not block PERF, DXVK or DX12 implementation/build/test preparation. A backend failure must not block HUD/FLARE work."
+    },
+    "automationCycle": {
+      "mode": "TWO_FULL_CYCLES_PER_HOUR",
+      "schedules": [
+        ":00",
+        ":30"
+      ],
+      "activeTaskIds": [
+        "6ab45eaa511c8191ab7d5984495d7e93",
+        "6ab45ed52f548191b94c90af792116fb"
+      ],
+      "productionIntegrationWip": 1,
+      "rule": "Each cycle performs recover/review/implement/validate/integrate. Remote claim/CAS prevents collisions. Waiting on one lane must not idle the cycle."
     }
   },
   "candidateWip": {
