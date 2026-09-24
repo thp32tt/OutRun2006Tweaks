@@ -495,7 +495,7 @@ namespace OutRunVRStereo
             const R30ScreenSpaceKind screenKind =
                 R30ClassifyScreenSpacePass(device);
             if (R31StateBlockRecording || !R29StableStereoBase(device) ||
-                screenKind == R30ScreenSpaceKind::None)
+                screenKind != R30ScreenSpaceKind::Hud2D)
                 return {};
             if (!R31StateBlockTrackingReliable.load(std::memory_order_acquire))
             {
@@ -652,7 +652,7 @@ namespace OutRunVRStereo
                 return actualDraw();
             }
 
-            if (R30ClassifyScreenSpacePass(device) != R30ScreenSpaceKind::None)
+            if (R30ClassifyScreenSpacePass(device) == R30ScreenSpaceKind::Hud2D)
             {
                 const auto hud = R31TryHud(device,
                     std::forward<ActualDraw>(actualDraw), site);

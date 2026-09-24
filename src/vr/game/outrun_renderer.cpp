@@ -18,6 +18,7 @@
 #include "vr_shared.hpp"
 #include "vr/ipc/host_pose_v3.hpp"
 #include "vr/ipc/cadence_v1.hpp"
+#include "vr/game/render_semantics.hpp"
 
 // Authoritative renderer-side OpenXR head-pose injector for OutRun 2006.
 //
@@ -169,6 +170,10 @@ namespace OutRunVRRenderer
 		std::uint64_t LastGameWvpTopLevelDrawSerial = 0;
 		std::uintptr_t LastGameWvpShaderIdentity = 0;
 		std::uint64_t LastGameWvpShaderSerial = 0;
+		OutRunVR::GameSemantic::RenderScope LastGameWvpSemanticScope =
+			OutRunVR::GameSemantic::RenderScope::None;
+		std::uint64_t LastGameWvpQueueNodeEpoch = 0;
+		const void* LastGameWvpQueueNode = nullptr;
 
 		D3DVECTOR CullingCameraSavedPos{};
 		D3DVECTOR CullingCameraSavedLook{};
@@ -185,6 +190,7 @@ namespace OutRunVRRenderer
 		std::uint64_t WvpUploadSucceededCalls = 0;
 		std::uint64_t WvpUploadFailedCalls = 0;
 		std::uint64_t WvpRejectedCalls = 0;
+		std::uint64_t SemanticOverlayBypassCalls = 0;
 		std::uint64_t UnsafeAddressRejects = 0;
 		std::uint64_t ReusedPoseSceneCalls = 0;
 		std::uint64_t V3PoseReads = 0;
@@ -194,6 +200,7 @@ namespace OutRunVRRenderer
 		bool FirstRejectedLogged = false;
 		bool FirstUnsafeAddressLogged = false;
 		bool FirstUploadFailedLogged = false;
+		bool FirstSemanticOverlayBypassLogged = false;
 		bool CullingUnionFovDeferredLogged = false;
 		bool FirstV3PoseLogged = false;
 		bool FirstV2FallbackLogged = false;
@@ -1183,52 +1190,11 @@ namespace OutRunVRRenderer
 				cameraWorld._43 + forward.z * lookDistance
 			};
 			CullingCameraOverridden = true;
-			if (Settings::VRCullingUnionFov && LatchedStereo.valid &&
-				RendererProjection &&
-				IsWritableRange(const_cast<D3DMATRIX*>(RendererProjection), sizeof(D3DMATRIX)))
+			if (Settings::VRCullingUnionFov && !CullingUnionFovDeferredLogged)
 			{
-				SharedFov unionFov{};
-				unionFov.angleLeft = std::min(
-					LatchedStereo.eyeFov[0].angleLeft,
-					LatchedStereo.eyeFov[1].angleLeft);
-				unionFov.angleRight = std::max(
-					LatchedStereo.eyeFov[0].angleRight,
-					LatchedStereo.eyeFov[1].angleRight);
-				unionFov.angleDown = std::min(
-					LatchedStereo.eyeFov[0].angleDown,
-					LatchedStereo.eyeFov[1].angleDown);
-				unionFov.angleUp = std::max(
-					LatchedStereo.eyeFov[0].angleUp,
-					LatchedStereo.eyeFov[1].angleUp);
-
-				const float margin = std::clamp(
-					Settings::VRCullingUnionMarginDegrees.get(), 0.0f, 15.0f) *
-					(Pi / 180.0f);
-				unionFov.angleLeft = std::max(-1.55f, unionFov.angleLeft - margin);
-				unionFov.angleRight = std::min(1.55f, unionFov.angleRight + margin);
-				unionFov.angleDown = std::max(-1.55f, unionFov.angleDown - margin);
-				unionFov.angleUp = std::min(1.55f, unionFov.angleUp + margin);
-
-				if (FovValid(unionFov))
-				{
-					std::memcpy(&CullingProjectionSaved, RendererProjection,
-						sizeof(CullingProjectionSaved));
-					const D3DMATRIX widened =
-						ProjectionFromFov(CullingProjectionSaved, unionFov);
-					if (MatrixFinite(widened))
-					{
-						std::memcpy(const_cast<D3DMATRIX*>(RendererProjection),
-							&widened, sizeof(widened));
-						CullingProjectionOverridden = true;
-						if (!CullingUnionFovDeferredLogged)
-						{
-							CullingUnionFovDeferredLogged = true;
-							spdlog::info(
-								"VR renderer: two-eye union culling FOV ACTIVE margin={:.1f}deg; stock projection remains authoritative for actual eye rendering",
-								Settings::VRCullingUnionMarginDegrees.get());
-						}
-					}
-				}
+				CullingUnionFovDeferredLogged = true;
+				spdlog::warn(
+					"VR renderer: CullingUnionFov disabled in active rendering after visual-regression evidence; live projection remains untouched until a culling-only frustum boundary is proven");
 			}
 			FrameTelemetryFlags |= ClientCullingCameraSynced;
 		}
@@ -1499,6 +1465,9 @@ namespace OutRunVRRenderer
 			LastGameWvpTopLevelDrawSerial = 0;
 			LastGameWvpShaderIdentity = 0;
 			LastGameWvpShaderSerial = 0;
+			LastGameWvpSemanticScope = OutRunVR::GameSemantic::RenderScope::None;
+			LastGameWvpQueueNodeEpoch = 0;
+			LastGameWvpQueueNode = nullptr;
 		}
 
 		void RecordGameWvpWrite(const float* constants,
@@ -1525,6 +1494,11 @@ namespace OutRunVRRenderer
 			LastGameWvpTopLevelDrawSerial = OutRunVRStereo::GetTopLevelDrawSerial();
 			LastGameWvpShaderIdentity = shaderIdentity;
 			LastGameWvpShaderSerial = shaderSerial;
+			LastGameWvpSemanticScope = OutRunVR::GameSemantic::CurrentScope;
+			LastGameWvpQueueNodeEpoch =
+				OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
+			LastGameWvpQueueNode =
+				OutRunVR::GameSemantic::CurrentQueueNode();
 			LastGameWvpWriteValid = true;
 		}
 
@@ -1554,9 +1528,10 @@ namespace OutRunVRRenderer
 				return;
 			LastSummaryMs = now;
 			spdlog::info(
-				"VR renderer: beginScene={} poseReuse={} c64Candidate={} verified={} prepared={} uploadOk={} uploadFail={} rejected={} unsafe={} latchedSeq={} poseSource={} v3Reads={} v2Fallbacks={} wvpGen={} presentPoseLocked={}",
+				"VR renderer: beginScene={} poseReuse={} c64Candidate={} verified={} prepared={} uploadOk={} uploadFail={} rejected={} semanticOverlayBypass={} unsafe={} latchedSeq={} poseSource={} v3Reads={} v2Fallbacks={} wvpGen={} presentPoseLocked={}",
 				BeginSceneCalls, ReusedPoseSceneCalls, WvpCandidateCalls, WvpVerifiedCalls, WvpPreparedCalls,
 				WvpUploadSucceededCalls, WvpUploadFailedCalls, WvpRejectedCalls,
+				SemanticOverlayBypassCalls,
 				UnsafeAddressRejects, LatchedPoseSequence, LastPoseSourceV3 ? "v3" : "v2",
 				V3PoseReads, V2PoseFallbacks, LastVerifiedWvpGeneration, PresentPoseLocked ? 1 : 0);
 		}
@@ -1636,6 +1611,44 @@ namespace OutRunVRRenderer
 			{
 				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
 					device, startRegister, constantData, vector4fCount);
+			}
+
+			// R51 ownership split: the canonical EXE sprite queue and exact
+			// original-mod world-marker tags identify overlays before this c64
+			// upload. Leave SCREEN_OVERLAY_2D / SCREEN_HUD / WORLD_BILLBOARD
+			// game WVP completely raw here. R30 is then the single owner that
+			// places queue HUD on the finite world-fixed plane or keeps rival
+			// markers in world space. Without this split,
+			// renderer head injection can happen first and R30 applies a second
+			// transform, which is visible as duplicated/misplaced 6th/6 and menus.
+			const auto semanticScope =
+				OutRunVR::GameSemantic::CurrentScope;
+			const bool semanticOverlay =
+				OutRunVR::GameSemantic::CorroboratesHud(semanticScope) ||
+				OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
+					semanticScope) ||
+				OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
+			if (semanticOverlay)
+			{
+				const HRESULT result =
+					SetVertexShaderConstantFHook.stdcall<HRESULT>(
+						device, startRegister, constantData, vector4fCount);
+				if (SUCCEEDED(result))
+				{
+					const UINT wvpOffsetRegisters =
+						OutRunWvpRegister - startRegister;
+					RecordGameWvpWrite(
+						constantData + wvpOffsetRegisters * 4,
+						constantData + wvpOffsetRegisters * 4);
+					++SemanticOverlayBypassCalls;
+					if (!FirstSemanticOverlayBypassLogged)
+					{
+						FirstSemanticOverlayBypassLogged = true;
+						spdlog::info(
+							"VR R51 HUD OWNER: queue overlay c64 kept raw; renderer head injection bypassed so R30 owns exactly one HUD/world-billboard transform");
+					}
+				}
+				return result;
 			}
 
 			float patchedData[256 * 4];
@@ -1839,6 +1852,19 @@ namespace OutRunVRRenderer
 		topLevelDrawSerial = LastGameWvpTopLevelDrawSerial;
 		shaderIdentity = LastGameWvpShaderIdentity;
 		shaderSerial = LastGameWvpShaderSerial;
+		return true;
+	}
+
+	bool GetLastGameWvpSemanticProvenance(
+		OutRunVR::GameSemantic::RenderScope& semanticScope,
+		std::uint64_t& queueNodeEpoch,
+		const void*& queueNode) noexcept
+	{
+		if (!LastGameWvpWriteValid || LastGameWvpWriteSerial == 0)
+			return false;
+		semanticScope = LastGameWvpSemanticScope;
+		queueNodeEpoch = LastGameWvpQueueNodeEpoch;
+		queueNode = LastGameWvpQueueNode;
 		return true;
 	}
 
