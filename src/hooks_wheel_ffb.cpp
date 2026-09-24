@@ -557,18 +557,30 @@ namespace
             const float arcadeSpeedStrength =
                 WheelFFBMath::arcade_speed_strength(speedNorm);
 
-            // A model switch changes the required periodic waveform. Never let
-            // a live Sine object from Modern/Arcade survive into PS2 Triangle,
-            // or vice versa, even if the setting was changed outside F11.
-            if (roadTextureEffect_ &&
-                roadPeriodicIsTriangle_ != ps2Original)
+            // The periodic effect set is model-owned, not just waveform-owned.
+            // Any live model-ID change atomically drops the old set so a
+            // road-only Original model cannot masquerade as a complete
+            // Modern/Hybrid pair, and a stale TireSlip Sine cannot survive in
+            // an Original model. F11/profile transitions already do this too;
+            // this runtime guard covers every other live settings path.
+            const int runtimeModelValue = static_cast<int>(ffbModel);
+            if (activeRuntimeModel_ != runtimeModelValue)
             {
-                disable_periodics();
+                const int previousModel = activeRuntimeModel_;
+                if (activeRuntimeModel_ >= 0 &&
+                    (roadTextureEffect_ || tireSlipEffect_))
+                {
+                    disable_periodics();
+                }
+                activeRuntimeModel_ = runtimeModelValue;
                 periodicRecreateHoldoffUntil_ = 0;
                 updateCounter_ = 59;
-                spdlog::info(
-                    "WheelFFB: force model changed periodic waveform; recreating road effect as {}",
-                    ps2Original ? "GUID_Triangle" : "GUID_Sine");
+                if (previousModel >= 0)
+                {
+                    spdlog::info(
+                        "WheelFFB: live force-model change {} -> {}; recreating model-owned periodic set",
+                        previousModel, runtimeModelValue);
+                }
             }
 
             const float configuredStrength =
@@ -4197,6 +4209,7 @@ namespace
         bool enabledLastTick_ = true;
         bool appActive_ = true;
         bool periodicsActive_ = false;
+        int activeRuntimeModel_ = -1;
         bool directionTested_ = false;
         bool constantCapsKnown_ = false;
         bool springCapsKnown_ = false;
