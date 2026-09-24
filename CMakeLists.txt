@@ -301,6 +301,7 @@ set(outrun2006tweaks_SOURCES
 	"src/hooks_framerate.cpp"
 	"src/hooks_graphics.cpp"
 	"src/hooks_input.cpp"
+	"src/hooks_localization.cpp"
 	"src/hooks_misc.cpp"
 	"src/hooks_textures.cpp"
 	"src/hooks_uiscaling.cpp"

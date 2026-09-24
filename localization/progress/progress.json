@@ -1,6 +1,6 @@
 {
-  "schema_version": 1,
-  "updated_at_kst": "2026-09-25T00:08:00+09:00",
+  "schema_version": 3,
+  "updated_at_kst": "2026-09-25T00:12:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -11,12 +11,7 @@
     "vr_source_present": false,
     "vr_merge_allowed": false,
     "ffb_feature_merge_allowed": false,
-    "shareable_cross_project_data": [
-      "reverse-engineering notes",
-      "stage/material maps",
-      "file format maps",
-      "symbol/address evidence"
-    ]
+    "shared_knowledge_only": true
   },
   "source_archive": {
     "analyzed_files": 324,
@@ -40,15 +35,12 @@
       "percent": 100
     },
     "text_translation": {
-      "status": "in_progress",
-      "percent": 13.3,
-      "translated": 180,
-      "total": 1356
+      "status": "data_complete",
+      "percent": 100
     },
     "graphics_inventory": {
       "status": "done",
-      "percent": 100,
-      "total": 243
+      "percent": 100
     },
     "graphics_localization": {
       "status": "in_progress",
@@ -57,7 +49,7 @@
       "total_categories": 10
     },
     "runtime_text_trace": {
-      "status": "queued",
+      "status": "needs_clean_revalidation",
       "percent": 20
     },
     "unicode_runtime": {
@@ -73,5 +65,57 @@
       "percent": 0
     }
   },
-  "next_checkpoint": "Visual-review front_end/selector/loading/route/name_entry, then extend Korean text draft beyond ID 179"
+  "next_checkpoint": "Pass clean build/state/domain CI, then produce clean K1 trace package; continue graphics transcription/artwork in parallel.",
+  "text": {
+    "total_ids": 1356,
+    "non_null_ids": 1355,
+    "unique_source_strings": 1067,
+    "reviewed": 1347,
+    "reviewed_special": 4,
+    "draft_context": 4,
+    "blocked_null": 1,
+    "todo": 0,
+    "translated_non_null": 1355,
+    "translation_coverage_non_null_percent": 100,
+    "context_review_ids": [
+      96,
+      97,
+      279,
+      280
+    ],
+    "config_text_rows": 23,
+    "config_text_reviewed": 23,
+    "placeholder_qa": "pass"
+  },
+  "graphics": {
+    "total_dds": 243,
+    "visually_reviewed": 243,
+    "localize_text": 80,
+    "preserve_brand_song_credit": 32,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "zoom_review": 47,
+    "no_localization": 74,
+    "work_queue_total": 137,
+    "work_queue_file": "localization/graphics/asset_queue.csv",
+    "artwork_completed": 0,
+    "transcribed_assets": 28,
+    "transcribed_segments": 82,
+    "transcription_state_file": "localization/graphics/transcriptions.jsonl"
+  },
+  "data_build": {
+    "draft_bin_entries": 1356,
+    "draft_bin_size": 58438,
+    "draft_bin_sha256": "20d5c3cc245855d55d9dc9bfe90d0269c0ba8c1242b35779f979b974dec56440",
+    "result": "pass",
+    "deployable": false
+  },
+  "runtime": {
+    "k0_txet_roundtrip": "pass",
+    "k1_trace_hook": "migrated_to_clean_branch",
+    "prototype_k1_ci_run_id": 35981045694,
+    "prototype_evidence_role": "historical_only",
+    "clean_k1_ci": "pending",
+    "hangul_runtime_render": "blocked_pending_clean_runtime_trace_and_font"
+  }
 }

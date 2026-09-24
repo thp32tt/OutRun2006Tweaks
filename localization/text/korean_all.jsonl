@@ -1,0 +1,1356 @@
+{"id":0,"source_hash":"f78c3ccf9e77a537","korean":"화면 위치","status":"reviewed"}
+{"id":1,"source_hash":"405471403cf149ae","korean":"일반 (4:3)","status":"reviewed"}
+{"id":2,"source_hash":"d69439507d729f71","korean":"와이드스크린 (16:9)","status":"reviewed"}
+{"id":3,"source_hash":"48cf1eda418f6134","korean":"범퍼","status":"reviewed"}
+{"id":4,"source_hash":"fd711db814b162cd","korean":"내부","status":"reviewed"}
+{"id":5,"source_hash":"1e20e047fe1f6d7a","korean":"외부","status":"reviewed"}
+{"id":6,"source_hash":"7221454c39bb1886","korean":"km/h","status":"reviewed"}
+{"id":7,"source_hash":"5bb7a231825a8646","korean":"mph","status":"reviewed"}
+{"id":8,"source_hash":"04d69b6b516c48f8","korean":"매우 쉬움","status":"reviewed"}
+{"id":9,"source_hash":"f60d3128cc34a8cc","korean":"쉬움","status":"reviewed"}
+{"id":10,"source_hash":"35e5d117220bb9da","korean":"보통","status":"reviewed"}
+{"id":11,"source_hash":"0370777b33b08617","korean":"어려움","status":"reviewed"}
+{"id":12,"source_hash":"ca01ac69dc25f13e","korean":"매우 어려움","status":"reviewed"}
+{"id":13,"source_hash":"32aee05f2b45bd3b","korean":"영어","status":"reviewed"}
+{"id":14,"source_hash":"96e0f8e16427ba48","korean":"프랑스어","status":"reviewed"}
+{"id":15,"source_hash":"f000f0582099e47a","korean":"이탈리아어","status":"reviewed"}
+{"id":16,"source_hash":"87c485ad57a0f514","korean":"독일어","status":"reviewed"}
+{"id":17,"source_hash":"a3e44beb908392a3","korean":"스페인어","status":"reviewed"}
+{"id":18,"source_hash":"93d0d9cbe5140e57","korean":"켜기","status":"reviewed"}
+{"id":19,"source_hash":"faade486aecf524d","korean":"끄기","status":"reviewed"}
+{"id":20,"source_hash":"7b93fd756f3b97ac","korean":"설정 A","status":"reviewed"}
+{"id":21,"source_hash":"01d5c5fd11347d9c","korean":"설정 B","status":"reviewed"}
+{"id":22,"source_hash":"0642a2a5718fd99e","korean":"설정 C","status":"reviewed"}
+{"id":23,"source_hash":"beaf66928dbc1a00","korean":"설정 D","status":"reviewed"}
+{"id":24,"source_hash":"5e451885494da40b","korean":"설정 E","status":"reviewed"}
+{"id":25,"source_hash":"d41a5d8d446de09c","korean":"설정 F","status":"reviewed"}
+{"id":26,"source_hash":"2b34731144add985","korean":"설정 G","status":"reviewed"}
+{"id":27,"source_hash":"34af8b0970bbf52d","korean":"설정 H","status":"reviewed"}
+{"id":28,"source_hash":"4849abd2ae72426a","korean":"설정 I","status":"reviewed"}
+{"id":29,"source_hash":"aef458f6222ab354","korean":"설정 J","status":"reviewed"}
+{"id":30,"source_hash":"8a2f1ca0bb65c658","korean":"설정 K","status":"reviewed"}
+{"id":31,"source_hash":"65aa902a561c2bf6","korean":"낮음","status":"reviewed"}
+{"id":32,"source_hash":"35e5d117220bb9da","korean":"보통","status":"reviewed"}
+{"id":33,"source_hash":"bcfaa25ee2623cee","korean":"높음","status":"reviewed"}
+{"id":34,"source_hash":"26cdf94961b3f4e4","korean":"OutRun 2006: C2C","status":"reviewed"}
+{"id":35,"source_hash":"35e5d117220bb9da","korean":"보통","status":"reviewed"}
+{"id":36,"source_hash":"ee443e1bbc90675f","korean":"무작위","status":"reviewed"}
+{"id":37,"source_hash":"53d1bbdf848c6542","korean":"온라인","status":"reviewed"}
+{"id":38,"source_hash":"91285de97477e142","korean":"오프라인","status":"reviewed"}
+{"id":39,"source_hash":"312614da52b6920c","korean":"데이터 불러오기","status":"reviewed"}
+{"id":40,"source_hash":"8f3fb6bf0a736ea3","korean":"자동 저장 켜기","status":"reviewed"}
+{"id":41,"source_hash":"c59a2a133d5ce4ac","korean":"자동 저장 끄기","status":"reviewed"}
+{"id":42,"source_hash":"22ebadbcfda57ae0","korean":"게임 설정","status":"reviewed"}
+{"id":43,"source_hash":"665bcc4edd8e7a30","korean":"시점 설정","status":"reviewed"}
+{"id":44,"source_hash":"fc599a0fd301acec","korean":"차량 설정","status":"reviewed"}
+{"id":45,"source_hash":"e7f104e4a1ca4234","korean":"무작위","status":"reviewed"}
+{"id":46,"source_hash":"052a3d9a154c54fa","korean":"게임 시작","status":"reviewed"}
+{"id":47,"source_hash":"5abc5222c9e98854","korean":"유형:","status":"reviewed"}
+{"id":48,"source_hash":"ec146ceafb0e6f1f","korean":"랭크 매치","status":"reviewed"}
+{"id":49,"source_hash":"9ff12d955d75daeb","korean":"일반 매치","status":"reviewed"}
+{"id":50,"source_hash":"ac5a504e229166ec","korean":"국적:","status":"reviewed"}
+{"id":51,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed"}
+{"id":52,"source_hash":"58c52522f0705750","korean":"미국","status":"reviewed"}
+{"id":53,"source_hash":"2c075a0216495e7a","korean":"호주","status":"reviewed"}
+{"id":54,"source_hash":"df06f37673e3ab17","korean":"오스트리아","status":"reviewed"}
+{"id":55,"source_hash":"429aec1f5d273f7c","korean":"벨기에","status":"reviewed"}
+{"id":56,"source_hash":"ef4b9344c9e8ecec","korean":"영국","status":"reviewed"}
+{"id":57,"source_hash":"a4616541888ecf90","korean":"캐나다","status":"reviewed"}
+{"id":58,"source_hash":"3548c3b63fc3a993","korean":"중국","status":"reviewed"}
+{"id":59,"source_hash":"6e8a917f49b887c1","korean":"덴마크","status":"reviewed"}
+{"id":60,"source_hash":"95c411d60c806ee6","korean":"핀란드","status":"reviewed"}
+{"id":61,"source_hash":"8b64af6bd799b049","korean":"프랑스","status":"reviewed"}
+{"id":62,"source_hash":"d4271c8da34ec75b","korean":"독일","status":"reviewed"}
+{"id":63,"source_hash":"3be0afdbaf379232","korean":"홍콩","status":"reviewed"}
+{"id":64,"source_hash":"6e9e2e447e32dcf8","korean":"이탈리아","status":"reviewed"}
+{"id":65,"source_hash":"1cdc198a4d690825","korean":"일본","status":"reviewed"}
+{"id":66,"source_hash":"f1bef188e2dbe191","korean":"멕시코","status":"reviewed"}
+{"id":67,"source_hash":"107d27663af27061","korean":"네덜란드","status":"reviewed"}
+{"id":68,"source_hash":"d216632d114441e7","korean":"뉴질랜드","status":"reviewed"}
+{"id":69,"source_hash":"e64279bb91594b35","korean":"노르웨이","status":"reviewed"}
+{"id":70,"source_hash":"4f5c653c6bfd66b2","korean":"북한","status":"reviewed"}
+{"id":71,"source_hash":"05a5a43164ed54bc","korean":"대한민국","status":"reviewed"}
+{"id":72,"source_hash":"2c1bfab5e25af986","korean":"싱가포르","status":"reviewed"}
+{"id":73,"source_hash":"7985b07451ae6187","korean":"스페인","status":"reviewed"}
+{"id":74,"source_hash":"fc53e20319a73f48","korean":"스웨덴","status":"reviewed"}
+{"id":75,"source_hash":"e7ba36afcabb1ff0","korean":"스위스","status":"reviewed"}
+{"id":76,"source_hash":"f3a27dc76b7523fb","korean":"태국","status":"reviewed"}
+{"id":77,"source_hash":"91145dcb0fb5f470","korean":"로비 이름:","status":"reviewed"}
+{"id":78,"source_hash":"6f0c164fc49669a8","korean":"최대 인원:","status":"reviewed"}
+{"id":79,"source_hash":"dcec3c1bfcf0965a","korean":"2인","status":"reviewed"}
+{"id":80,"source_hash":"97fc153733b9e171","korean":"3인","status":"reviewed"}
+{"id":81,"source_hash":"5cf3007d6a573064","korean":"4인","status":"reviewed"}
+{"id":82,"source_hash":"ef7a7ce9a0d09f29","korean":"5인","status":"reviewed"}
+{"id":83,"source_hash":"67625cb50157d7d9","korean":"6인","status":"reviewed"}
+{"id":84,"source_hash":"9ffccd24516fda96","korean":"친구 슬롯:","status":"reviewed"}
+{"id":85,"source_hash":"4f8320d91e97d546","korean":"0","status":"reviewed"}
+{"id":86,"source_hash":"f860c9cfef11763b","korean":"1개","status":"reviewed"}
+{"id":87,"source_hash":"dcec3c1bfcf0965a","korean":"2개","status":"reviewed"}
+{"id":88,"source_hash":"97fc153733b9e171","korean":"3개","status":"reviewed"}
+{"id":89,"source_hash":"5cf3007d6a573064","korean":"4개","status":"reviewed"}
+{"id":90,"source_hash":"ef7a7ce9a0d09f29","korean":"5개","status":"reviewed"}
+{"id":91,"source_hash":"a25f226a43067aa7","korean":"모드 유형:","status":"reviewed"}
+{"id":92,"source_hash":"36776f911c4e16fc","korean":"레이스","status":"reviewed"}
+{"id":93,"source_hash":"76aa2609b44f7ff5","korean":"녹아웃","status":"reviewed"}
+{"id":94,"source_hash":"b9495b8ecb110270","korean":"드리프트","status":"reviewed"}
+{"id":95,"source_hash":"5dcfa1992a3263e1","korean":"슬립스트림","status":"reviewed"}
+{"id":96,"source_hash":"927bc07107b0b851","korean":"동승자","status":"draft","notes":"online mode title; verify semantics in runtime menu before final"}
+{"id":97,"source_hash":"f422b23ed8f76d28","korean":"차임","status":"draft","notes":"online mode title; verify semantics in runtime menu before final"}
+{"id":98,"source_hash":"51b6cc79c1507560","korean":"코스 유형:","status":"reviewed"}
+{"id":99,"source_hash":"4825ea60f74f0f5f","korean":"아웃런","status":"reviewed"}
+{"id":100,"source_hash":"4c91d1fe8ff2e337","korean":"골","status":"reviewed"}
+{"id":101,"source_hash":"02380949d153da7f","korean":"15 코스 연속","status":"reviewed"}
+{"id":102,"source_hash":"ae0bb2d24f9e4624","korean":"스페셜","status":"reviewed"}
+{"id":103,"source_hash":"90927b7534723b69","korean":"코스:","status":"reviewed"}
+{"id":104,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed"}
+{"id":105,"source_hash":"9a09662d98cfc876","korean":"OUTRUN2","status":"reviewed"}
+{"id":106,"source_hash":"79fc180e9c23fd0c","korean":"OUTRUN2SP","status":"reviewed"}
+{"id":107,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed"}
+{"id":108,"source_hash":"2b7fdd2bf55a3533","korean":"OUTRUN2 골 A","status":"reviewed"}
+{"id":109,"source_hash":"c9f59258fafb09a8","korean":"OUTRUN2 골 B","status":"reviewed"}
+{"id":110,"source_hash":"6e8e2bff5b5b8404","korean":"OUTRUN2 골 C","status":"reviewed"}
+{"id":111,"source_hash":"58437a6e7103701f","korean":"OUTRUN2 골 D","status":"reviewed"}
+{"id":112,"source_hash":"cb5d0d280d7b06fe","korean":"OUTRUN2 골 E","status":"reviewed"}
+{"id":113,"source_hash":"047f7439fef06a28","korean":"OUTRUN2SP 골 A","status":"reviewed"}
+{"id":114,"source_hash":"8a41dbe83862c56f","korean":"OUTRUN2SP 골 B","status":"reviewed"}
+{"id":115,"source_hash":"863ae936ab9e5763","korean":"OUTRUN2SP 골 C","status":"reviewed"}
+{"id":116,"source_hash":"f8f54577af24b03b","korean":"OUTRUN2SP 골 D","status":"reviewed"}
+{"id":117,"source_hash":"cc27d13a36bce3eb","korean":"OUTRUN2SP 골 E","status":"reviewed"}
+{"id":118,"source_hash":"78da24f366c1d68a","korean":"OUTRUN2 골 A(역방향)","status":"reviewed"}
+{"id":119,"source_hash":"5b66909ccbded376","korean":"OUTRUN2 골 B(역방향)","status":"reviewed"}
+{"id":120,"source_hash":"93a84664d6a4b141","korean":"OUTRUN2 골 C(역방향)","status":"reviewed"}
+{"id":121,"source_hash":"7e7bc183870f330a","korean":"OUTRUN2 골 D(역방향)","status":"reviewed"}
+{"id":122,"source_hash":"5bee1269c65315c8","korean":"OUTRUN2 골 E(역방향)","status":"reviewed"}
+{"id":123,"source_hash":"66640ea1846e1acc","korean":"OUTRUN2SP 골 A(역방향)","status":"reviewed"}
+{"id":124,"source_hash":"598bdc80d65c73bb","korean":"OUTRUN2SP 골 B(역방향)","status":"reviewed"}
+{"id":125,"source_hash":"162a37201d552161","korean":"OUTRUN2SP 골 C(역방향)","status":"reviewed"}
+{"id":126,"source_hash":"124c85d3790ba792","korean":"OUTRUN2SP 골 D(역방향)","status":"reviewed"}
+{"id":127,"source_hash":"32a65e28a2ebcbd4","korean":"OUTRUN2SP 골 E(역방향)","status":"reviewed"}
+{"id":128,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed"}
+{"id":129,"source_hash":"51ad1bbd2491d15e","korean":"팜 비치","status":"reviewed"}
+{"id":130,"source_hash":"8029d5f169757322","korean":"딥 레이크","status":"reviewed"}
+{"id":131,"source_hash":"ade1ae6d3e2134f8","korean":"인더스트리얼 컴플렉스","status":"reviewed"}
+{"id":132,"source_hash":"210a0dc83fe97a50","korean":"알파인","status":"reviewed"}
+{"id":133,"source_hash":"dff25583789caaf6","korean":"스노 마운틴","status":"reviewed"}
+{"id":134,"source_hash":"3b71ec53d8bdf8d9","korean":"클라우디 하이랜드","status":"reviewed"}
+{"id":135,"source_hash":"53c0787c03a1596f","korean":"캐슬 월","status":"reviewed"}
+{"id":136,"source_hash":"2dded7b50bab0b8e","korean":"고스트 포레스트","status":"reviewed"}
+{"id":137,"source_hash":"55b84b3820b7b920","korean":"침엽수림","status":"reviewed"}
+{"id":138,"source_hash":"11b5f092f04b97ef","korean":"사막","status":"reviewed"}
+{"id":139,"source_hash":"9180063b4425337e","korean":"튤립 가든","status":"reviewed"}
+{"id":140,"source_hash":"e23d8affe7aa3a59","korean":"메트로폴리스","status":"reviewed"}
+{"id":141,"source_hash":"4f7eaace3f4dd66a","korean":"고대 유적","status":"reviewed"}
+{"id":142,"source_hash":"c526b581d8e4d0c2","korean":"케이프 웨이","status":"reviewed"}
+{"id":143,"source_hash":"95b2f91cc852c7fe","korean":"임페리얼 애비뉴","status":"reviewed"}
+{"id":144,"source_hash":"c5cd3e625ea911f4","korean":"비치","status":"reviewed"}
+{"id":145,"source_hash":"22e8a6ad91079928","korean":"세쿼이아","status":"reviewed"}
+{"id":146,"source_hash":"d7cd25456f39c4b1","korean":"나이아가라","status":"reviewed"}
+{"id":147,"source_hash":"1b26a9090c59fc34","korean":"라스베이거스","status":"reviewed"}
+{"id":148,"source_hash":"6c3a6280096c5c16","korean":"알래스카","status":"reviewed"}
+{"id":149,"source_hash":"dfb76c705623dc8f","korean":"그랜드 캐니언","status":"reviewed"}
+{"id":150,"source_hash":"257679d12f8009ef","korean":"샌프란시스코","status":"reviewed"}
+{"id":151,"source_hash":"75f2e3339fde062d","korean":"아마존","status":"reviewed"}
+{"id":152,"source_hash":"c4716defd4c8d2ae","korean":"마추픽추","status":"reviewed"}
+{"id":153,"source_hash":"c6fd602582015933","korean":"요세미티","status":"reviewed"}
+{"id":154,"source_hash":"36ec9374395412af","korean":"마야","status":"reviewed"}
+{"id":155,"source_hash":"d7e31f677a93e67f","korean":"뉴욕","status":"reviewed"}
+{"id":156,"source_hash":"11d424eb23477d11","korean":"프린스 에드워드","status":"reviewed"}
+{"id":157,"source_hash":"06fb15c6657ce223","korean":"플로리다","status":"reviewed"}
+{"id":158,"source_hash":"890776e1f8b91ca8","korean":"이스터 섬","status":"reviewed"}
+{"id":159,"source_hash":"ad9a8ebfd2c981c6","korean":"팜 비치 (역방향)","status":"reviewed"}
+{"id":160,"source_hash":"3160f07c65f101c9","korean":"딥 레이크 (역방향)","status":"reviewed"}
+{"id":161,"source_hash":"fff5df444087935e","korean":"인더스트리얼 컴플렉스 (역방향)","status":"reviewed"}
+{"id":162,"source_hash":"44a860512d031f99","korean":"알파인 (역방향)","status":"reviewed"}
+{"id":163,"source_hash":"c65531c9a87af2bf","korean":"스노 마운틴 (역방향)","status":"reviewed"}
+{"id":164,"source_hash":"0156760ec3d7a547","korean":"클라우디 하이랜드 (역방향)","status":"reviewed"}
+{"id":165,"source_hash":"7259ca5f04865bf7","korean":"캐슬 월 (역방향)","status":"reviewed"}
+{"id":166,"source_hash":"f03838be3bf8a591","korean":"고스트 포레스트 (역방향)","status":"reviewed"}
+{"id":167,"source_hash":"57a457e2ee44e97c","korean":"침엽수림 (역방향)","status":"reviewed"}
+{"id":168,"source_hash":"7457c02c709cb114","korean":"사막 (역방향)","status":"reviewed"}
+{"id":169,"source_hash":"f6d892d7a6ca6742","korean":"튤립 가든 (역방향)","status":"reviewed"}
+{"id":170,"source_hash":"75ff01c8f88a3d1f","korean":"메트로폴리스 (역방향)","status":"reviewed"}
+{"id":171,"source_hash":"3e1959ddde699cfc","korean":"고대 유적 (역방향)","status":"reviewed"}
+{"id":172,"source_hash":"cff9516d877c4e24","korean":"케이프 웨이 (역방향)","status":"reviewed"}
+{"id":173,"source_hash":"3c6350958de6bd36","korean":"임페리얼 애비뉴 (역방향)","status":"reviewed"}
+{"id":174,"source_hash":"de5a9e9cc0aeced5","korean":"비치 (역방향)","status":"reviewed"}
+{"id":175,"source_hash":"60bed0d55ae17e24","korean":"세쿼이아 (역방향)","status":"reviewed"}
+{"id":176,"source_hash":"f2eda344bb2275ee","korean":"나이아가라 (역방향)","status":"reviewed"}
+{"id":177,"source_hash":"a50a9a58a5de63dc","korean":"라스베이거스 (역방향)","status":"reviewed"}
+{"id":178,"source_hash":"06c6618b673bc7d6","korean":"알래스카 (역방향)","status":"reviewed"}
+{"id":179,"source_hash":"c6a4b9b571a6092a","korean":"그랜드 캐니언 (역방향)","status":"reviewed"}
+{"id":180,"source_hash":"7a6dbb08ab980f21","korean":"샌프란시스코 (역방향)","status":"reviewed"}
+{"id":181,"source_hash":"4e18668948d559c7","korean":"아마존 (역방향)","status":"reviewed"}
+{"id":182,"source_hash":"a6b8b42162cb11c7","korean":"마추픽추 (역방향)","status":"reviewed"}
+{"id":183,"source_hash":"d860378bbe40e97e","korean":"요세미티 (역방향)","status":"reviewed"}
+{"id":184,"source_hash":"3fc6ebd926def74e","korean":"마야 (역방향)","status":"reviewed"}
+{"id":185,"source_hash":"7a50b828aa1ede6c","korean":"뉴욕 (역방향)","status":"reviewed"}
+{"id":186,"source_hash":"a10314e0590a2c76","korean":"프린스 에드워드 (역방향)","status":"reviewed"}
+{"id":187,"source_hash":"8a8c265a98775d62","korean":"플로리다 (역방향)","status":"reviewed"}
+{"id":188,"source_hash":"cd52751c679b160b","korean":"이스터 섬 (역방향)","status":"reviewed"}
+{"id":189,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":190,"source_hash":"9a09662d98cfc876","korean":"OUTRUN2","status":"reviewed","notes":"propagated from identical source string"}
+{"id":191,"source_hash":"79fc180e9c23fd0c","korean":"OUTRUN2SP","status":"reviewed","notes":"propagated from identical source string"}
+{"id":192,"source_hash":"8cdcdc761f3fc8c5","korean":"OUTRUN2 (역방향)","status":"reviewed"}
+{"id":193,"source_hash":"501b41110d9f6ba1","korean":"OUTRUN2SP (역방향)","status":"reviewed"}
+{"id":194,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":195,"source_hash":"487c7dc9be47d087","korean":"전체 스테이지","status":"reviewed"}
+{"id":196,"source_hash":"a71a0f39e6f1af82","korean":"OUTRUN2 믹스","status":"reviewed"}
+{"id":197,"source_hash":"caf1bf63515b9f20","korean":"OUTRUN2SP 믹스","status":"reviewed"}
+{"id":198,"source_hash":"ec5fa5131e2a2596","korean":"랩 수:","status":"reviewed"}
+{"id":199,"source_hash":"40d95a7c7f1655a0","korean":"3","status":"reviewed"}
+{"id":200,"source_hash":"8432386e2c3b0e40","korean":"5","status":"reviewed"}
+{"id":201,"source_hash":"cbff72b7063a71e4","korean":"10","status":"reviewed"}
+{"id":202,"source_hash":"250866022cda91aa","korean":"15","status":"reviewed"}
+{"id":203,"source_hash":"189d75ccfe2e5eec","korean":"차량 클래스:","status":"reviewed"}
+{"id":204,"source_hash":"560b20501f76d467","korean":"자유 선택","status":"reviewed"}
+{"id":205,"source_hash":"f4d3e02d0d317a93","korean":"초급","status":"reviewed"}
+{"id":206,"source_hash":"df966b5315c2ea6f","korean":"중급","status":"reviewed"}
+{"id":207,"source_hash":"c558dab1d7dc0961","korean":"프로","status":"reviewed"}
+{"id":208,"source_hash":"4825ea60f74f0f5f","korean":"아웃런","status":"reviewed","notes":"propagated from identical source string"}
+{"id":209,"source_hash":"6bea1b85c8039049","korean":"차량 유형:","status":"reviewed"}
+{"id":210,"source_hash":"560b20501f76d467","korean":"자유 선택","status":"reviewed"}
+{"id":211,"source_hash":"2bf54b46be4d87af","korean":"OUTRUN 2006","status":"reviewed"}
+{"id":212,"source_hash":"79fc180e9c23fd0c","korean":"OUTRUN2SP","status":"reviewed","notes":"propagated from identical source string"}
+{"id":213,"source_hash":"ffdc379663b7f337","korean":"추격 보정:","status":"reviewed"}
+{"id":214,"source_hash":"93d0d9cbe5140e57","korean":"켜기","status":"reviewed","notes":"propagated from identical source string"}
+{"id":215,"source_hash":"faade486aecf524d","korean":"끄기","status":"reviewed","notes":"propagated from identical source string"}
+{"id":216,"source_hash":"bfc147d52e8251c2","korean":"슬립스트림:","status":"reviewed"}
+{"id":217,"source_hash":"93d0d9cbe5140e57","korean":"켜기","status":"reviewed","notes":"propagated from identical source string"}
+{"id":218,"source_hash":"faade486aecf524d","korean":"끄기","status":"reviewed","notes":"propagated from identical source string"}
+{"id":219,"source_hash":"8130f740cff7ea98","korean":"충돌:","status":"reviewed"}
+{"id":220,"source_hash":"93d0d9cbe5140e57","korean":"켜기","status":"reviewed","notes":"propagated from identical source string"}
+{"id":221,"source_hash":"faade486aecf524d","korean":"끄기","status":"reviewed","notes":"propagated from identical source string"}
+{"id":222,"source_hash":"50d2977efba4322d","korean":"트래픽:","status":"reviewed"}
+{"id":223,"source_hash":"89762610bdb9fd53","korean":"없음","status":"reviewed"}
+{"id":224,"source_hash":"65aa902a561c2bf6","korean":"낮음","status":"reviewed","notes":"propagated from identical source string"}
+{"id":225,"source_hash":"bcfaa25ee2623cee","korean":"높음","status":"reviewed","notes":"propagated from identical source string"}
+{"id":226,"source_hash":"dfa03b08b0bee58e","korean":"완료","status":"reviewed"}
+{"id":227,"source_hash":"5abc5222c9e98854","korean":"유형:","status":"reviewed","notes":"propagated from identical source string"}
+{"id":228,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":229,"source_hash":"ec146ceafb0e6f1f","korean":"랭크 매치","status":"reviewed","notes":"propagated from identical source string"}
+{"id":230,"source_hash":"9ff12d955d75daeb","korean":"일반 매치","status":"reviewed","notes":"propagated from identical source string"}
+{"id":231,"source_hash":"ac5a504e229166ec","korean":"국적:","status":"reviewed","notes":"propagated from identical source string"}
+{"id":232,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":233,"source_hash":"58c52522f0705750","korean":"미국","status":"reviewed","notes":"propagated from identical source string"}
+{"id":234,"source_hash":"2c075a0216495e7a","korean":"호주","status":"reviewed","notes":"propagated from identical source string"}
+{"id":235,"source_hash":"df06f37673e3ab17","korean":"오스트리아","status":"reviewed","notes":"propagated from identical source string"}
+{"id":236,"source_hash":"429aec1f5d273f7c","korean":"벨기에","status":"reviewed","notes":"propagated from identical source string"}
+{"id":237,"source_hash":"ef4b9344c9e8ecec","korean":"영국","status":"reviewed","notes":"propagated from identical source string"}
+{"id":238,"source_hash":"a4616541888ecf90","korean":"캐나다","status":"reviewed","notes":"propagated from identical source string"}
+{"id":239,"source_hash":"3548c3b63fc3a993","korean":"중국","status":"reviewed","notes":"propagated from identical source string"}
+{"id":240,"source_hash":"6e8a917f49b887c1","korean":"덴마크","status":"reviewed","notes":"propagated from identical source string"}
+{"id":241,"source_hash":"95c411d60c806ee6","korean":"핀란드","status":"reviewed","notes":"propagated from identical source string"}
+{"id":242,"source_hash":"8b64af6bd799b049","korean":"프랑스","status":"reviewed","notes":"propagated from identical source string"}
+{"id":243,"source_hash":"d4271c8da34ec75b","korean":"독일","status":"reviewed","notes":"propagated from identical source string"}
+{"id":244,"source_hash":"3be0afdbaf379232","korean":"홍콩","status":"reviewed","notes":"propagated from identical source string"}
+{"id":245,"source_hash":"6e9e2e447e32dcf8","korean":"이탈리아","status":"reviewed","notes":"propagated from identical source string"}
+{"id":246,"source_hash":"1cdc198a4d690825","korean":"일본","status":"reviewed","notes":"propagated from identical source string"}
+{"id":247,"source_hash":"f1bef188e2dbe191","korean":"멕시코","status":"reviewed","notes":"propagated from identical source string"}
+{"id":248,"source_hash":"107d27663af27061","korean":"네덜란드","status":"reviewed","notes":"propagated from identical source string"}
+{"id":249,"source_hash":"d216632d114441e7","korean":"뉴질랜드","status":"reviewed","notes":"propagated from identical source string"}
+{"id":250,"source_hash":"e64279bb91594b35","korean":"노르웨이","status":"reviewed","notes":"propagated from identical source string"}
+{"id":251,"source_hash":"4f5c653c6bfd66b2","korean":"북한","status":"reviewed","notes":"propagated from identical source string"}
+{"id":252,"source_hash":"05a5a43164ed54bc","korean":"대한민국","status":"reviewed","notes":"propagated from identical source string"}
+{"id":253,"source_hash":"2c1bfab5e25af986","korean":"싱가포르","status":"reviewed","notes":"propagated from identical source string"}
+{"id":254,"source_hash":"7985b07451ae6187","korean":"스페인","status":"reviewed","notes":"propagated from identical source string"}
+{"id":255,"source_hash":"fc53e20319a73f48","korean":"스웨덴","status":"reviewed","notes":"propagated from identical source string"}
+{"id":256,"source_hash":"e7ba36afcabb1ff0","korean":"스위스","status":"reviewed","notes":"propagated from identical source string"}
+{"id":257,"source_hash":"f3a27dc76b7523fb","korean":"태국","status":"reviewed","notes":"propagated from identical source string"}
+{"id":258,"source_hash":"91145dcb0fb5f470","korean":"로비 이름:","status":"reviewed","notes":"propagated from identical source string"}
+{"id":259,"source_hash":"6f0c164fc49669a8","korean":"최대 인원:","status":"reviewed","notes":"propagated from identical source string"}
+{"id":260,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":261,"source_hash":"dcec3c1bfcf0965a","korean":"2인","status":"reviewed"}
+{"id":262,"source_hash":"97fc153733b9e171","korean":"3인","status":"reviewed"}
+{"id":263,"source_hash":"5cf3007d6a573064","korean":"4인","status":"reviewed"}
+{"id":264,"source_hash":"ef7a7ce9a0d09f29","korean":"5인","status":"reviewed"}
+{"id":265,"source_hash":"67625cb50157d7d9","korean":"6인","status":"reviewed"}
+{"id":266,"source_hash":"116ce2f36ce9f350","korean":"친구 슬롯:","status":"reviewed"}
+{"id":267,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":268,"source_hash":"f860c9cfef11763b","korean":"1개","status":"reviewed"}
+{"id":269,"source_hash":"dcec3c1bfcf0965a","korean":"2개","status":"reviewed"}
+{"id":270,"source_hash":"97fc153733b9e171","korean":"3개","status":"reviewed"}
+{"id":271,"source_hash":"5cf3007d6a573064","korean":"4개","status":"reviewed"}
+{"id":272,"source_hash":"ef7a7ce9a0d09f29","korean":"5개","status":"reviewed"}
+{"id":273,"source_hash":"a25f226a43067aa7","korean":"모드 유형:","status":"reviewed","notes":"propagated from identical source string"}
+{"id":274,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":275,"source_hash":"36776f911c4e16fc","korean":"레이스","status":"reviewed","notes":"propagated from identical source string"}
+{"id":276,"source_hash":"76aa2609b44f7ff5","korean":"녹아웃","status":"reviewed","notes":"propagated from identical source string"}
+{"id":277,"source_hash":"b9495b8ecb110270","korean":"드리프트","status":"reviewed","notes":"propagated from identical source string"}
+{"id":278,"source_hash":"5dcfa1992a3263e1","korean":"슬립스트림","status":"reviewed","notes":"propagated from identical source string"}
+{"id":279,"source_hash":"927bc07107b0b851","korean":"동승자","status":"draft","notes":"online mode title; verify semantics in runtime menu before final"}
+{"id":280,"source_hash":"f422b23ed8f76d28","korean":"차임","status":"draft","notes":"online mode title; verify semantics in runtime menu before final"}
+{"id":281,"source_hash":"51b6cc79c1507560","korean":"코스 유형:","status":"reviewed","notes":"propagated from identical source string"}
+{"id":282,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":283,"source_hash":"4825ea60f74f0f5f","korean":"아웃런","status":"reviewed","notes":"propagated from identical source string"}
+{"id":284,"source_hash":"dd1646c68f9cba3d","korean":"루트 / 믹스","status":"reviewed"}
+{"id":285,"source_hash":"4c91d1fe8ff2e337","korean":"골","status":"reviewed","notes":"propagated from identical source string"}
+{"id":286,"source_hash":"02380949d153da7f","korean":"15 코스 연속","status":"reviewed","notes":"propagated from identical source string"}
+{"id":287,"source_hash":"ae0bb2d24f9e4624","korean":"스페셜","status":"reviewed","notes":"propagated from identical source string"}
+{"id":288,"source_hash":"90927b7534723b69","korean":"코스:","status":"reviewed","notes":"propagated from identical source string"}
+{"id":289,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":290,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":291,"source_hash":"9a09662d98cfc876","korean":"OUTRUN2","status":"reviewed","notes":"propagated from identical source string"}
+{"id":292,"source_hash":"79fc180e9c23fd0c","korean":"OUTRUN2SP","status":"reviewed","notes":"propagated from identical source string"}
+{"id":293,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":294,"source_hash":"2b7fdd2bf55a3533","korean":"OUTRUN2 골 A","status":"reviewed","notes":"propagated from identical source string"}
+{"id":295,"source_hash":"c9f59258fafb09a8","korean":"OUTRUN2 골 B","status":"reviewed","notes":"propagated from identical source string"}
+{"id":296,"source_hash":"6e8e2bff5b5b8404","korean":"OUTRUN2 골 C","status":"reviewed","notes":"propagated from identical source string"}
+{"id":297,"source_hash":"58437a6e7103701f","korean":"OUTRUN2 골 D","status":"reviewed","notes":"propagated from identical source string"}
+{"id":298,"source_hash":"cb5d0d280d7b06fe","korean":"OUTRUN2 골 E","status":"reviewed","notes":"propagated from identical source string"}
+{"id":299,"source_hash":"047f7439fef06a28","korean":"OUTRUN2SP 골 A","status":"reviewed","notes":"propagated from identical source string"}
+{"id":300,"source_hash":"8a41dbe83862c56f","korean":"OUTRUN2SP 골 B","status":"reviewed","notes":"propagated from identical source string"}
+{"id":301,"source_hash":"863ae936ab9e5763","korean":"OUTRUN2SP 골 C","status":"reviewed","notes":"propagated from identical source string"}
+{"id":302,"source_hash":"f8f54577af24b03b","korean":"OUTRUN2SP 골 D","status":"reviewed","notes":"propagated from identical source string"}
+{"id":303,"source_hash":"cc27d13a36bce3eb","korean":"OUTRUN2SP 골 E","status":"reviewed","notes":"propagated from identical source string"}
+{"id":304,"source_hash":"78da24f366c1d68a","korean":"OUTRUN2 골 A(역방향)","status":"reviewed","notes":"propagated from identical source string"}
+{"id":305,"source_hash":"5b66909ccbded376","korean":"OUTRUN2 골 B(역방향)","status":"reviewed","notes":"propagated from identical source string"}
+{"id":306,"source_hash":"93a84664d6a4b141","korean":"OUTRUN2 골 C(역방향)","status":"reviewed","notes":"propagated from identical source string"}
+{"id":307,"source_hash":"7e7bc183870f330a","korean":"OUTRUN2 골 D(역방향)","status":"reviewed","notes":"propagated from identical source string"}
+{"id":308,"source_hash":"5bee1269c65315c8","korean":"OUTRUN2 골 E(역방향)","status":"reviewed","notes":"propagated from identical source string"}
+{"id":309,"source_hash":"66640ea1846e1acc","korean":"OUTRUN2SP 골 A(역방향)","status":"reviewed","notes":"propagated from identical source string"}
+{"id":310,"source_hash":"598bdc80d65c73bb","korean":"OUTRUN2SP 골 B(역방향)","status":"reviewed","notes":"propagated from identical source string"}
+{"id":311,"source_hash":"162a37201d552161","korean":"OUTRUN2SP 골 C(역방향)","status":"reviewed","notes":"propagated from identical source string"}
+{"id":312,"source_hash":"124c85d3790ba792","korean":"OUTRUN2SP 골 D(역방향)","status":"reviewed","notes":"propagated from identical source string"}
+{"id":313,"source_hash":"32a65e28a2ebcbd4","korean":"OUTRUN2SP 골 E(역방향)","status":"reviewed","notes":"propagated from identical source string"}
+{"id":314,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":315,"source_hash":"51ad1bbd2491d15e","korean":"팜 비치","status":"reviewed","notes":"propagated from identical source string"}
+{"id":316,"source_hash":"8029d5f169757322","korean":"딥 레이크","status":"reviewed","notes":"propagated from identical source string"}
+{"id":317,"source_hash":"ade1ae6d3e2134f8","korean":"인더스트리얼 컴플렉스","status":"reviewed","notes":"propagated from identical source string"}
+{"id":318,"source_hash":"210a0dc83fe97a50","korean":"알파인","status":"reviewed","notes":"propagated from identical source string"}
+{"id":319,"source_hash":"dff25583789caaf6","korean":"스노 마운틴","status":"reviewed","notes":"propagated from identical source string"}
+{"id":320,"source_hash":"3b71ec53d8bdf8d9","korean":"클라우디 하이랜드","status":"reviewed","notes":"propagated from identical source string"}
+{"id":321,"source_hash":"53c0787c03a1596f","korean":"캐슬 월","status":"reviewed","notes":"propagated from identical source string"}
+{"id":322,"source_hash":"2dded7b50bab0b8e","korean":"고스트 포레스트","status":"reviewed","notes":"propagated from identical source string"}
+{"id":323,"source_hash":"55b84b3820b7b920","korean":"침엽수림","status":"reviewed","notes":"propagated from identical source string"}
+{"id":324,"source_hash":"11b5f092f04b97ef","korean":"사막","status":"reviewed","notes":"propagated from identical source string"}
+{"id":325,"source_hash":"9180063b4425337e","korean":"튤립 가든","status":"reviewed","notes":"propagated from identical source string"}
+{"id":326,"source_hash":"e23d8affe7aa3a59","korean":"메트로폴리스","status":"reviewed","notes":"propagated from identical source string"}
+{"id":327,"source_hash":"4f7eaace3f4dd66a","korean":"고대 유적","status":"reviewed","notes":"propagated from identical source string"}
+{"id":328,"source_hash":"c526b581d8e4d0c2","korean":"케이프 웨이","status":"reviewed","notes":"propagated from identical source string"}
+{"id":329,"source_hash":"95b2f91cc852c7fe","korean":"임페리얼 애비뉴","status":"reviewed","notes":"propagated from identical source string"}
+{"id":330,"source_hash":"c5cd3e625ea911f4","korean":"비치","status":"reviewed","notes":"propagated from identical source string"}
+{"id":331,"source_hash":"22e8a6ad91079928","korean":"세쿼이아","status":"reviewed","notes":"propagated from identical source string"}
+{"id":332,"source_hash":"d7cd25456f39c4b1","korean":"나이아가라","status":"reviewed","notes":"propagated from identical source string"}
+{"id":333,"source_hash":"1b26a9090c59fc34","korean":"라스베이거스","status":"reviewed","notes":"propagated from identical source string"}
+{"id":334,"source_hash":"6c3a6280096c5c16","korean":"알래스카","status":"reviewed","notes":"propagated from identical source string"}
+{"id":335,"source_hash":"dfb76c705623dc8f","korean":"그랜드 캐니언","status":"reviewed","notes":"propagated from identical source string"}
+{"id":336,"source_hash":"257679d12f8009ef","korean":"샌프란시스코","status":"reviewed","notes":"propagated from identical source string"}
+{"id":337,"source_hash":"75f2e3339fde062d","korean":"아마존","status":"reviewed","notes":"propagated from identical source string"}
+{"id":338,"source_hash":"c4716defd4c8d2ae","korean":"마추픽추","status":"reviewed","notes":"propagated from identical source string"}
+{"id":339,"source_hash":"c6fd602582015933","korean":"요세미티","status":"reviewed","notes":"propagated from identical source string"}
+{"id":340,"source_hash":"36ec9374395412af","korean":"마야","status":"reviewed","notes":"propagated from identical source string"}
+{"id":341,"source_hash":"d7e31f677a93e67f","korean":"뉴욕","status":"reviewed","notes":"propagated from identical source string"}
+{"id":342,"source_hash":"11d424eb23477d11","korean":"프린스 에드워드","status":"reviewed","notes":"propagated from identical source string"}
+{"id":343,"source_hash":"06fb15c6657ce223","korean":"플로리다","status":"reviewed","notes":"propagated from identical source string"}
+{"id":344,"source_hash":"890776e1f8b91ca8","korean":"이스터 섬","status":"reviewed","notes":"propagated from identical source string"}
+{"id":345,"source_hash":"ad9a8ebfd2c981c6","korean":"팜 비치 (역방향)","status":"reviewed"}
+{"id":346,"source_hash":"3160f07c65f101c9","korean":"딥 레이크 (역방향)","status":"reviewed"}
+{"id":347,"source_hash":"fff5df444087935e","korean":"인더스트리얼 컴플렉스 (역방향)","status":"reviewed"}
+{"id":348,"source_hash":"44a860512d031f99","korean":"알파인 (역방향)","status":"reviewed"}
+{"id":349,"source_hash":"c65531c9a87af2bf","korean":"스노 마운틴 (역방향)","status":"reviewed"}
+{"id":350,"source_hash":"0156760ec3d7a547","korean":"클라우디 하이랜드 (역방향)","status":"reviewed"}
+{"id":351,"source_hash":"7259ca5f04865bf7","korean":"캐슬 월 (역방향)","status":"reviewed"}
+{"id":352,"source_hash":"f03838be3bf8a591","korean":"고스트 포레스트 (역방향)","status":"reviewed"}
+{"id":353,"source_hash":"57a457e2ee44e97c","korean":"침엽수림 (역방향)","status":"reviewed"}
+{"id":354,"source_hash":"7457c02c709cb114","korean":"사막 (역방향)","status":"reviewed"}
+{"id":355,"source_hash":"f6d892d7a6ca6742","korean":"튤립 가든 (역방향)","status":"reviewed"}
+{"id":356,"source_hash":"75ff01c8f88a3d1f","korean":"메트로폴리스 (역방향)","status":"reviewed"}
+{"id":357,"source_hash":"3e1959ddde699cfc","korean":"고대 유적 (역방향)","status":"reviewed"}
+{"id":358,"source_hash":"cff9516d877c4e24","korean":"케이프 웨이 (역방향)","status":"reviewed"}
+{"id":359,"source_hash":"3c6350958de6bd36","korean":"임페리얼 애비뉴 (역방향)","status":"reviewed"}
+{"id":360,"source_hash":"de5a9e9cc0aeced5","korean":"비치 (역방향)","status":"reviewed"}
+{"id":361,"source_hash":"60bed0d55ae17e24","korean":"세쿼이아 (역방향)","status":"reviewed"}
+{"id":362,"source_hash":"f2eda344bb2275ee","korean":"나이아가라 (역방향)","status":"reviewed"}
+{"id":363,"source_hash":"a50a9a58a5de63dc","korean":"라스베이거스 (역방향)","status":"reviewed"}
+{"id":364,"source_hash":"06c6618b673bc7d6","korean":"알래스카 (역방향)","status":"reviewed"}
+{"id":365,"source_hash":"c6a4b9b571a6092a","korean":"그랜드 캐니언 (역방향)","status":"reviewed"}
+{"id":366,"source_hash":"7a6dbb08ab980f21","korean":"샌프란시스코 (역방향)","status":"reviewed"}
+{"id":367,"source_hash":"4e18668948d559c7","korean":"아마존 (역방향)","status":"reviewed"}
+{"id":368,"source_hash":"a6b8b42162cb11c7","korean":"마추픽추 (역방향)","status":"reviewed"}
+{"id":369,"source_hash":"d860378bbe40e97e","korean":"요세미티 (역방향)","status":"reviewed"}
+{"id":370,"source_hash":"3fc6ebd926def74e","korean":"마야 (역방향)","status":"reviewed"}
+{"id":371,"source_hash":"7a50b828aa1ede6c","korean":"뉴욕 (역방향)","status":"reviewed"}
+{"id":372,"source_hash":"a10314e0590a2c76","korean":"프린스 에드워드 (역방향)","status":"reviewed"}
+{"id":373,"source_hash":"8a8c265a98775d62","korean":"플로리다 (역방향)","status":"reviewed"}
+{"id":374,"source_hash":"cd52751c679b160b","korean":"이스터 섬 (역방향)","status":"reviewed"}
+{"id":375,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":376,"source_hash":"9a09662d98cfc876","korean":"OUTRUN2","status":"reviewed","notes":"propagated from identical source string"}
+{"id":377,"source_hash":"79fc180e9c23fd0c","korean":"OUTRUN2SP","status":"reviewed","notes":"propagated from identical source string"}
+{"id":378,"source_hash":"8cdcdc761f3fc8c5","korean":"OUTRUN2 (역방향)","status":"reviewed"}
+{"id":379,"source_hash":"501b41110d9f6ba1","korean":"OUTRUN2SP (역방향)","status":"reviewed"}
+{"id":380,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":381,"source_hash":"487c7dc9be47d087","korean":"전체 스테이지","status":"reviewed"}
+{"id":382,"source_hash":"a71a0f39e6f1af82","korean":"OUTRUN2 믹스","status":"reviewed"}
+{"id":383,"source_hash":"caf1bf63515b9f20","korean":"OUTRUN2SP 믹스","status":"reviewed"}
+{"id":384,"source_hash":"ec5fa5131e2a2596","korean":"랩 수:","status":"reviewed"}
+{"id":385,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":386,"source_hash":"40d95a7c7f1655a0","korean":"3","status":"reviewed"}
+{"id":387,"source_hash":"8432386e2c3b0e40","korean":"5","status":"reviewed"}
+{"id":388,"source_hash":"cbff72b7063a71e4","korean":"10","status":"reviewed"}
+{"id":389,"source_hash":"250866022cda91aa","korean":"15","status":"reviewed"}
+{"id":390,"source_hash":"189d75ccfe2e5eec","korean":"차량 클래스:","status":"reviewed"}
+{"id":391,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":392,"source_hash":"560b20501f76d467","korean":"자유 선택","status":"reviewed"}
+{"id":393,"source_hash":"f4d3e02d0d317a93","korean":"초급","status":"reviewed"}
+{"id":394,"source_hash":"df966b5315c2ea6f","korean":"중급","status":"reviewed"}
+{"id":395,"source_hash":"c558dab1d7dc0961","korean":"프로","status":"reviewed"}
+{"id":396,"source_hash":"4825ea60f74f0f5f","korean":"아웃런","status":"reviewed","notes":"propagated from identical source string"}
+{"id":397,"source_hash":"6bea1b85c8039049","korean":"차량 유형:","status":"reviewed"}
+{"id":398,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":399,"source_hash":"560b20501f76d467","korean":"자유 선택","status":"reviewed"}
+{"id":400,"source_hash":"2bf54b46be4d87af","korean":"OUTRUN 2006","status":"reviewed"}
+{"id":401,"source_hash":"79fc180e9c23fd0c","korean":"OUTRUN2SP","status":"reviewed","notes":"propagated from identical source string"}
+{"id":402,"source_hash":"ffdc379663b7f337","korean":"추격 보정:","status":"reviewed"}
+{"id":403,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":404,"source_hash":"93d0d9cbe5140e57","korean":"켜기","status":"reviewed","notes":"propagated from identical source string"}
+{"id":405,"source_hash":"faade486aecf524d","korean":"끄기","status":"reviewed","notes":"propagated from identical source string"}
+{"id":406,"source_hash":"bfc147d52e8251c2","korean":"슬립스트림:","status":"reviewed"}
+{"id":407,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":408,"source_hash":"93d0d9cbe5140e57","korean":"켜기","status":"reviewed","notes":"propagated from identical source string"}
+{"id":409,"source_hash":"faade486aecf524d","korean":"끄기","status":"reviewed","notes":"propagated from identical source string"}
+{"id":410,"source_hash":"8130f740cff7ea98","korean":"충돌:","status":"reviewed"}
+{"id":411,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":412,"source_hash":"93d0d9cbe5140e57","korean":"켜기","status":"reviewed","notes":"propagated from identical source string"}
+{"id":413,"source_hash":"faade486aecf524d","korean":"끄기","status":"reviewed","notes":"propagated from identical source string"}
+{"id":414,"source_hash":"50d2977efba4322d","korean":"트래픽:","status":"reviewed"}
+{"id":415,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
+{"id":416,"source_hash":"89762610bdb9fd53","korean":"없음","status":"reviewed"}
+{"id":417,"source_hash":"65aa902a561c2bf6","korean":"낮음","status":"reviewed","notes":"propagated from identical source string"}
+{"id":418,"source_hash":"bcfaa25ee2623cee","korean":"높음","status":"reviewed","notes":"propagated from identical source string"}
+{"id":419,"source_hash":"1e6833e8973e1790","korean":"검색","status":"reviewed"}
+{"id":420,"source_hash":"78622bf0b8de7535","korean":"차량:","status":"reviewed"}
+{"id":421,"source_hash":"0b49daf5e060b78d","korean":"F50","status":"reviewed"}
+{"id":422,"source_hash":"bf9458e9f487a4d9","korean":"DINO 246 GTS","status":"reviewed"}
+{"id":423,"source_hash":"1d15faf337a15a30","korean":"288 GTO","status":"reviewed"}
+{"id":424,"source_hash":"012cabda51d0388a","korean":"512 BB","status":"reviewed"}
+{"id":425,"source_hash":"e75854a560a072fc","korean":"365 GTS/4 DAYTONA","status":"reviewed"}
+{"id":426,"source_hash":"cbbd0e484a3e26e2","korean":"ENZO FERRARI","status":"reviewed"}
+{"id":427,"source_hash":"cb3d1e0e47061e6b","korean":"TESTAROSSA","status":"reviewed"}
+{"id":428,"source_hash":"97bf3931cd5f43df","korean":"360 SPIDER","status":"reviewed"}
+{"id":429,"source_hash":"06592e69c4275b7e","korean":"F40","status":"reviewed"}
+{"id":430,"source_hash":"637647b90bfd4c36","korean":"250 GTO","status":"reviewed"}
+{"id":431,"source_hash":"76374a87e8037fc5","korean":"F355 SPIDER","status":"reviewed"}
+{"id":432,"source_hash":"9436736076a9cabe","korean":"328 GTS","status":"reviewed"}
+{"id":433,"source_hash":"9b5ceafee50d18ce","korean":"F430","status":"reviewed"}
+{"id":434,"source_hash":"8ef1793fdfc8fbe5","korean":"550 BARCHETTA","status":"reviewed"}
+{"id":435,"source_hash":"9bd4343896aeb6cc","korean":"SUPERAMERICA","status":"reviewed"}
+{"id":436,"source_hash":"ce972175602a6061","korean":"F50 (OR)","status":"reviewed"}
+{"id":437,"source_hash":"1c0499b334ba2fae","korean":"DINO 246 GTS (OR)","status":"reviewed"}
+{"id":438,"source_hash":"7ae7c5b745c16781","korean":"288 GTO (OR)","status":"reviewed"}
+{"id":439,"source_hash":"4bcd9595b854083b","korean":"512 BB (OR)","status":"reviewed"}
+{"id":440,"source_hash":"46c99070eaa081db","korean":"365 GTS/4 DAYTONA (OR)","status":"reviewed"}
+{"id":441,"source_hash":"3943044b78f0ce60","korean":"ENZO FERRARI (OR)","status":"reviewed"}
+{"id":442,"source_hash":"9d41fbbb84c7004b","korean":"TESTAROSSA (OR)","status":"reviewed"}
+{"id":443,"source_hash":"4b93043ecfc1d603","korean":"360 SPIDER (OR)","status":"reviewed"}
+{"id":444,"source_hash":"406c401bd63ca5f1","korean":"F40 (OR)","status":"reviewed"}
+{"id":445,"source_hash":"151378b48c89e5d0","korean":"250 GTO (OR)","status":"reviewed"}
+{"id":446,"source_hash":"c9084f255d9202bc","korean":"F355 SPIDER (OR)","status":"reviewed"}
+{"id":447,"source_hash":"35dc37e2123ed154","korean":"328 GTS (OR)","status":"reviewed"}
+{"id":448,"source_hash":"979c1cee27daa888","korean":"F430 SPIDER (OR)","status":"reviewed"}
+{"id":449,"source_hash":"d29491138df6d21e","korean":"550 BARCHETTA (OR)","status":"reviewed"}
+{"id":450,"source_hash":"aca269cf53dea924","korean":"SUPERAMERICA (OR)","status":"reviewed"}
+{"id":451,"source_hash":"4f6a6a5f1157e4dd","korean":"변속기:","status":"reviewed"}
+{"id":452,"source_hash":"57e5e251efbd1510","korean":"AT","status":"reviewed"}
+{"id":453,"source_hash":"23544ecfe3f1e5b7","korean":"MT","status":"reviewed"}
+{"id":454,"source_hash":"01cfd4b784cb9244","korean":"핸들링:","status":"reviewed"}
+{"id":455,"source_hash":"d3ce2262825fd3c9","korean":"OutRun2","status":"reviewed"}
+{"id":456,"source_hash":"5d100710b07d76d7","korean":"OutRun2SP","status":"reviewed"}
+{"id":457,"source_hash":"dca6f33df2e88531","korean":"색상:","status":"reviewed"}
+{"id":458,"source_hash":"5f2313e06a5f0642","korean":"빨강","status":"reviewed"}
+{"id":459,"source_hash":"32ff38e633f00c8c","korean":"노랑","status":"reviewed"}
+{"id":460,"source_hash":"28cbf34ebeeccbd0","korean":"검정","status":"reviewed"}
+{"id":461,"source_hash":"1a4623df2ff16a92","korean":"흰색","status":"reviewed"}
+{"id":462,"source_hash":"fdc2ee381d40df4a","korean":"은색","status":"reviewed"}
+{"id":463,"source_hash":"806732cc81ca72a5","korean":"초록","status":"reviewed"}
+{"id":464,"source_hash":"c8ac609e3ffb3c44","korean":"하늘색","status":"reviewed"}
+{"id":465,"source_hash":"483b93b29806b8fe","korean":"진한 파랑","status":"reviewed"}
+{"id":466,"source_hash":"5ca5a5a2fb4372f8","korean":"라디오:","status":"reviewed"}
+{"id":467,"source_hash":"b286650dd61a8b5b","korean":"SPLASH WAVE","status":"reviewed"}
+{"id":468,"source_hash":"8fc7b735c1f22542","korean":"MAGICAL SOUND SHOWER","status":"reviewed"}
+{"id":469,"source_hash":"49efa0aef9df22cb","korean":"PASSING BREEZE","status":"reviewed"}
+{"id":470,"source_hash":"4317cc7879d43772","korean":"RISKY RIDE","status":"reviewed"}
+{"id":471,"source_hash":"396a9f0a39acbd55","korean":"SHINY WORLD","status":"reviewed"}
+{"id":472,"source_hash":"1a476d38a3558ba0","korean":"NIGHT FLIGHT","status":"reviewed"}
+{"id":473,"source_hash":"6a4bf96c6aec65f1","korean":"LIFE WAS A BORE","status":"reviewed"}
+{"id":474,"source_hash":"3414bbce7119cf64","korean":"RADIATION","status":"reviewed"}
+{"id":475,"source_hash":"b342ef489537cf58","korean":"NIGHT BIRD","status":"reviewed"}
+{"id":476,"source_hash":"59326fdca693fe2b","korean":"SPLASH WAVE -1986-","status":"reviewed"}
+{"id":477,"source_hash":"ab5dddb4991eb873","korean":"MAGICAL SOUND SHOWER -1986-","status":"reviewed"}
+{"id":478,"source_hash":"453864e34165f073","korean":"PASSING BREEZE -1986-","status":"reviewed"}
+{"id":479,"source_hash":"4da0a672f9813f4f","korean":"SHAKE THE STREET -1989-","status":"reviewed"}
+{"id":480,"source_hash":"f3061affcbc107f0","korean":"RUSH A DIFFICULTY -1989-","status":"reviewed"}
+{"id":481,"source_hash":"d938a309ab7aa705","korean":"WHO ARE YOU -1989-","status":"reviewed"}
+{"id":482,"source_hash":"f88561438d5e6347","korean":"KEEP YOUR HEART -1989-","status":"reviewed"}
+{"id":483,"source_hash":"d8f11c14c0167129","korean":"SPLASH WAVE -EURO REMIX-","status":"reviewed"}
+{"id":484,"source_hash":"7bd68ed3b753657a","korean":"MAGICAL SOUND SHOWER -EURO REMIX-","status":"reviewed"}
+{"id":485,"source_hash":"3c24241d833f1fc0","korean":"PASSING BREEZE -EURO REMIX-","status":"reviewed"}
+{"id":486,"source_hash":"2681e4d30b5338d1","korean":"RISKY RIDE -GUITAR MIX -","status":"reviewed"}
+{"id":487,"source_hash":"2e0c35003fab4d4b","korean":"SHAKE THE STREET","status":"reviewed"}
+{"id":488,"source_hash":"de16203a1662ef65","korean":"WHO ARE YOU?","status":"reviewed"}
+{"id":489,"source_hash":"47f4f7fdea1ea5ac","korean":"RUSH A DIFFICULTY","status":"reviewed"}
+{"id":490,"source_hash":"9f7f27f1a73fad0c","korean":"KEEP YOUR HEART","status":"reviewed"}
+{"id":491,"source_hash":"38d702de73031750","korean":"SHINY WORLD -PROTOTYPE-","status":"reviewed"}
+{"id":492,"source_hash":"b767ba0d295a5712","korean":"NIGHT FLIGHT -PROTOTYPE-","status":"reviewed"}
+{"id":493,"source_hash":"d6cc4c0396ff0e2c","korean":"LIFE WAS A BORE -INSTRUMENTAL-","status":"reviewed"}
+{"id":494,"source_hash":"dcb6b0b28ecb68c1","korean":"NIGHT FLIGHT -INSTRUMENTAL-","status":"reviewed"}
+{"id":495,"source_hash":"2faa1c8fe0f3993e","korean":"세션을 찾지 못했습니다!","status":"reviewed"}
+{"id":496,"source_hash":"9d19f008dd60d373","korean":"세션을 찾지 못했습니다. 새 세션을 만들까요?","status":"reviewed"}
+{"id":497,"source_hash":"75e7841c9907c5ed","korean":"예","status":"reviewed"}
+{"id":498,"source_hash":"eee6d6305c201526","korean":"아니요","status":"reviewed"}
+{"id":499,"source_hash":"09c0d8fdd01467a6","korean":"확인","status":"reviewed"}
+{"id":500,"source_hash":"ca16a2a62c44ee8f","korean":"주의! 아직 레이스 중인 플레이어가 있습니다.","status":"reviewed"}
+{"id":501,"source_hash":"cbfac6b2bf448aaf","korean":"주의! 설정을 변경 중인 플레이어가 있습니다. 그래도 게임을 시작할까요?","status":"reviewed"}
+{"id":502,"source_hash":"e5a1157d35f7a177","korean":"주의! 이전 레이스에서 아직 돌아오는 중인 플레이어가 있습니다. 그래도 게임을 시작할까요?","status":"reviewed"}
+{"id":503,"source_hash":"8ef06f6116386318","korean":"메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)를 확인 중입니다. 메모리 카드(8MB)나 컨트롤러를 빼거나 본체를 리셋/전원 종료하지 마십시오.","status":"reviewed"}
+{"id":504,"source_hash":"796fd1247aef38dd","korean":"OutRun 2006: Coast 2 Coast는 자동 저장 기능을 사용합니다. 이 지점 이후 메모리 카드 슬롯 1에 PlayStation®2용 메모리 카드(8MB)를 삽입하면 게임 데이터가 덮어써질 수 있습니다.","status":"reviewed"}
+{"id":505,"source_hash":"81cb641b730f4cf3","korean":"메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)에 여유 공간이 부족합니다. 최소 %d KB의 여유 공간이 있는 메모리 카드를 삽입하거나 본체 브라우저에서 공간을 확보하십시오.","status":"reviewed"}
+{"id":506,"source_hash":"a78fdec677823996","korean":"메모리 카드 슬롯 1에서 PlayStation®2용 메모리 카드(8MB)를 찾을 수 없습니다. 게임 데이터를 저장하려면 %d KB의 여유 공간이 있는 메모리 카드(8MB)가 필요합니다.","status":"reviewed"}
+{"id":507,"source_hash":"278996975d146a48","korean":"메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)에 OutRun 2006: Coast 2 Coast 게임 데이터가 없습니다.","status":"reviewed"}
+{"id":508,"source_hash":"5c0b605c65859360","korean":"메모리 카드(8MB) 오류! 메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)를 확인한 뒤 다시 시도하십시오.","status":"reviewed"}
+{"id":509,"source_hash":"9d10d1f198e02ccb","korean":"PlayStation®2용 메모리 카드(8MB)가 제거되었습니다.","status":"reviewed"}
+{"id":510,"source_hash":"bc0197c010f46cb1","korean":"메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)에 있는 게임 데이터가 손상되었을 수 있습니다.","status":"reviewed"}
+{"id":511,"source_hash":"db9f3747233a90d3","korean":"메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)에 있는 게임 데이터가 손상되었을 수 있습니다. 손상된 게임 데이터를 덮어쓰시겠습니까?","status":"reviewed"}
+{"id":512,"source_hash":"a78fdec677823996","korean":"메모리 카드 슬롯 1에서 PlayStation®2용 메모리 카드(8MB)를 찾을 수 없습니다. 게임 데이터를 저장하려면 %d KB의 여유 공간이 있는 메모리 카드(8MB)가 필요합니다.","status":"reviewed"}
+{"id":513,"source_hash":"38ff5726f64a7443","korean":"메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)에 공간이 부족합니다. 게임 데이터를 저장하려면 %d KB의 여유 공간이 필요합니다.","status":"reviewed"}
+{"id":514,"source_hash":"4374f488884ef32b","korean":"저장했습니다.","status":"reviewed"}
+{"id":515,"source_hash":"2750fb52b9231126","korean":"메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)에 OutRun 2006: Coast 2 Coast 게임 데이터를 생성하시겠습니까?","status":"reviewed"}
+{"id":516,"source_hash":"f1c9d556949c446e","korean":"메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)가 포맷되지 않았습니다. 지금 포맷하시겠습니까?","status":"reviewed"}
+{"id":517,"source_hash":"ed5fe892b1edcf5c","korean":"게임 데이터를 불러오는 중입니다. 메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)나 컨트롤러를 빼거나 본체를 리셋/전원 종료하지 마십시오.","status":"reviewed"}
+{"id":518,"source_hash":"00ebb497ea36c4e3","korean":"데이터를 저장하는 중입니다. 메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)나 컨트롤러를 빼거나 본체를 리셋/전원 종료하지 마십시오.","status":"reviewed"}
+{"id":519,"source_hash":"d55c2850fc94639d","korean":"불러오기에 실패했습니다! 메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)를 확인하고 다시 시도하십시오.","status":"reviewed"}
+{"id":520,"source_hash":"af1c2962df23aa4a","korean":"저장에 실패했습니다! 메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)를 확인하고 다시 시도하십시오.","status":"reviewed"}
+{"id":521,"source_hash":"fd448c48eecd8c1a","korean":"포맷에 실패했습니다! 메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)를 확인하고 다시 시도하십시오.","status":"reviewed"}
+{"id":522,"source_hash":"494b4f1c665193c9","korean":"게임 데이터를 자동 저장 중입니다. 메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)나 컨트롤러를 빼거나 본체를 리셋/전원 종료하지 마십시오.","status":"reviewed"}
+{"id":523,"source_hash":"e5918abd9b2ffd55","korean":"메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)를 포맷 중입니다. 메모리 카드(8MB)나 컨트롤러를 빼거나 본체를 리셋/전원 종료하지 마십시오.","status":"reviewed"}
+{"id":524,"source_hash":"77ff6cc4da5796e5","korean":"포맷했습니다.","status":"reviewed"}
+{"id":525,"source_hash":"ae6122477c0bdba6","korean":"불러오기에 실패했습니다! 메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)에 있는 게임 데이터가 손상되었을 수 있습니다. 메모리 카드를 확인하고 다시 시도하십시오.","status":"reviewed"}
+{"id":526,"source_hash":"c008be4efb9e2d9b","korean":"다시 시도","status":"reviewed"}
+{"id":527,"source_hash":"4ca0338a5bd8d0e5","korean":"취소","status":"reviewed"}
+{"id":528,"source_hash":"c6fd908b4635d455","korean":"계속","status":"reviewed"}
+{"id":529,"source_hash":"2d71300979781e99","korean":"저장하지 않고 계속","status":"reviewed"}
+{"id":530,"source_hash":"51bcdbb6637f56a1","korean":"메모리 카드 포맷","status":"reviewed"}
+{"id":531,"source_hash":"75e7841c9907c5ed","korean":"예","status":"reviewed"}
+{"id":532,"source_hash":"eee6d6305c201526","korean":"아니요","status":"reviewed"}
+{"id":533,"source_hash":"a6902f83417030e2","korean":"PlayStation®2용 메모리 카드(8MB)가 변경되었습니다. 메모리 카드 슬롯 1의 메모리 카드에 자동 저장을 계속하시겠습니까?","status":"reviewed"}
+{"id":534,"source_hash":"9c2bae5692ee989c","korean":"메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)에 기존 게임 데이터가 있습니다. 덮어쓰시겠습니까? (주의! 기존 게임 데이터가 덮어써질 수 있습니다.)","status":"reviewed"}
+{"id":535,"source_hash":"abdd56456c334fbf","korean":"덮어쓰기","status":"reviewed"}
+{"id":536,"source_hash":"66d77bf38fbf0d86","korean":"새 라이선스 만들기","status":"reviewed"}
+{"id":537,"source_hash":"9f65b59511a3d696","korean":"OR2C2C","status":"reviewed"}
+{"id":538,"source_hash":"3031b4e81cedcdbc","korean":"싱글 플레이","status":"reviewed"}
+{"id":539,"source_hash":"8c8fb6c9955a45ca","korean":"총 주행 시간:","status":"reviewed"}
+{"id":540,"source_hash":"cb930d184d7abb7d","korean":"주행 거리:","status":"reviewed"}
+{"id":541,"source_hash":"e26088a38341c18d","korean":"OutRun 마일:","status":"reviewed"}
+{"id":542,"source_hash":"87c049b1a50a8fe7","korean":"총 아이템:","status":"reviewed"}
+{"id":543,"source_hash":"14a560e94056a797","korean":"Coast 2 Coast:","status":"reviewed"}
+{"id":544,"source_hash":"4da54b6730cdc869","korean":"레이스 미션:","status":"reviewed"}
+{"id":545,"source_hash":"4410b242775e9463","korean":"하트 미션:","status":"reviewed"}
+{"id":546,"source_hash":"1c158aa468fe7297","korean":"OutRun","status":"reviewed"}
+{"id":547,"source_hash":"123a5dca9ce48be9","korean":"하트 어택:","status":"reviewed"}
+{"id":548,"source_hash":"94d0adc4362b84b0","korean":"레이스 어택:","status":"reviewed"}
+{"id":549,"source_hash":"ac4adc321aedf5c5","korean":"타임 어택:","status":"reviewed"}
+{"id":550,"source_hash":"e222c5e0df02222a","korean":"드리프트 어택:","status":"reviewed"}
+{"id":551,"source_hash":"637df7e49a92ce1b","korean":"라운드 01","status":"reviewed"}
+{"id":552,"source_hash":"01ad84b3f2885ea9","korean":"라운드 02","status":"reviewed"}
+{"id":553,"source_hash":"1a653f1903297f6c","korean":"라운드 03","status":"reviewed"}
+{"id":554,"source_hash":"5b8da4ed2d8b3943","korean":"라운드 04","status":"reviewed"}
+{"id":555,"source_hash":"4fb03bc208421424","korean":"라운드 05","status":"reviewed"}
+{"id":556,"source_hash":"e6c15fa810fbcc1f","korean":"요청","status":"reviewed"}
+{"id":557,"source_hash":"790d38e8b6e8cf15","korean":"특별 요청 01","status":"reviewed"}
+{"id":558,"source_hash":"b9a82429f1e105f3","korean":"특별 요청 02","status":"reviewed"}
+{"id":559,"source_hash":"714ab6f93505085c","korean":"특별 요청 03","status":"reviewed"}
+{"id":560,"source_hash":"094e0513f426dd5e","korean":"특별 요청 04","status":"reviewed"}
+{"id":561,"source_hash":"a63555806e4274ed","korean":"평균 랭크","status":"reviewed"}
+{"id":562,"source_hash":"8198bcf80afb09f9","korean":"메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB) 상태가 변경되었습니다. 현재 저장 데이터가 들어 있는 메모리 카드(8MB)를 삽입하십시오.","status":"reviewed"}
+{"id":563,"source_hash":"c82ae097efb89da8","korean":"라이선스 선택","status":"reviewed"}
+{"id":564,"source_hash":"70ab0c98e1e28275","korean":"라이선스 초기화","status":"reviewed"}
+{"id":565,"source_hash":"c9d6943c3f687cac","korean":"라이선스 복사","status":"reviewed"}
+{"id":566,"source_hash":"e38f538699e0ba64","korean":"라이선스 병합","status":"reviewed"}
+{"id":567,"source_hash":"a586485629fcdea1","korean":"라이선스 편집","status":"reviewed"}
+{"id":568,"source_hash":"240b10b7e8c85c9f","korean":"오류 없음","status":"reviewed"}
+{"id":569,"source_hash":"2db5892f6acf5f2b","korean":"네트워크 초기화에 실패했습니다!","status":"reviewed"}
+{"id":570,"source_hash":"fc4e6f8f1e22584a","korean":"연결 오류가 발생했습니다. WLAN 스위치가 꺼져 있습니다.","status":"reviewed"}
+{"id":571,"source_hash":"13e71f111939add4","korean":"인터넷 연결을 찾을 수 없습니다.","status":"reviewed"}
+{"id":572,"source_hash":"cfa28955711107e6","korean":"사용 가능한 네트워크 연결이 없습니다. 네트워크 설정 파일과 케이블을 확인하십시오.","status":"reviewed"}
+{"id":573,"source_hash":"4c71b8e7c9790bdb","korean":"이 게임 세션은 더 이상 사용할 수 없습니다.","status":"reviewed"}
+{"id":574,"source_hash":"76892abb6610c09f","korean":"세션에서 강제 퇴장되었습니다.","status":"reviewed"}
+{"id":575,"source_hash":"86e6f1eb17d23620","korean":"강제 퇴장되었으며 이 매치에 다시 참가할 수 없습니다.","status":"reviewed"}
+{"id":576,"source_hash":"4c71b8e7c9790bdb","korean":"이 게임 세션은 더 이상 사용할 수 없습니다.","status":"reviewed"}
+{"id":577,"source_hash":"4c71b8e7c9790bdb","korean":"이 게임 세션은 더 이상 사용할 수 없습니다.","status":"reviewed"}
+{"id":578,"source_hash":"4c71b8e7c9790bdb","korean":"이 게임 세션은 더 이상 사용할 수 없습니다.","status":"reviewed"}
+{"id":579,"source_hash":"5800ec31041fb728","korean":"세션 생성에 실패했습니다.","status":"reviewed"}
+{"id":580,"source_hash":"5d8dd7fe3941c773","korean":"세션 취소에 실패했습니다.","status":"reviewed"}
+{"id":581,"source_hash":"f67f231b0a7f0aa8","korean":"세션을 찾을 수 없습니다. 이미 종료되었을 수 있습니다.","status":"reviewed"}
+{"id":582,"source_hash":"c476f05e7a98924b","korean":"로비 이름에 부적절한 문구가 포함되어 있습니다. 로비 이름을 수정하십시오.","status":"reviewed"}
+{"id":583,"source_hash":"ae78eca7f8da973e","korean":"세션 참가 중 오류가 발생했습니다.","status":"reviewed"}
+{"id":584,"source_hash":"56ade243970333de","korean":"중복 로그인이 감지되었습니다. 이 사용자는 이미 로그인되어 있습니다.","status":"reviewed"}
+{"id":585,"source_hash":"b2f3d3c14de6bd96","korean":"로그온 서버가 혼잡합니다.","status":"reviewed"}
+{"id":586,"source_hash":"53902c227de3bee3","korean":"로그온 서비스 인증이 허용되지 않았습니다.","status":"reviewed"}
+{"id":587,"source_hash":"0b728060831fc3af","korean":"로그온 서비스를 일시적으로 사용할 수 없습니다.","status":"reviewed"}
+{"id":588,"source_hash":"029db7c523ac9225","korean":"Xbox Live 접속 중 오류가 발생했습니다.","status":"reviewed"}
+{"id":589,"source_hash":"6d7b6723705eb840","korean":"피드백 전송에 실패했습니다.","status":"reviewed"}
+{"id":590,"source_hash":"db719e50b806cfc0","korean":"사용자를 음소거 목록에 추가하지 못했습니다.","status":"reviewed"}
+{"id":591,"source_hash":"75576228b72e364f","korean":"세션 검색에 실패했습니다.","status":"reviewed"}
+{"id":592,"source_hash":"d56fd75d6119ccff","korean":"친구 목록 업데이트에 실패했습니다.","status":"reviewed"}
+{"id":593,"source_hash":"b840f2fffb1d6752","korean":"친구에게 메시지를 보내지 못했습니다.","status":"reviewed"}
+{"id":594,"source_hash":"382f141e5cb2ab46","korean":"메시지에 부적절한 문구가 포함되어 있습니다. 문구를 수정한 뒤 다시 시도하십시오.","status":"reviewed"}
+{"id":595,"source_hash":"432ddedc90fab9c5","korean":"초대 취소에 실패했습니다.","status":"reviewed"}
+{"id":596,"source_hash":"706d1b0c82ac478e","korean":"초대 응답에 실패했습니다.","status":"reviewed"}
+{"id":597,"source_hash":"f097edd23236322d","korean":"친구 목록에 추가하지 못했습니다.","status":"reviewed"}
+{"id":598,"source_hash":"aa955847c8e38e8c","korean":"이미 친구인 사용자입니다.","status":"reviewed"}
+{"id":599,"source_hash":"ec39055aef8d8c1c","korean":"이미 이 사용자에게 친구 요청을 보냈습니다.","status":"reviewed"}
+{"id":600,"source_hash":"26af0c80150a9213","korean":"친구 목록에서 삭제하지 못했습니다.","status":"reviewed"}
+{"id":601,"source_hash":"318bf06fbb635f7e","korean":"친구 목록 불러오기에 실패했습니다.","status":"reviewed"}
+{"id":602,"source_hash":"ccc6d6fd42d2923a","korean":"친구 초대 응답에 실패했습니다.","status":"reviewed"}
+{"id":603,"source_hash":"34ba8400fa3c6e44","korean":"게임 초대에 실패했습니다.","status":"reviewed"}
+{"id":604,"source_hash":"d56fd75d6119ccff","korean":"친구 목록 업데이트에 실패했습니다.","status":"reviewed","notes":"propagated from identical source string"}
+{"id":605,"source_hash":"9d0397fff2619c6f","korean":"네트플레이 로그아웃에 실패했습니다.","status":"reviewed"}
+{"id":606,"source_hash":"0546f088eb3a94d7","korean":"로그인 실패","status":"reviewed"}
+{"id":607,"source_hash":"2cbbf0ba8e330545","korean":"새 계정 생성에 실패했습니다. 네트워크 연결이 끊어졌습니다.","status":"reviewed"}
+{"id":608,"source_hash":"5a142e3f37c1c0ca","korean":"계정 삭제에 실패했습니다.","status":"reviewed"}
+{"id":609,"source_hash":"b5fff78c723622e1","korean":"비밀번호 변경에 실패했습니다.","status":"reviewed"}
+{"id":610,"source_hash":"367afd51325c320b","korean":"계정 인증에 실패했습니다.","status":"reviewed"}
+{"id":611,"source_hash":"9b34d6d81ccad221","korean":"이미 존재하는 계정입니다. 다른 사용자 이름으로 다시 시도하십시오.","status":"reviewed"}
+{"id":612,"source_hash":"214b050dac3059d9","korean":"부적절한 사용자 이름입니다. 다른 사용자 이름으로 다시 시도하십시오.","status":"reviewed"}
+{"id":613,"source_hash":"4554a7142a8f1b6c","korean":"비밀번호가 올바르지 않습니다. 다시 시도하십시오.","status":"reviewed"}
+{"id":614,"source_hash":"2f28e33cd3187a48","korean":"온라인 스코어보드에 접속하는 중 오류가 발생했습니다.","status":"reviewed"}
+{"id":615,"source_hash":"c4917f94abe1b12b","korean":"Xbox Live 스코어보드에 접속하는 중 오류가 발생했습니다.","status":"reviewed"}
+{"id":616,"source_hash":"ef3003c356d756d3","korean":"고스트 업로드에 실패했습니다.","status":"reviewed"}
+{"id":617,"source_hash":"fbb0b9ed15342b5a","korean":"네트워크가 혼잡합니다.","status":"reviewed"}
+{"id":618,"source_hash":"4ff1ef9449b4393c","korean":"네트워크 오류.","status":"reviewed"}
+{"id":619,"source_hash":"4bad881bf73d2940","korean":"네트워크 설정 파일을 찾을 수 없습니다. 네트워크 설정 파일을 만들려면 Network Access Disc를 사용하십시오.","status":"reviewed"}
+{"id":620,"source_hash":"d6415f8c713f9617","korean":"PlayStation®2용 네트워크 어댑터(이더넷/모뎀)를 감지할 수 없습니다.","status":"reviewed"}
+{"id":621,"source_hash":"97064663eef9e07f","korean":"친구 초대에 실패했습니다. 자기 자신은 친구로 추가할 수 없습니다.","status":"reviewed"}
+{"id":622,"source_hash":"d1521672d5830120","korean":"친구 목록이 가득 찼습니다.","status":"reviewed"}
+{"id":623,"source_hash":"620a2d172b67ee95","korean":"이미 친구인 사용자입니다.","status":"reviewed"}
+{"id":624,"source_hash":"0731e1efe146afe0","korean":"사용자를 찾을 수 없습니다.","status":"reviewed"}
+{"id":625,"source_hash":"e65d386a7c04fc77","korean":"입력한 게이머태그를 찾을 수 없습니다.","status":"reviewed"}
+{"id":626,"source_hash":"f097edd23236322d","korean":"친구 목록에 추가하지 못했습니다.","status":"reviewed","notes":"propagated from identical source string"}
+{"id":627,"source_hash":"26af0c80150a9213","korean":"친구 목록에서 삭제하지 못했습니다.","status":"reviewed","notes":"propagated from identical source string"}
+{"id":628,"source_hash":"85f217b7a7e21382","korean":"온라인 서비스와의 연결이 끊어졌습니다.","status":"reviewed"}
+{"id":629,"source_hash":"a0b058cb21132a1b","korean":"다른 사용자가 같은 계정으로 로그인하여 온라인 서비스 연결이 끊어졌습니다.","status":"reviewed"}
+{"id":630,"source_hash":"54b4037b654fe79a","korean":"사용 가능한 네트워크 연결이 없습니다. 케이블을 확인하십시오.","status":"reviewed"}
+{"id":631,"source_hash":"00dc4565a4463ab8","korean":"시스템 링크 케이블이 분리되었을 수 있습니다. 케이블을 확인하고 다시 시도하십시오.","status":"reviewed"}
+{"id":632,"source_hash":"ab4e723f8d2734c6","korean":"Xbox 본체에서 Xbox Live에 연결할 수 없습니다. A를 눌러 문제 해결사를 시작하거나 B를 눌러 취소하십시오.","status":"reviewed"}
+{"id":633,"source_hash":"a121695c9ae831bf","korean":"연결 오류가 발생했습니다.","status":"reviewed"}
+{"id":634,"source_hash":"fc4e6f8f1e22584a","korean":"연결 오류가 발생했습니다. WLAN 스위치가 꺼져 있습니다.","status":"reviewed","notes":"propagated from identical source string"}
+{"id":635,"source_hash":"2b8d2de8b448fa3d","korean":"WLAN 스위치가 꺼져 있습니다. 연결하려면 WLAN 스위치를 켜십시오.","status":"reviewed"}
+{"id":636,"source_hash":"28192a475abe23e6","korean":"세션과의 연결이 끊어졌습니다.","status":"reviewed"}
+{"id":637,"source_hash":"28192a475abe23e6","korean":"세션과의 연결이 끊어졌습니다.","status":"reviewed"}
+{"id":638,"source_hash":"c719bba469873b19","korean":"Xbox Live 서비스에 필수 업데이트가 있습니다. 업데이트를 설치하기 전에는 Xbox Live에 연결할 수 없습니다. 지금 업데이트하시겠습니까?","status":"reviewed"}
+{"id":639,"source_hash":"dcd4fbb9a3229f7e","korean":"Xbox Live 서비스가 혼잡합니다. 다시 시도하시겠습니까?","status":"reviewed"}
+{"id":640,"source_hash":"cd8e1ed02f4db977","korean":"다른 사용자가 같은 계정으로 로그인하여 Xbox Live에서 로그아웃되었습니다.","status":"reviewed"}
+{"id":641,"source_hash":"4c71b8e7c9790bdb","korean":"이 게임 세션은 더 이상 사용할 수 없습니다.","status":"reviewed","notes":"propagated from identical source string"}
+{"id":642,"source_hash":"e1be992aefcad3e4","korean":"Xbox 본체에서 Xbox Live에 연결할 수 없습니다. 문제 해결사를 시작하시겠습니까?","status":"reviewed"}
+{"id":643,"source_hash":"0489a836d520715d","korean":"이 계정은 최신 상태가 아닙니다. 계정 복구에서 계정을 업데이트하시겠습니까?","status":"reviewed"}
+{"id":644,"source_hash":"af66443eaefeaa76","korean":"Xbox Live 계정에 확인하지 않은 메시지가 있습니다. 지금 보시겠습니까?","status":"reviewed"}
+{"id":645,"source_hash":"6a7554f3d075f9bc","korean":"Xbox Live에서 중요한 메시지가 도착했습니다. 지금 보시겠습니까?","status":"reviewed"}
+{"id":646,"source_hash":"c29d25d28b207757","korean":"Xbox Live 계정 제한으로 이 기능을 사용할 수 없습니다.","status":"reviewed"}
+{"id":647,"source_hash":"53d02fe4f67ff4b9","korean":"온라인","status":"reviewed"}
+{"id":648,"source_hash":"f9e0a22948497173","korean":"오프라인","status":"reviewed"}
+{"id":649,"source_hash":"4c0b0aa4894d9028","korean":"플레이 중:","status":"reviewed"}
+{"id":650,"source_hash":"da6a95e0daa22e81","korean":"친구가 되고 싶어 합니다.","status":"reviewed"}
+{"id":651,"source_hash":"eb44c3cd874c2646","korean":"친구 요청을 보냈습니다.","status":"reviewed"}
+{"id":652,"source_hash":"e676179c8ab230e6","korean":"계속하려면 %s을(를) 누르십시오.","status":"reviewed"}
+{"id":653,"source_hash":"da4247935d2cb291","korean":"%s님이 친구 요청을 수락했습니다.","status":"reviewed"}
+{"id":654,"source_hash":"c0ff6655cb232d78","korean":"%s님이 친구 요청을 거절했습니다.","status":"reviewed"}
+{"id":655,"source_hash":"2c30fba007acb44d","korean":"%s님의 초대를 수락하시겠습니까?","status":"reviewed"}
+{"id":656,"source_hash":"d1b056e692ca4c10","korean":"%s Xbox 게임 디스크를 삽입하십시오.","status":"reviewed"}
+{"id":657,"source_hash":"8fcb81e7b6b9af5f","korean":"이 교차 게임 초대에 사용할 적절한 Xbox Live 사용자 계정을 찾을 수 없습니다.","status":"reviewed"}
+{"id":658,"source_hash":"01b89e7db807b055","korean":"%s님의 게임에 참가하시겠습니까? 참가하면 현재 진행 상황이 모두 사라집니다.","status":"reviewed"}
+{"id":659,"source_hash":"ea939fa2daddfb41","korean":"%s 플레이 초대를 받았습니다. 현재 게임이 종료되고 저장하지 않은 진행 상황이 모두 사라집니다. 게임 초대를 수락하시겠습니까?","status":"reviewed"}
+{"id":660,"source_hash":"6b9e3895f3da350b","korean":"Xbox Dashboard 플레이 초대를 받았습니다. 현재 게임이 종료되고 저장하지 않은 진행 상황이 모두 사라집니다. 음성 채팅 초대를 수락하시겠습니까?","status":"reviewed"}
+{"id":661,"source_hash":"6522e61166af9d8c","korean":"선택","status":"reviewed"}
+{"id":662,"source_hash":"2b64e7e5738465cf","korean":"뒤로","status":"reviewed"}
+{"id":663,"source_hash":"2e1c25c533ef2ba2","korean":"친구","status":"reviewed"}
+{"id":664,"source_hash":"e2008c9128414c22","korean":"로그인","status":"reviewed"}
+{"id":665,"source_hash":"f5a394f5d6760d61","korean":"로그아웃","status":"reviewed"}
+{"id":666,"source_hash":"aa54c66faffbca40","korean":"라이선스","status":"reviewed"}
+{"id":667,"source_hash":"3c7baa1013cc42b8","korean":"색상","status":"reviewed"}
+{"id":668,"source_hash":"db8235b9bc2b52b2","korean":"무작위","status":"reviewed"}
+{"id":669,"source_hash":"9a09662d98cfc876","korean":"OUTRUN2","status":"reviewed","notes":"propagated from identical source string"}
+{"id":670,"source_hash":"79fc180e9c23fd0c","korean":"OUTRUN2SP","status":"reviewed","notes":"propagated from identical source string"}
+{"id":671,"source_hash":"890e9981d09ded2e","korean":"사운드 밸런스","status":"reviewed"}
+{"id":672,"source_hash":"3c57d24a743f304c","korean":"음악 변경","status":"reviewed"}
+{"id":673,"source_hash":"7698ad685635ce81","korean":"XBOX LIVE","status":"reviewed"}
+{"id":674,"source_hash":"954f939c114e9c34","korean":"XBOX LIVE / AT","status":"reviewed"}
+{"id":675,"source_hash":"4142402988e49cb4","korean":"XBOX LIVE / MT","status":"reviewed"}
+{"id":676,"source_hash":"53d1bbdf848c6542","korean":"온라인","status":"reviewed","notes":"propagated from identical source string"}
+{"id":677,"source_hash":"2e1c25c533ef2ba2","korean":"친구","status":"reviewed"}
+{"id":678,"source_hash":"78656163857ce6f5","korean":"로컬","status":"reviewed"}
+{"id":679,"source_hash":"f9c084437fcdec7e","korean":"로컬 / AT","status":"reviewed"}
+{"id":680,"source_hash":"b26a3698967a2a8b","korean":"로컬 / MT","status":"reviewed"}
+{"id":681,"source_hash":"00f2bf7b0e5c9395","korean":"국가","status":"reviewed"}
+{"id":682,"source_hash":"e0230756b072de6f","korean":"내 순위","status":"reviewed"}
+{"id":683,"source_hash":"91285de97477e142","korean":"오프라인","status":"reviewed","notes":"propagated from identical source string"}
+{"id":684,"source_hash":"39a4c050bb47d709","korean":"필터","status":"reviewed"}
+{"id":685,"source_hash":"4d8857dd945b3886","korean":"기본값","status":"reviewed"}
+{"id":686,"source_hash":"cf7179d37a80ab10","korean":"편집","status":"reviewed"}
+{"id":687,"source_hash":"38cd0149dad0f8fd","korean":"삭제","status":"reviewed"}
+{"id":688,"source_hash":"9ff4650dfa248031","korean":"새로고침","status":"reviewed"}
+{"id":689,"source_hash":"7698ad685635ce81","korean":"XBOX LIVE","status":"reviewed"}
+{"id":690,"source_hash":"cb9e73970fc986b1","korean":"일반 AT","status":"reviewed"}
+{"id":691,"source_hash":"44d6aa1977e73275","korean":"일반 MT","status":"reviewed"}
+{"id":692,"source_hash":"ea06c25f7cc58424","korean":"튜닝 AT","status":"reviewed"}
+{"id":693,"source_hash":"dfb134960ba03368","korean":"튜닝 MT","status":"reviewed"}
+{"id":694,"source_hash":"66bf7eabd51e8e0f","korean":"이 라이선스는 PSP®(PlayStation®Portable)로 전송되었습니다. 라이선스를 다시 활성화할 수 있지만, PSP®에서 다시 전송하면 현재 라이선스가 덮어써집니다. 다시 활성화하시겠습니까? X: 활성화 / ○: 취소","status":"reviewed"}
+{"id":695,"source_hash":"7b6d8d691210b202","korean":"이 라이선스는 PlayStation®2로 전송되었습니다. 라이선스를 다시 활성화할 수 있지만, PlayStation®2에서 다시 전송하면 현재 라이선스가 덮어써집니다. 다시 활성화하시겠습니까? X: 활성화 / ○: 취소","status":"reviewed"}
+{"id":696,"source_hash":"37fa87306a7bc87b","korean":"USB 연결","status":"reviewed"}
+{"id":697,"source_hash":"37fa87306a7bc87b","korean":"USB 연결","status":"reviewed"}
+{"id":698,"source_hash":"b91063d9b7925c64","korean":"메모리 카드 슬롯 1에 PlayStation®2용 메모리 카드(8MB)가 없습니다. OutRun 2006: Coast 2 Coast 게임 데이터가 들어 있는 메모리 카드(8MB)를 삽입하고 다시 시도하십시오.","status":"reviewed"}
+{"id":699,"source_hash":"65e16e06057e721a","korean":"메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)에 OutRun 2006: Coast 2 Coast 게임 데이터가 없습니다. 게임 데이터를 전송할 수 없습니다.","status":"reviewed"}
+{"id":700,"source_hash":"9588d73a62a76877","korean":"PSP®(PlayStation®Portable)를 찾을 수 없습니다.","status":"reviewed"}
+{"id":701,"source_hash":"b0b7f49a1bbff4aa","korean":"PSP®(PlayStation®Portable)를 연결 모드로 설정하십시오.","status":"reviewed"}
+{"id":702,"source_hash":"f54c097a5d1b5744","korean":"PSP®(PlayStation®Portable)를 기다리는 중입니다.","status":"reviewed"}
+{"id":703,"source_hash":"4ca0338a5bd8d0e5","korean":"취소","status":"reviewed","notes":"propagated from identical source string"}
+{"id":704,"source_hash":"9025b7915284a628","korean":"Memory Stick Duo®가 없습니다. OutRun 2006: Coast 2 Coast 데이터가 들어 있는 Memory Stick Duo®를 삽입하고 다시 시도하십시오.","status":"reviewed"}
+{"id":705,"source_hash":"f5f4780a4554b731","korean":"Memory Stick Duo®에 OutRun 2006: Coast 2 Coast 라이선스 데이터가 없습니다. 데이터를 전송할 수 없습니다.","status":"reviewed"}
+{"id":706,"source_hash":"fb41ce951a69e546","korean":"PlayStation®2를 찾을 수 없습니다.","status":"reviewed"}
+{"id":707,"source_hash":"5a95af80b1e8d414","korean":"PlayStation®2를 연결 모드로 설정하십시오.","status":"reviewed"}
+{"id":708,"source_hash":"1c5601b3146157ad","korean":"PlayStation®2를 기다리는 중입니다.","status":"reviewed"}
+{"id":709,"source_hash":"efaa04a7c8262a3f","korean":"USB로 PlayStation®2에 연결되었습니다. 잠시 기다리십시오.","status":"reviewed"}
+{"id":710,"source_hash":"57dc303fc679ad54","korean":"○ - 취소","status":"reviewed"}
+{"id":711,"source_hash":"14c6fd82b830a271","korean":"PSP®(PlayStation®Portable)에서 라이선스 가져오기","status":"reviewed"}
+{"id":712,"source_hash":"14ae4911e50c4698","korean":"PSP®(PlayStation®Portable)로 라이선스 보내기","status":"reviewed"}
+{"id":713,"source_hash":"eb027dbb8f03b5cb","korean":"PSP®(PlayStation®Portable) 연결 해제","status":"reviewed"}
+{"id":714,"source_hash":"811e269d574474b3","korean":"현재 라이선스를 전송했습니다. 계속 플레이하려면 다른 라이선스를 선택하십시오. X를 눌러 계속합니다.","status":"reviewed"}
+{"id":715,"source_hash":"8ba3125d89f3fb1f","korean":"이 라이선스는 이미 PlayStation®2에서 활성화되어 있습니다. 전송하면 PlayStation®2용 메모리 카드(8MB)의 기존 라이선스를 덮어씁니다(게임 진행 상황이 사라질 수 있습니다). 계속하시겠습니까? X: 계속 / ○: 취소","status":"reviewed"}
+{"id":716,"source_hash":"b44e5d975d582ddf","korean":"PlayStation®2에 빈 라이선스 슬롯이 없어 새 라이선스를 만들 수 없습니다. 전송을 중단합니다.","status":"reviewed"}
+{"id":717,"source_hash":"3ab43953cb2e87c8","korean":"USB로 데이터를 전송 중입니다. USB 케이블을 분리하거나 본체를 리셋/전원 종료하지 마십시오.","status":"reviewed"}
+{"id":718,"source_hash":"fa261114cf0419ad","korean":"USB로 데이터를 전송 중입니다. USB 케이블을 분리하거나 시스템 전원을 끄지 마십시오.","status":"reviewed"}
+{"id":719,"source_hash":"f3e43a07d9dd676b","korean":"라이선스를 전송했습니다.","status":"reviewed"}
+{"id":720,"source_hash":"f479bb5497b151f0","korean":"이 라이선스는 이미 PSP®(PlayStation®Portable)에서 활성화되어 있습니다. 전송하면 Memory Stick Duo®의 기존 라이선스를 덮어씁니다(게임 진행 상황이 사라질 수 있습니다). 계속하시겠습니까? X: 계속 / ○: 취소","status":"reviewed"}
+{"id":721,"source_hash":"efa335f4c0abe001","korean":"PSP®(PlayStation®Portable)에 빈 라이선스 슬롯이 없어 새 라이선스를 만들 수 없습니다. 전송을 중단합니다.","status":"reviewed"}
+{"id":722,"source_hash":"4a357d88365559eb","korean":"USB 케이블이 분리되었습니다. 연결을 종료합니다.","status":"reviewed"}
+{"id":723,"source_hash":"e6e2b30da2dedd53","korean":"PSP®(PlayStation®Portable)에서 Memory Stick Duo®가 제거되었습니다. 연결을 종료합니다.","status":"reviewed"}
+{"id":724,"source_hash":"aa24c64d52fdacff","korean":"Memory Stick Duo®가 제거되었습니다. 연결을 종료합니다.","status":"reviewed"}
+{"id":725,"source_hash":"4b904957ffac9099","korean":"PlayStation®2용 메모리 카드(8MB)가 제거되었습니다. 연결을 종료합니다.","status":"reviewed"}
+{"id":726,"source_hash":"b4295454516921e6","korean":"PlayStation®2에서 메모리 카드(8MB)가 제거되었습니다. 연결을 종료합니다.","status":"reviewed"}
+{"id":727,"source_hash":"155ead4e15a4754e","korean":"PSP®(PlayStation®Portable)로 라이선스 복사","status":"reviewed"}
+{"id":728,"source_hash":"b9fcc82f7d7f116c","korean":"PSP®(PlayStation®Portable)에서 라이선스 복사","status":"reviewed"}
+{"id":729,"source_hash":"234e116b12cc5ae7","korean":"라이선스를 병합하고 마일을 PlayStation®2로 복사","status":"reviewed"}
+{"id":730,"source_hash":"90bcae5a097e8113","korean":"라이선스를 병합하고 마일을 PSP®(PlayStation®Portable)로 복사","status":"reviewed"}
+{"id":731,"source_hash":"078453608c0fb338","korean":"USB로 데이터를 병합 중입니다. USB 케이블을 분리하거나 본체를 리셋/전원 종료하지 마십시오.","status":"reviewed"}
+{"id":732,"source_hash":"247c75edd17e9168","korean":"USB로 데이터를 병합 중입니다. USB 케이블을 분리하거나 시스템 전원을 끄지 마십시오.","status":"reviewed"}
+{"id":733,"source_hash":"ff053cf47651c0e3","korean":"라이선스를 병합했습니다.","status":"reviewed"}
+{"id":734,"source_hash":"36b85918e000eb24","korean":"초급 레이스 1","status":"reviewed"}
+{"id":735,"source_hash":"795d9c274bf9863b","korean":"초급 레이스 2","status":"reviewed"}
+{"id":736,"source_hash":"e9205110770f6c58","korean":"초급 레이스 3","status":"reviewed"}
+{"id":737,"source_hash":"fcd1dbe90cb6797c","korean":"초급 레이스 4","status":"reviewed"}
+{"id":738,"source_hash":"464f769d8ae5ca05","korean":"초급 레이스 5","status":"reviewed"}
+{"id":739,"source_hash":"29c66a4356de0617","korean":"중급 레이스 1","status":"reviewed"}
+{"id":740,"source_hash":"0f5d5b6205305254","korean":"중급 레이스 2","status":"reviewed"}
+{"id":741,"source_hash":"2decd781a5f02189","korean":"중급 레이스 3","status":"reviewed"}
+{"id":742,"source_hash":"81ce3f2267d18bfb","korean":"중급 레이스 4","status":"reviewed"}
+{"id":743,"source_hash":"f7fe038716b26f8e","korean":"중급 레이스 5","status":"reviewed"}
+{"id":744,"source_hash":"8534efbec9a48693","korean":"중급 레이스 6","status":"reviewed"}
+{"id":745,"source_hash":"16b3fa8ae1a26f23","korean":"중급 레이스 7","status":"reviewed"}
+{"id":746,"source_hash":"eb9cf6ec02175af7","korean":"중급 레이스 8","status":"reviewed"}
+{"id":747,"source_hash":"bee0ff36599a3dd8","korean":"중급 레이스 9","status":"reviewed"}
+{"id":748,"source_hash":"3ed5241fbad1407f","korean":"프로 레이스 1","status":"reviewed"}
+{"id":749,"source_hash":"d275387ca83c36f8","korean":"프로 레이스 2","status":"reviewed"}
+{"id":750,"source_hash":"717324432bd640f2","korean":"프로 레이스 3","status":"reviewed"}
+{"id":751,"source_hash":"bfc99abbc46f2854","korean":"프로 레이스 4","status":"reviewed"}
+{"id":752,"source_hash":"016c1b14f4aac467","korean":"프로 레이스 5","status":"reviewed"}
+{"id":753,"source_hash":"c9d3d6ff19815082","korean":"프로 레이스 6","status":"reviewed"}
+{"id":754,"source_hash":"4d001934a90074c0","korean":"프로 레이스 7","status":"reviewed"}
+{"id":755,"source_hash":"e01ffe5b1f4b34d9","korean":"프로 레이스 8","status":"reviewed"}
+{"id":756,"source_hash":"e08938dd800b584f","korean":"프로 레이스 9","status":"reviewed"}
+{"id":757,"source_hash":"f698e89342de72eb","korean":"프로 레이스 10","status":"reviewed"}
+{"id":758,"source_hash":"af098b6d4d11bbb6","korean":"프로 레이스 11","status":"reviewed"}
+{"id":759,"source_hash":"6fc56f104cbf19fd","korean":"OutRun 레이스 1","status":"reviewed"}
+{"id":760,"source_hash":"7a9b36eec3fd9de6","korean":"OutRun 레이스 2","status":"reviewed"}
+{"id":761,"source_hash":"484b813f301e4222","korean":"OutRun 레이스 3","status":"reviewed"}
+{"id":762,"source_hash":"6cf7cdf11072eb73","korean":"OutRun 레이스 4","status":"reviewed"}
+{"id":763,"source_hash":"95a5c5417866a7cd","korean":"OutRun 레이스 5","status":"reviewed"}
+{"id":764,"source_hash":"2dfd5aaae4c8b51c","korean":"OutRun 레이스 6","status":"reviewed"}
+{"id":765,"source_hash":"3c4dadfe592c01c2","korean":"OutRun 레이스 7","status":"reviewed"}
+{"id":766,"source_hash":"92ffbbf80ccf983a","korean":"OutRun 레이스 8","status":"reviewed"}
+{"id":767,"source_hash":"c4ae0bc68e3bea42","korean":"OutRun 레이스 9","status":"reviewed"}
+{"id":768,"source_hash":"8ccd9ba6c2c4ebcc","korean":"OutRun 레이스 10","status":"reviewed"}
+{"id":769,"source_hash":"645624074174a906","korean":"OutRun 레이스 11","status":"reviewed"}
+{"id":770,"source_hash":"20342bd79c2cd069","korean":"OutRun 레이스 12","status":"reviewed"}
+{"id":771,"source_hash":"cce2d5945846f84c","korean":"OutRun 레이스 13","status":"reviewed"}
+{"id":772,"source_hash":"f5339a6213d5ccef","korean":"OutRun 레이스 14","status":"reviewed"}
+{"id":773,"source_hash":"9fcae0f985fa0f68","korean":"OutRun 레이스 15","status":"reviewed"}
+{"id":774,"source_hash":"d3637574e27cd0ec","korean":"제니퍼","status":"reviewed"}
+{"id":775,"source_hash":"be7d47319980d3c9","korean":"클라리사","status":"reviewed"}
+{"id":776,"source_hash":"97cc82a423b9018c","korean":"플래그맨","status":"reviewed"}
+{"id":777,"source_hash":"fdb049a353344899","korean":"홀리","status":"reviewed"}
+{"id":778,"source_hash":"f39f516cbc0ce8da","korean":"Memory Stick Duo®가 없습니다.","status":"reviewed"}
+{"id":779,"source_hash":"c15175ce9c6ae9fc","korean":"Memory Stick Duo®가 없습니다. 게임 데이터를 저장하려면 %d KB가 필요합니다.","status":"reviewed"}
+{"id":780,"source_hash":"8ccaebd902ee631d","korean":"Memory Stick Duo®에 게임 데이터가 없습니다. Memory Stick Duo®에 게임 데이터를 생성하시겠습니까?","status":"reviewed"}
+{"id":781,"source_hash":"7ee30f5d75ae36e2","korean":"Memory Stick Duo®에 게임 데이터가 없습니다.","status":"reviewed"}
+{"id":782,"source_hash":"9bf0795861c1ead8","korean":"저장 공간이 부족합니다. 게임 데이터를 저장하려면 %d KB가 필요합니다. 저장 데이터 중 일부를 선택해 삭제하시겠습니까, 아니면 저장하지 않고 계속하시겠습니까?","status":"reviewed"}
+{"id":783,"source_hash":"82410a85f05c0b47","korean":"Memory Stick Duo®가 변경되었습니다. 새 Memory Stick Duo®에 게임 데이터를 생성하시겠습니까?","status":"reviewed"}
+{"id":784,"source_hash":"0dea7eb5d8ba1fb6","korean":"Memory Stick Duo®가 변경되었고 기존 게임 데이터가 있습니다. 덮어쓰시겠습니까, 아니면 저장하지 않고 계속하시겠습니까? (기존 데이터가 덮어써집니다.)","status":"reviewed"}
+{"id":785,"source_hash":"b63aef3666ad6ce7","korean":"Memory Stick Duo®가 없습니다. 계속하려면 X를 누르십시오.","status":"reviewed"}
+{"id":786,"source_hash":"06e126502da593c1","korean":"Memory Stick Duo®에 게임 데이터가 없습니다. 계속하려면 X를 누르십시오.","status":"reviewed"}
+{"id":787,"source_hash":"1a36451ca3d69a31","korean":"Memory Stick Duo®의 데이터는 이미 불러왔습니다. 불러오기를 취소합니다.","status":"reviewed"}
+{"id":788,"source_hash":"be1abd499bfa4408","korean":"Memory Stick Duo®에서 데이터를 불러오시겠습니까? 저장하지 않은 진행 상황은 사라집니다!","status":"reviewed"}
+{"id":789,"source_hash":"21797116a18c6191","korean":"저장 실패. Memory Stick Duo®가 제거되었습니다.","status":"reviewed"}
+{"id":790,"source_hash":"027a0cec79cfdb51","korean":"저장 실패. Memory Stick Duo®가 잠겨 있습니다.","status":"reviewed"}
+{"id":791,"source_hash":"55b64f2153b47a2e","korean":"불러오기 실패. Memory Stick Duo®가 제거되었습니다.","status":"reviewed"}
+{"id":792,"source_hash":"0fc46e699e4f0a88","korean":"불러오기 실패. 저장 데이터가 손상되었습니다. 저장 데이터를 덮어쓰시겠습니까?","status":"reviewed"}
+{"id":793,"source_hash":"1f9cf8b286ff5375","korean":"Memory Stick Duo®를 확인 중입니다. Memory Stick Duo®를 제거하거나 시스템 전원을 끄지 마십시오.","status":"reviewed"}
+{"id":794,"source_hash":"e75b1feddba9bafe","korean":"불러오는 중입니다. Memory Stick Duo®를 제거하거나 시스템 전원을 끄지 마십시오.","status":"reviewed"}
+{"id":795,"source_hash":"3d2933a9fda86202","korean":"Memory Stick Duo® 접근 오류.","status":"reviewed"}
+{"id":796,"source_hash":"5b4e08784da8ff98","korean":"불러오기 오류!","status":"reviewed"}
+{"id":797,"source_hash":"142083825a618f4a","korean":"저장 중입니다. Memory Stick Duo®를 제거하거나 시스템 전원을 끄지 마십시오.","status":"reviewed"}
+{"id":798,"source_hash":"d3145a264c308590","korean":"저장 오류!","status":"reviewed"}
+{"id":799,"source_hash":"e1b9a44282c5ed48","korean":"Memory Stick Duo®의 데이터가 손상되었습니다. 저장 데이터 중 일부를 선택해 삭제하시겠습니까?","status":"reviewed"}
+{"id":800,"source_hash":"abdd56456c334fbf","korean":"덮어쓰기","status":"reviewed","notes":"propagated from identical source string"}
+{"id":801,"source_hash":"4ca0338a5bd8d0e5","korean":"취소","status":"reviewed","notes":"propagated from identical source string"}
+{"id":802,"source_hash":"c008be4efb9e2d9b","korean":"다시 시도","status":"reviewed","notes":"propagated from identical source string"}
+{"id":803,"source_hash":"463b8cb787b47dd1","korean":"불러오기 취소","status":"reviewed"}
+{"id":804,"source_hash":"c6fd908b4635d455","korean":"계속","status":"reviewed","notes":"propagated from identical source string"}
+{"id":805,"source_hash":"2d71300979781e99","korean":"저장하지 않고 계속","status":"reviewed","notes":"propagated from identical source string"}
+{"id":806,"source_hash":"0750fe7816a37f05","korean":"불러오지 않고 계속","status":"reviewed"}
+{"id":807,"source_hash":"5153064af2756cfe","korean":"게임 데이터 불러오기","status":"reviewed"}
+{"id":808,"source_hash":"90fb0a1821fe9520","korean":"삭제","status":"reviewed"}
+{"id":809,"source_hash":"8d59f21100867d85","korean":"게임 데이터 생성","status":"reviewed"}
+{"id":810,"source_hash":"8d1046c4512bdc03","korean":"이 게임은 특정 시점에 Memory Stick Duo®에 자동으로 접근합니다. Memory Stick Duo® 접근 표시등이 깜빡이는 동안에는 Memory Stick Duo®를 제거하거나 시스템 전원을 끄지 마십시오.","status":"reviewed"}
+{"id":811,"source_hash":"541eee8a5d620f24","korean":"이 차량은 사용할 수 없습니다.","status":"reviewed"}
+{"id":812,"source_hash":"9433486d66ad2e44","korean":"이 차량은 아직 선택할 수 없습니다. 잠금을 해제하려면 싱글 플레이 메뉴의 쇼룸에서 차량을 구입하십시오.","status":"reviewed"}
+{"id":813,"source_hash":"3c7baa1013cc42b8","korean":"색상","status":"reviewed","notes":"propagated from identical source string"}
+{"id":814,"source_hash":"890e9981d09ded2e","korean":"사운드 밸런스","status":"reviewed","notes":"propagated from identical source string"}
+{"id":815,"source_hash":"a8b3eec6e173e53c","korean":"화면 모드를 선택하십시오.","status":"reviewed"}
+{"id":816,"source_hash":"c0c7422051062339","korean":"50Hz","status":"reviewed"}
+{"id":817,"source_hash":"3165092d19b1fb70","korean":"60Hz - 테스트","status":"reviewed"}
+{"id":818,"source_hash":"bb3d85a02f1e9c4b","korean":"60Hz 프로그레시브(480P) - 테스트","status":"reviewed"}
+{"id":819,"source_hash":"3c14cfcb7581d36c","korean":"60Hz","status":"reviewed"}
+{"id":820,"source_hash":"454f1b010efbb77f","korean":"60Hz로 전환하면 화면이 정상적으로 표시되지 않을 수 있습니다. 문제가 있으면 15초 기다리면 원래 화면 설정으로 자동 복귀합니다.","status":"reviewed"}
+{"id":821,"source_hash":"dee1291101ccaab4","korean":"60Hz 프로그레시브(480P)로 전환하면 화면이 정상적으로 표시되지 않을 수 있습니다. 문제가 있으면 15초 기다리면 원래 화면 설정으로 자동 복귀합니다.","status":"reviewed"}
+{"id":822,"source_hash":"c8467172199dc74f","korean":"현재 화면은 60Hz 모드입니다. 이 화면 모드를 유지하시겠습니까? (응답이 없으면 %d초 후 원래 화면 모드로 돌아갑니다.)","status":"reviewed"}
+{"id":823,"source_hash":"a601df3860e10e86","korean":"현재 화면은 60Hz 프로그레시브(480P) 모드입니다. 이 화면 모드를 유지하시겠습니까? (응답이 없으면 %d초 후 원래 화면 모드로 돌아갑니다.)","status":"reviewed"}
+{"id":824,"source_hash":"cd69e671cd86a92b","korean":"컨트롤러를 다시 연결한 뒤 START를 눌러 계속하십시오.","status":"reviewed"}
+{"id":825,"source_hash":"a587da8879590d5f","korean":"컨트롤러가 제거되었습니다.","status":"reviewed"}
+{"id":826,"source_hash":"78955cb6051473cf","korean":"컨트롤러를 감지할 수 없습니다. 컨트롤러 포트 1에 컨트롤러를 연결하십시오.","status":"reviewed"}
+{"id":827,"source_hash":"578a7f0e0b234d3c","korean":"컨트롤러 연결 끊김","status":"reviewed"}
+{"id":828,"source_hash":"9b27f65d9ec4b5be","korean":"XBOX LIVE 암호를 입력하십시오.","status":"reviewed"}
+{"id":829,"source_hash":"e54796eb3804e1f8","korean":"Xbox Live 암호를 입력하십시오.","status":"reviewed"}
+{"id":830,"source_hash":"251815a48f910065","korean":"받는 사람:","status":"reviewed"}
+{"id":831,"source_hash":"b7aa3aea71effdbc","korean":"메시지 보내기","status":"reviewed"}
+{"id":832,"source_hash":"e08095f97817c481","korean":"%s님과 친구가 되시겠습니까?","status":"reviewed"}
+{"id":833,"source_hash":"4e625d7dcb069365","korean":"%s님의 멀티플레이 세션에 참가하시겠습니까?","status":"reviewed"}
+{"id":834,"source_hash":"ba569c2b864b9029","korean":"이 고스트 차량을 다운로드해 대결하시겠습니까?","status":"reviewed"}
+{"id":835,"source_hash":"4d6ca69bfb407e06","korean":"총 플레이어: %d","status":"reviewed"}
+{"id":836,"source_hash":"833a0a731f708fb1","korean":"랭크: %d","status":"reviewed"}
+{"id":837,"source_hash":"2e6f91efe12b7f7c","korean":"플레이어 수 부족!","status":"reviewed"}
+{"id":838,"source_hash":"435bc95c168e3441","korean":"네트워크 게임을 시작하려면 최소 2명이 필요합니다.","status":"reviewed"}
+{"id":839,"source_hash":"1ff09f2ea51cba0e","korean":"시작하려면 최소 2명이 필요합니다.","status":"reviewed"}
+{"id":840,"source_hash":"c46cbb6ad968f6bb","korean":"플레이어 옵션","status":"reviewed"}
+{"id":841,"source_hash":"34ba03ced410704f","korean":"이 플레이어의 라이선스 정보를 봅니다.","status":"reviewed"}
+{"id":842,"source_hash":"6ef22e494774502c","korean":"이 플레이어의 음성을 음소거합니다.","status":"reviewed"}
+{"id":843,"source_hash":"65f0529ce94e111a","korean":"이 플레이어를 게임 세션에서 강제 퇴장시킵니다.","status":"reviewed"}
+{"id":844,"source_hash":"7120e84fc1a66ee8","korean":"디스크가 제거되었습니다. 디스크를 다시 삽입하십시오.","status":"reviewed"}
+{"id":845,"source_hash":"43a93c4034bdcf11","korean":"PSP®Game이 제거되었습니다. PSP®Game을 다시 삽입하십시오.","status":"reviewed"}
+{"id":846,"source_hash":"d6dd8b826ce7b7bb","korean":"사용 중인 디스크에 문제가 있습니다. 디스크가 더럽거나 손상되었을 수 있습니다.","status":"reviewed"}
+{"id":847,"source_hash":"5f0605a71d7b59e0","korean":"라이벌과 레이스!","status":"reviewed"}
+{"id":848,"source_hash":"62f1354fd1fff082","korean":"녹아웃을 피하라!","status":"reviewed"}
+{"id":849,"source_hash":"c340a7311078484f","korean":"드리프트 실력을 시험하라!","status":"reviewed"}
+{"id":850,"source_hash":"1e76087e470fa5b1","korean":"슬립스트림 실력을 시험하라!","status":"reviewed"}
+{"id":851,"source_hash":"55514a98e47e0a30","korean":"여자친구를 놓치지 마라!","status":"reviewed"}
+{"id":852,"source_hash":"6991629a2f421ce8","korean":"계속 차량을 추월하라!","status":"reviewed"}
+{"id":853,"source_hash":"6f20ca1dacebfa42","korean":"더 많이 드리프트하라!","status":"reviewed"}
+{"id":854,"source_hash":"85da7f864c0f075f","korean":"충돌하지 마라!","status":"reviewed"}
+{"id":855,"source_hash":"04df4c5f9722fd2e","korean":"파란 콘을 맞혀라!","status":"reviewed"}
+{"id":856,"source_hash":"b0c3735303953bf3","korean":"코인을 모아라!","status":"reviewed"}
+{"id":857,"source_hash":"1e7e52909d0e7202","korean":"게이트를 통과하라!","status":"reviewed"}
+{"id":858,"source_hash":"5ffa13bbdf5e8ba5","korean":"호송 차량을 추월하라!","status":"reviewed"}
+{"id":859,"source_hash":"749c88d90980c379","korean":"고스트를 맞혀라!","status":"reviewed"}
+{"id":860,"source_hash":"765434ecd6bc48fc","korean":"선을 끊어라!","status":"reviewed"}
+{"id":861,"source_hash":"4a85045ef644e3a4","korean":"빨간색을 통과하라!","status":"reviewed"}
+{"id":862,"source_hash":"b27f290fcb76dfc4","korean":"초록색을 통과하라!","status":"reviewed"}
+{"id":863,"source_hash":"485f0d857e386fe8","korean":"파란색을 통과하라!","status":"reviewed"}
+{"id":864,"source_hash":"8123c9fa8c6a090a","korean":"라인을 유지하라!","status":"reviewed"}
+{"id":865,"source_hash":"79d898bb40b9d97f","korean":"제한 속도보다 빠르게 달려라!","status":"reviewed"}
+{"id":866,"source_hash":"c8ec4fbd91ec3c7f","korean":"차량 뒤에서 슬립스트림하라!","status":"reviewed"}
+{"id":867,"source_hash":"cf35b95ebe03399b","korean":"차량을 제어하라!","status":"reviewed"}
+{"id":868,"source_hash":"56def647d25c7975","korean":"비치볼을 드리블하라!","status":"reviewed"}
+{"id":869,"source_hash":"8ebf67ebd24bbfef","korean":"경적을 울려라!","status":"reviewed"}
+{"id":870,"source_hash":"5633b4d8bf4950be","korean":"지퍼를 맞혀라!","status":"reviewed"}
+{"id":871,"source_hash":"6fadf66ef0f05392","korean":"여자아이에게 먹이를 줘라!","status":"reviewed"}
+{"id":872,"source_hash":"a721a85b7f516872","korean":"오리를 맞혀라!","status":"reviewed"}
+{"id":873,"source_hash":"ed382cc14322d13f","korean":"운석을 피해라!","status":"reviewed"}
+{"id":874,"source_hash":"337d5559ce1d2d3d","korean":"차량을 맞혀라!","status":"reviewed"}
+{"id":875,"source_hash":"af0097826883f341","korean":"명소를 촬영하라!","status":"reviewed"}
+{"id":876,"source_hash":"18b4beecb7296ea5","korean":"UFO를 피해라!","status":"reviewed"}
+{"id":877,"source_hash":"751f9e18362e85b3","korean":"합계를 맞혀라!","status":"reviewed"}
+{"id":878,"source_hash":"f89606a6ed9ebffb","korean":"선물 개수를 세어라!","status":"reviewed"}
+{"id":879,"source_hash":"085cd7c90dffa97e","korean":"순서를 기억하라!","status":"reviewed"}
+{"id":880,"source_hash":"4616cd561fbf4515","korean":"소리를 맞혀라!","status":"reviewed"}
+{"id":881,"source_hash":"2d5acc1d083de193","korean":"계산하라!","status":"reviewed"}
+{"id":882,"source_hash":"1ead382b1a4a4111","korean":"양의 수를 세어라!","status":"reviewed"}
+{"id":883,"source_hash":"6036f99d9258153a","korean":"다른 하나를 찾아라!","status":"reviewed"}
+{"id":884,"source_hash":"d1a6bb31ff4622c4","korean":"Xbox Live에서 로그아웃하시겠습니까?","status":"reviewed"}
+{"id":885,"source_hash":"0694b7ddeba7dfaf","korean":"로그아웃하시겠습니까?","status":"reviewed"}
+{"id":886,"source_hash":"d1e2a454c3ef37d6","korean":"없음","status":"reviewed"}
+{"id":887,"source_hash":"1503a242bb76854b","korean":"익명","status":"reviewed"}
+{"id":888,"source_hash":"79f1f18117979fd4","korean":"카툰","status":"reviewed"}
+{"id":889,"source_hash":"473361fa72bb188a","korean":"거구","status":"reviewed"}
+{"id":890,"source_hash":"9575b551a0ef5997","korean":"어린이","status":"reviewed"}
+{"id":891,"source_hash":"477bc0311fec9164","korean":"로봇","status":"reviewed"}
+{"id":892,"source_hash":"dab195be5f5328e7","korean":"다크 로드","status":"reviewed"}
+{"id":893,"source_hash":"01c5d8c265078eba","korean":"속삭임","status":"reviewed"}
+{"id":894,"source_hash":"fd60bac0378132b8","korean":"끄기","status":"reviewed"}
+{"id":895,"source_hash":"c9212ed6cea7808c","korean":"Xbox Communicator","status":"reviewed"}
+{"id":896,"source_hash":"feb8839d942f4a2c","korean":"스피커로 음성 출력","status":"reviewed"}
+{"id":897,"source_hash":"a8dbd3e71befdaa4","korean":"코스를 주행해 미션을 잠금 해제하세요!","status":"reviewed"}
+{"id":898,"source_hash":"f10836f96ae2b9bf","korean":"초급 레이스에 도전하세요","status":"reviewed"}
+{"id":899,"source_hash":"5ab1330ebe94a676","korean":"중급 레이스에 도전하세요","status":"reviewed"}
+{"id":900,"source_hash":"998fd698f70c1adb","korean":"프로 레이스에 도전하세요","status":"reviewed"}
+{"id":901,"source_hash":"cbc97ac853956023","korean":"OutRun 레이스에 도전하세요","status":"reviewed"}
+{"id":902,"source_hash":"9776076f35a14f11","korean":"완벽합니다! 초급 레이스 완료!","status":"reviewed"}
+{"id":903,"source_hash":"aae7a8da31887114","korean":"완벽합니다! 중급 레이스 완료!","status":"reviewed"}
+{"id":904,"source_hash":"b578158c8f5ae861","korean":"완벽합니다! 프로 레이스 완료!","status":"reviewed"}
+{"id":905,"source_hash":"ce5dba4c897dbadc","korean":"완벽합니다! OutRun 레이스 완료!","status":"reviewed"}
+{"id":906,"source_hash":"1b3467aea58e3c04","korean":"잠금 해제 조건: 플래그맨 1 평균 랭크 A","status":"reviewed"}
+{"id":907,"source_hash":"4e953e63d1d908fa","korean":"잠금 해제 조건: 플래그맨 2 평균 랭크 A","status":"reviewed"}
+{"id":908,"source_hash":"f6f18a6a83048eea","korean":"잠금 해제 조건: 플래그맨 3 평균 랭크 A","status":"reviewed"}
+{"id":909,"source_hash":"ec4d1dbde93c8c0f","korean":"트래픽 요청을 달성해\n클라리사에게 좋은 인상을 주세요!","status":"reviewed"}
+{"id":910,"source_hash":"7b4efa0f366f4ace","korean":"테크닉 요청을 달성해\n제니퍼에게 좋은 인상을 주세요!","status":"reviewed"}
+{"id":911,"source_hash":"ecb30d8a0092555e","korean":"퍼즐 요청을 달성해\n홀리에게 좋은 인상을 주세요!","status":"reviewed"}
+{"id":912,"source_hash":"ecb30d8a0092555e","korean":"퍼즐 요청을 달성해\n홀리에게 좋은 인상을 주세요!","status":"reviewed"}
+{"id":913,"source_hash":"cd665b408a4adb53","korean":"완벽합니다! 클라리사가 아주 기뻐합니다!","status":"reviewed"}
+{"id":914,"source_hash":"5c98aae34f7afb4d","korean":"완벽합니다! 제니퍼가 당신의 테크닉을 좋아합니다!","status":"reviewed"}
+{"id":915,"source_hash":"0f664db219d715ab","korean":"완벽합니다! 홀리가 당신의 센스를 마음에 들어 합니다!","status":"reviewed"}
+{"id":916,"source_hash":"642183f142e94e02","korean":"완벽합니다! 홀리가 전율하고 있습니다!","status":"reviewed"}
+{"id":917,"source_hash":"1433edbee1e15236","korean":"잠금 해제 조건: 클라리사 평균 랭크 A","status":"reviewed"}
+{"id":918,"source_hash":"65c962028d25d0d4","korean":"잠금 해제 조건: 제니퍼 평균 랭크 A","status":"reviewed"}
+{"id":919,"source_hash":"46d3e579a9db86b2","korean":"PSP®(PlayStation®Portable)에서 Mix 01을 플레이하세요!\n여기서 상태를 확인할 수 있습니다!","status":"reviewed"}
+{"id":920,"source_hash":"4dd8543869187abf","korean":"PlayStation®2에서 Mix 02를 플레이하세요!\n여기서 상태를 확인할 수 있습니다!","status":"reviewed"}
+{"id":921,"source_hash":"e2008c9128414c22","korean":"로그인","status":"reviewed","notes":"propagated from identical source string"}
+{"id":922,"source_hash":"ed8cdd16e76c8f58","korean":"새 계정 등록","status":"reviewed"}
+{"id":923,"source_hash":"514071ff6aa12f28","korean":"계정 삭제","status":"reviewed"}
+{"id":924,"source_hash":"29ffa2ce873e4aec","korean":"플레이어 목록","status":"reviewed"}
+{"id":925,"source_hash":"9bc2b11b76d1d07a","korean":"친구 목록","status":"reviewed"}
+{"id":926,"source_hash":"89ab0d20fd8515c2","korean":"피드백 남기기","status":"reviewed"}
+{"id":927,"source_hash":"61075a22a19cdbd7","korean":"친구 요청","status":"reviewed"}
+{"id":928,"source_hash":"e379121d55fe46cc","korean":"친구 옵션","status":"reviewed"}
+{"id":929,"source_hash":"42f6d41b91f88bb2","korean":"플레이어 옵션","status":"reviewed"}
+{"id":930,"source_hash":"f7c97009895c07e7","korean":"OptiMatch 설정","status":"reviewed"}
+{"id":931,"source_hash":"9e98463efa1bf2da","korean":"커스텀 게임 설정","status":"reviewed"}
+{"id":932,"source_hash":"9e98463efa1bf2da","korean":"커스텀 게임 설정","status":"reviewed"}
+{"id":933,"source_hash":"f694c8e0b68ff70a","korean":"아이템 구매","status":"reviewed"}
+{"id":934,"source_hash":"6c6e124e7366ee40","korean":"라이선스 옵션","status":"reviewed"}
+{"id":935,"source_hash":"8b2b889728a6e8c8","korean":"확실합니까?","status":"reviewed"}
+{"id":936,"source_hash":"ee16ebb21cca3f9c","korean":"지금 게임을 나가면 이 세션이 종료됩니다. 정말 나가시겠습니까?","status":"reviewed"}
+{"id":937,"source_hash":"618ecff65f748e35","korean":"이름이 승인되었습니다.","status":"reviewed"}
+{"id":938,"source_hash":"7f1096e3a57ff27a","korean":"계정 이름은 최소 %d자 이상이어야 합니다.","status":"reviewed"}
+{"id":939,"source_hash":"488a09246a2ec4bc","korean":"주의: 계정 이름에는 공백을 사용할 수 없습니다.","status":"reviewed"}
+{"id":940,"source_hash":"ec40d0b79c67c116","korean":"비밀번호가 승인되었습니다.","status":"reviewed"}
+{"id":941,"source_hash":"2ae2b98442813f25","korean":"계정 비밀번호는 최소 %d자 이상이어야 합니다.","status":"reviewed"}
+{"id":942,"source_hash":"28a7bc80ae7b3c10","korean":"주의: 계정 비밀번호에는 공백을 사용할 수 없습니다.","status":"reviewed"}
+{"id":943,"source_hash":"13373944b1dd5028","korean":"온라인 계정 이름을 입력하십시오(최소 %d자).","status":"reviewed"}
+{"id":944,"source_hash":"c421ee4161cba0a2","korean":"온라인 계정 비밀번호를 입력하십시오(최소 %d자).","status":"reviewed"}
+{"id":945,"source_hash":"1b9bcb69404989cb","korean":"위에 입력한 정보로 계정을 생성합니다.","status":"reviewed"}
+{"id":946,"source_hash":"68a1d09f8d205f8d","korean":"계정을 생성하려면 계정 이름과 비밀번호를 입력하십시오.","status":"reviewed"}
+{"id":947,"source_hash":"0afe6e97d547d052","korean":"플래그맨이 감탄했습니다!","status":"reviewed"}
+{"id":948,"source_hash":"0cae82bed7c9bab3","korean":"플래그맨 2를 사용할 수 있습니다!","status":"reviewed"}
+{"id":949,"source_hash":"3eb4026199d2c3d4","korean":"플래그맨이 크게 감탄했습니다!","status":"reviewed"}
+{"id":950,"source_hash":"3047ecd5cbb64e98","korean":"플래그맨 3을 사용할 수 있습니다!","status":"reviewed"}
+{"id":951,"source_hash":"6b32a38a3436ef71","korean":"플래그맨이 아주 기뻐합니다!","status":"reviewed"}
+{"id":952,"source_hash":"d9241bd978af2842","korean":"플래그맨 4를 사용할 수 있습니다!","status":"reviewed"}
+{"id":953,"source_hash":"36cfc92c39385ef7","korean":"플래그맨이 전율하고 있습니다!","status":"reviewed"}
+{"id":954,"source_hash":"a0e8ea92696e85c2","korean":"레이스 미션을 통과했습니다.\n모두 완벽하게 클리어할 수 있을까요?!","status":"reviewed"}
+{"id":955,"source_hash":"f632b244d3fc80a8","korean":"클라리사가 아주 기뻐합니다!","status":"reviewed"}
+{"id":956,"source_hash":"83f4ccb8ef84763f","korean":"제니퍼를 사용할 수 있습니다!","status":"reviewed"}
+{"id":957,"source_hash":"f58a25a840baad35","korean":"제니퍼가 당신의 테크닉을 좋아합니다!","status":"reviewed"}
+{"id":958,"source_hash":"5b824195232b09ff","korean":"홀리를 사용할 수 있습니다!","status":"reviewed"}
+{"id":959,"source_hash":"0d0637a67e86d12f","korean":"홀리가 당신의 센스를 마음에 들어 합니다!","status":"reviewed"}
+{"id":960,"source_hash":"cfb2c941518982c0","korean":"Coast 2 Coast를 클리어했습니다","status":"reviewed"}
+{"id":961,"source_hash":"b161fbaef6732fac","korean":"완벽하게 클리어할 수 있을까요?","status":"reviewed"}
+{"id":962,"source_hash":"cfb9f6dbe454fd83","korean":"당신은\nCoast 2 Coast\n챔피언입니다!","status":"reviewed"}
+{"id":963,"source_hash":"4c81714b1e5fb38d","korean":"Xbox에 게임 저장 공간이 부족합니다. %d개의 블록이 더 필요합니다. A를 눌러 공간을 확보하거나 B를 눌러 취소하십시오.","status":"reviewed"}
+{"id":964,"source_hash":"c525ed6343e8f991","korean":"수락","status":"reviewed"}
+{"id":965,"source_hash":"c96be329a7f71eb4","korean":"로그인에 실패했습니다.","status":"reviewed"}
+{"id":966,"source_hash":"c4407748678002cd","korean":"메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB) 상태가 변경되었습니다. 이 메모리 카드를 계속 사용하시겠습니까?","status":"reviewed"}
+{"id":967,"source_hash":"249f7530ef00df60","korean":"고스트 차량과 점수 데이터를 멀티플레이 랭킹에 추가하시겠습니까?","status":"reviewed"}
+{"id":968,"source_hash":"55bf3b6a84215b45","korean":"고스트 차량과 점수 데이터를 온라인 스코어보드에 업로드하시겠습니까?","status":"reviewed"}
+{"id":969,"source_hash":"80a0219ff8fd96cd","korean":"랭킹 업데이트","status":"reviewed"}
+{"id":970,"source_hash":"3236143cde7d97a8","korean":"연결이 끊어졌습니다.","status":"reviewed"}
+{"id":971,"source_hash":"0a261d255f438045","korean":"게임을 나갔습니다.","status":"reviewed"}
+{"id":972,"source_hash":"6c5bfb293190b491","korean":"로비로 돌아왔습니다.","status":"reviewed"}
+{"id":973,"source_hash":"9c3a459a042fc8dd","korean":"%s님에 대한 피드백을 남기시겠습니까?","status":"reviewed"}
+{"id":974,"source_hash":"43a93c4034bdcf11","korean":"PSP®Game이 제거되었습니다. PSP®Game을 다시 삽입하십시오.","status":"reviewed","notes":"propagated from identical source string"}
+{"id":975,"source_hash":"1b198b8692593e39","korean":"디스크가 제거되었습니다. 로비로 돌아갑니다.","status":"reviewed"}
+{"id":976,"source_hash":"a1091210e100a61e","korean":"님이 게임에 참가했습니다.","status":"reviewed"}
+{"id":977,"source_hash":"4edc55f8d0118370","korean":"저장 데이터가 손상되어 사용할 수 없습니다. 계속하려면 A를 누르십시오.","status":"reviewed"}
+{"id":978,"source_hash":"86ecb8e99d415c20","korean":"정말 종료하시겠습니까? 고스트 데이터가 사라집니다!","status":"reviewed"}
+{"id":979,"source_hash":"1e38eacebf586cf8","korean":"네트워크 설정 파일을 선택하십시오.","status":"reviewed"}
+{"id":980,"source_hash":"32487a2cb3fe4627","korean":"LAN 또는 온라인 게임에서 사용할 네트워크 설정을 다음 중에서 선택하십시오.","status":"reviewed"}
+{"id":981,"source_hash":"b2882b244d64914d","korean":"계정 로그인","status":"reviewed"}
+{"id":982,"source_hash":"f64ac0c06b4f120f","korean":"계정에 로그인하려면 계정 이름과 비밀번호를 입력하십시오.","status":"reviewed"}
+{"id":983,"source_hash":"c83c0c3f3bea95f5","korean":"라이벌","status":"reviewed"}
+{"id":984,"source_hash":"b3eaf4ce3259e5bb","korean":"아래 정보로 계정에 로그인합니다.","status":"reviewed"}
+{"id":985,"source_hash":"78656163857ce6f5","korean":"로컬","status":"reviewed","notes":"propagated from identical source string"}
+{"id":986,"source_hash":"fbcc381de1167fa0","korean":"원격","status":"reviewed"}
+{"id":987,"source_hash":"e0662796f23a441f","korean":"로컬 및 원격","status":"reviewed"}
+{"id":988,"source_hash":"2f9eda5386e00a86","korean":"DNAS 오류 (-101)\n\n네트워크 인증 서버가 혼잡합니다. 나중에 다시 시도하십시오.","status":"reviewed"}
+{"id":989,"source_hash":"babbac897033c631","korean":"DNAS 오류 (-102)\n\n이 소프트웨어 타이틀은 서비스 중이 아닙니다.\n\n오류 코드 번호를 적어 두고 SCEK(02-6677-7771)로 문의하십시오.","status":"reviewed"}
+{"id":990,"source_hash":"4bbb88a85932afc9","korean":"DNAS 오류 (-103)\n\n이 소프트웨어 타이틀은 서비스 중이 아닙니다.\n\n오류 코드 번호를 적어 두고 SCEK(02-6677-7771)로 문의하십시오.","status":"reviewed"}
+{"id":991,"source_hash":"80b578823e6249fb","korean":"DNAS 오류 (-104)\n\n네트워크 인증 서버가 서비스 중이 아닙니다.\n\n오류 코드 번호를 적어 두고 SCEK(02-6677-7771)로 문의하십시오.","status":"reviewed"}
+{"id":992,"source_hash":"7f5e7cece57df38d","korean":"DNAS 오류 (-105)\n\n네트워크 인증 서버 연결 시간이 초과되었습니다. 나중에 다시 시도하십시오.\n\n같은 문제가 계속되면 소프트웨어 설명서에 안내된 지역 PlayStation 고객지원 센터로 문의하십시오.","status":"reviewed"}
+{"id":993,"source_hash":"dc4bf753cf6bdc84","korean":"DNAS 오류 (-106)\n\n네트워크 인증 시스템 오류가 발생했습니다.\n\n오류 코드 번호를 적어 두고 SCEK(02-6677-7771)로 문의하십시오.","status":"reviewed"}
+{"id":994,"source_hash":"36d71f0862316f53","korean":"DNAS 오류 (-107)\n\n네트워크 인증 시스템 오류가 발생했습니다.\n\n오류 코드 번호를 적어 두고 SCEK(02-6677-7771)로 문의하십시오.","status":"reviewed"}
+{"id":995,"source_hash":"8bd723e419dd6773","korean":"DNAS 오류 (-108)\n\n네트워크 인증 시스템 오류가 발생했습니다.\n\n오류 코드 번호를 적어 두고 SCEK(02-6677-7771)로 문의하십시오.","status":"reviewed"}
+{"id":996,"source_hash":"744f2d0e39332e3e","korean":"DNAS 오류 (-110)\n\n네트워크 인증 서버가 혼잡합니다.\n\n나중에 다시 시도하십시오.","status":"reviewed"}
+{"id":997,"source_hash":"5cfead2e67db0ab0","korean":"DNAS 오류 (-401)\n\nPlayStation®2 하드웨어 정보 오류가 발생했습니다.\n\n오류 코드 번호를 적어 두고 SCEK(02-6677-7771)로 문의하십시오.","status":"reviewed"}
+{"id":998,"source_hash":"e2b347933ce192f7","korean":"DNAS 오류 (-402)\n\nPlayStation®2 디스크 정보 오류가 발생했습니다.\n\n오류 코드 번호를 적어 두고 SCEK(02-6677-7771)로 문의하십시오.","status":"reviewed"}
+{"id":999,"source_hash":"4fd77bb52da1ade1","korean":"DNAS 오류 (-403)\n\nPlayStation®2 디스크 정보 오류가 발생했습니다.\n\n오류 코드 번호를 적어 두고 SCEK(02-6677-7771)로 문의하십시오.","status":"reviewed"}
+{"id":1000,"source_hash":"1de8dd698821e198","korean":"DNAS 오류 (-404)\n\nPlayStation®2 하드웨어 정보 오류가 발생했습니다.\n\n오류 코드 번호를 적어 두고 SCEK(02-6677-7771)로 문의하십시오.","status":"reviewed"}
+{"id":1001,"source_hash":"e8eab32e743a9ae2","korean":"네트워크 오류 (-601)\n\n네트워크 연결이 중단되었습니다.","status":"reviewed"}
+{"id":1002,"source_hash":"ac67db5c3cef4bcc","korean":"네트워크 오류 (-602)\n\n프록시 설정에 오류가 있습니다.","status":"reviewed"}
+{"id":1003,"source_hash":"ff6a3d83b01dbd2c","korean":"네트워크 오류 (-603)\n\n연결 시간이 초과되었습니다. 나중에 다시 연결해 보십시오.","status":"reviewed"}
+{"id":1004,"source_hash":"8a6952280930cc5e","korean":"네트워크 오류 (-610)\n\nDNAS 서버 연결에 실패했습니다.","status":"reviewed"}
+{"id":1005,"source_hash":"da3cd49251babc3f","korean":"네트워크 오류 (-611)\n\nDNS 서버 응답에 오류가 있습니다. 네트워크 설정을 확인하십시오.","status":"reviewed"}
+{"id":1006,"source_hash":"743038134c76eb35","korean":"네트워크 오류 (-612)\n\nDNS 서버에서 응답이 없습니다. 네트워크 설정을 확인하십시오.","status":"reviewed"}
+{"id":1007,"source_hash":"8501eaa2fe0a5d87","korean":"네트워크 오류 (-613)\n\nDNS 서버 응답에 오류가 있습니다. 네트워크 설정을 확인하십시오.","status":"reviewed"}
+{"id":1008,"source_hash":"56b857d6de18c0d2","korean":"네트워크 오류 (-614)\n\nDNS 서버 응답에 오류가 있습니다. 네트워크 설정을 확인하십시오.","status":"reviewed"}
+{"id":1009,"source_hash":"382db1de19240ad2","korean":"네트워크 오류 (-615)\n\nDNS 오류가 발생했습니다. 네트워크 설정을 확인하십시오.","status":"reviewed"}
+{"id":1010,"source_hash":"0c42e12913577a02","korean":"네트워크 오류 (-616)\n\nDNAS 서버 연결에 실패했습니다.","status":"reviewed"}
+{"id":1011,"source_hash":"27ca89c2b1378696","korean":"네트워크 오류 (-617)\n\n연결 시간이 초과되었습니다. 나중에 다시 연결해 보십시오.","status":"reviewed"}
+{"id":1012,"source_hash":"0c199839069a6224","korean":"네트워크 오류 (-618)\n\nDNAS 서버 연결에 실패했습니다.","status":"reviewed"}
+{"id":1013,"source_hash":"00be1c5bc6b70fcc","korean":"네트워크 오류 (-619)\n\nDNAS 서버 연결에 실패했습니다.","status":"reviewed"}
+{"id":1014,"source_hash":"9dfcdf16336a3c1d","korean":"네트워크 오류 (-620)\n\nDNAS 서버 연결에 실패했습니다.","status":"reviewed"}
+{"id":1015,"source_hash":"efea3b5354c5ef43","korean":"네트워크 오류 (-621)\n\n연결 오류가 발생했습니다.","status":"reviewed"}
+{"id":1016,"source_hash":"df339020aabfd65f","korean":"네트워크 오류 (-622)\n\n연결 오류가 발생했습니다.","status":"reviewed"}
+{"id":1017,"source_hash":"081b8f2bc96a5da1","korean":"네트워크 오류 (-623)\n\n연결 오류가 발생했습니다.","status":"reviewed"}
+{"id":1018,"source_hash":"0cfd01504b871c5b","korean":"네트워크 오류 (-624)\n\n연결 오류가 발생했습니다.","status":"reviewed"}
+{"id":1019,"source_hash":"90c9a42966345a10","korean":"네트워크 오류 (-625)\n\n연결 오류가 발생했습니다.","status":"reviewed"}
+{"id":1020,"source_hash":"6ac95c0dc9e8f4c7","korean":"네트워크 오류 (-626)\n\nDNAS 서버 연결에 실패했습니다.","status":"reviewed"}
+{"id":1021,"source_hash":"eb19f87288711e8c","korean":"DNAS 오류 (-%d)\n\n인증 오류가 발생했습니다.\n\n오류 코드 번호를 적어 두고 SCEK(02-6677-7771)로 문의하십시오.","status":"reviewed"}
+{"id":1022,"source_hash":"2f9eda5386e00a86","korean":"DNAS 오류 (-101)\n\n네트워크 인증 서버가 혼잡합니다. 나중에 다시 시도하십시오.","status":"reviewed"}
+{"id":1023,"source_hash":"fe10fa4f49141e62","korean":"DNAS 오류 (-102)\n\n이 소프트웨어 타이틀은 서비스 중이 아닙니다.\n\n오류 코드 번호를 적어 두고 SCEA(1-866-466-5333) 또는 www.us.playstation.com으로 문의하십시오.","status":"reviewed"}
+{"id":1024,"source_hash":"7bcf2d1cf3698aad","korean":"DNAS 오류 (-103)\n\n이 소프트웨어 타이틀은 서비스 중이 아닙니다.\n\n오류 코드 번호를 적어 두고 SCEA(1-866-466-5333) 또는 www.us.playstation.com으로 문의하십시오.","status":"reviewed"}
+{"id":1025,"source_hash":"87eee3f23731b0ad","korean":"DNAS 오류 (-104)\n\n네트워크 인증 서버가 서비스 중이 아닙니다.\n\n오류 코드 번호를 적어 두고 SCEA(1-866-466-5333) 또는 www.us.playstation.com으로 문의하십시오.","status":"reviewed"}
+{"id":1026,"source_hash":"c196b3cb7596d25f","korean":"DNAS 오류 (-105)\n\n네트워크 인증 서버 연결 시간이 초과되었습니다. 나중에 다시 시도하십시오.","status":"reviewed"}
+{"id":1027,"source_hash":"2bf0016b560f0a8a","korean":"DNAS 오류 (-106)\n\n네트워크 인증 시스템 오류가 발생했습니다.\n\n오류 코드 번호를 적어 두고 SCEA(1-866-466-5333) 또는 www.us.playstation.com으로 문의하십시오.","status":"reviewed"}
+{"id":1028,"source_hash":"292573b3fb857fc6","korean":"DNAS 오류 (-107)\n\n네트워크 인증 시스템 오류가 발생했습니다.\n\n오류 코드 번호를 적어 두고 SCEA(1-866-466-5333) 또는 www.us.playstation.com으로 문의하십시오.","status":"reviewed"}
+{"id":1029,"source_hash":"4943f164c85c5f1b","korean":"DNAS 오류 (-108)\n\n네트워크 인증 시스템 오류가 발생했습니다.\n\n오류 코드 번호를 적어 두고 SCEA(1-866-466-5333) 또는 www.us.playstation.com으로 문의하십시오.","status":"reviewed"}
+{"id":1030,"source_hash":"4541c8c2fadcab49","korean":"DNAS 오류 (-110)\n\n네트워크 인증 서버가 혼잡합니다. 나중에 다시 시도하십시오.","status":"reviewed"}
+{"id":1031,"source_hash":"ea3660f968d42c37","korean":"DNAS 오류 (-401)\n\nPlayStation®2 하드웨어 정보 오류가 발생했습니다.\n\n오류 코드 번호를 적어 두고 SCEA(1-866-466-5333) 또는 www.us.playstation.com으로 문의하십시오.","status":"reviewed"}
+{"id":1032,"source_hash":"00b5c223c700da55","korean":"DNAS 오류 (-402)\n\nPlayStation®2 디스크 정보 오류가 발생했습니다.\n\n오류 코드 번호를 적어 두고 SCEA(1-866-466-5333) 또는 www.us.playstation.com으로 문의하십시오.","status":"reviewed"}
+{"id":1033,"source_hash":"6b88164b7701630e","korean":"DNAS 오류 (-403)\n\nPlayStation®2 디스크 정보 오류가 발생했습니다.\n\n오류 코드 번호를 적어 두고 SCEA(1-866-466-5333) 또는 www.us.playstation.com으로 문의하십시오.","status":"reviewed"}
+{"id":1034,"source_hash":"e203d8ed3aef534c","korean":"DNAS 오류 (-404)\n\nPlayStation®2 하드웨어 정보 오류가 발생했습니다.\n\n오류 코드 번호를 적어 두고 SCEA(1-866-466-5333) 또는 www.us.playstation.com으로 문의하십시오.","status":"reviewed"}
+{"id":1035,"source_hash":"e8eab32e743a9ae2","korean":"네트워크 오류 (-601)\n\n네트워크 연결이 중단되었습니다.","status":"reviewed"}
+{"id":1036,"source_hash":"ac67db5c3cef4bcc","korean":"네트워크 오류 (-602)\n\n프록시 설정에 오류가 있습니다.","status":"reviewed"}
+{"id":1037,"source_hash":"ff6a3d83b01dbd2c","korean":"네트워크 오류 (-603)\n\n연결 시간이 초과되었습니다. 나중에 다시 연결해 보십시오.","status":"reviewed"}
+{"id":1038,"source_hash":"8a6952280930cc5e","korean":"네트워크 오류 (-610)\n\nDNAS 서버 연결에 실패했습니다.","status":"reviewed"}
+{"id":1039,"source_hash":"da3cd49251babc3f","korean":"네트워크 오류 (-611)\n\nDNS 서버 응답에 오류가 있습니다. 네트워크 설정을 확인하십시오.","status":"reviewed"}
+{"id":1040,"source_hash":"743038134c76eb35","korean":"네트워크 오류 (-612)\n\nDNS 서버에서 응답이 없습니다. 네트워크 설정을 확인하십시오.","status":"reviewed"}
+{"id":1041,"source_hash":"8501eaa2fe0a5d87","korean":"네트워크 오류 (-613)\n\nDNS 서버 응답에 오류가 있습니다. 네트워크 설정을 확인하십시오.","status":"reviewed"}
+{"id":1042,"source_hash":"56b857d6de18c0d2","korean":"네트워크 오류 (-614)\n\nDNS 서버 응답에 오류가 있습니다. 네트워크 설정을 확인하십시오.","status":"reviewed"}
+{"id":1043,"source_hash":"382db1de19240ad2","korean":"네트워크 오류 (-615)\n\nDNS 오류가 발생했습니다. 네트워크 설정을 확인하십시오.","status":"reviewed"}
+{"id":1044,"source_hash":"0c42e12913577a02","korean":"네트워크 오류 (-616)\n\nDNAS 서버 연결에 실패했습니다.","status":"reviewed"}
+{"id":1045,"source_hash":"27ca89c2b1378696","korean":"네트워크 오류 (-617)\n\n연결 시간이 초과되었습니다. 나중에 다시 연결해 보십시오.","status":"reviewed"}
+{"id":1046,"source_hash":"0c199839069a6224","korean":"네트워크 오류 (-618)\n\nDNAS 서버 연결에 실패했습니다.","status":"reviewed"}
+{"id":1047,"source_hash":"00be1c5bc6b70fcc","korean":"네트워크 오류 (-619)\n\nDNAS 서버 연결에 실패했습니다.","status":"reviewed"}
+{"id":1048,"source_hash":"3573a09e4e3b8a74","korean":"네트워크 오류 (-620)\n\nDNAS 서버 연결에 실패했습니다.","status":"reviewed"}
+{"id":1049,"source_hash":"efea3b5354c5ef43","korean":"네트워크 오류 (-621)\n\n연결 오류가 발생했습니다.","status":"reviewed"}
+{"id":1050,"source_hash":"df339020aabfd65f","korean":"네트워크 오류 (-622)\n\n연결 오류가 발생했습니다.","status":"reviewed"}
+{"id":1051,"source_hash":"081b8f2bc96a5da1","korean":"네트워크 오류 (-623)\n\n연결 오류가 발생했습니다.","status":"reviewed"}
+{"id":1052,"source_hash":"0cfd01504b871c5b","korean":"네트워크 오류 (-624)\n\n연결 오류가 발생했습니다.","status":"reviewed"}
+{"id":1053,"source_hash":"90c9a42966345a10","korean":"네트워크 오류 (-625)\n\n연결 오류가 발생했습니다.","status":"reviewed"}
+{"id":1054,"source_hash":"6ac95c0dc9e8f4c7","korean":"네트워크 오류 (-626)\n\nDNAS 서버 연결에 실패했습니다.","status":"reviewed"}
+{"id":1055,"source_hash":"0cf00a3d0f0cd319","korean":"DNAS 오류 (-%d)\n\n인증 오류가 발생했습니다.\n\n오류 코드 번호를 적어 두고 SCEA(1-866-466-5333) 또는 www.us.playstation.com으로 문의하십시오.","status":"reviewed"}
+{"id":1056,"source_hash":"528213185ad555aa","korean":"%s의 암호를 입력하십시오.","status":"reviewed"}
+{"id":1057,"source_hash":"581c5cf4c61f4c49","korean":"%s에 입력한 암호가 올바르지 않습니다.","status":"reviewed"}
+{"id":1058,"source_hash":"00dc4565a4463ab8","korean":"시스템 링크 케이블이 분리되었을 수 있습니다. 케이블을 확인하고 다시 시도하십시오.","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1059,"source_hash":"669336782398e6fb","korean":"더 보기","status":"reviewed"}
+{"id":1060,"source_hash":"37cbd15afd1eb9fb","korean":"무선을 선택하면 온라인 계정에서 자동으로 로그아웃됩니다. 계속하시겠습니까?","status":"reviewed"}
+{"id":1061,"source_hash":"5a3bf524bee93528","korean":"위","status":"reviewed"}
+{"id":1062,"source_hash":"b57b839f7e275886","korean":"위","status":"reviewed"}
+{"id":1063,"source_hash":"14ecf914dd1a1e3e","korean":"위","status":"reviewed"}
+{"id":1064,"source_hash":"0b9c13e3887f20c2","korean":"위","status":"reviewed"}
+{"id":1065,"source_hash":"ee16ebb21cca3f9c","korean":"지금 게임을 나가면 이 세션이 종료됩니다. 정말 나가시겠습니까?","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1066,"source_hash":"a7a0658ec799b62b","korean":"잠시 기다려 주십시오..","status":"reviewed"}
+{"id":1067,"source_hash":"f12b8afcb515e41c","korean":"점수를 찾을 수 없습니다","status":"reviewed"}
+{"id":1068,"source_hash":"d6669dbebb6d3654","korean":"%s님의 친구 요청을 차단하시겠습니까?","status":"reviewed"}
+{"id":1069,"source_hash":"f078935b274c76f1","korean":"일반","status":"reviewed"}
+{"id":1070,"source_hash":"75504dd5425b6104","korean":"튜닝","status":"reviewed"}
+{"id":1071,"source_hash":"eb0da1c0313cbe3b","korean":"차량 수를 세어라!","status":"reviewed"}
+{"id":1072,"source_hash":"f15883606a773ef9","korean":"저장","status":"reviewed"}
+{"id":1073,"source_hash":"f5a839467e540d3a","korean":"이 소프트웨어는 Sony Computer Entertainment Inc.(\"SCEI\")가 개발한 독자적인 인증 시스템인 \"DNAS\"(Dynamic Network Authentication System)를 사용합니다. \"DNAS\"는 인증, 복제 방지, 계정 차단, 시스템·규칙·게임 관리 및 기타 목적을 위해 사용자의 하드웨어와 소프트웨어 정보를 수집합니다. SCEI, Sony Computer Entertainment Korea(\"SCEK\") 및 그 계열사는 \"DNAS\" 서버의 지속적인 운영을 보장하지 않습니다. SCEK는 \"DNAS\" 서버의 지연 또는 작동 불능에 대해 책임을 지지 않습니다.","status":"reviewed_special","notes":"replace first UTF-16 segment; preserve trailing raw segment byte-for-byte"}
+{"id":1074,"source_hash":"41d3a5ea353d80cc","korean":"로그인 중 \"DNAS\" 인증 오류 메시지가 표시되면 소프트웨어 설명서에 안내된 지역 PlayStation 고객지원 센터로 문의하십시오. \"DNAS\"에 대한 자세한 내용은 PlayStation.com을 참조하십시오. 시스템 호환성 문제 또는 DNAS 작동 불능이 발생하는 경우 SCEI, SCEK 및 그 계열사의 책임은 SCEK의 선택에 따라 사용자의 해당 게임 소프트웨어, 콘솔 또는 주변기기의 수리 또는 교체로 제한됩니다. SCEK, 모회사, 계열사 또는 라이선스 퍼블리셔는 온라인 게임 플레이 또는 접속에 영향을 줄 수 있는 지연, 시스템 장애, 인증 실패 또는 시스템 중단에 대해 책임을 지지 않습니다.","status":"reviewed_special","notes":"replace first UTF-16 segment; preserve trailing raw segment byte-for-byte"}
+{"id":1075,"source_hash":"68741151521dc16c","korean":"이 소프트웨어는 Sony Computer Entertainment Inc.(\"SCEI\")가 개발한 독자적인 인증 시스템인 \"DNAS\"(Dynamic Network Authentication System)를 사용합니다. \"DNAS\"는 인증, 복제 방지, 계정 차단, 시스템·규칙·게임 관리 및 기타 목적을 위해 사용자의 하드웨어와 소프트웨어 정보를 수집합니다. 수집되는 정보만으로 사용자를 개인적으로 식별하지 않으며 SCE 이외의 회사와 공유하지 않습니다. 사용자가 퍼블리셔에 개인 식별 정보를 제공한 경우 퍼블리셔는 이 정보를 자체 기록의 개인 식별 정보와 결합할 수 있습니다. 퍼블리셔에 개인 정보를 제공하기 전에 반드시 해당 퍼블리셔의 개인정보처리방침 및 이용약관을 확인하십시오. 개인정보처리방침과 이용약관에 동의하지 않는 경우 퍼블리셔에 개인 식별 정보를 제공하지 마십시오. SCEI, Sony Computer Entertainment Korea(\"SCEK\") 및 그 계열사는 \"DNAS\" 서버의 지속적인 운영을 보장하지 않습니다. 로그인 중 \"DNAS\" 인증 오류 메시지가 표시되면 SCEK 정보센터 02-6677-7771로 문의하십시오.","status":"reviewed_special","notes":"replace first UTF-16 segment; preserve trailing raw segment byte-for-byte"}
+{"id":1076,"source_hash":"1dd377360e53887b","korean":"SCEI, Sony Computer Entertainment Korea(\"SCEK\") 및 그 계열사는 \"DNAS\" 서버의 지속적인 운영을 보장하지 않습니다. SCEK는 \"DNAS\" 서버의 지연 또는 작동 불능에 대해 책임을 지지 않습니다. 로그인 중 \"DNAS\" 인증 오류 메시지가 표시되면 SCEK 정보센터 02-6677-7771로 문의하십시오. 시스템 호환성 문제 또는 DNAS 작동 불능이 발생하는 경우 SCEI, SCEK 및 그 계열사의 책임은 SCEK의 선택에 따라 사용자의 해당 게임 소프트웨어, 콘솔 또는 주변기기의 수리 또는 교체로 제한됩니다. SCEK, 모회사, 계열사 또는 라이선스 퍼블리셔는 온라인 게임 플레이 또는 접속에 영향을 줄 수 있는 지연, 시스템 장애, 인증 실패 또는 시스템 중단에 대해 책임을 지지 않습니다.","status":"reviewed_special","notes":"replace first UTF-16 segment; preserve trailing raw segment byte-for-byte"}
+{"id":1077,"source_hash":"7be4e718ca5631b6","korean":"네트워크 설정 파일을 찾을 수 없습니다. 네트워크 설정 파일을 만들려면 네트워크 어댑터 시작 디스크를 사용하십시오.","status":"reviewed"}
+{"id":1078,"source_hash":"dadb9693d1a4c4a4","korean":"네트워크 설정 파일이 다른 본체에서 생성되었습니다. 네트워크 설정 파일을 만들려면 Network Access Disc를 사용하십시오.","status":"reviewed"}
+{"id":1079,"source_hash":"1da7bfcd8f1a4f3d","korean":"네트워크 설정 파일이 다른 PlayStation®2에서 생성되었습니다. 네트워크 설정 파일을 만들려면 네트워크 어댑터 시작 디스크를 사용하십시오.","status":"reviewed"}
+{"id":1080,"source_hash":"31c63222412e98b5","korean":"DNF","status":"reviewed"}
+{"id":1081,"source_hash":"2179cceb2eec63b7","korean":"방향 버튼으로 화면 위치를 조정하십시오","status":"reviewed"}
+{"id":1082,"source_hash":"6f3f5bc1d921b306","korean":"OutRun 2006: Coast 2 Coast는 자동 저장 기능을 사용합니다. 게임은 특정 시점에 메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)에 자동으로 접근합니다. 아래 접근 표시등이 깜빡이는 동안에는 메모리 카드(8MB)나 컨트롤러를 빼거나 본체를 리셋/전원 종료하지 마십시오.\n\n이 지점 이후 메모리 카드(8MB)를 삽입하면 게임 데이터가 덮어써질 수 있습니다.","status":"reviewed"}
+{"id":1083,"source_hash":"1203527c21045438","korean":"서버 연결에 실패했습니다.","status":"reviewed"}
+{"id":1084,"source_hash":"bba56d69471071c2","korean":"사용자 ID와 비밀번호를 인증할 수 없습니다. 네트워크 설정을 확인한 뒤 다시 시도하십시오.","status":"reviewed"}
+{"id":1085,"source_hash":"681cefbdd000114b","korean":"메모리 카드 슬롯 1에서 PlayStation®2용 메모리 카드(8MB)를 찾을 수 없습니다.","status":"reviewed"}
+{"id":1086,"source_hash":"c079dfaad020a433","korean":"메모리 카드 슬롯 1에 삽입된 PlayStation®2용 메모리 카드(8MB)에서 게임 데이터를 불러오시겠습니까? 저장하지 않은 진행 상황은 사라집니다!","status":"reviewed"}
+{"id":1087,"source_hash":"14cccf6c11f21beb","korean":"DNAS 데이터를 인증하는 중입니다. . .","status":"reviewed"}
+{"id":1088,"source_hash":"2f08821586ef7a3d","korean":"DNAS 로고는 Sony Computer Entertainment Inc.의 상표입니다.","status":"reviewed"}
+{"id":1089,"source_hash":"cfa28955711107e6","korean":"사용 가능한 네트워크 연결이 없습니다. 네트워크 설정 파일과 케이블을 확인하십시오.","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1090,"source_hash":"eee4041340dec2f3","korean":"50Hz 모드로 게임을 실행합니다.","status":"reviewed"}
+{"id":1091,"source_hash":"d9a4c0bc308e2b8e","korean":"불러오기 / 저장","status":"reviewed"}
+{"id":1092,"source_hash":"30a64b201ee00cdd","korean":"내 기록","status":"reviewed"}
+{"id":1093,"source_hash":"61343d5d878d4fe0","korean":"내 점수","status":"reviewed"}
+{"id":1094,"source_hash":"eb5211e83ed9c490","korean":"내 하트","status":"reviewed"}
+{"id":1095,"source_hash":"9648cd90c9aa960c","korean":"60Hz 모드로 게임을 실행합니다.","status":"reviewed"}
+{"id":1096,"source_hash":"18542efcb385ed9b","korean":"%s님의 게임에 참가하시겠습니까?\n모든 플레이어의 현재 세션이 종료됩니다.","status":"reviewed"}
+{"id":1097,"source_hash":"5972149f7de3eb4a","korean":"%s님의 게임에 참가하시겠습니까?\n현재 세션이 종료됩니다.","status":"reviewed"}
+{"id":1098,"source_hash":"b7aa3aea71effdbc","korean":"메시지 보내기","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1099,"source_hash":"d3f78f648e08a6cb","korean":"게임 초대 보내기","status":"reviewed"}
+{"id":1100,"source_hash":"821f9b064d07560e","korean":"친구 요청 보내기","status":"reviewed"}
+{"id":1101,"source_hash":"e173bd56d169768f","korean":"받은 메시지","status":"reviewed"}
+{"id":1102,"source_hash":"40883bc604611482","korean":"받은 게임 초대","status":"reviewed"}
+{"id":1103,"source_hash":"c5850f55ad98944f","korean":"받은 친구 요청","status":"reviewed"}
+{"id":1104,"source_hash":"2b34b043cf5fa50e","korean":"거절","status":"reviewed"}
+{"id":1105,"source_hash":"ae92f669a48cf7bf","korean":"수락","status":"reviewed"}
+{"id":1106,"source_hash":"583dadb0cc6b43b8","korean":"피드백","status":"reviewed"}
+{"id":1107,"source_hash":"080f7c29ba7b64ca","korean":"답장","status":"reviewed"}
+{"id":1108,"source_hash":"ed9e9e358aa8eba5","korean":"건너뛰기","status":"reviewed"}
+{"id":1109,"source_hash":"38cd0149dad0f8fd","korean":"삭제","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1110,"source_hash":"c4d2921f4e6265d4","korean":"재생","status":"reviewed"}
+{"id":1111,"source_hash":"c7970f87cf073a43","korean":"정지","status":"reviewed"}
+{"id":1112,"source_hash":"35b6559aecf13c22","korean":"녹음","status":"reviewed"}
+{"id":1113,"source_hash":"3043e76c8cfa272a","korean":"메시지 입력","status":"reviewed"}
+{"id":1114,"source_hash":"25ea0fda06580248","korean":"이름 입력","status":"reviewed"}
+{"id":1115,"source_hash":"ec2e3cf599f769ee","korean":"텍스트 메시지 없음","status":"reviewed"}
+{"id":1116,"source_hash":"a850ebc8d703f833","korean":"Xbox Dashboard로 이동하려면 꺼내기 버튼을 누르십시오.","status":"reviewed"}
+{"id":1117,"source_hash":"5296c85027295b2f","korean":"Xbox Dashboard 플레이 초대를 받았습니다. 음성 채팅 초대를 수락하시겠습니까?","status":"reviewed"}
+{"id":1118,"source_hash":"e7cf6f86baac2401","korean":"%s님에게 부정적인 피드백을 남기시겠습니까?","status":"reviewed"}
+{"id":1119,"source_hash":"bf71c48f1a7f05d6","korean":"친구 요청을 취소하시겠습니까?","status":"reviewed"}
+{"id":1120,"source_hash":"251815a48f910065","korean":"받는 사람:","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1121,"source_hash":"a483c239a7277ad4","korean":"보낸 사람:","status":"reviewed"}
+{"id":1122,"source_hash":"4530f7679f5fcb25","korean":"코스 주행","status":"reviewed"}
+{"id":1123,"source_hash":"df43f6d10541a710","korean":"스테이지 주행","status":"reviewed"}
+{"id":1124,"source_hash":"f75c3c36478b3eb8","korean":"친구 요청을 보낼 수 없습니다. 친구 목록이 가득 찼습니다. 새 친구를 추가하려면 기존 친구를 삭제하십시오.","status":"reviewed"}
+{"id":1125,"source_hash":"c4ee9b91c371ce3d","korean":"친구 목록에서 %s님을 삭제하시겠습니까?","status":"reviewed"}
+{"id":1126,"source_hash":"932bddfdbb2854e8","korean":"<게이머태그 입력>","status":"reviewed"}
+{"id":1127,"source_hash":"75504dd5425b6104","korean":"튜닝","status":"reviewed"}
+{"id":1128,"source_hash":"480e33a7052a9c68","korean":"이 플레이어를 강제 퇴장하고 이 매치에 다시 참가하지 못하도록 하시겠습니까?","status":"reviewed"}
+{"id":1129,"source_hash":"fea6ee57376cf7d2","korean":"새 Xbox Live 계정을 등록하기 위해 OutRun 2006: Coast 2 Coast를 종료하시겠습니까? 주의: 저장하지 않은 진행 상황은 사라집니다!","status":"reviewed"}
+{"id":1130,"source_hash":"35fd9d8af6134224","korean":"이 플레이어를 매치에서 강제 퇴장시키시겠습니까?","status":"reviewed"}
+{"id":1131,"source_hash":"a98dfd50f85d4a41","korean":"PlayStation®2용 네트워크 어댑터(이더넷/모뎀)를 감지할 수 없습니다. 이 게임의 온라인 기능을 사용할 수 없습니다.","status":"reviewed"}
+{"id":1132,"source_hash":"e66e4f4daf1d7789","korean":"온라인 계정 목록에서 %s 계정을 삭제하시겠습니까?","status":"reviewed"}
+{"id":1133,"source_hash":"6f1b5f4a81bea7a2","korean":"코스를 주행해 스테이지를 잠금 해제하세요","status":"reviewed"}
+{"id":1134,"source_hash":"bf4c95abac1d4c98","korean":"잠금 해제 조건: 요청 랭크 A","status":"reviewed"}
+{"id":1135,"source_hash":"8289b594600ade9f","korean":"잠금 해제 조건: 특별 요청 1 랭크 A","status":"reviewed"}
+{"id":1136,"source_hash":"8d384bbb4652f869","korean":"잠금 해제 조건: 특별 요청 2 랭크 AA","status":"reviewed"}
+{"id":1137,"source_hash":"f9e0a22948497173","korean":"오프라인","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1138,"source_hash":"91285de97477e142","korean":"오프라인","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1139,"source_hash":"91285de97477e142","korean":"오프라인","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1140,"source_hash":"69808650fb35c9cd","korean":"로그인되지 않음","status":"reviewed"}
+{"id":1141,"source_hash":"0546f088eb3a94d7","korean":"로그인 실패","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1142,"source_hash":"6a9de10126125cf1","korean":"로그인: %s","status":"reviewed"}
+{"id":1143,"source_hash":"0546f088eb3a94d7","korean":"로그인 실패","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1144,"source_hash":"f158173d08e5f81a","korean":"로그인되지 않음: 암호 필요","status":"reviewed"}
+{"id":1145,"source_hash":"06872d9b96a89c15","korean":"메모리 카드 슬롯 1에 PlayStation®2용 메모리 카드(8MB)가 없습니다. 유효한 네트워크 설정 파일이 들어 있는 메모리 카드(8MB)를 삽입하고 다시 시도하십시오.","status":"reviewed"}
+{"id":1146,"source_hash":"1771c082c45409b0","korean":"메모리 카드 슬롯 1의 PlayStation®2용 메모리 카드(8MB)에 공간이 부족합니다. 이 게임 데이터를 저장하려면 최소 %d KB가 필요합니다. 그래도 게임을 시작하시겠습니까?","status":"reviewed"}
+{"id":1147,"source_hash":"e311503aa20e1e47","korean":"메모리 카드 슬롯 1에서 PlayStation®2용 메모리 카드(8MB)를 찾을 수 없습니다. 게임 데이터를 저장하려면 %d KB의 여유 공간이 있는 메모리 카드(8MB)가 필요합니다. 그래도 시작하시겠습니까?","status":"reviewed"}
+{"id":1148,"source_hash":"3fbcd59b572cf474","korean":"컨트롤러를 감지할 수 없습니다. 컨트롤러 포트 1에 컨트롤러를 연결하십시오.","status":"reviewed"}
+{"id":1149,"source_hash":"53d1bbdf848c6542","korean":"온라인","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1150,"source_hash":"53d02fe4f67ff4b9","korean":"온라인","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1151,"source_hash":"53d1bbdf848c6542","korean":"온라인","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1152,"source_hash":"7029589be9e26fae","korean":"주의! 플레이어의 컨트롤러 연결이 끊겨 게임을 시작할 수 없습니다.","status":"reviewed"}
+{"id":1153,"source_hash":"a9df4bfa5de1097c","korean":"세션 나감","status":"reviewed"}
+{"id":1154,"source_hash":"cc343b91ebab8a9d","korean":"Xbox에 이 고스트 차량을 다운로드할 공간이 부족합니다. %d개의 블록이 더 필요합니다. A를 눌러 공간을 확보하거나 B를 눌러 취소하십시오.","status":"reviewed"}
+{"id":1155,"source_hash":"e7c4b5f23e3f0aee","korean":"잘못된 네트워크 설정을 선택했습니다. 네트워크 설정 파일을 확인하고 다시 시도하십시오.","status":"reviewed"}
+{"id":1156,"source_hash":"f92361a6a4b84423","korean":"플레이어의 컨트롤러, PlayStation®2용 메모리 카드(8MB) 또는 디스크가 제거되어 게임을 시작할 수 없습니다.","status":"reviewed"}
+{"id":1157,"source_hash":"797942ceed8b45e5","korean":"컨트롤러","status":"reviewed"}
+{"id":1158,"source_hash":"a18047904f894f8f","korean":"가속 축","status":"reviewed"}
+{"id":1159,"source_hash":"9f8e1028762abb12","korean":"브레이크 축","status":"reviewed"}
+{"id":1160,"source_hash":"ccf899208d42f08b","korean":"가속 / 브레이크 축","status":"reviewed"}
+{"id":1161,"source_hash":"2f8b10929d387970","korean":"조향 축","status":"reviewed"}
+{"id":1162,"source_hash":"f43c43cd19b6f187","korean":"메뉴 위/아래 축","status":"reviewed"}
+{"id":1163,"source_hash":"d3d68f0643c05537","korean":"기어 업 / 다운 축","status":"reviewed"}
+{"id":1164,"source_hash":"ba9cfc92bab5c327","korean":"왼쪽 조향","status":"reviewed"}
+{"id":1165,"source_hash":"0c710b6cd30ff85c","korean":"오른쪽 조향","status":"reviewed"}
+{"id":1166,"source_hash":"1f10e634f1ba1e84","korean":"가속 버튼","status":"reviewed"}
+{"id":1167,"source_hash":"5236a17cb787c988","korean":"브레이크 버튼","status":"reviewed"}
+{"id":1168,"source_hash":"dce670b63eb96ae5","korean":"기어 업 버튼","status":"reviewed"}
+{"id":1169,"source_hash":"3d741a31e0978a5b","korean":"기어 다운 버튼","status":"reviewed"}
+{"id":1170,"source_hash":"0753830203bcf3a0","korean":"시작 버튼","status":"reviewed"}
+{"id":1171,"source_hash":"744e5dab24f078f3","korean":"경적 버튼","status":"reviewed"}
+{"id":1172,"source_hash":"f9e902c123de013f","korean":"시점 버튼","status":"reviewed"}
+{"id":1173,"source_hash":"84aa5bb80ffe647a","korean":"컨트롤러 설정","status":"reviewed"}
+{"id":1174,"source_hash":"65a9df490f31d660","korean":"할당 안 됨","status":"reviewed"}
+{"id":1175,"source_hash":"828a6a5e5876cc08","korean":"컨트롤러를 찾을 수 없음","status":"reviewed"}
+{"id":1176,"source_hash":"e5452a14d91241a4","korean":"축 1 X","status":"reviewed"}
+{"id":1177,"source_hash":"2413d34c2b412a00","korean":"축 1 Y","status":"reviewed"}
+{"id":1178,"source_hash":"845f08059118a15a","korean":"축 1 Z","status":"reviewed"}
+{"id":1179,"source_hash":"a91278051c02bf52","korean":"축 2 X","status":"reviewed"}
+{"id":1180,"source_hash":"8d1c70eb94756c2b","korean":"축 2 Y","status":"reviewed"}
+{"id":1181,"source_hash":"376f90193fdcbd73","korean":"축 2 Z","status":"reviewed"}
+{"id":1182,"source_hash":"21cf6299130c6b5b","korean":"슬라이더 축 1","status":"reviewed"}
+{"id":1183,"source_hash":"3c3f69566379ba30","korean":"슬라이더 축 2","status":"reviewed"}
+{"id":1184,"source_hash":"53dbebfd01e40496","korean":"버튼 %d","status":"reviewed"}
+{"id":1185,"source_hash":"2c6d2804e0a5d1fa","korean":"사용 가능한 컨트롤러를 순환하며 게임에서 사용할 컨트롤러를 선택합니다.","status":"reviewed"}
+{"id":1186,"source_hash":"3b202fab43a91ff7","korean":"이 동작에 축을 할당하려면 선택하십시오.","status":"reviewed"}
+{"id":1187,"source_hash":"5e3eb7d87d7543dd","korean":"이 동작에 버튼을 할당하려면 선택하십시오.","status":"reviewed"}
+{"id":1188,"source_hash":"171beec652119c20","korean":"주의: 컨트롤러 동작을 기본값으로 초기화합니다.","status":"reviewed"}
+{"id":1189,"source_hash":"2c5fc5057b3f7a2e","korean":"이 동작에 할당할 축을 움직이십시오. 현재 할당 예정: %s","status":"reviewed"}
+{"id":1190,"source_hash":"469593d1eb74d82d","korean":"이 동작에 할당할 버튼을 누르십시오.","status":"reviewed"}
+{"id":1191,"source_hash":"f299f8b19aab5c6a","korean":"가속 페달을 최소/휴지 위치로 이동한 뒤 선택 버튼을 누르십시오.","status":"reviewed"}
+{"id":1192,"source_hash":"fae12aba586171e6","korean":"가속 페달을 최대/끝 위치로 이동한 뒤 선택 버튼을 누르십시오.","status":"reviewed"}
+{"id":1193,"source_hash":"74967a80b0185f78","korean":"브레이크 페달을 최소/휴지 위치로 이동한 뒤 선택 버튼을 누르십시오.","status":"reviewed"}
+{"id":1194,"source_hash":"63d252056f7ee013","korean":"브레이크 페달을 최대/끝 위치로 이동한 뒤 선택 버튼을 누르십시오.","status":"reviewed"}
+{"id":1195,"source_hash":"e673444ad2f3a5ac","korean":"축을 최대 브레이크 위치로 이동한 뒤 선택 버튼을 누르십시오.","status":"reviewed"}
+{"id":1196,"source_hash":"fb288049124bbb43","korean":"축을 최대 가속 위치로 이동한 뒤 선택 버튼을 누르십시오.","status":"reviewed"}
+{"id":1197,"source_hash":"572f0641d38c3d04","korean":"조향을 끝까지 왼쪽으로 돌린 뒤 선택 버튼을 누르십시오.","status":"reviewed"}
+{"id":1198,"source_hash":"0c0bdfcfc3bc9f9b","korean":"조향을 끝까지 오른쪽으로 돌린 뒤 선택 버튼을 누르십시오.","status":"reviewed"}
+{"id":1199,"source_hash":"a91bc4a2de5a3800","korean":"축을 아래 위치로 이동한 뒤 선택 버튼을 누르십시오.","status":"reviewed"}
+{"id":1200,"source_hash":"89e9a247d242f3e4","korean":"축을 위 위치로 이동한 뒤 선택 버튼을 누르십시오.","status":"reviewed"}
+{"id":1201,"source_hash":"19cf29e4a58041b7","korean":"축을 기어 다운 위치로 이동한 뒤 선택 버튼을 누르십시오.","status":"reviewed"}
+{"id":1202,"source_hash":"80c39b1023b60cfb","korean":"축을 기어 업 위치로 이동한 뒤 선택 버튼을 누르십시오.","status":"reviewed"}
+{"id":1203,"source_hash":"e4f431101b2a7e96","korean":"OutRun 2006: Coast 2 Coast를 종료하시겠습니까?","status":"reviewed"}
+{"id":1204,"source_hash":"5bd1e6bfa240ed73","korean":"백스페이스","status":"reviewed"}
+{"id":1205,"source_hash":"6063a4166be4db24","korean":"탭","status":"reviewed"}
+{"id":1206,"source_hash":"28276425d45829d4","korean":"-","status":"reviewed"}
+{"id":1207,"source_hash":"4b4c91edbeecd267","korean":"=","status":"reviewed"}
+{"id":1208,"source_hash":"92cb57f8659c0581","korean":"왼쪽 대괄호","status":"reviewed"}
+{"id":1209,"source_hash":"b040bde4c3639ac0","korean":"오른쪽 대괄호","status":"reviewed"}
+{"id":1210,"source_hash":"c53f1704adf845d6","korean":";","status":"reviewed"}
+{"id":1211,"source_hash":"05a79a4430222ed7","korean":"작은따옴표","status":"reviewed"}
+{"id":1212,"source_hash":"d636cca26e23abba","korean":"# / `","status":"reviewed"}
+{"id":1213,"source_hash":"32434dc5b0f72c9b","korean":",","status":"reviewed"}
+{"id":1214,"source_hash":"c245aff912593782","korean":".","status":"reviewed"}
+{"id":1215,"source_hash":"bce941d196c26696","korean":"/","status":"reviewed"}
+{"id":1216,"source_hash":"7b2dde5ad675e124","korean":"클리어","status":"reviewed"}
+{"id":1217,"source_hash":"8b90e9d4a1cf7838","korean":"엔터","status":"reviewed"}
+{"id":1218,"source_hash":"4802d43f803942f8","korean":"시프트","status":"reviewed"}
+{"id":1219,"source_hash":"346b7cb1a9016a45","korean":"컨트롤","status":"reviewed"}
+{"id":1220,"source_hash":"6b2982ba9055622b","korean":"메뉴","status":"reviewed"}
+{"id":1221,"source_hash":"ea087132735c106c","korean":"일시정지","status":"reviewed"}
+{"id":1222,"source_hash":"0278c8d0f1801003","korean":"Caps Lock","status":"reviewed"}
+{"id":1223,"source_hash":"0da40c6a26d38161","korean":"Esc","status":"reviewed"}
+{"id":1224,"source_hash":"5d19df6aa40d0979","korean":"스페이스","status":"reviewed"}
+{"id":1225,"source_hash":"2c036fde90020310","korean":"Page Up","status":"reviewed"}
+{"id":1226,"source_hash":"19561ccfeec3472c","korean":"Page Down","status":"reviewed"}
+{"id":1227,"source_hash":"33301616f0210a0b","korean":"End","status":"reviewed"}
+{"id":1228,"source_hash":"bd268e599458a10d","korean":"Home","status":"reviewed"}
+{"id":1229,"source_hash":"142e12353d7a4a6c","korean":"왼쪽","status":"reviewed"}
+{"id":1230,"source_hash":"f91c1eec1eada9d8","korean":"위","status":"reviewed"}
+{"id":1231,"source_hash":"21dbb549936972df","korean":"오른쪽","status":"reviewed"}
+{"id":1232,"source_hash":"70eccb676844a4b6","korean":"아래","status":"reviewed"}
+{"id":1233,"source_hash":"6522e61166af9d8c","korean":"선택","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1234,"source_hash":"26e9b8052f042aa7","korean":"Print","status":"reviewed"}
+{"id":1235,"source_hash":"f46e4715042acecb","korean":"Insert","status":"reviewed"}
+{"id":1236,"source_hash":"38cd0149dad0f8fd","korean":"삭제","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1237,"source_hash":"103195887930ecd1","korean":"NUMPAD0","status":"reviewed"}
+{"id":1238,"source_hash":"628e24bdb3a14952","korean":"NUMPAD1","status":"reviewed"}
+{"id":1239,"source_hash":"58650a2d71cebb29","korean":"NUMPAD2","status":"reviewed"}
+{"id":1240,"source_hash":"c7bf3a9d723cae07","korean":"NUMPAD3","status":"reviewed"}
+{"id":1241,"source_hash":"26fd066ef18e984a","korean":"NUMPAD4","status":"reviewed"}
+{"id":1242,"source_hash":"5c97ac95770428f9","korean":"NUMPAD5","status":"reviewed"}
+{"id":1243,"source_hash":"12b86c959feb7634","korean":"NUMPAD6","status":"reviewed"}
+{"id":1244,"source_hash":"30963f52b6690d9d","korean":"NUMPAD7","status":"reviewed"}
+{"id":1245,"source_hash":"c2078d8fe0640655","korean":"NUMPAD8","status":"reviewed"}
+{"id":1246,"source_hash":"5c6b73a271d81eca","korean":"NUMPAD9","status":"reviewed"}
+{"id":1247,"source_hash":"bebac427d0746f89","korean":"곱하기","status":"reviewed"}
+{"id":1248,"source_hash":"a1dd42e072538094","korean":"더하기","status":"reviewed"}
+{"id":1249,"source_hash":"d1c51b016244be3a","korean":"구분자","status":"reviewed"}
+{"id":1250,"source_hash":"64794b6b08961d4a","korean":"빼기","status":"reviewed"}
+{"id":1251,"source_hash":"76db245dd5d6ad4a","korean":"소수점","status":"reviewed"}
+{"id":1252,"source_hash":"c3d35cc4eab1219e","korean":"나누기","status":"reviewed"}
+{"id":1253,"source_hash":"cc32beb3bbc666fa","korean":"F1","status":"reviewed"}
+{"id":1254,"source_hash":"86143edd8e137435","korean":"F2","status":"reviewed"}
+{"id":1255,"source_hash":"a11f1ef00b3ab707","korean":"F3","status":"reviewed"}
+{"id":1256,"source_hash":"8de026a061f15b14","korean":"F4","status":"reviewed"}
+{"id":1257,"source_hash":"196c490e9a11debd","korean":"F5","status":"reviewed"}
+{"id":1258,"source_hash":"50b153fbad9e6f70","korean":"F6","status":"reviewed"}
+{"id":1259,"source_hash":"baf2fe01c142ab9a","korean":"F7","status":"reviewed"}
+{"id":1260,"source_hash":"3758ece32ec0d6db","korean":"F8","status":"reviewed"}
+{"id":1261,"source_hash":"342d8ff39b5c75ed","korean":"F9","status":"reviewed"}
+{"id":1262,"source_hash":"a3f131332d0d6806","korean":"F10","status":"reviewed"}
+{"id":1263,"source_hash":"d69d013d4b55be49","korean":"F11","status":"reviewed"}
+{"id":1264,"source_hash":"5d167fa94ce3aa00","korean":"F12","status":"reviewed"}
+{"id":1265,"source_hash":"3bda268710a546c5","korean":"왼쪽 Shift","status":"reviewed"}
+{"id":1266,"source_hash":"290757d7446d2ca4","korean":"오른쪽 Shift","status":"reviewed"}
+{"id":1267,"source_hash":"1e2596ba700a33a8","korean":"왼쪽 Ctrl","status":"reviewed"}
+{"id":1268,"source_hash":"a2cd2f11b4271e03","korean":"오른쪽 Ctrl","status":"reviewed"}
+{"id":1269,"source_hash":"afc1e562600ce44c","korean":"왼쪽 Alt","status":"reviewed"}
+{"id":1270,"source_hash":"abdea6940515e43b","korean":"오른쪽 Alt","status":"reviewed"}
+{"id":1271,"source_hash":"16e661ba1ce82ba8","korean":"숫자패드 Enter","status":"reviewed"}
+{"id":1272,"source_hash":"60864aae26451939","korean":"1","status":"reviewed"}
+{"id":1273,"source_hash":"85dd751867e3155c","korean":"2","status":"reviewed"}
+{"id":1274,"source_hash":"40d95a7c7f1655a0","korean":"3","status":"reviewed"}
+{"id":1275,"source_hash":"77f906b94309dc84","korean":"4","status":"reviewed"}
+{"id":1276,"source_hash":"8432386e2c3b0e40","korean":"5","status":"reviewed"}
+{"id":1277,"source_hash":"6855b5c2b40b54d7","korean":"6","status":"reviewed"}
+{"id":1278,"source_hash":"e2733b3db9d93b0a","korean":"7","status":"reviewed"}
+{"id":1279,"source_hash":"6fea016a651b6460","korean":"8","status":"reviewed"}
+{"id":1280,"source_hash":"e3f69f6c094ffb4e","korean":"9","status":"reviewed"}
+{"id":1281,"source_hash":"4f8320d91e97d546","korean":"0","status":"reviewed"}
+{"id":1282,"source_hash":"b2dad12f48da4b2c","korean":"Q","status":"reviewed"}
+{"id":1283,"source_hash":"fb31b4206368ca3d","korean":"W","status":"reviewed"}
+{"id":1284,"source_hash":"4fd33dcde4707d09","korean":"E","status":"reviewed"}
+{"id":1285,"source_hash":"cfc66af7710b364a","korean":"R","status":"reviewed"}
+{"id":1286,"source_hash":"3fbf037cb6bcb617","korean":"T","status":"reviewed"}
+{"id":1287,"source_hash":"8d4cd219a8179c66","korean":"Y","status":"reviewed"}
+{"id":1288,"source_hash":"0009ea1df10edeb0","korean":"U","status":"reviewed"}
+{"id":1289,"source_hash":"6cb5a8ec7215303a","korean":"I","status":"reviewed"}
+{"id":1290,"source_hash":"cff611e6fecb2649","korean":"O","status":"reviewed"}
+{"id":1291,"source_hash":"29374cfdd45d8433","korean":"P","status":"reviewed"}
+{"id":1292,"source_hash":"daaf62de76f04e09","korean":"A","status":"reviewed"}
+{"id":1293,"source_hash":"5bb10a0ea4aab835","korean":"S","status":"reviewed"}
+{"id":1294,"source_hash":"d16a7ad80717a9e7","korean":"D","status":"reviewed"}
+{"id":1295,"source_hash":"ba8c9eac092a503e","korean":"F","status":"reviewed"}
+{"id":1296,"source_hash":"0ab677189bbd88d8","korean":"G","status":"reviewed"}
+{"id":1297,"source_hash":"97f3f29734d22b76","korean":"H","status":"reviewed"}
+{"id":1298,"source_hash":"d782580f356f26fa","korean":"J","status":"reviewed"}
+{"id":1299,"source_hash":"a1559d842c4e705b","korean":"K","status":"reviewed"}
+{"id":1300,"source_hash":"33149ff2dc4209e1","korean":"L","status":"reviewed"}
+{"id":1301,"source_hash":"b7fc02907b1fe26a","korean":"\\","status":"reviewed"}
+{"id":1302,"source_hash":"a962c99ae0666415","korean":"Z","status":"reviewed"}
+{"id":1303,"source_hash":"9855cda098dcac49","korean":"X","status":"reviewed"}
+{"id":1304,"source_hash":"d23f96d836ebed25","korean":"C","status":"reviewed"}
+{"id":1305,"source_hash":"a71962744b947463","korean":"V","status":"reviewed"}
+{"id":1306,"source_hash":"46f83e3a0dcc4f04","korean":"B","status":"reviewed"}
+{"id":1307,"source_hash":"c0736411a62ec0f4","korean":"N","status":"reviewed"}
+{"id":1308,"source_hash":"95e71cbf73f14e32","korean":"M","status":"reviewed"}
+{"id":1309,"source_hash":"a0435a9dc06cebf5","korean":"Num Lock","status":"reviewed"}
+{"id":1310,"source_hash":"f6236b6a16d62da8","korean":"Scroll Lock","status":"reviewed"}
+{"id":1311,"source_hash":"aaeb2107ca2a825d","korean":"OEM_102","status":"reviewed"}
+{"id":1312,"source_hash":"872df6a7686db129","korean":"F13","status":"reviewed"}
+{"id":1313,"source_hash":"ffee336494f69f0b","korean":"F14","status":"reviewed"}
+{"id":1314,"source_hash":"dd54d9dc4439420e","korean":"F15","status":"reviewed"}
+{"id":1315,"source_hash":"649e77d9f53818fc","korean":"가나","status":"reviewed"}
+{"id":1316,"source_hash":"e16a105ab44cd16c","korean":"ABNT_C1","status":"reviewed"}
+{"id":1317,"source_hash":"436b282d5224083d","korean":"변환","status":"reviewed"}
+{"id":1318,"source_hash":"60a2c78eeccefd6e","korean":"무변환","status":"reviewed"}
+{"id":1319,"source_hash":"b3cb7895c7cfbfb5","korean":"엔","status":"reviewed"}
+{"id":1320,"source_hash":"2936e88d90808f10","korean":"ABNT_C2","status":"reviewed"}
+{"id":1321,"source_hash":"3f0d6bb742b5e790","korean":"숫자패드 =","status":"reviewed"}
+{"id":1322,"source_hash":"3ee52bb540659cf9","korean":"이전 트랙","status":"reviewed"}
+{"id":1323,"source_hash":"57e5e251efbd1510","korean":"AT","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1324,"source_hash":"4d70f4a881c72812","korean":":","status":"reviewed"}
+{"id":1325,"source_hash":"a1585617affa448d","korean":"밑줄","status":"reviewed"}
+{"id":1326,"source_hash":"51cce2bed728070b","korean":"한자","status":"reviewed"}
+{"id":1327,"source_hash":"c7970f87cf073a43","korean":"정지","status":"reviewed","notes":"propagated from identical source string"}
+{"id":1328,"source_hash":"667cc1dc2e15ab3c","korean":"AX","status":"reviewed"}
+{"id":1329,"source_hash":"27c85056b2170f5c","korean":"라벨 없음","status":"reviewed"}
+{"id":1330,"source_hash":"1efddc2193d46376","korean":"다음 트랙","status":"reviewed"}
+{"id":1331,"source_hash":"4ca4f87e632223e1","korean":"음소거","status":"reviewed"}
+{"id":1332,"source_hash":"d7016360da89413a","korean":"계산기","status":"reviewed"}
+{"id":1333,"source_hash":"de1fdb816948ee3c","korean":"재생/일시정지","status":"reviewed"}
+{"id":1334,"source_hash":"90de53af57ef5f2a","korean":"미디어 정지","status":"reviewed"}
+{"id":1335,"source_hash":"1e484b7c10c5549a","korean":"볼륨 낮추기","status":"reviewed"}
+{"id":1336,"source_hash":"5a45845cc7a7915f","korean":"볼륨 높이기","status":"reviewed"}
+{"id":1337,"source_hash":"0feaebf1e6b0cf49","korean":"웹 홈","status":"reviewed"}
+{"id":1338,"source_hash":"6b4c9c97a42d0a72","korean":"숫자패드 쉼표","status":"reviewed"}
+{"id":1339,"source_hash":"b3e2c5b5828cbfed","korean":"SysRq","status":"reviewed"}
+{"id":1340,"source_hash":"e19b0eff79f47262","korean":"왼쪽 Windows","status":"reviewed"}
+{"id":1341,"source_hash":"d707cf76eb851d03","korean":"오른쪽 Windows","status":"reviewed"}
+{"id":1342,"source_hash":"800f3c4d055f8603","korean":"앱","status":"reviewed"}
+{"id":1343,"source_hash":"1bfdce7c37c7677e","korean":"전원","status":"reviewed"}
+{"id":1344,"source_hash":"12eb05d36c820d9e","korean":"절전","status":"reviewed"}
+{"id":1345,"source_hash":"14b48fd852b84d38","korean":"깨우기","status":"reviewed"}
+{"id":1346,"source_hash":"a455a9e432cb8fcc","korean":"웹 검색","status":"reviewed"}
+{"id":1347,"source_hash":"14c3eacc4929fce3","korean":"웹 즐겨찾기","status":"reviewed"}
+{"id":1348,"source_hash":"9a1ae0a67944b1f8","korean":"웹 새로고침","status":"reviewed"}
+{"id":1349,"source_hash":"6d7faecc8244a848","korean":"웹 중지","status":"reviewed"}
+{"id":1350,"source_hash":"0042174cfe42de2b","korean":"웹 앞으로","status":"reviewed"}
+{"id":1351,"source_hash":"6d2fc3bc42f0f261","korean":"웹 뒤로","status":"reviewed"}
+{"id":1352,"source_hash":"1af0ffcd6884d7a5","korean":"내 컴퓨터","status":"reviewed"}
+{"id":1353,"source_hash":"0984b0de8ee56288","korean":"메일","status":"reviewed"}
+{"id":1354,"source_hash":"b11d31a515d5012e","korean":"미디어 선택","status":"reviewed"}
+{"id":1355,"source_hash":"","korean":"","status":"blocked_null","notes":"null pointer entry"}

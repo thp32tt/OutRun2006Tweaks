@@ -42,3 +42,17 @@ The supplied localization analysis archive contains 243 DDS textures. Work is sp
 9. Package independently.
 
 All progress is checkpointed under `localization/progress/`.
+
+
+## Clean migration of completed state
+
+The full localization-owned text/graphics state from the historical prototype has been migrated without importing its VR ancestry.
+
+- 1,355/1,355 non-null text IDs translated.
+- 1,347 normal records + 4 special records reviewed.
+- 4 context-sensitive IDs remain runtime-context drafts: 96, 97, 279, 280.
+- 243 DDS assets classified; 80 text-localization targets.
+- 28 assets / 82 text segments transcribed.
+- 9 font atlases + 1 Hangul name-entry atlas identified.
+
+Prototype K1 build/run evidence is historical only. Clean upstream build and runtime evidence is mandatory before packaging.

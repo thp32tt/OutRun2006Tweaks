@@ -1,0 +1,18 @@
+name: Domain Isolation Guard
+on:
+  push:
+    branches: [vr-d3d9ex-focus, korean-localization-prototype, korean-localization-clean, ffb-arcade-dd-research]
+  pull_request:
+    branches: [vr-d3d9ex-focus, korean-localization-prototype, korean-localization-clean, ffb-arcade-dd-research]
+permissions: {contents: read}
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then B="${{ github.event.pull_request.base.sha }}"; H="${{ github.event.pull_request.head.sha }}"; else B="${{ github.event.before }}"; H="${{ github.sha }}"; fi
+          if [[ "$B" =~ ^0+$ ]]; then B="$(git rev-parse HEAD^)"; fi
+          python tools/verify_domain_isolation.py --base "$B" --head "$H" --branch "${GITHUB_BASE_REF:-$GITHUB_REF_NAME}"

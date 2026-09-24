@@ -5,44 +5,29 @@
 
 Base: `emoose/OutRun2006Tweaks@08e5efb4deea4066c440307ec009c868a30562d3`
 
-This branch is the only production branch for Korean localization work.
+This branch is the only production/release line for Korean localization.
 
-## Isolation contract
-- No `src/vr` tree exists on this branch.
-- Do not merge VR source into this branch.
-- Do not merge FFB feature changes into this branch.
-- Cross-project sharing is limited to reverse-engineering knowledge/data such as symbol maps, stage/material maps, file-format notes, and validated addresses.
-- Localization changes may later be packaged independently of VR/FFB.
+## Isolation
+- No VR source merge/cherry-pick.
+- No FFB feature merge/cherry-pick.
+- Cross-domain facts only through `docs/shared-knowledge/`.
+- Prototype branch is historical evidence only.
 
-## Current measured inventory
-- analyzed files: 324
-- DDS textures: 243
-- txet string IDs: 1,356
-- simple txet records: 1,351
-- special/multi records: 4
-- null records: 1
+## Progress
+| Workstream | State |
+|---|---|
+| Clean upstream lineage | DONE |
+| txet lossless tooling | DONE |
+| Text translation | 1,355/1,355 non-null translated |
+| Text final review | 1,347 normal + 4 special reviewed; 4 context drafts |
+| Config text | 23/23 |
+| DDS inventory/classification | 243/243 |
+| Text-bearing DDS | 80 |
+| Graphics transcription | 28 assets / 82 segments |
+| Korean artwork | 0/80 |
+| K1 resolver trace hook | MIGRATED; CLEAN CI/RUNTIME REVALIDATION REQUIRED |
+| K2 Unicode-safe path | NEXT |
+| K3 Hangul glyph proof | NEXT |
+| Independent package | BLOCKED by clean K1/K2/K3 runtime proof |
 
-## Workstreams
-| Workstream | Status | Progress |
-|---|---|---:|
-| Clean upstream branch | DONE | 100% |
-| Lossless txet parser/rebuilder | DONE | 100% |
-| Text inventory | IN PROGRESS | 85% |
-| Korean text translation | IN PROGRESS | 0% |
-| Graphics inventory | IN PROGRESS | 70% |
-| Graphics localization | NOT STARTED | 0% |
-| Runtime text trace | QUEUED | 20% |
-| Unicode-safe runtime | QUEUED | 10% |
-| Hangul font path | QUEUED | 5% |
-| Packaging | NOT STARTED | 0% |
-
-Machine-readable state: `localization/progress/progress.json`.
-
-## Resume rule
-On any new session, read in this order:
-1. `localization/progress/progress.json`
-2. `localization/progress/events.jsonl`
-3. `docs/KOREAN_LOCALIZATION.md`
-4. current Git branch HEAD
-
-Continue from `next_checkpoint`; never restart completed inventory/format work unless its source hash changes.
+Canonical state: `localization/progress/progress.json`.

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "domains": {
+    "VR": "vr-d3d9ex-focus",
+    "LOCALIZATION": "korean-localization-clean",
+    "FFB": "ffb-arcade-dd-research"
+  },
+  "legacy": [
+    "korean-localization-prototype"
+  ],
+  "entries": []
+}

@@ -1,0 +1,21 @@
+name: Localization State
+on:
+  push:
+    branches: [korean-localization-clean]
+  pull_request:
+    branches: [korean-localization-clean]
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - name: Verify clean lineage
+        shell: bash
+        run: |
+          test "$(cat .project-domain)" = "LOCALIZATION"
+          git merge-base --is-ancestor 08e5efb4deea4066c440307ec009c868a30562d3 HEAD
+          test ! -d src/vr
+      - name: Verify localization state
+        run: python tools/localization/verify_state.py
