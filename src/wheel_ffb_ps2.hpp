@@ -117,4 +117,15 @@ namespace WheelFFBPS2
         const int period = std::max(1, triangle_period_raw(factor));
         return 1000.0f / static_cast<float>(period);
     }
+
+    inline float triangle_wave(float phaseCycles)
+    {
+        if (!std::isfinite(phaseCycles))
+            return 0.0f;
+        phaseCycles = std::fmod(phaseCycles, 1.0f);
+        if (phaseCycles < 0.0f)
+            phaseCycles += 1.0f;
+        // -1 at cycle 0, +1 at 0.5, back to -1 at cycle 1.
+        return 1.0f - 4.0f * std::abs(phaseCycles - 0.5f);
+    }
 }
