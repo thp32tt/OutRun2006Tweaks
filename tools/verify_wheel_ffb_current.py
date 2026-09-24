@@ -245,7 +245,7 @@ req(wheel_ui, 'WheelFFB_RequestSettingsTransition();', 'profile/preset switching
 req(wheel_ui, 'WheelFFBDamperStrength.ptr(), 0.0f, 1.0f', 'Dynamic Damping UI exposes full supported range')
 req(ffb, 'void settings_transition()', 'FFB engine has profile transition safety path')
 req(ffb, 'updateCounter_ = 59;', 'profile transition recreates newly enabled hardware effects promptly')
-req(ffb, 'settings/profile transition; forces zeroed and warm-up restarted', 'profile transition is observable in logs')
+req(ffb, 'settings/profile transition; forces zeroed, periodic model reset and warm-up restarted', 'profile transition is observable in logs')
 req(ffb, 'void WheelFFB_RequestSettingsTransition()', 'FFB settings transition exported to UI')
 req(dyn, 'rawFrontSlip_', 'raw front-slip telemetry retained')
 req(dyn, 'frontSlipBlend_ = 0.24f + (0.58f - 0.24f) * transientT;', 'front-slip transient accelerates with speed')
