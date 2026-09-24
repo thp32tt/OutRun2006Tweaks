@@ -2,16 +2,16 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-24T02:19:00+09:00",
+  "updatedKst": "2026-09-24T22:41:00+09:00",
   "policy": {
-    "maxIndependentUnvalidatedRuntimeCandidates": 3,
+    "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
     "productionWriter": "D_INTEGRATION_PLANNER",
     "candidateWriter": "D_INTEGRATION_PLANNER",
     "queueWriter": "D_INTEGRATION_PLANNER",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
-    "primaryBackend": "DX9Ex protected reference; DXVK and DX12/D3D9On12 are parallel development backends",
+    "primaryBackend": "DX9Ex R51-protected reference; HUD/lens-flare/performance HMD experiments may prepare in parallel, production integration remains serial",
     "regressionKnowledge": {
       "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
       "ledgerIssue": 13,
@@ -20,7 +20,7 @@
       "recurrenceAction": "REOPEN_EXISTING_STABLE_KEY"
     },
     "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-    "parallelBackendDevelopment": true,
+    "parallelBackendDevelopment": false,
     "backendReplacementGate": "Quest3/VDXR parity with protected R51 world stereo and frame stability",
     "parallelTracks": {
       "HUD": "B evidence + C post-fix sanity -> D isolated implementation/integration",
@@ -31,11 +31,54 @@
       "status": "DISABLED_UNTIL_EXPLICIT_USER_REAUTHORIZATION",
       "endedAtKst": "2026-09-24T01:49:00+09:00",
       "rule": "Scheduled overnight work may review/analyze/use normal cloud CI, but must not dispatch or trigger self-hosted PC builds until the user explicitly opens a new PC-build session."
+    },
+    "eveningHmdMatrix": {
+      "enabled": true,
+      "maxExperimentSlots": 6,
+      "productionIntegrationWip": 1,
+      "rule": "Parallel HMD experiment preparation is allowed from one TEST_MATRIX_BASE; experiment slots are test-only until HMD evidence and exact-tree validation.",
+      "frozenPrimaryWork": [
+        "DXVK",
+        "DX12",
+        "multiview",
+        "broad EXE-map expansion",
+        "generic dependency/toolchain cleanup",
+        "PS2/FFB runtime",
+        "localization runtime"
+      ]
     }
   },
   "candidateWip": {
-    "activeUnvalidatedCount": 0,
-    "candidateBranches": []
+    "activeUnvalidatedCount": 1,
+    "candidateBranches": [
+      "vr-d3d9ex-candidate/R51-MATRIX-BASE-MANUAL-20260924"
+    ],
+    "activeCandidate": {
+      "candidateId": "R51-MATRIX-BASE-MANUAL-20260924",
+      "branch": "vr-d3d9ex-candidate/R51-MATRIX-BASE-MANUAL-20260924",
+      "candidateSha": "27f4ad958cf965f33bc6791395dd77ca1af7fb42",
+      "baseSha": "0ca18d79a9e0c9f1f8ed45194c49b679785aceae",
+      "integrationHeadObserved": "0ca18d79a9e0c9f1f8ed45194c49b679785aceae",
+      "findingIds": [
+        "STRUCT-REGRESSION-GATE-001",
+        "VR-BINARY-CONTRACT-HUD-SOURCE-BINDING-GAP-001",
+        "VR-R51-HUD-SEMANTIC-LIFETIME-001"
+      ],
+      "status": "VALIDATING",
+      "requiredReviewers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "ciEvidenceRefs": [
+        "actions:36007124220",
+        "actions:36007124238"
+      ],
+      "owner": "D_INTEGRATION_PLANNER",
+      "updatedAt": "2026-09-24T22:41:00+09:00",
+      "blocker": "Exact-SHA cloud CI in progress",
+      "nextAction": "Consume runs 36007124220 and 36007124238; if green, declare TEST_MATRIX_BASE and prepare parallel HUD/FLARE/PERF HMD slots."
+    }
   },
   "items": [
     {
@@ -327,5 +370,12 @@
       "runtimeCandidate": false,
       "blockReason": "Development/build/smoke is allowed; only release/promotion is blocked pending Quest3/VDXR parity with the protected R51 baseline."
     }
-  ]
+  ],
+  "hmdTestMatrix": {
+    "status": "BASE_VALIDATING",
+    "testMatrixBaseCandidateSha": "27f4ad958cf965f33bc6791395dd77ca1af7fb42",
+    "maxSlots": 6,
+    "slots": [],
+    "nextAction": "After base CI passes, create immutable A CONTROL and bounded HUD/FLARE/PERF experiment slots with automatic identity."
+  }
 }
