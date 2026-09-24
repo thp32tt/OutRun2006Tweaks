@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_kst": "2026-09-24T23:59:00+09:00",
+  "updated_at_kst": "2026-09-25T00:08:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -36,20 +36,25 @@
       "percent": 100
     },
     "text_inventory": {
-      "status": "in_progress",
-      "percent": 85
+      "status": "done",
+      "percent": 100
     },
     "text_translation": {
       "status": "in_progress",
-      "percent": 0
+      "percent": 13.3,
+      "translated": 180,
+      "total": 1356
     },
     "graphics_inventory": {
-      "status": "in_progress",
-      "percent": 70
+      "status": "done",
+      "percent": 100,
+      "total": 243
     },
     "graphics_localization": {
-      "status": "not_started",
-      "percent": 0
+      "status": "in_progress",
+      "percent": 8,
+      "reviewed_categories": 4,
+      "total_categories": 10
     },
     "runtime_text_trace": {
       "status": "queued",
@@ -68,5 +73,5 @@
       "percent": 0
     }
   },
-  "next_checkpoint": "Generate machine-readable string/graphics manifests from uploaded asset archive"
+  "next_checkpoint": "Visual-review front_end/selector/loading/route/name_entry, then extend Korean text draft beyond ID 179"
 }
