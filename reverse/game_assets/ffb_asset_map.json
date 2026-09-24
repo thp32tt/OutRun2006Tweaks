@@ -1,0 +1,353 @@
+{
+  "schema": "outrun-ffb-asset-map-v4",
+  "sourceSha": "35c5b82e30d583c3a961260e81b5d9827f1bb720",
+  "nativeContactInputs": {
+    "surfaceMask": {
+      "storage": "EVWORK_CAR::water_flag_24C[0..3]",
+      "semanticAlias": "surfaceMask[4]",
+      "confidence": "EXE_CONFIRMED",
+      "note": "Canonical PC collision query proves each returned contact mask is 1u << COLI0200 materialId."
+    },
+    "loadColiType": {
+      "storage": "EVWORK_CAR::OnRoadPlace_5C.loadColiType_0",
+      "semanticRole": "branch/junction collision context",
+      "confidence": "SOURCE_CONFIRMED",
+      "evidence": "EVWORK_CAR::is_in_bunki() returns loadColiType_0 != 0",
+      "materialId": false
+    },
+    "roadSectionNum": "EVWORK_CAR::OnRoadPlace_5C.roadSectionNum_8",
+    "curStageIdx": "EVWORK_CAR::OnRoadPlace_5C.curStageIdx_C",
+    "roughnessFunction": "sub_1149C0",
+    "contactCollisionIndex": {
+      "storage": "wheelWork[i]+0x10; wheelWork pointer array VA 0x0082EA38",
+      "confidence": "EXE_CONFIRMED",
+      "note": "Exact COLI collisionIndex selected by RVA 0x0003DB60 for contact i."
+    },
+    "bodyCollisionIndex": {
+      "storage": "EVWORK_CAR+0x230",
+      "confidence": "EXE_CONFIRMED"
+    },
+    "bodySurfaceMask": {
+      "storage": "EVWORK_CAR+0x248",
+      "confidence": "EXE_CONFIRMED"
+    },
+    "collisionFlags": {
+      "storage": "EVWORK_CAR+0x25C",
+      "source": "selected geometry record +0x3C u16",
+      "confidence": "EXE_CONFIRMED"
+    }
+  },
+  "roughness": {
+    "0x000001": {
+      "value": 0
+    },
+    "0x000002": {
+      "default": 0.25,
+      "waterCases": [
+        {
+          "stage": [
+            11,
+            41
+          ],
+          "name": "Metropolis",
+          "value": 0.73
+        },
+        {
+          "stage": [
+            13,
+            43
+          ],
+          "name": "Cape Way",
+          "value": 0.79
+        },
+        {
+          "stage": [
+            14,
+            44
+          ],
+          "name": "Imperial Avenue",
+          "value": 0.76
+        }
+      ]
+    },
+    "0x000004": {
+      "value": 0.7
+    },
+    "0x000008": {
+      "value": 0.85
+    },
+    "0x000010": {
+      "value": 0.9
+    },
+    "0x000080": {
+      "value": 0.85
+    },
+    "0x000100": {
+      "value": 0.45
+    },
+    "0x000200": {
+      "value": 0.35
+    },
+    "0x000400": {
+      "value": 0.3
+    },
+    "0x000800": {
+      "value": 0.35
+    },
+    "0x001000": {
+      "value": 0.35
+    },
+    "0x002000": {
+      "value": 0.35
+    },
+    "0x008000": {
+      "value": 0.4
+    },
+    "0x100000": {
+      "value": 0.71
+    },
+    "0x200000": {
+      "value": 0.8
+    },
+    "0x400000": {
+      "whenLoadColiTypeNonzero": 0.25,
+      "default": 0.9,
+      "exceptions": [
+        {
+          "stage": [
+            18,
+            48
+          ],
+          "name": "Casino Town",
+          "value": 0.25
+        }
+      ]
+    },
+    "0x800000": {
+      "value": 0.5
+    },
+    "fallbackHighMask": {
+      "value": 0.31
+    }
+  },
+  "currentModernSignals": [
+    "body slip",
+    "yaw rate",
+    "front-slip proxy",
+    "tire scrub",
+    "native speed-vector correlation",
+    "weight transfer",
+    "collision impulse",
+    "gear-change event",
+    "road texture",
+    "tire-slip periodic effect"
+  ],
+  "currentStagePolicy": {
+    "snowIceUniqueStages": [
+      4,
+      19,
+      34,
+      49
+    ],
+    "note": "Current runtime still has stage-wide Snow/Ice attenuation; direct COLI data now supports replacing it with per-contact mask 0x00800000 after LEVEL1 validation."
+  },
+  "collisionEvidence": {
+    "stageZip": {
+      "sizeBytes": 290113621,
+      "sha256": "385a5be540d87139c065bb5d62899767ca57c9a26950f7c2819235aa1448e6f6",
+      "directByteInspection": "PASS"
+    },
+    "collisionFiles": 72,
+    "coli0200Files": 66,
+    "legacyColi0105Files": 6,
+    "exactStaticFieldToSurfaceMask": "CONFIRMED",
+    "formula": "surfaceMask = 1u << materialId",
+    "exeAnchor": "VA 0x0043ECB8..0x0043ECC7",
+    "geometry": "64-byte record = vec3 corner[4] + vec3 center + u16 collisionFlags + s16 localHeadingAngle",
+    "cornerNormals": "48-byte record = vec3 normal[4]",
+    "primaryRoadMaterialIds": [
+      1,
+      20,
+      22,
+      23
+    ],
+    "deepMap": "reverse/game_assets/stage_coli_ffb_map.json",
+    "spatialGrid": {
+      "layout": "256x256 u16 at section0; each cell points (u16 units) into section1 candidate list",
+      "helper": "RVA 0x0003BB40: collision-set-local cell = clamp(int((coord+3072)/6),0,255)",
+      "validation": "66/66 files: referenced candidate lists bounds-valid; max observed list length 113"
+    },
+    "collisionSubtype": "section5 byte; low nibble is collision topology/response selector via VA 0x005E0DE0, not material",
+    "roadSection": "section6 u16 -> EVWORK_CAR::OnRoadPlace_5C.roadSectionNum_8",
+    "cornerLighting": "section8 4*u8 per record -> 1/255 normalized corner lighting/intensity -> EVWORK_CAR::lightRate_58; not FFB material"
+  },
+  "researchChain": [
+    "COLI0200 static attributes",
+    "runtime contact/material flags",
+    "sub_1149C0 original roughness",
+    "modern DD-wheel road/slip policy"
+  ],
+  "runtimeObservedRoughness": {
+    "values": [
+      0.25,
+      0.35,
+      0.5,
+      0.7,
+      0.71,
+      0.76,
+      0.85
+    ],
+    "transitions": [
+      "0.35 -> 0.76 mixed then 0.76 full-rough",
+      "0.35 -> 0.85 mixed then 0.85 full-rough",
+      "0.25 -> 0.71 mixed then 0.71 full-rough",
+      "snow/ice samples include 0.25/0.35..0.50"
+    ],
+    "identityWarning": "Do not infer raw surfaceMask from roughness alone because several masks share a roughness value."
+  },
+  "recommendedTelemetry": [
+    "stageId",
+    "roadSectionNum",
+    "curStageIdx",
+    "loadColiType",
+    "bodyCollisionIndex",
+    "bodySurfaceMask",
+    "contactCollisionIndex[0..3]",
+    "surfaceMask[0..3]",
+    "derivedMaterialId[0..3]",
+    "static collisionFlags/localHeading/subtype/roadSection by collisionIndex",
+    "roughness[0..3]",
+    "waterFlag",
+    "speed",
+    "roadEffectOutput"
+  ],
+  "ffbPolicy": {
+    "preservePerContactIdentity": true,
+    "currentCoreReduction": "max roughness across four contacts",
+    "candidate": "FFB-SURFACE-MASK-POLICY-001",
+    "snowIceMask": "0x00800000",
+    "snowIceMaterialId": 23,
+    "evidence": "Snowy Mountain primary road 88.8% ID23 + 11.2% ID1; Ice Scape 100% ID23.",
+    "guardrails": [
+      "Original Xbox roughness is semantic/intensity evidence, not DD-wheel torque.",
+      "Do not assign FL/FR/RL/RR names until contact ordering is proven.",
+      "Do not assign physical names to non-primary material IDs without runtime correlation.",
+      "Keep original stage exceptions in sub_1149C0 where the game intentionally uses stage context."
+    ],
+    "level1RegressionRanges": {
+      "SnowyMountainOrdinaryRoad": "stage 4 roadSection 132-203 -> materialId 0x01 / mask 0x2",
+      "IceScape": "stage 19/49 primary roadSection 0-620 -> materialId 0x17 / mask 0x800000",
+      "DeepLakeRoughStrip": "stage 1 roadSection 419-458 -> materialId 0x14 / mask 0x100000",
+      "TulipRoughStrip": "stage 10 roadSection 54-70 -> materialId 0x14 / mask 0x100000",
+      "FloralVillageRoughStrip": "stage 27 roadSection 510-533 -> materialId 0x14 / mask 0x100000"
+    }
+  },
+  "roughnessToMaskCandidates": {
+    "0.00": [
+      "0x000001"
+    ],
+    "0.25": [
+      "0x000002 default/context",
+      "0x400000 when loadColiType!=0",
+      "0x400000 on Casino Town"
+    ],
+    "0.30": [
+      "0x000400"
+    ],
+    "0.31": [
+      "fallback/unrecognized mapped mask"
+    ],
+    "0.35": [
+      "0x000200",
+      "0x000800",
+      "0x001000",
+      "0x002000"
+    ],
+    "0.40": [
+      "0x008000"
+    ],
+    "0.45": [
+      "0x000100"
+    ],
+    "0.50": [
+      "0x800000"
+    ],
+    "0.70": [
+      "0x000004"
+    ],
+    "0.71": [
+      "0x100000"
+    ],
+    "0.73": [
+      "0x000002 on Metropolis"
+    ],
+    "0.76": [
+      "0x000002 on Imperial Avenue"
+    ],
+    "0.79": [
+      "0x000002 on Cape Way"
+    ],
+    "0.80": [
+      "0x200000"
+    ],
+    "0.85": [
+      "0x000008",
+      "0x000080"
+    ],
+    "0.90": [
+      "0x000010",
+      "0x400000 normal non-Casino/non-junction context"
+    ]
+  },
+  "historicalLogInterpretation": {
+    "0.76": "Strongly identifies the stage-specific 0x000002 Imperial Avenue path when stage context agrees.",
+    "0.71": "Maps uniquely to 0x100000 in the current recovered function.",
+    "0.70": "Maps uniquely to 0x000004.",
+    "0.50": "Maps uniquely to 0x800000.",
+    "0.35": "Ambiguous across four masks; raw-mask telemetry required.",
+    "0.85": "Ambiguous between 0x000008 and 0x000080; raw-mask telemetry required.",
+    "0.25": "Contextual/ambiguous; raw mask + loadColiType + stage required."
+  },
+  "dataProducts": {
+    "stageInventory": "reverse/game_assets/stage_collision_inventory.json",
+    "stageMaterialMap": "reverse/game_assets/stage_coli_ffb_map.json",
+    "humanGuide": "docs/reverse/STAGE_SURFACE_FFB_MAP.md",
+    "sharedAnalyzer": "tools/reverse/analyze_game_data.py",
+    "stageAnalyzer": "tools/reverse/analyze_stage_coli.py",
+    "telemetrySchema": "reverse/game_assets/ffb_surface_telemetry_schema.json"
+  },
+  "externalCrossCheck": {
+    "repository": "StupidCoder/RetroReverse",
+    "commit": "e9d892e19825c518407e41144fb8050f9d3e6c50",
+    "platform": "Xbox OutRun 2006 C2C",
+    "findings": [
+      "66 main coli_CS_* files use COLI0200 with size/magic/count/section-offset structure.",
+      "Six COLI0105 old-format leftovers exist in the Xbox corpus.",
+      "COLI section/material semantics remain unopened in that independent project.",
+      "Visible road asphalt/lane/kerb mesh is in cs_CS_*_pmt.sz; do not equate render texture material with collision surface identity."
+    ],
+    "xboxContactPipeline": {
+      "carOffset": "0x5C",
+      "observation": "Only watched writer reported at Xbox 0x16902E, contact write-back in per-car pipeline 0x1692A0 fed by collision 0x168880.",
+      "pcCorrelation": "PC EVWORK_CAR::OnRoadPlace_5C occupies the same +0x5C offset.",
+      "nextPcReverseStep": "CLOSED for material mask path: canonical PC EXE now proves materialId -> surfaceMask and the four EVWORK_CAR contact writes.",
+      "warning": "Xbox function addresses are evidence anchors only and must not be reused as PC addresses."
+    }
+  },
+  "contactTopology": {
+    "status": "PARTIAL_GEOMETRY_CONFIRMED",
+    "localOrder": [
+      "0:-X/-Z side",
+      "1:+X/-Z side",
+      "2:-X/+Z side",
+      "3:+X/+Z side"
+    ],
+    "evidence": "0x46BBF0 returns per-car contact geometry; 0x4A58EC copies vec3 to EVWORK_CAR::vector_130[i]",
+    "finalWheelNames": "OPEN"
+  },
+  "nextResearch": {
+    "key": "SURFACE-MASK-EFFECT-CONSUMERS-001",
+    "goal": "Map aggregate/native surface-mask consumers to particle/sound/effect semantics before assigning human names to non-primary materials.",
+    "currentEvidence": "Several routines OR/test contact masks, but inspected examples also participate in gameplay/stat logic; no particle/sound identity is yet proven."
+  }
+}
