@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T00:36:00+09:00",
+  "updated_at_kst": "2026-09-25T00:48:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -56,9 +56,10 @@
     },
     "graphics_localization": {
       "status": "in_progress",
-      "percent": 8,
-      "reviewed_categories": 4,
-      "total_categories": 10
+      "transcription_percent": 62,
+      "final_artwork_percent": 0,
+      "transcribed_assets": 49,
+      "total_artwork_targets": 79
     },
     "runtime_text_trace": {
       "status": "clean_k1_package_ready",
@@ -87,16 +88,16 @@
     },
     "graphics_transcription": {
       "status": "in_progress",
-      "percent": 40,
-      "transcribed_assets": 32,
-      "localize_text_targets": 80,
-      "transcribed_segments": 153
+      "percent": 62,
+      "transcribed_assets": 49,
+      "localize_text_targets": 79,
+      "transcribed_segments": 364
     },
     "graphics_artwork": {
       "status": "not_started",
       "percent": 0,
       "completed": 0,
-      "total": 80
+      "total": 79
     },
     "graphics_artwork_pipeline": {
       "status": "proof_renderer_ready",
@@ -106,7 +107,7 @@
       "total": 80
     }
   },
-  "next_checkpoint": "Pass latest clean CI; package/run K1 trace; resolve IDs 96/97/279/280; in-game validate first Continue Korean DDS candidate; continue transcription queue",
+  "next_checkpoint": "Latest clean CI; user K1 runtime log; then K2 ASCII proof; continue remaining 30/79 graphics transcriptions; validate Continue Korean DDS in-game; design K3 glyph/width hook",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -131,17 +132,17 @@
   "graphics": {
     "total_dds": 243,
     "visually_reviewed": 243,
-    "localize_text": 80,
-    "preserve_brand_song_credit": 32,
+    "localize_text": 79,
+    "preserve_brand_song_credit": 33,
     "font_pipeline": 9,
     "hangul_name_entry": 1,
     "zoom_review": 47,
     "no_localization": 74,
-    "work_queue_total": 137,
+    "work_queue_total": 136,
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
-    "transcribed_assets": 32,
-    "transcribed_segments": 153,
+    "transcribed_assets": 49,
+    "transcribed_segments": 364,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 1,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -179,6 +180,16 @@
       "korean_trace": true,
       "proof_text_override": false,
       "status": "ready_for_runtime_log"
+    },
+    "clean_k2_ascii_test_package": {
+      "build_head": "079d890c2bdb87590f2f95e55281a7c4627401df",
+      "package_name": "OutRun2_Korean_Clean_K2_ASCII_Proof.zip",
+      "package_sha256": "0d68692be110175bd49d4d84f926f673eb6ca09cc32b9410bac6e847755f1229",
+      "includes_game_exe": false,
+      "korean_trace": true,
+      "proof_text_override": true,
+      "expected_id0": "[KOR-PROOF] Screen Position",
+      "status": "ready_after_k1"
     }
   }
 }
