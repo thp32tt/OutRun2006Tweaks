@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-24T22:41:00+09:00",
+  "updatedKst": "2026-09-24T22:47:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -49,35 +49,22 @@
     }
   },
   "candidateWip": {
-    "activeUnvalidatedCount": 1,
-    "candidateBranches": [
-      "vr-d3d9ex-candidate/R51-MATRIX-BASE-MANUAL-20260924"
-    ],
-    "activeCandidate": {
+    "activeUnvalidatedCount": 0,
+    "candidateBranches": [],
+    "activeCandidate": null,
+    "lastIntegratedCandidate": {
       "candidateId": "R51-MATRIX-BASE-MANUAL-20260924",
-      "branch": "vr-d3d9ex-candidate/R51-MATRIX-BASE-MANUAL-20260924",
+      "candidateBranch": "vr-d3d9ex-candidate/R51-MATRIX-BASE-MANUAL-20260924",
       "candidateSha": "27f4ad958cf965f33bc6791395dd77ca1af7fb42",
-      "baseSha": "0ca18d79a9e0c9f1f8ed45194c49b679785aceae",
-      "integrationHeadObserved": "0ca18d79a9e0c9f1f8ed45194c49b679785aceae",
-      "findingIds": [
-        "STRUCT-REGRESSION-GATE-001",
-        "VR-BINARY-CONTRACT-HUD-SOURCE-BINDING-GAP-001",
-        "VR-R51-HUD-SEMANTIC-LIFETIME-001"
+      "integrationSha": "060e2ae5ff78503b41d8a38980843dd5003e43bb",
+      "candidateCiRuns": [
+        36007124220,
+        36007124238
       ],
-      "status": "VALIDATING",
-      "requiredReviewers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "ciEvidenceRefs": [
-        "actions:36007124220",
-        "actions:36007124238"
-      ],
-      "owner": "D_INTEGRATION_PLANNER",
-      "updatedAt": "2026-09-24T22:41:00+09:00",
-      "blocker": "Exact-SHA cloud CI in progress",
-      "nextAction": "Consume runs 36007124220 and 36007124238; if green, declare TEST_MATRIX_BASE and prepare parallel HUD/FLARE/PERF HMD slots."
+      "candidateCiResult": "SUCCESS",
+      "status": "INTEGRATED_NEEDS_HMD",
+      "integratedAtKst": "2026-09-24T22:46:00+09:00",
+      "evidenceNote": "Prospective integration preserves candidate runtime/build-input blobs; intervening focus commits were queue/matrix documentation only."
     }
   },
   "items": [
@@ -372,10 +359,11 @@
     }
   ],
   "hmdTestMatrix": {
-    "status": "BASE_VALIDATING",
-    "testMatrixBaseCandidateSha": "27f4ad958cf965f33bc6791395dd77ca1af7fb42",
+    "status": "BASE_BUILD_VERIFIED",
+    "testMatrixBaseRuntimeSha": "27f4ad958cf965f33bc6791395dd77ca1af7fb42",
+    "integrationSha": "060e2ae5ff78503b41d8a38980843dd5003e43bb",
     "maxSlots": 6,
-    "slots": [],
-    "nextAction": "After base CI passes, create immutable A CONTROL and bounded HUD/FLARE/PERF experiment slots with automatic identity."
+    "manifest": "docs/VR_HMD_TEST_MATRIX.json",
+    "nextAction": "Complete A_CONTROL identity, then prepare bounded B_HUD, C_FLARE and D_PERF experiment slots in parallel from the integrated R51-protected base."
   }
 }
