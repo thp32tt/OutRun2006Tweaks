@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-24T23:08:00+09:00",
+  "updatedKst": "2026-09-24T23:24:08+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -66,6 +66,20 @@
       ],
       "productionIntegrationWip": 1,
       "rule": "Each cycle performs recover/review/implement/validate/integrate. Remote claim/CAS prevents collisions. Waiting on one lane must not idle the cycle."
+    },
+    "implementationFirstEnforcement": {
+      "enabled": true,
+      "noReadyParking": true,
+      "actionableStates": [
+        "READY",
+        "IMPLEMENT_NEXT",
+        "NEEDS_VALIDATION"
+      ],
+      "sameCycleRule": "If safe without HMD, implement or deterministically validate in the same full cycle; documentation alone is not completion.",
+      "ciPendingRule": "Persist exact immutable SHA/run then advance another non-conflicting lane; never idle or busy-poll.",
+      "staleQueueRule": "If source already contains the fix, correct the queue and add/persist a regression verifier instead of recreating the fix.",
+      "hmdGateRule": "Use NEED_HMD_TEST only for genuinely hardware-visible uncertainty after deterministic gates are exhausted.",
+      "endOfCycleGate": "Scan actionable states and continue useful independent work until only HMD gates, active immutable CI, ownership conflict, or hard capability blockers remain."
     }
   },
   "candidateWip": {
