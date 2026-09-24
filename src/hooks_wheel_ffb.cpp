@@ -1546,9 +1546,20 @@ namespace
             result.damperCapsKnown = damperCapsKnown_;
             result.damperDynamic = !damperCapsKnown_ ||
                 (damperDynamicParams_ & DIEP_TYPESPECIFICPARAMS) != 0;
-            result.periodicCapsKnown = periodicCapsKnown_;
-            result.periodicDynamic = !periodicCapsKnown_ ||
-                (periodicDynamicParams_ & DIEP_TYPESPECIFICPARAMS) != 0;
+            const WheelFFBMath::Model statusModel =
+                WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+            const bool statusNeedsSlip =
+                WheelFFBMath::model_uses_modern_sat(statusModel);
+            result.periodicCapsKnown =
+                roadPeriodicCapsKnown_ &&
+                (!statusNeedsSlip || slipPeriodicCapsKnown_);
+            result.periodicDynamic =
+                (!roadPeriodicCapsKnown_ ||
+                 (roadPeriodicDynamicParams_ & DIEP_TYPESPECIFICPARAMS) != 0) &&
+                (!statusNeedsSlip ||
+                 !slipPeriodicCapsKnown_ ||
+                 (slipPeriodicDynamicParams_ & DIEP_TYPESPECIFICPARAMS) != 0);
             result.directionTested = directionTested_;
 
             if (device_)
@@ -2050,6 +2061,10 @@ namespace
             damperStrategy_ = 1;
             roadPeriodicStrategy_ = 1;
             slipPeriodicStrategy_ = 1;
+            roadPeriodicCapsKnown_ = false;
+            slipPeriodicCapsKnown_ = false;
+            roadPeriodicDynamicParams_ = 0;
+            slipPeriodicDynamicParams_ = 0;
             roadPeriodicIsTriangle_ = false;
             clear_constant_live_failure();
         }
@@ -2837,14 +2852,9 @@ namespace
             LONG directions[1] = { 1 };
 
             const float configuredSaturation =
-                saturationOverride >= 0.0f
-                    ? saturationOverride
-                    : static_cast<float>(Settings::WheelFFBSpringSaturation);
+                static_cast<float>(Settings::WheelFFBSpringSaturation);
             const float safeSaturation = std::isfinite(configuredSaturation)
-                ? std::clamp(
-                    configuredSaturation,
-                    saturationOverride >= 0.0f ? 0.0f : 0.1f,
-                    1.0f)
+                ? std::clamp(configuredSaturation, 0.1f, 1.0f)
                 : 0.775f;
             const DWORD saturation = static_cast<DWORD>(
                 safeSaturation * static_cast<float>(DI_FFNOMINALMAX));
@@ -2921,9 +2931,14 @@ namespace
                 ? -coefficientMagnitude
                 : coefficientMagnitude;
             const float configuredSaturation =
-                static_cast<float>(Settings::WheelFFBSpringSaturation);
+                saturationOverride >= 0.0f
+                    ? saturationOverride
+                    : static_cast<float>(Settings::WheelFFBSpringSaturation);
             const float safeSaturation = std::isfinite(configuredSaturation)
-                ? std::clamp(configuredSaturation, 0.1f, 1.0f)
+                ? std::clamp(
+                    configuredSaturation,
+                    saturationOverride >= 0.0f ? 0.0f : 0.1f,
+                    1.0f)
                 : 0.775f;
             const DWORD saturation = static_cast<DWORD>(
                 safeSaturation * static_cast<float>(DI_FFNOMINALMAX));
@@ -3160,13 +3175,15 @@ namespace
             float initialHz,
             REFGUID effectGuid,
             const char* effectName,
-            int& updateStrategy)
+            int& updateStrategy,
+            bool& capsKnown,
+            DWORD& dynamicParams)
         {
             if (!device_)
                 return nullptr;
 
-            bool capsKnown = false;
-            DWORD dynamicParams = 0;
+            capsKnown = false;
+            dynamicParams = 0;
             if (!query_dynamic_effect_capability(
                     effectGuid, effectName, DIEP_TYPESPECIFICPARAMS,
                     capsKnown, dynamicParams))
@@ -3276,7 +3293,9 @@ namespace
                     initialRoadHz,
                     ps2Original ? GUID_Triangle : GUID_Sine,
                     ps2Original ? "GUID_Triangle" : "GUID_Sine",
-                    roadPeriodicStrategy_);
+                    roadPeriodicStrategy_,
+                    roadPeriodicCapsKnown_,
+                    roadPeriodicDynamicParams_);
                 roadPeriodicIsTriangle_ =
                     roadTextureEffect_ != nullptr && ps2Original;
             }
@@ -3286,7 +3305,9 @@ namespace
                 tireSlipEffect_ = create_periodic_effect(
                     "TireSlip", 35.0f,
                     GUID_Sine, "GUID_Sine",
-                    slipPeriodicStrategy_);
+                    slipPeriodicStrategy_,
+                    slipPeriodicCapsKnown_,
+                    slipPeriodicDynamicParams_);
             }
 
             roadState_ = {};
@@ -3442,6 +3463,10 @@ namespace
             roadState_ = {};
             slipState_ = {};
             periodicsActive_ = false;
+            roadPeriodicCapsKnown_ = false;
+            slipPeriodicCapsKnown_ = false;
+            roadPeriodicDynamicParams_ = 0;
+            slipPeriodicDynamicParams_ = 0;
             roadPeriodicIsTriangle_ = false;
             roadPeriodicStrategy_ = 1;
             slipPeriodicStrategy_ = 1;
@@ -4219,6 +4244,10 @@ namespace
         DWORD constantDynamicParams_ = 0;
         DWORD springDynamicParams_ = 0;
         DWORD damperDynamicParams_ = 0;
+        bool roadPeriodicCapsKnown_ = false;
+        bool slipPeriodicCapsKnown_ = false;
+        DWORD roadPeriodicDynamicParams_ = 0;
+        DWORD slipPeriodicDynamicParams_ = 0;
         bool roadPeriodicIsTriangle_ = false;
         int roadPeriodicStrategy_ = 1;
         int slipPeriodicStrategy_ = 1;
