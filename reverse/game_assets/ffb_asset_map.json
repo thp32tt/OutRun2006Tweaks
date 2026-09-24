@@ -277,6 +277,7 @@
   "dataProducts": {
     "stageInventory": "reverse/game_assets/stage_collision_inventory.json",
     "humanGuide": "docs/reverse/STAGE_SURFACE_FFB_MAP.md",
-    "sharedAnalyzer": "tools/reverse/analyze_game_data.py"
+    "sharedAnalyzer": "tools/reverse/analyze_game_data.py",
+    "telemetrySchema": "reverse/game_assets/ffb_surface_telemetry_schema.json"
   }
 }
