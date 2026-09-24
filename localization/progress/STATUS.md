@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-25 00:09 KST
+Updated: 2026-09-25 01:39 KST
 
 ## Active branch
 `korean-localization-clean`
@@ -12,7 +12,6 @@ Base: `emoose/OutRun2006Tweaks@08e5efb4deea4066c440307ec009c868a30562d3`
 - VR source merge/cherry-pick: **forbidden**
 - FFB feature merge/cherry-pick: **forbidden**
 - Cross-project sharing: factual reverse-engineering data only
-- Domain Isolation Guard: **PASS** on current HEAD
 
 ## Text
 - txet IDs: 1,356
@@ -21,35 +20,34 @@ Base: `emoose/OutRun2006Tweaks@08e5efb4deea4066c440307ec009c868a30562d3`
 - reviewed/finalized: **1,351 / 1,355 (99.7%)**
 - context-sensitive drafts: **4** (IDs 96, 97, 279, 280)
 - placeholder QA: **PASS**
-- generated draft BIN: **PASS** (data validation only; not deployable until Unicode runtime is solved)
 
 ## Graphics
-- DDS inventory: **243 / 243 (100%)**
-- visually reviewed: **243 / 243 (100%)**
-- direct Korean artwork targets: **80**
-- preserve brand/song/credit: **32**
-- font atlases: **9**
-- Hangul name-entry atlas: **1**
-- zoom-review queue: **47**
-- no localization required: **74**
-- transcription completed: **28 assets / 82 text segments**
-- Korean artwork rendered: **0 / 80**
+- DDS inventory / visual review: **243 / 243 (100%)**
+- direct Korean artwork targets: **79**
+- transcription completed: **78 / 79 (98.7%)**
+- translated/transcribed graphic segments: **668**
+- context-blocked graphic asset: **index 152** (`PRO./INS./G.M./E.R.` badge context)
+- final Korean artwork validated in game: **0 / 79**
+- first DDS candidate: `Continue? -> 계속?` ready, pending in-game validation
+- font atlases: 9
+- Hangul name-entry atlas: 1
 
 ## Runtime
 - K0 txet lossless roundtrip: **PASS**
-- clean K1 trace source: **present**
-- Localization State workflow: **PASS**
-- Domain Isolation Guard: **PASS**
-- Win32 clean build: **IN PROGRESS** (run 36017712385)
-- K1 runtime trace log: **pending**
-- K2 Unicode-safe one-string proof: **pending**
-- K3 Hangul glyph proof: **pending**
+- K1 clean trace package: **READY**
+- K2 ASCII resolver proof package: **READY**
+- K3 Hangul glyph/width path: **ANALYSIS/IMPLEMENTATION NEXT**
+- confirmed width routine `0x42C480` is byte-oriented and calls `0x42C410` for glyph-pair spacing
 
-## Resume order
-1. `localization/progress/progress.json`
-2. `localization/resume_state.json`
-3. `localization/WORKLOG.md`
-4. `localization/graphics/asset_queue.csv`
-5. current branch HEAD / CI state
+## Data durability
+- `transcriptions.jsonl` record-boundary defect repaired
+- CI verifier now parses graphics JSONL and verifies record count + segment count
+- source of truth: `progress.json`, `resume_state.json`, `events.jsonl`, `WORKLOG.md`
 
-Do not restart completed inventory/translation work unless the source archive hash changes.
+## Next
+1. Pass latest CI with the new JSONL integrity gate.
+2. Collect K1 runtime log.
+3. Run K2 ASCII resolver proof.
+4. Resolve the four text IDs and graphics index 152 using runtime context.
+5. Add K3 width/glyph trace scaffold.
+6. Validate first Korean DDS in game.
