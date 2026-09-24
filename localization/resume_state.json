@@ -1,11 +1,28 @@
 {
+  "schema_version": 2,
   "branch": "korean-localization-prototype",
-  "next_actions": [
-    "continue translation at text ID 159",
-    "classify DDS visual index 36 onward",
-    "do not overwrite original game assets",
-    "after CI pass package K1 trace build",
-    "collect runtime log before K2 Unicode override"
+  "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+  "resume_order": [
+    "read localization/progress.json",
+    "read localization/WORKLOG.md newest checkpoint",
+    "load localization/text/korean_*.jsonl and special_records.json",
+    "load localization/graphics/visual_review.csv",
+    "never overwrite original game assets in the repository"
   ],
-  "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57"
+  "next_actions": [
+    "resolve text IDs 96,97,279,280 using K1 runtime menu context",
+    "package/download K1 trace artifact from CI run 35981045694",
+    "run with [Localization] KoreanTrace=true and collect OutRun2006Tweaks.log",
+    "zoom-review the 47 graphics rows marked zoom_review",
+    "create Korean replacement artwork for confirmed localize_text assets",
+    "prototype the 9 font atlases plus Hangul name-entry atlas",
+    "after trace confirmation implement K2 single-string Unicode override and K3 minimal Hangul glyph proof"
+  ],
+  "data_build": {
+    "last_output_sha256": "20d5c3cc245855d55d9dc9bfe90d0269c0ba8c1242b35779f979b974dec56440",
+    "last_output_entries": 1356,
+    "last_output_valid": true,
+    "deployable": false,
+    "reason_not_deployable": "stock executable truncates UTF-16LE to one byte and stock font atlas has no Hangul"
+  }
 }
