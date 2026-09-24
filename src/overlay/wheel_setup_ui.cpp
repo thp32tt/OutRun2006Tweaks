@@ -1779,7 +1779,14 @@ namespace
                 track_ffb_change(ImGui::SliderFloat("Spring Saturation", Settings::WheelFFBSpringSaturation.ptr(), 0.10f, 1.0f, "%.3f"));
                 track_ffb_change(ImGui::SliderFloat("Weight Transfer", Settings::WheelFFBWeightTransfer.ptr(), 0.0f, 1.5f, "%.2f"));
                 track_ffb_change(ImGui::SliderFloat("Lateral Signal Deadzone", Settings::WheelFFBLateralDeadzone.ptr(), 0.0f, 8.0f, "%.2f"));
+                if (activeFfbModel == 3) ImGui::BeginDisabled();
                 track_ffb_change(ImGui::SliderFloat("Gear Shift", Settings::WheelFFBGearShift.ptr(), 0.0f, 1.0f, "%.2f"));
+                if (activeFfbModel == 3)
+                {
+                    ImGui::EndDisabled();
+                    ImGui::TextDisabled(
+                        "PS2 Original: gear-shift FFB stays disabled until a retail PS2 effect caller is verified.");
+                }
                 track_ffb_change(ImGui::SliderFloat("Force Build Slew Rate", Settings::WheelFFBSlewRate.ptr(), 0.01f, 1.0f, "%.3f"));
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip("Maximum normal structural-force build change per 60 Hz tick. Lower is smoother/slower; higher responds faster.");
