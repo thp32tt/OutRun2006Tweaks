@@ -1,0 +1,136 @@
+{
+  "schema": "outrun-vr-performance-static-audit-v2",
+  "sourceSha": "3aff39d2d964c1df7d9085af058cbe2cc97e45ec",
+  "protectedRuntimeBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+  "existingOptimizations": {
+    "r31FastWorld": {
+      "liveWvpValidationInterval": 16,
+      "condition": "after reliable StateBlock tracking",
+      "eyeTailCacheKey": [
+        "poseSequence",
+        "worldScale",
+        "projection"
+      ]
+    },
+    "reflectionCadence": {
+      "normalizedTo60Hz": true,
+      "defaultUpdateRate": 0.5,
+      "originalBudgetFacesPerSecond": 180
+    }
+  },
+  "graphicsDefaults": {
+    "disableStageCulling": true,
+    "disableVehicleLODs": true,
+    "transparencySupersampling": true,
+    "reflectionResolution": 1024,
+    "normalSkyGlowFactor": 4,
+    "vrProfileSkyGlowFactor": 1
+  },
+  "staticRatios": {
+    "reflection1024Vs128PixelsPerFace": 64,
+    "reflection512Vs1024PixelsPerFace": 0.25,
+    "skyGlowFactor1FullScreenOutputEquivalentPerEye": 4,
+    "skyGlowFactor4TwoStepOutputEquivalentPerEye": 1.25,
+    "skyGlowApproxOutputRatioFactor1Vs4": 3.2,
+    "warning": "Static pixel/output ratios are not measured GPU-time ratios."
+  },
+  "existingProfiles": [
+    {
+      "name": "A_BASELINE",
+      "stageCulling": "disabled",
+      "transparencySSAA": true,
+      "reflectionResolution": 1024
+    },
+    {
+      "name": "B_CULLING",
+      "stageCulling": "enabled",
+      "transparencySSAA": true,
+      "reflectionResolution": 1024
+    },
+    {
+      "name": "C_CULLING_NO_SSAA",
+      "stageCulling": "enabled",
+      "transparencySSAA": false,
+      "reflectionResolution": 1024
+    },
+    {
+      "name": "D_CULLING_NO_SSAA_R512",
+      "stageCulling": "enabled",
+      "transparencySSAA": false,
+      "reflectionResolution": 512
+    }
+  ],
+  "directGpu": {
+    "perFrame": [
+      "left StretchRect",
+      "right StretchRect",
+      "EVENT Issue",
+      "EVENT wait/poll",
+      "post-Present publication"
+    ],
+    "dPerfSourceSha": "2d96a3117a6057bf66b7415c9cda959d80834fd5",
+    "measuredByCurrentCandidate": [
+      "fence sample count",
+      "poll count",
+      "average wait us",
+      "maximum wait us",
+      "backpressure/fallback"
+    ],
+    "missing": [
+      "copy-pair CPU enqueue us",
+      "surface dimensions/format",
+      "copied pixel count",
+      "copy destination bytes/sec"
+    ],
+    "targetSizing": "max(recommendedWidth[0],recommendedWidth[1]) x max(recommendedHeight[0],recommendedHeight[1]); stable direct size retained on transient seqlock read failure",
+    "formats": {
+      "D3DFMT_A8R8G8B8": 4,
+      "D3DFMT_A2B10G10R10": 4,
+      "D3DFMT_A16B16G16R16F": 8,
+      "default": "convert to A8R8G8B8 when supported"
+    },
+    "copyVolumeFormula": "2 * width * height * bytesPerPixel * headsetHz",
+    "historicalScaleExample": {
+      "source": "comment in DirectTransportTargetSize",
+      "eyeSize": [
+        2124,
+        2284
+      ],
+      "headsetHz": 72,
+      "destinationWriteGBps4Bpp": 2.794300416,
+      "destinationWriteGBps8Bpp": 5.588600832,
+      "warning": "historical source-comment size only; not current runtime measurement; excludes source reads/conversion/host work"
+    }
+  },
+  "hudInspector": {
+    "defaultEnabled": false,
+    "needsRestart": true,
+    "hudScreenProfileExplicitlyEnables": false,
+    "hotPathWhenEnabled": [
+      "RtlCaptureStackBackTrace up to 24 frames before rate limiting",
+      "mutex",
+      "unordered_map",
+      "per-row flush",
+      "per-XST-row flush"
+    ],
+    "performanceBenchmarkRule": "disable unless measuring inspector overhead"
+  },
+  "candidates": [
+    {
+      "key": "VR-PERF-DIRECT-COPY-TELEMETRY-001",
+      "type": "telemetry-only"
+    },
+    {
+      "key": "VR-PERF-SKYGLOW-FACTOR-AB-001",
+      "type": "profile-only A/B"
+    },
+    {
+      "key": "VR-PERF-VEHICLE-LOD-AB-001",
+      "type": "profile-only A/B"
+    },
+    {
+      "key": "HUD-INSPECTOR-TRACE-COST-001",
+      "type": "diagnostic-tool optimization"
+    }
+  ]
+}

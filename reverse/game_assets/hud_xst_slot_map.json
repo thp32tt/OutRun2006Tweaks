@@ -1,0 +1,399 @@
+{
+  "schema": "outrun-hud-xst-slot-map-v1",
+  "sourceSha": "3aff39d2d964c1df7d9085af058cbe2cc97e45ec",
+  "canonicalExeSha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+  "xstTables": {
+    "slotCount": 75,
+    "englishVa": "0x00639CB8",
+    "frenchVa": "0x00639DE4",
+    "germanVa": "0x00639F10",
+    "italianVa": "0x0063A03C",
+    "spanishVa": "0x0063A168",
+    "tableStrideBytes": 300,
+    "englishNonNullSlots": 50,
+    "localizedFiveLanguageFamilies": 16
+  },
+  "executableAnchors": {
+    "languageSlotLoad": "VA 0x0042DF49..0x0042DF55: language*0x4B + xstSet -> path pointer",
+    "packedSpriteResolver": "VA 0x0042DDF0: high16=xstSet, low16=spriteIndex",
+    "spraniIdResolver": "VA 0x00428A10: high16=spraniSet, low16=animationIndex",
+    "spraniChildSpriteResolver": "VA 0x00428C0F -> 0x0042DDF0"
+  },
+  "runtimeIdentity": {
+    "spriteNodeField": "SPRARGS::xstnum_0",
+    "formula": "packed=(xstSet<<16)|spriteIndex",
+    "semanticUse": "provenance axis; never sole screen/world classifier"
+  },
+  "rankMarker": {
+    "putClipSprite": {
+      "rva": "0x0002D280",
+      "callsPutSpriteExAt": "VA 0x0042D2EC",
+      "putSpriteExCallsPerInvocation": 1,
+      "multiNodeHypothesis": "FALSIFIED_FOR_SINGLE_CALL"
+    },
+    "sprani": {
+      "rva": "0x00029580",
+      "multiNodePotential": true,
+      "status": "VERIFY_CONCRETE_RANK_ANIMATION_CARDINALITY"
+    }
+  },
+  "representativeSlots": [
+    {
+      "slot": 0,
+      "family": "FONT",
+      "textures": 10,
+      "sprites": 10
+    },
+    {
+      "slot": 3,
+      "family": "ETC",
+      "textures": 13,
+      "sprites": 117
+    },
+    {
+      "slot": 18,
+      "family": "SELECT",
+      "textures": 6,
+      "sprites": 136
+    },
+    {
+      "slot": 19,
+      "family": "WARNING",
+      "textures": 2,
+      "sprites": 2
+    },
+    {
+      "slot": 20,
+      "family": "NAME_ENTRY",
+      "textures": 3,
+      "sprites": 93
+    },
+    {
+      "slot": 21,
+      "family": "RANKING",
+      "textures": 2,
+      "sprites": 50
+    },
+    {
+      "slot": 32,
+      "family": "SPRANI_LOGO",
+      "textures": 2,
+      "sprites": 5,
+      "spraniAnimations": 1
+    },
+    {
+      "slot": 33,
+      "family": "LOGO",
+      "textures": 2,
+      "sprites": 5,
+      "spraniAnimations": 1,
+      "localized": true
+    },
+    {
+      "slot": 34,
+      "family": "TITLE_CVT",
+      "textures": 6,
+      "sprites": 15,
+      "spraniAnimations": 4
+    },
+    {
+      "slot": 35,
+      "family": "METER_246GTS",
+      "textures": 2,
+      "sprites": 2,
+      "spraniAnimations": 1
+    },
+    {
+      "slot": 36,
+      "family": "METER_DINO",
+      "textures": 2,
+      "sprites": 2,
+      "spraniAnimations": 1
+    },
+    {
+      "slot": 37,
+      "family": "METER_ENZO",
+      "textures": 2,
+      "sprites": 2,
+      "spraniAnimations": 1
+    },
+    {
+      "slot": 38,
+      "family": "METER_F355",
+      "textures": 2,
+      "sprites": 2,
+      "spraniAnimations": 1
+    },
+    {
+      "slot": 39,
+      "family": "METER_F40",
+      "textures": 2,
+      "sprites": 2,
+      "spraniAnimations": 1
+    },
+    {
+      "slot": 40,
+      "family": "METER_F50",
+      "textures": 2,
+      "sprites": 2,
+      "spraniAnimations": 1
+    },
+    {
+      "slot": 41,
+      "family": "METER_SCAGLIETTI",
+      "textures": 2,
+      "sprites": 2,
+      "spraniAnimations": 1
+    },
+    {
+      "slot": 42,
+      "family": "METER_TESTAROSSA",
+      "textures": 2,
+      "sprites": 2,
+      "spraniAnimations": 1
+    },
+    {
+      "slot": 43,
+      "family": "GAME_CVT",
+      "textures": 7,
+      "sprites": 338,
+      "spraniAnimations": 108,
+      "localized": true
+    },
+    {
+      "slot": 44,
+      "family": "ETC_CVT",
+      "textures": 11,
+      "sprites": 698,
+      "spraniAnimations": 319,
+      "localized": true
+    },
+    {
+      "slot": 45,
+      "family": "FIGHT",
+      "textures": 1,
+      "sprites": 34,
+      "spraniAnimations": 11,
+      "localized": true
+    },
+    {
+      "slot": 46,
+      "family": "SELECTOR_CVT",
+      "textures": 38,
+      "sprites": 523,
+      "spraniAnimations": 96,
+      "localized": true
+    },
+    {
+      "slot": 47,
+      "family": "LOADING_CVT",
+      "textures": 5,
+      "sprites": 18,
+      "spraniAnimations": 9,
+      "localized": true
+    },
+    {
+      "slot": 48,
+      "family": "METER_512BB",
+      "textures": 2,
+      "sprites": 2,
+      "spraniAnimations": 1
+    },
+    {
+      "slot": 49,
+      "family": "METER_250GTO",
+      "textures": 2,
+      "sprites": 2,
+      "spraniAnimations": 1
+    },
+    {
+      "slot": 50,
+      "family": "ADV_CVT",
+      "textures": 12,
+      "sprites": 197,
+      "spraniAnimations": 30
+    },
+    {
+      "slot": 51,
+      "family": "COMMON",
+      "textures": 4,
+      "sprites": 5,
+      "spraniAnimations": 2
+    },
+    {
+      "slot": 52,
+      "family": "ROUTE_CVT",
+      "textures": 12,
+      "sprites": 80,
+      "spraniAnimations": 32,
+      "localized": true
+    },
+    {
+      "slot": 53,
+      "family": "ENDING",
+      "textures": 7,
+      "sprites": 141,
+      "spraniAnimations": 20
+    },
+    {
+      "slot": 54,
+      "family": "NAME_CMN",
+      "textures": 8,
+      "sprites": 126,
+      "spraniAnimations": 15
+    },
+    {
+      "slot": 55,
+      "family": "NAME5A",
+      "textures": 10,
+      "sprites": 29,
+      "spraniAnimations": 14
+    },
+    {
+      "slot": 56,
+      "family": "NAME5B",
+      "textures": 9,
+      "sprites": 28,
+      "spraniAnimations": 14
+    },
+    {
+      "slot": 57,
+      "family": "NAME5C",
+      "textures": 9,
+      "sprites": 28,
+      "spraniAnimations": 14
+    },
+    {
+      "slot": 58,
+      "family": "NAME5D",
+      "textures": 9,
+      "sprites": 28,
+      "spraniAnimations": 14
+    },
+    {
+      "slot": 59,
+      "family": "NAME5E",
+      "textures": 9,
+      "sprites": 28,
+      "spraniAnimations": 14
+    },
+    {
+      "slot": 60,
+      "family": "EFCT_FLOR",
+      "textures": 1,
+      "sprites": 1,
+      "spraniAnimations": 1
+    },
+    {
+      "slot": 61,
+      "family": "RANKING_CVT",
+      "textures": 3,
+      "sprites": 108,
+      "spraniAnimations": 41,
+      "localized": true
+    },
+    {
+      "slot": 62,
+      "family": "FLAG_RANK",
+      "textures": 4,
+      "sprites": 17,
+      "spraniAnimations": 7,
+      "localized": true
+    },
+    {
+      "slot": 63,
+      "family": "CLAR_RANK",
+      "textures": 5,
+      "sprites": 18,
+      "spraniAnimations": 7,
+      "localized": true
+    },
+    {
+      "slot": 64,
+      "family": "JENN_RANK",
+      "textures": 2,
+      "sprites": 18,
+      "spraniAnimations": 7,
+      "localized": true
+    },
+    {
+      "slot": 65,
+      "family": "HOLL_RANK",
+      "textures": 2,
+      "sprites": 18,
+      "spraniAnimations": 7,
+      "localized": true
+    },
+    {
+      "slot": 66,
+      "family": "CONGRATS_CVT",
+      "textures": 2,
+      "sprites": 9,
+      "spraniAnimations": 5,
+      "localized": true
+    },
+    {
+      "slot": 67,
+      "family": "STAFFROLL",
+      "textures": 5,
+      "sprites": 37,
+      "spraniAnimations": 7
+    },
+    {
+      "slot": 68,
+      "family": "SUMO_FE_CVT",
+      "textures": 129,
+      "sprites": 1564,
+      "spraniAnimations": 224,
+      "localized": true
+    },
+    {
+      "slot": 69,
+      "family": "DEMO_SPLASH",
+      "assetPresentInSuppliedSpriteZip": false
+    },
+    {
+      "slot": 70,
+      "family": "FRUITY_CVT",
+      "textures": 2,
+      "sprites": 195,
+      "spraniAnimations": 103,
+      "localized": true
+    },
+    {
+      "slot": 71,
+      "family": "SPLASH",
+      "textures": 2,
+      "sprites": 9,
+      "spraniAnimations": 1
+    },
+    {
+      "slot": 72,
+      "family": "SUMO_LOADING",
+      "textures": 4,
+      "sprites": 5,
+      "spraniAnimations": 2,
+      "localized": true
+    },
+    {
+      "slot": 73,
+      "family": "SUMO_VSLOAD",
+      "textures": 4,
+      "sprites": 278,
+      "spraniAnimations": 32,
+      "localized": true
+    },
+    {
+      "slot": 74,
+      "family": "TAEXTRA",
+      "textures": 1,
+      "sprites": 140,
+      "spraniAnimations": 20
+    }
+  ],
+  "boundaries": [
+    "One additional non-null early XST slot exists outside this concise representative list; use the reproducer for the complete table.",
+    "The standard XST parser is valid for canonical table assets in this corpus; a non-canonical alternate/special SMSELECTOR XST needs separate format handling.",
+    "Asset family identity supports provenance but cannot by itself distinguish screen HUD from world billboards."
+  ]
+}
