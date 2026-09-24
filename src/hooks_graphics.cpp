@@ -7,6 +7,7 @@
 #include <iostream>
 #include <array>
 #include <cmath>
+#include <intrin.h>
 
 namespace Settings
 {
@@ -21,6 +22,7 @@ namespace Settings
 	// gets composited into the right eye as a translucent ghost.
 	extern Setting<bool> VREnabled;
 	extern Setting<bool> VRStereo;
+	extern Setting<bool> VRTelemetry;
 	extern Setting<bool> VRMirrorFitDesktop;
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRDriverSeatView;
@@ -236,6 +238,93 @@ public:
 	static VRDriverSeatRenderTest instance;
 };
 VRDriverSeatRenderTest VRDriverSeatRenderTest::instance;
+
+class VRLensFlareProducerTelemetry : public Hook
+{
+    // Canonical EXE evidence: lens-flare producer 0x40CBC0 calls helper
+    // 0x40C9A0, which ultimately calls DrawObjectAlpha_Internal at RVA 0x56D0.
+    // Observe only calls returning into the helper body; never alter draw state.
+    constexpr static std::uintptr_t DrawObjectAlphaRva = 0x56D0;
+    constexpr static std::uintptr_t LensFlareHelperBeginRva = 0xC9A0;
+    constexpr static std::uintptr_t LensFlareProducerRva = 0xCBC0;
+
+    inline static SafetyHookInline DrawObjectAlphaHook{};
+    inline static std::uint64_t FlareCalls = 0;
+    inline static ULONGLONG LastSummaryMs = 0;
+    inline static std::array<int, 32> SeenObjectIds{};
+    inline static std::size_t SeenObjectCount = 0;
+
+    static bool RememberObject(int objectId) noexcept
+    {
+        for (std::size_t i = 0; i < SeenObjectCount; ++i)
+            if (SeenObjectIds[i] == objectId)
+                return false;
+        if (SeenObjectCount >= SeenObjectIds.size())
+            return false;
+        SeenObjectIds[SeenObjectCount++] = objectId;
+        return true;
+    }
+
+    static void __cdecl DrawObjectAlpha_dest(
+        int objectId, float alpha, void* a3, int a4)
+    {
+        const std::uintptr_t returnAddress =
+            reinterpret_cast<std::uintptr_t>(_ReturnAddress());
+        const std::uintptr_t exeBase =
+            reinterpret_cast<std::uintptr_t>(Module::ExeHandle);
+        const std::uintptr_t callerRva =
+            (returnAddress >= exeBase) ? returnAddress - exeBase : 0;
+        const bool flareCall =
+            callerRva >= LensFlareHelperBeginRva &&
+            callerRva < LensFlareProducerRva;
+
+        if (flareCall && Settings::VREnabled && Settings::VRTelemetry)
+        {
+            ++FlareCalls;
+            if (RememberObject(objectId))
+            {
+                spdlog::info(
+                    "VR FLARE TRACE: callerRva=0x{:X} objectId=0x{:X} alpha={} semantic={}",
+                    static_cast<unsigned>(callerRva),
+                    static_cast<unsigned>(objectId), alpha,
+                    OutRunVR::GameSemantic::Name(
+                        OutRunVR::GameSemantic::CurrentScope));
+            }
+
+            const ULONGLONG now = GetTickCount64();
+            if (LastSummaryMs == 0 || now - LastSummaryMs >= 5000)
+            {
+                LastSummaryMs = now;
+                spdlog::info(
+                    "VR FLARE TRACE 5s: calls={} uniqueObjects={} producer=0x40CBC0 helper=0x40C9A0 draw=0x4056D0",
+                    FlareCalls, SeenObjectCount);
+            }
+        }
+
+        DrawObjectAlphaHook.ccall<void>(objectId, alpha, a3, a4);
+    }
+
+public:
+    std::string_view description() override
+    {
+        return "VRLensFlareProducerTelemetry";
+    }
+
+    bool validate() override
+    {
+        return Settings::VREnabled;
+    }
+
+    bool apply() override
+    {
+        DrawObjectAlphaHook = safetyhook::create_inline(
+            Module::exe_ptr(DrawObjectAlphaRva), DrawObjectAlpha_dest);
+        return !!DrawObjectAlphaHook;
+    }
+
+    static VRLensFlareProducerTelemetry instance;
+};
+VRLensFlareProducerTelemetry VRLensFlareProducerTelemetry::instance;
 
 class RestoreCarBaseShadow : public Hook
 {
