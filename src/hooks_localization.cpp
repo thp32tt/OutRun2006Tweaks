@@ -16,7 +16,15 @@ namespace Settings
         "KoreanTrace",
         false,
         "Experimental Korean-localization text resolver trace. "
-        "Logging only; does not replace or modify game text."
+        "Logging only unless a separate proof override is enabled."
+    };
+
+    Setting<bool> KoreanProofTextOverride{
+        "Localization",
+        "KoreanProofTextOverride",
+        false,
+        "K2 resolver proof. Replaces only text ID 0 with an ASCII marker. "
+        "This does not enable Hangul rendering and is disabled by default."
     };
 }
 
@@ -37,12 +45,17 @@ class KoreanLocalizationTraceHook : public Hook
     inline static std::bitset<TextEntryCount> SeenIds{};
     inline static std::mutex SeenMutex{};
     inline static size_t UniqueLogEntries = 0;
+    inline static char ProofTextId0[] = "[KOR-PROOF] Screen Position";
 
     static char* __cdecl TextResolverDest(uint32_t id)
     {
-        char* text = TextResolverHook.call<char*>(id);
+        char* originalText = TextResolverHook.call<char*>(id);
+        char* returnedText = originalText;
 
-        if (id < TextEntryCount)
+        if (Settings::KoreanProofTextOverride && id == 0)
+            returnedText = ProofTextId0;
+
+        if (Settings::KoreanLocalizationTrace && id < TextEntryCount)
         {
             std::scoped_lock lock(SeenMutex);
             if (!SeenIds.test(id) && UniqueLogEntries < MaxUniqueLogEntries)
@@ -50,13 +63,15 @@ class KoreanLocalizationTraceHook : public Hook
                 SeenIds.set(id);
                 ++UniqueLogEntries;
                 spdlog::info(
-                    "KoreanLocalizationTrace: text_id={} text='{}'",
+                    "KoreanLocalizationTrace: text_id={} original='{}' returned='{}' proof_override={}",
                     id,
-                    text ? text : "<null>");
+                    originalText ? originalText : "<null>",
+                    returnedText ? returnedText : "<null>",
+                    Settings::KoreanProofTextOverride && id == 0);
             }
         }
 
-        return text;
+        return returnedText;
     }
 
 public:
@@ -68,11 +83,12 @@ public:
     void declare_settings() override
     {
         Settings::KoreanLocalizationTrace.needs_restart();
+        Settings::KoreanProofTextOverride.needs_restart();
     }
 
     bool validate() override
     {
-        if (!Settings::KoreanLocalizationTrace)
+        if (!Settings::KoreanLocalizationTrace && !Settings::KoreanProofTextOverride)
             return false;
 
         const uint8_t* resolver = Module::exe_ptr(TextResolverOffset);
@@ -102,6 +118,11 @@ public:
         TextResolverHook = safetyhook::create_inline(
             Module::exe_ptr(TextResolverOffset),
             TextResolverDest);
+
+        spdlog::info(
+            "KoreanLocalizationTrace: trace={} proof_text_override={}",
+            Settings::KoreanLocalizationTrace.get(),
+            Settings::KoreanProofTextOverride.get());
         return true;
     }
 
