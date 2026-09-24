@@ -233,7 +233,7 @@ req(build, 'Settings::WheelFFBXForceGain = 1.00f;', 'legacy preset migration res
 req(build, 'Settings::WheelFFBNativeTireSat = false;', 'legacy preset migration fail closes native front tyre SAT')
 req(build, 'Settings::WheelFFBNativeOversteerCue = false;', 'legacy preset migration fail closes native rear countersteer cue')
 req(build, 'Settings::WheelFFBNativeOversteerSlipThreshold = 0.12f;', 'legacy preset migration restores conservative rear peak-slip reference')
-req(build, 'Range<int>{ 0, 8 }', 'FFB feel migration revision includes per-wheel surface rewrite')
+req(build, 'Range<int>{ 0, 9 }', 'FFB feel migration revision includes R3 native-front-SAT test candidate')
 req(build, 'if (revision < 6)', 'existing user.ini receives rear cue sign/default migration')
 req(build, 'if (revision < 7)', 'existing R3 user.ini receives canonical reverse-off migration')
 req(build, 'if (revision < 8)', 'existing user.ini receives per-wheel road model migration')
