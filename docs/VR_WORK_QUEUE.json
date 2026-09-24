@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-24T23:09:00+09:00",
+  "updatedKst": "2026-09-24T23:12:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -78,19 +78,25 @@
     {
       "id": "VR-R51-RANK-ANCHOR-PROPAGATION-001",
       "priority": 13,
-      "status": "READY",
+      "status": "VALIDATING",
       "preferredRole": "B_RENDER_REVIEW",
       "summary": "Reconstruct rival rank-marker anchor propagation from Calc3D2D/vehicle source through sprani/put_clip SpriteNode and per-eye WORLD_BILLBOARD projection; current exact-callsite tags still leave markers head-locked/detached.",
       "testLevel": "LEVEL0",
       "dependencies": [],
-      "attempts": 0,
+      "attempts": 1,
       "runtimeCandidate": false,
       "sourceEvidence": {
         "candidateSha": "8d21824f9502b3354fae679972a90868a0cce562",
         "sessionId": "20260923T164207853Z-2202b186",
         "userResult": "vehicle rank markers remain detached and head-locked"
       },
-      "guard": "Preserve R51 road/background/vehicle stereo and keep ordinary HUD separate."
+      "guard": "Preserve R51 road/background/vehicle stereo and keep ordinary HUD separate.",
+      "candidateBranch": "vr-d3d9ex-candidate/RANK-ANCHOR-SIDECAR-20260924",
+      "candidateSha": "bdfcea9b40d461fb6f043a9f5da73b61332d2570",
+      "validationRunId": 36009907829,
+      "validationResult": "IN_PROGRESS",
+      "implementationProgress": "Calc3D2D original 3D anchor + stock projected anchor are now preserved per rank SpriteNode via a sidecar; R30 telemetry confirms reachability at WORLD_BILLBOARD draw once runtime-exercised. Visual reprojection behavior is intentionally unchanged in this candidate.",
+      "nextAction": "Complete exact-SHA CI, then HMD-run this anchor-provenance candidate. If VR R51 RANK ANCHOR telemetry proves sidecar reachability, implement per-eye reprojection from the preserved world anchor rather than screen-space coordinates."
     },
     {
       "id": "VR-R51-HUD-SEMANTIC-LIFETIME-001",
