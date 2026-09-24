@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T01:43:00+09:00",
+  "updated_at_kst": "2026-09-25T01:47:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -109,10 +109,10 @@
       "blocked_context_indices": []
     },
     "graphics_artwork": {
-      "status": "proof_candidate_one_ready",
-      "percent": 1.3,
+      "status": "proof_candidates_ready",
+      "percent": 8.9,
       "completed": 0,
-      "proof_candidate_ready": 1,
+      "proof_candidate_ready": 7,
       "total": 79
     },
     "graphics_artwork_pipeline": {
@@ -183,7 +183,20 @@
     "blocked_context_indices": [],
     "artwork_plan_assets": 79,
     "artwork_plan_segments": 674,
-    "artwork_proof_candidates": 1
+    "artwork_proof_candidates": 7,
+    "simple6_package": {
+      "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
+      "sha256": "e334254f82105a016f4ab2fa548265431a7877d92283c926ea83e569a1d3f21b",
+      "indices": [
+        55,
+        89,
+        102,
+        104,
+        116,
+        119
+      ],
+      "status": "ready_for_ingame_validation"
+    }
   },
   "data_build": {
     "draft_bin_entries": 1356,
