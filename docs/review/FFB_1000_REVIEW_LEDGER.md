@@ -12,19 +12,31 @@ A cycle is counted only after its assigned source/concern has been inspected and
 
 | Cycle | Scope | Result | Finding / Fix | Validation |
 | --- | --- | --- | --- | --- |
-| C0001 | PS2 model + F11 model shortcuts + original-effect ownership | IN PROGRESS | pending | pending |
+| C0001 | PS2 model + F11 model shortcuts + original-effect ownership | COMPLETE | FFB-R0001-F01..F13 fixed before review baseline HEAD `f8c6bc9` | Win32 Release 36031426942 SUCCESS; domain isolation 36031427012 SUCCESS |
+| C0002 | Modern DD structural/SAT/math ownership | COMPLETE | No new non-duplicate finding | Existing production math + structural verification at `f8c6bc9` |
+| C0003 | Arcade Original effect ownership / Lindbergh-derived behavior | COMPLETE | No new non-duplicate finding | Existing structural verification at `f8c6bc9` |
+| C0004 | Arcade Hybrid composition / Modern interaction | COMPLETE | No new non-duplicate finding | Existing production math + structural verification at `f8c6bc9` |
+| C0005 | PS2 Original Experimental evidence/translation boundary | COMPLETE | No new non-duplicate finding | SLPM retail evidence kept distinct from comparative liblgdev and provisional C2C mapping |
+| C0006 | DirectInput effect lifetime / model transition / capability fallback | COMPLETE | No new non-duplicate finding | Existing Win32 Release + structural verification at `f8c6bc9` |
+| C0007 | Device loss / reacquire / focus / safety recovery | COMPLETE | No new non-duplicate finding | Existing Win32 Release + safety paths reviewed at `f8c6bc9` |
+| C0008 | Stage/surface/road-texture handling | COMPLETE | No new non-duplicate finding | Stage/surface mapping and model ownership reviewed at `f8c6bc9` |
+| C0009 | F11 UI / profile / config / logging | COMPLETE | No new non-duplicate finding | Model-gated controls and profile transition paths reviewed at `f8c6bc9` |
+| C0010 | CI / packaging / standalone domain isolation | COMPLETE | No new non-duplicate finding | Win32 Release 36031426942 SUCCESS; domain isolation 36031427012 SUCCESS |
 
-Completed cycles: **0 / 1000**
+Completed cycles: **10 / 1000**
 
 ## Findings
 
-_No findings recorded yet._
+- `FFB-R0001-F01` .. `FFB-R0001-F13`: see GitHub Issue #29 for evidence, fixes and validation history.
+- C0002..C0010: no new finding after duplicate check against Issue #29.
 
-## PS2 evidence queue
+## PS2 evidence discipline
 
-- Decode retail wrapper payloads at `0x001354B0..0x00135EB0`.
-- Decode caller groups in `0x00133700..0x00135300`.
-- Resolve condition type IDs and effect-slot meanings.
-- Resolve overall gain caller at `0x00133D18 -> 0x00135CD8`.
-- Retain the verified 0x3C Logitech force-effect ABI; do not import another game's tuning constants.
-- Locate/analyse disc `LGDEV.IRX` if it becomes available.
+- **Retail SLPM evidence:** `SLPM_666.28` and directly recovered wrapper/caller behavior.
+- **Comparative evidence:** liblgdev is used only to interpret the common Logitech ABI/type enum where applicable.
+- **Provisional translations:** C2C event/source mappings remain explicitly provisional until a retail PS2 caller/semantic link is recovered.
+- Never promote comparative/provisional evidence to an OutRun PS2 original value without direct SLPM evidence.
+
+## Next review
+
+Resume at **C0011**. Continue distinct source/behavior slices and record a cycle only after inspection plus ledger/Issue documentation.
