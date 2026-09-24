@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-24T22:47:00+09:00",
+  "updatedKst": "2026-09-24T22:56:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -11,7 +11,7 @@
     "queueWriter": "D_INTEGRATION_PLANNER",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
-    "primaryBackend": "DX9Ex R51-protected reference; HUD/lens-flare/performance HMD experiments may prepare in parallel, production integration remains serial",
+    "primaryBackend": "DX9Ex remains the protected reference baseline; HUD, performance, DXVK and DX12 are independent parallel development/test tracks and none may block the others.",
     "regressionKnowledge": {
       "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
       "ledgerIssue": 13,
@@ -20,12 +20,13 @@
       "recurrenceAction": "REOPEN_EXISTING_STABLE_KEY"
     },
     "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-    "parallelBackendDevelopment": false,
-    "backendReplacementGate": "Quest3/VDXR parity with protected R51 world stereo and frame stability",
+    "parallelBackendDevelopment": true,
+    "backendReplacementGate": "DXVK/DX12 may be developed, built and HMD-tested in parallel; only promotion to protected/default backend requires Quest3/VDXR parity with R51.",
     "parallelTracks": {
-      "HUD": "B evidence + C post-fix sanity -> D isolated implementation/integration",
-      "DXVK_DX12": "A architecture/parity review + C sanity/dedup -> D isolated backend implementation/integration; runtime promotion needs HMD parity",
-      "PERFORMANCE": "B performance evidence + C validation-prep -> D bounded optimization/integration"
+      "HUD": "B/C/D continue exact semantic-lifetime and world-marker work independently.",
+      "PERFORMANCE": "D/C continue dense-scene/frame-budget optimization without waiting for HUD completion.",
+      "DXVK": "A/C/D resume x86 DXVK SAFE compatibility first, then multiview optimization after SAFE evidence.",
+      "DX12": "A/C/D resume D3D9On12 device/resource compatibility and HMD test preparation independently of HUD."
     },
     "pcRunnerAuthorization": {
       "status": "DISABLED_UNTIL_EXPLICIT_USER_REAUTHORIZATION",
@@ -38,14 +39,20 @@
       "productionIntegrationWip": 1,
       "rule": "Parallel HMD experiment preparation is allowed from one TEST_MATRIX_BASE; experiment slots are test-only until HMD evidence and exact-tree validation.",
       "frozenPrimaryWork": [
-        "DXVK",
-        "DX12",
-        "multiview",
-        "broad EXE-map expansion",
-        "generic dependency/toolchain cleanup",
+        "broad EXE-map expansion unrelated to active HUD/flare/backend work",
+        "generic dependency/toolchain cleanup unrelated to active builds",
         "PS2/FFB runtime",
         "localization runtime"
-      ]
+      ],
+      "requiredSlots": [
+        "A_CONTROL",
+        "B_HUD",
+        "C_FLARE",
+        "D_PERF",
+        "E_DXVK",
+        "F_DX12"
+      ],
+      "nonBlockingRule": "A failure or delay in HUD/FLARE must not block PERF, DXVK or DX12 implementation/build/test preparation. A backend failure must not block HUD/FLARE work."
     }
   },
   "candidateWip": {
@@ -250,7 +257,7 @@
     },
     {
       "id": "DXVK-REACTIVATE-001",
-      "priority": 9,
+      "priority": 13,
       "status": "READY",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "Re-enable the isolated x86 DXVK path and turn the existing PoC into a repeatable build/smoke/backend-identity path while preserving the R51 semantic/frame contract.",
@@ -258,11 +265,13 @@
       "dependencies": [],
       "attempts": 0,
       "runtimeCandidate": false,
-      "expectedFix": "Backend selector/log manifest must identify DXVK explicitly; verify D3D9 initialization/reset and transport behavior without modifying the protected DX9Ex world renderer."
+      "expectedFix": "Backend selector/log manifest must identify DXVK explicitly; verify D3D9 initialization/reset and transport behavior without modifying the protected DX9Ex world renderer.",
+      "parallelIndependent": true,
+      "blockedByHud": false
     },
     {
       "id": "DX12-D3D9ON12-REACTIVATE-001",
-      "priority": 9,
+      "priority": 13,
       "status": "READY",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "Resume DX12/D3D9On12 from the known Direct3DCreate9On12Ex/CreateDevice 0x8876086C boundary; isolate device parameters and translated MANAGED/LockRect compatibility before any renderer promotion.",
@@ -270,11 +279,13 @@
       "dependencies": [],
       "attempts": 0,
       "runtimeCandidate": false,
-      "expectedFix": "First obtain deterministic device-creation/resource-compatibility diagnostics and a no-HMD smoke build; do not change R51 world/HUD ownership to make DX12 pass."
+      "expectedFix": "First obtain deterministic device-creation/resource-compatibility diagnostics and a no-HMD smoke build; do not change R51 world/HUD ownership to make DX12 pass.",
+      "parallelIndependent": true,
+      "blockedByHud": false
     },
     {
       "id": "VR-PERF-COMMON-001",
-      "priority": 9,
+      "priority": 13,
       "status": "READY",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "Create a common frame-budget telemetry and optimization lane covering game-thread producer fence wait, host copy/fence wait, draw amplification, capture/commit copy, render and xrEndFrame timing across backends.",
@@ -282,7 +293,9 @@
       "dependencies": [],
       "attempts": 0,
       "runtimeCandidate": false,
-      "expectedFix": "Instrumentation first with bounded counters/QPC windows; only then remove redundant waits/copies or reduce draw work where deterministic correctness gates prove equivalence."
+      "expectedFix": "Instrumentation first with bounded counters/QPC windows; only then remove redundant waits/copies or reduce draw work where deterministic correctness gates prove equivalence.",
+      "parallelIndependent": true,
+      "blockedByHud": false
     },
     {
       "id": "L1-VIS-002",
@@ -310,14 +323,16 @@
     },
     {
       "id": "L2-PERF-001",
-      "priority": 8,
+      "priority": 12,
       "status": "READY",
       "preferredRole": "C_PERF_REVIEW",
       "summary": "Cross-backend frame-pacing optimization: quantify R29+ draw amplification, producer/consumer waits, copies and XR pacing without waiting for all visual cleanup. Correctness invariants remain hard gates.",
       "testLevel": "LEVEL2",
       "dependencies": [],
       "attempts": 0,
-      "runtimeCandidate": true
+      "runtimeCandidate": true,
+      "parallelIndependent": true,
+      "blockedByHud": false
     },
     {
       "id": "L1-RECENTER-001",
@@ -364,6 +379,14 @@
     "integrationSha": "060e2ae5ff78503b41d8a38980843dd5003e43bb",
     "maxSlots": 6,
     "manifest": "docs/VR_HMD_TEST_MATRIX.json",
-    "nextAction": "Complete A_CONTROL identity, then prepare bounded B_HUD, C_FLARE and D_PERF experiment slots in parallel from the integrated R51-protected base."
+    "requiredSlots": [
+      "A_CONTROL",
+      "B_HUD",
+      "C_FLARE",
+      "D_PERF",
+      "E_DXVK",
+      "F_DX12"
+    ],
+    "nextAction": "Prepare B_HUD, C_FLARE, D_PERF, E_DXVK and F_DX12 in parallel from the protected baseline. Do not wait for HUD completion before backend/performance work."
   }
 }
