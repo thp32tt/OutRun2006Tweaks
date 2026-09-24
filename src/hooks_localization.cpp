@@ -164,8 +164,27 @@ class KoreanK3TraceHook : public Hook
     inline static SafetyHookMid GlyphDrawHook{};
     inline static std::mutex TraceMutex{};
     inline static std::unordered_set<std::string> SeenStrings{};
+    inline static std::unordered_set<uint32_t> SeenFontHandles{};
     inline static std::bitset<256> SeenGlyphCodes{};
     inline static size_t LoggedGlyphCodes = 0;
+
+    static constexpr uintptr_t FontTexturePtrOffset = 0x556BA0;
+    static constexpr uintptr_t KerningTableOffset = 0x556BA4;
+    static constexpr uintptr_t FontHandleOffset = 0x556BAC;
+    static constexpr uintptr_t TextureWidthOffset = 0x556BB0;
+    static constexpr uintptr_t TextureHeightOffset = 0x556BB2;
+    static constexpr uintptr_t CursorXOffset = 0x556BB8;
+    static constexpr uintptr_t CursorYOffset = 0x556BBA;
+    static constexpr uintptr_t CellWidthOffset = 0x556BBC;
+    static constexpr uintptr_t CellHeightOffset = 0x556BBE;
+    static constexpr uintptr_t ScaleXOffset = 0x556BC4;
+    static constexpr uintptr_t ScaleYOffset = 0x556BC8;
+    static constexpr uintptr_t ColorOffset = 0x556BCC;
+    static constexpr uintptr_t LayerOffset = 0x556BD0;
+    static constexpr uintptr_t BaseCodeOffset = 0x556BD4;
+    static constexpr uintptr_t FlagsOffset = 0x556BD8;
+    static constexpr uintptr_t LetterSpacingOffset = 0x556BDC;
+    static constexpr uintptr_t LineAdvanceOffset = 0x556BE0;
 
     static std::string PreviewString(const char* text)
     {
@@ -190,6 +209,38 @@ class KoreanK3TraceHook : public Hook
             return;
 
         std::scoped_lock lock(TraceMutex);
+
+        const uint32_t fontHandle = *Module::exe_ptr<uint32_t>(FontHandleOffset);
+        if (SeenFontHandles.insert(fontHandle).second)
+        {
+            const uintptr_t texturePtr =
+                reinterpret_cast<uintptr_t>(*Module::exe_ptr<void*>(FontTexturePtrOffset));
+            const uintptr_t kerningPtr =
+                reinterpret_cast<uintptr_t>(*Module::exe_ptr<void*>(KerningTableOffset));
+
+            spdlog::info(
+                "KoreanK3Trace: font_state handle=0x{:08X} texture={:p} kerning={:p} "
+                "tex={}x{} cell={}x{} cursor=({}, {}) scale=({:.4f}, {:.4f}) "
+                "color=0x{:08X} layer={} base_code={} flags=0x{:08X} spacing={:.4f} line_advance={:.4f}",
+                fontHandle,
+                reinterpret_cast<void*>(texturePtr),
+                reinterpret_cast<void*>(kerningPtr),
+                *Module::exe_ptr<uint16_t>(TextureWidthOffset),
+                *Module::exe_ptr<uint16_t>(TextureHeightOffset),
+                *Module::exe_ptr<int16_t>(CellWidthOffset),
+                *Module::exe_ptr<int16_t>(CellHeightOffset),
+                *Module::exe_ptr<int16_t>(CursorXOffset),
+                *Module::exe_ptr<int16_t>(CursorYOffset),
+                *Module::exe_ptr<float>(ScaleXOffset),
+                *Module::exe_ptr<float>(ScaleYOffset),
+                *Module::exe_ptr<uint32_t>(ColorOffset),
+                *Module::exe_ptr<uint32_t>(LayerOffset),
+                *Module::exe_ptr<uint32_t>(BaseCodeOffset),
+                *Module::exe_ptr<uint32_t>(FlagsOffset),
+                *Module::exe_ptr<float>(LetterSpacingOffset),
+                *Module::exe_ptr<float>(LineAdvanceOffset));
+        }
+
         if (SeenStrings.size() >= MaxUniqueStrings)
             return;
 
