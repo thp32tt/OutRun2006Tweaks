@@ -142,9 +142,21 @@ Its behavior-changing commit `f6a91063...` fixes one specific semantic-lifetime 
 
 This is a valid narrow fix, but it does not by itself solve every remaining HUD family.
 
-### Fixed-function / no-VS HUD remains a distinct boundary
+### Fixed-function / no-VS HUD path is already implemented; remaining gap is semantic coverage
 
-The R51 runtime capture observed genuine `vsPtr=0 / vsHash=0` fixed-function overlay states. Paths that require a current vertex shader/c64 WVP cannot own those draws. Keep fixed-function exact-HUD handling as a separate semantic/rendering problem; do not broaden unknown fixed-function draws into HUD.
+The R51 runtime capture observed genuine `vsPtr=0 / vsHash=0` states, but current source already has a dedicated fixed-function path:
+
+- `R30PrepareXyzrhwState` explicitly requires no current vertex shader and `D3DFVF_XYZRHW`.
+- `R30ConfigureXyzrhwWorldEffect` treats exact `SCREEN_HUD` and generic queue `SCREEN_OVERLAY_2D` as authoritative non-world semantics.
+- it constructs the same finite recentered world-locked HUD plane and transforms XYZRHW vertices per eye.
+- unknown XYZRHW draws still fail closed unless they have strong projected-depth world evidence.
+
+Therefore a remaining white/fixed-function HUD draw is **not** evidence that R30 lacks a no-VS HUD owner. If it reaches no screen/XYZRHW semantic counters, the next question is whether the exact SpriteNode scope was active at that draw and whether the draw met the XYZRHW/FVF entry contract.
+
+Next diagnostic should capture, only for the failing exact producer:
+`semantic scope + packed xstnum + current node + FVF + primitive path + XYZ/RHW sample + fallback reason`.
+
+Do not create a second broad fixed-function HUD classifier.
 
 ### Rival-marker world anchor remains a distinct boundary
 
