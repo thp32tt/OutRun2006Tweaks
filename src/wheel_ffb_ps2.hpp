@@ -80,6 +80,26 @@ namespace WheelFFBPS2
             static_cast<float>(LogitechScaleMax);
     }
 
+    inline int damper_coefficient_raw(float factor)
+    {
+        factor = std::isfinite(factor) ? std::clamp(factor, 0.0f, 1.0f) : 0.0f;
+        return std::clamp(
+            static_cast<int>(std::lround(10.0f * (1.0f - factor))),
+            0, LogitechScaleMax);
+    }
+
+    inline float damper_coefficient_norm(float factor)
+    {
+        return static_cast<float>(damper_coefficient_raw(factor)) /
+            static_cast<float>(LogitechScaleMax);
+    }
+
+    inline float damper_saturation_norm()
+    {
+        return static_cast<float>(RetailDamperSaturation) /
+            static_cast<float>(LogitechScaleMax);
+    }
+
     inline int triangle_period_raw(float factor)
     {
         factor = std::isfinite(factor) ? std::clamp(factor, 0.0f, 1.0f) : 0.0f;
