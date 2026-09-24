@@ -1,0 +1,23 @@
+{
+  "schema": "outrun-shared-reverse-index-v1",
+  "sourceSha": "8a312af992e4319aa5d101bfbfa97f271dd75203",
+  "canonicalExeSha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+  "analyzedCorpus": {
+    "manifestFiles": 3693,
+    "szFiles": 1160,
+    "xstFiles": 141,
+    "spraniFiles": 51,
+    "scriptFiles": 80,
+    "uploadedCollisionFiles": 19
+  },
+  "files": [
+    "docs/reverse/GAME_ASSET_KNOWLEDGE_BASE.md",
+    "docs/reverse/LOCALIZATION_MAP.md",
+    "docs/reverse/FFB_ASSET_MAP.md",
+    "docs/reverse/SCRIPT_BIN_FORMAT.md",
+    "reverse/game_assets/localization_map.json",
+    "reverse/game_assets/ffb_asset_map.json",
+    "reverse/game_assets/scripts_map.json",
+    "tools/reverse/analyze_game_data.py"
+  ]
+}
