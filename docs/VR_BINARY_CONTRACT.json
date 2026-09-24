@@ -23,7 +23,12 @@
       "disassemblyWindow": 48,
       "expectedBytes": "535657e824c5ffff8b04ad006c950085",
       "purpose": "Canonical SpriteNode render-queue entry recovered from original executable analysis.",
-      "sourceBindings": []
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "RVA 0x2D734 = queue-entry context only; DO NOT hook this address"
+        }
+      ]
     },
     {
       "id": "VR-EXE-HUD-SPRITENODE-NODE-RENDER",
@@ -32,7 +37,12 @@
       "disassemblyWindow": 48,
       "expectedBytes": "8b0d20b295008b470c4985c0890d20b2",
       "purpose": "Canonical SpriteNode node-render point used to distinguish screen HUD from broad draw heuristics.",
-      "sourceBindings": []
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "Module::exe_ptr(0x2D762)"
+        }
+      ]
     },
     {
       "id": "VR-EXE-HUD-SPRITENODE-QUEUE-EXIT",
@@ -41,7 +51,12 @@
       "disassemblyWindow": 48,
       "expectedBytes": "5d83c444c3cccccccccccccc576a00c7",
       "purpose": "Canonical SpriteNode render-queue exit.",
-      "sourceBindings": []
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "Module::exe_ptr(0x2DCB4)"
+        }
+      ]
     },
     {
       "id": "VR-EXE-UI-D3DX-MATRIX-TRANSFORM2D",

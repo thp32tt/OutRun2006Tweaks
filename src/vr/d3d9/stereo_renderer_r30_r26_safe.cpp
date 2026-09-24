@@ -12,6 +12,7 @@
 // perspective effects remain entirely owned by R29/R13.
 
 #include "stereo_renderer_r26.cpp"
+#include "vr/game/render_semantics.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
@@ -32,6 +33,10 @@ namespace OutRunVRRenderer
     bool GetLastRawGameWvpWrite(float outConstants[16],
         std::uint64_t& writeSerial, std::uint64_t& topLevelDrawSerial,
         std::uintptr_t& shaderIdentity, std::uint64_t& shaderSerial) noexcept;
+    bool GetLastGameWvpSemanticProvenance(
+        OutRunVR::GameSemantic::RenderScope& semanticScope,
+        std::uint64_t& queueNodeEpoch,
+        const void*& queueNode) noexcept;
 }
 
 namespace OutRunVRStereo
@@ -87,6 +92,14 @@ namespace OutRunVRStereo
         std::uint64_t R30XyzrhwHudDraws = 0;
         std::uint64_t R30XyzrhwWorldLockedHudDraws = 0;
         std::uint64_t R30XyzrhwWorldEffectDraws = 0;
+        std::uint64_t R47SemanticHudAccepted = 0; // fixed-function XYZRHW
+        std::uint64_t R51VsSemanticHudAccepted = 0;
+        std::uint64_t R51VsSemanticHudC64SameNode = 0;
+        std::uint64_t R51VsSemanticHudC64OtherNode = 0;
+        std::uint64_t R51VsSemanticHudC64NoNode = 0;
+        std::uint64_t R47SemanticUnknownRejected = 0;
+        std::uint64_t R50SemanticOverlay2DAccepted = 0;
+        std::uint64_t R50ScreenOverlay2DDraws = 0;
         std::uint64_t R30Hud2DDraws = 0;
         std::uint64_t R30PerspectiveHudDraws = 0;
         std::uint64_t R30WorldBillboardDraws = 0;
@@ -1113,12 +1126,16 @@ namespace OutRunVRStereo
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(
-                "VR R41: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R51: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAcceptedXyzrhw={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={},semanticHudAcceptedVs={},c64SameNode={},c64OtherNode={},c64NoNode={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
                 R30XyzrhwWorldEffectDraws, R30XyzrhwHudDraws,
                 R30XyzrhwWorldLockedHudDraws,
+                R47SemanticHudAccepted,
+                R47SemanticUnknownRejected,
+                R50SemanticOverlay2DAccepted,
+                R50ScreenOverlay2DDraws,
                 R30XyzrhwRhwWorldPromotions,
                 R30XyzrhwRhwOnlyDepthEvidence,
                 R30XyzrhwZOnlyDepthEvidence,
@@ -1127,6 +1144,10 @@ namespace OutRunVRStereo
                 R30XyzrhwBilateralFallbacks,
                 R30ScreenSpaceFovDraws, R30Hud2DDraws,
                 R30PerspectiveHudDraws, R30WorldBillboardDraws,
+                R51VsSemanticHudAccepted,
+                R51VsSemanticHudC64SameNode,
+                R51VsSemanticHudC64OtherNode,
+                R51VsSemanticHudC64NoNode,
                 R44OverlayOwnedWvpHits, R44OverlayOwnedWvpGroupHits,
                 R44SpatialBillboardClassifications,
                 R44FlatOverlayClassifications,
@@ -1276,6 +1297,7 @@ namespace OutRunVRStereo
             None,
             Hud2D,
             PerspectiveHud,
+            ScreenOverlay2D,
             WorldBillboard
         };
 
@@ -1385,6 +1407,29 @@ namespace OutRunVRStereo
             if (!device || !TargetIsBackBuffer())
                 return R30ScreenSpaceKind::None;
 
+            const auto semanticScope =
+                OutRunVR::GameSemantic::CurrentScope;
+            const bool semanticHud =
+                OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
+            const bool semanticWorld =
+                OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
+            const bool semanticOverlay2D =
+                OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
+                    semanticScope);
+
+            // R50: canonical queue membership proves generic 2D ownership but
+            // not finite/world-locked HUD ownership. This class receives only
+            // the per-eye asymmetric-FOV affine.
+            if (semanticOverlay2D)
+                return R30ScreenSpaceKind::ScreenOverlay2D;
+
+            // R48 final-test policy: screen/perspective HUD ownership comes only
+            // from the canonical EXE sprite queue or exact original-mod semantic
+            // tags. Do not infer HUD from alpha, ZENABLE, cull mode, shader
+            // shape, primitive count or a recently uploaded matrix.
+            if (!semanticHud && !semanticWorld)
+                return R30ScreenSpaceKind::None;
+
             float projection[16]{};
             if (!OutRunVRRenderer::GetRendererBaseProjection(projection))
                 return R30ScreenSpaceKind::None;
@@ -1392,6 +1437,57 @@ namespace OutRunVRStereo
             const auto projectionClass =
                 OutRunVR::PassPolicy::ClassifyProjectionSignature(
                     projection[11], projection[15]);
+
+            if (semanticWorld)
+            {
+                // Exact rival-car WORLD_BILLBOARD tags never become HUD.
+                // If the live draw already has a verified/rebindable world WVP,
+                // let the lower R9/R28 world owner handle it directly. R30 only
+                // reconstructs a billboard when those stricter world owners
+                // cannot prove the current draw.
+                if (projectionClass ==
+                    OutRunVR::PassPolicy::ProjectionClass::Perspective3D)
+                {
+                    if (CurrentDrawMatchesVerifiedWorld(device))
+                        return R30ScreenSpaceKind::None;
+                    std::uintptr_t reboundShader = 0;
+                    std::uint64_t reboundSerial = 0;
+                    if (R28CanRebindVerifiedWorld(
+                            device, reboundShader, reboundSerial))
+                        return R30ScreenSpaceKind::None;
+                    ++R44SpatialBillboardClassifications;
+                    return R30ScreenSpaceKind::WorldBillboard;
+                }
+                return R30ScreenSpaceKind::None;
+            }
+
+            if (semanticHud)
+            {
+                ++R51VsSemanticHudAccepted;
+                OutRunVR::GameSemantic::RenderScope c64Scope =
+                    OutRunVR::GameSemantic::RenderScope::None;
+                std::uint64_t c64NodeEpoch = 0;
+                const void* c64Node = nullptr;
+                if (OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
+                        c64Scope, c64NodeEpoch, c64Node))
+                {
+                    const auto drawNode = OutRunVR::GameSemantic::CurrentQueueNode();
+                    const auto drawEpoch =
+                        OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
+                    if (drawNode && c64Node == drawNode &&
+                        c64NodeEpoch == drawEpoch)
+                        ++R51VsSemanticHudC64SameNode;
+                    else if (c64Node)
+                        ++R51VsSemanticHudC64OtherNode;
+                    else
+                        ++R51VsSemanticHudC64NoNode;
+                }
+                else
+                {
+                    ++R51VsSemanticHudC64NoNode;
+                }
+            }
+
             if (projectionClass ==
                 OutRunVR::PassPolicy::ProjectionClass::Orthographic2D)
                 return R30ScreenSpaceKind::Hud2D;
@@ -1399,8 +1495,10 @@ namespace OutRunVRStereo
                 OutRunVR::PassPolicy::ProjectionClass::Perspective3D)
                 return R30ScreenSpaceKind::None;
 
-            // Verified/rebindable perspective WVP is already owned by the true
-            // world path and must never be intercepted as UI.
+            // A SCREEN_HUD node may still use the game's perspective sprite
+            // shader (6th/6, Position/results and menu glyph variants). The EXE
+            // queue semantic is the ownership proof; use raw game WVP only as
+            // placement data, never as a classifier.
             if (CurrentDrawMatchesVerifiedWorld(device))
                 return R30ScreenSpaceKind::None;
             std::uintptr_t reboundShader = 0;
@@ -1409,65 +1507,9 @@ namespace OutRunVRStereo
                     device, reboundShader, reboundSerial))
                 return R30ScreenSpaceKind::None;
 
-            DWORD zEnable = D3DZB_TRUE;
-            DWORD zWrite = TRUE;
-            DWORD alphaBlend = FALSE;
-            DWORD alphaTest = FALSE;
-            DWORD cullMode = D3DCULL_CCW;
-            if (!ReadTrackedRenderState(device, D3DRS_ZENABLE, zEnable) ||
-                !ReadTrackedRenderState(device, D3DRS_ZWRITEENABLE, zWrite) ||
-                !ReadTrackedRenderState(
-                    device, D3DRS_ALPHABLENDENABLE, alphaBlend) ||
-                !ReadTrackedRenderState(
-                    device, D3DRS_ALPHATESTENABLE, alphaTest) ||
-                !ReadTrackedRenderState(device, D3DRS_CULLMODE, cullMode))
-                return R30ScreenSpaceKind::None;
-
-            const bool alphaLike =
-                alphaBlend != FALSE || alphaTest != FALSE;
-            if (!alphaLike)
-                return R30ScreenSpaceKind::None;
-
-            float rawOwnedWvp[16]{};
-            const bool haveOwnedWvp =
-                R44GetOwnedRawOverlayWvp(rawOwnedWvp);
-            if (haveOwnedWvp)
-            {
-                const auto matrixKind =
-                    R44ClassifyOwnedOverlayMatrix(rawOwnedWvp);
-                if (matrixKind == R44OverlayMatrixKind::SpatialBillboard)
-                {
-                    ++R44SpatialBillboardClassifications;
-                    return R30ScreenSpaceKind::WorldBillboard;
-                }
-                if (matrixKind == R44OverlayMatrixKind::FlatHud)
-                {
-                    ++R44FlatOverlayClassifications;
-                    return R30ScreenSpaceKind::PerspectiveHud;
-                }
-            }
-
-            // Keep R13's fragile-effect shape as an explicit fallback signal.
-            // If the matrix owner is unavailable, depth-disabled/two-sided alpha
-            // is still a flat overlay. Routing it through the finite HUD plane
-            // prevents two visible zero-disparity copies for result text while
-            // preserving depth-tested unknown effects fail-closed.
-            const bool r13FlatEffectShape =
-                cullMode == D3DCULL_NONE &&
-                zEnable == D3DZB_FALSE &&
-                ((alphaBlend != FALSE && zWrite == FALSE) ||
-                 alphaTest != FALSE);
-            if (r13FlatEffectShape)
-            {
-                ++R44FlatOverlayClassifications;
-                return R30ScreenSpaceKind::PerspectiveHud;
-            }
-
-            if (zEnable != D3DZB_FALSE)
-                return R30ScreenSpaceKind::None;
+            ++R44FlatOverlayClassifications;
             return R30ScreenSpaceKind::PerspectiveHud;
         }
-
 
         bool R30BuildEyeAffine(
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
@@ -1530,6 +1572,7 @@ namespace OutRunVRStereo
             float hudClipY[2][3]{};
             float hudClipW[2][3]{};
             bool hudWorldLockValid = false;
+            bool screenOverlay2D = false;
             bool fullWorldReprojection = false;
             bool depthTestEnabled = false;
             bool rhwDepthEvidence = false;
@@ -1811,17 +1854,50 @@ namespace OutRunVRStereo
                     source, vertexCount, stride, state,
                     baseProjection, usedMask);
 
-            // R42: depth signature is authoritative world evidence. ZENABLE by
-            // itself is not: several HUD passes leave Z enabled. When depth
-            // evidence is absent, admit only a strongly pre-transformed screen
-            // plane (RHW~=1 with near-constant Z) to the HUD world-lock.
-            state.worldEffect = state.rhwDepthEvidence;
-            if (state.depthTestEnabled && !state.worldEffect &&
-                !R30XyzrhwLooksLikeHudPlane(
-                    source, vertexCount, stride, state, usedMask))
+            // R47: semantic ownership is authoritative. The canonical EXE
+            // sprite-queue renderer marks ordinary queued 2D nodes SCREEN_HUD;
+            // exact original-mod call sites can tag individual nodes as
+            // WORLD_BILLBOARD. Never promote an unknown XYZRHW draw from D3D
+            // state, RHW shape, ZENABLE, blend mode, or primitive count.
+            //
+            // Positive projected-depth evidence remains sufficient for known
+            // world effects. Everything else fails closed to the R26/R23 owner.
+            const auto semanticScope =
+                OutRunVR::GameSemantic::CurrentScope;
+            const bool semanticHud =
+                OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
+            const bool semanticWorld =
+                OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
+            const bool semanticOverlay2D =
+                OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
+                    semanticScope);
+
+            // R51 ownership precedence is explicit:
+            // exact WORLD_BILLBOARD > queue-owned 2D/HUD > geometric evidence.
+            // Runtime 750453f2 proved FOV-only queue placement converges the
+            // image but remains head-locked. Queue-owned 2D now uses the same
+            // finite recentered HUD plane as SCREEN_HUD, while keeping its
+            // distinct semantic class so it can never be mistaken for 3D.
+            state.screenOverlay2D = semanticOverlay2D;
+            if (semanticOverlay2D)
+                ++R50SemanticOverlay2DAccepted;
+
+            if (semanticWorld)
+                state.worldEffect = true;
+            else if (semanticHud || semanticOverlay2D)
+                state.worldEffect = false;
+            else
+                state.worldEffect = state.rhwDepthEvidence;
+
+            if (!state.worldEffect && !semanticHud && !semanticOverlay2D)
+            {
+                ++R47SemanticUnknownRejected;
                 return false;
+            }
             if (!state.worldEffect)
             {
+                if (semanticHud)
+                    ++R47SemanticHudAccepted;
                 // R41: most of OutRun's HUD is fixed-function XYZRHW, not the
                 // shader/c64 path. Build a synthetic finite HUD plane in the
                 // recentered gameplay space, then transform that plane by the
@@ -2325,10 +2401,10 @@ namespace OutRunVRStereo
                 }
                 else
                 {
-                    // R41: the real OutRun HUD is overwhelmingly XYZRHW. Put
-                    // those pre-transformed vertices on the same finite,
-                    // recentered plane used by the shader HUD instead of
-                    // copying screen coordinates into both eyes (head-lock).
+                    // R51: both exact SCREEN_HUD and generic canonical
+                    // SCREEN_OVERLAY_2D are queue-owned 2D. Put them on the
+                    // finite recentered world-fixed plane so they no longer
+                    // rotate with the HMD. WORLD_BILLBOARD never enters here.
                     if (!state.hudWorldLockValid)
                         return false;
 
@@ -2483,11 +2559,13 @@ namespace OutRunVRStereo
                 ++R30XyzrhwHudDraws;
                 if (state.hudWorldLockValid)
                     ++R30XyzrhwWorldLockedHudDraws;
+                if (state.screenOverlay2D)
+                    ++R50ScreenOverlay2DDraws;
                 if (!R30FirstXyzrhwHudLogged)
                 {
                     R30FirstXyzrhwHudLogged = true;
                     spdlog::info(
-                        "VR R41 XYZRHW HUD: fixed-function HUD uses HudScale on a finite recentered world-locked plane; R42 Z-enabled screen-plane HUD is safely admitted and uses cached planar coefficients instead of per-vertex 4x4 transforms");
+                        "VR R50 XYZRHW 2D: generic SpriteNode content uses asymmetric-FOV common-ray affine only; exact SCREEN_HUD may still use the finite recentered world-locked plane");
                 }
             }
 
@@ -3037,12 +3115,14 @@ namespace OutRunVRStereo
                 // a live register that may already contain our head correction.
                 if (!R44GetOwnedRawOverlayWvp(original))
                 {
-                    // Some flat result overlays never refresh c64 in the short
-                    // ownership window. They are safe only as PerspectiveHud;
-                    // preserve the old live fallback for those, but never for a
-                    // spatial billboard.
-                    if (screenKind == R30ScreenSpaceKind::WorldBillboard ||
-                        FAILED(device->GetVertexShaderConstantF(
+                    // R51: an exact WORLD_BILLBOARD semantic is already stronger
+                    // than the old 12-draw R44 age heuristic. The classifier has
+                    // just excluded both current-verified and strict R28-rebind
+                    // world ownership, so the live c64 is the remaining placement
+                    // source. This fixes rank-marker groups whose raw upload was
+                    // older than R44OverlayWvpDrawWindow without widening any
+                    // untagged draw.
+                    if (FAILED(device->GetVertexShaderConstantF(
                             OutRunWvpRegister, original,
                             OutRunWvpRegisterCount)))
                         return false;
@@ -3071,6 +3151,10 @@ namespace OutRunVRStereo
             if (!MatrixFinite(baseProjection) ||
                 !InvertMatrix(baseProjection, inverseBaseProjection))
                 return false;
+
+            // R51: SCREEN_OVERLAY_2D continues below into the same finite,
+            // recentered world-fixed plane transform as SCREEN_HUD. R49/R51
+            // keeps its c64 raw so R30 remains the sole transform owner.
 
             const float centerEye[3]{
                 0.5f * (stereo.eyeOffset[0][0] + stereo.eyeOffset[1][0]),
@@ -3133,7 +3217,8 @@ namespace OutRunVRStereo
             }
 
             if (screenKind != R30ScreenSpaceKind::Hud2D &&
-                screenKind != R30ScreenSpaceKind::PerspectiveHud)
+                screenKind != R30ScreenSpaceKind::PerspectiveHud &&
+                screenKind != R30ScreenSpaceKind::ScreenOverlay2D)
                 return false;
 
             // R40: turn all screen HUD into one finite, recentered view plane.
@@ -3228,6 +3313,28 @@ namespace OutRunVRStereo
                 R30ClassifyScreenSpacePass(device);
             if (screenKind == R30ScreenSpaceKind::None)
                 return E_NOTIMPL;
+
+            // D3D state can describe a candidate shape, but it never owns it.
+            // Promotion requires the canonical EXE/original-mod semantic scope.
+            const auto semanticScope =
+                OutRunVR::GameSemantic::CurrentScope;
+            if (screenKind == R30ScreenSpaceKind::WorldBillboard)
+            {
+                if (!OutRunVR::GameSemantic::CorroboratesWorld(
+                        semanticScope))
+                    return E_NOTIMPL;
+            }
+            else if (screenKind == R30ScreenSpaceKind::ScreenOverlay2D)
+            {
+                if (!OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
+                        semanticScope))
+                    return E_NOTIMPL;
+            }
+            else if (!OutRunVR::GameSemantic::CorroboratesHud(
+                         semanticScope))
+            {
+                return E_NOTIMPL;
+            }
 
             if (!EnsureStereoResources(device))
                 return E_NOTIMPL;
@@ -3422,6 +3529,12 @@ namespace OutRunVRStereo
         HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
+            const auto drawSemanticValue =
+                (device && IsGameDevice(device) && !InternalStereoPass)
+                ? OutRunVR::GameSemantic::ConsumeForDraw()
+                : OutRunVR::GameSemantic::CurrentScope;
+            OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
+                drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
                 device, type, startVertex, primitiveCount);
             if (xyzrhw != E_NOTIMPL)
@@ -3444,6 +3557,12 @@ namespace OutRunVRStereo
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
+            const auto drawSemanticValue =
+                (device && IsGameDevice(device) && !InternalStereoPass)
+                ? OutRunVR::GameSemantic::ConsumeForDraw()
+                : OutRunVR::GameSemantic::CurrentScope;
+            OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
+                drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
                 device, type, baseVertexIndex, minVertexIndex, numVertices,
                 startIndex, primitiveCount);
@@ -3468,6 +3587,12 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT primitiveCount, const void* data, UINT stride)
         {
+            const auto drawSemanticValue =
+                (device && IsGameDevice(device) && !InternalStereoPass)
+                ? OutRunVR::GameSemantic::ConsumeForDraw()
+                : OutRunVR::GameSemantic::CurrentScope;
+            OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
+                drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                 device, type, primitiveCount, data, stride);
             if (xyzrhw != E_NOTIMPL)
@@ -3491,6 +3616,12 @@ namespace OutRunVRStereo
             const void* indexData, D3DFORMAT indexFormat,
             const void* vertexData, UINT stride)
         {
+            const auto drawSemanticValue =
+                (device && IsGameDevice(device) && !InternalStereoPass)
+                ? OutRunVR::GameSemantic::ConsumeForDraw()
+                : OutRunVR::GameSemantic::CurrentScope;
+            OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
+                drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
                 device, type, minVertexIndex, numVertices, primitiveCount,
                 indexData, indexFormat, vertexData, stride);
@@ -3602,7 +3733,7 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current={:.2f}; R41 shader+XYZRHW finite HUD world-lock + spatial billboard rebuild active",
+                        "VR R47 HUD: canonical EXE sprite-queue semantics own HUD transforms; unknown draw heuristics are disabled; HudScale={:.2f}; exact original-mod world-billboard tags override queue HUD ownership",
                         R30HudScaleValue());
                     return 0;
                 }
