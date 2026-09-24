@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "updated_at_kst": "2026-09-24T23:59:00+09:00",
+  "branch": "korean-localization-clean",
+  "base": {
+    "repository": "emoose/OutRun2006Tweaks",
+    "ref": "master",
+    "commit": "08e5efb4deea4066c440307ec009c868a30562d3"
+  },
+  "isolation": {
+    "vr_source_present": false,
+    "vr_merge_allowed": false,
+    "ffb_feature_merge_allowed": false,
+    "shareable_cross_project_data": [
+      "reverse-engineering notes",
+      "stage/material maps",
+      "file format maps",
+      "symbol/address evidence"
+    ]
+  },
+  "source_archive": {
+    "analyzed_files": 324,
+    "dds_textures": 243,
+    "text_entries_total": 1356,
+    "text_simple_records": 1351,
+    "text_special_records": 4,
+    "text_null_records": 1
+  },
+  "workstreams": {
+    "clean_branch": {
+      "status": "done",
+      "percent": 100
+    },
+    "txet_parser_roundtrip": {
+      "status": "done",
+      "percent": 100
+    },
+    "text_inventory": {
+      "status": "in_progress",
+      "percent": 85
+    },
+    "text_translation": {
+      "status": "in_progress",
+      "percent": 0
+    },
+    "graphics_inventory": {
+      "status": "in_progress",
+      "percent": 70
+    },
+    "graphics_localization": {
+      "status": "not_started",
+      "percent": 0
+    },
+    "runtime_text_trace": {
+      "status": "queued",
+      "percent": 20
+    },
+    "unicode_runtime": {
+      "status": "queued",
+      "percent": 10
+    },
+    "hangul_font": {
+      "status": "queued",
+      "percent": 5
+    },
+    "packaging": {
+      "status": "not_started",
+      "percent": 0
+    }
+  },
+  "next_checkpoint": "Generate machine-readable string/graphics manifests from uploaded asset archive"
+}
