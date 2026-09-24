@@ -111,7 +111,7 @@ Direct analysis of the user-supplied Stage.zip plus the canonical PC executable 
 - `COLI0200` section 2 is the per-collision **materialId byte array**.
 - Canonical PC VA `0x0043ECB8..0x0043ECC7` reads `materialId[collisionIndex]` and returns `surfaceMask = 1u << materialId`.
 - The four contact calls write masks to `EVWORK_CAR+0x24C/+0x250/+0x254/+0x258`.
-- Section 3 is a 64-byte collision geometry record (`vec3 corner[4] + vec3 center + u32 flags`).
+- Section 3 is a 64-byte collision geometry record (`vec3 corner[4] + vec3 center + u16 collisionFlags + s16 localHeadingAngle`).
 - Section 4 is a 48-byte per-corner-normal record.
 - Section 5 is a one-byte collision subtype/class family; names remain open.
 - Section 6 is a u16 road-section-index family compared against `OnRoadPlace::roadSectionNum`.
@@ -126,3 +126,63 @@ Primary-road material IDs are only `0x01, 0x14, 0x16, 0x17` in the supplied 66-s
 FFB should therefore prefer the **runtime per-contact raw masks** over stage-name-wide material assumptions. The current snow/ice stage-wide attenuation can be refined to the proven `0x00800000` contact mask after normal FFB branch review/validation.
 
 See `docs/reverse/STAGE_SURFACE_FFB_MAP.md`, `reverse/game_assets/stage_coli_ffb_map.json` and `tools/reverse/analyze_stage_coli.py`.
+
+
+## Exact per-contact polygon identity
+
+The canonical PC four-contact collision loop now exposes a stronger FFB correlation key than position alone.
+
+- loop VA: `0x00475720`
+- contact position input: `EVWORK_CAR::vector_130[i]`
+- wheel-work pointer: `0x82EA38[i]`
+- collision query: RVA `0x0003DB60`
+- exact selected polygon output: `*(wheelWork[i] + 0x10) = collisionIndex`
+- returned material mask: stored to `EVWORK_CAR+0x24C+4*i`
+
+This allows deterministic joining of a runtime contact to the static Stage record:
+
+```text
+contact i
+ -> collisionIndex
+ -> materialId
+ -> collisionFlags / localHeadingAngle
+ -> subtype / roadSection
+ -> surfaceMask
+ -> native roughness
+ -> DD-wheel output
+```
+
+The same reverse pass closes several other COLI fields:
+
+- section0: 256×256 u16 spatial grid in collision-set-local coordinates.
+- section1: `u16 count + u16 collisionIndex[count]` candidate lists.
+- geometry tail: u16 collisionFlags + s16 localHeadingAngle.
+- section5: collision topology/response selector, not material.
+- section6: u16 road-section index.
+- section8: four per-corner lighting/intensity bytes contributing to `EVWORK_CAR::lightRate_58`, not FFB surface identity.
+- section7: still open.
+
+### Contact ordering boundary
+
+Per-car static contact positions are copied from the `0x46BBF0` table into `vector_130[0..3]` in this exact local topology:
+
+```text
+0 = -X / -Z side
+1 = +X / -Z side
+2 = -X / +Z side
+3 = +X / +Z side
+```
+
+This proves pair topology, not final FL/FR/RL/RR names. The vehicle-local forward-axis sign still needs independent proof.
+
+### Level1 validation anchors
+
+Useful deterministic roadSection transitions:
+
+- Snowy Mountain stage 4: sections `132..203` are ordinary ID01/mask `0x2`, inside an otherwise snow-dominant course.
+- Ice Scape 19/49: primary `0..620` is ID17/mask `0x800000`.
+- Deep Lake 1: `419..458` is ID14/mask `0x100000`.
+- Tulip Garden 10: `54..70` is ID14.
+- Floral Village 27: `510..533` is ID14.
+
+Future telemetry should capture the exact contact collision indices; raw world position is secondary because the 256×256 grid is addressed only after the game's collision-set-local coordinate transform.
