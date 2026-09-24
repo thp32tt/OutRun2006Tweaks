@@ -1,23 +1,13 @@
-name: Localization State
+name: Localization State (Legacy Prototype Frozen)
 
 on:
-  push:
-    branches: [korean-localization-prototype]
-    paths:
-      - 'localization/**'
-      - 'tools/localization/**'
-      - '.github/workflows/localization-state.yml'
-  pull_request:
-    paths:
-      - 'localization/**'
-      - 'tools/localization/**'
-      - '.github/workflows/localization-state.yml'
   workflow_dispatch:
 
 jobs:
-  verify:
+  frozen:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Verify resumable Korean localization state
-        run: python tools/localization/verify_state.py
+      - name: Legacy branch notice
+        run: |
+          echo "korean-localization-prototype is frozen."
+          echo "Use korean-localization-clean for all active localization development."
