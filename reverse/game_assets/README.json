@@ -1,0 +1,111 @@
+{
+  "schema": "outrun-shared-reverse-index-v4",
+  "sourceSha": "8a312af992e4319aa5d101bfbfa97f271dd75203",
+  "canonicalExeSha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+  "analyzedCorpus": {
+    "manifestFiles": 3693,
+    "szFiles": 1160,
+    "xstFiles": 141,
+    "spraniFiles": 51,
+    "scriptFiles": 80,
+    "uploadedCollisionFiles": 19,
+    "stageFiles": 847,
+    "stageDirectories": 66,
+    "stageCollisionFiles": 72,
+    "stageCollisionCompressedBytes": 19481268,
+    "stageZip": {
+      "sizeBytes": 290113621,
+      "sha256": "385a5be540d87139c065bb5d62899767ca57c9a26950f7c2819235aa1448e6f6",
+      "collisionFiles": 72,
+      "coli0200": 66,
+      "legacyColi0105": 6,
+      "directInspection": "PASS"
+    }
+  },
+  "files": [
+    "docs/reverse/GAME_ASSET_KNOWLEDGE_BASE.md",
+    "docs/reverse/LOCALIZATION_MAP.md",
+    "docs/reverse/FFB_ASSET_MAP.md",
+    "docs/reverse/SCRIPT_BIN_FORMAT.md",
+    "reverse/game_assets/localization_map.json",
+    "reverse/game_assets/ffb_asset_map.json",
+    "reverse/game_assets/scripts_map.json",
+    "tools/reverse/analyze_game_data.py",
+    "docs/reverse/STAGE_SURFACE_FFB_MAP.md",
+    "reverse/game_assets/stage_collision_inventory.json",
+    "reverse/game_assets/ffb_surface_telemetry_schema.json",
+    "reverse/game_assets/stage_coli_ffb_map.json",
+    "tools/reverse/analyze_stage_coli.py",
+    "docs/reverse/HUD_ASSET_SEMANTIC_MAP.md",
+    "docs/reverse/VR_PERFORMANCE_STATIC_AUDIT.md",
+    "reverse/game_assets/hud_xst_slot_map.json",
+    "reverse/game_assets/vr_performance_static_audit.json",
+    "tools/reverse/analyze_hud_assets.py"
+  ],
+  "stageSurfaceEvidence": {
+    "semanticAlias": "EVWORK_CAR::water_flag_24C[4] -> four per-contact surfaceMask values",
+    "junctionContext": "OnRoadPlace.loadColiType_0 != 0 -> is_in_bunki(); not material identity",
+    "staticFieldToRuntimeMask": "CONFIRMED: materialId -> surfaceMask = 1u << materialId",
+    "primaryRoadMaterialIds": [
+      "0x01",
+      "0x14",
+      "0x16",
+      "0x17"
+    ],
+    "deepMap": "reverse/game_assets/stage_coli_ffb_map.json",
+    "inventory": "reverse/game_assets/stage_collision_inventory.json",
+    "telemetrySchema": "reverse/game_assets/ffb_surface_telemetry_schema.json",
+    "reproducer": "tools/reverse/analyze_stage_coli.py",
+    "open": [
+      "section7 semantics",
+      "collisionFlags individual bit names",
+      "final contact index -> FL/FR/RL/RR labels",
+      "physical names for non-primary material IDs",
+      "surface-mask particle/sound/effect consumer semantics"
+    ],
+    "formatV3": {
+      "spatialGrid": "section0 256x256 u16 -> section1 candidate lists",
+      "geometry": "64B = 4 corners + center + u16 collisionFlags + s16 localHeadingAngle",
+      "normals": "48B = four corner normals",
+      "subtype": "section5 topology/response selector",
+      "roadSection": "section6 u16 -> OnRoadPlace.roadSectionNum",
+      "cornerLighting": "section8 4*u8 -> car lightRate"
+    },
+    "exactContactJoin": "wheelWork[i]+0x10 collisionIndex -> static COLI record -> surfaceMask",
+    "contactTopology": "0:-X/-Z, 1:+X/-Z, 2:-X/+Z, 3:+X/+Z; final FL/FR/RL/RR names OPEN"
+  },
+  "hudAssetEvidence": {
+    "canonicalXstSlots": 75,
+    "englishNonNullSlots": 50,
+    "localizedFiveLanguageFamilies": 16,
+    "packedSpriteIdentity": "high16 XST set + low16 sprite index; canonical resolver VA 0x0042DDF0",
+    "packedSpraniIdentity": "high16 Sprani set + low16 animation index; resolver VA 0x00428A10",
+    "childSpriteBridge": "Sprani renderer VA 0x00428C0F -> sprite resolver 0x0042DDF0",
+    "rankMarkerPutClipCorrection": "RVA 0x2D280 calls put_sprite_ex exactly once per invocation; multi-node concern is falsified for this path",
+    "open": [
+      "rank-marker Sprani concrete child-node cardinality",
+      "fixed-function exact HUD owner",
+      "rival-marker world-anchor metadata"
+    ]
+  },
+  "performanceEvidence": {
+    "existingProfiles": [
+      "A_BASELINE",
+      "B_CULLING",
+      "C_CULLING_NO_SSAA",
+      "D_CULLING_NO_SSAA_R512"
+    ],
+    "staticRatios": {
+      "reflection1024Vs128PixelsPerFace": 64,
+      "reflection512Vs1024": 0.25,
+      "skyGlowFactor1Vs4ApproxOutputRatio": 3.2
+    },
+    "currentDPerfSource": "2d96a3117a6057bf66b7415c9cda959d80834fd5",
+    "gaps": [
+      "DirectGPU copy-pair enqueue/pixel telemetry",
+      "SkyGlow 1-vs-4 A/B",
+      "vehicle LOD A/B",
+      "HUD Inspector trace overhead when enabled"
+    ]
+  }
+}
