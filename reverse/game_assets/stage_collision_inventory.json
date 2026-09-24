@@ -1009,5 +1009,19 @@
       }
     ],
     "warning": "Compressed size is only a complexity/storage clue; it is not evidence of road material type or number of surface classes."
+  },
+  "externalFormatCrossCheck": {
+    "repository": "StupidCoder/RetroReverse",
+    "commit": "e9d892e19825c518407e41144fb8050f9d3e6c50",
+    "xboxMainCourseCollision": {
+      "count": 66,
+      "magic": "COLI0200"
+    },
+    "xboxLegacyCollision": {
+      "count": 6,
+      "magic": "COLI0105"
+    },
+    "internalSectionsDecoded": false,
+    "note": "Platform/corpus cross-check only; do not assume Xbox legacy leftovers are byte-identical to PC BK files without hashes."
   }
 }
