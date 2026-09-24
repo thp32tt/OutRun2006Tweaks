@@ -87,8 +87,6 @@ These are starting values rather than a guarantee for every firmware/Pit House c
 
 ### Diagnostics
 
-The wheel backend also keeps the reconstructed Xbox C2C `CalcVibrationValues()` output as a **read-only reference witness**. The logged `origXboxL/origXboxR` (compact log) and `xboxLeft/xboxRight` (10 Hz telemetry) values are the two XInput rumble-motor envelopes; they are not left/right steering torque and do not alter the DirectInput force model. They are intended for correlating current DD-wheel behavior with original game vibration timing and public Lindbergh drive-board observations.
-
 `OutRun2006Tweaks.log` records:
 
 - selected DirectInput FFB identity;
@@ -202,8 +200,6 @@ mixed와 fully rough 연석 상태에는 같은 강한 촉각 프로필을 사�
 이 값들은 시작점이며 모든 펌웨어/Pit House 조합에서 동일한 느낌을 보장하지 않습니다.
 
 ### 진단 로그
-
-휠 백엔드는 재구성된 Xbox C2C `CalcVibrationValues()` 출력도 **읽기 전용 비교 신호**로 보존합니다. 일반 진단 로그의 `origXboxL/origXboxR`, 10 Hz 텔레메트리의 `xboxLeft/xboxRight`는 XInput의 두 럼블 모터 엔벌로프이며 좌/우 조향 토크가 아닙니다. 따라서 DirectInput 힘 방향에는 섞지 않고, 현재 DD 휠 동작을 원본 게임 진동 타이밍 및 공개된 Lindbergh 드라이브보드 관찰과 대조하는 용도로만 사용합니다.
 
 `OutRun2006Tweaks.log`에는 다음 정보가 기록됩니다.
 

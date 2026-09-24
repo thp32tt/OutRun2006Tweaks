@@ -182,12 +182,6 @@ req(wheel_ui, 'Settings::WheelFFBInvertSpring = false;', 'R3 Spring direction ba
 req(wheel_ui, 'Settings::VibrationMode = 0;', 'R3 preset disables gamepad rumble')
 req(ffb, 'load={:.2f} slide={:.2f} scrub={:.2f}', 'separated load/slide/scrub diagnostics')
 req(ffb, 'step={:.5f} spdLen={:.5f} spdCorr={:.2f}', 'velocity diagnostic telemetry')
-req(ffb, 'extern float VibrationLeftMotor;', 'original Xbox vibration witness left channel')
-req(ffb, 'extern float VibrationRightMotor;', 'original Xbox vibration witness right channel')
-req(ffb, 'origXboxL={:.3f} origXboxR={:.3f}', 'compact diagnostics expose original Xbox vibration witness')
-req(ffb, 'xboxLeft={} xboxRight={}', '10 Hz telemetry exposes original Xbox vibration witness')
-req(ffb, 'NOT left/right steering', 'witness channels are explicitly non-directional')
-req(read('docs/reverse/LINDBERGH_FFB_MAP.md'), '0x08105A48', 'Lindbergh FFB comparative map retained')
 
 for pattern, label in [
     (r'(?m)^SteeringDeadZone\s*=\s*0\.0\s*$', 'zero steering deadzone'),
