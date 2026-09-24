@@ -63,4 +63,25 @@ if required_flag not in workflow:
 if "-DOUTRUN_VR_R26_HUD_COMPARE=OFF" in workflow:
     raise SystemExit("protected R51 build contract regressed: active DX9Ex workflow contains R26_HUD_COMPARE=OFF")
 
+
+
+# D3D9Ex Reset contract: ResetCompatDeviceR15 must replay fresh-device state
+# explicitly and must never create/apply a pre-Reset D3DSBT_ALL state block.
+r15 = read("src/vr/d3d9/ex_device_upgrade_r15.cpp")
+reset_begin = r15.find("bool ResetCompatDeviceR15(")
+reset_end = r15.find("void R15RollbackHooks()", reset_begin)
+if reset_begin < 0 or reset_end < 0:
+    raise SystemExit("R15 Reset contract missing")
+reset_block = r15[reset_begin:reset_end]
+for required in (
+    "RestoreClassicResetState(device)",
+    "R15RestoreClassicExtraBaseline(device)",
+    "SetExternalSafetyBlock(!healthy)",
+):
+    if required not in reset_block:
+        raise SystemExit(f"R15 Reset regression: missing explicit fresh-device replay/fail-close marker: {required}")
+for forbidden in ("CreateStateBlock(", "stateBlock->Apply(", "D3DSBT_ALL, &"):
+    if forbidden in reset_block:
+        raise SystemExit(f"R15 Reset regression: pre/post Reset state-block replay reintroduced: {forbidden}")
+
 print("R51 protected runtime contract: PASS")
