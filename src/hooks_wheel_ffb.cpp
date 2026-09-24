@@ -734,6 +734,8 @@ namespace
                 static_cast<float>(Settings::WheelFFBRoadTexture) * outputStrength *
                 stageRoadTextureScale;
             float roadFreq = 25.0f + 12.0f * speedNorm;
+            if (arcadeEffects)
+                roadAmp = 0.0f; // arcade surface codes own road vibration in these modes
 
             // Lindbergh-derived arcade reconstruction:
             // - both sides on a rough non-water surface correspond to the plugin's
@@ -816,7 +818,8 @@ namespace
                 lastArcadeSurfaceCode_ = -1;
             }
 
-            if (waterFlag && roughness > 0.7f && speedNorm > 0.70f && splashTimer_ <= 0)
+            if (!arcadeEffects &&
+                waterFlag && roughness > 0.7f && speedNorm > 0.70f && splashTimer_ <= 0)
             {
                 const float roadTextureScale = std::clamp(
                     static_cast<float>(Settings::WheelFFBRoadTexture) / 0.20f,
@@ -828,7 +831,8 @@ namespace
             }
             if (splashTimer_ > 0)
             {
-                roadAmp = std::max(roadAmp, splashAmp_);
+                if (!arcadeEffects)
+                    roadAmp = std::max(roadAmp, splashAmp_);
                 --splashTimer_;
             }
 
@@ -899,8 +903,13 @@ namespace
                 static_cast<float>(Settings::WheelFFBSpringStrength) * springSpeed,
                 0.0f, 1.0f);
 
-            const bool suppressSpringForImpact =
-                crashImpulseTimer_ > CrashCooldownFrames;
+            const int impactAge =
+                crashImpulseTimer_ > 0
+                    ? CrashTimerFrames - crashImpulseTimer_
+                    : CrashTimerFrames;
+            const bool suppressSpringForImpact = arcadeEffects
+                ? (crashImpulseTimer_ > 0 && impactAge < 6)
+                : crashImpulseTimer_ > CrashCooldownFrames;
 
             // Make UseHardwareSpring a real live F11 switch.  Previously
             // changing it to false after startup left the already-created
@@ -945,10 +954,14 @@ namespace
             // go completely loose in an ordinary loaded corner.
             const float damperSlipRelief = std::max(bodySlide, frontScrub * 0.75f);
             const float damperRelease = 1.0f - 0.55f * gripLoss * damperSlipRelief;
-            const float dynamicDamperStrength = std::clamp(
-                static_cast<float>(Settings::WheelFFBDamperStrength) *
-                    dampingSpeed * damperRelease,
+            const float configuredDamperStrength = std::clamp(
+                static_cast<float>(Settings::WheelFFBDamperStrength),
                 0.0f, 1.0f);
+            const float dynamicDamperStrength = originalConditionBackbone
+                ? configuredDamperStrength
+                : std::clamp(
+                    configuredDamperStrength * dampingSpeed * damperRelease,
+                    0.0f, 1.0f);
 
             if (!Settings::WheelFFBUseHardwareDamper && damperEffect_)
             {
@@ -1117,8 +1130,10 @@ namespace
                 // verified condition-force backbone rather than the modern
                 // inferred SAT. Hybrid keeps Modern DD SAT and swaps the
                 // transient/surface semantics to the arcade reconstruction.
+                const float modelLoadMod =
+                    modernStructural ? loadMod : 1.0f;
                 structural =
-                    (softwareSpring + selfAligningTorque) * loadMod + damper;
+                    (softwareSpring + selfAligningTorque) * modelLoadMod + damper;
             }
 
             // Headroom analysis uses sustained structural steering only. Do not
@@ -3473,15 +3488,20 @@ namespace
                     if (arcadeEffects)
                     {
                         // OutRun2Real.cpp groups hard wall requests into two
-                        // directional ConstantForce codes (0x0B / 0x1B) and
-                        // holds the request for roughly 100 ms. C2C supplies the
-                        // impact direction from its own lateral/collision state.
-                        const float direction =
-                            crashImpulseForce_ >= 0.0f ? 1.0f : -1.0f;
-                        result += direction * arcadeSpeedStrength *
-                            std::clamp(
-                                static_cast<float>(Settings::WheelFFBWallImpact),
-                                0.0f, 1.0f);
+                        // directional ConstantForce codes (0x0B / 0x1B) with a
+                        // 100 ms request length. Emit only the first six 60 Hz
+                        // ticks; the remaining timer is collision debounce.
+                        const int impactFrame =
+                            CrashTimerFrames - crashImpulseTimer_;
+                        if (impactFrame < 6)
+                        {
+                            const float direction =
+                                crashImpulseForce_ >= 0.0f ? 1.0f : -1.0f;
+                            result += direction * arcadeSpeedStrength *
+                                std::clamp(
+                                    static_cast<float>(Settings::WheelFFBWallImpact),
+                                    0.0f, 1.0f);
+                        }
                     }
                     else if (ps2Original)
                     {
