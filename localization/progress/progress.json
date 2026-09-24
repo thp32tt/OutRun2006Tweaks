@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T01:47:00+09:00",
+  "updated_at_kst": "2026-09-25T01:43:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -82,8 +82,8 @@
       }
     },
     "hangul_font": {
-      "status": "compact_manifest_ready",
-      "percent": 30,
+      "status": "two_page_atlas_proof_generated",
+      "percent": 45,
       "required_unique_hangul_syllables": 505,
       "atlas_pages": 2,
       "page_capacity": 256,
@@ -228,6 +228,20 @@
       "unique_hangul_syllables": 505,
       "compact_pages_required": 2,
       "build_status": "ci_in_progress"
+    },
+    "k3_atlas_proof": {
+      "glyphs": 505,
+      "pages": 2,
+      "page_size": "1024x1024",
+      "grid": "16x16",
+      "cell_px": 64,
+      "font_size_px": 48,
+      "source_font_file_distributed": false,
+      "page0_sha256": "9a916857a850b4c8697d784706952adddb9f7b8513eb7b37f26274ce30664546",
+      "page1_sha256": "8c3136cd113e635d6ccfdbbfc2de4e9efce11e036e250f1516117eff0a62881c",
+      "metrics_sha256": "f4908dcfefd318d629645a97ca74261a6b9053337d77bac5181fac4af3bae91b",
+      "package_sha256": "33a4e2b69a1a288582a6b028430ac70338eca66e4e72cdf2655abc5db89b4c0a",
+      "status": "development_proof_not_ingame_validated"
     }
   }
 }
