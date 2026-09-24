@@ -1777,8 +1777,10 @@ namespace
             if (ImGui::CollapsingHeader("Advanced FFB tuning"))
             {
                 track_ffb_change(ImGui::SliderFloat("Spring Saturation", Settings::WheelFFBSpringSaturation.ptr(), 0.10f, 1.0f, "%.3f"));
+                if (!modelUsesModernSat) ImGui::BeginDisabled();
                 track_ffb_change(ImGui::SliderFloat("Weight Transfer", Settings::WheelFFBWeightTransfer.ptr(), 0.0f, 1.5f, "%.2f"));
                 track_ffb_change(ImGui::SliderFloat("Lateral Signal Deadzone", Settings::WheelFFBLateralDeadzone.ptr(), 0.0f, 8.0f, "%.2f"));
+                if (!modelUsesModernSat) ImGui::EndDisabled();
                 if (activeFfbModel == 3) ImGui::BeginDisabled();
                 track_ffb_change(ImGui::SliderFloat("Gear Shift", Settings::WheelFFBGearShift.ptr(), 0.0f, 1.0f, "%.2f"));
                 if (activeFfbModel == 3)
@@ -1798,7 +1800,7 @@ namespace
                 ImGui::TextDisabled("Approx full-scale ramp: build %.0f ms | stale reversal release %.0f ms at 60 Hz.",
                     (1.0f / buildRate) * (1000.0f / 60.0f),
                     (1.0f / reversalRate) * (1000.0f / 60.0f));
-                if (Settings::WheelFFBPhysicsSat)
+                if (modelUsesModernSat && Settings::WheelFFBPhysicsSat)
                 {
                     ImGui::SeparatorText("Physics SAT transient");
                     track_ffb_change(ImGui::SliderFloat("Pneumatic Trail Response Lead", Settings::WheelFFBTrailResponseLead.ptr(), 0.0f, 0.60f, "%.2f"));
