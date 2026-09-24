@@ -1,0 +1,23 @@
+name: Localization State
+
+on:
+  push:
+    branches: [korean-localization-prototype]
+    paths:
+      - 'localization/**'
+      - 'tools/localization/**'
+      - '.github/workflows/localization-state.yml'
+  pull_request:
+    paths:
+      - 'localization/**'
+      - 'tools/localization/**'
+      - '.github/workflows/localization-state.yml'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify resumable Korean localization state
+        run: python tools/localization/verify_state.py
