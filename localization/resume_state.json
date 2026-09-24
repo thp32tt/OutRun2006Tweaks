@@ -1,5 +1,5 @@
 {
-  "schema_version": 7,
+  "schema_version": 8,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,15 +7,14 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "pass latest clean Win32 build, Localization State and Domain Isolation Guard",
-    "run clean K1 trace package and collect OutRun2006Tweaks.log",
-    "run K2 ASCII resolver proof after K1 and confirm ID 0 marker",
-    "resolve mode-title IDs 96,97,279,280 from runtime menu context",
-    "continue remaining graphics transcription (49/79 complete)",
-    "in-game validate first Continue Korean DDS candidate",
-    "produce Korean artwork only after each atlas transcription/spec is reviewed",
-    "prototype K3 Hangul glyph/width path using 0x42C480 byte-loop evidence",
-    "prototype 9 font atlases + Hangul name-entry atlas"
+    "pass latest Localization State, Domain Isolation Guard and Win32 build with graphics JSONL integrity checks",
+    "collect K1 runtime trace log",
+    "run K2 ASCII resolver proof and confirm ID0 marker",
+    "resolve text IDs 96,97,279,280 and graphics badge index 152 from runtime context",
+    "add K3 signature-gated width/glyph trace scaffold for 0x42C480 and 0x42C410",
+    "validate Continue Korean DDS candidate in game",
+    "begin final Korean artwork rendering for transcribed atlases",
+    "prototype Hangul font atlas/name-entry path"
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -32,12 +31,13 @@
     ]
   },
   "graphics_checkpoint": {
-    "transcribed_assets": 49,
-    "transcribed_segments": 364,
+    "transcribed_assets": 78,
+    "transcribed_segments": 668,
     "artwork_completed": 0,
     "artwork_targets": 79,
-    "preserve_brand_song_credit": 33,
-    "legal_credits_reclassified": true
+    "blocked_context_indices": [
+      152
+    ]
   },
   "runtime_packages": {
     "k1": {
