@@ -1879,6 +1879,15 @@ namespace
 
             ImGui::SeparatorText("FFB Headroom / Clipping");
             const WheelFFBHeadroomSnapshot headroom = WheelFFB_GetHeadroomSnapshot();
+            if (!modelUsesModernSat)
+            {
+                ImGui::TextDisabled(
+                    "Headroom recommendation is unavailable for condition-driven Original modes.");
+                ImGui::TextDisabled(
+                    "Hardware Spring/Damper torque is outside the ConstantForce structural histogram.");
+            }
+            else
+            {
             ImGui::Text("Current structural demand: %.0f%%   Peak: %.0f%%",
                 headroom.currentDemand * 100.0f, headroom.peakDemand * 100.0f);
             ImGui::Text("P95: %.0f%%   P99: %.0f%%   samples: %llu (%.1fs)",
@@ -1901,8 +1910,11 @@ namespace
             ImGui::TextDisabled("Collision, gear events, startup/recreate ramps and near-stop frames are excluded from the statistics.");
             if (ImGui::Button("Reset headroom analysis"))
                 WheelFFB_ResetHeadroomStats();
+            }
 
             ImGui::SeparatorText("Recent FFB Pipeline (last 3 seconds of driving)");
+            if (!modelUsesModernSat)
+                ImGui::TextDisabled("Original modes: graph shows ConstantForce/event output; hardware condition torque is not plotted.");
             const WheelFFBGraphSnapshot graph = WheelFFB_GetGraphSnapshot();
             if (graph.count > 1)
             {
