@@ -5,20 +5,21 @@ Repository: thp32tt/OutRun2006Tweaks
 Integration branch: vr-d3d9ex-focus
 Protected runtime baseline: R51 17ad376bfdf7939f0851c0c629e4fa094a84f28a
 
-Previous active schedule backup:
+Schedule backups:
 - docs/automation/schedule-backups/2026-09-24T2216KST_FLOW-20260924-1.md
-- backup commit: de1ecca0da88d15cf0ae7d2d05fc0a87e368be46
+- docs/automation/schedule-backups/2026-09-24T2305KST_FOUR-TO-TWO-CYCLES.md
+- latest pre-consolidation backup commit: 9c553489cfcc2cb8258d9cbff54c48114f85649e
 
 ## Hourly schedule
 
 | Minute | Automation | Role |
 |---|---|---|
-| :00 | OutRun A R51 Baseline Guard (Chat) | R51 regression guard and risky-matrix review |
-| :20 | OutRun B Active VR Fix Review (Chat) | implementation-ready HUD/flare/perf evidence and matrix comparison |
-| :35 | OutRun C Exact Candidate Gate (Chat) | exact-SHA candidate/matrix validation and package identity |
-| :45 | OutRun D Implementation-First Integrate (Chat) | sole source writer, builds, integration and evening matrix packaging |
+| :00 | OutRun Full Cycle 1 (Chat) | full recover -> review -> implement -> validate -> integrate -> matrix/package cycle |
+| :30 | OutRun Full Cycle 2 (Chat) | consume Cycle 1 outputs/CI, then full recover -> review -> implement -> validate -> integrate -> matrix/package cycle |
 
-All four remain hourly in Asia/Seoul.
+Only these two OutRun development automations are active. The previous :20 review and :45 integration tasks are disabled.
+
+Both cycles may perform production work, but repository remote claim/CAS plus production integration WIP=1 prevents concurrent source writers. If one cycle owns the active candidate, the other must consume immutable evidence or advance a non-conflicting independent lane rather than waiting idle.
 
 ## Core rule: integration is serial, HMD experiments are parallel
 
@@ -122,13 +123,15 @@ Only these may preempt the user-visible matrix work:
 
 Other findings are BACKLOG_ONLY.
 
-## Review routing
+## In-cycle review and validation
 
-- HUD/render/visual/performance: B + C
-- architecture/reset/resource/synchronization: A + C
-- mixed impact: A + B + C
+The old mandatory A -> B -> C -> D handoff chain is removed. Each full cycle performs impact-based review and validation inside the same run.
 
-No review-count quota. Review exact SHAs and matrix deltas only.
+- HUD/render/visual/performance changes require render-oriented scrutiny plus independent deterministic validation.
+- architecture/reset/resource/synchronization/backend/device changes require architecture-oriented scrutiny plus independent deterministic validation.
+- mixed changes require both lenses.
+
+Use actual diffs, call paths, regression guards and exact-SHA cloud CI. No review-count quota and no artificial role-stage waiting. A change may integrate in the same cycle once all applicable deterministic/domain gates pass. HMD-only uncertainty remains INTEGRATED_NEEDS_HMD.
 
 ## Evening package contract
 
