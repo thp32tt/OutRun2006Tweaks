@@ -1,3 +1,5 @@
 {"ts_kst":"2026-09-24T23:57:00+09:00","event":"branch_created","branch":"korean-localization-clean","base":"emoose/OutRun2006Tweaks@08e5efb4deea4066c440307ec009c868a30562d3","vr_source_present":false}
 {"ts_kst":"2026-09-24T23:58:00+09:00","event":"txet_tool_imported","roundtrip_verified":true,"entries":1356}
 {"ts_kst":"2026-09-24T23:59:00+09:00","event":"inventory_baseline","files":324,"dds":243,"text_entries":1356}
+{"ts_kst":"2026-09-25T00:05:00+09:00","event":"translation_checkpoint","translated":180,"total":1356,"percent":13.3,"range":"0-179"}
+{"ts_kst":"2026-09-25T00:08:00+09:00","event":"graphics_inventory_checkpoint","dds_total":243,"categories":{"front_end":111,"selector":31,"common_ui":19,"ranking":15,"font":9,"loading":9,"game_ui":7,"route":4,"name_entry":1,"other":37},"visually_reviewed":["game_ui","common_ui","ranking","font"]}
