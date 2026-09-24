@@ -1499,14 +1499,15 @@ namespace OutRunVRStereo
             // shader (6th/6, Position/results and menu glyph variants). The EXE
             // queue semantic is the ownership proof; use raw game WVP only as
             // placement data, never as a classifier.
-            if (CurrentDrawMatchesVerifiedWorld(device))
-                return R30ScreenSpaceKind::None;
-            std::uintptr_t reboundShader = 0;
-            std::uint64_t reboundSerial = 0;
-            if (R28CanRebindVerifiedWorld(
-                    device, reboundShader, reboundSerial))
-                return R30ScreenSpaceKind::None;
-
+            //
+            // R51 HUD lifetime bridge: c64 is uploaded before the canonical
+            // SpriteNode semantic becomes current. Therefore a c64 write may
+            // already have been accepted/rebindable as world by the lower
+            // renderer even though the exact draw is subsequently proven to be
+            // SCREEN_HUD. Do not let that earlier timing artifact veto the
+            // exact draw semantic. WORLD_BILLBOARD remains protected by the
+            // separate semanticWorld branch above and still uses the strict
+            // verified/rebindable world gates.
             ++R44FlatOverlayClassifications;
             return R30ScreenSpaceKind::PerspectiveHud;
         }
