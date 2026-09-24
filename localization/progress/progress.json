@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T00:18:00+09:00",
+  "updated_at_kst": "2026-09-25T00:22:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -106,7 +106,7 @@
       "total": 80
     }
   },
-  "next_checkpoint": "Latest clean CI; K1 runtime trace; resolve IDs 96/97/279/280; convert Continue proof to source-compatible DDS after format inspection; continue transcription queue",
+  "next_checkpoint": "Pass latest clean CI; package/run K1 trace; resolve IDs 96/97/279/280; in-game validate first Continue Korean DDS candidate; continue transcription queue",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -144,7 +144,17 @@
     "transcribed_segments": 153,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 1,
-    "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending"
+    "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
+    "first_dds_candidate": {
+      "source_path": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+      "korean": "계속?",
+      "dimensions": "256x64",
+      "source_bytes": 65664,
+      "candidate_bytes": 65664,
+      "header_128_byte_identical": true,
+      "candidate_sha256": "847aa537f1651239a794b531438cb26e8dd7302738df65c5858f6cf6b55c3999",
+      "status": "candidate_pending_ingame_validation"
+    }
   },
   "data_build": {
     "draft_bin_entries": 1356,
