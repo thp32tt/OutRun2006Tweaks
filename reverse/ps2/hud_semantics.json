@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "executable": "SLPM_666.28",
+    "sha256": "bc5dd6d836bf34546ef9f047ad2bcb99c5ef5a713767a161d0c342af33f38c34"
+  },
+  "tables": {
+    "jspraniPaths": "0x0032AA58",
+    "jspritePaths": "0x0035C96C",
+    "gameStateNames": "0x0035CAA8",
+    "currentGameState": "0x00434110"
+  },
+  "functions": [
+    {"va":"0x00116C20","name":"SpraniResource_GetLoadedPointerById","confidence":"high"},
+    {"va":"0x00116C50","name":"SpraniResource_RequestById","confidence":"high"},
+    {"va":"0x00116D60","name":"SpraniResource_AssignLoadedObject","confidence":"medium-high"},
+    {"va":"0x00116DD0","name":"SpraniResource_PumpLoadQueue","confidence":"high"},
+    {"va":"0x00116EA8","name":"SpraniResource_ReleaseById","confidence":"high"},
+    {"va":"0x001BBAB0","name":"GetCurrentGameStateName","confidence":"high"},
+    {"va":"0x0030D220","name":"renderCode_section_entry","confidence":"verified-region"},
+    {"va":"0x0030DBA0","name":"Sprani_Update","confidence":"verified"}
+  ],
+  "resourceGroups": [
+    {"ids":"0x23..0x2A,0x30..0x31","tags":["HUD","METER","GAUGE"]},
+    {"ids":"0x2B","name":"GAME_CVT","tags":["HUD","INGAME"],"priority":"P0"},
+    {"ids":"0x2C","name":"ETC_CVT","tags":["HUD","MISC"],"priority":"P1"},
+    {"ids":"0x34","name":"ROUTE_CVT","tags":["HUD","ROUTE","MAP"],"priority":"P0"},
+    {"ids":"0x3D","name":"RANKING_CVT","tags":["HUD","RANKING"],"priority":"P0"},
+    {"ids":"0x3E..0x41","name":"FLAG/CLAR/JENN/HOLL_RANK","tags":["HUD","RANK_MARKER_CANDIDATE"],"priority":"P0","note":"World-space ownership is not established by the filename alone."}
+  ],
+  "gameStates": {
+    "0x10":"GAME",
+    "0x13":"GOAL",
+    "0x16":"RESULT",
+    "0x19":"ROUTEMAP",
+    "0x1A":"T_RANKING"
+  }
+}
