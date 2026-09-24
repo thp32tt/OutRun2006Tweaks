@@ -23,6 +23,7 @@ ffb = read('src/hooks_wheel_ffb.cpp')
 vib = read('src/hooks_forcefeedback.cpp')
 dyn = read('src/hooks_wheel_vehicle_dynamics.hpp')
 math = read('src/wheel_ffb_math.hpp')
+ps2 = read('src/wheel_ffb_ps2.hpp')
 input_cpp = read('src/input_manager.cpp')
 input_hpp = read('src/input_manager.hpp')
 bind_ui = read('src/overlay/input_bindings_ui.cpp')
@@ -41,6 +42,7 @@ for rel, text in [
     ('src/hooks_wheel_ffb_build.cpp', build),
     ('src/hooks_forcefeedback.cpp', vib),
     ('src/hooks_wheel_vehicle_dynamics.hpp', dyn),
+    ('src/wheel_ffb_ps2.hpp', ps2),
     ('src/input_manager.cpp', input_cpp),
     ('src/overlay/input_bindings_ui.cpp', bind_ui),
     ('src/overlay/wheel_setup_ui.cpp', wheel_ui),
@@ -56,6 +58,7 @@ req(ini, 'UseNewInput = true', 'shipped SDL multi-device input default')
 for rel in (
     'src/wheel_profile_store.hpp', 'src/hooks_input.cpp',
     'src/overlay/settings_ui.cpp', 'src/overlay/overlay.cpp',
+    'src/wheel_ffb_ps2.hpp',
     'CMakeLists.txt', 'cmake.toml', 'README.md', 'WHEEL_FFB.md',
     'RELEASE_NOTES_v0.1.md', '.github/workflows/build.yml',
 ):
@@ -110,7 +113,7 @@ req(ffb, 'previous rejected-interface quarantine must not', 'FFB disable hard-re
 req(ffb, 'if (!reacquire_after_input_loss("ConstantForce", hr) || !constantEffect_)', 'ConstantForce transient input loss keeps the recovery grace window')
 req(ffb, 'if (!reacquire_after_input_loss("GUID_Spring", hr))', 'Spring transient input loss keeps the recovery grace window')
 req(ffb, 'if (!reacquire_after_input_loss("GUID_Damper", hr))', 'Damper transient input loss keeps the recovery grace window')
-req(ffb, 'if (!reacquire_after_input_loss("GUID_Sine periodic", hr))', 'Periodic transient input loss keeps the recovery grace window')
+req(ffb, 'if (!reacquire_after_input_loss(effectName, hr))', 'Periodic transient input loss keeps the recovery grace window')
 req(ffb, 'game window not available yet; retrying shortly', 'missing game window uses the short device retry')
 req(ffb, 'Settings::write(Module::UserIniPath)', 'auto-selected working FFB GUID is persisted for the next launch')
 req(ffb, 'saved FFB GUID unavailable or rejected; probing compatible sibling interfaces', 'saved FFB GUID can fall back to sibling interface')
@@ -526,7 +529,9 @@ req(wheel_ui, '// Arcade Original\'s verified rough-surface path is periodic.', 
 req(wheel_ui, '// The retail PS2 binary has explicit periodic download/update', 'PS2 shortcut documents verified periodic ownership')
 original_shortcut = wheel_ui[wheel_ui.find('if (ImGui::Button("Use Arcade Original"))'):wheel_ui.find('if (ImGui::Button("Use Arcade Hybrid"))')]
 hybrid_shortcut = wheel_ui[wheel_ui.find('if (ImGui::Button("Use Arcade Hybrid"))'):wheel_ui.find('if (ImGui::Button("Use PS2 Original (Experimental)"))')]
-ps2_shortcut = wheel_ui[wheel_ui.find('if (ImGui::Button("Use PS2 Original (Experimental)"))':wheel_ui.find('if (!Settings::UseNewInput)', wheel_ui.find('if (ImGui::Button("Use PS2 Original (Experimental)"))')]
+ps2_shortcut_start = wheel_ui.find('if (ImGui::Button("Use PS2 Original (Experimental)"))')
+ps2_shortcut_end = wheel_ui.find('if (!Settings::UseNewInput)', ps2_shortcut_start)
+ps2_shortcut = wheel_ui[ps2_shortcut_start:ps2_shortcut_end]
 for block, label in (
     (original_shortcut, 'Arcade Original shortcut'),
     (hybrid_shortcut, 'Arcade Hybrid shortcut'),
@@ -534,6 +539,32 @@ for block, label in (
 ):
     req(block, 'Settings::WheelFFBUsePeriodicEffects = true;', label + ' enables hardware periodic path')
     forbid(block, 'Settings::WheelFFBUsePeriodicEffects = false;', label + ' never disables verified periodic path')
+req(ps2, 'speedRaw / 0.875f', 'PS2 retail drive factor recovered from SLPM')
+req(ps2, 'RetailSpringSaturationBase = 15', 'PS2 retail spring saturation base')
+req(ps2, 'RetailSpringSaturationSpan = 45', 'PS2 retail spring saturation speed span')
+req(ps2, 'RetailSpringCoefficient = 200', 'PS2 retail spring coefficient')
+req(ps2, 'RetailDamperSaturation = 255', 'PS2 retail damper saturation')
+req(ps2, 'RetailConstantMagnitudeCap = 220', 'PS2 retail constant magnitude cap')
+req(ps2, 'RetailPeriodicBasePeriod = 100', 'PS2 retail Triangle base period')
+req(ps2, 'RetailPeriodicPeriodSpan = 60', 'PS2 retail Triangle period span')
+req(ffb, '#include "wheel_ffb_ps2.hpp"', 'runtime consumes retail PS2 translation')
+req(ffb, 'WheelFFBPS2::drive_factor(speedRaw)', 'PS2 runtime uses retail speed factor instead of Modern speedNorm')
+req(ffb, 'WheelFFBPS2::spring_coefficient_norm()', 'PS2 runtime uses recovered spring coefficient')
+req(ffb, 'WheelFFBPS2::spring_saturation_norm(ps2DriveFactor)', 'PS2 runtime uses recovered dynamic spring saturation')
+req(ffb, 'WheelFFBPS2::damper_coefficient_norm(ps2DriveFactor)', 'PS2 runtime uses recovered speed-fading damper coefficient')
+req(ffb, 'GUID_Triangle', 'PS2 retail Type 4 is translated to DirectInput Triangle')
+req(ffb, 'roadPeriodicIsTriangle_ != ps2Original', 'model changes cannot retain the wrong periodic waveform')
+req(ffb, 'if (roadTextureEffect_ || tireSlipEffect_)\n                disable_periodics();', 'explicit settings/model transitions destroy waveform-bound periodic objects')
+req(ffb, 'const bool needSlip =\n                WheelFFBMath::model_uses_modern_sat(model);', 'periodic set requires tire slip only for Modern/Hybrid')
+req(ffb, '(!needSlip || tireSlipEffect_ != nullptr)', 'Original modes do not require unused Modern tyre-slip periodic')
+req(ffb, 'roadPeriodicStrategy_', 'road periodic owns independent driver update strategy')
+req(ffb, 'slipPeriodicStrategy_', 'tire periodic owns independent driver update strategy')
+forbid(ffb, 'int periodicStrategy_ =', 'shared periodic strategy removed')
+req(wheel_ui, 'Hardware road/slip periodic effects', 'F11 periodic control is waveform-neutral')
+req(wheel_ui, 'modelUsesModernTireSlip', 'F11 disables ignored tire-slip tuning in original modes')
+req(wheel_ui, 'modelUsesEngineHaptics', 'F11 disables ignored engine haptic tuning outside Modern DD')
+req(wheel_ui, 'WheelFFBSpringSaturation = 0.775f;', 'PS2 shortcut restores 1x retail spring saturation scaler')
+req(wheel_ui, 'WheelFFBDamperStrength = 0.30f;', 'PS2 shortcut restores 1x retail damper scaler')
 req(wheel_ui, 'savedFfb_.model = Settings::WheelFFBModel;', 'FFB revert snapshot includes model selection')
 req(wheel_ui, 'Settings::WheelFFBModel = savedFfb_.model;', 'FFB revert restores model selection')
 req(ini, 'Model = 0', 'shipped INI defaults to Modern DD')
