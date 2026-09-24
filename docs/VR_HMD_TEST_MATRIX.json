@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-09-24T22:43:00+09:00",
+  "updatedKst": "2026-09-24T22:47:00+09:00",
   "policy": "IMPLEMENTATION-FIRST + EVENING-HMD-MATRIX",
   "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
   "integrationBranch": "vr-d3d9ex-focus",
@@ -10,17 +10,25 @@
     "branch": "vr-d3d9ex-candidate/R51-MATRIX-BASE-MANUAL-20260924",
     "sourceSha": "27f4ad958cf965f33bc6791395dd77ca1af7fb42",
     "baseIntegrationSha": "0ca18d79a9e0c9f1f8ed45194c49b679785aceae",
-    "status": "CI_IN_PROGRESS",
+    "status": "BUILD_VERIFIED_INTEGRATED_NEEDS_HMD",
     "ciRuns": [
       36007124220,
       36007124238
     ],
-    "purpose": "Restore protected R51 runtime contract on current focus while retaining provenance diagnostics and binary/source-binding guards."
+    "purpose": "Restore protected R51 runtime contract on current focus while retaining provenance diagnostics and binary/source-binding guards.",
+    "integrationSha": "060e2ae5ff78503b41d8a38980843dd5003e43bb",
+    "ciResult": "SUCCESS",
+    "artifact": {
+      "id": 10811237291,
+      "name": "OutRun2-VR-DX9EX-ACTIVE-27f4ad958cf965f33bc6791395dd77ca1af7fb42",
+      "artifactDigest": "sha256:d3b91d61661b78bdcb27a9dc2c9547f21881375a1bc745d866d87a72d260c516",
+      "workflowRunId": 36007124220
+    }
   },
   "slots": [
     {
       "slotId": "A_CONTROL",
-      "status": "WAITING_FOR_BASE_CI",
+      "status": "BUILD_VERIFIED_IDENTITY_PENDING",
       "sourceSha": "27f4ad958cf965f33bc6791395dd77ca1af7fb42",
       "profile": "CONTROL",
       "featureFlags": [],
@@ -28,7 +36,10 @@
       "expectedObservable": "Road/background/vehicle stereo and startup/gameplay remain at R51 level; existing HUD defects may remain.",
       "binarySha256": null,
       "configProfileHash": null,
-      "artifactRef": null
+      "artifactRef": "github-actions:36007124220/artifact:10811237291",
+      "artifactDigest": "sha256:d3b91d61661b78bdcb27a9dc2c9547f21881375a1bc745d866d87a72d260c516",
+      "integrationSha": "060e2ae5ff78503b41d8a38980843dd5003e43bb",
+      "note": "Candidate exact-SHA CI and package passed. BinarySha256/configProfileHash must be filled from frozen evening package before HMD_EXPERIMENT_READY."
     },
     {
       "slotId": "B_HUD",
