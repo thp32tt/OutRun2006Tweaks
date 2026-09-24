@@ -1,0 +1,832 @@
+{
+  "schema": "outrun-stage-collision-ffb-map-v1",
+  "evidenceDateKst": "2026-09-24",
+  "source": {
+    "manifest": "game_file_manifest.txt",
+    "manifestStageFiles": 847,
+    "manifestStageDirectories": 66,
+    "manifestStageBytes": 296418999,
+    "manifestCollisionFiles": 72,
+    "manifestCollisionCompressedBytes": 19481268,
+    "uploadedStageZip": {
+      "name": "Stage.zip",
+      "sizeBytes": 290113621,
+      "materialized": true,
+      "directByteInspection": "BLOCKED_BY_EXECUTION_BACKEND_THIS_RUN"
+    },
+    "sourceCode": {
+      "ffbBranch": "ffb-arcade-dd-research",
+      "sha": "7b08c30055212334735cc55b71575c6cc57c48b1"
+    },
+    "canonicalExeSha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3"
+  },
+  "semanticCorrections": {
+    "EVWORK_CAR::water_flag_24C[4]": "Treat as per-wheel surfaceMask[4] for FFB/reverse-analysis semantics. Legacy field name is misleading; sub_1149C0 branches on many non-water mask bits.",
+    "OnRoadPlace::loadColiType_0": "Not a material ID. Current source's is_in_bunki() returns loadColiType_0 != 0, so model it as branch/junction collision-mode context until stronger evidence exists."
+  },
+  "stageVariants": [
+    {
+      "stageId": 0,
+      "folder": "PALM",
+      "displayName": "Palm Beach",
+      "variant": "forward",
+      "collisionCs": "Stage/PALM/coli_CS_PALM_bin.sz",
+      "compressedBytes": 270432,
+      "collisionBk": null
+    },
+    {
+      "stageId": 1,
+      "folder": "LAKE",
+      "displayName": "Deep Lake",
+      "variant": "forward",
+      "collisionCs": "Stage/LAKE/coli_CS_LAKE_bin.sz",
+      "compressedBytes": 330642,
+      "collisionBk": null
+    },
+    {
+      "stageId": 2,
+      "folder": "INDU",
+      "displayName": "Industrial Complex",
+      "variant": "forward",
+      "collisionCs": "Stage/INDU/coli_CS_INDU_bin.sz",
+      "compressedBytes": 144574,
+      "collisionBk": null
+    },
+    {
+      "stageId": 3,
+      "folder": "ALPI",
+      "displayName": "Alpine",
+      "variant": "forward",
+      "collisionCs": "Stage/ALPI/coli_CS_ALPI_bin.sz",
+      "compressedBytes": 365458,
+      "collisionBk": null
+    },
+    {
+      "stageId": 4,
+      "folder": "SNOW",
+      "displayName": "Snowy Mountain",
+      "variant": "forward",
+      "collisionCs": "Stage/SNOW/coli_CS_SNOW_bin.sz",
+      "compressedBytes": 295386,
+      "collisionBk": null
+    },
+    {
+      "stageId": 5,
+      "folder": "CLOU",
+      "displayName": "Cloudy Highland",
+      "variant": "forward",
+      "collisionCs": "Stage/CLOU/coli_CS_CLOU_bin.sz",
+      "compressedBytes": 356675,
+      "collisionBk": null
+    },
+    {
+      "stageId": 6,
+      "folder": "CAST",
+      "displayName": "Castle Wall",
+      "variant": "forward",
+      "collisionCs": "Stage/CAST/coli_CS_CAST_bin.sz",
+      "compressedBytes": 354825,
+      "collisionBk": null
+    },
+    {
+      "stageId": 7,
+      "folder": "GHOS",
+      "displayName": "Ghost Forest",
+      "variant": "forward",
+      "collisionCs": "Stage/GHOS/coli_CS_GHOS_bin.sz",
+      "compressedBytes": 273251,
+      "collisionBk": null
+    },
+    {
+      "stageId": 8,
+      "folder": "FORE",
+      "displayName": "Coniferous Forest",
+      "variant": "forward",
+      "collisionCs": "Stage/FORE/coli_CS_FORE_bin.sz",
+      "compressedBytes": 224317,
+      "collisionBk": null
+    },
+    {
+      "stageId": 9,
+      "folder": "DESE",
+      "displayName": "Desert",
+      "variant": "forward",
+      "collisionCs": "Stage/DESE/coli_CS_DESE_bin.sz",
+      "compressedBytes": 289874,
+      "collisionBk": null
+    },
+    {
+      "stageId": 10,
+      "folder": "TULI",
+      "displayName": "Tulip Garden",
+      "variant": "forward",
+      "collisionCs": "Stage/TULI/coli_CS_TULI_bin.sz",
+      "compressedBytes": 314888,
+      "collisionBk": null
+    },
+    {
+      "stageId": 11,
+      "folder": "METR",
+      "displayName": "Metropolis",
+      "variant": "forward",
+      "collisionCs": "Stage/METR/coli_CS_METR_bin.sz",
+      "compressedBytes": 233196,
+      "collisionBk": null
+    },
+    {
+      "stageId": 12,
+      "folder": "RUIN",
+      "displayName": "Ancient Ruins",
+      "variant": "forward",
+      "collisionCs": "Stage/RUIN/coli_CS_RUIN_bin.sz",
+      "compressedBytes": 430952,
+      "collisionBk": null
+    },
+    {
+      "stageId": 13,
+      "folder": "CAPE",
+      "displayName": "Cape Way",
+      "variant": "forward",
+      "collisionCs": "Stage/CAPE/coli_CS_CAPE_bin.sz",
+      "compressedBytes": 247925,
+      "collisionBk": "Stage/CAPE/coli_BK_CAPE_bin.sz"
+    },
+    {
+      "stageId": 14,
+      "folder": "IMPE",
+      "displayName": "Imperial Avenue",
+      "variant": "forward",
+      "collisionCs": "Stage/IMPE/coli_CS_IMPE_bin.sz",
+      "compressedBytes": 230851,
+      "collisionBk": null
+    },
+    {
+      "stageId": 15,
+      "folder": "BEAC",
+      "displayName": "Sunny Beach",
+      "variant": "forward",
+      "collisionCs": "Stage/BEAC/coli_CS_BEAC_bin.sz",
+      "compressedBytes": 293687,
+      "collisionBk": null
+    },
+    {
+      "stageId": 16,
+      "folder": "SEQU",
+      "displayName": "Big Forest",
+      "variant": "forward",
+      "collisionCs": "Stage/SEQU/coli_CS_SEQU_bin.sz",
+      "compressedBytes": 356246,
+      "collisionBk": null
+    },
+    {
+      "stageId": 17,
+      "folder": "NIAG",
+      "displayName": "Waterfalls",
+      "variant": "forward",
+      "collisionCs": "Stage/NIAG/coli_CS_NIAG_bin.sz",
+      "compressedBytes": 266148,
+      "collisionBk": null
+    },
+    {
+      "stageId": 18,
+      "folder": "LASV",
+      "displayName": "Casino Town",
+      "variant": "forward",
+      "collisionCs": "Stage/LASV/coli_CS_LASV_bin.sz",
+      "compressedBytes": 192737,
+      "collisionBk": null
+    },
+    {
+      "stageId": 19,
+      "folder": "ALAS",
+      "displayName": "Ice Scape",
+      "variant": "forward",
+      "collisionCs": "Stage/ALAS/coli_CS_ALAS_bin.sz",
+      "compressedBytes": 273738,
+      "collisionBk": null
+    },
+    {
+      "stageId": 20,
+      "folder": "GRAN",
+      "displayName": "Canyon",
+      "variant": "forward",
+      "collisionCs": "Stage/GRAN/coli_CS_GRAN_bin.sz",
+      "compressedBytes": 325402,
+      "collisionBk": null
+    },
+    {
+      "stageId": 21,
+      "folder": "SANF",
+      "displayName": "Bay Area",
+      "variant": "forward",
+      "collisionCs": "Stage/SANF/coli_CS_SANF_bin.sz",
+      "compressedBytes": 218777,
+      "collisionBk": null
+    },
+    {
+      "stageId": 22,
+      "folder": "AMAZ",
+      "displayName": "Jungle",
+      "variant": "forward",
+      "collisionCs": "Stage/AMAZ/coli_CS_AMAZ_bin.sz",
+      "compressedBytes": 278803,
+      "collisionBk": null
+    },
+    {
+      "stageId": 23,
+      "folder": "MACH",
+      "displayName": "Lost City",
+      "variant": "forward",
+      "collisionCs": "Stage/MACH/coli_CS_MACH_bin.sz",
+      "compressedBytes": 395034,
+      "collisionBk": null
+    },
+    {
+      "stageId": 24,
+      "folder": "YOSE",
+      "displayName": "National Park",
+      "variant": "forward",
+      "collisionCs": "Stage/YOSE/coli_CS_YOSE_bin.sz",
+      "compressedBytes": 289150,
+      "collisionBk": null
+    },
+    {
+      "stageId": 25,
+      "folder": "MAYA",
+      "displayName": "Legend",
+      "variant": "forward",
+      "collisionCs": "Stage/MAYA/coli_CS_MAYA_bin.sz",
+      "compressedBytes": 369792,
+      "collisionBk": "Stage/MAYA/coli_BK_MAYA_bin.sz"
+    },
+    {
+      "stageId": 26,
+      "folder": "NEWY",
+      "displayName": "Skyscrapers",
+      "variant": "forward",
+      "collisionCs": "Stage/NEWY/coli_CS_NEWY_bin.sz",
+      "compressedBytes": 198504,
+      "collisionBk": "Stage/NEWY/coli_BK_NEWY_bin.sz"
+    },
+    {
+      "stageId": 27,
+      "folder": "PRIN",
+      "displayName": "Floral Village",
+      "variant": "forward",
+      "collisionCs": "Stage/PRIN/coli_CS_PRIN_bin.sz",
+      "compressedBytes": 381689,
+      "collisionBk": "Stage/PRIN/coli_BK_PRIN_bin.sz"
+    },
+    {
+      "stageId": 28,
+      "folder": "FLOR",
+      "displayName": "Milky Way",
+      "variant": "forward",
+      "collisionCs": "Stage/FLOR/coli_CS_FLOR_bin.sz",
+      "compressedBytes": 310145,
+      "collisionBk": "Stage/FLOR/coli_BK_FLOR_bin.sz"
+    },
+    {
+      "stageId": 29,
+      "folder": "EAST",
+      "displayName": "Giant Statues",
+      "variant": "forward",
+      "collisionCs": "Stage/EAST/coli_CS_EAST_bin.sz",
+      "compressedBytes": 365568,
+      "collisionBk": "Stage/EAST/coli_BK_EAST_bin.sz"
+    },
+    {
+      "stageId": 30,
+      "folder": "PALM_R",
+      "displayName": "(R) Palm Beach",
+      "variant": "reverse",
+      "collisionCs": "Stage/PALM_R/coli_CS_PALM_R_bin.sz",
+      "compressedBytes": 256047,
+      "collisionBk": null
+    },
+    {
+      "stageId": 31,
+      "folder": "LAKE_R",
+      "displayName": "(R) Deep Lake",
+      "variant": "reverse",
+      "collisionCs": "Stage/LAKE_R/coli_CS_LAKE_R_bin.sz",
+      "compressedBytes": 336996,
+      "collisionBk": null
+    },
+    {
+      "stageId": 32,
+      "folder": "INDU_R",
+      "displayName": "(R) Industrial Complex",
+      "variant": "reverse",
+      "collisionCs": "Stage/INDU_R/coli_CS_INDU_R_bin.sz",
+      "compressedBytes": 147840,
+      "collisionBk": null
+    },
+    {
+      "stageId": 33,
+      "folder": "ALPI_R",
+      "displayName": "(R) Alpine",
+      "variant": "reverse",
+      "collisionCs": "Stage/ALPI_R/coli_CS_ALPI_R_bin.sz",
+      "compressedBytes": 366777,
+      "collisionBk": null
+    },
+    {
+      "stageId": 34,
+      "folder": "SNOW_R",
+      "displayName": "(R) Snowy Mountain",
+      "variant": "reverse",
+      "collisionCs": "Stage/SNOW_R/coli_CS_SNOW_R_bin.sz",
+      "compressedBytes": 292901,
+      "collisionBk": null
+    },
+    {
+      "stageId": 35,
+      "folder": "CLOU_R",
+      "displayName": "(R) Cloudy Highland",
+      "variant": "reverse",
+      "collisionCs": "Stage/CLOU_R/coli_CS_CLOU_R_bin.sz",
+      "compressedBytes": 359036,
+      "collisionBk": null
+    },
+    {
+      "stageId": 36,
+      "folder": "CAST_R",
+      "displayName": "(R) Castle Wall",
+      "variant": "reverse",
+      "collisionCs": "Stage/CAST_R/coli_CS_CAST_R_bin.sz",
+      "compressedBytes": 352198,
+      "collisionBk": null
+    },
+    {
+      "stageId": 37,
+      "folder": "GHOS_R",
+      "displayName": "(R) Ghost Forest",
+      "variant": "reverse",
+      "collisionCs": "Stage/GHOS_R/coli_CS_GHOS_R_bin.sz",
+      "compressedBytes": 298494,
+      "collisionBk": null
+    },
+    {
+      "stageId": 38,
+      "folder": "FORE_R",
+      "displayName": "(R) Coniferous Forest",
+      "variant": "reverse",
+      "collisionCs": "Stage/FORE_R/coli_CS_FORE_R_bin.sz",
+      "compressedBytes": 223035,
+      "collisionBk": null
+    },
+    {
+      "stageId": 39,
+      "folder": "DESE_R",
+      "displayName": "(R) Desert",
+      "variant": "reverse",
+      "collisionCs": "Stage/DESE_R/coli_CS_DESE_R_bin.sz",
+      "compressedBytes": 285807,
+      "collisionBk": null
+    },
+    {
+      "stageId": 40,
+      "folder": "TULI_R",
+      "displayName": "(R) Tulip Garden",
+      "variant": "reverse",
+      "collisionCs": "Stage/TULI_R/coli_CS_TULI_R_bin.sz",
+      "compressedBytes": 308614,
+      "collisionBk": null
+    },
+    {
+      "stageId": 41,
+      "folder": "METR_R",
+      "displayName": "(R) Metropolis",
+      "variant": "reverse",
+      "collisionCs": "Stage/METR_R/coli_CS_METR_R_bin.sz",
+      "compressedBytes": 241749,
+      "collisionBk": null
+    },
+    {
+      "stageId": 42,
+      "folder": "RUIN_R",
+      "displayName": "(R) Ancient Ruins",
+      "variant": "reverse",
+      "collisionCs": "Stage/RUIN_R/coli_CS_RUIN_R_bin.sz",
+      "compressedBytes": 418502,
+      "collisionBk": null
+    },
+    {
+      "stageId": 43,
+      "folder": "CAPE_R",
+      "displayName": "(R) Cape Way",
+      "variant": "reverse",
+      "collisionCs": "Stage/CAPE_R/coli_CS_CAPE_R_bin.sz",
+      "compressedBytes": 245863,
+      "collisionBk": null
+    },
+    {
+      "stageId": 44,
+      "folder": "IMPE_R",
+      "displayName": "(R) Imperial Avenue",
+      "variant": "reverse",
+      "collisionCs": "Stage/IMPE_R/coli_CS_IMPE_R_bin.sz",
+      "compressedBytes": 261112,
+      "collisionBk": null
+    },
+    {
+      "stageId": 45,
+      "folder": "BEAC_R",
+      "displayName": "(R) Sunny Beach",
+      "variant": "reverse",
+      "collisionCs": "Stage/BEAC_R/coli_CS_BEAC_R_bin.sz",
+      "compressedBytes": 280903,
+      "collisionBk": null
+    },
+    {
+      "stageId": 46,
+      "folder": "SEQU_R",
+      "displayName": "(R) Big Forest",
+      "variant": "reverse",
+      "collisionCs": "Stage/SEQU_R/coli_CS_SEQU_R_bin.sz",
+      "compressedBytes": 354382,
+      "collisionBk": null
+    },
+    {
+      "stageId": 47,
+      "folder": "NIAG_R",
+      "displayName": "(R) Waterfalls",
+      "variant": "reverse",
+      "collisionCs": "Stage/NIAG_R/coli_CS_NIAG_R_bin.sz",
+      "compressedBytes": 271376,
+      "collisionBk": null
+    },
+    {
+      "stageId": 48,
+      "folder": "LASV_R",
+      "displayName": "(R) Casino Town",
+      "variant": "reverse",
+      "collisionCs": "Stage/LASV_R/coli_CS_LASV_R_bin.sz",
+      "compressedBytes": 200408,
+      "collisionBk": null
+    },
+    {
+      "stageId": 49,
+      "folder": "ALAS_R",
+      "displayName": "(R) Ice Scape",
+      "variant": "reverse",
+      "collisionCs": "Stage/ALAS_R/coli_CS_ALAS_R_bin.sz",
+      "compressedBytes": 268490,
+      "collisionBk": null
+    },
+    {
+      "stageId": 50,
+      "folder": "GRAN_R",
+      "displayName": "(R) Canyon",
+      "variant": "reverse",
+      "collisionCs": "Stage/GRAN_R/coli_CS_GRAN_R_bin.sz",
+      "compressedBytes": 361816,
+      "collisionBk": null
+    },
+    {
+      "stageId": 51,
+      "folder": "SANF_R",
+      "displayName": "(R) Bay Area",
+      "variant": "reverse",
+      "collisionCs": "Stage/SANF_R/coli_CS_SANF_R_bin.sz",
+      "compressedBytes": 223740,
+      "collisionBk": null
+    },
+    {
+      "stageId": 52,
+      "folder": "AMAZ_R",
+      "displayName": "(R) Jungle",
+      "variant": "reverse",
+      "collisionCs": "Stage/AMAZ_R/coli_CS_AMAZ_R_bin.sz",
+      "compressedBytes": 276257,
+      "collisionBk": null
+    },
+    {
+      "stageId": 53,
+      "folder": "MACH_R",
+      "displayName": "(R) Lost City",
+      "variant": "reverse",
+      "collisionCs": "Stage/MACH_R/coli_CS_MACH_R_bin.sz",
+      "compressedBytes": 399210,
+      "collisionBk": null
+    },
+    {
+      "stageId": 54,
+      "folder": "YOSE_R",
+      "displayName": "(R) National Park",
+      "variant": "reverse",
+      "collisionCs": "Stage/YOSE_R/coli_CS_YOSE_R_bin.sz",
+      "compressedBytes": 282643,
+      "collisionBk": null
+    },
+    {
+      "stageId": 55,
+      "folder": "MAYA_R",
+      "displayName": "(R) Legend",
+      "variant": "reverse",
+      "collisionCs": "Stage/MAYA_R/coli_CS_MAYA_R_bin.sz",
+      "compressedBytes": 363804,
+      "collisionBk": null
+    },
+    {
+      "stageId": 56,
+      "folder": "NEWY_R",
+      "displayName": "(R) Skyscrapers",
+      "variant": "reverse",
+      "collisionCs": "Stage/NEWY_R/coli_CS_NEWY_R_bin.sz",
+      "compressedBytes": 201487,
+      "collisionBk": null
+    },
+    {
+      "stageId": 57,
+      "folder": "PRIN_R",
+      "displayName": "(R) Floral Village",
+      "variant": "reverse",
+      "collisionCs": "Stage/PRIN_R/coli_CS_PRIN_R_bin.sz",
+      "compressedBytes": 381991,
+      "collisionBk": null
+    },
+    {
+      "stageId": 58,
+      "folder": "FLOR_R",
+      "displayName": "(R) Milky Way",
+      "variant": "reverse",
+      "collisionCs": "Stage/FLOR_R/coli_CS_FLOR_R_bin.sz",
+      "compressedBytes": 313961,
+      "collisionBk": null
+    },
+    {
+      "stageId": 59,
+      "folder": "EAST_R",
+      "displayName": "(R) Giant Statues",
+      "variant": "reverse",
+      "collisionCs": "Stage/EAST_R/coli_CS_EAST_R_bin.sz",
+      "compressedBytes": 358735,
+      "collisionBk": null
+    },
+    {
+      "stageId": 60,
+      "folder": "PALM_T",
+      "displayName": "(T) Palm Beach",
+      "variant": "time-trial",
+      "baseFolder": "PALM",
+      "collisionCs": "Stage/PALM_T/coli_CS_PALM_T_bin.sz",
+      "compressedBytes": 254518,
+      "collisionBk": null
+    },
+    {
+      "stageId": 61,
+      "folder": "BEAC_T",
+      "displayName": "(T) Sunny Beach",
+      "variant": "time-trial",
+      "baseFolder": "BEAC",
+      "collisionCs": "Stage/BEAC_T/coli_CS_BEAC_T_bin.sz",
+      "compressedBytes": 276103,
+      "collisionBk": null
+    },
+    {
+      "stageId": 62,
+      "folder": "PALM_BT",
+      "displayName": "(Night) Palm Beach",
+      "variant": "night",
+      "baseFolder": "PALM",
+      "collisionCs": "Stage/PALM_BT/coli_CS_PALM_BT_bin.sz",
+      "compressedBytes": 254518,
+      "collisionBk": null
+    },
+    {
+      "stageId": 63,
+      "folder": "BEAC_BT",
+      "displayName": "(Night) Sunny Beach",
+      "variant": "night",
+      "baseFolder": "BEAC",
+      "collisionCs": "Stage/BEAC_BT/coli_CS_BEAC_BT_bin.sz",
+      "compressedBytes": 276103,
+      "collisionBk": null
+    },
+    {
+      "stageId": 64,
+      "folder": "PALM_BR",
+      "displayName": "(R-Night) Palm Beach",
+      "variant": "reverse-night",
+      "baseFolder": "PALM",
+      "collisionCs": "Stage/PALM_BR/coli_CS_PALM_BR_bin.sz",
+      "compressedBytes": 256047,
+      "collisionBk": null
+    },
+    {
+      "stageId": 65,
+      "folder": "BEAC_BR",
+      "displayName": "(R-Night) Sunny Beach",
+      "variant": "reverse-night",
+      "baseFolder": "BEAC",
+      "collisionCs": "Stage/BEAC_BR/coli_CS_BEAC_BR_bin.sz",
+      "compressedBytes": 280903,
+      "collisionBk": null
+    }
+  ],
+  "backgroundCollision": [
+    {
+      "folder": "CAPE",
+      "path": "Stage/CAPE/coli_BK_CAPE_bin.sz",
+      "compressedBytes": 11706
+    },
+    {
+      "folder": "EAST",
+      "path": "Stage/EAST/coli_BK_EAST_bin.sz",
+      "compressedBytes": 11706
+    },
+    {
+      "folder": "FLOR",
+      "path": "Stage/FLOR/coli_BK_FLOR_bin.sz",
+      "compressedBytes": 11706
+    },
+    {
+      "folder": "MAYA",
+      "path": "Stage/MAYA/coli_BK_MAYA_bin.sz",
+      "compressedBytes": 11706
+    },
+    {
+      "folder": "NEWY",
+      "path": "Stage/NEWY/coli_BK_NEWY_bin.sz",
+      "compressedBytes": 11706
+    },
+    {
+      "folder": "PRIN",
+      "path": "Stage/PRIN/coli_BK_PRIN_bin.sz",
+      "compressedBytes": 11706
+    }
+  ],
+  "originalSurfaceRoughness": {
+    "0x000001": {
+      "roughness": 0,
+      "semanticName": "unknown",
+      "confidence": "value-confirmed/name-open"
+    },
+    "0x000002": {
+      "roughness": 0.25,
+      "semanticName": "stage-dependent water-capable surface",
+      "confidence": "behavior-confirmed/name-partial",
+      "stageOverrides": [
+        {
+          "stageIds": [
+            11,
+            41
+          ],
+          "stageName": "Metropolis",
+          "roughness": 0.73,
+          "setsWaterFlag": true
+        },
+        {
+          "stageIds": [
+            13,
+            43
+          ],
+          "stageName": "Cape Way",
+          "roughness": 0.79,
+          "setsWaterFlag": true
+        },
+        {
+          "stageIds": [
+            14,
+            44
+          ],
+          "stageName": "Imperial Avenue",
+          "roughness": 0.76,
+          "setsWaterFlag": true
+        }
+      ]
+    },
+    "0x000004": {
+      "roughness": 0.7,
+      "semanticName": "unknown rough surface",
+      "confidence": "value-confirmed/name-open"
+    },
+    "0x000008": {
+      "roughness": 0.85,
+      "semanticName": "unknown very rough surface",
+      "confidence": "value-confirmed/name-open"
+    },
+    "0x000010": {
+      "roughness": 0.9,
+      "semanticName": "unknown very rough surface",
+      "confidence": "value-confirmed/name-open"
+    },
+    "0x000080": {
+      "roughness": 0.85,
+      "semanticName": "unknown very rough surface",
+      "confidence": "value-confirmed/name-open"
+    },
+    "0x000100": {
+      "roughness": 0.45,
+      "semanticName": "unknown medium surface",
+      "confidence": "value-confirmed/name-open"
+    },
+    "0x000200": {
+      "roughness": 0.35,
+      "semanticName": "unknown mild rough surface",
+      "confidence": "value-confirmed/name-open"
+    },
+    "0x000400": {
+      "roughness": 0.3,
+      "semanticName": "unknown near-baseline surface",
+      "confidence": "value-confirmed/name-open"
+    },
+    "0x000800": {
+      "roughness": 0.35,
+      "semanticName": "unknown mild rough surface",
+      "confidence": "value-confirmed/name-open"
+    },
+    "0x001000": {
+      "roughness": 0.35,
+      "semanticName": "unknown mild rough surface",
+      "confidence": "value-confirmed/name-open"
+    },
+    "0x002000": {
+      "roughness": 0.35,
+      "semanticName": "unknown mild rough surface",
+      "confidence": "value-confirmed/name-open"
+    },
+    "0x008000": {
+      "roughness": 0.4,
+      "semanticName": "unknown medium surface",
+      "confidence": "value-confirmed/name-open"
+    },
+    "0x100000": {
+      "roughness": 0.71,
+      "semanticName": "unknown rough surface",
+      "confidence": "value-confirmed/name-open"
+    },
+    "0x200000": {
+      "roughness": 0.8,
+      "semanticName": "unknown rough surface",
+      "confidence": "value-confirmed/name-open"
+    },
+    "0x400000": {
+      "roughness": 0.9,
+      "semanticName": "junction/stage-dependent surface",
+      "confidence": "behavior-confirmed/name-open",
+      "overrides": [
+        {
+          "condition": "loadColiType != 0",
+          "roughness": 0.25
+        },
+        {
+          "stageIds": [
+            18,
+            48
+          ],
+          "stageName": "Casino Town",
+          "roughness": 0.25
+        }
+      ]
+    },
+    "0x800000": {
+      "roughness": 0.5,
+      "semanticName": "unknown medium surface",
+      "confidence": "value-confirmed/name-open"
+    }
+  },
+  "runtimeObservedRoughnessBands": {
+    "values": [
+      0.25,
+      0.35,
+      0.5,
+      0.7,
+      0.71,
+      0.76,
+      0.85
+    ],
+    "examples": [
+      "0.35->0.76 mixed then 0.76 all-wheel",
+      "0.35->0.85 mixed then 0.85 all-wheel",
+      "0.25->0.71 mixed then 0.71 all-wheel",
+      "snow samples 0.25/0.35..0.50"
+    ],
+    "caveat": "Roughness alone is not sufficient to recover surfaceMask when multiple masks share the same value."
+  },
+  "ffbUsage": {
+    "safeNow": [
+      "Use raw per-wheel surfaceMask as the identity key; keep roughness as intensity evidence.",
+      "Keep 4 wheel samples separately for curb/shoulder transitions; do not reduce identity to max roughness.",
+      "Keep loadColiType as route/junction context, not material.",
+      "Use original roughness as semantic/intensity witness, then apply separate DD-wheel tuning."
+    ],
+    "doNotDo": [
+      "Do not name 0x4/0x8/etc as grass/curb/snow until static COLI and runtime masks are correlated.",
+      "Do not use Stage folder name as the primary road material.",
+      "Do not treat Xbox rumble magnitude as direct DD-wheel torque."
+    ],
+    "telemetryNext": [
+      "stageId",
+      "roadSectionNum",
+      "curStageIdx",
+      "loadColiType",
+      "surfaceMask[4]",
+      "roughness[4]",
+      "waterFlag",
+      "wheel contact state"
+    ]
+  }
+}
