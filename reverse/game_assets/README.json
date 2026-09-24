@@ -1,5 +1,5 @@
 {
-  "schema": "outrun-shared-reverse-index-v2",
+  "schema": "outrun-shared-reverse-index-v3",
   "sourceSha": "8a312af992e4319aa5d101bfbfa97f271dd75203",
   "canonicalExeSha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
   "analyzedCorpus": {
@@ -40,7 +40,7 @@
   "stageSurfaceEvidence": {
     "semanticAlias": "EVWORK_CAR::water_flag_24C[4] -> four per-contact surfaceMask values",
     "junctionContext": "OnRoadPlace.loadColiType_0 != 0 -> is_in_bunki(); not material identity",
-    "staticFieldToRuntimeMask": "CONFIRMED: COLI0200 materialId byte; canonical PC VA 0x0043ECB8..0x0043ECC7 computes surfaceMask = 1u << materialId",
+    "staticFieldToRuntimeMask": "CONFIRMED: materialId -> surfaceMask = 1u << materialId",
     "primaryRoadMaterialIds": [
       "0x01",
       "0x14",
@@ -52,9 +52,21 @@
     "telemetrySchema": "reverse/game_assets/ffb_surface_telemetry_schema.json",
     "reproducer": "tools/reverse/analyze_stage_coli.py",
     "open": [
-      "contact index -> wheel ordering",
+      "section7 semantics",
+      "collisionFlags individual bit names",
+      "final contact index -> FL/FR/RL/RR labels",
       "physical names for non-primary material IDs",
-      "COLI sections 7/8"
-    ]
+      "surface-mask particle/sound/effect consumer semantics"
+    ],
+    "formatV3": {
+      "spatialGrid": "section0 256x256 u16 -> section1 candidate lists",
+      "geometry": "64B = 4 corners + center + u16 collisionFlags + s16 localHeadingAngle",
+      "normals": "48B = four corner normals",
+      "subtype": "section5 topology/response selector",
+      "roadSection": "section6 u16 -> OnRoadPlace.roadSectionNum",
+      "cornerLighting": "section8 4*u8 -> car lightRate"
+    },
+    "exactContactJoin": "wheelWork[i]+0x10 collisionIndex -> static COLI record -> surfaceMask",
+    "contactTopology": "0:-X/-Z, 1:+X/-Z, 2:-X/+Z, 3:+X/+Z; final FL/FR/RL/RR names OPEN"
   }
 }
