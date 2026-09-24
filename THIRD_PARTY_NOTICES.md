@@ -35,6 +35,14 @@ Role: important public reference for DirectInput wheel-FFB architecture and forc
 
 The repository retains the upstream MIT license notice. This fork does not redistribute the separate `WheelFfb.dll` toolkit from that project; the v0.1 FFB backend is implemented directly with Windows DirectInput COM.
 
+#### Boomslangnz / FFBArcadePlugin
+
+Repository: https://github.com/Boomslangnz/FFBArcadePlugin
+
+Role: comparative reverse-engineering reference for OutRun 2 Special Tours Deluxe/Lindbergh FFB event semantics and timing. The standalone FFB branch records observations from `OutRun2Real.cpp` and `OutRun2Fake.cpp`, but does not copy Lindbergh absolute addresses or plugin force-output code into the C2C runtime.
+
+License: GNU GPL version 3. No FFBArcadePlugin implementation code is incorporated by the witness/logging change; this notice attributes the public reference used by `docs/reverse/LINDBERGH_FFB_MAP.md`.
+
 ### Build dependencies
 
 The produced DLL also incorporates open-source dependencies from the upstream build, including projects fetched or linked through CMake/submodules such as SDL, SafetyHook/Zydis, spdlog, Dear ImGui, xxHash, IXWebSocket, zlib, jsoncpp, Ogg/FLAC, miniz and related support libraries.
@@ -95,6 +103,14 @@ This file is a project attribution/packaging record, not legal advice.
 역할: DirectInput 휠 FFB 구조와 포스 모델/신호 처리 아이디어의 중요한 공개 참고 자료로 사용했습니다.
 
 해당 저장소는 원본 MIT 라이선스 고지를 유지합니다. 이 포크는 그 프로젝트의 별도 `WheelFfb.dll` 툴킷을 재배포하지 않으며, v0.1 FFB 백엔드는 Windows DirectInput COM을 직접 사용해 구현했습니다.
+
+#### Boomslangnz / FFBArcadePlugin
+
+저장소: https://github.com/Boomslangnz/FFBArcadePlugin
+
+역할: OutRun 2 Special Tours Deluxe/Lindbergh의 FFB 이벤트 의미와 타이밍을 비교 역분석하기 위한 공개 참고 자료입니다. 독립 FFB 브랜치는 `OutRun2Real.cpp`, `OutRun2Fake.cpp`의 관찰 결과만 기록하며 Lindbergh 절대주소나 플러그인의 출력 구현을 C2C 런타임에 복사하지 않습니다.
+
+라이선스: GNU GPL version 3. 이번 witness/로그 변경에는 FFBArcadePlugin 구현 코드를 포함하지 않으며, `docs/reverse/LINDBERGH_FFB_MAP.md` 작성에 사용한 공개 참고 자료의 출처를 명시합니다.
 
 ### 빌드 의존성
 
