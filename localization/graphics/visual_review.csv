@@ -121,7 +121,7 @@ index,path,text_detected,action,review_status,notes
 119,textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds,yes,localize_text,visual_reviewed,
 120,textures/load/spr_sprani_selector_cvt_Exst/FD5FE04B_256x64.dds,yes_preserve,preserve_brand_song_credit,visual_reviewed,
 121,textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds,yes,localize_text,visual_reviewed,
-122,textures/load/spr_sprani_splash_cvt_xst/549D375_512x256.dds,yes,localize_text,visual_reviewed,
+122,textures/load/spr_sprani_splash_cvt_xst/549D375_512x256.dds,yes,preserve_brand_song_credit,visual_reviewed_preserve,legal/licensing credits; preserve original
 123,textures/load/spr_sprani_splash_cvt_xst/5E9B06_256x64.dds,yes_preserve,preserve_brand_song_credit,visual_reviewed,
 124,textures/load/spr_sprani_staffroll_cvt_xst/5A215D6E_1024x256.dds,yes_preserve,preserve_brand_song_credit,visual_reviewed,
 125,textures/load/spr_sprani_staffroll_cvt_xst/BD39D0F4_1024x1024.dds,yes_preserve,preserve_brand_song_credit,visual_reviewed,
