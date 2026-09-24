@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "image_base_expected": "0x00400000",
+  "functions": [
+    {
+      "name": "glyph_pair_spacing",
+      "va": "0x0042C410",
+      "rva": "0x0002C410",
+      "bytes": "51 56 8B 70 08 85 F6 74 3A 85 FF 74 36 8B 50 34"
+    },
+    {
+      "name": "string_width",
+      "va": "0x0042C480",
+      "rva": "0x0002C480",
+      "bytes": "83 EC 10 56 57 33 FF 8B F0 89 7C 24 08 8D 50 01"
+    },
+    {
+      "name": "cursor_advance",
+      "va": "0x0042C610",
+      "rva": "0x0002C610",
+      "bytes": "51 3C 0A 0F BF 15 BC 6B 95 00 89 14 24 DB 04 24"
+    },
+    {
+      "name": "single_glyph_draw",
+      "va": "0x0042C720",
+      "rva": "0x0002C720",
+      "bytes": "8B 0D A0 6B 95 00 83 EC 4C 85 C9 0F 84 E1 00 00"
+    },
+    {
+      "name": "glyph_metadata_lookup",
+      "va": "0x0042C2F0",
+      "rva": "0x0002C2F0",
+      "bytes": "8B 4C 24 08 8B C1 C1 F8 10 25 FF FF 00 00 83 F8"
+    },
+    {
+      "name": "text_id_resolver",
+      "va": "0x00465EB0",
+      "rva": "0x00065EB0",
+      "bytes": "8B 44 24 04 8B 0D 74 8D 7F 00 8B 04 81 C3"
+    }
+  ]
+}
