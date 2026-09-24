@@ -457,11 +457,21 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
     if (!car)
         clear_snow_curb_latch();
 
+    StageSurfaceContext stage{};
     if (car)
     {
-        const StageSurfaceContext stage = sample_stage_surface_context();
+        stage = sample_stage_surface_context();
         maybe_log_stage_context(stage);
+    }
 
+    const WheelFFBMath::Model ffbModel =
+        WheelFFBMath::sanitize_model(static_cast<int>(Settings::WheelFFBModel));
+
+    // The compatibility wrapper's normalized curb boost belongs to the Modern
+    // DD model only. Arcade/Hybrid/PS2 models own their surface semantics inside
+    // the core and must not be pre-shaped by the Modern DD wrapper.
+    if (car && ffbModel == WheelFFBMath::Model::ModernDD)
+    {
         const RoadSurfaceProfile surface = sample_surface_profile(car);
         const bool rawMixedSurface =
             surface.validSamples >= 2 && surface.spread >= 0.08f;
