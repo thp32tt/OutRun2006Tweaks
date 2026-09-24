@@ -65,7 +65,8 @@ if len(set(inv_paths))!=243: fail('duplicate graphics paths')
 for r in inventory:
     if not re.fullmatch(r'[0-9a-f]{64}',r.get('sha256','')): fail(f"invalid asset hash: {r.get('path')}")
 actions=Counter(r['action'] for r in visual)
-expected_actions={k:v for k,v in progress['graphics'].items() if k not in ('total_dds','visually_reviewed')}
+action_keys=('localize_text','preserve_brand_song_credit','font_pipeline','hangul_name_entry','zoom_review','no_localization')
+expected_actions={k:progress['graphics'][k] for k in action_keys}
 if dict(actions)!=expected_actions: fail(f'graphics action counts {dict(actions)} != {expected_actions}')
 
 if errors:
