@@ -1,5 +1,5 @@
 {
-  "schema_version": 6,
+  "schema_version": 7,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8,13 +8,14 @@
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
     "pass latest clean Win32 build, Localization State and Domain Isolation Guard",
-    "build/use clean K1 trace test artifact and collect runtime log",
-    "resolve IDs 96,97,279,280 from runtime menu context",
-    "continue pending_transcription graphics queue (32/80 complete)",
-    "create first Korean DDS typesetting proof while preserving source DDS format/alpha/mip behavior",
-    "continue 47 zoom reviews",
-    "prototype 9 font atlases + Hangul name-entry atlas",
-    "implement K2 Unicode-safe one-string proof then K3 Hangul glyph proof"
+    "run clean K1 trace package and collect OutRun2006Tweaks.log",
+    "run K2 ASCII resolver proof after K1 and confirm ID 0 marker",
+    "resolve mode-title IDs 96,97,279,280 from runtime menu context",
+    "continue remaining graphics transcription (49/79 complete)",
+    "in-game validate first Continue Korean DDS candidate",
+    "produce Korean artwork only after each atlas transcription/spec is reviewed",
+    "prototype K3 Hangul glyph/width path using 0x42C480 byte-loop evidence",
+    "prototype 9 font atlases + Hangul name-entry atlas"
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -31,9 +32,21 @@
     ]
   },
   "graphics_checkpoint": {
-    "transcribed_assets": 32,
-    "transcribed_segments": 153,
+    "transcribed_assets": 49,
+    "transcribed_segments": 364,
     "artwork_completed": 0,
-    "artwork_targets": 80
+    "artwork_targets": 79,
+    "preserve_brand_song_credit": 33,
+    "legal_credits_reclassified": true
+  },
+  "runtime_packages": {
+    "k1": {
+      "name": "OutRun2_Korean_Clean_K1_Trace.zip",
+      "sha256": "930a510bf8c6ffaa589da51bd805047bbfc1cef9d43076149e1fcef86899b287"
+    },
+    "k2": {
+      "name": "OutRun2_Korean_Clean_K2_ASCII_Proof.zip",
+      "sha256": "0d68692be110175bd49d4d84f926f673eb6ca09cc32b9410bac6e847755f1229"
+    }
   }
 }
