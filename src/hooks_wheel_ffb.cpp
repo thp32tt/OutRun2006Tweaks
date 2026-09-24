@@ -1071,7 +1071,7 @@ namespace
             const bool nativeTireRequested =
                 Settings::WheelFFBPhysicsSat &&
                 Settings::WheelFFBNativeTireSat &&
-                speedNorm > 0.04f;
+                speedNorm > 0.08f;
             const bool nativeTireValid =
                 nativeTireRequested && nativeFront.valid;
 
@@ -1555,6 +1555,14 @@ namespace
                     constantEffectPolar_, springEffect_ != nullptr, damperEffect_ != nullptr,
                     periodicsActive_, outputStrength, bool(Settings::WheelFFBInvertForce),
                     bool(Settings::WheelFFBInvertSpring));
+                spdlog::info(
+                    "WheelFFB NATIVE_TIRE t={} requested={} valid={} blend={} frontSlipRad={} frontAC={} frontCapacity={} frontNormalized={} nativeSat={} syntheticSat={} baseSat={} invert={}",
+                    telemetryNow, nativeTireRequested, nativeTireValid,
+                    nativeTireSatBlend_, nativeFront.slipRad,
+                    nativeFront.lateralSum, nativeFront.capacitySum,
+                    nativeFront.normalizedLateral, nativeTireSatTorque,
+                    syntheticModernSat, baseModernSelfAligningTorque,
+                    bool(Settings::WheelFFBNativeTireSatInvert));
                 spdlog::info(
                     "WheelFFB XFORCE t={} character={} raw={} finite={} range={} observed={} responsive={} fresh={} stopped={} valid={} normalized={} motionGate={} guardBlend={} nativeShare={} nativeTorque={} modernTorque={} finalSat={} mix={} candidateInvert={}",
                     telemetryNow, feedbackCharacter, xForceRaw, xForceSample.finite,

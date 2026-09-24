@@ -36,7 +36,7 @@ namespace Settings
     Setting<int> WheelFFBFeelRevision{
         "WheelFFB", "FeelRevision", 0,
         "Internal one-shot migration version for wheel FFB feel defaults.",
-        Range<int>{ 0, 8 }
+        Range<int>{ 0, 9 }
     };
 }
 
@@ -450,6 +450,32 @@ namespace
                 changed = true;
             }
 
+            if (revision < 9)
+            {
+                // 2026-09-24 R3 native-front-SAT test candidate. Whole-EXE
+                // mapping and the 2026-09-23 hardware capture confirmed the
+                // front wheel workspace/sign family well enough for a bounded
+                // R3 test, while unknown wheel hardware must remain opt-in.
+                // Keep global/native direction on the already validated R3
+                // reverse-OFF contract and enable only 10 Hz telemetry; the
+                // 60 Hz raw native capture remains user-controlled.
+                const std::string device =
+                    lower_copy(Settings::WheelFFBDeviceName.get().c_str());
+                const bool validatedR3 =
+                    device.find("r3 racing wheel") != std::string::npos ||
+                    device.find("moza r3") != std::string::npos;
+                if (validatedR3)
+                {
+                    Settings::WheelFFBNativeTireSat = true;
+                    Settings::WheelFFBNativeTireSatInvert = false;
+                    Settings::WheelFFBTelemetry = true;
+                }
+
+                Settings::WheelFFBFeelRevision = 9;
+                revision = 9;
+                changed = true;
+            }
+
             if (!changed)
                 return true;
 
@@ -461,6 +487,11 @@ namespace
                 spdlog::warn(
                     "WheelFFBFeelRetune: applied revision {} for this session but could not persist user.ini",
                     revision);
+            }
+            else if (revision >= 9)
+            {
+                spdlog::info(
+                    "WheelFFBFeelRetune: applied revision 9 (R3 native front-tyre SAT test enabled; reverse OFF; 10 Hz telemetry enabled)");
             }
             else if (revision >= 8)
             {
