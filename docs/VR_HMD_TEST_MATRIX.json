@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-09-24T23:02:00+09:00",
+  "updatedKst": "2026-09-24T23:07:00+09:00",
   "policy": "IMPLEMENTATION-FIRST + PARALLEL-HMD-MATRIX (HUD/PERF/DXVK/DX12 non-blocking)",
   "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
   "integrationBranch": "vr-d3d9ex-focus",
@@ -70,15 +70,28 @@
     {
       "slotId": "C_FLARE",
       "backend": "DX9Ex",
-      "status": "IMPLEMENT_NEXT",
-      "sourceSha": null,
+      "status": "HMD_EXPERIMENT_READY",
+      "sourceSha": "37b5272b731c31f2391994fc96bd5e0d3e9fdd6a",
       "profile": "HUD_WORLD",
       "featureFlags": [
         "LENS_FLARE_PRODUCER_TELEMETRY"
       ],
       "hypothesis": "Lens flare is a dedicated transformed 3D alpha camera-effect path and must be traced/scoped at its exact producer.",
-      "expectedObservable": "Telemetry identifies exact eye/pass/matrix ownership before any visual policy change.",
-      "blockedByOtherSlots": false
+      "expectedObservable": "VR FLARE TRACE logs exact DrawObjectAlpha caller RVA, object ID, alpha and current semantic for the 0x40CBC0 -> 0x40C9A0 producer path; rendering behavior is unchanged.",
+      "blockedByOtherSlots": false,
+      "branch": "vr-d3d9ex-candidate/FLARE-PRODUCER-TELEMETRY-C-20260924",
+      "ciRunIds": [
+        36008798863,
+        36008798872
+      ],
+      "ciResult": "SUCCESS",
+      "artifactRef": "github-actions:36008798872/artifact:10811833230",
+      "artifactDigest": "sha256:5126a2d3b2800de3164a0c2b3a379f04e1499d6b91e0fb4b11b4a70d8157584f",
+      "binarySha256": "e3686e175d1a4e40f7e58b71989ad25c0a26a87edcfb491e958fe921cff8084f",
+      "configSha256": "da1ab4c9f9aa614b8aae8afcd000122ddf77ba2113bdee3ecd8838a563be22b7",
+      "profileLibrarySha256": "872134376d3bfcea22f81d555b4af3444013482fce4afdba67dbb080f09ed843",
+      "configProfileHash": "6cab206714ecff00f7429b08b62c237a72ce6a49f580f8633aae4be3f88dd03f",
+      "note": "EXE HUD inspector and exact-SHA DX9Ex Active Validation both passed; producer telemetry only."
     },
     {
       "slotId": "D_PERF",
