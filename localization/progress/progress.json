@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T00:13:00+09:00",
+  "updated_at_kst": "2026-09-25T00:18:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -97,9 +97,16 @@
       "percent": 0,
       "completed": 0,
       "total": 80
+    },
+    "graphics_artwork_pipeline": {
+      "status": "proof_renderer_ready",
+      "percent": 15,
+      "proof_specs": 1,
+      "final_artwork_completed": 0,
+      "total": 80
     }
   },
-  "next_checkpoint": "Pass latest clean CI; collect K1 runtime trace; resolve IDs 96/97/279/280; continue pending_transcription queue and prepare first Korean DDS typesetting proof",
+  "next_checkpoint": "Latest clean CI; K1 runtime trace; resolve IDs 96/97/279/280; convert Continue proof to source-compatible DDS after format inspection; continue transcription queue",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -135,7 +142,9 @@
     "artwork_completed": 0,
     "transcribed_assets": 32,
     "transcribed_segments": 153,
-    "transcription_state_file": "localization/graphics/transcriptions.jsonl"
+    "transcription_state_file": "localization/graphics/transcriptions.jsonl",
+    "artwork_proof_specs": 1,
+    "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending"
   },
   "data_build": {
     "draft_bin_entries": 1356,
