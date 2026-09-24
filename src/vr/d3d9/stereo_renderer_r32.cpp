@@ -31,6 +31,10 @@ namespace OutRunVRStereo
         std::uint64_t R32DirectProbeCacheHits = 0;
         std::uint64_t R32DirectFenceSuccess = 0;
         std::uint64_t R32DirectFenceBudgetFallbacks = 0;
+        std::uint64_t R32DirectFenceWaitSamples = 0;
+        std::uint64_t R32DirectFencePolls = 0;
+        std::uint64_t R32DirectFenceWaitUsTotal = 0;
+        std::uint64_t R32DirectFenceWaitUsMax = 0;
         std::uint64_t R32DirectIdentityInvalidations = 0;
         std::uint64_t R32PendingFenceDrains = 0;
         std::uint64_t R32PendingFenceBlocks = 0;
@@ -64,6 +68,9 @@ namespace OutRunVRStereo
             std::uint64_t directCache = 0;
             std::uint64_t directFenceOk = 0;
             std::uint64_t directFenceFallback = 0;
+            std::uint64_t directFenceWaitSamples = 0;
+            std::uint64_t directFencePolls = 0;
+            std::uint64_t directFenceWaitUs = 0;
             std::uint64_t directBackpressure = 0;
             std::uint64_t pendingDrain = 0;
             std::uint64_t pendingBlock = 0;
@@ -685,8 +692,38 @@ namespace OutRunVRStereo
             LARGE_INTEGER start{};
             const bool highResolutionClock = qpcFrequency > 0 &&
                 QueryPerformanceCounter(&start) != FALSE;
+            const ULONGLONG fallbackStartMs = highResolutionClock ? 0 :
+                GetTickCount64();
             const ULONGLONG fallbackDeadline = highResolutionClock ? 0 :
-                GetTickCount64() + OutRunVR::R32::ProducerFenceBudgetMs;
+                fallbackStartMs + OutRunVR::R32::ProducerFenceBudgetMs;
+            std::uint64_t pollCount = 0;
+            auto recordFenceWait = [&]() noexcept {
+                if (!Settings::VRTelemetry)
+                    return;
+                std::uint64_t elapsedUs = 0;
+                if (highResolutionClock)
+                {
+                    LARGE_INTEGER now{};
+                    if (QueryPerformanceCounter(&now) != FALSE &&
+                        now.QuadPart >= start.QuadPart)
+                    {
+                        elapsedUs = static_cast<std::uint64_t>(
+                            ((now.QuadPart - start.QuadPart) * 1000000LL) /
+                            qpcFrequency);
+                    }
+                }
+                else
+                {
+                    const ULONGLONG nowMs = GetTickCount64();
+                    elapsedUs = (nowMs >= fallbackStartMs)
+                        ? (nowMs - fallbackStartMs) * 1000ULL : 0ULL;
+                }
+                ++R32DirectFenceWaitSamples;
+                R32DirectFencePolls += pollCount;
+                R32DirectFenceWaitUsTotal += elapsedUs;
+                R32DirectFenceWaitUsMax =
+                    (std::max)(R32DirectFenceWaitUsMax, elapsedUs);
+            };
             const LONGLONG budgetTicks = highResolutionClock
                 ? (qpcFrequency *
                     static_cast<LONGLONG>(OutRunVR::R32::ProducerFenceBudgetMs) +
@@ -699,17 +736,23 @@ namespace OutRunVRStereo
             if (ready == S_OK)
             {
                 if (Settings::VRTelemetry) ++R32DirectFenceSuccess;
+                recordFenceWait();
                 return true;
             }
             if (ready != S_FALSE)
+            {
+                recordFenceWait();
                 return false;
+            }
 
             for (;;)
             {
+                ++pollCount;
                 ready = query->GetData(nullptr, 0, 0);
                 if (ready == S_OK)
                 {
                     if (Settings::VRTelemetry) ++R32DirectFenceSuccess;
+                    recordFenceWait();
                     return true;
                 }
 
@@ -736,6 +779,7 @@ namespace OutRunVRStereo
                             "VR R32 D3D9Ex: producer copy fence exceeded {}ms; falling back to SBS instead of stalling up to 12ms",
                             OutRunVR::R32::ProducerFenceBudgetMs);
                     }
+                    recordFenceWait();
                     return false;
                 }
                 SwitchToThread();
@@ -947,6 +991,9 @@ namespace OutRunVRStereo
                 R32Counters.directCache = R32DirectProbeCacheHits;
                 R32Counters.directFenceOk = R32DirectFenceSuccess;
                 R32Counters.directFenceFallback = R32DirectFenceBudgetFallbacks;
+                R32Counters.directFenceWaitSamples = R32DirectFenceWaitSamples;
+                R32Counters.directFencePolls = R32DirectFencePolls;
+                R32Counters.directFenceWaitUs = R32DirectFenceWaitUsTotal;
                 R32Counters.directBackpressure = DirectTransportRingBackpressure;
                 R32Counters.pendingDrain = R32PendingFenceDrains;
                 R32Counters.pendingBlock = R32PendingFenceBlocks;
@@ -958,8 +1005,17 @@ namespace OutRunVRStereo
             if (now - R32Counters.lastLogMs < 5000)
                 return;
 
+            const std::uint64_t fenceSamples =
+                R32DirectFenceWaitSamples - R32Counters.directFenceWaitSamples;
+            const std::uint64_t fencePolls =
+                R32DirectFencePolls - R32Counters.directFencePolls;
+            const std::uint64_t fenceWaitUs =
+                R32DirectFenceWaitUsTotal - R32Counters.directFenceWaitUs;
+            const std::uint64_t fenceAvgUs =
+                fenceSamples ? fenceWaitUs / fenceSamples : 0;
+
             spdlog::info(
-                "VR R32 PERF 5s: liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},producerFenceOk={},producerBudgetFallback={},backpressure={},pendingDrain={},pendingBlock={},pendingError={}] reset[rearm={},fail={}]",
+                "VR R32 PERF 5s: liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},producerFenceOk={},producerBudgetFallback={},fenceSamples={},fencePolls={},fenceAvgUs={},fenceMaxUs={},backpressure={},pendingDrain={},pendingBlock={},pendingError={}] reset[rearm={},fail={}]",
                 R31FastWorldLiveValidations - R32Counters.liveWvp,
                 R31FastWorldValidationRejects - R32Counters.liveReject,
                 R31StateBlockRecordings - R32Counters.stateRecord,
@@ -971,6 +1027,10 @@ namespace OutRunVRStereo
                 R32DirectProbeCacheHits - R32Counters.directCache,
                 R32DirectFenceSuccess - R32Counters.directFenceOk,
                 R32DirectFenceBudgetFallbacks - R32Counters.directFenceFallback,
+                fenceSamples,
+                fencePolls,
+                fenceAvgUs,
+                R32DirectFenceWaitUsMax,
                 DirectTransportRingBackpressure - R32Counters.directBackpressure,
                 R32PendingFenceDrains - R32Counters.pendingDrain,
                 R32PendingFenceBlocks - R32Counters.pendingBlock,
@@ -990,6 +1050,9 @@ namespace OutRunVRStereo
             R32Counters.directCache = R32DirectProbeCacheHits;
             R32Counters.directFenceOk = R32DirectFenceSuccess;
             R32Counters.directFenceFallback = R32DirectFenceBudgetFallbacks;
+            R32Counters.directFenceWaitSamples = R32DirectFenceWaitSamples;
+            R32Counters.directFencePolls = R32DirectFencePolls;
+            R32Counters.directFenceWaitUs = R32DirectFenceWaitUsTotal;
             R32Counters.directBackpressure = DirectTransportRingBackpressure;
             R32Counters.pendingDrain = R32PendingFenceDrains;
             R32Counters.pendingBlock = R32PendingFenceBlocks;
