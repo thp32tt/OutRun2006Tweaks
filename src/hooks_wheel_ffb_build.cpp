@@ -70,15 +70,55 @@ void InputManager_Update();
 
 namespace
 {
-    bool is_snow_or_ice_stage_for_ffb()
+    struct StageSurfaceContext
     {
-        if (!Game::GetNowStageNum || !Game::GetStageUniqueNum)
-            return false;
+        int stageNumber = -1;
+        int uniqueStage = -1;
+        const char* name = "Unknown";
+        bool snowOrIce = false;
+        bool mask2CanMarkWater = false;
+        bool mask400000IsLowRoughness = false;
+    };
 
-        const int stageNumber = Game::GetNowStageNum(8);
-        const int uniqueStage = Game::GetStageUniqueNum(stageNumber);
-        return uniqueStage == 4 || uniqueStage == 19 ||
-               uniqueStage == 34 || uniqueStage == 49;
+    StageSurfaceContext sample_stage_surface_context()
+    {
+        StageSurfaceContext result{};
+        if (!Game::GetNowStageNum || !Game::GetStageUniqueNum)
+            return result;
+
+        result.stageNumber = Game::GetNowStageNum(8);
+        result.uniqueStage = Game::GetStageUniqueNum(result.stageNumber);
+        if (result.uniqueStage >= 0 && result.uniqueStage < 66)
+            result.name = Game::StageNames[result.uniqueStage];
+
+        // These IDs are taken from the game's own stage table and the
+        // reconstructed Xbox sub_1149C0 surface LUT.
+        result.snowOrIce =
+            result.uniqueStage == 4 || result.uniqueStage == 19 ||
+            result.uniqueStage == 34 || result.uniqueStage == 49;
+        result.mask2CanMarkWater =
+            result.uniqueStage == 11 || result.uniqueStage == 13 ||
+            result.uniqueStage == 14 || result.uniqueStage == 41 ||
+            result.uniqueStage == 43 || result.uniqueStage == 44;
+        result.mask400000IsLowRoughness =
+            result.uniqueStage == 18 || result.uniqueStage == 48;
+        return result;
+    }
+
+    int lastLoggedUniqueStage = -999;
+
+    void maybe_log_stage_context(const StageSurfaceContext& stage)
+    {
+        if (!Settings::WheelFFBDebugLog || stage.uniqueStage < 0 ||
+            stage.uniqueStage == lastLoggedUniqueStage)
+            return;
+
+        lastLoggedUniqueStage = stage.uniqueStage;
+        spdlog::info(
+            "WheelFFB STAGE: stageNumber={} unique={} name={} snowIce={} mask2CanMarkWater={} mask400000Low={}",
+            stage.stageNumber, stage.uniqueStage, stage.name,
+            stage.snowOrIce, stage.mask2CanMarkWater,
+            stage.mask400000IsLowRoughness);
     }
 
     struct RoadSurfaceProfile
@@ -86,7 +126,15 @@ namespace
         float minimum = 1.0f;
         float maximum = 0.0f;
         float spread = 0.0f;
+        float nonWaterMinimum = 1.0f;
+        float nonWaterMaximum = 0.0f;
+        unsigned int surfaceMask[4]{};
+        float wheelRoughness[4]{};
+        unsigned int validWheelMask = 0;
+        unsigned int waterWheelMask = 0;
         int validSamples = 0;
+        int nonWaterSamples = 0;
+        int collisionContext = 0;
     };
 
     RoadSurfaceProfile sample_surface_profile(EVWORK_CAR* car)
@@ -95,26 +143,52 @@ namespace
         if (!car)
             return result;
 
-        DWORD waterFlag = 0;
+        // Despite the historical EVWORK_CAR member name, water_flag_24C[] is
+        // passed by the original Xbox routine as the per-wheel surface mask.
+        // sub_1149C0 independently reports whether a given sample is one of the
+        // stage-specific water cases through its output flag.
+        result.collisionContext =
+            static_cast<int>(car->OnRoadPlace_5C.loadColiType_0);
+
         for (int i = 0; i < 4; ++i)
         {
+            result.surfaceMask[i] = car->water_flag_24C[i];
+            DWORD wheelWaterFlag = 0;
             const float roughness = static_cast<float>(sub_1149C0(
-                car->water_flag_24C[i],
-                static_cast<int>(car->OnRoadPlace_5C.loadColiType_0),
-                &waterFlag));
+                result.surfaceMask[i], result.collisionContext,
+                &wheelWaterFlag));
+            result.wheelRoughness[i] = roughness;
             if (!std::isfinite(roughness))
                 continue;
 
+            result.validWheelMask |= (1u << i);
             result.minimum = std::min(result.minimum, roughness);
             result.maximum = std::max(result.maximum, roughness);
             ++result.validSamples;
+
+            if ((wheelWaterFlag & 1u) != 0)
+            {
+                result.waterWheelMask |= (1u << i);
+            }
+            else
+            {
+                result.nonWaterMinimum =
+                    std::min(result.nonWaterMinimum, roughness);
+                result.nonWaterMaximum =
+                    std::max(result.nonWaterMaximum, roughness);
+                ++result.nonWaterSamples;
+            }
         }
 
         if (result.validSamples == 0)
         {
             result.minimum = 0.0f;
+            result.nonWaterMinimum = 0.0f;
             return result;
         }
+
+        if (result.nonWaterSamples == 0)
+            result.nonWaterMinimum = 0.0f;
 
         result.spread = std::max(0.0f, result.maximum - result.minimum);
         return result;
@@ -385,22 +459,40 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
 
     if (car)
     {
+        const StageSurfaceContext stage = sample_stage_surface_context();
+        maybe_log_stage_context(stage);
+
         const RoadSurfaceProfile surface = sample_surface_profile(car);
         const bool rawMixedSurface =
             surface.validSamples >= 2 && surface.spread >= 0.08f;
-        const bool genuinelyRough = surface.maximum >= 0.60f;
+
+        // The reconstructed Xbox LUT can mark stage-specific water as a high
+        // roughness value (0.73/0.76/0.79). Keep that signal for the core's
+        // water/splash path, but do not mistake water for a curb and apply the
+        // compatibility layer's SAT/damper unload or fixed curb amplitude.
+        const bool nonWaterRough = surface.nonWaterMaximum >= 0.60f;
+        const bool waterOnlyRough =
+            surface.waterWheelMask != 0 &&
+            surface.maximum >= 0.60f && !nonWaterRough;
+
         // Ordinary route-fork/asphalt material changes (for example 0.25/0.35)
         // are not tactile curbs. A non-snow mixed transition must include a
-        // genuinely rough material before the compatibility boost is allowed.
-        const bool mixedSurface = rawMixedSurface && genuinelyRough;
+        // genuinely rough NON-WATER material before the compatibility boost.
+        const bool mixedSurface = rawMixedSurface && nonWaterRough;
         const bool fullyRough =
-            surface.validSamples >= 2 && surface.minimum >= 0.60f;
+            surface.nonWaterSamples >= 2 &&
+            surface.nonWaterMinimum >= 0.60f;
+
         const DWORD now = GetTickCount();
-        const bool snowStage = is_snow_or_ice_stage_for_ffb();
+        const bool snowStage = stage.snowOrIce;
         const bool snowCurbHeld = update_snow_curb_latch(
             surface, snowStage, rawMixedSurface, now);
         const bool strongTactile = mixedSurface || fullyRough || snowCurbHeld;
-        const bool tactileSurface = genuinelyRough || snowCurbHeld;
+        const bool tactileSurface = nonWaterRough || snowCurbHeld;
+
+        float desiredRoadAmp = 0.0f;
+        float steeringScale = 1.0f;
+        float damperScale = 1.0f;
 
         if (tactileSurface)
         {
@@ -411,17 +503,18 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
                 std::clamp((speedNorm - 0.05f) / 0.20f, 0.0f, 1.0f);
 
             // A latched snow curb is already a positively identified surface
-            // transition. Treat it as full texture in the compatibility envelope
-            // even when its LUT scalar is <=0.30; the core receives the matching
-            // temporary roughness floor immediately before its update below.
+            // transition. Otherwise only NON-WATER roughness drives the curb
+            // compatibility envelope; stage water remains owned by the core.
             const float textureRoughness = snowCurbHeld
                 ? 1.0f
-                : std::clamp((surface.maximum - 0.30f) / 0.55f, 0.0f, 1.0f);
+                : std::clamp(
+                    (surface.nonWaterMaximum - 0.30f) / 0.55f,
+                    0.0f, 1.0f);
             const float outputStrength = std::clamp(
                 static_cast<float>(Settings::WheelFFBGlobalStrength), 0.0f, 1.5f);
             const float coreStageScale = snowStage ? 0.04f : 1.0f;
 
-            const float desiredRoadAmp = strongTactile ? 0.30f : 0.22f;
+            desiredRoadAmp = strongTactile ? 0.30f : 0.22f;
             const float envelope =
                 textureRoughness * roadSpeedGate * outputStrength * coreStageScale;
             if (envelope > 0.0005f)
@@ -438,31 +531,40 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
             }
 
             // Only an already-identified snow curb gets the core surface floor.
-            // Normal snow and ordinary asphalt still use the game's exact LUT.
+            // Normal snow, water and ordinary asphalt use the game's exact LUT.
             applyCoreSurfaceFloor = snowCurbHeld;
 
             // Keep exactly the same SAT/damper relief when the car completes the
             // transition onto a fully rough or latched snow curb/shoulder.
-            const float steeringScale = strongTactile ? 0.72f : 0.80f;
-            const float damperScale = strongTactile ? 0.55f : 0.70f;
+            steeringScale = strongTactile ? 0.72f : 0.80f;
+            damperScale = strongTactile ? 0.55f : 0.70f;
             Settings::WheelFFBSteeringWeight =
                 originalSteeringWeight * steeringScale;
             Settings::WheelFFBDamperStrength =
                 originalDamperStrength * damperScale;
             restoreTactileOverrides = true;
+        }
 
-            if (Settings::WheelFFBDebugLog &&
-                now - lastRoadCompatibilityLogTick >= 750)
-            {
-                lastRoadCompatibilityLogTick = now;
-                spdlog::info(
-                    "WheelFFB ROAD: min={:.2f} max={:.2f} spread={:.2f} mixed={} fullRough={} snow={} snowLatch={} latchMaterial={:.2f} coreFloor={} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
-                    surface.minimum, surface.maximum, surface.spread,
-                    mixedSurface, fullyRough, snowStage, snowCurbHeld,
-                    snowCurbMaterial, applyCoreSurfaceFloor, desiredRoadAmp,
-                    static_cast<float>(Settings::WheelFFBRoadTexture),
-                    steeringScale, damperScale);
-            }
+        if (Settings::WheelFFBDebugLog &&
+            (tactileSurface || surface.waterWheelMask != 0) &&
+            now - lastRoadCompatibilityLogTick >= 750)
+        {
+            lastRoadCompatibilityLogTick = now;
+            spdlog::info(
+                "WheelFFB ROAD: stage={} min={:.2f} max={:.2f} spread={:.2f} nonWaterMin={:.2f} nonWaterMax={:.2f} mixed={} fullRough={} snow={} snowLatch={} waterWheels=0x{:X} waterOnlyRough={} masks={:08X}/{:08X}/{:08X}/{:08X} rough={:.2f}/{:.2f}/{:.2f}/{:.2f} collisionCtx={} coreFloor={} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
+                stage.uniqueStage,
+                surface.minimum, surface.maximum, surface.spread,
+                surface.nonWaterMinimum, surface.nonWaterMaximum,
+                mixedSurface, fullyRough, snowStage, snowCurbHeld,
+                surface.waterWheelMask, waterOnlyRough,
+                surface.surfaceMask[0], surface.surfaceMask[1],
+                surface.surfaceMask[2], surface.surfaceMask[3],
+                surface.wheelRoughness[0], surface.wheelRoughness[1],
+                surface.wheelRoughness[2], surface.wheelRoughness[3],
+                surface.collisionContext, applyCoreSurfaceFloor,
+                desiredRoadAmp,
+                static_cast<float>(Settings::WheelFFBRoadTexture),
+                steeringScale, damperScale);
         }
     }
 
