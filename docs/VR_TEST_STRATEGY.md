@@ -8,9 +8,9 @@ This branch treats Quest 3 / VDXR runtime testing as a scarce validation gate ra
 2. Classify every change into TEST_LEVEL 0..4.
 3. Accumulate compatible LEVEL0/LEVEL1 changes behind configuration/feature boundaries.
 4. Build and statically validate affected Win32 DX9Ex game + x64 D3D11 OpenXR host only.
-5. Freeze one CORRECTNESS candidate around the evening test window when material changes exist.
-6. Ask for CONTROL or PERFORMANCE only when the evidence requires an A/B comparison.
-7. Preserve the frozen candidate while the user is testing it.
+5. Prepare one evening HMD matrix with independent slots for DX9Ex control, HUD, flare, performance, DXVK and DX12 when material work exists.
+6. Do not wait for HUD completion before building or validating PERFORMANCE, DXVK or DX12 slots.
+7. Preserve exact SHA/backend/profile identity for every slot and keep production integration serial even while HMD experiments are prepared in parallel.
 
 ## Profiles
 
@@ -19,7 +19,7 @@ This branch treats Quest 3 / VDXR runtime testing as a scarce validation gate ra
 - HUD_WORLD: current third-priority world-attached display session for rival/car markers, Heart Attack markers, world hearts/lines, lens flare, sky, smoke and skid.
 - CONTROL: conservative DX9Ex reference used only when a baseline comparison is needed.
 - CORRECTNESS: general daily correctness profile after the focused HUD sessions.
-- PERFORMANCE: performance work is deferred until HUD/display correctness is stable.
+- PERFORMANCE: active parallel track for dense-scene/frame-pacing work. It is explicitly not blocked by HUD/display correctness.
 - A_BASELINE: reproducible A/B baseline: DisableStageCulling=true, TransparencySupersampling=true, ReflectionResolution=1024.
 - B_CULLING: A with DisableStageCulling=false so VR union-FOV culling can be measured.
 - C_CULLING_NO_SSAA: B with TransparencySupersampling=false.
@@ -65,10 +65,14 @@ The :30 automation works independently on vr-d3d9ex-review. It performs adversar
 
 The main job consumes only verified evidence from the review branch.
 
+## Parallel backend/performance rule
+
+The protected R51/DX9Ex world baseline is a comparison anchor, not a serialization barrier. HUD, lens flare, dense-scene performance, DXVK and DX12/D3D9On12 development may proceed independently in parallel. A HUD regression or unresolved HUD defect must not block performance/backend implementation, build, smoke validation or preparation of an HMD test slot. Likewise, a backend failure must not block HUD work. Only production integration remains WIP=1, and replacing the protected default backend requires Quest3/VDXR parity evidence.
+
 
 ## Temporary compile-time comparison caveat
 
-Some current renderer-chain comparisons (historical P1/P2/P3/P4) are selected by CMake source composition and cannot yet be toggled safely inside one DLL. They are retained only as regression-isolation tools. The default development policy no longer requires the user to test them sequentially. Runtime/profile differences that are already safe to isolate use CONTROL/CORRECTNESS/PERFORMANCE with one binary set; renderer-chain compile variants should be retired or feature-flagged only after the DX9Ex reference path is established.
+Some current renderer-chain comparisons (historical P1/P2/P3/P4) are selected by CMake source composition and cannot yet be toggled safely inside one DLL. They are retained only as regression-isolation tools. The default development policy no longer requires the user to test them sequentially. DXVK and DX12 are also active independent backend tracks once the DX9Ex/R51 world baseline is protected; only promotion to the default backend is parity-gated. Runtime/profile differences that are already safe to isolate use CONTROL/CORRECTNESS/PERFORMANCE with one binary set; renderer-chain compile variants should be retired or feature-flagged only after the DX9Ex reference path is established.
 
 ## Scheduled support split
 
