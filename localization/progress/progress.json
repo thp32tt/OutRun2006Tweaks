@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T01:39:00+09:00",
+  "updated_at_kst": "2026-09-25T01:40:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -70,12 +70,24 @@
       "localization_state_run_id": 36017712175
     },
     "unicode_runtime": {
-      "status": "queued",
-      "percent": 10
+      "status": "k3_trace_implemented_ci_pending",
+      "percent": 35,
+      "evidence": {
+        "string_width_va": "0x42C480",
+        "pair_spacing_va": "0x42C410",
+        "cursor_advance_va": "0x42C610",
+        "glyph_draw_va": "0x42C720",
+        "glyph_metadata_va": "0x42C2F0",
+        "glyph_ascii_limit": "0x7F"
+      }
     },
     "hangul_font": {
-      "status": "queued",
-      "percent": 5
+      "status": "compact_manifest_ready",
+      "percent": 30,
+      "required_unique_hangul_syllables": 505,
+      "atlas_pages": 2,
+      "page_capacity": 256,
+      "manifest": "localization/font/hangul_glyph_manifest.json"
     },
     "packaging": {
       "status": "not_started",
@@ -112,7 +124,7 @@
       "total": 80
     }
   },
-  "next_checkpoint": "CI with JSONL integrity gate; K1 runtime log and K2 ASCII proof; resolve text IDs 96/97/279/280 and graphics index 152; implement K3 width/glyph trace scaffold; validate first Korean DDS in-game",
+  "next_checkpoint": "Pass K3 trace Win32 build; make K3 trace package; K1/K2/K3 runtime logs; resolve text IDs and graphic index 152; begin Korean atlas rendering/metrics and first in-game glyph proof",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -199,6 +211,16 @@
       "proof_text_override": true,
       "expected_id0": "[KOR-PROOF] Screen Position",
       "status": "ready_after_k1"
+    },
+    "k3": {
+      "trace_setting": "KoreanK3Trace",
+      "behavior_change": false,
+      "width_trace_rva": "0x2C480",
+      "glyph_trace_rva": "0x2C720",
+      "signatures_verified_against_uploaded_exe": true,
+      "unique_hangul_syllables": 505,
+      "compact_pages_required": 2,
+      "build_status": "ci_in_progress"
     }
   }
 }
