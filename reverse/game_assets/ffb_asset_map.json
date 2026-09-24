@@ -1,9 +1,22 @@
 {
-  "schema": "outrun-ffb-asset-map-v1",
-  "sourceSha": "8a312af992e4319aa5d101bfbfa97f271dd75203",
+  "schema": "outrun-ffb-asset-map-v2",
+  "sourceSha": "7b08c30055212334735cc55b71575c6cc57c48b1",
   "nativeContactInputs": {
-    "surfaceMask": "EVWORK_CAR::water_flag_24C[0..3]",
-    "loadColiType": "EVWORK_CAR::OnRoadPlace_5C.loadColiType_0",
+    "surfaceMask": {
+      "storage": "EVWORK_CAR::water_flag_24C[0..3]",
+      "semanticAlias": "surfaceMask[4]",
+      "confidence": "SOURCE_CONFIRMED",
+      "note": "Legacy struct field name is misleading; Xbox-derived sub_1149C0 dispatches many non-water bit masks."
+    },
+    "loadColiType": {
+      "storage": "EVWORK_CAR::OnRoadPlace_5C.loadColiType_0",
+      "semanticRole": "branch/junction collision context",
+      "confidence": "SOURCE_CONFIRMED",
+      "evidence": "EVWORK_CAR::is_in_bunki() returns loadColiType_0 != 0",
+      "materialId": false
+    },
+    "roadSectionNum": "EVWORK_CAR::OnRoadPlace_5C.roadSectionNum_8",
+    "curStageIdx": "EVWORK_CAR::OnRoadPlace_5C.curStageIdx_C",
     "roughnessFunction": "sub_1149C0"
   },
   "roughness": {
@@ -121,16 +134,78 @@
     "note": "Current DD-wheel policy scale, not recovered collision-material identity."
   },
   "collisionEvidence": {
-    "uploadedFiles": 19,
-    "uniquePayloads": 7,
+    "priorUploadedCollisionFiles": 19,
+    "priorUniquePayloads": 7,
     "formatMagic": "COLI0200",
-    "manifestStageCollisionFiles": 72,
-    "stageCollisionPayloadsPresentInBundle": false
+    "stageCorpus": {
+      "stageDirectories": 66,
+      "stageFiles": 847,
+      "stageBytesFromManifest": 296418999,
+      "collisionFiles": 72,
+      "collisionCompressedBytes": 19481268,
+      "inventory": "reverse/game_assets/stage_collision_inventory.json",
+      "uploadedStageZip": {
+        "sizeBytes": 290113621,
+        "directByteInspection": "BLOCKED_BY_EXECUTION_BACKEND_THIS_RUN"
+      }
+    },
+    "exactStaticFieldToSurfaceMask": "OPEN"
   },
   "researchChain": [
     "COLI0200 static attributes",
     "runtime contact/material flags",
     "sub_1149C0 original roughness",
     "modern DD-wheel road/slip policy"
-  ]
+  ],
+  "runtimeObservedRoughness": {
+    "values": [
+      0.25,
+      0.35,
+      0.5,
+      0.7,
+      0.71,
+      0.76,
+      0.85
+    ],
+    "transitions": [
+      "0.35 -> 0.76 mixed then 0.76 full-rough",
+      "0.35 -> 0.85 mixed then 0.85 full-rough",
+      "0.25 -> 0.71 mixed then 0.71 full-rough",
+      "snow/ice samples include 0.25/0.35..0.50"
+    ],
+    "identityWarning": "Do not infer raw surfaceMask from roughness alone because several masks share a roughness value."
+  },
+  "recommendedTelemetry": [
+    "stageId",
+    "roadSectionNum",
+    "curStageIdx",
+    "loadColiType",
+    "surfaceMaskFL",
+    "surfaceMaskFR",
+    "surfaceMaskRL",
+    "surfaceMaskRR",
+    "roughnessFL",
+    "roughnessFR",
+    "roughnessRL",
+    "roughnessRR",
+    "waterFlag",
+    "speed",
+    "roadEffectOutput"
+  ],
+  "ffbPolicy": {
+    "preservePerWheelIdentity": true,
+    "currentCoreReduction": "max roughness across four wheels",
+    "futureRecommendedFeatures": [
+      "min/max/spread",
+      "left-right mask split",
+      "front-rear transition",
+      "wheel count per raw mask"
+    ],
+    "guardrails": [
+      "Original Xbox roughness is a semantic/intensity witness, not a DD-wheel torque command.",
+      "Do not name raw masks as asphalt/curb/grass/snow until COLI static fields and runtime masks correlate.",
+      "Do not use loadColiType as a material ID.",
+      "Keep stage-name special cases until native material identity is proven, then remove only with regression evidence."
+    ]
+  }
 }
