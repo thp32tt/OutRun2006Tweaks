@@ -23,6 +23,7 @@
 #include "game_addrs.hpp"
 #include "hooks_wheel_vehicle_dynamics.hpp"
 #include "wheel_ffb_math.hpp"
+#include "wheel_ffb_ps2.hpp"
 #include "wheel_ffb_runtime.hpp"
 #include "overlay/overlay.hpp"
 
@@ -190,7 +191,7 @@ namespace Settings
 
     Setting<bool> WheelFFBUsePeriodicEffects{
         "WheelFFB", "UsePeriodicEffects", true,
-        "Use DirectInput hardware GUID_Sine effects for road texture and tire slip."
+        "Use DirectInput hardware periodic effects for road texture and tire slip (PS2 Original uses Triangle for its verified periodic type)."
     };
 
     Setting<bool> WheelFFBInvertForce{
@@ -543,8 +544,24 @@ namespace
                 WheelFFBMath::model_uses_original_condition_backbone(ffbModel);
             const bool ps2Original =
                 ffbModel == WheelFFBMath::Model::PS2OriginalExperimental;
+            const float ps2DriveFactor =
+                ps2Original ? WheelFFBPS2::drive_factor(speedRaw) : 0.0f;
             const float arcadeSpeedStrength =
                 WheelFFBMath::arcade_speed_strength(speedNorm);
+
+            // A model switch changes the required periodic waveform. Never let
+            // a live Sine object from Modern/Arcade survive into PS2 Triangle,
+            // or vice versa, even if the setting was changed outside F11.
+            if (roadTextureEffect_ &&
+                roadPeriodicIsTriangle_ != ps2Original)
+            {
+                disable_periodics();
+                periodicRecreateHoldoffUntil_ = 0;
+                updateCounter_ = 59;
+                spdlog::info(
+                    "WheelFFB: force model changed periodic waveform; recreating road effect as {}",
+                    ps2Original ? "GUID_Triangle" : "GUID_Sine");
+            }
 
             const float configuredStrength =
                 static_cast<float>(Settings::WheelFFBGlobalStrength);
@@ -737,6 +754,23 @@ namespace
             if (arcadeEffects)
                 roadAmp = 0.0f; // arcade surface codes own road vibration in these modes
 
+            if (ps2Original)
+            {
+                // Retail PS2 Type 4 is a Logitech Triangle periodic. Its raw
+                // period is 100 + 60*driveFactor. C2C does not expose the same
+                // PS2 periodic magnitude source, so keep the current per-wheel
+                // surface envelope as a provisional magnitude translator while
+                // using the verified PS2 speed factor and waveform/period.
+                const float roadSetting = std::clamp(
+                    static_cast<float>(Settings::WheelFFBRoadTexture), 0.0f, 1.0f);
+                roadAmp =
+                    textureRoughness * ps2DriveFactor * roadSetting *
+                    outputStrength;
+                roadFreq =
+                    WheelFFBPS2::triangle_frequency_hz_for_directinput(
+                        ps2DriveFactor);
+            }
+
             // Lindbergh-derived arcade reconstruction:
             // - both sides on a rough non-water surface correspond to the plugin's
             //   grass/sand sine event (observed code 0x02);
@@ -818,7 +852,7 @@ namespace
                 lastArcadeSurfaceCode_ = -1;
             }
 
-            if (!arcadeEffects &&
+            if (!arcadeEffects && !ps2Original &&
                 waterFlag && roughness > 0.7f && speedNorm > 0.70f && splashTimer_ <= 0)
             {
                 const float roadTextureScale = std::clamp(
@@ -831,7 +865,7 @@ namespace
             }
             if (splashTimer_ > 0)
             {
-                if (!arcadeEffects)
+                if (!arcadeEffects && !ps2Original)
                     roadAmp = std::max(roadAmp, splashAmp_);
                 --splashTimer_;
             }
@@ -897,11 +931,25 @@ namespace
             const float springSpeed = originalConditionBackbone
                 ? 1.0f
                 : (1.0f - 0.88f * springFade);
-            // Centering Spring is an artificial low-speed stabilizer, not a tyre
-            // grip estimator. Do not modulate it with lateral-G or slide state.
-            const float springStrength = std::clamp(
-                static_cast<float>(Settings::WheelFFBSpringStrength) * springSpeed,
-                0.0f, 1.0f);
+            const float configuredSpringStrength = std::clamp(
+                static_cast<float>(Settings::WheelFFBSpringStrength), 0.0f, 1.5f);
+            const float ps2SpringUserScale =
+                configuredSpringStrength / 0.65f;
+            const float springStrength = ps2Original
+                ? std::clamp(
+                    WheelFFBPS2::spring_coefficient_norm() * ps2SpringUserScale,
+                    0.0f, 1.0f)
+                : std::clamp(
+                    configuredSpringStrength * springSpeed, 0.0f, 1.0f);
+            const float configuredSpringSaturation = std::clamp(
+                static_cast<float>(Settings::WheelFFBSpringSaturation),
+                0.1f, 1.0f);
+            const float ps2SpringSaturation = ps2Original
+                ? std::clamp(
+                    WheelFFBPS2::spring_saturation_norm(ps2DriveFactor) *
+                        (configuredSpringSaturation / 0.775f),
+                    0.0f, 1.0f)
+                : -1.0f;
 
             const int impactAge =
                 crashImpulseTimer_ > 0
@@ -928,18 +976,34 @@ namespace
 
             if (springEffect_)
             {
+                const float springRamp =
+                    warmupScale * recreateScale * outputStrength;
                 update_spring(
                     suppressSpringForImpact
                         ? 0.0f
-                        : springStrength * warmupScale * recreateScale * outputStrength);
+                        : springStrength * springRamp,
+                    ps2Original
+                        ? ps2SpringSaturation * springRamp
+                        : -1.0f);
             }
 
             const float softwareSpringSign = Settings::WheelFFBInvertSpring
                 ? 1.0f : -1.0f;
-            const float softwareSpring =
+            float softwareSpring =
                 springEffect_
                     ? 0.0f
                     : steer * softwareSpringSign * springStrength;
+            if (ps2Original && !springEffect_)
+            {
+                // Retail Type 7 uses a coefficient larger than its dynamic
+                // saturation. Preserve that clipped condition curve in the
+                // software fallback instead of turning it into an uncapped
+                // centre spring.
+                softwareSpring = std::clamp(
+                    softwareSpring,
+                    -ps2SpringSaturation,
+                    ps2SpringSaturation);
+            }
 
             // ACC/AMS2-inspired dynamic damping. It resists steering velocity
             // rather than pulling toward centre, grows with vehicle speed, and
@@ -957,11 +1021,18 @@ namespace
             const float configuredDamperStrength = std::clamp(
                 static_cast<float>(Settings::WheelFFBDamperStrength),
                 0.0f, 1.0f);
-            const float dynamicDamperStrength = originalConditionBackbone
-                ? configuredDamperStrength
-                : std::clamp(
-                    configuredDamperStrength * dampingSpeed * damperRelease,
-                    0.0f, 1.0f);
+            const float ps2DamperUserScale =
+                configuredDamperStrength / 0.30f;
+            const float dynamicDamperStrength = ps2Original
+                ? std::clamp(
+                    WheelFFBPS2::damper_coefficient_norm(ps2DriveFactor) *
+                        ps2DamperUserScale,
+                    0.0f, 1.0f)
+                : (originalConditionBackbone
+                    ? configuredDamperStrength
+                    : std::clamp(
+                        configuredDamperStrength * dampingSpeed * damperRelease,
+                        0.0f, 1.0f));
 
             if (!Settings::WheelFFBUseHardwareDamper && damperEffect_)
             {
@@ -1284,12 +1355,20 @@ namespace
             ++updateCounter_;
             if (periodicsActive_ && (updateCounter_ % 2) == 0)
             {
-                update_periodic(roadTextureEffect_, roadState_, roadAmp * effectRampScale, roadFreq);
-                update_periodic(tireSlipEffect_, slipState_, slipAmp * effectRampScale, slipFreq);
+                update_periodic(
+                    roadTextureEffect_, roadState_,
+                    roadAmp * effectRampScale, roadFreq,
+                    roadPeriodicStrategy_,
+                    ps2Original ? "GUID_Triangle road periodic" : "GUID_Sine road periodic");
+                update_periodic(
+                    tireSlipEffect_, slipState_,
+                    slipAmp * effectRampScale, slipFreq,
+                    slipPeriodicStrategy_,
+                    "GUID_Sine tire-slip periodic");
             }
 
             if (Settings::WheelFFBUsePeriodicEffects &&
-                (!roadTextureEffect_ || !tireSlipEffect_) &&
+                !periodic_set_complete(ffbModel) &&
                 (updateCounter_ % 60) == 0 &&
                 tick_reached(GetTickCount(), periodicRecreateHoldoffUntil_))
             {
@@ -1548,13 +1627,22 @@ namespace
             manualTestFrames_ = 0;
             if (initialized_ && device_ && deviceAcquired_ && !panicStopped_)
                 zero_all_forces();
+
+            // Periodic waveform type is part of the selected force model.
+            // Recreate on every explicit model/profile transition so a Sine
+            // from Modern/Arcade cannot leak into PS2 Triangle, and so Original
+            // modes do not retain an unused Modern tire-slip object.
+            if (roadTextureEffect_ || tireSlipEffect_)
+                disable_periodics();
+            periodicRecreateHoldoffUntil_ = 0;
+            roadPeriodicStrategy_ = 1;
+            slipPeriodicStrategy_ = 1;
+
             reset_signal_state();
             reset_headroom_stats();
-            // Re-enable any hardware effect selected by the new profile on the
-            // first active gameplay tick instead of waiting up to one second.
-            // The normal warm-up ramp is already reset by reset_signal_state().
             updateCounter_ = 59;
-            spdlog::info("WheelFFB: settings/profile transition; forces zeroed and warm-up restarted");
+            spdlog::info(
+                "WheelFFB: settings/profile transition; forces zeroed, periodic model reset and warm-up restarted");
         }
 
         void service_safety()
@@ -1928,7 +2016,9 @@ namespace
             periodicsActive_ = false;
             springStrategy_ = 1;
             damperStrategy_ = 1;
-            periodicStrategy_ = 1;
+            roadPeriodicStrategy_ = 1;
+            slipPeriodicStrategy_ = 1;
+            roadPeriodicIsTriangle_ = false;
             clear_constant_live_failure();
         }
 
@@ -2715,9 +2805,14 @@ namespace
             LONG directions[1] = { 1 };
 
             const float configuredSaturation =
-                static_cast<float>(Settings::WheelFFBSpringSaturation);
+                saturationOverride >= 0.0f
+                    ? saturationOverride
+                    : static_cast<float>(Settings::WheelFFBSpringSaturation);
             const float safeSaturation = std::isfinite(configuredSaturation)
-                ? std::clamp(configuredSaturation, 0.1f, 1.0f)
+                ? std::clamp(
+                    configuredSaturation,
+                    saturationOverride >= 0.0f ? 0.0f : 0.1f,
+                    1.0f)
                 : 0.775f;
             const DWORD saturation = static_cast<DWORD>(
                 safeSaturation * static_cast<float>(DI_FFNOMINALMAX));
@@ -2775,7 +2870,7 @@ namespace
             return true;
         }
 
-        void update_spring(float strength)
+        void update_spring(float strength, float saturationOverride = -1.0f)
         {
             if (!springEffect_ || !device_ || panicStopped_)
                 return;
@@ -3028,15 +3123,25 @@ namespace
             lastDamperWriteTick_ = GetTickCount();
         }
 
-        IDirectInputEffect* create_periodic_effect(const char* label, float initialHz)
+        IDirectInputEffect* create_periodic_effect(
+            const char* label,
+            float initialHz,
+            REFGUID effectGuid,
+            const char* effectName,
+            int& updateStrategy)
         {
             if (!device_)
                 return nullptr;
+
+            bool capsKnown = false;
+            DWORD dynamicParams = 0;
             if (!query_dynamic_effect_capability(
-                    GUID_Sine, "GUID_Sine", DIEP_TYPESPECIFICPARAMS,
-                    periodicCapsKnown_, periodicDynamicParams_))
+                    effectGuid, effectName, DIEP_TYPESPECIFICPARAMS,
+                    capsKnown, dynamicParams))
             {
-                spdlog::warn("WheelFFB: GUID_Sine is not safely live-updatable; using ConstantForce vibration fallback");
+                spdlog::warn(
+                    "WheelFFB: {} is not safely live-updatable; using ConstantForce vibration fallback",
+                    effectName);
                 return nullptr;
             }
 
@@ -3049,7 +3154,8 @@ namespace
             periodic.dwMagnitude = 0;
             periodic.lOffset = 0;
             periodic.dwPhase = 0;
-            periodic.dwPeriod = static_cast<DWORD>(1000000.0f / initialHz);
+            periodic.dwPeriod = static_cast<DWORD>(
+                1000000.0f / std::clamp(initialHz, 1.0f, 100.0f));
 
             DIEFFECT effect{};
             effect.dwSize = sizeof(effect);
@@ -3065,22 +3171,37 @@ namespace
 
             IDirectInputEffect* result = nullptr;
             HRESULT hr = device_->CreateEffect(
-                GUID_Sine, &effect, &result, nullptr);
+                effectGuid, &effect, &result, nullptr);
 
             if (FAILED(hr) || !result)
             {
                 spdlog::warn(
-                    "WheelFFB: CreateEffect({}/GUID_Sine) failed (0x{:08X})",
-                    label, (unsigned)hr);
+                    "WheelFFB: CreateEffect({}/{}) failed (0x{:08X})",
+                    label, effectName, (unsigned)hr);
                 return nullptr;
             }
 
             hr = result->Start(1, 0);
             if (FAILED(hr))
-                spdlog::warn("WheelFFB: {} initial Start failed (0x{:08X})", label, (unsigned)hr);
+                spdlog::warn(
+                    "WheelFFB: {} {} initial Start failed (0x{:08X})",
+                    label, effectName, (unsigned)hr);
 
-            spdlog::info("WheelFFB: {} hardware sine created", label);
+            updateStrategy = 1;
+            spdlog::info(
+                "WheelFFB: {} hardware periodic created as {}",
+                label, effectName);
             return result;
+        }
+
+        bool periodic_set_complete(WheelFFBMath::Model model) const
+        {
+            if (!Settings::WheelFFBUsePeriodicEffects)
+                return false;
+            const bool needSlip =
+                WheelFFBMath::model_uses_modern_sat(model);
+            return roadTextureEffect_ != nullptr &&
+                (!needSlip || tireSlipEffect_ != nullptr);
         }
 
         void create_periodic_effects()
@@ -3091,24 +3212,64 @@ namespace
                 return;
             }
 
+            const WheelFFBMath::Model model =
+                WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+            const bool ps2Original =
+                model == WheelFFBMath::Model::PS2OriginalExperimental;
+            const bool needSlip =
+                WheelFFBMath::model_uses_modern_sat(model);
+
+            if (roadTextureEffect_ &&
+                roadPeriodicIsTriangle_ != ps2Original)
+            {
+                disable_periodics();
+            }
+
+            if (!needSlip && tireSlipEffect_)
+            {
+                tireSlipEffect_->Stop();
+                safe_release_effect(tireSlipEffect_, "unused tire slip periodic");
+                slipState_ = {};
+                slipPeriodicStrategy_ = 1;
+            }
+
             if (!roadTextureEffect_)
-                roadTextureEffect_ = create_periodic_effect("RoadTexture", 30.0f);
-            if (!tireSlipEffect_)
-                tireSlipEffect_ = create_periodic_effect("TireSlip", 35.0f);
+            {
+                const float initialRoadHz = ps2Original
+                    ? WheelFFBPS2::triangle_frequency_hz_for_directinput(0.0f)
+                    : 30.0f;
+                roadTextureEffect_ = create_periodic_effect(
+                    "RoadTexture",
+                    initialRoadHz,
+                    ps2Original ? GUID_Triangle : GUID_Sine,
+                    ps2Original ? "GUID_Triangle" : "GUID_Sine",
+                    roadPeriodicStrategy_);
+                roadPeriodicIsTriangle_ =
+                    roadTextureEffect_ != nullptr && ps2Original;
+            }
+
+            if (needSlip && !tireSlipEffect_)
+            {
+                tireSlipEffect_ = create_periodic_effect(
+                    "TireSlip", 35.0f,
+                    GUID_Sine, "GUID_Sine",
+                    slipPeriodicStrategy_);
+            }
 
             roadState_ = {};
             slipState_ = {};
-            periodicsActive_ =
-                roadTextureEffect_ != nullptr && tireSlipEffect_ != nullptr;
+            periodicsActive_ = periodic_set_complete(model);
 
             if (!periodicsActive_)
             {
-                // Treat the two sines atomically. A half-created pair plus the
-                // software fallback would double one signal and distort tuning.
+                // Modern/Hybrid need both road and inferred tyre-slip effects.
+                // Original Arcade/PS2 models need only their road periodic.
                 disable_periodics();
                 periodicRecreateHoldoffUntil_ = GetTickCount() + 500;
                 spdlog::warn(
-                    "WheelFFB: complete hardware periodic pair unavailable; using ConstantForce fallback for both signals");
+                    "WheelFFB: required hardware periodic set unavailable for {}; using ConstantForce fallback",
+                    WheelFFBMath::model_name(model));
             }
         }
 
@@ -3116,15 +3277,13 @@ namespace
             IDirectInputEffect*& effect,
             PeriodicState& state,
             float magnitude,
-            float frequency)
+            float frequency,
+            int& updateStrategy,
+            const char* effectName)
         {
             if (!effect || panicStopped_)
                 return;
 
-            // Very small hardware-sine magnitudes can remain audible on DD
-            // bases.  Snap them to zero, and update much more aggressively on
-            // falling magnitude so an off-road effect cannot remain latched
-            // after the car returns to asphalt.
             const float magnitudeClamped = std::isfinite(magnitude)
                 ? std::clamp(magnitude, 0.0f, 1.0f)
                 : 0.0f;
@@ -3146,7 +3305,9 @@ namespace
                  magDelta * 5 > static_cast<long>(state.lastMagnitude));
             const bool periodChanged =
                 state.lastPeriod != 0 &&
-                std::abs(static_cast<long>(period) - static_cast<long>(state.lastPeriod)) * 10 >
+                std::abs(
+                    static_cast<long>(period) -
+                    static_cast<long>(state.lastPeriod)) * 10 >
                     static_cast<long>(state.lastPeriod);
 
             const DWORD periodicNow = GetTickCount();
@@ -3161,12 +3322,16 @@ namespace
             periodic = {};
             periodic.dwMagnitude = mag;
             periodic.dwPeriod = period;
-            // DIEP_START restarts the lease. Advance phase so refreshing an
-            // unchanged envelope does not deliberately restart at phase zero.
             if (state.lastPeriod != 0)
-                state.phaseCycles = std::fmod(state.phaseCycles +
-                    double(periodicNow - state.lastWriteTick) * 1000.0 / state.lastPeriod, 1.0);
-            periodic.dwPhase = static_cast<DWORD>(state.phaseCycles * 36000.0);
+            {
+                state.phaseCycles = std::fmod(
+                    state.phaseCycles +
+                        double(periodicNow - state.lastWriteTick) *
+                            1000.0 / state.lastPeriod,
+                    1.0);
+            }
+            periodic.dwPhase =
+                static_cast<DWORD>(state.phaseCycles * 36000.0);
 
             DIEFFECT params{};
             params.dwSize = sizeof(params);
@@ -3174,38 +3339,43 @@ namespace
             params.lpvTypeSpecificParams = &periodic;
 
             DWORD flags = DIEP_TYPESPECIFICPARAMS |
-                (periodicStrategy_ == 1 ? DIEP_START : 0);
+                (updateStrategy == 1 ? DIEP_START : 0);
 
             HRESULT hr = effect->SetParameters(&params, flags);
 
-            if (periodicStrategy_ == -1)
+            if (updateStrategy == -1)
             {
                 if (SUCCEEDED(hr))
                 {
-                    periodicStrategy_ = 0;
-                    spdlog::info("WheelFFB: periodic updates work without DIEP_START");
+                    updateStrategy = 0;
+                    spdlog::info(
+                        "WheelFFB: {} periodic updates work without DIEP_START",
+                        effectName);
                 }
                 else
                 {
                     hr = effect->SetParameters(
-                        &params, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+                        &params,
+                        DIEP_TYPESPECIFICPARAMS | DIEP_START);
                     if (SUCCEEDED(hr))
                     {
-                        periodicStrategy_ = 1;
-                        spdlog::info("WheelFFB: periodic driver requires DIEP_START");
+                        updateStrategy = 1;
+                        spdlog::info(
+                            "WheelFFB: {} periodic driver requires DIEP_START",
+                            effectName);
                     }
                 }
             }
 
             if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
             {
-                if (!reacquire_after_input_loss("GUID_Sine periodic", hr))
+                if (!reacquire_after_input_loss(effectName, hr))
                     return;
                 hr = effect->SetParameters(
                     &params, DIEP_TYPESPECIFICPARAMS | DIEP_START);
                 if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
                 {
-                    note_device_failure("GUID_Sine periodic retry", hr);
+                    note_device_failure(effectName, hr);
                     return;
                 }
             }
@@ -3213,10 +3383,11 @@ namespace
             if (FAILED(hr))
             {
                 spdlog::warn(
-                    "WheelFFB: periodic update failed (0x{:08X}); falling back to ConstantForce vibration",
-                    (unsigned)hr);
+                    "WheelFFB: {} periodic update failed (0x{:08X}); falling back to ConstantForce vibration",
+                    effectName, (unsigned)hr);
                 disable_periodics();
-                periodicRecreateHoldoffUntil_ = GetTickCount() + 500;
+                periodicRecreateHoldoffUntil_ =
+                    GetTickCount() + 500;
                 return;
             }
 
@@ -3239,6 +3410,9 @@ namespace
             roadState_ = {};
             slipState_ = {};
             periodicsActive_ = false;
+            roadPeriodicIsTriangle_ = false;
+            roadPeriodicStrategy_ = 1;
+            slipPeriodicStrategy_ = 1;
         }
 
         void record_graph_sample(float rawStructural, float softLimited, float postSlew, float finalOutput)
@@ -3961,12 +4135,12 @@ namespace
         bool constantCapsKnown_ = false;
         bool springCapsKnown_ = false;
         bool damperCapsKnown_ = false;
-        bool periodicCapsKnown_ = false;
         DWORD constantDynamicParams_ = 0;
         DWORD springDynamicParams_ = 0;
         DWORD damperDynamicParams_ = 0;
-        DWORD periodicDynamicParams_ = 0;
-        int periodicStrategy_ = 1; // Explicitly restart sine effects on every update.
+        bool roadPeriodicIsTriangle_ = false;
+        int roadPeriodicStrategy_ = 1;
+        int slipPeriodicStrategy_ = 1;
         int springStrategy_ = -1;
         int damperStrategy_ = -1;
 
