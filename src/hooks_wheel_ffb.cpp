@@ -1231,6 +1231,7 @@ namespace
             // let a wall hit, gear thunk, startup ramp or nearly-stopped frame
             // teach the gain recommendation the wrong lesson.
             const bool headroomEligible =
+                modernStructural &&
                 crashImpulseTimer_ <= 0 && gearShiftTimer_ <= 0 &&
                 warmupScale >= 0.999f && recreateScale >= 0.999f &&
                 speedNorm > 0.08f;
