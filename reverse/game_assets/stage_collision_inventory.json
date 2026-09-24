@@ -962,5 +962,52 @@
         "roughness": 0.25
       }
     ]
+  },
+  "collisionSizeStatistics": {
+    "courseSurfaceCount": 66,
+    "courseSurfaceCompressedBytes": 19411032,
+    "backgroundCount": 6,
+    "backgroundCompressedBytes": 70236,
+    "totalCollisionCount": 72,
+    "totalCollisionCompressedBytes": 19481268,
+    "courseSurfaceMeanBytes": 294107,
+    "courseSurfaceMedianBytes": 284225,
+    "smallest": [
+      {
+        "folder": "INDU",
+        "bytes": 144574
+      },
+      {
+        "folder": "INDU_R",
+        "bytes": 147840
+      },
+      {
+        "folder": "LASV",
+        "bytes": 192737
+      },
+      {
+        "folder": "NEWY",
+        "bytes": 198504
+      }
+    ],
+    "largest": [
+      {
+        "folder": "RUIN",
+        "bytes": 430952
+      },
+      {
+        "folder": "RUIN_R",
+        "bytes": 418502
+      },
+      {
+        "folder": "MACH_R",
+        "bytes": 399210
+      },
+      {
+        "folder": "MACH",
+        "bytes": 395034
+      }
+    ],
+    "warning": "Compressed size is only a complexity/storage clue; it is not evidence of road material type or number of surface classes."
   }
 }
