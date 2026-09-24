@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-09-24T22:47:00+09:00",
-  "policy": "IMPLEMENTATION-FIRST + EVENING-HMD-MATRIX",
+  "updatedKst": "2026-09-24T22:57:00+09:00",
+  "policy": "IMPLEMENTATION-FIRST + PARALLEL-HMD-MATRIX (HUD/PERF/DXVK/DX12 non-blocking)",
   "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
   "integrationBranch": "vr-d3d9ex-focus",
   "productionIntegrationWip": 1,
@@ -28,51 +28,89 @@
   "slots": [
     {
       "slotId": "A_CONTROL",
+      "backend": "DX9Ex",
       "status": "BUILD_VERIFIED_IDENTITY_PENDING",
       "sourceSha": "27f4ad958cf965f33bc6791395dd77ca1af7fb42",
       "profile": "CONTROL",
       "featureFlags": [],
-      "hypothesis": "Protected R51-equivalent runtime behavior is preserved on the current project tree.",
+      "hypothesis": "Protected R51-equivalent DX9Ex runtime behavior is preserved on the current project tree.",
       "expectedObservable": "Road/background/vehicle stereo and startup/gameplay remain at R51 level; existing HUD defects may remain.",
-      "binarySha256": null,
-      "configProfileHash": null,
       "artifactRef": "github-actions:36007124220/artifact:10811237291",
       "artifactDigest": "sha256:d3b91d61661b78bdcb27a9dc2c9547f21881375a1bc745d866d87a72d260c516",
-      "integrationSha": "060e2ae5ff78503b41d8a38980843dd5003e43bb",
-      "note": "Candidate exact-SHA CI and package passed. BinarySha256/configProfileHash must be filled from frozen evening package before HMD_EXPERIMENT_READY."
+      "integrationSha": "060e2ae5ff78503b41d8a38980843dd5003e43bb"
     },
     {
       "slotId": "B_HUD",
+      "backend": "DX9Ex",
       "status": "IMPLEMENT_NEXT",
       "sourceSha": null,
-      "profile": "HUD",
+      "profile": "HUD_SCREEN",
       "featureFlags": [
         "HUD_SEMANTIC_LIFETIME_EXPERIMENT"
       ],
       "hypothesis": "Exact producer/node semantic ownership must be available at the relevant VS/c64 boundary; failed 8d21824f candidate must not be recreated unchanged.",
-      "expectedObservable": "HUD diplopia/head-lock changes without altering protected world stereo."
+      "expectedObservable": "HUD diplopia/head-lock changes without altering protected world stereo.",
+      "blockedByOtherSlots": false
     },
     {
       "slotId": "C_FLARE",
+      "backend": "DX9Ex",
       "status": "IMPLEMENT_NEXT",
       "sourceSha": null,
-      "profile": "FLARE",
+      "profile": "HUD_WORLD",
       "featureFlags": [
         "LENS_FLARE_PRODUCER_TELEMETRY"
       ],
       "hypothesis": "Lens flare is a dedicated transformed 3D alpha camera-effect path and must be traced/scoped at its exact producer.",
-      "expectedObservable": "Telemetry identifies exact eye/pass/matrix ownership before any visual policy change."
+      "expectedObservable": "Telemetry identifies exact eye/pass/matrix ownership before any visual policy change.",
+      "blockedByOtherSlots": false
     },
     {
       "slotId": "D_PERF",
+      "backend": "DX9Ex",
       "status": "IMPLEMENT_NEXT",
       "sourceSha": null,
       "profile": "PERFORMANCE",
       "featureFlags": [
-        "DENSE_SCENE_PERF_TELEMETRY"
+        "DENSE_SCENE_PERF_TELEMETRY",
+        "FRAME_BUDGET_TELEMETRY"
       ],
-      "hypothesis": "Dense-scene loss must first be localized to draw amplification/copies/waits/resource churn/frame cadence.",
-      "expectedObservable": "Per-frame counters distinguish the dominant measured bottleneck without changing stereo behavior."
+      "hypothesis": "Dense-scene loss must be localized to draw amplification/copies/waits/resource churn/frame cadence and optimized independently of HUD completion.",
+      "expectedObservable": "Per-frame counters identify dominant cost; optimization candidates can be built/tested while HUD remains open.",
+      "blockedByHud": false
+    },
+    {
+      "slotId": "E_DXVK",
+      "backend": "DXVK",
+      "status": "IMPLEMENT_NEXT",
+      "sourceSha": null,
+      "profile": "PERFORMANCE",
+      "backendMode": "dxvk-safe",
+      "followupMode": "dxvk",
+      "featureFlags": [
+        "DXVK_SAFE_FIRST",
+        "DXVK_MULTIVIEW_AFTER_SAFE"
+      ],
+      "hypothesis": "The x86 DXVK path can be restored as a repeatable backend while preserving the protected R51 world contract; SAFE compatibility is validated before multiview optimization.",
+      "expectedObservable": "DXVK initialization/reset/gameplay/VR transport evidence with explicit backend identity; if SAFE is viable, continue immediately to multiview performance testing.",
+      "blockedByHud": false,
+      "promotionGate": "May be built and HMD-tested now; default-backend promotion still requires R51 parity."
+    },
+    {
+      "slotId": "F_DX12",
+      "backend": "DX12/D3D9On12",
+      "status": "IMPLEMENT_NEXT",
+      "sourceSha": null,
+      "profile": "PERFORMANCE",
+      "backendMode": "dx12",
+      "featureFlags": [
+        "D3D9ON12_STRICT",
+        "DX12_RESOURCE_COMPAT_DIAGNOSTICS"
+      ],
+      "hypothesis": "The known CreateDevice 0x8876086C/resource-compatibility boundary can be isolated without changing R51 world/HUD ownership.",
+      "expectedObservable": "Deterministic D3D9On12 device/resource diagnostics, then successful startup/render/VR transport if compatibility blockers are removed.",
+      "blockedByHud": false,
+      "promotionGate": "May be built and HMD-tested now; default-backend promotion still requires R51 parity."
     }
   ],
   "loggingContract": {
@@ -89,5 +127,15 @@
     ],
     "manualLogRenameRequired": false,
     "singleFinalCollectorZip": true
-  }
+  },
+  "nonBlockingRule": "HUD/FLARE work may continue, but it must never block PERFORMANCE, DXVK or DX12 implementation/build/test preparation.",
+  "testOrderRecommendation": [
+    "A_CONTROL",
+    "D_PERF",
+    "E_DXVK",
+    "F_DX12",
+    "B_HUD",
+    "C_FLARE"
+  ],
+  "testOrderNote": "Order is for efficient user testing only, not a dependency chain. Backend/performance development continues even if HUD/FLARE remains unresolved."
 }
