@@ -1,5 +1,5 @@
 {
-  "schema": "outrun-ffb-asset-map-v3",
+  "schema": "outrun-ffb-asset-map-v4",
   "sourceSha": "35c5b82e30d583c3a961260e81b5d9827f1bb720",
   "nativeContactInputs": {
     "surfaceMask": {
@@ -17,7 +17,25 @@
     },
     "roadSectionNum": "EVWORK_CAR::OnRoadPlace_5C.roadSectionNum_8",
     "curStageIdx": "EVWORK_CAR::OnRoadPlace_5C.curStageIdx_C",
-    "roughnessFunction": "sub_1149C0"
+    "roughnessFunction": "sub_1149C0",
+    "contactCollisionIndex": {
+      "storage": "wheelWork[i]+0x10; wheelWork pointer array VA 0x0082EA38",
+      "confidence": "EXE_CONFIRMED",
+      "note": "Exact COLI collisionIndex selected by RVA 0x0003DB60 for contact i."
+    },
+    "bodyCollisionIndex": {
+      "storage": "EVWORK_CAR+0x230",
+      "confidence": "EXE_CONFIRMED"
+    },
+    "bodySurfaceMask": {
+      "storage": "EVWORK_CAR+0x248",
+      "confidence": "EXE_CONFIRMED"
+    },
+    "collisionFlags": {
+      "storage": "EVWORK_CAR+0x25C",
+      "source": "selected geometry record +0x3C u16",
+      "confidence": "EXE_CONFIRMED"
+    }
   },
   "roughness": {
     "0x000001": {
@@ -145,7 +163,7 @@
     "exactStaticFieldToSurfaceMask": "CONFIRMED",
     "formula": "surfaceMask = 1u << materialId",
     "exeAnchor": "VA 0x0043ECB8..0x0043ECC7",
-    "geometry": "64-byte record = vec3 corner[4] + vec3 center + u32 flags",
+    "geometry": "64-byte record = vec3 corner[4] + vec3 center + u16 collisionFlags + s16 localHeadingAngle",
     "cornerNormals": "48-byte record = vec3 normal[4]",
     "primaryRoadMaterialIds": [
       1,
@@ -153,7 +171,15 @@
       22,
       23
     ],
-    "deepMap": "reverse/game_assets/stage_coli_ffb_map.json"
+    "deepMap": "reverse/game_assets/stage_coli_ffb_map.json",
+    "spatialGrid": {
+      "layout": "256x256 u16 at section0; each cell points (u16 units) into section1 candidate list",
+      "helper": "RVA 0x0003BB40: collision-set-local cell = clamp(int((coord+3072)/6),0,255)",
+      "validation": "66/66 files: referenced candidate lists bounds-valid; max observed list length 113"
+    },
+    "collisionSubtype": "section5 byte; low nibble is collision topology/response selector via VA 0x005E0DE0, not material",
+    "roadSection": "section6 u16 -> EVWORK_CAR::OnRoadPlace_5C.roadSectionNum_8",
+    "cornerLighting": "section8 4*u8 per record -> 1/255 normalized corner lighting/intensity -> EVWORK_CAR::lightRate_58; not FFB material"
   },
   "researchChain": [
     "COLI0200 static attributes",
@@ -184,8 +210,12 @@
     "roadSectionNum",
     "curStageIdx",
     "loadColiType",
+    "bodyCollisionIndex",
+    "bodySurfaceMask",
+    "contactCollisionIndex[0..3]",
     "surfaceMask[0..3]",
     "derivedMaterialId[0..3]",
+    "static collisionFlags/localHeading/subtype/roadSection by collisionIndex",
     "roughness[0..3]",
     "waterFlag",
     "speed",
@@ -203,7 +233,14 @@
       "Do not assign FL/FR/RL/RR names until contact ordering is proven.",
       "Do not assign physical names to non-primary material IDs without runtime correlation.",
       "Keep original stage exceptions in sub_1149C0 where the game intentionally uses stage context."
-    ]
+    ],
+    "level1RegressionRanges": {
+      "SnowyMountainOrdinaryRoad": "stage 4 roadSection 132-203 -> materialId 0x01 / mask 0x2",
+      "IceScape": "stage 19/49 primary roadSection 0-620 -> materialId 0x17 / mask 0x800000",
+      "DeepLakeRoughStrip": "stage 1 roadSection 419-458 -> materialId 0x14 / mask 0x100000",
+      "TulipRoughStrip": "stage 10 roadSection 54-70 -> materialId 0x14 / mask 0x100000",
+      "FloralVillageRoughStrip": "stage 27 roadSection 510-533 -> materialId 0x14 / mask 0x100000"
+    }
   },
   "roughnessToMaskCandidates": {
     "0.00": [
@@ -296,5 +333,21 @@
       "nextPcReverseStep": "CLOSED for material mask path: canonical PC EXE now proves materialId -> surfaceMask and the four EVWORK_CAR contact writes.",
       "warning": "Xbox function addresses are evidence anchors only and must not be reused as PC addresses."
     }
+  },
+  "contactTopology": {
+    "status": "PARTIAL_GEOMETRY_CONFIRMED",
+    "localOrder": [
+      "0:-X/-Z side",
+      "1:+X/-Z side",
+      "2:-X/+Z side",
+      "3:+X/+Z side"
+    ],
+    "evidence": "0x46BBF0 returns per-car contact geometry; 0x4A58EC copies vec3 to EVWORK_CAR::vector_130[i]",
+    "finalWheelNames": "OPEN"
+  },
+  "nextResearch": {
+    "key": "SURFACE-MASK-EFFECT-CONSUMERS-001",
+    "goal": "Map aggregate/native surface-mask consumers to particle/sound/effect semantics before assigning human names to non-primary materials.",
+    "currentEvidence": "Several routines OR/test contact masks, but inspected examples also participate in gameplay/stat logic; no particle/sound identity is yet proven."
   }
 }
