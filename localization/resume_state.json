@@ -1,5 +1,5 @@
 {
-  "schema_version": 9,
+  "schema_version": 10,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,15 +7,13 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "pass latest Localization State, Domain Isolation Guard and Win32 build",
-    "package clean K3 trace build when CI succeeds",
-    "collect K1 runtime trace log",
-    "run K2 ASCII resolver proof",
-    "run K3 width/glyph trace",
-    "resolve text IDs 96,97,279,280 from runtime menu context",
-    "generate deterministic artwork specs for the 79 fully transcribed atlases",
-    "validate Continue Korean DDS candidate in game",
-    "render compact two-page 505-syllable Hangul atlas and metrics for K3 proof"
+    "wait for/verify one Win32 build containing the K3 trace source",
+    "package K3 trace build with KoreanTrace=true and KoreanK3Trace=true but no game EXE",
+    "collect K1/K2/K3 runtime logs",
+    "resolve text IDs 96,97,279,280 using actual mode-screen context",
+    "reuse stock text batching path for K3-A four-glyph Korean render proof",
+    "in-game validate 7 graphics DDS proof candidates",
+    "expand deterministic artwork candidates from the 79-item artwork plan"
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -34,9 +32,9 @@
   "graphics_checkpoint": {
     "transcribed_assets": 79,
     "transcribed_segments": 674,
-    "artwork_completed": 0,
     "artwork_targets": 79,
-    "blocked_context_indices": []
+    "proof_candidates": 7,
+    "artwork_completed": 0
   },
   "runtime_packages": {
     "k1": {
@@ -47,5 +45,16 @@
       "name": "OutRun2_Korean_Clean_K2_ASCII_Proof.zip",
       "sha256": "0d68692be110175bd49d4d84f926f673eb6ca09cc32b9410bac6e847755f1229"
     }
+  },
+  "k3_checkpoint": {
+    "unique_hangul_syllables": 505,
+    "atlas_pages": 2,
+    "local_atlas_proof_ready": true,
+    "trace_code_present": true,
+    "source_build_validation": "pending",
+    "upper_draw_loop_va": "0x42CCE0",
+    "byte_loop_va": "0x42CD30",
+    "glyph_draw_va": "0x42C720",
+    "batch_submit_va": "0x42CFE0"
   }
 }
