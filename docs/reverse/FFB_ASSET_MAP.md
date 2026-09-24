@@ -63,27 +63,41 @@ The current fork additionally derives:
 
 These should be correlated against native material/contact state before adding new synthetic cues.
 
-## 4. Collision assets — CONFIRMED / OPEN semantics
+## 4. Collision assets and Stage corpus — CONFIRMED inventory / OPEN field semantics
 
-Nineteen uploaded collision files inflate to a container with magic `COLI0200`. They represent 7 unique payload hashes in this subset; many BK files are byte-identical placeholder/common payloads.
+The earlier non-Stage sample established the `COLI0200` container family. The full installation manifest now gives a complete Stage inventory:
 
-The full installation manifest lists **72 `Stage/.../coli_*` files**, including stage-specific `coli_CS_*` data that was not included in the current uploaded asset archives.
+- 847 files under `Stage/`;
+- 66 stage directories/variants;
+- 72 collision assets = 66 main `coli_CS_*` files + 6 `coli_BK_*` files;
+- 19,481,268 bytes of compressed collision data.
 
-Observed COLI files have a stable header family beginning with:
+The supplied `Stage.zip` is 290,113,621 bytes and was received/materialized for analysis. During this run the execution backend failed on raw ZIP access, so the newly uploaded Stage payload has **not** yet been used to claim any per-triangle/material field semantics. The authoritative stage/file inventory is preserved in `reverse/game_assets/stage_collision_inventory.json`.
+
+Observed COLI containers have a stable family beginning with:
 
 - total/payload-size field;
 - ASCII `COLI0200`;
 - counts and multiple in-file offsets;
-- ASCII marker equivalent to `NEW COLLFMT` in the early header area.
+- early `NEW COLLFMT` marker.
 
-Exact material/triangle field meanings are still **OPEN**. No field should be labeled `surfaceMask` merely because values resemble the runtime flag.
+Exact COLI record-field -> runtime `surfaceMask` mapping remains **OPEN**.
+
+### Correct runtime semantics
+
+For FFB/reverse-analysis purposes, the legacy `EVWORK_CAR::water_flag_24C[4]` field should be treated as a **per-wheel surfaceMask[4]**. The Xbox-derived roughness routine dispatches many non-water masks through it.
+
+Conversely, `OnRoadPlace_5C.loadColiType_0` is not a proven material ID. Current source defines `is_in_bunki()` as `loadColiType_0 != 0`, so it is route/branch/junction collision context.
+
+The detailed evidence, stage-specific exceptions and telemetry design are in `docs/reverse/STAGE_SURFACE_FFB_MAP.md`.
 
 ## 5. FFB research plan enabled by the shared KB
 
-1. Obtain representative `Stage/.../coli_CS_*_bin.sz` files for asphalt, grass, snow/ice, water-edge and wall scenes.
-2. Parse COLI sections and cluster per-face/per-region attribute words.
-3. Add read-only runtime tracing at the point that populates `OnRoadPlace_5C` and `water_flag_24C[]`.
-4. Correlate static COLI attributes with runtime `surfaceMask/loadColiType` and `sub_1149C0` output.
-5. Replace stage-name special cases only when a native material/contact semantic is proven.
+1. Run the shared analyzer over the supplied Stage tree when raw execution access is available; record inflated COLI hashes/header/offset metadata.
+2. Cluster anonymous per-face/per-region candidate fields across SNOW/ALAS/PALM/METR/CAPE/IMPE/LASV and forward/reverse pairs.
+3. Add read-only runtime telemetry for `stageId, roadSectionNum, curStageIdx, loadColiType, surfaceMask[4], roughness[4]`.
+4. Correlate driven locations and mask transitions with static COLI candidate values.
+5. Assign semantic material names only after that correlation.
+6. Replace stage-name FFB special cases only when native material/contact identity is proven and regression-tested.
 
-This can improve road texture, snow/ice behavior, curb/grass distinction and water/splash cues while retaining a modern DD-wheel force model.
+The FFB layer should preserve four-wheel material identity instead of reducing everything to one max-roughness value when implementing curb/shoulder transitions.
