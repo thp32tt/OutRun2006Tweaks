@@ -31,3 +31,22 @@ The tool intentionally refuses records that contain multiple/special payload seg
 ## Important
 
 Creating a BIN with Korean text does not make the game display Hangul. The stock executable reduces UTF-16LE characters to one byte before the existing glyph renderer, and the stock font atlas does not contain Hangul. Runtime/font work is tracked in `docs/KOREAN_LOCALIZATION.md`.
+
+## Runtime trace analysis
+
+After a K1/K2/K3 test, analyze the game log with:
+
+```bash
+python tools/localization/analyze_korean_trace.py OutRun2006Tweaks.log \
+  --json localization_work/trace.json \
+  --markdown localization_work/trace.md
+```
+
+The analyzer extracts:
+- observed text IDs and K2 proof override,
+- context-sensitive IDs 96/97/279/280,
+- K3 width strings and high-bit detection,
+- observed glyph bytes,
+- active font handle/texture/cell/scale/spacing state.
+
+This is the preferred input to K3-A implementation decisions.
