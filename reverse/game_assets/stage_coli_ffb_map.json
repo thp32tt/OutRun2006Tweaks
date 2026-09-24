@@ -1,0 +1,792 @@
+{
+  "schema": "outrun-stage-coli-ffb-summary-v2",
+  "source": {
+    "file": "Stage.zip",
+    "sizeBytes": 290113621,
+    "sha256": "385a5be540d87139c065bb5d62899767ca57c9a26950f7c2819235aa1448e6f6"
+  },
+  "canonicalExeSha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+  "corpus": {
+    "collisionFiles": 72,
+    "coli0200": 66,
+    "legacyColi0105": 6,
+    "materialIdsObserved": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      14,
+      16,
+      17,
+      18,
+      19,
+      20,
+      22,
+      23,
+      24,
+      25
+    ],
+    "primaryRoadMaterialIds": [
+      1,
+      20,
+      22,
+      23
+    ]
+  },
+  "format": {
+    "offsetBaseBytes": 4,
+    "materialArray": {
+      "recordStride": 1,
+      "confirmed": true
+    },
+    "geometry": {
+      "recordStride": 64,
+      "layout": "vec3 corner[4] + vec3 center + u32 flags",
+      "confirmed": true
+    },
+    "cornerNormals": {
+      "recordStride": 48,
+      "layout": "vec3 normal[4]",
+      "confirmed": true
+    },
+    "collisionSubtype": {
+      "recordStride": 1,
+      "semanticNames": "OPEN"
+    },
+    "roadSectionIndex": {
+      "recordStride": 2,
+      "comparison": "OnRoadPlace::roadSectionNum"
+    },
+    "primaryRoadCollisionCount": {
+      "fileOffset": "0x10",
+      "nameIsDescriptive": true
+    }
+  },
+  "runtimeContract": {
+    "collisionSurfaceQuery": {
+      "rva": "0x0003DB60",
+      "va": "0x0043EB60"
+    },
+    "materialToMask": {
+      "va": "0x0043ECB8..0x0043ECC7",
+      "formula": "surfaceMask = 1u << materialId"
+    },
+    "contactMaskWrites": [
+      "EVWORK_CAR+0x24C",
+      "EVWORK_CAR+0x250",
+      "EVWORK_CAR+0x254",
+      "EVWORK_CAR+0x258"
+    ],
+    "contactOrder": "OPEN"
+  },
+  "materialCatalog": [
+    {
+      "materialId": 1,
+      "surfaceMask": "0x00000002",
+      "allRecords": 81936,
+      "primaryRoadRecords": 81936,
+      "defaultNativeRoughness": 0.25
+    },
+    {
+      "materialId": 2,
+      "surfaceMask": "0x00000004",
+      "allRecords": 46816,
+      "primaryRoadRecords": 0,
+      "defaultNativeRoughness": 0.7
+    },
+    {
+      "materialId": 3,
+      "surfaceMask": "0x00000008",
+      "allRecords": 19947,
+      "primaryRoadRecords": 0,
+      "defaultNativeRoughness": 0.85
+    },
+    {
+      "materialId": 4,
+      "surfaceMask": "0x00000010",
+      "allRecords": 10903,
+      "primaryRoadRecords": 0,
+      "defaultNativeRoughness": 0.9
+    },
+    {
+      "materialId": 5,
+      "surfaceMask": "0x00000020",
+      "allRecords": 31107,
+      "primaryRoadRecords": 0,
+      "defaultNativeRoughness": 0.31
+    },
+    {
+      "materialId": 7,
+      "surfaceMask": "0x00000080",
+      "allRecords": 6765,
+      "primaryRoadRecords": 0,
+      "defaultNativeRoughness": 0.85
+    },
+    {
+      "materialId": 8,
+      "surfaceMask": "0x00000100",
+      "allRecords": 2556,
+      "primaryRoadRecords": 0,
+      "defaultNativeRoughness": 0.45
+    },
+    {
+      "materialId": 9,
+      "surfaceMask": "0x00000200",
+      "allRecords": 1184,
+      "primaryRoadRecords": 0,
+      "defaultNativeRoughness": 0.35
+    },
+    {
+      "materialId": 10,
+      "surfaceMask": "0x00000400",
+      "allRecords": 5173,
+      "primaryRoadRecords": 0,
+      "defaultNativeRoughness": 0.3
+    },
+    {
+      "materialId": 11,
+      "surfaceMask": "0x00000800",
+      "allRecords": 82949,
+      "primaryRoadRecords": 0,
+      "defaultNativeRoughness": 0.35
+    },
+    {
+      "materialId": 12,
+      "surfaceMask": "0x00001000",
+      "allRecords": 4512,
+      "primaryRoadRecords": 0,
+      "defaultNativeRoughness": 0.35
+    },
+    {
+      "materialId": 14,
+      "surfaceMask": "0x00004000",
+      "allRecords": 2885,
+      "primaryRoadRecords": 0,
+      "defaultNativeRoughness": 0.31
+    },
+    {
+      "materialId": 16,
+      "surfaceMask": "0x00010000",
+      "allRecords": 34833,
+      "primaryRoadRecords": 0,
+      "defaultNativeRoughness": 0.31
+    },
+    {
+      "materialId": 17,
+      "surfaceMask": "0x00020000",
+      "allRecords": 4450,
+      "primaryRoadRecords": 0,
+      "defaultNativeRoughness": 0.31
+    },
+    {
+      "materialId": 18,
+      "surfaceMask": "0x00040000",
+      "allRecords": 2700,
+      "primaryRoadRecords": 0,
+      "defaultNativeRoughness": 0.31
+    },
+    {
+      "materialId": 19,
+      "surfaceMask": "0x00080000",
+      "allRecords": 11146,
+      "primaryRoadRecords": 0,
+      "defaultNativeRoughness": 0.31
+    },
+    {
+      "materialId": 20,
+      "surfaceMask": "0x00100000",
+      "allRecords": 306,
+      "primaryRoadRecords": 306,
+      "defaultNativeRoughness": 0.71
+    },
+    {
+      "materialId": 22,
+      "surfaceMask": "0x00400000",
+      "allRecords": 1298,
+      "primaryRoadRecords": 1298,
+      "defaultNativeRoughness": 0.9
+    },
+    {
+      "materialId": 23,
+      "surfaceMask": "0x00800000",
+      "allRecords": 5628,
+      "primaryRoadRecords": 5628,
+      "defaultNativeRoughness": 0.5
+    },
+    {
+      "materialId": 24,
+      "surfaceMask": "0x01000000",
+      "allRecords": 1126,
+      "primaryRoadRecords": 0,
+      "defaultNativeRoughness": 0.31
+    },
+    {
+      "materialId": 25,
+      "surfaceMask": "0x02000000",
+      "allRecords": 4464,
+      "primaryRoadRecords": 0,
+      "defaultNativeRoughness": 0.31
+    }
+  ],
+  "primarySemanticEvidence": {
+    "defaultRoad": {
+      "materialId": 1,
+      "surfaceMask": "0x00000002"
+    },
+    "roughPrimaryStrip": {
+      "materialId": 20,
+      "surfaceMask": "0x00100000",
+      "nativeRoughness": 0.71,
+      "stages": [
+        "Deep Lake",
+        "Tulip Garden",
+        "Floral Village"
+      ],
+      "physicalName": "OPEN"
+    },
+    "casinoPrimary": {
+      "materialId": 22,
+      "surfaceMask": "0x00400000",
+      "stage": "Casino Town",
+      "casinoNativeRoughness": 0.25
+    },
+    "snowIcePrimary": {
+      "materialId": 23,
+      "surfaceMask": "0x00800000",
+      "nativeRoughness": 0.5,
+      "stages": [
+        "Snowy Mountain",
+        "Ice Scape"
+      ]
+    }
+  },
+  "stageSpecificNativeOverrides": [
+    {
+      "stageIds": [
+        11,
+        41
+      ],
+      "stage": "Metropolis",
+      "materialId": 1,
+      "surfaceMask": "0x00000002",
+      "roughness": 0.73,
+      "setsWaterFlag": true
+    },
+    {
+      "stageIds": [
+        13,
+        43
+      ],
+      "stage": "Cape Way",
+      "materialId": 1,
+      "surfaceMask": "0x00000002",
+      "roughness": 0.79,
+      "setsWaterFlag": true
+    },
+    {
+      "stageIds": [
+        14,
+        44
+      ],
+      "stage": "Imperial Avenue",
+      "materialId": 1,
+      "surfaceMask": "0x00000002",
+      "roughness": 0.76,
+      "setsWaterFlag": true
+    },
+    {
+      "stageIds": [
+        18,
+        48
+      ],
+      "stage": "Casino Town",
+      "materialId": 22,
+      "surfaceMask": "0x00400000",
+      "roughness": 0.25
+    }
+  ],
+  "forwardStages": [
+    {
+      "stageId": 0,
+      "folder": "PALM",
+      "name": "Palm Beach",
+      "primaryRoadCollisionCount": 1283,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1283,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 1,
+      "folder": "LAKE",
+      "name": "Deep Lake",
+      "primaryRoadCollisionCount": 1325,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1263,
+          "fraction": 0.953208
+        },
+        {
+          "materialId": 20,
+          "surfaceMask": "0x00100000",
+          "records": 62,
+          "fraction": 0.046792
+        }
+      ]
+    },
+    {
+      "stageId": 2,
+      "folder": "INDU",
+      "name": "Industrial Complex",
+      "primaryRoadCollisionCount": 635,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 635,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 3,
+      "folder": "ALPI",
+      "name": "Alpine",
+      "primaryRoadCollisionCount": 1638,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1638,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 4,
+      "folder": "SNOW",
+      "name": "Snowy Mountain",
+      "primaryRoadCollisionCount": 1549,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 174,
+          "fraction": 0.112331
+        },
+        {
+          "materialId": 23,
+          "surfaceMask": "0x00800000",
+          "records": 1375,
+          "fraction": 0.887669
+        }
+      ]
+    },
+    {
+      "stageId": 5,
+      "folder": "CLOU",
+      "name": "Cloudy Highland",
+      "primaryRoadCollisionCount": 1378,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1378,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 6,
+      "folder": "CAST",
+      "name": "Castle Wall",
+      "primaryRoadCollisionCount": 1515,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1515,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 7,
+      "folder": "GHOS",
+      "name": "Ghost Forest",
+      "primaryRoadCollisionCount": 1489,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1489,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 8,
+      "folder": "FORE",
+      "name": "Coniferous Forest",
+      "primaryRoadCollisionCount": 1453,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1453,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 9,
+      "folder": "DESE",
+      "name": "Desert",
+      "primaryRoadCollisionCount": 1472,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1472,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 10,
+      "folder": "TULI",
+      "name": "Tulip Garden",
+      "primaryRoadCollisionCount": 1372,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1333,
+          "fraction": 0.971574
+        },
+        {
+          "materialId": 20,
+          "surfaceMask": "0x00100000",
+          "records": 39,
+          "fraction": 0.028426
+        }
+      ]
+    },
+    {
+      "stageId": 11,
+      "folder": "METR",
+      "name": "Metropolis",
+      "primaryRoadCollisionCount": 1378,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1378,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 12,
+      "folder": "RUIN",
+      "name": "Ancient Ruins",
+      "primaryRoadCollisionCount": 1551,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1551,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 13,
+      "folder": "CAPE",
+      "name": "Cape Way",
+      "primaryRoadCollisionCount": 1413,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1413,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 14,
+      "folder": "IMPE",
+      "name": "Imperial Avenue",
+      "primaryRoadCollisionCount": 1448,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1448,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 15,
+      "folder": "BEAC",
+      "name": "Sunny Beach",
+      "primaryRoadCollisionCount": 1113,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1113,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 16,
+      "folder": "SEQU",
+      "name": "Big Forest",
+      "primaryRoadCollisionCount": 1424,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1424,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 17,
+      "folder": "NIAG",
+      "name": "Waterfalls",
+      "primaryRoadCollisionCount": 1388,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1388,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 18,
+      "folder": "LASV",
+      "name": "Casino Town",
+      "primaryRoadCollisionCount": 830,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 181,
+          "fraction": 0.218072
+        },
+        {
+          "materialId": 22,
+          "surfaceMask": "0x00400000",
+          "records": 649,
+          "fraction": 0.781928
+        }
+      ]
+    },
+    {
+      "stageId": 19,
+      "folder": "ALAS",
+      "name": "Ice Scape",
+      "primaryRoadCollisionCount": 1439,
+      "primaryMaterials": [
+        {
+          "materialId": 23,
+          "surfaceMask": "0x00800000",
+          "records": 1439,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 20,
+      "folder": "GRAN",
+      "name": "Canyon",
+      "primaryRoadCollisionCount": 1332,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1332,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 21,
+      "folder": "SANF",
+      "name": "Bay Area",
+      "primaryRoadCollisionCount": 1134,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1134,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 22,
+      "folder": "AMAZ",
+      "name": "Jungle",
+      "primaryRoadCollisionCount": 1406,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1406,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 23,
+      "folder": "MACH",
+      "name": "Lost City",
+      "primaryRoadCollisionCount": 1325,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1325,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 24,
+      "folder": "YOSE",
+      "name": "National Park",
+      "primaryRoadCollisionCount": 1466,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1466,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 25,
+      "folder": "MAYA",
+      "name": "Legend",
+      "primaryRoadCollisionCount": 1607,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1607,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 26,
+      "folder": "NEWY",
+      "name": "Skyscrapers",
+      "primaryRoadCollisionCount": 855,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 855,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 27,
+      "folder": "PRIN",
+      "name": "Floral Village",
+      "primaryRoadCollisionCount": 1504,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1452,
+          "fraction": 0.965426
+        },
+        {
+          "materialId": 20,
+          "surfaceMask": "0x00100000",
+          "records": 52,
+          "fraction": 0.034574
+        }
+      ]
+    },
+    {
+      "stageId": 28,
+      "folder": "FLOR",
+      "name": "Milky Way",
+      "primaryRoadCollisionCount": 1769,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1769,
+          "fraction": 1
+        }
+      ]
+    },
+    {
+      "stageId": 29,
+      "folder": "EAST",
+      "name": "Giant Statues",
+      "primaryRoadCollisionCount": 1511,
+      "primaryMaterials": [
+        {
+          "materialId": 1,
+          "surfaceMask": "0x00000002",
+          "records": 1511,
+          "fraction": 1
+        }
+      ]
+    }
+  ],
+  "reversePolicy": "Reverse stage IDs are forward+30 and preserve the corresponding primary material families. Runtime mask remains authoritative because some non-primary geometry/order differs.",
+  "specialVariants": {
+    "60": "PALM_T",
+    "61": "BEAC_T",
+    "62": "PALM_BT",
+    "63": "BEAC_BT",
+    "64": "PALM_BR",
+    "65": "BEAC_BR",
+    "primaryMaterialId": 1
+  },
+  "geometryOrientationSurvey": {
+    "result": "Most material families are overwhelmingly upward-facing in the collision normal array; this does not support assigning wall/curb/grass names from normal direction alone.",
+    "exception": "materialId 0x10 has about 7.5% non-upward records, still insufficient for a physical label."
+  },
+  "ffbRecommendation": {
+    "snowIce": "Replace stage-wide snow/ice attenuation candidate with per-contact surfaceMask==0x00800000 after FFB branch validation.",
+    "preservePerContact": [
+      "surfaceMask[0..3]",
+      "derived materialId[0..3]",
+      "native roughness[0..3]"
+    ],
+    "guard": "Do not label contact indices FL/FR/RL/RR until ordering is proven; do not assign human surface names to non-primary IDs without runtime correlation."
+  },
+  "reproducer": "tools/reverse/analyze_stage_coli.py",
+  "fullLocalArtifact": "stage_coli_ffb_map_v2.json"
+}
