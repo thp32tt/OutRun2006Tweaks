@@ -202,9 +202,22 @@ class UIScaling : public Hook
 
 	// Adjust positions of sprites in 3d space (eg 1st/2nd/etc markers)
 	static inline SafetyHookInline Calc3D2D_hk = {};
+	static inline D3DVECTOR LastCalc3D2DWorld{};
+	static inline D3DVECTOR LastCalc3D2DProjected{};
+	static inline bool LastCalc3D2DValid = false;
+	static inline D3DVECTOR RankMarkerWorldAnchor{};
+	static inline D3DVECTOR RankMarkerProjectedAnchor{};
+	static inline bool RankMarkerAnchorValid = false;
 	static void Calc3D2D_dest(float a1, float a2, D3DVECTOR* in, D3DVECTOR* out)
 	{
+		const D3DVECTOR input = in ? *in : D3DVECTOR{};
 		Calc3D2D_hk.call(a1, a2, in, out);
+		if (in && out)
+		{
+			LastCalc3D2DWorld = input;
+			LastCalc3D2DProjected = *out;
+			LastCalc3D2DValid = true;
+		}
 
 		// TODO: OnlineArcade mode needs to add position here
 
@@ -230,6 +243,15 @@ class UIScaling : public Hook
 		// the marker that draw sits at.
 		RankMarkerFracX = (x + 320.0f) - float(int(ctx.esi));
 		RankMarkerFracY = ((240.0f - y) - 32.0f) - float(int(ctx.ebp));
+		// This exact truncate site is inside sub_4BAD20 immediately after its
+		// Calc3D2D projection. Freeze both the original 3D point and the stock
+		// projected point so queued rank sprites retain their vehicle anchor.
+		RankMarkerAnchorValid = LastCalc3D2DValid;
+		if (RankMarkerAnchorValid)
+		{
+			RankMarkerWorldAnchor = LastCalc3D2DWorld;
+			RankMarkerProjectedAnchor = LastCalc3D2DProjected;
+		}
 	}
 
 	// 1st, 2nd and 3rd are each a single sprite, and this call takes its
@@ -256,6 +278,15 @@ class UIScaling : public Hook
 			if (node && node != tailsBefore[prio])
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
 					node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+				if (RankMarkerAnchorValid)
+				{
+					const float world[3]{ RankMarkerWorldAnchor.x,
+						RankMarkerWorldAnchor.y, RankMarkerWorldAnchor.z };
+					const float projected[3]{ RankMarkerProjectedAnchor.x,
+						RankMarkerProjectedAnchor.y, RankMarkerProjectedAnchor.z };
+					OutRunVR::GameSemantic::RegisterSpriteNodeWorldAnchor(
+						node, world, projected);
+				}
 		}
 		return result;
 	}
@@ -284,6 +315,15 @@ class UIScaling : public Hook
 			node->args_10.float28 += RankMarkerFracY;
 			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
 				node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+			if (RankMarkerAnchorValid)
+			{
+				const float world[3]{ RankMarkerWorldAnchor.x,
+					RankMarkerWorldAnchor.y, RankMarkerWorldAnchor.z };
+				const float projected[3]{ RankMarkerProjectedAnchor.x,
+					RankMarkerProjectedAnchor.y, RankMarkerProjectedAnchor.z };
+				OutRunVR::GameSemantic::RegisterSpriteNodeWorldAnchor(
+					node, world, projected);
+			}
 		}
 
 		return result;
