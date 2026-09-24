@@ -25,10 +25,10 @@ index,path,action,artwork_status,transcription_status,notes
 37,textures/load/spr_sprani_JENN_RANK_Exst/515DCBB2_1024x1024.dds,zoom_review,blocked_review,needs_zoom_review,
 38,textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds,zoom_review,blocked_review,needs_zoom_review,
 43,textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
-44,textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds,localize_text,pending_artwork,pending_transcription,
+44,textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass3 transcription saved
 45,textures/load/spr_sprani_etc_cvt_Exst/1F77CB88_128x128.dds,zoom_review,blocked_review,needs_zoom_review,
 46,textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass2 transcription saved
-47,textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds,localize_text,pending_artwork,pending_transcription,
+47,textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass3 transcription saved
 48,textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass2 transcription saved
 49,textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass2 transcription saved
 50,textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
