@@ -13,6 +13,49 @@ CANONICAL_EXE_SHA256 = "68ceb386829066f8455b9d027320af962584321f3e2e8a79c7284149
 MAX_INFLATED = 256 * 1024 * 1024
 LANG_SUFFIXES = "EFGIS"
 
+STAGE_FOLDERS = [
+    ("PALM", "Palm Beach"), ("LAKE", "Deep Lake"), ("INDU", "Industrial Complex"),
+    ("ALPI", "Alpine"), ("SNOW", "Snowy Mountain"), ("CLOU", "Cloudy Highland"),
+    ("CAST", "Castle Wall"), ("GHOS", "Ghost Forest"), ("FORE", "Coniferous Forest"),
+    ("DESE", "Desert"), ("TULI", "Tulip Garden"), ("METR", "Metropolis"),
+    ("RUIN", "Ancient Ruins"), ("CAPE", "Cape Way"), ("IMPE", "Imperial Avenue"),
+    ("BEAC", "Sunny Beach"), ("SEQU", "Big Forest"), ("NIAG", "Waterfalls"),
+    ("LASV", "Casino Town"), ("ALAS", "Ice Scape"), ("GRAN", "Canyon"),
+    ("SANF", "Bay Area"), ("AMAZ", "Jungle"), ("MACH", "Lost City"),
+    ("YOSE", "National Park"), ("MAYA", "Legend"), ("NEWY", "Skyscrapers"),
+    ("PRIN", "Floral Village"), ("FLOR", "Milky Way"), ("EAST", "Giant Statues"),
+]
+STAGE_FOLDER_ID = {name: i for i, (name, _) in enumerate(STAGE_FOLDERS)}
+STAGE_FOLDER_ID.update({name + "_R": i + 30 for i, (name, _) in enumerate(STAGE_FOLDERS)})
+STAGE_FOLDER_ID.update({
+    "PALM_T": 60, "BEAC_T": 61, "PALM_BT": 62,
+    "BEAC_BT": 63, "PALM_BR": 64, "BEAC_BR": 65,
+})
+STAGE_DISPLAY = {name: display for name, display in STAGE_FOLDERS}
+STAGE_DISPLAY.update({name + "_R": "(R) " + display for name, display in STAGE_FOLDERS})
+STAGE_DISPLAY.update({
+    "PALM_T": "(T) Palm Beach", "BEAC_T": "(T) Sunny Beach",
+    "PALM_BT": "(Night) Palm Beach", "BEAC_BT": "(Night) Sunny Beach",
+    "PALM_BR": "(R-Night) Palm Beach", "BEAC_BR": "(R-Night) Sunny Beach",
+})
+
+def stage_identity_from_path(relative_path: str) -> dict | None:
+    parts = Path(relative_path).parts
+    try:
+        idx = next(i for i, part in enumerate(parts) if part.lower() == "stage")
+    except StopIteration:
+        return None
+    if idx + 1 >= len(parts):
+        return None
+    folder = parts[idx + 1].upper()
+    if folder not in STAGE_FOLDER_ID:
+        return {"folder": folder, "stageId": None, "displayName": None}
+    return {
+        "folder": folder,
+        "stageId": STAGE_FOLDER_ID[folder],
+        "displayName": STAGE_DISPLAY[folder],
+    }
+
 def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -285,7 +328,15 @@ def scan(root: Path, exe: Path | None = None, manifest: Path | None = None) -> d
             if "/scripts/bin/" in ("/" + rp.lower()):
                 scripts[rp] = parse_script_bin(data)
             if low.startswith("coli_") and low.endswith("_bin.sz") and len(data) >= 12 and data[4:12] == b"COLI0200":
-                collision[rp] = parse_coli(data)
+                coli_meta = parse_coli(data)
+                coli_meta["compressedSize"] = p.stat().st_size
+                coli_meta["stage"] = stage_identity_from_path(rp)
+                coli_meta["collisionClass"] = (
+                    "course-surface" if low.startswith("coli_cs_")
+                    else "background" if low.startswith("coli_bk_")
+                    else "other"
+                )
+                collision[rp] = coli_meta
             if p.parent.name.lower() == "text" and p.suffix.lower() == ".bin":
                 try:
                     textbins[rp] = parse_txet(data)
@@ -341,8 +392,18 @@ def scan(root: Path, exe: Path | None = None, manifest: Path | None = None) -> d
     hashes = collections.defaultdict(list)
     for rp, meta in collision.items():
         hashes[meta["sha256"]].append(rp)
+    stage_coli = [
+        {"path": rp, **meta["stage"], "collisionClass": meta["collisionClass"],
+         "compressedSize": meta["compressedSize"], "inflatedSize": meta["size"],
+         "sha256": meta["sha256"]}
+        for rp, meta in collision.items() if meta.get("stage")
+    ]
     report["collision"]["summary"] = {
         "fileCount": len(collision), "uniquePayloads": len(hashes),
+        "stageCollisionCount": len(stage_coli),
+        "stageCollisionInventory": sorted(
+            stage_coli,
+            key=lambda x: (999 if x["stageId"] is None else x["stageId"], x["path"])),
         "duplicateGroups": [
             {"sha256": h, "paths": paths} for h, paths in hashes.items() if len(paths) > 1]}
 
