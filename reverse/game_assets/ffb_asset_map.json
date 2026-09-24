@@ -1,12 +1,12 @@
 {
-  "schema": "outrun-ffb-asset-map-v2",
-  "sourceSha": "7b08c30055212334735cc55b71575c6cc57c48b1",
+  "schema": "outrun-ffb-asset-map-v3",
+  "sourceSha": "35c5b82e30d583c3a961260e81b5d9827f1bb720",
   "nativeContactInputs": {
     "surfaceMask": {
       "storage": "EVWORK_CAR::water_flag_24C[0..3]",
       "semanticAlias": "surfaceMask[4]",
-      "confidence": "SOURCE_CONFIRMED",
-      "note": "Legacy struct field name is misleading; Xbox-derived sub_1149C0 dispatches many non-water bit masks."
+      "confidence": "EXE_CONFIRMED",
+      "note": "Canonical PC collision query proves each returned contact mask is 1u << COLI0200 materialId."
     },
     "loadColiType": {
       "storage": "EVWORK_CAR::OnRoadPlace_5C.loadColiType_0",
@@ -131,25 +131,29 @@
       34,
       49
     ],
-    "note": "Current DD-wheel policy scale, not recovered collision-material identity."
+    "note": "Current runtime still has stage-wide Snow/Ice attenuation; direct COLI data now supports replacing it with per-contact mask 0x00800000 after LEVEL1 validation."
   },
   "collisionEvidence": {
-    "priorUploadedCollisionFiles": 19,
-    "priorUniquePayloads": 7,
-    "formatMagic": "COLI0200",
-    "stageCorpus": {
-      "stageDirectories": 66,
-      "stageFiles": 847,
-      "stageBytesFromManifest": 296418999,
-      "collisionFiles": 72,
-      "collisionCompressedBytes": 19481268,
-      "inventory": "reverse/game_assets/stage_collision_inventory.json",
-      "uploadedStageZip": {
-        "sizeBytes": 290113621,
-        "directByteInspection": "BLOCKED_BY_EXECUTION_BACKEND_THIS_RUN"
-      }
+    "stageZip": {
+      "sizeBytes": 290113621,
+      "sha256": "385a5be540d87139c065bb5d62899767ca57c9a26950f7c2819235aa1448e6f6",
+      "directByteInspection": "PASS"
     },
-    "exactStaticFieldToSurfaceMask": "OPEN"
+    "collisionFiles": 72,
+    "coli0200Files": 66,
+    "legacyColi0105Files": 6,
+    "exactStaticFieldToSurfaceMask": "CONFIRMED",
+    "formula": "surfaceMask = 1u << materialId",
+    "exeAnchor": "VA 0x0043ECB8..0x0043ECC7",
+    "geometry": "64-byte record = vec3 corner[4] + vec3 center + u32 flags",
+    "cornerNormals": "48-byte record = vec3 normal[4]",
+    "primaryRoadMaterialIds": [
+      1,
+      20,
+      22,
+      23
+    ],
+    "deepMap": "reverse/game_assets/stage_coli_ffb_map.json"
   },
   "researchChain": [
     "COLI0200 static attributes",
@@ -180,32 +184,25 @@
     "roadSectionNum",
     "curStageIdx",
     "loadColiType",
-    "surfaceMaskFL",
-    "surfaceMaskFR",
-    "surfaceMaskRL",
-    "surfaceMaskRR",
-    "roughnessFL",
-    "roughnessFR",
-    "roughnessRL",
-    "roughnessRR",
+    "surfaceMask[0..3]",
+    "derivedMaterialId[0..3]",
+    "roughness[0..3]",
     "waterFlag",
     "speed",
     "roadEffectOutput"
   ],
   "ffbPolicy": {
-    "preservePerWheelIdentity": true,
-    "currentCoreReduction": "max roughness across four wheels",
-    "futureRecommendedFeatures": [
-      "min/max/spread",
-      "left-right mask split",
-      "front-rear transition",
-      "wheel count per raw mask"
-    ],
+    "preservePerContactIdentity": true,
+    "currentCoreReduction": "max roughness across four contacts",
+    "candidate": "FFB-SURFACE-MASK-POLICY-001",
+    "snowIceMask": "0x00800000",
+    "snowIceMaterialId": 23,
+    "evidence": "Snowy Mountain primary road 88.8% ID23 + 11.2% ID1; Ice Scape 100% ID23.",
     "guardrails": [
-      "Original Xbox roughness is a semantic/intensity witness, not a DD-wheel torque command.",
-      "Do not name raw masks as asphalt/curb/grass/snow until COLI static fields and runtime masks correlate.",
-      "Do not use loadColiType as a material ID.",
-      "Keep stage-name special cases until native material identity is proven, then remove only with regression evidence."
+      "Original Xbox roughness is semantic/intensity evidence, not DD-wheel torque.",
+      "Do not assign FL/FR/RL/RR names until contact ordering is proven.",
+      "Do not assign physical names to non-primary material IDs without runtime correlation.",
+      "Keep original stage exceptions in sub_1149C0 where the game intentionally uses stage context."
     ]
   },
   "roughnessToMaskCandidates": {
@@ -276,8 +273,10 @@
   },
   "dataProducts": {
     "stageInventory": "reverse/game_assets/stage_collision_inventory.json",
+    "stageMaterialMap": "reverse/game_assets/stage_coli_ffb_map.json",
     "humanGuide": "docs/reverse/STAGE_SURFACE_FFB_MAP.md",
     "sharedAnalyzer": "tools/reverse/analyze_game_data.py",
+    "stageAnalyzer": "tools/reverse/analyze_stage_coli.py",
     "telemetrySchema": "reverse/game_assets/ffb_surface_telemetry_schema.json"
   },
   "externalCrossCheck": {
@@ -294,7 +293,7 @@
       "carOffset": "0x5C",
       "observation": "Only watched writer reported at Xbox 0x16902E, contact write-back in per-car pipeline 0x1692A0 fed by collision 0x168880.",
       "pcCorrelation": "PC EVWORK_CAR::OnRoadPlace_5C occupies the same +0x5C offset.",
-      "nextPcReverseStep": "Find canonical PC EXE writers to car+0x5C; trace backward to collision query and forward to car+0x24C..0x258 per-wheel surfaceMask writes.",
+      "nextPcReverseStep": "CLOSED for material mask path: canonical PC EXE now proves materialId -> surfaceMask and the four EVWORK_CAR contact writes.",
       "warning": "Xbox function addresses are evidence anchors only and must not be reused as PC addresses."
     }
   }
