@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-09-24T22:57:00+09:00",
+  "updatedKst": "2026-09-24T23:00:00+09:00",
   "policy": "IMPLEMENTATION-FIRST + PARALLEL-HMD-MATRIX (HUD/PERF/DXVK/DX12 non-blocking)",
   "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
   "integrationBranch": "vr-d3d9ex-focus",
@@ -47,15 +47,25 @@
     {
       "slotId": "B_HUD",
       "backend": "DX9Ex",
-      "status": "IMPLEMENT_NEXT",
-      "sourceSha": null,
+      "status": "HMD_EXPERIMENT_READY",
+      "sourceSha": "7e2095aa2156f6a9dd301d2899b0e62b4d92f4f1",
       "profile": "HUD_SCREEN",
       "featureFlags": [
         "HUD_SEMANTIC_LIFETIME_EXPERIMENT"
       ],
       "hypothesis": "Exact producer/node semantic ownership must be available at the relevant VS/c64 boundary; failed 8d21824f candidate must not be recreated unchanged.",
-      "expectedObservable": "HUD diplopia/head-lock changes without altering protected world stereo.",
-      "blockedByOtherSlots": false
+      "expectedObservable": "Exact SCREEN_HUD perspective draws are no longer vetoed by a pre-draw c64 world verification; HUD diplopia/head-lock should improve while protected world stereo remains unchanged.",
+      "blockedByOtherSlots": false,
+      "branch": "vr-d3d9ex-candidate/HUD-SEMANTIC-LIFETIME-B-20260924",
+      "ciRunId": 36008480891,
+      "ciResult": "SUCCESS",
+      "artifactRef": "github-actions:36008480891/artifact:10811687964",
+      "artifactDigest": "sha256:119f866447278ddd03c30d46a69f2ee7e397facc3de87d1696e6b0b450b5f4b8",
+      "binarySha256": "2a8259612406ecdc4753c042b4918f3313110864938b20b8b7cd60a0fd966f87",
+      "configSha256": "da1ab4c9f9aa614b8aae8afcd000122ddf77ba2113bdee3ecd8838a563be22b7",
+      "profileLibrarySha256": "872134376d3bfcea22f81d555b4af3444013482fce4afdba67dbb080f09ed843",
+      "configProfileHash": "3aa1b6b9d08b029f15c843a5252f9419f542f3a9f9309561b1a624c887b37ed5",
+      "note": "Exact-SHA DX9Ex Active Validation passed. HUD_SCREEN is the valid packaged profile; generic HUD label was corrected."
     },
     {
       "slotId": "C_FLARE",
