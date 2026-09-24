@@ -1,5 +1,5 @@
 {
-  "schema_version": 5,
+  "schema_version": 6,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,11 +7,12 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "pass clean Win32 build, Localization State and Domain Isolation Guard",
-    "build clean K1 trace test artifact and collect runtime log",
-    "resolve IDs 96,97,279,280",
-    "continue 47 zoom reviews and remaining graphics transcription",
-    "create 80 Korean artwork replacements",
+    "pass latest clean Win32 build, Localization State and Domain Isolation Guard",
+    "build/use clean K1 trace test artifact and collect runtime log",
+    "resolve IDs 96,97,279,280 from runtime menu context",
+    "continue pending_transcription graphics queue (32/80 complete)",
+    "create first Korean DDS typesetting proof while preserving source DDS format/alpha/mip behavior",
+    "continue 47 zoom reviews",
     "prototype 9 font atlases + Hangul name-entry atlas",
     "implement K2 Unicode-safe one-string proof then K3 Hangul glyph proof"
   ],
@@ -28,5 +29,11 @@
       "K2 Unicode-safe path",
       "K3 Hangul glyph proof"
     ]
+  },
+  "graphics_checkpoint": {
+    "transcribed_assets": 32,
+    "transcribed_segments": 153,
+    "artwork_completed": 0,
+    "artwork_targets": 80
   }
 }
