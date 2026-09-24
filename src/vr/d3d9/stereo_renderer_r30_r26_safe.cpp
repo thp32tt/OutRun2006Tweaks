@@ -103,6 +103,8 @@ namespace OutRunVRStereo
         std::uint64_t R30Hud2DDraws = 0;
         std::uint64_t R30PerspectiveHudDraws = 0;
         std::uint64_t R30WorldBillboardDraws = 0;
+        std::uint64_t R51WorldBillboardAnchorHits = 0;
+        bool R51FirstWorldBillboardAnchorLogged = false;
         std::uint64_t R44OverlayOwnedWvpHits = 0;
         std::uint64_t R44OverlayOwnedWvpGroupHits = 0;
         std::uint64_t R44SpatialBillboardClassifications = 0;
@@ -1455,6 +1457,21 @@ namespace OutRunVRStereo
                     if (R28CanRebindVerifiedWorld(
                             device, reboundShader, reboundSerial))
                         return R30ScreenSpaceKind::None;
+                    float worldAnchor[3]{};
+                    float projectedAnchor[3]{};
+                    if (OutRunVR::GameSemantic::CurrentWorldBillboardAnchor(
+                            worldAnchor, projectedAnchor))
+                    {
+                        ++R51WorldBillboardAnchorHits;
+                        if (!R51FirstWorldBillboardAnchorLogged)
+                        {
+                            R51FirstWorldBillboardAnchorLogged = true;
+                            spdlog::info(
+                                "VR R51 RANK ANCHOR: SpriteNode preserved Calc3D2D world=({:.3f},{:.3f},{:.3f}) projected=({:.3f},{:.3f},{:.3f}); behavior unchanged pending per-eye reprojection",
+                                worldAnchor[0], worldAnchor[1], worldAnchor[2],
+                                projectedAnchor[0], projectedAnchor[1], projectedAnchor[2]);
+                        }
+                    }
                     ++R44SpatialBillboardClassifications;
                     return R30ScreenSpaceKind::WorldBillboard;
                 }
