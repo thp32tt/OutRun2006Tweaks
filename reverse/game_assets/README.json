@@ -1,5 +1,5 @@
 {
-  "schema": "outrun-shared-reverse-index-v1",
+  "schema": "outrun-shared-reverse-index-v2",
   "sourceSha": "8a312af992e4319aa5d101bfbfa97f271dd75203",
   "canonicalExeSha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
   "analyzedCorpus": {
@@ -12,7 +12,15 @@
     "stageFiles": 847,
     "stageDirectories": 66,
     "stageCollisionFiles": 72,
-    "stageCollisionCompressedBytes": 19481268
+    "stageCollisionCompressedBytes": 19481268,
+    "stageZip": {
+      "sizeBytes": 290113621,
+      "sha256": "385a5be540d87139c065bb5d62899767ca57c9a26950f7c2819235aa1448e6f6",
+      "collisionFiles": 72,
+      "coli0200": 66,
+      "legacyColi0105": 6,
+      "directInspection": "PASS"
+    }
   },
   "files": [
     "docs/reverse/GAME_ASSET_KNOWLEDGE_BASE.md",
@@ -25,13 +33,28 @@
     "tools/reverse/analyze_game_data.py",
     "docs/reverse/STAGE_SURFACE_FFB_MAP.md",
     "reverse/game_assets/stage_collision_inventory.json",
-    "reverse/game_assets/ffb_surface_telemetry_schema.json"
+    "reverse/game_assets/ffb_surface_telemetry_schema.json",
+    "reverse/game_assets/stage_coli_ffb_map.json",
+    "tools/reverse/analyze_stage_coli.py"
   ],
   "stageSurfaceEvidence": {
-    "semanticAlias": "EVWORK_CAR::water_flag_24C[4] -> per-wheel surfaceMask[4]",
-    "junctionContext": "OnRoadPlace.loadColiType_0 != 0 -> is_in_bunki()",
-    "staticFieldToRuntimeMask": "OPEN",
+    "semanticAlias": "EVWORK_CAR::water_flag_24C[4] -> four per-contact surfaceMask values",
+    "junctionContext": "OnRoadPlace.loadColiType_0 != 0 -> is_in_bunki(); not material identity",
+    "staticFieldToRuntimeMask": "CONFIRMED: COLI0200 materialId byte; canonical PC VA 0x0043ECB8..0x0043ECC7 computes surfaceMask = 1u << materialId",
+    "primaryRoadMaterialIds": [
+      "0x01",
+      "0x14",
+      "0x16",
+      "0x17"
+    ],
+    "deepMap": "reverse/game_assets/stage_coli_ffb_map.json",
     "inventory": "reverse/game_assets/stage_collision_inventory.json",
-    "telemetrySchema": "reverse/game_assets/ffb_surface_telemetry_schema.json"
+    "telemetrySchema": "reverse/game_assets/ffb_surface_telemetry_schema.json",
+    "reproducer": "tools/reverse/analyze_stage_coli.py",
+    "open": [
+      "contact index -> wheel ordering",
+      "physical names for non-primary material IDs",
+      "COLI sections 7/8"
+    ]
   }
 }
