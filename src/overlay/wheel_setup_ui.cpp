@@ -34,6 +34,7 @@ namespace Settings
     extern Setting<float> SteeringDeadZone;
     extern Setting<bool> UseNewInput;
     extern Setting<bool> WheelFFBEnable;
+    extern Setting<int> WheelFFBModel;
     extern Setting<bool> WheelAccelerationInvert;
     extern Setting<bool> WheelBrakeInvert;
     extern Setting<std::string> WheelFFBDeviceName;
@@ -802,6 +803,7 @@ namespace
         {
             bool valid = false;
             bool enable = true;
+            int model = 0;
             bool physicsSat = true;
             bool hwSpring = true;
             bool hwDamper = true;
@@ -837,6 +839,7 @@ namespace
         {
             savedFfb_.valid = true;
             savedFfb_.enable = Settings::WheelFFBEnable;
+            savedFfb_.model = Settings::WheelFFBModel;
             savedFfb_.physicsSat = Settings::WheelFFBPhysicsSat;
             savedFfb_.hwSpring = Settings::WheelFFBUseHardwareSpring;
             savedFfb_.hwDamper = Settings::WheelFFBUseHardwareDamper;
@@ -872,6 +875,7 @@ namespace
         {
             if (!savedFfb_.valid) return;
             Settings::WheelFFBEnable = savedFfb_.enable;
+            Settings::WheelFFBModel = savedFfb_.model;
             Settings::WheelFFBPhysicsSat = savedFfb_.physicsSat;
             Settings::WheelFFBUseHardwareSpring = savedFfb_.hwSpring;
             Settings::WheelFFBUseHardwareDamper = savedFfb_.hwDamper;
@@ -1657,18 +1661,68 @@ namespace
                 apply_r3_menu_defaults();
             }
 
-            ImGui::SeparatorText("Simulation FFB");
+            ImGui::SeparatorText("Force Feedback Model");
             track_ffb_change(ImGui::Checkbox("Enable Force Feedback", Settings::WheelFFBEnable.ptr()));
-            ImGui::TextDisabled("gameplay FFB follows the exact selected DirectInput GUID.");
-            ImGui::TextWrapped(
-                "Single-owner wheel FFB: DirectInput COM only. field_264/268 are lateral load only; front slip drives a pneumatic + mechanical/caster SAT model, while body/front slip release damping. Centering Spring remains a low-speed stabilizer.");
-            ImGui::TextDisabled("Settings > WheelFFB is hidden; changes on this page apply live. Gamepad rumble is suppressed only while DirectInput FFB owns an output device.");
+
+            static constexpr const char* FfbModelNames[] = {
+                "Modern DD Physics",
+                "Arcade Original (Lindbergh-derived)",
+                "Arcade + Modern Hybrid",
+                "PS2 Original topology (Experimental)"
+            };
+            int selectedFfbModel = std::clamp(int(Settings::WheelFFBModel), 0, 3);
+            if (ImGui::BeginCombo("FFB Model", FfbModelNames[selectedFfbModel]))
+            {
+                for (int modelIndex = 0; modelIndex < 4; ++modelIndex)
+                {
+                    const bool selected = selectedFfbModel == modelIndex;
+                    if (ImGui::Selectable(FfbModelNames[modelIndex], selected))
+                    {
+                        Settings::WheelFFBModel = modelIndex;
+                        track_ffb_change(true);
+                        WheelFFB_RequestSettingsTransition();
+                        status_ = std::string("FFB model changed live: ") +
+                            FfbModelNames[modelIndex] + ". Save Force Feedback to persist it.";
+                    }
+                    if (selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+
+            const int activeFfbModel = std::clamp(int(Settings::WheelFFBModel), 0, 3);
+            if (activeFfbModel == 0)
+            {
+                ImGui::TextWrapped(
+                    "Modern DD: current front-slip/yaw Physics SAT, mechanical/caster trail, dynamic damping and modern transient shaping.");
+            }
+            else if (activeFfbModel == 1)
+            {
+                ImGui::TextWrapped(
+                    "Arcade Original: Lindbergh-derived drive-board semantics. Uses a condition/spring backbone plus directional wall/rail/surface-transition events and rough-surface vibration. Modern inferred SAT and tire-slip chatter are disabled.");
+                ImGui::TextDisabled(
+                    "Event meanings come from the public OutRun2Real drive-board interception, not an official Sega protocol document.");
+            }
+            else if (activeFfbModel == 2)
+            {
+                ImGui::TextWrapped(
+                    "Arcade + Modern Hybrid: keeps Modern DD SAT/damping but uses the Lindbergh-derived arcade wall, surface and gear-event behavior.");
+            }
+            else
+            {
+                ImGui::TextWrapped(
+                    "PS2 Original topology (Experimental): uses the verified PS2 Condition/Constant/Periodic effect topology. Exact PS2 effect payload fields and units are not fully decoded yet, so unverified numeric parameters are not claimed as original.");
+            }
+            ImGui::TextDisabled("gameplay FFB follows the exact selected DirectInput GUID. All models share the same DD safety, focus-loss, slew/cap and device-recovery layer.");
 
             ImGui::SeparatorText("Physics / Structural");
             track_ffb_change(ImGui::SliderFloat("Overall Strength", Settings::WheelFFBGlobalStrength.ptr(), 0.0f, 1.5f, "%.2f"));
             if (Settings::WheelFFBGlobalStrength.get() > 1.0f)
                 ImGui::TextColored(ImVec4(1.0f, 0.65f, 0.25f, 1.0f),
                     "Above 100% trades force-detail contrast for extra weight.");
+            const bool modelUsesModernSat =
+                activeFfbModel == 0 || activeFfbModel == 2;
+            if (!modelUsesModernSat) ImGui::BeginDisabled();
             track_ffb_change(ImGui::SliderFloat("Self-aligning Torque (SAT)", Settings::WheelFFBSteeringWeight.ptr(), 0.0f, 2.00f, "%.2f"));
             track_ffb_change(ImGui::Checkbox("Physics SAT (body slip + yaw)", Settings::WheelFFBPhysicsSat.ptr()));
             if (ImGui::IsItemHovered())
@@ -1680,6 +1734,7 @@ namespace
                     ImGui::SetTooltip("Normalized mechanical/caster trail acts with front lateral force throughout a corner. 0 disables it; this is not a centre spring.");
             }
             track_ffb_change(ImGui::SliderFloat("Grip-loss Response", Settings::WheelFFBGripLoss.ptr(), 0.0f, 1.0f, "%.2f"));
+            if (!modelUsesModernSat) ImGui::EndDisabled();
 
             ImGui::SeparatorText("Steering Feel");
             track_ffb_change(ImGui::SliderFloat("Centering Spring (low speed)", Settings::WheelFFBSpringStrength.ptr(), 0.0f, 1.0f, "%.2f"));
@@ -1848,6 +1903,7 @@ namespace
             if (ImGui::Button("Load MOZA R3 Physics SAT"))
             {
                 Settings::WheelFFBEnable = true;
+                Settings::WheelFFBModel = 0;
                 Settings::WheelFFBPhysicsSat = true;
                 Settings::WheelFFBGlobalStrength = 0.70f;
                 Settings::WheelFFBSpringStrength = 0.65f;
@@ -1887,6 +1943,7 @@ namespace
 
             if (ImGui::Button("Load MOZA R3 Natural SAT"))
             {
+                Settings::WheelFFBModel = 0;
                 Settings::WheelFFBPhysicsSat = false;
                 Settings::WheelFFBEnable = true;
                 Settings::WheelFFBGlobalStrength = 0.70f;
@@ -1921,6 +1978,46 @@ namespace
                     ffbDirty_ = true;
                     status_ = "Loaded MOZA R3 Natural SAT for this session, but could not save user.ini.";
                 }
+            }
+
+            ImGui::SeparatorText("Original / Arcade model shortcuts");
+            if (ImGui::Button("Use Arcade Original"))
+            {
+                Settings::WheelFFBEnable = true;
+                Settings::WheelFFBModel = 1;
+                Settings::WheelFFBUseHardwareSpring = true;
+                Settings::WheelFFBUseHardwareDamper = true;
+                Settings::WheelFFBEngineVibration = false;
+                Settings::WheelFFBUsePeriodicEffects = false;
+                Settings::VibrationMode = 0;
+                track_ffb_change(true);
+                WheelFFB_RequestSettingsTransition();
+                status_ = "Arcade Original enabled: Lindbergh-derived spring/constant/surface event reconstruction. Save Force Feedback to persist.";
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Use Arcade Hybrid"))
+            {
+                Settings::WheelFFBEnable = true;
+                Settings::WheelFFBModel = 2;
+                Settings::WheelFFBPhysicsSat = true;
+                Settings::WheelFFBEngineVibration = false;
+                Settings::VibrationMode = 0;
+                track_ffb_change(true);
+                WheelFFB_RequestSettingsTransition();
+                status_ = "Arcade + Modern Hybrid enabled: Modern DD SAT with Lindbergh-derived arcade events. Save Force Feedback to persist.";
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Use PS2 Original (Experimental)"))
+            {
+                Settings::WheelFFBEnable = true;
+                Settings::WheelFFBModel = 3;
+                Settings::WheelFFBUseHardwareSpring = true;
+                Settings::WheelFFBUseHardwareDamper = true;
+                Settings::WheelFFBEngineVibration = false;
+                Settings::VibrationMode = 0;
+                track_ffb_change(true);
+                WheelFFB_RequestSettingsTransition();
+                status_ = "PS2 Original topology enabled (experimental): verified Condition/Constant/Periodic structure; exact PS2 payload tuning remains provisional.";
             }
 
             if (!Settings::UseNewInput)
