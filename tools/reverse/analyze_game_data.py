@@ -2,7 +2,7 @@
 """Read-only shared game-data analyzer for OutRun 2006 C2C.
 
 Emits metadata/hashes/offsets only. It does not copy game payloads into output.
-Supported: zlib .sz, XST, Sprani, Scripts/bin, COLI0200, Text/*.bin candidates,
+Supported: zlib .sz, XST, Sprani, Scripts/bin, COLI0200, Text/*.bin txet,
 and canonical OR2006C2C.EXE localization anchors.
 """
 from __future__ import annotations
@@ -144,46 +144,68 @@ def parse_coli(data: bytes) -> dict:
         "headerU32": [f"0x{x:08X}" for x in words], "sha256": sha256(data),
     }
 
-def parse_text_candidate(data: bytes) -> dict:
-    """Strict parser inferred from canonical text loader RVA 0x65DF0."""
-    if len(data) < 16:
-        raise ValueError("text bin too small")
-    ptrs, off = [], 8
-    while off + 4 <= len(data):
-        p = u32(data, off)
-        if p == 0:
-            break
-        if p < 8 or p >= len(data) or p % 2:
-            raise ValueError(f"invalid text pointer {p:#x} at {off:#x}")
-        ptrs.append(p)
-        off += 4
-        if len(ptrs) > 100000:
-            raise ValueError("too many text pointers")
-    if not ptrs or off + 4 > len(data) or u32(data, off) != 0:
-        raise ValueError("unterminated/empty text pointer table")
-    strings = []
-    for p in ptrs:
-        q, units = p, []
-        while q + 2 <= len(data):
-            w = struct.unpack_from("<H", data, q)[0]
-            q += 2
-            if w == 0:
+def parse_txet(data: bytes) -> dict:
+    """Lossless txet structure parser shared with Korean-localization research."""
+    if len(data) < 12 or data[:4] != b"txet":
+        raise ValueError("not txet")
+    declared = u32(data, 4)
+    if declared != len(data):
+        raise ValueError(f"txet size mismatch header={declared} actual={len(data)}")
+    first = u32(data, 8)
+    if first < 8 or (first - 8) % 4:
+        raise ValueError(f"invalid first txet payload offset {first:#x}")
+    count = (first - 8) // 4
+    if 8 + count * 4 > len(data):
+        raise ValueError("txet offset table OOB")
+    offsets = list(struct.unpack_from(f"<{count}I", data, 8))
+    nonzero = [x for x in offsets if x]
+    if nonzero != sorted(nonzero) or len(nonzero) != len(set(nonzero)):
+        raise ValueError("txet non-zero offsets not strictly increasing")
+
+    entries, chars = [], collections.Counter()
+    simple = multi = nulls = 0
+    for i, off in enumerate(offsets):
+        if off == 0:
+            nulls += 1
+            entries.append({"index": i, "nullPointer": True})
+            continue
+        next_off = len(data)
+        for candidate in offsets[i + 1:]:
+            if candidate:
+                next_off = candidate
                 break
-            units.append(w)
-            if len(units) > 8192:
-                raise ValueError("text string too long")
-        else:
-            raise ValueError("unterminated UTF-16 string")
-        strings.append(b"".join(struct.pack("<H", w) for w in units).decode("utf-16le", "replace"))
-    chars = collections.Counter(ch for s in strings for ch in s)
+        if not (first <= off <= next_off <= len(data)):
+            raise ValueError(f"txet record bounds invalid index={i}")
+        raw = data[off:next_off]
+        segments, simple_text = [], None
+        try:
+            decoded = raw.decode("utf-16le")
+            segments = decoded.split("\x00")
+            if segments and segments[-1] == "":
+                segments = segments[:-1]
+            if len(segments) == 1 and raw.endswith(b"\x00\x00"):
+                simple_text = segments[0]
+                simple += 1
+            elif segments:
+                multi += 1
+            for segment in segments:
+                chars.update(segment)
+        except UnicodeDecodeError:
+            multi += 1
+        entries.append({
+            "index": i, "nullPointer": False, "offset": off, "size": len(raw),
+            "segmentCount": len(segments), "simpleText": simple_text})
+
     return {
-        "format": "TEXT_BIN_CANDIDATE", "size": len(data),
-        "pointerCount": len(ptrs), "pointerTableEnd": off + 4,
-        "uniqueCharacters": len(chars),
+        "format": "TXET", "size": len(data), "sha256": sha256(data),
+        "entryCount": count, "simpleRecordCount": simple,
+        "multiOrSpecialRecordCount": multi, "nullPointerCount": nulls,
+        "firstPayloadOffset": first, "uniqueCharacters": len(chars),
         "nonAsciiCharacterCount": sum(ord(ch) > 0x7F for ch in chars),
         "uniqueHangulSyllables": sum(0xAC00 <= ord(ch) <= 0xD7A3 for ch in chars),
-        "sampleStrings": strings[:20], "status": "STRUCTURE_MATCHED_LOADER_CONTRACT",
+        "entries": entries,
     }
+
 
 def analyze_exe(path: Path) -> dict:
     data = path.read_bytes()
@@ -266,7 +288,7 @@ def scan(root: Path, exe: Path | None = None, manifest: Path | None = None) -> d
                 collision[rp] = parse_coli(data)
             if p.parent.name.lower() == "text" and p.suffix.lower() == ".bin":
                 try:
-                    textbins[rp] = parse_text_candidate(data)
+                    textbins[rp] = parse_txet(data)
                 except ValueError as e:
                     textbins[rp] = {"status": "PARSE_REJECTED", "reason": str(e), "size": len(data)}
         except Exception as e:
