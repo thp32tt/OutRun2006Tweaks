@@ -569,7 +569,7 @@ req(ffb, 'WheelFFBPS2::triangle_wave(cycles) * amplitude', 'PS2 software Triangl
 req(ffb, 'int activeRuntimeModel_ = -1;', 'runtime tracks periodic ownership by complete FFB model')
 req(ffb, 'if (activeRuntimeModel_ != runtimeModelValue)', 'every live FFB model change rebuilds model-owned periodic objects')
 req(ffb, 'live force-model change {} -> {}; recreating model-owned periodic set', 'runtime model self-heal is observable')
-forbid(ffb, 'roadPeriodicIsTriangle_ != ps2Original', 'waveform-only transition guard replaced by full model ownership')
+req(ffb, 'roadPeriodicIsTriangle_ != ps2Original', 'periodic creator still rejects an already-live wrong road waveform')
 req(ffb, 'if (roadTextureEffect_ || tireSlipEffect_)\n                disable_periodics();', 'explicit settings/model transitions destroy waveform-bound periodic objects')
 req(ffb, 'const bool needSlip =\n                WheelFFBMath::model_uses_modern_sat(model);', 'periodic set requires tire slip only for Modern/Hybrid')
 req(ffb, '(!needSlip || tireSlipEffect_ != nullptr)', 'Original modes do not require unused Modern tyre-slip periodic')
