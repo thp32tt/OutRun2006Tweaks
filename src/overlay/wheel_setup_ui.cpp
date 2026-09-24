@@ -1988,7 +1988,11 @@ namespace
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
                 Settings::WheelFFBEngineVibration = false;
-                Settings::WheelFFBUsePeriodicEffects = false;
+                // Arcade Original's verified rough-surface path is periodic.
+                // Prefer the wheel driver's hardware periodic effect; the 60 Hz
+                // software fallback cannot faithfully synthesize the observed
+                // 70 Hz arcade surface vibration.
+                Settings::WheelFFBUsePeriodicEffects = true;
                 Settings::VibrationMode = 0;
                 track_ffb_change(true);
                 WheelFFB_RequestSettingsTransition();
@@ -2001,6 +2005,7 @@ namespace
                 Settings::WheelFFBModel = 2;
                 Settings::WheelFFBPhysicsSat = true;
                 Settings::WheelFFBEngineVibration = false;
+                Settings::WheelFFBUsePeriodicEffects = true;
                 Settings::VibrationMode = 0;
                 track_ffb_change(true);
                 WheelFFB_RequestSettingsTransition();
@@ -2014,6 +2019,9 @@ namespace
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
                 Settings::WheelFFBEngineVibration = false;
+                // The retail PS2 binary has explicit periodic download/update
+                // paths; never inherit a previous model's disabled state.
+                Settings::WheelFFBUsePeriodicEffects = true;
                 Settings::VibrationMode = 0;
                 track_ffb_change(true);
                 WheelFFB_RequestSettingsTransition();
