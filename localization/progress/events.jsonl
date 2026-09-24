@@ -4,3 +4,4 @@
 {"ts_kst":"2026-09-25T00:05:00+09:00","event":"translation_checkpoint","translated":180,"total":1356,"percent":13.3,"range":"0-179"}
 {"ts_kst":"2026-09-25T00:08:00+09:00","event":"graphics_inventory_checkpoint","dds_total":243,"categories":{"front_end":111,"selector":31,"common_ui":19,"ranking":15,"font":9,"loading":9,"game_ui":7,"route":4,"name_entry":1,"other":37},"visually_reviewed":["game_ui","common_ui","ranking","font"]}
 {"ts_kst":"2026-09-25T00:12:00+09:00","event":"full_prototype_localization_state_migrated","text_non_null_translated":1355,"dds_classified":243,"transcribed_assets":28,"runtime_evidence":"prototype_history_only"}
+{"ts_kst":"2026-09-25T00:14:00+09:00","event":"translation_propagation_ready","explicit":180,"exact_match_covered":361,"total":1356,"percent":26.6}
