@@ -115,6 +115,19 @@ Fence time alone does not tell whether cost comes from:
 - ring backpressure;
 - fallback routing.
 
+The shared-eye target size is the max of the two OpenXR `recommendedWidth/Height` values. The direct transport format preserves `A8R8G8B8` / `A2B10G10R10` (4 bytes/pixel) and `A16B16G16R16F` (8 bytes/pixel), otherwise converting to `A8R8G8B8`.
+
+A useful lower-bound destination-write metric is therefore:
+
+```text
+bytesPerFrame = 2 * directWidth * directHeight * bytesPerPixel
+bytesPerSec   = bytesPerFrame * headsetHz
+```
+
+This is only destination surface write volume; it excludes source reads, filtering/conversion traffic, cache behavior and host-side D3D11/OpenXR work.
+
+The source contains a historical ring-resize comment showing `2124x2284` as one observed recommended eye size. At 72 Hz that would be about **2.79 GB/s** of destination writes for a 4-Bpp format, or **5.59 GB/s** for an 8-Bpp format. Treat this only as a concrete scale example, not the current runtime size.
+
 Add read-only telemetry for the two copy submissions:
 
 - pair count;
