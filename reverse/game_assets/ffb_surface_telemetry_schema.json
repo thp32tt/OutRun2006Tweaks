@@ -1,5 +1,5 @@
 {
-  "schema": "outrun-ffb-surface-telemetry-v2",
+  "schema": "outrun-ffb-surface-telemetry-v3",
   "purpose": "Correlate confirmed COLI0200 material IDs with the canonical per-contact surfaceMask path and modern DD-wheel output.",
   "runtimeChangeIncluded": false,
   "samplePolicy": {
@@ -39,16 +39,40 @@
       "semantic": "branch/junction collision context; not material"
     },
     {
+      "name": "bodyCollisionIndex",
+      "type": "uint32",
+      "source": "EVWORK_CAR+0x230",
+      "semantic": "exact body/general collision polygon index"
+    },
+    {
+      "name": "bodySurfaceMask",
+      "type": "uint32",
+      "source": "EVWORK_CAR+0x248",
+      "semantic": "body/general collision material mask"
+    },
+    {
       "name": "surfaceMask",
       "type": "uint32[4]",
       "source": "EVWORK_CAR::water_flag_24C[0..3]",
       "semantic": "four native contact surface masks; canonical EXE proves each mask is 1u << COLI0200 materialId"
     },
     {
+      "name": "contactCollisionIndex",
+      "type": "uint32[4]",
+      "source": "*(wheelWork[i]+0x10), wheelWork pointer array VA 0x0082EA38",
+      "semantic": "exact COLI polygon selected for each native contact"
+    },
+    {
       "name": "materialId",
       "type": "int[4]",
       "source": "derived from one-hot surfaceMask[i] using countr_zero/bit-scan",
       "semantic": "exact COLI0200 material byte for nonzero one-hot masks; canonical EXE VA 0x0043ECB8..0x0043ECC7"
+    },
+    {
+      "name": "staticCollisionMetadata",
+      "type": "derived[4]",
+      "source": "stage_coli_ffb_map + collisionIndex",
+      "semantic": "materialId, collisionFlags, localHeadingAngle, subtype, roadSectionIndex"
     },
     {
       "name": "roughness",
@@ -99,33 +123,37 @@
     }
   ],
   "wheelOrder": {
-    "status": "OPEN",
-    "indices": [
-      0,
-      1,
-      2,
-      3
+    "status": "PARTIAL_GEOMETRY_CONFIRMED",
+    "localTopology": [
+      "0=-X/-Z side",
+      "1=+X/-Z side",
+      "2=-X/+Z side",
+      "3=+X/+Z side"
     ],
-    "rule": "Do not label FL/FR/RL/RR until canonical wheel-object ordering is separately proven."
+    "source": "0x46BBF0 per-car geometry table copied by 0x4A58EC into EVWORK_CAR::vector_130[0..3]",
+    "finalLabels": "OPEN; do not assign FL/FR/RL/RR until forward-axis convention is independently proven"
   },
   "correlationKey": [
     "stageId",
+    "contactCollisionIndex",
+    "surfaceMask",
     "roadSectionNum",
-    "curStageIdx",
-    "loadColiType",
-    "surfaceMask"
+    "loadColiType"
   ],
   "interpretationRules": [
     "Canonical EXE proves surfaceMask = 1u << materialId for the selected collision record.",
-    "For a nonzero one-hot surfaceMask, derived materialId is exact and may be used for diagnostics.",
-    "Contact index ordering is not yet proven; keep names contact0..contact3.",
-    "Human labels for non-primary material IDs remain open until driven runtime correlation identifies the physical surface.",
-    "Keep DD-wheel feel parameters separate from original Xbox roughness values."
+    "Use contactCollisionIndex as the primary static/runtime join key when available.",
+    "Raw vehicle position alone cannot index the COLI 256x256 grid without reproducing the collision-set-local transform.",
+    "Contact local topology is known, but FL/FR/RL/RR human labels remain open.",
+    "Section8 values are lighting/intensity coefficients and must not be used as FFB material identity.",
+    "Human labels for non-primary material IDs remain open until effect/runtime correlation identifies the physical surface."
   ],
   "successCriteria": [
-    "Repeated passes over the same physical region reproduce the same raw mask pattern.",
-    "Forward/reverse stages correlate to equivalent static collision attributes where geometry/material is shared.",
-    "A candidate COLI attribute predicts raw surfaceMask transitions across at least two distinct stages before receiving a semantic material name."
+    "On Snowy Mountain, roadSection 132-203 should report ordinary material 0x01/mask 0x2 rather than snow material 0x17/mask 0x800000.",
+    "On Ice Scape, primary road sections 0-620 should report material 0x17/mask 0x800000.",
+    "Deep Lake roadSection 419-458 should report material 0x14/mask 0x100000; reverse 218-257 likewise.",
+    "Exact contactCollisionIndex must resolve to a static record whose materialId reproduces the runtime surfaceMask.",
+    "No FL/FR/RL/RR label is promoted until contact forward-axis orientation is proven."
   ],
   "staticCorrelation": {
     "map": "reverse/game_assets/stage_coli_ffb_map.json",
