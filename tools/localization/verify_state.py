@@ -72,6 +72,28 @@ if len(transcriptions)!=expected_tr_assets:
 if tr_segments!=expected_tr_segments:
     fail(f'graphics transcription segments {tr_segments} != {expected_tr_segments}')
 
+# Artwork production plan
+artwork=[]
+for n,line in enumerate((LOC/'graphics/artwork_plan.jsonl').read_text(encoding='utf-8').splitlines(),1):
+    if not line.strip():
+        continue
+    try:
+        row=json.loads(line)
+    except Exception as e:
+        fail(f'artwork plan line {n}: invalid JSON: {e}')
+        continue
+    artwork.append(row)
+art_ids=[r.get('index') for r in artwork]
+if len(art_ids)!=len(set(art_ids)):
+    fail('duplicate artwork-plan indices')
+if sorted(art_ids)!=sorted(tr_ids):
+    fail('artwork-plan indices do not match transcription indices')
+art_segments=sum(int(r.get('segment_count',0)) for r in artwork)
+if art_segments!=tr_segments:
+    fail(f'artwork-plan segment total {art_segments} != transcription total {tr_segments}')
+if len(artwork)!=progress['graphics']['localize_text']:
+    fail(f'artwork-plan count {len(artwork)} != localize_text target {progress["graphics"]["localize_text"]}')
+
 # Graphics state
 with (LOC/'graphics/visual_review.csv').open(encoding='utf-8-sig',newline='') as f:
     visual=list(csv.DictReader(f))
