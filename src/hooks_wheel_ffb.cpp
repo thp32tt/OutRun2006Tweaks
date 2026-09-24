@@ -3697,12 +3697,33 @@ namespace
                     }
                     else if (ps2Original)
                     {
-                        // PS2 confirms a dedicated ConstantForce path but the
-                        // retail payload fields/units are not fully decoded yet.
-                        // Preserve C2C impact direction and user-safe scaling
-                        // without claiming an unverified PS2 magnitude.
-                        result += std::clamp(
-                            crashImpulseForce_ * 0.45f, -1.0f, 1.0f);
+                        // Retail SLPM proves a directional ConstantForce capped
+                        // at 220/255. The exact retail event source behind that
+                        // force is still unresolved, so C2C collision detection
+                        // remains an explicitly provisional trigger. Normalize
+                        // the known C2C 1.7..2.5 severity envelope, preserve its
+                        // direction/user WallImpact scale, then enforce the
+                        // verified retail output cap.
+                        const int impactFrame =
+                            CrashTimerFrames - crashImpulseTimer_;
+                        const float direction =
+                            crashImpulseForce_ >= 0.0f ? 1.0f : -1.0f;
+                        const float translatedSeverity = std::clamp(
+                            std::abs(crashImpulseForce_) / 2.5f,
+                            0.0f, 1.0f);
+                        const float ps2Constant =
+                            direction * translatedSeverity *
+                            WheelFFBPS2::constant_magnitude_cap_norm();
+                        result += ps2Constant;
+
+                        if (impactFrame == 0 &&
+                            Settings::WheelFFBDebugLog)
+                        {
+                            spdlog::info(
+                                "WheelFFB PS2: provisional C2C collision -> retail ConstantForce envelope severity={:.3f} cap={:.3f}",
+                                translatedSeverity,
+                                WheelFFBPS2::constant_magnitude_cap_norm());
+                        }
                     }
                     else
                     {
@@ -3732,14 +3753,17 @@ namespace
                         0.10f * (gearShiftTimer_ > 3 ? 1.0f : -1.0f);
                     result += pulse;
                 }
-                else
+                else if (!ps2Original)
                 {
                     const float thunk =
-                        (ps2Original ? 0.12f : 0.20f) *
+                        0.20f *
                         static_cast<float>(Settings::WheelFFBGearShift) *
                         (gearShiftTimer_ > 3 ? 1.0f : -1.0f);
                     result += thunk;
                 }
+                // No retail PS2 caller has been tied to a gear-change effect.
+                // Original mode therefore emits nothing rather than preserving
+                // the old unsupported 0.12 synthetic thunk.
                 --gearShiftTimer_;
             }
 
