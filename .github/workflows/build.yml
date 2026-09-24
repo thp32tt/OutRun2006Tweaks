@@ -18,6 +18,10 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Verify standalone FFB scope
+        shell: pwsh
+        run: python tools/verify_ffb_standalone_scope.py
+
       - name: Verify consolidated wheel FFB source
         shell: pwsh
         run: python tools/verify_wheel_ffb_current.py
