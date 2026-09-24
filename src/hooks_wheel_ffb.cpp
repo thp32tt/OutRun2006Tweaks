@@ -45,6 +45,12 @@ namespace Settings
         "Enable experimental DirectInput COM force feedback for steering wheels."
     };
 
+    Setting<int> WheelFFBModel{
+        "WheelFFB", "Model", 0,
+        "0=Modern DD, 1=Arcade Original (Lindbergh-derived), 2=Arcade + Modern Hybrid, 3=PS2 Original topology (experimental).",
+        Range<int>{ 0, 3 }
+    };
+
     Setting<std::string> WheelFFBDeviceName{
         "WheelFFB", "DeviceName", "MOZA",
         "Case-insensitive substring used to select the FFB wheel. Empty selects the first non-virtual FFB device."
@@ -527,6 +533,19 @@ namespace
             const float speedRaw = car->field_1C4;
             const float speed = std::isfinite(speedRaw) ? speedRaw : 0.0f;
             const float speedNorm = std::clamp(speed / 2.0f, 0.0f, 1.0f);
+            const WheelFFBMath::Model ffbModel =
+                WheelFFBMath::sanitize_model(static_cast<int>(Settings::WheelFFBModel));
+            const bool modernStructural =
+                WheelFFBMath::model_uses_modern_sat(ffbModel);
+            const bool arcadeEffects =
+                WheelFFBMath::model_uses_arcade_events(ffbModel);
+            const bool originalConditionBackbone =
+                WheelFFBMath::model_uses_original_condition_backbone(ffbModel);
+            const bool ps2Original =
+                ffbModel == WheelFFBMath::Model::PS2OriginalExperimental;
+            const float arcadeSpeedStrength =
+                WheelFFBMath::arcade_speed_strength(speedNorm);
+
             const float configuredStrength =
                 static_cast<float>(Settings::WheelFFBGlobalStrength);
             const float outputStrength = std::isfinite(configuredStrength)
@@ -659,15 +678,33 @@ namespace
 
             float roughness = 0.0f;
             DWORD waterFlag = 0;
+            float wheelRoughness[4]{};
+            bool wheelWater[4]{};
             for (int i = 0; i < 4; ++i)
             {
+                DWORD wheelWaterFlag = 0;
                 const float surfaceRoughness = static_cast<float>(sub_1149C0(
                     car->water_flag_24C[i],
                     static_cast<int>(car->OnRoadPlace_5C.loadColiType_0),
-                    &waterFlag));
-                if (std::isfinite(surfaceRoughness))
-                    roughness = std::max(roughness, surfaceRoughness);
+                    &wheelWaterFlag));
+                wheelRoughness[i] = std::isfinite(surfaceRoughness)
+                    ? surfaceRoughness : 0.0f;
+                wheelWater[i] = (wheelWaterFlag & 1u) != 0;
+                waterFlag |= wheelWaterFlag;
+                roughness = std::max(roughness, wheelRoughness[i]);
             }
+
+            const auto non_water_rough = [&](int a, int b)
+            {
+                float value = 0.0f;
+                if (!wheelWater[a]) value = std::max(value, wheelRoughness[a]);
+                if (!wheelWater[b]) value = std::max(value, wheelRoughness[b]);
+                return value;
+            };
+            const float leftSurfaceRoughness = non_water_rough(0, 2);
+            const float rightSurfaceRoughness = non_water_rough(1, 3);
+            const bool leftArcadeRough = leftSurfaceRoughness >= 0.60f;
+            const bool rightArcadeRough = rightSurfaceRoughness >= 0.60f;
 
             // Road texture and tire-slip envelopes.  sub_1149C0 returns
             // ~0.25 for ordinary asphalt; that is a material baseline, not a
@@ -696,7 +733,88 @@ namespace
                 textureRoughness * roadSpeedGate *
                 static_cast<float>(Settings::WheelFFBRoadTexture) * outputStrength *
                 stageRoadTextureScale;
-            const float roadFreq = 25.0f + 12.0f * speedNorm;
+            float roadFreq = 25.0f + 12.0f * speedNorm;
+
+            // Lindbergh-derived arcade reconstruction:
+            // - both sides on a rough non-water surface correspond to the plugin's
+            //   grass/sand sine event (observed code 0x02);
+            // - one-sided rough contact and rough->road transitions correspond to
+            //   its directional constant-force groups (0x10/0x00 and 0x04/0x14).
+            // The PC build has no drive-board packet stream, so classify from the
+            // per-wheel C2C surface LUT and preserve the arcade event semantics.
+            float arcadeDirectionalSurface = 0.0f;
+            int arcadeSurfaceCode = -1;
+            if (arcadeEffects)
+            {
+                const float roadSetting = std::clamp(
+                    static_cast<float>(Settings::WheelFFBRoadTexture), 0.0f, 1.0f);
+                if (leftArcadeRough && rightArcadeRough)
+                {
+                    roadAmp = std::max(
+                        roadAmp, arcadeSpeedStrength * roadSetting * outputStrength);
+                    roadFreq = 70.0f;
+                    arcadeSurfaceCode = 0x02;
+                }
+                else if (leftArcadeRough != rightArcadeRough)
+                {
+                    // Preserve the two directional groups from OutRun2Real.cpp.
+                    // The final hardware polarity remains controlled by InvertForce.
+                    const float sideSign = rightArcadeRough ? 1.0f : -1.0f;
+                    arcadeDirectionalSurface =
+                        sideSign * arcadeSpeedStrength * roadSetting;
+                    arcadeSurfaceCode = rightArcadeRough ? 0x10 : 0x00;
+                }
+
+                if (prevArcadeRightRough_ && !rightArcadeRough)
+                {
+                    arcadeSurfaceTransitionTimer_ = 6; // ~100 ms at 60 Hz
+                    arcadeSurfaceTransitionForce_ =
+                        arcadeSpeedStrength * roadSetting;
+                    arcadeSurfaceTransitionCode_ = 0x04;
+                }
+                else if (prevArcadeLeftRough_ && !leftArcadeRough)
+                {
+                    arcadeSurfaceTransitionTimer_ = 6;
+                    arcadeSurfaceTransitionForce_ =
+                        -arcadeSpeedStrength * roadSetting;
+                    arcadeSurfaceTransitionCode_ = 0x14;
+                }
+
+                prevArcadeLeftRough_ = leftArcadeRough;
+                prevArcadeRightRough_ = rightArcadeRough;
+
+                if (arcadeSurfaceTransitionTimer_ > 0)
+                {
+                    arcadeDirectionalSurface += arcadeSurfaceTransitionForce_;
+                    arcadeSurfaceCode = arcadeSurfaceTransitionCode_;
+                    --arcadeSurfaceTransitionTimer_;
+                }
+
+                if (Settings::WheelFFBDebugLog &&
+                    arcadeSurfaceCode >= 0 &&
+                    arcadeSurfaceCode != lastArcadeSurfaceCode_)
+                {
+                    spdlog::info(
+                        "WheelFFB ARCADE: surfaceCode=0x{:02X} speedStrength={:.2f} leftRough={} rightRough={} directional={:.3f}",
+                        arcadeSurfaceCode, arcadeSpeedStrength,
+                        leftArcadeRough, rightArcadeRough,
+                        arcadeDirectionalSurface);
+                    lastArcadeSurfaceCode_ = arcadeSurfaceCode;
+                }
+                else if (arcadeSurfaceCode < 0)
+                {
+                    lastArcadeSurfaceCode_ = -1;
+                }
+            }
+            else
+            {
+                prevArcadeLeftRough_ = leftArcadeRough;
+                prevArcadeRightRough_ = rightArcadeRough;
+                arcadeSurfaceTransitionTimer_ = 0;
+                arcadeSurfaceTransitionForce_ = 0.0f;
+                arcadeSurfaceTransitionCode_ = -1;
+                lastArcadeSurfaceCode_ = -1;
+            }
 
             if (waterFlag && roughness > 0.7f && speedNorm > 0.70f && splashTimer_ <= 0)
             {
@@ -720,7 +838,10 @@ namespace
                 frontScrub * (0.50f + 0.50f * lateralLoadSmooth) +
                     bodySlide * 0.20f,
                 0.0f, 1.0f);
-            if (slipSeverity > 0.08f && speedNorm > 0.05f)
+            // Modern DD owns the inferred tyre-slip chatter. The original
+            // Lindbergh reconstruction and the PS2 topology mode avoid inventing
+            // a tyre-slip effect that is not yet verified in those sources.
+            if (modernStructural && slipSeverity > 0.08f && speedNorm > 0.05f)
             {
                 slipAmp =
                     slipSeverity * static_cast<float>(Settings::WheelFFBTireSlip) *
@@ -769,7 +890,9 @@ namespace
                 (speedNorm - 0.05f) / 0.35f, 0.0f, 1.0f);
             const float springFade =
                 springFadeT * springFadeT * (3.0f - 2.0f * springFadeT);
-            const float springSpeed = 1.0f - 0.88f * springFade;
+            const float springSpeed = originalConditionBackbone
+                ? 1.0f
+                : (1.0f - 0.88f * springFade);
             // Centering Spring is an artificial low-speed stabilizer, not a tyre
             // grip estimator. Do not modulate it with lateral-G or slide state.
             const float springStrength = std::clamp(
@@ -963,9 +1086,11 @@ namespace
             // Dropping it on the calibration tick created a short SAT hole while
             // physicsMix was still near zero.
             const float physicsFallback = naturalSatTorque;
-            const float selfAligningTorque = Settings::WheelFFBPhysicsSat
+            const float modernSelfAligningTorque = Settings::WheelFFBPhysicsSat
                 ? physicsFallback + (physicsSatTorque - physicsFallback) * physicsMix
                 : naturalSatTorque;
+            const float selfAligningTorque =
+                modernStructural ? modernSelfAligningTorque : 0.0f;
 
             float loadMod = 1.0f;
             if (speedHistoryIndex_ > 6)
@@ -987,7 +1112,14 @@ namespace
 
             float structural = 0.0f;
             if (crashImpulseTimer_ <= CrashCooldownFrames)
-                structural = (softwareSpring + selfAligningTorque) * loadMod + damper;
+            {
+                // Arcade Original and PS2 Original topology modes use the
+                // verified condition-force backbone rather than the modern
+                // inferred SAT. Hybrid keeps Modern DD SAT and swaps the
+                // transient/surface semantics to the arcade reconstruction.
+                structural =
+                    (softwareSpring + selfAligningTorque) * loadMod + damper;
+            }
 
             // Headroom analysis uses sustained structural steering only. Do not
             // let a wall hit, gear thunk, startup ramp or nearly-stopped frame
@@ -997,7 +1129,10 @@ namespace
                 warmupScale >= 0.999f && recreateScale >= 0.999f &&
                 speedNorm > 0.08f;
 
-            float events = update_event_force();
+            float events = update_event_force(
+                arcadeEffects, ps2Original, arcadeSpeedStrength);
+            if (arcadeEffects)
+                events += arcadeDirectionalSurface;
 
             // Sustained steering and short events have different timing needs.
             // Keep SAT/spring/damper on the DD-safe slew path while allowing a
@@ -1087,7 +1222,8 @@ namespace
             // transport so wheel brand / GUID_Sine support cannot change the feel.
             // The existing vibration-headroom clamp below guarantees SAT/events
             // always have priority over this cosmetic engine texture.
-            if (Settings::WheelFFBEngineVibration)
+            if (Settings::WheelFFBEngineVibration &&
+                ffbModel == WheelFFBMath::Model::ModernDD)
             {
                 fallbackVibration += synth_fallback(
                     enginePhase_, engineAmp * effectRampScale, engineFreq);
@@ -1097,7 +1233,9 @@ namespace
                 structuralLevel + eventLevel,
                 -static_cast<LONG>(DI_FFNOMINALMAX),
                 static_cast<LONG>(DI_FFNOMINALMAX));
-            if (Settings::WheelFFBEngineVibration && engineAmp > 0.0001f && eventLevel == 0)
+            if (Settings::WheelFFBEngineVibration &&
+                ffbModel == WheelFFBMath::Model::ModernDD &&
+                engineAmp > 0.0001f && eventLevel == 0)
             {
                 // Reserve at most 2.5% during ordinary driving so the optional
                 // engine texture does not abruptly vanish at brief SAT peaks.
@@ -1162,6 +1300,7 @@ namespace
             prevGear_ = curGear;
             prevCollisionFlags_ = stateFlags;
             maybe_log(
+                ffbModel,
                 speedNorm, steer, steerRate, lateralLoadSmooth, bodySlide, frontScrub,
                 roughness, originalXboxLeftRumble, originalXboxRightRumble,
                 selfAligningTorque, level);
@@ -1170,8 +1309,8 @@ namespace
             {
                 lastTelemetryTick_ = telemetryNow;
                 spdlog::info(
-                    "WheelFFB SAMPLE t={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperRelease={} damperCoefficient={} xboxLeft={} xboxRight={} roadAmp={} slipAmp={} structural={} event={} structuralPreClip={} structuralPostClip={} eventPostClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
-                    telemetryNow, static_cast<const void*>(car), speedRaw, speedNorm, steer, rawSteerRate, steerRate,
+                    "WheelFFB SAMPLE t={} model={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperRelease={} damperCoefficient={} xboxLeft={} xboxRight={} roadAmp={} slipAmp={} structural={} event={} structuralPreClip={} structuralPostClip={} eventPostClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
+                    telemetryNow, WheelFFBMath::model_name(ffbModel), static_cast<const void*>(car), speedRaw, speedNorm, steer, rawSteerRate, steerRate,
                     car->field_264, car->field_268, lateralRaw, smoothedLateral_, lateralLoadSmooth,
                     vehicleDynamics_.bodySlip(), bodySlide, vehicleDynamics_.yawRate(), frontSlip, frontScrub,
                     vehicleDynamics_.vLong(), vehicleDynamics_.vLat(), vehicleDynamics_.positionStep(),
@@ -3320,7 +3459,10 @@ namespace
                 gearShiftTimer_ = 6;
         }
 
-        float update_event_force()
+        float update_event_force(
+            bool arcadeEffects,
+            bool ps2Original,
+            float arcadeSpeedStrength)
         {
             float result = 0.0f;
 
@@ -3328,26 +3470,64 @@ namespace
             {
                 if (crashImpulseTimer_ > CrashCooldownFrames)
                 {
-                    // A short kick/rebound is much easier to feel on a DD wheel
-                    // than the old soft one-direction 10-frame push.
-                    const int impactFrame = CrashTimerFrames - crashImpulseTimer_;
-                    if (impactFrame < 3)
-                        result += crashImpulseForce_;
-                    else if (impactFrame < 6)
-                        result -= crashImpulseForce_ * 0.55f;
+                    if (arcadeEffects)
+                    {
+                        // OutRun2Real.cpp groups hard wall requests into two
+                        // directional ConstantForce codes (0x0B / 0x1B) and
+                        // holds the request for roughly 100 ms. C2C supplies the
+                        // impact direction from its own lateral/collision state.
+                        const float direction =
+                            crashImpulseForce_ >= 0.0f ? 1.0f : -1.0f;
+                        result += direction * arcadeSpeedStrength *
+                            std::clamp(
+                                static_cast<float>(Settings::WheelFFBWallImpact),
+                                0.0f, 1.0f);
+                    }
+                    else if (ps2Original)
+                    {
+                        // PS2 confirms a dedicated ConstantForce path but the
+                        // retail payload fields/units are not fully decoded yet.
+                        // Preserve C2C impact direction and user-safe scaling
+                        // without claiming an unverified PS2 magnitude.
+                        result += std::clamp(
+                            crashImpulseForce_ * 0.45f, -1.0f, 1.0f);
+                    }
                     else
-                        result += crashImpulseForce_ * 0.20f;
+                    {
+                        // Modern DD uses a short kick/rebound so an impact
+                        // remains tactile without holding the rack to one side.
+                        const int impactFrame = CrashTimerFrames - crashImpulseTimer_;
+                        if (impactFrame < 3)
+                            result += crashImpulseForce_;
+                        else if (impactFrame < 6)
+                            result -= crashImpulseForce_ * 0.55f;
+                        else
+                            result += crashImpulseForce_ * 0.20f;
+                    }
                 }
                 --crashImpulseTimer_;
             }
 
             if (gearShiftTimer_ > 0)
             {
-                const float thunk =
-                    0.20f *
-                    static_cast<float>(Settings::WheelFFBGearShift) *
-                    (gearShiftTimer_ > 3 ? 1.0f : -1.0f);
-                result += thunk;
+                if (arcadeEffects)
+                {
+                    // Lindbergh Real issues a 0.10 sine pulse on gear change.
+                    // At 60 Hz a short alternating ConstantForce pulse is the
+                    // hardware-independent fallback for wheels whose sine path
+                    // is ineffective; the 0.10 source magnitude is retained.
+                    const float pulse =
+                        0.10f * (gearShiftTimer_ > 3 ? 1.0f : -1.0f);
+                    result += pulse;
+                }
+                else
+                {
+                    const float thunk =
+                        (ps2Original ? 0.12f : 0.20f) *
+                        static_cast<float>(Settings::WheelFFBGearShift) *
+                        (gearShiftTimer_ > 3 ? 1.0f : -1.0f);
+                    result += thunk;
+                }
                 --gearShiftTimer_;
             }
 
@@ -3413,6 +3593,12 @@ namespace
             smoothedEngineFreq_ = 0.0f;
             splashTimer_ = 0;
             splashAmp_ = 0.0f;
+            prevArcadeLeftRough_ = false;
+            prevArcadeRightRough_ = false;
+            arcadeSurfaceTransitionTimer_ = 0;
+            arcadeSurfaceTransitionForce_ = 0.0f;
+            arcadeSurfaceTransitionCode_ = -1;
+            lastArcadeSurfaceCode_ = -1;
             manualTestFrames_ = 0;
             manualTestDirection_ = 1;
 
@@ -3649,6 +3835,7 @@ namespace
         }
 
         void maybe_log(
+            WheelFFBMath::Model ffbModel,
             float speedNorm,
             float steer,
             float steerRate,
@@ -3670,7 +3857,8 @@ namespace
 
             lastLogTick_ = now;
             spdlog::info(
-                "WheelFFB DIAG: spd={:.2f} steer={:.3f} rate={:.4f} lat={:.2f} load={:.2f} slide={:.2f} scrub={:.2f} rough={:.2f} origXboxL={:.3f} origXboxR={:.3f} sat={:.3f} phys={} basis=M70r{} cal={:.2f} mix={:.2f} beta={:.3f} yaw={:.3f} fslip={:.3f} vLat={:.5f} vLong={:.5f} step={:.5f} spdLen={:.5f} spdCorr={:.2f} steerSrc={} out={} invCF={} spring={} invSpring={} coeff={} damper={} dcoeff={} periodic={}",
+                "WheelFFB DIAG: model={} spd={:.2f} steer={:.3f} rate={:.4f} lat={:.2f} load={:.2f} slide={:.2f} scrub={:.2f} rough={:.2f} origXboxL={:.3f} origXboxR={:.3f} sat={:.3f} phys={} basis=M70r{} cal={:.2f} mix={:.2f} beta={:.3f} yaw={:.3f} fslip={:.3f} vLat={:.5f} vLong={:.5f} step={:.5f} spdLen={:.5f} spdCorr={:.2f} steerSrc={} out={} invCF={} spring={} invSpring={} coeff={} damper={} dcoeff={} periodic={}",
+                WheelFFBMath::model_name(ffbModel),
                 speedNorm,
                 steer,
                 steerRate,
@@ -3815,6 +4003,13 @@ namespace
         float smoothedEngineAmp_ = 0.0f;
         float smoothedEngineFreq_ = 0.0f;
         float splashAmp_ = 0.0f;
+
+        bool prevArcadeLeftRough_ = false;
+        bool prevArcadeRightRough_ = false;
+        int arcadeSurfaceTransitionTimer_ = 0;
+        float arcadeSurfaceTransitionForce_ = 0.0f;
+        int arcadeSurfaceTransitionCode_ = -1;
+        int lastArcadeSurfaceCode_ = -1;
 
         float speedHistory_[SpeedHistoryCount]{};
         int speedHistoryIndex_ = 0;
