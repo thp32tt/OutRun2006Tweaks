@@ -558,6 +558,7 @@ req(ffb, 'WheelFFBPS2::spring_saturation_norm(ps2DriveFactor)', 'PS2 runtime use
 req(ffb, 'WheelFFBPS2::damper_coefficient_norm(ps2DriveFactor)', 'PS2 runtime uses recovered speed-fading damper coefficient')
 req(ffb, 'std::abs(crashImpulseForce_) / 2.5f', 'PS2 provisional collision source is normalized from the known C2C severity envelope')
 req(ffb, 'WheelFFBPS2::constant_magnitude_cap_norm()', 'PS2 provisional collision translation obeys the recovered retail ConstantForce cap')
+req(ffb, ': (!ps2Original &&\n                   crashImpulseTimer_ > CrashCooldownFrames);', 'PS2 original spring is not suppressed by an unverified Modern collision interaction')
 forbid(ffb, 'crashImpulseForce_ * 0.45f', 'arbitrary PS2 collision multiplier removed')
 forbid(ffb, '(ps2Original ? 0.12f : 0.20f)', 'unsupported PS2 gear thunk removed')
 req(ffb, 'else if (!ps2Original)', 'PS2 original mode emits no unverified generic gear-shift thunk')
