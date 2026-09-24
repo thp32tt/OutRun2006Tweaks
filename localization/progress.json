@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "project": "OutRun 2006 Korean localization",
+  "branch": "korean-localization-prototype",
+  "updated_at_kst": "2026-09-24T18:49:00+09:00",
+  "phase": "TEXT_AND_GRAPHICS_PREWORK",
+  "resume_from": "Translate remaining text IDs from 159; continue DDS visual classification after sheet 00.",
+  "text": {
+    "total_ids": 1356,
+    "unique_source_strings": 1067,
+    "reviewed": 157,
+    "draft": 2,
+    "todo": 1192,
+    "blocked_or_special": 5,
+    "next_id": 159,
+    "config_text_rows": 23,
+    "config_text_reviewed": 23
+  },
+  "graphics": {
+    "total_dds": 243,
+    "inspect_queue": 213,
+    "deferred_nonlocalized": 30,
+    "visually_reviewed": 36,
+    "text_detected_confirmed": 0,
+    "next_visual_index": 36
+  },
+  "runtime": {
+    "k0_txet_roundtrip": "pass",
+    "k1_trace_hook": "implemented",
+    "ci": "running",
+    "hangul_runtime_render": "blocked_pending_trace_and_font"
+  },
+  "checkpoints": [
+    {"id":"CP-TEXT-000","state":"complete","detail":"full 1356-row translation work table created"},
+    {"id":"CP-TEXT-001","state":"complete","detail":"core IDs 0-158 seeded; most reviewed, 2 draft-context items"},
+    {"id":"CP-CONFIG-001","state":"complete","detail":"23 config_text rows translated"},
+    {"id":"CP-GFX-000","state":"complete","detail":"243 DDS inventory with hashes/dimensions created"},
+    {"id":"CP-GFX-001","state":"in_progress","detail":"visual inspection started; first 36 contact-sheet items reviewed manually"}
+  ]
+}
