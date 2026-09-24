@@ -72,3 +72,28 @@ All runtime patches must signature-check the executable before installation.
 ## Distribution rule
 
 Do not ship a font file. Generate raster atlas assets during development from a suitably licensed Hangul font and distribute only the derived atlas/metrics needed by the mod.
+
+
+## Stock font resource map
+
+The canonical executable has 10 font descriptors at VA `0x76F7B8`. Function `0x42CA60` selects one descriptor and copies its state into the active globals around `0x956BA0`.
+
+The embedded `spr_font_xst` DDS resources have been hash-mapped to the descriptor resource handles. The machine-readable mapping is:
+
+`localization/font/stock_font_map.json`
+
+Notable result:
+
+- resource handle 1 -> `CE41E71C_256x128.dds`
+- descriptor index 1 -> handle 1, 16x16 cell, base code 0
+- it is the only one of the 10 embedded stock font resources without a corresponding high-resolution replacement in the analyzed texture pack.
+
+This makes handle 1 interesting for K3 research, but **not yet safe to repurpose**. Runtime `KoreanK3Trace` font-state evidence must show how/where the handle is used before any replacement or page-switching experiment.
+
+The current K3 direction is therefore:
+
+1. Log actual font-handle usage per target screen.
+2. Preserve active stock ASCII resources.
+3. Reuse the stock `0x42CFE0` text batch queue.
+4. Select a Korean atlas/page only inside a controlled Korean glyph path.
+5. Restore the original font state before returning to the stock ASCII path.
