@@ -43,6 +43,11 @@ int main() {
  require(WheelFFBPS2::triangle_period_raw(1.0f)==160,"PS2 Triangle high-speed period field");
  require(std::abs(WheelFFBPS2::triangle_frequency_hz_for_directinput(0.0f)-10.0f)<1e-6f,"PS2 host Triangle 100ms translation");
  require(std::abs(WheelFFBPS2::triangle_frequency_hz_for_directinput(1.0f)-6.25f)<1e-6f,"PS2 host Triangle 160ms translation");
+ require(std::abs(WheelFFBPS2::triangle_wave(0.0f)+1.0f)<1e-6f,"PS2 Triangle starts at negative peak");
+ require(std::abs(WheelFFBPS2::triangle_wave(0.25f)-0.0f)<1e-6f,"PS2 Triangle quarter-cycle zero");
+ require(std::abs(WheelFFBPS2::triangle_wave(0.5f)-1.0f)<1e-6f,"PS2 Triangle half-cycle positive peak");
+ require(std::abs(WheelFFBPS2::triangle_wave(1.25f)-0.0f)<1e-6f,"PS2 Triangle wraps cycles");
+ require(WheelFFBPS2::triangle_wave(std::numeric_limits<float>::quiet_NaN())==0.0f,"PS2 Triangle rejects NaN");
  require(std::abs(WheelFFBPS2::constant_magnitude_cap_norm()-220.0f/255.0f)<1e-6f,"PS2 constant cap 220/255");
 
  auto engineIdle=estimate_engine_haptics(0.0f,0,0.0f);
