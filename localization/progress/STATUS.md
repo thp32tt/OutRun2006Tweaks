@@ -24,13 +24,15 @@ Base: `emoose/OutRun2006Tweaks@08e5efb4deea4066c440307ec009c868a30562d3`
 ## Graphics
 - DDS inventory / visual review: **243 / 243 (100%)**
 - direct Korean artwork targets: **79**
-- transcription completed: **78 / 79 (98.7%)**
-- translated/transcribed graphic segments: **668**
-- context-blocked graphic asset: **index 152** (`PRO./INS./G.M./E.R.` badge context)
+- transcription completed: **79 / 79 (100%)**
+- translated/transcribed graphic segments: **674**
+- context-blocked graphic assets: **0**
 - final Korean artwork validated in game: **0 / 79**
 - first DDS candidate: `Continue? -> 계속?` ready, pending in-game validation
 - font atlases: 9
 - Hangul name-entry atlas: 1
+
+- music-version badge semantics resolved by cross-reference to the full music-label atlas
 
 ## Runtime
 - K0 txet lossless roundtrip: **PASS**
