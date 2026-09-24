@@ -74,3 +74,16 @@
 - Added stage-name, timer/ghost HUD, stage-rank/bowling and multiplayer mission-HUD Korean text specs.
 - Artwork remains source-preserving metadata only at this checkpoint; no final DDS replacement is marked complete yet.
 - Next: clean CI on latest HEAD, K1 runtime trace, resolve four context-sensitive strings, continue graphics transcription, then first Korean DDS typesetting proof.
+
+## 2026-09-25 00:48 KST - CP5
+
+- Clean K1 trace package generated from successful clean HEAD build artifact 10816665179; game EXE excluded.
+- K1 package SHA-256: `930a510bf8c6ffaa589da51bd805047bbfc1cef9d43076149e1fcef86899b287`.
+- K2 ASCII resolver proof package generated with `KoreanProofTextOverride=true`; game EXE excluded.
+- K2 package SHA-256: `0d68692be110175bd49d4d84f926f673eb6ca09cc32b9410bac6e847755f1229`.
+- Disassembly reconfirmed `0x42C480` walks text byte-by-byte; a Unicode resolver alone cannot render Hangul. K3 must handle glyph/width behavior as well.
+- Additional graphics transcription passes completed through selector/mode assets.
+- Graphics transcription: 49/79 direct Korean-artwork targets (62.0%), 364 text segments.
+- Legal/licensing credit texture index 122 was removed from the direct-localization set and reclassified to preserve-original; target count corrected from 80 to 79.
+- Four text IDs remain context-sensitive: PASSENGER at 96/279 and DUMPED at 97/280. The DUMPED gameplay event is drafted as `차였어요!`; mode-title wording remains pending runtime menu context.
+- Next: latest clean CI -> K1 runtime log -> K2 ID0 marker -> continue remaining 30 atlas transcriptions -> first in-game Korean DDS validation -> K3 Hangul glyph/width proof.
