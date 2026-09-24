@@ -97,3 +97,51 @@ The current K3 direction is therefore:
 3. Reuse the stock `0x42CFE0` text batch queue.
 4. Select a Korean atlas/page only inside a controlled Korean glyph path.
 5. Restore the original font state before returning to the stock ASCII path.
+
+
+## K3-A state isolation contract
+
+The stock renderer stores the active font in writable globals, so Korean rendering must be scoped and reversible.
+
+For every Korean render segment:
+
+1. Snapshot the complete stock font state:
+   - texture pointer
+   - kerning pointer
+   - resource handle
+   - texture width/height
+   - cursor X/Y
+   - cell width/height
+   - scale X/Y
+   - color/layer
+   - base code/flags
+   - letter spacing/line advance
+2. Switch only the fields required by the Korean atlas page.
+3. Submit Korean glyph commands through the existing `0x42CFE0` batch path.
+4. Preserve cursor progression and alignment semantics.
+5. Restore every snapshotted stock field before returning to the original renderer.
+6. If any signature, texture, descriptor, or page prerequisite is missing, render the original English text and do not mutate the stock font state.
+
+### Page switching
+
+The compact corpus uses 505 syllables across two 256-cell pages. A Korean glyph index maps to:
+
+```text
+page = index / 256
+cell = index % 256
+row  = cell / 16
+col  = cell % 16
+```
+
+The page switch must occur only when the requested Korean glyph page differs from the currently bound Korean page. ASCII remains on the stock renderer.
+
+### K3-A proof scope
+
+The first behavior-changing proof is deliberately limited to text ID 0:
+
+```text
+Screen Position
+-> 화면 위치
+```
+
+Only the four required Hangul glyphs are accepted by the proof gate. Any unexpected Korean code point falls back to the original English string. This keeps the first runtime patch falsifiable and limits blast radius.
