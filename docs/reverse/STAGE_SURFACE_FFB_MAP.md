@@ -1,251 +1,224 @@
-# Stage collision / road-surface map for wheel FFB
+# Stage COLI0200 / road-surface map for wheel FFB — v2
 
-This document turns the Stage asset inventory and current game/FFB source into a reusable road-surface evidence model.
+Evidence date: 2026-09-24 KST  
+Input: user-supplied `Stage.zip` (290,113,621 bytes)  
+ZIP SHA-256: `385a5be540d87139c065bb5d62899767ca57c9a26950f7c2819235aa1448e6f6`  
+Canonical EXE SHA-256: `68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3`
 
-> Evidence boundary: the uploaded `Stage.zip` (290,113,621 bytes) was successfully received/materialized, but raw ZIP extraction was blocked by the execution backend during this run. Exact per-triangle/region fields inside the newly uploaded Stage payload are therefore **not claimed as decoded here**. The inventory below is independently grounded by the previously supplied full game manifest and current source/runtime evidence.
+This revision directly parses the uploaded Stage archive and cross-references the canonical PC executable. It supersedes the previous inventory-only analysis.
 
-## 1. Stage corpus — CONFIRMED inventory
+## 1. Corpus
 
-The full game manifest contains:
+- collision archives: **72**
+- `COLI0200` current course files (`coli_CS_*`): **66**
+- legacy `COLI0105` background files (`coli_BK_*`): **6**
+- current material IDs observed: `01,02,03,04,05,07,08,09,0A,0B,0C,0E,10,11,12,13,14,16,17,18,19`
+- material IDs observed in the primary road region: **01, 14, 16, 17 only**
 
-- **847** files below `Stage/`
-- **66** stage directories/variants
-- **296,418,999 bytes** total for those Stage files as stored in the installation
-- **72** `coli_*` collision assets
-- **19,481,268 bytes** total compressed collision payload
-- 456 `*_bin.sz`, 273 `*_pmt.sz`, 114 other `.sz` files, plus 4 other entries
+## 2. COLI0200 layout now decoded enough for FFB
 
-There are 66 game stage IDs: 30 forward, 30 reverse and six Palm Beach/Sunny Beach time/night variants. The machine-readable mapping is in `reverse/game_assets/stage_collision_inventory.json`.
+Offsets stored in the file are relative to `file + 4` (the payload-size prefix is outside the collision object proper).
 
-Six forward folders also carry a `coli_BK_*` file (CAPE, EAST, FLOR, MAYA, NEWY, PRIN). All six manifest sizes are exactly 11,706 bytes. They are tracked separately from the main course-surface `coli_CS_*` file and must not be assumed to contain road material until their consumer is proven.
+| section | record/layout | status / use |
+|---|---|---|
+| section 0 | 131,072 bytes = 65,536 × u16 | spatial lookup/bucket map; collision-query acceleration |
+| section 1 | variable | candidate-list data used by the collision query |
+| section 2 | `u8 materialId[collisionCount]` | **CONFIRMED** material array |
+| section 3 | 64 B/record | **CONFIRMED**: `vec3 corner[4] + vec3 center + u32 flags` |
+| section 4 | 48 B/record | **CONFIRMED**: `vec3 normal[4]` |
+| section 5 | `u8[collisionCount]` | collision subtype/class; low nibble is consumed through canonical table VA `0x5E0DE0`; names open |
+| section 6 | `u16[collisionCount]` | road-section index family; compared with `OnRoadPlace::roadSectionNum` |
+| section 7 | variable | open |
+| section 8 | variable | open |
 
-## 2. Runtime contact fields — SOURCE-CONFIRMED
+The 64-byte geometry relationship and 48-byte normal relationship hold across all **66/66 COLI0200 files**.
 
-Current `EVWORK_CAR` contains:
+The second header count at file offset `0x10` behaves as the **primary/main-road collision record count**. For all 66 files, the first `primaryCount` subtype/class entries are zero, and their material distribution maps cleanly to the course's main-road surface families. The exact original symbol name is unknown, so tooling preserves the descriptive name `primaryRoadCollisionCount`.
 
-```cpp
-OnRoadPlace OnRoadPlace_5C;
+## 3. PC executable proves materialId -> surfaceMask
 
-uint32_t water_flag_24C[4];
+The canonical PC executable makes the link directly.
 
-struct OnRoadPlace {
-    uint32_t loadColiType_0;
-    uint32_t field_4;
-    int16_t  roadSectionNum_8;
-    uint8_t  field_A;
-    uint8_t  unk_B;
-    uint32_t curStageIdx_C;
-};
+Collision surface query at VA `0x0043EB60` / RVA `0x0003DB60` reaches:
+
+```asm
+0043ECB8  mov  0x780100(,stage,4), ecx   ; material array base
+0043ECBF  mov  byte ptr [edi+ecx], cl    ; materialId = material[collisionIndex]
+0043ECC2  mov  1, eax
+0043ECC7  shl  eax, cl                    ; surfaceMask = 1u << materialId
 ```
 
-Two semantic corrections matter for FFB.
-
-### `water_flag_24C[4]` is effectively a per-wheel surface mask
-
-The historical field name is misleading. The wheel code passes every element as the first argument of:
-
-`sub_1149C0(surfaceMask, loadColiType, waterFlag)`
-
-and the Xbox-derived routine branches over values from `0x1` through `0x800000`. Most of these cases have nothing specifically water-only about them.
-
-For reverse-engineering and FFB documentation, use the semantic alias:
+The per-wheel caller then stores the returned masks at:
 
 ```text
-surfaceMask[4] := EVWORK_CAR::water_flag_24C[4]
+004757FA -> EVWORK_CAR + 0x24C
+00475807 -> EVWORK_CAR + 0x250
+00475814 -> EVWORK_CAR + 0x254
+00475821 -> EVWORK_CAR + 0x258
 ```
 
-Do not rename the binary structure field in production merely for readability unless all call sites are audited.
+These are the existing `water_flag_24C[4]` fields. The historical name is misleading: they are four contact **surface masks**.
 
-### `loadColiType_0` is branch/junction context, not a proven material ID
+The same collision query uses:
 
-Current source defines:
+- `0x780110[stage]` at 64-byte stride for collision geometry;
+- `0x780120[stage]` at 48-byte stride for per-corner normals;
+- `0x780100[stage]` for the material byte array.
 
-```cpp
-bool is_in_bunki() {
-    return OnRoadPlace_5C.loadColiType_0 != 0;
-}
-```
-
-(`bunki` = branch/junction in the existing game terminology.)
-
-Therefore `loadColiType` must be carried separately from material identity. It affects some original roughness decisions, but it should **not** be used as a surface enum.
-
-## 3. Original surfaceMask -> roughness table — SOURCE-CONFIRMED
-
-The Xbox-derived `sub_1149C0` provides the strongest currently known native material witness.
-
-| surfaceMask | original roughness | notes |
-|---:|---:|---|
-| `0x000001` | 0.00 | semantic name open |
-| `0x000002` | 0.25 normally | stage-dependent water behavior |
-| `0x000004` | 0.70 | name open |
-| `0x000008` | 0.85 | name open |
-| `0x000010` | 0.90 | name open |
-| `0x000080` | 0.85 | name open |
-| `0x000100` | 0.45 | name open |
-| `0x000200` | 0.35 | name open |
-| `0x000400` | 0.30 | name open |
-| `0x000800` | 0.35 | name open |
-| `0x001000` | 0.35 | name open |
-| `0x002000` | 0.35 | name open |
-| `0x008000` | 0.40 | name open |
-| `0x100000` | 0.71 | name open |
-| `0x200000` | 0.80 | name open |
-| `0x400000` | 0.90 normally | 0.25 in junction context; also 0.25 on Casino Town |
-| `0x800000` | 0.50 | name open |
-| unrecognized/fallback | about 0.31 | depends on branch |
-
-### Proven stage-dependent `0x2` behavior
-
-When `loadColiType == 0`, mask `0x2` sets the routine's water output for:
-
-- stage 11 / 41 — Metropolis / reverse: **0.73**
-- stage 13 / 43 — Cape Way / reverse: **0.79**
-- stage 14 / 44 — Imperial Avenue / reverse: **0.76**
-
-This proves that the same surface mask can have stage context. A future material database therefore needs the tuple:
-
-`{stageId, surfaceMask, loadColiType}`
-
-rather than a global one-dimensional “surface ID”.
-
-## 4. Runtime road evidence already captured — CONFIRMED
-
-Existing FFB logs contain real four-wheel transitions including:
-
-- `0.35 -> 0.76` mixed contact, followed by all-wheel `0.76`
-- `0.35 -> 0.85` mixed contact, followed by all-wheel `0.85`
-- `0.25 -> 0.71` mixed contact, followed by all-wheel `0.71`
-- snow/ice runs showing wheel sets around `0.25/0.35 .. 0.50`
-- all-wheel `0.70` runs
-
-This is useful validation of the Xbox-derived table, but roughness alone does not uniquely identify a mask:
-
-- 0.35 has four known mask candidates;
-- 0.85 has two;
-- 0.25 has multiple context-sensitive paths.
-
-Raw masks must therefore be logged before assigning names such as curb, grass or snow.
-
-## 5. What FFB can safely use now
-
-The recommended data pipeline is:
+Therefore the end-to-end relation is now **CONFIRMED**, not inferred:
 
 ```text
-COLI0200 static region/face attribute
-        ↓  (still needs exact correlation)
-runtime per-wheel surfaceMask[4]
-        ↓
-stageId + loadColiType/junction context
-        ↓
-original sub_1149C0 roughness
-        ↓
-semantic material profile
-        ↓
-modern DD-wheel effect
+COLI0200 collision polygon
+  -> materialId byte
+  -> surfaceMask = 1 << materialId
+  -> EVWORK_CAR surfaceMask[0..3]
+  -> sub_1149C0(surfaceMask, loadColiType, waterFlag)
+  -> original roughness
+  -> modern wheel FFB policy
 ```
 
-For a modern DD wheel, keep two layers separate:
+## 4. Material ID / mask / original roughness map
 
-**Game semantics**
-- raw surface mask;
-- stage/junction context;
-- original roughness;
-- water behavior;
-- contact wheel.
+| material ID | surfaceMask | original roughness | observed role |
+|---:|---:|---:|---|
+| `01` | `0x00000002` | 0.25 normally | **default primary road**; stage overrides below |
+| `02` | `0x00000004` | 0.70 | non-primary; semantic name open |
+| `03` | `0x00000008` | 0.85 | non-primary; name open |
+| `04` | `0x00000010` | 0.90 | non-primary; name open |
+| `05` | `0x00000020` | ~0.31 fallback | non-primary; name open |
+| `07` | `0x00000080` | 0.85 | non-primary; name open |
+| `08` | `0x00000100` | 0.45 | non-primary; name open |
+| `09` | `0x00000200` | 0.35 | non-primary; name open |
+| `0A` | `0x00000400` | 0.30 | non-primary; name open |
+| `0B` | `0x00000800` | 0.35 | non-primary; name open |
+| `0C` | `0x00001000` | 0.35 | non-primary; name open |
+| `0E` | `0x00004000` | ~0.31 fallback | non-primary; name open |
+| `10` | `0x00010000` | ~0.31 fallback | non-primary; name open |
+| `11` | `0x00020000` | ~0.31 fallback | non-primary; name open |
+| `12` | `0x00040000` | ~0.31 fallback | non-primary; name open |
+| `13` | `0x00080000` | ~0.31 fallback | non-primary; name open |
+| `14` | `0x00100000` | **0.71** | **special rough primary-road strip** in Deep Lake, Tulip Garden, Floral Village; exact physical name open |
+| `16` | `0x00400000` | 0.90 normally; **0.25 Casino Town** | **Casino Town primary-road family** |
+| `17` | `0x00800000` | **0.50** | **Snowy Mountain / Ice Scape snow-ice primary road** |
+| `18` | `0x01000000` | ~0.31 fallback | non-primary; name open |
+| `19` | `0x02000000` | ~0.31 fallback | non-primary; name open |
 
-**Wheel feel**
-- RoadTexture amplitude/frequency;
-- curb/edge pulse;
-- grass/gravel-like texture once proven;
-- snow/ice attenuation;
-- splash event;
-- SAT/grip/damper policy.
+Do not invent labels such as grass/curb/wall for the non-primary IDs yet. The static files prove the ID and native roughness path; physical names still need driven runtime correlation.
 
-Do not directly turn Xbox rumble amplitude into wheel torque.
+## 5. Main-road surface inventory — forward stages
 
-## 6. Improvement over current max-roughness reduction
+| ID | Stage | primary records | material distribution / effective native roughness |
+|---:|---|---:|---|
+| 0 | Palm Beach | 1283 | `01` 100% -> 0.25 |
+| 1 | Deep Lake | 1325 | `01` 95.3% -> 0.25; `14` 4.7% -> **0.71** |
+| 2 | Industrial Complex | 635 | `01` 100% -> 0.25 |
+| 3 | Alpine | 1638 | `01` 100% -> 0.25 |
+| 4 | Snowy Mountain | 1549 | `17` **88.8% -> 0.50**; `01` 11.2% -> 0.25 |
+| 5 | Cloudy Highland | 1378 | `01` 100% -> 0.25 |
+| 6 | Castle Wall | 1515 | `01` 100% -> 0.25 |
+| 7 | Ghost Forest | 1489 | `01` 100% -> 0.25 |
+| 8 | Coniferous Forest | 1453 | `01` 100% -> 0.25 |
+| 9 | Desert | 1472 | `01` 100% -> 0.25 |
+| 10 | Tulip Garden | 1372 | `01` 97.2%; `14` 2.8% -> **0.71** |
+| 11 | Metropolis | 1378 | `01` 100%; stage override -> **0.73 + water flag** |
+| 12 | Ancient Ruins | 1551 | `01` 100% -> 0.25 |
+| 13 | Cape Way | 1413 | `01` 100%; stage override -> **0.79 + water flag** |
+| 14 | Imperial Avenue | 1448 | `01` 100%; stage override -> **0.76 + water flag** |
+| 15 | Sunny Beach | 1113 | `01` 100% -> 0.25 |
+| 16 | Big Forest | 1424 | `01` 100% -> 0.25 |
+| 17 | Waterfalls | 1388 | `01` 100% -> 0.25 |
+| 18 | Casino Town | 830 | `16` **78.2% -> 0.25 Casino exception**; `01` 21.8% -> 0.25 |
+| 19 | Ice Scape | 1439 | `17` **100% -> 0.50** |
+| 20 | Canyon | 1332 | `01` 100% -> 0.25 |
+| 21 | Bay Area | 1134 | `01` 100% -> 0.25 |
+| 22 | Jungle | 1406 | `01` 100% -> 0.25 |
+| 23 | Lost City | 1325 | `01` 100% -> 0.25 |
+| 24 | National Park | 1466 | `01` 100% -> 0.25 |
+| 25 | Legend | 1607 | `01` 100% -> 0.25 |
+| 26 | Skyscrapers | 855 | `01` 100% -> 0.25 |
+| 27 | Floral Village | 1504 | `01` 96.5%; `14` 3.5% -> **0.71** |
+| 28 | Milky Way | 1769 | `01` 100% -> 0.25 |
+| 29 | Giant Statues | 1511 | `01` 100% -> 0.25 |
 
-The core FFB path currently takes the maximum roughness across four wheels. That is useful for a single road-texture intensity but loses information needed for good curb/shoulder feel.
+Reverse stages use stage IDs +30. Their primary material counts match the corresponding forward surface families; some files differ in non-primary collision geometry/material ordering, so runtime masks remain authoritative.
 
-For future FFB material logic, retain:
+Special Palm/Sunny Beach variants (IDs 60..65) use material `01` for their primary road region.
+
+## 6. Immediate FFB implications
+
+### 6.1 Replace the snow/ice stage-name heuristic with the proven material mask
+
+Current DD FFB applies `SnowIceRoadTextureScale` to the whole stage for stage IDs 4/19/34/49. Static collision data proves a better discriminator:
 
 ```text
-surfaceMaskFL / FR / RL / RR
-roughnessFL   / FR / RL / RR
+materialId 0x17
+<=> surfaceMask 0x00800000
+<=> actual snow/ice primary-road material
 ```
 
-and derive:
+This matters on **Snowy Mountain**: 174 of 1549 primary road polygons (11.2%) are ordinary material `01`, while 1375 are snow/ice `17`. A stage-wide multiplier suppresses both; a mask-based multiplier can affect only real snow/ice contact. Ice Scape is 100% material `17` in the primary-road range.
 
-- `roughnessMin`
-- `roughnessMax`
-- `roughnessSpread`
-- number of wheels on each raw mask
-- front-versus-rear transition
-- left-versus-right transition
+Recommended implementation key: `FFB-SURFACE-MASK-POLICY-001`.
 
-This can distinguish “one side touching a curb” from “all four wheels on the same rough road” without guessing from stage name.
+### 6.2 Keep four contacts instead of reducing immediately to max roughness
 
-## 7. Required telemetry before changing behavior
+Because each contact receives its own mask, retain:
 
-A read-only diagnostic line should capture at low rate or on contact changes:
+```text
+surfaceMask[0..3]
+materialId[0..3] = countr_zero(surfaceMask[i]) for one-hot nonzero masks
+roughness[0..3]
+```
+
+Then derive max/mean/spread, mask counts and transition events. Do **not** label the indices FL/FR/RL/RR until wheel ordering is separately proven.
+
+### 6.3 Static map is a regression oracle, not the runtime decision source
+
+Runtime masks are authoritative. Useful static expectations:
+
+- Ice Scape primary road: `0x00800000`.
+- Snowy Mountain: mostly `0x00800000`, with real `0x00000002` road patches.
+- Casino Town: substantial `0x00400000` roadway, but original roughness is 0.25 there by explicit stage exception.
+- Deep Lake / Tulip Garden / Floral Village: short `0x00100000` rough-road runs -> 0.71.
+- Metropolis / Cape Way / Imperial Avenue: material `01`, but original routine intentionally applies stage wet-road overrides.
+
+## 7. Telemetry for the next FFB validation run
+
+Log on mask changes plus a low-rate heartbeat:
 
 ```text
 stageId
 roadSectionNum
 curStageIdx
 loadColiType
-surfaceMask[4]
-roughness[4]
-waterFlag
-speed
-FFB road output
+for contact[0..3]:
+    surfaceMask
+    derivedMaterialId
+    nativeRoughness
+waterFlagAggregate
+speedNorm
+roadAmp
+roadFreq
 ```
 
-This is sufficient to correlate a driven location with the static Stage collision asset once the COLI face/region field is decoded.
+The exact contact-index-to-wheel-name order remains OPEN.
 
-## 8. Stage-file parsing next step
+## 8. Evidence boundaries
 
-The shared analyzer already verifies `COLI0200` identity/header bounds and zlib SZ. It should additionally emit for every `Stage/*/coli_*.sz`:
+**CONFIRMED**
+- 72 collision files are directly readable from the uploaded ZIP: 66 COLI0200 + 6 COLI0105.
+- material array and `surfaceMask = 1 << materialId` are linked by canonical PC EXE code.
+- 64-byte geometry and 48-byte per-corner normal arrays are consumed by the canonical collision query.
+- four returned masks are written to `EVWORK_CAR +0x24C..+0x258`.
 
-- stage folder / stage ID / variant;
-- compressed and inflated sizes;
-- full collision SHA-256;
-- header/count/offset fields;
-- per-region/per-record candidate field histograms;
-- cross-stage repeated values;
-- forward/reverse similarities.
+**STRONG descriptive naming**
+- file `0x10` count is called `primaryRoadCollisionCount` from its behavior; original symbol name is unknown.
+- section 6 is called road-section-index family because it is directly compared with `OnRoadPlace::roadSectionNum`.
 
-Candidate fields should remain anonymous (for example `record_u32_0C`) until a runtime mask correlation proves their meaning.
+**OPEN**
+- human physical names for non-primary material IDs (curb/grass/gravel/wall/etc.).
+- contact index -> FL/FR/RL/RR order.
+- section 7/8 semantics.
 
-The goal is not merely a list of road types; it is a reproducible mapping that can eventually remove stage-name heuristics from FFB.
-
-
-## 9. Independent Xbox cross-check — RetroReverse
-
-An independent public reverse-engineering project, `StupidCoder/RetroReverse` at commit `e9d892e19825c518407e41144fb8050f9d3e6c50`, provides a useful cross-check against the Xbox C2C assets.
-
-Its current OutRun 2006 Xbox notes independently report:
-
-- `coli_CS_*_bin` self-describes as `{size, "COLI0200", counts, section offsets}`;
-- 66 main COLI0200 course files are present;
-- six old-format `COLI0105` leftovers also exist on the Xbox disc;
-- the COLI sections/material meanings remain unopened in that project as well.
-
-The same work later proves that the **visible road mesh** (asphalt, lane markings and kerbs) is ordinary rendered batch geometry inside decompressed `cs_CS_*_pmt.sz`. This is an important boundary for FFB:
-
-```text
-cs_CS_*_pmt.sz   -> visible/render road geometry + textures
-coli_CS_*_bin.sz -> collision/contact geometry/data used for physics lookup
-```
-
-Visual texture identity must therefore not be substituted for collision material identity. It can be used only as a spatial cross-check after the runtime collision mask is correlated.
-
-
-### Cross-platform contact-pipeline anchor
-
-The same independent Xbox reverse project later corrected an earlier misidentification of `car+0x5C`: a write watch showed its only writer at Xbox `0x16902E`, described as contact write-back inside the `0x1692A0` per-car pipeline and fed by collision routine `0x168880`.
-
-The PC fork independently places `OnRoadPlace_5C` at **exactly car offset +0x5C**. Function addresses are platform-specific and must not be copied to PC, but the structure/role agreement is valuable.
-
-**PC next anchor:** find every canonical-EXE writer to `EVWORK_CAR + 0x5C`, then walk backward to the collision query and forward to the writes of per-wheel `surfaceMask` at `+0x24C..+0x258`. This is a stronger route to the COLI material field than guessing from static values.
+Machine-readable map: `reverse/game_assets/stage_coli_ffb_map.json`.  
+Reproducer: `tools/reverse/analyze_stage_coli.py`.
