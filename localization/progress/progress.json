@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T04:14:00+09:00",
+  "updated_at_kst": "2026-09-25T07:49:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -169,7 +169,7 @@
     "transcribed_assets": 79,
     "transcribed_segments": 674,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
-    "artwork_proof_specs": 1,
+    "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
     "first_dds_candidate": {
       "source_path": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
