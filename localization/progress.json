@@ -1,10 +1,10 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "project": "OutRun 2006 Korean localization",
   "branch": "korean-localization-prototype",
-  "updated_at_kst": "2026-09-24T19:05:00+09:00",
-  "phase": "TEXT_DATA_COMPLETE_GRAPHICS_CLASSIFIED_RUNTIME_TRACE_READY",
-  "resume_from": "Resolve 4 context-sensitive text drafts with K1 runtime trace; zoom-review 47 DDS; begin Korean replacement assets for 84 confirmed text DDS.",
+  "updated_at_kst": "2026-09-24T19:20:00+09:00",
+  "phase": "TEXT_PERSISTED_GRAPHICS_QUEUE_READY_K1_TRACE_PACKAGE_READY",
+  "resume_from": "Run K1 trace and resolve 4 context-sensitive text IDs; continue transcription/artwork for the 84 confirmed DDS targets and zoom-review 47 uncertain DDS.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -17,6 +17,8 @@
     "translated_non_null": 1355,
     "translation_coverage_non_null_percent": 100.0,
     "context_review_ids": [96,97,279,280],
+    "canonical_state_file": "localization/text/korean_all.jsonl",
+    "canonical_state_blob_sha": "e7db1ed08851f223c66b782e378c1115240c1ad3",
     "config_text_rows": 23,
     "config_text_reviewed": 23,
     "placeholder_qa": "pass"
@@ -29,7 +31,10 @@
     "font_pipeline": 9,
     "hangul_name_entry": 1,
     "zoom_review": 47,
-    "no_localization": 72
+    "no_localization": 72,
+    "work_queue_total": 141,
+    "work_queue_file": "localization/graphics/asset_queue.csv",
+    "artwork_completed": 0
   },
   "data_build": {
     "draft_bin_entries": 1356,
@@ -43,17 +48,30 @@
     "k1_trace_hook": "implemented",
     "k1_ci": "success",
     "k1_ci_run_id": 35981045694,
+    "k1_ci_artifact_id": 10800442258,
+    "k1_trace_test_package_sha256": "f54bb11442d3e5d315f0402800f6cadde2eb85ef895f7bc15e9517bb6125814d",
+    "k1_trace_test_package": "OutRun2006Tweaks_KOREAN_K1_TRACE_TEST.zip",
     "hangul_runtime_render": "blocked_pending_runtime_trace_and_font"
+  },
+  "state_validation": {
+    "script": "tools/localization/verify_state.py",
+    "workflow": ".github/workflows/localization-state.yml",
+    "latest_run_id": 35986376224,
+    "latest_result": "success"
   },
   "checkpoints": [
     {"id":"CP-TEXT-000","state":"complete","detail":"full 1356-row translation work table created"},
     {"id":"CP-TEXT-001","state":"complete","detail":"core IDs 0-158 seeded"},
     {"id":"CP-TEXT-002","state":"complete","detail":"all 1355 non-null text IDs translated; 4 context-sensitive IDs remain draft"},
     {"id":"CP-TEXT-QA-001","state":"complete","detail":"format placeholder preservation passed"},
+    {"id":"CP-TEXT-PERSIST-001","state":"complete","detail":"complete source-hash-bound translation state committed to GitHub"},
     {"id":"CP-CONFIG-001","state":"complete","detail":"23 config_text rows translated"},
     {"id":"CP-GFX-000","state":"complete","detail":"243 DDS inventory with hashes/dimensions created"},
     {"id":"CP-GFX-002","state":"complete","detail":"all 243 DDS visually classified; 84 confirmed text-localization targets"},
+    {"id":"CP-GFX-QUEUE-001","state":"complete","detail":"141 actionable graphics/font rows persisted as resumable queue"},
     {"id":"CP-DATA-BUILD-001","state":"complete","detail":"1356-entry Korean draft txet BIN generated and parsed successfully"},
-    {"id":"CP-RUNTIME-001","state":"complete","detail":"K1 trace-hook Win32 Release CI passed"}
+    {"id":"CP-RUNTIME-001","state":"complete","detail":"K1 trace-hook Win32 Release CI passed"},
+    {"id":"CP-STATE-CI-001","state":"complete","detail":"Localization State workflow passed"},
+    {"id":"CP-K1-PACKAGE-001","state":"complete","detail":"isolated non-VR K1 trace test package created"}
   ]
 }
