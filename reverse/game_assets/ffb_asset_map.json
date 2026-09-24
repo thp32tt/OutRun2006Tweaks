@@ -289,6 +289,13 @@
       "Six COLI0105 old-format leftovers exist in the Xbox corpus.",
       "COLI section/material semantics remain unopened in that independent project.",
       "Visible road asphalt/lane/kerb mesh is in cs_CS_*_pmt.sz; do not equate render texture material with collision surface identity."
-    ]
+    ],
+    "xboxContactPipeline": {
+      "carOffset": "0x5C",
+      "observation": "Only watched writer reported at Xbox 0x16902E, contact write-back in per-car pipeline 0x1692A0 fed by collision 0x168880.",
+      "pcCorrelation": "PC EVWORK_CAR::OnRoadPlace_5C occupies the same +0x5C offset.",
+      "nextPcReverseStep": "Find canonical PC EXE writers to car+0x5C; trace backward to collision query and forward to car+0x24C..0x258 per-wheel surfaceMask writes.",
+      "warning": "Xbox function addresses are evidence anchors only and must not be reused as PC addresses."
+    }
   }
 }
