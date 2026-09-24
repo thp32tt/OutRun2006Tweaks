@@ -977,7 +977,8 @@ namespace
                     : CrashTimerFrames;
             const bool suppressSpringForImpact = arcadeEffects
                 ? (crashImpulseTimer_ > 0 && impactAge < 6)
-                : crashImpulseTimer_ > CrashCooldownFrames;
+                : (!ps2Original &&
+                   crashImpulseTimer_ > CrashCooldownFrames);
 
             // Make UseHardwareSpring a real live F11 switch.  Previously
             // changing it to false after startup left the already-created
