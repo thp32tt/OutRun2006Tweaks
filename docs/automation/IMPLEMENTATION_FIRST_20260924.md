@@ -133,6 +133,32 @@ The old mandatory A -> B -> C -> D handoff chain is removed. Each full cycle per
 
 Use actual diffs, call paths, regression guards and exact-SHA cloud CI. No review-count quota and no artificial role-stage waiting. A change may integrate in the same cycle once all applicable deterministic/domain gates pass. HMD-only uncertainty remains INTEGRATED_NEEDS_HMD.
 
+
+## No-ready-parking enforcement
+
+The automation is not allowed to stop after discovering or documenting actionable work.
+
+For every READY / IMPLEMENT_NEXT / actionable review finding, the same full-cycle run must do one of the following:
+
+1. **Implement now** when the root cause is sufficiently bounded and no Quest3/VDXR evidence is required to make the source change safely.
+2. **Validate/integrate now** when an exact immutable candidate already exists and its required deterministic/domain gates have completed.
+3. **Repair the blocker now** when the obstacle is stale queue metadata, missing regression coverage, CI trigger/identity, branch drift, packaging identity, or another repository/tooling issue that can be corrected without HMD evidence.
+4. **Move to NEED_HMD_TEST** only when the remaining uncertainty is genuinely visual/runtime and cannot be resolved deterministically.
+5. **Move to BLOCKED with exact evidence** only when the required capability/evidence is genuinely unavailable after attempting the available recovery path.
+
+Merely writing READY, IMPLEMENT_NEXT, NEEDS_VALIDATION, a review comment, or a nextAction is **not cycle completion** when implementation or deterministic validation can still be performed in the current run.
+
+If CI is pending, persist the exact candidate/run identity and immediately advance another non-conflicting lane. Do not busy-poll and do not idle.
+
+Before a cycle ends, perform a **NO-IDLE GATE**:
+- scan READY / IMPLEMENT_NEXT / NEEDS_VALIDATION items;
+- resolve stale queue entries whose source is already fixed;
+- consume completed exact-SHA CI immediately;
+- ensure every still-actionable item has either concrete source progress in this run, an active immutable validation run, a genuine HMD-only gate, or a documented hard blocker;
+- continue an independent lane if any useful work remains.
+
+Progress is measured by implemented source, deterministic validation, resolved blockers, integrated changes, or HMD-ready immutable experiments — not by review/findings count.
+
 ## Evening package contract
 
 D should freeze one self-contained EVENING_MATRIX package near 19:45 KST when useful candidates exist. If the day's package was not created and the user changes policy after 19:45, the next D run may create one late-evening package once.
