@@ -42,6 +42,8 @@ C2C does not expose the Lindbergh drive-board packet stream, so this branch reco
 
 Modern inferred Physics SAT and inferred tire-slip chatter are disabled in this mode. The centering backbone is the shared DirectInput condition/spring path. Road Detail and Collision are explicit PC host scalers around the reconstructed `SpeedStrength` source; both Arcade shortcuts set them to 1.00 for one-to-one source amplitude before common Overall Strength. The **Use Arcade Original** shortcut restores the public OutRun2Real profile baseline: `SpringStrength=50` maps to a 0.50 condition coefficient with 1.00 saturation, while `EnableDamper=0` maps to zero Dynamic Damping. F11 can still override those values explicitly after loading the shortcut; Arcade Hybrid does not inherit this Original-only condition baseline.
 
+OutRun2Real creates its infinite Spring and ConstantForce in separate SDL haptic effect slots. A 0x7B wall/rail/surface event therefore does not implicitly cancel the already-running Spring. Arcade Original now mirrors that coexistence: the servo-style condition backbone remains active through the ~80 ms directional event instead of being blanked for five C2C ticks. Hybrid still briefly unloads its inferred Modern structural layer during the directional event so the reconstructed arcade transient remains readable.
+
 The Lindbergh plugin's speed-strength staircase is retained as a comparative shape. Its thresholds were defined in a different speed scale, so C2C uses the same ten-step structure after scaling `speedRaw / 2`; this is a porting approximation, not a claim that the raw speed units are identical. Modern DD still clamps its own `speedNorm` to 0..1, while Arcade preserves 0..1.25 headroom so the reference final >500 / 100% strength band remains reachable. Captured C2C telemetry reaches `speedRaw ~= 2.239`, i.e. Arcade normalized speed ~=1.12.
 
 ## Model 2 — Arcade + Modern Hybrid
@@ -49,6 +51,8 @@ The Lindbergh plugin's speed-strength staircase is retained as a comparative sha
 Keeps the Modern DD structural steering model but swaps surface/wall/gear event behavior to the Lindbergh-derived arcade reconstruction.
 
 This is intended for modern DD hardware when the user wants current SAT quality with arcade-style transient timing. Collision debounce remains shared, but Hybrid only unloads its Modern structural torque during the active Arcade directional event window (~80 ms); the rest of the debounce interval no longer leaves SAT artificially blank.
+
+The **Use Arcade Hybrid** shortcut is a complete reference preset rather than a delta from the previously selected model. It explicitly restores the Modern DD spring/damper, mechanical/caster, tire-slip, slew and reversal-release baseline before enabling the arcade event layer. This prevents Arcade Original's 0.50/no-damper condition profile or PS2 condition settings from leaking into Hybrid during live F11 switching. All Original/Hybrid/PS2 reference shortcuts also restore both ConstantForce and Spring reversal to OFF so stale direction settings cannot contaminate model comparisons.
 
 ## Model 3 — PS2 Original topology (Experimental)
 

@@ -655,7 +655,7 @@ req(ps2_event_block, 'no verified non-zero retail ConstantForce caller', 'PS2 co
 req(ps2_event_block, 'event output suppressed', 'PS2 C2C collision is diagnostic-only until retail evidence exists')
 forbid(ps2_event_block, 'result +=', 'PS2 Original does not synthesize an unverified C2C collision ConstantForce')
 forbid(ps2_event_block, 'translatedSeverity', 'removed provisional PS2 collision magnitude translation cannot return')
-req(ffb, ': (!ps2Original &&\n                   crashImpulseTimer_ > CrashCooldownFrames);', 'PS2 original spring is not suppressed by an unverified Modern collision interaction')
+req(ffb, ': (arcadeOriginal || ps2Original\n                    ? false\n                    : crashImpulseTimer_ > CrashCooldownFrames);', 'PS2 Original and Arcade Original condition backbones are not suppressed by Modern collision interaction')
 forbid(ffb, 'crashImpulseForce_ * 0.45f', 'arbitrary PS2 collision multiplier removed')
 forbid(ffb, '(ps2Original ? 0.12f : 0.20f)', 'unsupported PS2 gear thunk removed')
 req(ffb, 'else if (!ps2Original)', 'PS2 original mode emits no unverified generic gear-shift thunk')
@@ -732,4 +732,30 @@ req(ffb, 'car->field_coli_281, car->field_282, car->field_283', 'runtime samples
 req(ffb, '"WheelFFB: course/wall collision edge timer={}', 'dedicated course/wall edge is diagnostic and testable')
 req(stage_map, 'field_283', 'stage/collision map records the dedicated course-collision timer witness')
 req(read('docs/reverse/LINDBERGH_FFB_MAP.md'), 'ffwall = 0x08273FAC', 'Fake ffwall evidence is documented without promoting it as a force signal')
-print('OK [R4 arcade wall / PS2 host gain / deep-slip caster guards]')
+
+# r5 live preset-isolation guards
+arcade_original_start = wheel_ui.find('if (ImGui::Button("Use Arcade Original"))')
+arcade_hybrid_start = wheel_ui.find('if (ImGui::Button("Use Arcade Hybrid"))')
+ps2_original_start = wheel_ui.find('if (ImGui::Button("Use PS2 Original (Experimental)"))')
+req(str(arcade_original_start), '', 'Arcade Original shortcut location evaluated')
+if min(arcade_original_start, arcade_hybrid_start, ps2_original_start) < 0:
+    raise AssertionError('reference preset shortcut block missing')
+arcade_original_block = wheel_ui[arcade_original_start:arcade_hybrid_start]
+arcade_hybrid_block = wheel_ui[arcade_hybrid_start:ps2_original_start]
+ps2_original_block = wheel_ui[ps2_original_start:wheel_ui.find('if (!Settings::UseNewInput)', ps2_original_start)]
+req(arcade_original_block, 'Settings::WheelFFBInvertSpring = false;', 'Arcade Original restores safe spring polarity')
+req(ps2_original_block, 'Settings::WheelFFBInvertSpring = false;', 'PS2 Original restores safe spring polarity')
+req(arcade_hybrid_block, 'Settings::WheelFFBUseHardwareSpring = true;', 'Hybrid restores Modern hardware spring ownership')
+req(arcade_hybrid_block, 'Settings::WheelFFBUseHardwareDamper = true;', 'Hybrid restores Modern hardware damper ownership')
+req(arcade_hybrid_block, 'Settings::WheelFFBSpringStrength = 0.65f;', 'Hybrid cannot inherit Arcade Original 0.50 spring')
+req(arcade_hybrid_block, 'Settings::WheelFFBSpringSaturation = 0.95f;', 'Hybrid cannot inherit Original/PS2 spring saturation')
+req(arcade_hybrid_block, 'Settings::WheelFFBDamperStrength = 0.28f;', 'Hybrid cannot inherit Arcade Original zero damper')
+req(arcade_hybrid_block, 'Settings::WheelFFBMechanicalTrail = 0.25f;', 'Hybrid restores Modern mechanical/caster baseline')
+req(arcade_hybrid_block, 'Settings::WheelFFBTireSlip = 0.20f;', 'Hybrid restores Modern tire-slip baseline')
+req(arcade_hybrid_block, 'Settings::WheelFFBInvertForce = false;', 'Hybrid restores ConstantForce polarity')
+req(arcade_hybrid_block, 'Settings::WheelFFBInvertSpring = false;', 'Hybrid restores spring polarity')
+req(ffb, 'const bool arcadeOriginal =', 'runtime distinguishes Arcade Original from Hybrid for condition-force coexistence')
+req(ffb, 'const bool arcadeHybrid =', 'runtime distinguishes Arcade Hybrid from Original for impact unloading')
+req(ffb, 'arcadeOriginal || ps2Original\n                    ? false', 'Arcade Original and PS2 keep condition backbone during impact events')
+req(ffb, 'OutRun2Real keeps its infinite Spring and Constant effects in\n            // separate SDL effect slots.', 'source-faithful Arcade Original effect coexistence is documented in code')
+print('OK [R5 preset isolation + Arcade Original spring coexistence + R4 guards]')
