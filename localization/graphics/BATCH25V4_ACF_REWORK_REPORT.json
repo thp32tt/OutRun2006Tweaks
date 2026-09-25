@@ -1,0 +1,29 @@
+{
+  "batch": "25v4-ACF61D7C-rework",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+  "status": "localized_candidate",
+  "raw_transform": "mirror_y",
+  "sha256": "c01f8af01cbb033d218f6582c08e2e961202e3ec7463b1d5247ad6b164cd9a32",
+  "package": "OutRun2_Korean_GFX_Batch25v4_ACF61D7C_Rework_Test.zip",
+  "package_sha256": "2b1acffcde85b6ee7cd2885b4cbf3eb3bdc3a277745f7ec4b1e432f92cba1fd5",
+  "combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B25v4_QA_Test.zip",
+  "combined_package_sha256": "e0d2df30e8de09dc69e154cbcffcfce649c76fd7edd760e4bb2fe0ab935d781d",
+  "qa": {
+    "dimensions_identical": true,
+    "header_128_identical": true,
+    "changed_pixels_outside_allowed_regions": 0,
+    "introduced_alpha_pixels_outside_allowed_regions": 0,
+    "raw_and_readable_manual_review": "pass",
+    "residual_generic_english": "none observed; MT/AT abbreviations, controller labels and OutRun2SP/song titles intentionally preserved",
+    "black_lines_crop_seams_erasure_residue_alpha_halos_clipping": "none observed"
+  },
+  "preserved": [
+    "song titles",
+    "OutRun2SP logo",
+    "controller/button art",
+    "numeric values",
+    "yellow/gray selector bar",
+    "MT/AT abbreviations"
+  ],
+  "note": "Fourth ACF pass uses corrected original-y text extents. The protected selector bar is restored by bright-pixel masking so English NORMAL is not restored; generic top/mid/bottom labels are localized without crossing source text cells."
+}
