@@ -1,0 +1,16 @@
+{
+  "batch": "23-ACF61D7C-glyph-mask-rework",
+  "updated_at_kst": "2026-09-26T07:58:00+09:00",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+  "status": "rejected_keep_original",
+  "source_policy": "original DDS re-opened; preserve song titles, OutRun2SP logo, numeric/legal/non-localizable artwork",
+  "manual_qa": {
+    "pass": false,
+    "reasons": [
+      "Residual English/source glyph fragments remain around several top selector labels and mid-screen generic labels.",
+      "Several replacements overlap or coexist with source English, including LICENSE DETAILS / YES / NO and single-player/ranking explanatory strings.",
+      "The candidate therefore fails residual-English, erasure-residue, and clean text-region replacement gates."
+    ]
+  },
+  "action": "Do not integrate. Keep original ACF61D7C. Next attempt must use tighter glyph-level source masks per label and skip any label whose source background/art cannot be reconstructed safely."
+}
