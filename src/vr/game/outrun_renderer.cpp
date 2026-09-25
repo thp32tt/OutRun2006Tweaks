@@ -1843,6 +1843,22 @@ namespace OutRunVRRenderer
 		ResetFrameState();
 	}
 
+	bool SuspendCullingCameraForCpuProjection() noexcept
+	{
+		if (!CullingCameraOverridden && !CullingProjectionOverridden)
+			return false;
+		RestoreCullingCamera();
+		return true;
+	}
+
+	void ResumeCullingCameraAfterCpuProjection(bool suspended) noexcept
+	{
+		if (!suspended)
+			return;
+		if (LatchedHeadInverseValid && GameRendererIsActive())
+			ApplyCullingCameraSync();
+	}
+
 	bool GetRendererBaseProjection(float outMatrix[16])
 	{
 		if (!outMatrix || !ValidateRendererGlobals() || !RendererProjection)
