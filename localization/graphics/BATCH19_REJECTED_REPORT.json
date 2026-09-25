@@ -1,0 +1,17 @@
+{
+  "batch": "19-ACF61D7C-rework",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+  "status": "rejected_keep_original",
+  "automated_qa": {
+    "introduced_alpha_pixels_outside_allowed_regions": 0
+  },
+  "manual_qa": {
+    "pass": false,
+    "reasons": [
+      "Top selector text boxes erased part of the yellow selector bar.",
+      "Residual source glyph fragments remain around small top labels.",
+      "The attempt therefore fails non-text-art preservation and artifact-cleanliness gates."
+    ]
+  },
+  "action": "Keep original DDS; next pass must mask only glyph pixels or skip the overlapping top selector labels."
+}
