@@ -120,34 +120,52 @@ namespace WheelFFBPS2
             static_cast<int>(std::lround(RetailPeriodicPeriodSpan * factor));
     }
 
+    // Retail wheel-specific feedback level:
+    //   - the options control is 0..10;
+    //   - wheel-device mode stores it in game-state byte +0xFC;
+    //   - invalid values >= 11 are reset to 0;
+    //   - level 0 disables the surface-feedback producer;
+    //   - the Type-4 manager uses (level + 1) / 11 for non-zero levels.
+    //
+    // The exact localized retail menu label is still unresolved, so keep the
+    // semantic name deliberately generic. PC Road Detail remains a separate
+    // host/user scaler; Road Detail 1.00 corresponds to retail level 10's
+    // multiplier of 1.0, without inventing the retail default level.
+    inline float retail_wheel_level_scale(int level)
+    {
+        if (level < 1 || level > 10)
+            return 0.0f;
+        return static_cast<float>(level + 1) / 11.0f;
+    }
+
     // Retail steady-state Type-4 magnitude chain:
     //   0x001D7C88: resolve each wheel surface mask
     //   0x001D80A8..0x001D810C: retain the maximum envelope
     //   0x00132E94..0x00132EA0: multiply by min(field_1C4, 1.0)
-    //   0x00133328..0x0013334C: * driveFactor * 50 * activation, round,
+    //   0x001332BC..0x00133340: apply wheel level (level + 1) / 11
+    //   0x00133328..0x0013334C: * driveFactor * 50, round,
     //                           and suppress values below raw 27.
     //
-    // activationScale is explicit because the retail manager has an additional
-    // activation/ramp factor whose owner/semantic is not fully named yet. The
-    // PC runtime currently passes 1.0 here and applies its independent DD-safe
-    // startup/recreate ramp downstream; that host ramp is not claimed to be the
-    // same retail variable.
+    // wheelLevelScale is explicit because the retail multiplier is now
+    // identified as the wheel-specific 0..10 feedback-strength level, not a
+    // transient activation/recreate ramp. The PC runtime passes 1.0 here and
+    // keeps its independent DD-safe warm-up/recreate ramp downstream.
     inline int periodic_magnitude_raw(
         float surfaceEnvelope,
         float speedRaw,
         float factor,
-        float activationScale = 1.0f)
+        float wheelLevelScale = 1.0f)
     {
         surfaceEnvelope = std::isfinite(surfaceEnvelope)
             ? std::clamp(surfaceEnvelope, 0.0f, 1.0f) : 0.0f;
         factor = std::isfinite(factor)
             ? std::clamp(factor, 0.0f, 1.0f) : 0.0f;
-        activationScale = std::isfinite(activationScale)
-            ? std::clamp(activationScale, 0.0f, 1.0f) : 0.0f;
+        wheelLevelScale = std::isfinite(wheelLevelScale)
+            ? std::clamp(wheelLevelScale, 0.0f, 1.0f) : 0.0f;
         const float raw =
             surfaceEnvelope * surface_speed_factor(speedRaw) *
             factor * static_cast<float>(RetailPeriodicMagnitudeScale) *
-            activationScale;
+            wheelLevelScale;
         return std::clamp(
             static_cast<int>(std::lround(raw)), 0, LogitechScaleMax);
     }
@@ -156,10 +174,10 @@ namespace WheelFFBPS2
         float surfaceEnvelope,
         float speedRaw,
         float factor,
-        float activationScale = 1.0f)
+        float wheelLevelScale = 1.0f)
     {
         const int raw = periodic_magnitude_raw(
-            surfaceEnvelope, speedRaw, factor, activationScale);
+            surfaceEnvelope, speedRaw, factor, wheelLevelScale);
         if (raw < RetailPeriodicStartThreshold)
             return 0.0f;
         return static_cast<float>(raw) /
