@@ -842,6 +842,15 @@ public:
 
 	bool apply() override
 	{
+		char modeText[8]{};
+		int experimentMode = 0;
+		if (GetEnvironmentVariableA(
+				"OUTRUN_VR_HUD_EXPERIMENT_MODE",
+				modeText, static_cast<DWORD>(sizeof(modeText))) > 0 &&
+			modeText[0] >= '0' && modeText[0] <= '4')
+			experimentMode = modeText[0] - '0';
+		OutRunVR::GameSemantic::SetHudExperimentMode(experimentMode);
+
 		QueueNode_hk = safetyhook::create_mid(
 			Module::exe_ptr(0x2D762), QueueNode);
 		QueueEnd_hk = safetyhook::create_mid(
@@ -858,7 +867,7 @@ public:
 		if (ok)
 		{
 			spdlog::info(
-				"VR HUD SEMANTIC R53: sprite queue node 0x2D762 consumes cross-thread-safe explicit tags; untagged nodes remain SCREEN_OVERLAY_2D FOV-only; unsafe 0x2D734 entry hook remains forbidden");
+				"VR HUD SEMANTIC R54: experimentMode={} sprite queue node 0x2D762 consumes explicit tags; mode1=next-draw latch mode2=sticky mode3=full owner mode4=full HUD-plane", experimentMode);
 		}
 		else
 		{
