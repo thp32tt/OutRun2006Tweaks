@@ -34,12 +34,13 @@ function Get-SessionFiles {
     return $files
 }
 
-function Write-ActiveSession([string]$backend,[string]$variant,[string]$profile,[string]$matrix,[string]$session,[datetime]$startedUtc){
+function Write-ActiveSession([string]$backend,[string]$variant,[string]$profile,[string]$matrix,[string]$session,[datetime]$startedUtc,[string]$sourceSha){
     $active=Join-Path $root 'ACTIVE_VR_BACKEND.txt'
     @(
         "backend=$backend"
         "variant=$variant"
         "profile=$profile"
+        "sourceSha=$sourceSha"
         "matrix=$matrix"
         "session=$session"
         "startedUtc=$($startedUtc.ToString('o'))"
@@ -47,7 +48,7 @@ function Write-ActiveSession([string]$backend,[string]$variant,[string]$profile,
     ) | Set-Content $active -Encoding ascii
 }
 
-function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,[string]$matrix){
+function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,[string]$matrix,[string]$sourceSha){
     $startedUtc=(Get-Date).ToUniversalTime()
     $session=$startedUtc.ToString('yyyyMMddTHHmmssfffZ')+'-'+[guid]::NewGuid().ToString('N').Substring(0,8)
     $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $matrix,$variant,$profile,$session)
@@ -61,6 +62,7 @@ function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,
         VariantId=$variant
         Backend=$backend
         TestProfile=$profile
+        SourceSha=$sourceSha
         SessionId=$session
         StartedUtc=$startedUtc.ToString('o')
         ConfigSha256=$configHash
@@ -69,10 +71,10 @@ function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,
     }
     $state|ConvertTo-Json -Depth 4|Set-Content (Join-Path $root 'CURRENT_VR_SESSION.json') -Encoding UTF8
     $state|ConvertTo-Json -Depth 4|Set-Content (Join-Path $sessionRoot 'session_manifest.json') -Encoding UTF8
-    Write-ActiveSession $backend $variant $profile $matrix $session $startedUtc
+    Write-ActiveSession $backend $variant $profile $matrix $session $startedUtc $sourceSha
 
     if(Test-Path $ini){
-        $allowed='^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|HudInspector)\s*='
+        $allowed='^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|HudInspector|DriverSeatView)\s*='
         Get-Content $ini|Where-Object{$_ -match $allowed}|Set-Content (Join-Path $sessionRoot 'VR_CONFIG_SNAPSHOT.txt') -Encoding UTF8
     }
     Copy-Item (Join-Path $root 'ACTIVE_VR_BACKEND.txt') $sessionRoot -Force
@@ -95,6 +97,7 @@ if(!$backend){throw 'backend identity missing'}
 $variant=if($kv.variant){$kv.variant}else{switch($backend){'d3d9'{'A_CONTROL'};'dxvk-safe'{'E_DXVK_SAFE'};'dxvk'{'E_DXVK_MULTIVIEW'};'dx12'{'F_DX12_STRICT'};'2d'{'CONTROL_2D'};default{'UNKNOWN'}}}
 $profile=if($kv.profile){$kv.profile}else{'CORRECTNESS'}
 $matrix=if($kv.matrix){$kv.matrix}else{'UNIFIED'}
+$activeSourceSha=if($kv.sourceSha){[string]$kv.sourceSha}else{'unknown'}
 
 $sessionState=Join-Path $root 'CURRENT_VR_SESSION.json'
 if(!(Test-Path $sessionState)){throw 'CURRENT_VR_SESSION.json not found; select the backend again before launching the game.'}
@@ -248,9 +251,27 @@ if(Test-Path $hudCsv){
     }
 }
 
-$payloadBackend=if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}
-$source=Join-Path $root "backends/$payloadBackend/SOURCE_SHA.txt"
-$sha=if(Test-Path $source){(Get-Content $source -Raw).Trim()}else{'unknown'}
+$sha=if($state.SourceSha){[string]$state.SourceSha}else{$activeSourceSha}
+if($sha -eq 'unknown'){
+    $payloadBackend=if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}
+    $source=Join-Path $root "backends/$payloadBackend/SOURCE_SHA.txt"
+    if(Test-Path $source){$sha=(Get-Content $source -Raw).Trim()}
+}
+$analyzer=Join-Path $root 'Analyze-OutRunVRSession.ps1'
+if(Test-Path $analyzer){
+    try {
+        & $analyzer -SessionDir $dest
+        if(Test-Path (Join-Path $dest 'AUTO_ANALYSIS_SUMMARY.txt')){$copied+='AUTO_ANALYSIS_SUMMARY.txt'}
+        if(Test-Path (Join-Path $dest 'AUTO_ANALYSIS_SUMMARY.json')){$copied+='AUTO_ANALYSIS_SUMMARY.json'}
+    } catch {
+        @(
+            'AUTO_ANALYSIS_STATUS=ERROR'
+            "message=$($_.Exception.Message)"
+        )|Set-Content (Join-Path $dest 'AUTO_ANALYSIS_SUMMARY.txt') -Encoding UTF8
+        $copied+='AUTO_ANALYSIS_SUMMARY.txt'
+    }
+}
+
 $configHash=if(Test-Path (Join-Path $root 'OutRun2006Tweaks.ini')){(Get-FileHash (Join-Path $root 'OutRun2006Tweaks.ini') -Algorithm SHA256).Hash.ToLowerInvariant()}else{'missing'}
 
 $analysisRequest=[ordered]@{
@@ -383,7 +404,7 @@ foreach($captureDir in $capturedDirs){
     if(Test-Path $captureDir){Remove-Item $captureDir -Recurse -Force}
 }
 
-$nextSession=Prepare-NextSession $backend $variant $profile $matrix
+$nextSession=Prepare-NextSession $backend $variant $profile $matrix $sha
 Write-Host "Diagnostic archive: $zip"
 Write-Host "Next test session prepared automatically: $nextSession"
 Write-Host 'You do NOT need to run the collector before the next test.'
