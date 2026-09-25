@@ -8,58 +8,44 @@ $runner=Join-Path $root 'Run-OutRunVRTest.ps1'
 $slots=[ordered]@{
     'R57_01_POSITION_KIND1_HUD35'=[ordered]@{
         Title='01. POSITION kind=1 only'
-        Detail='6th/6 POSITION의 첫 sprani/SPRARGS2 요소만 정확히 SCREEN_HUD + 35% 처리. 움직이면 kind=1 경로 확정.'
+        Detail='첫 sprani/SPRARGS2 요소만 SCREEN_HUD + 35%. 반응하면 POSITION의 kind=1 구성요소가 확정.'
     }
     'R57_02_POSITION_KIND0_HUD35'=[ordered]@{
         Title='02. POSITION kind=0 only'
-        Detail='뒤 8개 put_clip_sprite/SPRARGS 요소만 SCREEN_HUD + 35%. 01과 서로 다른 구성요소를 분리 판별.'
+        Detail='뒤 8개 put_clip_sprite/SPRARGS만 SCREEN_HUD + 35%. 01과 완전히 다른 렌더 타입.'
     }
     'R57_03_POSITION_ALL_WORLD35'=[ordered]@{
         Title='03. POSITION complete fix'
-        Detail='kind=1 + kind=0 전체를 exact SCREEN_HUD로 태그하고 35% finite world-plane 적용. POSITION 실제 수정 후보.'
+        Detail='kind=1 + kind=0 전체를 exact SCREEN_HUD + finite world-plane 35%. POSITION 실제 수정 후보.'
     }
     'R57_04_RANK_ALL_AS_HUD'=[ordered]@{
         Title='04. VEHICLE RANK as HUD control'
-        Detail='차량 위 1~6등을 일부러 SCREEN_HUD로 처리. 갈라짐/머리추종이 사라지면 최종 owner가 맞다는 음성 대조군.'
+        Detail='차량 위 1~6등을 일부러 SCREEN_HUD로 처리. 갈라짐 제거 여부로 최종 draw ownership을 검증.'
     }
     'R57_05_RANK_PROJECTED_IPD'=[ordered]@{
         Title='05. VEHICLE RANK projected-IPD'
-        Detail='Calc3D2D 직전의 실제 view X/Y/Z를 보존하고 양안 IPD/FOV로 다시 투영. 가장 유력한 실제 해결 후보.'
+        Detail='Calc3D2D의 실제 view X/Y/Z를 보존하고 양안 IPD/FOV로 재투영. 가장 유력한 해결 후보.'
     }
     'R57_06_RANK_PROJECTED_HEAD'=[ordered]@{
         Title='06. VEHICLE RANK + head inverse'
-        Detail='05에 head inverse까지 추가. Calc3D2D 입력 카메라가 이미 head-sync 되었는지 05와 직접 판별.'
+        Detail='05에 head inverse까지 추가. Calc3D2D 입력이 이미 head-sync인지 05와 직접 비교.'
     }
-    'R57_07_RANK 1-3 projected'
-    =[ordered]@{
+    'R57_07_RANK_PROJECTED_13'=[ordered]@{
         Title='07. RANK 1-3 projected only'
-        Detail='sprani/SPRARGS2인 1~3등만 새 projected-world-marker 경로. 4~6은 기존 경로 유지.'
+        Detail='sprani/SPRARGS2인 1~3등만 새 projected-world-marker 경로. 4~6은 기존 경로.'
     }
-    'R57_08_RANK 4-6 projected'
-    =[ordered]@{
+    'R57_08_RANK_PROJECTED_46'=[ordered]@{
         Title='08. RANK 4-6 projected only'
-        Detail='put_clip_sprite/SPRARGS인 4~6등만 새 경로. 1~3과의 렌더 타입 차이를 직접 분리.'
+        Detail='put_clip_sprite/SPRARGS인 4~6등만 새 경로. 1~3과 렌더 타입 차이를 분리.'
     }
     'R57_09_RANK_PROJECTED_ZERO'=[ordered]@{
         Title='09. projected owner / zero'
-        Detail='ProjectedWorldMarker semantic은 유지하되 양안 재투영을 끔. semantic 전달과 위치 수식을 분리 검증.'
+        Detail='새 semantic은 유지하고 양안 재투영만 끔. semantic 전달과 위치 수식을 분리 검증.'
     }
     'R57_10_RANK_PROJECTED_TRACE'=[ordered]@{
         Title='10. projected trace only'
-        Detail='view X/Y/Z와 projected owner를 계측하되 화면 위치는 원본 유지. 로그만으로 producer→queue→draw 연결 확인.'
+        Detail='view X/Y/Z와 producer→queue→draw 연결을 기록하고 화면 위치는 원본 유지.'
     }
-}
-
-# PowerShell ordered-hashtable key syntax cannot contain the display spacing aliases above.
-$slots.Remove('R57_07_RANK 1-3 projected')
-$slots.Remove('R57_08_RANK 4-6 projected')
-$slots['R57_07_RANK_PROJECTED_13']=[ordered]@{
-    Title='07. RANK 1-3 projected only'
-    Detail='sprani/SPRARGS2인 1~3등만 새 projected-world-marker 경로. 4~6은 기존 경로 유지.'
-}
-$slots['R57_08_RANK_PROJECTED_46']=[ordered]@{
-    Title='08. RANK 4-6 projected only'
-    Detail='put_clip_sprite/SPRARGS인 4~6등만 새 경로. 1~3과의 렌더 타입 차이를 직접 분리.'
 }
 
 function Run-Test([string]$variant){
