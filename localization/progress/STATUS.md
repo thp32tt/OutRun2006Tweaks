@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-26 07:54 KST
+Updated: 2026-09-26 08:31 KST
 
 ## Active branch
 `korean-localization-clean`
@@ -97,3 +97,11 @@ Next gate: continue the final 2 pending assets from original DDS; keep preserve-
 - Canonical state: **30 retained / 2 pending** (`37759842`, `C598919A`).
 - Hard gates: original orientation, preserve-original exclusions, source-style fidelity, artifact cleanliness, and original text-region containment.
 - Safety rule: no pixel promotion without original DDS + candidate-byte comparison; unsafe/unavailable candidates remain original.
+
+
+### QA checkpoint 2026-09-26 08:31 KST
+- Mandatory policy/state files re-read before promotion decisions.
+- Accessible file search did not locate usable exact original DDS bytes for the final two assets.
+- `37759842` and `C598919A` remain original; no preview-derived edit was promoted.
+- Canonical state remains **30 retained / 2 pending**.
+- Report: `localization/graphics/BATCH27_SAFE_HOLD_REPORT.json`.
