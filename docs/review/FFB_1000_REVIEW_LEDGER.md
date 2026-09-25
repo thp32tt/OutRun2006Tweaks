@@ -43,14 +43,15 @@ A cycle is counted only after its assigned source/concern has been inspected and
 | C0029 | PS2 ConstantForce hidden-caller/static-pointer audit | COMPLETE | No new PC defect; no extra direct caller, literal setter function-pointer entry, or second absolute writer to the two source globals was recovered | Whole-ELF direct-call/global-reference/literal-pointer audit; dynamic trace still required to exclude computed/indirect callers |
 | C0030 | Cross-model periodic transport ownership | COMPLETE | `FFB-R0030-F01`: shared wrapper forced UsePeriodicEffects=false every frame, defeating Arcade Sine / PS2 Triangle ownership and the live F11 switch; per-frame override removed | wrapper/core/UI contract review; source/verifier/docs updated |
 | C0031 | Arcade Original/Hybrid road periodic unit semantics | COMPLETE | `FFB-R0031-F01`: OutRun2Real Sine(70,80) uses 70ms period, while PC treated 70 as Hz; corrected to ~14.286Hz host translation | upstream EffectTriggers/TriggerSineEffect contract + source/math/tests/verifier/docs |
-| C0032 | Arcade one-sided rough -> road transition composition | COMPLETE | `FFB-R0032-F01`: transition force was added to opposite sustained surface force and could cancel to zero; transition now owns directional output for its six-tick window | single-code Lindbergh callback semantics + pure composition tests |
+| C0032 | Arcade one-sided rough -> road transition composition | COMPLETE | `FFB-R0032-F01`: transition force was added to opposite sustained surface force and could cancel to zero; transition now owns directional output for its active event window | single-code Lindbergh callback semantics + pure composition tests |
 | C0033 | Arcade gear-event waveform/duration/UI scaling | COMPLETE | `FFB-R0033-F01`: PC used a 100ms square-like pulse and ignored Gear Shift; reference is Sine(240,320,0.10), now synthesized as one ~240ms cycle with explicit host scaling | upstream EffectTriggers/TriggerSineEffect contract + source/math/UI/tests/docs |
 | C0034 | Shared Modern/Arcade crash detection / collision witness priority | COMPLETE | `FFB-R0034-F01`: 0.03 speed-drop heuristic fired on normal decel and could pre-empt the collision bit; collision edge now wins and fallback starts above 0.12 with 0.12..0.36 severity mapping | 46-event hardware log distribution + source/math/tests/verifier/docs |
 | C0035 | Arcade directional ConstantForce lifetime | COMPLETE | `FFB-R0035-F01`: OutRun2Real profile uses FeedbackLength=80ms, while PC used six ticks/~100ms; wall/transition/spring-suppression window now uses five ticks/~83.3ms | upstream OutRun2Real INI + TriggerConstantEffect contract + source/math/tests/docs |
 | C0036 | Arcade Original Spring/Damper reference baseline | COMPLETE | `FFB-R0036-F01`: shortcut inherited Modern spring/damper values; now restores OutRun2Real SpringStrength=50 -> coeff .50/sat 1.00 and EnableDamper=0 | upstream OutRun2Real INI + TriggerSpringEffectInfinite + UI/verifier/docs |
 | C0037 | Cross-model crash event lifetime vs debounce | COMPLETE | `FFB-R0037-F01`: common 10-tick structural blank outlived the 5-tick Arcade event and also affected PS2 software fallback; suppression is now model/event-window aware | core model interaction review + verifier/docs |
+| C0038 | Arcade speed-strength final band / Modern speed-normalization separation | COMPLETE | `FFB-R0038-F01`: Arcade mapper had a >1.0/100% step but caller fed Modern-clamped 0..1 speed; separate 0..1.25 Arcade speed now preserves captured C2C headroom | OutRun2Real staircase + hardware telemetry max speedRaw~2.2394 + source/tests/verifier/docs |
 
-Completed cycles: **37 / 1000**
+Completed cycles: **38 / 1000**
 
 ## Findings
 
@@ -70,6 +71,7 @@ Completed cycles: **37 / 1000**
 - `FFB-R0035-F01`: corrected Arcade directional ConstantForce lifetime from a 100 ms approximation to the OutRun2Real profile's 80 ms reference (five 60 Hz ticks).
 - `FFB-R0036-F01`: made Arcade Original shortcut restore the OutRun2Real 50% Spring / no-Damper reference condition baseline instead of inheriting Modern values.
 - `FFB-R0037-F01`: separated active impact-event suppression from the longer crash debounce so Hybrid/Original steering no longer stays blank after the event ends.
+- `FFB-R0038-F01`: separated Arcade speed normalization from Modern's 0..1 clamp so the Lindbergh-derived 100% top-speed step is reachable.
 - C0002..C0010 and C0014..C0020: no new non-duplicate finding after source/evidence review.
 
 ## PS2 evidence discipline
@@ -81,4 +83,4 @@ Completed cycles: **37 / 1000**
 
 ## Next review
 
-Resume at **C0038** with Modern DD SAT/road/periodic/fallback safety and Arcade Hybrid interaction review, then exact-head CI.
+Resume at **C0039** with Modern DD SAT/road/periodic/fallback safety and Arcade Hybrid interaction review, then exact-head CI.
