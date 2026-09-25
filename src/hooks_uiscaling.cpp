@@ -5,6 +5,12 @@
 
 #include <array>
 
+namespace OutRunVRRenderer
+{
+	bool SuspendCullingCameraForCpuProjection() noexcept;
+	void ResumeCullingCameraAfterCpuProjection(bool suspended) noexcept;
+}
+
 namespace Settings
 {
 	extern Setting<bool> VREnabled;
@@ -62,6 +68,42 @@ class UIScaling : public Hook
 	// is redirected on its own rather than hooking either function.
 	static constexpr int RankMarker_SpraniCalls[] = { 0xBB0FB, 0xBB133, 0xBB16C, 0xBB1A5 };
 	static constexpr int RankMarker_ClipSpriteCalls[] = { 0xBB21F, 0xBB241, 0xBB271, 0xBB2BC, 0xBB2D0 };
+	static constexpr int DispRank_ClipSpriteCalls[] = {
+		0xB9F3A, 0xB9F5E, 0xB9F81, 0xB9FD0,
+		0xB9FFC, 0xBA01E, 0xBA035, 0xBA052
+	};
+
+	static int R56ProducerMode() noexcept
+	{
+		static const int mode = []() noexcept {
+			char text[8]{};
+			if (GetEnvironmentVariableA(
+					"OUTRUN_VR_PRODUCER_MODE",
+					text, static_cast<DWORD>(sizeof(text))) == 0)
+				return 0;
+			if (text[0] < '0' || text[0] > '4')
+				return 0;
+			return static_cast<int>(text[0] - '0');
+		}();
+		return mode;
+	}
+
+	static bool R56UseBaseCameraForRank() noexcept
+	{
+		const int mode = R56ProducerMode();
+		return mode == 2 || mode == 3 || mode == 4;
+	}
+
+	static bool R56OwnDispRankCalls() noexcept
+	{
+		const int mode = R56ProducerMode();
+		return mode == 1 || mode == 4;
+	}
+
+	static bool R56ScaleRankClipDigits() noexcept
+	{
+		return R56ProducerMode() == 3;
+	}
 
 	// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
 	static inline SafetyHookInline D3DXMatrixTransformation2D = {};
@@ -204,12 +246,23 @@ class UIScaling : public Hook
 	static inline SafetyHookInline Calc3D2D_hk = {};
 	static void Calc3D2D_dest(float a1, float a2, D3DVECTOR* in, D3DVECTOR* out)
 	{
+		const auto returnAddress =
+			reinterpret_cast<std::uintptr_t>(_ReturnAddress());
+		const auto rankReturn =
+			reinterpret_cast<std::uintptr_t>(Module::exe_ptr<void>(0xBAEE7));
+		const bool rankProjection =
+			R56UseBaseCameraForRank() && returnAddress == rankReturn;
+		const bool suspended = rankProjection
+			? OutRunVRRenderer::SuspendCullingCameraForCpuProjection()
+			: false;
+
 		Calc3D2D_hk.call(a1, a2, in, out);
 
+		if (suspended)
+			OutRunVRRenderer::ResumeCullingCameraAfterCpuProjection(true);
+
 		// TODO: OnlineArcade mode needs to add position here
-
 		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
-
 		if (mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade)
 			out->x = (out->x / Game::screen_scale->y) * Game::screen_scale->x;
 	};
@@ -282,10 +335,57 @@ class UIScaling : public Hook
 		{
 			node->args_10.float24 += RankMarkerFracX;
 			node->args_10.float28 += RankMarkerFracY;
+			if (R56ScaleRankClipDigits())
+			{
+				node->args_10.scaleX *= 0.35f;
+				node->args_10.scaleY *= 0.35f;
+			}
 			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
 				node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
 		}
 
+		return result;
+	}
+
+	static int __cdecl R56_DispRank_putClipSprite(
+		int xstnum, int x, int y, uint32_t flags,
+		float priority, uint32_t color)
+	{
+		// The original UIScaling hook at these eight CALL instructions adjusts
+		// only the X argument. Once R56 owns the CALL directly, preserve that
+		// exact OnlineArcade spacing here before invoking the stock producer.
+		ScalingMode scaling = ScalingMode(Settings::UIScalingMode.get());
+		if (scaling == ScalingMode::OnlineArcade)
+		{
+			float spacing =
+				-((Game::screen_scale->y * Game::original_resolution.x) -
+				  Game::screen_resolution->x) / 2.0f;
+			spacing /= Game::screen_scale->x;
+			x += static_cast<int>(std::round(spacing));
+		}
+
+		int prio = static_cast<int>(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount
+				? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* before = root ? root->tail_4 : nullptr;
+
+		const int result =
+			Game::put_clip_sprite(xstnum, x, y, flags, priority, color);
+
+		root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (node && node != before)
+		{
+			// Intentionally obvious producer-level proof: this affects the
+			// actual 6th/6 POSITION clip-sprite node before any generic R30
+			// classification. Preserve dynamic alpha/color unchanged.
+			node->args_10.scaleX *= 0.35f;
+			node->args_10.scaleY *= 0.35f;
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		}
 		return result;
 	}
 
