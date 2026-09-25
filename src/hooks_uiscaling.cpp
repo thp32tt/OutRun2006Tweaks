@@ -4,6 +4,7 @@
 #include "vr/game/render_semantics.hpp"
 
 #include <array>
+#include <atomic>
 
 namespace Settings
 {
@@ -78,6 +79,26 @@ class UIScaling : public Hook
 			return (value >= 1 && value <= 20) ? value : 0;
 		}();
 		return mode;
+	}
+
+	inline static std::atomic<std::uint64_t> VRProbeDispRankHits{ 0 };
+	inline static std::atomic<std::uint64_t> VRProbeRank13Hits{ 0 };
+	inline static std::atomic<std::uint64_t> VRProbeRank46Hits{ 0 };
+
+	static void VRHudProbeTrace(
+		const char* site, std::atomic<std::uint64_t>& counter) noexcept
+	{
+		const int probe = VRHudProbeMode();
+		if (!probe)
+			return;
+		const std::uint64_t hit =
+			counter.fetch_add(1, std::memory_order_relaxed) + 1;
+		// Power-of-two logging proves the producer was reached without flooding
+		// long race logs.
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R56 PROBE: mode={} producer={} hits={}",
+				probe, site, hit);
 	}
 
 	// Addresses of the draw calls sub_4BAD20 makes. sprani_play_ae_auth_alpha
@@ -259,6 +280,7 @@ class UIScaling : public Hook
 	// position as floats, so the discarded fraction goes straight back on.
 	static int __cdecl RankMarker_sprani(uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
 	{
+		VRHudProbeTrace("rank13_sprani", VRProbeRank13Hits);
 		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
@@ -304,6 +326,7 @@ class UIScaling : public Hook
 	// there instead.
 	static int __cdecl RankMarker_putClipSprite(int xstnum, int x, int y, uint32_t flags, float priority, uint32_t color)
 	{
+		VRHudProbeTrace("rank46_clip", VRProbeRank46Hits);
 		int prio = int(priority);
 		prio = prio < 0 ? 0 : (prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
 
@@ -540,6 +563,7 @@ class UIScaling : public Hook
 	// callsites all pass the rank/POSITION horizontal coordinate at ESP+4.
 	static void DispRankProbe_AdjustPosition(safetyhook::Context& ctx)
 	{
+		VRHudProbeTrace("position_disprank", VRProbeDispRankHits);
 		int* x = reinterpret_cast<int*>(ctx.esp + 4);
 		AddSpriteSpacing(x, false);
 		const int probe = VRHudProbeMode();
