@@ -119,7 +119,9 @@ The main path at `0x001330A0..0x001330EC` combines two signed force sources, sel
 
 and computes a magnitude scaled by `220`, capped to `220` on the 0..255 Logitech scale.
 
-This proves a directional constant-force cap of `220/255`, but the semantic meaning of those two retail source variables is not yet sufficiently mapped to call the path specifically collision, rail, or steering force. The PC event mapping therefore remains explicitly provisional.
+This proves a directional constant-force cap of `220/255`, but a deeper static call-graph pass finds no verified non-zero retail caller for the two source floats in this build. Their direct setter at `0x00132A28` is called at initialization (`0x00132AF4`) and from the per-car update (`0x00132DB4`); both verified direct calls pass `0.0 / 0.0`. No additional direct call or static function-pointer reference to that setter was recovered.
+
+That does **not** prove that a computed/indirect caller is impossible, but it removes the evidentiary basis for mapping C2C collision detection to the retail ConstantForce transport. PS2 Original therefore keeps the transport/cap documented for future recovery while emitting no collision ConstantForce until a non-zero retail event caller is verified. Modern DD collision and Lindbergh Arcade wall-event behavior are unaffected.
 
 ### Periodic — Type 4 / Triangle
 
@@ -213,7 +215,7 @@ The compact reverse-map builder now imports the curated retail evidence records 
 
 Still unresolved and therefore **not** represented as retail-original tuning:
 
-- semantic identity of the signed constant-force source variables at `0x00349528 / 0x0034952C`;
+- any non-zero/indirect retail caller and semantic identity for the ConstantForce source variables at `0x00349528 / 0x0034952C`;
 - semantic identity of the additional vehicle-state shaping that can modify the surface envelope after `0x001D811C`;
 - semantic naming for the remaining non-core effect-manager categories (0, 3, 4, 5, 6, 9, 11);
 - event-to-effect mapping for collision, rail, surface transition, drift/slip, and gear;
