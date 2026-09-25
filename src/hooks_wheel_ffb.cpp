@@ -554,6 +554,10 @@ namespace
                 WheelFFBMath::model_uses_modern_sat(ffbModel);
             const bool arcadeEffects =
                 WheelFFBMath::model_uses_arcade_events(ffbModel);
+            const bool arcadeOriginal =
+                ffbModel == WheelFFBMath::Model::ArcadeOriginal;
+            const bool arcadeHybrid =
+                ffbModel == WheelFFBMath::Model::ArcadeHybrid;
             const bool originalConditionBackbone =
                 WheelFFBMath::model_uses_original_condition_backbone(ffbModel);
             const bool ps2Original =
@@ -1025,11 +1029,17 @@ namespace
                 crashImpulseTimer_ > 0
                     ? CrashTimerFrames - crashImpulseTimer_
                     : CrashTimerFrames;
-            const bool suppressSpringForImpact = arcadeEffects
+            // OutRun2Real keeps its infinite Spring and Constant effects in
+            // separate SDL effect slots. Arcade Original therefore preserves the
+            // servo-style condition backbone during 0x0B/0x1B/0x10/0x00 events.
+            // Hybrid may still briefly unload its Modern assist so the arcade
+            // directional event is not masked by inferred structural torque.
+            const bool suppressSpringForImpact = arcadeHybrid
                 ? (crashImpulseTimer_ > 0 &&
                    impactAge < WheelFFBMath::ArcadeConstantEventFrames)
-                : (!ps2Original &&
-                   crashImpulseTimer_ > CrashCooldownFrames);
+                : (arcadeOriginal || ps2Original
+                    ? false
+                    : crashImpulseTimer_ > CrashCooldownFrames);
 
             // Make UseHardwareSpring a real live F11 switch.  Previously
             // changing it to false after startup left the already-created
@@ -1271,10 +1281,10 @@ namespace
             }
 
             const bool suppressStructuralForImpact =
-                arcadeEffects
+                arcadeHybrid
                     ? (crashImpulseTimer_ > 0 &&
                        impactAge < WheelFFBMath::ArcadeConstantEventFrames)
-                    : (ps2Original
+                    : (arcadeOriginal || ps2Original
                         ? false
                         : crashImpulseTimer_ > CrashCooldownFrames);
 
