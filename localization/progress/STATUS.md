@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-26 08:14 KST
+Updated: 2026-09-26 08:39 KST
 
 ## Active branch
 `korean-localization-clean`
@@ -43,6 +43,7 @@ The full draft intentionally uses exact/OCR/manual/atlas-alpha placement evidenc
 - 1st/2nd/early-3rd batch generated images are visual drafts pending source-faithful rework.
 
 ### Source-faithful batches
+- Batch41: `37759842` rejected again; containment passes but lower blue/black cards still retain source English, report `BATCH41_REJECTED_REPORT.json`
 - Batch38: `C598919A` promoted after full-resolution text-cell replacement + block-level DXT5 QA, report `BATCH38_C598_REWORK_REPORT.json`
 - Batch33: `37759842` still rejected; embedded blue/black cards restore English fragments, report `BATCH33_REJECTED_REPORT.json`
 - Batch25v4: `ACF61D7C` promoted after exact source-y cleanup and protected selector-bar restoration, report `BATCH25V4_ACF_REWORK_REPORT.json`
@@ -70,7 +71,7 @@ The full draft intentionally uses exact/OCR/manual/atlas-alpha placement evidenc
 - Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip`
 - Combined package SHA-256: `7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02`
 - Mandatory extra QA gates: source-like typography/colors; no stray black lines, crop seams, text-erasure residue, clipped glyphs, accidental opaque boxes, or alpha halos.
-- Final pending graphics are only `37759842_1024x1024.dds` and `C598919A_1024x1024.dds`. The earlier DXT5 assets `49BB5FE5`, `42E618FD`, and `7CE1CFC5` were already promoted in Batch12v2 and must not be reopened without new evidence.
+- Final pending graphics asset is only `37759842_1024x1024.dds`. `C598919A_1024x1024.dds` was promoted in Batch38.
 
 ## Runtime/font
 - K0 txet roundtrip: **PASS**
