@@ -1,15 +1,17 @@
 {
-  "batch": "23-ACF61D7C-glyph-mask-rework",
-  "updated_at_kst": "2026-09-26T07:58:00+09:00",
+  "batch": "23-ACF61D7C-rework",
   "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
   "status": "rejected_keep_original",
+  "automated_qa": {
+    "note": "Local candidate was generated inside explicit cells, but manual review failed before promotion."
+  },
   "manual_qa": {
     "pass": false,
     "reasons": [
-      "Residual English/source glyph fragments remain around top selector and generic labels.",
-      "Several Korean replacements coexist with source English.",
-      "Fails residual-English, erasure-residue, and clean text-region replacement gates."
+      "Residual English remained around several top selector labels and mid-screen generic strings.",
+      "The glyph-cell boxes were still too small for complete source-text removal.",
+      "Candidate was therefore not promoted."
     ]
   },
-  "action": "Do not integrate. Keep original DDS. Next pass: per-label glyph masks; skip unsafe labels."
+  "action": "Keep original DDS. Next pass should use glyph-only masking or larger text extents while preserving the yellow selector bar and song-title art."
 }
