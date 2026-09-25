@@ -79,9 +79,10 @@ Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'Get-OutRunVRTestProfile') 'ru
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'TEST_PROFILE') 'collector manifest must record profile'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match '\$variant/\$profile/\$session') 'collector path must separate Variant/Profile/Session'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'captureRoot') 'collector must include capture bundles'
-Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'X_COMBINED') 'single GUI must expose combined semantic fix'
-Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'X_SCREEN_HUD') 'single GUI must expose screen-HUD isolation'
-Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'X_WORLD_RANK') 'single GUI must expose world-rank isolation'
+Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'R54_A_NEXTDRAW') 'single GUI must expose R54 next-draw case'
+Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'R54_B_STICKY') 'single GUI must expose R54 sticky-node case'
+Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'R54_C_FULL_OWNER') 'single GUI must expose R54 full-owner case'
+Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'R54_D_HUD_PLANE') 'single GUI must expose R54 HUD-plane case'
 Assert-True (-not (Test-Path (Join-Path $root 'OutRunVR-Backend-Selector.ps1'))) 'obsolete backend GUI selector must stay removed'
 Assert-True (-not (Test-Path (Join-Path $root 'OutRunVR-Slot-Selector.ps1'))) 'obsolete slot GUI selector must stay removed'
 
