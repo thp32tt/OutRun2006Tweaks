@@ -46,8 +46,9 @@ A cycle is counted only after its assigned source/concern has been inspected and
 | C0032 | Arcade one-sided rough -> road transition composition | COMPLETE | `FFB-R0032-F01`: transition force was added to opposite sustained surface force and could cancel to zero; transition now owns directional output for its six-tick window | single-code Lindbergh callback semantics + pure composition tests |
 | C0033 | Arcade gear-event waveform/duration/UI scaling | COMPLETE | `FFB-R0033-F01`: PC used a 100ms square-like pulse and ignored Gear Shift; reference is Sine(240,320,0.10), now synthesized as one ~240ms cycle with explicit host scaling | upstream EffectTriggers/TriggerSineEffect contract + source/math/UI/tests/docs |
 | C0034 | Shared Modern/Arcade crash detection / collision witness priority | COMPLETE | `FFB-R0034-F01`: 0.03 speed-drop heuristic fired on normal decel and could pre-empt the collision bit; collision edge now wins and fallback starts above 0.12 with 0.12..0.36 severity mapping | 46-event hardware log distribution + source/math/tests/verifier/docs |
+| C0035 | Arcade directional ConstantForce lifetime | COMPLETE | `FFB-R0035-F01`: OutRun2Real profile uses FeedbackLength=80ms, while PC used six ticks/~100ms; wall/transition/spring-suppression window now uses five ticks/~83.3ms | upstream OutRun2Real INI + TriggerConstantEffect contract + source/math/tests/docs |
 
-Completed cycles: **34 / 1000**
+Completed cycles: **35 / 1000**
 
 ## Findings
 
@@ -64,6 +65,7 @@ Completed cycles: **34 / 1000**
 - `FFB-R0032-F01`: made 0x04/0x14 rough-to-road transitions replace, not sum with, sustained one-sided surface force so opposite sides cannot cancel the event.
 - `FFB-R0033-F01`: restored the observed Arcade gear Sine's ~240 ms period/duration, moving-speed gate and live host scaler instead of the old 100 ms square-like pulse.
 - `FFB-R0034-F01`: made the C2C collision-state edge authoritative and raised the host-only speed-drop fallback above the captured normal-deceleration cluster.
+- `FFB-R0035-F01`: corrected Arcade directional ConstantForce lifetime from a 100 ms approximation to the OutRun2Real profile's 80 ms reference (five 60 Hz ticks).
 - C0002..C0010 and C0014..C0020: no new non-duplicate finding after source/evidence review.
 
 ## PS2 evidence discipline
@@ -75,4 +77,4 @@ Completed cycles: **34 / 1000**
 
 ## Next review
 
-Resume at **C0035** with Modern DD structural/road/safety and Arcade Hybrid interaction review, then exact-head CI.
+Resume at **C0036** with Arcade Original condition/spring baseline, then Modern DD structural/road/safety and Hybrid interaction review.
