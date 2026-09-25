@@ -2083,10 +2083,11 @@ namespace
                 // Host scaler: 1.00 preserves OutRun2Real's 0.10 gear Sine.
                 Settings::WheelFFBGearShift = 1.0f;
                 Settings::WheelFFBInvertForce = false;
+                Settings::WheelFFBInvertSpring = false;
                 Settings::VibrationMode = 0;
                 track_ffb_change(true);
                 WheelFFB_RequestSettingsTransition();
-                status_ = "Arcade Original enabled: Lindbergh-derived 50% servo-style spring / no-damper baseline plus reconstructed constant/surface/gear events; Reverse OFF reference restored. Save Force Feedback to persist.";
+                status_ = "Arcade Original enabled: isolated Lindbergh-derived 50% servo-style spring / no-damper baseline plus reconstructed constant/surface/gear events; both force and spring Reverse are OFF. Save Force Feedback to persist.";
             }
             ImGui::SameLine();
             if (ImGui::Button("Use Arcade Hybrid"))
@@ -2094,6 +2095,25 @@ namespace
                 Settings::WheelFFBEnable = true;
                 Settings::WheelFFBModel = 2;
                 Settings::WheelFFBPhysicsSat = true;
+
+                // Hybrid is a complete reference preset, not a delta from the
+                // previously selected model. Restore the Modern DD structural
+                // backbone explicitly so Arcade Original / PS2 condition values
+                // cannot leak into Hybrid when switching live in F11.
+                Settings::WheelFFBUseHardwareSpring = true;
+                Settings::WheelFFBUseHardwareDamper = true;
+                Settings::WheelFFBSpringStrength = 0.65f;
+                Settings::WheelFFBSpringSaturation = 0.95f;
+                Settings::WheelFFBDamperStrength = 0.28f;
+                Settings::WheelFFBSteeringWeight = 1.45f;
+                Settings::WheelFFBMechanicalTrail = 0.25f;
+                Settings::WheelFFBTrailResponseLead = 0.25f;
+                Settings::WheelFFBGripLoss = 0.65f;
+                Settings::WheelFFBWeightTransfer = 0.15f;
+                Settings::WheelFFBSlewRate = 0.040f;
+                Settings::WheelFFBReversalReleaseRate = 0.12f;
+                Settings::WheelFFBTireSlip = 0.20f;
+
                 Settings::WheelFFBEngineVibration = false;
                 Settings::WheelFFBUsePeriodicEffects = true;
                 // Arcade event/surface host scalers. 1.00 preserves the
@@ -2103,10 +2123,11 @@ namespace
                 // Host scaler: 1.00 preserves OutRun2Real's 0.10 gear Sine.
                 Settings::WheelFFBGearShift = 1.0f;
                 Settings::WheelFFBInvertForce = false;
+                Settings::WheelFFBInvertSpring = false;
                 Settings::VibrationMode = 0;
                 track_ffb_change(true);
                 WheelFFB_RequestSettingsTransition();
-                status_ = "Arcade + Modern Hybrid enabled: Modern DD SAT with Lindbergh-derived arcade events; Reverse OFF reference restored. Save Force Feedback to persist.";
+                status_ = "Arcade + Modern Hybrid enabled: isolated Modern DD structural baseline plus Lindbergh-derived arcade events; both force and spring Reverse are OFF. Save Force Feedback to persist.";
             }
             ImGui::SameLine();
             if (ImGui::Button("Use PS2 Original (Experimental)"))
@@ -2130,6 +2151,7 @@ namespace
                 // paths; never inherit a previous model's disabled state.
                 Settings::WheelFFBUsePeriodicEffects = true;
                 Settings::WheelFFBInvertForce = false;
+                Settings::WheelFFBInvertSpring = false;
                 Settings::VibrationMode = 0;
                 track_ffb_change(true);
                 WheelFFB_RequestSettingsTransition();
