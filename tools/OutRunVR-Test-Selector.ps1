@@ -6,21 +6,21 @@ $selector=Join-Path $root 'Select-OutRunVRBackend.ps1'
 $runner=Join-Path $root 'Run-OutRunVRTest.ps1'
 
 $slots=[ordered]@{
-    'R55_A_ZERO'=[ordered]@{
-        Title='1. A - ZERO DISPARITY'
-        Detail='화면 HUD를 좌/우 완전히 같은 2D 좌표로 강제. 갈라짐이 사라지는지 확인.'
+    'R56_A_DISPRANK35'=[ordered]@{
+        Title='1. A - POSITION DIRECT 35%'
+        Detail='6th/6 POSITION의 EXE 8개 put_clip_sprite CALL을 직접 소유하고 해당 노드만 35% 축소. 일반 HUD 분류 우회.'
     }
-    'R55_B_SCALE35'=[ordered]@{
-        Title='2. B - ZERO + 35% SCALE'
-        Detail='A와 같은 zero-disparity에 화면 HUD를 35%로 강제 축소. 경로가 보이면 크기가 확실히 달라져야 함.'
+    'R56_B_RANK_BASECAM'=[ordered]@{
+        Title='2. B - RANK BASE CAMERA'
+        Detail='차량 순위 Calc3D2D 순간에만 HMD culling camera를 원래 게임 카메라로 복원. 머리추종 원인 확인/수정.'
     }
-    'R55_C_WORLD35'=[ordered]@{
-        Title='3. C - WORLD PLANE 35%'
-        Detail='HUD를 35% finite world-plane + head inverse로 배치. 머리 추종 제거 실제 후보.'
+    'R56_C_RANKCLIP35'=[ordered]@{
+        Title='3. C - RANK BASE + 4PLUS 35%'
+        Detail='B + 4등 이후 put_clip_sprite 숫자만 35% 축소. 1~3 sprani와 4+ clip 경로를 눈으로 분리.'
     }
-    'R55_D_RANKZERO'=[ordered]@{
-        Title='4. D - WORLD HUD + RANK ZERO'
-        Detail='C + 차량 위 exact WORLD_BILLBOARD를 좌/우 같은 좌표로 강제. 특히 4/5등 마커 경로 확인.'
+    'R56_D_COMBINED'=[ordered]@{
+        Title='4. D - COMBINED FIX'
+        Detail='A+B 결합. 일반 HUD는 기존 world-fixed 0.55 유지, POSITION 직접 소유 + 차량 순위 base-camera projection.'
     }
 }
 
@@ -47,7 +47,7 @@ $title.Location=[System.Drawing.Point]::new(155,18)
 $form.Controls.Add($title)
 
 $guide=New-Object System.Windows.Forms.Label
-$guide.Text='같은 코스/시점에서 1→2→3→4 순서로 짧게 테스트하세요. 이번 네 모드는 최종 좌표 수식 자체가 서로 다릅니다. 특히 2번은 HUD가 35%로 줄지 않으면 보이는 HUD가 이 경로가 아닙니다.'
+$guide.Text='이번에는 producer 자체를 분리합니다. A는 6th/6 POSITION, B는 차량순위 머리추종, C는 4등 이후 clip 숫자, D는 A+B 결합입니다. 같은 코스/시점에서 1→2→3→4 순서로 테스트하세요.'
 $guide.AutoSize=$false
 $guide.Size=[System.Drawing.Size]::new(650,44)
 $guide.Location=[System.Drawing.Point]::new(35,58)
