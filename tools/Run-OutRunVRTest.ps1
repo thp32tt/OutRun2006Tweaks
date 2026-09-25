@@ -55,6 +55,7 @@ $variant=if($kv.variant){[string]$kv.variant}else{'AUTO'}
 $semanticMode='0'
 $hudExperimentMode='0'
 $hudCoordMode='0'
+$producerMode='0'
 switch($variant){
     'X_SCREEN_HUD'       { $semanticMode='1' }
     'X_WORLD_RANK'       { $semanticMode='2' }
@@ -67,13 +68,19 @@ switch($variant){
     'R55_B_SCALE35'      { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='2' }
     'R55_C_WORLD35'      { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='3' }
     'R55_D_RANKZERO'     { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='4' }
+    'R56_A_DISPRANK35'   { $semanticMode='3'; $hudExperimentMode='4'; $producerMode='1' }
+    'R56_B_RANK_BASECAM' { $semanticMode='3'; $hudExperimentMode='4'; $producerMode='2' }
+    'R56_C_RANKCLIP35'   { $semanticMode='3'; $hudExperimentMode='4'; $producerMode='3' }
+    'R56_D_COMBINED'     { $semanticMode='3'; $hudExperimentMode='4'; $producerMode='4' }
 }
 $oldExeSemanticMode=$env:OUTRUN_VR_EXE_SEMANTIC_MODE
 $oldHudExperimentMode=$env:OUTRUN_VR_HUD_EXPERIMENT_MODE
 $oldHudCoordMode=$env:OUTRUN_VR_HUD_COORD_MODE
+$oldProducerMode=$env:OUTRUN_VR_PRODUCER_MODE
 $env:OUTRUN_VR_EXE_SEMANTIC_MODE=$semanticMode
 $env:OUTRUN_VR_HUD_EXPERIMENT_MODE=$hudExperimentMode
 $env:OUTRUN_VR_HUD_COORD_MODE=$hudCoordMode
+$env:OUTRUN_VR_PRODUCER_MODE=$producerMode
 
 $patterns=@(
     'OutRun2006Tweaks*.log',
@@ -186,6 +193,7 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "exeSemanticMode=$semanticMode"
     "hudExperimentMode=$hudExperimentMode"
     "hudCoordMode=$hudCoordMode"
+    "producerMode=$producerMode"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
 Write-Host "Runtime overrides: $($gameArgs -join ' ')"
 
@@ -261,6 +269,7 @@ try{
     $env:OUTRUN_VR_EXE_SEMANTIC_MODE=$oldExeSemanticMode
     $env:OUTRUN_VR_HUD_EXPERIMENT_MODE=$oldHudExperimentMode
     $env:OUTRUN_VR_HUD_COORD_MODE=$oldHudCoordMode
+    $env:OUTRUN_VR_PRODUCER_MODE=$oldProducerMode
     foreach($key in $identityKeys){
         [Environment]::SetEnvironmentVariable($key,$oldIdentity[$key],'Process')
     }
