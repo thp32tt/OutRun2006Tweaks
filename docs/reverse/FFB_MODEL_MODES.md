@@ -1,6 +1,6 @@
 # Selectable Wheel FFB Models
 
-The standalone FFB branch exposes several force models through one DirectInput COM output owner. Device selection, focus-loss safety, actuator shutdown, response correction, slew limiting, soft saturation, reconnect handling and the hard DirectInput cap are shared by every model.
+The standalone FFB branch exposes several force models through one DirectInput COM output owner. Device selection, focus-loss safety, actuator shutdown, response correction, slew limiting, soft saturation, reconnect handling and the hard DirectInput cap are shared by every model. Hardware periodic transport remains a live model/user choice: Arcade Original/Hybrid can request Sine, PS2 Original can request Triangle, and the core falls back to ConstantForce when a required periodic effect is unavailable. The shared compatibility wrapper does not overwrite that choice.
 
 ## Model 0 — Modern DD Physics
 
