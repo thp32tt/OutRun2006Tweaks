@@ -89,6 +89,18 @@ namespace WheelFFBMath
             0.0f, 1.0f);
     }
 
+    // OR2006C2C course-collision response sets EVWORK_CAR::field_283 to
+    // 0x1E (30) from FUN_00503a20. Treat only a high-value reload/rising edge
+    // as a new course/wall contact so sustained scraping cannot retrigger every tick.
+    constexpr unsigned CourseCollisionTimerReload = 0x1Eu;
+    constexpr unsigned CourseCollisionTimerEdgeFloor = 0x1Cu;
+
+    inline bool course_collision_timer_edge(unsigned currentTimer, unsigned previousTimer)
+    {
+        return currentTimer >= CourseCollisionTimerEdgeFloor &&
+            currentTimer > previousTimer;
+    }
+
 
     inline float frequency_hz_from_period_ms(float periodMs)
     {
@@ -256,6 +268,30 @@ namespace WheelFFBMath
         return denominator > 0.0f
             ? std::clamp(lateral_force_shape(forceAlpha) * ratio / denominator, 0.0f, 1.0f)
             : 0.0f;
+    }
+
+    // Keep normal-corner feel unchanged, then add only the missing
+    // mechanical/caster self-steer in a large drift. Pneumatic trail and the
+    // existing re-grip/return suppression are deliberately untouched.
+    constexpr float DeepSlipMechanicalBoost = 1.25f;
+    constexpr float DeepSlipMechanicalStartRad = 0.18f;
+    constexpr float DeepSlipMechanicalFullRad = 0.32f;
+
+    inline float deep_slip_mechanical_trail_ratio(float forceAlpha, float mechanicalTrailRatio)
+    {
+        const float ratio = std::isfinite(mechanicalTrailRatio)
+            ? std::clamp(mechanicalTrailRatio, 0.0f, 0.60f) : 0.0f;
+        if (!std::isfinite(forceAlpha))
+            return ratio;
+
+        const float t = std::clamp(
+            (std::abs(forceAlpha) - DeepSlipMechanicalStartRad) /
+                (DeepSlipMechanicalFullRad - DeepSlipMechanicalStartRad),
+            0.0f, 1.0f);
+        const float smooth = t * t * (3.0f - 2.0f * t);
+        return std::clamp(
+            ratio * (1.0f + (DeepSlipMechanicalBoost - 1.0f) * smooth),
+            0.0f, 0.60f);
     }
 
     // Total aligning moment follows Fy * (pneumatic trail + mechanical trail).
