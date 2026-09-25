@@ -727,7 +727,8 @@ class TextureReplacement : public Hook
 		}
 		const int result = put_sprite_ex.call<int>(a1, a2);
 		VrRegisterQueuedSemantic(
-			semanticTailBefore, semanticPrio, semanticScope);
+			semanticTailBefore, semanticPrio, semanticScope,
+			producerMarker);
 		return result;
 	}
 
