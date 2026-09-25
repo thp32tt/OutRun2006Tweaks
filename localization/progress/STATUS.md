@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-26 08:31 KST
+Updated: 2026-09-26 08:14 KST
 
 ## Active branch
 `korean-localization-clean`
@@ -43,6 +43,8 @@ The full draft intentionally uses exact/OCR/manual/atlas-alpha placement evidenc
 - 1st/2nd/early-3rd batch generated images are visual drafts pending source-faithful rework.
 
 ### Source-faithful batches
+- Batch38: `C598919A` promoted after full-resolution text-cell replacement + block-level DXT5 QA, report `BATCH38_C598_REWORK_REPORT.json`
+- Batch33: `37759842` still rejected; embedded blue/black cards restore English fragments, report `BATCH33_REJECTED_REPORT.json`
 - Batch25v4: `ACF61D7C` promoted after exact source-y cleanup and protected selector-bar restoration, report `BATCH25V4_ACF_REWORK_REPORT.json`
 - Batch24v2: `2DA43E41` promoted after larger source-cell cleanup removed Batch18 English residue, report `BATCH24V2_2DA_REWORK_REPORT.json`
 - Batch23: `ACF61D7C` rejected; English remnants still visible, report `BATCH23_REJECTED_REPORT.json`
@@ -63,10 +65,10 @@ The full draft intentionally uses exact/OCR/manual/atlas-alpha placement evidenc
 - Batch11v2: 1 retained + 1 reset, report `BATCH11V2_REWORK_REPORT.json`
 - Current machine state: `localization/graphics/SOURCE_FAITHFUL_CURRENT.json`
 - Source-faithful reviewed since QA reset: **32**
-- Retained/rebuilt localized candidates: **30**
-- Reset to original pending safe rework: **2**
-- Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B25v4_QA_Test.zip`
-- Combined package SHA-256: `e0d2df30e8de09dc69e154cbcffcfce649c76fd7edd760e4bb2fe0ab935d781d`
+- Retained/rebuilt localized candidates: **31**
+- Reset to original pending safe rework: **1**
+- Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip`
+- Combined package SHA-256: `7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02`
 - Mandatory extra QA gates: source-like typography/colors; no stray black lines, crop seams, text-erasure residue, clipped glyphs, accidental opaque boxes, or alpha halos.
 - Final pending graphics are only `37759842_1024x1024.dds` and `C598919A_1024x1024.dds`. The earlier DXT5 assets `49BB5FE5`, `42E618FD`, and `7CE1CFC5` were already promoted in Batch12v2 and must not be reopened without new evidence.
 
@@ -90,7 +92,7 @@ Read:
 7. `localization/graphics/BATCH11V2_REWORK_REPORT.json`
 8. `localization/graphics/FULL_DRAFT_REPORT.json`
 
-Next gate: continue the final 2 pending assets from original DDS; keep preserve-original art untouched; in-game validate the 30 retained candidates.
+Next gate: finish the final pending `37759842_1024x1024.dds` from original DDS, then in-game validate the 31 retained candidates.
 
 
 ### QA checkpoint 2026-09-26 08:11 KST
