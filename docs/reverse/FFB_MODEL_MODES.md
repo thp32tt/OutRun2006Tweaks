@@ -40,7 +40,7 @@ C2C does not expose the Lindbergh drive-board packet stream, so this branch reco
 - C2C collision state for wall events, with a conservative host-only severe speed-drop fallback when no collision-state edge is available; the explicit game-state edge has priority;
 - C2C gear changes.
 
-Modern inferred Physics SAT and inferred tire-slip chatter are disabled in this mode. The centering backbone is the shared DirectInput condition/spring path.
+Modern inferred Physics SAT and inferred tire-slip chatter are disabled in this mode. The centering backbone is the shared DirectInput condition/spring path. The **Use Arcade Original** shortcut restores the public OutRun2Real profile baseline: `SpringStrength=50` maps to a 0.50 condition coefficient with 1.00 saturation, while `EnableDamper=0` maps to zero Dynamic Damping. F11 can still override those values explicitly after loading the shortcut; Arcade Hybrid does not inherit this Original-only condition baseline.
 
 The Lindbergh plugin's speed-strength staircase is retained as a comparative shape. Its thresholds were defined in a different speed scale, so C2C uses the same ten-step structure normalized to C2C `speedNorm`; this is a porting approximation, not a claim that the raw speed units are identical.
 
