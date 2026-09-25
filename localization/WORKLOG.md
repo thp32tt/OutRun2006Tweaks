@@ -209,3 +209,20 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Report: `localization/graphics/BATCH5_SOURCEFAITHFUL_REPORT.json`.
 - Cumulative source-faithful review checkpoint: 20 assets reviewed since orientation reset; 17 localized candidates retained/rebuilt, 3 assets explicitly reset to original pending safe rework.
 - Resume rule remains: read `ORIENTATION_POLICY.md` and these batch reports before the next graphics edit.
+
+
+## 2026-09-26 01:24 KST - BATCH6 THROUGH BATCH11V2 CONSOLIDATION
+
+- Canonical localization branch remains `korean-localization-clean`.
+- Added mandatory style-fidelity and artifact-cleanliness gates to `localization/graphics/ORIENTATION_POLICY.md`.
+- New rejection criteria include: generic style mismatch, stray black lines, crop seams, text-erasure residue, clipped glyphs, accidental opaque boxes and alpha halos.
+- Backfilled machine-readable reports for Batch6, Batch7, Batch8Fix, Batch9, Batch10v2 and Batch11v2.
+- Added `localization/graphics/SOURCE_FAITHFUL_CURRENT.json` as the current resume checkpoint.
+- Batch8Fix retained rebuilt `9CE4E175`, `C05E67EF`, and `1762489B`.
+- Batch9 retained rebuilt `2B0863D6`, `12519155`, and `4EDA9DE3`.
+- Batch10v2 retained `48DEBE77`, `53CE39D5`, and `411827E`; `ACF61D7C` was rejected and reset to original after style QA.
+- Batch11v2 retained `788CE557`; `C075FB49` was rejected and reset to original because residual/overlapping English remained.
+- Current checkpoint: **32 reviewed / 22 retained localized candidates / 10 reset-to-original pending rework**.
+- Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B11v2_QA_Test.zip`.
+- Combined package SHA-256: `4831a754df8ef85cab0e8bb0d898ae38d76779eb2bc69c13494248bf044d58b3`.
+- Remaining pending set is stored in `SOURCE_FAITHFUL_CURRENT.json`; future `이어서 작업해줘` requests must resume from it.
