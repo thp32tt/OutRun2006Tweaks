@@ -554,8 +554,15 @@ namespace
                 ffbModel == WheelFFBMath::Model::PS2OriginalExperimental;
             const float ps2DriveFactor =
                 ps2Original ? WheelFFBPS2::drive_factor(speedRaw) : 0.0f;
+            // Modern SAT deliberately clamps its normalized speed to 0..1,
+            // but the Lindbergh-derived Arcade staircase has a final >1.0
+            // band (500.1+ in the reference speedo). Preserve C2C's measured
+            // speedRaw headroom for that mapper instead of feeding speedNorm.
+            const float arcadeSpeedNorm = std::isfinite(speedRaw)
+                ? std::clamp(speedRaw / 2.0f, 0.0f, 1.25f)
+                : 0.0f;
             const float arcadeSpeedStrength =
-                WheelFFBMath::arcade_speed_strength(speedNorm);
+                WheelFFBMath::arcade_speed_strength(arcadeSpeedNorm);
 
             // The periodic effect set is model-owned, not just waveform-owned.
             // Any live model-ID change atomically drops the old set so a
@@ -1469,7 +1476,7 @@ namespace
             {
                 lastTelemetryTick_ = telemetryNow;
                 spdlog::info(
-                    "WheelFFB SAMPLE t={} model={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperRelease={} damperCoefficient={} xboxLeft={} xboxRight={} surfaceRough={} ps2Surface={} ps2RoadRaw={} ps2Drive={} roadAmp={} slipAmp={} structural={} event={} structuralPreClip={} structuralPostClip={} eventPostClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
+                    "WheelFFB SAMPLE t={} model={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperRelease={} damperCoefficient={} xboxLeft={} xboxRight={} surfaceRough={} ps2Surface={} ps2RoadRaw={} ps2Drive={} arcadeSpeedNorm={} arcadeSpeedStrength={} roadAmp={} slipAmp={} structural={} event={} structuralPreClip={} structuralPostClip={} eventPostClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
                     telemetryNow, WheelFFBMath::model_name(ffbModel), static_cast<const void*>(car), speedRaw, speedNorm, steer, rawSteerRate, steerRate,
                     car->field_264, car->field_268, lateralRaw, smoothedLateral_, lateralLoadSmooth,
                     vehicleDynamics_.bodySlip(), bodySlide, vehicleDynamics_.yawRate(), frontSlip, frontScrub,
@@ -1482,7 +1489,7 @@ namespace
                     dynamicDamperStrength, damperRelease, prevDamperCoefficient_,
                     originalXboxLeftRumble, originalXboxRightRumble,
                     roughness, ps2SurfaceEnvelope, ps2RoadRaw, ps2DriveFactor,
-                    roadAmp, slipAmp,
+                    arcadeSpeedNorm, arcadeSpeedStrength, roadAmp, slipAmp,
                     structural, events, total, compressed, eventCompressed, structuralLevel, level, prevConstantLevel_,
                     constantEffectPolar_, springEffect_ != nullptr, damperEffect_ != nullptr,
                     periodicsActive_, outputStrength, bool(Settings::WheelFFBInvertForce),
