@@ -65,6 +65,21 @@ namespace WheelFFBMath
         return 1000.0f / periodMs;
     }
 
+    inline float compose_arcade_directional_surface(
+        float sustainedForce,
+        float transitionForce,
+        bool transitionActive)
+    {
+        if (!std::isfinite(sustainedForce))
+            sustainedForce = 0.0f;
+        if (!std::isfinite(transitionForce))
+            transitionForce = 0.0f;
+        // A Lindbergh callback carries one force code. During the reconstructed
+        // short 0x04/0x14 transition, that code owns the directional output
+        // rather than summing with a simultaneous 0x10/0x00 reconstruction.
+        return transitionActive ? transitionForce : sustainedForce;
+    }
+
     inline float arcade_speed_strength(float speedNorm)
     {
         if (!std::isfinite(speedNorm) || speedNorm <= 0.0f)
