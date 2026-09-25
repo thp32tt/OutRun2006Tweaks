@@ -7,11 +7,11 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "read localization/graphics/ORIENTATION_POLICY.md and SOURCE_FAITHFUL_CURRENT.json before every graphics edit",
-    "continue the 6 pending source-faithful reworks from the original raw DDS",
-    "enforce per-element orientation, preserve-name exclusions, source style fidelity, artifact cleanliness, and original text-region containment",
-    "in-game validate the 26 retained source-faithful candidates",
-    "collect K1/K2/K3 runtime logs"
+    "read ORIENTATION_POLICY.md and SOURCE_FAITHFUL_CURRENT.json before editing",
+    "continue 5 pending assets from original DDS only",
+    "do not promote 37759842 until card gradients/icons can be preserved without residual English or restoration seams",
+    "enforce original text-region containment and style/artifact gates",
+    "in-game validate the 27 retained source-faithful candidates"
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -36,8 +36,8 @@
     "full_draft_package_sha256": "5512dad798a4ddb4872e4aa3e69438537f75f488f439317d7b95c0eb372b6c78",
     "source_faithful_policy": "localization/graphics/ORIENTATION_POLICY.md",
     "source_faithful_reviewed_assets": 32,
-    "source_faithful_localized_candidates": 26,
-    "source_faithful_reset_to_original": 6,
+    "source_faithful_localized_candidates": 27,
+    "source_faithful_reset_to_original": 5,
     "batch3_report": "localization/graphics/BATCH3_SOURCEFAITHFUL_REPORT.json",
     "batch4_report": "localization/graphics/BATCH4_SOURCEFAITHFUL_REPORT.json",
     "batch5_report": "localization/graphics/BATCH5_SOURCEFAITHFUL_REPORT.json",
@@ -52,8 +52,8 @@
     "batch9_report": "localization/graphics/BATCH9_REWORK_REPORT.json",
     "batch10v2_report": "localization/graphics/BATCH10V2_REWORK_REPORT.json",
     "batch11v2_report": "localization/graphics/BATCH11V2_REWORK_REPORT.json",
-    "current_combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B12v2_QA_Test.zip",
-    "current_combined_package_sha256": "806579f71f09211e942a54c5c9b3817a08ac0f496dd80ade53b695c9d6e9a6d3",
+    "current_combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B16v5_QA_Test.zip",
+    "current_combined_package_sha256": "b04ee2a5d428ab90163f8207a20ce209d073f73ecfc6f2ebfbdbd62f2ea3b746",
     "pending_dxt5_assets": [
       "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
       "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
@@ -61,7 +61,9 @@
       "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
       "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds"
     ],
-    "batch12v2_report": "localization/graphics/BATCH12V2_DXT5_REWORK_REPORT.json"
+    "batch12v2_report": "localization/graphics/BATCH12V2_DXT5_REWORK_REPORT.json",
+    "batch16v5_report": "localization/graphics/BATCH16V5_REWORK_REPORT.json",
+    "batch17v3_rejected_report": "localization/graphics/BATCH17V3_REJECTED_REPORT.json"
   },
   "runtime_packages": {
     "k1": {
