@@ -1,0 +1,23 @@
+{
+  "batch": "38-C598919A-rework",
+  "asset": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
+  "status": "promoted_source_faithful_candidate",
+  "raw_transform": "mirror_y",
+  "dds_sha256": "e0cbe3dd370f7f873effb601c688ba0373eaa19f2fa51da59cf0ef551bb9044a",
+  "package": "OutRun2_Korean_GFX_Batch38_C598919A_Rework_Test.zip",
+  "package_sha256": "1b55d951c366a0049948d587852d2a155c6f072a76f01316b326b9a681f515e5",
+  "combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip",
+  "combined_package_sha256": "7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02",
+  "localized_occurrences": 37,
+  "qa": {
+    "dimensions_identical": true,
+    "header_128_identical": true,
+    "patched_dxt5_blocks": 206849,
+    "decoded_changed_pixels_outside_patched_allowed_blocks": 0,
+    "introduced_alpha_pixels_outside_patched_allowed_blocks": 0,
+    "manual_raw_and_readable_review": "pass",
+    "residual_generic_english": "none observed in the edited ranking/mode/course/goal labels",
+    "non_text_art_preserved": "vehicle names, rank medals, icons, bars and logos remain outside edited cells"
+  },
+  "note": "Full-resolution text-cell replacement with DXT5 block-level patching. Final pass tightened goal/mode boxes and bottom TUNED replacement so source text is fully removed without damaging adjacent art."
+}
