@@ -38,4 +38,17 @@ with tempfile.TemporaryDirectory(prefix="ps2query-compact-") as tmp:
     if "STRINGS" not in text_query.stdout or "ForceEffect" not in text_query.stdout:
         raise SystemExit("compact text query did not search available string data")
 
-print("OK: compact PS2 query works without full-map semantics/string_xrefs tables")
+    con = sqlite3.connect(db)
+    con.execute("CREATE TABLE semantics(va INTEGER PRIMARY KEY,name TEXT,tags TEXT,confidence TEXT,evidence TEXT)")
+    con.execute(
+        "INSERT INTO semantics VALUES(?,?,?,?,?)",
+        (0x1330F0, "WheelRuntime_SpringConditionUpdate", "PS2,FFB,SPRING", "high", "retail test"))
+    con.commit()
+    con.close()
+    semantic_query = subprocess.run(
+        [sys.executable, str(QUERY), "--db", str(db), "SpringCondition"],
+        check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if "SEMANTICS" not in semantic_query.stdout or "WheelRuntime_SpringConditionUpdate" not in semantic_query.stdout:
+        raise SystemExit("semantic query did not consume optional curated semantics table")
+
+print("OK: compact PS2 query works with optional semantics and without full-map string_xrefs")
