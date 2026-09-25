@@ -1,0 +1,3 @@
+OpenAI/GitHub connector benign write probe.
+No source code change.
+Probe stage: create_file.
