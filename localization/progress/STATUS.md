@@ -43,6 +43,7 @@ The full draft intentionally uses exact/OCR/manual/atlas-alpha placement evidenc
 - 1st/2nd/early-3rd batch generated images are visual drafts pending source-faithful rework.
 
 ### Source-faithful batches
+- Batch25v4: `ACF61D7C` promoted after exact source-y cleanup and protected selector-bar restoration, report `BATCH25V4_ACF_REWORK_REPORT.json`
 - Batch24v2: `2DA43E41` promoted after larger source-cell cleanup removed Batch18 English residue, report `BATCH24V2_2DA_REWORK_REPORT.json`
 - Batch23: `ACF61D7C` rejected; English remnants still visible, report `BATCH23_REJECTED_REPORT.json`
 - Batch22: `C598919A` rejected after block-level DXT5 pass; residual English/clipped source styling remains, report `BATCH22_REJECTED_REPORT.json`
@@ -62,10 +63,10 @@ The full draft intentionally uses exact/OCR/manual/atlas-alpha placement evidenc
 - Batch11v2: 1 retained + 1 reset, report `BATCH11V2_REWORK_REPORT.json`
 - Current machine state: `localization/graphics/SOURCE_FAITHFUL_CURRENT.json`
 - Source-faithful reviewed since QA reset: **32**
-- Retained/rebuilt localized candidates: **29**
-- Reset to original pending safe rework: **3**
-- Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B24v2_QA_Test.zip`
-- Combined package SHA-256: `6a38aaae5fd979b1ebdbbe0e43f3e0b3c6e24b5fd929031ee496ef9ffb0f0541`
+- Retained/rebuilt localized candidates: **30**
+- Reset to original pending safe rework: **2**
+- Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B25v4_QA_Test.zip`
+- Combined package SHA-256: `e0d2df30e8de09dc69e154cbcffcfce649c76fd7edd760e4bb2fe0ab935d781d`
 - Mandatory extra QA gates: source-like typography/colors; no stray black lines, crop seams, text-erasure residue, clipped glyphs, accidental opaque boxes, or alpha halos.
 - DXT5-safe rewrite still required for several assets, including `49BB5FE5_128x32.dds`, `42E618FD_512x32.dds`, `7CE1CFC5_512x128.dds`, and `C598919A_1024x1024.dds`.
 
@@ -89,7 +90,7 @@ Read:
 7. `localization/graphics/BATCH11V2_REWORK_REPORT.json`
 8. `localization/graphics/FULL_DRAFT_REPORT.json`
 
-Next gate: continue the 3 pending assets from original DDS; keep preserve-original names/artwork untouched; in-game validate the 29 retained candidates.
+Next gate: continue the final 2 pending assets from original DDS; keep preserve-original art untouched; in-game validate the 30 retained candidates.
 
 
 ### QA checkpoint 2026-09-26 07:34 KST
