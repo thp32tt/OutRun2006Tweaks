@@ -124,6 +124,7 @@ namespace OutRunVR::GameSemantic
     inline std::array<SpriteNodeSemanticTag,
         SpriteNodeSemanticCapacity> SpriteNodeSemanticTags{};
     inline std::size_t SpriteNodeSemanticCount = 0;
+    inline std::atomic<std::size_t> SpriteNodeSemanticPublishedCount{ 0 };
     inline std::mutex SpriteNodeSemanticMutex;
     inline std::atomic<std::uint64_t> SpriteNodeSemanticNextSerial{ 1 };
     inline std::atomic<std::uint64_t> SpriteNodeSemanticRegistered{ 0 };
@@ -168,6 +169,8 @@ namespace OutRunVR::GameSemantic
             {
                 SpriteNodeSemanticTags[i].scope = scope;
                 SpriteNodeSemanticTags[i].serial = serial;
+                SpriteNodeSemanticPublishedCount.store(
+                    SpriteNodeSemanticCount, std::memory_order_release);
                 SpriteNodeSemanticRegistered.fetch_add(
                     1, std::memory_order_relaxed);
                 return;
@@ -178,6 +181,8 @@ namespace OutRunVR::GameSemantic
         {
             SpriteNodeSemanticTags[SpriteNodeSemanticCount++] =
                 { node, scope, serial };
+            SpriteNodeSemanticPublishedCount.store(
+                SpriteNodeSemanticCount, std::memory_order_release);
             SpriteNodeSemanticRegistered.fetch_add(
                 1, std::memory_order_relaxed);
             return;
@@ -200,7 +205,9 @@ namespace OutRunVR::GameSemantic
         const void* node,
         RenderScope fallback = RenderScope::ScreenOverlay2D) noexcept
     {
-        if (!node)
+        if (!node ||
+            SpriteNodeSemanticPublishedCount.load(
+                std::memory_order_acquire) == 0)
             return fallback;
 
         std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);
@@ -212,6 +219,8 @@ namespace OutRunVR::GameSemantic
             SpriteNodeSemanticTags[i] =
                 SpriteNodeSemanticTags[--SpriteNodeSemanticCount];
             SpriteNodeSemanticTags[SpriteNodeSemanticCount] = {};
+            SpriteNodeSemanticPublishedCount.store(
+                SpriteNodeSemanticCount, std::memory_order_release);
             SpriteNodeSemanticConsumed.fetch_add(
                 1, std::memory_order_relaxed);
             return scope;
@@ -286,6 +295,8 @@ namespace OutRunVR::GameSemantic
             }
             while (SpriteNodeSemanticCount > write)
                 SpriteNodeSemanticTags[--SpriteNodeSemanticCount] = {};
+            SpriteNodeSemanticPublishedCount.store(
+                SpriteNodeSemanticCount, std::memory_order_release);
             SpriteQueueSemanticCutoff = 0;
         }
     }
