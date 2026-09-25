@@ -1,0 +1,119 @@
+{
+  "batch": "12v2-dxt5-rework",
+  "policy_checks": [
+    "original DDS inspected",
+    "raw mirror-Y preserved",
+    "style/source colors retained",
+    "no stray black lines/crop seams visible in comparison",
+    "replacement alpha bbox contained in original source alpha bbox",
+    "dimensions and original 128-byte DDS header preserved"
+  ],
+  "assets": [
+    {
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+      "status": "localized_candidate",
+      "raw_transform": "mirror_y",
+      "sha256": "4805e98b151a9e152f5282cdff2cdacb7866e8888430b56083b64370e19d5592",
+      "header_128_identical": true
+    },
+    {
+      "asset": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+      "status": "localized_candidate",
+      "raw_transform": "mirror_y",
+      "sha256": "89b89700efb486b48a0ea5039c76088b47ac6393c4653208a46ddb0b672bc5fa",
+      "header_128_identical": true
+    },
+    {
+      "asset": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+      "status": "localized_candidate",
+      "raw_transform": "mirror_y",
+      "sha256": "6d2b2fbf8299ae03be123e5991c6a2e07c036fa0907d7d91fad8d5fe4b02b0dd",
+      "header_128_identical": true
+    },
+    {
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+      "status": "localized_candidate",
+      "raw_transform": "mirror_y",
+      "sha256": "7f8229ad0cbe3ae5b3a884bb025dc8669017c88d100e4933e58fec0497217ad3",
+      "header_128_identical": true
+    }
+  ],
+  "qa": [
+    {
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+      "source_alpha_bbox": [
+        0,
+        0,
+        1731,
+        848
+      ],
+      "candidate_alpha_bbox": [
+        0,
+        0,
+        1360,
+        848
+      ],
+      "alpha_bbox_contained": true,
+      "dimensions_identical": true,
+      "header_128_identical": true,
+      "pass": true
+    },
+    {
+      "asset": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+      "source_alpha_bbox": [
+        426,
+        0,
+        1678,
+        127
+      ],
+      "candidate_alpha_bbox": [
+        430,
+        5,
+        1599,
+        122
+      ],
+      "alpha_bbox_contained": true,
+      "dimensions_identical": true,
+      "header_128_identical": true,
+      "pass": true
+    },
+    {
+      "asset": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+      "source_alpha_bbox": [
+        0,
+        0,
+        2048,
+        512
+      ],
+      "candidate_alpha_bbox": [
+        65,
+        0,
+        1985,
+        502
+      ],
+      "alpha_bbox_contained": true,
+      "dimensions_identical": true,
+      "header_128_identical": true,
+      "pass": true
+    },
+    {
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+      "source_alpha_bbox": [
+        0,
+        0,
+        464,
+        96
+      ],
+      "candidate_alpha_bbox": [
+        0,
+        1,
+        464,
+        96
+      ],
+      "alpha_bbox_contained": true,
+      "dimensions_identical": true,
+      "header_128_identical": true,
+      "pass": true
+    }
+  ]
+}
