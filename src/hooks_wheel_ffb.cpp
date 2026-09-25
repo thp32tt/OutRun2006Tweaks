@@ -781,17 +781,22 @@ namespace
                 // does not subtract the 0.30 asphalt baseline and re-normalize
                 // to a synthetic 0..1 texture curve. Reproduce the recovered
                 // steady-state retail magnitude chain:
-                //   maxSurface * min(field_1C4,1) * driveFactor * 50,
-                // then round and suppress raw magnitudes below 27.
+                //   boostedSurface * min(field_1C4,1) * driveFactor * 50,
+                // where retail can raise roughness >0.30 by 1.25 from the
+                // recovered field_264/field_268 predicates, then round and
+                // suppress raw magnitudes below 27.
                 //
                 // Road Detail is an explicit host/user scaler: 1.00 means the
                 // recovered retail envelope before Overall Strength and the
                 // common DD safety/output layer.
                 const float roadSetting = std::clamp(
                     static_cast<float>(Settings::WheelFFBRoadTexture), 0.0f, 1.0f);
+                const float ps2SurfaceEnvelope =
+                    WheelFFBPS2::surface_envelope(
+                        roughness, car->field_264, car->field_268);
                 roadAmp =
                     WheelFFBPS2::periodic_magnitude_norm(
-                        roughness, speedRaw, ps2DriveFactor) *
+                        ps2SurfaceEnvelope, speedRaw, ps2DriveFactor) *
                     roadSetting * outputStrength;
                 roadFreq =
                     WheelFFBPS2::triangle_frequency_hz_for_directinput(
