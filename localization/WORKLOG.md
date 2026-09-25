@@ -322,3 +322,17 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Removed stale resume/status references that could incorrectly reopen Batch12v2-promoted DXT5 assets (`49BB5FE5`, `42E618FD`, `7CE1CFC5`).
 - Hard gate remains: original DDS orientation, protected vehicle/brand/logo/song/legal artwork, source typography/color/outline/proportion, strict original-text-cell containment, and zero black lines/crop seams/English residue/erasure residue/alpha halos/clipping.
 - Next executable graphics step: obtain the original analysis archive/candidate bytes, then rework `37759842` and `C598919A`; otherwise keep both original.
+
+
+## 2026-09-26 08:14 KST - BATCH38 C598919A PROMOTION
+
+- Reworked `C598919A_1024x1024.dds` from the original raw DDS at full 4096x4096 resolution.
+- Used transparent source text-cell replacement and copied only the overlapping **DXT5 4x4 blocks** into the original compressed DDS.
+- Vehicle/model names, rank medals, icons, bars, OutRun logos and other protected non-text artwork were kept outside the edited cells.
+- Final pass fixed goal-label cell bounds, fully redrew crowded TimeAttack/OutRun mode blocks, and replaced the bottom `TUNED` label using its exact alpha-component extent.
+- Automated QA: original dimensions/header preserved; **0 decoded changed pixels and 0 introduced-alpha pixels outside patched allowed blocks**.
+- Manual readable review passed for edited course/mode/ranking/goal labels.
+- Latest `37759842` reconstruction attempt remains rejected: source English fragments still return with blue/black card icon restoration.
+- Current checkpoint: **32 reviewed / 31 retained / 1 pending**.
+- Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip`
+- SHA-256: `7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02`
