@@ -59,7 +59,15 @@ namespace OutRunVrR32DirectSubmit
         OutRunVR::SharedRenderFrameState frame{};
     };
 
+    struct PendingSkippedRelease
+    {
+        bool pending = false;
+        OutRunVR::SharedRenderFrameState frame{};
+    };
+
     inline std::array<PendingAck, OutRunVR::RenderFrameRingSize> Pending{};
+    inline std::array<PendingSkippedRelease, OutRunVR::RenderFrameRingSize>
+        SkippedRelease{};
 
     struct AckIdentity
     {
@@ -109,6 +117,9 @@ namespace OutRunVrR32DirectSubmit
     inline std::uint64_t AckFlushEscalations = 0;
     inline std::uint64_t AckQueryErrors = 0;
     inline std::uint64_t AckSameFramePendingReuse = 0;
+    inline std::uint64_t SkippedReleaseQueued = 0;
+    inline std::uint64_t SkippedReleaseCompleted = 0;
+    inline std::uint64_t SkippedReleaseRetry = 0;
     inline std::array<std::uint64_t,
         static_cast<std::size_t>(FastRejectReason::Count)> RejectReasons{};
     inline AckIdentity AckFaultIdentity{};
@@ -129,6 +140,9 @@ namespace OutRunVrR32DirectSubmit
         std::uint64_t flushEscalations = 0;
         std::uint64_t ackQueryError = 0;
         std::uint64_t sameFramePendingReuse = 0;
+        std::uint64_t skippedQueued = 0;
+        std::uint64_t skippedCompleted = 0;
+        std::uint64_t skippedRetry = 0;
         std::array<std::uint64_t,
             static_cast<std::size_t>(FastRejectReason::Count)> rejectReasons{};
         std::uint64_t safeCacheHit = 0;
@@ -150,6 +164,11 @@ namespace OutRunVrR32DirectSubmit
             pending.armed = false;
             pending.flushIssued = false;
             pending.frame = {};
+        }
+        for (auto& skipped : SkippedRelease)
+        {
+            skipped.pending = false;
+            skipped.frame = {};
         }
         AckedFrame.fill(0);
         AckedIdentity.fill({});
@@ -173,9 +192,20 @@ namespace OutRunVrR32DirectSubmit
         AckedFrame.fill(0);
         AckedIdentity.fill({});
 
-        // A D3D11 query failure quarantines only the exact producer run that
-        // owned the failed query. A fast game restart with a colliding transport
-        // generation must not inherit the old run's quarantine.
+        for (auto& skipped : SkippedRelease)
+        {
+            if (!skipped.pending)
+                continue;
+            if (!SameAckIdentity(
+                    FrameAckIdentity(skipped.frame), identity))
+            {
+                skipped.pending = false;
+                skipped.frame = {};
+            }
+        }
+
+        // Query failure quarantine belongs to one exact producer run. A new
+        // game run must not inherit a colliding transport-generation fault.
         if (!SameAckIdentity(AckFaultIdentity, identity))
             AckFaultIdentity = {};
     }
@@ -193,8 +223,106 @@ namespace OutRunVrR32DirectSubmit
             &desc, &pending.fence)) && pending.fence;
     }
 
+    inline bool HasPendingConsumption(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        const std::uint32_t slot =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        const AckIdentity identity = FrameAckIdentity(frame);
+        if (slot >= Pending.size() || !identity.clientPid ||
+            !identity.runGeneration || !identity.transportGeneration ||
+            !frame.frameId)
+            return false;
+        const auto& pending = Pending[slot];
+        return pending.armed &&
+            SameFrameAckIdentity(pending.frame, frame);
+    }
+
+    inline bool QueueSkippedRelease(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        const std::uint32_t slot =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        const AckIdentity identity = FrameAckIdentity(frame);
+        if (slot >= SkippedRelease.size() || !identity.clientPid ||
+            !identity.runGeneration || !identity.transportGeneration ||
+            !frame.frameId)
+            return false;
+        if (ActiveAckIdentity.clientPid != 0 &&
+            !SameAckIdentity(identity, ActiveAckIdentity))
+            return false;
+
+        if (HasPendingConsumption(frame))
+            return false;
+
+        if (OutRunVrD3D9ExDirectPassthrough::PublishCompletedFrame(frame))
+        {
+            AckedFrame[slot] = frame.frameId;
+            AckedIdentity[slot] = identity;
+            ++SkippedReleaseCompleted;
+            return true;
+        }
+
+        auto& skipped = SkippedRelease[slot];
+        if (skipped.pending)
+        {
+            // Never overwrite a still-current release owner for the same slot.
+            // If it belongs to an obsolete game run, it can be retired now.
+            if (OutRunVrD3D9ExDirectPassthrough::FrameRunIdentityCurrent(
+                    skipped.frame))
+            {
+                ++SkippedReleaseRetry;
+                return false;
+            }
+            skipped.pending = false;
+            skipped.frame = {};
+        }
+
+        skipped.pending = true;
+        skipped.frame = frame;
+        ++SkippedReleaseQueued;
+        return false;
+    }
+
+    inline void PollSkippedReleases() noexcept
+    {
+        for (std::size_t slot = 0; slot < SkippedRelease.size(); ++slot)
+        {
+            auto& skipped = SkippedRelease[slot];
+            if (!skipped.pending)
+                continue;
+            const AckIdentity identity =
+                FrameAckIdentity(skipped.frame);
+            if ((ActiveAckIdentity.clientPid != 0 &&
+                 !SameAckIdentity(identity, ActiveAckIdentity)) ||
+                !OutRunVrD3D9ExDirectPassthrough::FrameRunIdentityCurrent(
+                    skipped.frame))
+            {
+                skipped.pending = false;
+                skipped.frame = {};
+                continue;
+            }
+            if (!OutRunVrD3D9ExDirectPassthrough::PublishCompletedFrame(
+                    skipped.frame))
+            {
+                ++SkippedReleaseRetry;
+                continue;
+            }
+
+            AckedFrame[slot] = skipped.frame.frameId;
+            AckedIdentity[slot] = FrameAckIdentity(skipped.frame);
+            skipped.pending = false;
+            skipped.frame = {};
+            ++SkippedReleaseCompleted;
+        }
+    }
+
     inline void PollCompletedAcks() noexcept
     {
+        // Skipped frames never touched D3D11, so their ACK retry does not
+        // require a graphics context and can still complete during session
+        // transitions. Touched frames below remain EVENT-gated.
+        PollSkippedReleases();
         if (!OutRunVrFinalTest::Context)
             return;
         for (auto& pending : Pending)
@@ -420,6 +548,9 @@ namespace OutRunVrR32DirectSubmit
         Perf.flushEscalations = AckFlushEscalations;
         Perf.ackQueryError = AckQueryErrors;
         Perf.sameFramePendingReuse = AckSameFramePendingReuse;
+        Perf.skippedQueued = SkippedReleaseQueued;
+        Perf.skippedCompleted = SkippedReleaseCompleted;
+        Perf.skippedRetry = SkippedReleaseRetry;
         Perf.rejectReasons = RejectReasons;
         Perf.safeCacheHit = OutRunVrD3D9ExDirectPassthrough::R32SharedCacheHits;
         Perf.safeCacheMiss = OutRunVrD3D9ExDirectPassthrough::R32SharedCacheMisses;
@@ -450,6 +581,13 @@ namespace OutRunVrR32DirectSubmit
             << " ackQueryError=" << AckQueryErrors - Perf.ackQueryError
             << " sameFrameAckReuse="
             << AckSameFramePendingReuse - Perf.sameFramePendingReuse
+            << " skippedAck[queued="
+            << SkippedReleaseQueued - Perf.skippedQueued
+            << ",completed="
+            << SkippedReleaseCompleted - Perf.skippedCompleted
+            << ",retry="
+            << SkippedReleaseRetry - Perf.skippedRetry
+            << "]"
             << " rejectReason[projection="
             << RejectReasons[static_cast<std::size_t>(
                 FastRejectReason::ProjectionMismatch)] -
@@ -543,7 +681,12 @@ namespace OutRunVrR32DirectSubmit
 
     inline XrResult XRAPI_CALL DestroySession(XrSession session) noexcept
     {
-        ReleasePending();
+        // D3D11 EVENT queries protect producer texture reuse, not OpenXR
+        // session objects. A STOPPING/loss transition can destroy and recreate
+        // the XR session while the same host process/device remains alive.
+        // Preserve incomplete EVENT owners across that boundary; completed
+        // queries and never-touched skipped releases are retired first.
+        PollCompletedAcks();
         OutRunVrD3D9ExDirectPassthrough::R32ResetDirectCaches();
         return OutRunVrR24BlackScreenGuard::DestroySession(session);
     }
