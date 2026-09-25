@@ -3,15 +3,32 @@ param(
     [ValidateSet("2d","d3d9","dxvk-safe","dxvk","dx12")]
     [string]$Backend,
     [ValidateSet("CONTROL","CORRECTNESS","HUD_SCREEN","HUD_MENU","HUD_WORLD","PERFORMANCE","STAGE_DIAGNOSTIC","A_BASELINE","B_CULLING","C_CULLING_NO_SSAA","D_CULLING_NO_SSAA_R512")]
-    [string]$TestProfile = "CORRECTNESS"
+    [string]$TestProfile = "CORRECTNESS",
+    [ValidateSet("AUTO","CONTROL_2D","CURRENT_FOCUS","A_CONTROL","B_HUD","C_FLARE","D_PERF","E_DXVK_SAFE","E_DXVK_MULTIVIEW","F_DX12_STRICT","G_COCKPIT")]
+    [string]$VariantId = "AUTO"
 )
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $backendRoot = Join-Path $root "backends"
 $payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "dxvk-safe") { "d3d9" } else { $Backend }
-$src = Join-Path $backendRoot $payloadBackend
-if (-not (Test-Path $src)) { throw "Backend payload not found: $src" }
+
+$defaultVariant = switch ($Backend) {
+    "2d"        { "CONTROL_2D" }
+    "d3d9"      { "A_CONTROL" }
+    "dxvk-safe" { "E_DXVK_SAFE" }
+    "dxvk"      { "E_DXVK_MULTIVIEW" }
+    "dx12"      { "F_DX12_STRICT" }
+}
+$variant = if ($VariantId -eq "AUTO") { $defaultVariant } else { $VariantId }
+
+$slotPayload = Join-Path $root ("slots/" + $variant)
+$backendPayload = Join-Path $backendRoot $payloadBackend
+$src = if (Test-Path $slotPayload) { $slotPayload } else { $backendPayload }
+if (-not (Test-Path $src)) { throw "Test payload not found for variant=$variant backend=$Backend : $src" }
+
+$sourceFile = Join-Path $src "SOURCE_SHA.txt"
+$sourceSha = if (Test-Path $sourceFile) { (Get-Content $sourceFile -Raw).Trim() } else { "unknown" }
 
 $logPatterns=@(
     'OutRun2006Tweaks*.log',
@@ -205,17 +222,16 @@ if (Test-Path $ini) {
             $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
         }
     }
+
+    # Keep the experimental cockpit camera completely isolated from normal
+    # A/B/HUD/performance/backend sessions. It is enabled only by G_COCKPIT.
+    $driverSeatValue = if ($variant -eq "G_COCKPIT") { "true" } else { "false" }
+    $text = Set-IniSectionValue $text "VR" "DriverSeatView" $driverSeatValue
+
     Set-Content $ini $text -Encoding UTF8
 }
 
 $nl = [Environment]::NewLine
-$variant = switch ($Backend) {
-    "2d"        { "CONTROL_2D" }
-    "d3d9"      { "A_CONTROL" }
-    "dxvk-safe" { "E_DXVK_SAFE" }
-    "dxvk"      { "E_DXVK_MULTIVIEW" }
-    "dx12"      { "F_DX12_STRICT" }
-}
 $matrixFile = Join-Path $root "BUILD_MATRIX_ID.txt"
 $matrix = if (Test-Path $matrixFile) { (Get-Content $matrixFile -Raw).Trim() } else { "UNIFIED_LOCAL" }
 $startedUtc = (Get-Date).ToUniversalTime()
@@ -227,6 +243,7 @@ $activeText = @(
     "backend=$Backend"
     "variant=$variant"
     "profile=$TestProfile"
+    "sourceSha=$sourceSha"
     "matrix=$matrix"
     "session=$session"
     "startedUtc=$($startedUtc.ToString('o'))"
@@ -242,6 +259,7 @@ $sessionManifest = [ordered]@{
     VariantId = $variant
     Backend = $Backend
     TestProfile = $TestProfile
+    SourceSha = $sourceSha
     SessionId = $session
     StartedUtc = $startedUtc.ToString("o")
     ConfigSha256 = $configHash
@@ -252,7 +270,7 @@ $sessionManifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $root "CURRE
 $sessionManifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $sessionRoot "session_manifest.json") -Encoding UTF8
 
 if (Test-Path $ini) {
-    $allowed = '^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor)\s*='
+    $allowed = '^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|DriverSeatView)\s*='
     Get-Content $ini | Where-Object { $_ -match $allowed } |
         Set-Content (Join-Path $sessionRoot "VR_CONFIG_SNAPSHOT.txt") -Encoding UTF8
 }
@@ -262,7 +280,9 @@ if (Test-Path (Join-Path $root "BUILD_INPUTS.json")) {
 }
 
 Write-Host "OutRun renderer mode activated: $Backend"
+Write-Host "Test variant: $variant"
 Write-Host "Test profile: $TestProfile"
+Write-Host "Source SHA: $sourceSha"
 Write-Host "Diagnostic session prepared before launch: $session"
 Write-Host "Any previous root logs were archived before this session was created."
 switch ($Backend) {
