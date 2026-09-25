@@ -1,0 +1,42 @@
+{
+  "batch": "18-safety-revalidation",
+  "timestamp_kst": "2026-09-26T07:31:00+09:00",
+  "policy": "localization/graphics/ORIENTATION_POLICY.md",
+  "scope": [
+    "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+    "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+    "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+    "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds"
+  ],
+  "result": "NO_PROMOTION",
+  "findings": [
+    {
+      "asset": "ACF61D7C_1024x512.dds",
+      "decision": "KEEP_ORIGINAL",
+      "reason": "Existing batch13 preview visibly damages/clips large RANKINGS/OPTIONS text and leaves mixed English; fails text-region/style/artifact gates."
+    },
+    {
+      "asset": "2DA43E41_1024x1024.dds",
+      "decision": "KEEP_ORIGINAL",
+      "reason": "Existing batch14 preview does not provide a clean source-faithful localized result; large atlas needs per-cell reconstruction and game validation."
+    },
+    {
+      "asset": "37759842_1024x1024.dds",
+      "decision": "KEEP_ORIGINAL",
+      "reason": "Previous v3 rejection remains valid: residual English and gradient/icon restoration seams."
+    },
+    {
+      "asset": "C075FB49_512x512.dds",
+      "decision": "KEEP_ORIGINAL",
+      "reason": "Existing batch14/15 previews retain mixed English and small-text artifacts; unsafe to promote."
+    }
+  ],
+  "remaining_pending": [
+    "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+    "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+    "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+    "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds"
+  ],
+  "note": "Safety gate intentionally prefers original DDS over visually damaged or partially localized candidates. No binary candidate promoted in this pass."
+}
