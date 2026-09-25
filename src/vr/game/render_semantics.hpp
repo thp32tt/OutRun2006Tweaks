@@ -18,6 +18,10 @@ namespace OutRunVR::GameSemantic
         SkyGlow,
         WorldParticle,
         WorldBillboard,
+        // R57: a world-space anchor that the game has already projected into
+        // the 640x480 sprite coordinate system before queueing the SpriteNode.
+        // Unlike WorldBillboard, the final draw is intentionally 2D.
+        ProjectedWorldMarker2D,
         ReflectionCube,
         // Generic canonical 2D queue content. It needs only per-eye
         // asymmetric-FOV alignment, never head/IPD/world-plane placement.
@@ -25,8 +29,18 @@ namespace OutRunVR::GameSemantic
         ScreenHud,
     };
 
+    struct ProjectedMarkerInfo
+    {
+        bool valid = false;
+        float viewX = 0.0f;
+        float viewY = 0.0f;
+        float viewZ = 0.0f;
+    };
+
     inline thread_local RenderScope CurrentScope = RenderScope::None;
     inline thread_local RenderScope NextDrawScope = RenderScope::None;
+    inline thread_local RenderScope CurrentProducerScope = RenderScope::None;
+    inline thread_local ProjectedMarkerInfo CurrentProducerMarker{};
     inline thread_local RenderScope CurrentQueueExactScope = RenderScope::None;
     inline std::atomic<int> HudExperimentMode{ 0 };
 
@@ -65,6 +79,7 @@ namespace OutRunVR::GameSemantic
         case RenderScope::SkyGlow: return "SKY_GLOW";
         case RenderScope::WorldParticle: return "WORLD_PARTICLE";
         case RenderScope::WorldBillboard: return "WORLD_BILLBOARD";
+        case RenderScope::ProjectedWorldMarker2D: return "PROJECTED_WORLD_MARKER_2D";
         case RenderScope::ReflectionCube: return "REFLECTION_CUBE";
         case RenderScope::ScreenOverlay2D: return "SCREEN_OVERLAY_2D";
         case RenderScope::ScreenHud: return "SCREEN_HUD";
@@ -88,6 +103,43 @@ namespace OutRunVR::GameSemantic
         ScopedRenderSemantic(const ScopedRenderSemantic&) = delete;
         ScopedRenderSemantic& operator=(const ScopedRenderSemantic&) = delete;
     };
+
+    // Exact producer ownership survives nested sprite helpers without relying on
+    // x86 stack walking. put_sprite_ex/put_sprite_ex2 sample this scope while
+    // the producer call is active and attach it to every queued SpriteNode.
+    class ScopedProducerSemantic
+    {
+        RenderScope previousScope_ = RenderScope::None;
+        ProjectedMarkerInfo previousMarker_{};
+    public:
+        explicit ScopedProducerSemantic(
+            RenderScope scope,
+            const ProjectedMarkerInfo* marker = nullptr) noexcept
+            : previousScope_(CurrentProducerScope),
+              previousMarker_(CurrentProducerMarker)
+        {
+            CurrentProducerScope = scope;
+            CurrentProducerMarker =
+                marker ? *marker : ProjectedMarkerInfo{};
+        }
+        ~ScopedProducerSemantic()
+        {
+            CurrentProducerScope = previousScope_;
+            CurrentProducerMarker = previousMarker_;
+        }
+        ScopedProducerSemantic(const ScopedProducerSemantic&) = delete;
+        ScopedProducerSemantic& operator=(const ScopedProducerSemantic&) = delete;
+    };
+
+    inline RenderScope ProducerScope() noexcept
+    {
+        return CurrentProducerScope;
+    }
+
+    inline const ProjectedMarkerInfo* ProducerProjectedMarker() noexcept
+    {
+        return CurrentProducerMarker.valid ? &CurrentProducerMarker : nullptr;
+    }
 
     inline void ArmNextDraw(RenderScope scope) noexcept
     {
@@ -123,6 +175,11 @@ namespace OutRunVR::GameSemantic
             scope == RenderScope::WorldBillboard;
     }
 
+    inline bool CorroboratesProjectedWorldMarker(RenderScope scope) noexcept
+    {
+        return scope == RenderScope::ProjectedWorldMarker2D;
+    }
+
     inline bool CorroboratesScreenOverlay2D(RenderScope scope) noexcept
     {
         return scope == RenderScope::ScreenOverlay2D;
@@ -149,6 +206,7 @@ namespace OutRunVR::GameSemantic
         const void* node = nullptr;
         RenderScope scope = RenderScope::None;
         std::uint64_t serial = 0;
+        ProjectedMarkerInfo projectedMarker{};
     };
 
     inline constexpr std::size_t SpriteNodeSemanticCapacity = 0x230;
@@ -173,6 +231,7 @@ namespace OutRunVR::GameSemantic
     // change semantic classification or draw ownership.
     inline thread_local const void* CurrentSpriteQueueNode = nullptr;
     inline thread_local std::uint64_t SpriteQueueNodeEpoch = 0;
+    inline thread_local ProjectedMarkerInfo CurrentQueueProjectedMarker{};
 
     inline const void* CurrentQueueNode() noexcept
     {
@@ -184,13 +243,20 @@ namespace OutRunVR::GameSemantic
         return SpriteQueueNodeEpoch;
     }
 
+    inline const ProjectedMarkerInfo* CurrentProjectedMarker() noexcept
+    {
+        return CurrentQueueProjectedMarker.valid
+            ? &CurrentQueueProjectedMarker : nullptr;
+    }
+
     inline bool QueueRenderActive() noexcept
     {
         return SpriteQueueDepth != 0;
     }
 
     inline void RegisterSpriteNodeScope(
-        const void* node, RenderScope scope) noexcept
+        const void* node, RenderScope scope,
+        const ProjectedMarkerInfo* projectedMarker = nullptr) noexcept
     {
         if (!node || scope == RenderScope::None)
             return;
@@ -204,6 +270,8 @@ namespace OutRunVR::GameSemantic
             {
                 SpriteNodeSemanticTags[i].scope = scope;
                 SpriteNodeSemanticTags[i].serial = serial;
+                SpriteNodeSemanticTags[i].projectedMarker =
+                    projectedMarker ? *projectedMarker : ProjectedMarkerInfo{};
                 SpriteNodeSemanticPublishedCount.store(
                     SpriteNodeSemanticCount, std::memory_order_release);
                 SpriteNodeSemanticRegistered.fetch_add(
@@ -215,7 +283,8 @@ namespace OutRunVR::GameSemantic
         if (SpriteNodeSemanticCount < SpriteNodeSemanticTags.size())
         {
             SpriteNodeSemanticTags[SpriteNodeSemanticCount++] =
-                { node, scope, serial };
+                { node, scope, serial,
+                  projectedMarker ? *projectedMarker : ProjectedMarkerInfo{} };
             SpriteNodeSemanticPublishedCount.store(
                 SpriteNodeSemanticCount, std::memory_order_release);
             SpriteNodeSemanticRegistered.fetch_add(
@@ -231,7 +300,9 @@ namespace OutRunVR::GameSemantic
             if (SpriteNodeSemanticTags[i].serial <
                 SpriteNodeSemanticTags[oldest].serial)
                 oldest = i;
-        SpriteNodeSemanticTags[oldest] = { node, scope, serial };
+        SpriteNodeSemanticTags[oldest] =
+            { node, scope, serial,
+              projectedMarker ? *projectedMarker : ProjectedMarkerInfo{} };
         SpriteNodeSemanticRegistered.fetch_add(1, std::memory_order_relaxed);
         SpriteNodeSemanticStaleCleared.fetch_add(1, std::memory_order_relaxed);
     }
@@ -251,6 +322,8 @@ namespace OutRunVR::GameSemantic
             if (SpriteNodeSemanticTags[i].node != node)
                 continue;
             const RenderScope scope = SpriteNodeSemanticTags[i].scope;
+            CurrentQueueProjectedMarker =
+                SpriteNodeSemanticTags[i].projectedMarker;
             SpriteNodeSemanticTags[i] =
                 SpriteNodeSemanticTags[--SpriteNodeSemanticCount];
             SpriteNodeSemanticTags[SpriteNodeSemanticCount] = {};
@@ -294,6 +367,7 @@ namespace OutRunVR::GameSemantic
             SpriteQueueSemanticCutoff = next > 0 ? next - 1 : 0;
         }
         CurrentSpriteQueueNode = node;
+        CurrentQueueProjectedMarker = {};
         if (++SpriteQueueNodeEpoch == 0)
             ++SpriteQueueNodeEpoch;
         CurrentScope = ConsumeSpriteNodeScope(
@@ -319,6 +393,7 @@ namespace OutRunVR::GameSemantic
             SpriteQueuePreviousScope = RenderScope::None;
             CurrentSpriteQueueNode = nullptr;
             CurrentQueueExactScope = RenderScope::None;
+            CurrentQueueProjectedMarker = {};
 
             // Remove only tags that existed before this queue walk began.
             // A producer thread may already be preparing the next frame while
