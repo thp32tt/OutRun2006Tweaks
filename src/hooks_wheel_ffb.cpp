@@ -3670,44 +3670,14 @@ namespace
 
         void update_crash_detection(float speed, uint32_t stateFlags)
         {
-            if (crashImpulseTimer_ <= 0 && speedHistoryIndex_ > 6)
-            {
-                const float oldSpeed =
-                    speedHistory_[(speedHistoryIndex_ - 6) % SpeedHistoryCount];
-                const float speedDrop = oldSpeed - speed;
-
-                if (speedDrop > 0.03f && speed > 0.10f)
-                {
-                    const float lateralBeforeImpact =
-                        lateralHistoryIndex_ > 8
-                            ? lateralHistory_[(lateralHistoryIndex_ - 8) % LateralHistoryCount]
-                            : smoothedLateral_;
-
-                    const float direction =
-                        lateralBeforeImpact >= 0.0f ? -1.0f : 1.0f;
-
-                    const float severity =
-                        std::clamp((speedDrop - 0.03f) / 0.12f, 0.0f, 1.0f);
-                    crashImpulseForce_ =
-                        direction * (1.7f + 0.8f * severity) *
-                        static_cast<float>(Settings::WheelFFBWallImpact);
-
-                    crashImpulseTimer_ = CrashTimerFrames;
-                    smoothedLateral_ = 0.0f;
-
-                    if (Settings::WheelFFBDebugLog)
-                    {
-                        spdlog::info(
-                            "WheelFFB: crash speedDrop={:.3f}, dir={:.0f}",
-                            speedDrop, direction);
-                    }
-                }
-            }
-
             const bool collision = (stateFlags & 0x1000) != 0;
             const bool wasCollision = (prevCollisionFlags_ & 0x1000) != 0;
+            const bool collisionEdge = collision && !wasCollision;
 
-            if (collision && !wasCollision && crashImpulseTimer_ <= 0)
+            // Prefer the game's explicit collision-state edge. The speed-drop
+            // path is only a conservative emergency fallback for impacts where
+            // that witness is absent.
+            if (collisionEdge && crashImpulseTimer_ <= 0)
             {
                 const float lateralBeforeImpact =
                     lateralHistoryIndex_ > 8
@@ -3722,6 +3692,48 @@ namespace
                     static_cast<float>(Settings::WheelFFBWallImpact);
                 crashImpulseTimer_ = CrashTimerFrames;
                 smoothedLateral_ = 0.0f;
+
+                if (Settings::WheelFFBDebugLog)
+                {
+                    spdlog::info(
+                        "WheelFFB: collision state edge, dir={:.0f}",
+                        direction);
+                }
+                return;
+            }
+
+            if (crashImpulseTimer_ <= 0 && !collisionEdge &&
+                speedHistoryIndex_ > 6)
+            {
+                const float oldSpeed =
+                    speedHistory_[(speedHistoryIndex_ - 6) % SpeedHistoryCount];
+                const float speedDrop = oldSpeed - speed;
+
+                if (WheelFFBMath::crash_speed_drop_fallback(speedDrop, speed))
+                {
+                    const float lateralBeforeImpact =
+                        lateralHistoryIndex_ > 8
+                            ? lateralHistory_[(lateralHistoryIndex_ - 8) % LateralHistoryCount]
+                            : smoothedLateral_;
+
+                    const float direction =
+                        lateralBeforeImpact >= 0.0f ? -1.0f : 1.0f;
+                    const float severity =
+                        WheelFFBMath::crash_speed_drop_severity(speedDrop);
+                    crashImpulseForce_ =
+                        direction * (1.7f + 0.8f * severity) *
+                        static_cast<float>(Settings::WheelFFBWallImpact);
+
+                    crashImpulseTimer_ = CrashTimerFrames;
+                    smoothedLateral_ = 0.0f;
+
+                    if (Settings::WheelFFBDebugLog)
+                    {
+                        spdlog::info(
+                            "WheelFFB: crash fallback speedDrop={:.3f}, dir={:.0f}",
+                            speedDrop, direction);
+                    }
+                }
             }
         }
 
