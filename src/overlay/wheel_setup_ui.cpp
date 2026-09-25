@@ -1760,7 +1760,12 @@ namespace
             track_ffb_change(ImGui::SliderFloat("Tire Slip", Settings::WheelFFBTireSlip.ptr(), 0.0f, 0.50f, "%.2f"));
             if (!modelUsesModernTireSlip) ImGui::EndDisabled();
 
+            const bool modelUsesCollisionEvent = activeFfbModel != 3;
+            if (!modelUsesCollisionEvent) ImGui::BeginDisabled();
             track_ffb_change(ImGui::SliderFloat("Collision", Settings::WheelFFBWallImpact.ptr(), 0.0f, 1.0f, "%.2f"));
+            if (!modelUsesCollisionEvent) ImGui::EndDisabled();
+            if (!modelUsesCollisionEvent && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
+                ImGui::SetTooltip("PS2 Original: collision ConstantForce stays disabled until a non-zero retail event caller is verified.");
 
             const bool modelUsesEngineHaptics = activeFfbModel == 0;
             if (!modelUsesEngineHaptics) ImGui::BeginDisabled();
