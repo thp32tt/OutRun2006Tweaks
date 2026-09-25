@@ -26,6 +26,9 @@ int main() {
  require(std::abs(frequency_hz_from_period_ms(70.0f)-(1000.0f/70.0f))<1e-6f,"arcade road 70ms period converts to host Hz");
  require(frequency_hz_from_period_ms(0.0f)==0.0f,"invalid zero period is rejected");
  require(frequency_hz_from_period_ms(std::numeric_limits<float>::quiet_NaN())==0.0f,"NaN period is rejected");
+ require(std::abs(compose_arcade_directional_surface(-.7f,.7f,true)-.7f)<1e-6f,"arcade right transition overrides opposite sustained force");
+ require(std::abs(compose_arcade_directional_surface(.7f,-.7f,true)+.7f)<1e-6f,"arcade left transition overrides opposite sustained force");
+ require(std::abs(compose_arcade_directional_surface(.4f,-.8f,false)-.4f)<1e-6f,"arcade sustained force remains when no transition is active");
  require(std::abs(arcade_speed_strength(.10f)-.10f)<1e-6f,"arcade first speed step");
  require(std::abs(arcade_speed_strength(.20f)-.20f)<1e-6f,"arcade second speed step");
  require(std::abs(arcade_speed_strength(.50f)-.50f)<1e-6f,"arcade mid speed step");
