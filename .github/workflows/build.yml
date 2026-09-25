@@ -54,6 +54,8 @@ jobs:
         run: |
           cp OutRun2006Tweaks.ini build/bin/OutRun2006Tweaks.ini
           cp OutRun2006Tweaks.lods.ini build/bin/OutRun2006Tweaks.lods.ini
+          New-Item -ItemType Directory -Force -Path build/bin/localization/text | Out-Null
+          cp localization/text/runtime_ko.tsv build/bin/localization/text/runtime_ko.tsv
           
       - name: Download EXE
         shell: pwsh
