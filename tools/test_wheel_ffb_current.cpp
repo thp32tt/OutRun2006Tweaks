@@ -26,6 +26,13 @@ int main() {
  require(std::abs(frequency_hz_from_period_ms(70.0f)-(1000.0f/70.0f))<1e-6f,"arcade road 70ms period converts to host Hz");
  require(frequency_hz_from_period_ms(0.0f)==0.0f,"invalid zero period is rejected");
  require(frequency_hz_from_period_ms(std::numeric_limits<float>::quiet_NaN())==0.0f,"NaN period is rejected");
+ require(!crash_speed_drop_fallback(.057f,.90f),"normal logged deceleration does not trigger crash fallback");
+ require(!crash_speed_drop_fallback(.12f,.90f),"crash fallback threshold is strict");
+ require(crash_speed_drop_fallback(.121f,.90f),"severe deceleration above threshold triggers fallback");
+ require(!crash_speed_drop_fallback(.36f,.10f),"near-stop speed does not trigger emergency crash fallback");
+ require(std::abs(crash_speed_drop_severity(.12f))<1e-6f,"crash fallback severity starts at zero");
+ require(std::abs(crash_speed_drop_severity(.36f)-1.0f)<1e-6f,"crash fallback severity reaches one at captured large-impact bound");
+ require(crash_speed_drop_severity(std::numeric_limits<float>::quiet_NaN())==0.0f,"crash fallback severity rejects NaN");
  require(std::abs(arcade_gear_sine_force(0,1.0f))<1e-6f,"arcade gear Sine starts at zero phase");
  require(arcade_gear_sine_force(4,1.0f)>0.09f,"arcade gear Sine reaches positive lobe near quarter cycle");
  require(arcade_gear_sine_force(11,1.0f)<-0.09f,"arcade gear Sine reaches negative lobe");
