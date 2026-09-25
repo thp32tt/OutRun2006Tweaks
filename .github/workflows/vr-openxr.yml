@@ -282,7 +282,7 @@ jobs:
           }
           foreach ($forbidden in @(
             'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
-            'VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current=',
+            'VR R30 HUD: asymmetric-FOV convergence correction ACTIVE; common-centre offset[L/R]=',
             'VR R33 DISPATCH: R33TryFastWorld/R33TryHud + direct R29 fallback READY',
             'VR R34 RESET GUARD: R15 classic-state replay health now gates post-Reset stereo eligibility'
           )) {
@@ -445,7 +445,7 @@ jobs:
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
           foreach ($marker in @(
             'VR R26+HUD SAFE TEST: R26/R23 world path + R30 HUD/XYZRHW/SkyGlow overlay ACTIVE',
-            'VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current=',
+            'VR R30 HUD: asymmetric-FOV convergence correction ACTIVE; common-centre offset[L/R]=',
             'VR R30.6 XYZRHW WORLD:'
           )) {
             if (-not $ascii.Contains($marker)) {
@@ -617,7 +617,7 @@ jobs:
             'VR C1/C2 CLASSIFY: R29 renderer delegates candidate WVP uploads to R23/R27/R28 perspective-world classification',
             'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
             'VR C1.1 BASELINE: authoritative color clear replay seeds right/mono surfaces; two full-surface StretchRect baseline copies removed',
-            'VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current=',
+            'VR R30 HUD: asymmetric-FOV convergence correction ACTIVE; common-centre offset[L/R]=',
             'VR R30.6 XYZRHW WORLD:'
           )) {
             if (-not $ascii.Contains($marker)) { throw "C2 marker missing: $marker" }
