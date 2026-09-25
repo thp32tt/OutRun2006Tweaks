@@ -41,8 +41,9 @@ A cycle is counted only after its assigned source/concern has been inspected and
 | C0027 | PS2 non-Type-4 transient-channel ownership | COMPLETE | No PC defect; remaining producer channels match controller-rumble logic and pad output is zeroed under wheel ownership, so they must not be imported as steering torque | SLPM 0x1D7F70 producer + 0x102460 pad output compared with Xbox CalcVibrationValues |
 | C0028 | PS2 retail road-chain runtime instrumentation | COMPLETE | Validation prep: 10 Hz telemetry now exposes surfaceRough, boosted ps2Surface, ps2RoadRaw and ps2Drive before host scaling | Source + verifier instrumentation; no intended force behavior change |
 | C0029 | PS2 ConstantForce hidden-caller/static-pointer audit | COMPLETE | No new PC defect; no extra direct caller, literal setter function-pointer entry, or second absolute writer to the two source globals was recovered | Whole-ELF direct-call/global-reference/literal-pointer audit; dynamic trace still required to exclude computed/indirect callers |
+| C0030 | Cross-model periodic transport ownership | COMPLETE | `FFB-R0030-F01`: shared wrapper forced UsePeriodicEffects=false every frame, defeating Arcade Sine / PS2 Triangle ownership and the live F11 switch; per-frame override removed | wrapper/core/UI contract review; source/verifier/docs updated |
 
-Completed cycles: **29 / 1000**
+Completed cycles: **30 / 1000**
 
 ## Findings
 
@@ -54,6 +55,7 @@ Completed cycles: **29 / 1000**
 - `FFB-R0022-F01`: corrected the PS2 Type-4 extra multiplier from an assumed activation ramp to the recovered wheel-specific 0..10 feedback-strength setting.
 - `FFB-R0024-F01`: removed the invented C2C collision mapping from PS2 Original after retail source-setter tracing found no verified non-zero caller.
 - `FFB-R0026-F01`: restored the verified PS2 Type-4 roughness*1.25 vehicle-state surface boost and valid 1.125 envelope headroom.
+- `FFB-R0030-F01`: removed the shared per-frame periodic-disable override so Arcade Sine / PS2 Triangle ownership and the live F11 transport toggle can operate.
 - C0002..C0010 and C0014..C0020: no new non-duplicate finding after source/evidence review.
 
 ## PS2 evidence discipline
@@ -65,4 +67,4 @@ Completed cycles: **29 / 1000**
 
 ## Next review
 
-Resume at **C0030** after exact-head CI. Highest-value remaining work is hardware telemetry/A-B validation of the recovered PS2 road envelope and dynamic/emulated discovery of any computed ConstantForce caller; the IOP lane remains BINARY_BLOCKED until disc-local `LGDEV.IRX` is supplied.
+Resume at **C0031** with cross-model Arcade/Modern behavior review. Highest-value remaining work includes Lindbergh periodic/event fidelity, Modern crash/transient validation, hardware telemetry/A-B validation, and dynamic/emulated discovery of any computed PS2 ConstantForce caller.
