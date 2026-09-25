@@ -57,6 +57,29 @@ class UIScaling : public Hook
 	const static int RankMarker_StackX = 0x40;
 	const static int RankMarker_StackY = 0x44;
 
+	// R56 runtime-only HMD probe selector. A single DLL carries all 20 cases so
+	// every comparison uses identical codegen except for the selected probe.
+	static int VRHudProbeMode() noexcept
+	{
+		static const int mode = []() noexcept {
+			char text[8]{};
+			const DWORD len = GetEnvironmentVariableA(
+				"OUTRUN_VR_HUD_PROBE", text,
+				static_cast<DWORD>(sizeof(text)));
+			if (len == 0 || len >= sizeof(text))
+				return 0;
+			int value = 0;
+			for (DWORD i = 0; i < len; ++i)
+			{
+				if (text[i] < '0' || text[i] > '9')
+					return 0;
+				value = value * 10 + int(text[i] - '0');
+			}
+			return (value >= 1 && value <= 20) ? value : 0;
+		}();
+		return mode;
+	}
+
 	// Addresses of the draw calls sub_4BAD20 makes. sprani_play_ae_auth_alpha
 	// and put_clip_sprite are both used throughout the game, so each call site
 	// is redirected on its own rather than hooking either function.
@@ -243,8 +266,18 @@ class UIScaling : public Hook
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
 
+		const int probe = VRHudProbeMode();
+		float probeX = x + RankMarkerFracX;
+		float probeY = y + RankMarkerFracY;
+		// R56 09-12: directly perturb only the known 1st/2nd/3rd producer.
+		// A visible movement proves the final image still contains this producer.
+		if (probe == 9) probeX += 96.0f;
+		else if (probe == 10) probeX -= 96.0f;
+		else if (probe == 11) probeY -= 72.0f;
+		else if (probe == 12) { probeX = 320.0f; probeY = 208.0f; }
+
 		const int result = Game::sprani_play_ae_auth_alpha(
-			spriteId, x + RankMarkerFracX, y + RankMarkerFracY, a4, a5, alpha);
+			spriteId, probeX, probeY, a4, a5, alpha);
 
 		// These four call sites are explicitly identified by the original mod as
 		// rival-car rank markers. Preserve that ownership on the queued node so
@@ -254,8 +287,13 @@ class UIScaling : public Hook
 			SpriteNode* root = Game::sprite_prio_root[prio];
 			SpriteNode* node = root ? root->tail_4 : nullptr;
 			if (node && node != tailsBefore[prio])
-				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-					node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+			{
+				const auto scope =
+					(probe == 16)
+					? OutRunVR::GameSemantic::RenderScope::ScreenHud
+					: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
+			}
 		}
 		return result;
 	}
@@ -272,7 +310,15 @@ class UIScaling : public Hook
 		SpriteNode* root = Game::sprite_prio_root[prio];
 		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
 
-		int result = Game::put_clip_sprite(xstnum, x, y, flags, priority, color);
+		const int probe = VRHudProbeMode();
+		int probeX = x;
+		int probeY = y;
+		// R56 13-15: directly perturb only the 4th+ digit-sprite producer.
+		if (probe == 13) probeX += 96;
+		else if (probe == 14) probeY -= 72;
+		else if (probe == 15) { probeX = 320; probeY = 208; }
+		int result = Game::put_clip_sprite(
+			xstnum, probeX, probeY, flags, priority, color);
 
 		// tail_4 is the last sprite queued at that priority. If it has not
 		// changed then the sprite pool was full and nothing was queued.
@@ -282,8 +328,17 @@ class UIScaling : public Hook
 		{
 			node->args_10.float24 += RankMarkerFracX;
 			node->args_10.float28 += RankMarkerFracY;
-			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-				node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+			const auto scope =
+				(probe == 17)
+				? OutRunVR::GameSemantic::RenderScope::ScreenHud
+				: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
+			// R56-18 deliberately tests whether a one-shot semantic survives from
+			// this exact producer to the eventual D3D draw. Cross-thread loss is a
+			// useful negative result, not a production policy.
+			if (probe == 18)
+				OutRunVR::GameSemantic::ArmNextDraw(
+					OutRunVR::GameSemantic::RenderScope::WorldBillboard);
 		}
 
 		return result;
@@ -479,6 +534,24 @@ class UIScaling : public Hook
 	static void put_scroll_AdjustPositionLeft(safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing((int*)(ctx.esp + 4), true);
+	}
+
+	// R56 05-08/19: exact DispRank producer probe. The eight original-mod
+	// callsites all pass the rank/POSITION horizontal coordinate at ESP+4.
+	static void DispRankProbe_AdjustPosition(safetyhook::Context& ctx)
+	{
+		int* x = reinterpret_cast<int*>(ctx.esp + 4);
+		AddSpriteSpacing(x, false);
+		const int probe = VRHudProbeMode();
+		if (probe == 5) *x += 96;
+		else if (probe == 6) *x -= 96;
+		else if (probe == 7)
+			*x = 320 + int((float(*x) - 320.0f) * 0.35f);
+		else if (probe == 8)
+			*x = 320;
+		else if (probe == 19)
+			OutRunVR::GameSemantic::ArmNextDraw(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
 	}
 
 	// PutGhostGapInfo
@@ -684,14 +757,14 @@ public:
 		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, put_scroll_AdjustPositionRight);
 		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, put_scroll_AdjustPositionRight);
 
-		DispRank_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9F3A, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4B9F5E, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4B9F81, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4B9FD0, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4B9FFC, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BA01E, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BA035, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BA052, put_scroll_AdjustPositionRight);
+		DispRank_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9F3A, DispRankProbe_AdjustPosition);
+		DispRank_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4B9F5E, DispRankProbe_AdjustPosition);
+		DispRank_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4B9F81, DispRankProbe_AdjustPosition);
+		DispRank_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4B9FD0, DispRankProbe_AdjustPosition);
+		DispRank_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4B9FFC, DispRankProbe_AdjustPosition);
+		DispRank_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BA01E, DispRankProbe_AdjustPosition);
+		DispRank_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BA035, DispRankProbe_AdjustPosition);
+		DispRank_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BA052, DispRankProbe_AdjustPosition);
 
 		// REV indicator
 		DispGearPosition_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9096, put_scroll_AdjustPositionLeft);
