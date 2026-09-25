@@ -194,6 +194,53 @@ namespace
         return result;
     }
 
+    // Direct Stage.zip/COLI0200 analysis proves that Floral Village's short
+    // rough PRIMARY-road strip uses materialId 0x14 -> surfaceMask 0x00100000
+    // at roadSection 510..533.  Do not use "all four tyres are rough" as the
+    // discriminator: that also becomes true when the whole car leaves the road.
+    // Keep the attenuation only while every valid non-water contact is one of
+    // the two proven primary-road materials for this stage (0x2 asphalt or
+    // 0x100000 rough paving), and at least one contact is on the rough strip.
+    constexpr int FloralVillageStage = 27;
+    constexpr int FloralVillageBrickRoadSectionFirst = 510;
+    constexpr int FloralVillageBrickRoadSectionLast = 533;
+    constexpr unsigned int FloralVillageAsphaltMask = 0x00000002u;
+    constexpr unsigned int FloralVillageRoughPavingMask = 0x00100000u;
+    constexpr float FloralVillageRoughPavingScale = 0.60f;
+
+    bool is_floral_village_primary_rough_paving(
+        const StageSurfaceContext& stage,
+        const RoadSurfaceProfile& surface,
+        const EVWORK_CAR* car)
+    {
+        if (!car || stage.uniqueStage != FloralVillageStage)
+            return false;
+
+        const int roadSection =
+            static_cast<int>(car->OnRoadPlace_5C.roadSectionNum_8);
+        if (roadSection < FloralVillageBrickRoadSectionFirst ||
+            roadSection > FloralVillageBrickRoadSectionLast)
+            return false;
+
+        bool sawRoughPaving = false;
+        for (int i = 0; i < 4; ++i)
+        {
+            const unsigned int bit = 1u << i;
+            if ((surface.validWheelMask & bit) == 0)
+                continue;
+            if ((surface.waterWheelMask & bit) != 0)
+                return false;
+
+            const unsigned int mask = surface.surfaceMask[i];
+            if (mask == FloralVillageRoughPavingMask)
+                sawRoughPaving = true;
+            else if (mask != FloralVillageAsphaltMask)
+                return false;
+        }
+
+        return sawRoughPaving;
+    }
+
     // v0.2 snow-curb state. On snow stages a curb can be rougher OR smoother
     // than the ~0.50 snow baseline. Mixed contact tells us which material is the
     // curb; once all four tyres cross onto that same material the old per-frame
@@ -495,7 +542,11 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
         const bool snowStage = stage.snowOrIce;
         const bool snowCurbHeld = update_snow_curb_latch(
             surface, snowStage, rawMixedSurface, now);
-        const bool strongTactile = mixedSurface || fullyRough || snowCurbHeld;
+        const bool floralVillageRoughPaving =
+            is_floral_village_primary_rough_paving(stage, surface, car);
+        const bool strongTactile =
+            !floralVillageRoughPaving &&
+            (mixedSurface || fullyRough || snowCurbHeld);
         const bool tactileSurface = nonWaterRough || snowCurbHeld;
 
         float desiredRoadAmp = 0.0f;
@@ -525,7 +576,17 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
             desiredRoadAmp = strongTactile ? 0.30f : 0.22f;
             const float envelope =
                 textureRoughness * roadSpeedGate * outputStrength * coreStageScale;
-            if (envelope > 0.0005f)
+
+            if (floralVillageRoughPaving)
+            {
+                // Comfort policy for the proven Floral Village primary-road
+                // rough-paving strip.  Scale only Road Detail; keep SAT, damper,
+                // collision and any non-primary/off-road material untouched.
+                Settings::WheelFFBRoadTexture = std::clamp(
+                    originalRoadTexture * FloralVillageRoughPavingScale,
+                    0.0f, 120.0f);
+            }
+            else if (envelope > 0.0005f)
             {
                 // This value is temporary for one physics tick and is restored
                 // immediately below. Values above the UI range are intentional:
@@ -542,10 +603,14 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
             // Normal snow, water and ordinary asphalt use the game's exact LUT.
             applyCoreSurfaceFloor = snowCurbHeld;
 
-            // Keep exactly the same SAT/damper relief when the car completes the
-            // transition onto a fully rough or latched snow curb/shoulder.
-            steeringScale = strongTactile ? 0.72f : 0.80f;
-            damperScale = strongTactile ? 0.55f : 0.70f;
+            // Keep exactly the same SAT/damper relief for genuine tactile
+            // transitions.  The Floral Village primary-road rough paving is a
+            // sustained road surface, not a curb: only its Road Detail is scaled.
+            if (!floralVillageRoughPaving)
+            {
+                steeringScale = strongTactile ? 0.72f : 0.80f;
+                damperScale = strongTactile ? 0.55f : 0.70f;
+            }
             Settings::WheelFFBSteeringWeight =
                 originalSteeringWeight * steeringScale;
             Settings::WheelFFBDamperStrength =
@@ -559,8 +624,10 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
         {
             lastRoadCompatibilityLogTick = now;
             spdlog::info(
-                "WheelFFB ROAD: stage={} min={:.2f} max={:.2f} spread={:.2f} nonWaterMin={:.2f} nonWaterMax={:.2f} mixed={} fullRough={} snow={} snowLatch={} waterWheels=0x{:X} waterOnlyRough={} masks={:08X}/{:08X}/{:08X}/{:08X} rough={:.2f}/{:.2f}/{:.2f}/{:.2f} collisionCtx={} coreFloor={} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
+                "WheelFFB ROAD: stage={} roadSection={} floralRoughPaving={} min={:.2f} max={:.2f} spread={:.2f} nonWaterMin={:.2f} nonWaterMax={:.2f} mixed={} fullRough={} snow={} snowLatch={} waterWheels=0x{:X} waterOnlyRough={} masks={:08X}/{:08X}/{:08X}/{:08X} rough={:.2f}/{:.2f}/{:.2f}/{:.2f} collisionCtx={} coreFloor={} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
                 stage.uniqueStage,
+                static_cast<int>(car->OnRoadPlace_5C.roadSectionNum_8),
+                floralVillageRoughPaving,
                 surface.minimum, surface.maximum, surface.spread,
                 surface.nonWaterMinimum, surface.nonWaterMaximum,
                 mixedSurface, fullyRough, snowStage, snowCurbHeld,
