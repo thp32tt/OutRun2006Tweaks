@@ -6,21 +6,21 @@ $selector=Join-Path $root 'Select-OutRunVRBackend.ps1'
 $runner=Join-Path $root 'Run-OutRunVRTest.ps1'
 
 $slots=[ordered]@{
-    'R54_A_NEXTDRAW'=[ordered]@{
-        Title='1. A - NEXT DRAW LATCH'
-        Detail='queue exact semantic을 다음 D3D draw에 1회 직접 전달. 가장 좁은 수정.'
+    'R55_A_ZERO'=[ordered]@{
+        Title='1. A - ZERO DISPARITY'
+        Detail='화면 HUD를 좌/우 완전히 같은 2D 좌표로 강제. 갈라짐이 사라지는지 확인.'
     }
-    'R54_B_STICKY'=[ordered]@{
-        Title='2. B - STICKY NODE'
-        Detail='현재 SpriteNode가 끝날 때까지 exact SCREEN_HUD/WORLD_RANK를 유지. multi-draw node 대응.'
+    'R55_B_SCALE35'=[ordered]@{
+        Title='2. B - ZERO + 35% SCALE'
+        Detail='A와 같은 zero-disparity에 화면 HUD를 35%로 강제 축소. 경로가 보이면 크기가 확실히 달라져야 함.'
     }
-    'R54_C_FULL_OWNER'=[ordered]@{
-        Title='3. C - FULL OWNER'
-        Detail='sticky semantic + c64/WVP 단계에서도 exact queue semantic을 강제 복구. 가장 유력한 수정.'
+    'R55_C_WORLD35'=[ordered]@{
+        Title='3. C - WORLD PLANE 35%'
+        Detail='HUD를 35% finite world-plane + head inverse로 배치. 머리 추종 제거 실제 후보.'
     }
-    'R54_D_HUD_PLANE'=[ordered]@{
-        Title='4. D - HUD PLANE FORCE'
-        Detail='C 방식 + generic queue HUD까지 finite HUD plane으로 승격. 화면 HUD 크기/머리추종 분리 확인.'
+    'R55_D_RANKZERO'=[ordered]@{
+        Title='4. D - WORLD HUD + RANK ZERO'
+        Detail='C + 차량 위 exact WORLD_BILLBOARD를 좌/우 같은 좌표로 강제. 특히 4/5등 마커 경로 확인.'
     }
 }
 
@@ -47,7 +47,7 @@ $title.Location=[System.Drawing.Point]::new(155,18)
 $form.Controls.Add($title)
 
 $guide=New-Object System.Windows.Forms.Label
-$guide.Text='같은 코스/시점에서 1→2→3→4 순서로 짧게 테스트하세요. 화면 변화가 생기는 첫 버전이 핵심입니다. F11 VR Recenter도 메뉴/게임에서 같이 확인하세요.'
+$guide.Text='같은 코스/시점에서 1→2→3→4 순서로 짧게 테스트하세요. 이번 네 모드는 최종 좌표 수식 자체가 서로 다릅니다. 특히 2번은 HUD가 35%로 줄지 않으면 보이는 HUD가 이 경로가 아닙니다.'
 $guide.AutoSize=$false
 $guide.Size=[System.Drawing.Size]::new(650,44)
 $guide.Location=[System.Drawing.Point]::new(35,58)
