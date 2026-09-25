@@ -43,6 +43,7 @@ The full draft intentionally uses exact/OCR/manual/atlas-alpha placement evidenc
 - 1st/2nd/early-3rd batch generated images are visual drafts pending source-faithful rework.
 
 ### Source-faithful batches
+- Batch22: `C598919A` rejected after block-level DXT5 pass; residual English/clipped source styling remains, report `BATCH22_REJECTED_REPORT.json`
 - Batch21v3: `C075FB49` promoted after containment + manual style/artifact QA, report `BATCH21V3_REWORK_REPORT.json`
 - Batch18/19: `2DA43E41` and `ACF61D7C` rejected and kept original, reports `BATCH18_REJECTED_REPORT.json`, `BATCH19_REJECTED_REPORT.json`
 - Batch16v5: `560FA536` promoted after full containment + manual style/artifact QA, report `BATCH16V5_REWORK_REPORT.json`
@@ -86,7 +87,7 @@ Read:
 7. `localization/graphics/BATCH11V2_REWORK_REPORT.json`
 8. `localization/graphics/FULL_DRAFT_REPORT.json`
 
-Next gate: continue the 10 pending assets from original DDS first; solve DXT5-safe rewriting; keep preserve-original names/artwork untouched; run in-game validation on the 22 retained candidates.
+Next gate: continue the 4 pending assets from original DDS first; keep preserve-original names/artwork untouched; reuse block-level DXT5 patching for C598919A; run in-game validation on the 28 retained candidates.
 
 
 ### QA checkpoint 2026-09-26 07:34 KST
