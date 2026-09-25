@@ -1,0 +1,23 @@
+{
+  "batch": "16v5-560FA536-rework",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+  "status": "localized_candidate",
+  "sha256": "b1feb6d8c75afd5493f460b8e64960a94494689391145244e49b507ea0ff7768",
+  "raw_transform": "mirror_y",
+  "translated_segments": 12,
+  "preserved": [
+    "song titles",
+    "speed values",
+    "course images",
+    "gauges/icons"
+  ],
+  "qa": {
+    "dimensions_identical": true,
+    "header_128_identical": true,
+    "changed_pixels_outside_allowed_regions": 0,
+    "allowed_region_count": 13,
+    "automated_pass": true,
+    "manual_style_artifact_review": "pass"
+  },
+  "note": "All 12 generic segments translated. RANDOM/TUNED/NORMAL lettering removed by inpainting to preserve tile geometry. No residual English observed in reviewed regions; all changed pixels remain inside explicit source text regions."
+}
