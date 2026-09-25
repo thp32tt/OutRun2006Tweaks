@@ -571,6 +571,12 @@ req(wheel_ui, 'Arcade + Modern Hybrid', 'F11 exposes Arcade Hybrid model')
 req(wheel_ui, 'PS2 Original topology (Experimental)', 'F11 exposes PS2 experimental model')
 req(wheel_ui, '// Arcade Original\'s verified rough-surface path is periodic.', 'Arcade shortcut documents hardware periodic ownership')
 req(wheel_ui, '// The retail PS2 binary has explicit periodic download/update', 'PS2 shortcut documents verified periodic ownership')
+physics_preset = wheel_ui[wheel_ui.find('if (ImGui::Button("Load MOZA R3 Physics SAT"))'):wheel_ui.find('if (ImGui::Button("Load MOZA R3 Natural SAT"))')]
+natural_preset = wheel_ui[wheel_ui.find('if (ImGui::Button("Load MOZA R3 Natural SAT"))'):wheel_ui.find('if (ImGui::Button("Use Arcade Original"))')]
+req(physics_preset, 'Settings::WheelFFBUsePeriodicEffects = false;', 'MOZA R3 Physics SAT keeps ConstantForce tactile compatibility default')
+req(natural_preset, 'Settings::WheelFFBUsePeriodicEffects = false;', 'MOZA R3 Natural SAT keeps ConstantForce tactile compatibility default')
+forbid(physics_preset, 'Settings::WheelFFBUsePeriodicEffects = true;', 'Modern R3 Physics preset cannot silently re-enable weak hardware Sine path')
+forbid(natural_preset, 'Settings::WheelFFBUsePeriodicEffects = true;', 'Modern R3 Natural preset cannot silently re-enable weak hardware Sine path')
 original_shortcut = wheel_ui[wheel_ui.find('if (ImGui::Button("Use Arcade Original"))'):wheel_ui.find('if (ImGui::Button("Use Arcade Hybrid"))')]
 hybrid_shortcut = wheel_ui[wheel_ui.find('if (ImGui::Button("Use Arcade Hybrid"))'):wheel_ui.find('if (ImGui::Button("Use PS2 Original (Experimental)"))')]
 ps2_shortcut_start = wheel_ui.find('if (ImGui::Button("Use PS2 Original (Experimental)"))')
