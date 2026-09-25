@@ -48,7 +48,7 @@ The Lindbergh plugin's speed-strength staircase is retained as a comparative sha
 
 Keeps the Modern DD structural steering model but swaps surface/wall/gear event behavior to the Lindbergh-derived arcade reconstruction.
 
-This is intended for modern DD hardware when the user wants current SAT quality with arcade-style transient timing.
+This is intended for modern DD hardware when the user wants current SAT quality with arcade-style transient timing. Collision debounce remains shared, but Hybrid only unloads its Modern structural torque during the active Arcade directional event window (~80 ms); the rest of the debounce interval no longer leaves SAT artificially blank.
 
 ## Model 3 — PS2 Original topology (Experimental)
 
