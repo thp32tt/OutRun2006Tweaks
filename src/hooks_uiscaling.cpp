@@ -788,6 +788,10 @@ class VRHudQueueSemanticBridge : public Hook
 {
 	inline static SafetyHookMid QueueNode_hk{};
 	inline static SafetyHookMid QueueEnd_hk{};
+	inline static std::uint64_t QueuePasses = 0;
+	inline static std::uint64_t LastRegistered = 0;
+	inline static std::uint64_t LastConsumed = 0;
+	inline static std::uint64_t LastStaleCleared = 0;
 
 	static void QueueNode(SafetyHookContext& ctx)
 	{
@@ -798,6 +802,31 @@ class VRHudQueueSemanticBridge : public Hook
 	static void QueueEnd(SafetyHookContext&)
 	{
 		OutRunVR::GameSemantic::EndSpriteQueueRender();
+		++QueuePasses;
+		if ((QueuePasses % 300u) != 0)
+			return;
+
+		const auto registered =
+			OutRunVR::GameSemantic::SpriteNodeSemanticRegistered.load(
+				std::memory_order_relaxed);
+		const auto consumed =
+			OutRunVR::GameSemantic::SpriteNodeSemanticConsumed.load(
+				std::memory_order_relaxed);
+		const auto staleCleared =
+			OutRunVR::GameSemantic::SpriteNodeSemanticStaleCleared.load(
+				std::memory_order_relaxed);
+		if (registered != LastRegistered ||
+			consumed != LastConsumed ||
+			staleCleared != LastStaleCleared)
+		{
+			spdlog::info(
+				"VR HUD SEMANTIC R53: queuePass={} registered={} consumed={} staleCleared={} deltaRegistered={} deltaConsumed={}",
+				QueuePasses, registered, consumed, staleCleared,
+				registered - LastRegistered, consumed - LastConsumed);
+			LastRegistered = registered;
+			LastConsumed = consumed;
+			LastStaleCleared = staleCleared;
+		}
 	}
 
 public:
@@ -813,6 +842,15 @@ public:
 
 	bool apply() override
 	{
+		char modeText[8]{};
+		int experimentMode = 0;
+		if (GetEnvironmentVariableA(
+				"OUTRUN_VR_HUD_EXPERIMENT_MODE",
+				modeText, static_cast<DWORD>(sizeof(modeText))) > 0 &&
+			modeText[0] >= '0' && modeText[0] <= '4')
+			experimentMode = modeText[0] - '0';
+		OutRunVR::GameSemantic::SetHudExperimentMode(experimentMode);
+
 		QueueNode_hk = safetyhook::create_mid(
 			Module::exe_ptr(0x2D762), QueueNode);
 		QueueEnd_hk = safetyhook::create_mid(
@@ -829,7 +867,7 @@ public:
 		if (ok)
 		{
 			spdlog::info(
-				"VR HUD SEMANTIC R50: sprite queue node 0x2D762 selects explicit tags; untagged nodes use SCREEN_OVERLAY_2D FOV-only alignment; unsafe 0x2D734 entry hook is forbidden; original-mod tagged rival nodes remain WORLD_BILLBOARD");
+				"VR HUD SEMANTIC R54: experimentMode={} sprite queue node 0x2D762 consumes explicit tags; mode1=next-draw latch mode2=sticky mode3=full owner mode4=full HUD-plane", experimentMode);
 		}
 		else
 		{
