@@ -63,8 +63,8 @@
       "full_draft_candidates": 79,
       "total_artwork_targets": 79,
       "source_faithful_reviewed": 32,
-      "source_faithful_localized_candidates": 29,
-      "reset_to_original_pending_rework": 3
+      "source_faithful_localized_candidates": 30,
+      "reset_to_original_pending_rework": 2
     },
     "runtime_text_trace": {
       "status": "clean_k1_package_ready",
@@ -122,8 +122,8 @@
       "full_draft_candidates": 79,
       "total": 79,
       "source_faithful_reviewed": 32,
-      "source_faithful_localized_candidates": 29,
-      "reset_to_original_pending_rework": 3
+      "source_faithful_localized_candidates": 30,
+      "reset_to_original_pending_rework": 2
     },
     "graphics_artwork_pipeline": {
       "status": "proof_renderer_ready",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Continue 3 pending assets with full checklist; in-game validate 29 retained candidates.",
+  "next_checkpoint": "Continue final 2 pending assets with full checklist; in-game validate 30 retained candidates.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -218,8 +218,8 @@
     },
     "orientation_policy": "localization/graphics/ORIENTATION_POLICY.md",
     "source_faithful_reviewed_assets": 32,
-    "source_faithful_localized_candidates": 29,
-    "source_faithful_reset_to_original": 3,
+    "source_faithful_localized_candidates": 30,
+    "source_faithful_reset_to_original": 2,
     "source_faithful_batches": {
       "batch3": {
         "assets": 10,
@@ -243,14 +243,13 @@
       }
     },
     "pending_source_faithful_rework": [
-      "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
       "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
       "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds"
     ],
     "current_state_file": "localization/graphics/SOURCE_FAITHFUL_CURRENT.json",
     "current_combined_package": {
-      "name": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B24v2_QA_Test.zip",
-      "sha256": "6a38aaae5fd979b1ebdbbe0e43f3e0b3c6e24b5fd929031ee496ef9ffb0f0541"
+      "name": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B25v4_QA_Test.zip",
+      "sha256": "e0d2df30e8de09dc69e154cbcffcfce649c76fd7edd760e4bb2fe0ab935d781d"
     }
   },
   "data_build": {
