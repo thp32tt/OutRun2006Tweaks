@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "created_at_kst": "2026-09-25T12:20:00+09:00",
+  "branch": "korean-localization-clean",
+  "package_name": "OutRun2_Korean_GFX_FULL_DRAFT_Test.zip",
+  "package_sha256": "5512dad798a4ddb4872e4aa3e69438537f75f488f439317d7b95c0eb372b6c78",
+  "package_scope": "FULL_DRAFT_TEST_ONLY",
+  "assets": {
+    "dds_total": 79,
+    "draft_candidates": 79,
+    "final_ingame_validated": 0
+  },
+  "text": {
+    "segments_total": 674,
+    "segments_rendered": 674
+  },
+  "mapping_methods": {
+    "exact": 8,
+    "ocr": 225,
+    "alpha-heuristic": 330,
+    "manual": 28,
+    "alpha-order": 51,
+    "alpha-special159": 15,
+    "alpha-special201": 14,
+    "manual-special201": 3
+  },
+  "dds": {
+    "rgba32": 67,
+    "dxt5": 12,
+    "raw32-header-preserved": 66,
+    "dxt5-reencoded": 11,
+    "unchanged-copy": 2,
+    "header_128_identical_assets": 68
+  },
+  "validation": {
+    "all_expected_paths_present": true,
+    "dds_magic_verified": true,
+    "dimensions_and_mip_counts_verified": true,
+    "ingame_validation": "pending"
+  },
+  "caveat": "Large atlas placement uses exact/OCR/manual/alpha heuristics. Treat this as a complete broad-test draft, not release artwork."
+}
