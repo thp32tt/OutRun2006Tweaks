@@ -1,0 +1,37 @@
+{
+  "batch": "24v2-2DA43E41-rework",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+  "status": "localized_candidate",
+  "raw_transform": "mirror_y",
+  "sha256": "86ad666fd8052fe0f6cec43c425f18547b39b14329a6bd7ca1fc49794d2bc849",
+  "package": "OutRun2_Korean_GFX_Batch24v2_2DA43E41_Rework_Test.zip",
+  "package_sha256": "76f424f2a9802d1bbf925246b8e97fc36c17c53e8ae05bdbba7c35f8464afcdc",
+  "combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B24v2_QA_Test.zip",
+  "combined_package_sha256": "6a38aaae5fd979b1ebdbbe0e43f3e0b3c6e24b5fd929031ee496ef9ffb0f0541",
+  "qa": {
+    "dimensions_identical": true,
+    "header_128_identical": true,
+    "changed_pixels_outside_allowed_regions": 0,
+    "introduced_alpha_pixels_outside_allowed_regions": 0,
+    "raw_and_readable_manual_review": "pass",
+    "residual_generic_english": "none observed in the edited selection/waiting/mode labels",
+    "black_lines_crop_seams_erasure_residue_alpha_halos_clipping": "none observed"
+  },
+  "preserved": [
+    "course-map artwork",
+    "character art/silhouettes",
+    "player indicators",
+    "numeric/UI art",
+    "non-text decorative panels"
+  ],
+  "localized": [
+    "OutRun2 15-course selected",
+    "OutRun2 SP 15-course selected",
+    "two waiting-player messages",
+    "Single Play",
+    "For Expert Drivers",
+    "Heart Attack Mode",
+    "Special Course"
+  ],
+  "note": "Second pass enlarged each source text cell enough to remove the residual English seen in Batch18 while keeping every changed pixel inside explicit source text regions."
+}
