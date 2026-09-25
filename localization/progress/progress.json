@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-26T00:34:00+09:00",
+  "updated_at_kst": "2026-09-26T01:24:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -62,9 +62,9 @@
       "transcribed_assets": 79,
       "full_draft_candidates": 79,
       "total_artwork_targets": 79,
-      "source_faithful_reviewed": 20,
-      "source_faithful_localized_candidates": 17,
-      "reset_to_original_pending_rework": 3
+      "source_faithful_reviewed": 32,
+      "source_faithful_localized_candidates": 22,
+      "reset_to_original_pending_rework": 10
     },
     "runtime_text_trace": {
       "status": "clean_k1_package_ready",
@@ -121,9 +121,9 @@
       "completed": 0,
       "full_draft_candidates": 79,
       "total": 79,
-      "source_faithful_reviewed": 20,
-      "source_faithful_localized_candidates": 17,
-      "reset_to_original_pending_rework": 3
+      "source_faithful_reviewed": 32,
+      "source_faithful_localized_candidates": 22,
+      "reset_to_original_pending_rework": 10
     },
     "graphics_artwork_pipeline": {
       "status": "proof_renderer_ready",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Continue original-DDS-first source-faithful graphics rework; solve DXT5-safe replacement for 49BB5FE5; validate Batch3/4/5 in game.",
+  "next_checkpoint": "Continue 10 pending assets from original DDS; enforce orientation + style fidelity + artifact-cleanliness; solve DXT5-safe rewriting; in-game validate 22 retained candidates.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -217,9 +217,9 @@
       "status": "ready_for_ingame_validation"
     },
     "orientation_policy": "localization/graphics/ORIENTATION_POLICY.md",
-    "source_faithful_reviewed_assets": 20,
-    "source_faithful_localized_candidates": 17,
-    "source_faithful_reset_to_original": 3,
+    "source_faithful_reviewed_assets": 32,
+    "source_faithful_localized_candidates": 22,
+    "source_faithful_reset_to_original": 10,
     "source_faithful_batches": {
       "batch3": {
         "assets": 10,
@@ -243,10 +243,22 @@
       }
     },
     "pending_source_faithful_rework": [
+      "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
       "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
       "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
-      "textures/load/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds"
-    ]
+      "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+      "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+      "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+      "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+      "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+      "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+      "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds"
+    ],
+    "current_state_file": "localization/graphics/SOURCE_FAITHFUL_CURRENT.json",
+    "current_combined_package": {
+      "name": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B11v2_QA_Test.zip",
+      "sha256": "4831a754df8ef85cab0e8bb0d898ae38d76779eb2bc69c13494248bf044d58b3"
+    }
   },
   "data_build": {
     "draft_bin_entries": 1356,
