@@ -66,7 +66,7 @@ The retail path is now decoded beyond topology for several fields: the Type-7 Sp
 Still unresolved are the gameplay meanings of the retail ConstantForce source globals, additional vehicle-state/activation shaping around the periodic envelope, some effect-manager slot semantics, and the raw period field's physical unit. Therefore:
 
 - Condition/Spring and Damper parameters use recovered retail values with explicit user scaling;
-- the PS2 road periodic uses the recovered Type-4/Triangle shape, raw period curve, four-wheel surface-envelope family, `min(field_1C4,1)` factor, magnitude scale `50`, and raw start threshold `27`; later retail boost/ramp semantics remain explicitly unresolved;
+- the PS2 road periodic uses the recovered Type-4/Triangle shape, raw period curve, four-wheel surface-envelope family, verified 1.25 vehicle-state envelope boost, `min(field_1C4,1)` factor, magnitude scale `50`, and raw start threshold `27`; the car-field labels behind the boost remain intentionally unnamed;
 - F11 Road Detail `1.00` is the one-to-one host scaler around that recovered periodic envelope before Overall Strength and DD safety;
 - the recovered directional ConstantForce transport/cap remains documented, but PS2 Original emits no C2C collision force because no verified non-zero retail caller has been recovered;
 - no PS2 gear-shift pulse is synthesized without a verified retail caller;
