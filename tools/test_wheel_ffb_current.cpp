@@ -33,6 +33,11 @@ int main() {
  require(std::abs(crash_speed_drop_severity(.12f))<1e-6f,"crash fallback severity starts at zero");
  require(std::abs(crash_speed_drop_severity(.36f)-1.0f)<1e-6f,"crash fallback severity reaches one at captured large-impact bound");
  require(crash_speed_drop_severity(std::numeric_limits<float>::quiet_NaN())==0.0f,"crash fallback severity rejects NaN");
+ require(course_collision_timer_edge(30,0),"course collision 0->30 reload is an edge");
+ require(course_collision_timer_edge(29,12),"course collision high reload survives one-tick observation loss");
+ require(!course_collision_timer_edge(30,30),"steady course contact does not retrigger");
+ require(!course_collision_timer_edge(29,30),"countdown is not a new collision");
+ require(!course_collision_timer_edge(27,0),"low timer values are not fresh course impacts");
  require(std::abs(arcade_gear_sine_force(0,1.0f))<1e-6f,"arcade gear Sine starts at zero phase");
  require(arcade_gear_sine_force(4,1.0f)>0.09f,"arcade gear Sine reaches positive lobe near quarter cycle");
  require(arcade_gear_sine_force(11,1.0f)<-0.09f,"arcade gear Sine reaches negative lobe");
@@ -114,6 +119,10 @@ int main() {
  require(pneumatic_sat_shape(.32f)<.50f,"pneumatic trail falls in deep understeer");
  require(combined_sat_shape(.16f,.25f)<=1.000001f,"combined SAT bounded");
  require(mechanical_sat_shape(.12f,.25f)>0.10f,"mechanical trail acts in normal loaded corner");
+ require(std::abs(deep_slip_mechanical_trail_ratio(.12f,.25f)-.25f)<1e-6f,"normal-corner caster ratio is unchanged");
+ require(deep_slip_mechanical_trail_ratio(.32f,.25f)>.3124f&&deep_slip_mechanical_trail_ratio(.32f,.25f)<.3126f,"deep-slip caster ratio gains 25 percent");
+ require(std::abs(deep_slip_mechanical_trail_ratio(-.32f,.25f)-deep_slip_mechanical_trail_ratio(.32f,.25f))<1e-6f,"deep-slip caster boost is symmetric");
+ require(deep_slip_mechanical_trail_ratio(.32f,.60f)<=.600001f,"deep-slip caster boost respects mechanical cap");
  require(mechanical_sat_shape(.32f,.25f)>mechanical_sat_shape(.12f,.25f),"mechanical term follows front lateral force");
  require(combined_sat_shape(.32f,.25f)>pneumatic_sat_shape(.32f),"total trail preserves deep-slip torque");
  require(combined_sat_shape(.32f,0.0f)==pneumatic_sat_shape(.32f),"mechanical trail zero is pure pneumatic");
