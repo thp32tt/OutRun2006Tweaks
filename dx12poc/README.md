@@ -13,7 +13,9 @@ The probe now validates:
 5. `IDirect3DDevice9On12` and same-adapter identity;
 6. D3D9 render-target -> underlying `ID3D12Resource` ownership transfer;
 7. explicit fence-backed `ReturnUnderlyingResource`;
-8. legacy `IDirect3DDevice9::Reset` after interop resources are released.
+8. D3DPOOL_MANAGED texture/vertex-buffer creation and CPU Lock/Unlock;
+9. legacy `IDirect3DDevice9::Reset` after interop resources are released;
+10. MANAGED resources remain lockable after Reset, matching the legacy D3D9 contract OutRun expects.
 
 No native-D3D9 fallback is introduced here and no R56 HUD/world semantic logic is duplicated.
 
@@ -22,8 +24,10 @@ A successful runtime probe ends with:
 ```text
 d3d9on12_bridge=PASS
 legacy_create_device=PASS
+managed_resources_create=PASS
 resource_interop=PASS
 legacy_reset=PASS
+managed_resources_survive_reset=PASS
 DX12_POC_RESULT=PASS
 ```
 
