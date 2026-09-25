@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-26T07:54:00+09:00",
+  "updated_at_kst": "2026-09-26T08:16:00+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 30,
@@ -12,10 +12,9 @@
   ],
   "mandatory_policy": "localization/graphics/ORIENTATION_POLICY.md",
   "automation_checkpoint": {
-    "run": "D-20260926-0743",
-    "result": "batch21v3_c075_promoted",
-    "note": "C075FB49 v3 revalidated against original-DDS-first orientation/preserve/style/artifact/containment gates. 0 changed pixels outside allowed source text regions; protected Ferrari/model/logo artwork preserved. In-game validation remains pending.",
-    "mandatory_additional_gate": "translated glyph pixels must remain inside the original text region; reject clipping, overlap, or spill into adjacent sprite cells"
+    "run": "B-20260926-0816",
+    "result": "final_two_safe_hold",
+    "note": "37759842 and C598919A remain original. Existing rejection evidence fails manual artifact/style gates; no original/candidate DDS bytes were available for a repeatable safe rebuild."
   },
   "latest_promoted_batch": "localization/graphics/BATCH25V4_ACF_REWORK_REPORT.json",
   "latest_rejected_batch": "localization/graphics/BATCH17V3_REJECTED_REPORT.json",
@@ -24,5 +23,6 @@
     "localization/graphics/BATCH22_REJECTED_REPORT.json",
     "localization/graphics/BATCH19_REJECTED_REPORT.json",
     "localization/graphics/BATCH17V3_REJECTED_REPORT.json"
-  ]
+  ],
+  "latest_safe_hold_report": "localization/graphics/BATCH26_SAFE_HOLD_REPORT.json"
 }
