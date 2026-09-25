@@ -5,6 +5,11 @@
 
 #include <array>
 
+namespace OutRunVRRenderer
+{
+	bool GetRendererBaseView(float outMatrix[16]) noexcept;
+}
+
 namespace Settings
 {
 	extern Setting<bool> VREnabled;
@@ -62,6 +67,42 @@ class UIScaling : public Hook
 	// is redirected on its own rather than hooking either function.
 	static constexpr int RankMarker_SpraniCalls[] = { 0xBB0FB, 0xBB133, 0xBB16C, 0xBB1A5 };
 	static constexpr int RankMarker_ClipSpriteCalls[] = { 0xBB21F, 0xBB241, 0xBB271, 0xBB2BC, 0xBB2D0 };
+	static constexpr int DispRank_ClipSpriteCalls[] = {
+		0xB9F3A, 0xB9F5E, 0xB9F81, 0xB9FD0,
+		0xB9FFC, 0xBA01E, 0xBA035, 0xBA052
+	};
+
+	static int R56ProducerMode() noexcept
+	{
+		static const int mode = []() noexcept {
+			char text[8]{};
+			if (GetEnvironmentVariableA(
+					"OUTRUN_VR_PRODUCER_MODE",
+					text, static_cast<DWORD>(sizeof(text))) == 0)
+				return 0;
+			if (text[0] < '0' || text[0] > '4')
+				return 0;
+			return static_cast<int>(text[0] - '0');
+		}();
+		return mode;
+	}
+
+	static bool R56UseBaseCameraForRank() noexcept
+	{
+		const int mode = R56ProducerMode();
+		return mode == 2 || mode == 3 || mode == 4;
+	}
+
+	static bool R56OwnDispRankCalls() noexcept
+	{
+		const int mode = R56ProducerMode();
+		return mode == 1 || mode == 4;
+	}
+
+	static bool R56ScaleRankClipDigits() noexcept
+	{
+		return R56ProducerMode() == 3;
+	}
 
 	// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
 	static inline SafetyHookInline D3DXMatrixTransformation2D = {};
@@ -202,14 +243,54 @@ class UIScaling : public Hook
 
 	// Adjust positions of sprites in 3d space (eg 1st/2nd/etc markers)
 	static inline SafetyHookInline Calc3D2D_hk = {};
+	static bool R56ProjectRankWithBaseView(
+		float a1, float a2, const D3DVECTOR* in, D3DVECTOR* out) noexcept
+	{
+		if (!in || !out)
+			return false;
+		float raw[16]{};
+		if (!OutRunVRRenderer::GetRendererBaseView(raw))
+			return false;
+		D3DMATRIX view{};
+		std::memcpy(&view, raw, sizeof(view));
+
+		const float x =
+			in->x * view._11 + in->y * view._21 +
+			in->z * view._31 + view._41;
+		const float y =
+			in->x * view._12 + in->y * view._22 +
+			in->z * view._32 + view._42;
+		const float z =
+			in->x * view._13 + in->y * view._23 +
+			in->z * view._33 + view._43;
+		if (!std::isfinite(x) || !std::isfinite(y) ||
+			!std::isfinite(z) || std::fabs(z) <= 1.0e-5f)
+			return false;
+
+		const float inv = 1.0f / -z;
+		out->x = x * inv * a1;
+		out->y = y * inv * a2;
+		out->z = z;
+		return std::isfinite(out->x) && std::isfinite(out->y);
+	}
+
 	static void Calc3D2D_dest(float a1, float a2, D3DVECTOR* in, D3DVECTOR* out)
 	{
-		Calc3D2D_hk.call(a1, a2, in, out);
+		const auto returnAddress =
+			reinterpret_cast<std::uintptr_t>(_ReturnAddress());
+		const auto rankReturn =
+			reinterpret_cast<std::uintptr_t>(Module::exe_ptr<void>(0xBAEE7));
+		const bool rankProjection =
+			R56UseBaseCameraForRank() && returnAddress == rankReturn;
+
+		if (!rankProjection ||
+			!R56ProjectRankWithBaseView(a1, a2, in, out))
+		{
+			Calc3D2D_hk.call(a1, a2, in, out);
+		}
 
 		// TODO: OnlineArcade mode needs to add position here
-
 		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
-
 		if (mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade)
 			out->x = (out->x / Game::screen_scale->y) * Game::screen_scale->x;
 	};
@@ -282,10 +363,57 @@ class UIScaling : public Hook
 		{
 			node->args_10.float24 += RankMarkerFracX;
 			node->args_10.float28 += RankMarkerFracY;
+			if (R56ScaleRankClipDigits())
+			{
+				node->args_10.scaleX *= 0.35f;
+				node->args_10.scaleY *= 0.35f;
+			}
 			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
 				node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
 		}
 
+		return result;
+	}
+
+	static int __cdecl R56_DispRank_putClipSprite(
+		int xstnum, int x, int y, uint32_t flags,
+		float priority, uint32_t color)
+	{
+		// The original UIScaling hook at these eight CALL instructions adjusts
+		// only the X argument. Once R56 owns the CALL directly, preserve that
+		// exact OnlineArcade spacing here before invoking the stock producer.
+		ScalingMode scaling = ScalingMode(Settings::UIScalingMode.get());
+		if (scaling == ScalingMode::OnlineArcade)
+		{
+			float spacing =
+				-((Game::screen_scale->y * Game::original_resolution.x) -
+				  Game::screen_resolution->x) / 2.0f;
+			spacing /= Game::screen_scale->x;
+			x += static_cast<int>(std::round(spacing));
+		}
+
+		int prio = static_cast<int>(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount
+				? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* before = root ? root->tail_4 : nullptr;
+
+		const int result =
+			Game::put_clip_sprite(xstnum, x, y, flags, priority, color);
+
+		root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (node && node != before)
+		{
+			// Intentionally obvious producer-level proof: this affects the
+			// actual 6th/6 POSITION clip-sprite node before any generic R30
+			// classification. Preserve dynamic alpha/color unchanged.
+			node->args_10.scaleX *= 0.35f;
+			node->args_10.scaleY *= 0.35f;
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		}
 		return result;
 	}
 
@@ -625,6 +753,11 @@ public:
 		D3DXMatrixTransformation2D = safetyhook::create_inline(Module::exe_ptr(D3DXMatrixTransformation2D_Addr), D3DXMatrixTransformation2D_dest);
 
 		Calc3D2D_hk = safetyhook::create_inline(Module::exe_ptr(Calc3D2D_Addr), Calc3D2D_dest);
+		spdlog::info(
+			"VR R56 producer split active mode={} baseCameraRank={} directDispRank={} scaleRankClip35={}",
+			R56ProducerMode(), R56UseBaseCameraForRank() ? 1 : 0,
+			R56OwnDispRankCalls() ? 1 : 0,
+			R56ScaleRankClipDigits() ? 1 : 0);
 
 		RankMarker_Truncate_hk = safetyhook::create_mid(Module::exe_ptr(RankMarker_Truncate), RankMarker_Truncate_dest);
 		for (int addr : RankMarker_SpraniCalls)
@@ -684,14 +817,26 @@ public:
 		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, put_scroll_AdjustPositionRight);
 		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, put_scroll_AdjustPositionRight);
 
-		DispRank_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9F3A, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4B9F5E, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4B9F81, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4B9FD0, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4B9FFC, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BA01E, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BA035, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BA052, put_scroll_AdjustPositionRight);
+		if (R56OwnDispRankCalls())
+		{
+			for (int addr : DispRank_ClipSpriteCalls)
+				Memory::VP::InjectHook(
+					Module::exe_ptr(addr), R56_DispRank_putClipSprite,
+					Memory::HookType::Call);
+			spdlog::info(
+				"VR R56 producer split: DispRank eight put_clip_sprite CALLs are directly owned; dynamic alpha preserved; node scale forced to 35% for visibility proof");
+		}
+		else
+		{
+			DispRank_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9F3A, put_scroll_AdjustPositionRight);
+			DispRank_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4B9F5E, put_scroll_AdjustPositionRight);
+			DispRank_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4B9F81, put_scroll_AdjustPositionRight);
+			DispRank_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4B9FD0, put_scroll_AdjustPositionRight);
+			DispRank_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4B9FFC, put_scroll_AdjustPositionRight);
+			DispRank_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BA01E, put_scroll_AdjustPositionRight);
+			DispRank_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BA035, put_scroll_AdjustPositionRight);
+			DispRank_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BA052, put_scroll_AdjustPositionRight);
+		}
 
 		// REV indicator
 		DispGearPosition_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9096, put_scroll_AdjustPositionLeft);
@@ -788,6 +933,10 @@ class VRHudQueueSemanticBridge : public Hook
 {
 	inline static SafetyHookMid QueueNode_hk{};
 	inline static SafetyHookMid QueueEnd_hk{};
+	inline static std::uint64_t QueuePasses = 0;
+	inline static std::uint64_t LastRegistered = 0;
+	inline static std::uint64_t LastConsumed = 0;
+	inline static std::uint64_t LastStaleCleared = 0;
 
 	static void QueueNode(SafetyHookContext& ctx)
 	{
@@ -798,6 +947,31 @@ class VRHudQueueSemanticBridge : public Hook
 	static void QueueEnd(SafetyHookContext&)
 	{
 		OutRunVR::GameSemantic::EndSpriteQueueRender();
+		++QueuePasses;
+		if ((QueuePasses % 300u) != 0)
+			return;
+
+		const auto registered =
+			OutRunVR::GameSemantic::SpriteNodeSemanticRegistered.load(
+				std::memory_order_relaxed);
+		const auto consumed =
+			OutRunVR::GameSemantic::SpriteNodeSemanticConsumed.load(
+				std::memory_order_relaxed);
+		const auto staleCleared =
+			OutRunVR::GameSemantic::SpriteNodeSemanticStaleCleared.load(
+				std::memory_order_relaxed);
+		if (registered != LastRegistered ||
+			consumed != LastConsumed ||
+			staleCleared != LastStaleCleared)
+		{
+			spdlog::info(
+				"VR HUD SEMANTIC R53: queuePass={} registered={} consumed={} staleCleared={} deltaRegistered={} deltaConsumed={}",
+				QueuePasses, registered, consumed, staleCleared,
+				registered - LastRegistered, consumed - LastConsumed);
+			LastRegistered = registered;
+			LastConsumed = consumed;
+			LastStaleCleared = staleCleared;
+		}
 	}
 
 public:
@@ -813,6 +987,15 @@ public:
 
 	bool apply() override
 	{
+		char modeText[8]{};
+		int experimentMode = 0;
+		if (GetEnvironmentVariableA(
+				"OUTRUN_VR_HUD_EXPERIMENT_MODE",
+				modeText, static_cast<DWORD>(sizeof(modeText))) > 0 &&
+			modeText[0] >= '0' && modeText[0] <= '4')
+			experimentMode = modeText[0] - '0';
+		OutRunVR::GameSemantic::SetHudExperimentMode(experimentMode);
+
 		QueueNode_hk = safetyhook::create_mid(
 			Module::exe_ptr(0x2D762), QueueNode);
 		QueueEnd_hk = safetyhook::create_mid(
@@ -829,7 +1012,7 @@ public:
 		if (ok)
 		{
 			spdlog::info(
-				"VR HUD SEMANTIC R50: sprite queue node 0x2D762 selects explicit tags; untagged nodes use SCREEN_OVERLAY_2D FOV-only alignment; unsafe 0x2D734 entry hook is forbidden; original-mod tagged rival nodes remain WORLD_BILLBOARD");
+				"VR HUD SEMANTIC R54: experimentMode={} sprite queue node 0x2D762 consumes explicit tags; mode1=next-draw latch mode2=sticky mode3=full owner mode4=full HUD-plane", experimentMode);
 		}
 		else
 		{
