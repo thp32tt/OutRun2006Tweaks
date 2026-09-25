@@ -234,3 +234,15 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Later local B12-B15 experimental DDS outputs are not persisted in Git, so this run did not promote them without repeatable source-vs-result validation.
 - Canonical state remains 32 reviewed / 22 retained / 10 reset-to-original pending safe rework.
 - Added mandatory boundary gate: replacement Korean glyph pixels must remain inside the original text region or sprite cell; clipping, overlap, or spill into adjacent cells is a hard reject.
+
+
+## 2026-09-26 07:04 KST - BATCH12V2 PROMOTION
+
+- Re-ran the full graphics QA checklist against the original DDS for the four DXT5 candidates.
+- Enforced the new original-text-region containment gate.
+- Corrected `49BB5FE5_128x32.dds`: its previous rightmost capsule exceeded the original overall alpha bbox by 2 pixels; Batch12v2 shrinks it back inside the source bounds.
+- Promoted after QA: `39BCA907`, `49BB5FE5`, `42E618FD`, `7CE1CFC5`.
+- All four preserve original dimensions and the original 128-byte DDS header; candidate alpha bbox is contained inside the source alpha bbox.
+- Current checkpoint: **32 reviewed / 26 retained / 6 pending**.
+- Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B12v2_QA_Test.zip`.
+- SHA-256: `806579f71f09211e942a54c5c9b3817a08ac0f496dd80ade53b695c9d6e9a6d3`.
