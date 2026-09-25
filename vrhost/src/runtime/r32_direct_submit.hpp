@@ -31,7 +31,7 @@
 namespace OutRunVrR32DirectSubmit
 {
     inline constexpr const char* BuildId =
-        "R45-direct-recenter-live-projection-20260920";
+        "R56-backend-hardening-r3-20260926";
 
     enum class FastRejectReason : std::uint8_t
     {
