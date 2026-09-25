@@ -725,6 +725,11 @@ public:
 		D3DXMatrixTransformation2D = safetyhook::create_inline(Module::exe_ptr(D3DXMatrixTransformation2D_Addr), D3DXMatrixTransformation2D_dest);
 
 		Calc3D2D_hk = safetyhook::create_inline(Module::exe_ptr(Calc3D2D_Addr), Calc3D2D_dest);
+		spdlog::info(
+			"VR R56 producer split active mode={} baseCameraRank={} directDispRank={} scaleRankClip35={}",
+			R56ProducerMode(), R56UseBaseCameraForRank() ? 1 : 0,
+			R56OwnDispRankCalls() ? 1 : 0,
+			R56ScaleRankClipDigits() ? 1 : 0);
 
 		RankMarker_Truncate_hk = safetyhook::create_mid(Module::exe_ptr(RankMarker_Truncate), RankMarker_Truncate_dest);
 		for (int addr : RankMarker_SpraniCalls)
@@ -784,14 +789,26 @@ public:
 		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, put_scroll_AdjustPositionRight);
 		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, put_scroll_AdjustPositionRight);
 
-		DispRank_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9F3A, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4B9F5E, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4B9F81, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4B9FD0, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4B9FFC, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BA01E, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BA035, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BA052, put_scroll_AdjustPositionRight);
+		if (R56OwnDispRankCalls())
+		{
+			for (int addr : DispRank_ClipSpriteCalls)
+				Memory::VP::InjectHook(
+					Module::exe_ptr(addr), R56_DispRank_putClipSprite,
+					Memory::HookType::Call);
+			spdlog::info(
+				"VR R56 producer split: DispRank eight put_clip_sprite CALLs are directly owned; dynamic alpha preserved; node scale forced to 35% for visibility proof");
+		}
+		else
+		{
+			DispRank_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9F3A, put_scroll_AdjustPositionRight);
+			DispRank_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4B9F5E, put_scroll_AdjustPositionRight);
+			DispRank_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4B9F81, put_scroll_AdjustPositionRight);
+			DispRank_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4B9FD0, put_scroll_AdjustPositionRight);
+			DispRank_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4B9FFC, put_scroll_AdjustPositionRight);
+			DispRank_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BA01E, put_scroll_AdjustPositionRight);
+			DispRank_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BA035, put_scroll_AdjustPositionRight);
+			DispRank_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BA052, put_scroll_AdjustPositionRight);
+		}
 
 		// REV indicator
 		DispGearPosition_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9096, put_scroll_AdjustPositionLeft);
