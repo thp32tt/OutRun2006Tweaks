@@ -125,6 +125,8 @@ This proves a directional constant-force cap of `220/255`, but a deeper static c
 
 That does **not** prove that a computed/indirect caller is impossible, but it removes the evidentiary basis for mapping C2C collision detection to the retail ConstantForce transport. PS2 Original therefore keeps the transport/cap documented for future recovery while emitting no collision ConstantForce until a non-zero retail event caller is verified. Modern DD collision and Lindbergh Arcade wall-event behavior are unaffected.
 
+A follow-up whole-ELF static audit found no literal 32-bit pointer to `0x00132A28`, no additional direct JAL caller, and no second absolute writer to `0x00349528 / 0x0034952C`. This strengthens the static boundary but still cannot exclude a computed/indirect call produced at runtime. Further progress on this lane requires dynamic execution tracing/emulation or new binary evidence rather than more direct-call scanning.
+
 ### Periodic — Type 4 / Triangle
 
 The main path at `0x00133328..0x00133384` requests effect Type `4`. Contemporary Logitech `liblgdev` ABI material identifies Type 4 as **Triangle**.
