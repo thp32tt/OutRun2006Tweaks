@@ -717,3 +717,19 @@ req(profiles, 'ec == std::errc::no_such_file_or_directory', 'missing profile is 
 req(profiles, 'inspect_regular_file(finalPath, finalExists, "the existing profile")', 'final profile existence check uses missing-safe helper')
 req(profiles, 'inspect_regular_file(backup, backupExists, "the profile backup")', 'backup existence check uses missing-safe helper')
 forbid(profiles, 'if (!finalExists && std::filesystem::is_regular_file(backup, ec) && !ec)', 'backup probe no longer treats missing backup as filesystem failure')
+
+
+# r4-arcade-wall-ps2-caster regression guards
+req(ffb, '"WheelFFB", "InvertForce", false', 'clean-install ConstantForce direction baseline is Reverse OFF')
+req(wheel_ui, 'Settings::WheelFFBInvertForce = false;', 'reference presets explicitly restore Reverse OFF')
+req(ffb, 'Setting<float> WheelFFBPS2HostGain', 'PS2 has an independent host-side DD compensation gain')
+req(ffb, 'const float modelOutputStrength =', 'PS2 host gain is applied at the host/output boundary')
+req(wheel_ui, '"PS2 Host Gain"', 'F11 exposes PS2 host gain separately from recovered retail formulas')
+req(math, 'deep_slip_mechanical_trail_ratio(', 'Modern Physics SAT has bounded deep-slip mechanical/caster reinforcement')
+req(ffb, 'const float effectiveMechanicalTrail =', 'runtime consumes deep-slip mechanical/caster reinforcement')
+req(math, 'course_collision_timer_edge(', 'course/wall collision timer edge helper exists')
+req(ffb, 'car->field_coli_281, car->field_282, car->field_283', 'runtime samples dedicated C2C course-collision witnesses')
+req(ffb, '"WheelFFB: course/wall collision edge timer={}', 'dedicated course/wall edge is diagnostic and testable')
+req(stage_map, 'field_283', 'stage/collision map records the dedicated course-collision timer witness')
+req(read('docs/reverse/LINDBERGH_FFB_MAP.md'), 'ffwall = 0x08273FAC', 'Fake ffwall evidence is documented without promoting it as a force signal')
+print('OK [R4 arcade wall / PS2 host gain / deep-slip caster guards]')
