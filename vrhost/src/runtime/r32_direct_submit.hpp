@@ -144,6 +144,19 @@ namespace OutRunVrR32DirectSubmit
         ActiveAckGeneration = generation;
         AckedFrame.fill(0);
         AckedGeneration.fill(0);
+        for (auto& skipped : SkippedRelease)
+        {
+            if (!skipped.pending)
+                continue;
+            const std::uint32_t queuedGeneration =
+                skipped.frame.reserved[
+                    OutRunVR::RenderFrameDirectGenerationIndex];
+            if (queuedGeneration != generation)
+            {
+                skipped.pending = false;
+                skipped.frame = {};
+            }
+        }
     }
 
     inline bool EnsureFence(std::uint32_t slot) noexcept
@@ -183,6 +196,8 @@ namespace OutRunVrR32DirectSubmit
         const std::uint32_t generation =
             frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
         if (slot >= SkippedRelease.size() || !generation || !frame.frameId)
+            return false;
+        if (ActiveAckGeneration != 0 && generation != ActiveAckGeneration)
             return false;
 
         if (HasPendingConsumption(frame))
@@ -224,7 +239,12 @@ namespace OutRunVrR32DirectSubmit
             auto& skipped = SkippedRelease[slot];
             if (!skipped.pending)
                 continue;
-            if (!OutRunVrD3D9ExDirectPassthrough::FrameRunIdentityCurrent(
+            const std::uint32_t generation =
+                skipped.frame.reserved[
+                    OutRunVR::RenderFrameDirectGenerationIndex];
+            if ((ActiveAckGeneration != 0 &&
+                 generation != ActiveAckGeneration) ||
+                !OutRunVrD3D9ExDirectPassthrough::FrameRunIdentityCurrent(
                     skipped.frame))
             {
                 skipped.pending = false;
