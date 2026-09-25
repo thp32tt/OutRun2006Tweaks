@@ -1,0 +1,38 @@
+{
+  "batch": "27-safe-hold-final-two",
+  "checked_at_kst": "2026-09-26T08:31:00+09:00",
+  "branch": "korean-localization-clean",
+  "checkpoint_before": {
+    "reviewed": 32,
+    "retained": 30,
+    "pending": 2
+  },
+  "assets": [
+    {
+      "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+      "status": "keep_original",
+      "evidence": "BATCH17V3_REJECTED_REPORT.json",
+      "reason": "Residual English and gradient/icon restoration seams remain in the last verified candidate. Original/candidate DDS bytes were not found in current accessible conversation/library search, so no repeatable safe pixel rebuild can be performed."
+    },
+    {
+      "asset": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
+      "status": "keep_original",
+      "evidence": "BATCH22_REJECTED_REPORT.json",
+      "reason": "Block-level containment passed previously, but residual English/clipped styling remains. Original/candidate DDS bytes were not found in current accessible conversation/library search, so larger-label DXT5 repatching cannot be safely reproduced."
+    }
+  ],
+  "checklist": {
+    "original_dds_orientation": "required_not_reconstructed_from_draft",
+    "protected_vehicle_brand_logo_song_legal": "required",
+    "source_style_fidelity": "required",
+    "original_text_region_containment": "required",
+    "artifact_cleanliness": "required",
+    "unsafe_edits_integrated": false
+  },
+  "checkpoint_after": {
+    "reviewed": 32,
+    "retained": 30,
+    "pending": 2
+  },
+  "next": "Resume only when original analysis archive or exact original DDS bytes are accessible; then rebuild 37759842 first and C598919A second."
+}
