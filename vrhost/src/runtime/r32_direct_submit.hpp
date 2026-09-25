@@ -59,7 +59,15 @@ namespace OutRunVrR32DirectSubmit
         OutRunVR::SharedRenderFrameState frame{};
     };
 
+    struct PendingSkippedRelease
+    {
+        bool pending = false;
+        OutRunVR::SharedRenderFrameState frame{};
+    };
+
     inline std::array<PendingAck, OutRunVR::RenderFrameRingSize> Pending{};
+    inline std::array<PendingSkippedRelease, OutRunVR::RenderFrameRingSize>
+        SkippedRelease{};
     inline std::array<std::uint32_t, OutRunVR::RenderFrameRingSize> AckedFrame{};
     inline std::array<std::uint32_t, OutRunVR::RenderFrameRingSize> AckedGeneration{};
     inline std::uint64_t FastDirectSubmits = 0;
@@ -71,6 +79,9 @@ namespace OutRunVrR32DirectSubmit
     inline std::uint64_t AckFlushEscalations = 0;
     inline std::uint64_t AckQueryErrors = 0;
     inline std::uint64_t AckSameFramePendingReuse = 0;
+    inline std::uint64_t SkippedReleaseQueued = 0;
+    inline std::uint64_t SkippedReleaseCompleted = 0;
+    inline std::uint64_t SkippedReleaseRetry = 0;
     inline std::array<std::uint64_t,
         static_cast<std::size_t>(FastRejectReason::Count)> RejectReasons{};
     inline std::uint32_t AckFaultGeneration = 0;
@@ -113,6 +124,11 @@ namespace OutRunVrR32DirectSubmit
             pending.flushIssued = false;
             pending.frame = {};
         }
+        for (auto& skipped : SkippedRelease)
+        {
+            skipped.pending = false;
+            skipped.frame = {};
+        }
         AckedFrame.fill(0);
         AckedGeneration.fill(0);
         AckFaultGeneration = 0;
@@ -143,8 +159,100 @@ namespace OutRunVrR32DirectSubmit
             &desc, &pending.fence)) && pending.fence;
     }
 
+    inline bool HasPendingConsumption(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        const std::uint32_t slot =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        if (slot >= Pending.size() || !generation || !frame.frameId)
+            return false;
+        const auto& pending = Pending[slot];
+        return pending.armed &&
+            pending.frame.frameId == frame.frameId &&
+            pending.frame.reserved[
+                OutRunVR::RenderFrameDirectGenerationIndex] == generation;
+    }
+
+    inline bool QueueSkippedRelease(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        const std::uint32_t slot =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        if (slot >= SkippedRelease.size() || !generation || !frame.frameId)
+            return false;
+
+        if (HasPendingConsumption(frame))
+            return false;
+
+        if (OutRunVrD3D9ExDirectPassthrough::PublishCompletedFrame(frame))
+        {
+            AckedFrame[slot] = frame.frameId;
+            AckedGeneration[slot] = generation;
+            ++SkippedReleaseCompleted;
+            return true;
+        }
+
+        auto& skipped = SkippedRelease[slot];
+        if (skipped.pending)
+        {
+            // Never overwrite a still-current release owner for the same slot.
+            // If it belongs to an obsolete game run, it can be retired now.
+            if (OutRunVrD3D9ExDirectPassthrough::FrameRunIdentityCurrent(
+                    skipped.frame))
+            {
+                ++SkippedReleaseRetry;
+                return false;
+            }
+            skipped.pending = false;
+            skipped.frame = {};
+        }
+
+        skipped.pending = true;
+        skipped.frame = frame;
+        ++SkippedReleaseQueued;
+        return false;
+    }
+
+    inline void PollSkippedReleases() noexcept
+    {
+        for (std::size_t slot = 0; slot < SkippedRelease.size(); ++slot)
+        {
+            auto& skipped = SkippedRelease[slot];
+            if (!skipped.pending)
+                continue;
+            if (!OutRunVrD3D9ExDirectPassthrough::FrameRunIdentityCurrent(
+                    skipped.frame))
+            {
+                skipped.pending = false;
+                skipped.frame = {};
+                continue;
+            }
+            if (!OutRunVrD3D9ExDirectPassthrough::PublishCompletedFrame(
+                    skipped.frame))
+            {
+                ++SkippedReleaseRetry;
+                continue;
+            }
+
+            AckedFrame[slot] = skipped.frame.frameId;
+            AckedGeneration[slot] = skipped.frame.reserved[
+                OutRunVR::RenderFrameDirectGenerationIndex];
+            skipped.pending = false;
+            skipped.frame = {};
+            ++SkippedReleaseCompleted;
+        }
+    }
+
     inline void PollCompletedAcks() noexcept
     {
+        // Skipped frames never touched D3D11, so their ACK retry does not
+        // require a graphics context and can still complete during session
+        // transitions. Touched frames below remain EVENT-gated.
+        PollSkippedReleases();
         if (!OutRunVrFinalTest::Context)
             return;
         for (auto& pending : Pending)
