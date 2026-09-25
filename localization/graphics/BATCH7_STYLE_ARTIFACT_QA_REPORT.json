@@ -1,0 +1,18 @@
+{
+  "batch": "7-style-artifact-qa",
+  "package_sha256": "c1b8f1e2963f4ede89f11fe263fa962292b74f725931cb83c00acf561f0064a1",
+  "added_gates": [
+    "style fidelity to original",
+    "no stray black lines",
+    "no crop seams",
+    "no text-erasure residue"
+  ],
+  "reset_to_original": [
+    "textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
+    "textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+    "textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+    "textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds",
+    "textures/load/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+    "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds"
+  ]
+}
