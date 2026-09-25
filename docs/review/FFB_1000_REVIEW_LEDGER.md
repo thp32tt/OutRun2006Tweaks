@@ -38,8 +38,9 @@ A cycle is counted only after its assigned source/concern has been inspected and
 | C0024 | PS2 ConstantForce source-global caller recovery | COMPLETE | `FFB-R0024-F01`: PC PS2 mode injected C2C collision into a retail transport with no verified non-zero caller; synthetic collision output removed and F11 Collision disabled for PS2 Original | Setter 0x132A28 + direct callers 0x132AF4/0x132DB4; source/UI/verifier/docs updated |
 | C0025 | PS2 IOP Logitech module search in supplied assets | COMPLETE / BINARY_BLOCKED | No PC defect; IOPRP ROMDIR has no LGDEV/USBD and DRIVER.PS2 is a packed asset, not an IRX container | IOPRP310.IMG + DRIVER.PS2 binary/signature/string inspection; LGDEV.IRX still required |
 | C0026 | PS2 Type-4 remaining surface-envelope writes | COMPLETE | `FFB-R0026-F01`: PC omitted retail roughness*1.25 vehicle-state boost and clipped valid 1.125 envelope to 1.0; helper/runtime/tests/verifier corrected | SLPM 0x1D811C, 0x1D81BC, 0x1D8268 -> consume 0x132E94; exact-head CI pending |
+| C0027 | PS2 non-Type-4 transient-channel ownership | COMPLETE | No PC defect; remaining producer channels match controller-rumble logic and pad output is zeroed under wheel ownership, so they must not be imported as steering torque | SLPM 0x1D7F70 producer + 0x102460 pad output compared with Xbox CalcVibrationValues |
 
-Completed cycles: **26 / 1000**
+Completed cycles: **27 / 1000**
 
 ## Findings
 
@@ -62,4 +63,4 @@ Completed cycles: **26 / 1000**
 
 ## Next review
 
-Resume at **C0027**. Continue distinct source/behavior slices and record a cycle only after inspection plus ledger/Issue documentation. Highest-value PS2 targets are semantic classification of the remaining non-Type-4 transient channels, any hidden ConstantForce source caller, and runtime hardware validation; the IOP lane remains BINARY_BLOCKED until disc-local `LGDEV.IRX` is supplied.
+Resume at **C0028**. Continue distinct source/behavior slices and record a cycle only after inspection plus ledger/Issue documentation. Highest-value remaining work is exact-head validation plus hardware telemetry/A-B validation of the recovered PS2 road envelope; the IOP lane remains BINARY_BLOCKED until disc-local `LGDEV.IRX` is supplied.
