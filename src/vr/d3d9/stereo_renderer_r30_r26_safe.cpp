@@ -1209,6 +1209,27 @@ namespace OutRunVRStereo
             return mode;
         }
 
+        int R56HudProbeMode() noexcept
+        {
+            static const int mode = []() noexcept {
+                char text[8]{};
+                const DWORD len = GetEnvironmentVariableA(
+                    "OUTRUN_VR_HUD_PROBE", text,
+                    static_cast<DWORD>(sizeof(text)));
+                if (len == 0 || len >= sizeof(text))
+                    return 0;
+                int value = 0;
+                for (DWORD i = 0; i < len; ++i)
+                {
+                    if (text[i] < '0' || text[i] > '9')
+                        return 0;
+                    value = value * 10 + int(text[i] - '0');
+                }
+                return (value >= 1 && value <= 20) ? value : 0;
+            }();
+            return mode;
+        }
+
         float R30HudAspectCompensation(
             const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
         {
@@ -2400,7 +2421,17 @@ namespace OutRunVRStereo
                 float correctedX = 0.0f;
                 float correctedY = 0.0f;
                 const int coordMode = R55HudCoordMode();
-                if (state.worldEffect)
+                const int probeMode = R56HudProbeMode();
+                // R56-20 is the broadest ownership falsification: every R30
+                // screen-space draw, including exact rank billboards, receives
+                // identical source NDC in both eyes. If a visible element still
+                // ignores this case it is outside the R30 XYZRHW owner.
+                if (probeMode == 20)
+                {
+                    correctedX = ndcX;
+                    correctedY = ndcY;
+                }
+                else if (state.worldEffect)
                 {
                     // R55-D isolates exact rival rank-marker visibility: keep
                     // the original 2D position identical in both eyes. If 4th/
@@ -3182,6 +3213,14 @@ namespace OutRunVRStereo
                 return false;
 
             const int coordMode = R55HudCoordMode();
+            const int probeMode = R56HudProbeMode();
+            if (probeMode == 20)
+            {
+                const D3DMATRIX stockT = TransposeMatrix(stockWvp);
+                std::memcpy(eyeConstants[0], &stockT, sizeof(stockT));
+                std::memcpy(eyeConstants[1], &stockT, sizeof(stockT));
+                return true;
+            }
             if (screenKind == R30ScreenSpaceKind::WorldBillboard &&
                 coordMode == 4)
             {
@@ -3803,8 +3842,8 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R55 HUD: coordMode={} canonical queue semantics active; mode1=raw-zero-disparity mode2=raw-35pct mode3=world-plane-35pct mode4=world-plane-35pct+rank-zero; configured HudScale={:.2f}",
-                        R55HudCoordMode(), R30HudScaleValue());
+                        "VR R56 HUD: coordMode={} probeMode={} canonical queue semantics active; probe20=all-R30-screen raw identical; configured HudScale={:.2f}",
+                        R55HudCoordMode(), R56HudProbeMode(), R30HudScaleValue());
                     return 0;
                 }
                 Sleep(25);
