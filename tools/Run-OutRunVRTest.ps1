@@ -53,13 +53,20 @@ $backend=$kv.backend
 if(!$backend){throw 'Active backend identity is missing.'}
 $variant=if($kv.variant){[string]$kv.variant}else{'AUTO'}
 $semanticMode='0'
+$hudExperimentMode='0'
 switch($variant){
-    'X_SCREEN_HUD' { $semanticMode='1' }
-    'X_WORLD_RANK' { $semanticMode='2' }
-    'X_COMBINED'   { $semanticMode='3' }
+    'X_SCREEN_HUD'       { $semanticMode='1' }
+    'X_WORLD_RANK'       { $semanticMode='2' }
+    'X_COMBINED'         { $semanticMode='3' }
+    'R54_A_NEXTDRAW'     { $semanticMode='3'; $hudExperimentMode='1' }
+    'R54_B_STICKY'       { $semanticMode='3'; $hudExperimentMode='2' }
+    'R54_C_FULL_OWNER'   { $semanticMode='3'; $hudExperimentMode='3' }
+    'R54_D_HUD_PLANE'    { $semanticMode='3'; $hudExperimentMode='4' }
 }
 $oldExeSemanticMode=$env:OUTRUN_VR_EXE_SEMANTIC_MODE
+$oldHudExperimentMode=$env:OUTRUN_VR_HUD_EXPERIMENT_MODE
 $env:OUTRUN_VR_EXE_SEMANTIC_MODE=$semanticMode
+$env:OUTRUN_VR_HUD_EXPERIMENT_MODE=$hudExperimentMode
 
 $patterns=@(
     'OutRun2006Tweaks*.log',
@@ -170,6 +177,7 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "exeSha256=$exeSha256"
     "exeSemanticIdentityVerified=$semanticIdentityVerified"
     "exeSemanticMode=$semanticMode"
+    "hudExperimentMode=$hudExperimentMode"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
 Write-Host "Runtime overrides: $($gameArgs -join ' ')"
 
@@ -243,6 +251,7 @@ try{
     $env:OUTRUN_VR_SHADER_FINGERPRINT=$oldShaderFingerprint
     $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED=$oldExeSemanticVerified
     $env:OUTRUN_VR_EXE_SEMANTIC_MODE=$oldExeSemanticMode
+    $env:OUTRUN_VR_HUD_EXPERIMENT_MODE=$oldHudExperimentMode
     foreach($key in $identityKeys){
         [Environment]::SetEnvironmentVariable($key,$oldIdentity[$key],'Process')
     }
