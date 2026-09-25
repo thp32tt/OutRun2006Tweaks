@@ -1,13 +1,24 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
+#include <algorithm>
+#include <array>
 #include <bitset>
+#include <cstdarg>
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
+#include <fstream>
 #include <mutex>
+#include <sstream>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
+#include <imgui.h>
+
+#include "game_addrs.hpp"
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 
@@ -36,7 +47,367 @@ namespace Settings
         "K3 research trace. Logs a limited set of text-width strings and glyph bytes "
         "without changing layout or rendering."
     };
+
+    Setting<bool> KoreanTextOverlayTest{
+        "Localization",
+        "KoreanTextOverlayTest",
+        false,
+        "Experimental full Korean text test renderer. Tracks stock text IDs, suppresses "
+        "their English glyph output, and redraws Korean UTF-8 text through the existing "
+        "D3D9 ImGui overlay. Requires Overlay.Enabled=true."
+    };
 }
+
+
+namespace KoreanRuntime
+{
+    static constexpr size_t TextEntryCount = 1356;
+    static constexpr size_t MaxQueuedDraws = 1024;
+    static constexpr size_t MaxFormattedBytes = 4096;
+
+    struct DrawCommand
+    {
+        std::string text;
+        int16_t x = 0;
+        int16_t y = 0;
+        int16_t cellHeight = 16;
+        float scaleY = 1.0f;
+        uint32_t color = 0xFFFFFFFF;
+        uint32_t flags = 1;
+    };
+
+    inline static std::array<std::string, TextEntryCount> Translations{};
+    inline static bool TranslationsLoaded = false;
+    inline static std::unordered_map<const char*, uint32_t> PointerToId{};
+    inline static std::unordered_map<std::string, uint32_t> TextToId{};
+    inline static std::mutex StateMutex{};
+    inline static std::vector<DrawCommand> DrawQueue{};
+
+    static std::string UnescapeField(const std::string& input)
+    {
+        std::string out;
+        out.reserve(input.size());
+        for (size_t i = 0; i < input.size(); ++i)
+        {
+            if (input[i] != '\\' || i + 1 >= input.size())
+            {
+                out.push_back(input[i]);
+                continue;
+            }
+
+            const char next = input[++i];
+            switch (next)
+            {
+            case 'n': out.push_back('\n'); break;
+            case 'r': out.push_back('\r'); break;
+            case 't': out.push_back('\t'); break;
+            case '\\': out.push_back('\\'); break;
+            default:
+                out.push_back('\\');
+                out.push_back(next);
+                break;
+            }
+        }
+        return out;
+    }
+
+    static bool LoadTranslations()
+    {
+        if (TranslationsLoaded)
+            return true;
+
+        const std::filesystem::path candidates[] = {
+            Module::DllPath.parent_path() / "localization" / "text" / "runtime_ko.tsv",
+            Module::DllPath.parent_path() / "runtime_ko.tsv"
+        };
+
+        std::ifstream file;
+        std::filesystem::path loadedPath;
+        for (const auto& path : candidates)
+        {
+            file.open(path, std::ios::binary);
+            if (file)
+            {
+                loadedPath = path;
+                break;
+            }
+            file.clear();
+        }
+
+        if (!file)
+        {
+            spdlog::error(
+                "KoreanTextOverlayTest: runtime_ko.tsv was not found next to the DLL; "
+                "leaving stock English text untouched");
+            return false;
+        }
+
+        size_t loaded = 0;
+        std::string line;
+        while (std::getline(file, line))
+        {
+            if (!line.empty() && line.back() == '\r')
+                line.pop_back();
+
+            const size_t tab = line.find('\t');
+            if (tab == std::string::npos)
+                continue;
+
+            try
+            {
+                const uint32_t id = static_cast<uint32_t>(std::stoul(line.substr(0, tab)));
+                if (id >= TextEntryCount)
+                    continue;
+
+                Translations[id] = UnescapeField(line.substr(tab + 1));
+                if (!Translations[id].empty())
+                    ++loaded;
+            }
+            catch (...)
+            {
+                continue;
+            }
+        }
+
+        TranslationsLoaded = loaded > 0;
+        if (TranslationsLoaded)
+        {
+            spdlog::info(
+                "KoreanTextOverlayTest: loaded {} Korean text rows from '{}'",
+                loaded,
+                loadedPath.string());
+        }
+        return TranslationsLoaded;
+    }
+
+    static void RememberText(uint32_t id, const char* text)
+    {
+        if (!Settings::KoreanTextOverlayTest || !text || id >= TextEntryCount)
+            return;
+        if (!TranslationsLoaded || Translations[id].empty())
+            return;
+
+        std::scoped_lock lock(StateMutex);
+        PointerToId[text] = id;
+        TextToId.emplace(std::string(text), id);
+    }
+
+    static bool ResolveTextId(const char* text, uint32_t& id)
+    {
+        if (!text)
+            return false;
+
+        std::scoped_lock lock(StateMutex);
+
+        if (const auto it = PointerToId.find(text); it != PointerToId.end())
+        {
+            id = it->second;
+            return id < TextEntryCount && !Translations[id].empty();
+        }
+
+        if (const auto it = TextToId.find(std::string(text)); it != TextToId.end())
+        {
+            id = it->second;
+            return id < TextEntryCount && !Translations[id].empty();
+        }
+
+        return false;
+    }
+
+    static std::string FormatTranslation(const std::string& format, uintptr_t firstArgAddress)
+    {
+        if (format.find('%') == std::string::npos)
+            return format;
+
+        char buffer[MaxFormattedBytes]{};
+#if defined(_M_IX86)
+        va_list args = reinterpret_cast<va_list>(firstArgAddress);
+        const int result = _vsnprintf_s(
+            buffer,
+            sizeof(buffer),
+            _TRUNCATE,
+            format.c_str(),
+            args);
+        if (result >= 0 || buffer[0] != '\0')
+            return std::string(buffer);
+#endif
+        return format;
+    }
+
+    static std::string BuildHiddenLayout(const std::string& utf8)
+    {
+        std::string hidden;
+        hidden.reserve(utf8.size());
+
+        for (size_t i = 0; i < utf8.size();)
+        {
+            const unsigned char ch = static_cast<unsigned char>(utf8[i]);
+            if (ch == '\n' || ch == '\r' || ch == '\t')
+            {
+                hidden.push_back(static_cast<char>(ch));
+                ++i;
+                continue;
+            }
+
+            if (ch < 0x80)
+            {
+                hidden.push_back(' ');
+                ++i;
+                continue;
+            }
+
+            hidden.push_back(' ');
+            size_t advance = 1;
+            if ((ch & 0xE0) == 0xC0) advance = 2;
+            else if ((ch & 0xF0) == 0xE0) advance = 3;
+            else if ((ch & 0xF8) == 0xF0) advance = 4;
+
+            i += (std::min)(advance, utf8.size() - i);
+        }
+
+        return hidden;
+    }
+
+    static void Queue(uint32_t id, uintptr_t firstArgAddress)
+    {
+        if (id >= TextEntryCount || Translations[id].empty())
+            return;
+
+        DrawCommand cmd;
+        cmd.text = FormatTranslation(Translations[id], firstArgAddress);
+        cmd.x = *Module::exe_ptr<int16_t>(0x556BB8);
+        cmd.y = *Module::exe_ptr<int16_t>(0x556BBA);
+        cmd.cellHeight = *Module::exe_ptr<int16_t>(0x556BBE);
+        cmd.scaleY = *Module::exe_ptr<float>(0x556BC8);
+        cmd.color = *Module::exe_ptr<uint32_t>(0x556BCC);
+        cmd.flags = *Module::exe_ptr<uint32_t>(0x556BD8);
+
+        std::scoped_lock lock(StateMutex);
+        if (DrawQueue.size() < MaxQueuedDraws)
+            DrawQueue.emplace_back(std::move(cmd));
+    }
+
+    static void InterceptPrint(SafetyHookContext& ctx)
+    {
+        if (!Settings::KoreanTextOverlayTest || !Settings::OverlayEnabled)
+            return;
+        if (!TranslationsLoaded)
+            return;
+
+        const uintptr_t stack = static_cast<uintptr_t>(ctx.esp);
+        const char** formatSlot = reinterpret_cast<const char**>(stack + 4);
+        if (!formatSlot || !*formatSlot)
+            return;
+
+        uint32_t id = 0;
+        if (!ResolveTextId(*formatSlot, id))
+            return;
+
+        Queue(id, stack + 8);
+
+        thread_local std::string hiddenLayout;
+        hiddenLayout = BuildHiddenLayout(
+            FormatTranslation(Translations[id], stack + 8));
+
+        // Preserve newlines/layout progression while ensuring the stock 7-bit
+        // glyph path has no visible English characters to draw.
+        *formatSlot = hiddenLayout.c_str();
+    }
+
+    static ImU32 ConvertColor(uint32_t argb)
+    {
+        const uint8_t a = static_cast<uint8_t>((argb >> 24) & 0xFF);
+        const uint8_t r = static_cast<uint8_t>((argb >> 16) & 0xFF);
+        const uint8_t g = static_cast<uint8_t>((argb >> 8) & 0xFF);
+        const uint8_t b = static_cast<uint8_t>(argb & 0xFF);
+        return IM_COL32(r, g, b, a ? a : 0xFF);
+    }
+
+    static void Draw()
+    {
+        if (!Settings::KoreanTextOverlayTest || !Settings::OverlayEnabled)
+            return;
+        if (!TranslationsLoaded || ImGui::GetCurrentContext() == nullptr)
+            return;
+
+        std::vector<DrawCommand> queue;
+        {
+            std::scoped_lock lock(StateMutex);
+            queue.swap(DrawQueue);
+        }
+
+        if (queue.empty())
+            return;
+
+        ImDrawList* drawList = ImGui::GetForegroundDrawList();
+        ImFont* font = ImGui::GetFont();
+        const ImVec2 display = ImGui::GetIO().DisplaySize;
+
+        float sx = display.x / 640.0f;
+        float sy = display.y / 480.0f;
+        if (Game::screen_scale)
+        {
+            sx = Game::screen_scale->x;
+            sy = Game::screen_scale->y;
+        }
+
+        const bool uniformUi = Settings::UIScalingMode > 0;
+        const float uiScale = uniformUi ? ((sx < sy) ? sx : sy) : 1.0f;
+        const float mapScaleX = uniformUi ? uiScale : sx;
+        const float mapScaleY = uniformUi ? uiScale : sy;
+        const float centerX = uniformUi ? (display.x - (640.0f * uiScale)) * 0.5f : 0.0f;
+
+        for (const DrawCommand& cmd : queue)
+        {
+            if (cmd.text.empty())
+                continue;
+
+            const float cellHeight = static_cast<float>(cmd.cellHeight == 0 ? 16 : std::abs(cmd.cellHeight));
+            const float logicalFontHeight = (std::max)(8.0f, cellHeight * (std::max)(0.05f, std::fabs(cmd.scaleY)));
+            const float fontSize = (std::max)(8.0f, logicalFontHeight * mapScaleY);
+
+            float logicalX = static_cast<float>(cmd.x);
+            float logicalY = static_cast<float>(cmd.y);
+
+            // Match the stock vertical alignment helper at 0x42C390.
+            if (cmd.flags & 0x08)
+                logicalY -= cellHeight * 0.5f;
+            else if (cmd.flags & 0x10)
+                logicalY -= cellHeight;
+
+            float x = (logicalX * mapScaleX) + centerX;
+            const float y = logicalY * mapScaleY;
+
+            const ImVec2 size = font->CalcTextSizeA(
+                fontSize,
+                FLT_MAX,
+                0.0f,
+                cmd.text.c_str());
+
+            // Match stock left/center/right behavior: bit 0 = left, bit 2 = centered.
+            if ((cmd.flags & 0x01) == 0)
+            {
+                if (cmd.flags & 0x04)
+                    x -= size.x * 0.5f;
+                else
+                    x -= size.x;
+            }
+
+            drawList->AddText(
+                font,
+                fontSize,
+                ImVec2(x, y),
+                ConvertColor(cmd.color),
+                cmd.text.c_str());
+        }
+    }
+}
+
+void KoreanLocalization_DrawOverlay()
+{
+    KoreanRuntime::Draw();
+}
+
 
 class KoreanLocalizationTraceHook : public Hook
 {
@@ -64,6 +435,10 @@ class KoreanLocalizationTraceHook : public Hook
 
         if (Settings::KoreanProofTextOverride && id == 0)
             returnedText = ProofTextId0;
+
+        KoreanRuntime::RememberText(id, originalText);
+        if (returnedText != originalText)
+            KoreanRuntime::RememberText(id, returnedText);
 
         if (Settings::KoreanLocalizationTrace && id < TextEntryCount)
         {
@@ -94,12 +469,29 @@ public:
     {
         Settings::KoreanLocalizationTrace.needs_restart();
         Settings::KoreanProofTextOverride.needs_restart();
+        Settings::KoreanTextOverlayTest.needs_restart();
     }
 
     bool validate() override
     {
-        if (!Settings::KoreanLocalizationTrace && !Settings::KoreanProofTextOverride)
+        if (!Settings::KoreanLocalizationTrace &&
+            !Settings::KoreanProofTextOverride &&
+            !Settings::KoreanTextOverlayTest)
             return false;
+
+        if (Settings::KoreanTextOverlayTest)
+        {
+            if (!Settings::OverlayEnabled)
+            {
+                spdlog::error(
+                    "KoreanTextOverlayTest: Overlay.Enabled must be true; "
+                    "leaving stock English text untouched");
+                return false;
+            }
+
+            if (!KoreanRuntime::LoadTranslations())
+                return false;
+        }
 
         const uint8_t* resolver = Module::exe_ptr(TextResolverOffset);
         if (!resolver)
@@ -140,6 +532,97 @@ public:
 };
 
 KoreanLocalizationTraceHook KoreanLocalizationTraceHook::instance;
+
+
+class KoreanTextOverlayPrintHook : public Hook
+{
+    static constexpr uintptr_t SprPrintfOffset = 0x2CCE0;
+    static constexpr uintptr_t SumoPrintfOffset = 0x2CDD0;
+
+    static constexpr uint8_t ExpectedSprPrintfBytes[] = {
+        0x81, 0xEC, 0x08, 0x01, 0x00, 0x00, 0xA1, 0x00,
+        0x5A, 0x73, 0x00, 0x8B, 0x8C, 0x24, 0x0C, 0x01
+    };
+
+    static constexpr uint8_t ExpectedSumoPrintfBytes[] = {
+        0x81, 0xEC, 0x04, 0x01, 0x00, 0x00, 0xA1, 0x00,
+        0x5A, 0x73, 0x00, 0x8B, 0x8C, 0x24, 0x08, 0x01
+    };
+
+    inline static SafetyHookMid SprPrintfHook{};
+    inline static SafetyHookMid SumoPrintfHook{};
+
+    static void SprPrintfDest(SafetyHookContext& ctx)
+    {
+        KoreanRuntime::InterceptPrint(ctx);
+    }
+
+    static void SumoPrintfDest(SafetyHookContext& ctx)
+    {
+        KoreanRuntime::InterceptPrint(ctx);
+    }
+
+public:
+    std::string_view description() override
+    {
+        return "KoreanTextOverlayPrint";
+    }
+
+    void declare_settings() override
+    {
+        Settings::KoreanTextOverlayTest.needs_restart();
+    }
+
+    bool validate() override
+    {
+        if (!Settings::KoreanTextOverlayTest)
+            return false;
+
+        if (!Settings::OverlayEnabled || !KoreanRuntime::LoadTranslations())
+            return false;
+
+        const uint8_t* spr = Module::exe_ptr(SprPrintfOffset);
+        const uint8_t* sumo = Module::exe_ptr(SumoPrintfOffset);
+        if (!spr || !sumo)
+            return false;
+
+        if (std::memcmp(spr, ExpectedSprPrintfBytes, sizeof(ExpectedSprPrintfBytes)) != 0)
+        {
+            spdlog::error(
+                "KoreanTextOverlayTest: sprPrintf signature mismatch at EXE+0x{:X}",
+                SprPrintfOffset);
+            return false;
+        }
+
+        if (std::memcmp(sumo, ExpectedSumoPrintfBytes, sizeof(ExpectedSumoPrintfBytes)) != 0)
+        {
+            spdlog::error(
+                "KoreanTextOverlayTest: Sumo_Printf signature mismatch at EXE+0x{:X}",
+                SumoPrintfOffset);
+            return false;
+        }
+
+        return true;
+    }
+
+    bool apply() override
+    {
+        SprPrintfHook = safetyhook::create_mid(
+            Module::exe_ptr(SprPrintfOffset),
+            SprPrintfDest);
+        SumoPrintfHook = safetyhook::create_mid(
+            Module::exe_ptr(SumoPrintfOffset),
+            SumoPrintfDest);
+
+        spdlog::info(
+            "KoreanTextOverlayTest: installed UTF-8 text interception on sprPrintf/Sumo_Printf");
+        return !!SprPrintfHook && !!SumoPrintfHook;
+    }
+
+    static KoreanTextOverlayPrintHook instance;
+};
+
+KoreanTextOverlayPrintHook KoreanTextOverlayPrintHook::instance;
 
 
 class KoreanK3TraceHook : public Hook
