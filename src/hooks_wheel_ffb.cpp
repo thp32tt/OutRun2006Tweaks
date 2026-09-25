@@ -771,6 +771,8 @@ namespace
                 static_cast<float>(Settings::WheelFFBRoadTexture) * outputStrength *
                 stageRoadTextureScale;
             float roadFreq = 25.0f + 12.0f * speedNorm;
+            float ps2SurfaceEnvelope = 0.0f;
+            int ps2RoadRaw = 0;
             if (arcadeEffects)
                 roadAmp = 0.0f; // arcade surface codes own road vibration in these modes
 
@@ -791,13 +793,18 @@ namespace
                 // common DD safety/output layer.
                 const float roadSetting = std::clamp(
                     static_cast<float>(Settings::WheelFFBRoadTexture), 0.0f, 1.0f);
-                const float ps2SurfaceEnvelope =
+                ps2SurfaceEnvelope =
                     WheelFFBPS2::surface_envelope(
                         roughness, car->field_264, car->field_268);
-                roadAmp =
-                    WheelFFBPS2::periodic_magnitude_norm(
-                        ps2SurfaceEnvelope, speedRaw, ps2DriveFactor) *
-                    roadSetting * outputStrength;
+                ps2RoadRaw =
+                    WheelFFBPS2::periodic_magnitude_raw(
+                        ps2SurfaceEnvelope, speedRaw, ps2DriveFactor);
+                const float ps2RoadNorm =
+                    ps2RoadRaw < WheelFFBPS2::RetailPeriodicStartThreshold
+                        ? 0.0f
+                        : static_cast<float>(ps2RoadRaw) /
+                            static_cast<float>(WheelFFBPS2::LogitechScaleMax);
+                roadAmp = ps2RoadNorm * roadSetting * outputStrength;
                 roadFreq =
                     WheelFFBPS2::triangle_frequency_hz_for_directinput(
                         ps2DriveFactor);
@@ -1447,7 +1454,7 @@ namespace
             {
                 lastTelemetryTick_ = telemetryNow;
                 spdlog::info(
-                    "WheelFFB SAMPLE t={} model={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperRelease={} damperCoefficient={} xboxLeft={} xboxRight={} roadAmp={} slipAmp={} structural={} event={} structuralPreClip={} structuralPostClip={} eventPostClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
+                    "WheelFFB SAMPLE t={} model={} car={} speedRaw={} speedNorm={} steer={} steerRateRaw={} steerRateFiltered={} field264={} field268={} lateralRaw={} lateralSmooth={} lateralLoad={} bodySlip={} bodySlide={} yawRate={} frontSlip={} frontScrub={} vLongTick={} vLatTick={} positionStep={} spdX={} spdY={} spdZ={} spdLenXZ={} spdCorrelation={} basis={} basisConfidence={} sampleValid={} mix={} satRaw={} satMixed={} trailShape={} satLoad={} rearSlideRelief={} springRequested={} springCoefficient={} damperRequested={} damperRelease={} damperCoefficient={} xboxLeft={} xboxRight={} surfaceRough={} ps2Surface={} ps2RoadRaw={} ps2Drive={} roadAmp={} slipAmp={} structural={} event={} structuralPreClip={} structuralPostClip={} eventPostClip={} postSlew={} diRequested={} diLastAccepted={} polar={} hwSpring={} hwDamper={} hwPeriodic={} gain={} invert={} invertSpring={}",
                     telemetryNow, WheelFFBMath::model_name(ffbModel), static_cast<const void*>(car), speedRaw, speedNorm, steer, rawSteerRate, steerRate,
                     car->field_264, car->field_268, lateralRaw, smoothedLateral_, lateralLoadSmooth,
                     vehicleDynamics_.bodySlip(), bodySlide, vehicleDynamics_.yawRate(), frontSlip, frontScrub,
@@ -1458,7 +1465,9 @@ namespace
                     vehicleDynamics_.sampleValid(), physicsMix, physicsSatTorque, selfAligningTorque,
                     trailShape, physicsLoad, rearSlideRelief, springStrength, prevSpringCoefficient_,
                     dynamicDamperStrength, damperRelease, prevDamperCoefficient_,
-                    originalXboxLeftRumble, originalXboxRightRumble, roadAmp, slipAmp,
+                    originalXboxLeftRumble, originalXboxRightRumble,
+                    roughness, ps2SurfaceEnvelope, ps2RoadRaw, ps2DriveFactor,
+                    roadAmp, slipAmp,
                     structural, events, total, compressed, eventCompressed, structuralLevel, level, prevConstantLevel_,
                     constantEffectPolar_, springEffect_ != nullptr, damperEffect_ != nullptr,
                     periodicsActive_, outputStrength, bool(Settings::WheelFFBInvertForce),
