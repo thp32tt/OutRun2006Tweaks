@@ -1970,7 +1970,9 @@ namespace
                 Settings::WheelFFBWallImpact = 0.38f;
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
-                Settings::WheelFFBUsePeriodicEffects = true;
+                // R3 compatibility default: prefer ConstantForce road/slip
+                // fallback because reported Sine support can be physically weak.
+                Settings::WheelFFBUsePeriodicEffects = false;
                 Settings::WheelFFBInvertForce = true;
                 Settings::WheelFFBInvertSpring = false;
                 Settings::WheelFFBDebugLog = true;
@@ -2011,7 +2013,9 @@ namespace
                 Settings::WheelFFBWallImpact = 0.38f;
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
-                Settings::WheelFFBUsePeriodicEffects = true;
+                // R3 compatibility default: prefer ConstantForce road/slip
+                // fallback because reported Sine support can be physically weak.
+                Settings::WheelFFBUsePeriodicEffects = false;
                 Settings::WheelFFBInvertForce = true;
                 Settings::WheelFFBInvertSpring = false;
                 Settings::VibrationMode = 0;
