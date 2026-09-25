@@ -68,7 +68,7 @@ The full draft intentionally uses exact/OCR/manual/atlas-alpha placement evidenc
 - Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B25v4_QA_Test.zip`
 - Combined package SHA-256: `e0d2df30e8de09dc69e154cbcffcfce649c76fd7edd760e4bb2fe0ab935d781d`
 - Mandatory extra QA gates: source-like typography/colors; no stray black lines, crop seams, text-erasure residue, clipped glyphs, accidental opaque boxes, or alpha halos.
-- DXT5-safe rewrite still required for several assets, including `49BB5FE5_128x32.dds`, `42E618FD_512x32.dds`, `7CE1CFC5_512x128.dds`, and `C598919A_1024x1024.dds`.
+- Final pending graphics are only `37759842_1024x1024.dds` and `C598919A_1024x1024.dds`. The earlier DXT5 assets `49BB5FE5`, `42E618FD`, and `7CE1CFC5` were already promoted in Batch12v2 and must not be reopened without new evidence.
 
 ## Runtime/font
 - K0 txet roundtrip: **PASS**
@@ -93,6 +93,7 @@ Read:
 Next gate: continue the final 2 pending assets from original DDS; keep preserve-original art untouched; in-game validate the 30 retained candidates.
 
 
-### QA checkpoint 2026-09-26 07:34 KST
-- Canonical state: **28 retained / 4 pending**.
+### QA checkpoint 2026-09-26 08:11 KST
+- Canonical state: **30 retained / 2 pending** (`37759842`, `C598919A`).
 - Hard gates: original orientation, preserve-original exclusions, source-style fidelity, artifact cleanliness, and original text-region containment.
+- Safety rule: no pixel promotion without original DDS + candidate-byte comparison; unsafe/unavailable candidates remain original.
