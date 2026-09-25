@@ -1,4 +1,5 @@
 name: VR PC Fast Test Build
+# SCREENFIX candidate PC trigger enabled.
 
 permissions:
   contents: read
