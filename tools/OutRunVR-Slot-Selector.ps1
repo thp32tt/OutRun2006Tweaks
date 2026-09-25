@@ -45,7 +45,7 @@ function Start-Slot([string]$slot){
 $form=New-Object System.Windows.Forms.Form
 $form.Text='OutRun VR Slot Selector V2'
 $form.StartPosition='CenterScreen'
-$form.ClientSize=New-Object System.Drawing.Size(620,720)
+$form.ClientSize=[System.Drawing.Size]::new(620,720)
 $form.FormBorderStyle='FixedDialog'
 $form.MaximizeBox=$false
 
@@ -53,20 +53,20 @@ $title=New-Object System.Windows.Forms.Label
 $title.Text='OutRun VR Slot Selector V2'
 $title.Font=New-Object System.Drawing.Font('Segoe UI',16,[System.Drawing.FontStyle]::Bold)
 $title.AutoSize=$true
-$title.Location=New-Object System.Drawing.Point(145,18)
+$title.Location=[System.Drawing.Point]::new(145,18)
 $form.Controls.Add($title)
 
 $desc=New-Object System.Windows.Forms.Label
 $desc.Text='슬롯 버튼 하나로 바이너리 + 설정 + 프로필 + 로그 이름을 같이 변경합니다. 게임 종료 후 로그 ZIP과 자동 분석 요약을 생성합니다.'
 $desc.AutoSize=$false
-$desc.Size=New-Object System.Drawing.Size(550,46)
-$desc.Location=New-Object System.Drawing.Point(35,55)
+$desc.Size=[System.Drawing.Size]::new(550,46)
+$desc.Location=[System.Drawing.Point]::new(35,55)
 $form.Controls.Add($desc)
 
 $status=New-Object System.Windows.Forms.Label
 $status.AutoSize=$false
-$status.Size=New-Object System.Drawing.Size(550,28)
-$status.Location=New-Object System.Drawing.Point(35,105)
+$status.Size=[System.Drawing.Size]::new(550,28)
+$status.Location=[System.Drawing.Point]::new(35,105)
 $status.Font=New-Object System.Drawing.Font('Segoe UI',10,[System.Drawing.FontStyle]::Bold)
 $form.Controls.Add($status)
 
@@ -81,8 +81,8 @@ foreach($slot in $slots.Keys){
     $cfg=$slots[$slot]
     $btn=New-Object System.Windows.Forms.Button
     $btn.Text=$cfg.Title
-    $btn.Size=New-Object System.Drawing.Size(255,46)
-    $btn.Location=New-Object System.Drawing.Point(35,$y)
+    $btn.Size=[System.Drawing.Size]::new(255,46)
+    $btn.Location=[System.Drawing.Point]::new(35,$y)
     $btn.Tag=$slot
     if($slot -notin @('CURRENT_FOCUS','E_DXVK_SAFE','G_COCKPIT')){
         $slotPath=Join-Path $root ("slots/"+$slot)
@@ -108,8 +108,8 @@ $($cfg.Help)
 
     $run=New-Object System.Windows.Forms.Button
     $run.Text='설정 + 바로 실행'
-    $run.Size=New-Object System.Drawing.Size(140,46)
-    $run.Location=New-Object System.Drawing.Point(300,$y)
+    $run.Size=[System.Drawing.Size]::new(140,46)
+    $run.Location=[System.Drawing.Point]::new(300,$y)
     $run.Tag=$slot
     $run.Enabled=$btn.Enabled
     $run.Add_Click({
@@ -125,7 +125,7 @@ $($cfg.Help)
     $profile=New-Object System.Windows.Forms.Label
     $profile.Text="$($cfg.Backend) / $($cfg.Profile)"
     $profile.AutoSize=$true
-    $profile.Location=New-Object System.Drawing.Point(450,$y+14)
+    $profile.Location=[System.Drawing.Point]::new(450,($y+14))
     $form.Controls.Add($profile)
     $y+=58
 }
@@ -134,16 +134,16 @@ $helpBox=New-Object System.Windows.Forms.TextBox
 $helpBox.Multiline=$true
 $helpBox.ReadOnly=$true
 $helpBox.ScrollBars='Vertical'
-$helpBox.Size=New-Object System.Drawing.Size(550,92)
-$helpBox.Location=New-Object System.Drawing.Point(35,560)
+$helpBox.Size=[System.Drawing.Size]::new(550,92)
+$helpBox.Location=[System.Drawing.Point]::new(35,560)
 $helpBox.Text='권장: CURRENT_FOCUS -> A_CONTROL -> D_PERF -> B_HUD -> C_FLARE. G_COCKPIT은 별도 카메라 실험입니다. E_DXVK_SAFE는 현재 SBS fallback이 확인되어 진단용입니다.'
 $form.Controls.Add($helpBox)
 
 $note=New-Object System.Windows.Forms.Label
 $note.Text='게임 종료 후 collector가 자동 실행되어 OutRun2_VR_ANALYZE_<slot>_<profile>_<session>.zip 을 만듭니다.'
 $note.AutoSize=$false
-$note.Size=New-Object System.Drawing.Size(550,40)
-$note.Location=New-Object System.Drawing.Point(35,665)
+$note.Size=[System.Drawing.Size]::new(550,40)
+$note.Location=[System.Drawing.Point]::new(35,665)
 $form.Controls.Add($note)
 
 [void]$form.ShowDialog()

@@ -59,13 +59,13 @@ foreach($pattern in $patterns){
     }
 }
 if($stale){
-    & $selector -Backend $backend -TestProfile $TestProfile -VariantId $variant -VariantId $variant
+    & $selector -Backend $backend -TestProfile $TestProfile -VariantId $variant
     if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'Failed to seal stale logs before launch.'}
 }
 
 $state=Get-Content $current -Raw|ConvertFrom-Json
 if($state.TestProfile -and $state.TestProfile -ne $TestProfile){
-    & $selector -Backend $backend -TestProfile $TestProfile
+    & $selector -Backend $backend -TestProfile $TestProfile -VariantId $variant
     if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'Failed to prepare requested test profile.'}
     $state=Get-Content $current -Raw|ConvertFrom-Json
 }
@@ -103,6 +103,29 @@ if($backend -eq 'd3d9'){
 
 if($backend -ne '2d'){
     $gameArgs += '-HudInspector=true'
+}
+
+# R52 visual-isolation variants: remove any inherited value first, then add one
+# authoritative value for each controlled variable. This makes every A/B run
+# differ from V_BASE by exactly one rendering owner.
+if($backend -eq 'd3d9' -and $variant -match '^V_'){
+    $gameArgs=@($gameArgs | Where-Object {
+        $_ -notmatch '^-VisualDiagnosticMode=' -and
+        $_ -notmatch '^-HeadTracking=' -and
+        $_ -notmatch '^-SkyGlowFactor='
+    })
+    $diagMode='0'
+    $headTracking='true'
+    $skyGlow='1'
+    switch($variant){
+        'V_OVERLAY_BYPASS'      { $diagMode='1' }
+        'V_XYZRHW_WORLD_BYPASS' { $diagMode='2' }
+        'V_HEAD_TRACKING_OFF'    { $headTracking='false' }
+        'V_SKYGLOW_OFF'          { $skyGlow='0' }
+    }
+    $gameArgs += "-VisualDiagnosticMode=$diagMode"
+    $gameArgs += "-HeadTracking=$headTracking"
+    $gameArgs += "-SkyGlowFactor=$skyGlow"
 }
 
 $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)

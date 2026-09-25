@@ -24,6 +24,7 @@ namespace Settings
 {
     extern Setting<float> VRHudScale;
     extern Setting<float> VRStereoDepth;
+    extern Setting<int> VRVisualDiagnosticMode;
     extern Setting<int> SkyGlowFactor;
     extern Setting<bool> SkyGlowTwoStep;
 }
@@ -111,6 +112,10 @@ namespace OutRunVRStereo
         std::uint64_t R30XyzrhwRhwOnlyDepthEvidence = 0;
         std::uint64_t R30XyzrhwZOnlyDepthEvidence = 0;
         std::uint64_t R30XyzrhwFallbacks = 0;
+        std::uint64_t R52DiagnosticOverlayBypasses = 0;
+        std::uint64_t R52DiagnosticWorldBypasses = 0;
+        bool R52FirstDiagnosticOverlayLogged = false;
+        bool R52FirstDiagnosticWorldLogged = false;
         bool R30FirstXyzrhwHudLogged = false;
         bool R30FirstXyzrhwWorldLogged = false;
         bool R30FirstXyzrhwRhwPromotionLogged = false;
@@ -1872,6 +1877,38 @@ namespace OutRunVRStereo
                 OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
                     semanticScope);
 
+            // R52 visual-isolation matrix. These are diagnostic A/B modes only:
+            // each mode removes exactly one R30 owner and lets the established
+            // R29/R26 path handle the draw. Normal mode is byte-for-byte
+            // equivalent to the production ownership decisions below.
+            const int diagnosticMode =
+                Settings::VRVisualDiagnosticMode.get();
+            if (diagnosticMode == 1 && semanticOverlay2D)
+            {
+                ++R52DiagnosticOverlayBypasses;
+                if (!R52FirstDiagnosticOverlayLogged)
+                {
+                    R52FirstDiagnosticOverlayLogged = true;
+                    spdlog::info(
+                        "VR R52 DIAGNOSTIC: SCREEN_OVERLAY_2D R30 XYZRHW owner bypassed; R29 fallback owns generic overlay draws");
+                }
+                return false;
+            }
+            if (diagnosticMode == 2 &&
+                (semanticWorld ||
+                 (!semanticHud && !semanticOverlay2D &&
+                  state.rhwDepthEvidence)))
+            {
+                ++R52DiagnosticWorldBypasses;
+                if (!R52FirstDiagnosticWorldLogged)
+                {
+                    R52FirstDiagnosticWorldLogged = true;
+                    spdlog::info(
+                        "VR R52 DIAGNOSTIC: XYZRHW world/effect R30 reprojection bypassed; R29 fallback owns pre-transformed world draws");
+                }
+                return false;
+            }
+
             // R51 ownership precedence is explicit:
             // exact WORLD_BILLBOARD > queue-owned 2D/HUD > geometric evidence.
             // Runtime 750453f2 proved FOV-only queue placement converges the
@@ -3318,6 +3355,19 @@ namespace OutRunVRStereo
             // Promotion requires the canonical EXE/original-mod semantic scope.
             const auto semanticScope =
                 OutRunVR::GameSemantic::CurrentScope;
+            if (Settings::VRVisualDiagnosticMode.get() == 1 &&
+                OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
+                    semanticScope))
+            {
+                ++R52DiagnosticOverlayBypasses;
+                if (!R52FirstDiagnosticOverlayLogged)
+                {
+                    R52FirstDiagnosticOverlayLogged = true;
+                    spdlog::info(
+                        "VR R52 DIAGNOSTIC: SCREEN_OVERLAY_2D shader owner bypassed; R29 fallback owns generic overlay draws");
+                }
+                return E_NOTIMPL;
+            }
             if (screenKind == R30ScreenSpaceKind::WorldBillboard)
             {
                 if (!OutRunVR::GameSemantic::CorroboratesWorld(
