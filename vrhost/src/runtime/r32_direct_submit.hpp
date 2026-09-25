@@ -102,6 +102,9 @@ namespace OutRunVrR32DirectSubmit
         std::uint64_t flushEscalations = 0;
         std::uint64_t ackQueryError = 0;
         std::uint64_t sameFramePendingReuse = 0;
+        std::uint64_t skippedQueued = 0;
+        std::uint64_t skippedCompleted = 0;
+        std::uint64_t skippedRetry = 0;
         std::array<std::uint64_t,
             static_cast<std::size_t>(FastRejectReason::Count)> rejectReasons{};
         std::uint64_t safeCacheHit = 0;
@@ -500,6 +503,9 @@ namespace OutRunVrR32DirectSubmit
         Perf.flushEscalations = AckFlushEscalations;
         Perf.ackQueryError = AckQueryErrors;
         Perf.sameFramePendingReuse = AckSameFramePendingReuse;
+        Perf.skippedQueued = SkippedReleaseQueued;
+        Perf.skippedCompleted = SkippedReleaseCompleted;
+        Perf.skippedRetry = SkippedReleaseRetry;
         Perf.rejectReasons = RejectReasons;
         Perf.safeCacheHit = OutRunVrD3D9ExDirectPassthrough::R32SharedCacheHits;
         Perf.safeCacheMiss = OutRunVrD3D9ExDirectPassthrough::R32SharedCacheMisses;
@@ -530,6 +536,13 @@ namespace OutRunVrR32DirectSubmit
             << " ackQueryError=" << AckQueryErrors - Perf.ackQueryError
             << " sameFrameAckReuse="
             << AckSameFramePendingReuse - Perf.sameFramePendingReuse
+            << " skippedAck[queued="
+            << SkippedReleaseQueued - Perf.skippedQueued
+            << ",completed="
+            << SkippedReleaseCompleted - Perf.skippedCompleted
+            << ",retry="
+            << SkippedReleaseRetry - Perf.skippedRetry
+            << "]"
             << " rejectReason[projection="
             << RejectReasons[static_cast<std::size_t>(
                 FastRejectReason::ProjectionMismatch)] -
@@ -624,7 +637,12 @@ namespace OutRunVrR32DirectSubmit
 
     inline XrResult XRAPI_CALL DestroySession(XrSession session) noexcept
     {
-        ReleasePending();
+        // D3D11 EVENT queries protect producer texture reuse, not OpenXR
+        // session objects. A STOPPING/loss transition can destroy and recreate
+        // the XR session while the same host process/device remains alive.
+        // Preserve incomplete EVENT owners across that boundary; completed
+        // queries and never-touched skipped releases are retired first.
+        PollCompletedAcks();
         OutRunVrD3D9ExDirectPassthrough::R32ResetDirectCaches();
         return OutRunVrR24BlackScreenGuard::DestroySession(session);
     }
