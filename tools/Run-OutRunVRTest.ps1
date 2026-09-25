@@ -56,6 +56,7 @@ $semanticMode='0'
 $hudExperimentMode='0'
 $hudCoordMode='0'
 $hudProbe='0'
+$r57Mode='0'
 switch($variant){
     'X_SCREEN_HUD'       { $semanticMode='1' }
     'X_WORLD_RANK'       { $semanticMode='2' }
@@ -88,15 +89,27 @@ switch($variant){
     'R56_18_RANK46_NEXTDRAW'   { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='18' }
     'R56_19_POSITION_NEXTDRAW' { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='19' }
     'R56_20_ALLSCREEN_RAW'     { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='20' }
+    'R57_01_POSITION_KIND1_HUD35' { $semanticMode='0'; $hudExperimentMode='2'; $hudCoordMode='2'; $r57Mode='1' }
+    'R57_02_POSITION_KIND0_HUD35' { $semanticMode='0'; $hudExperimentMode='2'; $hudCoordMode='2'; $r57Mode='2' }
+    'R57_03_POSITION_ALL_WORLD35' { $semanticMode='0'; $hudExperimentMode='2'; $hudCoordMode='3'; $r57Mode='3' }
+    'R57_04_RANK_ALL_AS_HUD'      { $semanticMode='0'; $hudExperimentMode='2'; $hudCoordMode='3'; $r57Mode='4' }
+    'R57_05_RANK_PROJECTED_IPD'   { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='5' }
+    'R57_06_RANK_PROJECTED_HEAD'  { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='6' }
+    'R57_07_RANK_PROJECTED_13'    { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='7' }
+    'R57_08_RANK_PROJECTED_46'    { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='8' }
+    'R57_09_RANK_PROJECTED_ZERO'  { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='9' }
+    'R57_10_RANK_PROJECTED_TRACE' { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='10' }
 }
 $oldExeSemanticMode=$env:OUTRUN_VR_EXE_SEMANTIC_MODE
 $oldHudExperimentMode=$env:OUTRUN_VR_HUD_EXPERIMENT_MODE
 $oldHudCoordMode=$env:OUTRUN_VR_HUD_COORD_MODE
 $oldHudProbe=$env:OUTRUN_VR_HUD_PROBE
+$oldR57Mode=$env:OUTRUN_VR_R57_MODE
 $env:OUTRUN_VR_EXE_SEMANTIC_MODE=$semanticMode
 $env:OUTRUN_VR_HUD_EXPERIMENT_MODE=$hudExperimentMode
 $env:OUTRUN_VR_HUD_COORD_MODE=$hudCoordMode
 $env:OUTRUN_VR_HUD_PROBE=$hudProbe
+$env:OUTRUN_VR_R57_MODE=$r57Mode
 
 $patterns=@(
     'OutRun2006Tweaks*.log',
@@ -209,6 +222,8 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "exeSemanticMode=$semanticMode"
     "hudExperimentMode=$hudExperimentMode"
     "hudCoordMode=$hudCoordMode"
+    "hudProbe=$hudProbe"
+    "r57Mode=$r57Mode"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
 Write-Host "Runtime overrides: $($gameArgs -join ' ')"
 
@@ -285,6 +300,7 @@ try{
     $env:OUTRUN_VR_HUD_EXPERIMENT_MODE=$oldHudExperimentMode
     $env:OUTRUN_VR_HUD_COORD_MODE=$oldHudCoordMode
     $env:OUTRUN_VR_HUD_PROBE=$oldHudProbe
+    $env:OUTRUN_VR_R57_MODE=$oldR57Mode
     foreach($key in $identityKeys){
         [Environment]::SetEnvironmentVariable($key,$oldIdentity[$key],'Process')
     }
