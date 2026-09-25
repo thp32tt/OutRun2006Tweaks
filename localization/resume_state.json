@@ -8,10 +8,10 @@
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
     "read ORIENTATION_POLICY.md and SOURCE_FAITHFUL_CURRENT.json before editing",
-    "continue the final 2 pending assets from original DDS only",
-    "37759842: preserve gradients/icons while removing English from black/blue cards",
-    "C598919A: reuse verified DXT5 block-level patching with larger per-label extents",
-    "in-game validate the 30 retained source-faithful candidates"
+    "continue the final pending asset 37759842_1024x1024.dds from original DDS only",
+    "do not promote 37759842 until blue/black card reconstruction contains no restored source English fragments",
+    "preserve vehicle/model names, song titles, logos and non-text card artwork",
+    "in-game validate the 31 retained source-faithful candidates"
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -36,8 +36,8 @@
     "full_draft_package_sha256": "5512dad798a4ddb4872e4aa3e69438537f75f488f439317d7b95c0eb372b6c78",
     "source_faithful_policy": "localization/graphics/ORIENTATION_POLICY.md",
     "source_faithful_reviewed_assets": 32,
-    "source_faithful_localized_candidates": 30,
-    "source_faithful_reset_to_original": 2,
+    "source_faithful_localized_candidates": 31,
+    "source_faithful_reset_to_original": 1,
     "batch3_report": "localization/graphics/BATCH3_SOURCEFAITHFUL_REPORT.json",
     "batch4_report": "localization/graphics/BATCH4_SOURCEFAITHFUL_REPORT.json",
     "batch5_report": "localization/graphics/BATCH5_SOURCEFAITHFUL_REPORT.json",
@@ -52,8 +52,8 @@
     "batch9_report": "localization/graphics/BATCH9_REWORK_REPORT.json",
     "batch10v2_report": "localization/graphics/BATCH10V2_REWORK_REPORT.json",
     "batch11v2_report": "localization/graphics/BATCH11V2_REWORK_REPORT.json",
-    "current_combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B25v4_QA_Test.zip",
-    "current_combined_package_sha256": "e0d2df30e8de09dc69e154cbcffcfce649c76fd7edd760e4bb2fe0ab935d781d",
+    "current_combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip",
+    "current_combined_package_sha256": "7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02",
     "pending_dxt5_assets": [
       "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
       "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds"
@@ -67,7 +67,9 @@
     "batch23_rejected_report": "localization/graphics/BATCH23_REJECTED_REPORT.json",
     "batch24v2_report": "localization/graphics/BATCH24V2_2DA_REWORK_REPORT.json",
     "batch25v4_report": "localization/graphics/BATCH25V4_ACF_REWORK_REPORT.json",
-    "latest_safe_rework_note": "2026-09-26 08:11 KST: only 37759842 and C598919A remain pending; do not regenerate without original DDS plus candidate bytes. 37759842 requires gradient/icon-preserving cleanup; C598919A requires larger per-label DXT5 block extents. Unsafe edits stay original."
+    "latest_safe_rework_note": "2026-09-26 08:11 KST: only 37759842 and C598919A remain pending; do not regenerate without original DDS plus candidate bytes. 37759842 requires gradient/icon-preserving cleanup; C598919A requires larger per-label DXT5 block extents. Unsafe edits stay original.",
+    "batch33_rejected_report": "localization/graphics/BATCH33_REJECTED_REPORT.json",
+    "batch38_report": "localization/graphics/BATCH38_C598_REWORK_REPORT.json"
   },
   "runtime_packages": {
     "k1": {
