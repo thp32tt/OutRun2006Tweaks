@@ -1,0 +1,25 @@
+{
+  "run": "B-20260926-0816",
+  "status": "safe_hold_original",
+  "checkpoint": "32 reviewed / 30 retained / 2 pending",
+  "assets": [
+    {
+      "asset": "37759842_1024x1024.dds",
+      "decision": "keep_original",
+      "reason": "Batch17v3 visual evidence still shows residual English plus gradient/icon restoration seams; original DDS/candidate bytes are not available in this run for a source-faithful rebuild."
+    },
+    {
+      "asset": "C598919A_1024x1024.dds",
+      "decision": "keep_original",
+      "reason": "Batch22 evidence still shows residual English/clipped source styling; original DDS/candidate bytes are not available in this run to safely enlarge DXT5 per-label block extents."
+    }
+  ],
+  "checklist": {
+    "original_orientation": "required_not_guessable_without_original_bytes",
+    "protected_art": "preserve",
+    "style_fidelity": "required",
+    "text_region_containment": "required",
+    "artifact_cleanliness": "required"
+  },
+  "next": "Rework only when original DDS plus candidate bytes are accessible; otherwise retain originals."
+}
