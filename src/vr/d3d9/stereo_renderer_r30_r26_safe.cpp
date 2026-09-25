@@ -3455,6 +3455,17 @@ namespace OutRunVRStereo
             {
                 if (R57Mode() == 9 || R57Mode() == 10)
                 {
+                    // Mode 10 performs the full depth/delta calculation only
+                    // for telemetry, then deliberately leaves the visual output
+                    // untouched. Mode 9 is the cheaper semantic-owner control.
+                    if (R57Mode() == 10)
+                    {
+                        float traceDeltaX[2]{}, traceDeltaY[2]{};
+                        if (!R57BuildProjectedMarkerDelta(
+                                stereo, baseProjection,
+                                traceDeltaX, traceDeltaY))
+                            return false;
+                    }
                     const D3DMATRIX stockT = TransposeMatrix(stockWvp);
                     std::memcpy(eyeConstants[0], &stockT, sizeof(stockT));
                     std::memcpy(eyeConstants[1], &stockT, sizeof(stockT));
