@@ -6,6 +6,8 @@
 #include <bitset>
 #include <cstdarg>
 #include <cstdint>
+#include <cfloat>
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <fstream>
