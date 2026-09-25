@@ -1,3 +1,4 @@
 OpenAI/GitHub connector benign write probe.
 No source code change.
-Probe stage: create_file.
+Probe stage: update_file.
+Result target: harmless text mutation only.
