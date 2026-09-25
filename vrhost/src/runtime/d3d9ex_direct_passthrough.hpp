@@ -323,7 +323,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
         {
             FirstAckMappingLogged = true;
             std::cerr
-                << "[D3D9Ex R23] dedicated per-slot DirectGpuAck mapping ready\n";
+                << "[D3D9Ex R23] dedicated per-slot DirectGpuAck mapping ready version="
+                << OutRunVR::R13::DirectGpuAckVersion << "\n";
         }
         return true;
     }

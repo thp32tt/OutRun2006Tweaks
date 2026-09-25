@@ -326,12 +326,95 @@ namespace
         R37BootstrapSubmittedFrame{};
     std::array<std::uint32_t, OutRunVR::RenderFrameRingSize>
         R37BootstrapSubmittedGeneration{};
+    // Exact DirectGPU frames whose shared eye textures have already been
+    // sampled by D3D11. These must never take the immediate skipped-frame ACK
+    // path, even if a presentation/reference-space transition advances the
+    // display watermark before xrEndFrame.
+    std::array<OutRunVR::SharedRenderFrameState,
+        OutRunVR::RenderFrameRingSize> R48DirectTouched{};
 
     bool R37FrameIdBefore(
         std::uint32_t candidate, std::uint32_t reference) noexcept
     {
         return candidate != reference &&
             static_cast<std::int32_t>(candidate - reference) < 0;
+    }
+
+    void R48RetireNeverTouchedDirectFramesThrough(
+        RenderFrameReader& reader,
+        std::uint32_t previousWatermark,
+        std::uint32_t newWatermark) noexcept
+    {
+        if (!newWatermark ||
+            (previousWatermark != 0 &&
+             !R37FrameIdBefore(previousWatermark, newWatermark)))
+            return;
+
+        std::array<OutRunVR::SharedRenderFrameState,
+            OutRunVR::RenderFrameRingSize> history{};
+        std::size_t count = 0;
+        if (!reader.ReadHistory(history, count))
+            return;
+
+        // Follow the latest valid DirectGPU frame's transport generation. ACK
+        // state is generation-scoped, so never publish an older generation
+        // after a reset/recreation boundary.
+        std::uint32_t currentGeneration = 0;
+        std::uint32_t newestFrame = 0;
+        OutRunVR::SharedRenderFrameState currentIdentityFrame{};
+        for (std::size_t i = 0; i < count; ++i)
+        {
+            const auto& frame = history[i];
+            const std::uint32_t generation =
+                frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+            if (!frame.frameId || !generation ||
+                frame.state != OutRunVR::StereoSbsActive ||
+                (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
+                (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
+                R37FrameIdBefore(newWatermark, frame.frameId))
+                continue;
+            if (!newestFrame || R37FrameIdBefore(newestFrame, frame.frameId))
+            {
+                newestFrame = frame.frameId;
+                currentGeneration = generation;
+                currentIdentityFrame = frame;
+            }
+        }
+        if (!currentGeneration)
+            return;
+
+        OutRunVrR32DirectSubmit::ObserveIdentity(currentIdentityFrame);
+
+        for (std::size_t i = 0; i < count; ++i)
+        {
+            const auto& frame = history[i];
+            const std::uint32_t slot =
+                frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+            const std::uint32_t generation =
+                frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+            if (!frame.frameId || slot >= OutRunVR::RenderFrameRingSize ||
+                generation != currentGeneration ||
+                frame.state != OutRunVR::StereoSbsActive ||
+                (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
+                (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
+                (previousWatermark != 0 &&
+                 !R37FrameIdBefore(previousWatermark, frame.frameId)) ||
+                R37FrameIdBefore(newWatermark, frame.frameId))
+                continue;
+
+            const bool touched =
+                OutRunVrR32DirectSubmit::SameFrameAckIdentity(
+                    R48DirectTouched[slot], frame);
+            if (touched ||
+                OutRunVrR32DirectSubmit::HasPendingConsumption(frame))
+                continue;
+
+            // This frame was published by the producer but was never sampled
+            // by D3D11. Transfer it into durable skipped-release ownership
+            // before the display watermark makes it unreachable.
+            OutRunVrR32DirectSubmit::QueueSkippedRelease(frame);
+        }
+        OutRunVrR32DirectSubmit::PollCompletedAcks();
     }
 
     void R23ReleaseDirectHoldResources() noexcept
@@ -419,11 +502,28 @@ namespace
             R23DirectHold.format = left.Format;
         }
 
-        // Immediate-context ordering guarantees that both copies execute before
-        // the following projection draw samples this host-owned pair. The R32
-        // EVENT fence then covers the copy + projection work before producer ACK.
+        // Record shared-eye ownership before issuing any D3D11 copy. A transition
+        // may happen before xrEndFrame, and that frame must never be mistaken
+        // for an untouched skipped frame.
+        R48DirectTouched[slot] = frame;
+        OutRunVrR32DirectSubmit::ObserveIdentity(frame);
+
+        // The shared producer textures are sampled only by these two copies.
+        // Arm the asynchronous EVENT immediately after them, not later at
+        // xrEndFrame. This closes the copy->ACK ownership gap when projection
+        // rendering or a session/reference-space transition interrupts the
+        // normal submission path. Later xrEndFrame sees the same pending frame
+        // and reuses this fence without adding another GPU wait.
         c.context_->CopyResource(R23DirectHold.eye[0], c.directLeft_[slot]);
         c.context_->CopyResource(R23DirectHold.eye[1], c.directRight_[slot]);
+        if (!OutRunVrR32DirectSubmit::ArmConsumptionFence(frame))
+        {
+            R23DirectHold.frameId = 0;
+            R23DirectHold.generation = 0;
+            R23DirectHold.valid = false;
+            return false;
+        }
+
         R23DirectHold.frameId = frame.frameId;
         R23DirectHold.generation = generation;
         R23DirectHold.valid = true;
@@ -2117,7 +2217,12 @@ int main(int argc, char** argv)
                         compositor.ReferenceSpaceChanged();
                         OutRunVrR23VerifiedBundle::Invalidate();
                         OutRunVR::SharedRenderFrameState rf{};
-                        if (renderFrames.Read(rf)) lastProcessedStereoFrame = rf.frameId;
+                        if (renderFrames.Read(rf))
+                        {
+                            R48RetireNeverTouchedDirectFramesThrough(
+                                renderFrames, lastProcessedStereoFrame, rf.frameId);
+                            lastProcessedStereoFrame = rf.frameId;
+                        }
                     }
                     else if (state == XR_SESSION_STATE_EXITING || state == XR_SESSION_STATE_LOSS_PENDING)
                         quit = true;
@@ -2162,7 +2267,13 @@ int main(int argc, char** argv)
                 refreshMenuAnchorAfterLocate = true;
                 OutRunVrR23VerifiedBundle::Invalidate();
                 OutRunVR::SharedRenderFrameState rf{};
-                lastProcessedStereoFrame = renderFrames.Read(rf) ? rf.frameId : shared.ReadStereoMeta().frame;
+                const std::uint32_t transitionWatermark =
+                    renderFrames.Read(rf)
+                        ? rf.frameId
+                        : shared.ReadStereoMeta().frame;
+                R48RetireNeverTouchedDirectFramesThrough(
+                    renderFrames, lastProcessedStereoFrame, transitionWatermark);
+                lastProcessedStereoFrame = transitionWatermark;
                 pendingReferenceSpaceChange = false; pendingReferenceSpaceChangeTime = 0;
             }
 
@@ -2250,7 +2361,13 @@ int main(int argc, char** argv)
                 compositor.ReferenceSpaceChanged(); matchedStereoValid = false;
                 OutRunVrR23VerifiedBundle::Invalidate();
                 OutRunVR::SharedRenderFrameState rf{};
-                lastProcessedStereoFrame = renderFrames.Read(rf) ? rf.frameId : shared.ReadStereoMeta().frame;
+                const std::uint32_t transitionWatermark =
+                    renderFrames.Read(rf)
+                        ? rf.frameId
+                        : shared.ReadStereoMeta().frame;
+                R48RetireNeverTouchedDirectFramesThrough(
+                    renderFrames, lastProcessedStereoFrame, transitionWatermark);
+                lastProcessedStereoFrame = transitionWatermark;
                 if (presentation != OutRunVR::PresentationGameplay)
                 {
                     cachedProjectionValid = false;
@@ -2384,6 +2501,8 @@ int main(int argc, char** argv)
 
                             if (foundDirect)
                             {
+                                OutRunVrR32DirectSubmit::ObserveIdentity(
+                                    selectedDirect);
                                 for (std::size_t i = 0; i < historyCount; ++i)
                                 {
                                     const auto& frame = history[i];
@@ -2404,10 +2523,20 @@ int main(int argc, char** argv)
                                         generation != currentGeneration)
                                         continue;
 
+                                    const bool touched =
+                                        OutRunVrR32DirectSubmit::
+                                            SameFrameAckIdentity(
+                                                R48DirectTouched[slot], frame);
+                                    if (touched ||
+                                        OutRunVrR32DirectSubmit::
+                                            HasPendingConsumption(frame))
+                                        continue;
+
                                     // No D3D11 draw/copy references this skipped
-                                    // frame, so producer reuse is safe immediately.
-                                    if (OutRunVrD3D9ExDirectPassthrough::
-                                            PublishCompletedFrame(frame))
+                                    // frame. Keep release ownership durable if the
+                                    // ACK mapping is temporarily unavailable.
+                                    if (OutRunVrR32DirectSubmit::
+                                            QueueSkippedRelease(frame))
                                     {
                                         R37BootstrapSubmittedFrame[slot] =
                                             frame.frameId;

@@ -243,9 +243,16 @@ host_direct = require(
     "AckedFrame",
     "AckedIdentity",
     "SameFrameAckIdentity",
+    "PendingSkippedRelease",
+    "QueueSkippedRelease",
+    "PollSkippedReleases",
+    "HasPendingConsumption",
+    "SkippedReleaseQueued",
+    "skippedAck[queued=",
     "R32 direct PERF 5s",
     "verified incoming DirectGPU projection submitted once",
     "OutRunVrR26RecenterHardening::EndFrame",
+    "Preserve incomplete EVENT owners across that boundary",
 )
 # Flush remains permitted only in the slot-pressure escalation block. Reject the
 # old unconditional End(query)+Flush() sequence.
@@ -265,6 +272,37 @@ if not (query_error < fault_identity < fast_gate):
 if "AckFaultGeneration" in host_direct or "AckedGeneration" in host_direct:
     raise SystemExit(
         "R32 host ACK cache regressed to transport-generation-only identity")
+
+ack_contract = require(
+    "src/vr/ipc/direct_ack_r13.hpp",
+    "DirectGpuAckVersion = 2",
+    "clientPid",
+    "runGeneration",
+    "DirectGpuAckIdentityMatches",
+)
+if "DirectGpuAckVersion = 1" in ack_contract:
+    raise SystemExit("run-identity DirectGPU ACK protocol must not reuse v1 semantics")
+
+host_r23_lifetime = require(
+    "vrhost/src/main_r23.cpp",
+    "R48DirectTouched",
+    "R48RetireNeverTouchedDirectFramesThrough",
+    "QueueSkippedRelease(frame)",
+    "SameFrameAckIdentity",
+    "ArmConsumptionFence(frame)",
+    "copy->ACK ownership gap",
+)
+stage_start = host_r23_lifetime.find("bool R23StageDirectHold")
+touch = host_r23_lifetime.find("R48DirectTouched[slot] = frame", stage_start)
+copy_left = host_r23_lifetime.find(
+    "c.context_->CopyResource(R23DirectHold.eye[0]", stage_start)
+copy_right = host_r23_lifetime.find(
+    "c.context_->CopyResource(R23DirectHold.eye[1]", copy_left)
+arm = host_r23_lifetime.find("ArmConsumptionFence(frame)", copy_right)
+if min(stage_start, touch, copy_left, copy_right, arm) < 0 or not (
+        stage_start < touch < copy_left < copy_right < arm):
+    raise SystemExit(
+        "DirectGPU touched identity must be recorded before copy and EVENT armed immediately after both eye copies")
 
 r34 = require(
     "src/vr/d3d9/stereo_renderer_r34.cpp",
