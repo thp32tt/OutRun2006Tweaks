@@ -42,7 +42,7 @@ function Run-Test([string]$variant){
 $form=New-Object System.Windows.Forms.Form
 $form.Text='OutRun VR Visual Isolation Matrix'
 $form.StartPosition='CenterScreen'
-$form.ClientSize=New-Object System.Drawing.Size(700,560)
+$form.ClientSize=[System.Drawing.Size]::new(700,560)
 $form.FormBorderStyle='FixedDialog'
 $form.MaximizeBox=$false
 
@@ -50,14 +50,14 @@ $title=New-Object System.Windows.Forms.Label
 $title.Text='OutRun VR 화면 오류 격리 테스트'
 $title.Font=New-Object System.Drawing.Font('Segoe UI',16,[System.Drawing.FontStyle]::Bold)
 $title.AutoSize=$true
-$title.Location=New-Object System.Drawing.Point(150,18)
+$title.Location=[System.Drawing.Point]::new(150,18)
 $form.Controls.Add($title)
 
 $guide=New-Object System.Windows.Forms.Label
 $guide.Text='같은 코스/시점에서 1 -> 2 -> 3 -> 4 -> 5 순서로 테스트하세요. 각 버튼은 변수 하나만 바꿉니다. 게임 종료 후 로그 ZIP은 자동 생성됩니다.'
 $guide.AutoSize=$false
-$guide.Size=New-Object System.Drawing.Size(630,48)
-$guide.Location=New-Object System.Drawing.Point(35,58)
+$guide.Size=[System.Drawing.Size]::new(630,48)
+$guide.Location=[System.Drawing.Point]::new(35,58)
 $form.Controls.Add($guide)
 
 $y=115
@@ -66,8 +66,8 @@ foreach($key in $slots.Keys){
     $button=New-Object System.Windows.Forms.Button
     $button.Text=$cfg.Title
     $button.Tag=$key
-    $button.Size=New-Object System.Drawing.Size(210,54)
-    $button.Location=New-Object System.Drawing.Point(35,$y)
+    $button.Size=[System.Drawing.Size]::new(210,54)
+    $button.Location=[System.Drawing.Point]::new(35,$y)
     $button.Add_Click({
         try{
             Run-Test ([string]$this.Tag)
@@ -81,8 +81,8 @@ foreach($key in $slots.Keys){
     $label=New-Object System.Windows.Forms.Label
     $label.Text=$cfg.Detail
     $label.AutoSize=$false
-    $label.Size=New-Object System.Drawing.Size(405,50)
-    $label.Location=New-Object System.Drawing.Point(255,$y+3)
+    $label.Size=[System.Drawing.Size]::new(405,50)
+    $label.Location=[System.Drawing.Point]::new(255,($y+3))
     $form.Controls.Add($label)
     $y+=68
 }
@@ -91,14 +91,14 @@ $status=New-Object System.Windows.Forms.Label
 $status.Text='준비됨'
 $status.Font=New-Object System.Drawing.Font('Segoe UI',10,[System.Drawing.FontStyle]::Bold)
 $status.AutoSize=$true
-$status.Location=New-Object System.Drawing.Point(35,470)
+$status.Location=[System.Drawing.Point]::new(35,470)
 $form.Controls.Add($status)
 
 $bottom=New-Object System.Windows.Forms.Label
 $bottom.Text='중요: 화면이 정상으로 바뀌는 최초 번호를 기억하세요. 해당 ZIP만 올려도 되지만 가능하면 1~5 ZIP을 모두 올리면 자동 비교합니다.'
 $bottom.AutoSize=$false
-$bottom.Size=New-Object System.Drawing.Size(630,48)
-$bottom.Location=New-Object System.Drawing.Point(35,500)
+$bottom.Size=[System.Drawing.Size]::new(630,48)
+$bottom.Location=[System.Drawing.Point]::new(35,500)
 $form.Controls.Add($bottom)
 
 [void]$form.ShowDialog()
