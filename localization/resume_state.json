@@ -44,7 +44,7 @@
     "batch3_package_sha256": "02d848b9746cb474d52d500cc849294fe55baca0e1bbe618f5faa39ee3b1c69c",
     "batch4_package_sha256": "cfddc6c758bfdc8313dd624bbe9211ce6d2221bd04985ee6856d449e66cffb95",
     "batch5_package_sha256": "1d5de3dcc55caefba4e904e3d0030b6ae5fbd70f479546641add3d967cf3459f",
-    "pending_dxt5_asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+    "pending_dxt5_asset": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
     "current_state_file": "localization/graphics/SOURCE_FAITHFUL_CURRENT.json",
     "batch6_report": "localization/graphics/BATCH6_SOURCEFAITHFUL_REPORT.json",
     "batch7_report": "localization/graphics/BATCH7_STYLE_ARTIFACT_QA_REPORT.json",
@@ -55,10 +55,7 @@
     "current_combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B25v4_QA_Test.zip",
     "current_combined_package_sha256": "e0d2df30e8de09dc69e154cbcffcfce649c76fd7edd760e4bb2fe0ab935d781d",
     "pending_dxt5_assets": [
-      "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
-      "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
-      "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
-      "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+      "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
       "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds"
     ],
     "batch12v2_report": "localization/graphics/BATCH12V2_DXT5_REWORK_REPORT.json",
@@ -69,7 +66,8 @@
     "batch21v3_report": "localization/graphics/BATCH21V3_REWORK_REPORT.json",
     "batch23_rejected_report": "localization/graphics/BATCH23_REJECTED_REPORT.json",
     "batch24v2_report": "localization/graphics/BATCH24V2_2DA_REWORK_REPORT.json",
-    "batch25v4_report": "localization/graphics/BATCH25V4_ACF_REWORK_REPORT.json"
+    "batch25v4_report": "localization/graphics/BATCH25V4_ACF_REWORK_REPORT.json",
+    "latest_safe_rework_note": "2026-09-26 08:11 KST: only 37759842 and C598919A remain pending; do not regenerate without original DDS plus candidate bytes. 37759842 requires gradient/icon-preserving cleanup; C598919A requires larger per-label DXT5 block extents. Unsafe edits stay original."
   },
   "runtime_packages": {
     "k1": {
