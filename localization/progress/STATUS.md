@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-26 08:39 KST
+Updated: 2026-09-26 08:55 KST
 
 ## Active branch
 `korean-localization-clean`
@@ -96,15 +96,13 @@ Read:
 Next gate: finish the final pending `37759842_1024x1024.dds` from original DDS, then in-game validate the 31 retained candidates.
 
 
-### QA checkpoint 2026-09-26 08:11 KST
-- Canonical state: **30 retained / 2 pending** (`37759842`, `C598919A`).
-- Hard gates: original orientation, preserve-original exclusions, source-style fidelity, artifact cleanliness, and original text-region containment.
-- Safety rule: no pixel promotion without original DDS + candidate-byte comparison; unsafe/unavailable candidates remain original.
 
 
-### QA checkpoint 2026-09-26 08:31 KST
-- Mandatory policy/state files re-read before promotion decisions.
-- Accessible file search did not locate usable exact original DDS bytes for the final two assets.
-- `37759842` and `C598919A` remain original; no preview-derived edit was promoted.
-- Canonical state remains **30 retained / 2 pending**.
-- Report: `localization/graphics/BATCH27_SAFE_HOLD_REPORT.json`.
+### QA checkpoint 2026-09-26 08:55 KST
+- Re-read mandatory policy/current/resume/status and Batch41 before making a promotion decision.
+- Canonical state: **32 reviewed / 31 retained / 1 pending**.
+- Sole pending asset: `37759842_1024x1024.dds`.
+- Batch41 automated containment passed, but manual artifact-cleanliness failed because source English remains in lower blue `Mode` cards and black 15-course cards.
+- Exact DDS binaries are not committed to Git; no preview/report-derived pixel edit was promoted.
+- `C598919A` stale pending references were removed from resume metadata; it remains promoted by Batch38.
+- Report: `localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json`.
