@@ -1,17 +1,13 @@
 {
-  "updated_at_kst": "2026-09-26T07:05:00+09:00",
+  "updated_at_kst": "2026-09-26T07:04:00+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
-  "localized_candidates": 22,
-  "reset_to_original_pending_rework": 10,
-  "combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B11v2_QA_Test.zip",
-  "combined_package_sha256": "4831a754df8ef85cab0e8bb0d898ae38d76779eb2bc69c13494248bf044d58b3",
+  "localized_candidates": 26,
+  "reset_to_original_pending_rework": 6,
+  "combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B12v2_QA_Test.zip",
+  "combined_package_sha256": "806579f71f09211e942a54c5c9b3817a08ac0f496dd80ade53b695c9d6e9a6d3",
   "pending": [
     "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
-    "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
-    "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
-    "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
-    "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
     "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
     "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
     "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
@@ -24,5 +20,6 @@
     "result": "metadata_reconciled_no_binary_promotion",
     "note": "Local runtime work produced B12-B15 experiments, but those binary DDS candidates are not persisted in Git and cannot be revalidated from this automation environment. Therefore no candidate was promoted. Pending list remains canonical until original-DDS + raw/readable/game-orientation QA can be rerun.",
     "mandatory_additional_gate": "translated glyph pixels must remain inside the original text region; reject clipping, overlap, or spill into adjacent sprite cells"
-  }
+  },
+  "latest_promoted_batch": "localization/graphics/BATCH12V2_DXT5_REWORK_REPORT.json"
 }
