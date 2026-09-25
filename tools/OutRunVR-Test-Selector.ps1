@@ -6,17 +6,21 @@ $selector=Join-Path $root 'Select-OutRunVRBackend.ps1'
 $runner=Join-Path $root 'Run-OutRunVRTest.ps1'
 
 $slots=[ordered]@{
-    'X_COMBINED'=[ordered]@{
-        Title='1. COMBINED FIX (먼저 테스트)'
-        Detail='cross-thread semantic 보존 + SCREEN_HUD + WORLD_RANK를 함께 적용. 화면 HUD와 차량 순위 마커의 실제 수정 후보.'
+    'R54_A_NEXTDRAW'=[ordered]@{
+        Title='1. A - NEXT DRAW LATCH'
+        Detail='queue exact semantic을 다음 D3D draw에 1회 직접 전달. 가장 좁은 수정.'
     }
-    'X_SCREEN_HUD'=[ordered]@{
-        Title='2. SCREEN HUD ONLY'
-        Detail='DispRank/TimeAttack/REV 등 확인된 화면 HUD만 정확한 SCREEN_HUD로 처리. 고정 HUD/리사이즈 확인용.'
+    'R54_B_STICKY'=[ordered]@{
+        Title='2. B - STICKY NODE'
+        Detail='현재 SpriteNode가 끝날 때까지 exact SCREEN_HUD/WORLD_RANK를 유지. multi-draw node 대응.'
     }
-    'X_WORLD_RANK'=[ordered]@{
-        Title='3. WORLD RANK ONLY'
-        Detail='1~5등 차량 위 마커의 WORLD_BILLBOARD semantic만 적용. 특히 4/5등 위치/머리추종 확인용.'
+    'R54_C_FULL_OWNER'=[ordered]@{
+        Title='3. C - FULL OWNER'
+        Detail='sticky semantic + c64/WVP 단계에서도 exact queue semantic을 강제 복구. 가장 유력한 수정.'
+    }
+    'R54_D_HUD_PLANE'=[ordered]@{
+        Title='4. D - HUD PLANE FORCE'
+        Detail='C 방식 + generic queue HUD까지 finite HUD plane으로 승격. 화면 HUD 크기/머리추종 분리 확인.'
     }
 }
 
@@ -31,7 +35,7 @@ function Run-Test([string]$variant){
 $form=New-Object System.Windows.Forms.Form
 $form.Text='OutRun VR Test Selector'
 $form.StartPosition='CenterScreen'
-$form.ClientSize=[System.Drawing.Size]::new(720,390)
+$form.ClientSize=[System.Drawing.Size]::new(720,440)
 $form.FormBorderStyle='FixedDialog'
 $form.MaximizeBox=$false
 
@@ -43,7 +47,7 @@ $title.Location=[System.Drawing.Point]::new(155,18)
 $form.Controls.Add($title)
 
 $guide=New-Object System.Windows.Forms.Label
-$guide.Text='먼저 1번 COMBINED FIX를 테스트하세요. 남은 문제가 있으면 2/3번으로 원인을 분리합니다. F11 > Configure Input Bindings에서 VR Recenter도 원하는 휠/키에 지정해 메뉴와 게임에서 모두 확인하세요.'
+$guide.Text='같은 코스/시점에서 1→2→3→4 순서로 짧게 테스트하세요. 화면 변화가 생기는 첫 버전이 핵심입니다. F11 VR Recenter도 메뉴/게임에서 같이 확인하세요.
 $guide.AutoSize=$false
 $guide.Size=[System.Drawing.Size]::new(650,44)
 $guide.Location=[System.Drawing.Point]::new(35,58)
@@ -80,7 +84,7 @@ $status=New-Object System.Windows.Forms.Label
 $status.Text='준비됨'
 $status.Font=New-Object System.Drawing.Font('Segoe UI',10,[System.Drawing.FontStyle]::Bold)
 $status.AutoSize=$true
-$status.Location=[System.Drawing.Point]::new(35,340)
+$status.Location=[System.Drawing.Point]::new(35,390)
 $form.Controls.Add($status)
 
 [void]$form.ShowDialog()
