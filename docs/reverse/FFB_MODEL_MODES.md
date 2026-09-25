@@ -50,6 +50,8 @@ Keeps the Modern DD structural steering model but swaps surface/wall/gear event 
 
 This is intended for modern DD hardware when the user wants current SAT quality with arcade-style transient timing. Collision debounce remains shared, but Hybrid only unloads its Modern structural torque during the active Arcade directional event window (~80 ms); the rest of the debounce interval no longer leaves SAT artificially blank.
 
+The **Use Arcade Hybrid** shortcut is a complete reference preset rather than a delta from the previously selected model. It explicitly restores the Modern DD spring/damper, mechanical/caster, tire-slip, slew and reversal-release baseline before enabling the arcade event layer. This prevents Arcade Original's 0.50/no-damper condition profile or PS2 condition settings from leaking into Hybrid during live F11 switching. All Original/Hybrid/PS2 reference shortcuts also restore both ConstantForce and Spring reversal to OFF so stale direction settings cannot contaminate model comparisons.
+
 ## Model 3 — PS2 Original topology (Experimental)
 
 The PS2 reverse map verifies distinct:
