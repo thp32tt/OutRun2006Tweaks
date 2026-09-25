@@ -456,7 +456,33 @@
         "SURFACE"
       ],
       "confidence": "high",
-      "evidence": "After evaluating car offsets 0x24C/0x250/0x254/0x258 and retaining the maximum LUT value, retail SLPM stores that surface envelope to 0x0035F280."
+      "evidence": "After evaluating car offsets 0x24C/0x250/0x254/0x258 and retaining the maximum LUT value, retail SLPM stores the surface envelope to 0x0035F280. Later verified writes at 0x001D81BC/0x001D8268 can replace it with roughness*1.25 under recovered car-field predicates."
+    },
+    {
+      "va": "0x001D81BC",
+      "name": "WheelRuntime_SurfaceEnvelopeBoostA",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RUNTIME",
+        "PERIODIC",
+        "SURFACE"
+      ],
+      "confidence": "high",
+      "evidence": "For roughness >0.30 and car float +0x268 <0.10, retail SLPM overwrites Type-4 surface source 0x0035F280 with roughness*1.25."
+    },
+    {
+      "va": "0x001D8268",
+      "name": "WheelRuntime_SurfaceEnvelopeBoostB",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RUNTIME",
+        "PERIODIC",
+        "SURFACE"
+      ],
+      "confidence": "high",
+      "evidence": "When the first boost predicate is false, roughness >0.30 and car float +0x264 >-0.10 cause retail SLPM to overwrite Type-4 source 0x0035F280 with roughness*1.25."
     },
     {
       "va": "0x0024DF10",
