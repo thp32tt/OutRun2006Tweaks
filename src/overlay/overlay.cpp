@@ -148,22 +148,38 @@ void Overlay::rebuild_fonts()
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->Clear();
 
-	// Read the file rather than handing ImGui the path, so a Windows directory
-	// with characters outside the active code page still works.
+	// Prefer a Windows Korean-capable system font on the localization branch.
+	// No font file is shipped with the mod; only the locally installed Windows
+	// font is read into ImGui.
 	std::vector<uint8_t> fontData;
+	std::filesystem::path loadedFontPath;
 	{
 		wchar_t windowsDir[MAX_PATH]{};
 		if (GetWindowsDirectoryW(windowsDir, MAX_PATH))
 		{
-			const std::filesystem::path fontPath = std::filesystem::path(windowsDir) / "Fonts" / "segoeui.ttf";
+			const std::filesystem::path fontsDir = std::filesystem::path(windowsDir) / "Fonts";
+			const std::filesystem::path candidates[] = {
+				fontsDir / "malgun.ttf",
+				fontsDir / "malgunsl.ttf",
+				fontsDir / "gulim.ttc",
+				fontsDir / "batang.ttc",
+				fontsDir / "segoeui.ttf"
+			};
 
-			std::ifstream file(fontPath, std::ios::binary | std::ios::ate);
-			if (file)
+			for (const auto& fontPath : candidates)
 			{
+				std::ifstream file(fontPath, std::ios::binary | std::ios::ate);
+				if (!file)
+					continue;
+
 				fontData.resize(size_t(file.tellg()));
 				file.seekg(0);
-				if (!file.read(reinterpret_cast<char*>(fontData.data()), fontData.size()))
-					fontData.clear();
+				if (file.read(reinterpret_cast<char*>(fontData.data()), fontData.size()))
+				{
+					loadedFontPath = fontPath;
+					break;
+				}
+				fontData.clear();
 			}
 		}
 	}
@@ -177,11 +193,13 @@ void Overlay::rebuild_fonts()
 		memcpy(owned, fontData.data(), fontData.size());
 
 		loaded = io.Fonts->AddFontFromMemoryTTF(owned, int(fontData.size()), sizePixels) != nullptr;
+		if (loaded)
+			spdlog::info("Overlay::rebuild_fonts - loaded '{}'", loadedFontPath.string());
 	}
 
 	if (!loaded)
 	{
-		spdlog::warn("Overlay::rebuild_fonts - Segoe UI unavailable, falling back to the built-in font");
+		spdlog::warn("Overlay::rebuild_fonts - no usable Windows UI/Korean font found, falling back to the built-in font");
 
 		ImFontConfig config;
 		config.SizePixels = sizePixels;
