@@ -28,23 +28,23 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "\${{ github.event_name }}" == "pull_request" ]]; then
-            echo "BASE_SHA=\${{ github.event.pull_request.base.sha }}" >> "$GITHUB_ENV"
-            echo "HEAD_SHA=\${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "BASE_SHA=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_ENV"
+            echo "HEAD_SHA=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
           else
-            BEFORE="\${{ github.event.before }}"
+            BEFORE="${{ github.event.before }}"
             if [[ "$BEFORE" =~ ^0+$ ]]; then
               BEFORE="$(git rev-parse HEAD^)"
             fi
             echo "BASE_SHA=$BEFORE" >> "$GITHUB_ENV"
-            echo "HEAD_SHA=\${{ github.sha }}" >> "$GITHUB_ENV"
+            echo "HEAD_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
           fi
 
       - name: Verify domain isolation
         shell: bash
         run: |
           set -euo pipefail
-          TARGET_BRANCH="\${GITHUB_BASE_REF:-$GITHUB_REF_NAME}"
+          TARGET_BRANCH="${GITHUB_BASE_REF:-$GITHUB_REF_NAME}"
           python tools/verify_domain_isolation.py \
             --base "$BASE_SHA" \
             --head "$HEAD_SHA" \
