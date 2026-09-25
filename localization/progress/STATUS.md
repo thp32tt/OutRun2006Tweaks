@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-26 00:34 KST
+Updated: 2026-09-26 01:24 KST
 
 ## Active branch
 `korean-localization-clean`
@@ -44,12 +44,22 @@ The full draft intentionally uses exact/OCR/manual/atlas-alpha placement evidenc
 
 ### Source-faithful batches
 - Batch3: 10 assets, report `BATCH3_SOURCEFAITHFUL_REPORT.json`
-- Batch4: 5 assets, package SHA-256 `cfddc6c758bfdc8313dd624bbe9211ce6d2221bd04985ee6856d449e66cffb95`
-- Batch5: 5 assets, package SHA-256 `1d5de3dcc55caefba4e904e3d0030b6ae5fbd70f479546641add3d967cf3459f`
-- Source-faithful reviewed since QA reset: **20**
-- Retained/rebuilt localized candidates: **17**
-- Reset to original pending safe rework: **3**
-- Pending special case: `49BB5FE5_128x32.dds` DXT5 compression-safe rewrite
+- Batch4: 5 assets, report `BATCH4_SOURCEFAITHFUL_REPORT.json`
+- Batch5: 5 assets, report `BATCH5_SOURCEFAITHFUL_REPORT.json`
+- Batch6: 12 reviewed, report `BATCH6_SOURCEFAITHFUL_REPORT.json`
+- Batch7: style/artifact QA reset, report `BATCH7_STYLE_ARTIFACT_QA_REPORT.json`
+- Batch8Fix: 3 rebuilt, report `BATCH8FIX_REWORK_REPORT.json`
+- Batch9: 3 rebuilt, report `BATCH9_REWORK_REPORT.json`
+- Batch10v2: 3 retained + 1 reset, report `BATCH10V2_REWORK_REPORT.json`
+- Batch11v2: 1 retained + 1 reset, report `BATCH11V2_REWORK_REPORT.json`
+- Current machine state: `localization/graphics/SOURCE_FAITHFUL_CURRENT.json`
+- Source-faithful reviewed since QA reset: **32**
+- Retained/rebuilt localized candidates: **22**
+- Reset to original pending safe rework: **10**
+- Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B11v2_QA_Test.zip`
+- Combined package SHA-256: `4831a754df8ef85cab0e8bb0d898ae38d76779eb2bc69c13494248bf044d58b3`
+- Mandatory extra QA gates: source-like typography/colors; no stray black lines, crop seams, text-erasure residue, clipped glyphs, accidental opaque boxes, or alpha halos.
+- DXT5-safe rewrite still required for several assets, including `49BB5FE5_128x32.dds`, `42E618FD_512x32.dds`, `7CE1CFC5_512x128.dds`, and `C598919A_1024x1024.dds`.
 
 ## Runtime/font
 - K0 txet roundtrip: **PASS**
@@ -66,9 +76,9 @@ Read:
 2. `localization/resume_state.json`
 3. `localization/WORKLOG.md`
 4. `localization/graphics/ORIENTATION_POLICY.md`
-5. `localization/graphics/BATCH3_SOURCEFAITHFUL_REPORT.json`
-6. `localization/graphics/BATCH4_SOURCEFAITHFUL_REPORT.json`
-7. `localization/graphics/BATCH5_SOURCEFAITHFUL_REPORT.json`
+5. `localization/graphics/SOURCE_FAITHFUL_CURRENT.json`
+6. `localization/graphics/BATCH10V2_REWORK_REPORT.json`
+7. `localization/graphics/BATCH11V2_REWORK_REPORT.json`
 8. `localization/graphics/FULL_DRAFT_REPORT.json`
 
-Next gate: continue remaining assets from original DDS first; handle DXT5 safely; keep vehicle/model/brand/song/legal text preserved; in-game validate source-faithful candidates.
+Next gate: continue the 10 pending assets from original DDS first; solve DXT5-safe rewriting; keep preserve-original names/artwork untouched; run in-game validation on the 22 retained candidates.
