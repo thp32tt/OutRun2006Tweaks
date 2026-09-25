@@ -60,6 +60,8 @@ namespace WheelFFBMath
     constexpr float ArcadeGearSinePeriodMs = 240.0f;
     constexpr float ArcadeGearSineAmplitude = 0.10f;
     constexpr int ArcadeGearEventFrames = 15; // ceil(240 ms * 60 Hz)
+    constexpr float ArcadeConstantEventLengthMs = 80.0f;
+    constexpr int ArcadeConstantEventFrames = 5; // nearest 60 Hz frame count
 
     // Host-only emergency crash fallback. The game's collision-state edge is
     // authoritative; these thresholds only catch severe deceleration when that
