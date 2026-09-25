@@ -381,9 +381,23 @@ namespace OutRunVRHudInspector
             }
         }
 
-        if (semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud)
+        char semanticModeText[8]{};
+        int semanticMode = 0;
+        if (GetEnvironmentVariableA(
+                "OUTRUN_VR_EXE_SEMANTIC_MODE",
+                semanticModeText,
+                static_cast<DWORD>(sizeof(semanticModeText))) > 0 &&
+            semanticModeText[0] >= '0' && semanticModeText[0] <= '3')
+            semanticMode = semanticModeText[0] - '0';
+
+        // Bit 0 = exact SCREEN_HUD, bit 1 = exact WORLD_BILLBOARD.
+        // Default 0 keeps production behavior untouched unless a test variant
+        // explicitly asks to consume the verified disassembly semantics.
+        if (semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud &&
+            (semanticMode & 1) != 0)
             return OutRunVR::GameSemantic::RenderScope::ScreenHud;
-        if (semantic.space == OutRunVRHudSemantics::SpacePolicy::WorldBillboard)
+        if (semantic.space == OutRunVRHudSemantics::SpacePolicy::WorldBillboard &&
+            (semanticMode & 2) != 0)
             return OutRunVR::GameSemantic::RenderScope::WorldBillboard;
         return OutRunVR::GameSemantic::RenderScope::None;
     }
