@@ -1,0 +1,22 @@
+{
+  "batch": "22-C598919A-rework",
+  "asset": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
+  "status": "rejected_keep_original",
+  "technique": "DXT5 block-level patching; only approved 4x4 blocks were replaced",
+  "automated_qa": {
+    "dimensions_identical": true,
+    "header_128_identical": true,
+    "decoded_changed_pixels_outside_patched_allowed_blocks": 0,
+    "patched_dxt5_blocks": 278542,
+    "pass": true
+  },
+  "manual_qa": {
+    "pass": false,
+    "reasons": [
+      "Residual English remains around several course/mode/ranking labels because the source text extents exceeded the initial boxes.",
+      "Several GOAL/mode cards show partial source glyph remnants or clipped source styling around the Korean replacement.",
+      "Candidate therefore fails artifact-cleanliness and complete-label replacement despite byte-preserving DXT5 block patching."
+    ]
+  },
+  "action": "Keep original DDS. Reuse the verified block-level DXT5 patcher in the next pass with larger per-label boxes."
+}
