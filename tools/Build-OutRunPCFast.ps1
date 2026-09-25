@@ -168,7 +168,9 @@ $runtimeFiles = @(
     'OutRunVR-Backend-Selector.ps1',
     'OutRunVR-Backend-Selector.cmd',
     'OutRunVR-Slot-Selector.ps1',
-    'OutRunVR-Slot-Selector.cmd'
+    'OutRunVR-Slot-Selector.cmd',
+    'OutRunVR-EXE-Semantic-Selector.ps1',
+    'OutRunVR-EXE-Semantic-Selector.cmd'
 )
 foreach ($file in $runtimeFiles) {
     $src = Join-Path 'tools' $file
