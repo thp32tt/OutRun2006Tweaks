@@ -74,3 +74,8 @@ Recommended correlation for hardware logs:
 ### Gear Sine trigger semantics
 
 The plugin interface declares `Sine(UINT16 period, UINT16 fadePeriod, double strength)`, and `TriggerSineEffect` writes the first argument to SDL's periodic period and length. OutRun2Real's gear-change call `Sine(240, 320, 0.10)` therefore represents a 240 ms-period, 240 ms-length Sine at source amplitude 0.10; the second value is the attack/fade parameter. The PC reconstruction uses the 240 ms period as ~4.167 Hz and F11 Gear Shift only as an explicit host scaler.
+
+
+### OutRun2Real ConstantForce lifetime
+
+The shipped plugin profile `[Outrun 2 Special Tours Deluxe Real]` sets `FeedbackLength=80`. `TriggerConstantEffect` assigns that value to SDL's constant-effect length. The local `percentLength=100` in `SendForceFeedback` is used only by the companion rumble call, not by ConstantForce. The C2C reconstruction therefore represents the directional 0x10/0x00/0x0B/0x1B/0x04/0x14 ConstantForce lifetime as five 60 Hz ticks (~83.3 ms), the nearest whole-frame representation of 80 ms.
