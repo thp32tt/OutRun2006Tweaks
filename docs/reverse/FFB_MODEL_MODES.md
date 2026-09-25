@@ -12,7 +12,7 @@ The existing DD-oriented model:
 - stage-aware four-wheel road texture;
 - modern collision, gear and optional engine haptics.
 
-This remains the default.
+This remains the default. The two **MOZA R3** Modern presets intentionally default hardware periodic effects **off**, using the ConstantForce road/slip fallback because the R3 compatibility work found that reported Sine support can be physically weak. This is a preset default, not a global lock: the F11 periodic switch remains live.
 
 ## Model 1 — Arcade Original (Lindbergh-derived)
 
