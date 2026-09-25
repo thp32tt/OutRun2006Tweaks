@@ -18,6 +18,7 @@
 #include "vr_shared.hpp"
 #include "vr/ipc/host_pose_v3.hpp"
 #include "vr/ipc/cadence_v1.hpp"
+#include "vr/ipc/recenter_request.hpp"
 #include "vr/game/render_semantics.hpp"
 
 // Authoritative renderer-side OpenXR head-pose injector for OutRun 2006.
@@ -145,6 +146,8 @@ namespace OutRunVRRenderer
 		std::uint32_t CenterHostPid = 0;
 		std::uint32_t CenterReferenceSpaceGeneration = 0;
 		bool RecenterWasDown = false;
+		bool PendingRendererRecenter = false;
+		LONG LastPublishedRecenterRequest = 0;
 		bool AutoEnableLogged = false;
 
 		D3DMATRIX LatchedHeadInverse{};
@@ -800,6 +803,31 @@ namespace OutRunVRRenderer
 			return pressed;
 		}
 
+		void ServiceRendererRecenterInput()
+		{
+			if (!RendererRecenterPressed())
+				return;
+
+			// Keep a game-side center request pending until gameplay has a valid
+			// pose again, but publish to the host immediately. This makes the same
+			// bound action recenter the LOCAL-fixed theater/menu as well as the
+			// later gameplay projection.
+			PendingRendererRecenter = true;
+			LastPublishedRecenterRequest =
+				OutRunVR::RecenterIpc::SharedChannel().Publish();
+			if (LastPublishedRecenterRequest != 0)
+			{
+				spdlog::info(
+					"VR recenter: published host requestId={} from configured VR Recenter action",
+					LastPublishedRecenterRequest);
+			}
+			else
+			{
+				spdlog::warn(
+					"VR recenter: failed to publish host request; renderer-local recenter remains pending");
+			}
+		}
+
 		bool GameRendererIsActive()
 		{
 			return CurrentPresentationMode() == PresentationGameplay;
@@ -1204,6 +1232,11 @@ namespace OutRunVRRenderer
 			ResetFrameState();
 			RestoreCullingCamera();
 
+			// Recenter is an application action, not a gameplay-only render action.
+			// Service it before the presentation gate so the LOCAL-fixed menu
+			// theater can move immediately through the host IPC channel.
+			ServiceRendererRecenterInput();
+
 			if (!GameRendererIsActive())
 				return;
 
@@ -1234,7 +1267,9 @@ namespace OutRunVRRenderer
 			if (!enabled)
 				return;
 
-			const bool recenter = RendererRecenterPressed();
+			const bool recenter = PendingRendererRecenter;
+			if (recenter)
+				PendingRendererRecenter = false;
 			const bool hostChanged = !CenterValid || CenterHostPid != sample.hostPid;
 			const bool referenceSpaceChanged = CenterValid &&
 				CenterReferenceSpaceGeneration != sample.referenceSpaceGeneration;
@@ -1249,7 +1284,7 @@ namespace OutRunVRRenderer
 				CenterReferenceSpaceGeneration = sample.referenceSpaceGeneration;
 				CenterValid = true;
 				if (recenter)
-					spdlog::info("VR renderer: yaw recentered HMD pose (configured VR Recenter action); pitch/roll preserved");
+					spdlog::info("VR renderer: yaw recentered gameplay pose after configured VR Recenter action; host requestId={}; pitch/roll preserved", LastPublishedRecenterRequest);
 				else if (referenceSpaceChanged)
 					spdlog::info("VR renderer: OpenXR reference space changed; tracking origin refreshed");
 			}
@@ -1622,7 +1657,7 @@ namespace OutRunVRRenderer
 			// renderer head injection can happen first and R30 applies a second
 			// transform, which is visible as duplicated/misplaced 6th/6 and menus.
 			const auto semanticScope =
-				OutRunVR::GameSemantic::CurrentScope;
+				OutRunVR::GameSemantic::EffectiveScope();
 			const bool semanticOverlay =
 				OutRunVR::GameSemantic::CorroboratesHud(semanticScope) ||
 				OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(

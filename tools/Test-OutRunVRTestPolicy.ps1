@@ -60,7 +60,7 @@ $requiredFiles = @(
     'Select-OutRunVRBackend.ps1',
     'Run-OutRunVRTest.ps1',
     'Collect-OutRunVRLogs.ps1',
-    'OutRunVR-Backend-Selector.ps1'
+    'OutRunVR-Test-Selector.ps1'
 )
 $text = @{}
 $parseTargets = @('OutRunVR-TestProfiles.ps1') + $requiredFiles
@@ -79,9 +79,12 @@ Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'Get-OutRunVRTestProfile') 'ru
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'TEST_PROFILE') 'collector manifest must record profile'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match '\$variant/\$profile/\$session') 'collector path must separate Variant/Profile/Session'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'captureRoot') 'collector must include capture bundles'
-Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'CORRECTNESS') 'GUI must expose CORRECTNESS'
-Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'CONTROL') 'GUI must expose CONTROL'
-Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'PERFORMANCE') 'GUI must expose PERFORMANCE'
+Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'R54_A_NEXTDRAW') 'single GUI must expose R54 next-draw case'
+Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'R54_B_STICKY') 'single GUI must expose R54 sticky-node case'
+Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'R54_C_FULL_OWNER') 'single GUI must expose R54 full-owner case'
+Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'R54_D_HUD_PLANE') 'single GUI must expose R54 HUD-plane case'
+Assert-True (-not (Test-Path (Join-Path $root 'OutRunVR-Backend-Selector.ps1'))) 'obsolete backend GUI selector must stay removed'
+Assert-True (-not (Test-Path (Join-Path $root 'OutRunVR-Slot-Selector.ps1'))) 'obsolete slot GUI selector must stay removed'
 
 $watchdogPath = Join-Path $repoRoot 'vrhost/src/diagnostics/runtime_watchdog.cpp'
 Assert-True (Test-Path $watchdogPath) 'runtime watchdog source missing'
@@ -113,4 +116,4 @@ Assert-True ($state.testProfiles.CORRECTNESS.defaultUserTest -eq $true) 'CORRECT
 Assert-True ($state.testProfiles.CONTROL.defaultUserTest -eq $false) 'CONTROL must be optional'
 Assert-True ($state.testProfiles.PERFORMANCE.defaultUserTest -eq $false) 'PERFORMANCE must be optional'
 
-Write-Host 'VR test policy verification passed: profile identity, runtime defaults, session/log separation, GUI exposure, bounded Ctrl+F9 capture, single-active CI and TEST_LEVEL state are consistent.'
+Write-Host 'VR test policy verification passed: profile identity, runtime defaults, session/log separation, single user-facing semantic selector, bounded Ctrl+F9 capture, single-active CI and TEST_LEVEL state are consistent.'

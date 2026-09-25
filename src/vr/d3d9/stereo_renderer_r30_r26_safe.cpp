@@ -1408,7 +1408,7 @@ namespace OutRunVRStereo
                 return R30ScreenSpaceKind::None;
 
             const auto semanticScope =
-                OutRunVR::GameSemantic::CurrentScope;
+                OutRunVR::GameSemantic::EffectiveScope();
             const bool semanticHud =
                 OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
             const bool semanticWorld =
@@ -1863,7 +1863,7 @@ namespace OutRunVRStereo
             // Positive projected-depth evidence remains sufficient for known
             // world effects. Everything else fails closed to the R26/R23 owner.
             const auto semanticScope =
-                OutRunVR::GameSemantic::CurrentScope;
+                OutRunVR::GameSemantic::EffectiveScope();
             const bool semanticHud =
                 OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
             const bool semanticWorld =
@@ -3317,7 +3317,7 @@ namespace OutRunVRStereo
             // D3D state can describe a candidate shape, but it never owns it.
             // Promotion requires the canonical EXE/original-mod semantic scope.
             const auto semanticScope =
-                OutRunVR::GameSemantic::CurrentScope;
+                OutRunVR::GameSemantic::EffectiveScope();
             if (screenKind == R30ScreenSpaceKind::WorldBillboard)
             {
                 if (!OutRunVR::GameSemantic::CorroboratesWorld(
@@ -3532,7 +3532,7 @@ namespace OutRunVRStereo
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
@@ -3560,7 +3560,7 @@ namespace OutRunVRStereo
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
@@ -3590,7 +3590,7 @@ namespace OutRunVRStereo
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
@@ -3619,7 +3619,7 @@ namespace OutRunVRStereo
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(

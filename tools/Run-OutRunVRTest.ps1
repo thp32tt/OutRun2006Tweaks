@@ -13,6 +13,26 @@ $selector=Join-Path $root 'Select-OutRunVRBackend.ps1'
 $profileLib=Join-Path $root 'OutRunVR-TestProfiles.ps1'
 $game=Join-Path $root $GameExe
 
+# Canonical EXE identity gates the reverse-engineered HUD semantic map.
+# Never apply hard-coded RVA semantics to an unknown executable.
+$canonicalExeSha256='68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3'
+$exeSha256='missing'
+$semanticIdentityVerified=$false
+try{
+    if(Test-Path $game){
+        $exeSha256=(Get-FileHash $game -Algorithm SHA256).Hash.ToLowerInvariant()
+        $semanticIdentityVerified=($exeSha256 -eq $canonicalExeSha256)
+    }
+}catch{
+    $semanticIdentityVerified=$false
+}
+$oldExeSemanticVerified=$env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED
+if($semanticIdentityVerified){
+    $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED='1'
+}else{
+    $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED=$null
+}
+
 if(!(Test-Path $active) -or !(Test-Path $current)){
     throw 'Select a renderer/backend once before using the test launcher.'
 }
@@ -32,6 +52,21 @@ Get-Content $active|ForEach-Object{if($_ -match '^([^=]+)=(.*)$'){$kv[$matches[1
 $backend=$kv.backend
 if(!$backend){throw 'Active backend identity is missing.'}
 $variant=if($kv.variant){[string]$kv.variant}else{'AUTO'}
+$semanticMode='0'
+$hudExperimentMode='0'
+switch($variant){
+    'X_SCREEN_HUD'       { $semanticMode='1' }
+    'X_WORLD_RANK'       { $semanticMode='2' }
+    'X_COMBINED'         { $semanticMode='3' }
+    'R54_A_NEXTDRAW'     { $semanticMode='3'; $hudExperimentMode='1' }
+    'R54_B_STICKY'       { $semanticMode='3'; $hudExperimentMode='2' }
+    'R54_C_FULL_OWNER'   { $semanticMode='3'; $hudExperimentMode='3' }
+    'R54_D_HUD_PLANE'    { $semanticMode='3'; $hudExperimentMode='4' }
+}
+$oldExeSemanticMode=$env:OUTRUN_VR_EXE_SEMANTIC_MODE
+$oldHudExperimentMode=$env:OUTRUN_VR_HUD_EXPERIMENT_MODE
+$env:OUTRUN_VR_EXE_SEMANTIC_MODE=$semanticMode
+$env:OUTRUN_VR_HUD_EXPERIMENT_MODE=$hudExperimentMode
 
 $patterns=@(
     'OutRun2006Tweaks*.log',
@@ -59,13 +94,13 @@ foreach($pattern in $patterns){
     }
 }
 if($stale){
-    & $selector -Backend $backend -TestProfile $TestProfile -VariantId $variant -VariantId $variant
+    & $selector -Backend $backend -TestProfile $TestProfile -VariantId $variant
     if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'Failed to seal stale logs before launch.'}
 }
 
 $state=Get-Content $current -Raw|ConvertFrom-Json
 if($state.TestProfile -and $state.TestProfile -ne $TestProfile){
-    & $selector -Backend $backend -TestProfile $TestProfile
+    & $selector -Backend $backend -TestProfile $TestProfile -VariantId $variant
     if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'Failed to prepare requested test profile.'}
     $state=Get-Content $current -Raw|ConvertFrom-Json
 }
@@ -139,6 +174,10 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "profile=$TestProfile"
     "forceVrDisabled=$($backend -eq '2d')"
     "arguments=$($gameArgs -join ' ')"
+    "exeSha256=$exeSha256"
+    "exeSemanticIdentityVerified=$semanticIdentityVerified"
+    "exeSemanticMode=$semanticMode"
+    "hudExperimentMode=$hudExperimentMode"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
 Write-Host "Runtime overrides: $($gameArgs -join ' ')"
 
@@ -210,6 +249,9 @@ try{
     $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
     $env:OUTRUN_VR_PERFORMANCE_PROFILE=$oldPerformanceProfile
     $env:OUTRUN_VR_SHADER_FINGERPRINT=$oldShaderFingerprint
+    $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED=$oldExeSemanticVerified
+    $env:OUTRUN_VR_EXE_SEMANTIC_MODE=$oldExeSemanticMode
+    $env:OUTRUN_VR_HUD_EXPERIMENT_MODE=$oldHudExperimentMode
     foreach($key in $identityKeys){
         [Environment]::SetEnvironmentVariable($key,$oldIdentity[$key],'Process')
     }
