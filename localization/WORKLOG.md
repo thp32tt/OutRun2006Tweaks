@@ -310,3 +310,15 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Current checkpoint: **32 reviewed / 30 retained / 2 pending**.
 - Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B25v4_QA_Test.zip`
 - SHA-256: `e0d2df30e8de09dc69e154cbcffcfce649c76fd7edd760e4bb2fe0ab935d781d`
+
+
+## 2026-09-26 08:11 KST - FINAL-TWO SAFE RESUME
+
+- Re-read `ORIENTATION_POLICY.md`, `SOURCE_FAITHFUL_CURRENT.json`, `resume_state.json`, and `progress/STATUS.md` before any promotion decision.
+- Canonical checkpoint confirmed: **32 reviewed / 30 retained / 2 pending**.
+- Remaining pending assets are only `37759842_1024x1024.dds` and `C598919A_1024x1024.dds`.
+- Re-read Batch17v3 and Batch22 rejection evidence. `37759842` still requires gradient/icon-preserving card cleanup with zero English residue/seams; `C598919A` requires larger per-label DXT5 block extents while retaining block-level containment.
+- The original/candidate DDS bytes are intentionally not committed to GitHub, and the original analysis archive was not available in the accessible file store during this run. Per safety policy, no guessed pixel edit or promotion was made.
+- Removed stale resume/status references that could incorrectly reopen Batch12v2-promoted DXT5 assets (`49BB5FE5`, `42E618FD`, `7CE1CFC5`).
+- Hard gate remains: original DDS orientation, protected vehicle/brand/logo/song/legal artwork, source typography/color/outline/proportion, strict original-text-cell containment, and zero black lines/crop seams/English residue/erasure residue/alpha halos/clipping.
+- Next executable graphics step: obtain the original analysis archive/candidate bytes, then rework `37759842` and `C598919A`; otherwise keep both original.
