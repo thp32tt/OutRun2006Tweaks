@@ -34,9 +34,11 @@ Ramp-force diagnostic strings are present, but no direct code XREF is verified y
 
 ## IOPRP310
 
-The ROMDIR image was parsed into the standard runtime modules: SYSMEM, LOADCORE, SIFCMD, SIFMAN, THREADMAN, IOMAN, MODLOAD, FILEIO, CDVDMAN, CDVDFSV, LOADFILE, TIMEMANI, ROMDRV, EESYNC, SYSCLIB and STDIO.
+The ROMDIR image was parsed directly. Its module list is: RESET, ROMDIR, EXTINFO, SYSMEM, LOADCORE, SIFCMD, SIFMAN, THREADMAN, IOMAN, MODLOAD, FILEIO, CDVDMAN, CDVDFSV, LOADFILE, TIMEMANI, ROMDRV, EESYNC, SYSCLIB and STDIO.
 
 `LGDEV.IRX` is **not** inside this IOPRP image. The EE binary explicitly references that filename, so the disc's `LGDEV.IRX` is the next required binary for the IOP-side Logitech USB/force protocol map. A disc-local `USBD.IRX` is also useful if present.
+
+The supplied `DRIVER.PS2` was also checked as a possible module container. It is 458,752 bytes with SHA-256 `d5cd14efec2378d96497fdc8d9dc2f0b31ae799d42fdb1a7e798adf066a3cea9`; it has no ELF, ROMDIR, IRX, LGDEV, USBD, Logitech or wheel-module signature/string, and its high-entropy payload is consistent with a packed game asset rather than an IOPRP/IRX container. It is therefore not used as evidence for Logitech transport semantics.
 
 ## Map-generation result
 
