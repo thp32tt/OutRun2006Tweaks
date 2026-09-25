@@ -56,6 +56,15 @@ namespace WheelFFBMath
     // C2C exposes a different speed scale, so normalize those thresholds to the
     // established C2C speedNorm (top-speed region ~= 1.0). This preserves the
     // observed arcade step structure without importing Lindbergh addresses.
+    constexpr float ArcadeRoadSinePeriodMs = 70.0f;
+
+    inline float frequency_hz_from_period_ms(float periodMs)
+    {
+        if (!std::isfinite(periodMs) || periodMs <= 0.0f)
+            return 0.0f;
+        return 1000.0f / periodMs;
+    }
+
     inline float arcade_speed_strength(float speedNorm)
     {
         if (!std::isfinite(speedNorm) || speedNorm <= 0.0f)
