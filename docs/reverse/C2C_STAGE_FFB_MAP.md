@@ -66,6 +66,32 @@ For `0x2`, non-zero collision context forces `0.25`. With zero context the water
 
 For `0x400000`, non-zero collision context forces `0.25`. With zero context, Casino Town / reverse (18 / 48) also return `0.25`; other stages return `0.90`.
 
+## Floral Village primary rough-road identity
+
+Direct Stage.zip / COLI0200 analysis gives an exact machine identity for the
+rough **primary/main-road** strip in Floral Village (27):
+
+- folder: `PRIN`;
+- primary-road material ID: `0x14`;
+- runtime surface mask: `0x00100000` (`1u << 0x14`);
+- native roughness: `0.71`;
+- primary roadSection range: `510..533`;
+- the other proven primary-road material in this stage is `0x2` (normal 0.25 road).
+
+The collision data does not contain a human-readable material name such as
+"brick".  The user-observed brick-paved main-road section is therefore keyed by
+the exact stage/material/roadSection contract above rather than by scenery name
+or by the unsafe heuristic "all four tyres are rough".
+
+Modern DD applies a comfort multiplier of `0.60` to **Road Detail only** while
+that primary-road contract is satisfied.  Every valid non-water contact must be
+either the stage's proven normal primary-road mask `0x2` or the rough primary
+mask `0x100000`, and at least one contact must be `0x100000`.  If a wheel
+touches another material (for example a curb/shoulder/off-road mask), the
+attenuation is cancelled immediately. SAT, damping, collision, tire-slip and
+other force families are not scaled. Reverse Floral Village is intentionally
+left unchanged until its own primary roadSection range is evidence-pinned.
+
 ## FFB integration rule
 
 The standalone DD-wheel layer now preserves, per wheel:
