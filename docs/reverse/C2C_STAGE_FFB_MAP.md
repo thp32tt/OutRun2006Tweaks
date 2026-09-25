@@ -93,3 +93,16 @@ During significant road/water contact:
 `WheelFFB ROAD: ... nonWaterMin=... nonWaterMax=... waterWheels=... masks=... rough=... collisionCtx=...`
 
 These fields are intended to turn future hardware logs into evidence for additional bounded FFB changes instead of guessing material meanings from stage appearance.
+
+
+## Dedicated course / wall collision witnesses
+
+The full OR2006C2C EXE map provides a stronger wall/course witness than the broad `EVWORK_CAR::field_8 & 0x1000` state bit:
+
+- `FUN_005041b0` writes `EVWORK_CAR::field_coli_281` as 0/1/2/3 from the sign quadrant of the course-collision response vector.
+- `FUN_00503a20`, reached from that course-collision pipeline, reloads `EVWORK_CAR::field_283` to `0x1E` (30) and updates `field_282`.
+- `field_283` then counts down in the normal car-control path. The wheel backend therefore treats only a high-value rising/reload edge (28..30 and greater than the previous sample) as a fresh course/wall impact.
+- `field_281` and `field_282` are logged for side/intensity correlation, but their exact physical polarity/units are not promoted beyond the evidence yet.
+- The older `field_8 & 0x1000` edge remains as a separate vehicle/other-impact witness; a speed-drop heuristic is emergency fallback only.
+
+This separation fixes wall contacts that do not raise the broad state bit without pretending the still-unnamed collision fields are a complete official force protocol.
