@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-26T08:14:00+09:00",
+  "updated_at_kst": "2026-09-26T08:39:00+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -11,12 +11,12 @@
   ],
   "mandatory_policy": "localization/graphics/ORIENTATION_POLICY.md",
   "automation_checkpoint": {
-    "run": "C-20260926-0831",
-    "result": "final_two_safe_hold_confirmed",
-    "note": "Mandatory state/policy re-read and accessible file search repeated. Exact original DDS bytes still unavailable; 37759842 and C598919A remain original; no unsafe promotion."
+    "run": "interactive-20260926-0839",
+    "result": "377_batch41_rejected_safe_hold",
+    "note": "Batch41 passes dimensions/header/containment but fails manual artifact-cleanliness because residual English remains in lower blue mode cards and black 15-course cards. Original DDS remains canonical."
   },
   "latest_promoted_batch": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
-  "latest_rejected_batch": "localization/graphics/BATCH33_REJECTED_REPORT.json",
+  "latest_rejected_batch": "localization/graphics/BATCH41_REJECTED_REPORT.json",
   "latest_rejected_batches": [
     "localization/graphics/BATCH33_REJECTED_REPORT.json"
   ],
