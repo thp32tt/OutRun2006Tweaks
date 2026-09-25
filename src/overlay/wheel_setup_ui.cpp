@@ -1797,7 +1797,7 @@ namespace
                 else if (activeFfbModel == 1 || activeFfbModel == 2)
                 {
                     ImGui::TextDisabled(
-                        "Arcade: 1.00 preserves the observed 0.10 / 240 ms gear Sine; lower values are PC host scaling.");
+                        "Arcade: Road Detail / Collision / Gear Shift at 1.00 preserve reconstructed source amplitude; lower values are PC host scaling.");
                 }
                 track_ffb_change(ImGui::SliderFloat("Force Build Slew Rate", Settings::WheelFFBSlewRate.ptr(), 0.01f, 1.0f, "%.3f"));
                 if (ImGui::IsItemHovered())
@@ -2048,6 +2048,10 @@ namespace
                 // Prefer the wheel driver's hardware periodic effect. The
                 // observed road Sine uses a 70 ms period (~14.286 Hz).
                 Settings::WheelFFBUsePeriodicEffects = true;
+                // Host scalers: 1.00 preserves OutRun2Real's SpeedStrength
+                // amplitude for road/directional/wall requests.
+                Settings::WheelFFBRoadTexture = 1.0f;
+                Settings::WheelFFBWallImpact = 1.0f;
                 // Host scaler: 1.00 preserves OutRun2Real's 0.10 gear Sine.
                 Settings::WheelFFBGearShift = 1.0f;
                 Settings::VibrationMode = 0;
@@ -2063,6 +2067,10 @@ namespace
                 Settings::WheelFFBPhysicsSat = true;
                 Settings::WheelFFBEngineVibration = false;
                 Settings::WheelFFBUsePeriodicEffects = true;
+                // Arcade event/surface host scalers. 1.00 preserves the
+                // reconstructed SpeedStrength amplitude before Overall Strength.
+                Settings::WheelFFBRoadTexture = 1.0f;
+                Settings::WheelFFBWallImpact = 1.0f;
                 // Host scaler: 1.00 preserves OutRun2Real's 0.10 gear Sine.
                 Settings::WheelFFBGearShift = 1.0f;
                 Settings::VibrationMode = 0;
