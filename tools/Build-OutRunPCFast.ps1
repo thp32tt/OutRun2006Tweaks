@@ -161,16 +161,10 @@ $runtimeFiles = @(
     'OutRunVR-TestProfiles.ps1',
     'Select-OutRunVRBackend.ps1',
     'Run-OutRunVRTest.ps1',
-    'Run-OutRunVRTest.cmd',
     'Collect-OutRunVRLogs.ps1',
-    'Collect-OutRunVRLogs.cmd',
     'Analyze-OutRunVRSession.ps1',
-    'OutRunVR-Backend-Selector.ps1',
-    'OutRunVR-Backend-Selector.cmd',
-    'OutRunVR-Slot-Selector.ps1',
-    'OutRunVR-Slot-Selector.cmd',
-    'OutRunVR-EXE-Semantic-Selector.ps1',
-    'OutRunVR-EXE-Semantic-Selector.cmd'
+    'OutRunVR-Test-Selector.ps1',
+    'START_HERE_VR_TEST.cmd'
 )
 foreach ($file in $runtimeFiles) {
     $src = Join-Path 'tools' $file
@@ -178,6 +172,15 @@ foreach ($file in $runtimeFiles) {
     Copy-Item $src (Join-Path $packageDir $file)
 }
 Copy-Item 'docs/VR_TEST_STRATEGY.md' (Join-Path $packageDir 'VR_TEST_STRATEGY.md')
+
+@(
+    'USER-FACING LAUNCHER POLICY'
+    ''
+    'Use only START_HERE_VR_TEST.cmd.'
+    'Do not add additional selector CMD/PS1 files to test packages.'
+    'When the active test matrix changes, update OutRunVR-Test-Selector.ps1 in place.'
+    'Helper scripts remain implementation details and are not alternate entry points.'
+) | Set-Content (Join-Path $packageDir 'START_HERE_ONLY.txt') -Encoding UTF8
 
 @(
     'OUTRUN VR TEST / LOG UPLOAD'
