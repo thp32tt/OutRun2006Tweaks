@@ -53,6 +53,21 @@ if($m){
     $fenceTimeout=[int64]$m.Groups[3].Value
 }
 
+$semanticRegistered=0
+$semanticConsumed=0
+$semanticStaleCleared=0
+$semantic=Get-LastRegexMatch $gameLog 'VR HUD SEMANTIC R53: queuePass=\d+ registered=(\d+) consumed=(\d+) staleCleared=(\d+)'
+if($semantic){
+    $semanticRegistered=[int64]$semantic.Groups[1].Value
+    $semanticConsumed=[int64]$semantic.Groups[2].Value
+    $semanticStaleCleared=[int64]$semantic.Groups[3].Value
+}
+
+$recenterPublished=([regex]::Matches($gameLog,'VR recenter: published host requestId=')).Count
+$recenterGameplayApplied=([regex]::Matches($gameLog,'VR renderer: yaw recentered gameplay pose')).Count
+$recenterHostReceived=([regex]::Matches($hostLog,'(?i)recenter.*requestId=.*received|requestId=.*recenter.*received')).Count
+$recenterHostApplied=([regex]::Matches($hostLog,'(?i)recenter.*requestId=.*applied|requestId=.*completed by fresh visible|anchorUpdated=1 submitSuccess=1')).Count
+
 $frameIntervals=@()
 foreach($m2 in [regex]::Matches($hostLog,'xrFrameIntervalMs=([0-9\.]+)')){
     $v=0.0
@@ -102,6 +117,13 @@ $result=[ordered]@{
     DirectFallbacks=$directFallbacks
     FenceTimeouts=$fenceTimeout
     DriverSeatCameraActivationCount=$driverSeatCount
+    SemanticRegistered=$semanticRegistered
+    SemanticConsumed=$semanticConsumed
+    SemanticStaleCleared=$semanticStaleCleared
+    RecenterPublished=$recenterPublished
+    RecenterGameplayApplied=$recenterGameplayApplied
+    RecenterHostReceived=$recenterHostReceived
+    RecenterHostApplied=$recenterHostApplied
     ApproxAverageXrFrameMs=$avgFrameMs
     ApproxAverageXrHz=$approxHz
     Flags=$flags
@@ -123,6 +145,13 @@ $lines=@(
     "directFallbacks=$directFallbacks"
     "fenceTimeouts=$fenceTimeout"
     "driverSeatCameraActivationCount=$driverSeatCount"
+    "semanticRegistered=$semanticRegistered"
+    "semanticConsumed=$semanticConsumed"
+    "semanticStaleCleared=$semanticStaleCleared"
+    "recenterPublished=$recenterPublished"
+    "recenterGameplayApplied=$recenterGameplayApplied"
+    "recenterHostReceived=$recenterHostReceived"
+    "recenterHostApplied=$recenterHostApplied"
     ("approxAverageXrFrameMs="+$(if($null -ne $avgFrameMs){'{0:F3}' -f $avgFrameMs}else{'n/a'}))
     ("approxAverageXrHz="+$(if($null -ne $approxHz){'{0:F1}' -f $approxHz}else{'n/a'}))
     "flags=$($flags -join ',')"
