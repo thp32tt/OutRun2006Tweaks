@@ -180,6 +180,8 @@ namespace OutRunVRRenderer
 
 		D3DVECTOR CullingCameraSavedPos{};
 		D3DVECTOR CullingCameraSavedLook{};
+		D3DMATRIX CullingBaseViewSaved{};
+		bool CullingBaseViewSavedValid = false;
 		EvWorkCamera* CullingCameraObject = nullptr;
 		bool CullingCameraOverridden = false;
 		D3DMATRIX CullingProjectionSaved{};
@@ -1185,6 +1187,8 @@ namespace OutRunVRRenderer
 			std::memcpy(&baseView, RendererView, sizeof(baseView));
 			if (!MatrixFinite(baseView))
 				return;
+			CullingBaseViewSaved = baseView;
+			CullingBaseViewSavedValid = true;
 
 			const D3DMATRIX correctedView = MultiplyMatrix(baseView, LatchedHeadInverse);
 			if (!MatrixFinite(correctedView))
@@ -1827,6 +1831,7 @@ namespace OutRunVRRenderer
 		InvalidateVerifiedWvp();
 		InvalidateGameWvpWrite();
 		RestoreCullingCamera();
+		CullingBaseViewSavedValid = false;
 		WaitForNextCadenceRequest();
 	}
 
@@ -1840,6 +1845,7 @@ namespace OutRunVRRenderer
 		PresentPoseLocked = false;
 		InvalidateGameWvpWrite();
 		RestoreCullingCamera();
+		CullingBaseViewSavedValid = false;
 		ResetFrameState();
 	}
 
@@ -1857,6 +1863,21 @@ namespace OutRunVRRenderer
 			return;
 		if (LatchedHeadInverseValid && GameRendererIsActive())
 			ApplyCullingCameraSync();
+	}
+
+	bool GetRendererBaseView(float outMatrix[16]) noexcept
+	{
+		if (!outMatrix || !ValidateRendererGlobals() || !RendererView)
+			return false;
+		D3DMATRIX view{};
+		if (CullingBaseViewSavedValid)
+			view = CullingBaseViewSaved;
+		else
+			std::memcpy(&view, RendererView, sizeof(view));
+		if (!MatrixFinite(view))
+			return false;
+		std::memcpy(outMatrix, &view, sizeof(view));
+		return true;
 	}
 
 	bool GetRendererBaseProjection(float outMatrix[16])
