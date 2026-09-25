@@ -5,13 +5,17 @@
 int main()
 {
     using namespace OutRunVR::R13;
+    static_assert(DirectGpuAckVersion == 2);
+    static_assert(sizeof(DirectGpuAckState) == 48);
+
     DirectGpuAckState ack{};
     ack.hostPid = 10;
     ack.clientPid = 20;
     ack.runGeneration = 30;
     ack.transportGeneration = 40;
 
-    if (!DirectGpuAckIdentityMatches(ack, 10, 20, 30, 40)) return 1;
+    if (ack.version != 2) return 1;
+    if (!DirectGpuAckIdentityMatches(ack, 10, 20, 30, 40)) return 7;
     if (DirectGpuAckIdentityMatches(ack, 11, 20, 30, 40)) return 2;
     if (DirectGpuAckIdentityMatches(ack, 10, 21, 30, 40)) return 3;
     if (DirectGpuAckIdentityMatches(ack, 10, 20, 31, 40)) return 4;
