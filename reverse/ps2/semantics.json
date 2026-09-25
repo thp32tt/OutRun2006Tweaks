@@ -11,6 +11,18 @@
   },
   "records": [
     {
+      "va": "0x00102460",
+      "name": "PadVibration_Output",
+      "tags": [
+        "PS2",
+        "VIBRATION",
+        "PAD",
+        "OUTPUT"
+      ],
+      "confidence": "high",
+      "evidence": "Receives the two non-Type-4 vibration channels. It checks wheel-device ownership through 0x00132C18; when wheel mode is active it explicitly zeros the normal pad actuator channels instead of converting them into steering torque."
+    },
+    {
       "va": "0x00132488",
       "name": "WheelSubsystem_ModuleInit",
       "tags": [
@@ -431,6 +443,18 @@
       ],
       "confidence": "high",
       "evidence": "Retail SLPM surface-mask/collision-context LUT; values and stage-specific 0x2/0x400000 cases match the reconstructed C2C/Xbox sub_1149C0 map."
+    },
+    {
+      "va": "0x001D7F70",
+      "name": "CarVibration_SurfaceAndTransientProducer",
+      "tags": [
+        "PS2",
+        "VIBRATION",
+        "FFB",
+        "SURFACE"
+      ],
+      "confidence": "high",
+      "evidence": "Controller-vibration producer closely matches Xbox CalcVibrationValues. The wheel-specific FFB evidence is the distinct 0x0035F280 Type-4 side-channel writes; the other accumulated channels remain pad vibration."
     },
     {
       "va": "0x001D7FBC",
