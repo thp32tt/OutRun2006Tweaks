@@ -1872,32 +1872,39 @@ namespace OutRunVRStereo
                 OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
                     semanticScope);
 
-            // R51 ownership precedence is explicit:
-            // exact WORLD_BILLBOARD > queue-owned 2D/HUD > geometric evidence.
-            // Runtime 750453f2 proved FOV-only queue placement converges the
-            // image but remains head-locked. Queue-owned 2D now uses the same
-            // finite recentered HUD plane as SCREEN_HUD, while keeping its
-            // distinct semantic class so it can never be mistaken for 3D.
-            state.screenOverlay2D = semanticOverlay2D;
+            // SCREENFIX V2: restore the bounded R50 ownership split for
+            // generic queue-owned 2D. The latest FIX1 runtime showed every
+            // generic XYZRHW queue draw (61k+) entering the finite HUD-plane
+            // path while exact SCREEN_HUD ownership stayed at zero. That makes
+            // the world-plane transform the dominant suspect for global 2D
+            // distortion/doubling. Keep generic SCREEN_OVERLAY_2D on the
+            // common-ray asymmetric-FOV affine only; exact SCREEN_HUD retains
+            // the finite recentered plane and WORLD_BILLBOARD remains world.
             if (semanticOverlay2D)
-                ++R50SemanticOverlay2DAccepted;
-
-            if (semanticWorld)
-                state.worldEffect = true;
-            else if (semanticHud || semanticOverlay2D)
+            {
+                state.screenOverlay2D = true;
                 state.worldEffect = false;
-            else
-                state.worldEffect = state.rhwDepthEvidence;
+                ++R50SemanticOverlay2DAccepted;
+                return true;
+            }
 
-            if (!state.worldEffect && !semanticHud && !semanticOverlay2D)
+            state.worldEffect = semanticWorld || state.rhwDepthEvidence;
+
+            // SCREENFIX V4 = V2 + V3. Keep generic 2D on the bounded R50
+            // common-ray FOV-only path, and bypass R30 XYZRHW world-effect
+            // reprojection so particles/decals/flares fall to the lower safe
+            // owner. Perspective road/background/vehicle stereo is untouched.
+            if (state.worldEffect)
+                return false;
+
+            if (!state.worldEffect && !semanticHud)
             {
                 ++R47SemanticUnknownRejected;
                 return false;
             }
             if (!state.worldEffect)
             {
-                if (semanticHud)
-                    ++R47SemanticHudAccepted;
+                ++R47SemanticHudAccepted;
                 // R41: most of OutRun's HUD is fixed-function XYZRHW, not the
                 // shader/c64 path. Build a synthetic finite HUD plane in the
                 // recentered gameplay space, then transform that plane by the
@@ -2399,12 +2406,19 @@ namespace OutRunVRStereo
                     }
                     // Fallback keeps the game's original Z/RHW pair intact.
                 }
+                else if (state.screenOverlay2D)
+                {
+                    // SCREENFIX V2 / R50 bounded path: map identical desktop
+                    // pixels to the same visual ray for each asymmetric OpenXR
+                    // eye. Do not apply head inverse, IPD translation, HudScale
+                    // or the finite world plane to generic queue-owned 2D.
+                    correctedX =
+                        state.eyeScale[eye] * ndcX + state.eyeOffset[eye];
+                    correctedY = ndcY;
+                }
                 else
                 {
-                    // R51: both exact SCREEN_HUD and generic canonical
-                    // SCREEN_OVERLAY_2D are queue-owned 2D. Put them on the
-                    // finite recentered world-fixed plane so they no longer
-                    // rotate with the HMD. WORLD_BILLBOARD never enters here.
+                    // Exact SCREEN_HUD only: finite recentered world-locked plane.
                     if (!state.hudWorldLockValid)
                         return false;
 
