@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-26T08:11:00+09:00",
+  "updated_at_kst": "2026-09-26T08:14:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -63,8 +63,8 @@
       "full_draft_candidates": 79,
       "total_artwork_targets": 79,
       "source_faithful_reviewed": 32,
-      "source_faithful_localized_candidates": 30,
-      "reset_to_original_pending_rework": 2
+      "source_faithful_localized_candidates": 31,
+      "reset_to_original_pending_rework": 1
     },
     "runtime_text_trace": {
       "status": "clean_k1_package_ready",
@@ -122,8 +122,8 @@
       "full_draft_candidates": 79,
       "total": 79,
       "source_faithful_reviewed": 32,
-      "source_faithful_localized_candidates": 30,
-      "reset_to_original_pending_rework": 2
+      "source_faithful_localized_candidates": 31,
+      "reset_to_original_pending_rework": 1
     },
     "graphics_artwork_pipeline": {
       "status": "proof_renderer_ready",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Only 37759842 and C598919A remain. Rework only with original DDS + candidate bytes; otherwise keep original. Then in-game validate 30 retained candidates.",
+  "next_checkpoint": "Finish 37759842 with clean blue/black card reconstruction; in-game validate 31 retained candidates.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -218,8 +218,8 @@
     },
     "orientation_policy": "localization/graphics/ORIENTATION_POLICY.md",
     "source_faithful_reviewed_assets": 32,
-    "source_faithful_localized_candidates": 30,
-    "source_faithful_reset_to_original": 2,
+    "source_faithful_localized_candidates": 31,
+    "source_faithful_reset_to_original": 1,
     "source_faithful_batches": {
       "batch3": {
         "assets": 10,
@@ -243,13 +243,12 @@
       }
     },
     "pending_source_faithful_rework": [
-      "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
-      "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds"
+      "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"
     ],
     "current_state_file": "localization/graphics/SOURCE_FAITHFUL_CURRENT.json",
     "current_combined_package": {
-      "name": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B25v4_QA_Test.zip",
-      "sha256": "e0d2df30e8de09dc69e154cbcffcfce649c76fd7edd760e4bb2fe0ab935d781d"
+      "name": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip",
+      "sha256": "7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02"
     }
   },
   "data_build": {
