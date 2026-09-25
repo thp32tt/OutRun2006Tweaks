@@ -3743,35 +3743,18 @@ namespace
                     }
                     else if (ps2Original)
                     {
-                        // Retail SLPM proves a directional ConstantForce capped
-                        // at 220/255. The exact retail event source behind that
-                        // force is still unresolved, so C2C collision detection
-                        // remains an explicitly provisional trigger. Normalize
-                        // the known C2C 1.7..2.5 severity envelope, preserve its
-                        // direction/user WallImpact scale, then enforce the
-                        // verified retail output cap.
+                        // Retail SLPM contains a valid directional ConstantForce
+                        // transport capped at 220/255, but the recovered direct
+                        // calls to its two source-float setter write 0/0. No
+                        // non-zero retail event caller has been verified, so do
+                        // not invent a PS2 wall/collision mapping from C2C.
                         const int impactFrame =
                             CrashTimerFrames - crashImpulseTimer_;
-                        if (impactFrame < 6)
+                        if (impactFrame == 0 &&
+                            Settings::WheelFFBDebugLog)
                         {
-                            const float direction =
-                                crashImpulseForce_ >= 0.0f ? 1.0f : -1.0f;
-                            const float translatedSeverity = std::clamp(
-                                std::abs(crashImpulseForce_) / 2.5f,
-                                0.0f, 1.0f);
-                            const float ps2Constant =
-                                direction * translatedSeverity *
-                                WheelFFBPS2::constant_magnitude_cap_norm();
-                            result += ps2Constant;
-
-                            if (impactFrame == 0 &&
-                                Settings::WheelFFBDebugLog)
-                            {
-                                spdlog::info(
-                                    "WheelFFB PS2: provisional C2C collision -> retail ConstantForce envelope severity={:.3f} cap={:.3f} eventFrames=6",
-                                    translatedSeverity,
-                                    WheelFFBPS2::constant_magnitude_cap_norm());
-                            }
+                            spdlog::info(
+                                "WheelFFB PS2: C2C collision detected; no verified non-zero retail ConstantForce caller, event output suppressed");
                         }
                     }
                     else
