@@ -655,7 +655,7 @@ req(ps2_event_block, 'no verified non-zero retail ConstantForce caller', 'PS2 co
 req(ps2_event_block, 'event output suppressed', 'PS2 C2C collision is diagnostic-only until retail evidence exists')
 forbid(ps2_event_block, 'result +=', 'PS2 Original does not synthesize an unverified C2C collision ConstantForce')
 forbid(ps2_event_block, 'translatedSeverity', 'removed provisional PS2 collision magnitude translation cannot return')
-req(ffb, ': (!ps2Original &&\n                   crashImpulseTimer_ > CrashCooldownFrames);', 'PS2 original spring is not suppressed by an unverified Modern collision interaction')
+req(ffb, ': (arcadeOriginal || ps2Original\n                    ? false\n                    : crashImpulseTimer_ > CrashCooldownFrames);', 'PS2 Original and Arcade Original condition backbones are not suppressed by Modern collision interaction')
 forbid(ffb, 'crashImpulseForce_ * 0.45f', 'arbitrary PS2 collision multiplier removed')
 forbid(ffb, '(ps2Original ? 0.12f : 0.20f)', 'unsupported PS2 gear thunk removed')
 req(ffb, 'else if (!ps2Original)', 'PS2 original mode emits no unverified generic gear-shift thunk')
