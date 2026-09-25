@@ -1,0 +1,21 @@
+{
+  "batch": "33-37759842-rework",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "status": "rejected_keep_original",
+  "automated_qa": {
+    "dimensions_identical": true,
+    "header_128_identical": true,
+    "changed_pixels_outside_allowed_regions": 0,
+    "introduced_alpha_pixels_outside_allowed_regions": 0,
+    "pass": true
+  },
+  "manual_qa": {
+    "pass": false,
+    "reasons": [
+      "Several blue mode cards still restore fragments of the original English mode text around icon regions.",
+      "Black 15-course cards still retain partial source glyphs when icon restoration is preserved.",
+      "Candidate therefore still fails artifact-cleanliness despite containment passing."
+    ]
+  },
+  "action": "Keep original DDS. Remaining blocker is clean reconstruction of embedded blue/black cards without restoring source glyphs."
+}
