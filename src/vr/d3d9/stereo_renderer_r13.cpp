@@ -153,9 +153,13 @@ namespace OutRunVRStereo
                 if (snapshot.magic != OutRunVR::R13::DirectGpuAckMagic ||
                     snapshot.version != OutRunVR::R13::DirectGpuAckVersion ||
                     snapshot.structSize != sizeof(snapshot) ||
-                    !snapshot.hostPid || !SharedState ||
-                    snapshot.hostPid != SharedState->hostPid ||
-                    snapshot.transportGeneration != DirectTransportGeneration)
+                    !SharedState ||
+                    !OutRunVR::R13::DirectGpuAckIdentityMatches(
+                        snapshot,
+                        SharedState->hostPid,
+                        GetCurrentProcessId(),
+                        RenderFrameRunGeneration,
+                        DirectTransportGeneration))
                     return false;
 
                 completedFrame = snapshot.completedFrameId[slotIndex];
