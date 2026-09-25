@@ -1,0 +1,32 @@
+[
+  {
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+    "mode": "mirror_draft",
+    "sha256": "570354ea1a986dd4a5bbdd535f0e9ba4bdb539478aec099729b00ce95de82abf",
+    "note": "Localized draft was converted to source-faithful raw orientation by mirror-X to match the original DDS."
+  },
+  {
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+    "mode": "mirror_draft",
+    "sha256": "fe67e8083ddff88c9c7fbd34df3770c1fc78386bf975ac90f210ecfe409128f4",
+    "note": "Localized draft was converted to source-faithful raw orientation by mirror-X to match the original DDS."
+  },
+  {
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+    "mode": "copy_original",
+    "sha256": "c52f48b1d08781c70e9637b9c95103dc3ae8cc637ca0ed951f74cf1d69e40b72",
+    "note": "Reset to original DDS for now; no safe localized replacement confirmed in this pass."
+  },
+  {
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+    "mode": "copy_original",
+    "sha256": "de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77",
+    "note": "Reset to original DDS; DXT5 compression asset requires a separate compression-safe rewrite path."
+  },
+  {
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds",
+    "mode": "copy_original",
+    "sha256": "69e5a72b51d6a6a1b2dda1d115713c74dca1792564e703f43d8bb4c39b9cf2ac",
+    "note": "Reset to original DDS for now; current Korean draft is not source-faithful enough for release testing."
+  }
+]
