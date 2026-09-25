@@ -4,6 +4,7 @@
 #include "vr/game/render_semantics.hpp"
 
 #include <array>
+#include <atomic>
 
 namespace Settings
 {
@@ -56,6 +57,49 @@ class UIScaling : public Hook
 	const static int RankMarker_Truncate = 0xBB046;
 	const static int RankMarker_StackX = 0x40;
 	const static int RankMarker_StackY = 0x44;
+
+	// R56 runtime-only HMD probe selector. A single DLL carries all 20 cases so
+	// every comparison uses identical codegen except for the selected probe.
+	static int VRHudProbeMode() noexcept
+	{
+		static const int mode = []() noexcept {
+			char text[8]{};
+			const DWORD len = GetEnvironmentVariableA(
+				"OUTRUN_VR_HUD_PROBE", text,
+				static_cast<DWORD>(sizeof(text)));
+			if (len == 0 || len >= sizeof(text))
+				return 0;
+			int value = 0;
+			for (DWORD i = 0; i < len; ++i)
+			{
+				if (text[i] < '0' || text[i] > '9')
+					return 0;
+				value = value * 10 + int(text[i] - '0');
+			}
+			return (value >= 1 && value <= 20) ? value : 0;
+		}();
+		return mode;
+	}
+
+	inline static std::atomic<std::uint64_t> VRProbeDispRankHits{ 0 };
+	inline static std::atomic<std::uint64_t> VRProbeRank13Hits{ 0 };
+	inline static std::atomic<std::uint64_t> VRProbeRank46Hits{ 0 };
+
+	static void VRHudProbeTrace(
+		const char* site, std::atomic<std::uint64_t>& counter) noexcept
+	{
+		const int probe = VRHudProbeMode();
+		if (!probe)
+			return;
+		const std::uint64_t hit =
+			counter.fetch_add(1, std::memory_order_relaxed) + 1;
+		// Power-of-two logging proves the producer was reached without flooding
+		// long race logs.
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R56 PROBE: mode={} producer={} hits={}",
+				probe, site, hit);
+	}
 
 	// Addresses of the draw calls sub_4BAD20 makes. sprani_play_ae_auth_alpha
 	// and put_clip_sprite are both used throughout the game, so each call site
@@ -236,6 +280,7 @@ class UIScaling : public Hook
 	// position as floats, so the discarded fraction goes straight back on.
 	static int __cdecl RankMarker_sprani(uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
 	{
+		VRHudProbeTrace("rank13_sprani", VRProbeRank13Hits);
 		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
@@ -243,8 +288,18 @@ class UIScaling : public Hook
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
 
+		const int probe = VRHudProbeMode();
+		float probeX = x + RankMarkerFracX;
+		float probeY = y + RankMarkerFracY;
+		// R56 09-12: directly perturb only the known 1st/2nd/3rd producer.
+		// A visible movement proves the final image still contains this producer.
+		if (probe == 9) probeX += 96.0f;
+		else if (probe == 10) probeX -= 96.0f;
+		else if (probe == 11) probeY -= 72.0f;
+		else if (probe == 12) { probeX = 320.0f; probeY = 208.0f; }
+
 		const int result = Game::sprani_play_ae_auth_alpha(
-			spriteId, x + RankMarkerFracX, y + RankMarkerFracY, a4, a5, alpha);
+			spriteId, probeX, probeY, a4, a5, alpha);
 
 		// These four call sites are explicitly identified by the original mod as
 		// rival-car rank markers. Preserve that ownership on the queued node so
@@ -254,8 +309,13 @@ class UIScaling : public Hook
 			SpriteNode* root = Game::sprite_prio_root[prio];
 			SpriteNode* node = root ? root->tail_4 : nullptr;
 			if (node && node != tailsBefore[prio])
-				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-					node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+			{
+				const auto scope =
+					(probe == 16)
+					? OutRunVR::GameSemantic::RenderScope::ScreenHud
+					: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
+			}
 		}
 		return result;
 	}
@@ -266,13 +326,22 @@ class UIScaling : public Hook
 	// there instead.
 	static int __cdecl RankMarker_putClipSprite(int xstnum, int x, int y, uint32_t flags, float priority, uint32_t color)
 	{
+		VRHudProbeTrace("rank46_clip", VRProbeRank46Hits);
 		int prio = int(priority);
 		prio = prio < 0 ? 0 : (prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
 
 		SpriteNode* root = Game::sprite_prio_root[prio];
 		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
 
-		int result = Game::put_clip_sprite(xstnum, x, y, flags, priority, color);
+		const int probe = VRHudProbeMode();
+		int probeX = x;
+		int probeY = y;
+		// R56 13-15: directly perturb only the 4th+ digit-sprite producer.
+		if (probe == 13) probeX += 96;
+		else if (probe == 14) probeY -= 72;
+		else if (probe == 15) { probeX = 320; probeY = 208; }
+		int result = Game::put_clip_sprite(
+			xstnum, probeX, probeY, flags, priority, color);
 
 		// tail_4 is the last sprite queued at that priority. If it has not
 		// changed then the sprite pool was full and nothing was queued.
@@ -282,8 +351,17 @@ class UIScaling : public Hook
 		{
 			node->args_10.float24 += RankMarkerFracX;
 			node->args_10.float28 += RankMarkerFracY;
-			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-				node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+			const auto scope =
+				(probe == 17)
+				? OutRunVR::GameSemantic::RenderScope::ScreenHud
+				: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
+			// R56-18 deliberately tests whether a one-shot semantic survives from
+			// this exact producer to the eventual D3D draw. Cross-thread loss is a
+			// useful negative result, not a production policy.
+			if (probe == 18)
+				OutRunVR::GameSemantic::ArmNextDraw(
+					OutRunVR::GameSemantic::RenderScope::WorldBillboard);
 		}
 
 		return result;
@@ -479,6 +557,25 @@ class UIScaling : public Hook
 	static void put_scroll_AdjustPositionLeft(safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing((int*)(ctx.esp + 4), true);
+	}
+
+	// R56 05-08/19: exact DispRank producer probe. The eight original-mod
+	// callsites all pass the rank/POSITION horizontal coordinate at ESP+4.
+	static void DispRankProbe_AdjustPosition(safetyhook::Context& ctx)
+	{
+		VRHudProbeTrace("position_disprank", VRProbeDispRankHits);
+		int* x = reinterpret_cast<int*>(ctx.esp + 4);
+		AddSpriteSpacing(x, false);
+		const int probe = VRHudProbeMode();
+		if (probe == 5) *x += 96;
+		else if (probe == 6) *x -= 96;
+		else if (probe == 7)
+			*x = 320 + int((float(*x) - 320.0f) * 0.35f);
+		else if (probe == 8)
+			*x = 320;
+		else if (probe == 19)
+			OutRunVR::GameSemantic::ArmNextDraw(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
 	}
 
 	// PutGhostGapInfo
@@ -684,14 +781,14 @@ public:
 		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, put_scroll_AdjustPositionRight);
 		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, put_scroll_AdjustPositionRight);
 
-		DispRank_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9F3A, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4B9F5E, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4B9F81, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4B9FD0, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4B9FFC, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BA01E, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BA035, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BA052, put_scroll_AdjustPositionRight);
+		DispRank_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9F3A, DispRankProbe_AdjustPosition);
+		DispRank_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4B9F5E, DispRankProbe_AdjustPosition);
+		DispRank_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4B9F81, DispRankProbe_AdjustPosition);
+		DispRank_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4B9FD0, DispRankProbe_AdjustPosition);
+		DispRank_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4B9FFC, DispRankProbe_AdjustPosition);
+		DispRank_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BA01E, DispRankProbe_AdjustPosition);
+		DispRank_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BA035, DispRankProbe_AdjustPosition);
+		DispRank_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BA052, DispRankProbe_AdjustPosition);
 
 		// REV indicator
 		DispGearPosition_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9096, put_scroll_AdjustPositionLeft);
@@ -788,6 +885,10 @@ class VRHudQueueSemanticBridge : public Hook
 {
 	inline static SafetyHookMid QueueNode_hk{};
 	inline static SafetyHookMid QueueEnd_hk{};
+	inline static std::uint64_t QueuePasses = 0;
+	inline static std::uint64_t LastRegistered = 0;
+	inline static std::uint64_t LastConsumed = 0;
+	inline static std::uint64_t LastStaleCleared = 0;
 
 	static void QueueNode(SafetyHookContext& ctx)
 	{
@@ -798,6 +899,31 @@ class VRHudQueueSemanticBridge : public Hook
 	static void QueueEnd(SafetyHookContext&)
 	{
 		OutRunVR::GameSemantic::EndSpriteQueueRender();
+		++QueuePasses;
+		if ((QueuePasses % 300u) != 0)
+			return;
+
+		const auto registered =
+			OutRunVR::GameSemantic::SpriteNodeSemanticRegistered.load(
+				std::memory_order_relaxed);
+		const auto consumed =
+			OutRunVR::GameSemantic::SpriteNodeSemanticConsumed.load(
+				std::memory_order_relaxed);
+		const auto staleCleared =
+			OutRunVR::GameSemantic::SpriteNodeSemanticStaleCleared.load(
+				std::memory_order_relaxed);
+		if (registered != LastRegistered ||
+			consumed != LastConsumed ||
+			staleCleared != LastStaleCleared)
+		{
+			spdlog::info(
+				"VR HUD SEMANTIC R53: queuePass={} registered={} consumed={} staleCleared={} deltaRegistered={} deltaConsumed={}",
+				QueuePasses, registered, consumed, staleCleared,
+				registered - LastRegistered, consumed - LastConsumed);
+			LastRegistered = registered;
+			LastConsumed = consumed;
+			LastStaleCleared = staleCleared;
+		}
 	}
 
 public:
@@ -813,6 +939,15 @@ public:
 
 	bool apply() override
 	{
+		char modeText[8]{};
+		int experimentMode = 0;
+		if (GetEnvironmentVariableA(
+				"OUTRUN_VR_HUD_EXPERIMENT_MODE",
+				modeText, static_cast<DWORD>(sizeof(modeText))) > 0 &&
+			modeText[0] >= '0' && modeText[0] <= '4')
+			experimentMode = modeText[0] - '0';
+		OutRunVR::GameSemantic::SetHudExperimentMode(experimentMode);
+
 		QueueNode_hk = safetyhook::create_mid(
 			Module::exe_ptr(0x2D762), QueueNode);
 		QueueEnd_hk = safetyhook::create_mid(
@@ -829,7 +964,7 @@ public:
 		if (ok)
 		{
 			spdlog::info(
-				"VR HUD SEMANTIC R50: sprite queue node 0x2D762 selects explicit tags; untagged nodes use SCREEN_OVERLAY_2D FOV-only alignment; unsafe 0x2D734 entry hook is forbidden; original-mod tagged rival nodes remain WORLD_BILLBOARD");
+				"VR HUD SEMANTIC R54: experimentMode={} sprite queue node 0x2D762 consumes explicit tags; mode1=next-draw latch mode2=sticky mode3=full owner mode4=full HUD-plane", experimentMode);
 		}
 		else
 		{

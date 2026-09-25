@@ -13,6 +13,26 @@ $selector=Join-Path $root 'Select-OutRunVRBackend.ps1'
 $profileLib=Join-Path $root 'OutRunVR-TestProfiles.ps1'
 $game=Join-Path $root $GameExe
 
+# Canonical EXE identity gates the reverse-engineered HUD semantic map.
+# Never apply hard-coded RVA semantics to an unknown executable.
+$canonicalExeSha256='68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3'
+$exeSha256='missing'
+$semanticIdentityVerified=$false
+try{
+    if(Test-Path $game){
+        $exeSha256=(Get-FileHash $game -Algorithm SHA256).Hash.ToLowerInvariant()
+        $semanticIdentityVerified=($exeSha256 -eq $canonicalExeSha256)
+    }
+}catch{
+    $semanticIdentityVerified=$false
+}
+$oldExeSemanticVerified=$env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED
+if($semanticIdentityVerified){
+    $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED='1'
+}else{
+    $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED=$null
+}
+
 if(!(Test-Path $active) -or !(Test-Path $current)){
     throw 'Select a renderer/backend once before using the test launcher.'
 }
@@ -32,6 +52,51 @@ Get-Content $active|ForEach-Object{if($_ -match '^([^=]+)=(.*)$'){$kv[$matches[1
 $backend=$kv.backend
 if(!$backend){throw 'Active backend identity is missing.'}
 $variant=if($kv.variant){[string]$kv.variant}else{'AUTO'}
+$semanticMode='0'
+$hudExperimentMode='0'
+$hudCoordMode='0'
+$hudProbe='0'
+switch($variant){
+    'X_SCREEN_HUD'       { $semanticMode='1' }
+    'X_WORLD_RANK'       { $semanticMode='2' }
+    'X_COMBINED'         { $semanticMode='3' }
+    'R54_A_NEXTDRAW'     { $semanticMode='3'; $hudExperimentMode='1' }
+    'R54_B_STICKY'       { $semanticMode='3'; $hudExperimentMode='2' }
+    'R54_C_FULL_OWNER'   { $semanticMode='3'; $hudExperimentMode='3' }
+    'R54_D_HUD_PLANE'    { $semanticMode='3'; $hudExperimentMode='4' }
+    'R55_A_ZERO'         { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='1' }
+    'R55_B_SCALE35'      { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='2' }
+    'R55_C_WORLD35'      { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='3' }
+    'R55_D_RANKZERO'     { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='4' }
+    'R56_01_ZERO'              { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='1'; $hudProbe='1' }
+    'R56_02_SCALE35'           { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='2'; $hudProbe='2' }
+    'R56_03_WORLD35'           { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='3'; $hudProbe='3' }
+    'R56_04_RANKZERO'          { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='4'; $hudProbe='4' }
+    'R56_05_POSITION_XP96'     { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='5' }
+    'R56_06_POSITION_XM96'     { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='6' }
+    'R56_07_POSITION_XS35'     { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='7' }
+    'R56_08_POSITION_XCENTER'  { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='8' }
+    'R56_09_RANK13_XP96'       { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='9' }
+    'R56_10_RANK13_XM96'       { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='10' }
+    'R56_11_RANK13_YM72'       { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='11' }
+    'R56_12_RANK13_CENTER'     { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='12' }
+    'R56_13_RANK46_XP96'       { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='13' }
+    'R56_14_RANK46_YM72'       { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='14' }
+    'R56_15_RANK46_CENTER'     { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='15' }
+    'R56_16_RANK13_AS_HUD'     { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='16' }
+    'R56_17_RANK46_AS_HUD'     { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='17' }
+    'R56_18_RANK46_NEXTDRAW'   { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='18' }
+    'R56_19_POSITION_NEXTDRAW' { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='19' }
+    'R56_20_ALLSCREEN_RAW'     { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='20' }
+}
+$oldExeSemanticMode=$env:OUTRUN_VR_EXE_SEMANTIC_MODE
+$oldHudExperimentMode=$env:OUTRUN_VR_HUD_EXPERIMENT_MODE
+$oldHudCoordMode=$env:OUTRUN_VR_HUD_COORD_MODE
+$oldHudProbe=$env:OUTRUN_VR_HUD_PROBE
+$env:OUTRUN_VR_EXE_SEMANTIC_MODE=$semanticMode
+$env:OUTRUN_VR_HUD_EXPERIMENT_MODE=$hudExperimentMode
+$env:OUTRUN_VR_HUD_COORD_MODE=$hudCoordMode
+$env:OUTRUN_VR_HUD_PROBE=$hudProbe
 
 $patterns=@(
     'OutRun2006Tweaks*.log',
@@ -59,13 +124,13 @@ foreach($pattern in $patterns){
     }
 }
 if($stale){
-    & $selector -Backend $backend -TestProfile $TestProfile -VariantId $variant -VariantId $variant
+    & $selector -Backend $backend -TestProfile $TestProfile -VariantId $variant
     if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'Failed to seal stale logs before launch.'}
 }
 
 $state=Get-Content $current -Raw|ConvertFrom-Json
 if($state.TestProfile -and $state.TestProfile -ne $TestProfile){
-    & $selector -Backend $backend -TestProfile $TestProfile
+    & $selector -Backend $backend -TestProfile $TestProfile -VariantId $variant
     if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'Failed to prepare requested test profile.'}
     $state=Get-Content $current -Raw|ConvertFrom-Json
 }
@@ -139,6 +204,11 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "profile=$TestProfile"
     "forceVrDisabled=$($backend -eq '2d')"
     "arguments=$($gameArgs -join ' ')"
+    "exeSha256=$exeSha256"
+    "exeSemanticIdentityVerified=$semanticIdentityVerified"
+    "exeSemanticMode=$semanticMode"
+    "hudExperimentMode=$hudExperimentMode"
+    "hudCoordMode=$hudCoordMode"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
 Write-Host "Runtime overrides: $($gameArgs -join ' ')"
 
@@ -210,6 +280,11 @@ try{
     $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
     $env:OUTRUN_VR_PERFORMANCE_PROFILE=$oldPerformanceProfile
     $env:OUTRUN_VR_SHADER_FINGERPRINT=$oldShaderFingerprint
+    $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED=$oldExeSemanticVerified
+    $env:OUTRUN_VR_EXE_SEMANTIC_MODE=$oldExeSemanticMode
+    $env:OUTRUN_VR_HUD_EXPERIMENT_MODE=$oldHudExperimentMode
+    $env:OUTRUN_VR_HUD_COORD_MODE=$oldHudCoordMode
+    $env:OUTRUN_VR_HUD_PROBE=$oldHudProbe
     foreach($key in $identityKeys){
         [Environment]::SetEnvironmentVariable($key,$oldIdentity[$key],'Process')
     }
