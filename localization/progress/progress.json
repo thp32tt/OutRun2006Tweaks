@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_kst": "2026-09-25T07:49:00+09:00",
+  "updated_at_kst": "2026-09-25T12:20:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -55,11 +55,12 @@
       "total": 243
     },
     "graphics_localization": {
-      "status": "artwork_rendering_pending",
+      "status": "full_draft_test_package_ready",
       "transcription_percent": 100,
+      "draft_artwork_percent": 100,
       "final_artwork_percent": 0,
       "transcribed_assets": 79,
-      "blocked_context_assets": 0,
+      "full_draft_candidates": 79,
       "total_artwork_targets": 79
     },
     "runtime_text_trace": {
@@ -111,10 +112,11 @@
       "blocked_context_indices": []
     },
     "graphics_artwork": {
-      "status": "proof_candidates_ready",
-      "percent": 8.9,
+      "status": "full_draft_test_package_ready",
+      "final_artwork_percent": 0,
+      "draft_percent": 100,
       "completed": 0,
-      "proof_candidate_ready": 7,
+      "full_draft_candidates": 79,
       "total": 79
     },
     "graphics_artwork_pipeline": {
@@ -132,7 +134,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Latest-head state/domain CI PASS; collect clean K1/K2/K3 runtime logs; continue deterministic graphics artwork candidates in parallel",
+  "next_checkpoint": "In-game validate FULL-DRAFT 79-asset graphics package; replace heuristic placements with screenshot-verified exact boxes; collect K1/K2/K3 runtime logs in parallel",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -197,6 +199,15 @@
         116,
         119
       ],
+      "status": "ready_for_ingame_validation"
+    },
+    "full_draft_package": {
+      "name": "OutRun2_Korean_GFX_FULL_DRAFT_Test.zip",
+      "sha256": "5512dad798a4ddb4872e4aa3e69438537f75f488f439317d7b95c0eb372b6c78",
+      "assets": 79,
+      "rendered_segments": 674,
+      "final_validated_assets": 0,
+      "report": "localization/graphics/FULL_DRAFT_REPORT.json",
       "status": "ready_for_ingame_validation"
     }
   },
