@@ -1,0 +1,29 @@
+{
+  "batch": "21v3-c075-rework",
+  "updated_at_kst": "2026-09-26T07:43:00+09:00",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+  "status": "promoted_source_faithful_candidate",
+  "raw_transform": "mirror_y",
+  "dds_sha256": "89996528c263159fb53a7e3293be13a98154500470de8574ce9bf53490f0df29",
+  "package": "OutRun2_Korean_GFX_Batch21v3_C075FB49_Rework_Test.zip",
+  "package_sha256": "98e214f109f2960fced783bdb1ae0209692bda2d9dac5b6c19f04f24aa2ed5d7",
+  "combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B21v3_QA_Test.zip",
+  "combined_package_sha256": "1f6820a886a43227b1f94491b625517d517736dc24c144e46ea06c3f952ca9fa",
+  "qa": {
+    "original_dds_inspected": true,
+    "dimensions_identical": true,
+    "header_128_identical": true,
+    "changed_pixels_outside_allowed_regions": 0,
+    "introduced_alpha_pixels_outside_allowed_regions": 0,
+    "raw_and_readable_manual_review": "pass",
+    "residual_generic_english": "none observed",
+    "black_lines_crop_seams_erasure_residue_alpha_halos_clipping": "none observed"
+  },
+  "preserved": [
+    "Ferrari vehicle names/images",
+    "OutRun2 SP / OutRun2 logos",
+    "1P marker",
+    "numeric/UI art"
+  ],
+  "note": "Promoted only after re-opening the original-DDS-first policy and manually reviewing v3. Generic labels are localized inside their source cells; protected model/brand/logo artwork remains original. In-game screenshot validation is still pending."
+}
