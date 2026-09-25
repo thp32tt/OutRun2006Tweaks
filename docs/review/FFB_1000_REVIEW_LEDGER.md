@@ -35,8 +35,9 @@ A cycle is counted only after its assigned source/concern has been inspected and
 | C0021 | PS2 retail surface-LUT -> Type-4 periodic magnitude dataflow | COMPLETE | `FFB-R0021-F01`: PS2 PC road amplitude reused Modern texture shaping; direct SLPM analysis recovered the steady-state surface/speed/drive/50/threshold-27 chain and production translation was corrected in this batch | Win32 Release 36125477321 SUCCESS; domain isolation 36125477189 SUCCESS |
 | C0022 | PS2 wheel-specific 0..10 feedback-level multiplier / Type-4 ownership | COMPLETE | `FFB-R0022-F01`: multiplier at 0x00133340 was mislabeled activation/ramp; retail menu + producer + manager tracing identifies game-state +0xFC as 0..10 wheel feedback strength | SLPM evidence at 0x24DF10, 0x24E8DC, 0x1D7FBC and 0x1332BC..0x133340; helper/test/docs/semantics updated |
 | C0023 | PS2 effect-manager category / type ownership | COMPLETE | No new PC defect; categories 1=ConstantForce, 2=Type-8 Damper, 7=Type-7 Spring, 8=periodic are now tied to concrete retail builders/wrappers | SLPM dispatch/call graph at 0x133700, 0x133B20, 0x133DB0, 0x134048, 0x134268, 0x134EB0 |
+| C0024 | PS2 ConstantForce source-global caller recovery | COMPLETE | `FFB-R0024-F01`: PC PS2 mode injected C2C collision into a retail transport with no verified non-zero caller; synthetic collision output removed and F11 Collision disabled for PS2 Original | Setter 0x132A28 + direct callers 0x132AF4/0x132DB4; source/UI/verifier/docs updated |
 
-Completed cycles: **23 / 1000**
+Completed cycles: **24 / 1000**
 
 ## Findings
 
@@ -46,6 +47,7 @@ Completed cycles: **23 / 1000**
 - `FFB-R0013-F01`: persisted recovered retail runtime sites in the curated PS2 semantic map and imported them into regenerated compact SQLite maps.
 - `FFB-R0021-F01`: replaced Modern DD texture shaping in PS2 Original's road periodic with the recovered retail surface-envelope / speed / drive-factor / magnitude-scale / threshold chain.
 - `FFB-R0022-F01`: corrected the PS2 Type-4 extra multiplier from an assumed activation ramp to the recovered wheel-specific 0..10 feedback-strength setting.
+- `FFB-R0024-F01`: removed the invented C2C collision mapping from PS2 Original after retail source-setter tracing found no verified non-zero caller.
 - C0002..C0010 and C0014..C0020: no new non-duplicate finding after source/evidence review.
 
 ## PS2 evidence discipline
@@ -57,4 +59,4 @@ Completed cycles: **23 / 1000**
 
 ## Next review
 
-Resume at **C0024**. Continue distinct source/behavior slices and record a cycle only after inspection plus ledger/Issue documentation. Highest-value PS2 reverse targets are the unresolved ConstantForce source globals, remaining vehicle-state surface shaping and the missing disc-local `LGDEV.IRX`.
+Resume at **C0025**. Continue distinct source/behavior slices and record a cycle only after inspection plus ledger/Issue documentation. Highest-value PS2 reverse targets are the remaining vehicle-state surface shaping, any hidden/indirect ConstantForce source caller, and the missing disc-local `LGDEV.IRX`.
