@@ -9,6 +9,8 @@
 #include <backends/imgui_impl_dx9.h>
 #include "overlay.hpp"
 
+extern void KoreanLocalization_DrawOverlay();
+
 namespace Settings
 {
 	Setting<bool> OverlayEnabled{ "Overlay", "Enabled", true,
@@ -211,6 +213,7 @@ class D3DHooks : public Hook
 			ImGui_ImplDX9_NewFrame();
 			ImGui_ImplWin32_NewFrame();
 			overlayActive = Overlay::render();
+			KoreanLocalization_DrawOverlay();
 			ImGui::Render();
 			ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 		}
