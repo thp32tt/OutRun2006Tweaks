@@ -349,3 +349,15 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Therefore the canonical package continues to carry the original `37759842`; no unsafe promotion was made.
 - Current checkpoint remains **32 reviewed / 31 retained / 1 pending**.
 - Canonical test package remains `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip` (SHA-256 `7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02`).
+
+
+## 2026-09-26 08:55 KST - BATCH42 FINAL-PENDING SAFE HOLD / STATE NORMALIZATION
+
+- Re-read `ORIENTATION_POLICY.md`, `SOURCE_FAITHFUL_CURRENT.json`, `resume_state.json`, `STATUS.md`, Batch38 and Batch41 before continuing.
+- Confirmed canonical checkpoint is **32 reviewed / 31 retained / 1 pending**; Batch38 already promoted `C598919A`.
+- Re-applied all hard gates to the remaining `37759842_1024x1024.dds`: original raw-DDS orientation, preserve-original vehicle/model/brand/logo/song/legal artwork, source-like typography/color/outline/proportion, strict original-text-region containment, and artifact cleanliness.
+- Batch41's automated containment remains valid (**0 changed pixels outside allowed regions; 0 introduced-alpha pixels outside allowed regions**), but manual QA remains a hard fail because lower blue mode cards retain source `Mode` fragments and black 15-course cards retain large English fragments.
+- Exact original/candidate DDS binaries are not committed to Git. Per policy, no report/preview-derived reconstruction was attempted and the original DDS remains canonical.
+- Added `BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json`.
+- Removed stale `C598919A` pending metadata from `resume_state.json`; only `37759842` is now listed.
+- Next executable graphics action requires exact DDS bytes. Do not promote `37759842` until residual English is zero and manual raw/readable QA passes.
