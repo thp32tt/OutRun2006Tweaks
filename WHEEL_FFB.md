@@ -34,7 +34,7 @@ The main steering model contains:
 
 1. **Physics SAT** — estimates front slip from vehicle motion, steering and yaw, then derives aligning torque from lateral force and total trail.
 2. **Natural SAT fallback** — progressive steering-angle-based restoring torque when the physics sample is unavailable or Physics SAT is disabled.
-3. **Mechanical / caster trail** — remains active with front lateral load instead of acting as an artificial center spring.
+3. **Mechanical / caster trail** — remains active with front lateral load instead of acting as an artificial center spring; in large drift slip only, the mechanical/caster component smoothly gains up to 25% while the existing re-grip/return suppression remains unchanged.
 4. **Low-speed spring** — only a stabilizer near low speed; deliberately reduced on the tested R3 feel.
 5. **Dynamic damping** — steering-velocity resistance that releases as the front end scrubs or the car slides.
 6. **Grip-loss unloading** — reduces steering load as usable front grip falls away.
@@ -45,9 +45,9 @@ The main steering model contains:
 The standalone branch now exposes four models through the same DirectInput safety/output layer:
 
 - **Modern DD Physics** — current front-slip/yaw SAT and DD-oriented transient model;
-- **Arcade Original (Lindbergh-derived)** — condition/spring backbone plus directional wall, surface-transition and rough-surface behavior reconstructed from the public Lindbergh drive-board interception;
+- **Arcade Original (Lindbergh-derived)** — full-speed condition/spring servo-style backbone (OutRun2Real reference 0.50, damper reference OFF) plus directional wall, surface-transition and rough-surface behavior reconstructed from the public Lindbergh drive-board interception;
 - **Arcade + Modern Hybrid** — Modern DD SAT with the arcade event/surface semantics;
-- **PS2 Original topology (Experimental)** — verified PS2 Condition/Constant/Periodic effect topology without claiming still-unknown payload fields as original values.
+- **PS2 Original topology (Experimental)** — verified PS2 Condition/Constant/Periodic effect topology without claiming still-unknown payload fields as original values. A separate PS2 Host Gain keeps 1.00x as the retail-reference translation while the F11 shortcut uses 2.00x DD compensation.
 
 Xbox controller vibration is not exposed as a wheel model. See `docs/reverse/FFB_MODEL_MODES.md` for evidence boundaries and mapping details.
 
@@ -251,3 +251,10 @@ v0.1 릴리즈 워크플로는 동일 커밋의 Build 워크플로가 성공한 
 구현은 `emoose/OutRun2006Tweaks`를 기반으로 하며, `hyp36rmax/multi-device-input`과 `d-b-c-e/OutRun2006Tweaks-FFB` 등 공개 OutRun 휠 관련 작업의 설계 경험도 참고했습니다.
 
 저장소 라이선스 세부 내용은 `LICENSE.md`와 `THIRD_PARTY_NOTICES.md`에 있습니다. 공개 바이너리 ZIP에는 해당 빌드에 사용된 의존성 소스 트리에서 생성한 하나의 통합 `LICENSES.txt`가 포함됩니다.
+
+
+### R4 collision and direction baseline
+
+Wall/course impacts now use the dedicated C2C course-collision response timer (`field_283` reload from 30) before the broader collision-state bit. `field_coli_281` and `field_282` remain in debug logging for later side/intensity validation. Vehicle/other impacts keep the broad collision witness, so the two paths no longer need to be treated as one signal.
+
+The clean-install and MOZA R3/reference-preset ConstantForce direction baseline is **Reverse OFF**. Reverse remains available as a per-wheel corrective option when a device reports opposite physical polarity.
