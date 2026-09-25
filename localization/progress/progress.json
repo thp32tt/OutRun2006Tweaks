@@ -1,6 +1,6 @@
 {
-  "schema_version": 3,
-  "updated_at_kst": "2026-09-25T12:20:00+09:00",
+  "schema_version": 4,
+  "updated_at_kst": "2026-09-26T00:34:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -55,13 +55,16 @@
       "total": 243
     },
     "graphics_localization": {
-      "status": "full_draft_test_package_ready",
+      "status": "source_faithful_rework_in_progress",
       "transcription_percent": 100,
       "draft_artwork_percent": 100,
       "final_artwork_percent": 0,
       "transcribed_assets": 79,
       "full_draft_candidates": 79,
-      "total_artwork_targets": 79
+      "total_artwork_targets": 79,
+      "source_faithful_reviewed": 20,
+      "source_faithful_localized_candidates": 17,
+      "reset_to_original_pending_rework": 3
     },
     "runtime_text_trace": {
       "status": "clean_k1_package_ready",
@@ -112,12 +115,15 @@
       "blocked_context_indices": []
     },
     "graphics_artwork": {
-      "status": "full_draft_test_package_ready",
+      "status": "source_faithful_rework_in_progress",
       "final_artwork_percent": 0,
       "draft_percent": 100,
       "completed": 0,
       "full_draft_candidates": 79,
-      "total": 79
+      "total": 79,
+      "source_faithful_reviewed": 20,
+      "source_faithful_localized_candidates": 17,
+      "reset_to_original_pending_rework": 3
     },
     "graphics_artwork_pipeline": {
       "status": "proof_renderer_ready",
@@ -134,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "In-game validate FULL-DRAFT 79-asset graphics package; replace heuristic placements with screenshot-verified exact boxes; collect K1/K2/K3 runtime logs in parallel",
+  "next_checkpoint": "Continue original-DDS-first source-faithful graphics rework; solve DXT5-safe replacement for 49BB5FE5; validate Batch3/4/5 in game.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -209,7 +215,38 @@
       "final_validated_assets": 0,
       "report": "localization/graphics/FULL_DRAFT_REPORT.json",
       "status": "ready_for_ingame_validation"
-    }
+    },
+    "orientation_policy": "localization/graphics/ORIENTATION_POLICY.md",
+    "source_faithful_reviewed_assets": 20,
+    "source_faithful_localized_candidates": 17,
+    "source_faithful_reset_to_original": 3,
+    "source_faithful_batches": {
+      "batch3": {
+        "assets": 10,
+        "report": "localization/graphics/BATCH3_SOURCEFAITHFUL_REPORT.json",
+        "package_name": "OutRun2_Korean_GFX_Batch3_SourceFaithful_Test.zip",
+        "package_sha256": "02d848b9746cb474d52d500cc849294fe55baca0e1bbe618f5faa39ee3b1c69c"
+      },
+      "batch4": {
+        "assets": 5,
+        "report": "localization/graphics/BATCH4_SOURCEFAITHFUL_REPORT.json",
+        "package_name": "OutRun2_Korean_GFX_Batch4_SourceFaithful_Test.zip",
+        "package_sha256": "cfddc6c758bfdc8313dd624bbe9211ce6d2221bd04985ee6856d449e66cffb95"
+      },
+      "batch5": {
+        "assets": 5,
+        "localized_candidates": 2,
+        "reset_original": 3,
+        "report": "localization/graphics/BATCH5_SOURCEFAITHFUL_REPORT.json",
+        "package_name": "OutRun2_Korean_GFX_Batch5_SourceFaithful_Test.zip",
+        "package_sha256": "1d5de3dcc55caefba4e904e3d0030b6ae5fbd70f479546641add3d967cf3459f"
+      }
+    },
+    "pending_source_faithful_rework": [
+      "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+      "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+      "textures/load/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds"
+    ]
   },
   "data_build": {
     "draft_bin_entries": 1356,
