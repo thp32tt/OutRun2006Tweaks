@@ -84,3 +84,10 @@ The shipped plugin profile `[Outrun 2 Special Tours Deluxe Real]` sets `Feedback
 ### OutRun2Real condition baseline
 
 The shipped plugin profile sets `SpringStrength=50` and `EnableDamper=0`. Non-0x7B drive-board requests call `Springi(SpringStrength/100)`. With the plugin defaults MinForce=0 / MaxForce=100, `TriggerSpringEffectInfinite(0.50)` yields coefficient 0.50 and saturation 1.00 (`coeff*2`). The standalone **Arcade Original** shortcut restores that profile before the common PC Overall Strength/safety scaler. Arcade Hybrid deliberately retains the Modern DD structural backbone instead.
+
+
+### Cabinet steering-hardware scope
+
+Do not generalize one OutRun 2 cabinet steering mechanism to every cabinet variant. The SEGA motorized SPG-2500 handle assembly used by motor-FFB Twin/Deluxe-family documentation lists a 500 W servo motor, pulleys/gears, timing belt and steering VR, while DRIVE BOARD TEST actively rolls the wheel left/right and exposes MOTOR POWER steering-resistance levels with 80% as the default. A separate UK HAPP Upright service path explicitly documents mechanical spring replacement. The latter is a different handle/cabinet variant and must not be used as evidence that the motorized OutRun2Real/Lindbergh target had a passive centering spring.
+
+For Arcade Original, the target remains the motorized drive-board feel represented by OutRun2Real: a continuously available condition/centering backbone plus drive-board event codes. The 0.50 condition coefficient is therefore a host translation of the motorized cabinet's active steering resistance, not a claim about a physical coil spring in the SPG-2500 mechanism.
