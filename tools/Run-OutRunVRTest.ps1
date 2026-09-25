@@ -13,6 +13,26 @@ $selector=Join-Path $root 'Select-OutRunVRBackend.ps1'
 $profileLib=Join-Path $root 'OutRunVR-TestProfiles.ps1'
 $game=Join-Path $root $GameExe
 
+# Canonical EXE identity gates the reverse-engineered HUD semantic map.
+# Never apply hard-coded RVA semantics to an unknown executable.
+$canonicalExeSha256='68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3'
+$exeSha256='missing'
+$semanticIdentityVerified=$false
+try{
+    if(Test-Path $game){
+        $exeSha256=(Get-FileHash $game -Algorithm SHA256).Hash.ToLowerInvariant()
+        $semanticIdentityVerified=($exeSha256 -eq $canonicalExeSha256)
+    }
+}catch{
+    $semanticIdentityVerified=$false
+}
+$oldExeSemanticVerified=$env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED
+if($semanticIdentityVerified){
+    $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED='1'
+}else{
+    $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED=$null
+}
+
 if(!(Test-Path $active) -or !(Test-Path $current)){
     throw 'Select a renderer/backend once before using the test launcher.'
 }
@@ -139,6 +159,8 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "profile=$TestProfile"
     "forceVrDisabled=$($backend -eq '2d')"
     "arguments=$($gameArgs -join ' ')"
+    "exeSha256=$exeSha256"
+    "exeSemanticIdentityVerified=$semanticIdentityVerified"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
 Write-Host "Runtime overrides: $($gameArgs -join ' ')"
 
@@ -210,6 +232,7 @@ try{
     $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
     $env:OUTRUN_VR_PERFORMANCE_PROFILE=$oldPerformanceProfile
     $env:OUTRUN_VR_SHADER_FINGERPRINT=$oldShaderFingerprint
+    $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED=$oldExeSemanticVerified
     foreach($key in $identityKeys){
         [Environment]::SetEnvironmentVariable($key,$oldIdentity[$key],'Process')
     }
