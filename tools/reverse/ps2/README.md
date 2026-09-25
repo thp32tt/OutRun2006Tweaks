@@ -15,7 +15,10 @@ Use `ps2query.py` against a generated `ps2_knowledge_map.sqlite`:
 ```bash
 python3 tools/reverse/ps2/ps2query.py --db /path/to/ps2_knowledge_map.sqlite 0x1354B0
 python3 tools/reverse/ps2/ps2query.py --db /path/to/ps2_knowledge_map.sqlite ForceEffect
+python3 tools/reverse/ps2/ps2query.py --db /path/to/ps2_knowledge_map.sqlite SpringCondition
 ```
+
+The compact builder imports the curated records in `reverse/ps2/semantics.json` into an optional `semantics` table. Rich one-off maps may additionally contain `string_xrefs`; the query tool detects that table when present and remains usable when it is absent. `tools/reverse/ps2/test_ps2query.py` guards both compact and enriched query paths.
 
 Input identity for the current map:
 
