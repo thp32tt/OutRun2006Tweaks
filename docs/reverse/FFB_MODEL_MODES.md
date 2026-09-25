@@ -61,14 +61,17 @@ The PS2 reverse map verifies distinct:
 - overall force gain;
 - Logitech enumerate/open/device-property flow.
 
-What is **not** fully decoded yet is the exact force payload field layout, units and game-event mapping used by the retail build. Therefore this mode deliberately implements only the verified effect topology:
+The retail path is now decoded beyond topology for several fields: the Type-7 Spring coefficient/dynamic saturation, Type-8 Damper coefficient/saturation, the directional ConstantForce output cap, and the Type-4 periodic raw period/direction/phase/offset are backed by direct SLPM evidence. The PC translation uses those verified envelopes where possible.
 
-- condition/spring backbone;
-- ConstantForce collision/event transport;
-- periodic road transport;
-- shared modern DD output safety.
+Still unresolved are the gameplay meanings of the retail ConstantForce source globals, the retail periodic-magnitude source, some effect-manager slot semantics, and the raw period field's physical unit. Therefore:
 
-It does not claim unverified magnitudes to be original PS2 values. Once the remaining PS2 force payload is decoded, the model can be tightened without changing the UI or output-owner architecture.
+- Condition/Spring and Damper parameters use recovered retail values with explicit user scaling;
+- the PS2 road periodic uses the recovered Type-4/Triangle shape and raw period curve, while the C2C road magnitude source remains provisional;
+- C2C collision detection is only a provisional trigger for the recovered directional ConstantForce envelope;
+- no PS2 gear-shift pulse is synthesized without a verified retail caller;
+- all output still passes through the shared modern DD safety layer.
+
+The mode remains **Experimental** until those event/source mappings and remaining units are recovered and hardware-tested.
 
 ## Why Xbox is not a selectable wheel model
 
