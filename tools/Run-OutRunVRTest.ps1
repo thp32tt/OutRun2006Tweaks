@@ -52,6 +52,14 @@ Get-Content $active|ForEach-Object{if($_ -match '^([^=]+)=(.*)$'){$kv[$matches[1
 $backend=$kv.backend
 if(!$backend){throw 'Active backend identity is missing.'}
 $variant=if($kv.variant){[string]$kv.variant}else{'AUTO'}
+$semanticMode='0'
+switch($variant){
+    'X_SCREEN_HUD' { $semanticMode='1' }
+    'X_WORLD_RANK' { $semanticMode='2' }
+    'X_COMBINED'   { $semanticMode='3' }
+}
+$oldExeSemanticMode=$env:OUTRUN_VR_EXE_SEMANTIC_MODE
+$env:OUTRUN_VR_EXE_SEMANTIC_MODE=$semanticMode
 
 $patterns=@(
     'OutRun2006Tweaks*.log',
@@ -161,6 +169,7 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "arguments=$($gameArgs -join ' ')"
     "exeSha256=$exeSha256"
     "exeSemanticIdentityVerified=$semanticIdentityVerified"
+    "exeSemanticMode=$semanticMode"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
 Write-Host "Runtime overrides: $($gameArgs -join ' ')"
 
@@ -233,6 +242,7 @@ try{
     $env:OUTRUN_VR_PERFORMANCE_PROFILE=$oldPerformanceProfile
     $env:OUTRUN_VR_SHADER_FINGERPRINT=$oldShaderFingerprint
     $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED=$oldExeSemanticVerified
+    $env:OUTRUN_VR_EXE_SEMANTIC_MODE=$oldExeSemanticMode
     foreach($key in $identityKeys){
         [Environment]::SetEnvironmentVariable($key,$oldIdentity[$key],'Process')
     }
