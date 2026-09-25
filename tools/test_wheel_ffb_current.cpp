@@ -61,6 +61,13 @@ int main() {
  require(WheelFFBPS2::periodic_magnitude_raw(.90f,.50f,1.0f)==23,"PS2 periodic source includes min(field_1C4,1) speed factor");
  require(std::abs(WheelFFBPS2::retail_wheel_level_scale(1)-2.0f/11.0f)<1e-6f,"PS2 retail wheel level 1 scale");
  require(std::abs(WheelFFBPS2::retail_wheel_level_scale(10)-1.0f)<1e-6f,"PS2 retail wheel level 10 scale");
+ require(std::abs(WheelFFBPS2::surface_envelope(.30f,0.0f,0.0f)-.30f)<1e-6f,"PS2 surface boost starts strictly above 0.30");
+ require(std::abs(WheelFFBPS2::surface_envelope(.31f,-.5f,0.0f)-.3875f)<1e-6f,"PS2 surface first car-field predicate boosts by 1.25");
+ require(std::abs(WheelFFBPS2::surface_envelope(.80f,0.0f,.5f)-1.0f)<1e-6f,"PS2 surface second car-field predicate boosts by 1.25");
+ require(std::abs(WheelFFBPS2::surface_envelope(.90f,0.0f,0.0f)-1.125f)<1e-6f,"PS2 surface envelope preserves retail headroom above one");
+ require(std::abs(WheelFFBPS2::surface_envelope(.90f,-.10f,.10f)-.90f)<1e-6f,"PS2 surface envelope stays unboosted when both strict predicates fail");
+ require(WheelFFBPS2::surface_envelope(std::numeric_limits<float>::quiet_NaN(),0.0f,0.0f)==0.0f,"PS2 surface envelope rejects NaN roughness");
+ require(WheelFFBPS2::periodic_magnitude_raw(1.125f,1.0f,1.0f)==56,"PS2 periodic magnitude retains boosted 1.125 envelope");
  require(WheelFFBPS2::retail_wheel_level_scale(0)==0.0f,"PS2 retail wheel level zero disables feedback");
  require(WheelFFBPS2::retail_wheel_level_scale(11)==0.0f,"PS2 invalid wheel level is rejected");
  require(WheelFFBPS2::periodic_magnitude_raw(.90f,1.0f,1.0f,WheelFFBPS2::retail_wheel_level_scale(5))==25,"PS2 periodic accepts recovered wheel-level scaler");
