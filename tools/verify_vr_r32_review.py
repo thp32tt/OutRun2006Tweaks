@@ -253,8 +253,10 @@ if "Context->End(pending.fence);\n        OutRunVrFinalTest::Context->Flush();" 
     raise SystemExit("R32 host must not Flush every direct frame")
 query_error = host_direct.find("if (FAILED(hr))")
 fault_identity = host_direct.find("AckFaultIdentity = identity", query_error)
-fast_gate = host_direct.find("SameAckIdentity(AckFaultIdentity, identity)")
-if min(query_error, fault_identity, fast_gate) < 0:
+can_fast_submit = host_direct.find("inline bool CanFastSubmit")
+fast_gate = host_direct.find(
+    "SameAckIdentity(AckFaultIdentity, identity)", can_fast_submit)
+if min(query_error, fault_identity, can_fast_submit, fast_gate) < 0:
     raise SystemExit(
         "R32 host ACK query failure must disable fast-submit for the exact producer run")
 if not (query_error < fault_identity < fast_gate):
