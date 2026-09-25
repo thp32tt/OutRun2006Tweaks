@@ -577,6 +577,11 @@ for block, label in (
     forbid(block, 'Settings::WheelFFBUsePeriodicEffects = false;', label + ' never disables verified periodic path')
     if label != 'PS2 Original shortcut':
         req(block, 'Settings::WheelFFBGearShift = 1.0f;', label + ' restores observed Arcade gear Sine amplitude')
+req(original_shortcut, 'Settings::WheelFFBSpringStrength = 0.50f;', 'Arcade Original shortcut restores OutRun2Real 50% SpringStrength')
+req(original_shortcut, 'Settings::WheelFFBSpringSaturation = 1.00f;', 'Arcade Original shortcut restores Springi 0.50 saturation behavior')
+req(original_shortcut, 'Settings::WheelFFBDamperStrength = 0.0f;', 'Arcade Original shortcut restores OutRun2Real no-damper baseline')
+req(original_shortcut, 'Settings::WheelFFBUseHardwareDamper = false;', 'Arcade Original shortcut does not leave stale hardware Damper active')
+forbid(hybrid_shortcut, 'Settings::WheelFFBSpringStrength = 0.50f;', 'Arcade Hybrid does not inherit Original condition baseline')
 req(ps2, 'speedRaw / 0.875f', 'PS2 retail drive factor recovered from SLPM')
 req(ps2, 'RetailSpringSaturationBase = 15', 'PS2 retail spring saturation base')
 req(ps2, 'RetailSpringSaturationSpan = 45', 'PS2 retail spring saturation speed span')
