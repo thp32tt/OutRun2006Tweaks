@@ -30,7 +30,7 @@ The reference path intercepts the Lindbergh routine at `0x08105A48`. Observed ef
 | `0x14` | opposite rough -> road transition | ~100 ms opposite transition |
 | `0x00` | grass/sand/rough state, opposite group | one-sided rough-surface ConstantForce |
 
-The public plugin also applies a spring for non-`0x7B` drive-board requests and a short 0.10 sine-like gear pulse.
+The public plugin also applies a spring for non-`0x7B` drive-board requests and a short 0.10 sine-like gear pulse. Its rough-surface call is `Sine(70, 80, strength)`; the plugin API names the first argument `period` and copies it to SDL's periodic period field, so the PC host translates 70 ms to about 14.286 Hz rather than treating 70 as Hz.
 
 C2C does not expose the Lindbergh drive-board packet stream, so this branch reconstructs the event semantics from C2C-native signals:
 
