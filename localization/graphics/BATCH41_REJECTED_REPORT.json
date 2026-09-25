@@ -1,0 +1,25 @@
+{
+  "batch": "41-37759842-rework",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "status": "rejected_keep_original",
+  "local_package": "OutRun2_Korean_GFX_Batch41_37759842_Rework_Test.zip",
+  "local_package_sha256": "03812506b9d8a4bfcdaec7fa08f6a79cdca7152dbf1c11e7413767917c59cf65",
+  "candidate_dds_sha256": "5f5ad405a83ae4d53723589ead856d15e0473d16de3bab99977c35caa072aebd",
+  "automated_qa": {
+    "dimensions_identical": true,
+    "header_128_identical": true,
+    "changed_pixels_outside_allowed_regions": 0,
+    "introduced_alpha_pixels_outside_allowed_regions": 0,
+    "allowed_region_count": 30,
+    "pass": true
+  },
+  "manual_qa": {
+    "pass": false,
+    "reasons": [
+      "Several lower blue mode cards still retain source English fragments such as Mode after text-zone reconstruction.",
+      "Black 15-course cards still retain large source English fragments next to the Korean labels.",
+      "The candidate therefore fails artifact-cleanliness / complete-label replacement despite perfect containment."
+    ]
+  },
+  "action": "Keep original DDS in the canonical package. Do not promote until the blue/black card interiors can be reconstructed without residual source text and without damaging icons/gradients."
+}
