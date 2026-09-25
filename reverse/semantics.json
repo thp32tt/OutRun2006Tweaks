@@ -6,7 +6,12 @@
       "rva": "0x0002D734",
       "kind": "render-queue",
       "name": "SpriteNodeQueue_Enter",
-      "tags": ["HUD", "SPRITE", "QUEUE", "SCREEN_SPACE"],
+      "tags": [
+        "HUD",
+        "SPRITE",
+        "QUEUE",
+        "SCREEN_SPACE"
+      ],
       "confidence": "high",
       "evidence": "canonical executable byte contract + source/runtime investigation",
       "notes": "Entry of the canonical SpriteNode render queue; queue membership alone must not imply blanket HUD ownership."
@@ -16,7 +21,11 @@
       "rva": "0x0002D762",
       "kind": "render-node",
       "name": "SpriteNode_Render",
-      "tags": ["HUD", "SPRITE", "DRAW"],
+      "tags": [
+        "HUD",
+        "SPRITE",
+        "DRAW"
+      ],
       "confidence": "high",
       "evidence": "canonical executable byte contract + source/runtime investigation",
       "notes": "Per-node render point used as an exact provenance anchor for HUD semantic tagging."
@@ -26,7 +35,11 @@
       "rva": "0x0002DCB4",
       "kind": "render-queue",
       "name": "SpriteNodeQueue_Exit",
-      "tags": ["HUD", "SPRITE", "QUEUE"],
+      "tags": [
+        "HUD",
+        "SPRITE",
+        "QUEUE"
+      ],
       "confidence": "high",
       "evidence": "canonical executable byte contract",
       "notes": "Exit of canonical SpriteNode render queue."
@@ -36,7 +49,12 @@
       "rva": "0x00049940",
       "kind": "projection",
       "name": "Calc3D2D",
-      "tags": ["UI", "WORLD_BILLBOARD", "RANK_MARKER", "PROJECTION"],
+      "tags": [
+        "UI",
+        "WORLD_BILLBOARD",
+        "RANK_MARKER",
+        "PROJECTION"
+      ],
       "confidence": "high",
       "evidence": "upstream hook + canonical executable byte contract",
       "notes": "World-to-screen projection anchor relevant to vehicle-attached rank marker reconstruction."
@@ -46,10 +64,14 @@
       "rva": "0x000BB046",
       "kind": "rank-marker",
       "name": "RankMarker_Truncate",
-      "tags": ["HUD", "WORLD_BILLBOARD", "RANK_MARKER"],
+      "tags": [
+        "HUD",
+        "WORLD_BILLBOARD",
+        "RANK_MARKER"
+      ],
       "confidence": "high",
       "evidence": "upstream hook + canonical executable byte contract",
-      "notes": "Rival rank marker anchor in sub_4BAD20; useful starting point for marker producer and vehicle-anchor XREF traversal."
+      "notes": "Rival rank marker anchor in sub_4BAD20. R55 HMD evidence shows 1st/2nd/3rd already converge while later rank digits remain split; re-traverse sprani vs put_clip_sprite/font callees before the next VR ownership patch."
     }
   ]
 }
