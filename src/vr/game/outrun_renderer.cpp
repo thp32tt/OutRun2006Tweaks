@@ -1662,7 +1662,9 @@ namespace OutRunVRRenderer
 				OutRunVR::GameSemantic::CorroboratesHud(semanticScope) ||
 				OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
 					semanticScope) ||
-				OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
+				OutRunVR::GameSemantic::CorroboratesWorld(semanticScope) ||
+				OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+					semanticScope);
 			if (semanticOverlay)
 			{
 				const HRESULT result =
