@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-26T01:24:00+09:00",
+  "updated_at_kst": "2026-09-26T07:05:00+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 22,
@@ -18,5 +18,11 @@
     "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
     "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds"
   ],
-  "mandatory_policy": "localization/graphics/ORIENTATION_POLICY.md"
+  "mandatory_policy": "localization/graphics/ORIENTATION_POLICY.md",
+  "automation_checkpoint": {
+    "run": "A-20260926-0701",
+    "result": "metadata_reconciled_no_binary_promotion",
+    "note": "Local runtime work produced B12-B15 experiments, but those binary DDS candidates are not persisted in Git and cannot be revalidated from this automation environment. Therefore no candidate was promoted. Pending list remains canonical until original-DDS + raw/readable/game-orientation QA can be rerun.",
+    "mandatory_additional_gate": "translated glyph pixels must remain inside the original text region; reject clipping, overlap, or spill into adjacent sprite cells"
+  }
 }
