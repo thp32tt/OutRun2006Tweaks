@@ -185,7 +185,11 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "Enabled" "false"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "false"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "false"
-        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        # Probe the DXVK provider's own Direct3DCreate9Ex export when
+        # available. The game hook never substitutes the system provider for a
+        # third-party provider, and DirectGpuOnly remains false so incompatible
+        # shared-resource interop falls back to SBS/Desktop Duplication.
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
     } elseif ($Backend -eq "dxvk-safe") {
@@ -288,7 +292,7 @@ Write-Host "Any previous root logs were archived before this session was created
 switch ($Backend) {
     "2d"   { Write-Host "2D ORIGINAL: classic D3D9, VR disabled, D3D9Ex promotion disabled, no VR host." }
     "d3d9" { Write-Host "D3D9Ex REFERENCE: PreferD3D9Ex enabled; DirectGPU optional; profile=$TestProfile." }
-    "dxvk-safe" { Write-Host "DXVK SAFE: classic D3D9 calls translated by DXVK; validated two-pass VR, multiview patcher disabled." }
+    "dxvk-safe" { Write-Host "DXVK SAFE: provider-local D3D9Ex is probed when exported; DirectGPU is optional and incompatible interop falls back to SBS; multiview patcher disabled." }
     "dxvk" { Write-Host "DXVK MULTIVIEW: local d3d9.dll + multiviewpatcher.dll active." }
     "dx12" { Write-Host "DX12 STRICT: local d3d9.dll verified absent; Windows D3D9On12 required." }
 }
