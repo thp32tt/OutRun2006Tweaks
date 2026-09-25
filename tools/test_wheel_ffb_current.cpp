@@ -59,7 +59,11 @@ int main() {
  require(std::abs(WheelFFBPS2::periodic_magnitude_norm(.54f,1.0f,1.0f)-27.0f/255.0f)<1e-6f,"PS2 periodic threshold is inclusive at raw 27");
  require(std::abs(WheelFFBPS2::periodic_magnitude_norm(.70f,1.0f,1.0f)-35.0f/255.0f)<1e-6f,"PS2 periodic normalized retail magnitude");
  require(WheelFFBPS2::periodic_magnitude_raw(.90f,.50f,1.0f)==23,"PS2 periodic source includes min(field_1C4,1) speed factor");
- require(WheelFFBPS2::periodic_magnitude_raw(.90f,1.0f,1.0f,.50f)==23,"PS2 periodic activation scale remains explicit");
+ require(std::abs(WheelFFBPS2::retail_wheel_level_scale(1)-2.0f/11.0f)<1e-6f,"PS2 retail wheel level 1 scale");
+ require(std::abs(WheelFFBPS2::retail_wheel_level_scale(10)-1.0f)<1e-6f,"PS2 retail wheel level 10 scale");
+ require(WheelFFBPS2::retail_wheel_level_scale(0)==0.0f,"PS2 retail wheel level zero disables feedback");
+ require(WheelFFBPS2::retail_wheel_level_scale(11)==0.0f,"PS2 invalid wheel level is rejected");
+ require(WheelFFBPS2::periodic_magnitude_raw(.90f,1.0f,1.0f,WheelFFBPS2::retail_wheel_level_scale(5))==25,"PS2 periodic accepts recovered wheel-level scaler");
  require(WheelFFBPS2::periodic_magnitude_raw(std::numeric_limits<float>::quiet_NaN(),1.0f,1.0f)==0,"PS2 periodic magnitude rejects NaN");
 
  auto engineIdle=estimate_engine_haptics(0.0f,0,0.0f);
