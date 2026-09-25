@@ -79,3 +79,8 @@ The plugin interface declares `Sine(UINT16 period, UINT16 fadePeriod, double str
 ### OutRun2Real ConstantForce lifetime
 
 The shipped plugin profile `[Outrun 2 Special Tours Deluxe Real]` sets `FeedbackLength=80`. `TriggerConstantEffect` assigns that value to SDL's constant-effect length. The local `percentLength=100` in `SendForceFeedback` is used only by the companion rumble call, not by ConstantForce. The C2C reconstruction therefore represents the directional 0x10/0x00/0x0B/0x1B/0x04/0x14 ConstantForce lifetime as five 60 Hz ticks (~83.3 ms), the nearest whole-frame representation of 80 ms.
+
+
+### OutRun2Real condition baseline
+
+The shipped plugin profile sets `SpringStrength=50` and `EnableDamper=0`. Non-0x7B drive-board requests call `Springi(SpringStrength/100)`. With the plugin defaults MinForce=0 / MaxForce=100, `TriggerSpringEffectInfinite(0.50)` yields coefficient 0.50 and saturation 1.00 (`coeff*2`). The standalone **Arcade Original** shortcut restores that profile before the common PC Overall Strength/safety scaler. Arcade Hybrid deliberately retains the Modern DD structural backbone instead.
