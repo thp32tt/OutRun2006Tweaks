@@ -1,0 +1,18 @@
+{
+  "batch": "11v2-rework",
+  "package_sha256": "a20c0bb0ccd96754876110923313895ffe2773ed6618f24c2241da1d25b1d27b",
+  "assets": [
+    {
+      "asset": "textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+      "status": "localized_candidate",
+      "sha256": "515464f8c76e705bf348b016bf02e6ab1b5e6e2a5cbe731e7a14c8e309428a5b",
+      "note": "Rebuilt full text-only top band to prevent duplicate English residue; icons/numerics preserved."
+    },
+    {
+      "asset": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+      "status": "reset_to_original",
+      "sha256": "35cd645b8379331e1541c56c4824170f14e22520cac17ce0d9cb6ed16535dae5",
+      "note": "Selective draft rejected due overlapping/residual English text."
+    }
+  ]
+}
