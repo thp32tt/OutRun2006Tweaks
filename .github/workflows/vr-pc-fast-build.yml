@@ -19,6 +19,7 @@ on:
   push:
     branches:
       - vr-d3d9ex-focus
+      - 'vr-d3d9ex-candidate/SCREENFIX-*'
 
 concurrency:
   group: outrun-pc-fast-test
@@ -42,7 +43,7 @@ jobs:
       - name: Checkout current VR integration branch without deleting build cache
         uses: actions/checkout@v4
         with:
-          ref: vr-d3d9ex-focus
+          ref: ${{ github.sha }}
           submodules: recursive
           fetch-depth: 1
           clean: false
