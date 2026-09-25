@@ -259,3 +259,18 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Current checkpoint: **32 reviewed / 27 retained / 5 pending**.
 - Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B16v5_QA_Test.zip`
 - SHA-256: `b04ee2a5d428ab90163f8207a20ce209d073f73ecfc6f2ebfbdbd62f2ea3b746`
+
+
+## 2026-09-26 07:34 KST - BATCH21V3 PROMOTION
+
+- Rejected Batch18 `2DA43E41`: residual English remained in selection/waiting/status areas.
+- Rejected Batch19 `ACF61D7C`: small top-selector clear boxes damaged non-text selector art and left glyph fragments.
+- Promoted Batch21v3 `C075FB49_512x512.dds`.
+- Preserved all Ferrari vehicle names/images, OutRun2 SP / OutRun2 logos, 1P marker and numeric/UI art.
+- Localized generic challenge/settings/course-condition labels only.
+- Fixed the Batch21v2 bottom-tag draw-context bug by reconstructing the three bottom arrow tags cleanly.
+- Automated gate: **0 changed pixels outside allowed source cells; 0 introduced-alpha pixels outside allowed source cells**.
+- Manual preview: no residual English in the edited labels, no black-line/crop-seam residue, and no vehicle-name/image corruption observed.
+- Current checkpoint: **32 reviewed / 28 retained / 4 pending**.
+- Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B21v3_QA_Test.zip`
+- SHA-256: `c566a79e47faaf788380da73fc6ec6bd23639e75c1f26c65d58e061067a07284`
