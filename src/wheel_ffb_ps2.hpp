@@ -41,6 +41,10 @@ namespace WheelFFBPS2
     constexpr int RetailPeriodicPeriodSpan = 60;
     constexpr int RetailPeriodicMagnitudeScale = 50;
     constexpr int RetailPeriodicStartThreshold = 27;
+    constexpr float RetailSurfaceRoughnessMax = 0.90f;
+    constexpr float RetailSurfaceBoost = 1.25f;
+    constexpr float RetailSurfaceEnvelopeMax =
+        RetailSurfaceRoughnessMax * RetailSurfaceBoost;
 
     // The retail game first stores min(field_1C4 / 2.5, 1.0), then its FFB
     // update divides that value by 0.35 and clamps again. Algebraically this is
@@ -138,6 +142,35 @@ namespace WheelFFBPS2
         return static_cast<float>(level + 1) / 11.0f;
     }
 
+    // The retail surface producer writes max four-wheel roughness first, then
+    // overwrites the Type-4 source with roughness*1.25 when roughness > 0.30
+    // and either of the recovered car-field predicates is true:
+    //   field_268 < 0.10
+    //   otherwise field_264 > -0.10
+    // Keep the field names numeric until their gameplay semantics are proven.
+    inline float surface_envelope(
+        float roughness,
+        float carField264,
+        float carField268)
+    {
+        if (!std::isfinite(roughness))
+            return 0.0f;
+        roughness = std::clamp(
+            roughness, 0.0f, RetailSurfaceRoughnessMax);
+
+        if (roughness <= 0.30f)
+            return roughness;
+
+        const bool firstPredicate =
+            std::isfinite(carField268) && carField268 < 0.10f;
+        const bool secondPredicate =
+            !firstPredicate &&
+            std::isfinite(carField264) && carField264 > -0.10f;
+        return (firstPredicate || secondPredicate)
+            ? roughness * RetailSurfaceBoost
+            : roughness;
+    }
+
     // Retail steady-state Type-4 magnitude chain:
     //   0x001D7C88: resolve each wheel surface mask
     //   0x001D80A8..0x001D810C: retain the maximum envelope
@@ -157,7 +190,8 @@ namespace WheelFFBPS2
         float wheelLevelScale = 1.0f)
     {
         surfaceEnvelope = std::isfinite(surfaceEnvelope)
-            ? std::clamp(surfaceEnvelope, 0.0f, 1.0f) : 0.0f;
+            ? std::clamp(surfaceEnvelope, 0.0f, RetailSurfaceEnvelopeMax)
+            : 0.0f;
         factor = std::isfinite(factor)
             ? std::clamp(factor, 0.0f, 1.0f) : 0.0f;
         wheelLevelScale = std::isfinite(wheelLevelScale)
