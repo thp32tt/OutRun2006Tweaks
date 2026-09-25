@@ -56,7 +56,9 @@ r32 = require(
     "OutRunWvpRegisterCount",
     "R32WaitProducerFence",
     "QueryPerformanceCounter",
-    "static const LONGLONG qpcFrequency",
+    "R32QpcFrequency",
+    "QueryPerformanceFrequency",
+    "R32QpcTicksToUs",
     "Budget starts before the FLUSH request",
     "R32ProducerFencePending",
     "R32DrainPendingProducerFence",
@@ -226,7 +228,10 @@ require(
 host_direct = require(
     "vrhost/src/runtime/r32_direct_submit.hpp",
     "CanFastSubmit",
-    "AckFaultGeneration",
+    "AckIdentity",
+    "FrameAckIdentity",
+    "SameAckIdentity",
+    "AckFaultIdentity",
     "Completion is unknowable",
     "SafeEye fallback perform a separately fenced copy/ACK",
     "ProjectionMatchesSnapshot",
@@ -236,7 +241,8 @@ host_direct = require(
     "deferred until actual direct-ring slot pressure",
     "PublishCompletedFrame",
     "AckedFrame",
-    "AckedGeneration",
+    "AckedIdentity",
+    "SameFrameAckIdentity",
     "R32 direct PERF 5s",
     "verified incoming DirectGPU projection submitted once",
     "OutRunVrR26RecenterHardening::EndFrame",
@@ -246,12 +252,17 @@ host_direct = require(
 if "Context->End(pending.fence);\n        OutRunVrFinalTest::Context->Flush();" in host_direct:
     raise SystemExit("R32 host must not Flush every direct frame")
 query_error = host_direct.find("if (FAILED(hr))")
-fault_generation = host_direct.find("AckFaultGeneration = generation", query_error)
-fast_gate = host_direct.find("AckFaultGeneration == generation")
-if min(query_error, fault_generation, fast_gate) < 0:
-    raise SystemExit("R32 host ACK query failure must disable fast-submit for that generation")
-if not (query_error < fault_generation < fast_gate):
-    raise SystemExit("R32 host ACK fault must be recorded before the fast-submit generation gate")
+fault_identity = host_direct.find("AckFaultIdentity = identity", query_error)
+fast_gate = host_direct.find("SameAckIdentity(AckFaultIdentity, identity)")
+if min(query_error, fault_identity, fast_gate) < 0:
+    raise SystemExit(
+        "R32 host ACK query failure must disable fast-submit for the exact producer run")
+if not (query_error < fault_identity < fast_gate):
+    raise SystemExit(
+        "R32 host ACK fault identity must be recorded before the fast-submit run gate")
+if "AckFaultGeneration" in host_direct or "AckedGeneration" in host_direct:
+    raise SystemExit(
+        "R32 host ACK cache regressed to transport-generation-only identity")
 
 r34 = require(
     "src/vr/d3d9/stereo_renderer_r34.cpp",
