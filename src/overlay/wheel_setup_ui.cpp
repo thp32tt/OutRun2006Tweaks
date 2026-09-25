@@ -42,6 +42,7 @@ namespace Settings
     extern Setting<bool> WheelMenuR3DirectDPad;
     extern Setting<bool> WheelMenuR3DirectAB;
     extern Setting<float> WheelFFBGlobalStrength;
+    extern Setting<float> WheelFFBPS2HostGain;
     extern Setting<float> WheelFFBSpringStrength;
     extern Setting<float> WheelFFBSpringSaturation;
     extern Setting<float> WheelFFBDamperStrength;
@@ -808,13 +809,14 @@ namespace
             bool hwSpring = true;
             bool hwDamper = true;
             bool periodic = true;
-            bool invertForce = true;
+            bool invertForce = false;
             bool invertSpring = false;
             bool responseCorrection = false;
             bool debugLog = true;
             bool telemetry = false;
             bool engineVibration = false;
             float global = 0.70f;
+            float ps2HostGain = 1.0f;
             float spring = 0.65f;
             float springSaturation = 0.95f;
             float damper = 0.30f;
@@ -850,6 +852,7 @@ namespace
             savedFfb_.debugLog = Settings::WheelFFBDebugLog;
             savedFfb_.telemetry = Settings::WheelFFBTelemetry;
             savedFfb_.global = Settings::WheelFFBGlobalStrength;
+            savedFfb_.ps2HostGain = Settings::WheelFFBPS2HostGain;
             savedFfb_.spring = Settings::WheelFFBSpringStrength;
             savedFfb_.springSaturation = Settings::WheelFFBSpringSaturation;
             savedFfb_.damper = Settings::WheelFFBDamperStrength;
@@ -886,6 +889,7 @@ namespace
             Settings::WheelFFBDebugLog = savedFfb_.debugLog;
             Settings::WheelFFBTelemetry = savedFfb_.telemetry;
             Settings::WheelFFBGlobalStrength = savedFfb_.global;
+            Settings::WheelFFBPS2HostGain = savedFfb_.ps2HostGain;
             Settings::WheelFFBSpringStrength = savedFfb_.spring;
             Settings::WheelFFBSpringSaturation = savedFfb_.springSaturation;
             Settings::WheelFFBDamperStrength = savedFfb_.damper;
@@ -1717,6 +1721,14 @@ namespace
 
             ImGui::SeparatorText("Physics / Structural");
             track_ffb_change(ImGui::SliderFloat("Overall Strength", Settings::WheelFFBGlobalStrength.ptr(), 0.0f, 1.5f, "%.2f"));
+            if (activeFfbModel == 3)
+            {
+                track_ffb_change(ImGui::SliderFloat(
+                    "PS2 Host Gain", Settings::WheelFFBPS2HostGain.ptr(),
+                    1.0f, 2.5f, "%.2fx"));
+                ImGui::TextDisabled(
+                    "1.00x = recovered retail-reference translation; 2.00-2.50x = modern DD host compensation. Retail Spring/Damper/Triangle ratios stay unchanged until the DirectInput safety cap.");
+            }
             if (Settings::WheelFFBGlobalStrength.get() > 1.0f)
                 ImGui::TextColored(ImVec4(1.0f, 0.65f, 0.25f, 1.0f),
                     "Above 100% trades force-detail contrast for extra weight.");
@@ -1737,8 +1749,20 @@ namespace
             if (!modelUsesModernSat) ImGui::EndDisabled();
 
             ImGui::SeparatorText("Steering Feel");
-            track_ffb_change(ImGui::SliderFloat("Centering Spring (low speed)", Settings::WheelFFBSpringStrength.ptr(), 0.0f, 1.0f, "%.2f"));
+            const char* springLabel = activeFfbModel == 1
+                ? "Arcade Servo Centering / Resistance"
+                : (activeFfbModel == 3
+                    ? "PS2 Spring Scale"
+                    : "Centering Spring (low speed)");
+            track_ffb_change(ImGui::SliderFloat(
+                springLabel, Settings::WheelFFBSpringStrength.ptr(),
+                0.0f, 1.0f, "%.2f"));
             track_ffb_change(ImGui::SliderFloat("Dynamic Damping", Settings::WheelFFBDamperStrength.ptr(), 0.0f, 1.0f, "%.2f"));
+            if (activeFfbModel == 1)
+            {
+                ImGui::TextDisabled(
+                    "Arcade reference: 0.50 = OutRun2Real SpringStrength 50. This condition backbone remains active at speed to approximate cabinet-servo centering/resistance; reference Damper is OFF.");
+            }
             if (activeFfbModel == 3)
             {
                 ImGui::TextDisabled(
@@ -1973,7 +1997,7 @@ namespace
                 // R3 compatibility default: prefer ConstantForce road/slip
                 // fallback because reported Sine support can be physically weak.
                 Settings::WheelFFBUsePeriodicEffects = false;
-                Settings::WheelFFBInvertForce = true;
+                Settings::WheelFFBInvertForce = false;
                 Settings::WheelFFBInvertSpring = false;
                 Settings::WheelFFBDebugLog = true;
                 Settings::VibrationMode = 0;
@@ -2016,7 +2040,7 @@ namespace
                 // R3 compatibility default: prefer ConstantForce road/slip
                 // fallback because reported Sine support can be physically weak.
                 Settings::WheelFFBUsePeriodicEffects = false;
-                Settings::WheelFFBInvertForce = true;
+                Settings::WheelFFBInvertForce = false;
                 Settings::WheelFFBInvertSpring = false;
                 Settings::VibrationMode = 0;
                 WheelFFB_RequestSettingsTransition();
@@ -2058,10 +2082,11 @@ namespace
                 Settings::WheelFFBWallImpact = 1.0f;
                 // Host scaler: 1.00 preserves OutRun2Real's 0.10 gear Sine.
                 Settings::WheelFFBGearShift = 1.0f;
+                Settings::WheelFFBInvertForce = false;
                 Settings::VibrationMode = 0;
                 track_ffb_change(true);
                 WheelFFB_RequestSettingsTransition();
-                status_ = "Arcade Original enabled: Lindbergh-derived 50% spring / no-damper baseline plus reconstructed constant/surface/gear events. Save Force Feedback to persist.";
+                status_ = "Arcade Original enabled: Lindbergh-derived 50% servo-style spring / no-damper baseline plus reconstructed constant/surface/gear events; Reverse OFF reference restored. Save Force Feedback to persist.";
             }
             ImGui::SameLine();
             if (ImGui::Button("Use Arcade Hybrid"))
@@ -2077,16 +2102,18 @@ namespace
                 Settings::WheelFFBWallImpact = 1.0f;
                 // Host scaler: 1.00 preserves OutRun2Real's 0.10 gear Sine.
                 Settings::WheelFFBGearShift = 1.0f;
+                Settings::WheelFFBInvertForce = false;
                 Settings::VibrationMode = 0;
                 track_ffb_change(true);
                 WheelFFB_RequestSettingsTransition();
-                status_ = "Arcade + Modern Hybrid enabled: Modern DD SAT with Lindbergh-derived arcade events. Save Force Feedback to persist.";
+                status_ = "Arcade + Modern Hybrid enabled: Modern DD SAT with Lindbergh-derived arcade events; Reverse OFF reference restored. Save Force Feedback to persist.";
             }
             ImGui::SameLine();
             if (ImGui::Button("Use PS2 Original (Experimental)"))
             {
                 Settings::WheelFFBEnable = true;
                 Settings::WheelFFBModel = 3;
+                Settings::WheelFFBPS2HostGain = 2.0f;
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
                 // These shipped control values are defined as 1.00x scaling
@@ -2102,10 +2129,11 @@ namespace
                 // The retail PS2 binary has explicit periodic download/update
                 // paths; never inherit a previous model's disabled state.
                 Settings::WheelFFBUsePeriodicEffects = true;
+                Settings::WheelFFBInvertForce = false;
                 Settings::VibrationMode = 0;
                 track_ffb_change(true);
                 WheelFFB_RequestSettingsTransition();
-                status_ = "PS2 Original enabled (experimental): recovered retail Spring/Damper/Type-4 road envelope active; unresolved event/source mappings remain provisional.";
+                status_ = "PS2 Original enabled (experimental): recovered retail Spring/Damper/Type-4 road envelope with 2.00x DD host compensation; 1.00x remains the retail-reference translation.";
             }
 
             if (!Settings::UseNewInput)
