@@ -1,6 +1,6 @@
 {
   "batch": "21v3-c075-rework",
-  "updated_at_kst": "2026-09-26T07:43:00+09:00",
+  "updated_at_kst": "2026-09-26T07:34:00+09:00",
   "asset": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
   "status": "promoted_source_faithful_candidate",
   "raw_transform": "mirror_y",
@@ -8,7 +8,7 @@
   "package": "OutRun2_Korean_GFX_Batch21v3_C075FB49_Rework_Test.zip",
   "package_sha256": "98e214f109f2960fced783bdb1ae0209692bda2d9dac5b6c19f04f24aa2ed5d7",
   "combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B21v3_QA_Test.zip",
-  "combined_package_sha256": "1f6820a886a43227b1f94491b625517d517736dc24c144e46ea06c3f952ca9fa",
+  "combined_package_sha256": "c566a79e47faaf788380da73fc6ec6bd23639e75c1f26c65d58e061067a07284",
   "qa": {
     "original_dds_inspected": true,
     "dimensions_identical": true,
