@@ -1,0 +1,21 @@
+{
+  "batch": "17v3-37759842-rework",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "status": "rejected_keep_original",
+  "automated_qa": {
+    "dimensions_identical": true,
+    "header_128_identical": true,
+    "changed_pixels_outside_allowed_regions": 0,
+    "allowed_region_count": 32,
+    "pass": true
+  },
+  "manual_qa": {
+    "pass": false,
+    "reasons": [
+      "Black 15-course cards still contain residual English after cleanup.",
+      "Blue mode-card inpainting flattens the source gradient and rectangular icon restoration introduces visible seams.",
+      "Candidate fails style-fidelity and artifact-cleanliness gates even though edits remain inside allowed regions."
+    ]
+  },
+  "action": "Keep original DDS. Future pass must reconstruct/inpaint card interiors without flattening gradients or rectangular restoration seams."
+}
