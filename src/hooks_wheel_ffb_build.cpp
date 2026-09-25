@@ -420,11 +420,11 @@ namespace
     DWORD lastRoadCompatibilityLogTick = 0;
 }
 
-// Road texture and snow/curb tactile handling are deliberately universal.
-// Wheel model names do not select a force model. ConstantForce is the common
-// road/slip transport so a driver claiming GUID_Sine support cannot silently
-// produce a different feel from another wheel. Hardware Spring/Damper remain
-// capability-driven inside the core and retain their software fallbacks.
+// Modern DD snow/curb compatibility shaping lives here, but tactile transport
+// ownership stays in the model-aware core. UsePeriodicEffects is a live user/
+// model setting: Arcade Original/Hybrid can request the observed Sine path and
+// PS2 Original can request its recovered Triangle path. If those hardware
+// effects are unavailable, the core already falls back safely to ConstantForce.
 //
 // During a real surface transition, temporarily unload SAT/damping and normalize
 // RoadTexture so the tactile signal remains audible under sustained corner load.
@@ -439,10 +439,8 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
     // untouched, then immediately bring those presets onto the universal tune.
     normalize_legacy_preset(true);
 
-    // One tactile transport for every wheel. Spring and Damper are still chosen
-    // by DirectInput capability probing; only road/slip sine is standardized.
-    if (Settings::WheelFFBUsePeriodicEffects)
-        Settings::WheelFFBUsePeriodicEffects = false;
+    // Do not rewrite WheelFFBUsePeriodicEffects here. Transport ownership is
+    // model-aware in the core and the F11 switch is intentionally live.
 
     const float originalRoadTexture =
         static_cast<float>(Settings::WheelFFBRoadTexture);
