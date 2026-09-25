@@ -38,6 +38,8 @@ int main() {
  require(arcade_gear_sine_force(11,1.0f)<-0.09f,"arcade gear Sine reaches negative lobe");
  require(std::abs(arcade_gear_sine_force(4,.5f)-.5f*arcade_gear_sine_force(4,1.0f))<1e-6f,"arcade gear host scaler is linear");
  require(arcade_gear_sine_force(ArcadeGearEventFrames,1.0f)==0.0f,"arcade gear Sine stops after 240ms event window");
+ require(ArcadeConstantEventFrames==5,"arcade 80ms ConstantForce maps to five 60Hz ticks");
+ require(std::abs(ArcadeConstantEventLengthMs-80.0f)<1e-6f,"arcade reference ConstantForce lifetime remains 80ms");
  require(std::abs(compose_arcade_directional_surface(-.7f,.7f,true)-.7f)<1e-6f,"arcade right transition overrides opposite sustained force");
  require(std::abs(compose_arcade_directional_surface(.7f,-.7f,true)+.7f)<1e-6f,"arcade left transition overrides opposite sustained force");
  require(std::abs(compose_arcade_directional_surface(.4f,-.8f,false)-.4f)<1e-6f,"arcade sustained force remains when no transition is active");
