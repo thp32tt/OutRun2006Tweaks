@@ -79,10 +79,33 @@ Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'Get-OutRunVRTestProfile') 'ru
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'TEST_PROFILE') 'collector manifest must record profile'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match '\$variant/\$profile/\$session') 'collector path must separate Variant/Profile/Session'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'captureRoot') 'collector must include capture bundles'
-Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'R55_A_ZERO') 'single GUI must expose R55 zero-disparity case'
-Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'R55_B_SCALE35') 'single GUI must expose R55 obvious 35-percent scale case'
-Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'R55_C_WORLD35') 'single GUI must expose R55 finite-world-plane case'
-Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'R55_D_RANKZERO') 'single GUI must expose R55 rank-zero case'
+$r56Variants=@(
+    'R56_01_ZERO',
+    'R56_02_SCALE35',
+    'R56_03_WORLD35',
+    'R56_04_RANKZERO',
+    'R56_05_POSITION_XP96',
+    'R56_06_POSITION_XM96',
+    'R56_07_POSITION_XS35',
+    'R56_08_POSITION_XCENTER',
+    'R56_09_RANK13_XP96',
+    'R56_10_RANK13_XM96',
+    'R56_11_RANK13_YM72',
+    'R56_12_RANK13_CENTER',
+    'R56_13_RANK46_XP96',
+    'R56_14_RANK46_YM72',
+    'R56_15_RANK46_CENTER',
+    'R56_16_RANK13_AS_HUD',
+    'R56_17_RANK46_AS_HUD',
+    'R56_18_RANK46_NEXTDRAW',
+    'R56_19_POSITION_NEXTDRAW',
+    'R56_20_ALLSCREEN_RAW'
+)
+foreach($id in $r56Variants){
+    Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match [regex]::Escape($id)) "single GUI must expose $id"
+    Assert-True ($text['Run-OutRunVRTest.ps1'] -match [regex]::Escape($id)) "runner must map $id"
+}
+Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'OUTRUN_VR_HUD_PROBE') 'runner must set the R56 runtime probe selector'
 Assert-True (-not (Test-Path (Join-Path $root 'OutRunVR-Backend-Selector.ps1'))) 'obsolete backend GUI selector must stay removed'
 Assert-True (-not (Test-Path (Join-Path $root 'OutRunVR-Slot-Selector.ps1'))) 'obsolete slot GUI selector must stay removed'
 
