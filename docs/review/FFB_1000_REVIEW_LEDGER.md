@@ -37,8 +37,9 @@ A cycle is counted only after its assigned source/concern has been inspected and
 | C0023 | PS2 effect-manager category / type ownership | COMPLETE | No new PC defect; categories 1=ConstantForce, 2=Type-8 Damper, 7=Type-7 Spring, 8=periodic are now tied to concrete retail builders/wrappers | SLPM dispatch/call graph at 0x133700, 0x133B20, 0x133DB0, 0x134048, 0x134268, 0x134EB0 |
 | C0024 | PS2 ConstantForce source-global caller recovery | COMPLETE | `FFB-R0024-F01`: PC PS2 mode injected C2C collision into a retail transport with no verified non-zero caller; synthetic collision output removed and F11 Collision disabled for PS2 Original | Setter 0x132A28 + direct callers 0x132AF4/0x132DB4; source/UI/verifier/docs updated |
 | C0025 | PS2 IOP Logitech module search in supplied assets | COMPLETE / BINARY_BLOCKED | No PC defect; IOPRP ROMDIR has no LGDEV/USBD and DRIVER.PS2 is a packed asset, not an IRX container | IOPRP310.IMG + DRIVER.PS2 binary/signature/string inspection; LGDEV.IRX still required |
+| C0026 | PS2 Type-4 remaining surface-envelope writes | COMPLETE | `FFB-R0026-F01`: PC omitted retail roughness*1.25 vehicle-state boost and clipped valid 1.125 envelope to 1.0; helper/runtime/tests/verifier corrected | SLPM 0x1D811C, 0x1D81BC, 0x1D8268 -> consume 0x132E94; exact-head CI pending |
 
-Completed cycles: **25 / 1000**
+Completed cycles: **26 / 1000**
 
 ## Findings
 
@@ -49,6 +50,7 @@ Completed cycles: **25 / 1000**
 - `FFB-R0021-F01`: replaced Modern DD texture shaping in PS2 Original's road periodic with the recovered retail surface-envelope / speed / drive-factor / magnitude-scale / threshold chain.
 - `FFB-R0022-F01`: corrected the PS2 Type-4 extra multiplier from an assumed activation ramp to the recovered wheel-specific 0..10 feedback-strength setting.
 - `FFB-R0024-F01`: removed the invented C2C collision mapping from PS2 Original after retail source-setter tracing found no verified non-zero caller.
+- `FFB-R0026-F01`: restored the verified PS2 Type-4 roughness*1.25 vehicle-state surface boost and valid 1.125 envelope headroom.
 - C0002..C0010 and C0014..C0020: no new non-duplicate finding after source/evidence review.
 
 ## PS2 evidence discipline
@@ -60,4 +62,4 @@ Completed cycles: **25 / 1000**
 
 ## Next review
 
-Resume at **C0026**. Continue distinct source/behavior slices and record a cycle only after inspection plus ledger/Issue documentation. Highest-value PS2 reverse target is the remaining vehicle-state surface shaping; the IOP transport lane is BINARY_BLOCKED until disc-local `LGDEV.IRX` is supplied.
+Resume at **C0027**. Continue distinct source/behavior slices and record a cycle only after inspection plus ledger/Issue documentation. Highest-value PS2 targets are semantic classification of the remaining non-Type-4 transient channels, any hidden ConstantForce source caller, and runtime hardware validation; the IOP lane remains BINARY_BLOCKED until disc-local `LGDEV.IRX` is supplied.
