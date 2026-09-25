@@ -336,3 +336,16 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Current checkpoint: **32 reviewed / 31 retained / 1 pending**.
 - Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip`
 - SHA-256: `7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02`
+
+
+## 2026-09-26 08:39 KST - BATCH41 37759842 SAFE REJECTION
+
+- Rebuilt the final pending `37759842_1024x1024.dds` again from the original raw DDS.
+- Batch39 text-color inpainting was discarded because card interiors showed obvious smear/artifact damage.
+- Batch40 passed automated containment but manual review showed heavy smearing and residual source text.
+- Batch41 switched to local gradient-plane replacement only inside the original text zones.
+- Automated Batch41 gate passed: original dimensions/header preserved; **0 changed pixels outside allowed regions; 0 introduced-alpha pixels outside allowed regions**.
+- Manual review still rejected Batch41: lower blue mode cards retain source `Mode` fragments and black 15-course cards retain large source English fragments.
+- Therefore the canonical package continues to carry the original `37759842`; no unsafe promotion was made.
+- Current checkpoint remains **32 reviewed / 31 retained / 1 pending**.
+- Canonical test package remains `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip` (SHA-256 `7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02`).
