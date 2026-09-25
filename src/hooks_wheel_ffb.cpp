@@ -1240,13 +1240,22 @@ namespace
                     -smoothedLongAccel_ * weightTransfer, -0.06f, 0.08f);
             }
 
+            const bool suppressStructuralForImpact =
+                arcadeEffects
+                    ? (crashImpulseTimer_ > 0 &&
+                       impactAge < WheelFFBMath::ArcadeConstantEventFrames)
+                    : (ps2Original
+                        ? false
+                        : crashImpulseTimer_ > CrashCooldownFrames);
+
             float structural = 0.0f;
-            if (crashImpulseTimer_ <= CrashCooldownFrames)
+            if (!suppressStructuralForImpact)
             {
                 // Arcade Original and PS2 Original topology modes use the
-                // verified condition-force backbone rather than the modern
-                // inferred SAT. Hybrid keeps Modern DD SAT and swaps the
-                // transient/surface semantics to the arcade reconstruction.
+                // condition-force backbone rather than Modern inferred SAT.
+                // Collision debounce is not itself a reason to keep steering
+                // torque blank: each model suppresses only during its active
+                // impact event window.
                 const float modelLoadMod =
                     modernStructural ? loadMod : 1.0f;
                 structural =
