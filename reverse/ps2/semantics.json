@@ -22,6 +22,19 @@
       "evidence": "Direct XREF to literal LGDEV.IRX; direct call to wrapper init."
     },
     {
+      "va": "0x00132A28",
+      "name": "WheelRuntime_ConstantSourceSetter",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RUNTIME",
+        "CONSTANT",
+        "SOURCE"
+      ],
+      "confidence": "high",
+      "evidence": "Direct writer for source floats 0x00349528/0x0034952C. Verified direct calls at 0x00132AF4 and 0x00132DB4 both pass 0.0/0.0; no verified non-zero retail caller is currently recovered."
+    },
+    {
       "va": "0x00132CB0",
       "name": "WheelRuntime_DriveFactorStage1",
       "tags": [
@@ -56,7 +69,7 @@
         "CONSTANT"
       ],
       "confidence": "high",
-      "evidence": "Retail SLPM combines two signed sources, selects direction 90/270 and scales/caps magnitude at 220/255; source-variable gameplay semantics remain unresolved."
+      "evidence": "Retail SLPM sums source floats 0x00349528/0x0034952C, selects direction 90/270, and scales/caps magnitude at 220/255. The direct source setter's verified callers currently write only 0/0, so event semantics and any non-zero indirect caller remain unresolved."
     },
     {
       "va": "0x001330F0",
