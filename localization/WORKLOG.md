@@ -150,3 +150,17 @@
 - Binary game assets are not committed to GitHub; only package metadata/report and resumable progress state are committed.
 
 Next: run the full draft in game, capture problematic screens, replace heuristic positions with exact verified boxes, then promote verified assets to final candidates.
+
+
+## 2026-09-25 22:50 KST - GFX-ORIENTATION-RESET
+
+- User screenshot QA exposed a systemic graphics rule error in the broad FULL-DRAFT workflow: raw DDS elements were being visually normalized instead of preserving the source sprite/UV orientation.
+- Re-opened the **original game DDS** from `outrun_korean_analysis.tar.gz` and made the original archive the mandatory graphics source of truth.
+- Added `localization/graphics/ORIENTATION_POLICY.md`.
+- New mandatory rule: inspect each original raw DDS before artwork work; preserve each sprite's original mirror/rotation independently; Korean replacement text inherits the original raw transform.
+- New preserve rule: vehicle model/variant names, brand marks, logos, song/credit/legal text remain original unless explicitly approved for localization.
+- Verified `spr_sprani_selector_cvt_Exst/841E796B_512x128.dds`: its blue vehicle cards are vehicle/model-name artwork. Preserve the card artwork, vehicle pictograms and vehicle/model names exactly as original, including raw orientation. Do not translate those names. Only genuinely localizable non-model UI text may be replaced.
+- Verified `spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds`: route/loading text is intentionally stored in non-upright raw-texture orientations. Korean route/loading text must reproduce the original per-element transform instead of being made upright in the DDS viewer.
+- Previous generated 1st/2nd/early-3rd-batch graphics are now **visual drafts only**, not source-faithful candidates, until rechecked against the original raw DDS.
+- Resume behavior changed: future requests such as `이어서 작업해줘` must read the orientation policy first and continue from original-DDS verification.
+- Next: rebuild the affected engine-background and branch/loading assets source-faithfully, then continue the remaining artwork batch only after per-asset original-orientation and preserve-vs-translate checks.
