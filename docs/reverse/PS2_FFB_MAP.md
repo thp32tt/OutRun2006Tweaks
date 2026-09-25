@@ -158,10 +158,24 @@ A deeper retail-SLPM pass resolves the steady-state Type-4 magnitude source:
 
 The standalone PS2 mode therefore no longer reuses Modern DD's `(roughness - 0.30) / 0.55` texture shaping. Its steady-state translation uses the recovered raw surface envelope, `min(field_1C4,1)`, the independent PS2 `driveFactor`, the retail scale `50`, and the raw start threshold `27`.
 
+The multiplier previously described as an unknown activation/ramp is now identified more precisely. The retail options path creates a 0..10 control and, when the wheel-device path is active, stores its selected integer in game-state byte `+0xFC` at `0x0024E8DC`. The surface producer at `0x001D7FBC..` reads the same byte, rejects values >=11, and disables the surface-feedback producer when it is zero. For non-zero levels it also forms a base strength:
+
+```
+surfaceFeedbackBase = 0.20 + 0.08 * level
+```
+
+The Type-4 manager at `0x001332BC..0x00133340` independently applies:
+
+```
+wheelLevelScale = (level + 1) / 11
+```
+
+with the same invalid-value reset. This is strong evidence for a **wheel-specific 0..10 feedback-strength level**, not a transient activation/recreate ramp. The exact localized menu label is still unresolved, so the documentation intentionally avoids claiming a literal retail setting name.
+
 Two boundaries remain explicit:
 
-- the retail manager multiplies by an additional activation/ramp factor whose exact owner/semantic is not fully named; the PC backend retains its independent DD-safe startup/recreate ramp but does not claim that host ramp is the same variable;
-- F11 **Road Detail = 1.00** is a host/user one-to-one scaler around the recovered retail envelope before Overall Strength and the common DD output/safety layer.
+- later vehicle-state shaping inside the surface-feedback producer is still under analysis;
+- F11 **Road Detail = 1.00** is a host/user one-to-one scaler corresponding to the retail maximum level multiplier of 1.0 before Overall Strength and the common DD output/safety layer. Lower F11 values remain continuous host scaling; no retail default level is invented.
 
 ### Model-transition ownership
 
@@ -185,7 +199,7 @@ The compact reverse-map builder now imports the curated retail evidence records 
 Still unresolved and therefore **not** represented as retail-original tuning:
 
 - semantic identity of the signed constant-force source variables at `0x00349528 / 0x0034952C`;
-- semantic identity of the additional vehicle-state shaping that can modify the surface envelope after `0x001D811C`, plus the manager activation/ramp source used at `0x00133340`;
+- semantic identity of the additional vehicle-state shaping that can modify the surface envelope after `0x001D811C`;
 - full mapping of effect-manager slots/types around `0x00134478..0x001351FC`;
 - event-to-effect mapping for collision, rail, surface transition, drift/slip, and gear;
 - `LGDEV.IRX` internal transport/units if the disc module becomes available.
