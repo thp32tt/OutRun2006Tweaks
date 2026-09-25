@@ -1,6 +1,6 @@
 # Graphics Orientation & Preserve Policy
 
-Updated: 2026-09-26 01:24 KST
+Updated: 2026-09-26 07:04 KST
 Branch: `korean-localization-clean`
 
 This policy is mandatory for all Korean graphics localization work.
@@ -105,3 +105,19 @@ For every completed graphics batch or QA-rule change:
 - add/update the machine-readable batch report under `localization/graphics/`,
 - update `localization/WORKLOG.md` and `localization/progress/STATUS.md`,
 - do not merge VR or FFB source into the localization branch.
+
+
+## Text-region containment rule
+
+This gate is mandatory for every translated sprite or text segment.
+
+1. Determine the original text region / sprite cell from the original DDS before drawing Korean.
+2. All non-transparent pixels introduced by the Korean replacement must remain inside that original text region.
+3. The replacement must not spill into neighboring sprite cells, artwork, icons, bars, or transparent padding used by another element.
+4. If Korean text does not fit:
+   - reduce horizontal scale,
+   - reduce font size,
+   - use a shorter translation/abbreviation,
+   - or leave/reset to the original.
+5. Reject the candidate if any glyph is clipped, overlaps another element, or crosses the source region boundary.
+6. Check containment both in raw DDS orientation and in the readable/game-orientation preview.
