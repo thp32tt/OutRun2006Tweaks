@@ -861,7 +861,11 @@ namespace
 
                 if (arcadeSurfaceTransitionTimer_ > 0)
                 {
-                    arcadeDirectionalSurface += arcadeSurfaceTransitionForce_;
+                    arcadeDirectionalSurface =
+                        WheelFFBMath::compose_arcade_directional_surface(
+                            arcadeDirectionalSurface,
+                            arcadeSurfaceTransitionForce_,
+                            true);
                     arcadeSurfaceCode = arcadeSurfaceTransitionCode_;
                     --arcadeSurfaceTransitionTimer_;
                 }
