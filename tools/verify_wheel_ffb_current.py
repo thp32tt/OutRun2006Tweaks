@@ -526,6 +526,11 @@ req(ffb, 'modernStructural ? modernSelfAligningTorque : 0.0f', 'original modes d
 req(ffb, 'model={} spd={:.2f}', 'compact diagnostics identify the active FFB model')
 req(ffb, 'model={} car={}', '10Hz telemetry identifies the active FFB model')
 req(build, 'ffbModel == WheelFFBMath::Model::ModernDD', 'Modern DD tactile wrapper cannot pre-shape original modes')
+wrapper_start = build.find('void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)')
+wrapper_end = build.find('namespace\n{\n    class VibrationRoutingFix', wrapper_start)
+wrapper_block = build[wrapper_start:wrapper_end]
+forbid(wrapper_block, 'Settings::WheelFFBUsePeriodicEffects = false;', 'shared compatibility wrapper cannot disable model-owned hardware periodic effects')
+req(wrapper_block, 'Do not rewrite WheelFFBUsePeriodicEffects here.', 'wrapper documents live model-aware periodic ownership')
 req(wheel_ui, 'Arcade Original (Lindbergh-derived)', 'F11 exposes Arcade Original model')
 req(wheel_ui, 'Arcade + Modern Hybrid', 'F11 exposes Arcade Hybrid model')
 req(wheel_ui, 'PS2 Original topology (Experimental)', 'F11 exposes PS2 experimental model')
