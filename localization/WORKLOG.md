@@ -164,3 +164,18 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Previous generated 1st/2nd/early-3rd-batch graphics are now **visual drafts only**, not source-faithful candidates, until rechecked against the original raw DDS.
 - Resume behavior changed: future requests such as `이어서 작업해줘` must read the orientation policy first and continue from original-DDS verification.
 - Next: rebuild the affected engine-background and branch/loading assets source-faithfully, then continue the remaining artwork batch only after per-asset original-orientation and preserve-vs-translate checks.
+
+
+## 2026-09-25 22:58 KST - BATCH3 SOURCE-FAITHFUL
+
+- Completed a 10-asset source-faithful graphics batch after the orientation-policy reset.
+- Every asset was reopened from the original game DDS before editing.
+- Confirmed all 10 edited text sprites in this batch use raw mirror-Y storage; Korean replacements were constructed upright only in a temporary view and flipped back before DDS output.
+- `841E796B_512x128.dds`: Ferrari vehicle/model cards and names preserved unchanged; only `No Handicap` -> `핸디캡 없음`.
+- `EBEF6D20_512x512.dds`: `Left`, `Right`, `Diverge`, and both `Loading` labels localized while preserving the original raw mirror-Y transform; logos/non-text art retained.
+- Rebuilt eight additional mirror-Y text assets: `571E78F3`, `62BEBF33`, `E3FD08BE`, `F6811E94`, `1A43E9D9`, `D41D0B1`, `4F68708E`, `2EA557B4`.
+- Package: `OutRun2_Korean_GFX_Batch3_SourceFaithful_Test.zip`
+- Package SHA-256: `02d848b9746cb474d52d500cc849294fe55baca0e1bbe618f5faa39ee3b1c69c`
+- Machine-readable report: `localization/graphics/BATCH3_SOURCEFAITHFUL_REPORT.json`.
+- Binary DDS assets remain outside Git; only hashes/state/report are committed.
+- In-game validation remains pending. Future artwork continues only after original-DDS orientation + preserve-vs-translate verification.
