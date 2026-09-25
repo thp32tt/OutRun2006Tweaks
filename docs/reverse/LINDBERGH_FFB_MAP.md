@@ -42,7 +42,7 @@ Its speed-dependent strength is quantized in ten-percent steps. That curve is us
 | address | plugin use |
 | --- | --- |
 | `0x0827A1A0` | effect/state value |
-| `0x08273FAC` | wall-related value |
+| `0x08273FAC` | wall-related value read into `ffwall`; the current Fake source does not use it to generate FFB |
 | `0x0827A1DA` | changing event value |
 | `0x0827A35D` | changing event value / sine trigger |
 | `0x0827A1D4` | side selector |
@@ -53,7 +53,7 @@ Its speed-dependent strength is quantized in ten-percent steps. That curve is us
 | `0x0827A160` | gear |
 | `0x08273DF0` | speed |
 
-The Fake path converts the steering byte directly into directional ConstantForce. This is a compatibility approximation, not a model to transplant into the current Physics SAT path.
+The Fake path converts the steering byte directly into directional ConstantForce. This is a compatibility approximation, not a model to transplant into the current Physics SAT path. In particular, although the source reads `ffwall = 0x08273FAC`, it does not use that value to generate FFB; it remains only a discovery hint, not a validated wall-impact signal.
 
 ## C2C integration rule
 
