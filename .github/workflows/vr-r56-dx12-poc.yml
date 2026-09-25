@@ -1,0 +1,55 @@
+name: R56 D3D9On12 Current-Base Probe
+
+on:
+  push:
+    branches:
+      - vr-r56-dx12-currentbase-20260926
+    paths:
+      - 'dx12poc/**'
+      - '.github/workflows/vr-r56-dx12-poc.yml'
+  pull_request:
+    paths:
+      - 'dx12poc/**'
+      - '.github/workflows/vr-r56-dx12-poc.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  win32-d3d9on12-probe:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Win32 probe
+        shell: cmd
+        run: >
+          cmake -S dx12poc -B build-dx12-poc
+          -G "Visual Studio 17 2022" -A Win32
+      - name: Build Win32 probe
+        run: cmake --build build-dx12-poc --config Release
+      - name: Verify current-base probe binary
+        shell: pwsh
+        run: |
+          $exe = 'build-dx12-poc/Release/outrun-d3d9on12-probe.exe'
+          if (-not (Test-Path $exe)) { throw 'D3D9On12 probe executable missing' }
+          $bytes = [System.IO.File]::ReadAllBytes($exe)
+          $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+          $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
+          if ($machine -ne 0x014C) { throw ('expected x86 probe, machine=0x{0:X4}' -f $machine) }
+          $ascii = [Text.Encoding]::ASCII.GetString($bytes)
+          foreach ($marker in @(
+            'OUTRUN_DX12_POC_BUILD_2_R56',
+            'legacy_create_device=PASS',
+            'legacy_reset=PASS',
+            'DX12_POC_RESULT=PASS'
+          )) {
+            if (-not $ascii.Contains($marker)) { throw "missing marker: $marker" }
+          }
+          Get-FileHash $exe -Algorithm SHA256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: outrun-r56-d3d9on12-win32-probe
+          path: build-dx12-poc/Release/outrun-d3d9on12-probe.exe
+          if-no-files-found: error
