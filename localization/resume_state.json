@@ -8,11 +8,10 @@
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
     "read ORIENTATION_POLICY.md and SOURCE_FAITHFUL_CURRENT.json before editing",
-    "continue the 3 pending assets from original DDS only",
-    "ACF61D7C: use glyph-only masking or larger exact text extents while preserving yellow selector bar and song-title art",
+    "continue the final 2 pending assets from original DDS only",
     "37759842: preserve gradients/icons while removing English from black/blue cards",
     "C598919A: reuse verified DXT5 block-level patching with larger per-label extents",
-    "in-game validate the 29 retained source-faithful candidates"
+    "in-game validate the 30 retained source-faithful candidates"
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -37,8 +36,8 @@
     "full_draft_package_sha256": "5512dad798a4ddb4872e4aa3e69438537f75f488f439317d7b95c0eb372b6c78",
     "source_faithful_policy": "localization/graphics/ORIENTATION_POLICY.md",
     "source_faithful_reviewed_assets": 32,
-    "source_faithful_localized_candidates": 29,
-    "source_faithful_reset_to_original": 3,
+    "source_faithful_localized_candidates": 30,
+    "source_faithful_reset_to_original": 2,
     "batch3_report": "localization/graphics/BATCH3_SOURCEFAITHFUL_REPORT.json",
     "batch4_report": "localization/graphics/BATCH4_SOURCEFAITHFUL_REPORT.json",
     "batch5_report": "localization/graphics/BATCH5_SOURCEFAITHFUL_REPORT.json",
@@ -53,8 +52,8 @@
     "batch9_report": "localization/graphics/BATCH9_REWORK_REPORT.json",
     "batch10v2_report": "localization/graphics/BATCH10V2_REWORK_REPORT.json",
     "batch11v2_report": "localization/graphics/BATCH11V2_REWORK_REPORT.json",
-    "current_combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B24v2_QA_Test.zip",
-    "current_combined_package_sha256": "6a38aaae5fd979b1ebdbbe0e43f3e0b3c6e24b5fd929031ee496ef9ffb0f0541",
+    "current_combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B25v4_QA_Test.zip",
+    "current_combined_package_sha256": "e0d2df30e8de09dc69e154cbcffcfce649c76fd7edd760e4bb2fe0ab935d781d",
     "pending_dxt5_assets": [
       "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
       "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
@@ -69,7 +68,8 @@
     "batch19_rejected_report": "localization/graphics/BATCH19_REJECTED_REPORT.json",
     "batch21v3_report": "localization/graphics/BATCH21V3_REWORK_REPORT.json",
     "batch23_rejected_report": "localization/graphics/BATCH23_REJECTED_REPORT.json",
-    "batch24v2_report": "localization/graphics/BATCH24V2_2DA_REWORK_REPORT.json"
+    "batch24v2_report": "localization/graphics/BATCH24V2_2DA_REWORK_REPORT.json",
+    "batch25v4_report": "localization/graphics/BATCH25V4_ACF_REWORK_REPORT.json"
   },
   "runtime_packages": {
     "k1": {
