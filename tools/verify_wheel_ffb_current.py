@@ -585,6 +585,8 @@ for block, label in (
     forbid(block, 'Settings::WheelFFBUsePeriodicEffects = false;', label + ' never disables verified periodic path')
     if label != 'PS2 Original shortcut':
         req(block, 'Settings::WheelFFBGearShift = 1.0f;', label + ' restores observed Arcade gear Sine amplitude')
+        req(block, 'Settings::WheelFFBRoadTexture = 1.0f;', label + ' restores one-to-one Arcade road/surface host scaling')
+        req(block, 'Settings::WheelFFBWallImpact = 1.0f;', label + ' restores one-to-one Arcade wall host scaling')
 req(original_shortcut, 'Settings::WheelFFBSpringStrength = 0.50f;', 'Arcade Original shortcut restores OutRun2Real 50% SpringStrength')
 req(original_shortcut, 'Settings::WheelFFBSpringSaturation = 1.00f;', 'Arcade Original shortcut restores Springi 0.50 saturation behavior')
 req(original_shortcut, 'Settings::WheelFFBDamperStrength = 0.0f;', 'Arcade Original shortcut restores OutRun2Real no-damper baseline')
@@ -652,7 +654,7 @@ forbid(ffb, 'crashImpulseForce_ * 0.45f', 'arbitrary PS2 collision multiplier re
 forbid(ffb, '(ps2Original ? 0.12f : 0.20f)', 'unsupported PS2 gear thunk removed')
 req(ffb, 'else if (!ps2Original)', 'PS2 original mode emits no unverified generic gear-shift thunk')
 req(wheel_ui, 'PS2 Original: gear-shift FFB stays disabled until a retail PS2 effect caller is verified.', 'F11 marks PS2 gear effect unavailable pending retail evidence')
-req(wheel_ui, 'Arcade: 1.00 preserves the observed 0.10 / 240 ms gear Sine', 'F11 documents Arcade gear host-scaler semantics')
+req(wheel_ui, 'Arcade: Road Detail / Collision / Gear Shift at 1.00 preserve reconstructed source amplitude', 'F11 documents Arcade host-scaler semantics')
 req(wheel_ui, 'const bool modelUsesCollisionEvent = activeFfbModel != 3;', 'F11 disables Collision control in PS2 Original')
 req(wheel_ui, 'collision ConstantForce stays disabled until a non-zero retail event caller is verified.', 'F11 explains why PS2 Collision is disabled')
 req(ffb, 'GUID_Triangle', 'PS2 retail Type 4 is translated to DirectInput Triangle')
