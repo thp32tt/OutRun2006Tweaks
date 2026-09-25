@@ -68,7 +68,7 @@ Still unresolved are the gameplay meanings of the retail ConstantForce source gl
 - Condition/Spring and Damper parameters use recovered retail values with explicit user scaling;
 - the PS2 road periodic uses the recovered Type-4/Triangle shape, raw period curve, four-wheel surface-envelope family, `min(field_1C4,1)` factor, magnitude scale `50`, and raw start threshold `27`; later retail boost/ramp semantics remain explicitly unresolved;
 - F11 Road Detail `1.00` is the one-to-one host scaler around that recovered periodic envelope before Overall Strength and DD safety;
-- C2C collision detection is only a provisional trigger for the recovered directional ConstantForce envelope;
+- the recovered directional ConstantForce transport/cap remains documented, but PS2 Original emits no C2C collision force because no verified non-zero retail caller has been recovered;
 - no PS2 gear-shift pulse is synthesized without a verified retail caller;
 - all output still passes through the shared modern DD safety layer.
 
