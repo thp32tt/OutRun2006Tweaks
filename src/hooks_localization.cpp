@@ -322,7 +322,7 @@ namespace KoreanRuntime
         const uint8_t r = static_cast<uint8_t>((argb >> 16) & 0xFF);
         const uint8_t g = static_cast<uint8_t>((argb >> 8) & 0xFF);
         const uint8_t b = static_cast<uint8_t>(argb & 0xFF);
-        return IM_COL32(r, g, b, a ? a : 0xFF);
+        return IM_COL32(r, g, b, a);
     }
 
     static void Draw()
