@@ -134,6 +134,80 @@
       "evidence": "Literal EZ Wheel Wrapper v4.01 is referenced by this function."
     },
     {
+      "va": "0x00133700",
+      "name": "WheelManager_StopCategory",
+      "tags": [
+        "PS2",
+        "FFB",
+        "MANAGER",
+        "LIFETIME"
+      ],
+      "confidence": "high",
+      "evidence": "Retail 0..11 category dispatcher stops/releases the category-specific effect object; paired with presence/query dispatcher 0x00133B20."
+    },
+    {
+      "va": "0x00133B20",
+      "name": "WheelManager_HasCategory",
+      "tags": [
+        "PS2",
+        "FFB",
+        "MANAGER",
+        "QUERY"
+      ],
+      "confidence": "high",
+      "evidence": "Retail 0..11 category presence dispatcher. Confirmed FFB ownership: category 1 ConstantForce, 2 Type-8 Damper condition, 7 Type-7 Spring condition, 8 periodic."
+    },
+    {
+      "va": "0x00133DB0",
+      "name": "WheelManager_SpringType7",
+      "tags": [
+        "PS2",
+        "FFB",
+        "MANAGER",
+        "CONDITION",
+        "SPRING"
+      ],
+      "confidence": "high",
+      "evidence": "Retail builder queries manager category 7 and creates/updates a Type-7 condition; the initial caller supplies 70/70 and runtime caller supplies recovered Spring parameters."
+    },
+    {
+      "va": "0x00134048",
+      "name": "WheelManager_ConstantForce",
+      "tags": [
+        "PS2",
+        "FFB",
+        "MANAGER",
+        "CONSTANT"
+      ],
+      "confidence": "high",
+      "evidence": "Retail builder queries manager category 1 and converges on verified ConstantForce download/update wrappers."
+    },
+    {
+      "va": "0x00134268",
+      "name": "WheelManager_DamperType8",
+      "tags": [
+        "PS2",
+        "FFB",
+        "MANAGER",
+        "CONDITION",
+        "DAMPER"
+      ],
+      "confidence": "high",
+      "evidence": "Retail builder queries manager category 2 and updates the condition wrapper with effect type 8 and recovered Damper coefficient/saturation."
+    },
+    {
+      "va": "0x00134EB0",
+      "name": "WheelManager_Periodic",
+      "tags": [
+        "PS2",
+        "FFB",
+        "MANAGER",
+        "PERIODIC"
+      ],
+      "confidence": "high",
+      "evidence": "Retail builder queries manager category 8; the main wheel update supplies effect type 4 and recovered magnitude/period values."
+    },
+    {
       "va": "0x001354B0",
       "name": "WheelWrapper_DownloadConditionForce",
       "tags": [
