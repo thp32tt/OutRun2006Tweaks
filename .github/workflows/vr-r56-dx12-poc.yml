@@ -42,7 +42,9 @@ jobs:
           foreach ($marker in @(
             'OUTRUN_DX12_POC_BUILD_2_R56',
             'legacy_create_device=PASS',
+            'managed_resources_create=PASS',
             'legacy_reset=PASS',
+            'managed_resources_survive_reset=PASS',
             'DX12_POC_RESULT=PASS'
           )) {
             if (-not $ascii.Contains($marker)) { throw "missing marker: $marker" }
