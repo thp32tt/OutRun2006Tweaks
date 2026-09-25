@@ -6,6 +6,9 @@ exports; this repository version intentionally stays compact and reproducible.
 """
 import argparse, hashlib, json, pathlib, re, shutil, sqlite3, struct, subprocess
 
+ROOT=pathlib.Path(__file__).resolve().parents[3]
+SEMANTICS_JSON=ROOT/"reverse/ps2/semantics.json"
+
 ALLOC=2
 EXEC=4
 INS_RE=re.compile(r"^\\s*([0-9a-fA-F]+):\\s+((?:[0-9a-fA-F]{2}\\s+){4})\\s*(.*)$")
@@ -127,6 +130,7 @@ def main():
     CREATE TABLE strings(va INTEGER PRIMARY KEY,file_offset INTEGER,section TEXT,length INTEGER,value TEXT);
     CREATE TABLE anchors(va INTEGER PRIMARY KEY,reasons TEXT,name TEXT);
     CREATE TABLE calls(id INTEGER PRIMARY KEY,from_va INTEGER,to_va INTEGER,type TEXT);
+    CREATE TABLE semantics(va INTEGER PRIMARY KEY,name TEXT,tags TEXT,confidence TEXT,evidence TEXT);
     CREATE INDEX calls_from ON calls(from_va);
     CREATE INDEX calls_to ON calls(to_va);
     """)
@@ -137,11 +141,19 @@ def main():
     con.executemany("INSERT INTO strings VALUES(?,?,?,?,?)",strs)
     con.executemany("INSERT INTO anchors VALUES(?,?,?)",[(va,",".join(sorted(r)),f"sub_{va:08X}") for va,r in sorted(anchors.items())])
     con.executemany("INSERT INTO calls(from_va,to_va,type) VALUES(?,?,?)",calls)
+    semantic_rows=[]
+    if SEMANTICS_JSON.is_file():
+        semantic_doc=json.loads(SEMANTICS_JSON.read_text(encoding="utf-8"))
+        for rec in semantic_doc.get("records",[]):
+            semantic_rows.append((
+                int(rec["va"],16), rec["name"], ",".join(rec.get("tags",[])),
+                rec.get("confidence",""), rec.get("evidence","")))
+        con.executemany("INSERT OR REPLACE INTO semantics VALUES(?,?,?,?,?)",semantic_rows)
     con.commit()
     integrity=con.execute("pragma integrity_check").fetchone()[0]
     con.close()
     (a.out/"ioprp_romdir.json").write_text(json.dumps(romdir(a.ioprp),indent=2)+"\\n",encoding="utf-8")
-    summary={"meta":meta,"counts":{"instructions":len(ins),"strings":len(strs),"calls":len(calls),"anchors":len(anchors)},"sqlite_integrity":integrity}
+    summary={"meta":meta,"counts":{"instructions":len(ins),"strings":len(strs),"calls":len(calls),"anchors":len(anchors),"semantics":len(semantic_rows)},"sqlite_integrity":integrity}
     (a.out/"summary.json").write_text(json.dumps(summary,indent=2)+"\\n",encoding="utf-8")
     print(json.dumps(summary,indent=2))
 
