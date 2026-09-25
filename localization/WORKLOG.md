@@ -297,3 +297,16 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Current checkpoint: **32 reviewed / 29 retained / 3 pending**.
 - Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B24v2_QA_Test.zip`
 - SHA-256: `6a38aaae5fd979b1ebdbbe0e43f3e0b3c6e24b5fd929031ee496ef9ffb0f0541`
+
+
+## 2026-09-26 07:54 KST - BATCH25V4 ACF61D7C PROMOTION
+
+- Reworked `ACF61D7C_1024x512.dds` again using actual alpha/component y-extents from the original readable DDS.
+- Preserved song titles, OutRun2SP logo, controller/button art, numeric values, yellow/gray selector bar, and MT/AT abbreviations.
+- Protected selector art is restored by a bright-pixel mask so the original English `NORMAL` glyph is not restored with the bar.
+- Expanded the exchange-item text cell to remove the last residual English line.
+- Automated containment: **0 changed pixels outside allowed regions; 0 introduced-alpha pixels outside allowed regions**.
+- Manual readable preview: no residual generic English observed; no black-line/crop-seam residue observed.
+- Current checkpoint: **32 reviewed / 30 retained / 2 pending**.
+- Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B25v4_QA_Test.zip`
+- SHA-256: `e0d2df30e8de09dc69e154cbcffcfce649c76fd7edd760e4bb2fe0ab935d781d`
