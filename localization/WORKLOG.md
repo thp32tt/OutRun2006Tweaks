@@ -274,3 +274,12 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Current checkpoint: **32 reviewed / 28 retained / 4 pending**.
 - Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B21v3_QA_Test.zip`
 - SHA-256: `c566a79e47faaf788380da73fc6ec6bd23639e75c1f26c65d58e061067a07284`
+
+
+## 2026-09-26 07:34 KST - BATCH22 C598919A BLOCK-PATCH ATTEMPT
+
+- Implemented DXT5 **block-level patching** for `C598919A_1024x1024.dds`: only approved 4x4 blocks are replaced, leaving all other compressed blocks byte-identical to the original.
+- Automated containment passed: dimensions/header preserved and decoded changed pixels outside the patched allowed blocks = **0**.
+- Manual review rejected the candidate: several course/mode/ranking labels still retain English fragments or clipped source styling around Korean replacements.
+- Kept original `C598919A` in the canonical package.
+- The block-level DXT5 patching method itself is retained for the next larger-box cleanup pass.
