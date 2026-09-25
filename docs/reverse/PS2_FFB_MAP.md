@@ -177,6 +177,21 @@ Two boundaries remain explicit:
 - later vehicle-state shaping inside the surface-feedback producer is still under analysis;
 - F11 **Road Detail = 1.00** is a host/user one-to-one scaler corresponding to the retail maximum level multiplier of 1.0 before Overall Strength and the common DD output/safety layer. Lower F11 values remain continuous host scaling; no retail default level is invented.
 
+### Effect-manager category ownership
+
+The retail manager uses a 0..11 category dispatcher. The FFB-relevant categories needed by the OutRun wheel update are now tied to concrete wrapper families:
+
+| manager category | retail owner | evidence |
+| ---: | --- | --- |
+| `1` | ConstantForce | queried by `0x00134048`; create/update converges on `0x001357B8 / 0x00135910` |
+| `2` | Type-8 condition / Damper | queried by `0x00134268`; condition update carries effect type `8` |
+| `7` | Type-7 condition / Spring | queried by `0x00133DB0`; initial 70/70 setup and runtime condition update carry type `7` |
+| `8` | periodic | queried by `0x00134EB0`; the main update supplies periodic type `4` |
+
+`0x00133B20` is the presence/query dispatcher and `0x00133700` is the matching stop/release dispatcher. Their jump tables also contain categories 0, 3, 4, 5, 6, 9 and 11; those are not assigned force-effect names without stronger caller evidence. Category 10 falls through the query dispatcher. Category 9 is exercised by the manager control path but remains deliberately unnamed.
+
+This confirms that Spring, Damper, ConstantForce and periodic ownership are distinct in the retail manager and supports keeping those DirectInput objects separate in the PC PS2 model.
+
 ### Model-transition ownership
 
 Periodic COM objects are waveform-specific. On FFB model/profile transitions the PC backend now releases the old periodic objects and recreates the required set:
@@ -200,7 +215,7 @@ Still unresolved and therefore **not** represented as retail-original tuning:
 
 - semantic identity of the signed constant-force source variables at `0x00349528 / 0x0034952C`;
 - semantic identity of the additional vehicle-state shaping that can modify the surface envelope after `0x001D811C`;
-- full mapping of effect-manager slots/types around `0x00134478..0x001351FC`;
+- semantic naming for the remaining non-core effect-manager categories (0, 3, 4, 5, 6, 9, 11);
 - event-to-effect mapping for collision, rail, surface transition, drift/slip, and gear;
 - `LGDEV.IRX` internal transport/units if the disc module becomes available.
 
