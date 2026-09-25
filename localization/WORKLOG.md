@@ -246,3 +246,16 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Current checkpoint: **32 reviewed / 26 retained / 6 pending**.
 - Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B12v2_QA_Test.zip`.
 - SHA-256: `806579f71f09211e942a54c5c9b3817a08ac0f496dd80ade53b695c9d6e9a6d3`.
+
+
+## 2026-09-26 07:04 KST - BATCH16V5 PROMOTION / BATCH17V3 REJECTION
+
+- Promoted `560FA536_1024x1024.dds` after re-running the full checklist from the original DDS.
+- Preserved song titles, speed values, course images and gauges/icons.
+- Translated all 12 generic segments; RANDOM/TUNED/NORMAL used inpainting so the colored tile geometry remained intact.
+- Automated gate: dimensions/header unchanged; **0 changed pixels outside 13 explicit source text regions**.
+- Manual gate: no residual English, black-line residue, crop seams or tile-shape damage observed in the reviewed comparison.
+- Tried three cleanup passes on `37759842_1024x1024.dds`; kept it **pending/original** because black 15-course cards still leave English residue and card-gradient/icon restoration creates visible seams.
+- Current checkpoint: **32 reviewed / 27 retained / 5 pending**.
+- Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B16v5_QA_Test.zip`
+- SHA-256: `b04ee2a5d428ab90163f8207a20ce209d073f73ecfc6f2ebfbdbd62f2ea3b746`
