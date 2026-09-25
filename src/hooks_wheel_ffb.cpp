@@ -843,14 +843,14 @@ namespace
 
                 if (prevArcadeRightRough_ && !rightArcadeRough)
                 {
-                    arcadeSurfaceTransitionTimer_ = 6; // ~100 ms at 60 Hz
+                    arcadeSurfaceTransitionTimer_ = WheelFFBMath::ArcadeConstantEventFrames;
                     arcadeSurfaceTransitionForce_ =
                         arcadeSpeedStrength * roadSetting;
                     arcadeSurfaceTransitionCode_ = 0x04;
                 }
                 else if (prevArcadeLeftRough_ && !leftArcadeRough)
                 {
-                    arcadeSurfaceTransitionTimer_ = 6;
+                    arcadeSurfaceTransitionTimer_ = WheelFFBMath::ArcadeConstantEventFrames;
                     arcadeSurfaceTransitionForce_ =
                         -arcadeSpeedStrength * roadSetting;
                     arcadeSurfaceTransitionCode_ = 0x14;
@@ -1000,7 +1000,8 @@ namespace
                     ? CrashTimerFrames - crashImpulseTimer_
                     : CrashTimerFrames;
             const bool suppressSpringForImpact = arcadeEffects
-                ? (crashImpulseTimer_ > 0 && impactAge < 6)
+                ? (crashImpulseTimer_ > 0 &&
+                   impactAge < WheelFFBMath::ArcadeConstantEventFrames)
                 : (!ps2Original &&
                    crashImpulseTimer_ > CrashCooldownFrames);
 
@@ -3772,11 +3773,12 @@ namespace
                     {
                         // OutRun2Real.cpp groups hard wall requests into two
                         // directional ConstantForce codes (0x0B / 0x1B) with a
-                        // 100 ms request length. Emit only the first six 60 Hz
-                        // ticks; the remaining timer is collision debounce.
+                        // OutRun2Real profile uses FeedbackLength=80 ms for
+                        // ConstantForce. Emit the nearest 60 Hz representation;
+                        // the remaining crash timer is collision debounce.
                         const int impactFrame =
                             CrashTimerFrames - crashImpulseTimer_;
-                        if (impactFrame < 6)
+                        if (impactFrame < WheelFFBMath::ArcadeConstantEventFrames)
                         {
                             const float direction =
                                 crashImpulseForce_ >= 0.0f ? 1.0f : -1.0f;
