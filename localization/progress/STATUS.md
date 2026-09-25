@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-26 01:24 KST
+Updated: 2026-09-26 07:05 KST
 
 ## Active branch
 `korean-localization-clean`
@@ -82,3 +82,8 @@ Read:
 8. `localization/graphics/FULL_DRAFT_REPORT.json`
 
 Next gate: continue the 10 pending assets from original DDS first; solve DXT5-safe rewriting; keep preserve-original names/artwork untouched; run in-game validation on the 22 retained candidates.
+
+### QA checkpoint 2026-09-26 07:05 KST
+- Repository state re-read before promotion; no unrepeatable local B12-B15 binary candidate was promoted.
+- Hard gate: Korean replacement pixels must remain inside the original text region/sprite cell; clipping, overlap, or spill is rejected.
+- Canonical state remains **22 retained / 10 pending**.
