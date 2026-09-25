@@ -26,8 +26,8 @@ The reference path intercepts the Lindbergh routine at `0x08105A48`. Observed ef
 | `0x1B` | hard left-wall impact | opposite directional ConstantForce |
 | `0x02` | grass/sand | rough-surface vibration |
 | `0x10` | side-rail / one directional group | one-sided rough-surface ConstantForce |
-| `0x04` | rough surface -> road, one side | ~100 ms directional transition |
-| `0x14` | opposite rough -> road transition | ~100 ms opposite transition |
+| `0x04` | rough surface -> road, one side | ~80 ms directional transition (5 C2C ticks) |
+| `0x14` | opposite rough -> road transition | ~80 ms opposite transition (5 C2C ticks) |
 | `0x00` | grass/sand/rough state, opposite group | one-sided rough-surface ConstantForce |
 
 The public plugin also applies a spring for non-`0x7B` drive-board requests. Its rough-surface call is `Sine(70, 80, strength)`; the plugin API names the first argument `period` and copies it to SDL's periodic period field, so the PC host translates 70 ms to about 14.286 Hz rather than treating 70 as Hz. Gear changes while moving call `Sine(240, 320, 0.10)`: the PC reconstruction synthesizes one ~240 ms (~4.167 Hz) cycle and treats F11 Gear Shift as a host scaler, with 1.00 preserving the observed 0.10 source amplitude.
@@ -42,7 +42,7 @@ C2C does not expose the Lindbergh drive-board packet stream, so this branch reco
 
 Modern inferred Physics SAT and inferred tire-slip chatter are disabled in this mode. The centering backbone is the shared DirectInput condition/spring path. The **Use Arcade Original** shortcut restores the public OutRun2Real profile baseline: `SpringStrength=50` maps to a 0.50 condition coefficient with 1.00 saturation, while `EnableDamper=0` maps to zero Dynamic Damping. F11 can still override those values explicitly after loading the shortcut; Arcade Hybrid does not inherit this Original-only condition baseline.
 
-The Lindbergh plugin's speed-strength staircase is retained as a comparative shape. Its thresholds were defined in a different speed scale, so C2C uses the same ten-step structure normalized to C2C `speedNorm`; this is a porting approximation, not a claim that the raw speed units are identical.
+The Lindbergh plugin's speed-strength staircase is retained as a comparative shape. Its thresholds were defined in a different speed scale, so C2C uses the same ten-step structure after scaling `speedRaw / 2`; this is a porting approximation, not a claim that the raw speed units are identical. Modern DD still clamps its own `speedNorm` to 0..1, while Arcade preserves 0..1.25 headroom so the reference final >500 / 100% strength band remains reachable. Captured C2C telemetry reaches `speedRaw ~= 2.239`, i.e. Arcade normalized speed ~=1.12.
 
 ## Model 2 — Arcade + Modern Hybrid
 
