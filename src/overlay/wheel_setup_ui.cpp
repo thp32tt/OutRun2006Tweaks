@@ -2035,7 +2035,14 @@ namespace
                 Settings::WheelFFBEnable = true;
                 Settings::WheelFFBModel = 1;
                 Settings::WheelFFBUseHardwareSpring = true;
-                Settings::WheelFFBUseHardwareDamper = true;
+                // OutRun2Real profile: SpringStrength=50. TriggerSpringEffectInfinite
+                // maps that to coefficient 0.50 and saturation 1.00 before host gain.
+                Settings::WheelFFBSpringStrength = 0.50f;
+                Settings::WheelFFBSpringSaturation = 1.00f;
+                // OutRun2Real profile: EnableDamper=0. Keep damping available as
+                // an explicit F11 override, but restore zero for the reference shortcut.
+                Settings::WheelFFBDamperStrength = 0.0f;
+                Settings::WheelFFBUseHardwareDamper = false;
                 Settings::WheelFFBEngineVibration = false;
                 // Arcade Original's verified rough-surface path is periodic.
                 // Prefer the wheel driver's hardware periodic effect. The
@@ -2046,7 +2053,7 @@ namespace
                 Settings::VibrationMode = 0;
                 track_ffb_change(true);
                 WheelFFB_RequestSettingsTransition();
-                status_ = "Arcade Original enabled: Lindbergh-derived spring/constant/surface event reconstruction. Save Force Feedback to persist.";
+                status_ = "Arcade Original enabled: Lindbergh-derived 50% spring / no-damper baseline plus reconstructed constant/surface/gear events. Save Force Feedback to persist.";
             }
             ImGui::SameLine();
             if (ImGui::Button("Use Arcade Hybrid"))
