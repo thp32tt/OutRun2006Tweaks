@@ -134,3 +134,19 @@
   - `KoreanTrace=true`, `KoreanProofTextOverride=false`, `KoreanK3Trace=true`.
 - Generated six additional simple-text DDS proof candidates with source header/size preserved; graphics proof candidate count is now 7/79.
 - Next runtime gate: collect K3 log from real game screens, inspect width/glyph/global font state, then implement K3-A `화면 위치` four-glyph rendering through the existing text batch path.
+
+## 2026-09-25 12:20 KST - CP6 FULL GRAPHICS DRAFT
+
+- Produced a complete 79/79 DDS Korean graphics test set from the clean localization asset plan.
+- Rendered all 674/674 translated graphics segments.
+- Placement evidence: exact 8, OCR 225, manual 28, alpha-order 51, alpha-heuristic 330, special atlas mappings 32.
+- DDS formats: 67 RGBA32, 12 DXT5.
+- 66 translated RGBA32 assets preserve the original 128-byte DDS header; 2 zero-localizable assets are unchanged copies.
+- 11 translated DXT5 assets were re-encoded as DXT5 with the source mip count.
+- Verified all 79 expected DDS paths, DDS magic, dimensions, and mip counts.
+- Test package: `OutRun2_Korean_GFX_FULL_DRAFT_Test.zip`.
+- Package SHA-256: `5512dad798a4ddb4872e4aa3e69438537f75f488f439317d7b95c0eb372b6c78`.
+- This is a broad in-game FULL-DRAFT, not release artwork. Final validated count remains 0/79 until screenshots confirm position, clipping, orientation, alpha, and style.
+- Binary game assets are not committed to GitHub; only package metadata/report and resumable progress state are committed.
+
+Next: run the full draft in game, capture problematic screens, replace heuristic positions with exact verified boxes, then promote verified assets to final candidates.
