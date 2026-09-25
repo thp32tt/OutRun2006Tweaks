@@ -1,0 +1,22 @@
+{
+  "batch": "17v2-37759842-rework",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "status": "rejected_keep_original",
+  "raw_transform": "mirror_y",
+  "automated_qa": {
+    "dimensions_identical": true,
+    "header_128_identical": true,
+    "changed_pixels_outside_allowed_regions": 0,
+    "allowed_region_count": 32,
+    "pass": true
+  },
+  "manual_qa": {
+    "pass": false,
+    "reasons": [
+      "Residual English remains in multiple black 15-course cards.",
+      "Some generic blue mode cards still retain English text fragments after icon-preserving inpaint.",
+      "Candidate therefore fails artifact-cleanliness despite passing automated region-containment checks."
+    ]
+  },
+  "action": "Keep/reset original DDS and leave pending for another per-card cleanup pass."
+}
