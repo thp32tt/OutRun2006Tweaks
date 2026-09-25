@@ -48,8 +48,9 @@ A cycle is counted only after its assigned source/concern has been inspected and
 | C0034 | Shared Modern/Arcade crash detection / collision witness priority | COMPLETE | `FFB-R0034-F01`: 0.03 speed-drop heuristic fired on normal decel and could pre-empt the collision bit; collision edge now wins and fallback starts above 0.12 with 0.12..0.36 severity mapping | 46-event hardware log distribution + source/math/tests/verifier/docs |
 | C0035 | Arcade directional ConstantForce lifetime | COMPLETE | `FFB-R0035-F01`: OutRun2Real profile uses FeedbackLength=80ms, while PC used six ticks/~100ms; wall/transition/spring-suppression window now uses five ticks/~83.3ms | upstream OutRun2Real INI + TriggerConstantEffect contract + source/math/tests/docs |
 | C0036 | Arcade Original Spring/Damper reference baseline | COMPLETE | `FFB-R0036-F01`: shortcut inherited Modern spring/damper values; now restores OutRun2Real SpringStrength=50 -> coeff .50/sat 1.00 and EnableDamper=0 | upstream OutRun2Real INI + TriggerSpringEffectInfinite + UI/verifier/docs |
+| C0037 | Cross-model crash event lifetime vs debounce | COMPLETE | `FFB-R0037-F01`: common 10-tick structural blank outlived the 5-tick Arcade event and also affected PS2 software fallback; suppression is now model/event-window aware | core model interaction review + verifier/docs |
 
-Completed cycles: **36 / 1000**
+Completed cycles: **37 / 1000**
 
 ## Findings
 
@@ -68,6 +69,7 @@ Completed cycles: **36 / 1000**
 - `FFB-R0034-F01`: made the C2C collision-state edge authoritative and raised the host-only speed-drop fallback above the captured normal-deceleration cluster.
 - `FFB-R0035-F01`: corrected Arcade directional ConstantForce lifetime from a 100 ms approximation to the OutRun2Real profile's 80 ms reference (five 60 Hz ticks).
 - `FFB-R0036-F01`: made Arcade Original shortcut restore the OutRun2Real 50% Spring / no-Damper reference condition baseline instead of inheriting Modern values.
+- `FFB-R0037-F01`: separated active impact-event suppression from the longer crash debounce so Hybrid/Original steering no longer stays blank after the event ends.
 - C0002..C0010 and C0014..C0020: no new non-duplicate finding after source/evidence review.
 
 ## PS2 evidence discipline
@@ -79,4 +81,4 @@ Completed cycles: **36 / 1000**
 
 ## Next review
 
-Resume at **C0037** with Modern DD structural/road/safety and Arcade Hybrid interaction review.
+Resume at **C0038** with Modern DD SAT/road/periodic/fallback safety and Arcade Hybrid interaction review, then exact-head CI.
