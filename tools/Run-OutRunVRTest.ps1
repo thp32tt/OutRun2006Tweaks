@@ -31,6 +31,7 @@ $kv=@{}
 Get-Content $active|ForEach-Object{if($_ -match '^([^=]+)=(.*)$'){$kv[$matches[1]]=$matches[2]}}
 $backend=$kv.backend
 if(!$backend){throw 'Active backend identity is missing.'}
+$variant=if($kv.variant){[string]$kv.variant}else{'AUTO'}
 
 $patterns=@(
     'OutRun2006Tweaks*.log',
@@ -58,7 +59,7 @@ foreach($pattern in $patterns){
     }
 }
 if($stale){
-    & $selector -Backend $backend -TestProfile $TestProfile
+    & $selector -Backend $backend -TestProfile $TestProfile -VariantId $variant -VariantId $variant
     if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'Failed to seal stale logs before launch.'}
 }
 
@@ -160,9 +161,11 @@ $identityKeys = @(
 $oldIdentity = @{}
 foreach($key in $identityKeys){ $oldIdentity[$key] = [Environment]::GetEnvironmentVariable($key,'Process') }
 
-$sourceSha='unknown'
-$sourceFile=Join-Path $root ("backends/{0}/SOURCE_SHA.txt" -f $(if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}))
-if(Test-Path $sourceFile){ $sourceSha=(Get-Content $sourceFile -Raw).Trim() }
+$sourceSha=if($state.SourceSha){[string]$state.SourceSha}else{'unknown'}
+if($sourceSha -eq 'unknown'){
+    $sourceFile=Join-Path $root ("backends/{0}/SOURCE_SHA.txt" -f $(if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}))
+    if(Test-Path $sourceFile){ $sourceSha=(Get-Content $sourceFile -Raw).Trim() }
+}
 $env:OUTRUN_VR_SESSION_ID=[string]$state.SessionId
 $env:OUTRUN_VR_VARIANT_ID=[string]$state.VariantId
 $env:OUTRUN_VR_MATRIX_ID=[string]$state.BuildMatrixId
