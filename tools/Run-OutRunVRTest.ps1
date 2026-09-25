@@ -54,6 +54,7 @@ if(!$backend){throw 'Active backend identity is missing.'}
 $variant=if($kv.variant){[string]$kv.variant}else{'AUTO'}
 $semanticMode='0'
 $hudExperimentMode='0'
+$hudCoordMode='0'
 switch($variant){
     'X_SCREEN_HUD'       { $semanticMode='1' }
     'X_WORLD_RANK'       { $semanticMode='2' }
@@ -62,11 +63,17 @@ switch($variant){
     'R54_B_STICKY'       { $semanticMode='3'; $hudExperimentMode='2' }
     'R54_C_FULL_OWNER'   { $semanticMode='3'; $hudExperimentMode='3' }
     'R54_D_HUD_PLANE'    { $semanticMode='3'; $hudExperimentMode='4' }
+    'R55_A_ZERO'         { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='1' }
+    'R55_B_SCALE35'      { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='2' }
+    'R55_C_WORLD35'      { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='3' }
+    'R55_D_RANKZERO'     { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='4' }
 }
 $oldExeSemanticMode=$env:OUTRUN_VR_EXE_SEMANTIC_MODE
 $oldHudExperimentMode=$env:OUTRUN_VR_HUD_EXPERIMENT_MODE
+$oldHudCoordMode=$env:OUTRUN_VR_HUD_COORD_MODE
 $env:OUTRUN_VR_EXE_SEMANTIC_MODE=$semanticMode
 $env:OUTRUN_VR_HUD_EXPERIMENT_MODE=$hudExperimentMode
+$env:OUTRUN_VR_HUD_COORD_MODE=$hudCoordMode
 
 $patterns=@(
     'OutRun2006Tweaks*.log',
@@ -178,6 +185,7 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "exeSemanticIdentityVerified=$semanticIdentityVerified"
     "exeSemanticMode=$semanticMode"
     "hudExperimentMode=$hudExperimentMode"
+    "hudCoordMode=$hudCoordMode"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
 Write-Host "Runtime overrides: $($gameArgs -join ' ')"
 
@@ -252,6 +260,7 @@ try{
     $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED=$oldExeSemanticVerified
     $env:OUTRUN_VR_EXE_SEMANTIC_MODE=$oldExeSemanticMode
     $env:OUTRUN_VR_HUD_EXPERIMENT_MODE=$oldHudExperimentMode
+    $env:OUTRUN_VR_HUD_COORD_MODE=$oldHudCoordMode
     foreach($key in $identityKeys){
         [Environment]::SetEnvironmentVariable($key,$oldIdentity[$key],'Process')
     }
