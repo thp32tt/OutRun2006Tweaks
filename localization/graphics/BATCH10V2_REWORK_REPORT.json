@@ -1,0 +1,30 @@
+{
+  "batch": "10v2-rework",
+  "package_sha256": "8e097ea808e7dea9514d5c07275e6091ef4398e36a1486e8ced520c4e4d8199a",
+  "assets": [
+    {
+      "asset": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+      "status": "localized_candidate",
+      "sha256": "2e7ec64f4b8803a32f24065ba8424a6f225b8fb92d9f63b770a6c945ff1009ca",
+      "note": "Preserved route maps; replaced START/GOAL badges only."
+    },
+    {
+      "asset": "textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds",
+      "status": "localized_candidate",
+      "sha256": "2d7624f897b909be86ae594c598153b7e13ec0808d9085f3b89ee2fab837131b",
+      "note": "Preserved vehicle/song artwork; localized RANDOM and six game-mode tiles only."
+    },
+    {
+      "asset": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+      "status": "localized_candidate",
+      "sha256": "2eb37099cd31f690cef05e0bb375b177b5495976ba5640b117798ecd06259757",
+      "note": "Preserved Ferrari names/images; localized Automatic/engine sound/Tuned/Normal/Random/Recommendation."
+    },
+    {
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+      "status": "reset_to_original",
+      "sha256": "34cadbc0b33b6280978c81614a9347ad667cbe8279cf105dc8623ebd13888f07",
+      "note": "Selective rework rejected: typography too small/inconsistent."
+    }
+  ]
+}
