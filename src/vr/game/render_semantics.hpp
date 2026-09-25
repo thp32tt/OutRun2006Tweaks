@@ -3,6 +3,8 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <atomic>
+#include <mutex>
 
 namespace OutRunVR::GameSemantic
 {
@@ -111,12 +113,23 @@ namespace OutRunVR::GameSemantic
     {
         const void* node = nullptr;
         RenderScope scope = RenderScope::None;
+        std::uint64_t serial = 0;
     };
 
     inline constexpr std::size_t SpriteNodeSemanticCapacity = 0x230;
-    inline thread_local std::array<SpriteNodeSemanticTag,
+    // Producer hooks and the canonical queue renderer are not guaranteed to run
+    // on the same thread. The old thread_local table therefore lost exact
+    // SCREEN_HUD/WORLD_BILLBOARD ownership before draw time. Keep only the
+    // semantic tag table shared; CurrentScope itself remains render-thread local.
+    inline std::array<SpriteNodeSemanticTag,
         SpriteNodeSemanticCapacity> SpriteNodeSemanticTags{};
-    inline thread_local std::size_t SpriteNodeSemanticCount = 0;
+    inline std::size_t SpriteNodeSemanticCount = 0;
+    inline std::mutex SpriteNodeSemanticMutex;
+    inline std::atomic<std::uint64_t> SpriteNodeSemanticNextSerial{ 1 };
+    inline std::atomic<std::uint64_t> SpriteNodeSemanticRegistered{ 0 };
+    inline std::atomic<std::uint64_t> SpriteNodeSemanticConsumed{ 0 };
+    inline std::atomic<std::uint64_t> SpriteNodeSemanticStaleCleared{ 0 };
+    inline thread_local std::uint64_t SpriteQueueSemanticCutoff = 0;
     inline thread_local RenderScope SpriteQueuePreviousScope = RenderScope::None;
     inline thread_local unsigned SpriteQueueDepth = 0;
     // Monotonic per-thread identity for the canonical queue node currently
@@ -145,37 +158,63 @@ namespace OutRunVR::GameSemantic
     {
         if (!node || scope == RenderScope::None)
             return;
+
+        const std::uint64_t serial =
+            SpriteNodeSemanticNextSerial.fetch_add(1, std::memory_order_acq_rel);
+        std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);
         for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
         {
             if (SpriteNodeSemanticTags[i].node == node)
             {
                 SpriteNodeSemanticTags[i].scope = scope;
+                SpriteNodeSemanticTags[i].serial = serial;
+                SpriteNodeSemanticRegistered.fetch_add(
+                    1, std::memory_order_relaxed);
                 return;
             }
         }
+
         if (SpriteNodeSemanticCount < SpriteNodeSemanticTags.size())
         {
             SpriteNodeSemanticTags[SpriteNodeSemanticCount++] =
-                { node, scope };
+                { node, scope, serial };
+            SpriteNodeSemanticRegistered.fetch_add(
+                1, std::memory_order_relaxed);
+            return;
         }
+
+        // This should never be hot: exact semantic producers are sparse.
+        // If a broken frame fills the table, replace the oldest entry rather
+        // than silently disabling semantic ownership for the rest of the run.
+        std::size_t oldest = 0;
+        for (std::size_t i = 1; i < SpriteNodeSemanticCount; ++i)
+            if (SpriteNodeSemanticTags[i].serial <
+                SpriteNodeSemanticTags[oldest].serial)
+                oldest = i;
+        SpriteNodeSemanticTags[oldest] = { node, scope, serial };
+        SpriteNodeSemanticRegistered.fetch_add(1, std::memory_order_relaxed);
+        SpriteNodeSemanticStaleCleared.fetch_add(1, std::memory_order_relaxed);
     }
 
     inline RenderScope ConsumeSpriteNodeScope(
         const void* node,
         RenderScope fallback = RenderScope::ScreenOverlay2D) noexcept
     {
-        if (node)
+        if (!node)
+            return fallback;
+
+        std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);
+        for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
         {
-            for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
-            {
-                if (SpriteNodeSemanticTags[i].node != node)
-                    continue;
-                const RenderScope scope = SpriteNodeSemanticTags[i].scope;
-                SpriteNodeSemanticTags[i] =
-                    SpriteNodeSemanticTags[--SpriteNodeSemanticCount];
-                SpriteNodeSemanticTags[SpriteNodeSemanticCount] = {};
-                return scope;
-            }
+            if (SpriteNodeSemanticTags[i].node != node)
+                continue;
+            const RenderScope scope = SpriteNodeSemanticTags[i].scope;
+            SpriteNodeSemanticTags[i] =
+                SpriteNodeSemanticTags[--SpriteNodeSemanticCount];
+            SpriteNodeSemanticTags[SpriteNodeSemanticCount] = {};
+            SpriteNodeSemanticConsumed.fetch_add(
+                1, std::memory_order_relaxed);
+            return scope;
         }
         return fallback;
     }
@@ -206,6 +245,9 @@ namespace OutRunVR::GameSemantic
         {
             SpriteQueueDepth = 1;
             SpriteQueuePreviousScope = CurrentScope;
+            const std::uint64_t next =
+                SpriteNodeSemanticNextSerial.load(std::memory_order_acquire);
+            SpriteQueueSemanticCutoff = next > 0 ? next - 1 : 0;
         }
         CurrentSpriteQueueNode = node;
         if (++SpriteQueueNodeEpoch == 0)
@@ -223,7 +265,28 @@ namespace OutRunVR::GameSemantic
             CurrentScope = SpriteQueuePreviousScope;
             SpriteQueuePreviousScope = RenderScope::None;
             CurrentSpriteQueueNode = nullptr;
-            SpriteNodeSemanticCount = 0;
+
+            // Remove only tags that existed before this queue walk began.
+            // A producer thread may already be preparing the next frame while
+            // the render thread is finishing this one; preserve those newer tags.
+            std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);
+            std::size_t write = 0;
+            for (std::size_t read = 0; read < SpriteNodeSemanticCount; ++read)
+            {
+                const auto& tag = SpriteNodeSemanticTags[read];
+                if (tag.serial != 0 && tag.serial <= SpriteQueueSemanticCutoff)
+                {
+                    SpriteNodeSemanticStaleCleared.fetch_add(
+                        1, std::memory_order_relaxed);
+                    continue;
+                }
+                if (write != read)
+                    SpriteNodeSemanticTags[write] = tag;
+                ++write;
+            }
+            while (SpriteNodeSemanticCount > write)
+                SpriteNodeSemanticTags[--SpriteNodeSemanticCount] = {};
+            SpriteQueueSemanticCutoff = 0;
         }
     }
 }
