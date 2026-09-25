@@ -164,8 +164,11 @@ $runtimeFiles = @(
     'Run-OutRunVRTest.cmd',
     'Collect-OutRunVRLogs.ps1',
     'Collect-OutRunVRLogs.cmd',
+    'Analyze-OutRunVRSession.ps1',
     'OutRunVR-Backend-Selector.ps1',
-    'OutRunVR-Backend-Selector.cmd'
+    'OutRunVR-Backend-Selector.cmd',
+    'OutRunVR-Slot-Selector.ps1',
+    'OutRunVR-Slot-Selector.cmd'
 )
 foreach ($file in $runtimeFiles) {
     $src = Join-Path 'tools' $file
