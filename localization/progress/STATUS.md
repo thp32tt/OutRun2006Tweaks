@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-25 22:50 KST
+Updated: 2026-09-26 00:34 KST
 
 ## Active branch
 `korean-localization-clean`
@@ -42,6 +42,15 @@ The full draft intentionally uses exact/OCR/manual/atlas-alpha placement evidenc
 - `EBEF6D20_512x512.dds`: Korean route/loading text must inherit the original raw DDS transforms.
 - 1st/2nd/early-3rd batch generated images are visual drafts pending source-faithful rework.
 
+### Source-faithful batches
+- Batch3: 10 assets, report `BATCH3_SOURCEFAITHFUL_REPORT.json`
+- Batch4: 5 assets, package SHA-256 `cfddc6c758bfdc8313dd624bbe9211ce6d2221bd04985ee6856d449e66cffb95`
+- Batch5: 5 assets, package SHA-256 `1d5de3dcc55caefba4e904e3d0030b6ae5fbd70f479546641add3d967cf3459f`
+- Source-faithful reviewed since QA reset: **20**
+- Retained/rebuilt localized candidates: **17**
+- Reset to original pending safe rework: **3**
+- Pending special case: `49BB5FE5_128x32.dds` DXT5 compression-safe rewrite
+
 ## Runtime/font
 - K0 txet roundtrip: **PASS**
 - K1 clean trace package: **ready**
@@ -57,6 +66,9 @@ Read:
 2. `localization/resume_state.json`
 3. `localization/WORKLOG.md`
 4. `localization/graphics/ORIENTATION_POLICY.md`
-5. `localization/graphics/FULL_DRAFT_REPORT.json`
+5. `localization/graphics/BATCH3_SOURCEFAITHFUL_REPORT.json`
+6. `localization/graphics/BATCH4_SOURCEFAITHFUL_REPORT.json`
+7. `localization/graphics/BATCH5_SOURCEFAITHFUL_REPORT.json`
+8. `localization/graphics/FULL_DRAFT_REPORT.json`
 
-Next gate: source-faithfully rebuild screenshot-failed assets using original per-element orientation/preserve rules, then resume the remaining graphics batch and in-game validation.
+Next gate: continue remaining assets from original DDS first; handle DXT5 safely; keep vehicle/model/brand/song/legal text preserved; in-game validate source-faithful candidates.
