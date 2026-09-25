@@ -101,11 +101,65 @@ class UIScaling : public Hook
 				probe, site, hit);
 	}
 
+	static int VRR57Mode() noexcept
+	{
+		static const int mode = []() noexcept {
+			char text[8]{};
+			const DWORD len = GetEnvironmentVariableA(
+				"OUTRUN_VR_R57_MODE", text,
+				static_cast<DWORD>(sizeof(text)));
+			if (len == 0 || len >= sizeof(text))
+				return 0;
+			int value = 0;
+			for (DWORD i = 0; i < len; ++i)
+			{
+				if (text[i] < '0' || text[i] > '9')
+					return 0;
+				value = value * 10 + int(text[i] - '0');
+			}
+			return (value >= 1 && value <= 10) ? value : 0;
+		}();
+		return mode;
+	}
+
+	inline static thread_local
+		OutRunVR::GameSemantic::ProjectedMarkerInfo RankMarkerProjectedInfo{};
+
+	static OutRunVR::GameSemantic::RenderScope
+	R57RankProducerScope(bool rank13) noexcept
+	{
+		switch (VRR57Mode())
+		{
+		case 4:
+			return OutRunVR::GameSemantic::RenderScope::ScreenHud;
+		case 5:
+		case 6:
+		case 9:
+		case 10:
+			return OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
+		case 7:
+			return rank13
+				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+				: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+		case 8:
+			return rank13
+				? OutRunVR::GameSemantic::RenderScope::WorldBillboard
+				: OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
+		default:
+			return OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+		}
+	}
+
 	// Addresses of the draw calls sub_4BAD20 makes. sprani_play_ae_auth_alpha
 	// and put_clip_sprite are both used throughout the game, so each call site
 	// is redirected on its own rather than hooking either function.
 	static constexpr int RankMarker_SpraniCalls[] = { 0xBB0FB, 0xBB133, 0xBB16C, 0xBB1A5 };
 	static constexpr int RankMarker_ClipSpriteCalls[] = { 0xBB21F, 0xBB241, 0xBB271, 0xBB2BC, 0xBB2D0 };
+	static constexpr int DispRank_SpraniCall = 0xB9DA6;
+	static constexpr int DispRank_ClipSpriteCalls[] = {
+		0xB9F3A, 0xB9F5E, 0xB9F81, 0xB9FD0,
+		0xB9FFC, 0xBA01E, 0xBA035, 0xBA052
+	};
 
 	// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
 	static inline SafetyHookInline D3DXMatrixTransformation2D = {};
@@ -250,6 +304,32 @@ class UIScaling : public Hook
 	{
 		Calc3D2D_hk.call(a1, a2, in, out);
 
+		// R57: sub_4BAD20 callsite RVA 0xBAEE2 returns at 0xBAEE7.
+		// Calc3D2D projects a stock-view point as:
+		//   sx = viewX / -viewZ * a1
+		//   sy = viewY / -viewZ * a2
+		// Preserve the recovered view point so the final queued sprite can be
+		// translated to the real left/right OpenXR projections instead of
+		// guessing depth from an already-flattened SpriteNode.
+		if (_ReturnAddress() == Module::exe_ptr(0xBAEE7) &&
+			out && std::isfinite(out->x) && std::isfinite(out->y) &&
+			std::isfinite(out->z) && std::isfinite(a1) &&
+			std::isfinite(a2) && std::fabs(a1) > 1.0e-6f &&
+			std::fabs(a2) > 1.0e-6f &&
+			std::fabs(out->z) > 1.0e-6f)
+		{
+			RankMarkerProjectedInfo.valid = true;
+			RankMarkerProjectedInfo.viewZ = out->z;
+			RankMarkerProjectedInfo.viewX =
+				out->x * (-out->z) / a1;
+			RankMarkerProjectedInfo.viewY =
+				out->y * (-out->z) / a2;
+		}
+		else if (_ReturnAddress() == Module::exe_ptr(0xBAEE7))
+		{
+			RankMarkerProjectedInfo = {};
+		}
+
 		// TODO: OnlineArcade mode needs to add position here
 
 		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
@@ -298,23 +378,36 @@ class UIScaling : public Hook
 		else if (probe == 11) probeY -= 72.0f;
 		else if (probe == 12) { probeX = 320.0f; probeY = 208.0f; }
 
-		const int result = Game::sprani_play_ae_auth_alpha(
-			spriteId, probeX, probeY, a4, a5, alpha);
-
-		// These four call sites are explicitly identified by the original mod as
-		// rival-car rank markers. Preserve that ownership on the queued node so
-		// the VR sprite renderer does not flatten the marker into the fixed HUD.
-		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		int result = 0;
+		if (VRR57Mode() != 0)
 		{
-			SpriteNode* root = Game::sprite_prio_root[prio];
-			SpriteNode* node = root ? root->tail_4 : nullptr;
-			if (node && node != tailsBefore[prio])
+			const auto scope = R57RankProducerScope(true);
+			const auto* marker =
+				scope == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+				? &RankMarkerProjectedInfo : nullptr;
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				scope, marker);
+			result = Game::sprani_play_ae_auth_alpha(
+				spriteId, probeX, probeY, a4, a5, alpha);
+		}
+		else
+		{
+			result = Game::sprani_play_ae_auth_alpha(
+				spriteId, probeX, probeY, a4, a5, alpha);
+
+			// R56 compatibility path.
+			for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 			{
-				const auto scope =
-					(probe == 16)
-					? OutRunVR::GameSemantic::RenderScope::ScreenHud
-					: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
-				OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
+				SpriteNode* root = Game::sprite_prio_root[prio];
+				SpriteNode* node = root ? root->tail_4 : nullptr;
+				if (node && node != tailsBefore[prio])
+				{
+					const auto scope =
+						(probe == 16)
+						? OutRunVR::GameSemantic::RenderScope::ScreenHud
+						: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+					OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
+				}
 			}
 		}
 		return result;
@@ -340,8 +433,23 @@ class UIScaling : public Hook
 		if (probe == 13) probeX += 96;
 		else if (probe == 14) probeY -= 72;
 		else if (probe == 15) { probeX = 320; probeY = 208; }
-		int result = Game::put_clip_sprite(
-			xstnum, probeX, probeY, flags, priority, color);
+		int result = 0;
+		if (VRR57Mode() != 0)
+		{
+			const auto scope = R57RankProducerScope(false);
+			const auto* marker =
+				scope == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+				? &RankMarkerProjectedInfo : nullptr;
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				scope, marker);
+			result = Game::put_clip_sprite(
+				xstnum, probeX, probeY, flags, priority, color);
+		}
+		else
+		{
+			result = Game::put_clip_sprite(
+				xstnum, probeX, probeY, flags, priority, color);
+		}
 
 		// tail_4 is the last sprite queued at that priority. If it has not
 		// changed then the sprite pool was full and nothing was queued.
@@ -351,11 +459,14 @@ class UIScaling : public Hook
 		{
 			node->args_10.float24 += RankMarkerFracX;
 			node->args_10.float28 += RankMarkerFracY;
-			const auto scope =
-				(probe == 17)
-				? OutRunVR::GameSemantic::RenderScope::ScreenHud
-				: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
-			OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
+			if (VRR57Mode() == 0)
+			{
+				const auto scope =
+					(probe == 17)
+					? OutRunVR::GameSemantic::RenderScope::ScreenHud
+					: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
+			}
 			// R56-18 deliberately tests whether a one-shot semantic survives from
 			// this exact producer to the eventual D3D draw. Cross-thread loss is a
 			// useful negative result, not a production policy.
@@ -365,6 +476,55 @@ class UIScaling : public Hook
 		}
 
 		return result;
+	}
+
+
+	using DispRankSpraniFn =
+		int(__cdecl*)(std::uint32_t, float, float, int, int);
+
+	static int __cdecl DispRank_sprani(
+		std::uint32_t spriteId, float x, float y, int a4, int a5)
+	{
+		auto original = reinterpret_cast<DispRankSpraniFn>(
+			Module::exe_ptr(0x29530));
+		const int r57 = VRR57Mode();
+		if (r57 == 1 || r57 == 3)
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			return original(spriteId, x, y, a4, a5);
+		}
+		return original(spriteId, x, y, a4, a5);
+	}
+
+	static int __cdecl DispRank_putClipSprite(
+		int xstnum, int x, int y, std::uint32_t flags,
+		float priority, std::uint32_t color)
+	{
+		VRHudProbeTrace("position_disprank", VRProbeDispRankHits);
+		AddSpriteSpacing(&x, false);
+
+		const int probe = VRHudProbeMode();
+		if (probe == 5) x += 96;
+		else if (probe == 6) x -= 96;
+		else if (probe == 7)
+			x = 320 + int((float(x) - 320.0f) * 0.35f);
+		else if (probe == 8)
+			x = 320;
+		else if (probe == 19)
+			OutRunVR::GameSemantic::ArmNextDraw(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+
+		const int r57 = VRR57Mode();
+		if (r57 == 2 || r57 == 3)
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			return Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+		}
+		return Game::put_clip_sprite(
+			xstnum, x, y, flags, priority, color);
 	}
 
 	enum SpriteScaleType
@@ -781,14 +941,16 @@ public:
 		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, put_scroll_AdjustPositionRight);
 		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, put_scroll_AdjustPositionRight);
 
-		DispRank_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9F3A, DispRankProbe_AdjustPosition);
-		DispRank_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4B9F5E, DispRankProbe_AdjustPosition);
-		DispRank_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4B9F81, DispRankProbe_AdjustPosition);
-		DispRank_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4B9FD0, DispRankProbe_AdjustPosition);
-		DispRank_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4B9FFC, DispRankProbe_AdjustPosition);
-		DispRank_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BA01E, DispRankProbe_AdjustPosition);
-		DispRank_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BA035, DispRankProbe_AdjustPosition);
-		DispRank_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BA052, DispRankProbe_AdjustPosition);
+		// R57 direct producer ownership: DispRank is a composite. Its first
+		// element uses sprani/SPRARGS2 (kind_C=1), while the remaining eight
+		// use put_clip_sprite/SPRARGS (kind_C=0).
+		Memory::VP::InjectHook(
+			Module::exe_ptr(DispRank_SpraniCall),
+			DispRank_sprani, Memory::HookType::Call);
+		for (int addr : DispRank_ClipSpriteCalls)
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr),
+				DispRank_putClipSprite, Memory::HookType::Call);
 
 		// REV indicator
 		DispGearPosition_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9096, put_scroll_AdjustPositionLeft);
