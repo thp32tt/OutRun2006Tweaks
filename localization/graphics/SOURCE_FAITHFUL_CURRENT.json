@@ -2,12 +2,11 @@
   "updated_at_kst": "2026-09-26T07:54:00+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
-  "localized_candidates": 29,
-  "reset_to_original_pending_rework": 3,
-  "combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B24v2_QA_Test.zip",
-  "combined_package_sha256": "6a38aaae5fd979b1ebdbbe0e43f3e0b3c6e24b5fd929031ee496ef9ffb0f0541",
+  "localized_candidates": 30,
+  "reset_to_original_pending_rework": 2,
+  "combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B25v4_QA_Test.zip",
+  "combined_package_sha256": "e0d2df30e8de09dc69e154cbcffcfce649c76fd7edd760e4bb2fe0ab935d781d",
   "pending": [
-    "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
     "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
     "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds"
   ],
@@ -18,7 +17,7 @@
     "note": "C075FB49 v3 revalidated against original-DDS-first orientation/preserve/style/artifact/containment gates. 0 changed pixels outside allowed source text regions; protected Ferrari/model/logo artwork preserved. In-game validation remains pending.",
     "mandatory_additional_gate": "translated glyph pixels must remain inside the original text region; reject clipping, overlap, or spill into adjacent sprite cells"
   },
-  "latest_promoted_batch": "localization/graphics/BATCH24V2_2DA_REWORK_REPORT.json",
+  "latest_promoted_batch": "localization/graphics/BATCH25V4_ACF_REWORK_REPORT.json",
   "latest_rejected_batch": "localization/graphics/BATCH17V3_REJECTED_REPORT.json",
   "latest_rejected_batches": [
     "localization/graphics/BATCH23_REJECTED_REPORT.json",
