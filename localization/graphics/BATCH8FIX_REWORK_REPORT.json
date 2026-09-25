@@ -1,0 +1,18 @@
+{
+  "batch": "8fix-rework",
+  "package_sha256": "68ba32521c83cd40f7d595bb3df5daae14348496d30d3e47ebb62d7ca475e468",
+  "localized_candidates": [
+    {
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+      "sha256": "c644a28b0cd24a925298a322933860ae015bd4d609d039bdaf85ab331112019a"
+    },
+    {
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds",
+      "sha256": "c422b6a586954e970155b5a478ab37450fc1ffd55dfc2561e90b85d64491ce84"
+    },
+    {
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+      "sha256": "d961619a5cd1c94e93865af5c80bdf11800fff245ce9a1470a2ffca51c44efa9"
+    }
+  ]
+}
