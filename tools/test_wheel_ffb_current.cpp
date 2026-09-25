@@ -23,6 +23,9 @@ int main() {
  require(model_uses_modern_sat(Model::ModernDD)&&model_uses_modern_sat(Model::ArcadeHybrid),"modern SAT models");
  require(!model_uses_modern_sat(Model::ArcadeOriginal)&&!model_uses_modern_sat(Model::PS2OriginalExperimental),"original modes do not claim modern SAT");
  require(model_uses_arcade_events(Model::ArcadeOriginal)&&model_uses_arcade_events(Model::ArcadeHybrid),"arcade event models");
+ require(std::abs(frequency_hz_from_period_ms(70.0f)-(1000.0f/70.0f))<1e-6f,"arcade road 70ms period converts to host Hz");
+ require(frequency_hz_from_period_ms(0.0f)==0.0f,"invalid zero period is rejected");
+ require(frequency_hz_from_period_ms(std::numeric_limits<float>::quiet_NaN())==0.0f,"NaN period is rejected");
  require(std::abs(arcade_speed_strength(.10f)-.10f)<1e-6f,"arcade first speed step");
  require(std::abs(arcade_speed_strength(.20f)-.20f)<1e-6f,"arcade second speed step");
  require(std::abs(arcade_speed_strength(.50f)-.50f)<1e-6f,"arcade mid speed step");
