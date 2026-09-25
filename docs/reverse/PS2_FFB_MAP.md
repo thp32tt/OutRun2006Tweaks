@@ -162,6 +162,12 @@ A deeper retail-SLPM pass resolves the steady-state Type-4 magnitude source:
 
 The standalone PS2 mode therefore no longer reuses Modern DD's `(roughness - 0.30) / 0.55` texture shaping. Its steady-state translation uses the recovered raw surface envelope, `min(field_1C4,1)`, the independent PS2 `driveFactor`, the retail scale `50`, and the raw start threshold `27`.
 
+The producer has one additional verified write to that envelope. After the initial maximum is stored, roughness strictly above `0.30` is overwritten with `roughness * 1.25` when either:
+- car float `+0x268 < 0.10`; or
+- when that first predicate is false, car float `+0x264 > -0.10`.
+
+The writes are at `0x001D81BC` and `0x001D8268`. No later instruction in this producer writes `0x0035F280` before `0x00132E94` consumes it. The field semantics are deliberately left numeric, but the arithmetic is direct retail evidence. Because the roughness LUT reaches `0.90`, the valid boosted envelope can reach `1.125`; the PC PS2 helper preserves that headroom instead of clipping it to 1.0.
+
 The multiplier previously described as an unknown activation/ramp is now identified more precisely. The retail options path creates a 0..10 control and, when the wheel-device path is active, stores its selected integer in game-state byte `+0xFC` at `0x0024E8DC`. The surface producer at `0x001D7FBC..` reads the same byte, rejects values >=11, and disables the surface-feedback producer when it is zero. For non-zero levels it also forms a base strength:
 
 ```
@@ -218,7 +224,7 @@ The compact reverse-map builder now imports the curated retail evidence records 
 Still unresolved and therefore **not** represented as retail-original tuning:
 
 - any non-zero/indirect retail caller and semantic identity for the ConstantForce source variables at `0x00349528 / 0x0034952C`;
-- semantic identity of the additional vehicle-state shaping that can modify the surface envelope after `0x001D811C`;
+- semantic naming of the car fields used by the now-recovered 1.25 surface-envelope boost, plus any non-Type-4 transient channels produced by the same routine;
 - semantic naming for the remaining non-core effect-manager categories (0, 3, 4, 5, 6, 9, 11);
 - event-to-effect mapping for collision, rail, surface transition, drift/slip, and gear;
 - `LGDEV.IRX` internal transport/units if the disc module becomes available.
