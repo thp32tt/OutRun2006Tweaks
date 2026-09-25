@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-26 07:05 KST
+Updated: 2026-09-26 07:04 KST
 
 ## Active branch
 `korean-localization-clean`
@@ -43,6 +43,7 @@ The full draft intentionally uses exact/OCR/manual/atlas-alpha placement evidenc
 - 1st/2nd/early-3rd batch generated images are visual drafts pending source-faithful rework.
 
 ### Source-faithful batches
+- Batch12v2: 4 DXT5 candidates promoted after source-alpha-bounds/header/dimension QA, report `BATCH12V2_DXT5_REWORK_REPORT.json`
 - Batch3: 10 assets, report `BATCH3_SOURCEFAITHFUL_REPORT.json`
 - Batch4: 5 assets, report `BATCH4_SOURCEFAITHFUL_REPORT.json`
 - Batch5: 5 assets, report `BATCH5_SOURCEFAITHFUL_REPORT.json`
@@ -54,10 +55,10 @@ The full draft intentionally uses exact/OCR/manual/atlas-alpha placement evidenc
 - Batch11v2: 1 retained + 1 reset, report `BATCH11V2_REWORK_REPORT.json`
 - Current machine state: `localization/graphics/SOURCE_FAITHFUL_CURRENT.json`
 - Source-faithful reviewed since QA reset: **32**
-- Retained/rebuilt localized candidates: **22**
-- Reset to original pending safe rework: **10**
-- Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B11v2_QA_Test.zip`
-- Combined package SHA-256: `4831a754df8ef85cab0e8bb0d898ae38d76779eb2bc69c13494248bf044d58b3`
+- Retained/rebuilt localized candidates: **26**
+- Reset to original pending safe rework: **6**
+- Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B12v2_QA_Test.zip`
+- Combined package SHA-256: `806579f71f09211e942a54c5c9b3817a08ac0f496dd80ade53b695c9d6e9a6d3`
 - Mandatory extra QA gates: source-like typography/colors; no stray black lines, crop seams, text-erasure residue, clipped glyphs, accidental opaque boxes, or alpha halos.
 - DXT5-safe rewrite still required for several assets, including `49BB5FE5_128x32.dds`, `42E618FD_512x32.dds`, `7CE1CFC5_512x128.dds`, and `C598919A_1024x1024.dds`.
 
