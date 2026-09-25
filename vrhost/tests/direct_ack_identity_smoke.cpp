@@ -15,11 +15,11 @@ int main()
     ack.transportGeneration = 40;
 
     if (ack.version != 2) return 1;
-    if (!DirectGpuAckIdentityMatches(ack, 10, 20, 30, 40)) return 7;
-    if (DirectGpuAckIdentityMatches(ack, 11, 20, 30, 40)) return 2;
-    if (DirectGpuAckIdentityMatches(ack, 10, 21, 30, 40)) return 3;
-    if (DirectGpuAckIdentityMatches(ack, 10, 20, 31, 40)) return 4;
-    if (DirectGpuAckIdentityMatches(ack, 10, 20, 30, 41)) return 5;
-    if (DirectGpuAckIdentityMatches(ack, 10, 20, 0, 40)) return 6;
+    if (!DirectGpuAckIdentityMatches(ack, 10, 20, 30, 40)) return 2;
+    if (DirectGpuAckIdentityMatches(ack, 11, 20, 30, 40)) return 3;
+    if (DirectGpuAckIdentityMatches(ack, 10, 21, 30, 40)) return 4;
+    if (DirectGpuAckIdentityMatches(ack, 10, 20, 31, 40)) return 5;
+    if (DirectGpuAckIdentityMatches(ack, 10, 20, 30, 41)) return 6;
+    if (DirectGpuAckIdentityMatches(ack, 10, 20, 0, 40)) return 7;
     return 0;
 }
