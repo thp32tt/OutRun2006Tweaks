@@ -6,6 +6,7 @@
 #include <wrl/client.h>
 
 #include <cstdint>
+#include <cstring>
 #include <iomanip>
 #include <iostream>
 
@@ -217,6 +218,71 @@ HRESULT CreateD3D9On12(
     return hr;
 }
 
+struct ManagedResourceProbe
+{
+    ComPtr<IDirect3DTexture9> texture;
+    ComPtr<IDirect3DVertexBuffer9> vertexBuffer;
+};
+
+HRESULT CreateManagedResourceProbe(
+    IDirect3DDevice9* device9,
+    ManagedResourceProbe& out)
+{
+    if (!device9)
+        return E_POINTER;
+
+    HRESULT hr = device9->CreateTexture(
+        32, 32, 1, 0, D3DFMT_A8R8G8B8,
+        D3DPOOL_MANAGED, &out.texture, nullptr);
+    if (FAILED(hr))
+        return hr;
+
+    D3DLOCKED_RECT locked{};
+    hr = out.texture->LockRect(0, &locked, nullptr, 0);
+    if (FAILED(hr))
+        return hr;
+    if (locked.pBits && locked.Pitch > 0)
+        std::memset(locked.pBits, 0x5a,
+            static_cast<std::size_t>(locked.Pitch) * 32u);
+    out.texture->UnlockRect(0);
+
+    hr = device9->CreateVertexBuffer(
+        256, 0, D3DFVF_XYZ, D3DPOOL_MANAGED,
+        &out.vertexBuffer, nullptr);
+    if (FAILED(hr))
+        return hr;
+
+    void* vb = nullptr;
+    hr = out.vertexBuffer->Lock(0, 0, &vb, 0);
+    if (FAILED(hr))
+        return hr;
+    if (vb)
+        std::memset(vb, 0x3c, 256);
+    out.vertexBuffer->Unlock();
+
+    return S_OK;
+}
+
+HRESULT ValidateManagedResourceProbeAfterReset(
+    ManagedResourceProbe& probe)
+{
+    if (!probe.texture || !probe.vertexBuffer)
+        return E_POINTER;
+
+    D3DLOCKED_RECT locked{};
+    HRESULT hr = probe.texture->LockRect(0, &locked, nullptr, 0);
+    if (FAILED(hr))
+        return hr;
+    probe.texture->UnlockRect(0);
+
+    void* vb = nullptr;
+    hr = probe.vertexBuffer->Lock(0, 0, &vb, 0);
+    if (FAILED(hr))
+        return hr;
+    probe.vertexBuffer->Unlock();
+    return S_OK;
+}
+
 HRESULT ExerciseResourceInterop(
     IDirect3DDevice9* device9,
     IDirect3DDevice9On12* bridge,
@@ -405,6 +471,16 @@ int wmain()
         return 60;
     }
 
+    ManagedResourceProbe managed{};
+    hr = CreateManagedResourceProbe(device9.Get(), managed);
+    if (FAILED(hr))
+    {
+        PrintHr("CreateManagedResourceProbe", hr);
+        DestroyWindow(window);
+        return 65;
+    }
+    std::cout << "managed_resources_create=PASS\n";
+
     hr = ExerciseResourceInterop(
         device9.Get(),
         bridge.Get(),
@@ -432,6 +508,15 @@ int wmain()
         return 80;
     }
     std::cout << "legacy_reset=PASS\n";
+
+    hr = ValidateManagedResourceProbeAfterReset(managed);
+    if (FAILED(hr))
+    {
+        PrintHr("ValidateManagedResourceProbeAfterReset", hr);
+        DestroyWindow(window);
+        return 90;
+    }
+    std::cout << "managed_resources_survive_reset=PASS\n";
     std::cout << "DX12_POC_RESULT=PASS\n";
 
     DestroyWindow(window);
