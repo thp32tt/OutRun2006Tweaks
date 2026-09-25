@@ -732,4 +732,26 @@ req(ffb, 'car->field_coli_281, car->field_282, car->field_283', 'runtime samples
 req(ffb, '"WheelFFB: course/wall collision edge timer={}', 'dedicated course/wall edge is diagnostic and testable')
 req(stage_map, 'field_283', 'stage/collision map records the dedicated course-collision timer witness')
 req(read('docs/reverse/LINDBERGH_FFB_MAP.md'), 'ffwall = 0x08273FAC', 'Fake ffwall evidence is documented without promoting it as a force signal')
-print('OK [R4 arcade wall / PS2 host gain / deep-slip caster guards]')
+
+# r5 live preset-isolation guards
+arcade_original_start = wheel_ui.find('if (ImGui::Button("Use Arcade Original"))')
+arcade_hybrid_start = wheel_ui.find('if (ImGui::Button("Use Arcade Hybrid"))')
+ps2_original_start = wheel_ui.find('if (ImGui::Button("Use PS2 Original (Experimental)"))')
+req(str(arcade_original_start), '', 'Arcade Original shortcut location evaluated')
+if min(arcade_original_start, arcade_hybrid_start, ps2_original_start) < 0:
+    raise AssertionError('reference preset shortcut block missing')
+arcade_original_block = wheel_ui[arcade_original_start:arcade_hybrid_start]
+arcade_hybrid_block = wheel_ui[arcade_hybrid_start:ps2_original_start]
+ps2_original_block = wheel_ui[ps2_original_start:wheel_ui.find('if (!Settings::UseNewInput)', ps2_original_start)]
+req(arcade_original_block, 'Settings::WheelFFBInvertSpring = false;', 'Arcade Original restores safe spring polarity')
+req(ps2_original_block, 'Settings::WheelFFBInvertSpring = false;', 'PS2 Original restores safe spring polarity')
+req(arcade_hybrid_block, 'Settings::WheelFFBUseHardwareSpring = true;', 'Hybrid restores Modern hardware spring ownership')
+req(arcade_hybrid_block, 'Settings::WheelFFBUseHardwareDamper = true;', 'Hybrid restores Modern hardware damper ownership')
+req(arcade_hybrid_block, 'Settings::WheelFFBSpringStrength = 0.65f;', 'Hybrid cannot inherit Arcade Original 0.50 spring')
+req(arcade_hybrid_block, 'Settings::WheelFFBSpringSaturation = 0.95f;', 'Hybrid cannot inherit Original/PS2 spring saturation')
+req(arcade_hybrid_block, 'Settings::WheelFFBDamperStrength = 0.28f;', 'Hybrid cannot inherit Arcade Original zero damper')
+req(arcade_hybrid_block, 'Settings::WheelFFBMechanicalTrail = 0.25f;', 'Hybrid restores Modern mechanical/caster baseline')
+req(arcade_hybrid_block, 'Settings::WheelFFBTireSlip = 0.20f;', 'Hybrid restores Modern tire-slip baseline')
+req(arcade_hybrid_block, 'Settings::WheelFFBInvertForce = false;', 'Hybrid restores ConstantForce polarity')
+req(arcade_hybrid_block, 'Settings::WheelFFBInvertSpring = false;', 'Hybrid restores spring polarity')
+print('OK [R5 preset isolation + R4 arcade wall / PS2 host gain / deep-slip caster guards]')
