@@ -1,5 +1,5 @@
 {
-  "schema_version": 10,
+  "schema_version": 11,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,11 +7,12 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "in-game validate OutRun2_Korean_GFX_FULL_DRAFT_Test.zip across menu, selector, race, results, ranking, multiplayer and loading screens",
+    "use screenshots to replace heuristic atlas placements with exact verified boxes",
+    "promote each verified DDS from FULL_DRAFT to FINAL candidate",
     "collect K1/K2/K3 runtime logs",
     "resolve text IDs 96,97,279,280 using actual mode-screen context",
-    "reuse stock text batching path for K3-A four-glyph Korean render proof",
-    "in-game validate 7 graphics DDS proof candidates",
-    "expand deterministic artwork candidates from the 79-item artwork plan"
+    "continue K3 Hangul glyph/width proof"
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -31,8 +32,9 @@
     "transcribed_assets": 79,
     "transcribed_segments": 674,
     "artwork_targets": 79,
-    "proof_candidates": 7,
-    "artwork_completed": 0
+    "full_draft_candidates": 79,
+    "final_artwork_completed": 0,
+    "full_draft_package_sha256": "5512dad798a4ddb4872e4aa3e69438537f75f488f439317d7b95c0eb372b6c78"
   },
   "runtime_packages": {
     "k1": {
