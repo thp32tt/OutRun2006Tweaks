@@ -7,8 +7,7 @@
 
 namespace OutRunVRRenderer
 {
-	bool SuspendCullingCameraForCpuProjection() noexcept;
-	void ResumeCullingCameraAfterCpuProjection(bool suspended) noexcept;
+	bool GetRendererBaseView(float outMatrix[16]) noexcept;
 }
 
 namespace Settings
@@ -244,6 +243,37 @@ class UIScaling : public Hook
 
 	// Adjust positions of sprites in 3d space (eg 1st/2nd/etc markers)
 	static inline SafetyHookInline Calc3D2D_hk = {};
+	static bool R56ProjectRankWithBaseView(
+		float a1, float a2, const D3DVECTOR* in, D3DVECTOR* out) noexcept
+	{
+		if (!in || !out)
+			return false;
+		float raw[16]{};
+		if (!OutRunVRRenderer::GetRendererBaseView(raw))
+			return false;
+		D3DMATRIX view{};
+		std::memcpy(&view, raw, sizeof(view));
+
+		const float x =
+			in->x * view._11 + in->y * view._21 +
+			in->z * view._31 + view._41;
+		const float y =
+			in->x * view._12 + in->y * view._22 +
+			in->z * view._32 + view._42;
+		const float z =
+			in->x * view._13 + in->y * view._23 +
+			in->z * view._33 + view._43;
+		if (!std::isfinite(x) || !std::isfinite(y) ||
+			!std::isfinite(z) || std::fabs(z) <= 1.0e-5f)
+			return false;
+
+		const float inv = 1.0f / -z;
+		out->x = x * inv * a1;
+		out->y = y * inv * a2;
+		out->z = z;
+		return std::isfinite(out->x) && std::isfinite(out->y);
+	}
+
 	static void Calc3D2D_dest(float a1, float a2, D3DVECTOR* in, D3DVECTOR* out)
 	{
 		const auto returnAddress =
@@ -252,14 +282,12 @@ class UIScaling : public Hook
 			reinterpret_cast<std::uintptr_t>(Module::exe_ptr<void>(0xBAEE7));
 		const bool rankProjection =
 			R56UseBaseCameraForRank() && returnAddress == rankReturn;
-		const bool suspended = rankProjection
-			? OutRunVRRenderer::SuspendCullingCameraForCpuProjection()
-			: false;
 
-		Calc3D2D_hk.call(a1, a2, in, out);
-
-		if (suspended)
-			OutRunVRRenderer::ResumeCullingCameraAfterCpuProjection(true);
+		if (!rankProjection ||
+			!R56ProjectRankWithBaseView(a1, a2, in, out))
+		{
+			Calc3D2D_hk.call(a1, a2, in, out);
+		}
 
 		// TODO: OnlineArcade mode needs to add position here
 		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
