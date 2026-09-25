@@ -27,6 +27,35 @@ namespace OutRunVR::GameSemantic
 
     inline thread_local RenderScope CurrentScope = RenderScope::None;
     inline thread_local RenderScope NextDrawScope = RenderScope::None;
+    inline thread_local RenderScope CurrentQueueExactScope = RenderScope::None;
+    inline std::atomic<int> HudExperimentMode{ 0 };
+
+    inline void SetHudExperimentMode(int mode) noexcept
+    {
+        HudExperimentMode.store(mode < 0 ? 0 : (mode > 4 ? 4 : mode),
+            std::memory_order_release);
+    }
+
+    inline int GetHudExperimentMode() noexcept
+    {
+        return HudExperimentMode.load(std::memory_order_acquire);
+    }
+
+    inline bool IsExactHudScope(RenderScope scope) noexcept
+    {
+        return scope == RenderScope::ScreenHud ||
+            scope == RenderScope::WorldBillboard;
+    }
+
+    inline RenderScope EffectiveScope() noexcept
+    {
+        const int mode = GetHudExperimentMode();
+        if (mode >= 3 && IsExactHudScope(CurrentQueueExactScope))
+            return CurrentQueueExactScope;
+        if (mode >= 4 && CurrentScope == RenderScope::ScreenOverlay2D)
+            return RenderScope::ScreenHud;
+        return CurrentScope;
+    }
 
     inline const char* Name(RenderScope scope) noexcept
     {
@@ -73,6 +102,12 @@ namespace OutRunVR::GameSemantic
             NextDrawScope = RenderScope::None;
             return scope;
         }
+
+        const int mode = GetHudExperimentMode();
+        if (mode >= 2 && IsExactHudScope(CurrentQueueExactScope))
+            return CurrentQueueExactScope;
+        if (mode >= 4 && CurrentScope == RenderScope::ScreenOverlay2D)
+            return RenderScope::ScreenHud;
         return CurrentScope;
     }
 
@@ -263,6 +298,15 @@ namespace OutRunVR::GameSemantic
             ++SpriteQueueNodeEpoch;
         CurrentScope = ConsumeSpriteNodeScope(
             node, RenderScope::ScreenOverlay2D);
+        CurrentQueueExactScope = IsExactHudScope(CurrentScope)
+            ? CurrentScope : RenderScope::None;
+
+        // R54-A: one-shot handoff to the next D3D draw. This survives helper
+        // scopes that overwrite CurrentScope between queue-node selection and
+        // the actual draw call.
+        if (GetHudExperimentMode() == 1 &&
+            CurrentQueueExactScope != RenderScope::None)
+            ArmNextDraw(CurrentQueueExactScope);
     }
 
     inline void EndSpriteQueueRender() noexcept
@@ -274,6 +318,7 @@ namespace OutRunVR::GameSemantic
             CurrentScope = SpriteQueuePreviousScope;
             SpriteQueuePreviousScope = RenderScope::None;
             CurrentSpriteQueueNode = nullptr;
+            CurrentQueueExactScope = RenderScope::None;
 
             // Remove only tags that existed before this queue walk began.
             // A producer thread may already be preparing the next frame while
