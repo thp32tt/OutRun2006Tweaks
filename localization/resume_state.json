@@ -1,5 +1,5 @@
 {
-  "schema_version": 11,
+  "schema_version": 12,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,9 +7,11 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "in-game validate OutRun2_Korean_GFX_FULL_DRAFT_Test.zip across menu, selector, race, results, ranking, multiplayer and loading screens",
-    "use screenshots to replace heuristic atlas placements with exact verified boxes",
-    "promote each verified DDS from FULL_DRAFT to FINAL candidate",
+    "read localization/graphics/ORIENTATION_POLICY.md before every graphics edit",
+    "continue source-faithful review from original raw DDS; do not infer transforms from prior Korean drafts",
+    "preserve vehicle/model/brand/logo/song/legal text unless explicitly approved for localization",
+    "rework pending unsafe assets, including 49BB5FE5_128x32.dds through a DXT5-safe path and C05E67EF_128x64.dds",
+    "in-game validate source-faithful Batch3/4/5 candidates",
     "collect K1/K2/K3 runtime logs",
     "resolve text IDs 96,97,279,280 using actual mode-screen context",
     "continue K3 Hangul glyph/width proof"
@@ -34,7 +36,18 @@
     "artwork_targets": 79,
     "full_draft_candidates": 79,
     "final_artwork_completed": 0,
-    "full_draft_package_sha256": "5512dad798a4ddb4872e4aa3e69438537f75f488f439317d7b95c0eb372b6c78"
+    "full_draft_package_sha256": "5512dad798a4ddb4872e4aa3e69438537f75f488f439317d7b95c0eb372b6c78",
+    "source_faithful_policy": "localization/graphics/ORIENTATION_POLICY.md",
+    "source_faithful_reviewed_assets": 20,
+    "source_faithful_localized_candidates": 17,
+    "source_faithful_reset_to_original": 3,
+    "batch3_report": "localization/graphics/BATCH3_SOURCEFAITHFUL_REPORT.json",
+    "batch4_report": "localization/graphics/BATCH4_SOURCEFAITHFUL_REPORT.json",
+    "batch5_report": "localization/graphics/BATCH5_SOURCEFAITHFUL_REPORT.json",
+    "batch3_package_sha256": "02d848b9746cb474d52d500cc849294fe55baca0e1bbe618f5faa39ee3b1c69c",
+    "batch4_package_sha256": "cfddc6c758bfdc8313dd624bbe9211ce6d2221bd04985ee6856d449e66cffb95",
+    "batch5_package_sha256": "1d5de3dcc55caefba4e904e3d0030b6ae5fbd70f479546641add3d967cf3459f",
+    "pending_dxt5_asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds"
   },
   "runtime_packages": {
     "k1": {
