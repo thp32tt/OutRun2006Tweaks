@@ -36,7 +36,7 @@ C2C does not expose the Lindbergh drive-board packet stream, so this branch reco
 
 - four per-wheel surface masks and the original `sub_1149C0` roughness LUT;
 - left/right non-water rough-surface grouping;
-- rough -> road transitions;
+- rough -> road transitions; while the short 0x04/0x14 transition is active it owns the directional surface output, matching the single-code callback semantics instead of summing/cancelling against a simultaneous sustained 0x10/0x00 reconstruction;
 - C2C collision state and speed-loss detection for wall events;
 - C2C gear changes.
 
