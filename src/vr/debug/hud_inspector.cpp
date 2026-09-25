@@ -17,6 +17,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "../hud_semantics.hpp"
+#include "../game/render_semantics.hpp"
 
 namespace Settings
 {
@@ -332,6 +333,59 @@ namespace OutRunVRHudInspector
             catch (...) {}
         }
 
+    }
+
+    // Production-facing semantic resolver backed only by the canonical EXE map.
+    // It returns a render scope only when the launcher has verified the exact
+    // replacement EXE SHA-256. Helper/wrapper return addresses are stack-walked
+    // until a UIScaling-derived semantic range is found.
+    OutRunVR::GameSemantic::RenderScope ResolveRenderScope(
+        const void* returnAddress) noexcept
+    {
+        char semanticVerified[8]{};
+        const bool identityVerified =
+            SemanticIdentityVerified ||
+            (GetEnvironmentVariableA(
+                "OUTRUN_VR_EXE_SEMANTICS_VERIFIED",
+                semanticVerified,
+                static_cast<DWORD>(sizeof(semanticVerified))) > 0 &&
+             semanticVerified[0] == '1');
+        if (!identityVerified)
+            return OutRunVR::GameSemantic::RenderScope::None;
+
+        auto resolveRva = [](std::uint32_t returnRva) noexcept {
+            const std::uint32_t callRva =
+                returnRva >= 5 ? returnRva - 5 : returnRva;
+            return OutRunVRHudSemantics::ClassifyCaller(callRva);
+        };
+
+        auto semantic = resolveRva(ToExeRva(returnAddress));
+        if (semantic.space == OutRunVRHudSemantics::SpacePolicy::Unknown)
+        {
+            void* frames[24]{};
+            const USHORT frameCount = RtlCaptureStackBackTrace(
+                0, static_cast<DWORD>(std::size(frames)),
+                frames, nullptr);
+            for (USHORT depth = 0; depth < frameCount; ++depth)
+            {
+                const std::uint32_t frameReturnRva =
+                    ToExeRva(frames[depth]);
+                if (!frameReturnRva)
+                    continue;
+                const auto candidate = resolveRva(frameReturnRva);
+                if (candidate.space ==
+                    OutRunVRHudSemantics::SpacePolicy::Unknown)
+                    continue;
+                semantic = candidate;
+                break;
+            }
+        }
+
+        if (semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud)
+            return OutRunVR::GameSemantic::RenderScope::ScreenHud;
+        if (semantic.space == OutRunVRHudSemantics::SpacePolicy::WorldBillboard)
+            return OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+        return OutRunVR::GameSemantic::RenderScope::None;
     }
 
     // Feed points used by the existing texture hooks. Keeping put_sprite_ex on
