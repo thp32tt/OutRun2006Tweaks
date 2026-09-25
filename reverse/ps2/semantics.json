@@ -85,6 +85,19 @@
       "evidence": "Retail Type-8 update uses symmetric coefficient round(10*(1-driveFactor)); builder confirms saturation 255 and zero offset/deadband."
     },
     {
+      "va": "0x001332BC",
+      "name": "WheelRuntime_WheelLevelScale",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RUNTIME",
+        "PERIODIC",
+        "SETTING"
+      ],
+      "confidence": "high",
+      "evidence": "Retail SLPM reads wheel-mode game-state byte +0xFC, rejects values >=11, and derives the Type-4 multiplier (level+1)/11 before the periodic magnitude multiply at 0x00133340."
+    },
+    {
       "va": "0x00133328",
       "name": "WheelRuntime_PeriodicBuild",
       "tags": [
@@ -94,7 +107,7 @@
         "PERIODIC"
       ],
       "confidence": "high",
-      "evidence": "Retail Type-4 build multiplies the periodic source by driveFactor, static magnitude scale 50 (0x0034950C), and an activation factor before rounding; direction 90, phase 0, offset 0, and raw period 100 + round(60*driveFactor) are also verified. Host period-unit interpretation remains provisional."
+      "evidence": "Retail Type-4 build multiplies the periodic source by driveFactor, static magnitude scale 50 (0x0034950C), and the wheel-specific 0..10 setting multiplier (level+1)/11 before rounding; direction 90, phase 0, offset 0, and raw period 100 + round(60*driveFactor) are verified. Host period-unit interpretation remains provisional."
     },
     {
       "va": "0x0013334C",
@@ -333,6 +346,19 @@
       "evidence": "Retail SLPM surface-mask/collision-context LUT; values and stage-specific 0x2/0x400000 cases match the reconstructed C2C/Xbox sub_1149C0 map."
     },
     {
+      "va": "0x001D7FBC",
+      "name": "WheelSurface_WheelFeedbackLevel",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RUNTIME",
+        "SURFACE",
+        "SETTING"
+      ],
+      "confidence": "high",
+      "evidence": "Wheel-device surface-feedback producer reads game-state +0xFC, validates 0..10, skips production at level 0, and for nonzero level derives base strength 0.20 + 0.08*level."
+    },
+    {
       "va": "0x001D811C",
       "name": "WheelRuntime_PeriodicSurfaceEnvelopeStore",
       "tags": [
@@ -344,6 +370,30 @@
       ],
       "confidence": "high",
       "evidence": "After evaluating car offsets 0x24C/0x250/0x254/0x258 and retaining the maximum LUT value, retail SLPM stores that surface envelope to 0x0035F280."
+    },
+    {
+      "va": "0x0024DF10",
+      "name": "WheelOptions_FeedbackLevelControl",
+      "tags": [
+        "PS2",
+        "FFB",
+        "UI",
+        "SETTING"
+      ],
+      "confidence": "high",
+      "evidence": "Retail options code constructs the relevant integer control with minimum 0 and maximum 10."
+    },
+    {
+      "va": "0x0024E8DC",
+      "name": "WheelOptions_StoreWheelFeedbackLevel",
+      "tags": [
+        "PS2",
+        "FFB",
+        "UI",
+        "SETTING"
+      ],
+      "confidence": "high",
+      "evidence": "When the wheel-device path is active, the selected 0..10 options value is stored to game-state byte +0xFC."
     }
   ],
   "unresolved": [
