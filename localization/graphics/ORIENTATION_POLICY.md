@@ -1,6 +1,6 @@
 # Graphics Orientation & Preserve Policy
 
-Updated: 2026-09-25 22:50 KST
+Updated: 2026-09-26 01:24 KST
 Branch: `korean-localization-clean`
 
 This policy is mandatory for all Korean graphics localization work.
@@ -65,3 +65,43 @@ An asset cannot move to final candidate status until all are checked:
 ## Resume rule
 
 On any future request such as **"이어서 작업해줘"**, read and apply this policy before producing or revising localization artwork.
+
+
+## Style-fidelity rule
+
+This gate is mandatory in addition to orientation correctness.
+
+1. Korean replacement text must stay visually close to the original artwork:
+   - similar stroke/outline weight,
+   - similar fill color or gradient,
+   - similar shadow/highlight behavior,
+   - similar condensed/wide proportions,
+   - similar alignment, scale, and spacing.
+2. Do not use a generic white-outline Korean style when the original is flat gray, orange, red, yellow, or otherwise stylistically different.
+3. Prefer preserving the original background/badge/panel artwork and replacing only the text layer/region.
+4. If the translated text cannot yet be made source-faithful, keep/reset that asset to the original DDS and mark it pending rework.
+
+## Artifact-cleanliness rule
+
+Before an asset can be retained as a localized candidate, inspect the full alpha/color result for editing residue.
+
+Reject or rework an asset if it contains:
+- stray black horizontal/vertical lines,
+- crop seams,
+- underline-like remnants not present in the source,
+- text-erasure residue,
+- clipped glyphs,
+- opaque boxes introduced accidentally,
+- alpha halos or mismatched borders around replaced text.
+
+The artifact check must be performed on both the raw DDS view and the readable/game-orientation preview.
+
+## GitHub persistence rule
+
+The canonical localization branch is **`korean-localization-clean`**.
+
+For every completed graphics batch or QA-rule change:
+- update this branch's localization progress/resume metadata,
+- add/update the machine-readable batch report under `localization/graphics/`,
+- update `localization/WORKLOG.md` and `localization/progress/STATUS.md`,
+- do not merge VR or FFB source into the localization branch.
