@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-26 07:34 KST
+Updated: 2026-09-26 07:54 KST
 
 ## Active branch
 `korean-localization-clean`
@@ -43,6 +43,8 @@ The full draft intentionally uses exact/OCR/manual/atlas-alpha placement evidenc
 - 1st/2nd/early-3rd batch generated images are visual drafts pending source-faithful rework.
 
 ### Source-faithful batches
+- Batch24v2: `2DA43E41` promoted after larger source-cell cleanup removed Batch18 English residue, report `BATCH24V2_2DA_REWORK_REPORT.json`
+- Batch23: `ACF61D7C` rejected; English remnants still visible, report `BATCH23_REJECTED_REPORT.json`
 - Batch22: `C598919A` rejected after block-level DXT5 pass; residual English/clipped source styling remains, report `BATCH22_REJECTED_REPORT.json`
 - Batch21v3: `C075FB49` promoted after containment + manual style/artifact QA, report `BATCH21V3_REWORK_REPORT.json`
 - Batch18/19: `2DA43E41` and `ACF61D7C` rejected and kept original, reports `BATCH18_REJECTED_REPORT.json`, `BATCH19_REJECTED_REPORT.json`
@@ -60,10 +62,10 @@ The full draft intentionally uses exact/OCR/manual/atlas-alpha placement evidenc
 - Batch11v2: 1 retained + 1 reset, report `BATCH11V2_REWORK_REPORT.json`
 - Current machine state: `localization/graphics/SOURCE_FAITHFUL_CURRENT.json`
 - Source-faithful reviewed since QA reset: **32**
-- Retained/rebuilt localized candidates: **28**
-- Reset to original pending safe rework: **4**
-- Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B21v3_QA_Test.zip`
-- Combined package SHA-256: `c566a79e47faaf788380da73fc6ec6bd23639e75c1f26c65d58e061067a07284`
+- Retained/rebuilt localized candidates: **29**
+- Reset to original pending safe rework: **3**
+- Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B24v2_QA_Test.zip`
+- Combined package SHA-256: `6a38aaae5fd979b1ebdbbe0e43f3e0b3c6e24b5fd929031ee496ef9ffb0f0541`
 - Mandatory extra QA gates: source-like typography/colors; no stray black lines, crop seams, text-erasure residue, clipped glyphs, accidental opaque boxes, or alpha halos.
 - DXT5-safe rewrite still required for several assets, including `49BB5FE5_128x32.dds`, `42E618FD_512x32.dds`, `7CE1CFC5_512x128.dds`, and `C598919A_1024x1024.dds`.
 
@@ -87,7 +89,7 @@ Read:
 7. `localization/graphics/BATCH11V2_REWORK_REPORT.json`
 8. `localization/graphics/FULL_DRAFT_REPORT.json`
 
-Next gate: continue the 4 pending assets from original DDS first; keep preserve-original names/artwork untouched; reuse block-level DXT5 patching for C598919A; run in-game validation on the 28 retained candidates.
+Next gate: continue the 3 pending assets from original DDS; keep preserve-original names/artwork untouched; in-game validate the 29 retained candidates.
 
 
 ### QA checkpoint 2026-09-26 07:34 KST
