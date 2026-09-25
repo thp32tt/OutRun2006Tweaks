@@ -283,3 +283,17 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Manual review rejected the candidate: several course/mode/ranking labels still retain English fragments or clipped source styling around Korean replacements.
 - Kept original `C598919A` in the canonical package.
 - The block-level DXT5 patching method itself is retained for the next larger-box cleanup pass.
+
+
+## 2026-09-26 07:54 KST - BATCH24V2 2DA43E41 PROMOTION
+
+- Reworked `2DA43E41_1024x1024.dds` again from the original raw DDS after Batch18 rejection.
+- Increased only the explicit source text cells enough to remove the residual English from both 15-course selected messages and both waiting-player messages.
+- Preserved course-map art, character/silhouette art, player indicators, numeric/UI art, and decorative panels.
+- Localized Single Play, For Expert Drivers, Heart Attack Mode, and Special Course without changing pixels outside their source text cells.
+- Automated containment: **0 changed pixels outside allowed regions; 0 introduced-alpha pixels outside allowed regions**.
+- Manual readable preview: no residual English observed in the edited labels; no black-line/crop-seam residue observed.
+- Batch23 `ACF61D7C` was rejected again because English remnants remain around multiple labels.
+- Current checkpoint: **32 reviewed / 29 retained / 3 pending**.
+- Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B24v2_QA_Test.zip`
+- SHA-256: `6a38aaae5fd979b1ebdbbe0e43f3e0b3c6e24b5fd929031ee496ef9ffb0f0541`
