@@ -39,8 +39,9 @@ A cycle is counted only after its assigned source/concern has been inspected and
 | C0025 | PS2 IOP Logitech module search in supplied assets | COMPLETE / BINARY_BLOCKED | No PC defect; IOPRP ROMDIR has no LGDEV/USBD and DRIVER.PS2 is a packed asset, not an IRX container | IOPRP310.IMG + DRIVER.PS2 binary/signature/string inspection; LGDEV.IRX still required |
 | C0026 | PS2 Type-4 remaining surface-envelope writes | COMPLETE | `FFB-R0026-F01`: PC omitted retail roughness*1.25 vehicle-state boost and clipped valid 1.125 envelope to 1.0; helper/runtime/tests/verifier corrected | SLPM 0x1D811C, 0x1D81BC, 0x1D8268 -> consume 0x132E94; exact-head CI pending |
 | C0027 | PS2 non-Type-4 transient-channel ownership | COMPLETE | No PC defect; remaining producer channels match controller-rumble logic and pad output is zeroed under wheel ownership, so they must not be imported as steering torque | SLPM 0x1D7F70 producer + 0x102460 pad output compared with Xbox CalcVibrationValues |
+| C0028 | PS2 retail road-chain runtime instrumentation | COMPLETE | Validation prep: 10 Hz telemetry now exposes surfaceRough, boosted ps2Surface, ps2RoadRaw and ps2Drive before host scaling | Source + verifier instrumentation; no intended force behavior change |
 
-Completed cycles: **27 / 1000**
+Completed cycles: **28 / 1000**
 
 ## Findings
 
@@ -63,4 +64,4 @@ Completed cycles: **27 / 1000**
 
 ## Next review
 
-Resume at **C0028**. Continue distinct source/behavior slices and record a cycle only after inspection plus ledger/Issue documentation. Highest-value remaining work is exact-head validation plus hardware telemetry/A-B validation of the recovered PS2 road envelope; the IOP lane remains BINARY_BLOCKED until disc-local `LGDEV.IRX` is supplied.
+Resume at **C0029** after exact-head CI. Highest-value remaining work is hardware telemetry/A-B validation of the recovered PS2 road envelope and any hidden ConstantForce caller discovery; the IOP lane remains BINARY_BLOCKED until disc-local `LGDEV.IRX` is supplied.
