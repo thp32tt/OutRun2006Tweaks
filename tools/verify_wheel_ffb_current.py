@@ -547,7 +547,8 @@ req(ffb, 'const bool suppressStructuralForImpact =', 'structural crash suppressi
 req(ffb, 'impactAge < WheelFFBMath::ArcadeConstantEventFrames', 'Arcade structural suppression ends with its 80ms event')
 req(ffb, 'ps2Original\n                        ? false', 'PS2 software condition fallback is not blanked by an unverified collision event')
 forbid(ffb, 'if (crashImpulseTimer_ <= CrashCooldownFrames)', 'shared debounce timer cannot globally blank structural torque')
-forbid(ffb, 'impactFrame < 6', 'arcade wall event cannot regress to old 100ms approximation')
+# Modern DD legitimately keeps its own <6 rebound phase; Arcade is guarded by
+# the explicit ArcadeConstantEventFrames requirement above.
 req(ffb, 'const bool collisionEdge = collision && !wasCollision;', 'shared crash detector identifies explicit C2C collision edge')
 req(ffb, 'WheelFFBMath::crash_speed_drop_fallback(speedDrop, speed)', 'shared crash detector uses tested emergency deceleration fallback')
 req(ffb, 'WheelFFB: collision state edge', 'collision-state witness has distinct diagnostic')
