@@ -34,8 +34,9 @@ A cycle is counted only after its assigned source/concern has been inspected and
 | C0020 | F11 model UI, profile persistence, config defaults, telemetry/CI/package/domain isolation | COMPLETE | No new non-duplicate finding; model selection is captured/restored and stored in named FFB profiles; Modern remains default; standalone/domain gates remain active | UI/profile/config/workflow/domain review on current tree |
 | C0021 | PS2 retail surface-LUT -> Type-4 periodic magnitude dataflow | COMPLETE | `FFB-R0021-F01`: PS2 PC road amplitude reused Modern texture shaping; direct SLPM analysis recovered the steady-state surface/speed/drive/50/threshold-27 chain and production translation was corrected in this batch | Win32 Release 36125477321 SUCCESS; domain isolation 36125477189 SUCCESS |
 | C0022 | PS2 wheel-specific 0..10 feedback-level multiplier / Type-4 ownership | COMPLETE | `FFB-R0022-F01`: multiplier at 0x00133340 was mislabeled activation/ramp; retail menu + producer + manager tracing identifies game-state +0xFC as 0..10 wheel feedback strength | SLPM evidence at 0x24DF10, 0x24E8DC, 0x1D7FBC and 0x1332BC..0x133340; helper/test/docs/semantics updated |
+| C0023 | PS2 effect-manager category / type ownership | COMPLETE | No new PC defect; categories 1=ConstantForce, 2=Type-8 Damper, 7=Type-7 Spring, 8=periodic are now tied to concrete retail builders/wrappers | SLPM dispatch/call graph at 0x133700, 0x133B20, 0x133DB0, 0x134048, 0x134268, 0x134EB0 |
 
-Completed cycles: **22 / 1000**
+Completed cycles: **23 / 1000**
 
 ## Findings
 
@@ -56,4 +57,4 @@ Completed cycles: **22 / 1000**
 
 ## Next review
 
-Resume at **C0023**. Continue distinct source/behavior slices and record a cycle only after inspection plus ledger/Issue documentation. Highest-value PS2 reverse targets are the effect-manager slot/type ownership, unresolved ConstantForce source globals, remaining vehicle-state surface shaping and the missing disc-local `LGDEV.IRX`.
+Resume at **C0024**. Continue distinct source/behavior slices and record a cycle only after inspection plus ledger/Issue documentation. Highest-value PS2 reverse targets are the unresolved ConstantForce source globals, remaining vehicle-state surface shaping and the missing disc-local `LGDEV.IRX`.
