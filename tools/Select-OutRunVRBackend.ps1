@@ -4,7 +4,7 @@ param(
     [string]$Backend,
     [ValidateSet("CONTROL","CORRECTNESS","HUD_SCREEN","HUD_MENU","HUD_WORLD","PERFORMANCE","STAGE_DIAGNOSTIC","A_BASELINE","B_CULLING","C_CULLING_NO_SSAA","D_CULLING_NO_SSAA_R512")]
     [string]$TestProfile = "CORRECTNESS",
-    [ValidateSet("AUTO","CONTROL_2D","CURRENT_FOCUS","A_CONTROL","B_HUD","C_FLARE","D_PERF","E_DXVK_SAFE","E_DXVK_MULTIVIEW","F_DX12_STRICT","G_COCKPIT")]
+    [ValidateSet("AUTO","CONTROL_2D","CURRENT_FOCUS","A_CONTROL","B_HUD","C_FLARE","D_PERF","E_DXVK_SAFE","E_DXVK_MULTIVIEW","F_DX12_STRICT","G_COCKPIT","V_BASE","V_OVERLAY_BYPASS","V_XYZRHW_WORLD_BYPASS","V_HEAD_TRACKING_OFF","V_SKYGLOW_OFF")]
     [string]$VariantId = "AUTO"
 )
 
@@ -228,6 +228,20 @@ if (Test-Path $ini) {
     $driverSeatValue = if ($variant -eq "G_COCKPIT") { "true" } else { "false" }
     $text = Set-IniSectionValue $text "VR" "DriverSeatView" $driverSeatValue
 
+    # R52 visual-isolation matrix. These variants deliberately change only one
+    # visual owner relative to V_BASE. Run-OutRunVRTest.ps1 repeats these as
+    # command-line overrides so the captured RUN_OVERRIDES is authoritative.
+    $visualDiagnosticMode = switch ($variant) {
+        "V_OVERLAY_BYPASS"      { "1" }
+        "V_XYZRHW_WORLD_BYPASS" { "2" }
+        default                  { "0" }
+    }
+    $headTrackingValue = if ($variant -eq "V_HEAD_TRACKING_OFF") { "false" } else { "true" }
+    $skyGlowValue = if ($variant -eq "V_SKYGLOW_OFF") { "0" } else { "1" }
+    $text = Set-IniSectionValue $text "VR" "VisualDiagnosticMode" $visualDiagnosticMode
+    $text = Set-IniSectionValue $text "VR" "HeadTracking" $headTrackingValue
+    $text = Set-IniSectionValue $text "VR" "SkyGlowFactor" $skyGlowValue
+
     Set-Content $ini $text -Encoding UTF8
 }
 
@@ -270,7 +284,7 @@ $sessionManifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $root "CURRE
 $sessionManifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $sessionRoot "session_manifest.json") -Encoding UTF8
 
 if (Test-Path $ini) {
-    $allowed = '^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|DriverSeatView)\s*='
+    $allowed = '^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|DriverSeatView|HeadTracking|VisualDiagnosticMode)\s*='
     Get-Content $ini | Where-Object { $_ -match $allowed } |
         Set-Content (Join-Path $sessionRoot "VR_CONFIG_SNAPSHOT.txt") -Encoding UTF8
 }
