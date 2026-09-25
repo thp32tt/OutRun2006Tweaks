@@ -83,6 +83,12 @@ namespace Settings
         "Master force-model gain. Applied before soft saturation/slew; 1.0=100%, 1.5=150% headroom.", Range<float>{ 0.0f, 1.5f }
     };
 
+    Setting<float> WheelFFBPS2HostGain{
+        "WheelFFB", "PS2HostGain", 1.0f,
+        "PS2 Original host-side DD compensation. 1.0 preserves the recovered retail reference; 2.0-2.5 strengthens all translated PS2 channels together.",
+        Range<float>{ 1.0f, 2.5f }
+    };
+
     Setting<float> WheelFFBSpringStrength{
         "WheelFFB", "SpringStrength", 0.65f,
         "Speed-dependent center restoring force. Drives GUID_Spring when hardware spring is enabled.", Range<float>{ 0.0f, 1.5f }
@@ -195,7 +201,7 @@ namespace Settings
     };
 
     Setting<bool> WheelFFBInvertForce{
-        "WheelFFB", "InvertForce", true,
+        "WheelFFB", "InvertForce", false,
         "Reverse ConstantForce steering/event direction without changing the centering spring."
     };
 
@@ -595,6 +601,17 @@ namespace
             const float outputStrength = std::isfinite(configuredStrength)
                 ? std::clamp(configuredStrength, 0.0f, 1.5f)
                 : 0.0f;
+            const float configuredPs2HostGain =
+                static_cast<float>(Settings::WheelFFBPS2HostGain);
+            const float ps2HostGain = ps2Original
+                ? (std::isfinite(configuredPs2HostGain)
+                    ? std::clamp(configuredPs2HostGain, 1.0f, 2.5f)
+                    : 1.0f)
+                : 1.0f;
+            // Apply PS2 compensation once at the PC host/output boundary.
+            // Recovered retail Spring/Damper/Triangle formulas stay unchanged.
+            const float modelOutputStrength =
+                ps2Original ? outputStrength * ps2HostGain : outputStrength;
 
             const uint32_t stateFlags = car->field_8;
             const uint32_t curGear = car->cur_gear_208;
@@ -717,7 +734,9 @@ namespace
             speedHistory_[speedHistoryIndex_ % SpeedHistoryCount] = speed;
             ++speedHistoryIndex_;
 
-            update_crash_detection(speed, stateFlags);
+            update_crash_detection(
+                speed, stateFlags,
+                car->field_coli_281, car->field_282, car->field_283);
             update_gear_event(curGear, arcadeEffects, speedRaw);
 
             float roughness = 0.0f;
@@ -811,7 +830,7 @@ namespace
                         ? 0.0f
                         : static_cast<float>(ps2RoadRaw) /
                             static_cast<float>(WheelFFBPS2::LogitechScaleMax);
-                roadAmp = ps2RoadNorm * roadSetting * outputStrength;
+                roadAmp = ps2RoadNorm * roadSetting * modelOutputStrength;
                 roadFreq =
                     WheelFFBPS2::triangle_frequency_hz_for_directinput(
                         ps2DriveFactor);
@@ -1030,7 +1049,7 @@ namespace
             if (springEffect_)
             {
                 const float springRamp =
-                    warmupScale * recreateScale * outputStrength;
+                    warmupScale * recreateScale * modelOutputStrength;
                 update_spring(
                     suppressSpringForImpact
                         ? 0.0f
@@ -1099,7 +1118,7 @@ namespace
             }
 
             if (damperEffect_)
-                update_damper(dynamicDamperStrength * warmupScale * recreateScale * outputStrength);
+                update_damper(dynamicDamperStrength * warmupScale * recreateScale * modelOutputStrength);
 
             constexpr float SteerRateScale = 10.0f;
             const float damper = damperEffect_
@@ -1193,10 +1212,14 @@ namespace
             const float mechanicalTrailMix = std::isfinite(configuredMechanicalTrail)
                 ? std::clamp(configuredMechanicalTrail, 0.0f, 0.60f)
                 : 0.25f;
+            const float effectiveMechanicalTrail =
+                WheelFFBMath::deep_slip_mechanical_trail_ratio(
+                    frontSlip, mechanicalTrailMix);
             const float mechanicalContribution =
-                WheelFFBMath::mechanical_sat_shape(frontSlip, mechanicalTrailMix);
+                WheelFFBMath::mechanical_sat_shape(
+                    frontSlip, effectiveMechanicalTrail);
             const float physicsShape = WheelFFBMath::combined_sat_shape(
-                frontSlip, trailResponseSlip, mechanicalTrailMix);
+                frontSlip, trailResponseSlip, effectiveMechanicalTrail);
             const float trailShape = pneumaticSatShape; // legacy telemetry field name
             const float physicsLoad = 0.62f + 0.48f * lateralLoadSmooth;
             const float rearSlideRelief = 1.0f - 0.15f * gripLoss * bodySlide;
@@ -1289,7 +1312,7 @@ namespace
             // slew limiter for the whole steering signal.
             const float forceDirection = Settings::WheelFFBInvertForce ? -1.0f : 1.0f;
             const float outputRamp = warmupScale * recreateScale;
-            float total = structural * outputStrength * forceDirection * outputRamp;
+            float total = structural * modelOutputStrength * forceDirection * outputRamp;
             float eventOutput = events * outputStrength * forceDirection * outputRamp;
             if (!std::isfinite(total))
                 total = 0.0f;
@@ -3685,15 +3708,55 @@ namespace
             lastConstantWriteTick_ = GetTickCount();
         }
 
-        void update_crash_detection(float speed, uint32_t stateFlags)
+        void update_crash_detection(
+            float speed,
+            uint32_t stateFlags,
+            uint8_t courseCollisionSide,
+            uint8_t courseCollisionStrength,
+            uint8_t courseCollisionTimer)
         {
             const bool collision = (stateFlags & 0x1000) != 0;
             const bool wasCollision = (prevCollisionFlags_ & 0x1000) != 0;
             const bool collisionEdge = collision && !wasCollision;
+            const bool courseCollisionEdge =
+                WheelFFBMath::course_collision_timer_edge(
+                    courseCollisionTimer, prevCourseCollisionTimer_);
+            prevCourseCollisionTimer_ = courseCollisionTimer;
 
-            // Prefer the game's explicit collision-state edge. The speed-drop
-            // path is only a conservative emergency fallback for impacts where
-            // that witness is absent.
+            // FUN_00503a20 reloads car+0x283 to 30 from the course-collision
+            // solver. Give that dedicated boundary/wall witness priority over
+            // the broader field_8/0x1000 state used by other impacts.
+            // field_coli_281 and field_282 stay diagnostic until physical
+            // left/right polarity and units are validated on hardware.
+            if (courseCollisionEdge && crashImpulseTimer_ <= 0)
+            {
+                const float lateralBeforeImpact =
+                    lateralHistoryIndex_ > 8
+                        ? lateralHistory_[(lateralHistoryIndex_ - 8) % LateralHistoryCount]
+                        : smoothedLateral_;
+                const float direction =
+                    lateralBeforeImpact >= 0.0f ? -1.0f : 1.0f;
+
+                crashImpulseForce_ =
+                    direction * 1.9f *
+                    static_cast<float>(Settings::WheelFFBWallImpact);
+                crashImpulseTimer_ = CrashTimerFrames;
+                smoothedLateral_ = 0.0f;
+
+                if (Settings::WheelFFBDebugLog)
+                {
+                    spdlog::info(
+                        "WheelFFB: course/wall collision edge timer={} side={} strength={} dir={:.0f}",
+                        unsigned(courseCollisionTimer),
+                        unsigned(courseCollisionSide),
+                        unsigned(courseCollisionStrength),
+                        direction);
+                }
+                return;
+            }
+
+            // The broad collision-state edge remains useful for vehicle and
+            // other non-course impacts. Speed-drop is emergency fallback only.
             if (collisionEdge && crashImpulseTimer_ <= 0)
             {
                 const float lateralBeforeImpact =
@@ -3971,6 +4034,7 @@ namespace
             lateralHistoryIndex_ = 0;
             prevGear_ = 0;
             prevCollisionFlags_ = 0;
+            prevCourseCollisionTimer_ = 0;
         }
 
         void install_exit_guards()
@@ -4382,6 +4446,7 @@ namespace
 
         uint32_t prevGear_ = 0;
         uint32_t prevCollisionFlags_ = 0;
+        uint8_t prevCourseCollisionTimer_ = 0;
 
         LONG prevConstantLevel_ = 0;
         LONG prevStructuralLevel_ = 0;
