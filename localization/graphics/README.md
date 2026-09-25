@@ -30,3 +30,15 @@ Reviewed: `game_ui`, `common_ui`, `ranking`, `font`.
 The reviewed atlases clearly contain embedded English labels suitable for direct texture localization. The font atlases contain Latin/digit/symbol glyphs and require a separate Hangul strategy.
 
 Machine-readable summary: `inventory_summary.json`.
+
+
+## Mandatory original-orientation policy
+
+Before editing any DDS, read and apply `localization/graphics/ORIENTATION_POLICY.md`.
+
+Key requirements:
+- inspect the original game DDS, not a previous Korean FULL-DRAFT;
+- classify vehicle/model/brand/song/legal text as preserve-original where applicable;
+- preserve per-sprite mirror/rotation exactly as stored in the original raw DDS;
+- apply the same raw transform to Korean replacements when the original text is mirrored/rotated;
+- never normalize an entire atlas simply to make it upright in an image viewer.
