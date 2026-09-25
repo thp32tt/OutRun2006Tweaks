@@ -638,21 +638,29 @@ class TextureReplacement : public Hook
 
 	static void VrRegisterQueuedSemantic(
 		SpriteNode* tailBefore, int prio,
-		OutRunVR::GameSemantic::RenderScope scope) noexcept
+		OutRunVR::GameSemantic::RenderScope scope,
+		const OutRunVR::GameSemantic::ProjectedMarkerInfo* projectedMarker = nullptr) noexcept
 	{
 		if (scope == OutRunVR::GameSemantic::RenderScope::None)
 			return;
 		SpriteNode* node = VrSpriteTail(prio);
 		if (node && node != tailBefore)
-			OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, scope, projectedMarker);
 	}
 
 	inline static SafetyHookInline put_sprite_ex2 = {};
 	static int __cdecl put_sprite_ex2_dest(SPRARGS2* a1, float a2)
 	{
 		const void* returnAddress = _ReturnAddress();
+		const auto producerScope =
+			OutRunVR::GameSemantic::ProducerScope();
 		const auto semanticScope =
-			OutRunVRHudInspector::ResolveRenderScope(returnAddress);
+			producerScope != OutRunVR::GameSemantic::RenderScope::None
+			? producerScope
+			: OutRunVRHudInspector::ResolveRenderScope(returnAddress);
+		const auto* producerMarker =
+			OutRunVR::GameSemantic::ProducerProjectedMarker();
 		const int semanticPrio = VrSpritePriorityIndex(a2);
 		SpriteNode* semanticTailBefore = VrSpriteTail(semanticPrio);
 		OutRunVRHudInspector::TracePutSprite2(a1, a2, returnAddress);
@@ -685,7 +693,8 @@ class TextureReplacement : public Hook
 
 		const int result = put_sprite_ex2.call<int>(a1, a2);
 		VrRegisterQueuedSemantic(
-			semanticTailBefore, semanticPrio, semanticScope);
+			semanticTailBefore, semanticPrio, semanticScope,
+			producerMarker);
 		return result;
 	}
 
@@ -693,8 +702,14 @@ class TextureReplacement : public Hook
 	static int __cdecl put_sprite_ex_dest(SPRARGS* a1, float a2)
 	{
 		const void* returnAddress = _ReturnAddress();
+		const auto producerScope =
+			OutRunVR::GameSemantic::ProducerScope();
 		const auto semanticScope =
-			OutRunVRHudInspector::ResolveRenderScope(returnAddress);
+			producerScope != OutRunVR::GameSemantic::RenderScope::None
+			? producerScope
+			: OutRunVRHudInspector::ResolveRenderScope(returnAddress);
+		const auto* producerMarker =
+			OutRunVR::GameSemantic::ProducerProjectedMarker();
 		const int semanticPrio = VrSpritePriorityIndex(a2);
 		SpriteNode* semanticTailBefore = VrSpriteTail(semanticPrio);
 		OutRunVRHudInspector::TracePutSprite(a1, a2, returnAddress);
