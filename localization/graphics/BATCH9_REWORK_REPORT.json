@@ -1,0 +1,18 @@
+{
+  "batch": "9-rework",
+  "package_sha256": "71a3b9e6c27a89b1223fcc03e51e78a9f382b9458835835cf7caf53301855dec",
+  "localized_candidates": [
+    {
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
+      "sha256": "8d4e61e08ade63b5a9df7567f2b0149016f42f1192ce59a8fb8e4cfd451fb414"
+    },
+    {
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds",
+      "sha256": "50365019dae55f3a3864c0e3c588b61a00255aba8b550f37de1e99e8c7d06749"
+    },
+    {
+      "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+      "sha256": "690a607ade122fcb66469da5280c7572179b263d4b62f4fd7152a21b29bcba46"
+    }
+  ]
+}
