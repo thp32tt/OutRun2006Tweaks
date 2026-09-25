@@ -1794,6 +1794,11 @@ namespace
                     ImGui::TextDisabled(
                         "PS2 Original: gear-shift FFB stays disabled until a retail PS2 effect caller is verified.");
                 }
+                else if (activeFfbModel == 1 || activeFfbModel == 2)
+                {
+                    ImGui::TextDisabled(
+                        "Arcade: 1.00 preserves the observed 0.10 / 240 ms gear Sine; lower values are PC host scaling.");
+                }
                 track_ffb_change(ImGui::SliderFloat("Force Build Slew Rate", Settings::WheelFFBSlewRate.ptr(), 0.01f, 1.0f, "%.3f"));
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip("Maximum normal structural-force build change per 60 Hz tick. Lower is smoother/slower; higher responds faster.");
@@ -2033,10 +2038,11 @@ namespace
                 Settings::WheelFFBUseHardwareDamper = true;
                 Settings::WheelFFBEngineVibration = false;
                 // Arcade Original's verified rough-surface path is periodic.
-                // Prefer the wheel driver's hardware periodic effect; the 60 Hz
-                // software fallback cannot faithfully synthesize the observed
-                // 70 Hz arcade surface vibration.
+                // Prefer the wheel driver's hardware periodic effect. The
+                // observed road Sine uses a 70 ms period (~14.286 Hz).
                 Settings::WheelFFBUsePeriodicEffects = true;
+                // Host scaler: 1.00 preserves OutRun2Real's 0.10 gear Sine.
+                Settings::WheelFFBGearShift = 1.0f;
                 Settings::VibrationMode = 0;
                 track_ffb_change(true);
                 WheelFFB_RequestSettingsTransition();
@@ -2050,6 +2056,8 @@ namespace
                 Settings::WheelFFBPhysicsSat = true;
                 Settings::WheelFFBEngineVibration = false;
                 Settings::WheelFFBUsePeriodicEffects = true;
+                // Host scaler: 1.00 preserves OutRun2Real's 0.10 gear Sine.
+                Settings::WheelFFBGearShift = 1.0f;
                 Settings::VibrationMode = 0;
                 track_ffb_change(true);
                 WheelFFB_RequestSettingsTransition();
