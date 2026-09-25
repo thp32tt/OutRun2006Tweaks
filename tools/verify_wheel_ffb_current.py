@@ -567,6 +567,11 @@ forbid(create_spring_block, 'saturationOverride', 'create-time Spring code canno
 req(ffb, 'WheelFFBPS2::damper_coefficient_norm(ps2DriveFactor)', 'PS2 runtime uses recovered speed-fading damper coefficient')
 req(ffb, 'std::abs(crashImpulseForce_) / 2.5f', 'PS2 provisional collision source is normalized from the known C2C severity envelope')
 req(ffb, 'WheelFFBPS2::constant_magnitude_cap_norm()', 'PS2 provisional collision translation obeys the recovered retail ConstantForce cap')
+ps2_event_start = ffb.find('else if (ps2Original)')
+ps2_event_end = ffb.find('else\n                    {', ps2_event_start)
+ps2_event_block = ffb[ps2_event_start:ps2_event_end]
+req(ps2_event_block, 'if (impactFrame < 6)', 'PS2 provisional ConstantForce is bounded to the short event window')
+req(ps2_event_block, 'eventFrames=6', 'PS2 event-window translation is explicit in diagnostics')
 req(ffb, ': (!ps2Original &&\n                   crashImpulseTimer_ > CrashCooldownFrames);', 'PS2 original spring is not suppressed by an unverified Modern collision interaction')
 forbid(ffb, 'crashImpulseForce_ * 0.45f', 'arbitrary PS2 collision multiplier removed')
 forbid(ffb, '(ps2Original ? 0.12f : 0.20f)', 'unsupported PS2 gear thunk removed')
