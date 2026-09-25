@@ -6,20 +6,13 @@
     {
       "asset": "37759842_1024x1024.dds",
       "decision": "keep_original",
-      "reason": "Batch17v3 visual evidence still shows residual English plus gradient/icon restoration seams; original DDS/candidate bytes are not available in this run for a source-faithful rebuild."
+      "reason": "Batch17v3 still fails residual-English and gradient/icon-seam manual QA."
     },
     {
       "asset": "C598919A_1024x1024.dds",
       "decision": "keep_original",
-      "reason": "Batch22 evidence still shows residual English/clipped source styling; original DDS/candidate bytes are not available in this run to safely enlarge DXT5 per-label block extents."
+      "reason": "Batch22 still fails residual-English and clipped-style manual QA."
     }
   ],
-  "checklist": {
-    "original_orientation": "required_not_guessable_without_original_bytes",
-    "protected_art": "preserve",
-    "style_fidelity": "required",
-    "text_region_containment": "required",
-    "artifact_cleanliness": "required"
-  },
-  "next": "Rework only when original DDS plus candidate bytes are accessible; otherwise retain originals."
+  "next": "Retry only with original DDS and candidate bytes available for repeatable source-faithful comparison."
 }
