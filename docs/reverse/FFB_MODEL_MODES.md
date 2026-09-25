@@ -89,3 +89,10 @@ The reconstructed Xbox `CalcVibrationValues()` path is controller-rumble logic r
 4. PS2 Original topology (Experimental)
 
 Named FFB profiles include the selected model. Device identity, wheel response correction and diagnostics remain global/wheel-specific as before.
+
+
+### Cabinet steering-hardware scope
+
+Do not generalize one OutRun 2 cabinet steering mechanism to every cabinet variant. The SEGA motorized SPG-2500 handle assembly used by motor-FFB Twin/Deluxe-family documentation lists a 500 W servo motor, pulleys/gears, timing belt and steering VR, while DRIVE BOARD TEST actively rolls the wheel left/right and exposes MOTOR POWER steering-resistance levels with 80% as the default. A separate UK HAPP Upright service path explicitly documents mechanical spring replacement. The latter is a different handle/cabinet variant and must not be used as evidence that the motorized OutRun2Real/Lindbergh target had a passive centering spring.
+
+For Arcade Original, the target remains the motorized drive-board feel represented by OutRun2Real: a continuously available condition/centering backbone plus drive-board event codes. The 0.50 condition coefficient is therefore a host translation of the motorized cabinet's active steering resistance, not a claim about a physical coil spring in the SPG-2500 mechanism.
