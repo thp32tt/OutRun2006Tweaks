@@ -44,8 +44,9 @@ A cycle is counted only after its assigned source/concern has been inspected and
 | C0030 | Cross-model periodic transport ownership | COMPLETE | `FFB-R0030-F01`: shared wrapper forced UsePeriodicEffects=false every frame, defeating Arcade Sine / PS2 Triangle ownership and the live F11 switch; per-frame override removed | wrapper/core/UI contract review; source/verifier/docs updated |
 | C0031 | Arcade Original/Hybrid road periodic unit semantics | COMPLETE | `FFB-R0031-F01`: OutRun2Real Sine(70,80) uses 70ms period, while PC treated 70 as Hz; corrected to ~14.286Hz host translation | upstream EffectTriggers/TriggerSineEffect contract + source/math/tests/verifier/docs |
 | C0032 | Arcade one-sided rough -> road transition composition | COMPLETE | `FFB-R0032-F01`: transition force was added to opposite sustained surface force and could cancel to zero; transition now owns directional output for its six-tick window | single-code Lindbergh callback semantics + pure composition tests |
+| C0033 | Arcade gear-event waveform/duration/UI scaling | COMPLETE | `FFB-R0033-F01`: PC used a 100ms square-like pulse and ignored Gear Shift; reference is Sine(240,320,0.10), now synthesized as one ~240ms cycle with explicit host scaling | upstream EffectTriggers/TriggerSineEffect contract + source/math/UI/tests/docs |
 
-Completed cycles: **32 / 1000**
+Completed cycles: **33 / 1000**
 
 ## Findings
 
@@ -60,6 +61,7 @@ Completed cycles: **32 / 1000**
 - `FFB-R0030-F01`: removed the shared per-frame periodic-disable override so Arcade Sine / PS2 Triangle ownership and the live F11 transport toggle can operate.
 - `FFB-R0031-F01`: corrected the Arcade road Sine from an incorrect 70 Hz interpretation to the observed 70 ms period (~14.286 Hz host translation).
 - `FFB-R0032-F01`: made 0x04/0x14 rough-to-road transitions replace, not sum with, sustained one-sided surface force so opposite sides cannot cancel the event.
+- `FFB-R0033-F01`: restored the observed Arcade gear Sine's ~240 ms period/duration, moving-speed gate and live host scaler instead of the old 100 ms square-like pulse.
 - C0002..C0010 and C0014..C0020: no new non-duplicate finding after source/evidence review.
 
 ## PS2 evidence discipline
@@ -71,4 +73,4 @@ Completed cycles: **32 / 1000**
 
 ## Next review
 
-Resume at **C0033** with Arcade gear-event fidelity/UI scaling, then Modern crash/transient validation.
+Resume at **C0034** with Modern/shared crash detection and transient validation.
