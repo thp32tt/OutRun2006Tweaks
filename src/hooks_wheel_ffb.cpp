@@ -711,7 +711,7 @@ namespace
             ++speedHistoryIndex_;
 
             update_crash_detection(speed, stateFlags);
-            update_gear_event(curGear);
+            update_gear_event(curGear, arcadeEffects, speedRaw);
 
             float roughness = 0.0f;
             DWORD waterFlag = 0;
@@ -3725,10 +3725,24 @@ namespace
             }
         }
 
-        void update_gear_event(uint32_t curGear)
+        void update_gear_event(
+            uint32_t curGear,
+            bool arcadeEffects,
+            float speedRaw)
         {
-            if (curGear != prevGear_ && prevGear_ != 0 && gearShiftTimer_ <= 0)
+            if (curGear == prevGear_ || prevGear_ == 0 || gearShiftTimer_ > 0)
+                return;
+
+            if (arcadeEffects)
+            {
+                // OutRun2Real emits its gear Sine only while moving.
+                if (std::isfinite(speedRaw) && speedRaw >= 0.10f)
+                    gearShiftTimer_ = WheelFFBMath::ArcadeGearEventFrames;
+            }
+            else
+            {
                 gearShiftTimer_ = 6;
+            }
         }
 
         float update_event_force(
@@ -3796,13 +3810,17 @@ namespace
             {
                 if (arcadeEffects)
                 {
-                    // Lindbergh Real issues a 0.10 sine pulse on gear change.
-                    // At 60 Hz a short alternating ConstantForce pulse is the
-                    // hardware-independent fallback for wheels whose sine path
-                    // is ineffective; the 0.10 source magnitude is retained.
-                    const float pulse =
-                        0.10f * (gearShiftTimer_ > 3 ? 1.0f : -1.0f);
-                    result += pulse;
+                    // OutRun2Real calls Sine(240, 320, 0.10). The plugin copies
+                    // 240 to SDL's period and length, so synthesize one ~240 ms
+                    // cycle through the shared event output. Gear Shift is a PC
+                    // host scaler; 1.00 preserves the observed 0.10 amplitude.
+                    const int elapsedFrame =
+                        WheelFFBMath::ArcadeGearEventFrames - gearShiftTimer_;
+                    const float hostScale = std::clamp(
+                        static_cast<float>(Settings::WheelFFBGearShift),
+                        0.0f, 1.0f);
+                    result += WheelFFBMath::arcade_gear_sine_force(
+                        elapsedFrame, hostScale);
                 }
                 else if (!ps2Original)
                 {
