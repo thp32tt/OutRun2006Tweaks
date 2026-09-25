@@ -47,7 +47,7 @@ $title.Location=[System.Drawing.Point]::new(155,18)
 $form.Controls.Add($title)
 
 $guide=New-Object System.Windows.Forms.Label
-$guide.Text='같은 코스/시점에서 1→2→3→4 순서로 짧게 테스트하세요. 화면 변화가 생기는 첫 버전이 핵심입니다. F11 VR Recenter도 메뉴/게임에서 같이 확인하세요.
+$guide.Text='같은 코스/시점에서 1→2→3→4 순서로 짧게 테스트하세요. 화면 변화가 생기는 첫 버전이 핵심입니다. F11 VR Recenter도 메뉴/게임에서 같이 확인하세요.'
 $guide.AutoSize=$false
 $guide.Size=[System.Drawing.Size]::new(650,44)
 $guide.Location=[System.Drawing.Point]::new(35,58)
