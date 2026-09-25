@@ -80,8 +80,8 @@ jobs:
           "- ZIP: $zip" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           "- Build policy: incremental by default; canonical R51 CMake contract is enforced by Build-OutRunPCFast.ps1`n          - Final hosted CI: not run by this fast path" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
 
-      - name: Optional GitHub artifact upload
-        if: ${{ env.OUTRUN_PC_STALE != 'true' && github.event_name == 'workflow_dispatch' && inputs.upload_artifact }}
+      - name: Upload PC fast artifact
+        if: ${{ env.OUTRUN_PC_STALE != 'true' && (github.event_name == 'push' || inputs.upload_artifact) }}
         uses: actions/upload-artifact@v4
         with:
           name: OutRun2-VR-PC-FAST-${{ github.sha }}
