@@ -1,5 +1,5 @@
 {
-  "schema_version": 13,
+  "schema_version": 14,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9,8 +9,9 @@
   "next_actions": [
     "read ORIENTATION_POLICY.md and SOURCE_FAITHFUL_CURRENT.json before editing",
     "only 37759842_1024x1024.dds remains pending",
-    "do not promote a 37759842 candidate if any source English remains in blue/black cards even when containment passes",
-    "preserve vehicle/model names, logos, icons and card gradients",
+    "obtain exact original DDS and candidate bytes before any further pixel edit",
+    "do not promote if any source English remains in blue/black cards even when containment passes",
+    "preserve vehicle/model names, brands, logos, song titles, legal marks, icons and card gradients",
     "in-game validate the 31 retained source-faithful candidates"
   ],
   "prototype_history": {
@@ -44,7 +45,6 @@
     "batch3_package_sha256": "02d848b9746cb474d52d500cc849294fe55baca0e1bbe618f5faa39ee3b1c69c",
     "batch4_package_sha256": "cfddc6c758bfdc8313dd624bbe9211ce6d2221bd04985ee6856d449e66cffb95",
     "batch5_package_sha256": "1d5de3dcc55caefba4e904e3d0030b6ae5fbd70f479546641add3d967cf3459f",
-    "pending_dxt5_asset": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
     "current_state_file": "localization/graphics/SOURCE_FAITHFUL_CURRENT.json",
     "batch6_report": "localization/graphics/BATCH6_SOURCEFAITHFUL_REPORT.json",
     "batch7_report": "localization/graphics/BATCH7_STYLE_ARTIFACT_QA_REPORT.json",
@@ -55,8 +55,7 @@
     "current_combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip",
     "current_combined_package_sha256": "7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02",
     "pending_dxt5_assets": [
-      "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
-      "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds"
+      "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"
     ],
     "batch12v2_report": "localization/graphics/BATCH12V2_DXT5_REWORK_REPORT.json",
     "batch16v5_report": "localization/graphics/BATCH16V5_REWORK_REPORT.json",
@@ -67,10 +66,11 @@
     "batch23_rejected_report": "localization/graphics/BATCH23_REJECTED_REPORT.json",
     "batch24v2_report": "localization/graphics/BATCH24V2_2DA_REWORK_REPORT.json",
     "batch25v4_report": "localization/graphics/BATCH25V4_ACF_REWORK_REPORT.json",
-    "latest_safe_rework_note": "2026-09-26 08:11 KST: only 37759842 and C598919A remain pending; do not regenerate without original DDS plus candidate bytes. 37759842 requires gradient/icon-preserving cleanup; C598919A requires larger per-label DXT5 block extents. Unsafe edits stay original.",
+    "latest_safe_rework_note": "2026-09-26 08:55 KST: C598919A is already promoted by Batch38. Only 37759842 remains pending. Batch41 containment passed but manual QA failed on residual English in blue Mode cards and black 15-course cards. Exact original/candidate DDS bytes are not committed; keep original until byte-backed rework can pass all gates.",
     "batch33_rejected_report": "localization/graphics/BATCH33_REJECTED_REPORT.json",
     "batch38_report": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
-    "batch41_rejected_report": "localization/graphics/BATCH41_REJECTED_REPORT.json"
+    "batch41_rejected_report": "localization/graphics/BATCH41_REJECTED_REPORT.json",
+    "batch42_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json"
   },
   "runtime_packages": {
     "k1": {
