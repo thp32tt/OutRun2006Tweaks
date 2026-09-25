@@ -187,6 +187,14 @@ Two boundaries remain explicit:
 - later vehicle-state shaping inside the surface-feedback producer is still under analysis;
 - F11 **Road Detail = 1.00** is a host/user one-to-one scaler corresponding to the retail maximum level multiplier of 1.0 before Overall Strength and the common DD output/safety layer. Lower F11 values remain continuous host scaling; no retail default level is invented.
 
+### Controller-vibration channels versus wheel Type-4 side channel
+
+The rest of the producer at `0x001D7F70..` closely mirrors the Xbox `CalcVibrationValues()` controller-rumble algorithm: the same four-wheel LUT maximum, `field_264/field_268` thresholds, water branch, constants and later car-state transients are present. These accumulated channels are not evidence of steering torque.
+
+The PS2 wheel-specific addition is the separate `0x0035F280` side channel consumed by the Type-4 manager. The ordinary pad-output helper `0x00102460` checks wheel ownership via `0x00132C18`; in wheel mode it explicitly writes zero to the normal pad actuator channels. Therefore the remaining f21/f22-style controller-vibration arithmetic is not promoted into PS2 DirectInput steering/ConstantForce.
+
+This reinforces the cross-platform evidence rule: controller motor envelopes may be logged as witnesses, but they are not left/right wheel-force direction.
+
 ### Effect-manager category ownership
 
 The retail manager uses a 0..11 category dispatcher. The FFB-relevant categories needed by the OutRun wheel update are now tied to concrete wrapper families:
