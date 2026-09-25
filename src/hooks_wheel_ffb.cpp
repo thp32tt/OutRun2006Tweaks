@@ -3745,23 +3745,26 @@ namespace
                         // verified retail output cap.
                         const int impactFrame =
                             CrashTimerFrames - crashImpulseTimer_;
-                        const float direction =
-                            crashImpulseForce_ >= 0.0f ? 1.0f : -1.0f;
-                        const float translatedSeverity = std::clamp(
-                            std::abs(crashImpulseForce_) / 2.5f,
-                            0.0f, 1.0f);
-                        const float ps2Constant =
-                            direction * translatedSeverity *
-                            WheelFFBPS2::constant_magnitude_cap_norm();
-                        result += ps2Constant;
-
-                        if (impactFrame == 0 &&
-                            Settings::WheelFFBDebugLog)
+                        if (impactFrame < 6)
                         {
-                            spdlog::info(
-                                "WheelFFB PS2: provisional C2C collision -> retail ConstantForce envelope severity={:.3f} cap={:.3f}",
-                                translatedSeverity,
-                                WheelFFBPS2::constant_magnitude_cap_norm());
+                            const float direction =
+                                crashImpulseForce_ >= 0.0f ? 1.0f : -1.0f;
+                            const float translatedSeverity = std::clamp(
+                                std::abs(crashImpulseForce_) / 2.5f,
+                                0.0f, 1.0f);
+                            const float ps2Constant =
+                                direction * translatedSeverity *
+                                WheelFFBPS2::constant_magnitude_cap_norm();
+                            result += ps2Constant;
+
+                            if (impactFrame == 0 &&
+                                Settings::WheelFFBDebugLog)
+                            {
+                                spdlog::info(
+                                    "WheelFFB PS2: provisional C2C collision -> retail ConstantForce envelope severity={:.3f} cap={:.3f} eventFrames=6",
+                                    translatedSeverity,
+                                    WheelFFBPS2::constant_magnitude_cap_norm());
+                            }
                         }
                     }
                     else
