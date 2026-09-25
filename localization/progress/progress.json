@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-26T08:39:00+09:00",
+  "updated_at_kst": "2026-09-26T08:55:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Final graphics pending asset is 37759842 only; no promotion until residual English is zero under manual review. In-game validate 31 retained candidates.",
+  "next_checkpoint": "Batch42: only 37759842 remains pending. Keep original until exact DDS byte-backed rework removes all residual English while preserving gradients/icons and passing containment + manual artifact QA. In-game validate 31 retained candidates.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -249,7 +249,8 @@
     "current_combined_package": {
       "name": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip",
       "sha256": "7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02"
-    }
+    },
+    "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json"
   },
   "data_build": {
     "draft_bin_entries": 1356,
