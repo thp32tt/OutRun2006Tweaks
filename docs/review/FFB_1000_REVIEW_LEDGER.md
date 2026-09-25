@@ -42,8 +42,9 @@ A cycle is counted only after its assigned source/concern has been inspected and
 | C0028 | PS2 retail road-chain runtime instrumentation | COMPLETE | Validation prep: 10 Hz telemetry now exposes surfaceRough, boosted ps2Surface, ps2RoadRaw and ps2Drive before host scaling | Source + verifier instrumentation; no intended force behavior change |
 | C0029 | PS2 ConstantForce hidden-caller/static-pointer audit | COMPLETE | No new PC defect; no extra direct caller, literal setter function-pointer entry, or second absolute writer to the two source globals was recovered | Whole-ELF direct-call/global-reference/literal-pointer audit; dynamic trace still required to exclude computed/indirect callers |
 | C0030 | Cross-model periodic transport ownership | COMPLETE | `FFB-R0030-F01`: shared wrapper forced UsePeriodicEffects=false every frame, defeating Arcade Sine / PS2 Triangle ownership and the live F11 switch; per-frame override removed | wrapper/core/UI contract review; source/verifier/docs updated |
+| C0031 | Arcade Original/Hybrid road periodic unit semantics | COMPLETE | `FFB-R0031-F01`: OutRun2Real Sine(70,80) uses 70ms period, while PC treated 70 as Hz; corrected to ~14.286Hz host translation | upstream EffectTriggers/TriggerSineEffect contract + source/math/tests/verifier/docs |
 
-Completed cycles: **30 / 1000**
+Completed cycles: **31 / 1000**
 
 ## Findings
 
@@ -56,6 +57,7 @@ Completed cycles: **30 / 1000**
 - `FFB-R0024-F01`: removed the invented C2C collision mapping from PS2 Original after retail source-setter tracing found no verified non-zero caller.
 - `FFB-R0026-F01`: restored the verified PS2 Type-4 roughness*1.25 vehicle-state surface boost and valid 1.125 envelope headroom.
 - `FFB-R0030-F01`: removed the shared per-frame periodic-disable override so Arcade Sine / PS2 Triangle ownership and the live F11 transport toggle can operate.
+- `FFB-R0031-F01`: corrected the Arcade road Sine from an incorrect 70 Hz interpretation to the observed 70 ms period (~14.286 Hz host translation).
 - C0002..C0010 and C0014..C0020: no new non-duplicate finding after source/evidence review.
 
 ## PS2 evidence discipline
@@ -67,4 +69,4 @@ Completed cycles: **30 / 1000**
 
 ## Next review
 
-Resume at **C0031** with cross-model Arcade/Modern behavior review. Highest-value remaining work includes Lindbergh periodic/event fidelity, Modern crash/transient validation, hardware telemetry/A-B validation, and dynamic/emulated discovery of any computed PS2 ConstantForce caller.
+Resume at **C0032** with Arcade event composition/gear fidelity, then Modern crash/transient validation.
