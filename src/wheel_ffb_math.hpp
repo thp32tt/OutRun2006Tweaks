@@ -61,6 +61,32 @@ namespace WheelFFBMath
     constexpr float ArcadeGearSineAmplitude = 0.10f;
     constexpr int ArcadeGearEventFrames = 15; // ceil(240 ms * 60 Hz)
 
+    // Host-only emergency crash fallback. The game's collision-state edge is
+    // authoritative; these thresholds only catch severe deceleration when that
+    // witness is absent. They are tuned from captured PC runtime telemetry.
+    constexpr float CrashFallbackSpeedDropMin = 0.12f;
+    constexpr float CrashFallbackSpeedDropFull = 0.36f;
+    constexpr float CrashFallbackCurrentSpeedMin = 0.10f;
+
+    inline bool crash_speed_drop_fallback(
+        float speedDrop,
+        float currentSpeed)
+    {
+        return std::isfinite(speedDrop) && std::isfinite(currentSpeed) &&
+            currentSpeed > CrashFallbackCurrentSpeedMin &&
+            speedDrop > CrashFallbackSpeedDropMin;
+    }
+
+    inline float crash_speed_drop_severity(float speedDrop)
+    {
+        if (!std::isfinite(speedDrop))
+            return 0.0f;
+        return std::clamp(
+            (speedDrop - CrashFallbackSpeedDropMin) /
+                (CrashFallbackSpeedDropFull - CrashFallbackSpeedDropMin),
+            0.0f, 1.0f);
+    }
+
 
     inline float frequency_hz_from_period_ms(float periodMs)
     {
