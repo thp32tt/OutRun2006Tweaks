@@ -1,0 +1,32 @@
+[
+  {
+    "asset": "textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+    "transform": "mirror_x",
+    "sha256": "e4f5dae7bda1c7f0742df1e11a8e1c796ae58a9d70346197b09fafe110f8d3a5",
+    "note": "Original raw DDS is horizontal mirror; localized Korean preserved with mirror-X."
+  },
+  {
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
+    "transform": "mirror_x",
+    "sha256": "6519e7939d5d1c854aaca1c87b8f43a76a27b6e19be9f937c7415cc76474c31c",
+    "note": "Original raw DDS is horizontal mirror; selection labels preserved with mirror-X."
+  },
+  {
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+    "transform": "mirror_x",
+    "sha256": "6a2e11255e4488b87ab2073cf990016fadb36e48707e007a718dddecc50f2432",
+    "note": "Original raw DDS is horizontal mirror; localized Korean preserved with mirror-X."
+  },
+  {
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+    "transform": "identity",
+    "sha256": "56ffba4bb666542d1218a1e8d721c6e9129268eae8f2e2b87229c6aa83a6874d",
+    "note": "Current localized draft already follows the original mirror-X layout; kept as-is for source-faithful batch."
+  },
+  {
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds",
+    "transform": "identity",
+    "sha256": "c66b8a0b1294a5ada7f28ebb0023bb461c26aac4b99da4c5da60894dce8a3f83",
+    "note": "Current localized draft already follows the original mirror-X layout; kept as-is for source-faithful batch."
+  }
+]
