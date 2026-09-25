@@ -57,12 +57,32 @@ namespace WheelFFBMath
     // established C2C speedNorm (top-speed region ~= 1.0). This preserves the
     // observed arcade step structure without importing Lindbergh addresses.
     constexpr float ArcadeRoadSinePeriodMs = 70.0f;
+    constexpr float ArcadeGearSinePeriodMs = 240.0f;
+    constexpr float ArcadeGearSineAmplitude = 0.10f;
+    constexpr int ArcadeGearEventFrames = 15; // ceil(240 ms * 60 Hz)
+
 
     inline float frequency_hz_from_period_ms(float periodMs)
     {
         if (!std::isfinite(periodMs) || periodMs <= 0.0f)
             return 0.0f;
         return 1000.0f / periodMs;
+    }
+
+    inline float arcade_gear_sine_force(
+        int elapsedFrame,
+        float hostScale)
+    {
+        if (elapsedFrame < 0 || elapsedFrame >= ArcadeGearEventFrames)
+            return 0.0f;
+        hostScale = std::isfinite(hostScale)
+            ? std::clamp(hostScale, 0.0f, 1.0f) : 0.0f;
+        constexpr float TwoPi = 6.28318530718f;
+        const float elapsedMs =
+            static_cast<float>(elapsedFrame) * (1000.0f / 60.0f);
+        const float phase =
+            TwoPi * elapsedMs / ArcadeGearSinePeriodMs;
+        return std::sin(phase) * ArcadeGearSineAmplitude * hostScale;
     }
 
     inline float compose_arcade_directional_surface(
