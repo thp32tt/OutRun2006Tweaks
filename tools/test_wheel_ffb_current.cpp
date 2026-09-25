@@ -49,6 +49,18 @@ int main() {
  require(std::abs(WheelFFBPS2::triangle_wave(1.25f)-0.0f)<1e-6f,"PS2 Triangle wraps cycles");
  require(WheelFFBPS2::triangle_wave(std::numeric_limits<float>::quiet_NaN())==0.0f,"PS2 Triangle rejects NaN");
  require(std::abs(WheelFFBPS2::constant_magnitude_cap_norm()-220.0f/255.0f)<1e-6f,"PS2 constant cap 220/255");
+ require(std::abs(WheelFFBPS2::surface_speed_factor(.50f)-.50f)<1e-6f,"PS2 periodic surface speed factor");
+ require(WheelFFBPS2::surface_speed_factor(2.0f)==1.0f,"PS2 periodic surface speed factor caps at one");
+ require(WheelFFBPS2::surface_speed_factor(std::numeric_limits<float>::quiet_NaN())==0.0f,"PS2 periodic surface speed factor rejects NaN");
+ require(WheelFFBPS2::periodic_magnitude_raw(.50f,1.0f,1.0f)==25,"PS2 periodic raw magnitude below threshold");
+ require(WheelFFBPS2::periodic_magnitude_raw(.54f,1.0f,1.0f)==27,"PS2 periodic raw magnitude threshold");
+ require(WheelFFBPS2::periodic_magnitude_raw(.70f,1.0f,1.0f)==35,"PS2 periodic retail magnitude scale 50");
+ require(WheelFFBPS2::periodic_magnitude_norm(.50f,1.0f,1.0f)==0.0f,"PS2 periodic raw values below 27 are suppressed");
+ require(std::abs(WheelFFBPS2::periodic_magnitude_norm(.54f,1.0f,1.0f)-27.0f/255.0f)<1e-6f,"PS2 periodic threshold is inclusive at raw 27");
+ require(std::abs(WheelFFBPS2::periodic_magnitude_norm(.70f,1.0f,1.0f)-35.0f/255.0f)<1e-6f,"PS2 periodic normalized retail magnitude");
+ require(WheelFFBPS2::periodic_magnitude_raw(.90f,.50f,1.0f)==23,"PS2 periodic source includes min(field_1C4,1) speed factor");
+ require(WheelFFBPS2::periodic_magnitude_raw(.90f,1.0f,1.0f,.50f)==23,"PS2 periodic activation scale remains explicit");
+ require(WheelFFBPS2::periodic_magnitude_raw(std::numeric_limits<float>::quiet_NaN(),1.0f,1.0f)==0,"PS2 periodic magnitude rejects NaN");
 
  auto engineIdle=estimate_engine_haptics(0.0f,0,0.0f);
  require(engineIdle.rpmNorm>=.08f&&engineIdle.rpmNorm<.20f,"engine idle RPM estimate");

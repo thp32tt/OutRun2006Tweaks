@@ -34,6 +34,19 @@
       "evidence": "Retail SLPM dataflow reads the car value corresponding to field_1C4, divides by 2.5 and clamps to 1 before the later /0.35 FFB normalization."
     },
     {
+      "va": "0x00132E94",
+      "name": "WheelRuntime_PeriodicSurfaceSourceConsume",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RUNTIME",
+        "PERIODIC",
+        "SURFACE"
+      ],
+      "confidence": "high",
+      "evidence": "Retail SLPM loads the surface envelope from 0x0035F280, clears the consumed value, multiplies it by min(field_1C4,1), and passes it to the Type-4 source setter."
+    },
+    {
       "va": "0x001330A0",
       "name": "WheelRuntime_ConstantForceBuild",
       "tags": [
@@ -81,7 +94,20 @@
         "PERIODIC"
       ],
       "confidence": "high",
-      "evidence": "Retail path requests Type 4 with direction 90, phase 0, offset 0 and raw period 100 + round(60*driveFactor); host milliseconds interpretation remains comparative/provisional."
+      "evidence": "Retail Type-4 build multiplies the periodic source by driveFactor, static magnitude scale 50 (0x0034950C), and an activation factor before rounding; direction 90, phase 0, offset 0, and raw period 100 + round(60*driveFactor) are also verified. Host period-unit interpretation remains provisional."
+    },
+    {
+      "va": "0x0013334C",
+      "name": "WheelRuntime_PeriodicStartThreshold",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RUNTIME",
+        "PERIODIC",
+        "THRESHOLD"
+      ],
+      "confidence": "high",
+      "evidence": "Retail Type-4 path suppresses/stops the effect when the rounded raw magnitude is below 0x1B (27)."
     },
     {
       "va": "0x001333D8",
@@ -292,6 +318,32 @@
       ],
       "confidence": "high",
       "evidence": "lgDevAStopForceEffect diagnostic and wrapper call edge."
+    },
+    {
+      "va": "0x001D7C88",
+      "name": "WheelSurface_RoughnessLUT",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RUNTIME",
+        "SURFACE",
+        "LUT"
+      ],
+      "confidence": "high",
+      "evidence": "Retail SLPM surface-mask/collision-context LUT; values and stage-specific 0x2/0x400000 cases match the reconstructed C2C/Xbox sub_1149C0 map."
+    },
+    {
+      "va": "0x001D811C",
+      "name": "WheelRuntime_PeriodicSurfaceEnvelopeStore",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RUNTIME",
+        "PERIODIC",
+        "SURFACE"
+      ],
+      "confidence": "high",
+      "evidence": "After evaluating car offsets 0x24C/0x250/0x254/0x258 and retaining the maximum LUT value, retail SLPM stores that surface envelope to 0x0035F280."
     }
   ],
   "unresolved": [

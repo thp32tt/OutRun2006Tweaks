@@ -63,10 +63,11 @@ The PS2 reverse map verifies distinct:
 
 The retail path is now decoded beyond topology for several fields: the Type-7 Spring coefficient/dynamic saturation, Type-8 Damper coefficient/saturation, the directional ConstantForce output cap, and the Type-4 periodic raw period/direction/phase/offset are backed by direct SLPM evidence. The PC translation uses those verified envelopes where possible.
 
-Still unresolved are the gameplay meanings of the retail ConstantForce source globals, the retail periodic-magnitude source, some effect-manager slot semantics, and the raw period field's physical unit. Therefore:
+Still unresolved are the gameplay meanings of the retail ConstantForce source globals, additional vehicle-state/activation shaping around the periodic envelope, some effect-manager slot semantics, and the raw period field's physical unit. Therefore:
 
 - Condition/Spring and Damper parameters use recovered retail values with explicit user scaling;
-- the PS2 road periodic uses the recovered Type-4/Triangle shape and raw period curve, while the C2C road magnitude source remains provisional;
+- the PS2 road periodic uses the recovered Type-4/Triangle shape, raw period curve, four-wheel surface-envelope family, `min(field_1C4,1)` factor, magnitude scale `50`, and raw start threshold `27`; later retail boost/ramp semantics remain explicitly unresolved;
+- F11 Road Detail `1.00` is the one-to-one host scaler around that recovered periodic envelope before Overall Strength and DD safety;
 - C2C collision detection is only a provisional trigger for the recovered directional ConstantForce envelope;
 - no PS2 gear-shift pulse is synthesized without a verified retail caller;
 - all output still passes through the shared modern DD safety layer.

@@ -143,6 +143,26 @@ The retail binary proves the numeric period field `100..160`; it does **not** it
 
 The PS2 PC mode now creates `GUID_Triangle` for its road periodic instead of reusing the Modern/Arcade `GUID_Sine` object.
 
+### Periodic magnitude / surface source — retail chain recovered
+
+A deeper retail-SLPM pass resolves the steady-state Type-4 magnitude source:
+
+1. `0x001D7C88` maps a wheel's surface mask plus collision context to a roughness envelope. The caller at `0x001D8098..0x001D810C` evaluates the four car values at offsets `0x24C/0x250/0x254/0x258` and keeps the maximum.
+2. The LUT values and the stage/context special cases for masks `0x2` and `0x400000` match the already reconstructed C2C/Xbox `sub_1149C0` map. This makes the current C2C four-wheel roughness result a retail-backed baseline source for PS2 translation.
+3. `0x001D811C` stores the maximum surface envelope to `0x0035F280`. The same producer contains additional vehicle-state shaping after that store; those later semantic branches remain under analysis.
+4. `0x00132E94..0x00132EA0` consumes that envelope and multiplies it by `min(field_1C4, 1.0)` before storing the Type-4 source.
+5. `0x00133328..0x0013334C` computes the integer periodic magnitude from:
+   `surfaceSource * driveFactor * 50 * activationScale`.
+   Static retail data at `0x0034950C` is `50`.
+6. After round-to-integer, raw magnitudes below `27` are suppressed/stopped (`slti ..., 0x1B` at `0x0013334C`).
+
+The standalone PS2 mode therefore no longer reuses Modern DD's `(roughness - 0.30) / 0.55` texture shaping. Its steady-state translation uses the recovered raw surface envelope, `min(field_1C4,1)`, the independent PS2 `driveFactor`, the retail scale `50`, and the raw start threshold `27`.
+
+Two boundaries remain explicit:
+
+- the retail manager multiplies by an additional activation/ramp factor whose exact owner/semantic is not fully named; the PC backend retains its independent DD-safe startup/recreate ramp but does not claim that host ramp is the same variable;
+- F11 **Road Detail = 1.00** is a host/user one-to-one scaler around the recovered retail envelope before Overall Strength and the common DD output/safety layer.
+
 ### Model-transition ownership
 
 Periodic COM objects are waveform-specific. On FFB model/profile transitions the PC backend now releases the old periodic objects and recreates the required set:
@@ -165,7 +185,7 @@ The compact reverse-map builder now imports the curated retail evidence records 
 Still unresolved and therefore **not** represented as retail-original tuning:
 
 - semantic identity of the signed constant-force source variables at `0x00349528 / 0x0034952C`;
-- semantic identity of the periodic magnitude source around `0x00349538`;
+- semantic identity of the additional vehicle-state shaping that can modify the surface envelope after `0x001D811C`, plus the manager activation/ramp source used at `0x00133340`;
 - full mapping of effect-manager slots/types around `0x00134478..0x001351FC`;
 - event-to-effect mapping for collision, rail, surface transition, drift/slip, and gear;
 - `LGDEV.IRX` internal transport/units if the disc module becomes available.

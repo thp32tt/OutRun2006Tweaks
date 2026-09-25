@@ -32,8 +32,9 @@ A cycle is counted only after its assigned source/concern has been inspected and
 | C0018 | DirectInput focus, menu, device loss/reacquire, reinit, watchdog and panic safety | COMPLETE | No new non-duplicate finding; foreground/menu paths zero torque before unacquire, reacquire checks foreground again, reinit releases effects and PanicStop stops all/actuators | Full safety/lifetime path review on current tree |
 | C0019 | Four-wheel stage/surface/water/snow/curb ownership across models | COMPLETE | No new non-duplicate finding; per-wheel water outputs retained, Modern compatibility wrapper remains Modern-only, Arcade/PS2 avoid generic Modern splash | Core + wrapper + stage-map review on current tree |
 | C0020 | F11 model UI, profile persistence, config defaults, telemetry/CI/package/domain isolation | COMPLETE | No new non-duplicate finding; model selection is captured/restored and stored in named FFB profiles; Modern remains default; standalone/domain gates remain active | UI/profile/config/workflow/domain review on current tree |
+| C0021 | PS2 retail surface-LUT -> Type-4 periodic magnitude dataflow | COMPLETE | `FFB-R0021-F01`: PS2 PC road amplitude reused Modern texture shaping; direct SLPM analysis recovered the steady-state surface/speed/drive/50/threshold-27 chain and production translation was corrected in this batch | Retail `SLPM_666.28` instruction/dataflow at 0x001D7C88, 0x001D811C, 0x00132E94 and 0x00133328..0x0013334C; exact batch CI pending at commit time |
 
-Completed cycles: **20 / 1000**
+Completed cycles: **21 / 1000**
 
 ## Findings
 
@@ -41,6 +42,7 @@ Completed cycles: **20 / 1000**
 - `FFB-R0011-F01`: bound the provisional PS2 collision ConstantForce to the short six-tick event window while retaining the longer timer only as debounce.
 - `FFB-R0012-F01`: repaired the compact PS2 reverse-map query/schema contract and added deterministic CI coverage.
 - `FFB-R0013-F01`: persisted recovered retail runtime sites in the curated PS2 semantic map and imported them into regenerated compact SQLite maps.
+- `FFB-R0021-F01`: replaced Modern DD texture shaping in PS2 Original's road periodic with the recovered retail surface-envelope / speed / drive-factor / magnitude-scale / threshold chain.
 - C0002..C0010 and C0014..C0020: no new non-duplicate finding after source/evidence review.
 
 ## PS2 evidence discipline
@@ -52,4 +54,4 @@ Completed cycles: **20 / 1000**
 
 ## Next review
 
-Resume at **C0021**. Continue distinct source/behavior slices and record a cycle only after inspection plus ledger/Issue documentation. Highest-value PS2 reverse targets remain the unresolved ConstantForce source globals, periodic magnitude source, effect-manager slot semantics and the missing disc-local `LGDEV.IRX`.
+Resume at **C0022**. Continue distinct source/behavior slices and record a cycle only after inspection plus ledger/Issue documentation. Highest-value PS2 reverse targets are now the unresolved ConstantForce source globals, additional periodic envelope/activation shaping, effect-manager slot semantics and the missing disc-local `LGDEV.IRX`.

@@ -39,6 +39,8 @@ namespace WheelFFBPS2
     constexpr int RetailPeriodicOffset = 0;
     constexpr int RetailPeriodicBasePeriod = 100;
     constexpr int RetailPeriodicPeriodSpan = 60;
+    constexpr int RetailPeriodicMagnitudeScale = 50;
+    constexpr int RetailPeriodicStartThreshold = 27;
 
     // The retail game first stores min(field_1C4 / 2.5, 1.0), then its FFB
     // update divides that value by 0.35 and clamps again. Algebraically this is
@@ -49,6 +51,17 @@ namespace WheelFFBPS2
         if (!std::isfinite(speedRaw))
             return 0.0f;
         return std::clamp(speedRaw / 0.875f, 0.0f, 1.0f);
+    }
+
+    // The retail periodic source path at 0x00132E94 multiplies the
+    // four-wheel surface envelope by min(field_1C4, 1.0) before handing it to
+    // the FFB manager. Keep this factor separate from drive_factor(): retail
+    // applies both.
+    inline float surface_speed_factor(float speedRaw)
+    {
+        if (!std::isfinite(speedRaw))
+            return 0.0f;
+        return std::clamp(speedRaw, 0.0f, 1.0f);
     }
 
     inline int spring_saturation_raw(float factor)
@@ -105,6 +118,52 @@ namespace WheelFFBPS2
         factor = std::isfinite(factor) ? std::clamp(factor, 0.0f, 1.0f) : 0.0f;
         return RetailPeriodicBasePeriod +
             static_cast<int>(std::lround(RetailPeriodicPeriodSpan * factor));
+    }
+
+    // Retail steady-state Type-4 magnitude chain:
+    //   0x001D7C88: resolve each wheel surface mask
+    //   0x001D80A8..0x001D810C: retain the maximum envelope
+    //   0x00132E94..0x00132EA0: multiply by min(field_1C4, 1.0)
+    //   0x00133328..0x0013334C: * driveFactor * 50 * activation, round,
+    //                           and suppress values below raw 27.
+    //
+    // activationScale is explicit because the retail manager has an additional
+    // activation/ramp factor whose owner/semantic is not fully named yet. The
+    // PC runtime currently passes 1.0 here and applies its independent DD-safe
+    // startup/recreate ramp downstream; that host ramp is not claimed to be the
+    // same retail variable.
+    inline int periodic_magnitude_raw(
+        float surfaceEnvelope,
+        float speedRaw,
+        float factor,
+        float activationScale = 1.0f)
+    {
+        surfaceEnvelope = std::isfinite(surfaceEnvelope)
+            ? std::clamp(surfaceEnvelope, 0.0f, 1.0f) : 0.0f;
+        factor = std::isfinite(factor)
+            ? std::clamp(factor, 0.0f, 1.0f) : 0.0f;
+        activationScale = std::isfinite(activationScale)
+            ? std::clamp(activationScale, 0.0f, 1.0f) : 0.0f;
+        const float raw =
+            surfaceEnvelope * surface_speed_factor(speedRaw) *
+            factor * static_cast<float>(RetailPeriodicMagnitudeScale) *
+            activationScale;
+        return std::clamp(
+            static_cast<int>(std::lround(raw)), 0, LogitechScaleMax);
+    }
+
+    inline float periodic_magnitude_norm(
+        float surfaceEnvelope,
+        float speedRaw,
+        float factor,
+        float activationScale = 1.0f)
+    {
+        const int raw = periodic_magnitude_raw(
+            surfaceEnvelope, speedRaw, factor, activationScale);
+        if (raw < RetailPeriodicStartThreshold)
+            return 0.0f;
+        return static_cast<float>(raw) /
+            static_cast<float>(LogitechScaleMax);
     }
 
     // SLPM proves the raw period field is 100 + 60*driveFactor. liblgdev's

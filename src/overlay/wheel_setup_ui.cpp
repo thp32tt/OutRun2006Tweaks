@@ -2062,6 +2062,10 @@ namespace
                 Settings::WheelFFBSpringStrength = 0.65f;
                 Settings::WheelFFBSpringSaturation = 0.775f;
                 Settings::WheelFFBDamperStrength = 0.30f;
+                // PS2 Road Detail is a host scaler around the recovered retail
+                // Type-4 magnitude envelope. 1.00 = one-to-one before Overall
+                // Strength / response correction / DirectInput safety limits.
+                Settings::WheelFFBRoadTexture = 1.0f;
                 Settings::WheelFFBEngineVibration = false;
                 // The retail PS2 binary has explicit periodic download/update
                 // paths; never inherit a previous model's disabled state.
@@ -2069,7 +2073,7 @@ namespace
                 Settings::VibrationMode = 0;
                 track_ffb_change(true);
                 WheelFFB_RequestSettingsTransition();
-                status_ = "PS2 Original topology enabled (experimental): verified Condition/Constant/Periodic structure; exact PS2 payload tuning remains provisional.";
+                status_ = "PS2 Original enabled (experimental): recovered retail Spring/Damper/Type-4 road envelope active; unresolved event/source mappings remain provisional.";
             }
 
             if (!Settings::UseNewInput)

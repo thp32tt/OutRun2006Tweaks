@@ -776,16 +776,23 @@ namespace
 
             if (ps2Original)
             {
-                // Retail PS2 Type 4 is a Logitech Triangle periodic. Its raw
-                // period is 100 + 60*driveFactor. C2C does not expose the same
-                // PS2 periodic magnitude source, so keep the current per-wheel
-                // surface envelope as a provisional magnitude translator while
-                // using the verified PS2 speed factor and waveform/period.
+                // Retail PS2 uses the same four-wheel surface-mask family that
+                // is already reconstructed by sub_1149C0. Unlike Modern DD it
+                // does not subtract the 0.30 asphalt baseline and re-normalize
+                // to a synthetic 0..1 texture curve. Reproduce the recovered
+                // steady-state retail magnitude chain:
+                //   maxSurface * min(field_1C4,1) * driveFactor * 50,
+                // then round and suppress raw magnitudes below 27.
+                //
+                // Road Detail is an explicit host/user scaler: 1.00 means the
+                // recovered retail envelope before Overall Strength and the
+                // common DD safety/output layer.
                 const float roadSetting = std::clamp(
                     static_cast<float>(Settings::WheelFFBRoadTexture), 0.0f, 1.0f);
                 roadAmp =
-                    textureRoughness * ps2DriveFactor * roadSetting *
-                    outputStrength;
+                    WheelFFBPS2::periodic_magnitude_norm(
+                        roughness, speedRaw, ps2DriveFactor) *
+                    roadSetting * outputStrength;
                 roadFreq =
                     WheelFFBPS2::triangle_frequency_hz_for_directinput(
                         ps2DriveFactor);
