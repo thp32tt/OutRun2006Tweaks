@@ -32,6 +32,9 @@ jobs:
           call "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat" || exit /b 1
           python tools/verify_wheel_ffb_math.py
 
+      - name: Test compact PS2 reverse-map query
+        run: python tools/reverse/ps2/test_ps2query.py
+
       - name: Configure
         run: |
           mkdir build
@@ -183,6 +186,9 @@ jobs:
             src/wheel_ffb_runtime.hpp
             tools/test_wheel_ffb_current.cpp
             tools/verify_wheel_ffb_math.py
+            tools/reverse/ps2/build_ps2_map.py
+            tools/reverse/ps2/ps2query.py
+            tools/reverse/ps2/test_ps2query.py
             src/hooks_forcefeedback.cpp
             src/hooks_framerate.cpp
             src/hooks_wheel_input_compat_v2.hpp
