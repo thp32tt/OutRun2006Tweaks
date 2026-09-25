@@ -87,13 +87,13 @@ foreach($pattern in $patterns){
     }
 }
 if($stale){
-    & $selector -Backend $backend -TestProfile $TestProfile -VariantId $variant -VariantId $variant
+    & $selector -Backend $backend -TestProfile $TestProfile -VariantId $variant
     if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'Failed to seal stale logs before launch.'}
 }
 
 $state=Get-Content $current -Raw|ConvertFrom-Json
 if($state.TestProfile -and $state.TestProfile -ne $TestProfile){
-    & $selector -Backend $backend -TestProfile $TestProfile
+    & $selector -Backend $backend -TestProfile $TestProfile -VariantId $variant
     if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'Failed to prepare requested test profile.'}
     $state=Get-Content $current -Raw|ConvertFrom-Json
 }
