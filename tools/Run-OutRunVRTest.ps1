@@ -55,6 +55,7 @@ $variant=if($kv.variant){[string]$kv.variant}else{'AUTO'}
 $semanticMode='0'
 $hudExperimentMode='0'
 $hudCoordMode='0'
+$hudProbe='0'
 switch($variant){
     'X_SCREEN_HUD'       { $semanticMode='1' }
     'X_WORLD_RANK'       { $semanticMode='2' }
@@ -67,13 +68,35 @@ switch($variant){
     'R55_B_SCALE35'      { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='2' }
     'R55_C_WORLD35'      { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='3' }
     'R55_D_RANKZERO'     { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='4' }
+    'R56_01_ZERO'              { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='1'; $hudProbe='1' }
+    'R56_02_SCALE35'           { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='2'; $hudProbe='2' }
+    'R56_03_WORLD35'           { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='3'; $hudProbe='3' }
+    'R56_04_RANKZERO'          { $semanticMode='3'; $hudExperimentMode='4'; $hudCoordMode='4'; $hudProbe='4' }
+    'R56_05_POSITION_XP96'     { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='5' }
+    'R56_06_POSITION_XM96'     { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='6' }
+    'R56_07_POSITION_XS35'     { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='7' }
+    'R56_08_POSITION_XCENTER'  { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='8' }
+    'R56_09_RANK13_XP96'       { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='9' }
+    'R56_10_RANK13_XM96'       { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='10' }
+    'R56_11_RANK13_YM72'       { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='11' }
+    'R56_12_RANK13_CENTER'     { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='12' }
+    'R56_13_RANK46_XP96'       { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='13' }
+    'R56_14_RANK46_YM72'       { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='14' }
+    'R56_15_RANK46_CENTER'     { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='15' }
+    'R56_16_RANK13_AS_HUD'     { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='16' }
+    'R56_17_RANK46_AS_HUD'     { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='17' }
+    'R56_18_RANK46_NEXTDRAW'   { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='18' }
+    'R56_19_POSITION_NEXTDRAW' { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='19' }
+    'R56_20_ALLSCREEN_RAW'     { $semanticMode='3'; $hudExperimentMode='2'; $hudProbe='20' }
 }
 $oldExeSemanticMode=$env:OUTRUN_VR_EXE_SEMANTIC_MODE
 $oldHudExperimentMode=$env:OUTRUN_VR_HUD_EXPERIMENT_MODE
 $oldHudCoordMode=$env:OUTRUN_VR_HUD_COORD_MODE
+$oldHudProbe=$env:OUTRUN_VR_HUD_PROBE
 $env:OUTRUN_VR_EXE_SEMANTIC_MODE=$semanticMode
 $env:OUTRUN_VR_HUD_EXPERIMENT_MODE=$hudExperimentMode
 $env:OUTRUN_VR_HUD_COORD_MODE=$hudCoordMode
+$env:OUTRUN_VR_HUD_PROBE=$hudProbe
 
 $patterns=@(
     'OutRun2006Tweaks*.log',
@@ -261,6 +284,7 @@ try{
     $env:OUTRUN_VR_EXE_SEMANTIC_MODE=$oldExeSemanticMode
     $env:OUTRUN_VR_HUD_EXPERIMENT_MODE=$oldHudExperimentMode
     $env:OUTRUN_VR_HUD_COORD_MODE=$oldHudCoordMode
+    $env:OUTRUN_VR_HUD_PROBE=$oldHudProbe
     foreach($key in $identityKeys){
         [Environment]::SetEnvironmentVariable($key,$oldIdentity[$key],'Process')
     }
