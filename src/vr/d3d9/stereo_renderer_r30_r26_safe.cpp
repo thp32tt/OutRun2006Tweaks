@@ -1890,6 +1890,7 @@ namespace OutRunVRStereo
                 state.worldEffect = state.rhwDepthEvidence;
 
             // SCREENFIX V3 diagnostic: bypass R30's XYZRHW world-effect
+            // PC-HMD diagnostic build marker: WORLD-XYZRHW-FALLBACK.
             // reprojection entirely. Regular perspective world geometry keeps
             // the protected R51 stereo path, while pre-transformed
             // particles/decals/flares fall back to the lower safe owner. If
