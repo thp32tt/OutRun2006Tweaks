@@ -32,9 +32,10 @@ A cycle is counted only after its assigned source/concern has been inspected and
 | C0018 | DirectInput focus, menu, device loss/reacquire, reinit, watchdog and panic safety | COMPLETE | No new non-duplicate finding; foreground/menu paths zero torque before unacquire, reacquire checks foreground again, reinit releases effects and PanicStop stops all/actuators | Full safety/lifetime path review on current tree |
 | C0019 | Four-wheel stage/surface/water/snow/curb ownership across models | COMPLETE | No new non-duplicate finding; per-wheel water outputs retained, Modern compatibility wrapper remains Modern-only, Arcade/PS2 avoid generic Modern splash | Core + wrapper + stage-map review on current tree |
 | C0020 | F11 model UI, profile persistence, config defaults, telemetry/CI/package/domain isolation | COMPLETE | No new non-duplicate finding; model selection is captured/restored and stored in named FFB profiles; Modern remains default; standalone/domain gates remain active | UI/profile/config/workflow/domain review on current tree |
-| C0021 | PS2 retail surface-LUT -> Type-4 periodic magnitude dataflow | COMPLETE | `FFB-R0021-F01`: PS2 PC road amplitude reused Modern texture shaping; direct SLPM analysis recovered the steady-state surface/speed/drive/50/threshold-27 chain and production translation was corrected in this batch | Retail `SLPM_666.28` instruction/dataflow at 0x001D7C88, 0x001D811C, 0x00132E94 and 0x00133328..0x0013334C; exact batch CI pending at commit time |
+| C0021 | PS2 retail surface-LUT -> Type-4 periodic magnitude dataflow | COMPLETE | `FFB-R0021-F01`: PS2 PC road amplitude reused Modern texture shaping; direct SLPM analysis recovered the steady-state surface/speed/drive/50/threshold-27 chain and production translation was corrected in this batch | Win32 Release 36125477321 SUCCESS; domain isolation 36125477189 SUCCESS |
+| C0022 | PS2 wheel-specific 0..10 feedback-level multiplier / Type-4 ownership | COMPLETE | `FFB-R0022-F01`: multiplier at 0x00133340 was mislabeled activation/ramp; retail menu + producer + manager tracing identifies game-state +0xFC as 0..10 wheel feedback strength | SLPM evidence at 0x24DF10, 0x24E8DC, 0x1D7FBC and 0x1332BC..0x133340; helper/test/docs/semantics updated |
 
-Completed cycles: **21 / 1000**
+Completed cycles: **22 / 1000**
 
 ## Findings
 
@@ -43,6 +44,7 @@ Completed cycles: **21 / 1000**
 - `FFB-R0012-F01`: repaired the compact PS2 reverse-map query/schema contract and added deterministic CI coverage.
 - `FFB-R0013-F01`: persisted recovered retail runtime sites in the curated PS2 semantic map and imported them into regenerated compact SQLite maps.
 - `FFB-R0021-F01`: replaced Modern DD texture shaping in PS2 Original's road periodic with the recovered retail surface-envelope / speed / drive-factor / magnitude-scale / threshold chain.
+- `FFB-R0022-F01`: corrected the PS2 Type-4 extra multiplier from an assumed activation ramp to the recovered wheel-specific 0..10 feedback-strength setting.
 - C0002..C0010 and C0014..C0020: no new non-duplicate finding after source/evidence review.
 
 ## PS2 evidence discipline
@@ -54,4 +56,4 @@ Completed cycles: **21 / 1000**
 
 ## Next review
 
-Resume at **C0022**. Continue distinct source/behavior slices and record a cycle only after inspection plus ledger/Issue documentation. Highest-value PS2 reverse targets are now the unresolved ConstantForce source globals, additional periodic envelope/activation shaping, effect-manager slot semantics and the missing disc-local `LGDEV.IRX`.
+Resume at **C0023**. Continue distinct source/behavior slices and record a cycle only after inspection plus ledger/Issue documentation. Highest-value PS2 reverse targets are the effect-manager slot/type ownership, unresolved ConstantForce source globals, remaining vehicle-state surface shaping and the missing disc-local `LGDEV.IRX`.
