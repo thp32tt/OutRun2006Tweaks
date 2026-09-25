@@ -837,14 +837,14 @@ namespace OutRunVRD3D9ExUpgrade
             {
                 if (!ThirdPartyLogged.exchange(true))
                 {
-                    wchar_t providerPath[MAX_PATH]{};
+                    char providerPath[MAX_PATH]{};
                     const DWORD providerPathLen = provider
-                        ? GetModuleFileNameW(provider, providerPath, MAX_PATH) : 0;
+                        ? GetModuleFileNameA(provider, providerPath, MAX_PATH) : 0;
                     const bool hasCreate9Ex = provider &&
                         GetProcAddress(provider, "Direct3DCreate9Ex") != nullptr;
                     spdlog::warn(
                         "VR D3D9Ex upgrade: third-party d3d9 provider detected; path='{}' Direct3DCreate9Ex={} device upgrade skipped to preserve wrapper compatibility",
-                        providerPathLen ? std::wstring(providerPath) : L"<unknown>",
+                        providerPathLen ? providerPath : "<unknown>",
                         hasCreate9Ex);
                 }
                 return fallback;
