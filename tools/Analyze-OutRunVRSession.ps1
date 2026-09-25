@@ -65,7 +65,7 @@ if($semantic){
 
 $recenterPublished=([regex]::Matches($gameLog,'VR recenter: published host requestId=')).Count
 $recenterGameplayApplied=([regex]::Matches($gameLog,'VR renderer: yaw recentered gameplay pose')).Count
-$recenterHostReceived=([regex]::Matches($hostLog,'(?i)recenter.*requestId=.*received|requestId=.*recenter.*received')).Count
+$recenterHostReceived=([regex]::Matches($hostLog,'(?i)recenter.*(?:received.*requestId|requestId=.*received)|requestId=.*recenter.*received')).Count
 $recenterHostApplied=([regex]::Matches($hostLog,'(?i)recenter.*requestId=.*applied|requestId=.*completed by fresh visible|anchorUpdated=1 submitSuccess=1')).Count
 
 $frameIntervals=@()
