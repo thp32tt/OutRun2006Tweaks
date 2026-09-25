@@ -10,26 +10,289 @@
     "gp": "0x0043BC70"
   },
   "records": [
-    {"va":"0x00132488","name":"WheelSubsystem_ModuleInit","tags":["PS2","FFB","MODULE"],"confidence":"high","evidence":"Direct XREF to literal LGDEV.IRX; direct call to wrapper init."},
-    {"va":"0x001333D8","name":"EZWheelWrapper_Init","tags":["PS2","FFB","WHEEL"],"confidence":"high","evidence":"Literal EZ Wheel Wrapper v4.01 is referenced by this function."},
-    {"va":"0x001354B0","name":"WheelWrapper_DownloadConditionForce","tags":["PS2","FFB","CONDITION"],"confidence":"high","evidence":"Diagnostic string and direct call to 0x00167720 lgDevDownloadForceEffect."},
-    {"va":"0x00135640","name":"WheelWrapper_UpdateConditionForce","tags":["PS2","FFB","CONDITION"],"confidence":"high","evidence":"Diagnostic string and direct call to 0x00167AB8 lgDevAUpdateForceEffect."},
-    {"va":"0x001357B8","name":"WheelWrapper_DownloadConstantForce","tags":["PS2","FFB","CONSTANT"],"confidence":"high","evidence":"Diagnostic string and direct call to 0x00167720 lgDevDownloadForceEffect."},
-    {"va":"0x00135910","name":"WheelWrapper_UpdateConstantForce","tags":["PS2","FFB","CONSTANT"],"confidence":"high","evidence":"Diagnostic string and direct call to 0x00167AB8 lgDevAUpdateForceEffect."},
-    {"va":"0x00135AA8","name":"WheelWrapper_StartForceEffect","tags":["PS2","FFB"],"confidence":"high","evidence":"Diagnostic string and direct call to 0x00167C08 lgDevAStartForceEffect."},
-    {"va":"0x00135B60","name":"WheelWrapper_StopForceEffect","tags":["PS2","FFB"],"confidence":"high","evidence":"Diagnostic string and direct call to 0x00167CA0 lgDevAStopForceEffect."},
-    {"va":"0x00135C18","name":"WheelWrapper_DestroyForceEffect","tags":["PS2","FFB"],"confidence":"high","evidence":"Diagnostic string and direct call to 0x00167888 lgDevDestroyForceEffect."},
-    {"va":"0x00135CD8","name":"WheelWrapper_SetOverallForceGain","tags":["PS2","FFB","GAIN"],"confidence":"high","evidence":"Diagnostic string and direct call to 0x00167670 lgDevSetDeviceProperty."},
-    {"va":"0x00135D40","name":"WheelWrapper_DownloadPeriodicForce","tags":["PS2","FFB","PERIODIC"],"confidence":"high","evidence":"Diagnostic string and direct call to 0x00167720 lgDevDownloadForceEffect."},
-    {"va":"0x00135EB0","name":"WheelWrapper_UpdatePeriodicForce","tags":["PS2","FFB","PERIODIC"],"confidence":"high","evidence":"Diagnostic string and direct call to 0x00167AB8 lgDevAUpdateForceEffect."},
-    {"va":"0x001362A0","name":"LogitechWheel_EnumerateOpen","tags":["PS2","FFB","USB","LOGITECH"],"confidence":"high","evidence":"Found/opened Logitech USB device diagnostics; calls lgDevEnumerate/Open/SetDeviceProperty/Close."},
-    {"va":"0x00166F30","name":"lgDevInit","tags":["PS2","FFB","RPC"],"confidence":"high","evidence":"lgDevInit diagnostic strings."},
-    {"va":"0x00167670","name":"lgDevSetDeviceProperty","tags":["PS2","FFB","RPC"],"confidence":"high","evidence":"lgDevSetDeviceProperty diagnostic string."},
-    {"va":"0x00167720","name":"lgDevDownloadForceEffect","tags":["PS2","FFB","RPC"],"confidence":"high","evidence":"lgDevDownloadForceEffect diagnostics and wrapper call edges."},
-    {"va":"0x00167888","name":"lgDevDestroyForceEffect","tags":["PS2","FFB","RPC"],"confidence":"high","evidence":"lgDevDestroyForceEffect diagnostic string and wrapper call edge."},
-    {"va":"0x00167AB8","name":"lgDevAUpdateForceEffect","tags":["PS2","FFB","RPC","ASYNC"],"confidence":"high","evidence":"lgDevAUpdateForceEffect diagnostics and wrapper call edges."},
-    {"va":"0x00167C08","name":"lgDevAStartForceEffect","tags":["PS2","FFB","RPC","ASYNC"],"confidence":"high","evidence":"lgDevAStartForceEffect diagnostic and wrapper call edge."},
-    {"va":"0x00167CA0","name":"lgDevAStopForceEffect","tags":["PS2","FFB","RPC","ASYNC"],"confidence":"high","evidence":"lgDevAStopForceEffect diagnostic and wrapper call edge."}
+    {
+      "va": "0x00132488",
+      "name": "WheelSubsystem_ModuleInit",
+      "tags": [
+        "PS2",
+        "FFB",
+        "MODULE"
+      ],
+      "confidence": "high",
+      "evidence": "Direct XREF to literal LGDEV.IRX; direct call to wrapper init."
+    },
+    {
+      "va": "0x00132CB0",
+      "name": "WheelRuntime_DriveFactorStage1",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RUNTIME",
+        "SPEED"
+      ],
+      "confidence": "high",
+      "evidence": "Retail SLPM dataflow reads the car value corresponding to field_1C4, divides by 2.5 and clamps to 1 before the later /0.35 FFB normalization."
+    },
+    {
+      "va": "0x001330A0",
+      "name": "WheelRuntime_ConstantForceBuild",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RUNTIME",
+        "CONSTANT"
+      ],
+      "confidence": "high",
+      "evidence": "Retail SLPM combines two signed sources, selects direction 90/270 and scales/caps magnitude at 220/255; source-variable gameplay semantics remain unresolved."
+    },
+    {
+      "va": "0x001330F0",
+      "name": "WheelRuntime_SpringConditionUpdate",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RUNTIME",
+        "CONDITION",
+        "SPRING"
+      ],
+      "confidence": "high",
+      "evidence": "Retail Type-7 update uses symmetric coefficient 200 and saturation 15 + round(45*driveFactor), with zero offset/deadband."
+    },
+    {
+      "va": "0x00133138",
+      "name": "WheelRuntime_DamperConditionUpdate",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RUNTIME",
+        "CONDITION",
+        "DAMPER"
+      ],
+      "confidence": "high",
+      "evidence": "Retail Type-8 update uses symmetric coefficient round(10*(1-driveFactor)); builder confirms saturation 255 and zero offset/deadband."
+    },
+    {
+      "va": "0x00133328",
+      "name": "WheelRuntime_PeriodicBuild",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RUNTIME",
+        "PERIODIC"
+      ],
+      "confidence": "high",
+      "evidence": "Retail path requests Type 4 with direction 90, phase 0, offset 0 and raw period 100 + round(60*driveFactor); host milliseconds interpretation remains comparative/provisional."
+    },
+    {
+      "va": "0x001333D8",
+      "name": "EZWheelWrapper_Init",
+      "tags": [
+        "PS2",
+        "FFB",
+        "WHEEL"
+      ],
+      "confidence": "high",
+      "evidence": "Literal EZ Wheel Wrapper v4.01 is referenced by this function."
+    },
+    {
+      "va": "0x001354B0",
+      "name": "WheelWrapper_DownloadConditionForce",
+      "tags": [
+        "PS2",
+        "FFB",
+        "CONDITION"
+      ],
+      "confidence": "high",
+      "evidence": "Diagnostic string and direct call to 0x00167720 lgDevDownloadForceEffect."
+    },
+    {
+      "va": "0x00135640",
+      "name": "WheelWrapper_UpdateConditionForce",
+      "tags": [
+        "PS2",
+        "FFB",
+        "CONDITION"
+      ],
+      "confidence": "high",
+      "evidence": "Diagnostic string and direct call to 0x00167AB8 lgDevAUpdateForceEffect."
+    },
+    {
+      "va": "0x001357B8",
+      "name": "WheelWrapper_DownloadConstantForce",
+      "tags": [
+        "PS2",
+        "FFB",
+        "CONSTANT"
+      ],
+      "confidence": "high",
+      "evidence": "Diagnostic string and direct call to 0x00167720 lgDevDownloadForceEffect."
+    },
+    {
+      "va": "0x00135910",
+      "name": "WheelWrapper_UpdateConstantForce",
+      "tags": [
+        "PS2",
+        "FFB",
+        "CONSTANT"
+      ],
+      "confidence": "high",
+      "evidence": "Diagnostic string and direct call to 0x00167AB8 lgDevAUpdateForceEffect."
+    },
+    {
+      "va": "0x00135AA8",
+      "name": "WheelWrapper_StartForceEffect",
+      "tags": [
+        "PS2",
+        "FFB"
+      ],
+      "confidence": "high",
+      "evidence": "Diagnostic string and direct call to 0x00167C08 lgDevAStartForceEffect."
+    },
+    {
+      "va": "0x00135B60",
+      "name": "WheelWrapper_StopForceEffect",
+      "tags": [
+        "PS2",
+        "FFB"
+      ],
+      "confidence": "high",
+      "evidence": "Diagnostic string and direct call to 0x00167CA0 lgDevAStopForceEffect."
+    },
+    {
+      "va": "0x00135C18",
+      "name": "WheelWrapper_DestroyForceEffect",
+      "tags": [
+        "PS2",
+        "FFB"
+      ],
+      "confidence": "high",
+      "evidence": "Diagnostic string and direct call to 0x00167888 lgDevDestroyForceEffect."
+    },
+    {
+      "va": "0x00135CD8",
+      "name": "WheelWrapper_SetOverallForceGain",
+      "tags": [
+        "PS2",
+        "FFB",
+        "GAIN"
+      ],
+      "confidence": "high",
+      "evidence": "Diagnostic string and direct call to 0x00167670 lgDevSetDeviceProperty."
+    },
+    {
+      "va": "0x00135D40",
+      "name": "WheelWrapper_DownloadPeriodicForce",
+      "tags": [
+        "PS2",
+        "FFB",
+        "PERIODIC"
+      ],
+      "confidence": "high",
+      "evidence": "Diagnostic string and direct call to 0x00167720 lgDevDownloadForceEffect."
+    },
+    {
+      "va": "0x00135EB0",
+      "name": "WheelWrapper_UpdatePeriodicForce",
+      "tags": [
+        "PS2",
+        "FFB",
+        "PERIODIC"
+      ],
+      "confidence": "high",
+      "evidence": "Diagnostic string and direct call to 0x00167AB8 lgDevAUpdateForceEffect."
+    },
+    {
+      "va": "0x001362A0",
+      "name": "LogitechWheel_EnumerateOpen",
+      "tags": [
+        "PS2",
+        "FFB",
+        "USB",
+        "LOGITECH"
+      ],
+      "confidence": "high",
+      "evidence": "Found/opened Logitech USB device diagnostics; calls lgDevEnumerate/Open/SetDeviceProperty/Close."
+    },
+    {
+      "va": "0x00166F30",
+      "name": "lgDevInit",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RPC"
+      ],
+      "confidence": "high",
+      "evidence": "lgDevInit diagnostic strings."
+    },
+    {
+      "va": "0x00167670",
+      "name": "lgDevSetDeviceProperty",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RPC"
+      ],
+      "confidence": "high",
+      "evidence": "lgDevSetDeviceProperty diagnostic string."
+    },
+    {
+      "va": "0x00167720",
+      "name": "lgDevDownloadForceEffect",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RPC"
+      ],
+      "confidence": "high",
+      "evidence": "lgDevDownloadForceEffect diagnostics and wrapper call edges."
+    },
+    {
+      "va": "0x00167888",
+      "name": "lgDevDestroyForceEffect",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RPC"
+      ],
+      "confidence": "high",
+      "evidence": "lgDevDestroyForceEffect diagnostic string and wrapper call edge."
+    },
+    {
+      "va": "0x00167AB8",
+      "name": "lgDevAUpdateForceEffect",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RPC",
+        "ASYNC"
+      ],
+      "confidence": "high",
+      "evidence": "lgDevAUpdateForceEffect diagnostics and wrapper call edges."
+    },
+    {
+      "va": "0x00167C08",
+      "name": "lgDevAStartForceEffect",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RPC",
+        "ASYNC"
+      ],
+      "confidence": "high",
+      "evidence": "lgDevAStartForceEffect diagnostic and wrapper call edge."
+    },
+    {
+      "va": "0x00167CA0",
+      "name": "lgDevAStopForceEffect",
+      "tags": [
+        "PS2",
+        "FFB",
+        "RPC",
+        "ASYNC"
+      ],
+      "confidence": "high",
+      "evidence": "lgDevAStopForceEffect diagnostic and wrapper call edge."
+    }
   ],
   "unresolved": [
     {
