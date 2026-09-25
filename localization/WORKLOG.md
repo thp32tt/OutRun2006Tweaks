@@ -226,3 +226,11 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Current combined package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B11v2_QA_Test.zip`.
 - Combined package SHA-256: `4831a754df8ef85cab0e8bb0d898ae38d76779eb2bc69c13494248bf044d58b3`.
 - Remaining pending set is stored in `SOURCE_FAITHFUL_CURRENT.json`; future `이어서 작업해줘` requests must resume from it.
+
+
+## 2026-09-26 07:05 KST - AUTOMATION A QA CHECKPOINT
+
+- Resumed from ORIENTATION_POLICY.md and SOURCE_FAITHFUL_CURRENT.json before promotion decisions.
+- Later local B12-B15 experimental DDS outputs are not persisted in Git, so this run did not promote them without repeatable source-vs-result validation.
+- Canonical state remains 32 reviewed / 22 retained / 10 reset-to-original pending safe rework.
+- Added mandatory boundary gate: replacement Korean glyph pixels must remain inside the original text region or sprite cell; clipping, overlap, or spill into adjacent cells is a hard reject.
