@@ -179,3 +179,33 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Machine-readable report: `localization/graphics/BATCH3_SOURCEFAITHFUL_REPORT.json`.
 - Binary DDS assets remain outside Git; only hashes/state/report are committed.
 - In-game validation remains pending. Future artwork continues only after original-DDS orientation + preserve-vs-translate verification.
+
+
+## 2026-09-25 23:27 KST - BATCH4 SOURCE-FAITHFUL
+
+- Continued from `ORIENTATION_POLICY.md`; original raw DDS was checked before deciding each transform.
+- Added 5 source-faithful test entries:
+  - `43B07A77_512x64.dds`: mirror-X
+  - `2B0863D6_512x64.dds`: mirror-X
+  - `9CE4E175_256x32.dds`: mirror-X
+  - `1762489B_512x128.dds`: current localized draft already follows source raw layout
+  - `12519155_256x256.dds`: current localized draft already follows source raw layout
+- Package: `OutRun2_Korean_GFX_Batch4_SourceFaithful_Test.zip`
+- Package SHA-256: `cfddc6c758bfdc8313dd624bbe9211ce6d2221bd04985ee6856d449e66cffb95`
+- Report: `localization/graphics/BATCH4_SOURCEFAITHFUL_REPORT.json`.
+
+## 2026-09-25 23:35 KST - BATCH5 SOURCE-FAITHFUL
+
+- Continued original-DDS-first verification on SUMO/front-end assets.
+- Corrected to original raw mirror-X:
+  - `4EDA9DE3_512x256.dds`
+  - `ACF61D7C_1024x512.dds`
+- Reset three unsafe Korean drafts back to their original DDS instead of carrying forward broken artwork:
+  - `39BCA907_512x256.dds`
+  - `49BB5FE5_128x32.dds` (DXT5; compression-safe rewrite pending)
+  - `C05E67EF_128x64.dds`
+- Package: `OutRun2_Korean_GFX_Batch5_SourceFaithful_Test.zip`
+- Package SHA-256: `1d5de3dcc55caefba4e904e3d0030b6ae5fbd70f479546641add3d967cf3459f`
+- Report: `localization/graphics/BATCH5_SOURCEFAITHFUL_REPORT.json`.
+- Cumulative source-faithful review checkpoint: 20 assets reviewed since orientation reset; 17 localized candidates retained/rebuilt, 3 assets explicitly reset to original pending safe rework.
+- Resume rule remains: read `ORIENTATION_POLICY.md` and these batch reports before the next graphics edit.
