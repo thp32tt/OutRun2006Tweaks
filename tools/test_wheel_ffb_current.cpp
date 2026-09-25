@@ -44,6 +44,9 @@ int main() {
  require(std::abs(compose_arcade_directional_surface(.7f,-.7f,true)+.7f)<1e-6f,"arcade left transition overrides opposite sustained force");
  require(std::abs(compose_arcade_directional_surface(.4f,-.8f,false)-.4f)<1e-6f,"arcade sustained force remains when no transition is active");
  require(std::abs(arcade_speed_strength(.10f)-.10f)<1e-6f,"arcade first speed step");
+ require(std::abs(arcade_speed_strength(1.0f)-.90f)<1e-6f,"arcade 430.1..500 normalized band remains 90 percent");
+ require(std::abs(arcade_speed_strength(1.01f)-1.0f)<1e-6f,"arcade >500 normalized band reaches 100 percent");
+ require(std::abs(arcade_speed_strength(1.1197f)-1.0f)<1e-6f,"captured C2C top-speed headroom reaches Arcade 100 percent band");
  require(std::abs(arcade_speed_strength(.20f)-.20f)<1e-6f,"arcade second speed step");
  require(std::abs(arcade_speed_strength(.50f)-.50f)<1e-6f,"arcade mid speed step");
  require(std::abs(arcade_speed_strength(.90f)-.90f)<1e-6f,"arcade upper speed step");
