@@ -46,6 +46,8 @@ namespace OutRunVRStereo
         // R26-safe comparison owner: R26 remains the world/effect authority;
         // only R30 HUD, XYZRHW correction and stereo SkyGlow are layered above.
         std::uint64_t R30SafeTwoEyeDraws = 0;
+        std::atomic<std::uint64_t> R57ProjectedMarkerDeltaBuilds{ 0 };
+        std::atomic<bool> R57ProjectedMarkerFirstLogged{ false };
 
         void R30ArmSafeFallback(std::uint64_t = 2) noexcept
         {
@@ -1357,6 +1359,18 @@ namespace OutRunVRStereo
                     std::fabs(deltaX[eye]) > 2.0f ||
                     std::fabs(deltaY[eye]) > 2.0f)
                     return false;
+            }
+            const std::uint64_t builds =
+                R57ProjectedMarkerDeltaBuilds.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+            bool expected = false;
+            if (R57ProjectedMarkerFirstLogged.compare_exchange_strong(
+                    expected, true, std::memory_order_acq_rel))
+            {
+                spdlog::info(
+                    "VR R57 PROJECTED MARKER: mode={} view=({:.4f},{:.4f},{:.4f}) deltaL=({:.5f},{:.5f}) deltaR=({:.5f},{:.5f}) builds={}",
+                    R57Mode(), marker->viewX, marker->viewY, marker->viewZ,
+                    deltaX[0], deltaY[0], deltaX[1], deltaY[1], builds);
             }
             return true;
         }
