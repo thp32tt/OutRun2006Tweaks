@@ -8,9 +8,9 @@
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
     "read ORIENTATION_POLICY.md and SOURCE_FAITHFUL_CURRENT.json before editing",
-    "continue the final pending asset 37759842_1024x1024.dds from original DDS only",
-    "do not promote 37759842 until blue/black card reconstruction contains no restored source English fragments",
-    "preserve vehicle/model names, song titles, logos and non-text card artwork",
+    "only 37759842_1024x1024.dds remains pending",
+    "do not promote a 37759842 candidate if any source English remains in blue/black cards even when containment passes",
+    "preserve vehicle/model names, logos, icons and card gradients",
     "in-game validate the 31 retained source-faithful candidates"
   ],
   "prototype_history": {
@@ -69,7 +69,8 @@
     "batch25v4_report": "localization/graphics/BATCH25V4_ACF_REWORK_REPORT.json",
     "latest_safe_rework_note": "2026-09-26 08:11 KST: only 37759842 and C598919A remain pending; do not regenerate without original DDS plus candidate bytes. 37759842 requires gradient/icon-preserving cleanup; C598919A requires larger per-label DXT5 block extents. Unsafe edits stay original.",
     "batch33_rejected_report": "localization/graphics/BATCH33_REJECTED_REPORT.json",
-    "batch38_report": "localization/graphics/BATCH38_C598_REWORK_REPORT.json"
+    "batch38_report": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
+    "batch41_rejected_report": "localization/graphics/BATCH41_REJECTED_REPORT.json"
   },
   "runtime_packages": {
     "k1": {
