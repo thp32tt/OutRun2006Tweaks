@@ -60,8 +60,46 @@ namespace OutRunVrR32DirectSubmit
     };
 
     inline std::array<PendingAck, OutRunVR::RenderFrameRingSize> Pending{};
+
+    struct AckIdentity
+    {
+        std::uint32_t clientPid = 0;
+        std::uint32_t runGeneration = 0;
+        std::uint32_t transportGeneration = 0;
+    };
+
+    inline AckIdentity FrameAckIdentity(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        return {
+            frame.clientPid,
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex],
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex]
+        };
+    }
+
+    inline bool SameAckIdentity(
+        const AckIdentity& a, const AckIdentity& b) noexcept
+    {
+        return a.clientPid != 0 &&
+            a.runGeneration != 0 &&
+            a.transportGeneration != 0 &&
+            a.clientPid == b.clientPid &&
+            a.runGeneration == b.runGeneration &&
+            a.transportGeneration == b.transportGeneration;
+    }
+
+    inline bool SameFrameAckIdentity(
+        const OutRunVR::SharedRenderFrameState& a,
+        const OutRunVR::SharedRenderFrameState& b) noexcept
+    {
+        return a.frameId != 0 &&
+            a.frameId == b.frameId &&
+            SameAckIdentity(FrameAckIdentity(a), FrameAckIdentity(b));
+    }
+
     inline std::array<std::uint32_t, OutRunVR::RenderFrameRingSize> AckedFrame{};
-    inline std::array<std::uint32_t, OutRunVR::RenderFrameRingSize> AckedGeneration{};
+    inline std::array<AckIdentity, OutRunVR::RenderFrameRingSize> AckedIdentity{};
     inline std::uint64_t FastDirectSubmits = 0;
     inline std::uint64_t FastDirectRejects = 0;
     inline std::uint64_t AckArmed = 0;
@@ -73,8 +111,8 @@ namespace OutRunVrR32DirectSubmit
     inline std::uint64_t AckSameFramePendingReuse = 0;
     inline std::array<std::uint64_t,
         static_cast<std::size_t>(FastRejectReason::Count)> RejectReasons{};
-    inline std::uint32_t AckFaultGeneration = 0;
-    inline std::uint32_t ActiveAckGeneration = 0;
+    inline AckIdentity AckFaultIdentity{};
+    inline AckIdentity ActiveAckIdentity{};
     inline ULONGLONG LastPerfLogMs = 0;
     inline bool FirstFastSubmitLogged = false;
     inline bool FirstAsyncAckLogged = false;
@@ -114,20 +152,32 @@ namespace OutRunVrR32DirectSubmit
             pending.frame = {};
         }
         AckedFrame.fill(0);
-        AckedGeneration.fill(0);
-        AckFaultGeneration = 0;
-        ActiveAckGeneration = 0;
+        AckedIdentity.fill({});
+        AckFaultIdentity = {};
+        ActiveAckIdentity = {};
         AckSameFramePendingReuse = 0;
         RejectReasons.fill(0);
     }
 
-    inline void ObserveGeneration(std::uint32_t generation) noexcept
+    inline void ObserveIdentity(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
     {
-        if (!generation || ActiveAckGeneration == generation)
+        const AckIdentity identity = FrameAckIdentity(frame);
+        if (!identity.clientPid || !identity.runGeneration ||
+            !identity.transportGeneration)
             return;
-        ActiveAckGeneration = generation;
+        if (SameAckIdentity(ActiveAckIdentity, identity))
+            return;
+
+        ActiveAckIdentity = identity;
         AckedFrame.fill(0);
-        AckedGeneration.fill(0);
+        AckedIdentity.fill({});
+
+        // A D3D11 query failure quarantines only the exact producer run that
+        // owned the failed query. A fast game restart with a colliding transport
+        // generation must not inherit the old run's quarantine.
+        if (!SameAckIdentity(AckFaultIdentity, identity))
+            AckFaultIdentity = {};
     }
 
     inline bool EnsureFence(std::uint32_t slot) noexcept
@@ -160,11 +210,11 @@ namespace OutRunVrR32DirectSubmit
                 // Completion is unknowable, so never ACK this producer frame.
                 // Disable fast-submit for its transport generation and let the
                 // SafeEye fallback perform a separately fenced copy/ACK.
-                const std::uint32_t generation =
-                    pending.frame.reserved[
-                        OutRunVR::RenderFrameDirectGenerationIndex];
-                if (generation)
-                    AckFaultGeneration = generation;
+                const AckIdentity identity =
+                    FrameAckIdentity(pending.frame);
+                if (identity.clientPid && identity.runGeneration &&
+                    identity.transportGeneration)
+                    AckFaultIdentity = identity;
                 ++AckQueryErrors;
                 pending.armed = false;
                 pending.flushIssued = false;
@@ -173,11 +223,10 @@ namespace OutRunVrR32DirectSubmit
                 pending.fence = nullptr;
                 continue;
             }
-            const std::uint32_t completedGeneration =
-                pending.frame.reserved[
-                    OutRunVR::RenderFrameDirectGenerationIndex];
-            if (ActiveAckGeneration != 0 &&
-                completedGeneration != ActiveAckGeneration)
+            const AckIdentity completedIdentity =
+                FrameAckIdentity(pending.frame);
+            if (ActiveAckIdentity.clientPid != 0 &&
+                !SameAckIdentity(completedIdentity, ActiveAckIdentity))
             {
                 // Late completion from a superseded shared-eye generation is
                 // safe to forget, but must never roll the global ACK generation
@@ -213,7 +262,7 @@ namespace OutRunVrR32DirectSubmit
             if (slot < AckedFrame.size())
             {
                 AckedFrame[slot] = pending.frame.frameId;
-                AckedGeneration[slot] = generation;
+                AckedIdentity[slot] = FrameAckIdentity(pending.frame);
             }
             pending.armed = false;
             pending.flushIssued = false;
@@ -240,20 +289,20 @@ namespace OutRunVrR32DirectSubmit
         if (slot >= Pending.size() || !generation || !EnsureFence(slot))
             return false;
 
-        if (AckedGeneration[slot] == generation &&
-            AckedFrame[slot] == frame.frameId)
+        const AckIdentity identity = FrameAckIdentity(frame);
+        if (AckedFrame[slot] == frame.frameId &&
+            SameAckIdentity(AckedIdentity[slot], identity))
             return true;
-        if (AckedGeneration[slot] != 0 && AckedGeneration[slot] != generation)
+        if (AckedIdentity[slot].clientPid != 0 &&
+            !SameAckIdentity(AckedIdentity[slot], identity))
         {
-            AckedGeneration[slot] = 0;
+            AckedIdentity[slot] = {};
             AckedFrame[slot] = 0;
         }
 
         auto& pending = Pending[slot];
         if (pending.armed &&
-            pending.frame.frameId == frame.frameId &&
-            pending.frame.reserved[
-                OutRunVR::RenderFrameDirectGenerationIndex] == generation)
+            SameFrameAckIdentity(pending.frame, frame))
         {
             // R42: xrWaitFrame can submit the same already-rendered projection
             // more than once before the first EVENT is observed complete. The
@@ -286,8 +335,8 @@ namespace OutRunVrR32DirectSubmit
             }
         }
 
-        if (AckedGeneration[slot] == generation &&
-            AckedFrame[slot] == frame.frameId)
+        if (AckedFrame[slot] == frame.frameId &&
+            SameAckIdentity(AckedIdentity[slot], identity))
             return true;
 
         OutRunVrFinalTest::Context->End(pending.fence);
@@ -350,9 +399,8 @@ namespace OutRunVrR32DirectSubmit
         if (!OutRunVrR21RuntimeHardening::DirectTransportRequested())
         { reject = FastRejectReason::TransportDisabled; return false; }
 
-        const std::uint32_t generation =
-            verified.frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-        if (generation != 0 && AckFaultGeneration == generation)
+        const AckIdentity identity = FrameAckIdentity(verified.frame);
+        if (SameAckIdentity(AckFaultIdentity, identity))
         { reject = FastRejectReason::GenerationFault; return false; }
 
         // main_r23 has already staged this exact immutable slot and rendered the
@@ -446,7 +494,7 @@ namespace OutRunVrR32DirectSubmit
                 OutRunVrR23VerifiedBundle::SourceKind::DirectGpu &&
             MetadataValid(observed.frame))
         {
-            ObserveGeneration(observed.frame.reserved[
+            ObserveIdentity(observed.frame.reserved[
                 OutRunVR::RenderFrameDirectGenerationIndex]);
         }
         PollCompletedAcks();
