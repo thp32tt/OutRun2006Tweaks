@@ -827,7 +827,8 @@ namespace
                 {
                     roadAmp = std::max(
                         roadAmp, arcadeSpeedStrength * roadSetting * outputStrength);
-                    roadFreq = 70.0f;
+                    roadFreq = WheelFFBMath::frequency_hz_from_period_ms(
+                        WheelFFBMath::ArcadeRoadSinePeriodMs);
                     arcadeSurfaceCode = 0x02;
                 }
                 else if (leftArcadeRough != rightArcadeRough)
