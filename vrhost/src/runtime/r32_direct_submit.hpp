@@ -494,8 +494,7 @@ namespace OutRunVrR32DirectSubmit
                 OutRunVrR23VerifiedBundle::SourceKind::DirectGpu &&
             MetadataValid(observed.frame))
         {
-            ObserveIdentity(observed.frame.reserved[
-                OutRunVR::RenderFrameDirectGenerationIndex]);
+            ObserveIdentity(observed.frame);
         }
         PollCompletedAcks();
 
