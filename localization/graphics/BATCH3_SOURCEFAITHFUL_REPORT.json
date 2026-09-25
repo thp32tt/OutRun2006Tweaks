@@ -1,0 +1,63 @@
+{
+  "batch": "3-source-faithful",
+  "created_kst": "2026-09-25 22:58",
+  "policy_file": "localization/graphics/ORIENTATION_POLICY.md",
+  "package": "OutRun2_Korean_GFX_Batch3_SourceFaithful_Test.zip",
+  "package_sha256": "02d848b9746cb474d52d500cc849294fe55baca0e1bbe618f5faa39ee3b1c69c",
+  "binary_assets_committed": false,
+  "validation": "pending in-game",
+  "assets": [
+    {
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
+      "sha256": "81653d92ca2696cda4ce2f809c2e7b0e3d47a5a26e1f69667c543772e108c588",
+      "raw_transform": "mirror-Y",
+      "note": "vehicle/model cards + names preserved; only No Handicap localized"
+    },
+    {
+      "path": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+      "sha256": "ace4041be53e5c2d987ffee37e49da4cf000fae5693335159a012e7b7fb47324",
+      "raw_transform": "mirror-Y per localized text element",
+      "note": "Left/Right/Diverge/Loading localized; logos/non-text artwork preserved"
+    },
+    {
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+      "sha256": "8eb4e0aa4170ed7910a1ebada45328c66b9588efa6c4c5ed393c1f270852a812",
+      "raw_transform": "mirror-Y"
+    },
+    {
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+      "sha256": "6abc8b451608ff59475a25f8d6999e1bab8246ad62c6d9c98bb0dfbd3efd2d5f",
+      "raw_transform": "mirror-Y"
+    },
+    {
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+      "sha256": "bac51e3d05bc638db19a3e86456fa92e81f57e2b649258719dcf93a92aa16d61",
+      "raw_transform": "mirror-Y"
+    },
+    {
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+      "sha256": "65d2f026e353f1b35f1c5af727d655bb62752ab6343d63450b762ad59c677131",
+      "raw_transform": "mirror-Y"
+    },
+    {
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds",
+      "sha256": "06acbaf643c72d367555f5b5199fdb6294c00eb5371da0378f1c403ceb81a4b1",
+      "raw_transform": "mirror-Y"
+    },
+    {
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+      "sha256": "7a7b5279cd45fc5fa017ac0ee9357a738b5c98a506bbcbd7bb917ca6783e6120",
+      "raw_transform": "mirror-Y"
+    },
+    {
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+      "sha256": "c33cdd91da3ec819e9f4683a55c50f9cd2042bdd8694e0dcbd895172bcf9f986",
+      "raw_transform": "mirror-Y"
+    },
+    {
+      "path": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+      "sha256": "56b2371251f2e254f099ba7a1219087759baeb301ee3eb61b7f1eaa7dccde18b",
+      "raw_transform": "mirror-Y"
+    }
+  ]
+}
