@@ -1,0 +1,14 @@
+{
+  "batch": "18-2DA43E41-rework",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+  "status": "rejected_keep_original",
+  "manual_qa": {
+    "pass": false,
+    "reasons": [
+      "Residual English fragments remain in both 15-course selection messages.",
+      "Waiting-player text still contains English fragments.",
+      "Single Play / Special Course areas retain source English around the Korean replacement."
+    ]
+  },
+  "action": "Keep original DDS; retry with larger per-string clear masks while preserving map/character art."
+}
