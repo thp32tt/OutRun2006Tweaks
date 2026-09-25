@@ -1,5 +1,5 @@
 {
-  "schema_version": 12,
+  "schema_version": 13,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,14 +7,14 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "read localization/graphics/ORIENTATION_POLICY.md before every graphics edit",
-    "continue source-faithful review from original raw DDS; do not infer transforms from prior Korean drafts",
-    "preserve vehicle/model/brand/logo/song/legal text unless explicitly approved for localization",
-    "rework pending unsafe assets, including 49BB5FE5_128x32.dds through a DXT5-safe path and C05E67EF_128x64.dds",
-    "in-game validate source-faithful Batch3/4/5 candidates",
+    "read localization/graphics/ORIENTATION_POLICY.md and SOURCE_FAITHFUL_CURRENT.json before every graphics edit",
+    "continue the 10 pending source-faithful reworks from the original raw DDS",
+    "preserve vehicle/model/brand/logo/song/legal artwork and original per-element orientation",
+    "match original typography/color/outline/shadow/proportions and reject stray black lines/crop seams/residue",
+    "solve DXT5-safe rewrite path for 49BB5FE5, 42E618FD, 7CE1CFC5 and C598919A",
+    "in-game validate the 22 retained source-faithful candidates",
     "collect K1/K2/K3 runtime logs",
-    "resolve text IDs 96,97,279,280 using actual mode-screen context",
-    "continue K3 Hangul glyph/width proof"
+    "resolve text IDs 96,97,279,280 using actual mode-screen context"
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -38,16 +38,32 @@
     "final_artwork_completed": 0,
     "full_draft_package_sha256": "5512dad798a4ddb4872e4aa3e69438537f75f488f439317d7b95c0eb372b6c78",
     "source_faithful_policy": "localization/graphics/ORIENTATION_POLICY.md",
-    "source_faithful_reviewed_assets": 20,
-    "source_faithful_localized_candidates": 17,
-    "source_faithful_reset_to_original": 3,
+    "source_faithful_reviewed_assets": 32,
+    "source_faithful_localized_candidates": 22,
+    "source_faithful_reset_to_original": 10,
     "batch3_report": "localization/graphics/BATCH3_SOURCEFAITHFUL_REPORT.json",
     "batch4_report": "localization/graphics/BATCH4_SOURCEFAITHFUL_REPORT.json",
     "batch5_report": "localization/graphics/BATCH5_SOURCEFAITHFUL_REPORT.json",
     "batch3_package_sha256": "02d848b9746cb474d52d500cc849294fe55baca0e1bbe618f5faa39ee3b1c69c",
     "batch4_package_sha256": "cfddc6c758bfdc8313dd624bbe9211ce6d2221bd04985ee6856d449e66cffb95",
     "batch5_package_sha256": "1d5de3dcc55caefba4e904e3d0030b6ae5fbd70f479546641add3d967cf3459f",
-    "pending_dxt5_asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds"
+    "pending_dxt5_asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+    "current_state_file": "localization/graphics/SOURCE_FAITHFUL_CURRENT.json",
+    "batch6_report": "localization/graphics/BATCH6_SOURCEFAITHFUL_REPORT.json",
+    "batch7_report": "localization/graphics/BATCH7_STYLE_ARTIFACT_QA_REPORT.json",
+    "batch8fix_report": "localization/graphics/BATCH8FIX_REWORK_REPORT.json",
+    "batch9_report": "localization/graphics/BATCH9_REWORK_REPORT.json",
+    "batch10v2_report": "localization/graphics/BATCH10V2_REWORK_REPORT.json",
+    "batch11v2_report": "localization/graphics/BATCH11V2_REWORK_REPORT.json",
+    "current_combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B11v2_QA_Test.zip",
+    "current_combined_package_sha256": "4831a754df8ef85cab0e8bb0d898ae38d76779eb2bc69c13494248bf044d58b3",
+    "pending_dxt5_assets": [
+      "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+      "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+      "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+      "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+      "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds"
+    ]
   },
   "runtime_packages": {
     "k1": {
