@@ -50,8 +50,9 @@ A cycle is counted only after its assigned source/concern has been inspected and
 | C0036 | Arcade Original Spring/Damper reference baseline | COMPLETE | `FFB-R0036-F01`: shortcut inherited Modern spring/damper values; now restores OutRun2Real SpringStrength=50 -> coeff .50/sat 1.00 and EnableDamper=0 | upstream OutRun2Real INI + TriggerSpringEffectInfinite + UI/verifier/docs |
 | C0037 | Cross-model crash event lifetime vs debounce | COMPLETE | `FFB-R0037-F01`: common 10-tick structural blank outlived the 5-tick Arcade event and also affected PS2 software fallback; suppression is now model/event-window aware | core model interaction review + verifier/docs |
 | C0038 | Arcade speed-strength final band / Modern speed-normalization separation | COMPLETE | `FFB-R0038-F01`: Arcade mapper had a >1.0/100% step but caller fed Modern-clamped 0..1 speed; separate 0..1.25 Arcade speed now preserves captured C2C headroom | OutRun2Real staircase + hardware telemetry max speedRaw~2.2394 + source/tests/verifier/docs |
+| C0039 | Arcade shortcut source-amplitude host scalers | COMPLETE | `FFB-R0039-F01`: Road Detail/Collision inherited Modern attenuation although Arcade source uses SpeedStrength directly; both Arcade shortcuts now restore Road=1.00 / Collision=1.00 before Overall Strength | runtime scaler ownership + F11 shortcut/verifier/docs |
 
-Completed cycles: **38 / 1000**
+Completed cycles: **39 / 1000**
 
 ## Findings
 
@@ -72,6 +73,7 @@ Completed cycles: **38 / 1000**
 - `FFB-R0036-F01`: made Arcade Original shortcut restore the OutRun2Real 50% Spring / no-Damper reference condition baseline instead of inheriting Modern values.
 - `FFB-R0037-F01`: separated active impact-event suppression from the longer crash debounce so Hybrid/Original steering no longer stays blank after the event ends.
 - `FFB-R0038-F01`: separated Arcade speed normalization from Modern's 0..1 clamp so the Lindbergh-derived 100% top-speed step is reachable.
+- `FFB-R0039-F01`: made both Arcade shortcuts restore Road/Collision host scalers to 1.00 so the reconstructed SpeedStrength source is not silently attenuated by inherited Modern tuning.
 - C0002..C0010 and C0014..C0020: no new non-duplicate finding after source/evidence review.
 
 ## PS2 evidence discipline
@@ -83,4 +85,4 @@ Completed cycles: **38 / 1000**
 
 ## Next review
 
-Resume at **C0039** with Modern DD SAT/road/periodic/fallback safety and Arcade Hybrid interaction review, then exact-head CI.
+Resume at **C0040** with Modern DD SAT/road/periodic/fallback safety and Arcade Hybrid interaction review, then exact-head CI.
