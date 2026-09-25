@@ -51,8 +51,9 @@ A cycle is counted only after its assigned source/concern has been inspected and
 | C0037 | Cross-model crash event lifetime vs debounce | COMPLETE | `FFB-R0037-F01`: common 10-tick structural blank outlived the 5-tick Arcade event and also affected PS2 software fallback; suppression is now model/event-window aware | core model interaction review + verifier/docs |
 | C0038 | Arcade speed-strength final band / Modern speed-normalization separation | COMPLETE | `FFB-R0038-F01`: Arcade mapper had a >1.0/100% step but caller fed Modern-clamped 0..1 speed; separate 0..1.25 Arcade speed now preserves captured C2C headroom | OutRun2Real staircase + hardware telemetry max speedRaw~2.2394 + source/tests/verifier/docs |
 | C0039 | Arcade shortcut source-amplitude host scalers | COMPLETE | `FFB-R0039-F01`: Road Detail/Collision inherited Modern attenuation although Arcade source uses SpeedStrength directly; both Arcade shortcuts now restore Road=1.00 / Collision=1.00 before Overall Strength | runtime scaler ownership + F11 shortcut/verifier/docs |
+| C0040 | Modern DD + Arcade Hybrid structural/SAT/road/output/safety interaction | COMPLETE | No new non-duplicate defect; Modern/Hybrid structural ownership, Original isolation, model-specific periodics/fallback, gain application, headroom and transition safety remain consistent after C0030-C0039 | current-tree source/verifier/model-boundary review |
 
-Completed cycles: **39 / 1000**
+Completed cycles: **40 / 1000**
 
 ## Findings
 
@@ -85,4 +86,4 @@ Completed cycles: **39 / 1000**
 
 ## Next review
 
-Resume at **C0040** with Modern DD SAT/road/periodic/fallback safety and Arcade Hybrid interaction review, then exact-head CI.
+Resume at **C0041** with runtime hardware validation or new external evidence. Static cross-model review is now current through C0040; run exact-head CI before packaging.
