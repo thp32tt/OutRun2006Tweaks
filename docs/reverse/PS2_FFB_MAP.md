@@ -154,6 +154,12 @@ Periodic COM objects are waveform-specific. On FFB model/profile transitions the
 
 This prevents a Modern/Arcade Sine from surviving into PS2 and removes the false requirement that original modes support the unused Modern tire-slip effect.
 
+### Reproducible compact semantic map
+
+The compact reverse-map builder now imports the curated retail evidence records from `reverse/ps2/semantics.json` into its SQLite `semantics` table. This includes the recovered runtime construction sites at `0x00132CB0`, `0x001330A0`, `0x001330F0`, `0x00133138`, and `0x00133328`. These records persist already-established instruction/dataflow evidence; they do not upgrade unresolved gameplay-event semantics.
+
+`ps2query.py` is schema-aware: a compact regenerated map works without the richer one-off `string_xrefs` table, while enriched maps can expose those XREFs when present. CI executes a minimal SQLite regression test for this contract.
+
 ### Remaining PS2 reverse targets
 
 Still unresolved and therefore **not** represented as retail-original tuning:
