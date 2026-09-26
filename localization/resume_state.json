@@ -7,11 +7,11 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "read ORIENTATION_POLICY.md and SOURCE_FAITHFUL_CURRENT.json before editing",
-    "only 37759842_1024x1024.dds remains pending",
-    "do not promote any candidate that degrades the blue/black card icons even if containment is perfect",
-    "next attempt should build exact per-card templates or exact icon masks from original DDS",
-    "in-game validate the 31 retained source-faithful candidates"
+    "read ORIENTATION_POLICY.md, SOURCE_FAITHFUL_CURRENT.json, and BATCH53_FULL32_STRICT_RESET_REPORT.json before editing",
+    "treat 24 assets as REWORK_REQUIRED and 8 assets as ZOOM_MANUAL_REQUIRED; no previous retained asset is grandfathered as strict PASS",
+    "build exact per-text-cell masks/bounds before repainting; enforce overlay-box overflow=0, no residual English/seams, and non-text changed pixels=0",
+    "rework user-rejected 841E796B, EBEF6D20, 571E78F3, 62BEBF33, E3FD08BE first, then remaining high-risk assets",
+    "after the 32-package strict reset, extend identical QA to FULL_DRAFT 79 and the complete 243-DDS policy inventory"
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -65,7 +65,7 @@
     "batch23_rejected_report": "localization/graphics/BATCH23_REJECTED_REPORT.json",
     "batch24v2_report": "localization/graphics/BATCH24V2_2DA_REWORK_REPORT.json",
     "batch25v4_report": "localization/graphics/BATCH25V4_ACF_REWORK_REPORT.json",
-    "latest_safe_rework_note": "2026-09-26 11:15 KST: Batch53 fallback reconciliation metadata synced. Canonical remains 32 reviewed / 31 retained / 1 pending; 37759842 stays original-safe until exact-source per-card template/icon-mask reconstruction passes all gates.",
+    "latest_safe_rework_note": "2026-09-26 13:00 KST: full32 strict reset is active; 24 REWORK_REQUIRED / 8 ZOOM_MANUAL_REQUIRED / 0 strict PASS. Do not resume the old 'only 37759842 pending' assumption.",
     "batch33_rejected_report": "localization/graphics/BATCH33_REJECTED_REPORT.json",
     "batch38_report": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
     "batch41_rejected_report": "localization/graphics/BATCH41_REJECTED_REPORT.json",
@@ -76,7 +76,17 @@
     "batch44_candidate_sha256": "65d919ce4f15408f873a800dfcf73e0638f6902cbde9ad50a2e1c99c18d00aad",
     "batch51_rejected_report": "localization/graphics/BATCH51_REJECTED_REPORT.json",
     "batch52_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
-    "batch53_fallback_reconcile_report": "localization/graphics/BATCH53_FALLBACK_RECONCILE_REPORT.json"
+    "batch53_fallback_reconcile_report": "localization/graphics/BATCH53_FALLBACK_RECONCILE_REPORT.json",
+    "strict_qa_reset": {
+      "updated_at_kst": "2026-09-26T13:00:28+09:00",
+      "report": "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json",
+      "package_assets_scanned": 32,
+      "rework_required": 24,
+      "zoom_manual_required": 8,
+      "strict_pass": 0,
+      "promotion_hold": true,
+      "note": "Existing source_faithful_localized_candidates count remains historical package-candidate metadata, not strict approval."
+    }
   },
   "runtime_packages": {
     "k1": {
