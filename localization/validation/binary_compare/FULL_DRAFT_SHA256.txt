@@ -1,0 +1,1 @@
+5512dad798a4ddb4872e4aa3e69438537f75f488f439317d7b95c0eb372b6c78  localization/validation/binary_compare/OutRun2_Korean_GFX_FULL_DRAFT_Test.zip
