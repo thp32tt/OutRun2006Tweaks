@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "run": "batch56-full32-exact-original-risk-audit-20260926",
+  "timestamp_kst": "2026-09-26T14:45:00+09:00",
+  "source_archive_sha256": "56082ef73dac45f2798fceef2dc608ca29eb226afe6cf62be6f3e75db75b6d6e",
+  "candidate_package_sha256": "7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02",
+  "package_assets_compared": 32,
+  "changed_assets": 31,
+  "byte_identical_original_safe": 1,
+  "header_mismatch": 0,
+  "strict_pass": 0,
+  "findings": [
+    {
+      "asset": "C598919A_1024x1024.dds",
+      "changed_pixels": 2555543,
+      "introduced_alpha": 273175,
+      "lost_alpha": 945973,
+      "status": "REWORK_REQUIRED"
+    },
+    {
+      "asset": "39BCA907_512x256.dds",
+      "changed_pixels": 1334758,
+      "introduced_alpha": 78258,
+      "lost_alpha": 272683,
+      "status": "REWORK_REQUIRED"
+    },
+    {
+      "asset": "D41D0B1_512x64.dds",
+      "changed_pixels": 478014,
+      "introduced_alpha": 12802,
+      "lost_alpha": 127283,
+      "status": "REWORK_REQUIRED"
+    },
+    {
+      "asset": "4F68708E_512x64.dds",
+      "changed_pixels": 476272,
+      "introduced_alpha": 19561,
+      "lost_alpha": 125097,
+      "status": "REWORK_REQUIRED"
+    },
+    {
+      "asset": "7CE1CFC5_512x128.dds",
+      "changed_pixels": 433658,
+      "introduced_alpha": 66909,
+      "lost_alpha": 138742,
+      "status": "REWORK_REQUIRED"
+    },
+    {
+      "asset": "4EDA9DE3_512x256.dds",
+      "changed_pixels": 366741,
+      "introduced_alpha": 85795,
+      "lost_alpha": 216144,
+      "status": "REWORK_REQUIRED"
+    }
+  ],
+  "note": "Exact original archive was recovered from persistent Library. Global pixel audit is a risk filter, not per-cell strict PASS. All historical retained/promoted approvals remain on promotion hold until per-cell mask/text-exactness plus raw/readable 1x/2x visual QA passes. User-rejected five remain USER_REJECTED_NEEDS_REWORK; do not re-promote."
+}
