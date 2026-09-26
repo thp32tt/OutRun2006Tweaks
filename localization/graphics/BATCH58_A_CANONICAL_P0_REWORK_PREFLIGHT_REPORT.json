@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "run": "batch58-a-canonical-p0-rework-preflight-20260926",
+  "timestamp_kst": "2026-09-26T16:00:00+09:00",
+  "branch": "korean-localization-clean",
+  "input_reports": [
+    "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json",
+    "localization/graphics/BATCH54_FULL32_STRICT_REWORK_QUEUE_REPORT.json",
+    "localization/graphics/BATCH57_D_CANONICAL_SOURCE_P0_STRICT_REPORT.json"
+  ],
+  "canonical_source": {
+    "archive": "outrun_korean_analysis.tar.gz",
+    "sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+    "dds_inventory": 243,
+    "status": "RECOVERED_BY_BATCH57"
+  },
+  "correction": {
+    "prior_assumption": "exact original archive unavailable",
+    "status": "SUPERSEDED",
+    "reason": "Batch57 recovered and verified the canonical archive identity."
+  },
+  "strict_state": {
+    "rework_required": 24,
+    "zoom_manual_required": 8,
+    "strict_pass": 0,
+    "promotion_hold": true
+  },
+  "p0_order": [
+    "841E796B",
+    "EBEF6D20",
+    "571E78F3",
+    "62BEBF33",
+    "E3FD08BE"
+  ],
+  "hard_gates": [
+    "inspect exact original DDS before editing",
+    "preserve vehicle/model/brand/logo/song/legal artwork",
+    "match per-element raw DDS transform",
+    "source-like style/weight/color/outline/proportion",
+    "replacement pixels contained in original text cell/mask",
+    "outside-mask and non-text changed pixels = 0",
+    "no black lines/crop seams/residual English/erasure residue/alpha halos/clipping",
+    "format/header/mip/alpha contract match",
+    "raw + readable 1x/2x manual QA"
+  ],
+  "decision": "READY_FOR_ORIGINAL_ONLY_P0_REWORK_NO_PROMOTION",
+  "note": "This run corrects the stale source-unavailable checkpoint. No pixel candidate is promoted by this preflight; each P0 asset still requires original-only reconstruction and all strict gates."
+}
