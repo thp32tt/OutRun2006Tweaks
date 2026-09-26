@@ -2100,19 +2100,36 @@ namespace OutRunVRStereo
             return true;
         }
 
-        UINT R30PrimitiveElementCount(
-            D3DPRIMITIVETYPE type, UINT primitiveCount) noexcept
+        bool R30PrimitiveElementCount(
+            D3DPRIMITIVETYPE type, UINT primitiveCount,
+            UINT hardLimit, UINT& out) noexcept
         {
+            std::uint64_t count = 0;
             switch (type)
             {
-            case D3DPT_POINTLIST: return primitiveCount;
-            case D3DPT_LINELIST: return primitiveCount * 2u;
-            case D3DPT_LINESTRIP: return primitiveCount + 1u;
-            case D3DPT_TRIANGLELIST: return primitiveCount * 3u;
+            case D3DPT_POINTLIST:
+                count = primitiveCount;
+                break;
+            case D3DPT_LINELIST:
+                count = static_cast<std::uint64_t>(primitiveCount) * 2u;
+                break;
+            case D3DPT_LINESTRIP:
+                count = static_cast<std::uint64_t>(primitiveCount) + 1u;
+                break;
+            case D3DPT_TRIANGLELIST:
+                count = static_cast<std::uint64_t>(primitiveCount) * 3u;
+                break;
             case D3DPT_TRIANGLESTRIP:
-            case D3DPT_TRIANGLEFAN: return primitiveCount + 2u;
-            default: return 0;
+            case D3DPT_TRIANGLEFAN:
+                count = static_cast<std::uint64_t>(primitiveCount) + 2u;
+                break;
+            default:
+                return false;
             }
+            if (count == 0 || count > hardLimit || count > UINT_MAX)
+                return false;
+            out = static_cast<UINT>(count);
+            return true;
         }
 
         bool R30TransformXyzrhwVertices(
@@ -2631,9 +2648,9 @@ namespace OutRunVRStereo
             R30XyzrhwState state{};
             if (!R30PrepareXyzrhwState(device, state))
                 return E_NOTIMPL;
-            const UINT vertexCount =
-                R30PrimitiveElementCount(type, primitiveCount);
-            if (!vertexCount || vertexCount > 262144u)
+            UINT vertexCount = 0;
+            if (!R30PrimitiveElementCount(
+                    type, primitiveCount, 262144u, vertexCount))
                 return E_NOTIMPL;
             if (!R30ConfigureXyzrhwWorldEffect(
                     device, data, vertexCount, stride, state))
@@ -2679,9 +2696,10 @@ namespace OutRunVRStereo
             if (!R30PrepareXyzrhwState(device, state))
                 return E_NOTIMPL;
 
-            const UINT indexCount =
-                R30PrimitiveElementCount(type, primitiveCount);
-            if (!indexData || !vertexData || indexCount == 0 ||
+            UINT indexCount = 0;
+            if (!indexData || !vertexData ||
+                !R30PrimitiveElementCount(
+                    type, primitiveCount, 524288u, indexCount) ||
                 (indexFormat != D3DFMT_INDEX16 &&
                  indexFormat != D3DFMT_INDEX32))
                 return E_NOTIMPL;
@@ -2702,11 +2720,13 @@ namespace OutRunVRStereo
                     maxIndex = std::max(maxIndex, indices[i]);
             }
 
-            const UINT vertexCount =
-                std::max<UINT>(minVertexIndex + numVertices,
-                    maxIndex + 1u);
-            if (vertexCount == 0 || vertexCount > 262144u)
+            const std::uint64_t vertexCount64 = std::max<std::uint64_t>(
+                static_cast<std::uint64_t>(minVertexIndex) + numVertices,
+                static_cast<std::uint64_t>(maxIndex) + 1u);
+            if (vertexCount64 == 0 || vertexCount64 > 262144u ||
+                vertexCount64 > UINT_MAX)
                 return E_NOTIMPL;
+            const UINT vertexCount = static_cast<UINT>(vertexCount64);
 
             R30ScratchLease lease;
             if (!lease)
@@ -2773,9 +2793,9 @@ namespace OutRunVRStereo
             if (!R30PrepareXyzrhwState(device, state))
                 return E_NOTIMPL;
 
-            const UINT vertexCount =
-                R30PrimitiveElementCount(type, primitiveCount);
-            if (!vertexCount || vertexCount > 262144u)
+            UINT vertexCount = 0;
+            if (!R30PrimitiveElementCount(
+                    type, primitiveCount, 262144u, vertexCount))
                 return E_NOTIMPL;
 
             IDirect3DVertexBuffer9* vb = nullptr;
@@ -2878,9 +2898,10 @@ namespace OutRunVRStereo
             if (!R30PrepareXyzrhwState(device, state))
                 return E_NOTIMPL;
 
-            const UINT indexCount =
-                R30PrimitiveElementCount(type, primitiveCount);
-            if (!indexCount || !numVertices || indexCount > 524288u)
+            UINT indexCount = 0;
+            if (!numVertices ||
+                !R30PrimitiveElementCount(
+                    type, primitiveCount, 524288u, indexCount))
                 return E_NOTIMPL;
 
             IDirect3DVertexBuffer9* vb = nullptr;
