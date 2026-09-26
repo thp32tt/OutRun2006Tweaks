@@ -206,6 +206,7 @@ settings = require(
     'VRFrameCadenceTargetHz{ "VR", "FrameCadenceTargetHz", 0.0f',
     'VRFrameCadenceMaxHz{ "VR", "FrameCadenceMaxHz", 120.0f',
     'VRRankMarkerScale{ "VR", "RankMarkerScale", 0.82f',
+    'VRAllowThirdPartyD3D9Ex{ "VR", "AllowThirdPartyD3D9Ex", false',
     "OUTRUN_VR_DIRECT_TRANSPORT",
     "OUTRUN_VR_DIRECT_ONLY",
     "OUTRUN_VR_DISABLE_DESKTOP_DUPLICATION",
@@ -233,6 +234,12 @@ require(
     "(ndcX - state.projectedBaseX)",
     "deltaX[eye] + (1.0f - rankScale) * baseX",
     "R57Mode() == 6 || R57Mode() == 8",
+)
+require(
+    "src/vr/d3d9/ex_device_upgrade.cpp",
+    "VRAllowThirdPartyD3D9Ex",
+    "third-party provider-local Ex blocked by default",
+    "AllowThirdPartyD3D9Ex=true",
 )
 
 # R23 installer workers may only request cleanup. Live OutRun camera/projection
