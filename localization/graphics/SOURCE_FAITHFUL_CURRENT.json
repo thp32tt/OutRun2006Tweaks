@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-26T16:00:00+09:00",
+  "updated_at_kst": "2026-09-26T19:15:00+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -11,9 +11,9 @@
   ],
   "mandatory_policy": "localization/graphics/ORIENTATION_POLICY.md",
   "automation_checkpoint": {
-    "run": "batch58-a-canonical-p0-rework-preflight-20260926",
-    "result": "canonical_source_recovered_p0_ready_no_promotion",
-    "note": "Batch57 canonical source recovery supersedes stale source-unavailable checkpoint. Strict state remains 24 REWORK_REQUIRED / 8 ZOOM_MANUAL_REQUIRED / 0 PASS; P0 original-only rework may proceed."
+    "run": "batch61-b-p0-rawbyte-orientation-inspection-20260926",
+    "result": "RAW_BYTE_GATE_RESOLVED_P0_REWORK_CAN_PROCEED_NO_ASSET_PROMOTED",
+    "note": "Canonical 243-DDS source raw bytes materialized and P0 inspected. Strict state remains 24 REWORK_REQUIRED / 8 ZOOM_MANUAL_REQUIRED / 0 PASS; promotion hold stays on."
   },
   "latest_promoted_batch": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
   "latest_rejected_batch": "localization/graphics/BATCH51_REJECTED_REPORT.json",
@@ -92,7 +92,8 @@
       "62BEBF33",
       "E3FD08BE"
     ],
-    "batch56_source_identity": "SUPERSEDED"
+    "batch56_source_identity": "SUPERSEDED",
+    "latest_rawbyte_report": "localization/graphics/BATCH61_B_P0_RAWBYTE_ORIENTATION_INSPECTION_REPORT.json"
   },
   "latest_p0_rework_preflight_report": "localization/graphics/BATCH58_A_CANONICAL_P0_REWORK_PREFLIGHT_REPORT.json"
 }
