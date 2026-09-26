@@ -7,12 +7,11 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "read ORIENTATION_POLICY.md, SOURCE_FAITHFUL_CURRENT.json, BATCH64_USER_APPROVAL_P0_IMPORT_REPORT.json, FULL_STRICT_REVIEW_QUEUE.md, and P0_USER_APPROVED_STRICT_RESULTS.json before graphics editing",
+    "read ORIENTATION_POLICY.md, SOURCE_FAITHFUL_CURRENT.json, BATCH64_USER_APPROVAL_P0_IMPORT_REPORT.json, BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json, FULL_STRICT_REVIEW_QUEUE.md, and P0_USER_APPROVED_STRICT_RESULTS.json before graphics editing",
     "USER_APPROVED_LOCKED: 571E78F3, 62BEBF33, E3FD08BE; do not rework unless user explicitly reopens or a hard binary/format regression is proven",
-    "priority original-only rework: EBEF6D20 then 841E796B",
-    "EBEF6D20: replace Loading/Diverge/Left/Right only with independent exact original text-cell masks; preserve logos/road/arrows/nontext",
-    "841E796B: preserve every vehicle/model/brand card; translate only yellow No Handicap badge without badge edge/texture damage",
-    "after P0, continue FULL_STRICT_REVIEW_QUEUE.md across all remaining graphics",
+    "C strict QA: independently inspect current 841E796B and EBEF6D20 B candidates at raw/readable 1x/2x; do not promote before style/manual pass",
+    "if either Batch65 candidate fails style/manual QA, refine only inside exact original text cells while preserving nontext pixels and source orientation",
+    "after P0 is resolved, continue FULL_STRICT_REVIEW_QUEUE.md across all remaining graphics",
     "enforce bbox containment, overlay_box_overflow_pixels=0, outside_mask_changed_pixels=0, nontext_changed_pixels=0, zero residual English/seams/halos/clipping, source orientation/style, and raw+readable 1x/2x manual QA",
     "if GitHub write fails, persist exact candidate/QA logs internally and retry without losing completed work"
   ],
@@ -68,7 +67,7 @@
     "batch23_rejected_report": "localization/graphics/BATCH23_REJECTED_REPORT.json",
     "batch24v2_report": "localization/graphics/BATCH24V2_2DA_REWORK_REPORT.json",
     "batch25v4_report": "localization/graphics/BATCH25V4_ACF_REWORK_REPORT.json",
-    "latest_safe_rework_note": "2026-09-26 21:43 KST: exact DDS for user-approved 571E78F3/62BEBF33/E3FD08BE committed by GitHub Actions at b2fd5fcf; SHA checks passed. Remaining P0 is EBEF6D20 + 841E796B, followed by full strict queue.",
+    "latest_safe_rework_note": "2026-09-26 22:24 KST: Batch65 B created actual source-derived candidates for 841E796B and EBEF6D20; automated containment/header/orientation gates pass, but neither is promoted. C raw/readable 1x/2x strict visual/style QA is required next. Locked 571E78F3/62BEBF33/E3FD08BE remain untouched.",
     "batch33_rejected_report": "localization/graphics/BATCH33_REJECTED_REPORT.json",
     "batch38_report": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
     "batch41_rejected_report": "localization/graphics/BATCH41_REJECTED_REPORT.json",
@@ -115,6 +114,17 @@
       ],
       "promotion_hold_for_nonapproved": true,
       "queue": "localization/graphics/FULL_STRICT_REVIEW_QUEUE.md"
+    },
+    "batch65_b_report": "localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json",
+    "batch65_b_candidates": {
+      "841E796B": {
+        "status": "B_CANDIDATE_FOR_C_STRICT_QA",
+        "sha256": "0b3bd9570db72d8f7c4f1bce7fd8dd2dfc2946c05e3c06a046fe82e7860cd02b"
+      },
+      "EBEF6D20": {
+        "status": "B_CANDIDATE_FOR_C_STRICT_QA",
+        "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
+      }
     }
   },
   "runtime_packages": {
