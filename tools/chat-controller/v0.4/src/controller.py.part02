@@ -160,13 +160,15 @@ async def replace_with_fresh_slot_page(context: BrowserContext, pages: dict[str,
 
 
 def prompt_for_slot(slot: Slot, phase: str) -> str:
-    """N100 is review-only; every slot uses the review prompt family."""
-    mapping = {
-        "bootstrap": "bootstrap_review.md",
-        "continue": "continue_review.md",
-        "watchdog": "watchdog_resume.md",
+    """Dedicated browser-chat roles: A/B/C/D localization, E Git sync."""
+    role_prompts = {
+        "A": "localization_A.md",
+        "B": "localization_B.md",
+        "C": "localization_C.md",
+        "D": "localization_D.md",
+        "E": "localization_git_sync.md",
     }
-    return read_prompt(mapping[phase])
+    return read_prompt(role_prompts.get(slot.name, "localization_A.md"))
 
 
 async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
