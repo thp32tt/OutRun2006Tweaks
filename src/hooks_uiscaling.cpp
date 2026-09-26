@@ -545,7 +545,10 @@ class UIScaling : public Hook
 				for (unsigned guard = 0; node && guard < 0x230; ++guard)
 				{
 					OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-						node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+						node,
+						OutRunVR::GameSemantic::RenderScope::ScreenHud,
+						nullptr,
+						OutRunVR::GameSemantic::SpriteNodeOwner::DispRank);
 					++tagged;
 					if (node == tailAfter)
 						break;
@@ -613,7 +616,10 @@ class UIScaling : public Hook
 			if (node && node != tailBefore)
 			{
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-					node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+					node,
+					OutRunVR::GameSemantic::RenderScope::ScreenHud,
+					nullptr,
+					OutRunVR::GameSemantic::SpriteNodeOwner::DispRank);
 				static std::atomic<std::uint64_t> directPositionTags{ 0 };
 				const auto hit = directPositionTags.fetch_add(
 					1, std::memory_order_relaxed) + 1;
@@ -624,6 +630,19 @@ class UIScaling : public Hook
 			}
 		}
 		return result;
+	}
+
+	using TextGlyphPutSpriteFn =
+		int(__cdecl*)(SPRARGS*, float);
+
+	static int __cdecl TextGlyph_putSprite(
+		SPRARGS* args, float priority)
+	{
+		auto original = reinterpret_cast<TextGlyphPutSpriteFn>(
+			Module::exe_ptr(0x2CFE0));
+		OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		return original(args, priority);
 	}
 
 	enum SpriteScaleType
@@ -1040,6 +1059,13 @@ public:
 		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, put_scroll_AdjustPositionRight);
 		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, put_scroll_AdjustPositionRight);
 
+		// R64 canonical font glyph ownership. RVA 0x2C9DB is the direct
+		// call from the font/glyph renderer to put_sprite_ex. Do not promote
+		// generic put_sprite_ex/put_sprite_ex2: those also carry world sprites.
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0x2C9DB),
+			TextGlyph_putSprite, Memory::HookType::Call);
+
 		// R57 direct producer ownership: DispRank is a composite. Its first
 		// element uses sprani/SPRARGS2 (kind_C=1), while the remaining eight
 		// use put_clip_sprite/SPRARGS (kind_C=0).
@@ -1154,9 +1180,15 @@ class VRProjectedD3DXSpriteIsolation : public Hook
 			OutRunVR::GameSemantic::EffectiveScope();
 		const auto* marker =
 			OutRunVR::GameSemantic::CurrentProjectedMarker();
-		if (!OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
-				scope) ||
-			!marker || !marker->valid || !self)
+		const bool projectedRank =
+			OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+				scope) &&
+			marker && marker->valid;
+		const bool dispRankHud =
+			OutRunVR::GameSemantic::CorroboratesHud(scope) &&
+			OutRunVR::GameSemantic::CurrentSpriteOwner() ==
+				OutRunVR::GameSemantic::SpriteNodeOwner::DispRank;
+		if ((!projectedRank && !dispRankHud) || !self)
 			return hr;
 
 		void** vtable = *reinterpret_cast<void***>(self);
@@ -1173,10 +1205,11 @@ class VRProjectedD3DXSpriteIsolation : public Hook
 
 		if ((hit & (hit - 1)) == 0)
 			spdlog::info(
-				"VR R63 PROJECTED D3DX ISOLATE: flushes={} failures={} marker=({:.3f},{:.3f},{:.3f})",
+				"VR R64 D3DX ISOLATE: owner={} flushes={} failures={} markerValid={}",
+				projectedRank ? "projected-rank" : "disprank-hud",
 				hit,
 				Failures.load(std::memory_order_relaxed),
-				marker->viewX, marker->viewY, marker->viewZ);
+				marker && marker->valid ? 1 : 0);
 		return hr;
 	}
 
@@ -1200,7 +1233,7 @@ class VRProjectedD3DXSpriteIsolation : public Hook
 						Draw_hk.enable().has_value())
 					{
 						spdlog::info(
-							"VR R63 PROJECTED D3DX ISOLATE: exact projected-rank post-Draw Flush ACTIVE; generic HUD batching untouched");
+							"VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE; generic HUD batching untouched");
 						return 0;
 					}
 					Draw_hk = {};
