@@ -21,7 +21,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: vr-nightly-unified-r57-20260926
+  group: vr-nightly-unified-r57-20260926-v2
   cancel-in-progress: true
 
 jobs:
