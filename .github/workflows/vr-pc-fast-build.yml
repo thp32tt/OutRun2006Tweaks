@@ -20,6 +20,7 @@ on:
     branches:
       - vr-d3d9ex-focus
       - vr-nightly-r59-final-hud-rank-20260927
+      - vr-nightly-r60-kind0-batch-flush-20260927
 
 concurrency:
   group: outrun-pc-fast-test
