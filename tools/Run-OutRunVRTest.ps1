@@ -188,6 +188,7 @@ if($backend -ne '2d'){
 # candidate being compared across backends.
 if($backend -match '^dxvk'){
     $gameArgs += '-PreferD3D9Ex=false'
+    $gameArgs += '-AllowThirdPartyD3D9Ex=false'
     $gameArgs += '-DirectGpuOnly=false'
     $gameArgs += '-DisableDesktopDuplication=false'
 }
