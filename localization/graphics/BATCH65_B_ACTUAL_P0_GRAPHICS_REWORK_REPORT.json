@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "run": "batch65-b-actual-p0-graphics-rework-20260926",
+  "timestamp_kst": "2026-09-26T22:24:00+09:00",
+  "branch": "korean-localization-clean",
+  "result": "TWO_ACTUAL_DDS_CANDIDATES_CREATED_FOR_C_QA",
+  "source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+  "locked_untouched": ["571E78F3","62BEBF33","E3FD08BE"],
+  "assets": [
+    {"asset":"841E796B_512x128.dds","source_sha256":"872a6a93c711e82f43171ac1469f2216c5e27e7bd6dc11db500fb14c4814b6da","candidate_sha256":"0b3bd9570db72d8f7c4f1bce7fd8dd2dfc2946c05e3c06a046fe82e7860cd02b","changed_pixels":1952,"outside_text_cells_changed_pixels":0,"nontext_changed_pixels":0,"overlay_box_overflow_pixels":0,"header_match":true,"raw_orientation":"mirror_y","source_text_cell":[374,58,456,105],"translation":"핸디캡 없음","status":"B_CANDIDATE_FOR_C_STRICT_QA"},
+    {"asset":"EBEF6D20_512x512.dds","source_sha256":"1ee491be92af2e70d0dae33a8c205b13b152f198f8a534136fac1c3c4e164a3e","candidate_sha256":"978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922","changed_pixels":11606,"outside_text_cells_changed_pixels":0,"nontext_changed_pixels":0,"overlay_box_overflow_pixels":0,"header_match":true,"raw_orientation":"mirror_y","translations":{"Loading":"로딩","Diverge":"분기","Left":"좌측","Right":"우측"},"status":"B_CANDIDATE_FOR_C_STRICT_QA"}
+  ],
+  "promotion": false,
+  "next": "C independently inspect v4 candidates at raw/readable 1x/2x; refine style if needed before D promotion"
+}
