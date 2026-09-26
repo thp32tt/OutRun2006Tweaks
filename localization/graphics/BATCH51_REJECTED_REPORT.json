@@ -1,0 +1,35 @@
+{
+  "batch": "51-37759842-rework",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "status": "rejected_keep_original",
+  "local_package": "OutRun2_Korean_GFX_Batch51_37759842_Rework_Test.zip",
+  "local_package_sha256": "9724a8419744426ed3351745fbcedbb731032c694505fbc2959e5679085b5621",
+  "candidate_dds_sha256": "55c6c695eb8365c680d605c07d16b44a94443a1bf954f93ba557716a3d4ff3a2",
+  "automated_qa": {
+    "dimensions_identical": true,
+    "header_128_identical": true,
+    "changed_pixels_outside_allowed_regions": 0,
+    "introduced_alpha_pixels_outside_allowed_regions": 0,
+    "allowed_region_count": 45,
+    "pass": true
+  },
+  "manual_qa": {
+    "pass": false,
+    "reasons": [
+      "Several localized blue mode cards still show degraded or incomplete icon reconstruction.",
+      "The black 15-course cards lose too much original icon/detail and remain visually below source-fidelity standards.",
+      "Some localized mode labels become too small/narrow compared with the original visual hierarchy.",
+      "Therefore the candidate fails the non-text-art preservation and source-style fidelity gates despite perfect containment."
+    ]
+  },
+  "attempted_methods": [
+    "Batch45 color-mask inpainting: rejected due smear/artifact residue.",
+    "Batch46 compact quadratic text-zone reconstruction: rejected due residual source text and icon damage.",
+    "Batch47 expanded quadratic card reconstruction with source icon restore: rejected due incomplete icons/residue.",
+    "Batch48 row-median source gradient reconstruction: rejected due visible banding.",
+    "Batch49 full-inner quadratic reconstruction: rejected due icon/text fidelity problems.",
+    "Batch50 smooth vertical gradient reconstruction: rejected due icon degradation.",
+    "Batch51 connected-component icon restoration: containment passed but manual fidelity still failed."
+  ],
+  "action": "Keep original DDS in the canonical package. Next attempt should use exact per-card icon masks/templates or a hand-rebuilt card template; do not promote a merely clean-but-visually-degraded card."
+}
