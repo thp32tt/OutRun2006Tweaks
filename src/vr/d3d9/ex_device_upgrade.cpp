@@ -645,8 +645,14 @@ namespace OutRunVRD3D9ExUpgrade
                     AddRef();
                     return S_OK;
                 }
-                if (riid == __uuidof(IDirect3D9Ex) && ex_)
-                    return ex_->QueryInterface(riid, object);
+                if (riid == __uuidof(IDirect3D9Ex))
+                {
+                    // This object intentionally presents the legacy IDirect3D9
+                    // contract. Returning the raw Ex factory would let callers
+                    // bypass CreateDevice promotion/fallback and its managed/
+                    // Reset compatibility ownership.
+                    return E_NOINTERFACE;
+                }
                 return fallback_ ? fallback_->QueryInterface(riid, object) : E_NOINTERFACE;
             }
 
