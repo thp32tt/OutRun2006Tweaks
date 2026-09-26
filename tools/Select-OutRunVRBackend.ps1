@@ -237,10 +237,33 @@ if (Test-Path $ini) {
 
 $backendDll = Join-Path $root "dinput8.dll"
 $hostExe = Join-Path $root "outrun-vr-host.exe"
-$providerDll = Join-Path $root "d3d9.dll"
+$gameExe = Join-Path $root "OR2006C2C.EXE"
+$localProviderDll = Join-Path $root "d3d9.dll"
+$providerDll = $null
+$providerBinaryKind = "missing"
+if (Test-Path $localProviderDll) {
+    $providerDll = $localProviderDll
+    $providerBinaryKind = "local"
+} elseif ($env:WINDIR) {
+    # OutRun is x86. Prefer the 32-bit system D3D9 provider on 64-bit Windows;
+    # fall back to System32 for 32-bit Windows or unusual installations.
+    $systemProviderCandidates = @(
+        (Join-Path $env:WINDIR "SysWOW64\d3d9.dll"),
+        (Join-Path $env:WINDIR "System32\d3d9.dll")
+    )
+    foreach ($candidate in $systemProviderCandidates) {
+        if (Test-Path $candidate) {
+            $providerDll = $candidate
+            $providerBinaryKind = "system"
+            break
+        }
+    }
+}
 $gameBinarySha256 = if (Test-Path $backendDll) { (Get-FileHash $backendDll -Algorithm SHA256).Hash.ToLowerInvariant() } else { "missing" }
 $hostBinarySha256 = if (Test-Path $hostExe) { (Get-FileHash $hostExe -Algorithm SHA256).Hash.ToLowerInvariant() } else { "none" }
-$providerBinarySha256 = if (Test-Path $providerDll) { (Get-FileHash $providerDll -Algorithm SHA256).Hash.ToLowerInvariant() } else { "system-or-none" }
+$gameExeSha256 = if (Test-Path $gameExe) { (Get-FileHash $gameExe -Algorithm SHA256).Hash.ToLowerInvariant() } else { "missing" }
+$providerBinarySha256 = if ($providerDll -and (Test-Path $providerDll)) { (Get-FileHash $providerDll -Algorithm SHA256).Hash.ToLowerInvariant() } else { "missing" }
+$providerBinaryPath = if ($providerDll) { [IO.Path]::GetFullPath($providerDll) } else { "missing" }
 
 $nl = [Environment]::NewLine
 $matrixFile = Join-Path $root "BUILD_MATRIX_ID.txt"
@@ -257,7 +280,10 @@ $activeText = @(
     "sourceSha=$sourceSha"
     "gameBinarySha256=$gameBinarySha256"
     "hostBinarySha256=$hostBinarySha256"
+    "gameExeSha256=$gameExeSha256"
     "providerBinarySha256=$providerBinarySha256"
+    "providerBinaryKind=$providerBinaryKind"
+    "providerBinaryPath=$providerBinaryPath"
     "matrix=$matrix"
     "session=$session"
     "startedUtc=$($startedUtc.ToString('o'))"
@@ -276,7 +302,10 @@ $sessionManifest = [ordered]@{
     SourceSha = $sourceSha
     GameBinarySha256 = $gameBinarySha256
     HostBinarySha256 = $hostBinarySha256
+    GameExeSha256 = $gameExeSha256
     ProviderBinarySha256 = $providerBinarySha256
+    ProviderBinaryKind = $providerBinaryKind
+    ProviderBinaryPath = $providerBinaryPath
     SessionId = $session
     StartedUtc = $startedUtc.ToString("o")
     ConfigSha256 = $configHash
