@@ -272,12 +272,9 @@ namespace OutRunVrR24BlackScreenGuard
                 state, snapshot.frame))
             return false;
 
-        const auto generation = snapshot.frame.reserved[
-            OutRunVR::RenderFrameDirectGenerationIndex];
         const bool safeAlreadyOwned =
-            SafeFrameId == snapshot.frameId &&
-            SafeTransportGeneration == generation &&
-            SafeEyeSrv[0] && SafeEyeSrv[1];
+            OutRunVrD3D9ExDirectPassthrough::SafeEyeIdentityMatchesR32(
+                snapshot.frame);
         if (!safeAlreadyOwned && !EnsureSafeFrame(snapshot.frameId))
             return false;
         if (!OutRunVrR23RuntimeHardening::DirectSafeEyeMatchesCommittedFrame(
