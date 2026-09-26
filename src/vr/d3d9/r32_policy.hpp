@@ -20,6 +20,32 @@ namespace OutRunVR::R32
             : presentEpoch + extraPresents;
     }
 
+    struct ProducerFrameIdentity
+    {
+        std::uint32_t frameId = 0;
+        std::uint32_t clientPid = 0;
+        std::uint32_t runGeneration = 0;
+        std::uint32_t transportGeneration = 0;
+    };
+
+    constexpr bool ExactProducerFrameIdentityMatches(
+        const ProducerFrameIdentity& owned,
+        const ProducerFrameIdentity& requested) noexcept
+    {
+        return owned.frameId != 0 &&
+            owned.clientPid != 0 &&
+            owned.runGeneration != 0 &&
+            owned.transportGeneration != 0 &&
+            requested.frameId != 0 &&
+            requested.clientPid != 0 &&
+            requested.runGeneration != 0 &&
+            requested.transportGeneration != 0 &&
+            owned.frameId == requested.frameId &&
+            owned.clientPid == requested.clientPid &&
+            owned.runGeneration == requested.runGeneration &&
+            owned.transportGeneration == requested.transportGeneration;
+    }
+
     enum class EffectSnapshotDecision : std::uint8_t
     {
         UseCapturedPolicy,
