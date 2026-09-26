@@ -183,6 +183,22 @@ if($backend -ne '2d'){
     $gameArgs += '-HudInspector=true'
 }
 
+# R59 runtime identity overrides. Keep these explicit so an old user INI cannot
+# silently re-enable the DXVK provider-local Ex path or alter the rank-scale
+# candidate being compared across backends.
+if($backend -match '^dxvk'){
+    $gameArgs += '-PreferD3D9Ex=false'
+    $gameArgs += '-DirectGpuOnly=false'
+    $gameArgs += '-DisableDesktopDuplication=false'
+}
+if($backend -eq 'dx12'){
+    $gameArgs += '-DirectGpuOnly=true'
+    $gameArgs += '-DisableDesktopDuplication=true'
+}
+if($variant -eq 'R57_06_RANK_PROJECTED_HEAD'){
+    $gameArgs += '-RankMarkerScale=0.82'
+}
+
 $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)
 New-Item -ItemType Directory -Force $sessionRoot|Out-Null
 
