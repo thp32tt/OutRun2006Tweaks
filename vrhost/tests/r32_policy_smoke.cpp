@@ -24,6 +24,22 @@ int main()
     static_assert(ProducerFenceBudgetMs <= 2,
         "R32 producer fence must stay below the old 12 ms synchronous budget");
 
+    const ProducerFrameIdentity identity{ 17, 1001, 44, 9 };
+    assert(ExactProducerFrameIdentityMatches(
+        identity, ProducerFrameIdentity{ 17, 1001, 44, 9 }));
+    assert(!ExactProducerFrameIdentityMatches(
+        identity, ProducerFrameIdentity{ 17, 1002, 44, 9 }));
+    assert(!ExactProducerFrameIdentityMatches(
+        identity, ProducerFrameIdentity{ 17, 1001, 45, 9 }));
+    assert(!ExactProducerFrameIdentityMatches(
+        identity, ProducerFrameIdentity{ 17, 1001, 44, 10 }));
+    assert(!ExactProducerFrameIdentityMatches(
+        identity, ProducerFrameIdentity{ 18, 1001, 44, 9 }));
+    assert(!ExactProducerFrameIdentityMatches(
+        identity, ProducerFrameIdentity{ 0, 1001, 44, 9 }));
+
+
+
     // A timed-out D3D9 producer copy cannot make its ring slot reusable until
     // the old EVENT query has actually completed.
     assert(ClassifyPendingFence(false, false, false, false) ==
