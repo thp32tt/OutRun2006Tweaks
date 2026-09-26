@@ -23,6 +23,8 @@ RANGES=[
  ("sprani_core_28A10",0x028A10,0x390),
  ("sprite_batch_begin_end",0x029B00,0x560),
  ("sprani_core_28AF0",0x028AF0,0x390),
+ ("sprani_args2_stage_28BD0",0x028BD0,0x2C0),
+ ("sprani_frame_emit_29350",0x029350,0x110),
  ("sprani_emit_29460",0x029460,0x120),
  ("sprani_projected_helper_295D0",0x0295D0,0x230),
  ("sprani_play_ae_auth_alpha",0x029580,0x700),
