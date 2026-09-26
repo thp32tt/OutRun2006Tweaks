@@ -7,11 +7,11 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "HD GRAPHICS: process localization/graphics/HD_TEXT_REWORK_QUEUE_20260926.json; rebuild the 13 queued text graphics from HD/vector/working sources.",
+    "HD GRAPHICS: continue HD_TEXT_REWORK_QUEUE_20260926.json from FF2462BB; D6DC1380 and 48DEBE77 now have fresh HD Korean batch candidates.",
     "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
     "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
     "Never upscale prior stock-resolution Korean DDS candidates.",
-    "Enforce bbox containment, overlay_box_overflow_pixels=0, outside_mask_changed_pixels=0, nontext_changed_pixels=0, zero residual English/seams/halos/clipping, source orientation/style, and raw+readable 1x/2x manual QA.",
+    "Strict-QA Batch66 candidates in runtime before promotion; keep raw atlas orientation and bounds.",
     "If GitHub write fails, persist exact candidate/QA logs internally and retry without losing completed work."
   ],
   "prototype_history": {
@@ -124,7 +124,10 @@
         "status": "B_CANDIDATE_FOR_C_STRICT_QA",
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
-    }
+    },
+    "latest_hd_rework_batch": "localization/graphics/BATCH66_HD_REWORK_B01_REPORT.json",
+    "hd_rework_candidates_ready": 2,
+    "hd_rework_remaining": 11
   },
   "runtime_packages": {
     "k1": {
