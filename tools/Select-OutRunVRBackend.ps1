@@ -1,21 +1,22 @@
 param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet("2d","d3d9","dxvk-safe","dxvk","dx12")]
+    [ValidateSet("2d","d3d9","dx11","dxvk-safe","dxvk","dx12")]
     [string]$Backend,
     [ValidateSet("CONTROL","CORRECTNESS","HUD_SCREEN","HUD_MENU","HUD_WORLD","PERFORMANCE","STAGE_DIAGNOSTIC","A_BASELINE","B_CULLING","C_CULLING_NO_SSAA","D_CULLING_NO_SSAA_R512")]
     [string]$TestProfile = "CORRECTNESS",
-    [ValidateSet("AUTO","CONTROL_2D","CURRENT_FOCUS","A_CONTROL","B_HUD","C_FLARE","D_PERF","E_DXVK_SAFE","E_DXVK_MULTIVIEW","F_DX12_STRICT","G_COCKPIT")]
+    [ValidateSet("AUTO","CONTROL_2D","CURRENT_FOCUS","A_CONTROL","B_HUD","C_FLARE","D_PERF","E_DXVK_SAFE","E_DXVK_MULTIVIEW","F_DX12_STRICT","G_COCKPIT","X_BASE","X_SCREEN_HUD","X_WORLD_RANK","X_COMBINED","R54_A_NEXTDRAW","R54_B_STICKY","R54_C_FULL_OWNER","R54_D_HUD_PLANE","R55_A_ZERO","R55_B_SCALE35","R55_C_WORLD35","R55_D_RANKZERO","R56_01_ZERO","R56_02_SCALE35","R56_03_WORLD35","R56_04_RANKZERO","R56_05_POSITION_XP96","R56_06_POSITION_XM96","R56_07_POSITION_XS35","R56_08_POSITION_XCENTER","R56_09_RANK13_XP96","R56_10_RANK13_XM96","R56_11_RANK13_YM72","R56_12_RANK13_CENTER","R56_13_RANK46_XP96","R56_14_RANK46_YM72","R56_15_RANK46_CENTER","R56_16_RANK13_AS_HUD","R56_17_RANK46_AS_HUD","R56_18_RANK46_NEXTDRAW","R56_19_POSITION_NEXTDRAW","R56_20_ALLSCREEN_RAW","R57_01_POSITION_KIND1_HUD35","R57_02_POSITION_KIND0_HUD35","R57_03_POSITION_ALL_WORLD35","R57_04_RANK_ALL_AS_HUD","R57_05_RANK_PROJECTED_IPD","R57_06_RANK_PROJECTED_HEAD","R57_07_RANK_PROJECTED_13","R57_08_RANK_PROJECTED_46","R57_09_RANK_PROJECTED_ZERO","R57_10_RANK_PROJECTED_TRACE")]
     [string]$VariantId = "AUTO"
 )
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $backendRoot = Join-Path $root "backends"
-$payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "dxvk-safe") { "d3d9" } else { $Backend }
+$payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "dxvk-safe" -or $Backend -eq "dx11") { "d3d9" } else { $Backend }
 
 $defaultVariant = switch ($Backend) {
     "2d"        { "CONTROL_2D" }
     "d3d9"      { "A_CONTROL" }
+    "dx11"      { "R57_05_RANK_PROJECTED_IPD" }
     "dxvk-safe" { "E_DXVK_SAFE" }
     "dxvk"      { "E_DXVK_MULTIVIEW" }
     "dx12"      { "F_DX12_STRICT" }
@@ -193,7 +194,7 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "Enabled" "true"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
-        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
         $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
@@ -207,6 +208,17 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
+    } elseif ($Backend -eq "dx11") {
+        # Explicitly exercise the x64 D3D11 OpenXR DirectGPU host. The game side
+        # remains D3D9Ex; DirectGPU-only prevents a desktop-duplication fallback
+        # from hiding ACK/run-identity failures.
+        $text = Set-IniSectionValue $text "VR" "RenderBackend" "1"
+        $text = Set-IniSectionValue $text "VR" "Enabled" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"
+        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "true"
     } else {
         $value = switch ($Backend) {
             "dxvk" { "2" }
@@ -288,7 +300,8 @@ Write-Host "Any previous root logs were archived before this session was created
 switch ($Backend) {
     "2d"   { Write-Host "2D ORIGINAL: classic D3D9, VR disabled, D3D9Ex promotion disabled, no VR host." }
     "d3d9" { Write-Host "D3D9Ex REFERENCE: PreferD3D9Ex enabled; DirectGPU optional; profile=$TestProfile." }
-    "dxvk-safe" { Write-Host "DXVK SAFE: classic D3D9 calls translated by DXVK; validated two-pass VR, multiview patcher disabled." }
+    "dx11" { Write-Host "DX11 HOST/DIRECTGPU: D3D9Ex game + x64 D3D11 OpenXR host; DirectGPU-only; ACK run identity required." }
+    "dxvk-safe" { Write-Host "DXVK SAFE: provider-local D3D9Ex is probed when exported; DirectGPU optional; multiview patcher disabled." }
     "dxvk" { Write-Host "DXVK MULTIVIEW: local d3d9.dll + multiviewpatcher.dll active." }
     "dx12" { Write-Host "DX12 STRICT: local d3d9.dll verified absent; Windows D3D9On12 required." }
 }
