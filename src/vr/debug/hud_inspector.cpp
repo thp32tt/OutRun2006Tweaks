@@ -184,6 +184,37 @@ namespace OutRunVRHudInspector
             if (!ShouldWrite(key, count))
                 return;
 
+            // R63: the exit confirmation HUD ("Are you sure?", YES/NO) is an
+            // existing unclassified menu path. Capture a small ASLR-safe stack
+            // sample only while the observed menu state is active so the next
+            // patch can use canonical EXE call-site ownership instead of a
+            // current_mode/stage heuristic.
+            if (semantic.space ==
+                    OutRunVRHudSemantics::SpacePolicy::Unknown &&
+                mode == 32 && stage == 60 && count <= 4)
+            {
+                void* frames[16]{};
+                const USHORT frameCount = RtlCaptureStackBackTrace(
+                    0, static_cast<DWORD>(std::size(frames)),
+                    frames, nullptr);
+                std::string stack;
+                for (USHORT depth = 0; depth < frameCount; ++depth)
+                {
+                    const auto rva = ToExeRva(frames[depth]);
+                    if (!rva)
+                        continue;
+                    char text[24]{};
+                    std::snprintf(
+                        text, sizeof(text), "%s0x%08X",
+                        stack.empty() ? "" : "/",
+                        static_cast<unsigned>(rva));
+                    stack += text;
+                }
+                spdlog::info(
+                    "VR R63 EXIT HUD STACK: event={} leaf=0x{:08X} a0={} a1={} stack={}",
+                    eventName, callRva, arg0, arg1, stack);
+            }
+
             TraceFile
                 << (GetTickCount64() - StartMs) << ','
                 << eventName << ','
