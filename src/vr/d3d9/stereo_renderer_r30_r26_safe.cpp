@@ -178,6 +178,8 @@ namespace OutRunVRStereo
         std::uint64_t R30ShadowReadHits = 0;
         std::uint64_t R30ShadowReadMisses = 0;
         std::uint64_t R30ShadowDiscardInvalidations = 0;
+        // Telemetry marker only: actual capture is scoped by membership in
+        // the per-resource shadow registries below.
         std::atomic<bool> R30BufferShadowCaptureArmed{ false };
         bool R30FirstShadowMissLogged = false;
         bool R30FirstShadowArmLogged = false;
@@ -436,11 +438,12 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30VertexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
-            if (R30BufferShadowCaptureArmed.load(
-                    std::memory_order_acquire) &&
-                SUCCEEDED(hr) && data && *data)
-                R30BeginObservedLock(
-                    R30EnsureVertexShadow(buffer), offset, size, *data, flags);
+            if (SUCCEEDED(hr) && data && *data)
+            {
+                const auto entry = R30FindVertexShadow(buffer);
+                if (entry)
+                    R30BeginObservedLock(entry, offset, size, *data, flags);
+            }
             return hr;
         }
 
@@ -481,11 +484,12 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30IndexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
-            if (R30BufferShadowCaptureArmed.load(
-                    std::memory_order_acquire) &&
-                SUCCEEDED(hr) && data && *data)
-                R30BeginObservedLock(
-                    R30EnsureIndexShadow(buffer), offset, size, *data, flags);
+            if (SUCCEEDED(hr) && data && *data)
+            {
+                const auto entry = R30FindIndexShadow(buffer);
+                if (entry)
+                    R30BeginObservedLock(entry, offset, size, *data, flags);
+            }
             return hr;
         }
 
@@ -571,9 +575,6 @@ namespace OutRunVRStereo
             if (SUCCEEDED(hr) && out && *out)
             {
                 R30EnsureVertexBufferHooks(*out);
-                if (R30BufferShadowCaptureArmed.load(
-                        std::memory_order_acquire))
-                    R30EnsureVertexShadow(*out);
             }
             return hr;
         }
@@ -588,9 +589,6 @@ namespace OutRunVRStereo
             if (SUCCEEDED(hr) && out && *out)
             {
                 R30EnsureIndexBufferHooks(*out);
-                if (R30BufferShadowCaptureArmed.load(
-                        std::memory_order_acquire))
-                    R30EnsureIndexShadow(*out);
             }
             return hr;
         }
