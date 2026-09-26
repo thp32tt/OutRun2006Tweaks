@@ -1,0 +1,9 @@
+{
+  "package": "OR2-HD-GUI-v0.25.10a.zip",
+  "package_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+  "pack_version": "Oct-2025-a",
+  "upstream_repo": "Sonic-TV/OR2006Sprites",
+  "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+  "scope": "13 HD graphics rework source DDS + 1 separated font-pipeline DDS",
+  "verification": "Every destination DDS is SHA-256 verified before commit."
+}
