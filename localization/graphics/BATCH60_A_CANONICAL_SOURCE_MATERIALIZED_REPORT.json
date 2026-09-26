@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "run": "batch60-a-canonical-source-materialized-20260926",
+  "timestamp_kst": "2026-09-26T18:57:00+09:00",
+  "branch": "korean-localization-clean",
+  "canonical_archive": {
+    "name": "outrun_korean_analysis.tar(1).gz",
+    "sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+    "status": "MATERIALIZED_AND_HASH_VERIFIED"
+  },
+  "p0_exact_sources": {
+    "841E796B_512x128.dds": "872a6a93c711e82f43171ac1469f2216c5e27e7bd6dc11db500fb14c4814b6da",
+    "EBEF6D20_512x512.dds": "1ee491be92af2e70d0dae33a8c205b13b152f198f8a534136fac1c3c4e164a3e",
+    "571E78F3_512x64.dds": "83febd33ab9e1fef1bdb608e01fb113fde646597b309f60354c68602449e4bcb",
+    "62BEBF33_512x64.dds": "60454d0080e328e7139f10f69c080a1b2c0a3e959ced3bcdd8b22fb04e1758b4",
+    "E3FD08BE_512x64.dds": "151e9537e534643a9154739aeffcee8a24bf9921eda6346252b7482287af029e",
+    "37759842_1024x1024.dds": "ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0"
+  },
+  "strict_state": {
+    "rework_required": 24,
+    "zoom_manual_required": 8,
+    "strict_pass": 0,
+    "promotion_hold": true
+  },
+  "decision": "SOURCE_GATE_CLEARED_NO_PIXEL_PROMOTION",
+  "next": [
+    "Perform original-only P0 per-text-cell classification/masks in order 841E796B, EBEF6D20, 571E78F3, 62BEBF33, E3FD08BE.",
+    "Preserve vehicle/model/brand/logo/song/legal artwork and raw DDS transforms.",
+    "Require non-text changed pixels=0, containment, artifact cleanliness, zero residual English, raw+readable 1x/2x manual QA before promotion."
+  ]
+}
