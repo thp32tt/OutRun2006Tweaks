@@ -76,6 +76,8 @@ def fmt_target(ins):
     return f" ; target_rva=0x{rva:08X}" + (f" {label}" if label else "")
 
 WATCH_ABS = {
+    0x0095D860: 'renderer_view',
+    0x0095DB20: 'renderer_world_view',
     0x0095D8A0: 'renderer_projection',
     0x0089B564: 'sprite_matrix_stack_ptr',
     0x0089B568: 'sprite_matrix_stack_depth',
