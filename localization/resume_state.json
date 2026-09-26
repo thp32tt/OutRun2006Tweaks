@@ -1,5 +1,5 @@
 {
-  "schema_version": 18,
+  "schema_version": 19,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,9 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "HD SOURCE MIGRATION: run tools/localization/collect_hd_localization_source.ps1 against the installed high-resolution texture mod/game tree and import the resulting ZIP/manifest",
+    "HOLD new graphics promotion until exact HD source DDS SHA-256 identities are imported; stock original is fallback/orientation reference only",
+    "REBUILD/REVALIDATE Korean graphics from exact HD DDS; never upscale existing stock-resolution Korean candidates",
     "read ORIENTATION_POLICY.md, SOURCE_FAITHFUL_CURRENT.json, BATCH64_USER_APPROVAL_P0_IMPORT_REPORT.json, BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json, FULL_STRICT_REVIEW_QUEUE.md, and P0_USER_APPROVED_STRICT_RESULTS.json before graphics editing",
     "USER_APPROVED_LOCKED: 571E78F3, 62BEBF33, E3FD08BE; do not rework unless user explicitly reopens or a hard binary/format regression is proven",
     "C strict QA: independently inspect current 841E796B and EBEF6D20 B candidates at raw/readable 1x/2x; do not promote before style/manual pass",
@@ -67,7 +70,7 @@
     "batch23_rejected_report": "localization/graphics/BATCH23_REJECTED_REPORT.json",
     "batch24v2_report": "localization/graphics/BATCH24V2_2DA_REWORK_REPORT.json",
     "batch25v4_report": "localization/graphics/BATCH25V4_ACF_REWORK_REPORT.json",
-    "latest_safe_rework_note": "2026-09-26 22:24 KST: Batch65 B created actual source-derived candidates for 841E796B and EBEF6D20; automated containment/header/orientation gates pass, but neither is promoted. C raw/readable 1x/2x strict visual/style QA is required next. Locked 571E78F3/62BEBF33/E3FD08BE remain untouched.",
+    "latest_safe_rework_note": "2026-09-26 22:46 KST: user switched canonical graphics source to installed HD texture mod. Existing stock-resolution work is historical; new promotion is held pending exact HD source import and per-asset SHA verification.",
     "batch33_rejected_report": "localization/graphics/BATCH33_REJECTED_REPORT.json",
     "batch38_report": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
     "batch41_rejected_report": "localization/graphics/BATCH41_REJECTED_REPORT.json",
@@ -154,5 +157,14 @@
     "build_head": "3af9dec1650245272dfd594cad6a8885b11480a6",
     "build_run_id": 36029358510,
     "artifact_id": 10820094736
+  },
+  "source_migration": {
+    "timestamp_kst": "2026-09-26T22:46:00+09:00",
+    "mode": "HD_TEXTURE_MOD_PRIMARY",
+    "status": "PENDING_EXACT_HD_SOURCE_IMPORT",
+    "collector": "tools/localization/collect_hd_localization_source.ps1",
+    "migration_report": "localization/graphics/HD_SOURCE_MIGRATION_20260926.json",
+    "previous_stock_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+    "note": "Do not replace required_source_archive_sha256 until the collected HD source ZIP and per-DDS manifest are imported and verified."
   }
 }
