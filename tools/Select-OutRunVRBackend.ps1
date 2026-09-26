@@ -189,7 +189,7 @@ if (Test-Path $ini) {
         # available. The game hook never substitutes the system provider for a
         # third-party provider, and DirectGpuOnly remains false so incompatible
         # shared-resource interop falls back to SBS/Desktop Duplication.
-        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
     } elseif ($Backend -eq "dxvk-safe") {
@@ -197,7 +197,7 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "Enabled" "true"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
-        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
         $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
