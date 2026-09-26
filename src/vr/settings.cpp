@@ -298,22 +298,46 @@ namespace OutRunVR
 			DWORD retryDelayMs = 500;
 			bool restartLogged = false;
 			bool staleLogged = false;
+			ULONGLONG startingSinceMs = 0;
 			for (;;)
 			{
 				DWORD hostPid = 0;
 				const VRHostHealth health = QueryVRHostHealth(hostPid);
-				if (health == VRHostHealth::Healthy ||
-					health == VRHostHealth::Starting)
+				if (health == VRHostHealth::Healthy)
 				{
 					retryDelayMs = 500;
 					restartLogged = false;
 					staleLogged = false;
+					startingSinceMs = 0;
 					Sleep(1000);
 					continue;
+				}
+				if (health == VRHostHealth::Starting)
+				{
+					const ULONGLONG now = GetTickCount64();
+					if (!startingSinceMs)
+						startingSinceMs = now;
+					if (now - startingSinceMs <= 15000)
+					{
+						Sleep(1000);
+						continue;
+					}
+					spdlog::error(
+						"VR AUTO HOST: exact host pid={} failed to publish matching HostState within 15s; recycling the exact game-directory host",
+						hostPid);
+					if (!TerminateStaleVRHost(hostPid))
+					{
+						Sleep(1000);
+						continue;
+					}
+					startingSinceMs = 0;
+					staleLogged = true;
+					Sleep(250);
 				}
 
 				if (health == VRHostHealth::StaleRenderable)
 				{
+					startingSinceMs = 0;
 					if (!staleLogged)
 					{
 						spdlog::error(
