@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "run": "batch61-a-post-source-materialization-reconcile-20260926",
+  "timestamp_kst": "2026-09-26T20:00:00+09:00",
+  "branch": "korean-localization-clean",
+  "inputs": [
+    "localization/graphics/ORIENTATION_POLICY.md",
+    "localization/graphics/SOURCE_FAITHFUL_CURRENT.json",
+    "localization/resume_state.json",
+    "localization/progress/STATUS.md",
+    "localization/graphics/BATCH60_A_CANONICAL_SOURCE_MATERIALIZED_REPORT.json"
+  ],
+  "canonical_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+  "strict_state": {
+    "rework_required": 24,
+    "zoom_manual_required": 8,
+    "strict_pass": 0,
+    "promotion_hold": true
+  },
+  "finding": "Batch60 cleared the exact-source-byte gate, but CURRENT/resume/status/progress/worklog metadata still contains pre-Batch60/stale wording.",
+  "decision": "METADATA_RECONCILE_REQUIRED_NO_PIXEL_PROMOTION",
+  "p0_order": [
+    "841E796B",
+    "EBEF6D20",
+    "571E78F3",
+    "62BEBF33",
+    "E3FD08BE"
+  ],
+  "next": "Rework P0 from exact original DDS only; preserve excluded artwork/transforms and require per-cell containment, non-text changed pixels=0, zero residue/artifacts, raw+readable 1x/2x QA."
+}
