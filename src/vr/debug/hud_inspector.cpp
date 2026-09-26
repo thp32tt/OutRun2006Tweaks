@@ -17,6 +17,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "../hud_semantics.hpp"
+#include "../game/render_semantics.hpp"
 
 namespace Settings
 {
@@ -183,6 +184,37 @@ namespace OutRunVRHudInspector
             if (!ShouldWrite(key, count))
                 return;
 
+            // R63: the exit confirmation HUD ("Are you sure?", YES/NO) is an
+            // existing unclassified menu path. Capture a small ASLR-safe stack
+            // sample only while the observed menu state is active so the next
+            // patch can use canonical EXE call-site ownership instead of a
+            // current_mode/stage heuristic.
+            if (semantic.space ==
+                    OutRunVRHudSemantics::SpacePolicy::Unknown &&
+                mode == 32 && stage == 60 && count <= 4)
+            {
+                void* frames[16]{};
+                const USHORT frameCount = RtlCaptureStackBackTrace(
+                    0, static_cast<DWORD>(std::size(frames)),
+                    frames, nullptr);
+                std::string stack;
+                for (USHORT depth = 0; depth < frameCount; ++depth)
+                {
+                    const auto rva = ToExeRva(frames[depth]);
+                    if (!rva)
+                        continue;
+                    char text[24]{};
+                    std::snprintf(
+                        text, sizeof(text), "%s0x%08X",
+                        stack.empty() ? "" : "/",
+                        static_cast<unsigned>(rva));
+                    stack += text;
+                }
+                spdlog::info(
+                    "VR R63 EXIT HUD STACK: event={} leaf=0x{:08X} a0={} a1={} stack={}",
+                    eventName, callRva, arg0, arg1, stack);
+            }
+
             TraceFile
                 << (GetTickCount64() - StartMs) << ','
                 << eventName << ','
@@ -332,6 +364,73 @@ namespace OutRunVRHudInspector
             catch (...) {}
         }
 
+    }
+
+    // Production-facing semantic resolver backed only by the canonical EXE map.
+    // It returns a render scope only when the launcher has verified the exact
+    // replacement EXE SHA-256. Helper/wrapper return addresses are stack-walked
+    // until a UIScaling-derived semantic range is found.
+    OutRunVR::GameSemantic::RenderScope ResolveRenderScope(
+        const void* returnAddress) noexcept
+    {
+        char semanticVerified[8]{};
+        const bool identityVerified =
+            SemanticIdentityVerified ||
+            (GetEnvironmentVariableA(
+                "OUTRUN_VR_EXE_SEMANTICS_VERIFIED",
+                semanticVerified,
+                static_cast<DWORD>(sizeof(semanticVerified))) > 0 &&
+             semanticVerified[0] == '1');
+        if (!identityVerified)
+            return OutRunVR::GameSemantic::RenderScope::None;
+
+        auto resolveRva = [](std::uint32_t returnRva) noexcept {
+            const std::uint32_t callRva =
+                returnRva >= 5 ? returnRva - 5 : returnRva;
+            return OutRunVRHudSemantics::ClassifyCaller(callRva);
+        };
+
+        auto semantic = resolveRva(ToExeRva(returnAddress));
+        if (semantic.space == OutRunVRHudSemantics::SpacePolicy::Unknown)
+        {
+            void* frames[24]{};
+            const USHORT frameCount = RtlCaptureStackBackTrace(
+                0, static_cast<DWORD>(std::size(frames)),
+                frames, nullptr);
+            for (USHORT depth = 0; depth < frameCount; ++depth)
+            {
+                const std::uint32_t frameReturnRva =
+                    ToExeRva(frames[depth]);
+                if (!frameReturnRva)
+                    continue;
+                const auto candidate = resolveRva(frameReturnRva);
+                if (candidate.space ==
+                    OutRunVRHudSemantics::SpacePolicy::Unknown)
+                    continue;
+                semantic = candidate;
+                break;
+            }
+        }
+
+        char semanticModeText[8]{};
+        int semanticMode = 0;
+        if (GetEnvironmentVariableA(
+                "OUTRUN_VR_EXE_SEMANTIC_MODE",
+                semanticModeText,
+                static_cast<DWORD>(sizeof(semanticModeText))) > 0 &&
+            semanticModeText[0] >= '0' && semanticModeText[0] <= '3')
+            semanticMode = semanticModeText[0] - '0';
+
+        // Bit 0 = exact SCREEN_HUD, bit 1 = exact WORLD_BILLBOARD.
+        // Default 0 keeps production behavior untouched unless a test variant
+        // explicitly asks to consume the verified disassembly semantics.
+        if (semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud &&
+            (semanticMode & 1) != 0)
+            return OutRunVR::GameSemantic::RenderScope::ScreenHud;
+        if (semantic.space == OutRunVRHudSemantics::SpacePolicy::WorldBillboard &&
+            (semanticMode & 2) != 0)
+            return OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+        return OutRunVR::GameSemantic::RenderScope::None;
     }
 
     // Feed points used by the existing texture hooks. Keeping put_sprite_ex on
