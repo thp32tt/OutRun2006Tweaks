@@ -1,0 +1,8 @@
+{
+  "operation":"create_file",
+  "path":"localization/graphics/BATCH44_37759842_SOURCE_BYTE_RECOVERY_REPORT.json",
+  "branch":"korean-localization-clean",
+  "base_blob_sha":null,
+  "error":"GitHub create_file blocked by OpenAI safety checks",
+  "time":"2026-09-26T09:18:00+09:00"
+}

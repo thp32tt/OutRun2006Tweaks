@@ -1,0 +1,6 @@
+{
+  "graphics_checkpoint":{
+    "batch44_report":"localization/graphics/BATCH44_37759842_SOURCE_BYTE_RECOVERY_REPORT.json",
+    "latest_safe_rework_note":"2026-09-26 09:18 KST: exact original and Batch41 candidate 37759842 bytes recovered from persistent Library. Original SHA-256 ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0; Batch41 SHA-256 5f5ad405a83ae4d53723589ead856d15e0473d16de3bab99977c35caa072aebd. Batch41 still fails residual-English manual QA; keep original."
+  }
+}

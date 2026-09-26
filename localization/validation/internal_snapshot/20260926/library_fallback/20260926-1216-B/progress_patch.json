@@ -1,0 +1,1 @@
+{"updated_at_kst":"2026-09-26T12:16:00+09:00","next_checkpoint":"Batch45 exact-diff and Batch53 glyph-mask plan are now reconciled into GitHub. 37759842 remains sole pending asset. Next pixel candidate must modify only source glyph+outline footprint, restore all other pixels from exact source, and pass residual-English/icon-gradient/seam/alpha/clipping manual QA."}

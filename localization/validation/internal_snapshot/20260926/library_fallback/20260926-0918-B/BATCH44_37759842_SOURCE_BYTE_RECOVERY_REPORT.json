@@ -1,0 +1,24 @@
+{
+  "batch": "44-37759842-source-byte-recovery",
+  "updated_at_kst": "2026-09-26T09:18:00+09:00",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "status": "source_bytes_recovered_rework_not_promoted",
+  "source_recovery": {
+    "original_container": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip",
+    "original_dds_sha256": "ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0",
+    "batch41_container": "OutRun2_Korean_GFX_Batch41_37759842_Rework_Test.zip",
+    "batch41_candidate_sha256": "5f5ad405a83ae4d53723589ead856d15e0473d16de3bab99977c35caa072aebd",
+    "dimensions": "1024x1024",
+    "pixel_format": "ARGB8888",
+    "note": "Exact original and rejected Batch41 candidate were recovered from persistent user Library packages; no copyrighted DDS bytes are stored in fallback."
+  },
+  "qa_recheck": {
+    "batch41_containment": "pass per prior report",
+    "manual_artifact_cleanliness": "fail",
+    "residuals": ["lower blue generic mode cards retain source Mode fragments", "black 15-course cards retain large source English fragments"],
+    "protected_artwork": "song-title/music cards, vehicle/model names, brands/logos/legal marks remain source-original"
+  },
+  "decision": "KEEP_ORIGINAL",
+  "promotion": false,
+  "next_rework": "Use recovered exact bytes; reconstruct only generic mode/15-course text interiors; preserve music-title cards and icons/gradients; rerun all hard QA gates."
+}
