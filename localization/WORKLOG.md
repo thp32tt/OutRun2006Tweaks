@@ -431,3 +431,14 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Status for both: `B_CANDIDATE_FOR_C_STRICT_QA`. C must independently inspect raw/readable 1x/2x appearance and style before any D promotion.
 - Durable report: `localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json`.
 
+
+
+## 2026-09-26 22:46 KST - HD TEXTURE SOURCE MIGRATION
+
+- User changed the graphics localization baseline from stock DDS to the installed high-resolution texture mod.
+- New primary construction source: exact HD DDS from the user's installed texture tree.
+- Stock original DDS/archive is retained only as fallback and orientation/reverse-engineering reference.
+- Added `tools/localization/collect_hd_localization_source.ps1`; it matches targets by stable hexadecimal asset key, reads actual DDS dimensions from the header, chooses the highest-resolution matching source, and records SHA-256.
+- Existing stock-resolution Korean DDS and approvals are preserved as historical evidence but are not automatically promoted into the HD line.
+- New graphics promotion is held until the HD source ZIP/manifest is imported and verified.
+- Migration report: `localization/graphics/HD_SOURCE_MIGRATION_20260926.json`.
