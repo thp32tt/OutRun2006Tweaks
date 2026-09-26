@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-26T21:01:54+09:00",
+  "updated_at_kst": "2026-09-26T21:43:00+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -7,13 +7,14 @@
   "combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip",
   "combined_package_sha256": "7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02",
   "pending": [
-    "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"
+    "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+    "textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds"
   ],
   "mandatory_policy": "localization/graphics/ORIENTATION_POLICY.md",
   "automation_checkpoint": {
-    "run": "batch62-a-p0-rework-execution-gate-20260926",
-    "result": "P0_SOURCE_AND_POLICY_GATES_READY_NO_PIXEL_PROMOTION_THIS_RUN",
-    "note": "Canonical source/raw-byte gate resolved. Strict 24/8/0 promotion hold remains. Start original-only P0 rebuild with 841E796B; no unsafe promotion."
+    "run": "batch64-user-approved-dds-import-20260926",
+    "result": "USER_APPROVED_3_IMPORTED_EXACT_DDS_REMAINING_STRICT_REWORK_CONTINUES",
+    "note": "571E78F3, 62BEBF33, E3FD08BE are USER_APPROVED_LOCKED and stored as exact DDS in Git. EBEF6D20 and 841E796B remain P0 REWORK_REQUIRED; continue full strict queue."
   },
   "latest_promoted_batch": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
   "latest_rejected_batch": "localization/graphics/BATCH51_REJECTED_REPORT.json",
@@ -28,15 +29,12 @@
     "promotion_hold": true,
     "package_assets_scanned": 32,
     "auto_risk_flagged": 19,
-    "rework_required": 24,
+    "rework_required": 21,
     "zoom_manual_required": 8,
-    "strict_pass": 0,
+    "strict_pass": 3,
     "user_rejected": [
       "841E796B",
-      "EBEF6D20",
-      "571E78F3",
-      "62BEBF33",
-      "E3FD08BE"
+      "EBEF6D20"
     ],
     "rework_required_assets": [
       "D6DC1380",
@@ -48,13 +46,10 @@
       "1A43E9D9",
       "37759842",
       "4F68708E",
-      "571E78F3",
-      "62BEBF33",
       "788CE557",
       "841E796B",
       "C075FB49",
       "D41D0B1",
-      "E3FD08BE",
       "F6811E94",
       "12519155",
       "1762489B",
@@ -75,7 +70,16 @@
       "ACF61D7C"
     ],
     "report": "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json",
-    "note": "No previous PASS/retained/promoted decision is grandfathered. Per-text-cell/mask + 1x/2x manual QA is required before strict PASS."
+    "note": "No previous PASS/retained/promoted decision is grandfathered. Per-text-cell/mask + 1x/2x manual QA is required before strict PASS.",
+    "user_approved_locked": [
+      "571E78F3",
+      "62BEBF33",
+      "E3FD08BE"
+    ],
+    "original_safe_hold": [
+      "37759842"
+    ],
+    "current_note": "Batch53 counters were superseded for three assets by explicit user visual approval plus exact DDS SHA verification. Non-approved assets remain under strict promotion hold."
   },
   "latest_strict_reset_report": "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json",
   "strict_qa_canonical_source": {
@@ -96,5 +100,17 @@
     "latest_rawbyte_report": "localization/graphics/BATCH61_B_P0_RAWBYTE_ORIENTATION_INSPECTION_REPORT.json"
   },
   "latest_p0_rework_preflight_report": "localization/graphics/BATCH58_A_CANONICAL_P0_REWORK_PREFLIGHT_REPORT.json",
-  "latest_p0_execution_gate_report": "localization/graphics/BATCH62_A_P0_REWORK_EXECUTION_GATE_REPORT.json"
+  "latest_p0_execution_gate_report": "localization/graphics/BATCH62_A_P0_REWORK_EXECUTION_GATE_REPORT.json",
+  "latest_user_approval_report": "localization/graphics/BATCH64_USER_APPROVAL_P0_IMPORT_REPORT.json",
+  "approved_dds_root": "localization/graphics/approved_dds",
+  "user_approved_locked": [
+    "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+    "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+    "textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds"
+  ],
+  "user_approved_sha256": {
+    "571E78F3_512x64.dds": "4ff6a767fca35ebff7e1ba587c1992f94319c5f1bdd7d03faf59450d81e32f1e",
+    "62BEBF33_512x64.dds": "91b0424df17e48ee3445208991f15f6e5cdb413f6f77eeb1aa3f453a3706e4eb",
+    "E3FD08BE_512x64.dds": "246e4313cb9806623f695ea94262100e1e6f3888847dcc09338d870e3944b49e"
+  }
 }
