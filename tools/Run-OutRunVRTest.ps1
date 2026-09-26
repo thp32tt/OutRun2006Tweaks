@@ -57,6 +57,7 @@ $hudExperimentMode='0'
 $hudCoordMode='0'
 $hudProbe='0'
 $r57Mode='0'
+$r58Mode='0'
 switch($variant){
     'X_SCREEN_HUD'       { $semanticMode='1' }
     'X_WORLD_RANK'       { $semanticMode='2' }
@@ -99,17 +100,29 @@ switch($variant){
     'R57_08_RANK_PROJECTED_46'    { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='8' }
     'R57_09_RANK_PROJECTED_ZERO'  { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='9' }
     'R57_10_RANK_PROJECTED_TRACE' { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='10' }
+    'R58_01_CONFIRMED_13_HEAD'       { $semanticMode='0'; $hudExperimentMode='2'; $r58Mode='1' }
+    'R58_02_BAD20_46_DIRECT_HEAD'    { $semanticMode='0'; $hudExperimentMode='2'; $r58Mode='2' }
+    'R58_03_SIBLING_BB3_HEAD'        { $semanticMode='0'; $hudExperimentMode='2'; $r58Mode='3' }
+    'R58_04_SIBLING_BB6_HEAD'        { $semanticMode='0'; $hudExperimentMode='2'; $r58Mode='4' }
+    'R58_05_SIBLING_BBB_HEAD'        { $semanticMode='0'; $hudExperimentMode='2'; $r58Mode='5' }
+    'R58_06_SIBLING_BBD_HEAD'        { $semanticMode='0'; $hudExperimentMode='2'; $r58Mode='6' }
+    'R58_07_ALL_PROJECTED_HEAD'      { $semanticMode='0'; $hudExperimentMode='2'; $r58Mode='7' }
+    'R58_08_POSITION_SUPPRESS'       { $semanticMode='0'; $hudExperimentMode='2'; $r58Mode='8' }
+    'R58_09_POSITION_DIRECT_HUD'     { $semanticMode='0'; $hudExperimentMode='2'; $r58Mode='9' }
+    'R58_10_POSITION_DIRECT_HUD35'   { $semanticMode='0'; $hudExperimentMode='2'; $hudCoordMode='3'; $r58Mode='10' }
 }
 $oldExeSemanticMode=$env:OUTRUN_VR_EXE_SEMANTIC_MODE
 $oldHudExperimentMode=$env:OUTRUN_VR_HUD_EXPERIMENT_MODE
 $oldHudCoordMode=$env:OUTRUN_VR_HUD_COORD_MODE
 $oldHudProbe=$env:OUTRUN_VR_HUD_PROBE
 $oldR57Mode=$env:OUTRUN_VR_R57_MODE
+$oldR58Mode=$env:OUTRUN_VR_R58_MODE
 $env:OUTRUN_VR_EXE_SEMANTIC_MODE=$semanticMode
 $env:OUTRUN_VR_HUD_EXPERIMENT_MODE=$hudExperimentMode
 $env:OUTRUN_VR_HUD_COORD_MODE=$hudCoordMode
 $env:OUTRUN_VR_HUD_PROBE=$hudProbe
 $env:OUTRUN_VR_R57_MODE=$r57Mode
+$env:OUTRUN_VR_R58_MODE=$r58Mode
 
 $patterns=@(
     'OutRun2006Tweaks*.log',
@@ -224,6 +237,7 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "hudCoordMode=$hudCoordMode"
     "hudProbe=$hudProbe"
     "r57Mode=$r57Mode"
+    "r58Mode=$r58Mode"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
 Write-Host "Runtime overrides: $($gameArgs -join ' ')"
 
@@ -301,6 +315,7 @@ try{
     $env:OUTRUN_VR_HUD_COORD_MODE=$oldHudCoordMode
     $env:OUTRUN_VR_HUD_PROBE=$oldHudProbe
     $env:OUTRUN_VR_R57_MODE=$oldR57Mode
+    $env:OUTRUN_VR_R58_MODE=$oldR58Mode
     foreach($key in $identityKeys){
         [Environment]::SetEnvironmentVariable($key,$oldIdentity[$key],'Process')
     }
