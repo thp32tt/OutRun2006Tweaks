@@ -238,6 +238,60 @@ namespace OutRunVR::GameSemantic
     inline thread_local std::uint64_t SpriteQueueNodeEpoch = 0;
     inline thread_local ProjectedMarkerInfo CurrentQueueProjectedMarker{};
 
+    // R61 diagnostic only: observe the real D3DXSprite batching boundary used by
+    // kind-0 SpriteNodes without changing presentation order or draw state.
+    // hooks_uiscaling.cpp records semantic ownership at ID3DXSprite::Draw time,
+    // then marks Flush/End while the deferred device draw is actually emitted.
+    inline thread_local bool D3DXSpriteEmissionActive = false;
+    inline thread_local std::uint32_t D3DXBatchGeneric = 0;
+    inline thread_local std::uint32_t D3DXBatchScreenHud = 0;
+    inline thread_local std::uint32_t D3DXBatchWorldBillboard = 0;
+    inline thread_local std::uint32_t D3DXBatchProjectedWorld = 0;
+    inline thread_local std::uint32_t D3DXEmissionGeneric = 0;
+    inline thread_local std::uint32_t D3DXEmissionScreenHud = 0;
+    inline thread_local std::uint32_t D3DXEmissionWorldBillboard = 0;
+    inline thread_local std::uint32_t D3DXEmissionProjectedWorld = 0;
+
+    inline void NoteD3DXSpriteQueuedDraw() noexcept
+    {
+        const RenderScope scope =
+            IsExactHudScope(CurrentQueueExactScope)
+            ? CurrentQueueExactScope : EffectiveScope();
+        switch (scope)
+        {
+        case RenderScope::ScreenHud:
+            ++D3DXBatchScreenHud;
+            break;
+        case RenderScope::WorldBillboard:
+            ++D3DXBatchWorldBillboard;
+            break;
+        case RenderScope::ProjectedWorldMarker2D:
+            ++D3DXBatchProjectedWorld;
+            break;
+        default:
+            ++D3DXBatchGeneric;
+            break;
+        }
+    }
+
+    inline void BeginD3DXSpriteEmission() noexcept
+    {
+        D3DXEmissionGeneric = D3DXBatchGeneric;
+        D3DXEmissionScreenHud = D3DXBatchScreenHud;
+        D3DXEmissionWorldBillboard = D3DXBatchWorldBillboard;
+        D3DXEmissionProjectedWorld = D3DXBatchProjectedWorld;
+        D3DXSpriteEmissionActive = true;
+    }
+
+    inline void EndD3DXSpriteEmission() noexcept
+    {
+        D3DXSpriteEmissionActive = false;
+        D3DXBatchGeneric = 0;
+        D3DXBatchScreenHud = 0;
+        D3DXBatchWorldBillboard = 0;
+        D3DXBatchProjectedWorld = 0;
+    }
+
     inline const void* CurrentQueueNode() noexcept
     {
         return CurrentSpriteQueueNode;
