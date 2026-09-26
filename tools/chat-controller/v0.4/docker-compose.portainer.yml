@@ -11,7 +11,7 @@ services:
     environment:
       TZ: Asia/Seoul
       AUTO_SEND: "${AUTO_SEND:-false}"
-      SCHEDULE_MINUTES: "10"
+      SCHEDULE_MINUTES: "50"
       CHAT_SLOTS: "1"
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"
@@ -21,7 +21,7 @@ services:
       RETRY_BUTTON_COOLDOWN_SECONDS: "45"
       VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"
       STATUS_PORT: "8787"
-      WATCHDOG_ENABLED: "true"
+      WATCHDOG_ENABLED: "false"
       WATCHDOG_STALL_MINUTES: "5"
       WATCHDOG_BUSY_STALL_MINUTES: "10"
       WATCHDOG_CHECK_SECONDS: "30"
