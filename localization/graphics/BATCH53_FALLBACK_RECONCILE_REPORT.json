@@ -1,0 +1,30 @@
+{
+  "batch": "53-fallback-reconcile",
+  "updated_at_kst": "2026-09-26T11:00:00+09:00",
+  "branch": "korean-localization-clean",
+  "result": "NO_STATE_ROLLBACK_SAFE_HOLD",
+  "canonical_state": {
+    "reviewed": 32,
+    "retained": 31,
+    "pending": 1
+  },
+  "fallback_reconcile": {
+    "prior_fallbacks": [
+      "Batch45 safe-hold",
+      "Batch53 local reconcile"
+    ],
+    "newer_canonical_evidence": [
+      "localization/graphics/BATCH51_REJECTED_REPORT.json",
+      "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json"
+    ],
+    "action": "Do not replay older state patches over Batch51/52."
+  },
+  "pending": {
+    "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+    "source_sha256": "ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0",
+    "raw_transform": "mirror_y",
+    "decision": "KEEP_ORIGINAL",
+    "reason": "Batch51 containment passes but manual source-art/icon/gradient/style QA fails."
+  },
+  "next_safe_action": "Use exact original DDS bytes to derive per-card templates/icon masks; require zero residual English, intact icons/gradients, source-like typography, containment, and raw/readable manual QA."
+}
