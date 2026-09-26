@@ -393,3 +393,13 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - No unsafe candidate was promoted. Canonical package remains Batch38 with the original `37759842`.
 - State remains **32 reviewed / 31 retained / 1 pending**.
 - Next safe implementation path: exact per-card template/icon masks derived from the original, not generic inpainting or gradient reconstruction.
+
+
+## 2026-09-26 10:47 KST - D PREFLIGHT / APPROVED MATERIALS CHECKPOINT
+
+- Performed D-only preflight before any new graphics work: policy/current/resume/status and accumulated promotion/rejection history were reconciled.
+- Canonical approved ledger remains **32 reviewed / 31 retained / 1 pending**; no report-level contradiction was found in the retained ledger.
+- Git intentionally stores reports/state rather than binary DDS payloads, so no claim of a fresh byte/pixel revalidation of all 31 retained DDS files is made from Git alone.
+- Final pending `37759842_1024x1024.dds` remains original-safe: late automated containment passes, but manual visual QA fails on card icon/gradient fidelity and/or residual English.
+- No rejected candidate was promoted. Existing B3-B38 approved retained set remains canonical.
+- Added `localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json`.
