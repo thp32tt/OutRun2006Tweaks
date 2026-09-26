@@ -369,67 +369,134 @@ namespace OutRunVRStereo
         bool R30CopyVertexShadow(IDirect3DVertexBuffer9* buffer,
             UINT offset, UINT size, std::vector<std::uint8_t>& out)
         {
-            const auto entry = R30FindVertexShadow(buffer);
+            const auto entry = R30EnsureVertexShadow(buffer);
             if (!entry)
             {
                 ++R30ShadowReadMisses;
                 return false;
             }
-            std::lock_guard<std::mutex> lock(entry->mutex);
-            if (offset > entry->size || size > entry->size - offset ||
-                entry->bytes.size() != entry->size ||
-                !R30RangeValid(entry->valid, offset, offset + size))
             {
-                ++R30ShadowReadMisses;
-                if (!R30FirstShadowMissLogged)
+                std::lock_guard<std::mutex> lock(entry->mutex);
+                if (offset <= entry->size && size <= entry->size - offset &&
+                    entry->bytes.size() == entry->size &&
+                    R30RangeValid(entry->valid, offset, offset + size))
                 {
-                    R30FirstShadowMissLogged = true;
-                    spdlog::info(
-                        "VR R30.6 BUFFER SHADOW: draw-time GPU Lock removed; an unobserved VB/IB range will fail open until the game's next write Lock/Unlock supplies CPU bytes");
+                    try
+                    {
+                        out.resize(size);
+                        std::memcpy(out.data(), entry->bytes.data() + offset, size);
+                    }
+                    catch (...)
+                    {
+                        return false;
+                    }
+                    ++R30ShadowReadHits;
+                    return true;
                 }
-                return false;
             }
-            try
+
+            // Existing static buffers can predate the R30 creation hook and may
+            // never receive another write Lock. Prefer correctness over the old
+            // lazy policy: perform one bounded READONLY seed on the first missing
+            // range, cache those bytes, then all later draws remain shadow-only.
+            void* data = nullptr;
+            if (offset <= entry->size && size <= entry->size - offset &&
+                SUCCEEDED(buffer->Lock(offset, size, &data, D3DLOCK_READONLY)) &&
+                data)
             {
-                out.resize(size);
-                std::memcpy(out.data(), entry->bytes.data() + offset, size);
+                bool copied = false;
+                try
+                {
+                    out.resize(size);
+                    std::memcpy(out.data(), data, size);
+                    std::lock_guard<std::mutex> lock(entry->mutex);
+                    if (entry->bytes.size() != entry->size)
+                        entry->bytes.resize(entry->size);
+                    std::memcpy(entry->bytes.data() + offset, data, size);
+                    R30MergeValidRange(entry->valid, offset, offset + size);
+                    copied = true;
+                }
+                catch (...)
+                {
+                    copied = false;
+                }
+                buffer->Unlock();
+                if (copied)
+                {
+                    ++R30ShadowReadHits;
+                    return true;
+                }
             }
-            catch (...)
+
+            ++R30ShadowReadMisses;
+            if (!R30FirstShadowMissLogged)
             {
-                return false;
+                R30FirstShadowMissLogged = true;
+                spdlog::info(
+                    "VR R30.6 BUFFER SHADOW: missing pre-hook VB data could not be seeded READONLY; this draw fails open without corrupting the original buffer");
             }
-            ++R30ShadowReadHits;
-            return true;
+            return false;
         }
 
         bool R30CopyIndexShadow(IDirect3DIndexBuffer9* buffer,
             UINT offset, UINT size, std::vector<std::uint8_t>& out)
         {
-            const auto entry = R30FindIndexShadow(buffer);
+            const auto entry = R30EnsureIndexShadow(buffer);
             if (!entry)
             {
                 ++R30ShadowReadMisses;
                 return false;
             }
-            std::lock_guard<std::mutex> lock(entry->mutex);
-            if (offset > entry->size || size > entry->size - offset ||
-                entry->bytes.size() != entry->size ||
-                !R30RangeValid(entry->valid, offset, offset + size))
             {
-                ++R30ShadowReadMisses;
-                return false;
+                std::lock_guard<std::mutex> lock(entry->mutex);
+                if (offset <= entry->size && size <= entry->size - offset &&
+                    entry->bytes.size() == entry->size &&
+                    R30RangeValid(entry->valid, offset, offset + size))
+                {
+                    try
+                    {
+                        out.resize(size);
+                        std::memcpy(out.data(), entry->bytes.data() + offset, size);
+                    }
+                    catch (...)
+                    {
+                        return false;
+                    }
+                    ++R30ShadowReadHits;
+                    return true;
+                }
             }
-            try
+
+            void* data = nullptr;
+            if (offset <= entry->size && size <= entry->size - offset &&
+                SUCCEEDED(buffer->Lock(offset, size, &data, D3DLOCK_READONLY)) &&
+                data)
             {
-                out.resize(size);
-                std::memcpy(out.data(), entry->bytes.data() + offset, size);
+                bool copied = false;
+                try
+                {
+                    out.resize(size);
+                    std::memcpy(out.data(), data, size);
+                    std::lock_guard<std::mutex> lock(entry->mutex);
+                    if (entry->bytes.size() != entry->size)
+                        entry->bytes.resize(entry->size);
+                    std::memcpy(entry->bytes.data() + offset, data, size);
+                    R30MergeValidRange(entry->valid, offset, offset + size);
+                    copied = true;
+                }
+                catch (...)
+                {
+                    copied = false;
+                }
+                buffer->Unlock();
+                if (copied)
+                {
+                    ++R30ShadowReadHits;
+                    return true;
+                }
             }
-            catch (...)
-            {
-                return false;
-            }
-            ++R30ShadowReadHits;
-            return true;
+            ++R30ShadowReadMisses;
+            return false;
         }
 
         HRESULT __stdcall R30VertexBufferLockDest(
@@ -575,6 +642,8 @@ namespace OutRunVRStereo
             if (SUCCEEDED(hr) && out && *out)
             {
                 R30EnsureVertexBufferHooks(*out);
+                R30EnsureVertexShadow(*out);
+                R30BufferShadowCaptureArmed.store(true, std::memory_order_release);
             }
             return hr;
         }
@@ -589,6 +658,8 @@ namespace OutRunVRStereo
             if (SUCCEEDED(hr) && out && *out)
             {
                 R30EnsureIndexBufferHooks(*out);
+                R30EnsureIndexShadow(*out);
+                R30BufferShadowCaptureArmed.store(true, std::memory_order_release);
             }
             return hr;
         }
