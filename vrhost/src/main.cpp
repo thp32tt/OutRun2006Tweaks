@@ -1898,6 +1898,8 @@ namespace
         {
             XrSwapchainImageAcquireInfo ai{ XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO };
             CheckXr(xrAcquireSwapchainImage(s.handle, &ai, &image), "xrAcquireSwapchainImage");
+            if (image >= s.images.size() || image >= s.rtvs.size())
+                throw std::runtime_error("xrAcquireSwapchainImage returned out-of-range image index");
             XrSwapchainImageWaitInfo wi{ XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO };
             wi.timeout = XR_INFINITE_DURATION;
             CheckXr(xrWaitSwapchainImage(s.handle, &wi), "xrWaitSwapchainImage");
