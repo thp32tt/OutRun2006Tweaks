@@ -467,7 +467,7 @@ namespace WheelProfileStore
         return key != "DeviceName" && key != "DeviceGuid" &&
             key != "Telemetry" && key != "DebugLog" &&
             key != "ResponseCorrection" && key != "ResponseLUT" &&
-            key != "MaxTorqueNm";
+            key != "MaxTorqueNm" && key != "FeelRevision";
     }
 
     inline std::vector<Settings::SettingBase*> ffb_settings()
@@ -502,7 +502,7 @@ namespace WheelProfileStore
         }
         file << "# OutRun2006Tweaks named force-feedback feel profile.\n";
         file << "# DeviceName/DeviceGuid and diagnostic logging are intentionally not stored here.\n\n";
-        file << "[Profile]\nType = ForceFeedback\nVersion = 1\n\n";
+        file << "[Profile]\nType = ForceFeedback\nVersion = 2\n\n";
         file << "[WheelFFB]\n";
         for (const Settings::SettingBase* setting : ffb_settings())
             file << setting->key() << " = " << setting->to_string() << "\n";
@@ -532,6 +532,30 @@ namespace WheelProfileStore
         return true;
     }
 
+    inline std::optional<std::string_view> canonical_ffb_profile_default(std::string_view key)
+    {
+        static constexpr std::pair<std::string_view, std::string_view> defaults[] = {
+            {"Enable","true"}, {"Model","0"}, {"GlobalStrength","0.70"},
+            {"PS2HostGain","1.0"}, {"SpringStrength","0.65"},
+            {"UseHardwareSpring","true"}, {"SpringSaturation","0.775"},
+            {"DamperStrength","0.30"}, {"UseHardwareDamper","true"},
+            {"SteeringWeight","1.45"}, {"MechanicalTrail","0.25"},
+            {"TrailResponseLead","0.25"}, {"PhysicsSAT","true"},
+            {"GripLoss","0.65"}, {"LateralDeadzone","1.5"},
+            {"WeightTransfer","0.60"}, {"WallImpact","0.38"},
+            {"GearShift","0.18"}, {"RoadTexture","0.30"},
+            {"TireSlip","0.20"}, {"EngineVibration","false"},
+            {"EngineIdle","0.20"}, {"SlewRate","0.06"},
+            {"ReversalReleaseRate","0.12"}, {"UsePeriodicEffects","true"},
+            {"InvertForce","false"}, {"InvertSpring","false"},
+        };
+        const std::string wanted = lower_ascii(std::string(key));
+        for (const auto& entry : defaults)
+            if (wanted == lower_ascii(std::string(entry.first)))
+                return entry.second;
+        return std::nullopt;
+    }
+
     inline bool load_ffb_profile(
         std::string_view rawName, int* appliedCount = nullptr, std::string* error = nullptr)
     {
@@ -549,6 +573,21 @@ namespace WheelProfileStore
         for (Settings::SettingBase* setting : settings)
             before.push_back(setting->to_string());
 
+        for (size_t i = 0; i < settings.size(); ++i)
+        {
+            Settings::SettingBase* setting = settings[i];
+            if (const auto baseline = canonical_ffb_profile_default(setting->key()))
+            {
+                if (!setting->set_from_string(*baseline))
+                {
+                    for (size_t restore = 0; restore < settings.size(); ++restore)
+                        settings[restore]->set_from_string(before[restore]);
+                    if (error) *error = "Could not apply canonical FFB profile baseline.";
+                    return false;
+                }
+            }
+        }
+
         int applied = 0;
         std::vector<Settings::SettingBase*> changed;
         for (size_t i = 0; i < settings.size(); ++i)
@@ -556,7 +595,7 @@ namespace WheelProfileStore
             Settings::SettingBase* setting = settings[i];
             const auto it = values.find(lower_ascii(std::string(setting->key())));
             if (it == values.end())
-                continue; // Forward/backward-compatible partial profile.
+                continue; // Missing keys keep the canonical baseline, not stale live state.
             if (!setting->set_from_string(it->second))
             {
                 for (size_t restore = 0; restore < settings.size(); ++restore)
@@ -564,10 +603,12 @@ namespace WheelProfileStore
                 if (error) *error = "FFB profile contains an invalid value for " + std::string(setting->key()) + ".";
                 return false;
             }
-            if (setting->to_string() != before[i])
-                changed.push_back(setting);
             ++applied;
         }
+
+        for (size_t i = 0; i < settings.size(); ++i)
+            if (settings[i]->to_string() != before[i])
+                changed.push_back(settings[i]);
 
         if (applied == 0)
         {
