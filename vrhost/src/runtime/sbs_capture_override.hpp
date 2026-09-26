@@ -688,11 +688,17 @@ float4 PSMain(VSOut input) : SV_Target
         {
             const XrResult result = ::xrWaitSwapchainImage(swapchain.handle, &wait);
             if (result == XR_TIMEOUT_EXPIRED)
-                continue;
+            {
+                // The image is still legally acquired but not waited. Keep that
+                // exact ownership and retry xrWaitSwapchainImage on a later XR
+                // frame; do not reacquire, release-before-wait, destroy, or
+                // permanently poison the fallback swapchain for a transient stall.
+                return false;
+            }
             if (XR_FAILED(result))
             {
-                // A failed wait leaves ownership ambiguous. Never acquire,
-                // render, release or recreate this swapchain again in-session.
+                // Non-timeout wait failures leave ownership ambiguous. Never
+                // acquire/render/recreate this swapchain again in-session.
                 swapchain.imageState = SwapchainImageState::Poisoned;
                 return false;
             }
