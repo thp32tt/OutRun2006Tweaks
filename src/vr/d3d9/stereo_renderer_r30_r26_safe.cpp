@@ -1199,8 +1199,10 @@ namespace OutRunVRStereo
 
         float R57RankMarkerScaleValue() noexcept
         {
-            return std::clamp(
-                Settings::VRRankMarkerScale.get(), 0.35f, 1.20f);
+            const float scale = Settings::VRRankMarkerScale.get();
+            if (!std::isfinite(scale))
+                return 0.82f;
+            return std::clamp(scale, 0.35f, 1.20f);
         }
 
         int R55HudCoordMode() noexcept
