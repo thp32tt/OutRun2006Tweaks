@@ -559,7 +559,7 @@ req(ffb, 'arcadeSurfaceTransitionCode_ = 0x04;', 'arcade right-side transition c
 req(ffb, 'arcadeSurfaceTransitionCode_ = 0x14;', 'arcade opposite transition code retained')
 req(ffb, 'WheelFFBMath::compose_arcade_directional_surface(', 'arcade transition owns directional surface output while active')
 forbid(ffb, 'arcadeDirectionalSurface += arcadeSurfaceTransitionForce_;', 'arcade transition cannot cancel against opposite sustained surface force')
-req(ffb, 'crashImpulseForce_ >= 0.0f ? 1.0f : -1.0f', 'arcade wall events preserve C2C-derived impact direction')
+req(ffb, 'crashImpactDirection_ * crashArcadeStrength_', 'arcade wall events preserve latched C2C-derived impact direction and pre-impact strength')
 req(ffb, 'impactFrame < WheelFFBMath::ArcadeConstantEventFrames', 'arcade wall output uses reference 80ms lifetime')
 req(ffb, 'const bool suppressStructuralForImpact =', 'structural crash suppression is model-aware')
 req(ffb, 'impactAge < WheelFFBMath::ArcadeConstantEventFrames', 'Arcade structural suppression ends with its 80ms event')
