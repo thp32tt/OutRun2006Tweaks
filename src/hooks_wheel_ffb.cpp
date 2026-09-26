@@ -1643,10 +1643,12 @@ namespace
             result.polarDirectionDynamic = !constantCapsKnown_ ||
                 (constantDynamicParams_ & DIEP_DIRECTION) != 0;
             result.springCapsKnown = springCapsKnown_;
-            result.springDynamic = !springCapsKnown_ ||
+            result.springDynamic = springEffect_ != nullptr ||
+                !springCapsKnown_ ||
                 (springDynamicParams_ & DIEP_TYPESPECIFICPARAMS) != 0;
             result.damperCapsKnown = damperCapsKnown_;
-            result.damperDynamic = !damperCapsKnown_ ||
+            result.damperDynamic = damperEffect_ != nullptr ||
+                !damperCapsKnown_ ||
                 (damperDynamicParams_ & DIEP_TYPESPECIFICPARAMS) != 0;
             const WheelFFBMath::Model statusModel =
                 WheelFFBMath::sanitize_model(
@@ -1657,9 +1659,11 @@ namespace
                 roadPeriodicCapsKnown_ &&
                 (!statusNeedsSlip || slipPeriodicCapsKnown_);
             result.periodicDynamic =
-                (!roadPeriodicCapsKnown_ ||
+                (roadTextureEffect_ != nullptr ||
+                 !roadPeriodicCapsKnown_ ||
                  (roadPeriodicDynamicParams_ & DIEP_TYPESPECIFICPARAMS) != 0) &&
                 (!statusNeedsSlip ||
+                 tireSlipEffect_ != nullptr ||
                  !slipPeriodicCapsKnown_ ||
                  (slipPeriodicDynamicParams_ & DIEP_TYPESPECIFICPARAMS) != 0);
             result.directionTested = directionTested_;
@@ -3562,12 +3566,29 @@ namespace
 
             if (FAILED(hr))
             {
+                const bool failedRoad = effect == roadTextureEffect_;
                 spdlog::warn(
-                    "WheelFFB: {} periodic update failed (0x{:08X}); falling back to ConstantForce vibration",
+                    "WheelFFB: {} periodic update failed (0x{:08X}); only this channel falls back to ConstantForce",
                     effectName, (unsigned)hr);
-                disable_periodics();
-                periodicRecreateHoldoffUntil_ =
-                    GetTickCount() + 500;
+                effect->Stop();
+                safe_release_effect(effect, "failed periodic channel");
+                state = {};
+                if (failedRoad)
+                {
+                    roadPeriodicCapsKnown_ = false;
+                    roadPeriodicDynamicParams_ = 0;
+                    roadPeriodicIsTriangle_ = false;
+                    roadPeriodicStrategy_ = 1;
+                }
+                else
+                {
+                    slipPeriodicCapsKnown_ = false;
+                    slipPeriodicDynamicParams_ = 0;
+                    slipPeriodicStrategy_ = 1;
+                }
+                periodicsActive_ =
+                    roadTextureEffect_ != nullptr || tireSlipEffect_ != nullptr;
+                periodicRecreateHoldoffUntil_ = GetTickCount() + 1000;
                 return;
             }
 
