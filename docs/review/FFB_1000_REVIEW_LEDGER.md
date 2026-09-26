@@ -54,7 +54,7 @@ A cycle is counted only after its assigned source/concern has been inspected and
 | C0040 | Modern DD + Arcade Hybrid structural/SAT/road/output/safety interaction | COMPLETE | No new non-duplicate defect; Modern/Hybrid structural ownership, Original isolation, model-specific periodics/fallback, gain application, headroom and transition safety remain consistent after C0030-C0039 | current-tree source/verifier/model-boundary review |
 | C0041 | Modern MOZA R3 preset tactile transport after C0030 | COMPLETE | `FFB-R0041-F01`: removing the global periodic lock made stale R3 preset=true live; both Modern R3 presets now explicitly keep hardware periodics off while Original-model shortcuts remain on | UI preset/verifier/model-doc review |
 
-Completed cycles: **41 / 1000**
+Completed cycles: **148 / 1000**
 
 ## Findings
 
@@ -89,3 +89,29 @@ Completed cycles: **41 / 1000**
 ## Next review
 
 Resume at **C0042** with runtime hardware validation or new external evidence. Static cross-model review is current through C0041; run exact-head CI before packaging.
+
+
+## R7 implementation status — C0042-C0148
+
+Branch: `ffb-r7-review100-fixes-20260926`
+
+The 100-cycle read-only pass C0049-C0148 was completed and recorded in Issue #29. R7 then implemented the confirmed/actionable queue without importing VR/localization source.
+
+Implemented in R7:
+- C0042 deep-slip reinforcement survives final SAT normalization.
+- C0043 pre-impact Arcade wall strength is latched for the short event.
+- C0044 authoritative course/vehicle collision edges no longer wait for the full 90-frame heuristic debounce after the real output pulse.
+- C0045 Spring/Damper/Periodic compatibility uses safe zero-output operation probes instead of metadata-only vetoes.
+- C0047 working road/slip hardware periodic channels are retained independently.
+- C0050 current R3 presets are not reclassified by per-frame legacy migration; legacy polarity migration no longer forces Reverse ON.
+- C0056 near-neutral/head-on impacts do not invent a left/right kick.
+- C0061/C0062 snow handling is material-aware and snow<->ordinary-primary-asphalt does not seed the curb latch.
+- C0080 older/partial named FFB profiles start from a deterministic canonical baseline and internal FeelRevision is not stored as a feel setting.
+- C0105 reversal latency gets a bounded four-tick post-zero build assist while preserving zero-crossing/regrip safety.
+- C0116/C0145 regression tests now cover current preset stability semantics, deep-slip final output and primary rough-road truth-table boundaries.
+- C0132 R3 ConstantForce tactile fallback separates road/slip carriers at smoother 10/12 Hz ceilings.
+- C0134 Deep Lake/Tulip/Floral proven primary rough roads are separated from generic curb/off-road promotion.
+- C0136 Floral entry/exit gets an explicit state-edge diagnostic.
+- C0137 high-volume telemetry is reduced to 5 Hz summary + 1 Hz deep detail.
+
+Research-gated and intentionally unchanged: C0046 physical road-wheel lock mapping, Arcade physical left/right polarity, exact per-contact collisionIndex production gating, exact material-to-Lindbergh event-code equivalence, and unresolved PS2 raw-period/non-zero ConstantForce caller semantics.

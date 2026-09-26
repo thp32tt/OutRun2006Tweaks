@@ -212,7 +212,7 @@ namespace Settings
 
     Setting<bool> WheelFFBTelemetry{
         "WheelFFB", "Telemetry", false,
-        "Opt-in 10 Hz dynamics and force-pipeline telemetry. Event logs remain separate."
+        "Opt-in 5 Hz force telemetry with 1 Hz deep dynamics detail. Event logs remain separate."
     };
 
     Setting<bool> WheelFFBDebugLog{
@@ -740,7 +740,8 @@ namespace
 
             update_crash_detection(
                 speed, stateFlags,
-                car->field_coli_281, car->field_282, car->field_283);
+                car->field_coli_281, car->field_282, car->field_283,
+                arcadeSpeedStrength);
             update_gear_event(curGear, arcadeEffects, speedRaw);
 
             float roughness = 0.0f;
@@ -761,17 +762,21 @@ namespace
                 roughness = std::max(roughness, wheelRoughness[i]);
             }
 
-            const auto non_water_rough = [&](int a, int b)
+            const int stageNumber = Game::GetNowStageNum(8);
+            const int uniqueStage = Game::GetStageUniqueNum(stageNumber);
+            const int roadSection =
+                static_cast<int>(car->OnRoadPlace_5C.roadSectionNum_8);
+
+            const auto arcade_rough_contact = [&](int i)
             {
-                float value = 0.0f;
-                if (!wheelWater[a]) value = std::max(value, wheelRoughness[a]);
-                if (!wheelWater[b]) value = std::max(value, wheelRoughness[b]);
-                return value;
+                return !wheelWater[i] && wheelRoughness[i] >= 0.60f &&
+                    !WheelFFBMath::is_proven_primary_rough_road_contact(
+                        uniqueStage, roadSection, car->water_flag_24C[i]);
             };
-            const float leftSurfaceRoughness = non_water_rough(0, 2);
-            const float rightSurfaceRoughness = non_water_rough(1, 3);
-            const bool leftArcadeRough = leftSurfaceRoughness >= 0.60f;
-            const bool rightArcadeRough = rightSurfaceRoughness >= 0.60f;
+            const bool leftArcadeRough =
+                arcade_rough_contact(0) || arcade_rough_contact(2);
+            const bool rightArcadeRough =
+                arcade_rough_contact(1) || arcade_rough_contact(3);
 
             // Road texture and tire-slip envelopes.  sub_1149C0 returns
             // ~0.25 for ordinary asphalt; that is a material baseline, not a
@@ -783,23 +788,27 @@ namespace
             const float roadSpeedGate =
                 std::clamp((speedNorm - 0.05f) / 0.20f, 0.0f, 1.0f);
 
-            // Xbox gamepad rumble treats snow/ice as a continuously rough
-            // material. On a DD wheel that becomes an unpleasant constant
-            // high-frequency sine. Stage IDs follow Game::StageNames: 4/19
-            // are Snowy Mountain/Ice Scape and +30 are their reverse variants.
-            const int stageNumber = Game::GetNowStageNum(8);
-            const int uniqueStage = Game::GetStageUniqueNum(stageNumber);
-            const bool snowOrIceStage =
-                uniqueStage == 4 || uniqueStage == 19 ||
-                uniqueStage == 34 || uniqueStage == 49;
+            bool sawSnowPrimary = false;
+            bool sawNonPrimarySnowMix = false;
+            for (int i = 0; i < 4; ++i)
+            {
+                if (wheelWater[i])
+                    continue;
+                const unsigned mask = car->water_flag_24C[i];
+                if (mask == WheelFFBMath::PrimarySnowIceSurfaceMask)
+                    sawSnowPrimary = true;
+                else if (mask != WheelFFBMath::PrimaryAsphaltSurfaceMask)
+                    sawNonPrimarySnowMix = true;
+            }
+            const bool snowPrimaryRoad = sawSnowPrimary && !sawNonPrimarySnowMix;
             constexpr float SnowIceRoadTextureScale = 0.04f;
-            const float stageRoadTextureScale =
-                snowOrIceStage ? SnowIceRoadTextureScale : 1.0f;
+            const float materialRoadTextureScale =
+                snowPrimaryRoad ? SnowIceRoadTextureScale : 1.0f;
 
             float roadAmp =
                 textureRoughness * roadSpeedGate *
                 static_cast<float>(Settings::WheelFFBRoadTexture) * outputStrength *
-                stageRoadTextureScale;
+                materialRoadTextureScale;
             float roadFreq = 25.0f + 12.0f * speedNorm;
             float ps2SurfaceEnvelope = 0.0f;
             int ps2RoadRaw = 0;
@@ -934,7 +943,7 @@ namespace
                     0.0f, 5.0f);
                 splashAmp_ =
                     (roughness - 0.7f) * speedNorm * 0.75f * roadTextureScale *
-                    outputStrength * stageRoadTextureScale;
+                    outputStrength * materialRoadTextureScale;
                 splashTimer_ = 9;
             }
             if (splashTimer_ > 0)
@@ -1228,8 +1237,9 @@ namespace
             const float mechanicalContribution =
                 WheelFFBMath::mechanical_sat_shape(
                     frontSlip, effectiveMechanicalTrail);
-            const float physicsShape = WheelFFBMath::combined_sat_shape(
-                frontSlip, trailResponseSlip, effectiveMechanicalTrail);
+            const float physicsShape =
+                WheelFFBMath::combined_sat_shape_with_deep_slip_boost(
+                    frontSlip, trailResponseSlip, mechanicalTrailMix);
             const float trailShape = pneumaticSatShape; // legacy telemetry field name
             const float physicsLoad = 0.62f + 0.48f * lateralLoadSmooth;
             const float rearSlideRelief = 1.0f - 0.15f * gripLoss * bodySlide;
@@ -1362,21 +1372,30 @@ namespace
 
             if (oppositeTorqueDirection)
             {
-                // A sign change first unloads stale torque to zero at the
-                // already-approved faster release rate. Do not build the new
-                // direction in the same tick.
                 if (std::abs(prevStructuralLevel_) <= reversalReleaseMaxSlew)
+                {
                     structuralLevel = 0;
+                    reversalBuildAssistFrames_ = 4;
+                }
                 else
+                {
                     structuralLevel = prevStructuralLevel_ +
                         (prevStructuralLevel_ > 0 ? -reversalReleaseMaxSlew : reversalReleaseMaxSlew);
+                }
             }
             else
             {
                 const bool unloadingStructural =
                     std::abs(structuralLevel) < std::abs(prevStructuralLevel_);
-                const LONG appliedMaxSlew =
+                LONG appliedMaxSlew =
                     unloadingStructural ? releaseMaxSlew : maxSlew;
+                if (!unloadingStructural && reversalBuildAssistFrames_ > 0)
+                {
+                    appliedMaxSlew = std::max(
+                        appliedMaxSlew,
+                        static_cast<LONG>(reversalReleaseMaxSlew * 3 / 4));
+                    --reversalBuildAssistFrames_;
+                }
                 const LONG structuralDelta =
                     structuralLevel - prevStructuralLevel_;
                 if (std::abs(structuralDelta) > appliedMaxSlew)
@@ -1392,7 +1411,7 @@ namespace
             // share the same startup/recreate ramp as structural force.
             const float effectRampScale = warmupScale * recreateScale;
             float fallbackVibration = 0.0f;
-            if (!periodicsActive_)
+            if (!roadTextureEffect_)
             {
                 if (ps2Original)
                 {
@@ -1403,11 +1422,14 @@ namespace
                 {
                     fallbackVibration += synth_fallback(
                         roadPhase_, roadAmp * effectRampScale,
-                        std::min(roadFreq, 15.0f));
+                        WheelFFBMath::software_road_tactile_frequency(roadFreq));
                 }
+            }
+            if (!tireSlipEffect_)
+            {
                 fallbackVibration += synth_fallback(
                     slipPhase_, slipAmp * effectRampScale,
-                    std::min(slipFreq, 15.0f));
+                    WheelFFBMath::software_slip_tactile_frequency(slipFreq));
             }
 
             // Engine haptics always use the normalized ConstantForce tactile
@@ -1505,7 +1527,7 @@ namespace
                 roughness, originalXboxLeftRumble, originalXboxRightRumble,
                 selfAligningTorque, level);
             const DWORD telemetryNow = GetTickCount();
-            if (Settings::WheelFFBTelemetry && telemetryNow - lastTelemetryTick_ >= 100)
+            if (Settings::WheelFFBTelemetry && telemetryNow - lastTelemetryTick_ >= 200)
             {
                 lastTelemetryTick_ = telemetryNow;
                 spdlog::info(
@@ -1527,7 +1549,10 @@ namespace
                     constantEffectPolar_, springEffect_ != nullptr, damperEffect_ != nullptr,
                     periodicsActive_, outputStrength, bool(Settings::WheelFFBInvertForce),
                     bool(Settings::WheelFFBInvertSpring));
-                spdlog::info(
+                if (telemetryNow - lastTelemetryDetailTick_ >= 1000)
+                {
+                    lastTelemetryDetailTick_ = telemetryNow;
+                    spdlog::info(
                     "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} rawFrontSlip={} frontSlip={} frontBlend={} trailResponseSlip={} trailResponseLead={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} diPreResponse={} diCorrected={} responseCorrection={}",
                     telemetryNow,
                     vehicleDynamics_.rawBodySlip(), vehicleDynamics_.bodySlip(), vehicleDynamics_.bodySlipBlend(),
@@ -1545,6 +1570,7 @@ namespace
                     car->matrix_70._11, car->matrix_70._13, car->matrix_70._31, car->matrix_70._33,
                     car->matrix_B0._11, car->matrix_B0._13, car->matrix_B0._31, car->matrix_B0._33,
                     car->matrix_F0._11, car->matrix_F0._13, car->matrix_F0._31, car->matrix_F0._33);
+                }
             }
         }
 
@@ -1617,10 +1643,12 @@ namespace
             result.polarDirectionDynamic = !constantCapsKnown_ ||
                 (constantDynamicParams_ & DIEP_DIRECTION) != 0;
             result.springCapsKnown = springCapsKnown_;
-            result.springDynamic = !springCapsKnown_ ||
+            result.springDynamic = springEffect_ != nullptr ||
+                !springCapsKnown_ ||
                 (springDynamicParams_ & DIEP_TYPESPECIFICPARAMS) != 0;
             result.damperCapsKnown = damperCapsKnown_;
-            result.damperDynamic = !damperCapsKnown_ ||
+            result.damperDynamic = damperEffect_ != nullptr ||
+                !damperCapsKnown_ ||
                 (damperDynamicParams_ & DIEP_TYPESPECIFICPARAMS) != 0;
             const WheelFFBMath::Model statusModel =
                 WheelFFBMath::sanitize_model(
@@ -1631,9 +1659,11 @@ namespace
                 roadPeriodicCapsKnown_ &&
                 (!statusNeedsSlip || slipPeriodicCapsKnown_);
             result.periodicDynamic =
-                (!roadPeriodicCapsKnown_ ||
+                (roadTextureEffect_ != nullptr ||
+                 !roadPeriodicCapsKnown_ ||
                  (roadPeriodicDynamicParams_ & DIEP_TYPESPECIFICPARAMS) != 0) &&
                 (!statusNeedsSlip ||
+                 tireSlipEffect_ != nullptr ||
                  !slipPeriodicCapsKnown_ ||
                  (slipPeriodicDynamicParams_ & DIEP_TYPESPECIFICPARAMS) != 0);
             result.directionTested = directionTested_;
@@ -2916,13 +2946,11 @@ namespace
         {
             if (!device_ || !Settings::WheelFFBUseHardwareSpring)
                 return false;
-            if (!query_dynamic_effect_capability(
-                    GUID_Spring, "GUID_Spring", DIEP_TYPESPECIFICPARAMS,
-                    springCapsKnown_, springDynamicParams_))
-            {
-                spdlog::warn("WheelFFB: GUID_Spring is not safely live-updatable; using software centering");
-                return false;
-            }
+            const bool springMetadataLive = query_dynamic_effect_capability(
+                GUID_Spring, "GUID_Spring", DIEP_TYPESPECIFICPARAMS,
+                springCapsKnown_, springDynamicParams_);
+            if (springCapsKnown_ && !springMetadataLive)
+                spdlog::warn("WheelFFB: GUID_Spring metadata lacks live-update flag; probing zero-output path");
 
             DWORD axes[1] = { primary_actuator_axis() };
             LONG directions[1] = { 1 };
@@ -2971,10 +2999,20 @@ namespace
 
             hr = springEffect_->Start(1, 0);
             if (FAILED(hr))
+                spdlog::warn("WheelFFB: GUID_Spring initial Start failed (0x{:08X}); probing zero-output update", (unsigned)hr);
+            DIEFFECT springProbe{};
+            springProbe.dwSize = sizeof(springProbe);
+            springProbe.cbTypeSpecificParams = sizeof(springParams_);
+            springProbe.lpvTypeSpecificParams = &springParams_;
+            const HRESULT springProbeHr = springEffect_->SetParameters(
+                &springProbe, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+            if (FAILED(springProbeHr))
             {
-                spdlog::warn(
-                    "WheelFFB: GUID_Spring initial Start failed (0x{:08X}); SetParameters will retry with DIEP_START",
-                    (unsigned)hr);
+                spdlog::warn("WheelFFB: GUID_Spring zero-output probe failed (0x{:08X}); using software centering", (unsigned)springProbeHr);
+                springEffect_->Stop();
+                safe_release_effect(springEffect_, "failed spring live probe");
+                springRecreateHoldoffUntil_ = GetTickCount() + 1000;
+                return false;
             }
 
             prevSpringCoefficient_ = 0;
@@ -3105,13 +3143,11 @@ namespace
         {
             if (!device_ || !Settings::WheelFFBUseHardwareDamper)
                 return false;
-            if (!query_dynamic_effect_capability(
-                    GUID_Damper, "GUID_Damper", DIEP_TYPESPECIFICPARAMS,
-                    damperCapsKnown_, damperDynamicParams_))
-            {
-                spdlog::warn("WheelFFB: GUID_Damper is not safely live-updatable; using software damping");
-                return false;
-            }
+            const bool damperMetadataLive = query_dynamic_effect_capability(
+                GUID_Damper, "GUID_Damper", DIEP_TYPESPECIFICPARAMS,
+                damperCapsKnown_, damperDynamicParams_);
+            if (damperCapsKnown_ && !damperMetadataLive)
+                spdlog::warn("WheelFFB: GUID_Damper metadata lacks live-update flag; probing zero-output path");
 
             DWORD axes[1] = { primary_actuator_axis() };
             LONG directions[1] = { 1 };
@@ -3150,7 +3186,21 @@ namespace
 
             hr = damperEffect_->Start(1, 0);
             if (FAILED(hr))
-                spdlog::warn("WheelFFB: GUID_Damper initial Start failed (0x{:08X})", (unsigned)hr);
+                spdlog::warn("WheelFFB: GUID_Damper initial Start failed (0x{:08X}); probing zero-output update", (unsigned)hr);
+            DIEFFECT damperProbe{};
+            damperProbe.dwSize = sizeof(damperProbe);
+            damperProbe.cbTypeSpecificParams = sizeof(damperParams_);
+            damperProbe.lpvTypeSpecificParams = &damperParams_;
+            const HRESULT damperProbeHr = damperEffect_->SetParameters(
+                &damperProbe, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+            if (FAILED(damperProbeHr))
+            {
+                spdlog::warn("WheelFFB: GUID_Damper zero-output probe failed (0x{:08X}); using software damping", (unsigned)damperProbeHr);
+                damperEffect_->Stop();
+                safe_release_effect(damperEffect_, "failed damper live probe");
+                damperRecreateHoldoffUntil_ = GetTickCount() + 1000;
+                return false;
+            }
 
             prevDamperCoefficient_ = 0;
             damperStrategy_ = 1; // Always include DIEP_START after menu reacquire.
@@ -3260,15 +3310,11 @@ namespace
 
             capsKnown = false;
             dynamicParams = 0;
-            if (!query_dynamic_effect_capability(
-                    effectGuid, effectName, DIEP_TYPESPECIFICPARAMS,
-                    capsKnown, dynamicParams))
-            {
-                spdlog::warn(
-                    "WheelFFB: {} is not safely live-updatable; using ConstantForce vibration fallback",
-                    effectName);
-                return nullptr;
-            }
+            const bool periodicMetadataLive = query_dynamic_effect_capability(
+                effectGuid, effectName, DIEP_TYPESPECIFICPARAMS,
+                capsKnown, dynamicParams);
+            if (capsKnown && !periodicMetadataLive)
+                spdlog::warn("WheelFFB: {} metadata lacks live-update flag; probing zero-output path", effectName);
 
             DWORD axes[1] = { primary_actuator_axis() };
             LONG directions[1] = { 1 };
@@ -3308,9 +3354,20 @@ namespace
 
             hr = result->Start(1, 0);
             if (FAILED(hr))
-                spdlog::warn(
-                    "WheelFFB: {} {} initial Start failed (0x{:08X})",
-                    label, effectName, (unsigned)hr);
+                spdlog::warn("WheelFFB: {} {} initial Start failed (0x{:08X}); probing zero-output update", label, effectName, (unsigned)hr);
+            DIEFFECT periodicProbe{};
+            periodicProbe.dwSize = sizeof(periodicProbe);
+            periodicProbe.cbTypeSpecificParams = sizeof(periodic);
+            periodicProbe.lpvTypeSpecificParams = &periodic;
+            const HRESULT periodicProbeHr = result->SetParameters(
+                &periodicProbe, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+            if (FAILED(periodicProbeHr))
+            {
+                spdlog::warn("WheelFFB: {} {} zero-output probe failed (0x{:08X}); using ConstantForce fallback for this channel", label, effectName, (unsigned)periodicProbeHr);
+                result->Stop();
+                safe_release_effect(result, "failed periodic live probe");
+                return nullptr;
+            }
 
             updateStrategy = 1;
             spdlog::info(
@@ -3388,16 +3445,14 @@ namespace
 
             roadState_ = {};
             slipState_ = {};
-            periodicsActive_ = periodic_set_complete(model);
+            periodicsActive_ =
+                roadTextureEffect_ != nullptr || tireSlipEffect_ != nullptr;
 
-            if (!periodicsActive_)
+            if (!periodic_set_complete(model))
             {
-                // Modern/Hybrid need both road and inferred tyre-slip effects.
-                // Original Arcade/PS2 models need only their road periodic.
-                disable_periodics();
-                periodicRecreateHoldoffUntil_ = GetTickCount() + 500;
+                periodicRecreateHoldoffUntil_ = GetTickCount() + 1000;
                 spdlog::warn(
-                    "WheelFFB: required hardware periodic set unavailable for {}; using ConstantForce fallback",
+                    "WheelFFB: hardware periodic set is partial for {}; missing channels use ConstantForce fallback",
                     WheelFFBMath::model_name(model));
             }
         }
@@ -3511,12 +3566,29 @@ namespace
 
             if (FAILED(hr))
             {
+                const bool failedRoad = effect == roadTextureEffect_;
                 spdlog::warn(
-                    "WheelFFB: {} periodic update failed (0x{:08X}); falling back to ConstantForce vibration",
+                    "WheelFFB: {} periodic update failed (0x{:08X}); only this channel falls back to ConstantForce",
                     effectName, (unsigned)hr);
-                disable_periodics();
-                periodicRecreateHoldoffUntil_ =
-                    GetTickCount() + 500;
+                effect->Stop();
+                safe_release_effect(effect, "failed periodic channel");
+                state = {};
+                if (failedRoad)
+                {
+                    roadPeriodicCapsKnown_ = false;
+                    roadPeriodicDynamicParams_ = 0;
+                    roadPeriodicIsTriangle_ = false;
+                    roadPeriodicStrategy_ = 1;
+                }
+                else
+                {
+                    slipPeriodicCapsKnown_ = false;
+                    slipPeriodicDynamicParams_ = 0;
+                    slipPeriodicStrategy_ = 1;
+                }
+                periodicsActive_ =
+                    roadTextureEffect_ != nullptr || tireSlipEffect_ != nullptr;
+                periodicRecreateHoldoffUntil_ = GetTickCount() + 1000;
                 return;
             }
 
@@ -3723,8 +3795,11 @@ namespace
             uint32_t stateFlags,
             uint8_t courseCollisionSide,
             uint8_t courseCollisionStrength,
-            uint8_t courseCollisionTimer)
+            uint8_t courseCollisionTimer,
+            float arcadeSpeedStrength)
         {
+            if (speedFallbackCooldown_ > 0)
+                --speedFallbackCooldown_;
             const bool collision = (stateFlags & 0x1000) != 0;
             const bool wasCollision = (prevCollisionFlags_ & 0x1000) != 0;
             const bool collisionEdge = collision && !wasCollision;
@@ -3732,97 +3807,66 @@ namespace
                 WheelFFBMath::course_collision_timer_edge(
                     courseCollisionTimer, prevCourseCollisionTimer_);
             prevCourseCollisionTimer_ = courseCollisionTimer;
+            const bool impactOutputActive =
+                crashImpulseTimer_ > CrashCooldownFrames;
+            const bool authoritativeCanRetrigger = !impactOutputActive;
 
-            // FUN_00503a20 reloads car+0x283 to 30 from the course-collision
-            // solver. Give that dedicated boundary/wall witness priority over
-            // the broader field_8/0x1000 state used by other impacts.
-            // field_coli_281 and field_282 stay diagnostic until physical
-            // left/right polarity and units are validated on hardware.
-            if (courseCollisionEdge && crashImpulseTimer_ <= 0)
+            const float lateralBeforeImpact =
+                lateralHistoryIndex_ > 8
+                    ? lateralHistory_[(lateralHistoryIndex_ - 8) % LateralHistoryCount]
+                    : smoothedLateral_;
+            const float impactDirection =
+                WheelFFBMath::impact_direction_from_lateral(lateralBeforeImpact);
+
+            auto latch_impact = [&](float magnitude)
             {
-                const float lateralBeforeImpact =
-                    lateralHistoryIndex_ > 8
-                        ? lateralHistory_[(lateralHistoryIndex_ - 8) % LateralHistoryCount]
-                        : smoothedLateral_;
-                const float direction =
-                    lateralBeforeImpact >= 0.0f ? -1.0f : 1.0f;
-
-                crashImpulseForce_ =
-                    direction * 1.9f *
+                crashImpactDirection_ = impactDirection;
+                crashImpulseForce_ = impactDirection * magnitude *
                     static_cast<float>(Settings::WheelFFBWallImpact);
+                crashArcadeStrength_ = std::clamp(
+                    std::isfinite(arcadeSpeedStrength) ? arcadeSpeedStrength : 0.0f,
+                    0.0f, 1.0f);
                 crashImpulseTimer_ = CrashTimerFrames;
+                speedFallbackCooldown_ = CrashTimerFrames;
                 smoothedLateral_ = 0.0f;
+            };
 
+            if (courseCollisionEdge && authoritativeCanRetrigger)
+            {
+                latch_impact(1.9f);
                 if (Settings::WheelFFBDebugLog)
-                {
                     spdlog::info(
-                        "WheelFFB: course/wall collision edge timer={} side={} strength={} dir={:.0f}",
-                        unsigned(courseCollisionTimer),
-                        unsigned(courseCollisionSide),
-                        unsigned(courseCollisionStrength),
-                        direction);
-                }
+                        "WheelFFB: course/wall collision edge timer={} side={} strength={} dir={:.0f} arcadeLatch={:.2f}",
+                        unsigned(courseCollisionTimer), unsigned(courseCollisionSide),
+                        unsigned(courseCollisionStrength), impactDirection, crashArcadeStrength_);
                 return;
             }
 
-            // The broad collision-state edge remains useful for vehicle and
-            // other non-course impacts. Speed-drop is emergency fallback only.
-            if (collisionEdge && crashImpulseTimer_ <= 0)
+            if (collisionEdge && authoritativeCanRetrigger)
             {
-                const float lateralBeforeImpact =
-                    lateralHistoryIndex_ > 8
-                        ? lateralHistory_[(lateralHistoryIndex_ - 8) % LateralHistoryCount]
-                        : smoothedLateral_;
-
-                const float direction =
-                    lateralBeforeImpact >= 0.0f ? -1.0f : 1.0f;
-
-                crashImpulseForce_ =
-                    direction * 1.9f *
-                    static_cast<float>(Settings::WheelFFBWallImpact);
-                crashImpulseTimer_ = CrashTimerFrames;
-                smoothedLateral_ = 0.0f;
-
+                latch_impact(1.9f);
                 if (Settings::WheelFFBDebugLog)
-                {
                     spdlog::info(
-                        "WheelFFB: collision state edge, dir={:.0f}",
-                        direction);
-                }
+                        "WheelFFB: collision state edge, dir={:.0f} arcadeLatch={:.2f}",
+                        impactDirection, crashArcadeStrength_);
                 return;
             }
 
-            if (crashImpulseTimer_ <= 0 && !collisionEdge &&
+            if (speedFallbackCooldown_ <= 0 && !collisionEdge &&
                 speedHistoryIndex_ > 6)
             {
                 const float oldSpeed =
                     speedHistory_[(speedHistoryIndex_ - 6) % SpeedHistoryCount];
                 const float speedDrop = oldSpeed - speed;
-
                 if (WheelFFBMath::crash_speed_drop_fallback(speedDrop, speed))
                 {
-                    const float lateralBeforeImpact =
-                        lateralHistoryIndex_ > 8
-                            ? lateralHistory_[(lateralHistoryIndex_ - 8) % LateralHistoryCount]
-                            : smoothedLateral_;
-
-                    const float direction =
-                        lateralBeforeImpact >= 0.0f ? -1.0f : 1.0f;
                     const float severity =
                         WheelFFBMath::crash_speed_drop_severity(speedDrop);
-                    crashImpulseForce_ =
-                        direction * (1.7f + 0.8f * severity) *
-                        static_cast<float>(Settings::WheelFFBWallImpact);
-
-                    crashImpulseTimer_ = CrashTimerFrames;
-                    smoothedLateral_ = 0.0f;
-
+                    latch_impact(1.7f + 0.8f * severity);
                     if (Settings::WheelFFBDebugLog)
-                    {
                         spdlog::info(
                             "WheelFFB: crash fallback speedDrop={:.3f}, dir={:.0f}",
-                            speedDrop, direction);
-                    }
+                            speedDrop, impactDirection);
                 }
             }
         }
@@ -3869,9 +3913,7 @@ namespace
                             CrashTimerFrames - crashImpulseTimer_;
                         if (impactFrame < WheelFFBMath::ArcadeConstantEventFrames)
                         {
-                            const float direction =
-                                crashImpulseForce_ >= 0.0f ? 1.0f : -1.0f;
-                            result += direction * arcadeSpeedStrength *
+                            result += crashImpactDirection_ * crashArcadeStrength_ *
                                 std::clamp(
                                     static_cast<float>(Settings::WheelFFBWallImpact),
                                     0.0f, 1.0f);
@@ -4015,6 +4057,10 @@ namespace
             prevDamperCoefficient_ = 0;
             crashImpulseTimer_ = 0;
             crashImpulseForce_ = 0.0f;
+            crashImpactDirection_ = 0.0f;
+            crashArcadeStrength_ = 0.0f;
+            speedFallbackCooldown_ = 0;
+            reversalBuildAssistFrames_ = 0;
             gearShiftTimer_ = 0;
             warmupFrames_ = 0;
             roadPhase_ = 0.0f;
@@ -4400,6 +4446,7 @@ namespace
         DWORD damperRecreateHoldoffUntil_ = 0;
         DWORD lastUpdateTick_ = 0;
         DWORD lastLogTick_ = 0;
+        DWORD lastTelemetryDetailTick_ = 0;
         DWORD deviceFailureSince_ = 0;
         unsigned constantLiveFailureCount_ = 0;
         DWORD deviceReinitAfter_ = 0;
@@ -4434,6 +4481,8 @@ namespace
         bool responseLutValid_ = true;
 
         float crashImpulseForce_ = 0.0f;
+        float crashImpactDirection_ = 0.0f;
+        float crashArcadeStrength_ = 0.0f;
         float roadPhase_ = 0.0f;
         float slipPhase_ = 0.0f;
         float enginePhase_ = 0.0f;
@@ -4465,6 +4514,8 @@ namespace
         DWORD prevSpringSaturation_ = 0;
 
         int crashImpulseTimer_ = 0;
+        int speedFallbackCooldown_ = 0;
+        int reversalBuildAssistFrames_ = 0;
         int gearShiftTimer_ = 0;
         int warmupFrames_ = 0;
         int recreateRampFrames_ = 0;

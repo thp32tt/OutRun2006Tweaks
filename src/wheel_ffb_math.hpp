@@ -273,7 +273,7 @@ namespace WheelFFBMath
     // Keep normal-corner feel unchanged, then add only the missing
     // mechanical/caster self-steer in a large drift. Pneumatic trail and the
     // existing re-grip/return suppression are deliberately untouched.
-    constexpr float DeepSlipMechanicalBoost = 1.25f;
+    constexpr float DeepSlipMechanicalBoost = 1.50f;
     constexpr float DeepSlipMechanicalStartRad = 0.18f;
     constexpr float DeepSlipMechanicalFullRad = 0.32f;
 
@@ -313,6 +313,59 @@ namespace WheelFFBMath
     inline float combined_sat_shape(float alpha, float mechanicalTrailRatio)
     {
         return combined_sat_shape(alpha, alpha, mechanicalTrailRatio);
+    }
+
+    inline float combined_sat_shape_with_deep_slip_boost(
+        float forceAlpha, float trailAlpha, float baseMechanicalTrailRatio)
+    {
+        if (!std::isfinite(forceAlpha) || !std::isfinite(trailAlpha))
+            return 0.0f;
+        const float baseRatio = std::clamp(baseMechanicalTrailRatio, 0.0f, 0.60f);
+        const float effectiveRatio =
+            deep_slip_mechanical_trail_ratio(forceAlpha, baseRatio);
+        const float denominator = PneumaticReferencePeak + baseRatio;
+        if (denominator <= 0.0f)
+            return 0.0f;
+        const float raw = lateral_force_shape(forceAlpha) *
+            (pneumatic_trail_factor(trailAlpha) + effectiveRatio);
+        return std::clamp(raw / denominator, 0.0f, 1.0f);
+    }
+
+    inline float impact_direction_from_lateral(float lateral, float deadband = 0.04f)
+    {
+        if (!std::isfinite(lateral) || std::abs(lateral) <= std::max(0.0f, deadband))
+            return 0.0f;
+        return lateral > 0.0f ? -1.0f : 1.0f;
+    }
+
+    constexpr unsigned PrimaryAsphaltSurfaceMask = 0x00000002u;
+    constexpr unsigned PrimaryRoughRoadSurfaceMask = 0x00100000u;
+    constexpr unsigned PrimarySnowIceSurfaceMask = 0x00800000u;
+
+    inline bool proven_primary_rough_road_section(int uniqueStage, int roadSection)
+    {
+        return (uniqueStage == 1 && roadSection >= 419 && roadSection <= 458) ||
+               (uniqueStage == 10 && roadSection >= 54 && roadSection <= 70) ||
+               (uniqueStage == 27 && roadSection >= 510 && roadSection <= 533);
+    }
+
+    inline bool is_proven_primary_rough_road_contact(
+        int uniqueStage, int roadSection, unsigned surfaceMask)
+    {
+        return surfaceMask == PrimaryRoughRoadSurfaceMask &&
+            proven_primary_rough_road_section(uniqueStage, roadSection);
+    }
+
+    inline float software_road_tactile_frequency(float requestedHz)
+    {
+        if (!std::isfinite(requestedHz) || requestedHz <= 0.0f) return 0.0f;
+        return std::min(requestedHz, 10.0f);
+    }
+
+    inline float software_slip_tactile_frequency(float requestedHz)
+    {
+        if (!std::isfinite(requestedHz) || requestedHz <= 0.0f) return 0.0f;
+        return std::min(requestedHz, 12.0f);
     }
 
     // Kept as a compatibility alias for older host tests/tools. Production

@@ -8,6 +8,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "plugin.hpp"
@@ -467,7 +468,7 @@ namespace WheelProfileStore
         return key != "DeviceName" && key != "DeviceGuid" &&
             key != "Telemetry" && key != "DebugLog" &&
             key != "ResponseCorrection" && key != "ResponseLUT" &&
-            key != "MaxTorqueNm";
+            key != "MaxTorqueNm" && key != "FeelRevision";
     }
 
     inline std::vector<Settings::SettingBase*> ffb_settings()
@@ -502,7 +503,7 @@ namespace WheelProfileStore
         }
         file << "# OutRun2006Tweaks named force-feedback feel profile.\n";
         file << "# DeviceName/DeviceGuid and diagnostic logging are intentionally not stored here.\n\n";
-        file << "[Profile]\nType = ForceFeedback\nVersion = 1\n\n";
+        file << "[Profile]\nType = ForceFeedback\nVersion = 2\n\n";
         file << "[WheelFFB]\n";
         for (const Settings::SettingBase* setting : ffb_settings())
             file << setting->key() << " = " << setting->to_string() << "\n";
@@ -532,6 +533,92 @@ namespace WheelProfileStore
         return true;
     }
 
+    inline std::optional<std::string_view> canonical_ffb_profile_default(
+        std::string_view key, int model)
+    {
+        const std::string wanted = lower_ascii(std::string(key));
+
+        // Common clean baseline. Model-specific reference values below override
+        // only settings owned by that model; device routing/calibration and
+        // diagnostics are excluded from FFB feel profiles entirely.
+        static constexpr std::pair<std::string_view, std::string_view> common[] = {
+            {"Enable","true"}, {"Model","0"}, {"GlobalStrength","0.70"},
+            {"PS2HostGain","1.0"}, {"SpringStrength","0.65"},
+            {"UseHardwareSpring","true"}, {"SpringSaturation","0.775"},
+            {"DamperStrength","0.30"}, {"UseHardwareDamper","true"},
+            {"SteeringWeight","1.45"}, {"MechanicalTrail","0.25"},
+            {"TrailResponseLead","0.25"}, {"PhysicsSAT","true"},
+            {"GripLoss","0.65"}, {"LateralDeadzone","1.5"},
+            {"WeightTransfer","0.60"}, {"WallImpact","0.38"},
+            {"GearShift","0.18"}, {"RoadTexture","0.30"},
+            {"TireSlip","0.20"}, {"EngineVibration","false"},
+            {"EngineIdle","0.20"}, {"SlewRate","0.06"},
+            {"ReversalReleaseRate","0.12"}, {"UsePeriodicEffects","true"},
+            {"InvertForce","false"}, {"InvertSpring","false"},
+        };
+
+        const auto pick = [&](std::string_view name, std::string_view value)
+            -> std::optional<std::string_view>
+        {
+            return wanted == lower_ascii(std::string(name))
+                ? std::optional<std::string_view>(value)
+                : std::nullopt;
+        };
+
+        if (model == 1) // Arcade Original
+        {
+            if (auto v=pick("Model","1")) return v;
+            if (auto v=pick("SpringStrength","0.50")) return v;
+            if (auto v=pick("SpringSaturation","1.00")) return v;
+            if (auto v=pick("DamperStrength","0.0")) return v;
+            if (auto v=pick("UseHardwareDamper","false")) return v;
+            if (auto v=pick("RoadTexture","1.0")) return v;
+            if (auto v=pick("WallImpact","1.0")) return v;
+            if (auto v=pick("GearShift","1.0")) return v;
+            if (auto v=pick("UsePeriodicEffects","true")) return v;
+        }
+        else if (model == 2) // Arcade + Modern Hybrid
+        {
+            if (auto v=pick("Model","2")) return v;
+            if (auto v=pick("PhysicsSAT","true")) return v;
+            if (auto v=pick("SpringStrength","0.65")) return v;
+            if (auto v=pick("SpringSaturation","0.95")) return v;
+            if (auto v=pick("DamperStrength","0.28")) return v;
+            if (auto v=pick("UseHardwareDamper","true")) return v;
+            if (auto v=pick("SteeringWeight","1.45")) return v;
+            if (auto v=pick("MechanicalTrail","0.25")) return v;
+            if (auto v=pick("TrailResponseLead","0.25")) return v;
+            if (auto v=pick("GripLoss","0.65")) return v;
+            if (auto v=pick("WeightTransfer","0.15")) return v;
+            if (auto v=pick("SlewRate","0.040")) return v;
+            if (auto v=pick("ReversalReleaseRate","0.12")) return v;
+            if (auto v=pick("RoadTexture","1.0")) return v;
+            if (auto v=pick("WallImpact","1.0")) return v;
+            if (auto v=pick("GearShift","1.0")) return v;
+            if (auto v=pick("TireSlip","0.20")) return v;
+            if (auto v=pick("UsePeriodicEffects","true")) return v;
+        }
+        else if (model == 3) // PS2 Original
+        {
+            if (auto v=pick("Model","3")) return v;
+            if (auto v=pick("PS2HostGain","2.0")) return v;
+            if (auto v=pick("SpringStrength","0.65")) return v;
+            if (auto v=pick("SpringSaturation","0.775")) return v;
+            if (auto v=pick("DamperStrength","0.30")) return v;
+            if (auto v=pick("RoadTexture","1.0")) return v;
+            if (auto v=pick("UsePeriodicEffects","true")) return v;
+        }
+        else
+        {
+            if (auto v=pick("Model","0")) return v;
+        }
+
+        for (const auto& entry : common)
+            if (wanted == lower_ascii(std::string(entry.first)))
+                return entry.second;
+        return std::nullopt;
+    }
+
     inline bool load_ffb_profile(
         std::string_view rawName, int* appliedCount = nullptr, std::string* error = nullptr)
     {
@@ -543,11 +630,41 @@ namespace WheelProfileStore
         if (!parse_section(*path, "WheelFFB", values, error))
             return false;
 
+        int profileModel = 0;
+        if (const auto modelIt = values.find("model"); modelIt != values.end())
+        {
+            try
+            {
+                profileModel = std::clamp(std::stoi(modelIt->second), 0, 3);
+            }
+            catch (...)
+            {
+                if (error) *error = "FFB profile contains an invalid Model value.";
+                return false;
+            }
+        }
+
         auto settings = ffb_settings();
         std::vector<std::string> before;
         before.reserve(settings.size());
         for (Settings::SettingBase* setting : settings)
             before.push_back(setting->to_string());
+
+        for (size_t i = 0; i < settings.size(); ++i)
+        {
+            Settings::SettingBase* setting = settings[i];
+            if (const auto baseline = canonical_ffb_profile_default(
+                    setting->key(), profileModel))
+            {
+                if (!setting->set_from_string(*baseline))
+                {
+                    for (size_t restore = 0; restore < settings.size(); ++restore)
+                        settings[restore]->set_from_string(before[restore]);
+                    if (error) *error = "Could not apply canonical FFB profile baseline.";
+                    return false;
+                }
+            }
+        }
 
         int applied = 0;
         std::vector<Settings::SettingBase*> changed;
@@ -556,7 +673,7 @@ namespace WheelProfileStore
             Settings::SettingBase* setting = settings[i];
             const auto it = values.find(lower_ascii(std::string(setting->key())));
             if (it == values.end())
-                continue; // Forward/backward-compatible partial profile.
+                continue; // Missing keys keep the canonical baseline, not stale live state.
             if (!setting->set_from_string(it->second))
             {
                 for (size_t restore = 0; restore < settings.size(); ++restore)
@@ -564,10 +681,12 @@ namespace WheelProfileStore
                 if (error) *error = "FFB profile contains an invalid value for " + std::string(setting->key()) + ".";
                 return false;
             }
-            if (setting->to_string() != before[i])
-                changed.push_back(setting);
             ++applied;
         }
+
+        for (size_t i = 0; i < settings.size(); ++i)
+            if (settings[i]->to_string() != before[i])
+                changed.push_back(settings[i]);
 
         if (applied == 0)
         {

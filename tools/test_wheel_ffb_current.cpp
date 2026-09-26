@@ -120,13 +120,25 @@ int main() {
  require(combined_sat_shape(.16f,.25f)<=1.000001f,"combined SAT bounded");
  require(mechanical_sat_shape(.12f,.25f)>0.10f,"mechanical trail acts in normal loaded corner");
  require(std::abs(deep_slip_mechanical_trail_ratio(.12f,.25f)-.25f)<1e-6f,"normal-corner caster ratio is unchanged");
- require(deep_slip_mechanical_trail_ratio(.32f,.25f)>.3124f&&deep_slip_mechanical_trail_ratio(.32f,.25f)<.3126f,"deep-slip caster ratio gains 25 percent");
+ require(deep_slip_mechanical_trail_ratio(.32f,.25f)>.3749f&&deep_slip_mechanical_trail_ratio(.32f,.25f)<.3751f,"deep-slip caster ratio gains 50 percent");
  require(std::abs(deep_slip_mechanical_trail_ratio(-.32f,.25f)-deep_slip_mechanical_trail_ratio(.32f,.25f))<1e-6f,"deep-slip caster boost is symmetric");
  require(deep_slip_mechanical_trail_ratio(.32f,.60f)<=.600001f,"deep-slip caster boost respects mechanical cap");
  require(mechanical_sat_shape(.32f,.25f)>mechanical_sat_shape(.12f,.25f),"mechanical term follows front lateral force");
  require(combined_sat_shape(.32f,.25f)>pneumatic_sat_shape(.32f),"total trail preserves deep-slip torque");
  require(combined_sat_shape(.32f,0.0f)==pneumatic_sat_shape(.32f),"mechanical trail zero is pure pneumatic");
  require(std::abs(combined_sat_shape(.32f,.25f)-combined_sat_shape(-.32f,.25f))<1e-6f,"SAT shape symmetry");
+ require(combined_sat_shape_with_deep_slip_boost(.32f,.32f,.25f)>combined_sat_shape(.32f,.32f,.25f)*1.15f,"deep-slip boost survives final normalization");
+ require(std::abs(combined_sat_shape_with_deep_slip_boost(.12f,.12f,.25f)-combined_sat_shape(.12f,.12f,.25f))<1e-5f,"deep-slip boost leaves normal corner unchanged");
+ require(impact_direction_from_lateral(0.0f)==0.0f,"head-on impact is neutral");
+ require(impact_direction_from_lateral(.20f)<0.0f&&impact_direction_from_lateral(-.20f)>0.0f,"lateral impact direction remains symmetric");
+ require(proven_primary_rough_road_section(1,419)&&proven_primary_rough_road_section(1,458),"Deep Lake primary rough-road bounds");
+ require(!proven_primary_rough_road_section(1,418)&&!proven_primary_rough_road_section(1,459),"Deep Lake rough-road bounds reject neighbors");
+ require(proven_primary_rough_road_section(10,54)&&proven_primary_rough_road_section(10,70),"Tulip Garden primary rough-road bounds");
+ require(proven_primary_rough_road_section(27,510)&&proven_primary_rough_road_section(27,533),"Floral Village primary rough-road bounds");
+ require(is_proven_primary_rough_road_contact(27,520,PrimaryRoughRoadSurfaceMask),"Floral primary rough material accepted");
+ require(!is_proven_primary_rough_road_contact(27,520,PrimaryAsphaltSurfaceMask),"ordinary asphalt is not rough-road material");
+ require(std::abs(software_road_tactile_frequency(35.0f)-10.0f)<1e-6f,"software road carrier smoother than old 15Hz fallback");
+ require(std::abs(software_slip_tactile_frequency(35.0f)-12.0f)<1e-6f,"software slip carrier remains distinct from road carrier");
  require(pneumatic_sat_shape(.20f,.28f)<pneumatic_sat_shape(.20f,.20f),"phase-led growing slip drops pneumatic trail sooner");
  require(pneumatic_sat_shape(.20f,.12f)>pneumatic_sat_shape(.20f,.20f),"phase-led recovering slip restores pneumatic trail sooner");
  for(int i=0;i<=7000;++i) {float a=i*.0001f;float p=pneumatic_sat_shape(a),c=combined_sat_shape(a,.25f);require(std::isfinite(p)&&p>=0&&p<=1.000001f,"pneumatic bounds");require(std::isfinite(c)&&c>=0&&c<=1.000001f,"combined bounds");}

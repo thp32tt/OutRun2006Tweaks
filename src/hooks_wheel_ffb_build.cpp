@@ -59,7 +59,7 @@ namespace Settings
     Setting<int> WheelFFBFeelRevision{
         "WheelFFB", "FeelRevision", 0,
         "Internal one-shot migration version for wheel FFB feel defaults.",
-        Range<int>{ 0, 5 }
+        Range<int>{ 0, 6 }
     };
 }
 
@@ -194,35 +194,27 @@ namespace
         return result;
     }
 
-    // Direct Stage.zip/COLI0200 analysis proves that Floral Village's short
-    // rough PRIMARY-road strip uses materialId 0x14 -> surfaceMask 0x00100000
-    // at roadSection 510..533.  Do not use "all four tyres are rough" as the
-    // discriminator: that also becomes true when the whole car leaves the road.
-    // Keep the attenuation only while every valid non-water contact is one of
-    // the two proven primary-road materials for this stage (0x2 asphalt or
-    // 0x100000 rough paving), and at least one contact is on the rough strip.
-    constexpr int FloralVillageStage = 27;
-    constexpr int FloralVillageBrickRoadSectionFirst = 510;
-    constexpr int FloralVillageBrickRoadSectionLast = 533;
-    constexpr unsigned int FloralVillageAsphaltMask = 0x00000002u;
-    constexpr unsigned int FloralVillageRoughPavingMask = 0x00100000u;
+    // Direct Stage.zip/COLI0200 analysis proves material 0x14 / mask
+    // 0x100000 is PRIMARY road in these exact forward-stage ranges.
+    // Keep them out of generic curb/shoulder classification. Floral Village
+    // retains the tested 0.60 comfort attenuation; Deep Lake/Tulip keep normal
+    // Road Detail until hardware A/B justifies any stage-specific attenuation.
     constexpr float FloralVillageRoughPavingScale = 0.60f;
 
-    bool is_floral_village_primary_rough_paving(
+    bool is_proven_primary_rough_road(
         const StageSurfaceContext& stage,
         const RoadSurfaceProfile& surface,
         const EVWORK_CAR* car)
     {
-        if (!car || stage.uniqueStage != FloralVillageStage)
+        if (!car)
             return false;
-
         const int roadSection =
             static_cast<int>(car->OnRoadPlace_5C.roadSectionNum_8);
-        if (roadSection < FloralVillageBrickRoadSectionFirst ||
-            roadSection > FloralVillageBrickRoadSectionLast)
+        if (!WheelFFBMath::proven_primary_rough_road_section(
+                stage.uniqueStage, roadSection))
             return false;
 
-        bool sawRoughPaving = false;
+        bool sawRoughRoad = false;
         for (int i = 0; i < 4; ++i)
         {
             const unsigned int bit = 1u << i;
@@ -232,13 +224,12 @@ namespace
                 return false;
 
             const unsigned int mask = surface.surfaceMask[i];
-            if (mask == FloralVillageRoughPavingMask)
-                sawRoughPaving = true;
-            else if (mask != FloralVillageAsphaltMask)
+            if (mask == WheelFFBMath::PrimaryRoughRoadSurfaceMask)
+                sawRoughRoad = true;
+            else if (mask != WheelFFBMath::PrimaryAsphaltSurfaceMask)
                 return false;
         }
-
-        return sawRoughPaving;
+        return sawRoughRoad;
     }
 
     // v0.2 snow-curb state. On snow stages a curb can be rougher OR smoother
@@ -267,6 +258,29 @@ namespace
         DWORD now)
     {
         if (!snowStage || surface.validSamples < 2)
+        {
+            clear_snow_curb_latch();
+            return false;
+        }
+
+        // Snowy Mountain contains a proven primary-road transition between
+        // 0x800000 snow and ordinary 0x2 asphalt. Never turn that road-to-road
+        // transition into a curb latch.
+        bool primarySnowAsphaltOnly = true;
+        bool sawSnowMask = false;
+        for (int i = 0; i < 4; ++i)
+        {
+            const unsigned int bit = 1u << i;
+            if ((surface.validWheelMask & bit) == 0 ||
+                (surface.waterWheelMask & bit) != 0)
+                continue;
+            const unsigned int mask = surface.surfaceMask[i];
+            sawSnowMask |= mask == WheelFFBMath::PrimarySnowIceSurfaceMask;
+            if (mask != WheelFFBMath::PrimarySnowIceSurfaceMask &&
+                mask != WheelFFBMath::PrimaryAsphaltSurfaceMask)
+                primarySnowAsphaltOnly = false;
+        }
+        if (sawSnowMask && primarySnowAsphaltOnly)
         {
             clear_snow_curb_latch();
             return false;
@@ -406,7 +420,7 @@ namespace
         Settings::WheelFFBUseHardwareSpring = true;
         Settings::WheelFFBUseHardwareDamper = true;
         Settings::WheelFFBUsePeriodicEffects = false;
-        Settings::WheelFFBInvertForce = true;
+        Settings::WheelFFBInvertForce = false;
         Settings::WheelFFBInvertSpring = false;
         Settings::WheelFFBDebugLog = true;
         Settings::VibrationMode = 0;
@@ -436,7 +450,7 @@ namespace
         Settings::WheelFFBUseHardwareSpring = true;
         Settings::WheelFFBUseHardwareDamper = true;
         Settings::WheelFFBUsePeriodicEffects = false;
-        Settings::WheelFFBInvertForce = true;
+        Settings::WheelFFBInvertForce = false;
         Settings::WheelFFBInvertSpring = false;
         Settings::WheelFFBDebugLog = true;
         Settings::VibrationMode = 0;
@@ -465,6 +479,7 @@ namespace
     }
 
     DWORD lastRoadCompatibilityLogTick = 0;
+    bool lastFloralRoughPavingState = false;
 }
 
 // Modern DD snow/curb compatibility shaping lives here, but tactile transport
@@ -481,11 +496,9 @@ namespace
 // lower than the snow scalar.
 void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
 {
-    // Old named profiles or old F11 presets can still restore the v0.1 values.
-    // Recognize only the exact known signatures so arbitrary user tuning remains
-    // untouched, then immediately bring those presets onto the universal tune.
-    normalize_legacy_preset(true);
-
+    // Numeric legacy-preset migration is startup-only in WheelFFBFeelRetune.
+    // Running it here every physics tick reclassified the current R3 presets
+    // because their published values overlap the old signatures.
     // Do not rewrite WheelFFBUsePeriodicEffects here. Transport ownership is
     // model-aware in the core and the F11 switch is intentionally live.
 
@@ -542,10 +555,10 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
         const bool snowStage = stage.snowOrIce;
         const bool snowCurbHeld = update_snow_curb_latch(
             surface, snowStage, rawMixedSurface, now);
-        const bool floralVillageRoughPaving =
-            is_floral_village_primary_rough_paving(stage, surface, car);
+        const bool primaryRoughRoad =
+            is_proven_primary_rough_road(stage, surface, car);
         const bool strongTactile =
-            !floralVillageRoughPaving &&
+            !primaryRoughRoad &&
             (mixedSurface || fullyRough || snowCurbHeld);
         const bool tactileSurface = nonWaterRough || snowCurbHeld;
 
@@ -571,19 +584,33 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
                     0.0f, 1.0f);
             const float outputStrength = std::clamp(
                 static_cast<float>(Settings::WheelFFBGlobalStrength), 0.0f, 1.5f);
-            const float coreStageScale = snowStage ? 0.04f : 1.0f;
+            bool sawSnowPrimary = false;
+            bool sawSnowDisqualifier = false;
+            for (int i = 0; i < 4; ++i)
+            {
+                const unsigned int bit = 1u << i;
+                if ((surface.validWheelMask & bit) == 0 ||
+                    (surface.waterWheelMask & bit) != 0)
+                    continue;
+                const unsigned int mask = surface.surfaceMask[i];
+                if (mask == WheelFFBMath::PrimarySnowIceSurfaceMask)
+                    sawSnowPrimary = true;
+                else if (mask != WheelFFBMath::PrimaryAsphaltSurfaceMask)
+                    sawSnowDisqualifier = true;
+            }
+            const bool snowPrimaryRoad = sawSnowPrimary && !sawSnowDisqualifier;
+            const float coreStageScale = snowPrimaryRoad ? 0.04f : 1.0f;
 
             desiredRoadAmp = strongTactile ? 0.30f : 0.22f;
             const float envelope =
                 textureRoughness * roadSpeedGate * outputStrength * coreStageScale;
 
-            if (floralVillageRoughPaving)
+            if (primaryRoughRoad)
             {
-                // Comfort policy for the proven Floral Village primary-road
-                // rough-paving strip.  Scale only Road Detail; keep SAT, damper,
-                // collision and any non-primary/off-road material untouched.
+                const bool floralComfort = stage.uniqueStage == 27;
                 Settings::WheelFFBRoadTexture = std::clamp(
-                    originalRoadTexture * FloralVillageRoughPavingScale,
+                    originalRoadTexture *
+                        (floralComfort ? FloralVillageRoughPavingScale : 1.0f),
                     0.0f, 120.0f);
             }
             else if (envelope > 0.0005f)
@@ -606,7 +633,7 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
             // Keep exactly the same SAT/damper relief for genuine tactile
             // transitions.  The Floral Village primary-road rough paving is a
             // sustained road surface, not a curb: only its Road Detail is scaled.
-            if (!floralVillageRoughPaving)
+            if (!primaryRoughRoad)
             {
                 steeringScale = strongTactile ? 0.72f : 0.80f;
                 damperScale = strongTactile ? 0.55f : 0.70f;
@@ -618,16 +645,30 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
             restoreTactileOverrides = true;
         }
 
+        const bool floralRoughPavingNow =
+            primaryRoughRoad && stage.uniqueStage == 27;
+        if (Settings::WheelFFBDebugLog &&
+            floralRoughPavingNow != lastFloralRoughPavingState)
+        {
+            lastFloralRoughPavingState = floralRoughPavingNow;
+            spdlog::info(
+                "WheelFFB ROAD EDGE: floralRoughPaving={} roadSection={} masks={:08X}/{:08X}/{:08X}/{:08X}",
+                floralRoughPavingNow,
+                static_cast<int>(car->OnRoadPlace_5C.roadSectionNum_8),
+                surface.surfaceMask[0], surface.surfaceMask[1],
+                surface.surfaceMask[2], surface.surfaceMask[3]);
+        }
+
         if (Settings::WheelFFBDebugLog &&
             (tactileSurface || surface.waterWheelMask != 0) &&
             now - lastRoadCompatibilityLogTick >= 750)
         {
             lastRoadCompatibilityLogTick = now;
             spdlog::info(
-                "WheelFFB ROAD: stage={} roadSection={} floralRoughPaving={} min={:.2f} max={:.2f} spread={:.2f} nonWaterMin={:.2f} nonWaterMax={:.2f} mixed={} fullRough={} snow={} snowLatch={} waterWheels=0x{:X} waterOnlyRough={} masks={:08X}/{:08X}/{:08X}/{:08X} rough={:.2f}/{:.2f}/{:.2f}/{:.2f} collisionCtx={} coreFloor={} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
+                "WheelFFB ROAD: stage={} roadSection={} primaryRoughRoad={} min={:.2f} max={:.2f} spread={:.2f} nonWaterMin={:.2f} nonWaterMax={:.2f} mixed={} fullRough={} snow={} snowLatch={} waterWheels=0x{:X} waterOnlyRough={} masks={:08X}/{:08X}/{:08X}/{:08X} rough={:.2f}/{:.2f}/{:.2f}/{:.2f} collisionCtx={} coreFloor={} targetAmp={:.2f} roadSetting={:.2f} satScale={:.2f} damperScale={:.2f}",
                 stage.uniqueStage,
                 static_cast<int>(car->OnRoadPlace_5C.roadSectionNum_8),
-                floralVillageRoughPaving,
+                primaryRoughRoad,
                 surface.minimum, surface.maximum, surface.spread,
                 surface.nonWaterMinimum, surface.nonWaterMaximum,
                 mixedSurface, fullyRough, snowStage, snowCurbHeld,
@@ -829,6 +870,13 @@ namespace
                 Settings::WheelFFBUsePeriodicEffects = false;
                 Settings::WheelFFBFeelRevision = 5;
                 revision = 5;
+                changed = true;
+            }
+
+            if (revision < 6)
+            {
+                Settings::WheelFFBFeelRevision = 6;
+                revision = 6;
                 changed = true;
             }
 
