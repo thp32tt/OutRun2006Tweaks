@@ -109,8 +109,8 @@ jobs:
           git -C dxvk-src fetch --depth 1 origin 5bb301ab22f7b41d68a879bf84c1e3d10ae0c473
           git -C dxvk-src checkout --detach FETCH_HEAD
           git -C dxvk-src submodule update --init --recursive --depth 1
-          python3 dxvk-fork/apply_openrbrvr_layer_switch.py
           cd dxvk-src
+          python3 ../dxvk-fork/apply_openrbrvr_layer_switch.py
           meson setup --cross-file build-win32.txt --buildtype release --prefix "$GITHUB_WORKSPACE/dxvk-install" build.w32
           cd ..
           ninja -C dxvk-src/build.w32 install
