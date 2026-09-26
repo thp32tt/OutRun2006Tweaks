@@ -21,6 +21,7 @@
 namespace Settings
 {
     extern Setting<bool> VRPreferD3D9Ex;
+    extern Setting<bool> VRAllowThirdPartyD3D9Ex;
 }
 
 namespace OutRunVRD3D9ExUpgrade
@@ -839,21 +840,30 @@ namespace OutRunVRD3D9ExUpgrade
                 : nullptr;
 
             // Never mix a third-party Direct3DCreate9 object with the system
-            // Direct3DCreate9Ex provider. If the same provider that supplied
-            // Direct3DCreate9 also exports Direct3DCreate9Ex (for example a
-            // DXVK build with Ex support), it is safe to probe that provider's
-            // own Ex path while retaining its own classic object as fallback.
+            // Direct3DCreate9Ex provider. R59 additionally requires a separate
+            // opt-in before calling a third-party provider's Ex path. HMD logs
+            // showed OpenRBRVR DXVK can enter CreateDeviceEx and terminate
+            // before either success or the classic fallback is observable.
             if (!systemProvider)
             {
+                char providerPath[MAX_PATH]{};
+                const DWORD providerPathLen = provider
+                    ? GetModuleFileNameA(provider, providerPath, MAX_PATH) : 0;
+                if (!Settings::VRAllowThirdPartyD3D9Ex.get())
+                {
+                    if (!ThirdPartyLogged.exchange(true))
+                        spdlog::warn(
+                            "VR D3D9Ex upgrade: third-party provider-local Ex blocked by default; path='{}'; set AllowThirdPartyD3D9Ex=true only for explicit provider Ex testing",
+                            providerPathLen ? providerPath : "<unknown>");
+                    return fallback;
+                }
+
                 if (!ThirdPartyLogged.exchange(true))
                 {
-                    char providerPath[MAX_PATH]{};
-                    const DWORD providerPathLen = provider
-                        ? GetModuleFileNameA(provider, providerPath, MAX_PATH) : 0;
                     if (createEx)
                     {
                         spdlog::info(
-                            "VR D3D9Ex upgrade: third-party provider-local Ex path enabled; path='{}'; system/third-party object mixing remains forbidden",
+                            "VR D3D9Ex upgrade: third-party provider-local Ex explicitly enabled; path='{}'; system/third-party object mixing remains forbidden",
                             providerPathLen ? providerPath : "<unknown>");
                     }
                     else
