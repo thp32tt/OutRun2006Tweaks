@@ -36,6 +36,8 @@ namespace Settings
 		"Uses immediate D3D9 presentation while VR is enabled so the game source is not hard-capped by the desktop VSync setting before the OpenXR host captures it." };
 	Setting<float> VRHudScale{ "VR", "HudScale", 0.55f,
 		"Projection-space HUD size after the headset-specific asymmetric-FOV correction. Lower values make speed/time/position and menus smaller in the HMD.", Range<float>{ 0.30f, 1.20f } };
+	Setting<float> VRRankMarkerScale{ "VR", "RankMarkerScale", 0.82f,
+		"Scales only the projected vehicle rank markers (1st-6th) around their reconstructed vehicle/world anchor. 1.0 keeps the stock sprite size without moving the anchor.", Range<float>{ 0.35f, 1.20f } };
 	Setting<bool> VRHeadTracking{ "VR", "HeadTracking", true,
 		"Applies the OpenXR HMD orientation at OutRun's verified D3D9 WorldViewProjection upload." };
 	Setting<bool> VRStereo{ "VR", "Stereo", true,
