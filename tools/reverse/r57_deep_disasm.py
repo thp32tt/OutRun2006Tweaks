@@ -26,6 +26,7 @@ RANGES=[
  ("put_sprite_ex",0x02CFE0,0x2A0),
  ("put_clip_sprite_and_queue_entry",0x02D280,0xB00),
  ("DispRank",0x0B9E00,0x380),
+ ("RankPre_BA9xx_BACxx",0x0BA900,0x420),
  ("RankMarker_sub_4BAD20",0x0BAD20,0x700),
  ("RankSibling_BB3xx_BB8xx",0x0BB300,0x600),
  ("RankSibling_BBBxx",0x0BBB00,0x380),
