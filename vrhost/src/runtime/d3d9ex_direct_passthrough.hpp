@@ -60,6 +60,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
     inline std::uint32_t SafeEyeHeight = 0;
     inline std::uint32_t SafeFrameId = 0;
     inline std::uint32_t SafeTransportGeneration = 0;
+    inline std::uint32_t SafeClientPid = 0;
+    inline std::uint32_t SafeRunGeneration = 0;
 
     inline std::uint64_t LastObservedCaptureFresh = 0;
     inline ULONGLONG LastCaptureFreshMs = 0;
@@ -109,6 +111,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
         SafeEyeWidth = SafeEyeHeight = 0;
         SafeFrameId = 0;
         SafeTransportGeneration = 0;
+        SafeClientPid = 0;
+        SafeRunGeneration = 0;
     }
 
     inline void CloseDirectAckMapping() noexcept
