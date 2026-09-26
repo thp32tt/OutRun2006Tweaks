@@ -1,0 +1,52 @@
+{
+  "batch": "59-p0-exact-source-inspection",
+  "updated_at_kst": "2026-09-26T17:00:00+09:00",
+  "canonical_source_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+  "strict_state_before": {
+    "rework_required": 24,
+    "zoom_manual_required": 8,
+    "strict_pass": 0,
+    "promotion_hold": true
+  },
+  "p0_original_verified": [
+    {
+      "asset": "841E796B_512x128.dds",
+      "sha256": "872a6a93c711e82f43171ac1469f2216c5e27e7bd6dc11db500fb14c4814b6da",
+      "bytes": 262272,
+      "rule": "preserve vehicle/model cards and names; only generic No Handicap localization is eligible"
+    },
+    {
+      "asset": "EBEF6D20_512x512.dds",
+      "sha256": "1ee491be92af2e70d0dae33a8c205b13b152f198f8a534136fac1c3c4e164a3e",
+      "bytes": 1048704,
+      "rule": "per-element raw transform required for Left/Right/Diverge/Loading; preserve non-text art"
+    },
+    {
+      "asset": "571E78F3_512x64.dds",
+      "sha256": "83febd33ab9e1fef1bdb608e01fb113fde646597b309f60354c68602449e4bcb",
+      "bytes": 131200,
+      "rule": "original-only reconstruction; no historical candidate inheritance"
+    },
+    {
+      "asset": "62BEBF33_512x64.dds",
+      "sha256": "60454d0080e328e7139f10f69c080a1b2c0a3e959ced3bcdd8b22fb04e1758b4",
+      "bytes": 131200,
+      "rule": "original-only reconstruction; no historical candidate inheritance"
+    },
+    {
+      "asset": "E3FD08BE_512x64.dds",
+      "sha256": "151e9537e534643a9154739aeffcee8a24bf9921eda6346252b7482287af029e",
+      "bytes": 131200,
+      "rule": "original-only reconstruction; no historical candidate inheritance"
+    }
+  ],
+  "checklist": [
+    "raw DDS orientation must be verified per text element",
+    "vehicle/model/brand/logo/song/legal artwork preserve-original",
+    "match source style/weight/color/outline/proportion",
+    "introduced pixels must remain inside original text cell",
+    "reject black lines/crop seams/residual English/erasure residue/alpha halos/clipping"
+  ],
+  "result": "SOURCE_IDENTITY_PASS_REWORK_NOT_YET_PROMOTED",
+  "note": "Exact source bytes were read from the recovered canonical archive. Historical candidates remain non-authoritative under strict reset. No candidate promoted until pixel-mask construction and raw/readable 1x/2x QA pass."
+}
