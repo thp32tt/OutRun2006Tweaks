@@ -400,31 +400,37 @@ namespace OutRunVRStereo
             // lazy policy: perform one bounded READONLY seed on the first missing
             // range, cache those bytes, then all later draws remain shadow-only.
             void* data = nullptr;
-            if (offset <= entry->size && size <= entry->size - offset &&
-                SUCCEEDED(buffer->Lock(offset, size, &data, D3DLOCK_READONLY)) &&
-                data)
+            if (offset <= entry->size && size <= entry->size - offset)
             {
-                bool copied = false;
-                try
+                const HRESULT seedHr =
+                    buffer->Lock(offset, size, &data, D3DLOCK_READONLY);
+                if (SUCCEEDED(seedHr))
                 {
-                    out.resize(size);
-                    std::memcpy(out.data(), data, size);
-                    std::lock_guard<std::mutex> lock(entry->mutex);
-                    if (entry->bytes.size() != entry->size)
-                        entry->bytes.resize(entry->size);
-                    std::memcpy(entry->bytes.data() + offset, data, size);
-                    R30MergeValidRange(entry->valid, offset, offset + size);
-                    copied = true;
-                }
-                catch (...)
-                {
-                    copied = false;
-                }
-                buffer->Unlock();
-                if (copied)
-                {
-                    ++R30ShadowReadHits;
-                    return true;
+                    bool copied = false;
+                    if (data)
+                    {
+                        try
+                        {
+                            out.resize(size);
+                            std::memcpy(out.data(), data, size);
+                            std::lock_guard<std::mutex> lock(entry->mutex);
+                            if (entry->bytes.size() != entry->size)
+                                entry->bytes.resize(entry->size);
+                            std::memcpy(entry->bytes.data() + offset, data, size);
+                            R30MergeValidRange(entry->valid, offset, offset + size);
+                            copied = true;
+                        }
+                        catch (...)
+                        {
+                            copied = false;
+                        }
+                    }
+                    buffer->Unlock();
+                    if (copied)
+                    {
+                        ++R30ShadowReadHits;
+                        return true;
+                    }
                 }
             }
 
@@ -468,31 +474,37 @@ namespace OutRunVRStereo
             }
 
             void* data = nullptr;
-            if (offset <= entry->size && size <= entry->size - offset &&
-                SUCCEEDED(buffer->Lock(offset, size, &data, D3DLOCK_READONLY)) &&
-                data)
+            if (offset <= entry->size && size <= entry->size - offset)
             {
-                bool copied = false;
-                try
+                const HRESULT seedHr =
+                    buffer->Lock(offset, size, &data, D3DLOCK_READONLY);
+                if (SUCCEEDED(seedHr))
                 {
-                    out.resize(size);
-                    std::memcpy(out.data(), data, size);
-                    std::lock_guard<std::mutex> lock(entry->mutex);
-                    if (entry->bytes.size() != entry->size)
-                        entry->bytes.resize(entry->size);
-                    std::memcpy(entry->bytes.data() + offset, data, size);
-                    R30MergeValidRange(entry->valid, offset, offset + size);
-                    copied = true;
-                }
-                catch (...)
-                {
-                    copied = false;
-                }
-                buffer->Unlock();
-                if (copied)
-                {
-                    ++R30ShadowReadHits;
-                    return true;
+                    bool copied = false;
+                    if (data)
+                    {
+                        try
+                        {
+                            out.resize(size);
+                            std::memcpy(out.data(), data, size);
+                            std::lock_guard<std::mutex> lock(entry->mutex);
+                            if (entry->bytes.size() != entry->size)
+                                entry->bytes.resize(entry->size);
+                            std::memcpy(entry->bytes.data() + offset, data, size);
+                            R30MergeValidRange(entry->valid, offset, offset + size);
+                            copied = true;
+                        }
+                        catch (...)
+                        {
+                            copied = false;
+                        }
+                    }
+                    buffer->Unlock();
+                    if (copied)
+                    {
+                        ++R30ShadowReadHits;
+                        return true;
+                    }
                 }
             }
             ++R30ShadowReadMisses;
