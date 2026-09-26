@@ -134,3 +134,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Final pending `37759842_1024x1024.dds` remains original-safe; no report/preview-derived pixel reconstruction is permitted without exact original DDS bytes.
 - Next safe graphics action: exact per-card template/icon-mask reconstruction from the original DDS, then zero-residual-English + icon/gradient/style + containment + raw/readable manual QA.
 - Report: `localization/graphics/BATCH53_FALLBACK_RECONCILE_REPORT.json`.
+
+
+### Strict full32 reset 2026-09-26 13:00 KST
+- Rechecked the actual 32-DDS source-faithful package against the original analysis archive under the new strict pixel rules.
+- Automated full-canvas risk scan flagged **19/32**; this scan is only a risk filter and does not replace per-text-cell masks.
+- User rejection plus pixel-exact contact-sheet review yields **24 REWORK_REQUIRED / 8 ZOOM_MANUAL_REQUIRED / 0 strict PASS**.
+- Previous 31 retained/localized candidates are now historical package candidates only; **promotion is held** until each asset passes per-text-cell containment, overlay-box overflow=0, residual-English/seam checks, non-text changed pixels=0, orientation/format checks, and 1x/2x manual visual QA.
+- Report: `localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json`.
+- Next: rework the 24 high-risk assets first, manually zoom-review the remaining 8, then apply the same strict policy to FULL_DRAFT 79 and the complete 243-DDS inventory.
