@@ -21,6 +21,7 @@ RANGES=[
  ("dispMarkerCheck",0x0BA0E0,0x190),
  ("rank_helper_BABF0",0x0BABF0,0x130),
  ("sprani_core_28A10",0x028A10,0x390),
+ ("sprite_batch_begin_end",0x029B00,0x560),
  ("sprani_core_28AF0",0x028AF0,0x390),
  ("sprani_play_ae_auth_alpha",0x029580,0x700),
  ("draw_sprite_plain",0x02A0A0,0x250),
@@ -36,6 +37,7 @@ RANGES=[
  ("RankSibling_BB3xx_BB8xx",0x0BB300,0x600),
  ("RankSibling_BBBxx",0x0BBB00,0x380),
  ("RankSibling_BBDxx_BC4xx",0x0BBD80,0x780),
+ ("Third_dispMarkerCheck_caller",0x0BE980,0x280),
 ]
 KNOWN=dict(mod.KNOWN_TARGETS)
 for rva,label in mod.KNOWN_CALL_SITES.items():
