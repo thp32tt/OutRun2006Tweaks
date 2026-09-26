@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "run": "batch61-b-p0-rawbyte-orientation-inspection-20260926",
+  "timestamp_kst": "2026-09-26T19:15:00+09:00",
+  "branch": "korean-localization-clean",
+  "canonical_source": {
+    "archive": "outrun_korean_analysis.tar(1).gz",
+    "sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+    "materialized": true,
+    "dds_inventory": 243
+  },
+  "strict_state": {
+    "rework_required": 24,
+    "zoom_manual_required": 8,
+    "strict_pass": 0,
+    "promotion_hold": true
+  },
+  "result": "RAW_BYTE_GATE_RESOLVED_P0_REWORK_CAN_PROCEED_NO_ASSET_PROMOTED",
+  "p0": [
+    "841E796B",
+    "EBEF6D20",
+    "571E78F3",
+    "62BEBF33",
+    "E3FD08BE"
+  ]
+}
