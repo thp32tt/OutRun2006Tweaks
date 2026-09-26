@@ -5,6 +5,7 @@
 #include <dxgi1_4.h>
 #include <wrl/client.h>
 
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <iomanip>
