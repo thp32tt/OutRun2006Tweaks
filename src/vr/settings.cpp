@@ -188,20 +188,42 @@ namespace OutRunVR
 		{
 			if (!Settings::VREnabled || !Settings::VRAutoLaunchHost)
 				return 0;
-			bool launched = false;
-			for (int attempt = 0; attempt < 40; ++attempt)
+
+			// Stay alive for the game lifetime. A bounded OpenXR/swapchain failure
+			// deliberately lets the x64 host exit rather than hang forever; the
+			// game must therefore supervise and relaunch it instead of treating a
+			// successful initial CreateProcess as permanent ownership.
+			DWORD retryDelayMs = 500;
+			bool restartLogged = false;
+			for (;;)
 			{
-				if (!VRHostProcessRunning() && !launched)
+				if (!Settings::VREnabled || !Settings::VRAutoLaunchHost)
+					return 0;
+
+				if (VRHostProcessRunning())
 				{
-					launched = VRLaunchHostOnce();
-					if (launched)
-						return 0;
+					retryDelayMs = 500;
+					restartLogged = false;
+					Sleep(1000);
+					continue;
 				}
-				Sleep(500);
+
+				if (VRLaunchHostOnce())
+				{
+					if (restartLogged)
+						spdlog::info("VR AUTO HOST: supervisor relaunched host after runtime exit");
+					Sleep(1000);
+					continue;
+				}
+
+				if (!restartLogged)
+				{
+					spdlog::warn("VR AUTO HOST: host unavailable; supervisor will keep retrying with bounded backoff");
+					restartLogged = true;
+				}
+				Sleep(retryDelayMs);
+				retryDelayMs = std::min<DWORD>(retryDelayMs * 2, 8000);
 			}
-			if (!VRHostProcessRunning())
-				spdlog::warn("VR AUTO HOST: no host process became available during the startup retry window");
-			return 0;
 		}
 	}
 
