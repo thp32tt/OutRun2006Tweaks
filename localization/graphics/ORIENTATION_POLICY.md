@@ -1,16 +1,21 @@
 # Graphics Orientation & Preserve Policy
 
-Updated: 2026-09-26 07:04 KST
+Updated: 2026-09-26 22:46 KST
 Branch: `korean-localization-clean`
 
 This policy is mandatory for all Korean graphics localization work.
 
 ## Source-of-truth rule
 
-1. **Always inspect the original game DDS from the original analysis archive before editing.**
-2. Do **not** infer orientation from a previously generated Korean FULL-DRAFT DDS or from a generated preview.
-3. The original raw DDS may intentionally contain per-sprite mirroring, rotation, upside-down text, or mixed orientations because the runtime sprite/UV path corrects it in game.
-4. Orientation is therefore determined **per element / per sprite**, not per whole texture.
+1. **Primary construction source is now the user's installed high-resolution texture mod DDS.**
+2. Identify an asset by its stable hexadecimal hash prefix (for example `EBEF6D20`), not by the old `_512x512` resolution suffix.
+3. Read the actual DDS header for width/height/format/mips. A high-resolution mod may keep an old filename suffix, so filename dimensions are not authoritative.
+4. The stock original DDS/archive remains a **fallback and reverse-engineering/orientation reference**, not the preferred artwork source when an HD replacement exists.
+5. Do **not** upscale or reuse an old Korean DDS as the new base. Korean artwork must be reconstructed from the exact HD DDS.
+6. Do **not** infer orientation from a previously generated Korean FULL-DRAFT DDS or from a generated preview.
+7. Raw DDS may intentionally contain per-sprite mirroring, rotation, upside-down text, or mixed orientations because the runtime sprite/UV path corrects it in game.
+8. Orientation is determined **per element / per sprite**.
+9. Until the exact HD source package is imported and hashed, graphics promotion is held; stock-resolution candidates remain historical evidence only.
 
 ## Translation exclusion rule
 
@@ -121,3 +126,16 @@ This gate is mandatory for every translated sprite or text segment.
    - or leave/reset to the original.
 5. Reject the candidate if any glyph is clipped, overlaps another element, or crosses the source region boundary.
 6. Check containment both in raw DDS orientation and in the readable/game-orientation preview.
+
+
+## HD texture migration rule
+
+Effective 2026-09-26 22:46 KST:
+
+- Canonical artwork baseline: **user-installed high-resolution texture mod**.
+- Collector: `tools/localization/collect_hd_localization_source.ps1`.
+- The collector matches by hexadecimal asset key, reads dimensions directly from each DDS header, and records SHA-256 for every selected HD source.
+- When the HD source contains a target, all Korean text bounds, masks, alpha checks, orientation checks, style checks and containment checks are recalculated against that HD DDS.
+- If the HD mod does not contain a target, the stock original DDS is allowed only as an explicit fallback and must be recorded as such.
+- Existing B3-B65 stock-resolution candidates and user approvals are preserved as history, but they are not automatically valid HD candidates.
+- Never resize an already-localized low-resolution DDS to create the HD localization.
