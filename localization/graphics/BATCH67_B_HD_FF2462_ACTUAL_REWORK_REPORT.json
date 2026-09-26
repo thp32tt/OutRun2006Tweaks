@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "batch": "BATCH67_B_HD_FF2462_ACTUAL_REWORK",
+  "generated_at_kst": "2026-09-27T00:15:00+09:00",
+  "branch": "korean-localization-clean",
+  "source_package_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+  "asset": {
+    "hash": "FF2462BB",
+    "source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+    "candidate_sha256": "2fe8c6bf3a1fd3bb44782d8e03620c43ec9162d42a6d561c53f8aabeb425d18c",
+    "actual": [4096,2048],
+    "edited_segment": {"source":"Drift!","korean":"드리프트!","raw_orientation":"mirror_x","source_text_bbox":[1733,779,1904,856]},
+    "qa": {"outside_text_bbox_changed_pixels":0,"dds_header_128_exact":true,"dimensions_exact":true,"format":"RGBA32","mips":1,"manual_2x_comparison":"PASS_FOR_B_FIRST_QA"},
+    "status":"PARTIAL_ACTUAL_HD_REWORK_CANDIDATE_FOR_C_D_QA"
+  },
+  "actual_candidates_created": 1,
+  "promotion": "HOLD_FOR_C_D_STRICT_QA",
+  "note": "A B01 package raw bytes were unavailable; B continued from exact canonical HD source instead of stopping."
+}
