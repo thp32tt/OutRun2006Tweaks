@@ -361,3 +361,11 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Added `BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json`.
 - Removed stale `C598919A` pending metadata from `resume_state.json`; only `37759842` is now listed.
 - Next executable graphics action requires exact DDS bytes. Do not promote `37759842` until residual English is zero and manual raw/readable QA passes.
+
+
+## 2026-09-26 09:40 KST - BATCH44 FALLBACK RECONCILED
+- Re-read mandatory orientation/style/containment policy and current checkpoint.
+- Reconciled local Batch44 fallback against current GitHub state; no newer promotion of 37759842 was present.
+- Exact original DDS SHA-256: `ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0`.
+- Batch44 remains rejected: containment passed, manual source-faithful/artifact QA failed due to flattened card detail and residual English.
+- Original 37759842 remains canonical; no force push or unsafe promotion performed.
