@@ -434,14 +434,14 @@ class UIScaling : public Hook
 		else if (probe == 14) probeY -= 72;
 		else if (probe == 15) { probeX = 320; probeY = 208; }
 		int result = 0;
+		const auto r57Scope = R57RankProducerScope(false);
+		const auto* r57Marker =
+			r57Scope == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+			? &RankMarkerProjectedInfo : nullptr;
 		if (VRR57Mode() != 0)
 		{
-			const auto scope = R57RankProducerScope(false);
-			const auto* marker =
-				scope == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
-				? &RankMarkerProjectedInfo : nullptr;
 			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
-				scope, marker);
+				r57Scope, r57Marker);
 			result = Game::put_clip_sprite(
 				xstnum, probeX, probeY, flags, priority, color);
 		}
@@ -451,15 +451,31 @@ class UIScaling : public Hook
 				xstnum, probeX, probeY, flags, priority, color);
 		}
 
-		// tail_4 is the last sprite queued at that priority. If it has not
-		// changed then the sprite pool was full and nothing was queued.
+		// Canonical put_clip_sprite (RVA 0x2D280) performs exactly one
+		// put_sprite_ex call (RVA 0x2D2EC). Register the actual appended node
+		// here as the presentation-authoritative owner instead of relying only on
+		// nested producer-scope propagation. R57 HMD mode 8 proved that the
+		// indirect path could lose 4th+ PROJECTED_WORLD_MARKER_2D ownership.
 		root = Game::sprite_prio_root[prio];
 		SpriteNode* node = root ? root->tail_4 : nullptr;
 		if (node && node != tailBefore)
 		{
 			node->args_10.float24 += RankMarkerFracX;
 			node->args_10.float28 += RankMarkerFracY;
-			if (VRR57Mode() == 0)
+			if (VRR57Mode() != 0)
+			{
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node, r57Scope, r57Marker);
+				static std::atomic<std::uint64_t> directRank46Tags{ 0 };
+				const auto hit = directRank46Tags.fetch_add(
+					1, std::memory_order_relaxed) + 1;
+				if ((hit & (hit - 1)) == 0)
+					spdlog::info(
+						"VR R58 DIRECT CLIP: owner=rank46 prio={} kind={} projected={} hits={}",
+						prio, node->kind_C,
+						r57Marker && r57Marker->valid ? 1 : 0, hit);
+			}
+			else
 			{
 				const auto scope =
 					(probe == 17)
@@ -515,16 +531,48 @@ class UIScaling : public Hook
 			OutRunVR::GameSemantic::ArmNextDraw(
 				OutRunVR::GameSemantic::RenderScope::ScreenHud);
 
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
+
 		const int r57 = VRR57Mode();
+		int result = 0;
 		if (r57 == 2 || r57 == 3)
 		{
 			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
 				OutRunVR::GameSemantic::RenderScope::ScreenHud);
-			return Game::put_clip_sprite(
+			result = Game::put_clip_sprite(
 				xstnum, x, y, flags, priority, color);
 		}
-		return Game::put_clip_sprite(
-			xstnum, x, y, flags, priority, color);
+		else
+		{
+			result = Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+		}
+
+		// R57 HMD modes 2/3 proved that the nested put_clip_sprite -> put_sprite_ex
+		// producer scope did not survive as an accepted kind-0 HUD owner. The
+		// canonical helper appends one node, so pin the exact new node directly.
+		if (r57 == 2 || r57 == 3)
+		{
+			root = Game::sprite_prio_root[prio];
+			SpriteNode* node = root ? root->tail_4 : nullptr;
+			if (node && node != tailBefore)
+			{
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+				static std::atomic<std::uint64_t> directPositionTags{ 0 };
+				const auto hit = directPositionTags.fetch_add(
+					1, std::memory_order_relaxed) + 1;
+				if ((hit & (hit - 1)) == 0)
+					spdlog::info(
+						"VR R58 DIRECT CLIP: owner=position prio={} kind={} hits={}",
+						prio, node->kind_C, hit);
+			}
+		}
+		return result;
 	}
 
 	enum SpriteScaleType
