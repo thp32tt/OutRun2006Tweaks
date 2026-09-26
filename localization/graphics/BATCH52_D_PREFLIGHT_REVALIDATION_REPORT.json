@@ -1,0 +1,29 @@
+{
+  "batch": "52-D-preflight-full-ledger-revalidation",
+  "updated_at_kst": "2026-09-26T10:47:00+09:00",
+  "branch": "korean-localization-clean",
+  "result": "SAFE_HOLD_APPROVED_LEDGER_CONFIRMED",
+  "canonical_state": {
+    "reviewed": 32,
+    "retained": 31,
+    "pending": 1
+  },
+  "approved_materials": "Existing B3-B38 retained ledger and reports remain canonical; no rejected 37759842 candidate promoted.",
+  "preflight": {
+    "policy_state_resume_status_read": true,
+    "historical_batch_reports_reconciled": true,
+    "report_level_contradiction_in_retained_ledger": "none found",
+    "fresh_byte_pixel_revalidation_of_all_31": "not possible from Git branch because binary DDS assets are intentionally not committed",
+    "promotion_rule": "manual visual QA overrides automated containment"
+  },
+  "pending": {
+    "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+    "source_sha256": "ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0",
+    "raw_transform": "mirror_y",
+    "latest_attempt": "Batch51",
+    "automated_containment": "pass",
+    "manual_visual_qa": "fail",
+    "action": "KEEP_ORIGINAL"
+  },
+  "next_safe_action": "Exact per-card template/icon masks from original DDS; require zero residual English, intact icons/gradients, source-like typography, containment, and raw/readable manual QA before promotion."
+}
