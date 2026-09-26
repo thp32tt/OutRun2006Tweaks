@@ -312,6 +312,37 @@ namespace OutRunVR::GameSemantic
         SpriteNodeSemanticStaleCleared.fetch_add(1, std::memory_order_relaxed);
     }
 
+    inline bool PeekSpriteNodeTag(
+        const void* node, RenderScope& scope,
+        ProjectedMarkerInfo* projectedMarker = nullptr) noexcept
+    {
+        scope = RenderScope::None;
+        if (projectedMarker)
+            *projectedMarker = {};
+        if (!node ||
+            SpriteNodeSemanticPublishedCount.load(
+                std::memory_order_acquire) == 0)
+            return false;
+
+        std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);
+        for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
+        {
+            const auto& tag = SpriteNodeSemanticTags[i];
+            if (tag.node != node)
+                continue;
+            scope = tag.scope;
+            if (projectedMarker)
+                *projectedMarker = tag.projectedMarker;
+            return true;
+        }
+        return false;
+    }
+
+    inline RenderScope CurrentExactQueueScope() noexcept
+    {
+        return CurrentQueueExactScope;
+    }
+
     inline RenderScope ConsumeSpriteNodeScope(
         const void* node,
         RenderScope fallback = RenderScope::ScreenOverlay2D) noexcept
