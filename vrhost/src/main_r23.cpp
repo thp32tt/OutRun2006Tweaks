@@ -502,18 +502,23 @@ namespace
             R23DirectHold.format = left.Format;
         }
 
-        // Record shared-eye ownership before issuing any D3D11 copy. A transition
-        // may happen before xrEndFrame, and that frame must never be mistaken
-        // for an untouched skipped frame.
-        R48DirectTouched[slot] = frame;
         OutRunVrR32DirectSubmit::ObserveIdentity(frame);
 
-        // The shared producer textures are sampled only by these two copies.
-        // Arm the asynchronous EVENT immediately after them, not later at
-        // xrEndFrame. This closes the copy->ACK ownership gap when projection
-        // rendering or a session/reference-space transition interrupts the
-        // normal submission path. Later xrEndFrame sees the same pending frame
-        // and reuses this fence without adding another GPU wait.
+        // Prove that this slot has a usable, unowned EVENT query before issuing
+        // any GPU command that samples producer memory. If preflight fails the
+        // frame remains genuinely untouched and transition cleanup may safely
+        // return it through the skipped-frame ACK path.
+        if (!OutRunVrR32DirectSubmit::PrepareConsumptionFenceSlot(frame))
+        {
+            R23DirectHold.frameId = 0;
+            R23DirectHold.generation = 0;
+            R23DirectHold.valid = false;
+            return false;
+        }
+
+        // Record ownership immediately before the first copy. From this point
+        // the frame must remain EVENT-gated and must never take skipped ACK.
+        R48DirectTouched[slot] = frame;
         c.context_->CopyResource(R23DirectHold.eye[0], c.directLeft_[slot]);
         c.context_->CopyResource(R23DirectHold.eye[1], c.directRight_[slot]);
         if (!OutRunVrR32DirectSubmit::ArmConsumptionFence(frame))
