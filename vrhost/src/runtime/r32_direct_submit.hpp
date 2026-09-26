@@ -405,6 +405,49 @@ namespace OutRunVrR32DirectSubmit
         }
     }
 
+    inline bool PrepareConsumptionFenceSlot(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        if (!OutRunVrFinalTest::Context)
+            return false;
+        const std::uint32_t slot =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        const AckIdentity identity = FrameAckIdentity(frame);
+        if (slot >= Pending.size() || !generation || !frame.frameId ||
+            !identity.clientPid || !identity.runGeneration ||
+            !identity.transportGeneration || !EnsureFence(slot))
+            return false;
+
+        // Never sample a producer frame after this exact slot/frame was already
+        // ACKed, and never issue another copy while an EVENT for the same or a
+        // different frame still owns the slot.
+        if (AckedFrame[slot] == frame.frameId &&
+            SameAckIdentity(AckedIdentity[slot], identity))
+            return false;
+        if (AckedIdentity[slot].clientPid != 0 &&
+            !SameAckIdentity(AckedIdentity[slot], identity))
+        {
+            AckedIdentity[slot] = {};
+            AckedFrame[slot] = 0;
+        }
+
+        auto& pending = Pending[slot];
+        if (pending.armed)
+        {
+            PollCompletedAcks();
+            if (pending.armed && !pending.flushIssued)
+            {
+                OutRunVrFinalTest::Context->Flush();
+                pending.flushIssued = true;
+                ++AckFlushEscalations;
+                PollCompletedAcks();
+            }
+        }
+        return !pending.armed;
+    }
+
     inline bool ArmConsumptionFence(
         const OutRunVR::SharedRenderFrameState& frame) noexcept
     {
