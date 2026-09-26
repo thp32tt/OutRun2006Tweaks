@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "generated_at_kst": "2026-09-26T22:50:00+09:00",
+  "branch": "korean-localization-clean",
+  "canonical_source": {
+    "package": "OR2-HD-GUI-v0.25.10a(1).zip",
+    "package_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "upstream_repo": "Sonic-TV/OR2006Sprites",
+    "upstream_ref": "main",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "pack_version": "Oct-2025-a"
+  },
+  "scan_summary": {
+    "package_dds": 289,
+    "localization_targets_matched": 89,
+    "targets_with_larger_actual_dds_than_legacy_suffix": 86,
+    "targets_same_actual_size_as_legacy_suffix": 3,
+    "graphics_rework_targets": 13,
+    "low_res_font_pipeline_targets": 1,
+    "hd_preserve_targets": 75
+  },
+  "rules": [
+    "Use DDS header dimensions, never the filename resolution suffix.",
+    "Keep completed HD artwork unchanged except exact text cells needed for Korean.",
+    "Treat OR2006Sprites 'Placeholder upscale assets that need replacing' as low-resolution source content even when canvas is 4x.",
+    "Never upscale prior Korean DDS candidates; rebuild Korean text on the HD/vector/working source.",
+    "Preserve alpha, orientation, sprite-cell geometry, non-text pixels, format behavior, and original bounds.",
+    "6B8ED9DA is a font-atlas/runtime-font task and is excluded from generic graphics repaint."
+  ],
+  "graphics_rework_queue": [
+    {
+      "hash": "D6DC1380",
+      "path": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+      "actual": [
+        256,
+        64
+      ],
+      "sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+      "reason": "STOCK_RESOLUTION_TEXT_GRAPHIC",
+      "policy": "CREATE_NEW_HD_KOREAN_ASSET",
+      "priority": "P0",
+      "status": "REWORK_FROM_HD_BASE"
+    },
+    {
+      "hash": "48DEBE77",
+      "path": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+      "actual": [
+        512,
+        512
+      ],
+      "sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+      "reason": "STOCK_RESOLUTION_TEXT_GRAPHIC",
+      "policy": "CREATE_NEW_HD_KOREAN_ASSET",
+      "priority": "P0",
+      "status": "REWORK_FROM_HD_BASE"
+    },
+    {
+      "hash": "FF2462BB",
+      "path": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+      "actual": [
+        4096,
+        2048
+      ],
+      "sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
+      "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
+      "priority": "P1",
+      "status": "REWORK_FROM_HD_BASE"
+    },
+    {
+      "hash": "568D3696",
+      "path": "textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+      "actual": [
+        4096,
+        4096
+      ],
+      "sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+      "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
+      "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
+      "priority": "P1",
+      "status": "REWORK_FROM_HD_BASE"
+    },
+    {
+      "hash": "FA7BBB13",
+      "path": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+      "actual": [
+        4096,
+        2048
+      ],
+      "sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+      "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
+      "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
+      "priority": "P1",
+      "status": "REWORK_FROM_HD_BASE"
+    },
+    {
+      "hash": "39229D64",
+      "path": "textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+      "actual": [
+        4096,
+        4096
+      ],
+      "sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+      "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
+      "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
+      "priority": "P1",
+      "status": "REWORK_FROM_HD_BASE"
+    },
+    {
+      "hash": "A064FDFC",
+      "path": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+      "actual": [
+        4096,
+        2048
+      ],
+      "sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
+      "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
+      "priority": "P1",
+      "status": "REWORK_FROM_HD_BASE"
+    },
+    {
+      "hash": "C4A2937B",
+      "path": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+      "actual": [
+        4096,
+        4096
+      ],
+      "sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
+      "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
+      "priority": "P1",
+      "status": "REWORK_FROM_HD_BASE"
+    },
+    {
+      "hash": "2DA43E41",
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+      "actual": [
+        4096,
+        4096
+      ],
+      "sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+      "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
+      "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
+      "priority": "P1",
+      "status": "REWORK_FROM_HD_BASE"
+    },
+    {
+      "hash": "411827E",
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+      "actual": [
+        2048,
+        2048
+      ],
+      "sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
+      "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
+      "priority": "P1",
+      "status": "REWORK_FROM_HD_BASE"
+    },
+    {
+      "hash": "C075FB49",
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+      "actual": [
+        2048,
+        2048
+      ],
+      "sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
+      "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
+      "priority": "P1",
+      "status": "REWORK_FROM_HD_BASE"
+    },
+    {
+      "hash": "FD90AA9",
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+      "actual": [
+        4096,
+        4096
+      ],
+      "sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
+      "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
+      "priority": "P1",
+      "status": "REWORK_FROM_HD_BASE"
+    },
+    {
+      "hash": "9F060EC1",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+      "actual": [
+        2048,
+        2048
+      ],
+      "sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+      "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
+      "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
+      "priority": "P1",
+      "status": "REWORK_FROM_HD_BASE"
+    }
+  ],
+  "separated_font_pipeline": [
+    {
+      "hash": "6B8ED9DA",
+      "path": "textures/load/spr_font_xst/6B8ED9DA_256x128.dds",
+      "actual": [
+        256,
+        128
+      ],
+      "sha256": "46051db8d7ae08a3c010f29371724109e7cdb61e17590c2b983a5130a8ae501d",
+      "reason": "LOW_RES_FONT_ATLAS",
+      "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
+    }
+  ]
+}
