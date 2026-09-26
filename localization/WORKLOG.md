@@ -420,3 +420,14 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Remaining P0 rework is `EBEF6D20_512x512.dds` and `841E796B_512x128.dds`; after those, continue the complete strict queue.
 - `841E796B` prior local badge reconstructions were deliberately rejected rather than promoted because either source-English residue or yellow-badge texture/edge damage remained.
 - Durable artifacts: `BATCH64_USER_APPROVAL_P0_IMPORT_REPORT.json`, `P0_USER_APPROVED_STRICT_RESULTS.json`, `FULL_STRICT_REVIEW_QUEUE.md`, and `LOCAL_CHECKPOINT_20260926_2120_KST.md`.
+
+## 2026-09-26 22:24 KST - BATCH65 B ACTUAL P0 GRAPHICS REWORK
+
+- Preserved the three user-approved locked DDS assets unchanged: `571E78F3`, `62BEBF33`, and `E3FD08BE`.
+- Created two actual DDS candidates from the canonical original archive for independent C-stage strict QA; **neither candidate was promoted**.
+- `841E796B_512x128.dds`: translated only the yellow No Handicap text cell to `핸디캡 없음`; candidate SHA-256 `0b3bd9570db72d8f7c4f1bce7fd8dd2dfc2946c05e3c06a046fe82e7860cd02b`; changed pixels 1,952; outside-text-cell changes 0; non-text changes 0; overlay overflow 0; DDS header match PASS; raw orientation `mirror_y`.
+- `EBEF6D20_512x512.dds`: rebuilt only Loading/Diverge/Left/Right text cells as `로딩 / 분기 / 좌측 / 우측`; candidate SHA-256 `978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922`; changed pixels 11,606; outside-text-cell changes 0; non-text changes 0; overlay overflow 0; DDS header match PASS; raw orientation `mirror_y`.
+- Source SHA-256 values remain `841E796B=872a6a93c711e82f43171ac1469f2216c5e27e7bd6dc11db500fb14c4814b6da` and `EBEF6D20=1ee491be92af2e70d0dae33a8c205b13b152f198f8a534136fac1c3c4e164a3e`.
+- Status for both: `B_CANDIDATE_FOR_C_STRICT_QA`. C must independently inspect raw/readable 1x/2x appearance and style before any D promotion.
+- Durable report: `localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json`.
+
