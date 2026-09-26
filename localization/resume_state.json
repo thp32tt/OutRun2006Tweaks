@@ -1,5 +1,5 @@
 {
-  "schema_version": 14,
+  "schema_version": 15,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -9,8 +9,9 @@
   "next_actions": [
     "read ORIENTATION_POLICY.md and SOURCE_FAITHFUL_CURRENT.json before editing",
     "only 37759842_1024x1024.dds remains pending",
-    "obtain exact original DDS and candidate bytes before any further pixel edit",
-    "do not promote if any source English remains in blue/black cards even when containment passes",
+    "use exact original DDS SHA-256 ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0 as construction source",
+    "Batch44 is rejected: do not enlarge reconstruction zones that flatten card art; isolate glyph pixels/text layers more precisely",
+    "do not promote until residual English is zero and raw/readable manual QA passes",
     "preserve vehicle/model names, brands, logos, song titles, legal marks, icons and card gradients",
     "in-game validate the 31 retained source-faithful candidates"
   ],
@@ -66,12 +67,15 @@
     "batch23_rejected_report": "localization/graphics/BATCH23_REJECTED_REPORT.json",
     "batch24v2_report": "localization/graphics/BATCH24V2_2DA_REWORK_REPORT.json",
     "batch25v4_report": "localization/graphics/BATCH25V4_ACF_REWORK_REPORT.json",
-    "latest_safe_rework_note": "2026-09-26 09:00 KST: only 37759842 remains pending. Exact original DDS/candidate bytes unavailable in accessible file retrieval; Batch41 still fails residual-English manual QA. Keep original; do not reconstruct from report/preview.",
+    "latest_safe_rework_note": "2026-09-26 09:40 KST: Batch44 used exact original 37759842 DDS and passed automated containment, but manual QA failed because expanded blue-card cleanup flattened card detail and residual English remained. Keep original.",
     "batch33_rejected_report": "localization/graphics/BATCH33_REJECTED_REPORT.json",
     "batch38_report": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
     "batch41_rejected_report": "localization/graphics/BATCH41_REJECTED_REPORT.json",
     "batch42_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
-    "batch43_safe_hold_report": "localization/graphics/BATCH43_FINAL_PENDING_SOURCE_BYTE_GATE_REPORT.json"
+    "batch43_safe_hold_report": "localization/graphics/BATCH43_FINAL_PENDING_SOURCE_BYTE_GATE_REPORT.json",
+    "batch44_rejected_report": "localization/graphics/BATCH44_REJECTED_REPORT.json",
+    "source_37759842_sha256": "ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0",
+    "batch44_candidate_sha256": "65d919ce4f15408f873a800dfcf73e0638f6902cbde9ad50a2e1c99c18d00aad"
   },
   "runtime_packages": {
     "k1": {
