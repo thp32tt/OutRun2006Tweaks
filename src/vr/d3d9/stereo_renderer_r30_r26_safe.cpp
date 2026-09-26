@@ -46,6 +46,8 @@ namespace OutRunVRStereo
         // R26-safe comparison owner: R26 remains the world/effect authority;
         // only R30 HUD, XYZRHW correction and stereo SkyGlow are layered above.
         std::uint64_t R30SafeTwoEyeDraws = 0;
+        std::atomic<std::uint64_t> R57ProjectedMarkerDeltaBuilds{ 0 };
+        std::atomic<bool> R57ProjectedMarkerFirstLogged{ false };
 
         void R30ArmSafeFallback(std::uint64_t = 2) noexcept
         {
@@ -1194,6 +1196,209 @@ namespace OutRunVRStereo
             return std::clamp(Settings::VRHudScale.get(), 0.30f, 1.20f);
         }
 
+        int R55HudCoordMode() noexcept
+        {
+            static const int mode = []() noexcept {
+                char text[8]{};
+                if (GetEnvironmentVariableA(
+                        "OUTRUN_VR_HUD_COORD_MODE",
+                        text, static_cast<DWORD>(sizeof(text))) == 0)
+                    return 0;
+                if (text[0] < '0' || text[0] > '4')
+                    return 0;
+                return static_cast<int>(text[0] - '0');
+            }();
+            return mode;
+        }
+
+        int R56HudProbeMode() noexcept
+        {
+            static const int mode = []() noexcept {
+                char text[8]{};
+                const DWORD len = GetEnvironmentVariableA(
+                    "OUTRUN_VR_HUD_PROBE", text,
+                    static_cast<DWORD>(sizeof(text)));
+                if (len == 0 || len >= sizeof(text))
+                    return 0;
+                int value = 0;
+                for (DWORD i = 0; i < len; ++i)
+                {
+                    if (text[i] < '0' || text[i] > '9')
+                        return 0;
+                    value = value * 10 + int(text[i] - '0');
+                }
+                return (value >= 1 && value <= 20) ? value : 0;
+            }();
+            return mode;
+        }
+
+        int R57Mode() noexcept
+        {
+            static const int mode = []() noexcept {
+                char text[8]{};
+                const DWORD len = GetEnvironmentVariableA(
+                    "OUTRUN_VR_R57_MODE", text,
+                    static_cast<DWORD>(sizeof(text)));
+                if (len == 0 || len >= sizeof(text))
+                    return 0;
+                int value = 0;
+                for (DWORD i = 0; i < len; ++i)
+                {
+                    if (text[i] < '0' || text[i] > '9')
+                        return 0;
+                    value = value * 10 + int(text[i] - '0');
+                }
+                return (value >= 1 && value <= 10) ? value : 0;
+            }();
+            return mode;
+        }
+
+        int R58Mode() noexcept
+        {
+            static const int mode = []() noexcept {
+                char text[8]{};
+                const DWORD len = GetEnvironmentVariableA(
+                    "OUTRUN_VR_R58_MODE", text,
+                    static_cast<DWORD>(sizeof(text)));
+                if (len == 0 || len >= sizeof(text))
+                    return 0;
+                int value = 0;
+                for (DWORD i = 0; i < len; ++i)
+                {
+                    if (text[i] < '0' || text[i] > '9')
+                        return 0;
+                    value = value * 10 + int(text[i] - '0');
+                }
+                return (value >= 1 && value <= 10) ? value : 0;
+            }();
+            return mode;
+        }
+
+        bool R57ProjectViewPoint(
+            const OutRunVR::GameSemantic::ProjectedMarkerInfo& marker,
+            const D3DMATRIX& transform,
+            float& ndcX, float& ndcY) noexcept
+        {
+            if (!marker.valid ||
+                !std::isfinite(marker.viewX) ||
+                !std::isfinite(marker.viewY) ||
+                !std::isfinite(marker.viewZ) ||
+                !MatrixFinite(transform))
+                return false;
+
+            const float clipX =
+                marker.viewX * transform._11 +
+                marker.viewY * transform._21 +
+                marker.viewZ * transform._31 +
+                transform._41;
+            const float clipY =
+                marker.viewX * transform._12 +
+                marker.viewY * transform._22 +
+                marker.viewZ * transform._32 +
+                transform._42;
+            const float clipW =
+                marker.viewX * transform._14 +
+                marker.viewY * transform._24 +
+                marker.viewZ * transform._34 +
+                transform._44;
+            if (!std::isfinite(clipX) || !std::isfinite(clipY) ||
+                !std::isfinite(clipW) || std::fabs(clipW) <= 1.0e-6f)
+                return false;
+            ndcX = clipX / clipW;
+            ndcY = clipY / clipW;
+            return std::isfinite(ndcX) && std::isfinite(ndcY);
+        }
+
+        bool R57BuildProjectedMarkerDelta(
+            const OutRunVRRenderer::LatchedStereoFrame& stereo,
+            const D3DMATRIX& baseProjection,
+            float deltaX[2], float deltaY[2]) noexcept
+        {
+            const auto* marker =
+                OutRunVR::GameSemantic::CurrentProjectedMarker();
+            if (!marker || !marker->valid || !MatrixFinite(baseProjection))
+                return false;
+
+            float baseX = 0.0f, baseY = 0.0f;
+            if (!R57ProjectViewPoint(
+                    *marker, baseProjection, baseX, baseY))
+                return false;
+
+            const float centerEye[3]{
+                0.5f * (stereo.eyeOffset[0][0] + stereo.eyeOffset[1][0]),
+                0.5f * (stereo.eyeOffset[0][1] + stereo.eyeOffset[1][1]),
+                0.5f * (stereo.eyeOffset[0][2] + stereo.eyeOffset[1][2])
+            };
+            const float identityOrientation[4]{
+                0.0f, 0.0f, 0.0f, 1.0f
+            };
+
+            D3DMATRIX headInverse = IdentityMatrix();
+            const bool includeHeadInverse =
+                R57Mode() == 6 || R58Mode() != 0;
+            if (includeHeadInverse)
+            {
+                float headRaw[16]{};
+                std::uint32_t headPoseSequence = 0;
+                if (!OutRunVRRenderer::GetLatchedHeadInverse(
+                        headRaw, headPoseSequence) ||
+                    headPoseSequence != stereo.poseSequence)
+                    return false;
+                std::memcpy(&headInverse, headRaw, sizeof(headInverse));
+                if (!MatrixFinite(headInverse))
+                    return false;
+            }
+
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                const float relativeEye[3]{
+                    stereo.eyeOffset[eye][0] - centerEye[0],
+                    stereo.eyeOffset[eye][1] - centerEye[1],
+                    stereo.eyeOffset[eye][2] - centerEye[2]
+                };
+                const D3DMATRIX eyePose =
+                    MatrixFromQuaternionTranslation(
+                        identityOrientation, relativeEye,
+                        Settings::VRWorldScale * Settings::VRStereoDepth);
+                const D3DMATRIX eyeInverse = InverseRigid(eyePose);
+                const D3DMATRIX eyeProjection =
+                    ProjectionFromFov(
+                        baseProjection, stereo.eyeFov[eye]);
+                const D3DMATRIX eyeTransform =
+                    includeHeadInverse
+                    ? MultiplyMatrix(
+                        MultiplyMatrix(headInverse, eyeInverse),
+                        eyeProjection)
+                    : MultiplyMatrix(eyeInverse, eyeProjection);
+
+                float eyeX = 0.0f, eyeY = 0.0f;
+                if (!R57ProjectViewPoint(
+                        *marker, eyeTransform, eyeX, eyeY))
+                    return false;
+                deltaX[eye] = eyeX - baseX;
+                deltaY[eye] = eyeY - baseY;
+                if (!std::isfinite(deltaX[eye]) ||
+                    !std::isfinite(deltaY[eye]) ||
+                    std::fabs(deltaX[eye]) > 2.0f ||
+                    std::fabs(deltaY[eye]) > 2.0f)
+                    return false;
+            }
+            const std::uint64_t builds =
+                R57ProjectedMarkerDeltaBuilds.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+            bool expected = false;
+            if (R57ProjectedMarkerFirstLogged.compare_exchange_strong(
+                    expected, true, std::memory_order_acq_rel))
+            {
+                spdlog::info(
+                    "VR PROJECTED MARKER: r57={} r58={} head={} view=({:.4f},{:.4f},{:.4f}) deltaL=({:.5f},{:.5f}) deltaR=({:.5f},{:.5f}) builds={}",
+                    R57Mode(), R58Mode(), includeHeadInverse ? 1 : 0,
+                    marker->viewX, marker->viewY, marker->viewZ,
+                    deltaX[0], deltaY[0], deltaX[1], deltaY[1], builds);
+            }
+            return true;
+        }
+
         float R30HudAspectCompensation(
             const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
         {
@@ -1280,14 +1485,14 @@ namespace OutRunVRStereo
             float& scaleX, float& scaleY) noexcept
         {
             (void)stereo;
-            const float userScale = R30HudScaleValue();
+            float userScale = R30HudScaleValue();
+            const int coordMode = R55HudCoordMode();
+            if (coordMode == 3 || coordMode == 4)
+                userScale = 0.35f;
 
-            // R43: the finite HUD plane is reconstructed through the game's
-            // base projection and then through each OpenXR eye projection.
-            // Applying sourceAspect/eyeAspect again here was a second,
-            // anisotropic aspect correction. On this run sourceOverTarget=2.569,
-            // so HudScale=0.55 became X=0.55/Y=0.214 and visibly squashed the
-            // complete HUD. Keep HUD scale uniform; projection handles aspect.
+            // R55: modes 3/4 intentionally force a visually obvious 35% scale
+            // so HMD testing can prove that this exact final-coordinate path is
+            // presentation-authoritative. Production policy still uses HudScale.
             scaleX = userScale;
             scaleY = userScale;
         }
@@ -1298,7 +1503,8 @@ namespace OutRunVRStereo
             Hud2D,
             PerspectiveHud,
             ScreenOverlay2D,
-            WorldBillboard
+            WorldBillboard,
+            ProjectedWorldMarker2D
         };
 
         constexpr std::uint64_t R44OverlayWvpDrawWindow = 12u;
@@ -1408,7 +1614,7 @@ namespace OutRunVRStereo
                 return R30ScreenSpaceKind::None;
 
             const auto semanticScope =
-                OutRunVR::GameSemantic::CurrentScope;
+                OutRunVR::GameSemantic::EffectiveScope();
             const bool semanticHud =
                 OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
             const bool semanticWorld =
@@ -1416,18 +1622,23 @@ namespace OutRunVRStereo
             const bool semanticOverlay2D =
                 OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
                     semanticScope);
+            const bool semanticProjectedWorld =
+                OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+                    semanticScope);
 
             // R50: canonical queue membership proves generic 2D ownership but
             // not finite/world-locked HUD ownership. This class receives only
             // the per-eye asymmetric-FOV affine.
             if (semanticOverlay2D)
                 return R30ScreenSpaceKind::ScreenOverlay2D;
+            if (semanticProjectedWorld)
+                return R30ScreenSpaceKind::ProjectedWorldMarker2D;
 
             // R48 final-test policy: screen/perspective HUD ownership comes only
             // from the canonical EXE sprite queue or exact original-mod semantic
             // tags. Do not infer HUD from alpha, ZENABLE, cull mode, shader
             // shape, primitive count or a recently uploaded matrix.
-            if (!semanticHud && !semanticWorld)
+            if (!semanticHud && !semanticWorld && !semanticProjectedWorld)
                 return R30ScreenSpaceKind::None;
 
             float projection[16]{};
@@ -1573,6 +1784,10 @@ namespace OutRunVRStereo
             float hudClipW[2][3]{};
             bool hudWorldLockValid = false;
             bool screenOverlay2D = false;
+            bool exactWorldBillboard = false;
+            bool projectedWorldMarker2D = false;
+            float projectedDeltaX[2]{};
+            float projectedDeltaY[2]{};
             bool fullWorldReprojection = false;
             bool depthTestEnabled = false;
             bool rhwDepthEvidence = false;
@@ -1863,7 +2078,7 @@ namespace OutRunVRStereo
             // Positive projected-depth evidence remains sufficient for known
             // world effects. Everything else fails closed to the R26/R23 owner.
             const auto semanticScope =
-                OutRunVR::GameSemantic::CurrentScope;
+                OutRunVR::GameSemantic::EffectiveScope();
             const bool semanticHud =
                 OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
             const bool semanticWorld =
@@ -1871,6 +2086,11 @@ namespace OutRunVRStereo
             const bool semanticOverlay2D =
                 OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
                     semanticScope);
+            const bool semanticProjectedWorld =
+                OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+                    semanticScope);
+            state.exactWorldBillboard = semanticWorld;
+            state.projectedWorldMarker2D = semanticProjectedWorld;
 
             // R51 ownership precedence is explicit:
             // exact WORLD_BILLBOARD > queue-owned 2D/HUD > geometric evidence.
@@ -1881,6 +2101,19 @@ namespace OutRunVRStereo
             state.screenOverlay2D = semanticOverlay2D;
             if (semanticOverlay2D)
                 ++R50SemanticOverlay2DAccepted;
+
+            if (semanticProjectedWorld)
+            {
+                if (!haveBaseProjection || !MatrixFinite(baseProjection) ||
+                    !R57BuildProjectedMarkerDelta(
+                        state.stereo, baseProjection,
+                        state.projectedDeltaX,
+                        state.projectedDeltaY))
+                    return false;
+                state.baseProjection = baseProjection;
+                state.worldEffect = true;
+                return true;
+            }
 
             if (semanticWorld)
                 state.worldEffect = true;
@@ -2382,29 +2615,76 @@ namespace OutRunVRStereo
 
                 float correctedX = 0.0f;
                 float correctedY = 0.0f;
-                if (state.worldEffect)
+                const int coordMode = R55HudCoordMode();
+                const int probeMode = R56HudProbeMode();
+                // R56-20 is the broadest ownership falsification: every R30
+                // screen-space draw, including exact rank billboards, receives
+                // identical source NDC in both eyes. If a visible element still
+                // ignores this case it is outside the R30 XYZRHW owner.
+                if (probeMode == 20)
                 {
-                    correctedX =
-                        state.worldScaleX[eye] * ndcX +
-                        state.worldOffsetX[eye];
-                    correctedY =
-                        state.worldScaleY[eye] * ndcY +
-                        state.worldOffsetY[eye];
-                    if (rhw > 0.0f && rhw < 1000.0f)
+                    correctedX = ndcX;
+                    correctedY = ndcY;
+                }
+                else if (state.projectedWorldMarker2D)
+                {
+                    if (R57Mode() == 9 || R57Mode() == 10)
                     {
-                        correctedX +=
-                            state.parallaxPerRhwX[eye] * rhw;
-                        correctedY +=
-                            state.parallaxPerRhwY[eye] * rhw;
+                        correctedX = ndcX;
+                        correctedY = ndcY;
                     }
-                    // Fallback keeps the game's original Z/RHW pair intact.
+                    else
+                    {
+                        correctedX =
+                            ndcX + state.projectedDeltaX[eye];
+                        correctedY =
+                            ndcY + state.projectedDeltaY[eye];
+                    }
+                }
+                else if (state.worldEffect)
+                {
+                    // R55-D isolates exact rival rank-marker visibility: keep
+                    // the original 2D position identical in both eyes. If 4th/
+                    // 5th collapse in D, the tagged marker path is confirmed.
+                    if (coordMode == 4 && state.exactWorldBillboard)
+                    {
+                        correctedX = ndcX;
+                        correctedY = ndcY;
+                    }
+                    else
+                    {
+                        correctedX =
+                            state.worldScaleX[eye] * ndcX +
+                            state.worldOffsetX[eye];
+                        correctedY =
+                            state.worldScaleY[eye] * ndcY +
+                            state.worldOffsetY[eye];
+                        if (rhw > 0.0f && rhw < 1000.0f)
+                        {
+                            correctedX +=
+                                state.parallaxPerRhwX[eye] * rhw;
+                            correctedY +=
+                                state.parallaxPerRhwY[eye] * rhw;
+                        }
+                    }
+                }
+                else if (coordMode == 1)
+                {
+                    // R55-A: hard zero-disparity proof. Both eye surfaces receive
+                    // exactly the source screen coordinates.
+                    correctedX = ndcX;
+                    correctedY = ndcY;
+                }
+                else if (coordMode == 2)
+                {
+                    // R55-B: deliberately obvious ownership proof. Identical
+                    // zero-disparity HUD, shrunk to 35% around screen centre.
+                    correctedX = ndcX * 0.35f;
+                    correctedY = ndcY * 0.35f;
                 }
                 else
                 {
-                    // R51: both exact SCREEN_HUD and generic canonical
-                    // SCREEN_OVERLAY_2D are queue-owned 2D. Put them on the
-                    // finite recentered world-fixed plane so they no longer
-                    // rotate with the HMD. WORLD_BILLBOARD never enters here.
+                    // R55-C/D: finite recentered world-plane ownership.
                     if (!state.hudWorldLockValid)
                         return false;
 
@@ -3108,7 +3388,8 @@ namespace OutRunVRStereo
                 return false;
 
             if (screenKind == R30ScreenSpaceKind::PerspectiveHud ||
-                screenKind == R30ScreenSpaceKind::WorldBillboard)
+                screenKind == R30ScreenSpaceKind::WorldBillboard ||
+                screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D)
             {
                 // R44: glyph/billboard batches commonly reuse one game c64 for
                 // several consecutive draws. Use the original game upload, not
@@ -3142,6 +3423,47 @@ namespace OutRunVRStereo
             if (!MatrixFinite(stockWvp))
                 return false;
 
+            const int coordMode = R55HudCoordMode();
+            const int probeMode = R56HudProbeMode();
+            if (probeMode == 20)
+            {
+                const D3DMATRIX stockT = TransposeMatrix(stockWvp);
+                std::memcpy(eyeConstants[0], &stockT, sizeof(stockT));
+                std::memcpy(eyeConstants[1], &stockT, sizeof(stockT));
+                return true;
+            }
+            if (screenKind == R30ScreenSpaceKind::WorldBillboard &&
+                coordMode == 4)
+            {
+                const D3DMATRIX stockT = TransposeMatrix(stockWvp);
+                std::memcpy(eyeConstants[0], &stockT, sizeof(stockT));
+                std::memcpy(eyeConstants[1], &stockT, sizeof(stockT));
+                return true;
+            }
+            if (screenKind != R30ScreenSpaceKind::WorldBillboard &&
+                screenKind != R30ScreenSpaceKind::ProjectedWorldMarker2D &&
+                coordMode == 1)
+            {
+                const D3DMATRIX stockT = TransposeMatrix(stockWvp);
+                std::memcpy(eyeConstants[0], &stockT, sizeof(stockT));
+                std::memcpy(eyeConstants[1], &stockT, sizeof(stockT));
+                return true;
+            }
+            if (screenKind != R30ScreenSpaceKind::WorldBillboard &&
+                screenKind != R30ScreenSpaceKind::ProjectedWorldMarker2D &&
+                coordMode == 2)
+            {
+                D3DMATRIX obviousScale = IdentityMatrix();
+                obviousScale._11 = 0.35f;
+                obviousScale._22 = 0.35f;
+                const D3DMATRIX scaled =
+                    MultiplyMatrix(stockWvp, obviousScale);
+                const D3DMATRIX scaledT = TransposeMatrix(scaled);
+                std::memcpy(eyeConstants[0], &scaledT, sizeof(scaledT));
+                std::memcpy(eyeConstants[1], &scaledT, sizeof(scaledT));
+                return true;
+            }
+
             float baseRaw[16]{};
             D3DMATRIX baseProjection{};
             D3DMATRIX inverseBaseProjection{};
@@ -3151,6 +3473,49 @@ namespace OutRunVRStereo
             if (!MatrixFinite(baseProjection) ||
                 !InvertMatrix(baseProjection, inverseBaseProjection))
                 return false;
+
+            if (screenKind ==
+                R30ScreenSpaceKind::ProjectedWorldMarker2D)
+            {
+                if (R57Mode() == 9 || R57Mode() == 10)
+                {
+                    // Mode 10 performs the full depth/delta calculation only
+                    // for telemetry, then deliberately leaves the visual output
+                    // untouched. Mode 9 is the cheaper semantic-owner control.
+                    if (R57Mode() == 10)
+                    {
+                        float traceDeltaX[2]{}, traceDeltaY[2]{};
+                        if (!R57BuildProjectedMarkerDelta(
+                                stereo, baseProjection,
+                                traceDeltaX, traceDeltaY))
+                            return false;
+                    }
+                    const D3DMATRIX stockT = TransposeMatrix(stockWvp);
+                    std::memcpy(eyeConstants[0], &stockT, sizeof(stockT));
+                    std::memcpy(eyeConstants[1], &stockT, sizeof(stockT));
+                    return true;
+                }
+
+                float deltaX[2]{}, deltaY[2]{};
+                if (!R57BuildProjectedMarkerDelta(
+                        stereo, baseProjection, deltaX, deltaY))
+                    return false;
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    D3DMATRIX clipShift = IdentityMatrix();
+                    clipShift._41 = deltaX[eye];
+                    clipShift._42 = deltaY[eye];
+                    const D3DMATRIX corrected =
+                        MultiplyMatrix(stockWvp, clipShift);
+                    if (!MatrixFinite(corrected))
+                        return false;
+                    const D3DMATRIX correctedT =
+                        TransposeMatrix(corrected);
+                    std::memcpy(eyeConstants[eye], &correctedT,
+                        sizeof(correctedT));
+                }
+                return true;
+            }
 
             // R51: SCREEN_OVERLAY_2D continues below into the same finite,
             // recentered world-fixed plane transform as SCREEN_HUD. R49/R51
@@ -3317,10 +3682,17 @@ namespace OutRunVRStereo
             // D3D state can describe a candidate shape, but it never owns it.
             // Promotion requires the canonical EXE/original-mod semantic scope.
             const auto semanticScope =
-                OutRunVR::GameSemantic::CurrentScope;
+                OutRunVR::GameSemantic::EffectiveScope();
             if (screenKind == R30ScreenSpaceKind::WorldBillboard)
             {
                 if (!OutRunVR::GameSemantic::CorroboratesWorld(
+                        semanticScope))
+                    return E_NOTIMPL;
+            }
+            else if (screenKind ==
+                R30ScreenSpaceKind::ProjectedWorldMarker2D)
+            {
+                if (!OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
                         semanticScope))
                     return E_NOTIMPL;
             }
@@ -3471,7 +3843,8 @@ namespace OutRunVRStereo
                 ++R30Hud2DDraws;
             else if (screenKind == R30ScreenSpaceKind::PerspectiveHud)
                 ++R30PerspectiveHudDraws;
-            else if (screenKind == R30ScreenSpaceKind::WorldBillboard)
+            else if (screenKind == R30ScreenSpaceKind::WorldBillboard ||
+                     screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D)
                 ++R30WorldBillboardDraws;
 
             if (!R30FirstScreenSpaceLogged)
@@ -3532,7 +3905,7 @@ namespace OutRunVRStereo
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
@@ -3560,7 +3933,7 @@ namespace OutRunVRStereo
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
@@ -3590,7 +3963,7 @@ namespace OutRunVRStereo
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
@@ -3619,7 +3992,7 @@ namespace OutRunVRStereo
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
@@ -3733,7 +4106,8 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R47 HUD: canonical EXE sprite-queue semantics own HUD transforms; unknown draw heuristics are disabled; HudScale={:.2f}; exact original-mod world-billboard tags override queue HUD ownership",
+                        "VR R57 HUD: coordMode={} probeMode={} r57Mode={} exact producer semantics + projected-world-marker owner active; configured HudScale={:.2f}",
+                        R55HudCoordMode(), R56HudProbeMode(), R57Mode(),
                         R30HudScaleValue());
                     return 0;
                 }

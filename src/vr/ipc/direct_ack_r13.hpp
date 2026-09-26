@@ -21,9 +21,29 @@ namespace OutRunVR::R13
         std::uint32_t hostPid{};
         std::uint32_t transportGeneration{};
         std::uint32_t completedFrameId[DirectGpuAckRingSize]{};
-        std::uint32_t reserved[2]{};
+        // Exact producer-run identity. These replace the two previously unused
+        // reserved dwords without changing the 48-byte shared-memory ABI.
+        std::uint32_t clientPid{};
+        std::uint32_t runGeneration{};
     };
 #pragma pack(pop)
+
+    inline bool DirectGpuAckIdentityMatches(
+        const DirectGpuAckState& ack,
+        std::uint32_t hostPid,
+        std::uint32_t clientPid,
+        std::uint32_t runGeneration,
+        std::uint32_t transportGeneration) noexcept
+    {
+        return hostPid != 0 &&
+            clientPid != 0 &&
+            runGeneration != 0 &&
+            transportGeneration != 0 &&
+            ack.hostPid == hostPid &&
+            ack.clientPid == clientPid &&
+            ack.runGeneration == runGeneration &&
+            ack.transportGeneration == transportGeneration;
+    }
 
     static_assert(sizeof(DirectGpuAckState) == 48);
     static_assert(std::is_standard_layout_v<DirectGpuAckState>);

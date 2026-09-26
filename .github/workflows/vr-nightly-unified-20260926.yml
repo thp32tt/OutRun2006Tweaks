@@ -1,0 +1,270 @@
+name: VR Nightly Unified R57 2026-09-26
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - vr-d3d9ex-focus
+  push:
+    branches:
+      - vr-nightly-unified-r57-20260926
+    paths:
+      - 'src/**'
+      - 'vrhost/**'
+      - 'dx12poc/**'
+      - 'tools/**'
+      - 'OutRun2006Tweaks.ini'
+      - 'OutRun2006Tweaks.lods.ini'
+      - '.github/workflows/vr-nightly-unified-20260926.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vr-nightly-unified-r57-20260926-v2
+  cancel-in-progress: true
+
+jobs:
+  game-host:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Validate test scripts
+        shell: pwsh
+        run: ./tools/Test-OutRunVRTestPolicy.ps1
+      - name: Configure Win32 R57 game
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+      - name: Apply VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ''
+          (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+      - name: Build Win32 R57 game DLL
+        run: cmake --build build-game --config Release --target outrun2006tweaks
+      - name: Build D3D11 OpenXR host and ACK smoke
+        shell: pwsh
+        run: |
+          cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
+          cmake --build build-host --config Release --target outrun-vr-host outrun-vr-direct-ack-identity-smoke
+          & build-host/bin/outrun-vr-direct-ack-identity-smoke.exe
+          if ($LASTEXITCODE -ne 0) { throw "DirectGPU ACK identity smoke failed: $LASTEXITCODE" }
+      - name: Stage current R57 game and D3D11 host
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force stage | Out-Null
+          $dll=Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if(-not $dll){throw 'dinput8.dll missing'}
+          Copy-Item $dll.FullName stage/dinput8.dll
+          Copy-Item build-host/bin/outrun-vr-host.exe stage/outrun-vr-host.exe
+          Set-Content stage/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
+          Set-Content stage/HOST_RENDERER.txt 'D3D11 OpenXR host; DirectGPU ACK bound to hostPid+gamePid+runGeneration+transportGeneration' -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nightly-r57-game-host
+          path: stage/
+          if-no-files-found: error
+
+  dx12-probe:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure D3D9On12 x86 probe
+        shell: cmd
+        run: cmake -S dx12poc -B build-dx12-poc -G "Visual Studio 17 2022" -A Win32
+      - name: Build D3D9On12 x86 probe
+        run: cmake --build build-dx12-poc --config Release
+      - name: Stage probe
+        shell: pwsh
+        run: |
+          $exe='build-dx12-poc/Release/outrun-d3d9on12-probe.exe'
+          if(!(Test-Path $exe)){throw 'D3D9On12 probe missing'}
+          New-Item -ItemType Directory -Force stage | Out-Null
+          Copy-Item $exe stage/outrun-d3d9on12-probe.exe
+          Set-Content stage/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nightly-dx12-probe
+          path: stage/
+          if-no-files-found: error
+
+  dxvk-provider:
+    runs-on: ubuntu-latest
+    container: archlinux/archlinux:base-devel
+    steps:
+      - name: Install dependencies
+        run: pacman -Syu --needed --noconfirm git meson ninja mingw-w64-gcc glslang python
+      - uses: actions/checkout@v4
+      - name: Build pinned OpenRBRVR DXVK provider
+        run: |
+          git init dxvk-src
+          git -C dxvk-src remote add origin https://github.com/Detegr/dxvk-openRBRVR.git
+          git -C dxvk-src fetch --depth 1 origin 5bb301ab22f7b41d68a879bf84c1e3d10ae0c473
+          git -C dxvk-src checkout --detach FETCH_HEAD
+          git -C dxvk-src submodule update --init --recursive --depth 1
+          cd dxvk-src
+          python3 ../dxvk-fork/apply_openrbrvr_layer_switch.py
+          meson setup --cross-file build-win32.txt --buildtype release --prefix "$GITHUB_WORKSPACE/dxvk-install" build.w32
+          cd ..
+          ninja -C dxvk-src/build.w32 install
+          mkdir -p stage
+          p=$(find dxvk-install -type f -iname d3d9.dll | head -n 1)
+          test -n "$p"
+          cp "$p" stage/d3d9.dll
+          cp dxvk-src/LICENSE stage/LICENSE-DXVK-openRBRVR.txt
+          git -C dxvk-src rev-parse HEAD > stage/DXVK_PROVIDER_SOURCE_SHA.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nightly-dxvk-provider
+          path: stage/
+          if-no-files-found: error
+
+  multiview-patcher:
+    runs-on: windows-2022
+    steps:
+      - name: Build pinned multiview patcher
+        shell: pwsh
+        run: |
+          git init patcher-src
+          git -C patcher-src remote add origin https://github.com/Detegr/RBR-spirvpatcher.git
+          git -C patcher-src fetch --depth 1 origin 0ef3253da1738b07e67358a027311c7bcedaa001
+          git -C patcher-src checkout --detach FETCH_HEAD
+          git -C patcher-src submodule update --init --recursive --depth 1
+          Push-Location patcher-src/spirv-tools
+          python utils/git-sync-deps
+          Pop-Location
+          cmake -S patcher-src -B patcher-build -A Win32 -DCMAKE_BUILD_TYPE=Release
+          cmake --build patcher-build --config Release
+          New-Item -ItemType Directory -Force stage | Out-Null
+          Copy-Item patcher-build/src/Release/multiviewpatcher.dll stage/multiviewpatcher.dll
+          Copy-Item patcher-src/LICENSE stage/LICENSE-RBR-spirvpatcher-MPL-2.0.txt
+          git -C patcher-src rev-parse HEAD | Set-Content stage/MULTIVIEW_PATCHER_SOURCE_SHA.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nightly-multiview-patcher
+          path: stage/
+          if-no-files-found: error
+
+  package:
+    runs-on: windows-2022
+    needs: [game-host, dx12-probe, dxvk-provider, multiview-patcher]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: nightly-r57-game-host
+          path: payload/current
+      - uses: actions/download-artifact@v4
+        with:
+          name: nightly-dx12-probe
+          path: payload/dx12-probe
+      - uses: actions/download-artifact@v4
+        with:
+          name: nightly-dxvk-provider
+          path: payload/dxvk
+      - uses: actions/download-artifact@v4
+        with:
+          name: nightly-multiview-patcher
+          path: payload/multiview
+      - name: Assemble nightly unified tester
+        shell: pwsh
+        run: |
+          $dir='package'
+          foreach($b in @('d3d9','dxvk','dx12')){New-Item -ItemType Directory -Force "$dir/backends/$b"|Out-Null}
+          foreach($b in @('d3d9','dxvk','dx12')){
+            Copy-Item payload/current/dinput8.dll "$dir/backends/$b/dinput8.dll"
+            Copy-Item payload/current/outrun-vr-host.exe "$dir/backends/$b/outrun-vr-host.exe"
+            Copy-Item payload/current/SOURCE_SHA.txt "$dir/backends/$b/SOURCE_SHA.txt"
+          }
+          Copy-Item payload/dxvk/d3d9.dll "$dir/backends/dxvk/d3d9.dll"
+          Copy-Item payload/dxvk/DXVK_PROVIDER_SOURCE_SHA.txt "$dir/backends/dxvk/DXVK_PROVIDER_SOURCE_SHA.txt"
+          Copy-Item payload/multiview/multiviewpatcher.dll "$dir/backends/dxvk/multiviewpatcher.dll"
+          Copy-Item payload/multiview/MULTIVIEW_PATCHER_SOURCE_SHA.txt "$dir/backends/dxvk/MULTIVIEW_PATCHER_SOURCE_SHA.txt"
+          Copy-Item payload/dx12-probe/outrun-d3d9on12-probe.exe "$dir/outrun-d3d9on12-probe.exe"
+          Copy-Item OutRun2006Tweaks.ini "$dir/OutRun2006Tweaks.ini"
+          Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
+          foreach($file in @(
+            'OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1',
+            'Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-Test-Selector.ps1',
+            'START_HERE_VR_TEST.cmd'
+          )){Copy-Item "tools/$file" "$dir/$file"}
+          Copy-Item payload/current/dinput8.dll "$dir/dinput8.dll"
+          Copy-Item payload/current/outrun-vr-host.exe "$dir/outrun-vr-host.exe"
+          $short=$env:GITHUB_SHA.Substring(0,12)
+          $matrix="NIGHTLY-R57-UNIFIED-20260926-$short"
+          Set-Content "$dir/BUILD_MATRIX_ID.txt" $matrix -Encoding ascii
+          [ordered]@{
+            SchemaVersion=1
+            BuildMatrixId=$matrix
+            IntegrationSha=$env:GITHUB_SHA
+            RuntimeSource='R57 projected-world-marker + DirectGPU ACK run identity + DXVK provider-local Ex'
+            DX11='D3D9Ex game + D3D11 OpenXR host; DirectGPU-only mode available'
+            DXVK='SAFE and MULTIVIEW modes use pinned OpenRBRVR DXVK provider'
+            DX12='D3D9On12 probe is authoritative gate; DX12 STRICT gameplay remains experimental, not a native D3D12 host claim'
+            R57Variants=@(
+              'R57_01_POSITION_KIND1_HUD35','R57_02_POSITION_KIND0_HUD35','R57_03_POSITION_ALL_WORLD35',
+              'R57_04_RANK_ALL_AS_HUD','R57_05_RANK_PROJECTED_IPD','R57_06_RANK_PROJECTED_HEAD',
+              'R57_07_RANK_PROJECTED_13','R57_08_RANK_PROJECTED_46','R57_09_RANK_PROJECTED_ZERO',
+              'R57_10_RANK_PROJECTED_TRACE'
+            )
+          }|ConvertTo-Json -Depth 5|Set-Content "$dir/BUILD_INPUTS.json" -Encoding UTF8
+          @(
+            'OUTRUN VR NIGHTLY UNIFIED 2026-09-26'
+            ''
+            'START: START_HERE_VR_TEST.cmd'
+            ''
+            'Recommended quick order:'
+            '1) R57 03 POSITION complete fix'
+            '2) R57 05 vehicle-rank projected IPD'
+            '3) R57 06 only if 05 still head-follows'
+            '4) DX11 HOST DirectGPU using R57 05'
+            '5) DXVK SAFE using R57 05'
+            '6) DXVK MULTIVIEW using R57 05'
+            '7) Run DX12 D3D9On12 PROBE; only after all PASS try DX12 STRICT'
+            ''
+            'DX11 means D3D9Ex game -> x64 D3D11 OpenXR host, not a native DX11 game renderer.'
+            'DX12 STRICT is experimental. The included D3D9On12 probe is the current verified DX12-progress gate.'
+            'After each game exit the log collector creates OutRun2_VR_ANALYZE_*.zip. Upload that ZIP only.'
+          )|Set-Content "$dir/TEST_ORDER.txt" -Encoding UTF8
+          New-Item -ItemType Directory -Force "$dir/licenses"|Out-Null
+          Copy-Item payload/dxvk/LICENSE-DXVK-openRBRVR.txt "$dir/licenses/"
+          Copy-Item payload/multiview/LICENSE-RBR-spirvpatcher-MPL-2.0.txt "$dir/licenses/"
+          Get-ChildItem $dir -Recurse -File|Get-FileHash -Algorithm SHA256|ForEach-Object{
+            "$($_.Hash)  $([IO.Path]::GetRelativePath((Resolve-Path $dir),$_.Path))"
+          }|Set-Content "$dir/SHA256SUMS.txt" -Encoding ascii
+          Compress-Archive -Path "$dir/*" -DestinationPath ("OutRun2_VR_NIGHTLY_UNIFIED_R57_" + $short + ".zip") -Force
+      - name: Validate unified package
+        shell: pwsh
+        run: |
+          $zip=Get-ChildItem -Filter 'OutRun2_VR_NIGHTLY_UNIFIED_R57_*.zip'|Select-Object -First 1
+          if(!$zip){throw 'nightly ZIP missing'}
+          Expand-Archive $zip.FullName verify
+          foreach($file in @('START_HERE_VR_TEST.cmd','OutRunVR-Test-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','outrun-d3d9on12-probe.exe','BUILD_INPUTS.json','TEST_ORDER.txt')){
+            if(!(Test-Path "verify/$file")){throw "missing $file"}
+          }
+          foreach($b in @('d3d9','dxvk','dx12')){
+            foreach($file in @('dinput8.dll','outrun-vr-host.exe','SOURCE_SHA.txt')){
+              if(!(Test-Path "verify/backends/$b/$file")){throw "$b missing $file"}
+            }
+          }
+          if(!(Test-Path 'verify/backends/dxvk/d3d9.dll')){throw 'DXVK provider missing'}
+          if(!(Test-Path 'verify/backends/dxvk/multiviewpatcher.dll')){throw 'multiview patcher missing'}
+          $selector=Get-Content verify/Select-OutRunVRBackend.ps1 -Raw
+          if($selector -notmatch '"dx11"'){throw 'DX11 host mode missing'}
+          $gui=Get-Content verify/OutRunVR-Test-Selector.ps1 -Raw
+          foreach($marker in @('DX11 Host DirectGPU','DXVK SAFE','DXVK MULTIVIEW','DX12 STRICT','R57_05_RANK_PROJECTED_IPD')){
+            if($gui -notmatch [regex]::Escape($marker)){throw "GUI missing $marker"}
+          }
+          Get-FileHash $zip.FullName -Algorithm SHA256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-NIGHTLY-UNIFIED-R57-${{ github.sha }}
+          path: OutRun2_VR_NIGHTLY_UNIFIED_R57_*.zip
+          if-no-files-found: error
