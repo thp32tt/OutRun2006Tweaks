@@ -238,6 +238,9 @@ namespace OutRunVR
 				// The host inherits these test-mode switches. Keeping transport
 				// policy in the same [VR] config as D3D9Ex avoids mismatched
 				// game/host modes during cadence testing.
+				const std::string gamePid =
+					std::to_string(GetCurrentProcessId());
+				SetEnvironmentVariableA("OUTRUN_VR_GAME_PID", gamePid.c_str());
 				SetEnvironmentVariableA("OUTRUN_VR_DIRECT_TRANSPORT", "1");
 				SetEnvironmentVariableA("OUTRUN_VR_DIRECT_ONLY",
 					Settings::VRDirectGpuOnly ? "1" : "0");
