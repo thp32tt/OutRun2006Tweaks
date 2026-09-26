@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-26T10:25:00+09:00",
+  "updated_at_kst": "2026-09-26T10:47:00+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -11,14 +11,15 @@
   ],
   "mandatory_policy": "localization/graphics/ORIENTATION_POLICY.md",
   "automation_checkpoint": {
-    "run": "interactive-20260926-1025",
-    "result": "batch51_rejected_keep_original",
-    "note": "Batches45-51 explored inpaint, quadratic/row-gradient reconstruction, and icon restoration. Automated containment passes on late candidates, but manual source-style/non-text-art QA still fails. Original remains canonical."
+    "run": "interactive-20260926-1047-D",
+    "result": "d_preflight_approved_ledger_confirmed",
+    "note": "Full report-ledger preflight completed before new work. 31 retained remain approved; 37759842 remains original-safe pending manual-QA-clean rework."
   },
   "latest_promoted_batch": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
   "latest_rejected_batch": "localization/graphics/BATCH51_REJECTED_REPORT.json",
   "latest_rejected_batches": [
     "localization/graphics/BATCH33_REJECTED_REPORT.json"
   ],
-  "latest_safe_hold_report": "localization/graphics/BATCH43_FINAL_PENDING_SOURCE_BYTE_GATE_REPORT.json"
+  "latest_safe_hold_report": "localization/graphics/BATCH43_FINAL_PENDING_SOURCE_BYTE_GATE_REPORT.json",
+  "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json"
 }
