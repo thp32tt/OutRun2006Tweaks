@@ -235,6 +235,13 @@ if (Test-Path $ini) {
     Set-Content $ini $text -Encoding UTF8
 }
 
+$backendDll = Join-Path $root "dinput8.dll"
+$hostExe = Join-Path $root "outrun-vr-host.exe"
+$providerDll = Join-Path $root "d3d9.dll"
+$gameBinarySha256 = if (Test-Path $backendDll) { (Get-FileHash $backendDll -Algorithm SHA256).Hash.ToLowerInvariant() } else { "missing" }
+$hostBinarySha256 = if (Test-Path $hostExe) { (Get-FileHash $hostExe -Algorithm SHA256).Hash.ToLowerInvariant() } else { "none" }
+$providerBinarySha256 = if (Test-Path $providerDll) { (Get-FileHash $providerDll -Algorithm SHA256).Hash.ToLowerInvariant() } else { "system-or-none" }
+
 $nl = [Environment]::NewLine
 $matrixFile = Join-Path $root "BUILD_MATRIX_ID.txt"
 $matrix = if (Test-Path $matrixFile) { (Get-Content $matrixFile -Raw).Trim() } else { "UNIFIED_LOCAL" }
@@ -248,6 +255,9 @@ $activeText = @(
     "variant=$variant"
     "profile=$TestProfile"
     "sourceSha=$sourceSha"
+    "gameBinarySha256=$gameBinarySha256"
+    "hostBinarySha256=$hostBinarySha256"
+    "providerBinarySha256=$providerBinarySha256"
     "matrix=$matrix"
     "session=$session"
     "startedUtc=$($startedUtc.ToString('o'))"
@@ -264,6 +274,9 @@ $sessionManifest = [ordered]@{
     Backend = $Backend
     TestProfile = $TestProfile
     SourceSha = $sourceSha
+    GameBinarySha256 = $gameBinarySha256
+    HostBinarySha256 = $hostBinarySha256
+    ProviderBinarySha256 = $providerBinarySha256
     SessionId = $session
     StartedUtc = $startedUtc.ToString("o")
     ConfigSha256 = $configHash
