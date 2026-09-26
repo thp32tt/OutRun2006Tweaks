@@ -1,0 +1,83 @@
+name: Sync HD localization source
+
+on:
+  push:
+    branches:
+      - korean-localization-clean
+    paths:
+      - .github/workflows/sync-hd-localization-source.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-hd-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout localization branch
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-clean
+          fetch-depth: 1
+
+      - name: Download and verify canonical HD source DDS
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          SOURCE_REPO="Sonic-TV/OR2006Sprites"
+          SOURCE_COMMIT="a95efe01d1f136514cef94b0d9e9fd61df021754"
+          DEST_ROOT="localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load"
+
+          cat > /tmp/hd_sources.tsv <<'EOF'
+42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352	spr_etc_xst/D6DC1380_256x64.dds
+5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635	spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds
+5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67	spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds
+65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813	spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds
+61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15	spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds
+2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481	spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds
+6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc	spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds
+821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0	spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds
+3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099	spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds
+bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364	spr_sprani_selector_cvt_Exst/411827E_512x512.dds
+a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036	spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds
+f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e	spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds
+177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05	spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds
+46051db8d7ae08a3c010f29371724109e7cdb61e17590c2b983a5130a8ae501d	spr_font_xst/6B8ED9DA_256x128.dds
+EOF
+
+          while IFS=$'\t' read -r expected rel; do
+            dest="$DEST_ROOT/$rel"
+            mkdir -p "$(dirname "$dest")"
+            url="https://raw.githubusercontent.com/$SOURCE_REPO/$SOURCE_COMMIT/Release/$rel"
+            echo "Downloading $rel"
+            curl --fail --location --retry 4 --retry-delay 2 "$url" -o "$dest"
+            echo "$expected  $dest" | sha256sum --check --strict
+          done < /tmp/hd_sources.tsv
+
+          cat > "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/SOURCE_INFO.json" <<'EOF'
+{
+  "package": "OR2-HD-GUI-v0.25.10a.zip",
+  "package_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+  "pack_version": "Oct-2025-a",
+  "upstream_repo": "Sonic-TV/OR2006Sprites",
+  "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+  "scope": "13 HD graphics rework source DDS + 1 separated font-pipeline DDS",
+  "verification": "Every destination DDS is SHA-256 verified before commit."
+}
+EOF
+
+      - name: Commit synchronized HD sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a
+          if git diff --cached --quiet; then
+            echo "HD source already synchronized."
+            exit 0
+          fi
+          git commit -m "localization: sync canonical HD GUI source DDS"
+          git push origin HEAD:korean-localization-clean
