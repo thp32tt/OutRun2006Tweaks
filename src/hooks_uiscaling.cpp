@@ -1150,15 +1150,87 @@ class VRHudQueueSemanticBridge : public Hook
 	inline static std::uint64_t LastRegistered = 0;
 	inline static std::uint64_t LastConsumed = 0;
 	inline static std::uint64_t LastStaleCleared = 0;
+	inline static std::atomic<std::uint64_t> R60SpriteFlushes{ 0 };
+	inline static std::atomic<std::uint64_t> R60SpriteFlushFailures{ 0 };
+
+	static bool FlushD3DXSpriteBatch(const char* reason) noexcept
+	{
+		// Canonical EXE deep reverse:
+		//   global ID3DXSprite* = VA 0x0095B218 (RVA 0x55B218)
+		//   kind-0 helper 0x42A0A0 calls vtbl+0x14 SetTransform then
+		//   vtbl+0x24 Draw. Draw is batched, so the eventual D3D draw can occur
+		//   after the queue semantic has changed. ID3DXSprite::Flush is vtbl+0x28.
+		void* sprite = *Module::exe_ptr<void*>(0x55B218);
+		if (!sprite)
+			return false;
+		void** vtable = *reinterpret_cast<void***>(sprite);
+		if (!vtable || !vtable[10])
+			return false;
+
+		using FlushFn = HRESULT(__stdcall*)(void*);
+		const HRESULT hr =
+			reinterpret_cast<FlushFn>(vtable[10])(sprite);
+		if (FAILED(hr))
+		{
+			R60SpriteFlushFailures.fetch_add(1, std::memory_order_relaxed);
+			return false;
+		}
+
+		const auto hit = R60SpriteFlushes.fetch_add(
+			1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R60 D3DXSPRITE FLUSH: reason={} scope={} hits={} failures={}",
+				reason,
+				OutRunVR::GameSemantic::Name(
+					OutRunVR::GameSemantic::EffectiveScope()),
+				hit,
+				R60SpriteFlushFailures.load(std::memory_order_relaxed));
+		return true;
+	}
+
+	static bool IsExactKind0(
+		const SpriteNode* node,
+		OutRunVR::GameSemantic::RenderScope scope) noexcept
+	{
+		return node && node->kind_C == 0 &&
+			OutRunVR::GameSemantic::IsExactHudScope(scope);
+	}
 
 	static void QueueNode(SafetyHookContext& ctx)
 	{
-		OutRunVR::GameSemantic::SelectSpriteQueueNode(
-			reinterpret_cast<const void*>(ctx.edi));
+		const auto* incoming =
+			reinterpret_cast<const SpriteNode*>(ctx.edi);
+		OutRunVR::GameSemantic::RenderScope incomingScope =
+			OutRunVR::GameSemantic::RenderScope::None;
+		OutRunVR::GameSemantic::PeekSpriteNodeTag(
+			incoming, incomingScope);
+
+		const auto* current = reinterpret_cast<const SpriteNode*>(
+			OutRunVR::GameSemantic::CurrentQueueNode());
+		const auto currentScope =
+			OutRunVR::GameSemantic::CurrentExactQueueScope();
+
+		// R60: establish a real D3DXSprite batch boundary whenever entering or
+		// leaving an exact kind-0 owner. Flush BEFORE selecting the next node so
+		// the pending batch is rendered with the previous node's semantic and
+		// projected-marker metadata still active.
+		if (IsExactKind0(current, currentScope) ||
+			IsExactKind0(incoming, incomingScope))
+			FlushD3DXSpriteBatch("node-boundary");
+
+		OutRunVR::GameSemantic::SelectSpriteQueueNode(incoming);
 	}
 
 	static void QueueEnd(SafetyHookContext&)
 	{
+		const auto* current = reinterpret_cast<const SpriteNode*>(
+			OutRunVR::GameSemantic::CurrentQueueNode());
+		const auto currentScope =
+			OutRunVR::GameSemantic::CurrentExactQueueScope();
+		if (IsExactKind0(current, currentScope))
+			FlushD3DXSpriteBatch("queue-end");
+
 		OutRunVR::GameSemantic::EndSpriteQueueRender();
 		++QueuePasses;
 		if ((QueuePasses % 300u) != 0)
@@ -1225,7 +1297,7 @@ public:
 		if (ok)
 		{
 			spdlog::info(
-				"VR HUD SEMANTIC R54: experimentMode={} sprite queue node 0x2D762 consumes explicit tags; mode1=next-draw latch mode2=sticky mode3=full owner mode4=full HUD-plane", experimentMode);
+				"VR HUD SEMANTIC R60: experimentMode={} queue node 0x2D762 + D3DXSprite kind0 exact-owner flush active; mode1=next-draw latch mode2=sticky mode3=full owner mode4=full HUD-plane", experimentMode);
 		}
 		else
 		{
