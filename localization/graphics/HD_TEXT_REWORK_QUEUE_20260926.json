@@ -17,7 +17,9 @@
     "targets_same_actual_size_as_legacy_suffix": 3,
     "graphics_rework_targets": 13,
     "low_res_font_pipeline_targets": 1,
-    "hd_preserve_targets": 75
+    "hd_preserve_targets": 75,
+    "graphics_rework_candidates_ready": 2,
+    "graphics_rework_remaining": 11
   },
   "rules": [
     "Use DDS header dimensions, never the filename resolution suffix.",
@@ -39,7 +41,8 @@
       "reason": "STOCK_RESOLUTION_TEXT_GRAPHIC",
       "policy": "CREATE_NEW_HD_KOREAN_ASSET",
       "priority": "P0",
-      "status": "REWORK_FROM_HD_BASE"
+      "status": "BATCH_CANDIDATE_READY",
+      "batch_report": "localization/graphics/BATCH66_HD_REWORK_B01_REPORT.json"
     },
     {
       "hash": "48DEBE77",
@@ -52,7 +55,8 @@
       "reason": "STOCK_RESOLUTION_TEXT_GRAPHIC",
       "policy": "CREATE_NEW_HD_KOREAN_ASSET",
       "priority": "P0",
-      "status": "REWORK_FROM_HD_BASE"
+      "status": "BATCH_CANDIDATE_READY",
+      "batch_report": "localization/graphics/BATCH66_HD_REWORK_B01_REPORT.json"
     },
     {
       "hash": "FF2462BB",
@@ -210,5 +214,6 @@
       "reason": "LOW_RES_FONT_ATLAS",
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
-  ]
+  ],
+  "latest_batch": "localization/graphics/BATCH66_HD_REWORK_B01_REPORT.json"
 }
