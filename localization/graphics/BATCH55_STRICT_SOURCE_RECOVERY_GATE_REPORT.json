@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "run": "automation-batch55-strict-source-recovery-gate-20260926",
+  "timestamp_kst": "2026-09-26T15:00:00+09:00",
+  "branch": "korean-localization-clean",
+  "input_reports": [
+    "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json",
+    "localization/graphics/BATCH54_FULL32_STRICT_REWORK_QUEUE_REPORT.json"
+  ],
+  "strict_state": {
+    "rework_required": 24,
+    "zoom_manual_required": 8,
+    "strict_pass": 0,
+    "promotion_hold": true
+  },
+  "persistence_reconcile": {
+    "fallback_folder": "/아웃런2 한글화/localization_fallback/20260926-1400-B/",
+    "folder_exists": true,
+    "files_found": 0,
+    "decision": "No Batch54 fallback payload exists to replay; GitHub Batch54 report and resume_state are already canonical."
+  },
+  "source_recovery": {
+    "exact_original_archive_available_this_run": false,
+    "combined_candidate_package_is_not_source_of_truth": true,
+    "exception_37759842_exact_source_hash": "ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0"
+  },
+  "checklist": [
+    "original DDS per-element orientation",
+    "preserve vehicle/model/brand/logo/song/legal artwork",
+    "source-like style/weight/color/outline/proportion",
+    "replacement pixels inside original text cell",
+    "non-text changed pixels=0",
+    "no black lines/crop seams/residual English/erasure residue/alpha halos/clipping",
+    "raw/readable 1x/2x manual QA"
+  ],
+  "action": "HOLD_ALL_PROMOTION",
+  "note": "P0/P1/P3 rework cannot safely begin without exact original DDS bytes. Do not use localized combined package as source. 37759842 remains eligible for exact-source rework only, but no new byte-backed candidate was generated in this run."
+}
