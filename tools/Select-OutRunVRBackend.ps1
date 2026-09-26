@@ -16,7 +16,7 @@ $payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "dxvk-safe" -or $Backen
 $defaultVariant = switch ($Backend) {
     "2d"        { "CONTROL_2D" }
     "d3d9"      { "A_CONTROL" }
-    "dx11"      { "R57_05_RANK_PROJECTED_IPD" }
+    "dx11"      { "R57_06_RANK_PROJECTED_HEAD" }
     "dxvk-safe" { "E_DXVK_SAFE" }
     "dxvk"      { "E_DXVK_MULTIVIEW" }
     "dx12"      { "F_DX12_STRICT" }
@@ -194,7 +194,11 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "Enabled" "true"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
-        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        # 2026-09-27 HMD logs: provider-local CreateDeviceEx can terminate
+        # before either success or classic fallback is logged. SAFE therefore
+        # stays on the provider's classic IDirect3D9 path until Ex startup is
+        # isolated behind a dedicated experimental backend.
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
         $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
@@ -219,20 +223,29 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "true"
+    } elseif ($Backend -eq "dxvk") {
+        $text = Set-IniSectionValue $text "VR" "RenderBackend" "2"
+        $text = Set-IniSectionValue $text "VR" "Enabled" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
+        # MULTIVIEW remains experimental, but correctness comes first: do not
+        # enter the provider-local Ex path that currently dies during
+        # CreateDeviceEx. Keep Desktop Duplication available as fail-open.
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
+        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
+        $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
     } else {
-        $value = switch ($Backend) {
-            "dxvk" { "2" }
-            "dx12" { "3" }
-        }
-        $text = Set-IniSectionValue $text "VR" "RenderBackend" $value
+        # DX12 STRICT is only considered valid when the collected session proves
+        # a D3D9On12 provider identity. The analyzer rejects a native-D3D9Ex
+        # session that is merely labelled dx12.
+        $text = Set-IniSectionValue $text "VR" "RenderBackend" "3"
         $text = Set-IniSectionValue $text "VR" "Enabled" "true"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"
-        if ($Backend -eq "dxvk") {
-            $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
-        }
+        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "true"
     }
 
     # Keep the experimental cockpit camera completely isolated from normal
@@ -247,6 +260,14 @@ $nl = [Environment]::NewLine
 $matrixFile = Join-Path $root "BUILD_MATRIX_ID.txt"
 $matrix = if (Test-Path $matrixFile) { (Get-Content $matrixFile -Raw).Trim() } else { "UNIFIED_LOCAL" }
 $startedUtc = (Get-Date).ToUniversalTime()
+$expectedProvider = switch ($Backend) {
+    "2d"        { "CLASSIC_D3D9" }
+    "d3d9"      { "NATIVE_D3D9EX" }
+    "dx11"      { "NATIVE_D3D9EX+D3D11_HOST" }
+    "dxvk-safe" { "DXVK_CLASSIC" }
+    "dxvk"      { "DXVK_CLASSIC_MULTIVIEW" }
+    "dx12"      { "D3D9ON12" }
+}
 $session = $startedUtc.ToString("yyyyMMddTHHmmssfffZ") + "-" + [guid]::NewGuid().ToString("N").Substring(0,8)
 $sessionRoot = Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $matrix,$variant,$TestProfile,$session)
 New-Item -ItemType Directory -Force $sessionRoot | Out-Null
@@ -256,6 +277,7 @@ $activeText = @(
     "variant=$variant"
     "profile=$TestProfile"
     "sourceSha=$sourceSha"
+    "expectedProvider=$expectedProvider"
     "matrix=$matrix"
     "session=$session"
     "startedUtc=$($startedUtc.ToString('o'))"
@@ -272,6 +294,7 @@ $sessionManifest = [ordered]@{
     Backend = $Backend
     TestProfile = $TestProfile
     SourceSha = $sourceSha
+    ExpectedProvider = $expectedProvider
     SessionId = $session
     StartedUtc = $startedUtc.ToString("o")
     ConfigSha256 = $configHash
@@ -301,7 +324,7 @@ switch ($Backend) {
     "2d"   { Write-Host "2D ORIGINAL: classic D3D9, VR disabled, D3D9Ex promotion disabled, no VR host." }
     "d3d9" { Write-Host "D3D9Ex REFERENCE: PreferD3D9Ex enabled; DirectGPU optional; profile=$TestProfile." }
     "dx11" { Write-Host "DX11 HOST/DIRECTGPU: D3D9Ex game + x64 D3D11 OpenXR host; DirectGPU-only; ACK run identity required." }
-    "dxvk-safe" { Write-Host "DXVK SAFE: provider-local D3D9Ex is probed when exported; DirectGPU optional; multiview patcher disabled." }
-    "dxvk" { Write-Host "DXVK MULTIVIEW: local d3d9.dll + multiviewpatcher.dll active." }
-    "dx12" { Write-Host "DX12 STRICT: local d3d9.dll verified absent; Windows D3D9On12 required." }
+    "dxvk-safe" { Write-Host "DXVK SAFE: classic DXVK IDirect3D9 + SBS/Desktop Duplication fail-open; provider-local Ex disabled after HMD startup failure." }
+    "dxvk" { Write-Host "DXVK MULTIVIEW: classic DXVK + multiviewpatcher; Desktop Duplication fail-open; provider-local Ex disabled." }
+    "dx12" { Write-Host "DX12 STRICT: local d3d9.dll absent; collected session must prove D3D9On12 identity or analysis fails." }
 }
