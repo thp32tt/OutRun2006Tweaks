@@ -1,4 +1,4 @@
-name: VR Nightly Unified R57 2026-09-26
+name: VR Nightly R58 Direct Clip 2026-09-26
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
       - vr-d3d9ex-focus
   push:
     branches:
-      - vr-nightly-unified-r57-20260926
+      - vr-nightly-r58-direct-clip-20260926
     paths:
       - 'src/**'
       - 'vrhost/**'
@@ -21,7 +21,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: vr-nightly-unified-r57-20260926-v2
+  group: vr-nightly-r58-direct-clip-20260926-v2
   cancel-in-progress: true
 
 jobs:
@@ -198,13 +198,13 @@ jobs:
           Copy-Item payload/current/dinput8.dll "$dir/dinput8.dll"
           Copy-Item payload/current/outrun-vr-host.exe "$dir/outrun-vr-host.exe"
           $short=$env:GITHUB_SHA.Substring(0,12)
-          $matrix="NIGHTLY-R57-UNIFIED-20260926-$short"
+          $matrix="NIGHTLY-R58-DIRECTCLIP-20260926-$short"
           Set-Content "$dir/BUILD_MATRIX_ID.txt" $matrix -Encoding ascii
           [ordered]@{
             SchemaVersion=1
             BuildMatrixId=$matrix
             IntegrationSha=$env:GITHUB_SHA
-            RuntimeSource='R57 projected-world-marker + DirectGPU ACK run identity + DXVK provider-local Ex'
+            RuntimeSource='R58 direct clip-node ownership + proven R57 mode6 head-inverse projected-world-marker + backend transport fixes'
             DX11='D3D9Ex game + D3D11 OpenXR host; DirectGPU-only mode available'
             DXVK='SAFE and MULTIVIEW modes use pinned OpenRBRVR DXVK provider'
             DX12='D3D9On12 probe is authoritative gate; DX12 STRICT gameplay remains experimental, not a native D3D12 host claim'
@@ -220,14 +220,14 @@ jobs:
             ''
             'START: START_HERE_VR_TEST.cmd'
             ''
-            'Recommended quick order:'
-            '1) R57 03 POSITION complete fix'
-            '2) R57 05 vehicle-rank projected IPD'
-            '3) R57 06 only if 05 still head-follows'
-            '4) DX11 HOST DirectGPU using R57 05'
-            '5) DXVK SAFE using R57 05'
-            '6) DXVK MULTIVIEW using R57 05'
-            '7) Run DX12 D3D9On12 PROBE; only after all PASS try DX12 STRICT'
+            'R58 focused HMD order (do not repeat all ten):'
+            '1) R57 03 - POSITION direct kind0 ownership + HUD35 proof'
+            '2) R57 08 - isolated 4th+ rank direct projected ownership + head inverse'
+            '3) R57 06 - combined 1st-6th projected rank with proven head inverse'
+            ''
+            'Backend comparisons are optional after the three visual checks.'
+            'DX11 HOST DirectGPU / DXVK SAFE / DXVK MULTIVIEW still use R57_05 in the GUI for transport comparison.'
+            'Run DX12 D3D9On12 PROBE before DX12 STRICT.'
             ''
             'DX11 means D3D9Ex game -> x64 D3D11 OpenXR host, not a native DX11 game renderer.'
             'DX12 STRICT is experimental. The included D3D9On12 probe is the current verified DX12-progress gate.'
@@ -239,11 +239,11 @@ jobs:
           Get-ChildItem $dir -Recurse -File|Get-FileHash -Algorithm SHA256|ForEach-Object{
             "$($_.Hash)  $([IO.Path]::GetRelativePath((Resolve-Path $dir),$_.Path))"
           }|Set-Content "$dir/SHA256SUMS.txt" -Encoding ascii
-          Compress-Archive -Path "$dir/*" -DestinationPath ("OutRun2_VR_NIGHTLY_UNIFIED_R57_" + $short + ".zip") -Force
+          Compress-Archive -Path "$dir/*" -DestinationPath ("OutRun2_VR_NIGHTLY_R58_" + $short + ".zip") -Force
       - name: Validate unified package
         shell: pwsh
         run: |
-          $zip=Get-ChildItem -Filter 'OutRun2_VR_NIGHTLY_UNIFIED_R57_*.zip'|Select-Object -First 1
+          $zip=Get-ChildItem -Filter 'OutRun2_VR_NIGHTLY_R58_*.zip'|Select-Object -First 1
           if(!$zip){throw 'nightly ZIP missing'}
           Expand-Archive $zip.FullName verify
           foreach($file in @('START_HERE_VR_TEST.cmd','OutRunVR-Test-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','outrun-d3d9on12-probe.exe','BUILD_INPUTS.json','TEST_ORDER.txt')){
@@ -265,6 +265,6 @@ jobs:
           Get-FileHash $zip.FullName -Algorithm SHA256
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun2-VR-NIGHTLY-UNIFIED-R57-${{ github.sha }}
-          path: OutRun2_VR_NIGHTLY_UNIFIED_R57_*.zip
+          name: OutRun2-VR-NIGHTLY-R58-${{ github.sha }}
+          path: OutRun2_VR_NIGHTLY_R58_*.zip
           if-no-files-found: error
