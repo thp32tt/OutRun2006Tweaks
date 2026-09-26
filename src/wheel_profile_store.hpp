@@ -533,9 +533,15 @@ namespace WheelProfileStore
         return true;
     }
 
-    inline std::optional<std::string_view> canonical_ffb_profile_default(std::string_view key)
+    inline std::optional<std::string_view> canonical_ffb_profile_default(
+        std::string_view key, int model)
     {
-        static constexpr std::pair<std::string_view, std::string_view> defaults[] = {
+        const std::string wanted = lower_ascii(std::string(key));
+
+        // Common clean baseline. Model-specific reference values below override
+        // only settings owned by that model; device routing/calibration and
+        // diagnostics are excluded from FFB feel profiles entirely.
+        static constexpr std::pair<std::string_view, std::string_view> common[] = {
             {"Enable","true"}, {"Model","0"}, {"GlobalStrength","0.70"},
             {"PS2HostGain","1.0"}, {"SpringStrength","0.65"},
             {"UseHardwareSpring","true"}, {"SpringSaturation","0.775"},
@@ -550,8 +556,64 @@ namespace WheelProfileStore
             {"ReversalReleaseRate","0.12"}, {"UsePeriodicEffects","true"},
             {"InvertForce","false"}, {"InvertSpring","false"},
         };
-        const std::string wanted = lower_ascii(std::string(key));
-        for (const auto& entry : defaults)
+
+        const auto pick = [&](std::string_view name, std::string_view value)
+            -> std::optional<std::string_view>
+        {
+            return wanted == lower_ascii(std::string(name))
+                ? std::optional<std::string_view>(value)
+                : std::nullopt;
+        };
+
+        if (model == 1) // Arcade Original
+        {
+            if (auto v=pick("Model","1")) return v;
+            if (auto v=pick("SpringStrength","0.50")) return v;
+            if (auto v=pick("SpringSaturation","1.00")) return v;
+            if (auto v=pick("DamperStrength","0.0")) return v;
+            if (auto v=pick("UseHardwareDamper","false")) return v;
+            if (auto v=pick("RoadTexture","1.0")) return v;
+            if (auto v=pick("WallImpact","1.0")) return v;
+            if (auto v=pick("GearShift","1.0")) return v;
+            if (auto v=pick("UsePeriodicEffects","true")) return v;
+        }
+        else if (model == 2) // Arcade + Modern Hybrid
+        {
+            if (auto v=pick("Model","2")) return v;
+            if (auto v=pick("PhysicsSAT","true")) return v;
+            if (auto v=pick("SpringStrength","0.65")) return v;
+            if (auto v=pick("SpringSaturation","0.95")) return v;
+            if (auto v=pick("DamperStrength","0.28")) return v;
+            if (auto v=pick("UseHardwareDamper","true")) return v;
+            if (auto v=pick("SteeringWeight","1.45")) return v;
+            if (auto v=pick("MechanicalTrail","0.25")) return v;
+            if (auto v=pick("TrailResponseLead","0.25")) return v;
+            if (auto v=pick("GripLoss","0.65")) return v;
+            if (auto v=pick("WeightTransfer","0.15")) return v;
+            if (auto v=pick("SlewRate","0.040")) return v;
+            if (auto v=pick("ReversalReleaseRate","0.12")) return v;
+            if (auto v=pick("RoadTexture","1.0")) return v;
+            if (auto v=pick("WallImpact","1.0")) return v;
+            if (auto v=pick("GearShift","1.0")) return v;
+            if (auto v=pick("TireSlip","0.20")) return v;
+            if (auto v=pick("UsePeriodicEffects","true")) return v;
+        }
+        else if (model == 3) // PS2 Original
+        {
+            if (auto v=pick("Model","3")) return v;
+            if (auto v=pick("PS2HostGain","2.0")) return v;
+            if (auto v=pick("SpringStrength","0.65")) return v;
+            if (auto v=pick("SpringSaturation","0.775")) return v;
+            if (auto v=pick("DamperStrength","0.30")) return v;
+            if (auto v=pick("RoadTexture","1.0")) return v;
+            if (auto v=pick("UsePeriodicEffects","true")) return v;
+        }
+        else
+        {
+            if (auto v=pick("Model","0")) return v;
+        }
+
+        for (const auto& entry : common)
             if (wanted == lower_ascii(std::string(entry.first)))
                 return entry.second;
         return std::nullopt;
@@ -568,6 +630,20 @@ namespace WheelProfileStore
         if (!parse_section(*path, "WheelFFB", values, error))
             return false;
 
+        int profileModel = 0;
+        if (const auto modelIt = values.find("model"); modelIt != values.end())
+        {
+            try
+            {
+                profileModel = std::clamp(std::stoi(modelIt->second), 0, 3);
+            }
+            catch (...)
+            {
+                if (error) *error = "FFB profile contains an invalid Model value.";
+                return false;
+            }
+        }
+
         auto settings = ffb_settings();
         std::vector<std::string> before;
         before.reserve(settings.size());
@@ -577,7 +653,8 @@ namespace WheelProfileStore
         for (size_t i = 0; i < settings.size(); ++i)
         {
             Settings::SettingBase* setting = settings[i];
-            if (const auto baseline = canonical_ffb_profile_default(setting->key()))
+            if (const auto baseline = canonical_ffb_profile_default(
+                    setting->key(), profileModel))
             {
                 if (!setting->set_from_string(*baseline))
                 {
