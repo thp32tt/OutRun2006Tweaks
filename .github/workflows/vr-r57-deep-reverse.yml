@@ -2,6 +2,12 @@ name: R57 targeted deep reverse
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - vr-d3d9ex-focus
+    paths:
+      - 'tools/reverse/r57_deep_disasm.py'
+      - '.github/workflows/vr-r57-deep-reverse.yml'
   push:
     branches:
       - 'vr-d3d9ex-candidate/R57-ORTHOGONAL-ROOTCAUSE-20260926'
