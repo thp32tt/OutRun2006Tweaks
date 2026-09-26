@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "run": "interactive-full32-strict-reset-20260926",
+  "timestamp_kst": "2026-09-26T13:00:28+09:00",
+  "branch": "korean-localization-clean",
+  "source_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip",
+  "scope": {
+    "package_dds": 32,
+    "repository_dds_inventory": 243,
+    "direct_artwork_targets": 79
+  },
+  "policy": {
+    "previous_pass_not_grandfathered": true,
+    "actual_dds_pixel_review": true,
+    "generative_comparison_forbidden": true,
+    "user_rejected_assets": ["841E796B","EBEF6D20","571E78F3","62BEBF33","E3FD08BE"],
+    "note": "Full-canvas alpha/bbox scan is a risk filter only; per-text-cell masks plus 1x/2x visual QA remain mandatory before PASS."
+  },
+  "summary": {
+    "rework_required": 24,
+    "zoom_manual_required": 8,
+    "strict_pass": 0,
+    "auto_risk_flagged": 19
+  },
+  "rework_required_assets": [
+    "D6DC1380","2EA557B4","7CE1CFC5","48DEBE77","EBEF6D20","43B07A77",
+    "1A43E9D9","37759842","4F68708E","571E78F3","62BEBF33","788CE557",
+    "841E796B","C075FB49","D41D0B1","E3FD08BE","F6811E94","12519155",
+    "1762489B","2B0863D6","39BCA907","4EDA9DE3","9CE4E175","C05E67EF"
+  ],
+  "zoom_manual_required_assets": [
+    "C598919A","2DA43E41","411827E","42E618FD",
+    "53CE39D5","560FA536","49BB5FE5","ACF61D7C"
+  ],
+  "high_confidence_findings": [
+    {
+      "asset": "841E796B",
+      "finding": "global alpha bbox expands +3px width/+16px height; introduced alpha outside original global bbox=861; USER_REJECTED"
+    },
+    {
+      "asset": "571E78F3",
+      "finding": "global alpha bbox height expands +4px; introduced alpha outside original global bbox=220; USER_REJECTED"
+    },
+    {
+      "asset": "62BEBF33",
+      "finding": "global alpha bbox height expands +15px; introduced alpha outside original global bbox=2546; USER_REJECTED"
+    },
+    {
+      "asset": "E3FD08BE",
+      "finding": "global alpha bbox height expands +16px; introduced alpha outside original global bbox=2072; USER_REJECTED"
+    },
+    {
+      "asset": "4F68708E",
+      "finding": "localized layout is visibly collapsed/repeated; global bbox width expands by 600px; rework required"
+    },
+    {
+      "asset": "D41D0B1",
+      "finding": "localized layout is visibly collapsed/repeated; global bbox width expands by 766px; rework required"
+    },
+    {
+      "asset": "9CE4E175",
+      "finding": "localized red label geometry duplicates/overlaps source footprint; bbox height expands by 56px; rework required"
+    },
+    {
+      "asset": "7CE1CFC5",
+      "finding": "manual visual review shows Korean title footprint/style substantially larger/heavier than source title block"
+    },
+    {
+      "asset": "12519155",
+      "finding": "manual visual review shows localized text block drastically reduced/moved versus source list"
+    },
+    {
+      "asset": "39BCA907",
+      "finding": "manual visual review shows list typography/spacing substantially reformatted versus source"
+    },
+    {
+      "asset": "37759842",
+      "finding": "existing report ledger already rejects promotion because residual English/card-detail fidelity remains unresolved"
+    }
+  ],
+  "next_action": [
+    "hold promotion of all 32 until strict per-text-cell QA",
+    "rework 24 REWORK_REQUIRED assets by exact source text-cell/mask priority",
+    "perform zoom/manual block-level QA on remaining 8 before any PASS",
+    "then extend the same strict review to FULL_DRAFT 79 and the full 243-inventory policy set"
+  ]
+}
