@@ -122,12 +122,71 @@ class UIScaling : public Hook
 		return mode;
 	}
 
+	static int VRR58Mode() noexcept
+	{
+		static const int mode = []() noexcept {
+			char text[8]{};
+			const DWORD len = GetEnvironmentVariableA(
+				"OUTRUN_VR_R58_MODE", text,
+				static_cast<DWORD>(sizeof(text)));
+			if (len == 0 || len >= sizeof(text))
+				return 0;
+			int value = 0;
+			for (DWORD i = 0; i < len; ++i)
+			{
+				if (text[i] < '0' || text[i] > '9')
+					return 0;
+				value = value * 10 + int(text[i] - '0');
+			}
+			return (value >= 1 && value <= 10) ? value : 0;
+		}();
+		return mode;
+	}
+
 	inline static thread_local
 		OutRunVR::GameSemantic::ProjectedMarkerInfo RankMarkerProjectedInfo{};
+	inline static thread_local
+		OutRunVR::GameSemantic::ProjectedMarkerInfo R58SiblingBB3ProjectedInfo{};
+	inline static thread_local
+		OutRunVR::GameSemantic::ProjectedMarkerInfo R58SiblingBB6ProjectedInfo{};
+	inline static thread_local
+		OutRunVR::GameSemantic::ProjectedMarkerInfo R58SiblingBBBProjectedInfo{};
+	inline static thread_local
+		OutRunVR::GameSemantic::ProjectedMarkerInfo R58SiblingBBDProjectedInfo{};
+
+	static void R58CaptureProjectedMarker(
+		OutRunVR::GameSemantic::ProjectedMarkerInfo& info,
+		float a1, float a2, const D3DVECTOR* out) noexcept
+	{
+		info = {};
+		if (!out || !std::isfinite(out->x) || !std::isfinite(out->y) ||
+			!std::isfinite(out->z) || !std::isfinite(a1) ||
+			!std::isfinite(a2) || std::fabs(a1) <= 1.0e-6f ||
+			std::fabs(a2) <= 1.0e-6f || std::fabs(out->z) <= 1.0e-6f)
+			return;
+		info.valid = true;
+		info.viewZ = out->z;
+		info.viewX = out->x * (-out->z) / a1;
+		info.viewY = out->y * (-out->z) / a2;
+	}
 
 	static OutRunVR::GameSemantic::RenderScope
 	R57RankProducerScope(bool rank13) noexcept
 	{
+		const int r58 = VRR58Mode();
+		if (r58 != 0)
+		{
+			// R58 keeps the HMD-proven R57-06 1st-3rd transform active in every
+			// new diagnostic so the remaining families can be isolated without
+			// regressing the one path that is already visually correct.
+			if (rank13)
+				return OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
+			// Modes 2 and 7 deliberately promote the BAD20 4th+ digit family.
+			if (r58 == 2 || r58 == 7)
+				return OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
+			return OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+		}
+
 		switch (VRR57Mode())
 		{
 		case 4:
@@ -304,31 +363,20 @@ class UIScaling : public Hook
 	{
 		Calc3D2D_hk.call(a1, a2, in, out);
 
-		// R57: sub_4BAD20 callsite RVA 0xBAEE2 returns at 0xBAEE7.
-		// Calc3D2D projects a stock-view point as:
-		//   sx = viewX / -viewZ * a1
-		//   sy = viewY / -viewZ * a2
-		// Preserve the recovered view point so the final queued sprite can be
-		// translated to the real left/right OpenXR projections instead of
-		// guessing depth from an already-flattened SpriteNode.
-		if (_ReturnAddress() == Module::exe_ptr(0xBAEE7) &&
-			out && std::isfinite(out->x) && std::isfinite(out->y) &&
-			std::isfinite(out->z) && std::isfinite(a1) &&
-			std::isfinite(a2) && std::fabs(a1) > 1.0e-6f &&
-			std::fabs(a2) > 1.0e-6f &&
-			std::fabs(out->z) > 1.0e-6f)
-		{
-			RankMarkerProjectedInfo.valid = true;
-			RankMarkerProjectedInfo.viewZ = out->z;
-			RankMarkerProjectedInfo.viewX =
-				out->x * (-out->z) / a1;
-			RankMarkerProjectedInfo.viewY =
-				out->y * (-out->z) / a2;
-		}
-		else if (_ReturnAddress() == Module::exe_ptr(0xBAEE7))
-		{
-			RankMarkerProjectedInfo = {};
-		}
+		// R58 expands the proven BAD20 capture to the four sibling projected
+		// marker families found by canonical-EXE disassembly. The return address
+		// identifies which world anchor owns the later sprite producer.
+		const void* calcReturn = _ReturnAddress();
+		if (calcReturn == Module::exe_ptr(0xBAEE7))
+			R58CaptureProjectedMarker(RankMarkerProjectedInfo, a1, a2, out);
+		else if (calcReturn == Module::exe_ptr(0xBB3DB))
+			R58CaptureProjectedMarker(R58SiblingBB3ProjectedInfo, a1, a2, out);
+		else if (calcReturn == Module::exe_ptr(0xBB6F5))
+			R58CaptureProjectedMarker(R58SiblingBB6ProjectedInfo, a1, a2, out);
+		else if (calcReturn == Module::exe_ptr(0xBBB8A))
+			R58CaptureProjectedMarker(R58SiblingBBBProjectedInfo, a1, a2, out);
+		else if (calcReturn == Module::exe_ptr(0xBBDCA))
+			R58CaptureProjectedMarker(R58SiblingBBDProjectedInfo, a1, a2, out);
 
 		// TODO: OnlineArcade mode needs to add position here
 
@@ -379,7 +427,7 @@ class UIScaling : public Hook
 		else if (probe == 12) { probeX = 320.0f; probeY = 208.0f; }
 
 		int result = 0;
-		if (VRR57Mode() != 0)
+		if (VRR57Mode() != 0 || VRR58Mode() != 0)
 		{
 			const auto scope = R57RankProducerScope(true);
 			const auto* marker =
@@ -434,7 +482,7 @@ class UIScaling : public Hook
 		else if (probe == 14) probeY -= 72;
 		else if (probe == 15) { probeX = 320; probeY = 208; }
 		int result = 0;
-		if (VRR57Mode() != 0)
+		if (VRR57Mode() != 0 || VRR58Mode() != 0)
 		{
 			const auto scope = R57RankProducerScope(false);
 			const auto* marker =
@@ -459,7 +507,17 @@ class UIScaling : public Hook
 		{
 			node->args_10.float24 += RankMarkerFracX;
 			node->args_10.float28 += RankMarkerFracY;
-			if (VRR57Mode() == 0)
+			const int r58 = VRR58Mode();
+			if ((r58 == 2 || r58 == 7) && RankMarkerProjectedInfo.valid)
+			{
+				// Bypass every nested semantic/lifetime assumption: tag the final
+				// 4th+ digit node directly with the same BAD20 world anchor.
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node,
+					OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D,
+					&RankMarkerProjectedInfo);
+			}
+			if (VRR57Mode() == 0 && r58 == 0)
 			{
 				const auto scope =
 					(probe == 17)
@@ -479,6 +537,88 @@ class UIScaling : public Hook
 	}
 
 
+	static int R58SiblingSpraniImpl(
+		OutRunVR::GameSemantic::ProjectedMarkerInfo& marker,
+		int isolatedMode, const char* family,
+		uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
+	{
+		const int r58 = VRR58Mode();
+		const bool active = r58 == isolatedMode || r58 == 7;
+		if (!active)
+			return Game::sprani_play_ae_auth_alpha(
+				spriteId, x, y, a4, a5, alpha);
+
+		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			tailsBefore[prio] = root ? root->tail_4 : nullptr;
+		}
+		OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+			OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D,
+			marker.valid ? &marker : nullptr);
+		const int result = Game::sprani_play_ae_auth_alpha(
+			spriteId, x, y, a4, a5, alpha);
+
+		// Direct final-node tagging removes put_sprite_ex2 propagation as a
+		// variable. Each sibling is therefore a clean producer-family test.
+		if (marker.valid)
+		{
+			for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+			{
+				SpriteNode* root = Game::sprite_prio_root[prio];
+				SpriteNode* node = root ? root->tail_4 : nullptr;
+				if (node && node != tailsBefore[prio])
+					OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+						node,
+						OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D,
+						&marker);
+			}
+		}
+		static std::array<std::atomic<std::uint64_t>, 4> hits{};
+		const int index = isolatedMode - 3;
+		if (index >= 0 && index < 4)
+		{
+			const auto hit = hits[index].fetch_add(1, std::memory_order_relaxed) + 1;
+			if ((hit & (hit - 1)) == 0)
+				spdlog::info(
+					"VR R58 SIBLING: family={} mode={} valid={} view=({:.4f},{:.4f},{:.4f}) hits={}",
+					family, r58, marker.valid ? 1 : 0,
+					marker.viewX, marker.viewY, marker.viewZ, hit);
+		}
+		return result;
+	}
+
+	static int __cdecl R58SiblingBB3_sprani(
+		uint32_t id, float x, float y, int a4, int a5, float alpha)
+	{
+		return R58SiblingSpraniImpl(
+			R58SiblingBB3ProjectedInfo, 3, "BB3",
+			id, x, y, a4, a5, alpha);
+	}
+	static int __cdecl R58SiblingBB6_sprani(
+		uint32_t id, float x, float y, int a4, int a5, float alpha)
+	{
+		return R58SiblingSpraniImpl(
+			R58SiblingBB6ProjectedInfo, 4, "BB6",
+			id, x, y, a4, a5, alpha);
+	}
+	static int __cdecl R58SiblingBBB_sprani(
+		uint32_t id, float x, float y, int a4, int a5, float alpha)
+	{
+		return R58SiblingSpraniImpl(
+			R58SiblingBBBProjectedInfo, 5, "BBB",
+			id, x, y, a4, a5, alpha);
+	}
+	static int __cdecl R58SiblingBBD_sprani(
+		uint32_t id, float x, float y, int a4, int a5, float alpha)
+	{
+		return R58SiblingSpraniImpl(
+			R58SiblingBBDProjectedInfo, 6, "BBD",
+			id, x, y, a4, a5, alpha);
+	}
+
+
 	using DispRankSpraniFn =
 		int(__cdecl*)(std::uint32_t, float, float, int, int);
 
@@ -487,14 +627,43 @@ class UIScaling : public Hook
 	{
 		auto original = reinterpret_cast<DispRankSpraniFn>(
 			Module::exe_ptr(0x29530));
+		const int r58 = VRR58Mode();
+		if (r58 == 8)
+			return 0;
+
+		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+		if (r58 == 9 || r58 == 10)
+		{
+			for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+			{
+				SpriteNode* root = Game::sprite_prio_root[prio];
+				tailsBefore[prio] = root ? root->tail_4 : nullptr;
+			}
+		}
 		const int r57 = VRR57Mode();
+		int result = 0;
 		if (r57 == 1 || r57 == 3)
 		{
 			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
 				OutRunVR::GameSemantic::RenderScope::ScreenHud);
-			return original(spriteId, x, y, a4, a5);
+			result = original(spriteId, x, y, a4, a5);
 		}
-		return original(spriteId, x, y, a4, a5);
+		else
+		{
+			result = original(spriteId, x, y, a4, a5);
+		}
+		if (r58 == 9 || r58 == 10)
+		{
+			for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+			{
+				SpriteNode* root = Game::sprite_prio_root[prio];
+				SpriteNode* node = root ? root->tail_4 : nullptr;
+				if (node && node != tailsBefore[prio])
+					OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+						node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			}
+		}
+		return result;
 	}
 
 	static int __cdecl DispRank_putClipSprite(
@@ -515,16 +684,39 @@ class UIScaling : public Hook
 			OutRunVR::GameSemantic::ArmNextDraw(
 				OutRunVR::GameSemantic::RenderScope::ScreenHud);
 
+		const int r58 = VRR58Mode();
+		if (r58 == 8)
+			return 0;
+
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
+
 		const int r57 = VRR57Mode();
+		int result = 0;
 		if (r57 == 2 || r57 == 3)
 		{
 			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
 				OutRunVR::GameSemantic::RenderScope::ScreenHud);
-			return Game::put_clip_sprite(
+			result = Game::put_clip_sprite(
 				xstnum, x, y, flags, priority, color);
 		}
-		return Game::put_clip_sprite(
-			xstnum, x, y, flags, priority, color);
+		else
+		{
+			result = Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+		}
+		if (r58 == 9 || r58 == 10)
+		{
+			root = Game::sprite_prio_root[prio];
+			SpriteNode* node = root ? root->tail_4 : nullptr;
+			if (node && node != tailBefore)
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		}
+		return result;
 	}
 
 	enum SpriteScaleType
@@ -888,6 +1080,13 @@ public:
 			Memory::VP::InjectHook(Module::exe_ptr(addr), RankMarker_sprani, Memory::HookType::Call);
 		for (int addr : RankMarker_ClipSpriteCalls)
 			Memory::VP::InjectHook(Module::exe_ptr(addr), RankMarker_putClipSprite, Memory::HookType::Call);
+
+		// R58 sibling-family probes discovered by deeper canonical-EXE analysis.
+		Memory::VP::InjectHook(Module::exe_ptr(0xBB550), R58SiblingBB3_sprani, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xBB796), R58SiblingBB6_sprani, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xBBC5A), R58SiblingBBB_sprani, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xBC2E5), R58SiblingBBD_sprani, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xBC346), R58SiblingBBD_sprani, Memory::HookType::Call);
 
 		NaviPub_Disp_SpriteSpacingEnable_hk = safetyhook::create_mid(Module::exe_ptr(NaviPub_Disp_SpriteScaleEnable_Addr), SpriteSpacingEnable);
 		NaviPub_Disp_SpriteSpacingEnable2_hk = safetyhook::create_mid(Module::exe_ptr(NaviPub_Disp_SpriteScaleEnable2_Addr), SpriteSpacingEnable);
