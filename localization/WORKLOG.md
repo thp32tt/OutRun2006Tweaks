@@ -369,3 +369,16 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Exact original DDS SHA-256: `ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0`.
 - Batch44 remains rejected: containment passed, manual source-faithful/artifact QA failed due to flattened card detail and residual English.
 - Original 37759842 remains canonical; no force push or unsafe promotion performed.
+
+
+## 2026-09-26 10:26 KST - TEXT+GFX B3-B38 TEST PACKAGE
+
+- Built from the isolated `korean-localization-clean` line; no VR/FFB source was merged.
+- Selected the latest relevant successful runtime build after the alpha fix: commit `1326f96840bfec7accf2e4016c238b8980b82853`, Actions run `36200209935`, artifact `10891921525`.
+- Included `runtime_ko.tsv` with 1,355/1,355 non-null Korean text rows and enabled `KoreanTextOverlayTest`.
+- Replaced the older graphics payload with the latest source-faithful B3-B38 package: 32 DDS files, 31 localized candidates and 1 original-safe fallback (`37759842_1024x1024.dds`).
+- Produced `OutRun2_Korean_Text_GFX_B3-B38_Test_20260926_1326f968.zip`.
+- Final package SHA-256: `fb0987e244881a48704b60f43ba5956096ef7fc6e5d50845bb7c21713a6ef258`.
+- ZIP integrity/structure QA: PASS; text row count 1,355; DDS count 32.
+- Test README repeats the hard containment gate: Korean glyph/text must never extend outside the original text region/sprite cell.
+- In-game validation remains pending; this package is a test build, not a final release.
