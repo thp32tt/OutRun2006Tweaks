@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-26T10:25:00+09:00",
+  "updated_at_kst": "2026-09-26T10:47:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Final graphics asset 37759842 remains pending after Batch51; exact card-template/icon-mask reconstruction is the next safe approach. In-game validate 31 retained candidates.",
+  "next_checkpoint": "D preflight complete; approved B3-B38 retained ledger confirmed at 32 reviewed / 31 retained / 1 pending. Keep original 37759842 until exact per-card template/icon-mask reconstruction passes manual raw/readable QA.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -250,7 +250,8 @@
       "name": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip",
       "sha256": "7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02"
     },
-    "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json"
+    "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
+    "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json"
   },
   "data_build": {
     "draft_bin_entries": 1356,
