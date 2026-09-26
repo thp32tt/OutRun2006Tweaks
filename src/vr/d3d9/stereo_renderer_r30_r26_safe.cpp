@@ -23,6 +23,7 @@
 namespace Settings
 {
     extern Setting<float> VRHudScale;
+    extern Setting<float> VRRankMarkerScale;
     extern Setting<float> VRStereoDepth;
     extern Setting<int> SkyGlowFactor;
     extern Setting<bool> SkyGlowTwoStep;
@@ -1196,6 +1197,12 @@ namespace OutRunVRStereo
             return std::clamp(Settings::VRHudScale.get(), 0.30f, 1.20f);
         }
 
+        float R57RankMarkerScaleValue() noexcept
+        {
+            return std::clamp(
+                Settings::VRRankMarkerScale.get(), 0.35f, 1.20f);
+        }
+
         int R55HudCoordMode() noexcept
         {
             static const int mode = []() noexcept {
@@ -1291,7 +1298,9 @@ namespace OutRunVRStereo
         bool R57BuildProjectedMarkerDelta(
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
             const D3DMATRIX& baseProjection,
-            float deltaX[2], float deltaY[2]) noexcept
+            float deltaX[2], float deltaY[2],
+            float* baseXOut = nullptr,
+            float* baseYOut = nullptr) noexcept
         {
             const auto* marker =
                 OutRunVR::GameSemantic::CurrentProjectedMarker();
@@ -1302,6 +1311,10 @@ namespace OutRunVRStereo
             if (!R57ProjectViewPoint(
                     *marker, baseProjection, baseX, baseY))
                 return false;
+            if (baseXOut)
+                *baseXOut = baseX;
+            if (baseYOut)
+                *baseYOut = baseY;
 
             const float centerEye[3]{
                 0.5f * (stereo.eyeOffset[0][0] + stereo.eyeOffset[1][0]),
@@ -1367,9 +1380,11 @@ namespace OutRunVRStereo
                     expected, true, std::memory_order_acq_rel))
             {
                 spdlog::info(
-                    "VR R57 PROJECTED MARKER: mode={} view=({:.4f},{:.4f},{:.4f}) deltaL=({:.5f},{:.5f}) deltaR=({:.5f},{:.5f}) builds={}",
+                    "VR R59 PROJECTED MARKER: mode={} view=({:.4f},{:.4f},{:.4f}) base=({:.5f},{:.5f}) deltaL=({:.5f},{:.5f}) deltaR=({:.5f},{:.5f}) rankScale={:.3f} builds={}",
                     R57Mode(), marker->viewX, marker->viewY, marker->viewZ,
-                    deltaX[0], deltaY[0], deltaX[1], deltaY[1], builds);
+                    baseX, baseY,
+                    deltaX[0], deltaY[0], deltaX[1], deltaY[1],
+                    R57RankMarkerScaleValue(), builds);
             }
             return true;
         }
@@ -1761,6 +1776,8 @@ namespace OutRunVRStereo
             bool screenOverlay2D = false;
             bool exactWorldBillboard = false;
             bool projectedWorldMarker2D = false;
+            float projectedBaseX = 0.0f;
+            float projectedBaseY = 0.0f;
             float projectedDeltaX[2]{};
             float projectedDeltaY[2]{};
             bool fullWorldReprojection = false;
@@ -2083,7 +2100,9 @@ namespace OutRunVRStereo
                     !R57BuildProjectedMarkerDelta(
                         state.stereo, baseProjection,
                         state.projectedDeltaX,
-                        state.projectedDeltaY))
+                        state.projectedDeltaY,
+                        &state.projectedBaseX,
+                        &state.projectedBaseY))
                     return false;
                 state.baseProjection = baseProjection;
                 state.worldEffect = true;
@@ -2610,10 +2629,25 @@ namespace OutRunVRStereo
                     }
                     else
                     {
+                        // R59: preserve the reconstructed vehicle/world anchor
+                        // while scaling the rank sprite around that anchor.
+                        // Scaling around screen centre would pull the marker off
+                        // its car; scaling source NDC relative to the recovered
+                        // stock anchor keeps anchor -> eyeAnchor exact.
+                        const float rankScale =
+                            R57RankMarkerScaleValue();
+                        const float eyeAnchorX =
+                            state.projectedBaseX +
+                            state.projectedDeltaX[eye];
+                        const float eyeAnchorY =
+                            state.projectedBaseY +
+                            state.projectedDeltaY[eye];
                         correctedX =
-                            ndcX + state.projectedDeltaX[eye];
+                            eyeAnchorX + rankScale *
+                            (ndcX - state.projectedBaseX);
                         correctedY =
-                            ndcY + state.projectedDeltaY[eye];
+                            eyeAnchorY + rankScale *
+                            (ndcY - state.projectedBaseY);
                     }
                 }
                 else if (state.worldEffect)
@@ -3472,16 +3506,27 @@ namespace OutRunVRStereo
                 }
 
                 float deltaX[2]{}, deltaY[2]{};
+                float baseX = 0.0f, baseY = 0.0f;
                 if (!R57BuildProjectedMarkerDelta(
-                        stereo, baseProjection, deltaX, deltaY))
+                        stereo, baseProjection, deltaX, deltaY,
+                        &baseX, &baseY))
                     return false;
+                const float rankScale = R57RankMarkerScaleValue();
                 for (int eye = 0; eye < 2; ++eye)
                 {
-                    D3DMATRIX clipShift = IdentityMatrix();
-                    clipShift._41 = deltaX[eye];
-                    clipShift._42 = deltaY[eye];
+                    // For row-vector clip coordinates:
+                    // x' = scale*x + translation*w.
+                    // translation = eyeAnchor - scale*baseAnchor keeps the
+                    // reconstructed world anchor fixed while changing size.
+                    D3DMATRIX clipTransform = IdentityMatrix();
+                    clipTransform._11 = rankScale;
+                    clipTransform._22 = rankScale;
+                    clipTransform._41 =
+                        deltaX[eye] + (1.0f - rankScale) * baseX;
+                    clipTransform._42 =
+                        deltaY[eye] + (1.0f - rankScale) * baseY;
                     const D3DMATRIX corrected =
-                        MultiplyMatrix(stockWvp, clipShift);
+                        MultiplyMatrix(stockWvp, clipTransform);
                     if (!MatrixFinite(corrected))
                         return false;
                     const D3DMATRIX correctedT =
