@@ -168,7 +168,7 @@ req(ffb, 'frontScrub * (0.50f + 0.50f * lateralLoadSmooth) +\n                  
 req(ffb, 'const float naturalSlideRelief =\n                1.0f - 0.25f * gripLoss * bodySlide;', 'Natural SAT unloads from real slide')
 req(ffb, 'const float rearSlideRelief = 1.0f - 0.15f * gripLoss * bodySlide;', 'Physics SAT avoids body-slip double unload')
 req(ffb, 'WheelFFBMath::pneumatic_sat_shape(frontSlip, trailResponseSlip)', 'production pneumatic SAT curve separates force and trail transients')
-req(ffb, 'WheelFFBMath::combined_sat_shape(\n                frontSlip, trailResponseSlip, effectiveMechanicalTrail)', 'Physics SAT combines pneumatic and boosted deep-slip mechanical total trail')
+req(ffb, 'WheelFFBMath::combined_sat_shape_with_deep_slip_boost(\n                    frontSlip, trailResponseSlip, mechanicalTrailMix)', 'Physics SAT combines pneumatic and non-cancelled deep-slip mechanical total trail')
 req(ffb, '(frontSlip > 0.0f ? -1.0f : 1.0f)', 'Physics SAT direction follows front slip')
 forbid(ffb, 'physicsGrip', 'old strong body-slip SAT double-unload removed')
 
