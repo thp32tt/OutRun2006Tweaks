@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "run": "batch59-a-source-parts-recovery-audit-20260926",
+  "timestamp_kst": "2026-09-26T17:00:00+09:00",
+  "branch": "korean-localization-clean",
+  "input_reports": [
+    "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json",
+    "localization/graphics/BATCH54_FULL32_STRICT_REWORK_QUEUE_REPORT.json",
+    "localization/graphics/BATCH57_D_CANONICAL_SOURCE_P0_STRICT_REPORT.json",
+    "localization/graphics/BATCH58_A_CANONICAL_P0_REWORK_PREFLIGHT_REPORT.json"
+  ],
+  "strict_state": {
+    "rework_required": 24,
+    "zoom_manual_required": 8,
+    "strict_pass": 0,
+    "promotion_hold": true
+  },
+  "source_recovery_audit": {
+    "canonical_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+    "canonical_dds_inventory": 243,
+    "library_evidence": "multiple archived base64 part files from prior source recovery remain discoverable, including 1,000,000-byte numbered parts and a final 933,796-byte part; exact archive bytes were not reconstructed in this run because the full numbered sequence could not be proven complete from current retrieval.",
+    "source_truth_rule": "candidate B3-B38 package must never substitute for original DDS"
+  },
+  "p0_order": [
+    "841E796B",
+    "EBEF6D20",
+    "571E78F3",
+    "62BEBF33",
+    "E3FD08BE"
+  ],
+  "decision": "NO_PIXEL_EDIT_NO_PROMOTION",
+  "reason": "Canonical source identity is proven by Batch57, but exact P0 DDS bytes were not materialized in this run. Strict policy forbids report/preview/candidate-derived reconstruction.",
+  "next": [
+    "reconstruct/materialize the complete canonical archive only when every numbered source part is resolved and hash verifies e17db462...",
+    "extract exact P0 DDS and perform original-only per-text-cell masks",
+    "retain promotion hold until raw/readable 1x/2x manual QA and all pixel gates pass"
+  ]
+}
