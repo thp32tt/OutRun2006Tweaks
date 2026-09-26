@@ -14,6 +14,8 @@ sys.modules[spec.name]=mod
 spec.loader.exec_module(mod)
 
 RANGES=[
+ ("renderer_view_writer_F6xx",0x00F600,0x320),
+ ("renderer_worldview_writer_FBxx",0x00FB40,0x260),
  ("mxPushLoadMatrix",0x009F90,0x190),
  ("matrix_helper_A170",0x00A170,0x110),
  ("mxCalcPoint",0x00A7D0,0x130),
