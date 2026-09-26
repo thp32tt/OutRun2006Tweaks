@@ -1,5 +1,5 @@
 {
-  "schema_version": 16,
+  "schema_version": 17,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,11 +7,12 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "read ORIENTATION_POLICY.md, SOURCE_FAITHFUL_CURRENT.json, and BATCH53_FULL32_STRICT_RESET_REPORT.json before editing",
-    "treat 24 assets as REWORK_REQUIRED and 8 assets as ZOOM_MANUAL_REQUIRED; no previous retained asset is grandfathered as strict PASS",
-    "build exact per-text-cell masks/bounds before repainting; enforce overlay-box overflow=0, no residual English/seams, and non-text changed pixels=0",
-    "rework user-rejected 841E796B, EBEF6D20, 571E78F3, 62BEBF33, E3FD08BE first, then remaining high-risk assets",
-    "after the 32-package strict reset, extend identical QA to FULL_DRAFT 79 and the complete 243-DDS policy inventory"
+    "read ORIENTATION_POLICY.md, SOURCE_FAITHFUL_CURRENT.json, BATCH53_FULL32_STRICT_RESET_REPORT.json, and BATCH54_FULL32_STRICT_REWORK_QUEUE_REPORT.json before editing",
+    "strict state is 24 REWORK_REQUIRED / 8 ZOOM_MANUAL_REQUIRED / 0 strict PASS; historical 31 candidate count is not approval",
+    "recover exact original DDS bytes before reworking any previously localized asset; never use the combined candidate package as source-of-truth",
+    "priority: user-rejected 841E796B, EBEF6D20, 571E78F3, 62BEBF33, E3FD08BE once exact originals are available",
+    "37759842 exact source is available; continue glyph/outline-footprint reconstruction only, never full-card clearing",
+    "enforce per-text-cell containment, non-text changed pixels=0, zero residual English/seams/halos/clipping, and raw+readable 1x/2x manual QA"
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -65,7 +66,7 @@
     "batch23_rejected_report": "localization/graphics/BATCH23_REJECTED_REPORT.json",
     "batch24v2_report": "localization/graphics/BATCH24V2_2DA_REWORK_REPORT.json",
     "batch25v4_report": "localization/graphics/BATCH25V4_ACF_REWORK_REPORT.json",
-    "latest_safe_rework_note": "2026-09-26 13:00 KST: full32 strict reset is active; 24 REWORK_REQUIRED / 8 ZOOM_MANUAL_REQUIRED / 0 strict PASS. Do not resume the old 'only 37759842 pending' assumption.",
+    "latest_safe_rework_note": "2026-09-26 14:00 KST: strict full32 reset remains authoritative: 24 REWORK_REQUIRED / 8 ZOOM_MANUAL_REQUIRED / 0 strict PASS. Combined B3-B38 package was materialized, but its 31 localized files are candidates, not originals. Exact source archive is required before reworking them; 37759842 is the original-safe exception.",
     "batch33_rejected_report": "localization/graphics/BATCH33_REJECTED_REPORT.json",
     "batch38_report": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
     "batch41_rejected_report": "localization/graphics/BATCH41_REJECTED_REPORT.json",
@@ -85,7 +86,9 @@
       "zoom_manual_required": 8,
       "strict_pass": 0,
       "promotion_hold": true,
-      "note": "Existing source_faithful_localized_candidates count remains historical package-candidate metadata, not strict approval."
+      "note": "Existing source_faithful_localized_candidates count remains historical package-candidate metadata, not strict approval.",
+      "latest_queue_report": "localization/graphics/BATCH54_FULL32_STRICT_REWORK_QUEUE_REPORT.json",
+      "latest_queue_commit": "5e71ec08d322dafd7b55fc7bf2597febe6f0fa14"
     }
   },
   "runtime_packages": {
