@@ -220,6 +220,7 @@ namespace OutRunVR
 			Settings::VRMirrorFitDesktop.needs_restart();
 			Settings::VRDisableDesktopVsync.needs_restart();
 			Settings::VRPreferD3D9Ex.needs_restart();
+			Settings::VRAllowThirdPartyD3D9Ex.needs_restart();
 			Settings::VRDirectGpuOnly.needs_restart();
 			Settings::VRDisableDesktopDuplication.needs_restart();
 			Settings::VRTargetRefreshRateHz.needs_restart();
