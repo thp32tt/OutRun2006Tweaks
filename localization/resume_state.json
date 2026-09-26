@@ -66,11 +66,12 @@
     "batch23_rejected_report": "localization/graphics/BATCH23_REJECTED_REPORT.json",
     "batch24v2_report": "localization/graphics/BATCH24V2_2DA_REWORK_REPORT.json",
     "batch25v4_report": "localization/graphics/BATCH25V4_ACF_REWORK_REPORT.json",
-    "latest_safe_rework_note": "2026-09-26 08:55 KST: C598919A is already promoted by Batch38. Only 37759842 remains pending. Batch41 containment passed but manual QA failed on residual English in blue Mode cards and black 15-course cards. Exact original/candidate DDS bytes are not committed; keep original until byte-backed rework can pass all gates.",
+    "latest_safe_rework_note": "2026-09-26 09:00 KST: only 37759842 remains pending. Exact original DDS/candidate bytes unavailable in accessible file retrieval; Batch41 still fails residual-English manual QA. Keep original; do not reconstruct from report/preview.",
     "batch33_rejected_report": "localization/graphics/BATCH33_REJECTED_REPORT.json",
     "batch38_report": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
     "batch41_rejected_report": "localization/graphics/BATCH41_REJECTED_REPORT.json",
-    "batch42_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json"
+    "batch42_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
+    "batch43_safe_hold_report": "localization/graphics/BATCH43_FINAL_PENDING_SOURCE_BYTE_GATE_REPORT.json"
   },
   "runtime_packages": {
     "k1": {
