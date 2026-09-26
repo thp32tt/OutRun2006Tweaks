@@ -117,3 +117,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - No unsafe DDS was integrated. Canonical state remains **32 reviewed / 31 retained / 1 pending**.
 - Report: `localization/graphics/BATCH44_REJECTED_REPORT.json`.
 - Next: isolate glyph pixels/text layers more precisely instead of enlarging reconstruction zones.
+
+
+### D preflight checkpoint 2026-09-26 10:47 KST
+- Reconciled the full retained/rejected report ledger before new work.
+- Approved canonical state remains **32 reviewed / 31 retained / 1 pending**.
+- No rejected `37759842` reconstruction was promoted; original-safe fallback remains required.
+- Git does not contain the exact retained DDS binaries, so fresh pixel-level revalidation of all 31 is deferred until exact package bytes are available.
+- Report: `localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json`.
