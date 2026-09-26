@@ -14,7 +14,12 @@ sys.modules[spec.name]=mod
 spec.loader.exec_module(mod)
 
 RANGES=[
+ ("mxPushLoadMatrix",0x009F90,0x190),
+ ("matrix_helper_A170",0x00A170,0x110),
+ ("mxCalcPoint",0x00A7D0,0x130),
  ("Calc3D2D",0x049940,0x320),
+ ("dispMarkerCheck",0x0BA0E0,0x190),
+ ("rank_helper_BABF0",0x0BABF0,0x130),
  ("sprani_play_ae_auth_alpha",0x029580,0x700),
  ("put_clip_sprite_and_queue_entry",0x02D280,0xB00),
  ("DispRank",0x0B9E00,0x380),
