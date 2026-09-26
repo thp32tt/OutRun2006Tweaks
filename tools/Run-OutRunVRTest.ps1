@@ -248,7 +248,7 @@ foreach($key in $identityKeys){ $oldIdentity[$key] = [Environment]::GetEnvironme
 
 $sourceSha=if($state.SourceSha){[string]$state.SourceSha}else{'unknown'}
 if($sourceSha -eq 'unknown'){
-    $sourceFile=Join-Path $root ("backends/{0}/SOURCE_SHA.txt" -f $(if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}))
+    $sourceFile=Join-Path $root ("backends/{0}/SOURCE_SHA.txt" -f $(if($backend -eq '2d' -or $backend -eq 'dxvk-safe' -or $backend -eq 'dx11'){'d3d9'}else{$backend}))
     if(Test-Path $sourceFile){ $sourceSha=(Get-Content $sourceFile -Raw).Trim() }
 }
 $env:OUTRUN_VR_SESSION_ID=[string]$state.SessionId
