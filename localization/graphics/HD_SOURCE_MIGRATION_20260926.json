@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-09-26T22:46:00+09:00",
+  "branch": "korean-localization-clean",
+  "requested_source_mode": "HD_TEXTURE_MOD_PRIMARY",
+  "status": "PENDING_EXACT_HD_SOURCE_IMPORT",
+  "previous_canonical_source": {
+    "type": "stock_original_analysis_archive",
+    "sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+    "role_after_migration": "fallback_and_orientation_reference_only"
+  },
+  "new_canonical_source": {
+    "type": "user_installed_high_resolution_texture_mod",
+    "identity": "asset_hash_prefix_plus_exact_dds_sha256",
+    "dimension_policy": "read DDS header; do not trust _WIDTHxHEIGHT suffix",
+    "import_status": "waiting_for_collected_HD_source_zip"
+  },
+  "collector": "tools/localization/collect_hd_localization_source.ps1",
+  "migration_rules": [
+    "Match assets by stable hexadecimal hash prefix, not the old resolution suffix.",
+    "Prefer the highest actual DDS dimensions from the installed HD texture tree.",
+    "Preserve the HD mod's artwork, alpha, DDS format, mip behavior, sprite orientation and cell geometry.",
+    "Re-render Korean graphics against the HD source; do not upscale old Korean DDS candidates.",
+    "Previously approved stock-resolution Korean DDS remain historical evidence only until revalidated/rebuilt against HD source.",
+    "No new graphics promotion while the HD source archive identity is pending."
+  ]
+}
