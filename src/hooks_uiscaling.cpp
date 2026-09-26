@@ -506,13 +506,62 @@ class UIScaling : public Hook
 		auto original = reinterpret_cast<DispRankSpraniFn>(
 			Module::exe_ptr(0x29530));
 		const int r57 = VRR57Mode();
-		if (r57 == 1 || r57 == 3)
+		const bool exactPositionOwner = r57 == 1 || r57 == 3;
+
+		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+		if (exactPositionOwner)
+		{
+			for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+			{
+				SpriteNode* root = Game::sprite_prio_root[prio];
+				tailsBefore[prio] = root ? root->tail_4 : nullptr;
+			}
+		}
+
+		int result = 0;
+		if (exactPositionOwner)
 		{
 			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
 				OutRunVR::GameSemantic::RenderScope::ScreenHud);
-			return original(spriteId, x, y, a4, a5);
+			result = original(spriteId, x, y, a4, a5);
 		}
-		return original(spriteId, x, y, a4, a5);
+		else
+		{
+			result = original(spriteId, x, y, a4, a5);
+		}
+
+		if (exactPositionOwner)
+		{
+			std::uint64_t tagged = 0;
+			for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+			{
+				SpriteNode* root = Game::sprite_prio_root[prio];
+				SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
+				if (!root || !tailAfter || tailAfter == tailsBefore[prio])
+					continue;
+
+				SpriteNode* node = tailsBefore[prio]
+					? tailsBefore[prio]->next_0 : root->next_0;
+				for (unsigned guard = 0; node && guard < 0x230; ++guard)
+				{
+					OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+						node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+					++tagged;
+					if (node == tailAfter)
+						break;
+					node = node->next_0;
+				}
+			}
+
+			static std::atomic<std::uint64_t> directPositionKind1Tags{ 0 };
+			const auto total = directPositionKind1Tags.fetch_add(
+				tagged, std::memory_order_relaxed) + tagged;
+			if (tagged != 0 && (total & (total - 1)) == 0)
+				spdlog::info(
+					"VR R59 DIRECT SPRANI: owner=position kind=1 tagged={} total={}",
+					tagged, total);
+		}
+		return result;
 	}
 
 	static int __cdecl DispRank_putClipSprite(
