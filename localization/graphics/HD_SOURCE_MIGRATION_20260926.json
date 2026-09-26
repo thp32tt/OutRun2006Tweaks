@@ -1,27 +1,37 @@
 {
   "schema_version": 1,
-  "timestamp_kst": "2026-09-26T22:46:00+09:00",
+  "timestamp_kst": "2026-09-26T22:50:00+09:00",
   "branch": "korean-localization-clean",
   "requested_source_mode": "HD_TEXTURE_MOD_PRIMARY",
-  "status": "PENDING_EXACT_HD_SOURCE_IMPORT",
+  "status": "HD_PACKAGE_IMPORTED_REWORK_SCOPE_READY",
   "previous_canonical_source": {
     "type": "stock_original_analysis_archive",
     "sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
     "role_after_migration": "fallback_and_orientation_reference_only"
   },
   "new_canonical_source": {
-    "type": "user_installed_high_resolution_texture_mod",
+    "type": "OR2-HD-GUI-v0.25.10a",
+    "package": "OR2-HD-GUI-v0.25.10a(1).zip",
+    "package_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "upstream_repo": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "dds_total": 289,
+    "localization_targets_matched": 89,
+    "exact_rework_asset_sha_count": 13,
+    "queue": "localization/graphics/HD_TEXT_REWORK_QUEUE_20260926.json",
     "identity": "asset_hash_prefix_plus_exact_dds_sha256",
-    "dimension_policy": "read DDS header; do not trust _WIDTHxHEIGHT suffix",
-    "import_status": "waiting_for_collected_HD_source_zip"
+    "dimension_policy": "read DDS header; do not trust _WIDTHxHEIGHT suffix"
   },
   "collector": "tools/localization/collect_hd_localization_source.ps1",
   "migration_rules": [
     "Match assets by stable hexadecimal hash prefix, not the old resolution suffix.",
-    "Prefer the highest actual DDS dimensions from the installed HD texture tree.",
-    "Preserve the HD mod's artwork, alpha, DDS format, mip behavior, sprite orientation and cell geometry.",
-    "Re-render Korean graphics against the HD source; do not upscale old Korean DDS candidates.",
-    "Previously approved stock-resolution Korean DDS remain historical evidence only until revalidated/rebuilt against HD source.",
-    "No new graphics promotion while the HD source archive identity is pending."
-  ]
+    "Use the user-supplied OR2-HD-GUI package as the graphics baseline.",
+    "Keep completed HD artwork unchanged except exact text cells required for Korean localization.",
+    "Treat upstream placeholder-upscale assets as low-resolution source content and rebuild them.",
+    "Create new HD Korean artwork for stock-resolution text graphics D6DC1380 and 48DEBE77.",
+    "Keep 6B8ED9DA in the Hangul font pipeline rather than generic graphics repaint.",
+    "Preserve alpha, DDS behavior, sprite orientation, cell geometry, non-text pixels and original bounds.",
+    "Do not upscale prior stock-resolution Korean candidates."
+  ],
+  "rework_queue": "localization/graphics/HD_TEXT_REWORK_QUEUE_20260926.json"
 }
