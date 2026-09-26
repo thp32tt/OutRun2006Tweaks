@@ -1147,7 +1147,7 @@ class VRProjectedD3DXSpriteIsolation : public Hook
 	{
 		const HRESULT hr = Draw_hk.stdcall<HRESULT>(
 			self, texture, rect, center, pos, color);
-		if (FAILED(hr) || VRR57Mode() == 0)
+		if (FAILED(hr))
 			return hr;
 
 		const auto scope =
