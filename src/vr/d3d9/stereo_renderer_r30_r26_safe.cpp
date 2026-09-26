@@ -3901,9 +3901,56 @@ namespace OutRunVRStereo
             return r29Draw();
         }
 
+        void R61TraceD3DXDeviceDraw(
+            IDirect3DDevice9* device, const char* method,
+            D3DPRIMITIVETYPE type, UINT primitiveCount) noexcept
+        {
+            if (!device ||
+                !OutRunVR::GameSemantic::D3DXSpriteEmissionActive)
+                return;
+
+            static std::atomic<std::uint64_t> hits{ 0 };
+            const auto hit =
+                hits.fetch_add(1, std::memory_order_relaxed) + 1;
+            if (hit > 64 && (hit & (hit - 1)) != 0)
+                return;
+
+            DWORD fvf = 0;
+            const HRESULT fvfHr = device->GetFVF(&fvf);
+            IDirect3DVertexShader9* vs = nullptr;
+            const HRESULT vsHr = device->GetVertexShader(&vs);
+            const bool hasVs = SUCCEEDED(vsHr) && vs != nullptr;
+            if (vs)
+                vs->Release();
+
+            spdlog::info(
+                "VR R61 D3DX DEVICE DRAW: method={} type={} prim={} fvfHr=0x{:08X} fvf=0x{:08X} vsHr=0x{:08X} hasVS={} current={} effective={} queueExact={} marker={} batch[g={},h={},w={},p={}] hit={}",
+                method,
+                static_cast<unsigned>(type),
+                primitiveCount,
+                static_cast<unsigned>(fvfHr),
+                static_cast<unsigned>(fvf),
+                static_cast<unsigned>(vsHr),
+                hasVs ? 1 : 0,
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::CurrentScope),
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::EffectiveScope()),
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::CurrentQueueExactScope),
+                OutRunVR::GameSemantic::CurrentProjectedMarker() ? 1 : 0,
+                OutRunVR::GameSemantic::D3DXEmissionGeneric,
+                OutRunVR::GameSemantic::D3DXEmissionScreenHud,
+                OutRunVR::GameSemantic::D3DXEmissionWorldBillboard,
+                OutRunVR::GameSemantic::D3DXEmissionProjectedWorld,
+                hit);
+        }
+
         HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
+            R61TraceD3DXDeviceDraw(
+                device, "DrawPrimitive", type, primitiveCount);
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
@@ -3932,6 +3979,8 @@ namespace OutRunVRStereo
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
+            R61TraceD3DXDeviceDraw(
+                device, "DrawIndexedPrimitive", type, primitiveCount);
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
@@ -3962,6 +4011,8 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT primitiveCount, const void* data, UINT stride)
         {
+            R61TraceD3DXDeviceDraw(
+                device, "DrawPrimitiveUP", type, primitiveCount);
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
@@ -3991,6 +4042,8 @@ namespace OutRunVRStereo
             const void* indexData, D3DFORMAT indexFormat,
             const void* vertexData, UINT stride)
         {
+            R61TraceD3DXDeviceDraw(
+                device, "DrawIndexedPrimitiveUP", type, primitiveCount);
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
