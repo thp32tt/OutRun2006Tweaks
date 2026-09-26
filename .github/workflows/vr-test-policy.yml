@@ -3,7 +3,7 @@ name: VR Test Policy
 on:
   workflow_dispatch:
   push:
-    branches: [ vr-d3d9ex-focus ]
+    branches: [ vr-d3d9ex-focus, vr-r56-safety-perf-review-fixes-20260926 ]
     paths:
       - 'tools/OutRunVR-TestProfiles.ps1'
       - 'tools/Select-OutRunVRBackend.ps1'
