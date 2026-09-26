@@ -11,6 +11,8 @@
 
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
+#include "vr/ipc/host_state_v3_reader.hpp"
+#include "vr/ipc/protocol_v3.hpp"
 
 // VR settings live here, but the final camera transform does not.
 // Head tracking is applied only at the verified D3D9 c64 WorldViewProjection
@@ -103,27 +105,123 @@ namespace OutRunVR
 {
 	namespace
 	{
-		bool VRHostProcessRunning() noexcept
+		enum class VRHostHealth
 		{
+			Missing,
+			Starting,
+			Healthy,
+			StaleRenderable
+		};
+
+		bool SamePathInsensitive(const std::filesystem::path& a,
+			const std::filesystem::path& b) noexcept
+		{
+			const std::wstring aw = a.lexically_normal().wstring();
+			const std::wstring bw = b.lexically_normal().wstring();
+			return _wcsicmp(aw.c_str(), bw.c_str()) == 0;
+		}
+
+		bool FindExpectedVRHostProcess(DWORD& pid) noexcept
+		{
+			pid = 0;
+			const std::filesystem::path expected =
+				Module::ExePath.parent_path() / "outrun-vr-host.exe";
 			HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 			if (snapshot == INVALID_HANDLE_VALUE)
 				return false;
+
 			PROCESSENTRY32W entry{};
 			entry.dwSize = sizeof(entry);
-			bool found = false;
 			if (Process32FirstW(snapshot, &entry))
 			{
 				do
 				{
-					if (_wcsicmp(entry.szExeFile, L"outrun-vr-host.exe") == 0)
+					if (_wcsicmp(entry.szExeFile, L"outrun-vr-host.exe") != 0)
+						continue;
+
+					HANDLE process = OpenProcess(
+						PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE,
+						FALSE, entry.th32ProcessID);
+					if (!process)
+						continue;
+					wchar_t path[MAX_PATH]{};
+					DWORD length = static_cast<DWORD>(std::size(path));
+					const bool running =
+						WaitForSingleObject(process, 0) == WAIT_TIMEOUT;
+					const bool havePath =
+						running && QueryFullProcessImageNameW(
+							process, 0, path, &length) != FALSE;
+					CloseHandle(process);
+					if (havePath && SamePathInsensitive(path, expected))
 					{
-						found = true;
+						pid = entry.th32ProcessID;
 						break;
 					}
 				} while (Process32NextW(snapshot, &entry));
 			}
 			CloseHandle(snapshot);
-			return found;
+			return pid != 0;
+		}
+
+		VRHostHealth QueryVRHostHealth(DWORD& pid) noexcept
+		{
+			if (!FindExpectedVRHostProcess(pid))
+				return VRHostHealth::Missing;
+
+			OutRunVR::IpcV3::HostStateReader reader;
+			OutRunVR::IpcV3::HostState state{};
+			if (!reader.Read(state) || state.hostPid != pid)
+				return VRHostHealth::Starting;
+
+			const std::uint32_t renderFlags =
+				OutRunVR::IpcV3::HostAlive |
+				OutRunVR::IpcV3::SessionVisible |
+				OutRunVR::IpcV3::HostShouldRender;
+			if ((state.flags & renderFlags) != renderFlags)
+				return VRHostHealth::Healthy;
+
+			LARGE_INTEGER now{}, frequency{};
+			if (!QueryPerformanceCounter(&now) ||
+				!QueryPerformanceFrequency(&frequency) ||
+				frequency.QuadPart <= 0 || state.sampleQpc <= 0)
+				return VRHostHealth::Starting;
+
+			const LONGLONG age = now.QuadPart - state.sampleQpc;
+			if (age < 0)
+				return VRHostHealth::Starting;
+			const LONGLONG staleTicks = frequency.QuadPart * 10;
+			return age > staleTicks
+				? VRHostHealth::StaleRenderable
+				: VRHostHealth::Healthy;
+		}
+
+		bool TerminateStaleVRHost(DWORD pid) noexcept
+		{
+			if (!pid)
+				return false;
+			HANDLE process = OpenProcess(
+				PROCESS_TERMINATE | SYNCHRONIZE |
+				PROCESS_QUERY_LIMITED_INFORMATION,
+				FALSE, pid);
+			if (!process)
+				return false;
+
+			wchar_t path[MAX_PATH]{};
+			DWORD length = static_cast<DWORD>(std::size(path));
+			const std::filesystem::path expected =
+				Module::ExePath.parent_path() / "outrun-vr-host.exe";
+			const bool exactBinary =
+				QueryFullProcessImageNameW(process, 0, path, &length) != FALSE &&
+				SamePathInsensitive(path, expected);
+			bool terminated = false;
+			if (exactBinary && WaitForSingleObject(process, 0) == WAIT_TIMEOUT)
+			{
+				terminated = TerminateProcess(process, 0x56524853) != FALSE;
+				if (terminated)
+					WaitForSingleObject(process, 2000);
+			}
+			CloseHandle(process);
+			return terminated;
 		}
 
 		bool VRLaunchHostOnce() noexcept
@@ -190,29 +288,51 @@ namespace OutRunVR
 			if (!Settings::VREnabled || !Settings::VRAutoLaunchHost)
 				return 0;
 
-			// Stay alive for the game lifetime. A bounded OpenXR/swapchain failure
-			// deliberately lets the x64 host exit rather than hang forever; the
-			// game must therefore supervise and relaunch it instead of treating a
-			// successful initial CreateProcess as permanent ownership.
+			// Enabled/AutoLaunchHost are restart-required settings. Once this
+			// process starts in supervised mode, keep the supervisor alive for the
+			// process lifetime; live toggles cannot safely uninstall/reinstall the
+			// OpenXR hook graph.
 			DWORD retryDelayMs = 500;
 			bool restartLogged = false;
+			bool staleLogged = false;
 			for (;;)
 			{
-				if (!Settings::VREnabled || !Settings::VRAutoLaunchHost)
-					return 0;
-
-				if (VRHostProcessRunning())
+				DWORD hostPid = 0;
+				const VRHostHealth health = QueryVRHostHealth(hostPid);
+				if (health == VRHostHealth::Healthy ||
+					health == VRHostHealth::Starting)
 				{
 					retryDelayMs = 500;
 					restartLogged = false;
+					staleLogged = false;
 					Sleep(1000);
 					continue;
 				}
 
+				if (health == VRHostHealth::StaleRenderable)
+				{
+					if (!staleLogged)
+					{
+						spdlog::error(
+							"VR AUTO HOST: expected host pid={} stopped publishing a renderable HostState for >10s; terminating only the exact game-directory host binary",
+							hostPid);
+						staleLogged = true;
+					}
+					if (!TerminateStaleVRHost(hostPid))
+					{
+						Sleep(1000);
+						continue;
+					}
+					Sleep(250);
+				}
+
 				if (VRLaunchHostOnce())
 				{
-					if (restartLogged)
-						spdlog::info("VR AUTO HOST: supervisor relaunched host after runtime exit");
+					if (restartLogged || staleLogged)
+						spdlog::info("VR AUTO HOST: supervisor relaunched the exact game-directory host");
+					retryDelayMs = 500;
+					restartLogged = false;
+					staleLogged = false;
 					Sleep(1000);
 					continue;
 				}
@@ -235,6 +355,7 @@ namespace OutRunVR
 		bool validate() override { return true; }
 		void declare_settings() override
 		{
+			Settings::VREnabled.needs_restart();
 			Settings::VRAutoLaunchHost.needs_restart();
 			Settings::VRMirrorFitDesktop.needs_restart();
 			Settings::VRDisableDesktopVsync.needs_restart();
