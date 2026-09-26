@@ -453,3 +453,8 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Exact 128-byte DDS header preserved; actual dimensions 4096x2048 RGBA32; changes outside the four source text cells = 0.
 - Manual side-by-side row inspection passed B first QA. Candidate remains partial: 4/29 FF2462BB segments complete, 25 remain before independent C/D strict QA.
 - Durable report: `localization/graphics/BATCH68_B_HD_FF2462_PERSISTED_REWORK_REPORT.json`.
+
+### Batch68 continuation 2026-09-27 09:03 KST
+- Added `Don't lose your girlfriend!` -> `여자친구를 놓치지 마세요!` as a two-line HD rebuild inside source bbox [3002,482,3512,643].
+- FF2462BB persisted HD candidate is now 5/29 segments; SHA-256 `e792a2a213249797d684af48c57122eaa4754246666fd1142d01f6f73312dd64`.
+- Outside all five edited source cells: 0 changes; exact DDS header remains preserved.
