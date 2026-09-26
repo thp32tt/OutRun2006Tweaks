@@ -289,20 +289,22 @@ host_r23_lifetime = require(
     "R48RetireNeverTouchedDirectFramesThrough",
     "QueueSkippedRelease(frame)",
     "SameFrameAckIdentity",
+    "PrepareConsumptionFenceSlot(frame)",
     "ArmConsumptionFence(frame)",
-    "copy->ACK ownership gap",
 )
 stage_start = host_r23_lifetime.find("bool R23StageDirectHold")
-touch = host_r23_lifetime.find("R48DirectTouched[slot] = frame", stage_start)
+preflight = host_r23_lifetime.find(
+    "PrepareConsumptionFenceSlot(frame)", stage_start)
+touch = host_r23_lifetime.find("R48DirectTouched[slot] = frame", preflight)
 copy_left = host_r23_lifetime.find(
-    "c.context_->CopyResource(R23DirectHold.eye[0]", stage_start)
+    "c.context_->CopyResource(R23DirectHold.eye[0]", touch)
 copy_right = host_r23_lifetime.find(
     "c.context_->CopyResource(R23DirectHold.eye[1]", copy_left)
 arm = host_r23_lifetime.find("ArmConsumptionFence(frame)", copy_right)
-if min(stage_start, touch, copy_left, copy_right, arm) < 0 or not (
-        stage_start < touch < copy_left < copy_right < arm):
+if min(stage_start, preflight, touch, copy_left, copy_right, arm) < 0 or not (
+        stage_start < preflight < touch < copy_left < copy_right < arm):
     raise SystemExit(
-        "DirectGPU touched identity must be recorded before copy and EVENT armed immediately after both eye copies")
+        "DirectGPU must secure an unowned EVENT before touch/copy, record touched identity immediately before the copies, then arm that exact EVENT after both eye copies")
 
 r34 = require(
     "src/vr/d3d9/stereo_renderer_r34.cpp",
