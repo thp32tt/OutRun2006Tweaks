@@ -121,6 +121,38 @@ namespace OutRunVR
 			return _wcsicmp(aw.c_str(), bw.c_str()) == 0;
 		}
 
+		bool IsCurrentGameOwnedHostEntry(const PROCESSENTRY32W& entry) noexcept
+		{
+			return _wcsicmp(entry.szExeFile, L"outrun-vr-host.exe") == 0 &&
+				entry.th32ParentProcessID == GetCurrentProcessId();
+		}
+
+		bool IsCurrentGameOwnedHostPid(DWORD pid) noexcept
+		{
+			if (!pid)
+				return false;
+			HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+			if (snapshot == INVALID_HANDLE_VALUE)
+				return false;
+
+			bool owned = false;
+			PROCESSENTRY32W entry{};
+			entry.dwSize = sizeof(entry);
+			if (Process32FirstW(snapshot, &entry))
+			{
+				do
+				{
+					if (entry.th32ProcessID == pid)
+					{
+						owned = IsCurrentGameOwnedHostEntry(entry);
+						break;
+					}
+				} while (Process32NextW(snapshot, &entry));
+			}
+			CloseHandle(snapshot);
+			return owned;
+		}
+
 		bool FindExpectedVRHostProcess(DWORD& pid) noexcept
 		{
 			pid = 0;
@@ -136,7 +168,11 @@ namespace OutRunVR
 			{
 				do
 				{
-					if (_wcsicmp(entry.szExeFile, L"outrun-vr-host.exe") != 0)
+					// Auto-launch supervision must never adopt a same-directory host
+					// that belongs to an older/parallel OutRun process. The exact
+					// game PID is also passed to the child through OUTRUN_VR_GAME_PID;
+					// parent ownership closes the supervisor side of that binding.
+					if (!IsCurrentGameOwnedHostEntry(entry))
 						continue;
 
 					HANDLE process = OpenProcess(
@@ -213,8 +249,10 @@ namespace OutRunVR
 			const bool exactBinary =
 				QueryFullProcessImageNameW(process, 0, path, &length) != FALSE &&
 				SamePathInsensitive(path, expected);
+			const bool ownedByCurrentGame = IsCurrentGameOwnedHostPid(pid);
 			bool terminated = false;
-			if (exactBinary && WaitForSingleObject(process, 0) == WAIT_TIMEOUT)
+			if (exactBinary && ownedByCurrentGame &&
+				WaitForSingleObject(process, 0) == WAIT_TIMEOUT)
 			{
 				terminated = TerminateProcess(process, 0x56524853) != FALSE;
 				if (terminated)
@@ -323,7 +361,7 @@ namespace OutRunVR
 						continue;
 					}
 					spdlog::error(
-						"VR AUTO HOST: exact host pid={} failed to publish matching HostState within 15s; recycling the exact game-directory host",
+						"VR AUTO HOST: owned host pid={} failed to publish matching HostState within 15s; recycling only this game's exact host",
 						hostPid);
 					if (!TerminateStaleVRHost(hostPid))
 					{
@@ -341,7 +379,7 @@ namespace OutRunVR
 					if (!staleLogged)
 					{
 						spdlog::error(
-							"VR AUTO HOST: expected host pid={} stopped publishing a renderable HostState for >10s; terminating only the exact game-directory host binary",
+							"VR AUTO HOST: owned host pid={} stopped publishing a renderable HostState for >10s; terminating only this game's exact host binary",
 							hostPid);
 						staleLogged = true;
 					}
@@ -356,7 +394,7 @@ namespace OutRunVR
 				if (VRLaunchHostOnce())
 				{
 					if (restartLogged || staleLogged)
-						spdlog::info("VR AUTO HOST: supervisor relaunched the exact game-directory host");
+						spdlog::info("VR AUTO HOST: supervisor relaunched this game's exact child host");
 					retryDelayMs = 500;
 					restartLogged = false;
 					staleLogged = false;
