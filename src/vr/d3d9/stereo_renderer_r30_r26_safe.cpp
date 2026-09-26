@@ -3901,6 +3901,196 @@ namespace OutRunVRStereo
             return r29Draw();
         }
 
+        HRESULT R62TryFixedFunctionSpriteIndexed(
+            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+            INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
+            UINT startIndex, UINT primitiveCount)
+        {
+            if (!device || type != D3DPT_TRIANGLELIST ||
+                !TargetIsBackBuffer() || !R30SafeStereoBase(device))
+                return E_NOTIMPL;
+
+            const auto semanticScope =
+                OutRunVR::GameSemantic::EffectiveScope();
+            const bool projected =
+                OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+                    semanticScope);
+            const bool hud =
+                OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
+            if (!projected && !hud)
+                return E_NOTIMPL;
+
+            // R61 HMD trace proved the missing kind-0 path is D3DXSprite's
+            // fixed-function XYZ|DIFFUSE|TEX1 indexed quad:
+            // DrawIndexedPrimitive(TRIANGLELIST), FVF 0x142, no vertex shader.
+            // Do not widen this to arbitrary fixed-function content.
+            if (CurrentVertexShaderIdentity.load(
+                    std::memory_order_acquire) != 0)
+                return E_NOTIMPL;
+            IDirect3DVertexShader9* shader = nullptr;
+            if (FAILED(device->GetVertexShader(&shader)))
+                return E_NOTIMPL;
+            if (shader)
+            {
+                shader->Release();
+                return E_NOTIMPL;
+            }
+
+            DWORD fvf = 0;
+            if (FAILED(device->GetFVF(&fvf)) || fvf != 0x00000142u)
+                return E_NOTIMPL;
+
+            R30XyzrhwState state{};
+            if (!EnsureStereoResources(device) ||
+                FAILED(device->GetViewport(&state.viewport)) ||
+                state.viewport.Width == 0 || state.viewport.Height == 0 ||
+                !OutRunVRRenderer::GetLatchedStereoFrame(state.stereo) ||
+                state.stereo.poseSequence == 0 ||
+                (FrameStereoPoseSequence != 0 &&
+                 FrameStereoPoseSequence != state.stereo.poseSequence) ||
+                !R30BuildEyeAffine(
+                    state.stereo, state.eyeScale, state.eyeOffset))
+                return E_NOTIMPL;
+
+            DWORD zEnable = D3DZB_FALSE;
+            if (!ReadTrackedRenderState(device, D3DRS_ZENABLE, zEnable))
+                return E_NOTIMPL;
+            state.depthTestEnabled = zEnable != D3DZB_FALSE;
+
+            // For exact HUD / projected-marker ownership this configuration
+            // path depends only on semantic + captured anchor; XYZRHW source
+            // geometry is not required.
+            if (!R30ConfigureXyzrhwWorldEffect(
+                    device, nullptr, 0, 0, state))
+                return E_NOTIMPL;
+
+            D3DMATRIX originalProjection{};
+            if (FAILED(device->GetTransform(
+                    D3DTS_PROJECTION, &originalProjection)) ||
+                !MatrixFinite(originalProjection))
+                return E_NOTIMPL;
+
+            D3DMATRIX eyeProjection[2]{};
+            if (projected)
+            {
+                // Apply the exact same clip-space delta/anchor scale already
+                // proven by mode 6 for kind-1 rank markers. D3DXSprite supplies
+                // XYZ vertices, so post-multiply its fixed-function projection
+                // rather than trying to rewrite a nonexistent XYZRHW/RHW field.
+                const float markerScale = R30HudScaleValue();
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    D3DMATRIX clipShift = IdentityMatrix();
+                    clipShift._11 = markerScale;
+                    clipShift._22 = markerScale;
+                    clipShift._41 =
+                        state.projectedDeltaX[eye] +
+                        (1.0f - markerScale) * state.projectedBaseX;
+                    clipShift._42 =
+                        state.projectedDeltaY[eye] +
+                        (1.0f - markerScale) * state.projectedBaseY;
+                    eyeProjection[eye] =
+                        MultiplyMatrix(originalProjection, clipShift);
+                    if (!MatrixFinite(eyeProjection[eye]))
+                        return E_NOTIMPL;
+                }
+            }
+            else
+            {
+                // Exact SCREEN_HUD kind-0 sprites use the same finite,
+                // head-stable HUD plane as the working XYZRHW path. Encode the
+                // already-derived projective NDC mapping as a clip-space matrix
+                // after D3DXSprite's own fixed-function projection.
+                if (!state.hudWorldLockValid)
+                    return E_NOTIMPL;
+                constexpr float HudPlaneViewZ = -2.50f;
+                const float planeClipW =
+                    HudPlaneViewZ * state.baseProjection._34 +
+                    state.baseProjection._44;
+                const float planeClipZ =
+                    HudPlaneViewZ * state.baseProjection._33 +
+                    state.baseProjection._43;
+                if (!std::isfinite(planeClipW) ||
+                    !std::isfinite(planeClipZ) ||
+                    std::fabs(planeClipW) <= 1.0e-6f)
+                    return E_NOTIMPL;
+                const float planeNdcZ = planeClipZ / planeClipW;
+                if (!std::isfinite(planeNdcZ))
+                    return E_NOTIMPL;
+
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    D3DMATRIX clipMap{};
+                    clipMap._11 = state.hudClipX[eye][0];
+                    clipMap._21 = state.hudClipX[eye][1];
+                    clipMap._41 = state.hudClipX[eye][2];
+
+                    clipMap._12 = state.hudClipY[eye][0];
+                    clipMap._22 = state.hudClipY[eye][1];
+                    clipMap._42 = state.hudClipY[eye][2];
+
+                    clipMap._14 = state.hudClipW[eye][0];
+                    clipMap._24 = state.hudClipW[eye][1];
+                    clipMap._44 = state.hudClipW[eye][2];
+
+                    clipMap._13 = planeNdcZ * clipMap._14;
+                    clipMap._23 = planeNdcZ * clipMap._24;
+                    clipMap._43 = planeNdcZ * clipMap._44;
+
+                    eyeProjection[eye] =
+                        MultiplyMatrix(originalProjection, clipMap);
+                    if (!MatrixFinite(eyeProjection[eye]))
+                        return E_NOTIMPL;
+                }
+            }
+
+            auto drawEye = [&](int eye) -> HRESULT {
+                InternalPassScope guard;
+                if (FAILED(device->SetTransform(
+                        D3DTS_PROJECTION, &eyeProjection[eye])))
+                    return E_FAIL;
+                return DrawIndexedPrimitiveHook.stdcall<HRESULT>(
+                    device, type, baseVertexIndex, minVertexIndex,
+                    numVertices, startIndex, primitiveCount);
+            };
+            auto leftDraw = [&]() { return drawEye(0); };
+            auto rightDraw = [&]() { return drawEye(1); };
+
+            const HRESULT hr = R30ExecuteXyzrhwStereo(
+                device, state, leftDraw, rightDraw,
+                projected
+                    ? "R62/D3DXSprite-ProjectedXYZ"
+                    : "R62/D3DXSprite-ScreenHudXYZ");
+
+            bool restored = false;
+            {
+                InternalPassScope guard;
+                restored = SUCCEEDED(device->SetTransform(
+                    D3DTS_PROJECTION, &originalProjection));
+            }
+            if (!restored)
+            {
+                NoteRestoreFailure(
+                    "R62 D3DXSprite fixed-function projection restore");
+                R30ArmSafeFallback();
+            }
+
+            static std::atomic<std::uint64_t> projectedDraws{ 0 };
+            static std::atomic<std::uint64_t> hudDraws{ 0 };
+            auto& counter = projected ? projectedDraws : hudDraws;
+            const auto hit =
+                counter.fetch_add(1, std::memory_order_relaxed) + 1;
+            if ((hit & (hit - 1)) == 0)
+                spdlog::info(
+                    "VR R62 FIXEDFN KIND0: owner={} fvf=0x{:08X} prim={} marker={} hits={}",
+                    projected ? "PROJECTED_WORLD_MARKER_2D" : "SCREEN_HUD",
+                    static_cast<unsigned>(fvf),
+                    primitiveCount,
+                    OutRunVR::GameSemantic::CurrentProjectedMarker() ? 1 : 0,
+                    hit);
+            return hr;
+        }
+
         HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
@@ -3938,6 +4128,14 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+
+            const HRESULT fixedFnSprite =
+                R62TryFixedFunctionSpriteIndexed(
+                    device, type, baseVertexIndex, minVertexIndex,
+                    numVertices, startIndex, primitiveCount);
+            if (fixedFnSprite != E_NOTIMPL)
+                return fixedFnSprite;
+
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
                 device, type, baseVertexIndex, minVertexIndex, numVertices,
                 startIndex, primitiveCount);
