@@ -340,6 +340,32 @@ namespace
             static_cast<std::int32_t>(candidate - reference) < 0;
     }
 
+    std::uint32_t R48TransitionWatermark(
+        RenderFrameReader& reader, std::uint32_t fallback) noexcept
+    {
+        OutRunVR::SharedRenderFrameState latest{};
+        if (reader.Read(latest) && latest.frameId)
+            return latest.frameId;
+
+        // Reset/theater control packets intentionally publish frameId=0 into a
+        // new ring slot. Do not let that erase the retirement watermark for
+        // older DirectGPU frames that still need skipped/EVENT ACK handling.
+        std::array<OutRunVR::SharedRenderFrameState,
+            OutRunVR::RenderFrameRingSize> history{};
+        std::size_t count = 0;
+        if (!reader.ReadHistory(history, count))
+            return fallback;
+
+        std::uint32_t newest = 0;
+        for (std::size_t i = 0; i < count; ++i)
+        {
+            const auto frameId = history[i].frameId;
+            if (frameId && (!newest || R37FrameIdBefore(newest, frameId)))
+                newest = frameId;
+        }
+        return newest ? newest : fallback;
+    }
+
     void R48RetireNeverTouchedDirectFramesThrough(
         RenderFrameReader& reader,
         std::uint32_t previousWatermark,
@@ -2221,13 +2247,14 @@ int main(int argc, char** argv)
                         refreshMenuAnchorAfterLocate = true;
                         compositor.ReferenceSpaceChanged();
                         OutRunVrR23VerifiedBundle::Invalidate();
-                        OutRunVR::SharedRenderFrameState rf{};
-                        if (renderFrames.Read(rf))
-                        {
-                            R48RetireNeverTouchedDirectFramesThrough(
-                                renderFrames, lastProcessedStereoFrame, rf.frameId);
-                            lastProcessedStereoFrame = rf.frameId;
-                        }
+                        const std::uint32_t transitionWatermark =
+                            R48TransitionWatermark(
+                                renderFrames, shared.ReadStereoMeta().frame);
+                        R48RetireNeverTouchedDirectFramesThrough(
+                            renderFrames, lastProcessedStereoFrame,
+                            transitionWatermark);
+                        if (transitionWatermark)
+                            lastProcessedStereoFrame = transitionWatermark;
                     }
                     else if (state == XR_SESSION_STATE_EXITING || state == XR_SESSION_STATE_LOSS_PENDING)
                         quit = true;
@@ -2271,11 +2298,9 @@ int main(int argc, char** argv)
                 menuProjectionAnchorValid = false;
                 refreshMenuAnchorAfterLocate = true;
                 OutRunVrR23VerifiedBundle::Invalidate();
-                OutRunVR::SharedRenderFrameState rf{};
                 const std::uint32_t transitionWatermark =
-                    renderFrames.Read(rf)
-                        ? rf.frameId
-                        : shared.ReadStereoMeta().frame;
+                    R48TransitionWatermark(
+                        renderFrames, shared.ReadStereoMeta().frame);
                 R48RetireNeverTouchedDirectFramesThrough(
                     renderFrames, lastProcessedStereoFrame, transitionWatermark);
                 lastProcessedStereoFrame = transitionWatermark;
@@ -2365,11 +2390,9 @@ int main(int argc, char** argv)
             {
                 compositor.ReferenceSpaceChanged(); matchedStereoValid = false;
                 OutRunVrR23VerifiedBundle::Invalidate();
-                OutRunVR::SharedRenderFrameState rf{};
                 const std::uint32_t transitionWatermark =
-                    renderFrames.Read(rf)
-                        ? rf.frameId
-                        : shared.ReadStereoMeta().frame;
+                    R48TransitionWatermark(
+                        renderFrames, shared.ReadStereoMeta().frame);
                 R48RetireNeverTouchedDirectFramesThrough(
                     renderFrames, lastProcessedStereoFrame, transitionWatermark);
                 lastProcessedStereoFrame = transitionWatermark;
