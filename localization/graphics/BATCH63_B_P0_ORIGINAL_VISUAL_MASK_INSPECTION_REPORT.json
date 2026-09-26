@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "run": "batch63-b-p0-original-visual-mask-inspection-20260926",
+  "timestamp_kst": "2026-09-26T21:16:00+09:00",
+  "branch": "korean-localization-clean",
+  "canonical_source_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+  "strict_state": {
+    "rework_required": 24,
+    "zoom_manual_required": 8,
+    "strict_pass": 0,
+    "promotion_hold": true
+  },
+  "original_visual_inspection": {
+    "841E796B_512x128.dds": {
+      "classification": "PRESERVE 9 vehicle/model cards; localize yellow Handicap No card only",
+      "raw_orientation": "yellow card text is stored non-upright/mirrored; replacement must match its exact raw transform",
+      "safe_edit_rule": "yellow-card text glyph/outline footprint only; preserve yellow polygon/background and all blue vehicle/model cards byte-identically"
+    },
+    "EBEF6D20_512x512.dds": {
+      "classification": "preserve road geometry, arrows, logos and all non-text art; localize Left/Right/Diverge/Loading text cells only",
+      "raw_orientation": "mixed transforms confirmed; Left/Right/Diverge and Loading cannot share one whole-texture normalization",
+      "safe_edit_rule": "independent per-cell masks only; non-text changed pixels=0"
+    },
+    "571E78F3_512x64.dds": {
+      "source_text": "Time Attack Mode / 15 Continuous Courses",
+      "raw_orientation": "rotate-180/mirrored presentation confirmed",
+      "status": "Batch62_D candidate exists but style/manual QA failed; do not promote"
+    },
+    "62BEBF33_512x64.dds": {
+      "source_text": "OutRun Mode",
+      "raw_orientation": "non-upright raw presentation confirmed",
+      "status": "Batch62_D candidate exists but style/manual QA failed; do not promote"
+    },
+    "E3FD08BE_512x64.dds": {
+      "source_text": "Heart Attack Mode",
+      "raw_orientation": "non-upright raw presentation confirmed",
+      "status": "Batch62_D candidate exists but style/manual QA failed; do not promote"
+    }
+  },
+  "decision": "NO_PROMOTION",
+  "next": [
+    "Refine Batch62_D three candidates for source-like italic/orange-fill/dark-outline proportions",
+    "Construct 841E796B yellow-card-only glyph mask from exact original",
+    "Construct EBEF6D20 four independent text-cell masks",
+    "Run raw+readable 1x/2x QA before any promotion"
+  ]
+}
