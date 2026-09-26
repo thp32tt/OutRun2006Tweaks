@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 jobs:
-  inspect-full-draft:
+  prepare-binary-comparison:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
@@ -20,48 +20,117 @@ jobs:
           ref: korean-localization-clean
           fetch-depth: 0
 
-      - name: Reconstruct FULL_DRAFT binary
+      - name: Reconstruct comparison archives
         shell: bash
         run: |
           set -euo pipefail
-          SRC="localization/validation/internal_snapshot/20260926/full_draft_b64_1m"
+          SNAP="localization/validation/internal_snapshot/20260926"
           OUT="localization/validation/binary_compare"
-          mkdir -p "$OUT"
-          cat "$SRC"/part-*.b64 | base64 -d > "$OUT/OutRun2_Korean_GFX_FULL_DRAFT_Test.zip"
-          sha256sum "$OUT/OutRun2_Korean_GFX_FULL_DRAFT_Test.zip" > "$OUT/FULL_DRAFT_SHA256.txt"
-          unzip -l "$OUT/OutRun2_Korean_GFX_FULL_DRAFT_Test.zip" > "$OUT/FULL_DRAFT_CONTENTS.txt"
-          unzip -Z1 "$OUT/OutRun2_Korean_GFX_FULL_DRAFT_Test.zip" > "$OUT/FULL_DRAFT_FILES.txt"
+          mkdir -p "$OUT/original" "$OUT/modified" "$OUT/pairs/37759842/original" "$OUT/pairs/37759842/modified_batch51"
 
-      - name: Build DDS manifest
+          cat "$SNAP"/full_draft_b64_1m/part-*.b64 | base64 -d > "$OUT/modified/OutRun2_Korean_GFX_FULL_DRAFT_Test.zip"
+          cat "$SNAP"/original_match_b64_2m/part-*.b64 | base64 -d > "$OUT/original/OutRun2_ORIGINAL_matching_FULL_DRAFT.zip"
+          base64 -d "$SNAP/batch51_37759842.b64" > "$OUT/modified/OutRun2_Korean_GFX_Batch51_37759842_Rework_Test.zip"
+
+          test "$(sha256sum "$OUT/modified/OutRun2_Korean_GFX_FULL_DRAFT_Test.zip" | awk '{print $1}')" = "5512dad798a4ddb4872e4aa3e69438537f75f488f439317d7b95c0eb372b6c78"
+          test "$(sha256sum "$OUT/original/OutRun2_ORIGINAL_matching_FULL_DRAFT.zip" | awk '{print $1}')" = "56082ef73dac45f2798fceef2dc608ca29eb226afe6cf62be6f3e75db75b6d6e"
+          test "$(sha256sum "$OUT/modified/OutRun2_Korean_GFX_Batch51_37759842_Rework_Test.zip" | awk '{print $1}')" = "9724a8419744426ed3351745fbcedbb731032c694505fbc2959e5679085b5621"
+
+      - name: Extract direct 37759842 pair
         shell: bash
         run: |
           set -euo pipefail
           OUT="localization/validation/binary_compare"
-          TMP="$RUNNER_TEMP/full_draft_extract"
-          mkdir -p "$TMP"
-          unzip -q "$OUT/OutRun2_Korean_GFX_FULL_DRAFT_Test.zip" -d "$TMP"
+          ASSET="textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"
+          unzip -p "$OUT/original/OutRun2_ORIGINAL_matching_FULL_DRAFT.zip" "$ASSET" > "$OUT/pairs/37759842/original/37759842_1024x1024.dds"
+          unzip -p "$OUT/modified/OutRun2_Korean_GFX_Batch51_37759842_Rework_Test.zip" "$ASSET" > "$OUT/pairs/37759842/modified_batch51/37759842_1024x1024.dds"
+
           {
-            echo -e "sha256\tsize\tpath"
-            find "$TMP" -type f \( -iname '*.dds' -o -iname '*.bin' -o -iname '*.exe' -o -iname '*.dll' \) -print0 |
-              sort -z |
-              while IFS= read -r -d '' f; do
-                sha=$(sha256sum "$f" | awk '{print $1}')
-                size=$(stat -c '%s' "$f")
-                rel="${f#$TMP/}"
-                printf '%s\t%s\t%s\n' "$sha" "$size" "$rel"
-              done
-          } > "$OUT/FULL_DRAFT_BINARY_MANIFEST.tsv"
+            echo "ORIGINAL_DDS_SHA256=$(sha256sum "$OUT/pairs/37759842/original/37759842_1024x1024.dds" | awk '{print $1}')"
+            echo "MODIFIED_BATCH51_DDS_SHA256=$(sha256sum "$OUT/pairs/37759842/modified_batch51/37759842_1024x1024.dds" | awk '{print $1}')"
+            echo "ORIGINAL_DDS_SIZE=$(stat -c '%s' "$OUT/pairs/37759842/original/37759842_1024x1024.dds")"
+            echo "MODIFIED_DDS_SIZE=$(stat -c '%s' "$OUT/pairs/37759842/modified_batch51/37759842_1024x1024.dds")"
+          } > "$OUT/pairs/37759842/SHA256.txt"
 
-      - name: Commit reconstructed comparison material
+          grep -q 'ORIGINAL_DDS_SHA256=ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0' "$OUT/pairs/37759842/SHA256.txt"
+          grep -q 'MODIFIED_BATCH51_DDS_SHA256=55c6c695eb8365c680d605c07d16b44a94443a1bf954f93ba557716a3d4ff3a2' "$OUT/pairs/37759842/SHA256.txt"
+
+      - name: Build full original vs modified DDS comparison
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="localization/validation/binary_compare"
+          ORIG="$RUNNER_TEMP/original"
+          MOD="$RUNNER_TEMP/modified"
+          rm -rf "$ORIG" "$MOD"
+          mkdir -p "$ORIG" "$MOD"
+          unzip -q "$OUT/original/OutRun2_ORIGINAL_matching_FULL_DRAFT.zip" -d "$ORIG"
+          unzip -q "$OUT/modified/OutRun2_Korean_GFX_FULL_DRAFT_Test.zip" -d "$MOD"
+
+          {
+            printf 'status\toriginal_sha256\tmodified_sha256\toriginal_size\tmodified_size\tpath\n'
+            find "$MOD" -type f -iname '*.dds' -print0 | sort -z |
+              while IFS= read -r -d '' mf; do
+                rel="${mf#$MOD/}"
+                of="$ORIG/$rel"
+                if [ ! -f "$of" ]; then
+                  printf 'MISSING_ORIGINAL\t-\t%s\t-\t%s\t%s\n' "$(sha256sum "$mf"|awk '{print $1}')" "$(stat -c '%s' "$mf")" "$rel"
+                  continue
+                fi
+                os="$(sha256sum "$of"|awk '{print $1}')"
+                ms="$(sha256sum "$mf"|awk '{print $1}')"
+                oz="$(stat -c '%s' "$of")"
+                mz="$(stat -c '%s' "$mf")"
+                if [ "$os" = "$ms" ]; then st="SAME"; else st="CHANGED"; fi
+                printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$st" "$os" "$ms" "$oz" "$mz" "$rel"
+              done
+          } > "$OUT/FULL_DRAFT_PAIR_COMPARISON.tsv"
+
+          total=$(tail -n +2 "$OUT/FULL_DRAFT_PAIR_COMPARISON.tsv" | wc -l)
+          changed=$(awk -F '\t' 'NR>1 && $1=="CHANGED"{n++} END{print n+0}' "$OUT/FULL_DRAFT_PAIR_COMPARISON.tsv")
+          same=$(awk -F '\t' 'NR>1 && $1=="SAME"{n++} END{print n+0}' "$OUT/FULL_DRAFT_PAIR_COMPARISON.tsv")
+          missing=$(awk -F '\t' 'NR>1 && $1=="MISSING_ORIGINAL"{n++} END{print n+0}' "$OUT/FULL_DRAFT_PAIR_COMPARISON.tsv")
+          {
+            echo "TOTAL_DDS=$total"
+            echo "CHANGED_DDS=$changed"
+            echo "SAME_DDS=$same"
+            echo "MISSING_ORIGINAL=$missing"
+          } > "$OUT/COMPARISON_SUMMARY.txt"
+          test "$total" -eq 79
+          test "$missing" -eq 0
+
+      - name: Write comparison README
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="localization/validation/binary_compare"
+          cat > "$OUT/README.md" <<'EOF'
+          # Korean localization binary comparison
+
+          This directory contains binary material for source-vs-localized verification.
+
+          - `original/OutRun2_ORIGINAL_matching_FULL_DRAFT.zip`: original game DDS files matching every DDS path in the FULL_DRAFT package.
+          - `modified/OutRun2_Korean_GFX_FULL_DRAFT_Test.zip`: reconstructed localization FULL_DRAFT binary package.
+          - `modified/OutRun2_Korean_GFX_Batch51_37759842_Rework_Test.zip`: latest Batch51 candidate package for 37759842.
+          - `pairs/37759842/original/37759842_1024x1024.dds`: direct original DDS.
+          - `pairs/37759842/modified_batch51/37759842_1024x1024.dds`: direct Batch51 modified DDS.
+          - `FULL_DRAFT_PAIR_COMPARISON.tsv`: per-DDS SHA-256, size, and SAME/CHANGED status.
+
+          The original and modified archives preserve identical relative texture paths for straightforward binary and image comparison.
+          EOF
+
+      - name: Commit comparison binaries
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add localization/validation/binary_compare/
+
+          rm -f "localization/validation/binary_compare/OutRun2_Korean_GFX_FULL_DRAFT_Test.zip"
+          git add -A localization/validation/binary_compare/
           if git diff --cached --quiet; then
             echo "No changes"
             exit 0
           fi
-          git commit -m "localization: reconstruct binary comparison material"
+          git commit -m "localization: publish original and modified binary comparison"
           git push origin HEAD:korean-localization-clean
