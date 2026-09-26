@@ -58,3 +58,27 @@ Contents verified:
 - Package assembly/checksum: PASS.
 - In-game runtime validation: PENDING USER TEST.
 - Final release readiness: NOT YET; this remains an experimental localization test build.
+
+
+## Latest B3-B38 integrated test package
+
+Generated: 2026-09-26
+
+- Packaging branch head: `9e005d9c8728b3494d2c92c840a3a7849a791161`
+- Runtime source/build commit: `1326f96840bfec7accf2e4016c238b8980b82853`
+- GitHub Actions build run: `36200209935` — PASS
+- Runtime artifact id: `10891921525`
+- Runtime artifact digest: `sha256:5b4978a5596a5e7f05bd1e3b2e6fa2f7cb7d6fa5623b8ed6ca4dd0e57e64ef81`
+- Runtime includes the stock-text alpha preservation fix from `1326f968`.
+- Korean text: `runtime_ko.tsv`, 1,355/1,355 non-null rows included.
+- Graphics source package: `OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip`
+- Graphics source package SHA-256: `7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02`
+- Graphics: 32 reviewed DDS files, 31 retained localized candidates, 1 original-safe fallback.
+- Remaining original-safe fallback: `textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds`.
+- Combined test package: `OutRun2_Korean_Text_GFX_B3-B38_Test_20260926_1326f968.zip`
+- Combined package SHA-256: `fb0987e244881a48704b60f43ba5956096ef7fc6e5d50845bb7c21713a6ef258`
+- ZIP integrity and structure validation: PASS.
+- In-game validation: PENDING USER TEST.
+- Release readiness: NOT YET.
+
+The mandatory containment rule remains unchanged: Korean text/glyph artwork must stay inside the original text region or sprite cell. Spill, clipping, overlap, double-draw, unrelated artwork damage, or residual source text in a promoted localized cell is a hard failure.
