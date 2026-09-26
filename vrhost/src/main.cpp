@@ -1902,7 +1902,11 @@ namespace
                 throw std::runtime_error("xrAcquireSwapchainImage returned out-of-range image index");
             XrSwapchainImageWaitInfo wi{ XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO };
             wi.timeout = XR_INFINITE_DURATION;
-            CheckXr(xrWaitSwapchainImage(s.handle, &wi), "xrWaitSwapchainImage");
+            const XrResult waitResult = xrWaitSwapchainImage(s.handle, &wi);
+            if (waitResult == XR_TIMEOUT_EXPIRED)
+                throw std::runtime_error(
+                    "xrWaitSwapchainImage timed out; restart host before using an un-waited image");
+            CheckXr(waitResult, "xrWaitSwapchainImage");
         }
 
         void Release(SwapchainSet& s)
