@@ -38,7 +38,7 @@ def main():
     out=["# R64 text/UI producer reverse",""]
     refs={k:[] for k in TARGETS}
     # scan .text for direct calls/jumps into target funcs/near internal returns
-    text=pe.sections.get(".text")
+    text=pe.section(".text")
     if text:
         start=text.virtual_address
         blob=pe.bytes_at_rva(start,text.virtual_size)
