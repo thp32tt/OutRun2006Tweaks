@@ -132,6 +132,7 @@ namespace OutRunVRRenderer
 		std::int64_t CadencePresentedQpc = 0;
 		bool FirstCadenceAcceptedLogged = false;
 		bool FirstCadenceTimeoutLogged = false;
+		bool FirstCadenceWaitFailedLogged = false;
 
 		const D3DMATRIX* RendererView = nullptr;
 		const D3DMATRIX* RendererProjection = nullptr;
@@ -1127,6 +1128,24 @@ namespace OutRunVRRenderer
                     spdlog::warn(
                         "VR R35 CADENCE: host request timeout after {} ms; failing open so OutRun cannot hang",
                         timeoutMs);
+                }
+            }
+            else if (wait == WAIT_FAILED)
+            {
+                const DWORD error = GetLastError();
+                ++CadenceTimeoutCount;
+                CadenceTimedOutRequestId =
+                    current ? current : host.requestId;
+                CadencePacingActive.store(false, std::memory_order_release);
+                PublishCadenceClient(
+                    OutRunVR::CadenceV1::ClientEnabled |
+                    OutRunVR::CadenceV1::ClientLastWaitTimedOut);
+                if (!FirstCadenceWaitFailedLogged)
+                {
+                    FirstCadenceWaitFailedLogged = true;
+                    spdlog::error(
+                        "VR R35 CADENCE: WaitForSingleObject failed error={}; pacing disabled and game continues fail-open",
+                        error);
                 }
             }
             else
