@@ -187,13 +187,33 @@ namespace
         return s.best;
     }
 
+    DWORD PreferredGamePid()
+    {
+        char text[32]{};
+        const DWORD length = GetEnvironmentVariableA(
+            "OUTRUN_VR_GAME_PID", text, static_cast<DWORD>(sizeof(text)));
+        if (!length || length >= sizeof(text))
+            return 0;
+        char* end = nullptr;
+        const unsigned long value = std::strtoul(text, &end, 10);
+        if (!end || *end != '\0' || value == 0 || value > 0xFFFFFFFFul)
+            return 0;
+        return static_cast<DWORD>(value);
+    }
+
     HWND WaitForGameWindow()
     {
-        std::cout << "Waiting for OR2006C2C.EXE... Launch OutRun from the Virtual Desktop screen.\n";
+        const DWORD preferredPid = PreferredGamePid();
+        if (preferredPid)
+            std::cout << "Waiting for launcher-bound OR2006C2C.EXE pid="
+                      << preferredPid << "...\n";
+        else
+            std::cout << "Waiting for OR2006C2C.EXE... Launch OutRun from the Virtual Desktop screen.\n";
+
         DWORD last = 0;
         for (;;)
         {
-            const DWORD pid = FindGameProcess();
+            const DWORD pid = preferredPid ? preferredPid : FindGameProcess();
             if (pid && pid != last)
             {
                 std::cout << "OutRun process detected (pid=" << pid << ").\n";
@@ -205,6 +225,21 @@ namespace
                 {
                     std::cout << "OutRun window detected. Starting true-stereo OpenXR host.\n";
                     return hwnd;
+                }
+
+                // An auto-launched host is bound to one exact game process.
+                // If that process dies before its window appears, exit instead
+                // of silently attaching to another OutRun instance.
+                if (preferredPid)
+                {
+                    HANDLE process = OpenProcess(SYNCHRONIZE, FALSE, preferredPid);
+                    const bool alive = process &&
+                        WaitForSingleObject(process, 0) == WAIT_TIMEOUT;
+                    if (process)
+                        CloseHandle(process);
+                    if (!alive)
+                        throw std::runtime_error(
+                            "launcher-bound OutRun process exited before window creation");
                 }
             }
             Sleep(100);

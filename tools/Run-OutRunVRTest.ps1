@@ -150,8 +150,11 @@ if($backend -eq 'd3d9'){
     }
 }
 
-if($backend -ne '2d'){
+$enableHudInspector = $backend -ne '2d' -and $TestProfile -ne 'PERFORMANCE'
+if($enableHudInspector){
     $gameArgs += '-HudInspector=true'
+}else{
+    $gameArgs += '-HudInspector=false'
 }
 
 $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)

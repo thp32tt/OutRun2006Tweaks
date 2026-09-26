@@ -76,6 +76,13 @@ foreach($name in $parseTargets) {
 
 Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'TestProfile') 'selector must persist TestProfile'
 Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'Get-OutRunVRTestProfile') 'runner must consume profile definitions'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match '(?s)elseif \(\$Backend -eq "dxvk-safe"\).*?"PreferD3D9Ex" "true"') 'DXVK SAFE must enable provider-local D3D9Ex probing'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match '(?s)if \(\$Backend -eq "2d"\).*?"PreferD3D9Ex" "false"') '2D control must keep D3D9Ex promotion disabled'
+Assert-True ($text['Run-OutRunVRTest.ps1'] -match '\$TestProfile -ne ''PERFORMANCE''') 'PERFORMANCE runs must disable HudInspector instrumentation'
+Assert-True ($text['Run-OutRunVRTest.ps1'] -match '\$gameArgs \+= ''-HudInspector=false''') 'runner must explicitly disable HudInspector for non-instrumented runs'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'ProviderBinarySha256') 'selector must record provider binary SHA-256 identity'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'GameBinarySha256') 'selector must record game DLL SHA-256 identity'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'HostBinarySha256') 'selector must record host SHA-256 identity'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'TEST_PROFILE') 'collector manifest must record profile'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match '\$variant/\$profile/\$session') 'collector path must separate Variant/Profile/Session'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'captureRoot') 'collector must include capture bundles'

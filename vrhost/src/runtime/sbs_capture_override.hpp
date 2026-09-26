@@ -498,6 +498,9 @@ float4 PSMain(VSOut input) : SV_Target
         return uv.w > 0.01f && uv.h > 0.01f;
     }
 
+    inline bool Acquire(Swapchain& swapchain, std::uint32_t& image);
+    inline bool Release(Swapchain& swapchain);
+
     inline DXGI_FORMAT ChooseSwapchainFormat(XrSession session)
     {
         std::uint32_t count = 0;
@@ -529,13 +532,20 @@ float4 PSMain(VSOut input) : SV_Target
                 swapchain.arraySize == arraySize && !swapchain.images.empty())
                 return true;
             // Never destroy/recreate a swapchain while an image is still owned.
-            // A resize/reformat request must wait for the transaction to return
-            // to Idle; otherwise fail closed until session teardown.
-            if (swapchain.imageState != SwapchainImageState::Idle)
+            // A timeout leaves the exact image legally Acquired. If dimensions
+            // change during that interval, finish waiting/releasing that same
+            // image first instead of permanently poisoning the fallback chain.
+            if (swapchain.imageState == SwapchainImageState::Acquired)
             {
-                swapchain.imageState = SwapchainImageState::Poisoned;
-                return false;
+                std::uint32_t pendingImage = swapchain.acquiredImage;
+                if (!Acquire(swapchain, pendingImage))
+                    return false;
             }
+            if (swapchain.imageState == SwapchainImageState::Waited &&
+                !Release(swapchain))
+                return false;
+            if (swapchain.imageState != SwapchainImageState::Idle)
+                return false;
         }
 
         swapchain.Destroy();
@@ -654,8 +664,6 @@ float4 PSMain(VSOut input) : SV_Target
         OutRunVrFinalTest::Context->OMSetRenderTargets(1, &nullRtv, nullptr);
         return true;
     }
-
-    inline bool Release(Swapchain& swapchain);
 
     inline bool Acquire(Swapchain& swapchain, std::uint32_t& image)
     {

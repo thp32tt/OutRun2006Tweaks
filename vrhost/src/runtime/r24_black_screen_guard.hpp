@@ -322,8 +322,19 @@ namespace OutRunVrR24BlackScreenGuard
         using namespace OutRunVrSbsCaptureOverride;
         using namespace OutRunVrD3D9ExDirectPassthrough;
 
-        if (!SafeFrameId || !SafeEyeSrv[0] || !SafeEyeWidth || !SafeEyeHeight ||
-            !EnsureViewSpace(session) || !CreateShaders() ||
+        if (!SafeFrameId || !SafeEyeSrv[0] || !SafeEyeWidth || !SafeEyeHeight)
+            return false;
+
+        // A host-owned SafeEye is reusable only while its exact producer/run
+        // identity is still present in the current frame ring. Never flatten a
+        // previous game run after restart/reset just because its SRV survived.
+        OutRunVR::SharedRenderFrameState safeFrame{};
+        if (!ReadFrameById(SafeFrameId, safeFrame) ||
+            !FrameRunIdentityCurrent(safeFrame) ||
+            !SafeEyeIdentityMatchesR32(safeFrame))
+            return false;
+
+        if (!EnsureViewSpace(session) || !CreateShaders() ||
             !EnsureSwapchain(Theater, session, 1920, 1080, 1))
             return false;
 
