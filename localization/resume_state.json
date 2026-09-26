@@ -1,5 +1,5 @@
 {
-  "schema_version": 17,
+  "schema_version": 18,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,12 +7,14 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "read ORIENTATION_POLICY.md, SOURCE_FAITHFUL_CURRENT.json, BATCH53_FULL32_STRICT_RESET_REPORT.json, BATCH54_FULL32_STRICT_REWORK_QUEUE_REPORT.json, BATCH57_D_CANONICAL_SOURCE_P0_STRICT_REPORT.json, and BATCH58_A_CANONICAL_P0_REWORK_PREFLIGHT_REPORT.json before editing",
-    "canonical original archive is recovered/verified by Batch57: SHA-256 e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57, DDS inventory 243",
-    "strict state remains 24 REWORK_REQUIRED / 8 ZOOM_MANUAL_REQUIRED / 0 strict PASS; historical 31 candidate count is not approval",
-    "priority original-only rework: 841E796B, EBEF6D20, 571E78F3, 62BEBF33, E3FD08BE",
-    "37759842: exact-source glyph/outline-footprint reconstruction only; never full-card clearing",
-    "enforce per-text-cell containment, non-text changed pixels=0, zero residual English/seams/halos/clipping, and raw+readable 1x/2x manual QA"
+    "read ORIENTATION_POLICY.md, SOURCE_FAITHFUL_CURRENT.json, BATCH64_USER_APPROVAL_P0_IMPORT_REPORT.json, FULL_STRICT_REVIEW_QUEUE.md, and P0_USER_APPROVED_STRICT_RESULTS.json before graphics editing",
+    "USER_APPROVED_LOCKED: 571E78F3, 62BEBF33, E3FD08BE; do not rework unless user explicitly reopens or a hard binary/format regression is proven",
+    "priority original-only rework: EBEF6D20 then 841E796B",
+    "EBEF6D20: replace Loading/Diverge/Left/Right only with independent exact original text-cell masks; preserve logos/road/arrows/nontext",
+    "841E796B: preserve every vehicle/model/brand card; translate only yellow No Handicap badge without badge edge/texture damage",
+    "after P0, continue FULL_STRICT_REVIEW_QUEUE.md across all remaining graphics",
+    "enforce bbox containment, overlay_box_overflow_pixels=0, outside_mask_changed_pixels=0, nontext_changed_pixels=0, zero residual English/seams/halos/clipping, source orientation/style, and raw+readable 1x/2x manual QA",
+    "if GitHub write fails, persist exact candidate/QA logs internally and retry without losing completed work"
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -66,7 +68,7 @@
     "batch23_rejected_report": "localization/graphics/BATCH23_REJECTED_REPORT.json",
     "batch24v2_report": "localization/graphics/BATCH24V2_2DA_REWORK_REPORT.json",
     "batch25v4_report": "localization/graphics/BATCH25V4_ACF_REWORK_REPORT.json",
-    "latest_safe_rework_note": "2026-09-26 16:00 KST: Batch57 recovered canonical source archive e17db462... (243 DDS), superseding stale source-unavailable notes. Strict hold remains 24/8/0. P0 original-only rework is now source-ready but no candidate is promoted without all strict gates.",
+    "latest_safe_rework_note": "2026-09-26 21:43 KST: exact DDS for user-approved 571E78F3/62BEBF33/E3FD08BE committed by GitHub Actions at b2fd5fcf; SHA checks passed. Remaining P0 is EBEF6D20 + 841E796B, followed by full strict queue.",
     "batch33_rejected_report": "localization/graphics/BATCH33_REJECTED_REPORT.json",
     "batch38_report": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
     "batch41_rejected_report": "localization/graphics/BATCH41_REJECTED_REPORT.json",
@@ -90,7 +92,30 @@
       "latest_queue_report": "localization/graphics/BATCH54_FULL32_STRICT_REWORK_QUEUE_REPORT.json",
       "latest_queue_commit": "5e71ec08d322dafd7b55fc7bf2597febe6f0fa14"
     },
-    "batch58_a_p0_preflight_report": "localization/graphics/BATCH58_A_CANONICAL_P0_REWORK_PREFLIGHT_REPORT.json"
+    "batch58_a_p0_preflight_report": "localization/graphics/BATCH58_A_CANONICAL_P0_REWORK_PREFLIGHT_REPORT.json",
+    "user_approved_locked": [
+      "571E78F3",
+      "62BEBF33",
+      "E3FD08BE"
+    ],
+    "user_approved_exact_dds_commit": "b2fd5fcf5b6edae90479af89577e9a403704bdfc",
+    "user_approved_report": "localization/graphics/BATCH64_USER_APPROVAL_P0_IMPORT_REPORT.json",
+    "approved_dds_root": "localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst",
+    "remaining_p0_rework": [
+      "EBEF6D20",
+      "841E796B"
+    ],
+    "strict_qa_current": {
+      "updated_at_kst": "2026-09-26T21:43:00+09:00",
+      "user_approved_locked": 3,
+      "historical_package_assets_scanned": 32,
+      "remaining_rework_required": 28,
+      "original_safe_hold": [
+        "37759842"
+      ],
+      "promotion_hold_for_nonapproved": true,
+      "queue": "localization/graphics/FULL_STRICT_REVIEW_QUEUE.md"
+    }
   },
   "runtime_packages": {
     "k1": {
