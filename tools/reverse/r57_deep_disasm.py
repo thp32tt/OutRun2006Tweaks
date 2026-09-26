@@ -38,6 +38,12 @@ RANGES=[
  ("RankSibling_BBBxx",0x0BBB00,0x380),
  ("RankSibling_BBDxx_BC4xx",0x0BBD80,0x780),
  ("Third_dispMarkerCheck_caller",0x0BE980,0x280),
+ ("put_sprite_ex2_caller_14xxx",0x014A80,0x240),
+ ("put_sprite_ex2_caller_AFxxx",0x0AF200,0x320),
+ ("put_sprite_ex2_caller_107xxx",0x107400,0x480),
+ ("Calc3D2D_caller_95xxx",0x095A80,0x480),
+ ("Calc3D2D_caller_ACxxx",0x0AC180,0x620),
+ ("Calc3D2D_caller_FAxxx",0x0FAE20,0x300),
 ]
 KNOWN=dict(mod.KNOWN_TARGETS)
 KNOWN.update({
