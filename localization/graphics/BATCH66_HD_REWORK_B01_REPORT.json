@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "batch": "HD_REWORK_B01",
+  "generated_at_kst": "2026-09-26T22:50:00+09:00",
+  "source": {
+    "package": "OR2-HD-GUI-v0.25.10a(1).zip",
+    "package_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "upstream_repo": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754"
+  },
+  "assets": [
+    {
+      "hash": "D6DC1380",
+      "runtime_path": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+      "source_actual": [
+        256,
+        64
+      ],
+      "output_actual": [
+        1024,
+        256
+      ],
+      "source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+      "candidate_sha256": "dd93ee5a8f50df51d0bcbc6164c8aac0447ec6e8518bb7dce98d19e08838aec3",
+      "translation": [
+        {
+          "source": "Continue?",
+          "korean": "계속?"
+        }
+      ],
+      "source_text_bbox": [
+        8,
+        10,
+        247,
+        43
+      ],
+      "allowed_scaled_bbox": [
+        32,
+        40,
+        991,
+        175
+      ],
+      "candidate_alpha_bbox": [
+        206,
+        40,
+        816,
+        174
+      ],
+      "bbox_contained": true,
+      "status": "BATCH_CANDIDATE_READY"
+    },
+    {
+      "hash": "48DEBE77",
+      "runtime_path": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+      "source_actual": [
+        512,
+        512
+      ],
+      "output_actual": [
+        2048,
+        2048
+      ],
+      "source_sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+      "candidate_sha256": "4575ee69ab9c041a92309baeef83f58a79b6df247910dafa63ecb8d1ce771a73",
+      "translation": [
+        {
+          "source": "START",
+          "korean": "출발"
+        },
+        {
+          "source": "GOAL",
+          "korean": "골"
+        }
+      ],
+      "orientation": "RAW_ATLAS_MIRROR_PRESERVED",
+      "nontext_policy": "source artwork is 4x resampled; only existing red label interiors are re-typeset",
+      "status": "BATCH_CANDIDATE_READY"
+    }
+  ],
+  "test_package": {
+    "name": "OutRun2_Korean_HD_Rework_B01_Test.zip",
+    "sha256": "d2052202c385e02ff290913a346008c1eccc9553a7cb17aa0fb80d8fb64a39ae"
+  },
+  "promotion": "HOLD_FOR_RUNTIME_TEST_AND_STRICT_QA",
+  "note": "This is the first actual rebuild batch after switching the graphics baseline to OR2-HD-GUI. No legacy Korean DDS was upscaled."
+}
