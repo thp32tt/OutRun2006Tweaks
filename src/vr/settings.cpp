@@ -145,7 +145,7 @@ namespace OutRunVR
 					if (!process)
 						continue;
 					wchar_t path[MAX_PATH]{};
-					DWORD length = static_cast<DWORD>(std::size(path));
+					DWORD length = MAX_PATH;
 					const bool running =
 						WaitForSingleObject(process, 0) == WAIT_TIMEOUT;
 					const bool havePath =
@@ -207,7 +207,7 @@ namespace OutRunVR
 				return false;
 
 			wchar_t path[MAX_PATH]{};
-			DWORD length = static_cast<DWORD>(std::size(path));
+			DWORD length = MAX_PATH;
 			const std::filesystem::path expected =
 				Module::ExePath.parent_path() / "outrun-vr-host.exe";
 			const bool exactBinary =
