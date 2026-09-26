@@ -27,6 +27,8 @@ Canonical OR2006C2C.EXE:
 
 The calls use fixed screen coordinates and priority 2.0. Therefore `6th/6 POSITION` should not be fixed by guessing world depth. It needs exact SCREEN_HUD ownership carried from these producer calls into the render node / final draw.
 
+Current generic semantic propagation is weaker than these exact callsites: `put_clip_sprite` builds a local SPRARGS and calls `put_sprite_ex` internally, and the global `put_sprite_ex` hook recovers semantics by `_ReturnAddress()` plus stack walking. At that point the immediate caller is the helper inside `put_clip_sprite`, not DispRank itself. A direct DispRank callsite wrapper can tag the exact newly-created SpriteNode without depending on optimized x86 stack recovery.
+
 ### Vehicle-attached rank markers
 
 `Calc3D2D` at RVA `0x49940` is a real 3D-to-2D projection:
@@ -77,6 +79,8 @@ That matches the runtime evidence:
 - final `worldBillboard` counter can remain zero.
 
 A vehicle marker therefore needs a dedicated concept such as `ProjectedWorldBillboard2D`: world-owned metadata with a 2D final draw, not generic WORLD_BILLBOARD and not SCREEN_HUD.
+
+There is a second timing hazard on shader HUD: the game can upload/reuse c64 before the queue node semantic becomes current. The renderer stores both the uploaded WVP and the original raw game WVP, but the R44 raw-overlay lookup currently uses a 12-draw age window. Exact node provenance should be allowed to select the latest raw WVP for the same shader epoch without relying on that heuristic window; otherwise an already head-injected live c64 can be transformed again at R30.
 
 ## Metadata required for the real vehicle-rank fix
 
