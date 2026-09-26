@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-26 22:24 KST
+Updated: 2026-09-26 22:46 KST
 
 ## Active branch
 `korean-localization-clean`
@@ -18,6 +18,16 @@ Base: `emoose/OutRun2006Tweaks@08e5efb4deea4066c440307ec009c868a30562d3`
 - Korean draft: **1,355/1,355 (100%)**
 - reviewed/finalized: **1,351/1,355 (99.7%)**
 - context-sensitive IDs: **96, 97, 279, 280**
+
+## HD texture source migration
+
+- Canonical graphics source: **user-installed high-resolution texture mod**
+- Migration state: **PENDING exact HD DDS import**
+- Collector: `tools/localization/collect_hd_localization_source.ps1`
+- Asset matching: hexadecimal hash prefix; dimensions read from DDS header
+- Stock original archive: fallback + orientation/reference only
+- Existing stock-resolution Korean DDS/candidates: historical until rebuilt/revalidated against HD source
+- New graphics promotion: **HOLD** until HD source ZIP + SHA-256 manifest are imported
 
 ## Graphics
 - DDS inventory/visual review: **243/243 (100%)**
