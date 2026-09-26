@@ -1291,7 +1291,9 @@ namespace OutRunVRStereo
         bool R57BuildProjectedMarkerDelta(
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
             const D3DMATRIX& baseProjection,
-            float deltaX[2], float deltaY[2]) noexcept
+            float deltaX[2], float deltaY[2],
+            float* baseXOut = nullptr,
+            float* baseYOut = nullptr) noexcept
         {
             const auto* marker =
                 OutRunVR::GameSemantic::CurrentProjectedMarker();
@@ -1302,6 +1304,8 @@ namespace OutRunVRStereo
             if (!R57ProjectViewPoint(
                     *marker, baseProjection, baseX, baseY))
                 return false;
+            if (baseXOut) *baseXOut = baseX;
+            if (baseYOut) *baseYOut = baseY;
 
             const float centerEye[3]{
                 0.5f * (stereo.eyeOffset[0][0] + stereo.eyeOffset[1][0]),
@@ -1763,6 +1767,8 @@ namespace OutRunVRStereo
             bool projectedWorldMarker2D = false;
             float projectedDeltaX[2]{};
             float projectedDeltaY[2]{};
+            float projectedBaseX = 0.0f;
+            float projectedBaseY = 0.0f;
             bool fullWorldReprojection = false;
             bool depthTestEnabled = false;
             bool rhwDepthEvidence = false;
@@ -2083,7 +2089,9 @@ namespace OutRunVRStereo
                     !R57BuildProjectedMarkerDelta(
                         state.stereo, baseProjection,
                         state.projectedDeltaX,
-                        state.projectedDeltaY))
+                        state.projectedDeltaY,
+                        &state.projectedBaseX,
+                        &state.projectedBaseY))
                     return false;
                 state.baseProjection = baseProjection;
                 state.worldEffect = true;
@@ -2610,10 +2618,18 @@ namespace OutRunVRStereo
                     }
                     else
                     {
-                        correctedX =
-                            ndcX + state.projectedDeltaX[eye];
-                        correctedY =
-                            ndcY + state.projectedDeltaY[eye];
+                        // R59: mode 6 proved the anchor reprojection itself
+                        // is correct. Apply HudScale only to marker extent around
+                        // that world anchor so resizing cannot disturb tracking.
+                        const float markerScale = R30HudScaleValue();
+                        const float eyeAnchorX =
+                            state.projectedBaseX + state.projectedDeltaX[eye];
+                        const float eyeAnchorY =
+                            state.projectedBaseY + state.projectedDeltaY[eye];
+                        correctedX = eyeAnchorX +
+                            (ndcX - state.projectedBaseX) * markerScale;
+                        correctedY = eyeAnchorY +
+                            (ndcY - state.projectedBaseY) * markerScale;
                     }
                 }
                 else if (state.worldEffect)
@@ -3472,14 +3488,25 @@ namespace OutRunVRStereo
                 }
 
                 float deltaX[2]{}, deltaY[2]{};
+                float baseAnchorX = 0.0f, baseAnchorY = 0.0f;
                 if (!R57BuildProjectedMarkerDelta(
-                        stereo, baseProjection, deltaX, deltaY))
+                        stereo, baseProjection, deltaX, deltaY,
+                        &baseAnchorX, &baseAnchorY))
                     return false;
+                const float markerScale = R30HudScaleValue();
                 for (int eye = 0; eye < 2; ++eye)
                 {
+                    // Row-vector clip-space affine:
+                    // x' = scale*x + (delta + (1-scale)*anchor)*w.
+                    // This shrinks the sprite cluster about the recovered
+                    // vehicle anchor without changing the proven head/eye pose.
                     D3DMATRIX clipShift = IdentityMatrix();
-                    clipShift._41 = deltaX[eye];
-                    clipShift._42 = deltaY[eye];
+                    clipShift._11 = markerScale;
+                    clipShift._22 = markerScale;
+                    clipShift._41 =
+                        deltaX[eye] + (1.0f - markerScale) * baseAnchorX;
+                    clipShift._42 =
+                        deltaY[eye] + (1.0f - markerScale) * baseAnchorY;
                     const D3DMATRIX corrected =
                         MultiplyMatrix(stockWvp, clipShift);
                     if (!MatrixFinite(corrected))
