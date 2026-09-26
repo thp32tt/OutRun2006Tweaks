@@ -181,7 +181,7 @@ jobs:
           Set-Content (Join-Path $backend 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
           Copy-Item OutRun2006Tweaks.ini (Join-Path $dir 'OutRun2006Tweaks.ini')
           Copy-Item OutRun2006Tweaks.lods.ini (Join-Path $dir 'OutRun2006Tweaks.lods.ini')
-          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Run-OutRunVRTest.cmd','Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','Analyze-OutRunVRSession.ps1','OutRunVR-Backend-Selector.ps1','OutRunVR-Backend-Selector.cmd','OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd')) {
+          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-Test-Selector.ps1','START_HERE_VR_TEST.cmd')) {
             Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
           }
           Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
@@ -220,7 +220,7 @@ jobs:
           $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_ACTIVE_*.zip' | Select-Object -First 1
           if (-not $zip) { throw 'active DX9Ex ZIP missing' }
           Expand-Archive $zip.FullName verify
-          foreach ($file in @('OutRunVR-Backend-Selector.cmd','OutRunVR-Backend-Selector.ps1','OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt')) {
+          foreach ($file in @('START_HERE_VR_TEST.cmd','OutRunVR-Test-Selector.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt')) {
             if (-not (Test-Path (Join-Path verify $file))) { throw "package missing $file" }
           }
           $collectorText = Get-Content (Join-Path verify 'Collect-OutRunVRLogs.ps1') -Raw
