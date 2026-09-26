@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-26T22:46:00+09:00",
+  "updated_at_kst": "2026-09-26T22:50:00+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -79,7 +79,7 @@
     "original_safe_hold": [
       "37759842"
     ],
-    "current_note": "HD source migration requested at 2026-09-26 22:46 KST. Hold new graphics promotion until exact HD DDS package is imported and hashed. Existing stock-resolution approvals are historical evidence only for HD migration."
+    "current_note": "HD package imported. Preserve completed HD assets. Rebuild only the 13 queued low-resolution/placeholder-upscale text graphics; keep 6B8ED9DA in the font pipeline."
   },
   "latest_strict_reset_report": "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json",
   "strict_qa_canonical_source": {
@@ -116,12 +116,15 @@
   },
   "canonical_source_policy": {
     "mode": "HD_TEXTURE_MOD_PRIMARY",
-    "status": "PENDING_EXACT_HD_SOURCE_IMPORT",
+    "status": "HD_PACKAGE_IMPORTED_REWORK_SCOPE_READY",
+    "package": "OR2-HD-GUI-v0.25.10a(1).zip",
+    "package_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "upstream_repo": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
     "migration_report": "localization/graphics/HD_SOURCE_MIGRATION_20260926.json",
-    "collector": "tools/localization/collect_hd_localization_source.ps1",
-    "previous_stock_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+    "rework_queue": "localization/graphics/HD_TEXT_REWORK_QUEUE_20260926.json",
     "stock_role": "fallback_and_orientation_reference_only",
-    "asset_identity": "hex_hash_prefix",
+    "asset_identity": "hex_hash_prefix_plus_exact_dds_sha256",
     "dimensions": "read_from_dds_header",
     "old_candidates": "historical_until_rebuilt_or_revalidated_against_HD"
   }
