@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "run": "batch64-user-approval-p0-import-20260926",
+  "timestamp_kst": "2026-09-26T21:20:00+09:00",
+  "branch": "korean-localization-clean",
+  "source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+  "user_visual_decision": {
+    "approved": [
+      "571E78F3_512x64.dds",
+      "62BEBF33_512x64.dds",
+      "E3FD08BE_512x64.dds"
+    ],
+    "continue_rework": [
+      "841E796B_512x128.dds",
+      "EBEF6D20_512x512.dds"
+    ]
+  },
+  "approved_binary_sha256": {
+    "571E78F3_512x64.dds": "4ff6a767fca35ebff7e1ba587c1992f94319c5f1bdd7d03faf59450d81e32f1e",
+    "62BEBF33_512x64.dds": "91b0424df17e48ee3445208991f15f6e5cdb413f6f77eeb1aa3f453a3706e4eb",
+    "E3FD08BE_512x64.dds": "246e4313cb9806623f695ea94262100e1e6f3888847dcc09338d870e3944b49e"
+  },
+  "automated_gates_for_approved": {
+    "bbox_contained": true,
+    "outside_original_bbox_changed_pixels": 0,
+    "introduced_alpha_outside_original_bbox": 0,
+    "dds_header_128_bytes_match": true
+  },
+  "manual_visual_qa": "USER_APPROVED",
+  "policy": [
+    "approved assets are locked from routine rework unless the user explicitly reopens them or a hard binary/format regression is found",
+    "all remaining graphics are still subject to full strict review",
+    "overlay boxes or reconstructed backgrounds must remain inside original icon/card/text-cell boundaries",
+    "no residual English, patch seams, halos, clipping, non-text edits, or oversized localized text",
+    "if patch repair cannot preserve the original format, rebuild the affected element from the exact original while preserving surrounding art"
+  ],
+  "next": [
+    "rework EBEF6D20 using independent original text-cell masks",
+    "rework 841E796B yellow No Handicap badge only; preserve all vehicle/model cards",
+    "continue strict full-asset queue after P0"
+  ]
+}

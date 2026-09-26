@@ -1,0 +1,38 @@
+[
+  {
+    "file": "571E78F3_512x64.dds",
+    "orig_bbox": [101, 4, 389, 59],
+    "loc_bbox": [177, 5, 313, 58],
+    "orig_size": [288, 55],
+    "loc_size": [136, 53],
+    "bbox_contained": true,
+    "changed_outside_orig_bbox": 0,
+    "alpha_outside_orig_bbox": 0,
+    "header_match": true,
+    "manual_visual_qa": "USER_APPROVED"
+  },
+  {
+    "file": "62BEBF33_512x64.dds",
+    "orig_bbox": [100, 15, 338, 50],
+    "loc_bbox": [147, 16, 290, 49],
+    "orig_size": [238, 35],
+    "loc_size": [143, 33],
+    "bbox_contained": true,
+    "changed_outside_orig_bbox": 0,
+    "alpha_outside_orig_bbox": 0,
+    "header_match": true,
+    "manual_visual_qa": "USER_APPROVED"
+  },
+  {
+    "file": "E3FD08BE_512x64.dds",
+    "orig_bbox": [100, 15, 405, 49],
+    "loc_bbox": [166, 16, 338, 48],
+    "orig_size": [305, 34],
+    "loc_size": [172, 32],
+    "bbox_contained": true,
+    "changed_outside_orig_bbox": 0,
+    "alpha_outside_orig_bbox": 0,
+    "header_match": true,
+    "manual_visual_qa": "USER_APPROVED"
+  }
+]

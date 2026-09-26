@@ -1,0 +1,56 @@
+name: Localization Binary Import
+
+on:
+  push:
+    branches:
+      - korean-localization-clean
+    paths:
+      - 'localization/graphics/binary_staging/20260926/**'
+      - '.github/workflows/localization-binary-import.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  import-approved-dds:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-clean
+          fetch-depth: 0
+
+      - name: Reconstruct approved DDS binaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="localization/graphics/binary_staging/20260926"
+          out="localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst"
+          mkdir -p "$out"
+
+          for file in             571E78F3_512x64.dds             62BEBF33_512x64.dds             E3FD08BE_512x64.dds
+          do
+            cat "$root/${file}.part"* | base64 -d | xz -dc > "$out/$file"
+          done
+
+          cat > /tmp/approved_dds.sha256 <<'EOF'
+          4ff6a767fca35ebff7e1ba587c1992f94319c5f1bdd7d03faf59450d81e32f1e  localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds
+          91b0424df17e48ee3445208991f15f6e5cdb413f6f77eeb1aa3f453a3706e4eb  localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds
+          246e4313cb9806623f695ea94262100e1e6f3888847dcc09338d870e3944b49e  localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds
+          EOF
+          sha256sum -c /tmp/approved_dds.sha256
+
+      - name: Commit exact binaries and remove staging
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm -r localization/graphics/binary_staging/20260926
+          git add localization/graphics/approved_dds
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "localization: add user-approved P0 DDS 3-5"
+          git push origin HEAD:korean-localization-clean
