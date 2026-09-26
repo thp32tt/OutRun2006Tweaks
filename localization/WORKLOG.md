@@ -403,3 +403,20 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Final pending `37759842_1024x1024.dds` remains original-safe: late automated containment passes, but manual visual QA fails on card icon/gradient fidelity and/or residual English.
 - No rejected candidate was promoted. Existing B3-B38 approved retained set remains canonical.
 - Added `localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json`.
+
+
+## 2026-09-26 21:44 KST - BATCH64 USER-APPROVED P0 DDS IMPORT
+
+- Reconciled the strict full32 reset with the user's direct visual decision.
+- User approved and locked `571E78F3_512x64.dds`, `62BEBF33_512x64.dds`, and `E3FD08BE_512x64.dds`.
+- Before approval, each rebuilt DDS already passed deterministic automated gates: localized bbox within original bbox, changed pixels outside original bbox = 0, introduced alpha outside original bbox = 0, and exact 128-byte DDS header match.
+- Stored exact approved DDS binaries under `localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst/`.
+- GitHub Actions `Localization Binary Import` reconstructed the text-staged binaries and verified all three expected SHA-256 values successfully before commit.
+- Exact binary commit: `b2fd5fcf5b6edae90479af89577e9a403704bdfc`.
+- `571E78F3` SHA-256: `4ff6a767fca35ebff7e1ba587c1992f94319c5f1bdd7d03faf59450d81e32f1e`.
+- `62BEBF33` SHA-256: `91b0424df17e48ee3445208991f15f6e5cdb413f6f77eeb1aa3f453a3706e4eb`.
+- `E3FD08BE` SHA-256: `246e4313cb9806623f695ea94262100e1e6f3888847dcc09338d870e3944b49e`.
+- These three assets are now `USER_APPROVED_LOCKED`. Automated C/D jobs were updated so they may not modify/revert them unless the user explicitly reopens them or a proven binary/format regression exists.
+- Remaining P0 rework is `EBEF6D20_512x512.dds` and `841E796B_512x128.dds`; after those, continue the complete strict queue.
+- `841E796B` prior local badge reconstructions were deliberately rejected rather than promoted because either source-English residue or yellow-badge texture/edge damage remained.
+- Durable artifacts: `BATCH64_USER_APPROVAL_P0_IMPORT_REPORT.json`, `P0_USER_APPROVED_STRICT_RESULTS.json`, `FULL_STRICT_REVIEW_QUEUE.md`, and `LOCAL_CHECKPOINT_20260926_2120_KST.md`.
