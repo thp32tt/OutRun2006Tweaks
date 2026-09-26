@@ -57,8 +57,13 @@ namespace OutRunVR::GameSemantic
 
     inline bool IsExactHudScope(RenderScope scope) noexcept
     {
+        // R59: ProjectedWorldMarker2D is also an exact queue owner. R58 HMD
+        // telemetry proved kind-0 rank nodes were tagged correctly but helper
+        // scopes overwrote CurrentScope before the D3D draw. Keep the exact
+        // projected owner sticky just like SCREEN_HUD/WORLD_BILLBOARD.
         return scope == RenderScope::ScreenHud ||
-            scope == RenderScope::WorldBillboard;
+            scope == RenderScope::WorldBillboard ||
+            scope == RenderScope::ProjectedWorldMarker2D;
     }
 
     inline RenderScope EffectiveScope() noexcept
