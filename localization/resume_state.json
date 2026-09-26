@@ -7,11 +7,11 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "read ORIENTATION_POLICY.md, SOURCE_FAITHFUL_CURRENT.json, BATCH53_FULL32_STRICT_RESET_REPORT.json, and BATCH54_FULL32_STRICT_REWORK_QUEUE_REPORT.json before editing",
-    "strict state is 24 REWORK_REQUIRED / 8 ZOOM_MANUAL_REQUIRED / 0 strict PASS; historical 31 candidate count is not approval",
-    "recover exact original DDS bytes before reworking any previously localized asset; never use the combined candidate package as source-of-truth",
-    "priority: user-rejected 841E796B, EBEF6D20, 571E78F3, 62BEBF33, E3FD08BE once exact originals are available",
-    "37759842 exact source is available; continue glyph/outline-footprint reconstruction only, never full-card clearing",
+    "read ORIENTATION_POLICY.md, SOURCE_FAITHFUL_CURRENT.json, BATCH53_FULL32_STRICT_RESET_REPORT.json, BATCH54_FULL32_STRICT_REWORK_QUEUE_REPORT.json, BATCH57_D_CANONICAL_SOURCE_P0_STRICT_REPORT.json, and BATCH58_A_CANONICAL_P0_REWORK_PREFLIGHT_REPORT.json before editing",
+    "canonical original archive is recovered/verified by Batch57: SHA-256 e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57, DDS inventory 243",
+    "strict state remains 24 REWORK_REQUIRED / 8 ZOOM_MANUAL_REQUIRED / 0 strict PASS; historical 31 candidate count is not approval",
+    "priority original-only rework: 841E796B, EBEF6D20, 571E78F3, 62BEBF33, E3FD08BE",
+    "37759842: exact-source glyph/outline-footprint reconstruction only; never full-card clearing",
     "enforce per-text-cell containment, non-text changed pixels=0, zero residual English/seams/halos/clipping, and raw+readable 1x/2x manual QA"
   ],
   "prototype_history": {
@@ -66,7 +66,7 @@
     "batch23_rejected_report": "localization/graphics/BATCH23_REJECTED_REPORT.json",
     "batch24v2_report": "localization/graphics/BATCH24V2_2DA_REWORK_REPORT.json",
     "batch25v4_report": "localization/graphics/BATCH25V4_ACF_REWORK_REPORT.json",
-    "latest_safe_rework_note": "2026-09-26 14:00 KST: strict full32 reset remains authoritative: 24 REWORK_REQUIRED / 8 ZOOM_MANUAL_REQUIRED / 0 strict PASS. Combined B3-B38 package was materialized, but its 31 localized files are candidates, not originals. Exact source archive is required before reworking them; 37759842 is the original-safe exception.",
+    "latest_safe_rework_note": "2026-09-26 16:00 KST: Batch57 recovered canonical source archive e17db462... (243 DDS), superseding stale source-unavailable notes. Strict hold remains 24/8/0. P0 original-only rework is now source-ready but no candidate is promoted without all strict gates.",
     "batch33_rejected_report": "localization/graphics/BATCH33_REJECTED_REPORT.json",
     "batch38_report": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
     "batch41_rejected_report": "localization/graphics/BATCH41_REJECTED_REPORT.json",
@@ -89,7 +89,8 @@
       "note": "Existing source_faithful_localized_candidates count remains historical package-candidate metadata, not strict approval.",
       "latest_queue_report": "localization/graphics/BATCH54_FULL32_STRICT_REWORK_QUEUE_REPORT.json",
       "latest_queue_commit": "5e71ec08d322dafd7b55fc7bf2597febe6f0fa14"
-    }
+    },
+    "batch58_a_p0_preflight_report": "localization/graphics/BATCH58_A_CANONICAL_P0_REWORK_PREFLIGHT_REPORT.json"
   },
   "runtime_packages": {
     "k1": {
