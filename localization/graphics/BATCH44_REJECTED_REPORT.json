@@ -1,0 +1,21 @@
+{
+  "batch": "44-37759842-expanded-text-cell-rework",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "status": "rejected_keep_original",
+  "source_dds_sha256": "ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0",
+  "candidate_dds_sha256": "65d919ce4f15408f873a800dfcf73e0638f6902cbde9ad50a2e1c99c18d00aad",
+  "local_test_package_sha256": "3ae9cc76f198ae935b5700821538e7a0208294df36db856bbeeedc2e509cfcbb",
+  "source_transform": "mirror_y",
+  "automated_qa": {
+    "dimensions_identical": true,
+    "header_128_identical": true,
+    "changed_pixels_outside_allowed_regions": 0,
+    "introduced_alpha_pixels_outside_allowed_regions": 0
+  },
+  "manual_qa": "fail",
+  "rejection_reasons": [
+    "Expanded blue-card cleanup flattens/overwrites too much source card detail.",
+    "Residual source English remains adjacent to several blue mode labels and black 15-course cards."
+  ],
+  "action": "Do not integrate; keep original DDS canonical."
+}
