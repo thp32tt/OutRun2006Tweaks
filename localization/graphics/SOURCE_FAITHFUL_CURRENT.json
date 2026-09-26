@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-26T21:43:00+09:00",
+  "updated_at_kst": "2026-09-26T22:46:00+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -79,7 +79,7 @@
     "original_safe_hold": [
       "37759842"
     ],
-    "current_note": "Batch53 counters were superseded for three assets by explicit user visual approval plus exact DDS SHA verification. Non-approved assets remain under strict promotion hold."
+    "current_note": "HD source migration requested at 2026-09-26 22:46 KST. Hold new graphics promotion until exact HD DDS package is imported and hashed. Existing stock-resolution approvals are historical evidence only for HD migration."
   },
   "latest_strict_reset_report": "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json",
   "strict_qa_canonical_source": {
@@ -97,7 +97,8 @@
       "E3FD08BE"
     ],
     "batch56_source_identity": "SUPERSEDED",
-    "latest_rawbyte_report": "localization/graphics/BATCH61_B_P0_RAWBYTE_ORIENTATION_INSPECTION_REPORT.json"
+    "latest_rawbyte_report": "localization/graphics/BATCH61_B_P0_RAWBYTE_ORIENTATION_INSPECTION_REPORT.json",
+    "status": "SUPERSEDED_BY_HD_SOURCE_MIGRATION_PENDING_IMPORT"
   },
   "latest_p0_rework_preflight_report": "localization/graphics/BATCH58_A_CANONICAL_P0_REWORK_PREFLIGHT_REPORT.json",
   "latest_p0_execution_gate_report": "localization/graphics/BATCH62_A_P0_REWORK_EXECUTION_GATE_REPORT.json",
@@ -112,5 +113,16 @@
     "571E78F3_512x64.dds": "4ff6a767fca35ebff7e1ba587c1992f94319c5f1bdd7d03faf59450d81e32f1e",
     "62BEBF33_512x64.dds": "91b0424df17e48ee3445208991f15f6e5cdb413f6f77eeb1aa3f453a3706e4eb",
     "E3FD08BE_512x64.dds": "246e4313cb9806623f695ea94262100e1e6f3888847dcc09338d870e3944b49e"
+  },
+  "canonical_source_policy": {
+    "mode": "HD_TEXTURE_MOD_PRIMARY",
+    "status": "PENDING_EXACT_HD_SOURCE_IMPORT",
+    "migration_report": "localization/graphics/HD_SOURCE_MIGRATION_20260926.json",
+    "collector": "tools/localization/collect_hd_localization_source.ps1",
+    "previous_stock_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+    "stock_role": "fallback_and_orientation_reference_only",
+    "asset_identity": "hex_hash_prefix",
+    "dimensions": "read_from_dds_header",
+    "old_candidates": "historical_until_rebuilt_or_revalidated_against_HD"
   }
 }
