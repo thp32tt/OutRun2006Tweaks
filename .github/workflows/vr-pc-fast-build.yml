@@ -21,6 +21,7 @@ on:
       - vr-d3d9ex-focus
       - vr-nightly-r59-final-hud-rank-20260927
       - vr-nightly-r62-fixedfn-kind0-20260927
+      - vr-nightly-r63-rank-batch-isolate-trace-20260927
 
 concurrency:
   group: outrun-pc-fast-test
