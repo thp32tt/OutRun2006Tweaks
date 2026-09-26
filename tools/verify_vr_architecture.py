@@ -205,6 +205,7 @@ settings = require(
     'VRFrameCadenceMode{ "VR", "FrameCadenceMode", 1',
     'VRFrameCadenceTargetHz{ "VR", "FrameCadenceTargetHz", 0.0f',
     'VRFrameCadenceMaxHz{ "VR", "FrameCadenceMaxHz", 120.0f',
+    'VRRankMarkerScale{ "VR", "RankMarkerScale", 0.82f',
     "OUTRUN_VR_DIRECT_TRANSPORT",
     "OUTRUN_VR_DIRECT_ONLY",
     "OUTRUN_VR_DISABLE_DESKTOP_DUPLICATION",
@@ -212,6 +213,26 @@ settings = require(
     "OUTRUN_VR_CADENCE_MODE",
     "OUTRUN_VR_CADENCE_TARGET_HZ",
     "OUTRUN_VR_CADENCE_MAX_HZ",
+)
+
+# R59 rank-marker correctness: R58 HMD evidence proved direct post-call tagging
+# is required for 4th+ kind-0 clip nodes; R57 mode 6 provides the proven
+# head-inverse projected placement. Size adjustment must be around the recovered
+# vehicle/world anchor, never around screen centre.
+require(
+    "src/hooks_uiscaling.cpp",
+    "R57RankProducerScope",
+    "VR R58 DIRECT CLIP: owner=rank46",
+    "RegisterSpriteNodeScope(",
+    "node, r57Scope, r57Marker",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "R57RankMarkerScaleValue",
+    "projectedBaseX",
+    "(ndcX - state.projectedBaseX)",
+    "deltaX[eye] + (1.0f - rankScale) * baseX",
+    "R57Mode() == 6 || R57Mode() == 8",
 )
 
 # R23 installer workers may only request cleanup. Live OutRun camera/projection
