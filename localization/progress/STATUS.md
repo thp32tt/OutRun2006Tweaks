@@ -176,3 +176,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Candidate SHA-256: `841E796B=0b3bd9570db72d8f7c4f1bce7fd8dd2dfc2946c05e3c06a046fe82e7860cd02b`; `EBEF6D20=978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922`.
 - Report: `localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json`.
 
+
+### Batch68 HD FF2462BB checkpoint 2026-09-27 08:55 KST
+- Git workflow restored on `korean-localization-clean`.
+- Persisted actual HD DDS candidate for FF2462BB with 4/29 translated HUD segments.
+- Completed cells: `Avoid the knockout!`, `Slipstream the cars!`, `Drift!`, `Beat that car!`.
+- Candidate SHA-256: `0ade0bac94a20652e2b490dc215a9dd355ad6b7cec840e4b3bd2bdc9dc963af6`.
+- QA: exact 128-byte DDS header, 4096x2048 RGBA32, outside edited-cell changes = 0, B manual row comparison PASS.
+- Status remains partial; 25 FF2462BB segments remain before C/D strict QA and promotion.

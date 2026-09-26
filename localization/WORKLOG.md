@@ -442,3 +442,14 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Existing stock-resolution Korean DDS and approvals are preserved as historical evidence but are not automatically promoted into the HD line.
 - New graphics promotion is held until the HD source ZIP/manifest is imported and verified.
 - Migration report: `localization/graphics/HD_SOURCE_MIGRATION_20260926.json`.
+
+## 2026-09-27 08:55 KST - BATCH68 B FF2462BB HD PERSISTED REWORK
+
+- Returned to the Git-based `korean-localization-clean` workflow at HEAD `7846903ccc07a1e5600244165289f14399b7b495`.
+- Rebuilt four FF2462BB HUD text cells directly on the canonical 4096x2048 HD DDS: `Avoid the knockout!`, `Slipstream the cars!`, `Drift!`, and `Beat that car!`.
+- Korean: `녹아웃을 피하세요!` / `차량 뒤에서 슬립스트림하세요!` / `드리프트!` / `저 차를 이기세요!`.
+- No prior low-resolution Korean pixels were upscaled; fresh glyph rendering uses the canonical HD source and preserves raw vertical-mirror storage orientation.
+- Candidate SHA-256: `0ade0bac94a20652e2b490dc215a9dd355ad6b7cec840e4b3bd2bdc9dc963af6`.
+- Exact 128-byte DDS header preserved; actual dimensions 4096x2048 RGBA32; changes outside the four source text cells = 0.
+- Manual side-by-side row inspection passed B first QA. Candidate remains partial: 4/29 FF2462BB segments complete, 25 remain before independent C/D strict QA.
+- Durable report: `localization/graphics/BATCH68_B_HD_FF2462_PERSISTED_REWORK_REPORT.json`.

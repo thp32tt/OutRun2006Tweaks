@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "batch": "BATCH68_B_HD_FF2462_PERSISTED_REWORK",
+  "generated_at_kst": "2026-09-27T08:55:00+09:00",
+  "branch": "korean-localization-clean",
+  "source_package_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+  "asset": {
+    "hash": "FF2462BB",
+    "source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+    "candidate_sha256": "0ade0bac94a20652e2b490dc215a9dd355ad6b7cec840e4b3bd2bdc9dc963af6",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+    "actual": [4096, 2048],
+    "raw_orientation": "mirror_x",
+    "edited_segments": [
+      {"source":"Avoid the knockout!","korean":"녹아웃을 피하세요!","bbox":[26,783,685,859]},
+      {"source":"Slipstream the cars!","korean":"차량 뒤에서 슬립스트림하세요!","bbox":[770,770,1420,860]},
+      {"source":"Drift!","korean":"드리프트!","bbox":[1732,779,1904,856]},
+      {"source":"Beat that car!","korean":"저 차를 이기세요!","bbox":[2326,783,2773,859]}
+    ],
+    "qa": {"outside_edited_cells_changed_pixels":0,"dds_header_128_exact":true,"dimensions_exact":true,"format":"RGBA32","mips":1,"manual_row_comparison":"PASS_FOR_B_FIRST_QA"},
+    "status":"PARTIAL_ACTUAL_HD_REWORK_CANDIDATE_PERSISTED"
+  },
+  "actual_segments_completed": 4,
+  "total_segments": 29,
+  "promotion": "HOLD_FOR_C_D_STRICT_QA_AND_REMAINING_SEGMENTS",
+  "note": "Rebuilt directly on the canonical HD DDS with fresh Korean glyph rendering; no prior low-resolution Korean pixels were upscaled."
+}

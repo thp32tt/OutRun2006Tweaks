@@ -7,7 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "HD GRAPHICS: continue HD_TEXT_REWORK_QUEUE_20260926.json from FF2462BB; D6DC1380 and 48DEBE77 now have fresh HD Korean batch candidates.",
+    "HD GRAPHICS: continue FF2462BB from Batch68; 4/29 text segments now exist in a persisted HD DDS candidate, 25 segments remain before C/D strict QA.",
     "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
     "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
     "Never upscale prior stock-resolution Korean DDS candidates.",
@@ -125,9 +125,16 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/BATCH66_HD_REWORK_B01_REPORT.json",
+    "latest_hd_rework_batch": "localization/graphics/BATCH68_B_HD_FF2462_PERSISTED_REWORK_REPORT.json",
     "hd_rework_candidates_ready": 2,
-    "hd_rework_remaining": 11
+    "hd_rework_remaining": 11,
+    "hd_partial_rework": {
+      "FF2462BB": {
+        "status": "PARTIAL_B_CANDIDATE_PERSISTED_4_OF_29",
+        "candidate_sha256": "0ade0bac94a20652e2b490dc215a9dd355ad6b7cec840e4b3bd2bdc9dc963af6",
+        "remaining_segments": 25
+      }
+    }
   },
   "runtime_packages": {
     "k1": {
