@@ -41,10 +41,14 @@ jobs:
       - name: Derive Calc3D2D inverse-projection facts
         shell: pwsh
         run: python tools/reverse/r57_projection_formula.py --exe OR2006C2C.EXE --out analysis/R57_PROJECTION_FORMULA.md
+      - name: Map projected-marker pipeline xrefs
+        shell: pwsh
+        run: python tools/reverse/r57_pipeline_xrefs.py --exe OR2006C2C.EXE --out analysis/R57_PIPELINE_XREFS.md
       - uses: actions/upload-artifact@v4
         with:
           name: R57-targeted-disasm-${{ github.sha }}
           path: |
             analysis/R57_TARGETED_DISASM.md
             analysis/R57_PROJECTION_FORMULA.md
+            analysis/R57_PIPELINE_XREFS.md
           if-no-files-found: error
