@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "run": "automation-D-final-strict-full-scope-20260926",
+  "timestamp_kst": "2026-09-26T14:45:00+09:00",
+  "branch": "korean-localization-clean",
+  "inputs": [
+    "ORIENTATION_POLICY.md",
+    "SOURCE_FAITHFUL_CURRENT.json",
+    "resume_state.json",
+    "STATUS.md",
+    "progress.json",
+    "BATCH53_FULL32_STRICT_RESET_REPORT.json",
+    "BATCH54_FULL32_STRICT_REWORK_QUEUE_REPORT.json",
+    "FULL_DRAFT_REPORT.json"
+  ],
+  "scope": {
+    "dds_inventory": 243,
+    "full_draft": 79,
+    "source_faithful_package": 32,
+    "user_rejected_priority": 5
+  },
+  "source_bytes": {
+    "candidate_combined_package": true,
+    "exact_original_archive": false,
+    "full_draft_exact_package_in_current_workspace": false
+  },
+  "strict_result": {
+    "strict_pass": 0,
+    "promotion_hold": true,
+    "source_faithful": {
+      "rework_required": 24,
+      "zoom_manual_required": 8
+    },
+    "full_draft": {
+      "strictly_revalidated": 0,
+      "total": 79
+    },
+    "inventory": {
+      "policy_scope_registered": 243,
+      "byte_level_strictly_revalidated": 0
+    }
+  },
+  "priority_user_rejected": [
+    "841E796B",
+    "EBEF6D20",
+    "571E78F3",
+    "62BEBF33",
+    "E3FD08BE"
+  ],
+  "decision": "NO_GRANDFATHERING_NO_PROMOTION",
+  "reason": "Exact original analysis archive bytes are unavailable in this execution context. Candidate package bytes cannot establish original text cells/masks or preserve-original zero-diff. The 12 strict gates therefore cannot produce PASS for any asset.",
+  "package_action": "Keep all localized graphics packages non-promoted/test-only. Do not include any asset as final until exact original+candidate byte comparison and manual 1x/2x QA both pass.",
+  "next_action": [
+    "recover exact original analysis archive matching SHA e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+    "process five USER_REJECTED first",
+    "continue all 32 source-faithful candidates",
+    "then FULL_DRAFT 79",
+    "then zoom_review/preserve-original across 243 inventory"
+  ],
+  "per_asset_required_fields": [
+    "original_text_bbox",
+    "allowed_mask_id/hash",
+    "localized_bbox",
+    "bbox_contained",
+    "bbox_width_ok",
+    "bbox_height_ok",
+    "outside_mask_changed_pixels",
+    "nontext_changed_pixels",
+    "overlay_box_overflow_pixels",
+    "residual_english_detected",
+    "patch_seam_detected",
+    "background_reconstruction_pass",
+    "icon_boundary_preserved",
+    "text_exact_match",
+    "glyph_corruption_detected",
+    "format_match",
+    "header_match",
+    "mip_match",
+    "alpha_contract_match",
+    "raw_orientation_match",
+    "readable_orientation_match",
+    "style_visual_pass",
+    "manual_visual_pass",
+    "full_redraw_used"
+  ]
+}
