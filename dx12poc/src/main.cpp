@@ -244,7 +244,9 @@ HRESULT CreateManagedResourceProbe(
     if (locked.pBits && locked.Pitch > 0)
         std::memset(locked.pBits, 0x5a,
             static_cast<std::size_t>(locked.Pitch) * 32u);
-    out.texture->UnlockRect(0);
+    hr = out.texture->UnlockRect(0);
+    if (FAILED(hr))
+        return hr;
 
     hr = device9->CreateVertexBuffer(
         256, 0, D3DFVF_XYZ, D3DPOOL_MANAGED,
@@ -258,7 +260,9 @@ HRESULT CreateManagedResourceProbe(
         return hr;
     if (vb)
         std::memset(vb, 0x3c, 256);
-    out.vertexBuffer->Unlock();
+    hr = out.vertexBuffer->Unlock();
+    if (FAILED(hr))
+        return hr;
 
     return S_OK;
 }
@@ -270,17 +274,54 @@ HRESULT ValidateManagedResourceProbeAfterReset(
         return E_POINTER;
 
     D3DLOCKED_RECT locked{};
-    HRESULT hr = probe.texture->LockRect(0, &locked, nullptr, 0);
+    HRESULT hr = probe.texture->LockRect(0, &locked, nullptr, D3DLOCK_READONLY);
     if (FAILED(hr))
         return hr;
-    probe.texture->UnlockRect(0);
+
+    bool texturePatternOk = locked.pBits && locked.Pitch >= 32 * 4;
+    if (texturePatternOk)
+    {
+        const auto* base = static_cast<const std::uint8_t*>(locked.pBits);
+        for (UINT y = 0; y < 32 && texturePatternOk; ++y)
+        {
+            const auto* row = base + static_cast<std::ptrdiff_t>(y) * locked.Pitch;
+            for (UINT x = 0; x < 32 * 4; ++x)
+            {
+                if (row[x] != 0x5a)
+                {
+                    texturePatternOk = false;
+                    break;
+                }
+            }
+        }
+    }
+    const HRESULT textureUnlockHr = probe.texture->UnlockRect(0);
+    if (FAILED(textureUnlockHr))
+        return textureUnlockHr;
+    if (!texturePatternOk)
+        return E_FAIL;
 
     void* vb = nullptr;
-    hr = probe.vertexBuffer->Lock(0, 0, &vb, 0);
+    hr = probe.vertexBuffer->Lock(0, 0, &vb, D3DLOCK_READONLY);
     if (FAILED(hr))
         return hr;
-    probe.vertexBuffer->Unlock();
-    return S_OK;
+    bool vertexPatternOk = vb != nullptr;
+    if (vertexPatternOk)
+    {
+        const auto* bytes = static_cast<const std::uint8_t*>(vb);
+        for (UINT i = 0; i < 256; ++i)
+        {
+            if (bytes[i] != 0x3c)
+            {
+                vertexPatternOk = false;
+                break;
+            }
+        }
+    }
+    const HRESULT vertexUnlockHr = probe.vertexBuffer->Unlock();
+    if (FAILED(vertexUnlockHr))
+        return vertexUnlockHr;
+    return vertexPatternOk ? S_OK : E_FAIL;
 }
 
 HRESULT ExerciseResourceInterop(
@@ -377,11 +418,24 @@ HRESULT ExerciseResourceInterop(
             return HRESULT_FROM_WIN32(GetLastError());
 
         hr = fence->SetEventOnCompletion(signalValue, eventHandle);
+        DWORD waitResult = WAIT_FAILED;
+        DWORD waitError = ERROR_SUCCESS;
         if (SUCCEEDED(hr))
-            WaitForSingleObject(eventHandle, 5000);
+        {
+            waitResult = WaitForSingleObject(eventHandle, 5000);
+            if (waitResult == WAIT_FAILED)
+                waitError = GetLastError();
+        }
         CloseHandle(eventHandle);
         if (FAILED(hr))
             return hr;
+        if (waitResult == WAIT_TIMEOUT)
+            return HRESULT_FROM_WIN32(ERROR_TIMEOUT);
+        if (waitResult != WAIT_OBJECT_0)
+            return HRESULT_FROM_WIN32(
+                waitError != ERROR_SUCCESS ? waitError : ERROR_GEN_FAILURE);
+        if (fence->GetCompletedValue() < signalValue)
+            return E_FAIL;
     }
 
     return S_OK;
