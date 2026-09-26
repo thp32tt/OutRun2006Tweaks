@@ -125,3 +125,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - No rejected `37759842` reconstruction was promoted; original-safe fallback remains required.
 - Git does not contain the exact retained DDS binaries, so fresh pixel-level revalidation of all 31 is deferred until exact package bytes are available.
 - Report: `localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json`.
+
+
+### QA checkpoint 2026-09-26 11:15 KST
+- Re-read mandatory policy/current/resume/status and reconciled Batch53 against Batch51/52.
+- Canonical state remains **32 reviewed / 31 retained / 1 pending**.
+- Older local fallback patches were not replayed because Batch51/52 are newer canonical evidence.
+- Final pending `37759842_1024x1024.dds` remains original-safe; no report/preview-derived pixel reconstruction is permitted without exact original DDS bytes.
+- Next safe graphics action: exact per-card template/icon-mask reconstruction from the original DDS, then zero-residual-English + icon/gradient/style + containment + raw/readable manual QA.
+- Report: `localization/graphics/BATCH53_FALLBACK_RECONCILE_REPORT.json`.
