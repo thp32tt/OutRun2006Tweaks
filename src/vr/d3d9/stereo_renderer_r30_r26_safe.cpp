@@ -1313,7 +1313,7 @@ namespace OutRunVRStereo
             };
 
             D3DMATRIX headInverse = IdentityMatrix();
-            if (R57Mode() == 6)
+            if (R57Mode() == 6 || R57Mode() == 8)
             {
                 float headRaw[16]{};
                 std::uint32_t headPoseSequence = 0;
@@ -1342,8 +1342,7 @@ namespace OutRunVRStereo
                     ProjectionFromFov(
                         baseProjection, stereo.eyeFov[eye]);
                 const D3DMATRIX eyeTransform =
-                    R57Mode() == 6
-                    ? MultiplyMatrix(
+                    (R57Mode() == 6 || R57Mode() == 8) ? MultiplyMatrix(
                         MultiplyMatrix(headInverse, eyeInverse),
                         eyeProjection)
                     : MultiplyMatrix(eyeInverse, eyeProjection);
