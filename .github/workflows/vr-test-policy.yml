@@ -3,7 +3,19 @@ name: VR Test Policy
 on:
   workflow_dispatch:
   push:
-    branches: [ vr-d3d9ex-focus, vr-r56-safety-perf-review-fixes-20260926 ]
+    branches: [ vr-d3d9ex-focus ]
+    paths:
+      - 'tools/OutRunVR-TestProfiles.ps1'
+      - 'tools/Select-OutRunVRBackend.ps1'
+      - 'tools/Run-OutRunVRTest.ps1'
+      - 'tools/Collect-OutRunVRLogs.ps1'
+      - 'tools/OutRunVR-Backend-Selector.ps1'
+      - 'tools/Test-OutRunVRTestPolicy.ps1'
+      - 'docs/VR_TEST_STRATEGY.md'
+      - 'docs/VR_AUTODEV_STATE.json'
+      - '.github/workflows/vr-test-policy.yml'
+  pull_request:
+    branches: [ vr-d3d9ex-focus ]
     paths:
       - 'tools/OutRunVR-TestProfiles.ps1'
       - 'tools/Select-OutRunVRBackend.ps1'
