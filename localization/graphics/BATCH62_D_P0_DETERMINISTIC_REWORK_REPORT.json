@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "run": "batch62-d-p0-deterministic-rework-20260926",
+  "timestamp_kst": "2026-09-26T20:43:00+09:00",
+  "branch": "korean-localization-clean",
+  "canonical_source_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+  "source_faithful_package_sha256": "7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02",
+  "source32_structure": {"assets":32,"header_match":32,"format_match":32,"mip_match":32,"alpha_contract_match":32,"byte_identical_original":["37759842_1024x1024.dds"]},
+  "p0_reworked_this_run": ["571E78F3_512x64.dds","62BEBF33_512x64.dds","E3FD08BE_512x64.dds"],
+  "p0_deferred": ["841E796B_512x128.dds","EBEF6D20_512x512.dds"],
+  "automated_result": "3 deterministic candidates: bbox contained, outside_mask_changed_pixels=0, nontext_changed_pixels=0, overlay_box_overflow_pixels=0, header/format/mip/alpha contract match",
+  "manual_visual_result": "FAIL: substantially cleaner than rejected candidates but source-like Korean glyph proportions/outline still not close enough",
+  "strict_pass": 0,
+  "promotion_hold": true,
+  "decision": "NO_PROMOTION",
+  "fallback": "/아웃런2 한글화/localization_fallback/20260926-2045-D/"
+}
