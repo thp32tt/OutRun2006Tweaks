@@ -413,6 +413,8 @@ class UIScaling : public Hook
 		return result;
 	}
 
+	// R58 HMD evidence: mode 6 proved head-inverse projected tracking for 1st-3rd;
+	// mode 8 proved 4th+ kind-0 ownership never reached the final projected path.
 	// 4th place onward is spelled out from digit sprites drawn by
 	// put_clip_sprite, which takes its position as int. It converts that to
 	// float when filling in the sprite it queues, so the fraction goes back on
