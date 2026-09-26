@@ -1253,6 +1253,27 @@ namespace OutRunVRStereo
             return mode;
         }
 
+        int R58Mode() noexcept
+        {
+            static const int mode = []() noexcept {
+                char text[8]{};
+                const DWORD len = GetEnvironmentVariableA(
+                    "OUTRUN_VR_R58_MODE", text,
+                    static_cast<DWORD>(sizeof(text)));
+                if (len == 0 || len >= sizeof(text))
+                    return 0;
+                int value = 0;
+                for (DWORD i = 0; i < len; ++i)
+                {
+                    if (text[i] < '0' || text[i] > '9')
+                        return 0;
+                    value = value * 10 + int(text[i] - '0');
+                }
+                return (value >= 1 && value <= 10) ? value : 0;
+            }();
+            return mode;
+        }
+
         bool R57ProjectViewPoint(
             const OutRunVR::GameSemantic::ProjectedMarkerInfo& marker,
             const D3DMATRIX& transform,
@@ -1313,7 +1334,9 @@ namespace OutRunVRStereo
             };
 
             D3DMATRIX headInverse = IdentityMatrix();
-            if (R57Mode() == 6)
+            const bool includeHeadInverse =
+                R57Mode() == 6 || R58Mode() != 0;
+            if (includeHeadInverse)
             {
                 float headRaw[16]{};
                 std::uint32_t headPoseSequence = 0;
@@ -1342,7 +1365,7 @@ namespace OutRunVRStereo
                     ProjectionFromFov(
                         baseProjection, stereo.eyeFov[eye]);
                 const D3DMATRIX eyeTransform =
-                    R57Mode() == 6
+                    includeHeadInverse
                     ? MultiplyMatrix(
                         MultiplyMatrix(headInverse, eyeInverse),
                         eyeProjection)
@@ -1368,8 +1391,9 @@ namespace OutRunVRStereo
                     expected, true, std::memory_order_acq_rel))
             {
                 spdlog::info(
-                    "VR R57 PROJECTED MARKER: mode={} view=({:.4f},{:.4f},{:.4f}) deltaL=({:.5f},{:.5f}) deltaR=({:.5f},{:.5f}) builds={}",
-                    R57Mode(), marker->viewX, marker->viewY, marker->viewZ,
+                    "VR PROJECTED MARKER: r57={} r58={} head={} view=({:.4f},{:.4f},{:.4f}) deltaL=({:.5f},{:.5f}) deltaR=({:.5f},{:.5f}) builds={}",
+                    R57Mode(), R58Mode(), includeHeadInverse ? 1 : 0,
+                    marker->viewX, marker->viewY, marker->viewZ,
                     deltaX[0], deltaY[0], deltaX[1], deltaY[1], builds);
             }
             return true;
