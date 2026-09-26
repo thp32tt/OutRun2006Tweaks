@@ -1,5 +1,5 @@
 {
-  "schema_version": 15,
+  "schema_version": 16,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -65,7 +65,7 @@
     "batch23_rejected_report": "localization/graphics/BATCH23_REJECTED_REPORT.json",
     "batch24v2_report": "localization/graphics/BATCH24V2_2DA_REWORK_REPORT.json",
     "batch25v4_report": "localization/graphics/BATCH25V4_ACF_REWORK_REPORT.json",
-    "latest_safe_rework_note": "2026-09-26 09:40 KST: Batch44 used exact original 37759842 DDS and passed automated containment, but manual QA failed because expanded blue-card cleanup flattened card detail and residual English remained. Keep original.",
+    "latest_safe_rework_note": "2026-09-26 10:47 KST: D preflight reconciled approved ledger; 32 reviewed / 31 retained / 1 pending. 37759842 remains original-safe because manual QA overrides containment pass.",
     "batch33_rejected_report": "localization/graphics/BATCH33_REJECTED_REPORT.json",
     "batch38_report": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
     "batch41_rejected_report": "localization/graphics/BATCH41_REJECTED_REPORT.json",
@@ -74,7 +74,8 @@
     "batch44_rejected_report": "localization/graphics/BATCH44_REJECTED_REPORT.json",
     "source_37759842_sha256": "ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0",
     "batch44_candidate_sha256": "65d919ce4f15408f873a800dfcf73e0638f6902cbde9ad50a2e1c99c18d00aad",
-    "batch51_rejected_report": "localization/graphics/BATCH51_REJECTED_REPORT.json"
+    "batch51_rejected_report": "localization/graphics/BATCH51_REJECTED_REPORT.json",
+    "batch52_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json"
   },
   "runtime_packages": {
     "k1": {
