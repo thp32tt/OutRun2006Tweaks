@@ -21,6 +21,11 @@ COPY entrypoint.direct.sh /opt/outrun/entrypoint.sh
 COPY bootstrap_review.override.md /opt/outrun/prompts/bootstrap_review.md
 COPY continue_review.override.md /opt/outrun/prompts/continue_review.md
 COPY watchdog_resume.override.md /opt/outrun/prompts/watchdog_resume.md
+COPY localization_A.md /opt/outrun/prompts/localization_A.md
+COPY localization_B.md /opt/outrun/prompts/localization_B.md
+COPY localization_C.md /opt/outrun/prompts/localization_C.md
+COPY localization_D.md /opt/outrun/prompts/localization_D.md
+COPY localization_git_sync.md /opt/outrun/prompts/localization_git_sync.md
 
 RUN chmod +x /opt/outrun/entrypoint.sh
 
