@@ -652,7 +652,7 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
         {
             lastFloralRoughPavingState = floralRoughPavingNow;
             spdlog::info(
-                "WheelFFB ROAD EDGE: primaryRoughRoad={} roadSection={} masks={:08X}/{:08X}/{:08X}/{:08X}",
+                "WheelFFB ROAD EDGE: floralRoughPaving={} roadSection={} masks={:08X}/{:08X}/{:08X}/{:08X}",
                 floralRoughPavingNow,
                 static_cast<int>(car->OnRoadPlace_5C.roadSectionNum_8),
                 surface.surfaceMask[0], surface.surfaceMask[1],
