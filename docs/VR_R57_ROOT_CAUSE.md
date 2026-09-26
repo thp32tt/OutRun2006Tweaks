@@ -151,3 +151,66 @@ R56 remains diagnostic evidence only. R57 is not merged into `vr-d3d9ex-focus` u
 - anchor metadata remains attached through queue selection,
 - per-eye reprojection keeps the marker over the correct vehicle while the head moves,
 - protected road/background/vehicle stereo and frame pacing do not regress.
+
+
+## Deeper R57 finding: depth survives Calc3D2D but is discarded by SpriteNode draw data
+
+The canonical EXE constants prove `0x0062806C = 1.0f`, `0x006281C8 = 320.0f`, `0x006281CC = 240.0f`, and the BAD20 glyph vertical offset is `32.0f`.
+
+Calc3D2D therefore has the exact form:
+
+```
+view = mxCalcPoint(currentMatrix, input)
+out.x = a1 * view.x / (-view.z)
+out.y = a2 * view.y / (-view.z)
+out.z = view.z
+```
+
+and can be inverted without the original vehicle point:
+
+```
+view.x = out.x * (-out.z) / a1
+view.y = out.y * (-out.z) / a2
+view.z = out.z
+```
+
+This is the strongest shortcut found so far. The original rank-marker code keeps the true camera/current-matrix depth in `out.z` long enough to perform visibility/size/alpha decisions, then loses that depth when it creates a 2D sprite.
+
+For BAD20 specifically, the already-installed safe hook at RVA `0xBB046` reads the unrounded projected X/Y from stack offsets `+0x40/+0x44`; the adjacent `+0x48` value is the preserved Calc3D2D Z for that same projected vector. This means a BAD20 proof candidate can capture real marker depth without adding another risky mid-hook.
+
+### Why exact WORLD_BILLBOARD tags still fail
+
+The queue has two concrete sprite representations:
+- 1st-3rd use `sprani_play_ae_auth_alpha -> put_sprite_ex2`, yielding `SpriteNode.kind_C = 1` / `SPRARGS2`.
+- 4th+ use `put_clip_sprite -> put_sprite_ex`, yielding `SpriteNode.kind_C = 0` / `SPRARGS`.
+
+The custom-matrix renderer for `SPRARGS2` expands the quad and explicitly writes RHW = `1.0f` for every vertex before `DrawPrimitiveUP`. The plain `SPRARGS` representation also has no vehicle/view-depth field. Both paths therefore reach R30 after the real Calc3D2D depth has been discarded.
+
+R30's existing full XYZRHW world reprojection expects RHW/clip-W or screen-Z to carry depth. That assumption is valid for projected particles/decals but is false for rival-marker sprites. Consequently an exact WORLD_BILLBOARD tag can still reconstruct the marker at an artificial near/flat depth.
+
+### Lower-risk fix: depth-aware anchor translation
+
+Do not replace the game's sprite renderer and do not rebuild every rank glyph in 3D.
+
+Store a small projected-anchor record next to the existing per-SpriteNode semantic tag:
+- Calc3D2D caller/family,
+- `out.x/out.y/out.z`,
+- `a1/a2`,
+- original screen anchor after the game's 320/240/32 offsets,
+- node/glyph offset from that anchor,
+- generation/serial.
+
+At R30 stereo replay:
+1. reconstruct the center/game-view anchor from `out.x/out.y/out.z/a1/a2`;
+2. apply the existing R30 relative-eye transform and eye projection (no second common head rotation);
+3. compute left/right projected anchor positions;
+4. translate the already-generated sprite quad by `eyeAnchor - originalAnchor`;
+5. leave texture, animation, scale, alpha, color, rank digits and layout unchanged.
+
+This one transform can handle both `SPRARGS2` 1st-3rd and `SPRARGS` 4th+ because both ultimately reach D3D9 `DrawPrimitiveUP`.
+
+The existing `SpriteNodeSemanticTag` side table already has the correct lifetime/concurrency model and capacity equal to the 0x230-node sprite pool, so projected-anchor metadata can use a parallel bounded table rather than introducing a new allocation-heavy map.
+
+### Alternative central capture point under investigation
+
+`dispMarkerCheck(0xBA0E0)` takes the candidate object pointer and directly reads a 3D vector at `object+0x14` while comparing it with the player-side world position. If global xrefs prove all relevant rival-rank families pass through it, this may provide an even simpler common vehicle identity/world-anchor source. It is not yet assumed to cover every visible rank producer.
