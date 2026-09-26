@@ -9,10 +9,8 @@
   "next_actions": [
     "read ORIENTATION_POLICY.md and SOURCE_FAITHFUL_CURRENT.json before editing",
     "only 37759842_1024x1024.dds remains pending",
-    "use exact original DDS SHA-256 ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0 as construction source",
-    "Batch44 is rejected: do not enlarge reconstruction zones that flatten card art; isolate glyph pixels/text layers more precisely",
-    "do not promote until residual English is zero and raw/readable manual QA passes",
-    "preserve vehicle/model names, brands, logos, song titles, legal marks, icons and card gradients",
+    "do not promote any candidate that degrades the blue/black card icons even if containment is perfect",
+    "next attempt should build exact per-card templates or exact icon masks from original DDS",
     "in-game validate the 31 retained source-faithful candidates"
   ],
   "prototype_history": {
@@ -75,7 +73,8 @@
     "batch43_safe_hold_report": "localization/graphics/BATCH43_FINAL_PENDING_SOURCE_BYTE_GATE_REPORT.json",
     "batch44_rejected_report": "localization/graphics/BATCH44_REJECTED_REPORT.json",
     "source_37759842_sha256": "ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0",
-    "batch44_candidate_sha256": "65d919ce4f15408f873a800dfcf73e0638f6902cbde9ad50a2e1c99c18d00aad"
+    "batch44_candidate_sha256": "65d919ce4f15408f873a800dfcf73e0638f6902cbde9ad50a2e1c99c18d00aad",
+    "batch51_rejected_report": "localization/graphics/BATCH51_REJECTED_REPORT.json"
   },
   "runtime_packages": {
     "k1": {
