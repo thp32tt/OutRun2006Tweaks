@@ -1128,6 +1128,114 @@ public:
 
 UIScaling UIScaling::instance;
 
+// R63: isolate only exact PROJECTED_WORLD_MARKER_2D D3DXSprite draws.
+// R62 proved kind-0 rank markers are emitted as D3DXSprite fixed-function
+// batches (FVF 0x142). The HMD result then showed two rival rank quads can be
+// coalesced into one DrawIndexedPrimitive (prim=4), causing one vehicle anchor
+// to move both quads. Flush immediately after each projected D3DXSprite::Draw
+// while the current queue node/marker is still authoritative. Unlike rejected
+// R60, generic HUD and SCREEN_HUD batches are never flushed here.
+class VRProjectedD3DXSpriteIsolation : public Hook
+{
+	inline static SafetyHookInline Draw_hk{};
+	inline static std::atomic<std::uint64_t> Flushes{ 0 };
+	inline static std::atomic<std::uint64_t> Failures{ 0 };
+
+	static HRESULT __stdcall DrawDest(
+		void* self, IDirect3DTexture9* texture, const RECT* rect,
+		const D3DVECTOR* center, const D3DVECTOR* pos, D3DCOLOR color)
+	{
+		const HRESULT hr = Draw_hk.stdcall<HRESULT>(
+			self, texture, rect, center, pos, color);
+		if (FAILED(hr) || VRR57Mode() == 0)
+			return hr;
+
+		const auto scope =
+			OutRunVR::GameSemantic::EffectiveScope();
+		const auto* marker =
+			OutRunVR::GameSemantic::CurrentProjectedMarker();
+		if (!OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+				scope) ||
+			!marker || !marker->valid || !self)
+			return hr;
+
+		void** vtable = *reinterpret_cast<void***>(self);
+		if (!vtable || !vtable[10])
+			return hr;
+
+		using FlushFn = HRESULT(__stdcall*)(void*);
+		const HRESULT flushHr =
+			reinterpret_cast<FlushFn>(vtable[10])(self);
+		const auto hit = Flushes.fetch_add(
+			1, std::memory_order_relaxed) + 1;
+		if (FAILED(flushHr))
+			Failures.fetch_add(1, std::memory_order_relaxed);
+
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R63 PROJECTED D3DX ISOLATE: flushes={} failures={} marker=({:.3f},{:.3f},{:.3f})",
+				hit,
+				Failures.load(std::memory_order_relaxed),
+				marker->viewX, marker->viewY, marker->viewZ);
+		return hr;
+	}
+
+	static DWORD WINAPI InstallThread(void*)
+	{
+		for (int attempt = 0; attempt < 7200; ++attempt)
+		{
+			void* sprite = *Module::exe_ptr<void*>(0x55B218);
+			if (sprite)
+			{
+				void** vtable = *reinterpret_cast<void***>(sprite);
+				if (vtable && vtable[9] && vtable[10])
+				{
+					const auto disabled =
+						safetyhook::InlineHook::StartDisabled;
+					Draw_hk = safetyhook::create_inline(
+						vtable[9],
+						reinterpret_cast<void*>(&DrawDest),
+						disabled);
+					if (Draw_hk &&
+						Draw_hk.enable().has_value())
+					{
+						spdlog::info(
+							"VR R63 PROJECTED D3DX ISOLATE: exact projected-rank post-Draw Flush ACTIVE; generic HUD batching untouched");
+						return 0;
+					}
+					Draw_hk = {};
+				}
+			}
+			Sleep(25);
+		}
+		spdlog::warn(
+			"VR R63 PROJECTED D3DX ISOLATE: ID3DXSprite Draw hook unavailable; R62 behavior retained");
+		return 0;
+	}
+
+public:
+	std::string_view description() override
+	{
+		return "VRProjectedD3DXSpriteIsolationR63";
+	}
+	bool validate() override
+	{
+		return Settings::VREnabled.get();
+	}
+	bool apply() override
+	{
+		HANDLE thread = CreateThread(
+			nullptr, 0, InstallThread, nullptr, 0, nullptr);
+		if (!thread)
+			return false;
+		CloseHandle(thread);
+		return true;
+	}
+	static VRProjectedD3DXSpriteIsolation instance;
+};
+VRProjectedD3DXSpriteIsolation
+	VRProjectedD3DXSpriteIsolation::instance;
+
 // VR semantic bridge for the game's canonical queued 2D renderer.
 // Canonical replacement EXE SHA256:
 // 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3
