@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "run": "automation-strict-queue-20260926",
+  "timestamp_kst": "2026-09-26T14:00:00+09:00",
+  "branch": "korean-localization-clean",
+  "input_report": "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json",
+  "state": {
+    "package_assets_scanned": 32,
+    "rework_required": 24,
+    "zoom_manual_required": 8,
+    "strict_pass": 0,
+    "promotion_hold": true
+  },
+  "source_byte_availability": {
+    "combined_package": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip",
+    "materialized_this_run": true,
+    "exact_original_archive_materialized": false,
+    "note": "Combined package bytes are available, but for 31 previously localized assets they are candidates, not source-of-truth originals. They cannot be used as original DDS for strict rework. 37759842 remains an exception because the combined package intentionally carries its original-safe DDS."
+  },
+  "priority": [
+    {
+      "tier": "P0_USER_REJECTED",
+      "assets": [
+        "841E796B",
+        "EBEF6D20",
+        "571E78F3",
+        "62BEBF33",
+        "E3FD08BE"
+      ],
+      "action": "rework only after exact original DDS bytes are available"
+    },
+    {
+      "tier": "P1_HIGH_CONFIDENCE_GEOMETRY",
+      "assets": [
+        "4F68708E",
+        "D41D0B1",
+        "9CE4E175",
+        "7CE1CFC5",
+        "12519155",
+        "39BCA907"
+      ],
+      "action": "exact source-cell reconstruction after original-byte recovery"
+    },
+    {
+      "tier": "P2_KNOWN_PENDING",
+      "assets": [
+        "37759842"
+      ],
+      "action": "exact source bytes available; continue glyph/outline-footprint approach, no full-card clearing"
+    },
+    {
+      "tier": "P3_REMAINING_REWORK",
+      "assets": [
+        "D6DC1380",
+        "2EA557B4",
+        "48DEBE77",
+        "43B07A77",
+        "1A43E9D9",
+        "788CE557",
+        "C075FB49",
+        "F6811E94",
+        "1762489B",
+        "2B0863D6",
+        "4EDA9DE3",
+        "C05E67EF"
+      ],
+      "action": "per-text-cell strict QA/rework after original-byte recovery"
+    },
+    {
+      "tier": "P4_ZOOM_MANUAL",
+      "assets": [
+        "C598919A",
+        "2DA43E41",
+        "411827E",
+        "42E618FD",
+        "53CE39D5",
+        "560FA536",
+        "49BB5FE5",
+        "ACF61D7C"
+      ],
+      "action": "1x/2x manual + block/text-cell QA before PASS"
+    }
+  ],
+  "hard_gates": [
+    "raw DDS per-element orientation",
+    "preserve vehicle/model/brand/logo/song/legal art",
+    "source-like style/weight/color/outline/proportion",
+    "replacement pixels inside original text cell",
+    "non-text changed pixels=0",
+    "no black lines/crop seams/residual English/erasure residue/alpha halos/clipping",
+    "raw and readable 1x/2x manual QA"
+  ],
+  "fallback_reconcile": {
+    "older_fallback_through": "20260926-1216-B",
+    "decision": "superseded_by_Batch53_full32_strict_reset; do not replay old 31-retained assumptions"
+  },
+  "promotion": false
+}
