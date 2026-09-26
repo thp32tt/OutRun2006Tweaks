@@ -382,3 +382,14 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - ZIP integrity/structure QA: PASS; text row count 1,355; DDS count 32.
 - Test README repeats the hard containment gate: Korean glyph/text must never extend outside the original text region/sprite cell.
 - In-game validation remains pending; this package is a test build, not a final release.
+
+
+## 2026-09-26 10:25 KST - BATCH45~51 37759842 RECONSTRUCTION REVIEW
+
+- Continued the final pending `37759842_1024x1024.dds` from the exact original DDS.
+- Tried seven progressively different cleanup paths: color-mask inpainting, compact quadratic text-zone replacement, expanded card reconstruction, row-median gradients, full-inner quadratic gradients, smooth vertical gradients, and connected-component icon restoration.
+- Late candidates pass the hard containment gate with **0 changed pixels** and **0 introduced-alpha pixels** outside approved regions.
+- Manual QA still rejects them because the blue/black card icons or source gradients are visibly degraded, or the localized labels become too small relative to the source art.
+- No unsafe candidate was promoted. Canonical package remains Batch38 with the original `37759842`.
+- State remains **32 reviewed / 31 retained / 1 pending**.
+- Next safe implementation path: exact per-card template/icon masks derived from the original, not generic inpainting or gradient reconstruction.
