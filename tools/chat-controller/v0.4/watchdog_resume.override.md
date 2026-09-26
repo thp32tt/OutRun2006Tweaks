@@ -1,7 +1,9 @@
-중단된 지점부터 OutRun2006Tweaks N100 지속 심층 리뷰를 즉시 이어서 진행해.
+한글화 작업 결과의 Git 동기화만 수행해줘.
 
-먼저 GitHub 최신 HEAD와 A/B/C review ledger, consolidated findings, D 상태를 확인하고 Issue #6에서는 최신 N100_CHECKPOINT와 그 이후 delta만 우선 확인해 이미 발견·수정·검증된 항목을 반복하지 마.
+기존 한글화 Git 저장소에 이미 설정된 동기화 설정파일을 먼저 읽고, 그 설정에 지정된 저장소·브랜치·경로를 그대로 사용해. 임의의 저장소, 브랜치, 경로를 새로 만들거나 VR/FFB 소스와 병합하지 마.
 
-현재 canonical 역할은 A(:00)=architecture/state/lifetime/OpenXR lifecycle/synchronization, N100(:10)=보조 리뷰, B(:20)=rendering/stereo/visual/performance/frame-pacing, C(:35)=post-fix/change-sanity/dedup/validation-prep/D_IMPLEMENT_NEXT, D(:45)=유일 production IMPLEMENT+BUILD+VALIDATE+INTEGRATE이다. 과거 역할/시간표 문서는 현재 contract를 덮어쓰지 못한다.
+GPT Library에 보관된 현재 한글화 작업 결과 중 설정파일이 동기화 대상으로 지정한 파일만 확인하고, 기존 Git 내용과 비교해서 실제 변경분만 동기화해. 원본 파일과 작업본을 구분하고 바이너리/DDS 등 한글패치에 필요한 파일도 설정 범위에 포함되어 있으면 그대로 반영해.
 
-이전 리뷰가 끝났다면 아직 충분히 검토되지 않은 다음 subsystem/lens/cross-subsystem/regression boundary로 이동한다. 새롭고 근거 있는 finding 또는 기존 finding의 유효한 추가 증거만 Issue #6에 append-only로 남기고, 종료 시 N100_CHECKPOINT(target_sha, processed_through, ledger identity, stable key 요약, exact nextReview)를 추가해.
+이 실행에서는 한글 번역/그래픽 제작/리뷰/VR/FFB/빌드/테스트 등 다른 작업을 하지 마. 목적은 이미 완료된 한글화 결과를 Git과 동기화하는 것 하나뿐이야.
+
+Git 쓰기가 현재 세션에서 허용되지 않거나 설정파일/대상 파일을 읽을 수 없으면 우회하거나 다른 저장소를 사용하지 말고, 동기화하지 못한 파일과 이유만 명확히 정리해줘. 성공하면 변경 파일, 대상 브랜치, 커밋 결과를 간결하게 보고해줘.
