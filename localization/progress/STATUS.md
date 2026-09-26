@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-26 08:55 KST
+Updated: 2026-09-26 10:25 KST
 
 ## Active branch
 `korean-localization-clean`
@@ -43,6 +43,7 @@ The full draft intentionally uses exact/OCR/manual/atlas-alpha placement evidenc
 - 1st/2nd/early-3rd batch generated images are visual drafts pending source-faithful rework.
 
 ### Source-faithful batches
+- Batch51: `37759842` rejected after seven reconstruction approaches; containment passes but icon/style fidelity still fails, report `BATCH51_REJECTED_REPORT.json`
 - Batch41: `37759842` rejected again; containment passes but lower blue/black cards still retain source English, report `BATCH41_REJECTED_REPORT.json`
 - Batch38: `C598919A` promoted after full-resolution text-cell replacement + block-level DXT5 QA, report `BATCH38_C598_REWORK_REPORT.json`
 - Batch33: `37759842` still rejected; embedded blue/black cards restore English fragments, report `BATCH33_REJECTED_REPORT.json`
@@ -93,7 +94,7 @@ Read:
 7. `localization/graphics/BATCH11V2_REWORK_REPORT.json`
 8. `localization/graphics/FULL_DRAFT_REPORT.json`
 
-Next gate: finish the final pending `37759842_1024x1024.dds` from original DDS, then in-game validate the 31 retained candidates.
+Next gate: final pending `37759842_1024x1024.dds` requires exact per-card template/icon-mask reconstruction; in-game validate the 31 retained candidates in parallel.
 
 
 
