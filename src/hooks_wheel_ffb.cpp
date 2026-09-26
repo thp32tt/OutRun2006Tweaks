@@ -943,7 +943,7 @@ namespace
                     0.0f, 5.0f);
                 splashAmp_ =
                     (roughness - 0.7f) * speedNorm * 0.75f * roadTextureScale *
-                    outputStrength * stageRoadTextureScale;
+                    outputStrength * materialRoadTextureScale;
                 splashTimer_ = 9;
             }
             if (splashTimer_ > 0)
