@@ -39,7 +39,21 @@ RANGES=[
  ("RankSibling_BBDxx_BC4xx",0x0BBD80,0x780),
  ("Third_dispMarkerCheck_caller",0x0BE980,0x280),
 ]
-KNOWN=dict(mod.KNOWN_TARGETS)\nKNOWN.update({\n  0x02D0C0: 'put_sprite_ex2_kind1',\n  0x0295D0: 'sprani_projected_world_helper_295D0',\n  0x028A10: 'sprani_core_28A10',\n  0x028AF0: 'sprani_core_28AF0',\n  0x028EA0: 'sprani_build_args2_28EA0',\n  0x029460: 'sprani_emit_29460',\n  0x02A0A0: 'draw_sprite_plain',\n  0x02A3A0: 'draw_sprite_custom_matrix',\n  0x02A800: 'draw_sprite_custom_matrix_alt',\n  0x02C0F0: 'draw_sprite_kind0_helper',\n  0x02DDF0: 'sprite_texture_metrics_2DDF0',\n  0x029C60: 'sprite_batch_begin_29C60',\n})
+KNOWN=dict(mod.KNOWN_TARGETS)
+KNOWN.update({
+  0x02D0C0: 'put_sprite_ex2_kind1',
+  0x0295D0: 'sprani_projected_world_helper_295D0',
+  0x028A10: 'sprani_core_28A10',
+  0x028AF0: 'sprani_core_28AF0',
+  0x028EA0: 'sprani_build_args2_28EA0',
+  0x029460: 'sprani_emit_29460',
+  0x02A0A0: 'draw_sprite_plain',
+  0x02A3A0: 'draw_sprite_custom_matrix',
+  0x02A800: 'draw_sprite_custom_matrix_alt',
+  0x02C0F0: 'draw_sprite_kind0_helper',
+  0x02DDF0: 'sprite_texture_metrics_2DDF0',
+  0x029C60: 'sprite_batch_begin_29C60',
+})
 for rva,label in mod.KNOWN_CALL_SITES.items():
     KNOWN[rva]=label
 
@@ -51,14 +65,58 @@ def fmt_target(ins):
     label=KNOWN.get(rva,"")
     return f" ; target_rva=0x{rva:08X}" + (f" {label}" if label else "")
 
-WATCH_ABS = {\n    0x0095D8A0: 'renderer_projection',\n    0x0089B564: 'sprite_matrix_stack_ptr',\n    0x0089B568: 'sprite_matrix_stack_depth',\n    0x00956C00: 'sprite_priority_roots',\n    0x00986B28: 'sprani_deferred_flag',\n    0x00986B30: 'sprani_deferred_index',\n}\n\ndef full_text_xrefs(pe, md):\n    text_section = pe.section('.text')\n    if not text_section:\n        return [], []\n    blob = pe.data[text_section.raw_pointer:text_section.raw_pointer + text_section.raw_size]\n    calls, datarefs = [], []\n    for ins in md.disasm(blob, pe.image_base + text_section.virtual_address):\n        irva = ins.address - pe.image_base\n        if ins.mnemonic == 'call' and ins.operands and ins.operands[0].type == X86_OP_IMM:\n            trva = ((ins.operands[0].imm & 0xffffffff) - pe.image_base) & 0xffffffff\n            if trva in KNOWN:\n                frva = mod.guess_function_start(blob, text_section.virtual_address, irva - text_section.virtual_address)\n                calls.append((irva, trva, KNOWN[trva], frva))\n        for op in ins.operands:\n            if op.type == X86_OP_MEM and op.mem.base == 0 and op.mem.index == 0:\n                va = op.mem.disp & 0xffffffff\n                if va in WATCH_ABS:\n                    frva = mod.guess_function_start(blob, text_section.virtual_address, irva - text_section.virtual_address)\n                    datarefs.append((irva, va, WATCH_ABS[va], frva))\n    return calls, datarefs\n\ndef main():
+WATCH_ABS = {
+    0x0095D8A0: 'renderer_projection',
+    0x0089B564: 'sprite_matrix_stack_ptr',
+    0x0089B568: 'sprite_matrix_stack_depth',
+    0x00956C00: 'sprite_priority_roots',
+    0x00986B28: 'sprani_deferred_flag',
+    0x00986B30: 'sprani_deferred_index',
+}
+
+def full_text_xrefs(pe, md):
+    text_section = pe.section('.text')
+    if not text_section:
+        return [], []
+    blob = pe.data[text_section.raw_pointer:text_section.raw_pointer + text_section.raw_size]
+    calls, datarefs = [], []
+    for ins in md.disasm(blob, pe.image_base + text_section.virtual_address):
+        irva = ins.address - pe.image_base
+        if ins.mnemonic == 'call' and ins.operands and ins.operands[0].type == X86_OP_IMM:
+            trva = ((ins.operands[0].imm & 0xffffffff) - pe.image_base) & 0xffffffff
+            if trva in KNOWN:
+                frva = mod.guess_function_start(blob, text_section.virtual_address, irva - text_section.virtual_address)
+                calls.append((irva, trva, KNOWN[trva], frva))
+        for op in ins.operands:
+            if op.type == X86_OP_MEM and op.mem.base == 0 and op.mem.index == 0:
+                va = op.mem.disp & 0xffffffff
+                if va in WATCH_ABS:
+                    frva = mod.guess_function_start(blob, text_section.virtual_address, irva - text_section.virtual_address)
+                    datarefs.append((irva, va, WATCH_ABS[va], frva))
+    return calls, datarefs
+
+def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--exe",type=Path,required=True)
     ap.add_argument("--out",type=Path,required=True)
     a=ap.parse_args()
     pe=mod.parse_pe(a.exe.read_bytes())
     md=Cs(CS_ARCH_X86,CS_MODE_32); md.detail=True
-    out=["# R57 targeted deep disassembly","",f"EXE image base: 0x{pe.image_base:08X}",""]\n    calls, datarefs = full_text_xrefs(pe, md)\n    out += ["## Full-text direct call cross-references","",\n            "| Call RVA | Function start guess | Target RVA | Target |",\n            "|---:|---:|---:|---|"]\n    for crva,trva,label,frva in calls:\n        fr = "-" if frva is None else f"0x{frva:08X}"\n        out.append(f"| 0x{crva:08X} | {fr} | 0x{trva:08X} | {label} |")\n    out += ["","## Full-text watched data references","",\n            "| Ref RVA | Function start guess | Absolute VA | Meaning |",\n            "|---:|---:|---:|---|"]\n    for rrva,va,label,frva in datarefs:\n        fr = "-" if frva is None else f"0x{frva:08X}"\n        out.append(f"| 0x{rrva:08X} | {fr} | 0x{va:08X} | {label} |")\n    out += [""]
+    out=["# R57 targeted deep disassembly","",f"EXE image base: 0x{pe.image_base:08X}",""]
+    calls, datarefs = full_text_xrefs(pe, md)
+    out += ["## Full-text direct call cross-references","",
+            "| Call RVA | Function start guess | Target RVA | Target |",
+            "|---:|---:|---:|---|"]
+    for crva,trva,label,frva in calls:
+        fr = "-" if frva is None else f"0x{frva:08X}"
+        out.append(f"| 0x{crva:08X} | {fr} | 0x{trva:08X} | {label} |")
+    out += ["","## Full-text watched data references","",
+            "| Ref RVA | Function start guess | Absolute VA | Meaning |",
+            "|---:|---:|---:|---|"]
+    for rrva,va,label,frva in datarefs:
+        fr = "-" if frva is None else f"0x{frva:08X}"
+        out.append(f"| 0x{rrva:08X} | {fr} | 0x{va:08X} | {label} |")
+    out += [""]
     for name,rva,size in RANGES:
         blob=pe.bytes_at_rva(rva,size)
         out += [f"## {name} RVA 0x{rva:08X}..0x{rva+size:08X}","", "\`\`\`asm"]
