@@ -219,10 +219,8 @@ namespace OutRunVrR23RuntimeHardening
         // Once CopySharedFrameToSafeEyes completed, SafeEye is host-owned and
         // independent of producer ring reuse. Reuse it directly even when the
         // original Frame.v2 slot has already advanced/been overwritten.
-        const bool safeAlreadyOwned = SafeFrameId == frame.frameId &&
-            SafeTransportGeneration ==
-                frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex] &&
-            SafeEyeSrv[0] && SafeEyeSrv[1];
+        const bool safeAlreadyOwned =
+            OutRunVrD3D9ExDirectPassthrough::SafeEyeIdentityMatchesR32(frame);
         if (!safeAlreadyOwned && !EnsureSafeFrame(frame.frameId))
         {
             RecordFinalSubmission(frame.frameId, kind, false);
