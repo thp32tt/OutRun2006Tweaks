@@ -1,0 +1,37 @@
+{
+  "batch": "43-final-pending-source-byte-gate",
+  "updated_at_kst": "2026-09-26T09:00:00+09:00",
+  "branch": "korean-localization-clean",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "status": "blocked_keep_original",
+  "checkpoint_before": {
+    "reviewed_assets": 32,
+    "localized_candidates": 31,
+    "pending": 1
+  },
+  "evidence_reviewed": [
+    "localization/graphics/ORIENTATION_POLICY.md",
+    "localization/graphics/SOURCE_FAITHFUL_CURRENT.json",
+    "localization/resume_state.json",
+    "localization/progress/STATUS.md",
+    "localization/graphics/BATCH41_REJECTED_REPORT.json",
+    "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json"
+  ],
+  "file_retrieval": {
+    "exact_original_analysis_archive_available": false,
+    "exact_original_dds_available": false,
+    "exact_batch41_candidate_available": false,
+    "note": "Accessible file search returned inventory/manifest metadata but not the exact source archive, original DDS, or Batch41 candidate bytes."
+  },
+  "checklist": {
+    "original_dds_orientation": "cannot newly byte-verify in this run; no edit allowed",
+    "preserve_vehicle_brand_logo_song_legal": "mandatory",
+    "source_style_weight_color_outline_ratio": "mandatory",
+    "original_text_region_containment": "prior Batch41 pass only; insufficient alone for promotion",
+    "artifact_cleanliness": "prior Batch41 fail: residual English in blue Mode and black 15-course cards",
+    "black_lines_crop_seams_erasure_alpha_halo_clipping": "must all pass before promotion"
+  },
+  "action": "KEEP_ORIGINAL",
+  "promotion": false,
+  "next_executable_step": "Resume pixel work only when exact original DDS and candidate bytes are available; reconstruct only blue/black text interiors while preserving gradients/icons and require zero residual English plus full containment."
+}
