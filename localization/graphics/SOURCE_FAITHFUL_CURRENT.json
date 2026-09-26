@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-26T13:00:28+09:00",
+  "updated_at_kst": "2026-09-26T16:00:00+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -11,9 +11,9 @@
   ],
   "mandatory_policy": "localization/graphics/ORIENTATION_POLICY.md",
   "automation_checkpoint": {
-    "run": "interactive-full32-strict-reset-20260926",
-    "result": "full32_strict_promotion_hold",
-    "note": "Actual DDS full-package scan + pixel-exact contact-sheet review reset promotion eligibility. 24 REWORK_REQUIRED, 8 ZOOM_MANUAL_REQUIRED, 0 strict PASS. Legacy 31 localized_candidates is retained only as package-history count, not strict approval."
+    "run": "batch58-a-canonical-p0-rework-preflight-20260926",
+    "result": "canonical_source_recovered_p0_ready_no_promotion",
+    "note": "Batch57 canonical source recovery supersedes stale source-unavailable checkpoint. Strict state remains 24 REWORK_REQUIRED / 8 ZOOM_MANUAL_REQUIRED / 0 PASS; P0 original-only rework may proceed."
   },
   "latest_promoted_batch": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
   "latest_rejected_batch": "localization/graphics/BATCH51_REJECTED_REPORT.json",
@@ -93,5 +93,6 @@
       "E3FD08BE"
     ],
     "batch56_source_identity": "SUPERSEDED"
-  }
+  },
+  "latest_p0_rework_preflight_report": "localization/graphics/BATCH58_A_CANONICAL_P0_REWORK_PREFLIGHT_REPORT.json"
 }
