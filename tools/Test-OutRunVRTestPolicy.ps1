@@ -60,7 +60,7 @@ $requiredFiles = @(
     'Select-OutRunVRBackend.ps1',
     'Run-OutRunVRTest.ps1',
     'Collect-OutRunVRLogs.ps1',
-    'OutRunVR-Backend-Selector.ps1'
+    'OutRunVR-Test-Selector.ps1'
 )
 $text = @{}
 $parseTargets = @('OutRunVR-TestProfiles.ps1') + $requiredFiles
@@ -79,9 +79,35 @@ Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'Get-OutRunVRTestProfile') 'ru
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'TEST_PROFILE') 'collector manifest must record profile'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match '\$variant/\$profile/\$session') 'collector path must separate Variant/Profile/Session'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'captureRoot') 'collector must include capture bundles'
-Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'CORRECTNESS') 'GUI must expose CORRECTNESS'
-Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'CONTROL') 'GUI must expose CONTROL'
-Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'PERFORMANCE') 'GUI must expose PERFORMANCE'
+$r56Variants=@(
+    'R56_01_ZERO',
+    'R56_02_SCALE35',
+    'R56_03_WORLD35',
+    'R56_04_RANKZERO',
+    'R56_05_POSITION_XP96',
+    'R56_06_POSITION_XM96',
+    'R56_07_POSITION_XS35',
+    'R56_08_POSITION_XCENTER',
+    'R56_09_RANK13_XP96',
+    'R56_10_RANK13_XM96',
+    'R56_11_RANK13_YM72',
+    'R56_12_RANK13_CENTER',
+    'R56_13_RANK46_XP96',
+    'R56_14_RANK46_YM72',
+    'R56_15_RANK46_CENTER',
+    'R56_16_RANK13_AS_HUD',
+    'R56_17_RANK46_AS_HUD',
+    'R56_18_RANK46_NEXTDRAW',
+    'R56_19_POSITION_NEXTDRAW',
+    'R56_20_ALLSCREEN_RAW'
+)
+foreach($id in $r56Variants){
+    Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match [regex]::Escape($id)) "single GUI must expose $id"
+    Assert-True ($text['Run-OutRunVRTest.ps1'] -match [regex]::Escape($id)) "runner must map $id"
+}
+Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'OUTRUN_VR_HUD_PROBE') 'runner must set the R56 runtime probe selector'
+Assert-True (-not (Test-Path (Join-Path $root 'OutRunVR-Backend-Selector.ps1'))) 'obsolete backend GUI selector must stay removed'
+Assert-True (-not (Test-Path (Join-Path $root 'OutRunVR-Slot-Selector.ps1'))) 'obsolete slot GUI selector must stay removed'
 
 $watchdogPath = Join-Path $repoRoot 'vrhost/src/diagnostics/runtime_watchdog.cpp'
 Assert-True (Test-Path $watchdogPath) 'runtime watchdog source missing'
@@ -113,4 +139,4 @@ Assert-True ($state.testProfiles.CORRECTNESS.defaultUserTest -eq $true) 'CORRECT
 Assert-True ($state.testProfiles.CONTROL.defaultUserTest -eq $false) 'CONTROL must be optional'
 Assert-True ($state.testProfiles.PERFORMANCE.defaultUserTest -eq $false) 'PERFORMANCE must be optional'
 
-Write-Host 'VR test policy verification passed: profile identity, runtime defaults, session/log separation, GUI exposure, bounded Ctrl+F9 capture, single-active CI and TEST_LEVEL state are consistent.'
+Write-Host 'VR test policy verification passed: profile identity, runtime defaults, session/log separation, single user-facing semantic selector, bounded Ctrl+F9 capture, single-active CI and TEST_LEVEL state are consistent.'
