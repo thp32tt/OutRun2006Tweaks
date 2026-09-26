@@ -44,6 +44,8 @@ namespace Settings
 		"Renders true left/right geometry stereo into verified shared-eye transport. Menus use a LOCAL-space world-fixed mono quad so head rotation and translation remain 6DoF." };
 	Setting<bool> VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", true,
 		"Prefers guarded D3D9Ex shared-eye transport so gameplay can bypass Desktop Duplication. Disable to return to classic D3D9/SBS capture." };
+	Setting<bool> VRAllowThirdPartyD3D9Ex{ "VR", "AllowThirdPartyD3D9Ex", false,
+		"Experimental opt-in for Direct3DCreate9Ex supplied by a third-party d3d9 provider such as DXVK. Keep false unless that provider's CreateDeviceEx startup path is specifically being tested." };
 	Setting<bool> VRDirectGpuOnly{ "VR", "DirectGpuOnly", true,
 		"During gameplay, rejects classic Desktop-Duplication stereo candidates and keeps DirectGPU/cached OpenXR projection paths only. Menus remain mono on a world-fixed LOCAL-space quad." };
 	Setting<bool> VRDisableDesktopDuplication{ "VR", "DisableDesktopDuplication", false,
