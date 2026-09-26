@@ -1128,6 +1128,147 @@ public:
 
 UIScaling UIScaling::instance;
 
+// R61 diagnostic-only D3DXSprite provenance bridge. This does not Flush,
+// reorder, suppress, or otherwise alter the game's sprite batching. It only
+// records the semantic mix present when D3DXSprite::Draw queues work and marks
+// the natural Flush/End emission window so the D3D9 hooks can identify the real
+// device draw shape used by kind-0 sprites.
+class VRD3DXSpriteTrace : public Hook
+{
+	inline static SafetyHookInline Draw_hk{};
+	inline static SafetyHookInline Flush_hk{};
+	inline static SafetyHookInline End_hk{};
+	inline static std::atomic<std::uint64_t> DrawCalls{ 0 };
+	inline static std::atomic<std::uint64_t> FlushCalls{ 0 };
+	inline static std::atomic<std::uint64_t> EndCalls{ 0 };
+
+	using DrawFn = HRESULT(__stdcall*)(
+		void*, IDirect3DTexture9*, const RECT*,
+		const D3DVECTOR*, const D3DVECTOR*, D3DCOLOR);
+
+	static HRESULT __stdcall DrawDest(
+		void* self, IDirect3DTexture9* texture, const RECT* rect,
+		const D3DVECTOR* center, const D3DVECTOR* pos, D3DCOLOR color)
+	{
+		OutRunVR::GameSemantic::NoteD3DXSpriteQueuedDraw();
+		const auto hit = DrawCalls.fetch_add(
+			1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+		{
+			const auto* marker =
+				OutRunVR::GameSemantic::CurrentProjectedMarker();
+			spdlog::info(
+				"VR R61 D3DX DRAW QUEUE: scope={} node={} marker={} pos=({:.2f},{:.2f},{:.2f}) queued={}",
+				OutRunVR::GameSemantic::Name(
+					OutRunVR::GameSemantic::EffectiveScope()),
+				reinterpret_cast<std::uintptr_t>(
+					OutRunVR::GameSemantic::CurrentQueueNode()),
+				marker && marker->valid ? 1 : 0,
+				pos ? pos->x : 0.0f,
+				pos ? pos->y : 0.0f,
+				pos ? pos->z : 0.0f,
+				hit);
+		}
+		return Draw_hk.stdcall<HRESULT>(
+			self, texture, rect, center, pos, color);
+	}
+
+	static HRESULT __stdcall FlushDest(void* self)
+	{
+		const auto hit = FlushCalls.fetch_add(
+			1, std::memory_order_relaxed) + 1;
+		OutRunVR::GameSemantic::BeginD3DXSpriteEmission();
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R61 D3DX FLUSH BEGIN: generic={} hud={} world={} projected={} flushes={}",
+				OutRunVR::GameSemantic::D3DXEmissionGeneric,
+				OutRunVR::GameSemantic::D3DXEmissionScreenHud,
+				OutRunVR::GameSemantic::D3DXEmissionWorldBillboard,
+				OutRunVR::GameSemantic::D3DXEmissionProjectedWorld,
+				hit);
+		const HRESULT hr = Flush_hk.stdcall<HRESULT>(self);
+		OutRunVR::GameSemantic::EndD3DXSpriteEmission();
+		return hr;
+	}
+
+	static HRESULT __stdcall EndDest(void* self)
+	{
+		const auto hit = EndCalls.fetch_add(
+			1, std::memory_order_relaxed) + 1;
+		OutRunVR::GameSemantic::BeginD3DXSpriteEmission();
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R61 D3DX END BEGIN: generic={} hud={} world={} projected={} ends={}",
+				OutRunVR::GameSemantic::D3DXEmissionGeneric,
+				OutRunVR::GameSemantic::D3DXEmissionScreenHud,
+				OutRunVR::GameSemantic::D3DXEmissionWorldBillboard,
+				OutRunVR::GameSemantic::D3DXEmissionProjectedWorld,
+				hit);
+		const HRESULT hr = End_hk.stdcall<HRESULT>(self);
+		OutRunVR::GameSemantic::EndD3DXSpriteEmission();
+		return hr;
+	}
+
+	static DWORD WINAPI InstallThread(void*)
+	{
+		for (int attempt = 0; attempt < 7200; ++attempt)
+		{
+			void* sprite = *Module::exe_ptr<void*>(0x55B218);
+			if (sprite)
+			{
+				void** vtable = *reinterpret_cast<void***>(sprite);
+				if (vtable && vtable[9] && vtable[10] && vtable[11])
+				{
+					const auto disabled = safetyhook::InlineHook::StartDisabled;
+					Draw_hk = safetyhook::create_inline(
+						vtable[9], reinterpret_cast<void*>(&DrawDest), disabled);
+					Flush_hk = safetyhook::create_inline(
+						vtable[10], reinterpret_cast<void*>(&FlushDest), disabled);
+					End_hk = safetyhook::create_inline(
+						vtable[11], reinterpret_cast<void*>(&EndDest), disabled);
+					if (Draw_hk && Flush_hk && End_hk &&
+						Draw_hk.enable().has_value() &&
+						Flush_hk.enable().has_value() &&
+						End_hk.enable().has_value())
+					{
+						spdlog::info(
+							"VR R61 D3DX TRACE: Draw/Flush/End hooks ACTIVE; diagnostics only, no batching changes");
+						return 0;
+					}
+					Draw_hk = {};
+					Flush_hk = {};
+					End_hk = {};
+				}
+			}
+			Sleep(25);
+		}
+		spdlog::warn(
+			"VR R61 D3DX TRACE: global ID3DXSprite was not hookable; visual path unchanged");
+		return 0;
+	}
+
+public:
+	std::string_view description() override
+	{
+		return "VRD3DXSpriteTraceR61";
+	}
+	bool validate() override
+	{
+		return Settings::VREnabled.get();
+	}
+	bool apply() override
+	{
+		HANDLE thread = CreateThread(
+			nullptr, 0, InstallThread, nullptr, 0, nullptr);
+		if (!thread)
+			return false;
+		CloseHandle(thread);
+		return true;
+	}
+	static VRD3DXSpriteTrace instance;
+};
+VRD3DXSpriteTrace VRD3DXSpriteTrace::instance;
+
 // VR semantic bridge for the game's canonical queued 2D renderer.
 // Canonical replacement EXE SHA256:
 // 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3
