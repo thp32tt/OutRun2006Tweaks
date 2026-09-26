@@ -10,6 +10,7 @@
 // longer re-opens the same resources every frame.
 
 #include "d3d9ex_direct_passthrough.hpp"
+#include "vr/d3d9/r32_policy.hpp"
 
 #include <array>
 #include <cstdint>
@@ -286,15 +287,16 @@ namespace OutRunVrD3D9ExDirectPassthrough
     inline bool SafeEyeIdentityMatchesR32(
         const OutRunVR::SharedRenderFrameState& frame) noexcept
     {
-        const std::uint32_t generation =
-            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-        const std::uint32_t runGeneration =
-            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
-        return frame.frameId && generation && runGeneration && frame.clientPid &&
-            SafeFrameId == frame.frameId &&
-            SafeTransportGeneration == generation &&
-            SafeClientPid == frame.clientPid &&
-            SafeRunGeneration == runGeneration &&
+        const OutRunVR::R32::ProducerFrameIdentity owned{
+            SafeFrameId, SafeClientPid, SafeRunGeneration,
+            SafeTransportGeneration };
+        const OutRunVR::R32::ProducerFrameIdentity requested{
+            frame.frameId,
+            frame.clientPid,
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex],
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex] };
+        return OutRunVR::R32::ExactProducerFrameIdentityMatches(
+                owned, requested) &&
             SafeEyeSrv[0] && SafeEyeSrv[1];
     }
 
