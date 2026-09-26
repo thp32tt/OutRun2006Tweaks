@@ -106,3 +106,13 @@ Next gate: finish the final pending `37759842_1024x1024.dds` from original DDS, 
 - Exact DDS binaries are not committed to Git; no preview/report-derived pixel edit was promoted.
 - `C598919A` stale pending references were removed from resume metadata; it remains promoted by Batch38.
 - Report: `localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json`.
+
+
+### QA checkpoint 2026-09-26 09:40 KST
+- Reconciled the previously persisted Batch44 fallback against the current branch state.
+- Exact original `37759842_1024x1024.dds` SHA-256: `ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0`.
+- Batch44 automated containment passed: dimensions/header preserved; 0 changed pixels and 0 introduced-alpha pixels outside allowed regions.
+- Manual QA rejected Batch44: expanded blue-card cleanup flattened source card detail and residual English remained near several mode/15-course labels.
+- No unsafe DDS was integrated. Canonical state remains **32 reviewed / 31 retained / 1 pending**.
+- Report: `localization/graphics/BATCH44_REJECTED_REPORT.json`.
+- Next: isolate glyph pixels/text layers more precisely instead of enlarging reconstruction zones.
