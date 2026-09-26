@@ -38,8 +38,13 @@ jobs:
       - name: Targeted deep disassembly
         shell: pwsh
         run: python tools/reverse/r57_deep_disasm.py --exe OR2006C2C.EXE --out analysis/R57_TARGETED_DISASM.md
+      - name: Derive Calc3D2D inverse-projection facts
+        shell: pwsh
+        run: python tools/reverse/r57_projection_formula.py --exe OR2006C2C.EXE --out analysis/R57_PROJECTION_FORMULA.md
       - uses: actions/upload-artifact@v4
         with:
           name: R57-targeted-disasm-${{ github.sha }}
-          path: analysis/R57_TARGETED_DISASM.md
+          path: |
+            analysis/R57_TARGETED_DISASM.md
+            analysis/R57_PROJECTION_FORMULA.md
           if-no-files-found: error
