@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-26T11:15:00+09:00",
+  "updated_at_kst": "2026-09-26T13:00:28+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -11,9 +11,9 @@
   ],
   "mandatory_policy": "localization/graphics/ORIENTATION_POLICY.md",
   "automation_checkpoint": {
-    "run": "automation-A-20260926-1115",
-    "result": "batch53_fallback_reconciled_metadata_synced",
-    "note": "Batch53 is canonical. Older fallback patches were not replayed. 37759842 remains original-safe; no binary candidate promoted without exact source bytes."
+    "run": "interactive-full32-strict-reset-20260926",
+    "result": "full32_strict_promotion_hold",
+    "note": "Actual DDS full-package scan + pixel-exact contact-sheet review reset promotion eligibility. 24 REWORK_REQUIRED, 8 ZOOM_MANUAL_REQUIRED, 0 strict PASS. Legacy 31 localized_candidates is retained only as package-history count, not strict approval."
   },
   "latest_promoted_batch": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
   "latest_rejected_batch": "localization/graphics/BATCH51_REJECTED_REPORT.json",
@@ -22,5 +22,60 @@
   ],
   "latest_safe_hold_report": "localization/graphics/BATCH43_FINAL_PENDING_SOURCE_BYTE_GATE_REPORT.json",
   "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
-  "latest_fallback_reconcile_report": "localization/graphics/BATCH53_FALLBACK_RECONCILE_REPORT.json"
+  "latest_fallback_reconcile_report": "localization/graphics/BATCH53_FALLBACK_RECONCILE_REPORT.json",
+  "strict_qa": {
+    "policy_version": "STRICT-PIXEL-20260926",
+    "promotion_hold": true,
+    "package_assets_scanned": 32,
+    "auto_risk_flagged": 19,
+    "rework_required": 24,
+    "zoom_manual_required": 8,
+    "strict_pass": 0,
+    "user_rejected": [
+      "841E796B",
+      "EBEF6D20",
+      "571E78F3",
+      "62BEBF33",
+      "E3FD08BE"
+    ],
+    "rework_required_assets": [
+      "D6DC1380",
+      "2EA557B4",
+      "7CE1CFC5",
+      "48DEBE77",
+      "EBEF6D20",
+      "43B07A77",
+      "1A43E9D9",
+      "37759842",
+      "4F68708E",
+      "571E78F3",
+      "62BEBF33",
+      "788CE557",
+      "841E796B",
+      "C075FB49",
+      "D41D0B1",
+      "E3FD08BE",
+      "F6811E94",
+      "12519155",
+      "1762489B",
+      "2B0863D6",
+      "39BCA907",
+      "4EDA9DE3",
+      "9CE4E175",
+      "C05E67EF"
+    ],
+    "zoom_manual_required_assets": [
+      "C598919A",
+      "2DA43E41",
+      "411827E",
+      "42E618FD",
+      "53CE39D5",
+      "560FA536",
+      "49BB5FE5",
+      "ACF61D7C"
+    ],
+    "report": "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json",
+    "note": "No previous PASS/retained/promoted decision is grandfathered. Per-text-cell/mask + 1x/2x manual QA is required before strict PASS."
+  },
+  "latest_strict_reset_report": "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json"
 }
