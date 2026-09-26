@@ -161,14 +161,19 @@ jobs:
             'vrhost/src/runtime/r23_runtime_hardening.hpp' = @(
               'ExpectedDirectDxgiFormat',
               'DirectSafeEyeMatchesCommittedFrame',
-              'SafeTransportGeneration'
+              'SafeEyeIdentityMatchesR32'
             )
             'vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp' = @(
               'R32SharedSlotCache',
               'R32InactiveEye',
+              'SafeEyeIdentityMatchesR32',
+              'ExactProducerFrameIdentityMatches',
+              'SafeClientPid',
+              'SafeRunGeneration',
               'queued copy cannot mutate SafeFrameId image identity'
             )
             'vrhost/src/runtime/r32_direct_submit.hpp' = @(
+              'PrepareConsumptionFenceSlot',
               'ArmConsumptionFence',
               'D3D11_ASYNC_GETDATA_DONOTFLUSH',
               'flushIssued',
@@ -178,8 +183,9 @@ jobs:
               'presentation-authoritative while its exact producer slot stays protected'
             )
             'vrhost/src/runtime/sbs_capture_override.hpp' = @(
-              'Preserve acquiredImage',
-              'bool acquired = false',
+              'SwapchainImageState::Acquired',
+              'XR_TIMEOUT_EXPIRED',
+              'retry xrWaitSwapchainImage on a later XR',
               'Release(Projection);',
               'Release(Theater);'
             )

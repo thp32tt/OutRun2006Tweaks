@@ -56,7 +56,9 @@ r32 = require(
     "OutRunWvpRegisterCount",
     "R32WaitProducerFence",
     "QueryPerformanceCounter",
-    "static const LONGLONG qpcFrequency",
+    "R32QpcFrequency",
+    "QueryPerformanceFrequency",
+    "R32QpcTicksToUs",
     "Budget starts before the FLUSH request",
     "R32ProducerFencePending",
     "R32DrainPendingProducerFence",
@@ -226,7 +228,10 @@ require(
 host_direct = require(
     "vrhost/src/runtime/r32_direct_submit.hpp",
     "CanFastSubmit",
-    "AckFaultGeneration",
+    "AckIdentity",
+    "FrameAckIdentity",
+    "SameAckIdentity",
+    "AckFaultIdentity",
     "Completion is unknowable",
     "SafeEye fallback perform a separately fenced copy/ACK",
     "ProjectionMatchesSnapshot",
@@ -236,22 +241,70 @@ host_direct = require(
     "deferred until actual direct-ring slot pressure",
     "PublishCompletedFrame",
     "AckedFrame",
-    "AckedGeneration",
+    "AckedIdentity",
+    "SameFrameAckIdentity",
+    "PendingSkippedRelease",
+    "QueueSkippedRelease",
+    "PollSkippedReleases",
+    "HasPendingConsumption",
+    "SkippedReleaseQueued",
+    "skippedAck[queued=",
     "R32 direct PERF 5s",
     "verified incoming DirectGPU projection submitted once",
     "OutRunVrR26RecenterHardening::EndFrame",
+    "Preserve incomplete EVENT owners across that boundary",
 )
 # Flush remains permitted only in the slot-pressure escalation block. Reject the
 # old unconditional End(query)+Flush() sequence.
 if "Context->End(pending.fence);\n        OutRunVrFinalTest::Context->Flush();" in host_direct:
     raise SystemExit("R32 host must not Flush every direct frame")
 query_error = host_direct.find("if (FAILED(hr))")
-fault_generation = host_direct.find("AckFaultGeneration = generation", query_error)
-fast_gate = host_direct.find("AckFaultGeneration == generation")
-if min(query_error, fault_generation, fast_gate) < 0:
-    raise SystemExit("R32 host ACK query failure must disable fast-submit for that generation")
-if not (query_error < fault_generation < fast_gate):
-    raise SystemExit("R32 host ACK fault must be recorded before the fast-submit generation gate")
+fault_identity = host_direct.find("AckFaultIdentity = identity", query_error)
+can_fast_submit = host_direct.find("inline bool CanFastSubmit")
+fast_gate = host_direct.find(
+    "SameAckIdentity(AckFaultIdentity, identity)", can_fast_submit)
+if min(query_error, fault_identity, can_fast_submit, fast_gate) < 0:
+    raise SystemExit(
+        "R32 host ACK query failure must disable fast-submit for the exact producer run")
+if not (query_error < fault_identity < fast_gate):
+    raise SystemExit(
+        "R32 host ACK fault identity must be recorded before the fast-submit run gate")
+if "AckFaultGeneration" in host_direct or "AckedGeneration" in host_direct:
+    raise SystemExit(
+        "R32 host ACK cache regressed to transport-generation-only identity")
+
+ack_contract = require(
+    "src/vr/ipc/direct_ack_r13.hpp",
+    "DirectGpuAckVersion = 2",
+    "clientPid",
+    "runGeneration",
+    "DirectGpuAckIdentityMatches",
+)
+if "DirectGpuAckVersion = 1" in ack_contract:
+    raise SystemExit("run-identity DirectGPU ACK protocol must not reuse v1 semantics")
+
+host_r23_lifetime = require(
+    "vrhost/src/main_r23.cpp",
+    "R48DirectTouched",
+    "R48RetireNeverTouchedDirectFramesThrough",
+    "QueueSkippedRelease(frame)",
+    "SameFrameAckIdentity",
+    "PrepareConsumptionFenceSlot(frame)",
+    "ArmConsumptionFence(frame)",
+)
+stage_start = host_r23_lifetime.find("bool R23StageDirectHold")
+preflight = host_r23_lifetime.find(
+    "PrepareConsumptionFenceSlot(frame)", stage_start)
+touch = host_r23_lifetime.find("R48DirectTouched[slot] = frame", preflight)
+copy_left = host_r23_lifetime.find(
+    "c.context_->CopyResource(R23DirectHold.eye[0]", touch)
+copy_right = host_r23_lifetime.find(
+    "c.context_->CopyResource(R23DirectHold.eye[1]", copy_left)
+arm = host_r23_lifetime.find("ArmConsumptionFence(frame)", copy_right)
+if min(stage_start, preflight, touch, copy_left, copy_right, arm) < 0 or not (
+        stage_start < preflight < touch < copy_left < copy_right < arm):
+    raise SystemExit(
+        "DirectGPU must secure an unowned EVENT before touch/copy, record touched identity immediately before the copies, then arm that exact EVENT after both eye copies")
 
 r34 = require(
     "src/vr/d3d9/stereo_renderer_r34.cpp",

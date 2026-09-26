@@ -212,6 +212,10 @@ settings = require(
     "OUTRUN_VR_CADENCE_MODE",
     "OUTRUN_VR_CADENCE_TARGET_HZ",
     "OUTRUN_VR_CADENCE_MAX_HZ",
+    "IsCurrentGameOwnedHostEntry",
+    "IsCurrentGameOwnedHostPid",
+    "entry.th32ParentProcessID == GetCurrentProcessId()",
+    "ownedByCurrentGame",
 )
 
 # R23 installer workers may only request cleanup. Live OutRun camera/projection
@@ -397,7 +401,8 @@ require(
     "R37BootstrapSubmittedGeneration",
     "R37FrameIdBefore",
     "DirectGPU latest-frame-wins active",
-    "PublishCompletedFrame(frame)",
+    "QueueSkippedRelease(frame)",
+    "PrepareConsumptionFenceSlot(frame)",
     "!R37FrameIdBefore(",
     "lastProcessedStereoFrame",
     "allowInitialWarmupWait",

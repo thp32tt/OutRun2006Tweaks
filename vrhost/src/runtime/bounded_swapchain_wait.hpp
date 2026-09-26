@@ -3,9 +3,10 @@
 // Bound XR_INFINITE_DURATION waits so a wedged runtime/driver cannot leave the
 // host process alive forever while the headset shows only black. Finite waits
 // requested by callers are preserved exactly. Infinite waits are sliced into
-// short waits and converted to XR_ERROR_RUNTIME_FAILURE after the total budget;
-// callers that can degrade return to their fallback path, while the main host
-// exits through its existing exception/cleanup path instead of hanging.
+// short waits and returned as XR_TIMEOUT_EXPIRED after the total budget.
+// Fallback swapchains keep the already-acquired image and retry its wait on a
+// later frame; main compositor callers may still choose to restart the host.
+// Never fabricate XR_ERROR_RUNTIME_FAILURE for a runtime that only timed out.
 
 #include <Windows.h>
 #include <openxr/openxr.h>
@@ -42,9 +43,9 @@ namespace OutRunVrBoundedSwapchainWait
                         true, std::memory_order_acq_rel))
                 {
                     std::cerr
-                        << "[R24] xrWaitSwapchainImage exceeded 250ms; aborting the wait so the host can recover/exit instead of hanging on a black frame\n";
+                        << "[R24] xrWaitSwapchainImage exceeded 250ms; returning a recoverable timeout instead of poisoning the swapchain or hanging on black\n";
                 }
-                return XR_ERROR_RUNTIME_FAILURE;
+                return XR_TIMEOUT_EXPIRED;
             }
             SwitchToThread();
         }

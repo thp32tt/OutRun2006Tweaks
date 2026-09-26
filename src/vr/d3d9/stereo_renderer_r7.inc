@@ -291,32 +291,73 @@ namespace OutRunVRStereo
 			}
 		}
 
-		bool HostRenderEligible()
+		bool ReadFreshHostFlags(std::uint32_t& flags)
 		{
+			flags = 0;
 			if (!SharedState || SharedState->magic != OutRunVR::SharedMagic ||
 				SharedState->protocolVersion != OutRunVR::SharedProtocolVersion ||
 				SharedState->structSize != sizeof(OutRunVR::SharedPoseState))
 				return false;
-			const std::uint32_t flags = SharedState->flags;
 
-			// Game-side stereo source generation is gated only by hard host
-			// liveness/visibility. XrFrameState::shouldRender is transient compositor
-			// advice to the x64 host; using it here used to zero the SBS frame metadata
-			// and tear down the eye source for several Presents even though the host
-			// heartbeat/session remained healthy. The host still decides independently
-			// whether a given OpenXR frame submits a layer.
+			std::uint32_t hostPid = 0;
+			LONGLONG sampleQpc = 0;
+			bool stable = false;
+			for (int attempt = 0; attempt < 4; ++attempt)
+			{
+				const std::uint32_t before = SharedState->sequence;
+				if (before & 1u)
+					continue;
+				MemoryBarrier();
+				flags = SharedState->flags;
+				hostPid = SharedState->hostPid;
+				sampleQpc = SharedState->sampleQpc;
+				MemoryBarrier();
+				const std::uint32_t after = SharedState->sequence;
+				if (before == after && !(after & 1u))
+				{
+					stable = true;
+					break;
+				}
+			}
+			if (!stable || hostPid == 0 || sampleQpc <= 0)
+				return false;
+
+			static LARGE_INTEGER frequency{};
+			if (frequency.QuadPart <= 0 && !QueryPerformanceFrequency(&frequency))
+				return false;
+			LARGE_INTEGER now{};
+			if (!QueryPerformanceCounter(&now) || frequency.QuadPart <= 0)
+				return false;
+			const LONGLONG ageTicks = now.QuadPart - sampleQpc;
+			const LONGLONG maxAgeTicks = (frequency.QuadPart * 500) / 1000;
+			return ageTicks >= 0 && ageTicks <= maxAgeTicks;
+		}
+
+		bool HostRenderEligible()
+		{
+			std::uint32_t flags = 0;
+			if (!ReadFreshHostFlags(flags))
+				return false;
+
+			// Game-side stereo source generation is gated by a fresh host
+			// heartbeat plus hard liveness/visibility. XrFrameState::shouldRender
+			// remains transient compositor advice and is not used here.
 			return (flags & OutRunVR::HostAlive) != 0 &&
 				(flags & OutRunVR::SessionVisible) != 0;
 		}
 
 		bool HostDirectTransportSupported()
 		{
-			return SharedState && (SharedState->flags & OutRunVR::HostDirectGpuTransport) != 0;
+			std::uint32_t flags = 0;
+			return ReadFreshHostFlags(flags) &&
+				(flags & OutRunVR::HostDirectGpuTransport) != 0;
 		}
 
 		bool HostDirectTransportReady()
 		{
-			return SharedState && (SharedState->flags & OutRunVR::HostDirectGpuReady) != 0;
+			std::uint32_t flags = 0;
+			return ReadFreshHostFlags(flags) &&
+				(flags & OutRunVR::HostDirectGpuReady) != 0;
 		}
 
 		bool StereoWanted()

@@ -645,8 +645,14 @@ namespace OutRunVRD3D9ExUpgrade
                     AddRef();
                     return S_OK;
                 }
-                if (riid == __uuidof(IDirect3D9Ex) && ex_)
-                    return ex_->QueryInterface(riid, object);
+                if (riid == __uuidof(IDirect3D9Ex))
+                {
+                    // This object intentionally presents the legacy IDirect3D9
+                    // contract. Returning the raw Ex factory would let callers
+                    // bypass CreateDevice promotion/fallback and its managed/
+                    // Reset compatibility ownership.
+                    return E_NOINTERFACE;
+                }
                 return fallback_ ? fallback_->QueryInterface(riid, object) : E_NOINTERFACE;
             }
 
@@ -833,6 +839,16 @@ namespace OutRunVRD3D9ExUpgrade
             HMODULE provider = nullptr;
             const bool systemProvider =
                 IsSystemModuleForAddress(reinterpret_cast<const void*>(OriginalDirect3DCreate9), provider);
+            const auto createEx = provider
+                ? reinterpret_cast<Direct3DCreate9ExFn>(
+                    GetProcAddress(provider, "Direct3DCreate9Ex"))
+                : nullptr;
+
+            // Never mix a third-party Direct3DCreate9 object with the system
+            // Direct3DCreate9Ex provider. If the same provider that supplied
+            // Direct3DCreate9 also exports Direct3DCreate9Ex (for example a
+            // DXVK build with Ex support), it is safe to probe that provider's
+            // own Ex path while retaining its own classic object as fallback.
             if (!systemProvider)
             {
                 if (!ThirdPartyLogged.exchange(true))
@@ -840,20 +856,26 @@ namespace OutRunVRD3D9ExUpgrade
                     char providerPath[MAX_PATH]{};
                     const DWORD providerPathLen = provider
                         ? GetModuleFileNameA(provider, providerPath, MAX_PATH) : 0;
-                    const bool hasCreate9Ex = provider &&
-                        GetProcAddress(provider, "Direct3DCreate9Ex") != nullptr;
-                    spdlog::warn(
-                        "VR D3D9Ex upgrade: third-party d3d9 provider detected; path='{}' Direct3DCreate9Ex={} device upgrade skipped to preserve wrapper compatibility",
-                        providerPathLen ? providerPath : "<unknown>",
-                        hasCreate9Ex);
+                    if (createEx)
+                    {
+                        spdlog::info(
+                            "VR D3D9Ex upgrade: third-party provider-local Ex path enabled; path='{}'; system/third-party object mixing remains forbidden",
+                            providerPathLen ? providerPath : "<unknown>");
+                    }
+                    else
+                    {
+                        spdlog::warn(
+                            "VR D3D9Ex upgrade: third-party d3d9 provider has no provider-local Direct3DCreate9Ex; path='{}'; keeping classic provider path",
+                            providerPathLen ? providerPath : "<unknown>");
+                    }
                 }
+                if (!createEx)
+                    return fallback;
+            }
+            else if (!createEx)
+            {
                 return fallback;
             }
-
-            const auto createEx = reinterpret_cast<Direct3DCreate9ExFn>(
-                GetProcAddress(provider, "Direct3DCreate9Ex"));
-            if (!createEx)
-                return fallback;
 
             IDirect3D9Ex* ex = nullptr;
             const HRESULT hr = createEx(sdkVersion, &ex);

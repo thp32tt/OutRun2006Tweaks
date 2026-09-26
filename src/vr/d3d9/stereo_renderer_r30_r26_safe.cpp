@@ -178,6 +178,8 @@ namespace OutRunVRStereo
         std::uint64_t R30ShadowReadHits = 0;
         std::uint64_t R30ShadowReadMisses = 0;
         std::uint64_t R30ShadowDiscardInvalidations = 0;
+        // Telemetry marker only: actual capture is scoped by membership in
+        // the per-resource shadow registries below.
         std::atomic<bool> R30BufferShadowCaptureArmed{ false };
         bool R30FirstShadowMissLogged = false;
         bool R30FirstShadowArmLogged = false;
@@ -367,67 +369,146 @@ namespace OutRunVRStereo
         bool R30CopyVertexShadow(IDirect3DVertexBuffer9* buffer,
             UINT offset, UINT size, std::vector<std::uint8_t>& out)
         {
-            const auto entry = R30FindVertexShadow(buffer);
+            const auto entry = R30EnsureVertexShadow(buffer);
             if (!entry)
             {
                 ++R30ShadowReadMisses;
                 return false;
             }
-            std::lock_guard<std::mutex> lock(entry->mutex);
-            if (offset > entry->size || size > entry->size - offset ||
-                entry->bytes.size() != entry->size ||
-                !R30RangeValid(entry->valid, offset, offset + size))
             {
-                ++R30ShadowReadMisses;
-                if (!R30FirstShadowMissLogged)
+                std::lock_guard<std::mutex> lock(entry->mutex);
+                if (offset <= entry->size && size <= entry->size - offset &&
+                    entry->bytes.size() == entry->size &&
+                    R30RangeValid(entry->valid, offset, offset + size))
                 {
-                    R30FirstShadowMissLogged = true;
-                    spdlog::info(
-                        "VR R30.6 BUFFER SHADOW: draw-time GPU Lock removed; an unobserved VB/IB range will fail open until the game's next write Lock/Unlock supplies CPU bytes");
+                    try
+                    {
+                        out.resize(size);
+                        std::memcpy(out.data(), entry->bytes.data() + offset, size);
+                    }
+                    catch (...)
+                    {
+                        return false;
+                    }
+                    ++R30ShadowReadHits;
+                    return true;
                 }
-                return false;
             }
-            try
+
+            // Existing static buffers can predate the R30 creation hook and may
+            // never receive another write Lock. Prefer correctness over the old
+            // lazy policy: perform one bounded READONLY seed on the first missing
+            // range, cache those bytes, then all later draws remain shadow-only.
+            void* data = nullptr;
+            if (offset <= entry->size && size <= entry->size - offset)
             {
-                out.resize(size);
-                std::memcpy(out.data(), entry->bytes.data() + offset, size);
+                const HRESULT seedHr =
+                    buffer->Lock(offset, size, &data, D3DLOCK_READONLY);
+                if (SUCCEEDED(seedHr))
+                {
+                    bool copied = false;
+                    if (data)
+                    {
+                        try
+                        {
+                            out.resize(size);
+                            std::memcpy(out.data(), data, size);
+                            std::lock_guard<std::mutex> lock(entry->mutex);
+                            if (entry->bytes.size() != entry->size)
+                                entry->bytes.resize(entry->size);
+                            std::memcpy(entry->bytes.data() + offset, data, size);
+                            R30MergeValidRange(entry->valid, offset, offset + size);
+                            copied = true;
+                        }
+                        catch (...)
+                        {
+                            copied = false;
+                        }
+                    }
+                    buffer->Unlock();
+                    if (copied)
+                    {
+                        ++R30ShadowReadHits;
+                        return true;
+                    }
+                }
             }
-            catch (...)
+
+            ++R30ShadowReadMisses;
+            if (!R30FirstShadowMissLogged)
             {
-                return false;
+                R30FirstShadowMissLogged = true;
+                spdlog::info(
+                    "VR R30.6 BUFFER SHADOW: missing pre-hook VB data could not be seeded READONLY; this draw fails open without corrupting the original buffer");
             }
-            ++R30ShadowReadHits;
-            return true;
+            return false;
         }
 
         bool R30CopyIndexShadow(IDirect3DIndexBuffer9* buffer,
             UINT offset, UINT size, std::vector<std::uint8_t>& out)
         {
-            const auto entry = R30FindIndexShadow(buffer);
+            const auto entry = R30EnsureIndexShadow(buffer);
             if (!entry)
             {
                 ++R30ShadowReadMisses;
                 return false;
             }
-            std::lock_guard<std::mutex> lock(entry->mutex);
-            if (offset > entry->size || size > entry->size - offset ||
-                entry->bytes.size() != entry->size ||
-                !R30RangeValid(entry->valid, offset, offset + size))
             {
-                ++R30ShadowReadMisses;
-                return false;
+                std::lock_guard<std::mutex> lock(entry->mutex);
+                if (offset <= entry->size && size <= entry->size - offset &&
+                    entry->bytes.size() == entry->size &&
+                    R30RangeValid(entry->valid, offset, offset + size))
+                {
+                    try
+                    {
+                        out.resize(size);
+                        std::memcpy(out.data(), entry->bytes.data() + offset, size);
+                    }
+                    catch (...)
+                    {
+                        return false;
+                    }
+                    ++R30ShadowReadHits;
+                    return true;
+                }
             }
-            try
+
+            void* data = nullptr;
+            if (offset <= entry->size && size <= entry->size - offset)
             {
-                out.resize(size);
-                std::memcpy(out.data(), entry->bytes.data() + offset, size);
+                const HRESULT seedHr =
+                    buffer->Lock(offset, size, &data, D3DLOCK_READONLY);
+                if (SUCCEEDED(seedHr))
+                {
+                    bool copied = false;
+                    if (data)
+                    {
+                        try
+                        {
+                            out.resize(size);
+                            std::memcpy(out.data(), data, size);
+                            std::lock_guard<std::mutex> lock(entry->mutex);
+                            if (entry->bytes.size() != entry->size)
+                                entry->bytes.resize(entry->size);
+                            std::memcpy(entry->bytes.data() + offset, data, size);
+                            R30MergeValidRange(entry->valid, offset, offset + size);
+                            copied = true;
+                        }
+                        catch (...)
+                        {
+                            copied = false;
+                        }
+                    }
+                    buffer->Unlock();
+                    if (copied)
+                    {
+                        ++R30ShadowReadHits;
+                        return true;
+                    }
+                }
             }
-            catch (...)
-            {
-                return false;
-            }
-            ++R30ShadowReadHits;
-            return true;
+            ++R30ShadowReadMisses;
+            return false;
         }
 
         HRESULT __stdcall R30VertexBufferLockDest(
@@ -436,11 +517,12 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30VertexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
-            if (R30BufferShadowCaptureArmed.load(
-                    std::memory_order_acquire) &&
-                SUCCEEDED(hr) && data && *data)
-                R30BeginObservedLock(
-                    R30EnsureVertexShadow(buffer), offset, size, *data, flags);
+            if (SUCCEEDED(hr) && data && *data)
+            {
+                const auto entry = R30FindVertexShadow(buffer);
+                if (entry)
+                    R30BeginObservedLock(entry, offset, size, *data, flags);
+            }
             return hr;
         }
 
@@ -481,11 +563,12 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30IndexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
-            if (R30BufferShadowCaptureArmed.load(
-                    std::memory_order_acquire) &&
-                SUCCEEDED(hr) && data && *data)
-                R30BeginObservedLock(
-                    R30EnsureIndexShadow(buffer), offset, size, *data, flags);
+            if (SUCCEEDED(hr) && data && *data)
+            {
+                const auto entry = R30FindIndexShadow(buffer);
+                if (entry)
+                    R30BeginObservedLock(entry, offset, size, *data, flags);
+            }
             return hr;
         }
 
@@ -571,9 +654,8 @@ namespace OutRunVRStereo
             if (SUCCEEDED(hr) && out && *out)
             {
                 R30EnsureVertexBufferHooks(*out);
-                if (R30BufferShadowCaptureArmed.load(
-                        std::memory_order_acquire))
-                    R30EnsureVertexShadow(*out);
+                R30EnsureVertexShadow(*out);
+                R30BufferShadowCaptureArmed.store(true, std::memory_order_release);
             }
             return hr;
         }
@@ -588,9 +670,8 @@ namespace OutRunVRStereo
             if (SUCCEEDED(hr) && out && *out)
             {
                 R30EnsureIndexBufferHooks(*out);
-                if (R30BufferShadowCaptureArmed.load(
-                        std::memory_order_acquire))
-                    R30EnsureIndexShadow(*out);
+                R30EnsureIndexShadow(*out);
+                R30BufferShadowCaptureArmed.store(true, std::memory_order_release);
             }
             return hr;
         }
@@ -1194,6 +1275,21 @@ namespace OutRunVRStereo
             return std::clamp(Settings::VRHudScale.get(), 0.30f, 1.20f);
         }
 
+        int R55HudCoordMode() noexcept
+        {
+            static const int mode = []() noexcept {
+                char text[8]{};
+                if (GetEnvironmentVariableA(
+                        "OUTRUN_VR_HUD_COORD_MODE",
+                        text, static_cast<DWORD>(sizeof(text))) == 0)
+                    return 0;
+                if (text[0] < '0' || text[0] > '4')
+                    return 0;
+                return static_cast<int>(text[0] - '0');
+            }();
+            return mode;
+        }
+
         float R30HudAspectCompensation(
             const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
         {
@@ -1280,14 +1376,14 @@ namespace OutRunVRStereo
             float& scaleX, float& scaleY) noexcept
         {
             (void)stereo;
-            const float userScale = R30HudScaleValue();
+            float userScale = R30HudScaleValue();
+            const int coordMode = R55HudCoordMode();
+            if (coordMode == 3 || coordMode == 4)
+                userScale = 0.35f;
 
-            // R43: the finite HUD plane is reconstructed through the game's
-            // base projection and then through each OpenXR eye projection.
-            // Applying sourceAspect/eyeAspect again here was a second,
-            // anisotropic aspect correction. On this run sourceOverTarget=2.569,
-            // so HudScale=0.55 became X=0.55/Y=0.214 and visibly squashed the
-            // complete HUD. Keep HUD scale uniform; projection handles aspect.
+            // R55: modes 3/4 intentionally force a visually obvious 35% scale
+            // so HMD testing can prove that this exact final-coordinate path is
+            // presentation-authoritative. Production policy still uses HudScale.
             scaleX = userScale;
             scaleY = userScale;
         }
@@ -1408,7 +1504,7 @@ namespace OutRunVRStereo
                 return R30ScreenSpaceKind::None;
 
             const auto semanticScope =
-                OutRunVR::GameSemantic::CurrentScope;
+                OutRunVR::GameSemantic::EffectiveScope();
             const bool semanticHud =
                 OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
             const bool semanticWorld =
@@ -1573,6 +1669,7 @@ namespace OutRunVRStereo
             float hudClipW[2][3]{};
             bool hudWorldLockValid = false;
             bool screenOverlay2D = false;
+            bool exactWorldBillboard = false;
             bool fullWorldReprojection = false;
             bool depthTestEnabled = false;
             bool rhwDepthEvidence = false;
@@ -1863,7 +1960,7 @@ namespace OutRunVRStereo
             // Positive projected-depth evidence remains sufficient for known
             // world effects. Everything else fails closed to the R26/R23 owner.
             const auto semanticScope =
-                OutRunVR::GameSemantic::CurrentScope;
+                OutRunVR::GameSemantic::EffectiveScope();
             const bool semanticHud =
                 OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
             const bool semanticWorld =
@@ -1871,6 +1968,7 @@ namespace OutRunVRStereo
             const bool semanticOverlay2D =
                 OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
                     semanticScope);
+            state.exactWorldBillboard = semanticWorld;
 
             // R51 ownership precedence is explicit:
             // exact WORLD_BILLBOARD > queue-owned 2D/HUD > geometric evidence.
@@ -2083,19 +2181,36 @@ namespace OutRunVRStereo
             return true;
         }
 
-        UINT R30PrimitiveElementCount(
-            D3DPRIMITIVETYPE type, UINT primitiveCount) noexcept
+        bool R30PrimitiveElementCount(
+            D3DPRIMITIVETYPE type, UINT primitiveCount,
+            UINT hardLimit, UINT& out) noexcept
         {
+            std::uint64_t count = 0;
             switch (type)
             {
-            case D3DPT_POINTLIST: return primitiveCount;
-            case D3DPT_LINELIST: return primitiveCount * 2u;
-            case D3DPT_LINESTRIP: return primitiveCount + 1u;
-            case D3DPT_TRIANGLELIST: return primitiveCount * 3u;
+            case D3DPT_POINTLIST:
+                count = primitiveCount;
+                break;
+            case D3DPT_LINELIST:
+                count = static_cast<std::uint64_t>(primitiveCount) * 2u;
+                break;
+            case D3DPT_LINESTRIP:
+                count = static_cast<std::uint64_t>(primitiveCount) + 1u;
+                break;
+            case D3DPT_TRIANGLELIST:
+                count = static_cast<std::uint64_t>(primitiveCount) * 3u;
+                break;
             case D3DPT_TRIANGLESTRIP:
-            case D3DPT_TRIANGLEFAN: return primitiveCount + 2u;
-            default: return 0;
+            case D3DPT_TRIANGLEFAN:
+                count = static_cast<std::uint64_t>(primitiveCount) + 2u;
+                break;
+            default:
+                return false;
             }
+            if (count == 0 || count > hardLimit || count > UINT_MAX)
+                return false;
+            out = static_cast<UINT>(count);
+            return true;
         }
 
         bool R30TransformXyzrhwVertices(
@@ -2382,29 +2497,51 @@ namespace OutRunVRStereo
 
                 float correctedX = 0.0f;
                 float correctedY = 0.0f;
+                const int coordMode = R55HudCoordMode();
                 if (state.worldEffect)
                 {
-                    correctedX =
-                        state.worldScaleX[eye] * ndcX +
-                        state.worldOffsetX[eye];
-                    correctedY =
-                        state.worldScaleY[eye] * ndcY +
-                        state.worldOffsetY[eye];
-                    if (rhw > 0.0f && rhw < 1000.0f)
+                    // R55-D isolates exact rival rank-marker visibility: keep
+                    // the original 2D position identical in both eyes. If 4th/
+                    // 5th collapse in D, the tagged marker path is confirmed.
+                    if (coordMode == 4 && state.exactWorldBillboard)
                     {
-                        correctedX +=
-                            state.parallaxPerRhwX[eye] * rhw;
-                        correctedY +=
-                            state.parallaxPerRhwY[eye] * rhw;
+                        correctedX = ndcX;
+                        correctedY = ndcY;
                     }
-                    // Fallback keeps the game's original Z/RHW pair intact.
+                    else
+                    {
+                        correctedX =
+                            state.worldScaleX[eye] * ndcX +
+                            state.worldOffsetX[eye];
+                        correctedY =
+                            state.worldScaleY[eye] * ndcY +
+                            state.worldOffsetY[eye];
+                        if (rhw > 0.0f && rhw < 1000.0f)
+                        {
+                            correctedX +=
+                                state.parallaxPerRhwX[eye] * rhw;
+                            correctedY +=
+                                state.parallaxPerRhwY[eye] * rhw;
+                        }
+                    }
+                }
+                else if (coordMode == 1)
+                {
+                    // R55-A: hard zero-disparity proof. Both eye surfaces receive
+                    // exactly the source screen coordinates.
+                    correctedX = ndcX;
+                    correctedY = ndcY;
+                }
+                else if (coordMode == 2)
+                {
+                    // R55-B: deliberately obvious ownership proof. Identical
+                    // zero-disparity HUD, shrunk to 35% around screen centre.
+                    correctedX = ndcX * 0.35f;
+                    correctedY = ndcY * 0.35f;
                 }
                 else
                 {
-                    // R51: both exact SCREEN_HUD and generic canonical
-                    // SCREEN_OVERLAY_2D are queue-owned 2D. Put them on the
-                    // finite recentered world-fixed plane so they no longer
-                    // rotate with the HMD. WORLD_BILLBOARD never enters here.
+                    // R55-C/D: finite recentered world-plane ownership.
                     if (!state.hudWorldLockValid)
                         return false;
 
@@ -2592,9 +2729,9 @@ namespace OutRunVRStereo
             R30XyzrhwState state{};
             if (!R30PrepareXyzrhwState(device, state))
                 return E_NOTIMPL;
-            const UINT vertexCount =
-                R30PrimitiveElementCount(type, primitiveCount);
-            if (!vertexCount || vertexCount > 262144u)
+            UINT vertexCount = 0;
+            if (!R30PrimitiveElementCount(
+                    type, primitiveCount, 262144u, vertexCount))
                 return E_NOTIMPL;
             if (!R30ConfigureXyzrhwWorldEffect(
                     device, data, vertexCount, stride, state))
@@ -2640,9 +2777,10 @@ namespace OutRunVRStereo
             if (!R30PrepareXyzrhwState(device, state))
                 return E_NOTIMPL;
 
-            const UINT indexCount =
-                R30PrimitiveElementCount(type, primitiveCount);
-            if (!indexData || !vertexData || indexCount == 0 ||
+            UINT indexCount = 0;
+            if (!indexData || !vertexData ||
+                !R30PrimitiveElementCount(
+                    type, primitiveCount, 524288u, indexCount) ||
                 (indexFormat != D3DFMT_INDEX16 &&
                  indexFormat != D3DFMT_INDEX32))
                 return E_NOTIMPL;
@@ -2663,11 +2801,13 @@ namespace OutRunVRStereo
                     maxIndex = std::max(maxIndex, indices[i]);
             }
 
-            const UINT vertexCount =
-                std::max<UINT>(minVertexIndex + numVertices,
-                    maxIndex + 1u);
-            if (vertexCount == 0 || vertexCount > 262144u)
+            const std::uint64_t vertexCount64 = std::max<std::uint64_t>(
+                static_cast<std::uint64_t>(minVertexIndex) + numVertices,
+                static_cast<std::uint64_t>(maxIndex) + 1u);
+            if (vertexCount64 == 0 || vertexCount64 > 262144u ||
+                vertexCount64 > UINT_MAX)
                 return E_NOTIMPL;
+            const UINT vertexCount = static_cast<UINT>(vertexCount64);
 
             R30ScratchLease lease;
             if (!lease)
@@ -2734,9 +2874,9 @@ namespace OutRunVRStereo
             if (!R30PrepareXyzrhwState(device, state))
                 return E_NOTIMPL;
 
-            const UINT vertexCount =
-                R30PrimitiveElementCount(type, primitiveCount);
-            if (!vertexCount || vertexCount > 262144u)
+            UINT vertexCount = 0;
+            if (!R30PrimitiveElementCount(
+                    type, primitiveCount, 262144u, vertexCount))
                 return E_NOTIMPL;
 
             IDirect3DVertexBuffer9* vb = nullptr;
@@ -2839,9 +2979,10 @@ namespace OutRunVRStereo
             if (!R30PrepareXyzrhwState(device, state))
                 return E_NOTIMPL;
 
-            const UINT indexCount =
-                R30PrimitiveElementCount(type, primitiveCount);
-            if (!indexCount || !numVertices || indexCount > 524288u)
+            UINT indexCount = 0;
+            if (!numVertices ||
+                !R30PrimitiveElementCount(
+                    type, primitiveCount, 524288u, indexCount))
                 return E_NOTIMPL;
 
             IDirect3DVertexBuffer9* vb = nullptr;
@@ -3142,6 +3283,37 @@ namespace OutRunVRStereo
             if (!MatrixFinite(stockWvp))
                 return false;
 
+            const int coordMode = R55HudCoordMode();
+            if (screenKind == R30ScreenSpaceKind::WorldBillboard &&
+                coordMode == 4)
+            {
+                const D3DMATRIX stockT = TransposeMatrix(stockWvp);
+                std::memcpy(eyeConstants[0], &stockT, sizeof(stockT));
+                std::memcpy(eyeConstants[1], &stockT, sizeof(stockT));
+                return true;
+            }
+            if (screenKind != R30ScreenSpaceKind::WorldBillboard &&
+                coordMode == 1)
+            {
+                const D3DMATRIX stockT = TransposeMatrix(stockWvp);
+                std::memcpy(eyeConstants[0], &stockT, sizeof(stockT));
+                std::memcpy(eyeConstants[1], &stockT, sizeof(stockT));
+                return true;
+            }
+            if (screenKind != R30ScreenSpaceKind::WorldBillboard &&
+                coordMode == 2)
+            {
+                D3DMATRIX obviousScale = IdentityMatrix();
+                obviousScale._11 = 0.35f;
+                obviousScale._22 = 0.35f;
+                const D3DMATRIX scaled =
+                    MultiplyMatrix(stockWvp, obviousScale);
+                const D3DMATRIX scaledT = TransposeMatrix(scaled);
+                std::memcpy(eyeConstants[0], &scaledT, sizeof(scaledT));
+                std::memcpy(eyeConstants[1], &scaledT, sizeof(scaledT));
+                return true;
+            }
+
             float baseRaw[16]{};
             D3DMATRIX baseProjection{};
             D3DMATRIX inverseBaseProjection{};
@@ -3317,7 +3489,7 @@ namespace OutRunVRStereo
             // D3D state can describe a candidate shape, but it never owns it.
             // Promotion requires the canonical EXE/original-mod semantic scope.
             const auto semanticScope =
-                OutRunVR::GameSemantic::CurrentScope;
+                OutRunVR::GameSemantic::EffectiveScope();
             if (screenKind == R30ScreenSpaceKind::WorldBillboard)
             {
                 if (!OutRunVR::GameSemantic::CorroboratesWorld(
@@ -3532,7 +3704,7 @@ namespace OutRunVRStereo
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
@@ -3560,7 +3732,7 @@ namespace OutRunVRStereo
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
@@ -3590,7 +3762,7 @@ namespace OutRunVRStereo
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
@@ -3619,7 +3791,7 @@ namespace OutRunVRStereo
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
@@ -3733,8 +3905,8 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R47 HUD: canonical EXE sprite-queue semantics own HUD transforms; unknown draw heuristics are disabled; HudScale={:.2f}; exact original-mod world-billboard tags override queue HUD ownership",
-                        R30HudScaleValue());
+                        "VR R55 HUD: coordMode={} canonical queue semantics active; mode1=raw-zero-disparity mode2=raw-35pct mode3=world-plane-35pct mode4=world-plane-35pct+rank-zero; configured HudScale={:.2f}",
+                        R55HudCoordMode(), R30HudScaleValue());
                     return 0;
                 }
                 Sleep(25);

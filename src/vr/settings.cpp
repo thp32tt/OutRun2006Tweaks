@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <TlHelp32.h>
 
+#include <algorithm>
 #include <filesystem>
 #include <string>
 
@@ -10,6 +11,8 @@
 
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
+#include "vr/ipc/host_state_v3_reader.hpp"
+#include "vr/ipc/protocol_v3.hpp"
 
 // VR settings live here, but the final camera transform does not.
 // Head tracking is applied only at the verified D3D9 c64 WorldViewProjection
@@ -29,7 +32,7 @@ namespace Settings
 	Setting<bool> VRAutoEnableWhenHostPresent{ "VR", "AutoEnableWhenHostPresent", true,
 		"Automatically applies renderer-side tracking whenever outrun-vr-host.exe is supplying a valid pose." };
 	Setting<bool> VRAutoLaunchHost{ "VR", "AutoLaunchHost", true,
-		"Starts outrun-vr-host.exe from the game directory when VR is enabled. A short retry window also covers fast game restarts where the previous host is still shutting down." };
+		"Starts and supervises outrun-vr-host.exe while VR is enabled, relaunching it with bounded backoff after runtime exits or fast game restarts." };
 	Setting<bool> VRMirrorFitDesktop{ "VR", "MirrorFitDesktop", false,
 		"Fits the borderless PC mirror window to the current monitor even when the internal game backbuffer is larger. The VR render resolution is unchanged." };
 	Setting<bool> VRDisableDesktopVsync{ "VR", "DisableDesktopVsync", true,
@@ -102,27 +105,161 @@ namespace OutRunVR
 {
 	namespace
 	{
-		bool VRHostProcessRunning() noexcept
+		enum class VRHostHealth
 		{
+			Missing,
+			Starting,
+			Healthy,
+			StaleRenderable
+		};
+
+		bool SamePathInsensitive(const std::filesystem::path& a,
+			const std::filesystem::path& b) noexcept
+		{
+			const std::wstring aw = a.lexically_normal().wstring();
+			const std::wstring bw = b.lexically_normal().wstring();
+			return _wcsicmp(aw.c_str(), bw.c_str()) == 0;
+		}
+
+		bool IsCurrentGameOwnedHostEntry(const PROCESSENTRY32W& entry) noexcept
+		{
+			return _wcsicmp(entry.szExeFile, L"outrun-vr-host.exe") == 0 &&
+				entry.th32ParentProcessID == GetCurrentProcessId();
+		}
+
+		bool IsCurrentGameOwnedHostPid(DWORD pid) noexcept
+		{
+			if (!pid)
+				return false;
 			HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 			if (snapshot == INVALID_HANDLE_VALUE)
 				return false;
+
+			bool owned = false;
 			PROCESSENTRY32W entry{};
 			entry.dwSize = sizeof(entry);
-			bool found = false;
 			if (Process32FirstW(snapshot, &entry))
 			{
 				do
 				{
-					if (_wcsicmp(entry.szExeFile, L"outrun-vr-host.exe") == 0)
+					if (entry.th32ProcessID == pid)
 					{
-						found = true;
+						owned = IsCurrentGameOwnedHostEntry(entry);
 						break;
 					}
 				} while (Process32NextW(snapshot, &entry));
 			}
 			CloseHandle(snapshot);
-			return found;
+			return owned;
+		}
+
+		bool FindExpectedVRHostProcess(DWORD& pid) noexcept
+		{
+			pid = 0;
+			const std::filesystem::path expected =
+				Module::ExePath.parent_path() / "outrun-vr-host.exe";
+			HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+			if (snapshot == INVALID_HANDLE_VALUE)
+				return false;
+
+			PROCESSENTRY32W entry{};
+			entry.dwSize = sizeof(entry);
+			if (Process32FirstW(snapshot, &entry))
+			{
+				do
+				{
+					// Auto-launch supervision must never adopt a same-directory host
+					// that belongs to an older/parallel OutRun process. The exact
+					// game PID is also passed to the child through OUTRUN_VR_GAME_PID;
+					// parent ownership closes the supervisor side of that binding.
+					if (!IsCurrentGameOwnedHostEntry(entry))
+						continue;
+
+					HANDLE process = OpenProcess(
+						PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE,
+						FALSE, entry.th32ProcessID);
+					if (!process)
+						continue;
+					wchar_t path[MAX_PATH]{};
+					DWORD length = MAX_PATH;
+					const bool running =
+						WaitForSingleObject(process, 0) == WAIT_TIMEOUT;
+					const bool havePath =
+						running && QueryFullProcessImageNameW(
+							process, 0, path, &length) != FALSE;
+					CloseHandle(process);
+					if (havePath && SamePathInsensitive(path, expected))
+					{
+						pid = entry.th32ProcessID;
+						break;
+					}
+				} while (Process32NextW(snapshot, &entry));
+			}
+			CloseHandle(snapshot);
+			return pid != 0;
+		}
+
+		VRHostHealth QueryVRHostHealth(DWORD& pid) noexcept
+		{
+			if (!FindExpectedVRHostProcess(pid))
+				return VRHostHealth::Missing;
+
+			OutRunVR::IpcV3::HostStateReader reader;
+			OutRunVR::IpcV3::HostState state{};
+			if (!reader.Read(state) || state.hostPid != pid)
+				return VRHostHealth::Starting;
+
+			const std::uint32_t renderFlags =
+				OutRunVR::IpcV3::HostAlive |
+				OutRunVR::IpcV3::SessionVisible |
+				OutRunVR::IpcV3::HostShouldRender;
+			if ((state.flags & renderFlags) != renderFlags)
+				return VRHostHealth::Healthy;
+
+			LARGE_INTEGER now{}, frequency{};
+			if (!QueryPerformanceCounter(&now) ||
+				!QueryPerformanceFrequency(&frequency) ||
+				frequency.QuadPart <= 0 || state.sampleQpc <= 0)
+				return VRHostHealth::Starting;
+
+			const LONGLONG age = now.QuadPart - state.sampleQpc;
+			if (age < 0)
+				return VRHostHealth::Starting;
+			const LONGLONG staleTicks = frequency.QuadPart * 10;
+			return age > staleTicks
+				? VRHostHealth::StaleRenderable
+				: VRHostHealth::Healthy;
+		}
+
+		bool TerminateStaleVRHost(DWORD pid) noexcept
+		{
+			if (!pid)
+				return false;
+			HANDLE process = OpenProcess(
+				PROCESS_TERMINATE | SYNCHRONIZE |
+				PROCESS_QUERY_LIMITED_INFORMATION,
+				FALSE, pid);
+			if (!process)
+				return false;
+
+			wchar_t path[MAX_PATH]{};
+			DWORD length = MAX_PATH;
+			const std::filesystem::path expected =
+				Module::ExePath.parent_path() / "outrun-vr-host.exe";
+			const bool exactBinary =
+				QueryFullProcessImageNameW(process, 0, path, &length) != FALSE &&
+				SamePathInsensitive(path, expected);
+			const bool ownedByCurrentGame = IsCurrentGameOwnedHostPid(pid);
+			bool terminated = false;
+			if (exactBinary && ownedByCurrentGame &&
+				WaitForSingleObject(process, 0) == WAIT_TIMEOUT)
+			{
+				terminated = TerminateProcess(process, 0x56524853) != FALSE;
+				if (terminated)
+					WaitForSingleObject(process, 2000);
+			}
+			CloseHandle(process);
+			return terminated;
 		}
 
 		bool VRLaunchHostOnce() noexcept
@@ -139,6 +276,9 @@ namespace OutRunVR
 				// The host inherits these test-mode switches. Keeping transport
 				// policy in the same [VR] config as D3D9Ex avoids mismatched
 				// game/host modes during cadence testing.
+				const std::string gamePid =
+					std::to_string(GetCurrentProcessId());
+				SetEnvironmentVariableA("OUTRUN_VR_GAME_PID", gamePid.c_str());
 				SetEnvironmentVariableA("OUTRUN_VR_DIRECT_TRANSPORT", "1");
 				SetEnvironmentVariableA("OUTRUN_VR_DIRECT_ONLY",
 					Settings::VRDirectGpuOnly ? "1" : "0");
@@ -188,20 +328,88 @@ namespace OutRunVR
 		{
 			if (!Settings::VREnabled || !Settings::VRAutoLaunchHost)
 				return 0;
-			bool launched = false;
-			for (int attempt = 0; attempt < 40; ++attempt)
+
+			// Enabled/AutoLaunchHost are restart-required settings. Once this
+			// process starts in supervised mode, keep the supervisor alive for the
+			// process lifetime; live toggles cannot safely uninstall/reinstall the
+			// OpenXR hook graph.
+			DWORD retryDelayMs = 500;
+			bool restartLogged = false;
+			bool staleLogged = false;
+			ULONGLONG startingSinceMs = 0;
+			for (;;)
 			{
-				if (!VRHostProcessRunning() && !launched)
+				DWORD hostPid = 0;
+				const VRHostHealth health = QueryVRHostHealth(hostPid);
+				if (health == VRHostHealth::Healthy)
 				{
-					launched = VRLaunchHostOnce();
-					if (launched)
-						return 0;
+					retryDelayMs = 500;
+					restartLogged = false;
+					staleLogged = false;
+					startingSinceMs = 0;
+					Sleep(1000);
+					continue;
 				}
-				Sleep(500);
+				if (health == VRHostHealth::Starting)
+				{
+					const ULONGLONG now = GetTickCount64();
+					if (!startingSinceMs)
+						startingSinceMs = now;
+					if (now - startingSinceMs <= 15000)
+					{
+						Sleep(1000);
+						continue;
+					}
+					spdlog::error(
+						"VR AUTO HOST: owned host pid={} failed to publish matching HostState within 15s; recycling only this game's exact host",
+						hostPid);
+					if (!TerminateStaleVRHost(hostPid))
+					{
+						Sleep(1000);
+						continue;
+					}
+					startingSinceMs = 0;
+					staleLogged = true;
+					Sleep(250);
+				}
+
+				if (health == VRHostHealth::StaleRenderable)
+				{
+					startingSinceMs = 0;
+					if (!staleLogged)
+					{
+						spdlog::error(
+							"VR AUTO HOST: owned host pid={} stopped publishing a renderable HostState for >10s; terminating only this game's exact host binary",
+							hostPid);
+						staleLogged = true;
+					}
+					if (!TerminateStaleVRHost(hostPid))
+					{
+						Sleep(1000);
+						continue;
+					}
+					Sleep(250);
+				}
+
+				if (VRLaunchHostOnce())
+				{
+					if (restartLogged || staleLogged)
+						spdlog::info("VR AUTO HOST: supervisor relaunched this game's exact child host");
+					retryDelayMs = 500;
+					restartLogged = false;
+					staleLogged = false;
+					Sleep(1000);
+					continue;
+				}
+
+				if (!restartLogged)
+				{
+					spdlog::warn("VR AUTO HOST: host unavailable; supervisor will keep retrying with bounded backoff");
+					restartLogged = true;
+				}
+				Sleep(retryDelayMs);
+				retryDelayMs = std::min<DWORD>(retryDelayMs * 2, 8000);
 			}
-			if (!VRHostProcessRunning())
-				spdlog::warn("VR AUTO HOST: no host process became available during the startup retry window");
-			return 0;
 		}
 	}
 
@@ -212,6 +420,7 @@ namespace OutRunVR
 		bool validate() override { return true; }
 		void declare_settings() override
 		{
+			Settings::VREnabled.needs_restart();
 			Settings::VRAutoLaunchHost.needs_restart();
 			Settings::VRMirrorFitDesktop.needs_restart();
 			Settings::VRDisableDesktopVsync.needs_restart();

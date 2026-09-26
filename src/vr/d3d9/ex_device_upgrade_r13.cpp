@@ -246,6 +246,8 @@ namespace OutRunVRD3D9ExUpgradeR13
                 deviceEx, params, fullscreen);
         result = deviceEx->ResetEx(params, fullscreenPtr);
         deviceEx->Release();
+        if (result == D3DERR_DEVICEHUNG || result == D3DERR_DEVICEREMOVED)
+            result = D3DERR_DRIVERINTERNALERROR;
         if (SUCCEEDED(result))
         {
             OutRunVRD3D9ExUpgrade::UpdateCompatPresentationState(device, params);

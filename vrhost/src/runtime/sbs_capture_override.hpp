@@ -181,6 +181,14 @@ float4 PSMain(VSOut input) : SV_Target
 
     inline std::uint64_t NextSwapchainGeneration = 0;
 
+    enum class SwapchainImageState : std::uint8_t
+    {
+        Idle,
+        Acquired,
+        Waited,
+        Poisoned
+    };
+
     struct Swapchain
     {
         XrSwapchain handle = XR_NULL_HANDLE;
@@ -192,8 +200,7 @@ float4 PSMain(VSOut input) : SV_Target
         DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
         std::vector<XrSwapchainImageD3D11KHR> images;
         std::vector<std::array<ID3D11RenderTargetView*, 2>> rtvs;
-        bool acquired = false;
-        bool waited = false;
+        SwapchainImageState imageState = SwapchainImageState::Idle;
         std::uint32_t acquiredImage = 0;
 
         void Destroy()
@@ -215,8 +222,7 @@ float4 PSMain(VSOut input) : SV_Target
             width = height = 0;
             arraySize = 1;
             format = DXGI_FORMAT_UNKNOWN;
-            acquired = false;
-            waited = false;
+            imageState = SwapchainImageState::Idle;
             acquiredImage = 0;
         }
     };
@@ -492,6 +498,9 @@ float4 PSMain(VSOut input) : SV_Target
         return uv.w > 0.01f && uv.h > 0.01f;
     }
 
+    inline bool Acquire(Swapchain& swapchain, std::uint32_t& image);
+    inline bool Release(Swapchain& swapchain);
+
     inline DXGI_FORMAT ChooseSwapchainFormat(XrSession session)
     {
         std::uint32_t count = 0;
@@ -515,10 +524,29 @@ float4 PSMain(VSOut input) : SV_Target
     inline bool EnsureSwapchain(Swapchain& swapchain, XrSession session,
         std::uint32_t width, std::uint32_t height, std::uint32_t arraySize)
     {
-        if (swapchain.handle != XR_NULL_HANDLE && swapchain.width == width &&
-            swapchain.height == height && swapchain.arraySize == arraySize &&
-            !swapchain.images.empty())
-            return true;
+        if (swapchain.handle != XR_NULL_HANDLE)
+        {
+            if (swapchain.imageState == SwapchainImageState::Poisoned)
+                return false;
+            if (swapchain.width == width && swapchain.height == height &&
+                swapchain.arraySize == arraySize && !swapchain.images.empty())
+                return true;
+            // Never destroy/recreate a swapchain while an image is still owned.
+            // A timeout leaves the exact image legally Acquired. If dimensions
+            // change during that interval, finish waiting/releasing that same
+            // image first instead of permanently poisoning the fallback chain.
+            if (swapchain.imageState == SwapchainImageState::Acquired)
+            {
+                std::uint32_t pendingImage = swapchain.acquiredImage;
+                if (!Acquire(swapchain, pendingImage))
+                    return false;
+            }
+            if (swapchain.imageState == SwapchainImageState::Waited &&
+                !Release(swapchain))
+                return false;
+            if (swapchain.imageState != SwapchainImageState::Idle)
+                return false;
+        }
 
         swapchain.Destroy();
         const DXGI_FORMAT format = ChooseSwapchainFormat(session);
@@ -639,18 +667,28 @@ float4 PSMain(VSOut input) : SV_Target
 
     inline bool Acquire(Swapchain& swapchain, std::uint32_t& image)
     {
-        if (!swapchain.acquired)
+        if (swapchain.imageState == SwapchainImageState::Poisoned ||
+            swapchain.handle == XR_NULL_HANDLE)
+            return false;
+
+        if (swapchain.imageState == SwapchainImageState::Idle)
         {
             XrSwapchainImageAcquireInfo acquire{ XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO };
             if (XR_FAILED(::xrAcquireSwapchainImage(swapchain.handle, &acquire,
                 &swapchain.acquiredImage)))
+            {
+                swapchain.imageState = SwapchainImageState::Poisoned;
                 return false;
-            swapchain.acquired = true;
-            swapchain.waited = false;
+            }
+            swapchain.imageState = SwapchainImageState::Acquired;
         }
+
         image = swapchain.acquiredImage;
-        if (swapchain.waited)
-            return true;
+        if (swapchain.imageState == SwapchainImageState::Waited)
+            return image < swapchain.images.size() &&
+                image < swapchain.rtvs.size();
+        if (swapchain.imageState != SwapchainImageState::Acquired)
+            return false;
 
         XrSwapchainImageWaitInfo wait{ XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO };
         wait.timeout = XR_INFINITE_DURATION;
@@ -658,34 +696,52 @@ float4 PSMain(VSOut input) : SV_Target
         {
             const XrResult result = ::xrWaitSwapchainImage(swapchain.handle, &wait);
             if (result == XR_TIMEOUT_EXPIRED)
-                continue; // The same acquired image must be waited again; it cannot be released yet.
-            if (XR_FAILED(result))
             {
-                // Preserve acquiredImage. A later attempt must wait this oldest
-                // acquired image again instead of violating acquire/wait order.
+                // The image is still legally acquired but not waited. Keep that
+                // exact ownership and retry xrWaitSwapchainImage on a later XR
+                // frame; do not reacquire, release-before-wait, destroy, or
+                // permanently poison the fallback swapchain for a transient stall.
                 return false;
             }
-            swapchain.waited = true;
+            if (XR_FAILED(result))
+            {
+                // Non-timeout wait failures leave ownership ambiguous. Never
+                // acquire/render/recreate this swapchain again in-session.
+                swapchain.imageState = SwapchainImageState::Poisoned;
+                return false;
+            }
+            swapchain.imageState = SwapchainImageState::Waited;
+            if (image >= swapchain.images.size() ||
+                image >= swapchain.rtvs.size())
+            {
+                // The runtime returned an image index outside the enumerated
+                // swapchain set. Release the waited image if possible, then
+                // permanently fail closed for this session.
+                Release(swapchain);
+                swapchain.imageState = SwapchainImageState::Poisoned;
+                return false;
+            }
             return true;
         }
     }
 
     inline bool Release(Swapchain& swapchain)
     {
-        if (!swapchain.acquired || !swapchain.waited)
+        if (swapchain.imageState != SwapchainImageState::Waited ||
+            swapchain.handle == XR_NULL_HANDLE)
             return false;
         XrSwapchainImageReleaseInfo release{ XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO };
         const XrResult result = ::xrReleaseSwapchainImage(swapchain.handle, &release);
         if (XR_SUCCEEDED(result))
         {
-            swapchain.acquired = false;
-            swapchain.waited = false;
+            swapchain.imageState = SwapchainImageState::Idle;
             swapchain.acquiredImage = 0;
             // A released image is valid only for the exact swapchain creation
             // that produced it. Recreated handles never inherit this evidence.
             swapchain.committedGeneration = swapchain.generation;
             return true;
         }
+        swapchain.imageState = SwapchainImageState::Poisoned;
         return false;
     }
 

@@ -60,6 +60,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
     inline std::uint32_t SafeEyeHeight = 0;
     inline std::uint32_t SafeFrameId = 0;
     inline std::uint32_t SafeTransportGeneration = 0;
+    inline std::uint32_t SafeClientPid = 0;
+    inline std::uint32_t SafeRunGeneration = 0;
 
     inline std::uint64_t LastObservedCaptureFresh = 0;
     inline ULONGLONG LastCaptureFreshMs = 0;
@@ -109,6 +111,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
         SafeEyeWidth = SafeEyeHeight = 0;
         SafeFrameId = 0;
         SafeTransportGeneration = 0;
+        SafeClientPid = 0;
+        SafeRunGeneration = 0;
     }
 
     inline void CloseDirectAckMapping() noexcept
@@ -312,6 +316,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
             DirectAckState->structSize = sizeof(*DirectAckState);
             DirectAckState->hostPid = GetCurrentProcessId();
             DirectAckState->transportGeneration = 0;
+            DirectAckState->clientPid = 0;
+            DirectAckState->runGeneration = 0;
             std::memset(DirectAckState->completedFrameId, 0,
                 sizeof(DirectAckState->completedFrameId));
             EndAckWrite();
@@ -321,7 +327,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
         {
             FirstAckMappingLogged = true;
             std::cerr
-                << "[D3D9Ex R23] dedicated per-slot DirectGpuAck mapping ready\n";
+                << "[D3D9Ex R23] dedicated per-slot DirectGpuAck mapping ready version="
+                << OutRunVR::R13::DirectGpuAckVersion << "\n";
         }
         return true;
     }
@@ -495,23 +502,38 @@ namespace OutRunVrD3D9ExDirectPassthrough
         return true;
     }
 
+    inline bool FrameRunIdentityCurrent(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        return EnsureFrameRing() &&
+            OutRunVR::RenderFrameRunIdentityMatches(*FrameRing, frame);
+    }
+
     inline bool PublishCompletedFrame(
         const OutRunVR::SharedRenderFrameState& frame) noexcept
     {
-        if (!EnsureDirectAckState())
+        if (!EnsureDirectAckState() || !FrameRunIdentityCurrent(frame))
             return false;
         const std::uint32_t slot =
             frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
         const std::uint32_t generation =
             frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        const std::uint32_t runGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
         if (slot >= OutRunVR::R13::DirectGpuAckRingSize || !generation ||
-            !frame.frameId)
+            !frame.frameId || !frame.clientPid || !runGeneration)
             return false;
 
         BeginAckWrite();
-        if (DirectAckState->transportGeneration != generation)
+        const bool identityChanged =
+            DirectAckState->transportGeneration != generation ||
+            DirectAckState->clientPid != frame.clientPid ||
+            DirectAckState->runGeneration != runGeneration;
+        if (identityChanged)
         {
             DirectAckState->transportGeneration = generation;
+            DirectAckState->clientPid = frame.clientPid;
+            DirectAckState->runGeneration = runGeneration;
             std::memset(DirectAckState->completedFrameId, 0,
                 sizeof(DirectAckState->completedFrameId));
         }

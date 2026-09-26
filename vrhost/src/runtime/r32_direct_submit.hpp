@@ -31,7 +31,7 @@
 namespace OutRunVrR32DirectSubmit
 {
     inline constexpr const char* BuildId =
-        "R45-direct-recenter-live-projection-20260920";
+        "R56-backend-hardening-r3-20260926";
 
     enum class FastRejectReason : std::uint8_t
     {
@@ -59,9 +59,55 @@ namespace OutRunVrR32DirectSubmit
         OutRunVR::SharedRenderFrameState frame{};
     };
 
+    struct PendingSkippedRelease
+    {
+        bool pending = false;
+        OutRunVR::SharedRenderFrameState frame{};
+    };
+
     inline std::array<PendingAck, OutRunVR::RenderFrameRingSize> Pending{};
+    inline std::array<PendingSkippedRelease, OutRunVR::RenderFrameRingSize>
+        SkippedRelease{};
+
+    struct AckIdentity
+    {
+        std::uint32_t clientPid = 0;
+        std::uint32_t runGeneration = 0;
+        std::uint32_t transportGeneration = 0;
+    };
+
+    inline AckIdentity FrameAckIdentity(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        return {
+            frame.clientPid,
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex],
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex]
+        };
+    }
+
+    inline bool SameAckIdentity(
+        const AckIdentity& a, const AckIdentity& b) noexcept
+    {
+        return a.clientPid != 0 &&
+            a.runGeneration != 0 &&
+            a.transportGeneration != 0 &&
+            a.clientPid == b.clientPid &&
+            a.runGeneration == b.runGeneration &&
+            a.transportGeneration == b.transportGeneration;
+    }
+
+    inline bool SameFrameAckIdentity(
+        const OutRunVR::SharedRenderFrameState& a,
+        const OutRunVR::SharedRenderFrameState& b) noexcept
+    {
+        return a.frameId != 0 &&
+            a.frameId == b.frameId &&
+            SameAckIdentity(FrameAckIdentity(a), FrameAckIdentity(b));
+    }
+
     inline std::array<std::uint32_t, OutRunVR::RenderFrameRingSize> AckedFrame{};
-    inline std::array<std::uint32_t, OutRunVR::RenderFrameRingSize> AckedGeneration{};
+    inline std::array<AckIdentity, OutRunVR::RenderFrameRingSize> AckedIdentity{};
     inline std::uint64_t FastDirectSubmits = 0;
     inline std::uint64_t FastDirectRejects = 0;
     inline std::uint64_t AckArmed = 0;
@@ -71,10 +117,13 @@ namespace OutRunVrR32DirectSubmit
     inline std::uint64_t AckFlushEscalations = 0;
     inline std::uint64_t AckQueryErrors = 0;
     inline std::uint64_t AckSameFramePendingReuse = 0;
+    inline std::uint64_t SkippedReleaseQueued = 0;
+    inline std::uint64_t SkippedReleaseCompleted = 0;
+    inline std::uint64_t SkippedReleaseRetry = 0;
     inline std::array<std::uint64_t,
         static_cast<std::size_t>(FastRejectReason::Count)> RejectReasons{};
-    inline std::uint32_t AckFaultGeneration = 0;
-    inline std::uint32_t ActiveAckGeneration = 0;
+    inline AckIdentity AckFaultIdentity{};
+    inline AckIdentity ActiveAckIdentity{};
     inline ULONGLONG LastPerfLogMs = 0;
     inline bool FirstFastSubmitLogged = false;
     inline bool FirstAsyncAckLogged = false;
@@ -91,6 +140,9 @@ namespace OutRunVrR32DirectSubmit
         std::uint64_t flushEscalations = 0;
         std::uint64_t ackQueryError = 0;
         std::uint64_t sameFramePendingReuse = 0;
+        std::uint64_t skippedQueued = 0;
+        std::uint64_t skippedCompleted = 0;
+        std::uint64_t skippedRetry = 0;
         std::array<std::uint64_t,
             static_cast<std::size_t>(FastRejectReason::Count)> rejectReasons{};
         std::uint64_t safeCacheHit = 0;
@@ -113,21 +165,49 @@ namespace OutRunVrR32DirectSubmit
             pending.flushIssued = false;
             pending.frame = {};
         }
+        for (auto& skipped : SkippedRelease)
+        {
+            skipped.pending = false;
+            skipped.frame = {};
+        }
         AckedFrame.fill(0);
-        AckedGeneration.fill(0);
-        AckFaultGeneration = 0;
-        ActiveAckGeneration = 0;
+        AckedIdentity.fill({});
+        AckFaultIdentity = {};
+        ActiveAckIdentity = {};
         AckSameFramePendingReuse = 0;
         RejectReasons.fill(0);
     }
 
-    inline void ObserveGeneration(std::uint32_t generation) noexcept
+    inline void ObserveIdentity(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
     {
-        if (!generation || ActiveAckGeneration == generation)
+        const AckIdentity identity = FrameAckIdentity(frame);
+        if (!identity.clientPid || !identity.runGeneration ||
+            !identity.transportGeneration)
             return;
-        ActiveAckGeneration = generation;
+        if (SameAckIdentity(ActiveAckIdentity, identity))
+            return;
+
+        ActiveAckIdentity = identity;
         AckedFrame.fill(0);
-        AckedGeneration.fill(0);
+        AckedIdentity.fill({});
+
+        for (auto& skipped : SkippedRelease)
+        {
+            if (!skipped.pending)
+                continue;
+            if (!SameAckIdentity(
+                    FrameAckIdentity(skipped.frame), identity))
+            {
+                skipped.pending = false;
+                skipped.frame = {};
+            }
+        }
+
+        // Query failure quarantine belongs to one exact producer run. A new
+        // game run must not inherit a colliding transport-generation fault.
+        if (!SameAckIdentity(AckFaultIdentity, identity))
+            AckFaultIdentity = {};
     }
 
     inline bool EnsureFence(std::uint32_t slot) noexcept
@@ -143,8 +223,106 @@ namespace OutRunVrR32DirectSubmit
             &desc, &pending.fence)) && pending.fence;
     }
 
+    inline bool HasPendingConsumption(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        const std::uint32_t slot =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        const AckIdentity identity = FrameAckIdentity(frame);
+        if (slot >= Pending.size() || !identity.clientPid ||
+            !identity.runGeneration || !identity.transportGeneration ||
+            !frame.frameId)
+            return false;
+        const auto& pending = Pending[slot];
+        return pending.armed &&
+            SameFrameAckIdentity(pending.frame, frame);
+    }
+
+    inline bool QueueSkippedRelease(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        const std::uint32_t slot =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        const AckIdentity identity = FrameAckIdentity(frame);
+        if (slot >= SkippedRelease.size() || !identity.clientPid ||
+            !identity.runGeneration || !identity.transportGeneration ||
+            !frame.frameId)
+            return false;
+        if (ActiveAckIdentity.clientPid != 0 &&
+            !SameAckIdentity(identity, ActiveAckIdentity))
+            return false;
+
+        if (HasPendingConsumption(frame))
+            return false;
+
+        if (OutRunVrD3D9ExDirectPassthrough::PublishCompletedFrame(frame))
+        {
+            AckedFrame[slot] = frame.frameId;
+            AckedIdentity[slot] = identity;
+            ++SkippedReleaseCompleted;
+            return true;
+        }
+
+        auto& skipped = SkippedRelease[slot];
+        if (skipped.pending)
+        {
+            // Never overwrite a still-current release owner for the same slot.
+            // If it belongs to an obsolete game run, it can be retired now.
+            if (OutRunVrD3D9ExDirectPassthrough::FrameRunIdentityCurrent(
+                    skipped.frame))
+            {
+                ++SkippedReleaseRetry;
+                return false;
+            }
+            skipped.pending = false;
+            skipped.frame = {};
+        }
+
+        skipped.pending = true;
+        skipped.frame = frame;
+        ++SkippedReleaseQueued;
+        return false;
+    }
+
+    inline void PollSkippedReleases() noexcept
+    {
+        for (std::size_t slot = 0; slot < SkippedRelease.size(); ++slot)
+        {
+            auto& skipped = SkippedRelease[slot];
+            if (!skipped.pending)
+                continue;
+            const AckIdentity identity =
+                FrameAckIdentity(skipped.frame);
+            if ((ActiveAckIdentity.clientPid != 0 &&
+                 !SameAckIdentity(identity, ActiveAckIdentity)) ||
+                !OutRunVrD3D9ExDirectPassthrough::FrameRunIdentityCurrent(
+                    skipped.frame))
+            {
+                skipped.pending = false;
+                skipped.frame = {};
+                continue;
+            }
+            if (!OutRunVrD3D9ExDirectPassthrough::PublishCompletedFrame(
+                    skipped.frame))
+            {
+                ++SkippedReleaseRetry;
+                continue;
+            }
+
+            AckedFrame[slot] = skipped.frame.frameId;
+            AckedIdentity[slot] = FrameAckIdentity(skipped.frame);
+            skipped.pending = false;
+            skipped.frame = {};
+            ++SkippedReleaseCompleted;
+        }
+    }
+
     inline void PollCompletedAcks() noexcept
     {
+        // Skipped frames never touched D3D11, so their ACK retry does not
+        // require a graphics context and can still complete during session
+        // transitions. Touched frames below remain EVENT-gated.
+        PollSkippedReleases();
         if (!OutRunVrFinalTest::Context)
             return;
         for (auto& pending : Pending)
@@ -160,11 +338,11 @@ namespace OutRunVrR32DirectSubmit
                 // Completion is unknowable, so never ACK this producer frame.
                 // Disable fast-submit for its transport generation and let the
                 // SafeEye fallback perform a separately fenced copy/ACK.
-                const std::uint32_t generation =
-                    pending.frame.reserved[
-                        OutRunVR::RenderFrameDirectGenerationIndex];
-                if (generation)
-                    AckFaultGeneration = generation;
+                const AckIdentity identity =
+                    FrameAckIdentity(pending.frame);
+                if (identity.clientPid && identity.runGeneration &&
+                    identity.transportGeneration)
+                    AckFaultIdentity = identity;
                 ++AckQueryErrors;
                 pending.armed = false;
                 pending.flushIssued = false;
@@ -173,15 +351,26 @@ namespace OutRunVrR32DirectSubmit
                 pending.fence = nullptr;
                 continue;
             }
-            const std::uint32_t completedGeneration =
-                pending.frame.reserved[
-                    OutRunVR::RenderFrameDirectGenerationIndex];
-            if (ActiveAckGeneration != 0 &&
-                completedGeneration != ActiveAckGeneration)
+            const AckIdentity completedIdentity =
+                FrameAckIdentity(pending.frame);
+            if (ActiveAckIdentity.clientPid != 0 &&
+                !SameAckIdentity(completedIdentity, ActiveAckIdentity))
             {
                 // Late completion from a superseded shared-eye generation is
                 // safe to forget, but must never roll the global ACK generation
                 // backwards and stall the producer's new ring.
+                pending.armed = false;
+                pending.flushIssued = false;
+                pending.frame = {};
+                ++AckCompleted;
+                continue;
+            }
+            if (!OutRunVrD3D9ExDirectPassthrough::FrameRunIdentityCurrent(
+                    pending.frame))
+            {
+                // A new game process has claimed Frame.v2. This completed fence
+                // belongs to an old producer run and must not rewrite the ACK
+                // mapping or remain as an infinite retry owner.
                 pending.armed = false;
                 pending.flushIssued = false;
                 pending.frame = {};
@@ -201,7 +390,7 @@ namespace OutRunVrR32DirectSubmit
             if (slot < AckedFrame.size())
             {
                 AckedFrame[slot] = pending.frame.frameId;
-                AckedGeneration[slot] = generation;
+                AckedIdentity[slot] = FrameAckIdentity(pending.frame);
             }
             pending.armed = false;
             pending.flushIssued = false;
@@ -216,6 +405,49 @@ namespace OutRunVrR32DirectSubmit
         }
     }
 
+    inline bool PrepareConsumptionFenceSlot(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        if (!OutRunVrFinalTest::Context)
+            return false;
+        const std::uint32_t slot =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        const AckIdentity identity = FrameAckIdentity(frame);
+        if (slot >= Pending.size() || !generation || !frame.frameId ||
+            !identity.clientPid || !identity.runGeneration ||
+            !identity.transportGeneration || !EnsureFence(slot))
+            return false;
+
+        // Never sample a producer frame after this exact slot/frame was already
+        // ACKed, and never issue another copy while an EVENT for the same or a
+        // different frame still owns the slot.
+        if (AckedFrame[slot] == frame.frameId &&
+            SameAckIdentity(AckedIdentity[slot], identity))
+            return false;
+        if (AckedIdentity[slot].clientPid != 0 &&
+            !SameAckIdentity(AckedIdentity[slot], identity))
+        {
+            AckedIdentity[slot] = {};
+            AckedFrame[slot] = 0;
+        }
+
+        auto& pending = Pending[slot];
+        if (pending.armed)
+        {
+            PollCompletedAcks();
+            if (pending.armed && !pending.flushIssued)
+            {
+                OutRunVrFinalTest::Context->Flush();
+                pending.flushIssued = true;
+                ++AckFlushEscalations;
+                PollCompletedAcks();
+            }
+        }
+        return !pending.armed;
+    }
+
     inline bool ArmConsumptionFence(
         const OutRunVR::SharedRenderFrameState& frame) noexcept
     {
@@ -228,20 +460,20 @@ namespace OutRunVrR32DirectSubmit
         if (slot >= Pending.size() || !generation || !EnsureFence(slot))
             return false;
 
-        if (AckedGeneration[slot] == generation &&
-            AckedFrame[slot] == frame.frameId)
+        const AckIdentity identity = FrameAckIdentity(frame);
+        if (AckedFrame[slot] == frame.frameId &&
+            SameAckIdentity(AckedIdentity[slot], identity))
             return true;
-        if (AckedGeneration[slot] != 0 && AckedGeneration[slot] != generation)
+        if (AckedIdentity[slot].clientPid != 0 &&
+            !SameAckIdentity(AckedIdentity[slot], identity))
         {
-            AckedGeneration[slot] = 0;
+            AckedIdentity[slot] = {};
             AckedFrame[slot] = 0;
         }
 
         auto& pending = Pending[slot];
         if (pending.armed &&
-            pending.frame.frameId == frame.frameId &&
-            pending.frame.reserved[
-                OutRunVR::RenderFrameDirectGenerationIndex] == generation)
+            SameFrameAckIdentity(pending.frame, frame))
         {
             // R42: xrWaitFrame can submit the same already-rendered projection
             // more than once before the first EVENT is observed complete. The
@@ -274,8 +506,8 @@ namespace OutRunVrR32DirectSubmit
             }
         }
 
-        if (AckedGeneration[slot] == generation &&
-            AckedFrame[slot] == frame.frameId)
+        if (AckedFrame[slot] == frame.frameId &&
+            SameAckIdentity(AckedIdentity[slot], identity))
             return true;
 
         OutRunVrFinalTest::Context->End(pending.fence);
@@ -338,9 +570,8 @@ namespace OutRunVrR32DirectSubmit
         if (!OutRunVrR21RuntimeHardening::DirectTransportRequested())
         { reject = FastRejectReason::TransportDisabled; return false; }
 
-        const std::uint32_t generation =
-            verified.frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-        if (generation != 0 && AckFaultGeneration == generation)
+        const AckIdentity identity = FrameAckIdentity(verified.frame);
+        if (SameAckIdentity(AckFaultIdentity, identity))
         { reject = FastRejectReason::GenerationFault; return false; }
 
         // main_r23 has already staged this exact immutable slot and rendered the
@@ -360,6 +591,9 @@ namespace OutRunVrR32DirectSubmit
         Perf.flushEscalations = AckFlushEscalations;
         Perf.ackQueryError = AckQueryErrors;
         Perf.sameFramePendingReuse = AckSameFramePendingReuse;
+        Perf.skippedQueued = SkippedReleaseQueued;
+        Perf.skippedCompleted = SkippedReleaseCompleted;
+        Perf.skippedRetry = SkippedReleaseRetry;
         Perf.rejectReasons = RejectReasons;
         Perf.safeCacheHit = OutRunVrD3D9ExDirectPassthrough::R32SharedCacheHits;
         Perf.safeCacheMiss = OutRunVrD3D9ExDirectPassthrough::R32SharedCacheMisses;
@@ -390,6 +624,13 @@ namespace OutRunVrR32DirectSubmit
             << " ackQueryError=" << AckQueryErrors - Perf.ackQueryError
             << " sameFrameAckReuse="
             << AckSameFramePendingReuse - Perf.sameFramePendingReuse
+            << " skippedAck[queued="
+            << SkippedReleaseQueued - Perf.skippedQueued
+            << ",completed="
+            << SkippedReleaseCompleted - Perf.skippedCompleted
+            << ",retry="
+            << SkippedReleaseRetry - Perf.skippedRetry
+            << "]"
             << " rejectReason[projection="
             << RejectReasons[static_cast<std::size_t>(
                 FastRejectReason::ProjectionMismatch)] -
@@ -434,8 +675,7 @@ namespace OutRunVrR32DirectSubmit
                 OutRunVrR23VerifiedBundle::SourceKind::DirectGpu &&
             MetadataValid(observed.frame))
         {
-            ObserveGeneration(observed.frame.reserved[
-                OutRunVR::RenderFrameDirectGenerationIndex]);
+            ObserveIdentity(observed.frame);
         }
         PollCompletedAcks();
 
@@ -484,7 +724,12 @@ namespace OutRunVrR32DirectSubmit
 
     inline XrResult XRAPI_CALL DestroySession(XrSession session) noexcept
     {
-        ReleasePending();
+        // D3D11 EVENT queries protect producer texture reuse, not OpenXR
+        // session objects. A STOPPING/loss transition can destroy and recreate
+        // the XR session while the same host process/device remains alive.
+        // Preserve incomplete EVENT owners across that boundary; completed
+        // queries and never-touched skipped releases are retired first.
+        PollCompletedAcks();
         OutRunVrD3D9ExDirectPassthrough::R32ResetDirectCaches();
         return OutRunVrR24BlackScreenGuard::DestroySession(session);
     }

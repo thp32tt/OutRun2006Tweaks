@@ -4,7 +4,7 @@ param(
     [string]$Backend,
     [ValidateSet("CONTROL","CORRECTNESS","HUD_SCREEN","HUD_MENU","HUD_WORLD","PERFORMANCE","STAGE_DIAGNOSTIC","A_BASELINE","B_CULLING","C_CULLING_NO_SSAA","D_CULLING_NO_SSAA_R512")]
     [string]$TestProfile = "CORRECTNESS",
-    [ValidateSet("AUTO","CONTROL_2D","CURRENT_FOCUS","A_CONTROL","B_HUD","C_FLARE","D_PERF","E_DXVK_SAFE","E_DXVK_MULTIVIEW","F_DX12_STRICT","G_COCKPIT")]
+    [ValidateSet("AUTO","CONTROL_2D","CURRENT_FOCUS","A_CONTROL","B_HUD","C_FLARE","D_PERF","E_DXVK_SAFE","E_DXVK_MULTIVIEW","F_DX12_STRICT","G_COCKPIT","X_BASE","X_SCREEN_HUD","X_WORLD_RANK","X_COMBINED","R54_A_NEXTDRAW","R54_B_STICKY","R54_C_FULL_OWNER","R54_D_HUD_PLANE","R55_A_ZERO","R55_B_SCALE35","R55_C_WORLD35","R55_D_RANKZERO","R56_A_DISPRANK35","R56_B_RANK_BASECAM","R56_C_RANKCLIP35","R56_D_COMBINED")]
     [string]$VariantId = "AUTO"
 )
 
@@ -185,6 +185,10 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "Enabled" "false"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "false"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "false"
+        # Probe the DXVK provider's own Direct3DCreate9Ex export when
+        # available. The game hook never substitutes the system provider for a
+        # third-party provider, and DirectGpuOnly remains false so incompatible
+        # shared-resource interop falls back to SBS/Desktop Duplication.
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
@@ -193,7 +197,7 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "Enabled" "true"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
-        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
         $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
@@ -231,6 +235,36 @@ if (Test-Path $ini) {
     Set-Content $ini $text -Encoding UTF8
 }
 
+$backendDll = Join-Path $root "dinput8.dll"
+$hostExe = Join-Path $root "outrun-vr-host.exe"
+$gameExe = Join-Path $root "OR2006C2C.EXE"
+$localProviderDll = Join-Path $root "d3d9.dll"
+$providerDll = $null
+$providerBinaryKind = "missing"
+if (Test-Path $localProviderDll) {
+    $providerDll = $localProviderDll
+    $providerBinaryKind = "local"
+} elseif ($env:WINDIR) {
+    # OutRun is x86. Prefer the 32-bit system D3D9 provider on 64-bit Windows;
+    # fall back to System32 for 32-bit Windows or unusual installations.
+    $systemProviderCandidates = @(
+        (Join-Path $env:WINDIR "SysWOW64\d3d9.dll"),
+        (Join-Path $env:WINDIR "System32\d3d9.dll")
+    )
+    foreach ($candidate in $systemProviderCandidates) {
+        if (Test-Path $candidate) {
+            $providerDll = $candidate
+            $providerBinaryKind = "system"
+            break
+        }
+    }
+}
+$gameBinarySha256 = if (Test-Path $backendDll) { (Get-FileHash $backendDll -Algorithm SHA256).Hash.ToLowerInvariant() } else { "missing" }
+$hostBinarySha256 = if (Test-Path $hostExe) { (Get-FileHash $hostExe -Algorithm SHA256).Hash.ToLowerInvariant() } else { "none" }
+$gameExeSha256 = if (Test-Path $gameExe) { (Get-FileHash $gameExe -Algorithm SHA256).Hash.ToLowerInvariant() } else { "missing" }
+$providerBinarySha256 = if ($providerDll -and (Test-Path $providerDll)) { (Get-FileHash $providerDll -Algorithm SHA256).Hash.ToLowerInvariant() } else { "missing" }
+$providerBinaryPath = if ($providerDll) { [IO.Path]::GetFullPath($providerDll) } else { "missing" }
+
 $nl = [Environment]::NewLine
 $matrixFile = Join-Path $root "BUILD_MATRIX_ID.txt"
 $matrix = if (Test-Path $matrixFile) { (Get-Content $matrixFile -Raw).Trim() } else { "UNIFIED_LOCAL" }
@@ -244,6 +278,12 @@ $activeText = @(
     "variant=$variant"
     "profile=$TestProfile"
     "sourceSha=$sourceSha"
+    "gameBinarySha256=$gameBinarySha256"
+    "hostBinarySha256=$hostBinarySha256"
+    "gameExeSha256=$gameExeSha256"
+    "providerBinarySha256=$providerBinarySha256"
+    "providerBinaryKind=$providerBinaryKind"
+    "providerBinaryPath=$providerBinaryPath"
     "matrix=$matrix"
     "session=$session"
     "startedUtc=$($startedUtc.ToString('o'))"
@@ -260,6 +300,12 @@ $sessionManifest = [ordered]@{
     Backend = $Backend
     TestProfile = $TestProfile
     SourceSha = $sourceSha
+    GameBinarySha256 = $gameBinarySha256
+    HostBinarySha256 = $hostBinarySha256
+    GameExeSha256 = $gameExeSha256
+    ProviderBinarySha256 = $providerBinarySha256
+    ProviderBinaryKind = $providerBinaryKind
+    ProviderBinaryPath = $providerBinaryPath
     SessionId = $session
     StartedUtc = $startedUtc.ToString("o")
     ConfigSha256 = $configHash
@@ -288,7 +334,7 @@ Write-Host "Any previous root logs were archived before this session was created
 switch ($Backend) {
     "2d"   { Write-Host "2D ORIGINAL: classic D3D9, VR disabled, D3D9Ex promotion disabled, no VR host." }
     "d3d9" { Write-Host "D3D9Ex REFERENCE: PreferD3D9Ex enabled; DirectGPU optional; profile=$TestProfile." }
-    "dxvk-safe" { Write-Host "DXVK SAFE: classic D3D9 calls translated by DXVK; validated two-pass VR, multiview patcher disabled." }
+    "dxvk-safe" { Write-Host "DXVK SAFE: provider-local D3D9Ex is probed when exported; DirectGPU is optional and incompatible interop falls back to SBS; multiview patcher disabled." }
     "dxvk" { Write-Host "DXVK MULTIVIEW: local d3d9.dll + multiviewpatcher.dll active." }
     "dx12" { Write-Host "DX12 STRICT: local d3d9.dll verified absent; Windows D3D9On12 required." }
 }

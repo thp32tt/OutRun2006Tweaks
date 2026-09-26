@@ -35,6 +35,10 @@ namespace OutRunVRStereo
         std::uint64_t R32PendingFenceDrains = 0;
         std::uint64_t R32PendingFenceBlocks = 0;
         std::uint64_t R32PendingFenceErrors = 0;
+        std::uint64_t R32DirectCopyPairs = 0;
+        std::uint64_t R32DirectCopyQpcTicks = 0;
+        std::uint64_t R32DirectCopyPixels = 0;
+        std::uint64_t R32DirectCopyMaxQpcTicksSinceLog = 0;
         bool R32FirstStateSnapshotFailureLogged = false;
         bool R32FirstBatchWvpLogged = false;
         bool R32FirstFenceBudgetLogged = false;
@@ -68,6 +72,9 @@ namespace OutRunVRStereo
             std::uint64_t pendingDrain = 0;
             std::uint64_t pendingBlock = 0;
             std::uint64_t pendingError = 0;
+            std::uint64_t directCopyPairs = 0;
+            std::uint64_t directCopyQpcTicks = 0;
+            std::uint64_t directCopyPixels = 0;
             std::uint64_t resetRearm = 0;
             std::uint64_t resetFail = 0;
         };
@@ -81,6 +88,26 @@ namespace OutRunVRStereo
             DWORD zEnable = D3DZB_TRUE;
             DWORD cullMode = D3DCULL_CCW;
         };
+
+        LONGLONG R32QpcFrequency() noexcept
+        {
+            static const LONGLONG frequency = []() noexcept {
+                LARGE_INTEGER value{};
+                return QueryPerformanceFrequency(&value) != FALSE
+                    ? value.QuadPart : 0;
+            }();
+            return frequency;
+        }
+
+        std::uint64_t R32QpcTicksToUs(std::uint64_t ticks) noexcept
+        {
+            const LONGLONG frequency = R32QpcFrequency();
+            if (frequency <= 0)
+                return 0;
+            return (ticks * 1000000ull +
+                static_cast<std::uint64_t>(frequency / 2)) /
+                static_cast<std::uint64_t>(frequency);
+        }
 
         bool R32ReadEffectSnapshot(IDirect3DDevice9* device,
             R32EffectSnapshot& out) noexcept
@@ -677,11 +704,7 @@ namespace OutRunVRStereo
             if (!query)
                 return false;
 
-            static const LONGLONG qpcFrequency = []() noexcept {
-                LARGE_INTEGER value{};
-                return QueryPerformanceFrequency(&value) != FALSE
-                    ? value.QuadPart : 0;
-            }();
+            const LONGLONG qpcFrequency = R32QpcFrequency();
             LARGE_INTEGER start{};
             const bool highResolutionClock = qpcFrequency > 0 &&
                 QueryPerformanceCounter(&start) != FALSE;
@@ -822,12 +845,37 @@ namespace OutRunVRStereo
 
             {
                 InternalPassScope guard;
+                LARGE_INTEGER copyStart{};
+                const bool measureCopy = Settings::VRTelemetry &&
+                    R32QpcFrequency() > 0 &&
+                    QueryPerformanceCounter(&copyStart) != FALSE;
+
                 const HRESULT leftCopy = device->StretchRect(BackBuffer, nullptr,
                     slot.leftSurface, nullptr, D3DTEXF_NONE);
                 const HRESULT rightCopy = SUCCEEDED(leftCopy)
                     ? device->StretchRect(RightEyeSurface, nullptr,
                         slot.rightSurface, nullptr, D3DTEXF_NONE)
                     : leftCopy;
+
+                if (measureCopy)
+                {
+                    LARGE_INTEGER copyEnd{};
+                    if (QueryPerformanceCounter(&copyEnd) != FALSE &&
+                        copyEnd.QuadPart >= copyStart.QuadPart)
+                    {
+                        const std::uint64_t ticks =
+                            static_cast<std::uint64_t>(
+                                copyEnd.QuadPart - copyStart.QuadPart);
+                        ++R32DirectCopyPairs;
+                        R32DirectCopyQpcTicks += ticks;
+                        R32DirectCopyMaxQpcTicksSinceLog =
+                            std::max(R32DirectCopyMaxQpcTicksSinceLog, ticks);
+                        R32DirectCopyPixels +=
+                            static_cast<std::uint64_t>(DirectTransportWidth) *
+                            static_cast<std::uint64_t>(DirectTransportHeight) * 2ull;
+                    }
+                }
+
                 if (FAILED(leftCopy) || FAILED(rightCopy))
                 {
                     R32DirectCopyPathRejected = true;
@@ -951,6 +999,10 @@ namespace OutRunVRStereo
                 R32Counters.pendingDrain = R32PendingFenceDrains;
                 R32Counters.pendingBlock = R32PendingFenceBlocks;
                 R32Counters.pendingError = R32PendingFenceErrors;
+                R32Counters.directCopyPairs = R32DirectCopyPairs;
+                R32Counters.directCopyQpcTicks = R32DirectCopyQpcTicks;
+                R32Counters.directCopyPixels = R32DirectCopyPixels;
+                R32DirectCopyMaxQpcTicksSinceLog = 0;
                 R32Counters.resetRearm = R32ResetEpochRearms;
                 R32Counters.resetFail = R32ResetFailures;
                 return;
@@ -959,7 +1011,7 @@ namespace OutRunVRStereo
                 return;
 
             spdlog::info(
-                "VR R32 PERF 5s: liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},producerFenceOk={},producerBudgetFallback={},backpressure={},pendingDrain={},pendingBlock={},pendingError={}] reset[rearm={},fail={}]",
+                "VR R32 PERF 5s: liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},producerFenceOk={},producerBudgetFallback={},backpressure={},pendingDrain={},pendingBlock={},pendingError={},copyPairs={},copyAvgUs={},copyMaxUs={},copyMPix={},copy={}x{} fmt={}] reset[rearm={},fail={}]",
                 R31FastWorldLiveValidations - R32Counters.liveWvp,
                 R31FastWorldValidationRejects - R32Counters.liveReject,
                 R31StateBlockRecordings - R32Counters.stateRecord,
@@ -975,6 +1027,17 @@ namespace OutRunVRStereo
                 R32PendingFenceDrains - R32Counters.pendingDrain,
                 R32PendingFenceBlocks - R32Counters.pendingBlock,
                 R32PendingFenceErrors - R32Counters.pendingError,
+                R32DirectCopyPairs - R32Counters.directCopyPairs,
+                (R32DirectCopyPairs - R32Counters.directCopyPairs) != 0
+                    ? R32QpcTicksToUs(
+                        R32DirectCopyQpcTicks - R32Counters.directCopyQpcTicks) /
+                        (R32DirectCopyPairs - R32Counters.directCopyPairs)
+                    : 0,
+                R32QpcTicksToUs(R32DirectCopyMaxQpcTicksSinceLog),
+                (R32DirectCopyPixels - R32Counters.directCopyPixels) / 1000000ull,
+                DirectTransportWidth,
+                DirectTransportHeight,
+                static_cast<int>(DirectTransportFormat),
                 R32ResetEpochRearms - R32Counters.resetRearm,
                 R32ResetFailures - R32Counters.resetFail);
 
@@ -994,6 +1057,10 @@ namespace OutRunVRStereo
             R32Counters.pendingDrain = R32PendingFenceDrains;
             R32Counters.pendingBlock = R32PendingFenceBlocks;
             R32Counters.pendingError = R32PendingFenceErrors;
+            R32Counters.directCopyPairs = R32DirectCopyPairs;
+            R32Counters.directCopyQpcTicks = R32DirectCopyQpcTicks;
+            R32Counters.directCopyPixels = R32DirectCopyPixels;
+            R32DirectCopyMaxQpcTicksSinceLog = 0;
             R32Counters.resetRearm = R32ResetEpochRearms;
             R32Counters.resetFail = R32ResetFailures;
         }

@@ -370,6 +370,57 @@
         "result": "vehicle rank labels remain detached from vehicles, move with headset, and affected rank/position elements are doubled",
         "telemetry": "R30 screen worldBillboard counter remained 0 while r44 spatial reached 5154"
       }
+    },
+    {
+      "key": "VR-HOST-SUPERVISOR-GAME-OWNERSHIP-001",
+      "title": "Auto-host supervisor can adopt a host owned by another OutRun process",
+      "status": "STATIC_CONFIRMED_FIX_NEEDS_RUNTIME_REVALIDATION",
+      "severity": "runtime-correctness",
+      "firstDetectedKst": "2026-09-26",
+      "sourceSha": "f102f3ba1cc9044bf5052fac6cb7be2dad2fe102",
+      "symptomFingerprint": {
+        "primary": "same-directory outrun-vr-host.exe from an older or parallel OR2006C2C process can satisfy path-only supervisor discovery",
+        "consequences": [
+          "new game may suppress its own correctly PID-bound host launch",
+          "HostState and game-window ownership can diverge across fast restarts or parallel game instances"
+        ]
+      },
+      "rootCause": {
+        "status": "STATIC_CONFIRMED",
+        "summary": "Supervisor discovery verified executable name/path and HostState PID but did not bind the host process parent to the current OR2006C2C PID, while the child side was already bound with OUTRUN_VR_GAME_PID."
+      },
+      "fixReferences": [
+        "f102f3ba1cc9044bf5052fac6cb7be2dad2fe102 — require current-game Toolhelp parent PID for supervised host discovery and recheck ownership before termination",
+        "1da0ded31c0b6e95d819b7f42d101a8c78fa1570 — architecture verifier enforces parent ownership markers"
+      ],
+      "constraints": [
+        "never terminate an exact-path host that is not owned by the current game process",
+        "preserve OUTRUN_VR_GAME_PID exact child-side game binding",
+        "do not broaden HostState stale detection to non-renderable states while v3 is shadow-published from v2 pose changes"
+      ],
+      "riskPaths": [
+        "src/vr/settings.cpp",
+        "vrhost/src/main.cpp",
+        "vrhost/src/ipc/host_state_v3_writer.hpp"
+      ],
+      "revalidationTriggers": [
+        "changes to auto-host discovery/restart/termination logic",
+        "changes to OUTRUN_VR_GAME_PID binding",
+        "changes to HostState ownership or process identity"
+      ],
+      "nextAction": "Run a fast-restart/second-process ownership test and confirm the new game launches only its own child host, never adopts or terminates another live game's host; retain HMD candidate status until normal Quest3/VDXR startup/gameplay also passes.",
+      "recurrenceCount": 0,
+      "testLevel": 1,
+      "verifier": {
+        "static": [
+          "architecture gate requires IsCurrentGameOwnedHostEntry/IsCurrentGameOwnedHostPid and current process parent check",
+          "termination requires exact binary path plus current-game ownership"
+        ],
+        "runtime": [
+          "normal single-game startup: auto-launched host PID parent is the current OR2006C2C PID and OpenXR startup proceeds",
+          "fast restart or parallel process: supervisor does not adopt or terminate a host owned by another live game process"
+        ]
+      }
     }
   ],
   "userRuntimeVerifiedBaseline": {
