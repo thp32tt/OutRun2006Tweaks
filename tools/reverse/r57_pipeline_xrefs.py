@@ -12,6 +12,10 @@ sys.modules[spec.name]=mod
 spec.loader.exec_module(mod)
 
 TARGETS={
+  0x00009F90:"mxPushLoadMatrix",
+  0x0000A010:"mxPopMatrix",
+  0x0000A170:"mxLoadCurrentMatrix",
+  0x0000A7D0:"mxCalcPoint",
   0x00049940:"Calc3D2D",
   0x000BA0E0:"dispMarkerCheck",
   0x00029580:"sprani_play_ae_auth_alpha",
