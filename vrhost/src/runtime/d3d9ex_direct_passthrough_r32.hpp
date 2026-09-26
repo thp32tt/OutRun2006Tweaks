@@ -283,21 +283,27 @@ namespace OutRunVrD3D9ExDirectPassthrough
         return true;
     }
 
+    inline bool SafeEyeIdentityMatchesR32(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        const std::uint32_t runGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+        return frame.frameId && generation && runGeneration && frame.clientPid &&
+            SafeFrameId == frame.frameId &&
+            SafeTransportGeneration == generation &&
+            SafeClientPid == frame.clientPid &&
+            SafeRunGeneration == runGeneration &&
+            SafeEyeSrv[0] && SafeEyeSrv[1];
+    }
+
     inline bool EnsureSafeFrameR32(std::uint32_t frameId) noexcept
     {
         OutRunVR::SharedRenderFrameState frame{};
         if (!ReadFrameById(frameId, frame))
             return false;
-        const std::uint32_t generation =
-            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-        const std::uint32_t runGeneration =
-            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
-        if (frameId && generation && runGeneration && frame.clientPid &&
-            SafeFrameId == frameId &&
-            SafeTransportGeneration == generation &&
-            SafeClientPid == frame.clientPid &&
-            SafeRunGeneration == runGeneration &&
-            SafeEyeSrv[0] && SafeEyeSrv[1])
+        if (SafeEyeIdentityMatchesR32(frame))
             return true;
         return CopySharedFrameToSafeEyesR32(frame);
     }
