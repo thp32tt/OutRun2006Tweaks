@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-26 22:46 KST
+Updated: 2026-09-26 22:51 KST
 
 ## Active branch
 `korean-localization-clean`
@@ -22,12 +22,16 @@ Base: `emoose/OutRun2006Tweaks@08e5efb4deea4066c440307ec009c868a30562d3`
 ## HD texture source migration
 
 - Canonical graphics source: **user-installed high-resolution texture mod**
-- Migration state: **PENDING exact HD DDS import**
+- Migration state: **HD source received and synchronized; rebuild against HD source is ACTIVE**
 - Collector: `tools/localization/collect_hd_localization_source.ps1`
 - Asset matching: hexadecimal hash prefix; dimensions read from DDS header
 - Stock original archive: fallback + orientation/reference only
 - Existing stock-resolution Korean DDS/candidates: historical until rebuilt/revalidated against HD source
-- New graphics promotion: **HOLD** until HD source ZIP + SHA-256 manifest are imported
+- HD source identity: `OR2-HD-GUI-v0.25.10a.zip` / SHA-256 `76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958`
+- Direct HD target match: **80/80**
+- Selected HD source package: `OutRun2_HD_Localization_Source_80.zip` / SHA-256 `86172324a835195d61c5852841fccf97b13d5ba1ed0d925567970b2755e17666`
+- Sync record: `localization/graphics/HD_SOURCE_SYNC_20260926.md`
+- New graphics work must use the HD source as canonical artwork base
 
 ## Graphics
 - DDS inventory/visual review: **243/243 (100%)**
