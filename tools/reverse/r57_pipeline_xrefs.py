@@ -23,6 +23,15 @@ TARGETS={
   0x0002A3A0:"draw_sprite_custom_matrix",
   0x0002A800:"draw_sprite_custom_matrix_alt",
   0x0002C0F0:"draw_sprite_kind0_helper",
+  0x000295D0:"sprani_projected_world_helper_295D0",
+  0x00028A10:"sprani_core_28A10",
+  0x00028AF0:"sprani_core_28AF0",
+  0x00028EA0:"sprani_build_args2_28EA0",
+  0x00029460:"sprani_emit_29460",
+  0x0002D300:"matrix_clip_sprite_helper_2D300",
+  0x0002D5F0:"clip_sprite_list_helper_2D5F0",
+  0x0002C2F0:"clip_sprite_decode_2C2F0",
+  0x00029C60:"sprite_batch_begin_29C60",
 }
 
 def main():
