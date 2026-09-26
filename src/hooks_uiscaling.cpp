@@ -506,7 +506,7 @@ class UIScaling : public Hook
 		auto original = reinterpret_cast<DispRankSpraniFn>(
 			Module::exe_ptr(0x29530));
 		const int r57 = VRR57Mode();
-		const bool exactPositionOwner = r57 == 1 || r57 == 3;
+		const bool exactPositionOwner = r57 == 1 || r57 == 3 || r57 == 6;
 
 		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
 		if (exactPositionOwner)
@@ -590,7 +590,7 @@ class UIScaling : public Hook
 
 		const int r57 = VRR57Mode();
 		int result = 0;
-		if (r57 == 2 || r57 == 3)
+		if (r57 == 2 || r57 == 3 || r57 == 6)
 		{
 			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
 				OutRunVR::GameSemantic::RenderScope::ScreenHud);
@@ -606,7 +606,7 @@ class UIScaling : public Hook
 		// R57 HMD modes 2/3 proved that the nested put_clip_sprite -> put_sprite_ex
 		// producer scope did not survive as an accepted kind-0 HUD owner. The
 		// canonical helper appends one node, so pin the exact new node directly.
-		if (r57 == 2 || r57 == 3)
+		if (r57 == 2 || r57 == 3 || r57 == 6)
 		{
 			root = Game::sprite_prio_root[prio];
 			SpriteNode* node = root ? root->tail_4 : nullptr;
