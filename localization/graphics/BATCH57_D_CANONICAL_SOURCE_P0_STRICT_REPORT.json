@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "run": "batch57-d-canonical-source-recovery-and-p0-strict-20260926",
+  "timestamp_kst": "2026-09-26T15:06:00+09:00",
+  "branch": "korean-localization-clean",
+  "source_truth": {
+    "archive": "outrun_korean_analysis.tar.gz",
+    "sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+    "dds_count": 243,
+    "canonical_match_resume": true
+  },
+  "correction": {
+    "report": "BATCH56_FULL32_EXACT_ORIGINAL_RISK_AUDIT_REPORT.json",
+    "recorded_source_sha256": "56082ef73dac45f2798fceef2dc608ca29eb226afe6cf62be6f3e75db75b6d6e",
+    "status": "SUPERSEDED_AS_SOURCE_IDENTITY_EVIDENCE",
+    "reason": "does not match canonical/uploaded source archive SHA; all exact-original conclusions must be recomputed from e17db462..."
+  },
+  "strict_scope": {
+    "inventory": 243,
+    "full_draft": 79,
+    "source_faithful": 32,
+    "grandfathering": false,
+    "strict_pass": 0,
+    "promotion_hold": true
+  },
+  "p0": [
+    {
+      "asset": "841E796B_512x128.dds",
+      "approved_translation": [
+        "핸디캡 없음"
+      ],
+      "preserve_original": "all vehicle/model/Ferrari/brand cards and pictograms",
+      "status": "USER_REJECTED_NEEDS_REWORK"
+    },
+    {
+      "asset": "EBEF6D20_512x512.dds",
+      "approved_translation": [
+        "로딩"
+      ],
+      "status": "USER_REJECTED_NEEDS_REWORK"
+    },
+    {
+      "asset": "571E78F3_512x64.dds",
+      "approved_translation": [
+        "타임 어택 모드",
+        "15코스 연속"
+      ],
+      "proof_box": [
+        90,
+        1,
+        320,
+        62
+      ],
+      "status": "USER_REJECTED_NEEDS_REWORK"
+    },
+    {
+      "asset": "62BEBF33_512x64.dds",
+      "approved_translation": [
+        "아웃런 모드"
+      ],
+      "proof_box": [
+        90,
+        7,
+        270,
+        50
+      ],
+      "status": "USER_REJECTED_NEEDS_REWORK"
+    },
+    {
+      "asset": "E3FD08BE_512x64.dds",
+      "approved_translation": [
+        "하트 어택 모드"
+      ],
+      "proof_box": [
+        90,
+        7,
+        335,
+        50
+      ],
+      "status": "USER_REJECTED_NEEDS_REWORK"
+    }
+  ],
+  "per_asset_required_fields": [
+    "original_text_bbox",
+    "allowed_mask_id/hash",
+    "localized_bbox",
+    "bbox_contained",
+    "bbox_width_ok",
+    "bbox_height_ok",
+    "outside_mask_changed_pixels",
+    "nontext_changed_pixels",
+    "overlay_box_overflow_pixels",
+    "residual_english_detected",
+    "patch_seam_detected",
+    "background_reconstruction_pass",
+    "icon_boundary_preserved",
+    "text_exact_match",
+    "glyph_corruption_detected",
+    "format_match",
+    "header_match",
+    "mip_match",
+    "alpha_contract_match",
+    "raw_orientation_match",
+    "readable_orientation_match",
+    "style_visual_pass",
+    "manual_visual_pass",
+    "full_redraw_used"
+  ],
+  "decision": "NO_PROMOTION",
+  "next": [
+    "recompute source-faithful 32 against canonical archive",
+    "rebuild P0 from original-only masks",
+    "run 12 gates from zero",
+    "continue FULL_DRAFT 79 then zoom/preserve inventory"
+  ]
+}
