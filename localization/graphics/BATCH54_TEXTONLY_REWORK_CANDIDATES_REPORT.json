@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "run": "interactive-batch54-textonly-rework-20260926",
+  "timestamp_kst": "2026-09-26T13:08:00+09:00",
+  "branch": "korean-localization-clean",
+  "status": "INTERNAL_REWORK_CANDIDATES_NOT_PROMOTED",
+  "policy": {
+    "final_dds_generation": "deterministic text rendering/pixel composition only",
+    "generative_image_used_for_final_dds": false,
+    "original_header_preserved": true,
+    "promotion_requires_manual_style_qa": true
+  },
+  "candidates": [
+    {
+      "asset": "571E78F3",
+      "translation": ["타임 어택 모드","15코스 연속"],
+      "original_bbox": [101,4,389,59],
+      "candidate_bbox": [115,5,374,59],
+      "bbox_width_ok": true,
+      "bbox_height_ok": true,
+      "bbox_contained": true,
+      "header_128_match": true,
+      "status": "REWORK_CANDIDATE_INTERNAL"
+    },
+    {
+      "asset": "62BEBF33",
+      "translation": ["아웃런 모드"],
+      "original_bbox": [100,15,338,50],
+      "candidate_bbox": [112,16,326,50],
+      "bbox_width_ok": true,
+      "bbox_height_ok": true,
+      "bbox_contained": true,
+      "header_128_match": true,
+      "status": "REWORK_CANDIDATE_INTERNAL"
+    },
+    {
+      "asset": "E3FD08BE",
+      "translation": ["하트 어택 모드"],
+      "original_bbox": [100,15,405,49],
+      "candidate_bbox": [115,15,389,49],
+      "bbox_width_ok": true,
+      "bbox_height_ok": true,
+      "bbox_contained": true,
+      "header_128_match": true,
+      "status": "REWORK_CANDIDATE_INTERNAL"
+    }
+  ],
+  "binary_persistence": {
+    "github_committed": false,
+    "reason": "keep game-derived DDS binary candidates internal until explicit publish/package instruction and final strict QA",
+    "internal_store": "localization_fallback/20260926-1250-D/rework_candidates/"
+  },
+  "next_action": [
+    "finish exact style/manual QA for these 3 candidates",
+    "rebuild 841E796B and EBEF6D20 with per-cell masks while preserving non-text/icon pixels",
+    "continue remaining Batch53 REWORK_REQUIRED assets"
+  ]
+}
