@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "run": "automation-D-final-strict-actual-byte-audit-20260926",
+  "timestamp_kst": "2026-09-26T14:45:00+09:00",
+  "branch": "korean-localization-clean",
+  "candidate_package": {
+    "name": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip",
+    "sha256": "7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02",
+    "actual_bytes_verified": true,
+    "dds_count": 32
+  },
+  "source_of_truth": {
+    "required_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
+    "available": false,
+    "library_search": "no matching archive found"
+  },
+  "result": {
+    "strict_pass": 0,
+    "promotion_hold": true,
+    "reason": "Actual candidate bytes were freshly audited, but exact original archive bytes are unavailable. Original-dependent bbox/mask/nontext/header/orientation/style gates cannot be proven and therefore cannot PASS."
+  },
+  "priority_user_rejected": [
+    "841E796B",
+    "EBEF6D20",
+    "571E78F3",
+    "62BEBF33",
+    "E3FD08BE"
+  ],
+  "local_fallback": "/mnt/data/D_FINAL_STRICT_BYTE_AUDIT_20260926/{audit.csv,audit.json,report.json}",
+  "next_action": "Recover exact original archive, then P0 five -> remaining source-faithful -> pending/rejected -> FULL_DRAFT 79 -> zoom/preserve inventory. No grandfathering."
+}
