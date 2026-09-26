@@ -200,6 +200,7 @@ if (Test-Path $ini) {
         # stays on the provider's classic IDirect3D9 path until Ex startup is
         # isolated behind a dedicated experimental backend.
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
         $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
@@ -211,6 +212,7 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
     } elseif ($Backend -eq "dx11") {
@@ -234,6 +236,7 @@ if (Test-Path $ini) {
         # enter the provider-local Ex path that currently dies during
         # CreateDeviceEx. Keep Desktop Duplication available as fail-open.
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
         $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
@@ -246,6 +249,7 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "true"
     }
