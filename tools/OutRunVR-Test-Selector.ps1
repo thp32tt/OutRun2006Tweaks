@@ -7,16 +7,16 @@ $runner=Join-Path $root 'Run-OutRunVRTest.ps1'
 $probe=Join-Path $root 'outrun-d3d9on12-probe.exe'
 
 $slots=[ordered]@{
-    'R57_01_POSITION_KIND1_HUD35'=@('01. POSITION kind=1 only','첫 sprani/SPRARGS2 요소만 SCREEN_HUD + 35%.')
-    'R57_02_POSITION_KIND0_HUD35'=@('02. POSITION kind=0 only','뒤 8개 put_clip_sprite/SPRARGS만 SCREEN_HUD + 35%.')
-    'R57_03_POSITION_ALL_WORLD35'=@('03. POSITION complete fix','kind=1+kind=0 전체 exact SCREEN_HUD + finite plane 35%.')
-    'R57_04_RANK_ALL_AS_HUD'=@('04. VEHICLE RANK as HUD','차량 위 1~6등을 HUD로 강제해 최종 draw ownership 확인.')
-    'R57_05_RANK_PROJECTED_IPD'=@('05. RANK projected-IPD','Calc3D2D view X/Y/Z 보존 후 eye IPD/FOV 재투영. 우선 테스트.')
-    'R57_06_RANK_PROJECTED_HEAD'=@('06. RANK + head inverse','05에 head inverse까지 적용해 camera-space 가설 비교.')
-    'R57_07_RANK_PROJECTED_13'=@('07. RANK 1-3 only','sprani/SPRARGS2 1~3등만 projected-world-marker.')
-    'R57_08_RANK_PROJECTED_46'=@('08. RANK 4-6 only','put_clip_sprite/SPRARGS 4등 이후만 projected-world-marker.')
-    'R57_09_RANK_PROJECTED_ZERO'=@('09. projected owner / zero','semantic은 유지하고 양안 위치 보정만 끔.')
-    'R57_10_RANK_PROJECTED_TRACE'=@('10. projected trace only','깊이/양안 delta를 계산·기록하되 화면은 원본 유지.')
+    'R58_01_CONFIRMED_13_HEAD'=@('01. 1-3 CONFIRMED HEAD','R57-06에서 성공한 1~3등 head-inverse 재투영만 유지.')
+    'R58_02_BAD20_46_DIRECT_HEAD'=@('02. BAD20 4+ DIRECT','4등 이후 digit 최종 SpriteNode를 BAEE2 anchor에 직접 연결.')
+    'R58_03_SIBLING_BB3_HEAD'=@('03. SIBLING BB3','BB3D6 Calc3D2D → BB550 sprite 계열만 추가 추적.')
+    'R58_04_SIBLING_BB6_HEAD'=@('04. SIBLING BB6','BB6F0 Calc3D2D → BB796 sprite 계열만 추가 추적.')
+    'R58_05_SIBLING_BBB_HEAD'=@('05. SIBLING BBB','BBB85 Calc3D2D → BBC5A sprite 계열만 추가 추적.')
+    'R58_06_SIBLING_BBD_HEAD'=@('06. SIBLING BBD','BBDC5 Calc3D2D → BC2E5/BC346 sprite 계열만 추가 추적.')
+    'R58_07_ALL_PROJECTED_HEAD'=@('07. ALL PROJECTED','1~3 + BAD20 4+ + sibling 전체를 head-inverse 방식으로 통합.')
+    'R58_08_POSITION_SUPPRESS'=@('08. POSITION SUPPRESS','DispRank로 추정한 9개 producer를 제거. 6th/6가 남으면 다른 owner.')
+    'R58_09_POSITION_DIRECT_HUD'=@('09. POSITION DIRECT HUD','DispRank가 만든 최종 node를 직접 SCREEN_HUD로 등록, HudScale 사용.')
+    'R58_10_POSITION_DIRECT_HUD35'=@('10. POSITION DIRECT 35%','09와 동일하되 35% 강제. 6th/6 ownership을 눈으로 확정.')
 }
 
 function Start-VRTest([string]$backend,[string]$variant){
@@ -29,20 +29,20 @@ function Start-VRTest([string]$backend,[string]$variant){
 }
 
 $form=New-Object System.Windows.Forms.Form
-$form.Text='OutRun VR 2026-09-26 Nightly Unified Test'
+$form.Text='OutRun VR R58 HUD / Rank Root-Cause Test'
 $form.StartPosition='CenterScreen'
 $form.ClientSize=[System.Drawing.Size]::new(1040,790)
 $form.MinimumSize=[System.Drawing.Size]::new(920,680)
 
 $title=New-Object System.Windows.Forms.Label
-$title.Text='OutRun VR Nightly - R57 + DX9Ex / DX11 Host / DXVK / DX12'
+$title.Text='OutRun VR R58 - HMD evidence-driven HUD / rival rank isolation'
 $title.Font=New-Object System.Drawing.Font('Segoe UI',15,[System.Drawing.FontStyle]::Bold)
 $title.AutoSize=$true
 $title.Location=[System.Drawing.Point]::new(24,16)
 $form.Controls.Add($title)
 
 $guide=New-Object System.Windows.Forms.Label
-$guide.Text='권장 순서: R57 03 → 05 → 06. 그 다음 같은 R57_05로 DX11 Host, DXVK SAFE, DXVK MULTIVIEW를 비교하세요. DX12는 먼저 D3D9On12 Probe PASS를 확인한 뒤 STRICT를 실행하세요.'
+$guide.Text='권장 순서: 01 → 02 → 08 → 10. 02가 4~6등에 안 먹으면 03~06을 확인하고, 맞는 family가 나오면 07로 통합 확인하세요.'
 $guide.AutoSize=$false
 $guide.Size=[System.Drawing.Size]::new(990,48)
 $guide.Location=[System.Drawing.Point]::new(26,54)
@@ -55,11 +55,11 @@ $backendBox.Size=[System.Drawing.Size]::new(990,150)
 $form.Controls.Add($backendBox)
 
 $backendButtons=@(
-    @('DX9Ex + D3D11 Host','d3d9','R57_05_RANK_PROJECTED_IPD','기준. DirectGPU 실패 시 fallback 허용.'),
-    @('DX11 Host DirectGPU','dx11','R57_05_RANK_PROJECTED_IPD','D3D9Ex 게임 + D3D11 OpenXR host. DirectGPU-only / ACK run identity.'),
-    @('DXVK SAFE','dxvk-safe','R57_05_RANK_PROJECTED_IPD','DXVK provider-local Ex probe, multiview off, fallback 허용.'),
-    @('DXVK MULTIVIEW','dxvk','R57_05_RANK_PROJECTED_IPD','DXVK + multiviewpatcher 실험 경로.'),
-    @('DX12 STRICT','dx12','R57_05_RANK_PROJECTED_IPD','실험적 D3D9On12 기대 경로. Probe PASS 후 실행.')
+    @('DX9Ex + D3D11 Host','d3d9','R58_07_ALL_PROJECTED_HEAD','기준. DirectGPU 실패 시 fallback 허용.'),
+    @('DX11 Host DirectGPU','dx11','R58_07_ALL_PROJECTED_HEAD','D3D9Ex 게임 + D3D11 OpenXR host. DirectGPU-only / ACK run identity.'),
+    @('DXVK SAFE','dxvk-safe','R58_07_ALL_PROJECTED_HEAD','DXVK provider-local Ex probe, multiview off, fallback 허용.'),
+    @('DXVK MULTIVIEW','dxvk','R58_07_ALL_PROJECTED_HEAD','DXVK + multiviewpatcher 실험 경로.'),
+    @('DX12 STRICT','dx12','R58_07_ALL_PROJECTED_HEAD','실험적 D3D9On12 기대 경로. Probe PASS 후 실행.')
 )
 $x=14
 foreach($b in $backendButtons){
@@ -93,7 +93,7 @@ $note.Location=[System.Drawing.Point]::new(248,86)
 $backendBox.Controls.Add($note)
 
 $r57Box=New-Object System.Windows.Forms.GroupBox
-$r57Box.Text='R57 HUD / 차량 순위 원인 분리'
+$r57Box.Text='R58 HUD / 차량 순위 원인 분리'
 $r57Box.Location=[System.Drawing.Point]::new(22,270)
 $r57Box.Size=[System.Drawing.Size]::new(990,485)
 $r57Box.Anchor='Top,Bottom,Left,Right'
