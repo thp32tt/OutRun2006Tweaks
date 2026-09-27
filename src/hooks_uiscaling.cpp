@@ -646,10 +646,38 @@ class UIScaling : public Hook
 		int xstnum, int x, int y, std::uint32_t flags,
 		float priority, std::uint32_t color)
 	{
-		OutRunVR::GameSemantic::ScopedProducerSemantic producer(
-			OutRunVR::GameSemantic::RenderScope::ScreenHud);
-		return Game::put_clip_sprite(
-			xstnum, x, y, flags, priority, color);
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
+
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+		}
+
+		// R66 review pass 5: exact option-arrow callsites are proven, but the
+		// 4th+ rank history showed that a nested producer scope alone can be lost
+		// before queue consumption. Pin the one node appended by put_clip_sprite.
+		root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (node && node != tailBefore)
+		{
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			static std::atomic<std::uint64_t> directArrowTags{ 0 };
+			const auto hit = directArrowTags.fetch_add(
+				1, std::memory_order_relaxed) + 1;
+			if ((hit & (hit - 1)) == 0)
+				spdlog::info(
+					"VR R66 OPTION ARROW: exact node pinned prio={} kind={} hits={}",
+					prio, node->kind_C, hit);
+		}
+		return result;
 	}
 
 	using TextGlyphPutSpriteFn =
