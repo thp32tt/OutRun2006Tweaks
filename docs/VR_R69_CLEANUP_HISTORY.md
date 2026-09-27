@@ -32,3 +32,12 @@ Rules:
 - HUD reverse-engineering ranges and the HUD inspector now use `OutRunVR::GameSemantic::RenderScope` directly.
 - Semantic outputs remain the same: unknown -> None, finite HUD -> ScreenHud, world-attached markers -> WorldBillboard.
 - Build gate: DX9Ex Active Validation triggered from this final stage head.
+
+
+## S3 — FrameContext introduction
+- Branch: `vr-d3d9ex-candidate/r69-clean-s3`
+- Parent: S2 `f504705ad8b2650790dbd2d07991a100a9b1820c`
+- Change: introduced `src/vr/d3d9/frame_context.hpp` and moved the R67/R68 stage-transition identity/hold state into `FrameContext`.
+- Stage-transition behavior remains unchanged: three-present hold, last-good projection reuse, SkyGlow capture epoch reset.
+- This is the first migration step; unrelated long-lived telemetry/state remains untouched.
+- Build gate: DX9Ex Active Validation triggered from this final stage head.
