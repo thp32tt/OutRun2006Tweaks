@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "audit": "FULL_PIXEL_BOUNDARY_ZERO_TOLERANCE",
+  "timestamp_kst": "2026-09-28T07:10:00+09:00",
+  "branch": "korean-localization-clean",
+  "rule": {
+    "max_outside_pixels": 0,
+    "max_introduced_alpha_outside_pixels": 0,
+    "bbox_requirement": "candidate text/glyph bbox must be fully contained in the original source text region/cell; any 1px escape => REWORK_REQUIRED",
+    "missing_evidence": "HOLD_STRICT_RECHECK; never PASS by assumption",
+    "dxt5": "decoded-pixel containment evidence preferred; block-only evidence is not final approval",
+    "release_note": "static containment PASS is not in-game approval"
+  },
+  "inventory": {
+    "image_binaries_total": 179,
+    "dds_total": 40,
+    "png_qa_preview_total": 139,
+    "canonical_hd_source_dds": 17,
+    "non_source_work_dds": 23,
+    "current_hd_candidates": 16,
+    "historical_role_a_work_dds": 4,
+    "historical_lowres_approved_dds": 3
+  },
+  "current_hd_candidates": [
+    {
+      "asset": "FF2462BB",
+      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
+      "outside_pixels": 0,
+      "introduced_alpha_outside": 0,
+      "evidence": "C75: a76 outside 32 regions exact; a77 outside 35 boxes exact; A78 YOU-box exact; edge nontransparent=0; D74 pass"
+    },
+    {
+      "asset": "568D3696",
+      "status": "STATIC_BOUNDARY_PASS_DXT5_RECHECK_CAUTION_PENDING_INGAME",
+      "outside_pixels": 0,
+      "introduced_alpha_outside": 0,
+      "evidence": "C76: changed payload confined to scaled 14 text regions; source_box_edge_alpha_failures=[]; non-text payload outside touched DXT5 blocks exact. Keep decoded-pixel caution because DXT5 works in 4x4 blocks."
+    },
+    {
+      "asset": "FA7BBB13",
+      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
+      "outside_pixels": 0,
+      "introduced_alpha_outside": 0,
+      "evidence": "C77/D77: outside 17 text cells=0; introduced alpha outside=0; candidate alpha bboxes inside source cells"
+    },
+    {
+      "asset": "39229D64",
+      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
+      "outside_pixels": 0,
+      "introduced_alpha_outside": 0,
+      "evidence": "C78/D79: outside all 15 source cells=0; introduced alpha outside=0"
+    },
+    {
+      "asset": "A064FDFC",
+      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
+      "outside_pixels": 0,
+      "introduced_alpha_outside": 0,
+      "min_margin_px": 3,
+      "evidence": "C79/D79"
+    },
+    {
+      "asset": "C4A2937B",
+      "status": "STATIC_BOUNDARY_PASS_CONTEXT_HOLD_PENDING_INGAME",
+      "outside_pixels": 0,
+      "introduced_alpha_outside": 0,
+      "evidence": "C80/D82: outside 21 source cells=0; introduced alpha outside=0"
+    },
+    {
+      "asset": "2DA43E41",
+      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
+      "outside_pixels": 0,
+      "introduced_alpha_outside": 0,
+      "evidence": "C80/D82: raw payload pixel changes outside all 11 cells=0; introduced alpha outside=0"
+    },
+    {
+      "asset": "411827E",
+      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
+      "outside_pixels": 0,
+      "introduced_alpha_outside": 0,
+      "evidence": "C80/D82: raw payload pixel changes outside all 7 cells=0; introduced alpha outside=0"
+    },
+    {
+      "asset": "571E78F3",
+      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME_REAPPROVAL",
+      "outside_pixels": 0,
+      "introduced_alpha_outside": 0,
+      "evidence": "C81/D83: decoded outside cells=0; DXT5 blocks outside cells=0"
+    },
+    {
+      "asset": "62BEBF33",
+      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME_REAPPROVAL",
+      "outside_pixels": 0,
+      "introduced_alpha_outside": 0,
+      "evidence": "C81/D83: decoded outside cells=0; DXT5 blocks outside cells=0"
+    },
+    {
+      "asset": "E3FD08BE",
+      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME_REAPPROVAL",
+      "outside_pixels": 0,
+      "introduced_alpha_outside": 0,
+      "evidence": "C81/D83: decoded outside cells=0; DXT5 blocks outside cells=0"
+    },
+    {
+      "asset": "C075FB49",
+      "status": "STATIC_BOUNDARY_PASS_ZERO_MARGIN_RISK_PENDING_INGAME",
+      "outside_pixels": 0,
+      "introduced_alpha_outside": 0,
+      "min_margin_px": 0,
+      "evidence": "C82/D84: outside corrected 17 cells=0; setting label touches boundary but does not escape; high-zoom no clipping/escape"
+    },
+    {
+      "asset": "FD90AA9",
+      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
+      "outside_pixels": 0,
+      "introduced_alpha_outside": 0,
+      "min_margin_px": 13,
+      "evidence": "C82/D84"
+    },
+    {
+      "asset": "9F060EC1",
+      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
+      "outside_pixels": 0,
+      "introduced_alpha_outside": 0,
+      "min_margin_px": 4,
+      "evidence": "C82/D84"
+    },
+    {
+      "asset": "D6DC1380",
+      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
+      "outside_pixels": 0,
+      "introduced_alpha_outside": 0,
+      "min_margin_ltrb": [
+        175,
+        1,
+        175,
+        1
+      ],
+      "evidence": "C83/D85 exact scaled source alpha bbox [32,40,992,176] vs candidate [207,41,817,175]"
+    },
+    {
+      "asset": "48DEBE77",
+      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
+      "outside_pixels": 0,
+      "introduced_alpha_outside": 0,
+      "min_margin_px": 4,
+      "evidence": "C83/D85: outside 3 source text cells=0; alpha changes outside=0"
+    }
+  ],
+  "historical_role_a_work_dds": [
+    {
+      "path": "localization/graphics/role_A/20260927-0850-A71/FF2462BB_A71_v2.dds",
+      "status": "BOUNDARY_EVIDENCE_PASS_BUT_SUPERSEDED",
+      "note": "A71 records outside localization bboxes=0 and edge nontransparent=0; includes one 1px safety margin but no escape."
+    },
+    {
+      "path": "localization/graphics/role_A/20260927-1038-A76/FF2462BB_A76_COMPLETE_CANDIDATE.dds",
+      "status": "BOUNDARY_EVIDENCE_PASS_BUT_SUPERSEDED",
+      "note": "Outside 32 localized regions exact canonical; GOAL/GHOST alpha bboxes inside source bounds."
+    },
+    {
+      "path": "localization/graphics/role_A/20260927-1207-A77/FF2462BB_A77_FULL_CANDIDATE.dds",
+      "status": "BOUNDARY_EVIDENCE_PASS_BUT_SUPERSEDED",
+      "note": "A77 writes constrained to declared original boxes; superseded by A78/current FF candidate."
+    },
+    {
+      "path": "localization/graphics/role_A/20260927-1215-A78/FF2462BB_A78_FULL_CANDIDATE.dds",
+      "status": "BOUNDARY_PASS_CURRENT_FF_LINEAGE",
+      "note": "Same final lineage validated by B79/C75/D74."
+    }
+  ],
+  "rework_required": [
+    {
+      "path": "localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+      "reason": "HISTORICAL_LOWRES_BASELINE_MISMATCH: 512x64 RGBA32 vs canonical HD 2048x256 DXT5; not valid current original-bound reference."
+    },
+    {
+      "path": "localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+      "reason": "HISTORICAL_LOWRES_BASELINE_MISMATCH: 512x64 RGBA32 vs canonical HD 2048x256 DXT5; not valid current original-bound reference."
+    },
+    {
+      "path": "localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+      "reason": "HISTORICAL_LOWRES_BASELINE_MISMATCH: 512x64 RGBA32 vs canonical HD 2048x256 DXT5; not valid current original-bound reference."
+    }
+  ],
+  "qa_preview_png": {
+    "count": 139,
+    "status": "QA_EVIDENCE_ONLY_NOT_DEPLOYABLE_TEXTURES",
+    "note": "Preview/compare PNGs are excluded from deployable DDS boundary promotion; their purpose is visual evidence."
+  },
+  "runtime_gate": {
+    "incident": "localization/validation/INCIDENT_20260928_TESTPATCH_FAIL.md",
+    "result": "ALL_16_CURRENT_HD_CANDIDATES_REMAIN_UNAPPROVED",
+    "required": "TEXT_ONLY first, then DDS_ONLY exactly one candidate at a time, then combined only after isolated passes"
+  },
+  "summary": {
+    "current_hd_static_boundary_pass": 16,
+    "current_hd_static_boundary_fail": 0,
+    "current_hd_reapproval_or_ingame_hold": 16,
+    "historical_lowres_rework_required": 3,
+    "current_approved_lock_count": 0
+  }
+}
