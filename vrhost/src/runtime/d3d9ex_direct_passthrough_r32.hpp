@@ -10,6 +10,7 @@
 // longer re-opens the same resources every frame.
 
 #include "d3d9ex_direct_passthrough.hpp"
+#include "vr/d3d9/r32_policy.hpp"
 
 #include <array>
 #include <cstdint>
@@ -22,6 +23,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
 
     struct R32SharedSlotCache
     {
+        std::uint32_t clientPid = 0;
+        std::uint32_t runGeneration = 0;
         std::uint32_t generation = 0;
         std::uint32_t leftHandle = 0;
         std::uint32_t rightHandle = 0;
@@ -85,6 +88,9 @@ namespace OutRunVrD3D9ExDirectPassthrough
 
         const std::uint32_t slotIndex =
             frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        const std::uint32_t clientPid = frame.clientPid;
+        const std::uint32_t runGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
         const std::uint32_t generation =
             frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
         const std::uint32_t left =
@@ -98,12 +104,15 @@ namespace OutRunVrD3D9ExDirectPassthrough
         const DXGI_FORMAT declared = ExpectedDeclaredFormat(
             frame.reserved[OutRunVR::RenderFrameDirectFormatIndex]);
 
-        if (slotIndex >= R32SharedSlots.size() || !generation || !left ||
-            !right || !width || !height || declared == DXGI_FORMAT_UNKNOWN)
+        if (slotIndex >= R32SharedSlots.size() || !clientPid ||
+            !runGeneration || !generation || !left || !right || !width ||
+            !height || declared == DXGI_FORMAT_UNKNOWN)
             return false;
 
         auto& cache = R32SharedSlots[slotIndex];
         if (cache.eye[0] && cache.eye[1] &&
+            cache.clientPid == clientPid &&
+            cache.runGeneration == runGeneration &&
             cache.generation == generation &&
             cache.leftHandle == left && cache.rightHandle == right &&
             cache.width == width && cache.height == height &&
@@ -155,6 +164,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
             return false;
         }
 
+        cache.clientPid = clientPid;
+        cache.runGeneration = runGeneration;
         cache.generation = generation;
         cache.leftHandle = left;
         cache.rightHandle = right;
@@ -258,6 +269,9 @@ namespace OutRunVrD3D9ExDirectPassthrough
         SafeFrameId = frame.frameId;
         SafeTransportGeneration =
             frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        SafeClientPid = frame.clientPid;
+        SafeRunGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
         ++SafeCopySuccess;
         ++R32SafeSwaps;
         if (!R32FirstSafeSwapLogged)
@@ -270,16 +284,28 @@ namespace OutRunVrD3D9ExDirectPassthrough
         return true;
     }
 
+    inline bool SafeEyeIdentityMatchesR32(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        const OutRunVR::R32::ProducerFrameIdentity owned{
+            SafeFrameId, SafeClientPid, SafeRunGeneration,
+            SafeTransportGeneration };
+        const OutRunVR::R32::ProducerFrameIdentity requested{
+            frame.frameId,
+            frame.clientPid,
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex],
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex] };
+        return OutRunVR::R32::ExactProducerFrameIdentityMatches(
+                owned, requested) &&
+            SafeEyeSrv[0] && SafeEyeSrv[1];
+    }
+
     inline bool EnsureSafeFrameR32(std::uint32_t frameId) noexcept
     {
         OutRunVR::SharedRenderFrameState frame{};
         if (!ReadFrameById(frameId, frame))
             return false;
-        const std::uint32_t generation =
-            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-        if (frameId && generation && SafeFrameId == frameId &&
-            SafeTransportGeneration == generation &&
-            SafeEyeSrv[0] && SafeEyeSrv[1])
+        if (SafeEyeIdentityMatchesR32(frame))
             return true;
         return CopySharedFrameToSafeEyesR32(frame);
     }
