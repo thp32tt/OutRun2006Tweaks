@@ -1,11 +1,11 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-title OutRun 2006 VR - R68 One Click Test
+title OutRun 2006 VR - R69 One Click Test
 
 cls
 echo ============================================================
-echo  OUTRUN 2006 VR R68 TEST
+echo  OUTRUN 2006 VR R69 TEST
 echo  THIS IS THE ONLY FILE YOU NEED TO RUN.
 echo ============================================================
 echo.
@@ -33,7 +33,7 @@ for %%F in (
   if exist "%%~F" del /q "%%~F" >nul 2>&1
 )
 
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Select-OutRunVRBackend.ps1" -Backend d3d9 -TestProfile CORRECTNESS -VariantId R68_FIXPACK
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Select-OutRunVRBackend.ps1" -Backend d3d9 -TestProfile CORRECTNESS -VariantId R69_FIXPACK
 if errorlevel 1 goto :failed
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Run-OutRunVRTest.ps1" -TestProfile CORRECTNESS
