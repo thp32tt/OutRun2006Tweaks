@@ -35,6 +35,7 @@
 #include "stereo_shader.hpp"
 #include "runtime/r23_verified_bundle.hpp"
 #include "vr/ipc/cadence_v1.hpp"
+#include "vr/ipc/frame_contract.hpp"
 
 #ifndef OUTRUN_VR_BUILD_SHA
 #define OUTRUN_VR_BUILD_SHA "unknown"
@@ -78,44 +79,7 @@ namespace
     bool R23UsableGameplayBootstrapFrame(
         const OutRunVR::SharedRenderFrameState& frame) noexcept
     {
-        constexpr std::uint32_t required =
-            OutRunVR::RenderFrameStereoComplete |
-            OutRunVR::RenderFrameWorldStereo |
-            OutRunVR::RenderFrameDrawDuplicated |
-            OutRunVR::RenderFrameEffectivePoseValid;
-
-        if (!frame.frameId || !frame.sourcePoseSequence ||
-            frame.presentationMode != OutRunVR::PresentationGameplay ||
-            frame.state != OutRunVR::StereoSbsActive ||
-            frame.failureReason != OutRunVR::StereoFailureNone ||
-            frame.presentQpc <= 0 ||
-            !frame.backbufferWidth || !frame.backbufferHeight ||
-            (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
-            (frame.flags & required) != required)
-            return false;
-
-        if ((frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0)
-            return true;
-
-        const std::uint32_t slot =
-            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
-        const std::uint32_t generation =
-            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-        const std::uint32_t width =
-            frame.reserved[OutRunVR::RenderFrameDirectWidthIndex];
-        const std::uint32_t height =
-            frame.reserved[OutRunVR::RenderFrameDirectHeightIndex];
-        const std::uint32_t leftHandle =
-            frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex];
-        const std::uint32_t rightHandle =
-            frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex];
-
-        return slot < OutRunVR::RenderFrameRingSize &&
-            generation != 0 &&
-            leftHandle != 0 && rightHandle != 0 &&
-            width != 0 && height != 0 &&
-            width == frame.backbufferWidth &&
-            height == frame.backbufferHeight;
+        return OutRunVR::FrameContract::IsUsableGameplayStereoFrame(frame);
     }
 
     std::uint64_t R23CachedProjectionSubmits = 0;
