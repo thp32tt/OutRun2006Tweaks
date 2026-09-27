@@ -146,6 +146,12 @@ require_all(".github/workflows/vr-dx9ex-active.yml", [
     '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF',
     '-DOUTRUN_VR_R26_HUD_COMPARE=ON',
 ], "P9_DX9EX_BUILD_CONTRACT")
+require(".github/workflows/vr-openxr.yml",
+        'outrun2006-vr-x86-r26-only-diagnostic-DO-NOT-PACKAGE',
+        "P9_SAFE_ONLY_ARTIFACT_QUARANTINED")
+forbid(".github/workflows/vr-openxr.yml",
+       'name: outrun2006-vr-x86\n          path: build-vr-game/bin/dinput8.dll',
+       "P9_NO_AMBIGUOUS_SAFE_ARTIFACT")
 
 # PASS 10 — the binary contract must cover every new exact production edge.
 contract = read("docs/VR_BINARY_CONTRACT.json")
