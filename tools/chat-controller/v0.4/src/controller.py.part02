@@ -21,7 +21,7 @@ async def last_assistant_text(page: Page) -> str:
 
 async def click_continue_generating(page: Page) -> bool:
     loc = await first_visible(page, CONTINUE_GENERATING_SELECTORS)
-    if not loc:
+    if loc is None:
         return False
     try:
         await loc.click()
@@ -34,7 +34,7 @@ async def click_continue_generating(page: Page) -> bool:
 
 async def click_retry_generation(page: Page) -> bool:
     loc = await first_visible(page, RETRY_SELECTORS)
-    if not loc:
+    if loc is None:
         return False
     try:
         await loc.click()
@@ -47,7 +47,7 @@ async def click_retry_generation(page: Page) -> bool:
 
 async def click_stop_generating(page: Page) -> bool:
     loc = await first_visible(page, BUSY_SELECTORS)
-    if not loc:
+    if loc is None:
         return False
     try:
         await loc.click()
