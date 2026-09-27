@@ -670,11 +670,17 @@ namespace OutRunVRStereo
         bool R67StageIdentitySeen = false;
         int R67LastStageIdentity = -1;
         std::uint64_t R67StageTransitionHolds = 0;
+        int R68StageHoldRemaining = 0;
+        constexpr int R68StageHoldPresents = 3;
 
         void R67GuardStageTransitionPresent() noexcept
         {
             if (!Game::stg_stage_num || !Game::is_vr_gameplay_presentation())
+            {
+                R68StageHoldRemaining = 0;
                 return;
+            }
+
             const int stage = static_cast<int>(*Game::stg_stage_num);
             if (!R67StageIdentitySeen)
             {
@@ -682,18 +688,26 @@ namespace OutRunVRStereo
                 R67LastStageIdentity = stage;
                 return;
             }
-            if (stage == R67LastStageIdentity)
-                return;
 
-            const int previous = R67LastStageIdentity;
-            R67LastStageIdentity = stage;
-            ++R67StageTransitionHolds;
-            R30SkyGlowSceneCaptureEpoch = 0;
-            FrameStereoIncomplete = true;
-            R67HoldPreviousProjectionThisPresent = true;
-            spdlog::info(
-                "VR R67 STAGE HOLD: stage {} -> {}; suppress one mixed transition publish and reuse last good HMD projection holds={}",
-                previous, stage, R67StageTransitionHolds);
+            if (stage != R67LastStageIdentity)
+            {
+                const int previous = R67LastStageIdentity;
+                R67LastStageIdentity = stage;
+                R68StageHoldRemaining = R68StageHoldPresents;
+                ++R67StageTransitionHolds;
+                R30SkyGlowSceneCaptureEpoch = 0;
+                spdlog::info(
+                    "VR R68 STAGE HOLD: stage {} -> {}; hold last good HMD projection for {} presents transitions={}",
+                    previous, stage, R68StageHoldPresents,
+                    R67StageTransitionHolds);
+            }
+
+            if (R68StageHoldRemaining > 0)
+            {
+                --R68StageHoldRemaining;
+                FrameStereoIncomplete = true;
+                R67HoldPreviousProjectionThisPresent = true;
+            }
         }
 
         void R30ReleaseSkyGlowResources() noexcept
@@ -1214,6 +1228,7 @@ namespace OutRunVRStereo
             R30SkyGlowSceneCaptureEpoch = 0;
             R67StageIdentitySeen = false;
             R67LastStageIdentity = -1;
+            R68StageHoldRemaining = 0;
             R30BufferShadowCaptureArmed.store(
                 false, std::memory_order_release);
             return R30ResetR29Hook.stdcall<HRESULT>(device, params);
@@ -1350,13 +1365,29 @@ namespace OutRunVRStereo
                 0.0f, 0.0f, 0.0f, 1.0f
             };
 
-            // R67: Calc3D2D runs while the renderer's live game camera is
-            // already synchronised to the latched HMD head pose. The recovered
-            // point is therefore already in head-corrected game-view space.
-            // R57 mode 6 applied LatchedHeadInverse a second time here, producing
-            // implausibly large common X/Y deltas (observed at depth ~109) and
-            // making projected markers keep following the head. Match the proven
-            // CPU-projected XYZRHW path: only add eye-relative IPD + eye FOV.
+            // R68: the rival-rank Calc3D2D point is produced from the stock
+            // game camera, so it still needs the latched HMD head inverse to
+            // remain world-locked when the user turns their head. R67 removed
+            // this entirely and HMD testing proved the 1st..5th markers became
+            // head-locked again. Explicit projected-screen anchors (lens flare)
+            // are different: they stay on the R67 eye-only path.
+            const bool applyHeadCorrection =
+                explicitMarker == nullptr &&
+                (R57Mode() == 6 || R57Mode() == 8);
+            D3DMATRIX headInverse = IdentityMatrix();
+            if (applyHeadCorrection)
+            {
+                float headRaw[16]{};
+                std::uint32_t headPoseSequence = 0;
+                if (!OutRunVRRenderer::GetLatchedHeadInverse(
+                        headRaw, headPoseSequence) ||
+                    headPoseSequence != stereo.poseSequence)
+                    return false;
+                std::memcpy(&headInverse, headRaw, sizeof(headInverse));
+                if (!MatrixFinite(headInverse))
+                    return false;
+            }
+
             for (int eye = 0; eye < 2; ++eye)
             {
                 const float relativeEye[3]{
@@ -1372,8 +1403,11 @@ namespace OutRunVRStereo
                 const D3DMATRIX eyeProjection =
                     ProjectionFromFov(
                         baseProjection, stereo.eyeFov[eye]);
-                const D3DMATRIX eyeTransform =
-                    MultiplyMatrix(eyeInverse, eyeProjection);
+                const D3DMATRIX eyeTransform = applyHeadCorrection
+                    ? MultiplyMatrix(
+                        MultiplyMatrix(headInverse, eyeInverse),
+                        eyeProjection)
+                    : MultiplyMatrix(eyeInverse, eyeProjection);
 
                 float eyeX = 0.0f, eyeY = 0.0f;
                 if (!R57ProjectViewPoint(
@@ -1395,8 +1429,9 @@ namespace OutRunVRStereo
                     expected, true, std::memory_order_acq_rel))
             {
                 spdlog::info(
-                    "VR R67 PROJECTED MARKER: mode={} eye-relative reprojection only view=({:.4f},{:.4f},{:.4f}) deltaL=({:.5f},{:.5f}) deltaR=({:.5f},{:.5f}) builds={}",
-                    R57Mode(), marker->viewX, marker->viewY, marker->viewZ,
+                    "VR R68 PROJECTED MARKER: mode={} headCorrection={} view=({:.4f},{:.4f},{:.4f}) deltaL=({:.5f},{:.5f}) deltaR=({:.5f},{:.5f}) builds={}",
+                    R57Mode(), applyHeadCorrection ? 1 : 0,
+                    marker->viewX, marker->viewY, marker->viewZ,
                     deltaX[0], deltaY[0], deltaX[1], deltaY[1], builds);
             }
             return true;
