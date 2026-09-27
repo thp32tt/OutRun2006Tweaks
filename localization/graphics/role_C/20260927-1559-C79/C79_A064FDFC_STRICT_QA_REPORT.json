@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C79",
+  "timestamp_kst": "2026-09-27T16:01:52+09:00",
+  "base_head": "ef97a819fd22817eec4577b1d814ab67b8fe4d6e",
+  "scope": "strict QA + correction decision; no build; no VR/FFB",
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "canonical_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
+  "inputs": {
+    "B84": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_PRODUCTION_FIRST_QA.json",
+    "D78_preflight": "localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json"
+  },
+  "result": "PASS_STATIC_STRICT_QA_PENDING_D_RECONCILE_AND_INGAME",
+  "candidate_changed_by_C": false,
+  "corrections_applied": [],
+  "semantic_qa": {
+    "reviewed_semantic_entries": 17,
+    "physical_regions": 21,
+    "result": "PASS",
+    "pairs": [
+      {
+        "source": "DUMPED!",
+        "korean": "차였어요!"
+      },
+      {
+        "source": "KNOCKOUT! IN...",
+        "korean": "탈락까지..."
+      },
+      {
+        "source": "Target",
+        "korean": "목표"
+      },
+      {
+        "source": "Ranking",
+        "korean": "순위"
+      },
+      {
+        "source": "Stage",
+        "korean": "스테이지"
+      },
+      {
+        "source": "Rank",
+        "korean": "랭크"
+      },
+      {
+        "source": "OUTRUN MILES:",
+        "korean": "아웃런 마일:"
+      },
+      {
+        "source": "BEST TIME:",
+        "korean": "최고 기록:"
+      },
+      {
+        "source": "STAGE CLEAR",
+        "korean": "스테이지 클리어"
+      },
+      {
+        "source": "PASS!!!",
+        "korean": "통과!!!"
+      },
+      {
+        "source": "CONTINUE?",
+        "korean": "계속?"
+      },
+      {
+        "source": "RETRY",
+        "korean": "재도전"
+      },
+      {
+        "source": "PLEASE WAIT",
+        "korean": "잠시만요"
+      },
+      {
+        "source": "TRY AGAIN?",
+        "korean": "다시 도전?"
+      },
+      {
+        "source": "EASY",
+        "korean": "쉬움"
+      },
+      {
+        "source": "KNOCKOUT!",
+        "korean": "탈락!"
+      },
+      {
+        "source": "OUTRUN MILES!",
+        "korean": "아웃런 마일!"
+      }
+    ],
+    "terminology_notes": [
+      "Ranking -> 순위 and Rank -> 랭크 are intentionally distinct UI terms.",
+      "DUMPED! -> 차였어요! is retained from reviewed gameplay/event transcription.",
+      "KNOCKOUT! / KNOCKOUT! IN... -> 탈락! / 탈락까지... are context-consistent.",
+      "OUTRUN MILES variants are consistently rendered as 아웃런 마일."
+    ]
+  },
+  "structural_qa": {
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "file_size_bytes": 33554560,
+    "dds_header_128_exact_canonical": true,
+    "total_changed_pixels": 1613081,
+    "outside_21_text_cells_changed_pixels": 0,
+    "introduced_alpha_outside_21_text_cells": 0,
+    "declared_alpha_bboxes_all_inside_source_cells": true,
+    "minimum_candidate_alpha_bbox_margin_px": 3,
+    "raw_changed_bbox": [
+      19,
+      163,
+      4062,
+      1928
+    ],
+    "raw_orientation": "mirror_y"
+  },
+  "visual_qa": {
+    "readable_orientation": "PASS_INDEPENDENT_C_REVIEW",
+    "raw_orientation": "PASS_MIRROR_Y_INDEPENDENT_C_REVIEW",
+    "translatable_source_english_residue": "NONE_OBSERVED",
+    "broken_hangul": "NONE_OBSERVED",
+    "clipping_or_overlap": "NONE_OBSERVED",
+    "box_escape": "NONE_OBSERVED",
+    "resolution_degradation": "NONE_OBSERVED",
+    "black_line_or_seam": "NONE_OBSERVED",
+    "opaque_box": "NONE_OBSERVED",
+    "alpha_halo": "NONE_OBSERVED",
+    "background_or_nontext_artwork_damage": "NONE_OBSERVED",
+    "duplicate_or_wrong_replacement": "NONE_OBSERVED",
+    "style_fidelity": "PASS_SOURCE_FAMILY",
+    "protected_character_names_ordinals_numbers_player_markers_vehicles_icons": "PRESERVED_OBSERVED",
+    "qa_artifacts": {
+      "readable_compare": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_READABLE_COMPARE.jpg",
+      "raw_compare": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_RAW_COMPARE.jpg",
+      "cell_sheets": [
+        "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_CELLS_01.jpg",
+        "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_CELLS_02.jpg",
+        "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_CELLS_03.jpg",
+        "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_CELLS_04.jpg",
+        "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_CELLS_05.jpg",
+        "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_CELLS_06.jpg"
+      ]
+    }
+  },
+  "d78_reconciliation": {
+    "candidate_sha_matches_d78": true,
+    "d78_binary_preflight_remains_valid": true,
+    "note": "C79 did not modify the DDS. D78 structurally reviewed the same candidate SHA before C79; final D gate reconciliation is still required because D78's decision predated the C result."
+  },
+  "in_game_validation": "NOT_PERFORMED",
+  "approved_dds_promotion": false,
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "next": "Final D reconciliation for the unchanged A064FDFC SHA, then mandatory in-game screenshot validation before approved_dds promotion.",
+  "persistence_rebase": {
+    "qa_base_head": "ef97a819fd22817eec4577b1d814ab67b8fe4d6e",
+    "latest_remote_head_before_commit": "6f87b46498c44bacea7fef2d9b865d01ee41df30",
+    "preserved_concurrent_results": [
+      "A83 C4A2937B production"
+    ]
+  }
+}

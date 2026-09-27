@@ -337,3 +337,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - All bytes outside 21 text cells remain canonical; every new Korean alpha bbox remains inside its source cell.
 - Readable/raw A-stage artifact QA PASS after one non-persisted spacing rework; protected rank/ordinal/vehicle/icon/character artwork preserved.
 - Status: A_PRODUCTION_COMPLETE_PENDING_B_C_D; in-game validation not performed. Next: 2DA43E41.
+
+## C79 A064FDFC strict QA — 2026-09-27 16:03 KST
+- Candidate e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1: C STATIC STRICT QA PASS, candidate unchanged.
+- 17 semantic / 21 physical; 4096x2048 RGBA32 / 1 mip / exact canonical header / raw mirror_y.
+- Outside 21 source cells changed pixels = 0; introduced alpha outside = 0; minimum declared alpha margin = 3 px.
+- Readable/raw and 21-cell review: no translation omission, residual English, broken Hangul, clipping/overlap, seam/black line, opaque box, alpha halo, resolution loss, duplicate/wrong replacement or protected-artwork damage.
+- D78 same-SHA preflight remains binary-valid; final D reconciliation + in-game screenshot QA remain before promotion. A83 C4A2937B progress preserved.
+- Machine report: localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json. No build; VR/FFB unchanged.

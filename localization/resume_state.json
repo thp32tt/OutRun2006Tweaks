@@ -1,5 +1,5 @@
 {
-  "schema_version": 34,
+  "schema_version": 35,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,7 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "HD GRAPHICS: C4A2937B A83 production complete (20 semantic / 21 physical) pending B/C/D + in-game. 39229D64 C78 needs D revalidation + in-game; A064FDFC needs C + in-game; FA7BBB13 needs in-game. After C4 static gate continue 2DA43E41.",
+    "HD GRAPHICS: C4A2937B A83 production complete (20 semantic / 21 physical) pending B/C/D + in-game. A064FDFC B84/C79 static QA PASS on unchanged SHA e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1 and D78 checked the same binary; final D reconciliation + in-game remain. 39229D64 C78 requires D revalidation + in-game; FA7BBB13 pending in-game. After C4 static gate continue 2DA43E41.",
     "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
     "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
     "Never upscale prior stock-resolution Korean DDS candidates.",
@@ -125,7 +125,7 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_A/20260927-1530-A83/A83_C4A2937B_PRODUCTION_REPORT.json",
+    "latest_hd_rework_batch": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json",
     "hd_rework_candidates_ready": 6,
     "hd_rework_remaining": 7,
     "hd_partial_rework": {
@@ -180,15 +180,19 @@
         "d_pre_c78_binary_status": "SUPERSEDED_REVALIDATION_REQUIRED"
       },
       "A064FDFC": {
-        "status": "D_PREFLIGHT_PASS_PENDING_C_INGAME",
+        "status": "C79_STATIC_PASS_D78_SAME_SHA_PENDING_D_RECONCILE_INGAME",
         "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
         "completed_transcription_entries": 17,
         "localized_regions": 21,
         "remaining_segments": 0,
-        "report": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_PRODUCTION_FIRST_QA.json",
+        "report": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json",
         "d_preflight_report": "localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json",
-        "in_game_validation": "PENDING"
+        "in_game_validation": "PENDING",
+        "b_production_first_qa_report": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_PRODUCTION_FIRST_QA.json",
+        "c_strict_qa_report": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json",
+        "c_candidate_changed": false,
+        "d78_same_sha_binary_preflight_valid": true
       },
       "C4A2937B": {
         "status": "A83_PRODUCTION_COMPLETE_PENDING_B_C_D",
@@ -213,7 +217,7 @@
       "status": "PENDING_B_C_D_STRICT_QA"
     },
     "latest_d_final_qa_report": "localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json",
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-1527-C78/C78_39229D64_STRICT_QA_REWORK_REPORT.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json",
     "c77_fa7bbb13": {
       "timestamp_kst": "2026-09-27T14:05:02+09:00",
       "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
@@ -236,6 +240,16 @@
       "outside_all_15_cells_changed_pixels": 0,
       "changes_vs_A82_outside_three_reworked_cells": 0,
       "report": "localization/graphics/role_C/20260927-1527-C78/C78_39229D64_STRICT_QA_REWORK_REPORT.json"
+    },
+    "c79_a064fdfc": {
+      "timestamp_kst": "2026-09-27T16:03:53+09:00",
+      "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
+      "result": "PASS_STATIC_STRICT_QA_PENDING_D_RECONCILE_AND_INGAME",
+      "candidate_changed_by_C": false,
+      "outside_21_cells_changed_pixels": 0,
+      "introduced_alpha_outside_21_cells": 0,
+      "minimum_bbox_margin_px": 3,
+      "report": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json"
     }
   },
   "runtime_packages": {

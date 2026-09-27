@@ -1,0 +1,149 @@
+{
+  "canonical_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
+  "bytes": 33554560,
+  "dimensions": [
+    4096,
+    2048
+  ],
+  "header_128_exact": true,
+  "total_changed_pixels": 1613081,
+  "outside_21_cells_changed_pixels": 0,
+  "introduced_alpha_outside_21_cells": 0,
+  "all_alpha_bboxes_inside": true,
+  "minimum_bbox_margin_px": 3,
+  "bbox_margins": {
+    "dumped_top": [
+      39,
+      3,
+      40,
+      3
+    ],
+    "dumped_white": [
+      15,
+      3,
+      16,
+      3
+    ],
+    "dumped_big": [
+      132,
+      10,
+      133,
+      11
+    ],
+    "knockout_white": [
+      97,
+      5,
+      98,
+      5
+    ],
+    "knockout_in": [
+      246,
+      3,
+      246,
+      3
+    ],
+    "target_top": [
+      33,
+      7,
+      34,
+      7
+    ],
+    "target_bottom": [
+      81,
+      16,
+      81,
+      16
+    ],
+    "ranking": [
+      84,
+      3,
+      85,
+      4
+    ],
+    "stage": [
+      5,
+      4,
+      5,
+      5
+    ],
+    "rank": [
+      12,
+      7,
+      13,
+      8
+    ],
+    "outrun_miles_white": [
+      151,
+      15,
+      152,
+      15
+    ],
+    "outrun_miles": [
+      127,
+      3,
+      127,
+      3
+    ],
+    "best_time": [
+      121,
+      3,
+      122,
+      4
+    ],
+    "stage_clear": [
+      28,
+      6,
+      28,
+      7
+    ],
+    "pass": [
+      83,
+      14,
+      84,
+      14
+    ],
+    "continue": [
+      331,
+      9,
+      331,
+      9
+    ],
+    "try_again": [
+      261,
+      24,
+      262,
+      25
+    ],
+    "rank_table": [
+      67,
+      22,
+      67,
+      22
+    ],
+    "retry": [
+      84,
+      17,
+      85,
+      17
+    ],
+    "please_wait": [
+      313,
+      27,
+      314,
+      28
+    ],
+    "easy": [
+      78,
+      5,
+      79,
+      5
+    ]
+  },
+  "raw_changed_bbox": [
+    19,
+    163,
+    4062,
+    1928
+  ]
+}

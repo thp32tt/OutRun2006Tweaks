@@ -655,3 +655,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Readable/raw mirror_y A-stage QA: no observed source-language residue, clipping/overlap, box escape, seam/black line, opaque box or alpha halo.
 - Exact 128-byte DDS header and canonical bytes outside the 21 cells verified. Candidate SHA-256: 7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e.
 - Status: A83_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA. No promotion, in-game claim, build, VR or FFB work. Next: 2DA43E41.
+
+## 2026-09-27 16:03 KST — C79 A064FDFC strict QA
+
+- Rebased C79 persistence onto latest A83 C4A2937B state without discarding that production work.
+- Independently compared B84 A064FDFC candidate e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1 against canonical HD in readable/game and raw mirror_y orientations; C did not repaint or replace the DDS.
+- Semantic QA PASS for 17 reviewed strings across 21 physical cells, including standalone KNOCKOUT! and OUTRUN MILES! variants; terminology matches reviewed transcriptions.jsonl.
+- Structural QA: 4096x2048 RGBA32, 1 mip, 33,554,560 bytes, exact canonical 128-byte DDS header. 1,613,081 changed pixels; outside 21 source cells = 0; introduced alpha outside = 0; minimum declared alpha margin = 3 px.
+- Direct 21-cell visual QA found no translatable English residue, broken Hangul, clipping/overlap, source-cell escape, resolution loss, black seam/line, opaque box, alpha halo, background/non-text damage, duplicate or wrong replacement. Protected names/ordinals/numbers/player markers/vehicles/icons remain preserved.
+- Candidate unchanged by C79; D78 direct binary preflight is for the same SHA and remains valid. Final D reconciliation is still required because D78 decision predates C79.
+- No approved_dds promotion; mandatory in-game screenshot validation remains. Build not run; VR/FFB untouched.
+- Machine report: localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json.
