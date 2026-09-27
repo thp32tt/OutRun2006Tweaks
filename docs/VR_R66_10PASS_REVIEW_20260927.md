@@ -150,3 +150,15 @@ lost while HUD work continues:
 
 Production DLL builders validate the corresponding compiled markers in addition
 to the R64/R65/R66 HUD markers.
+
+
+## Late packaging-identity correction
+
+A post-review readback of the final PC-fast packaging script found one remaining stale metadata field:
+
+- `backends/d3d9/VARIANT_ID.txt` already said `ACTIVE_R26_HUD_R66`
+- but `BUILD_INPUTS.json` was still emitted with `VariantId = ACTIVE_FULL_R34`
+
+The binary renderer was correct, but downstream log/package analysis could misidentify the build. This was corrected so both metadata sources now say `ACTIVE_R26_HUD_R66`.
+
+`verify_vr_proven_baseline.py` now explicitly rejects the stale `ACTIVE_FULL_R34` package identity so this class of omission cannot pass a future build gate.
