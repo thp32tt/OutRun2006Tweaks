@@ -214,7 +214,7 @@ jobs:
         shell: cmd
         run: |
           set CI=
-          cmake -S . -B build-vr-game -G "Visual Studio 17 2022" -A Win32
+          cmake -S . -B build-vr-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=ON -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
 
       - name: Verify regenerated R26 safe production source graph
         shell: pwsh
@@ -309,7 +309,7 @@ jobs:
         shell: cmd
         run: |
           set CI=
-          cmake -S . -B build-vr-safe-draw -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=ON
+          cmake -S . -B build-vr-safe-draw -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=ON -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
 
       - name: Verify R26 comparison source graph
         shell: pwsh
@@ -475,7 +475,7 @@ jobs:
         shell: cmd
         run: |
           set CI=
-          cmake -S . -B build-vr-c1 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=ON
+          cmake -S . -B build-vr-c1 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=ON -DOUTRUN_VR_C2_COMPARE=OFF
 
       - name: Verify C1 source graph
         shell: pwsh
@@ -562,7 +562,7 @@ jobs:
         shell: cmd
         run: |
           set CI=
-          cmake -S . -B build-vr-c2 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=ON
+          cmake -S . -B build-vr-c2 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=ON
 
       - name: Verify C2 source graph
         shell: pwsh
