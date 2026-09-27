@@ -167,6 +167,15 @@ require_all(".github/workflows/vr-unified-backends.yml", [
     '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=ON -DOUTRUN_VR_C2_COMPARE=OFF',
     '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=ON',
 ], "P9_UNIFIED_VARIANTS_EXPLICIT")
+require_all(".github/workflows/outrun-exe-hud-inspector.yml", [
+    '-DOUTRUN_VR_SAFE_DRAW_COMPARE=ON -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF',
+], "P9_HUD_INSPECTOR_EXPLICIT")
+require_all(".github/workflows/vr-openxr-r20.yml", [
+    '-DOUTRUN_VR_SAFE_DRAW_COMPARE=ON -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF',
+], "P9_R20_DIAGNOSTIC_EXPLICIT")
+require_all(".github/workflows/vr-openxr-r21.yml", [
+    '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF',
+], "P9_R21_R26HUD_EXPLICIT")
 require(".github/workflows/vr-openxr.yml",
         'outrun2006-vr-x86-r26-only-diagnostic-DO-NOT-PACKAGE',
         "P9_SAFE_ONLY_ARTIFACT_QUARANTINED")
@@ -181,8 +190,8 @@ required_contract_rvas = [
     "0x0000CABE",  # lens flare -> DrawObjectAlpha_Internal
     "0x000BEA5A", # GOAL helper 020
     "0x000BEA5F", # GOAL helper 150
-    "0x000E358B", "0x000E35F7", # option arrows producer A bounds
-    "0x000E481B", "0x000E4887", # option arrows producer B bounds
+    "0x000E358B", "0x000E35A3", "0x000E35CC", "0x000E35F7",
+    "0x000E481B", "0x000E4833", "0x000E485C", "0x000E4887"
 ]
 missing_contracts = [r for r in required_contract_rvas if r not in contract]
 if missing_contracts:
