@@ -151,6 +151,24 @@ require("src/vr/d3d9/stereo_renderer_r7.inc",
 require("src/vr/game/outrun_renderer.cpp",
         'Game::is_vr_gameplay_presentation()',
         "P8_RENDERER_SHARED_PREDICATE")
+require_all("src/vr/d3d9/ex_device_upgrade_r15.cpp", [
+    'no pre-Reset state-block replay',
+    'D3D9 state blocks are device-reset-sensitive COM objects. Never',
+], "P8_RESET_STATEBLOCK_REGRESSION")
+require("src/vr/d3d9/stereo_renderer_r23.cpp",
+        'VR R23/R25 BASELINE: authoritative first seed opened only after live viewport/scissor + full game draw serial + current-generation depth + fresh current-frame pose; R20/R22 double approval removed',
+        "P8_AUTHORITATIVE_SEED")
+require("src/vr/d3d9/stereo_renderer_r22.cpp",
+        'VR R22 GAME: shadow-tracked viewport/scissor replay + common initial depth baseline + R21 eligibility gate ACTIVE',
+        "P8_R22_VIEWPORT_DEPTH")
+require("src/vr/d3d9/stereo_renderer_r13.cpp",
+        'VR R13: stereo hardening ACTIVE;',
+        "P8_R13_HARDENING")
+require_all("vrhost/src/main_r23.cpp", [
+    'Do not publish the legacy global consumed-frame',
+    'R32 arms an EVENT after the',
+    'dedicated per-slot GPU-completion ACK only when',
+], "P8_DIRECTGPU_COPY_ACK_ORDER")
 
 # PASS 9 — canonical package builders explicitly pin R26+HUD.
 require_all("tools/Build-OutRunPCFast.ps1", [
