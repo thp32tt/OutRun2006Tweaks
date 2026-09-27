@@ -15,3 +15,11 @@ Rules:
 - Source behavior: identical to R69.
 - Build gate: DX9Ex Active Validation.
 - Status: branch created; validation trigger added in this stage.
+
+
+## S1 — diagnostics/experiment separation
+- Branch: `vr-d3d9ex-candidate/r69-clean-s1`
+- Parent: S0 `5ee57a2585d5f2c9a8e48a8b028b479e39d5af8e`
+- Change: moved R55 HUD coordinate mode, R56 HUD probe mode, and R57 projected-marker experiment environment parsing into `src/vr/debug/experiment_modes.hpp`.
+- Production renderer now consumes those values through a debug-module boundary; render behavior and defaults are unchanged.
+- Build gate: DX9Ex Active Validation triggered from this final stage head.
