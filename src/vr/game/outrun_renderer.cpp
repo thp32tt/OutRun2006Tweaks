@@ -590,33 +590,13 @@ namespace OutRunVRRenderer
 
 		ClientPresentationMode CurrentPresentationMode()
 		{
-			// R45: presentation ownership follows the actual OutRun state instead
-			// of Game::is_in_game() plus a 1.5 s sticky hold. The broad helper
-			// includes selector/menu-adjacent 3D scenes on this executable, which
-			// caused the vehicle-select preview car to receive gameplay stereo.
-			// Keep only states that are genuinely rendered on the race camera in
-			// stereo. Result/continue/try-again/ranking/selector states are mono
-			// theater UI and must switch immediately, with no stale stereo hold.
+			// R65: renderer and D3D9 stereo must make the same presentation
+			// decision. In particular, STATE_START is not gameplay until the
+			// proven progress==65 stereo-ready boundary.
 			if (!Game::current_mode)
 				return PresentationUnknown;
-
-			const GameState state =
-				static_cast<GameState>(*Game::current_mode);
-			switch (state)
-			{
-			case STATE_START:
-			case STATE_WARP:
-			case STATE_RESTART:
-			case STATE_GAME:
-			case STATE_GIVEUP:
-			case STATE_SMPAUSEMENU:
-			case STATE_GOAL:
-			case STATE_TIMEUP:
-			case STATE_LINK_TIMEUP:
-				return PresentationGameplay;
-			default:
-				return PresentationTheater;
-			}
+			return Game::is_vr_gameplay_presentation()
+				? PresentationGameplay : PresentationTheater;
 		}
 
 		void PublishClientTelemetry(std::uint32_t flags, float relativeAngleDeg)
