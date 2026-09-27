@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-28T01:06:17+09:00",
+  "updated_at_kst": "2026-09-28T07:10:00+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -256,5 +256,24 @@
     "hd_rework_remaining": 0,
     "current_approved_lock_count": 0,
     "report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
+  },
+  "zero_tolerance_boundary_audit": {
+    "report": "localization/graphics/FULL_PIXEL_BOUNDARY_AUDIT_20260928.json",
+    "max_outside_pixels": 0,
+    "current_hd_candidates_scanned": 16,
+    "current_hd_static_boundary_fail": 0,
+    "current_hd_pending_ingame": 16,
+    "historical_lowres_approved_rework_required": [
+      "571E78F3_512x64.dds",
+      "62BEBF33_512x64.dds",
+      "E3FD08BE_512x64.dds"
+    ],
+    "zero_margin_watch": [
+      "C075FB49"
+    ],
+    "dxt5_decoded_pixel_recheck_caution": [
+      "568D3696"
+    ],
+    "rule": "1px escape => REWORK_REQUIRED; missing exact evidence => HOLD_STRICT_RECHECK"
   }
 }
