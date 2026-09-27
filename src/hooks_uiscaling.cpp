@@ -717,7 +717,7 @@ class UIScaling : public Hook
 
 		// R68: canonical glyph rendering is deferred through the SpriteNode
 		// queue. Producer scope alone expires before the later queue draw.
-		// Pin only the node appended by the verified 0x2C9DB glyph edge.
+		// Pin only the node appended by the verified 0x2C808/0x2C9DB glyph edges.
 		root = Game::sprite_prio_root[prio];
 		SpriteNode* node = root ? root->tail_4 : nullptr;
 		if (node && node != tailBefore)
@@ -1231,12 +1231,15 @@ public:
 		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, TimeRecord_AdjustPositionAndHud);
 		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, TimeRecord_AdjustPositionAndHud);
 
-		// R64 canonical font glyph ownership. RVA 0x2C9DB is the direct
-		// call from the font/glyph renderer to put_sprite_ex. Do not promote
-		// generic put_sprite_ex/put_sprite_ex2: those also carry world sprites.
-		Memory::VP::InjectHook(
-			Module::exe_ptr(0x2C9DB),
-			TextGlyph_putSprite, Memory::HookType::Call);
+		// R68 canonical font glyph ownership. Disassembly proves two
+		// independent character renderers call put_sprite_ex directly:
+		// 0x2C808 (alternate/compact glyph path, observed on finish name/time)
+		// and 0x2C9DB (existing proportional glyph path). Keep this exact;
+		// generic put_sprite_ex/put_sprite_ex2 also carry non-font sprites.
+		for (int addr : { 0x2C808, 0x2C9DB })
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr),
+				TextGlyph_putSprite, Memory::HookType::Call);
 
 		// R57 direct producer ownership: DispRank is a composite. Its first
 		// element uses sprani/SPRARGS2 (kind_C=1), while the remaining eight
