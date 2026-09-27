@@ -127,3 +127,10 @@ Corrected both sources of truth:
 
 Any build produced before this correction is not an accepted R66 production
 test build.
+
+## Binary-contract final audit
+
+The canonical EXE was re-read byte-for-byte after the review. All 12 newly
+pinned production callsite signatures now match exactly and are 16 bytes
+(32 hex digits). The baseline verifier now rejects malformed signature lengths
+before a build can be accepted.
