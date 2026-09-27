@@ -150,6 +150,10 @@ $gameBytes = [System.IO.File]::ReadAllBytes($dll.FullName)
 $gameAscii = [Text.Encoding]::ASCII.GetString($gameBytes)
 foreach ($marker in @(
     'VR R26+HUD SAFE TEST: R26/R23 world path + R30 HUD/XYZRHW/SkyGlow overlay ACTIVE',
+    'VR R15 EX: explicit fresh-device state baselines + synchronous Reset/stereo handoff ACTIVE; no pre-Reset state-block replay',
+    'VR R23/R25 BASELINE: authoritative first seed opened only after live viewport/scissor + full game draw serial + current-generation depth + fresh current-frame pose; R20/R22 double approval removed',
+    'VR R22 GAME: shadow-tracked viewport/scissor replay + common initial depth baseline + R21 eligibility gate ACTIVE',
+    'VR R13: stereo hardening ACTIVE',
     'VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE',
     'VR R66 OPTION ARROW: exact node pinned',
     'VR R66 GOAL TIME HUD:',
