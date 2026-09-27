@@ -37,6 +37,7 @@ on:
       - 'tools/verify_vr_r51_runtime_contract.py'
       - 'tools/verify_vr_r32_review.py'
       - 'tools/verify_vr_nearplane_active_gate.py'
+      - 'tools/verify_vr_proven_baseline.py'
       - 'tools/Test-VRRegressionKnowledge.ps1'
       - '.github/workflows/vr-dx9ex-active.yml'
 
@@ -63,6 +64,10 @@ jobs:
           Invoke-WebRequest -Uri $contract.canonicalExe.sourceUrl -OutFile $exe
           python -m pip install --disable-pip-version-check --quiet capstone
           python tools/verify_vr_binary_contract.py --exe $exe --manifest docs/VR_BINARY_CONTRACT.json --source-root .
+      - name: Verify HMD-proven VR baseline
+        shell: pwsh
+        run: python tools/verify_vr_proven_baseline.py
+
       - name: Verify reconstructed VR architecture boundaries
         shell: pwsh
         run: |
