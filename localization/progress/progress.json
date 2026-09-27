@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T12:57:00+09:00",
+  "updated_at_kst": "2026-09-27T13:10:35+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -110,7 +110,7 @@
       "percent": 100,
       "transcribed_assets": 79,
       "localize_text_targets": 79,
-      "transcribed_segments": 704,
+      "transcribed_segments": 715,
       "blocked_context_assets": 0,
       "blocked_context_indices": []
     },
@@ -136,11 +136,11 @@
       "status": "done",
       "percent": 100,
       "planned_assets": 79,
-      "translated_segments": 704,
+      "translated_segments": 715,
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "FA7BBB13 A81 production is complete for all 17 transcribed regions; run B/C/D static QA before in-game approval, then continue P1 HD rework asset 39229D64.",
+  "next_checkpoint": "FA7BBB13 A81 candidate passed B82 first QA; C/D and in-game validation remain. 39229D64 transcription was expanded by B82 from 2 to 13 semantic strings and is the next canonical-HD render target.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -175,7 +175,7 @@
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
     "transcribed_assets": 79,
-    "transcribed_segments": 704,
+    "transcribed_segments": 715,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -257,8 +257,15 @@
       "coverage": "17/17",
       "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
       "report": "localization/graphics/role_A/20260927-1257-A81/A81_FA7BBB13_PRODUCTION_REPORT.json",
-      "status": "A_PRODUCTION_COMPLETE_PENDING_B_C_D",
-      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
+      "status": "B_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+      "b_first_qa_report": "localization/graphics/role_B/20260927-1310-B82/B82_FA7BBB13_FIRST_QA_AND_39229D64_TRANSCRIPTION.json"
+    },
+    "next_hd_rework": {
+      "asset": "39229D64",
+      "transcription_segments": 13,
+      "expected_physical_text_occurrences": 14,
+      "status": "READY_FOR_CANONICAL_HD_RENDER"
     }
   },
   "data_build": {

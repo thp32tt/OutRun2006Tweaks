@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B82",
+  "timestamp_kst": "2026-09-27T13:10:35+09:00",
+  "base_head": "b6800c3720dce2214a61a3e45ea9a9c34d6540e9",
+  "fa7bbb13": {
+    "asset": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+    "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
+    "result": "PASS_FIRST_QA_PENDING_C_D_INGAME",
+    "candidate_changed_by_B": false,
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "dds_header_128_byte_exact_to_canonical": true,
+    "outside_17_text_cells_exact_to_canonical": true,
+    "all_17_translations_match_reviewed_transcription": true,
+    "slipstream_term_consistent_with_FF2462BB": true,
+    "readable_orientation_visual_qa": "PASS",
+    "raw_orientation_visual_qa": "PASS_MIRROR_Y_PRESERVED",
+    "visible_source_english_residue_in_replaced_cells": "NONE_OBSERVED",
+    "clipping_overlap_or_box_escape": "NONE_OBSERVED",
+    "edit_artifacts": "NONE_OBSERVED",
+    "style_fidelity": "PASS_YELLOW_NAVY_WHITE_SOURCE_FAMILY",
+    "in_game_validation": "NOT_PERFORMED"
+  },
+  "next_asset_39229d64": {
+    "action": "TRANSCRIPTION_EXPANDED_AFTER_B_VISUAL_OMISSION_QA",
+    "prior_semantic_segments": 2,
+    "reviewed_semantic_segments": 13,
+    "expected_physical_text_occurrences": 14,
+    "segments": [
+      {
+        "source": "MISSION CLEARED!",
+        "korean": "미션 성공!"
+      },
+      {
+        "source": "MISSION FAILED!",
+        "korean": "미션 실패!"
+      },
+      {
+        "source": "Hearts",
+        "korean": "하트"
+      },
+      {
+        "source": "Technical Bonus",
+        "korean": "테크니컬 보너스"
+      },
+      {
+        "source": "Total Rank",
+        "korean": "종합 랭크"
+      },
+      {
+        "source": "STORING ONLINE RECORD...",
+        "korean": "온라인 기록 저장 중..."
+      },
+      {
+        "source": "SPECIAL REQUEST",
+        "korean": "스페셜 요청"
+      },
+      {
+        "source": "Target",
+        "korean": "목표"
+      },
+      {
+        "source": "START",
+        "korean": "시작"
+      },
+      {
+        "source": "GOAL",
+        "korean": "골"
+      },
+      {
+        "source": "Hit the ghost!",
+        "korean": "고스트를 맞히세요!"
+      },
+      {
+        "source": "EXIT",
+        "korean": "종료"
+      },
+      {
+        "source": "Collect the stars!",
+        "korean": "별을 모으세요!"
+      }
+    ],
+    "preserve_tokens": [
+      "ALBERTO",
+      "E",
+      "D",
+      "C",
+      "B",
+      "A",
+      "rd",
+      "st",
+      "nd",
+      "th",
+      "F1",
+      "Esc",
+      "numeric/rank glyphs"
+    ],
+    "artwork_status": "PENDING_CANONICAL_HD_RENDER"
+  },
+  "vr_ffb_changes": false,
+  "build_performed": false
+}

@@ -236,3 +236,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - DDS header exact, RGBA32/1 mip preserved; raw mirror_y and readable orientations reviewed.
 - All payload bytes outside the 17 text cells remain canonical bytes.
 - Status: A_PRODUCTION_COMPLETE_PENDING_B_C_D; in-game approval not claimed. Next asset after static gate: 39229D64.
+
+
+## B82 checkpoint — 2026-09-27 13:10 KST
+
+- FA7BBB13 A81 candidate 3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d: B FIRST QA PASS, pending C/D + in-game.
+- 4096×2048 RGBA32, 1 mip, canonical 128-byte header exact; edits confined to the 17 text cells; raw mirror_y preserved.
+- Static visual QA: no clipping/overlap/box escape or edit artifacts observed; 17 translations and shared terminology checked.
+- 39229D64 visual omission review expanded transcription from 2 to 13 semantic strings / 14 expected physical occurrences; canonical-HD artwork remains pending.
+- Next production target: 39229D64.

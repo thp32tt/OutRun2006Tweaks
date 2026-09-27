@@ -532,3 +532,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Candidate SHA-256: 3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d.
 - Candidate: localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds.
 - Next: B/C/D static QA; no approved promotion or in-game claim made. On gate pass, continue 39229D64.
+
+
+## 2026-09-27 13:10 KST — B82 FA7BBB13 first QA + 39229D64 transcription expansion
+
+- Rebased B review on A81 candidate 3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d from remote HEAD b6800c3; B did not replace the A81 DDS.
+- FA7BBB13 B first QA: PASS. Canonical 4096×2048 RGBA32/1-mip header is exact; all bytes outside the 17 source text cells are canonical; readable and raw mirror_y orientation checks pass.
+- 17/17 reviewed translations match the transcription corpus; repeated Slipstream the cars! remains 차량 뒤에서 슬립스트림하세요!, consistent with FF2462BB.
+- No clipping, overlap, source-English residue in replaced cells, seam, opaque box, black line, or alpha halo observed in static visual QA. In-game validation remains pending, so no approved promotion was made.
+- Additional B production review found 39229D64 pass1 transcription incomplete. Expanded it from 2 to 13 semantic strings (14 expected physical occurrences); names/rank letters/ordinal suffixes/key legends/numeric glyphs remain preserved.
+- Next: render 39229D64 directly on the canonical 4096×4096 HD DDS; C/D gates still required for FA7BBB13. No VR/FFB source touched and no build was run.
