@@ -138,7 +138,7 @@
       "sourceBindings": [
         {
           "path": "src/hooks_uiscaling.cpp",
-          "needle": "Module::exe_ptr(0x2C9DB)"
+          "needle": "0x2C808, 0x2C9DB"
         }
       ]
     },
