@@ -319,3 +319,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - LOCALIZATION_STATE_OK and Domain Isolation PASS; VR/FFB source/history contamination not observed.
 - No build performed. Machine report: localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json.
 - Next: C strict QA for A064FDFC and 39229D64, runtime screenshot QA for FA7/392/A064, continue C4A2937B production independently.
+
+## C78 39229D64 strict QA + rework — 2026-09-27 15:31 KST
+- REWORK APPLIED / C STATIC STRICT QA PASS: A82/B83 5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077 had visible background patch/seam artifacts in Total Rank x3.
+- Current candidate f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4; 4096x4096 RGBA32 / 1 mip / exact canonical header / raw mirror_y.
+- Only Total Rank x3 changed versus A82; outside those cells = 0. Against canonical, all changes remain inside 15 localization cells; introduced alpha outside = 0.
+- Raw/readable artifact QA PASS after correction; no new approved_dds promotion. D77/D78 old-SHA validation is superseded and D revalidation + in-game screenshot QA remain.
+- A064FDFC B84/D78 state is preserved and still awaits C + in-game; next production remains C4A2937B.
+- Machine report: localization/graphics/role_C/20260927-1527-C78/C78_39229D64_STRICT_QA_REWORK_REPORT.json. No build; VR/FFB unchanged.

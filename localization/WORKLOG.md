@@ -632,3 +632,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Existing approved_dds remains exactly the three USER_APPROVED_LOCKED DDS; all SHA-256 values reverified.
 - LOCALIZATION_STATE_OK and Domain Isolation PASS; no VR/FFB source diff or merge commit. Build was not run.
 - Report: localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json.
+
+## 2026-09-27 15:31 KST — C78 39229D64 strict QA + rework
+
+- Rebased C result onto latest D78 state without discarding B84 A064FDFC work.
+- Strict readable/raw comparison rejected A82/B83 39229D64 candidate 5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077 for visible reconstruction patches/seams around all three Total Rank -> 종합 랭크 cells (green, brown, pink).
+- C78 restored only those three cells from canonical HD, removed/reconstructed only original English glyph-shaped pixels, and re-rendered Korean inside the original cells. The other 12 localized regions remain unchanged from A82.
+- Current 39229D64 SHA-256: f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4; 4096x4096 RGBA32, 1 mip, 67,108,992 bytes, canonical 128-byte DDS header preserved, raw mirror_y preserved.
+- C78 vs canonical: 2,400,378 changed pixels, 0 outside all 15 source cells, 0 introduced alpha outside. C78 vs A82: 261,415 changed pixels, 0 outside the three corrected Total Rank cells.
+- Final raw/readable QA: no visible source-English residue, clipping, overlap, box escape, black seam/line, opaque box, obvious alpha halo, duplicate/wrong replacement, or protected-artwork damage observed.
+- D77/D78 refer to superseded SHA 5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077 and must revalidate the new C78 binary. In-game screenshot validation remains mandatory; no approved_dds promotion.
+- Machine report: localization/graphics/role_C/20260927-1527-C78/C78_39229D64_STRICT_QA_REWORK_REPORT.json. VR/FFB untouched; build not run.

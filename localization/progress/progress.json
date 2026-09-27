@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T15:18:24+09:00",
+  "updated_at_kst": "2026-09-27T15:35:19+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A064FDFC B84 + D78 static/raw/readable QA pass (17 semantic / 21 physical), but C strict QA and in-game validation remain. 39229D64 still needs C + in-game; FA7BBB13 needs in-game only. Continue C4A2937B canonical-HD production independently.",
+  "next_checkpoint": "39229D64 C78 corrected three Total Rank background artifacts and passes current C static strict QA on SHA f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4; D77/D78 reference superseded SHA 5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077 and must revalidate C78, then in-game validation. A064FDFC B84 + D78 preflight still needs C + in-game. FA7BBB13 needs in-game only. Continue C4A2937B canonical-HD production independently.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -273,15 +273,18 @@
       "result": "NO_NEW_APPROVALS",
       "approved_dds_count": 3,
       "FA7BBB13": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
-      "39229D64": "HOLD_PENDING_C_INGAME",
-      "A064FDFC": "D_PREFLIGHT_PASS_HOLD_PENDING_C_INGAME"
+      "39229D64": "D78_PRE_C78_SHA_SUPERSEDED_REVALIDATION_REQUIRED",
+      "A064FDFC": "D_PREFLIGHT_PASS_HOLD_PENDING_C_INGAME",
+      "post_d78_c78_report": "localization/graphics/role_C/20260927-1527-C78/C78_39229D64_STRICT_QA_REWORK_REPORT.json"
     },
     "latest_c_strict_qa": {
-      "asset": "FA7BBB13",
-      "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
-      "report": "localization/graphics/role_C/20260927-1405-C77/C77_FA7BBB13_STRICT_QA.json",
-      "result": "PASS_STATIC_STRICT_QA_PENDING_INGAME",
-      "candidate_changed_by_C": false,
+      "asset": "39229D64",
+      "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
+      "report": "localization/graphics/role_C/20260927-1527-C78/C78_39229D64_STRICT_QA_REWORK_REPORT.json",
+      "result": "REWORK_APPLIED_STATIC_STRICT_QA_PASS_PENDING_D_AND_INGAME",
+      "candidate_changed_by_C": true,
+      "superseded_candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+      "issues_corrected": 3,
       "outside_text_cells_changed_pixels": 0,
       "introduced_alpha_outside_text_cells": 0,
       "in_game_validation": "PENDING"
@@ -294,6 +297,13 @@
       "candidate_changed_by_B": true,
       "semantic_entries": 17,
       "physical_regions": 21
+    },
+    "c78_39229d64": {
+      "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
+      "superseded_candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+      "status": "C78_REWORK_STATIC_PASS_PENDING_D_INGAME",
+      "d77_d78_binary_validation": "SUPERSEDED_REVALIDATION_REQUIRED",
+      "report": "localization/graphics/role_C/20260927-1527-C78/C78_39229D64_STRICT_QA_REWORK_REPORT.json"
     }
   },
   "data_build": {

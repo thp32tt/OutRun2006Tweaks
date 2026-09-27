@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C78",
+  "timestamp_kst": "2026-09-27T15:31:58+09:00",
+  "base_head": "94661fbe251f60c0200b18acc3d45fe46427188b",
+  "scope": "strict QA + corrective DDS rework; no build; no VR/FFB",
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+  "canonical_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+  "input_candidate": {
+    "sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+    "A82_report": "localization/graphics/role_A/20260927-1330-A82/A82_39229D64_PRODUCTION_REPORT.json",
+    "B83_report": "localization/graphics/role_B/20260927-1412-B83/B83_39229D64_FIRST_QA.json",
+    "D77_preflight_report": "localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json"
+  },
+  "findings": [
+    {
+      "severity": "REWORK_REQUIRED",
+      "key": "TOTAL_RANK_BACKGROUND_ARTIFACT_GREEN",
+      "cell": "total_rank_green",
+      "issue": "A82/B83 candidate retains visible gray/green rectangular reconstruction patches/seams around the localized label.",
+      "policy": "artifact-cleanliness + preserve-original-background + style-fidelity"
+    },
+    {
+      "severity": "REWORK_REQUIRED",
+      "key": "TOTAL_RANK_BACKGROUND_ARTIFACT_BROWN",
+      "cell": "total_rank_brown",
+      "issue": "A82/B83 candidate retains visible beige/gray background reconstruction blocks around the localized label.",
+      "policy": "artifact-cleanliness + preserve-original-background + style-fidelity"
+    },
+    {
+      "severity": "REWORK_REQUIRED",
+      "key": "TOTAL_RANK_BACKGROUND_ARTIFACT_PINK",
+      "cell": "total_rank_pink",
+      "issue": "A82/B83 candidate retains visible patch/seam residue across the top/background of the localized label.",
+      "policy": "artifact-cleanliness + preserve-original-background + style-fidelity"
+    }
+  ],
+  "correction": {
+    "candidate_changed_by_C": true,
+    "output_candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
+    "output_candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+    "method": [
+      "Restore each affected Total Rank source cell from canonical HD DDS.",
+      "Mask only the original white/navy English glyph region; reconstruct only masked glyph pixels from adjacent canonical background.",
+      "Re-render Korean 종합 랭크 inside the original source cell with the existing white/navy source-family treatment.",
+      "Leave all other A82 localized regions unchanged."
+    ],
+    "corrected_cells": [
+      "total_rank_green",
+      "total_rank_brown",
+      "total_rank_pink"
+    ]
+  },
+  "semantic_qa": {
+    "semantic_entries": 13,
+    "physical_regions": 15,
+    "result": "PASS",
+    "translations": [
+      [
+        "MISSION CLEARED!",
+        "미션 성공!"
+      ],
+      [
+        "MISSION FAILED!",
+        "미션 실패!"
+      ],
+      [
+        "Hearts",
+        "하트"
+      ],
+      [
+        "Technical Bonus",
+        "테크니컬 보너스"
+      ],
+      [
+        "Total Rank",
+        "종합 랭크"
+      ],
+      [
+        "STORING ONLINE RECORD...",
+        "온라인 기록 저장 중..."
+      ],
+      [
+        "SPECIAL REQUEST",
+        "스페셜 요청"
+      ],
+      [
+        "Target",
+        "목표"
+      ],
+      [
+        "START",
+        "시작"
+      ],
+      [
+        "GOAL",
+        "골"
+      ],
+      [
+        "Hit the ghost!",
+        "고스트를 맞히세요!"
+      ],
+      [
+        "EXIT",
+        "종료"
+      ],
+      [
+        "Collect the stars!",
+        "별을 모으세요!"
+      ]
+    ],
+    "protected_original_tokens_preserved": [
+      "ALBERTO",
+      "E",
+      "D",
+      "C",
+      "B",
+      "A",
+      "rd",
+      "st",
+      "nd",
+      "th",
+      "F1",
+      "Esc",
+      "numeric/rank glyphs"
+    ]
+  },
+  "structural_qa": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "file_size_bytes": 67108992,
+    "dds_header_128_exact_canonical": true,
+    "raw_orientation": "mirror_y",
+    "total_changed_pixels_vs_canonical": 2400378,
+    "outside_all_15_source_cells_changed_pixels": 0,
+    "introduced_alpha_outside_all_15_cells": 0,
+    "changed_pixels_vs_A82": 261415,
+    "changes_vs_A82_outside_three_total_rank_cells": 0,
+    "all_new_total_rank_alpha_bboxes_inside_source_cells": true
+  },
+  "visual_qa": {
+    "readable_orientation": "PASS_AFTER_REWORK",
+    "raw_orientation": "PASS_MIRROR_Y_AFTER_REWORK",
+    "translation_omission": "NONE_OBSERVED",
+    "source_english_residue": "NONE_OBSERVED",
+    "clipping_or_overlap": "NONE_OBSERVED",
+    "box_escape": "NONE_OBSERVED",
+    "black_line_or_seam": "NONE_OBSERVED_AFTER_REWORK",
+    "opaque_box": "NONE_OBSERVED_AFTER_REWORK",
+    "alpha_halo": "NONE_OBSERVED",
+    "non_text_artwork_damage": "NONE_OBSERVED",
+    "duplicate_or_wrong_replacement": "NONE_OBSERVED",
+    "style_fidelity": "PASS_SOURCE_FAMILY_AFTER_REWORK",
+    "qa_contact_sheet": "localization/graphics/role_C/20260927-1527-C78/C78_39229D64_TOTAL_RANK_REWORK_QA.jpg",
+    "readable_preview": "localization/graphics/role_C/20260927-1527-C78/C78_39229D64_READABLE_QA.png",
+    "raw_preview": "localization/graphics/role_C/20260927-1527-C78/C78_39229D64_RAW_QA.png"
+  },
+  "supersession": {
+    "A82_B83_candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+    "status": "SUPERSEDED_BY_C78_REWORK",
+    "D77_39229D64_preflight": "SUPERSEDED_FOR_BINARY_VALIDATION_BECAUSE_C78_CHANGED_DDS",
+    "required_next": "D final QA must validate the C78 SHA; mandatory in-game screenshot validation remains required before approved_dds promotion."
+  },
+  "in_game_validation": "NOT_PERFORMED",
+  "approved_dds_promotion": false,
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "result": "REWORK_APPLIED_STATIC_STRICT_QA_PASS_PENDING_D_AND_INGAME",
+  "persistence_rebase": {
+    "original_qa_base_head": "94661fbe251f60c0200b18acc3d45fe46427188b",
+    "latest_remote_head_before_commit": "23caa3dfd452ff786cc6e8e2bbc3484fb1eab196",
+    "preserved_concurrent_results": [
+      "B84 A064FDFC production/first QA",
+      "D78 final QA reconciliation"
+    ]
+  }
+}

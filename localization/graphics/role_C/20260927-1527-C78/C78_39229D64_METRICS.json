@@ -1,0 +1,101 @@
+{
+  "canonical_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+  "a82_candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+  "c78_candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
+  "dimensions": [
+    4096,
+    4096
+  ],
+  "format": "RGBA32",
+  "mipmaps": 1,
+  "bytes": 67108992,
+  "header_128_exact_canonical": true,
+  "total_changed_pixels_vs_canonical": 2400378,
+  "outside_all_15_source_cells_changed_pixels": 0,
+  "changed_pixels_vs_A82": 261415,
+  "changes_vs_A82_outside_three_total_rank_cells": 0,
+  "introduced_alpha_outside_all_15_cells": 0,
+  "raw_orientation": "mirror_y",
+  "rendered_total_rank": {
+    "total_rank_green": {
+      "cell": [
+        512,
+        896,
+        1101,
+        1075
+      ],
+      "source_text_band": [
+        545,
+        930,
+        1075,
+        1045
+      ],
+      "font_size": 139,
+      "candidate_alpha_bbox": [
+        526,
+        905,
+        1087,
+        1065
+      ],
+      "inpaint_rounds": 41
+    },
+    "total_rank_brown": {
+      "cell": [
+        717,
+        1915,
+        1318,
+        2099
+      ],
+      "source_text_band": [
+        745,
+        1945,
+        1270,
+        2055
+      ],
+      "font_size": 143,
+      "candidate_alpha_bbox": [
+        729,
+        1925,
+        1305,
+        2088
+      ],
+      "inpaint_rounds": 48
+    },
+    "total_rank_pink": {
+      "cell": [
+        2598,
+        1900,
+        3238,
+        2099
+      ],
+      "source_text_band": [
+        2640,
+        1925,
+        3210,
+        2048
+      ],
+      "font_size": 155,
+      "candidate_alpha_bbox": [
+        2607,
+        1912,
+        3229,
+        2087
+      ],
+      "inpaint_rounds": 41
+    }
+  },
+  "english_source_mask_stats": {
+    "total_rank_green": {
+      "masked_source_text_pixels": 47159,
+      "byte_identical_to_source_after_rework": 1735
+    },
+    "total_rank_brown": {
+      "masked_source_text_pixels": 50101,
+      "byte_identical_to_source_after_rework": 373
+    },
+    "total_rank_pink": {
+      "masked_source_text_pixels": 47982,
+      "byte_identical_to_source_after_rework": 1344
+    }
+  }
+}

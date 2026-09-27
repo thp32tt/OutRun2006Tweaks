@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-27T15:18:24+09:00",
+  "updated_at_kst": "2026-09-27T15:35:19+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -128,5 +128,13 @@
     "dimensions": "read_from_dds_header",
     "old_candidates": "historical_until_rebuilt_or_revalidated_against_HD"
   },
-  "latest_d_final_qa_report": "localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json"
+  "latest_d_final_qa_report": "localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-1527-C78/C78_39229D64_STRICT_QA_REWORK_REPORT.json",
+  "post_d78_c78_update": {
+    "asset": "39229D64",
+    "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
+    "superseded_candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+    "result": "C78_REWORK_STATIC_PASS_PENDING_D_INGAME",
+    "note": "C78 corrected three Total Rank background patch/seam artifacts. D77/D78 binary validation predates C78 and must be rerun; no approved_dds promotion."
+  }
 }

@@ -132,12 +132,12 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "D_PREFLIGHT_PASS_PENDING_C_INGAME",
+      "status": "C78_REWORK_STATIC_PASS_PENDING_D_INGAME",
       "transcription_status": "B82_EXPANDED_REVIEWED",
       "transcription_segments": 13,
       "expected_physical_text_occurrences": 15,
       "batch_report": "localization/graphics/role_B/20260927-1412-B83/B83_39229D64_FIRST_QA.json",
-      "candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+      "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
       "completed_transcription_entries": 13,
       "localized_regions": 15,
@@ -146,7 +146,14 @@
       "b_candidate_changed": false,
       "physical_region_count_correction": "B82 expected 14; A82/D77 verified 15 because Total Rank appears three times",
       "d_preflight_report": "localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json",
-      "in_game_validation": "PENDING"
+      "in_game_validation": "PENDING",
+      "b_first_qa_report": "localization/graphics/role_B/20260927-1412-B83/B83_39229D64_FIRST_QA.json",
+      "b83_candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+      "c_strict_qa_report": "localization/graphics/role_C/20260927-1527-C78/C78_39229D64_STRICT_QA_REWORK_REPORT.json",
+      "c78_supersedes_candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+      "d77_preflight_report": "localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json",
+      "d78_reconcile_report": "localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json",
+      "d_pre_c78_binary_status": "SUPERSEDED_BY_C78_NEW_SHA_REQUIRES_D_REVALIDATION"
     },
     {
       "hash": "A064FDFC",
@@ -262,5 +269,5 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json"
+  "latest_batch": "localization/graphics/role_C/20260927-1527-C78/C78_39229D64_STRICT_QA_REWORK_REPORT.json"
 }
