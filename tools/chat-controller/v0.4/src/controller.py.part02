@@ -324,12 +324,12 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
             write_runtime(status="thinking_level_blocked", last_action=f"Watchdog did not send slot {slot.name}: {PREFERRED_THINKING_LEVEL} could not be verified")
             continue
 
-        sent = await send_message(page, prompt)
-        if not sent:
-            slot.last_result = "watchdog_input_not_found"
+        send_result = await send_message(page, prompt)
+        if send_result != "sent":
+            slot.last_result = f"watchdog_{send_result}"
             slot.last_watchdog_at = now.isoformat()
             save_registry(reg)
-            write_runtime(status="ui_changed", last_action=f"Watchdog could not find input for slot {slot.name}")
+            write_runtime(status="ui_changed", last_action=f"Watchdog slot {slot.name} send failed: {send_result}")
             continue
 
         request_now = datetime.now(TZ)
@@ -464,14 +464,14 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
         )
         return
 
-    sent = await send_message(page, prompt)
-    if not sent:
-        slot.last_result = "input_not_found"
+    send_result = await send_message(page, prompt)
+    if send_result != "sent":
+        slot.last_result = send_result
         save_registry(reg)
         diag = await composer_diagnostics(page)
         write_runtime(
             status="ui_changed",
-            last_action=f"Slot {slot.name}: prompt input not found",
+            last_action=f"Slot {slot.name}: send failed at {send_result}",
             composer_diagnostics=diag,
             current_url=page.url,
         )
