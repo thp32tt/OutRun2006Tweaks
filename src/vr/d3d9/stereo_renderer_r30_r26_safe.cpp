@@ -1377,18 +1377,21 @@ namespace OutRunVRStereo
                     std::fabs(deltaY[eye]) > 2.0f)
                     return false;
             }
-            const std::uint64_t builds =
-                R57ProjectedMarkerDeltaBuilds.fetch_add(
-                    1, std::memory_order_relaxed) + 1;
-            bool expected = false;
-            if (R57ProjectedMarkerFirstLogged.compare_exchange_strong(
-                    expected, true, std::memory_order_acq_rel))
+            if (Settings::VRTelemetry)
             {
-                spdlog::info(
-                    "VR R69 CLEAN PROJECTED MARKER: headCorrection={} view=({:.4f},{:.4f},{:.4f}) deltaL=({:.5f},{:.5f}) deltaR=({:.5f},{:.5f}) builds={}",
-                    applyHeadCorrection ? 1 : 0,
-                    marker->viewX, marker->viewY, marker->viewZ,
-                    deltaX[0], deltaY[0], deltaX[1], deltaY[1], builds);
+                const std::uint64_t builds =
+                    R57ProjectedMarkerDeltaBuilds.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                bool expected = false;
+                if (R57ProjectedMarkerFirstLogged.compare_exchange_strong(
+                        expected, true, std::memory_order_acq_rel))
+                {
+                    spdlog::info(
+                        "VR R69 CLEAN PROJECTED MARKER: headCorrection={} view=({:.4f},{:.4f},{:.4f}) deltaL=({:.5f},{:.5f}) deltaR=({:.5f},{:.5f}) builds={}",
+                        applyHeadCorrection ? 1 : 0,
+                        marker->viewX, marker->viewY, marker->viewZ,
+                        deltaX[0], deltaY[0], deltaX[1], deltaY[1], builds);
+                }
             }
             return true;
         }
@@ -1607,12 +1610,6 @@ namespace OutRunVRStereo
                 semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::ScreenHud;
             const bool semanticWorld =
                 semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::World;
-            const bool semanticOverlay2D =
-                semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::ScreenOverlay2D;
-            const bool semanticProjectedWorld =
-                semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::ProjectedWorld;
-            const bool semanticProjectedScreen =
-                semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::ProjectedScreenEffect;
             const auto directScreenKind =
                 OutRunVR::ScreenSpacePolicy::DirectKind(semanticRoute);
 
@@ -1633,8 +1630,7 @@ namespace OutRunVRStereo
             // from the canonical EXE sprite queue or exact original-mod semantic
             // tags. Do not infer HUD from alpha, ZENABLE, cull mode, shader
             // shape, primitive count or a recently uploaded matrix.
-            if (!semanticHud && !semanticWorld && !semanticProjectedWorld &&
-                !semanticProjectedScreen)
+            if (!semanticHud && !semanticWorld)
                 return R30ScreenSpaceKind::None;
 
             float projection[16]{};
