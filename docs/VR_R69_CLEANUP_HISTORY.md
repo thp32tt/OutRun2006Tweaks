@@ -89,3 +89,12 @@ Rules:
 - Projected-marker atomic counter and first-event log now run only when VR telemetry is enabled.
 - No projection, eye transform, safety, HUD-scale, flare, shadow or stage-transition policy changed.
 - Build gate: DX9Ex Active Validation on the candidate branch.
+
+
+## S9 — shared game/host frame contract
+- Branch: `vr-d3d9ex-candidate/r69-clean-s9`
+- Parent: S8 `72fe3768d68ae591000bf742cff8d20765288126`.
+- Added `src/vr/ipc/frame_contract.hpp` as a shared definition of a usable gameplay stereo frame and valid DirectGPU metadata.
+- `vrhost/src/main_r23.cpp` now consumes this shared contract instead of maintaining a second 40+ line copy of frame/flag/slot/handle validation.
+- Protocol layout and required flags are unchanged; this removes host/game contract drift risk.
+- Build gate: DX9Ex Active Validation plus existing host smoke targets.
