@@ -31,7 +31,7 @@
 namespace OutRunVrR32DirectSubmit
 {
     inline constexpr const char* BuildId =
-        "R56-backend-hardening-r3-20260926";
+        "R58-hud-baseline-dx11-dxvk-opt-20260927";
 
     enum class FastRejectReason : std::uint8_t
     {
