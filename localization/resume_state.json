@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "HD P0 REOPEN: 571E78F3, 62BEBF33, E3FD08BE historical 512x64 approvals are superseded by canonical 2048x256 DXT5 sources; rebuild all three from HD base and re-run A/B/C/D QA before any lock/promotion.",
     "HD GRAPHICS: C80 C4A2937B static PASS on unchanged B85 SHA with Drift and runtime-context hold; 2DA43E41 and 411827E C80 reworked SHAs need D revalidation + in-game. FA7/392/A064 remain in-game holds. Continue C075FB49 canonical-HD rebuild using B86-expanded 16 semantic / 17 physical coverage.",
     "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
     "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
@@ -91,11 +92,7 @@
       "latest_queue_commit": "5e71ec08d322dafd7b55fc7bf2597febe6f0fa14"
     },
     "batch58_a_p0_preflight_report": "localization/graphics/BATCH58_A_CANONICAL_P0_REWORK_PREFLIGHT_REPORT.json",
-    "user_approved_locked": [
-      "571E78F3",
-      "62BEBF33",
-      "E3FD08BE"
-    ],
+    "user_approved_locked": [],
     "user_approved_exact_dds_commit": "b2fd5fcf5b6edae90479af89577e9a403704bdfc",
     "user_approved_report": "localization/graphics/BATCH64_USER_APPROVAL_P0_IMPORT_REPORT.json",
     "approved_dds_root": "localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst",
@@ -105,14 +102,19 @@
     ],
     "strict_qa_current": {
       "updated_at_kst": "2026-09-26T21:43:00+09:00",
-      "user_approved_locked": 3,
+      "user_approved_locked": 0,
       "historical_package_assets_scanned": 32,
       "remaining_rework_required": 28,
       "original_safe_hold": [
         "37759842"
       ],
       "promotion_hold_for_nonapproved": true,
-      "queue": "localization/graphics/FULL_STRICT_REVIEW_QUEUE.md"
+      "queue": "localization/graphics/FULL_STRICT_REVIEW_QUEUE.md",
+      "historical_lowres_approvals_superseded": [
+        "571E78F3",
+        "62BEBF33",
+        "E3FD08BE"
+      ]
     },
     "batch65_b_report": "localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json",
     "batch65_b_candidates": {
@@ -330,7 +332,55 @@
         "changed": true,
         "superseded_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02"
       }
-    }
+    },
+    "user_approved_lowres_superseded": [
+      {
+        "hash": "571E78F3",
+        "historical_approved_resolution": [
+          512,
+          64
+        ],
+        "historical_approved_format": "RGBA32",
+        "canonical_hd_resolution": [
+          2048,
+          256
+        ],
+        "canonical_hd_format": "DXT5",
+        "canonical_upstream_blob_sha": "12a935df311634cb64ff01bddce2b7a1165a2ccc",
+        "status": "REOPENED_HD_REWORK_REQUIRED"
+      },
+      {
+        "hash": "62BEBF33",
+        "historical_approved_resolution": [
+          512,
+          64
+        ],
+        "historical_approved_format": "RGBA32",
+        "canonical_hd_resolution": [
+          2048,
+          256
+        ],
+        "canonical_hd_format": "DXT5",
+        "canonical_upstream_blob_sha": "1cc92c914687546fbef9b47dd1134659c2f1f0f6",
+        "status": "REOPENED_HD_REWORK_REQUIRED"
+      },
+      {
+        "hash": "E3FD08BE",
+        "historical_approved_resolution": [
+          512,
+          64
+        ],
+        "historical_approved_format": "RGBA32",
+        "canonical_hd_resolution": [
+          2048,
+          256
+        ],
+        "canonical_hd_format": "DXT5",
+        "canonical_upstream_blob_sha": "9cd996ed8f5e8c059492893617e4ff2006c525a2",
+        "status": "REOPENED_HD_REWORK_REQUIRED"
+      }
+    ],
+    "latest_hd_reopen_report": "localization/graphics/BATCH69_REOPEN_LOWRES_APPROVALS_HD_REWORK_REPORT.json"
   },
   "runtime_packages": {
     "k1": {

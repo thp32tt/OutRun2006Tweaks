@@ -15,11 +15,11 @@
     "localization_targets_matched": 89,
     "targets_with_larger_actual_dds_than_legacy_suffix": 86,
     "targets_same_actual_size_as_legacy_suffix": 3,
-    "graphics_rework_targets": 13,
+    "graphics_rework_targets": 16,
     "low_res_font_pipeline_targets": 1,
-    "hd_preserve_targets": 75,
+    "hd_preserve_targets": 72,
     "graphics_rework_candidates_ready": 8,
-    "graphics_rework_remaining": 5
+    "graphics_rework_remaining": 8
   },
   "rules": [
     "Use DDS header dimensions, never the filename resolution suffix.",
@@ -27,9 +27,83 @@
     "Treat OR2006Sprites 'Placeholder upscale assets that need replacing' as low-resolution source content even when canvas is 4x.",
     "Never upscale prior Korean DDS candidates; rebuild Korean text on the HD/vector/working source.",
     "Preserve alpha, orientation, sprite-cell geometry, non-text pixels, format behavior, and original bounds.",
-    "6B8ED9DA is a font-atlas/runtime-font task and is excluded from generic graphics repaint."
+    "6B8ED9DA is a font-atlas/runtime-font task and is excluded from generic graphics repaint.",
+    "Previously user-approved stock-resolution Korean DDS files are historical evidence only when the canonical HD source is larger; rebuild from the HD source and never upscale the approved raster."
   ],
   "graphics_rework_queue": [
+    {
+      "hash": "571E78F3",
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+      "actual": [
+        2048,
+        256
+      ],
+      "source_format": "DXT5",
+      "upstream_blob_sha": "12a935df311634cb64ff01bddce2b7a1165a2ccc",
+      "reason": "LOW_RES_USER_APPROVAL_SUPERSEDED_BY_CANONICAL_HD_SOURCE",
+      "policy": "REBUILD_KOREAN_FROM_HD_BASE",
+      "priority": "P0",
+      "status": "REWORK_FROM_HD_BASE",
+      "historical_approved_resolution": [
+        512,
+        64
+      ],
+      "historical_approved_format": "RGBA32",
+      "historical_user_approval": "SUPERSEDED_FOR_HD_MIGRATION",
+      "translation": [
+        "Time Attack Mode -> 타임 어택 모드",
+        "15 continuous course -> 15코스 연속"
+      ],
+      "in_game_validation": "PENDING"
+    },
+    {
+      "hash": "62BEBF33",
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+      "actual": [
+        2048,
+        256
+      ],
+      "source_format": "DXT5",
+      "upstream_blob_sha": "1cc92c914687546fbef9b47dd1134659c2f1f0f6",
+      "reason": "LOW_RES_USER_APPROVAL_SUPERSEDED_BY_CANONICAL_HD_SOURCE",
+      "policy": "REBUILD_KOREAN_FROM_HD_BASE",
+      "priority": "P0",
+      "status": "REWORK_FROM_HD_BASE",
+      "historical_approved_resolution": [
+        512,
+        64
+      ],
+      "historical_approved_format": "RGBA32",
+      "historical_user_approval": "SUPERSEDED_FOR_HD_MIGRATION",
+      "translation": [
+        "OutRun Mode -> 아웃런 모드"
+      ],
+      "in_game_validation": "PENDING"
+    },
+    {
+      "hash": "E3FD08BE",
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+      "actual": [
+        2048,
+        256
+      ],
+      "source_format": "DXT5",
+      "upstream_blob_sha": "9cd996ed8f5e8c059492893617e4ff2006c525a2",
+      "reason": "LOW_RES_USER_APPROVAL_SUPERSEDED_BY_CANONICAL_HD_SOURCE",
+      "policy": "REBUILD_KOREAN_FROM_HD_BASE",
+      "priority": "P0",
+      "status": "REWORK_FROM_HD_BASE",
+      "historical_approved_resolution": [
+        512,
+        64
+      ],
+      "historical_approved_format": "RGBA32",
+      "historical_user_approval": "SUPERSEDED_FOR_HD_MIGRATION",
+      "translation": [
+        "Heart Attack Mode -> 하트 어택 모드"
+      ],
+      "in_game_validation": "PENDING"
+    },
     {
       "hash": "D6DC1380",
       "path": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
@@ -361,5 +435,6 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json"
+  "latest_batch": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
+  "latest_reopen_report": "localization/graphics/BATCH69_REOPEN_LOWRES_APPROVALS_HD_REWORK_REPORT.json"
 }

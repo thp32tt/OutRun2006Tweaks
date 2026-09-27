@@ -760,3 +760,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - 411 current SHA c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74 supersedes A85/B86 8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02; all 9,767 canonical badge-border core pixels match exactly after repair; outside 7 cells = 0, introduced alpha outside = 0, changes versus B86 outside Recommendation cell = 0. D81 old-SHA validation is superseded.
 - Final raw/readable/white-background QA PASS for both C80 reworked DDS files; no observed source residue, clipping/overlap, box escape, black seam, opaque box or alpha halo. No approved_dds promotion; in-game validation remains mandatory. Build not run; VR/FFB untouched.
 - Machine report: localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json.
+## 2026-09-27 18:35 KST - BATCH69 HD REOPEN OF FORMER USER APPROVALS
+
+- Rechecked the three user-approved/locked selector DDS files against the canonical OR2-HD-GUI source instead of trusting filename suffixes.
+- Approved DDS headers are all **512x64 uncompressed RGBA32**: 571E78F3, 62BEBF33, E3FD08BE.
+- Canonical HD release DDS headers are all **2048x256 DXT5** (4x each axis / 16x pixels), confirmed at upstream commit a95efe01d1f136514cef94b0d9e9fd61df021754.
+- Therefore the prior approvals are retained only as historical visual evidence and the lock is removed for HD migration.
+- All three are reopened as P0 REWORK_FROM_HD_BASE; construction must start from the exact HD DDS, never by upscaling the old Korean raster.
+- Required strings: 571E78F3 = 타임 어택 모드 / 15코스 연속; 62BEBF33 = 아웃런 모드; E3FD08BE = 하트 어택 모드.
+- New gate: rebuild at 2048x256 DXT5, preserve orientation/alpha/non-text cells/bounds, then repeat strict static QA and in-game validation before any new lock.
+- Report: localization/graphics/BATCH69_REOPEN_LOWRES_APPROVALS_HD_REWORK_REPORT.json.
+

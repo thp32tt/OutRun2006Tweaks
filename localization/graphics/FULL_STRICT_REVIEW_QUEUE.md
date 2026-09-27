@@ -6,8 +6,8 @@ This file records the strict reset queue before the user's P0 visual approval.
 - automatic STRICT_FAIL: 28
 - NEEDS_CELL_MASK_VISUAL_QA: 3
 - ORIGINAL_UNCHANGED: 1
-- user-approved superseding items: 571E78F3, 62BEBF33, E3FD08BE
-- approved items are locked from routine rework.
+- historical user-approved low-resolution items: 571E78F3, 62BEBF33, E3FD08BE
+- 2026-09-27 HD gate: all three approvals are superseded and reopened because approved DDS headers are 512x64 RGBA32 while canonical HD sources are 2048x256 DXT5.
 
 ## Highest-risk remaining queue
 
@@ -41,7 +41,7 @@ This file records the strict reset queue before the user's P0 visual approval.
 28. 53CE39D5_512x512.dds — manual cell-mask review/rework
 29. 37759842_1024x1024.dds — ORIGINAL_UNCHANGED / safe hold
 
-## P0 user-approved locked
-- 571E78F3_512x64.dds
-- 62BEBF33_512x64.dds
-- E3FD08BE_512x64.dds
+## P0 HD-reopened former approvals
+- 571E78F3_512x64.dds — REOPENED: 512x64 RGBA32 approval -> rebuild from 2048x256 DXT5 HD source
+- 62BEBF33_512x64.dds — REOPENED: 512x64 RGBA32 approval -> rebuild from 2048x256 DXT5 HD source
+- E3FD08BE_512x64.dds — REOPENED: 512x64 RGBA32 approval -> rebuild from 2048x256 DXT5 HD source

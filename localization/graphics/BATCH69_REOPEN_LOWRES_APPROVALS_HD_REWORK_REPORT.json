@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "run": "batch69-reopen-lowres-approvals-hd-rework-20260927",
+  "timestamp_kst": "2026-09-27T18:35:00+09:00",
+  "branch": "korean-localization-clean",
+  "decision": "REOPEN_ALL_3_FOR_HD_REWORK",
+  "evidence": {
+    "historical_approved_dds": [
+      {
+        "hash": "571E78F3",
+        "width": 512,
+        "height": 64,
+        "format": "RGBA32",
+        "blob_sha": "b7db1af15488f9bd73a4f91051ad943901025f68"
+      },
+      {
+        "hash": "62BEBF33",
+        "width": 512,
+        "height": 64,
+        "format": "RGBA32",
+        "blob_sha": "064caa507159cbd8395fb7b5a5ffa5d81e00b689"
+      },
+      {
+        "hash": "E3FD08BE",
+        "width": 512,
+        "height": 64,
+        "format": "RGBA32",
+        "blob_sha": "1ca03b2c2282372c59a3091e7998a740ecaae295"
+      }
+    ],
+    "canonical_hd_sources": [
+      {
+        "hash": "571E78F3",
+        "width": 2048,
+        "height": 256,
+        "format": "DXT5",
+        "upstream_repo": "Sonic-TV/OR2006Sprites",
+        "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "upstream_blob_sha": "12a935df311634cb64ff01bddce2b7a1165a2ccc"
+      },
+      {
+        "hash": "62BEBF33",
+        "width": 2048,
+        "height": 256,
+        "format": "DXT5",
+        "upstream_repo": "Sonic-TV/OR2006Sprites",
+        "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "upstream_blob_sha": "1cc92c914687546fbef9b47dd1134659c2f1f0f6"
+      },
+      {
+        "hash": "E3FD08BE",
+        "width": 2048,
+        "height": 256,
+        "format": "DXT5",
+        "upstream_repo": "Sonic-TV/OR2006Sprites",
+        "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "upstream_blob_sha": "9cd996ed8f5e8c059492893617e4ff2006c525a2"
+      }
+    ]
+  },
+  "comparison": {
+    "linear_scale": 4,
+    "pixel_count_scale": 16,
+    "conclusion": "All three locked approvals are stock-resolution relative to the canonical HD source."
+  },
+  "required_rework": [
+    {
+      "hash": "571E78F3",
+      "translation": [
+        "Time Attack Mode -> 타임 어택 모드",
+        "15 continuous course -> 15코스 연속"
+      ],
+      "source": "exact canonical 2048x256 DXT5 HD DDS",
+      "rules": [
+        "do not upscale or reuse the old 512x64 Korean raster as construction source",
+        "preserve HD non-text pixels, alpha, DXT5 behavior, sprite orientation and original text-cell bounds",
+        "recalculate Korean placement on HD cells",
+        "repeat strict static QA and in-game validation before re-approval/lock"
+      ],
+      "status": "REWORK_FROM_HD_BASE"
+    },
+    {
+      "hash": "62BEBF33",
+      "translation": [
+        "OutRun Mode -> 아웃런 모드"
+      ],
+      "source": "exact canonical 2048x256 DXT5 HD DDS",
+      "rules": [
+        "do not upscale or reuse the old 512x64 Korean raster as construction source",
+        "preserve HD non-text pixels, alpha, DXT5 behavior, sprite orientation and original text-cell bounds",
+        "recalculate Korean placement on HD cells",
+        "repeat strict static QA and in-game validation before re-approval/lock"
+      ],
+      "status": "REWORK_FROM_HD_BASE"
+    },
+    {
+      "hash": "E3FD08BE",
+      "translation": [
+        "Heart Attack Mode -> 하트 어택 모드"
+      ],
+      "source": "exact canonical 2048x256 DXT5 HD DDS",
+      "rules": [
+        "do not upscale or reuse the old 512x64 Korean raster as construction source",
+        "preserve HD non-text pixels, alpha, DXT5 behavior, sprite orientation and original text-cell bounds",
+        "recalculate Korean placement on HD cells",
+        "repeat strict static QA and in-game validation before re-approval/lock"
+      ],
+      "status": "REWORK_FROM_HD_BASE"
+    }
+  ],
+  "historical_approval": "retained as audit history only; no longer locks these assets"
+}

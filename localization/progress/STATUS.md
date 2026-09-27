@@ -413,3 +413,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - 411827E c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74: C REWORK PASS. Restored canonical Recommendation badge white border while retaining 추천. D81 prior SHA superseded; D revalidation + in-game pending.
 - Containment: C4 outside 21 cells = 0; 2DA outside 11 cells = 0; 411 outside 7 cells = 0. New alpha outside declared cells = 0 for all. Canonical headers and raw mirror_y preserved.
 - No approved_dds promotion; no build; VR/FFB unchanged. Machine report: localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json.
+
+## 2026-09-27 18:35 KST - Former approved 3 reopened for HD rebuild
+
+- 571E78F3, 62BEBF33, E3FD08BE: previous approved/locked DDS = 512x64 RGBA32.
+- Canonical HD source = 2048x256 DXT5 for all three.
+- Current lock count for these approvals: **0**.
+- Current state: **P0 REWORK_FROM_HD_BASE**.
+- Old approved pixels may be used only as visual/reference evidence; they must not be upscaled into the new candidates.
+- Re-approval requires HD rebuild + strict static QA + in-game validation.
+
