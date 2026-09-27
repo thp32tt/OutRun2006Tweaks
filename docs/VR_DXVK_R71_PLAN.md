@@ -58,3 +58,9 @@ This phase intentionally cannot change rendered pixels.
 
 Do not merge this branch into the production/reference line until
 `docs/VR_DX11_DXVK_BRANCH_POLICY.md` is fully satisfied by one exact runtime build.
+
+## DXVK version baseline
+
+Development targets stock DXVK 3.1 first. On 2026-09-28 the official DXVK `v3.1` and current `master` both declare `ID3D9VkInteropDevice` with IID `2eaa4b89-0107-4bdb-87f7-0f541c493ce0` in `src/d3d9/d3d9_interfaces.h`. The R71 passive probe uses exactly that IID.
+
+Do not bind the graphics-correctness path to the old custom fork before stock DXVK 3.1 parity is demonstrated.
