@@ -4,7 +4,7 @@ param(
     [string]$Backend,
     [ValidateSet("CONTROL","CORRECTNESS","HUD_SCREEN","HUD_MENU","HUD_WORLD","PERFORMANCE","STAGE_DIAGNOSTIC","A_BASELINE","B_CULLING","C_CULLING_NO_SSAA","D_CULLING_NO_SSAA_R512")]
     [string]$TestProfile = "CORRECTNESS",
-    [ValidateSet("AUTO","CONTROL_2D","CURRENT_FOCUS","A_CONTROL","B_HUD","C_FLARE","D_PERF","E_DXVK_SAFE","E_DXVK_MULTIVIEW","F_DX12_STRICT","G_COCKPIT","X_BASE","X_SCREEN_HUD","X_WORLD_RANK","X_COMBINED","R54_A_NEXTDRAW","R54_B_STICKY","R54_C_FULL_OWNER","R54_D_HUD_PLANE","R55_A_ZERO","R55_B_SCALE35","R55_C_WORLD35","R55_D_RANKZERO","R56_01_ZERO","R56_02_SCALE35","R56_03_WORLD35","R56_04_RANKZERO","R56_05_POSITION_XP96","R56_06_POSITION_XM96","R56_07_POSITION_XS35","R56_08_POSITION_XCENTER","R56_09_RANK13_XP96","R56_10_RANK13_XM96","R56_11_RANK13_YM72","R56_12_RANK13_CENTER","R56_13_RANK46_XP96","R56_14_RANK46_YM72","R56_15_RANK46_CENTER","R56_16_RANK13_AS_HUD","R56_17_RANK46_AS_HUD","R56_18_RANK46_NEXTDRAW","R56_19_POSITION_NEXTDRAW","R56_20_ALLSCREEN_RAW","R57_01_POSITION_KIND1_HUD35","R57_02_POSITION_KIND0_HUD35","R57_03_POSITION_ALL_WORLD35","R57_04_RANK_ALL_AS_HUD","R57_05_RANK_PROJECTED_IPD","R57_06_RANK_PROJECTED_HEAD","R57_07_RANK_PROJECTED_13","R57_08_RANK_PROJECTED_46","R57_09_RANK_PROJECTED_ZERO","R57_10_RANK_PROJECTED_TRACE")]
+    [ValidateSet("AUTO","CONTROL_2D","CURRENT_FOCUS","A_CONTROL","B_HUD","C_FLARE","D_PERF","E_DXVK_SAFE","E_DXVK_MULTIVIEW","F_DX12_STRICT","G_COCKPIT","X_BASE","X_SCREEN_HUD","X_WORLD_RANK","X_COMBINED","R54_A_NEXTDRAW","R54_B_STICKY","R54_C_FULL_OWNER","R54_D_HUD_PLANE","R55_A_ZERO","R55_B_SCALE35","R55_C_WORLD35","R55_D_RANKZERO","R56_01_ZERO","R56_02_SCALE35","R56_03_WORLD35","R56_04_RANKZERO","R56_05_POSITION_XP96","R56_06_POSITION_XM96","R56_07_POSITION_XS35","R56_08_POSITION_XCENTER","R56_09_RANK13_XP96","R56_10_RANK13_XM96","R56_11_RANK13_YM72","R56_12_RANK13_CENTER","R56_13_RANK46_XP96","R56_14_RANK46_YM72","R56_15_RANK46_CENTER","R56_16_RANK13_AS_HUD","R56_17_RANK46_AS_HUD","R56_18_RANK46_NEXTDRAW","R56_19_POSITION_NEXTDRAW","R56_20_ALLSCREEN_RAW","R57_01_POSITION_KIND1_HUD35","R57_02_POSITION_KIND0_HUD35","R57_03_POSITION_ALL_WORLD35","R57_04_RANK_ALL_AS_HUD","R57_05_RANK_PROJECTED_IPD","R57_06_RANK_PROJECTED_HEAD","R57_07_RANK_PROJECTED_13","R57_08_RANK_PROJECTED_46","R57_09_RANK_PROJECTED_ZERO","R57_10_RANK_PROJECTED_TRACE","R59_01_RANK_HEAD_SCALE82")]
     [string]$VariantId = "AUTO"
 )
 
@@ -16,7 +16,7 @@ $payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "dxvk-safe" -or $Backen
 $defaultVariant = switch ($Backend) {
     "2d"        { "CONTROL_2D" }
     "d3d9"      { "A_CONTROL" }
-    "dx11"      { "R57_05_RANK_PROJECTED_IPD" }
+    "dx11"      { "R59_01_RANK_HEAD_SCALE82" }
     "dxvk-safe" { "E_DXVK_SAFE" }
     "dxvk"      { "E_DXVK_MULTIVIEW" }
     "dx12"      { "F_DX12_STRICT" }
@@ -187,6 +187,7 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "false"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "false"
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
     } elseif ($Backend -eq "dxvk-safe") {
@@ -194,7 +195,12 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "Enabled" "true"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
-        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        # 2026-09-27 HMD logs: provider-local CreateDeviceEx can terminate
+        # before either success or classic fallback is logged. SAFE therefore
+        # stays on the provider's classic IDirect3D9 path until Ex startup is
+        # isolated behind a dedicated experimental backend.
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
         $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
@@ -206,6 +212,7 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
     } elseif ($Backend -eq "dx11") {
@@ -217,22 +224,34 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "true"
+    } elseif ($Backend -eq "dxvk") {
+        $text = Set-IniSectionValue $text "VR" "RenderBackend" "2"
+        $text = Set-IniSectionValue $text "VR" "Enabled" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
+        # MULTIVIEW remains experimental, but correctness comes first: do not
+        # enter the provider-local Ex path that currently dies during
+        # CreateDeviceEx. Keep Desktop Duplication available as fail-open.
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
+        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
+        $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
     } else {
-        $value = switch ($Backend) {
-            "dxvk" { "2" }
-            "dx12" { "3" }
-        }
-        $text = Set-IniSectionValue $text "VR" "RenderBackend" $value
+        # DX12 STRICT is only considered valid when the collected session proves
+        # a D3D9On12 provider identity. The analyzer rejects a native-D3D9Ex
+        # session that is merely labelled dx12.
+        $text = Set-IniSectionValue $text "VR" "RenderBackend" "3"
         $text = Set-IniSectionValue $text "VR" "Enabled" "true"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"
-        if ($Backend -eq "dxvk") {
-            $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
-        }
+        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "true"
     }
 
     # Keep the experimental cockpit camera completely isolated from normal
@@ -247,6 +266,14 @@ $nl = [Environment]::NewLine
 $matrixFile = Join-Path $root "BUILD_MATRIX_ID.txt"
 $matrix = if (Test-Path $matrixFile) { (Get-Content $matrixFile -Raw).Trim() } else { "UNIFIED_LOCAL" }
 $startedUtc = (Get-Date).ToUniversalTime()
+$expectedProvider = switch ($Backend) {
+    "2d"        { "CLASSIC_D3D9" }
+    "d3d9"      { "NATIVE_D3D9EX" }
+    "dx11"      { "NATIVE_D3D9EX+D3D11_HOST" }
+    "dxvk-safe" { "DXVK_CLASSIC" }
+    "dxvk"      { "DXVK_CLASSIC_MULTIVIEW" }
+    "dx12"      { "D3D9ON12" }
+}
 $session = $startedUtc.ToString("yyyyMMddTHHmmssfffZ") + "-" + [guid]::NewGuid().ToString("N").Substring(0,8)
 $sessionRoot = Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $matrix,$variant,$TestProfile,$session)
 New-Item -ItemType Directory -Force $sessionRoot | Out-Null
@@ -256,6 +283,7 @@ $activeText = @(
     "variant=$variant"
     "profile=$TestProfile"
     "sourceSha=$sourceSha"
+    "expectedProvider=$expectedProvider"
     "matrix=$matrix"
     "session=$session"
     "startedUtc=$($startedUtc.ToString('o'))"
@@ -272,6 +300,7 @@ $sessionManifest = [ordered]@{
     Backend = $Backend
     TestProfile = $TestProfile
     SourceSha = $sourceSha
+    ExpectedProvider = $expectedProvider
     SessionId = $session
     StartedUtc = $startedUtc.ToString("o")
     ConfigSha256 = $configHash
@@ -282,7 +311,7 @@ $sessionManifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $root "CURRE
 $sessionManifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $sessionRoot "session_manifest.json") -Encoding UTF8
 
 if (Test-Path $ini) {
-    $allowed = '^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|DriverSeatView)\s*='
+    $allowed = '^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|AllowThirdPartyD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|DriverSeatView|RankMarkerScale)\s*='
     Get-Content $ini | Where-Object { $_ -match $allowed } |
         Set-Content (Join-Path $sessionRoot "VR_CONFIG_SNAPSHOT.txt") -Encoding UTF8
 }
@@ -301,7 +330,7 @@ switch ($Backend) {
     "2d"   { Write-Host "2D ORIGINAL: classic D3D9, VR disabled, D3D9Ex promotion disabled, no VR host." }
     "d3d9" { Write-Host "D3D9Ex REFERENCE: PreferD3D9Ex enabled; DirectGPU optional; profile=$TestProfile." }
     "dx11" { Write-Host "DX11 HOST/DIRECTGPU: D3D9Ex game + x64 D3D11 OpenXR host; DirectGPU-only; ACK run identity required." }
-    "dxvk-safe" { Write-Host "DXVK SAFE: provider-local D3D9Ex is probed when exported; DirectGPU optional; multiview patcher disabled." }
-    "dxvk" { Write-Host "DXVK MULTIVIEW: local d3d9.dll + multiviewpatcher.dll active." }
-    "dx12" { Write-Host "DX12 STRICT: local d3d9.dll verified absent; Windows D3D9On12 required." }
+    "dxvk-safe" { Write-Host "DXVK SAFE: classic DXVK IDirect3D9 + SBS/Desktop Duplication fail-open; provider-local Ex disabled after HMD startup failure." }
+    "dxvk" { Write-Host "DXVK MULTIVIEW: classic DXVK + multiviewpatcher; Desktop Duplication fail-open; provider-local Ex disabled." }
+    "dx12" { Write-Host "DX12 STRICT: local d3d9.dll absent; collected session must prove D3D9On12 identity or analysis fails." }
 }

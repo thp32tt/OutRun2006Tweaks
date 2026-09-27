@@ -198,15 +198,15 @@ jobs:
           Copy-Item payload/current/dinput8.dll "$dir/dinput8.dll"
           Copy-Item payload/current/outrun-vr-host.exe "$dir/outrun-vr-host.exe"
           $short=$env:GITHUB_SHA.Substring(0,12)
-          $matrix="NIGHTLY-R58-DIRECTCLIP-20260926-$short"
+          $matrix="NIGHTLY-R59-RANK-SCALE-20260927-$short"
           Set-Content "$dir/BUILD_MATRIX_ID.txt" $matrix -Encoding ascii
           [ordered]@{
             SchemaVersion=1
             BuildMatrixId=$matrix
             IntegrationSha=$env:GITHUB_SHA
-            RuntimeSource='R58 direct clip-node ownership + proven R57 mode6 head-inverse projected-world-marker + backend transport fixes'
+            RuntimeSource='R59 anchor-preserving rank scale + R58 direct clip ownership + proven R57 mode6 head-inverse projected-world-marker + backend diagnostics'
             DX11='D3D9Ex game + D3D11 OpenXR host; DirectGPU-only mode available'
-            DXVK='SAFE and MULTIVIEW modes use pinned OpenRBRVR DXVK provider'
+            DXVK='SAFE and MULTIVIEW use classic DXVK with SBS/Desktop Duplication fail-open; provider-local Ex is disabled after runtime startup failure'
             DX12='D3D9On12 probe is authoritative gate; DX12 STRICT gameplay remains experimental, not a native D3D12 host claim'
             R57Variants=@(
               'R57_01_POSITION_KIND1_HUD35','R57_02_POSITION_KIND0_HUD35','R57_03_POSITION_ALL_WORLD35',
@@ -214,19 +214,20 @@ jobs:
               'R57_07_RANK_PROJECTED_13','R57_08_RANK_PROJECTED_46','R57_09_RANK_PROJECTED_ZERO',
               'R57_10_RANK_PROJECTED_TRACE'
             )
+            R59Variants=@('R59_01_RANK_HEAD_SCALE82')
           }|ConvertTo-Json -Depth 5|Set-Content "$dir/BUILD_INPUTS.json" -Encoding UTF8
           @(
-            'OUTRUN VR NIGHTLY UNIFIED 2026-09-26'
+            'OUTRUN VR R59 UNIFIED 2026-09-27'
             ''
             'START: START_HERE_VR_TEST.cmd'
             ''
-            'R58 focused HMD order (do not repeat all ten):'
-            '1) R57 03 - POSITION direct kind0 ownership + HUD35 proof'
-            '2) R57 08 - isolated 4th+ rank direct projected ownership + head inverse'
-            '3) R57 06 - combined 1st-6th projected rank with proven head inverse'
+            'R59 focused HMD order:'
+            '1) R59_01 - combined 1st-6th projected rank, head inverse, direct 4th+ ownership, anchor-centred 82% scale'
+            '2) DX11 HOST DirectGPU - same R59_01 visible identity through the D3D11 OpenXR host'
+            '3) DXVK SAFE only if needed - classic DXVK fail-open; provider-local Ex remains disabled'
             ''
-            'Backend comparisons are optional after the three visual checks.'
-            'DX11 HOST DirectGPU / DXVK SAFE / DXVK MULTIVIEW still use R57_05 in the GUI for transport comparison.'
+            'R57 05 remains diagnostic IPD-only and is no longer the recommended production candidate.'
+            'DXVK SAFE / MULTIVIEW use R59_01 when comparing the same visible rank result.'
             'Run DX12 D3D9On12 PROBE before DX12 STRICT.'
             ''
             'DX11 means D3D9Ex game -> x64 D3D11 OpenXR host, not a native DX11 game renderer.'
@@ -239,11 +240,11 @@ jobs:
           Get-ChildItem $dir -Recurse -File|Get-FileHash -Algorithm SHA256|ForEach-Object{
             "$($_.Hash)  $([IO.Path]::GetRelativePath((Resolve-Path $dir),$_.Path))"
           }|Set-Content "$dir/SHA256SUMS.txt" -Encoding ascii
-          Compress-Archive -Path "$dir/*" -DestinationPath ("OutRun2_VR_NIGHTLY_R58_" + $short + ".zip") -Force
+          Compress-Archive -Path "$dir/*" -DestinationPath ("OutRun2_VR_NIGHTLY_R59_" + $short + ".zip") -Force
       - name: Validate unified package
         shell: pwsh
         run: |
-          $zip=Get-ChildItem -Filter 'OutRun2_VR_NIGHTLY_R58_*.zip'|Select-Object -First 1
+          $zip=Get-ChildItem -Filter 'OutRun2_VR_NIGHTLY_R59_*.zip'|Select-Object -First 1
           if(!$zip){throw 'nightly ZIP missing'}
           Expand-Archive $zip.FullName verify
           foreach($file in @('START_HERE_VR_TEST.cmd','OutRunVR-Test-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','outrun-d3d9on12-probe.exe','BUILD_INPUTS.json','TEST_ORDER.txt')){
@@ -259,12 +260,12 @@ jobs:
           $selector=Get-Content verify/Select-OutRunVRBackend.ps1 -Raw
           if($selector -notmatch '"dx11"'){throw 'DX11 host mode missing'}
           $gui=Get-Content verify/OutRunVR-Test-Selector.ps1 -Raw
-          foreach($marker in @('DX11 Host DirectGPU','DXVK SAFE','DXVK MULTIVIEW','DX12 STRICT','R57_05_RANK_PROJECTED_IPD')){
+          foreach($marker in @('DX11 Host DirectGPU','DXVK SAFE','DXVK MULTIVIEW','DX12 STRICT','R59_01_RANK_HEAD_SCALE82')){
             if($gui -notmatch [regex]::Escape($marker)){throw "GUI missing $marker"}
           }
           Get-FileHash $zip.FullName -Algorithm SHA256
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun2-VR-NIGHTLY-R58-${{ github.sha }}
-          path: OutRun2_VR_NIGHTLY_R58_*.zip
+          name: OutRun2-VR-NIGHTLY-R59-${{ github.sha }}
+          path: OutRun2_VR_NIGHTLY_R59_*.zip
           if-no-files-found: error

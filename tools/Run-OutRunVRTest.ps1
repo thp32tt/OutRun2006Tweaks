@@ -99,6 +99,7 @@ switch($variant){
     'R57_08_RANK_PROJECTED_46'    { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='8' }
     'R57_09_RANK_PROJECTED_ZERO'  { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='9' }
     'R57_10_RANK_PROJECTED_TRACE' { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='10' }
+    'R59_01_RANK_HEAD_SCALE82'     { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='6' }
 }
 $oldExeSemanticMode=$env:OUTRUN_VR_EXE_SEMANTIC_MODE
 $oldHudExperimentMode=$env:OUTRUN_VR_HUD_EXPERIMENT_MODE
@@ -181,6 +182,23 @@ if($backend -eq 'd3d9'){
 
 if($backend -ne '2d'){
     $gameArgs += '-HudInspector=true'
+}
+
+# R59 runtime identity overrides. Keep these explicit so an old user INI cannot
+# silently re-enable the DXVK provider-local Ex path or alter the rank-scale
+# candidate being compared across backends.
+if($backend -match '^dxvk'){
+    $gameArgs += '-PreferD3D9Ex=false'
+    $gameArgs += '-AllowThirdPartyD3D9Ex=false'
+    $gameArgs += '-DirectGpuOnly=false'
+    $gameArgs += '-DisableDesktopDuplication=false'
+}
+if($backend -eq 'dx12'){
+    $gameArgs += '-DirectGpuOnly=true'
+    $gameArgs += '-DisableDesktopDuplication=true'
+}
+if($variant -eq 'R59_01_RANK_HEAD_SCALE82'){
+    $gameArgs += '-RankMarkerScale=0.82'
 }
 
 $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)

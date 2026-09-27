@@ -60,7 +60,8 @@ $requiredFiles = @(
     'Select-OutRunVRBackend.ps1',
     'Run-OutRunVRTest.ps1',
     'Collect-OutRunVRLogs.ps1',
-    'OutRunVR-Test-Selector.ps1'
+    'OutRunVR-Test-Selector.ps1',
+    'Analyze-OutRunVRSession.ps1'
 )
 $text = @{}
 $parseTargets = @('OutRunVR-TestProfiles.ps1') + $requiredFiles
@@ -95,7 +96,23 @@ foreach($id in $r57Variants){
     Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match [regex]::Escape($id)) "single GUI must expose $id"
     Assert-True ($text['Run-OutRunVRTest.ps1'] -match [regex]::Escape($id)) "runner must map $id"
 }
+$r59RankVariant='R59_01_RANK_HEAD_SCALE82'
+Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match [regex]::Escape($r59RankVariant)) 'single GUI must expose the R59 rank candidate'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match [regex]::Escape($r59RankVariant)) 'selector must accept the R59 rank candidate identity'
+Assert-True ($text['Run-OutRunVRTest.ps1'] -match [regex]::Escape($r59RankVariant)) 'runner must map the R59 rank candidate to the proven mode6 transform'
 Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'OUTRUN_VR_R57_MODE') 'runner must set the R57 orthogonal probe selector'
+Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'R57_06_RANK_PROJECTED_HEAD') 'R59 GUI must expose the head-projected rank candidate'
+Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'RankMarkerScale 82%') 'R59 GUI must describe anchor-preserving rank scaling'
+Assert-True ($text['Run-OutRunVRTest.ps1'] -match '-RankMarkerScale=0\.82') 'R59 head-projected rank run must freeze RankMarkerScale=0.82'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match '(?s)elseif \(\$Backend -eq "dxvk-safe"\).*?"PreferD3D9Ex" "false".*?"AllowThirdPartyD3D9Ex" "false"') 'DXVK SAFE must avoid provider-local Ex after runtime startup failure'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match '(?s)elseif \(\$Backend -eq "dxvk"\).*?"AllowThirdPartyD3D9Ex" "false".*?"DirectGpuOnly" "false".*?"DisableDesktopDuplication" "false"') 'DXVK multiview comparison must retain functional fail-open transport'
+Assert-True ($text['Run-OutRunVRTest.ps1'] -match '-AllowThirdPartyD3D9Ex=false') 'DXVK runtime launch must freeze third-party Ex opt-in off'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'ExpectedProvider') 'selector must persist expected backend provider identity'
+Assert-True ($text['Analyze-OutRunVRSession.ps1'] -match 'DXVK_PROVIDER_EX_CREATEDEVICE_STALL') 'analyzer must flag provider-local Ex startup stalls'
+Assert-True ($text['Analyze-OutRunVRSession.ps1'] -match 'DX12_PROVIDER_IDENTITY_MISMATCH') 'analyzer must reject dx12 labels without D3D9On12 evidence'
+Assert-True ($text['Analyze-OutRunVRSession.ps1'] -match 'STARTUP_NO_FRAME') 'analyzer must flag non-2D zero-activity startup failures'
+Assert-True ($text['Analyze-OutRunVRSession.ps1'] -match 'Rank46DirectHits') 'analyzer must summarize direct 4th+ rank ownership'
+Assert-True ($text['Analyze-OutRunVRSession.ps1'] -match 'R59_RANK46_PROJECTED_OWNER_NOT_REACHED') 'analyzer must flag R59 rank ownership regressions'
 Assert-True ($text['OutRunVR-Test-Selector.ps1'] -notmatch 'R56_01_ZERO') 'R57 GUI must not waste user tests on the old redundant R55/R56 baseline matrix'
 Assert-True (-not (Test-Path (Join-Path $root 'OutRunVR-Backend-Selector.ps1'))) 'obsolete backend GUI selector must stay removed'
 Assert-True (-not (Test-Path (Join-Path $root 'OutRunVR-Slot-Selector.ps1'))) 'obsolete slot GUI selector must stay removed'
@@ -130,4 +147,4 @@ Assert-True ($state.testProfiles.CORRECTNESS.defaultUserTest -eq $true) 'CORRECT
 Assert-True ($state.testProfiles.CONTROL.defaultUserTest -eq $false) 'CONTROL must be optional'
 Assert-True ($state.testProfiles.PERFORMANCE.defaultUserTest -eq $false) 'PERFORMANCE must be optional'
 
-Write-Host 'VR test policy verification passed: profile identity, runtime defaults, session/log separation, single user-facing semantic selector, bounded Ctrl+F9 capture, single-active CI and TEST_LEVEL state are consistent.'
+Write-Host 'VR test policy verification passed: runtime defaults, R59 rank/head-scale identity, DXVK fail-open policy, backend-provider diagnostics, session/log separation and CI/test-level state are consistent.'

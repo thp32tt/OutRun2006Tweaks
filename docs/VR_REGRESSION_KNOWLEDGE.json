@@ -369,6 +369,71 @@
         "sessionId": "20260923T164207853Z-2202b186",
         "result": "vehicle rank labels remain detached from vehicles, move with headset, and affected rank/position elements are doubled",
         "telemetry": "R30 screen worldBillboard counter remained 0 while r44 spatial reached 5154"
+      },
+      "latestFixCandidate": {
+        "branch": "vr-r59-rank-anchor-scale-diagnostics-20260927",
+        "status": "SOURCE_APPLIED_NEEDS_HMD",
+        "evidence": [
+          "R58 runtime logs prove direct post-call projected ownership now reaches 4th+ kind-0 nodes repeatedly",
+          "R57 mode6 head-inverse projected placement is retained as the primary rank path",
+          "R59 adds anchor-centred RankMarkerScale=0.82 so size changes preserve the reconstructed vehicle/world anchor"
+        ],
+        "sourceHead": "2767af2e4fc13f887972ae8d44bbbdde791858c4",
+        "requiredRuntime": "Quest3/VDXR R57_06: 1st-6th remain attached to the correct cars during head motion and uniformly resize without anchor drift"
+      }
+    },
+    {
+      "key": "VR-DXVK-PROVIDER-LOCAL-EX-CREATEDEVICE-001",
+      "title": "Third-party DXVK provider-local CreateDeviceEx can terminate before success or fallback",
+      "status": "RUNTIME_LOG_CONFIRMED_FIX_CANDIDATE_NEEDS_HMD",
+      "severity": "runtime-blocking",
+      "firstObservedKst": "2026-09-27",
+      "sourceSha": "1bd91386edef8d6c760db3d9f9a55a0c02f14f92",
+      "evidenceLevel": "MULTI_SESSION_RUNTIME_LOG_CONFIRMED",
+      "symptomFingerprint": {
+        "primary": "DXVK provider-local Direct3DCreate9Ex path enters game CreateDevice but produces no usable VR/gameplay session",
+        "sessions": [
+          "20260926T151434665Z-339ce274 dxvk-safe",
+          "20260926T151446073Z-8f903c62 dxvk"
+        ],
+        "logBoundary": "third-party provider-local Ex enabled -> VR D3D9Ex startup CreateDevice flags -> no promoted-success log and no CreateDeviceEx-failed/classic-fallback log",
+        "zeroActivity": [
+          "DirectGPU frames=0",
+          "HUD semantic registered/consumed=0",
+          "no XR frame timing"
+        ]
+      },
+      "rootCause": {
+        "status": "BOUNDED_RUNTIME_BOUNDARY",
+        "summary": "Provider-local Ex discovery succeeds, but the provider's CreateDeviceEx path is not proven safe for the current OpenRBRVR DXVK build; failure occurs before the wrapper can observe a normal HRESULT and execute classic fallback."
+      },
+      "fixReferences": [
+        "R59: AllowThirdPartyD3D9Ex defaults false and is restart-required",
+        "R59: ex_device_upgrade.cpp returns the third-party provider's classic IDirect3D9 object unless explicit third-party Ex opt-in is enabled",
+        "R59 selectors and runners freeze DXVK SAFE/MULTIVIEW to classic provider + SBS/Desktop Duplication fail-open"
+      ],
+      "constraints": [
+        "never mix system Direct3DCreate9Ex with a third-party Direct3DCreate9 object",
+        "third-party Ex must remain explicit experimental opt-in until provider-specific startup/reset/gameplay is HMD-proven",
+        "DXVK SAFE must preserve a functional classic/SBS fallback even when DirectGPU is unavailable"
+      ],
+      "riskPaths": [
+        "src/vr/d3d9/ex_device_upgrade.cpp",
+        "src/vr/settings.cpp",
+        "tools/Select-OutRunVRBackend.ps1",
+        "tools/Run-OutRunVRTest.ps1"
+      ],
+      "nextAction": "Build R59, then HMD-test DXVK SAFE with third-party Ex disabled. Require menu/gameplay reachability and explicit analyzer provider identity; only revisit provider-local Ex in a separate opt-in experiment.",
+      "testLevel": 1,
+      "verifier": {
+        "static": [
+          "architecture verifier requires VRAllowThirdPartyD3D9Ex default false and the third-party blocked-by-default branch",
+          "test policy requires DXVK selector/runtime overrides to keep third-party Ex off and fallback available"
+        ],
+        "runtime": [
+          "DXVK SAFE reaches menu/gameplay without provider-local Ex CreateDevice stall",
+          "session analyzer reports DXVK provider and does not report DXVK_PROVIDER_EX_CREATEDEVICE_STALL or STARTUP_NO_FRAME"
+        ]
       }
     }
   ],

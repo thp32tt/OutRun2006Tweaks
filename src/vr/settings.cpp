@@ -36,12 +36,16 @@ namespace Settings
 		"Uses immediate D3D9 presentation while VR is enabled so the game source is not hard-capped by the desktop VSync setting before the OpenXR host captures it." };
 	Setting<float> VRHudScale{ "VR", "HudScale", 0.55f,
 		"Projection-space HUD size after the headset-specific asymmetric-FOV correction. Lower values make speed/time/position and menus smaller in the HMD.", Range<float>{ 0.30f, 1.20f } };
+	Setting<float> VRRankMarkerScale{ "VR", "RankMarkerScale", 0.82f,
+		"Scales only the projected vehicle rank markers (1st-6th) around their reconstructed vehicle/world anchor. 1.0 keeps the stock sprite size without moving the anchor.", Range<float>{ 0.35f, 1.20f } };
 	Setting<bool> VRHeadTracking{ "VR", "HeadTracking", true,
 		"Applies the OpenXR HMD orientation at OutRun's verified D3D9 WorldViewProjection upload." };
 	Setting<bool> VRStereo{ "VR", "Stereo", true,
 		"Renders true left/right geometry stereo into verified shared-eye transport. Menus use a LOCAL-space world-fixed mono quad so head rotation and translation remain 6DoF." };
 	Setting<bool> VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", true,
 		"Prefers guarded D3D9Ex shared-eye transport so gameplay can bypass Desktop Duplication. Disable to return to classic D3D9/SBS capture." };
+	Setting<bool> VRAllowThirdPartyD3D9Ex{ "VR", "AllowThirdPartyD3D9Ex", false,
+		"Experimental opt-in for Direct3DCreate9Ex supplied by a third-party d3d9 provider such as DXVK. Keep false unless that provider's CreateDeviceEx startup path is specifically being tested." };
 	Setting<bool> VRDirectGpuOnly{ "VR", "DirectGpuOnly", true,
 		"During gameplay, rejects classic Desktop-Duplication stereo candidates and keeps DirectGPU/cached OpenXR projection paths only. Menus remain mono on a world-fixed LOCAL-space quad." };
 	Setting<bool> VRDisableDesktopDuplication{ "VR", "DisableDesktopDuplication", false,
@@ -216,6 +220,7 @@ namespace OutRunVR
 			Settings::VRMirrorFitDesktop.needs_restart();
 			Settings::VRDisableDesktopVsync.needs_restart();
 			Settings::VRPreferD3D9Ex.needs_restart();
+			Settings::VRAllowThirdPartyD3D9Ex.needs_restart();
 			Settings::VRDirectGpuOnly.needs_restart();
 			Settings::VRDisableDesktopDuplication.needs_restart();
 			Settings::VRTargetRefreshRateHz.needs_restart();
