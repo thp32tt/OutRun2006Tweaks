@@ -106,7 +106,7 @@ require_all("src/hooks_uiscaling.cpp", [
 
 # PASS 5 — canonical font glyph and exact option arrows remain exact, never broad.
 require_all("src/hooks_uiscaling.cpp", [
-    'Module::exe_ptr(0x2C9DB)',
+    '0x2C808, 0x2C9DB',
     '0xE358B, 0xE35A3, 0xE35CC, 0xE35F7',
     '0xE481B, 0xE4833, 0xE485C, 0xE4887',
     'VR R66 OPTION ARROW: exact node pinned',
