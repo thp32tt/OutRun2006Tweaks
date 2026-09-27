@@ -65,6 +65,16 @@ require_all("tools/OutRunVR-Test-Selector.ps1", [
     "'DXVK SAFE','dxvk-safe','R57_06_RANK_PROJECTED_HEAD'",
 ], "P2_SELECTOR_DEFAULT_R57_06")
 
+selector = read("tools/OutRunVR-Test-Selector.ps1")
+if selector.count("'R57_05_RANK_PROJECTED_IPD'=@") != 1 or selector.count("'R57_06_RANK_PROJECTED_HEAD'=@") != 1:
+    errors.append("P2_SELECTOR_UNIQUE_SLOTS: R57_05/R57_06 diagnostic slot keys must each be defined exactly once")
+else:
+    passes.append("P2_SELECTOR_UNIQUE_SLOTS")
+require_all("tools/Run-OutRunVRTest.ps1", [
+    "'R57_06_RANK_PROJECTED_HEAD'",
+    "$hudExperimentMode='2'; $r57Mode='6'",
+], "P2_RUNNER_R57_06_MAPPING")
+
 # PASS 3 — diagnostics stay disabled and exact queue ownership stays sticky.
 require_all("src/hooks_uiscaling.cpp", [
     '"OUTRUN_VR_HUD_PROBE"',
