@@ -30,6 +30,7 @@ on:
       - 'docs/VR_AUTODEV_STATE.json'
       - 'tools/Test-OutRunVRTestPolicy.ps1'
       - 'docs/VR_PROBLEM_HISTORY.md'
+      - 'docs/VR_R69_CLEANUP_HISTORY.md'
       - 'docs/VR_BINARY_CONTRACT.json'
       - 'docs/VR_CRASH_SIGNATURES.json'
       - 'tools/verify_vr_binary_contract.py'
