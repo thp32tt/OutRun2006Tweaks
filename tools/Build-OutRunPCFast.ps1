@@ -50,7 +50,7 @@ $gameBuild = Join-Path $root 'game'
 $hostBuild = Join-Path $root 'host'
 $packageDir = Join-Path $root 'package'
 
-# Canonical PC-fast contract for the protected R51 renderer lineage.
+# Canonical PC-fast contract for the HMD-proven R66 renderer lineage.
 # Keep this single source of truth in sync with the HMD-proven R66 R26+HUD build.
 $buildContractVersion = 'R66-PROVEN-R26HUD-v1'
 $canonicalGameFlags = @(
@@ -79,7 +79,7 @@ function Assert-R66ProvenBuildContract {
     $cacheText = Get-Content $cache -Raw
     foreach ($line in $required) {
         if ($cacheText -notmatch [regex]::Escape($line)) {
-            throw "R66 proven build contract mismatch: expected '$line'. Refusing to compile/package a non-R51 renderer configuration."
+            throw "R66 proven build contract mismatch: expected '$line'. Refusing to compile/package a non-R66 proven renderer configuration."
         }
     }
 
