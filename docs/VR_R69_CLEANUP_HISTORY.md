@@ -80,3 +80,12 @@ Rules:
 - Existing R9/R13 mono-shadow fallback behavior is preserved; this stage changes ownership of the decision, not its conditions.
 - This is checkpoint build B2 for limited HMD testing.
 - Build gate: DX9Ex Active Validation on the candidate branch.
+
+
+## S8 — hot-path telemetry/branch cleanup
+- Branch: `vr-d3d9ex-candidate/r69-clean-s8`
+- Parent: S7 `b98155535d5ccbea2fd06e7ae55a8c5cadfb9670`.
+- Removed redundant projected/overlay semantic booleans after the new direct screen-route dispatch; HUD/world are the only routes that continue into projection/WVP classification.
+- Projected-marker atomic counter and first-event log now run only when VR telemetry is enabled.
+- No projection, eye transform, safety, HUD-scale, flare, shadow or stage-transition policy changed.
+- Build gate: DX9Ex Active Validation on the candidate branch.
