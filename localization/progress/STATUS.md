@@ -276,3 +276,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - 39229D64 A82 remains pending post-A82 B revalidation, then C/D.
 - Machine report: localization/graphics/role_C/20260927-1405-C77/C77_FA7BBB13_STRICT_QA.json.
 - VR/FFB unchanged; no build.
+
+
+## B83 39229D64 checkpoint — 2026-09-27 14:12 KST
+
+- A82 candidate 5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077: B FIRST QA PASS, pending C/D + in-game.
+- 4096×4096 RGBA32 / 1 mip / exact canonical header / raw mirror_y; outside 15 source cells changed pixels = 0, introduced alpha = 0.
+- Coverage corrected and verified at 13 semantic / 15 physical regions (Total Rank x3).
+- Readable/raw artifact and containment review PASS; protected original tokens/artwork unchanged.
+- Next production target: A064FDFC.

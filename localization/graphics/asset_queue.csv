@@ -37,7 +37,7 @@ index,path,action,artwork_status,transcription_status,notes
 53,textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds,localize_text,static_qa_pass_pending_ingame,transcribed_reviewed,A80 14/14; B81+C76+D75 static gates pass; in-game/context approval pending
 54,textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds,localize_text,b82_first_qa_pass_pending_c_d_ingame,transcribed_reviewed,A81 17/17 candidate; B82 first QA PASS; C/D and in-game approval pending
 55,textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
-57,textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds,localize_text,a82_candidate_pending_bcd_qa,transcribed_reviewed,A82 13 semantic / 15 physical regions on canonical HD; B82 physical count 14 corrected to 15 (Total Rank x3); B/C/D + in-game pending
+57,textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds,localize_text,b83_first_qa_pass_pending_c_d_ingame,transcribed_reviewed,A82 13 semantic / 15 physical candidate; B83 first QA PASS; C/D + in-game pending
 59,textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 60,textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass4 transcription saved
 61,textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds,localize_text,pending_artwork,transcribed_reviewed,pass4 transcription saved

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T14:05:02+09:00",
+  "updated_at_kst": "2026-09-27T14:12:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "39229D64 A82 canonical-HD production is complete (13 semantic / 15 physical) and still requires post-A82 B revalidation before C/D. FA7BBB13 A81/B82/C77 static QA passes; D76 independent static checks also passed, but approved promotion remains held for mandatory in-game screenshot validation. After the 39229D64 static gate, continue A064FDFC.",
+  "next_checkpoint": "39229D64 A82 candidate passed B83 first QA (13 semantic / 15 physical); C/D and in-game screenshot validation remain. Continue next P1 canonical-HD production target A064FDFC independently.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -257,14 +257,14 @@
       "coverage": "13 semantic / 15 physical",
       "candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
       "report": "localization/graphics/role_A/20260927-1330-A82/A82_39229D64_PRODUCTION_REPORT.json",
-      "status": "A_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "status": "B_FIRST_QA_PASS_PENDING_C_D_INGAME",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
-      "physical_region_count_correction": "B82 expected 14; A82 verified 15 because Total Rank appears three times"
+      "physical_region_count_correction": "B82 expected 14; A82 verified 15 because Total Rank appears three times",
+      "b_first_qa_report": "localization/graphics/role_B/20260927-1412-B83/B83_39229D64_FIRST_QA.json"
     },
     "next_hd_rework": {
-      "asset": "39229D64",
-      "transcription_segments": 13,
-      "expected_physical_text_occurrences": 14,
+      "asset": "A064FDFC",
+      "transcription_segments": 15,
       "status": "READY_FOR_CANONICAL_HD_RENDER"
     },
     "latest_d_final_qa": {
@@ -282,6 +282,14 @@
       "outside_text_cells_changed_pixels": 0,
       "introduced_alpha_outside_text_cells": 0,
       "in_game_validation": "PENDING"
+    },
+    "latest_b_first_qa": {
+      "asset": "39229D64",
+      "candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+      "report": "localization/graphics/role_B/20260927-1412-B83/B83_39229D64_FIRST_QA.json",
+      "result": "PASS_FIRST_QA_PENDING_C_D_INGAME",
+      "candidate_changed_by_B": false,
+      "physical_regions": 15
     }
   },
   "data_build": {

@@ -18,8 +18,8 @@
     "graphics_rework_targets": 13,
     "low_res_font_pipeline_targets": 1,
     "hd_preserve_targets": 75,
-    "graphics_rework_candidates_ready": 3,
-    "graphics_rework_remaining": 10
+    "graphics_rework_candidates_ready": 4,
+    "graphics_rework_remaining": 9
   },
   "rules": [
     "Use DDS header dimensions, never the filename resolution suffix.",
@@ -131,16 +131,18 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "A_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "status": "B_FIRST_QA_PASS_PENDING_C_D_INGAME",
       "transcription_status": "B82_EXPANDED_REVIEWED",
       "transcription_segments": 13,
-      "expected_physical_text_occurrences": 14,
-      "batch_report": "localization/graphics/role_A/20260927-1330-A82/A82_39229D64_PRODUCTION_REPORT.json",
+      "expected_physical_text_occurrences": 15,
+      "batch_report": "localization/graphics/role_B/20260927-1412-B83/B83_39229D64_FIRST_QA.json",
       "candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
       "completed_transcription_entries": 13,
       "localized_regions": 15,
-      "remaining_segments": 0
+      "remaining_segments": 0,
+      "a_production_report": "localization/graphics/role_A/20260927-1330-A82/A82_39229D64_PRODUCTION_REPORT.json",
+      "b_candidate_changed": false
     },
     {
       "hash": "A064FDFC",
@@ -247,5 +249,5 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_A/20260927-1330-A82/A82_39229D64_PRODUCTION_REPORT.json"
+  "latest_batch": "localization/graphics/role_B/20260927-1412-B83/B83_39229D64_FIRST_QA.json"
 }

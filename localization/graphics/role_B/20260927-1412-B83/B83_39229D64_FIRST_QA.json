@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B83",
+  "timestamp_kst": "2026-09-27T14:12:00+09:00",
+  "base_head": "3c75c54ffccb5ef0190a6204c164f5c38e3d1f70",
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+  "a_production_report": "localization/graphics/role_A/20260927-1330-A82/A82_39229D64_PRODUCTION_REPORT.json",
+  "candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+  "result": "PASS_FIRST_QA_PENDING_C_D_INGAME",
+  "candidate_changed_by_B": false,
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "bytes": 67108992,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "dds_header_128_byte_exact_to_canonical": true,
+    "raw_orientation": "mirror_y"
+  },
+  "coverage": {
+    "semantic_entries": 13,
+    "physical_regions": 15,
+    "total_rank_physical_regions": 3,
+    "b82_expected_physical_regions": 14,
+    "corrected_physical_regions": 15
+  },
+  "containment": {
+    "outside_15_cells_changed_pixels": 0,
+    "introduced_alpha_outside_15_cells": 0,
+    "candidate_alpha_bboxes_inside_source_cells": true
+  },
+  "translation_qa": {
+    "all_13_semantic_pairs_match_reviewed_transcription": true,
+    "terminology_consistency": "PASS",
+    "protected_original_tokens_preserved": true
+  },
+  "visual_qa": {
+    "readable_orientation": "PASS",
+    "raw_orientation": "PASS_MIRROR_Y_PRESERVED",
+    "source_english_residue": "NONE_OBSERVED",
+    "clipping_or_overlap": "NONE_OBSERVED",
+    "box_escape": "NONE_OBSERVED",
+    "black_line_or_seam": "NONE_OBSERVED",
+    "opaque_box": "NONE_OBSERVED",
+    "alpha_halo": "NONE_OBSERVED",
+    "style_fidelity": "PASS_SOURCE_FAMILY"
+  },
+  "in_game_validation": "NOT_PERFORMED",
+  "approval": "NOT_PROMOTED_PENDING_C_D_AND_INGAME",
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "next_asset": "A064FDFC_1024x512.dds"
+}

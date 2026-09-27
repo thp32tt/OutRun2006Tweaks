@@ -582,3 +582,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - 39229D64 A82 is not C-approved in this run because post-A82 B revalidation is not yet present.
 - Report: localization/graphics/role_C/20260927-1405-C77/C77_FA7BBB13_STRICT_QA.json.
 - VR/FFB source untouched; build not run.
+
+
+## 2026-09-27 14:12 KST — B83 39229D64 first QA
+
+- Rebased B validation on latest A82 candidate 5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077; B did not replace or repaint the A82 DDS.
+- Independent structural QA PASS: 4096×4096 RGBA32, 1 mip, 67,108,992 bytes, exact canonical 128-byte DDS header, raw mirror_y preserved.
+- Verified 13 reviewed semantic translations materialized across 15 physical regions. Total Rank → 종합 랭크 occurs in three cells; stale B82 expected count 14 is corrected to 15 in current state/queue.
+- Byte containment PASS: changed pixels outside the 15 source cells = 0; introduced alpha outside = 0. Protected ALBERTO/rank letters/ordinals/key legends/numeric graphics remain canonical.
+- Readable and raw visual QA PASS: no residual source English in replaced cells, clipping/overlap, box escape, seam/black line, opaque box or alpha halo observed; source-family colors/outlines remain consistent.
+- In-game screenshot validation was not available, so no approved_dds promotion. Next production target remains A064FDFC; C/D gates are still required for 39229D64. No VR/FFB changes and no build.
