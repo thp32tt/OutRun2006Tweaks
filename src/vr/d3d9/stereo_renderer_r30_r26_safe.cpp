@@ -1218,11 +1218,8 @@ namespace OutRunVRStereo
                 const DWORD len = GetEnvironmentVariableA(
                     "OUTRUN_VR_HUD_PROBE", text,
                     static_cast<DWORD>(sizeof(text)));
-                // R66 production baseline: mode 6 is the HMD-proven
-                // head-inverse projected-marker path. Explicit env=0 remains
-                // available for diagnostic rollback.
                 if (len == 0 || len >= sizeof(text))
-                    return 6;
+                    return 0;
                 int value = 0;
                 for (DWORD i = 0; i < len; ++i)
                 {
@@ -1242,13 +1239,15 @@ namespace OutRunVRStereo
                 const DWORD len = GetEnvironmentVariableA(
                     "OUTRUN_VR_R57_MODE", text,
                     static_cast<DWORD>(sizeof(text)));
+                // R66 production baseline: HMD testing established mode 6 as
+                // the correct head-inverse projected-marker path.
                 if (len == 0 || len >= sizeof(text))
-                    return 0;
+                    return 6;
                 int value = 0;
                 for (DWORD i = 0; i < len; ++i)
                 {
                     if (text[i] < '0' || text[i] > '9')
-                        return 0;
+                        return 6;
                     value = value * 10 + int(text[i] - '0');
                 }
                 return (value >= 0 && value <= 10) ? value : 6;
