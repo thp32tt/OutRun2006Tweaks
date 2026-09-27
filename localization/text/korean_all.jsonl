@@ -94,8 +94,8 @@
 {"id":93,"source_hash":"76aa2609b44f7ff5","korean":"녹아웃","status":"reviewed"}
 {"id":94,"source_hash":"b9495b8ecb110270","korean":"드리프트","status":"reviewed"}
 {"id":95,"source_hash":"5dcfa1992a3263e1","korean":"슬립스트림","status":"reviewed"}
-{"id":96,"source_hash":"927bc07107b0b851","korean":"동승자","status":"draft","notes":"online mode title; verify semantics in runtime menu before final"}
-{"id":97,"source_hash":"f422b23ed8f76d28","korean":"차임","status":"draft","notes":"online mode title; verify semantics in runtime menu before final"}
+{"id":96,"source_hash":"927bc07107b0b851","korean":"동승자","status":"reviewed","notes":"user-confirmed Heart Attack girlfriend-passenger context; preserve source PASSENGER nuance with neutral literal translation"}
+{"id":97,"source_hash":"f422b23ed8f76d28","korean":"차였어요!","status":"reviewed","notes":"user-confirmed Heart Attack failure context; DUMPED is the girlfriend rejection/failure result message"}
 {"id":98,"source_hash":"51b6cc79c1507560","korean":"코스 유형:","status":"reviewed"}
 {"id":99,"source_hash":"4825ea60f74f0f5f","korean":"아웃런","status":"reviewed"}
 {"id":100,"source_hash":"4c91d1fe8ff2e337","korean":"골","status":"reviewed"}
@@ -277,8 +277,8 @@
 {"id":276,"source_hash":"76aa2609b44f7ff5","korean":"녹아웃","status":"reviewed","notes":"propagated from identical source string"}
 {"id":277,"source_hash":"b9495b8ecb110270","korean":"드리프트","status":"reviewed","notes":"propagated from identical source string"}
 {"id":278,"source_hash":"5dcfa1992a3263e1","korean":"슬립스트림","status":"reviewed","notes":"propagated from identical source string"}
-{"id":279,"source_hash":"927bc07107b0b851","korean":"동승자","status":"draft","notes":"online mode title; verify semantics in runtime menu before final"}
-{"id":280,"source_hash":"f422b23ed8f76d28","korean":"차임","status":"draft","notes":"online mode title; verify semantics in runtime menu before final"}
+{"id":279,"source_hash":"927bc07107b0b851","korean":"동승자","status":"reviewed","notes":"user-confirmed Heart Attack girlfriend-passenger context; preserve source PASSENGER nuance with neutral literal translation"}
+{"id":280,"source_hash":"f422b23ed8f76d28","korean":"차였어요!","status":"reviewed","notes":"user-confirmed Heart Attack failure context; DUMPED is the girlfriend rejection/failure result message"}
 {"id":281,"source_hash":"51b6cc79c1507560","korean":"코스 유형:","status":"reviewed","notes":"propagated from identical source string"}
 {"id":282,"source_hash":"30f4a6bdacc320d8","korean":"무관","status":"reviewed","notes":"propagated from identical source string"}
 {"id":283,"source_hash":"4825ea60f74f0f5f","korean":"아웃런","status":"reviewed","notes":"propagated from identical source string"}
