@@ -175,8 +175,8 @@ require_all("tools/Build-OutRunPCFast.ps1", [
     "'-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF'",
     "'-DOUTRUN_VR_R26_HUD_COMPARE=ON'",
     "R66-PROVEN-R26HUD-v1",
-    "Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R67'",
-    "VariantId = 'ACTIVE_R26_HUD_R67'",
+    "Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R68'",
+    "VariantId = 'ACTIVE_R26_HUD_R68'",
 ], "P9_PC_FAST_CONTRACT")
 forbid("tools/Build-OutRunPCFast.ps1",
        "VariantId = 'ACTIVE_FULL_R34'",
@@ -191,7 +191,7 @@ require_all(".github/workflows/build.yml", [
 require_all(".github/workflows/vr-dx9ex-active.yml", [
     '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF',
     '-DOUTRUN_VR_R26_HUD_COMPARE=ON',
-    "ACTIVE_R26_HUD_R67",
+    "ACTIVE_R26_HUD_R68",
 ], "P9_DX9EX_BUILD_CONTRACT")
 require_all(".github/workflows/vr-nightly-unified-20260926.yml", [
     'python tools/verify_vr_proven_baseline.py',
