@@ -67,7 +67,6 @@ class UIScaling : public Hook
 			const DWORD len = GetEnvironmentVariableA(
 				"OUTRUN_VR_HUD_PROBE", text,
 				static_cast<DWORD>(sizeof(text)));
-			// R56 runtime-only diagnostic selector. Production default stays disabled.
 			if (len == 0 || len >= sizeof(text))
 				return 0;
 			int value = 0;
@@ -110,8 +109,8 @@ class UIScaling : public Hook
 				"OUTRUN_VR_R57_MODE", text,
 				static_cast<DWORD>(sizeof(text)));
 			// R66 production baseline: HMD testing established mode 6 as the
-			// correct projected rank + DispRank ownership path. Explicit env=0
-			// remains available only for controlled regression diagnostics.
+			// correct projected 1st-5th marker + DispRank ownership path.
+			// Explicit env=0 remains available for controlled regression tests.
 			if (len == 0 || len >= sizeof(text))
 				return 6;
 			int value = 0;
