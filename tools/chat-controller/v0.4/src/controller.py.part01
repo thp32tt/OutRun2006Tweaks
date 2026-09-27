@@ -472,13 +472,21 @@ async def send_message(page: Page, message: str) -> bool:
         return False
 
 
+def is_persistable_chat_url(url: Optional[str]) -> bool:
+    """Only retain server-backed ChatGPT conversations across browser/container restarts."""
+    if not url or "/c/" not in url:
+        return False
+    lowered = url.lower()
+    return "local-chatgpt%3a" not in lowered and "local-chatgpt:" not in lowered
+
+
 async def wait_for_chat_url(page: Page, timeout_sec: int = 30) -> Optional[str]:
     deadline = time.time() + timeout_sec
     while time.time() < deadline:
-        if "/c/" in page.url:
+        if is_persistable_chat_url(page.url):
             return page.url
         await page.wait_for_timeout(500)
-    return page.url if "/c/" in page.url else None
+    return page.url if is_persistable_chat_url(page.url) else None
 
 
 async def previous_run_still_busy(page: Page, reg: Registry) -> bool:
