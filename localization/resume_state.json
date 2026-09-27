@@ -1,5 +1,5 @@
 {
-  "schema_version": 21,
+  "schema_version": 24,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,7 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "HD GRAPHICS: FF2462BB A76 now materializes all 29/29 transcription entries on the canonical HD canvas; run B first QA, C strict QA, then D approval before promotion.",
+    "HD GRAPHICS: FF2462BB A78 passed B79/C75/D74 static QA and is pending in-game approval; start next HD rebuild asset 568D3696.",
     "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
     "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
     "Never upscale prior stock-resolution Korean DDS candidates.",
@@ -125,18 +125,18 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_A/20260927-1038-A76/A76_FF2462BB_PRODUCTION_REPORT.json",
+    "latest_hd_rework_batch": "localization/graphics/role_A/20260927-1215-A78/A78_FF2462BB_PRODUCTION_REPORT.json",
     "hd_rework_candidates_ready": 2,
     "hd_rework_remaining": 11,
     "hd_partial_rework": {
       "FF2462BB": {
-        "status": "A_PRODUCTION_COMPLETE_29_OF_29_PENDING_B_C_D",
-        "candidate_sha256": "6fb6c0ff857c8218e499dd4d1ddc0b8d81adeab9a0e400f559f7fde03169c3e9",
+        "status": "STATIC_QA_PASS_PENDING_INGAME",
+        "candidate_sha256": "c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
-        "completed_transcription_entries": 29,
-        "localized_regions": 32,
+        "completed_transcription_entries": 59,
+        "localized_regions": 68,
         "remaining_segments": 0,
-        "report": "localization/graphics/role_A/20260927-1038-A76/A76_FF2462BB_PRODUCTION_REPORT.json"
+        "report": "localization/graphics/role_A/20260927-1215-A78/A78_FF2462BB_PRODUCTION_REPORT.json"
       }
     },
     "a76_ff2462bb": {
@@ -191,5 +191,28 @@
       "6B8ED9DA"
     ],
     "note": "Preserve HD-complete artwork; rebuild only low-resolution or upstream placeholder-upscale text assets."
+  },
+  "a77_ff2462bb": {
+    "timestamp_kst": "2026-09-27T12:07:30+09:00",
+    "semantic_entries_materialized": 58,
+    "localized_regions": 67,
+    "candidate_sha256": "f9cb51c9f47df09c46cfdc19ef9d262377dcaadb68022695d89d70438b71d32e",
+    "status": "PENDING_B_C_D_STRICT_QA"
+  },
+  "a78_ff2462bb": {
+    "timestamp_kst": "2026-09-27T12:15:00+09:00",
+    "semantic_entries_materialized": 59,
+    "localized_regions": 68,
+    "candidate_sha256": "c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c",
+    "status": "PENDING_B_C_D_STRICT_QA"
+  },
+  "ff2462bb_static_gate": {
+    "timestamp_kst": "2026-09-27T12:20:00+09:00",
+    "semantic_entries": 59,
+    "localized_regions": 68,
+    "candidate_sha256": "c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c",
+    "B79": "PASS",
+    "C75": "PASS",
+    "D74": "STATIC_QA_PASS_PENDING_INGAME"
   }
 }

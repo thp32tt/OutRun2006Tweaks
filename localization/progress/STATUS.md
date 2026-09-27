@@ -195,3 +195,21 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Remaining untranslated entries in this atlas: **0**
 - Approval state: **not approved yet** — B first QA, C strict QA, D final approval remain
 - VR/FFB source: not touched
+
+## A77 checkpoint — 2026-09-27 12:07 KST
+
+- FF2462BB visual transcription corrected from 29 to **58 semantic entries**.
+- Physical localized regions: **67**.
+- Candidate SHA-256: `f9cb51c9f47df09c46cfdc19ef9d262377dcaadb68022695d89d70438b71d32e`.
+- B77 omission QA: CHANGES_REQUIRED on A76; resolved by A77 production.
+- Approval state: pending B/C/D strict QA.
+
+## A78 checkpoint — 2026-09-27 12:15 KST
+
+- FF2462BB coverage: **59 semantic / 68 physical regions**, SHA-256 c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c.
+- Final visible YOU marker translated to 나; static strict QA pending.
+
+## FF2462BB static gate — 2026-09-27 12:20 KST
+
+- B79 PASS / C75 PASS / D74 STATIC_QA_PASS_PENDING_INGAME; candidate c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c.
+- Not promoted to approved_dds until in-game/user confirmation. Next production target: 568D3696.

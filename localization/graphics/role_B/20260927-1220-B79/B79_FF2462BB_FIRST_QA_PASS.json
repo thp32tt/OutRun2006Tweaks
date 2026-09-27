@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B79",
+  "timestamp_kst": "2026-09-27T12:20:00+09:00",
+  "asset": "FF2462BB_1024x512.dds",
+  "candidate_sha256": "c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c",
+  "result": "PASS_STATIC_VISUAL",
+  "checks": {
+    "readable_preview_visual_review": "PASS",
+    "visible_translatable_english_remaining": "NONE_OBSERVED",
+    "korean_clipping_or_overlap": "NONE_OBSERVED",
+    "preserved_nonlocalized_tokens": [
+      "XBOX",
+      "rd",
+      "nd",
+      "6P",
+      "5P"
+    ],
+    "note": "XBOX is retained as product/platform text; rd/nd and player-count markers are compact graphical tokens."
+  },
+  "next": "C strict structural QA"
+}

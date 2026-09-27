@@ -471,3 +471,29 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Pixel containment: outside 32 known localization regions is byte-identical to canonical
 - Status: **A production complete, pending B/C/D strict QA**
 - Report: `localization/graphics/role_A/20260927-1038-A76/A76_FF2462BB_PRODUCTION_REPORT.json`
+
+## 2026-09-27 12:07 KST — B77 visual coverage correction + A77 production
+
+- B77 found A76's 29/29 transcription set was not exhaustive: visible account/menu/timeline English remained in the canonical HD atlas.
+- Added 29 missing semantic strings (35 physical regions) and rebuilt them on the A76 canonical-HD candidate.
+- A77 coverage: **58 semantic entries / 67 localized regions**.
+- A76 pixels outside the 35 new A77 edit boxes are byte-identical; DDS 128-byte header and 4096×2048 RGBA32 layout are preserved.
+- Preserved compact graphic tokens `rd`, `nd`, `6P`, `5P`; no VR/FFB source touched.
+- Candidate SHA-256: `f9cb51c9f47df09c46cfdc19ef9d262377dcaadb68022695d89d70438b71d32e`.
+- Next: B/C/D strict QA on A77 before approval, then `568D3696`.
+
+## 2026-09-27 12:15 KST — B78 final visual omission + A78 production
+
+- B78 found the remaining visible translatable player marker YOU.
+- A78 localized YOU -> 나 inside the original source box; all pixels outside that box are exact A77 bytes.
+- FF2462BB coverage is now **59 semantic entries / 68 localized regions**.
+- Candidate SHA-256: c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c.
+- Compact graphic tokens rd, nd, 6P, 5P remain intentionally preserved.
+- Next: B/C/D strict QA, then continue 568D3696.
+
+## 2026-09-27 12:20 KST — FF2462BB B79/C75/D74 static QA
+
+- B79 visual gate: PASS; no remaining visible translatable English observed in the reviewed atlas.
+- C75 structural gate: PASS; 4096x2048, 33,554,560 bytes, canonical 128-byte header, containment chain verified.
+- D74 final static gate: PASS_PENDING_INGAME. No approved_dds promotion was made because in-game/user approval is still required.
+- Candidate SHA-256: c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c. Next production asset: 568D3696.

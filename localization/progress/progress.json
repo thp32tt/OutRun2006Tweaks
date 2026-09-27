@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T10:38:00+09:00",
+  "updated_at_kst": "2026-09-27T12:20:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -110,7 +110,7 @@
       "percent": 100,
       "transcribed_assets": 79,
       "localize_text_targets": 79,
-      "transcribed_segments": 674,
+      "transcribed_segments": 704,
       "blocked_context_assets": 0,
       "blocked_context_indices": []
     },
@@ -136,11 +136,11 @@
       "status": "done",
       "percent": 100,
       "planned_assets": 79,
-      "translated_segments": 674,
+      "translated_segments": 704,
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "FF2462BB A76 production candidate has 29/29 transcription entries materialized on canonical HD canvas; perform B/C/D QA before approval, then continue next HD rework asset.",
+  "next_checkpoint": "FF2462BB passed B79/C75/D74 static gates and awaits in-game approval; continue production with next HD rework asset 568D3696.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -175,7 +175,7 @@
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
     "transcribed_assets": 79,
-    "transcribed_segments": 674,
+    "transcribed_segments": 704,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -192,7 +192,7 @@
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
     "artwork_plan_assets": 79,
-    "artwork_plan_segments": 674,
+    "artwork_plan_segments": 704,
     "artwork_proof_candidates": 7,
     "simple6_package": {
       "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
@@ -254,10 +254,13 @@
     "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "latest_hd_production_candidate": {
       "asset": "FF2462BB",
-      "coverage": "29/29",
-      "candidate_sha256": "6fb6c0ff857c8218e499dd4d1ddc0b8d81adeab9a0e400f559f7fde03169c3e9",
-      "report": "localization/graphics/role_A/20260927-1038-A76/A76_FF2462BB_PRODUCTION_REPORT.json",
-      "status": "A_PRODUCTION_COMPLETE_PENDING_B_C_D"
+      "coverage": "59/59",
+      "candidate_sha256": "c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c",
+      "report": "localization/graphics/role_A/20260927-1215-A78/A78_FF2462BB_PRODUCTION_REPORT.json",
+      "status": "STATIC_QA_PASS_PENDING_INGAME",
+      "b_report": "localization/graphics/role_B/20260927-1220-B79/B79_FF2462BB_FIRST_QA_PASS.json",
+      "c_report": "localization/graphics/role_C/20260927-1220-C75/C75_FF2462BB_STRICT_QA.json",
+      "d_report": "localization/graphics/role_D/20260927-1220-D74/D74_FF2462BB_FINAL_STATIC_GATE.json"
     }
   },
   "data_build": {

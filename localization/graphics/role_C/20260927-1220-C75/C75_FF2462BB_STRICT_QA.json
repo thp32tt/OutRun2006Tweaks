@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C75",
+  "timestamp_kst": "2026-09-27T12:20:00+09:00",
+  "asset": "FF2462BB_1024x512.dds",
+  "candidate_sha256": "c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c",
+  "canonical_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+  "result": "PASS_STATIC_STRICT_QA",
+  "checks": {
+    "dds_dimensions": [
+      4096,
+      2048
+    ],
+    "file_size_bytes": 33554560,
+    "header_128_exact_canonical": true,
+    "a76_outside_32_regions_exact_canonical": true,
+    "a77_outside_35_new_boxes_exact_a76": true,
+    "a78_outside_you_box_exact_a77": true,
+    "new_box_edge_nontransparent_pixels": 0,
+    "semantic_entries": 59,
+    "localized_regions": 68,
+    "high_resolution_canvas_preserved": true
+  },
+  "limitations": [
+    "In-game rendering/UV validation still requires game test."
+  ],
+  "next": "D final static gate"
+}

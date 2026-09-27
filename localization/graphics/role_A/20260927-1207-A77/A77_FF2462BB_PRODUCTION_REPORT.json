@@ -1,0 +1,487 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A77",
+  "timestamp_kst": "2026-09-27T12:07:30+09:00",
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+  "base_a76_sha256": "6fb6c0ff857c8218e499dd4d1ddc0b8d81adeab9a0e400f559f7fde03169c3e9",
+  "canonical_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+  "candidate_sha256": "f9cb51c9f47df09c46cfdc19ef9d262377dcaadb68022695d89d70438b71d32e",
+  "dimensions": [
+    4096,
+    2048
+  ],
+  "bytes": 33554560,
+  "prior_semantic_entries": 29,
+  "new_semantic_entries": 29,
+  "semantic_entries_materialized": 58,
+  "prior_known_regions": 32,
+  "new_physical_regions": 35,
+  "localized_regions": 67,
+  "outside_a77_edit_boxes_exact_to_a76": true,
+  "dds_header_128_byte_exact_to_canonical": true,
+  "edits": [
+    {
+      "key": "ACCOUNT_NAME",
+      "source": "ACCOUNT NAME:",
+      "korean": "계정 이름:",
+      "bbox_readable": [
+        0,
+        65,
+        400,
+        112
+      ],
+      "font_size": 40,
+      "style": "dark"
+    },
+    {
+      "key": "ACCOUNT_PASSWORD",
+      "source": "ACCOUNT PASSWORD:",
+      "korean": "계정 비밀번호:",
+      "bbox_readable": [
+        0,
+        128,
+        505,
+        177
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "CURSING_LEWDNESS",
+      "source": "CURSING OR LEWDNESS",
+      "korean": "욕설 또는 음란 표현",
+      "bbox_readable": [
+        0,
+        192,
+        565,
+        242
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "SCREAMING",
+      "source": "SCREAMING",
+      "korean": "고성",
+      "bbox_readable": [
+        0,
+        256,
+        305,
+        306
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "ENTER_ACCOUNT_NAME",
+      "source": "ENTER ACCOUNT NAME:",
+      "korean": "계정 이름 입력:",
+      "bbox_readable": [
+        0,
+        318,
+        565,
+        366
+      ],
+      "font_size": 41,
+      "style": "dark"
+    },
+    {
+      "key": "DONT_SIGN_IN",
+      "source": "DON'T SIGN-IN",
+      "korean": "로그인 안 함",
+      "bbox_readable": [
+        0,
+        384,
+        330,
+        435
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "EXIT_OUTRUN_PLUS",
+      "source": "EXIT OUTRUN PLUS",
+      "korean": "아웃런 플러스 종료",
+      "bbox_readable": [
+        1055,
+        64,
+        1540,
+        112
+      ],
+      "font_size": 41,
+      "style": "dark"
+    },
+    {
+      "key": "ACCOUNTS",
+      "source": "ACCOUNTS:",
+      "korean": "계정:",
+      "bbox_readable": [
+        1100,
+        128,
+        1370,
+        177
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "CHEATING",
+      "source": "CHEATING",
+      "korean": "부정행위",
+      "bbox_readable": [
+        1117,
+        192,
+        1365,
+        242
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "OFFENSIVE_MESSAGE",
+      "source": "OFFENSIVE MESSAGE",
+      "korean": "모욕적 메시지",
+      "bbox_readable": [
+        1117,
+        256,
+        1630,
+        306
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "GREAT_SESSION",
+      "source": "GREAT SESSION",
+      "korean": "즐거운 경기",
+      "bbox_readable": [
+        1120,
+        320,
+        1495,
+        370
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "ENTER_ACCOUNT_PASSWORD",
+      "source": "ENTER ACCOUNT PASSWORD:",
+      "korean": "계정 비밀번호 입력:",
+      "bbox_readable": [
+        1132,
+        384,
+        1790,
+        435
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "REGISTER_NEW_ACCOUNT_SMALL",
+      "source": "REGISTER NEW ACCOUNT",
+      "korean": "새 계정 등록",
+      "bbox_readable": [
+        2118,
+        64,
+        2725,
+        112
+      ],
+      "font_size": 41,
+      "style": "dark"
+    },
+    {
+      "key": "CREATE_ACCOUNT",
+      "source": "CREATE ACCOUNT",
+      "korean": "계정 만들기",
+      "bbox_readable": [
+        2175,
+        128,
+        2590,
+        177
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "BAD_NAME",
+      "source": "BAD NAME",
+      "korean": "부적절한 이름",
+      "bbox_readable": [
+        2235,
+        192,
+        2495,
+        242
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "GOOD_ATTITUDE",
+      "source": "GOOD ATTITUDE",
+      "korean": "좋은 태도",
+      "bbox_readable": [
+        2235,
+        256,
+        2610,
+        306
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "THREATS_HARASSMENT",
+      "source": "THREATS OR HARASSMENT",
+      "korean": "협박 또는 괴롭힘",
+      "bbox_readable": [
+        2238,
+        320,
+        2880,
+        370
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "DELETE_ACCOUNT_SMALL",
+      "source": "DELETE ACCOUNT",
+      "korean": "계정 삭제",
+      "bbox_readable": [
+        2555,
+        388,
+        2965,
+        440
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "SOUNDTRACK",
+      "source": "SOUNDTRACK",
+      "korean": "사운드트랙",
+      "bbox_readable": [
+        3195,
+        53,
+        3500,
+        122
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "LOAD_SAVE",
+      "source": "LOAD / SAVE",
+      "korean": "불러오기 / 저장",
+      "bbox_readable": [
+        3248,
+        132,
+        3550,
+        188
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "LOGIN_SMALL",
+      "source": "LOGIN:",
+      "korean": "로그인:",
+      "bbox_readable": [
+        3343,
+        192,
+        3505,
+        252
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "IN_MENU",
+      "source": "In Menu",
+      "korean": "메뉴",
+      "bbox_readable": [
+        2410,
+        5,
+        2590,
+        55
+      ],
+      "font_size": 42,
+      "style": "white_small"
+    },
+    {
+      "key": "OK",
+      "source": "OK",
+      "korean": "확인",
+      "bbox_readable": [
+        2955,
+        0,
+        3025,
+        55
+      ],
+      "font_size": 32,
+      "style": "dark"
+    },
+    {
+      "key": "SIGN_IN",
+      "source": "SIGN IN",
+      "korean": "로그인",
+      "bbox_readable": [
+        0,
+        448,
+        280,
+        525
+      ],
+      "font_size": 68,
+      "style": "white"
+    },
+    {
+      "key": "DELETE_ACCOUNT_BIG",
+      "source": "DELETE ACCOUNT",
+      "korean": "계정 삭제",
+      "bbox_readable": [
+        0,
+        535,
+        650,
+        608
+      ],
+      "font_size": 68,
+      "style": "white"
+    },
+    {
+      "key": "ENTER_XBOX_PASSCODE",
+      "source": "ENTER XBOX PASSCODE",
+      "korean": "XBOX 패스코드 입력",
+      "bbox_readable": [
+        900,
+        448,
+        1900,
+        528
+      ],
+      "font_size": 68,
+      "style": "white"
+    },
+    {
+      "key": "REGISTER_NEW_ACCOUNT_BIG",
+      "source": "REGISTER NEW ACCOUNT",
+      "korean": "새 계정 등록",
+      "bbox_readable": [
+        2470,
+        535,
+        3400,
+        615
+      ],
+      "font_size": 68,
+      "style": "white"
+    },
+    {
+      "key": "PLAYER_FEEDBACK",
+      "source": "PLAYER FEEDBACK",
+      "korean": "플레이어 피드백",
+      "bbox_readable": [
+        2320,
+        625,
+        3500,
+        710
+      ],
+      "font_size": 68,
+      "style": "white"
+    },
+    {
+      "key": "LOGIN_TO_ACCOUNT",
+      "source": "LOGIN TO ACCOUNT",
+      "korean": "계정 로그인",
+      "bbox_readable": [
+        2470,
+        1320,
+        2920,
+        1380
+      ],
+      "font_size": 42,
+      "style": "dark"
+    },
+    {
+      "key": "START_1",
+      "source": "Start",
+      "korean": "시작",
+      "bbox_readable": [
+        1320,
+        720,
+        1450,
+        785
+      ],
+      "font_size": 42,
+      "style": "outline"
+    },
+    {
+      "key": "GOAL_1",
+      "source": "Goal",
+      "korean": "골",
+      "bbox_readable": [
+        1950,
+        720,
+        2070,
+        785
+      ],
+      "font_size": 42,
+      "style": "outline"
+    },
+    {
+      "key": "START_2",
+      "source": "Start",
+      "korean": "시작",
+      "bbox_readable": [
+        2100,
+        720,
+        2225,
+        785
+      ],
+      "font_size": 42,
+      "style": "outline"
+    },
+    {
+      "key": "GOAL_2",
+      "source": "Goal",
+      "korean": "골",
+      "bbox_readable": [
+        2730,
+        720,
+        2850,
+        785
+      ],
+      "font_size": 42,
+      "style": "outline"
+    },
+    {
+      "key": "START_3",
+      "source": "Start",
+      "korean": "시작",
+      "bbox_readable": [
+        2880,
+        720,
+        3005,
+        785
+      ],
+      "font_size": 42,
+      "style": "outline"
+    },
+    {
+      "key": "GOAL_3",
+      "source": "Goal",
+      "korean": "골",
+      "bbox_readable": [
+        3505,
+        720,
+        3630,
+        785
+      ],
+      "font_size": 42,
+      "style": "outline"
+    }
+  ],
+  "preserved_graphic_tokens": [
+    "rd",
+    "nd",
+    "6P",
+    "5P"
+  ],
+  "status": "A77_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA"
+}

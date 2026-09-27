@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B78",
+  "timestamp_kst": "2026-09-27T12:15:00+09:00",
+  "asset": "FF2462BB_1024x512.dds",
+  "input_a77_sha256": "f9cb51c9f47df09c46cfdc19ef9d262377dcaadb68022695d89d70438b71d32e",
+  "result": "CHANGES_REQUIRED",
+  "reason": "A77 visual review still found the player marker YOU untranslated.",
+  "new_semantic_entries_found": 1,
+  "new_physical_regions_found": 1,
+  "action": "A78 localized YOU -> 나 inside its original source box."
+}

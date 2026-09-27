@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B77",
+  "timestamp_kst": "2026-09-27T12:07:30+09:00",
+  "asset": "FF2462BB_1024x512.dds",
+  "input_a76_sha256": "6fb6c0ff857c8218e499dd4d1ddc0b8d81adeab9a0e400f559f7fde03169c3e9",
+  "result": "CHANGES_REQUIRED",
+  "reason": "A76 reported 29/29 transcription coverage but visual atlas QA found additional visible English account/menu/timeline labels outside that transcription set.",
+  "new_semantic_entries_found": 29,
+  "new_physical_regions_found": 35,
+  "action": "A77 re-transcribed and localized these omitted regions before approval."
+}

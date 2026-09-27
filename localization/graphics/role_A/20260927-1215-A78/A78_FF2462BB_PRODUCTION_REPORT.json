@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A78",
+  "timestamp_kst": "2026-09-27T12:15:00+09:00",
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+  "base_a77_sha256": "f9cb51c9f47df09c46cfdc19ef9d262377dcaadb68022695d89d70438b71d32e",
+  "canonical_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+  "candidate_sha256": "c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c",
+  "dimensions": [
+    4096,
+    2048
+  ],
+  "bytes": 33554560,
+  "semantic_entries_materialized": 59,
+  "localized_regions": 68,
+  "new_edit": {
+    "source": "YOU",
+    "korean": "나",
+    "bbox_readable": [
+      1858,
+      660,
+      1971,
+      712
+    ]
+  },
+  "outside_a78_edit_box_exact_to_a77": true,
+  "dds_header_128_byte_exact_to_canonical": true,
+  "preserved_graphic_tokens": [
+    "rd",
+    "nd",
+    "6P",
+    "5P"
+  ],
+  "status": "A78_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA"
+}

@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "role": "D",
+  "run": "D74",
+  "timestamp_kst": "2026-09-27T12:20:00+09:00",
+  "asset": "FF2462BB_1024x512.dds",
+  "candidate_sha256": "c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c",
+  "result": "STATIC_QA_PASS_PENDING_INGAME",
+  "approved_dds_promotion": false,
+  "reason": "All static and visual gates pass, but existing approved_dds policy is user/in-game approval locked; this candidate is not promoted without in-game confirmation.",
+  "checks": {
+    "B79": "PASS_STATIC_VISUAL",
+    "C75": "PASS_STATIC_STRICT_QA",
+    "original_text_area_rule": "PASS",
+    "canonical_hd_preservation": "PASS",
+    "VR_FFB_cross_contamination": "NONE"
+  },
+  "next_production_asset": "568D3696_1024x1024.dds"
+}
