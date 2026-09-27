@@ -372,3 +372,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - C4A2937B: B85 rework/first-QA PASS on changed SHA f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99; Cut the line! -> 하트선을 통과하세요!; 20 semantic / 21 physical, outside-cell changes 0. Drift and runtime composition remains pending. C/D + in-game must rerun.
 - 2DA43E41: A84 rejected/reworked after B found source-English lower-stroke residue in 4 large text cells; 加速度: -> 가속도: corrected. B85 SHA 7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1; 11 semantic / 11 physical, outside-cell changes 0; readable/raw/white-background QA PASS.
 - No approved promotion. Next canonical-HD target: 411827E (7 reviewed segments).
+
+## D80 final QA checkpoint — 2026-09-27 17:19 KST
+- C4A2937B B85 current SHA f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99: D80 header/containment/raw/readable preflight PASS; HOLD_PENDING_C_INGAME. Cut the line! is now 하트선을 통과하세요!; Drift and composition remains runtime-pending.
+- 2DA43E41 B85 current SHA 7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1: D80 header/containment/raw/readable/white-background preflight PASS; HOLD_PENDING_C_INGAME. A84 residue rework and 가속도 terminology correction verified.
+- Both assets preserve 4096×4096 RGBA32 / 1 mip / exact canonical DDS header and canonical bytes outside their declared text cells.
+- FA7BBB13, 39229D64 and A064FDFC remain final-static PASS pending in-game validation only.
+- approved_dds remains 3 USER_APPROVED_LOCKED assets; hashes reverified unchanged. No new promotion.
+- LOCALIZATION_STATE_OK and Domain Isolation PASS; VR/FFB source/history contamination not observed.
+- Next production target: 411827E (7 reviewed segments). No build performed. Machine report: localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json.

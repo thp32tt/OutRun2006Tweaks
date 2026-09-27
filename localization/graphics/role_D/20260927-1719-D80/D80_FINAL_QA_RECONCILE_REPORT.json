@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "role": "D",
+  "run": "D80",
+  "timestamp_kst": "2026-09-27T17:19:04+09:00",
+  "base_head": "25e3f640311ec5327ca54052331271e19ff2ae55",
+  "scope": "final QA + approval reconciliation on latest B85 changed-SHA candidates; no build; no VR/FFB",
+  "approved_dds_changes": [],
+  "locked_approved_dds": {
+    "result": "PASS_UNCHANGED",
+    "count": 3,
+    "assets": [
+      {
+        "name": "571E78F3_512x64.dds",
+        "sha256": "4ff6a767fca35ebff7e1ba587c1992f94319c5f1bdd7d03faf59450d81e32f1e"
+      },
+      {
+        "name": "62BEBF33_512x64.dds",
+        "sha256": "91b0424df17e48ee3445208991f15f6e5cdb413f6f77eeb1aa3f453a3706e4eb"
+      },
+      {
+        "name": "E3FD08BE_512x64.dds",
+        "sha256": "246e4313cb9806623f695ea94262100e1e6f3888847dcc09338d870e3944b49e"
+      }
+    ]
+  },
+  "reviewed_candidates": {
+    "C4A2937B": {
+      "canonical_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
+      "superseded_sha256": "7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e",
+      "gate_chain": {
+        "A83": "PRODUCTION_PASS_SUPERSEDED_BINARY",
+        "B85": "REWORK_FIRST_QA_PASS_CURRENT_SHA",
+        "C_current": "MISSING_FOR_CURRENT_SHA",
+        "D79": "SUPERSEDED_BY_B85_CHANGED_SHA",
+        "D80": "DIRECT_PREFLIGHT_PASS_CURRENT_SHA"
+      },
+      "semantic_review": {
+        "entries": 20,
+        "physical_regions": 21,
+        "cut_line": {
+          "source": "Cut the line!",
+          "current_korean": "하트선을 통과하세요!",
+          "result": "PASS_CONTEXT_CORRECTION"
+        },
+        "drift_and": {
+          "source": "Drift and",
+          "current_korean": "드리프트하고",
+          "result": "HOLD_RUNTIME_ADJACENT_SPRITE_CONTEXT"
+        },
+        "other_entries": "PASS_RECONCILED_WITH_A83_B85"
+      },
+      "d80_direct_checks": {
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "file_size_bytes": 67108992,
+        "dds_header_128_exact_canonical": true,
+        "channel_masks": [
+          "0x000000ff",
+          "0x0000ff00",
+          "0x00ff0000",
+          "0xff000000"
+        ],
+        "outside_21_source_cells_byte_exact_canonical": true,
+        "introduced_alpha_outside_21_cells": 0,
+        "raw_orientation": "mirror_y",
+        "readable_visual_qa": "PASS",
+        "raw_visual_qa": "PASS",
+        "clipping_overlap_box_escape": "NONE_OBSERVED",
+        "source_residue": "NONE_OBSERVED",
+        "seam_black_line_opaque_box_alpha_halo": "NONE_OBSERVED",
+        "protected_rank_ordinal_vehicle_icon_character_artwork": "PRESERVED_OBSERVED"
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "D80_PREFLIGHT_PASS_PENDING_C_INGAME",
+      "promotion": false,
+      "reason": "B85 changed the binary after D79. D80 validates the current SHA, but independent C strict QA and mandatory in-game/runtime composition validation remain."
+    },
+    "2DA43E41": {
+      "canonical_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+      "candidate_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
+      "superseded_sha256": "0efaaa86849c66c94a4d5e1d5f7fbd86caa8935b5a5cb24ccbb26fc29f97d355",
+      "gate_chain": {
+        "A84": "PRODUCTION_PASS_SUPERSEDED_BINARY",
+        "B85": "REWORK_FIRST_QA_PASS_CURRENT_SHA",
+        "C_current": "MISSING_FOR_CURRENT_SHA",
+        "D80": "DIRECT_PREFLIGHT_PASS_CURRENT_SHA"
+      },
+      "semantic_review": {
+        "entries": 11,
+        "physical_regions": 11,
+        "acceleration": {
+          "source": "加速度:",
+          "current_korean": "가속도:",
+          "result": "PASS_TERMINOLOGY_CORRECTION"
+        },
+        "max_speed": {
+          "source": "最高速:",
+          "current_korean": "최고 속도:",
+          "result": "PASS"
+        },
+        "handling": {
+          "source": "ハンドリング:",
+          "current_korean": "핸들링:",
+          "result": "PASS"
+        },
+        "course_and_wait_messages": "PASS_STATIC_REVIEW",
+        "single_expert_view_special": "PASS_STATIC_REVIEW",
+        "preserved_titles": [
+          "OutRun2",
+          "OutRun2: SP"
+        ],
+        "preserved_song_title": "Keep Your Heart -1989-"
+      },
+      "b85_rework_scope": [
+        "course_or2",
+        "course_sp",
+        "wait_other",
+        "wait_now",
+        "acceleration"
+      ],
+      "d80_direct_checks": {
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "file_size_bytes": 67108992,
+        "dds_header_128_exact_canonical": true,
+        "channel_masks": [
+          "0x000000ff",
+          "0x0000ff00",
+          "0x00ff0000",
+          "0xff000000"
+        ],
+        "outside_11_source_cells_byte_exact_canonical": true,
+        "introduced_alpha_outside_11_cells": 0,
+        "raw_orientation": "mirror_y",
+        "readable_visual_qa": "PASS",
+        "raw_visual_qa": "PASS",
+        "white_background_residue_qa": "PASS",
+        "clipping_overlap_box_escape": "NONE_OBSERVED",
+        "source_residue": "NONE_OBSERVED_AFTER_B85_REWORK",
+        "seam_black_line_opaque_box_alpha_halo": "NONE_OBSERVED",
+        "protected_map_character_player_markers_numbers_song_title": "PRESERVED_OBSERVED"
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "D80_PREFLIGHT_PASS_PENDING_C_INGAME",
+      "promotion": false,
+      "reason": "B85 corrected A84 residue/terminology and D80 validates the current SHA, but independent C strict QA and mandatory in-game validation remain."
+    }
+  },
+  "unchanged_holds": {
+    "FA7BBB13": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+    "39229D64": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+    "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+    "FF2462BB": "STATIC_QA_PASS_PENDING_INGAME",
+    "568D3696": "STATIC_QA_PASS_PENDING_INGAME"
+  },
+  "state_reconciliation": {
+    "C4A2937B": {
+      "remove_stale_context_followup": "Cut the line! -> 라인을 끊으세요!",
+      "current_context_followup": "Drift and -> 드리프트하고 adjacent-sprite/in-game composition"
+    },
+    "2DA43E41": {
+      "replace_stale_semantic_expansion": "加速度: -> 가속:",
+      "current_semantic_expansion": "加速度: -> 가속도:"
+    },
+    "next_hd_rework": {
+      "asset": "411827E",
+      "transcription_segments": 7,
+      "status": "READY_FOR_CANONICAL_HD_RENDER"
+    }
+  },
+  "domain_isolation": {
+    "upstream_base": "08e5efb4deea4066c440307ec009c868a30562d3",
+    "verify_domain_isolation": "PASS",
+    "vr_ffb_source_diff_matches": [],
+    "merge_commits_since_base": [],
+    "result": "PASS_NO_VR_FFB_MIX"
+  },
+  "state_validation": "LOCALIZATION_STATE_OK",
+  "build_performed": false,
+  "final_decision": "NO_NEW_APPROVALS",
+  "next": [
+    "C4A2937B and 2DA43E41: run independent C strict QA on current B85 SHAs, then D final reconciliation and in-game validation.",
+    "C4A2937B: confirm Drift and adjacent-sprite composition in game.",
+    "Continue 411827E canonical-HD production independently.",
+    "FA7BBB13, 39229D64 and A064FDFC remain in-game-only approval holds."
+  ]
+}

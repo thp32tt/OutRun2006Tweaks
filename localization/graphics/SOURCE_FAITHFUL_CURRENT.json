@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-27T16:18:12+09:00",
+  "updated_at_kst": "2026-09-27T17:19:04+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -12,9 +12,9 @@
   ],
   "mandatory_policy": "localization/graphics/ORIENTATION_POLICY.md",
   "automation_checkpoint": {
-    "run": "D79-final-qa-reconcile-20260927",
+    "run": "D80-final-qa-reconcile-20260927",
     "result": "NO_NEW_APPROVALS",
-    "note": "Three USER_APPROVED_LOCKED DDS reverified unchanged. 39229D64 C78 current SHA and A064FDFC C79 same SHA pass D79 final static QA but lack in-game evidence; C4A2937B passes D preflight but lacks B/C/runtime validation."
+    "note": "Three USER_APPROVED_LOCKED DDS reverified unchanged. B85 changed C4A2937B and 2DA43E41; D80 validates both current SHAs structurally/raw/readable but C and in-game gates remain."
   },
   "latest_promoted_batch": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
   "latest_rejected_batch": "localization/graphics/BATCH51_REJECTED_REPORT.json",
@@ -128,7 +128,7 @@
     "dimensions": "read_from_dds_header",
     "old_candidates": "historical_until_rebuilt_or_revalidated_against_HD"
   },
-  "latest_d_final_qa_report": "localization/graphics/role_D/20260927-1618-D79/D79_FINAL_QA_RECONCILE_REPORT.json",
+  "latest_d_final_qa_report": "localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json",
   "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json",
   "post_d78_c78_update": {
     "asset": "39229D64",
@@ -149,5 +149,16 @@
     "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
     "result": "D79_CURRENT_SHA_FINAL_STATIC_QA_PASS_PENDING_INGAME",
     "report": "localization/graphics/role_D/20260927-1618-D79/D79_FINAL_QA_RECONCILE_REPORT.json"
+  },
+  "d80_b85_resolution": {
+    "C4A2937B": {
+      "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
+      "result": "D80_PREFLIGHT_PASS_PENDING_C_INGAME"
+    },
+    "2DA43E41": {
+      "candidate_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
+      "result": "D80_PREFLIGHT_PASS_PENDING_C_INGAME"
+    },
+    "report": "localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json"
   }
 }

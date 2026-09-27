@@ -195,7 +195,7 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "B85_REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "status": "D80_PREFLIGHT_PASS_PENDING_C_INGAME",
       "transcription_segments": 20,
       "localized_regions": 21,
       "remaining_segments": 0,
@@ -211,17 +211,16 @@
         "Beat that car!": 2
       },
       "in_game_validation": "PENDING",
-      "d_preflight_report": "localization/graphics/role_D/20260927-1618-D79/D79_FINAL_QA_RECONCILE_REPORT.json",
+      "d_preflight_report": "localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json",
       "semantic_context_followup": [
-        "Cut the line! -> 라인을 끊으세요!",
-        "Drift and -> 드리프트하고"
+        "Drift and -> 드리프트하고 adjacent-sprite/in-game composition"
       ],
       "b85_report": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json",
       "candidate_changed_by_B": true,
       "context_followup": [
         "Drift and -> 드리프트하고 adjacent-sprite/in-game composition"
       ],
-      "superseded_validation": "D79 preflight was for A83 SHA 7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e"
+      "superseded_validation": "D79 A83-SHA preflight superseded; D80 current B85 SHA preflight valid"
     },
     {
       "hash": "2DA43E41",
@@ -234,7 +233,7 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "B85_REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "status": "D80_PREFLIGHT_PASS_PENDING_C_INGAME",
       "transcription_segments": 11,
       "localized_regions": 11,
       "remaining_segments": 0,
@@ -243,7 +242,7 @@
       "candidate_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
       "semantic_expansion": [
-        "加速度: -> 가속:",
+        "加速度: -> 가속도:",
         "最高速: -> 최고 속도:",
         "ハンドリング: -> 핸들링:"
       ],
@@ -256,7 +255,8 @@
       "b85_report": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json",
       "candidate_changed_by_B": true,
       "semantic_fix": "加速度: 가속: -> 가속도:",
-      "artifact_fix": "A84 residual source-English lower strokes removed in 4 large text cells"
+      "artifact_fix": "A84 residual source-English lower strokes removed in 4 large text cells",
+      "d_preflight_report": "localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json"
     },
     {
       "hash": "411827E",
@@ -324,5 +324,5 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json"
+  "latest_batch": "localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json"
 }

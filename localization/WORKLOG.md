@@ -702,3 +702,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - 2DA final B85 QA: 4096×4096 RGBA32/1 mip, exact header, mirror_y; outside 11 cells changed pixels = 0, introduced alpha outside = 0; readable/raw and white-background residue checks PASS. OutRun2/OutRun2: SP, song title Keep Your Heart -1989-, player markers/numbers and map/character artwork remain original.
 - Neither changed-SHA candidate was promoted to approved_dds. New C/D strict QA and in-game screenshot validation are mandatory. Next P1 production target: 411827E.
 - No build, VR or FFB work.
+
+## 2026-09-27 17:19 KST — D80 final QA reconciliation
+
+- Started from latest remote HEAD 25e3f640311ec5327ca54052331271e19ff2ae55 after B85 changed both C4A2937B and 2DA43E41 candidate binaries; previous D79/A84 binary validation was not reused as final evidence.
+- C4A2937B current B85 SHA f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99 independently matches the canonical HD source/header contract: 4096×4096 RGBA32/1 mip, exact 128-byte header, and byte-exact canonical payload outside all 21 source text cells. Readable/raw mirror_y inspection PASS with no observed clipping, overlap, residue, seam, opaque box or halo. Cut the line! correction to 하트선을 통과하세요! resolves the prior literal-context issue; Drift and -> 드리프트하고 still needs adjacent-sprite/in-game composition confirmation. C is still missing for the current SHA, so no promotion.
+- 2DA43E41 current B85 SHA 7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1 independently matches the canonical HD source/header contract: 4096×4096 RGBA32/1 mip, exact 128-byte header, and byte-exact canonical payload outside all 11 source text cells. Readable/raw and B85 white-background residue sheets PASS after the A84 four-cell residue rework; 加速度 is correctly 가속도. OutRun2/OutRun2: SP and Keep Your Heart -1989- remain preserved. C is still missing for the current SHA, so no promotion.
+- Existing final-static holds FA7BBB13, 39229D64 and A064FDFC remain unchanged and still need in-game screenshots. Existing approved_dds remains exactly the three USER_APPROVED_LOCKED selector DDS; hashes reverified.
+- Reconciled stale metadata: removed the old C4 라인을 끊으세요 context follow-up and normalized 2DA semantic expansion to 加速度: -> 가속도:.
+- LOCALIZATION_STATE_OK and Domain Isolation PASS; no VR/FFB source diff or merge commit. Build not run.
+- Next production target remains 411827E (7 reviewed segments). Report: localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json.
