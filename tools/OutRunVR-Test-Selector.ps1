@@ -7,12 +7,13 @@ $runner=Join-Path $root 'Run-OutRunVRTest.ps1'
 $probe=Join-Path $root 'outrun-d3d9on12-probe.exe'
 
 $slots=[ordered]@{
+    'R59_01_RANK_HEAD_SCALE82'=@('R59. RANK head + scale 82%','권장 후보: mode6 head inverse + R58 direct 4~6등 ownership + 차량 anchor 중심 82% scale.')
     'R57_01_POSITION_KIND1_HUD35'=@('01. POSITION kind=1 only','첫 sprani/SPRARGS2 요소만 SCREEN_HUD + 35%.')
     'R57_02_POSITION_KIND0_HUD35'=@('02. POSITION kind=0 only','뒤 8개 put_clip_sprite/SPRARGS만 SCREEN_HUD + 35%.')
     'R57_03_POSITION_ALL_WORLD35'=@('03. POSITION complete fix','kind=1+kind=0 전체 exact SCREEN_HUD + finite plane 35%.')
     'R57_04_RANK_ALL_AS_HUD'=@('04. VEHICLE RANK as HUD','차량 위 1~6등을 HUD로 강제해 최종 draw ownership 확인.')
     'R57_05_RANK_PROJECTED_IPD'=@('05. RANK projected-IPD','Calc3D2D view X/Y/Z 보존 후 eye IPD/FOV 재투영. 우선 테스트.')
-    'R57_06_RANK_PROJECTED_HEAD'=@('06. R59 RANK head+scale','head inverse + R58 direct 4~6등 ownership + 실제 차량 anchor 중심 RankMarkerScale 82%.')
+    'R57_06_RANK_PROJECTED_HEAD'=@('06. RANK + head inverse','과거 비교용: head inverse까지 적용하되 R59 전용 test identity/scale 고정은 사용하지 않음.')
     'R57_07_RANK_PROJECTED_13'=@('07. RANK 1-3 only','sprani/SPRARGS2 1~3등만 projected-world-marker.')
     'R57_08_RANK_PROJECTED_46'=@('08. RANK 4-6 only','put_clip_sprite/SPRARGS 4등 이후만 projected-world-marker.')
     'R57_09_RANK_PROJECTED_ZERO'=@('09. projected owner / zero','semantic은 유지하고 양안 위치 보정만 끔.')
@@ -42,7 +43,7 @@ $title.Location=[System.Drawing.Point]::new(24,16)
 $form.Controls.Add($title)
 
 $guide=New-Object System.Windows.Forms.Label
-$guide.Text='권장 순서: R57 06을 DX9Ex → DX11 Host 순서로 확인하세요. R59는 mode 6 head-inverse + R58 direct 4~6등 tagging + anchor 중심 82% scale입니다. DXVK는 classic fail-open, DX12는 실제 D3D9On12 identity 확인용입니다.'
+$guide.Text='권장 순서: R59_01을 DX9Ex → DX11 Host 순서로 확인하세요. 기존 R57_06은 과거 head-inverse 비교용으로 보존됩니다. DXVK는 classic fail-open, DX12는 실제 D3D9On12 identity 확인용입니다.'
 $guide.AutoSize=$false
 $guide.Size=[System.Drawing.Size]::new(990,48)
 $guide.Location=[System.Drawing.Point]::new(26,54)
@@ -55,11 +56,11 @@ $backendBox.Size=[System.Drawing.Size]::new(990,150)
 $form.Controls.Add($backendBox)
 
 $backendButtons=@(
-    @('DX9Ex + D3D11 Host','d3d9','R57_06_RANK_PROJECTED_HEAD','R59 기준: head-inverse + direct rank46 + anchor 중심 RankMarkerScale=0.82.'),
-    @('DX11 Host DirectGPU','dx11','R57_06_RANK_PROJECTED_HEAD','동일 R59 rank 경로 + D3D11 OpenXR host. DirectGPU-only / ACK run identity.'),
-    @('DXVK SAFE','dxvk-safe','R57_06_RANK_PROJECTED_HEAD','provider-local Ex 비활성. classic DXVK + SBS/Desktop Duplication fail-open.'),
-    @('DXVK MULTIVIEW','dxvk','R57_06_RANK_PROJECTED_HEAD','classic DXVK + multiviewpatcher. DirectGPU 강제 금지, fallback 유지.'),
-    @('DX12 STRICT','dx12','R57_06_RANK_PROJECTED_HEAD','세션 분석에서 D3D9On12 provider identity가 실제 확인되어야 PASS.')
+    @('DX9Ex + D3D11 Host','d3d9','R59_01_RANK_HEAD_SCALE82','R59 기준: head-inverse + direct rank46 + anchor 중심 RankMarkerScale=0.82.'),
+    @('DX11 Host DirectGPU','dx11','R59_01_RANK_HEAD_SCALE82','동일 R59 rank 경로 + D3D11 OpenXR host. DirectGPU-only / ACK run identity.'),
+    @('DXVK SAFE','dxvk-safe','R59_01_RANK_HEAD_SCALE82','provider-local Ex 비활성. classic DXVK + SBS/Desktop Duplication fail-open.'),
+    @('DXVK MULTIVIEW','dxvk','R59_01_RANK_HEAD_SCALE82','classic DXVK + multiviewpatcher. DirectGPU 강제 금지, fallback 유지.'),
+    @('DX12 STRICT','dx12','R59_01_RANK_HEAD_SCALE82','세션 분석에서 D3D9On12 provider identity가 실제 확인되어야 PASS.')
 )
 $x=14
 foreach($b in $backendButtons){
