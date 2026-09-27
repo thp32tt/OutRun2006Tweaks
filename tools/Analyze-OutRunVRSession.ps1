@@ -125,12 +125,16 @@ $dx12IdentityMismatch=(
     $backend -eq 'dx12' -and
     $provider -ne 'D3D9ON12'
 )
+$startupEvidence=(
+    $provider -ne 'UNKNOWN' -or
+    $gameLog.Length -gt 0 -or
+    $dxvkLog.Length -gt 0 -or
+    $hostLog.Trim().Length -gt 0
+)
 $startupNoFrame=(
     $backend -ne '2d' -and
-    -not $hasRuntimeActivity -and
-    ($provider -eq 'UNKNOWN' -or
-     $providerLocalExEnabled -or
-     $dx12IdentityMismatch)
+    $startupEvidence -and
+    -not $hasRuntimeActivity
 )
 
 $flags=@()
@@ -167,6 +171,7 @@ $result=[ordered]@{
     ProviderCreateStarted=$providerCreateStarted
     ProviderCreateSucceeded=$providerCreateSucceeded
     ProviderCreateFellBack=$providerCreateFellBack
+    StartupEvidence=$startupEvidence
     StartupNoFrame=$startupNoFrame
     Dx12IdentityMismatch=$dx12IdentityMismatch
     SBSDesktopDupFallback=$sbsFallback
@@ -202,6 +207,7 @@ $lines=@(
     "providerCreateStarted=$providerCreateStarted"
     "providerCreateSucceeded=$providerCreateSucceeded"
     "providerCreateFellBack=$providerCreateFellBack"
+    "startupEvidence=$startupEvidence"
     "startupNoFrame=$startupNoFrame"
     "dx12IdentityMismatch=$dx12IdentityMismatch"
     "sbsDesktopDupFallback=$sbsFallback"
