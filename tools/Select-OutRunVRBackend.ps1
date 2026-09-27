@@ -223,21 +223,29 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "true"
+    } elseif ($Backend -eq "dxvk") {
+        # Keep the HMD-proven R58 HUD semantics untouched while DXVK runs as a
+        # translation/provider optimization only. Provider-local Ex is disabled
+        # and DirectGPU is not required; multiview may reduce game-side geometry
+        # work while SBS/Desktop Duplication remains the functional fallback.
+        $text = Set-IniSectionValue $text "VR" "RenderBackend" "2"
+        $text = Set-IniSectionValue $text "VR" "Enabled" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
+        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
+        $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
     } else {
-        $value = switch ($Backend) {
-            "dxvk" { "2" }
-            "dx12" { "3" }
-        }
-        $text = Set-IniSectionValue $text "VR" "RenderBackend" $value
+        $text = Set-IniSectionValue $text "VR" "RenderBackend" "3"
         $text = Set-IniSectionValue $text "VR" "Enabled" "true"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
         $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"
-        if ($Backend -eq "dxvk") {
-            $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
-        }
+        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "true"
     }
 
     # Keep the experimental cockpit camera completely isolated from normal
