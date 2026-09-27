@@ -103,11 +103,18 @@ ASSISTANT_MESSAGE_SELECTORS = [
 
 INPUT_SELECTORS = [
     "#prompt-textarea",
-    "div#prompt-textarea[contenteditable='true']",
-    "textarea[placeholder*='Message']",
-    "textarea[placeholder*='메시지']",
+    "div#prompt-textarea",
+    "[data-testid='prompt-textarea']",
+    "[data-testid='composer'] textarea",
     "[data-testid='composer'] [contenteditable='true']",
+    "textarea[placeholder*='Message' i]",
+    "textarea[placeholder*='Ask ChatGPT' i]",
+    "textarea[placeholder*='메시지']",
     "[contenteditable='true'][data-lexical-editor='true']",
+    "div.ProseMirror[contenteditable='true']",
+    "[role='textbox'][contenteditable='true']",
+    "[role='textbox']",
+    "form textarea",
     "form [contenteditable='true']",
     "[contenteditable='true']",
 ]
