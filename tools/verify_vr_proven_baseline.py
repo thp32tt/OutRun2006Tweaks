@@ -59,6 +59,11 @@ require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     '"OUTRUN_VR_R57_MODE"',
     'return (value >= 0 && value <= 10) ? value : 6;',
 ], "P2_R57_RENDERER_DEFAULT")
+require_all("tools/OutRunVR-Test-Selector.ps1", [
+    "'DX9Ex + D3D11 Host','d3d9','R57_06_RANK_PROJECTED_HEAD'",
+    "'DX11 Host DirectGPU','dx11','R57_06_RANK_PROJECTED_HEAD'",
+    "'DXVK SAFE','dxvk-safe','R57_06_RANK_PROJECTED_HEAD'",
+], "P2_SELECTOR_DEFAULT_R57_06")
 
 # PASS 3 — diagnostics stay disabled and exact queue ownership stays sticky.
 require_all("src/hooks_uiscaling.cpp", [
