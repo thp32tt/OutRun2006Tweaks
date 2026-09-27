@@ -31,6 +31,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - name: Verify HMD-proven VR baseline
+        shell: pwsh
+        run: python tools/verify_vr_proven_baseline.py
       - name: Validate test scripts
         shell: pwsh
         run: ./tools/Test-OutRunVRTestPolicy.ps1
@@ -62,6 +65,20 @@ jobs:
           New-Item -ItemType Directory -Force stage | Out-Null
           $dll=Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
           if(-not $dll){throw 'dinput8.dll missing'}
+          $bytes=[System.IO.File]::ReadAllBytes($dll.FullName)
+          $ascii=[Text.Encoding]::ASCII.GetString($bytes)
+          foreach($marker in @(
+            'VR R26+HUD SAFE TEST: R26/R23 world path + R30 HUD/XYZRHW/SkyGlow overlay ACTIVE',
+            'VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE',
+            'VR R66 OPTION ARROW: exact node pinned',
+            'VR R66 GOAL TIME HUD:',
+            'VR R65 FLARE FIX: exact projected-screen effect uses asymmetric-FOV affine only'
+          )){
+            if(-not $ascii.Contains($marker)){throw "nightly binary missing proven marker: $marker"}
+          }
+          if($ascii.Contains('VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE')){
+            throw 'nightly binary is forbidden R26-only SAFE-DRAW variant'
+          }
           Copy-Item $dll.FullName stage/dinput8.dll
           Copy-Item build-host/bin/outrun-vr-host.exe stage/outrun-vr-host.exe
           Set-Content stage/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
