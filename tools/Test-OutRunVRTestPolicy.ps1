@@ -58,6 +58,7 @@ Assert-True (Has-Argument $performance '-FrameCadenceTargetHz=0') 'PERFORMANCE m
 
 $requiredFiles = @(
     'Select-OutRunVRBackend.ps1',
+    'OutRunVR-BackendContract.ps1',
     'Run-OutRunVRTest.ps1',
     'Collect-OutRunVRLogs.ps1',
     'OutRunVR-Test-Selector.ps1'
@@ -75,6 +76,9 @@ foreach($name in $parseTargets) {
 }
 
 Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'TestProfile') 'selector must persist TestProfile'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'Get-OutRunVRBackendContract') 'selector must consume the canonical backend contract'
+Assert-True ($text['OutRunVR-BackendContract.ps1'] -match "SemanticContract='R69_CLEAN'") 'VR backends must advertise the R69 CLEAN semantic contract'
+Assert-True ($text['OutRunVR-BackendContract.ps1'] -notmatch 'R57_05_RANK_PROJECTED_IPD') 'backend defaults must not reintroduce R57 experiment variants'
 Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'Get-OutRunVRTestProfile') 'runner must consume profile definitions'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'TEST_PROFILE') 'collector manifest must record profile'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match '\$variant/\$profile/\$session') 'collector path must separate Variant/Profile/Session'
