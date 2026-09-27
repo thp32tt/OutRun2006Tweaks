@@ -309,7 +309,7 @@ async def ensure_thinking_level(page: Page, requested: str = PREFERRED_THINKING_
         return False
 
     control, state = await open_thinking_control(page, aliases)
-    if not control:
+    if control is None:
         diag = await collect_thinking_diagnostics(page)
         write_runtime(
             last_thinking_level_result=f"picker_not_found:{requested}",
@@ -435,7 +435,7 @@ def _normalize_composer_text(value: str) -> str:
 async def send_message(page: Page, message: str) -> bool:
     """Insert one complete prompt atomically, verify it, then send exactly once."""
     box = await first_visible(page, INPUT_SELECTORS)
-    if not box:
+    if box is None:
         return False
     try:
         # Playwright fill() supports textarea/input/contenteditable and updates the
