@@ -70,16 +70,16 @@ namespace OutRunVRD3D9ExUpgradeR13
         };
 
         thread_local std::uint32_t R14InternalReleaseDepth = 0;
-        // Keep the established 384 MiB general cap so the 32-bit game
-        // does not spend the whole address space on duplicate MANAGED shadows.
-        // R67 HMD evidence showed the cap could be reached before a 2048x512
-        // single-level A8R8G8B8 selector/car atlas was created; that atlas then
-        // fell to DirectOnly and its later LockRect failed. Reserve a bounded
-        // extra 64 MiB only for small single-level uncompressed atlases.
+        // Keep the total MANAGED CPU-shadow budget at the established 384 MiB.
+        // R68 HMD evidence showed raising the process budget to 448 MiB caused
+        // a start-grid shadow regression while a later 2048x2048 selector atlas
+        // could still miss its CPU shadow. Reserve 16 MiB *inside* the 384 MiB
+        // ceiling: ordinary shadows stop at 368 MiB, while one exact-size
+        // uncompressed selector/car atlas may consume the reserved headroom.
         constexpr std::uint64_t R14GeneralShadowBudgetBytes =
-            384ull * 1024ull * 1024ull;
+            368ull * 1024ull * 1024ull;
         constexpr std::uint64_t R14ShadowBudgetBytes =
-            448ull * 1024ull * 1024ull;
+            384ull * 1024ull * 1024ull;
         constexpr std::uint64_t R14EmergencyAtlasMaxBytes =
             16ull * 1024ull * 1024ull;
         std::atomic<std::uint64_t> R14ShadowBytes{0};
@@ -523,7 +523,7 @@ namespace OutRunVRD3D9ExUpgradeR13
                 !R14FirstEmergencyReserveLogged.exchange(true))
             {
                 spdlog::info(
-                    "VR R68 EX: emergency MANAGED shadow reserve ACTIVE size={}x{} fmt={} bytes={} currentMiB={:.1f}; 384 MiB general cap preserved",
+                    "VR R69 EX: in-budget MANAGED selector reserve ACTIVE size={}x{} fmt={} bytes={} currentMiB={:.1f}; 384 MiB total cap preserved",
                     desc.Width, desc.Height, static_cast<unsigned>(desc.Format),
                     estimate,
                     static_cast<double>(current) / (1024.0 * 1024.0));
