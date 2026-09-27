@@ -162,3 +162,28 @@ A post-review readback of the final PC-fast packaging script found one remaining
 The binary renderer was correct, but downstream log/package analysis could misidentify the build. This was corrected so both metadata sources now say `ACTIVE_R26_HUD_R66`.
 
 `verify_vr_proven_baseline.py` now explicitly rejects the stale `ACTIVE_FULL_R34` package identity so this class of omission cannot pass a future build gate.
+
+
+## 2026-09-28 R67 HMD regression follow-up
+
+HMD test package 90ac753f4245 reported:
+- stage split transition sky still briefly stereo-splits;
+- 1st..5th vehicle rank markers regressed to head-follow in R67;
+- GOAL and final 1st board are correct, but name/time remain doubled and head-follow;
+- option < > remains doubled and head-follow;
+- selector car colour is corrupted;
+- START scene shadow briefly corrupts.
+
+Uploaded runtime log proved:
+- R67 stage hold fired at stage 15 -> 60, so one-present hold was insufficient;
+- R67 projected-marker eye-only path executed, confirming the rank regression is transform policy, not producer discovery;
+- steady-state SkyGlow failures remain zero.
+
+R68 response now present on branch:
+- restore head correction for world-attached rank marker only; keep flare eye-only;
+- extend stage transition hold from 1 to 3 presents;
+- pin canonical glyph queue nodes including alternate glyph emitter for option/finish text;
+- bypass restored car base shadow in selector/SUMO_FE/START;
+- reserve bounded managed-shadow headroom for selector car atlases.
+
+Do not regress working GOAL/1st board path while validating R68.
