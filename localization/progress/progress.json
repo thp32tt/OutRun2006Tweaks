@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T17:46:30+09:00",
+  "updated_at_kst": "2026-09-27T18:00:42+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -110,7 +110,7 @@
       "percent": 100,
       "transcribed_assets": 79,
       "localize_text_targets": 79,
-      "transcribed_segments": 721,
+      "transcribed_segments": 723,
       "blocked_context_assets": 0,
       "blocked_context_indices": []
     },
@@ -136,11 +136,11 @@
       "status": "done",
       "percent": 100,
       "planned_assets": 79,
-      "translated_segments": 721,
+      "translated_segments": 723,
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "411827E A85 canonical-HD production complete on 7 semantic / 7 physical text regions; B/C/D static QA and in-game validation remain. C4A2937B/2DA43E41 changed-SHA candidates still need C + in-game; FA7BBB13/39229D64/A064FDFC remain in-game holds. Continue C075FB49 canonical-HD production after the 411 static gate.",
+  "next_checkpoint": "411827E A85 candidate passed B86 first QA unchanged; C/D and in-game remain. C075FB49 canonical-HD omission review expanded transcription 14 -> 16 semantic / 17 expected physical by adding Maximum Speed and Transmission; continue C075FB49 HD render.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -175,7 +175,7 @@
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
     "transcribed_assets": 79,
-    "transcribed_segments": 721,
+    "transcribed_segments": 723,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -192,7 +192,7 @@
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
     "artwork_plan_assets": 79,
-    "artwork_plan_segments": 721,
+    "artwork_plan_segments": 723,
     "artwork_proof_candidates": 7,
     "simple6_package": {
       "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
@@ -257,8 +257,10 @@
       "coverage": "7 semantic / 7 physical",
       "candidate_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
       "report": "localization/graphics/role_A/20260927-1730-A85/A85_411827E_PRODUCTION_REPORT.json",
-      "status": "A85_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "status": "B86_FIRST_QA_PASS_PENDING_C_D_INGAME",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+      "b_first_qa_report": "localization/graphics/role_B/20260927-1800-B86/B86_411827E_FIRST_QA_AND_C075FB49_TRANSCRIPTION.json",
+      "candidate_changed_by_B": false,
       "preserved": [
         "288GTO",
         "Testarossa",
@@ -268,9 +270,10 @@
       ]
     },
     "next_hd_rework": {
-      "asset": "411827E",
-      "transcription_segments": 7,
-      "status": "READY_FOR_CANONICAL_HD_RENDER"
+      "asset": "C075FB49",
+      "transcription_segments": 16,
+      "expected_physical_text_occurrences": 17,
+      "status": "TRANSCRIPTION_EXPANDED_READY_FOR_CANONICAL_HD_RENDER"
     },
     "latest_d_final_qa": {
       "run": "D80",
@@ -296,25 +299,16 @@
       "in_game_validation": "PENDING"
     },
     "latest_b_first_qa": {
-      "run": "B85",
-      "report": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json",
-      "C4A2937B": {
-        "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
-        "result": "REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
-        "candidate_changed_by_B": true,
-        "semantic_entries": 20,
-        "physical_regions": 21,
-        "context_pending": [
-          "Drift and"
-        ]
-      },
-      "2DA43E41": {
-        "candidate_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
-        "result": "REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
-        "candidate_changed_by_B": true,
-        "semantic_entries": 11,
-        "physical_regions": 11
-      }
+      "run": "B86",
+      "asset": "411827E",
+      "candidate_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
+      "report": "localization/graphics/role_B/20260927-1800-B86/B86_411827E_FIRST_QA_AND_C075FB49_TRANSCRIPTION.json",
+      "result": "PASS_FIRST_QA_PENDING_C_D_INGAME",
+      "candidate_changed_by_B": false,
+      "semantic_entries": 7,
+      "physical_regions": 7,
+      "outside_text_cells_changed_pixels": 0,
+      "introduced_alpha_outside_text_cells": 0
     },
     "c78_39229d64": {
       "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
@@ -344,6 +338,26 @@
       "acceleration_label": "가속도:",
       "source_residue_reworked": true,
       "report": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json"
+    },
+    "b86_c075fb49_transcription": {
+      "prior_semantic_entries": 14,
+      "reviewed_semantic_entries": 16,
+      "expected_physical_text_occurrences": 17,
+      "new_omissions": [
+        {
+          "source": "Maximum Speed",
+          "korean": "최고 속도"
+        },
+        {
+          "source": "Transmission",
+          "korean": "변속기"
+        }
+      ],
+      "duplicate_physical_occurrences": {
+        "More BGM": 2
+      },
+      "status": "TRANSCRIPTION_EXPANDED_READY_FOR_CANONICAL_HD_RENDER",
+      "report": "localization/graphics/role_B/20260927-1800-B86/B86_411827E_FIRST_QA_AND_C075FB49_TRANSCRIPTION.json"
     }
   },
   "data_build": {

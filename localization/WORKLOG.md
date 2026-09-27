@@ -723,3 +723,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Readable/raw mirror_y plus white-background alpha QA PASS; no observed source residue, clipping/overlap, box escape, seam/black line, opaque box or alpha halo.
 - Exact 128-byte DDS header preserved; all bytes outside the 7 declared localization cells remain canonical. Candidate SHA-256: 8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02.
 - Status: A85_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA. No promotion, in-game claim, build, VR or FFB work. Next: C075FB49.
+
+
+## 2026-09-27 18:00 KST — B86 411827E first QA + C075FB49 transcription expansion
+
+- Rebased B review on latest A85 411827E candidate 8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02 from remote HEAD 8cade40; B did not replace or repaint the A85 DDS.
+- Independent 411827E structural QA PASS: 2048×2048 RGBA32, 1 mip, 16,777,344 bytes, exact canonical 128-byte DDS header and raw mirror_y orientation.
+- Pixel containment PASS: 214,082 changed pixels total; changed pixels outside the 7 A85 source cells = 0; introduced alpha outside = 0. Protected 288GTO/Testarossa/F40/Enzo Ferrari, 1P~4P and vehicle/control artwork remain canonical outside those cells.
+- Readable, raw and white-background visual QA PASS: no source-English residue, clipping/overlap, box escape, black seam/line, opaque box or obvious alpha halo observed. A85 style fidelity is retained. In-game validation is not available, so no approved_dds promotion.
+- Continued production review on next P1 target C075FB49. Canonical HD inspection found two untranslated UI labels omitted from pass-6 transcription: Maximum Speed -> 최고 속도 and Transmission -> 변속기.
+- C075FB49 transcription expanded from 14 to 16 semantic strings / 17 expected physical occurrences because More BGM appears twice. OutRun2SP/OutRun2, 1P, Ferrari model names and vehicle artwork remain preserve-original.
+- Next: render C075FB49 directly on canonical 2048×2048 HD DDS; 411827E still requires C/D + in-game. No build, VR or FFB work.

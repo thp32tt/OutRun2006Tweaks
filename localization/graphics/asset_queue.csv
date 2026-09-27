@@ -49,7 +49,7 @@ index,path,action,artwork_status,transcription_status,notes
 92,textures/load/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 94,textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds,localize_text,b85_rework_first_qa_pass_pending_c_d_ingame,transcribed_reviewed,B85 changed SHA; 가속도 terminology + source-residue rework; C/D + in-game required
 95,textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds,localize_text,pending_artwork,transcribed_reviewed,pass5 transcription saved
-97,textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds,localize_text,a85_candidate_pending_bcd_qa,transcribed_reviewed,A85 canonical-HD 7/7 complete; Ferrari names/player labels preserved; B/C/D + in-game pending
+97,textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds,localize_text,a85_candidate_b86_first_qa_pass_pending_c_d_ingame,transcribed_reviewed,A85 SHA 8ffb3dce... B86 first QA PASS; candidate unchanged; C/D + in-game pending
 98,textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 99,textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 100,textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass6 transcription saved
@@ -59,7 +59,7 @@ index,path,action,artwork_status,transcription_status,notes
 104,textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 106,textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass6 transcription saved
 107,textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds,localize_text,pending_artwork,transcribed_reviewed,pass6 transcription saved
-111,textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass6 transcription saved
+111,textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds,localize_text,transcription_expanded_ready_hd_render,transcribed_reviewed,B86 expanded 14->16 semantic / 17 expected physical; added Maximum Speed/Transmission; More BGM x2
 112,textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 116,textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 119,textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved

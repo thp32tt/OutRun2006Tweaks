@@ -389,3 +389,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - 288GTO/Testarossa/F40/Enzo Ferrari, player-number labels and vehicle/control artwork preserved.
 - Outside 7 cells byte-identical; readable/raw/white-background A-stage artifact QA PASS after two rejected non-persisted drafts.
 - Status: A_PRODUCTION_COMPLETE_PENDING_B_C_D; in-game validation not performed. Next after gate: C075FB49.
+
+
+## B86 checkpoint — 2026-09-27 18:00 KST
+
+- 411827E: A85 SHA 8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02 B FIRST QA PASS, candidate unchanged; 7 semantic / 7 physical, 2048×2048 RGBA32/1 mip, exact header, raw mirror_y, outside-cell changes 0, introduced alpha outside 0. C/D + in-game remain.
+- C075FB49: HD omission review expanded transcription 14 -> 16 semantic / 17 expected physical by adding Maximum Speed -> 최고 속도 and Transmission -> 변속기; More BGM occurs twice.
+- Next production target: C075FB49_512x512.dds.

@@ -269,7 +269,7 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "A85_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "status": "B86_FIRST_QA_PASS_PENDING_C_D_INGAME",
       "transcription_segments": 7,
       "localized_regions": 7,
       "remaining_segments": 0,
@@ -277,7 +277,9 @@
       "a_production_report": "localization/graphics/role_A/20260927-1730-A85/A85_411827E_PRODUCTION_REPORT.json",
       "candidate_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
-      "in_game_validation": "PENDING"
+      "in_game_validation": "PENDING",
+      "b_first_qa_report": "localization/graphics/role_B/20260927-1800-B86/B86_411827E_FIRST_QA_AND_C075FB49_TRANSCRIPTION.json",
+      "candidate_changed_by_B": false
     },
     {
       "hash": "C075FB49",
@@ -290,7 +292,22 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "REWORK_FROM_HD_BASE"
+      "status": "TRANSCRIPTION_EXPANDED_READY_FOR_CANONICAL_HD_RENDER",
+      "transcription_segments": 16,
+      "expected_physical_text_occurrences": 17,
+      "transcription_expansion": [
+        {
+          "source": "Maximum Speed",
+          "korean": "최고 속도"
+        },
+        {
+          "source": "Transmission",
+          "korean": "변속기"
+        }
+      ],
+      "duplicate_physical_occurrences": {
+        "More BGM": 2
+      }
     },
     {
       "hash": "FD90AA9",
@@ -332,5 +349,5 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_A/20260927-1730-A85/A85_411827E_PRODUCTION_REPORT.json"
+  "latest_batch": "localization/graphics/role_B/20260927-1800-B86/B86_411827E_FIRST_QA_AND_C075FB49_TRANSCRIPTION.json"
 }

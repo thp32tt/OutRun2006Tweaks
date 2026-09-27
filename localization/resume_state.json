@@ -1,5 +1,5 @@
 {
-  "schema_version": 38,
+  "schema_version": 39,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,7 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "HD GRAPHICS: 411827E A85 production complete (7 semantic / 7 physical) pending B/C/D + in-game. C4/2DA changed SHAs need C + in-game; FA7/392/A064 remain in-game holds. After 411 static gate continue C075FB49 canonical-HD rebuild.",
+    "HD GRAPHICS: 411827E A85 candidate passed B86 first QA unchanged; C/D + in-game pending. C075FB49 transcription expanded 14 -> 16 semantic / 17 expected physical (added Maximum Speed, Transmission; More BGM x2). Continue C075FB49 canonical-HD render.",
     "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
     "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
     "Never upscale prior stock-resolution Korean DDS candidates.",
@@ -30,7 +30,7 @@
   },
   "graphics_checkpoint": {
     "transcribed_assets": 79,
-    "transcribed_segments": 721,
+    "transcribed_segments": 723,
     "artwork_targets": 79,
     "full_draft_candidates": 79,
     "final_artwork_completed": 0,
@@ -125,7 +125,7 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_A/20260927-1730-A85/A85_411827E_PRODUCTION_REPORT.json",
+    "latest_hd_rework_batch": "localization/graphics/role_B/20260927-1800-B86/B86_411827E_FIRST_QA_AND_C075FB49_TRANSCRIPTION.json",
     "hd_rework_candidates_ready": 8,
     "hd_rework_remaining": 5,
     "hd_partial_rework": {
@@ -240,14 +240,16 @@
         "d_preflight_report": "localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json"
       },
       "411827E": {
-        "status": "A85_PRODUCTION_COMPLETE_PENDING_B_C_D",
+        "status": "B86_FIRST_QA_PASS_PENDING_C_D_INGAME",
         "candidate_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
         "completed_transcription_entries": 7,
         "localized_regions": 7,
         "remaining_segments": 0,
         "report": "localization/graphics/role_A/20260927-1730-A85/A85_411827E_PRODUCTION_REPORT.json",
-        "in_game_validation": "PENDING"
+        "in_game_validation": "PENDING",
+        "b_first_qa_report": "localization/graphics/role_B/20260927-1800-B86/B86_411827E_FIRST_QA_AND_C075FB49_TRANSCRIPTION.json",
+        "candidate_changed_by_B": false
       }
     },
     "a76_ff2462bb": {
@@ -295,8 +297,9 @@
     },
     "next_hd_rework": {
       "asset": "C075FB49",
-      "transcription_segments": 14,
-      "status": "READY_FOR_CANONICAL_HD_RENDER"
+      "transcription_segments": 16,
+      "expected_physical_text_occurrences": 17,
+      "status": "TRANSCRIPTION_EXPANDED_READY_FOR_CANONICAL_HD_RENDER"
     }
   },
   "runtime_packages": {
@@ -582,6 +585,41 @@
     "header_128_exact": true,
     "outside_cells_exact": true,
     "raw_orientation": "mirror_y",
-    "status": "PENDING_B_C_D_STRICT_QA"
+    "status": "B86_FIRST_QA_PASS_PENDING_C_D_INGAME",
+    "b_first_qa_report": "localization/graphics/role_B/20260927-1800-B86/B86_411827E_FIRST_QA_AND_C075FB49_TRANSCRIPTION.json"
+  },
+  "b86_411827e": {
+    "timestamp_kst": "2026-09-27T18:00:42+09:00",
+    "candidate_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
+    "canonical_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+    "result": "PASS_FIRST_QA_PENDING_C_D_INGAME",
+    "semantic_entries": 7,
+    "physical_regions": 7,
+    "changed_pixels_total": 214082,
+    "outside_cells_changed_pixels": 0,
+    "introduced_alpha_outside_cells": 0,
+    "candidate_changed_by_B": false,
+    "report": "localization/graphics/role_B/20260927-1800-B86/B86_411827E_FIRST_QA_AND_C075FB49_TRANSCRIPTION.json"
+  },
+  "b86_c075fb49_transcription": {
+    "timestamp_kst": "2026-09-27T18:00:42+09:00",
+    "prior_semantic_entries": 14,
+    "reviewed_semantic_entries": 16,
+    "expected_physical_text_occurrences": 17,
+    "new_omissions": [
+      {
+        "source": "Maximum Speed",
+        "korean": "최고 속도"
+      },
+      {
+        "source": "Transmission",
+        "korean": "변속기"
+      }
+    ],
+    "duplicate_physical_occurrences": {
+      "More BGM": 2
+    },
+    "status": "TRANSCRIPTION_EXPANDED_READY_FOR_CANONICAL_HD_RENDER",
+    "report": "localization/graphics/role_B/20260927-1800-B86/B86_411827E_FIRST_QA_AND_C075FB49_TRANSCRIPTION.json"
   }
 }

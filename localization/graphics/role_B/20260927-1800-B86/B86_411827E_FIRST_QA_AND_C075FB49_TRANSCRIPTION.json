@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B86",
+  "timestamp_kst": "2026-09-27T18:00:42+09:00",
+  "base_head": "8cade40b87c775acd79cd4333c4e80d3534e5180",
+  "411827E": {
+    "canonical_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+    "candidate_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+    "result": "PASS_FIRST_QA_PENDING_C_D_INGAME",
+    "candidate_changed_by_B": false,
+    "structure": {
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "bytes": 16777344,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "header_128_exact": true,
+      "raw_orientation": "mirror_y"
+    },
+    "coverage": {
+      "semantic_entries": 7,
+      "physical_regions": 7
+    },
+    "changed_pixels_total": 214082,
+    "outside_7_cells_changed_pixels": 0,
+    "introduced_alpha_outside_7_cells": 0,
+    "protected_original": [
+      "288GTO",
+      "Testarossa",
+      "F40",
+      "Enzo Ferrari",
+      "2P/4P/3P/1P",
+      "vehicle/control artwork"
+    ],
+    "visual_qa": {
+      "readable": "PASS",
+      "raw": "PASS_MIRROR_Y_PRESERVED",
+      "white_background_alpha": "PASS",
+      "source_language_residue": "NONE_OBSERVED",
+      "clipping_or_overlap": "NONE_OBSERVED",
+      "box_escape": "NONE_OBSERVED",
+      "black_line_or_seam": "NONE_OBSERVED",
+      "opaque_box": "NONE_OBSERVED",
+      "alpha_halo": "NONE_OBSERVED",
+      "style_fidelity": "PASS_SOURCE_FAMILY"
+    },
+    "qa_artifacts": {
+      "readable": "localization/graphics/role_A/20260927-1730-A85/A85_411827E_READABLE_QA.png",
+      "raw": "localization/graphics/role_A/20260927-1730-A85/A85_411827E_RAW_QA.png",
+      "white_alpha": "localization/graphics/role_A/20260927-1730-A85/A85_411827E_WHITE_ALPHA_QA.jpg",
+      "compare": "localization/graphics/role_A/20260927-1730-A85/A85_411827E_SOURCE_CANDIDATE_COMPARE.png"
+    },
+    "in_game_validation": "NOT_PERFORMED",
+    "approval": "NOT_PROMOTED_PENDING_C_D_AND_INGAME"
+  },
+  "C075FB49_transcription": {
+    "prior_semantic_entries": 14,
+    "reviewed_semantic_entries": 16,
+    "expected_physical_text_occurrences": 17,
+    "new_omissions": [
+      {
+        "source": "Maximum Speed",
+        "korean": "최고 속도"
+      },
+      {
+        "source": "Transmission",
+        "korean": "변속기"
+      }
+    ],
+    "duplicate_physical_occurrences": {
+      "More BGM": 2
+    },
+    "preserve_original": [
+      "OutRun2SP",
+      "OutRun2",
+      "1P",
+      "Ferrari model names",
+      "vehicle artwork"
+    ],
+    "status": "TRANSCRIPTION_EXPANDED_READY_FOR_CANONICAL_HD_RENDER"
+  },
+  "next_asset": "C075FB49_512x512.dds",
+  "build_performed": false,
+  "vr_ffb_changes": false
+}
