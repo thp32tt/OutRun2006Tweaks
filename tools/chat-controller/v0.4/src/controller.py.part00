@@ -101,6 +101,9 @@ ASSISTANT_MESSAGE_SELECTORS = [
     "[data-message-author-role='assistant']",
 ]
 
+THINKING_CACHE_TTL_SECONDS = 3600
+_thinking_verified_cache: dict[int, tuple[str, float, str]] = {}
+
 INPUT_SELECTORS = [
     "#prompt-textarea",
     "div#prompt-textarea",
