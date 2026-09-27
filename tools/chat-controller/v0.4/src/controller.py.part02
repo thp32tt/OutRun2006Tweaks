@@ -146,6 +146,56 @@ async def slot_page(context: BrowserContext, pages: dict[str, Page], slot: Slot)
     return page
 
 
+async def recover_slot_composer(context: BrowserContext, pages: dict[str, Page], slot: Slot, page: Page) -> Page:
+    """Self-heal a retry/error-only tab without adding extra prompt sends."""
+    if await first_visible(page, INPUT_SELECTORS, total_wait_ms=2500) is not None:
+        return page
+
+    retry = await first_visible(page, RETRY_SELECTORS, total_wait_ms=800)
+    log.warning("composer missing slot=%s retry_visible=%s url=%s; refreshing once", slot.name, retry is not None, page.url)
+
+    # Recovery 1: reload the same persisted conversation once.
+    target = slot.url if slot.url and is_persistable_chat_url(slot.url) else BASE_URL
+    try:
+        await page.goto(target, wait_until="domcontentloaded", timeout=60000)
+        await page.wait_for_timeout(1500)
+        if await first_visible(page, INPUT_SELECTORS, total_wait_ms=5000) is not None:
+            return page
+    except Exception:
+        log.exception("composer recovery refresh failed slot=%s", slot.name)
+
+    # Recovery 2: replace only the broken slot tab and reopen the persisted chat.
+    try:
+        if not page.is_closed():
+            await page.close()
+    except Exception:
+        pass
+    page = await context.new_page()
+    pages[slot.name] = page
+    try:
+        await page.goto(target, wait_until="domcontentloaded", timeout=60000)
+        await page.wait_for_timeout(1500)
+        if await first_visible(page, INPUT_SELECTORS, total_wait_ms=5000) is not None:
+            return page
+    except Exception:
+        log.exception("composer recovery new-tab persisted-chat failed slot=%s", slot.name)
+
+    # Recovery 3: if the saved conversation itself is broken, start a clean home
+    # composer. The caller will send the full role prompt, and a new durable URL
+    # will replace the stale one after successful send.
+    try:
+        await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
+        await page.wait_for_timeout(1500)
+        if await first_visible(page, INPUT_SELECTORS, total_wait_ms=5000) is not None:
+            slot.url = None
+            slot.last_assistant_hash = None
+            slot.last_assistant_change_at = None
+            save_registry(load_registry(datetime.now(TZ)))
+    except Exception:
+        log.exception("composer recovery clean-home failed slot=%s", slot.name)
+    return page
+
+
 async def replace_with_fresh_slot_page(context: BrowserContext, pages: dict[str, Page], slot: Slot) -> Page:
     """Start each scheduled N100 run in a brand-new tab/chat and close the previous one."""
     old = pages.get(slot.name)
