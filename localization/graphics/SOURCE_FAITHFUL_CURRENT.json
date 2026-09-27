@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-27T17:19:04+09:00",
+  "updated_at_kst": "2026-09-27T18:13:44+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -12,9 +12,9 @@
   ],
   "mandatory_policy": "localization/graphics/ORIENTATION_POLICY.md",
   "automation_checkpoint": {
-    "run": "D80-final-qa-reconcile-20260927",
+    "run": "D81-final-qa-reconcile-20260927",
     "result": "NO_NEW_APPROVALS",
-    "note": "Three USER_APPROVED_LOCKED DDS reverified unchanged. B85 changed C4A2937B and 2DA43E41; D80 validates both current SHAs structurally/raw/readable but C and in-game gates remain."
+    "note": "Three USER_APPROVED_LOCKED DDS reverified unchanged. 411827E A85/B86 same SHA passes D81 direct static/raw/readable/containment QA but C and in-game gates remain."
   },
   "latest_promoted_batch": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
   "latest_rejected_batch": "localization/graphics/BATCH51_REJECTED_REPORT.json",
@@ -128,7 +128,7 @@
     "dimensions": "read_from_dds_header",
     "old_candidates": "historical_until_rebuilt_or_revalidated_against_HD"
   },
-  "latest_d_final_qa_report": "localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json",
+  "latest_d_final_qa_report": "localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json",
   "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json",
   "post_d78_c78_update": {
     "asset": "39229D64",
@@ -160,5 +160,10 @@
       "result": "D80_PREFLIGHT_PASS_PENDING_C_INGAME"
     },
     "report": "localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json"
+  },
+  "d81_411827e_resolution": {
+    "candidate_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
+    "result": "D81_PREFLIGHT_PASS_PENDING_C_INGAME",
+    "report": "localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json"
   }
 }

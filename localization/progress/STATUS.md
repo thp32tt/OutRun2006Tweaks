@@ -396,3 +396,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - 411827E: A85 SHA 8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02 B FIRST QA PASS, candidate unchanged; 7 semantic / 7 physical, 2048×2048 RGBA32/1 mip, exact header, raw mirror_y, outside-cell changes 0, introduced alpha outside 0. C/D + in-game remain.
 - C075FB49: HD omission review expanded transcription 14 -> 16 semantic / 17 expected physical by adding Maximum Speed -> 최고 속도 and Transmission -> 변속기; More BGM occurs twice.
 - Next production target: C075FB49_512x512.dds.
+
+## D81 final QA checkpoint — 2026-09-27 18:13 KST
+- 411827E A85/B86 current SHA 8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02: D81 direct header/containment/raw/readable/white-background QA PASS; HOLD_PENDING_C_INGAME.
+- 2048×2048 RGBA32 / 1 mip / exact canonical header. 214,082 changed pixels; outside 7 source cells = 0; introduced alpha outside = 0.
+- 7 semantic / 7 physical translations reviewed; protected Ferrari model names, player labels and vehicle/control artwork preserved.
+- C4A2937B and 2DA43E41 remain D80 preflight PASS pending C + in-game. FA7BBB13, 39229D64 and A064FDFC remain final-static PASS pending in-game only.
+- approved_dds remains 3 USER_APPROVED_LOCKED assets; hashes reverified unchanged. No new promotion.
+- Next production target: C075FB49, B86-expanded 16 semantic / 17 physical occurrences.
+- LOCALIZATION_STATE_OK and Domain Isolation PASS; VR/FFB source/history contamination not observed. No build performed.
+- Machine report: localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json.

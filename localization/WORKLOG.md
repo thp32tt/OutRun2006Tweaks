@@ -734,3 +734,18 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Continued production review on next P1 target C075FB49. Canonical HD inspection found two untranslated UI labels omitted from pass-6 transcription: Maximum Speed -> 최고 속도 and Transmission -> 변속기.
 - C075FB49 transcription expanded from 14 to 16 semantic strings / 17 expected physical occurrences because More BGM appears twice. OutRun2SP/OutRun2, 1P, Ferrari model names and vehicle artwork remain preserve-original.
 - Next: render C075FB49 directly on canonical 2048×2048 HD DDS; 411827E still requires C/D + in-game. No build, VR or FFB work.
+
+## 2026-09-27 18:13 KST — D81 final QA reconciliation
+
+- Started from latest remote HEAD 57f6b0988ac794468d1d80369195d9dd5576b855 and re-read the mandatory localization policy/state files.
+- 411827E A85/B86 candidate SHA 8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02 was independently compared against canonical HD SHA bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364.
+- Structural QA PASS: 2048×2048 RGBA32, 1 mip, 16,777,344 bytes, exact canonical 128-byte DDS header, raw mirror_y preserved.
+- Pixel/alpha containment PASS: 214,082 changed pixels total; changed pixels outside the 7 declared source cells = 0; introduced alpha outside = 0.
+- Semantic/style review PASS for Automatic→자동, seconds→초, More Engine sound→엔진음 크게, TUNED→튜닝, NORMAL→일반, RANDOM→무작위, Recommendation→추천. 288GTO/Testarossa/F40/Enzo Ferrari, player-number labels and vehicle/control artwork remain preserved.
+- Readable/raw/white-background QA found no observed residual source text, broken Hangul, clipping/overlap, source-cell escape, seam/black line, opaque box or alpha halo.
+- No promotion: C strict QA for this SHA and in-game screenshot validation are still absent. D81 status is D81_PREFLIGHT_PASS_PENDING_C_INGAME.
+- Existing D80 C4A2937B/2DA43E41 preflight holds and final-static FA7BBB13/39229D64/A064FDFC in-game holds remain unchanged.
+- Existing approved_dds remains exactly the three USER_APPROVED_LOCKED DDS; hashes reverified.
+- B86 expanded C075FB49 to 16 semantic / 17 expected physical regions (Maximum Speed→최고 속도, Transmission→변속기; More BGM x2). It remains the next production target.
+- LOCALIZATION_STATE_OK and Domain Isolation PASS; no VR/FFB source diff or merge commit. Build not run.
+- Report: localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json.

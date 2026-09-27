@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T18:00:42+09:00",
+  "updated_at_kst": "2026-09-27T18:13:44+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "411827E A85 candidate passed B86 first QA unchanged; C/D and in-game remain. C075FB49 canonical-HD omission review expanded transcription 14 -> 16 semantic / 17 expected physical by adding Maximum Speed and Transmission; continue C075FB49 HD render.",
+  "next_checkpoint": "411827E A85/B86 same SHA passes D81 direct header/containment/raw/readable/white-background preflight, but C strict QA and in-game validation remain. C4A2937B/2DA43E41 still need C + in-game; FA7BBB13/39229D64/A064FDFC remain in-game-only holds. Continue C075FB49 canonical-HD production independently.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -257,7 +257,7 @@
       "coverage": "7 semantic / 7 physical",
       "candidate_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
       "report": "localization/graphics/role_A/20260927-1730-A85/A85_411827E_PRODUCTION_REPORT.json",
-      "status": "B86_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "status": "D81_PREFLIGHT_PASS_PENDING_C_INGAME",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
       "b_first_qa_report": "localization/graphics/role_B/20260927-1800-B86/B86_411827E_FIRST_QA_AND_C075FB49_TRANSCRIPTION.json",
       "candidate_changed_by_B": false,
@@ -267,7 +267,8 @@
         "F40",
         "Enzo Ferrari",
         "player-number labels"
-      ]
+      ],
+      "d_preflight_report": "localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
       "asset": "C075FB49",
@@ -276,15 +277,16 @@
       "status": "TRANSCRIPTION_EXPANDED_READY_FOR_CANONICAL_HD_RENDER"
     },
     "latest_d_final_qa": {
-      "run": "D80",
-      "report": "localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json",
+      "run": "D81",
+      "report": "localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json",
       "result": "NO_NEW_APPROVALS",
       "approved_dds_count": 3,
       "FA7BBB13": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
       "39229D64": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
       "C4A2937B": "D80_PREFLIGHT_PASS_PENDING_C_INGAME",
-      "2DA43E41": "D80_PREFLIGHT_PASS_PENDING_C_INGAME"
+      "2DA43E41": "D80_PREFLIGHT_PASS_PENDING_C_INGAME",
+      "411827E": "D81_PREFLIGHT_PASS_PENDING_C_INGAME"
     },
     "latest_c_strict_qa": {
       "asset": "A064FDFC",
