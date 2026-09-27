@@ -13,8 +13,9 @@ namespace OutRunVR::Dxvk
 {
     namespace
     {
-        // Historical stock-DXVK D3D9 Vulkan interop IID already used by the
-        // previous PoC. This is detection only; no custom fork API is armed.
+        // Stock DXVK D3D9 Vulkan interop IID. Verified against official DXVK
+        // v3.1 and current master d3d9_interfaces.h on 2026-09-28. Detection
+        // only: no custom fork API is armed.
         const GUID DxvkVkInteropDeviceIid{
             0x2eaa4b89u, 0x0107u, 0x4bdbu,
             { 0x87u, 0xf7u, 0x0fu, 0x54u, 0x1cu, 0x49u, 0x3cu, 0xe0u }
