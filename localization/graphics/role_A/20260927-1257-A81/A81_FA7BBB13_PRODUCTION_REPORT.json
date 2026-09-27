@@ -1,0 +1,422 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A81",
+  "timestamp_kst": "2026-09-27T12:57:00+09:00",
+  "base_head": "3bc6a16b17a5330a4dfe722708fc8b0d3eb07ac8",
+  "asset": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+  "canonical_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+  "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+  "dimensions": [
+    4096,
+    2048
+  ],
+  "bytes": 33554560,
+  "semantic_entries_materialized": 17,
+  "localized_regions": 17,
+  "dds_header_128_byte_exact_to_canonical": true,
+  "format": "RGBA32",
+  "mipmaps": 1,
+  "raw_orientation": "mirror_y",
+  "outside_17_text_cells_byte_exact_to_canonical": true,
+  "readable_orientation_visual_qa": "PASS_FOR_B_FIRST_QA",
+  "raw_orientation_visual_qa": "PASS_MIRROR_Y_PRESERVED",
+  "in_game_validation": "NOT_PERFORMED_PENDING_B_C_D_AND_USER_RUNTIME",
+  "style": "yellow_navy_white source-family treatment; long Korean text reduced/condensed only within source cells",
+  "edits": [
+    {
+      "key": "match_total",
+      "source": "Match the total!",
+      "korean": "합계를 맞히세요!",
+      "readable_cell": [
+        92,
+        18,
+        681,
+        123
+      ],
+      "candidate_alpha_bbox": [
+        135,
+        27,
+        637,
+        113
+      ],
+      "render": {
+        "font_size": 71,
+        "outer_stroke": 8,
+        "inner_stroke": 4,
+        "xscale": 1.0
+      }
+    },
+    {
+      "key": "count_gifts",
+      "source": "Count the gifts!",
+      "korean": "선물을 세세요!",
+      "readable_cell": [
+        92,
+        110,
+        681,
+        210
+      ],
+      "candidate_alpha_bbox": [
+        178,
+        121,
+        594,
+        199
+      ],
+      "render": {
+        "font_size": 68,
+        "outer_stroke": 7,
+        "inner_stroke": 4,
+        "xscale": 1.0
+      }
+    },
+    {
+      "key": "hit_boost",
+      "source": "Hit the boost!",
+      "korean": "부스트를 밟으세요!",
+      "readable_cell": [
+        883,
+        18,
+        1403,
+        123
+      ],
+      "candidate_alpha_bbox": [
+        885,
+        29,
+        1401,
+        112
+      ],
+      "render": {
+        "font_size": 71,
+        "outer_stroke": 8,
+        "inner_stroke": 4,
+        "xscale": 0.9117
+      }
+    },
+    {
+      "key": "keep_control",
+      "source": "Keep control!",
+      "korean": "차량을 제어하세요!",
+      "readable_cell": [
+        883,
+        110,
+        1403,
+        210
+      ],
+      "candidate_alpha_bbox": [
+        885,
+        119,
+        1401,
+        200
+      ],
+      "render": {
+        "font_size": 68,
+        "outer_stroke": 7,
+        "inner_stroke": 4,
+        "xscale": 0.9538
+      }
+    },
+    {
+      "key": "hold_line",
+      "source": "Hold the line!",
+      "korean": "라인을 유지하세요!",
+      "readable_cell": [
+        1644,
+        18,
+        2181,
+        123
+      ],
+      "candidate_alpha_bbox": [
+        1646,
+        28,
+        2179,
+        113
+      ],
+      "render": {
+        "font_size": 71,
+        "outer_stroke": 8,
+        "inner_stroke": 4,
+        "xscale": 0.945
+      }
+    },
+    {
+      "key": "honk_horn",
+      "source": "Honk the horn!",
+      "korean": "경적을 울리세요!",
+      "readable_cell": [
+        1882,
+        110,
+        2470,
+        210
+      ],
+      "candidate_alpha_bbox": [
+        1937,
+        121,
+        2414,
+        199
+      ],
+      "render": {
+        "font_size": 68,
+        "outer_stroke": 7,
+        "inner_stroke": 4,
+        "xscale": 1.0
+      }
+    },
+    {
+      "key": "do_math",
+      "source": "Do the math!",
+      "korean": "계산하세요!",
+      "readable_cell": [
+        2683,
+        110,
+        3200,
+        215
+      ],
+      "candidate_alpha_bbox": [
+        2764,
+        120,
+        3118,
+        205
+      ],
+      "render": {
+        "font_size": 71,
+        "outer_stroke": 8,
+        "inner_stroke": 4,
+        "xscale": 1.0
+      }
+    },
+    {
+      "key": "guess_sound",
+      "source": "Guess the sound!",
+      "korean": "소리를 맞혀 보세요!",
+      "readable_cell": [
+        3366,
+        110,
+        4076,
+        215
+      ],
+      "candidate_alpha_bbox": [
+        3429,
+        119,
+        4012,
+        205
+      ],
+      "render": {
+        "font_size": 71,
+        "outer_stroke": 8,
+        "inner_stroke": 4,
+        "xscale": 1.0
+      }
+    },
+    {
+      "key": "count_green",
+      "source": "Count Green Cars!",
+      "korean": "초록색 차를 세세요!",
+      "readable_cell": [
+        20,
+        210,
+        691,
+        323
+      ],
+      "candidate_alpha_bbox": [
+        39,
+        222,
+        671,
+        311
+      ],
+      "render": {
+        "font_size": 77,
+        "outer_stroke": 8,
+        "inner_stroke": 4,
+        "xscale": 1.0
+      }
+    },
+    {
+      "key": "count_blue",
+      "source": "Count Blue Cars!",
+      "korean": "파란색 차를 세세요!",
+      "readable_cell": [
+        768,
+        210,
+        1395,
+        323
+      ],
+      "candidate_alpha_bbox": [
+        770,
+        222,
+        1393,
+        310
+      ],
+      "render": {
+        "font_size": 77,
+        "outer_stroke": 8,
+        "inner_stroke": 4,
+        "xscale": 0.9858
+      }
+    },
+    {
+      "key": "count_sheep",
+      "source": "Count the sheep!",
+      "korean": "양을 세세요!",
+      "readable_cell": [
+        2701,
+        210,
+        3392,
+        323
+      ],
+      "candidate_alpha_bbox": [
+        2845,
+        222,
+        3247,
+        310
+      ],
+      "render": {
+        "font_size": 77,
+        "outer_stroke": 8,
+        "inner_stroke": 4,
+        "xscale": 1.0
+      }
+    },
+    {
+      "key": "count_red",
+      "source": "Count Red Cars!",
+      "korean": "빨간색 차를 세세요!",
+      "readable_cell": [
+        2765,
+        358,
+        3405,
+        463
+      ],
+      "candidate_alpha_bbox": [
+        2794,
+        368,
+        3376,
+        453
+      ],
+      "render": {
+        "font_size": 71,
+        "outer_stroke": 8,
+        "inner_stroke": 4,
+        "xscale": 1.0
+      }
+    },
+    {
+      "key": "memorize_sequence",
+      "source": "Memorize the sequence!",
+      "korean": "순서를 기억하세요!",
+      "readable_cell": [
+        0,
+        456,
+        786,
+        568
+      ],
+      "candidate_alpha_bbox": [
+        91,
+        468,
+        695,
+        556
+      ],
+      "render": {
+        "font_size": 76,
+        "outer_stroke": 8,
+        "inner_stroke": 4,
+        "xscale": 1.0
+      }
+    },
+    {
+      "key": "drive_above_speed",
+      "source": "Drive above the speed!",
+      "korean": "지정 속도 이상으로 달리세요!",
+      "readable_cell": [
+        786,
+        456,
+        1562,
+        568
+      ],
+      "candidate_alpha_bbox": [
+        788,
+        468,
+        1560,
+        556
+      ],
+      "render": {
+        "font_size": 76,
+        "outer_stroke": 8,
+        "inner_stroke": 4,
+        "xscale": 0.8419
+      }
+    },
+    {
+      "key": "spot_odd",
+      "source": "Spot the odd one out!",
+      "korean": "다른 하나를 찾으세요!",
+      "readable_cell": [
+        1562,
+        456,
+        2324,
+        568
+      ],
+      "candidate_alpha_bbox": [
+        1598,
+        466,
+        2288,
+        557
+      ],
+      "render": {
+        "font_size": 76,
+        "outer_stroke": 8,
+        "inner_stroke": 4,
+        "xscale": 1.0
+      }
+    },
+    {
+      "key": "slipstream_cars",
+      "source": "Slipstream the cars!",
+      "korean": "차량 뒤에서 슬립스트림하세요!",
+      "readable_cell": [
+        2324,
+        456,
+        2924,
+        568
+      ],
+      "candidate_alpha_bbox": [
+        2326,
+        475,
+        2922,
+        549
+      ],
+      "render": {
+        "font_size": 61,
+        "outer_stroke": 7,
+        "inner_stroke": 3,
+        "xscale": 0.7651
+      }
+    },
+    {
+      "key": "run_green",
+      "source": "Run through green!",
+      "korean": "초록색을 통과하세요!",
+      "readable_cell": [
+        2924,
+        456,
+        3648,
+        568
+      ],
+      "candidate_alpha_bbox": [
+        2949,
+        467,
+        3622,
+        556
+      ],
+      "render": {
+        "font_size": 76,
+        "outer_stroke": 8,
+        "inner_stroke": 4,
+        "xscale": 1.0
+      }
+    }
+  ],
+  "status": "A81_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA",
+  "next_asset_after_static_gate": "39229D64_1024x1024.dds"
+}

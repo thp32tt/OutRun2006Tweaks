@@ -521,3 +521,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - C76 strict gate PASS: DXT5, 13 mip levels, 4096x4096, canonical header exact; all compressed payload outside the scaled text-block ranges is byte-identical to canonical.
 - D75 static gate PASS_PENDING_INGAME; no approved_dds promotion. The zippers wording remains an in-game context confirmation item.
 - A80 SHA-256: be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c. Next production target: FA7BBB13.
+
+## 2026-09-27 12:57 KST — A81 FA7BBB13 HD rebuild
+
+- Continued from the 568D3696 D75 static gate to the next P1 HD rework asset FA7BBB13.
+- Rebuilt all 17/17 reviewed mini-game instruction regions directly on the canonical 4096×2048 HD DDS; no legacy Korean DDS was upscaled.
+- Preserved raw mirror_y orientation, exact 128-byte DDS header, RGBA32 layout, alpha behavior and all non-text artwork.
+- Candidate payload bytes outside the 17 source text cells are byte-identical to canonical.
+- Readable/game orientation and raw DDS orientation manual QA: PASS for A-stage handoff; no clipping, seam, opaque box, black-line or source-English residue observed.
+- Candidate SHA-256: 3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d.
+- Candidate: localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds.
+- Next: B/C/D static QA; no approved promotion or in-game claim made. On gate pass, continue 39229D64.

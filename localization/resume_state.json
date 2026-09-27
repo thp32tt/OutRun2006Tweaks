@@ -7,7 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "HD GRAPHICS: 568D3696 A80 passed B81/C76/D75 static QA and is pending in-game/context approval; start FA7BBB13 canonical-HD rebuild.",
+    "HD GRAPHICS: FA7BBB13 A81 production is complete 17/17; run B/C/D static QA. If it passes, continue 39229D64 canonical-HD rebuild.",
     "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
     "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
     "Never upscale prior stock-resolution Korean DDS candidates.",
@@ -125,9 +125,9 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_D/20260927-1245-D75/D75_568D3696_FINAL_STATIC_GATE.json",
-    "hd_rework_candidates_ready": 2,
-    "hd_rework_remaining": 11,
+    "latest_hd_rework_batch": "localization/graphics/role_A/20260927-1257-A81/A81_FA7BBB13_PRODUCTION_REPORT.json",
+    "hd_rework_candidates_ready": 3,
+    "hd_rework_remaining": 10,
     "hd_partial_rework": {
       "FF2462BB": {
         "status": "STATIC_QA_PASS_PENDING_INGAME",
@@ -146,6 +146,15 @@
         "localized_regions": 14,
         "remaining_segments": 0,
         "report": "localization/graphics/role_D/20260927-1245-D75/D75_568D3696_FINAL_STATIC_GATE.json"
+      },
+      "FA7BBB13": {
+        "status": "A_PRODUCTION_COMPLETE_PENDING_B_C_D",
+        "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
+        "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+        "completed_transcription_entries": 17,
+        "localized_regions": 17,
+        "remaining_segments": 0,
+        "report": "localization/graphics/role_A/20260927-1257-A81/A81_FA7BBB13_PRODUCTION_REPORT.json"
       }
     },
     "a76_ff2462bb": {
@@ -242,5 +251,16 @@
     "context_followup": [
       "Hit the zippers! wording"
     ]
+  },
+  "a81_fa7bbb13": {
+    "timestamp_kst": "2026-09-27T12:57:00+09:00",
+    "semantic_entries_materialized": 17,
+    "semantic_entries_total": 17,
+    "localized_regions": 17,
+    "remaining_entries": 0,
+    "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+    "report": "localization/graphics/role_A/20260927-1257-A81/A81_FA7BBB13_PRODUCTION_REPORT.json",
+    "status": "PENDING_B_C_D_STRICT_QA"
   }
 }

@@ -228,3 +228,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 
 - A80/B81/C76/D75: STATIC_QA_PASS_PENDING_INGAME; SHA-256 be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c.
 - DXT5 13-mip structure and canonical non-text compressed blocks preserved. Next: FA7BBB13.
+
+## A81 FA7BBB13 checkpoint — 2026-09-27 12:57 KST
+
+- 17/17 reviewed mini-game instruction regions rebuilt on canonical 4096×2048 HD source.
+- Candidate SHA-256: 3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d.
+- DDS header exact, RGBA32/1 mip preserved; raw mirror_y and readable orientations reviewed.
+- All payload bytes outside the 17 text cells remain canonical bytes.
+- Status: A_PRODUCTION_COMPLETE_PENDING_B_C_D; in-game approval not claimed. Next asset after static gate: 39229D64.

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T12:45:00+09:00",
+  "updated_at_kst": "2026-09-27T12:57:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "568D3696 A80 passed B81/C76/D75 static gates and awaits in-game/context approval; continue next P1 HD rework asset FA7BBB13.",
+  "next_checkpoint": "FA7BBB13 A81 production is complete for all 17 transcribed regions; run B/C/D static QA before in-game approval, then continue P1 HD rework asset 39229D64.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -253,14 +253,12 @@
     "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
     "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "latest_hd_production_candidate": {
-      "asset": "568D3696",
-      "coverage": "14/14",
-      "candidate_sha256": "be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c",
-      "report": "localization/graphics/role_A/20260927-1240-A80/A80_568D3696_PRODUCTION_REPORT.json",
-      "status": "STATIC_QA_PASS_PENDING_INGAME",
-      "b_report": "localization/graphics/role_B/20260927-1245-B81/B81_568D3696_VISUAL_QA_PASS.json",
-      "c_report": "localization/graphics/role_C/20260927-1245-C76/C76_568D3696_STRICT_QA.json",
-      "d_report": "localization/graphics/role_D/20260927-1245-D75/D75_568D3696_FINAL_STATIC_GATE.json"
+      "asset": "FA7BBB13",
+      "coverage": "17/17",
+      "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
+      "report": "localization/graphics/role_A/20260927-1257-A81/A81_FA7BBB13_PRODUCTION_REPORT.json",
+      "status": "A_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
     }
   },
   "data_build": {
