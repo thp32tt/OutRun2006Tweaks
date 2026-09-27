@@ -306,6 +306,34 @@ namespace Game
 			(*Game::current_mode == GameState::STATE_START && *Game::game_start_progress_code == 65);
 	}
 
+	// R65: one authoritative presentation predicate for both renderer-side
+	// head/WVP injection and D3D9 stereo duplication. START stays theater until
+	// the game's progress code reaches 65, matching the proven stereo-ready
+	// boundary and preventing a half-VR pre-grid interval.
+	inline bool is_vr_gameplay_presentation()
+	{
+		if (!Game::current_mode)
+			return false;
+
+		switch (*Game::current_mode)
+		{
+		case GameState::STATE_START:
+			return Game::game_start_progress_code &&
+				*Game::game_start_progress_code == 65;
+		case GameState::STATE_WARP:
+		case GameState::STATE_RESTART:
+		case GameState::STATE_GAME:
+		case GameState::STATE_GIVEUP:
+		case GameState::STATE_SMPAUSEMENU:
+		case GameState::STATE_GOAL:
+		case GameState::STATE_TIMEUP:
+		case GameState::STATE_LINK_TIMEUP:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	inline const char* StageNames[] = {
 		"Palm Beach",
 		"Deep Lake", "Industrial Complex",
