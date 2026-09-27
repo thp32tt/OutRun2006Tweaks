@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-27T21:22:59+09:00",
+  "updated_at_kst": "2026-09-28T00:43:27+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -117,7 +117,7 @@
     "old_candidates": "historical_until_rebuilt_or_revalidated_against_HD"
   },
   "latest_d_final_qa_report": "localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json",
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json",
   "post_d78_c78_update": {
     "asset": "39229D64",
     "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
@@ -236,5 +236,17 @@
     "P0_HD_TRIO": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
     "current_approved_lock_count": 0,
     "report": "localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json"
+  },
+  "post_b90_c83_update": {
+    "result": "D6DC1380_48DEBE77_C83_STATIC_PASS_PENDING_D_INGAME",
+    "candidate_changed_by_C": false,
+    "current_approved_lock_count": 0,
+    "assets": {
+      "D6DC1380": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+      "48DEBE77": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0"
+    },
+    "hd_rework_candidates_ready": 16,
+    "hd_rework_remaining": 0,
+    "note": "Final two CREATE_NEW_HD candidates pass independent C83 static QA unchanged. D + mandatory in-game screenshots remain; no promotion."
   }
 }

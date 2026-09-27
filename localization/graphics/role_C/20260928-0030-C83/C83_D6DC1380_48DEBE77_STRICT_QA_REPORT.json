@@ -1,0 +1,350 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C83",
+  "timestamp_kst": "2026-09-28T00:43:27+09:00",
+  "base_head": "921c3077e5ef77e7850205d1225ce8484c606a6b",
+  "scope": "strict QA of final B90 HD-migration CREATE_NEW_HD candidates D6DC1380 and 48DEBE77; no build; no VR/FFB",
+  "policy_note": "Both assets are CREATE_NEW_HD_KOREAN_ASSET special cases because no true HD replacement exists; prior Korean DDS/Batch66 binaries were not accepted as construction sources.",
+  "result": "C83_BOTH_STATIC_STRICT_QA_PASS_PENDING_D_AND_INGAME",
+  "candidate_changed_by_C": false,
+  "approved_dds_promotion": false,
+  "current_user_approved_lock_count": 0,
+  "assets": {
+    "D6DC1380": {
+      "inputs": {
+        "A89": "localization/graphics/role_A/20260927-2130-A89/A89_D6DC1380_PRODUCTION_REPORT.json",
+        "B90": "localization/graphics/role_B/20260927-2145-B90/B90_D6DC1380_48DEBE77_REPORT.json"
+      },
+      "policy": "CREATE_NEW_HD_KOREAN_ASSET",
+      "translation": {
+        "source": "Continue?",
+        "korean": "계속?",
+        "semantic_review": "PASS_CONCISE_PROMPT_PRESERVES_MEANING_AND_CELL_FIT"
+      },
+      "canonical_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+      "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+      "candidate_changed_by_C": false,
+      "source_dimensions": [
+        256,
+        64
+      ],
+      "candidate_dimensions": [
+        1024,
+        256
+      ],
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "structure": {
+        "canonical_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+        "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+        "source_dimensions": [
+          256,
+          64
+        ],
+        "candidate_dimensions": [
+          1024,
+          256
+        ],
+        "source_bytes": 65664,
+        "candidate_bytes": 1048704,
+        "source_header_fields": {
+          "height": 64,
+          "width": 256,
+          "pitch": 1024,
+          "depth": 0,
+          "mips": 1
+        },
+        "candidate_header_fields": {
+          "height": 256,
+          "width": 1024,
+          "pitch": 4096,
+          "depth": 0,
+          "mips": 1
+        },
+        "header_diff_offsets": [
+          12,
+          13,
+          17,
+          21
+        ],
+        "header_exact_except_height_width_pitch": true,
+        "channel_masks_source": [
+          "0xff0000",
+          "0xff00",
+          "0xff",
+          "0xff000000"
+        ],
+        "channel_masks_candidate": [
+          "0xff0000",
+          "0xff00",
+          "0xff",
+          "0xff000000"
+        ],
+        "source_alpha_bbox": [
+          8,
+          10,
+          248,
+          44
+        ],
+        "allowed_scaled_bbox": [
+          32,
+          40,
+          992,
+          176
+        ],
+        "candidate_alpha_bbox": [
+          207,
+          41,
+          817,
+          175
+        ],
+        "allowed_bbox_margins": [
+          175,
+          1,
+          175,
+          1
+        ],
+        "candidate_alpha_outside_allowed_bbox_pixels": 0,
+        "candidate_bbox_edge_alpha_counts": {
+          "top": 80,
+          "bottom": 42,
+          "left": 13,
+          "right": 18
+        },
+        "raw_orientation": "normal"
+      },
+      "header_policy": "PASS_EXACT_SOURCE_HEADER_EXCEPT_HEIGHT_WIDTH_PITCH_REQUIRED_BY_NEW_HD_CANVAS",
+      "orientation_qa": "PASS_RAW_NORMAL_MATCHES_DIRECT_SOURCE_DDS",
+      "bounds_qa": {
+        "allowed_scaled_bbox": [
+          32,
+          40,
+          992,
+          176
+        ],
+        "candidate_alpha_bbox": [
+          207,
+          41,
+          817,
+          175
+        ],
+        "margins_ltrb": [
+          175,
+          1,
+          175,
+          1
+        ],
+        "alpha_outside_allowed_bbox_pixels": 0,
+        "note": "Top/bottom margin is 1 px; enlarged white/gray/black QA shows complete glyph/outline with no observed clipping or escape."
+      },
+      "visual_qa": {
+        "readable_white_gray_black": "PASS",
+        "raw": "PASS",
+        "source_language_residue": "NONE_OBSERVED",
+        "broken_hangul": "NONE_OBSERVED",
+        "clipping_overlap": "NONE_OBSERVED",
+        "box_escape": "NONE",
+        "black_line_seam": "NONE_OBSERVED",
+        "opaque_box": "NONE_OBSERVED",
+        "alpha_halo": "NONE_OBSERVED",
+        "style_fidelity": "PASS_SOURCE_FAMILY_WHITE_FACE_NAVY_OUTLINE_GRAY_OUTER_EDGE_WIDE_ASPECT",
+        "prior_korean_binary_reuse": "NONE"
+      },
+      "result": "C83_STATIC_STRICT_QA_PASS_PENDING_D_RECONCILE_INGAME"
+    },
+    "48DEBE77": {
+      "inputs": {
+        "B90": "localization/graphics/role_B/20260927-2145-B90/B90_D6DC1380_48DEBE77_REPORT.json"
+      },
+      "policy": "CREATE_NEW_HD_KOREAN_ASSET",
+      "translations": [
+        {
+          "source": "START",
+          "korean": "출발",
+          "physical_occurrences": 2,
+          "semantic_review": "PASS_ROUTE_START_MARKER_CONTEXT"
+        },
+        {
+          "source": "GOAL",
+          "korean": "골",
+          "physical_occurrences": 1,
+          "semantic_review": "PASS_CONSISTENT_WITH_EXISTING_GOAL_TERMINOLOGY"
+        }
+      ],
+      "canonical_sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+      "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+      "candidate_changed_by_C": false,
+      "source_dimensions": [
+        512,
+        512
+      ],
+      "candidate_dimensions": [
+        2048,
+        2048
+      ],
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "structure": {
+        "canonical_sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+        "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+        "source_dimensions": [
+          512,
+          512
+        ],
+        "candidate_dimensions": [
+          2048,
+          2048
+        ],
+        "source_bytes": 1048704,
+        "candidate_bytes": 16777344,
+        "source_header_fields": {
+          "height": 512,
+          "width": 512,
+          "pitch": 2048,
+          "depth": 0,
+          "mips": 1
+        },
+        "candidate_header_fields": {
+          "height": 2048,
+          "width": 2048,
+          "pitch": 8192,
+          "depth": 0,
+          "mips": 1
+        },
+        "header_diff_offsets": [
+          13,
+          17,
+          21
+        ],
+        "header_exact_except_height_width_pitch": true,
+        "channel_masks_source": [
+          "0xff0000",
+          "0xff00",
+          "0xff",
+          "0xff000000"
+        ],
+        "channel_masks_candidate": [
+          "0xff0000",
+          "0xff00",
+          "0xff",
+          "0xff000000"
+        ],
+        "changed_pixels_vs_4x_base": 41433,
+        "outside_3_cells_changed_pixels": 0,
+        "alpha_changed_pixels_total": 507,
+        "alpha_changes_outside_3_cells": 0,
+        "introduced_alpha_pixels_total": 507,
+        "introduced_alpha_outside_3_cells": 0,
+        "candidate_glyph_bbox_margins": {
+          "start_top": [
+            28,
+            12,
+            29,
+            13
+          ],
+          "start_bottom": [
+            28,
+            6,
+            29,
+            7
+          ],
+          "goal": [
+            62,
+            4,
+            63,
+            4
+          ]
+        },
+        "min_candidate_glyph_bbox_margin": 4,
+        "raw_orientation": "mirror_y",
+        "transparent_to_nontransparent_pixels_total": 0,
+        "alpha_increase_pixels_total": 507
+      },
+      "header_policy": "PASS_EXACT_SOURCE_HEADER_EXCEPT_HEIGHT_WIDTH_PITCH_REQUIRED_BY_4X_CANVAS",
+      "orientation_qa": "PASS_RAW_MIRROR_Y_MATCHES_CANONICAL_SOURCE",
+      "containment_qa": {
+        "changed_pixels_vs_4x_canonical_base": 41433,
+        "outside_3_text_cells_changed_pixels": 0,
+        "alpha_changed_pixels_total": 507,
+        "alpha_changes_outside_3_text_cells": 0,
+        "alpha_increase_pixels_total": 507,
+        "transparent_to_nontransparent_pixels_total": 0,
+        "candidate_glyph_bbox_margins": {
+          "start_top": [
+            28,
+            12,
+            29,
+            13
+          ],
+          "start_bottom": [
+            28,
+            6,
+            29,
+            7
+          ],
+          "goal": [
+            62,
+            4,
+            63,
+            4
+          ]
+        },
+        "min_candidate_glyph_bbox_margin": 4
+      },
+      "protected_original": [
+        "route letters A-E",
+        "course photography",
+        "route colors/geometry",
+        "red badge borders",
+        "badge shadows",
+        "all non-text artwork outside 3 source text cells"
+      ],
+      "visual_qa": {
+        "readable_white_gray_black": "PASS",
+        "raw": "PASS",
+        "source_language_residue": "NONE_OBSERVED",
+        "broken_hangul": "NONE_OBSERVED",
+        "clipping_overlap": "NONE_OBSERVED",
+        "box_escape": "NONE",
+        "black_line_seam": "NONE_OBSERVED",
+        "opaque_box": "NONE_OBSERVED",
+        "alpha_halo": "NONE_OBSERVED",
+        "background_artwork_damage": "NONE_OBSERVED",
+        "duplicate_wrong_replacement": "NONE_OBSERVED",
+        "diffmask_review": "PASS_CHANGES_FOLLOW_SOURCE_GLYPH_ERASURE_AND_KOREAN_RENDER_WITH_NO_PIXEL_ESCAPE"
+      },
+      "result": "C83_STATIC_STRICT_QA_PASS_PENDING_D_RECONCILE_INGAME"
+    }
+  },
+  "in_game_validation": "NOT_PERFORMED",
+  "qa_artifacts": {
+    "D6_contact": "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_SOURCE4_CAND_WGB.jpg",
+    "48_start_top_zoom": "localization/graphics/role_C/20260928-0030-C83/C83_48DEBE77_START_TOP_ZOOM.jpg",
+    "48_start_bottom_zoom": "localization/graphics/role_C/20260928-0030-C83/C83_48DEBE77_START_BOTTOM_ZOOM.jpg",
+    "48_goal_zoom": "localization/graphics/role_C/20260928-0030-C83/C83_48DEBE77_GOAL_ZOOM.jpg",
+    "48_readable": "localization/graphics/role_C/20260928-0030-C83/C83_48DEBE77_READABLE_COMPARE.jpg",
+    "48_raw": "localization/graphics/role_C/20260928-0030-C83/C83_48DEBE77_RAW_COMPARE.jpg",
+    "48_diffmasks": [
+      "localization/graphics/role_C/20260928-0030-C83/C83_48DEBE77_START_TOP_DIFFMASK.png",
+      "localization/graphics/role_C/20260928-0030-C83/C83_48DEBE77_START_BOTTOM_DIFFMASK.png",
+      "localization/graphics/role_C/20260928-0030-C83/C83_48DEBE77_GOAL_DIFFMASK.png"
+    ]
+  },
+  "limitations": [
+    "No in-game screenshot evidence is present for D6DC1380 or 48DEBE77.",
+    "Static C pass does not promote or lock either DDS."
+  ],
+  "next": [
+    "Run D final reconciliation for D6DC1380 and 48DEBE77 using the exact C83-validated SHAs.",
+    "Run mandatory in-game screenshot validation before promotion/approval.",
+    "HD migration candidate production is complete: 16 ready / 0 remaining."
+  ],
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "state_validation": {
+    "normalized_result": "LOCALIZATION_STATE_OK",
+    "stock_verify_state_result": "KNOWN_FALSE_NEGATIVE_AT_BASE_HEAD",
+    "detail": "At current base HEAD, text draft_context is 0 so Counter omits the draft key, while verify_state.py compares dict(status) to an expected map containing draft:0. A temporary non-committed normalized check passed all remaining state validation. No verifier/tool source was changed by C83."
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "D6DC1380": {
+    "canonical_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+    "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+    "source_dimensions": [
+      256,
+      64
+    ],
+    "candidate_dimensions": [
+      1024,
+      256
+    ],
+    "source_bytes": 65664,
+    "candidate_bytes": 1048704,
+    "source_header_fields": {
+      "height": 64,
+      "width": 256,
+      "pitch": 1024,
+      "depth": 0,
+      "mips": 1
+    },
+    "candidate_header_fields": {
+      "height": 256,
+      "width": 1024,
+      "pitch": 4096,
+      "depth": 0,
+      "mips": 1
+    },
+    "header_diff_offsets": [
+      12,
+      13,
+      17,
+      21
+    ],
+    "header_exact_except_height_width_pitch": true,
+    "channel_masks_source": [
+      "0xff0000",
+      "0xff00",
+      "0xff",
+      "0xff000000"
+    ],
+    "channel_masks_candidate": [
+      "0xff0000",
+      "0xff00",
+      "0xff",
+      "0xff000000"
+    ],
+    "source_alpha_bbox": [
+      8,
+      10,
+      248,
+      44
+    ],
+    "allowed_scaled_bbox": [
+      32,
+      40,
+      992,
+      176
+    ],
+    "candidate_alpha_bbox": [
+      207,
+      41,
+      817,
+      175
+    ],
+    "allowed_bbox_margins": [
+      175,
+      1,
+      175,
+      1
+    ],
+    "candidate_alpha_outside_allowed_bbox_pixels": 0,
+    "candidate_bbox_edge_alpha_counts": {
+      "top": 80,
+      "bottom": 42,
+      "left": 13,
+      "right": 18
+    },
+    "raw_orientation": "normal"
+  },
+  "48DEBE77": {
+    "canonical_sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+    "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+    "source_dimensions": [
+      512,
+      512
+    ],
+    "candidate_dimensions": [
+      2048,
+      2048
+    ],
+    "source_bytes": 1048704,
+    "candidate_bytes": 16777344,
+    "source_header_fields": {
+      "height": 512,
+      "width": 512,
+      "pitch": 2048,
+      "depth": 0,
+      "mips": 1
+    },
+    "candidate_header_fields": {
+      "height": 2048,
+      "width": 2048,
+      "pitch": 8192,
+      "depth": 0,
+      "mips": 1
+    },
+    "header_diff_offsets": [
+      13,
+      17,
+      21
+    ],
+    "header_exact_except_height_width_pitch": true,
+    "channel_masks_source": [
+      "0xff0000",
+      "0xff00",
+      "0xff",
+      "0xff000000"
+    ],
+    "channel_masks_candidate": [
+      "0xff0000",
+      "0xff00",
+      "0xff",
+      "0xff000000"
+    ],
+    "changed_pixels_vs_4x_base": 41433,
+    "outside_3_cells_changed_pixels": 0,
+    "alpha_changed_pixels_total": 507,
+    "alpha_changes_outside_3_cells": 0,
+    "introduced_alpha_pixels_total": 507,
+    "introduced_alpha_outside_3_cells": 0,
+    "candidate_glyph_bbox_margins": {
+      "start_top": [
+        28,
+        12,
+        29,
+        13
+      ],
+      "start_bottom": [
+        28,
+        6,
+        29,
+        7
+      ],
+      "goal": [
+        62,
+        4,
+        63,
+        4
+      ]
+    },
+    "min_candidate_glyph_bbox_margin": 4,
+    "raw_orientation": "mirror_y",
+    "transparent_to_nontransparent_pixels_total": 0,
+    "alpha_increase_pixels_total": 507
+  }
+}

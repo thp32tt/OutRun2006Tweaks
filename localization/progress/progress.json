@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T22:05:59+09:00",
+  "updated_at_kst": "2026-09-28T00:43:27+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B90: D6DC1380 A89 CREATE_NEW_HD candidate first-QA PASS unchanged; 48DEBE77 final HD-migration asset rebuilt by B90 as new 2048x2048 candidate from canonical 512x512 source artwork, first-QA PASS. HD migration queue now 16 ready / 0 remaining. Finalized text review state preserved. Both assets require C/D + in-game validation.",
+  "next_checkpoint": "C83: final HD-migration CREATE_NEW_HD candidates D6DC1380 and 48DEBE77 both pass independent C static strict QA unchanged. D6 1024x256 raw-normal candidate preserves source header except required H/W/pitch and keeps all alpha inside the 4x source-text bbox; 1px vertical margin was explicitly zoom-checked with no clipping. 48DEBE77 2048x2048 raw-mirror_y candidate changes 41,433 pixels only inside 3 text cells; alpha changes are confined to cells and transparent->nontransparent introductions are 0. HD migration production remains complete 16 ready / 0 remaining. Both require D + mandatory in-game screenshots; current lock count remains 0.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -256,15 +256,17 @@
       ],
       "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
       "report": "localization/graphics/role_B/20260927-2145-B90/B90_D6DC1380_48DEBE77_REPORT.json",
-      "status": "B90_CREATE_NEW_HD_PRODUCTION_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "status": "C83_STATIC_STRICT_QA_PASS_PENDING_D_INGAME",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
       "raw_orientation": "mirror_y",
-      "prior_korean_reused": false
+      "prior_korean_reused": false,
+      "c_strict_qa_report": "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json",
+      "c_candidate_changed": false
     },
     "next_hd_rework": {
       "asset": null,
-      "status": "HD_MIGRATION_QUEUE_COMPLETE_PENDING_STRICT_QA_INGAME",
-      "note": "All 16 graphics-rework targets now have current candidates. D6DC1380 and 48DEBE77 still require C/D + in-game."
+      "status": "HD_MIGRATION_QUEUE_COMPLETE_PENDING_D_INGAME",
+      "note": "All 16 graphics-rework targets have current candidates; D6DC1380 and 48DEBE77 now pass C83 and require D + in-game."
     },
     "latest_d_final_qa": {
       "run": "D84",
@@ -286,28 +288,23 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C82",
-      "report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
-      "result": "ALL_THREE_STATIC_STRICT_QA_PASS_PENDING_D_AND_INGAME",
+      "run": "C83",
+      "report": "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json",
+      "result": "D6DC1380_48DEBE77_STATIC_STRICT_QA_PASS_PENDING_D_INGAME",
       "candidate_changed_by_C": false,
       "assets": {
-        "C075FB49": {
-          "candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
-          "status": "C82_STATIC_PASS_D83_SAME_SHA_PENDING_D_RECONCILE_INGAME",
-          "outside_text_cells_changed_pixels": 0,
-          "introduced_alpha_outside_text_cells": 0
+        "D6DC1380": {
+          "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+          "status": "C83_STATIC_STRICT_QA_PASS_PENDING_D_INGAME",
+          "alpha_outside_allowed_bbox_pixels": 0,
+          "min_vertical_margin_px": 1
         },
-        "FD90AA9": {
-          "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
-          "status": "C82_STATIC_PASS_D83_SAME_SHA_PENDING_D_RECONCILE_INGAME",
+        "48DEBE77": {
+          "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+          "status": "C83_STATIC_STRICT_QA_PASS_PENDING_D_INGAME",
           "outside_text_cells_changed_pixels": 0,
-          "introduced_alpha_outside_text_cells": 0
-        },
-        "9F060EC1": {
-          "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
-          "status": "C82_STATIC_PASS_PENDING_D_RECONCILE_INGAME",
-          "outside_text_cells_changed_pixels": 0,
-          "introduced_alpha_outside_text_cells": 0
+          "alpha_changes_outside_text_cells": 0,
+          "transparent_to_nontransparent_pixels_total": 0
         }
       }
     },
@@ -475,6 +472,14 @@
         "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
         "result": "CREATE_NEW_HD_PRODUCTION_FIRST_QA_PASS_PENDING_C_D_INGAME"
       },
+      "hd_rework_candidates_ready": 16,
+      "hd_rework_remaining": 0
+    },
+    "c83_final_hd_migration_assets": {
+      "report": "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json",
+      "candidate_changed_by_C": false,
+      "D6DC1380": "PASS",
+      "48DEBE77": "PASS",
       "hd_rework_candidates_ready": 16,
       "hd_rework_remaining": 0
     }

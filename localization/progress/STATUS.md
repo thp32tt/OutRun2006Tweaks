@@ -547,3 +547,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - 48DEBE77 final: changes vs 4× canonical-source base only inside 3 text cells; outside-cell changes 0, introduced alpha 0. A-E/routes/photos/borders/shadows preserved.
 - First 48 draft with horizontal erasure streaks was rejected before persistence; final candidate passes readable/raw/white/black/gray artifact QA.
 - HD migration queue: 16 ready / 0 remaining. C/D + in-game validation still mandatory; approved/user-lock count remains 0.
+
+## C83 final HD-migration strict QA — 2026-09-28 00:43 KST
+- D6DC1380 PASS / unchanged: 256x64 source -> 1024x256 CREATE_NEW_HD, Continue? -> 계속?; RGBA32/1 mip; header exact except H/W/pitch; raw normal; alpha outside scaled source text bbox = 0. 1px vertical margin explicitly zoom-checked, no clipping observed.
+- 48DEBE77 PASS / unchanged: 512x512 source -> 2048x2048 CREATE_NEW_HD; START x2 -> 출발, GOAL -> 골; raw mirror_y; 41,433 changed pixels, 0 outside 3 cells; 507 alpha-value changes all inside cells; transparent->nontransparent new pixels = 0; minimum glyph margin 4 px.
+- No source residue, broken Hangul, seam/black line, opaque box, alpha halo, clipping/overlap, wrong replacement or protected-artwork damage observed in readable/raw + white/gray/black + diff-mask QA.
+- HD migration candidate production: 16 ready / 0 remaining. D final reconciliation + in-game screenshots remain mandatory; no promotion/lock, current lock count 0. No build; VR/FFB unchanged.
+- Machine report: localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json.
+- Validation note: stock verify_state.py currently false-fails only on the finalized text draft=0 Counter-key mismatch; temporary zero-normalized validation passes the full state. Verifier source was not modified.

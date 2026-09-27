@@ -1,5 +1,5 @@
 index,path,action,artwork_status,transcription_status,notes
-12,textures/load/spr_etc_xst/D6DC1380_256x64.dds,localize_text,a89_hd_candidate_b90_first_qa_pass_pending_c_d_ingame,transcribed_reviewed,A89 D6DC1380 1024x256 candidate B90 first-QA PASS unchanged; C/D + in-game pending
+12,textures/load/spr_etc_xst/D6DC1380_256x64.dds,localize_text,c83_static_strict_qa_pass_pending_d_ingame,transcribed_reviewed,A89/B90 CREATE_NEW_HD 1024x256 candidate C83 strict QA PASS unchanged; raw normal; header except H/W/pitch preserved; 1px vertical bbox margin zoom-checked; D + in-game pending
 15,textures/load/spr_font_xst/20389D70_512x256.dds,font_pipeline,blocked_runtime_font,glyph_atlas,
 16,textures/load/spr_font_xst/23DDB6EC_512x512.dds,font_pipeline,blocked_runtime_font,glyph_atlas,
 17,textures/load/spr_font_xst/6B8ED9DA_256x128.dds,font_pipeline,blocked_runtime_font,glyph_atlas,
@@ -42,7 +42,7 @@ index,path,action,artwork_status,transcription_status,notes
 60,textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds,localize_text,c79_static_pass_d78_same_sha_pending_d_ingame,transcribed_reviewed,B84 production + C79 strict QA PASS 17 semantic/21 physical; candidate unchanged; D78 same-SHA preflight valid; final D reconcile + in-game pending
 61,textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds,localize_text,c80_static_pass_context_hold_pending_d_ingame,transcribed_reviewed,C80 strict QA PASS unchanged B85 SHA; D80 same-SHA preflight valid; Drift and runtime composition + final D/in-game pending
 62,textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds,zoom_review,blocked_review,needs_zoom_review,
-63,textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds,localize_text,b90_create_new_hd_candidate_first_qa_pass_pending_c_d_ingame,transcribed_reviewed,B90 48DEBE77 CREATE_NEW_HD 2048x2048; START x2/GOAL x1 localized; raw mirror_y and non-text artwork preserved; C/D + in-game pending
+63,textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds,localize_text,c83_static_strict_qa_pass_pending_d_ingame,transcribed_reviewed,B90 CREATE_NEW_HD 2048x2048 candidate C83 strict QA PASS unchanged; START x2/GOAL x1; all pixel/alpha changes confined to 3 cells; raw mirror_y; D + in-game pending
 65,textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 86,textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds,localize_text,pending_artwork,transcribed_reviewed,pass5 transcription saved
 89,textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
