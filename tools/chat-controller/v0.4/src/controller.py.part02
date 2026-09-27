@@ -468,7 +468,14 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
     if not sent:
         slot.last_result = "input_not_found"
         save_registry(reg)
-        write_runtime(status="ui_changed", last_action=f"Slot {slot.name}: prompt input not found")
+        diag = await composer_diagnostics(page)
+        write_runtime(
+            status="ui_changed",
+            last_action=f"Slot {slot.name}: prompt input not found",
+            composer_diagnostics=diag,
+            current_url=page.url,
+        )
+        log.warning("composer not found slot=%s url=%s diagnostics=%s", slot.name, page.url, diag)
         return
 
     request_now = datetime.now(TZ)
