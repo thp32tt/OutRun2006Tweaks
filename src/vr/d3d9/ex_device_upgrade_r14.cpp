@@ -82,6 +82,23 @@ namespace OutRunVRD3D9ExUpgradeR13
             384ull * 1024ull * 1024ull;
         constexpr std::uint64_t R14EmergencyAtlasMaxBytes =
             16ull * 1024ull * 1024ull;
+
+        bool R69IsSelectorAtlasReserveCandidate(
+            const D3DSURFACE_DESC& desc, UINT levels,
+            std::uint64_t estimate) noexcept
+        {
+            // HMD R68 evidence: the earlier <=2048 heuristic let a 2048x512
+            // texture consume the reserve first, then the real 2048x2048
+            // selector/car atlas had no CPU shadow and LockRect failed.
+            // Reserve is intentionally exact-size and never broadens the
+            // general MANAGED compatibility policy.
+            return levels == 1 &&
+                desc.Width == 2048 && desc.Height == 2048 &&
+                estimate > 0 && estimate <= R14EmergencyAtlasMaxBytes &&
+                (desc.Format == D3DFMT_A8R8G8B8 ||
+                 desc.Format == D3DFMT_X8R8G8B8);
+        }
+
         std::atomic<std::uint64_t> R14ShadowBytes{0};
         std::atomic<std::uint64_t> R14ShadowBudgetRejects{0};
 
@@ -501,12 +518,8 @@ namespace OutRunVRD3D9ExUpgradeR13
                 R14ShadowBytes.load(std::memory_order_acquire);
 
             const bool emergencyAtlasEligible =
-                levels == 1 &&
-                estimate > 0 &&
-                estimate <= R14EmergencyAtlasMaxBytes &&
-                desc.Width <= 2048 && desc.Height <= 2048 &&
-                (desc.Format == D3DFMT_A8R8G8B8 ||
-                 desc.Format == D3DFMT_X8R8G8B8);
+                R69IsSelectorAtlasReserveCandidate(
+                    desc, levels, estimate);
             const std::uint64_t softBudget = emergencyAtlasEligible
                 ? R14ShadowBudgetBytes
                 : R14GeneralShadowBudgetBytes;
