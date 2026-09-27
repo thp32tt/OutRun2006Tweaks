@@ -241,24 +241,19 @@ class RestoreCarBaseShadow : public Hook
 {
 	static void __cdecl CalcPeraShadow(int a1, int a2, int a3, float a4)
 	{
-		// R65 one-run test: PC C2C originally called a nullsub here. The restored
-		// console base-shadow path is present in both normal-car and selector-car
-		// renderers. Keep gameplay restoration, but return selector VR to stock PC
-		// behavior so one HMD run can prove whether this path corrupts the preview.
-		if (Settings::VREnabled && Game::current_mode &&
-			(*Game::current_mode == GameState::STATE_SELECTOR ||
-			 *Game::current_mode == GameState::STATE_SUMO_FE ||
-			 *Game::current_mode == GameState::STATE_START))
+		// R69 HMD regression result: the restored console-only base-shadow path
+		// can stereo-split during the start grid and never existed in stock PC C2C.
+		// Keep the restoration for normal non-VR play, but VR always uses the
+		// original PC nullsub behavior. This removes a special-case state table
+		// and prevents future menu/start mode transitions from re-enabling it.
+		if (Settings::VREnabled)
 		{
-			static std::array<bool, 0x25> loggedModes{};
-			const int mode = static_cast<int>(*Game::current_mode);
-			if (mode >= 0 && mode < static_cast<int>(loggedModes.size()) &&
-				!loggedModes[mode])
+			static bool logged = false;
+			if (!logged)
 			{
-				loggedModes[mode] = true;
+				logged = true;
 				spdlog::info(
-					"VR R65 SELECTOR: restored base shadow bypassed; VR R68 NONPLAY CAR mode={} (stock PC nullsub behavior)",
-					mode);
+					"VR R69 BASE SHADOW: restored console shadow disabled for all VR presentations; stock PC nullsub behavior ACTIVE");
 			}
 			return;
 		}
