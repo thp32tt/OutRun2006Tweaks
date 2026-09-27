@@ -259,7 +259,7 @@
       "rva": "0x000E485C",
       "signatureLength": 16,
       "disassemblyWindow": 48,
-      "expectedBytes": "e81f8af4ff83c418b4e388b4634493b",
+      "expectedBytes": "e81f8af4ff83c4188b4e388b4634493b",
       "purpose": "Option/menu producer B exact put_clip_sprite arrow call 3.",
       "sourceBindings": [
         {
