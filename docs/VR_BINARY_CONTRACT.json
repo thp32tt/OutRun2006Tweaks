@@ -115,6 +115,20 @@
       ]
     },
     {
+      "id": "VR-EXE-HUD-FONT-GLYPH-PUT-SPRITE-ALT",
+      "rva": "0x0002C808",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e8d307000083c4085f5e83c44cc3cccc",
+      "purpose": "Alternate canonical font/glyph renderer direct call to put_sprite_ex; HMD GOAL/result trace proves this path is used alongside 0x2C9DB.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0x2C808, 0x2C9DB"
+        }
+      ]
+    },
+    {
       "id": "VR-EXE-HUD-FONT-GLYPH-PUT-SPRITE",
       "rva": "0x0002C9DB",
       "signatureLength": 16,
