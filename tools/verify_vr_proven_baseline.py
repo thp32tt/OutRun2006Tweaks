@@ -135,11 +135,16 @@ require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes',
 ], "P7_FLARE_R26HUD_PATH")
 
-# PASS 8 — selector shadow and START presentation protections remain present.
+# PASS 8 — VR keeps stock PC shadow behavior and selector texture headroom.
 require_all("src/hooks_graphics.cpp", [
-    '*Game::current_mode == GameState::STATE_SELECTOR',
-    'VR R65 SELECTOR: restored base shadow bypassed',
+    'if (Settings::VREnabled)',
+    'VR R69 BASE SHADOW: restored console shadow disabled for all VR presentations; stock PC nullsub behavior ACTIVE',
 ], "P8_SELECTOR_SHADOW")
+require_all("src/vr/d3d9/ex_device_upgrade_r14.cpp", [
+    'R69IsSelectorAtlasReserveCandidate',
+    'desc.Width == 2048 && desc.Height == 2048',
+    '384 MiB total cap preserved',
+], "P8_SELECTOR_ATLAS_RESERVE")
 require_all("src/game_addrs.hpp", [
     'is_vr_gameplay_presentation()',
     'GameState::STATE_START',
