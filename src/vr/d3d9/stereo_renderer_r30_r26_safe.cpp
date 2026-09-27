@@ -13,6 +13,7 @@
 
 #include "stereo_renderer_r26.cpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/debug/experiment_modes.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
@@ -1244,60 +1245,17 @@ namespace OutRunVRStereo
 
         int R55HudCoordMode() noexcept
         {
-            static const int mode = []() noexcept {
-                char text[8]{};
-                if (GetEnvironmentVariableA(
-                        "OUTRUN_VR_HUD_COORD_MODE",
-                        text, static_cast<DWORD>(sizeof(text))) == 0)
-                    return 0;
-                if (text[0] < '0' || text[0] > '4')
-                    return 0;
-                return static_cast<int>(text[0] - '0');
-            }();
-            return mode;
+            return OutRunVR::DebugModes::HudCoordMode();
         }
 
         int R56HudProbeMode() noexcept
         {
-            static const int mode = []() noexcept {
-                char text[8]{};
-                const DWORD len = GetEnvironmentVariableA(
-                    "OUTRUN_VR_HUD_PROBE", text,
-                    static_cast<DWORD>(sizeof(text)));
-                if (len == 0 || len >= sizeof(text))
-                    return 0;
-                int value = 0;
-                for (DWORD i = 0; i < len; ++i)
-                {
-                    if (text[i] < '0' || text[i] > '9')
-                        return 0;
-                    value = value * 10 + int(text[i] - '0');
-                }
-                return (value >= 1 && value <= 20) ? value : 0;
-            }();
-            return mode;
+            return OutRunVR::DebugModes::HudProbeMode();
         }
+
         int R57Mode() noexcept
         {
-            static const int mode = []() noexcept {
-                char text[8]{};
-                const DWORD len = GetEnvironmentVariableA(
-                    "OUTRUN_VR_R57_MODE", text,
-                    static_cast<DWORD>(sizeof(text)));
-                // R66 production baseline: mode 6 is the HMD-proven
-                // head-inverse projected-marker path. Env=0 is diagnostic only.
-                if (len == 0 || len >= sizeof(text))
-                    return 6;
-                int value = 0;
-                for (DWORD i = 0; i < len; ++i)
-                {
-                    if (text[i] < '0' || text[i] > '9')
-                        return 6;
-                    value = value * 10 + int(text[i] - '0');
-                }
-                return (value >= 0 && value <= 10) ? value : 6;
-            }();
-            return mode;
+            return OutRunVR::DebugModes::ProjectedMarkerMode();
         }
 
         bool R57ProjectViewPoint(
