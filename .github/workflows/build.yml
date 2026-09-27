@@ -19,6 +19,10 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Verify HMD-proven VR baseline
+        shell: pwsh
+        run: python tools/verify_vr_proven_baseline.py
+
       - name: Verify consolidated wheel FFB source
         shell: pwsh
         run: python tools/verify_wheel_ffb_current.py
