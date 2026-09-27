@@ -95,6 +95,9 @@ New-Item -ItemType Directory -Force $root | Out-Null
 Remove-Item Env:CI -ErrorAction SilentlyContinue
 $totalWatch = [Diagnostics.Stopwatch]::StartNew()
 
+Write-Host "PC fast build: verify HMD-proven VR baseline before configure"
+Invoke-Checked python 'tools/verify_vr_proven_baseline.py'
+
 Write-Host "PC fast build: configure Win32 game (persistent cache: $gameBuild)"
 Invoke-Checked cmake '-S' '.' '-B' $gameBuild '-G' 'Visual Studio 17 2022' '-A' 'Win32' @canonicalGameFlags
 Assert-R51PCBuildContract -BuildDir $gameBuild
