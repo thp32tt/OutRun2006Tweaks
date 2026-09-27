@@ -56,3 +56,10 @@ hooks or alter DX9Ex Reset/StateBlock, transport, HUD semantics or host behavior
 - FVF/vertex declarations need D3D11 input-layout generation.
 - Render-target/depth-surface lifetime needs explicit mirrors.
 - Lock/Unlock and dynamic-resource update behavior must match D3D9 expectations.
+
+## 2026-09-28 branch decision
+
+- Keep all native DX11 work on `vr-dx11-native-r71` until the shared graphics-correctness gate passes.
+- Use `src/vr/game/disasm_render_contract.hpp` as the backend-neutral EXE contract; do not re-infer HUD/world ownership from primitive/state heuristics.
+- DX12 is frozen and is no longer a target for this renderer effort.
+- Merge only after static/build validation and Quest 3/OpenXR runtime evidence show the menu/HUD/rank-marker/flare/shadow corruption set is closed.
