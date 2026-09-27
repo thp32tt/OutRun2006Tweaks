@@ -255,3 +255,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - VR/FFB contamination check: PASS; no matching source diff and no merge commit since clean upstream base.
 - No build performed. Report: localization/graphics/role_D/20260927-1319-D76/D76_FA7BBB13_FINAL_QA_HOLD_REPORT.json.
 - Next gate: current C strict QA for FA7BBB13 + in-game screenshot validation before promotion; 39229D64 remains the next production target.
+
+## A82 39229D64 checkpoint — 2026-09-27 13:58 KST
+
+- Canonical-HD rebuild complete: 13 semantic / 15 physical text regions; B82 expected 14 physical occurrences, corrected because Total Rank exists in three cells.
+- Candidate SHA-256: 5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077.
+- 4096×4096 RGBA32, 1 mip, exact canonical 128-byte header; raw mirror_y preserved.
+- Bytes outside the 15 source text cells remain canonical; candidate Korean alpha is contained in every source cell.
+- Readable/raw manual A-stage artifact QA: PASS after rejecting two internal drafts for English residue/position mismatch and Total Rank seam/residue.
+- Protected ALBERTO, rank/ordinal/key/numeric tokens and non-text artwork preserved.
+- Status: A_PRODUCTION_COMPLETE_PENDING_B_C_D; in-game validation not performed. Next after gate: A064FDFC.

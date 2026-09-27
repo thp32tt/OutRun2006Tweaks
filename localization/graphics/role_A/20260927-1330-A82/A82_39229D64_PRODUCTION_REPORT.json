@@ -1,0 +1,455 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A82",
+  "timestamp_kst": "2026-09-27T13:58:56+09:00",
+  "base_head": "de9aa88dad95b0d6a62880fe0c3021721731f18b",
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+  "canonical_source": "OR2-HD-GUI-v0.25.10a",
+  "canonical_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+  "candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+  "dimensions": [
+    4096,
+    4096
+  ],
+  "bytes": 67108992,
+  "format": "RGBA32",
+  "mipmaps": 1,
+  "raw_orientation": "mirror_y",
+  "semantic_entries_materialized": 13,
+  "localized_regions": 15,
+  "physical_region_count_correction": {
+    "b82_expected": 14,
+    "a82_verified": 15,
+    "reason": "Direct canonical-HD review confirms Total Rank appears in three physical cells."
+  },
+  "preserved_original_tokens": [
+    "ALBERTO",
+    "E",
+    "D",
+    "C",
+    "B",
+    "A",
+    "rd",
+    "st",
+    "nd",
+    "th",
+    "F1",
+    "Esc",
+    "numeric/rank glyphs"
+  ],
+  "dds_header_128_byte_exact_to_canonical": true,
+  "outside_15_text_cells_byte_exact_to_canonical": true,
+  "new_korean_alpha_contained_in_source_cells": true,
+  "readable_orientation_visual_qa": "PASS_A_STAGE",
+  "raw_orientation_visual_qa": "PASS_MIRROR_Y_PRESERVED",
+  "artifact_qa": {
+    "source_english_residue": "NONE_OBSERVED_FINAL",
+    "clipping_or_overlap": "NONE_OBSERVED",
+    "box_escape": "NONE_OBSERVED",
+    "black_line_or_seam": "NONE_OBSERVED_FINAL",
+    "opaque_box": "NONE_OBSERVED",
+    "alpha_halo": "NONE_OBSERVED"
+  },
+  "rework_history": [
+    {
+      "attempt": "internal_draft_1",
+      "result": "REJECTED_NOT_PERSISTED",
+      "reason": "Initial guessed HD text coordinates left source-English residue and position mismatch."
+    },
+    {
+      "attempt": "internal_draft_2",
+      "result": "REJECTED_NOT_PERSISTED",
+      "reason": "Rectangular Total Rank background interpolation produced visible seams and residual source text."
+    },
+    {
+      "attempt": "final",
+      "result": "PASS_FOR_A_HANDOFF",
+      "reason": "Source-text-pixel mask cleanup plus local background reconstruction removed residue without rectangular seams."
+    }
+  ],
+  "in_game_validation": "NOT_PERFORMED",
+  "approval": "NOT_PROMOTED_PENDING_B_C_D_AND_INGAME",
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "edits": [
+    {
+      "key": "hearts",
+      "source": "Hearts",
+      "korean": "하트",
+      "readable_cell": [
+        1715,
+        0,
+        2048,
+        102
+      ],
+      "candidate_alpha_bbox": [
+        1797,
+        4,
+        1965,
+        97
+      ],
+      "render": {
+        "font_size": 85,
+        "outer_stroke": 9,
+        "inner_stroke": 4,
+        "xscale": 1.0,
+        "style": "yellow_small",
+        "display": "하트"
+      }
+    },
+    {
+      "key": "technical_bonus",
+      "source": "Technical Bonus",
+      "korean": "테크니컬 보너스",
+      "readable_cell": [
+        2381,
+        77,
+        3610,
+        269
+      ],
+      "candidate_alpha_bbox": [
+        2475,
+        87,
+        3501,
+        258
+      ],
+      "render": {
+        "font_size": 153,
+        "outer_stroke": 14,
+        "inner_stroke": 7,
+        "xscale": 1.0,
+        "style": "cream_medium",
+        "display": "테크니컬 보너스"
+      }
+    },
+    {
+      "key": "mission_cleared",
+      "source": "MISSION CLEARED!",
+      "korean": "미션 성공!",
+      "readable_cell": [
+        128,
+        256,
+        1587,
+        794
+      ],
+      "candidate_alpha_bbox": [
+        584,
+        273,
+        1092,
+        776
+      ],
+      "render": {
+        "font_size": 236,
+        "outer_stroke": 18,
+        "inner_stroke": 11,
+        "xscale": 1.0,
+        "style": "mission_orange",
+        "display": "미션 / 성공!"
+      }
+    },
+    {
+      "key": "total_rank_green",
+      "source": "Total Rank",
+      "korean": "종합 랭크",
+      "readable_cell": [
+        512,
+        896,
+        1101,
+        1075
+      ],
+      "candidate_alpha_bbox": [
+        520,
+        904,
+        1078,
+        1067
+      ],
+      "render": {
+        "font_size": 139,
+        "outer_stroke": 14,
+        "inner_stroke": 6,
+        "xscale": 1.0,
+        "style": "total_rank_bg",
+        "display": "종합 랭크"
+      }
+    },
+    {
+      "key": "storing",
+      "source": "STORING ONLINE RECORD...",
+      "korean": "온라인 기록 저장 중...",
+      "readable_cell": [
+        1638,
+        858,
+        3021,
+        998
+      ],
+      "candidate_alpha_bbox": [
+        1808,
+        860,
+        2850,
+        996
+      ],
+      "render": {
+        "font_size": 116,
+        "outer_stroke": 13,
+        "inner_stroke": 5,
+        "xscale": 1.0,
+        "style": "yellow_small",
+        "display": "온라인 기록 저장 중..."
+      }
+    },
+    {
+      "key": "special_request",
+      "source": "SPECIAL REQUEST",
+      "korean": "스페셜 요청",
+      "readable_cell": [
+        1626,
+        1114,
+        2624,
+        1267
+      ],
+      "candidate_alpha_bbox": [
+        1813,
+        1116,
+        2437,
+        1265
+      ],
+      "render": {
+        "font_size": 128,
+        "outer_stroke": 13,
+        "inner_stroke": 6,
+        "xscale": 1.0,
+        "style": "yellow_medium",
+        "display": "스페셜 요청"
+      }
+    },
+    {
+      "key": "target",
+      "source": "Target",
+      "korean": "목표",
+      "readable_cell": [
+        2598,
+        550,
+        2854,
+        640
+      ],
+      "candidate_alpha_bbox": [
+        2654,
+        554,
+        2797,
+        636
+      ],
+      "render": {
+        "font_size": 73,
+        "outer_stroke": 7,
+        "inner_stroke": 3,
+        "xscale": 1.0,
+        "style": "gray_tiny",
+        "display": "목표"
+      }
+    },
+    {
+      "key": "start",
+      "source": "START",
+      "korean": "시작",
+      "readable_cell": [
+        2458,
+        1004,
+        2662,
+        1085
+      ],
+      "candidate_alpha_bbox": [
+        2495,
+        1007,
+        2624,
+        1082
+      ],
+      "render": {
+        "font_size": 66,
+        "outer_stroke": 6,
+        "inner_stroke": 3,
+        "xscale": 1.0,
+        "style": "gray_tiny",
+        "display": "시작"
+      }
+    },
+    {
+      "key": "goal",
+      "source": "GOAL",
+      "korean": "골",
+      "readable_cell": [
+        2975,
+        1004,
+        3144,
+        1085
+      ],
+      "candidate_alpha_bbox": [
+        3025,
+        1008,
+        3093,
+        1081
+      ],
+      "render": {
+        "font_size": 66,
+        "outer_stroke": 6,
+        "inner_stroke": 3,
+        "xscale": 1.0,
+        "style": "gray_tiny",
+        "display": "골"
+      }
+    },
+    {
+      "key": "hit_ghost",
+      "source": "Hit the ghost!",
+      "korean": "고스트를 맞히세요!",
+      "readable_cell": [
+        3136,
+        1004,
+        3661,
+        1114
+      ],
+      "candidate_alpha_bbox": [
+        3138,
+        1007,
+        3659,
+        1110
+      ],
+      "render": {
+        "font_size": 87,
+        "outer_stroke": 10,
+        "inner_stroke": 4,
+        "xscale": 0.7507,
+        "style": "yellow_small",
+        "display": "고스트를 맞히세요!"
+      }
+    },
+    {
+      "key": "exit",
+      "source": "EXIT",
+      "korean": "종료",
+      "readable_cell": [
+        3072,
+        1121,
+        3494,
+        1293
+      ],
+      "candidate_alpha_bbox": [
+        3141,
+        1130,
+        3410,
+        1283
+      ],
+      "render": {
+        "font_size": 141,
+        "outer_stroke": 12,
+        "inner_stroke": 6,
+        "xscale": 1.0,
+        "style": "exit_pink",
+        "display": "종료"
+      }
+    },
+    {
+      "key": "collect_stars",
+      "source": "Collect the stars!",
+      "korean": "별을 모으세요!",
+      "readable_cell": [
+        3469,
+        1172,
+        4019,
+        1280
+      ],
+      "candidate_alpha_bbox": [
+        3471,
+        1174,
+        4017,
+        1278
+      ],
+      "render": {
+        "font_size": 90,
+        "outer_stroke": 10,
+        "inner_stroke": 4,
+        "xscale": 0.9927,
+        "style": "yellow_small",
+        "display": "별을 모으세요!"
+      }
+    },
+    {
+      "key": "mission_failed",
+      "source": "MISSION FAILED!",
+      "korean": "미션 실패!",
+      "readable_cell": [
+        1984,
+        1280,
+        3187,
+        1805
+      ],
+      "candidate_alpha_bbox": [
+        2319,
+        1299,
+        2813,
+        1786
+      ],
+      "render": {
+        "font_size": 231,
+        "outer_stroke": 17,
+        "inner_stroke": 10,
+        "xscale": 1.0,
+        "style": "mission_blue",
+        "display": "미션 / 실패!"
+      }
+    },
+    {
+      "key": "total_rank_brown",
+      "source": "Total Rank",
+      "korean": "종합 랭크",
+      "readable_cell": [
+        717,
+        1915,
+        1318,
+        2099
+      ],
+      "candidate_alpha_bbox": [
+        723,
+        1923,
+        1296,
+        2090
+      ],
+      "render": {
+        "font_size": 143,
+        "outer_stroke": 14,
+        "inner_stroke": 6,
+        "xscale": 1.0,
+        "style": "total_rank_bg",
+        "display": "종합 랭크"
+      }
+    },
+    {
+      "key": "total_rank_pink",
+      "source": "Total Rank",
+      "korean": "종합 랭크",
+      "readable_cell": [
+        2598,
+        1900,
+        3238,
+        2099
+      ],
+      "candidate_alpha_bbox": [
+        2600,
+        1908,
+        3220,
+        2090
+      ],
+      "render": {
+        "font_size": 155,
+        "outer_stroke": 16,
+        "inner_stroke": 7,
+        "xscale": 1.0,
+        "style": "total_rank_bg",
+        "display": "종합 랭크"
+      }
+    }
+  ],
+  "status": "A82_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA",
+  "next_asset_after_static_gate": "A064FDFC_1024x512.dds"
+}

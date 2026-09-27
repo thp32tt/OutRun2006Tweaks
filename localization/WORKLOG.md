@@ -554,3 +554,16 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Clean-base diff check found no VR/FFB/force-feedback source change and no merge commit since upstream base 08e5efb4.
 - Build was not run.
 - Report: localization/graphics/role_D/20260927-1319-D76/D76_FA7BBB13_FINAL_QA_HOLD_REPORT.json.
+
+## 2026-09-27 13:58 KST — A82 39229D64 HD rebuild
+
+- Continued from latest GitHub korean-localization-clean HEAD de9aa88 and B82 transcription expansion; no GPT Library workspace was used.
+- Rebuilt 39229D64_1024x1024.dds directly from the canonical 4096×4096 HD RGBA32 DDS; no legacy Korean DDS was upscaled.
+- Materialized all 13 reviewed semantic strings. Direct source review corrected B82 physical coverage from 14 to 15 because Total Rank appears in three separate cells.
+- Preserved ALBERTO, rank letters, ordinal suffixes, F1/Esc, numeric/rank glyphs and all non-text artwork outside the 15 localization cells.
+- Internal draft 1 was rejected for source-English residue/coordinate mismatch; draft 2 was rejected for Total Rank background seams/residue. Neither was persisted.
+- Final candidate uses source-text-pixel masking for the three Total Rank cells, avoiding rectangular background seams. Readable and raw mirror_y static visual QA passed.
+- Exact 128-byte DDS header, 4096×4096 RGBA32/1-mip structure preserved; all bytes outside the 15 source cells are canonical bytes; new Korean alpha stays inside each source cell.
+- Candidate SHA-256: 5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077.
+- Candidate: localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds.
+- Status: A82_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA. No approved promotion, in-game claim, build, VR or FFB work. Next production asset after static gate: A064FDFC.

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T13:19:13+09:00",
+  "updated_at_kst": "2026-09-27T13:58:56+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "FA7BBB13 passed A81/B82 and D76 independent static/raw/readable QA, but approval is held pending current C strict QA and in-game screenshot validation. approved_dds remains the three user-approved locked assets. 39229D64 is the next canonical-HD production target.",
+  "next_checkpoint": "39229D64 A82 canonical-HD production is complete: 13 semantic / 15 physical text regions. Run B/C/D static QA and in-game screenshot validation before promotion; FA7BBB13 remains held pending current C + in-game. Next P1 production asset after the 39229D64 static gate is A064FDFC.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -192,7 +192,7 @@
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
     "artwork_plan_assets": 79,
-    "artwork_plan_segments": 704,
+    "artwork_plan_segments": 715,
     "artwork_proof_candidates": 7,
     "simple6_package": {
       "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
@@ -253,14 +253,13 @@
     "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
     "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "latest_hd_production_candidate": {
-      "asset": "FA7BBB13",
-      "coverage": "17/17",
-      "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
-      "report": "localization/graphics/role_A/20260927-1257-A81/A81_FA7BBB13_PRODUCTION_REPORT.json",
-      "status": "D_STATIC_REVALIDATED_HOLD_PENDING_C_INGAME",
-      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
-      "b_first_qa_report": "localization/graphics/role_B/20260927-1310-B82/B82_FA7BBB13_FIRST_QA_AND_39229D64_TRANSCRIPTION.json",
-      "d_final_qa_report": "localization/graphics/role_D/20260927-1319-D76/D76_FA7BBB13_FINAL_QA_HOLD_REPORT.json"
+      "asset": "39229D64",
+      "coverage": "13 semantic / 15 physical",
+      "candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+      "report": "localization/graphics/role_A/20260927-1330-A82/A82_39229D64_PRODUCTION_REPORT.json",
+      "status": "A_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+      "physical_region_count_correction": "B82 expected 14; A82 verified 15 because Total Rank appears three times"
     },
     "next_hd_rework": {
       "asset": "39229D64",

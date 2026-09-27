@@ -127,10 +127,16 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "REWORK_FROM_HD_BASE",
+      "status": "A_PRODUCTION_COMPLETE_PENDING_B_C_D",
       "transcription_status": "B82_EXPANDED_REVIEWED",
       "transcription_segments": 13,
-      "expected_physical_text_occurrences": 14
+      "expected_physical_text_occurrences": 14,
+      "batch_report": "localization/graphics/role_A/20260927-1330-A82/A82_39229D64_PRODUCTION_REPORT.json",
+      "candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+      "completed_transcription_entries": 13,
+      "localized_regions": 15,
+      "remaining_segments": 0
     },
     {
       "hash": "A064FDFC",
@@ -237,5 +243,5 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_D/20260927-1319-D76/D76_FA7BBB13_FINAL_QA_HOLD_REPORT.json"
+  "latest_batch": "localization/graphics/role_A/20260927-1330-A82/A82_39229D64_PRODUCTION_REPORT.json"
 }
