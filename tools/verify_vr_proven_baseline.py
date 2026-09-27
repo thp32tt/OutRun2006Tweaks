@@ -59,10 +59,10 @@ require_all("src/hooks_uiscaling.cpp", [
     'return 6;',
     'return (value >= 0 && value <= 10) ? value : 6;',
 ], "P2_R57_SOURCE_DEFAULT")
-require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
+require_all("src/vr/debug/experiment_modes.hpp", [
     '"OUTRUN_VR_R57_MODE"',
     'return (value >= 0 && value <= 10) ? value : 6;',
-], "P2_R57_RENDERER_DEFAULT")
+], "P2_R57_DEBUG_MODULE_DEFAULT")
 require_all("tools/OutRunVR-Test-Selector.ps1", [
     "'DX9Ex + D3D11 Host','d3d9','R57_06_RANK_PROJECTED_HEAD'",
     "'DX11 Host DirectGPU','dx11','R57_06_RANK_PROJECTED_HEAD'",
