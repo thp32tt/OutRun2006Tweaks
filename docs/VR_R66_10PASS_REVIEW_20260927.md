@@ -134,3 +134,19 @@ The canonical EXE was re-read byte-for-byte after the review. All 12 newly
 pinned production callsite signatures now match exactly and are 16 bytes
 (32 hex digits). The baseline verifier now rejects malformed signature lengths
 before a build can be accepted.
+
+## Historical-fix preservation gate
+
+The build gate now also preserves the earlier runtime fixes that must not be
+lost while HUD work continues:
+
+- R15: never replay a pre-Reset D3D9 state block after ResetEx.
+- R13: transactional stereo hardening / single ResetEx owner / GPU ring backpressure.
+- R22: viewport/scissor replay and common initial depth baseline.
+- R23/R25: authoritative first stereo seed requires live viewport/scissor,
+  game draw serial, current-generation depth and fresh pose.
+- Host DirectGPU: no consumed ACK immediately after queued copy; R32 EVENT
+  completion owns the per-slot GPU-completion ACK.
+
+Production DLL builders validate the corresponding compiled markers in addition
+to the R64/R65/R66 HUD markers.
