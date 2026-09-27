@@ -475,3 +475,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - FD90AA9: A87 SHA 72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445 B FIRST QA PASS unchanged; 29 semantic / 29 physical; 4096×4096 RGBA32/1 mip; outside cells changes 0, introduced alpha 0; readable/raw/white/gray QA PASS.
 - C81 reopened-P0-trio strict-QA state preserved unchanged. Current user-approved lock count remains 0.
 - Next canonical-HD production target: 9F060EC1_512x512.dds (5 reviewed segments).
+
+## D83 final QA checkpoint — 2026-09-27 20:14 KST
+- 571E78F3 / 62BEBF33 / E3FD08BE: canonical-HD B87 + C81 + D82/D83 same-SHA static QA PASS; HOLD_PENDING_INGAME_REAPPROVAL. Current lock count remains 0.
+- P0 trio: 2048×256 DXT5 / 1 mip / exact canonical header / raw mirror_y. Changed DXT5 blocks, decoded pixels and introduced alpha outside declared text cells = 0 for all three.
+- Historical 512×64 approvals remain audit/reference only and were not reused/upscaled.
+- FD90AA9 A87/B88: D83 direct preflight PASS on SHA 72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445; 4096×4096 RGBA32 / 1 mip / outside 29 cells unchanged. HOLD_PENDING_C_INGAME.
+- C075FB49 B88 SHA 9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9: D83 fresh preflight PASS after residue fix; 2048×2048 RGBA32 / 1 mip / outside corrected 17 cells = 0 / introduced alpha outside = 0. HOLD_PENDING_C_INGAME.
+- approved_dds receives no new promotion; user_approved_locked remains empty.
+- LOCALIZATION_STATE_OK and Domain Isolation PASS; VR/FFB contamination not observed. No build performed.
+- Next production target: 9F060EC1 (5 reviewed segments). Machine report: localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json.

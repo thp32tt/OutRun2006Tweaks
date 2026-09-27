@@ -845,3 +845,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - FD90 readable/raw/white/gray review found no new clipping, overlap, source-language residue, box escape, seam/black line, opaque box or obvious alpha halo. Canonical black alpha mask/shadow artwork outside declared cells remains untouched; song titles, Ferrari model names, speed/player/AT-MT labels and non-text artwork remain preserved.
 - No approved_dds promotion, no build, no VR/FFB work. Next production target: 9F060EC1 (5 reviewed segments).
 - Machine report: localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json.
+
+## 2026-09-27 20:14 KST — D83 final QA reconciliation
+
+- Started from latest remote HEAD 0fcfce0de6f95cb57296e7e65f5978544487dd08 and re-read the mandatory localization policy/state files.
+- Reopened historical low-res approvals 571E78F3 / 62BEBF33 / E3FD08BE were reconciled against their exact canonical 2048×256 DXT5 HD sources. Historical 512×64 RGBA approvals remain audit-only and were not used as construction sources.
+- All three current B87/C81 SHAs were independently revalidated: exact 128-byte canonical header, 1 mip, raw mirror_y, changed DXT5 blocks outside declared cells = 0, decoded changed pixels outside = 0, introduced alpha outside = 0. C81 did not modify the DDS files, so D82 same-SHA preflight remains valid.
+- Readable black/white and raw C81 evidence was rechecked: no observed source residue, broken Hangul, clipping/overlap, box escape, resolution degradation, seam/black line, opaque box, alpha halo or non-text artwork damage.
+- D83 therefore marks all three HD rebuilds FINAL_STATIC_QA_PASS, but does not re-lock/promote them because mandatory in-game screenshot reapproval is still absent. Current approved lock count remains 0.
+- FD90AA9 A87 SHA 72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445 passed B88 first QA unchanged and was independently D83-preflighted against canonical HD: 4096×4096 RGBA32/1 mip, exact header, outside all 29 declared cells unchanged, raw/readable/white/gray evidence PASS. Maximum Speed and Transmission omission recovery is present. No promotion because C and in-game gates are missing.
+- C075FB49 B88 changed SHA 9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9 supersedes the A86/D82 SHA after fixing a course-description source-cell boundary residue. D83 directly confirms exact header, 2048×2048 RGBA32/1 mip, 797,758 changed pixels, outside corrected 17 cells = 0 and introduced alpha outside = 0. C + in-game remain.
+- LOCALIZATION_STATE_OK and Domain Isolation PASS; no VR/FFB source/history merge. Build not run.
+- Next production target: 9F060EC1 (5 reviewed segments). Report: localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json.

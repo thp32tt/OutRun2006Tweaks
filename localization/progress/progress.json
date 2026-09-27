@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T20:11:31+09:00",
+  "updated_at_kst": "2026-09-27T20:14:16+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B88: C075FB49 A86/D82 SHA superseded by B course-description source-cell boundary/residue rework; new SHA passes B first QA and requires C/D + in-game. FD90AA9 A87 29 semantic / 29 physical SHA passes B first QA unchanged and requires C/D + in-game. C81 P0 trio state preserved. Next production target remains 9F060EC1.",
+  "next_checkpoint": "Reopened P0 HD trio 571E78F3/62BEBF33/E3FD08BE now has B87 + C81 + D82/D83 same-SHA static PASS but remains unapproved until mandatory in-game screenshot reapproval. FD90AA9 A87/B88 same SHA passes D83 preflight but needs C + in-game. C075FB49 B88 changed SHA passes D83 fresh preflight but needs C + in-game. Continue 9F060EC1 canonical-HD production.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -257,7 +257,7 @@
       "coverage": "29 semantic / 29 physical",
       "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
       "report": "localization/graphics/role_A/20260927-1930-A87/A87_FD90AA9_PRODUCTION_REPORT.json",
-      "status": "B88_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "status": "D83_PREFLIGHT_PASS_PENDING_C_INGAME",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
       "transcription_expansion": [
         "Maximum Speed -> 최고 속도",
@@ -286,7 +286,8 @@
         "road/vehicle icons"
       ],
       "b_first_qa_report": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json",
-      "candidate_changed_by_B": false
+      "candidate_changed_by_B": false,
+      "d_preflight_report": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
       "asset": "9F060EC1",
@@ -294,21 +295,22 @@
       "status": "READY_FOR_CANONICAL_HD_RENDER"
     },
     "latest_d_final_qa": {
-      "run": "D82",
-      "report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json",
+      "run": "D83",
+      "report": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json",
       "result": "NO_NEW_APPROVALS",
       "approved_dds_count": 0,
       "user_approved_locked": 0,
-      "FA7BBB13": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
-      "39229D64": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
-      "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+      "571E78F3": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
+      "62BEBF33": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
+      "E3FD08BE": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
+      "FD90AA9": "D83_PREFLIGHT_PASS_PENDING_C_INGAME",
+      "C075FB49": "D83_PREFLIGHT_PASS_PENDING_C_INGAME",
       "C4A2937B": "D82_FINAL_STATIC_PASS_CONTEXT_HOLD_PENDING_INGAME",
       "2DA43E41": "D82_FINAL_STATIC_PASS_PENDING_INGAME",
       "411827E": "D82_FINAL_STATIC_PASS_PENDING_INGAME",
-      "571E78F3": "D82_PREFLIGHT_PASS_PENDING_C_INGAME",
-      "62BEBF33": "D82_PREFLIGHT_PASS_PENDING_C_INGAME",
-      "E3FD08BE": "D82_PREFLIGHT_PASS_PENDING_C_INGAME",
-      "C075FB49": "D82_PRE_B88_SHA_SUPERSEDED_REVALIDATION_REQUIRED"
+      "FA7BBB13": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+      "39229D64": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+      "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
       "run": "C81",
