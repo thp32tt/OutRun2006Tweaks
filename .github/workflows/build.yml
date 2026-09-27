@@ -23,6 +23,10 @@ jobs:
         shell: pwsh
         run: python tools/verify_vr_proven_baseline.py
 
+      - name: Verify backend disassembly contract
+        shell: pwsh
+        run: python tools/verify_vr_backend_disasm_contract.py
+
       - name: Verify consolidated wheel FFB source
         shell: pwsh
         run: python tools/verify_wheel_ffb_current.py
