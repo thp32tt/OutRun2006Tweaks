@@ -197,6 +197,18 @@ forbid(".github/workflows/vr-openxr.yml",
 
 # PASS 10 — the binary contract must cover every new exact production edge.
 contract = read("docs/VR_BINARY_CONTRACT.json")
+import json
+contract_json = json.loads(contract)
+bad_sig_lengths = [
+    item.get("id", "<unknown>")
+    for item in contract_json.get("contracts", [])
+    if len("".join(str(item.get("expectedBytes", "")).split())) !=
+       int(item.get("signatureLength", 16)) * 2
+]
+if bad_sig_lengths:
+    errors.append(f"P10_BINARY_CONTRACT_LENGTHS: invalid signature hex lengths {bad_sig_lengths}")
+else:
+    passes.append("P10_BINARY_CONTRACT_LENGTHS")
 required_contract_rvas = [
     "0x0002C9DB", # canonical glyph -> put_sprite_ex
     "0x0000CABE",  # lens flare -> DrawObjectAlpha_Internal
