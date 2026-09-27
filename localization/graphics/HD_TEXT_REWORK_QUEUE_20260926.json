@@ -107,14 +107,18 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "D_STATIC_REVALIDATED_HOLD_PENDING_C_INGAME",
+      "status": "C_STRICT_QA_PASS_PENDING_INGAME",
       "batch_report": "localization/graphics/role_B/20260927-1310-B82/B82_FA7BBB13_FIRST_QA_AND_39229D64_TRANSCRIPTION.json",
       "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
       "completed_transcription_entries": 17,
       "localized_regions": 17,
       "remaining_segments": 0,
-      "d_final_qa_report": "localization/graphics/role_D/20260927-1319-D76/D76_FA7BBB13_FINAL_QA_HOLD_REPORT.json"
+      "d_final_qa_report": "localization/graphics/role_D/20260927-1319-D76/D76_FA7BBB13_FINAL_QA_HOLD_REPORT.json",
+      "c_strict_qa_report": "localization/graphics/role_C/20260927-1405-C77/C77_FA7BBB13_STRICT_QA.json",
+      "c_candidate_changed": false,
+      "c_outside_text_cells_changed_pixels": 0,
+      "c_introduced_alpha_outside_text_cells": 0
     },
     {
       "hash": "39229D64",

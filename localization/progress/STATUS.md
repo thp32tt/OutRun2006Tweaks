@@ -265,3 +265,14 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Readable/raw manual A-stage artifact QA: PASS after rejecting two internal drafts for English residue/position mismatch and Total Rank seam/residue.
 - Protected ALBERTO, rank/ordinal/key/numeric tokens and non-text artwork preserved.
 - Status: A_PRODUCTION_COMPLETE_PENDING_B_C_D; in-game validation not performed. Next after gate: A064FDFC.
+
+
+## C77 FA7BBB13 strict QA — 2026-09-27 14:05 KST
+- Candidate 3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d: C STATIC STRICT QA PASS, candidate unchanged.
+- Canonical SHA-256 61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15; 4096×2048 RGBA32 / 1 mip / 33,554,560 bytes / exact 128-byte header.
+- 1,054,544 changed pixels are confined to the 17 source text cells; outside-cell changes = 0; outside-cell introduced alpha = 0.
+- Raw mirror_y and readable orientation review PASS; no clipping/overlap, residual English, seam/black line, opaque box, alpha halo, or protected-artwork damage observed.
+- No approval promotion until in-game screenshot validation; D76 can be reconciled after this C result.
+- 39229D64 A82 remains pending post-A82 B revalidation, then C/D.
+- Machine report: localization/graphics/role_C/20260927-1405-C77/C77_FA7BBB13_STRICT_QA.json.
+- VR/FFB unchanged; no build.

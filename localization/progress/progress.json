@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T13:58:56+09:00",
+  "updated_at_kst": "2026-09-27T14:05:02+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "39229D64 A82 canonical-HD production is complete: 13 semantic / 15 physical text regions. Run B/C/D static QA and in-game screenshot validation before promotion; FA7BBB13 remains held pending current C + in-game. Next P1 production asset after the 39229D64 static gate is A064FDFC.",
+  "next_checkpoint": "39229D64 A82 canonical-HD production is complete (13 semantic / 15 physical) and still requires post-A82 B revalidation before C/D. FA7BBB13 A81/B82/C77 static QA passes; D76 independent static checks also passed, but approved promotion remains held for mandatory in-game screenshot validation. After the 39229D64 static gate, continue A064FDFC.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -272,6 +272,16 @@
       "report": "localization/graphics/role_D/20260927-1319-D76/D76_FA7BBB13_FINAL_QA_HOLD_REPORT.json",
       "result": "NO_NEW_APPROVALS",
       "approved_dds_count": 3
+    },
+    "latest_c_strict_qa": {
+      "asset": "FA7BBB13",
+      "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
+      "report": "localization/graphics/role_C/20260927-1405-C77/C77_FA7BBB13_STRICT_QA.json",
+      "result": "PASS_STATIC_STRICT_QA_PENDING_INGAME",
+      "candidate_changed_by_C": false,
+      "outside_text_cells_changed_pixels": 0,
+      "introduced_alpha_outside_text_cells": 0,
+      "in_game_validation": "PENDING"
     }
   },
   "data_build": {

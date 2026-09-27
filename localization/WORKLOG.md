@@ -567,3 +567,18 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Candidate SHA-256: 5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077.
 - Candidate: localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds.
 - Status: A82_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA. No approved promotion, in-game claim, build, VR or FFB work. Next production asset after static gate: A064FDFC.
+
+
+## 2026-09-27 14:05 KST — C77 FA7BBB13 strict QA
+
+- Based C review on latest remote HEAD 04d891126277269ae72aa942cbde0c64b46a382b; preserved concurrent A82 39229D64 production state.
+- Independently compared canonical HD FA7BBB13 against A81/B82 candidate 3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d in both readable and raw mirror_y orientations.
+- Semantic QA: all 17 source/Korean instruction pairs match the reviewed transcription; no mistranslation requiring C correction was found.
+- Structural QA: 4096×2048 RGBA32, 1 mip, 33,554,560 bytes, exact canonical 128-byte DDS header.
+- Pixel containment: 1,054,544 changed pixels total; 0 changed pixels outside the 17 source text cells; 0 introduced-alpha pixels outside those cells.
+- Visual/artifact gate: no residual source English in replaced cells, clipping, overlap, box escape, black seam/line, opaque box, obvious alpha halo, or non-text artwork damage observed.
+- Candidate DDS was not modified by C. Result: PASS_STATIC_STRICT_QA_PENDING_INGAME.
+- No approved_dds promotion: mandatory in-game screenshot validation remains. D76's missing-C dependency is now cleared; final D reconciliation is still required before promotion.
+- 39229D64 A82 is not C-approved in this run because post-A82 B revalidation is not yet present.
+- Report: localization/graphics/role_C/20260927-1405-C77/C77_FA7BBB13_STRICT_QA.json.
+- VR/FFB source untouched; build not run.

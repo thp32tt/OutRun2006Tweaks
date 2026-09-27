@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C77",
+  "timestamp_kst": "2026-09-27T14:05:02+09:00",
+  "base_head": "04d891126277269ae72aa942cbde0c64b46a382b",
+  "scope": "strict QA + correction decision; no build; no VR/FFB",
+  "asset": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+  "canonical_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+  "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
+  "inputs": {
+    "A81": "localization/graphics/role_A/20260927-1257-A81/A81_FA7BBB13_PRODUCTION_REPORT.json",
+    "B82": "localization/graphics/role_B/20260927-1310-B82/B82_FA7BBB13_FIRST_QA_AND_39229D64_TRANSCRIPTION.json",
+    "prior_D_hold": "localization/graphics/role_D/20260927-1319-D76/D76_FA7BBB13_FINAL_QA_HOLD_REPORT.json"
+  },
+  "result": "PASS_STATIC_STRICT_QA_PENDING_INGAME",
+  "candidate_changed_by_C": false,
+  "corrections_applied": [],
+  "semantic_review": {
+    "reviewed_pairs": 17,
+    "result": "PASS",
+    "pairs": [
+      {
+        "source": "Match the total!",
+        "korean": "합계를 맞히세요!"
+      },
+      {
+        "source": "Count the gifts!",
+        "korean": "선물을 세세요!"
+      },
+      {
+        "source": "Hit the boost!",
+        "korean": "부스트를 밟으세요!"
+      },
+      {
+        "source": "Keep control!",
+        "korean": "차량을 제어하세요!"
+      },
+      {
+        "source": "Hold the line!",
+        "korean": "라인을 유지하세요!"
+      },
+      {
+        "source": "Honk the horn!",
+        "korean": "경적을 울리세요!"
+      },
+      {
+        "source": "Do the math!",
+        "korean": "계산하세요!"
+      },
+      {
+        "source": "Guess the sound!",
+        "korean": "소리를 맞혀 보세요!"
+      },
+      {
+        "source": "Count Green Cars!",
+        "korean": "초록색 차를 세세요!"
+      },
+      {
+        "source": "Count Blue Cars!",
+        "korean": "파란색 차를 세세요!"
+      },
+      {
+        "source": "Count the sheep!",
+        "korean": "양을 세세요!"
+      },
+      {
+        "source": "Count Red Cars!",
+        "korean": "빨간색 차를 세세요!"
+      },
+      {
+        "source": "Memorize the sequence!",
+        "korean": "순서를 기억하세요!"
+      },
+      {
+        "source": "Drive above the speed!",
+        "korean": "지정 속도 이상으로 달리세요!"
+      },
+      {
+        "source": "Spot the odd one out!",
+        "korean": "다른 하나를 찾으세요!"
+      },
+      {
+        "source": "Slipstream the cars!",
+        "korean": "차량 뒤에서 슬립스트림하세요!"
+      },
+      {
+        "source": "Run through green!",
+        "korean": "초록색을 통과하세요!"
+      }
+    ]
+  },
+  "structural_checks": {
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "file_size_bytes": 33554560,
+    "dds_header_128_exact_canonical": true,
+    "total_changed_pixels": 1054544,
+    "outside_17_text_cells_changed_pixels": 0,
+    "introduced_alpha_outside_17_text_cells": 0,
+    "declared_candidate_alpha_bboxes_inside_source_cells": true,
+    "raw_changed_bbox": [
+      0,
+      1480,
+      4068,
+      2021
+    ]
+  },
+  "visual_checks": {
+    "readable_orientation_source_candidate_compare": "PASS",
+    "raw_orientation": "mirror_y",
+    "raw_orientation_source_candidate_compare": "PASS",
+    "visible_source_english_residue_in_replaced_cells": "NONE_OBSERVED",
+    "clipping_or_overlap": "NONE_OBSERVED",
+    "text_region_escape": "NONE",
+    "black_line_or_seam": "NONE_OBSERVED",
+    "opaque_box": "NONE_OBSERVED",
+    "alpha_halo_or_border_mismatch": "NONE_OBSERVED",
+    "non_text_artwork_damage": "NONE_OBSERVED",
+    "style_fidelity": "PASS_YELLOW_NAVY_WHITE_SOURCE_FAMILY",
+    "protected_brand_model_song_credit_legal_text_touched": false
+  },
+  "limitations": [
+    "Static raw/readable QA cannot replace mandatory in-game screenshot validation.",
+    "No approved_dds promotion is authorized by role C.",
+    "39229D64 A82 is not included in this C gate because its post-A82 B revalidation is not yet present."
+  ],
+  "next": "FA7BBB13 C dependency is cleared. Keep promotion on hold until in-game validation/final D reconciliation. Run B revalidation for 39229D64 A82 before its C gate."
+}
