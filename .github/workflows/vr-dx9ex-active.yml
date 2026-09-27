@@ -171,7 +171,7 @@ jobs:
           }
           Copy-Item $dll.FullName stage-game/dinput8.dll
           Set-Content stage-game/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
-          Set-Content stage-game/VARIANT_ID.txt 'ACTIVE_R26_HUD_R66' -Encoding ascii
+          Set-Content stage-game/VARIANT_ID.txt 'ACTIVE_R26_HUD_R67' -Encoding ascii
           Set-Content stage-game/CMAKE_FLAGS.txt '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF' -Encoding ascii
       - uses: actions/upload-artifact@v4
         with:
@@ -224,7 +224,7 @@ jobs:
             SchemaVersion = 1
             BuildMatrixId = $matrixId
             IntegrationSha = $env:GITHUB_SHA
-            VariantId = 'ACTIVE_R26_HUD_R66'
+            VariantId = 'ACTIVE_R26_HUD_R67'
             DefaultTestProfile = 'CORRECTNESS'
             Profiles = @('CONTROL','CORRECTNESS','PERFORMANCE')
             UserRuntimeVerified = $false

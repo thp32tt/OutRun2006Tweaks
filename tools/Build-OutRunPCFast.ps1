@@ -175,7 +175,7 @@ if (-not (Test-Path $hostExe)) { throw 'outrun-vr-host.exe missing after increme
 Copy-Item $dll.FullName (Join-Path $backendDir 'dinput8.dll')
 Copy-Item $hostExe (Join-Path $backendDir 'outrun-vr-host.exe')
 Set-Content (Join-Path $backendDir 'SOURCE_SHA.txt') $sourceSha -Encoding ascii
-Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R66' -Encoding ascii
+Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R67' -Encoding ascii
 Assert-R66ProvenBuildContract -BuildDir $gameBuild
 Set-Content (Join-Path $backendDir 'CMAKE_FLAGS.txt') $canonicalGameFlagString -Encoding ascii
 Set-Content (Join-Path $backendDir 'BUILD_CONTRACT.txt') $buildContractVersion -Encoding ascii
@@ -229,7 +229,7 @@ $buildInputs = [ordered]@{
     SchemaVersion = 1
     BuildMatrixId = $matrixId
     IntegrationSha = $sourceSha
-    VariantId = 'ACTIVE_R26_HUD_R66'
+    VariantId = 'ACTIVE_R26_HUD_R67'
     DefaultTestProfile = 'CORRECTNESS'
     Profiles = @('CONTROL', 'CORRECTNESS', 'PERFORMANCE')
     UserRuntimeVerified = $false
