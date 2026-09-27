@@ -183,6 +183,21 @@ if($backend -ne '2d'){
     $gameArgs += '-HudInspector=true'
 }
 
+# Keep yesterday's R58 HUD/stereo behavior unchanged. Backend overrides below
+# affect transport/provider selection only.
+if($backend -match '^dxvk'){
+    $gameArgs += '-PreferD3D9Ex=false'
+    $gameArgs += '-AllowThirdPartyD3D9Ex=false'
+    $gameArgs += '-DirectGpuOnly=false'
+    $gameArgs += '-DisableDesktopDuplication=false'
+}
+if($backend -eq 'dx11'){
+    $gameArgs += '-PreferD3D9Ex=true'
+    $gameArgs += '-AllowThirdPartyD3D9Ex=false'
+    $gameArgs += '-DirectGpuOnly=true'
+    $gameArgs += '-DisableDesktopDuplication=true'
+}
+
 $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)
 New-Item -ItemType Directory -Force $sessionRoot|Out-Null
 

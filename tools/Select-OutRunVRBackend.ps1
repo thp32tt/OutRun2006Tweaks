@@ -194,7 +194,8 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "Enabled" "true"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
-        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
         $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
@@ -206,6 +207,7 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
     } elseif ($Backend -eq "dx11") {
@@ -217,22 +219,28 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "true"
+    } elseif ($Backend -eq "dxvk") {
+        $text = Set-IniSectionValue $text "VR" "RenderBackend" "2"
+        $text = Set-IniSectionValue $text "VR" "Enabled" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
+        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
+        $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
     } else {
-        $value = switch ($Backend) {
-            "dxvk" { "2" }
-            "dx12" { "3" }
-        }
-        $text = Set-IniSectionValue $text "VR" "RenderBackend" $value
+        $text = Set-IniSectionValue $text "VR" "RenderBackend" "3"
         $text = Set-IniSectionValue $text "VR" "Enabled" "true"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        $text = Set-IniSectionValue $text "VR" "AllowThirdPartyD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"
-        if ($Backend -eq "dxvk") {
-            $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
-        }
+        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "true"
     }
 
     # Keep the experimental cockpit camera completely isolated from normal
@@ -282,7 +290,7 @@ $sessionManifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $root "CURRE
 $sessionManifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $sessionRoot "session_manifest.json") -Encoding UTF8
 
 if (Test-Path $ini) {
-    $allowed = '^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|DriverSeatView)\s*='
+    $allowed = '^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|AllowThirdPartyD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|DriverSeatView)\s*='
     Get-Content $ini | Where-Object { $_ -match $allowed } |
         Set-Content (Join-Path $sessionRoot "VR_CONFIG_SNAPSHOT.txt") -Encoding UTF8
 }
@@ -301,7 +309,7 @@ switch ($Backend) {
     "2d"   { Write-Host "2D ORIGINAL: classic D3D9, VR disabled, D3D9Ex promotion disabled, no VR host." }
     "d3d9" { Write-Host "D3D9Ex REFERENCE: PreferD3D9Ex enabled; DirectGPU optional; profile=$TestProfile." }
     "dx11" { Write-Host "DX11 HOST/DIRECTGPU: D3D9Ex game + x64 D3D11 OpenXR host; DirectGPU-only; ACK run identity required." }
-    "dxvk-safe" { Write-Host "DXVK SAFE: provider-local D3D9Ex is probed when exported; DirectGPU optional; multiview patcher disabled." }
-    "dxvk" { Write-Host "DXVK MULTIVIEW: local d3d9.dll + multiviewpatcher.dll active." }
+    "dxvk-safe" { Write-Host "DXVK SAFE: classic DXVK + SBS/Desktop Duplication fail-open; provider-local Ex disabled." }
+    "dxvk" { Write-Host "DXVK MULTIVIEW: classic DXVK + multiviewpatcher; DirectGPU is not forced; fallback remains available." }
     "dx12" { Write-Host "DX12 STRICT: local d3d9.dll verified absent; Windows D3D9On12 required." }
 }
