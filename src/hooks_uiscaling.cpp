@@ -701,9 +701,38 @@ class UIScaling : public Hook
 	{
 		auto original = reinterpret_cast<TextGlyphPutSpriteFn>(
 			Module::exe_ptr(0x2CFE0));
-		OutRunVR::GameSemantic::ScopedProducerSemantic producer(
-			OutRunVR::GameSemantic::RenderScope::ScreenHud);
-		return original(args, priority);
+
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
+
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = original(args, priority);
+		}
+
+		// R68: canonical glyph rendering is deferred through the SpriteNode
+		// queue. Producer scope alone expires before the later queue draw.
+		// Pin only the node appended by the verified 0x2C9DB glyph edge.
+		root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (node && node != tailBefore)
+		{
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			static std::atomic<std::uint64_t> glyphTags{ 0 };
+			const auto hit = glyphTags.fetch_add(
+				1, std::memory_order_relaxed) + 1;
+			if ((hit & (hit - 1)) == 0)
+				spdlog::info(
+					"VR R68 TEXT GLYPH: canonical node pinned prio={} kind={} hits={}",
+					prio, node->kind_C, hit);
+		}
+		return result;
 	}
 
 	enum SpriteScaleType
