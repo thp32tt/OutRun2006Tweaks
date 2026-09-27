@@ -101,56 +101,13 @@ class UIScaling : public Hook
 				probe, site, hit);
 	}
 
-	static int VRR57Mode() noexcept
-	{
-		static const int mode = []() noexcept {
-			char text[8]{};
-			const DWORD len = GetEnvironmentVariableA(
-				"OUTRUN_VR_R57_MODE", text,
-				static_cast<DWORD>(sizeof(text)));
-			// R66 production baseline: HMD testing established mode 6 as the
-			// correct projected 1st-5th marker + DispRank ownership path.
-			// Explicit env=0 remains available for controlled regression tests.
-			if (len == 0 || len >= sizeof(text))
-				return 6;
-			int value = 0;
-			for (DWORD i = 0; i < len; ++i)
-			{
-				if (text[i] < '0' || text[i] > '9')
-					return 6;
-				value = value * 10 + int(text[i] - '0');
-			}
-			return (value >= 0 && value <= 10) ? value : 6;
-		}();
-		return mode;
-	}
-
 	inline static thread_local
 		OutRunVR::GameSemantic::ProjectedMarkerInfo RankMarkerProjectedInfo{};
 
 	static OutRunVR::GameSemantic::RenderScope
-	R57RankProducerScope(bool rank13) noexcept
+	R57RankProducerScope(bool) noexcept
 	{
-		switch (VRR57Mode())
-		{
-		case 4:
-			return OutRunVR::GameSemantic::RenderScope::ScreenHud;
-		case 5:
-		case 6:
-		case 9:
-		case 10:
-			return OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
-		case 7:
-			return rank13
-				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
-				: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
-		case 8:
-			return rank13
-				? OutRunVR::GameSemantic::RenderScope::WorldBillboard
-				: OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
-		default:
-			return OutRunVR::GameSemantic::RenderScope::WorldBillboard;
-		}
+		return OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
 	}
 
 	// Addresses of the draw calls sub_4BAD20 makes. sprani_play_ae_auth_alpha
@@ -405,39 +362,14 @@ class UIScaling : public Hook
 		else if (probe == 11) probeY -= 72.0f;
 		else if (probe == 12) { probeX = 320.0f; probeY = 208.0f; }
 
-		int result = 0;
-		if (VRR57Mode() != 0)
-		{
-			const auto scope = R57RankProducerScope(true);
-			const auto* marker =
-				scope == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+		const auto scope = R57RankProducerScope(true);
+		const auto* marker =
+			scope == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
 				? &RankMarkerProjectedInfo : nullptr;
-			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
-				scope, marker);
-			result = Game::sprani_play_ae_auth_alpha(
-				spriteId, probeX, probeY, a4, a5, alpha);
-		}
-		else
-		{
-			result = Game::sprani_play_ae_auth_alpha(
-				spriteId, probeX, probeY, a4, a5, alpha);
-
-			// R56 compatibility path.
-			for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
-			{
-				SpriteNode* root = Game::sprite_prio_root[prio];
-				SpriteNode* node = root ? root->tail_4 : nullptr;
-				if (node && node != tailsBefore[prio])
-				{
-					const auto scope =
-						(probe == 16)
-						? OutRunVR::GameSemantic::RenderScope::ScreenHud
-						: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
-					OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
-				}
-			}
-		}
-		return result;
+		OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+			scope, marker);
+		return Game::sprani_play_ae_auth_alpha(
+			spriteId, probeX, probeY, a4, a5, alpha);
 	}
 
 	// R58 HMD evidence: mode 6 proved head-inverse projected tracking for 1st-3rd;
@@ -462,20 +394,14 @@ class UIScaling : public Hook
 		if (probe == 13) probeX += 96;
 		else if (probe == 14) probeY -= 72;
 		else if (probe == 15) { probeX = 320; probeY = 208; }
-		int result = 0;
 		const auto r57Scope = R57RankProducerScope(false);
 		const auto* r57Marker =
 			r57Scope == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
 			? &RankMarkerProjectedInfo : nullptr;
-		if (VRR57Mode() != 0)
+		int result = 0;
 		{
 			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
 				r57Scope, r57Marker);
-			result = Game::put_clip_sprite(
-				xstnum, probeX, probeY, flags, priority, color);
-		}
-		else
-		{
 			result = Game::put_clip_sprite(
 				xstnum, probeX, probeY, flags, priority, color);
 		}
@@ -491,7 +417,6 @@ class UIScaling : public Hook
 		{
 			node->args_10.float24 += RankMarkerFracX;
 			node->args_10.float28 += RankMarkerFracY;
-			if (VRR57Mode() != 0)
 			{
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
 					node, r57Scope, r57Marker);
@@ -503,14 +428,6 @@ class UIScaling : public Hook
 						"VR R58 DIRECT CLIP: owner=rank46 prio={} kind={} projected={} hits={}",
 						prio, node->kind_C,
 						r57Marker && r57Marker->valid ? 1 : 0, hit);
-			}
-			else
-			{
-				const auto scope =
-					(probe == 17)
-					? OutRunVR::GameSemantic::RenderScope::ScreenHud
-					: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
-				OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
 			}
 			// R56-18 deliberately tests whether a one-shot semantic survives from
 			// this exact producer to the eventual D3D draw. Cross-thread loss is a
@@ -532,8 +449,7 @@ class UIScaling : public Hook
 	{
 		auto original = reinterpret_cast<DispRankSpraniFn>(
 			Module::exe_ptr(0x29530));
-		const int r57 = VRR57Mode();
-		const bool exactPositionOwner = r57 == 1 || r57 == 3 || r57 == 6;
+		constexpr bool exactPositionOwner = true;
 
 		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
 		if (exactPositionOwner)
@@ -618,9 +534,9 @@ class UIScaling : public Hook
 		SpriteNode* root = Game::sprite_prio_root[prio];
 		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
 
-		const int r57 = VRR57Mode();
+		constexpr bool exactPositionOwner = true;
 		int result = 0;
-		if (r57 == 2 || r57 == 3 || r57 == 6)
+		if (exactPositionOwner)
 		{
 			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
 				OutRunVR::GameSemantic::RenderScope::ScreenHud);
@@ -636,7 +552,7 @@ class UIScaling : public Hook
 		// R57 HMD modes 2/3 proved that the nested put_clip_sprite -> put_sprite_ex
 		// producer scope did not survive as an accepted kind-0 HUD owner. The
 		// canonical helper appends one node, so pin the exact new node directly.
-		if (r57 == 2 || r57 == 3 || r57 == 6)
+		if (exactPositionOwner)
 		{
 			root = Game::sprite_prio_root[prio];
 			SpriteNode* node = root ? root->tail_4 : nullptr;
