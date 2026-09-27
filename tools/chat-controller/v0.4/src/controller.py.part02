@@ -480,6 +480,18 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
             return
         prompt = prompt_for_slot(slot, "continue")
 
+    # Scheduled self-healing: Retry/error pages can lose the composer entirely.
+    # Refresh once, then replace only this slot tab; do not consume an extra prompt send.
+    if await first_visible(page, INPUT_SELECTORS, total_wait_ms=1200) is None:
+        page = await recover_slot_composer(context, pages, slot, page)
+        is_new = not slot.url
+        if await first_visible(page, INPUT_SELECTORS, total_wait_ms=3000) is None:
+            slot.last_result = "composer_recovery_failed"
+            save_registry(reg)
+            write_runtime(status="ui_changed", last_action=f"Slot {slot.name}: composer recovery failed", current_url=page.url)
+            return
+        prompt = prompt_for_slot(slot, "bootstrap" if is_new else "continue")
+
     if await detect_rate_limit(page):
         slot.last_result = "rate_limited_pre_send"
         save_registry(reg)
