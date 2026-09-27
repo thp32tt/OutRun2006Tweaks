@@ -147,7 +147,7 @@ namespace OutRunVRHudInspector
             // turns the original mod's reverse-engineered HUD addresses into
             // runtime evidence instead of leaving every row UNKNOWN.
             if (SemanticIdentityVerified &&
-                semantic.space == OutRunVRHudSemantics::SpacePolicy::Unknown)
+                semantic.space == OutRunVR::GameSemantic::RenderScope::None)
             {
                 void* frames[24]{};
                 const USHORT frameCount = RtlCaptureStackBackTrace(
@@ -166,7 +166,7 @@ namespace OutRunVRHudInspector
                     const auto candidate =
                         OutRunVRHudSemantics::ClassifyCaller(candidateRva);
                     if (candidate.space ==
-                        OutRunVRHudSemantics::SpacePolicy::Unknown)
+                        OutRunVR::GameSemantic::RenderScope::None)
                         continue;
                     callRva = candidateRva;
                     semantic = candidate;
@@ -190,7 +190,7 @@ namespace OutRunVRHudInspector
             // patch can use canonical EXE call-site ownership instead of a
             // current_mode/stage heuristic.
             if (semantic.space ==
-                    OutRunVRHudSemantics::SpacePolicy::Unknown &&
+                    OutRunVR::GameSemantic::RenderScope::None &&
                 mode == 32 && stage == 60 && count <= 4)
             {
                 void* frames[16]{};
@@ -391,7 +391,7 @@ namespace OutRunVRHudInspector
         };
 
         auto semantic = resolveRva(ToExeRva(returnAddress));
-        if (semantic.space == OutRunVRHudSemantics::SpacePolicy::Unknown)
+        if (semantic.space == OutRunVR::GameSemantic::RenderScope::None)
         {
             void* frames[24]{};
             const USHORT frameCount = RtlCaptureStackBackTrace(
@@ -405,7 +405,7 @@ namespace OutRunVRHudInspector
                     continue;
                 const auto candidate = resolveRva(frameReturnRva);
                 if (candidate.space ==
-                    OutRunVRHudSemantics::SpacePolicy::Unknown)
+                    OutRunVR::GameSemantic::RenderScope::None)
                     continue;
                 semantic = candidate;
                 break;
@@ -424,10 +424,10 @@ namespace OutRunVRHudInspector
         // Bit 0 = exact SCREEN_HUD, bit 1 = exact WORLD_BILLBOARD.
         // Default 0 keeps production behavior untouched unless a test variant
         // explicitly asks to consume the verified disassembly semantics.
-        if (semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud &&
+        if (semantic.space == OutRunVR::GameSemantic::RenderScope::ScreenHud &&
             (semanticMode & 1) != 0)
             return OutRunVR::GameSemantic::RenderScope::ScreenHud;
-        if (semantic.space == OutRunVRHudSemantics::SpacePolicy::WorldBillboard &&
+        if (semantic.space == OutRunVR::GameSemantic::RenderScope::WorldBillboard &&
             (semanticMode & 2) != 0)
             return OutRunVR::GameSemantic::RenderScope::WorldBillboard;
         return OutRunVR::GameSemantic::RenderScope::None;
