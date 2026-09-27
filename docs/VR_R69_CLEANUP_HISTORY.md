@@ -70,3 +70,13 @@ Rules:
 - Exact ScreenOverlay2D / ProjectedWorld / ProjectedScreenEffect semantics now resolve through a small policy module before projection/WVP classification.
 - HUD and world paths still use the existing proven projection/WVP gates, so visual policy remains R69-equivalent.
 - Build gate: DX9Ex Active Validation on the candidate branch.
+
+
+## S7 — unified stereo safety policy
+- Branch: `vr-d3d9ex-candidate/r69-clean-s7`
+- Parent: S6 `d46e8c55335a8360b2a9d62a606160b02e6503b3`.
+- Added `src/vr/d3d9/safety_policy.hpp` with one fail-closed `StereoReplayState -> CanReplayStereo` predicate.
+- The R30 production owner now gathers live D3D9/runtime state and delegates the decision to this policy instead of maintaining a second nested boolean gate.
+- Existing R9/R13 mono-shadow fallback behavior is preserved; this stage changes ownership of the decision, not its conditions.
+- This is checkpoint build B2 for limited HMD testing.
+- Build gate: DX9Ex Active Validation on the candidate branch.
