@@ -210,10 +210,11 @@ jobs:
             DX12='D3D9On12 probe is authoritative gate; DX12 STRICT gameplay remains experimental, not a native D3D12 host claim'
             R57Variants=@(
               'R57_01_POSITION_KIND1_HUD35','R57_02_POSITION_KIND0_HUD35','R57_03_POSITION_ALL_WORLD35',
-              'R57_04_RANK_ALL_AS_HUD','R57_06_RANK_PROJECTED_HEAD','R57_06_RANK_PROJECTED_HEAD',
+              'R57_04_RANK_ALL_AS_HUD','R57_05_RANK_PROJECTED_IPD','R57_06_RANK_PROJECTED_HEAD',
               'R57_07_RANK_PROJECTED_13','R57_08_RANK_PROJECTED_46','R57_09_RANK_PROJECTED_ZERO',
               'R57_10_RANK_PROJECTED_TRACE'
             )
+            R59Variants=@('R59_01_RANK_HEAD_SCALE82')
           }|ConvertTo-Json -Depth 5|Set-Content "$dir/BUILD_INPUTS.json" -Encoding UTF8
           @(
             'OUTRUN VR R59 UNIFIED 2026-09-27'
@@ -221,12 +222,12 @@ jobs:
             'START: START_HERE_VR_TEST.cmd'
             ''
             'R59 focused HMD order:'
-            '1) R57 06 - combined 1st-6th projected rank, head inverse, direct 4th+ ownership, anchor-centred 82% scale'
-            '2) DX11 HOST DirectGPU - same R57 06 rank identity through the D3D11 OpenXR host'
+            '1) R59_01 - combined 1st-6th projected rank, head inverse, direct 4th+ ownership, anchor-centred 82% scale'
+            '2) DX11 HOST DirectGPU - same R59_01 visible identity through the D3D11 OpenXR host'
             '3) DXVK SAFE only if needed - classic DXVK fail-open; provider-local Ex remains disabled'
             ''
             'R57 05 remains diagnostic IPD-only and is no longer the recommended production candidate.'
-            'DXVK SAFE / MULTIVIEW use R57_06 when comparing the same visible rank result.'
+            'DXVK SAFE / MULTIVIEW use R59_01 when comparing the same visible rank result.'
             'Run DX12 D3D9On12 PROBE before DX12 STRICT.'
             ''
             'DX11 means D3D9Ex game -> x64 D3D11 OpenXR host, not a native DX11 game renderer.'
@@ -259,7 +260,7 @@ jobs:
           $selector=Get-Content verify/Select-OutRunVRBackend.ps1 -Raw
           if($selector -notmatch '"dx11"'){throw 'DX11 host mode missing'}
           $gui=Get-Content verify/OutRunVR-Test-Selector.ps1 -Raw
-          foreach($marker in @('DX11 Host DirectGPU','DXVK SAFE','DXVK MULTIVIEW','DX12 STRICT','R57_05_RANK_PROJECTED_IPD')){
+          foreach($marker in @('DX11 Host DirectGPU','DXVK SAFE','DXVK MULTIVIEW','DX12 STRICT','R59_01_RANK_HEAD_SCALE82')){
             if($gui -notmatch [regex]::Escape($marker)){throw "GUI missing $marker"}
           }
           Get-FileHash $zip.FullName -Algorithm SHA256
