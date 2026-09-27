@@ -512,3 +512,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - 9F: 5/5; 2048x2048 RGBA32; 62,929 changed pixels; outside cells = 0; alpha changes outside = 0; minimum bbox margin = 4 px; legal/barcode/watermark artwork preserved.
 - C075/FD90 D83 preflight remains same-SHA binary-valid; final D reconciliation + in-game still required. 9F requires D + in-game. No promotion/lock; current lock count 0. No build; VR/FFB unchanged.
 - Machine report: localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json.
+
+## D84 final QA checkpoint — 2026-09-27 21:22 KST
+- C075FB49: C82 + D84 FINAL STATIC QA PASS on SHA 9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9; HOLD_PENDING_INGAME.
+- FD90AA9: C82 + D84 FINAL STATIC QA PASS on SHA 72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445; HOLD_PENDING_INGAME.
+- 9F060EC1: A88/B89/C82/D84 FINAL STATIC QA PASS on SHA 39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60; HOLD_PENDING_INGAME.
+- All three preserve canonical DDS header/format/mips/raw mirror_y; changed pixels outside declared cells = 0 and introduced alpha outside = 0. C82 changed no DDS.
+- No promotion: mandatory in-game screenshot evidence is absent. approved/user-locked count remains 0. P0 HD trio also remains final-static pending in-game reapproval.
+- Next current-pipeline special cases: D6DC1380 then 48DEBE77, CREATE_NEW_HD_KOREAN_ASSET only; never upscale prior Korean DDS.
+- LOCALIZATION_STATE_OK and Domain Isolation PASS; VR/FFB contamination not observed. No build performed.
+- Machine report: localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json.

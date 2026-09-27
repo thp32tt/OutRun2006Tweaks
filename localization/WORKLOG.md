@@ -893,3 +893,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Readable/white/gray/raw mirror_y QA for all three found no source-language residue, broken Hangul, clipping/overlap, box escape, seam/black line, opaque box, alpha-halo artifact, resolution degradation, non-text damage or wrong replacement. C82 changed no DDS.
 - C075/FD90 D83 preflights are on the same current SHAs and remain binary-valid; final D reconciliation still follows C. 9F requires D reconciliation. All three remain in-game pending; current lock count stays 0. No build; VR/FFB untouched.
 - Machine report: localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json.
+
+## 2026-09-27 21:22 KST — D84 final QA reconciliation after C82
+
+- Rebased D final QA onto latest remote HEAD de56a0683b7d643a9acfead0ab79eb9c187340de after C82 strict QA arrived. C82 changed no DDS.
+- C075FB49 current SHA 9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9: B88 residue fix + D83 same-SHA preflight + C82 strict QA reconciled. 2048×2048 RGBA32/1 mip, exact header, 797,758 changed pixels, outside corrected 17 cells = 0, introduced alpha outside = 0. C82 high-zoom review explicitly accepts the zero-bottom-margin Tuned/Normal Setting cells with complete glyphs and no escape. FINAL_STATIC_QA_PASS_PENDING_INGAME.
+- FD90AA9 current SHA 72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445: A87/B88/D83/C82 same-SHA chain reconciled. 4096×4096 RGBA32/1 mip, exact header, 3,574,612 changed pixels, outside 29 cells = 0, introduced alpha outside = 0, minimum bbox margin 13 px. Maximum Speed/Transmission recovery present; protected songs/models/UI/non-text artwork preserved. FINAL_STATIC_QA_PASS_PENDING_INGAME.
+- 9F060EC1 current SHA 39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60: A88/B89/C82 same-SHA chain plus D84 direct reconciliation PASS. 2048×2048 RGBA32/1 mip, exact header/channel masks, 62,929 changed pixels, outside 5 cells = 0. Alpha changes total 61, all inside cells and no transparent→nontransparent introduced pixels. Row numbers, OM, barcode/legal code, repeating watermark and frame/panel artwork preserved. FINAL_STATIC_QA_PASS_PENDING_INGAME.
+- No in-game screenshot evidence exists for these three, so none is promoted/locked. Current approved/user-locked count remains 0.
+- Reopened P0 HD trio remains D83 final-static PASS pending mandatory in-game reapproval. Earlier C4/2DA/411 and FA7/392/A064 in-game holds remain unchanged.
+- No REWORK_FROM_HD_BASE entries remain. Next current-pipeline special cases are D6DC1380 then 48DEBE77 under CREATE_NEW_HD_KOREAN_ASSET; prior Korean DDS must not be upscaled.
+- LOCALIZATION_STATE_OK and Domain Isolation PASS; no VR/FFB source/history merge. Build not run.
+- Report: localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json.

@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "role": "D",
+  "run": "D84",
+  "timestamp_kst": "2026-09-27T21:22:59+09:00",
+  "base_head": "de56a0683b7d643a9acfead0ab79eb9c187340de",
+  "scope": "final QA + approval reconciliation on latest C82 C075FB49/FD90AA9/9F060EC1 state; no build; no VR/FFB",
+  "approved_dds_changes": [],
+  "current_approved_lock_count": 0,
+  "historical_lowres_approved_dds": "AUDIT_REFERENCE_ONLY_SUPERSEDED_BY_HD_MIGRATION",
+  "reviewed_candidates": {
+    "C075FB49": {
+      "canonical_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
+      "gate_chain": {
+        "A86": "PRODUCTION_PASS_SUPERSEDED_SHA",
+        "B88": "REWORK_FIRST_QA_PASS_CURRENT_SHA",
+        "D83": "CURRENT_SHA_PREFLIGHT_PASS",
+        "C82": "STATIC_STRICT_QA_PASS_UNCHANGED",
+        "D84": "FINAL_RECONCILIATION_PASS"
+      },
+      "semantic_entries": 16,
+      "physical_regions": 17,
+      "d84_checks": {
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "file_size_bytes": 16777344,
+        "dds_header_128_exact_canonical": true,
+        "candidate_sha_matches_current": true,
+        "total_changed_pixels_vs_canonical": 797758,
+        "outside_corrected_17_cells_changed_pixels": 0,
+        "introduced_alpha_outside_17_cells": 0,
+        "raw_orientation": "mirror_y",
+        "b88_source_residue_fix": "CONFIRMED_BY_C82",
+        "setting_label_zero_margin_boundary": "C82_HIGH_ZOOM_PASS_NO_CLIPPING_OR_ESCAPE",
+        "readable_white_gray_raw_visual_qa": "PASS",
+        "source_language_residue": "NONE_OBSERVED",
+        "broken_hangul": "NONE_OBSERVED",
+        "clipping_overlap_box_escape": "NONE_OBSERVED",
+        "black_line_seam_opaque_box_alpha_halo": "NONE_OBSERVED",
+        "protected_outRun_ferrari_nontext_artwork": "PRESERVED_OBSERVED"
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+      "promotion": false,
+      "reason": "B88 repaired the source-cell residue; D83 preflight and C82 strict QA are on the same current SHA, C82 changed no DDS, and D84 reconfirms current SHA/header. Mandatory in-game validation is still absent."
+    },
+    "FD90AA9": {
+      "canonical_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+      "gate_chain": {
+        "A87": "PRODUCTION_PASS",
+        "B88": "FIRST_QA_PASS_UNCHANGED",
+        "D83": "CURRENT_SHA_PREFLIGHT_PASS",
+        "C82": "STATIC_STRICT_QA_PASS_UNCHANGED",
+        "D84": "FINAL_RECONCILIATION_PASS"
+      },
+      "semantic_entries": 29,
+      "physical_regions": 29,
+      "d84_checks": {
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "file_size_bytes": 67108992,
+        "dds_header_128_exact_canonical": true,
+        "candidate_sha_matches_current": true,
+        "total_changed_pixels_vs_canonical": 3574612,
+        "outside_29_cells_changed_pixels": 0,
+        "introduced_alpha_outside_29_cells": 0,
+        "minimum_candidate_alpha_cell_margin_px": 13,
+        "raw_orientation": "mirror_y",
+        "maximum_speed_and_transmission_omission_recovery": "PRESENT",
+        "readable_white_gray_raw_visual_qa": "PASS",
+        "source_language_residue": "NONE_OBSERVED",
+        "broken_hangul": "NONE_OBSERVED",
+        "clipping_overlap_box_escape": "NONE_OBSERVED",
+        "black_line_seam_opaque_box_alpha_halo": "NONE_OBSERVED",
+        "protected_songs_models_speed_player_atmt_nontext_artwork": "PRESERVED_OBSERVED"
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+      "promotion": false,
+      "reason": "A87/B88/D83/C82 all validate the same current SHA, C82 changed no DDS, and D84 reconfirms current SHA/header. Mandatory in-game validation is still absent."
+    },
+    "9F060EC1": {
+      "canonical_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+      "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+      "gate_chain": {
+        "A88": "PRODUCTION_PASS",
+        "B89": "FIRST_QA_PASS_UNCHANGED",
+        "C82": "STATIC_STRICT_QA_PASS_UNCHANGED",
+        "D84": "DIRECT_FINAL_RECONCILIATION_PASS"
+      },
+      "semantic_review": {
+        "entries": 5,
+        "physical_regions": 5,
+        "pairs": [
+          {
+            "source": "OUTRUN LICENSE",
+            "korean": "아웃런 라이선스"
+          },
+          {
+            "source": "COMPLETE:",
+            "korean": "달성률:"
+          },
+          {
+            "source": "VS RANK:",
+            "korean": "VS 랭크:"
+          },
+          {
+            "source": "WIN RATIO:",
+            "korean": "승률:"
+          },
+          {
+            "source": "DRIVE TIME:",
+            "korean": "주행 시간:"
+          }
+        ]
+      },
+      "d84_checks": {
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "file_size_bytes": 16777344,
+        "dds_header_128_exact_canonical": true,
+        "candidate_sha_matches_current": true,
+        "channel_masks": [
+          "0xff0000",
+          "0xff00",
+          "0xff",
+          "0xff000000"
+        ],
+        "total_changed_pixels_vs_canonical": 62929,
+        "outside_5_cells_changed_pixels": 0,
+        "alpha_changed_pixels_total": 61,
+        "alpha_changes_outside_5_cells": 0,
+        "introduced_zero_to_nonzero_alpha_pixels": 0,
+        "introduced_alpha_outside_5_cells": 0,
+        "minimum_candidate_alpha_cell_margin_px": 4,
+        "raw_orientation": "mirror_y",
+        "readable_white_gray_raw_visual_qa": "PASS",
+        "source_language_residue": "NONE_OBSERVED",
+        "broken_hangul": "NONE_OBSERVED",
+        "clipping_overlap_box_escape": "NONE_OBSERVED",
+        "black_line_seam_opaque_box_alpha_halo": "NONE_OBSERVED",
+        "protected_row_numbers_om_barcode_legal_watermark_frame_artwork": "PRESERVED_OBSERVED"
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+      "promotion": false,
+      "reason": "A88/B89/C82 same-SHA candidate passes D84 semantic, structural, containment, alpha, raw/readable and artifact reconciliation. Mandatory in-game validation is still absent."
+    }
+  },
+  "preserved_prior_holds": {
+    "571E78F3": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
+    "62BEBF33": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
+    "E3FD08BE": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
+    "C4A2937B": "D82_FINAL_STATIC_PASS_CONTEXT_HOLD_PENDING_INGAME",
+    "2DA43E41": "D82_FINAL_STATIC_PASS_PENDING_INGAME",
+    "411827E": "D82_FINAL_STATIC_PASS_PENDING_INGAME",
+    "FA7BBB13": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+    "39229D64": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+    "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
+  },
+  "next_hd_work": {
+    "primary": "D6DC1380",
+    "secondary": "48DEBE77",
+    "status": "BATCH66_CANDIDATE_READY_REQUIRES_CURRENT_PIPELINE_RECONCILIATION",
+    "policy": "CREATE_NEW_HD_KOREAN_ASSET",
+    "note": "No REWORK_FROM_HD_BASE entries remain. Current A/B handoff must precede C/D. Never upscale prior Korean DDS."
+  },
+  "domain_isolation": {
+    "upstream_base": "08e5efb4deea4066c440307ec009c868a30562d3",
+    "verify_domain_isolation": "PASS",
+    "vr_ffb_source_diff_matches": [],
+    "merge_commits_since_base": [],
+    "result": "PASS_NO_VR_FFB_MIX"
+  },
+  "state_validation": "LOCALIZATION_STATE_OK",
+  "build_performed": false,
+  "final_decision": "NO_NEW_APPROVALS_CURRENT_LOCK_COUNT_0",
+  "next": [
+    "C075FB49/FD90AA9/9F060EC1: final static QA is complete; obtain mandatory in-game screenshots before any promotion/approval.",
+    "571E78F3/62BEBF33/E3FD08BE: still require mandatory in-game screenshot reapproval before HD lock.",
+    "Reconcile D6DC1380, then 48DEBE77 through current A/B/C/D CREATE_NEW_HD_KOREAN_ASSET flow."
+  ]
+}

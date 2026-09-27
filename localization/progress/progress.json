@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T21:15:10+09:00",
+  "updated_at_kst": "2026-09-27T21:22:59+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C82 static strict QA PASS: C075FB49 B88 changed SHA and FD90AA9 B88 same SHA both independently pass C; D83 preflights are same current SHAs and remain binary-valid, but final D reconciliation + in-game remain. 9F060EC1 A88/B89 same SHA also passes C82 and now needs D + in-game. Current lock count remains 0. Final Batch66 D6DC1380 then 48DEBE77 require current A/B pipeline reconciliation.",
+  "next_checkpoint": "C075FB49, FD90AA9 and 9F060EC1 now complete C82 + D84 final static QA on their current SHAs; no DDS was changed by C82. All three remain unapproved pending mandatory in-game screenshots. P0 HD trio also remains final-static pending in-game reapproval. Next current-pipeline special cases: D6DC1380 then 48DEBE77.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -257,7 +257,7 @@
       "coverage": "5 semantic / 5 physical",
       "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
       "report": "localization/graphics/role_A/20260927-2030-A88/A88_9F060EC1_PRODUCTION_REPORT.json",
-      "status": "C82_STATIC_PASS_PENDING_D_INGAME",
+      "status": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
       "preserved": [
         "row numbers 1.-4.",
@@ -268,7 +268,8 @@
       "b_first_qa_report": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_FIRST_QA_REPORT.json",
       "candidate_changed_by_B": false,
       "c_strict_qa_report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
-      "c_candidate_changed": false
+      "c_candidate_changed": false,
+      "d_final_qa_report": "localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
       "asset": "D6DC1380",
@@ -277,16 +278,17 @@
       "note": "No REWORK_FROM_HD_BASE entries remain. These two are CREATE_NEW_HD_KOREAN_ASSET special cases; never upscale old Korean DDS."
     },
     "latest_d_final_qa": {
-      "run": "D83",
-      "report": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json",
+      "run": "D84",
+      "report": "localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json",
       "result": "NO_NEW_APPROVALS",
       "approved_dds_count": 0,
       "user_approved_locked": 0,
+      "C075FB49": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+      "FD90AA9": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+      "9F060EC1": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
       "571E78F3": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
       "62BEBF33": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
       "E3FD08BE": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
-      "FD90AA9": "D83_PREFLIGHT_PASS_PENDING_C_INGAME",
-      "C075FB49": "D83_PREFLIGHT_PASS_PENDING_C_INGAME",
       "C4A2937B": "D82_FINAL_STATIC_PASS_CONTEXT_HOLD_PENDING_INGAME",
       "2DA43E41": "D82_FINAL_STATIC_PASS_PENDING_INGAME",
       "411827E": "D82_FINAL_STATIC_PASS_PENDING_INGAME",

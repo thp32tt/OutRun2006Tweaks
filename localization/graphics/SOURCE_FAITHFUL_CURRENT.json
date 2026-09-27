@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-27T21:15:10+09:00",
+  "updated_at_kst": "2026-09-27T21:22:59+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -12,9 +12,9 @@
   ],
   "mandatory_policy": "localization/graphics/ORIENTATION_POLICY.md",
   "automation_checkpoint": {
-    "run": "D83-final-qa-reconcile-20260927",
+    "run": "D84-final-qa-reconcile-20260927",
     "result": "NO_NEW_APPROVALS_CURRENT_LOCK_COUNT_0",
-    "note": "B87 canonical-HD P0 trio passes C81 and D83 final static QA unchanged but lacks mandatory in-game reapproval. B88 FD90 passes D83 same-SHA preflight and B88 C075 changed SHA passes D83 fresh preflight; both lack C/in-game."
+    "note": "C82 changed no DDS. C075FB49/FD90AA9/9F060EC1 now pass D84 final static QA on current SHAs but lack mandatory in-game validation; P0 trio final-static hold remains."
   },
   "latest_promoted_batch": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
   "latest_rejected_batch": "localization/graphics/BATCH51_REJECTED_REPORT.json",
@@ -116,7 +116,7 @@
     "dimensions": "read_from_dds_header",
     "old_candidates": "historical_until_rebuilt_or_revalidated_against_HD"
   },
-  "latest_d_final_qa_report": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json",
+  "latest_d_final_qa_report": "localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json",
   "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
   "post_d78_c78_update": {
     "asset": "39229D64",
@@ -228,5 +228,13 @@
       "9F060EC1": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60"
     },
     "note": "C82 independently revalidated B88 C075/FD90 and B89 9F. C075/FD90 D83 preflight is same-SHA valid; all require final D/in-game; no promotion."
+  },
+  "d84_resolution": {
+    "C075FB49": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+    "FD90AA9": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+    "9F060EC1": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+    "P0_HD_TRIO": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
+    "current_approved_lock_count": 0,
+    "report": "localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json"
   }
 }
