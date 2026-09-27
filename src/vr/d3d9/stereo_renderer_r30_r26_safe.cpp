@@ -16,6 +16,7 @@
 #include "vr/debug/experiment_modes.hpp"
 #include "vr/d3d9/frame_context.hpp"
 #include "vr/d3d9/render_policy.hpp"
+#include "vr/d3d9/screen_space_policy.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
@@ -1485,16 +1486,7 @@ namespace OutRunVRStereo
             scaleY = userScale;
         }
 
-        enum class R30ScreenSpaceKind : std::uint8_t
-        {
-            None,
-            Hud2D,
-            PerspectiveHud,
-            ScreenOverlay2D,
-            ProjectedScreenEffect2D,
-            WorldBillboard,
-            ProjectedWorldMarker2D
-        };
+        using R30ScreenSpaceKind = OutRunVR::ScreenSpacePolicy::Kind;
 
         constexpr std::uint64_t R44OverlayWvpDrawWindow = 12u;
 
@@ -1616,21 +1608,21 @@ namespace OutRunVRStereo
                 semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::ProjectedWorld;
             const bool semanticProjectedScreen =
                 semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::ProjectedScreenEffect;
+            const auto directScreenKind =
+                OutRunVR::ScreenSpacePolicy::DirectKind(semanticRoute);
+
+            // Exact producer-owned screen routes bypass heuristic projection
+            // classification. Their semantics were established by the canonical
+            // EXE producer/queue mapping before reaching this renderer.
+            if (directScreenKind != R30ScreenSpaceKind::None)
+                return directScreenKind;
 
             // R65: exact lens-flare producer has already converted its world
             // anchor to screen coordinates through Calc3D2D. It needs only the
             // per-eye asymmetric-FOV affine: no HUD scale, no finite HUD plane,
             // no extra head/IPD world transform.
-            if (semanticProjectedScreen)
-                return R30ScreenSpaceKind::ProjectedScreenEffect2D;
-
-            // R50: canonical queue membership proves generic 2D ownership but
-            // not finite/world-locked HUD ownership. This class receives only
-            // the per-eye asymmetric-FOV affine.
-            if (semanticOverlay2D)
-                return R30ScreenSpaceKind::ScreenOverlay2D;
-            if (semanticProjectedWorld)
-                return R30ScreenSpaceKind::ProjectedWorldMarker2D;
+            // Direct screen-owned routes were resolved above. HUD/world
+            // continue through the projection/WVP checks below.
 
             // R48 final-test policy: screen/perspective HUD ownership comes only
             // from the canonical EXE sprite queue or exact original-mod semantic
