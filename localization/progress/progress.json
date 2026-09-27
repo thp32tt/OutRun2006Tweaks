@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-28T00:43:27+09:00",
+  "updated_at_kst": "2026-09-28T01:06:17+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C83: final HD-migration CREATE_NEW_HD candidates D6DC1380 and 48DEBE77 both pass independent C static strict QA unchanged. D6 1024x256 raw-normal candidate preserves source header except required H/W/pitch and keeps all alpha inside the 4x source-text bbox; 1px vertical margin was explicitly zoom-checked with no clipping. 48DEBE77 2048x2048 raw-mirror_y candidate changes 41,433 pixels only inside 3 text cells; alpha changes are confined to cells and transparent->nontransparent introductions are 0. HD migration production remains complete 16 ready / 0 remaining. Both require D + mandatory in-game screenshots; current lock count remains 0.",
+  "next_checkpoint": "HD migration candidate production and static A/B/C/D QA are complete for the final two CREATE_NEW_HD assets D6DC1380 and 48DEBE77. Both pass D85 final static QA unchanged after C83, but mandatory in-game screenshots are still required before promotion. Current approved/user-lock count remains 0; earlier final-static holds are unchanged.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -256,24 +256,27 @@
       ],
       "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
       "report": "localization/graphics/role_B/20260927-2145-B90/B90_D6DC1380_48DEBE77_REPORT.json",
-      "status": "C83_STATIC_STRICT_QA_PASS_PENDING_D_INGAME",
+      "status": "D85_FINAL_STATIC_QA_PASS_PENDING_INGAME",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
       "raw_orientation": "mirror_y",
       "prior_korean_reused": false,
       "c_strict_qa_report": "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json",
-      "c_candidate_changed": false
+      "c_candidate_changed": false,
+      "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
       "asset": null,
-      "status": "HD_MIGRATION_QUEUE_COMPLETE_PENDING_D_INGAME",
-      "note": "All 16 graphics-rework targets have current candidates; D6DC1380 and 48DEBE77 now pass C83 and require D + in-game."
+      "status": "HD_MIGRATION_QUEUE_COMPLETE_FINAL_STATIC_QA_PENDING_INGAME",
+      "note": "All 16 graphics-rework targets have current candidates. Final two D6DC1380/48DEBE77 now pass C83+D85 static QA; mandatory in-game validation remains."
     },
     "latest_d_final_qa": {
-      "run": "D84",
-      "report": "localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json",
+      "run": "D85",
+      "report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json",
       "result": "NO_NEW_APPROVALS",
       "approved_dds_count": 0,
       "user_approved_locked": 0,
+      "D6DC1380": "D85_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+      "48DEBE77": "D85_FINAL_STATIC_QA_PASS_PENDING_INGAME",
       "C075FB49": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
       "FD90AA9": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
       "9F060EC1": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",

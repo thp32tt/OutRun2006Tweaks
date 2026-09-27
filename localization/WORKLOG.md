@@ -950,3 +950,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - HD migration production is now complete at 16 ready / 0 remaining. Both final assets still require D reconciliation and mandatory in-game screenshots; current approved lock count stays 0. No build; VR/FFB untouched.
 - Machine report: localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json.
 - State validation note: stock tools/localization/verify_state.py has a pre-existing zero-count false-negative after final text review (Counter omits draft while expected includes draft:0). A temporary non-committed zero-normalized copy returns LOCALIZATION_STATE_OK for the full current state; C83 does not modify the verifier.
+
+## 2026-09-28 01:06 KST — D85 final QA reconciliation
+
+- Started from latest remote HEAD e25b8939a3717e4a4ed0940699271aedb5ad5ffa after C83 final HD-migration strict QA. C83 changed no DDS.
+- Final text context state is reconciled at 1,355/1,355 non-null reviewed with 0 context drafts. PASSENGER IDs 96/279 -> 동승자 preserves the neutral passenger role in Heart Attack context; DUMPED IDs 97/280 -> 차였어요! preserves the girlfriend rejection/failure result nuance and is consistent with A064FDFC DUMPED! artwork terminology.
+- D6DC1380 SHA 53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00: A89/B90/C83 same-SHA chain reconciled. CREATE_NEW_HD 256×64 -> 1024×256 RGBA32/1 mip; header differs only required H/W/pitch offsets, masks/caps/mips preserved, raw orientation normal. Continue? -> 계속? alpha bbox 207,41-817,175 stays inside scaled source cell 32,40-992,176 with margins 175/1/175/1. Enlarged readable white/gray/black and raw review shows no clipping despite the 1px vertical margin. FINAL_STATIC_QA_PASS_PENDING_INGAME.
+- 48DEBE77 SHA fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0: B90/C83 same-SHA chain reconciled. CREATE_NEW_HD 512×512 -> 2048×2048 RGBA32/1 mip; header differs only H/W/pitch; raw mirror_y preserved. Independent D check against a fresh 4× LANCZOS canonical-source base confirms 41,433 changed pixels, 0 outside the three source text cells; 507 alpha-value increases stay inside the cells and transparent->nontransparent introductions are 0. START x2 -> 출발 and GOAL -> 골 are semantically consistent; route A-E/photos/colors/geometry/borders/shadows remain preserved. FINAL_STATIC_QA_PASS_PENDING_INGAME.
+- No promotion/lock because no in-game screenshot evidence exists for either final asset. Current approved/user-locked count remains 0.
+- HD migration candidate production is complete at 16 ready / 0 remaining. D84 and earlier final-static/in-game holds are preserved.
+- The remote base already contains the zero-count normalization fix for tools/localization/verify_state.py. Stock verification now returns LOCALIZATION_STATE_OK with draft_context_ids=[]; D85 did not modify verifier source.
+- Domain Isolation PASS; no VR/FFB source/history merge. Build not run.
+- Report: localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json.

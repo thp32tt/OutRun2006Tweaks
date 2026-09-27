@@ -1,5 +1,5 @@
 {
-  "schema_version": 51,
+  "schema_version": 52,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,8 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "APPROVAL STATE: current user-approved lock count remains 0. D84 final-static states and prior in-game holds remain unchanged; D6DC1380 and 48DEBE77 now also pass C83 static strict QA but are not promoted.",
-    "HD GRAPHICS: HD migration candidate production is complete (16 ready / 0 remaining). D6DC1380 and 48DEBE77 pass C83 unchanged and now require D final reconciliation plus mandatory in-game screenshot validation.",
+    "APPROVAL STATE: current user-approved lock count remains 0. D6DC1380 and 48DEBE77 now pass C83 + D85 final static QA; mandatory in-game screenshots remain required before promotion. D84 and earlier final-static holds remain unchanged.",
+    "HD GRAPHICS: migration candidate production and static QA are complete at 16 ready / 0 remaining. Next graphics gate is in-game validation, not further HD candidate production.",
     "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
     "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
     "Never upscale prior stock-resolution Korean DDS candidates.",
@@ -392,7 +392,7 @@
         "d_final_qa_report": "localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json"
       },
       "D6DC1380": {
-        "status": "C83_STATIC_STRICT_QA_PASS_PENDING_D_INGAME",
+        "status": "D85_FINAL_STATIC_QA_PASS_PENDING_INGAME",
         "source_dimensions": [
           256,
           64
@@ -412,10 +412,11 @@
         "b_first_qa_report": "localization/graphics/role_B/20260927-2145-B90/B90_D6DC1380_48DEBE77_REPORT.json",
         "candidate_changed_by_B": false,
         "c_strict_qa_report": "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json",
-        "c_candidate_changed": false
+        "c_candidate_changed": false,
+        "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
       },
       "48DEBE77": {
-        "status": "C83_STATIC_STRICT_QA_PASS_PENDING_D_INGAME",
+        "status": "D85_FINAL_STATIC_QA_PASS_PENDING_INGAME",
         "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
         "canonical_sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
@@ -435,7 +436,8 @@
           2048
         ],
         "c_strict_qa_report": "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json",
-        "c_candidate_changed": false
+        "c_candidate_changed": false,
+        "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
       }
     },
     "a76_ff2462bb": {
@@ -446,7 +448,7 @@
       "candidate_sha256": "6fb6c0ff857c8218e499dd4d1ddc0b8d81adeab9a0e400f559f7fde03169c3e9",
       "status": "PENDING_B_C_D_STRICT_QA"
     },
-    "latest_d_final_qa_report": "localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json",
+    "latest_d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json",
     "latest_c_strict_qa_report": "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json",
     "c77_fa7bbb13": {
       "timestamp_kst": "2026-09-27T14:05:02+09:00",
@@ -482,7 +484,8 @@
       "report": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "QUEUE_COMPLETE_PENDING_C_D_INGAME",
+      "asset": null,
+      "status": "QUEUE_COMPLETE_FINAL_STATIC_QA_PENDING_INGAME",
       "assets": [
         "D6DC1380",
         "48DEBE77"
@@ -1145,5 +1148,20 @@
     },
     "hd_rework_candidates_ready": 16,
     "hd_rework_remaining": 0
+  },
+  "d85_final_qa": {
+    "timestamp_kst": "2026-09-28T01:06:17+09:00",
+    "report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json",
+    "approved_dds_changes": 0,
+    "approved_dds_count": 0,
+    "user_approved_locked": 0,
+    "D6DC1380": "D85_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+    "48DEBE77": "D85_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+    "hd_rework_candidates_ready": 16,
+    "hd_rework_remaining": 0,
+    "text_context_drafts": 0,
+    "text_reviewed_non_null": 1355,
+    "build_performed": false,
+    "vr_ffb_changes": false
   }
 }

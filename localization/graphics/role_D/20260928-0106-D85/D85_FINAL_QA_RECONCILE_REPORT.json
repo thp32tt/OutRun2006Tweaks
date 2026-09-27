@@ -1,0 +1,263 @@
+{
+  "schema_version": 1,
+  "role": "D",
+  "run": "D85",
+  "timestamp_kst": "2026-09-28T01:06:17+09:00",
+  "base_head": "8cc121fd18eab2d0dbfca615f273bdf85e5401ed",
+  "scope": "final QA + approval reconciliation on C83 final HD-migration assets plus finalized text context state; no build; no VR/FFB",
+  "approved_dds_changes": [],
+  "current_approved_lock_count": 0,
+  "reviewed_candidates": {
+    "D6DC1380": {
+      "policy": "CREATE_NEW_HD_KOREAN_ASSET",
+      "canonical_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+      "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+      "gate_chain": {
+        "A89": "PRODUCTION_PASS_CURRENT_SHA",
+        "B90": "FIRST_QA_PASS_UNCHANGED",
+        "C83": "STATIC_STRICT_QA_PASS_UNCHANGED",
+        "D85": "FINAL_RECONCILIATION_PASS"
+      },
+      "semantic_review": {
+        "source": "Continue?",
+        "korean": "계속?",
+        "result": "PASS_CONCISE_PROMPT_MEANING_AND_FIT"
+      },
+      "d85_checks": {
+        "source_dimensions": [
+          256,
+          64
+        ],
+        "candidate_dimensions": [
+          1024,
+          256
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "source_bytes": 65664,
+        "candidate_bytes": 1048704,
+        "header_exact_source_except_height_width_pitch": true,
+        "header_diff_offsets": [
+          12,
+          13,
+          17,
+          21
+        ],
+        "channel_masks": [
+          "0xff0000",
+          "0xff00",
+          "0xff",
+          "0xff000000"
+        ],
+        "raw_orientation": "normal",
+        "allowed_scaled_source_text_bbox": [
+          32,
+          40,
+          992,
+          176
+        ],
+        "candidate_alpha_bbox": [
+          207,
+          41,
+          817,
+          175
+        ],
+        "bbox_margins_ltrb": [
+          175,
+          1,
+          175,
+          1
+        ],
+        "alpha_outside_allowed_bbox_pixels": 0,
+        "readable_white_gray_black_qa": "PASS",
+        "raw_qa": "PASS",
+        "source_language_residue": "NONE_OBSERVED",
+        "broken_hangul": "NONE_OBSERVED",
+        "clipping_overlap_box_escape": "NONE_OBSERVED",
+        "black_line_seam_opaque_box_alpha_halo": "NONE_OBSERVED",
+        "style_fidelity": "PASS_SOURCE_FAMILY_WHITE_FACE_NAVY_OUTLINE_GRAY_EDGE_WIDE_ASPECT",
+        "prior_korean_dds_or_batch66_binary_reused": false
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "D85_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+      "promotion": false,
+      "reason": "A89/B90/C83 validate the same SHA and D85 rechecks current binary/visual evidence; mandatory in-game screenshot validation is absent."
+    },
+    "48DEBE77": {
+      "policy": "CREATE_NEW_HD_KOREAN_ASSET",
+      "canonical_sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+      "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+      "gate_chain": {
+        "B90": "CREATE_NEW_HD_PRODUCTION_FIRST_QA_PASS",
+        "C83": "STATIC_STRICT_QA_PASS_UNCHANGED",
+        "D85": "FINAL_RECONCILIATION_PASS"
+      },
+      "semantic_review": [
+        {
+          "source": "START",
+          "korean": "출발",
+          "physical_occurrences": 2,
+          "result": "PASS_ROUTE_START_MARKER_CONTEXT"
+        },
+        {
+          "source": "GOAL",
+          "korean": "골",
+          "physical_occurrences": 1,
+          "result": "PASS_EXISTING_GOAL_TERMINOLOGY"
+        }
+      ],
+      "d85_checks": {
+        "source_dimensions": [
+          512,
+          512
+        ],
+        "candidate_dimensions": [
+          2048,
+          2048
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "source_bytes": 1048704,
+        "candidate_bytes": 16777344,
+        "header_exact_source_except_height_width_pitch": true,
+        "header_diff_offsets": [
+          13,
+          17,
+          21
+        ],
+        "channel_masks": [
+          "0xff0000",
+          "0xff00",
+          "0xff",
+          "0xff000000"
+        ],
+        "raw_orientation": "mirror_y",
+        "base_resampling": "4x_LANCZOS_CANONICAL_SOURCE",
+        "changed_pixels_vs_4x_base": 41433,
+        "outside_3_source_text_cells_changed_pixels": 0,
+        "alpha_changed_pixels_total": 507,
+        "alpha_changes_outside_3_cells": 0,
+        "alpha_increase_pixels_total": 507,
+        "transparent_to_nontransparent_pixels_total": 0,
+        "candidate_glyph_bbox_margins": {
+          "start_top": [
+            28,
+            12,
+            29,
+            13
+          ],
+          "start_bottom": [
+            28,
+            6,
+            29,
+            7
+          ],
+          "goal": [
+            62,
+            4,
+            63,
+            4
+          ]
+        },
+        "minimum_glyph_margin_px": 4,
+        "readable_white_gray_black_qa": "PASS",
+        "raw_qa": "PASS",
+        "source_language_residue": "NONE_OBSERVED",
+        "broken_hangul": "NONE_OBSERVED",
+        "clipping_overlap_box_escape": "NONE_OBSERVED",
+        "black_line_seam_opaque_box_alpha_halo": "NONE_OBSERVED",
+        "protected_original": [
+          "route letters A-E",
+          "course photography",
+          "route colors/geometry",
+          "red badge borders",
+          "badge shadows",
+          "all non-text artwork outside 3 cells"
+        ],
+        "prior_korean_dds_reused": false
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "D85_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+      "promotion": false,
+      "reason": "B90/C83 validate the same current SHA and D85 independently reconfirms 4x-LANCZOS containment/header/orientation/visual evidence; mandatory in-game screenshot validation is absent."
+    }
+  },
+  "text_context_reconciliation": {
+    "translated_non_null": "1355/1355",
+    "reviewed": 1351,
+    "reviewed_special": 4,
+    "draft_context": 0,
+    "blocked_null": 1,
+    "placeholder_qa": "PASS",
+    "final_context_ids": {
+      "96": {
+        "source": "PASSENGER",
+        "korean": "동승자",
+        "result": "PASS_SOURCE_NEUTRAL_HEART_ATTACK_PASSENGER_ROLE"
+      },
+      "97": {
+        "source": "DUMPED",
+        "korean": "차였어요!",
+        "result": "PASS_HEART_ATTACK_FAILURE_REJECTION_CONTEXT"
+      },
+      "279": {
+        "source": "PASSENGER",
+        "korean": "동승자",
+        "result": "PASS_SOURCE_NEUTRAL_HEART_ATTACK_PASSENGER_ROLE"
+      },
+      "280": {
+        "source": "DUMPED",
+        "korean": "차였어요!",
+        "result": "PASS_HEART_ATTACK_FAILURE_REJECTION_CONTEXT"
+      }
+    },
+    "graphics_consistency": "A064FDFC DUMPED! -> 차였어요! matches finalized runtime-text terminology",
+    "result": "FINAL_TEXT_CONTEXT_STATIC_REVIEW_COMPLETE"
+  },
+  "preserved_prior_holds": {
+    "C075FB49": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+    "FD90AA9": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+    "9F060EC1": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+    "571E78F3": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
+    "62BEBF33": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
+    "E3FD08BE": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
+    "C4A2937B": "D82_FINAL_STATIC_PASS_CONTEXT_HOLD_PENDING_INGAME",
+    "2DA43E41": "D82_FINAL_STATIC_PASS_PENDING_INGAME",
+    "411827E": "D82_FINAL_STATIC_PASS_PENDING_INGAME",
+    "FA7BBB13": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+    "39229D64": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+    "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
+  },
+  "hd_migration": {
+    "candidates_ready": 16,
+    "remaining": 0,
+    "candidate_production": "COMPLETE",
+    "final_two_static_qa": "COMPLETE_PENDING_INGAME"
+  },
+  "state_validation": {
+    "stock_verify_state": "LOCALIZATION_STATE_OK",
+    "text_status": {
+      "reviewed": 1351,
+      "reviewed_special": 4,
+      "draft": 0,
+      "blocked_null": 1
+    },
+    "draft_context_ids": [],
+    "verifier_fix_present_in_base_head": true,
+    "verifier_changed_by_D85": false
+  },
+  "domain_isolation": {
+    "upstream_base": "08e5efb4deea4066c440307ec009c868a30562d3",
+    "verify_domain_isolation": "PASS",
+    "vr_ffb_source_diff_matches": [],
+    "merge_commits_since_base": [],
+    "result": "PASS_NO_VR_FFB_MIX"
+  },
+  "build_performed": false,
+  "final_decision": "NO_NEW_APPROVALS_CURRENT_LOCK_COUNT_0",
+  "next": [
+    "D6DC1380 and 48DEBE77: static A/B/C/D QA is complete; obtain mandatory in-game screenshots before any promotion.",
+    "C075FB49/FD90AA9/9F060EC1 and all prior final-static holds remain pending in-game evidence.",
+    "HD migration candidate production is complete at 16 ready / 0 remaining."
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-28T00:43:27+09:00",
+  "updated_at_kst": "2026-09-28T01:06:17+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -12,9 +12,9 @@
   ],
   "mandatory_policy": "localization/graphics/ORIENTATION_POLICY.md",
   "automation_checkpoint": {
-    "run": "D84-final-qa-reconcile-20260927",
+    "run": "D85-final-qa-reconcile-20260928",
     "result": "NO_NEW_APPROVALS_CURRENT_LOCK_COUNT_0",
-    "note": "C82 changed no DDS. C075FB49/FD90AA9/9F060EC1 now pass D84 final static QA on current SHAs but lack mandatory in-game validation; P0 trio final-static hold remains."
+    "note": "C83 changed no DDS. Final CREATE_NEW_HD assets D6DC1380 and 48DEBE77 pass D85 final static QA on current SHAs but mandatory in-game validation is absent. HD migration candidate production is complete."
   },
   "latest_promoted_batch": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
   "latest_rejected_batch": "localization/graphics/BATCH51_REJECTED_REPORT.json",
@@ -116,7 +116,7 @@
     "dimensions": "read_from_dds_header",
     "old_candidates": "historical_until_rebuilt_or_revalidated_against_HD"
   },
-  "latest_d_final_qa_report": "localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json",
+  "latest_d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json",
   "latest_c_strict_qa_report": "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json",
   "post_d78_c78_update": {
     "asset": "39229D64",
@@ -248,5 +248,13 @@
     "hd_rework_candidates_ready": 16,
     "hd_rework_remaining": 0,
     "note": "Final two CREATE_NEW_HD candidates pass independent C83 static QA unchanged. D + mandatory in-game screenshots remain; no promotion."
+  },
+  "d85_resolution": {
+    "D6DC1380": "D85_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+    "48DEBE77": "D85_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+    "hd_rework_candidates_ready": 16,
+    "hd_rework_remaining": 0,
+    "current_approved_lock_count": 0,
+    "report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
   }
 }

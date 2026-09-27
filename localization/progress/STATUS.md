@@ -555,3 +555,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - HD migration candidate production: 16 ready / 0 remaining. D final reconciliation + in-game screenshots remain mandatory; no promotion/lock, current lock count 0. No build; VR/FFB unchanged.
 - Machine report: localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json.
 - Validation note: stock verify_state.py currently false-fails only on the finalized text draft=0 Counter-key mismatch; temporary zero-normalized validation passes the full state. Verifier source was not modified.
+
+## D85 final QA checkpoint — 2026-09-28 01:06 KST
+- D6DC1380: A89/B90/C83/D85 current SHA 53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00 FINAL STATIC QA PASS; HOLD_PENDING_INGAME.
+- 48DEBE77: B90/C83/D85 current SHA fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0 FINAL STATIC QA PASS; HOLD_PENDING_INGAME.
+- D6: 1024×256 RGBA32/1 mip, raw normal, header exact except H/W/pitch, Korean alpha outside scaled source text bbox = 0; 1px vertical margin zoom-reviewed with no clipping.
+- 48: 2048×2048 RGBA32/1 mip, raw mirror_y, header exact except H/W/pitch; 41,433 changed pixels vs fresh 4× LANCZOS source base, outside 3 cells = 0; alpha changes outside = 0; transparent→nontransparent pixels = 0.
+- Final text context review is complete: 1,355/1,355 non-null reviewed, 0 drafts. PASSENGER→동승자 and DUMPED→차였어요! are reconciled with Heart Attack context and graphics terminology.
+- HD migration candidate production: 16 ready / 0 remaining. No promotion because mandatory in-game screenshots are absent; approved/user-lock count remains 0.
+- Stock verify_state.py now returns LOCALIZATION_STATE_OK on the current base after the upstream zero-count normalization fix. Domain Isolation PASS; VR/FFB contamination not observed. No build performed.
+- Machine report: localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json.
