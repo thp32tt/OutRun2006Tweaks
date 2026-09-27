@@ -112,3 +112,18 @@ The following commit changes documentation only and intentionally carries the
 `[pc-build]` token so the exact reviewed tree is rebuilt by the PC-fast runner.
 No source, build flag or runtime logic may change after this trigger without a
 new review/build cycle.
+
+## Late pass-10 generated-source correction
+
+A final generated-source check found that `CMakeLists.txt` had been corrected to
+R26+HUD defaults while the cmkr source `cmake.toml` still declared the old
+R26-only SAFE-DRAW defaults. Because workflows intentionally clear `CI` before
+configure, cmkr can regenerate CMakeLists and silently restore the old defaults.
+
+Corrected both sources of truth:
+- `cmake.toml`: SAFE_DRAW=OFF, R26_HUD=ON
+- `CMakeLists.txt`: SAFE_DRAW=OFF, R26_HUD=ON
+- `verify_vr_proven_baseline.py` now validates both files.
+
+Any build produced before this correction is not an accepted R66 production
+test build.
