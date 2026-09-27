@@ -869,3 +869,17 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Exact 128-byte DDS header preserved; all bytes outside the 5 declared localization cells remain canonical; all candidate alpha bboxes remain inside cells. Candidate SHA-256: 39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60.
 - Status: A88_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA. No promotion, in-game claim, build, VR or FFB work.
 - Queue after A88: 14 ready / 2 remaining. No REWORK_FROM_HD_BASE entries remain; remaining Batch66 candidates are D6DC1380 and 48DEBE77 and require current-pipeline reconciliation/QA.
+
+
+## 2026-09-27 21:01 KST — B89 9F060EC1 A88 first QA
+
+- Continued from latest remote korean-localization-clean HEAD 882f5a5 after concurrent A88 9F060EC1 production landed; GPT Library was not used.
+- Discarded B's duplicate local production attempt and independently QA'd the current A88 canonical candidate instead, preserving the newer A result.
+- Candidate SHA-256: 39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60; canonical SHA-256: 177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05. 2048×2048 RGBA32 / 1 mip / exact canonical 128-byte header / BGRA DDS channel masks / raw mirror_y.
+- Semantic QA PASS for five reviewed labels: OUTRUN LICENSE -> 아웃런 라이선스, COMPLETE -> 달성률, VS RANK -> VS 랭크, WIN RATIO -> 승률, DRIVE TIME -> 주행 시간.
+- Preserved row numbers 1.-4., OM, barcode/legal code, card frames and repeating OUTRUN LICENSE watermark/background artwork.
+- Independent pixel QA: 62,929 changed pixels, 0 outside the five declared text cells; 61 alpha-changed pixels, 0 outside cells; introduced alpha pixels = 0.
+- Readable/raw/white/gray artifact QA PASS: no observed English residue, broken Hangul, clipping/overlap, cell escape, black line/seam, opaque box, alpha halo or protected-artwork damage.
+- A88 binary unchanged by B89. No approval promotion; C/D + in-game screenshot validation remain mandatory.
+- HD migration queue remains 14 ready / 2 remaining. Final two are historical Batch66 CREATE_NEW_HD_KOREAN_ASSET candidates D6DC1380 and 48DEBE77 requiring current-pipeline reconciliation; do not upscale old Korean DDS.
+- No build; VR/FFB untouched. Machine report: localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_FIRST_QA_REPORT.json.

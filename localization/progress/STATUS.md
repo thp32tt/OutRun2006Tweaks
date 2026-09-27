@@ -494,3 +494,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Outside 5 cells byte-identical; candidate alpha contained; readable/raw/white-background A-stage artifact QA PASS after rejecting a broad header-mask draft.
 - Queue: 14 ready / 2 remaining; zero REWORK_FROM_HD_BASE items remain. Final two queue entries are Batch66 CREATE_NEW_HD_KOREAN_ASSET candidates D6DC1380 and 48DEBE77 for current-pipeline reconciliation.
 - Status: A_PRODUCTION_COMPLETE_PENDING_B_C_D; in-game validation not performed.
+
+
+## B89 checkpoint — 2026-09-27 21:01 KST
+
+- 9F060EC1 A88 SHA 39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60: **B FIRST QA PASS unchanged**.
+- 2048×2048 RGBA32/1 mip, exact header, BGRA masks, raw mirror_y; 5 semantic / 5 physical.
+- 62,929 changed pixels; outside five text cells = 0. Alpha changes outside cells = 0; introduced alpha = 0.
+- Readable/raw/white/gray QA PASS; protected row numbers, OM, legal/barcode/card/watermark artwork preserved.
+- C/D + in-game pending; approved/user-locked count unchanged.
+- HD queue remains 14 ready / 2 remaining. Next: D6DC1380 current-pipeline reconciliation, then 48DEBE77; both are Batch66 CREATE_NEW_HD_KOREAN_ASSET special cases.

@@ -508,7 +508,7 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "A88_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "status": "B89_FIRST_QA_PASS_PENDING_C_D_INGAME",
       "transcription_segments": 5,
       "localized_regions": 5,
       "remaining_segments": 0,
@@ -522,7 +522,9 @@
         "barcode/legal-code",
         "repeating watermark/background"
       ],
-      "in_game_validation": "PENDING"
+      "in_game_validation": "PENDING",
+      "b_first_qa_report": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_FIRST_QA_REPORT.json",
+      "candidate_changed_by_B": false
     }
   ],
   "separated_font_pipeline": [
@@ -538,6 +540,10 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_A/20260927-2030-A88/A88_9F060EC1_PRODUCTION_REPORT.json",
-  "latest_reopen_report": "localization/graphics/BATCH69_REOPEN_LOWRES_APPROVALS_HD_REWORK_REPORT.json"
+  "latest_batch": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_FIRST_QA_REPORT.json",
+  "latest_reopen_report": "localization/graphics/BATCH69_REOPEN_LOWRES_APPROVALS_HD_REWORK_REPORT.json",
+  "next_hd_special_cases": [
+    "D6DC1380",
+    "48DEBE77"
+  ]
 }

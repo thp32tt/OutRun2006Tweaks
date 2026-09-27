@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B89",
+  "source_run": "A88",
+  "canonical_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+  "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "format": "RGBA32",
+  "mipmaps": 1,
+  "bytes": 16777344,
+  "dds_header_128_exact": true,
+  "channel_masks": [
+    "0xff0000",
+    "0xff00",
+    "0xff",
+    "0xff000000"
+  ],
+  "raw_orientation": "mirror_y",
+  "semantic_entries": 5,
+  "physical_regions": 5,
+  "changed_pixels_total": 62929,
+  "outside_5_text_cells_changed_pixels": 0,
+  "alpha_changed_pixels_total": 61,
+  "alpha_changes_outside_5_cells": 0,
+  "introduced_alpha_pixels_total": 0,
+  "introduced_alpha_outside_5_cells": 0,
+  "candidate_changed_by_B": false,
+  "visual_review": "PASS_READABLE_RAW_WHITE_GRAY",
+  "in_game_validation": "PENDING"
+}

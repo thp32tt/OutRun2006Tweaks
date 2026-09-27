@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B89",
+  "timestamp_kst": "2026-09-27T21:01:48+09:00",
+  "base_head": "882f5a5d5daff5fe00d3da1d0775127c4948cfd9",
+  "source_role": "A88",
+  "scope": "9F060EC1 independent B first QA on A88 candidate; no build; no VR/FFB",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+  "canonical_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+  "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+  "candidate_changed_by_B": false,
+  "semantic_entries": 5,
+  "physical_regions": 5,
+  "translations": [
+    {
+      "source": "OUTRUN LICENSE",
+      "korean": "아웃런 라이선스"
+    },
+    {
+      "source": "COMPLETE",
+      "display": "달성률:",
+      "korean": "달성률"
+    },
+    {
+      "source": "VS RANK",
+      "display": "VS 랭크:",
+      "korean": "VS 랭크"
+    },
+    {
+      "source": "WIN RATIO",
+      "display": "승률:",
+      "korean": "승률"
+    },
+    {
+      "source": "DRIVE TIME",
+      "display": "주행 시간:",
+      "korean": "주행 시간"
+    }
+  ],
+  "preserved_original": [
+    "row numbers 1.-4.",
+    "OM",
+    "barcode/legal-code block",
+    "repeating OUTRUN LICENSE watermark/background artwork",
+    "all frame/panel/background artwork"
+  ],
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "bytes": 16777344,
+    "dds_header_128_exact_canonical": true,
+    "channel_masks": [
+      "0xff0000",
+      "0xff00",
+      "0xff",
+      "0xff000000"
+    ],
+    "raw_orientation": "mirror_y",
+    "changed_pixels_total": 62929,
+    "outside_5_text_cells_changed_pixels": 0,
+    "alpha_changed_pixels_total": 61,
+    "alpha_changes_outside_5_cells": 0,
+    "introduced_alpha_pixels_total": 0,
+    "introduced_alpha_outside_5_cells": 0
+  },
+  "semantic_qa": {
+    "OUTRUN LICENSE": "아웃런 라이선스",
+    "COMPLETE": "달성률",
+    "VS RANK": "VS 랭크",
+    "WIN RATIO": "승률",
+    "DRIVE TIME": "주행 시간",
+    "terminology_consistent_with_transcriptions": true
+  },
+  "artifact_qa": {
+    "source_language_residue": "NONE_OBSERVED",
+    "broken_hangul": "NONE_OBSERVED",
+    "clipping_or_overlap": "NONE_OBSERVED",
+    "box_escape": "NONE_OBSERVED",
+    "black_line_or_seam": "NONE_OBSERVED",
+    "opaque_box": "NONE_OBSERVED",
+    "alpha_halo": "NONE_OBSERVED",
+    "watermark_or_legal_artwork_damage": "NONE_OBSERVED"
+  },
+  "qa_artifacts": {
+    "readable": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_READABLE_QA.jpg",
+    "white": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_READABLE_WHITE_QA.jpg",
+    "gray": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_READABLE_GRAY_QA.jpg",
+    "raw": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_RAW_QA.jpg",
+    "compare": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_SOURCE_CANDIDATE_COMPARE.jpg"
+  },
+  "result": "B89_FIRST_QA_PASS_PENDING_C_D_INGAME",
+  "in_game_validation": "PENDING",
+  "approved_dds_promotion": false,
+  "next_hd_work": [
+    "D6DC1380",
+    "48DEBE77"
+  ],
+  "next_hd_note": "Historical Batch66 CREATE_NEW_HD_KOREAN_ASSET candidates require current-pipeline reconciliation; do not upscale prior Korean DDS.",
+  "build_performed": false,
+  "vr_ffb_changes": false
+}

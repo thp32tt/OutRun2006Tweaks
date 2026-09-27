@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T20:48:31+09:00",
+  "updated_at_kst": "2026-09-27T21:01:48+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "9F060EC1 A88 canonical-HD production complete on 5 semantic / 5 physical regions; B/C/D static QA and in-game validation remain. D83 states for the reopened P0 trio, FD90AA9 and C075FB49 are preserved. No REWORK_FROM_HD_BASE queue entries remain; the final two HD-migration queue entries are Batch66 CREATE_NEW_HD_KOREAN_ASSET candidates D6DC1380 and 48DEBE77 requiring current-pipeline reconciliation/QA.",
+  "next_checkpoint": "9F060EC1 A88 candidate now B89 first-QA PASS unchanged on 5 semantic / 5 physical regions; C/D + in-game remain. D83 states for reopened P0 trio, FD90AA9 and C075FB49 remain preserved. Final two HD-migration items are historical Batch66 CREATE_NEW_HD_KOREAN_ASSET candidates D6DC1380 then 48DEBE77 and require current-pipeline reconciliation/QA.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -257,20 +257,22 @@
       "coverage": "5 semantic / 5 physical",
       "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
       "report": "localization/graphics/role_A/20260927-2030-A88/A88_9F060EC1_PRODUCTION_REPORT.json",
-      "status": "A88_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "status": "B89_FIRST_QA_PASS_PENDING_C_D_INGAME",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
       "preserved": [
         "row numbers 1.-4.",
         "OM",
         "barcode/legal-code",
         "repeating watermark/background artwork"
-      ]
+      ],
+      "b_first_qa_report": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_FIRST_QA_REPORT.json",
+      "candidate_changed_by_B": false
     },
     "next_hd_rework": {
       "asset": "D6DC1380",
       "secondary_asset": "48DEBE77",
       "status": "BATCH66_CANDIDATE_READY_REQUIRES_CURRENT_PIPELINE_RECONCILIATION",
-      "note": "After 9F060EC1, no REWORK_FROM_HD_BASE entries remain. The final two queue entries are historical Batch66 CREATE_NEW_HD_KOREAN_ASSET candidates."
+      "note": "No REWORK_FROM_HD_BASE entries remain. These two are CREATE_NEW_HD_KOREAN_ASSET special cases; never upscale old Korean DDS."
     },
     "latest_d_final_qa": {
       "run": "D83",
@@ -321,29 +323,18 @@
       }
     },
     "latest_b_first_qa": {
-      "run": "B88",
-      "report": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json",
-      "result": "MIXED_REWORK_AND_SAME_SHA_FIRST_QA_PENDING_C_D_INGAME",
-      "C075FB49": {
-        "candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
-        "superseded_a86_sha256": "d310c7da75c4efe7959ec28b7e5125208d37483052b4e5c56c54cc0d4f16e3c1",
-        "candidate_changed_by_B": true,
-        "semantic_entries": 16,
-        "physical_regions": 17,
-        "status": "REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
-        "finding": "A86 course-description source cell omitted canonical pixels x=788..829, leaving source-language residue.",
-        "outside_corrected_text_cells_changed_pixels": 0,
-        "introduced_alpha_outside_text_cells": 0
-      },
-      "FD90AA9": {
-        "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
-        "candidate_changed_by_B": false,
-        "semantic_entries": 29,
-        "physical_regions": 29,
-        "status": "FIRST_QA_PASS_PENDING_C_D_INGAME",
-        "outside_text_cells_changed_pixels": 0,
-        "introduced_alpha_outside_text_cells": 0
-      }
+      "run": "B89",
+      "report": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_FIRST_QA_REPORT.json",
+      "result": "9F060EC1_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "candidate_changed_by_B": false,
+      "asset": "9F060EC1",
+      "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+      "semantic_entries": 5,
+      "physical_regions": 5,
+      "changed_pixels_total": 62929,
+      "outside_text_cells_changed_pixels": 0,
+      "alpha_changes_outside_text_cells": 0,
+      "introduced_alpha_outside_text_cells": 0
     },
     "c78_39229d64": {
       "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
@@ -461,6 +452,18 @@
         "result": "FIRST_QA_PASS_PENDING_C_D_INGAME"
       },
       "next_asset": "9F060EC1"
+    },
+    "b89_9f060ec1": {
+      "timestamp_kst": "2026-09-27T21:01:48+09:00",
+      "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+      "canonical_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+      "report": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_FIRST_QA_REPORT.json",
+      "candidate_changed_by_B": false,
+      "semantic_entries": 5,
+      "physical_regions": 5,
+      "result": "FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "outside_cells_changed_pixels": 0,
+      "alpha_changes_outside_cells": 0
     }
   },
   "data_build": {
