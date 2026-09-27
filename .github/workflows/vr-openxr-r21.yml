@@ -144,7 +144,7 @@ jobs:
         shell: cmd
         run: |
           set CI=
-          cmake -S . -B build-r26hud-current -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON
+          cmake -S . -B build-r26hud-current -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
 
       - name: Apply dependency workarounds
         shell: pwsh
