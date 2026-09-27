@@ -573,3 +573,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - **RUNTIME VALIDATION:** reset to RETEST_REQUIRED / SUSPECT_UNISOLATED.
 - **NEXT:** TEXT_ONLY with zero DDS first, then one candidate per DDS_ONLY package. COMBINED/RELEASE remain blocked until isolated in-game passes.
 - Evidence: `localization/validation/INCIDENT_20260928_TESTPATCH_FAIL.md`.
+
+
+## Zero-tolerance graphics boundary audit — 2026-09-28 07:10 KST
+- **Rule:** original source region overflow allowance = 0 px. Any 1 px escape => REWORK_REQUIRED.
+- **Inventory:** 179 image binaries; 40 DDS = 17 canonical sources + 23 work DDS; 139 PNGs are QA/compare evidence only.
+- **Current HD:** 16/16 have latest static containment evidence with no recorded outside-source escape; still 0 approved locks because isolated in-game validation is mandatory.
+- **Watch:** C075FB49 minimum bbox margin = 0 (touches boundary, does not escape). 568D3696 DXT5 retains decoded-pixel recheck caution for final proof.
+- **Rework/obsolete:** historical low-res approved_dds 571E78F3 / 62BEBF33 / E3FD08BE are not valid against the canonical HD baseline.
+- **Report:** `localization/graphics/FULL_PIXEL_BOUNDARY_AUDIT_20260928.json`.
