@@ -689,3 +689,16 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Readable/raw mirror_y A-stage QA: no observed source-language residue, clipping/overlap, box escape, seam/black line, opaque box or alpha halo.
 - Exact 128-byte DDS header and all bytes outside the 11 localization cells are canonical; all new Korean alpha bboxes remain within their source cells.
 - Candidate SHA-256: 0efaaa86849c66c94a4d5e1d5f7fbd86caa8935b5a5cb24ccbb26fc29f97d355. Status: A84_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA. No promotion, in-game claim, build, VR or FFB work. Next: 411827E.
+
+
+## 2026-09-27 17:10 KST — B85 C4A2937B + 2DA43E41 rework/first QA
+
+- Started from latest remote HEAD d604fe9 after A84 2DA43E41 landed; preserved all concurrent A/C/D results and did not use GPT Library.
+- C4A2937B A83 structural/containment/orientation checks passed, but B context QA corrected Cut the line! from 라인을 끊으세요! to 하트선을 통과하세요!. SEGA Heart Attack documentation defines the request as driving through yellow heart lines between cars, so the previous literal wording did not describe the gameplay action.
+- C4 candidate rebuilt on canonical HD canvas while preserving the other A83-localized source cells. New SHA-256: f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99. 4096×4096 RGBA32/1 mip, exact header, raw mirror_y, outside 21 cells changed pixels = 0.
+- Drift and -> 드리프트하고 is retained as a faithful source fragment but still requires adjacent-sprite/in-game composition confirmation. D79 C4 preflight was for the superseded A83 SHA and must be rerun.
+- 2DA43E41 A84 first-QA was rejected for rework: white-background enlargement exposed residual lower strokes from the source English in the two course-selection cells and two waiting cells. 加速度: was also corrected from 가속: to 가속도: for accurate UI terminology.
+- Those five 2DA cells were rebuilt from canonical HD; all other A84-passed cells were preserved. New SHA-256: 7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1.
+- 2DA final B85 QA: 4096×4096 RGBA32/1 mip, exact header, mirror_y; outside 11 cells changed pixels = 0, introduced alpha outside = 0; readable/raw and white-background residue checks PASS. OutRun2/OutRun2: SP, song title Keep Your Heart -1989-, player markers/numbers and map/character artwork remain original.
+- Neither changed-SHA candidate was promoted to approved_dds. New C/D strict QA and in-game screenshot validation are mandatory. Next P1 production target: 411827E.
+- No build, VR or FFB work.

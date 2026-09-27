@@ -1,5 +1,5 @@
 {
-  "schema_version": 36,
+  "schema_version": 37,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,7 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "HD GRAPHICS: 2DA43E41 A84 production complete (11 semantic / 11 physical) pending B/C/D + in-game. C4A2937B needs B/C + context/in-game; 39229D64, A064FDFC and FA7BBB13 remain in-game holds. After 2DA static gate continue 411827E canonical-HD rebuild.",
+    "HD GRAPHICS: C4A2937B and 2DA43E41 now have B85 changed-SHA reworks and first-QA PASS; both require new C/D + in-game validation. C4 Drift and fragment still requires adjacent-sprite runtime composition confirmation. Continue 411827E canonical-HD rebuild.",
     "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
     "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
     "Never upscale prior stock-resolution Korean DDS candidates.",
@@ -125,7 +125,7 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_A/20260927-1630-A84/A84_2DA43E41_PRODUCTION_REPORT.json",
+    "latest_hd_rework_batch": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json",
     "hd_rework_candidates_ready": 7,
     "hd_rework_remaining": 6,
     "hd_partial_rework": {
@@ -197,13 +197,13 @@
         "d_final_qa_report": "localization/graphics/role_D/20260927-1618-D79/D79_FINAL_QA_RECONCILE_REPORT.json"
       },
       "C4A2937B": {
-        "status": "D_PREFLIGHT_PASS_PENDING_B_C_INGAME",
-        "candidate_sha256": "7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e",
+        "status": "B85_REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
+        "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
         "completed_transcription_entries": 20,
         "localized_regions": 21,
         "remaining_segments": 0,
-        "report": "localization/graphics/role_A/20260927-1530-A83/A83_C4A2937B_PRODUCTION_REPORT.json",
+        "report": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json",
         "semantic_corrections": [
           "速度2倍にして！ -> Double the speed!",
           "added Drift and -> 드리프트하고"
@@ -213,22 +213,31 @@
           "Cut the line! -> 라인을 끊으세요!",
           "Drift and -> 드리프트하고"
         ],
-        "in_game_validation": "PENDING"
+        "in_game_validation": "PENDING",
+        "candidate_changed_by_B": true,
+        "context_followup": [
+          "Drift and adjacent-sprite/in-game composition"
+        ],
+        "superseded_a83_sha256": "7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e"
       },
       "2DA43E41": {
-        "status": "A84_PRODUCTION_COMPLETE_PENDING_B_C_D",
-        "candidate_sha256": "0efaaa86849c66c94a4d5e1d5f7fbd86caa8935b5a5cb24ccbb26fc29f97d355",
+        "status": "B85_REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
+        "candidate_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
         "completed_transcription_entries": 11,
         "localized_regions": 11,
         "remaining_segments": 0,
-        "report": "localization/graphics/role_A/20260927-1630-A84/A84_2DA43E41_PRODUCTION_REPORT.json",
+        "report": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json",
         "semantic_expansion": [
           "加速度",
           "最高速",
           "ハンドリング"
         ],
-        "in_game_validation": "PENDING"
+        "in_game_validation": "PENDING",
+        "candidate_changed_by_B": true,
+        "superseded_a84_sha256": "0efaaa86849c66c94a4d5e1d5f7fbd86caa8935b5a5cb24ccbb26fc29f97d355",
+        "semantic_fix": "加速度: -> 가속도:",
+        "artifact_fix": "4 large cells source residue removed"
       }
     },
     "a76_ff2462bb": {
@@ -481,7 +490,9 @@
     "header_128_exact": true,
     "outside_cells_exact": true,
     "raw_orientation": "mirror_y",
-    "status": "PENDING_B_C_D_STRICT_QA"
+    "status": "SUPERSEDED_BY_B85_CHANGED_SHA",
+    "b85_candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
+    "b85_report": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json"
   },
   "d79_final_qa": {
     "timestamp_kst": "2026-09-27T16:18:12+09:00",
@@ -508,6 +519,27 @@
     "header_128_exact": true,
     "outside_cells_exact": true,
     "raw_orientation": "mirror_y",
-    "status": "PENDING_B_C_D_STRICT_QA"
+    "status": "SUPERSEDED_BY_B85_CHANGED_SHA",
+    "b85_candidate_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
+    "b85_report": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json"
+  },
+  "b85_c4a2937b_2da43e41": {
+    "timestamp_kst": "2026-09-27T17:10:23+09:00",
+    "report": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json",
+    "C4A2937B": {
+      "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
+      "superseded_sha256": "7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e",
+      "result": "REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "cut_line": "하트선을 통과하세요!",
+      "drift_and_context": "PENDING_INGAME"
+    },
+    "2DA43E41": {
+      "candidate_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
+      "superseded_sha256": "0efaaa86849c66c94a4d5e1d5f7fbd86caa8935b5a5cb24ccbb26fc29f97d355",
+      "result": "REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "acceleration_label": "가속도:",
+      "source_residue_reworked": true
+    },
+    "next_asset": "411827E"
   }
 }

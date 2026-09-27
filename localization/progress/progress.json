@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T16:48:45+09:00",
+  "updated_at_kst": "2026-09-27T17:10:23+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "2DA43E41 A84 canonical-HD production complete on 11 semantic / 11 physical text regions; B/C/D static QA and in-game validation remain. C4A2937B still needs B/C + context/in-game; 39229D64, A064FDFC and FA7BBB13 remain in-game holds. Continue 411827E canonical-HD production after the 2DA static gate.",
+  "next_checkpoint": "C4A2937B B85 changed-SHA rework first QA PASS with Cut the line context correction; Drift and remains runtime-composition pending. 2DA43E41 B85 changed-SHA rework first QA PASS after source-English residue removal and 가속도 terminology correction. Both require new C/D + in-game validation. Continue 411827E canonical-HD production independently.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -255,20 +255,18 @@
     "latest_hd_production_candidate": {
       "asset": "2DA43E41",
       "coverage": "11 semantic / 11 physical",
-      "candidate_sha256": "0efaaa86849c66c94a4d5e1d5f7fbd86caa8935b5a5cb24ccbb26fc29f97d355",
-      "report": "localization/graphics/role_A/20260927-1630-A84/A84_2DA43E41_PRODUCTION_REPORT.json",
-      "status": "A84_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "candidate_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
+      "report": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json",
+      "status": "B85_REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
-      "semantic_expansion": [
-        "加速度",
-        "最高速",
-        "ハンドリング"
-      ],
+      "superseded_a84_sha256": "0efaaa86849c66c94a4d5e1d5f7fbd86caa8935b5a5cb24ccbb26fc29f97d355",
+      "semantic_fix": "加速度: -> 가속도:",
+      "artifact_fix": "A84 source-English lower-stroke residue removed in 4 large cells",
       "preserved_song_title": "Keep Your Heart -1989-"
     },
     "next_hd_rework": {
-      "asset": "2DA43E41",
-      "transcription_segments": 8,
+      "asset": "411827E",
+      "transcription_segments": 7,
       "status": "READY_FOR_CANONICAL_HD_RENDER"
     },
     "latest_d_final_qa": {
@@ -294,13 +292,25 @@
       "in_game_validation": "PENDING"
     },
     "latest_b_first_qa": {
-      "asset": "A064FDFC",
-      "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
-      "report": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_PRODUCTION_FIRST_QA.json",
-      "result": "B_PRODUCTION_AND_FIRST_QA_PASS_PENDING_C_D_INGAME",
-      "candidate_changed_by_B": true,
-      "semantic_entries": 17,
-      "physical_regions": 21
+      "run": "B85",
+      "report": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json",
+      "C4A2937B": {
+        "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
+        "result": "REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
+        "candidate_changed_by_B": true,
+        "semantic_entries": 20,
+        "physical_regions": 21,
+        "context_pending": [
+          "Drift and"
+        ]
+      },
+      "2DA43E41": {
+        "candidate_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
+        "result": "REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
+        "candidate_changed_by_B": true,
+        "semantic_entries": 11,
+        "physical_regions": 11
+      }
     },
     "c78_39229d64": {
       "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
@@ -314,6 +324,22 @@
       "status": "C79_STATIC_PASS_D78_SAME_SHA_PENDING_D_RECONCILE_INGAME",
       "d78_same_sha_binary_preflight_valid": true,
       "report": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json"
+    },
+    "b85_c4a2937b": {
+      "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
+      "superseded_a83_sha256": "7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e",
+      "status": "B85_REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "cut_line": "하트선을 통과하세요!",
+      "drift_and_context": "PENDING_INGAME",
+      "report": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json"
+    },
+    "b85_2da43e41": {
+      "candidate_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
+      "superseded_a84_sha256": "0efaaa86849c66c94a4d5e1d5f7fbd86caa8935b5a5cb24ccbb26fc29f97d355",
+      "status": "B85_REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "acceleration_label": "가속도:",
+      "source_residue_reworked": true,
+      "report": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json"
     }
   },
   "data_build": {

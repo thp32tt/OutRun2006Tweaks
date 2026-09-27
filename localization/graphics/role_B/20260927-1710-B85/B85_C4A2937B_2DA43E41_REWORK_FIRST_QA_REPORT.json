@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B85",
+  "timestamp_kst": "2026-09-27T17:10:23+09:00",
+  "base_head": "d604fe9fdfdeea1f8002a3bb53445dae7736352b",
+  "assets": {
+    "C4A2937B": {
+      "canonical_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "superseded_a83_sha256": "7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e",
+      "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+      "result": "B85_REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "candidate_changed_by_B": true,
+      "structure": {
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "header_exact": true,
+        "raw_orientation": "mirror_y"
+      },
+      "coverage": {
+        "semantic_entries": 20,
+        "physical_regions": 21,
+        "duplicate_physical_occurrences": {
+          "Beat that car!": 2
+        }
+      },
+      "semantic_rework": {
+        "source": "Cut the line!",
+        "old_korean": "라인을 끊으세요!",
+        "new_korean": "하트선을 통과하세요!",
+        "reason": "SEGA Heart Attack request description states the player must drive through yellow heart lines between cars; literal 끊으세요 did not express the gameplay action."
+      },
+      "context_followup": [
+        {
+          "source": "Drift and",
+          "korean": "드리프트하고",
+          "status": "PENDING_INGAME_ADJACENT_SPRITE_COMPOSITION"
+        }
+      ],
+      "containment": {
+        "outside_21_cells_changed_pixels": 0,
+        "introduced_alpha_outside_21_cells": 0,
+        "all_candidate_alpha_inside_source_cells": true
+      },
+      "visual_qa": {
+        "readable": "PASS",
+        "raw": "PASS_MIRROR_Y_PRESERVED",
+        "clipping_overlap": "NONE_OBSERVED",
+        "box_escape": "NONE_OBSERVED",
+        "source_residue": "NONE_OBSERVED",
+        "seam_black_line": "NONE_OBSERVED",
+        "opaque_box": "NONE_OBSERVED",
+        "alpha_halo": "NONE_OBSERVED"
+      },
+      "prior_d79_preflight": "SUPERSEDED_BY_B85_CHANGED_SHA",
+      "qa_artifacts": {
+        "readable": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_READABLE_QA.jpg",
+        "raw": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_RAW_QA.jpg"
+      }
+    },
+    "2DA43E41": {
+      "canonical_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+      "superseded_a84_sha256": "0efaaa86849c66c94a4d5e1d5f7fbd86caa8935b5a5cb24ccbb26fc29f97d355",
+      "candidate_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+      "result": "B85_REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "candidate_changed_by_B": true,
+      "structure": {
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "header_exact": true,
+        "raw_orientation": "mirror_y"
+      },
+      "coverage": {
+        "semantic_entries": 11,
+        "physical_regions": 11
+      },
+      "semantic_rework": {
+        "source": "加速度:",
+        "old_korean": "가속:",
+        "new_korean": "가속도:",
+        "reason": "Acceleration label is a noun/stat name; 가속도 is the accurate Korean UI term and fits the source cell."
+      },
+      "artifact_rework": {
+        "reworked_cells": [
+          "course_or2",
+          "course_sp",
+          "wait_other",
+          "wait_now"
+        ],
+        "reason": "A84 white-background enlargement exposed residual lower strokes from source English; B85 fully cleared and re-rendered the isolated source cells from canonical HD."
+      },
+      "preserved_original": [
+        "OutRun2",
+        "OutRun2: SP",
+        "Keep Your Heart -1989-",
+        "4P",
+        "3P",
+        "2P",
+        "1P",
+        "6",
+        "5",
+        "4",
+        "987",
+        "course-map artwork",
+        "character artwork",
+        "player indicators"
+      ],
+      "containment": {
+        "outside_11_cells_changed_pixels": 0,
+        "introduced_alpha_outside_11_cells": 0,
+        "all_candidate_alpha_inside_source_cells": true
+      },
+      "visual_qa": {
+        "readable": "PASS",
+        "raw": "PASS_MIRROR_Y_PRESERVED",
+        "white_background_residue_check": "PASS",
+        "clipping_overlap": "NONE_OBSERVED",
+        "box_escape": "NONE_OBSERVED",
+        "source_residue": "NONE_OBSERVED_AFTER_REWORK",
+        "seam_black_line": "NONE_OBSERVED",
+        "opaque_box": "NONE_OBSERVED",
+        "alpha_halo": "NONE_OBSERVED"
+      },
+      "qa_artifacts": {
+        "readable": "localization/graphics/role_B/20260927-1710-B85/B85_2DA43E41_READABLE_QA.jpg",
+        "raw": "localization/graphics/role_B/20260927-1710-B85/B85_2DA43E41_RAW_QA.jpg",
+        "course1_white": "localization/graphics/role_B/20260927-1710-B85/B85_2DA43E41_course1_WHITE.jpg",
+        "course2_white": "localization/graphics/role_B/20260927-1710-B85/B85_2DA43E41_course2_WHITE.jpg",
+        "waiting_white": "localization/graphics/role_B/20260927-1710-B85/B85_2DA43E41_waiting_WHITE.jpg",
+        "stats_white": "localization/graphics/role_B/20260927-1710-B85/B85_2DA43E41_stats_WHITE.jpg"
+      }
+    }
+  },
+  "next_asset": "411827E_512x512.dds",
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "approved_dds_promotion": false
+}
