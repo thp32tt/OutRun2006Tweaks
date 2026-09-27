@@ -16,6 +16,7 @@ on:
       - 'vrhost/**'
       - 'tools/verify_vr_architecture.py'
       - 'tools/verify_vr_r32_review.py'
+      - 'tools/verify_vr_proven_baseline.py'
       - 'docs/VR_ARCHITECTURE.md'
       - '.github/workflows/vr-openxr.yml'
   pull_request:
@@ -32,6 +33,7 @@ on:
       - 'vrhost/**'
       - 'tools/verify_vr_architecture.py'
       - 'tools/verify_vr_r32_review.py'
+      - 'tools/verify_vr_proven_baseline.py'
       - 'docs/VR_ARCHITECTURE.md'
       - '.github/workflows/vr-openxr.yml'
 
@@ -388,6 +390,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Verify HMD-proven VR baseline
+        shell: pwsh
+        run: python tools/verify_vr_proven_baseline.py
 
       - name: Configure Win32 R26 HUD/SkyGlow safe test
         shell: cmd
