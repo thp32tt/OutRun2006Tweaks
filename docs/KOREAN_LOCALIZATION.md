@@ -49,8 +49,8 @@ All progress is checkpointed under `localization/progress/`.
 The full localization-owned text/graphics state from the historical prototype has been migrated without importing its VR ancestry.
 
 - 1,355/1,355 non-null text IDs translated.
-- 1,347 normal records + 4 special records reviewed.
-- 4 context-sensitive IDs remain runtime-context drafts: 96, 97, 279, 280.
+- 1,351 normal records + 4 special records reviewed; all 1,355 non-null text IDs are now review-complete.
+- Heart Attack context confirmed for IDs 96, 97, 279, 280: `PASSENGER` -> `동승자`, `DUMPED` -> `차였어요!`.
 - 243 DDS assets classified; 80 text-localization targets.
 - 28 assets / 82 text segments transcribed.
 - 9 font atlases + 1 Hangul name-entry atlas identified.
