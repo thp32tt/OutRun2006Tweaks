@@ -26,6 +26,9 @@ namespace OutRunVR::GameSemantic
         // Generic canonical 2D queue content. It needs only per-eye
         // asymmetric-FOV alignment, never head/IPD/world-plane placement.
         ScreenOverlay2D,
+        // R65: exact game producer already projected a world/light effect into
+        // screen space. Treat it as eye-FOV-corrected 2D without HUD ownership.
+        ProjectedScreenEffect2D,
         ScreenHud,
     };
 
@@ -87,6 +90,7 @@ namespace OutRunVR::GameSemantic
         case RenderScope::ProjectedWorldMarker2D: return "PROJECTED_WORLD_MARKER_2D";
         case RenderScope::ReflectionCube: return "REFLECTION_CUBE";
         case RenderScope::ScreenOverlay2D: return "SCREEN_OVERLAY_2D";
+        case RenderScope::ProjectedScreenEffect2D: return "PROJECTED_SCREEN_EFFECT_2D";
         case RenderScope::ScreenHud: return "SCREEN_HUD";
         default: return "NONE";
         }
@@ -171,7 +175,8 @@ namespace OutRunVR::GameSemantic
     inline bool ForceZeroDisparity(RenderScope scope) noexcept
     {
         return scope == RenderScope::SkyGlow ||
-            scope == RenderScope::ScreenOverlay2D;
+            scope == RenderScope::ScreenOverlay2D ||
+            scope == RenderScope::ProjectedScreenEffect2D;
     }
 
     inline bool CorroboratesWorld(RenderScope scope) noexcept
