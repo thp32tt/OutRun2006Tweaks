@@ -67,11 +67,9 @@ class UIScaling : public Hook
 			const DWORD len = GetEnvironmentVariableA(
 				"OUTRUN_VR_HUD_PROBE", text,
 				static_cast<DWORD>(sizeof(text)));
-			// R66 production baseline: R57 mode 6 is the HMD-proven owner for
-			// both 1st-3rd and 4th+ projected rank markers and for DispRank.
-			// Environment value 0 remains an explicit diagnostic rollback.
+			// R56 runtime-only diagnostic selector. Production default stays disabled.
 			if (len == 0 || len >= sizeof(text))
-				return 6;
+				return 0;
 			int value = 0;
 			for (DWORD i = 0; i < len; ++i)
 			{
@@ -111,13 +109,16 @@ class UIScaling : public Hook
 			const DWORD len = GetEnvironmentVariableA(
 				"OUTRUN_VR_R57_MODE", text,
 				static_cast<DWORD>(sizeof(text)));
+			// R66 production baseline: HMD testing established mode 6 as the
+			// correct projected rank + DispRank ownership path. Explicit env=0
+			// remains available only for controlled regression diagnostics.
 			if (len == 0 || len >= sizeof(text))
-				return 0;
+				return 6;
 			int value = 0;
 			for (DWORD i = 0; i < len; ++i)
 			{
 				if (text[i] < '0' || text[i] > '9')
-					return 0;
+					return 6;
 				value = value * 10 + int(text[i] - '0');
 			}
 			return (value >= 0 && value <= 10) ? value : 6;
