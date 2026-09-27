@@ -51,8 +51,8 @@ $hostBuild = Join-Path $root 'host'
 $packageDir = Join-Path $root 'package'
 
 # Canonical PC-fast contract for the protected R51 renderer lineage.
-# Keep this single source of truth in sync with the verified R51 build.
-$buildContractVersion = 'R51-PC-FAST-v2-R26HUD-ON'
+# Keep this single source of truth in sync with the HMD-proven R66 R26+HUD build.
+$buildContractVersion = 'R66-PROVEN-R26HUD-v1'
 $canonicalGameFlags = @(
     '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF'
     '-DOUTRUN_VR_R26_HUD_COMPARE=ON'
@@ -62,12 +62,12 @@ $canonicalGameFlags = @(
 $canonicalGameFlagString = $canonicalGameFlags -join ' '
 $buildMode = if ($Clean) { 'CLEAN' } else { 'INCREMENTAL' }
 
-function Assert-R51PCBuildContract {
+function Assert-R66ProvenBuildContract {
     param([Parameter(Mandatory = $true)][string]$BuildDir)
 
     $cache = Join-Path $BuildDir 'CMakeCache.txt'
     if (-not (Test-Path $cache)) {
-        throw "R51 PC build contract: CMakeCache missing after configure: $cache"
+        throw "R66 proven build contract: CMakeCache missing after configure: $cache"
     }
 
     $required = @(
@@ -79,7 +79,7 @@ function Assert-R51PCBuildContract {
     $cacheText = Get-Content $cache -Raw
     foreach ($line in $required) {
         if ($cacheText -notmatch [regex]::Escape($line)) {
-            throw "R51 PC build contract mismatch: expected '$line'. Refusing to compile/package a non-R51 renderer configuration."
+            throw "R66 proven build contract mismatch: expected '$line'. Refusing to compile/package a non-R51 renderer configuration."
         }
     }
 
@@ -100,7 +100,7 @@ Invoke-Checked python 'tools/verify_vr_proven_baseline.py'
 
 Write-Host "PC fast build: configure Win32 game (persistent cache: $gameBuild)"
 Invoke-Checked cmake '-S' '.' '-B' $gameBuild '-G' 'Visual Studio 17 2022' '-A' 'Win32' @canonicalGameFlags
-Assert-R51PCBuildContract -BuildDir $gameBuild
+Assert-R66ProvenBuildContract -BuildDir $gameBuild
 
 Patch-DependencyProject (Join-Path $gameBuild '_deps/safetyhook-build/src/safetyhook.vcxproj')
 Patch-DependencyProject (Join-Path $gameBuild '_deps/zydis-build/Zydis.vcxproj')
@@ -127,7 +127,7 @@ if ($sdlText -match '#define SDL_JOYSTICK_GAMEINPUT 1') {
 $gameWatch = [Diagnostics.Stopwatch]::StartNew()
 Write-Host "PC fast build: compile game DLL with up to $jobs parallel jobs"
 Invoke-Checked cmake '--build' $gameBuild '--config' 'Release' '--target' 'outrun2006tweaks' '--parallel' "$jobs"
-Assert-R51PCBuildContract -BuildDir $gameBuild
+Assert-R66ProvenBuildContract -BuildDir $gameBuild
 $gameWatch.Stop()
 
 $hostWatch = [Diagnostics.Stopwatch]::StartNew()
@@ -172,7 +172,7 @@ Copy-Item $dll.FullName (Join-Path $backendDir 'dinput8.dll')
 Copy-Item $hostExe (Join-Path $backendDir 'outrun-vr-host.exe')
 Set-Content (Join-Path $backendDir 'SOURCE_SHA.txt') $sourceSha -Encoding ascii
 Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R66' -Encoding ascii
-Assert-R51PCBuildContract -BuildDir $gameBuild
+Assert-R66ProvenBuildContract -BuildDir $gameBuild
 Set-Content (Join-Path $backendDir 'CMAKE_FLAGS.txt') $canonicalGameFlagString -Encoding ascii
 Set-Content (Join-Path $backendDir 'BUILD_CONTRACT.txt') $buildContractVersion -Encoding ascii
 
