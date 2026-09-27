@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "batch": "A71_FF2462BB_REVIEWED_TEXT_PRODUCTION",
+  "role": "A",
+  "run_kst": "2026-09-27T08:50:00+09:00",
+  "scope": "localization only; no git/build/VR/FFB",
+  "base_candidate": {
+    "filename": "FF2462BB_B67_v1.dds",
+    "sha256": "2fe8c6bf3a1fd3bb44782d8e03620c43ec9162d42a6d561c53f8aabeb425d18c",
+    "note": "B67 candidate with Drift! -> 드리프트! retained unchanged"
+  },
+  "canonical_hd_source": {
+    "filename": "FF2462BB_1024x512.dds",
+    "sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32 / DDS uncompressed",
+    "header_128_sha256": "8879e51b5ae7689d58b86a80001060eda7286fbfde07a03702b2f4cfa128df57"
+  },
+  "output": {
+    "filename": "FF2462BB_A71_v2.dds",
+    "sha256": "3a1e0598594643c5c857c973b174369af98f4979abc7f7802793bc3a9a1b5574",
+    "size_bytes": 33554560
+  },
+  "edited_segments": [
+    {
+      "key": "FF2462BB_DONT_LOSE_GIRLFRIEND",
+      "source": "Don't lose your girlfriend!",
+      "korean": "여자친구를 놓치지 마세요!",
+      "bbox": [
+        3002,
+        482,
+        3512,
+        643
+      ],
+      "orientation": "flip_y",
+      "design_ref": "B69 reviewed compare",
+      "safety": "2px bbox margin"
+    },
+    {
+      "key": "FF2462BB_TIMING_TOTAL_20",
+      "source": "Total",
+      "korean": "총",
+      "bbox": [
+        20,
+        1340,
+        251,
+        1414
+      ],
+      "orientation": "flip_y",
+      "context": "시간 label set",
+      "design_ref": "B70 reviewed timing labels"
+    },
+    {
+      "key": "FF2462BB_TIMING_TIME_273",
+      "source": "Time",
+      "korean": "시간",
+      "bbox": [
+        273,
+        1340,
+        480,
+        1414
+      ],
+      "orientation": "flip_y",
+      "context": "Total Time",
+      "design_ref": "B70 reviewed timing labels"
+    },
+    {
+      "key": "FF2462BB_TIMING_LAP_524",
+      "source": "Lap",
+      "korean": "랩",
+      "bbox": [
+        524,
+        1327,
+        690,
+        1414
+      ],
+      "orientation": "flip_y",
+      "context": "Lap Time",
+      "design_ref": "B70 reviewed timing labels"
+    },
+    {
+      "key": "FF2462BB_TIMING_TIME_720",
+      "source": "Time",
+      "korean": "타임",
+      "bbox": [
+        720,
+        1340,
+        927,
+        1414
+      ],
+      "orientation": "flip_y",
+      "context": "Lap Time",
+      "design_ref": "B70 reviewed timing labels"
+    },
+    {
+      "key": "FF2462BB_TIMING_HEARTS_1015",
+      "source": "Hearts",
+      "korean": "하트",
+      "bbox": [
+        1015,
+        1340,
+        1317,
+        1414
+      ],
+      "orientation": "flip_y",
+      "context": "Hearts Score",
+      "design_ref": "B70 reviewed timing labels"
+    },
+    {
+      "key": "FF2462BB_TIMING_SCORE_1333",
+      "source": "Score",
+      "korean": "점수",
+      "bbox": [
+        1333,
+        1340,
+        1592,
+        1415
+      ],
+      "orientation": "flip_y",
+      "context": "Hearts Score",
+      "design_ref": "B70 reviewed timing labels"
+    },
+    {
+      "key": "FF2462BB_TIMING_TIME_1627",
+      "source": "Time",
+      "korean": "시간",
+      "bbox": [
+        1627,
+        1340,
+        1834,
+        1414
+      ],
+      "orientation": "flip_y",
+      "context": "standalone Time",
+      "design_ref": "B70 reviewed timing labels"
+    },
+    {
+      "key": "FF2462BB_LAP_DUPLICATE_3401",
+      "source": "Lap",
+      "korean": "랩",
+      "bbox": [
+        3401,
+        1342,
+        3521,
+        1410
+      ],
+      "orientation": "flip_y",
+      "context": "duplicate standalone Lap label in same atlas",
+      "design_ref": "reused B70 reviewed 랩 glyph",
+      "safety": "1px bbox margin"
+    }
+  ],
+  "qa": {
+    "dds_header_128_exact_vs_canonical": true,
+    "dimensions_exact": [
+      4096,
+      2048
+    ],
+    "file_size_exact": true,
+    "outside_new_bboxes_changed_pixels_vs_B67": 0,
+    "outside_all_localization_bboxes_changed_pixels_vs_canonical": 0,
+    "edge_nontransparent_counts": [
+      [
+        "FF2462BB_DONT_LOSE_GIRLFRIEND",
+        0
+      ],
+      [
+        "FF2462BB_TIMING_TOTAL_20",
+        0
+      ],
+      [
+        "FF2462BB_TIMING_TIME_273",
+        0
+      ],
+      [
+        "FF2462BB_TIMING_LAP_524",
+        0
+      ],
+      [
+        "FF2462BB_TIMING_TIME_720",
+        0
+      ],
+      [
+        "FF2462BB_TIMING_HEARTS_1015",
+        0
+      ],
+      [
+        "FF2462BB_TIMING_SCORE_1333",
+        0
+      ],
+      [
+        "FF2462BB_TIMING_TIME_1627",
+        0
+      ],
+      [
+        "FF2462BB_LAP_DUPLICATE_3401",
+        0
+      ]
+    ],
+    "original_text_area_rule": "all new writes clipped to the listed source component bboxes"
+  },
+  "remaining_ff2462_examples": [
+    "Slipstream the cars!",
+    "Avoid the knockout!",
+    "Beat that car!",
+    "Stage / route labels and additional account/menu text",
+    "other localizable FF2462BB cells not yet reviewed"
+  ],
+  "next_after_ff2462": "568D3696"
+}

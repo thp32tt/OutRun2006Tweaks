@@ -1,0 +1,45 @@
+{
+  "role": "A",
+  "latest_batch": "A71_FF2462BB_REVIEWED_TEXT_PRODUCTION",
+  "output": "FF2462BB_A71_v2.dds",
+  "output_sha256": "3a1e0598594643c5c857c973b174369af98f4979abc7f7802793bc3a9a1b5574",
+  "retained_completed": [
+    "FF2462BB: Drift! -> 드리프트!"
+  ],
+  "new_completed": [
+    "FF2462BB: Don't lose your girlfriend! -> 여자친구를 놓치지 마세요!",
+    "FF2462BB: Total -> 총",
+    "FF2462BB: Time -> 시간 (Total Time)",
+    "FF2462BB: Lap -> 랩 (Lap Time)",
+    "FF2462BB: Time -> 타임 (Lap Time)",
+    "FF2462BB: Hearts -> 하트",
+    "FF2462BB: Score -> 점수",
+    "FF2462BB: standalone Time -> 시간",
+    "FF2462BB: duplicate Lap -> 랩"
+  ],
+  "qa": {
+    "outside_new_bboxes_changed_pixels_vs_B67": 0,
+    "outside_all_localization_bboxes_changed_pixels_vs_canonical": 0,
+    "edge_nontransparent_counts": {
+      "FF2462BB_DONT_LOSE_GIRLFRIEND": 0,
+      "FF2462BB_TIMING_TOTAL_20": 0,
+      "FF2462BB_TIMING_TIME_273": 0,
+      "FF2462BB_TIMING_LAP_524": 0,
+      "FF2462BB_TIMING_TIME_720": 0,
+      "FF2462BB_TIMING_HEARTS_1015": 0,
+      "FF2462BB_TIMING_SCORE_1333": 0,
+      "FF2462BB_TIMING_TIME_1627": 0,
+      "FF2462BB_LAP_DUPLICATE_3401": 0
+    },
+    "dds_header_128_exact": true,
+    "dimensions": [
+      4096,
+      2048
+    ]
+  },
+  "next": [
+    "FF2462BB remaining task instruction cells",
+    "FF2462BB Stage/route/account/menu cells",
+    "568D3696 after FF2462BB completion"
+  ]
+}
