@@ -23,6 +23,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - name: Verify HMD-proven VR source baseline
+        shell: pwsh
+        run: python tools/verify_vr_proven_baseline.py
       - name: Build x64 D3D11 OpenXR host only
         shell: pwsh
         run: |
@@ -46,16 +49,16 @@ jobs:
       matrix:
         include:
           - variant: P1_C1_FAST_WORLD
-            flags: "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=ON"
+            flags: "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=ON -DOUTRUN_VR_C2_COMPARE=OFF"
             purpose: "R29 fast L+R plus restored R27/R28 world classifier"
           - variant: P2_C2_FAST_HUD
-            flags: "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=ON"
+            flags: "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=ON"
             purpose: "P1 plus R30 HUD/XYZRHW/SkyGlow correction"
           - variant: P3_FULL_R34
             flags: "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF"
             purpose: "Full R29-R34 current correction chain"
           - variant: P4_R26_HUD_SAFE
-            flags: "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON"
+            flags: "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF"
             purpose: "Conservative R26 world plus R30 HUD/effect overlay"
     steps:
       - uses: actions/checkout@v4
