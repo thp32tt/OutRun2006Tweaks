@@ -151,7 +151,7 @@ require_all(".github/workflows/vr-dx9ex-active.yml", [
 contract = read("docs/VR_BINARY_CONTRACT.json")
 required_contract_rvas = [
     "0x0002C9DB", # canonical glyph -> put_sprite_ex
-    "0x000CABE",  # lens flare -> DrawObjectAlpha_Internal
+    "0x0000CABE",  # lens flare -> DrawObjectAlpha_Internal
     "0x000BEA5A", # GOAL helper 020
     "0x000BEA5F", # GOAL helper 150
     "0x000E358B", "0x000E35F7", # option arrows producer A bounds
