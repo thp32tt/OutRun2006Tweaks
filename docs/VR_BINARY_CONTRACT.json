@@ -295,6 +295,62 @@
           "needle": "0xE4887"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-MENU-LIST-ARROW-A-1",
+      "rva": "0x000EC24C",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e82f10f4ff83c4188b55788b4424144a",
+      "purpose": "Generic menu/list boundary arrow sprite 0x3004A call 1.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xEC24C"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-MENU-LIST-ARROW-A-2",
+      "rva": "0x000EC277",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e80410f4ff83c4185f5e5d5bc21400cc",
+      "purpose": "Generic menu/list boundary arrow sprite 0x3004A call 2.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xEC277"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-MENU-LIST-ARROW-B-1",
+      "rva": "0x000ED4D4",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e8a7fdf3ff83c4188b7e083bfb0f8469",
+      "purpose": "Generic menu/list boundary arrow sprite 0x3004B call 1.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xED4D4"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-MENU-LIST-ARROW-B-2",
+      "rva": "0x000ED7A3",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e8d8faf3ff83c4185f5e5d5b83c41cc3",
+      "purpose": "Generic menu/list boundary arrow sprite 0x3004B call 2.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xED7A3"
+        }
+      ]
     }
   ]
 }
