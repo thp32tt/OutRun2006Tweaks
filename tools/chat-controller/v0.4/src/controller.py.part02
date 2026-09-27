@@ -131,10 +131,18 @@ async def prepare_slot_pages(context: BrowserContext, reg: Registry) -> dict[str
 
 async def slot_page(context: BrowserContext, pages: dict[str, Page], slot: Slot) -> Page:
     page = pages.get(slot.name)
+    if slot.url and not is_persistable_chat_url(slot.url):
+        log.warning("discarding ephemeral slot URL slot=%s url=%s", slot.name, slot.url)
+        slot.url = None
+        slot.last_assistant_hash = None
+        slot.last_assistant_change_at = None
     if page is None or page.is_closed():
         page = await context.new_page()
         pages[slot.name] = page
         await page.goto(slot.url or BASE_URL, wait_until="domcontentloaded", timeout=60000)
+    elif not slot.url and "/c/local-chatgpt" in page.url.lower():
+        await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
+        await page.wait_for_timeout(700)
     return page
 
 
