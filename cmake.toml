@@ -349,7 +349,9 @@ link-libraries = [
     "Winmm.lib",
     "Setupapi.lib",
     "Crypt32.lib",
-    "d3dcompiler.lib"
+    "d3dcompiler.lib",
+    "d3d11.lib",
+    "dxgi.lib"
 ]
 
 [target.outrun2006tweaks.properties]

@@ -690,6 +690,8 @@ target_link_libraries(outrun2006tweaks PUBLIC
 	Setupapi.lib
 	Crypt32.lib
 	d3dcompiler.lib
+	d3d11.lib
+	dxgi.lib
 )
 
 target_link_options(outrun2006tweaks PUBLIC
