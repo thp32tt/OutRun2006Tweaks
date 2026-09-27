@@ -485,3 +485,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - approved_dds receives no new promotion; user_approved_locked remains empty.
 - LOCALIZATION_STATE_OK and Domain Isolation PASS; VR/FFB contamination not observed. No build performed.
 - Next production target: 9F060EC1 (5 reviewed segments). Machine report: localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json.
+
+## A88 9F060EC1 checkpoint — 2026-09-27 20:48 KST
+
+- Canonical-HD production complete: 5 semantic / 5 physical text regions.
+- Candidate SHA-256: 39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60; 2048×2048 RGBA32 / 1 mip / exact canonical header / raw mirror_y.
+- Row numbers 1.-4., OM, barcode/legal-code, repeating watermark/background and frame/panel artwork preserved.
+- Outside 5 cells byte-identical; candidate alpha contained; readable/raw/white-background A-stage artifact QA PASS after rejecting a broad header-mask draft.
+- Queue: 14 ready / 2 remaining; zero REWORK_FROM_HD_BASE items remain. Final two queue entries are Batch66 CREATE_NEW_HD_KOREAN_ASSET candidates D6DC1380 and 48DEBE77 for current-pipeline reconciliation.
+- Status: A_PRODUCTION_COMPLETE_PENDING_B_C_D; in-game validation not performed.

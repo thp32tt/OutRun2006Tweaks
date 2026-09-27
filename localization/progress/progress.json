@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T20:14:16+09:00",
+  "updated_at_kst": "2026-09-27T20:48:31+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Reopened P0 HD trio 571E78F3/62BEBF33/E3FD08BE now has B87 + C81 + D82/D83 same-SHA static PASS but remains unapproved until mandatory in-game screenshot reapproval. FD90AA9 A87/B88 same SHA passes D83 preflight but needs C + in-game. C075FB49 B88 changed SHA passes D83 fresh preflight but needs C + in-game. Continue 9F060EC1 canonical-HD production.",
+  "next_checkpoint": "9F060EC1 A88 canonical-HD production complete on 5 semantic / 5 physical regions; B/C/D static QA and in-game validation remain. D83 states for the reopened P0 trio, FD90AA9 and C075FB49 are preserved. No REWORK_FROM_HD_BASE queue entries remain; the final two HD-migration queue entries are Batch66 CREATE_NEW_HD_KOREAN_ASSET candidates D6DC1380 and 48DEBE77 requiring current-pipeline reconciliation/QA.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -253,46 +253,24 @@
     "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
     "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "latest_hd_production_candidate": {
-      "asset": "FD90AA9",
-      "coverage": "29 semantic / 29 physical",
-      "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
-      "report": "localization/graphics/role_A/20260927-1930-A87/A87_FD90AA9_PRODUCTION_REPORT.json",
-      "status": "D83_PREFLIGHT_PASS_PENDING_C_INGAME",
-      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
-      "transcription_expansion": [
-        "Maximum Speed -> 최고 속도",
-        "Transmission -> 변속기"
-      ],
+      "asset": "9F060EC1",
+      "coverage": "5 semantic / 5 physical",
+      "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+      "report": "localization/graphics/role_A/20260927-2030-A88/A88_9F060EC1_PRODUCTION_REPORT.json",
+      "status": "A88_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
       "preserved": [
-        "Risky Ride",
-        "PASSING BREEZE",
-        "Night Flight",
-        "MAGICAL SOUND SHOWER",
-        "Life Was a Bore",
-        "Shiny World",
-        "RANDOM",
-        "SPLASH WAVE",
-        "250GTO",
-        "512BB",
-        "300km/h",
-        "293km/h",
-        "4P",
-        "3P",
-        "5 AT/MT",
-        "6 AT/MT",
-        "route/map artwork",
-        "speech bubble",
-        "equalizer artwork",
-        "road/vehicle icons"
-      ],
-      "b_first_qa_report": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json",
-      "candidate_changed_by_B": false,
-      "d_preflight_report": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json"
+        "row numbers 1.-4.",
+        "OM",
+        "barcode/legal-code",
+        "repeating watermark/background artwork"
+      ]
     },
     "next_hd_rework": {
-      "asset": "9F060EC1",
-      "transcription_segments": 5,
-      "status": "READY_FOR_CANONICAL_HD_RENDER"
+      "asset": "D6DC1380",
+      "secondary_asset": "48DEBE77",
+      "status": "BATCH66_CANDIDATE_READY_REQUIRES_CURRENT_PIPELINE_RECONCILIATION",
+      "note": "After 9F060EC1, no REWORK_FROM_HD_BASE entries remain. The final two queue entries are historical Batch66 CREATE_NEW_HD_KOREAN_ASSET candidates."
     },
     "latest_d_final_qa": {
       "run": "D83",

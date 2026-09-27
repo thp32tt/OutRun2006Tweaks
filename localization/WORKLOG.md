@@ -857,3 +857,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - C075FB49 B88 changed SHA 9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9 supersedes the A86/D82 SHA after fixing a course-description source-cell boundary residue. D83 directly confirms exact header, 2048×2048 RGBA32/1 mip, 797,758 changed pixels, outside corrected 17 cells = 0 and introduced alpha outside = 0. C + in-game remain.
 - LOCALIZATION_STATE_OK and Domain Isolation PASS; no VR/FFB source/history merge. Build not run.
 - Next production target: 9F060EC1 (5 reviewed segments). Report: localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json.
+
+## 2026-09-27 20:48 KST — A88 9F060EC1 HD rebuild
+
+- Continued from latest GitHub korean-localization-clean HEAD d7f8a11; GPT Library was not used.
+- Rebuilt 9F060EC1_512x512.dds directly from canonical 2048×2048 HD RGBA32/1-mip source; no historical Korean DDS/FULL_DRAFT pixels were reused or upscaled.
+- Materialized all 5 reviewed labels: OUTRUN LICENSE -> 아웃런 라이선스, COMPLETE -> 달성률, VS RANK -> VS 랭크, WIN RATIO -> 승률, DRIVE TIME -> 주행 시간. Row-number prefixes and label punctuation layout were kept source-like.
+- Preserved 1.-4., OM, the barcode/legal-code block, repeating OUTRUN LICENSE watermark/background artwork, and all frame/panel artwork.
+- Initial heading erase mask was rejected before persistence because it matched non-text panel pixels too broadly. Final mask is constrained to the source gray-purple hue and high-alpha pixels.
+- Readable/raw mirror_y/white-background A-stage QA PASS; no observed source residue, broken Hangul, clipping/overlap, box escape, seam/black line, opaque box or alpha halo.
+- Exact 128-byte DDS header preserved; all bytes outside the 5 declared localization cells remain canonical; all candidate alpha bboxes remain inside cells. Candidate SHA-256: 39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60.
+- Status: A88_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA. No promotion, in-game claim, build, VR or FFB work.
+- Queue after A88: 14 ready / 2 remaining. No REWORK_FROM_HD_BASE entries remain; remaining Batch66 candidates are D6DC1380 and 48DEBE77 and require current-pipeline reconciliation/QA.

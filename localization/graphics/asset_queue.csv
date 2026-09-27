@@ -110,7 +110,7 @@ index,path,action,artwork_status,transcription_status,notes
 194,textures/load/spr_sprani_sumo_fe_cvt_Exst/9AC75730_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
 195,textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 196,textures/load/spr_sprani_sumo_fe_cvt_Exst/9EF903AF_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
-197,textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
+197,textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds,localize_text,a88_candidate_pending_bcd_qa,transcribed_reviewed,A88 canonical-HD 5/5 complete; row numbers/OM/barcode/watermark preserved; B/C/D + in-game pending
 198,textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass9 transcription saved
 201,textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass10 transcription saved
 202,textures/load/spr_sprani_sumo_fe_cvt_Exst/AB56F682_512x512.dds,zoom_review,blocked_review,needs_zoom_review,

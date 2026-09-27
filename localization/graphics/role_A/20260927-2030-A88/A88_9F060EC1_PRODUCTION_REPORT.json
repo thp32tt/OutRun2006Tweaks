@@ -1,0 +1,320 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A88",
+  "timestamp_kst": "2026-09-27T20:48:31+09:00",
+  "base_head": "d7f8a119efffe965f3918fef3299228533125b31",
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+  "canonical_source": "OR2-HD-GUI-v0.25.10a",
+  "canonical_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+  "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "bytes": 16777344,
+  "format": "RGBA32",
+  "mipmaps": 1,
+  "dds_channel_masks": [
+    "0xff0000",
+    "0xff00",
+    "0xff",
+    "0xff000000"
+  ],
+  "raw_orientation": "mirror_y",
+  "semantic_entries_materialized": 5,
+  "localized_regions": 5,
+  "translations": [
+    {
+      "source": "OUTRUN LICENSE",
+      "korean": "아웃런 라이선스"
+    },
+    {
+      "source": "COMPLETE",
+      "display": "달성률:",
+      "korean": "달성률"
+    },
+    {
+      "source": "VS RANK",
+      "display": "VS 랭크:",
+      "korean": "VS 랭크"
+    },
+    {
+      "source": "WIN RATIO",
+      "display": "승률:",
+      "korean": "승률"
+    },
+    {
+      "source": "DRIVE TIME",
+      "display": "주행 시간:",
+      "korean": "주행 시간"
+    }
+  ],
+  "preserved_original_tokens": [
+    "row numbers 1.-4.",
+    "OM",
+    "barcode/legal-code block",
+    "repeating OUTRUN LICENSE watermark/background artwork",
+    "all frame/panel/background artwork"
+  ],
+  "classification_notes": [
+    "Row numbers 1.-4. are separate source artwork and remain source-exact.",
+    "OM and bottom-right barcode/legal-code block are preserve-original.",
+    "Repeated pale OUTRUN LICENSE watermark is background artwork and remains source-exact outside declared text cells."
+  ],
+  "dds_header_128_byte_exact_to_canonical": true,
+  "outside_5_text_cells_byte_exact_to_canonical": true,
+  "new_korean_alpha_contained_in_declared_cells": true,
+  "header_source_mask_confined_to_heading": true,
+  "readable_orientation_visual_qa": "PASS_A_STAGE",
+  "raw_orientation_visual_qa": "PASS_MIRROR_Y_PRESERVED",
+  "white_background_alpha_qa": "PASS",
+  "artifact_qa": {
+    "source_language_residue": "NONE_OBSERVED_FINAL",
+    "broken_hangul": "NONE_OBSERVED",
+    "clipping_or_overlap": "NONE_OBSERVED",
+    "box_escape": "NONE_OBSERVED",
+    "black_line_or_seam": "NONE_OBSERVED",
+    "opaque_box": "NONE_OBSERVED",
+    "alpha_halo": "NONE_OBSERVED",
+    "protected_artwork_damage": "NONE_OBSERVED"
+  },
+  "internal_rework": [
+    {
+      "attempt": "draft_1",
+      "result": "REJECTED_NOT_PERSISTED",
+      "reason": "Heading erase mask matched non-text panel pixels too broadly despite acceptable visual preview."
+    },
+    {
+      "attempt": "final",
+      "result": "PASS_FOR_A_HANDOFF",
+      "reason": "Heading mask restricted to the source gray-purple hue and high-alpha pixels; panel/background preservation verified."
+    }
+  ],
+  "historical_full_draft_pixels_reused": false,
+  "in_game_validation": "NOT_PERFORMED",
+  "approval": "NOT_PROMOTED_PENDING_B_C_D_AND_INGAME",
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "records": [
+    {
+      "key": "license",
+      "source": "OUTRUN LICENSE",
+      "korean": "아웃런 라이선스",
+      "readable_cell": [
+        16,
+        1252,
+        642,
+        1358
+      ],
+      "source_text_mask_bbox_local": [
+        25,
+        33,
+        609,
+        95
+      ],
+      "candidate_alpha_bbox": [
+        25,
+        1270,
+        496,
+        1339
+      ],
+      "render": {
+        "font_size": 72,
+        "fill": [
+          151,
+          153,
+          173,
+          255
+        ],
+        "placement": [
+          9,
+          18
+        ],
+        "glyph_size": [
+          471,
+          69
+        ]
+      }
+    },
+    {
+      "key": "complete",
+      "source": "COMPLETE:",
+      "korean": "달성률:",
+      "readable_cell": [
+        394,
+        1548,
+        686,
+        1618
+      ],
+      "source_text_mask_bbox_local": [
+        5,
+        13,
+        285,
+        60
+      ],
+      "candidate_alpha_bbox": [
+        398,
+        1558,
+        546,
+        1607
+      ],
+      "render": {
+        "font_size": 50,
+        "fill": [
+          19,
+          36,
+          72,
+          255
+        ],
+        "placement": [
+          4,
+          10
+        ],
+        "glyph_size": [
+          148,
+          49
+        ]
+      }
+    },
+    {
+      "key": "vs_rank",
+      "source": "VS RANK:",
+      "korean": "VS 랭크:",
+      "readable_cell": [
+        394,
+        1640,
+        634,
+        1708
+      ],
+      "source_text_mask_bbox_local": [
+        3,
+        12,
+        231,
+        59
+      ],
+      "candidate_alpha_bbox": [
+        398,
+        1651,
+        574,
+        1697
+      ],
+      "render": {
+        "font_size": 48,
+        "fill": [
+          19,
+          36,
+          72,
+          255
+        ],
+        "placement": [
+          4,
+          11
+        ],
+        "glyph_size": [
+          176,
+          46
+        ]
+      }
+    },
+    {
+      "key": "win_ratio",
+      "source": "WIN RATIO:",
+      "korean": "승률:",
+      "readable_cell": [
+        394,
+        1730,
+        716,
+        1800
+      ],
+      "source_text_mask_bbox_local": [
+        4,
+        12,
+        283,
+        59
+      ],
+      "candidate_alpha_bbox": [
+        399,
+        1741,
+        503,
+        1789
+      ],
+      "render": {
+        "font_size": 50,
+        "fill": [
+          19,
+          36,
+          72,
+          255
+        ],
+        "placement": [
+          5,
+          11
+        ],
+        "glyph_size": [
+          104,
+          48
+        ]
+      }
+    },
+    {
+      "key": "drive_time",
+      "source": "DRIVE TIME:",
+      "korean": "주행 시간:",
+      "readable_cell": [
+        394,
+        1822,
+        716,
+        1892
+      ],
+      "source_text_mask_bbox_local": [
+        6,
+        12,
+        314,
+        57
+      ],
+      "candidate_alpha_bbox": [
+        399,
+        1832,
+        607,
+        1881
+      ],
+      "render": {
+        "font_size": 50,
+        "fill": [
+          19,
+          36,
+          72,
+          255
+        ],
+        "placement": [
+          5,
+          10
+        ],
+        "glyph_size": [
+          208,
+          49
+        ]
+      }
+    }
+  ],
+  "status": "A88_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA",
+  "remaining_hd_queue_after_this_run": {
+    "ready": 14,
+    "remaining": 2,
+    "rework_from_hd_base_count": 0,
+    "remaining_batch66_candidates": [
+      {
+        "asset": "D6DC1380",
+        "status": "BATCH_CANDIDATE_READY",
+        "policy": "CREATE_NEW_HD_KOREAN_ASSET"
+      },
+      {
+        "asset": "48DEBE77",
+        "status": "BATCH_CANDIDATE_READY",
+        "policy": "CREATE_NEW_HD_KOREAN_ASSET"
+      }
+    ]
+  }
+}

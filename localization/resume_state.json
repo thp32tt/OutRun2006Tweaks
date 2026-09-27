@@ -7,8 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "APPROVAL STATE: current user-approved lock count remains 0. Reopened HD trio 571E78F3/62BEBF33/E3FD08BE has B87/C81/D83 final static PASS but mandatory in-game screenshot reapproval is still required.",
-    "HD GRAPHICS: FD90AA9 A87/B88 same SHA + D83 preflight PASS, pending C + in-game. C075FB49 B88 changed SHA + D83 preflight PASS, pending C + in-game. Continue 9F060EC1 canonical-HD rebuild.",
+    "APPROVAL STATE: current user-approved lock count remains 0. D83 states for reopened P0 trio, FD90AA9 and C075FB49 remain unchanged and still require their pending C/D/in-game gates.",
+    "HD GRAPHICS: 9F060EC1 A88 production complete (5 semantic / 5 physical) pending B/C/D + in-game. No REWORK_FROM_HD_BASE entries remain; reconcile the remaining Batch66 CREATE_NEW_HD_KOREAN_ASSET candidates D6DC1380 first, then 48DEBE77, against current A/B/C/D rules.",
     "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
     "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
     "Never upscale prior stock-resolution Korean DDS candidates.",
@@ -127,9 +127,9 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json",
-    "hd_rework_candidates_ready": 13,
-    "hd_rework_remaining": 3,
+    "latest_hd_rework_batch": "localization/graphics/role_A/20260927-2030-A88/A88_9F060EC1_PRODUCTION_REPORT.json",
+    "hd_rework_candidates_ready": 14,
+    "hd_rework_remaining": 2,
     "hd_partial_rework": {
       "FF2462BB": {
         "status": "STATIC_QA_PASS_PENDING_INGAME",
@@ -365,6 +365,16 @@
         "b_first_qa_report": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json",
         "candidate_changed_by_B": false,
         "d_preflight_report": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json"
+      },
+      "9F060EC1": {
+        "status": "A88_PRODUCTION_COMPLETE_PENDING_B_C_D",
+        "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+        "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+        "completed_transcription_entries": 5,
+        "localized_regions": 5,
+        "remaining_segments": 0,
+        "report": "localization/graphics/role_A/20260927-2030-A88/A88_9F060EC1_PRODUCTION_REPORT.json",
+        "in_game_validation": "PENDING"
       }
     },
     "a76_ff2462bb": {
@@ -411,9 +421,10 @@
       "report": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json"
     },
     "next_hd_rework": {
-      "asset": "9F060EC1",
-      "transcription_segments": 5,
-      "status": "READY_FOR_CANONICAL_HD_RENDER"
+      "asset": "D6DC1380",
+      "secondary_asset": "48DEBE77",
+      "status": "BATCH66_CANDIDATE_READY_REQUIRES_CURRENT_PIPELINE_RECONCILIATION",
+      "rework_from_hd_base_remaining": 0
     },
     "c80": {
       "timestamp_kst": "2026-09-27T18:29:48+09:00",
@@ -954,5 +965,21 @@
     "next_hd_rework": "9F060EC1",
     "build_performed": false,
     "vr_ffb_changes": false
+  },
+  "a88_9f060ec1": {
+    "timestamp_kst": "2026-09-27T20:48:31+09:00",
+    "semantic_entries_materialized": 5,
+    "semantic_entries_total": 5,
+    "localized_regions": 5,
+    "remaining_entries": 0,
+    "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+    "report": "localization/graphics/role_A/20260927-2030-A88/A88_9F060EC1_PRODUCTION_REPORT.json",
+    "header_128_exact": true,
+    "outside_cells_exact": true,
+    "raw_orientation": "mirror_y",
+    "white_background_alpha_qa": "PASS",
+    "header_source_mask_confined": true,
+    "status": "PENDING_B_C_D_STRICT_QA"
   }
 }
