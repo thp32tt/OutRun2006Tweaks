@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T18:55:16+09:00",
+  "updated_at_kst": "2026-09-27T19:03:51+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B87 rebuilt reopened P0 571E78F3/62BEBF33/E3FD08BE directly from exact canonical 2048x256 DXT5 sources and first-QA passed all three; C/D + in-game pending. C80 2DA/411 changed SHAs remain D revalidation/in-game pending. Continue C075FB49 canonical-HD production with B86-expanded 16 semantic / 17 physical coverage.",
+  "next_checkpoint": "C075FB49 A86 canonical-HD production complete on 16 semantic / 17 physical regions; B/C/D static QA and in-game validation remain. B87 canonical-HD P0 trio rebuild/first-QA state is preserved and awaits C/D + in-game. C80 C4A2937B static PASS retains Drift and runtime-context hold; C80 2DA43E41/411827E changed SHAs need D revalidation + in-game. Continue FD90AA9 canonical-HD production next.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -253,25 +253,29 @@
     "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
     "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "latest_hd_production_candidate": {
-      "asset": "E3FD08BE",
-      "coverage": "1 semantic / 1 physical",
-      "candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
-      "report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
-      "status": "B87_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
-      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
-      "candidate_changed_by_B": true,
-      "canonical_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
-      "dimensions": [
-        2048,
-        256
+      "asset": "C075FB49",
+      "coverage": "16 semantic / 17 physical",
+      "candidate_sha256": "d310c7da75c4efe7959ec28b7e5125208d37483052b4e5c56c54cc0d4f16e3c1",
+      "report": "localization/graphics/role_A/20260927-1830-A86/A86_C075FB49_PRODUCTION_REPORT.json",
+      "status": "A86_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+      "duplicate_physical_occurrences": {
+        "More BGM": 2
+      },
+      "preserved": [
+        "OutRun2SP",
+        "OutRun2",
+        "1P",
+        "Ferrari model names",
+        "vehicle artwork"
       ],
-      "format": "DXT5"
+      "concurrent_c80_preserved": true,
+      "concurrent_b87_p0_trio_preserved": true
     },
     "next_hd_rework": {
-      "asset": "C075FB49",
-      "transcription_segments": 16,
-      "expected_physical_text_occurrences": 17,
-      "status": "TRANSCRIPTION_EXPANDED_READY_FOR_CANONICAL_HD_RENDER"
+      "asset": "FD90AA9",
+      "transcription_segments": 27,
+      "status": "READY_FOR_CANONICAL_HD_RENDER"
     },
     "latest_d_final_qa": {
       "run": "D81",

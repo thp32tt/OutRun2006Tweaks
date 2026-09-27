@@ -59,7 +59,7 @@ index,path,action,artwork_status,transcription_status,notes
 104,textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds,localize_text,b87_hd_rebuild_first_qa_pass_pending_c_d_ingame,transcribed_reviewed,B87 exact canonical 2048x256 DXT5 rebuild; header/orientation/cell containment PASS; C/D + in-game pending
 106,textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass6 transcription saved
 107,textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds,localize_text,pending_artwork,transcribed_reviewed,pass6 transcription saved
-111,textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds,localize_text,transcription_expanded_ready_hd_render,transcribed_reviewed,B86 expanded 14->16 semantic / 17 expected physical; added Maximum Speed/Transmission; More BGM x2
+111,textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds,localize_text,a86_candidate_pending_bcd_qa,transcribed_reviewed,A86 canonical-HD 16 semantic / 17 physical complete; More BGM x2; protected Ferrari/OutRun/player artwork; B/C/D + in-game pending
 112,textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 116,textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds,localize_text,b87_hd_rebuild_first_qa_pass_pending_c_d_ingame,transcribed_reviewed,B87 exact canonical 2048x256 DXT5 rebuild; header/orientation/cell containment PASS; C/D + in-game pending
 119,textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved

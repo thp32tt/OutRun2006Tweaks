@@ -1,0 +1,589 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A86",
+  "timestamp_kst": "2026-09-27T18:53:32+09:00",
+  "base_head": "5ae327a998569311af40fa89f929ddc3e4fe23f5",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+  "canonical_source": "OR2-HD-GUI-v0.25.10a",
+  "canonical_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+  "candidate_sha256": "d310c7da75c4efe7959ec28b7e5125208d37483052b4e5c56c54cc0d4f16e3c1",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "bytes": 16777344,
+  "format": "RGBA32",
+  "mipmaps": 1,
+  "raw_orientation": "mirror_y",
+  "semantic_entries_materialized": 16,
+  "localized_regions": 17,
+  "duplicate_physical_occurrences": {
+    "More BGM": 2
+  },
+  "translations": [
+    {
+      "source": "Long distance",
+      "korean": "장거리"
+    },
+    {
+      "source": "Keep passing the cars!",
+      "korean": "계속 차량을 추월하세요!"
+    },
+    {
+      "source": "Drift!",
+      "korean": "드리프트!"
+    },
+    {
+      "source": "Don't crash!",
+      "korean": "충돌하지 마세요!"
+    },
+    {
+      "source": "Go through the gate!",
+      "korean": "게이트를 통과하세요!"
+    },
+    {
+      "source": "For Experts:",
+      "korean": "상급자용:"
+    },
+    {
+      "source": "Tuned Setting",
+      "korean": "튜닝 설정"
+    },
+    {
+      "source": "Normal Setting",
+      "korean": "일반 설정"
+    },
+    {
+      "source": "A brand new course designed for OutRun2: SP.",
+      "korean": "아웃런2 SP용으로 새롭게 설계된 코스입니다."
+    },
+    {
+      "source": "The course from the original OutRun2.",
+      "korean": "오리지널 아웃런2의 코스입니다."
+    },
+    {
+      "source": "Conditions:",
+      "korean": "조건:"
+    },
+    {
+      "source": "RANDOM",
+      "korean": "무작위"
+    },
+    {
+      "source": "Normal balance",
+      "korean": "일반 밸런스"
+    },
+    {
+      "source": "More BGM",
+      "korean": "BGM 더 많이"
+    },
+    {
+      "source": "Maximum Speed",
+      "korean": "최고 속도"
+    },
+    {
+      "source": "Transmission",
+      "korean": "변속기"
+    }
+  ],
+  "preserved_original_tokens": [
+    "OutRun2SP",
+    "OutRun2",
+    "1P",
+    "Dino 246GTS",
+    "365GTS/4 Daytona",
+    "360Spider",
+    "Enzo Ferrari",
+    "F50",
+    "288GTO",
+    "512BB",
+    "250GTO",
+    "F40",
+    "Testarossa",
+    "all vehicle artwork",
+    "numeric/UI artwork"
+  ],
+  "dds_header_128_byte_exact_to_canonical": true,
+  "outside_17_text_cells_byte_exact_to_canonical": true,
+  "new_korean_alpha_contained_in_declared_cells": true,
+  "readable_orientation_visual_qa": "PASS_A_STAGE",
+  "raw_orientation_visual_qa": "PASS_MIRROR_Y_PRESERVED",
+  "white_background_alpha_qa": "PASS",
+  "artifact_qa": {
+    "source_language_residue": "NONE_OBSERVED_FINAL",
+    "clipping_or_overlap": "NONE_OBSERVED",
+    "box_escape": "NONE_OBSERVED",
+    "black_line_or_seam": "NONE_OBSERVED",
+    "opaque_box": "NONE_OBSERVED",
+    "alpha_halo": "NONE_OBSERVED"
+  },
+  "internal_rework": [
+    {
+      "attempt": "draft_1",
+      "result": "REJECTED_NOT_PERSISTED",
+      "reason": "Initial top-row cells were too shallow, leaving source-English lower fragments; setting-label alignment also missed source fidelity."
+    },
+    {
+      "attempt": "draft_2",
+      "result": "REJECTED_NOT_PERSISTED",
+      "reason": "Residual protected-title edge restoration and insufficient spacing remained between adjacent top labels."
+    },
+    {
+      "attempt": "draft_3",
+      "result": "PASS_FOR_A_HANDOFF",
+      "reason": "Expanded source-derived cells, exact protected-title alpha restoration, reduced top-label widths and corrected setting-label placement passed readable/raw/white-background review."
+    }
+  ],
+  "in_game_validation": "NOT_PERFORMED",
+  "approval": "NOT_PROMOTED_PENDING_B_C_D_AND_INGAME",
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "records": [
+    {
+      "key": "long_distance",
+      "source": "Long distance",
+      "korean": "장거리",
+      "readable_cell": [
+        550,
+        0,
+        1120,
+        145
+      ],
+      "candidate_alpha_bbox": [
+        712,
+        25,
+        948,
+        119
+      ],
+      "render": {
+        "font_size": 87,
+        "style": "red_title",
+        "placement": [
+          162,
+          25
+        ]
+      }
+    },
+    {
+      "key": "keep_passing",
+      "source": "Keep passing the cars!",
+      "korean": "계속 차량을 추월하세요!",
+      "readable_cell": [
+        0,
+        120,
+        520,
+        245
+      ],
+      "candidate_alpha_bbox": [
+        41,
+        144,
+        476,
+        220
+      ],
+      "render": {
+        "font_size": 70,
+        "style": "yellow_task",
+        "placement": [
+          41,
+          24
+        ]
+      }
+    },
+    {
+      "key": "drift",
+      "source": "Drift!",
+      "korean": "드리프트!",
+      "readable_cell": [
+        500,
+        120,
+        720,
+        245
+      ],
+      "candidate_alpha_bbox": [
+        517,
+        148,
+        702,
+        217
+      ],
+      "render": {
+        "font_size": 70,
+        "style": "yellow_task",
+        "placement": [
+          17,
+          28
+        ]
+      }
+    },
+    {
+      "key": "maximum_speed",
+      "source": "Maximum Speed",
+      "korean": "최고 속도",
+      "readable_cell": [
+        680,
+        120,
+        1160,
+        245
+      ],
+      "candidate_alpha_bbox": [
+        786,
+        149,
+        1045,
+        215
+      ],
+      "render": {
+        "font_size": 67,
+        "style": "white_italic",
+        "placement": [
+          106,
+          29
+        ]
+      }
+    },
+    {
+      "key": "transmission",
+      "source": "Transmission",
+      "korean": "변속기",
+      "readable_cell": [
+        0,
+        200,
+        600,
+        370
+      ],
+      "candidate_alpha_bbox": [
+        175,
+        239,
+        412,
+        330
+      ],
+      "render": {
+        "font_size": 91,
+        "style": "white_italic",
+        "placement": [
+          175,
+          39
+        ]
+      }
+    },
+    {
+      "key": "dont_crash",
+      "source": "Don't crash!",
+      "korean": "충돌하지 마세요!",
+      "readable_cell": [
+        550,
+        200,
+        1070,
+        370
+      ],
+      "candidate_alpha_bbox": [
+        591,
+        232,
+        1027,
+        337
+      ],
+      "render": {
+        "font_size": 95,
+        "style": "yellow_task",
+        "placement": [
+          41,
+          32
+        ]
+      }
+    },
+    {
+      "key": "go_gate",
+      "source": "Go through the gate!",
+      "korean": "게이트를 통과하세요!",
+      "readable_cell": [
+        1020,
+        200,
+        1590,
+        370
+      ],
+      "candidate_alpha_bbox": [
+        1065,
+        234,
+        1543,
+        336
+      ],
+      "render": {
+        "font_size": 95,
+        "style": "yellow_task",
+        "placement": [
+          45,
+          34
+        ]
+      }
+    },
+    {
+      "key": "for_experts",
+      "source": "For Experts:",
+      "korean": "상급자용:",
+      "readable_cell": [
+        1530,
+        200,
+        2048,
+        370
+      ],
+      "candidate_alpha_bbox": [
+        1580,
+        230,
+        1985,
+        340
+      ],
+      "render": {
+        "font_size": 102,
+        "style": "red_title",
+        "placement": [
+          50,
+          30
+        ]
+      }
+    },
+    {
+      "key": "tuned_setting",
+      "source": "Tuned Setting",
+      "korean": "튜닝 / 설정",
+      "readable_cell": [
+        40,
+        1170,
+        245,
+        1305
+      ],
+      "candidate_alpha_bbox": [
+        48,
+        1184,
+        156,
+        1305
+      ],
+      "render": {
+        "font_size": 62,
+        "style": "panel_yellow",
+        "placement": [
+          8,
+          14
+        ]
+      }
+    },
+    {
+      "key": "normal_setting",
+      "source": "Normal Setting",
+      "korean": "일반 / 설정",
+      "readable_cell": [
+        375,
+        1170,
+        600,
+        1305
+      ],
+      "candidate_alpha_bbox": [
+        384,
+        1184,
+        492,
+        1305
+      ],
+      "render": {
+        "font_size": 62,
+        "style": "panel_yellow",
+        "placement": [
+          9,
+          14
+        ]
+      }
+    },
+    {
+      "key": "new_course_desc",
+      "source": "A brand new course designed for OutRun2: SP.",
+      "korean": "아웃런2 SP용으로 새롭게 / 설계된 코스입니다.",
+      "readable_cell": [
+        225,
+        1370,
+        770,
+        1620
+      ],
+      "candidate_alpha_bbox": [
+        236,
+        1413,
+        742,
+        1576
+      ],
+      "render": {
+        "font_size": 80,
+        "style": "paragraph",
+        "placement": [
+          11,
+          43
+        ]
+      }
+    },
+    {
+      "key": "original_course_desc",
+      "source": "The course from the original OutRun2.",
+      "korean": "오리지널 아웃런2의 / 코스입니다.",
+      "readable_cell": [
+        830,
+        1370,
+        1308,
+        1620
+      ],
+      "candidate_alpha_bbox": [
+        839,
+        1404,
+        1279,
+        1585
+      ],
+      "render": {
+        "font_size": 90,
+        "style": "paragraph",
+        "placement": [
+          9,
+          34
+        ]
+      }
+    },
+    {
+      "key": "conditions",
+      "source": "Conditions:",
+      "korean": "조건:",
+      "readable_cell": [
+        1325,
+        1410,
+        1655,
+        1545
+      ],
+      "candidate_alpha_bbox": [
+        1400,
+        1435,
+        1573,
+        1519
+      ],
+      "render": {
+        "font_size": 81,
+        "style": "conditions",
+        "placement": [
+          75,
+          25
+        ]
+      }
+    },
+    {
+      "key": "random",
+      "source": "RANDOM",
+      "korean": "무작위",
+      "readable_cell": [
+        1710,
+        1410,
+        2008,
+        1515
+      ],
+      "candidate_alpha_bbox": [
+        1775,
+        1431,
+        1937,
+        1494
+      ],
+      "render": {
+        "font_size": 60,
+        "style": "random",
+        "placement": [
+          65,
+          21
+        ]
+      }
+    },
+    {
+      "key": "normal_balance",
+      "source": "Normal balance",
+      "korean": "일반 밸런스",
+      "readable_cell": [
+        875,
+        1625,
+        1265,
+        1715
+      ],
+      "candidate_alpha_bbox": [
+        952,
+        1647,
+        1182,
+        1693
+      ],
+      "render": {
+        "font_size": 49,
+        "style": "panel_dark",
+        "placement": [
+          77,
+          22
+        ]
+      }
+    },
+    {
+      "key": "more_bgm_1",
+      "source": "More BGM",
+      "korean": "BGM 더 많이",
+      "readable_cell": [
+        890,
+        1705,
+        1265,
+        1800
+      ],
+      "candidate_alpha_bbox": [
+        938,
+        1728,
+        1212,
+        1777
+      ],
+      "render": {
+        "font_size": 52,
+        "style": "panel_dark",
+        "placement": [
+          48,
+          23
+        ]
+      }
+    },
+    {
+      "key": "more_bgm_2",
+      "source": "More BGM",
+      "korean": "BGM 더 많이",
+      "readable_cell": [
+        1300,
+        1705,
+        1655,
+        1800
+      ],
+      "candidate_alpha_bbox": [
+        1338,
+        1728,
+        1612,
+        1777
+      ],
+      "render": {
+        "font_size": 52,
+        "style": "panel_dark_pale",
+        "placement": [
+          38,
+          23
+        ]
+      }
+    }
+  ],
+  "status": "A86_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA",
+  "next_asset_after_static_gate": "FD90AA9_1024x1024.dds",
+  "production_origin_head": "becf13acf5dbe7964cdd5b1343c456dce4cd6145",
+  "reconciled_at_kst": "2026-09-27T19:03:51+09:00",
+  "reconciled_concurrent_commits": [
+    {
+      "sha": "699e1d8",
+      "summary": "C80 strict-QA/rework C4A2937B, 2DA43E41 and 411827E preserved"
+    },
+    {
+      "sha": "4a9e071",
+      "summary": "BATCH69 reopened legacy low-res approvals as canonical-HD P0 rebuilds preserved"
+    },
+    {
+      "sha": "5ae327a",
+      "summary": "B87 rebuilt 571E78F3/62BEBF33/E3FD08BE from canonical 2048x256 DXT5 and first-QA passed; preserved"
+    }
+  ],
+  "next_asset_reason": "B87 completed the three reopened P0 production rebuilds; after C075 A86, FD90AA9 is the next unbuilt P1 HD target with 27 reviewed segments."
+}

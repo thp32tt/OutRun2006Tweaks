@@ -432,3 +432,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Header/format/mip/raw mirror_y preserved. Outside declared text cells: changed pixels 0, introduced alpha 0, changed DXT5 blocks 0 for all three.
 - Historical 512x64 approvals remain audit/reference evidence only; user-approved lock count stays 0 until C/D + in-game revalidation.
 - Next HD production: C075FB49 (16 semantic / 17 expected physical).
+
+## A86 C075FB49 checkpoint — 2026-09-27 19:03 KST
+
+- Canonical-HD production complete: 16 semantic / 17 physical text regions; More BGM appears twice.
+- Candidate SHA-256: d310c7da75c4efe7959ec28b7e5125208d37483052b4e5c56c54cc0d4f16e3c1; 2048×2048 RGBA32 / 1 mip / exact canonical header / raw mirror_y.
+- OutRun2SP/OutRun2, 1P, Ferrari model names, vehicles and numeric/non-text artwork preserved.
+- Outside 17 cells byte-identical; candidate alpha contained; readable/raw/white-background A-stage artifact QA PASS after two rejected non-persisted drafts.
+- Reconciled onto B87 without overwriting C80 or B87 P0-trio candidate/state. Queue now 12 ready / 4 remaining.
+- Status: A_PRODUCTION_COMPLETE_PENDING_B_C_D; in-game validation not performed. Next A target: FD90AA9 canonical-HD rebuild (27 reviewed segments).

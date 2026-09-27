@@ -786,3 +786,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Readable/raw/white-background visual QA PASS for all three: no source-language residue, clipping/overlap, box escape, seam/black line, opaque box or obvious alpha halo observed; orange/navy/white source-family style retained.
 - No approved_dds promotion or re-lock: C/D strict QA and in-game screenshots are still mandatory. Next production target remains C075FB49 with 16 semantic / 17 expected physical text occurrences.
 - Build not run; VR/FFB untouched. Machine report: localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json.
+
+## 2026-09-27 19:03 KST — A86 C075FB49 HD rebuild + B87-state reconciliation
+
+- Production began from korean-localization-clean becf13a and was reconciled onto latest remote 5ae327a before push; GPT Library was not used.
+- Concurrent C80 commit 699e1d8 is preserved unchanged: C4A2937B static pass/context hold plus changed-SHA 2DA43E41/411827E reworks remain intact.
+- BATCH69 4a9e071 reopen state and B87 5ae327a canonical-HD P0 rebuild/first-QA results for 571E78F3/62BEBF33/E3FD08BE are preserved intact; these remain C/D + in-game pending.
+- Rebuilt C075FB49_512x512.dds directly from canonical 2048×2048 HD RGBA32/1-mip source; no prior Korean DDS was upscaled.
+- Materialized B86-expanded 16 semantic strings / 17 physical occurrences, including Maximum Speed -> 최고 속도, Transmission -> 변속기 and More BGM x2.
+- Preserved OutRun2SP/OutRun2, 1P, all Ferrari model names and all vehicle/numeric/non-text artwork.
+- Two internal drafts were rejected before persistence for top-row residue/alignment and title-edge/spacing issues. Final source-derived cells, exact protected alpha restoration, narrower top labels and corrected setting-label placement passed.
+- Readable/raw mirror_y/white-background QA PASS; exact 128-byte header preserved; all bytes outside 17 declared cells canonical; candidate alpha bboxes contained. Candidate SHA-256: d310c7da75c4efe7959ec28b7e5125208d37483052b4e5c56c54cc0d4f16e3c1.
+- Status: A86_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA. No promotion, in-game claim, build, VR or FFB work. With B87 P0 production complete, next A target is FD90AA9 (27 reviewed segments).

@@ -8,7 +8,7 @@
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
     "HD P0 REOPEN: 571E78F3, 62BEBF33, E3FD08BE rebuilt by B87 from exact canonical 2048x256 DXT5 and first-QA PASS; keep unlocked until C/D + in-game validation.",
-    "HD GRAPHICS: C80 C4A2937B static PASS with Drift and runtime-context hold; 2DA43E41 and 411827E C80 reworked SHAs need D revalidation + in-game. Continue C075FB49 canonical-HD rebuild using B86-expanded 16 semantic / 17 physical coverage.",
+    "HD GRAPHICS: C075FB49 A86 production complete (16 semantic / 17 physical) pending B/C/D + in-game. Preserve C80 and B87 states; next production target is FD90AA9 canonical-HD rebuild (27 reviewed segments).",
     "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
     "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
     "Never upscale prior stock-resolution Korean DDS candidates.",
@@ -127,9 +127,9 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
-    "hd_rework_candidates_ready": 11,
-    "hd_rework_remaining": 5,
+    "latest_hd_rework_batch": "localization/graphics/role_A/20260927-1830-A86/A86_C075FB49_PRODUCTION_REPORT.json",
+    "hd_rework_candidates_ready": 12,
+    "hd_rework_remaining": 4,
     "hd_partial_rework": {
       "FF2462BB": {
         "status": "STATIC_QA_PASS_PENDING_INGAME",
@@ -300,6 +300,19 @@
         "report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
         "candidate_changed_by_B": true,
         "in_game_validation": "PENDING"
+      },
+      "C075FB49": {
+        "status": "A86_PRODUCTION_COMPLETE_PENDING_B_C_D",
+        "candidate_sha256": "d310c7da75c4efe7959ec28b7e5125208d37483052b4e5c56c54cc0d4f16e3c1",
+        "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+        "completed_transcription_entries": 16,
+        "localized_regions": 17,
+        "remaining_segments": 0,
+        "duplicate_physical_occurrences": {
+          "More BGM": 2
+        },
+        "report": "localization/graphics/role_A/20260927-1830-A86/A86_C075FB49_PRODUCTION_REPORT.json",
+        "in_game_validation": "PENDING"
       }
     },
     "a76_ff2462bb": {
@@ -346,10 +359,9 @@
       "report": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json"
     },
     "next_hd_rework": {
-      "asset": "C075FB49",
-      "transcription_segments": 16,
-      "expected_physical_text_occurrences": 17,
-      "status": "TRANSCRIPTION_EXPANDED_READY_FOR_CANONICAL_HD_RENDER"
+      "asset": "FD90AA9",
+      "transcription_segments": 27,
+      "status": "READY_FOR_CANONICAL_HD_RENDER"
     },
     "c80": {
       "timestamp_kst": "2026-09-27T18:29:48+09:00",
@@ -784,5 +796,24 @@
       }
     },
     "next_asset": "C075FB49"
+  },
+  "a86_c075fb49": {
+    "timestamp_kst": "2026-09-27T19:03:51+09:00",
+    "production_origin_head": "becf13acf5dbe7964cdd5b1343c456dce4cd6145",
+    "reconciled_base_head": "5ae327a998569311af40fa89f929ddc3e4fe23f5",
+    "semantic_entries_materialized": 16,
+    "semantic_entries_total": 16,
+    "localized_regions": 17,
+    "remaining_entries": 0,
+    "candidate_sha256": "d310c7da75c4efe7959ec28b7e5125208d37483052b4e5c56c54cc0d4f16e3c1",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "report": "localization/graphics/role_A/20260927-1830-A86/A86_C075FB49_PRODUCTION_REPORT.json",
+    "header_128_exact": true,
+    "outside_cells_exact": true,
+    "raw_orientation": "mirror_y",
+    "white_background_alpha_qa": "PASS",
+    "concurrent_c80_preserved": true,
+    "concurrent_b87_p0_trio_preserved": true,
+    "status": "PENDING_B_C_D_STRICT_QA"
   }
 }
