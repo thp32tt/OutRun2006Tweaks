@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T19:19:40+09:00",
+  "updated_at_kst": "2026-09-27T19:56:03+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -110,7 +110,7 @@
       "percent": 100,
       "transcribed_assets": 79,
       "localize_text_targets": 79,
-      "transcribed_segments": 723,
+      "transcribed_segments": 725,
       "blocked_context_assets": 0,
       "blocked_context_indices": []
     },
@@ -136,11 +136,11 @@
       "status": "done",
       "percent": 100,
       "planned_assets": 79,
-      "translated_segments": 723,
+      "translated_segments": 725,
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "D82 reconciled C80 current SHAs: C4A2937B final-static PASS with Drift and runtime-context hold; 2DA43E41 and 411827E final-static PASS, all pending in-game. B87 reopened HD P0 trio passes D82 preflight but still needs C + in-game; current approved lock count is 0. C075FB49 A86 passes D82 preflight but still needs B/C + in-game. Continue FD90AA9.",
+  "next_checkpoint": "FD90AA9 A87 canonical-HD production complete after white/gray omission recovery expanded 27 -> 29 semantic/physical regions; B/C/D static QA and in-game validation remain. D82/C80/B87/C075 states preserved. Continue 9F060EC1 canonical-HD production (5 reviewed segments).",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -175,7 +175,7 @@
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
     "transcribed_assets": 79,
-    "transcribed_segments": 723,
+    "transcribed_segments": 725,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -192,7 +192,7 @@
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
     "artwork_plan_assets": 79,
-    "artwork_plan_segments": 723,
+    "artwork_plan_segments": 725,
     "artwork_proof_candidates": 7,
     "simple6_package": {
       "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
@@ -253,29 +253,42 @@
     "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
     "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "latest_hd_production_candidate": {
-      "asset": "C075FB49",
-      "coverage": "16 semantic / 17 physical",
-      "candidate_sha256": "d310c7da75c4efe7959ec28b7e5125208d37483052b4e5c56c54cc0d4f16e3c1",
-      "report": "localization/graphics/role_A/20260927-1830-A86/A86_C075FB49_PRODUCTION_REPORT.json",
-      "status": "D82_PREFLIGHT_PASS_PENDING_B_C_INGAME",
-      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
-      "duplicate_physical_occurrences": {
-        "More BGM": 2
-      },
-      "preserved": [
-        "OutRun2SP",
-        "OutRun2",
-        "1P",
-        "Ferrari model names",
-        "vehicle artwork"
+      "asset": "FD90AA9",
+      "coverage": "29 semantic / 29 physical",
+      "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+      "report": "localization/graphics/role_A/20260927-1930-A87/A87_FD90AA9_PRODUCTION_REPORT.json",
+      "status": "A87_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+      "transcription_expansion": [
+        "Maximum Speed -> 최고 속도",
+        "Transmission -> 변속기"
       ],
-      "concurrent_c80_preserved": true,
-      "concurrent_b87_p0_trio_preserved": true,
-      "d_preflight_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json"
+      "preserved": [
+        "Risky Ride",
+        "PASSING BREEZE",
+        "Night Flight",
+        "MAGICAL SOUND SHOWER",
+        "Life Was a Bore",
+        "Shiny World",
+        "RANDOM",
+        "SPLASH WAVE",
+        "250GTO",
+        "512BB",
+        "300km/h",
+        "293km/h",
+        "4P",
+        "3P",
+        "5 AT/MT",
+        "6 AT/MT",
+        "route/map artwork",
+        "speech bubble",
+        "equalizer artwork",
+        "road/vehicle icons"
+      ]
     },
     "next_hd_rework": {
-      "asset": "FD90AA9",
-      "transcription_segments": 27,
+      "asset": "9F060EC1",
+      "transcription_segments": 5,
       "status": "READY_FOR_CANONICAL_HD_RENDER"
     },
     "latest_d_final_qa": {

@@ -1,0 +1,939 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A87",
+  "timestamp_kst": "2026-09-27T19:56:03+09:00",
+  "base_head": "4d36837399eaae674151500771d44a68bda4a2e8",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "canonical_source": "OR2-HD-GUI-v0.25.10a",
+  "canonical_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "dimensions": [
+    4096,
+    4096
+  ],
+  "bytes": 67108992,
+  "format": "RGBA32",
+  "mipmaps": 1,
+  "raw_orientation": "mirror_y",
+  "semantic_entries_materialized": 29,
+  "localized_regions": 29,
+  "transcription_expansion": [
+    {
+      "source": "Maximum Speed",
+      "korean": "최고 속도",
+      "reason": "visible only on light/gray compositing; omitted by prior black-background transcription"
+    },
+    {
+      "source": "Transmission",
+      "korean": "변속기",
+      "reason": "black source text hidden on black preview; recovered by white/gray source QA"
+    }
+  ],
+  "translations": [
+    {
+      "source": "OutRun2SP Course",
+      "korean": "아웃런2 SP 코스"
+    },
+    {
+      "source": "OutRun2 Course",
+      "korean": "아웃런2 코스"
+    },
+    {
+      "source": "More Engine sound",
+      "korean": "엔진음 크게"
+    },
+    {
+      "source": "You",
+      "korean": "나"
+    },
+    {
+      "source": "Gas Pedal :",
+      "korean": "가속 페달:"
+    },
+    {
+      "source": "You will run 15 courses continuously.",
+      "korean": "15코스를 연속으로 달립니다."
+    },
+    {
+      "source": "Maximum Speed",
+      "korean": "최고 속도"
+    },
+    {
+      "source": "Enter Selection",
+      "korean": "선택 확정"
+    },
+    {
+      "source": "Do you want to set up under the same conditions as your former race?",
+      "korean": "이전 레이스와 같은 조건으로 설정하시겠습니까?"
+    },
+    {
+      "source": "Transmission",
+      "korean": "변속기"
+    },
+    {
+      "source": "For Experts & Long distance to the goal",
+      "korean": "상급자용 · 골까지 장거리"
+    },
+    {
+      "source": "View Choices",
+      "korean": "선택 보기"
+    },
+    {
+      "source": "For Experts",
+      "korean": "상급자용"
+    },
+    {
+      "source": "Normal difficult",
+      "korean": "보통 난이도"
+    },
+    {
+      "source": "Select Game Mode",
+      "korean": "게임 모드 선택"
+    },
+    {
+      "source": "Select your car",
+      "korean": "차량 선택"
+    },
+    {
+      "source": "Select Course",
+      "korean": "코스 선택"
+    },
+    {
+      "source": "Select your music",
+      "korean": "음악 선택"
+    },
+    {
+      "source": "Select Transmission",
+      "korean": "변속 방식 선택"
+    },
+    {
+      "source": "Shortcut Features",
+      "korean": "바로가기 기능"
+    },
+    {
+      "source": "Outrun2: SP Course has been selected.",
+      "korean": "아웃런2 SP 코스가 선택되었습니다."
+    },
+    {
+      "source": "Outrun2 Course has been selected.",
+      "korean": "아웃런2 코스가 선택되었습니다."
+    },
+    {
+      "source": "Select car setting",
+      "korean": "차량 설정 선택"
+    },
+    {
+      "source": "Versus Mode.",
+      "korean": "대전 모드"
+    },
+    {
+      "source": "Gear change",
+      "korean": "기어 변속"
+    },
+    {
+      "source": "A course designed for player battle.",
+      "korean": "플레이어 대전을 위해 / 설계된 코스입니다."
+    },
+    {
+      "source": "A brand new course designed for OutRun2: SP.",
+      "korean": "아웃런2 SP용으로 새롭게 / 설계된 코스입니다."
+    },
+    {
+      "source": "The course from the original OutRun2.",
+      "korean": "오리지널 아웃런2의 / 코스입니다."
+    },
+    {
+      "source": "Music will be Randomly Selected.",
+      "korean": "음악이 무작위로 / 선택됩니다."
+    }
+  ],
+  "preserved_original_tokens": [
+    "Risky Ride",
+    "PASSING BREEZE",
+    "Night Flight",
+    "MAGICAL SOUND SHOWER",
+    "Life Was a Bore",
+    "Shiny World",
+    "RANDOM",
+    "SPLASH WAVE",
+    "250GTO",
+    "512BB",
+    "300km/h",
+    "293km/h",
+    "4P",
+    "3P",
+    "5 AT/MT",
+    "6 AT/MT",
+    "route/map artwork",
+    "speech bubble",
+    "equalizer artwork",
+    "road/vehicle icons"
+  ],
+  "dds_header_128_byte_exact_to_canonical": true,
+  "outside_29_text_cells_byte_exact_to_canonical": true,
+  "new_korean_alpha_contained_in_declared_cells": true,
+  "readable_orientation_visual_qa": "PASS_A_STAGE",
+  "raw_orientation_visual_qa": "PASS_MIRROR_Y_PRESERVED",
+  "white_background_alpha_qa": "PASS",
+  "artifact_qa": {
+    "source_language_residue_in_localized_cells": "NONE_OBSERVED_FINAL",
+    "clipping_or_overlap": "NONE_OBSERVED",
+    "box_escape": "NONE_OBSERVED",
+    "black_line_or_seam": "NONE_OBSERVED",
+    "opaque_box_introduced": "NONE_OBSERVED",
+    "alpha_halo_introduced": "NONE_OBSERVED",
+    "preexisting_black_alpha_artwork": "PRESERVED_FROM_CANONICAL"
+  },
+  "reference_use": {
+    "historical_full_draft": "COORDINATE_AND_CONTEXT_REFERENCE_ONLY",
+    "historical_pixels_reused": false,
+    "historical_lowres_upscaled": false
+  },
+  "internal_rework": [
+    {
+      "attempt": "draft_1",
+      "result": "REJECTED_NOT_PERSISTED",
+      "reason": "27-string transcription missed hidden black Maximum Speed/Transmission and left lower outline residue around expert/normal labels."
+    },
+    {
+      "attempt": "draft_2",
+      "result": "PASS_FOR_A_HANDOFF",
+      "reason": "Expanded to 29 semantic/29 physical regions, tightened Run15 cell, added hidden-black labels, expanded expert/normal source cells, and passed readable/raw/white-background review."
+    }
+  ],
+  "in_game_validation": "NOT_PERFORMED",
+  "approval": "NOT_PROMOTED_PENDING_B_C_D_AND_INGAME",
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "records": [
+    {
+      "key": "outsp_course",
+      "source": "OutRun2SP Course",
+      "korean": "아웃런2 SP 코스",
+      "readable_cell": [
+        1126,
+        353,
+        1690,
+        461
+      ],
+      "candidate_alpha_bbox": [
+        1162,
+        368,
+        1654,
+        445
+      ],
+      "render": {
+        "font_size": 70,
+        "style": "top_yellow",
+        "placement": [
+          36,
+          15
+        ]
+      }
+    },
+    {
+      "key": "out2_course",
+      "source": "OutRun2 Course",
+      "korean": "아웃런2 코스",
+      "readable_cell": [
+        1741,
+        353,
+        2266,
+        461
+      ],
+      "candidate_alpha_bbox": [
+        1798,
+        366,
+        2209,
+        448
+      ],
+      "render": {
+        "font_size": 75,
+        "style": "top_blue",
+        "placement": [
+          57,
+          13
+        ]
+      }
+    },
+    {
+      "key": "more_engine",
+      "source": "More Engine sound",
+      "korean": "엔진음 크게",
+      "readable_cell": [
+        2765,
+        353,
+        3187,
+        461
+      ],
+      "candidate_alpha_bbox": [
+        2828,
+        377,
+        3118,
+        436
+      ],
+      "render": {
+        "font_size": 62,
+        "style": "engine_tag",
+        "placement": [
+          63,
+          24
+        ]
+      }
+    },
+    {
+      "key": "you",
+      "source": "You",
+      "korean": "나",
+      "readable_cell": [
+        3169,
+        353,
+        3366,
+        461
+      ],
+      "candidate_alpha_bbox": [
+        3234,
+        374,
+        3297,
+        440
+      ],
+      "render": {
+        "font_size": 73,
+        "style": "top_yellow_plain",
+        "placement": [
+          65,
+          21
+        ]
+      }
+    },
+    {
+      "key": "gas_pedal",
+      "source": "Gas Pedal :",
+      "korean": "가속 페달:",
+      "readable_cell": [
+        3443,
+        353,
+        3814,
+        461
+      ],
+      "candidate_alpha_bbox": [
+        3475,
+        369,
+        3773,
+        444
+      ],
+      "render": {
+        "font_size": 71,
+        "style": "small_white",
+        "placement": [
+          32,
+          16
+        ]
+      }
+    },
+    {
+      "key": "run15",
+      "source": "You will run 15 courses continuously.",
+      "korean": "15코스를 연속으로 달립니다.",
+      "readable_cell": [
+        0,
+        517,
+        934,
+        620
+      ],
+      "candidate_alpha_bbox": [
+        62,
+        533,
+        864,
+        604
+      ],
+      "render": {
+        "font_size": 67,
+        "style": "small_white",
+        "placement": [
+          62,
+          16
+        ]
+      }
+    },
+    {
+      "key": "maximum_speed",
+      "source": "Maximum Speed",
+      "korean": "최고 속도",
+      "readable_cell": [
+        922,
+        499,
+        1408,
+        620
+      ],
+      "candidate_alpha_bbox": [
+        995,
+        518,
+        1327,
+        600
+      ],
+      "render": {
+        "font_size": 87,
+        "style": "hidden_black",
+        "placement": [
+          73,
+          19
+        ]
+      }
+    },
+    {
+      "key": "enter_selection",
+      "source": "Enter Selection",
+      "korean": "선택 확정",
+      "readable_cell": [
+        3456,
+        517,
+        3930,
+        627
+      ],
+      "candidate_alpha_bbox": [
+        3550,
+        532,
+        3828,
+        611
+      ],
+      "render": {
+        "font_size": 72,
+        "style": "small_white",
+        "placement": [
+          94,
+          15
+        ]
+      }
+    },
+    {
+      "key": "same_conditions",
+      "source": "Do you want to set up under the same conditions as your former race?",
+      "korean": "이전 레이스와 같은 조건으로 설정하시겠습니까?",
+      "readable_cell": [
+        0,
+        614,
+        1894,
+        730
+      ],
+      "candidate_alpha_bbox": [
+        193,
+        631,
+        1691,
+        712
+      ],
+      "render": {
+        "font_size": 76,
+        "style": "small_white",
+        "placement": [
+          193,
+          17
+        ]
+      }
+    },
+    {
+      "key": "transmission2",
+      "source": "Transmission",
+      "korean": "변속기",
+      "readable_cell": [
+        1216,
+        722,
+        1805,
+        870
+      ],
+      "candidate_alpha_bbox": [
+        1370,
+        746,
+        1640,
+        846
+      ],
+      "render": {
+        "font_size": 106,
+        "style": "hidden_black",
+        "placement": [
+          154,
+          24
+        ]
+      }
+    },
+    {
+      "key": "experts_long",
+      "source": "For Experts & Long distance to the goal",
+      "korean": "상급자용 · 골까지 장거리",
+      "readable_cell": [
+        1907,
+        602,
+        3443,
+        781
+      ],
+      "candidate_alpha_bbox": [
+        2028,
+        624,
+        3314,
+        758
+      ],
+      "render": {
+        "font_size": 125,
+        "style": "expert_red",
+        "placement": [
+          121,
+          22
+        ]
+      }
+    },
+    {
+      "key": "view_choices",
+      "source": "View Choices",
+      "korean": "선택 보기",
+      "readable_cell": [
+        3482,
+        614,
+        3942,
+        730
+      ],
+      "candidate_alpha_bbox": [
+        3563,
+        632,
+        3855,
+        712
+      ],
+      "render": {
+        "font_size": 76,
+        "style": "small_white",
+        "placement": [
+          81,
+          18
+        ]
+      }
+    },
+    {
+      "key": "for_experts",
+      "source": "For Experts",
+      "korean": "상급자용",
+      "readable_cell": [
+        1766,
+        704,
+        2304,
+        896
+      ],
+      "candidate_alpha_bbox": [
+        1794,
+        731,
+        2265,
+        868
+      ],
+      "render": {
+        "font_size": 128,
+        "style": "expert_red",
+        "placement": [
+          28,
+          27
+        ]
+      }
+    },
+    {
+      "key": "normal_difficult",
+      "source": "Normal difficult",
+      "korean": "보통 난이도",
+      "readable_cell": [
+        2547,
+        704,
+        3354,
+        896
+      ],
+      "candidate_alpha_bbox": [
+        2622,
+        728,
+        3271,
+        871
+      ],
+      "render": {
+        "font_size": 134,
+        "style": "normal_green",
+        "placement": [
+          75,
+          24
+        ]
+      }
+    },
+    {
+      "key": "select_game_mode",
+      "source": "Select Game Mode",
+      "korean": "게임 모드 선택",
+      "readable_cell": [
+        166,
+        819,
+        1229,
+        998
+      ],
+      "candidate_alpha_bbox": [
+        322,
+        844,
+        1062,
+        972
+      ],
+      "render": {
+        "font_size": 125,
+        "style": "large_white",
+        "placement": [
+          156,
+          25
+        ]
+      }
+    },
+    {
+      "key": "select_car",
+      "source": "Select your car",
+      "korean": "차량 선택",
+      "readable_cell": [
+        243,
+        947,
+        1190,
+        1126
+      ],
+      "candidate_alpha_bbox": [
+        470,
+        972,
+        953,
+        1100
+      ],
+      "render": {
+        "font_size": 125,
+        "style": "large_white",
+        "placement": [
+          227,
+          25
+        ]
+      }
+    },
+    {
+      "key": "select_course",
+      "source": "Select Course",
+      "korean": "코스 선택",
+      "readable_cell": [
+        294,
+        1062,
+        1165,
+        1242
+      ],
+      "candidate_alpha_bbox": [
+        483,
+        1088,
+        966,
+        1216
+      ],
+      "render": {
+        "font_size": 125,
+        "style": "large_white",
+        "placement": [
+          189,
+          26
+        ]
+      }
+    },
+    {
+      "key": "select_music",
+      "source": "Select your music",
+      "korean": "음악 선택",
+      "readable_cell": [
+        1549,
+        819,
+        2573,
+        998
+      ],
+      "candidate_alpha_bbox": [
+        1814,
+        844,
+        2297,
+        972
+      ],
+      "render": {
+        "font_size": 125,
+        "style": "large_white",
+        "placement": [
+          265,
+          25
+        ]
+      }
+    },
+    {
+      "key": "select_transmission",
+      "source": "Select Transmission",
+      "korean": "변속 방식 선택",
+      "readable_cell": [
+        1523,
+        947,
+        2650,
+        1126
+      ],
+      "candidate_alpha_bbox": [
+        1713,
+        972,
+        2449,
+        1100
+      ],
+      "render": {
+        "font_size": 125,
+        "style": "large_white",
+        "placement": [
+          190,
+          25
+        ]
+      }
+    },
+    {
+      "key": "shortcut_features",
+      "source": "Shortcut Features",
+      "korean": "바로가기 기능",
+      "readable_cell": [
+        1587,
+        1062,
+        2675,
+        1242
+      ],
+      "candidate_alpha_bbox": [
+        1769,
+        1088,
+        2478,
+        1216
+      ],
+      "render": {
+        "font_size": 125,
+        "style": "large_white",
+        "placement": [
+          182,
+          26
+        ]
+      }
+    },
+    {
+      "key": "selected_sp",
+      "source": "Outrun2: SP Course has been selected.",
+      "korean": "아웃런2 SP 코스가 선택되었습니다.",
+      "readable_cell": [
+        26,
+        1183,
+        2227,
+        1377
+      ],
+      "candidate_alpha_bbox": [
+        183,
+        1214,
+        2069,
+        1346
+      ],
+      "render": {
+        "font_size": 128,
+        "style": "selected_yellow",
+        "placement": [
+          157,
+          31
+        ]
+      }
+    },
+    {
+      "key": "selected_out2",
+      "source": "Outrun2 Course has been selected.",
+      "korean": "아웃런2 코스가 선택되었습니다.",
+      "readable_cell": [
+        90,
+        1306,
+        2125,
+        1510
+      ],
+      "candidate_alpha_bbox": [
+        222,
+        1339,
+        1993,
+        1477
+      ],
+      "render": {
+        "font_size": 134,
+        "style": "selected_yellow",
+        "placement": [
+          132,
+          33
+        ]
+      }
+    },
+    {
+      "key": "select_car_setting",
+      "source": "Select car setting",
+      "korean": "차량 설정 선택",
+      "readable_cell": [
+        2419,
+        1183,
+        3482,
+        1377
+      ],
+      "candidate_alpha_bbox": [
+        2544,
+        1210,
+        3345,
+        1350
+      ],
+      "render": {
+        "font_size": 135,
+        "style": "large_white",
+        "placement": [
+          125,
+          27
+        ]
+      }
+    },
+    {
+      "key": "versus_mode",
+      "source": "Versus Mode.",
+      "korean": "대전 모드",
+      "readable_cell": [
+        2150,
+        1306,
+        2995,
+        1510
+      ],
+      "candidate_alpha_bbox": [
+        2311,
+        1340,
+        2833,
+        1475
+      ],
+      "render": {
+        "font_size": 134,
+        "style": "selected_yellow",
+        "placement": [
+          161,
+          34
+        ]
+      }
+    },
+    {
+      "key": "gear_change",
+      "source": "Gear change",
+      "korean": "기어 변속",
+      "readable_cell": [
+        3456,
+        1293,
+        4091,
+        1510
+      ],
+      "candidate_alpha_bbox": [
+        3498,
+        1328,
+        4039,
+        1475
+      ],
+      "render": {
+        "font_size": 139,
+        "style": "gear_red",
+        "placement": [
+          42,
+          35
+        ]
+      }
+    },
+    {
+      "key": "player_battle_desc",
+      "source": "A course designed for player battle.",
+      "korean": "플레이어 대전을 위해 / 설계된 코스입니다.",
+      "readable_cell": [
+        3046,
+        1446,
+        3994,
+        1677
+      ],
+      "candidate_alpha_bbox": [
+        3086,
+        1462,
+        3937,
+        1661
+      ],
+      "render": {
+        "font_size": 99,
+        "style": "desc_white",
+        "placement": [
+          40,
+          16
+        ]
+      }
+    },
+    {
+      "key": "new_course_desc",
+      "source": "A brand new course designed for OutRun2: SP.",
+      "korean": "아웃런2 SP용으로 새롭게 / 설계된 코스입니다.",
+      "readable_cell": [
+        2893,
+        1587,
+        3917,
+        1856
+      ],
+      "candidate_alpha_bbox": [
+        2936,
+        1631,
+        3859,
+        1811
+      ],
+      "render": {
+        "font_size": 88,
+        "style": "desc_white",
+        "placement": [
+          43,
+          44
+        ]
+      }
+    },
+    {
+      "key": "orig_course_desc",
+      "source": "The course from the original OutRun2.",
+      "korean": "오리지널 아웃런2의 / 코스입니다.",
+      "readable_cell": [
+        2893,
+        1754,
+        3891,
+        2048
+      ],
+      "candidate_alpha_bbox": [
+        2935,
+        1786,
+        3831,
+        2015
+      ],
+      "render": {
+        "font_size": 111,
+        "style": "desc_white",
+        "placement": [
+          42,
+          32
+        ]
+      }
+    },
+    {
+      "key": "random_music",
+      "source": "Music will be Randomly Selected.",
+      "korean": "음악이 무작위로 / 선택됩니다.",
+      "readable_cell": [
+        1741,
+        2240,
+        2778,
+        2573
+      ],
+      "candidate_alpha_bbox": [
+        1803,
+        2266,
+        2687,
+        2546
+      ],
+      "render": {
+        "font_size": 135,
+        "style": "random_white",
+        "placement": [
+          62,
+          26
+        ]
+      }
+    }
+  ],
+  "status": "A87_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA",
+  "next_asset_after_static_gate": "9F060EC1_512x512.dds"
+}

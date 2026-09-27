@@ -810,3 +810,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Approval-state reconciliation: BATCH69 explicitly removed the three historical low-res locks. SOURCE_FAITHFUL_CURRENT still carried stale current lock fields from D81; D82 corrects current user-approved lock count from 3 to 0 while retaining the old DDS files as audit/reference artifacts only.
 - No new approved_dds promotion. LOCALIZATION_STATE_OK and Domain Isolation PASS; no VR/FFB source diff or merge commit. Build not run. Next production target: FD90AA9 (27 reviewed segments).
 - Report: localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json.
+
+## 2026-09-27 19:56 KST — A87 FD90AA9 HD rebuild
+
+- Started from latest GitHub korean-localization-clean HEAD 4d36837 after D82; GPT Library was not used.
+- Rebuilt FD90AA9_1024x1024.dds directly from canonical 4096×4096 HD RGBA32/1-mip source; no prior Korean DDS was upscaled. Historical 1024×1024 FULL_DRAFT was used only for coordinate/context reference, never as construction pixels.
+- Initial 27-string draft was rejected: white/gray source compositing exposed omitted black-text labels Maximum Speed and Transmission, and expert/normal source outline residue. Transcription expanded 27 -> 29: Maximum Speed -> 최고 속도, Transmission -> 변속기.
+- Final candidate materializes 29 semantic / 29 physical text regions and preserves song titles, Ferrari 250GTO/512BB, speed/AT-MT/player labels, route/map/equalizer/speech-bubble/vehicle artwork.
+- Readable/raw mirror_y/white-background QA PASS: no observed source-language residue in localized cells, clipping/overlap, box escape, introduced black seam/line, opaque box or alpha halo. Pre-existing canonical black-alpha artwork remains preserved.
+- Exact 128-byte DDS header preserved; all bytes outside 29 declared localization cells remain canonical; all candidate alpha bboxes are inside declared cells. Candidate SHA-256: 72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445.
+- Status: A87_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA. No promotion, in-game claim, build, VR or FFB work. Next: 9F060EC1 (5 reviewed segments).

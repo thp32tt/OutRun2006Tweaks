@@ -452,3 +452,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - FA7BBB13 / 39229D64 / A064FDFC remain final-static PASS pending in-game only.
 - LOCALIZATION_STATE_OK and Domain Isolation PASS; VR/FFB contamination not observed. No build performed.
 - Next production target: FD90AA9 (27 reviewed segments). Machine report: localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json.
+
+## A87 FD90AA9 checkpoint — 2026-09-27 19:56 KST
+
+- Canonical-HD production complete: 29 semantic / 29 physical text regions after white/gray omission recovery added Maximum Speed -> 최고 속도 and Transmission -> 변속기.
+- Candidate SHA-256: 72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445; 4096×4096 RGBA32 / 1 mip / exact canonical header / raw mirror_y.
+- Historical low-res FULL_DRAFT pixels were not reused or upscaled; song/model/speed/AT-MT/player and non-text artwork preserved.
+- Outside 29 cells byte-identical; candidate alpha contained; readable/raw/white-background A-stage artifact QA PASS after rejected 27-string draft.
+- Queue becomes 13 ready / 3 remaining. Status: A_PRODUCTION_COMPLETE_PENDING_B_C_D; in-game validation not performed. Next A target: 9F060EC1 (5 reviewed segments).

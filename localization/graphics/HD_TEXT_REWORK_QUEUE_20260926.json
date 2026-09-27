@@ -18,8 +18,8 @@
     "graphics_rework_targets": 16,
     "low_res_font_pipeline_targets": 1,
     "hd_preserve_targets": 72,
-    "graphics_rework_candidates_ready": 12,
-    "graphics_rework_remaining": 4
+    "graphics_rework_candidates_ready": 13,
+    "graphics_rework_remaining": 3
   },
   "rules": [
     "Use DDS header dimensions, never the filename resolution suffix.",
@@ -444,7 +444,25 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "REWORK_FROM_HD_BASE"
+      "status": "A87_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "transcription_segments": 29,
+      "localized_regions": 29,
+      "remaining_segments": 0,
+      "transcription_expansion": [
+        {
+          "source": "Maximum Speed",
+          "korean": "최고 속도"
+        },
+        {
+          "source": "Transmission",
+          "korean": "변속기"
+        }
+      ],
+      "batch_report": "localization/graphics/role_A/20260927-1930-A87/A87_FD90AA9_PRODUCTION_REPORT.json",
+      "a_production_report": "localization/graphics/role_A/20260927-1930-A87/A87_FD90AA9_PRODUCTION_REPORT.json",
+      "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+      "in_game_validation": "PENDING"
     },
     {
       "hash": "9F060EC1",
@@ -473,6 +491,6 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json",
+  "latest_batch": "localization/graphics/role_A/20260927-1930-A87/A87_FD90AA9_PRODUCTION_REPORT.json",
   "latest_reopen_report": "localization/graphics/BATCH69_REOPEN_LOWRES_APPROVALS_HD_REWORK_REPORT.json"
 }
