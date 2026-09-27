@@ -79,23 +79,10 @@ Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'Get-OutRunVRTestProfile') 'ru
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'TEST_PROFILE') 'collector manifest must record profile'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match '\$variant/\$profile/\$session') 'collector path must separate Variant/Profile/Session'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'captureRoot') 'collector must include capture bundles'
-$r57Variants=@(
-    'R57_01_POSITION_KIND1_HUD35',
-    'R57_02_POSITION_KIND0_HUD35',
-    'R57_03_POSITION_ALL_WORLD35',
-    'R57_04_RANK_ALL_AS_HUD',
-    'R57_05_RANK_PROJECTED_IPD',
-    'R57_06_RANK_PROJECTED_HEAD',
-    'R57_07_RANK_PROJECTED_13',
-    'R57_08_RANK_PROJECTED_46',
-    'R57_09_RANK_PROJECTED_ZERO',
-    'R57_10_RANK_PROJECTED_TRACE'
-)
-foreach($id in $r57Variants){
-    Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match [regex]::Escape($id)) "single GUI must expose $id"
-    Assert-True ($text['Run-OutRunVRTest.ps1'] -match [regex]::Escape($id)) "runner must map $id"
-}
-Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'OUTRUN_VR_R57_MODE') 'runner must set the R57 orthogonal probe selector'
+Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'R69_FIXPACK') 'single GUI must expose the R69 production variant'
+Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'R69_FIXPACK') 'runner must map the R69 production variant'
+Assert-True ($text['OutRunVR-Test-Selector.ps1'] -notmatch 'R57_01_POSITION_KIND1_HUD35') 'R69 GUI must not expose obsolete R57 orthogonal modes'
+Assert-True ($text['Run-OutRunVRTest.ps1'] -notmatch 'OUTRUN_VR_R57_MODE') 'runner must not export the removed R57 mode selector'
 Assert-True ($text['OutRunVR-Test-Selector.ps1'] -notmatch 'R56_01_ZERO') 'R57 GUI must not waste user tests on the old redundant R55/R56 baseline matrix'
 Assert-True (-not (Test-Path (Join-Path $root 'OutRunVR-Backend-Selector.ps1'))) 'obsolete backend GUI selector must stay removed'
 Assert-True (-not (Test-Path (Join-Path $root 'OutRunVR-Slot-Selector.ps1'))) 'obsolete slot GUI selector must stay removed'
