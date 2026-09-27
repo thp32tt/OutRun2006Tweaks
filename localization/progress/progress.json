@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T21:38:50+09:00",
+  "updated_at_kst": "2026-09-27T21:53:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -35,19 +35,14 @@
       "percent": 100
     },
     "text_translation": {
-      "status": "draft_complete_context_review_remaining",
-      "percent": 99.7,
+      "status": "done",
+      "percent": 100,
       "translation_coverage_percent": 100,
       "translated_non_null": 1355,
       "total_non_null": 1355,
-      "reviewed": 1351,
-      "context_drafts": 4,
-      "context_review_ids": [
-        96,
-        97,
-        279,
-        280
-      ]
+      "reviewed": 1355,
+      "context_drafts": 0,
+      "context_review_ids": []
     },
     "graphics_inventory": {
       "status": "done",
@@ -145,19 +140,14 @@
     "total_ids": 1356,
     "non_null_ids": 1355,
     "unique_source_strings": 1067,
-    "reviewed": 1347,
+    "reviewed": 1351,
     "reviewed_special": 4,
-    "draft_context": 4,
+    "draft_context": 0,
     "blocked_null": 1,
     "todo": 0,
     "translated_non_null": 1355,
     "translation_coverage_non_null_percent": 100,
-    "context_review_ids": [
-      96,
-      97,
-      279,
-      280
-    ],
+    "context_review_ids": [],
     "config_text_rows": 23,
     "config_text_reviewed": 23,
     "placeholder_qa": "pass"
