@@ -1231,7 +1231,6 @@ namespace OutRunVRStereo
             }();
             return mode;
         }
-
         int R57Mode() noexcept
         {
             static const int mode = []() noexcept {
@@ -1239,8 +1238,8 @@ namespace OutRunVRStereo
                 const DWORD len = GetEnvironmentVariableA(
                     "OUTRUN_VR_R57_MODE", text,
                     static_cast<DWORD>(sizeof(text)));
-                // R66 production baseline: HMD testing established mode 6 as
-                // the correct head-inverse projected-marker path.
+                // R66 production baseline: mode 6 is the HMD-proven
+                // head-inverse projected-marker path. Env=0 is diagnostic only.
                 if (len == 0 || len >= sizeof(text))
                     return 6;
                 int value = 0;
