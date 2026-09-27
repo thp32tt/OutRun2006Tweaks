@@ -253,6 +253,30 @@ if missing_contracts:
 else:
     passes.append("P10_BINARY_CONTRACT_COVERAGE")
 
+
+# PASS 11 — R70 structure squash owns compilation through stable facades.
+require_all("src/vr/d3d9/stereo_pipeline.cpp", [
+    '#include "stereo_renderer_r30_r26_safe.cpp"',
+    '#include "stereo_renderer_r26_compare.cpp"',
+    '#include "stereo_renderer_r29_c1_compare.cpp"',
+    '#include "stereo_renderer_r30_c2_compare.cpp"',
+], "P11_R70_STEREO_FACADE")
+require("src/vr/d3d9/ex_device_pipeline.cpp",
+        '#include "ex_device_upgrade_r15.cpp"',
+        "P11_R70_EX_DEVICE_FACADE")
+require_all("src/vr/d3d9/renderer_pipeline.cpp", [
+    '#include "../game/outrun_renderer_r23.cpp"',
+    '#include "../game/outrun_renderer_r29.cpp"',
+], "P11_R70_RENDERER_FACADE")
+for _build_graph in ("cmake.toml", "CMakeLists.txt"):
+    require_all(_build_graph, [
+        'OUTRUN_VR_R70_LEGACY_OWNER_TUS',
+        'OUTRUN_VR_R70_PRODUCTION_TUS',
+        'src/vr/d3d9/ex_device_pipeline.cpp',
+        'src/vr/d3d9/stereo_pipeline.cpp',
+        'src/vr/d3d9/renderer_pipeline.cpp',
+    ], "P11_R70_BUILD_GRAPH_" + _build_graph.replace(".", "_").upper())
+
 unique_passes = []
 for p in passes:
     if p not in unique_passes:
@@ -268,3 +292,26 @@ if errors:
     raise SystemExit(2)
 
 print(f"VR proven baseline verification passed: {len(unique_passes)} guards.")
+
+# PASS 11 — R70 structure squash owns compilation through stable facades.
+require_all("src/vr/d3d9/stereo_pipeline.cpp", [
+    '#include "stereo_renderer_r30_r26_safe.cpp"',
+    '#include "stereo_renderer_r26_compare.cpp"',
+    '#include "stereo_renderer_r29_c1_compare.cpp"',
+    '#include "stereo_renderer_r30_c2_compare.cpp"',
+], "P11_R70_STEREO_FACADE")
+require("src/vr/d3d9/ex_device_pipeline.cpp",
+        '#include "ex_device_upgrade_r15.cpp"',
+        "P11_R70_EX_DEVICE_FACADE")
+require_all("src/vr/d3d9/renderer_pipeline.cpp", [
+    '#include "../game/outrun_renderer_r23.cpp"',
+    '#include "../game/outrun_renderer_r29.cpp"',
+], "P11_R70_RENDERER_FACADE")
+for _build_graph in ("cmake.toml", "CMakeLists.txt"):
+    require_all(_build_graph, [
+        'OUTRUN_VR_R70_LEGACY_OWNER_TUS',
+        'OUTRUN_VR_R70_PRODUCTION_TUS',
+        'src/vr/d3d9/ex_device_pipeline.cpp',
+        'src/vr/d3d9/stereo_pipeline.cpp',
+        'src/vr/d3d9/renderer_pipeline.cpp',
+    ], "P11_R70_BUILD_GRAPH_" + _build_graph.replace(".", "_").upper())

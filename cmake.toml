@@ -212,6 +212,37 @@ endif()
 unset(_vr_source)
 unset(_vr_header_only)
 
+# R70 structure-squash stage 1: compile exactly three stable production facades.
+# Versioned Rxx files are retained as implementation layers/diagnostics only.
+# This changes translation-unit ownership, not the selected runtime logic.
+set(OUTRUN_VR_R70_LEGACY_OWNER_TUS
+    src/vr/d3d9/ex_device_upgrade_r15.cpp
+    src/vr/d3d9/stereo_renderer_r34.cpp
+    src/vr/d3d9/stereo_renderer_r26_compare.cpp
+    src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp
+    src/vr/d3d9/stereo_renderer_r29_c1_compare.cpp
+    src/vr/d3d9/stereo_renderer_r30_c2_compare.cpp
+    src/vr/game/outrun_renderer_r29.cpp
+    src/vr/game/outrun_renderer_r23.cpp)
+set_source_files_properties(${OUTRUN_VR_R70_LEGACY_OWNER_TUS}
+    PROPERTIES HEADER_FILE_ONLY TRUE)
+
+set(OUTRUN_VR_R70_PRODUCTION_TUS
+    src/vr/d3d9/ex_device_pipeline.cpp
+    src/vr/d3d9/stereo_pipeline.cpp
+    src/vr/d3d9/renderer_pipeline.cpp)
+foreach(_vr_source IN LISTS OUTRUN_VR_R70_PRODUCTION_TUS)
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_vr_source}")
+        message(FATAL_ERROR "R70 production facade missing: ${_vr_source}")
+    endif()
+    get_source_file_property(_vr_header_only "${_vr_source}" HEADER_FILE_ONLY)
+    if(_vr_header_only)
+        message(FATAL_ERROR "R70 production facade must compile normally: ${_vr_source}")
+    endif()
+endforeach()
+unset(_vr_source)
+unset(_vr_header_only)
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 
