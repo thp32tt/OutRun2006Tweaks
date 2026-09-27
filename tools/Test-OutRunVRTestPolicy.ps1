@@ -96,6 +96,10 @@ foreach($id in $r57Variants){
     Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match [regex]::Escape($id)) "single GUI must expose $id"
     Assert-True ($text['Run-OutRunVRTest.ps1'] -match [regex]::Escape($id)) "runner must map $id"
 }
+$r59RankVariant='R59_01_RANK_HEAD_SCALE82'
+Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match [regex]::Escape($r59RankVariant)) 'single GUI must expose the R59 rank candidate'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match [regex]::Escape($r59RankVariant)) 'selector must accept the R59 rank candidate identity'
+Assert-True ($text['Run-OutRunVRTest.ps1'] -match [regex]::Escape($r59RankVariant)) 'runner must map the R59 rank candidate to the proven mode6 transform'
 Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'OUTRUN_VR_R57_MODE') 'runner must set the R57 orthogonal probe selector'
 Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'R57_06_RANK_PROJECTED_HEAD') 'R59 GUI must expose the head-projected rank candidate'
 Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'RankMarkerScale 82%') 'R59 GUI must describe anchor-preserving rank scaling'
