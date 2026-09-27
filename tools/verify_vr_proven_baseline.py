@@ -53,31 +53,41 @@ require_all("cmake.toml", [
     'option(OUTRUN_VR_R26_HUD_COMPARE "Build R26-safe world path with R30 HUD/XYZRHW/SkyGlow overlay" ON)',
 ], "P1_CMKR_SOURCE_DEFAULT_R26_HUD")
 
-# PASS 2 — the HMD-proven projected-rank mode is the production default.
-require_all("src/hooks_uiscaling.cpp", [
-    '"OUTRUN_VR_R57_MODE"',
-    'return 6;',
-    'return (value >= 0 && value <= 10) ? value : 6;',
-], "P2_R57_SOURCE_DEFAULT")
-require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
-    '"OUTRUN_VR_R57_MODE"',
-    'return (value >= 0 && value <= 10) ? value : 6;',
-], "P2_R57_RENDERER_DEFAULT")
-require_all("tools/OutRunVR-Test-Selector.ps1", [
-    "'DX9Ex + D3D11 Host','d3d9','R57_06_RANK_PROJECTED_HEAD'",
-    "'DX11 Host DirectGPU','dx11','R57_06_RANK_PROJECTED_HEAD'",
-    "'DXVK SAFE','dxvk-safe','R57_06_RANK_PROJECTED_HEAD'",
-], "P2_SELECTOR_DEFAULT_R57_06")
+# PASS 2 — R69 CLEAN fixes projected-rank ownership to one production path.
+for rel in [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "tools/Run-OutRunVRTest.ps1",
+]:
+    forbid(rel, "OUTRUN_VR_R57_MODE", f"P2_NO_R57_MODE_SELECTOR_{rel}")
 
+require_all("src/hooks_uiscaling.cpp", [
+    "R57RankProducerScope(bool) noexcept",
+    "RenderScope::ProjectedWorldMarker2D",
+    "constexpr bool exactPositionOwner = true;",
+], "P2_FIXED_PRODUCER_OWNERSHIP")
+require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
+    "VR R69 CLEAN PROJECTED MARKER:",
+    "fixed projected-world-marker production path active",
+], "P2_FIXED_RENDERER_PATH")
+require_all("tools/OutRunVR-Test-Selector.ps1", [
+    "'DX9Ex + D3D11 Host','d3d9','R69_FIXPACK'",
+    "'DX11 Host DirectGPU','dx11','R69_FIXPACK'",
+    "'DXVK SAFE','dxvk-safe','R69_FIXPACK'",
+], "P2_SELECTOR_DEFAULT_R69")
 selector = read("tools/OutRunVR-Test-Selector.ps1")
-if selector.count("'R57_05_RANK_PROJECTED_IPD'=@") != 1 or selector.count("'R57_06_RANK_PROJECTED_HEAD'=@") != 1:
-    errors.append("P2_SELECTOR_UNIQUE_SLOTS: R57_05/R57_06 diagnostic slot keys must each be defined exactly once")
+if selector.count("'R69_FIXPACK'=@") != 1:
+    errors.append("P2_SELECTOR_UNIQUE_R69: R69_FIXPACK must be defined exactly once")
 else:
-    passes.append("P2_SELECTOR_UNIQUE_SLOTS")
+    passes.append("P2_SELECTOR_UNIQUE_R69")
+for stale in ["R57_01_POSITION_KIND1_HUD35", "R57_05_RANK_PROJECTED_IPD", "R57_10_RANK_PROJECTED_TRACE"]:
+    if stale in selector:
+        errors.append(f"P2_SELECTOR_NO_STALE_R57: stale selector entry present: {stale}")
+if not any(e.startswith("P2_SELECTOR_NO_STALE_R57") for e in errors):
+    passes.append("P2_SELECTOR_NO_STALE_R57")
 require_all("tools/Run-OutRunVRTest.ps1", [
-    "'R57_06_RANK_PROJECTED_HEAD'",
-    "$hudExperimentMode='2'; $r57Mode='6'",
-], "P2_RUNNER_R57_06_MAPPING")
+    "'R69_FIXPACK' { $semanticMode='0'; $hudExperimentMode='2' }",
+], "P2_RUNNER_R69_MAPPING")
 
 # PASS 3 — diagnostics stay disabled and exact queue ownership stays sticky.
 require_all("src/hooks_uiscaling.cpp", [
