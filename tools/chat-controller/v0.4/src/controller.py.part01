@@ -432,44 +432,49 @@ def _normalize_composer_text(value: str) -> str:
     return (value or "").replace("\r\n", "\n").replace("\r", "\n")
 
 
-async def send_message(page: Page, message: str) -> bool:
-    """Insert one complete prompt atomically, verify it, then send exactly once."""
+async def send_message(page: Page, message: str) -> str:
+    """Insert and send a prompt, returning the exact stage result for diagnostics."""
     box = await first_visible(page, INPUT_SELECTORS)
     if box is None:
-        return False
+        return "not_found"
     try:
-        # Playwright fill() supports textarea/input/contenteditable and updates the
-        # composer in one operation. Avoid keyboard.type(), which emits thousands
-        # of per-character events and can leave a long N100 prompt partially entered.
         try:
             await box.fill(message, timeout=15000)
         except Exception:
-            # Compatibility fallback is still a single text insertion operation,
-            # not character-by-character typing.
-            await box.click(timeout=3000)
-            await page.keyboard.press("Control+A")
-            await page.keyboard.insert_text(message)
+            try:
+                await box.click(timeout=3000)
+                await page.keyboard.press("Control+A")
+                await page.keyboard.insert_text(message)
+            except Exception:
+                log.exception("composer fill failed")
+                return "fill_failed"
 
         expected = _normalize_composer_text(message)
         actual = _normalize_composer_text(await _composer_text(box))
-        if actual != expected:
-            log.error(
-                "composer verification failed expected_len=%s actual_len=%s",
-                len(expected),
-                len(actual),
-            )
-            try:
-                await box.fill("", timeout=3000)
-            except Exception:
-                pass
-            return False
+        # ProseMirror may normalize block/newline representation. Require non-empty
+        # content and a close length match rather than byte-for-byte innerText equality.
+        if not actual.strip():
+            log.error("composer verification empty expected_len=%s", len(expected))
+            return "verify_empty"
+        ratio = len(actual) / max(1, len(expected))
+        if ratio < 0.90 or ratio > 1.10:
+            log.error("composer verification length mismatch expected_len=%s actual_len=%s ratio=%.3f",
+                      len(expected), len(actual), ratio)
+            return "verify_length_mismatch"
 
-        await page.keyboard.press("Enter")
+        try:
+            await box.press("Enter", timeout=5000)
+        except Exception:
+            try:
+                await page.keyboard.press("Enter")
+            except Exception:
+                log.exception("composer Enter failed")
+                return "send_failed"
         await page.wait_for_timeout(1500)
-        return True
+        return "sent"
     except Exception:
         log.exception("message send failed")
-        return False
+        return "send_failed"
 
 
 def is_persistable_chat_url(url: Optional[str]) -> bool:
