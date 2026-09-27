@@ -152,6 +152,8 @@ require("src/vr/game/outrun_renderer.cpp",
 require_all("tools/Build-OutRunPCFast.ps1", [
     "'-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF'",
     "'-DOUTRUN_VR_R26_HUD_COMPARE=ON'",
+    "R66-PROVEN-R26HUD-v1",
+    "ACTIVE_R26_HUD_R66",
 ], "P9_PC_FAST_CONTRACT")
 require_all(".github/workflows/build.yml", [
     '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF',
@@ -160,7 +162,13 @@ require_all(".github/workflows/build.yml", [
 require_all(".github/workflows/vr-dx9ex-active.yml", [
     '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF',
     '-DOUTRUN_VR_R26_HUD_COMPARE=ON',
+    "ACTIVE_R26_HUD_R66",
 ], "P9_DX9EX_BUILD_CONTRACT")
+require_all(".github/workflows/vr-nightly-unified-20260926.yml", [
+    'python tools/verify_vr_proven_baseline.py',
+    '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF',
+    'VR R66 OPTION ARROW: exact node pinned',
+], "P9_NIGHTLY_GUARDED")
 require_all(".github/workflows/vr-unified-backends.yml", [
     'P4_R26_HUD_SAFE',
     '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF',
