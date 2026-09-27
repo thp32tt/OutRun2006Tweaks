@@ -307,3 +307,15 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Coverage expanded from 15 to **17 semantic strings / 21 physical text regions** after B84 found standalone `KNOCKOUT!`, standalone `OUTRUN MILES!`, and duplicate `Rank`.
 - Outside 21 source cells changed pixels = 0; introduced alpha outside = 0. Readable/raw artifact and containment QA PASS.
 - Next production target: `C4A2937B`.
+
+## D78 final QA checkpoint — 2026-09-27 15:18 KST
+- A064FDFC: B84 production/first QA + D78 direct static/raw/readable QA PASS; HOLD_PENDING_C_INGAME.
+- A064 structure: 4096×2048 RGBA32 / 1 mip / exact 128-byte header; 17 semantic / 21 physical regions.
+- A064 containment: outside 21 text cells changed pixels = 0; introduced alpha outside = 0; all candidate alpha bboxes inside source cells.
+- A064 visual/semantic QA: no observed translatable-English residue, clipping/overlap, box escape, seam/black line, opaque box, alpha halo, or protected-artwork damage.
+- FA7BBB13 remains HOLD_PENDING_INGAME; 39229D64 remains HOLD_PENDING_C_INGAME.
+- approved_dds remains 3 USER_APPROVED_LOCKED assets; hashes reverified unchanged.
+- State reconciliation: artwork_plan.jsonl = 717 segments and transcriptions.jsonl = 717; stale progress artwork_plan_segments corrected 715 -> 717.
+- LOCALIZATION_STATE_OK and Domain Isolation PASS; VR/FFB source/history contamination not observed.
+- No build performed. Machine report: localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json.
+- Next: C strict QA for A064FDFC and 39229D64, runtime screenshot QA for FA7/392/A064, continue C4A2937B production independently.

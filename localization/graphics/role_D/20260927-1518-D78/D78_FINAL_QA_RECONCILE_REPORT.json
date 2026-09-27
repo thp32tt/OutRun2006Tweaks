@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "role": "D",
+  "run": "D78",
+  "timestamp_kst": "2026-09-27T15:18:24+09:00",
+  "base_head": "a8fab31c8096104318b8f171cfd0ed18d77d3b09",
+  "scope": "final QA + approval reconciliation; no build; no VR/FFB",
+  "approved_dds_changes": [],
+  "locked_approved_dds": {
+    "result": "PASS_UNCHANGED",
+    "count": 3,
+    "assets": [
+      {
+        "name": "571E78F3_512x64.dds",
+        "sha256": "4ff6a767fca35ebff7e1ba587c1992f94319c5f1bdd7d03faf59450d81e32f1e"
+      },
+      {
+        "name": "62BEBF33_512x64.dds",
+        "sha256": "91b0424df17e48ee3445208991f15f6e5cdb413f6f77eeb1aa3f453a3706e4eb"
+      },
+      {
+        "name": "E3FD08BE_512x64.dds",
+        "sha256": "246e4313cb9806623f695ea94262100e1e6f3888847dcc09338d870e3944b49e"
+      }
+    ]
+  },
+  "reviewed_candidates": {
+    "FA7BBB13": {
+      "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
+      "gate_chain": {
+        "A81": "PASS",
+        "B82": "PASS",
+        "C77": "PASS",
+        "D77": "PASS_STATIC"
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "UNCHANGED_FINAL_STATIC_PASS_HOLD_PENDING_INGAME",
+      "promotion": false
+    },
+    "39229D64": {
+      "candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+      "gate_chain": {
+        "A82": "PASS",
+        "B83": "PASS",
+        "D77": "PASS_PREFLIGHT",
+        "C_current": "MISSING"
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "UNCHANGED_HOLD_PENDING_C_INGAME",
+      "promotion": false
+    },
+    "A064FDFC": {
+      "canonical_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
+      "inputs": {
+        "B84": "B_PRODUCTION_AND_FIRST_QA_PASS",
+        "C_current": "MISSING"
+      },
+      "semantic_review": {
+        "semantic_entries": 17,
+        "physical_regions": 21,
+        "result": "PASS_D_REVIEW",
+        "notes": [
+          "DUMPED! -> 차였어요! retained as the gameplay/event wording recorded by the current reviewed graphics transcription.",
+          "KNOCKOUT! / KNOCKOUT! IN... -> 탈락! / 탈락까지... are context-consistent.",
+          "Ranking / Rank -> 순위 / 랭크 and Total Rank -> 종합 랭크 remain intentionally distinct UI terminology.",
+          "OUTRUN MILES variants, BEST TIME, STAGE CLEAR, PASS, CONTINUE, RETRY, PLEASE WAIT, TRY AGAIN and EASY are complete."
+        ]
+      },
+      "d78_direct_checks": {
+        "dimensions": [
+          4096,
+          2048
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "file_size_bytes": 33554560,
+        "dds_header_128_exact_canonical": true,
+        "channel_masks": [
+          "0x000000ff",
+          "0x0000ff00",
+          "0x00ff0000",
+          "0xff000000"
+        ],
+        "total_changed_pixels": 1613081,
+        "outside_21_text_cells_changed_pixels": 0,
+        "introduced_alpha_outside_21_text_cells": 0,
+        "declared_candidate_alpha_bboxes_inside_source_cells": true,
+        "raw_orientation": "mirror_y",
+        "raw_orientation_visual_qa": "PASS",
+        "readable_orientation_visual_qa": "PASS",
+        "visible_translatable_source_residue": "NONE_OBSERVED",
+        "clipping_overlap_or_box_escape": "NONE_OBSERVED",
+        "black_line_or_seam": "NONE_OBSERVED",
+        "opaque_box": "NONE_OBSERVED",
+        "alpha_halo": "NONE_OBSERVED",
+        "style_fidelity": "PASS_SOURCE_FAMILY",
+        "protected_character_names_ordinals_numbers_player_markers_vehicles_icons": "PRESERVED_OBSERVED"
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "D_PREFLIGHT_PASS_HOLD_PENDING_C_INGAME",
+      "promotion": false,
+      "reason": "B84 production/first QA and D78 direct static/raw/readable QA pass, but C strict QA and mandatory in-game screenshot validation are absent."
+    }
+  },
+  "other_held_candidates": {
+    "FF2462BB": "STATIC_QA_PASS_PENDING_INGAME",
+    "568D3696": "STATIC_QA_PASS_PENDING_INGAME; Hit the zippers! wording still needs runtime-context confirmation"
+  },
+  "state_reconciliation": {
+    "artwork_plan_rows": 79,
+    "artwork_plan_actual_segments": 717,
+    "transcriptions_actual_segments": 717,
+    "progress_artwork_plan_segments_before": 715,
+    "progress_artwork_plan_segments_after": 717,
+    "result": "CORRECTED_STALE_PROGRESS_COUNTER"
+  },
+  "domain_isolation": {
+    "upstream_base": "08e5efb4deea4066c440307ec009c868a30562d3",
+    "verify_domain_isolation": "PASS",
+    "vr_ffb_source_diff_matches": [],
+    "merge_commits_since_base": [],
+    "result": "PASS_NO_VR_FFB_MIX"
+  },
+  "state_validation": "LOCALIZATION_STATE_OK",
+  "build_performed": false,
+  "final_decision": "NO_NEW_APPROVALS",
+  "next": [
+    "FA7BBB13: obtain in-game screenshot validation before promotion.",
+    "39229D64: run C strict QA, then in-game validation before promotion.",
+    "A064FDFC: run C strict QA, then in-game validation before promotion.",
+    "Continue C4A2937B canonical-HD production independently."
+  ]
+}

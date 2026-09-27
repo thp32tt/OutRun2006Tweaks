@@ -159,7 +159,7 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "B_PRODUCTION_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "status": "D_PREFLIGHT_PASS_PENDING_C_INGAME",
       "transcription_segments": 17,
       "localized_regions": 21,
       "remaining_segments": 0,
@@ -167,7 +167,8 @@
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
       "batch_report": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_PRODUCTION_FIRST_QA.json",
       "candidate_changed_by_B": true,
-      "in_game_validation": "PENDING"
+      "in_game_validation": "PENDING",
+      "d_preflight_report": "localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json"
     },
     {
       "hash": "C4A2937B",
@@ -261,5 +262,5 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_PRODUCTION_FIRST_QA.json"
+  "latest_batch": "localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json"
 }

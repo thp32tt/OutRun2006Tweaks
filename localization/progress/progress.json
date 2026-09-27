@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T15:00:08+09:00",
+  "updated_at_kst": "2026-09-27T15:18:24+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A064FDFC B84 canonical-HD production + first QA PASS (17 semantic / 21 physical); C/D and in-game validation remain. Continue next P1 HD target C4A2937B independently.",
+  "next_checkpoint": "A064FDFC B84 + D78 static/raw/readable QA pass (17 semantic / 21 physical), but C strict QA and in-game validation remain. 39229D64 still needs C + in-game; FA7BBB13 needs in-game only. Continue C4A2937B canonical-HD production independently.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -192,7 +192,7 @@
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
     "artwork_plan_assets": 79,
-    "artwork_plan_segments": 715,
+    "artwork_plan_segments": 717,
     "artwork_proof_candidates": 7,
     "simple6_package": {
       "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
@@ -257,9 +257,10 @@
       "coverage": "17 semantic / 21 physical",
       "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
       "report": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_PRODUCTION_FIRST_QA.json",
-      "status": "B_PRODUCTION_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "status": "D_PREFLIGHT_PASS_PENDING_C_INGAME",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
-      "physical_occurrence_note": "DUMPED! x3, Target x2, Rank x2; B84 added standalone KNOCKOUT! and OUTRUN MILES!"
+      "physical_occurrence_note": "DUMPED! x3, Target x2, Rank x2; B84 added standalone KNOCKOUT! and OUTRUN MILES!",
+      "d_preflight_report": "localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
       "asset": "C4A2937B",
@@ -267,12 +268,13 @@
       "status": "READY_FOR_CANONICAL_HD_RENDER"
     },
     "latest_d_final_qa": {
-      "run": "D77",
-      "report": "localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json",
+      "run": "D78",
+      "report": "localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json",
       "result": "NO_NEW_APPROVALS",
       "approved_dds_count": 3,
       "FA7BBB13": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
-      "39229D64": "D_PREFLIGHT_PASS_HOLD_PENDING_C_INGAME"
+      "39229D64": "HOLD_PENDING_C_INGAME",
+      "A064FDFC": "D_PREFLIGHT_PASS_HOLD_PENDING_C_INGAME"
     },
     "latest_c_strict_qa": {
       "asset": "FA7BBB13",

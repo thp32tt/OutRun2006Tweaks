@@ -617,3 +617,18 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Exact canonical 128-byte DDS header, RGBA32 format, one mip and raw mirror_y orientation are preserved. Changed pixels outside the 21 declared source text cells = 0; introduced alpha outside = 0.
 - Readable/game and raw DDS visual QA PASS: no remaining observed translatable source English, clipping/overlap, box escape, seam/black line, opaque box or alpha halo. Character names, ordinals, numeric/player markers, vehicles/icons and other non-text artwork remain original.
 - No approved_dds promotion because C/D and in-game screenshot validation remain mandatory. No build, VR or FFB work. Next P1 production target: C4A2937B.
+
+## 2026-09-27 15:18 KST — D78 final QA reconciliation
+
+- Started from latest remote HEAD a8fab31c8096104318b8f171cfd0ed18d77d3b09 and re-read the mandatory localization policy/state files.
+- Reconciled B84 A064FDFC directly against canonical OR2-HD-GUI source and its raw/readable QA evidence.
+- A064FDFC candidate SHA-256 e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1 matches B84; canonical SHA-256 6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc also matches.
+- Structural QA: 4096×2048 RGBA32, 1 mip, 33,554,560 bytes, exact canonical 128-byte DDS header and raw mirror_y orientation.
+- Pixel containment: 1,613,081 changed pixels; 0 changed pixels and 0 introduced-alpha pixels outside the 21 declared text cells; every declared Korean alpha bbox stays inside its source cell.
+- Semantic/visual review covers 17 semantic strings across 21 physical regions. No translatable English residue, clipping/overlap/box escape, black seam/line, opaque box or obvious alpha halo observed. Character names, ordinals, numeric/player markers, vehicles/icons and other protected artwork remain preserved.
+- A064FDFC is not promoted because no C strict-QA result or in-game screenshot validation exists yet. D78 status: D_PREFLIGHT_PASS_PENDING_C_INGAME.
+- FA7BBB13 remains final-static PASS pending in-game only. 39229D64 remains A82/B83/D-preflight PASS but pending C + in-game. FF2462BB and 568D3696 remain pending in-game.
+- Reconciled a stale progress counter: artwork_plan.jsonl and transcriptions.jsonl both contain 717 segments; progress graphics.artwork_plan_segments was 715 and is corrected to 717.
+- Existing approved_dds remains exactly the three USER_APPROVED_LOCKED DDS; all SHA-256 values reverified.
+- LOCALIZATION_STATE_OK and Domain Isolation PASS; no VR/FFB source diff or merge commit. Build was not run.
+- Report: localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json.
