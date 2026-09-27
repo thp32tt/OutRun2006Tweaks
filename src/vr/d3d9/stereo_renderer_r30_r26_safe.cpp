@@ -15,6 +15,7 @@
 #include "vr/game/render_semantics.hpp"
 #include "vr/debug/experiment_modes.hpp"
 #include "vr/d3d9/frame_context.hpp"
+#include "vr/d3d9/render_policy.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
@@ -1603,18 +1604,18 @@ namespace OutRunVRStereo
 
             const auto semanticScope =
                 OutRunVR::GameSemantic::EffectiveScope();
+            const auto semanticRoute =
+                OutRunVR::RenderPolicy::RouteFor(semanticScope);
             const bool semanticHud =
-                OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
+                semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::ScreenHud;
             const bool semanticWorld =
-                OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
+                semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::World;
             const bool semanticOverlay2D =
-                OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
-                    semanticScope);
+                semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::ScreenOverlay2D;
             const bool semanticProjectedWorld =
-                OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
-                    semanticScope);
+                semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::ProjectedWorld;
             const bool semanticProjectedScreen =
-                semanticScope == OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D;
+                semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::ProjectedScreenEffect;
 
             // R65: exact lens-flare producer has already converted its world
             // anchor to screen coordinates through Calc3D2D. It needs only the
