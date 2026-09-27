@@ -43,6 +43,7 @@ namespace OutRunVRStereo
 {
     namespace
     {
+        // R68 HMD fixpack candidate: rank world-lock + transition hold regression build.
         // R26-safe comparison owner: R26 remains the world/effect authority;
         // only R30 HUD, XYZRHW correction and stereo SkyGlow are layered above.
         std::uint64_t R30SafeTwoEyeDraws = 0;
