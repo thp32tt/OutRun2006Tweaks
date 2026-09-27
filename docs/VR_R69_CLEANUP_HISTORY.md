@@ -23,3 +23,12 @@ Rules:
 - Change: moved R55 HUD coordinate mode, R56 HUD probe mode, and R57 projected-marker experiment environment parsing into `src/vr/debug/experiment_modes.hpp`.
 - Production renderer now consumes those values through a debug-module boundary; render behavior and defaults are unchanged.
 - Build gate: DX9Ex Active Validation triggered from this final stage head.
+
+
+## S2 — semantic type unification
+- Branch: `vr-d3d9ex-candidate/r69-clean-s2`
+- Parent: S1 `5497f00f0183a3f99b3a56262b8160c8fd7f2bf7`
+- Change: removed the duplicate HUD-only `SpacePolicy` enum from `src/vr/hud_semantics.hpp`.
+- HUD reverse-engineering ranges and the HUD inspector now use `OutRunVR::GameSemantic::RenderScope` directly.
+- Semantic outputs remain the same: unknown -> None, finite HUD -> ScreenHud, world-attached markers -> WorldBillboard.
+- Build gate: DX9Ex Active Validation triggered from this final stage head.
