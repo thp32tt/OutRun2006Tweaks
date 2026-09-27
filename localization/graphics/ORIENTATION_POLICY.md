@@ -139,3 +139,17 @@ Effective 2026-09-26 22:46 KST:
 - If the HD mod does not contain a target, the stock original DDS is allowed only as an explicit fallback and must be recorded as such.
 - Existing B3-B65 stock-resolution candidates and user approvals are preserved as history, but they are not automatically valid HD candidates.
 - Never resize an already-localized low-resolution DDS to create the HD localization.
+
+
+## Zero-tolerance pixel boundary gate
+
+Effective 2026-09-28:
+
+- The allowed overflow is **0 pixels**. If any Korean glyph/text pixel extends even **1 pixel** outside the original source text region or sprite cell, classify the asset as **REWORK_REQUIRED**.
+- A candidate bbox must be a subset of the original source bbox/cell on all four sides. Width/height growth is allowed only when the result still remains fully contained in the original source region.
+- `changed_pixels_outside_source_region` must be `0` and `introduced_alpha_outside_source_region` must be `0`.
+- A zero-margin edge touch is not an automatic failure, but must be recorded as a high-risk condition and checked at high zoom and in game. Any clipping or escape fails the gate.
+- For DXT5/BC3 assets, 4x4 block confinement alone is not sufficient for final approval when exact decoded-pixel evidence is unavailable. Keep such evidence on hold/recheck; never infer PASS from compression-block containment alone.
+- Missing or ambiguous source-region evidence is **HOLD_STRICT_RECHECK**, not PASS.
+- Static containment PASS does not override the mandatory isolated `DDS_ONLY` in-game validation gate.
+- Canonical audit record: `localization/graphics/FULL_PIXEL_BOUNDARY_AUDIT_20260928.json`.
