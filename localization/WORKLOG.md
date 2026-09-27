@@ -678,3 +678,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - State reconciliation: A83 already completed C4A2937B, so stale next_hd_rework C4A2937B is advanced to 2DA43E41 (8 reviewed segments).
 - LOCALIZATION_STATE_OK and Domain Isolation PASS; no VR/FFB source diff or merge commit. Build was not run.
 - Report: localization/graphics/role_D/20260927-1618-D79/D79_FINAL_QA_RECONCILE_REPORT.json.
+
+## 2026-09-27 16:48 KST — A84 2DA43E41 HD rebuild
+
+- Continued from latest GitHub korean-localization-clean HEAD af8373c; no GPT Library workspace was used.
+- Rebuilt 2DA43E41 directly from canonical 4096×4096 HD RGBA32/1-mip source; no previous Korean DDS was upscaled.
+- Canonical-HD omission review expanded transcription from 8 to 11 semantic strings by adding 加速度: -> 가속:, 最高速: -> 최고 속도:, and ハンドリング: -> 핸들링:.
+- OutRun2 and OutRun2: SP title text was preserved in Latin form inside the selected-course messages, and song title Keep Your Heart -1989- was left untouched.
+- First internal render was rejected before persistence because partial-alpha erase left source English outlines; final binary+dilated glyph erase removes those residues.
+- Readable/raw mirror_y A-stage QA: no observed source-language residue, clipping/overlap, box escape, seam/black line, opaque box or alpha halo.
+- Exact 128-byte DDS header and all bytes outside the 11 localization cells are canonical; all new Korean alpha bboxes remain within their source cells.
+- Candidate SHA-256: 0efaaa86849c66c94a4d5e1d5f7fbd86caa8935b5a5cb24ccbb26fc29f97d355. Status: A84_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA. No promotion, in-game claim, build, VR or FFB work. Next: 411827E.

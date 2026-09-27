@@ -18,8 +18,8 @@
     "graphics_rework_targets": 13,
     "low_res_font_pipeline_targets": 1,
     "hd_preserve_targets": 75,
-    "graphics_rework_candidates_ready": 6,
-    "graphics_rework_remaining": 7
+    "graphics_rework_candidates_ready": 7,
+    "graphics_rework_remaining": 6
   },
   "rules": [
     "Use DDS header dimensions, never the filename resolution suffix.",
@@ -228,7 +228,25 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "REWORK_FROM_HD_BASE"
+      "status": "A84_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "transcription_segments": 11,
+      "localized_regions": 11,
+      "remaining_segments": 0,
+      "batch_report": "localization/graphics/role_A/20260927-1630-A84/A84_2DA43E41_PRODUCTION_REPORT.json",
+      "a_production_report": "localization/graphics/role_A/20260927-1630-A84/A84_2DA43E41_PRODUCTION_REPORT.json",
+      "candidate_sha256": "0efaaa86849c66c94a4d5e1d5f7fbd86caa8935b5a5cb24ccbb26fc29f97d355",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+      "semantic_expansion": [
+        "加速度: -> 가속:",
+        "最高速: -> 최고 속도:",
+        "ハンドリング: -> 핸들링:"
+      ],
+      "preserved_song_title": "Keep Your Heart -1989-",
+      "preserved_titles": [
+        "OutRun2",
+        "OutRun2: SP"
+      ],
+      "in_game_validation": "PENDING"
     },
     {
       "hash": "411827E",
@@ -296,5 +314,5 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_D/20260927-1618-D79/D79_FINAL_QA_RECONCILE_REPORT.json"
+  "latest_batch": "localization/graphics/role_A/20260927-1630-A84/A84_2DA43E41_PRODUCTION_REPORT.json"
 }

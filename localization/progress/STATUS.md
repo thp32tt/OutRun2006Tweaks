@@ -356,3 +356,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - LOCALIZATION_STATE_OK and Domain Isolation PASS; VR/FFB source/history contamination not observed.
 - Next production target corrected to 2DA43E41 (8 reviewed segments).
 - No build performed. Machine report: localization/graphics/role_D/20260927-1618-D79/D79_FINAL_QA_RECONCILE_REPORT.json.
+
+## A84 2DA43E41 checkpoint — 2026-09-27 16:48 KST
+
+- Canonical-HD production complete: 11 semantic / 11 physical text regions.
+- Omission recovery: 加速度 -> 가속, 最高速 -> 최고 속도, ハンドリング -> 핸들링.
+- OutRun2/OutRun2: SP and Keep Your Heart -1989- preserved as original title/song artwork.
+- Candidate SHA-256: 0efaaa86849c66c94a4d5e1d5f7fbd86caa8935b5a5cb24ccbb26fc29f97d355; 4096×4096 RGBA32 / 1 mip / exact canonical header / raw mirror_y.
+- Outside 11 cells byte-identical; all Korean alpha contained in source cells. Readable/raw A-stage artifact QA PASS after rejected residue draft.
+- Status: A_PRODUCTION_COMPLETE_PENDING_B_C_D; in-game validation not performed. Next after gate: 411827E.

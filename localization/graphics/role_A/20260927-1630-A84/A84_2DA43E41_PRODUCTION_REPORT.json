@@ -1,0 +1,471 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A84",
+  "timestamp_kst": "2026-09-27T16:48:45+09:00",
+  "base_head": "af8373c829dadabf39c0aadd50c3cbb477b6e783",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+  "canonical_source": "OR2-HD-GUI-v0.25.10a",
+  "canonical_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+  "candidate_sha256": "0efaaa86849c66c94a4d5e1d5f7fbd86caa8935b5a5cb24ccbb26fc29f97d355",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+  "dimensions": [
+    4096,
+    4096
+  ],
+  "bytes": 67108992,
+  "format": "RGBA32",
+  "mipmaps": 1,
+  "raw_orientation": "mirror_y",
+  "prior_semantic_entries": 8,
+  "semantic_entries_materialized": 11,
+  "localized_regions": 11,
+  "transcription_expansion": [
+    {
+      "source": "加速度:",
+      "korean": "가속:",
+      "reason": "Canonical HD omission review found UI acceleration label."
+    },
+    {
+      "source": "最高速:",
+      "korean": "최고 속도:",
+      "reason": "Canonical HD omission review found UI max-speed label."
+    },
+    {
+      "source": "ハンドリング:",
+      "korean": "핸들링:",
+      "reason": "Canonical HD omission review found UI handling label."
+    }
+  ],
+  "title_preservation": [
+    "OutRun2",
+    "OutRun2: SP"
+  ],
+  "song_title_preserved": "Keep Your Heart -1989-",
+  "dds_header_128_byte_exact_to_canonical": true,
+  "outside_11_text_cells_byte_exact_to_canonical": true,
+  "new_korean_alpha_contained_in_source_cells": true,
+  "readable_orientation_visual_qa": "PASS_A_STAGE",
+  "raw_orientation_visual_qa": "PASS_MIRROR_Y_PRESERVED",
+  "artifact_qa": {
+    "source_language_residue": "NONE_OBSERVED_FINAL",
+    "clipping_or_overlap": "NONE_OBSERVED",
+    "box_escape": "NONE_OBSERVED",
+    "black_line_or_seam": "NONE_OBSERVED",
+    "opaque_box": "NONE_OBSERVED",
+    "alpha_halo": "NONE_OBSERVED"
+  },
+  "internal_rework": [
+    {
+      "attempt": "draft_1",
+      "result": "REJECTED_NOT_PERSISTED",
+      "reason": "Partial-alpha erase left visible source English outlines in selection/waiting text."
+    },
+    {
+      "attempt": "final",
+      "result": "PASS_FOR_A_HANDOFF",
+      "reason": "Binary+dilated source-glyph erase removed residual outlines while keeping edits inside isolated source cells."
+    }
+  ],
+  "preserved_original_tokens": [
+    "OutRun2",
+    "OutRun2: SP",
+    "Keep Your Heart -1989-",
+    "4P",
+    "3P",
+    "2P",
+    "1P",
+    "6",
+    "5",
+    "4",
+    "987",
+    "course-map artwork",
+    "character artwork",
+    "player indicators"
+  ],
+  "in_game_validation": "NOT_PERFORMED",
+  "approval": "NOT_PROMOTED_PENDING_B_C_D_AND_INGAME",
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "edits": [
+    {
+      "key": "course_or2",
+      "source": "OutRun2 · 15 Continuous Course has been selected.",
+      "korean": "OutRun2 · 15코스 연속 / 선택되었습니다.",
+      "readable_cell": [
+        115,
+        192,
+        2099,
+        448
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        1941,
+        256
+      ],
+      "candidate_alpha_bbox": [
+        607,
+        203,
+        1606,
+        431
+      ],
+      "render": {
+        "style": "select_two",
+        "lines": [
+          {
+            "line": 1,
+            "font_size": 96,
+            "xscale": 1.0,
+            "outer_stroke": 6
+          },
+          {
+            "line": 2,
+            "font_size": 96,
+            "xscale": 1.0,
+            "outer_stroke": 6
+          }
+        ]
+      }
+    },
+    {
+      "key": "course_sp",
+      "source": "OutRun2: SP · 15 Continuous Course has been selected.",
+      "korean": "OutRun2: SP · 15코스 연속 / 선택되었습니다.",
+      "readable_cell": [
+        102,
+        461,
+        2125,
+        717
+      ],
+      "source_visible_bbox_local": [
+        30,
+        27,
+        1976,
+        256
+      ],
+      "candidate_alpha_bbox": [
+        525,
+        472,
+        1702,
+        700
+      ],
+      "render": {
+        "style": "select_two",
+        "lines": [
+          {
+            "line": 1,
+            "font_size": 96,
+            "xscale": 1.0,
+            "outer_stroke": 6
+          },
+          {
+            "line": 2,
+            "font_size": 96,
+            "xscale": 1.0,
+            "outer_stroke": 6
+          }
+        ]
+      }
+    },
+    {
+      "key": "wait_other",
+      "source": "Waiting for other players. Please stand by.",
+      "korean": "다른 플레이어를 기다리는 중입니다. / 잠시 기다려 주세요.",
+      "readable_cell": [
+        2189,
+        192,
+        3533,
+        448
+      ],
+      "source_visible_bbox_local": [
+        11,
+        0,
+        1344,
+        256
+      ],
+      "candidate_alpha_bbox": [
+        2216,
+        203,
+        3506,
+        431
+      ],
+      "render": {
+        "style": "wait_two",
+        "lines": [
+          {
+            "line": 1,
+            "font_size": 96,
+            "xscale": 0.9155,
+            "outer_stroke": 6
+          },
+          {
+            "line": 2,
+            "font_size": 96,
+            "xscale": 1.0,
+            "outer_stroke": 6
+          }
+        ]
+      }
+    },
+    {
+      "key": "wait_now",
+      "source": "Now waiting for other players. Please stand by.",
+      "korean": "현재 다른 플레이어를 기다리는 중입니다. / 잠시 기다려 주세요.",
+      "readable_cell": [
+        2189,
+        461,
+        3776,
+        717
+      ],
+      "source_visible_bbox_local": [
+        39,
+        0,
+        1587,
+        256
+      ],
+      "candidate_alpha_bbox": [
+        2220,
+        472,
+        3744,
+        700
+      ],
+      "render": {
+        "style": "wait_two",
+        "lines": [
+          {
+            "line": 1,
+            "font_size": 96,
+            "xscale": 0.946,
+            "outer_stroke": 6
+          },
+          {
+            "line": 2,
+            "font_size": 96,
+            "xscale": 1.0,
+            "outer_stroke": 6
+          }
+        ]
+      }
+    },
+    {
+      "key": "acceleration",
+      "source": "加速度:",
+      "korean": "가속:",
+      "readable_cell": [
+        3789,
+        230,
+        4045,
+        320
+      ],
+      "source_visible_bbox_local": [
+        37,
+        17,
+        227,
+        90
+      ],
+      "candidate_alpha_bbox": [
+        3850,
+        243,
+        3984,
+        306
+      ],
+      "render": {
+        "font_size": 66,
+        "outer_stroke": 1,
+        "inner_stroke": 0,
+        "xscale": 1.0,
+        "style": "plain_white",
+        "shear": 0
+      }
+    },
+    {
+      "key": "max_speed",
+      "source": "最高速:",
+      "korean": "최고 속도:",
+      "readable_cell": [
+        3789,
+        312,
+        4045,
+        410
+      ],
+      "source_visible_bbox_local": [
+        38,
+        7,
+        229,
+        98
+      ],
+      "candidate_alpha_bbox": [
+        3797,
+        327,
+        4037,
+        395
+      ],
+      "render": {
+        "font_size": 72,
+        "outer_stroke": 1,
+        "inner_stroke": 0,
+        "xscale": 0.8108,
+        "style": "plain_white",
+        "shear": 0
+      }
+    },
+    {
+      "key": "handling",
+      "source": "ハンドリング:",
+      "korean": "핸들링:",
+      "readable_cell": [
+        1677,
+        896,
+        2120,
+        1050
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        435,
+        154
+      ],
+      "candidate_alpha_bbox": [
+        1731,
+        920,
+        2066,
+        1026
+      ],
+      "render": {
+        "font_size": 113,
+        "outer_stroke": 2,
+        "inner_stroke": 0,
+        "xscale": 1.0,
+        "style": "plain_white",
+        "shear": 0
+      }
+    },
+    {
+      "key": "view_change",
+      "source": "View Change Button :",
+      "korean": "시점 변경 버튼:",
+      "readable_cell": [
+        3430,
+        998,
+        3955,
+        1114
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        466,
+        104
+      ],
+      "candidate_alpha_bbox": [
+        3443,
+        1009,
+        3935,
+        1103
+      ],
+      "render": {
+        "font_size": 90,
+        "outer_stroke": 5,
+        "inner_stroke": 3,
+        "xscale": 0.8832,
+        "style": "view_change",
+        "shear": 0.09
+      }
+    },
+    {
+      "key": "single_play",
+      "source": "Single Play.",
+      "korean": "싱글 플레이",
+      "readable_cell": [
+        1677,
+        1075,
+        2355,
+        1229
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        678,
+        154
+      ],
+      "candidate_alpha_bbox": [
+        1719,
+        1085,
+        2308,
+        1219
+      ],
+      "render": {
+        "font_size": 123,
+        "outer_stroke": 9,
+        "inner_stroke": 4,
+        "xscale": 1.0,
+        "style": "single_orange",
+        "shear": 0.02
+      }
+    },
+    {
+      "key": "expert",
+      "source": "For Expert Drivers",
+      "korean": "상급자용",
+      "readable_cell": [
+        2842,
+        1088,
+        3482,
+        1229
+      ],
+      "source_visible_bbox_local": [
+        0,
+        36,
+        637,
+        141
+      ],
+      "candidate_alpha_bbox": [
+        2953,
+        1099,
+        3355,
+        1218
+      ],
+      "render": {
+        "font_size": 109,
+        "outer_stroke": 8,
+        "inner_stroke": 3,
+        "xscale": 1.0,
+        "style": "expert_red",
+        "shear": 0.08
+      }
+    },
+    {
+      "key": "special_course",
+      "source": "Special Course",
+      "korean": "스페셜 코스",
+      "readable_cell": [
+        3098,
+        1254,
+        3930,
+        1421
+      ],
+      "source_visible_bbox_local": [
+        39,
+        25,
+        781,
+        149
+      ],
+      "candidate_alpha_bbox": [
+        3183,
+        1265,
+        3830,
+        1409
+      ],
+      "render": {
+        "font_size": 133,
+        "outer_stroke": 10,
+        "inner_stroke": 4,
+        "xscale": 1.0,
+        "style": "special_yellow",
+        "shear": 0.08
+      }
+    }
+  ],
+  "status": "A84_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA",
+  "next_asset_after_static_gate": "411827E_512x512.dds"
+}

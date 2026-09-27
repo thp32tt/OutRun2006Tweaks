@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T16:18:12+09:00",
+  "updated_at_kst": "2026-09-27T16:48:45+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -110,7 +110,7 @@
       "percent": 100,
       "transcribed_assets": 79,
       "localize_text_targets": 79,
-      "transcribed_segments": 718,
+      "transcribed_segments": 721,
       "blocked_context_assets": 0,
       "blocked_context_indices": []
     },
@@ -136,11 +136,11 @@
       "status": "done",
       "percent": 100,
       "planned_assets": 79,
-      "translated_segments": 718,
+      "translated_segments": 721,
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "39229D64 C78-reworked SHA and A064FDFC B84/C79 SHA now have D79 final static QA PASS, but both still require in-game screenshot validation. FA7BBB13 also awaits in-game only. C4A2937B A83 + D79 preflight passes structurally, but B/C + context/runtime validation remain. Continue 2DA43E41 canonical-HD production independently.",
+  "next_checkpoint": "2DA43E41 A84 canonical-HD production complete on 11 semantic / 11 physical text regions; B/C/D static QA and in-game validation remain. C4A2937B still needs B/C + context/in-game; 39229D64, A064FDFC and FA7BBB13 remain in-game holds. Continue 411827E canonical-HD production after the 2DA static gate.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -175,7 +175,7 @@
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
     "transcribed_assets": 79,
-    "transcribed_segments": 718,
+    "transcribed_segments": 721,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -192,7 +192,7 @@
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
     "artwork_plan_assets": 79,
-    "artwork_plan_segments": 718,
+    "artwork_plan_segments": 721,
     "artwork_proof_candidates": 7,
     "simple6_package": {
       "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
@@ -253,17 +253,18 @@
     "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
     "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "latest_hd_production_candidate": {
-      "asset": "C4A2937B",
-      "coverage": "20 semantic / 21 physical",
-      "candidate_sha256": "7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e",
-      "report": "localization/graphics/role_A/20260927-1530-A83/A83_C4A2937B_PRODUCTION_REPORT.json",
-      "status": "D_PREFLIGHT_PASS_PENDING_B_C_INGAME",
-      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
-      "semantic_corrections": [
-        "visible source corrected to Double the speed!",
-        "omitted Drift and added"
+      "asset": "2DA43E41",
+      "coverage": "11 semantic / 11 physical",
+      "candidate_sha256": "0efaaa86849c66c94a4d5e1d5f7fbd86caa8935b5a5cb24ccbb26fc29f97d355",
+      "report": "localization/graphics/role_A/20260927-1630-A84/A84_2DA43E41_PRODUCTION_REPORT.json",
+      "status": "A84_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+      "semantic_expansion": [
+        "加速度",
+        "最高速",
+        "ハンドリング"
       ],
-      "d_preflight_report": "localization/graphics/role_D/20260927-1618-D79/D79_FINAL_QA_RECONCILE_REPORT.json"
+      "preserved_song_title": "Keep Your Heart -1989-"
     },
     "next_hd_rework": {
       "asset": "2DA43E41",
