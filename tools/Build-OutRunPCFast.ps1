@@ -157,7 +157,7 @@ foreach ($marker in @(
     'VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE',
     'VR R66 OPTION ARROW: exact node pinned',
     'VR R66 GOAL TIME HUD:',
-    'VR R67 FLARE FIX: exact projected-screen effect prefers Calc3D2D eye reprojection; FOV-only affine is fallback only',
+    'VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes',
     'VR R65 SELECTOR: restored base shadow bypassed'
 )) {
     if (-not $gameAscii.Contains($marker)) {
@@ -175,7 +175,7 @@ if (-not (Test-Path $hostExe)) { throw 'outrun-vr-host.exe missing after increme
 Copy-Item $dll.FullName (Join-Path $backendDir 'dinput8.dll')
 Copy-Item $hostExe (Join-Path $backendDir 'outrun-vr-host.exe')
 Set-Content (Join-Path $backendDir 'SOURCE_SHA.txt') $sourceSha -Encoding ascii
-Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R68' -Encoding ascii
+Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R69' -Encoding ascii
 Assert-R66ProvenBuildContract -BuildDir $gameBuild
 Set-Content (Join-Path $backendDir 'CMAKE_FLAGS.txt') $canonicalGameFlagString -Encoding ascii
 Set-Content (Join-Path $backendDir 'BUILD_CONTRACT.txt') $buildContractVersion -Encoding ascii
@@ -229,7 +229,7 @@ $buildInputs = [ordered]@{
     SchemaVersion = 1
     BuildMatrixId = $matrixId
     IntegrationSha = $sourceSha
-    VariantId = 'ACTIVE_R26_HUD_R68'
+    VariantId = 'ACTIVE_R26_HUD_R69'
     DefaultTestProfile = 'CORRECTNESS'
     Profiles = @('CONTROL', 'CORRECTNESS', 'PERFORMANCE')
     UserRuntimeVerified = $false
