@@ -10,7 +10,7 @@ services:
     shm_size: "2gb"
     environment:
       TZ: Asia/Seoul
-      AUTO_SEND: "${AUTO_SEND:-true}"
+      AUTO_SEND: "${AUTO_SEND:-false}"
       SCHEDULE_MINUTES: "0,10,20,30,50"
       CHAT_SLOTS: "5"
       CHAT_DAY_ROLLOVER_HOUR: "2"
