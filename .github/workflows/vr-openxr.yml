@@ -290,6 +290,9 @@ jobs:
           )) {
             if ($ascii.Contains($forbidden)) { throw "regressed fast/HUD marker present: $forbidden" }
           }
+          if ($ascii.Contains('VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE')) {
+            throw 'R26 HUD artifact contains forbidden R26-only SAFE-DRAW marker'
+          }
           $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
           if ([BitConverter]::ToUInt16($bytes, $peOffset + 4) -ne 0x014C) { throw 'expected x86 DLL' }
 
@@ -454,7 +457,12 @@ jobs:
           foreach ($marker in @(
             'VR R26+HUD SAFE TEST: R26/R23 world path + R30 HUD/XYZRHW/SkyGlow overlay ACTIVE',
             'VR R30 HUD: asymmetric-FOV convergence correction ACTIVE; common-centre offset[L/R]=',
-            'VR R30.6 XYZRHW WORLD:'
+            'VR R30.6 XYZRHW WORLD:',
+            'VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE',
+            'VR R66 OPTION ARROW: exact node pinned',
+            'VR R66 GOAL TIME HUD:',
+            'VR R65 FLARE FIX: exact projected-screen effect uses asymmetric-FOV affine only',
+            'VR R65 SELECTOR: restored base shadow bypassed'
           )) {
             if (-not $ascii.Contains($marker)) {
               throw "R26 HUD marker missing: $marker"
