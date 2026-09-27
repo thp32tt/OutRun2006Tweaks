@@ -161,7 +161,7 @@ jobs:
             'VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE',
             'VR R66 OPTION ARROW: exact node pinned',
             'VR R66 GOAL TIME HUD:',
-            'VR R65 FLARE FIX: exact projected-screen effect uses asymmetric-FOV affine only',
+            'VR R67 FLARE FIX: exact projected-screen effect prefers Calc3D2D eye reprojection; FOV-only affine is fallback only',
             'VR R65 SELECTOR: restored base shadow bypassed'
           )) {
             if (-not $ascii.Contains($marker)) { throw "DX9Ex active binary missing proven marker: $marker" }
@@ -205,7 +205,7 @@ jobs:
           Set-Content (Join-Path $backend 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
           Copy-Item OutRun2006Tweaks.ini (Join-Path $dir 'OutRun2006Tweaks.ini')
           Copy-Item OutRun2006Tweaks.lods.ini (Join-Path $dir 'OutRun2006Tweaks.lods.ini')
-          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-Test-Selector.ps1','START_HERE_VR_TEST.cmd')) {
+          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','START_HERE_VR_TEST.cmd')) {
             Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
           }
           Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
@@ -244,9 +244,11 @@ jobs:
           $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_ACTIVE_*.zip' | Select-Object -First 1
           if (-not $zip) { throw 'active DX9Ex ZIP missing' }
           Expand-Archive $zip.FullName verify
-          foreach ($file in @('START_HERE_VR_TEST.cmd','OutRunVR-Test-Selector.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt')) {
+          foreach ($file in @('START_HERE_VR_TEST.cmd','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt')) {
             if (-not (Test-Path (Join-Path verify $file))) { throw "package missing $file" }
           }
+          $cmds = @(Get-ChildItem verify -Filter '*.cmd' -File)
+          if ($cmds.Count -ne 1 -or $cmds[0].Name -ne 'START_HERE_VR_TEST.cmd') { throw 'package must expose exactly one CMD entry point: START_HERE_VR_TEST.cmd' }
           $collectorText = Get-Content (Join-Path verify 'Collect-OutRunVRLogs.ps1') -Raw
           foreach ($requiredMarker in @('ANALYSIS_REQUEST.json','AutoAnalyzeOnUpload=$true','RequiresUserDescription=$false','OutRun2_VR_ANALYZE_')) {
             if ($collectorText -notlike "*$requiredMarker*") { throw "collector missing runtime auto-analysis contract marker: $requiredMarker" }

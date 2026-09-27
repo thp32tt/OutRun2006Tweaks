@@ -95,6 +95,7 @@ switch($variant){
     'R57_04_RANK_ALL_AS_HUD'      { $semanticMode='0'; $hudExperimentMode='2'; $hudCoordMode='3'; $r57Mode='4' }
     'R57_05_RANK_PROJECTED_IPD'   { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='5' }
     'R57_06_RANK_PROJECTED_HEAD'  { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='6' }
+    'R67_EYE_REPROJECT'           { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='6' }
     'R57_07_RANK_PROJECTED_13'    { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='7' }
     'R57_08_RANK_PROJECTED_46'    { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='8' }
     'R57_09_RANK_PROJECTED_ZERO'  { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='9' }
@@ -319,8 +320,13 @@ do{
 }while((Get-Date) -lt $deadline)
 
 if(Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue){
-    Write-Warning 'outrun-vr-host.exe is still running. Close it, then run Collect-OutRunVRLogs.cmd once. No logs were deleted.'
-    exit 2
+    Write-Warning 'outrun-vr-host.exe remained after game exit; closing this test host automatically so log collection can finish.'
+    Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue |
+        Stop-Process -Force -ErrorAction SilentlyContinue
+    Start-Sleep -Milliseconds 750
+}
+if(Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue){
+    throw 'Could not close outrun-vr-host.exe automatically; log collection was not started.'
 }
 
 & $collector

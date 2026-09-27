@@ -128,11 +128,11 @@ require_all("src/hooks_uiscaling.cpp", [
 require_all("src/hooks_graphics.cpp", [
     'Module::exe_ptr(0xCABE)',
     'RenderScope::ProjectedScreenEffect2D',
-    'VR R65 FLARE: exact EXE+0xCABE projected-alpha semantic installed',
+    'VR R67 FLARE: exact EXE+0xCABE semantic installed; Calc3D2D view anchor will be reprojected per eye',
 ], "P7_FLARE_EXACT_PRODUCER")
 require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'R30ScreenSpaceKind::ProjectedScreenEffect2D',
-    'VR R65 FLARE FIX: exact projected-screen effect uses asymmetric-FOV affine only',
+    'VR R67 FLARE FIX: exact projected-screen effect prefers Calc3D2D eye reprojection; FOV-only affine is fallback only',
 ], "P7_FLARE_R26HUD_PATH")
 
 # PASS 8 — selector shadow and START presentation protections remain present.

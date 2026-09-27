@@ -667,6 +667,34 @@ namespace OutRunVRStereo
         std::uint64_t R30SkyGlowSceneCaptureEpoch = 0;
         bool R30FirstSkyGlowLogged = false;
         bool R30FirstSkyGlowFailureLogged = false;
+        bool R67StageIdentitySeen = false;
+        int R67LastStageIdentity = -1;
+        std::uint64_t R67StageTransitionHolds = 0;
+
+        void R67GuardStageTransitionPresent() noexcept
+        {
+            if (!Game::stg_stage_num || !Game::is_vr_gameplay_presentation())
+                return;
+            const int stage = static_cast<int>(*Game::stg_stage_num);
+            if (!R67StageIdentitySeen)
+            {
+                R67StageIdentitySeen = true;
+                R67LastStageIdentity = stage;
+                return;
+            }
+            if (stage == R67LastStageIdentity)
+                return;
+
+            const int previous = R67LastStageIdentity;
+            R67LastStageIdentity = stage;
+            ++R67StageTransitionHolds;
+            R30SkyGlowSceneCaptureEpoch = 0;
+            FrameStereoIncomplete = true;
+            R67HoldPreviousProjectionThisPresent = true;
+            spdlog::info(
+                "VR R67 STAGE HOLD: stage {} -> {}; suppress one mixed transition publish and reuse last good HMD projection holds={}",
+                previous, stage, R67StageTransitionHolds);
+        }
 
         void R30ReleaseSkyGlowResources() noexcept
         {
@@ -1163,6 +1191,7 @@ namespace OutRunVRStereo
             const RECT* destRect, HWND destWindowOverride,
             const RGNDATA* dirtyRegion)
         {
+            R67GuardStageTransitionPresent();
             R30MaybeLogTelemetry();
             if (Settings::SkyGlowFactor > 0 &&
                 StereoWanted() && FrameHadWorldStereo &&
@@ -1183,6 +1212,8 @@ namespace OutRunVRStereo
         {
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
+            R67StageIdentitySeen = false;
+            R67LastStageIdentity = -1;
             R30BufferShadowCaptureArmed.store(
                 false, std::memory_order_release);
             return R30ResetR29Hook.stdcall<HRESULT>(device, params);
@@ -1294,10 +1325,12 @@ namespace OutRunVRStereo
             const D3DMATRIX& baseProjection,
             float deltaX[2], float deltaY[2],
             float* baseXOut = nullptr,
-            float* baseYOut = nullptr) noexcept
+            float* baseYOut = nullptr,
+            const OutRunVR::GameSemantic::ProjectedMarkerInfo* explicitMarker = nullptr) noexcept
         {
-            const auto* marker =
-                OutRunVR::GameSemantic::CurrentProjectedMarker();
+            const auto* marker = explicitMarker
+                ? explicitMarker
+                : OutRunVR::GameSemantic::CurrentProjectedMarker();
             if (!marker || !marker->valid || !MatrixFinite(baseProjection))
                 return false;
 
@@ -1317,20 +1350,13 @@ namespace OutRunVRStereo
                 0.0f, 0.0f, 0.0f, 1.0f
             };
 
-            D3DMATRIX headInverse = IdentityMatrix();
-            if (R57Mode() == 6 || R57Mode() == 8)
-            {
-                float headRaw[16]{};
-                std::uint32_t headPoseSequence = 0;
-                if (!OutRunVRRenderer::GetLatchedHeadInverse(
-                        headRaw, headPoseSequence) ||
-                    headPoseSequence != stereo.poseSequence)
-                    return false;
-                std::memcpy(&headInverse, headRaw, sizeof(headInverse));
-                if (!MatrixFinite(headInverse))
-                    return false;
-            }
-
+            // R67: Calc3D2D runs while the renderer's live game camera is
+            // already synchronised to the latched HMD head pose. The recovered
+            // point is therefore already in head-corrected game-view space.
+            // R57 mode 6 applied LatchedHeadInverse a second time here, producing
+            // implausibly large common X/Y deltas (observed at depth ~109) and
+            // making projected markers keep following the head. Match the proven
+            // CPU-projected XYZRHW path: only add eye-relative IPD + eye FOV.
             for (int eye = 0; eye < 2; ++eye)
             {
                 const float relativeEye[3]{
@@ -1347,10 +1373,7 @@ namespace OutRunVRStereo
                     ProjectionFromFov(
                         baseProjection, stereo.eyeFov[eye]);
                 const D3DMATRIX eyeTransform =
-                    (R57Mode() == 6 || R57Mode() == 8) ? MultiplyMatrix(
-                        MultiplyMatrix(headInverse, eyeInverse),
-                        eyeProjection)
-                    : MultiplyMatrix(eyeInverse, eyeProjection);
+                    MultiplyMatrix(eyeInverse, eyeProjection);
 
                 float eyeX = 0.0f, eyeY = 0.0f;
                 if (!R57ProjectViewPoint(
@@ -1372,7 +1395,7 @@ namespace OutRunVRStereo
                     expected, true, std::memory_order_acq_rel))
             {
                 spdlog::info(
-                    "VR R57 PROJECTED MARKER: mode={} view=({:.4f},{:.4f},{:.4f}) deltaL=({:.5f},{:.5f}) deltaR=({:.5f},{:.5f}) builds={}",
+                    "VR R67 PROJECTED MARKER: mode={} eye-relative reprojection only view=({:.4f},{:.4f},{:.4f}) deltaL=({:.5f},{:.5f}) deltaR=({:.5f},{:.5f}) builds={}",
                     R57Mode(), marker->viewX, marker->viewY, marker->viewZ,
                     deltaX[0], deltaY[0], deltaX[1], deltaY[1], builds);
             }
@@ -3479,6 +3502,42 @@ namespace OutRunVRStereo
 
             if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
             {
+                // R67: the flare producer's Calc3D2D call is now captured at
+                // EXE+0xCF4E/return 0xCF53. Reproject that exact, already
+                // head-synchronised game-view anchor for each eye. The twelve
+                // 0x40C9A0 alpha objects keep their authored screen-space size;
+                // only their common anchor moves to the eye-correct ray.
+                float deltaX[2]{}, deltaY[2]{};
+                if (R57BuildProjectedMarkerDelta(
+                        stereo, baseProjection, deltaX, deltaY,
+                        nullptr, nullptr,
+                        OutRunVR::GameSemantic::ProjectedScreenAnchor()))
+                {
+                    for (int eye = 0; eye < 2; ++eye)
+                    {
+                        D3DMATRIX clipShift = IdentityMatrix();
+                        clipShift._41 = deltaX[eye];
+                        clipShift._42 = deltaY[eye];
+                        const D3DMATRIX corrected =
+                            MultiplyMatrix(stockWvp, clipShift);
+                        if (!MatrixFinite(corrected))
+                            return false;
+                        const D3DMATRIX correctedT = TransposeMatrix(corrected);
+                        std::memcpy(eyeConstants[eye], &correctedT,
+                            sizeof(correctedT));
+                    }
+                    static bool firstFlareReprojectionLogged = false;
+                    if (!firstFlareReprojectionLogged)
+                    {
+                        firstFlareReprojectionLogged = true;
+                        spdlog::info(
+                            "VR R67 FLARE REPROJECT: Calc3D2D view anchor -> eye-relative L/R projection ACTIVE");
+                    }
+                    return true;
+                }
+
+                // Exact anchor unavailable: retain the R65 FOV-only correction
+                // as a fail-soft path rather than widening alpha heuristics.
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     D3DMATRIX clipAffine = IdentityMatrix();
@@ -3900,7 +3959,7 @@ namespace OutRunVRStereo
                 {
                     firstProjectedScreenEffectLogged = true;
                     spdlog::info(
-                        "VR R65 FLARE FIX: exact projected-screen effect uses asymmetric-FOV affine only (no HUD scale/head/IPD plane)");
+                        "VR R67 FLARE FIX: exact projected-screen effect prefers Calc3D2D eye reprojection; FOV-only affine is fallback only");
                 }
             }
             if (screenKind == R30ScreenSpaceKind::WorldBillboard &&

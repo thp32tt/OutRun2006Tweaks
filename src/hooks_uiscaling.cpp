@@ -321,23 +321,36 @@ class UIScaling : public Hook
 		// Preserve the recovered view point so the final queued sprite can be
 		// translated to the real left/right OpenXR projections instead of
 		// guessing depth from an already-flattened SpriteNode.
-		if (_ReturnAddress() == Module::exe_ptr(0xBAEE7) &&
-			out && std::isfinite(out->x) && std::isfinite(out->y) &&
-			std::isfinite(out->z) && std::isfinite(a1) &&
-			std::isfinite(a2) && std::fabs(a1) > 1.0e-6f &&
-			std::fabs(a2) > 1.0e-6f &&
-			std::fabs(out->z) > 1.0e-6f)
+		const void* returnAddress = _ReturnAddress();
+		auto recoverViewPoint = [&](OutRunVR::GameSemantic::ProjectedMarkerInfo& info) {
+			info = {};
+			if (!out || !std::isfinite(out->x) || !std::isfinite(out->y) ||
+				!std::isfinite(out->z) || !std::isfinite(a1) ||
+				!std::isfinite(a2) || std::fabs(a1) <= 1.0e-6f ||
+				std::fabs(a2) <= 1.0e-6f || std::fabs(out->z) <= 1.0e-6f)
+				return;
+			info.valid = true;
+			info.viewZ = out->z;
+			info.viewX = out->x * (-out->z) / a1;
+			info.viewY = out->y * (-out->z) / a2;
+		};
+
+		if (returnAddress == Module::exe_ptr(0xBAEE7))
 		{
-			RankMarkerProjectedInfo.valid = true;
-			RankMarkerProjectedInfo.viewZ = out->z;
-			RankMarkerProjectedInfo.viewX =
-				out->x * (-out->z) / a1;
-			RankMarkerProjectedInfo.viewY =
-				out->y * (-out->z) / a2;
+			recoverViewPoint(RankMarkerProjectedInfo);
 		}
-		else if (_ReturnAddress() == Module::exe_ptr(0xBAEE7))
+		else if (returnAddress == Module::exe_ptr(0xCF53))
 		{
-			RankMarkerProjectedInfo = {};
+			// R67: FUN_0040CBC0 projects the flare anchor exactly once here,
+			// before the twelve 0x40C9A0 alpha-object draws. Preserve the
+			// already head-synchronised game-view point for eye-relative
+			// reprojection instead of trying to repair the flattened result.
+			OutRunVR::GameSemantic::ProjectedMarkerInfo flareAnchor{};
+			recoverViewPoint(flareAnchor);
+			if (flareAnchor.valid)
+				OutRunVR::GameSemantic::SetLatestProjectedScreenAnchor(flareAnchor);
+			else
+				OutRunVR::GameSemantic::ClearLatestProjectedScreenAnchor();
 		}
 
 		// TODO: OnlineArcade mode needs to add position here

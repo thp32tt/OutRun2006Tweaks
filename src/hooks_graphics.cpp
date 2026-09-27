@@ -322,7 +322,7 @@ public:
 		Memory::VP::InjectHook(
 			Module::exe_ptr(0xCABE), DrawObjectAlphaProjected,
 			Memory::HookType::Call);
-		spdlog::info("VR R65 FLARE: exact EXE+0xCABE projected-alpha semantic installed");
+		spdlog::info("VR R67 FLARE: exact EXE+0xCABE semantic installed; Calc3D2D view anchor will be reprojected per eye");
 		return true;
 	}
 

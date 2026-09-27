@@ -41,6 +41,7 @@ namespace OutRunVR::GameSemantic
     };
 
     inline thread_local RenderScope CurrentScope = RenderScope::None;
+    inline thread_local ProjectedMarkerInfo LatestProjectedScreenAnchor{};
     inline thread_local RenderScope NextDrawScope = RenderScope::None;
     inline thread_local RenderScope CurrentProducerScope = RenderScope::None;
     inline thread_local ProjectedMarkerInfo CurrentProducerMarker{};
@@ -148,6 +149,23 @@ namespace OutRunVR::GameSemantic
     inline const ProjectedMarkerInfo* ProducerProjectedMarker() noexcept
     {
         return CurrentProducerMarker.valid ? &CurrentProducerMarker : nullptr;
+    }
+
+    inline void SetLatestProjectedScreenAnchor(
+        const ProjectedMarkerInfo& marker) noexcept
+    {
+        LatestProjectedScreenAnchor = marker;
+    }
+
+    inline void ClearLatestProjectedScreenAnchor() noexcept
+    {
+        LatestProjectedScreenAnchor = {};
+    }
+
+    inline const ProjectedMarkerInfo* ProjectedScreenAnchor() noexcept
+    {
+        return LatestProjectedScreenAnchor.valid
+            ? &LatestProjectedScreenAnchor : nullptr;
     }
 
     inline void ArmNextDraw(RenderScope scope) noexcept
