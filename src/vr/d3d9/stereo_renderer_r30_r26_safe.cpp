@@ -14,6 +14,7 @@
 #include "stereo_renderer_r26.cpp"
 #include "vr/game/render_semantics.hpp"
 #include "vr/debug/experiment_modes.hpp"
+#include "vr/d3d9/frame_context.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
@@ -668,44 +669,42 @@ namespace OutRunVRStereo
         std::uint64_t R30SkyGlowSceneCaptureEpoch = 0;
         bool R30FirstSkyGlowLogged = false;
         bool R30FirstSkyGlowFailureLogged = false;
-        bool R67StageIdentitySeen = false;
-        int R67LastStageIdentity = -1;
-        std::uint64_t R67StageTransitionHolds = 0;
-        int R68StageHoldRemaining = 0;
+        OutRunVR::FrameState::FrameContext R69FrameContext{};
         constexpr int R68StageHoldPresents = 3;
 
         void R67GuardStageTransitionPresent() noexcept
         {
+            auto& frame = R69FrameContext;
             if (!Game::stg_stage_num || !Game::is_vr_gameplay_presentation())
             {
-                R68StageHoldRemaining = 0;
+                frame.stageHoldRemaining = 0;
                 return;
             }
 
             const int stage = static_cast<int>(*Game::stg_stage_num);
-            if (!R67StageIdentitySeen)
+            if (!frame.stageIdentitySeen)
             {
-                R67StageIdentitySeen = true;
-                R67LastStageIdentity = stage;
+                frame.stageIdentitySeen = true;
+                frame.lastStageIdentity = stage;
                 return;
             }
 
-            if (stage != R67LastStageIdentity)
+            if (stage != frame.lastStageIdentity)
             {
-                const int previous = R67LastStageIdentity;
-                R67LastStageIdentity = stage;
-                R68StageHoldRemaining = R68StageHoldPresents;
-                ++R67StageTransitionHolds;
+                const int previous = frame.lastStageIdentity;
+                frame.lastStageIdentity = stage;
+                frame.stageHoldRemaining = R68StageHoldPresents;
+                ++frame.stageTransitionHolds;
                 R30SkyGlowSceneCaptureEpoch = 0;
                 spdlog::info(
                     "VR R68 STAGE HOLD: stage {} -> {}; hold last good HMD projection for {} presents transitions={}",
                     previous, stage, R68StageHoldPresents,
-                    R67StageTransitionHolds);
+                    frame.stageTransitionHolds);
             }
 
-            if (R68StageHoldRemaining > 0)
+            if (frame.stageHoldRemaining > 0)
             {
-                --R68StageHoldRemaining;
+                --frame.stageHoldRemaining;
                 FrameStereoIncomplete = true;
                 R67HoldPreviousProjectionThisPresent = true;
             }
@@ -1227,9 +1226,7 @@ namespace OutRunVRStereo
         {
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
-            R67StageIdentitySeen = false;
-            R67LastStageIdentity = -1;
-            R68StageHoldRemaining = 0;
+            R69FrameContext.ResetStageTransition();
             R30BufferShadowCaptureArmed.store(
                 false, std::memory_order_release);
             return R30ResetR29Hook.stdcall<HRESULT>(device, params);
