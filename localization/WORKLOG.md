@@ -643,3 +643,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Final raw/readable QA: no visible source-English residue, clipping, overlap, box escape, black seam/line, opaque box, obvious alpha halo, duplicate/wrong replacement, or protected-artwork damage observed.
 - D77/D78 refer to superseded SHA 5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077 and must revalidate the new C78 binary. In-game screenshot validation remains mandatory; no approved_dds promotion.
 - Machine report: localization/graphics/role_C/20260927-1527-C78/C78_39229D64_STRICT_QA_REWORK_REPORT.json. VR/FFB untouched; build not run.
+
+## 2026-09-27 15:56 KST — A83 C4A2937B HD rebuild
+
+- Continued from latest GitHub korean-localization-clean HEAD ef97a81 while preserving concurrent C78 39229D64 rework; GPT Library was not used.
+- Rebuilt C4A2937B directly from canonical 4096×4096 HD RGBA32/1-mip source; no prior Korean DDS was upscaled.
+- Canonical-HD omission QA corrected transcription source 速度2倍にして！ to visible Double the speed! and added omitted Drift and -> 드리프트하고.
+- Coverage: 20 semantic strings / 21 physical text regions because Beat that car! appears twice.
+- Preserved 1st/2nd/3rd, rank letters B/C/D/E, numeric/rank glyphs, vehicle/icon artwork, character artwork and all non-text bytes outside the 21 source cells.
+- First internal render was rejected before persistence because long Korean strings crowded adjacent cells; final render restores breathing room while keeping every Korean alpha bbox inside its source cell.
+- Readable/raw mirror_y A-stage QA: no observed source-language residue, clipping/overlap, box escape, seam/black line, opaque box or alpha halo.
+- Exact 128-byte DDS header and canonical bytes outside the 21 cells verified. Candidate SHA-256: 7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e.
+- Status: A83_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA. No promotion, in-game claim, build, VR or FFB work. Next: 2DA43E41.

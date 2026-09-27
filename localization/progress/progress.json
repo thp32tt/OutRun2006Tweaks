@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T15:35:19+09:00",
+  "updated_at_kst": "2026-09-27T15:56:57+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -110,7 +110,7 @@
       "percent": 100,
       "transcribed_assets": 79,
       "localize_text_targets": 79,
-      "transcribed_segments": 717,
+      "transcribed_segments": 718,
       "blocked_context_assets": 0,
       "blocked_context_indices": []
     },
@@ -136,11 +136,11 @@
       "status": "done",
       "percent": 100,
       "planned_assets": 79,
-      "translated_segments": 717,
+      "translated_segments": 718,
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "39229D64 C78 corrected three Total Rank background artifacts and passes current C static strict QA on SHA f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4; D77/D78 reference superseded SHA 5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077 and must revalidate C78, then in-game validation. A064FDFC B84 + D78 preflight still needs C + in-game. FA7BBB13 needs in-game only. Continue C4A2937B canonical-HD production independently.",
+  "next_checkpoint": "C4A2937B A83 canonical-HD production complete on 20 semantic / 21 physical regions; B/C/D + in-game remain. 39229D64 C78 needs D revalidation + in-game; A064FDFC needs C + in-game; FA7BBB13 needs in-game. Continue 2DA43E41 after C4 static gate.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -175,7 +175,7 @@
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
     "transcribed_assets": 79,
-    "transcribed_segments": 717,
+    "transcribed_segments": 718,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -192,7 +192,7 @@
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
     "artwork_plan_assets": 79,
-    "artwork_plan_segments": 717,
+    "artwork_plan_segments": 718,
     "artwork_proof_candidates": 7,
     "simple6_package": {
       "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
@@ -253,14 +253,16 @@
     "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
     "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "latest_hd_production_candidate": {
-      "asset": "A064FDFC",
-      "coverage": "17 semantic / 21 physical",
-      "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
-      "report": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_PRODUCTION_FIRST_QA.json",
-      "status": "D_PREFLIGHT_PASS_PENDING_C_INGAME",
-      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
-      "physical_occurrence_note": "DUMPED! x3, Target x2, Rank x2; B84 added standalone KNOCKOUT! and OUTRUN MILES!",
-      "d_preflight_report": "localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json"
+      "asset": "C4A2937B",
+      "coverage": "20 semantic / 21 physical",
+      "candidate_sha256": "7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e",
+      "report": "localization/graphics/role_A/20260927-1530-A83/A83_C4A2937B_PRODUCTION_REPORT.json",
+      "status": "A83_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+      "semantic_corrections": [
+        "visible source corrected to Double the speed!",
+        "omitted Drift and added"
+      ]
     },
     "next_hd_rework": {
       "asset": "C4A2937B",

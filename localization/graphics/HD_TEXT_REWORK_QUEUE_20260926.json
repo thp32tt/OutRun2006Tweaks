@@ -18,8 +18,8 @@
     "graphics_rework_targets": 13,
     "low_res_font_pipeline_targets": 1,
     "hd_preserve_targets": 75,
-    "graphics_rework_candidates_ready": 5,
-    "graphics_rework_remaining": 8
+    "graphics_rework_candidates_ready": 6,
+    "graphics_rework_remaining": 7
   },
   "rules": [
     "Use DDS header dimensions, never the filename resolution suffix.",
@@ -188,7 +188,22 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "REWORK_FROM_HD_BASE"
+      "status": "A83_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "transcription_segments": 20,
+      "localized_regions": 21,
+      "remaining_segments": 0,
+      "batch_report": "localization/graphics/role_A/20260927-1530-A83/A83_C4A2937B_PRODUCTION_REPORT.json",
+      "a_production_report": "localization/graphics/role_A/20260927-1530-A83/A83_C4A2937B_PRODUCTION_REPORT.json",
+      "candidate_sha256": "7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+      "semantic_corrections": [
+        "速度2倍にして！ -> Double the speed!",
+        "added Drift and -> 드리프트하고"
+      ],
+      "duplicate_physical_occurrences": {
+        "Beat that car!": 2
+      },
+      "in_game_validation": "PENDING"
     },
     {
       "hash": "2DA43E41",
@@ -269,5 +284,5 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_C/20260927-1527-C78/C78_39229D64_STRICT_QA_REWORK_REPORT.json"
+  "latest_batch": "localization/graphics/role_A/20260927-1530-A83/A83_C4A2937B_PRODUCTION_REPORT.json"
 }

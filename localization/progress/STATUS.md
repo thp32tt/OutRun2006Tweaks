@@ -327,3 +327,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Raw/readable artifact QA PASS after correction; no new approved_dds promotion. D77/D78 old-SHA validation is superseded and D revalidation + in-game screenshot QA remain.
 - A064FDFC B84/D78 state is preserved and still awaits C + in-game; next production remains C4A2937B.
 - Machine report: localization/graphics/role_C/20260927-1527-C78/C78_39229D64_STRICT_QA_REWORK_REPORT.json. No build; VR/FFB unchanged.
+
+## A83 C4A2937B checkpoint — 2026-09-27 15:56 KST
+
+- Canonical-HD production complete: 20 semantic / 21 physical text regions.
+- Source correction: 速度2倍にして！ -> Double the speed!; omitted Drift and added as 드리프트하고; Beat that car! occurs twice.
+- Candidate SHA-256: 7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e.
+- 4096×4096 RGBA32 / 1 mip / exact canonical 128-byte header; raw mirror_y preserved.
+- All bytes outside 21 text cells remain canonical; every new Korean alpha bbox remains inside its source cell.
+- Readable/raw A-stage artifact QA PASS after one non-persisted spacing rework; protected rank/ordinal/vehicle/icon/character artwork preserved.
+- Status: A_PRODUCTION_COMPLETE_PENDING_B_C_D; in-game validation not performed. Next: 2DA43E41.

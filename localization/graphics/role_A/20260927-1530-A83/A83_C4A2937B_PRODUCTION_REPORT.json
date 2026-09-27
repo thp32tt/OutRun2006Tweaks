@@ -1,0 +1,756 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A83",
+  "timestamp_kst": "2026-09-27T15:56:57+09:00",
+  "base_head": "ef97a819fd22817eec4577b1d814ab67b8fe4d6e",
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+  "canonical_source": "OR2-HD-GUI-v0.25.10a",
+  "canonical_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+  "candidate_sha256": "7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+  "dimensions": [
+    4096,
+    4096
+  ],
+  "bytes": 67108992,
+  "format": "RGBA32",
+  "mipmaps": 1,
+  "raw_orientation": "mirror_y",
+  "prior_semantic_entries": 19,
+  "semantic_entries_materialized": 20,
+  "localized_regions": 21,
+  "transcription_corrections": [
+    {
+      "type": "SOURCE_TEXT_CORRECTION",
+      "from": "速度2倍にして！",
+      "to": "Double the speed!",
+      "korean": "속도를 2배로!",
+      "reason": "Canonical HD atlas visibly contains the English source string."
+    },
+    {
+      "type": "OMISSION_RECOVERY",
+      "source": "Drift and",
+      "korean": "드리프트하고",
+      "reason": "Canonical HD visual review found a standalone text sprite omitted from pass-4 transcription."
+    }
+  ],
+  "duplicate_physical_occurrences": {
+    "Beat that car!": 2
+  },
+  "preserved_original_tokens": [
+    "1st",
+    "2nd",
+    "3rd",
+    "rank letters B/C/D/E",
+    "numeric/rank glyphs",
+    "vehicle/icon artwork",
+    "character artwork"
+  ],
+  "dds_header_128_byte_exact_to_canonical": true,
+  "outside_21_text_cells_byte_exact_to_canonical": true,
+  "new_korean_alpha_contained_in_source_cells": true,
+  "readable_orientation_visual_qa": "PASS_A_STAGE",
+  "raw_orientation_visual_qa": "PASS_MIRROR_Y_PRESERVED",
+  "artifact_qa": {
+    "source_language_residue": "NONE_OBSERVED_IN_21_REPLACED_CELLS",
+    "clipping_or_overlap": "NONE_OBSERVED",
+    "box_escape": "NONE_OBSERVED",
+    "black_line_or_seam": "NONE_OBSERVED",
+    "opaque_box": "NONE_OBSERVED",
+    "alpha_halo": "NONE_OBSERVED"
+  },
+  "style_fidelity": "PASS_A_STAGE_SOURCE_FAMILY",
+  "internal_rework": [
+    {
+      "attempt": "draft_1",
+      "result": "REJECTED_NOT_PERSISTED",
+      "reason": "Long Korean strings visually crowded adjacent cells."
+    },
+    {
+      "attempt": "final",
+      "result": "PASS_FOR_A_HANDOFF",
+      "reason": "Added horizontal breathing room while retaining alpha inside source cells."
+    }
+  ],
+  "in_game_validation": "NOT_PERFORMED",
+  "approval": "NOT_PROMOTED_PENDING_B_C_D_AND_INGAME",
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "edits": [
+    {
+      "key": "go_gate",
+      "source": "Go through the gate!",
+      "korean": "게이트를 통과하세요!",
+      "readable_cell": [
+        2048,
+        998,
+        2565,
+        1106
+      ],
+      "source_visible_bbox_local": [
+        18,
+        0,
+        500,
+        108
+      ],
+      "candidate_alpha_bbox": [
+        2061,
+        1004,
+        2550,
+        1100
+      ],
+      "render": {
+        "font_size": 84,
+        "outer_stroke": 8,
+        "inner_stroke": 3,
+        "xscale": 0.6617,
+        "style": "instr_yellow",
+        "shear": 0.02,
+        "display": "게이트를 통과하세요!"
+      }
+    },
+    {
+      "key": "cut_line",
+      "source": "Cut the line!",
+      "korean": "라인을 끊으세요!",
+      "readable_cell": [
+        2573,
+        998,
+        3059,
+        1106
+      ],
+      "source_visible_bbox_local": [
+        22,
+        0,
+        456,
+        108
+      ],
+      "candidate_alpha_bbox": [
+        2585,
+        1004,
+        3045,
+        1100
+      ],
+      "render": {
+        "font_size": 84,
+        "outer_stroke": 8,
+        "inner_stroke": 3,
+        "xscale": 0.7871,
+        "style": "instr_yellow",
+        "shear": 0.02,
+        "display": "라인을 끊으세요!"
+      }
+    },
+    {
+      "key": "keep_passing",
+      "source": "Keep passing the cars!",
+      "korean": "계속 차량을 추월하세요!",
+      "readable_cell": [
+        3059,
+        998,
+        3584,
+        1106
+      ],
+      "source_visible_bbox_local": [
+        8,
+        24,
+        509,
+        108
+      ],
+      "candidate_alpha_bbox": [
+        3072,
+        1006,
+        3569,
+        1097
+      ],
+      "render": {
+        "font_size": 78,
+        "outer_stroke": 7,
+        "inner_stroke": 3,
+        "xscale": 0.6406,
+        "style": "instr_yellow",
+        "shear": 0.02,
+        "display": "계속 차량을 추월하세요!"
+      }
+    },
+    {
+      "key": "double_speed",
+      "source": "Double the speed!",
+      "korean": "속도를 2배로!",
+      "readable_cell": [
+        3584,
+        998,
+        4083,
+        1106
+      ],
+      "source_visible_bbox_local": [
+        23,
+        27,
+        448,
+        108
+      ],
+      "candidate_alpha_bbox": [
+        3596,
+        1004,
+        4068,
+        1100
+      ],
+      "render": {
+        "font_size": 84,
+        "outer_stroke": 8,
+        "inner_stroke": 3,
+        "xscale": 0.9693,
+        "style": "instr_yellow",
+        "shear": 0.02,
+        "display": "속도를 2배로!"
+      }
+    },
+    {
+      "key": "hit_blue_cone",
+      "source": "Hit the blue cone!",
+      "korean": "파란 콘을 맞히세요!",
+      "readable_cell": [
+        1024,
+        1472,
+        1541,
+        1600
+      ],
+      "source_visible_bbox_local": [
+        14,
+        14,
+        487,
+        96
+      ],
+      "candidate_alpha_bbox": [
+        1037,
+        1482,
+        1527,
+        1589
+      ],
+      "render": {
+        "font_size": 93,
+        "outer_stroke": 9,
+        "inner_stroke": 3,
+        "xscale": 0.6452,
+        "style": "instr_yellow",
+        "shear": 0.02,
+        "display": "파란 콘을 맞히세요!"
+      }
+    },
+    {
+      "key": "dont_crash",
+      "source": "Don't crash!",
+      "korean": "충돌하지 마세요!",
+      "readable_cell": [
+        1541,
+        1472,
+        2048,
+        1600
+      ],
+      "source_visible_bbox_local": [
+        25,
+        15,
+        449,
+        95
+      ],
+      "candidate_alpha_bbox": [
+        1553,
+        1478,
+        2033,
+        1593
+      ],
+      "render": {
+        "font_size": 99,
+        "outer_stroke": 9,
+        "inner_stroke": 3,
+        "xscale": 0.6945,
+        "style": "instr_yellow",
+        "shear": 0.02,
+        "display": "충돌하지 마세요!"
+      }
+    },
+    {
+      "key": "collect_coins",
+      "source": "Collect coins!",
+      "korean": "코인을 모으세요!",
+      "readable_cell": [
+        2048,
+        1472,
+        2547,
+        1600
+      ],
+      "source_visible_bbox_local": [
+        5,
+        14,
+        469,
+        96
+      ],
+      "candidate_alpha_bbox": [
+        2060,
+        1480,
+        2532,
+        1592
+      ],
+      "render": {
+        "font_size": 99,
+        "outer_stroke": 9,
+        "inner_stroke": 3,
+        "xscale": 0.683,
+        "style": "instr_yellow",
+        "shear": 0.02,
+        "display": "코인을 모으세요!"
+      }
+    },
+    {
+      "key": "run_red",
+      "source": "Run through red!",
+      "korean": "빨간색을 통과하세요!",
+      "readable_cell": [
+        1024,
+        1600,
+        1554,
+        1702
+      ],
+      "source_visible_bbox_local": [
+        6,
+        3,
+        530,
+        96
+      ],
+      "candidate_alpha_bbox": [
+        1037,
+        1605,
+        1539,
+        1696
+      ],
+      "render": {
+        "font_size": 79,
+        "outer_stroke": 8,
+        "inner_stroke": 3,
+        "xscale": 0.721,
+        "style": "instr_yellow",
+        "shear": 0.02,
+        "display": "빨간색을 통과하세요!"
+      }
+    },
+    {
+      "key": "run_blue",
+      "source": "Run through blue!",
+      "korean": "파란색을 통과하세요!",
+      "readable_cell": [
+        1554,
+        1600,
+        2053,
+        1702
+      ],
+      "source_visible_bbox_local": [
+        0,
+        3,
+        499,
+        96
+      ],
+      "candidate_alpha_bbox": [
+        1566,
+        1605,
+        2038,
+        1696
+      ],
+      "render": {
+        "font_size": 79,
+        "outer_stroke": 8,
+        "inner_stroke": 3,
+        "xscale": 0.6771,
+        "style": "instr_yellow",
+        "shear": 0.02,
+        "display": "파란색을 통과하세요!"
+      }
+    },
+    {
+      "key": "pass_convoy",
+      "source": "Pass the convoy!",
+      "korean": "차량 행렬을 추월하세요!",
+      "readable_cell": [
+        2053,
+        1600,
+        2573,
+        1702
+      ],
+      "source_visible_bbox_local": [
+        0,
+        3,
+        520,
+        95
+      ],
+      "candidate_alpha_bbox": [
+        2066,
+        1606,
+        2558,
+        1695
+      ],
+      "render": {
+        "font_size": 77,
+        "outer_stroke": 7,
+        "inner_stroke": 3,
+        "xscale": 0.6416,
+        "style": "instr_yellow",
+        "shear": 0.02,
+        "display": "차량 행렬을 추월하세요!"
+      }
+    },
+    {
+      "key": "catch_heart",
+      "source": "Catch the Heart!",
+      "korean": "하트를 잡으세요!",
+      "readable_cell": [
+        2555,
+        1600,
+        3067,
+        1702
+      ],
+      "source_visible_bbox_local": [
+        0,
+        6,
+        512,
+        88
+      ],
+      "candidate_alpha_bbox": [
+        2568,
+        1605,
+        3052,
+        1696
+      ],
+      "render": {
+        "font_size": 79,
+        "outer_stroke": 8,
+        "inner_stroke": 3,
+        "xscale": 0.8741,
+        "style": "instr_yellow",
+        "shear": 0.02,
+        "display": "하트를 잡으세요!"
+      }
+    },
+    {
+      "key": "beat_car_1",
+      "source": "Beat that car!",
+      "korean": "저 차를 이기세요!",
+      "readable_cell": [
+        3046,
+        1600,
+        3571,
+        1702
+      ],
+      "source_visible_bbox_local": [
+        8,
+        7,
+        480,
+        87
+      ],
+      "candidate_alpha_bbox": [
+        3059,
+        1605,
+        3556,
+        1696
+      ],
+      "render": {
+        "font_size": 79,
+        "outer_stroke": 8,
+        "inner_stroke": 3,
+        "xscale": 0.8678,
+        "style": "instr_yellow",
+        "shear": 0.02,
+        "display": "저 차를 이기세요!"
+      }
+    },
+    {
+      "key": "red",
+      "source": "RED",
+      "korean": "빨강",
+      "readable_cell": [
+        3110,
+        1446,
+        3443,
+        1600
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        333,
+        138
+      ],
+      "candidate_alpha_bbox": [
+        3150,
+        1455,
+        3378,
+        1591
+      ],
+      "render": {
+        "font_size": 123,
+        "outer_stroke": 10,
+        "inner_stroke": 4,
+        "xscale": 1.0,
+        "style": "red_label",
+        "shear": 0.1,
+        "display": "빨강"
+      }
+    },
+    {
+      "key": "blue",
+      "source": "BLUE",
+      "korean": "파랑",
+      "readable_cell": [
+        3571,
+        1446,
+        3904,
+        1600
+      ],
+      "source_visible_bbox_local": [
+        0,
+        0,
+        333,
+        136
+      ],
+      "candidate_alpha_bbox": [
+        3611,
+        1455,
+        3840,
+        1591
+      ],
+      "render": {
+        "font_size": 123,
+        "outer_stroke": 10,
+        "inner_stroke": 4,
+        "xscale": 1.0,
+        "style": "blue_label",
+        "shear": 0.1,
+        "display": "파랑"
+      }
+    },
+    {
+      "key": "drift",
+      "source": "Drift!",
+      "korean": "드리프트!",
+      "readable_cell": [
+        3686,
+        1600,
+        3999,
+        1702
+      ],
+      "source_visible_bbox_local": [
+        21,
+        7,
+        195,
+        88
+      ],
+      "candidate_alpha_bbox": [
+        3696,
+        1608,
+        3987,
+        1693
+      ],
+      "render": {
+        "font_size": 79,
+        "outer_stroke": 8,
+        "inner_stroke": 3,
+        "xscale": 0.9128,
+        "style": "instr_yellow",
+        "shear": 0.02,
+        "display": "드리프트!"
+      }
+    },
+    {
+      "key": "stage_bonus",
+      "source": "STAGE BONUS",
+      "korean": "스테이지 / 보너스",
+      "readable_cell": [
+        3814,
+        1741,
+        4096,
+        1894
+      ],
+      "source_visible_bbox_local": [
+        0,
+        57,
+        262,
+        153
+      ],
+      "candidate_alpha_bbox": [
+        3824,
+        1743,
+        4075,
+        1892
+      ],
+      "render": {
+        "font_size": 73,
+        "outer_stroke": 5,
+        "inner_stroke": 3,
+        "xscale": 0.985,
+        "style": "stage_bonus",
+        "shear": 0.06,
+        "display": "스테이지 / 보너스"
+      }
+    },
+    {
+      "key": "get",
+      "source": "GET!!",
+      "korean": "획득!!",
+      "readable_cell": [
+        3571,
+        1894,
+        3930,
+        2043
+      ],
+      "source_visible_bbox_local": [
+        23,
+        0,
+        359,
+        140
+      ],
+      "candidate_alpha_bbox": [
+        3594,
+        1900,
+        3889,
+        2037
+      ],
+      "render": {
+        "font_size": 119,
+        "outer_stroke": 10,
+        "inner_stroke": 4,
+        "xscale": 1.0,
+        "style": "get_red",
+        "shear": 0.1,
+        "display": "획득!!"
+      }
+    },
+    {
+      "key": "beat_car_2",
+      "source": "Beat that car!",
+      "korean": "저 차를 이기세요!",
+      "readable_cell": [
+        3494,
+        2043,
+        4083,
+        2150
+      ],
+      "source_visible_bbox_local": [
+        24,
+        17,
+        496,
+        97
+      ],
+      "candidate_alpha_bbox": [
+        3508,
+        2049,
+        4066,
+        2143
+      ],
+      "render": {
+        "font_size": 83,
+        "outer_stroke": 8,
+        "inner_stroke": 3,
+        "xscale": 0.9302,
+        "style": "instr_yellow",
+        "shear": 0.02,
+        "display": "저 차를 이기세요!"
+      }
+    },
+    {
+      "key": "next_stage",
+      "source": "NEXT STAGE",
+      "korean": "다음 스테이지",
+      "readable_cell": [
+        2534,
+        2163,
+        3034,
+        2284
+      ],
+      "source_visible_bbox_local": [
+        23,
+        16,
+        481,
+        109
+      ],
+      "candidate_alpha_bbox": [
+        2546,
+        2170,
+        3019,
+        2277
+      ],
+      "render": {
+        "font_size": 94,
+        "outer_stroke": 9,
+        "inner_stroke": 3,
+        "xscale": 0.8813,
+        "style": "instr_yellow",
+        "shear": 0.02,
+        "display": "다음 스테이지"
+      }
+    },
+    {
+      "key": "drift_and",
+      "source": "Drift and",
+      "korean": "드리프트하고",
+      "readable_cell": [
+        3021,
+        2163,
+        3400,
+        2284
+      ],
+      "source_visible_bbox_local": [
+        31,
+        22,
+        379,
+        103
+      ],
+      "candidate_alpha_bbox": [
+        3031,
+        2174,
+        3389,
+        2273
+      ],
+      "render": {
+        "font_size": 94,
+        "outer_stroke": 8,
+        "inner_stroke": 3,
+        "xscale": 0.6851,
+        "style": "drift_and",
+        "shear": 0.02,
+        "display": "드리프트하고"
+      }
+    },
+    {
+      "key": "position",
+      "source": "Position",
+      "korean": "순위",
+      "readable_cell": [
+        1370,
+        2688,
+        1779,
+        2829
+      ],
+      "source_visible_bbox_local": [
+        24,
+        32,
+        356,
+        141
+      ],
+      "candidate_alpha_bbox": [
+        1467,
+        2697,
+        1670,
+        2820
+      ],
+      "render": {
+        "font_size": 109,
+        "outer_stroke": 10,
+        "inner_stroke": 4,
+        "xscale": 1.0,
+        "style": "position_yellow",
+        "shear": 0.08,
+        "display": "순위"
+      }
+    }
+  ],
+  "status": "A83_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA",
+  "next_asset_after_static_gate": "2DA43E41_1024x1024.dds"
+}
