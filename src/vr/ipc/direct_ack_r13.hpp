@@ -8,7 +8,7 @@ namespace OutRunVR::R13
 {
     inline constexpr wchar_t DirectGpuAckName[] = L"Local\\OutRun2006Tweaks.VR.R13.DirectGpuAck";
     inline constexpr std::uint32_t DirectGpuAckMagic = 0x334B4341u; // 'ACK3'
-    inline constexpr std::uint32_t DirectGpuAckVersion = 1;
+    inline constexpr std::uint32_t DirectGpuAckVersion = 2;
     inline constexpr std::uint32_t DirectGpuAckRingSize = 4;
 
 #pragma pack(push, 4)

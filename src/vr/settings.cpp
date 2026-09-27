@@ -42,6 +42,8 @@ namespace Settings
 		"Renders true left/right geometry stereo into verified shared-eye transport. Menus use a LOCAL-space world-fixed mono quad so head rotation and translation remain 6DoF." };
 	Setting<bool> VRPreferD3D9Ex{ "VR", "PreferD3D9Ex", true,
 		"Prefers guarded D3D9Ex shared-eye transport so gameplay can bypass Desktop Duplication. Disable to return to classic D3D9/SBS capture." };
+	Setting<bool> VRAllowThirdPartyD3D9Ex{ "VR", "AllowThirdPartyD3D9Ex", false,
+		"Experimental opt-in for Direct3DCreate9Ex supplied by a third-party d3d9 provider such as DXVK. Keep false for normal play; classic DXVK/SBS remains the safe fallback." };
 	Setting<bool> VRDirectGpuOnly{ "VR", "DirectGpuOnly", true,
 		"During gameplay, rejects classic Desktop-Duplication stereo candidates and keeps DirectGPU/cached OpenXR projection paths only. Menus remain mono on a world-fixed LOCAL-space quad." };
 	Setting<bool> VRDisableDesktopDuplication{ "VR", "DisableDesktopDuplication", false,
@@ -216,6 +218,7 @@ namespace OutRunVR
 			Settings::VRMirrorFitDesktop.needs_restart();
 			Settings::VRDisableDesktopVsync.needs_restart();
 			Settings::VRPreferD3D9Ex.needs_restart();
+			Settings::VRAllowThirdPartyD3D9Ex.needs_restart();
 			Settings::VRDirectGpuOnly.needs_restart();
 			Settings::VRDisableDesktopDuplication.needs_restart();
 			Settings::VRTargetRefreshRateHz.needs_restart();
@@ -228,8 +231,9 @@ namespace OutRunVR
 		bool apply() override
 		{
 			spdlog::info(
-				"VR: D3D9Ex DirectGPU preference={} directOnly={} refreshOverrideHz={:.1f} cadenceMode={} cadenceTargetHz={:.1f} cadenceMaxHz={:.1f}; target 0 means XR-native render cadence, simulation remains 60 Hz",
+				"VR: D3D9Ex DirectGPU preference={} thirdPartyEx={} directOnly={} refreshOverrideHz={:.1f} cadenceMode={} cadenceTargetHz={:.1f} cadenceMaxHz={:.1f}; target 0 means XR-native render cadence, simulation remains 60 Hz",
 				Settings::VRPreferD3D9Ex.get(),
+				Settings::VRAllowThirdPartyD3D9Ex.get(),
 				Settings::VRDirectGpuOnly.get(),
 				Settings::VRTargetRefreshRateHz.get(),
 				Settings::VRFrameCadenceMode.get(),

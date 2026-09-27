@@ -183,6 +183,12 @@ if($backend -ne '2d'){
     $gameArgs += '-HudInspector=true'
 }
 
+if($backend -match '^dxvk'){
+    $gameArgs += '-AllowThirdPartyD3D9Ex=false'
+    $gameArgs += '-DirectGpuOnly=false'
+    $gameArgs += '-DisableDesktopDuplication=false'
+}
+
 $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)
 New-Item -ItemType Directory -Force $sessionRoot|Out-Null
 
