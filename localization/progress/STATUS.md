@@ -531,3 +531,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Direct raw-source inspection establishes normal orientation and supersedes stale historical mirror-X metadata. No prior Korean DDS or Batch66 binary was reused.
 - Raw/readable + white/black/gray A-stage QA PASS; in-game not performed. Queue now 15 ready / 1 remaining.
 - Next A target: 48DEBE77 CREATE_NEW_HD_KOREAN_ASSET current-pipeline production.
+
+
+### Text context finalization — 2026-09-27 21:53 KST
+- User confirmed the remaining context-sensitive strings belong to the Heart Attack girlfriend/passenger mission flow.
+- IDs 96/279 `PASSENGER` -> `동승자` (reviewed; source-neutral nuance preserved).
+- IDs 97/280 `DUMPED` -> `차였어요!` (reviewed; failure/rejection result message).
+- Text review state: **1,355/1,355 non-null IDs reviewed; 0 context drafts remain**.
