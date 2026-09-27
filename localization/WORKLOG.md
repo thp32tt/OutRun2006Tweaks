@@ -970,3 +970,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Runtime approval is reset. Static QA evidence is retained, but all 16 candidates require one-at-a-time DDS_ONLY in-game validation.
 - Mandatory recovery order: TEXT_ONLY (0 DDS) -> DDS_ONLY (exactly 1 DDS each) -> COMBINED after isolated passes -> D-approved RELEASE.
 - Detailed incident: `localization/validation/INCIDENT_20260928_TESTPATCH_FAIL.md`.
+
+
+## 2026-09-28 07:10 KST — full zero-tolerance image boundary audit
+- Inventoried 179 graphics image binaries on `korean-localization-clean`: 40 DDS + 139 QA/compare PNGs.
+- DDS scope: 17 canonical HD source DDS + 23 non-source work DDS (16 current HD candidates, 4 historical role-A FF2462BB work DDS, 3 historical low-resolution approved_dds artifacts).
+- Enforced new hard rule: any Korean glyph/text pixel escaping the original source text region/cell by even 1 pixel is `REWORK_REQUIRED`; outside changed pixels and introduced-alpha counts must both be 0. Missing exact evidence is HOLD_STRICT_RECHECK, never assumed PASS.
+- Current 16 HD candidates have no recorded source-region escape in the latest A/B/C/D evidence and remain STATIC boundary-pass only; all 16 still require isolated DDS_ONLY in-game validation after the failed combined package.
+- `C075FB49` has zero minimum bbox margin: no measured escape, but it is retained as a boundary-touch watch item for high-zoom/in-game validation.
+- `568D3696` is DXT5/BC3; its current QA confines changes to the 14 source regions and has no source-box edge alpha failures, but decoded-pixel evidence remains the preferred final proof because 4x4 compression blocks can cross logical edges.
+- Historical low-resolution `approved_dds` copies of `571E78F3`, `62BEBF33`, `E3FD08BE` remain REWORK/obsolete for the current HD baseline (512x64 RGBA32 vs canonical 2048x256 DXT5); current HD rebuilds are separate candidates.
+- No current approved lock was created. Report: `localization/graphics/FULL_PIXEL_BOUNDARY_AUDIT_20260928.json`.
