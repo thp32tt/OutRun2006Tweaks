@@ -59,11 +59,11 @@ index,path,action,artwork_status,transcription_status,notes
 104,textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds,localize_text,c81_static_pass_d82_same_sha_pending_d_ingame_reapproval,transcribed_reviewed,B87 canonical HD DXT5 rebuild + C81 strict QA PASS unchanged; D82 same-SHA preflight valid; final D + in-game reapproval pending; historical low-res approval remains superseded
 106,textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass6 transcription saved
 107,textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds,localize_text,pending_artwork,transcribed_reviewed,pass6 transcription saved
-111,textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds,localize_text,b88_rework_first_qa_pass_pending_c_d_ingame,transcribed_reviewed,B88 changed SHA after course-description source-cell boundary/residue fix; D82 old-SHA preflight superseded; C/D + in-game required
+111,textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds,localize_text,c82_static_pass_d83_same_sha_pending_d_ingame,transcribed_reviewed,B88 changed-SHA residue fix + C82 strict QA PASS; D83 same-SHA preflight valid; final D + in-game pending
 112,textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 116,textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds,localize_text,c81_static_pass_d82_same_sha_pending_d_ingame_reapproval,transcribed_reviewed,B87 canonical HD DXT5 rebuild + C81 strict QA PASS unchanged; D82 same-SHA preflight valid; final D + in-game reapproval pending; historical low-res approval remains superseded
 119,textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
-121,textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds,localize_text,a87_candidate_b88_first_qa_pass_pending_c_d_ingame,transcribed_reviewed,A87 29 semantic / 29 physical candidate B88 first-QA PASS unchanged; C/D + in-game pending
+121,textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds,localize_text,c82_static_pass_d83_same_sha_pending_d_ingame,transcribed_reviewed,A87/B88 same-SHA + C82 strict QA PASS 29/29; D83 same-SHA preflight valid; final D + in-game pending
 122,textures/load/spr_sprani_splash_cvt_xst/549D375_512x256.dds,preserve_brand_song_credit,preserve_original,not_required,legal/licensing credits; preserve original
 128,textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass7 transcription saved
 130,textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds,localize_text,pending_artwork,transcribed_reviewed,pass7 transcription saved
@@ -110,7 +110,7 @@ index,path,action,artwork_status,transcription_status,notes
 194,textures/load/spr_sprani_sumo_fe_cvt_Exst/9AC75730_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
 195,textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 196,textures/load/spr_sprani_sumo_fe_cvt_Exst/9EF903AF_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
-197,textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds,localize_text,a88_candidate_b89_first_qa_pass_pending_c_d_ingame,transcribed_reviewed,A88 9F060EC1 canonical-HD candidate B89 first-QA PASS unchanged; 5/5; C/D + in-game pending
+197,textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds,localize_text,c82_static_pass_pending_d_ingame,transcribed_reviewed,A88/B89 same-SHA + C82 strict QA PASS 5/5; D + in-game pending; legal/watermark artwork preserved
 198,textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass9 transcription saved
 201,textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass10 transcription saved
 202,textures/load/spr_sprani_sumo_fe_cvt_Exst/AB56F682_512x512.dds,zoom_review,blocked_review,needs_zoom_review,

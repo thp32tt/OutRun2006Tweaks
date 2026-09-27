@@ -883,3 +883,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - A88 binary unchanged by B89. No approval promotion; C/D + in-game screenshot validation remain mandatory.
 - HD migration queue remains 14 ready / 2 remaining. Final two are historical Batch66 CREATE_NEW_HD_KOREAN_ASSET candidates D6DC1380 and 48DEBE77 requiring current-pipeline reconciliation; do not upscale old Korean DDS.
 - No build; VR/FFB untouched. Machine report: localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_FIRST_QA_REPORT.json.
+
+## 2026-09-27 21:15 KST — C82 C075FB49 / FD90AA9 / 9F060EC1 strict QA
+
+- C075FB49 B88 current SHA 9f64a9de... independently compared with canonical HD. The B88 course-description boundary fix removes the prior OutRun2: SP source fragment; 16 semantic / 17 physical mappings match reviewed transcriptions. 2048x2048 RGBA32/1 mip, exact header, 797,758 changed pixels, 0 outside corrected cells and 0 introduced alpha outside.
+- C075 setting-label edge case was explicitly zoom-reviewed: Tuned Setting -> 튜닝 설정 and Normal Setting -> 일반 설정 candidate render reaches the lower source-cell boundary, but complete glyph outlines remain visible and no pixels cross the cell. No clipping/escape observed, so no C repaint was justified.
+- FD90AA9 SHA 72cbf2cc... independently reviewed across all 29 semantic / 29 physical cells. 4096x4096 RGBA32/1 mip, exact header, 3,574,612 changed pixels, 0 outside cells and 0 introduced alpha outside. Maximum Speed/Transmission omissions are present; protected songs/models/speed/player/AT-MT and non-text artwork remain canonical outside cells.
+- 9F060EC1 B89 SHA 39d917ca... independently reviewed: 5/5 labels match reviewed transcription, 2048x2048 RGBA32/1 mip exact header, 62,929 changed pixels, 0 outside 5 cells; alpha changes outside = 0, introduced alpha outside = 0, minimum declared bbox margin 4 px. Row numbers, OM, barcode/legal code and repeating watermark/background remain preserved.
+- Readable/white/gray/raw mirror_y QA for all three found no source-language residue, broken Hangul, clipping/overlap, box escape, seam/black line, opaque box, alpha-halo artifact, resolution degradation, non-text damage or wrong replacement. C82 changed no DDS.
+- C075/FD90 D83 preflights are on the same current SHAs and remain binary-valid; final D reconciliation still follows C. 9F requires D reconciliation. All three remain in-game pending; current lock count stays 0. No build; VR/FFB untouched.
+- Machine report: localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json.

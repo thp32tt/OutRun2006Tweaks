@@ -1,0 +1,361 @@
+{
+  "C075FB49": {
+    "canonical_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
+    "bytes": 16777344,
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "header_128_exact": true,
+    "total_changed_pixels": 797758,
+    "outside_cells_changed_pixels": 0,
+    "introduced_alpha_outside_cells": 0,
+    "raw_orientation": "mirror_y",
+    "min_bbox_margin": 0,
+    "bbox_margins": {
+      "long_distance": [
+        162,
+        25,
+        172,
+        26
+      ],
+      "keep_passing": [
+        41,
+        24,
+        44,
+        25
+      ],
+      "drift": [
+        17,
+        28,
+        18,
+        28
+      ],
+      "maximum_speed": [
+        106,
+        29,
+        115,
+        30
+      ],
+      "transmission": [
+        175,
+        39,
+        188,
+        40
+      ],
+      "dont_crash": [
+        41,
+        32,
+        43,
+        33
+      ],
+      "go_gate": [
+        45,
+        34,
+        47,
+        34
+      ],
+      "for_experts": [
+        50,
+        30,
+        63,
+        30
+      ],
+      "tuned_setting": [
+        8,
+        14,
+        89,
+        0
+      ],
+      "normal_setting": [
+        9,
+        14,
+        108,
+        0
+      ],
+      "new_course_desc": [
+        9,
+        48,
+        9,
+        39
+      ],
+      "original_course_desc": [
+        9,
+        48,
+        9,
+        34
+      ],
+      "conditions": [
+        75,
+        25,
+        82,
+        26
+      ],
+      "random": [
+        65,
+        21,
+        71,
+        21
+      ],
+      "normal_balance": [
+        77,
+        22,
+        83,
+        22
+      ],
+      "more_bgm_1": [
+        48,
+        23,
+        53,
+        23
+      ],
+      "more_bgm_2": [
+        38,
+        23,
+        43,
+        23
+      ]
+    }
+  },
+  "FD90AA9": {
+    "canonical_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+    "bytes": 67108992,
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "header_128_exact": true,
+    "total_changed_pixels": 3574612,
+    "outside_cells_changed_pixels": 0,
+    "introduced_alpha_outside_cells": 0,
+    "raw_orientation": "mirror_y",
+    "min_bbox_margin": 13,
+    "bbox_margins": {
+      "outsp_course": [
+        36,
+        15,
+        36,
+        16
+      ],
+      "out2_course": [
+        57,
+        13,
+        57,
+        13
+      ],
+      "more_engine": [
+        63,
+        24,
+        69,
+        25
+      ],
+      "you": [
+        65,
+        21,
+        69,
+        21
+      ],
+      "gas_pedal": [
+        32,
+        16,
+        41,
+        17
+      ],
+      "run15": [
+        62,
+        16,
+        70,
+        16
+      ],
+      "maximum_speed": [
+        73,
+        19,
+        81,
+        20
+      ],
+      "enter_selection": [
+        94,
+        15,
+        102,
+        16
+      ],
+      "same_conditions": [
+        193,
+        17,
+        203,
+        18
+      ],
+      "transmission2": [
+        154,
+        24,
+        165,
+        24
+      ],
+      "experts_long": [
+        121,
+        22,
+        129,
+        23
+      ],
+      "view_choices": [
+        81,
+        18,
+        87,
+        18
+      ],
+      "for_experts": [
+        28,
+        27,
+        39,
+        28
+      ],
+      "normal_difficult": [
+        75,
+        24,
+        83,
+        25
+      ],
+      "select_game_mode": [
+        156,
+        25,
+        167,
+        26
+      ],
+      "select_car": [
+        227,
+        25,
+        237,
+        26
+      ],
+      "select_course": [
+        189,
+        26,
+        199,
+        26
+      ],
+      "select_music": [
+        265,
+        25,
+        276,
+        26
+      ],
+      "select_transmission": [
+        190,
+        25,
+        201,
+        26
+      ],
+      "shortcut_features": [
+        182,
+        26,
+        197,
+        26
+      ],
+      "selected_sp": [
+        157,
+        31,
+        158,
+        31
+      ],
+      "selected_out2": [
+        132,
+        33,
+        132,
+        33
+      ],
+      "select_car_setting": [
+        125,
+        27,
+        137,
+        27
+      ],
+      "versus_mode": [
+        161,
+        34,
+        162,
+        35
+      ],
+      "gear_change": [
+        42,
+        35,
+        52,
+        35
+      ],
+      "player_battle_desc": [
+        40,
+        16,
+        57,
+        16
+      ],
+      "new_course_desc": [
+        43,
+        44,
+        58,
+        45
+      ],
+      "orig_course_desc": [
+        42,
+        32,
+        60,
+        33
+      ],
+      "random_music": [
+        62,
+        26,
+        91,
+        27
+      ]
+    }
+  },
+  "9F060EC1": {
+    "canonical_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+    "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+    "bytes": 16777344,
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "header_128_exact": true,
+    "total_changed_pixels": 62929,
+    "outside_cells_changed_pixels": 0,
+    "alpha_changed_pixels_total": 61,
+    "alpha_changes_outside_cells": 0,
+    "introduced_alpha_outside_cells": 0,
+    "raw_orientation": "mirror_y",
+    "min_bbox_margin": 4,
+    "bbox_margins": {
+      "license": [
+        9,
+        18,
+        146,
+        19
+      ],
+      "complete": [
+        4,
+        10,
+        140,
+        11
+      ],
+      "vs_rank": [
+        4,
+        11,
+        60,
+        11
+      ],
+      "win_ratio": [
+        5,
+        11,
+        213,
+        11
+      ],
+      "drive_time": [
+        5,
+        10,
+        109,
+        11
+      ]
+    }
+  }
+}

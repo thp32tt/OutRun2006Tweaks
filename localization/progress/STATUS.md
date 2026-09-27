@@ -504,3 +504,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Readable/raw/white/gray QA PASS; protected row numbers, OM, legal/barcode/card/watermark artwork preserved.
 - C/D + in-game pending; approved/user-locked count unchanged.
 - HD queue remains 14 ready / 2 remaining. Next: D6DC1380 current-pipeline reconciliation, then 48DEBE77; both are Batch66 CREATE_NEW_HD_KOREAN_ASSET special cases.
+
+## C82 strict QA — 2026-09-27 21:15 KST
+- **PASS / no DDS change:** C075FB49 B88 current SHA, FD90AA9 A87/B88 SHA, and 9F060EC1 A88/B89 SHA all pass C strict static QA.
+- C075: 16 semantic / 17 physical; B88 source-residue fix confirmed; 2048x2048 RGBA32; outside cells/introduced alpha = 0. Setting-label zero-margin boundary reviewed at high zoom with no observed clipping or escape.
+- FD90: 29/29; 4096x4096 RGBA32; outside cells/introduced alpha = 0; protected songs/models/UI/non-text artwork preserved.
+- 9F: 5/5; 2048x2048 RGBA32; 62,929 changed pixels; outside cells = 0; alpha changes outside = 0; minimum bbox margin = 4 px; legal/barcode/watermark artwork preserved.
+- C075/FD90 D83 preflight remains same-SHA binary-valid; final D reconciliation + in-game still required. 9F requires D + in-game. No promotion/lock; current lock count 0. No build; VR/FFB unchanged.
+- Machine report: localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json.

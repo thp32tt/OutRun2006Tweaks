@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T21:01:48+09:00",
+  "updated_at_kst": "2026-09-27T21:15:10+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "9F060EC1 A88 candidate now B89 first-QA PASS unchanged on 5 semantic / 5 physical regions; C/D + in-game remain. D83 states for reopened P0 trio, FD90AA9 and C075FB49 remain preserved. Final two HD-migration items are historical Batch66 CREATE_NEW_HD_KOREAN_ASSET candidates D6DC1380 then 48DEBE77 and require current-pipeline reconciliation/QA.",
+  "next_checkpoint": "C82 static strict QA PASS: C075FB49 B88 changed SHA and FD90AA9 B88 same SHA both independently pass C; D83 preflights are same current SHAs and remain binary-valid, but final D reconciliation + in-game remain. 9F060EC1 A88/B89 same SHA also passes C82 and now needs D + in-game. Current lock count remains 0. Final Batch66 D6DC1380 then 48DEBE77 require current A/B pipeline reconciliation.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -257,7 +257,7 @@
       "coverage": "5 semantic / 5 physical",
       "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
       "report": "localization/graphics/role_A/20260927-2030-A88/A88_9F060EC1_PRODUCTION_REPORT.json",
-      "status": "B89_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "status": "C82_STATIC_PASS_PENDING_D_INGAME",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
       "preserved": [
         "row numbers 1.-4.",
@@ -266,7 +266,9 @@
         "repeating watermark/background artwork"
       ],
       "b_first_qa_report": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_FIRST_QA_REPORT.json",
-      "candidate_changed_by_B": false
+      "candidate_changed_by_B": false,
+      "c_strict_qa_report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
+      "c_candidate_changed": false
     },
     "next_hd_rework": {
       "asset": "D6DC1380",
@@ -293,31 +295,27 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C81",
-      "report": "localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json",
-      "result": "P0_HD_TRIO_STATIC_STRICT_QA_PASS_PENDING_D_RECONCILE_INGAME_REAPPROVAL",
+      "run": "C82",
+      "report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
+      "result": "ALL_THREE_STATIC_STRICT_QA_PASS_PENDING_D_AND_INGAME",
       "candidate_changed_by_C": false,
-      "current_user_approved_lock_count": 0,
       "assets": {
-        "571E78F3": {
-          "candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
-          "status": "C81_STATIC_PASS_D82_SAME_SHA_PENDING_D_RECONCILE_INGAME_REAPPROVAL",
+        "C075FB49": {
+          "candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
+          "status": "C82_STATIC_PASS_D83_SAME_SHA_PENDING_D_RECONCILE_INGAME",
           "outside_text_cells_changed_pixels": 0,
-          "outside_text_cells_dxt5_blocks_changed": 0,
           "introduced_alpha_outside_text_cells": 0
         },
-        "62BEBF33": {
-          "candidate_sha256": "def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d",
-          "status": "C81_STATIC_PASS_D82_SAME_SHA_PENDING_D_RECONCILE_INGAME_REAPPROVAL",
+        "FD90AA9": {
+          "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+          "status": "C82_STATIC_PASS_D83_SAME_SHA_PENDING_D_RECONCILE_INGAME",
           "outside_text_cells_changed_pixels": 0,
-          "outside_text_cells_dxt5_blocks_changed": 0,
           "introduced_alpha_outside_text_cells": 0
         },
-        "E3FD08BE": {
-          "candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
-          "status": "C81_STATIC_PASS_D82_SAME_SHA_PENDING_D_RECONCILE_INGAME_REAPPROVAL",
+        "9F060EC1": {
+          "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+          "status": "C82_STATIC_PASS_PENDING_D_RECONCILE_INGAME",
           "outside_text_cells_changed_pixels": 0,
-          "outside_text_cells_dxt5_blocks_changed": 0,
           "introduced_alpha_outside_text_cells": 0
         }
       }
@@ -464,6 +462,13 @@
       "result": "FIRST_QA_PASS_PENDING_C_D_INGAME",
       "outside_cells_changed_pixels": 0,
       "alpha_changes_outside_cells": 0
+    },
+    "c82_assets": {
+      "report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
+      "candidate_changed_by_C": false,
+      "C075FB49": "PASS",
+      "FD90AA9": "PASS",
+      "9F060EC1": "PASS"
     }
   },
   "data_build": {

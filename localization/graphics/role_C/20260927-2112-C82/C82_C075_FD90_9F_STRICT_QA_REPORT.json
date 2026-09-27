@@ -1,0 +1,718 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C82",
+  "timestamp_kst": "2026-09-27T21:15:10+09:00",
+  "base_head": "294bb92bafcfa94b05bba1e1dfde8d1d67da3427",
+  "scope": "strict QA of B88 C075FB49 + FD90AA9 and B89 9F060EC1; correction decision; no build; no VR/FFB",
+  "result": "C82_ALL_THREE_STATIC_STRICT_QA_PASS_PENDING_D_AND_INGAME",
+  "candidate_changed_by_C": false,
+  "approved_dds_promotion": false,
+  "current_user_approved_lock_count": 0,
+  "assets": {
+    "C075FB49": {
+      "inputs": {
+        "B88": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json",
+        "D83_preflight": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json"
+      },
+      "canonical_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
+      "candidate_changed_by_C": false,
+      "semantic_entries": 16,
+      "physical_regions": 17,
+      "translations": [
+        {
+          "source": "Long distance",
+          "korean": "장거리"
+        },
+        {
+          "source": "Keep passing the cars!",
+          "korean": "계속 차량을 추월하세요!"
+        },
+        {
+          "source": "Drift!",
+          "korean": "드리프트!"
+        },
+        {
+          "source": "Don't crash!",
+          "korean": "충돌하지 마세요!"
+        },
+        {
+          "source": "Go through the gate!",
+          "korean": "게이트를 통과하세요!"
+        },
+        {
+          "source": "For Experts:",
+          "korean": "상급자용:"
+        },
+        {
+          "source": "Tuned Setting",
+          "korean": "튜닝 설정"
+        },
+        {
+          "source": "Normal Setting",
+          "korean": "일반 설정"
+        },
+        {
+          "source": "A brand new course designed for OutRun2: SP.",
+          "korean": "아웃런2 SP용으로 새롭게 설계된 코스입니다."
+        },
+        {
+          "source": "The course from the original OutRun2.",
+          "korean": "오리지널 아웃런2의 코스입니다."
+        },
+        {
+          "source": "Conditions:",
+          "korean": "조건:"
+        },
+        {
+          "source": "RANDOM",
+          "korean": "무작위"
+        },
+        {
+          "source": "Normal balance",
+          "korean": "일반 밸런스"
+        },
+        {
+          "source": "More BGM",
+          "korean": "BGM 더 많이"
+        },
+        {
+          "source": "Maximum Speed",
+          "korean": "최고 속도"
+        },
+        {
+          "source": "Transmission",
+          "korean": "변속기"
+        }
+      ],
+      "structure": {
+        "canonical_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+        "candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
+        "bytes": 16777344,
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "header_128_exact": true,
+        "total_changed_pixels": 797758,
+        "outside_cells_changed_pixels": 0,
+        "introduced_alpha_outside_cells": 0,
+        "raw_orientation": "mirror_y",
+        "min_bbox_margin": 0,
+        "bbox_margins": {
+          "long_distance": [
+            162,
+            25,
+            172,
+            26
+          ],
+          "keep_passing": [
+            41,
+            24,
+            44,
+            25
+          ],
+          "drift": [
+            17,
+            28,
+            18,
+            28
+          ],
+          "maximum_speed": [
+            106,
+            29,
+            115,
+            30
+          ],
+          "transmission": [
+            175,
+            39,
+            188,
+            40
+          ],
+          "dont_crash": [
+            41,
+            32,
+            43,
+            33
+          ],
+          "go_gate": [
+            45,
+            34,
+            47,
+            34
+          ],
+          "for_experts": [
+            50,
+            30,
+            63,
+            30
+          ],
+          "tuned_setting": [
+            8,
+            14,
+            89,
+            0
+          ],
+          "normal_setting": [
+            9,
+            14,
+            108,
+            0
+          ],
+          "new_course_desc": [
+            9,
+            48,
+            9,
+            39
+          ],
+          "original_course_desc": [
+            9,
+            48,
+            9,
+            34
+          ],
+          "conditions": [
+            75,
+            25,
+            82,
+            26
+          ],
+          "random": [
+            65,
+            21,
+            71,
+            21
+          ],
+          "normal_balance": [
+            77,
+            22,
+            83,
+            22
+          ],
+          "more_bgm_1": [
+            48,
+            23,
+            53,
+            23
+          ],
+          "more_bgm_2": [
+            38,
+            23,
+            43,
+            23
+          ]
+        }
+      },
+      "b88_fix_revalidated": "new_course_desc expanded to x=830; prior source-language residue between course-description cells is absent on current candidate.",
+      "boundary_review": {
+        "tuned_setting": "candidate render reaches source-cell bottom boundary but enlarged visual review shows complete glyphs; no pixels escape the cell.",
+        "normal_setting": "candidate render reaches source-cell bottom boundary but enlarged visual review shows complete glyphs; no pixels escape the cell.",
+        "decision": "PASS_NO_OBSERVED_CLIPPING_OR_ESCAPE"
+      },
+      "visual_qa": {
+        "readable": "PASS",
+        "raw_mirror_y": "PASS",
+        "white_gray": "PASS",
+        "source_residue": "NONE_OBSERVED",
+        "broken_hangul": "NONE_OBSERVED",
+        "clipping_overlap": "NONE_OBSERVED",
+        "cell_escape": "NONE",
+        "resolution_degradation": "NONE_OBSERVED",
+        "black_line_seam": "NONE_OBSERVED",
+        "opaque_box": "NONE_OBSERVED",
+        "alpha_halo": "NONE_OBSERVED",
+        "nontext_damage": "NONE_OBSERVED",
+        "duplicate_wrong_replacement": "NONE_OBSERVED"
+      },
+      "d83_same_sha_preflight_valid": true,
+      "result": "C82_STATIC_STRICT_QA_PASS_D83_SAME_SHA_PENDING_D_RECONCILE_INGAME"
+    },
+    "FD90AA9": {
+      "inputs": {
+        "A87": "localization/graphics/role_A/20260927-1930-A87/A87_FD90AA9_PRODUCTION_REPORT.json",
+        "B88": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json",
+        "D83_preflight": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json"
+      },
+      "canonical_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+      "candidate_changed_by_C": false,
+      "semantic_entries": 29,
+      "physical_regions": 29,
+      "translations": [
+        {
+          "source": "OutRun2SP Course",
+          "korean": "아웃런2 SP 코스"
+        },
+        {
+          "source": "OutRun2 Course",
+          "korean": "아웃런2 코스"
+        },
+        {
+          "source": "More Engine sound",
+          "korean": "엔진음 크게"
+        },
+        {
+          "source": "You",
+          "korean": "나"
+        },
+        {
+          "source": "Gas Pedal :",
+          "korean": "가속 페달:"
+        },
+        {
+          "source": "You will run 15 courses continuously.",
+          "korean": "15코스를 연속으로 달립니다."
+        },
+        {
+          "source": "Maximum Speed",
+          "korean": "최고 속도"
+        },
+        {
+          "source": "Enter Selection",
+          "korean": "선택 확정"
+        },
+        {
+          "source": "Do you want to set up under the same conditions as your former race?",
+          "korean": "이전 레이스와 같은 조건으로 설정하시겠습니까?"
+        },
+        {
+          "source": "Transmission",
+          "korean": "변속기"
+        },
+        {
+          "source": "For Experts & Long distance to the goal",
+          "korean": "상급자용 · 골까지 장거리"
+        },
+        {
+          "source": "View Choices",
+          "korean": "선택 보기"
+        },
+        {
+          "source": "For Experts",
+          "korean": "상급자용"
+        },
+        {
+          "source": "Normal difficult",
+          "korean": "보통 난이도"
+        },
+        {
+          "source": "Select Game Mode",
+          "korean": "게임 모드 선택"
+        },
+        {
+          "source": "Select your car",
+          "korean": "차량 선택"
+        },
+        {
+          "source": "Select Course",
+          "korean": "코스 선택"
+        },
+        {
+          "source": "Select your music",
+          "korean": "음악 선택"
+        },
+        {
+          "source": "Select Transmission",
+          "korean": "변속 방식 선택"
+        },
+        {
+          "source": "Shortcut Features",
+          "korean": "바로가기 기능"
+        },
+        {
+          "source": "Outrun2: SP Course has been selected.",
+          "korean": "아웃런2 SP 코스가 선택되었습니다."
+        },
+        {
+          "source": "Outrun2 Course has been selected.",
+          "korean": "아웃런2 코스가 선택되었습니다."
+        },
+        {
+          "source": "Select car setting",
+          "korean": "차량 설정 선택"
+        },
+        {
+          "source": "Versus Mode.",
+          "korean": "대전 모드"
+        },
+        {
+          "source": "Gear change",
+          "korean": "기어 변속"
+        },
+        {
+          "source": "A course designed for player battle.",
+          "korean": "플레이어 대전을 위해 설계된 코스입니다."
+        },
+        {
+          "source": "A brand new course designed for OutRun2: SP.",
+          "korean": "아웃런2 SP용으로 새롭게 설계된 코스입니다."
+        },
+        {
+          "source": "The course from the original OutRun2.",
+          "korean": "오리지널 아웃런2의 코스입니다."
+        },
+        {
+          "source": "Music will be Randomly Selected.",
+          "korean": "음악이 무작위로 선택됩니다."
+        }
+      ],
+      "structure": {
+        "canonical_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+        "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+        "bytes": 67108992,
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "header_128_exact": true,
+        "total_changed_pixels": 3574612,
+        "outside_cells_changed_pixels": 0,
+        "introduced_alpha_outside_cells": 0,
+        "raw_orientation": "mirror_y",
+        "min_bbox_margin": 13,
+        "bbox_margins": {
+          "outsp_course": [
+            36,
+            15,
+            36,
+            16
+          ],
+          "out2_course": [
+            57,
+            13,
+            57,
+            13
+          ],
+          "more_engine": [
+            63,
+            24,
+            69,
+            25
+          ],
+          "you": [
+            65,
+            21,
+            69,
+            21
+          ],
+          "gas_pedal": [
+            32,
+            16,
+            41,
+            17
+          ],
+          "run15": [
+            62,
+            16,
+            70,
+            16
+          ],
+          "maximum_speed": [
+            73,
+            19,
+            81,
+            20
+          ],
+          "enter_selection": [
+            94,
+            15,
+            102,
+            16
+          ],
+          "same_conditions": [
+            193,
+            17,
+            203,
+            18
+          ],
+          "transmission2": [
+            154,
+            24,
+            165,
+            24
+          ],
+          "experts_long": [
+            121,
+            22,
+            129,
+            23
+          ],
+          "view_choices": [
+            81,
+            18,
+            87,
+            18
+          ],
+          "for_experts": [
+            28,
+            27,
+            39,
+            28
+          ],
+          "normal_difficult": [
+            75,
+            24,
+            83,
+            25
+          ],
+          "select_game_mode": [
+            156,
+            25,
+            167,
+            26
+          ],
+          "select_car": [
+            227,
+            25,
+            237,
+            26
+          ],
+          "select_course": [
+            189,
+            26,
+            199,
+            26
+          ],
+          "select_music": [
+            265,
+            25,
+            276,
+            26
+          ],
+          "select_transmission": [
+            190,
+            25,
+            201,
+            26
+          ],
+          "shortcut_features": [
+            182,
+            26,
+            197,
+            26
+          ],
+          "selected_sp": [
+            157,
+            31,
+            158,
+            31
+          ],
+          "selected_out2": [
+            132,
+            33,
+            132,
+            33
+          ],
+          "select_car_setting": [
+            125,
+            27,
+            137,
+            27
+          ],
+          "versus_mode": [
+            161,
+            34,
+            162,
+            35
+          ],
+          "gear_change": [
+            42,
+            35,
+            52,
+            35
+          ],
+          "player_battle_desc": [
+            40,
+            16,
+            57,
+            16
+          ],
+          "new_course_desc": [
+            43,
+            44,
+            58,
+            45
+          ],
+          "orig_course_desc": [
+            42,
+            32,
+            60,
+            33
+          ],
+          "random_music": [
+            62,
+            26,
+            91,
+            27
+          ]
+        }
+      },
+      "protected_original": [
+        "Risky Ride",
+        "PASSING BREEZE",
+        "Night Flight",
+        "MAGICAL SOUND SHOWER",
+        "Life Was a Bore",
+        "Shiny World",
+        "RANDOM",
+        "SPLASH WAVE",
+        "250GTO",
+        "512BB",
+        "300km/h",
+        "293km/h",
+        "4P",
+        "3P",
+        "5 AT/MT",
+        "6 AT/MT",
+        "route/map artwork",
+        "speech bubble",
+        "equalizer artwork",
+        "road/vehicle icons"
+      ],
+      "visual_qa": {
+        "readable": "PASS",
+        "raw_mirror_y": "PASS",
+        "white_gray": "PASS",
+        "source_residue": "NONE_OBSERVED",
+        "broken_hangul": "NONE_OBSERVED",
+        "clipping_overlap": "NONE_OBSERVED",
+        "cell_escape": "NONE",
+        "resolution_degradation": "NONE_OBSERVED",
+        "black_line_seam": "NONE_OBSERVED",
+        "opaque_box": "NONE_OBSERVED",
+        "alpha_halo": "NONE_OBSERVED",
+        "nontext_damage": "NONE_OBSERVED",
+        "duplicate_wrong_replacement": "NONE_OBSERVED"
+      },
+      "d83_same_sha_preflight_valid": true,
+      "result": "C82_STATIC_STRICT_QA_PASS_D83_SAME_SHA_PENDING_D_RECONCILE_INGAME"
+    },
+    "9F060EC1": {
+      "inputs": {
+        "A88": "localization/graphics/role_A/20260927-2030-A88/A88_9F060EC1_PRODUCTION_REPORT.json",
+        "B89": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_FIRST_QA_REPORT.json"
+      },
+      "canonical_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+      "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+      "candidate_changed_by_C": false,
+      "semantic_entries": 5,
+      "physical_regions": 5,
+      "translations": [
+        {
+          "source": "OUTRUN LICENSE",
+          "korean": "아웃런 라이선스"
+        },
+        {
+          "source": "COMPLETE",
+          "korean": "달성률"
+        },
+        {
+          "source": "VS RANK",
+          "korean": "VS 랭크"
+        },
+        {
+          "source": "WIN RATIO",
+          "korean": "승률"
+        },
+        {
+          "source": "DRIVE TIME",
+          "korean": "주행 시간"
+        }
+      ],
+      "structure": {
+        "canonical_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+        "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+        "bytes": 16777344,
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "header_128_exact": true,
+        "total_changed_pixels": 62929,
+        "outside_cells_changed_pixels": 0,
+        "alpha_changed_pixels_total": 61,
+        "alpha_changes_outside_cells": 0,
+        "introduced_alpha_outside_cells": 0,
+        "raw_orientation": "mirror_y",
+        "min_bbox_margin": 4,
+        "bbox_margins": {
+          "license": [
+            9,
+            18,
+            146,
+            19
+          ],
+          "complete": [
+            4,
+            10,
+            140,
+            11
+          ],
+          "vs_rank": [
+            4,
+            11,
+            60,
+            11
+          ],
+          "win_ratio": [
+            5,
+            11,
+            213,
+            11
+          ],
+          "drive_time": [
+            5,
+            10,
+            109,
+            11
+          ]
+        }
+      },
+      "protected_original": [
+        "row numbers 1.-4.",
+        "OM",
+        "barcode/legal-code block",
+        "repeating OUTRUN LICENSE watermark/background artwork",
+        "frame/panel artwork"
+      ],
+      "visual_qa": {
+        "readable": "PASS",
+        "raw_mirror_y": "PASS",
+        "white_gray": "PASS",
+        "source_residue": "NONE_OBSERVED",
+        "broken_hangul": "NONE_OBSERVED",
+        "clipping_overlap": "NONE_OBSERVED",
+        "cell_escape": "NONE",
+        "resolution_degradation": "NONE_OBSERVED",
+        "black_line_seam": "NONE_OBSERVED",
+        "opaque_box": "NONE_OBSERVED",
+        "alpha_halo": "NONE_OBSERVED",
+        "watermark_legal_artwork_damage": "NONE_OBSERVED",
+        "duplicate_wrong_replacement": "NONE_OBSERVED"
+      },
+      "result": "C82_STATIC_STRICT_QA_PASS_PENDING_D_RECONCILE_INGAME"
+    }
+  },
+  "in_game_validation": "NOT_PERFORMED",
+  "qa_artifacts": {
+    "C075_readable": "localization/graphics/role_C/20260927-2112-C82/C82_C075FB49_READABLE_COMPARE.jpg",
+    "C075_raw": "localization/graphics/role_C/20260927-2112-C82/C82_C075FB49_RAW_COMPARE.jpg",
+    "C075_tuned_boundary": "localization/graphics/role_C/20260927-2112-C82/C82_C075_TUNED_SETTING_BOUNDARY_ZOOM.jpg",
+    "C075_normal_boundary": "localization/graphics/role_C/20260927-2112-C82/C82_C075_NORMAL_SETTING_BOUNDARY_ZOOM.jpg",
+    "FD90_readable": "localization/graphics/role_C/20260927-2112-C82/C82_FD90AA9_READABLE_COMPARE.jpg",
+    "FD90_raw": "localization/graphics/role_C/20260927-2112-C82/C82_FD90AA9_RAW_COMPARE.jpg",
+    "9F_cells": "localization/graphics/role_C/20260927-2112-C82/C82_9F060EC1_CELLS.jpg",
+    "9F_readable": "localization/graphics/role_C/20260927-2112-C82/C82_9F060EC1_READABLE_COMPARE.jpg",
+    "9F_raw": "localization/graphics/role_C/20260927-2112-C82/C82_9F060EC1_RAW_COMPARE.jpg"
+  },
+  "next": [
+    "Run D final reconciliation for C075FB49 and FD90AA9 using current same SHA after C82.",
+    "Run D first/final reconciliation for 9F060EC1 after C82.",
+    "Mandatory in-game screenshots remain required before any promotion/approval.",
+    "Do not process D6DC1380/48DEBE77 in C until current A/B handoff is ready."
+  ],
+  "build_performed": false,
+  "vr_ffb_changes": false
+}

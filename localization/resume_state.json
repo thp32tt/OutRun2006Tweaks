@@ -1,5 +1,5 @@
 {
-  "schema_version": 47,
+  "schema_version": 48,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,8 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "APPROVAL STATE: current user-approved lock count remains 0. D83 states for reopened P0 trio, FD90AA9 and C075FB49 remain unchanged and still require their pending C/D/in-game gates.",
-    "HD GRAPHICS: 9F060EC1 A88 candidate passes B89 first QA unchanged; C/D + in-game pending. No REWORK_FROM_HD_BASE entries remain. Reconcile historical Batch66 CREATE_NEW_HD_KOREAN_ASSET candidate D6DC1380 first, then 48DEBE77, against current A/B/C/D rules; never upscale prior Korean DDS.",
+    "APPROVAL STATE: current user-approved lock count remains 0. C075FB49, FD90AA9 and 9F060EC1 now pass C82 static strict QA; no DDS was changed by C. C075/FD90 D83 preflights are same-SHA binary-valid; all three still require final D reconciliation and mandatory in-game validation before approval.",
+    "HD GRAPHICS: 9F060EC1 A88/B89/C82 static pass pending D + in-game. No REWORK_FROM_HD_BASE entries remain; reconcile Batch66 D6DC1380 first, then 48DEBE77, through current A/B/C/D rules.",
     "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
     "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
     "Never upscale prior stock-resolution Korean DDS candidates.",
@@ -127,7 +127,7 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_FIRST_QA_REPORT.json",
+    "latest_hd_rework_batch": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
     "hd_rework_candidates_ready": 14,
     "hd_rework_remaining": 2,
     "hd_partial_rework": {
@@ -320,7 +320,7 @@
         "d_final_qa_report": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json"
       },
       "C075FB49": {
-        "status": "D83_PREFLIGHT_PASS_PENDING_C_INGAME",
+        "status": "C82_STATIC_PASS_D83_SAME_SHA_PENDING_D_RECONCILE_INGAME",
         "candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
         "completed_transcription_entries": 16,
@@ -341,10 +341,13 @@
           1370,
           830,
           1620
-        ]
+        ],
+        "c_strict_qa_report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
+        "c_candidate_changed": false,
+        "d83_same_sha_binary_preflight_valid": true
       },
       "FD90AA9": {
-        "status": "D83_PREFLIGHT_PASS_PENDING_C_INGAME",
+        "status": "C82_STATIC_PASS_D83_SAME_SHA_PENDING_D_RECONCILE_INGAME",
         "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
         "completed_transcription_entries": 29,
@@ -364,10 +367,13 @@
         "in_game_validation": "PENDING",
         "b_first_qa_report": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json",
         "candidate_changed_by_B": false,
-        "d_preflight_report": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json"
+        "d_preflight_report": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json",
+        "c_strict_qa_report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
+        "c_candidate_changed": false,
+        "d83_same_sha_binary_preflight_valid": true
       },
       "9F060EC1": {
-        "status": "B89_FIRST_QA_PASS_PENDING_C_D_INGAME",
+        "status": "C82_STATIC_PASS_PENDING_D_RECONCILE_INGAME",
         "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
         "canonical_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
@@ -378,7 +384,9 @@
         "b_first_qa_report": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_FIRST_QA_REPORT.json",
         "candidate_changed_by_B": false,
         "in_game_validation": "PENDING",
-        "raw_orientation": "mirror_y"
+        "raw_orientation": "mirror_y",
+        "c_strict_qa_report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
+        "c_candidate_changed": false
       }
     },
     "a76_ff2462bb": {
@@ -390,7 +398,7 @@
       "status": "PENDING_B_C_D_STRICT_QA"
     },
     "latest_d_final_qa_report": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json",
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
     "c77_fa7bbb13": {
       "timestamp_kst": "2026-09-27T14:05:02+09:00",
       "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
@@ -512,6 +520,17 @@
         "E3FD08BE": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc"
       },
       "result": "STATIC_STRICT_QA_PASS_PENDING_D_RECONCILE_INGAME_REAPPROVAL"
+    },
+    "c82_assets": {
+      "timestamp_kst": "2026-09-27T21:15:10+09:00",
+      "report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
+      "candidate_changed_by_C": false,
+      "assets": {
+        "C075FB49": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
+        "FD90AA9": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+        "9F060EC1": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60"
+      },
+      "result": "STATIC_STRICT_QA_PASS_PENDING_D_AND_INGAME"
     }
   },
   "runtime_packages": {

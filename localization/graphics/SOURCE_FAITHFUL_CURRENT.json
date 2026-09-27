@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-27T20:14:16+09:00",
+  "updated_at_kst": "2026-09-27T21:15:10+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -117,7 +117,7 @@
     "old_candidates": "historical_until_rebuilt_or_revalidated_against_HD"
   },
   "latest_d_final_qa_report": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json",
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
   "post_d78_c78_update": {
     "asset": "39229D64",
     "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
@@ -217,5 +217,16 @@
     "C075FB49": "D83_PREFLIGHT_PASS_PENDING_C_INGAME",
     "current_approved_lock_count": 0,
     "report": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json"
+  },
+  "post_d83_c82_update": {
+    "result": "C075_FD90_9F_C82_STATIC_PASS_PENDING_D_INGAME",
+    "candidate_changed_by_C": false,
+    "current_approved_lock_count": 0,
+    "assets": {
+      "C075FB49": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
+      "FD90AA9": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+      "9F060EC1": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60"
+    },
+    "note": "C82 independently revalidated B88 C075/FD90 and B89 9F. C075/FD90 D83 preflight is same-SHA valid; all require final D/in-game; no promotion."
   }
 }
