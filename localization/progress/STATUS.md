@@ -245,3 +245,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Static visual QA: no clipping/overlap/box escape or edit artifacts observed; 17 translations and shared terminology checked.
 - 39229D64 visual omission review expanded transcription from 2 to 13 semantic strings / 14 expected physical occurrences; canonical-HD artwork remains pending.
 - Next production target: 39229D64.
+
+## D76 final QA checkpoint — 2026-09-27 13:19 KST
+- FA7BBB13: A81 PASS, B82 PASS, D76 independent static/raw/readable QA PASS; HOLD_PENDING_C_AND_INGAME.
+- FF2462BB: D74 static PASS, still pending in-game validation.
+- 568D3696: D75 static PASS, still pending in-game validation and Hit the zippers! context confirmation.
+- approved_dds: unchanged at 3 USER_APPROVED_LOCKED assets; all three hashes reverified.
+- D76 containment: FA7 changed pixels outside 17 source cells = 0; introduced alpha outside = 0; header/dimensions/format/mips/orientation preserved.
+- VR/FFB contamination check: PASS; no matching source diff and no merge commit since clean upstream base.
+- No build performed. Report: localization/graphics/role_D/20260927-1319-D76/D76_FA7BBB13_FINAL_QA_HOLD_REPORT.json.
+- Next gate: current C strict QA for FA7BBB13 + in-game screenshot validation before promotion; 39229D64 remains the next production target.

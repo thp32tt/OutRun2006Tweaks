@@ -542,3 +542,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - No clipping, overlap, source-English residue in replaced cells, seam, opaque box, black line, or alpha halo observed in static visual QA. In-game validation remains pending, so no approved promotion was made.
 - Additional B production review found 39229D64 pass1 transcription incomplete. Expanded it from 2 to 13 semantic strings (14 expected physical occurrences); names/rank letters/ordinal suffixes/key legends/numeric glyphs remain preserved.
 - Next: render 39229D64 directly on the canonical 4096×4096 HD DDS; C/D gates still required for FA7BBB13. No VR/FFB source touched and no build was run.
+
+## 2026-09-27 13:19 KST — D76 final QA / approval hold
+
+- Re-read the mandatory localization policy/state files on latest remote HEAD a8d6a10 and included new B82 evidence.
+- Existing USER_APPROVED_LOCKED DDS (571E78F3, 62BEBF33, E3FD08BE) were hash-verified unchanged; approved_dds receives no new file in this run.
+- FF2462BB remains D74 STATIC_QA_PASS_PENDING_INGAME. 568D3696 remains D75 STATIC_QA_PASS_PENDING_INGAME; its Hit the zippers! wording still requires runtime-context confirmation.
+- FA7BBB13: A81 production PASS + B82 first QA PASS. D76 independently rechecked canonical/candidate SHA-256, 4096x2048 RGBA32/1 mip, exact 128-byte header, mirror_y raw orientation, readable orientation, and all 17 text cells.
+- FA7BBB13 changed pixels outside the 17 source text cells = 0; introduced alpha outside = 0; no clipping/overlap/box escape, source-English residue, black seam, opaque box, or obvious alpha halo was observed in raw/readable review.
+- Final approval is held because no current C strict-QA result exists for FA7BBB13 and mandatory in-game screenshot validation has not been performed.
+- Clean-base diff check found no VR/FFB/force-feedback source change and no merge commit since upstream base 08e5efb4.
+- Build was not run.
+- Report: localization/graphics/role_D/20260927-1319-D76/D76_FA7BBB13_FINAL_QA_HOLD_REPORT.json.

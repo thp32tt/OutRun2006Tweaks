@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T13:10:35+09:00",
+  "updated_at_kst": "2026-09-27T13:19:13+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "FA7BBB13 A81 candidate passed B82 first QA; C/D and in-game validation remain. 39229D64 transcription was expanded by B82 from 2 to 13 semantic strings and is the next canonical-HD render target.",
+  "next_checkpoint": "FA7BBB13 passed A81/B82 and D76 independent static/raw/readable QA, but approval is held pending current C strict QA and in-game screenshot validation. approved_dds remains the three user-approved locked assets. 39229D64 is the next canonical-HD production target.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -257,15 +257,22 @@
       "coverage": "17/17",
       "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
       "report": "localization/graphics/role_A/20260927-1257-A81/A81_FA7BBB13_PRODUCTION_REPORT.json",
-      "status": "B_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "status": "D_STATIC_REVALIDATED_HOLD_PENDING_C_INGAME",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
-      "b_first_qa_report": "localization/graphics/role_B/20260927-1310-B82/B82_FA7BBB13_FIRST_QA_AND_39229D64_TRANSCRIPTION.json"
+      "b_first_qa_report": "localization/graphics/role_B/20260927-1310-B82/B82_FA7BBB13_FIRST_QA_AND_39229D64_TRANSCRIPTION.json",
+      "d_final_qa_report": "localization/graphics/role_D/20260927-1319-D76/D76_FA7BBB13_FINAL_QA_HOLD_REPORT.json"
     },
     "next_hd_rework": {
       "asset": "39229D64",
       "transcription_segments": 13,
       "expected_physical_text_occurrences": 14,
       "status": "READY_FOR_CANONICAL_HD_RENDER"
+    },
+    "latest_d_final_qa": {
+      "run": "D76",
+      "report": "localization/graphics/role_D/20260927-1319-D76/D76_FA7BBB13_FINAL_QA_HOLD_REPORT.json",
+      "result": "NO_NEW_APPROVALS",
+      "approved_dds_count": 3
     }
   },
   "data_build": {

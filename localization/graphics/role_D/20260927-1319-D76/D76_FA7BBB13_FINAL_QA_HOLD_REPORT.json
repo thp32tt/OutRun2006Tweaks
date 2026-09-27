@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "role": "D",
+  "run": "D76",
+  "timestamp_kst": "2026-09-27T13:19:13+09:00",
+  "base_head": "a8d6a10a709b9e5c5929774de7a30b703dc0ad96",
+  "scope": "final QA and approval decision only; no build",
+  "approved_dds_changes": [],
+  "locked_approved_dds": {
+    "result": "PASS_UNCHANGED",
+    "assets": [
+      "571E78F3_512x64.dds",
+      "62BEBF33_512x64.dds",
+      "E3FD08BE_512x64.dds"
+    ]
+  },
+  "reviewed_candidates": {
+    "FF2462BB": {
+      "candidate_sha256": "c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c",
+      "prior_gate": "D74_STATIC_QA_PASS_PENDING_INGAME",
+      "result": "HOLD_PENDING_INGAME",
+      "promotion": false,
+      "reason": "Mandatory in-game validation is not present."
+    },
+    "568D3696": {
+      "candidate_sha256": "be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c",
+      "prior_gate": "D75_STATIC_QA_PASS_PENDING_INGAME",
+      "result": "HOLD_PENDING_INGAME",
+      "promotion": false,
+      "context_followup": "Hit the zippers! -> 지퍼를 맞히세요! requires in-game context confirmation."
+    },
+    "FA7BBB13": {
+      "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
+      "canonical_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+      "A81": "PASS_PRODUCTION",
+      "B82": "PASS_FIRST_QA",
+      "C_current": "MISSING_FOR_FA7BBB13_AT_D76",
+      "d_independent_static_checks": {
+        "dimensions": [
+          4096,
+          2048
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "file_size_bytes": 33554560,
+        "dds_header_128_exact_canonical": true,
+        "changed_pixels": 1054544,
+        "outside_17_text_cells_changed_pixels": 0,
+        "introduced_alpha_outside_17_text_cells": 0,
+        "all_declared_candidate_alpha_bboxes_within_source_cells": true,
+        "raw_orientation": "mirror_y",
+        "raw_orientation_visual_qa": "PASS",
+        "readable_orientation_visual_qa": "PASS",
+        "visible_source_english_residue_in_replaced_cells": "NONE_OBSERVED",
+        "clipping_overlap_box_escape": "NONE_OBSERVED",
+        "edit_artifacts": "NONE_OBSERVED",
+        "protected_brand_model_song_legal_text_touched": false
+      },
+      "meaning_context_terms": "PASS_STATIC_REVIEW",
+      "result": "HOLD_PENDING_C_AND_INGAME",
+      "promotion": false,
+      "reason": "B passed and D independent static/raw/readable QA passed, but current C strict QA and mandatory in-game validation are absent."
+    }
+  },
+  "domain_isolation": {
+    "upstream_base": "08e5efb4deea4066c440307ec009c868a30562d3",
+    "vr_ffb_source_diff_matches": [],
+    "hooks_forcefeedback_diff": "NONE",
+    "merge_commits_since_base": [],
+    "result": "PASS_NO_VR_FFB_MIX"
+  },
+  "build_performed": false,
+  "final_decision": "NO_NEW_APPROVALS",
+  "next": "Run C strict QA for FA7BBB13, then in-game screenshot validation before any approved_dds promotion. 39229D64 may continue as the next production asset independently."
+}
