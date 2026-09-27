@@ -111,6 +111,8 @@ Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'ExpectedProvider') 'sel
 Assert-True ($text['Analyze-OutRunVRSession.ps1'] -match 'DXVK_PROVIDER_EX_CREATEDEVICE_STALL') 'analyzer must flag provider-local Ex startup stalls'
 Assert-True ($text['Analyze-OutRunVRSession.ps1'] -match 'DX12_PROVIDER_IDENTITY_MISMATCH') 'analyzer must reject dx12 labels without D3D9On12 evidence'
 Assert-True ($text['Analyze-OutRunVRSession.ps1'] -match 'STARTUP_NO_FRAME') 'analyzer must flag non-2D zero-activity startup failures'
+Assert-True ($text['Analyze-OutRunVRSession.ps1'] -match 'Rank46DirectHits') 'analyzer must summarize direct 4th+ rank ownership'
+Assert-True ($text['Analyze-OutRunVRSession.ps1'] -match 'R59_RANK46_PROJECTED_OWNER_NOT_REACHED') 'analyzer must flag R59 rank ownership regressions'
 Assert-True ($text['OutRunVR-Test-Selector.ps1'] -notmatch 'R56_01_ZERO') 'R57 GUI must not waste user tests on the old redundant R55/R56 baseline matrix'
 Assert-True (-not (Test-Path (Join-Path $root 'OutRunVR-Backend-Selector.ps1'))) 'obsolete backend GUI selector must stay removed'
 Assert-True (-not (Test-Path (Join-Path $root 'OutRunVR-Slot-Selector.ps1'))) 'obsolete slot GUI selector must stay removed'
