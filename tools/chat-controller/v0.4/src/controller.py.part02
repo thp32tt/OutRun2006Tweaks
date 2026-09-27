@@ -168,13 +168,11 @@ async def replace_with_fresh_slot_page(context: BrowserContext, pages: dict[str,
 
 
 def prompt_for_slot(slot: Slot, phase: str) -> str:
-    """Dedicated browser-chat roles: A/B/C/D localization, E Git sync."""
+    """Three-stage localization cycle: A production, B exhaustive rework QA, C final approval/sync."""
     role_prompts = {
         "A": "localization_A.md",
         "B": "localization_B.md",
         "C": "localization_C.md",
-        "D": "localization_D.md",
-        "E": "localization_git_sync.md",
     }
     return read_prompt(role_prompts.get(slot.name, "localization_A.md"))
 
