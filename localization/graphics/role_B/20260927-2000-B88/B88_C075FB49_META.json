@@ -1,0 +1,71 @@
+{
+  "canonical_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+  "superseded_a86_sha256": "d310c7da75c4efe7959ec28b7e5125208d37483052b4e5c56c54cc0d4f16e3c1",
+  "candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "format": "RGBA32",
+  "mipmaps": 1,
+  "raw_orientation": "mirror_y",
+  "candidate_changed_by_B": true,
+  "b88_reworked_cells": [
+    "new_course_desc",
+    "original_course_desc"
+  ],
+  "changes_vs_a86_outside_two_description_cells": 0,
+  "outside_all_17_cells_changed_pixels": 0,
+  "introduced_alpha_outside_17_cells": 0,
+  "finding": "residual source title/English fragment in course-description area",
+  "renders": {
+    "new_course_desc": [
+      {
+        "text": "아웃런2 SP용으로 새롭게",
+        "font_size": 76,
+        "scale": 0.7141,
+        "bbox": [
+          234,
+          1418,
+          821,
+          1477
+        ]
+      },
+      {
+        "text": "설계된 코스입니다.",
+        "font_size": 82,
+        "scale": 0.8827,
+        "bbox": [
+          234,
+          1503,
+          821,
+          1581
+        ]
+      }
+    ],
+    "original_course_desc": [
+      {
+        "text": "오리지널 아웃런2의",
+        "font_size": 76,
+        "scale": 0.711,
+        "bbox": [
+          839,
+          1418,
+          1299,
+          1477
+        ]
+      },
+      {
+        "text": "코스입니다.",
+        "font_size": 82,
+        "scale": 1.0,
+        "bbox": [
+          861,
+          1498,
+          1277,
+          1586
+        ]
+      }
+    ]
+  }
+}

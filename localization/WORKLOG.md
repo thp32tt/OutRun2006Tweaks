@@ -831,3 +831,17 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Original orange/navy/white-glow style family is preserved. C81 changed no DDS, so D82 same-SHA binary preflight remains valid.
 - Final D reconciliation + mandatory in-game screenshot reapproval remain; current approved lock count stays 0. Build not run; VR/FFB untouched. C075FB49 remains outside C81 until B first QA completes.
 - Machine report: localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json.
+
+
+## 2026-09-27 20:11 KST — B88 C075FB49 rework + FD90AA9 first QA
+
+- Rebased B work onto latest remote HEAD 4f2b295, preserving A87 FD90AA9 production and C81 P0-trio strict-QA state. GPT Library was not used.
+- C075FB49 A86 candidate d310c7da... failed B artifact QA: enlarged source/candidate comparison exposed a residual blue/white source-text fragment between the two course-description cells.
+- Canonical-coordinate analysis confirmed the A86 first description cell ended at x=770 while the final OutRun2: SP. source glyph extends through x=829 (nontransparent source pixels observed x=788..829, y=1544..1596). This was a source-cell boundary defect, not a translation change.
+- B88 expanded new_course_desc from [225,1370,770,1620] to [225,1370,830,1620], kept original_course_desc at [830,1370,1308,1620], cleared/re-rendered only those two description regions, and removed the residue.
+- New C075FB49 SHA: 9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9. 2048×2048 RGBA32 / 1 mip / exact canonical header / raw mirror_y; changes vs A86 outside the two description regions = 0; against canonical, changes and introduced alpha outside the corrected 17 text cells = 0. Readable/raw/white-background QA PASS after rework.
+- D82's C075 preflight was on superseded A86 SHA d310c7da75c4efe7959ec28b7e5125208d37483052b4e5c56c54cc0d4f16e3c1; the new B88 SHA requires fresh C/D validation plus mandatory in-game screenshot QA.
+- FD90AA9 A87 candidate 72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445: B88 independent first QA PASS unchanged. B independently verified the A87 27 -> 29 omission recovery (Maximum Speed -> 최고 속도, standalone Transmission -> 변속기), all 29 semantic/29 physical mappings, exact 4096×4096 RGBA32/1-mip header, raw mirror_y, 3,574,612 changed pixels, 0 changes and 0 introduced alpha outside the 29 declared cells.
+- FD90 readable/raw/white/gray review found no new clipping, overlap, source-language residue, box escape, seam/black line, opaque box or obvious alpha halo. Canonical black alpha mask/shadow artwork outside declared cells remains untouched; song titles, Ferrari model names, speed/player/AT-MT labels and non-text artwork remain preserved.
+- No approved_dds promotion, no build, no VR/FFB work. Next production target: 9F060EC1 (5 reviewed segments).
+- Machine report: localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json.

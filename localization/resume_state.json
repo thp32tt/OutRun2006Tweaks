@@ -1,5 +1,5 @@
 {
-  "schema_version": 44,
+  "schema_version": 45,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -8,7 +8,7 @@
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
     "APPROVAL STATE: current user-approved lock count remains 0. Historical 512x64 approvals 571E78F3/62BEBF33/E3FD08BE are audit/reference only; their B87 2048x256 DXT5 HD rebuilds now pass C81 strict QA unchanged and D82 same-SHA preflight remains valid. Final D reconciliation + in-game screenshot reapproval are mandatory before any new lock.",
-    "HD GRAPHICS: FD90AA9 A87 production complete after 27->29 omission recovery (Maximum Speed/Transmission); pending B/C/D + in-game. Preserve D82/C80/B87/C075 states; next production target is 9F060EC1 canonical-HD rebuild (5 reviewed segments).",
+    "HD GRAPHICS: C075FB49 B88 changed-SHA rework passes B first QA after correcting undersized course-description source cell; old D82 preflight is superseded and C/D + in-game must rerun. FD90AA9 A87 SHA passes B88 first QA unchanged; C/D + in-game pending. Next production target: 9F060EC1 (5 reviewed segments).",
     "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
     "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
     "Never upscale prior stock-resolution Korean DDS candidates.",
@@ -127,7 +127,7 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json",
+    "latest_hd_rework_batch": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json",
     "hd_rework_candidates_ready": 13,
     "hd_rework_remaining": 3,
     "hd_partial_rework": {
@@ -317,8 +317,8 @@
         "d82_same_sha_binary_preflight_valid": true
       },
       "C075FB49": {
-        "status": "D82_PREFLIGHT_PASS_PENDING_B_C_INGAME",
-        "candidate_sha256": "d310c7da75c4efe7959ec28b7e5125208d37483052b4e5c56c54cc0d4f16e3c1",
+        "status": "B88_REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
+        "candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
         "completed_transcription_entries": 16,
         "localized_regions": 17,
@@ -328,10 +328,20 @@
         },
         "report": "localization/graphics/role_A/20260927-1830-A86/A86_C075FB49_PRODUCTION_REPORT.json",
         "in_game_validation": "PENDING",
-        "d_preflight_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json"
+        "d_preflight_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json",
+        "b_first_qa_report": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json",
+        "candidate_changed_by_B": true,
+        "superseded_a86_sha256": "d310c7da75c4efe7959ec28b7e5125208d37483052b4e5c56c54cc0d4f16e3c1",
+        "d82_preflight_status": "SUPERSEDED_BY_B88_CHANGED_SHA_REVALIDATION_REQUIRED",
+        "corrected_new_course_desc_cell": [
+          225,
+          1370,
+          830,
+          1620
+        ]
       },
       "FD90AA9": {
-        "status": "A87_PRODUCTION_COMPLETE_PENDING_B_C_D",
+        "status": "B88_FIRST_QA_PASS_PENDING_C_D_INGAME",
         "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
         "completed_transcription_entries": 29,
@@ -348,7 +358,9 @@
           }
         ],
         "report": "localization/graphics/role_A/20260927-1930-A87/A87_FD90AA9_PRODUCTION_REPORT.json",
-        "in_game_validation": "PENDING"
+        "in_game_validation": "PENDING",
+        "b_first_qa_report": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json",
+        "candidate_changed_by_B": false
       }
     },
     "a76_ff2462bb": {
@@ -861,7 +873,9 @@
     "white_background_alpha_qa": "PASS",
     "concurrent_c80_preserved": true,
     "concurrent_b87_p0_trio_preserved": true,
-    "status": "PENDING_B_C_D_STRICT_QA"
+    "status": "SUPERSEDED_BY_B88_CHANGED_SHA",
+    "b88_candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
+    "b88_report": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json"
   },
   "d82_final_qa": {
     "timestamp_kst": "2026-09-27T19:19:40+09:00",
@@ -896,6 +910,32 @@
       "Maximum Speed -> 최고 속도",
       "Transmission -> 변속기"
     ],
-    "status": "PENDING_B_C_D_STRICT_QA"
+    "status": "B88_FIRST_QA_PASS_PENDING_C_D_INGAME",
+    "b_first_qa_report": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json"
+  },
+  "b88_c075fb49_fd90aa9": {
+    "timestamp_kst": "2026-09-27T20:11:31+09:00",
+    "report": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json",
+    "C075FB49": {
+      "canonical_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "superseded_a86_sha256": "d310c7da75c4efe7959ec28b7e5125208d37483052b4e5c56c54cc0d4f16e3c1",
+      "candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
+      "candidate_changed_by_B": true,
+      "corrected_new_course_desc_cell": [
+        225,
+        1370,
+        830,
+        1620
+      ],
+      "result": "REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "d82_preflight": "SUPERSEDED_BY_B88_CHANGED_SHA"
+    },
+    "FD90AA9": {
+      "canonical_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+      "candidate_changed_by_B": false,
+      "result": "FIRST_QA_PASS_PENDING_C_D_INGAME"
+    },
+    "next_asset": "9F060EC1"
   }
 }

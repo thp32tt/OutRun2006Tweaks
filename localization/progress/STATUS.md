@@ -467,3 +467,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Readable black/white + raw QA found no omission, source residue, broken Hangul, clipping/overlap, seam/black line, opaque box, alpha-halo artifact, resolution loss, non-text damage or wrong replacement.
 - D82 same-SHA preflight remains binary-valid; final D reconciliation + in-game screenshot reapproval remain. Historical low-res approvals stay superseded; current lock count = 0. A87 FD90AA9 progress preserved.
 - Machine report: localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json. No build; VR/FFB unchanged.
+
+
+## B88 checkpoint — 2026-09-27 20:11 KST
+
+- C075FB49: B88 found/fixed A86 course-description source-cell boundary residue. New SHA 9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9; 16 semantic / 17 physical; 2048×2048 RGBA32/1 mip; exact header/raw mirror_y; outside corrected cells changes 0, introduced alpha 0. B REWORK FIRST QA PASS; old D82 SHA validation superseded; C/D + in-game pending.
+- FD90AA9: A87 SHA 72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445 B FIRST QA PASS unchanged; 29 semantic / 29 physical; 4096×4096 RGBA32/1 mip; outside cells changes 0, introduced alpha 0; readable/raw/white/gray QA PASS.
+- C81 reopened-P0-trio strict-QA state preserved unchanged. Current user-approved lock count remains 0.
+- Next canonical-HD production target: 9F060EC1_512x512.dds (5 reviewed segments).

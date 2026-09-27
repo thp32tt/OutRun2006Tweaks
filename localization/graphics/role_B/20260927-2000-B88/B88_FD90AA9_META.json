@@ -1,0 +1,22 @@
+{
+  "canonical_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+  "dimensions": [
+    4096,
+    4096
+  ],
+  "format": "RGBA32",
+  "mipmaps": 1,
+  "bytes": 67108992,
+  "header_128_exact": true,
+  "raw_orientation": "mirror_y",
+  "semantic_entries": 29,
+  "physical_regions": 29,
+  "changed_pixels_total": 3574612,
+  "outside_29_cells_changed_pixels": 0,
+  "introduced_alpha_outside_29_cells": 0,
+  "candidate_changed_by_B": false,
+  "visual_review": "PASS_READABLE_RAW_WHITE_GRAY",
+  "preexisting_black_alpha_artwork": "PRESERVED_CANONICAL_OUTSIDE_DECLARED_TEXT_CELLS",
+  "in_game_validation": "PENDING"
+}

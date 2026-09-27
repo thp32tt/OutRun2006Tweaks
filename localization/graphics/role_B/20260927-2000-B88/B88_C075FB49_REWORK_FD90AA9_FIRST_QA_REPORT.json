@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B88",
+  "timestamp_kst": "2026-09-27T20:11:31+09:00",
+  "base_head": "4f2b295c6ed716c1bd24695421e60175b7e270cf",
+  "scope": "C075FB49 first QA/rework + FD90AA9 first QA; no build; no VR/FFB",
+  "assets": {
+    "C075FB49": {
+      "canonical_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "input_candidate_sha256": "d310c7da75c4efe7959ec28b7e5125208d37483052b4e5c56c54cc0d4f16e3c1",
+      "candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+      "candidate_changed_by_B": true,
+      "semantic_entries": 16,
+      "physical_regions": 17,
+      "finding": {
+        "severity": "REWORK_REQUIRED",
+        "type": "SOURCE_LANGUAGE_RESIDUE_FROM_UNDERSIZED_SOURCE_CELL",
+        "detail": "A86 new_course_desc ended at x=770, but canonical final OutRun2: SP. glyph pixels extend through x=829 (observed x=788..829, y=1544..1596), leaving a blue/white source-text fragment between course-description cells."
+      },
+      "correction": {
+        "new_course_desc_cell_before": [
+          225,
+          1370,
+          770,
+          1620
+        ],
+        "new_course_desc_cell_after": [
+          225,
+          1370,
+          830,
+          1620
+        ],
+        "original_course_desc_cell": [
+          830,
+          1370,
+          1308,
+          1620
+        ],
+        "re_rendered_cells": [
+          "new_course_desc",
+          "original_course_desc"
+        ]
+      },
+      "structure": {
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "bytes": 16777344,
+        "header_128_exact_canonical": true,
+        "raw_orientation": "mirror_y",
+        "changes_vs_A86_outside_two_description_cells": 0,
+        "outside_corrected_17_cells_changed_pixels": 0,
+        "introduced_alpha_outside_17_cells": 0
+      },
+      "visual_qa": "PASS_AFTER_REWORK_READABLE_RAW_WHITE_BACKGROUND",
+      "source_residue_after_rework": "NONE_OBSERVED",
+      "d82_preflight": "SUPERSEDED_BY_B88_CHANGED_SHA",
+      "result": "B88_REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "qa_artifacts": {
+        "readable": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_READABLE_QA.jpg",
+        "raw": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_RAW_QA.jpg",
+        "white": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_READABLE_WHITE_QA.jpg",
+        "description_compare": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_DESC_SOURCE_A86_B88.jpg"
+      }
+    },
+    "FD90AA9": {
+      "canonical_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+      "candidate_changed_by_B": false,
+      "semantic_entries": 29,
+      "physical_regions": 29,
+      "transcription_expansion_verified": [
+        {
+          "source": "Maximum Speed",
+          "korean": "최고 속도"
+        },
+        {
+          "source": "Transmission",
+          "korean": "변속기"
+        }
+      ],
+      "structure": {
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "bytes": 67108992,
+        "header_128_exact_canonical": true,
+        "raw_orientation": "mirror_y",
+        "changed_pixels_total": 3574612,
+        "outside_29_cells_changed_pixels": 0,
+        "introduced_alpha_outside_29_cells": 0
+      },
+      "visual_qa": "PASS_READABLE_RAW_WHITE_GRAY",
+      "preexisting_black_alpha_artwork": "PRESERVED_FROM_CANONICAL_OUTSIDE_DECLARED_TEXT_CELLS",
+      "preserved_original": [
+        "Risky Ride",
+        "PASSING BREEZE",
+        "Night Flight",
+        "MAGICAL SOUND SHOWER",
+        "Life Was a Bore",
+        "Shiny World",
+        "RANDOM",
+        "SPLASH WAVE",
+        "250GTO",
+        "512BB",
+        "300km/h",
+        "293km/h",
+        "4P",
+        "3P",
+        "5 AT/MT",
+        "6 AT/MT",
+        "route/map artwork",
+        "speech bubble",
+        "equalizer artwork",
+        "road/vehicle icons"
+      ],
+      "result": "B88_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "qa_artifacts": {
+        "readable": "localization/graphics/role_B/20260927-2000-B88/B88_FD90AA9_READABLE_QA.jpg",
+        "raw": "localization/graphics/role_B/20260927-2000-B88/B88_FD90AA9_RAW_QA.jpg",
+        "white": "localization/graphics/role_B/20260927-2000-B88/B88_FD90AA9_READABLE_WHITE_QA.jpg",
+        "gray": "localization/graphics/role_B/20260927-2000-B88/B88_FD90AA9_READABLE_GRAY_QA.jpg",
+        "compare": "localization/graphics/role_B/20260927-2000-B88/B88_FD90AA9_SOURCE_CANDIDATE_GRAY_COMPARE.jpg"
+      }
+    }
+  },
+  "approved_dds_promotion": false,
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "next_asset": "9F060EC1_512x512.dds"
+}
