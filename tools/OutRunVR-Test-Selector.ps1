@@ -11,7 +11,7 @@ $slots=[ordered]@{
     'R57_02_POSITION_KIND0_HUD35'=@('02. POSITION kind=0 only','뒤 8개 put_clip_sprite/SPRARGS만 SCREEN_HUD + 35%.')
     'R57_03_POSITION_ALL_WORLD35'=@('03. POSITION complete fix','kind=1+kind=0 전체 exact SCREEN_HUD + finite plane 35%.')
     'R57_04_RANK_ALL_AS_HUD'=@('04. VEHICLE RANK as HUD','차량 위 1~6등을 HUD로 강제해 최종 draw ownership 확인.')
-    'R57_05_RANK_PROJECTED_IPD'=@('05. RANK projected-IPD','Calc3D2D view X/Y/Z 보존 후 eye IPD/FOV 재투영. 우선 테스트.')
+    'R57_06_RANK_PROJECTED_HEAD'=@('05. RANK projected-IPD','Calc3D2D view X/Y/Z 보존 후 eye IPD/FOV 재투영. 우선 테스트.')
     'R57_06_RANK_PROJECTED_HEAD'=@('06. RANK + head inverse','05에 head inverse까지 적용해 camera-space 가설 비교.')
     'R57_07_RANK_PROJECTED_13'=@('07. RANK 1-3 only','sprani/SPRARGS2 1~3등만 projected-world-marker.')
     'R57_08_RANK_PROJECTED_46'=@('08. RANK 4-6 only','put_clip_sprite/SPRARGS 4등 이후만 projected-world-marker.')
@@ -42,7 +42,7 @@ $title.Location=[System.Drawing.Point]::new(24,16)
 $form.Controls.Add($title)
 
 $guide=New-Object System.Windows.Forms.Label
-$guide.Text='권장 순서: R57 03 → 05 → 06. 그 다음 같은 R57_05로 DX11 Host, DXVK SAFE, DXVK MULTIVIEW를 비교하세요. DX12는 먼저 D3D9On12 Probe PASS를 확인한 뒤 STRICT를 실행하세요.'
+$guide.Text='R66 기준: R57_06(head-inverse projected rank)가 검증된 기본값입니다. R57_05는 비교/회귀 진단용으로만 사용하세요. DX11 Host/DXVK 비교도 R57_06을 기본으로 사용합니다.'
 $guide.AutoSize=$false
 $guide.Size=[System.Drawing.Size]::new(990,48)
 $guide.Location=[System.Drawing.Point]::new(26,54)
@@ -55,11 +55,11 @@ $backendBox.Size=[System.Drawing.Size]::new(990,150)
 $form.Controls.Add($backendBox)
 
 $backendButtons=@(
-    @('DX9Ex + D3D11 Host','d3d9','R57_05_RANK_PROJECTED_IPD','기준. DirectGPU 실패 시 fallback 허용.'),
-    @('DX11 Host DirectGPU','dx11','R57_05_RANK_PROJECTED_IPD','D3D9Ex 게임 + D3D11 OpenXR host. DirectGPU-only / ACK run identity.'),
-    @('DXVK SAFE','dxvk-safe','R57_05_RANK_PROJECTED_IPD','DXVK provider-local Ex probe, multiview off, fallback 허용.'),
-    @('DXVK MULTIVIEW','dxvk','R57_05_RANK_PROJECTED_IPD','DXVK + multiviewpatcher 실험 경로.'),
-    @('DX12 STRICT','dx12','R57_05_RANK_PROJECTED_IPD','실험적 D3D9On12 기대 경로. Probe PASS 후 실행.')
+    @('DX9Ex + D3D11 Host','d3d9','R57_06_RANK_PROJECTED_HEAD','기준. DirectGPU 실패 시 fallback 허용.'),
+    @('DX11 Host DirectGPU','dx11','R57_06_RANK_PROJECTED_HEAD','D3D9Ex 게임 + D3D11 OpenXR host. DirectGPU-only / ACK run identity.'),
+    @('DXVK SAFE','dxvk-safe','R57_06_RANK_PROJECTED_HEAD','DXVK provider-local Ex probe, multiview off, fallback 허용.'),
+    @('DXVK MULTIVIEW','dxvk','R57_06_RANK_PROJECTED_HEAD','DXVK + multiviewpatcher 실험 경로.'),
+    @('DX12 STRICT','dx12','R57_06_RANK_PROJECTED_HEAD','실험적 D3D9On12 기대 경로. Probe PASS 후 실행.')
 )
 $x=14
 foreach($b in $backendButtons){
