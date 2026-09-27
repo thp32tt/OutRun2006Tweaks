@@ -49,7 +49,7 @@ index,path,action,artwork_status,transcription_status,notes
 92,textures/load/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 94,textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds,localize_text,b85_rework_first_qa_pass_pending_c_d_ingame,transcribed_reviewed,B85 changed SHA; 가속도 terminology + source-residue rework; C/D + in-game required
 95,textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds,localize_text,pending_artwork,transcribed_reviewed,pass5 transcription saved
-97,textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass6 transcription saved
+97,textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds,localize_text,a85_candidate_pending_bcd_qa,transcribed_reviewed,A85 canonical-HD 7/7 complete; Ferrari names/player labels preserved; B/C/D + in-game pending
 98,textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 99,textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 100,textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass6 transcription saved

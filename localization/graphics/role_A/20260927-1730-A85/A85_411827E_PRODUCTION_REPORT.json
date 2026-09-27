@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A85",
+  "timestamp_kst": "2026-09-27T17:46:30+09:00",
+  "base_head": "0dc6de492749b17ff2d51a12b95753b687b7c22a",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+  "canonical_source": "OR2-HD-GUI-v0.25.10a",
+  "canonical_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+  "candidate_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "bytes": 16777344,
+  "format": "RGBA32",
+  "mipmaps": 1,
+  "raw_orientation": "mirror_y",
+  "semantic_entries_materialized": 7,
+  "localized_regions": 7,
+  "translations": [
+    {
+      "source": "Automatic",
+      "korean": "자동"
+    },
+    {
+      "source": "seconds",
+      "korean": "초"
+    },
+    {
+      "source": "More Engine sound",
+      "korean": "엔진음 크게"
+    },
+    {
+      "source": "TUNED",
+      "korean": "튜닝"
+    },
+    {
+      "source": "NORMAL",
+      "korean": "일반"
+    },
+    {
+      "source": "RANDOM",
+      "korean": "무작위"
+    },
+    {
+      "source": "Recommendation",
+      "korean": "추천"
+    }
+  ],
+  "preserved_original_tokens": [
+    "288GTO",
+    "Testarossa",
+    "F40",
+    "Enzo Ferrari",
+    "2P/4P/3P/1P",
+    "vehicle/control artwork"
+  ],
+  "dds_header_128_byte_exact_to_canonical": true,
+  "outside_7_text_cells_byte_exact_to_canonical": true,
+  "readable_orientation_visual_qa": "PASS_A_STAGE",
+  "raw_orientation_visual_qa": "PASS_MIRROR_Y_PRESERVED",
+  "white_background_alpha_qa": "PASS",
+  "artifact_qa": {
+    "source_language_residue": "NONE_OBSERVED_FINAL",
+    "clipping_or_overlap": "NONE_OBSERVED",
+    "box_escape": "NONE_OBSERVED",
+    "black_line_or_seam": "NONE_OBSERVED",
+    "opaque_box": "NONE_OBSERVED",
+    "alpha_halo": "NONE_OBSERVED"
+  },
+  "internal_rework": [
+    {
+      "attempt": "draft_1",
+      "result": "REJECTED_NOT_PERSISTED",
+      "reason": "Initial guessed cells touched adjacent vehicle/name artwork and left source labels."
+    },
+    {
+      "attempt": "draft_2",
+      "result": "REJECTED_NOT_PERSISTED",
+      "reason": "TUNED/NORMAL source outline residue and oversized engine-sound typography."
+    },
+    {
+      "attempt": "final",
+      "result": "PASS_FOR_A_HANDOFF",
+      "reason": "Source-derived sprite ranges, expanded label masks and panel-fitted text removed residue while preserving non-text artwork."
+    }
+  ],
+  "in_game_validation": "NOT_PERFORMED",
+  "approval": "NOT_PROMOTED_PENDING_B_C_D_AND_INGAME",
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "cells": {
+    "automatic": [
+      0,
+      164,
+      555,
+      300
+    ],
+    "seconds": [
+      1220,
+      20,
+      1590,
+      165
+    ],
+    "engine": [
+      1490,
+      330,
+      1915,
+      410
+    ],
+    "tuned": [
+      840,
+      835,
+      1160,
+      965
+    ],
+    "normal": [
+      1230,
+      835,
+      1555,
+      965
+    ],
+    "random": [
+      1620,
+      835,
+      1910,
+      965
+    ],
+    "recommendation": [
+      1555,
+      1690,
+      2020,
+      2030
+    ]
+  },
+  "status": "A85_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA",
+  "next_asset_after_static_gate": "C075FB49_512x512.dds"
+}

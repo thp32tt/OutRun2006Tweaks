@@ -381,3 +381,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - approved_dds remains 3 USER_APPROVED_LOCKED assets; hashes reverified unchanged. No new promotion.
 - LOCALIZATION_STATE_OK and Domain Isolation PASS; VR/FFB source/history contamination not observed.
 - Next production target: 411827E (7 reviewed segments). No build performed. Machine report: localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json.
+
+## A85 411827E checkpoint — 2026-09-27 17:46 KST
+
+- Canonical-HD production complete: 7 semantic / 7 physical text regions.
+- Candidate SHA-256: 8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02; 2048×2048 RGBA32 / 1 mip / exact canonical header / raw mirror_y.
+- 288GTO/Testarossa/F40/Enzo Ferrari, player-number labels and vehicle/control artwork preserved.
+- Outside 7 cells byte-identical; readable/raw/white-background A-stage artifact QA PASS after two rejected non-persisted drafts.
+- Status: A_PRODUCTION_COMPLETE_PENDING_B_C_D; in-game validation not performed. Next after gate: C075FB49.

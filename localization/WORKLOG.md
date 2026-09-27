@@ -712,3 +712,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Reconciled stale metadata: removed the old C4 라인을 끊으세요 context follow-up and normalized 2DA semantic expansion to 加速度: -> 가속도:.
 - LOCALIZATION_STATE_OK and Domain Isolation PASS; no VR/FFB source diff or merge commit. Build not run.
 - Next production target remains 411827E (7 reviewed segments). Report: localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json.
+
+## 2026-09-27 17:46 KST — A85 411827E HD rebuild
+
+- Continued from latest GitHub korean-localization-clean HEAD 0dc6de4 after preserving B85/D80 changed-SHA QA state; GPT Library was not used.
+- Rebuilt 411827E_512x512.dds directly from canonical 2048×2048 HD RGBA32/1-mip source; no prior Korean DDS was upscaled.
+- Materialized all 7 reviewed strings: Automatic/seconds/More Engine sound/TUNED/NORMAL/RANDOM/Recommendation.
+- Preserved 288GTO, Testarossa, F40, Enzo Ferrari, player-number labels and all vehicle/control/non-text artwork.
+- Two internal drafts were rejected before persistence: guessed cell ranges touched adjacent artwork/source labels, then panel-outline residue and oversized engine typography remained. Final source-derived ranges and expanded masks resolve both.
+- Readable/raw mirror_y plus white-background alpha QA PASS; no observed source residue, clipping/overlap, box escape, seam/black line, opaque box or alpha halo.
+- Exact 128-byte DDS header preserved; all bytes outside the 7 declared localization cells remain canonical. Candidate SHA-256: 8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02.
+- Status: A85_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA. No promotion, in-game claim, build, VR or FFB work. Next: C075FB49.

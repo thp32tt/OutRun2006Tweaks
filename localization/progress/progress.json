@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T17:19:04+09:00",
+  "updated_at_kst": "2026-09-27T17:46:30+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C4A2937B and 2DA43E41 B85 changed-SHA candidates pass D80 direct header/containment/raw/readable preflight, but both still require independent C strict QA and in-game validation. C4 Drift and remains runtime-composition pending. FA7BBB13/39229D64/A064FDFC remain in-game-only holds. Continue 411827E canonical-HD production independently.",
+  "next_checkpoint": "411827E A85 canonical-HD production complete on 7 semantic / 7 physical text regions; B/C/D static QA and in-game validation remain. C4A2937B/2DA43E41 changed-SHA candidates still need C + in-game; FA7BBB13/39229D64/A064FDFC remain in-game holds. Continue C075FB49 canonical-HD production after the 411 static gate.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -253,17 +253,19 @@
     "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
     "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "latest_hd_production_candidate": {
-      "asset": "2DA43E41",
-      "coverage": "11 semantic / 11 physical",
-      "candidate_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
-      "report": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json",
-      "status": "D80_PREFLIGHT_PASS_PENDING_C_INGAME",
-      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
-      "superseded_a84_sha256": "0efaaa86849c66c94a4d5e1d5f7fbd86caa8935b5a5cb24ccbb26fc29f97d355",
-      "semantic_fix": "加速度: -> 가속도:",
-      "artifact_fix": "A84 source-English lower-stroke residue removed in 4 large cells",
-      "preserved_song_title": "Keep Your Heart -1989-",
-      "d_preflight_report": "localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json"
+      "asset": "411827E",
+      "coverage": "7 semantic / 7 physical",
+      "candidate_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
+      "report": "localization/graphics/role_A/20260927-1730-A85/A85_411827E_PRODUCTION_REPORT.json",
+      "status": "A85_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+      "preserved": [
+        "288GTO",
+        "Testarossa",
+        "F40",
+        "Enzo Ferrari",
+        "player-number labels"
+      ]
     },
     "next_hd_rework": {
       "asset": "411827E",
