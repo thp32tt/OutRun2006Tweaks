@@ -61,3 +61,12 @@ Rules:
 - The production screen-space classifier now consumes the canonical route instead of independently re-deriving HUD/world/projected booleans.
 - Visual behavior is intentionally unchanged; this stage reduces duplicated classification logic before further renderer separation.
 - Build gate: DX9Ex Active Validation on the candidate branch.
+
+
+## S6 — screen-space policy extraction
+- Branch: `vr-d3d9ex-candidate/r69-clean-s6`
+- Parent: S5 `fc2b0de8cf78ec757d35efdaa83ddbcd744e3d0e`.
+- Added `src/vr/d3d9/screen_space_policy.hpp` and moved the screen-space kind definition plus exact producer-route dispatch out of the 4k-line renderer body.
+- Exact ScreenOverlay2D / ProjectedWorld / ProjectedScreenEffect semantics now resolve through a small policy module before projection/WVP classification.
+- HUD and world paths still use the existing proven projection/WVP gates, so visual policy remains R69-equivalent.
+- Build gate: DX9Ex Active Validation on the candidate branch.
