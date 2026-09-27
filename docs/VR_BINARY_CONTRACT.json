@@ -113,6 +113,174 @@
           "needle": "RankMarker_Truncate = 0xBB046"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-HUD-FONT-GLYPH-PUT-SPRITE",
+      "rva": "0x0002C9DB",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e80006000083c4085f5e5d5b83c450c",
+      "purpose": "Canonical font/glyph renderer direct call to put_sprite_ex.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "Module::exe_ptr(0x2C9DB)"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-LENS-FLARE-ALPHA-DRAW",
+      "rva": "0x0000CABE",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e80d8cffffa168b5890083c41048a368",
+      "purpose": "Exact lens-flare projected alpha-object draw callsite.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_graphics.cpp",
+          "needle": "Module::exe_ptr(0xCABE)"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-GOAL-TIME-HELPER-020",
+      "rva": "0x000BEA5A",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e8c1f5ffffe8ecf6ffffb801000000c3",
+      "purpose": "NaviPub_DispTimeAttackGoal exact call to helper 0xBE020.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "Module::exe_ptr(0xBEA5A)"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-GOAL-TIME-HELPER-150",
+      "rva": "0x000BEA5F",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e8ecf6ffffb801000000c333c0c3",
+      "purpose": "NaviPub_DispTimeAttackGoal exact call to helper 0xBE150.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "Module::exe_ptr(0xBEA5F)"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-A-1",
+      "rva": "0x000E358B",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e8f09cf4ff6aff68000060416a000fbf",
+      "purpose": "Option/menu producer A exact put_clip_sprite arrow call 1.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xE358B"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-A-2",
+      "rva": "0x000E35A3",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e8d89cf4ff8b7424408b463483c43085",
+      "purpose": "Option/menu producer A exact put_clip_sprite arrow call 2.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xE35A3"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-A-3",
+      "rva": "0x000E35CC",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e8af9cf4ff83c4188b4e388b4634493b",
+      "purpose": "Option/menu producer A exact put_clip_sprite arrow call 3.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xE35CC"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-A-4",
+      "rva": "0x000E35F7",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e8849cf4ff83c4185f5e5d5b83c408c3",
+      "purpose": "Option/menu producer A exact put_clip_sprite arrow call 4.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xE35F7"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-B-1",
+      "rva": "0x000E481B",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e8608af4ff6aff68000060416a000fbf",
+      "purpose": "Option/menu producer B exact put_clip_sprite arrow call 1.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xE481B"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-B-2",
+      "rva": "0x000E4833",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e8488af4ff8b7424408b463483c43085",
+      "purpose": "Option/menu producer B exact put_clip_sprite arrow call 2.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xE4833"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-B-3",
+      "rva": "0x000E485C",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e81f8af4ff83c4188b4e388b4634493b",
+      "purpose": "Option/menu producer B exact put_clip_sprite arrow call 3.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xE485C"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-OPTION-ARROW-B-4",
+      "rva": "0x000E4887",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e8f489f4ff83c4185f5e5d5b83c408c3",
+      "purpose": "Option/menu producer B exact put_clip_sprite arrow call 4.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "0xE4887"
+        }
+      ]
     }
   ]
 }
