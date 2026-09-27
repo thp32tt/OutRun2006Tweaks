@@ -119,7 +119,7 @@
       "rva": "0x0002C9DB",
       "signatureLength": 16,
       "disassemblyWindow": 48,
-      "expectedBytes": "e80006000083c4085f5e5d5b83c450c",
+      "expectedBytes": "e80006000083c4085f5e5d5b83c450c3",
       "purpose": "Canonical font/glyph renderer direct call to put_sprite_ex.",
       "sourceBindings": [
         {
