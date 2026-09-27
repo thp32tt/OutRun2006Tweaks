@@ -161,6 +161,13 @@ class UIScaling : public Hook
 		0xB9FFC, 0xBA01E, 0xBA035, 0xBA052
 	};
 
+	// R65 full-EXE map: these four sprite IDs (0x2C0251..0x2C0254)
+	// occur only in the two option/menu arrow producers below.
+	static constexpr int OptionArrow_ClipSpriteCalls[] = {
+		0xE358B, 0xE35A3, 0xE35CC, 0xE35F7,
+		0xE481B, 0xE4833, 0xE485C, 0xE4887
+	};
+
 	// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
 	static inline SafetyHookInline D3DXMatrixTransformation2D = {};
 	static int __stdcall D3DXMatrixTransformation2D_dest(D3DMATRIX* pOut, D3DXVECTOR2* pScalingCenter, float pScalingRotation,
@@ -632,6 +639,16 @@ class UIScaling : public Hook
 		return result;
 	}
 
+	static int __cdecl OptionArrow_putClipSprite(
+		int xstnum, int x, int y, std::uint32_t flags,
+		float priority, std::uint32_t color)
+	{
+		OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		return Game::put_clip_sprite(
+			xstnum, x, y, flags, priority, color);
+	}
+
 	using TextGlyphPutSpriteFn =
 		int(__cdecl*)(SPRARGS*, float);
 
@@ -832,6 +849,20 @@ class UIScaling : public Hook
 	{
 		AddSpriteSpacing((int*)(ctx.esp + 4), false);
 	}
+
+	static void TimeRecord_AdjustPositionAndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((int*)(ctx.esp + 4), false);
+		// These 15 exact DispTimeAttack2D callsites are already individually
+		// identified by the original UI-scaling patch. Arm only the immediate
+		// render handoff instead of promoting generic put_scroll/put_clip paths.
+		OutRunVR::GameSemantic::ArmNextDraw(
+			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info("VR R65 TIME HUD: exact DispTimeAttack2D handoff hits={}", hit);
+	}
 	static void put_scroll_AdjustPositionLeft(safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing((int*)(ctx.esp + 4), true);
@@ -1006,6 +1037,10 @@ public:
 			Memory::VP::InjectHook(Module::exe_ptr(addr), RankMarker_sprani, Memory::HookType::Call);
 		for (int addr : RankMarker_ClipSpriteCalls)
 			Memory::VP::InjectHook(Module::exe_ptr(addr), RankMarker_putClipSprite, Memory::HookType::Call);
+		for (int addr : OptionArrow_ClipSpriteCalls)
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr), OptionArrow_putClipSprite,
+				Memory::HookType::Call);
 
 		NaviPub_Disp_SpriteSpacingEnable_hk = safetyhook::create_mid(Module::exe_ptr(NaviPub_Disp_SpriteScaleEnable_Addr), SpriteSpacingEnable);
 		NaviPub_Disp_SpriteSpacingEnable2_hk = safetyhook::create_mid(Module::exe_ptr(NaviPub_Disp_SpriteScaleEnable2_Addr), SpriteSpacingEnable);
@@ -1043,21 +1078,21 @@ public:
 		DispTimeAttack2D_SpriteScalingForceLeft_hk = safetyhook::create_mid((void*)0x4BE4E7, SpriteSpacingForceLeft);
 		DispTimeAttack2D_SpriteScalingForceEnable_hk = safetyhook::create_mid((void*)0x4BE575, SpriteSpacingEnable);
 
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BE5CD, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4BE603, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4BE633, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4BE66D, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4BE690, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BE6B5, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BE6D5, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BE8D8, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk9 = safetyhook::create_mid((void*)0x4BE915, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk10 = safetyhook::create_mid((void*)0x4BE94A, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk11 = safetyhook::create_mid((void*)0x4BE97A, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk12 = safetyhook::create_mid((void*)0x4BE9A3, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk13 = safetyhook::create_mid((void*)0x4BE7E8, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, put_scroll_AdjustPositionRight);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BE5CD, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4BE603, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4BE633, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4BE66D, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4BE690, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BE6B5, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BE6D5, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BE8D8, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk9 = safetyhook::create_mid((void*)0x4BE915, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk10 = safetyhook::create_mid((void*)0x4BE94A, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk11 = safetyhook::create_mid((void*)0x4BE97A, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk12 = safetyhook::create_mid((void*)0x4BE9A3, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk13 = safetyhook::create_mid((void*)0x4BE7E8, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, TimeRecord_AdjustPositionAndHud);
 
 		// R64 canonical font glyph ownership. RVA 0x2C9DB is the direct
 		// call from the font/glyph renderer to put_sprite_ex. Do not promote
