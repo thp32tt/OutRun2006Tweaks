@@ -1,0 +1,83 @@
+{
+  "571E78F3": {
+    "canonical_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+    "candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+    "bytes": 524416,
+    "size": [
+      2048,
+      256
+    ],
+    "fourcc": "DXT5",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "changed_pixels_decoded": 252104,
+    "outside_cells_changed_pixels": 0,
+    "introduced_alpha_outside_cells": 0,
+    "changed_dxt5_blocks": 15840,
+    "outside_cells_dxt5_blocks_changed": 0,
+    "bbox_margins": {
+      "타임 어택 모드": [
+        161,
+        4,
+        162,
+        4
+      ],
+      "15코스 연속": [
+        318,
+        4,
+        319,
+        4
+      ]
+    }
+  },
+  "62BEBF33": {
+    "canonical_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+    "candidate_sha256": "def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d",
+    "bytes": 524416,
+    "size": [
+      2048,
+      256
+    ],
+    "fourcc": "DXT5",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "changed_pixels_decoded": 160090,
+    "outside_cells_changed_pixels": 0,
+    "introduced_alpha_outside_cells": 0,
+    "changed_dxt5_blocks": 10168,
+    "outside_cells_dxt5_blocks_changed": 0,
+    "bbox_margins": {
+      "아웃런 모드": [
+        185,
+        7,
+        186,
+        8
+      ]
+    }
+  },
+  "E3FD08BE": {
+    "canonical_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+    "candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
+    "bytes": 524416,
+    "size": [
+      2048,
+      256
+    ],
+    "fourcc": "DXT5",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "changed_pixels_decoded": 204502,
+    "outside_cells_changed_pixels": 0,
+    "introduced_alpha_outside_cells": 0,
+    "changed_dxt5_blocks": 12915,
+    "outside_cells_dxt5_blocks_changed": 0,
+    "bbox_margins": {
+      "하트 어택 모드": [
+        252,
+        9,
+        252,
+        10
+      ]
+    }
+  }
+}

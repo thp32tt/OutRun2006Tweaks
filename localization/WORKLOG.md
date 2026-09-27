@@ -820,3 +820,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Readable/raw mirror_y/white-background QA PASS: no observed source-language residue in localized cells, clipping/overlap, box escape, introduced black seam/line, opaque box or alpha halo. Pre-existing canonical black-alpha artwork remains preserved.
 - Exact 128-byte DDS header preserved; all bytes outside 29 declared localization cells remain canonical; all candidate alpha bboxes are inside declared cells. Candidate SHA-256: 72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445.
 - Status: A87_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA. No promotion, in-game claim, build, VR or FFB work. Next: 9F060EC1 (5 reviewed segments).
+
+## 2026-09-27 20:02 KST — C81 reopened P0 HD trio strict QA
+
+- Rebased C81 persistence onto latest A87 FD90AA9 state without discarding concurrent production work.
+- Independently reviewed B87 canonical-HD rebuilds for 571E78F3 / 62BEBF33 / E3FD08BE against exact 2048x256 DXT5 sources; historical 512x64 Korean approvals remain audit/reference only and were not construction inputs.
+- Semantic QA PASS: Time Attack Mode -> 타임 어택 모드; 15 continuous course -> 15코스 연속; OutRun Mode -> 아웃런 모드; Heart Attack Mode -> 하트 어택 모드.
+- All three preserve exact canonical 128-byte DDS headers, 2048x256 DXT5, 1 mip and raw mirror_y. Recomputed changed DXT5 blocks, decoded pixels and introduced alpha outside declared source cells = 0 for every asset.
+- Candidate alpha stays contained: 571E78F3 minimum vertical margin 4 px; 62BEBF33 minimum 7 px; E3FD08BE minimum 9 px. Direct canonical-vs-candidate black/white readable and raw QA found no source residue, broken Hangul, clipping/overlap, cell escape, seam/black line, opaque box, artificial alpha halo, resolution loss, non-text damage or wrong replacement.
+- Original orange/navy/white-glow style family is preserved. C81 changed no DDS, so D82 same-SHA binary preflight remains valid.
+- Final D reconciliation + mandatory in-game screenshot reapproval remain; current approved lock count stays 0. Build not run; VR/FFB untouched. C075FB49 remains outside C81 until B first QA completes.
+- Machine report: localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json.

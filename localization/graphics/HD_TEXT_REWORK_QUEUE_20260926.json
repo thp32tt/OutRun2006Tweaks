@@ -43,7 +43,7 @@
       "reason": "LOW_RES_USER_APPROVAL_SUPERSEDED_BY_CANONICAL_HD_SOURCE",
       "policy": "REBUILD_KOREAN_FROM_HD_BASE",
       "priority": "P0",
-      "status": "D82_PREFLIGHT_PASS_PENDING_C_INGAME",
+      "status": "C81_STATIC_PASS_D82_SAME_SHA_PENDING_D_RECONCILE_INGAME_REAPPROVAL",
       "historical_approved_resolution": [
         512,
         64
@@ -63,7 +63,10 @@
       "remaining_segments": 0,
       "b_first_qa_report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
       "candidate_changed_by_B": true,
-      "d_preflight_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json"
+      "d_preflight_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json",
+      "c_strict_qa_report": "localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json",
+      "c_candidate_changed": false,
+      "d82_same_sha_binary_preflight_valid": true
     },
     {
       "hash": "62BEBF33",
@@ -77,7 +80,7 @@
       "reason": "LOW_RES_USER_APPROVAL_SUPERSEDED_BY_CANONICAL_HD_SOURCE",
       "policy": "REBUILD_KOREAN_FROM_HD_BASE",
       "priority": "P0",
-      "status": "D82_PREFLIGHT_PASS_PENDING_C_INGAME",
+      "status": "C81_STATIC_PASS_D82_SAME_SHA_PENDING_D_RECONCILE_INGAME_REAPPROVAL",
       "historical_approved_resolution": [
         512,
         64
@@ -96,7 +99,10 @@
       "remaining_segments": 0,
       "b_first_qa_report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
       "candidate_changed_by_B": true,
-      "d_preflight_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json"
+      "d_preflight_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json",
+      "c_strict_qa_report": "localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json",
+      "c_candidate_changed": false,
+      "d82_same_sha_binary_preflight_valid": true
     },
     {
       "hash": "E3FD08BE",
@@ -110,7 +116,7 @@
       "reason": "LOW_RES_USER_APPROVAL_SUPERSEDED_BY_CANONICAL_HD_SOURCE",
       "policy": "REBUILD_KOREAN_FROM_HD_BASE",
       "priority": "P0",
-      "status": "D82_PREFLIGHT_PASS_PENDING_C_INGAME",
+      "status": "C81_STATIC_PASS_D82_SAME_SHA_PENDING_D_RECONCILE_INGAME_REAPPROVAL",
       "historical_approved_resolution": [
         512,
         64
@@ -129,7 +135,10 @@
       "remaining_segments": 0,
       "b_first_qa_report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
       "candidate_changed_by_B": true,
-      "d_preflight_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json"
+      "d_preflight_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json",
+      "c_strict_qa_report": "localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json",
+      "c_candidate_changed": false,
+      "d82_same_sha_binary_preflight_valid": true
     },
     {
       "hash": "D6DC1380",
@@ -491,6 +500,6 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_A/20260927-1930-A87/A87_FD90AA9_PRODUCTION_REPORT.json",
+  "latest_batch": "localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json",
   "latest_reopen_report": "localization/graphics/BATCH69_REOPEN_LOWRES_APPROVALS_HD_REWORK_REPORT.json"
 }

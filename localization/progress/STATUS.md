@@ -460,3 +460,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Historical low-res FULL_DRAFT pixels were not reused or upscaled; song/model/speed/AT-MT/player and non-text artwork preserved.
 - Outside 29 cells byte-identical; candidate alpha contained; readable/raw/white-background A-stage artifact QA PASS after rejected 27-string draft.
 - Queue becomes 13 ready / 3 remaining. Status: A_PRODUCTION_COMPLETE_PENDING_B_C_D; in-game validation not performed. Next A target: 9F060EC1 (5 reviewed segments).
+
+## C81 reopened P0 HD trio strict QA — 2026-09-27 20:02 KST
+- 571E78F3 / 62BEBF33 / E3FD08BE: C STATIC STRICT QA PASS, B87 DDS files unchanged.
+- All: canonical 2048x256 DXT5 / 1 mip / exact 128-byte header / raw mirror_y; DXT5 blocks, decoded pixels and introduced alpha outside declared text cells = 0.
+- Readable black/white + raw QA found no omission, source residue, broken Hangul, clipping/overlap, seam/black line, opaque box, alpha-halo artifact, resolution loss, non-text damage or wrong replacement.
+- D82 same-SHA preflight remains binary-valid; final D reconciliation + in-game screenshot reapproval remain. Historical low-res approvals stay superseded; current lock count = 0. A87 FD90AA9 progress preserved.
+- Machine report: localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json. No build; VR/FFB unchanged.

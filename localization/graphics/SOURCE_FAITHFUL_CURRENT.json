@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-27T19:19:40+09:00",
+  "updated_at_kst": "2026-09-27T20:02:41+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -117,7 +117,7 @@
     "old_candidates": "historical_until_rebuilt_or_revalidated_against_HD"
   },
   "latest_d_final_qa_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json",
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json",
   "post_d78_c78_update": {
     "asset": "39229D64",
     "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
@@ -195,5 +195,16 @@
     "C075FB49": "D82_PREFLIGHT_PASS_PENDING_B_C_INGAME",
     "current_approved_lock_count": 0,
     "report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json"
+  },
+  "post_d82_c81_update": {
+    "result": "P0_HD_TRIO_C81_STATIC_PASS_PENDING_D_RECONCILE_INGAME_REAPPROVAL",
+    "candidate_changed_by_C": false,
+    "current_approved_lock_count": 0,
+    "assets": {
+      "571E78F3": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+      "62BEBF33": "def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d",
+      "E3FD08BE": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc"
+    },
+    "note": "B87 canonical-HD DXT5 trio passes independent C81 strict QA unchanged. D82 preflight is same-SHA binary-valid; no re-lock/promotion without D reconciliation and in-game screenshots."
   }
 }

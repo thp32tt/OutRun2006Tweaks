@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T19:56:03+09:00",
+  "updated_at_kst": "2026-09-27T20:02:41+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "FD90AA9 A87 canonical-HD production complete after white/gray omission recovery expanded 27 -> 29 semantic/physical regions; B/C/D static QA and in-game validation remain. D82/C80/B87/C075 states preserved. Continue 9F060EC1 canonical-HD production (5 reviewed segments).",
+  "next_checkpoint": "FD90AA9 A87 production remains complete (29 semantic / 29 physical) pending B/C/D + in-game; next production target 9F060EC1. C81 independently passes reopened P0 HD trio 571E78F3/62BEBF33/E3FD08BE unchanged from B87; D82 same-SHA preflight remains valid, but final D reconciliation and mandatory in-game reapproval remain. Current user-approved lock count stays 0. C075FB49 still needs B/C + in-game.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -309,25 +309,33 @@
       "C075FB49": "D82_PREFLIGHT_PASS_PENDING_B_C_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C80",
-      "report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
-      "result": "MIXED_PASS_AND_REWORK_STATIC_QA_PENDING_D_AND_INGAME",
-      "C4A2937B": {
-        "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
-        "candidate_changed_by_C": false,
-        "status": "STATIC_PASS_CONTEXT_HOLD_PENDING_D_RECONCILE_INGAME"
-      },
-      "2DA43E41": {
-        "candidate_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
-        "candidate_changed_by_C": true,
-        "superseded_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
-        "status": "REWORK_STATIC_PASS_PENDING_D_REVALIDATION_INGAME"
-      },
-      "411827E": {
-        "candidate_sha256": "c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74",
-        "candidate_changed_by_C": true,
-        "superseded_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
-        "status": "REWORK_STATIC_PASS_PENDING_D_REVALIDATION_INGAME"
+      "run": "C81",
+      "report": "localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json",
+      "result": "P0_HD_TRIO_STATIC_STRICT_QA_PASS_PENDING_D_RECONCILE_INGAME_REAPPROVAL",
+      "candidate_changed_by_C": false,
+      "current_user_approved_lock_count": 0,
+      "assets": {
+        "571E78F3": {
+          "candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+          "status": "C81_STATIC_PASS_D82_SAME_SHA_PENDING_D_RECONCILE_INGAME_REAPPROVAL",
+          "outside_text_cells_changed_pixels": 0,
+          "outside_text_cells_dxt5_blocks_changed": 0,
+          "introduced_alpha_outside_text_cells": 0
+        },
+        "62BEBF33": {
+          "candidate_sha256": "def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d",
+          "status": "C81_STATIC_PASS_D82_SAME_SHA_PENDING_D_RECONCILE_INGAME_REAPPROVAL",
+          "outside_text_cells_changed_pixels": 0,
+          "outside_text_cells_dxt5_blocks_changed": 0,
+          "introduced_alpha_outside_text_cells": 0
+        },
+        "E3FD08BE": {
+          "candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
+          "status": "C81_STATIC_PASS_D82_SAME_SHA_PENDING_D_RECONCILE_INGAME_REAPPROVAL",
+          "outside_text_cells_changed_pixels": 0,
+          "outside_text_cells_dxt5_blocks_changed": 0,
+          "introduced_alpha_outside_text_cells": 0
+        }
       }
     },
     "latest_b_first_qa": {
@@ -463,6 +471,13 @@
         }
       },
       "report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json"
+    },
+    "c81_p0_hd_trio": {
+      "report": "localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json",
+      "candidate_changed_by_C": false,
+      "d82_same_sha_binary_preflight_valid": true,
+      "in_game_validation": "PENDING",
+      "reapproval_locked": false
     }
   },
   "data_build": {
