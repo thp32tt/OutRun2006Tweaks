@@ -132,7 +132,7 @@ require_all("src/hooks_graphics.cpp", [
 ], "P7_FLARE_EXACT_PRODUCER")
 require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'R30ScreenSpaceKind::ProjectedScreenEffect2D',
-    'VR R67 FLARE FIX: exact projected-screen effect prefers Calc3D2D eye reprojection; FOV-only affine is fallback only',
+    'VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes',
 ], "P7_FLARE_R26HUD_PATH")
 
 # PASS 8 — selector shadow and START presentation protections remain present.
@@ -175,8 +175,8 @@ require_all("tools/Build-OutRunPCFast.ps1", [
     "'-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF'",
     "'-DOUTRUN_VR_R26_HUD_COMPARE=ON'",
     "R66-PROVEN-R26HUD-v1",
-    "Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R68'",
-    "VariantId = 'ACTIVE_R26_HUD_R68'",
+    "Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R69'",
+    "VariantId = 'ACTIVE_R26_HUD_R69'",
 ], "P9_PC_FAST_CONTRACT")
 forbid("tools/Build-OutRunPCFast.ps1",
        "VariantId = 'ACTIVE_FULL_R34'",
@@ -191,7 +191,7 @@ require_all(".github/workflows/build.yml", [
 require_all(".github/workflows/vr-dx9ex-active.yml", [
     '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF',
     '-DOUTRUN_VR_R26_HUD_COMPARE=ON',
-    "ACTIVE_R26_HUD_R68",
+    "ACTIVE_R26_HUD_R69",
 ], "P9_DX9EX_BUILD_CONTRACT")
 require_all(".github/workflows/vr-nightly-unified-20260926.yml", [
     'python tools/verify_vr_proven_baseline.py',
