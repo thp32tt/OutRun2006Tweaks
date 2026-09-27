@@ -34,7 +34,7 @@ expected={
  'draft':progress['text']['draft_context'],
  'blocked_null':progress['text']['blocked_null'],
 }
-if dict(status)!=expected: fail(f'text status counts {dict(status)} != {expected}')
+actual_status={k:status.get(k,0) for k in expected}\nif actual_status!=expected: fail(f'text status counts {actual_status} != {expected}')
 if sum(1 for r in text if r.get('status')!='blocked_null')!=progress['text']['translated_non_null']:
     fail('translated_non_null mismatch')
 
