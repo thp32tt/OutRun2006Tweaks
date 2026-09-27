@@ -96,7 +96,7 @@ switch($variant){
     'R57_05_RANK_PROJECTED_IPD'   { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='5' }
     'R57_06_RANK_PROJECTED_HEAD'  { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='6' }
     'R67_EYE_REPROJECT'           { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='6' }
-    'R68_FIXPACK'                 { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='6' }
+    'R68_FIXPACK'                 { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='6' }\n    'R69_FIXPACK'                 { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='6' }
     'R57_07_RANK_PROJECTED_13'    { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='7' }
     'R57_08_RANK_PROJECTED_46'    { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='8' }
     'R57_09_RANK_PROJECTED_ZERO'  { $semanticMode='0'; $hudExperimentMode='2'; $r57Mode='9' }
