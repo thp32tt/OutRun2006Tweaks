@@ -1,4 +1,8 @@
 #include "state_translation.hpp"
+#include "vr/game/disasm_render_contract.hpp"
+
+static_assert(OutRunVR::DisasmContract::WvpVsRegister == 64u);
+static_assert(OutRunVR::DisasmContract::WvpVsRegisterCount == 4u);
 
 namespace outrun::vr::dx11 {
 
