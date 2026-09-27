@@ -1250,11 +1250,6 @@ namespace OutRunVRStereo
             return OutRunVR::DebugModes::HudProbeMode();
         }
 
-        int R57Mode() noexcept
-        {
-            return OutRunVR::DebugModes::ProjectedMarkerMode();
-        }
-
         bool R57ProjectViewPoint(
             const OutRunVR::GameSemantic::ProjectedMarkerInfo& marker,
             const D3DMATRIX& transform,
@@ -1327,8 +1322,7 @@ namespace OutRunVRStereo
             // head-locked again. Explicit projected-screen anchors (lens flare)
             // are different: they stay on the R67 eye-only path.
             const bool applyHeadCorrection =
-                explicitMarker == nullptr &&
-                (R57Mode() == 6 || R57Mode() == 8);
+                explicitMarker == nullptr;
             D3DMATRIX headInverse = IdentityMatrix();
             if (applyHeadCorrection)
             {
@@ -1384,8 +1378,8 @@ namespace OutRunVRStereo
                     expected, true, std::memory_order_acq_rel))
             {
                 spdlog::info(
-                    "VR R68 PROJECTED MARKER: mode={} headCorrection={} view=({:.4f},{:.4f},{:.4f}) deltaL=({:.5f},{:.5f}) deltaR=({:.5f},{:.5f}) builds={}",
-                    R57Mode(), applyHeadCorrection ? 1 : 0,
+                    "VR R69 CLEAN PROJECTED MARKER: headCorrection={} view=({:.4f},{:.4f},{:.4f}) deltaL=({:.5f},{:.5f}) deltaR=({:.5f},{:.5f}) builds={}",
+                    applyHeadCorrection ? 1 : 0,
                     marker->viewX, marker->viewY, marker->viewZ,
                     deltaX[0], deltaY[0], deltaX[1], deltaY[1], builds);
             }
@@ -2636,26 +2630,18 @@ namespace OutRunVRStereo
                 }
                 else if (state.projectedWorldMarker2D)
                 {
-                    if (R57Mode() == 9 || R57Mode() == 10)
-                    {
-                        correctedX = ndcX;
-                        correctedY = ndcY;
-                    }
-                    else
-                    {
-                        // R59: mode 6 proved the anchor reprojection itself
-                        // is correct. Apply HudScale only to marker extent around
-                        // that world anchor so resizing cannot disturb tracking.
-                        const float markerScale = R30HudScaleValue();
-                        const float eyeAnchorX =
-                            state.projectedBaseX + state.projectedDeltaX[eye];
-                        const float eyeAnchorY =
-                            state.projectedBaseY + state.projectedDeltaY[eye];
-                        correctedX = eyeAnchorX +
-                            (ndcX - state.projectedBaseX) * markerScale;
-                        correctedY = eyeAnchorY +
-                            (ndcY - state.projectedBaseY) * markerScale;
-                    }
+                    // R69 CLEAN: keep only the HMD-proven production path.
+                    // Apply HudScale around the recovered vehicle anchor so
+                    // resizing cannot disturb world tracking.
+                    const float markerScale = R30HudScaleValue();
+                    const float eyeAnchorX =
+                        state.projectedBaseX + state.projectedDeltaX[eye];
+                    const float eyeAnchorY =
+                        state.projectedBaseY + state.projectedDeltaY[eye];
+                    correctedX = eyeAnchorX +
+                        (ndcX - state.projectedBaseX) * markerScale;
+                    correctedY = eyeAnchorY +
+                        (ndcY - state.projectedBaseY) * markerScale;
                 }
                 else if (state.worldEffect)
                 {
@@ -3512,25 +3498,6 @@ namespace OutRunVRStereo
             if (screenKind ==
                 R30ScreenSpaceKind::ProjectedWorldMarker2D)
             {
-                if (R57Mode() == 9 || R57Mode() == 10)
-                {
-                    // Mode 10 performs the full depth/delta calculation only
-                    // for telemetry, then deliberately leaves the visual output
-                    // untouched. Mode 9 is the cheaper semantic-owner control.
-                    if (R57Mode() == 10)
-                    {
-                        float traceDeltaX[2]{}, traceDeltaY[2]{};
-                        if (!R57BuildProjectedMarkerDelta(
-                                stereo, baseProjection,
-                                traceDeltaX, traceDeltaY))
-                            return false;
-                    }
-                    const D3DMATRIX stockT = TransposeMatrix(stockWvp);
-                    std::memcpy(eyeConstants[0], &stockT, sizeof(stockT));
-                    std::memcpy(eyeConstants[1], &stockT, sizeof(stockT));
-                    return true;
-                }
-
                 float deltaX[2]{}, deltaY[2]{};
                 float baseAnchorX = 0.0f, baseAnchorY = 0.0f;
                 if (!R57BuildProjectedMarkerDelta(
@@ -4155,7 +4122,7 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, const char* method,
             D3DPRIMITIVETYPE type, UINT primitiveCount) noexcept
         {
-            if (!device || R57Mode() != 6 ||
+            if (!device ||
                 OutRunVR::GameSemantic::CurrentQueueExactScope !=
                     OutRunVR::GameSemantic::RenderScope::ScreenHud)
                 return;
@@ -4413,8 +4380,8 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R57 HUD: coordMode={} probeMode={} r57Mode={} exact producer semantics + projected-world-marker owner active; configured HudScale={:.2f}",
-                        R55HudCoordMode(), R56HudProbeMode(), R57Mode(),
+                        "VR R69 CLEAN HUD: coordMode={} probeMode={} fixed projected-world-marker production path active; configured HudScale={:.2f}",
+                        R55HudCoordMode(), R56HudProbeMode(),
                         R30HudScaleValue());
                     return 0;
                 }
