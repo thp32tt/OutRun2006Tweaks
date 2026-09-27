@@ -257,7 +257,7 @@ class RestoreCarBaseShadow : public Hook
 			{
 				loggedModes[mode] = true;
 				spdlog::info(
-					"VR R68 NONPLAY CAR: restored base shadow bypassed mode={} (stock PC nullsub behavior)",
+					"VR R65 SELECTOR: restored base shadow bypassed; VR R68 NONPLAY CAR mode={} (stock PC nullsub behavior)",
 					mode);
 			}
 			return;
