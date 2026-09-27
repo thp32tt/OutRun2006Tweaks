@@ -11,16 +11,12 @@ param(
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $backendRoot = Join-Path $root "backends"
-$payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "dxvk-safe" -or $Backend -eq "dx11") { "d3d9" } else { $Backend }
-
-$defaultVariant = switch ($Backend) {
-    "2d"        { "CONTROL_2D" }
-    "d3d9"      { "A_CONTROL" }
-    "dx11"      { "R57_05_RANK_PROJECTED_IPD" }
-    "dxvk-safe" { "E_DXVK_SAFE" }
-    "dxvk"      { "E_DXVK_MULTIVIEW" }
-    "dx12"      { "F_DX12_STRICT" }
-}
+$contractScript = Join-Path $root 'OutRunVR-BackendContract.ps1'
+if (-not (Test-Path $contractScript)) { throw "Backend contract missing: $contractScript" }
+. $contractScript
+$backendContract = Get-OutRunVRBackendContract -Backend $Backend
+$payloadBackend = [string]$backendContract.PayloadBackend
+$defaultVariant = [string]$backendContract.DefaultVariant
 $variant = if ($VariantId -eq "AUTO") { $defaultVariant } else { $VariantId }
 
 $slotPayload = Join-Path $root ("slots/" + $variant)
