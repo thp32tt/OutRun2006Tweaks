@@ -295,7 +295,9 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: outrun2006-vr-x86
+          # R66: this is the intentionally old R26-only diagnostic owner.
+          # Keep its artifact name impossible to confuse with a production package.
+          name: outrun2006-vr-x86-r26-only-diagnostic-DO-NOT-PACKAGE
           path: build-vr-game/bin/dinput8.dll
           if-no-files-found: error
 
