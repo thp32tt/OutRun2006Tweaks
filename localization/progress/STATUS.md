@@ -565,3 +565,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - HD migration candidate production: 16 ready / 0 remaining. No promotion because mandatory in-game screenshots are absent; approved/user-lock count remains 0.
 - Stock verify_state.py now returns LOCALIZATION_STATE_OK on the current base after the upstream zero-count normalization fix. Domain Isolation PASS; VR/FFB contamination not observed. No build performed.
 - Machine report: localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json.
+
+## Runtime regression reset — 2026-09-28 01:03 KST
+- **FAILED TEST PACKAGE:** `OutRun2_Korean_HD_Text_Test_20260927.zip`.
+- **P0:** crash in TextureReplacement path; combined package validation is invalid.
+- **OPEN VISUAL FAILS:** low-res Korean, clipping/overlap, residual English, corrupted ranking glyphs, mixed localization state.
+- **RUNTIME VALIDATION:** reset to RETEST_REQUIRED / SUSPECT_UNISOLATED.
+- **NEXT:** TEXT_ONLY with zero DDS first, then one candidate per DDS_ONLY package. COMBINED/RELEASE remain blocked until isolated in-game passes.
+- Evidence: `localization/validation/INCIDENT_20260928_TESTPATCH_FAIL.md`.

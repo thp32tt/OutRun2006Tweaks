@@ -962,3 +962,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - The remote base already contains the zero-count normalization fix for tools/localization/verify_state.py. Stock verification now returns LOCALIZATION_STATE_OK with draft_context_ids=[]; D85 did not modify verifier source.
 - Domain Isolation PASS; no VR/FFB source/history merge. Build not run.
 - Report: localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json.
+
+## 2026-09-28 01:03 KST — failed combined test patch / runtime gate reset
+- User test of `OutRun2_Korean_HD_Text_Test_20260927.zip` failed: game crash plus low-resolution Korean, clipping/overlap, residual English, corrupted ranking text and inconsistent mixed UI.
+- Crash evidence: 0xC0000005 in VCRUNTIME140.dll memmove; backtrace enters DINPUT8.dll TextureReplacement::D3DXCreateTextureFromFileInMemory_Custom_dest.
+- The package mixed KoreanTextOverlayTest with 16 unisolated HD DDS candidates; no single DDS is blamed without isolated proof.
+- Runtime approval is reset. Static QA evidence is retained, but all 16 candidates require one-at-a-time DDS_ONLY in-game validation.
+- Mandatory recovery order: TEXT_ONLY (0 DDS) -> DDS_ONLY (exactly 1 DDS each) -> COMBINED after isolated passes -> D-approved RELEASE.
+- Detailed incident: `localization/validation/INCIDENT_20260928_TESTPATCH_FAIL.md`.

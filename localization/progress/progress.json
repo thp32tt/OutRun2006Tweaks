@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-28T01:06:17+09:00",
+  "updated_at_kst": "2026-09-28T01:16:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "HD migration candidate production and static A/B/C/D QA are complete for the final two CREATE_NEW_HD assets D6DC1380 and 48DEBE77. Both pass D85 final static QA unchanged after C83, but mandatory in-game screenshots are still required before promotion. Current approved/user-lock count remains 0; earlier final-static holds are unchanged.",
+  "next_checkpoint": "P0 runtime recovery after failed 16-DDS combined test: build/test TEXT_ONLY with zero replacement DDS first; then validate each HD candidate one-at-a-time as DDS_ONLY with KoreanTextOverlayTest=false. COMBINED and RELEASE remain blocked until isolated INGAME_PASS evidence exists for text and every included DDS.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -559,6 +559,16 @@
       "package_sha256": "33a4e2b69a1a288582a6b028430ac70338eca66e4e72cdf2655abc5db89b4c0a",
       "status": "development_proof_not_ingame_validated"
     },
-    "clean_k1_ci_run_id": 36017712385
+    "clean_k1_ci_run_id": 36017712385,
+    "incident_20260928": {
+      "status": "RETEST_REQUIRED",
+      "failed_package": "OutRun2_Korean_HD_Text_Test_20260927.zip",
+      "crash": "0xC0000005 VCRUNTIME140.dll memmove via DINPUT8 TextureReplacement::D3DXCreateTextureFromFileInMemory_Custom_dest",
+      "text_only": "RETEST_REQUIRED",
+      "dds_candidates": "SUSPECT_UNISOLATED",
+      "combined": "BLOCKED",
+      "release": "BLOCKED",
+      "incident_report": "localization/validation/INCIDENT_20260928_TESTPATCH_FAIL.md"
+    }
   }
 }
