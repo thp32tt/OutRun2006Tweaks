@@ -3537,58 +3537,23 @@ namespace OutRunVRStereo
 
             if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
             {
-                // R67: the flare producer's Calc3D2D call is now captured at
-                // EXE+0xCF4E/return 0xCF53. Reproject that exact, already
-                // head-synchronised game-view anchor for each eye. The twelve
-                // 0x40C9A0 alpha objects keep their authored screen-space size;
-                // only their common anchor moves to the eye-correct ray.
-                float deltaX[2]{}, deltaY[2]{};
-                if (R57BuildProjectedMarkerDelta(
-                        stereo, baseProjection, deltaX, deltaY,
-                        nullptr, nullptr,
-                        OutRunVR::GameSemantic::ProjectedScreenAnchor()))
+                // R69 HMD evidence: the exact flare producer is a centre-eye
+                // Calc3D2D screen effect. Reprojecting it independently for
+                // left/right creates two visible flares. Preserve the game's
+                // head-tracked centre-eye placement but use the same WVP in
+                // both eyes so the effect fuses into one image.
+                const D3DMATRIX stockT = TransposeMatrix(stockWvp);
+                std::memcpy(eyeConstants[0], &stockT, sizeof(stockT));
+                std::memcpy(eyeConstants[1], &stockT, sizeof(stockT));
+                static bool firstFlareMonoFusionLogged = false;
+                if (!firstFlareMonoFusionLogged)
                 {
-                    for (int eye = 0; eye < 2; ++eye)
-                    {
-                        D3DMATRIX clipShift = IdentityMatrix();
-                        clipShift._41 = deltaX[eye];
-                        clipShift._42 = deltaY[eye];
-                        const D3DMATRIX corrected =
-                            MultiplyMatrix(stockWvp, clipShift);
-                        if (!MatrixFinite(corrected))
-                            return false;
-                        const D3DMATRIX correctedT = TransposeMatrix(corrected);
-                        std::memcpy(eyeConstants[eye], &correctedT,
-                            sizeof(correctedT));
-                    }
-                    static bool firstFlareReprojectionLogged = false;
-                    if (!firstFlareReprojectionLogged)
-                    {
-                        firstFlareReprojectionLogged = true;
-                        spdlog::info(
-                            "VR R67 FLARE REPROJECT: Calc3D2D view anchor -> eye-relative L/R projection ACTIVE");
-                    }
-                    return true;
-                }
-
-                // Exact anchor unavailable: retain the R65 FOV-only correction
-                // as a fail-soft path rather than widening alpha heuristics.
-                for (int eye = 0; eye < 2; ++eye)
-                {
-                    D3DMATRIX clipAffine = IdentityMatrix();
-                    clipAffine._11 = eyeScale[eye];
-                    clipAffine._41 = eyeOffset[eye];
-                    const D3DMATRIX corrected =
-                        MultiplyMatrix(stockWvp, clipAffine);
-                    if (!MatrixFinite(corrected))
-                        return false;
-                    const D3DMATRIX correctedT = TransposeMatrix(corrected);
-                    std::memcpy(eyeConstants[eye], &correctedT,
-                        sizeof(correctedT));
+                    firstFlareMonoFusionLogged = true;
+                    spdlog::info(
+                        "VR R69 FLARE FUSION: exact Calc3D2D centre-eye WVP copied identically to L/R; per-eye flare reprojection disabled");
                 }
                 return true;
             }
-
             if (screenKind ==
                 R30ScreenSpaceKind::ProjectedWorldMarker2D)
             {
@@ -3994,7 +3959,7 @@ namespace OutRunVRStereo
                 {
                     firstProjectedScreenEffectLogged = true;
                     spdlog::info(
-                        "VR R67 FLARE FIX: exact projected-screen effect prefers Calc3D2D eye reprojection; FOV-only affine is fallback only");
+                        "VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes");
                 }
             }
             if (screenKind == R30ScreenSpaceKind::WorldBillboard &&
