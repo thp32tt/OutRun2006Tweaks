@@ -48,6 +48,10 @@ require_all("CMakeLists.txt", [
     'option(OUTRUN_VR_SAFE_DRAW_COMPARE "Use R26-only safe-draw diagnostic path" OFF)',
     'option(OUTRUN_VR_R26_HUD_COMPARE "Build R26-safe world path with R30 HUD/XYZRHW/SkyGlow overlay" ON)',
 ], "P1_BUILD_DEFAULT_R26_HUD")
+require_all("cmake.toml", [
+    'option(OUTRUN_VR_SAFE_DRAW_COMPARE "Use R26-only safe-draw diagnostic path" OFF)',
+    'option(OUTRUN_VR_R26_HUD_COMPARE "Build R26-safe world path with R30 HUD/XYZRHW/SkyGlow overlay" ON)',
+], "P1_CMKR_SOURCE_DEFAULT_R26_HUD")
 
 # PASS 2 — the HMD-proven projected-rank mode is the production default.
 require_all("src/hooks_uiscaling.cpp", [
