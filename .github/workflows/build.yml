@@ -115,9 +115,18 @@ jobs:
             "VR R13: auxiliary/offscreen c64 WVP kept stock",
             "VR v3 shadow: live dual-protocol diagnostics active",
             "VR GPL SHADER: pair="
+            "VR R26+HUD SAFE TEST: R26/R23 world path + R30 HUD/XYZRHW/SkyGlow overlay ACTIVE"
+            "VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE"
+            "VR R66 OPTION ARROW: exact node pinned"
+            "VR R66 GOAL TIME HUD:"
+            "VR R65 FLARE FIX: exact projected-screen effect uses asymmetric-FOV affine only"
+            "VR R65 SELECTOR: restored base shadow bypassed"
           )
           foreach ($marker in $markers) {
             if (-not $ascii.Contains($marker)) { throw "missing compiled marker: $marker" }
+          }
+          if ($ascii.Contains("VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE")) {
+            throw "generic Build produced forbidden R26-only SAFE-DRAW variant"
           }
 
           $ini = Get-Content "build/bin/OutRun2006Tweaks.ini" -Raw
