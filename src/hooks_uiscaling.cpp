@@ -67,8 +67,11 @@ class UIScaling : public Hook
 			const DWORD len = GetEnvironmentVariableA(
 				"OUTRUN_VR_HUD_PROBE", text,
 				static_cast<DWORD>(sizeof(text)));
+			// R66 production baseline: R57 mode 6 is the HMD-proven owner for
+			// both 1st-3rd and 4th+ projected rank markers and for DispRank.
+			// Environment value 0 remains an explicit diagnostic rollback.
 			if (len == 0 || len >= sizeof(text))
-				return 0;
+				return 6;
 			int value = 0;
 			for (DWORD i = 0; i < len; ++i)
 			{
@@ -117,7 +120,7 @@ class UIScaling : public Hook
 					return 0;
 				value = value * 10 + int(text[i] - '0');
 			}
-			return (value >= 1 && value <= 10) ? value : 0;
+			return (value >= 0 && value <= 10) ? value : 6;
 		}();
 		return mode;
 	}
@@ -868,6 +871,70 @@ class UIScaling : public Hook
 		AddSpriteSpacing((int*)(ctx.esp + 4), true);
 	}
 
+	// R66: NaviPub_DispTimeAttackGoal (RVA 0xBEA50) does not execute the
+	// DispTimeAttack2D callsites above. Disassembly proves it calls only
+	// 0xBE020 and 0xBE150 after the 120-frame gate. Own only those two exact
+	// caller edges and tag every SpriteNode they append as SCREEN_HUD.
+	using GoalTimeHelperFn = void(__cdecl*)();
+
+	static void GoalTime_TagHelper(int helperRva, const char* label)
+	{
+		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			tailsBefore[prio] = root ? root->tail_4 : nullptr;
+		}
+
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			auto original = reinterpret_cast<GoalTimeHelperFn>(
+				Module::exe_ptr(helperRva));
+			original();
+		}
+
+		std::uint64_t tagged = 0;
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
+			if (!root || !tailAfter || tailAfter == tailsBefore[prio])
+				continue;
+
+			SpriteNode* node = tailsBefore[prio]
+				? tailsBefore[prio]->next_0 : root->next_0;
+			for (unsigned guard = 0; node && guard < 0x230; ++guard)
+			{
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+				++tagged;
+				if (node == tailAfter)
+					break;
+				node = node->next_0;
+			}
+		}
+
+		static std::atomic<std::uint64_t> calls{ 0 };
+		static std::atomic<std::uint64_t> nodes{ 0 };
+		const auto call = calls.fetch_add(1, std::memory_order_relaxed) + 1;
+		const auto total = nodes.fetch_add(tagged, std::memory_order_relaxed) + tagged;
+		if ((call & (call - 1)) == 0)
+			spdlog::info(
+				"VR R66 GOAL TIME HUD: helper={} calls={} tagged={} totalTags={}",
+				label, call, tagged, total);
+	}
+
+	static void __cdecl GoalTime_Help020()
+	{
+		GoalTime_TagHelper(0xBE020, "BE020");
+	}
+
+	static void __cdecl GoalTime_Help150()
+	{
+		GoalTime_TagHelper(0xBE150, "BE150");
+	}
+
 	// R56 05-08/19: exact DispRank producer probe. The eight original-mod
 	// callsites all pass the rank/POSITION horizontal coordinate at ESP+4.
 	static void DispRankProbe_AdjustPosition(safetyhook::Context& ctx)
@@ -1127,6 +1194,12 @@ public:
 		PutGhostGapInfo_sub_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BDAE8, PutGhostGapInfo_sub_AdjustPosition);
 
 		NaviPub_DispTimeAttackGoal_DisableScaling_hk = safetyhook::create_mid((void*)0x4BEA64, SpriteSpacingDisable);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBEA5A),
+			GoalTime_Help020, Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBEA5F),
+			GoalTime_Help150, Memory::HookType::Call);
 
 		// adjusts the girlfriend request speech bubble
 		ctrl_icon_work_AdjustPosition_hk = safetyhook::create_mid((void*)0x460D40, ctrl_icon_work_AdjustPosition);
@@ -1377,7 +1450,9 @@ public:
 	bool apply() override
 	{
 		char modeText[8]{};
-		int experimentMode = 0;
+		// R66: sticky exact queue ownership (mode 2) is the proven R57/R64
+		// baseline. Keep env=0 available only as an explicit diagnostic rollback.
+		int experimentMode = 2;
 		if (GetEnvironmentVariableA(
 				"OUTRUN_VR_HUD_EXPERIMENT_MODE",
 				modeText, static_cast<DWORD>(sizeof(modeText))) > 0 &&
