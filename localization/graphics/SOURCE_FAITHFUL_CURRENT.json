@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-27T18:13:44+09:00",
+  "updated_at_kst": "2026-09-27T18:29:48+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -129,7 +129,7 @@
     "old_candidates": "historical_until_rebuilt_or_revalidated_against_HD"
   },
   "latest_d_final_qa_report": "localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json",
-  "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json",
+  "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
   "post_d78_c78_update": {
     "asset": "39229D64",
     "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
@@ -165,5 +165,21 @@
     "candidate_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
     "result": "D81_PREFLIGHT_PASS_PENDING_C_INGAME",
     "report": "localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json"
+  },
+  "post_d81_c80_update": {
+    "result": "C80_MIXED_PASS_REWORK_PENDING_D_INGAME",
+    "C4A2937B": {
+      "sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
+      "note": "unchanged; D80 same-SHA preflight valid; runtime context hold remains"
+    },
+    "2DA43E41": {
+      "sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
+      "note": "C80 semantic render correction; D80 old SHA superseded"
+    },
+    "411827E": {
+      "sha256": "c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74",
+      "note": "C80 canonical badge-border restoration; D81 old SHA superseded"
+    },
+    "approved_dds_promotion": false
   }
 }

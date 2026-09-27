@@ -749,3 +749,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - B86 expanded C075FB49 to 16 semantic / 17 expected physical regions (Maximum Speed→최고 속도, Transmission→변속기; More BGM x2). It remains the next production target.
 - LOCALIZATION_STATE_OK and Domain Isolation PASS; no VR/FFB source diff or merge commit. Build not run.
 - Report: localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json.
+
+## 2026-09-27 18:29 KST — C80 strict QA + rework (C4A2937B / 2DA43E41 / 411827E)
+
+- C4A2937B: independent C review of B85 SHA f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99 PASS; 4096x4096 RGBA32/1 mip, exact header, 808,450 changed pixels, outside 21 cells = 0, introduced alpha outside = 0. Candidate unchanged.
+- C4 semantic QA accepts Cut the line! -> 하트선을 통과하세요!; Drift and -> 드리프트하고 remains an adjacent-sprite/in-game composition hold. D80 same-SHA preflight remains binary-valid.
+- 2DA43E41: found semantic render omission: both course-selection first lines rendered '15코스 연속' while reviewed transcription requires '15코스 연속이'. C80 re-rendered only those two first lines.
+- 2DA current SHA 02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563 supersedes B85 7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1; exact header/mirror_y retained; outside all 11 cells = 0, introduced alpha outside = 0, changes versus B85 outside the two course cells = 0. D80 old-SHA validation is superseded.
+- 411827E: found non-text artwork damage in Recommendation -> 추천: most canonical white badge outline was erased by the existing candidate. C80 restored the canonical badge border/background while retaining 추천.
+- 411 current SHA c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74 supersedes A85/B86 8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02; all 9,767 canonical badge-border core pixels match exactly after repair; outside 7 cells = 0, introduced alpha outside = 0, changes versus B86 outside Recommendation cell = 0. D81 old-SHA validation is superseded.
+- Final raw/readable/white-background QA PASS for both C80 reworked DDS files; no observed source residue, clipping/overlap, box escape, black seam, opaque box or alpha halo. No approved_dds promotion; in-game validation remains mandatory. Build not run; VR/FFB untouched.
+- Machine report: localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json.

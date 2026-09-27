@@ -1,0 +1,20 @@
+{
+  "canonical_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+  "b86_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
+  "c80_sha256": "c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74",
+  "header_128_exact_canonical": true,
+  "bytes": 16777344,
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "changed_pixels_vs_canonical": 204603,
+  "outside_all_7_cells_vs_canonical": 0,
+  "introduced_alpha_outside_7_cells": 0,
+  "changed_pixels_vs_b86": 9625,
+  "changes_vs_b86_outside_recommendation_cell": 0,
+  "canonical_border_core_pixels": 9767,
+  "border_core_mismatch_after_rework": 0,
+  "raw_payload_pixel_changes_outside_all_7_cells": 0,
+  "raw_payload_pixel_changes_vs_B86_outside_recommendation_cell": 0
+}

@@ -40,16 +40,16 @@ index,path,action,artwork_status,transcription_status,notes
 57,textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds,localize_text,c78_rework_static_pass_pending_d_ingame,transcribed_reviewed,C78 corrected Total Rank x3 background artifacts; candidate f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4; A82/B83/D77/D78 old SHA superseded for binary validation; D + in-game pending
 59,textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 60,textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds,localize_text,c79_static_pass_d78_same_sha_pending_d_ingame,transcribed_reviewed,B84 production + C79 strict QA PASS 17 semantic/21 physical; candidate unchanged; D78 same-SHA preflight valid; final D reconcile + in-game pending
-61,textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds,localize_text,b85_rework_first_qa_pass_pending_c_d_ingame,transcribed_reviewed,B85 changed SHA; Cut the line -> 하트선을 통과하세요!; Drift and context pending; C/D + in-game required
+61,textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds,localize_text,c80_static_pass_context_hold_pending_d_ingame,transcribed_reviewed,C80 strict QA PASS unchanged B85 SHA; D80 same-SHA preflight valid; Drift and runtime composition + final D/in-game pending
 62,textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds,zoom_review,blocked_review,needs_zoom_review,
 63,textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass5 transcription saved
 65,textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 86,textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds,localize_text,pending_artwork,transcribed_reviewed,pass5 transcription saved
 89,textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 92,textures/load/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
-94,textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds,localize_text,b85_rework_first_qa_pass_pending_c_d_ingame,transcribed_reviewed,B85 changed SHA; 가속도 terminology + source-residue rework; C/D + in-game required
+94,textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds,localize_text,c80_rework_static_pass_pending_d_ingame,transcribed_reviewed,C80 restored omitted particle 이 in both course-selection lines; new SHA 02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563; D80 old SHA superseded; D + in-game pending
 95,textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds,localize_text,pending_artwork,transcribed_reviewed,pass5 transcription saved
-97,textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds,localize_text,a85_candidate_b86_first_qa_pass_pending_c_d_ingame,transcribed_reviewed,A85 SHA 8ffb3dce... B86 first QA PASS; candidate unchanged; C/D + in-game pending
+97,textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds,localize_text,c80_rework_static_pass_pending_d_ingame,transcribed_reviewed,C80 restored canonical Recommendation badge white border while retaining 추천; new SHA c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74; D81 old SHA superseded; D + in-game pending
 98,textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 99,textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 100,textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass6 transcription saved

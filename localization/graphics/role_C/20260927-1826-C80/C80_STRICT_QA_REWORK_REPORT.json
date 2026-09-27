@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C80",
+  "timestamp_kst": "2026-09-27T18:29:48+09:00",
+  "qa_started_head": "8cade40b87c775acd79cd4333c4e80d3534e5180",
+  "persistence_base_head": "becf13acf5dbe7964cdd5b1343c456dce4cd6145",
+  "scope": "strict QA + corrections on current B85/B86 candidates; no build; no VR/FFB",
+  "result": "MIXED_PASS_AND_REWORK_STATIC_QA_PENDING_D_AND_INGAME",
+  "approved_dds_promotion": false,
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "assets": {
+    "C4A2937B": {
+      "canonical_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "input_candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
+      "output_candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
+      "candidate_changed_by_C": false,
+      "semantic_entries": 20,
+      "physical_regions": 21,
+      "semantic_result": "PASS_WITH_RUNTIME_CONTEXT_HOLD",
+      "context_hold": "Drift and -> 드리프트하고 requires adjacent-sprite/in-game composition confirmation.",
+      "cut_line_review": "하트선을 통과하세요! accepted as the current reviewed gameplay-context correction.",
+      "structure": {
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "bytes": 67108992,
+        "header_128_exact_canonical": true,
+        "total_changed_pixels": 808450,
+        "outside_21_cells_changed_pixels": 0,
+        "introduced_alpha_outside_21_cells": 0,
+        "raw_orientation": "mirror_y"
+      },
+      "visual_qa": "PASS_READABLE_RAW_WHITE_BACKGROUND",
+      "candidate_artifacts": "NONE_OBSERVED",
+      "d80_same_sha_preflight_valid": true,
+      "result": "C80_STATIC_PASS_CONTEXT_HOLD_PENDING_D_RECONCILE_INGAME"
+    },
+    "2DA43E41": {
+      "canonical_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+      "input_candidate_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
+      "output_candidate_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
+      "candidate_changed_by_C": true,
+      "semantic_entries": 11,
+      "physical_regions": 11,
+      "finding": {
+        "severity": "REWORK_REQUIRED",
+        "type": "SEMANTIC_RENDER_OMISSION",
+        "detail": "Both course-selection first lines omitted the Korean subject particle 이 present in reviewed transcription."
+      },
+      "correction": [
+        "OutRun2 · 15코스 연속 -> OutRun2 · 15코스 연속이",
+        "OutRun2: SP · 15코스 연속 -> OutRun2: SP · 15코스 연속이"
+      ],
+      "structure": {
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "bytes": 67108992,
+        "header_128_exact_canonical": true,
+        "changed_pixels_vs_canonical": 1244456,
+        "outside_11_cells_changed_pixels": 0,
+        "introduced_alpha_outside_11_cells": 0,
+        "changed_pixels_vs_B85": 136943,
+        "changes_vs_B85_outside_two_course_cells": 0,
+        "raw_orientation": "mirror_y",
+        "raw_payload_exact_outside_all_11_cells": true,
+        "raw_payload_changes_vs_B85_outside_two_repair_cells": 0
+      },
+      "visual_qa": "PASS_AFTER_REWORK_READABLE_RAW_WHITE_BACKGROUND",
+      "protected_titles": [
+        "OutRun2",
+        "OutRun2: SP",
+        "Keep Your Heart -1989-"
+      ],
+      "d80_binary_validation": "SUPERSEDED_BY_C80_CHANGED_SHA",
+      "result": "C80_REWORK_STATIC_PASS_PENDING_D_REVALIDATION_INGAME"
+    },
+    "411827E": {
+      "canonical_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "input_candidate_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
+      "output_candidate_sha256": "c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74",
+      "candidate_changed_by_C": true,
+      "semantic_entries": 7,
+      "physical_regions": 7,
+      "finding": {
+        "severity": "REWORK_REQUIRED",
+        "type": "NON_TEXT_ARTWORK_DAMAGE",
+        "detail": "Recommendation -> 추천 repaint removed most of the canonical white badge outline."
+      },
+      "correction": "Restored canonical badge outline/background while retaining Korean 추천 text.",
+      "structure": {
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "bytes": 16777344,
+        "header_128_exact_canonical": true,
+        "changed_pixels_vs_canonical": 204603,
+        "outside_7_cells_changed_pixels": 0,
+        "introduced_alpha_outside_7_cells": 0,
+        "changed_pixels_vs_B86": 9625,
+        "changes_vs_B86_outside_recommendation_cell": 0,
+        "canonical_badge_border_core_pixels": 9767,
+        "badge_border_core_mismatch_after_rework": 0,
+        "raw_orientation": "mirror_y",
+        "raw_payload_exact_outside_all_7_cells": true,
+        "raw_payload_changes_vs_B86_outside_recommendation_cell": 0
+      },
+      "visual_qa": "PASS_AFTER_REWORK_READABLE_RAW_WHITE_BACKGROUND",
+      "protected_original": [
+        "288GTO",
+        "Testarossa",
+        "F40",
+        "Enzo Ferrari",
+        "2P/4P/3P/1P",
+        "vehicle/control artwork"
+      ],
+      "d81_binary_validation": "SUPERSEDED_BY_C80_CHANGED_SHA",
+      "result": "C80_REWORK_STATIC_PASS_PENDING_D_REVALIDATION_INGAME"
+    }
+  },
+  "next": [
+    "C4A2937B: D final reconciliation may reuse D80 same-SHA binary checks; keep Drift and runtime composition hold.",
+    "2DA43E41: D must validate C80 SHA, then in-game validation.",
+    "411827E: D must validate C80 SHA, then in-game validation.",
+    "Continue C075FB49 production independently."
+  ]
+}

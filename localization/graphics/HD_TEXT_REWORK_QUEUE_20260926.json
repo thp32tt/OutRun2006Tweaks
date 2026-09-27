@@ -195,7 +195,7 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "D80_PREFLIGHT_PASS_PENDING_C_INGAME",
+      "status": "C80_STATIC_PASS_CONTEXT_HOLD_PENDING_D_RECONCILE_INGAME",
       "transcription_segments": 20,
       "localized_regions": 21,
       "remaining_segments": 0,
@@ -220,7 +220,10 @@
       "context_followup": [
         "Drift and -> 드리프트하고 adjacent-sprite/in-game composition"
       ],
-      "superseded_validation": "D79 A83-SHA preflight superseded; D80 current B85 SHA preflight valid"
+      "superseded_validation": "D79 A83-SHA preflight superseded; D80 current B85 SHA preflight valid",
+      "c_strict_qa_report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
+      "c_candidate_changed": false,
+      "d80_same_sha_preflight_valid": true
     },
     {
       "hash": "2DA43E41",
@@ -233,13 +236,13 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "D80_PREFLIGHT_PASS_PENDING_C_INGAME",
+      "status": "C80_REWORK_STATIC_PASS_PENDING_D_REVALIDATION_INGAME",
       "transcription_segments": 11,
       "localized_regions": 11,
       "remaining_segments": 0,
       "batch_report": "localization/graphics/role_A/20260927-1630-A84/A84_2DA43E41_PRODUCTION_REPORT.json",
       "a_production_report": "localization/graphics/role_A/20260927-1630-A84/A84_2DA43E41_PRODUCTION_REPORT.json",
-      "candidate_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
+      "candidate_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
       "semantic_expansion": [
         "加速度: -> 가속도:",
@@ -256,7 +259,11 @@
       "candidate_changed_by_B": true,
       "semantic_fix": "加速度: 가속: -> 가속도:",
       "artifact_fix": "A84 residual source-English lower strokes removed in 4 large text cells",
-      "d_preflight_report": "localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json"
+      "d_preflight_report": "localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json",
+      "c_strict_qa_report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
+      "c_candidate_changed": true,
+      "c80_supersedes_b85_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
+      "d80_status": "SUPERSEDED_BY_C80_CHANGED_SHA_REQUIRES_D_REVALIDATION"
     },
     {
       "hash": "411827E",
@@ -269,18 +276,22 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "D81_PREFLIGHT_PASS_PENDING_C_INGAME",
+      "status": "C80_REWORK_STATIC_PASS_PENDING_D_REVALIDATION_INGAME",
       "transcription_segments": 7,
       "localized_regions": 7,
       "remaining_segments": 0,
       "batch_report": "localization/graphics/role_A/20260927-1730-A85/A85_411827E_PRODUCTION_REPORT.json",
       "a_production_report": "localization/graphics/role_A/20260927-1730-A85/A85_411827E_PRODUCTION_REPORT.json",
-      "candidate_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
+      "candidate_sha256": "c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
       "in_game_validation": "PENDING",
       "b_first_qa_report": "localization/graphics/role_B/20260927-1800-B86/B86_411827E_FIRST_QA_AND_C075FB49_TRANSCRIPTION.json",
       "candidate_changed_by_B": false,
-      "d_preflight_report": "localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json"
+      "d_preflight_report": "localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json",
+      "c_strict_qa_report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
+      "c_candidate_changed": true,
+      "c80_supersedes_a85_b86_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
+      "d81_status": "SUPERSEDED_BY_C80_CHANGED_SHA_REQUIRES_D_REVALIDATION"
     },
     {
       "hash": "C075FB49",
@@ -350,5 +361,5 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json"
+  "latest_batch": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json"
 }

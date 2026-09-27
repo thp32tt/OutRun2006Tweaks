@@ -1,0 +1,18 @@
+{
+  "canonical_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+  "b85_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
+  "c80_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
+  "header_128_exact_canonical": true,
+  "bytes": 67108992,
+  "dimensions": [
+    4096,
+    4096
+  ],
+  "changed_pixels_vs_canonical": 1244456,
+  "outside_all_11_cells_vs_canonical": 0,
+  "introduced_alpha_outside_11_cells": 0,
+  "changed_pixels_vs_b85": 136943,
+  "changes_vs_b85_outside_two_course_cells": 0,
+  "raw_payload_pixel_changes_outside_all_11_cells": 0,
+  "raw_payload_pixel_changes_vs_B85_outside_two_repair_cells": 0
+}

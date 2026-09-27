@@ -406,3 +406,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Next production target: C075FB49, B86-expanded 16 semantic / 17 physical occurrences.
 - LOCALIZATION_STATE_OK and Domain Isolation PASS; VR/FFB source/history contamination not observed. No build performed.
 - Machine report: localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json.
+
+## C80 strict QA + rework — 2026-09-27 18:29 KST
+- C4A2937B f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99: C STATIC PASS, unchanged; D80 same-SHA preflight reusable; Drift and runtime composition remains pending.
+- 2DA43E41 02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563: C REWORK PASS. Restored omitted 조사 '이' in both course-selection messages. D80 prior SHA superseded; D revalidation + in-game pending.
+- 411827E c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74: C REWORK PASS. Restored canonical Recommendation badge white border while retaining 추천. D81 prior SHA superseded; D revalidation + in-game pending.
+- Containment: C4 outside 21 cells = 0; 2DA outside 11 cells = 0; 411 outside 7 cells = 0. New alpha outside declared cells = 0 for all. Canonical headers and raw mirror_y preserved.
+- No approved_dds promotion; no build; VR/FFB unchanged. Machine report: localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json.

@@ -1,0 +1,336 @@
+{
+  "canonical_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+  "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
+  "bytes": 67108992,
+  "dimensions": [
+    4096,
+    4096
+  ],
+  "header_128_exact": true,
+  "total_changed_pixels": 808450,
+  "outside_declared_cells_changed_pixels": 0,
+  "introduced_alpha_outside_declared_cells": 0,
+  "raw_changed_bbox": [
+    1031,
+    1267,
+    4075,
+    3098
+  ],
+  "per_cell": {
+    "go_gate": {
+      "changed_pixels": 45105,
+      "diff_bbox_local": [
+        13,
+        0,
+        502,
+        108
+      ],
+      "cell": [
+        2048,
+        998,
+        2565,
+        1106
+      ]
+    },
+    "cut_line": {
+      "changed_pixels": 42596,
+      "diff_bbox_local": [
+        10,
+        0,
+        476,
+        108
+      ],
+      "cell": [
+        2573,
+        998,
+        3059,
+        1106
+      ]
+    },
+    "keep_passing": {
+      "changed_pixels": 43550,
+      "diff_bbox_local": [
+        9,
+        8,
+        510,
+        108
+      ],
+      "cell": [
+        3059,
+        998,
+        3584,
+        1106
+      ]
+    },
+    "double_speed": {
+      "changed_pixels": 40092,
+      "diff_bbox_local": [
+        12,
+        6,
+        484,
+        108
+      ],
+      "cell": [
+        3584,
+        998,
+        4083,
+        1106
+      ]
+    },
+    "hit_blue_cone": {
+      "changed_pixels": 44419,
+      "diff_bbox_local": [
+        13,
+        10,
+        503,
+        117
+      ],
+      "cell": [
+        1024,
+        1472,
+        1541,
+        1600
+      ]
+    },
+    "dont_crash": {
+      "changed_pixels": 42842,
+      "diff_bbox_local": [
+        12,
+        6,
+        492,
+        121
+      ],
+      "cell": [
+        1541,
+        1472,
+        2048,
+        1600
+      ]
+    },
+    "collect_coins": {
+      "changed_pixels": 43349,
+      "diff_bbox_local": [
+        6,
+        8,
+        484,
+        120
+      ],
+      "cell": [
+        2048,
+        1472,
+        2547,
+        1600
+      ]
+    },
+    "run_red": {
+      "changed_pixels": 42289,
+      "diff_bbox_local": [
+        7,
+        4,
+        530,
+        96
+      ],
+      "cell": [
+        1024,
+        1600,
+        1554,
+        1702
+      ]
+    },
+    "run_blue": {
+      "changed_pixels": 39712,
+      "diff_bbox_local": [
+        0,
+        4,
+        499,
+        96
+      ],
+      "cell": [
+        1554,
+        1600,
+        2053,
+        1702
+      ]
+    },
+    "pass_convoy": {
+      "changed_pixels": 40105,
+      "diff_bbox_local": [
+        0,
+        4,
+        520,
+        95
+      ],
+      "cell": [
+        2053,
+        1600,
+        2573,
+        1702
+      ]
+    },
+    "catch_heart": {
+      "changed_pixels": 39874,
+      "diff_bbox_local": [
+        0,
+        5,
+        512,
+        96
+      ],
+      "cell": [
+        2555,
+        1600,
+        3067,
+        1702
+      ]
+    },
+    "beat_car_1": {
+      "changed_pixels": 38876,
+      "diff_bbox_local": [
+        0,
+        5,
+        510,
+        96
+      ],
+      "cell": [
+        3046,
+        1600,
+        3571,
+        1702
+      ]
+    },
+    "red": {
+      "changed_pixels": 34878,
+      "diff_bbox_local": [
+        0,
+        0,
+        333,
+        145
+      ],
+      "cell": [
+        3110,
+        1446,
+        3443,
+        1600
+      ]
+    },
+    "blue": {
+      "changed_pixels": 37573,
+      "diff_bbox_local": [
+        0,
+        0,
+        333,
+        145
+      ],
+      "cell": [
+        3571,
+        1446,
+        3904,
+        1600
+      ]
+    },
+    "drift": {
+      "changed_pixels": 21345,
+      "diff_bbox_local": [
+        10,
+        8,
+        301,
+        93
+      ],
+      "cell": [
+        3686,
+        1600,
+        3999,
+        1702
+      ]
+    },
+    "stage_bonus": {
+      "changed_pixels": 30463,
+      "diff_bbox_local": [
+        0,
+        2,
+        261,
+        153
+      ],
+      "cell": [
+        3814,
+        1741,
+        4096,
+        1894
+      ]
+    },
+    "get": {
+      "changed_pixels": 37022,
+      "diff_bbox_local": [
+        23,
+        0,
+        359,
+        143
+      ],
+      "cell": [
+        3571,
+        1894,
+        3930,
+        2043
+      ]
+    },
+    "beat_car_2": {
+      "changed_pixels": 45002,
+      "diff_bbox_local": [
+        14,
+        6,
+        572,
+        100
+      ],
+      "cell": [
+        3494,
+        2043,
+        4083,
+        2150
+      ]
+    },
+    "next_stage": {
+      "changed_pixels": 43634,
+      "diff_bbox_local": [
+        12,
+        7,
+        500,
+        114
+      ],
+      "cell": [
+        2534,
+        2163,
+        3034,
+        2284
+      ]
+    },
+    "drift_and": {
+      "changed_pixels": 29645,
+      "diff_bbox_local": [
+        10,
+        11,
+        379,
+        110
+      ],
+      "cell": [
+        3021,
+        2163,
+        3400,
+        2284
+      ]
+    },
+    "position": {
+      "changed_pixels": 28683,
+      "diff_bbox_local": [
+        24,
+        9,
+        356,
+        141
+      ],
+      "cell": [
+        1370,
+        2688,
+        1779,
+        2829
+      ]
+    }
+  }
+}

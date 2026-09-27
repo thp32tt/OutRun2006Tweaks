@@ -1,5 +1,5 @@
 {
-  "schema_version": 40,
+  "schema_version": 41,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,7 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "HD GRAPHICS: 411827E A85/B86 SHA passes D81 direct preflight but needs C + in-game; C4/2DA also need C + in-game; FA7/392/A064 remain in-game holds. Continue C075FB49 canonical-HD rebuild using B86-expanded 16 semantic / 17 physical coverage.",
+    "HD GRAPHICS: C80 C4A2937B static PASS on unchanged B85 SHA with Drift and runtime-context hold; 2DA43E41 and 411827E C80 reworked SHAs need D revalidation + in-game. FA7/392/A064 remain in-game holds. Continue C075FB49 canonical-HD rebuild using B86-expanded 16 semantic / 17 physical coverage.",
     "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
     "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
     "Never upscale prior stock-resolution Korean DDS candidates.",
@@ -125,7 +125,7 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_B/20260927-1800-B86/B86_411827E_FIRST_QA_AND_C075FB49_TRANSCRIPTION.json",
+    "latest_hd_rework_batch": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
     "hd_rework_candidates_ready": 8,
     "hd_rework_remaining": 5,
     "hd_partial_rework": {
@@ -197,7 +197,7 @@
         "d_final_qa_report": "localization/graphics/role_D/20260927-1618-D79/D79_FINAL_QA_RECONCILE_REPORT.json"
       },
       "C4A2937B": {
-        "status": "D80_PREFLIGHT_PASS_PENDING_C_INGAME",
+        "status": "C80_STATIC_PASS_CONTEXT_HOLD_PENDING_D_RECONCILE_INGAME",
         "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
         "completed_transcription_entries": 20,
@@ -217,11 +217,14 @@
         "context_followup": [
           "Drift and -> 드리프트하고 adjacent-sprite/in-game composition"
         ],
-        "superseded_a83_sha256": "7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e"
+        "superseded_a83_sha256": "7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e",
+        "c_strict_qa_report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
+        "c_candidate_changed": false,
+        "d80_same_sha_preflight_valid": true
       },
       "2DA43E41": {
-        "status": "D80_PREFLIGHT_PASS_PENDING_C_INGAME",
-        "candidate_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
+        "status": "C80_REWORK_STATIC_PASS_PENDING_D_REVALIDATION_INGAME",
+        "candidate_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
         "completed_transcription_entries": 11,
         "localized_regions": 11,
@@ -237,11 +240,15 @@
         "superseded_a84_sha256": "0efaaa86849c66c94a4d5e1d5f7fbd86caa8935b5a5cb24ccbb26fc29f97d355",
         "semantic_fix": "加速度: -> 가속도:",
         "artifact_fix": "4 large cells source residue removed",
-        "d_preflight_report": "localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json"
+        "d_preflight_report": "localization/graphics/role_D/20260927-1719-D80/D80_FINAL_QA_RECONCILE_REPORT.json",
+        "c_strict_qa_report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
+        "c_candidate_changed": true,
+        "c80_supersedes_b85_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
+        "d80_status": "SUPERSEDED_BY_C80_CHANGED_SHA_REQUIRES_D_REVALIDATION"
       },
       "411827E": {
-        "status": "D81_PREFLIGHT_PASS_PENDING_C_INGAME",
-        "candidate_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
+        "status": "C80_REWORK_STATIC_PASS_PENDING_D_REVALIDATION_INGAME",
+        "candidate_sha256": "c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
         "completed_transcription_entries": 7,
         "localized_regions": 7,
@@ -250,7 +257,11 @@
         "in_game_validation": "PENDING",
         "b_first_qa_report": "localization/graphics/role_B/20260927-1800-B86/B86_411827E_FIRST_QA_AND_C075FB49_TRANSCRIPTION.json",
         "candidate_changed_by_B": false,
-        "d_preflight_report": "localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json"
+        "d_preflight_report": "localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json",
+        "c_strict_qa_report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
+        "c_candidate_changed": true,
+        "c80_supersedes_a85_b86_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
+        "d81_status": "SUPERSEDED_BY_C80_CHANGED_SHA_REQUIRES_D_REVALIDATION"
       }
     },
     "a76_ff2462bb": {
@@ -262,7 +273,7 @@
       "status": "PENDING_B_C_D_STRICT_QA"
     },
     "latest_d_final_qa_report": "localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json",
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
     "c77_fa7bbb13": {
       "timestamp_kst": "2026-09-27T14:05:02+09:00",
       "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
@@ -301,6 +312,24 @@
       "transcription_segments": 16,
       "expected_physical_text_occurrences": 17,
       "status": "TRANSCRIPTION_EXPANDED_READY_FOR_CANONICAL_HD_RENDER"
+    },
+    "c80": {
+      "timestamp_kst": "2026-09-27T18:29:48+09:00",
+      "report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
+      "C4A2937B": {
+        "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
+        "changed": false
+      },
+      "2DA43E41": {
+        "candidate_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
+        "changed": true,
+        "superseded_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1"
+      },
+      "411827E": {
+        "candidate_sha256": "c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74",
+        "changed": true,
+        "superseded_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02"
+      }
     }
   },
   "runtime_packages": {
