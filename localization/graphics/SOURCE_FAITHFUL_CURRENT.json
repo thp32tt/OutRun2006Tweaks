@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-27T18:29:48+09:00",
+  "updated_at_kst": "2026-09-27T19:19:40+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -12,9 +12,9 @@
   ],
   "mandatory_policy": "localization/graphics/ORIENTATION_POLICY.md",
   "automation_checkpoint": {
-    "run": "D81-final-qa-reconcile-20260927",
-    "result": "NO_NEW_APPROVALS",
-    "note": "Three USER_APPROVED_LOCKED DDS reverified unchanged. 411827E A85/B86 same SHA passes D81 direct static/raw/readable/containment QA but C and in-game gates remain."
+    "run": "D82-final-qa-reconcile-20260927",
+    "result": "NO_NEW_APPROVALS_CURRENT_LOCK_COUNT_0",
+    "note": "C80 C4/2DA/411 are D82 reconciled; 2DA/411 changed SHAs pass current D revalidation, C4 retains runtime context hold. B87 P0 trio and A86 C075 pass D preflight but lack required independent gates/in-game."
   },
   "latest_promoted_batch": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
   "latest_rejected_batch": "localization/graphics/BATCH51_REJECTED_REPORT.json",
@@ -71,15 +71,11 @@
     ],
     "report": "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json",
     "note": "No previous PASS/retained/promoted decision is grandfathered. Per-text-cell/mask + 1x/2x manual QA is required before strict PASS.",
-    "user_approved_locked": [
-      "571E78F3",
-      "62BEBF33",
-      "E3FD08BE"
-    ],
+    "user_approved_locked": [],
     "original_safe_hold": [
       "37759842"
     ],
-    "current_note": "HD package imported. Preserve completed HD assets. Rebuild only the 13 queued low-resolution/placeholder-upscale text graphics; keep 6B8ED9DA in the font pipeline."
+    "current_note": "Historical low-resolution user approvals were superseded by canonical HD migration on 2026-09-27; current lock count is 0. Reapproval requires HD C/D + in-game validation."
   },
   "latest_strict_reset_report": "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json",
   "strict_qa_canonical_source": {
@@ -104,16 +100,8 @@
   "latest_p0_execution_gate_report": "localization/graphics/BATCH62_A_P0_REWORK_EXECUTION_GATE_REPORT.json",
   "latest_user_approval_report": "localization/graphics/BATCH64_USER_APPROVAL_P0_IMPORT_REPORT.json",
   "approved_dds_root": "localization/graphics/approved_dds",
-  "user_approved_locked": [
-    "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
-    "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
-    "textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds"
-  ],
-  "user_approved_sha256": {
-    "571E78F3_512x64.dds": "4ff6a767fca35ebff7e1ba587c1992f94319c5f1bdd7d03faf59450d81e32f1e",
-    "62BEBF33_512x64.dds": "91b0424df17e48ee3445208991f15f6e5cdb413f6f77eeb1aa3f453a3706e4eb",
-    "E3FD08BE_512x64.dds": "246e4313cb9806623f695ea94262100e1e6f3888847dcc09338d870e3944b49e"
-  },
+  "user_approved_locked": [],
+  "user_approved_sha256": {},
   "canonical_source_policy": {
     "mode": "HD_TEXTURE_MOD_PRIMARY",
     "status": "HD_PACKAGE_IMPORTED_REWORK_SCOPE_READY",
@@ -128,7 +116,7 @@
     "dimensions": "read_from_dds_header",
     "old_candidates": "historical_until_rebuilt_or_revalidated_against_HD"
   },
-  "latest_d_final_qa_report": "localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json",
+  "latest_d_final_qa_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json",
   "latest_c_strict_qa_report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
   "post_d78_c78_update": {
     "asset": "39229D64",
@@ -181,5 +169,31 @@
       "note": "C80 canonical badge-border restoration; D81 old SHA superseded"
     },
     "approved_dds_promotion": false
+  },
+  "current_approved_lock_count": 0,
+  "approved_dds_root_status": "HISTORICAL_REFERENCE_ARTIFACTS_PRESENT_NO_CURRENT_LOCKS",
+  "historical_lowres_user_approved": [
+    {
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+      "sha256": "4ff6a767fca35ebff7e1ba587c1992f94319c5f1bdd7d03faf59450d81e32f1e"
+    },
+    {
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+      "sha256": "91b0424df17e48ee3445208991f15f6e5cdb413f6f77eeb1aa3f453a3706e4eb"
+    },
+    {
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+      "sha256": "246e4313cb9806623f695ea94262100e1e6f3888847dcc09338d870e3944b49e"
+    }
+  ],
+  "latest_hd_reopen_report": "localization/graphics/BATCH69_REOPEN_LOWRES_APPROVALS_HD_REWORK_REPORT.json",
+  "d82_resolution": {
+    "C4A2937B": "FINAL_STATIC_QA_PASS_CONTEXT_HOLD_PENDING_INGAME",
+    "2DA43E41": "FINAL_STATIC_QA_PASS_PENDING_INGAME",
+    "411827E": "FINAL_STATIC_QA_PASS_PENDING_INGAME",
+    "B87_P0_HD_TRIO": "D82_PREFLIGHT_PASS_PENDING_C_INGAME",
+    "C075FB49": "D82_PREFLIGHT_PASS_PENDING_B_C_INGAME",
+    "current_approved_lock_count": 0,
+    "report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json"
   }
 }

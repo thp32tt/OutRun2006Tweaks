@@ -43,7 +43,7 @@
       "reason": "LOW_RES_USER_APPROVAL_SUPERSEDED_BY_CANONICAL_HD_SOURCE",
       "policy": "REBUILD_KOREAN_FROM_HD_BASE",
       "priority": "P0",
-      "status": "B87_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "status": "D82_PREFLIGHT_PASS_PENDING_C_INGAME",
       "historical_approved_resolution": [
         512,
         64
@@ -62,7 +62,8 @@
       "localized_regions": 2,
       "remaining_segments": 0,
       "b_first_qa_report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
-      "candidate_changed_by_B": true
+      "candidate_changed_by_B": true,
+      "d_preflight_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json"
     },
     {
       "hash": "62BEBF33",
@@ -76,7 +77,7 @@
       "reason": "LOW_RES_USER_APPROVAL_SUPERSEDED_BY_CANONICAL_HD_SOURCE",
       "policy": "REBUILD_KOREAN_FROM_HD_BASE",
       "priority": "P0",
-      "status": "B87_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "status": "D82_PREFLIGHT_PASS_PENDING_C_INGAME",
       "historical_approved_resolution": [
         512,
         64
@@ -94,7 +95,8 @@
       "localized_regions": 1,
       "remaining_segments": 0,
       "b_first_qa_report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
-      "candidate_changed_by_B": true
+      "candidate_changed_by_B": true,
+      "d_preflight_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json"
     },
     {
       "hash": "E3FD08BE",
@@ -108,7 +110,7 @@
       "reason": "LOW_RES_USER_APPROVAL_SUPERSEDED_BY_CANONICAL_HD_SOURCE",
       "policy": "REBUILD_KOREAN_FROM_HD_BASE",
       "priority": "P0",
-      "status": "B87_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "status": "D82_PREFLIGHT_PASS_PENDING_C_INGAME",
       "historical_approved_resolution": [
         512,
         64
@@ -126,7 +128,8 @@
       "localized_regions": 1,
       "remaining_segments": 0,
       "b_first_qa_report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
-      "candidate_changed_by_B": true
+      "candidate_changed_by_B": true,
+      "d_preflight_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json"
     },
     {
       "hash": "D6DC1380",
@@ -293,7 +296,7 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "C80_STATIC_PASS_CONTEXT_HOLD_PENDING_D_RECONCILE_INGAME",
+      "status": "D82_FINAL_STATIC_PASS_CONTEXT_HOLD_PENDING_INGAME",
       "transcription_segments": 20,
       "localized_regions": 21,
       "remaining_segments": 0,
@@ -321,7 +324,8 @@
       "superseded_validation": "D79 A83-SHA preflight superseded; D80 current B85 SHA preflight valid",
       "c_strict_qa_report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
       "c_candidate_changed": false,
-      "d80_same_sha_preflight_valid": true
+      "d80_same_sha_preflight_valid": true,
+      "d_final_qa_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json"
     },
     {
       "hash": "2DA43E41",
@@ -334,7 +338,7 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "C80_REWORK_STATIC_PASS_PENDING_D_REVALIDATION_INGAME",
+      "status": "D82_FINAL_STATIC_PASS_PENDING_INGAME",
       "transcription_segments": 11,
       "localized_regions": 11,
       "remaining_segments": 0,
@@ -361,7 +365,8 @@
       "c_strict_qa_report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
       "c_candidate_changed": true,
       "c80_supersedes_b85_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
-      "d80_status": "SUPERSEDED_BY_C80_CHANGED_SHA_REQUIRES_D_REVALIDATION"
+      "d80_status": "SUPERSEDED_BY_C80_CHANGED_SHA_REQUIRES_D_REVALIDATION",
+      "d_final_qa_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json"
     },
     {
       "hash": "411827E",
@@ -374,7 +379,7 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "C80_REWORK_STATIC_PASS_PENDING_D_REVALIDATION_INGAME",
+      "status": "D82_FINAL_STATIC_PASS_PENDING_INGAME",
       "transcription_segments": 7,
       "localized_regions": 7,
       "remaining_segments": 0,
@@ -389,7 +394,8 @@
       "c_strict_qa_report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
       "c_candidate_changed": true,
       "c80_supersedes_a85_b86_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
-      "d81_status": "SUPERSEDED_BY_C80_CHANGED_SHA_REQUIRES_D_REVALIDATION"
+      "d81_status": "SUPERSEDED_BY_C80_CHANGED_SHA_REQUIRES_D_REVALIDATION",
+      "d_final_qa_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json"
     },
     {
       "hash": "C075FB49",
@@ -402,7 +408,7 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "A86_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "status": "D82_PREFLIGHT_PASS_PENDING_B_C_INGAME",
       "transcription_segments": 16,
       "expected_physical_text_occurrences": 17,
       "transcription_expansion": [
@@ -424,7 +430,8 @@
       "a_production_report": "localization/graphics/role_A/20260927-1830-A86/A86_C075FB49_PRODUCTION_REPORT.json",
       "candidate_sha256": "d310c7da75c4efe7959ec28b7e5125208d37483052b4e5c56c54cc0d4f16e3c1",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
-      "in_game_validation": "PENDING"
+      "in_game_validation": "PENDING",
+      "d_preflight_report": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json"
     },
     {
       "hash": "FD90AA9",
@@ -466,6 +473,6 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_A/20260927-1830-A86/A86_C075FB49_PRODUCTION_REPORT.json",
+  "latest_batch": "localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json",
   "latest_reopen_report": "localization/graphics/BATCH69_REOPEN_LOWRES_APPROVALS_HD_REWORK_REPORT.json"
 }

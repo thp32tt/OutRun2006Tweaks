@@ -1,0 +1,301 @@
+{
+  "schema_version": 1,
+  "role": "D",
+  "run": "D82",
+  "timestamp_kst": "2026-09-27T19:19:40+09:00",
+  "base_head": "3eb0ed881cbe541f96f76d191e752b2e5944dbf0",
+  "scope": "final QA + approval reconciliation on C80/B87/A86 latest state; no build; no VR/FFB",
+  "approved_dds_changes": [],
+  "current_approved_lock_count": 0,
+  "historical_lowres_approved_dds": {
+    "status": "AUDIT_REFERENCE_ONLY_SUPERSEDED_BY_HD_MIGRATION",
+    "reopen_report": "localization/graphics/BATCH69_REOPEN_LOWRES_APPROVALS_HD_REWORK_REPORT.json",
+    "assets": [
+      {
+        "name": "571E78F3_512x64.dds",
+        "sha256": "4ff6a767fca35ebff7e1ba587c1992f94319c5f1bdd7d03faf59450d81e32f1e"
+      },
+      {
+        "name": "62BEBF33_512x64.dds",
+        "sha256": "91b0424df17e48ee3445208991f15f6e5cdb413f6f77eeb1aa3f453a3706e4eb"
+      },
+      {
+        "name": "E3FD08BE_512x64.dds",
+        "sha256": "246e4313cb9806623f695ea94262100e1e6f3888847dcc09338d870e3944b49e"
+      }
+    ]
+  },
+  "reviewed_candidates": {
+    "C4A2937B": {
+      "canonical_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
+      "gate_chain": {
+        "A83": "PASS_PRODUCTION",
+        "B85": "PASS_REWORK_FIRST_QA",
+        "D80": "PASS_CURRENT_SHA_PREFLIGHT",
+        "C80": "STATIC_PASS_UNCHANGED",
+        "D82": "FINAL_RECONCILIATION_PASS"
+      },
+      "d82_direct_checks": {
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "file_size_bytes": 67108992,
+        "dds_header_128_exact_canonical": true,
+        "total_changed_pixels": 808450,
+        "outside_21_source_cells_changed_pixels": 0,
+        "introduced_alpha_outside_21_cells": 0,
+        "raw_orientation": "mirror_y",
+        "readable_raw_white_visual_qa": "PASS",
+        "candidate_artifacts": "NONE_OBSERVED"
+      },
+      "semantic_result": "PASS_WITH_RUNTIME_CONTEXT_HOLD",
+      "context_hold": "Drift and -> 드리프트하고 requires adjacent-sprite/in-game composition confirmation.",
+      "cut_line": "Cut the line! -> 하트선을 통과하세요! accepted after B85/C80 context correction.",
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "FINAL_STATIC_QA_PASS_CONTEXT_HOLD_PENDING_INGAME",
+      "promotion": false
+    },
+    "2DA43E41": {
+      "canonical_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+      "candidate_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
+      "superseded_b85_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
+      "gate_chain": {
+        "A84": "PASS_PRODUCTION_SUPERSEDED",
+        "B85": "PASS_REWORK_FIRST_QA_SUPERSEDED",
+        "D80": "SUPERSEDED_BY_C80_CHANGED_SHA",
+        "C80": "REWORK_STATIC_PASS",
+        "D82": "CURRENT_SHA_REVALIDATION_PASS"
+      },
+      "c80_semantic_fix": [
+        "OutRun2 · 15코스 연속 -> OutRun2 · 15코스 연속이",
+        "OutRun2: SP · 15코스 연속 -> OutRun2: SP · 15코스 연속이"
+      ],
+      "d82_direct_checks": {
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "file_size_bytes": 67108992,
+        "dds_header_128_exact_canonical": true,
+        "total_changed_pixels": 1244456,
+        "outside_11_source_cells_changed_pixels": 0,
+        "introduced_alpha_outside_11_cells": 0,
+        "raw_orientation": "mirror_y",
+        "readable_raw_white_visual_qa": "PASS",
+        "protected_titles": [
+          "OutRun2",
+          "OutRun2: SP",
+          "Keep Your Heart -1989-"
+        ],
+        "candidate_artifacts": "NONE_OBSERVED"
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+      "promotion": false
+    },
+    "411827E": {
+      "canonical_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "candidate_sha256": "c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74",
+      "superseded_a85_b86_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
+      "gate_chain": {
+        "A85": "PASS_PRODUCTION_SUPERSEDED",
+        "B86": "PASS_FIRST_QA_SUPERSEDED",
+        "D81": "SUPERSEDED_BY_C80_CHANGED_SHA",
+        "C80": "REWORK_STATIC_PASS",
+        "D82": "CURRENT_SHA_REVALIDATION_PASS"
+      },
+      "c80_fix": "Restored canonical Recommendation badge white border/background while retaining 추천.",
+      "d82_direct_checks": {
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "file_size_bytes": 16777344,
+        "dds_header_128_exact_canonical": true,
+        "total_changed_pixels": 204603,
+        "outside_7_source_cells_changed_pixels": 0,
+        "introduced_alpha_outside_7_cells": 0,
+        "canonical_badge_border_core_pixels": 9767,
+        "badge_border_core_mismatch_after_rework": 0,
+        "raw_orientation": "mirror_y",
+        "readable_raw_white_visual_qa": "PASS",
+        "protected_original": [
+          "288GTO",
+          "Testarossa",
+          "F40",
+          "Enzo Ferrari",
+          "2P/4P/3P/1P",
+          "vehicle/control artwork"
+        ],
+        "candidate_artifacts": "NONE_OBSERVED"
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+      "promotion": false
+    },
+    "B87_P0_HD_TRIO": {
+      "gate_chain": {
+        "B87": "HD_REBUILD_FIRST_QA_PASS",
+        "C_current": "MISSING",
+        "D82": "DIRECT_PREFLIGHT_PASS",
+        "in_game": "MISSING"
+      },
+      "historical_lock_state": "REMOVED_BY_BATCH69",
+      "assets": {
+        "571E78F3": {
+          "canonical_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+          "candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+          "dimensions": [
+            2048,
+            256
+          ],
+          "format": "DXT5",
+          "mipmaps": 1,
+          "header_128_exact": true,
+          "changed_dxt5_blocks": 15840,
+          "outside_declared_cells_dxt5_blocks_changed": 0,
+          "decoded_outside_cells_changed_pixels": 0,
+          "introduced_alpha_outside_cells": 0,
+          "raw_orientation": "mirror_y",
+          "visual_qa": "PASS",
+          "translations": [
+            "Time Attack Mode -> 타임 어택 모드",
+            "15 continuous course -> 15코스 연속"
+          ],
+          "result": "D82_PREFLIGHT_PASS_PENDING_C_INGAME"
+        },
+        "62BEBF33": {
+          "canonical_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+          "candidate_sha256": "def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d",
+          "dimensions": [
+            2048,
+            256
+          ],
+          "format": "DXT5",
+          "mipmaps": 1,
+          "header_128_exact": true,
+          "changed_dxt5_blocks": 10168,
+          "outside_declared_cells_dxt5_blocks_changed": 0,
+          "decoded_outside_cells_changed_pixels": 0,
+          "introduced_alpha_outside_cells": 0,
+          "raw_orientation": "mirror_y",
+          "visual_qa": "PASS",
+          "translations": [
+            "OutRun Mode -> 아웃런 모드"
+          ],
+          "result": "D82_PREFLIGHT_PASS_PENDING_C_INGAME"
+        },
+        "E3FD08BE": {
+          "canonical_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+          "candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
+          "dimensions": [
+            2048,
+            256
+          ],
+          "format": "DXT5",
+          "mipmaps": 1,
+          "header_128_exact": true,
+          "changed_dxt5_blocks": 12915,
+          "outside_declared_cells_dxt5_blocks_changed": 0,
+          "decoded_outside_cells_changed_pixels": 0,
+          "introduced_alpha_outside_cells": 0,
+          "raw_orientation": "mirror_y",
+          "visual_qa": "PASS",
+          "translations": [
+            "Heart Attack Mode -> 하트 어택 모드"
+          ],
+          "result": "D82_PREFLIGHT_PASS_PENDING_C_INGAME"
+        }
+      },
+      "promotion": false,
+      "reason": "All three are canonical-HD rebuilds and pass D preflight, but independent C strict QA and in-game validation are missing."
+    },
+    "C075FB49": {
+      "canonical_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "candidate_sha256": "d310c7da75c4efe7959ec28b7e5125208d37483052b4e5c56c54cc0d4f16e3c1",
+      "gate_chain": {
+        "A86": "PRODUCTION_PASS",
+        "B_current": "MISSING_FOR_A86_SHA",
+        "C_current": "MISSING_FOR_A86_SHA",
+        "D82": "DIRECT_PREFLIGHT_PASS"
+      },
+      "semantic_entries": 16,
+      "physical_regions": 17,
+      "duplicate_physical_occurrences": {
+        "More BGM": 2
+      },
+      "d82_direct_checks": {
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "file_size_bytes": 16777344,
+        "dds_header_128_exact_canonical": true,
+        "total_changed_pixels": 784419,
+        "outside_17_source_cells_changed_pixels": 0,
+        "all_declared_candidate_alpha_bboxes_inside_source_cells": true,
+        "raw_orientation": "mirror_y",
+        "readable_raw_white_visual_qa": "PASS",
+        "source_language_residue": "NONE_OBSERVED",
+        "clipping_overlap_box_escape": "NONE_OBSERVED",
+        "black_line_seam_opaque_box_alpha_halo": "NONE_OBSERVED",
+        "protected_original": [
+          "OutRun2SP",
+          "OutRun2",
+          "1P",
+          "Ferrari model names",
+          "vehicle artwork",
+          "numeric/UI artwork"
+        ]
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "D82_PREFLIGHT_PASS_PENDING_B_C_INGAME",
+      "promotion": false
+    }
+  },
+  "unchanged_holds": {
+    "FA7BBB13": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+    "39229D64": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+    "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+    "FF2462BB": "STATIC_QA_PASS_PENDING_INGAME",
+    "568D3696": "STATIC_QA_PASS_PENDING_INGAME_WITH_RUNTIME_CONTEXT_CONFIRMATION"
+  },
+  "state_reconciliation": {
+    "stale_current_user_approved_locked_before": 3,
+    "current_user_approved_locked_after": 0,
+    "physical_lowres_approved_dds": "RETAINED_AS_AUDIT_REFERENCE_ONLY_NOT_CURRENT_LOCKS",
+    "reason": "BATCH69 superseded the three 512x64 RGBA32 approvals with canonical 2048x256 DXT5 HD sources; B87 rebuilt them but C/in-game reapproval gates are not complete.",
+    "next_hd_rework": {
+      "asset": "FD90AA9",
+      "transcription_segments": 27,
+      "status": "READY_FOR_CANONICAL_HD_RENDER"
+    }
+  },
+  "domain_isolation": {
+    "upstream_base": "08e5efb4deea4066c440307ec009c868a30562d3",
+    "verify_domain_isolation": "PASS",
+    "vr_ffb_source_diff_matches": [],
+    "merge_commits_since_base": [],
+    "result": "PASS_NO_VR_FFB_MIX"
+  },
+  "state_validation": "LOCALIZATION_STATE_OK",
+  "build_performed": false,
+  "final_decision": "NO_NEW_APPROVALS_CURRENT_LOCK_COUNT_0",
+  "next": [
+    "C4A2937B: runtime composition/in-game confirmation for Drift and.",
+    "2DA43E41 and 411827E: in-game screenshot validation before promotion.",
+    "571E78F3/62BEBF33/E3FD08BE: C strict QA then D final reconcile + in-game reapproval.",
+    "C075FB49: B first QA -> C strict QA -> D final reconcile -> in-game validation.",
+    "Continue FD90AA9 canonical-HD production independently."
+  ]
+}

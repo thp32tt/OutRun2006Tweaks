@@ -441,3 +441,14 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Outside 17 cells byte-identical; candidate alpha contained; readable/raw/white-background A-stage artifact QA PASS after two rejected non-persisted drafts.
 - Reconciled onto B87 without overwriting C80 or B87 P0-trio candidate/state. Queue now 12 ready / 4 remaining.
 - Status: A_PRODUCTION_COMPLETE_PENDING_B_C_D; in-game validation not performed. Next A target: FD90AA9 canonical-HD rebuild (27 reviewed segments).
+
+## D82 final QA checkpoint — 2026-09-27 19:19 KST
+- Current approved/user-locked count: **0**. Historical 512×64 RGBA32 DDS in approved_dds are audit/reference only after BATCH69 HD reopen; no new promotion.
+- C4A2937B f6f837cd...: FINAL_STATIC_QA_PASS with Drift and runtime-context hold; pending in-game.
+- 2DA43E41 C80 SHA 02da4680...: D82 current-SHA revalidation PASS; 4096×4096 RGBA32/1 mip, outside 11 cells = 0; pending in-game.
+- 411827E C80 SHA c3e89fb3...: D82 current-SHA revalidation PASS; 2048×2048 RGBA32/1 mip, outside 7 cells = 0, canonical Recommendation border restored; pending in-game.
+- B87 P0 HD trio 571E78F3 / 62BEBF33 / E3FD08BE: D82 DXT5 preflight PASS, zero changed blocks/pixels outside declared cells; HOLD_PENDING_C_INGAME and remain unlocked.
+- C075FB49 A86 SHA d310c7da...: D82 preflight PASS on 16 semantic / 17 physical regions; HOLD_PENDING_B_C_INGAME.
+- FA7BBB13 / 39229D64 / A064FDFC remain final-static PASS pending in-game only.
+- LOCALIZATION_STATE_OK and Domain Isolation PASS; VR/FFB contamination not observed. No build performed.
+- Next production target: FD90AA9 (27 reviewed segments). Machine report: localization/graphics/role_D/20260927-1919-D82/D82_FINAL_QA_RECONCILE_REPORT.json.
