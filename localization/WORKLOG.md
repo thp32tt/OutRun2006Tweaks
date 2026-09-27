@@ -917,3 +917,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Two internal attempts were rejected before persistence: one header-validation field mixup (no candidate persisted), then a stale mirror-X/compact-aspect draft. Final uses direct raw orientation and a source-like wide 610×134 envelope.
 - Status: A89_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA. No approval/promotion, in-game claim, build, VR or FFB work.
 - Queue after A89: 15 ready / 1 remaining. Next: 48DEBE77 current-pipeline CREATE_NEW_HD_KOREAN_ASSET production.
+
+
+## 2026-09-27 21:53 KST — FINAL TEXT CONTEXT REVIEW
+
+- User confirmed the remaining `PASSENGER` / `DUMPED` strings are from the Heart Attack girlfriend-passenger mission context.
+- IDs 96 and 279: `PASSENGER` finalized as `동승자`; this preserves the original neutral role wording instead of over-specifying `여자친구`.
+- IDs 97 and 280: `DUMPED` finalized as `차였어요!`; this matches the mission-failure/rejection result nuance.
+- All four rows moved from `draft` to `reviewed`.
+- Text review is now complete: 1,355/1,355 non-null IDs, 0 remaining context drafts.
