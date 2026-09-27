@@ -52,3 +52,12 @@ Rules:
 - Validation policy: proven-baseline and launcher-policy gates now reject reintroduction of `OUTRUN_VR_R57_MODE`.
 - Visual policy intentionally preserved from R69: projected rank head inverse, centre-eye fused flare, stock PC shadow behavior, exact option-arrow ownership.
 - Build gate: DX9Ex Active Validation triggered from this final stage head.
+
+
+## S5 — canonical render-policy boundary
+- Branch: `vr-d3d9ex-candidate/r69-clean-s5`
+- Parent: S4 `5942ea9445da5d5e18d8ba0abf72eb9ab677fb13`.
+- Added `src/vr/d3d9/render_policy.hpp` as the single RenderScope -> render-route mapping boundary.
+- The production screen-space classifier now consumes the canonical route instead of independently re-deriving HUD/world/projected booleans.
+- Visual behavior is intentionally unchanged; this stage reduces duplicated classification logic before further renderer separation.
+- Build gate: DX9Ex Active Validation on the candidate branch.
