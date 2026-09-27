@@ -570,5 +570,26 @@
       "release": "BLOCKED",
       "incident_report": "localization/validation/INCIDENT_20260928_TESTPATCH_FAIL.md"
     }
+  },
+  "graphics_zero_tolerance_boundary_audit": {
+    "timestamp_kst": "2026-09-28T07:10:00+09:00",
+    "report": "localization/graphics/FULL_PIXEL_BOUNDARY_AUDIT_20260928.json",
+    "max_outside_pixels": 0,
+    "current_hd_candidates": 16,
+    "static_boundary_pass": 16,
+    "static_boundary_fail": 0,
+    "isolated_ingame_required": 16,
+    "approved_lock_count": 0,
+    "zero_margin_watch": [
+      "C075FB49"
+    ],
+    "dxt5_final_decode_caution": [
+      "568D3696"
+    ],
+    "historical_lowres_rework_required": [
+      "571E78F3",
+      "62BEBF33",
+      "E3FD08BE"
+    ]
   }
 }
