@@ -301,5 +301,4 @@ switch ($Backend) {
     "dx11" { Write-Host "DX11 HOST/DIRECTGPU: D3D9Ex game + x64 D3D11 OpenXR host; DirectGPU-only; ACK run identity required." }
     "dxvk-safe" { Write-Host "DXVK SAFE: provider-local D3D9Ex is probed when exported; DirectGPU optional; multiview patcher disabled." }
     "dxvk" { Write-Host "DXVK MULTIVIEW: local d3d9.dll + multiviewpatcher.dll active." }
-    "dx12" { Write-Host "DX12 STRICT: local d3d9.dll verified absent; Windows D3D9On12 required." }
 }
