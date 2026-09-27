@@ -158,7 +158,7 @@ foreach ($marker in @(
     'VR R66 OPTION ARROW: exact node pinned',
     'VR R66 GOAL TIME HUD:',
     'VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes',
-    'VR R65 SELECTOR: restored base shadow bypassed'
+    'VR R69 BASE SHADOW: restored console shadow disabled for all VR presentations; stock PC nullsub behavior ACTIVE'
 )) {
     if (-not $gameAscii.Contains($marker)) {
         throw "R66 PC fast binary missing proven-baseline marker: $marker"
