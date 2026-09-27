@@ -161,7 +161,7 @@
       "rva": "0x000BEA5F",
       "signatureLength": 16,
       "disassemblyWindow": 48,
-      "expectedBytes": "e8ecf6ffffb801000000c333c0c3",
+      "expectedBytes": "e8ecf6ffffb801000000c333c0c3cccc",
       "purpose": "NaviPub_DispTimeAttackGoal exact call to helper 0xBE150.",
       "sourceBindings": [
         {
