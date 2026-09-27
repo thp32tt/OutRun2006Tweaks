@@ -102,3 +102,13 @@ A production test build is rejected if any of these conditions fail:
 - package metadata identifies a different renderer variant.
 
 R26-only, C1, C2 and old R20 builds remain available as explicitly named diagnostics only and must not be packaged as the user test build.
+
+## Final build trigger
+
+The post-review guard set was completed through source head
+`e56201696ec257310c9791f8d1b08a029c0dbf77`.
+
+The following commit changes documentation only and intentionally carries the
+`[pc-build]` token so the exact reviewed tree is rebuilt by the PC-fast runner.
+No source, build flag or runtime logic may change after this trigger without a
+new review/build cycle.
