@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-09-27T13:19:13+09:00",
+  "updated_at_kst": "2026-09-27T14:13:46+09:00",
   "canonical_branch": "korean-localization-clean",
   "reviewed_assets": 32,
   "localized_candidates": 31,
@@ -12,9 +12,9 @@
   ],
   "mandatory_policy": "localization/graphics/ORIENTATION_POLICY.md",
   "automation_checkpoint": {
-    "run": "D76-fa7-final-qa-20260927",
-    "result": "NO_NEW_APPROVALS_HOLD_PENDING_C_AND_INGAME",
-    "note": "Existing 3 USER_APPROVED_LOCKED DDS verified unchanged. FF2462BB and 568D3696 remain pending in-game; FA7BBB13 passed D static/raw/readable revalidation but lacks current C + in-game validation."
+    "run": "D77-final-qa-reconcile-20260927",
+    "result": "NO_NEW_APPROVALS",
+    "note": "Three USER_APPROVED_LOCKED DDS reverified unchanged. FA7BBB13 has complete A/B/C/D static PASS but lacks in-game evidence. 39229D64 has A82/B83 and passes D structural/raw/readable preflight but lacks C and in-game evidence."
   },
   "latest_promoted_batch": "localization/graphics/BATCH38_C598_REWORK_REPORT.json",
   "latest_rejected_batch": "localization/graphics/BATCH51_REJECTED_REPORT.json",
@@ -128,5 +128,5 @@
     "dimensions": "read_from_dds_header",
     "old_candidates": "historical_until_rebuilt_or_revalidated_against_HD"
   },
-  "latest_d_final_qa_report": "localization/graphics/role_D/20260927-1319-D76/D76_FA7BBB13_FINAL_QA_HOLD_REPORT.json"
+  "latest_d_final_qa_report": "localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json"
 }

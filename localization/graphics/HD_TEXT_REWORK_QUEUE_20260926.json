@@ -107,18 +107,19 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "C_STRICT_QA_PASS_PENDING_INGAME",
+      "status": "D_FINAL_STATIC_PASS_PENDING_INGAME",
       "batch_report": "localization/graphics/role_B/20260927-1310-B82/B82_FA7BBB13_FIRST_QA_AND_39229D64_TRANSCRIPTION.json",
       "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
       "completed_transcription_entries": 17,
       "localized_regions": 17,
       "remaining_segments": 0,
-      "d_final_qa_report": "localization/graphics/role_D/20260927-1319-D76/D76_FA7BBB13_FINAL_QA_HOLD_REPORT.json",
+      "d_final_qa_report": "localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json",
       "c_strict_qa_report": "localization/graphics/role_C/20260927-1405-C77/C77_FA7BBB13_STRICT_QA.json",
       "c_candidate_changed": false,
       "c_outside_text_cells_changed_pixels": 0,
-      "c_introduced_alpha_outside_text_cells": 0
+      "c_introduced_alpha_outside_text_cells": 0,
+      "in_game_validation": "PENDING"
     },
     {
       "hash": "39229D64",
@@ -131,7 +132,7 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "B_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "status": "D_PREFLIGHT_PASS_PENDING_C_INGAME",
       "transcription_status": "B82_EXPANDED_REVIEWED",
       "transcription_segments": 13,
       "expected_physical_text_occurrences": 15,
@@ -142,7 +143,10 @@
       "localized_regions": 15,
       "remaining_segments": 0,
       "a_production_report": "localization/graphics/role_A/20260927-1330-A82/A82_39229D64_PRODUCTION_REPORT.json",
-      "b_candidate_changed": false
+      "b_candidate_changed": false,
+      "physical_region_count_correction": "B82 expected 14; A82/D77 verified 15 because Total Rank appears three times",
+      "d_preflight_report": "localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json",
+      "in_game_validation": "PENDING"
     },
     {
       "hash": "A064FDFC",
@@ -249,5 +253,5 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_B/20260927-1412-B83/B83_39229D64_FIRST_QA.json"
+  "latest_batch": "localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json"
 }

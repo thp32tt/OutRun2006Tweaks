@@ -592,3 +592,16 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Byte containment PASS: changed pixels outside the 15 source cells = 0; introduced alpha outside = 0. Protected ALBERTO/rank letters/ordinals/key legends/numeric graphics remain canonical.
 - Readable and raw visual QA PASS: no residual source English in replaced cells, clipping/overlap, box escape, seam/black line, opaque box or alpha halo observed; source-family colors/outlines remain consistent.
 - In-game screenshot validation was not available, so no approved_dds promotion. Next production target remains A064FDFC; C/D gates are still required for 39229D64. No VR/FFB changes and no build.
+
+## 2026-09-27 14:13 KST — D77 final QA reconciliation
+
+- Started from latest remote HEAD 8585bb791dd7b4273147e840a398facde71a251c and re-read the mandatory localization policy/state files.
+- Reconciled A81/B82/C77/D76 for FA7BBB13. Candidate SHA-256 remains 3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d and C77 did not modify it.
+- D77 independently rechecked FA7 canonical/candidate bytes: 4096×2048 RGBA32, 1 mip, exact 128-byte header, 1,054,544 changed pixels, 0 changed pixels and 0 introduced alpha outside the 17 text cells. Raw mirror_y/readable review and semantic/terminology reconciliation pass.
+- FA7 final static QA is PASS, but approved_dds promotion remains blocked because no in-game screenshot evidence exists in the current branch.
+- Reconciled new A82 39229D64 candidate 5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077. D77 confirms 4096×4096 RGBA32/1 mip, exact header, 2,405,013 changed pixels, 0 outside-cell changes, 0 outside-cell introduced alpha, mirror_y preservation, and 15 physical text regions.
+- Corrected durable queue metadata from B82 expected 14 physical occurrences to A82/D77 verified 15 (Total Rank appears three times).
+- 39229D64 A82/B83 is not approval-eligible yet: C strict QA and in-game screenshot validation are still missing.
+- Existing approved_dds remains exactly the three USER_APPROVED_LOCKED selector DDS; all three SHA-256 values were reverified.
+- Localization state and domain-isolation verification pass; no VR/FFB source diff or merge commit was found. Build was not run.
+- Report: localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json.

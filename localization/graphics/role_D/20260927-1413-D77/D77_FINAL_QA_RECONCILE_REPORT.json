@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "role": "D",
+  "run": "D77",
+  "timestamp_kst": "2026-09-27T14:13:46+09:00",
+  "base_head": "8585bb791dd7b4273147e840a398facde71a251c",
+  "scope": "final QA + approval reconciliation; no build; no VR/FFB",
+  "approved_dds_changes": [],
+  "locked_approved_dds": {
+    "result": "PASS_UNCHANGED",
+    "count": 3,
+    "assets": [
+      {
+        "name": "571E78F3_512x64.dds",
+        "sha256": "4ff6a767fca35ebff7e1ba587c1992f94319c5f1bdd7d03faf59450d81e32f1e"
+      },
+      {
+        "name": "62BEBF33_512x64.dds",
+        "sha256": "91b0424df17e48ee3445208991f15f6e5cdb413f6f77eeb1aa3f453a3706e4eb"
+      },
+      {
+        "name": "E3FD08BE_512x64.dds",
+        "sha256": "246e4313cb9806623f695ea94262100e1e6f3888847dcc09338d870e3944b49e"
+      }
+    ]
+  },
+  "reviewed_candidates": {
+    "FA7BBB13": {
+      "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
+      "canonical_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+      "inputs": {
+        "A81": "PASS_PRODUCTION",
+        "B82": "PASS_FIRST_QA",
+        "C77": "PASS_STATIC_STRICT_QA_PENDING_INGAME",
+        "prior_D76": "STATIC_PASS_HOLD"
+      },
+      "d77_direct_checks": {
+        "dimensions": [
+          4096,
+          2048
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "file_size_bytes": 33554560,
+        "dds_header_128_exact_canonical": true,
+        "total_changed_pixels": 1054544,
+        "outside_17_text_cells_changed_pixels": 0,
+        "introduced_alpha_outside_17_text_cells": 0,
+        "declared_alpha_bboxes_inside_source_cells": true,
+        "raw_orientation": "mirror_y",
+        "raw_readable_visual_reconciliation": "PASS",
+        "semantic_term_reconciliation": "PASS",
+        "protected_text_or_nontext_damage": "NONE_OBSERVED"
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+      "promotion": false,
+      "reason": "A/B/C and D static gates pass, but mandatory in-game screenshot validation is absent."
+    },
+    "39229D64": {
+      "candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+      "canonical_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+      "inputs": {
+        "A82": "PASS_PRODUCTION_HANDOFF",
+        "post_A82_B": "B83_PASS_FIRST_QA",
+        "post_A82_C": "MISSING"
+      },
+      "d77_preflight_checks": {
+        "semantic_entries": 13,
+        "physical_text_regions": 15,
+        "physical_region_count_reconciled_from_B82_expected": 14,
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "file_size_bytes": 67108992,
+        "dds_header_128_exact_canonical": true,
+        "total_changed_pixels": 2405013,
+        "outside_15_text_cells_changed_pixels": 0,
+        "introduced_alpha_outside_15_text_cells": 0,
+        "declared_alpha_bboxes_inside_source_cells": true,
+        "raw_orientation": "mirror_y",
+        "raw_readable_visual_reconciliation": "PASS_D_PREFLIGHT",
+        "semantic_reconciliation": "PASS_D_PREFLIGHT",
+        "protected_tokens_preserved": [
+          "ALBERTO",
+          "E",
+          "D",
+          "C",
+          "B",
+          "A",
+          "rd",
+          "st",
+          "nd",
+          "th",
+          "F1",
+          "Esc",
+          "numeric/rank glyphs"
+        ]
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "D_PREFLIGHT_PASS_HOLD_PENDING_C_INGAME",
+      "promotion": false,
+      "reason": "Candidate and B83 first QA pass; C strict QA and in-game validation are still absent."
+    }
+  },
+  "other_held_candidates": {
+    "FF2462BB": "D74_STATIC_QA_PASS_PENDING_INGAME",
+    "568D3696": "D75_STATIC_QA_PASS_PENDING_INGAME; Hit the zippers! wording still requires runtime-context confirmation"
+  },
+  "domain_isolation": {
+    "upstream_base": "08e5efb4deea4066c440307ec009c868a30562d3",
+    "verify_domain_isolation": "PASS",
+    "vr_ffb_source_diff_matches": [],
+    "merge_commits_since_base": [],
+    "result": "PASS_NO_VR_FFB_MIX"
+  },
+  "state_validation": "LOCALIZATION_STATE_OK",
+  "build_performed": false,
+  "final_decision": "NO_NEW_APPROVALS",
+  "next": [
+    "FA7BBB13: obtain in-game screenshot validation; then final D can promote if runtime QA passes.",
+    "39229D64: run C strict QA, then in-game validation before D promotion.",
+    "After 39229D64 static gate, continue A064FDFC production."
+  ]
+}

@@ -285,3 +285,15 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Coverage corrected and verified at 13 semantic / 15 physical regions (Total Rank x3).
 - Readable/raw artifact and containment review PASS; protected original tokens/artwork unchanged.
 - Next production target: A064FDFC.
+
+## D77 final QA checkpoint — 2026-09-27 14:13 KST
+- FA7BBB13: A81/B82/C77/D77 static QA PASS; HOLD_PENDING_INGAME. No approved_dds promotion.
+- 39229D64: A82/B83 + D77 direct preflight PASS; HOLD_PENDING_C_INGAME. Physical regions reconciled to 15.
+- approved_dds remains 3 USER_APPROVED_LOCKED assets; hashes reverified unchanged.
+- FA7 containment: outside 17 text cells changed pixels = 0; introduced alpha outside = 0.
+- 392 containment: outside 15 text cells changed pixels = 0; introduced alpha outside = 0.
+- Header/dimensions/format/mips/raw mirror_y/readable orientation preserved for both current candidates.
+- No in-game screenshot evidence found for either asset in the current branch.
+- LOCALIZATION_STATE_OK and Domain Isolation PASS; VR/FFB source/history contamination not observed.
+- Build not run. Machine report: localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json.
+- Next: runtime screenshot QA for FA7; C -> runtime QA for 39229D64; then final D promotion decision.

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T14:12:00+09:00",
+  "updated_at_kst": "2026-09-27T14:13:46+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "39229D64 A82 candidate passed B83 first QA (13 semantic / 15 physical); C/D and in-game screenshot validation remain. Continue next P1 canonical-HD production target A064FDFC independently.",
+  "next_checkpoint": "FA7BBB13 A81/B82/C77/D77 static QA all pass; approval remains blocked only by missing in-game screenshot validation. 39229D64 A82/B83 also passes D77 structural/raw/readable preflight, but C plus in-game validation remain. After its static gate continue A064FDFC.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -257,10 +257,11 @@
       "coverage": "13 semantic / 15 physical",
       "candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
       "report": "localization/graphics/role_A/20260927-1330-A82/A82_39229D64_PRODUCTION_REPORT.json",
-      "status": "B_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "status": "D_PREFLIGHT_PASS_PENDING_C_INGAME",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
       "physical_region_count_correction": "B82 expected 14; A82 verified 15 because Total Rank appears three times",
-      "b_first_qa_report": "localization/graphics/role_B/20260927-1412-B83/B83_39229D64_FIRST_QA.json"
+      "b_first_qa_report": "localization/graphics/role_B/20260927-1412-B83/B83_39229D64_FIRST_QA.json",
+      "d_preflight_report": "localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
       "asset": "A064FDFC",
@@ -268,10 +269,12 @@
       "status": "READY_FOR_CANONICAL_HD_RENDER"
     },
     "latest_d_final_qa": {
-      "run": "D76",
-      "report": "localization/graphics/role_D/20260927-1319-D76/D76_FA7BBB13_FINAL_QA_HOLD_REPORT.json",
+      "run": "D77",
+      "report": "localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json",
       "result": "NO_NEW_APPROVALS",
-      "approved_dds_count": 3
+      "approved_dds_count": 3,
+      "FA7BBB13": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+      "39229D64": "D_PREFLIGHT_PASS_HOLD_PENDING_C_INGAME"
     },
     "latest_c_strict_qa": {
       "asset": "FA7BBB13",
