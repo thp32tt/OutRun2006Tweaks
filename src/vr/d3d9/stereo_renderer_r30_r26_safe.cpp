@@ -1482,6 +1482,7 @@ namespace OutRunVRStereo
             Hud2D,
             PerspectiveHud,
             ScreenOverlay2D,
+            ProjectedScreenEffect2D,
             WorldBillboard,
             ProjectedWorldMarker2D
         };
@@ -1604,6 +1605,15 @@ namespace OutRunVRStereo
             const bool semanticProjectedWorld =
                 OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
                     semanticScope);
+            const bool semanticProjectedScreen =
+                semanticScope == OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D;
+
+            // R65: exact lens-flare producer has already converted its world
+            // anchor to screen coordinates through Calc3D2D. It needs only the
+            // per-eye asymmetric-FOV affine: no HUD scale, no finite HUD plane,
+            // no extra head/IPD world transform.
+            if (semanticProjectedScreen)
+                return R30ScreenSpaceKind::ProjectedScreenEffect2D;
 
             // R50: canonical queue membership proves generic 2D ownership but
             // not finite/world-locked HUD ownership. This class receives only
@@ -1617,7 +1627,8 @@ namespace OutRunVRStereo
             // from the canonical EXE sprite queue or exact original-mod semantic
             // tags. Do not infer HUD from alpha, ZENABLE, cull mode, shader
             // shape, primitive count or a recently uploaded matrix.
-            if (!semanticHud && !semanticWorld && !semanticProjectedWorld)
+            if (!semanticHud && !semanticWorld && !semanticProjectedWorld &&
+                !semanticProjectedScreen)
                 return R30ScreenSpaceKind::None;
 
             float projection[16]{};
@@ -3465,6 +3476,24 @@ namespace OutRunVRStereo
                 !InvertMatrix(baseProjection, inverseBaseProjection))
                 return false;
 
+            if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
+            {
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    D3DMATRIX clipAffine = IdentityMatrix();
+                    clipAffine._11 = eyeScale[eye];
+                    clipAffine._41 = eyeOffset[eye];
+                    const D3DMATRIX corrected =
+                        MultiplyMatrix(stockWvp, clipAffine);
+                    if (!MatrixFinite(corrected))
+                        return false;
+                    const D3DMATRIX correctedT = TransposeMatrix(corrected);
+                    std::memcpy(eyeConstants[eye], &correctedT,
+                        sizeof(correctedT));
+                }
+                return true;
+            }
+
             if (screenKind ==
                 R30ScreenSpaceKind::ProjectedWorldMarker2D)
             {
@@ -3704,6 +3733,12 @@ namespace OutRunVRStereo
                         semanticScope))
                     return E_NOTIMPL;
             }
+            else if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
+            {
+                if (semanticScope !=
+                    OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D)
+                    return E_NOTIMPL;
+            }
             else if (!OutRunVR::GameSemantic::CorroboratesHud(
                          semanticScope))
             {
@@ -3856,6 +3891,16 @@ namespace OutRunVRStereo
                     "VR R30 HUD: asymmetric-FOV convergence correction ACTIVE; common-centre offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} sourceOverTarget={:.3f}",
                     eyeOffset[0], eyeOffset[1], R30HudScaleValue(),
                     R30HudAspectCompensation(stereo));
+            }
+            if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
+            {
+                static bool firstProjectedScreenEffectLogged = false;
+                if (!firstProjectedScreenEffectLogged)
+                {
+                    firstProjectedScreenEffectLogged = true;
+                    spdlog::info(
+                        "VR R65 FLARE FIX: exact projected-screen effect uses asymmetric-FOV affine only (no HUD scale/head/IPD plane)");
+                }
             }
             if (screenKind == R30ScreenSpaceKind::WorldBillboard &&
                 !R30FirstFlatPerspectiveLogged)
