@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B81",
+  "timestamp_kst": "2026-09-27T12:45:00+09:00",
+  "asset": "568D3696_1024x1024.dds",
+  "candidate_sha256": "be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c",
+  "result": "PASS_STATIC_VISUAL",
+  "checks": {
+    "all_14_transcribed_cells_present_in_korean": true,
+    "visible_source_english_residue": "NONE_OBSERVED",
+    "clipping_or_box_escape": "NONE_OBSERVED",
+    "large_label_color_family_preserved": true,
+    "small_label_yellow_navy_white_style_preserved": true,
+    "zippers_translation": "지퍼를 맞히세요! - retained from reviewed transcription; confirm wording during in-game context test"
+  }
+}

@@ -34,7 +34,7 @@ index,path,action,artwork_status,transcription_status,notes
 50,textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 51,textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds,localize_text,static_qa_pass_pending_ingame,transcribed_reviewed,A78 59 semantic / 68 regions; B79+C75+D74 static gates pass; in-game approval pending
 52,textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds,zoom_review,blocked_review,needs_zoom_review,
-53,textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds,localize_text,pending_artwork,transcribed_reviewed,pass4 transcription saved
+53,textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds,localize_text,static_qa_pass_pending_ingame,transcribed_reviewed,A80 14/14; B81+C76+D75 static gates pass; in-game/context approval pending
 54,textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass4 transcription saved
 55,textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 57,textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T12:20:00+09:00",
+  "updated_at_kst": "2026-09-27T12:45:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "FF2462BB passed B79/C75/D74 static gates and awaits in-game approval; continue production with next HD rework asset 568D3696.",
+  "next_checkpoint": "568D3696 A80 passed B81/C76/D75 static gates and awaits in-game/context approval; continue next P1 HD rework asset FA7BBB13.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -253,14 +253,14 @@
     "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
     "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "latest_hd_production_candidate": {
-      "asset": "FF2462BB",
-      "coverage": "59/59",
-      "candidate_sha256": "c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c",
-      "report": "localization/graphics/role_A/20260927-1215-A78/A78_FF2462BB_PRODUCTION_REPORT.json",
+      "asset": "568D3696",
+      "coverage": "14/14",
+      "candidate_sha256": "be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c",
+      "report": "localization/graphics/role_A/20260927-1240-A80/A80_568D3696_PRODUCTION_REPORT.json",
       "status": "STATIC_QA_PASS_PENDING_INGAME",
-      "b_report": "localization/graphics/role_B/20260927-1220-B79/B79_FF2462BB_FIRST_QA_PASS.json",
-      "c_report": "localization/graphics/role_C/20260927-1220-C75/C75_FF2462BB_STRICT_QA.json",
-      "d_report": "localization/graphics/role_D/20260927-1220-D74/D74_FF2462BB_FINAL_STATIC_GATE.json"
+      "b_report": "localization/graphics/role_B/20260927-1245-B81/B81_568D3696_VISUAL_QA_PASS.json",
+      "c_report": "localization/graphics/role_C/20260927-1245-C76/C76_568D3696_STRICT_QA.json",
+      "d_report": "localization/graphics/role_D/20260927-1245-D75/D75_568D3696_FINAL_STATIC_GATE.json"
     }
   },
   "data_build": {

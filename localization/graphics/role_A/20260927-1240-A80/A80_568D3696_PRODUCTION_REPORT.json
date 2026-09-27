@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A80",
+  "timestamp_kst": "2026-09-27T12:40:00+09:00",
+  "asset": "textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+  "canonical_sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+  "candidate_sha256": "be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c",
+  "dimensions": [
+    4096,
+    4096
+  ],
+  "bytes": 22369776,
+  "semantic_entries_materialized": 14,
+  "localized_regions": 14,
+  "outside_14_dxt5_block_aligned_regions_exact_to_canonical": true,
+  "dds_header_128_byte_exact_to_canonical": true,
+  "compression": "DXT5",
+  "mipmaps": 13,
+  "edits": [
+    {
+      "source": "Hit the zippers!",
+      "korean": "지퍼를 맞히세요!",
+      "bbox_readable": [
+        3100,
+        8,
+        3628,
+        112
+      ],
+      "font_size": 64,
+      "style": "yellow_navy_white"
+    },
+    {
+      "source": "Hit the cars!",
+      "korean": "차를 맞히세요!",
+      "bbox_readable": [
+        545,
+        2056,
+        974,
+        2160
+      ],
+      "font_size": 62,
+      "style": "yellow_navy_white"
+    },
+    {
+      "source": "Dodge the bombs!",
+      "korean": "폭탄을 피하세요!",
+      "bbox_readable": [
+        1140,
+        2054,
+        1775,
+        2165
+      ],
+      "font_size": 68,
+      "style": "yellow_navy_white"
+    },
+    {
+      "source": "Feed the girl!",
+      "korean": "여자친구에게 먹여 주세요!",
+      "bbox_readable": [
+        1988,
+        2053,
+        2445,
+        2164
+      ],
+      "font_size": 36,
+      "style": "yellow_navy_white"
+    },
+    {
+      "source": "Avoid abduction!",
+      "korean": "납치를 피하세요!",
+      "bbox_readable": [
+        2826,
+        2064,
+        3410,
+        2165
+      ],
+      "font_size": 62,
+      "style": "yellow_navy_white"
+    },
+    {
+      "source": "Avoid the meteors!",
+      "korean": "운석을 피하세요!",
+      "bbox_readable": [
+        1695,
+        2298,
+        2330,
+        2398
+      ],
+      "font_size": 60,
+      "style": "yellow_navy_white"
+    },
+    {
+      "source": "Dribble the beach ball!",
+      "korean": "비치볼을 드리블하세요!",
+      "bbox_readable": [
+        2328,
+        2298,
+        3080,
+        2400
+      ],
+      "font_size": 62,
+      "style": "yellow_navy_white"
+    },
+    {
+      "source": "Photograph the sights!",
+      "korean": "명소를 촬영하세요!",
+      "bbox_readable": [
+        3160,
+        2298,
+        3700,
+        2490
+      ],
+      "font_size": 62,
+      "style": "yellow_navy_white"
+    },
+    {
+      "source": "Hit the ducks!",
+      "korean": "오리를 맞히세요!",
+      "bbox_readable": [
+        3090,
+        3200,
+        3570,
+        3294
+      ],
+      "font_size": 54,
+      "style": "yellow_navy_white"
+    },
+    {
+      "source": "See the sights!",
+      "korean": "명소를 구경하세요!",
+      "bbox_readable": [
+        2968,
+        3296,
+        3510,
+        3395
+      ],
+      "font_size": 60,
+      "style": "yellow_navy_white"
+    },
+    {
+      "source": "END",
+      "korean": "종료",
+      "bbox_readable": [
+        920,
+        2548,
+        1510,
+        2818
+      ],
+      "font_size": 170,
+      "style": "large_glow"
+    },
+    {
+      "source": "ANSWER",
+      "korean": "정답",
+      "bbox_readable": [
+        2120,
+        2548,
+        3255,
+        2820
+      ],
+      "font_size": 170,
+      "style": "large_glow"
+    },
+    {
+      "source": "QUESTION",
+      "korean": "문제",
+      "bbox_readable": [
+        748,
+        2880,
+        2070,
+        3180
+      ],
+      "font_size": 170,
+      "style": "large_glow"
+    },
+    {
+      "source": "START",
+      "korean": "시작",
+      "bbox_readable": [
+        2570,
+        2880,
+        3490,
+        3180
+      ],
+      "font_size": 170,
+      "style": "large_glow"
+    }
+  ],
+  "status": "A80_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA"
+}

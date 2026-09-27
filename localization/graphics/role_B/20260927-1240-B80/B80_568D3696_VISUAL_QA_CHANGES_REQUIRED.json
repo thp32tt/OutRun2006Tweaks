@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B80",
+  "timestamp_kst": "2026-09-27T12:40:00+09:00",
+  "asset": "568D3696_1024x1024.dds",
+  "input_a79_sha256": "cfda02406c06be0281722150f3c9adb10eba8fef8b57229050b1ef3c9ff567d2",
+  "result": "CHANGES_REQUIRED",
+  "issue": "Dodge the bombs! source cell retained trailing bs! because the first source box was too narrow.",
+  "resolution": "A80 remeasured the source fill through x=1743 and rebuilt the cell using an expanded source-safe box through x=1775."
+}

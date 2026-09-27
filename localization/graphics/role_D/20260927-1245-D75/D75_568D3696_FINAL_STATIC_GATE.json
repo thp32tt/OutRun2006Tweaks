@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "role": "D",
+  "run": "D75",
+  "timestamp_kst": "2026-09-27T12:45:00+09:00",
+  "asset": "568D3696_1024x1024.dds",
+  "candidate_sha256": "be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c",
+  "result": "STATIC_QA_PASS_PENDING_INGAME",
+  "approved_dds_promotion": false,
+  "checks": {
+    "B80": "CHANGES_REQUIRED_A79_RESOLVED_BY_A80",
+    "B81": "PASS_STATIC_VISUAL",
+    "C76": "PASS_STATIC_STRICT_QA",
+    "HD_source_preserved_outside_text_blocks": "PASS",
+    "VR_FFB_cross_contamination": "NONE"
+  },
+  "reason": "Static gates pass; do not move to approved_dds until in-game/user confirmation.",
+  "next_production_asset": "FA7BBB13_1024x512.dds"
+}

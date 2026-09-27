@@ -213,3 +213,18 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 
 - B79 PASS / C75 PASS / D74 STATIC_QA_PASS_PENDING_INGAME; candidate c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c.
 - Not promoted to approved_dds until in-game/user confirmation. Next production target: 568D3696.
+
+## A79 568D3696 checkpoint — 2026-09-27 12:30 KST
+
+- 14/14 mini-game text cells rebuilt on canonical 4096x4096 HD source; SHA-256 cfda02406c06be0281722150f3c9adb10eba8fef8b57229050b1ef3c9ff567d2.
+- Original-area containment and canonical header checks pass; B/C/D QA pending.
+
+## A80 568D3696 checkpoint — 2026-09-27 12:40 KST
+
+- 14/14 mini-game text cells rebuilt on canonical 4096x4096 HD source; SHA-256 be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c.
+- Original-area containment and canonical header checks pass; B/C/D QA pending.
+
+## 568D3696 static gate — 2026-09-27 12:45 KST
+
+- A80/B81/C76/D75: STATIC_QA_PASS_PENDING_INGAME; SHA-256 be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c.
+- DXT5 13-mip structure and canonical non-text compressed blocks preserved. Next: FA7BBB13.

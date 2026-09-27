@@ -497,3 +497,27 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - C75 structural gate: PASS; 4096x2048, 33,554,560 bytes, canonical 128-byte header, containment chain verified.
 - D74 final static gate: PASS_PENDING_INGAME. No approved_dds promotion was made because in-game/user approval is still required.
 - Candidate SHA-256: c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c. Next production asset: 568D3696.
+
+## 2026-09-27 12:30 KST — A79 568D3696 HD rebuild
+
+- Continued from FF2462BB static gate to the next P1 HD rework asset 568D3696.
+- Rebuilt all 14 transcribed mini-game labels directly on the canonical 4096x4096 HD DDS.
+- Small mission labels reproduce the source yellow/navy/white treatment; END/ANSWER/QUESTION/START use source-family color, outline and glow treatments.
+- All new pixels are confined to the 14 source text boxes; pixels outside are byte-identical to canonical.
+- Candidate SHA-256: cfda02406c06be0281722150f3c9adb10eba8fef8b57229050b1ef3c9ff567d2. B/C/D strict QA pending.
+
+## 2026-09-27 12:40 KST — A80 568D3696 HD rebuild
+
+- Continued from FF2462BB static gate to the next P1 HD rework asset 568D3696.
+- Rebuilt all 14 transcribed mini-game labels directly on the canonical 4096x4096 HD DDS.
+- Small mission labels reproduce the source yellow/navy/white treatment; END/ANSWER/QUESTION/START use source-family color, outline and glow treatments.
+- All new pixels are confined to the 14 source text boxes; pixels outside are byte-identical to canonical.
+- Candidate SHA-256: be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c. B/C/D strict QA pending.
+
+## 2026-09-27 12:45 KST — 568D3696 B80/B81/C76/D75 QA
+
+- B80 rejected A79 because trailing English from Dodge the bombs! remained outside the initial box; A80 corrected the measured source width.
+- B81 visual gate PASS: all 14 translated cells visible, no source-English residue or clipping observed.
+- C76 strict gate PASS: DXT5, 13 mip levels, 4096x4096, canonical header exact; all compressed payload outside the scaled text-block ranges is byte-identical to canonical.
+- D75 static gate PASS_PENDING_INGAME; no approved_dds promotion. The zippers wording remains an in-game context confirmation item.
+- A80 SHA-256: be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c. Next production target: FA7BBB13.

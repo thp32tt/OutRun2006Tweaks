@@ -1,5 +1,5 @@
 {
-  "schema_version": 24,
+  "schema_version": 27,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,7 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "HD GRAPHICS: FF2462BB A78 passed B79/C75/D74 static QA and is pending in-game approval; start next HD rebuild asset 568D3696.",
+    "HD GRAPHICS: 568D3696 A80 passed B81/C76/D75 static QA and is pending in-game/context approval; start FA7BBB13 canonical-HD rebuild.",
     "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
     "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
     "Never upscale prior stock-resolution Korean DDS candidates.",
@@ -125,7 +125,7 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_A/20260927-1215-A78/A78_FF2462BB_PRODUCTION_REPORT.json",
+    "latest_hd_rework_batch": "localization/graphics/role_D/20260927-1245-D75/D75_568D3696_FINAL_STATIC_GATE.json",
     "hd_rework_candidates_ready": 2,
     "hd_rework_remaining": 11,
     "hd_partial_rework": {
@@ -137,6 +137,15 @@
         "localized_regions": 68,
         "remaining_segments": 0,
         "report": "localization/graphics/role_A/20260927-1215-A78/A78_FF2462BB_PRODUCTION_REPORT.json"
+      },
+      "568D3696": {
+        "status": "STATIC_QA_PASS_PENDING_INGAME",
+        "candidate_sha256": "be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c",
+        "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+        "completed_transcription_entries": 14,
+        "localized_regions": 14,
+        "remaining_segments": 0,
+        "report": "localization/graphics/role_D/20260927-1245-D75/D75_568D3696_FINAL_STATIC_GATE.json"
       }
     },
     "a76_ff2462bb": {
@@ -214,5 +223,24 @@
     "B79": "PASS",
     "C75": "PASS",
     "D74": "STATIC_QA_PASS_PENDING_INGAME"
+  },
+  "a79_568d3696": {
+    "timestamp_kst": "2026-09-27T12:30:00+09:00",
+    "semantic_entries_materialized": 14,
+    "localized_regions": 14,
+    "candidate_sha256": "cfda02406c06be0281722150f3c9adb10eba8fef8b57229050b1ef3c9ff567d2",
+    "status": "PENDING_B_C_D_STRICT_QA"
+  },
+  "a80_568d3696": {
+    "timestamp_kst": "2026-09-27T12:45:00+09:00",
+    "semantic_entries_materialized": 14,
+    "localized_regions": 14,
+    "candidate_sha256": "be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c",
+    "B81": "PASS",
+    "C76": "PASS",
+    "D75": "STATIC_QA_PASS_PENDING_INGAME",
+    "context_followup": [
+      "Hit the zippers! wording"
+    ]
   }
 }

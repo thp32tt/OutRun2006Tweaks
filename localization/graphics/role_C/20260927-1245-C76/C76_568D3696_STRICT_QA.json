@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C76",
+  "timestamp_kst": "2026-09-27T12:45:00+09:00",
+  "asset": "568D3696_1024x1024.dds",
+  "candidate_sha256": "be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c",
+  "canonical_sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+  "result": "PASS_STATIC_STRICT_QA",
+  "checks": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "file_size_bytes": 22369776,
+    "compression": "DXT5",
+    "mipmaps": 13,
+    "header_128_exact_canonical": true,
+    "changed_payload_ranges_confined_to_scaled_14_text_regions": true,
+    "changed_interval_groups": 1119,
+    "source_box_edge_alpha_failures": [],
+    "non_text_payload_outside_touched_DXT5_blocks_byte_exact": true
+  },
+  "limitations": [
+    "DXT5 modifies complete 4x4 blocks intersecting text boxes; all other blocks at every mip are canonical bytes.",
+    "Final semantic/context and UV behavior require in-game validation."
+  ]
+}
