@@ -27,8 +27,11 @@ on:
       - vr-r65-one-run-20260927
 
 concurrency:
-  group: outrun-pc-fast-test
-  cancel-in-progress: false
+  # Only real PC builds serialize with each other. Ordinary source pushes that
+  # fail the [pc-build] job condition get a SHA-scoped group and can be skipped
+  # immediately instead of blocking the self-hosted Windows runner queue.
+  group: ${{ (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[pc-build]')) && 'outrun-pc-fast-test' || format('outrun-pc-fast-skip-{0}', github.sha) }}
+  cancel-in-progress: true
 
 jobs:
   fast-build:
