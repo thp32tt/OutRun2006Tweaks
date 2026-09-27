@@ -42,24 +42,4 @@ namespace OutRunVR::DebugModes
         return mode;
     }
 
-    inline int ProjectedMarkerMode() noexcept
-    {
-        static const int mode = []() noexcept {
-            char text[8]{};
-            const DWORD len = GetEnvironmentVariableA(
-                "OUTRUN_VR_R57_MODE", text,
-                static_cast<DWORD>(sizeof(text)));
-            if (len == 0 || len >= sizeof(text))
-                return 6;
-            int value = 0;
-            for (DWORD i = 0; i < len; ++i)
-            {
-                if (text[i] < '0' || text[i] > '9')
-                    return 6;
-                value = value * 10 + int(text[i] - '0');
-            }
-            return (value >= 0 && value <= 10) ? value : 6;
-        }();
-        return mode;
-    }
 }
