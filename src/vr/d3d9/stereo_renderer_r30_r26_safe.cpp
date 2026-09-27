@@ -17,6 +17,7 @@
 #include "vr/d3d9/frame_context.hpp"
 #include "vr/d3d9/render_policy.hpp"
 #include "vr/d3d9/screen_space_policy.hpp"
+#include "vr/d3d9/safety_policy.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
@@ -62,22 +63,26 @@ namespace OutRunVRStereo
 
         bool R30SafeStereoBase(IDirect3DDevice9* device) noexcept
         {
-            if (!IsGameDevice(device) || InternalStereoPass ||
-                !TargetIsBackBuffer() || !StereoWanted() || !R9StereoSeeded)
-                return false;
-            if (!OutRunVR::RuntimeEligibility::MayInjectStereo() ||
+            const OutRunVR::SafetyPolicy::StereoReplayState state{
+                IsGameDevice(device),
+                InternalStereoPass,
+                TargetIsBackBuffer(),
+                StereoWanted(),
+                R9StereoSeeded,
+                OutRunVR::RuntimeEligibility::MayInjectStereo(),
                 OutRunVR::RuntimeEligibility::RecoveryPending.load(
-                    std::memory_order_acquire) ||
-                OutRunVR::RuntimeEligibility::PoseWarmupAllowed())
-                return false;
-            if (FrameStereoIncomplete || R9DeferredDepth ||
-                !R9CurrentDepthCanMirror() || AnyAuxRenderTargetActive() ||
-                R13ForceMonoShadow ||
+                    std::memory_order_acquire),
+                OutRunVR::RuntimeEligibility::PoseWarmupAllowed(),
+                FrameStereoIncomplete,
+                R9DeferredDepth,
+                R9CurrentDepthCanMirror(),
+                AnyAuxRenderTargetActive(),
+                R13ForceMonoShadow,
                 OcclusionQueryTrackingUnavailable.load(
-                    std::memory_order_acquire) ||
-                ActiveOcclusionQueries.load(std::memory_order_acquire) > 0)
-                return false;
-            return true;
+                    std::memory_order_acquire),
+                ActiveOcclusionQueries.load(std::memory_order_acquire) > 0
+            };
+            return OutRunVR::SafetyPolicy::CanReplayStereo(state);
         }
 
         SafetyHookInline R30DrawPrimitiveR29Hook{};
