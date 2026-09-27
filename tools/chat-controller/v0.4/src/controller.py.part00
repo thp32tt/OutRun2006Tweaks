@@ -255,15 +255,44 @@ def read_prompt(filename: str) -> str:
     return path.read_text(encoding="utf-8").strip()
 
 
-async def first_visible(page: Page, selectors: list[str]):
-    for sel in selectors:
+async def first_visible(page: Page, selectors: list[str], total_wait_ms: int = 10000):
+    """Wait for React composer hydration instead of sampling the DOM once."""
+    deadline = time.time() + (total_wait_ms / 1000)
+    while time.time() < deadline:
+        for frame in page.frames:
+            for sel in selectors:
+                try:
+                    loc = frame.locator(sel).first
+                    if await loc.count() and await loc.is_visible(timeout=250):
+                        return loc
+                except Exception:
+                    continue
+        await page.wait_for_timeout(250)
+    return None
+
+
+async def composer_diagnostics(page: Page) -> list[dict]:
+    """Return safe structural metadata only; never capture user/chat text."""
+    rows = []
+    for frame in page.frames:
         try:
-            loc = page.locator(sel).first
-            if await loc.count() and await loc.is_visible(timeout=500):
-                return loc
+            found = await frame.locator("textarea, input, [contenteditable], [role='textbox']").evaluate_all("""els => els.slice(0,40).map(el => ({
+                tag: el.tagName,
+                id: el.id || '',
+                role: el.getAttribute('role') || '',
+                placeholder: el.getAttribute('placeholder') || '',
+                contenteditable: el.getAttribute('contenteditable') || '',
+                testid: el.getAttribute('data-testid') || '',
+                aria: el.getAttribute('aria-label') || '',
+                cls: (typeof el.className === 'string' ? el.className : '').slice(0,160),
+                visible: !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)
+            }))""")
+            for row in found:
+                row["frame_url"] = frame.url[:180]
+                rows.append(row)
         except Exception:
             continue
-    return None
+    return rows[:60]
 
 
 async def page_text(page: Page) -> str:
