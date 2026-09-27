@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T18:29:48+09:00",
+  "updated_at_kst": "2026-09-27T18:55:16+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C80: C4A2937B passes independent C static QA on unchanged B85 SHA but keeps Drift and runtime-context hold; 2DA43E41 and 411827E were corrected by C to new SHAs and require D revalidation + in-game. FA7BBB13/39229D64/A064FDFC remain in-game-only holds. Continue C075FB49 canonical-HD production independently.",
+  "next_checkpoint": "B87 rebuilt reopened P0 571E78F3/62BEBF33/E3FD08BE directly from exact canonical 2048x256 DXT5 sources and first-QA passed all three; C/D + in-game pending. C80 2DA/411 changed SHAs remain D revalidation/in-game pending. Continue C075FB49 canonical-HD production with B86-expanded 16 semantic / 17 physical coverage.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -253,26 +253,19 @@
     "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
     "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "latest_hd_production_candidate": {
-      "asset": "411827E",
-      "coverage": "7 semantic / 7 physical",
-      "candidate_sha256": "c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74",
-      "report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
-      "status": "C80_REWORK_STATIC_PASS_PENDING_D_REVALIDATION_INGAME",
-      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
-      "b_first_qa_report": "localization/graphics/role_B/20260927-1800-B86/B86_411827E_FIRST_QA_AND_C075FB49_TRANSCRIPTION.json",
-      "candidate_changed_by_B": false,
-      "preserved": [
-        "288GTO",
-        "Testarossa",
-        "F40",
-        "Enzo Ferrari",
-        "player-number labels"
+      "asset": "E3FD08BE",
+      "coverage": "1 semantic / 1 physical",
+      "candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
+      "report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
+      "status": "B87_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+      "candidate_changed_by_B": true,
+      "canonical_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+      "dimensions": [
+        2048,
+        256
       ],
-      "d_preflight_report": "localization/graphics/role_D/20260927-1813-D81/D81_FINAL_QA_RECONCILE_REPORT.json",
-      "a_production_report": "localization/graphics/role_A/20260927-1730-A85/A85_411827E_PRODUCTION_REPORT.json",
-      "c_strict_qa_report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
-      "c_candidate_changed": true,
-      "superseded_a85_b86_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02"
+      "format": "DXT5"
     },
     "next_hd_rework": {
       "asset": "C075FB49",
@@ -315,17 +308,48 @@
       }
     },
     "latest_b_first_qa": {
-      "run": "B86",
-      "asset": "411827E",
-      "candidate_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
-      "report": "localization/graphics/role_B/20260927-1800-B86/B86_411827E_FIRST_QA_AND_C075FB49_TRANSCRIPTION.json",
-      "result": "PASS_FIRST_QA_PENDING_C_D_INGAME",
-      "candidate_changed_by_B": false,
-      "semantic_entries": 7,
-      "physical_regions": 7,
-      "outside_text_cells_changed_pixels": 0,
-      "introduced_alpha_outside_text_cells": 0,
-      "superseded_by_c80_candidate_sha256": "c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74"
+      "run": "B87",
+      "report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
+      "result": "P0_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "candidate_changed_by_B": true,
+      "assets": {
+        "571E78F3": {
+          "candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+          "semantic_entries": 2,
+          "physical_regions": 2,
+          "outside_text_cells_changed_pixels": 0,
+          "introduced_alpha_outside_text_cells": 0,
+          "format": "DXT5",
+          "dimensions": [
+            2048,
+            256
+          ]
+        },
+        "62BEBF33": {
+          "candidate_sha256": "def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d",
+          "semantic_entries": 1,
+          "physical_regions": 1,
+          "outside_text_cells_changed_pixels": 0,
+          "introduced_alpha_outside_text_cells": 0,
+          "format": "DXT5",
+          "dimensions": [
+            2048,
+            256
+          ]
+        },
+        "E3FD08BE": {
+          "candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
+          "semantic_entries": 1,
+          "physical_regions": 1,
+          "outside_text_cells_changed_pixels": 0,
+          "introduced_alpha_outside_text_cells": 0,
+          "format": "DXT5",
+          "dimensions": [
+            2048,
+            256
+          ]
+        }
+      }
     },
     "c78_39229d64": {
       "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
@@ -392,6 +416,30 @@
         "status": "REWORK_STATIC_PASS_PENDING_D_REVALIDATION_INGAME"
       },
       "report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json"
+    },
+    "b87_p0_hd_rebuild": {
+      "timestamp_kst": "2026-09-27T18:55:16+09:00",
+      "assets": {
+        "571E78F3": {
+          "candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+          "canonical_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+          "canonical_git_blob_sha": "12a935df311634cb64ff01bddce2b7a1165a2ccc",
+          "status": "FIRST_QA_PASS_PENDING_C_D_INGAME"
+        },
+        "62BEBF33": {
+          "candidate_sha256": "def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d",
+          "canonical_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+          "canonical_git_blob_sha": "1cc92c914687546fbef9b47dd1134659c2f1f0f6",
+          "status": "FIRST_QA_PASS_PENDING_C_D_INGAME"
+        },
+        "E3FD08BE": {
+          "candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
+          "canonical_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+          "canonical_git_blob_sha": "9cd996ed8f5e8c059492893617e4ff2006c525a2",
+          "status": "FIRST_QA_PASS_PENDING_C_D_INGAME"
+        }
+      },
+      "report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json"
     }
   },
   "data_build": {

@@ -42,6 +42,6 @@ This file records the strict reset queue before the user's P0 visual approval.
 29. 37759842_1024x1024.dds — ORIGINAL_UNCHANGED / safe hold
 
 ## P0 HD-reopened former approvals
-- 571E78F3_512x64.dds — REOPENED: 512x64 RGBA32 approval -> rebuild from 2048x256 DXT5 HD source
-- 62BEBF33_512x64.dds — REOPENED: 512x64 RGBA32 approval -> rebuild from 2048x256 DXT5 HD source
-- E3FD08BE_512x64.dds — REOPENED: 512x64 RGBA32 approval -> rebuild from 2048x256 DXT5 HD source
+- 571E78F3_512x64.dds — B87 HD REBUILD + FIRST QA PASS; 2048x256 DXT5; C/D + in-game pending
+- 62BEBF33_512x64.dds — B87 HD REBUILD + FIRST QA PASS; 2048x256 DXT5; C/D + in-game pending
+- E3FD08BE_512x64.dds — B87 HD REBUILD + FIRST QA PASS; 2048x256 DXT5; C/D + in-game pending

@@ -25,9 +25,9 @@
     "changed_outside_orig_bbox": 0,
     "alpha_outside_orig_bbox": 0,
     "header_match": true,
-    "manual_visual_qa": "HISTORICAL_USER_APPROVED_LOWRES_SUPERSEDED",
+    "manual_visual_qa": "HISTORICAL_USER_APPROVAL_REFERENCE_ONLY__B87_HD_FIRST_QA_PASS",
     "historical_user_approved": true,
-    "current_status": "REOPENED_HD_REWORK_REQUIRED",
+    "current_status": "B87_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
     "approved_resolution": [
       512,
       64
@@ -38,7 +38,20 @@
       256
     ],
     "canonical_hd_format": "DXT5",
-    "canonical_upstream_blob_sha": "12a935df311634cb64ff01bddce2b7a1165a2ccc"
+    "canonical_upstream_blob_sha": "12a935df311634cb64ff01bddce2b7a1165a2ccc",
+    "hd_candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+    "hd_canonical_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+    "hd_candidate_resolution": [
+      2048,
+      256
+    ],
+    "hd_candidate_format": "DXT5",
+    "hd_header_128_exact": true,
+    "hd_outside_declared_cells_changed_pixels": 0,
+    "hd_introduced_alpha_outside_declared_cells": 0,
+    "hd_outside_declared_cells_dxt5_blocks_changed": 0,
+    "hd_candidate_report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
+    "reapproval": "PENDING_C_D_AND_INGAME"
   },
   {
     "file": "62BEBF33_512x64.dds",
@@ -66,9 +79,9 @@
     "changed_outside_orig_bbox": 0,
     "alpha_outside_orig_bbox": 0,
     "header_match": true,
-    "manual_visual_qa": "HISTORICAL_USER_APPROVED_LOWRES_SUPERSEDED",
+    "manual_visual_qa": "HISTORICAL_USER_APPROVAL_REFERENCE_ONLY__B87_HD_FIRST_QA_PASS",
     "historical_user_approved": true,
-    "current_status": "REOPENED_HD_REWORK_REQUIRED",
+    "current_status": "B87_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
     "approved_resolution": [
       512,
       64
@@ -79,7 +92,20 @@
       256
     ],
     "canonical_hd_format": "DXT5",
-    "canonical_upstream_blob_sha": "1cc92c914687546fbef9b47dd1134659c2f1f0f6"
+    "canonical_upstream_blob_sha": "1cc92c914687546fbef9b47dd1134659c2f1f0f6",
+    "hd_candidate_sha256": "def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d",
+    "hd_canonical_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+    "hd_candidate_resolution": [
+      2048,
+      256
+    ],
+    "hd_candidate_format": "DXT5",
+    "hd_header_128_exact": true,
+    "hd_outside_declared_cells_changed_pixels": 0,
+    "hd_introduced_alpha_outside_declared_cells": 0,
+    "hd_outside_declared_cells_dxt5_blocks_changed": 0,
+    "hd_candidate_report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
+    "reapproval": "PENDING_C_D_AND_INGAME"
   },
   {
     "file": "E3FD08BE_512x64.dds",
@@ -107,9 +133,9 @@
     "changed_outside_orig_bbox": 0,
     "alpha_outside_orig_bbox": 0,
     "header_match": true,
-    "manual_visual_qa": "HISTORICAL_USER_APPROVED_LOWRES_SUPERSEDED",
+    "manual_visual_qa": "HISTORICAL_USER_APPROVAL_REFERENCE_ONLY__B87_HD_FIRST_QA_PASS",
     "historical_user_approved": true,
-    "current_status": "REOPENED_HD_REWORK_REQUIRED",
+    "current_status": "B87_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
     "approved_resolution": [
       512,
       64
@@ -120,6 +146,19 @@
       256
     ],
     "canonical_hd_format": "DXT5",
-    "canonical_upstream_blob_sha": "9cd996ed8f5e8c059492893617e4ff2006c525a2"
+    "canonical_upstream_blob_sha": "9cd996ed8f5e8c059492893617e4ff2006c525a2",
+    "hd_candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
+    "hd_canonical_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+    "hd_candidate_resolution": [
+      2048,
+      256
+    ],
+    "hd_candidate_format": "DXT5",
+    "hd_header_128_exact": true,
+    "hd_outside_declared_cells_changed_pixels": 0,
+    "hd_introduced_alpha_outside_declared_cells": 0,
+    "hd_outside_declared_cells_dxt5_blocks_changed": 0,
+    "hd_candidate_report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
+    "reapproval": "PENDING_C_D_AND_INGAME"
   }
 ]

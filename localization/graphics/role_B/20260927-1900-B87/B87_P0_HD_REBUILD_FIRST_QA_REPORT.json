@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B87",
+  "timestamp_kst": "2026-09-27T18:55:16+09:00",
+  "base_head": "4a9e071bbc2fa53e6cafdabda4fdcbc64d355057",
+  "scope": "P0 HD rebuild + first QA of three reopened historical low-resolution approvals",
+  "source_origin": "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+  "assets": {
+    "571E78F3": {
+      "canonical_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+      "canonical_git_blob_sha": "12a935df311634cb64ff01bddce2b7a1165a2ccc",
+      "candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+      "dimensions": [
+        2048,
+        256
+      ],
+      "format": "DXT5",
+      "mipmaps": 1,
+      "bytes": 524416,
+      "header_128_exact": true,
+      "raw_orientation": "mirror_y",
+      "localized_regions": 2,
+      "changed_pixels_decoded": 252104,
+      "outside_declared_cells_changed_pixels": 0,
+      "introduced_alpha_outside_declared_cells": 0,
+      "outside_declared_cells_dxt5_blocks_changed": 0,
+      "replaced_dxt5_blocks": 15840,
+      "renders": [
+        {
+          "korean": "타임 어택 모드",
+          "cell": [
+            380,
+            8,
+            1340,
+            140
+          ],
+          "candidate_alpha_bbox": [
+            541,
+            12,
+            1178,
+            136
+          ],
+          "font_size": 112,
+          "scale": 0.8857
+        },
+        {
+          "korean": "15코스 연속",
+          "cell": [
+            500,
+            132,
+            1612,
+            252
+          ],
+          "candidate_alpha_bbox": [
+            818,
+            136,
+            1293,
+            248
+          ],
+          "font_size": 102,
+          "scale": 0.855
+        }
+      ],
+      "translations": [
+        {
+          "source": "Time Attack Mode",
+          "korean": "타임 어택 모드"
+        },
+        {
+          "source": "15 continuous course",
+          "korean": "15코스 연속"
+        }
+      ],
+      "source": "exact canonical HD DDS",
+      "source_origin": "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+      "result": "B87_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "candidate_changed_by_B": true,
+      "visual_qa": {
+        "readable": "PASS",
+        "raw": "PASS_MIRROR_Y_PRESERVED",
+        "white_background": "PASS",
+        "clipping_overlap": "NONE_OBSERVED",
+        "box_escape": "NONE_OBSERVED",
+        "source_residue": "NONE_OBSERVED",
+        "black_line_seam": "NONE_OBSERVED",
+        "opaque_box": "NONE_OBSERVED",
+        "alpha_halo": "NONE_OBSERVED",
+        "style_fidelity": "PASS_SOURCE_FAMILY"
+      },
+      "in_game_validation": "PENDING",
+      "approval": "NOT_PROMOTED",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+      "canonical_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+      "historical_lowres_approval": "REFERENCE_ONLY_NOT_USED_AS_CONSTRUCTION_SOURCE"
+    },
+    "62BEBF33": {
+      "canonical_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+      "canonical_git_blob_sha": "1cc92c914687546fbef9b47dd1134659c2f1f0f6",
+      "candidate_sha256": "def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d",
+      "dimensions": [
+        2048,
+        256
+      ],
+      "format": "DXT5",
+      "mipmaps": 1,
+      "bytes": 524416,
+      "header_128_exact": true,
+      "raw_orientation": "mirror_y",
+      "localized_regions": 1,
+      "changed_pixels_decoded": 160090,
+      "outside_declared_cells_changed_pixels": 0,
+      "introduced_alpha_outside_declared_cells": 0,
+      "outside_declared_cells_dxt5_blocks_changed": 0,
+      "replaced_dxt5_blocks": 10168,
+      "renders": [
+        {
+          "korean": "아웃런 모드",
+          "cell": [
+            380,
+            44,
+            1372,
+            208
+          ],
+          "candidate_alpha_bbox": [
+            565,
+            51,
+            1186,
+            200
+          ],
+          "font_size": 120,
+          "scale": 1.0
+        }
+      ],
+      "translations": [
+        {
+          "source": "OutRun Mode",
+          "korean": "아웃런 모드"
+        }
+      ],
+      "source": "exact canonical HD DDS",
+      "source_origin": "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+      "result": "B87_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "candidate_changed_by_B": true,
+      "visual_qa": {
+        "readable": "PASS",
+        "raw": "PASS_MIRROR_Y_PRESERVED",
+        "white_background": "PASS",
+        "clipping_overlap": "NONE_OBSERVED",
+        "box_escape": "NONE_OBSERVED",
+        "source_residue": "NONE_OBSERVED",
+        "black_line_seam": "NONE_OBSERVED",
+        "opaque_box": "NONE_OBSERVED",
+        "alpha_halo": "NONE_OBSERVED",
+        "style_fidelity": "PASS_SOURCE_FAMILY"
+      },
+      "in_game_validation": "PENDING",
+      "approval": "NOT_PROMOTED",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+      "canonical_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+      "historical_lowres_approval": "REFERENCE_ONLY_NOT_USED_AS_CONSTRUCTION_SOURCE"
+    },
+    "E3FD08BE": {
+      "canonical_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+      "canonical_git_blob_sha": "9cd996ed8f5e8c059492893617e4ff2006c525a2",
+      "candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
+      "dimensions": [
+        2048,
+        256
+      ],
+      "format": "DXT5",
+      "mipmaps": 1,
+      "bytes": 524416,
+      "header_128_exact": true,
+      "raw_orientation": "mirror_y",
+      "localized_regions": 1,
+      "changed_pixels_decoded": 204502,
+      "outside_declared_cells_changed_pixels": 0,
+      "introduced_alpha_outside_declared_cells": 0,
+      "outside_declared_cells_dxt5_blocks_changed": 0,
+      "replaced_dxt5_blocks": 12915,
+      "renders": [
+        {
+          "korean": "하트 어택 모드",
+          "cell": [
+            380,
+            44,
+            1640,
+            208
+          ],
+          "candidate_alpha_bbox": [
+            632,
+            53,
+            1388,
+            198
+          ],
+          "font_size": 118,
+          "scale": 1.0
+        }
+      ],
+      "translations": [
+        {
+          "source": "Heart Attack Mode",
+          "korean": "하트 어택 모드"
+        }
+      ],
+      "source": "exact canonical HD DDS",
+      "source_origin": "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+      "result": "B87_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "candidate_changed_by_B": true,
+      "visual_qa": {
+        "readable": "PASS",
+        "raw": "PASS_MIRROR_Y_PRESERVED",
+        "white_background": "PASS",
+        "clipping_overlap": "NONE_OBSERVED",
+        "box_escape": "NONE_OBSERVED",
+        "source_residue": "NONE_OBSERVED",
+        "black_line_seam": "NONE_OBSERVED",
+        "opaque_box": "NONE_OBSERVED",
+        "alpha_halo": "NONE_OBSERVED",
+        "style_fidelity": "PASS_SOURCE_FAMILY"
+      },
+      "in_game_validation": "PENDING",
+      "approval": "NOT_PROMOTED",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+      "canonical_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+      "historical_lowres_approval": "REFERENCE_ONLY_NOT_USED_AS_CONSTRUCTION_SOURCE"
+    }
+  },
+  "approved_dds_promotion": false,
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "next_asset": "C075FB49_512x512.dds"
+}

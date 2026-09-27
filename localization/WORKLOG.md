@@ -771,3 +771,18 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - New gate: rebuild at 2048x256 DXT5, preserve orientation/alpha/non-text cells/bounds, then repeat strict static QA and in-game validation before any new lock.
 - Report: localization/graphics/BATCH69_REOPEN_LOWRES_APPROVALS_HD_REWORK_REPORT.json.
 
+
+
+## 2026-09-27 18:55 KST — B87 reopened P0 trio HD rebuild + first QA
+
+- Started from latest remote HEAD 4a9e071 and applied the mandatory localization/orientation/HD rules. GPT Library was not used.
+- Recovered the exact canonical Sonic-TV/OR2006Sprites@a95efe01 DXT5 source DDS files for 571E78F3, 62BEBF33 and E3FD08BE. Their Git blob SHAs exactly match Batch69.
+- Added those exact 2048x256 DXT5 canonical DDS files to the branch hd_source tree so future roles do not depend on a temporary external path.
+- Rebuilt all Korean artwork directly on those HD sources; the historical 512x64 Korean approvals were used only as visual/reference evidence and were never upscaled or copied as construction pixels.
+- 571E78F3: Time Attack Mode -> 타임 어택 모드; 15 continuous course -> 15코스 연속. Candidate SHA 0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4.
+- 62BEBF33: OutRun Mode -> 아웃런 모드. Candidate SHA def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d.
+- E3FD08BE: Heart Attack Mode -> 하트 어택 모드. Candidate SHA 12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc.
+- All three preserve exact canonical 128-byte DDS headers, 2048x256, DXT5, 1 mip and raw mirror_y orientation. DXT5 blocks outside declared source text cells are byte-identical to canonical; decoded pixels and introduced alpha outside cells are both zero.
+- Readable/raw/white-background visual QA PASS for all three: no source-language residue, clipping/overlap, box escape, seam/black line, opaque box or obvious alpha halo observed; orange/navy/white source-family style retained.
+- No approved_dds promotion or re-lock: C/D strict QA and in-game screenshots are still mandatory. Next production target remains C075FB49 with 16 semantic / 17 expected physical text occurrences.
+- Build not run; VR/FFB untouched. Machine report: localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json.

@@ -423,3 +423,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Old approved pixels may be used only as visual/reference evidence; they must not be upscaled into the new candidates.
 - Re-approval requires HD rebuild + strict static QA + in-game validation.
 
+
+
+## B87 checkpoint — 2026-09-27 18:55 KST
+
+- Former low-res approvals 571E78F3 / 62BEBF33 / E3FD08BE rebuilt from exact canonical 2048x256 DXT5 sources and B FIRST QA PASS.
+- Candidate SHAs: 571E78F3 0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4; 62BEBF33 def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d; E3FD08BE 12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc.
+- Header/format/mip/raw mirror_y preserved. Outside declared text cells: changed pixels 0, introduced alpha 0, changed DXT5 blocks 0 for all three.
+- Historical 512x64 approvals remain audit/reference evidence only; user-approved lock count stays 0 until C/D + in-game revalidation.
+- Next HD production: C075FB49 (16 semantic / 17 expected physical).

@@ -18,8 +18,8 @@
     "graphics_rework_targets": 16,
     "low_res_font_pipeline_targets": 1,
     "hd_preserve_targets": 72,
-    "graphics_rework_candidates_ready": 8,
-    "graphics_rework_remaining": 8
+    "graphics_rework_candidates_ready": 11,
+    "graphics_rework_remaining": 5
   },
   "rules": [
     "Use DDS header dimensions, never the filename resolution suffix.",
@@ -43,7 +43,7 @@
       "reason": "LOW_RES_USER_APPROVAL_SUPERSEDED_BY_CANONICAL_HD_SOURCE",
       "policy": "REBUILD_KOREAN_FROM_HD_BASE",
       "priority": "P0",
-      "status": "REWORK_FROM_HD_BASE",
+      "status": "B87_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
       "historical_approved_resolution": [
         512,
         64
@@ -54,7 +54,15 @@
         "Time Attack Mode -> 타임 어택 모드",
         "15 continuous course -> 15코스 연속"
       ],
-      "in_game_validation": "PENDING"
+      "in_game_validation": "PENDING",
+      "candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+      "canonical_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+      "canonical_git_blob_sha": "12a935df311634cb64ff01bddce2b7a1165a2ccc",
+      "localized_regions": 2,
+      "remaining_segments": 0,
+      "b_first_qa_report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
+      "candidate_changed_by_B": true
     },
     {
       "hash": "62BEBF33",
@@ -68,7 +76,7 @@
       "reason": "LOW_RES_USER_APPROVAL_SUPERSEDED_BY_CANONICAL_HD_SOURCE",
       "policy": "REBUILD_KOREAN_FROM_HD_BASE",
       "priority": "P0",
-      "status": "REWORK_FROM_HD_BASE",
+      "status": "B87_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
       "historical_approved_resolution": [
         512,
         64
@@ -78,7 +86,15 @@
       "translation": [
         "OutRun Mode -> 아웃런 모드"
       ],
-      "in_game_validation": "PENDING"
+      "in_game_validation": "PENDING",
+      "candidate_sha256": "def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+      "canonical_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+      "canonical_git_blob_sha": "1cc92c914687546fbef9b47dd1134659c2f1f0f6",
+      "localized_regions": 1,
+      "remaining_segments": 0,
+      "b_first_qa_report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
+      "candidate_changed_by_B": true
     },
     {
       "hash": "E3FD08BE",
@@ -92,7 +108,7 @@
       "reason": "LOW_RES_USER_APPROVAL_SUPERSEDED_BY_CANONICAL_HD_SOURCE",
       "policy": "REBUILD_KOREAN_FROM_HD_BASE",
       "priority": "P0",
-      "status": "REWORK_FROM_HD_BASE",
+      "status": "B87_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
       "historical_approved_resolution": [
         512,
         64
@@ -102,7 +118,15 @@
       "translation": [
         "Heart Attack Mode -> 하트 어택 모드"
       ],
-      "in_game_validation": "PENDING"
+      "in_game_validation": "PENDING",
+      "candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+      "canonical_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+      "canonical_git_blob_sha": "9cd996ed8f5e8c059492893617e4ff2006c525a2",
+      "localized_regions": 1,
+      "remaining_segments": 0,
+      "b_first_qa_report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
+      "candidate_changed_by_B": true
     },
     {
       "hash": "D6DC1380",
@@ -435,6 +459,6 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
+  "latest_batch": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
   "latest_reopen_report": "localization/graphics/BATCH69_REOPEN_LOWRES_APPROVALS_HD_REWORK_REPORT.json"
 }
