@@ -88,6 +88,43 @@ if($semantic){
     $semanticStaleCleared=[int64]$semantic.Groups[3].Value
 }
 
+$rank46DirectHits=0
+$rank46ProjectedSeen=$false
+$rank46=Get-LastRegexMatch $gameLog 'VR R58 DIRECT CLIP: owner=rank46 prio=(\d+) kind=(\d+) projected=(\d+) hits=(\d+)'
+if($rank46){
+    $rank46ProjectedSeen=([int]$rank46.Groups[3].Value -eq 1)
+    $rank46DirectHits=[int64]$rank46.Groups[4].Value
+}
+
+$rankProjectedMode=0
+$rankMarkerScale=$null
+$rankBaseX=$null
+$rankBaseY=$null
+$rankDeltaLX=$null
+$rankDeltaLY=$null
+$rankDeltaRX=$null
+$rankDeltaRY=$null
+$r59Projected=Get-LastRegexMatch $gameLog 'VR R59 PROJECTED MARKER: mode=(\d+) view=\([^\)]*\) base=\(([-0-9\.]+),([-0-9\.]+)\) deltaL=\(([-0-9\.]+),([-0-9\.]+)\) deltaR=\(([-0-9\.]+),([-0-9\.]+)\) rankScale=([0-9\.]+)'
+if($r59Projected){
+    $rankProjectedMode=[int]$r59Projected.Groups[1].Value
+    $rankBaseX=[double]$r59Projected.Groups[2].Value
+    $rankBaseY=[double]$r59Projected.Groups[3].Value
+    $rankDeltaLX=[double]$r59Projected.Groups[4].Value
+    $rankDeltaLY=[double]$r59Projected.Groups[5].Value
+    $rankDeltaRX=[double]$r59Projected.Groups[6].Value
+    $rankDeltaRY=[double]$r59Projected.Groups[7].Value
+    $rankMarkerScale=[double]$r59Projected.Groups[8].Value
+}else{
+    $r57Projected=Get-LastRegexMatch $gameLog 'VR R57 PROJECTED MARKER: mode=(\d+).*deltaL=\(([-0-9\.]+),([-0-9\.]+)\) deltaR=\(([-0-9\.]+),([-0-9\.]+)\)'
+    if($r57Projected){
+        $rankProjectedMode=[int]$r57Projected.Groups[1].Value
+        $rankDeltaLX=[double]$r57Projected.Groups[2].Value
+        $rankDeltaLY=[double]$r57Projected.Groups[3].Value
+        $rankDeltaRX=[double]$r57Projected.Groups[4].Value
+        $rankDeltaRY=[double]$r57Projected.Groups[5].Value
+    }
+}
+
 $recenterPublished=([regex]::Matches($gameLog,'VR recenter: published host requestId=')).Count
 $recenterGameplayApplied=([regex]::Matches($gameLog,'VR renderer: yaw recentered gameplay pose')).Count
 $recenterHostReceived=([regex]::Matches($hostLog,'(?i)recenter.*(?:received.*requestId|requestId=.*received)|requestId=.*recenter.*received')).Count
@@ -136,6 +173,11 @@ $startupNoFrame=(
     $startupEvidence -and
     -not $hasRuntimeActivity
 )
+$r59RankOwnerMissing=(
+    $variant -eq 'R59_01_RANK_HEAD_SCALE82' -and
+    $hasRuntimeActivity -and
+    ($rank46DirectHits -eq 0 -or -not $rank46ProjectedSeen)
+)
 
 $flags=@()
 if($sbsFallback){$flags+='SBS_DESKTOP_DUP_FALLBACK'}
@@ -148,12 +190,14 @@ if($whiteScreenEvidence){$flags+='WHITE_SCREEN_TEXT_PRESENT'}
 if($dxvkProviderExCreateStall){$flags+='DXVK_PROVIDER_EX_CREATEDEVICE_STALL'}
 if($dx12IdentityMismatch){$flags+='DX12_PROVIDER_IDENTITY_MISMATCH'}
 if($startupNoFrame){$flags+='STARTUP_NO_FRAME'}
+if($r59RankOwnerMissing){$flags+='R59_RANK46_PROJECTED_OWNER_NOT_REACHED'}
 if($flags.Count -eq 0){$flags+='NO_AUTOMATIC_RED_FLAG'}
 
 $status='OK'
 if($dxvkProviderExCreateStall){$status='DXVK_PROVIDER_EX_CREATEDEVICE_STALL'}
 elseif($dx12IdentityMismatch){$status='DX12_PROVIDER_IDENTITY_MISMATCH'}
 elseif($startupNoFrame){$status='STARTUP_NO_FRAME'}
+elseif($r59RankOwnerMissing){$status='R59_RANK46_PROJECTED_OWNER_NOT_REACHED'}
 elseif($sbsFallback -and $backend -match 'dxvk'){$status='DXVK_SBS_FALLBACK_CONFIRMED'}
 elseif($driverSeatCount -gt 0 -and $variant -ne 'G_COCKPIT'){$status='UNEXPECTED_DRIVER_SEAT_CAMERA_ACTIVE'}
 elseif($directFrames -eq 0 -and $directFallbacks -gt 0){$status='DIRECT_GPU_UNAVAILABLE'}
@@ -184,6 +228,15 @@ $result=[ordered]@{
     SemanticRegistered=$semanticRegistered
     SemanticConsumed=$semanticConsumed
     SemanticStaleCleared=$semanticStaleCleared
+    Rank46DirectHits=$rank46DirectHits
+    Rank46ProjectedSeen=$rank46ProjectedSeen
+    RankProjectedMode=$rankProjectedMode
+    RankMarkerScale=$rankMarkerScale
+    RankBaseX=$rankBaseX
+    RankBaseY=$rankBaseY
+    RankDeltaLeft=@($rankDeltaLX,$rankDeltaLY)
+    RankDeltaRight=@($rankDeltaRX,$rankDeltaRY)
+    R59RankOwnerMissing=$r59RankOwnerMissing
     RecenterPublished=$recenterPublished
     RecenterGameplayApplied=$recenterGameplayApplied
     RecenterHostReceived=$recenterHostReceived
@@ -220,6 +273,14 @@ $lines=@(
     "semanticRegistered=$semanticRegistered"
     "semanticConsumed=$semanticConsumed"
     "semanticStaleCleared=$semanticStaleCleared"
+    "rank46DirectHits=$rank46DirectHits"
+    "rank46ProjectedSeen=$rank46ProjectedSeen"
+    "rankProjectedMode=$rankProjectedMode"
+    ("rankMarkerScale="+$(if($null -ne $rankMarkerScale){'{0:F3}' -f $rankMarkerScale}else{'n/a'}))
+    ("rankBase="+$(if($null -ne $rankBaseX -and $null -ne $rankBaseY){'({0:F5},{1:F5})' -f $rankBaseX,$rankBaseY}else{'n/a'}))
+    ("rankDeltaLeft="+$(if($null -ne $rankDeltaLX -and $null -ne $rankDeltaLY){'({0:F5},{1:F5})' -f $rankDeltaLX,$rankDeltaLY}else{'n/a'}))
+    ("rankDeltaRight="+$(if($null -ne $rankDeltaRX -and $null -ne $rankDeltaRY){'({0:F5},{1:F5})' -f $rankDeltaRX,$rankDeltaRY}else{'n/a'}))
+    "r59RankOwnerMissing=$r59RankOwnerMissing"
     "recenterPublished=$recenterPublished"
     "recenterGameplayApplied=$recenterGameplayApplied"
     "recenterHostReceived=$recenterHostReceived"
@@ -236,6 +297,9 @@ if($status -eq 'DX12_PROVIDER_IDENTITY_MISMATCH'){
 }
 if($status -eq 'STARTUP_NO_FRAME'){
     $lines+='interpretation_startup=Non-2D session produced no DirectGPU frames, semantic activity, or XR frame timing. Treat as startup/device/provider failure until proven otherwise.'
+}
+if($status -eq 'R59_RANK46_PROJECTED_OWNER_NOT_REACHED'){
+    $lines+='interpretation_rank=R59 runtime activity was present, but the direct 4th+ rank node did not reach projected=1 ownership. Treat as a rank semantic regression.'
 }
 if($status -eq 'DXVK_SBS_FALLBACK_CONFIRMED'){
     $lines+='interpretation=DXVK loaded, but DirectGPU shared-eye transport did not activate; runtime fell back to SBS/Desktop Duplication.'
