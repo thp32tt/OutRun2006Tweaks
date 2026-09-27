@@ -290,9 +290,6 @@ jobs:
           )) {
             if ($ascii.Contains($forbidden)) { throw "regressed fast/HUD marker present: $forbidden" }
           }
-          if ($ascii.Contains('VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE')) {
-            throw 'R26 HUD artifact contains forbidden R26-only SAFE-DRAW marker'
-          }
           $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
           if ([BitConverter]::ToUInt16($bytes, $peOffset + 4) -ne 0x014C) { throw 'expected x86 DLL' }
 
@@ -467,6 +464,9 @@ jobs:
             if (-not $ascii.Contains($marker)) {
               throw "R26 HUD marker missing: $marker"
             }
+          }
+          if ($ascii.Contains('VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE')) {
+            throw 'R26 HUD artifact contains forbidden R26-only SAFE-DRAW marker'
           }
           $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
           if ([BitConverter]::ToUInt16($bytes, $peOffset + 4) -ne 0x014C) {
