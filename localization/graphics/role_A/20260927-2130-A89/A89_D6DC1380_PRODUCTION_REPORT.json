@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A89",
+  "timestamp_kst": "2026-09-27T21:38:50+09:00",
+  "base_head": "0db473f61ec7a2721acb4ed82e980efeef52840e",
+  "asset": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+  "policy": "CREATE_NEW_HD_KOREAN_ASSET",
+  "canonical_source": "OR2-HD-GUI-v0.25.10a stock-resolution fallback/reference",
+  "canonical_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+  "source_dimensions": [
+    256,
+    64
+  ],
+  "candidate_dimensions": [
+    1024,
+    256
+  ],
+  "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+  "source_bytes": 65664,
+  "candidate_bytes": 1048704,
+  "format": "RGBA32",
+  "mipmaps": 1,
+  "dds_channel_masks": [
+    "0xff0000",
+    "0xff00",
+    "0xff",
+    "0xff000000"
+  ],
+  "header_preservation": {
+    "source_exact_except_dimensions_pitch": true,
+    "changed_header_fields": {
+      "height": [
+        64,
+        256
+      ],
+      "width": [
+        256,
+        1024
+      ],
+      "pitch": [
+        1024,
+        4096
+      ]
+    },
+    "format_masks_mips_caps_preserved": true
+  },
+  "raw_orientation": "normal",
+  "orientation_evidence": "Direct canonical raw DDS inspection: source question mark is on the right; historical artwork_specs stored_mirrored_x=true is superseded by the raw-source rule.",
+  "semantic_entries_materialized": 1,
+  "localized_regions": 1,
+  "translation": {
+    "source": "Continue?",
+    "korean": "계속?"
+  },
+  "source_text_bbox": [
+    8,
+    10,
+    248,
+    44
+  ],
+  "allowed_scaled_bbox": [
+    32,
+    40,
+    992,
+    176
+  ],
+  "candidate_alpha_bbox": [
+    207,
+    41,
+    817,
+    175
+  ],
+  "bbox_contained": true,
+  "construction": {
+    "prior_korean_dds_reused": false,
+    "prior_batch66_binary_reused": false,
+    "historical_batch66_candidate_sha256": "dd93ee5a8f50df51d0bcbc6164c8aac0447ec6e8518bb7dce98d19e08838aec3",
+    "source_pixels_used_as_style_orientation_reference_only": true,
+    "korean_rendered_directly_at_1024x256": true
+  },
+  "preserved_original_properties": [
+    "transparent background",
+    "RGBA32 pixel format",
+    "channel masks",
+    "1-mip behavior",
+    "DDS caps/flags except dimensions/pitch fields required for the new HD canvas"
+  ],
+  "readable_orientation_visual_qa": "PASS_A_STAGE",
+  "raw_orientation_visual_qa": "PASS_A_STAGE",
+  "white_black_gray_background_qa": "PASS",
+  "artifact_qa": {
+    "source_language_residue": "NONE_OBSERVED_FINAL",
+    "broken_hangul": "NONE_OBSERVED",
+    "clipping_or_overlap": "NONE_OBSERVED",
+    "box_escape": "NONE_OBSERVED",
+    "black_line_or_seam": "NONE_OBSERVED",
+    "opaque_box": "NONE_OBSERVED",
+    "alpha_halo": "NONE_OBSERVED"
+  },
+  "internal_rework": [
+    {
+      "attempt": "draft_1",
+      "result": "REJECTED_NOT_PERSISTED",
+      "reason": "Header validation incorrectly treated DDS depth field as mip count; no candidate persisted."
+    },
+    {
+      "attempt": "draft_2",
+      "result": "REJECTED_NOT_PERSISTED",
+      "reason": "Used stale historical mirror-X metadata and overly compact Korean aspect ratio; direct raw inspection showed normal orientation."
+    },
+    {
+      "attempt": "final",
+      "result": "PASS_FOR_A_HANDOFF",
+      "reason": "Direct raw orientation restored to normal; Korean rendered at true 1024x256 with source-like wide 610x134 alpha envelope and source-faithful white/navy styling."
+    }
+  ],
+  "in_game_validation": "NOT_PERFORMED",
+  "approval": "NOT_PROMOTED_PENDING_B_C_D_AND_INGAME",
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "status": "A89_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA",
+  "next_asset": "48DEBE77_512x512.dds"
+}

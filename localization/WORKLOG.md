@@ -905,3 +905,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - No REWORK_FROM_HD_BASE entries remain. Next current-pipeline special cases are D6DC1380 then 48DEBE77 under CREATE_NEW_HD_KOREAN_ASSET; prior Korean DDS must not be upscaled.
 - LOCALIZATION_STATE_OK and Domain Isolation PASS; no VR/FFB source/history merge. Build not run.
 - Report: localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json.
+
+## 2026-09-27 21:38 KST — A89 D6DC1380 CREATE_NEW_HD production
+
+- Continued from latest GitHub korean-localization-clean HEAD 0db473f after D84; GPT Library was not used.
+- D6DC1380 has no true HD replacement in the imported HD package: canonical source/reference is 256×64 RGBA32/1 mip. Queue policy explicitly requires CREATE_NEW_HD_KOREAN_ASSET, so A89 created a new 1024×256 candidate rather than upscaling any Korean DDS.
+- Rendered Continue? -> 계속? directly at 1024×256. Candidate SHA-256: 53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00. Historical Batch66 candidate SHA dd93ee5a... was reference-only and its binary was not reused.
+- Direct raw DDS inspection overrides stale artwork_specs stored_mirrored_x=true: canonical raw shows the question mark on the right, so current raw orientation is normal. A89 stores Korean in the same normal raw orientation.
+- Source header bytes are preserved except height/width/pitch (64->256, 256->1024, 1024->4096); RGBA32 format, channel masks, mip count=1, caps/flags remain source-exact.
+- Source text bbox 8,10-248,44 scales to allowed 32,40-992,176; final Korean alpha bbox 207,41-817,175 is fully contained. White/black/gray plus raw/readable artifact QA PASS with no observed clipping, seam, opaque box or alpha halo.
+- Two internal attempts were rejected before persistence: one header-validation field mixup (no candidate persisted), then a stale mirror-X/compact-aspect draft. Final uses direct raw orientation and a source-like wide 610×134 envelope.
+- Status: A89_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA. No approval/promotion, in-game claim, build, VR or FFB work.
+- Queue after A89: 15 ready / 1 remaining. Next: 48DEBE77 current-pipeline CREATE_NEW_HD_KOREAN_ASSET production.

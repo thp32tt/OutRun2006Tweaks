@@ -1,5 +1,5 @@
 index,path,action,artwork_status,transcription_status,notes
-12,textures/load/spr_etc_xst/D6DC1380_256x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
+12,textures/load/spr_etc_xst/D6DC1380_256x64.dds,localize_text,a89_hd_candidate_pending_bcd_qa,transcribed_reviewed,A89 CREATE_NEW_HD 1024x256 complete; Continue?->계속?; raw orientation normal from canonical DDS; B/C/D + in-game pending
 15,textures/load/spr_font_xst/20389D70_512x256.dds,font_pipeline,blocked_runtime_font,glyph_atlas,
 16,textures/load/spr_font_xst/23DDB6EC_512x512.dds,font_pipeline,blocked_runtime_font,glyph_atlas,
 17,textures/load/spr_font_xst/6B8ED9DA_256x128.dds,font_pipeline,blocked_runtime_font,glyph_atlas,

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T21:22:59+09:00",
+  "updated_at_kst": "2026-09-27T21:38:50+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C075FB49, FD90AA9 and 9F060EC1 now complete C82 + D84 final static QA on their current SHAs; no DDS was changed by C82. All three remain unapproved pending mandatory in-game screenshots. P0 HD trio also remains final-static pending in-game reapproval. Next current-pipeline special cases: D6DC1380 then 48DEBE77.",
+  "next_checkpoint": "D6DC1380 A89 CREATE_NEW_HD_KOREAN_ASSET production complete at 1024x256 (Continue? -> 계속?) from the canonical 256x64 source reference without reusing/upscaling any prior Korean DDS. B/C/D + in-game remain. D84 final-static states are preserved. One HD-migration queue entry remains: 48DEBE77.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -253,29 +253,30 @@
     "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
     "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "latest_hd_production_candidate": {
-      "asset": "9F060EC1",
-      "coverage": "5 semantic / 5 physical",
-      "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
-      "report": "localization/graphics/role_A/20260927-2030-A88/A88_9F060EC1_PRODUCTION_REPORT.json",
-      "status": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
-      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
-      "preserved": [
-        "row numbers 1.-4.",
-        "OM",
-        "barcode/legal-code",
-        "repeating watermark/background artwork"
+      "asset": "D6DC1380",
+      "policy": "CREATE_NEW_HD_KOREAN_ASSET",
+      "coverage": "1 semantic / 1 physical",
+      "source_dimensions": [
+        256,
+        64
       ],
-      "b_first_qa_report": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_FIRST_QA_REPORT.json",
-      "candidate_changed_by_B": false,
-      "c_strict_qa_report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
-      "c_candidate_changed": false,
-      "d_final_qa_report": "localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json"
+      "candidate_dimensions": [
+        1024,
+        256
+      ],
+      "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+      "report": "localization/graphics/role_A/20260927-2130-A89/A89_D6DC1380_PRODUCTION_REPORT.json",
+      "status": "A89_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+      "raw_orientation": "normal",
+      "header_policy": "source-exact except height/width/pitch required for 4x HD canvas",
+      "prior_korean_reused": false
     },
     "next_hd_rework": {
-      "asset": "D6DC1380",
-      "secondary_asset": "48DEBE77",
+      "asset": "48DEBE77",
       "status": "BATCH66_CANDIDATE_READY_REQUIRES_CURRENT_PIPELINE_RECONCILIATION",
-      "note": "No REWORK_FROM_HD_BASE entries remain. These two are CREATE_NEW_HD_KOREAN_ASSET special cases; never upscale old Korean DDS."
+      "policy": "CREATE_NEW_HD_KOREAN_ASSET",
+      "note": "Final remaining HD-migration queue entry after D6DC1380 A89."
     },
     "latest_d_final_qa": {
       "run": "D84",

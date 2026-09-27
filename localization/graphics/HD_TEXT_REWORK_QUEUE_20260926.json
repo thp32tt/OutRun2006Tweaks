@@ -18,8 +18,8 @@
     "graphics_rework_targets": 16,
     "low_res_font_pipeline_targets": 1,
     "hd_preserve_targets": 72,
-    "graphics_rework_candidates_ready": 14,
-    "graphics_rework_remaining": 2
+    "graphics_rework_candidates_ready": 15,
+    "graphics_rework_remaining": 1
   },
   "rules": [
     "Use DDS header dimensions, never the filename resolution suffix.",
@@ -154,8 +154,25 @@
       "reason": "STOCK_RESOLUTION_TEXT_GRAPHIC",
       "policy": "CREATE_NEW_HD_KOREAN_ASSET",
       "priority": "P0",
-      "status": "BATCH_CANDIDATE_READY",
-      "batch_report": "localization/graphics/BATCH66_HD_REWORK_B01_REPORT.json"
+      "status": "A89_CREATE_NEW_HD_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "batch_report": "localization/graphics/role_A/20260927-2130-A89/A89_D6DC1380_PRODUCTION_REPORT.json",
+      "source_actual": [
+        256,
+        64
+      ],
+      "candidate_actual": [
+        1024,
+        256
+      ],
+      "transcription_segments": 1,
+      "localized_regions": 1,
+      "remaining_segments": 0,
+      "a_production_report": "localization/graphics/role_A/20260927-2130-A89/A89_D6DC1380_PRODUCTION_REPORT.json",
+      "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+      "raw_orientation": "normal",
+      "historical_stored_mirrored_x_superseded": true,
+      "in_game_validation": "PENDING"
     },
     {
       "hash": "48DEBE77",
@@ -551,7 +568,7 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json",
+  "latest_batch": "localization/graphics/role_A/20260927-2130-A89/A89_D6DC1380_PRODUCTION_REPORT.json",
   "latest_reopen_report": "localization/graphics/BATCH69_REOPEN_LOWRES_APPROVALS_HD_REWORK_REPORT.json",
   "next_hd_special_cases": [
     "D6DC1380",

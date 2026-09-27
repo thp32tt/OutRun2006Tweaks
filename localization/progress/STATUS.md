@@ -522,3 +522,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Next current-pipeline special cases: D6DC1380 then 48DEBE77, CREATE_NEW_HD_KOREAN_ASSET only; never upscale prior Korean DDS.
 - LOCALIZATION_STATE_OK and Domain Isolation PASS; VR/FFB contamination not observed. No build performed.
 - Machine report: localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json.
+
+## A89 D6DC1380 checkpoint — 2026-09-27 21:38 KST
+
+- CREATE_NEW_HD_KOREAN_ASSET production complete: Continue? -> 계속?, 1 semantic / 1 physical region.
+- Canonical source/reference 256×64 RGBA32 / 1 mip -> new candidate 1024×256; candidate SHA-256: 53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00.
+- Header source-exact except height/width/pitch; format/masks/mips/caps preserved. Candidate alpha 207,41-817,175 stays inside scaled source cell 32,40-992,176.
+- Direct raw-source inspection establishes normal orientation and supersedes stale historical mirror-X metadata. No prior Korean DDS or Batch66 binary was reused.
+- Raw/readable + white/black/gray A-stage QA PASS; in-game not performed. Queue now 15 ready / 1 remaining.
+- Next A target: 48DEBE77 CREATE_NEW_HD_KOREAN_ASSET current-pipeline production.
