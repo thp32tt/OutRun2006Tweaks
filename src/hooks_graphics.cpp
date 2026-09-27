@@ -246,13 +246,19 @@ class RestoreCarBaseShadow : public Hook
 		// renderers. Keep gameplay restoration, but return selector VR to stock PC
 		// behavior so one HMD run can prove whether this path corrupts the preview.
 		if (Settings::VREnabled && Game::current_mode &&
-			*Game::current_mode == GameState::STATE_SELECTOR)
+			(*Game::current_mode == GameState::STATE_SELECTOR ||
+			 *Game::current_mode == GameState::STATE_SUMO_FE ||
+			 *Game::current_mode == GameState::STATE_START))
 		{
-			static bool logged = false;
-			if (!logged)
+			static std::array<bool, 0x25> loggedModes{};
+			const int mode = static_cast<int>(*Game::current_mode);
+			if (mode >= 0 && mode < static_cast<int>(loggedModes.size()) &&
+				!loggedModes[mode])
 			{
-				logged = true;
-				spdlog::info("VR R65 SELECTOR: restored base shadow bypassed (stock PC nullsub behavior)");
+				loggedModes[mode] = true;
+				spdlog::info(
+					"VR R68 NONPLAY CAR: restored base shadow bypassed mode={} (stock PC nullsub behavior)",
+					mode);
 			}
 			return;
 		}
