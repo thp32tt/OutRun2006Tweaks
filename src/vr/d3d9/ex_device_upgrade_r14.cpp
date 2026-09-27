@@ -70,8 +70,18 @@ namespace OutRunVRD3D9ExUpgradeR13
         };
 
         thread_local std::uint32_t R14InternalReleaseDepth = 0;
-        constexpr std::uint64_t R14ShadowBudgetBytes =
+        // Keep the established 384 MiB general cap so the 32-bit game
+        // does not spend the whole address space on duplicate MANAGED shadows.
+        // R67 HMD evidence showed the cap could be reached before a 2048x512
+        // single-level A8R8G8B8 selector/car atlas was created; that atlas then
+        // fell to DirectOnly and its later LockRect failed. Reserve a bounded
+        // extra 64 MiB only for small single-level uncompressed atlases.
+        constexpr std::uint64_t R14GeneralShadowBudgetBytes =
             384ull * 1024ull * 1024ull;
+        constexpr std::uint64_t R14ShadowBudgetBytes =
+            448ull * 1024ull * 1024ull;
+        constexpr std::uint64_t R14EmergencyAtlasMaxBytes =
+            16ull * 1024ull * 1024ull;
         std::atomic<std::uint64_t> R14ShadowBytes{0};
         std::atomic<std::uint64_t> R14ShadowBudgetRejects{0};
 
@@ -126,6 +136,7 @@ namespace OutRunVRD3D9ExUpgradeR13
         std::atomic<bool> R14FirstUploadFailureLogged{false};
         std::atomic<bool> R14FirstRetireLogged{false};
         std::atomic<bool> R14FirstConcurrentWriteLogged{false};
+        std::atomic<bool> R14FirstEmergencyReserveLogged{false};
 
         struct R14InternalUploadScope
         {
@@ -488,11 +499,34 @@ namespace OutRunVRD3D9ExUpgradeR13
             const std::uint64_t estimate = R14EstimateShadowBytes(gpu);
             const std::uint64_t current =
                 R14ShadowBytes.load(std::memory_order_acquire);
-            if (!estimate || estimate > R14ShadowBudgetBytes ||
-                current > R14ShadowBudgetBytes - estimate)
+
+            const bool emergencyAtlasEligible =
+                levels == 1 &&
+                estimate > 0 &&
+                estimate <= R14EmergencyAtlasMaxBytes &&
+                desc.Width <= 2048 && desc.Height <= 2048 &&
+                (desc.Format == D3DFMT_A8R8G8B8 ||
+                 desc.Format == D3DFMT_X8R8G8B8);
+            const std::uint64_t softBudget = emergencyAtlasEligible
+                ? R14ShadowBudgetBytes
+                : R14GeneralShadowBudgetBytes;
+
+            if (!estimate || estimate > softBudget ||
+                current > softBudget - estimate)
             {
                 ++R14ShadowBudgetRejects;
                 return D3DERR_OUTOFVIDEOMEMORY;
+            }
+
+            if (emergencyAtlasEligible &&
+                current > R14GeneralShadowBudgetBytes - estimate &&
+                !R14FirstEmergencyReserveLogged.exchange(true))
+            {
+                spdlog::info(
+                    "VR R68 EX: emergency MANAGED shadow reserve ACTIVE size={}x{} fmt={} bytes={} currentMiB={:.1f}; 384 MiB general cap preserved",
+                    desc.Width, desc.Height, static_cast<unsigned>(desc.Format),
+                    estimate,
+                    static_cast<double>(current) / (1024.0 * 1024.0));
             }
 
             const HRESULT hr = device->CreateTexture(
