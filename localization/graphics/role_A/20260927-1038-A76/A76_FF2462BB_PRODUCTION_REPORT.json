@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A76",
+  "timestamp_kst": "2026-09-27T10:38:00+09:00",
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+  "canonical_source": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+  "canonical_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+  "candidate": "localization/graphics/role_A/20260927-1038-A76/FF2462BB_A76_COMPLETE_CANDIDATE.dds",
+  "candidate_sha256": "6fb6c0ff857c8218e499dd4d1ddc0b8d81adeab9a0e400f559f7fde03169c3e9",
+  "dimensions": [4096, 2048],
+  "bytes": 33554560,
+  "semantic_entries_materialized": 29,
+  "semantic_entries_total": 29,
+  "remaining_translation_entries": 0,
+  "status": "A_PRODUCTION_COMPLETE_PENDING_B_C_D_STRICT_QA",
+  "pixel_source_policy": "Canonical HD DDS only. Historical stock-resolution Korean draft was used only as layout evidence and no historical Korean pixels were upscaled or copied.",
+  "lineage": {
+    "premerge_9_entry_sha256": "33ae1b376896e7c02904bcc606a26568c3aa9ddb46e63478b369e295ac338684",
+    "a71_strict_qa_source_sha256": "3a1e0598594643c5c857c973b174369af98f4979abc7f7802793bc3a9a1b5574",
+    "a74_merged_sha256": "44f22cbbc42982e69028ccd12db2e32768015b3dacd119174cfb10e66bd37faf",
+    "recovered_unsaved_27_entry_sha256": "5a82baed443d3248461f658863f195ef335892184b471785b50a35e0ddeca920",
+    "a75_27_of_29_sha256": "fbf8cd5b9c6238ed82ab2f773888a9704b18d7cc6243e46233e43f3209c0aa77"
+  },
+  "qa": {
+    "dds_header_128_byte_exact_to_canonical": true,
+    "outside_32_known_localized_regions_exact_to_canonical": true,
+    "a71_strict_passed_regions_preserved_exactly": true,
+    "goal_source_box": [181, 1223, 413, 1318],
+    "goal_new_alpha_global": [256, 1227, 343, 1318],
+    "ghost_source_box": [479, 1223, 1053, 1318],
+    "ghost_new_alpha_global": [529, 1227, 1003, 1318],
+    "goal_and_ghost_inside_original_text_bounds": true,
+    "readable_preview": "localization/graphics/role_A/20260927-1038-A76/A76_FF2462BB_READABLE_PREVIEW.png",
+    "goalghost_background_clean_preview": "localization/graphics/role_A/20260927-1038-A76/A76_GOALGHOST_BACKGROUND_CLEAN.png"
+  },
+  "recovered_new_entries": [
+    "Skyscrapers", "Milky Way", "Floral Village", "Legend", "Giant Statues", "Jungle",
+    "Rival", "Stage Lap!", "Leader!", "Brake pedal + Shift : Player Only Mode Entry",
+    "Total Rank", "Score", "Target"
+  ],
+  "finalized_last_entries": ["GOAL", "TOP Ghost Car!!"],
+  "next_step": "B first QA against canonical HD source, then C strict QA and D approval. Do not mark this whole DDS approved yet."
+}

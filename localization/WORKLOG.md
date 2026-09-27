@@ -458,3 +458,16 @@ Next: run the full draft in game, capture problematic screens, replace heuristic
 - Added `Don't lose your girlfriend!` -> `여자친구를 놓치지 마세요!` as a two-line HD rebuild inside source bbox [3002,482,3512,643].
 - FF2462BB persisted HD candidate is now 5/29 segments; SHA-256 `e792a2a213249797d684af48c57122eaa4754246666fd1142d01f6f73312dd64`.
 - Outside all five edited source cells: 0 changes; exact DDS header remains preserved.
+
+## 2026-09-27 10:38 KST — A76 FF2462BB HD production complete
+
+Recovered the still-running N100 artwork session instead of discarding uncommitted work. The recovered session contained six additional stage labels plus Rival, Stage Lap!, Leader!, brake/shift guidance, Total Rank, Score and Target work. These regions were merged into the current canonical-HD candidate while preserving the D73-passed A71 cells.
+
+Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!! → 최고 고스트 카!!`, after reconstructing the pink speed-line background. Candidate now materializes all **29/29 transcription entries**.
+
+- Candidate: `localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds`
+- SHA-256: `6fb6c0ff857c8218e499dd4d1ddc0b8d81adeab9a0e400f559f7fde03169c3e9`
+- DDS: 4096×2048, 33,554,560 bytes, canonical 128-byte header preserved
+- Pixel containment: outside 32 known localization regions is byte-identical to canonical
+- Status: **A production complete, pending B/C/D strict QA**
+- Report: `localization/graphics/role_A/20260927-1038-A76/A76_FF2462BB_PRODUCTION_REPORT.json`

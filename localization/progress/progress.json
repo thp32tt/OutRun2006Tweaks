@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-26T14:45:00+09:00",
+  "updated_at_kst": "2026-09-27T10:38:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "Exact original 79-DDS archive recovered; full32 global risk audit complete. Continue strict per-cell QA/rework by risk order; no historical candidate is strict-approved.",
+  "next_checkpoint": "FF2462BB A76 production candidate has 29/29 transcription entries materialized on canonical HD canvas; perform B/C/D QA before approval, then continue next HD rework asset.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -251,7 +251,14 @@
       "sha256": "7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02"
     },
     "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
-    "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json"
+    "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
+    "latest_hd_production_candidate": {
+      "asset": "FF2462BB",
+      "coverage": "29/29",
+      "candidate_sha256": "6fb6c0ff857c8218e499dd4d1ddc0b8d81adeab9a0e400f559f7fde03169c3e9",
+      "report": "localization/graphics/role_A/20260927-1038-A76/A76_FF2462BB_PRODUCTION_REPORT.json",
+      "status": "A_PRODUCTION_COMPLETE_PENDING_B_C_D"
+    }
   },
   "data_build": {
     "draft_bin_entries": 1356,

@@ -1,5 +1,5 @@
 {
-  "schema_version": 20,
+  "schema_version": 21,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,7 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "HD GRAPHICS: continue FF2462BB from Batch68; 5/29 text segments now exist in a persisted HD DDS candidate, 24 segments remain before C/D strict QA.",
+    "HD GRAPHICS: FF2462BB A76 now materializes all 29/29 transcription entries on the canonical HD canvas; run B first QA, C strict QA, then D approval before promotion.",
     "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
     "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
     "Never upscale prior stock-resolution Korean DDS candidates.",
@@ -125,15 +125,27 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/BATCH68_B_HD_FF2462_PERSISTED_REWORK_REPORT.json",
+    "latest_hd_rework_batch": "localization/graphics/role_A/20260927-1038-A76/A76_FF2462BB_PRODUCTION_REPORT.json",
     "hd_rework_candidates_ready": 2,
     "hd_rework_remaining": 11,
     "hd_partial_rework": {
       "FF2462BB": {
-        "status": "PARTIAL_B_CANDIDATE_PERSISTED_5_OF_29",
-        "candidate_sha256": "e792a2a213249797d684af48c57122eaa4754246666fd1142d01f6f73312dd64",
-        "remaining_segments": 24
+        "status": "A_PRODUCTION_COMPLETE_29_OF_29_PENDING_B_C_D",
+        "candidate_sha256": "6fb6c0ff857c8218e499dd4d1ddc0b8d81adeab9a0e400f559f7fde03169c3e9",
+        "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+        "completed_transcription_entries": 29,
+        "localized_regions": 32,
+        "remaining_segments": 0,
+        "report": "localization/graphics/role_A/20260927-1038-A76/A76_FF2462BB_PRODUCTION_REPORT.json"
       }
+    },
+    "a76_ff2462bb": {
+      "timestamp_kst": "2026-09-27T10:38:00+09:00",
+      "semantic_entries_materialized": 29,
+      "semantic_entries_total": 29,
+      "remaining_entries": 0,
+      "candidate_sha256": "6fb6c0ff857c8218e499dd4d1ddc0b8d81adeab9a0e400f559f7fde03169c3e9",
+      "status": "PENDING_B_C_D_STRICT_QA"
     }
   },
   "runtime_packages": {

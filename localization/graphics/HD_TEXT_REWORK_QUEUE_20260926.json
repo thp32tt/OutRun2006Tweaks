@@ -69,10 +69,12 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "PARTIAL_B_CANDIDATE_PERSISTED_5_OF_29",
-      "batch_report": "localization/graphics/BATCH68_B_HD_FF2462_PERSISTED_REWORK_REPORT.json",
-      "candidate_sha256": "e792a2a213249797d684af48c57122eaa4754246666fd1142d01f6f73312dd64",
-      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds"
+      "status": "A_PRODUCTION_COMPLETE_29_OF_29_PENDING_B_C_D",
+      "batch_report": "localization/graphics/role_A/20260927-1038-A76/A76_FF2462BB_PRODUCTION_REPORT.json",
+      "candidate_sha256": "6fb6c0ff857c8218e499dd4d1ddc0b8d81adeab9a0e400f559f7fde03169c3e9",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+      "completed_transcription_entries": 29,
+      "remaining_segments": 0
     },
     {
       "hash": "568D3696",
@@ -218,5 +220,5 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/BATCH68_B_HD_FF2462_PERSISTED_REWORK_REPORT.json"
+  "latest_batch": "localization/graphics/role_A/20260927-1038-A76/A76_FF2462BB_PRODUCTION_REPORT.json"
 }

@@ -184,3 +184,14 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Candidate SHA-256: `0ade0bac94a20652e2b490dc215a9dd355ad6b7cec840e4b3bd2bdc9dc963af6`.
 - QA: exact 128-byte DDS header, 4096x2048 RGBA32, outside edited-cell changes = 0, B manual row comparison PASS.
 - Status remains partial; 25 FF2462BB segments remain before C/D strict QA and promotion.
+
+## A76 checkpoint — 2026-09-27 10:38 KST
+
+- Active HD asset: `FF2462BB_1024x512.dds`
+- A production coverage: **29/29 transcription entries materialized**
+- Candidate SHA-256: `6fb6c0ff857c8218e499dd4d1ddc0b8d81adeab9a0e400f559f7fde03169c3e9`
+- Header/format: canonical 4096×2048 RGBA32 DDS preserved
+- Containment QA: changes confined to 32 known localization regions; outside regions exact canonical bytes
+- Remaining untranslated entries in this atlas: **0**
+- Approval state: **not approved yet** — B first QA, C strict QA, D final approval remain
+- VR/FFB source: not touched

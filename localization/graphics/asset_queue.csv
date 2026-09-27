@@ -32,7 +32,7 @@ index,path,action,artwork_status,transcription_status,notes
 48,textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass2 transcription saved
 49,textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass2 transcription saved
 50,textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
-51,textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass2 transcription saved
+51,textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds,localize_text,a_production_complete_pending_b_c_d,transcribed_reviewed,A76 canonical-HD candidate 29/29 entries; strict QA pending
 52,textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds,zoom_review,blocked_review,needs_zoom_review,
 53,textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds,localize_text,pending_artwork,transcribed_reviewed,pass4 transcription saved
 54,textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass4 transcription saved
