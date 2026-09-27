@@ -1,5 +1,5 @@
 {
-  "schema_version": 31,
+  "schema_version": 32,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,7 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "HD GRAPHICS: FA7BBB13 has A81/B82/C77/D77 static PASS and now waits only for in-game screenshot validation before promotion. 39229D64 A82/B83 passes D77 preflight but still needs C and in-game validation. After its static gate continue A064FDFC.",
+    "HD GRAPHICS: A064FDFC B84 production + first QA PASS (17 semantic / 21 physical), pending C/D + in-game. Continue C4A2937B canonical-HD rebuild. FA7BBB13 and 39229D64 retain their existing static/hold states.",
     "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
     "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
     "Never upscale prior stock-resolution Korean DDS candidates.",
@@ -30,7 +30,7 @@
   },
   "graphics_checkpoint": {
     "transcribed_assets": 79,
-    "transcribed_segments": 715,
+    "transcribed_segments": 717,
     "artwork_targets": 79,
     "full_draft_candidates": 79,
     "final_artwork_completed": 0,
@@ -125,9 +125,9 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_B/20260927-1412-B83/B83_39229D64_FIRST_QA.json",
-    "hd_rework_candidates_ready": 4,
-    "hd_rework_remaining": 9,
+    "latest_hd_rework_batch": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_PRODUCTION_FIRST_QA.json",
+    "hd_rework_candidates_ready": 5,
+    "hd_rework_remaining": 8,
     "hd_partial_rework": {
       "FF2462BB": {
         "status": "STATIC_QA_PASS_PENDING_INGAME",
@@ -172,6 +172,15 @@
         "b_candidate_changed": false,
         "d_preflight_report": "localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json",
         "in_game_validation": "PENDING"
+      },
+      "A064FDFC": {
+        "status": "B_PRODUCTION_FIRST_QA_PASS_PENDING_C_D_INGAME",
+        "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
+        "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+        "completed_transcription_entries": 17,
+        "localized_regions": 21,
+        "remaining_segments": 0,
+        "report": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_PRODUCTION_FIRST_QA.json"
       }
     },
     "a76_ff2462bb": {
@@ -351,5 +360,28 @@
     "39229D64": "D_PREFLIGHT_PASS_HOLD_PENDING_C_INGAME",
     "build_performed": false,
     "vr_ffb_changes": false
+  },
+  "b84_a064fdfc": {
+    "timestamp_kst": "2026-09-27T15:00:08+09:00",
+    "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
+    "canonical_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "result": "B_PRODUCTION_AND_FIRST_QA_PASS_PENDING_C_D_INGAME",
+    "prior_semantic_entries": 15,
+    "semantic_entries": 17,
+    "physical_regions": 21,
+    "new_semantic_omissions": [
+      {
+        "source": "KNOCKOUT!",
+        "korean": "탈락!"
+      },
+      {
+        "source": "OUTRUN MILES!",
+        "korean": "아웃런 마일!"
+      }
+    ],
+    "outside_cells_changed_pixels": 0,
+    "introduced_alpha_outside_cells": 0,
+    "candidate_changed_by_B": true,
+    "report": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_PRODUCTION_FIRST_QA.json"
   }
 }

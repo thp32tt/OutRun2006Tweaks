@@ -605,3 +605,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Existing approved_dds remains exactly the three USER_APPROVED_LOCKED selector DDS; all three SHA-256 values were reverified.
 - Localization state and domain-isolation verification pass; no VR/FFB source diff or merge commit was found. Build was not run.
 - Report: localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json.
+
+
+## 2026-09-27 15:00 KST — B84 A064FDFC production + first QA
+
+- Continued from latest remote HEAD 94661fb and the B83/D77 checkpoint; no GPT Library workspace was used.
+- Rebuilt A064FDFC directly from canonical OR2-HD-GUI 4096×2048 RGBA32 / 1-mip DDS. No previous Korean DDS was upscaled.
+- Initial B84 draft was rejected because canonical-HD visual review found three untranslated physical variants: standalone white `KNOCKOUT!`, standalone white `OUTRUN MILES!`, and a second `Rank` label.
+- Expanded index 60 transcription from 15 to **17 semantic strings**, adding `KNOCKOUT! → 탈락!` and `OUTRUN MILES! → 아웃런 마일!`. Final physical coverage is **21 regions**: `DUMPED!` x3, `Target` x2, `Rank` x2 plus the remaining single occurrences.
+- Final candidate SHA-256: `e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1`.
+- Exact canonical 128-byte DDS header, RGBA32 format, one mip and raw mirror_y orientation are preserved. Changed pixels outside the 21 declared source text cells = 0; introduced alpha outside = 0.
+- Readable/game and raw DDS visual QA PASS: no remaining observed translatable source English, clipping/overlap, box escape, seam/black line, opaque box or alpha halo. Character names, ordinals, numeric/player markers, vehicles/icons and other non-text artwork remain original.
+- No approved_dds promotion because C/D and in-game screenshot validation remain mandatory. No build, VR or FFB work. Next P1 production target: C4A2937B.

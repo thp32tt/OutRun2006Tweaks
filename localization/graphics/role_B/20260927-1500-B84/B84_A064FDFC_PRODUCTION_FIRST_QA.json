@@ -1,0 +1,512 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B84",
+  "timestamp_kst": "2026-09-27T15:00:08+09:00",
+  "base_head": "94661fbe251f60c0200b18acc3d45fe46427188b",
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "canonical_source": "OR2-HD-GUI-v0.25.10a",
+  "canonical_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "result": "B_PRODUCTION_AND_FIRST_QA_PASS_PENDING_C_D_INGAME",
+  "candidate_changed_by_B": true,
+  "structure": {
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "bytes": 33554560,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "dds_header_128_byte_exact_to_canonical": true,
+    "raw_orientation": "mirror_y"
+  },
+  "coverage": {
+    "prior_semantic_entries": 15,
+    "reviewed_semantic_entries": 17,
+    "physical_regions": 21,
+    "new_semantic_omissions": [
+      {
+        "source": "KNOCKOUT!",
+        "korean": "탈락!"
+      },
+      {
+        "source": "OUTRUN MILES!",
+        "korean": "아웃런 마일!"
+      }
+    ],
+    "duplicates": {
+      "DUMPED!": 3,
+      "Target": 2,
+      "Rank": 2
+    }
+  },
+  "containment": {
+    "changed_pixels_total": 1613081,
+    "outside_21_cells_changed_pixels": 0,
+    "introduced_alpha_outside_21_cells": 0,
+    "all_candidate_alpha_bboxes_inside_source_cells": true
+  },
+  "preserved_original": {
+    "character_names": true,
+    "ordinals": true,
+    "numbers": true,
+    "player_markers": true,
+    "vehicles_icons_nontext": true
+  },
+  "visual_qa": {
+    "readable_orientation": "PASS",
+    "raw_orientation": "PASS_MIRROR_Y_PRESERVED",
+    "source_english_residue": "NONE_OBSERVED_FINAL",
+    "clipping_or_overlap": "NONE_OBSERVED",
+    "box_escape": "NONE_OBSERVED",
+    "black_line_or_seam": "NONE_OBSERVED",
+    "opaque_box": "NONE_OBSERVED",
+    "alpha_halo": "NONE_OBSERVED",
+    "style_fidelity": "PASS_SOURCE_FAMILY"
+  },
+  "rework_history": [
+    {
+      "attempt": "draft_1",
+      "result": "REJECTED_NOT_PERSISTED",
+      "reason": "15-string/18-region pass left white KNOCKOUT!, white OUTRUN MILES!, and a second Rank occurrence untranslated."
+    },
+    {
+      "attempt": "final",
+      "result": "PASS_FOR_B_HANDOFF",
+      "reason": "Expanded to 17 semantic strings / 21 physical regions and removed all observed translatable source residue while preserving protected artwork."
+    }
+  ],
+  "in_game_validation": "NOT_PERFORMED",
+  "approval": "NOT_PROMOTED_PENDING_C_D_AND_INGAME",
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "next_asset": "C4A2937B_1024x1024.dds",
+  "edits": [
+    {
+      "key": "dumped_top",
+      "source": "DUMPED!",
+      "korean": "차였어요!",
+      "readable_cell": [
+        165,
+        120,
+        665,
+        245
+      ],
+      "candidate_alpha_bbox": [
+        204,
+        123,
+        625,
+        242
+      ],
+      "font_size": 98,
+      "xscale": 1.0,
+      "style": "dumped_red_gradient"
+    },
+    {
+      "key": "dumped_white",
+      "source": "DUMPED!",
+      "korean": "차였어요!",
+      "readable_cell": [
+        3140,
+        270,
+        3605,
+        390
+      ],
+      "candidate_alpha_bbox": [
+        3155,
+        273,
+        3589,
+        387
+      ],
+      "font_size": 104,
+      "xscale": 1.0,
+      "style": "dumped_white"
+    },
+    {
+      "key": "dumped_big",
+      "source": "DUMPED!",
+      "korean": "차였어요!",
+      "readable_cell": [
+        2520,
+        1290,
+        3570,
+        1515
+      ],
+      "candidate_alpha_bbox": [
+        2652,
+        1300,
+        3437,
+        1504
+      ],
+      "font_size": 190,
+      "xscale": 1.0,
+      "style": "dumped_big_red_gradient"
+    },
+    {
+      "key": "knockout_white",
+      "source": "KNOCKOUT!",
+      "korean": "탈락!",
+      "readable_cell": [
+        825,
+        120,
+        1270,
+        250
+      ],
+      "candidate_alpha_bbox": [
+        922,
+        125,
+        1172,
+        245
+      ],
+      "font_size": 112,
+      "xscale": 1.0,
+      "style": "knockout_white"
+    },
+    {
+      "key": "knockout_in",
+      "source": "KNOCKOUT! IN...",
+      "korean": "탈락까지...",
+      "readable_cell": [
+        1260,
+        120,
+        2270,
+        250
+      ],
+      "candidate_alpha_bbox": [
+        1506,
+        123,
+        2024,
+        247
+      ],
+      "font_size": 110,
+      "xscale": 1.0,
+      "style": "knockout_cream"
+    },
+    {
+      "key": "target_top",
+      "source": "Target",
+      "korean": "목표",
+      "readable_cell": [
+        2910,
+        145,
+        3135,
+        245
+      ],
+      "candidate_alpha_bbox": [
+        2943,
+        152,
+        3101,
+        238
+      ],
+      "font_size": 78,
+      "xscale": 1.0,
+      "style": "target_white"
+    },
+    {
+      "key": "target_bottom",
+      "source": "Target",
+      "korean": "목표",
+      "readable_cell": [
+        3260,
+        1780,
+        3560,
+        1885
+      ],
+      "candidate_alpha_bbox": [
+        3341,
+        1796,
+        3479,
+        1869
+      ],
+      "font_size": 70,
+      "xscale": 1.0,
+      "style": "target_gray"
+    },
+    {
+      "key": "ranking",
+      "source": "Ranking",
+      "korean": "순위",
+      "readable_cell": [
+        120,
+        245,
+        455,
+        350
+      ],
+      "candidate_alpha_bbox": [
+        204,
+        248,
+        370,
+        346
+      ],
+      "font_size": 82,
+      "xscale": 1.0,
+      "style": "yellow_navy_white"
+    },
+    {
+      "key": "stage",
+      "source": "Stage",
+      "korean": "스테이지",
+      "readable_cell": [
+        455,
+        245,
+        690,
+        350
+      ],
+      "candidate_alpha_bbox": [
+        460,
+        249,
+        685,
+        345
+      ],
+      "font_size": 80,
+      "xscale": 0.7028,
+      "style": "yellow_navy_white"
+    },
+    {
+      "key": "rank",
+      "source": "Rank",
+      "korean": "랭크",
+      "readable_cell": [
+        690,
+        245,
+        875,
+        350
+      ],
+      "candidate_alpha_bbox": [
+        702,
+        252,
+        862,
+        342
+      ],
+      "font_size": 80,
+      "xscale": 1.0,
+      "style": "white_navy"
+    },
+    {
+      "key": "outrun_miles_white",
+      "source": "OUTRUN MILES!",
+      "korean": "아웃런 마일!",
+      "readable_cell": [
+        1090,
+        245,
+        1930,
+        385
+      ],
+      "candidate_alpha_bbox": [
+        1241,
+        260,
+        1778,
+        370
+      ],
+      "font_size": 100,
+      "xscale": 1.0,
+      "style": "outrun_miles_white"
+    },
+    {
+      "key": "outrun_miles",
+      "source": "OUTRUN MILES:",
+      "korean": "아웃런 마일:",
+      "readable_cell": [
+        2070,
+        250,
+        2860,
+        370
+      ],
+      "candidate_alpha_bbox": [
+        2197,
+        253,
+        2733,
+        367
+      ],
+      "font_size": 100,
+      "xscale": 1.0,
+      "style": "cream_gold_navy"
+    },
+    {
+      "key": "best_time",
+      "source": "BEST TIME:",
+      "korean": "최고 기록:",
+      "readable_cell": [
+        2160,
+        365,
+        3065,
+        540
+      ],
+      "candidate_alpha_bbox": [
+        2281,
+        368,
+        2943,
+        536
+      ],
+      "font_size": 150,
+      "xscale": 1.0,
+      "style": "orange_gold_navy"
+    },
+    {
+      "key": "stage_clear",
+      "source": "STAGE CLEAR",
+      "korean": "스테이지 클리어",
+      "readable_cell": [
+        3420,
+        355,
+        4090,
+        470
+      ],
+      "candidate_alpha_bbox": [
+        3448,
+        361,
+        4062,
+        463
+      ],
+      "font_size": 88,
+      "xscale": 1.0,
+      "style": "white_orange_glow"
+    },
+    {
+      "key": "pass",
+      "source": "PASS!!!",
+      "korean": "통과!!!",
+      "readable_cell": [
+        3620,
+        490,
+        4090,
+        625
+      ],
+      "candidate_alpha_bbox": [
+        3703,
+        504,
+        4006,
+        611
+      ],
+      "font_size": 94,
+      "xscale": 1.0,
+      "style": "white_orange_glow"
+    },
+    {
+      "key": "continue",
+      "source": "CONTINUE?",
+      "korean": "계속?",
+      "readable_cell": [
+        0,
+        570,
+        1090,
+        780
+      ],
+      "candidate_alpha_bbox": [
+        331,
+        579,
+        759,
+        771
+      ],
+      "font_size": 174,
+      "xscale": 1.0,
+      "style": "blue_white_gradient"
+    },
+    {
+      "key": "try_again",
+      "source": "TRY AGAIN?",
+      "korean": "다시 도전?",
+      "readable_cell": [
+        0,
+        760,
+        1320,
+        1000
+      ],
+      "candidate_alpha_bbox": [
+        261,
+        784,
+        1058,
+        975
+      ],
+      "font_size": 174,
+      "xscale": 1.0,
+      "style": "blue_white_gradient"
+    },
+    {
+      "key": "rank_table",
+      "source": "Rank",
+      "korean": "랭크",
+      "readable_cell": [
+        1320,
+        795,
+        1635,
+        940
+      ],
+      "candidate_alpha_bbox": [
+        1387,
+        817,
+        1568,
+        918
+      ],
+      "font_size": 92,
+      "xscale": 1.0,
+      "style": "rank_table_white"
+    },
+    {
+      "key": "retry",
+      "source": "RETRY",
+      "korean": "재도전",
+      "readable_cell": [
+        1270,
+        570,
+        1900,
+        780
+      ],
+      "candidate_alpha_bbox": [
+        1354,
+        587,
+        1815,
+        763
+      ],
+      "font_size": 160,
+      "xscale": 1.0,
+      "style": "orange_gold_gradient"
+    },
+    {
+      "key": "please_wait",
+      "source": "PLEASE WAIT",
+      "korean": "잠시만요",
+      "readable_cell": [
+        2320,
+        565,
+        3540,
+        790
+      ],
+      "candidate_alpha_bbox": [
+        2633,
+        592,
+        3226,
+        762
+      ],
+      "font_size": 154,
+      "xscale": 1.0,
+      "style": "orange_gold_gradient"
+    },
+    {
+      "key": "easy",
+      "source": "EASY",
+      "korean": "쉬움",
+      "readable_cell": [
+        3180,
+        795,
+        3635,
+        975
+      ],
+      "candidate_alpha_bbox": [
+        3258,
+        800,
+        3556,
+        970
+      ],
+      "font_size": 145,
+      "xscale": 1.0,
+      "style": "green_white_navy"
+    }
+  ],
+  "qa_artifacts": {
+    "readable": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_READABLE_QA.jpg",
+    "raw": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_RAW_QA.jpg"
+  }
+}

@@ -18,8 +18,8 @@
     "graphics_rework_targets": 13,
     "low_res_font_pipeline_targets": 1,
     "hd_preserve_targets": 75,
-    "graphics_rework_candidates_ready": 4,
-    "graphics_rework_remaining": 9
+    "graphics_rework_candidates_ready": 5,
+    "graphics_rework_remaining": 8
   },
   "rules": [
     "Use DDS header dimensions, never the filename resolution suffix.",
@@ -159,7 +159,15 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "REWORK_FROM_HD_BASE"
+      "status": "B_PRODUCTION_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "transcription_segments": 17,
+      "localized_regions": 21,
+      "remaining_segments": 0,
+      "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+      "batch_report": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_PRODUCTION_FIRST_QA.json",
+      "candidate_changed_by_B": true,
+      "in_game_validation": "PENDING"
     },
     {
       "hash": "C4A2937B",
@@ -253,5 +261,5 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json"
+  "latest_batch": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_PRODUCTION_FIRST_QA.json"
 }

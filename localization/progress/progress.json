@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T14:13:46+09:00",
+  "updated_at_kst": "2026-09-27T15:00:08+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -110,7 +110,7 @@
       "percent": 100,
       "transcribed_assets": 79,
       "localize_text_targets": 79,
-      "transcribed_segments": 715,
+      "transcribed_segments": 717,
       "blocked_context_assets": 0,
       "blocked_context_indices": []
     },
@@ -136,11 +136,11 @@
       "status": "done",
       "percent": 100,
       "planned_assets": 79,
-      "translated_segments": 715,
+      "translated_segments": 717,
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "FA7BBB13 A81/B82/C77/D77 static QA all pass; approval remains blocked only by missing in-game screenshot validation. 39229D64 A82/B83 also passes D77 structural/raw/readable preflight, but C plus in-game validation remain. After its static gate continue A064FDFC.",
+  "next_checkpoint": "A064FDFC B84 canonical-HD production + first QA PASS (17 semantic / 21 physical); C/D and in-game validation remain. Continue next P1 HD target C4A2937B independently.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -175,7 +175,7 @@
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
     "transcribed_assets": 79,
-    "transcribed_segments": 715,
+    "transcribed_segments": 717,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -253,19 +253,17 @@
     "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
     "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "latest_hd_production_candidate": {
-      "asset": "39229D64",
-      "coverage": "13 semantic / 15 physical",
-      "candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
-      "report": "localization/graphics/role_A/20260927-1330-A82/A82_39229D64_PRODUCTION_REPORT.json",
-      "status": "D_PREFLIGHT_PASS_PENDING_C_INGAME",
-      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
-      "physical_region_count_correction": "B82 expected 14; A82 verified 15 because Total Rank appears three times",
-      "b_first_qa_report": "localization/graphics/role_B/20260927-1412-B83/B83_39229D64_FIRST_QA.json",
-      "d_preflight_report": "localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json"
+      "asset": "A064FDFC",
+      "coverage": "17 semantic / 21 physical",
+      "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
+      "report": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_PRODUCTION_FIRST_QA.json",
+      "status": "B_PRODUCTION_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+      "physical_occurrence_note": "DUMPED! x3, Target x2, Rank x2; B84 added standalone KNOCKOUT! and OUTRUN MILES!"
     },
     "next_hd_rework": {
-      "asset": "A064FDFC",
-      "transcription_segments": 15,
+      "asset": "C4A2937B",
+      "transcription_segments": 19,
       "status": "READY_FOR_CANONICAL_HD_RENDER"
     },
     "latest_d_final_qa": {
@@ -287,12 +285,13 @@
       "in_game_validation": "PENDING"
     },
     "latest_b_first_qa": {
-      "asset": "39229D64",
-      "candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
-      "report": "localization/graphics/role_B/20260927-1412-B83/B83_39229D64_FIRST_QA.json",
-      "result": "PASS_FIRST_QA_PENDING_C_D_INGAME",
-      "candidate_changed_by_B": false,
-      "physical_regions": 15
+      "asset": "A064FDFC",
+      "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
+      "report": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_PRODUCTION_FIRST_QA.json",
+      "result": "B_PRODUCTION_AND_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "candidate_changed_by_B": true,
+      "semantic_entries": 17,
+      "physical_regions": 21
     }
   },
   "data_build": {

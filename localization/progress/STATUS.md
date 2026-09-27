@@ -297,3 +297,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - LOCALIZATION_STATE_OK and Domain Isolation PASS; VR/FFB source/history contamination not observed.
 - Build not run. Machine report: localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json.
 - Next: runtime screenshot QA for FA7; C -> runtime QA for 39229D64; then final D promotion decision.
+
+
+## B84 A064FDFC checkpoint — 2026-09-27 15:00 KST
+
+- **B production + first QA PASS**, pending C/D + in-game.
+- Candidate: `e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1`.
+- 4096×2048 RGBA32 / 1 mip / exact canonical header / raw mirror_y.
+- Coverage expanded from 15 to **17 semantic strings / 21 physical text regions** after B84 found standalone `KNOCKOUT!`, standalone `OUTRUN MILES!`, and duplicate `Rank`.
+- Outside 21 source cells changed pixels = 0; introduced alpha outside = 0. Readable/raw artifact and containment QA PASS.
+- Next production target: `C4A2937B`.
