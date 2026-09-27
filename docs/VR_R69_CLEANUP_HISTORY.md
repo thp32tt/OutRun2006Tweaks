@@ -98,3 +98,18 @@ Rules:
 - `vrhost/src/main_r23.cpp` now consumes this shared contract instead of maintaining a second 40+ line copy of frame/flag/slot/handle validation.
 - Protocol layout and required flags are unchanged; this removes host/game contract drift risk.
 - Build gate: DX9Ex Active Validation plus existing host smoke targets.
+
+
+## S10 — backend contract + limited-time checkpoint build matrix
+- Branch: `vr-d3d9ex-candidate/r69-clean-s10`
+- Parent: S9 `f2efcaf0809dc4dae16f4ddd06e1699061237330`.
+- Added `tools/OutRunVR-BackendContract.ps1`: DX9Ex, DX11-host, DXVK SAFE/MULTIVIEW and DX12 now default to the same `R69_CLEAN` semantic contract instead of backend-specific historical R57 variants.
+- The backend selector consumes the shared contract for payload/default-variant ownership; DX11 AUTO no longer falls back to `R57_05_RANK_PROJECTED_IPD`.
+- Active package CI now ships and validates the backend-contract file.
+- Added `.github/workflows/vr-r69-clean-checkpoints.yml` to build four HMD checkpoints in one run:
+  - B0_R69 = original R69 baseline.
+  - B1_S4 = R57 production mode matrix removed.
+  - B2_S7 = render/screen/safety policy boundaries established.
+  - B3_S10 = final S0-S10 cleanup with hot-path, frame-contract and backend-contract cleanup.
+- The bundle includes a short binary-search test order: B3 first; only fall back to B2/B1/B0 when a regression appears.
+- Build gate: dedicated checkpoint workflow plus DX9Ex Active Validation.
