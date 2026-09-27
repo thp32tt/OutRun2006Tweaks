@@ -666,3 +666,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Candidate unchanged by C79; D78 direct binary preflight is for the same SHA and remains valid. Final D reconciliation is still required because D78 decision predates C79.
 - No approved_dds promotion; mandatory in-game screenshot validation remains. Build not run; VR/FFB untouched.
 - Machine report: localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json.
+
+## 2026-09-27 16:18 KST — D79 final QA reconciliation
+
+- Started from latest remote HEAD ca07a2b416916d200d92a336361c12c78c79c54a and re-read the mandatory localization policy/state files.
+- 39229D64: C78 replaced the old A82/B83 SHA only in the three Total Rank cells to remove patch/seam artifacts. D79 independently validated current SHA f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4 against canonical HD: 4096×4096 RGBA32/1 mip, exact 128-byte header, 2,400,378 changed pixels, outside 15 cells = 0, all current/unchanged alpha bboxes contained. Raw/readable and Total Rank contact-sheet review PASS. Final static QA PASS, pending in-game.
+- A064FDFC: C79 did not change B84/D78 SHA e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1. D79 reconciled the full B84/C79/D78 evidence and directly rechecked 4096×2048 RGBA32/1 mip, exact header, 1,613,081 changed pixels, outside 21 cells = 0, alpha bboxes contained, raw/readable QA PASS. Final static QA PASS, pending in-game.
+- C4A2937B: A83 SHA 7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e passes D79 structural/containment/orientation preflight: 4096×4096 RGBA32/1 mip, exact header, 808,037 changed pixels, outside 21 cells = 0, alpha bboxes contained. No promotion: B/C are missing and Cut the line!/Drift and require independent context/runtime confirmation.
+- FA7BBB13 remains final-static PASS pending in-game. FF2462BB and 568D3696 retain their existing static-pass/in-game holds.
+- Existing approved_dds remains exactly the three USER_APPROVED_LOCKED selector DDS; all SHA-256 values reverified.
+- State reconciliation: A83 already completed C4A2937B, so stale next_hd_rework C4A2937B is advanced to 2DA43E41 (8 reviewed segments).
+- LOCALIZATION_STATE_OK and Domain Isolation PASS; no VR/FFB source diff or merge commit. Build was not run.
+- Report: localization/graphics/role_D/20260927-1618-D79/D79_FINAL_QA_RECONCILE_REPORT.json.

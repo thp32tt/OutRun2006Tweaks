@@ -345,3 +345,14 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Readable/raw and 21-cell review: no translation omission, residual English, broken Hangul, clipping/overlap, seam/black line, opaque box, alpha halo, resolution loss, duplicate/wrong replacement or protected-artwork damage.
 - D78 same-SHA preflight remains binary-valid; final D reconciliation + in-game screenshot QA remain before promotion. A83 C4A2937B progress preserved.
 - Machine report: localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json. No build; VR/FFB unchanged.
+
+## D79 final QA checkpoint — 2026-09-27 16:18 KST
+- 39229D64: C78 corrected SHA f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4; D79 current-binary static/raw/readable QA PASS; HOLD_PENDING_INGAME.
+- A064FDFC: B84/C79/D78/D79 same SHA e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1; FINAL_STATIC_QA_PASS, HOLD_PENDING_INGAME.
+- FA7BBB13 remains FINAL_STATIC_QA_PASS, HOLD_PENDING_INGAME.
+- C4A2937B: A83 + D79 direct preflight PASS on SHA 7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e; HOLD_PENDING_B_C_INGAME. B/C must also confirm Cut the line! and Drift and runtime context.
+- approved_dds remains 3 USER_APPROVED_LOCKED assets; hashes reverified unchanged. No new promotion.
+- 392 containment: outside 15 cells = 0. A064 containment: outside 21 cells = 0. C4 containment: outside 21 cells = 0. Canonical DDS headers/formats/mips and raw mirror_y orientation preserved.
+- LOCALIZATION_STATE_OK and Domain Isolation PASS; VR/FFB source/history contamination not observed.
+- Next production target corrected to 2DA43E41 (8 reviewed segments).
+- No build performed. Machine report: localization/graphics/role_D/20260927-1618-D79/D79_FINAL_QA_RECONCILE_REPORT.json.

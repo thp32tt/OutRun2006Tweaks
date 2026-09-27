@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "role": "D",
+  "run": "D79",
+  "timestamp_kst": "2026-09-27T16:18:12+09:00",
+  "base_head": "ca07a2b416916d200d92a336361c12c78c79c54a",
+  "scope": "final QA + approval reconciliation; no build; no VR/FFB",
+  "approved_dds_changes": [],
+  "locked_approved_dds": {
+    "result": "PASS_UNCHANGED",
+    "count": 3,
+    "assets": [
+      {
+        "name": "571E78F3_512x64.dds",
+        "sha256": "4ff6a767fca35ebff7e1ba587c1992f94319c5f1bdd7d03faf59450d81e32f1e"
+      },
+      {
+        "name": "62BEBF33_512x64.dds",
+        "sha256": "91b0424df17e48ee3445208991f15f6e5cdb413f6f77eeb1aa3f453a3706e4eb"
+      },
+      {
+        "name": "E3FD08BE_512x64.dds",
+        "sha256": "246e4313cb9806623f695ea94262100e1e6f3888847dcc09338d870e3944b49e"
+      }
+    ]
+  },
+  "reviewed_candidates": {
+    "FA7BBB13": {
+      "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
+      "gate_chain": {
+        "A81": "PASS",
+        "B82": "PASS",
+        "C77": "PASS",
+        "D77": "FINAL_STATIC_PASS"
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "UNCHANGED_FINAL_STATIC_PASS_HOLD_PENDING_INGAME",
+      "promotion": false
+    },
+    "39229D64": {
+      "canonical_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+      "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
+      "gate_chain": {
+        "A82": "PASS_PRODUCTION",
+        "B83": "PASS_FIRST_QA_ON_PRE_C78_SHA",
+        "C78": "REWORK_APPLIED_STATIC_STRICT_QA_PASS",
+        "D79": "CURRENT_SHA_DIRECT_REVALIDATION_PASS"
+      },
+      "superseded_sha": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+      "c78_correction_scope": [
+        "total_rank_green",
+        "total_rank_brown",
+        "total_rank_pink"
+      ],
+      "d79_direct_checks": {
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "file_size_bytes": 67108992,
+        "dds_header_128_exact_canonical": true,
+        "channel_masks": [
+          "0x000000ff",
+          "0x0000ff00",
+          "0x00ff0000",
+          "0xff000000"
+        ],
+        "total_changed_pixels_vs_canonical": 2400378,
+        "outside_15_source_cells_changed_pixels": 0,
+        "introduced_alpha_outside_15_source_cells": 0,
+        "all_current_or_unchanged_candidate_alpha_bboxes_inside_source_cells": true,
+        "raw_orientation": "mirror_y",
+        "raw_orientation_visual_qa": "PASS",
+        "readable_orientation_visual_qa": "PASS",
+        "total_rank_rework_contact_sheet": "PASS_NO_VISIBLE_PATCH_SEAM",
+        "semantic_review": "PASS_13_ENTRIES_15_REGIONS",
+        "protected_tokens_nontext_artwork": "PRESERVED_OBSERVED"
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+      "promotion": false,
+      "reason": "C78 corrected the three Total Rank cells and D79 independently revalidated the current SHA against canonical HD. Mandatory in-game screenshot validation is still absent."
+    },
+    "A064FDFC": {
+      "canonical_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
+      "gate_chain": {
+        "B84": "PRODUCTION_FIRST_QA_PASS",
+        "D78": "SAME_SHA_PREFLIGHT_PASS",
+        "C79": "STATIC_STRICT_QA_PASS_UNCHANGED",
+        "D79": "FINAL_RECONCILIATION_PASS"
+      },
+      "d79_direct_checks": {
+        "dimensions": [
+          4096,
+          2048
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "file_size_bytes": 33554560,
+        "dds_header_128_exact_canonical": true,
+        "channel_masks": [
+          "0x000000ff",
+          "0x0000ff00",
+          "0x00ff0000",
+          "0xff000000"
+        ],
+        "total_changed_pixels": 1613081,
+        "outside_21_source_cells_changed_pixels": 0,
+        "introduced_alpha_outside_21_source_cells": 0,
+        "all_candidate_alpha_bboxes_inside_source_cells": true,
+        "raw_orientation": "mirror_y",
+        "raw_orientation_visual_qa": "PASS",
+        "readable_orientation_visual_qa": "PASS",
+        "semantic_review": "PASS_17_ENTRIES_21_REGIONS",
+        "translatable_source_residue": "NONE_OBSERVED",
+        "artifact_qa": "PASS",
+        "protected_names_ordinals_numbers_player_markers_vehicles_icons": "PRESERVED_OBSERVED"
+      },
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+      "promotion": false,
+      "reason": "B84/C79 and D78/D79 validate the same candidate SHA. Mandatory in-game screenshot validation is still absent."
+    },
+    "C4A2937B": {
+      "canonical_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "candidate_sha256": "7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e",
+      "inputs": {
+        "A83": "PRODUCTION_COMPLETE",
+        "B_current": "MISSING",
+        "C_current": "MISSING"
+      },
+      "d79_preflight": {
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "file_size_bytes": 67108992,
+        "dds_header_128_exact_canonical": true,
+        "total_changed_pixels_vs_canonical": 808037,
+        "outside_21_source_cells_changed_pixels": 0,
+        "introduced_alpha_outside_21_source_cells": 0,
+        "all_candidate_alpha_bboxes_inside_source_cells": true,
+        "raw_orientation": "mirror_y",
+        "raw_orientation_visual_qa": "PASS_PRELIMINARY",
+        "readable_orientation_visual_qa": "PASS_PRELIMINARY",
+        "protected_rank_ordinal_vehicle_icon_character_artwork": "PRESERVED_OBSERVED",
+        "semantic_entries": 20,
+        "physical_regions": 21
+      },
+      "semantic_followup": [
+        "Cut the line! -> 라인을 끊으세요! requires B/C and runtime-context confirmation before final approval.",
+        "Drift and -> 드리프트하고 is an incomplete source fragment and requires adjacent-sprite/runtime composition confirmation."
+      ],
+      "in_game_evidence": "NOT_FOUND_IN_CURRENT_BRANCH",
+      "result": "D_PREFLIGHT_PASS_PENDING_B_C_INGAME",
+      "promotion": false,
+      "reason": "A83 binary/containment/orientation preflight passes, but independent B/C gates and runtime context/in-game validation are missing."
+    }
+  },
+  "other_held_candidates": {
+    "FF2462BB": "STATIC_QA_PASS_PENDING_INGAME",
+    "568D3696": "STATIC_QA_PASS_PENDING_INGAME; Hit the zippers! wording remains runtime-context follow-up"
+  },
+  "state_reconciliation": {
+    "next_hd_rework_before": {
+      "asset": "C4A2937B",
+      "transcription_segments": 19
+    },
+    "next_hd_rework_after": {
+      "asset": "2DA43E41",
+      "transcription_segments": 8
+    },
+    "reason": "A83 already completed C4A2937B canonical-HD production; its B/C gates can proceed independently while production continues to 2DA43E41."
+  },
+  "domain_isolation": {
+    "upstream_base": "08e5efb4deea4066c440307ec009c868a30562d3",
+    "verify_domain_isolation": "PASS",
+    "vr_ffb_source_diff_matches": [],
+    "merge_commits_since_base": [],
+    "result": "PASS_NO_VR_FFB_MIX"
+  },
+  "state_validation": "LOCALIZATION_STATE_OK",
+  "build_performed": false,
+  "final_decision": "NO_NEW_APPROVALS",
+  "next": [
+    "FA7BBB13, 39229D64 and A064FDFC: obtain in-game screenshot validation before any approved_dds promotion.",
+    "C4A2937B: run B first QA and C strict QA, with context confirmation for Cut the line! and Drift and, then in-game validation.",
+    "Continue 2DA43E41 canonical-HD production independently."
+  ]
+}

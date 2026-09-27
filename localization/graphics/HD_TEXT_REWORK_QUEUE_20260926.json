@@ -132,7 +132,7 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "C78_REWORK_STATIC_PASS_PENDING_D_INGAME",
+      "status": "D_FINAL_STATIC_PASS_PENDING_INGAME",
       "transcription_status": "B82_EXPANDED_REVIEWED",
       "transcription_segments": 13,
       "expected_physical_text_occurrences": 15,
@@ -153,7 +153,8 @@
       "c78_supersedes_candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
       "d77_preflight_report": "localization/graphics/role_D/20260927-1413-D77/D77_FINAL_QA_RECONCILE_REPORT.json",
       "d78_reconcile_report": "localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json",
-      "d_pre_c78_binary_status": "SUPERSEDED_BY_C78_NEW_SHA_REQUIRES_D_REVALIDATION"
+      "d_pre_c78_binary_status": "RESOLVED_BY_D79_CURRENT_SHA_REVALIDATION",
+      "d_final_qa_report": "localization/graphics/role_D/20260927-1618-D79/D79_FINAL_QA_RECONCILE_REPORT.json"
     },
     {
       "hash": "A064FDFC",
@@ -166,7 +167,7 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "C79_STATIC_PASS_D78_SAME_SHA_PENDING_D_RECONCILE_INGAME",
+      "status": "D_FINAL_STATIC_PASS_PENDING_INGAME",
       "transcription_segments": 17,
       "localized_regions": 21,
       "remaining_segments": 0,
@@ -180,7 +181,8 @@
       "b_production_first_qa_report": "localization/graphics/role_B/20260927-1500-B84/B84_A064FDFC_PRODUCTION_FIRST_QA.json",
       "c_strict_qa_report": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json",
       "c_candidate_changed": false,
-      "d78_same_sha_binary_preflight_valid": true
+      "d78_same_sha_binary_preflight_valid": true,
+      "d_final_qa_report": "localization/graphics/role_D/20260927-1618-D79/D79_FINAL_QA_RECONCILE_REPORT.json"
     },
     {
       "hash": "C4A2937B",
@@ -193,7 +195,7 @@
       "reason": "UPSTREAM_PLACEHOLDER_UPSCALE",
       "policy": "REBUILD_KOREAN_ON_HD_CANVAS",
       "priority": "P1",
-      "status": "A83_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "status": "D_PREFLIGHT_PASS_PENDING_B_C_INGAME",
       "transcription_segments": 20,
       "localized_regions": 21,
       "remaining_segments": 0,
@@ -208,7 +210,12 @@
       "duplicate_physical_occurrences": {
         "Beat that car!": 2
       },
-      "in_game_validation": "PENDING"
+      "in_game_validation": "PENDING",
+      "d_preflight_report": "localization/graphics/role_D/20260927-1618-D79/D79_FINAL_QA_RECONCILE_REPORT.json",
+      "semantic_context_followup": [
+        "Cut the line! -> 라인을 끊으세요!",
+        "Drift and -> 드리프트하고"
+      ]
     },
     {
       "hash": "2DA43E41",
@@ -289,5 +296,5 @@
       "policy": "KEEP_IN_HANGUL_FONT_PIPELINE_NOT_GRAPHICS_REPAINT"
     }
   ],
-  "latest_batch": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json"
+  "latest_batch": "localization/graphics/role_D/20260927-1618-D79/D79_FINAL_QA_RECONCILE_REPORT.json"
 }

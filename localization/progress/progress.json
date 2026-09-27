@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-27T16:03:53+09:00",
+  "updated_at_kst": "2026-09-27T16:18:12+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -140,7 +140,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C4A2937B A83 production remains complete (20 semantic / 21 physical) pending B/C/D + in-game. A064FDFC B84/C79 static QA pass on unchanged SHA e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1 and D78 preflight checked the same binary; final D reconciliation + in-game remain. 39229D64 C78 needs D revalidation + in-game; FA7BBB13 needs in-game. Continue 2DA43E41 after C4 static gate.",
+  "next_checkpoint": "39229D64 C78-reworked SHA and A064FDFC B84/C79 SHA now have D79 final static QA PASS, but both still require in-game screenshot validation. FA7BBB13 also awaits in-game only. C4A2937B A83 + D79 preflight passes structurally, but B/C + context/runtime validation remain. Continue 2DA43E41 canonical-HD production independently.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -257,27 +257,28 @@
       "coverage": "20 semantic / 21 physical",
       "candidate_sha256": "7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e",
       "report": "localization/graphics/role_A/20260927-1530-A83/A83_C4A2937B_PRODUCTION_REPORT.json",
-      "status": "A83_PRODUCTION_COMPLETE_PENDING_B_C_D",
+      "status": "D_PREFLIGHT_PASS_PENDING_B_C_INGAME",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
       "semantic_corrections": [
         "visible source corrected to Double the speed!",
         "omitted Drift and added"
-      ]
+      ],
+      "d_preflight_report": "localization/graphics/role_D/20260927-1618-D79/D79_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "asset": "C4A2937B",
-      "transcription_segments": 19,
+      "asset": "2DA43E41",
+      "transcription_segments": 8,
       "status": "READY_FOR_CANONICAL_HD_RENDER"
     },
     "latest_d_final_qa": {
-      "run": "D78",
-      "report": "localization/graphics/role_D/20260927-1518-D78/D78_FINAL_QA_RECONCILE_REPORT.json",
+      "run": "D79",
+      "report": "localization/graphics/role_D/20260927-1618-D79/D79_FINAL_QA_RECONCILE_REPORT.json",
       "result": "NO_NEW_APPROVALS",
       "approved_dds_count": 3,
       "FA7BBB13": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
-      "39229D64": "D78_PRE_C78_SHA_SUPERSEDED_REVALIDATION_REQUIRED",
-      "A064FDFC": "D_PREFLIGHT_PASS_HOLD_PENDING_C_INGAME",
-      "post_d78_c78_report": "localization/graphics/role_C/20260927-1527-C78/C78_39229D64_STRICT_QA_REWORK_REPORT.json"
+      "39229D64": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+      "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+      "C4A2937B": "D_PREFLIGHT_PASS_PENDING_B_C_INGAME"
     },
     "latest_c_strict_qa": {
       "asset": "A064FDFC",
