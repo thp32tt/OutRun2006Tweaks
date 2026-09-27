@@ -926,3 +926,16 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - IDs 97 and 280: `DUMPED` finalized as `차였어요!`; this matches the mission-failure/rejection result nuance.
 - All four rows moved from `draft` to `reviewed`.
 - Text review is now complete: 1,355/1,355 non-null IDs, 0 remaining context drafts.
+
+
+## 2026-09-27 22:05 KST — B90 D6DC1380 first QA + 48DEBE77 final HD-migration production
+
+- Started from latest remote HEAD 92d3058 after the final text-context review commits; preserved finalized text state and all A/C/D graphics results. GPT Library was not used.
+- D6DC1380 A89 SHA 53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00: B independent first QA PASS unchanged. CREATE_NEW_HD 256×64 -> 1024×256 RGBA32/1 mip; source header exact except height/width/pitch; raw orientation normal; candidate alpha bbox fully inside scaled source bbox; no observed clipping, seam, opaque box, halo or residue.
+- 48DEBE77 was the final remaining HD-migration special case. B90 rebuilt it directly from canonical 512×512 source artwork on a 2048×2048 canvas; no prior Korean DDS/Batch66 binary reused.
+- 48DEBE77 translations: START -> 출발 in both physical occurrences; GOAL -> 골 in one occurrence. Route letters A-E, course photography, route colors/geometry, red badge borders/shadows and all artwork outside the three text cells are preserved from the 4× canonical-source base.
+- First B90 48DEBE77 draft was rejected because English-erasure interpolation pulled black border colors into the sign interior, producing horizontal streaks. Final uses row-wise red-background reconstruction from source sign interior plus source-like wide/italic Korean proportions.
+- Final 48DEBE77 SHA fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0: 2048×2048 RGBA32/1 mip, source header exact except height/width/pitch, raw mirror_y. 41,433 changed pixels vs the 4× source base, 0 outside 3 text cells; introduced alpha total 0.
+- Readable/raw/white/black/gray QA PASS after rework; no observed source residue, clipping/overlap, box escape, black seam/line, opaque box or alpha halo.
+- HD migration queue is now 16 ready / 0 remaining. No promotion: D6DC1380 and 48DEBE77 still require C/D strict QA and in-game screenshots.
+- Build not run; VR/FFB untouched. Machine report: localization/graphics/role_B/20260927-2145-B90/B90_D6DC1380_48DEBE77_REPORT.json.

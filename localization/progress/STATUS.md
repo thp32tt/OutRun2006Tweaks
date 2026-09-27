@@ -538,3 +538,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - IDs 96/279 `PASSENGER` -> `동승자` (reviewed; source-neutral nuance preserved).
 - IDs 97/280 `DUMPED` -> `차였어요!` (reviewed; failure/rejection result message).
 - Text review state: **1,355/1,355 non-null IDs reviewed; 0 context drafts remain**.
+
+
+## B90 checkpoint — 2026-09-27 22:05 KST
+
+- D6DC1380 A89 SHA 53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00: B FIRST QA PASS unchanged. 1024×256 CREATE_NEW_HD candidate; normal raw orientation; scaled bbox containment/header/style/artifact checks pass.
+- 48DEBE77 SHA fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0: B90 CREATE_NEW_HD PRODUCTION + FIRST QA PASS. 2048×2048 RGBA32/1 mip; raw mirror_y; START x2 -> 출발, GOAL x1 -> 골.
+- 48DEBE77 final: changes vs 4× canonical-source base only inside 3 text cells; outside-cell changes 0, introduced alpha 0. A-E/routes/photos/borders/shadows preserved.
+- First 48 draft with horizontal erasure streaks was rejected before persistence; final candidate passes readable/raw/white/black/gray artifact QA.
+- HD migration queue: 16 ready / 0 remaining. C/D + in-game validation still mandatory; approved/user-lock count remains 0.

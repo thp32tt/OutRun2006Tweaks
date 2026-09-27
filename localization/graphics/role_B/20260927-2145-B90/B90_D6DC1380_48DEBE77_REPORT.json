@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B90",
+  "timestamp_kst": "2026-09-27T22:05:59+09:00",
+  "base_head": "92d305827d6a8b4e25b4be91ca83541183ca302b",
+  "scope": "D6DC1380 A89 first QA + 48DEBE77 current-pipeline CREATE_NEW_HD production/first QA",
+  "assets": {
+    "D6DC1380": {
+      "source_run": "A89",
+      "canonical_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+      "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+      "candidate_changed_by_B": false,
+      "source_dimensions": [
+        256,
+        64
+      ],
+      "candidate_dimensions": [
+        1024,
+        256
+      ],
+      "translation": {
+        "source": "Continue?",
+        "korean": "계속?"
+      },
+      "raw_orientation": "normal",
+      "header_source_exact_except_height_width_pitch": true,
+      "allowed_scaled_bbox": [
+        32,
+        40,
+        992,
+        176
+      ],
+      "candidate_alpha_bbox": [
+        207,
+        41,
+        817,
+        175
+      ],
+      "candidate_alpha_outside_allowed_bbox_pixels": 0,
+      "artifact_qa": "PASS_READABLE_RAW_WHITE_BLACK_GRAY",
+      "result": "B90_FIRST_QA_PASS_PENDING_C_D_INGAME"
+    },
+    "48DEBE77": {
+      "policy": "CREATE_NEW_HD_KOREAN_ASSET",
+      "canonical_sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+      "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+      "candidate_changed_by_B": true,
+      "source_dimensions": [
+        512,
+        512
+      ],
+      "candidate_dimensions": [
+        2048,
+        2048
+      ],
+      "translations": [
+        {
+          "source": "START",
+          "korean": "출발",
+          "physical_occurrences": 2
+        },
+        {
+          "source": "GOAL",
+          "korean": "골",
+          "physical_occurrences": 1
+        }
+      ],
+      "semantic_entries": 2,
+      "physical_regions": 3,
+      "raw_orientation": "mirror_y",
+      "header_source_exact_except_height_width_pitch": true,
+      "base_policy": "canonical stock source artwork resampled 4x; no prior Korean DDS reused",
+      "changed_pixels_vs_4x_base": 41433,
+      "outside_3_text_cells_changed_pixels": 0,
+      "introduced_alpha_pixels_total": 0,
+      "introduced_alpha_outside_3_text_cells": 0,
+      "preserved_original": [
+        "route letters A-E",
+        "course photography",
+        "route colors/geometry",
+        "red badge borders",
+        "badge shadows",
+        "all non-text artwork outside 3 text cells"
+      ],
+      "artifact_qa": "PASS_AFTER_REWORK",
+      "internal_rework": [
+        {
+          "attempt": "draft_1",
+          "result": "REJECTED_NOT_PERSISTED",
+          "reason": "horizontal black/removal streaks remained inside START/GOAL badges"
+        },
+        {
+          "attempt": "draft_2",
+          "result": "PASS",
+          "reason": "row-median red background reconstruction removed source glyph residue; source-like wide/italic Korean proportions applied"
+        }
+      ],
+      "result": "B90_CREATE_NEW_HD_PRODUCTION_FIRST_QA_PASS_PENDING_C_D_INGAME"
+    }
+  },
+  "hd_migration_queue": {
+    "ready": 16,
+    "remaining": 0
+  },
+  "approved_dds_promotion": false,
+  "user_approved_locked": 0,
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "next": "C/D strict QA + in-game screenshot validation for D6DC1380 and 48DEBE77"
+}

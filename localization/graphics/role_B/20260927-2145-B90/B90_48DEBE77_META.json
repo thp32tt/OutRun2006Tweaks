@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B90",
+  "asset": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+  "policy": "CREATE_NEW_HD_KOREAN_ASSET",
+  "canonical_sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+  "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+  "source_dimensions": [
+    512,
+    512
+  ],
+  "candidate_dimensions": [
+    2048,
+    2048
+  ],
+  "format": "RGBA32",
+  "mipmaps": 1,
+  "channel_masks": [
+    "0xff0000",
+    "0xff00",
+    "0xff",
+    "0xff000000"
+  ],
+  "header_source_exact_except_height_width_pitch": true,
+  "raw_orientation": "mirror_y",
+  "semantic_entries": 2,
+  "physical_regions": 3,
+  "translations": [
+    {
+      "source": "START",
+      "korean": "출발",
+      "physical_occurrences": 2
+    },
+    {
+      "source": "GOAL",
+      "korean": "골",
+      "physical_occurrences": 1
+    }
+  ],
+  "records": [
+    {
+      "key": "start_top",
+      "source": "START",
+      "korean": "출발",
+      "readable_cell": [
+        104,
+        492,
+        368,
+        576
+      ],
+      "candidate_alpha_bbox": [
+        132,
+        504,
+        339,
+        563
+      ],
+      "font_size": 58
+    },
+    {
+      "key": "start_bottom",
+      "source": "START",
+      "korean": "출발",
+      "readable_cell": [
+        104,
+        1532,
+        368,
+        1604
+      ],
+      "candidate_alpha_bbox": [
+        132,
+        1538,
+        339,
+        1597
+      ],
+      "font_size": 58
+    },
+    {
+      "key": "goal",
+      "source": "GOAL",
+      "korean": "골",
+      "readable_cell": [
+        1632,
+        20,
+        1820,
+        68
+      ],
+      "candidate_alpha_bbox": [
+        1694,
+        24,
+        1757,
+        64
+      ],
+      "font_size": 41
+    }
+  ],
+  "base_policy": "canonical stock source artwork resampled 4x; no prior Korean DDS reused",
+  "changed_pixels_vs_4x_base": 41433,
+  "outside_3_text_cells_changed_pixels": 0,
+  "introduced_alpha_pixels_total": 0,
+  "introduced_alpha_outside_3_text_cells": 0,
+  "preserved_original": [
+    "route letters A-E",
+    "course photography",
+    "route colors/geometry",
+    "red badge borders",
+    "badge shadows",
+    "all non-text artwork outside 3 text cells"
+  ],
+  "candidate_changed_by_B": true,
+  "in_game_validation": "PENDING"
+}

@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B90",
+  "source_run": "A89",
+  "canonical_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+  "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+  "source_dimensions": [
+    256,
+    64
+  ],
+  "candidate_dimensions": [
+    1024,
+    256
+  ],
+  "format": "RGBA32",
+  "mipmaps": 1,
+  "channel_masks": [
+    "0xff0000",
+    "0xff00",
+    "0xff",
+    "0xff000000"
+  ],
+  "header_source_exact_except_height_width_pitch": true,
+  "raw_orientation": "normal",
+  "source_alpha_bbox": [
+    8,
+    10,
+    248,
+    44
+  ],
+  "allowed_scaled_bbox": [
+    32,
+    40,
+    992,
+    176
+  ],
+  "candidate_alpha_bbox": [
+    207,
+    41,
+    817,
+    175
+  ],
+  "candidate_alpha_outside_allowed_bbox_pixels": 0,
+  "alpha_nonzero_pixels": 65605,
+  "alpha_full_pixels": 44207,
+  "alpha_semitransparent_pixels": 21398,
+  "source_opaque_palette": [
+    [
+      [
+        240,
+        240,
+        240
+      ],
+      1906
+    ],
+    [
+      [
+        16,
+        16,
+        64
+      ],
+      1204
+    ],
+    [
+      [
+        128,
+        128,
+        160
+      ],
+      184
+    ],
+    [
+      [
+        192,
+        192,
+        208
+      ],
+      140
+    ],
+    [
+      [
+        80,
+        80,
+        112
+      ],
+      72
+    ],
+    [
+      [
+        224,
+        240,
+        240
+      ],
+      62
+    ],
+    [
+      [
+        112,
+        112,
+        144
+      ],
+      60
+    ],
+    [
+      [
+        48,
+        48,
+        96
+      ],
+      56
+    ]
+  ],
+  "candidate_opaque_palette": [
+    [
+      [
+        16,
+        16,
+        64
+      ],
+      17717
+    ],
+    [
+      [
+        240,
+        240,
+        240
+      ],
+      17039
+    ],
+    [
+      [
+        0,
+        16,
+        64
+      ],
+      3280
+    ],
+    [
+      [
+        16,
+        16,
+        80
+      ],
+      1611
+    ],
+    [
+      [
+        16,
+        32,
+        80
+      ],
+      1563
+    ],
+    [
+      [
+        0,
+        0,
+        48
+      ],
+      692
+    ],
+    [
+      [
+        0,
+        0,
+        64
+      ],
+      462
+    ],
+    [
+      [
+        176,
+        176,
+        192
+      ],
+      445
+    ]
+  ],
+  "candidate_changed_by_B": false,
+  "visual_review": "PASS_READABLE_RAW_WHITE_BLACK_GRAY"
+}
