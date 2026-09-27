@@ -26,10 +26,10 @@ namespace OutRunVR::GameSemantic
         // Generic canonical 2D queue content. It needs only per-eye
         // asymmetric-FOV alignment, never head/IPD/world-plane placement.
         ScreenOverlay2D,
+        ScreenHud,
         // R65: exact game producer already projected a world/light effect into
         // screen space. Treat it as eye-FOV-corrected 2D without HUD ownership.
         ProjectedScreenEffect2D,
-        ScreenHud,
     };
 
     struct ProjectedMarkerInfo
