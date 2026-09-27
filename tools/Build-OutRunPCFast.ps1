@@ -146,13 +146,32 @@ New-Item -ItemType Directory -Force $backendDir | Out-Null
 $dll = Get-ChildItem $gameBuild -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
 if (-not $dll) { throw 'dinput8.dll missing after incremental build.' }
 
+$gameBytes = [System.IO.File]::ReadAllBytes($dll.FullName)
+$gameAscii = [Text.Encoding]::ASCII.GetString($gameBytes)
+foreach ($marker in @(
+    'VR R26+HUD SAFE TEST: R26/R23 world path + R30 HUD/XYZRHW/SkyGlow overlay ACTIVE',
+    'VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE',
+    'VR R66 OPTION ARROW: exact node pinned',
+    'VR R66 GOAL TIME HUD:',
+    'VR R65 FLARE FIX: exact projected-screen effect uses asymmetric-FOV affine only',
+    'VR R65 SELECTOR: restored base shadow bypassed'
+)) {
+    if (-not $gameAscii.Contains($marker)) {
+        throw "R66 PC fast binary missing proven-baseline marker: $marker"
+    }
+}
+if ($gameAscii.Contains('VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE')) {
+    throw 'R66 PC fast binary is the forbidden R26-only SAFE-DRAW variant.'
+}
+Write-Host 'PC fast binary proven-baseline markers PASS.'
+
 $hostExe = Join-Path $hostBuild 'bin/outrun-vr-host.exe'
 if (-not (Test-Path $hostExe)) { throw 'outrun-vr-host.exe missing after incremental build.' }
 
 Copy-Item $dll.FullName (Join-Path $backendDir 'dinput8.dll')
 Copy-Item $hostExe (Join-Path $backendDir 'outrun-vr-host.exe')
 Set-Content (Join-Path $backendDir 'SOURCE_SHA.txt') $sourceSha -Encoding ascii
-Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_FULL_R34' -Encoding ascii
+Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R66' -Encoding ascii
 Assert-R51PCBuildContract -BuildDir $gameBuild
 Set-Content (Join-Path $backendDir 'CMAKE_FLAGS.txt') $canonicalGameFlagString -Encoding ascii
 Set-Content (Join-Path $backendDir 'BUILD_CONTRACT.txt') $buildContractVersion -Encoding ascii
