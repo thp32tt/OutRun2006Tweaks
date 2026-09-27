@@ -41,3 +41,14 @@ Rules:
 - Stage-transition behavior remains unchanged: three-present hold, last-good projection reuse, SkyGlow capture epoch reset.
 - This is the first migration step; unrelated long-lived telemetry/state remains untouched.
 - Build gate: DX9Ex Active Validation triggered from this final stage head.
+
+
+## S4 — remove R57 production mode matrix
+- Branch: `vr-d3d9ex-candidate/r69-clean-s4`
+- Parent: S3 `6b6debb0a153a881e8a6e408a8bf5dadb55e4978`
+- Production renderer: removed `R57Mode()` and `OUTRUN_VR_R57_MODE`; projected rival markers now always use the R69 HMD-proven head-inverse path.
+- HUD producer ownership: removed the second R57 mode selector in `src/hooks_uiscaling.cpp`; rank markers are fixed to `ProjectedWorldMarker2D` and DispRank/POSITION nodes are fixed to exact `ScreenHud` ownership.
+- Test launcher: numbered R57 GUI variants are removed from the selector; `R69_FIXPACK` is the visible production variant. Legacy variant names remain runner aliases but no longer alter renderer ownership.
+- Validation policy: proven-baseline and launcher-policy gates now reject reintroduction of `OUTRUN_VR_R57_MODE`.
+- Visual policy intentionally preserved from R69: projected rank head inverse, centre-eye fused flare, stock PC shadow behavior, exact option-arrow ownership.
+- Build gate: DX9Ex Active Validation triggered from this final stage head.
