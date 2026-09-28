@@ -70,7 +70,11 @@ $launcherText = Get-Content (Join-Path $toolsRoot 'Invoke-OutRunVROneClick.ps1')
 foreach ($required in @(
     '[switch]$AllowTargetOverride',
     'One-click backend override blocked',
-    'One-click variant override blocked'
+    'One-click variant override blocked',
+    'Write-OneClickPreflightFailureDiagnostic',
+    '_preflight_failures',
+    'VR_PREFLIGHT_FAILURE_',
+    'One-click preflight failed before session creation'
 )) {
     if ($launcherText -notmatch [regex]::Escape($required)) {
         throw "One-click branch target override lock missing: $required"
