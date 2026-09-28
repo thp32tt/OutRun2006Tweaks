@@ -1433,10 +1433,14 @@ namespace OutRunVRStereo
                 FrameHadDuplicatedDraw &&
                 !FrameRightDrawFailed && !FrameStereoIncomplete)
             {
-                LARGE_INTEGER perfStart{}, perfEnd{}, perfFrequency{};
+                static const LARGE_INTEGER perfFrequency = []() noexcept {
+                    LARGE_INTEGER value{};
+                    QueryPerformanceFrequency(&value);
+                    return value;
+                }();
+                LARGE_INTEGER perfStart{}, perfEnd{};
                 const bool measureSkyGlow =
                     Settings::VRTelemetry &&
-                    QueryPerformanceFrequency(&perfFrequency) &&
                     perfFrequency.QuadPart > 0 &&
                     QueryPerformanceCounter(&perfStart);
                 {
