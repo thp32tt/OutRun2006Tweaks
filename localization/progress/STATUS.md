@@ -641,3 +641,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Automated containment 21/21 PASS; outside/collateral 0. Candidate f3210736300592f87472c19c930031649c18bd3de01dba032849e3a5974d1ebb.
 - Visual proof: localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/A_AUTO_00001_FF2462BB_QA.png. Independent C source-style/artifact QA + DDS_ONLY in-game remain required.
 - AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED.
+
+### B95 FA7BBB13 exact-bbox rework — 2026-09-28T16:06:49+09:00
+- B even shard index 54; ten C85 failing Korean text regions reworked from the canonical HD candidate path.
+- Strict B self-QA: 17/17 bbox containment PASS; changes outside old/new rework rectangles 0; introduced alpha outside original bboxes 0; pre-existing PASS cells outside rework overlap unchanged.
+- DDS 4096×2048 RGBA32 / 1 mip / exact header / raw mirror_y preserved. Candidate SHA-256 d0dae8165f8a6c7231b398be9fc7bc5fdf7f66f97253eb8ba03c54f6136615da.
+- AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED. Independent C visual/final QA and isolated DDS_ONLY in-game validation remain mandatory.
