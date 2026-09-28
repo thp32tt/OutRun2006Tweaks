@@ -4,24 +4,22 @@
   "target_branch": "korean-localization-clean",
   "attempt": 1,
   "base_sha": "cbe8e4a4974eb17ed5936574e0869fc383c290f3",
-  "automation_validation": "BLOCKED",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
-  "summary": "A index 57 39229D64 exact-bbox rework retry remains blocked at GitHub Actions execution. The GitHub-side reworker fix is committed, but the available GitHub connector exposes no new workflow-dispatch action; the prior failed run 36379580218 returns no jobs or artifacts, so rerunning it cannot safely prove execution against the fixed script. Candidate DDS remains unchanged.",
+  "summary": "A index 57 39229D64 exact-bbox rework retry failed safely in GitHub Actions before candidate DDS write. Strict post-QA still reports six source-diff containment failures; no collateral or outside-cell change was introduced. Candidate remains unchanged. Next A-shard rework candidate is index 51 FF2462BB, whose last B91 shrink variant passed decoded containment but failed source-style/artifact QA due ragged resampling.",
   "evidence": [
     "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
     "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
     "localization/graphics/role_B/20260928-0920-B91/B91_RGBA_REWORK_ACTIONS.json",
-    "localization/progress.json absent; maintained file is localization/progress/progress.json",
     "GitHub Actions run 36379580218 failed safely before candidate write.",
-    "Strict post-QA: collateral_pixels=0; outside_cells_changed_pixels=0; introduced_alpha_outside_cells=0.",
-    "Remaining failed keys: technical_bonus, mission_cleared, storing, special_request, exit, collect_stars, mission_failed.",
-    "Reworker fix commit e1ddc9b07bd3ac472172327a00300e27eeaa3cb2: source-diff binary-mask move/restore instead of whole localized-bbox clear/composite.",
-    "Latest korean-localization-clean HEAD before this review: 9c143ff391a683ff97ac061e08c1821f5f7b7c43.",
-    "Fixed reworker commit: e1ddc9b07bd3ac472172327a00300e27eeaa3cb2.",
-    "GitHub connector inspection: no workflow_dispatch/create-workflow-run action is available.",
-    "GitHub Actions run 36379580218 job list is empty and artifact list is empty through the available connector.",
-    "Safety decision: did not rerun the old failed run because execution against the fixed script could not be established."
+    "Reworker fix commit e1ddc9b07bd3ac472172327a00300e27eeaa3cb2 moved only source-diff pixels.",
+    "Retry trigger commit 9c143ff391a683ff97ac061e08c1821f5f7b7c43 [AUTO:LOCALIZATION-LOCALIZATION_A-00001].",
+    "GitHub Actions run 36388842906 failed safely before candidate write.",
+    "Remaining 39229D64 failed keys: technical_bonus, mission_cleared, storing, special_request, exit, mission_failed.",
+    "Strict post-QA on retry: collateral_pixels=0; outside_cells_changed_pixels=0; introduced_alpha_outside_cells=0.",
+    "Next A-shard REWORK_REQUIRED candidate by queue priority/index age: FF2462BB index 51; C85 reason REWORK_REQUIRED_ARTIFACT (ragged stroke degradation after shrink).",
+    "localization/progress.json absent; maintained file is localization/progress/progress.json"
   ],
-  "result_sha": "NO_CANDIDATE_CHANGE_BLOCKED_ACTIONS_TRIGGER",
-  "note": "GitHub-only review. No N100/local clone/worktree/GPT Library/VR/FFB/DX9Ex/DX11/DXVK work used. Runtime/in-game test not performed."
+  "result_sha": "NO_CANDIDATE_CHANGE",
+  "note": "No N100/local worktree/GPT Library/VR/FFB/DX9Ex/DX11/DXVK work used. Runtime/in-game test not performed."
 }
