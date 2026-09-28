@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-29T04:18:00+09:00",
+  "updated_at_kst": "2026-09-29T04:45:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "W00009 C94 final reconciliation: W00008 planning/visual drift repaired; A00029 promoted 103 and resolved 151/153/155; B00030 attempt3 additionally promoted 34/52/172 and resolved 196 after its earlier 26/28/30/32 exact-HD preflight. Queue is 88 localize_text + 38 zoom_review; unresolved zoom_review 19, resolved preserve-original zoom_review 19. Transcription/artwork planning 88 assets / 737 semantic segments. No W00009 DDS candidate bytes were persisted; approved_dds 0; runtime UNTESTED.",
+  "next_checkpoint": "W00010 C95 reconciliation: A00032 resolved zoom-review indices 157/165/169/171 as preserve-original; B00033 added immutable GitHub HD source/atlas reconstruction inputs for existing localize_text indices 34/44/52/172. Queue actions remain 88 localize_text + 38 zoom_review; unresolved zoom_review 15, resolved preserve-original zoom_review 23. Transcription/artwork planning remain 88 assets / 737 semantic segments. No W00010 DDS candidate bytes were persisted or approved; runtime UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -535,31 +535,26 @@
       }
     },
     "latest_c_barrier": {
-      "run": "C94",
-      "task_id": "LOCALIZATION-LOCALIZATION_C-00031",
-      "wave_id": "W00009",
-      "result": "PASS_W00009_SYNC_SHARED_STATE_REPAIRED_4_LOCALIZABLE_PROMOTED_4_PRESERVE_4_HD_PREFLIGHT_NO_NEW_DDS_APPROVALS",
+      "run": "C95",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00034",
+      "wave_id": "W00010",
+      "result": "PASS_W00010_SYNC_4_PRESERVE_4_RECONSTRUCTION_INPUTS_NO_NEW_DDS_APPROVALS",
       "approved_dds_count": 0,
-      "material_backlog_action": "REPAIR_W00008_PLAN_VISUAL_DRIFT_PLUS_W00009_A_B_FINAL_ZOOM_REVIEW_RECONCILIATION",
-      "promoted_indices": [
+      "material_backlog_action": "RECONCILE_A00032_PRESERVE_CLASSIFICATIONS_AND_B00033_EXACT_HD_RECONSTRUCTION_INPUTS",
+      "promoted_indices": [],
+      "resolved_preserve_indices": [
+        157,
+        165,
+        169,
+        171
+      ],
+      "reconstruction_input_indices": [
         34,
+        44,
         52,
-        103,
         172
       ],
-      "resolved_preserve_indices": [
-        151,
-        153,
-        155,
-        196
-      ],
-      "hd_preflight_indices": [
-        26,
-        28,
-        30,
-        32
-      ],
-      "report": "localization/graphics/role_C/20260929-0414-C94/C94_W00009_SYNC_FINAL_QA.json",
+      "report": "localization/graphics/role_C/20260929-0445-C95/C95_W00010_SYNC_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
     "single_dds_isolation": {
@@ -582,8 +577,8 @@
         "W00006_C00022_C4A2937B"
       ]
     },
-    "zoom_review_unresolved": 19,
-    "zoom_review_resolved_preserve_original": 19
+    "zoom_review_unresolved": 15,
+    "zoom_review_resolved_preserve_original": 23
   },
   "data_build": {
     "draft_bin_entries": 1356,

@@ -754,3 +754,15 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Canonical progress and legacy `localization/progress.json` are written byte-for-byte identically. No N100/GPT Library/VR/FFB/DX/build work.
 - Machine report: `localization/graphics/role_C/20260929-0414-C94/C94_W00009_SYNC_FINAL_QA.json`.
 - ATTEMPT 2 correction after Automation Gate run `36471592964`: the failed run observed an intermediate state where final B attempt-3 classifications were already in graphics files but progress still expected 85 assets / 731 segments. Latest GitHub state is reconciled to **88 localize_text / 38 zoom_review**, **88 transcriptions / 737 segments**, **88 artwork-plan rows / 737 segments**, with canonical and legacy progress byte-identical. B attempt-3 promotions: 34/52/172; preserve-original: 196. No DDS bytes were produced; runtime remains UNTESTED.
+
+### W00010 C95 synchronization barrier — 2026-09-29T04:45:00+09:00
+- Barrier gate: PASS. A00032 and B00033 durable terminal records/commits are both present in current HEAD ancestry.
+- A preserve-original reconciliation: 157 `4DF4D7CD`, 165 `5C98F2`, 169 `638F38C0`, 171 `67CE2848`.
+- B exact-HD reconstruction-input retention: 34 `B7E25BAD`, 44 `19CEDB9`, 52 `A8CE339F`, 172 `6C9B3611`; canonical semantic translations match 19/19 current transcription/artwork-plan segments.
+- Upstream immutable source identity: PASS 16/16 expected Git blob IDs across A/B evidence.
+- Candidate DDS writes: 0. New static approvals: 0. Pixel containment/clipping and DDS format/mipmap/alpha/background/orientation promotion are NOT_APPLICABLE for this wave because no candidate bytes changed.
+- Queue remains 137 rows with 88 `localize_text` / 38 `zoom_review`; zoom review unresolved 15, resolved preserve-original 23. Transcription/artwork plan remain 88 assets / 737 segments.
+- `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
+- `RUNTIME_VALIDATION=UNTESTED`
+- Report: `localization/graphics/role_C/20260929-0445-C95/C95_W00010_SYNC_FINAL_QA.json`
+

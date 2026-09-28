@@ -33,7 +33,7 @@ index,path,text_detected,action,review_status,notes
 31,textures/load/spr_sprani_FLAG_RANK_Exst/A82266FC_1024x512.dds,maybe,zoom_review,visual_reviewed,
 32,textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds,yes,localize_text,visual_reviewed,W00008 C93 classification reconciled by W00009 C94: Total Rank confirmed localizable
 33,textures/load/spr_sprani_FLAG_RANK_Exst/FBCAB18D_1024x512.dds,maybe,zoom_review,visual_reviewed,
-34,textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds,yes,localize_text,visual_reviewed,W00009 B00030 attempt3+C94: localizable UI text confirmed
+34,textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds,yes,localize_text,visual_reviewed,W00010 B00033+C95: localizable UI text retained; exact HD reconstruction input/source identity advanced; candidate still pending exact decoded-pixel bbox QA
 35,textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds,yes,localize_text,visual_reviewed,W00008 C93 classification reconciled by W00009 C94: Total Rank confirmed localizable
 36,textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds,maybe,zoom_review,visual_reviewed,
 37,textures/load/spr_sprani_JENN_RANK_Exst/515DCBB2_1024x1024.dds,maybe,zoom_review,visual_reviewed,
@@ -43,7 +43,7 @@ index,path,text_detected,action,review_status,notes
 41,textures/load/spr_sprani_common_cvt_xst/553BF480_128x128.dds,no,no_localization,visual_reviewed,
 42,textures/load/spr_sprani_common_cvt_xst/8DD870A0_512x512.dds,no,no_localization,visual_reviewed,
 43,textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds,yes,localize_text,visual_reviewed,
-44,textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds,yes,localize_text,visual_reviewed,
+44,textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds,yes,localize_text,visual_reviewed,W00010 B00033+C95: localizable UI text retained; exact HD reconstruction input/source identity advanced; candidate still pending exact decoded-pixel bbox QA
 45,textures/load/spr_sprani_etc_cvt_Exst/1F77CB88_128x128.dds,maybe,zoom_review,visual_reviewed,
 46,textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds,yes,localize_text,visual_reviewed,
 47,textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds,yes,localize_text,visual_reviewed,
@@ -51,7 +51,7 @@ index,path,text_detected,action,review_status,notes
 49,textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds,yes,localize_text,visual_reviewed,
 50,textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds,yes,localize_text,visual_reviewed,
 51,textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds,yes,localize_text,visual_reviewed,
-52,textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds,yes,localize_text,visual_reviewed,W00009 B00030 attempt3+C94: localizable UI text confirmed
+52,textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds,yes,localize_text,visual_reviewed,W00010 B00033+C95: localizable UI text retained; exact HD reconstruction input/source identity advanced; candidate still pending exact decoded-pixel bbox QA
 53,textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds,yes,localize_text,visual_reviewed,
 54,textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds,yes,localize_text,visual_reviewed,
 55,textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds,yes,localize_text,visual_reviewed,
@@ -156,7 +156,7 @@ index,path,text_detected,action,review_status,notes
 154,textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds,yes,localize_text,visual_reviewed,
 155,textures/load/spr_sprani_sumo_fe_cvt_Exst/4D49CA85_512x256.dds,no,zoom_review,visual_reviewed,W00009 A00029+C94: resolved preserve-original; no localizable UI prose
 156,textures/load/spr_sprani_sumo_fe_cvt_Exst/4DC09A74_1024x1024.dds,no,no_localization,visual_reviewed,
-157,textures/load/spr_sprani_sumo_fe_cvt_Exst/4DF4D7CD_512x512.dds,maybe,zoom_review,visual_reviewed,
+157,textures/load/spr_sprani_sumo_fe_cvt_Exst/4DF4D7CD_512x512.dds,no,zoom_review,visual_reviewed,W00010 A00032+C95 zoom review resolved: scenic/course-card artwork + protected OutRun2 logo only; no localizable UI prose; preserve original
 158,textures/load/spr_sprani_sumo_fe_cvt_Exst/4EA333E1_256x128.dds,no,no_localization,visual_reviewed,
 159,textures/load/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds,yes,localize_text,visual_reviewed,
 160,textures/load/spr_sprani_sumo_fe_cvt_Exst/502A4363_1024x256.dds,no,no_localization,visual_reviewed,
@@ -164,14 +164,14 @@ index,path,text_detected,action,review_status,notes
 162,textures/load/spr_sprani_sumo_fe_cvt_Exst/5799E10E_128x64.dds,yes_preserve,preserve_brand_song_credit,visual_reviewed,
 163,textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds,yes,localize_text,visual_reviewed,
 164,textures/load/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds,yes,localize_text,visual_reviewed,
-165,textures/load/spr_sprani_sumo_fe_cvt_Exst/5C98F2_512x512.dds,maybe,zoom_review,visual_reviewed,
+165,textures/load/spr_sprani_sumo_fe_cvt_Exst/5C98F2_512x512.dds,no,zoom_review,visual_reviewed,W00010 A00032+C95 zoom review resolved: scenic/course-card artwork + protected OutRun2SP logo only; no localizable UI prose; preserve original
 166,textures/load/spr_sprani_sumo_fe_cvt_Exst/5EBD7FE8_1024x1024.dds,maybe,zoom_review,visual_reviewed,
 167,textures/load/spr_sprani_sumo_fe_cvt_Exst/616FC97B_512x128.dds,no,no_localization,visual_reviewed,
 168,textures/load/spr_sprani_sumo_fe_cvt_Exst/633929F3_1024x512.dds,yes_preserve,preserve_brand_song_credit,visual_reviewed,
-169,textures/load/spr_sprani_sumo_fe_cvt_Exst/638F38C0_512x256.dds,maybe,zoom_review,visual_reviewed,
+169,textures/load/spr_sprani_sumo_fe_cvt_Exst/638F38C0_512x256.dds,no,zoom_review,visual_reviewed,W00010 A00032+C95 zoom review resolved: OutRun2/OutRun2SP logo collage + scenic cards + symbolic question mark only; no localizable UI prose; preserve original
 170,textures/load/spr_sprani_sumo_fe_cvt_Exst/642D0939_512x512.dds,no,no_localization,visual_reviewed,
-171,textures/load/spr_sprani_sumo_fe_cvt_Exst/67CE2848_512x256.dds,maybe,zoom_review,visual_reviewed,
-172,textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds,yes,localize_text,visual_reviewed,W00009 B00030 attempt3+C94: localizable UI text confirmed
+171,textures/load/spr_sprani_sumo_fe_cvt_Exst/67CE2848_512x256.dds,no,zoom_review,visual_reviewed,W00010 A00032+C95 zoom review resolved: scenic/course-card artwork + protected OutRun2SP/OutRun2 logos only; no localizable UI prose; preserve original
+172,textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds,yes,localize_text,visual_reviewed,W00010 B00033+C95: localizable UI text retained; exact HD reconstruction input/source identity advanced; candidate still pending exact decoded-pixel bbox QA
 173,textures/load/spr_sprani_sumo_fe_cvt_Exst/6DC89C6E_512x512.dds,yes,localize_text,visual_reviewed,
 174,textures/load/spr_sprani_sumo_fe_cvt_Exst/73F852A4_512x512.dds,maybe,zoom_review,visual_reviewed,
 175,textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds,yes,localize_text,visual_reviewed,

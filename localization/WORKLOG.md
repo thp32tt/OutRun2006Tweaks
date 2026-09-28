@@ -1209,3 +1209,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - No W00009 DDS bytes changed; approved DDS count 0; `RUNTIME_VALIDATION=UNTESTED`. No N100/GPT Library/VR/FFB/DX/build work.
 - Machine report: `localization/graphics/role_C/20260929-0414-C94/C94_W00009_SYNC_FINAL_QA.json`.
 - ATTEMPT 2 inspected failed Automation Gate run `36471592964` job `109094916692`: `verify_state.py` failed only because an intermediate commit had graphics state at 88 assets / 737 segments while progress still said 85 / 731 and 85 localize_text / 41 zoom_review. Latest HEAD repairs the mismatch to 88 / 737 and 88 / 38; canonical/legacy progress mirrors are identical. The identical failure is not rerun on the stale SHA.
+
+### C95 W00010 synchronization barrier — 2026-09-29T04:45:00+09:00
+- Durable A/B terminal inputs confirmed on `korean-localization-clean`: A00032 commit `e18578daebc5a99407b2590fcac4bfc93c083972` and B00033 commit `fb1cd3bf1ddfafd24a9a6633256abb4a2a8417dd`.
+- GitHub-only cross-lane source identity check matched all 16 pinned upstream blobs used by the two lane reports at `Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754`.
+- A00032: indices 157/165/169/171 contain only protected OutRun2/OutRun2SP logo, scenic/card, or symbolic artwork; reconciled as preserve-original. Their `zoom_review` action remains for accounting compatibility, but `artwork_status=preserve_original`, `transcription_status=not_required`, and visual `text_detected=no`.
+- B00033: indices 34/44/52/172 retain existing canonical translations and now have exact 4x HD atlas-cell + immutable GitHub DDS/atlas reconstruction inputs. All 19 semantic transcription segments match current canonical transcription/artwork-plan rows.
+- No DDS candidate bytes changed in W00010. Therefore clipping/1-pixel containment, DDS format/mipmap/alpha/transparency, background/artifact and readable-orientation promotion gates were not newly claimed; no new approval was added.
+- Shared counts: queue 137 = 88 localize_text + 38 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only; unresolved zoom-review 15; resolved preserve-original zoom-review 23; transcriptions/artwork plan 88 assets / 737 segments; approved DDS count 0.
+- Canonical `localization/progress/progress.json` and legacy `localization/progress.json` are updated byte-for-byte identically. Static state consistency PASS; remote Automation Gate is pending this commit.
+- No build, N100/local clone, GPT Library, VR/FFB/DX work, or in-game test. `RUNTIME_VALIDATION=UNTESTED`.
+- Machine report: `localization/graphics/role_C/20260929-0445-C95/C95_W00010_SYNC_FINAL_QA.json`.
+

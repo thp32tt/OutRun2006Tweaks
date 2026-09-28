@@ -1,0 +1,133 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00034",
+  "attempt": "1/3",
+  "wave_id": "W00010",
+  "lane": "LOCALIZATION_C",
+  "role": "SYNC_BARRIER_CROSS_LANE_FINAL_QA_SHARED_STATE_MERGE",
+  "recorded_at_kst": "2026-09-29T04:45:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "base_head_sha": "fb1cd3bf1ddfafd24a9a6633256abb4a2a8417dd",
+  "durable_terminal_gate": {
+    "result": "PASS_BOTH_PRESENT_ON_CURRENT_HEAD_ANCESTRY",
+    "lane_A": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00032",
+      "commit": "e18578daebc5a99407b2590fcac4bfc93c083972",
+      "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_PRESERVE_CLASSIFICATIONS",
+      "report": "localization/graphics/role_A/20260929-0431-A00032/A00032_W00010_ZOOM_REVIEW_RESOLUTION.json"
+    },
+    "lane_B": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00033",
+      "commit": "fb1cd3bf1ddfafd24a9a6633256abb4a2a8417dd",
+      "result": "PASS_MATERIAL_FALLBACK_4_EVEN_LOCALIZE_TEXT_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+      "report": "localization/graphics/role_B/20260929-0428-B105/B105_W00010_RECONSTRUCTION_INPUT.json"
+    }
+  },
+  "github_source_crosscheck": {
+    "upstream_repo": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "upstream_tree_sha": "1204f28afb7fb7d791d8f7a536dbdf3186d8e172",
+    "expected_blob_ids_checked": 16,
+    "matched_blob_ids": 16,
+    "result": "PASS"
+  },
+  "cross_lane_qa": {
+    "a_resolved_preserve_original": [
+      157,
+      165,
+      169,
+      171
+    ],
+    "a_policy_check": "PASS_ONLY_PROTECTED_LOGO_SCENIC_CARD_OR_SYMBOLIC_ARTWORK_REPORTED_AND_PINNED_SOURCE_IDENTITIES_MATCH",
+    "b_reconstruction_input_indices": [
+      34,
+      44,
+      52,
+      172
+    ],
+    "b_canonical_transcription_match": {
+      "semantic_segments": 19,
+      "result": "PASS_19_OF_19",
+      "translations": {
+        "Total Rank": "종합 랭크",
+        "Sector2": "섹터 2",
+        "Sector1": "섹터 1",
+        "WIN": "승리",
+        "LOSE": "패배",
+        "Result": "결과",
+        "Ranking": "랭킹",
+        "Stage": "스테이지",
+        "Rank1": "랭크 1",
+        "You": "나",
+        "Diff": "차이",
+        "Sector3": "섹터 3",
+        "TOP": "TOP",
+        "Rival": "라이벌",
+        "Extra Time": "추가 시간",
+        "Start": "시작",
+        "Goal": "골",
+        "START": "시작",
+        "GOAL": "골"
+      }
+    },
+    "candidate_dds_modified_in_wave": false,
+    "new_candidate_dds_bytes": 0,
+    "hangul_clipping": "NOT_APPLICABLE_NO_NEW_CANDIDATE_BYTES",
+    "zero_pixel_containment": "NOT_CLAIMED_NO_NEW_CANDIDATE_BYTES",
+    "dds_format_mipmap_alpha_transparency": "UNCHANGED_NO_NEW_CANDIDATE_BYTES",
+    "raw_readable_orientation": "UNCHANGED_NO_NEW_CANDIDATE_BYTES",
+    "background_artifact_wrong_replacement": "NO_NEW_CANDIDATE_BYTES; B mixed-art cells remain text-only-mask HOLD",
+    "hd_gui_policy": "PASS_NO_UPSCALE_OR_LOW_RES_CANDIDATE_ACCEPTED",
+    "approvals_added": 0,
+    "approved_dds_count": 0
+  },
+  "shared_state_merge": {
+    "preserve_rows_updated": [
+      157,
+      165,
+      169,
+      171
+    ],
+    "reconstruction_notes_updated": [
+      34,
+      44,
+      52,
+      172
+    ],
+    "visual_review_updated": [
+      34,
+      44,
+      52,
+      157,
+      165,
+      169,
+      171,
+      172
+    ],
+    "queue_rows": 137,
+    "queue_actions": {
+      "localize_text": 88,
+      "zoom_review": 38,
+      "font_pipeline": 9,
+      "hangul_name_entry": 1,
+      "preserve_brand_song_credit": 1
+    },
+    "zoom_review_unresolved": 15,
+    "zoom_review_resolved_preserve_original": 23,
+    "transcription_assets": 88,
+    "transcription_segments": 737,
+    "artwork_plan_assets": 88,
+    "artwork_plan_segments": 737,
+    "canonical_progress_and_legacy_mirror_identical": true
+  },
+  "static_precommit_validation": "PASS_EXPECTED_STATE: progress mirror identical; visual action counts unchanged 88 localize_text/38 zoom_review; transcription=artwork_plan=88 assets/737 segments; queue 137; resolved zoom-review 23/unresolved 15",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00010 C reconciled A00032 preserve classifications and B00033 exact-HD GitHub reconstruction inputs into shared state without creating or approving DDS bytes. Runtime remains UNTESTED."
+}

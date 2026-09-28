@@ -1,0 +1,75 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00034",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00010",
+  "recorded_at_kst": "2026-09-29T04:45:00+09:00",
+  "reconciliation_base_head_sha": "fb1cd3bf1ddfafd24a9a6633256abb4a2a8417dd",
+  "result": "PASS_W00010_SYNC_4_PRESERVE_4_RECONSTRUCTION_INPUTS_NO_NEW_DDS_APPROVALS",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED",
+  "barrier_inputs": {
+    "lane_A": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00032",
+      "commit": "e18578daebc5a99407b2590fcac4bfc93c083972",
+      "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_PRESERVE_CLASSIFICATIONS",
+      "runtime_validation": "UNTESTED"
+    },
+    "lane_B": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00033",
+      "commit": "fb1cd3bf1ddfafd24a9a6633256abb4a2a8417dd",
+      "result": "PASS_MATERIAL_FALLBACK_4_EVEN_LOCALIZE_TEXT_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "cross_lane_qa": {
+    "resolved_preserve_original": [
+      157,
+      165,
+      169,
+      171
+    ],
+    "retained_reconstruction_inputs": [
+      34,
+      44,
+      52,
+      172
+    ],
+    "upstream_blob_identity": "PASS_16_OF_16",
+    "canonical_translation_segments": "PASS_19_OF_19",
+    "candidate_dds_modified": false,
+    "new_candidate_dds_bytes": 0,
+    "clipping_hangul_raster": "NOT_APPLICABLE_NO_NEW_CANDIDATE_BYTES",
+    "zero_pixel_containment": "NOT_CLAIMED_NO_NEW_CANDIDATE_BYTES",
+    "dds_format_mipmap_alpha_transparency_orientation": "UNCHANGED_NO_NEW_CANDIDATE_BYTES",
+    "approvals_added": 0,
+    "approved_dds_count": 0
+  },
+  "shared_state_merge": {
+    "queue_rows": 137,
+    "queue_actions": {
+      "localize_text": 88,
+      "zoom_review": 38,
+      "font_pipeline": 9,
+      "hangul_name_entry": 1,
+      "preserve_brand_song_credit": 1
+    },
+    "zoom_review_unresolved": 15,
+    "zoom_review_resolved_preserve_original": 23,
+    "transcription_assets": 88,
+    "transcription_semantic_segments": 737,
+    "artwork_plan_assets": 88,
+    "artwork_plan_segments": 737,
+    "canonical_progress_and_legacy_mirror_identical": true
+  },
+  "report": "localization/graphics/role_C/20260929-0445-C95/C95_W00010_SYNC_FINAL_QA.json",
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00010 C completed the synchronization barrier and shared-state reconciliation. No DDS bytes changed or were approved; runtime remains UNTESTED."
+}
