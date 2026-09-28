@@ -9,6 +9,7 @@
   "recorded_kst": "2026-09-28T16:36:33+09:00",
   "base_sha": "971806cade039a61ba64692487ee570660e0a6dc",
   "code_result_sha": "a591f330e2e7342edfdd168fb50b4bd3333dcafe",
+  "result_sha": "a591f330e2e7342edfdd168fb50b4bd3333dcafe",
   "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
