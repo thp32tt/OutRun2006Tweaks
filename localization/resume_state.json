@@ -1,5 +1,5 @@
 {
-  "schema_version": 67,
+  "schema_version": 68,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,10 +7,10 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "Use B00033 pinned immutable GitHub HD DDS/atlas inputs for indices 34/44/52/172, but do not render/promote until exact decoded full-effect English text bboxes, raw orientation, alpha/background reconstruction and zero-pixel ENGLISH SOURCE vs KOREAN CANDIDATE proof are available.",
-    "Rows 157/165/169/171 are resolved preserve-original from A00032+C95. Remaining unresolved zoom_review count is 15; resolved preserve-original zoom_review count is 23.",
-    "Continue existing runnable source-faithful REWORK/localize_text backlog without repeating unchanged dependency blockers; no W00010 candidate DDS bytes were created.",
-    "Keep isolated DDS_ONLY runtime cases separate from production. C95 performed no in-game test, so RUNTIME_VALIDATION remains UNTESTED."
+    "Produce exact-HD source-faithful candidates for newly promoted indices 36/62/217/219 only after decoded full-effect English text bboxes, raw orientation, text-only/background-safe masks and zero-pixel ENGLISH SOURCE vs KOREAN CANDIDATE proof are available.",
+    "Rows 166/177/178/189/191 are resolved preserve-original from W00011. Remaining unresolved zoom_review indices are 38/202/206/210/214/238 (6 total); resolved preserve-original zoom_review count is 28.",
+    "Continue runnable source-faithful REWORK/localize_text backlog without repeating unchanged dependency blockers. W00011 produced no candidate DDS bytes; pending production localize_text count is 76 against the strict 16-candidate audit baseline.",
+    "Keep isolated DDS_ONLY runtime cases separate from production. C96 performed no in-game test, so RUNTIME_VALIDATION remains UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -27,9 +27,9 @@
     ]
   },
   "graphics_checkpoint": {
-    "transcribed_assets": 88,
-    "transcribed_segments": 737,
-    "artwork_targets": 88,
+    "transcribed_assets": 92,
+    "transcribed_segments": 746,
+    "artwork_targets": 92,
     "full_draft_candidates": 79,
     "final_artwork_completed": 0,
     "full_draft_package_sha256": "5512dad798a4ddb4872e4aa3e69438537f75f488f439317d7b95c0eb372b6c78",
@@ -125,13 +125,13 @@
         "FD90AA9"
       ],
       "failed_elements": 93,
-      "pending_production_localize_text": 72,
-      "hold_strict_recheck_zoom_review": 19,
+      "pending_production_localize_text": 76,
+      "hold_strict_recheck_zoom_review": 6,
       "promotion_hold_for_pixel_pass": true,
-      "promotion_hold_reason": "W00009 C94 reconciled; new/persisted candidate bytes were not produced in W00009, exact-HD reconstruction and final integrated runtime validation remain pending.",
+      "promotion_hold_reason": "W00011 C96 reconciled four newly localizable zoom-review assets and five preserve-original assets; no W00011 candidate DDS bytes were produced, so exact-HD reconstruction/zero-pixel static QA and final integrated runtime validation remain pending.",
       "user_approved_locked": 0,
-      "zoom_review_resolved_preserve_original": 19,
-      "queue_reconciled_at_kst": "2026-09-29T04:18:00+09:00"
+      "zoom_review_resolved_preserve_original": 28,
+      "queue_reconciled_at_kst": "2026-09-29T05:13:00+09:00"
     },
     "batch65_b_report": "localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json",
     "batch65_b_candidates": {
@@ -696,7 +696,41 @@
       },
       "cross_lane_qa": "NO_NEW_ASSET_APPROVALS_STATE_RECONCILED",
       "runtime_validation": "UNTESTED"
-    }
+    },
+    "latest_c_barrier": {
+      "run": "C96",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00037",
+      "wave_id": "W00011",
+      "result": "PASS_W00011_SYNC_4_PROMOTED_5_PRESERVE_NO_NEW_DDS_APPROVALS",
+      "approved_dds_count": 0,
+      "material_backlog_action": "RECONCILE_A00035_B00036_ZOOM_REVIEW_CLASSIFICATIONS_AND_RECONSTRUCTION_INPUTS",
+      "promoted_indices": [
+        36,
+        62,
+        217,
+        219
+      ],
+      "resolved_preserve_indices": [
+        166,
+        177,
+        178,
+        189,
+        191
+      ],
+      "reconstruction_input_indices": [
+        36,
+        62,
+        217,
+        219
+      ],
+      "semantic_correction": {
+        "217_START": "출발 (route-map context; aligns with index 63)"
+      },
+      "report": "localization/graphics/role_C/20260929-0513-C96/C96_W00011_SYNC_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "zoom_review_unresolved": 6,
+    "zoom_review_resolved_preserve_original": 28
   },
   "runtime_packages": {
     "k1": {

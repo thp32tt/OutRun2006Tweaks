@@ -35,7 +35,7 @@ index,path,text_detected,action,review_status,notes
 33,textures/load/spr_sprani_FLAG_RANK_Exst/FBCAB18D_1024x512.dds,maybe,zoom_review,visual_reviewed,
 34,textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds,yes,localize_text,visual_reviewed,W00010 B00033+C95: localizable UI text retained; exact HD reconstruction input/source identity advanced; candidate still pending exact decoded-pixel bbox QA
 35,textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds,yes,localize_text,visual_reviewed,W00008 C93 classification reconciled by W00009 C94: Total Rank confirmed localizable
-36,textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds,maybe,zoom_review,visual_reviewed,
+36,textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds,yes,localize_text,visual_reviewed,W00011 B00036+C96: Total Rank x3 confirmed localizable; source PNG/4x atlas Git identities revalidated; candidate pending exact decoded-pixel bbox QA
 37,textures/load/spr_sprani_JENN_RANK_Exst/515DCBB2_1024x1024.dds,maybe,zoom_review,visual_reviewed,
 38,textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds,maybe,zoom_review,visual_reviewed,
 39,textures/load/spr_sprani_common_cvt_xst/110B6849_256x256.dds,no,no_localization,visual_reviewed,
@@ -61,7 +61,7 @@ index,path,text_detected,action,review_status,notes
 59,textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds,yes,localize_text,visual_reviewed,
 60,textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds,yes,localize_text,visual_reviewed,
 61,textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds,yes,localize_text,visual_reviewed,
-62,textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds,maybe,zoom_review,visual_reviewed,
+62,textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds,yes,localize_text,visual_reviewed,W00011 B00036+C96: Diverge/Left/Right/HARD/EASY confirmed localizable; preserve road/arrows; candidate pending exact decoded-pixel mask QA
 63,textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds,yes,localize_text,visual_reviewed,
 64,textures/load/spr_sprani_loading_cvt_Exst/4E9FE840_32x512.dds,no,no_localization,visual_reviewed,
 65,textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds,yes,localize_text,visual_reviewed,
@@ -165,7 +165,7 @@ index,path,text_detected,action,review_status,notes
 163,textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds,yes,localize_text,visual_reviewed,
 164,textures/load/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds,yes,localize_text,visual_reviewed,
 165,textures/load/spr_sprani_sumo_fe_cvt_Exst/5C98F2_512x512.dds,no,zoom_review,visual_reviewed,W00010 A00032+C95 zoom review resolved: scenic/course-card artwork + protected OutRun2SP logo only; no localizable UI prose; preserve original
-166,textures/load/spr_sprani_sumo_fe_cvt_Exst/5EBD7FE8_1024x1024.dds,maybe,zoom_review,visual_reviewed,
+166,textures/load/spr_sprani_sumo_fe_cvt_Exst/5EBD7FE8_1024x1024.dds,no,zoom_review,visual_reviewed,W00011 B00036+C96 resolved: protected OutRun branding + song/track-title/credit album artwork only; preserve original
 167,textures/load/spr_sprani_sumo_fe_cvt_Exst/616FC97B_512x128.dds,no,no_localization,visual_reviewed,
 168,textures/load/spr_sprani_sumo_fe_cvt_Exst/633929F3_1024x512.dds,yes_preserve,preserve_brand_song_credit,visual_reviewed,
 169,textures/load/spr_sprani_sumo_fe_cvt_Exst/638F38C0_512x256.dds,no,zoom_review,visual_reviewed,W00010 A00032+C95 zoom review resolved: OutRun2/OutRun2SP logo collage + scenic cards + symbolic question mark only; no localizable UI prose; preserve original
@@ -176,8 +176,8 @@ index,path,text_detected,action,review_status,notes
 174,textures/load/spr_sprani_sumo_fe_cvt_Exst/73F852A4_512x512.dds,maybe,zoom_review,visual_reviewed,
 175,textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds,yes,localize_text,visual_reviewed,
 176,textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds,yes,localize_text,visual_reviewed,
-177,textures/load/spr_sprani_sumo_fe_cvt_Exst/7978907D_512x128.dds,maybe,zoom_review,visual_reviewed,
-178,textures/load/spr_sprani_sumo_fe_cvt_Exst/798A1E_1024x256.dds,maybe,zoom_review,visual_reviewed,
+177,textures/load/spr_sprani_sumo_fe_cvt_Exst/7978907D_512x128.dds,no,zoom_review,visual_reviewed,W00011 A00035+C96 resolved: protected OutRun2 album/soundtrack-cover artwork only; preserve original
+178,textures/load/spr_sprani_sumo_fe_cvt_Exst/798A1E_1024x256.dds,no,zoom_review,visual_reviewed,W00011 B00036+C96 resolved: protected OutRun2 music/album artwork only; preserve original
 179,textures/load/spr_sprani_sumo_fe_cvt_Exst/7A0DE345_256x256.dds,no,no_localization,visual_reviewed,
 180,textures/load/spr_sprani_sumo_fe_cvt_Exst/7ABD5110_1024x256.dds,maybe,zoom_review,visual_reviewed,
 181,textures/load/spr_sprani_sumo_fe_cvt_Exst/7B15E0D_256x256.dds,no,no_localization,visual_reviewed,
@@ -188,9 +188,9 @@ index,path,text_detected,action,review_status,notes
 186,textures/load/spr_sprani_sumo_fe_cvt_Exst/897570A3_512x128.dds,yes_preserve,preserve_brand_song_credit,visual_reviewed,
 187,textures/load/spr_sprani_sumo_fe_cvt_Exst/8A71F156_256x64.dds,yes_preserve,preserve_brand_song_credit,visual_reviewed,
 188,textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds,yes,localize_text,visual_reviewed,
-189,textures/load/spr_sprani_sumo_fe_cvt_Exst/8C9E91F8_512x512.dds,maybe,zoom_review,visual_reviewed,
+189,textures/load/spr_sprani_sumo_fe_cvt_Exst/8C9E91F8_512x512.dds,no,zoom_review,visual_reviewed,W00011 A00035+C96 resolved: protected OutRun2/OutRun2SP logo fragments + background only; preserve original
 190,textures/load/spr_sprani_sumo_fe_cvt_Exst/9459C3F3_256x256.dds,no,no_localization,visual_reviewed,
-191,textures/load/spr_sprani_sumo_fe_cvt_Exst/94BB6271_512x256.dds,maybe,zoom_review,visual_reviewed,
+191,textures/load/spr_sprani_sumo_fe_cvt_Exst/94BB6271_512x256.dds,no,zoom_review,visual_reviewed,W00011 A00035+C96 resolved: scenic/course-card + protected OutRun2SP logo only; preserve original
 192,textures/load/spr_sprani_sumo_fe_cvt_Exst/96F4DFEE_256x128.dds,yes_preserve,preserve_brand_song_credit,visual_reviewed,
 193,textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds,yes,localize_text,visual_reviewed,
 194,textures/load/spr_sprani_sumo_fe_cvt_Exst/9AC75730_512x512.dds,maybe,zoom_review,visual_reviewed,
@@ -216,9 +216,9 @@ index,path,text_detected,action,review_status,notes
 214,textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds,maybe,zoom_review,visual_reviewed,
 215,textures/load/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds,yes,localize_text,visual_reviewed,
 216,textures/load/spr_sprani_sumo_fe_cvt_Exst/C0E7DBE8_256x256.dds,no,no_localization,visual_reviewed,
-217,textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds,maybe,zoom_review,visual_reviewed,
+217,textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds,yes,localize_text,visual_reviewed,W00011 A00035+C96: route-map START/GOAL confirmed localizable; START canonicalized to 출발 for route-map context; candidate pending exact decoded-pixel bbox QA
 218,textures/load/spr_sprani_sumo_fe_cvt_Exst/D2065DF6_256x256.dds,no,no_localization,visual_reviewed,
-219,textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds,maybe,zoom_review,visual_reviewed,
+219,textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds,yes,localize_text,visual_reviewed,W00011 A00035+C96: COURSE SELECT confirmed localizable -> 코스 선택; candidate pending exact decoded-pixel bbox QA
 220,textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds,yes,localize_text,visual_reviewed,
 221,textures/load/spr_sprani_sumo_fe_cvt_Exst/D7392288_512x64.dds,no,no_localization,visual_reviewed,
 222,textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds,yes,localize_text,visual_reviewed,

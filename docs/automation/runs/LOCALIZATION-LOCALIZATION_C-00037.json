@@ -1,0 +1,59 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00037",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00011",
+  "recorded_at_kst": "2026-09-29T05:13:00+09:00",
+  "base_sha": "a893afd305acc016c2e9837187f57f113fc3078d",
+  "reconciliation_base_head_sha": "a893afd305acc016c2e9837187f57f113fc3078d",
+  "result": "PASS_W00011_SYNC_4_PROMOTED_5_PRESERVE_NO_NEW_DDS_APPROVALS",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED",
+  "summary": "C synchronized durable W00011 A00035/B00036 results, cross-checked pinned GitHub originals, promoted 36/62/217/219, resolved 166/177/178/189/191 preserve-original, reconciled canonical shared state, and added no DDS approval.",
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00035.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00036.json",
+    "localization/graphics/role_A/20260929-0504-A00035/A00035_W00011_ZOOM_REVIEW_RESOLUTION.json",
+    "localization/graphics/role_B/20260929-0503-B106/B106_W00011_ZOOM_REVIEW_RESOLUTION.json",
+    "localization/graphics/role_C/20260929-0513-C96/C96_W00011_SYNC_FINAL_QA.json",
+    "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754"
+  ],
+  "cross_lane_summary": {
+    "promoted": [
+      36,
+      62,
+      217,
+      219
+    ],
+    "preserve_original": [
+      166,
+      177,
+      178,
+      189,
+      191
+    ],
+    "source_png_blob_identity": "PASS_9_OF_9",
+    "atlas_blob_identity": "PASS_8_OF_8",
+    "semantic_correction_index_217": "START -> 출발"
+  },
+  "shared_state": {
+    "localize_text": 92,
+    "zoom_review": 34,
+    "zoom_review_unresolved": 6,
+    "zoom_review_resolved_preserve_original": 28,
+    "transcription_assets": 92,
+    "semantic_segments": 746,
+    "artwork_plan_assets": 92
+  },
+  "report": "localization/graphics/role_C/20260929-0513-C96/C96_W00011_SYNC_FINAL_QA.json",
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "Static C reconciliation complete. Remote post-commit workflows are pending at record creation; runtime remains UNTESTED."
+}

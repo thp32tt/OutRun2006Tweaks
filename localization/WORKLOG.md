@@ -1221,3 +1221,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - No build, N100/local clone, GPT Library, VR/FFB/DX work, or in-game test. `RUNTIME_VALIDATION=UNTESTED`.
 - Machine report: `localization/graphics/role_C/20260929-0445-C95/C95_W00010_SYNC_FINAL_QA.json`.
 
+## 2026-09-29 05:13 KST - W00011 C BARRIER + SHARED CLASSIFICATION MERGE (AUTO C-00037)
+- Refreshed GitHub-only `korean-localization-clean` at `a893afd305acc016c2e9837187f57f113fc3078d` after durable W00011 A00035/B00036 terminal commits. Localization State / Automation Gate / Domain Isolation Guard completed successfully on both exact lane task SHAs.
+- C independently matched all **9/9** pinned original-PNG Git blob identities and **8/8** recorded atlas Git blob identities at `Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754`, and visually cross-checked all nine source classifications.
+- Promoted to `localize_text / pending_artwork / transcribed_reviewed`: 36 `06AB5CEE` (Total Rank -> 종합 랭크), 62 `33491F83` (Diverge/Left/Right/HARD/EASY -> 분기/왼쪽/오른쪽/어려움/쉬움), 217 `D1039D6F` (START/GOAL -> 출발/골), 219 `D263B3F1` (COURSE SELECT -> 코스 선택).
+- C semantic correction: index 217 is a route-map marker, so A00035's `START -> 시작` proposal is canonicalized to `출발`, matching existing route-map index 63; this changes metadata only, not DDS bytes.
+- Resolved preserve-original: 166 `5EBD7FE8`, 177 `7978907D`, 178 `798A1E`, 189 `8C9E91F8`, 191 `94BB6271`. These contain protected OutRun2/OutRun2SP logos, music/album/song/credit typography, scenic/course art, or background fragments with no independent localizable UI prose.
+- Recomputed queue: **137 rows = 92 localize_text + 34 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only**. Unresolved zoom-review **15 -> 6**; resolved preserve-original zoom-review **23 -> 28**. Remaining unresolved indices: 38/202/206/210/214/238.
+- Canonical transcription and artwork planning are now **92 assets / 746 semantic segments** and their index sets are identical. Canonical `localization/progress/progress.json` and legacy `localization/progress.json` are written from identical bytes.
+- W00011 persisted **0 new/reworked Korean DDS bytes**. No clipping/1-pixel containment, DDS format/mipmap/alpha/transparency/orientation, background/artifact or ENGLISH SOURCE vs KOREAN CANDIDATE raster PASS is inferred; new approvals **0**, approved/locked DDS **0**.
+- No real-game test was performed by C: `RUNTIME_VALIDATION=UNTESTED`. No N100/local clone, GPT Library, VR/FFB/DX work, or game build was used.
+- Machine report: `localization/graphics/role_C/20260929-0513-C96/C96_W00011_SYNC_FINAL_QA.json`.

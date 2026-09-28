@@ -1,0 +1,168 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00037",
+  "attempt": "1/3",
+  "wave_id": "W00011",
+  "lane": "LOCALIZATION_C",
+  "role": "SYNCHRONIZATION_BARRIER_CROSS_LANE_FINAL_QA_SHARED_STATE_MERGE",
+  "recorded_at_kst": "2026-09-29T05:13:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "reconciliation_base_head_sha": "a893afd305acc016c2e9837187f57f113fc3078d",
+  "barrier_inputs": {
+    "lane_A": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00035",
+      "commit": "b43934d94af5d37e86b363841205c1e57bd061a4",
+      "result": "PASS_MATERIAL_FALLBACK_5_ZOOM_REVIEW_RESOLUTIONS_3_PRESERVE_2_LOCALIZABLE_REBUILD_SPECS",
+      "ci": {
+        "localization_state": 36476839694,
+        "automation_gate": 36476839697,
+        "domain_isolation_guard": 36476839717,
+        "all_conclusion": "success"
+      },
+      "runtime_validation": "UNTESTED"
+    },
+    "lane_B": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00036",
+      "commit": "a893afd305acc016c2e9837187f57f113fc3078d",
+      "result": "PASS_MATERIAL_FALLBACK_4_EVEN_ZOOM_REVIEW_RESOLUTIONS_2_LOCALIZABLE_REBUILD_INPUTS_2_PRESERVE",
+      "ci": {
+        "localization_state": 36477284368,
+        "automation_gate": 36477284390,
+        "domain_isolation_guard": 36477284286,
+        "all_conclusion": "success"
+      },
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "cross_lane_qa": {
+    "source_reference": "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "independent_original_png_blob_identity": "PASS_9_OF_9",
+    "independent_atlas_blob_identity": "PASS_8_OF_8",
+    "hd_dds_identity": "RETAINED_FROM_DURABLE_A_B_EVIDENCE_NO_CANDIDATE_WRITE",
+    "visual_classification": {
+      "promoted_localize_text": [
+        36,
+        62,
+        217,
+        219
+      ],
+      "preserve_original": [
+        166,
+        177,
+        178,
+        189,
+        191
+      ],
+      "observations": {
+        "36": "Three Total Rank labels are visible; rank grades, heart/icon, Jennifer art and flare remain protected artwork.",
+        "62": "Diverge/Left/Right and HARD/EASY labels are visible; road, arrows and icons remain protected artwork.",
+        "166": "Album/CD collage contains protected OutRun branding and song/track-title/credit artwork only.",
+        "177": "Album/soundtrack covers contain protected OutRun2 branding/music artwork only.",
+        "178": "Music/album panels contain protected OutRun2 branding/song-title artwork only.",
+        "189": "Only OutRun2/OutRun2SP logo fragments and background strips are present.",
+        "191": "Scenic/course cards contain protected OutRun2SP logos only.",
+        "217": "START/GOAL route-map labels are visible on one course card; OutRun2SP/scenic artwork is preserved.",
+        "219": "A standalone COURSE SELECT heading is visible; selector cards, logos and background are preserved."
+      }
+    },
+    "translations": {
+      "36": [
+        [
+          "Total Rank",
+          "종합 랭크"
+        ]
+      ],
+      "62": [
+        [
+          "Diverge",
+          "분기"
+        ],
+        [
+          "Left",
+          "왼쪽"
+        ],
+        [
+          "Right",
+          "오른쪽"
+        ],
+        [
+          "HARD",
+          "어려움"
+        ],
+        [
+          "EASY",
+          "쉬움"
+        ]
+      ],
+      "217": [
+        [
+          "START",
+          "출발"
+        ],
+        [
+          "GOAL",
+          "골"
+        ]
+      ],
+      "219": [
+        [
+          "COURSE SELECT",
+          "코스 선택"
+        ]
+      ]
+    },
+    "semantic_correction": "A00035 proposed START -> 시작 for index 217. C uses 출발 because this is a route-map START marker and existing route-map index 63 canonically uses START -> 출발; GOAL remains 골.",
+    "candidate_dds_modified": false,
+    "new_candidate_dds_bytes": 0,
+    "clipping_hangul_raster": "NOT_APPLICABLE_NO_NEW_CANDIDATE_BYTES",
+    "zero_pixel_containment": "NOT_CLAIMED_NO_NEW_CANDIDATE_BYTES",
+    "dds_format_mipmap_alpha_transparency_orientation": "UNCHANGED_NO_NEW_CANDIDATE_BYTES",
+    "background_wrong_replacement_hd_gui": "NO_CANDIDATE_WRITE_SOURCE_AND_PRESERVE_CLASSIFICATION_ONLY",
+    "mandatory_english_source_comparison_gate": "NOT_APPLICABLE_UNTIL_KOREAN_CANDIDATE_EXISTS",
+    "approvals_added": 0,
+    "approved_dds_count": 0
+  },
+  "shared_state_merge": {
+    "queue_rows": 137,
+    "queue_actions": {
+      "localize_text": 92,
+      "zoom_review": 34,
+      "font_pipeline": 9,
+      "hangul_name_entry": 1,
+      "preserve_brand_song_credit": 1
+    },
+    "zoom_review_unresolved": 6,
+    "zoom_review_resolved_preserve_original": 28,
+    "remaining_unresolved_zoom_review_indices": [
+      38,
+      202,
+      206,
+      210,
+      214,
+      238
+    ],
+    "transcription_assets": 92,
+    "transcription_semantic_segments": 746,
+    "artwork_plan_assets": 92,
+    "artwork_plan_segments": 746,
+    "visual_action_counts": {
+      "no_localization": 74,
+      "localize_text": 92,
+      "font_pipeline": 9,
+      "hangul_name_entry": 1,
+      "zoom_review": 34,
+      "preserve_brand_song_credit": 33
+    },
+    "canonical_progress_and_legacy_mirror_identical": true,
+    "strict_pending_production_localize_text": 76
+  },
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00011 C completed the synchronization barrier and cross-lane final QA. Four zoom-review assets are promoted with canonical transcription/artwork planning, five are resolved preserve-original, shared state is reconciled, and no DDS bytes or approvals were introduced. Runtime remains UNTESTED."
+}

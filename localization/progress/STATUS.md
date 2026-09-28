@@ -766,3 +766,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - `RUNTIME_VALIDATION=UNTESTED`
 - Report: `localization/graphics/role_C/20260929-0445-C95/C95_W00010_SYNC_FINAL_QA.json`
 
+### C96 W00011 synchronization barrier — 2026-09-29T05:13:00+09:00
+- Barrier gate: PASS. A00035 `b43934d94af5d37e86b363841205c1e57bd061a4` and B00036 `a893afd305acc016c2e9837187f57f113fc3078d` are durable in current HEAD ancestry; Localization State / Automation Gate / Domain Isolation Guard succeeded on both exact lane commits.
+- GitHub-only cross-lane source QA: 9/9 original PNG blob identities and 8/8 atlas identities matched the pinned upstream source; visual classifications were independently confirmed.
+- Promoted: 36/62/217/219. Preserve-original resolved: 166/177/178/189/191. Index 217 route-map START is canonicalized to `출발` (existing route-map index 63 context); GOAL remains `골`.
+- Queue: 137 rows = **92 localize_text / 34 zoom_review / 9 font / 1 Hangul name-entry / 1 preserve-only**; unresolved zoom-review **6**, resolved preserve-original **28**. Transcription/artwork plan: **92 assets / 746 semantic segments**.
+- Candidate DDS writes: **0**. New static approvals: **0**. Pixel containment/clipping and DDS format/mipmap/alpha/background/orientation/source-vs-candidate raster promotion are NOT_APPLICABLE for this wave because no candidate bytes changed.
+- `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
+- `RUNTIME_VALIDATION=UNTESTED`
+- Report: `localization/graphics/role_C/20260929-0513-C96/C96_W00011_SYNC_FINAL_QA.json`
