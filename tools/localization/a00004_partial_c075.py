@@ -52,26 +52,35 @@ src=rgba(sb,w,h).transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 before=rgba(cb,w,h).transpose(Image.Transpose.FLIP_TOP_BOTTOM); after=before.copy()
 recs=[]
 
-# These three cells are visually confirmed independent text-only regions in the
-# existing B88/C82 readable evidence. Require alpha bbox agreement before editing;
-# otherwise abort before any candidate write.
+# Existing B88/C82 readable evidence confirms these are visually isolated text
+# overlays, but their sprite cells can contain unrelated canonical alpha. Operate only
+# on the C85 localized foreground rectangle, and use that patch's own alpha mask.
 for key in SAFE_KEYS:
     r=next(x for x in rows if x["key"]==key); old=r["localized_bbox"]; orig=r["original_bbox"]
-    actual_before=alpha_bbox(before,r["sprite_cell"])
-    if actual_before!=old:
-        raise SystemExit(f"{key}: text-only alpha precondition mismatch {actual_before} != {old}")
     x0,y0,x1,y1=old; t=amap[key]["new_localized_bbox"]; tx0,ty0,tx1,ty1=t
     patch=before.crop((x0,y0,x1+1,y1+1))
-    after.paste((0,0,0,0),(x0,y0,x1+1,y1+1))
+    pmask=patch.getchannel("A")
+    pb=pmask.getbbox()
+    if pb is None:
+        raise SystemExit(f"{key}: empty localized patch")
+    # C85 localized_bbox is a tight foreground envelope; require alpha on every
+    # envelope edge before treating this rectangle as the Korean foreground patch.
+    if pb!=(0,0,patch.width,patch.height):
+        raise SystemExit(f"{key}: localized patch not tight {pb} vs {(0,0,patch.width,patch.height)}")
+    # Remove only pixels belonging to this foreground patch; do not clear unrelated
+    # alpha elsewhere in the sprite cell.
+    after.paste((0,0,0,0),(x0,y0,x1+1,y1+1),pmask)
+    transformed=patch
     if patch.size!=(tx1-tx0+1,ty1-ty0+1):
-        patch=patch.resize((tx1-tx0+1,ty1-ty0+1),Image.Resampling.LANCZOS)
-    after.alpha_composite(patch,(tx0,ty0))
-    ab=alpha_bbox(after,r["sprite_cell"])
+        transformed=patch.resize((tx1-tx0+1,ty1-ty0+1),Image.Resampling.LANCZOS)
+    after.alpha_composite(transformed,(tx0,ty0))
+    ab0=transformed.getchannel("A").getbbox()
+    ab=None if ab0 is None else [tx0+ab0[0],ty0+ab0[1],tx0+ab0[2]-1,ty0+ab0[3]-1]
     if not inside(ab,orig):
-        raise SystemExit(f"{key}: post alpha bbox {ab} outside {orig}")
-    recs.append({"key":key,"method":"isolated_text_patch_fit","before_bbox":old,"target_bbox":t,
-                 "post_alpha_bbox":ab,"containment":"PASS",
-                 "scale_x":round((tx1-tx0+1)/(x1-x0+1),6),"scale_y":round((ty1-ty0+1)/(y1-y0+1),6)})
+        raise SystemExit(f"{key}: transformed foreground bbox {ab} outside {orig}")
+    recs.append({"key":key,"method":"c85_foreground_patch_alpha_fit","before_bbox":old,"target_bbox":t,
+                 "post_foreground_bbox":ab,"containment":"PASS",
+                 "scale_x":round(transformed.width/patch.width,6),"scale_y":round(transformed.height/patch.height,6)})
 
 touch=mk_mask((w,h),[next(x for x in rows if x["key"]==k)["sprite_cell"] for k in SAFE_KEYS])
 changed=diffmask(before,after)
