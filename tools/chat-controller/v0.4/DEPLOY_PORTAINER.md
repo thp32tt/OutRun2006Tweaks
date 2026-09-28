@@ -147,3 +147,16 @@ MAX_TASK_ATTEMPTS=3
 `STRICT_THINKING_LEVEL=true` is mandatory for automated sends. If High cannot be positively verified in the ChatGPT UI, the controller must block that send instead of falling back to another thinking level.
 
 If Portainer does not auto-pull Git changes, use **Pull and redeploy** for each stack after this controller update.
+
+## Localization parallel waves
+
+When `LOCALIZATION_PARALLEL=true`, the localization controller uses a wave barrier:
+
+1. Lane A starts on the odd-index asset_queue shard.
+2. Lane B starts after `PARALLEL_LANE_STAGGER_SECONDS` (default 60s) on the even-index shard.
+3. A and B run concurrently in separate project chats and may not modify shared resume/worklog/progress/asset_queue state.
+4. Each lane is completed by locating its exact `[AUTO:<TASK_ID>]` commit in branch history and validating GitHub Actions for that exact SHA; branch HEAD may belong to the peer lane and is not used as the lane completion identity.
+5. After both production lanes reach a durable terminal result, C starts as the synchronization barrier, performs cross-lane final QA, and reconciles shared state.
+6. After C is terminal, the next A+B wave begins.
+
+The existing single-active queue state is migrated on first startup: an in-flight A/B task becomes that lane of the first parallel wave, and the missing peer lane is dispatched without discarding the existing task.
