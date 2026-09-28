@@ -987,5 +987,7 @@
   "local_clone_used": false,
   "gpt_library_used": false,
   "vr_ffb_dx_changes": false,
-  "conclusion": "W00014 lane B materially advanced four unfinished even-shard localize_text assets with exact pinned GitHub source identities and semantic-to-atlas reconstruction constraints. No DDS bytes were guessed or promoted; zero-pixel, DDS/alpha/orientation raster gates remain HOLD/NO-WRITE until exact HD decoding and a Korean candidate exist. Runtime remains UNTESTED."
+  "conclusion": "W00014 lane B materially advanced four unfinished even-shard localize_text assets with exact pinned GitHub source identities and semantic-to-atlas reconstruction constraints. No DDS bytes were guessed or promoted; zero-pixel, DDS/alpha/orientation raster gates remain HOLD/NO-WRITE until exact HD decoding and a Korean candidate exist. Runtime remains UNTESTED.",
+  "automation_validation": "PASS_STATIC_PRECOMMIT_REMOTE_POSTCOMMIT_PENDING",
+  "runtime_validation": "UNTESTED"
 }
