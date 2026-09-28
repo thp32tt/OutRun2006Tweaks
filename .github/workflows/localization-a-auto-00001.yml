@@ -1,8 +1,6 @@
 name: Localization A AUTO 00001 FF2462BB Exact BBox Rework
 on:
-  push:
-    branches: [korean-localization-clean]
-    paths: ['docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00001.json']
+  workflow_dispatch:
 permissions:
   contents: write
 concurrency:
