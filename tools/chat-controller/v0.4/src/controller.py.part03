@@ -266,6 +266,18 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             return
         text = await last_assistant_text(page)
         if not text:
+            sent_at = _parse_iso(active.get("sent_at")) or now
+            if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
+                return
+            reason = (
+                "No assistant response was detected before the queue result grace period expired; "
+                "the active chat may be stale, hidden, or failed before generation started."
+            )
+            if await queue_rollover_chat(context, pages, active, reason):
+                save_queue_state(q)
+                return
+            if active.get("phase") == "BLOCKED":
+                save_queue_state(q)
             return
         h = stable_hash(text)
         changed_at = _parse_iso(active.get("last_hash_changed_at")) or now
