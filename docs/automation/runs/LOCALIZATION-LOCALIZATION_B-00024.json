@@ -1,0 +1,66 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00024",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00007",
+  "recorded_at_kst": "2026-09-29T02:40:00+09:00",
+  "initial_head_sha": "bd99a3726927033658a52f6ec6b7c2c808e6dea7",
+  "final_precommit_head_sha": "ef10cf5f43c23368eb0ecd7b3a62771f556358fd",
+  "report_commit_sha": "ef10cf5f43c23368eb0ecd7b3a62771f556358fd",
+  "preserved_intervening_head": true,
+  "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_ITEMS_RESOLVED_PRESERVE_ORIGINAL",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "scope": "GitHub-only lane B even-index primary shard; current runnable DDS rework dependencies were not speculatively rewritten; mandatory fallback ladder step 2 resolved four unfinished zoom_review assets as preserve-original/no-localizable-text; no work stealing and no shared-state mutation.",
+  "report": "localization/graphics/role_B/20260929-0240-B101/B101_W00007_ZOOM_REVIEW_RESOLUTION.json",
+  "material_deliverable": {
+    "type": "MACHINE_READABLE_ZOOM_REVIEW_RESOLUTION",
+    "resolved_indices": [
+      150,
+      174,
+      180,
+      194
+    ],
+    "assets": [
+      "40A4D914",
+      "73F852A4",
+      "7ABD5110",
+      "9AC75730"
+    ],
+    "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+    "unresolved_even_zoom_review_before": 22,
+    "lane_local_unresolved_even_zoom_review_after": 18,
+    "candidate_dds_modified": false,
+    "c_merge_required": true
+  },
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_or_materially_advanced_assets": [
+    "40A4D914",
+    "73F852A4",
+    "7ABD5110",
+    "9AC75730"
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "peer_lane": {
+    "task_id": "LOCALIZATION-LOCALIZATION_A-00023",
+    "terminal_record_present_at_final_precommit_refresh": false,
+    "action": "NO_WAIT_OR_WORK_STEAL; lane B stayed on even primary shard."
+  },
+  "conclusion": "W00007 lane B satisfies the minimum-progress contract with four new machine-readable zoom-review resolutions. Indices 150, 174, 180 and 194 contain only non-text artwork plus protected OutRun2/OutRun2SP logos in the decoded GitHub source references; no Korean raster replacement is required. C must reconcile the shared queue. Runtime remains UNTESTED.",
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/ORIENTATION_POLICY.md",
+    "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "localization/graphics/role_B/20260929-0240-B101/B101_W00007_ZOOM_REVIEW_RESOLUTION.json"
+  ]
+}
