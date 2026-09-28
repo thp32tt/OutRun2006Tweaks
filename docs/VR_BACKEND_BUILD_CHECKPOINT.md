@@ -13,3 +13,5 @@ Required behavior:
 
 Checkpoint refresh: one-run census JSON extraction + resource/declaration/FFP census + runtime preflight.
 
+Final one-run packaging checkpoint: machine-readable DX11 census summary wired into the diagnostic ZIP.
+
