@@ -1397,6 +1397,31 @@ class VRHudQueueSemanticBridge : public Hook
 	{
 		OutRunVR::GameSemantic::SelectSpriteQueueNode(
 			reinterpret_cast<const void*>(ctx.edi));
+
+		// V7 OutRun-mode HMD evidence: the final GOAL presentation uses a
+		// separate canonical SpriteNode path from the R65/R66 TimeAttack goal
+		// producers. In the captured OutRun session every unowned GOAL node was
+		// generic 2D queue content and the old GoalTime hooks never fired.
+		// Promote only this state-local unowned queue content; exact producer
+		// tags still win before this fallback is considered.
+		if (Game::current_mode &&
+			*Game::current_mode == STATE_GOAL &&
+			OutRunVR::GameSemantic::CurrentScope ==
+				OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D)
+		{
+			OutRunVR::GameSemantic::CurrentScope =
+				OutRunVR::GameSemantic::RenderScope::ScreenHud;
+			OutRunVR::GameSemantic::CurrentQueueExactScope =
+				OutRunVR::GameSemantic::RenderScope::ScreenHud;
+
+			static std::atomic<std::uint64_t> goalFallbackHits{ 0 };
+			const auto hit = goalFallbackHits.fetch_add(
+				1, std::memory_order_relaxed) + 1;
+			if ((hit & (hit - 1)) == 0)
+				spdlog::info(
+					"VR V7 OUTRUN GOAL HUD: state-local unowned SpriteNode promoted to SCREEN_HUD hits={}",
+					hit);
+		}
 	}
 
 	static void QueueEnd(SafetyHookContext&)
