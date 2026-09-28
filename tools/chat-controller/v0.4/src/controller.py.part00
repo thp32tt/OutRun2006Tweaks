@@ -52,6 +52,7 @@ QUEUE_CHECK_SECONDS = max(10, int(os.getenv("QUEUE_CHECK_SECONDS", "15")))
 QUEUE_STABLE_SECONDS = max(10, int(os.getenv("QUEUE_STABLE_SECONDS", "30")))
 QUEUE_RESULT_GRACE_SECONDS = max(30, int(os.getenv("QUEUE_RESULT_GRACE_SECONDS", "180")))
 GITHUB_POLL_SECONDS = max(60, int(os.getenv("GITHUB_POLL_SECONDS", "180")))
+QUEUE_NEXT_TASK_DELAY_SECONDS = max(0, int(os.getenv("QUEUE_NEXT_TASK_DELAY_SECONDS", "180")))
 MAX_TASK_ATTEMPTS = max(1, int(os.getenv("MAX_TASK_ATTEMPTS", "3")))
 CONVERSATION_ROLLOVER_ENABLED = os.getenv("CONVERSATION_ROLLOVER_ENABLED", "true").lower() == "true"
 MAX_CHAT_ROLLOVERS_PER_TASK = max(1, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "5")))
@@ -208,6 +209,7 @@ runtime = {
     "queue_check_seconds": QUEUE_CHECK_SECONDS,
     "queue_stable_seconds": QUEUE_STABLE_SECONDS,
     "github_poll_seconds": GITHUB_POLL_SECONDS,
+    "queue_next_task_delay_seconds": QUEUE_NEXT_TASK_DELAY_SECONDS,
     "max_task_attempts": MAX_TASK_ATTEMPTS,
     "conversation_rollover_enabled": CONVERSATION_ROLLOVER_ENABLED,
     "max_chat_rollovers_per_task": MAX_CHAT_ROLLOVERS_PER_TASK,
