@@ -1,17 +1,17 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-title OutRun 2006 VR - R69 One Click Test
+title OutRun 2006 VR - R69 V7 UI Test
 
 cls
 echo ============================================================
-echo  OUTRUN 2006 VR R69 TEST
+echo  OUTRUN 2006 VR R69 V7 UI TEST
 echo  THIS IS THE ONLY FILE YOU NEED TO RUN.
 echo ============================================================
 echo.
 echo  Mode: DX9Ex + D3D11 OpenXR host
 echo  Profile: CORRECTNESS
-echo  Fix focus: world rank, menu/finish text, selector/start shadow, stage sky transition
+echo  Fix focus: washed UI/glow ordering, OutRun menu arrows, checkpoint/result HUD
 echo.
 echo  The game will start automatically.
 echo  After you exit the game, logs will be collected automatically.
@@ -33,7 +33,7 @@ for %%F in (
   if exist "%%~F" del /q "%%~F" >nul 2>&1
 )
 
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Select-OutRunVRBackend.ps1" -Backend d3d9 -TestProfile CORRECTNESS -VariantId R69_FIXPACK
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Select-OutRunVRBackend.ps1" -Backend d3d9 -TestProfile CORRECTNESS -VariantId R69_V7_UIFIX
 if errorlevel 1 goto :failed
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Run-OutRunVRTest.ps1" -TestProfile CORRECTNESS
