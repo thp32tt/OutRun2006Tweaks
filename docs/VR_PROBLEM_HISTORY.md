@@ -108,3 +108,14 @@ Task `CONVERSION-DXVK-00017` added a CI-only contract for the host-owned DXVK sh
 The first gate `36461911548` and follow-up `36462121987` exposed verifier-only false failures (an occurrence-count assumption and a comment-text marker). Those were replaced with concrete allocation and control-flow markers; no transport behavior was weakened. Final exact SHA `561f2fee1d000eee2334fc45e08e8b199ec063bc` passed Backend Conversion Gate `36462406084`, Build `36462414296`, OpenXR architecture `36462414281`, and HUD Inspector `36462414245`.
 
 This is **AUTOMATION_VERIFIED / RUNTIME UNTESTED**. The underlying `VR-DXVK-D3D9EX-SHARED-HANDLE-001` remains OPEN. Quest 3 / VDXR evidence is still required for DirectFrames, fallback reduction, pacing recovery and visual/startup regression checks.
+
+
+## 2026-09-29 — DXVK runtime evidence exact-build identity gate
+
+Task `CONVERSION-DXVK-00019` hardened evidence attribution for the pending host-owned DXVK runtime gate. The collector already places `session_manifest.json`, `BUILD_INPUTS.json`, and `VR_ONE_CLICK_PREFLIGHT.json` in the analysis bundle; the automatic analyzer now cross-checks their source SHA and backend identities before allowing an exact-build interpretation.
+
+A concrete identity mismatch has higher precedence than apparent DirectGPU success and reports `DXVK_BUILD_IDENTITY_MISMATCH`. Missing optional metadata is reported as incomplete rather than falsely mismatched, so older/manual bundles remain analyzable but lower-confidence.
+
+Initial gate `36465739251` exposed a new-test ordering error under PowerShell StrictMode; no runtime code failed. Final source `ffebc679e30c0f742953c02e7b961f79ead6ea37` corrected the calculation order and passed Backend Conversion Gate `36465995809`, Build `36466003756`, OpenXR architecture `36466003736`, and HUD Inspector `36466003758`.
+
+This is **AUTOMATION_VERIFIED / RUNTIME UNTESTED**. The underlying `VR-DXVK-D3D9EX-SHARED-HANDLE-001` remains OPEN; future Quest 3 / VDXR evidence must first have `BuildIdentityVerified=true`, then separately prove host-owned DirectGPU frames, fallback reduction, pacing recovery and visual/startup safety.

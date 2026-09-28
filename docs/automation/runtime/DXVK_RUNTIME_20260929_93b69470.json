@@ -129,5 +129,15 @@
     "verifier": "tools/verify_dxvk_host_owned_transport_contract.py",
     "runtime_validation": "UNTESTED",
     "interpretation": "Static synchronization/lifetime inheritance is guarded, but this does not prove the DXVK host-owned transport opens or performs correctly on Quest3/VDXR."
+  },
+  "runtime_evidence_identity_gate": {
+    "task_id": "CONVERSION-DXVK-00019",
+    "result_sha": "ffebc679e30c0f742953c02e7b961f79ead6ea37",
+    "automation_validation": "PASS",
+    "validation_run_id": 36465995809,
+    "runtime_validation": "UNTESTED",
+    "success_evidence_precondition": "For future exact-build DXVK HMD evidence, BuildIdentityVerified must be true before DirectGPU/pacing results are attributed to a source SHA.",
+    "fail_closed_status": "DXVK_BUILD_IDENTITY_MISMATCH",
+    "incomplete_flag": "DXVK_BUILD_IDENTITY_INCOMPLETE"
   }
 }

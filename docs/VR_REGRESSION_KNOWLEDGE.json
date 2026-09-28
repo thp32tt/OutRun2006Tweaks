@@ -489,6 +489,24 @@
         ],
         "review_basis": "VR_BACKEND_100_REVIEW_SET_07 S07-R01..R09",
         "runtime_problem_status_unchanged": true
+      },
+      "runtimeEvidenceIdentityGate": {
+        "status": "AUTOMATION_VERIFIED",
+        "task_id": "CONVERSION-DXVK-00019",
+        "result_sha": "ffebc679e30c0f742953c02e7b961f79ead6ea37",
+        "validation_run_id": 36465995809,
+        "fields": [
+          "BuildIdentityComplete",
+          "BuildIdentityVerified",
+          "BuildIdentityMismatch",
+          "BuildIdentityIssues",
+          "BuildInputSourceSha",
+          "PreflightSourceSha",
+          "BuildInputBackend",
+          "PreflightBackend"
+        ],
+        "rule": "Concrete session/build/preflight source or backend mismatch overrides apparent DXVK DirectGPU success as DXVK_BUILD_IDENTITY_MISMATCH. Missing optional evidence is incomplete, not mismatch.",
+        "runtime_problem_status_unchanged": true
       }
     }
   ],
