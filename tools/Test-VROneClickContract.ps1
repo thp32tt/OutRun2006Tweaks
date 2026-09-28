@@ -9,6 +9,7 @@ if (!(Test-Path $targetPath)) { throw "Missing one-click target metadata: $targe
 $parseFiles = @(
     'Invoke-OutRunVROneClick.ps1',
     'Test-OutRunVROneClickPreflight.ps1',
+    'analyze_dx11_census.py',
     'Select-OutRunVRBackend.ps1',
     'Run-OutRunVRTest.ps1',
     'OutRunVR-Test-Selector.ps1',
@@ -109,6 +110,15 @@ switch ([string]$target.RendererTarget) {
             $launcher = Get-Content (Join-Path $toolsRoot 'Invoke-OutRunVROneClick.ps1') -Raw
             if ($launcher -notmatch [regex]::Escape($requiredText)) {
                 throw "DX11 one-click census activation missing: $requiredText"
+            }
+        }
+        $collectorDx11 = Get-Content (Join-Path $toolsRoot 'Collect-OutRunVRLogs.ps1') -Raw
+        foreach ($requiredText in @(
+            'analyze_dx11_census.py',
+            'DX11_CENSUS_SUMMARY.json'
+        )) {
+            if ($collectorDx11 -notmatch [regex]::Escape($requiredText)) {
+                throw "DX11 collector census extraction missing: $requiredText"
             }
         }
         foreach ($path in @(
