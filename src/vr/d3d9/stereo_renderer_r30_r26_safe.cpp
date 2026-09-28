@@ -466,6 +466,13 @@ namespace OutRunVRStereo
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
                 auto [it, inserted] =
                     R30VertexShadows.emplace(buffer, entry);
+                // A concurrent release can rebuild the Bloom while this
+                // registration is waiting for the registry mutex. Republish
+                // the definitive bit while holding the mutex so the inserted
+                // entry cannot become invisible to subsequent Lock hooks.
+                R30TrackedVertexBloom.fetch_or(
+                    R30ShadowBloomBit(buffer),
+                    std::memory_order_release);
                 if (inserted)
                     R30ShadowRegistryGeneration.fetch_add(
                         1, std::memory_order_release);
@@ -503,6 +510,9 @@ namespace OutRunVRStereo
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
                 auto [it, inserted] =
                     R30IndexShadows.emplace(buffer, entry);
+                R30TrackedIndexBloom.fetch_or(
+                    R30ShadowBloomBit(buffer),
+                    std::memory_order_release);
                 if (inserted)
                     R30ShadowRegistryGeneration.fetch_add(
                         1, std::memory_order_release);
