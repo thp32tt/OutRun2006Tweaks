@@ -19,6 +19,8 @@ Helper selectors remain diagnostic tools, not alternate setup instructions.
 START_HERE_VR_TEST.cmd
   -> Invoke-OutRunVROneClick.ps1
   -> VR_ONE_CLICK_TARGET.json
+  -> Test-OutRunVROneClickPreflight.ps1
+       -> VR_ONE_CLICK_PREFLIGHT.json
   -> Select-OutRunVRBackend.ps1
   -> Run-OutRunVRTest.ps1
   -> OR2006C2C.EXE
@@ -104,3 +106,7 @@ option arrows, goal/time/name, vehicle rank markers, Reset and recenter.
 
 Unknown or unsupported rendering always falls back/fails closed until its game
 provenance and translation are known.
+
+## Runtime preflight identity
+
+Before the selector mutates any root payload, the launcher verifies the x86 game EXE, x86 game VR DLL, x64 OpenXR host, source SHA and INI identity. DXVK runs additionally require the pinned x86 provider version and SHA-256 to match branch metadata. The resulting `VR_ONE_CLICK_PREFLIGHT.json` is copied into the diagnostic ZIP so every one-click run has an exact executable/provider identity record.
