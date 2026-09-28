@@ -54,8 +54,9 @@ Each set contains ten distinct review passes and derives the next set's directio
 - Exact-build Quest 3 two-pass visual parity is still required.
 
 ### E. Performance evidence
-- DX11/DXVK SAFE currently use fixed conservative 60-Hz/cadence-off arguments rather than profile-equivalent settings.
-- HUD inspector/shader fingerprint/DX11 census make current sessions diagnostic, not clean benchmarks.
+- **DXVK SAFE clean-profile infrastructure closed 2026-09-28:** `dxvk-safe + PERFORMANCE` now consumes the canonical PERFORMANCE cadence policy, explicitly forces `HudInspector=false`, and disables shader fingerprinting while preserving DXVK provider/runtime-version logging. Source result `27bd1e89bdac1d547bd9994eb5ea51901d08d81a`; Build `36414470101`, OpenXR `36414470068`, and HUD Inspector `36414470078` PASS on validation checkpoint `d288dec167dc770db2ff2f2264b9781acded5929`.
+- DX11 performance methodology remains open because DX11 profile equivalence and census/fingerprint benchmark isolation are not closed by this DXVK-only task.
+- DXVK runtime/performance verdict remains **UNTESTED** until an exact-build Quest 3/VDXR same-scene PERFORMANCE run is available.
 - R32 ACK polling/pressure-only Flush policy is accepted.
 
 ### F. Diagnostics / CI
@@ -73,7 +74,7 @@ Each set contains ten distinct review passes and derives the next set's directio
 4. Tighten DX11 census/activation gates and transport parity.
 5. **PROVENANCE/VERSION/LIFECYCLE DONE 2026-09-28:** F24 runtime-version attestation, F08/F09 archive/cache/package-provider provenance, and F12 device-recreation provider/capability re-attestation are enforced and gate-tested. Hardware visual/runtime validation is still required.
 6. Obtain stock DXVK SAFE and DX11 observation one-run Quest 3 evidence.
-7. Separate clean performance profiles from discovery instrumentation.
+7. **DXVK SAFE portion DONE 2026-09-28:** clean PERFORMANCE cadence/instrumentation isolation is implemented and automatically validated. DX11 methodology remains open, and DXVK performance conclusions still require exact-build Quest 3/VDXR runtime evidence.
 8. Only after graphics/lifecycle gates close, consider DXVK multiview or native DX11 draw ownership promotion.
 
 The detailed reasoning, evidence and per-pass results remain in Set 01 through Set 10.
