@@ -66,18 +66,29 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 - C does not use parity sharding and reviews both lanes.
 
 ## Throughput rule
-- A/B are batch producers, not single-asset/blocker checkers. Default production goal is up to 4 newly created or materially reworked DDS candidates per lane per invocation, continuing until the goal is reached, tool/runtime budget is exhausted, or that lane has no runnable asset.
+- A/B are batch producers, not single-asset/blocker checkers. Default production goal is up to 4 newly created or materially reworked DDS candidates per lane per invocation. A production invocation MUST NOT terminate with zero material output unless the entire graphics queue is complete.
 - A blocked REWORK item MUST NOT terminate a lane while another independent runnable item exists in that lane. Record/retain the blocker, skip it immediately, and continue to the next runnable REWORK/localize_text/zoom_review item.
 - A blocker with unchanged dependency inputs MUST NOT be re-reviewed every wave. Treat it as dependency-blocked until at least one dependency fingerprint changes: source DDS/blob SHA, candidate SHA, transcription/artwork input, runtime/in-game evidence, QA contract, or explicit user instruction.
 - Runtime/in-game isolation is asset-local. Existing candidates that require isolated DDS_ONLY testing belong to a separate validation backlog and MUST NOT block production of unrelated pending DDS assets.
 - Persist completed production batches and machine-readable self-QA evidence to Git so the next invocation can resume from repository state alone.
+- Minimum progress contract: every A/B invocation must commit at least one material deliverable that advances an unfinished asset. A repeated blocker report, unchanged task record, note-only worklog entry, empty commit, timestamp-only change, or re-review of identical evidence does NOT count.
+- If no safe candidate DDS can be produced immediately, use the fallback ladder below and keep working until at least one material deliverable exists.
 - Do not require Docker/controller configuration changes for workflow-rule changes; modify this Git contract/state instead.
 
+## Mandatory fallback ladder when DDS production is blocked
+When the current candidate cannot safely be rewritten, do not end the run. Select the first applicable action below on another unfinished asset in the lane:
+1. Produce/rework the next runnable `localize_text` DDS candidate and self-QA it.
+2. Resolve an unfinished `zoom_review` asset: positively classify whether it contains localizable text; if yes, produce a candidate when safe; if no, record machine-readable evidence that removes it from the unresolved review backlog.
+3. For an existing candidate awaiting runtime isolation, create a concrete single-DDS isolation deliverable: deterministic package manifest/input set and exact candidate/source hashes sufficient for the controller/package workflow to build or test that DDS alone. Do not mark runtime PASS without a real game test.
+4. For a source-faithful reconstruction blocker, create new reconstruction input that did not previously exist: per-element source bbox/alpha/style metrics, translated text/layout spec, source/candidate hashes, or deterministic render/rebuild spec/tool output that makes the next safe DDS rewrite actionable.
+5. If a QA/tooling deficiency is the blocker, add or improve deterministic asset-specific QA/rebuild tooling and produce its machine-readable output for at least one unfinished DDS.
+A fallback deliverable must materially reduce unresolved work or create new executable/reproducible input for the next production step. Generic prose saying why work is blocked is not a deliverable.
+
 ## No-action suppression and C batching
-- Repeated no-action waves are forbidden when they only reproduce an already-recorded blocker with identical dependency inputs.
-- If a lane has no runnable production after applying dependency-blocked skips, it may reuse the existing blocker state instead of creating another blocker-only production cycle unless a unique controller TASK_ID contract requires a durable terminal record. Such a required record must be minimal and must not trigger speculative DDS rewrites.
+- Repeated no-action waves are forbidden. A/B terminal results named `NO_ACTION`, `BLOCKED_NO_ACTION`, or equivalent zero-output states are invalid while any graphics work remains.
+- If a lane has no immediately runnable DDS after dependency-blocked skips, it MUST execute the mandatory fallback ladder and commit a material deliverable. A unique controller TASK_ID still requires its durable task record, but that record must accompany the material deliverable rather than replace it.
 - C final QA is batch-oriented. C should review all new/changed A+B candidate DDS SHAs from the wave together and reconcile shared state once per productive batch.
-- Do not schedule a C barrier solely because A/B repeated the same no-change blocker state. If neither lane produced new candidate bytes nor new material QA/runtime evidence, advance directly to the next runnable production opportunity or wait for the missing dependency.
+- Do not schedule a C barrier solely for repeated no-change blocker state. Under the minimum progress contract A/B should instead produce fallback deliverables. If C is nevertheless invoked with no new A/B candidate bytes, C must perform at least one material backlog action (for example, finalize a newly produced fallback artifact, create one single-DDS isolation input set, or make a concrete QA/fix change) rather than commit a no-op barrier report.
 - A productive wave is one where at least one lane creates/materially reworks candidate DDS bytes or adds material new QA/runtime evidence that changes an asset's eligibility/state.
 
 ## State and completion

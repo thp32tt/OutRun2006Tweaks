@@ -37,8 +37,11 @@ Each task must update or add a durable record under `docs/automation/runs/` cont
 - Maximum automatic repair attempts: 3 per asset for the same dependency/input fingerprint.
 - After 3 failed attempts, record the blocker and immediately move to another independent runnable asset in the same lane/run.
 - Do not retry that blocker in later waves until its dependency fingerprint changes (source/candidate bytes, runtime evidence, relevant QA input/contract, or explicit user instruction).
-- A/B should batch up to 4 newly created or materially reworked DDS candidates per lane per invocation when runnable work exists.
+- A/B should batch up to 4 newly created or materially reworked DDS candidates per lane per invocation and MUST produce at least one material deliverable while unfinished graphics work remains.
+- Zero-output terminals such as NO_ACTION/BLOCKED_NO_ACTION are invalid while unfinished graphics work remains.
+- If no safe DDS rewrite is currently possible, create a material fallback deliverable: resolve a zoom-review classification, create a single-DDS isolation manifest/input set with exact hashes, create new per-element reconstruction metrics/specs, or add deterministic asset-specific rebuild/QA tooling plus new machine-readable output.
+- Generic blocker prose, an unchanged task record, timestamps, worklog-only edits, and empty commits do not count as progress.
 - Existing runtime-isolation candidates are a separate validation backlog; they block only themselves, not unrelated graphics production.
-- Do not spend a C barrier on a wave where both lanes have zero new candidate bytes and zero material new evidence.
+- C must also avoid no-op barrier commits: if invoked without new candidate bytes, perform at least one material backlog action or do not dispatch C.
 - Never use N100 local clones/worktrees as a project workspace.
 - GitHub branch HEAD and Actions are the durable source of truth.
