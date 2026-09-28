@@ -10,3 +10,6 @@ Required behavior:
 - adapter LUID, pipeline exactness, resource formats, vertex declarations and fixed-function texture-stage semantics are captured in one run;
 - one-click runtime preflight must pass before root payload mutation;
 - diagnostic ZIP retains target and preflight identities.
+
+Checkpoint refresh: one-run census JSON extraction + resource/declaration/FFP census + runtime preflight.
+
