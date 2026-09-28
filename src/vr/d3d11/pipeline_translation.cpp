@@ -86,6 +86,168 @@ namespace outrun::vr::dx11
             default:                        return nullptr;
             }
         }
+
+        bool append_fvf_element(
+            VertexInputLayoutTranslation& out,
+            const char* semantic,
+            UINT semanticIndex,
+            DXGI_FORMAT format,
+            UINT byteSize,
+            UINT& offset,
+            UINT stream0Stride) noexcept
+        {
+            if (!semantic || stream0Stride == 0 ||
+                out.elementCount >= out.elements.size() ||
+                byteSize > stream0Stride ||
+                offset > stream0Stride - byteSize)
+                return false;
+
+            auto& desc = out.elements[out.elementCount++];
+            desc.SemanticName = semantic;
+            desc.SemanticIndex = semanticIndex;
+            desc.Format = format;
+            desc.InputSlot = 0;
+            desc.AlignedByteOffset = offset;
+            desc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+            desc.InstanceDataStepRate = 0;
+            offset += byteSize;
+            return true;
+        }
+
+        bool translate_fvf_layout(
+            DWORD fvf,
+            UINT stream0Stride,
+            VertexInputLayoutTranslation& out) noexcept
+        {
+            if (fvf == 0 || stream0Stride == 0)
+                return false;
+
+            // Deliberately exclude reserved/LASTBETA encodings. Position blend
+            // weights/indices stay pending until their exact D3D9 semantics are
+            // paired with the future shader-signature F21 gate.
+            constexpr DWORD supportedFlags =
+                D3DFVF_POSITION_MASK |
+                D3DFVF_NORMAL |
+                D3DFVF_PSIZE |
+                D3DFVF_DIFFUSE |
+                D3DFVF_SPECULAR |
+                D3DFVF_TEXCOUNT_MASK |
+                0xFFFF0000u;
+            if ((fvf & ~supportedFlags) != 0)
+                return false;
+
+            UINT offset = 0;
+            const DWORD position = fvf & D3DFVF_POSITION_MASK;
+            switch (position)
+            {
+            case D3DFVF_XYZ:
+                if (!append_fvf_element(
+                        out, "POSITION", 0,
+                        DXGI_FORMAT_R32G32B32_FLOAT, 12,
+                        offset, stream0Stride))
+                    return false;
+                break;
+            case D3DFVF_XYZRHW:
+                if ((fvf & D3DFVF_NORMAL) != 0 ||
+                    !append_fvf_element(
+                        out, "POSITIONT", 0,
+                        DXGI_FORMAT_R32G32B32A32_FLOAT, 16,
+                        offset, stream0Stride))
+                    return false;
+                break;
+            case D3DFVF_XYZW:
+                if (!append_fvf_element(
+                        out, "POSITION", 0,
+                        DXGI_FORMAT_R32G32B32A32_FLOAT, 16,
+                        offset, stream0Stride))
+                    return false;
+                break;
+            default:
+                // XYZB1..XYZB5 and any unknown position encoding remain
+                // fail-closed until blend-weight/index semantics are modeled.
+                return false;
+            }
+
+            if ((fvf & D3DFVF_NORMAL) != 0)
+            {
+                if (position != D3DFVF_XYZ ||
+                    !append_fvf_element(
+                        out, "NORMAL", 0,
+                        DXGI_FORMAT_R32G32B32_FLOAT, 12,
+                        offset, stream0Stride))
+                    return false;
+            }
+
+            if ((fvf & D3DFVF_PSIZE) != 0 &&
+                !append_fvf_element(
+                    out, "PSIZE", 0,
+                    DXGI_FORMAT_R32_FLOAT, 4,
+                    offset, stream0Stride))
+                return false;
+
+            if ((fvf & D3DFVF_DIFFUSE) != 0 &&
+                !append_fvf_element(
+                    out, "COLOR", 0,
+                    DXGI_FORMAT_B8G8R8A8_UNORM, 4,
+                    offset, stream0Stride))
+                return false;
+
+            if ((fvf & D3DFVF_SPECULAR) != 0 &&
+                !append_fvf_element(
+                    out, "COLOR", 1,
+                    DXGI_FORMAT_B8G8R8A8_UNORM, 4,
+                    offset, stream0Stride))
+                return false;
+
+            const UINT texCount = static_cast<UINT>(
+                (fvf & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT);
+            if (texCount > 8)
+                return false;
+
+            for (UINT index = 0; index < 8; ++index)
+            {
+                const DWORD mask = 0x3u << (16u + index * 2u);
+                const DWORD sizeBits = fvf & mask;
+                if (index >= texCount)
+                {
+                    if (sizeBits != 0)
+                        return false;
+                    continue;
+                }
+
+                DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
+                UINT byteSize = 0;
+                if (sizeBits == D3DFVF_TEXCOORDSIZE1(index))
+                {
+                    format = DXGI_FORMAT_R32_FLOAT;
+                    byteSize = 4;
+                }
+                else if (sizeBits == D3DFVF_TEXCOORDSIZE2(index))
+                {
+                    format = DXGI_FORMAT_R32G32_FLOAT;
+                    byteSize = 8;
+                }
+                else if (sizeBits == D3DFVF_TEXCOORDSIZE3(index))
+                {
+                    format = DXGI_FORMAT_R32G32B32_FLOAT;
+                    byteSize = 12;
+                }
+                else if (sizeBits == D3DFVF_TEXCOORDSIZE4(index))
+                {
+                    format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+                    byteSize = 16;
+                }
+                else
+                    return false;
+
+                if (!append_fvf_element(
+                        out, "TEXCOORD", index, format, byteSize,
+                        offset, stream0Stride))
+                    return false;
+            }
+
+            return out.elementCount > 0;
+        }
     }
 
     PipelineTranslation translate_pipeline(
@@ -196,7 +358,15 @@ namespace outrun::vr::dx11
         VertexInputLayoutTranslation out{};
         if (!source || count == 0)
         {
-            out.fvfPending = fvf != 0;
+            out.fvfPath = fvf != 0;
+            if (!out.fvfPath)
+                return out;
+            if (translate_fvf_layout(fvf, stream0Stride, out))
+            {
+                out.exact = true;
+                return out;
+            }
+            out.fvfPending = true;
             return out;
         }
 
