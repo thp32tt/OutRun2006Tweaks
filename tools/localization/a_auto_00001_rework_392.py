@@ -36,13 +36,21 @@ if len(fails)!=7: raise SystemExit(f"expected 7 fails got {len(fails)}")
 acts=json.loads(B91.read_text("utf-8")); actions={r["key"]:r for r in next(x for x in acts["assets"] if x["asset"]==ASSET)["rows"]}
 src=rgba(sb,w,h).transpose(Image.Transpose.FLIP_TOP_BOTTOM); before=rgba(cb,w,h).transpose(Image.Transpose.FLIP_TOP_BOTTOM); after=before.copy(); recs=[]
 for r in fails:
-    a=actions[r["key"]]; x0,y0,x1,y1=r["localized_bbox"]; patch=before.crop((x0,y0,x1+1,y1+1)); after.paste((0,0,0,0),(x0,y0,x1+1,y1+1))
+    a=actions[r["key"]]; x0,y0,x1,y1=r["localized_bbox"]
+    src_patch=src.crop((x0,y0,x1+1,y1+1)); loc_patch=before.crop((x0,y0,x1+1,y1+1))
+    move_mask=diffmask(src_patch,loc_patch).point(lambda p: 255 if p else 0)
+    # Restore only pixels that actually differ from canonical source. Clearing the whole
+    # localized bbox damaged neighboring/overlapping elements in the first AUTO attempt.
+    after.paste(src_patch,(x0,y0),move_mask)
     nx0,ny0,nx1,ny1=a["new_localized_bbox"]
     if r["key"]=="exit":
         width=nx1-nx0; nx1=3464; nx0=nx1-width
     tw,th=nx1-nx0+1,ny1-ny0+1
-    if patch.size!=(tw,th): patch=patch.resize((tw,th),Image.Resampling.LANCZOS)
-    after.alpha_composite(patch,(nx0,ny0)); recs.append({"key":r["key"],"target_bbox":[nx0,ny0,nx1,ny1]})
+    if loc_patch.size!=(tw,th):
+        loc_patch=loc_patch.resize((tw,th),Image.Resampling.LANCZOS)
+        move_mask=move_mask.resize((tw,th),Image.Resampling.NEAREST)
+    after.paste(loc_patch,(nx0,ny0),move_mask)
+    recs.append({"key":r["key"],"target_bbox":[nx0,ny0,nx1,ny1],"move_mask":"source_diff_binary"})
 touch=mk_mask((w,h),[r["sprite_cell"] for r in fails]); allowed=mk_mask((w,h),[r["original_bbox"] for r in rows]); repair=ImageChops.multiply(touch,ImageOps.invert(allowed)); after=Image.composite(src,after,repair)
 qa=[]; failed=[]
 for r in rows:
