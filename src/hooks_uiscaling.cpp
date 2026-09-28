@@ -126,10 +126,12 @@ class UIScaling : public Hook
 	static constexpr int OptionArrow_ClipSpriteCalls[] = {
 		0xE358B, 0xE35A3, 0xE35CC, 0xE35F7,
 		0xE481B, 0xE4833, 0xE485C, 0xE4887,
-		// R69 candidate: generic menu/list boundary arrows. Canonical EXE
-		// disassembly shows sprite 0x3004A/0x3004B emitted only at list
-		// previous/next boundaries; keep these exact instead of widening HUD rules.
-		0xEC24C, 0xEC277, 0xED4D4, 0xED7A3
+		// R69 candidate: generic menu/list boundary arrows.
+		0xEC24C, 0xEC277, 0xED4D4, 0xED7A3,
+		// V7 runtime evidence from the OutRun-mode session 92ce3403:
+		// sprite 0x3004A was emitted only from these three put_clip_sprite
+		// caller RVAs while the visible < > controls were still head-following.
+		0x460F1, 0x463D6, 0x46410
 	};
 
 	// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
@@ -579,6 +581,15 @@ class UIScaling : public Hook
 		int xstnum, int x, int y, std::uint32_t flags,
 		float priority, std::uint32_t color)
 	{
+		// Exact asset gate protects the newly observed generic caller RVAs from
+		// promoting unrelated clip sprites that may share the same callsite.
+		const bool exactArrow =
+			(xstnum >= 0x2C0251 && xstnum <= 0x2C0254) ||
+			xstnum == 0x3004A || xstnum == 0x3004B;
+		if (!exactArrow)
+			return Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+
 		int prio = int(priority);
 		prio = prio < 0 ? 0 :
 			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
@@ -607,8 +618,8 @@ class UIScaling : public Hook
 				1, std::memory_order_relaxed) + 1;
 			if ((hit & (hit - 1)) == 0)
 				spdlog::info(
-					"VR R66 OPTION ARROW: exact node pinned prio={} kind={} hits={}",
-					prio, node->kind_C, hit);
+					"VR V7 OPTION ARROW: exact node pinned sprite=0x{:X} prio={} kind={} hits={}",
+					xstnum, prio, node->kind_C, hit);
 		}
 		return result;
 	}
