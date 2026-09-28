@@ -21,6 +21,9 @@ from playwright.async_api import async_playwright, BrowserContext, Page, Timeout
 TZ = ZoneInfo(os.getenv("TZ", "Asia/Seoul"))
 BASE_URL = os.getenv("CHATGPT_BASE_URL", "https://chatgpt.com/")
 AUTO_SEND = os.getenv("AUTO_SEND", "false").lower() == "true"
+CONTROLLER_MODE = os.getenv("CONTROLLER_MODE", "localization").strip().lower()
+if CONTROLLER_MODE not in {"localization", "vr"}:
+    raise ValueError(f"Unsupported CONTROLLER_MODE={CONTROLLER_MODE!r}; expected localization or vr")
 SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("SCHEDULE_MINUTES", "7,17,27,37,47,57").split(",") if x.strip()})
 CHAT_SLOTS = max(1, int(os.getenv("CHAT_SLOTS", "6")))
 ROLLOVER_HOUR = int(os.getenv("CHAT_DAY_ROLLOVER_HOUR", "2"))
@@ -153,6 +156,7 @@ class Registry:
 runtime = {
     "started_at": datetime.now(TZ).isoformat(),
     "auto_send": AUTO_SEND,
+    "controller_mode": CONTROLLER_MODE,
     "schedule_minutes": SCHEDULE_MINUTES,
     "status": "starting",
     "last_tick": None,
