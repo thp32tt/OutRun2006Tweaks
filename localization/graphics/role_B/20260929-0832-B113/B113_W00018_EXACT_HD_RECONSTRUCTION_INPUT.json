@@ -1,0 +1,568 @@
+{
+  "schema_version": 4,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00057",
+  "attempt": "1/3",
+  "wave_id": "W00018",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T08:32:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "initial_head_sha": "6a8e975da2560383e78ab5935e4a3b77e33dfa48",
+  "final_precommit_head_sha": "47f97d9f270eb7768554c4adadcca5b709985b23",
+  "peer_lane_commit_observed_before_commit": true,
+  "peer_lane_task_id": "LOCALIZATION-LOCALIZATION_A-00056",
+  "peer_lane_material_commit_sha": "9b87b86447a36320970354c7127b85c4c69b0896",
+  "peer_lane_terminal_commit_sha": "84115b00d2b3e47248312c2ab4e7d07c71032e71",
+  "peer_lane_preserved": "VERIFIED_ANCESTOR_OF_CURRENT_HEAD",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection": {
+    "selected_pending_localize_text_indices": [
+      132,
+      176,
+      188,
+      198
+    ],
+    "queue_blob_sha": "fdce9105501da896cf97a4dfdc09c3fa009b75c9",
+    "selection_reason": "Fresh even-shard pending_artwork assets not used by B in W00015-W00017; no work steal."
+  },
+  "result": "PASS_MATERIAL_FALLBACK_4_NEW_EVEN_EXACT_HD_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+  "source": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "tree_sha": "1204f28afb7fb7d791d8f7a536dbdf3186d8e172",
+    "identity_policy": "Exact Release DDS Git blob is pixel authority; decoded stock PNG, 4x atlas and working-source blobs are reconstruction references only."
+  },
+  "material_advance": {
+    "fallback_step": 4,
+    "core_source_identities_pinned": 12,
+    "working_source_identities_pinned": 5,
+    "semantic_segments_pinned": 21,
+    "exact_atlas_regions_pinned": 123,
+    "candidate_dds_written": false
+  },
+  "assets": [
+    {
+      "queue_index": 132,
+      "asset": "1F5FE6E9",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+      "release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+        "sha": "a89e403c92d335f83c808e5f10dcc9e584d4ff7c",
+        "size": 33554560
+      },
+      "png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.png",
+        "sha": "e72ae022ad8b1bff7657237beb056680ab47dbc1",
+        "size": 170469
+      },
+      "atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_1F5FE6E9_1024x512_atlas.json",
+        "sha": "f7bb4e1f974afc0719311f8bbbf36e82303961f6",
+        "width": 4096,
+        "height": 2048,
+        "regions": 21
+      },
+      "working": [
+        {
+          "path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Main Menu Sumo Backgrounds/Palm Tree Sunny BG/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512-palm-tree-sunny-bg-4by3-ratio-2048p-sprite.png",
+          "sha": "ddb81de8df4a078f0dcb67bb4f29acc2018fab4f"
+        },
+        {
+          "path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Main Menu Sumo Backgrounds/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.psd",
+          "sha": "ff08309d8709d26de2d181a3cfee40fd1a7c4270"
+        },
+        {
+          "path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Main Menu Sumo Backgrounds/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512_TextOnly.png",
+          "sha": "7762db2256853bced9db060e2db2ecf249f95f25"
+        }
+      ],
+      "translations": [
+        {
+          "source": "REQUEST",
+          "korean": "요청"
+        },
+        {
+          "source": "SPECIAL REQUEST 1",
+          "korean": "스페셜 요청 1"
+        },
+        {
+          "source": "SPECIAL REQUEST 2",
+          "korean": "스페셜 요청 2"
+        },
+        {
+          "source": "SPECIAL REQUEST 3",
+          "korean": "스페셜 요청 3"
+        }
+      ],
+      "preserve": [
+        "colored menu panels",
+        "all non-text artwork/background outside confirmed glyph/effect masks"
+      ],
+      "reconstruction_status": "READY_FOR_EXACT_HD_DECODED_TEXT_MASK_AND_CLEAN_PLATE",
+      "mapping_note": "Do not infer semantic-to-region mapping by array order. Confirm from decoded exact English HD DDS/working source before any rewrite.",
+      "next_action": "Decode exact Release DDS; extract complete English glyph/effect masks; protect artwork; build CLEAN_PLATE; fit Korean inside measured source bboxes; then enforce zero-pixel containment and exact ENGLISH SOURCE vs KOREAN CANDIDATE proof.",
+      "element_gates": [
+        {
+          "element_index": 0,
+          "source": "REQUEST",
+          "korean": "요청",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        },
+        {
+          "element_index": 1,
+          "source": "SPECIAL REQUEST 1",
+          "korean": "스페셜 요청 1",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        },
+        {
+          "element_index": 2,
+          "source": "SPECIAL REQUEST 2",
+          "korean": "스페셜 요청 2",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        },
+        {
+          "element_index": 3,
+          "source": "SPECIAL REQUEST 3",
+          "korean": "스페셜 요청 3",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        }
+      ]
+    },
+    {
+      "queue_index": 176,
+      "asset": "75C3586A",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+      "release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+        "sha": "9d21e4fb47d3b17dab89a05b9552cfeaa913eac9",
+        "size": 16777344
+      },
+      "png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.png",
+        "sha": "8979db22c2fd2669f50581c8cf50b1f2edc8bb37",
+        "size": 73238
+      },
+      "atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_75C3586A_512x512_atlas.json",
+        "sha": "07620598cd03cc6d62455b57d3537158cabfc21a",
+        "width": 2048,
+        "height": 2048,
+        "regions": 53
+      },
+      "working": [
+        {
+          "path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/75C3586A_v02/75C3586A_512x512.psd",
+          "sha": "9d9cb0607460dbc9460e0b75a76a2aeff9037a7d"
+        }
+      ],
+      "translations": [
+        {
+          "source": "FLAGMAN 4",
+          "korean": "플래그맨 4"
+        },
+        {
+          "source": "HOLLY",
+          "korean": "홀리"
+        },
+        {
+          "source": "JENNIFER",
+          "korean": "제니퍼"
+        },
+        {
+          "source": "CLARISSA",
+          "korean": "클라리사"
+        }
+      ],
+      "preserve": [
+        "route/map artwork",
+        "character portraits",
+        "all pixels outside confirmed glyph/effect masks"
+      ],
+      "reconstruction_status": "READY_FOR_EXACT_HD_DECODED_TEXT_MASK_AND_CLEAN_PLATE",
+      "mapping_note": "Do not infer semantic-to-region mapping by array order. Confirm from decoded exact English HD DDS/working source before any rewrite.",
+      "next_action": "Decode exact Release DDS; extract complete English glyph/effect masks; protect artwork; build CLEAN_PLATE; fit Korean inside measured source bboxes; then enforce zero-pixel containment and exact ENGLISH SOURCE vs KOREAN CANDIDATE proof.",
+      "element_gates": [
+        {
+          "element_index": 0,
+          "source": "FLAGMAN 4",
+          "korean": "플래그맨 4",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        },
+        {
+          "element_index": 1,
+          "source": "HOLLY",
+          "korean": "홀리",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        },
+        {
+          "element_index": 2,
+          "source": "JENNIFER",
+          "korean": "제니퍼",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        },
+        {
+          "element_index": 3,
+          "source": "CLARISSA",
+          "korean": "클라리사",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        }
+      ]
+    },
+    {
+      "queue_index": 188,
+      "asset": "8C259C68",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+      "release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+        "sha": "4a95a48c9c34f2ddd786340e4323d6779b7a103b",
+        "size": 16777344
+      },
+      "png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.png",
+        "sha": "d11093f1dff2e897226db856c56bd9fa62dad579",
+        "size": 22034
+      },
+      "atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_8C259C68_512x512_atlas.json",
+        "sha": "6061128430caeb04773ac8caa7918629eeef8ba8",
+        "width": 2048,
+        "height": 2048,
+        "regions": 6
+      },
+      "working": [
+        {
+          "path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/8C259C68_v02/8C259C68_512x512.psd",
+          "sha": "e1b1b75f40136d17c108746a9ba5eafcd06fc62f"
+        }
+      ],
+      "translations": [
+        {
+          "source": "Online and LAN OutRun for up to 6 players",
+          "korean": "온라인/LAN 아웃런 최대 6인 플레이"
+        },
+        {
+          "source": "Complete Race and Heart Attack missions to win OR Miles!",
+          "korean": "레이스와 하트 어택 미션을 완료해 OR 마일을 획득하세요!"
+        },
+        {
+          "source": "Try to win Hearts by meeting your girlfriend's demands!",
+          "korean": "여자친구의 요구를 들어주고 하트를 획득하세요!"
+        },
+        {
+          "source": "Try to reach the goal with your girlfriend!",
+          "korean": "여자친구와 함께 골에 도착하세요!"
+        },
+        {
+          "source": "Buy your OutRun items here!",
+          "korean": "여기서 아웃런 아이템을 구매하세요!"
+        },
+        {
+          "source": "Drive against the Ghost Cars and go for the course records!",
+          "korean": "고스트 카와 달리며 코스 기록에 도전하세요!"
+        }
+      ],
+      "preserve": [
+        "front-end help panel/background artwork",
+        "all pixels outside confirmed glyph/effect masks"
+      ],
+      "reconstruction_status": "READY_FOR_EXACT_HD_DECODED_TEXT_MASK_AND_CLEAN_PLATE",
+      "mapping_note": "Do not infer semantic-to-region mapping by array order. Confirm from decoded exact English HD DDS/working source before any rewrite.",
+      "next_action": "Decode exact Release DDS; extract complete English glyph/effect masks; protect artwork; build CLEAN_PLATE; fit Korean inside measured source bboxes; then enforce zero-pixel containment and exact ENGLISH SOURCE vs KOREAN CANDIDATE proof.",
+      "element_gates": [
+        {
+          "element_index": 0,
+          "source": "Online and LAN OutRun for up to 6 players",
+          "korean": "온라인/LAN 아웃런 최대 6인 플레이",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        },
+        {
+          "element_index": 1,
+          "source": "Complete Race and Heart Attack missions to win OR Miles!",
+          "korean": "레이스와 하트 어택 미션을 완료해 OR 마일을 획득하세요!",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        },
+        {
+          "element_index": 2,
+          "source": "Try to win Hearts by meeting your girlfriend's demands!",
+          "korean": "여자친구의 요구를 들어주고 하트를 획득하세요!",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        },
+        {
+          "element_index": 3,
+          "source": "Try to reach the goal with your girlfriend!",
+          "korean": "여자친구와 함께 골에 도착하세요!",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        },
+        {
+          "element_index": 4,
+          "source": "Buy your OutRun items here!",
+          "korean": "여기서 아웃런 아이템을 구매하세요!",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        },
+        {
+          "element_index": 5,
+          "source": "Drive against the Ghost Cars and go for the course records!",
+          "korean": "고스트 카와 달리며 코스 기록에 도전하세요!",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        }
+      ]
+    },
+    {
+      "queue_index": 198,
+      "asset": "9FC88069",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+      "release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+        "sha": "e97d852a905aa8a219b786b843089e0998037f52",
+        "size": 33554560
+      },
+      "png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.png",
+        "sha": "d892585f6d441e2a093d7f5def8ffb4459fd3734",
+        "size": 48210
+      },
+      "atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_9FC88069_1024x512_atlas.json",
+        "sha": "77904226ad9347044c4c091575efbe0aba72717a",
+        "width": 4096,
+        "height": 2048,
+        "regions": 43
+      },
+      "working": [],
+      "translations": [
+        {
+          "source": "(PROTOTYPE)",
+          "korean": "(프로토타입)"
+        },
+        {
+          "source": "INTERMEDIATE B",
+          "korean": "중급 B"
+        },
+        {
+          "source": "INTERMEDIATE A",
+          "korean": "중급 A"
+        },
+        {
+          "source": "RANDOM",
+          "korean": "무작위"
+        },
+        {
+          "source": "- RANDOM PLAY -",
+          "korean": "- 무작위 재생 -"
+        },
+        {
+          "source": "(GUITAR MIX)",
+          "korean": "(기타 믹스)"
+        },
+        {
+          "source": "(INSTRUMENTAL)",
+          "korean": "(연주곡)"
+        }
+      ],
+      "preserve": [
+        "song titles",
+        "numbered TBD/work labels",
+        "all pixels outside confirmed glyph/effect masks"
+      ],
+      "reconstruction_status": "READY_FOR_EXACT_HD_DECODED_TEXT_MASK_AND_CLEAN_PLATE",
+      "mapping_note": "Do not infer semantic-to-region mapping by array order. Confirm from decoded exact English HD DDS/working source before any rewrite.",
+      "next_action": "Decode exact Release DDS; extract complete English glyph/effect masks; protect artwork; build CLEAN_PLATE; fit Korean inside measured source bboxes; then enforce zero-pixel containment and exact ENGLISH SOURCE vs KOREAN CANDIDATE proof.",
+      "element_gates": [
+        {
+          "element_index": 0,
+          "source": "(PROTOTYPE)",
+          "korean": "(프로토타입)",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        },
+        {
+          "element_index": 1,
+          "source": "INTERMEDIATE B",
+          "korean": "중급 B",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        },
+        {
+          "element_index": 2,
+          "source": "INTERMEDIATE A",
+          "korean": "중급 A",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        },
+        {
+          "element_index": 3,
+          "source": "RANDOM",
+          "korean": "무작위",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        },
+        {
+          "element_index": 4,
+          "source": "- RANDOM PLAY -",
+          "korean": "- 무작위 재생 -",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        },
+        {
+          "element_index": 5,
+          "source": "(GUITAR MIX)",
+          "korean": "(기타 믹스)",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        },
+        {
+          "element_index": 6,
+          "source": "(INSTRUMENTAL)",
+          "korean": "(연주곡)",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+        }
+      ]
+    }
+  ],
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_132_176_188_198",
+    "work_steal": "NONE",
+    "canonical_translation_match": "PASS_21_OF_21_AGAINST_CURRENT_TRANSCRIPTIONS_AND_ARTWORK_PLAN",
+    "immutable_upstream_identity": "PASS_12_CORE_BLOBS_PLUS_5_WORKING_SOURCE_REFS_PINNED_FROM_UPSTREAM_TREE",
+    "atlas_dimensions_region_counts": "PASS_4_OF_4__123_REGIONS_TOTAL",
+    "generation_reset_source_rule": "PASS_EXACT_ENGLISH_HD_SOURCE_ONLY_NO_OLD_KOREAN_INPUT",
+    "source_text_mask": "HOLD_STRICT_RECHECK_NEXT_STAGE_NO_PIXEL_DECODE_THIS_RUN",
+    "clean_plate": "HOLD_STRICT_RECHECK_NEXT_STAGE_NO_PIXEL_DECODE_THIS_RUN",
+    "one_pixel_containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE_WRITTEN",
+    "dds_header_alpha_orientation": "HOLD_NO_DDS_WRITE",
+    "english_source_vs_korean_candidate_proof": "HOLD_NO_CANDIDATE_WRITTEN",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "Four fresh even-shard pending assets now have immutable exact-HD source/decoded/atlas/working-source identities plus canonical translation sets and fail-closed reconstruction next actions. No guessed Korean DDS was emitted; runtime remains untested."
+}
