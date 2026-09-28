@@ -1,0 +1,22 @@
+{
+  "task_id": "CONVERSION-DXVK-00002",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "base_sha": "693410403d0fff2cd0b994611ffd3264d6f0c584",
+  "result_sha": "1090264633ee7dd30eba883721114ed7a5039620",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "summary": "Reconciled the stale protected-baseline predicate verifier and the one-click verifier literal so the DXVK conversion gate reaches actual Win32 compilation. Static contracts and configure pass; Build Win32 fails in the pre-existing R70 stereo pipeline with unresolved helper identifiers. This bounded task stops at that newly exposed independent blocker.",
+  "evidence": [
+    "Commit 243f5600dc2064cb795a283286e27ae399510b32: tools/verify_vr_proven_baseline.py now checks the active R26+HUD production gameplay predicate instead of obsolete stereo_renderer_r7.inc text.",
+    "Commit 1090264633ee7dd30eba883721114ed7a5039620: tools/Test-VROneClickContract.ps1 fixes the escaped PowerShell backend literal exposed by the first gate run.",
+    "Backend Conversion Gate run 36388906952: queue automation contract PASS; HMD-proven baseline PASS; one-click structure contract PASS; backend disassembly contract PASS; Configure Win32 PASS; dependency workarounds PASS; Build Win32 FAIL.",
+    "Build failure examples: src/vr/d3d9/stereo_renderer.cpp C2065 'guard' undeclared and C3861 missing IsGameDevice/ReplaceSurfaceRef/StereoWanted/EnsureStereoResources; src/vr/d3d9/stereo_renderer_r13.cpp reports corresponding missing helper declarations and ends with C1003 after more than 100 errors.",
+    "No HMD, Quest 3, VDXR, or in-game visual/runtime test was performed."
+  ],
+  "attempt": 1,
+  "selected_work_item": "VR-BACKEND-CONVERSION-GATE-UNBLOCK-001",
+  "next_action": "Use a separate bounded queue task to repair the R70 stereo_pipeline compile graph. After build health is restored, continue DXVK provider/version hardening such as review finding F24.",
+  "workflow_run_id": 36388906952,
+  "workflow_job_id": 108820154342,
+  "recorded_at": "2026-09-28T16:02:21+09:00"
+}

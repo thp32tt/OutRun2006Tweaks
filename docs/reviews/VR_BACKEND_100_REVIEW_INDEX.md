@@ -62,11 +62,11 @@ Each set contains ten distinct review passes and derives the next set's directio
 - Normal game failures are sealed before exit-code propagation.
 - Launch exceptions, stuck host teardown and pre-session selector failures can bypass automatic ZIP collection.
 - One-click CI is mostly structural/textual; behavior tests are still needed.
-- Current hosted Build is blocked before compilation by stale `P8_STEREO_SHARED_PREDICATE` verifier text expecting `return Game::is_vr_gameplay_presentation();`.
+- The stale baseline and one-click verifier literals were reconciled on 2026-09-28 (`243f5600dc2064cb795a283286e27ae399510b32`, `1090264633ee7dd30eba883721114ed7a5039620`). Backend Conversion Gate run `36388906952` passes the queue, HMD-proven baseline, one-click and backend-disassembly contracts plus Win32 configure, then fails during Win32 compilation in the R70 stereo pipeline with unresolved helper identifiers. Compilation is now the automated blocker.
 
 ## Evidence-driven implementation order
 
-1. Reconcile the stale proven-baseline verifier so CI can reach configure/compile.
+1. **DONE 2026-09-28:** Reconcile stale gate verifiers so CI reaches configure/compile. Run `36388906952` reaches `Build Win32`; the next independent blocker is the R70 stereo-pipeline compile failure and must be handled as a separate bounded task.
 2. Unify semantic catalogs and runtime producer classification.
 3. Seal selector payload identity and transactional failure behavior.
 4. Tighten DX11 census/activation gates and transport parity.
