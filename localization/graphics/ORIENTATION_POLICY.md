@@ -423,3 +423,85 @@ A changed DDS is not accepted merely because a QA JSON exists. Automation must p
 
 A missing metric is not assumed to be zero; missing mandatory post-reset evidence blocks promotion.
 
+## First-pass image-generation prompt contract
+
+Effective 2026-09-29. The goal is to prevent defects during generation, not to depend on QA to repair them later.
+
+Every image-generation/reconstruction request must be assembled from this contract plus asset-specific measured facts. Free-form prompts that merely say "translate this image to Korean" are forbidden.
+
+### Prompt priority
+
+The generator must understand the task in this order:
+
+1. **EDIT, DO NOT REDESIGN.** The exact supplied HD source is authoritative.
+2. Preserve every pixel/shape outside the explicitly identified source-text/effect footprint.
+3. Remove the complete specified English/source text and its own outline/shadow/glow only.
+4. Reconstruct the exposed background so it is a seamless continuation of the exact surrounding source.
+5. Render only the supplied approved Korean wording in the cleared region.
+6. Match the measured source typography/layout/effects as closely as Korean glyph geometry permits.
+7. If faithful reconstruction or fitting is uncertain, return no production candidate and flag manual reconstruction.
+
+### Mandatory positive instructions
+
+Each asset prompt must explicitly state:
+- exact source image dimensions and raw orientation;
+- exact text element(s) to replace;
+- exact approved Korean string for each element;
+- measured source bbox and permitted edit region;
+- protected regions/elements that must remain unchanged;
+- source alignment, baseline/center, approximate text height and line count;
+- sampled source text/effect colors;
+- outline/shadow/glow direction and extent when present;
+- alpha/transparency behavior;
+- whether background under the text is flat, gradient, patterned, illustrated or transparent;
+- required output dimensions and alpha behavior;
+- "the result must look as though the Korean text was part of the original game artwork, not pasted on later."
+
+### Mandatory negative instructions
+
+Every generation prompt must explicitly forbid:
+- Korean text drawn over visible English;
+- black, white, gray, colored or semitransparent cover rectangles;
+- new panels, labels, plaques, ribbons, boxes or backing shapes;
+- blur/smudge patches used to conceal source text;
+- visible English/source glyph fragments, shadows, outlines, glow or antialias residue;
+- modification of icons, logos, borders, separators, neighboring sprites or unrelated text;
+- redesigning, restyling, recoloring or re-composing the UI;
+- replacing the original background with a newly invented background;
+- cropping, padding, resizing or changing aspect ratio;
+- arbitrary font fallback, missing-glyph boxes or mixed fallback fonts;
+- adding outlines/shadows/glows that are absent from the source;
+- generic "improved readability" effects;
+- low-resolution reconstruction followed by upscale;
+- changing alpha outside the permitted edit mask;
+- hallucinating additional Korean/English words, punctuation, icons or decoration.
+
+### Background-specific generation instruction
+
+The prompt must name the reconstruction strategy:
+- flat background: continue exact neighboring color/texture;
+- gradient: continue gradient direction, stops and local luminance without a seam;
+- pattern/artwork: reconstruct only masked source-text pixels from surrounding/source structure;
+- transparent/semitransparent: preserve alpha structure and reconstruct RGB+alpha together;
+- complex unrecoverable art: redraw only the affected element from source evidence, never invent a covering panel.
+
+### Typography-first fitting instruction
+
+Before committing Korean lettering, the generation step must conceptually fit the approved string inside the measured permitted region. Prefer:
+1. source-faithful tracking/spacing;
+2. source-faithful line breaking;
+3. modest font-size reduction;
+4. approved shorter translation.
+
+Never solve fit by stretching/squashing glyphs, clipping, escaping the source region, covering neighboring art, or adding a new background.
+
+### Single-pass self-check instruction
+
+The final paragraph of every generation prompt must require an internal pre-output check:
+
+"Before producing the candidate, verify that no source-language text or effect remains; no cover box, patch, seam or invented panel exists; all protected artwork is unchanged; Korean text is fully inside the permitted region and unclipped; canvas, orientation and transparency are unchanged. If any condition cannot be satisfied, do not produce a production candidate."
+
+### Prompt provenance
+
+The exact final prompt text (or structured prompt JSON) used for each production candidate must be saved with the QA artifacts and hashed. This makes prompt regressions auditable and allows a successful first-pass recipe to be reused for visually equivalent source families.
+
