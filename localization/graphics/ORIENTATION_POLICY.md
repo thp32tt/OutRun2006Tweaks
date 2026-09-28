@@ -575,3 +575,54 @@ The generation step must reject its own candidate before DDS output when:
 
 These checks are required even if pixel containment, alpha and protected-mask metrics are otherwise perfect.
 
+## Signed slant and GitHub visual-review artifact contract
+
+Effective 2026-09-29 after the second post-reset sample review.
+
+### Slant direction is signed geometry
+
+A description such as `italic`, `slanted` or `right-leaning` is not sufficient for production generation.
+
+For every stylized source text element, measure and record in the **display/readable coordinate system**:
+- `slant_dx_per_dy`: signed horizontal displacement of the top edge relative to the bottom edge per positive glyph height;
+- `slant_angle_deg`: signed angle derived from that displacement;
+- `slant_direction`: `left`, `none`, or `right`;
+- the exact transform used to map this readable geometry back to raw DDS coordinates.
+
+Sign convention: in readable display coordinates, positive X is right and positive Y is down. A glyph whose top is displaced to the right of its bottom is `right`; top displaced left is `left`.
+
+The Korean candidate must match the source sign first, then the measured magnitude within the approved tolerance. Mirroring/flipping for DDS storage must happen **after** readable-space lettering construction and must not invert the intended displayed slant.
+
+A candidate with the opposite displayed slant sign is an unconditional `REWORK_REQUIRED` even when orientation, containment and alpha gates pass.
+
+### Slant preflight/postflight
+
+Before production rendering:
+1. normalize exact source to readable display coordinates;
+2. measure source signed slant from at least two stable glyph stems/edges when possible;
+3. render a geometry proof and measure its signed slant;
+4. require matching sign before full Korean effects are applied.
+
+After DDS round-trip:
+1. decode raw DDS;
+2. apply the recorded display transform;
+3. measure candidate signed slant in readable coordinates;
+4. require source/candidate sign equality and tolerance compliance.
+
+Never compare slant sign directly in differently transformed raw/display coordinate systems.
+
+### Mandatory GitHub PNG review set
+
+Every newly generated production candidate must save human-review PNG artifacts under:
+`localization/graphics/generated_png/<asset_id>/`
+
+Required files:
+- `source_display.png` — exact HD source normalized to readable display orientation;
+- `clean_plate_display.png` — clean plate in the same readable orientation;
+- `candidate_display.png` — Korean candidate in the same readable orientation;
+- `comparison.png` — labeled side-by-side source / clean plate / candidate at native or nearest-neighbor integer scale;
+- `generation_prompt.json` — exact strict prompt/spec used;
+- `qa_report.json` — machine-readable QA including orientation and signed-slant fields.
+
+These PNGs are review artifacts, not DDS construction inputs. They must be generated from the exact source/candidate lineage. A changed production DDS without this review set is not promotable.
+
