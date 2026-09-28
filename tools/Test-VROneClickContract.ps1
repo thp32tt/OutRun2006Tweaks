@@ -140,7 +140,11 @@ foreach ($requiredText in @(
     'Restore-BackendSwitchTransaction',
     'Remove-BackendSwitchTransaction',
     'Backend selection rollback failed',
-    'backup preserved at'
+    'backup preserved at',
+    'Write-BackendSelectionFailureDiagnostic',
+    '_selector_failures',
+    'VR_SELECTOR_FAILURE_',
+    'RollbackStatus'
 )) {
     if ($selector -notmatch [regex]::Escape($requiredText)) {
         throw "Selector root payload attestation contract missing: $requiredText"

@@ -183,6 +183,48 @@ function Remove-BackendSwitchTransaction($State) {
     }
 }
 
+
+function Write-BackendSelectionFailureDiagnostic(
+    [string]$Phase,
+    [string]$ErrorText,
+    [string]$RollbackStatus,
+    [string]$BackupRoot = ''
+) {
+    $stamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssfffZ')
+    $record = [ordered]@{
+        SchemaVersion = 1
+        RecordedUtc = (Get-Date).ToUniversalTime().ToString('o')
+        Phase = $Phase
+        Backend = $Backend
+        VariantId = $variant
+        SourceSha = $sourceSha
+        Error = $ErrorText
+        RollbackStatus = $RollbackStatus
+        BackupRoot = $BackupRoot
+        SessionCreated = $false
+    }
+
+    $path = $null
+    try {
+        $dest = Join-Path $root ("logs/_selector_failures/{0}" -f $stamp)
+        New-Item -ItemType Directory -Force $dest | Out-Null
+        $path = Join-Path $dest 'SELECTOR_FAILURE.json'
+        $record | ConvertTo-Json -Depth 6 | Set-Content $path -Encoding UTF8
+        return $path
+    } catch {
+        # Pre-session failures can occur because the logs tree itself is the
+        # broken resource. Fall back to a root sidecar so the original failure
+        # still has durable evidence without masking it.
+        try {
+            $path = Join-Path $root ("VR_SELECTOR_FAILURE_{0}.json" -f $stamp)
+            $record | ConvertTo-Json -Depth 6 | Set-Content $path -Encoding UTF8
+            return $path
+        } catch {
+            return 'diagnostic-write-failed'
+        }
+    }
+}
+
 function Get-FileIdentity([string]$Path) {
     if (-not (Test-Path $Path -PathType Leaf)) { return $null }
     $resolved = (Resolve-Path $Path).Path
@@ -278,13 +320,28 @@ function Set-IniSectionValue([string]$text,[string]$section,[string]$key,[string
 $running = Get-Process -ErrorAction SilentlyContinue | Where-Object {
     $_.ProcessName -ieq "OR2006C2C" -or $_.ProcessName -ieq "outrun-vr-host"
 }
-if ($running) { throw "OutRun or outrun-vr-host.exe is still running. Close it before switching." }
+if ($running) {
+    $message = "OutRun or outrun-vr-host.exe is still running. Close it before switching."
+    $diagnostic = Write-BackendSelectionFailureDiagnostic -Phase 'PROCESS_GUARD' -ErrorText $message -RollbackStatus 'not-required'
+    throw ("{0} Diagnostic={1}" -f $message,$diagnostic)
+}
 
 # Preserve any uncollected logs before touching the backend or starting a new
 # session. This makes game-side truncate/overwrite behavior harmless.
-Seal-PendingSessionLogs
+try {
+    Seal-PendingSessionLogs
+} catch {
+    $diagnostic = Write-BackendSelectionFailureDiagnostic -Phase 'ARCHIVE_PENDING_LOGS' -ErrorText $_.Exception.Message -RollbackStatus 'not-required'
+    throw ("Could not archive pending VR logs before backend switch. Diagnostic={0}; error={1}" -f $diagnostic,$_.Exception.Message)
+}
 
-$backendSwitchTransaction = Start-BackendSwitchTransaction
+$backendSwitchTransaction = $null
+try {
+    $backendSwitchTransaction = Start-BackendSwitchTransaction
+} catch {
+    $diagnostic = Write-BackendSelectionFailureDiagnostic -Phase 'TRANSACTION_SNAPSHOT' -ErrorText $_.Exception.Message -RollbackStatus 'not-started'
+    throw ("Could not snapshot backend selection state. Diagnostic={0}; error={1}" -f $diagnostic,$_.Exception.Message)
+}
 $removeBackendSwitchTransactionBackup = $true
 try {
 Copy-Required "dinput8.dll"
@@ -439,12 +496,19 @@ if (Test-Path (Join-Path $root "BUILD_INPUTS.json")) {
     $selectionFailure = $_.Exception
     try {
         Restore-BackendSwitchTransaction $backendSwitchTransaction
+        $diagnostic = Write-BackendSelectionFailureDiagnostic -Phase 'MUTATION_OR_SESSION_SETUP' -ErrorText $selectionFailure.Message -RollbackStatus 'restored'
+        throw ("Backend selection failed before launch; rollback restored prior root state. Diagnostic={0}; error={1}" -f
+            $diagnostic,$selectionFailure.Message)
     } catch {
+        if ($_.Exception.Message -like 'Backend selection failed before launch; rollback restored prior root state.*') {
+            throw
+        }
+        $rollbackFailure = $_.Exception
         $removeBackendSwitchTransactionBackup = $false
-        throw ("Backend selection failed: {0}; rollback failed: {1}; backup preserved at {2}" -f
-            $selectionFailure.Message,$_.Exception.Message,$backendSwitchTransaction.BackupRoot)
+        $diagnostic = Write-BackendSelectionFailureDiagnostic -Phase 'MUTATION_OR_SESSION_SETUP' -ErrorText $selectionFailure.Message -RollbackStatus ('failed: ' + $rollbackFailure.Message) -BackupRoot $backendSwitchTransaction.BackupRoot
+        throw ("Backend selection failed: {0}; rollback failed: {1}; backup preserved at {2}; Diagnostic={3}" -f
+            $selectionFailure.Message,$rollbackFailure.Message,$backendSwitchTransaction.BackupRoot,$diagnostic)
     }
-    throw $selectionFailure
 } finally {
     if ($removeBackendSwitchTransactionBackup) {
         Remove-BackendSwitchTransaction $backendSwitchTransaction

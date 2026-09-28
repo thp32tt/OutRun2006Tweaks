@@ -70,7 +70,23 @@ try {
         throw 'Injected failure sentinel was unexpectedly modified.'
     }
 
-    Write-Host 'Backend selector transactional rollback PASS'
+
+    $failureEvidence = @(Get-ChildItem $testRoot -File -Filter 'VR_SELECTOR_FAILURE_*.json' -ErrorAction SilentlyContinue)
+    if ($failureEvidence.Count -ne 1) {
+        throw "Expected one root fallback selector failure diagnostic, found $($failureEvidence.Count)."
+    }
+    $failureRecord = Get-Content $failureEvidence[0].FullName -Raw | ConvertFrom-Json
+    if ([string]$failureRecord.Phase -ne 'MUTATION_OR_SESSION_SETUP') {
+        throw "Selector failure diagnostic phase mismatch: $($failureRecord.Phase)"
+    }
+    if ([string]$failureRecord.RollbackStatus -ne 'restored') {
+        throw "Selector failure diagnostic rollback status mismatch: $($failureRecord.RollbackStatus)"
+    }
+    if ([bool]$failureRecord.SessionCreated) {
+        throw 'Selector failure diagnostic incorrectly claims a normal session was created.'
+    }
+
+    Write-Host 'Backend selector transactional rollback + pre-session diagnostic PASS'
 } finally {
     if (Test-Path $testRoot) {
         Remove-Item $testRoot -Recurse -Force -ErrorAction SilentlyContinue
