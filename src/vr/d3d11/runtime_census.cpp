@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <mutex>
 #include <unordered_set>
+#include <vector>
 
 #include <spdlog/spdlog.h>
 
@@ -32,6 +33,8 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> UnsupportedTopologySamples{0};
         std::atomic<std::uint64_t> UnsupportedIndexFormatSamples{0};
         std::atomic<std::uint64_t> UnsupportedTextureFormatSamples{0};
+        std::atomic<std::uint64_t> UnsupportedColorFormatSamples{0};
+        std::atomic<std::uint64_t> UnsupportedDepthFormatSamples{0};
         std::atomic<std::uint64_t> UniqueDrawSignatures{0};
         std::atomic<std::uint64_t> VertexDeclarationSamples{0};
         std::atomic<std::uint64_t> IndexedSamples{0};
@@ -45,9 +48,13 @@ namespace outrun::vr::dx11
         struct SourceSignature
         {
             DWORD fvf{};
+            std::uint64_t vertexDeclHash{};
+            UINT vertexDeclElements{};
             UINT streamOffset{};
             UINT stride{};
             D3DFORMAT indexFormat = D3DFMT_UNKNOWN;
+            D3DFORMAT renderTargetFormat = D3DFMT_UNKNOWN;
+            D3DFORMAT depthFormat = D3DFMT_UNKNOWN;
             D3DRESOURCETYPE texture0Type = D3DRTYPE_FORCE_DWORD;
             D3DFORMAT texture0Format = D3DFMT_UNKNOWN;
             D3DRESOURCETYPE texture1Type = D3DRTYPE_FORCE_DWORD;
@@ -80,9 +87,13 @@ namespace outrun::vr::dx11
             std::uint64_t hash = 0xcbf29ce484222325ull;
             hash = hash_mix(hash, static_cast<std::uint32_t>(primitive));
             hash = hash_mix(hash, sig.fvf);
+            hash = hash_mix(hash, sig.vertexDeclHash);
+            hash = hash_mix(hash, sig.vertexDeclElements);
             hash = hash_mix(hash, sig.streamOffset);
             hash = hash_mix(hash, sig.stride);
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.indexFormat));
+            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.renderTargetFormat));
+            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.depthFormat));
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture0Type));
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture0Format));
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture1Type));
@@ -176,6 +187,32 @@ namespace outrun::vr::dx11
                 declaration)
             {
                 sig.vertexDeclaration = true;
+
+                UINT count = 0;
+                if (SUCCEEDED(declaration->GetDeclaration(nullptr, &count)) &&
+                    count > 0 && count <= (MAXD3DDECLLENGTH + 1))
+                {
+                    std::vector<D3DVERTEXELEMENT9> elements(count);
+                    UINT actual = count;
+                    if (SUCCEEDED(declaration->GetDeclaration(
+                            elements.data(), &actual)) &&
+                        actual > 0 && actual <= count)
+                    {
+                        std::uint64_t declHash = 0xcbf29ce484222325ull;
+                        for (UINT i = 0; i < actual; ++i)
+                        {
+                            const auto& element = elements[i];
+                            declHash = hash_mix(declHash, element.Stream);
+                            declHash = hash_mix(declHash, element.Offset);
+                            declHash = hash_mix(declHash, element.Type);
+                            declHash = hash_mix(declHash, element.Method);
+                            declHash = hash_mix(declHash, element.Usage);
+                            declHash = hash_mix(declHash, element.UsageIndex);
+                        }
+                        sig.vertexDeclHash = declHash;
+                        sig.vertexDeclElements = actual;
+                    }
+                }
                 declaration->Release();
             }
 
@@ -183,6 +220,24 @@ namespace outrun::vr::dx11
             if (SUCCEEDED(device->GetStreamSource(
                     0, &vb, &sig.streamOffset, &sig.stride)) && vb)
                 vb->Release();
+
+            IDirect3DSurface9* rt0 = nullptr;
+            if (SUCCEEDED(device->GetRenderTarget(0, &rt0)) && rt0)
+            {
+                D3DSURFACE_DESC desc{};
+                if (SUCCEEDED(rt0->GetDesc(&desc)))
+                    sig.renderTargetFormat = desc.Format;
+                rt0->Release();
+            }
+
+            IDirect3DSurface9* depth = nullptr;
+            if (SUCCEEDED(device->GetDepthStencilSurface(&depth)) && depth)
+            {
+                D3DSURFACE_DESC desc{};
+                if (SUCCEEDED(depth->GetDesc(&desc)))
+                    sig.depthFormat = desc.Format;
+                depth->Release();
+            }
 
             IDirect3DIndexBuffer9* ib = nullptr;
             if (SUCCEEDED(device->GetIndices(&ib)) && ib)
@@ -248,15 +303,19 @@ namespace outrun::vr::dx11
             if (inserted && unique <= 64)
             {
                 spdlog::info(
-                    "VR DX11 R72 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} stream0[offset={},stride={}] indexFmt={} tex0[type={},fmt={}] tex1[type={},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
+                    "VR DX11 R72 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} stream0[offset={},stride={}] indexFmt={} rtFmt={} depthFmt={} tex0[type={},fmt={}] tex1[type={},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
                     unique,
                     static_cast<int>(primitive),
                     sig.fixedFunction ? 1 : 0,
                     sig.fvf,
                     sig.vertexDeclaration ? 1 : 0,
+                    sig.vertexDeclHash,
+                    sig.vertexDeclElements,
                     sig.streamOffset,
                     sig.stride,
                     static_cast<int>(sig.indexFormat),
+                    static_cast<int>(sig.renderTargetFormat),
+                    static_cast<int>(sig.depthFormat),
                     static_cast<int>(sig.texture0Type),
                     static_cast<int>(sig.texture0Format),
                     static_cast<int>(sig.texture1Type),
@@ -310,7 +369,7 @@ namespace outrun::vr::dx11
                     UnsupportedCounts[i].load(std::memory_order_relaxed);
 
             spdlog::info(
-                "VR DX11 R72 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[indexUnsupported={},textureUnsupported={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R72 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -353,10 +412,12 @@ namespace outrun::vr::dx11
         const auto translated = translate_pipeline(source);
         const auto topology = translate_primitive(primitive);
 
+        bool resourcesExact = true;
         if (sig.indexFormat != D3DFMT_UNKNOWN &&
             !translate_resource_format(sig.indexFormat, ResourceRole::Index).exact)
         {
             UnsupportedIndexFormatSamples.fetch_add(1, std::memory_order_relaxed);
+            resourcesExact = false;
         }
         for (const D3DFORMAT format : { sig.texture0Format, sig.texture1Format })
         {
@@ -364,7 +425,22 @@ namespace outrun::vr::dx11
                 !translate_resource_format(format, ResourceRole::Texture).exact)
             {
                 UnsupportedTextureFormatSamples.fetch_add(1, std::memory_order_relaxed);
+                resourcesExact = false;
             }
+        }
+        if (sig.renderTargetFormat != D3DFMT_UNKNOWN &&
+            !translate_resource_format(
+                sig.renderTargetFormat, ResourceRole::Color).exact)
+        {
+            UnsupportedColorFormatSamples.fetch_add(1, std::memory_order_relaxed);
+            resourcesExact = false;
+        }
+        if (sig.depthFormat != D3DFMT_UNKNOWN &&
+            !translate_resource_format(
+                sig.depthFormat, ResourceRole::DepthStencil).exact)
+        {
+            UnsupportedDepthFormatSamples.fetch_add(1, std::memory_order_relaxed);
+            resourcesExact = false;
         }
 
         Samples.fetch_add(1, std::memory_order_relaxed);
@@ -394,7 +470,7 @@ namespace outrun::vr::dx11
             inspect_source_signature(device, fixedFunction);
         note_signature(signature, primitive);
 
-        if (unsupported == PipelineUnsupportedNone && topology.exact)
+        if (unsupported == PipelineUnsupportedNone && topology.exact && resourcesExact)
             ExactSamples.fetch_add(1, std::memory_order_relaxed);
 
         maybe_log();
