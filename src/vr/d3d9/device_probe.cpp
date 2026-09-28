@@ -57,9 +57,10 @@ namespace OutRunVRDeviceProbe
 
                 const auto dxvk = OutRunVR::Dxvk::ProbeProvider(device);
                 spdlog::info(
-                    "VR DXVK R71 census: providerLoaded={} nonSystem={} stockInterop={} D3D9Ex={} stockHr=0x{:08X} exHr=0x{:08X}",
+                    "VR DXVK R71 census: providerLoaded={} nonSystem={} gameLocal={} stockInterop={} D3D9Ex={} stockHr=0x{:08X} exHr=0x{:08X}",
                     dxvk.d3d9ProviderLoaded ? 1 : 0,
                     dxvk.nonSystemProvider ? 1 : 0,
+                    dxvk.gameLocalProvider ? 1 : 0,
                     dxvk.stockDxvkInterop ? 1 : 0,
                     dxvk.d3d9ExAvailable ? 1 : 0,
                     static_cast<unsigned>(dxvk.stockDxvkInteropHr),
