@@ -371,7 +371,14 @@ namespace
             {
                 // Completion is unknowable. Keep the producer slot blocked
                 // rather than publishing an unsafe ACK that could allow D3D9
-                // to overwrite a resource still referenced by D3D11.
+                // to overwrite a resource still referenced by D3D11. Also
+                // quarantine this DirectGPU generation so no new zero-copy
+                // source from it is sampled while completion is unknowable.
+                const std::uint32_t failedGeneration =
+                    pending.frame.reserved[
+                        OutRunVR::RenderFrameDirectGenerationIndex];
+                OutRunVrR32DirectSubmit::MarkGenerationFault(
+                    failedGeneration);
                 pending.poisoned = true;
                 ++R23DeferredReferenceAckPoisoned;
                 if (!R23FirstDeferredReferenceAckPoisonLogged)
@@ -481,6 +488,13 @@ namespace
                     &desc, &pending.fence)) ||
                 !pending.fence)
             {
+                // This exact producer slot was already referenced by D3D11,
+                // but without an EVENT its completion cannot be proven. Never
+                // ACK it. Quarantine the whole generation so future frames
+                // route to cached/classic recovery instead of consuming more
+                // shared slots into the same failure mode.
+                OutRunVrR32DirectSubmit::MarkGenerationFault(
+                    generation);
                 pending.frame = frame;
                 pending.armed = true;
                 pending.poisoned = true;
@@ -1314,6 +1328,16 @@ namespace
     bool R23CommitDirectAfterValidation(StereoCompositor& c,
         const OutRunVR::SharedRenderFrameState& frame)
     {
+        const std::uint32_t generation =
+            frame.reserved[
+                OutRunVR::RenderFrameDirectGenerationIndex];
+        OutRunVrR32DirectSubmit::ObserveGeneration(generation);
+        if (OutRunVrR32DirectSubmit::GenerationFaulted(generation))
+        {
+            R23InvalidateDirect(c);
+            return false;
+        }
+
         if (!c.PrepareDirectStereoSource(frame) ||
             !R23StageDirectHold(c, frame))
         {
@@ -2069,6 +2093,10 @@ int main(int argc, char** argv)
         const bool directTransportEnabled = DirectTransportEnabled();
         const bool directTransportOnly =
             directTransportEnabled && DirectTransportOnly();
+        const auto directOnlyEffective = [&]() noexcept {
+            return directTransportOnly &&
+                !OutRunVrR32DirectSubmit::ActiveGenerationFaulted();
+        };
         const bool disableDesktopDuplication = DisableDesktopDuplication();
         const float targetRefreshRateHz = RequestedRefreshRateHz();
         const int cadenceMode = std::clamp(
@@ -2500,7 +2528,7 @@ int main(int argc, char** argv)
                     // producer slot indefinitely.
                     R23PollDeferredReferenceAcks(compositor);
 
-                    if (directTransportOnly)
+                    if (directOnlyEffective())
                     {
                         std::array<OutRunVR::SharedRenderFrameState,
                             OutRunVR::RenderFrameRingSize> history{};
@@ -2674,7 +2702,7 @@ int main(int argc, char** argv)
 
                         LARGE_INTEGER cs{}, ce{};
                         QueryPerformanceCounter(&cs);
-                        if (!directFrame && directTransportOnly)
+                        if (!directFrame && directOnlyEffective())
                         {
                             candidateReady = false;
                             candidateRejectReason =
@@ -2733,7 +2761,7 @@ int main(int argc, char** argv)
 
                         if (!candidateReady)
                         {
-                            if (!directFrame && directTransportOnly)
+                            if (!directFrame && directOnlyEffective())
                             {
                                 candidateRejectReason =
                                     "direct-only-classic-rejected";
@@ -2988,7 +3016,7 @@ int main(int argc, char** argv)
                     // projection, keep the last LOCAL-fixed menu/loading image
                     // visible in direct-only mode. This is strictly a bootstrap
                     // bridge; the first fresh gameplay projection disables it.
-                    if (!layerReady && directTransportOnly &&
+                    if (!layerReady && directOnlyEffective() &&
                         awaitingFirstGameplayStereo &&
                         cachedMenuProjectionValid)
                     {
@@ -3008,7 +3036,7 @@ int main(int argc, char** argv)
                     // Duplication missed the stereo grace window. VDXR can show a
                     // solid compositor colour / severe HMD stutter even while the
                     // desktop game keeps running normally.
-                    if (!layerReady && directTransportOnly)
+                    if (!layerReady && directOnlyEffective())
                     {
                         finalLayerKind = "direct-only-no-classic-fallback";
                     }
