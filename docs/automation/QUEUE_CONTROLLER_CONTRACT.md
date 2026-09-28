@@ -34,7 +34,11 @@ Each task must update or add a durable record under `docs/automation/runs/` cont
 - A/B must not modify shared state files while running concurrently. Their commits are lane-local only; C alone reconciles `resume_state.json`, worklog, progress/status, asset_queue and shared queue summaries after both production lanes reach terminal durable results.
 - Parallel completion is task-commit based, not branch-HEAD based. The controller must find the commit carrying that lane's exact `[AUTO:<TASK_ID>]` marker and validate Actions for that exact SHA even if the peer lane moved branch HEAD later.
 - Keep changes narrowly scoped.
-- Maximum automatic repair attempts: 3.
-- After 3 failed attempts, record the blocker and move to another independent runnable task.
+- Maximum automatic repair attempts: 3 per asset for the same dependency/input fingerprint.
+- After 3 failed attempts, record the blocker and immediately move to another independent runnable asset in the same lane/run.
+- Do not retry that blocker in later waves until its dependency fingerprint changes (source/candidate bytes, runtime evidence, relevant QA input/contract, or explicit user instruction).
+- A/B should batch up to 4 newly created or materially reworked DDS candidates per lane per invocation when runnable work exists.
+- Existing runtime-isolation candidates are a separate validation backlog; they block only themselves, not unrelated graphics production.
+- Do not spend a C barrier on a wave where both lanes have zero new candidate bytes and zero material new evidence.
 - Never use N100 local clones/worktrees as a project workspace.
 - GitHub branch HEAD and Actions are the durable source of truth.

@@ -44,17 +44,18 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 
 ## Parallel dual-production dispatch
 - A and B are independent production workers and SHOULD run concurrently when the controller runtime supports multiple active conversations/workers.
-- A: PRODUCTION LANE A + self-QA on the odd-index shard. Create/rework actual localization assets continuously from A's shard and immediately fix zero-pixel-overflow failures in the same run.
-- B: PRODUCTION LANE B + self-QA on the even-index shard. Create/rework actual localization assets continuously from B's shard, including positively identified `zoom_review` text assets, and immediately fix zero-pixel-overflow failures in the same run.
-- C is a synchronization barrier, not a third concurrent modifier. Start C only after the current A and B tasks have each produced a durable Git result (PASS, no-action, or recorded blocker), then refresh HEAD and run CROSS-LANE FINAL QA + approval.
-- After C records its durable result, dispatch the next A+B production wave.
+- A: PRODUCTION LANE A + self-QA on the odd-index shard. Create/rework actual localization assets continuously from A's shard and immediately fix zero-pixel-overflow failures in the same run. Aim for a multi-DDS batch rather than stopping on the first blocked asset.
+- B: PRODUCTION LANE B + self-QA on the even-index shard. Create/rework actual localization assets continuously from B's shard, including positively identified `zoom_review` text assets, and immediately fix zero-pixel-overflow failures in the same run. Aim for a multi-DDS batch rather than stopping on the first blocked asset.
+- C is a synchronization barrier, not a third concurrent modifier. Start C after the current A and B productive batches have each produced a durable Git result, then refresh HEAD and run CROSS-LANE FINAL QA + approval over the whole batch.
+- If both A and B produced no new candidate bytes and no material new QA/runtime evidence, do not spend a full C cycle re-recording the same blocker state; proceed according to the no-action suppression rule.
+- After C records a productive-batch result, dispatch the next A+B production wave.
 - If the controller runtime cannot actually launch two workers concurrently, fall back to sequential queue execution and report that mode accurately; Git configuration alone must not be treated as proof of runtime parallelism.
 
 ## A/B work sharding and anti-duplication
 - Use the stable numeric `index` column in `localization/graphics/asset_queue.csv` to avoid A/B producing the same DDS.
 - A primary shard: rows with an ODD numeric `index`.
 - B primary shard: rows with an EVEN numeric `index`.
-- Each role prioritizes in this order inside its shard: `REWORK_REQUIRED` -> unfinished `localize_text` -> unresolved `zoom_review` that contains localizable text -> other role-specific pending work.
+- Each role prioritizes in this order inside its shard: runnable `REWORK_REQUIRED` -> unfinished `localize_text` -> unresolved `zoom_review` that contains localizable text -> other role-specific pending work. A REWORK row whose required source/runtime/decoded-pixel dependency is unchanged and unavailable is dependency-blocked, not runnable, and must be skipped without terminating the batch.
 - A/B must refresh branch HEAD and queue state immediately before selecting work and again before commit. If an item is already completed or changed by the other role, skip it rather than redo it.
 - A/B concurrent runs must remain on disjoint primary shards. Do not work-steal while the peer production lane is active.
 - Work stealing is allowed only after the peer lane is confirmed idle/completed, followed by a fresh GitHub HEAD/queue refresh proving the target is unclaimed and has no newer current-cycle production/state change. Record `work_stolen_from_lane` in the role report.
@@ -65,9 +66,19 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 - C does not use parity sharding and reviews both lanes.
 
 ## Throughput rule
-- Continue producing multiple assets in one run while tool/runtime budget allows; do not stop after a single DDS when additional independent queue items are actionable.
-- Persist each completed batch and machine-readable QA evidence to Git so the next invocation can resume from repository state alone.
+- A/B are batch producers, not single-asset/blocker checkers. Default production goal is up to 4 newly created or materially reworked DDS candidates per lane per invocation, continuing until the goal is reached, tool/runtime budget is exhausted, or that lane has no runnable asset.
+- A blocked REWORK item MUST NOT terminate a lane while another independent runnable item exists in that lane. Record/retain the blocker, skip it immediately, and continue to the next runnable REWORK/localize_text/zoom_review item.
+- A blocker with unchanged dependency inputs MUST NOT be re-reviewed every wave. Treat it as dependency-blocked until at least one dependency fingerprint changes: source DDS/blob SHA, candidate SHA, transcription/artwork input, runtime/in-game evidence, QA contract, or explicit user instruction.
+- Runtime/in-game isolation is asset-local. Existing candidates that require isolated DDS_ONLY testing belong to a separate validation backlog and MUST NOT block production of unrelated pending DDS assets.
+- Persist completed production batches and machine-readable self-QA evidence to Git so the next invocation can resume from repository state alone.
 - Do not require Docker/controller configuration changes for workflow-rule changes; modify this Git contract/state instead.
+
+## No-action suppression and C batching
+- Repeated no-action waves are forbidden when they only reproduce an already-recorded blocker with identical dependency inputs.
+- If a lane has no runnable production after applying dependency-blocked skips, it may reuse the existing blocker state instead of creating another blocker-only production cycle unless a unique controller TASK_ID contract requires a durable terminal record. Such a required record must be minimal and must not trigger speculative DDS rewrites.
+- C final QA is batch-oriented. C should review all new/changed A+B candidate DDS SHAs from the wave together and reconcile shared state once per productive batch.
+- Do not schedule a C barrier solely because A/B repeated the same no-change blocker state. If neither lane produced new candidate bytes nor new material QA/runtime evidence, advance directly to the next runnable production opportunity or wait for the missing dependency.
+- A productive wave is one where at least one lane creates/materially reworks candidate DDS bytes or adds material new QA/runtime evidence that changes an asset's eligibility/state.
 
 ## State and completion
 Do not repeat completed work. Resume from current Git progress/resume state.
