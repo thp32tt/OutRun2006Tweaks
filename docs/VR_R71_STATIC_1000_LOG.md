@@ -339,3 +339,15 @@ Validation:
 Next:
 - Consume the exact-head CI first.
 - If green, add a pure LEVEL0 transition-history eligibility helper before touching runtime transition paths.
+
+
+## Cycle 0012 — exact-head hosted gate consumption
+
+Review lenses: architecture/control-flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence: exact `b03ca30c3e1229b33dbe8da58ee9a3134e5a31f6` hosted Build `36497134902`, OpenXR `36497134942`, and HUD Inspector `36497134904` completed success. Transition release remains gated on positive sampled-history proof. No runtime behavior changed and no self-hosted runner was used.
+
+Changed files: durable log/state only.
+AUTOMATION_VALIDATION: `PASS_EXACT_HEAD_HOSTED_CI`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: define positive sampled-identity history contract before transition ACK wiring.
