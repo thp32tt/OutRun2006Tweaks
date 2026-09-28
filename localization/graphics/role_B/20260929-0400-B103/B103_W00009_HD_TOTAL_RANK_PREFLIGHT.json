@@ -1,0 +1,81 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00030",
+  "wave_id": "W00009",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T04:00:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "initial_head_sha": "79300d3e017f0325e29e4d9afb894252b4fee89b",
+  "precommit_refresh_head_sha": "667230cab14693126e69501a5188631802d4e66d",
+  "preserved_peer_lane_commit": true,
+  "peer_lane_task": "LOCALIZATION-LOCALIZATION_A-00029",
+  "result": "PASS_MATERIAL_FALLBACK_EXACT_HD_DECODED_PIXEL_PREFLIGHT_4_ASSETS_6_LABELS",
+  "automation_validation": "PASS_LANE_LOCAL_STATIC_PRECOMMIT",
+  "runtime_validation": "UNTESTED",
+  "contract_fallback": [
+    "MANDATORY_FALLBACK_LADDER_STEP_4_SOURCE_FAITHFUL_RECONSTRUCTION_INPUT",
+    "MANDATORY_FALLBACK_LADDER_STEP_5_ASSET_SPECIFIC_QA_REBUILD_TOOLING"
+  ],
+  "source_policy": {
+    "git_identity_source": "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "git_blob_identity_pass": "4/4",
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "translation": {"Total Rank": "종합 랭크"}
+  },
+  "decoded_pixel_metrics": [
+    {"queue_index":26,"asset":"63C91067","git_blob_sha":"9f41fe44ecb17a4daba096ddbb9d2c73fa28e8f9","source_sha256":"d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab","dimensions":[2048,2048],"labels":[{"key":"pink","search_rect":[560,140,1160,270],"foreground_core_bbox":[602,140,1120,242],"foreground_core_pixels":29592,"bbox_alpha":{"min":128,"p10":128,"median":255,"p90":255,"max":255},"background_ring_alpha":{"min":128,"p10":128,"median":128,"p90":240,"max":255}},{"key":"brown","search_rect":[720,1160,1320,1300],"foreground_core_bbox":[750,1160,1306,1271],"foreground_core_pixels":32639,"bbox_alpha":{"min":0,"p10":15,"median":255,"p90":255,"max":255},"background_ring_alpha":{"min":0,"p10":0,"median":192,"p90":239,"max":255}}]},
+    {"queue_index":28,"asset":"A05BF610","git_blob_sha":"1ed3fc83fc0501ac6420c0b3e3c51b7f0c9b1374","source_sha256":"52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129","dimensions":[2048,2048],"labels":[{"key":"green","search_rect":[520,1160,1100,1300],"foreground_core_bbox":[547,1188,1064,1271],"foreground_core_pixels":29151,"bbox_alpha":{"min":191,"p10":191,"median":255,"p90":255,"max":255},"background_ring_alpha":{"min":191,"p10":191,"median":191,"p90":199,"max":224}}]},
+    {"queue_index":30,"asset":"8215FD25","git_blob_sha":"64a92104d3158614283d0d63baee7ec29ca45316","source_sha256":"e8125cb52c6a135dcde0dade0dcf447ea5d806b8a9b2438d7d6732be84c9b66e","dimensions":[4096,2048],"labels":[{"key":"pink","search_rect":[1650,140,2250,270],"foreground_core_bbox":[1690,140,2208,242],"foreground_core_pixels":29592,"bbox_alpha":{"min":128,"p10":128,"median":255,"p90":255,"max":255},"background_ring_alpha":{"min":128,"p10":128,"median":128,"p90":240,"max":255}},{"key":"brown","search_rect":[1800,1160,2400,1300],"foreground_core_bbox":[1838,1160,2394,1271],"foreground_core_pixels":32639,"bbox_alpha":{"min":0,"p10":15,"median":255,"p90":255,"max":255},"background_ring_alpha":{"min":0,"p10":0,"median":192,"p90":239,"max":255}}]},
+    {"queue_index":32,"asset":"DCC7B488","git_blob_sha":"7f8f0d10f2ac8a19bda1933d6a324a37123b48c0","source_sha256":"ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e","dimensions":[2048,1024],"labels":[{"key":"green","search_rect":[520,140,1100,280],"foreground_core_bbox":[547,164,1064,247],"foreground_core_pixels":29151,"bbox_alpha":{"min":191,"p10":191,"median":255,"p90":255,"max":255},"background_ring_alpha":{"min":191,"p10":191,"median":191,"p90":199,"max":224}}]}
+  ],
+  "style_metrics": {
+    "white_fill_median_rgba": [255,255,255,255],
+    "navy_outline_median_rgba": [8,16,57,255],
+    "physical_labels": 6,
+    "permitted_full_effect_bbox": null,
+    "containment_state": "HOLD_STRICT_RECHECK"
+  },
+  "production_attempt": {
+    "candidate_dds_persisted": false,
+    "rejected_not_persisted": true,
+    "visual_failure": "Exact-HD candidate trials exposed source 3D/shadow/alpha interaction with semi-transparent speech-bubble/burst backgrounds. Trials left English-effect residue or line/rectangular reconstruction seams; artifact-cleanliness gate failed, therefore no unsafe DDS was persisted.",
+    "zero_pixel_claim": "NOT_CLAIMED_FOR_REJECTED_DRAFTS",
+    "mandatory_english_source_comparison": "PERFORMED_ON_REJECTED_DRAFT; VISUAL_FAIL; draft discarded",
+    "next_safe_action": "Implement alpha-aware exact-HD background reconstruction from these decoded metrics, then require full-effect source bbox, ENGLISH SOURCE vs KOREAN CANDIDATE proof, zero-pixel containment, header/alpha/orientation QA."
+  },
+  "known_preexisting_shared_state_blocker": {
+    "owner": "LOCALIZATION_C",
+    "source_task": "LOCALIZATION-LOCALIZATION_A-00029",
+    "indices": [26,28,30,32,35],
+    "failure_root_cause": "PREEXISTING_C_SHARED_STATE_INCONSISTENCY_ARTWORK_PLAN_AND_VISUAL_REVIEW_NOT_RECONCILED_FOR_PROMOTED_W00008_ASSETS",
+    "b_action": "DO_NOT_TOUCH_SHARED_STATE"
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_26_28_30_32",
+    "work_steal": "NONE",
+    "queue_freshness": "PASS_PRECOMMIT_REFRESH",
+    "git_blob_identity": "PASS_4_OF_4",
+    "dds_header_dimensions_format_mips": "PASS_4_OF_4",
+    "raw_orientation": "PASS_MIRROR_Y_4_OF_4",
+    "decoded_foreground_core_bbox": "PASS_6_OF_6",
+    "candidate_artifact_gate": "FAIL_REJECTED_NOT_PERSISTED",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE_PERSISTED",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "reviewed_or_materially_advanced_assets": ["63C91067","A05BF610","8215FD25","DCC7B488"],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00009 B advanced four even-shard assets beyond the W00008 classification-only state by identity-verifying and decoding the exact immutable HD sources and recording six source text core/alpha/style reconstruction inputs. Unsafe candidate drafts failed visual QA and were deliberately discarded. Runtime remains UNTESTED; shared-state reconciliation remains C-owned."
+}
