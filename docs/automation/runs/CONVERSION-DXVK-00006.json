@@ -1,0 +1,50 @@
+{
+  "task_id": "CONVERSION-DXVK-00006",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "e028d57727e986b5f3609f95347128e52d25878d",
+  "result_sha": "b0ae61d7f0eb930d252caafe3b9b9db603d44ee9",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "ONECLICK-S09-F31-F32-LAUNCH-HOST-DIAGNOSTIC-SURVIVABILITY",
+  "summary": "Selected the highest-priority runnable DXVK follow-up from the durable prior checkpoint: Set 09 F31/F32 post-launch diagnostic survivability. The runner now captures launch/wait and host-teardown failures into RUNNER_FAILURE.json, restores process environment, invokes diagnostic collection before propagating those failures, and uses a non-destructive emergency collector snapshot when outrun-vr-host cannot be terminated. Emergency collection permits the stuck-process diagnostic case, produces the session ZIP, and deliberately preserves root logs/captures and CURRENT_VR_SESSION.json without rotating to a new session. Added Windows behavior regression coverage and wired it into the one-click Backend Conversion Gate. No renderer/provider ownership or vr-d3d9ex-focus changes were made.",
+  "changed_paths": [
+    "tools/Run-OutRunVRTest.ps1",
+    "tools/Collect-OutRunVRLogs.ps1",
+    "tools/Test-RunOutRunVRFailureDiagnostics.ps1",
+    "tools/Test-VROneClickContract.ps1"
+  ],
+  "source_commits": [
+    "77c2ae423047ee5460d38bdfce4565d0c7a0f48a",
+    "01fdad3cad9d635ec7db75b67238d9fabdc42198",
+    "dfc02f6c73490dd05f316a039dcdbf61cd75a8a0",
+    "614e75fec1016acb74cd013d7e85cc9568b3ef87",
+    "b0ae61d7f0eb930d252caafe3b9b9db603d44ee9"
+  ],
+  "evidence": [
+    "C0 recovered branch HEAD e028d57727e986b5f3609f95347128e52d25878d plus AGENTS.md, QUEUE_CONTROLLER_CONTRACT.md, VR automation/state files, Set 09/10 review docs, prior CONVERSION-DXVK-00004 checkpoint, regression knowledge and Issue #14. F06/F07/F15 were already closed and were not repeated.",
+    "Set 09 S09-R01/F31 documented that Start-Process exceptions bypassed post-game host wait and collector invocation; S09-R03/F32 documented that a host surviving forced teardown threw before collector invocation.",
+    "Run-OutRunVRTest.ps1 now stores GAME_LAUNCH_OR_WAIT or HOST_TEARDOWN failure evidence in the active session, restores environment first, performs diagnostic collection, and only then propagates the original failure.",
+    "Collect-OutRunVRLogs.ps1 -Emergency allows a stuck-process snapshot but marks LogBoundary=emergency-snapshot-running-process and EmergencySnapshot=true, does not delete copied source logs/captures, and does not rotate CURRENT_VR_SESSION.json or prepare a next session.",
+    "Test-RunOutRunVRFailureDiagnostics.ps1 behavior-tests an invalid executable Start-Process failure and verifies collection occurred before failure propagation. It also behavior-tests emergency collection is non-destructive, preserves the current session, emits the emergency manifest and creates exactly one ZIP.",
+    "Backend Conversion Gate 36399100147 PASS on exact SHA b0ae61d7f0eb930d252caafe3b9b9db603d44ee9: queue/baseline checks, one-click contract including F31/F32 behavior test, disassembly contract, semantic catalog, DXVK analyzer regression, pinned acquisition, Win32 configure/build, binary verification and artifact upload all succeeded.",
+    "Artifact 10959399294: backend-autovalidated-vr-dxvk-r71-disasm-b0ae61d7f0eb930d252caafe3b9b9db603d44ee9; digest sha256:123aa95c1ca383376293d68499a82178bbd0a7a9f0d600a59207bc38ed4a9e5c.",
+    "Issue #14 production ledger comment 5866525494 records the source transaction. No N100 clone/worktree, HMD, Quest 3, VDXR or in-game visual validation was used."
+  ],
+  "completed_work_items": [
+    "ONECLICK-S09-F31-GAME-LAUNCH-EXCEPTION-DIAGNOSTIC-SURVIVABILITY",
+    "ONECLICK-S09-F32-STUCK-HOST-EMERGENCY-DIAGNOSTIC-SURVIVABILITY"
+  ],
+  "open_work_items": [
+    "ONECLICK-S09-F33-COLLECTOR-FAILURE-RESULT-PRECEDENCE",
+    "DXVK-EXACT-BUILD-QUEST3-VDXR-TWO-PASS-VISUAL-PARITY",
+    "DXVK-CLEAN-PERFORMANCE-PROFILE"
+  ],
+  "next_action": "F31/F32 are complete at automated-behavior/build level. Keep F33 collector-failure precedence as a separate bounded task. Runtime visual/parity claims remain blocked on an exact-build Quest 3/VDXR run; until then RUNTIME_VALIDATION stays UNTESTED and DXVK multiview promotion remains blocked.",
+  "workflow_run_id": 36399100147,
+  "workflow_job_id": 108852689421,
+  "artifact_id": 10959399294,
+  "artifact_digest": "sha256:123aa95c1ca383376293d68499a82178bbd0a7a9f0d600a59207bc38ed4a9e5c",
+  "recorded_at": "2026-09-28T17:48:54+09:00"
+}
