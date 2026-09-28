@@ -71,8 +71,18 @@ def minutes_since(value: Optional[str], now: datetime) -> Optional[float]:
 
 
 async def prepare_slot_pages(context: BrowserContext, reg: Registry) -> dict[str, Page]:
-    """Create and keep one persistent Chrome tab per A~F review slot."""
+    """Create and keep persistent tabs, hard-scoped to the configured ChatGPT project."""
     pages: dict[str, Page] = {}
+    registry_changed = False
+    for slot in reg.slots:
+        if slot.url and not is_project_scoped_chat_url(slot.url):
+            log.warning("discarding cross-project/stale slot URL slot=%s url=%s", slot.name, slot.url)
+            slot.url = None
+            slot.last_assistant_hash = None
+            slot.last_assistant_change_at = None
+            registry_changed = True
+    if registry_changed:
+        save_registry(reg)
     available = [p for p in context.pages if not p.is_closed()]
 
     # First reuse tabs that already match persisted chat URLs.
@@ -131,8 +141,8 @@ async def prepare_slot_pages(context: BrowserContext, reg: Registry) -> dict[str
 
 async def slot_page(context: BrowserContext, pages: dict[str, Page], slot: Slot) -> Page:
     page = pages.get(slot.name)
-    if slot.url and not is_persistable_chat_url(slot.url):
-        log.warning("discarding ephemeral slot URL slot=%s url=%s", slot.name, slot.url)
+    if slot.url and not is_project_scoped_chat_url(slot.url):
+        log.warning("discarding non-project slot URL slot=%s url=%s", slot.name, slot.url)
         slot.url = None
         slot.last_assistant_hash = None
         slot.last_assistant_change_at = None
@@ -155,7 +165,7 @@ async def recover_slot_composer(context: BrowserContext, pages: dict[str, Page],
     log.warning("composer missing slot=%s retry_visible=%s url=%s; refreshing once", slot.name, retry is not None, page.url)
 
     # Recovery 1: reload the same persisted conversation once.
-    target = slot.url if slot.url and is_persistable_chat_url(slot.url) else BASE_URL
+    target = slot.url if slot.url and is_project_scoped_chat_url(slot.url) else BASE_URL
     try:
         await page.goto(target, wait_until="domcontentloaded", timeout=60000)
         await page.wait_for_timeout(1500)
