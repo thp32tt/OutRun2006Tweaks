@@ -398,3 +398,12 @@ Five lenses: architecture; lifetime/reset/sync; stereo correctness; performance;
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: review gameplay bootstrap freshness.
+
+
+## Cycle 0017 — gameplay bootstrap freshness
+
+Five lenses: architecture; lifetime/reset/sync; stereo correctness; performance; falsification. Gameplay stays Theater without a usable stereo bootstrap, and frame reads require current run identity. No gate relaxation is supported.
+
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: review cached projection hold telemetry.
