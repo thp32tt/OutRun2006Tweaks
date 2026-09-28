@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-28T10:09:21+09:00",
+  "updated_at_kst": "2026-09-28T12:31:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C85: 4 current HD candidates pass exact pixel+visual static QA but remain unapproved pending isolated DDS_ONLY in-game. 12 current candidates require rework; 63 additional localize_text rows remain pending production; 47 zoom_review rows remain HOLD_STRICT_RECHECK.",
+  "next_checkpoint": "B92: 62BEBF33 and E3FD08BE exact-bbox rework self-QA PASS; pending independent C and isolated DDS_ONLY in-game. C85 has 10 other REWORK_REQUIRED assets; 63 additional localize_text rows and 47 zoom_review rows remain.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -161,7 +161,7 @@
     "hangul_name_entry": 1,
     "zoom_review": 47,
     "no_localization": 74,
-    "work_queue_total": 136,
+    "work_queue_total": 137,
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
     "transcribed_assets": 79,
@@ -276,17 +276,19 @@
         "2DA43E41",
         "411827E",
         "571E78F3",
-        "62BEBF33",
-        "E3FD08BE",
         "C075FB49",
         "FD90AA9"
       ],
-      "remaining": 12,
+      "remaining": 10,
       "pixel_visual_pass_pending_ingame": [
         "C4A2937B",
         "9F060EC1",
         "D6DC1380",
         "48DEBE77"
+      ],
+      "pending_c_revalidation": [
+        "62BEBF33",
+        "E3FD08BE"
       ]
     },
     "latest_d_final_qa": {
@@ -343,19 +345,17 @@
       "in_game_validation": "PENDING_ISOLATED_DDS_ONLY"
     },
     "latest_b_first_qa": {
-      "run": "B90",
-      "report": "localization/graphics/role_B/20260927-2145-B90/B90_D6DC1380_48DEBE77_REPORT.json",
-      "result": "D6_PASS_48_PRODUCTION_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "run": "B92",
+      "report": "localization/graphics/role_B/20260928-1231-B92/B92_62B_E3_ONE_PIXEL_REWORK_REPORT.json",
+      "result": "2_DXT5_REWORK_SELF_QA_PASS_PENDING_C_INGAME",
       "assets": {
-        "D6DC1380": {
-          "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
-          "candidate_changed_by_B": false,
-          "status": "FIRST_QA_PASS_PENDING_C_D_INGAME"
+        "62BEBF33": {
+          "candidate_sha256": "503f89fb2f68f5f3e8a86f527edf5aecb6219e31b1aa81c0678c2e54979dbd7e",
+          "status": "B92_SELF_QA_PASS_PENDING_C_INGAME"
         },
-        "48DEBE77": {
-          "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
-          "candidate_changed_by_B": true,
-          "status": "CREATE_NEW_HD_PRODUCTION_FIRST_QA_PASS_PENDING_C_D_INGAME"
+        "E3FD08BE": {
+          "candidate_sha256": "51982e41c33b2e95ddbf1039cd65b342b5f54a1c2a5dab0abee6b4c785a0f548",
+          "status": "B92_SELF_QA_PASS_PENDING_C_INGAME"
         }
       }
     },
