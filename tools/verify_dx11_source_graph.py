@@ -88,6 +88,15 @@ def main() -> None:
         "ShaderMixedPairSamples": "mixed VS/PS fail-closed counter",
         "ShaderFixedFunctionPendingSamples": "fixed-function F20 dependency counter",
         "ShaderProgrammablePendingSamples": "programmable F21 dependency counter",
+        "std::array<FixedFunctionStageSignature, 8>": "R81 all eight fixed-function texture stages",
+        "D3DSAMP_MINFILTER": "R81 per-stage sampler min filter observation",
+        "D3DSAMP_MAGFILTER": "R81 per-stage sampler mag filter observation",
+        "D3DSAMP_MIPFILTER": "R81 per-stage sampler mip filter observation",
+        "D3DSAMP_ADDRESSU": "R81 per-stage sampler U addressing observation",
+        "D3DSAMP_ADDRESSV": "R81 per-stage sampler V addressing observation",
+        "fixedFunctionStateCoverageExact": "R81 fixed-function coverage readiness evidence",
+        "FixedFunctionStateCoverageExactSamples": "R81 complete FFP observation counter",
+        "FixedFunctionStateCoverageFailureSamples": "R81 failed FFP observation counter",
         "shaderTranslationExact = false": "native shader translation remains fail-closed",
     }
     missing_contract = [
@@ -267,7 +276,7 @@ def main() -> None:
         "behaviorUnsupported": "descriptor behavior evidence",
         "mutationTelemetryRequired": "lock/update blocker evidence",
         "managedShadowRequired": "managed lifetime blocker evidence",
-        "R(?:7[23456789]|80) census": "R72 through R80 summary compatibility",
+        "R(?:7[23456789]|8[01]) census": "R72 through R81 summary compatibility",
         "mutationWriteUnlocks": "R74 write Lock/Unlock evidence",
         "mutationReadOnlyUnlocks": "R74 read-only Lock/Unlock evidence",
         "mutationDiscardWriteUnlocks": "R74 DISCARD evidence",
@@ -301,6 +310,10 @@ def main() -> None:
         "shaderMixedPair": "R80 mixed VS/PS pair evidence",
         "shaderFixedFunctionPending": "R80 fixed-function F20 dependency evidence",
         "shaderProgrammablePending": "R80 programmable F21 dependency evidence",
+        "fixedFunctionCoverageExact": "R81 complete fixed-function coverage evidence",
+        "fixedFunctionQueryFailure": "R81 failed fixed-function coverage evidence",
+        "samplerMin": "R81 per-stage sampler parser evidence",
+        "samplerAddressV": "R81 per-stage sampler parser evidence",
     }
     missing_analyzer = [
         meaning for token, meaning in analyzer_contract.items() if token not in analyzer
