@@ -10,9 +10,9 @@
   "wave_id": "W00002",
   "recorded_at_kst": "2026-09-28T22:36:00+09:00",
   "base_sha": "c7a7217735895473b6b8ff0326f458bb23446ec7",
-  "result_sha": "PENDING_SELF_REFERENCE_FINALIZATION",
+  "result_sha": "d570edf4978e627de0067561045cca8d7550c150",
   "result": "PASS_BARRIER_RECONCILED_NO_NEW_APPROVALS",
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "lane_terminals": {
     "A": {
@@ -41,5 +41,6 @@
   "runtime_test_performed": false,
   "n100_used": false,
   "gpt_library_used": false,
-  "vr_ffb_dx_changes": false
+  "vr_ffb_dx_changes": false,
+  "validation_note": "Verified the result commit is the current branch HEAD, carries the exact [AUTO:LOCALIZATION-LOCALIZATION_C-00010] marker, contains the expected seven reconciliation files, and keeps canonical/compatibility progress files byte-identical."
 }

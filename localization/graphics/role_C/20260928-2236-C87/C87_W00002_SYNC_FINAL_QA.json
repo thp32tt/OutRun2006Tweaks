@@ -74,9 +74,15 @@
   "candidate_dds_modified": false,
   "runtime_test_performed": false,
   "runtime_validation": "UNTESTED",
-  "automation_validation": "PENDING_COMMIT_VERIFICATION",
+  "automation_validation": "PASS",
   "n100_used": false,
   "gpt_library_used": false,
   "build_performed": false,
-  "vr_ffb_dx_changes": false
+  "vr_ffb_dx_changes": false,
+  "result_sha": "d570edf4978e627de0067561045cca8d7550c150",
+  "validation_evidence": {
+    "branch_head_verified": "d570edf4978e627de0067561045cca8d7550c150",
+    "expected_files_verified": 7,
+    "progress_compatibility_mirror_byte_identical": true
+  }
 }
