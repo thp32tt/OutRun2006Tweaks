@@ -1211,7 +1211,10 @@ namespace OutRunVRStereo
         {
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
-            return R30ResetR29Hook.stdcall<HRESULT>(device, params);
+            const HRESULT hr =
+                R30ResetR29Hook.stdcall<HRESULT>(device, params);
+            outrun::vr::dx11::observe_device_reset_generation(hr);
+            return hr;
         }
 
         // User-adjustable projection-space HUD scale. The per-eye FOV affine
