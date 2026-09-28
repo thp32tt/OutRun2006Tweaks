@@ -567,6 +567,10 @@ async def detect_conversation_limit(page: Page) -> bool:
 
 async def detect_limit(page: Page) -> bool:
     text = await visible_error_surface_text(page)
+    # A per-conversation length limit is recoverable by rolling into a new chat;
+    # never misclassify it as an account usage limit.
+    if any(re.search(p, text, flags=re.I | re.S) for p in CONVERSATION_LIMIT_PATTERNS):
+        return False
     matched = [p for p in LIMIT_PATTERNS if re.search(p, text, flags=re.I | re.S)]
     if matched:
         write_runtime(
