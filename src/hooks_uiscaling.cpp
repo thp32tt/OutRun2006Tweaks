@@ -126,10 +126,13 @@ class UIScaling : public Hook
 	static constexpr int OptionArrow_ClipSpriteCalls[] = {
 		0xE358B, 0xE35A3, 0xE35CC, 0xE35F7,
 		0xE481B, 0xE4833, 0xE485C, 0xE4887,
-		// R69 candidate: generic menu/list boundary arrows. Canonical EXE
-		// disassembly shows sprite 0x3004A/0x3004B emitted only at list
-		// previous/next boundaries; keep these exact instead of widening HUD rules.
-		0xEC24C, 0xEC277, 0xED4D4, 0xED7A3
+		// R69 generic menu/list boundary arrows.
+		0xEC24C, 0xEC277, 0xED4D4, 0xED7A3,
+		// V7 runtime-verified OutRun/menu arrows. The V6 HMD trace observed
+		// sprite 0x3004A directly from these three call edges while the older
+		// 12 owner edges had zero hits. Keep ownership exact and reuse the
+		// existing queued-node pinning path.
+		0x460F1, 0x463D6, 0x46410
 	};
 
 	// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
