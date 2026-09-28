@@ -88,8 +88,16 @@ ordered(
     "dxvkBridgeReady_ = true;",
     "PublishDxvkHostSharedBridge(true);",
 )
-if host_init.count("createSharedEye(") < 3:
-    raise SystemExit("DXVK bridge must allocate both eyes for every ring slot before publish")
+for marker in (
+    "&dxvkBridgeLeft_[slot]",
+    "dxvkBridgeState_->slots[slot].leftHandle",
+    "&dxvkBridgeRight_[slot]",
+    "dxvkBridgeState_->slots[slot].rightHandle",
+):
+    if marker not in host_init:
+        raise SystemExit(
+            f"DXVK bridge must allocate both eyes for every ring slot before publish: {marker}"
+        )
 
 game = require(
     "src/vr/d3d9/stereo_renderer_r7.inc",
