@@ -1,0 +1,20 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00009",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00002",
+  "initial_head_sha": "dae7b9908d495d578ac204afc356f2058743f98a",
+  "commit_base_sha": "f0f10146f37fa170c3838eac75721f6dff416047",
+  "result": "DURABLE_BLOCKER_GITHUB_SOURCE_BYTES_MISSING",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "scope": "GitHub-only B even-index primary shard refresh, anti-duplication review, source-byte availability gate, and self-QA eligibility check.",
+  "report": "localization/graphics/role_B/20260928-2223-B96/B96_W00002_GITHUB_SOURCE_GATE.json",
+  "shared_state_modified": false,
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "peer_lane_commit_preserved": "f0f10146f37fa170c3838eac75721f6dff416047"
+}
